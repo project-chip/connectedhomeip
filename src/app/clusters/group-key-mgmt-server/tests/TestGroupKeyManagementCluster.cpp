@@ -216,7 +216,7 @@ struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementC
     void VerifyGroupKeysMatch(const chip::FabricIndex fabricIndex,
                               const std::vector<GroupKeyManagement::Structs::GroupKeyMapStruct::Type> & expectedKeys)
     {
-        chip::Credentials::GroupDataProvider::GroupKeyIterator * iterator = mRealProvider.IterateGroupKeys(fabricIndex);
+        auto * iterator = mRealProvider.IterateGroupKeys(fabricIndex);
         ASSERT_NE(iterator, nullptr);
         ASSERT_EQ(iterator->Count(), expectedKeys.size());
 
@@ -225,16 +225,13 @@ struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementC
         while (iterator->Next(storedKey))
         {
             ASSERT_LT(i, expectedKeys.size());
-            if (i < expectedKeys.size())
-            {
-                EXPECT_EQ(storedKey.group_id, expectedKeys[i].groupId);
-                EXPECT_EQ(storedKey.keyset_id, expectedKeys[i].groupKeySetID);
-            }
-            i++;
+            EXPECT_EQ(storedKey.group_id, expectedKeys[i].groupId);
+            EXPECT_EQ(storedKey.keyset_id, expectedKeys[i].groupKeySetID);
+            ++i;
         }
 
         ASSERT_EQ(i, expectedKeys.size());
-        iterator->Release();
+        iterator->Release(); // ensure this frees memory or returns to pool
     }
 };
 // Cluster should accept writing multiple group keys with the same KeySetID but different Group IDs

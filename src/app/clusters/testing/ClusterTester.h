@@ -210,7 +210,10 @@ public:
 
         app::ConcreteAttributePath path(paths[0].mEndpointId, paths[0].mClusterId, attr);
         app::Testing::WriteOperation writeOp(path);
-        writeOp.SetSubjectDescriptor(chip::Access::SubjectDescriptor{ fabricIndex });
+
+        // Create a stable object on the stack beware of a dangling ptr fabric index will change
+        chip::Access::SubjectDescriptor subjectDescriptor{ fabricIndex };
+        writeOp.SetSubjectDescriptor(subjectDescriptor);
 
         uint8_t buffer[1024];
         chip::TLV::TLVWriter writer;
@@ -225,7 +228,6 @@ public:
         app::AttributeValueDecoder decoder(reader, *writeOp.GetRequest().subjectDescriptor);
         return mCluster.WriteAttribute(writeOp.GetRequest(), decoder).GetUnderlyingError();
     }
-
     // Write list of values
     template <typename ElementT>
     CHIP_ERROR WriteAttribute(AttributeId attr, const chip::app::DataModel::List<ElementT> & list, chip::FabricIndex fabricIndex)
@@ -235,8 +237,9 @@ public:
 
         app::ConcreteAttributePath path(paths[0].mEndpointId, paths[0].mClusterId, attr);
         app::Testing::WriteOperation writeOp(path);
-        writeOp.SetSubjectDescriptor(chip::Access::SubjectDescriptor{ fabricIndex });
-
+        // Create a stable object on the stack beware of a dangling ptr fabric index will change
+        chip::Access::SubjectDescriptor subjectDescriptor{ fabricIndex };
+        writeOp.SetSubjectDescriptor(subjectDescriptor);
         uint8_t buffer[1024];
         chip::TLV::TLVWriter writer;
         writer.Init(buffer);
@@ -268,13 +271,14 @@ private:
         {
             return chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), value);
         }
-        else if constexpr (HasGenericEncode<T>::value)
-        {
-            return value.Encode(writer, chip::TLV::AnonymousTag());
-        }
-        else if constexpr (HasEncodeForWrite<T>::value)
+        // *** FIX: CHECK FOR EncodeForWrite FIRST ***
+        else if constexpr (HasEncodeForWrite<T>::value) // <-- Path B
         {
             return value.EncodeForWrite(writer, chip::TLV::AnonymousTag());
+        }
+        else if constexpr (HasGenericEncode<T>::value) // <-- Path A
+        {
+            return value.Encode(writer, chip::TLV::AnonymousTag());
         }
         else
         {
