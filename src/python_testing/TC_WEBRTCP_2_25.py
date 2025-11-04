@@ -58,6 +58,7 @@ class TC_WEBRTCP_2_25(MatterBaseTest, WEBRTCPTestBase):
 
     def steps_TC_WEBRTCP_2_25(self) -> list[TestStep]:
         steps = [
+            TestStep("precondition", "DUT commissioned", is_commissioning=True),
             TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
                      "DUT responds with success and provides stream IDs"),
             TestStep(2, "TH sends the ProvideOffer command with SFrameConfig containing unsupported cipher suite",
@@ -90,6 +91,8 @@ class TC_WEBRTCP_2_25(MatterBaseTest, WEBRTCPTestBase):
         Executes the test steps for validating ProvideOffer SFrame configuration handling.
         """
 
+        self.step("precondition")
+        # Commission DUT - already done
         endpoint = self.get_endpoint(default=1)
 
         # SFrame cipher suite constants (from SFrame RFC)
