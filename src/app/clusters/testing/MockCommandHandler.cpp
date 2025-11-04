@@ -55,10 +55,10 @@ CHIP_ERROR MockCommandHandler::AddResponseData(const ConcreteCommandPath & aRequ
     DataModel::FabricAwareTLVWriter writer(baseWriter, mFabricIndex);
     TLV::TLVType ct;
 
-    ReturnErrorOnFailure(static_cast<TLV::TLVWriter &>(writer).StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, ct));
+    ReturnErrorOnFailure(writer.mTLVWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, ct));
     ReturnErrorOnFailure(aEncodable.EncodeTo(writer, TLV::ContextTag(app::CommandDataIB::Tag::kFields)));
-    ReturnErrorOnFailure(static_cast<TLV::TLVWriter &>(writer).EndContainer(ct));
-    handle->SetDataLength(static_cast<TLV::TLVWriter &>(writer).GetLengthWritten());
+    ReturnErrorOnFailure(writer.mTLVWriter.EndContainer(ct));
+    handle->SetDataLength(writer.mTLVWriter.GetLengthWritten());
 
     mResponses.emplace_back(ResponseRecord{ aResponseCommandId, std::move(handle), aRequestCommandPath });
     return CHIP_NO_ERROR;
