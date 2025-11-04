@@ -13,15 +13,4 @@
 // the License.
 #pragma once
 
-// this is needed so that CONFIG_* are visible to the backend
-#include "sdkconfig.h"
-
-#include "freertos/FreeRTOS.h"
-#include "freertos/semphr.h"
-
-namespace pw::sync::backend {
-
-using NativeMutex       = StaticSemaphore_t;
-using NativeMutexHandle = NativeMutex &;
-
-} // namespace pw::sync::backend
+#include "pw_sync_esp32/mutex_native.h"

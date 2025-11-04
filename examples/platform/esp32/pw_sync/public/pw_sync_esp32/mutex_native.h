@@ -15,7 +15,6 @@
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
-#include "sdkconfig.h"
 
 namespace pw::sync::backend {
 

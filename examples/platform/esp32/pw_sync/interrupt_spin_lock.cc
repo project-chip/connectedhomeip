@@ -18,7 +18,6 @@
 #include "freertos/portmacro.h"
 #include "freertos/task.h"
 #include "pw_assert/check.h"
-#include "sdkconfig.h"
 
 namespace pw::sync {
 
@@ -39,25 +38,15 @@ void InterruptSpinLock::lock()
 {
     if (InInterruptContext())
     {
-        native_type_.saved_interrupt_mask = taskENTER_CRITICAL_FROM_ISR();
+        portENTER_CRITICAL_ISR(&s_interrupt_spin_lock_mux);
     }
     else
-    { // Task context
-        // Suspending the scheduler ensures that kernel API calls that occur
-        // within the critical section will not preempt the current task
-        // (if called from a thread context).  Otherwise, kernel APIs called
-        // from within the critical section may preempt the running task if
-        // the port implements portYIELD synchronously.
-        // Note: calls to vTaskSuspendAll(), like vTaskEnterCritical() can
-        // be nested.
-        // Note: vTaskSuspendAll()/xTaskResumeAll() are not safe to call before the
-        // scheduler has been started.
-        if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
-        {
-            vTaskSuspendAll();
-        }
+    {
+        // Task context
         vPortEnterCritical(&s_interrupt_spin_lock_mux);
     }
+    // NOTE: This recursion check is flawed. A recursive call on the same core
+    // will deadlock before this check is reached.
     // We can't deadlock here so crash instead.
     PW_DCHECK(!native_type_.locked, "Recursive InterruptSpinLock::lock() detected");
     native_type_.locked = true;
@@ -68,15 +57,12 @@ void InterruptSpinLock::unlock()
     native_type_.locked = false;
     if (InInterruptContext())
     {
-        taskEXIT_CRITICAL_FROM_ISR(native_type_.saved_interrupt_mask);
+        portEXIT_CRITICAL_ISR(&s_interrupt_spin_lock_mux);
     }
     else
-    { // Task context
+    {
+        // Task context
         vPortExitCritical(&s_interrupt_spin_lock_mux);
-        if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
-        {
-            xTaskResumeAll();
-        }
     }
 }
 

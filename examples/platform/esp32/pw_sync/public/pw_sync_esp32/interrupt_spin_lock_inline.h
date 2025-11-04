@@ -17,7 +17,7 @@
 
 namespace pw::sync {
 
-constexpr InterruptSpinLock::InterruptSpinLock() : native_type_{ .locked = false, .saved_interrupt_mask = 0 } {}
+constexpr InterruptSpinLock::InterruptSpinLock() : native_type_{ .locked = false } {}
 
 inline InterruptSpinLock::native_handle_type InterruptSpinLock::native_handle()
 {
@@ -26,8 +26,9 @@ inline InterruptSpinLock::native_handle_type InterruptSpinLock::native_handle()
 
 inline bool InterruptSpinLock::try_lock()
 {
-    // This backend does not support SMP and on a uniprocessor we cannot actually
-    // fail to acquire the lock. Recursive locking is already detected by lock().
+    // This backend is for a multicore system. The underlying ESP-IDF primitives
+    // do not support a non-blocking try_lock, so this implementation is
+    // blocking. Recursive locking is already detected by lock().
     lock();
     return true;
 }
