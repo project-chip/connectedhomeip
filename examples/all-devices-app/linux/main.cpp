@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <AllClustersExampleDeviceInfoProviderImpl.h>
+#include <AllDevicesExampleDeviceInfoProviderImpl.h>
 #include <AppMain.h>
 #include <LinuxCommissionableDataProvider.h>
 #include <TracingCommandLineArgument.h>
@@ -46,7 +46,7 @@ AppMainLoopImplementation * gMainLoopImplementation = nullptr;
 
 DeviceLayer::NetworkCommissioning::LinuxWiFiDriver sWiFiDriver;
 
-AllClustersExampleDeviceInfoProviderImpl gExampleDeviceInfoProvider;
+AllDevicesExampleDeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 // To hold SPAKE2+ verifier, discriminator, passcode
 LinuxCommissionableDataProvider gCommissionableDataProvider;
