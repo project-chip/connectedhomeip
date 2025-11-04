@@ -912,7 +912,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
         await attr_handler_step7.cancel()
 
-        # Step 8: Wildcard subscription (endpoint + cluster)
+        # Step 8: Attribute wildcard subscription 
         # (This was originally test step 17 in the test plan)
         self.step(8)
 
