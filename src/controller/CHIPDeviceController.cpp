@@ -2552,12 +2552,12 @@ CHIP_ERROR DeviceCommissioner::ParseNetworkCommissioningInfo(ReadCommissioningIn
                 ChipLogProgress(Controller, "NetworkCommissioning Features: has WiFi. endpointid = %u", path.mEndpointId);
                 info.network.wifi.endpoint = path.mEndpointId;
             }
-            else if (features.Has(NetworkCommissioning::Feature::kThreadNetworkInterface))
+            if (features.Has(NetworkCommissioning::Feature::kThreadNetworkInterface))
             {
                 ChipLogProgress(Controller, "NetworkCommissioning Features: has Thread. endpointid = %u", path.mEndpointId);
                 info.network.thread.endpoint = path.mEndpointId;
             }
-            else if (features.Has(NetworkCommissioning::Feature::kEthernetNetworkInterface))
+            if (features.Has(NetworkCommissioning::Feature::kEthernetNetworkInterface))
             {
                 ChipLogProgress(Controller, "NetworkCommissioning Features: has Ethernet. endpointid = %u", path.mEndpointId);
                 info.network.eth.endpoint = path.mEndpointId;
