@@ -72,6 +72,10 @@ class TC_WEBRTCP_2_10(MatterBaseTest, WEBRTCPTestBase):
         ]
         return pics
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_WEBRTCP_2_10(self):
         """
@@ -80,7 +84,7 @@ class TC_WEBRTCP_2_10(MatterBaseTest, WEBRTCPTestBase):
 
         self.step("precondition")
         # Commission DUT - already done
-        endpoint = self.user_params.get("endpoint", 1)
+        endpoint = self.get_endpoint()
         # Use a specific originating endpoint ID to test storage
         originating_endpoint_id = 5
 
