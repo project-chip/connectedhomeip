@@ -25,7 +25,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/CommandDataIB.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
-#include <app/clusters/testing/CommandTesting.h>
+#include <app/clusters/testing/MockCommandHandler.h>
 #include <app/clusters/tls-client-management-server/tls-client-management-server.h>
 #include <app/tests/AppTestContext.h>
 #include <lib/core/Optional.h>
