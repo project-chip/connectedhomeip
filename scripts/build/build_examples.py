@@ -47,9 +47,8 @@ class Context:
             for target_meta in build.targets.BUILD_TARGETS:
                 if target_meta.StringIntoTargetParts(target):
                     builder = target_meta.Create(
-                        name=target,
+                        root=self.repository_path,
                         runner=self.runner,
-                        repository_path=self.repository_path,
                         output_prefix=self.output_prefix,
                         verbose=self.verbose,
                         ninja_jobs=self.ninja_jobs,
