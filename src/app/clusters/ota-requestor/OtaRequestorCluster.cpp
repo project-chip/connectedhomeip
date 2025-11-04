@@ -46,8 +46,16 @@ DataModel::ActionReturnStatus OtaRequestorCluster::ReadAttribute(
 {
     switch (request.path.mAttributeId)
     {
-    case OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id:
-        return Protocols::InteractionModel::Status::UnsupportedRead;
+    case OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id: {
+        return encoder.EncodeList([this](const auto & listEncoder) -> CHIP_ERROR {
+            ProviderLocationList::Iterator providerIterator = mOtaRequestor.GetDefaultOTAProviderListIterator();
+            CHIP_ERROR error = CHIP_NO_ERROR;
+            while (error == CHIP_NO_ERROR && providerIterator.Next()) {
+                error = listEncoder.Encode(providerIterator.GetValue());
+            }
+            return error;
+        });
+    }
     case OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id:
         return encoder.Encode(mOtaRequestor.GetUpdatePossible());
     case OtaSoftwareUpdateRequestor::Attributes::UpdateState::Id:
