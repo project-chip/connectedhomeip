@@ -19,16 +19,17 @@
 #pragma once
 
 #include "resource-monitoring-cluster.h"
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
+
+using namespace chip::app::Clusters::ResourceMonitoring;
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace ResourceMonitoring {
 
-class Instance : public ResourceMonitoringCluster
+struct Instance
 {
-
-public:
     /**
      * Creates an Instance object which wraps a resource monitoring cluster object and attaches the provided delegate.
      *
@@ -45,20 +46,21 @@ public:
      * @param aDegradationDirection            The degradation direction of the cluster.
      * @param resetConditionCommandSupported   Whether the ResetCondition command is supported by the cluster.
      */
-    Instance(Delegate * delegate, EndpointId endpointId, ClusterId clusterId, uint32_t featureMap,
-             DegradationDirectionEnum degradationDirection, bool resetConditionCommandSupported) :
-        ResourceMonitoringCluster(endpointId, clusterId, BitFlags<ResourceMonitoring::Feature>{ featureMap },
-                                  OptionalAttributeSet{ ResourceMonitoring::Attributes::Condition::Id |
-                                                        ResourceMonitoring::Attributes::DegradationDirection::Id |
-                                                        ResourceMonitoring::Attributes::InPlaceIndicator::Id |
-                                                        ResourceMonitoring::Attributes::LastChangedTime::Id },
-                                  degradationDirection, resetConditionCommandSupported)
-    {
-        SetDelegate(delegate);
-    }
+    Instance(Delegate * delegate, chip::EndpointId endpointId, chip::ClusterId clusterId, uint32_t featureMap,
+             DegradationDirectionEnum degradationDirection, bool resetConditionCommandSupported);
+    
+    ~Instance();
+
+
+    CHIP_ERROR Init() { return mCluster.Cluster().Init(); };
+
+
+    Instance * nextInstance = nullptr;
+
+    chip::app::RegisteredServerCluster<chip::app::Clusters::ResourceMonitoring::ResourceMonitoringCluster> mCluster;
 };
 
-} // namespace ResourceMonitoring
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // ResourceMonitoring
+} // Clusters
+} // app
+} // chip
