@@ -48,19 +48,17 @@ struct Instance
      */
     Instance(Delegate * delegate, chip::EndpointId endpointId, chip::ClusterId clusterId, uint32_t featureMap,
              DegradationDirectionEnum degradationDirection, bool resetConditionCommandSupported);
-    
+
     ~Instance();
 
-
     CHIP_ERROR Init() { return mCluster.Cluster().Init(); };
-
 
     Instance * nextInstance = nullptr;
 
     chip::app::RegisteredServerCluster<chip::app::Clusters::ResourceMonitoring::ResourceMonitoringCluster> mCluster;
 };
 
-} // ResourceMonitoring
-} // Clusters
-} // app
-} // chip
+} // namespace ResourceMonitoring
+} // namespace Clusters
+} // namespace app
+} // namespace chip
