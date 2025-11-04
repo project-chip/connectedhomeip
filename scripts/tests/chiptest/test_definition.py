@@ -160,8 +160,8 @@ class App:
 
         def searchSymptoms():
             for s in symptoms:
-                # s[0] = found, s[1] = index
-                symptom_dict[s] = outpipe.CapturedLogContains(s, self.lastLogIndex)
+                found, index = outpipe.CapturedLogContains(s, self.lastLogIndex)
+                symptom_dict[s] = found, index
 
             ready = all([s[0] for s in symptom_dict.values()])
             if ready:
@@ -171,9 +171,7 @@ class App:
         ready = searchSymptoms()
         while not ready:
             if server_process.poll() is not None:
-                died_str = f'Server died while waiting for {symptoms!r}, '
-                'returncode {server_process.returncode}'
-
+                died_str = f'Server died while waiting for {symptoms!r}, returncode {server_process.returncode}'
                 logging.error(died_str)
                 raise Exception(died_str)
             if time.monotonic() - start_time > timeoutInSeconds:
