@@ -32,10 +32,19 @@ void JitterDeferredProviderChangeListener::MarkDirty(const AttributePathParams &
         mUnderlyingListener->MarkDirty(path);
         return;
     }
+
     if (mCurrentIndex >= kMaxAttributePathsBufferSize)
     {
         // When attribute path buffer is full, flush and process existing paths to make room
         FlushDirtyPaths();
+    }
+
+    for (uint32_t i = 0; i < mCurrentIndex; ++i)
+    {
+        if (mAttributePaths[i] == path)
+        {
+            return;
+        }
     }
     mAttributePaths[mCurrentIndex++] = path;
     if (!mTimerActive)
