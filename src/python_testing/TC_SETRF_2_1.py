@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -177,7 +178,7 @@ class TC_SETRF_2_1(CommodityTariffTestBaseHelper):
                         - Verify that entry does NOT contain RandomizationType field if SETRF.S.F05(RNDM) is False;
                         - If SETRF.S.F05(RNDM) is True and RandomizationType field is presented it has DayEntryRandomizationType type. Value has to be between a range of 0 - 4;
                         - Store the field value randomizationTypeValue;
-                     - RandomizationOffset field: 
+                     - RandomizationOffset field:
                         - Verify that entry does NOT contain RandomizationOffset fields if SETRF.S.F05(RNDM) is False;
                         - If SETRF.S.F05(RNDM) is True and randomizationTypeValue is 0x01 (Fixed) and RandomizationOffset field is presented, it has an int16 value;
                         - If SETRF.S.F05(RNDM) is True and randomizationTypeValue is 0x04 (RandomNegative) and RandomizationOffset field is presented, it has an int16 value less or equal 0;

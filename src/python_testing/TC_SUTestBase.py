@@ -186,7 +186,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         """Verify the version from the BasicInformationCluster and compares against the provider target version.
 
         Args:
-            controller (ChipDeviceCtrl): Controller 
+            controller (ChipDeviceCtrl): Controller
             node_id (int): Node to request
             target_version (int): Version to compare
         """

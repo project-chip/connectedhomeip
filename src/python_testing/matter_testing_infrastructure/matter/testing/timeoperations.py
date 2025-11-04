@@ -100,7 +100,7 @@ def utc_datetime_from_posix_time_ms(posix_time_ms: int) -> datetime:
         posix_time_ms: int, Unix timestamp in milliseconds since Jan 1, 1970
 
     Returns:
-        datetime: UTC datetime   
+        datetime: UTC datetime
 
     Examples:
         >>> utc_datetime_from_posix_time_ms(0)
