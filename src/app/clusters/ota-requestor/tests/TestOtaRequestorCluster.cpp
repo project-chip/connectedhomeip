@@ -73,6 +73,10 @@ public:
     }
     OTAUpdateStateEnum GetCurrentUpdateState() override
     {
+        return OTAUpdateStateEnum::kIdle;
+    }
+    DataModel::Nullable<uint8_t> GetCurrentUpdateStateProgress() override
+    {
         return {};
     }
     uint32_t GetTargetVersion() override
@@ -95,6 +99,11 @@ public:
     {
         ProviderLocationList::Iterator result(nullptr, 0);
         return result;
+    }
+    void SetUpdatePossible(bool updatePossible) override {}
+    bool GetUpdatePossible() override
+    {
+        return true;
     }
 
     OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType GetLastAnnounceCommandPayload() const
@@ -289,7 +298,8 @@ TEST_F(TestOtaRequestorCluster, ReadAttributesTest)
 
     // Read and verify UpdateStateProgress.
     DataModel::Nullable<uint8_t> updateStateProgress;
-    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id, updateStateProgress),
+    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id,
+                                   updateStateProgress),
               CHIP_NO_ERROR);
     EXPECT_TRUE(updateStateProgress.IsNull());
 

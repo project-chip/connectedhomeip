@@ -46,14 +46,18 @@ DataModel::ActionReturnStatus OtaRequestorCluster::ReadAttribute(
 {
     switch (request.path.mAttributeId)
     {
-    case Attributes::DefaultOTAProviders::Id:
+    case OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id:
         return Protocols::InteractionModel::Status::UnsupportedRead;
-    case Attributes::UpdatePossible::Id:
-        return Protocols::InteractionModel::Status::UnsupportedRead;
-    case Attributes::UpdateStatus::Id:
-        return Protocols::InteractionModel::Status::UnsupportedRead;
-    case Attributes::UpdateStatusProgress::Id:
-        return Protocols::InteractionModel::Status::UnsupportedRead;
+    case OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id:
+        return encoder.Encode(mOtaRequestor.GetUpdatePossible());
+    case OtaSoftwareUpdateRequestor::Attributes::UpdateState::Id:
+        return encoder.Encode(mOtaRequestor.GetCurrentUpdateState());
+    case OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id:
+        return encoder.Encode(mOtaRequestor.GetCurrentUpdateStateProgress());
+    case Globals::Attributes::FeatureMap::Id:
+        return encoder.Encode<uint32_t>(0);
+    case Globals::Attributes::ClusterRevision::Id:
+        return encoder.Encode(OtaSoftwareUpdateRequestor::kRevision);
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }

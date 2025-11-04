@@ -75,6 +75,9 @@ public:
     // Get the current state of the OTA update
     OTAUpdateStateEnum GetCurrentUpdateState() override { return mCurrentUpdateState; }
 
+    // Get the progress of the current OTA update state
+    app::DataModel::Nullable<uint8_t> GetCurrentUpdateStateProgress() override { return mCurrentUpdateStateProgress; }
+
     // Get the target version of the OTA update
     uint32_t GetTargetVersion() override { return mTargetVersion; }
 
@@ -101,6 +104,12 @@ public:
 
     // Retrieve an iterator to the cached default OTA provider list
     ProviderLocationList::Iterator GetDefaultOTAProviderListIterator(void) override { return mDefaultOtaProviderList.Begin(); }
+
+    // Set the attribute that indicates whether updates are possible
+    virtual void SetUpdatePossible(bool updatePossible) override { mUpdatePossible = updatePossible; }
+
+    // Retrieve the attribute that indicates whether updates are possible
+    virtual bool GetUpdatePossible() { return mUpdatePossible; }
 
     //////////// BDXDownloader::StateDelegate Implementation ///////////////
     void OnDownloadStateChanged(OTADownloader::State state,
@@ -204,11 +213,6 @@ private:
         chip::Messaging::ExchangeContext * mExchangeCtx;
         chip::BDXDownloader * mDownloader;
     };
-
-    /**
-     * Callback to initialize states and server attributes in the CHIP context
-     */
-    static void InitState(intptr_t context);
 
     /**
      * Map a CHIP_ERROR to an IdleStateReason enum type
@@ -336,13 +340,15 @@ private:
     char mFileDesignatorBuffer[bdx::kMaxFileDesignatorLen];
     CharSpan mFileDesignator;
     OTAUpdateStateEnum mCurrentUpdateState = OTAUpdateStateEnum::kUnknown;
-    Server * mServer                       = nullptr;
+    app::DataModel::Nullable<uint8_t> mCurrentUpdateStateProgress;
+    Server * mServer = nullptr;
     ProviderLocationList mDefaultOtaProviderList;
     // Provider location used for the current/last update in progress. Note that on reboot, this value will be read from the
     // persistent storage (if available), used for sending the NotifyApplied message, and then cleared. This will ensure determinism
     // in the OTARequestorDriver on reboot.
     Optional<ProviderLocationType> mProviderLocation;
     SessionHolder mSessionHolder;
+    bool mUpdatePossible = true;
 };
 
 } // namespace chip

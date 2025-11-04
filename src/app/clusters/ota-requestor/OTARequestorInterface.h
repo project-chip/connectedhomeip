@@ -190,6 +190,9 @@ public:
     // Get the current state of the OTA update
     virtual OTAUpdateStateEnum GetCurrentUpdateState() = 0;
 
+    // Get the progress of the current state of the OTA update
+    virtual chip::app::DataModel::Nullable<uint8_t> GetCurrentUpdateStateProgress() = 0;
+
     // Get the target version of the OTA update
     virtual uint32_t GetTargetVersion() = 0;
 
@@ -215,6 +218,12 @@ public:
 
     // Retrieve an iterator to the cached default OTA provider list
     virtual ProviderLocationList::Iterator GetDefaultOTAProviderListIterator(void) = 0;
+
+    // Set the attribute that indicates whether updates are possible
+    virtual void SetUpdatePossible(bool updatePossible) = 0;
+
+    // Retrieve the attribute that indicates whether updates are possible
+    virtual bool GetUpdatePossible() = 0;
 };
 
 // The instance of the class implementing OTARequestorInterface must be managed through
