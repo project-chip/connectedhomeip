@@ -92,7 +92,7 @@ class Context:
 
     def CopyArtifactsTo(self, directory):
         for target_name, builder in self.builders.items():
-            builder.CopyArtifacts(directory)
+            builder.CopyArtifacts(os.path.join(directory, builder.identifier))
 
     def CreateArtifactArchives(self, directory):
         for target_name, builder in self.builders.items():
