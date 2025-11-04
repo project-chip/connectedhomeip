@@ -83,31 +83,31 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
     def steps_TC_IDM_4_3(self):
         return [
-                TestStep(1, "DUT and TH activate the subscription for an attribute. Do not change the value of the attribute which has been subscribed.",
-                         "Verify that there is an empty report data message sent from the DUT to the TH after the MinInterval time and no later than the MaxInterval time plus an additional duration equal to the total retransmission time according to negotiated MRP parameters."),
-                TestStep(2, "Activate the subscription between the DUT and the TH for an attribute. Change the value of the attribute which has been subscribed on the DUT by sending a Write command from the TH.",
-                        "Verify that there is a report data message sent from the DUT for the changed value of the attribute. Verify that the Report Data is sent after the MinIntervalFloor time is reached and before the MaxInterval time."),
-                TestStep(3, "Activate the subscription between the DUT and the TH for any attribute. KeepSubscriptions flag should be set to False Save the returned MaxInterval value as original_max_interval TH then sends another subscription request message for the same attribute with different parameters than before. KeepSubscriptions flag should be set to False Wait for original_max_interval. Change the value of the attribute requested on the DUT.",
-                         "Verify that the DUT sends the changed value of the attribute with the newest subscription id sent with the second request."),
-                TestStep(4, "Activate the subscription between the DUT and the TH for any attribute with MinIntervalFloor set to 5 seconds and MaxIntervalCeiling set to 10. Save the returned MaxInterval as max_interval. Wait to receive the empty report on the subscription and save the time the report was received as time_empty. TH then changes the attribute and waits for a data report. Save the time the report was received as time_data. TH then waits for a second empty report on the subscription and saves the time the report was received as time_empty_2",
-                         "Verify that time_data - time_empty is larger than the MinIntervalFloor and smaller than max_interval plus an additional duration equal to the total retransmission time according to negotiated MRP parameters. Verify that time_empty_2 - time_data is larger than the MinIntervalFloor and smaller than max_interval plus an additional duration equal to the total retransmission time according to negotiated MRP parameters."),
-                TestStep(5, "TH sends a subscription request action for an attribute to the DUT with the KeepSubscriptions flag set to False. Activate the subscription between DUT and the TH. Initiate another subscription request action to the DUT for another attribute with the KeepSubscriptions flag set to True. Change both the attribute values on the DUT.",
-                         "Verify that the TH receives reports for both these attributes on their respective subscriptions."),
-                TestStep(6, "TH sends a subscription request action for an attribute to the DUT with the KeepSubscriptions flag set to False. Activate the subscription between DUT and the TH. Initiate another subscription request action to the DUT for another attribute with the KeepSubscriptions flag set to False. Change both the attribute values on the DUT.",
-                         "Verify that the TH receives a report for the second attribute on the second subscription. Verify that that the TH does not receive a report on the first subscription."),
-                TestStep(7, "TH sends a subscription request action for an attribute and all events. Change the value of the attribute and trigger an action on the DUT to trigger any event.",
-                         "Verify on TH that DUT sends a report action data for both the attribute and the event."),
-                TestStep(8, "TH sends a subscription request action for attribute wildcard - AttributePath = [[Endpoint = EndpointID, Cluster = ClusterID]] for a cluster where more than 1 attribute can be changed by the TH. Change all or few of the attributes on the DUT",
+            TestStep(1, "DUT and TH activate the subscription for an attribute. Do not change the value of the attribute which has been subscribed.",
+                     "Verify that there is an empty report data message sent from the DUT to the TH after the MinInterval time and no later than the MaxInterval time plus an additional duration equal to the total retransmission time according to negotiated MRP parameters."),
+            TestStep(2, "Activate the subscription between the DUT and the TH for an attribute. Change the value of the attribute which has been subscribed on the DUT by sending a Write command from the TH.",
+                     "Verify that there is a report data message sent from the DUT for the changed value of the attribute. Verify that the Report Data is sent after the MinIntervalFloor time is reached and before the MaxInterval time."),
+            TestStep(3, "Activate the subscription between the DUT and the TH for any attribute. KeepSubscriptions flag should be set to False Save the returned MaxInterval value as original_max_interval TH then sends another subscription request message for the same attribute with different parameters than before. KeepSubscriptions flag should be set to False Wait for original_max_interval. Change the value of the attribute requested on the DUT.",
+                     "Verify that the DUT sends the changed value of the attribute with the newest subscription id sent with the second request."),
+            TestStep(4, "Activate the subscription between the DUT and the TH for any attribute with MinIntervalFloor set to 5 seconds and MaxIntervalCeiling set to 10. Save the returned MaxInterval as max_interval. Wait to receive the empty report on the subscription and save the time the report was received as time_empty. TH then changes the attribute and waits for a data report. Save the time the report was received as time_data. TH then waits for a second empty report on the subscription and saves the time the report was received as time_empty_2",
+                     "Verify that time_data - time_empty is larger than the MinIntervalFloor and smaller than max_interval plus an additional duration equal to the total retransmission time according to negotiated MRP parameters. Verify that time_empty_2 - time_data is larger than the MinIntervalFloor and smaller than max_interval plus an additional duration equal to the total retransmission time according to negotiated MRP parameters."),
+            TestStep(5, "TH sends a subscription request action for an attribute to the DUT with the KeepSubscriptions flag set to False. Activate the subscription between DUT and the TH. Initiate another subscription request action to the DUT for another attribute with the KeepSubscriptions flag set to True. Change both the attribute values on the DUT.",
+                     "Verify that the TH receives reports for both these attributes on their respective subscriptions."),
+            TestStep(6, "TH sends a subscription request action for an attribute to the DUT with the KeepSubscriptions flag set to False. Activate the subscription between DUT and the TH. Initiate another subscription request action to the DUT for another attribute with the KeepSubscriptions flag set to False. Change both the attribute values on the DUT.",
+                     "Verify that the TH receives a report for the second attribute on the second subscription. Verify that that the TH does not receive a report on the first subscription."),
+            TestStep(7, "TH sends a subscription request action for an attribute and all events. Change the value of the attribute and trigger an action on the DUT to trigger any event.",
+                     "Verify on TH that DUT sends a report action data for both the attribute and the event."),
+            TestStep(8, "TH sends a subscription request action for attribute wildcard - AttributePath = [[Endpoint = EndpointID, Cluster = ClusterID]] for a cluster where more than 1 attribute can be changed by the TH. Change all or few of the attributes on the DUT",
+                     "Verify that the DUT sends reports for all the attributes that have changed."),
+            TestStep(9, "TH sends a subscription request to subscribe to an attribute on a specific cluster from all endpoints AttributePath = [[Attribute = Attribute, Cluster = ClusterID ]]. Change the attribute on the DUT",
+                     "Verify that the DUT sends a priming reports for all the attributes."),
+            TestStep(10, "TH sends a subscription request to subscribe to all attributes from all clusters from all endpoints. AttributePath = [[]]. Change all or few of the attributes on the DUT",
                          "Verify that the DUT sends reports for all the attributes that have changed."),
-                TestStep(9, "TH sends a subscription request to subscribe to an attribute on a specific cluster from all endpoints AttributePath = [[Attribute = Attribute, Cluster = ClusterID ]]. Change the attribute on the DUT",
+            TestStep(11, "TH sends a sub scription request to subscribe to all attributes from all clusters on an endpoint. AttributePath = [[Endpoint = EndpointID]]. Change all or few of the attributes on the DUT",
+                         "Verify that the DUT sends reports for all the attributes that have changed."),
+            TestStep(12, "TH sends a subscription request to subscribe to all attributes from a specific cluster on all endpoints. AttributePath = [[Cluster = ClusterID]].",
                          "Verify that the DUT sends a priming reports for all the attributes."),
-                TestStep(10, "TH sends a subscription request to subscribe to all attributes from all clusters from all endpoints. AttributePath = [[]]. Change all or few of the attributes on the DUT",
-                         "Verify that the DUT sends reports for all the attributes that have changed."),
-                TestStep(11, "TH sends a sub scription request to subscribe to all attributes from all clusters on an endpoint. AttributePath = [[Endpoint = EndpointID]]. Change all or few of the attributes on the DUT",
-                         "Verify that the DUT sends reports for all the attributes that have changed."),
-                TestStep(12, "TH sends a subscription request to subscribe to all attributes from a specific cluster on all endpoints. AttributePath = [[Cluster = ClusterID]].",
-                         "Verify that the DUT sends a priming reports for all the attributes."),
-                ]
+        ]
 
     def all_device_clusters(self) -> set:
         device_clusters = set()
@@ -577,7 +577,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         attr_handler_step3_second = AttributeSubscriptionHandler(
             expected_cluster=Clusters.BasicInformation,
             expected_attribute=node_label_attr
-            )
+        )
         sub_step3_second = await attr_handler_step3_second.start(
             dev_ctrl=TH,
             node_id=self.dut_node_id,
@@ -586,7 +586,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
             min_interval_sec=self.min_interval_floor_sec + 1,
             max_interval_sec=self.max_interval_ceiling_sec + 1,
             keepSubscriptions=False
-            )
+        )
         self._init_subscription_callback(sub_step3_second)
 
         second_sub_id = sub_step3_second.subscriptionId
@@ -912,7 +912,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
         await attr_handler_step7.cancel()
 
-        # Step 8: Attribute wildcard subscription 
+        # Step 8: Attribute wildcard subscription
         # (This was originally test step 17 in the test plan)
         self.step(8)
 
