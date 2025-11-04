@@ -84,8 +84,6 @@ private:
     }
 #endif // CHIP_CONFIG_ENABLE_ICD_LIT
 
-ICDManagementServer ICDManagementServer::instance;
-
 #if CHIP_CONFIG_ENABLE_ICD_CIP
     CHIP_ERROR ReadRegisteredClients(EndpointId endpoint, AttributeValueEncoder & encoder);
     CHIP_ERROR ReadICDCounter(EndpointId endpoint, AttributeValueEncoder & encoder);
@@ -190,14 +188,8 @@ private:
 /*
  * ICD Management Implementation
  */
-#if CHIP_CONFIG_ENABLE_ICD_CIP
-PersistentStorageDelegate * ICDManagementServer::mStorage           = nullptr;
-Crypto::SymmetricKeystore * ICDManagementServer::mSymmetricKeystore = nullptr;
-#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
-ICDConfigurationData * ICDManagementServer::mICDConfigurationData = nullptr;
-
-namespace {
+ namespace {
 IcdManagementAttributeAccess gAttribute;
 #if CHIP_CONFIG_ENABLE_ICD_CIP
 IcdManagementFabricDelegate gFabricDelegate;
@@ -285,6 +277,12 @@ CHIP_ERROR CheckAdmin(CommandHandler * commandObj, const ConcreteCommandPath & c
 }
 
 } // namespace
+
+namespace chip {
+namespace app {
+namespace Clusters {
+
+ICDManagementServer ICDManagementServer::instance;
 
 Status ICDManagementServer::RegisterClient(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                            const Commands::RegisterClient::DecodableType & commandData, uint32_t & icdCounter)
@@ -427,7 +425,10 @@ void ICDManagementServer::OnICDModeChange()
     MatterReportingAttributeChangeCallback(kRootEndpointId, IcdManagement::Id, IcdManagement::Attributes::OperatingMode::Id);
 }
 
-} // namespace chip::app::Clusters
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
 /**********************************************************
  * Callbacks Implementation
  *********************************************************/
