@@ -271,7 +271,6 @@ private:
         {
             return chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), value);
         }
-        // *** FIX: CHECK FOR EncodeForWrite FIRST ***
         else if constexpr (HasEncodeForWrite<T>::value) // <-- Path B
         {
             return value.EncodeForWrite(writer, chip::TLV::AnonymousTag());
