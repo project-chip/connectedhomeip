@@ -21,34 +21,87 @@
 
 #pragma once
 
-#include "boolean-state-configuration-delegate.h"
-
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/util/basic-types.h>
-#include <lib/core/DataModelTypes.h>
-#include <protocols/interaction_model/StatusCode.h>
+#include <app/clusters/boolean-state-configuration-server/boolean-state-configuration-cluster.h>
+#include <app/clusters/boolean-state-configuration-server/boolean-state-configuration-delegate.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace BooleanStateConfiguration {
 
-void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
-Delegate * GetDefaultDelegate(EndpointId endpoint);
+// Get access to the underlying cluster registered on the given endpoint
+BooleanStateConfigurationCluster * FindClusterOnEndpoint(EndpointId endpointId);
 
-CHIP_ERROR SetAlarmsActive(EndpointId ep, chip::BitMask<AlarmModeBitmap> alarms);
-CHIP_ERROR SetAllEnabledAlarmsActive(EndpointId ep);
-CHIP_ERROR ClearAllAlarms(EndpointId ep);
-CHIP_ERROR SuppressAlarms(EndpointId ep, chip::BitMask<BooleanStateConfiguration::AlarmModeBitmap> alarms);
-CHIP_ERROR SetCurrentSensitivityLevel(EndpointId ep, uint8_t level);
-CHIP_ERROR EmitSensorFault(EndpointId ep, chip::BitMask<BooleanStateConfiguration::SensorFaultBitmap> fault);
+////////////////////////////////////////////////////////////////////////////////////
+// The methods below are DEPRECATED. Please interact with the cluster directly
+// via `FindClusterOnEndpoint` (for code generated builds)
+////////////////////////////////////////////////////////////////////////////////////
+inline void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
+{
+    // NOTE: this will only work AFTER cluster startup (i.e. emberAfClusterInit)
+    if (auto cluster = FindClusterOnEndpoint(endpoint); cluster != nullptr)
+    {
+        cluster->SetDelegate(delegate);
+    }
+}
+
+inline Delegate * GetDefaultDelegate(EndpointId endpoint)
+{
+    if (auto cluster = FindClusterOnEndpoint(endpoint); cluster != nullptr)
+    {
+        return cluster->GetDelegate();
+    }
+    return nullptr;
+}
+
+inline CHIP_ERROR SetAlarmsActive(EndpointId ep, chip::BitMask<AlarmModeBitmap> alarms)
+{
+    auto cluster = FindClusterOnEndpoint(ep);
+    VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_NO_ENDPOINT);
+    return cluster->SetAlarmsActive(alarms);
+}
+
+inline CHIP_ERROR SetAllEnabledAlarmsActive(EndpointId ep)
+{
+    auto cluster = FindClusterOnEndpoint(ep);
+    VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_NO_ENDPOINT);
+    return cluster->SetAllEnabledAlarmsActive();
+}
+
+inline CHIP_ERROR ClearAllAlarms(EndpointId ep)
+{
+    auto cluster = FindClusterOnEndpoint(ep);
+    VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_NO_ENDPOINT);
+    return cluster->ClearAllAlarms();
+}
+
+inline CHIP_ERROR SuppressAlarms(EndpointId ep, chip::BitMask<BooleanStateConfiguration::AlarmModeBitmap> alarms)
+{
+    auto cluster = FindClusterOnEndpoint(ep);
+    VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_NO_ENDPOINT);
+    return cluster->SuppressAlarms(alarms);
+}
+
+inline CHIP_ERROR SetCurrentSensitivityLevel(EndpointId ep, uint8_t level)
+{
+    auto cluster = FindClusterOnEndpoint(ep);
+    VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_NO_ENDPOINT);
+    return cluster->SetCurrentSensitivityLevel(level);
+}
+
+inline CHIP_ERROR EmitSensorFault(EndpointId ep, chip::BitMask<BooleanStateConfiguration::SensorFaultBitmap> fault)
+{
+
+    auto cluster = FindClusterOnEndpoint(ep);
+    VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_NO_ENDPOINT);
+    return cluster->EmitSensorFault(fault);
+}
 
 inline bool HasFeature(EndpointId ep, Feature feature)
 {
-    uint32_t map;
-    bool success = (Attributes::FeatureMap::Get(ep, &map) == Protocols::InteractionModel::Status::Success);
-    return success ? (map & to_underlying(feature)) : false;
+    auto cluster = FindClusterOnEndpoint(ep);
+    VerifyOrReturnValue(cluster != nullptr, false);
+    return cluster->GetFeatures().Has(feature);
 }
 
 } // namespace BooleanStateConfiguration

@@ -16,24 +16,28 @@
  *
  */
 
-#include "boolean-state-configuration-server.h"
+// TODO: start converting
 
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
-#include <app/AttributeAccessInterface.h>
-#include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/CommandHandler.h>
-#include <app/ConcreteCommandPath.h>
-#include <app/EventLogging.h>
-#include <app/SafeAttributePersistenceProvider.h>
-#include <app/data-model/Encode.h>
-#include <app/util/attribute-storage.h>
-#include <app/util/config.h>
-#include <lib/core/CHIPError.h>
-#include <lib/support/logging/CHIPLogging.h>
-#include <platform/CHIPDeviceConfig.h>
+#include "boolean-state-configuration-cluster.h"
+#if 0
+#include "boolean-state-configuration-server.h" // nogncheck
+
+#include <app-common/zap-generated/attributes/Accessors.h> //nogncheck
+#include <app-common/zap-generated/cluster-objects.h>      //nogncheck
+#include <app-common/zap-generated/ids/Attributes.h>       //nogncheck
+#include <app-common/zap-generated/ids/Clusters.h>         //nogncheck
+#include <app/AttributeAccessInterface.h>                  //nogncheck
+#include <app/AttributeAccessInterfaceRegistry.h>          //nogncheck
+#include <app/CommandHandler.h>                            //nogncheck
+#include <app/ConcreteCommandPath.h>                       //nogncheck
+#include <app/EventLogging.h>                              //nogncheck
+#include <app/SafeAttributePersistenceProvider.h>          //nogncheck
+#include <app/data-model/Encode.h>                         //nogncheck
+#include <app/util/attribute-storage.h>                    //nogncheck
+#include <app/util/config.h>                               //nogncheck
+#include <lib/core/CHIPError.h>                            //nogncheck
+#include <lib/support/logging/CHIPLogging.h>               //nogncheck
+#include <platform/CHIPDeviceConfig.h>                     //nogncheck
 
 using namespace chip;
 using namespace chip::app;
@@ -451,12 +455,15 @@ exit:
     return true;
 }
 
-void MatterBooleanStateConfigurationPluginServerInitCallback()
+#endif
+
+namespace chip::app::Clusters {
+
+DataModel::ActionReturnStatus BooleanStateConfigurationCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                                              AttributeValueEncoder & encoder)
 {
-    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
+    // FIXME: implement
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-void MatterBooleanStateConfigurationPluginServerShutdownCallback()
-{
-    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
-}
+} // namespace chip::app::Clusters
