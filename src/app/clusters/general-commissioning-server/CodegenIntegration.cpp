@@ -62,7 +62,7 @@ public:
 
     ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override { return &gRegistration.Cluster(); }
 
-    // Nothing to destroy: separate singleton class without constructor/destructor is used
+    // Nothing to destroy: gRegistration is a global static that handles destruction
     void ReleaseRegistration(unsigned clusterInstanceIndex) override {}
 };
 
