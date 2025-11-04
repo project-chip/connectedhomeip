@@ -20,6 +20,15 @@ INS_SELECT = 0xA4           # Select file or application
 INS_READ_BINARY = 0xB0      # Read binary data from file
 INS_UPDATE_BINARY = 0xD6    # Update binary data in file
 
+# Constant representing the NFC Forum Well-Known Type (WKT) for a URI record.
+# Used to identify NDEF records containing a Uniform Resource Identifier (URI)
+# such as a website link, app link, or other addressable resource . urn:nfc:wkt:U -> refers to URI type
+# Some commonly used formats are below for reference
+# urn:nfc:wkt:T -> refers Text record
+# urn:nfc:wkt:Sp -> Smart Poster record
+NFC_WKT = 'urn:nfc:wkt:U'
+
+
 def _check_transmission_status(sw1: int, sw2: int, operation_name: str):
     """
     Check status words from NFC message transmission.
@@ -174,7 +183,7 @@ def _read_ndef_data(reader_connection_object, length: int) -> bytes:
     parsed into NDEF records.
 
     Args:
-        connection: The NFC reader connection object used to communicate with the
+        reader_connection_object: The NFC reader connection object used to communicate with the
                    NFC tag.
         length (int): The number of bytes to read, typically obtained from
                      _read_ndef_length().
@@ -241,7 +250,7 @@ def _read_nfc_tag_data(reader_objects: list, nfc_reader_index: int):
         # Loop through records to find a URI record
         for record in ndef_records:
             # Check for URI record type (well-known type 'U')
-            if record.type == 'urn:nfc:wkt:U':
+            if record.type == NFC_WKT:
                 # The payload is described in NFC Forum's "URI Record Type Definition Technical Specification"
                 # available here https://berlin.ccc.de/~starbug/felica/NFCForum-TS-RTD_URI_1.0.pdf
                 # As indicated in paragraph 3, the payload format is:
@@ -260,8 +269,9 @@ def _read_nfc_tag_data(reader_objects: list, nfc_reader_index: int):
     finally:
         try:
             reader_connection_object.disconnect()
-        except Exception:
-            pass  # Ignore disconnect errors
+        except Exception as e:
+            logger.warning(f"Disconnect Failed Due to Reason: {e}")  # Ignore disconnect errors
+
 
 def connect_read_nfc_tag_data(nfc_reader_index: int) -> str:
     """

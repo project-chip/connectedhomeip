@@ -657,7 +657,7 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
         return True
 
     # For NFC transport (when using the --commissioning-method argument), the NFC tag data is
-    # read beforehand and commissioning data ( QR code ) is already populated from the tag.
+    # read beforehand and commissioning data (QR code) is already populated from the tag.
     # Therefore, it does not need to be passed explicitly.
     #
     # However, during in-test commissioning, the user must manually read the NFC tag
