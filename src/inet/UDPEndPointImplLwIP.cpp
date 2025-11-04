@@ -210,7 +210,6 @@ void UDPEndPointImplLwIP::CloseImpl()
     {
         return;
     }
-
     RunOnTCPIP([this]() { udp_remove(mUDP); });
     mUDP              = nullptr;
     mLwIPEndPointType = LwIPEndPointType::Unknown;
@@ -219,8 +218,7 @@ void UDPEndPointImplLwIP::CloseImpl()
     // event pending in the event queue (SystemLayer::ScheduleLambda), we
     // schedule a unref call to the end of the queue, to ensure that the
     // queued pointer to UDPEndPointImplLwIP is not dangling.
-    int32_t currentDelayCount = mDelayReleaseCount.load();
-    if (currentDelayCount != 0)
+    if (mDelayReleaseCount != 0)
     {
         Ref();
         // Capture the instance ID to validate this is still the same endpoint instance
@@ -399,7 +397,7 @@ void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb
         [ep, pcb, expectedInstanceId, p = System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(buf), pktInfo = pktInfo.get()] {
             
             // Critical check: Verify this lambda is for the correct endpoint instance
-            // by comparing the instance ID. If they don't match, this endpoint was 
+            // by comparing the instance ID. If they don't match, the endpoint was 
             // deleted and recreated at the same memory address.
             if (ep->mInstanceId.load() != expectedInstanceId)
             {
@@ -412,7 +410,6 @@ void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb
             ep->mDelayReleaseCount--;
 
             auto handle = System::PacketBufferHandle::Adopt(p);
-
             ep->HandleDataReceived(std::move(handle), pktInfo);
         });
 
@@ -432,7 +429,6 @@ void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb
             (void) sQueueFilter->FilterAfterDequeue(ep, *(pktInfo.get()), buf);
             ChipLogError(Inet, "Dequeue ERROR err = %" CHIP_ERROR_FORMAT, err.Format());
         }
-        
         ep->mDelayReleaseCount--;
     }
 }

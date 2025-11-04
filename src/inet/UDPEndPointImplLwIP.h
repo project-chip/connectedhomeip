@@ -40,9 +40,6 @@ public:
         mInstanceId.store(sNextInstanceId.fetch_add(1));
     }
 
-    ~UDPEndPointImplLwIP()
-    {}
-
     // UDPEndPoint overrides.
     CHIP_ERROR SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback) override;
     InterfaceId GetBoundInterface() const override;
@@ -84,7 +81,7 @@ private:
 
     udp_pcb * mUDP; // LwIP User datagram protocol (UDP) control block.
     std::atomic_int mDelayReleaseCount{ 0 };
-    std::atomic<uint32_t> mInstanceId{ 0 }; // Unique ID to detect endpoint reuse
+    std::atomic<uint32_t> mInstanceId{ 0 }; // Unique endpoint ID 
 
     static EndpointQueueFilter * sQueueFilter;
 };

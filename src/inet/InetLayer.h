@@ -144,7 +144,6 @@ public:
     ~EndPointManagerImplPool() override = default;
 
     TypedEndPointHandle CreateEndPoint() override { return sEndPointPool.CreateObject(*this); }
-
     Loop ForEachEndPoint(const typename Manager::EndPointVisitor visitor) override
     {
         return sEndPointPool.ForEachActiveObject([&](EndPoint * endPoint) -> Loop {
