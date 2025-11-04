@@ -118,7 +118,7 @@ class GnBuilder(Builder):
         if self.ninja_jobs is not None:
             cmd.append('-j' + str(self.ninja_jobs))
 
-        if not self.unified_id and self.build_command:
+        if self.build_command and not getattr(self, 'unified', False):
             cmd.append(self.build_command)
 
         extra_env = self.GnBuildEnv()
@@ -132,9 +132,6 @@ class GnBuilder(Builder):
                 )
             ]
 
-        title = 'Building ' + self.identifier
-        if not self.unified_id and self.build_command:
-            title += f" (target: {self.build_command})"
-        self._Execute(cmd, title=title)
+        self._Execute(cmd, title='Building ' + self.identifier)
 
         self.PostBuildCommand()
