@@ -115,6 +115,14 @@ DataModel::ActionReturnStatus AdministratorCommissioningLogic::RevokeCommissioni
 
     auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
 
+    // No need to call ForceFailSafeTimerExpiry() if fail-safe is not armed
+    if (!failSafeContext.IsFailSafeArmed())
+    {
+        Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
+        ChipLogProgress(Zcl, "Commissioning window closed immediately as fail-safe is not armed");
+        return Status::Success;
+    }
+
     // Register a callback so that CloseCommissioningWindow() runs only after the fail-safe has been fully disarmed.
     // This avoids a race where the CommissioningWindowManager’s event handler is unregistered before the pending
     // kFailSafeTimerExpired event is processed.
