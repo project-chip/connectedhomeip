@@ -911,10 +911,10 @@ CHIP_ERROR WifiInterfaceImpl::StartNetworkScan(chip::ByteSpan ssid, ::ScanCallba
     if (wfx_rsi.scan_ssid != nullptr)
     {
         chip::ByteSpan requestedSsid(wfx_rsi.scan_ssid, wfx_rsi.scan_ssid_length);
-        chip::MutableByteSpan ouputSsid(_ssid.value, sizeof(_ssid.value));
-        chip::CopySpanToMutableSpan(requestedSsid, ouputSsid);
+        chip::MutableByteSpan outputSsid(_ssid.value, sizeof(_ssid.value));
+        chip::CopySpanToMutableSpan(requestedSsid, outputSsid);
 
-        _ssid.length = ouputSsid.size();
+        _ssid.length = outputSsid.size();
         ssidPtr      = &_ssid;
     }
 
