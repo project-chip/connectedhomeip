@@ -126,9 +126,8 @@ bool HasTurnsOrStunsScheme(const CharSpan & url)
  *         Status::ConstraintError if a constraint is violated
  *         Status::InvalidCommand if the list structure is invalid
  */
-Status ICEServersFollowsSpecConstraints(
-    const DataModel::DecodableList<Clusters::Globals::Structs::ICEServerStruct::DecodableType> & iceServers,
-    const char * commandName)
+Status ICEServersFollowsSpecConstraints(const DataModel::DecodableList<ICEServerDecodableStruct> & iceServers,
+                                        const char * commandName)
 {
     size_t iceServerCount = 0;
     auto iter             = iceServers.begin();
@@ -563,7 +562,7 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
         return;
     }
 
-    // TODO: If the passed in StreamUsage is not found in the StreamUsagePriorities, return DYNAMIC_CONSTRAINT_ERROR
+    // TODO:#41458 If the passed in StreamUsage is not found in the StreamUsagePriorities, return DYNAMIC_CONSTRAINT_ERROR
 
     // Validate VideoStreamID against AllocatedVideoStreams.
     // If present and null then a stream has to have been allocated.
@@ -846,7 +845,7 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
             return;
         }
 
-        // TODO: If the passed in StreamUsage is not found in the StreamUsagePriorities, return DYNAMIC_CONSTRAINT_ERROR
+        // TODO:#41458 If the passed in StreamUsage is not found in the StreamUsagePriorities, return DYNAMIC_CONSTRAINT_ERROR
 
         // If VideoStreamID is present and is not null and does not match a value in AllocatedVideoStreams:
         // Fail the command with the status code DYNAMIC_CONSTRAINT_ERROR
