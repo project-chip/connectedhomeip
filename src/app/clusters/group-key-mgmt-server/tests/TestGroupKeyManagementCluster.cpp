@@ -141,6 +141,9 @@ public:
 };
 namespace TestHelpers {
 
+constexpr chip::GroupId kTestGroupId = 0x1001;
+constexpr uint16_t kTestKeySetId     = 1;
+
 GroupKeyManagement::Structs::GroupKeyMapStruct::Type CreateKey(chip::GroupId groupId, uint16_t keySetId,
                                                                chip::FabricIndex fabricIndex)
 {
@@ -151,8 +154,8 @@ GroupKeyManagement::Structs::GroupKeyMapStruct::Type CreateKey(chip::GroupId gro
     return key;
 }
 std::vector<GroupKeyManagement::Structs::GroupKeyMapStruct::Type>
-CreateGroupKeyMapList(size_t count, chip::FabricIndex fabricIndex, chip::GroupId startGroupId = 0x1001, uint16_t startKeySetId = 1,
-                      uint16_t groupIdIncrement = 1, uint16_t keySetIdIncrement = 1)
+CreateGroupKeyMapList(size_t count, chip::FabricIndex fabricIndex, chip::GroupId startGroupId = kTestGroupId,
+                      uint16_t startKeySetId = kTestKeySetId, uint16_t groupIdIncrement = 1, uint16_t keySetIdIncrement = 1)
 {
     std::vector<GroupKeyManagement::Structs::GroupKeyMapStruct::Type> list;
     for (size_t i = 0; i < count; ++i)
@@ -238,10 +241,8 @@ struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementC
 TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttributeSameKeySetDifferentGroup)
 {
     const chip::FabricIndex fabricIndex = chip::app::Testing::kTestFabrixIndex;
-    chip::GroupId startGroupId          = 0x1001;
-    uint16_t sharedKeySetId             = 5;
 
-    auto keys = TestHelpers::CreateGroupKeyMapList(2, fabricIndex, startGroupId, sharedKeySetId, 1, 0);
+    auto keys = TestHelpers::CreateGroupKeyMapList(2, fabricIndex, TestHelpers::kTestGroupId, TestHelpers::kTestKeySetId, 1, 0);
     PrepopulateGroupKeyMap(keys, fabricIndex);
     VerifyGroupKeysMatch(fabricIndex, keys);
 }
@@ -250,10 +251,7 @@ TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttributeSa
 TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttributeDuplicateKey)
 {
     const chip::FabricIndex fabricIndex = chip::app::Testing::kTestFabrixIndex;
-    chip::GroupId groupId               = 100;
-    uint16_t keysetId                   = 5;
-
-    auto keys = TestHelpers::CreateGroupKeyMapList(2, fabricIndex, groupId, keysetId, 0, 0);
+    auto keys = TestHelpers::CreateGroupKeyMapList(2, fabricIndex, TestHelpers::kTestGroupId, TestHelpers::kTestKeySetId, 0, 0);
 
     auto listToWrite =
         chip::app::DataModel::List<const GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(keys.data(), keys.size());
