@@ -89,7 +89,7 @@ def clear_queue(report_queue: queue.Queue):
             break
 
 
-def get_first_setup_code(dev_ctrl: ChipDeviceCtrl, matter_test_config: MatterTestConfig) -> str:
+def get_first_setup_code(dev_ctrl: ChipDeviceCtrl.ChipDeviceControllerBase, matter_test_config: MatterTestConfig) -> Optional[str]:
     created_codes = []
     for idx, discriminator in enumerate(matter_test_config.discriminators):
         created_codes.append(dev_ctrl.CreateManualCode(discriminator, matter_test_config.setup_passcodes[idx]))
@@ -451,7 +451,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         return self.matter_test_config.dut_node_ids[0]
 
     @property
-    def first_setup_code(self) -> str:
+    def first_setup_code(self) -> Optional[str]:
         return get_first_setup_code(self.default_controller, self.matter_test_config)
 
     @property
