@@ -59,8 +59,6 @@
 # Run 2: Tests CASE connection using manual discriminator and passcode
 # Run 3: Tests without factory reset
 
-import asyncio
-
 from mobly import asserts
 
 import matter.clusters as Clusters
