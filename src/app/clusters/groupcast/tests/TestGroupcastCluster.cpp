@@ -118,7 +118,7 @@ TEST_F(TestGroupcastCluster, TestJoinGroupCommand)
     chip::Test::ClusterTester tester(cluster);
     auto status = tester.Invoke(Commands::JoinGroup::Id, cmdData);
     ASSERT_TRUE(status.has_value());
-    EXPECT_EQ(status->GetStatusCode().GetStatus(),
+    EXPECT_EQ(status.value().GetStatusCode().GetStatus(),
               Protocols::InteractionModel::Status::Failure); // Currently expect Failure as JoinGroup command returns
                                                              // CHIP_ERROR_NOT_IMPLEMENTED
 }
