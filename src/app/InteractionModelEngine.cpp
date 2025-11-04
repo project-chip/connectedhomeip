@@ -1793,25 +1793,29 @@ void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, 
 
 Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBeDispatched(const DataModel::InvokeRequest & request)
 {
-    // Spec §9.6.2 says we should return UnsupportedCommand as soon as the path is unknown. We check
-    // privilege first instead. This is equivalent to the spec as long as every command requires at
-    // least Operate privilege (the default we apply when metadata is missing). Should a command ever
-    // demand less than Operate, the spec’s algorithm would also need to change to stay consistent.
+    // The specification describes a validate-then-authorize flow that first resolves command metadata
+    // (which implicitly checks existence) and then enforces the privilege declared for that command.
+    // We reverse those steps: authorization happens first so we never reveal whether a command exists
+    // to a caller lacking sufficient privilege. This produces the same result as the spec today because
+    // all Matter commands require at least Operate privilege and we fall back to Operate when metadata
+    // is unavailable; if a command ever shipped with a lower privilege requirement we would need to
+    // revisit this ordering.
 
     DataModel::AcceptedCommandEntry acceptedCommandEntry;
 
-    Status existenceStatus = CheckCommandExistence(request.path, acceptedCommandEntry);
+    const Status existenceStatus = CheckCommandExistence(request.path, acceptedCommandEntry);
+    const bool commandExists     = (existenceStatus == Status::Success);
 
     // Default to Operate when the command metadata is unknown so we can fail closed while still avoiding
     // leaking information about whether the path actually exists. When the metadata lookup succeeds we
     // enforce the precise privilege declared for the command.
     Access::Privilege privilegeToCheck =
-        (existenceStatus == Status::Success) ? acceptedCommandEntry.GetInvokePrivilege() : Access::Privilege::kOperate;
+        commandExists ? acceptedCommandEntry.GetInvokePrivilege() : Access::Privilege::kOperate;
 
     Status accessStatus = CheckCommandAccess(request, privilegeToCheck);
     VerifyOrReturnValue(accessStatus == Status::Success, accessStatus);
 
-    if (existenceStatus != Status::Success)
+    if (!commandExists)
     {
         ChipLogDetail(DataManagement, "No command " ChipLogFormatMEI " in Cluster " ChipLogFormatMEI " on Endpoint %u",
                       ChipLogValueMEI(request.path.mCommandId), ChipLogValueMEI(request.path.mClusterId), request.path.mEndpointId);
