@@ -34,8 +34,10 @@ public:
     virtual ~DeviceInterface() = default;
 
     /// Register relevant clusters on the given endpoint. This must only
-    /// be called after starting up a device for the first time. This function
+    /// be called once after starting up a device for the first time. This function
     /// will create/instantiate all clusters on the device and complete endpoint registration.
+    /// It should return error if there's any failure when adding the device's clusters to the provider.
+    /// A parentId of kInvalidEndpointId represents that there is no parent to this device 
     virtual CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                 EndpointId parentId = kInvalidEndpointId) = 0;
 
