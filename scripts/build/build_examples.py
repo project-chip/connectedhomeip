@@ -47,7 +47,11 @@ class Context:
             for target_meta in build.targets.BUILD_TARGETS:
                 if target_meta.StringIntoTargetParts(target):
                     builder = target_meta.Create(
-                        self.output_prefix, self.runner, options)
+                        runner=self.runner,
+                        output_prefix=self.output_prefix,
+                        verbose=self.verbose,
+                        ninja_jobs=self.ninja_jobs,
+                        builder_options=options)
                     break
 
             if not builder:
