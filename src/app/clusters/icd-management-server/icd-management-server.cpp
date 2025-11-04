@@ -25,7 +25,12 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/icd/server/ICDNotifier.h>
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+#include <app/icd/server/ICDNotifier.h> // nogncheck
+#endif
+#include <app/reporting/reporting.h>
+
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 
@@ -78,6 +83,8 @@ private:
             : encoder.Encode(IcdManagement::OperatingModeEnum::kLit);
     }
 #endif // CHIP_CONFIG_ENABLE_ICD_LIT
+
+ICDManagementServer ICDManagementServer::instance;
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
     CHIP_ERROR ReadRegisteredClients(EndpointId endpoint, AttributeValueEncoder & encoder);
@@ -354,7 +361,7 @@ Status ICDManagementServer::RegisterClient(CommandHandler * commandObj, const Co
         // Notify subscribers that the first entry for the fabric was successfully added
         TriggerICDMTableUpdatedEvent();
     }
-
+    MatterReportingAttributeChangeCallback(kRootEndpointId, IcdManagement::Id, IcdManagement::Attributes::RegisteredClients::Id);
     icdCounter = mICDConfigurationData->GetICDCounter().GetValue();
     return Status::Success;
 }
@@ -393,6 +400,7 @@ Status ICDManagementServer::UnregisterClient(CommandHandler * commandObj, const 
         TriggerICDMTableUpdatedEvent();
     }
 
+    MatterReportingAttributeChangeCallback(kRootEndpointId, IcdManagement::Id, IcdManagement::Attributes::RegisteredClients::Id);
     return Status::Success;
 }
 
@@ -413,6 +421,13 @@ void ICDManagementServer::Init(PersistentStorageDelegate & storage, Crypto::Symm
     mICDConfigurationData = &icdConfigurationData;
 }
 
+void ICDManagementServer::OnICDModeChange()
+{
+    // Notify attribute change for OperatingMode attribute
+    MatterReportingAttributeChangeCallback(kRootEndpointId, IcdManagement::Id, IcdManagement::Attributes::OperatingMode::Id);
+}
+
+} // namespace chip::app::Clusters
 /**********************************************************
  * Callbacks Implementation
  *********************************************************/
@@ -427,8 +442,7 @@ bool emberAfIcdManagementClusterRegisterClientCallback(CommandHandler * commandO
 {
     uint32_t icdCounter = 0;
 
-    ICDManagementServer server;
-    Status status = server.RegisterClient(commandObj, commandPath, commandData, icdCounter);
+    Status status = ICDManagementServer::GetInstance().RegisterClient(commandObj, commandPath, commandData, icdCounter);
 
     if (Status::Success == status)
     {
@@ -450,8 +464,7 @@ bool emberAfIcdManagementClusterRegisterClientCallback(CommandHandler * commandO
 bool emberAfIcdManagementClusterUnregisterClientCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                          const Commands::UnregisterClient::DecodableType & commandData)
 {
-    ICDManagementServer server;
-    Status status = server.UnregisterClient(commandObj, commandPath, commandData);
+    Status status = ICDManagementServer::GetInstance().UnregisterClient(commandObj, commandPath, commandData);
 
     commandObj->AddStatus(commandPath, status);
     return true;
@@ -493,5 +506,22 @@ void MatterIcdManagementPluginServerInitCallback()
     AttributeAccessInterfaceRegistry::Instance().Register(&gAttribute);
 
     // Configure ICD Management
-    ICDManagementServer::Init(storage, symmetricKeystore, icdConfigurationData);
+    ICDManagementServer::GetInstance().Init(storage, symmetricKeystore, icdConfigurationData);
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    chip::Server::GetInstance().GetICDManager().RegisterObserver(&ICDManagementServer::GetInstance());
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 }
+
+void MatterIcdManagementPluginServerShutdownCallback()
+{
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttribute);
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+    FabricTable & fabricTable = Server::GetInstance().GetFabricTable();
+    fabricTable.RemoveFabricDelegate(&gFabricDelegate);
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    chip::Server::GetInstance().GetICDManager().ReleaseObserver(&ICDManagementServer::GetInstance());
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+}
+
