@@ -41,7 +41,7 @@ namespace DeviceLayer {
 class WiFiPAFDriverCtrlIface : public WiFiPAFDriver
 {
 public:
-    ~WiFiPAFDriverCtrlIface() override {}
+    ~WiFiPAFDriverCtrlIface() override;
     CHIP_ERROR Initialize() override;
     CHIP_ERROR Publish(std::unique_ptr<uint16_t[]> freq_list, uint16_t freq_list_len) override;
     CHIP_ERROR CancelPublish(uint32_t PublishId) override;

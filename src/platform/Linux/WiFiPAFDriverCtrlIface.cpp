@@ -120,6 +120,11 @@ std::unordered_map<std::string, std::string> GetKeyValueFromWpaCtrlReply(const s
     return kv;
 }
 
+WiFiPAFDriverCtrlIface::~WiFiPAFDriverCtrlIface() {
+    wpa_ctrl_close(ctrl);
+    wpa_ctrl_close(cmd_ctrl);
+}
+
 gboolean WiFiPAFDriverCtrlIface::OnWiFiManagerFdActivity(GIOChannel * source, GIOCondition condition, gpointer data)
 {
     ChipLogProgress(DeviceLayer, "Activity on WiFiPAFDriver file descriptor");
@@ -206,11 +211,15 @@ CHIP_ERROR WiFiPAFDriverCtrlIface::Publish(std::unique_ptr<uint16_t[]> freq_list
 
     std::ostringstream oss;
     oss << "NAN_PUBLISH "
-        << "srv_name=" << srv_name << " srv_proto_type=" << srv_proto_type << " ttl=" << ttl << " freq=" << freq
-        << " ssi=" << std::hex << std::setfill('0') // hex output, zero-padded
-        << std::setw(2) << static_cast<int>(PafPublish_ssi.DevOpCode) << std::setw(4) << htons(PafPublish_ssi.DevInfo)
-        << std::setw(4) << htons(PafPublish_ssi.ProductId) << std::setw(4) << htons(PafPublish_ssi.VendorId) << " freq_list=";
+        << "service_name=" << srv_name << " srv_proto_type=" << srv_proto_type << " ttl=" << ttl << " freq=" << freq;
 
+    oss << " ssi=" << std::hex << std::setfill('0');
+    uint8_t *ssi_array = reinterpret_cast<uint8_t*>(&PafPublish_ssi);
+    for (size_t i = 0; i < sizeof(PafPublish_ssi); i++) {
+        oss << std::setw(2) << static_cast<int>(ssi_array[i]);
+    }
+
+    oss << " freq_list=";
     for (size_t i = 0; i < freq_list_len; ++i)
     {
         if (i > 0)
@@ -249,7 +258,7 @@ CHIP_ERROR WiFiPAFDriverCtrlIface::CancelPublish(uint32_t PublishId)
     ChipLogProgress(DeviceLayer, "WiFi-PAF: cancel publish_id: %d ! ", PublishId);
 
     std::ostringstream oss;
-    oss << "NAN_CANCEL_PUBLISH id=" << PublishId;
+    oss << "NAN_CANCEL_PUBLISH publish_id=" << PublishId;
     std::string cmd_str = oss.str();
     const char * cmd    = cmd_str.c_str();
     size_t cmd_len      = std::strlen(cmd);
@@ -428,7 +437,7 @@ CHIP_ERROR WiFiPAFDriverCtrlIface::CancelSubscribe(uint32_t SubscribeId)
     ChipLogProgress(DeviceLayer, "WiFi-PAF: cancel subscribe_id: %d ! ", SubscribeId);
 
     std::ostringstream oss;
-    oss << "NAN_CANCEL_SUBSCRIBE id=" << SubscribeId;
+    oss << "NAN_CANCEL_SUBSCRIBE subscribe_id=" << SubscribeId;
     std::string cmd_str = oss.str();
     const char * cmd    = cmd_str.c_str();
     size_t cmd_len      = std::strlen(cmd);
@@ -473,12 +482,10 @@ CHIP_ERROR WiFiPAFDriverCtrlIface::Send(const WiFiPAF::WiFiPAFSession & TxInfo, 
     snprintf(peer_mac, sizeof(peer_mac), "%02x:%02x:%02x:%02x:%02x:%02x", TxInfo.peer_addr[0], TxInfo.peer_addr[1],
              TxInfo.peer_addr[2], TxInfo.peer_addr[3], TxInfo.peer_addr[4], TxInfo.peer_addr[5]);
 
-    std::ostringstream oss_ssi;
-    for (size_t i = 0; i < msgBuf->DataLength(); ++i)
-    {
-        oss_ssi << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(msgBuf->Start()[i]);
-    }
-    auto ssi_str = oss_ssi.str();
+    std::vector<char> ssi_hex_buffer(msgBuf->DataLength() * 2 + 1);
+    BitFlags<Encoding::HexFlags> flags(Encoding::HexFlags::kNone);
+    ReturnErrorOnFailure(chip::Encoding::BytesToHex(msgBuf->Start(), msgBuf->DataLength(), ssi_hex_buffer.data(), ssi_hex_buffer.size(), flags));
+    auto ssi_str = std::string(ssi_hex_buffer.data());
 
     std::ostringstream oss;
     oss << "NAN_TRANSMIT "
@@ -507,8 +514,6 @@ CHIP_ERROR WiFiPAFDriverCtrlIface::Send(const WiFiPAF::WiFiPAFSession & TxInfo, 
 
 CHIP_ERROR WiFiPAFDriverCtrlIface::Shutdown(uint32_t id, WiFiPAF::WiFiPafRole role)
 {
-    wpa_ctrl_close(ctrl);
-    wpa_ctrl_close(cmd_ctrl);
     return _Shutdown(id, role);
 }
 
