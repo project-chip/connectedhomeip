@@ -415,6 +415,10 @@ void ApplicationInit()
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommand");
         sChipNamedPipeCommands.Stop();
     }
+    else
+    {
+        sOtaProviderAppCommandDelegate.SetPipes(&sChipNamedPipeCommands);
+    }
 }
 
 void ApplicationShutdown()

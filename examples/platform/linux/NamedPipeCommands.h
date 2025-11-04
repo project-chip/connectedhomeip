@@ -33,6 +33,8 @@ public:
     CHIP_ERROR Start(std::string & path, NamedPipeCommandDelegate * delegate);
     CHIP_ERROR Start(std::string & path, std::string & path_out, NamedPipeCommandDelegate * delegate);
     CHIP_ERROR Stop();
+    void WriteToOutPipe(const std::string & json);
+    const std::string & OutPath() const { return mChipEventFifoPathOut; }
 
 private:
     bool mStarted = false;
@@ -40,7 +42,7 @@ private:
     std::string mChipEventFifoPath;
     std::string mChipEventFifoPathOut;
     NamedPipeCommandDelegate * mDelegate = nullptr;
+    int mOutFd = -1;
 
     static void * EventCommandListenerTask(void * arg);
-    void WriteToOutPipe();
 };

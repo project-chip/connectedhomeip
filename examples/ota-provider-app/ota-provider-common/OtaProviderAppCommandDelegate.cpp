@@ -24,7 +24,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::DeviceLayer;
 
-OtaProviderAppCommandHandler * OtaProviderAppCommandHandler::FromJSON(const char * json)
+OtaProviderAppCommandHandler * OtaProviderAppCommandHandler::FromJSON(const char * json, OtaProviderAppCommandDelegate * delegate)
 {
     Json::Reader reader;
     Json::Value value;
@@ -48,24 +48,60 @@ OtaProviderAppCommandHandler * OtaProviderAppCommandHandler::FromJSON(const char
         return nullptr;
     }
 
-    return chip::Platform::New<OtaProviderAppCommandHandler>(std::move(value));
+    return chip::Platform::New<OtaProviderAppCommandHandler>(std::move(value), delegate);
 }
 
-std::string OtaProviderAppCommandHandler::GetQueryImageResponse()
+static std::string ToString(const Json::Value & v)
 {
-    return "Test";
+    Json::StreamWriterBuilder w;
+    w["identation"] = "";
+    return Json::writeString(w, v);
+}
+
+Json::Value OtaProviderAppCommandHandler::BuildOtaProviderSnapshot(uint16_t endpoint)
+{
+    Json::Value payload(Json::objectValue);
+
+    payload["QueryImageStatus"] = "Test"; // static_cast<uint32_t>(gQueryImageStatus);
+
+    return payload;
 }
 
 void OtaProviderAppCommandHandler::HandleCommand(intptr_t context)
 {
-    auto * self      = reinterpret_cast<OtaProviderAppCommandHandler *>(context);
-    std::string name = self->mJsonValue["Name"].asString();
+    auto * self = reinterpret_cast<OtaProviderAppCommandHandler *>(context);
+    std::string name;
+    std::string cluster;
+    uint16_t endpoint                        = 0;
+    OtaProviderAppCommandDelegate * delegate = nullptr;
 
     VerifyOrExit(!self->mJsonValue.empty(), ChipLogError(NotSpecified, "Invalid JSON event command received"));
 
-    if (name == "GetQueryImageResponse")
+    name     = self->mJsonValue["Name"].asString();
+    cluster  = self->mJsonValue.get("Cluster", "").asString();
+    endpoint = static_cast<uint16_t>(self->mJsonValue.get("Endpoint", 0).asUInt());
+    delegate = self->mDelegate;
+
+    if (name == "Snapshot")
     {
-        std::string queryImage = self->GetQueryImageResponse();
+        Json::Value out(Json::objectValue);
+        out["Name"]     = "SnapshotResponse";
+        out["Cluster"]  = cluster;
+        out["Endpoint"] = endpoint;
+
+        if (cluster == "OtaSoftwareUpdateProvider")
+        {
+            out["Payload"] = self->BuildOtaProviderSnapshot(endpoint);
+        }
+        else
+        {
+            out["Error"] = "Unsupported cluster for snapshot";
+        }
+
+        if (delegate && delegate->GetPipes())
+        {
+            delegate->GetPipes()->WriteToOutPipe(ToString(out));
+        }
     }
     else
     {
@@ -78,7 +114,7 @@ exit:
 
 void OtaProviderAppCommandDelegate::OnEventCommandReceived(const char * json)
 {
-    auto handler = OtaProviderAppCommandHandler::FromJSON(json);
+    auto handler = OtaProviderAppCommandHandler::FromJSON(json, this);
     if (nullptr == handler)
     {
         ChipLogError(NotSpecified, "OTA Provider App: Unable to instantiate a command handler");

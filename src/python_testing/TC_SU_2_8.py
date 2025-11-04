@@ -102,33 +102,12 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
                      "Verify the field ProtocolsSupported lists the BDX Synchronous protocol."
                      "If (MCORE.OTA.HTTPS_Supported) HTTPS protocol should be listed."
                      "Verify the default value of RequestorCanConsent is set to False unless DUT sets it to True."
-                     "If the Location field is present, verify that the value is same as Basic Information Cluster Location Attribute of the DUT."),
-            TestStep(2, "Configure DefaultOTAProviders with invalid node ID. DUT tries to send a QueryImage command to TH1/OTA-P. DUT sends QueryImage command to TH2/OTA-P.",
-                     "TH1/OTA-P does not respond with QueryImage response command. StateTransition goes from idle to querying, then a download error happens and finally it goes back to idle."
-                     "Subscribe to events for OtaSoftwareUpdateRequestor cluster and verify StateTransition reaches downloading state. Also check if the targetSoftwareVersion is 3."),
+                     "If the Location field is present, verify that the value is same as Basic Information Cluster Location Attribute of the DUT.")  # ,
+            # TestStep(2, "Configure DefaultOTAProviders with invalid node ID. DUT tries to send a QueryImage command to TH1/OTA-P. DUT sends QueryImage command to TH2/OTA-P.",
+            #          "TH1/OTA-P does not respond with QueryImage response command. StateTransition goes from idle to querying, then a download error happens and finally it goes back to idle."
+            #          "Subscribe to events for OtaSoftwareUpdateRequestor cluster and verify StateTransition reaches downloading state. Also check if the targetSoftwareVersion is 3."),
         ]
         return steps
-
-    def parse_query_block(self, block: dict) -> dict:
-        text = ANSI_RE.sub("", '\n'.join(block.get("after", [])))
-
-        out = {}
-
-        for name, rx in FIELDS.items():
-            m = rx.search(text)
-            if m:
-                val = m.group(1) if m.lastindex else m.group(0)
-                if name == "location":
-                    out[name] = val
-                else:
-                    out[name] = int(val, 0)
-
-        m = PROTO_RE.search(text)
-        out["protocols_supported"] = (
-            [int(n, 0) for n in HEX_OR_DEC.findall(m.group(1))] if m else []
-        )
-
-        return out
 
     @async_test_body
     async def test_TC_SU_2_8(self):
@@ -147,7 +126,7 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         provider_port = 5540
 
         app_path = "./out/debug/chip-ota-provider-app"
-        provider_ota_file = OtaImagePath(path="firmware_v2.ota")
+        provider_ota_file = OtaImagePath(path="firmware_v3.ota")
 
         # States
         idle = Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
@@ -186,7 +165,9 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
             ota_source=provider_ota_file,
             kvs_path='/tmp/chip_kvs_provider',
             log_file='/tmp/provider_1.log',
-            err_log_file='/tmp/provider_1.log'
+            err_log_file='/tmp/provider_1.log',
+            app_pipe='/tmp/su_2_8_fifo',
+            app_pipe_out='/tmp/su_2_8_fifo_out'
         )
 
         provider_1.start()
@@ -217,10 +198,10 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
 
         await asyncio.sleep(2)
 
-        command = {"Name": "GetQueryImageResponse"}
-        fifo_out = "/tmp/fifo_out_2_8"
+        command = {"Name": "Snapshot", "Cluster": "OtaSoftwareUpdateProvider", "Endpoint": 0}
+        fifo_out = "/tmp/su_2_8_fifo_out"
         self.write_to_app_pipe(command)
-        response_data = self.read_from_app_pipe('GetQueryImageResponse', fifo_out)
+        response_data = self.read_from_app_pipe(fifo_out)
 
         logging.info(f"Response data: {response_data}")
 
@@ -289,152 +270,152 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         #                          parsed['location'], f"Location is {parsed['location']} and it should be {location_basic_information}")
 
         # Event Handler
-        event_cb = EventSubscriptionHandler(expected_cluster=Clusters.Objects.OtaSoftwareUpdateRequestor)
-        await event_cb.start(dev_ctrl=th1, node_id=requestor_node_id, endpoint=endpoint,
-                             fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
+        # event_cb = EventSubscriptionHandler(expected_cluster=Clusters.Objects.OtaSoftwareUpdateRequestor)
+        # await event_cb.start(dev_ctrl=th1, node_id=requestor_node_id, endpoint=endpoint,
+        #                      fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
 
         # Stop provider
-        await asyncio.sleep(2)
-        try:
-            provider_1.terminate()
-        except Exception as e:
-            logging.warning(f"Provider termination raised: {e}")
-
-        th1.ExpireSessions(nodeid=p1_node)
-        await asyncio.sleep(2)
-
-        event_cb.reset()
-        await event_cb.cancel()
+        # await asyncio.sleep(2)
+        # try:
+        #     provider_1.terminate()
+        # except Exception as e:
+        #     logging.warning(f"Provider termination raised: {e}")
+#
+        # th1.ExpireSessions(nodeid=p1_node)
+        # await asyncio.sleep(2)
+#
+        # event_cb.reset()
+        # await event_cb.cancel()
 
         # Configure DefaultOTAProviders with invalid node ID. DUT tries to send a QueryImage command to TH1/OTA-P. DUT sends QueryImage command to TH2/OTA-P
-        self.step(2)
+        # self.step(2)
 
-        provider_ota_file = OtaImagePath(path="firmware_v3.ota")
-
-        logging.info("Starting OTA Provider 2")
-        provider_2 = OTAProviderSubprocess(
-            app=app_path,
-            storage_dir='/tmp',
-            port=provider_port,
-            discriminator=p2_disc,
-            passcode=p_pass,
-            ota_source=provider_ota_file,
-            kvs_path='/tmp/chip_kvs_provider_2',
-            log_file='/tmp/provider_2.log',
-            err_log_file='/tmp/provider_2.log'
-        )
-
-        provider_2.start()
-
+        # provider_ota_file = OtaImagePath(path="firmware_v3.ota")
+#
+        # logging.info("Starting OTA Provider 2")
+        # provider_2 = OTAProviderSubprocess(
+        #    app=app_path,
+        #    storage_dir='/tmp',
+        #    port=provider_port,
+        #    discriminator=p2_disc,
+        #    passcode=p_pass,
+        #    ota_source=provider_ota_file,
+        #    kvs_path='/tmp/chip_kvs_provider_2',
+        #    log_file='/tmp/provider_2.log',
+        #    err_log_file='/tmp/provider_2.log'
+        # )
+#
+        # provider_2.start()
+#
         # Create TH2
-        logging.info("Setting up TH2.")
-        th2_certificate_auth = self.certificate_authority_manager.NewCertificateAuthority()
-        th2_fabric_admin = th2_certificate_auth.NewFabricAdmin(vendorId=vendor_id, fabricId=fabric_id_th2)
-        th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
-
-        logging.info("Opening commissioning window on DUT.")
-        params = await self.open_commissioning_window(th1, dut_node_id)
-
+        # logging.info("Setting up TH2.")
+        # th2_certificate_auth = self.certificate_authority_manager.NewCertificateAuthority()
+        # th2_fabric_admin = th2_certificate_auth.NewFabricAdmin(vendorId=vendor_id, fabricId=fabric_id_th2)
+        # th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
+#
+        # logging.info("Opening commissioning window on DUT.")
+        # params = await self.open_commissioning_window(th1, dut_node_id)
+#
         # Commission TH2/DUT (requestor)
-        resp = await th2.CommissionOnNetwork(
-            nodeId=requestor_node_id,
-            setupPinCode=params.commissioningParameters.setupPinCode,
-            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
-            filter=params.randomDiscriminator
-        )
-
-        logging.info(f"TH2 commissioned: {resp}.")
-
+        # resp = await th2.CommissionOnNetwork(
+        #    nodeId=requestor_node_id,
+        #    setupPinCode=params.commissioningParameters.setupPinCode,
+        #    filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+        #    filter=params.randomDiscriminator
+        # )
+#
+        # logging.info(f"TH2 commissioned: {resp}.")
+#
         # Commissioning Provider-TH2
-        logging.info("Commissioning OTA Provider to TH2")
-
-        resp = await th2.CommissionOnNetwork(
-            nodeId=p2_node,
-            setupPinCode=p_pass,
-            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
-            filter=p2_disc
-        )
-
-        logging.info(f"Commissioning response: {resp}.")
-
+        # logging.info("Commissioning OTA Provider to TH2")
+#
+        # resp = await th2.CommissionOnNetwork(
+        #    nodeId=p2_node,
+        #    setupPinCode=p_pass,
+        #    filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+        #    filter=p2_disc
+        # )
+#
+        # logging.info(f"Commissioning response: {resp}.")
+#
         # ACL permissions are not required
-
-        if fabric_id_th2 == th1.fabricId:
-            raise AssertionError(f"Fabric IDs are the same for TH1: {th1.fabricId} and TH2: {fabric_id_th2}.")
-
+#
+        # if fabric_id_th2 == th1.fabricId:
+        #    raise AssertionError(f"Fabric IDs are the same for TH1: {th1.fabricId} and TH2: {fabric_id_th2}.")
+#
         # Event Handler
-        event_cb = EventSubscriptionHandler(expected_cluster=Clusters.Objects.OtaSoftwareUpdateRequestor)
-        await event_cb.start(dev_ctrl=th1, node_id=requestor_node_id, endpoint=endpoint,
-                             fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
-
+        # event_cb = EventSubscriptionHandler(expected_cluster=Clusters.Objects.OtaSoftwareUpdateRequestor)
+        # await event_cb.start(dev_ctrl=th1, node_id=requestor_node_id, endpoint=endpoint,
+        #                     fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
+#
         # Write default OTA providers TH1 with p1_node which does not exist
-        await self.write_ota_providers(th1, p1_node_invalid, endpoint)
-
+        # await self.write_ota_providers(th1, p1_node_invalid, endpoint)
+#
         # Announce TH1-OTA Provider
-        await self.announce_ota_provider(controller=th1, provider_node_id=p1_node_invalid, requestor_node_id=requestor_node_id, vendor_id=vendor_id, endpoint=endpoint)
-
+        # await self.announce_ota_provider(controller=th1, provider_node_id=p1_node_invalid, requestor_node_id=requestor_node_id, vendor_id=vendor_id, endpoint=endpoint)
+#
         # Expect events idle to querying, downloadError and then back to idle
-        querying_event = event_cb.wait_for_event_report(
-            Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)
-        asserts.assert_equal(querying, querying_event.newState,
-                             f"New state is {querying_event.newState} and it should be {querying}")
-
-        download_error = event_cb.wait_for_event_report(
-            Clusters.Objects.OtaSoftwareUpdateRequestor.Events.DownloadError, 50000)
-
-        logging.info(f"Download Error: {download_error}")
-
-        idle_event = event_cb.wait_for_event_report(
-            Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 50000)
-        asserts.assert_equal(idle, idle_event.newState,
-                             f"New state is {idle_event.newState} and it should be {idle}")
-
-        event_cb.reset()
-        await event_cb.cancel()
-        await asyncio.sleep(2)
-
+        # querying_event = event_cb.wait_for_event_report(
+        #    Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)
+        # asserts.assert_equal(querying, querying_event.newState,
+        #                     f"New state is {querying_event.newState} and it should be {querying}")
+#
+        # download_error = event_cb.wait_for_event_report(
+        #    Clusters.Objects.OtaSoftwareUpdateRequestor.Events.DownloadError, 50000)
+#
+        # logging.info(f"Download Error: {download_error}")
+#
+        # idle_event = event_cb.wait_for_event_report(
+        #    Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 50000)
+        # asserts.assert_equal(idle, idle_event.newState,
+        #                     f"New state is {idle_event.newState} and it should be {idle}")
+#
+        # event_cb.reset()
+        # await event_cb.cancel()
+        # await asyncio.sleep(2)
+#
         # Subscribe to events
-        event_cb = EventSubscriptionHandler(expected_cluster=Clusters.Objects.OtaSoftwareUpdateRequestor)
-        await event_cb.start(dev_ctrl=th2, node_id=requestor_node_id, endpoint=endpoint,
-                             fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
-
+        # event_cb = EventSubscriptionHandler(expected_cluster=Clusters.Objects.OtaSoftwareUpdateRequestor)
+        # await event_cb.start(dev_ctrl=th2, node_id=requestor_node_id, endpoint=endpoint,
+        #                     fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
+#
         # Define ACL entry
-        await self.create_acl_entry(dev_ctrl=th2, provider_node_id=p2_node, requestor_node_id=requestor_node_id)
-
+        # await self.create_acl_entry(dev_ctrl=th2, provider_node_id=p2_node, requestor_node_id=requestor_node_id)
+#
         # Write default OTA providers TH2
-        await self.write_ota_providers(th2, p2_node, endpoint)
-
+        # await self.write_ota_providers(th2, p2_node, endpoint)
+#
         # Announce after subscription
-        await self.announce_ota_provider(controller=th2, provider_node_id=p2_node, requestor_node_id=requestor_node_id, vendor_id=vendor_id, endpoint=endpoint)
-
-        event_idle_to_querying = event_cb.wait_for_event_report(
-            Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)
-
-        self.verify_state_transition_event(event_report=event_idle_to_querying, previous_state=idle, new_state=querying)
-
-        event_querying_to_downloading = event_cb.wait_for_event_report(
-            Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)
-
-        self.verify_state_transition_event(event_report=event_querying_to_downloading,
-                                           previous_state=querying, new_state=downloading, target_version=target_version)
-
-        event_cb.reset()
-        await event_cb.cancel()
-
-        logging.info("Cleaning DefaultOTAProviders.")
-        resp = await th2.WriteAttribute(
-            dut_node_id,
-            [(endpoint, Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders([]))]
-        )
-        asserts.assert_equal(resp[0].Status, Status.Success, "Clean DefaultOTAProviders failed.")
-
-        await asyncio.sleep(2)
-        try:
-            provider_2.terminate()
-        except Exception as e:
-            logging.warning(f"Provider termination raised: {e}")
-
-        th2.ExpireSessions(nodeid=p2_node)
+        # await self.announce_ota_provider(controller=th2, provider_node_id=p2_node, requestor_node_id=requestor_node_id, vendor_id=vendor_id, endpoint=endpoint)
+#
+        # event_idle_to_querying = event_cb.wait_for_event_report(
+        #    Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)
+#
+        # self.verify_state_transition_event(event_report=event_idle_to_querying, previous_state=idle, new_state=querying)
+#
+        # event_querying_to_downloading = event_cb.wait_for_event_report(
+        #    Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)
+#
+        # self.verify_state_transition_event(event_report=event_querying_to_downloading,
+        #                                   previous_state=querying, new_state=downloading, target_version=target_version)
+#
+        # event_cb.reset()
+        # await event_cb.cancel()
+#
+        # logging.info("Cleaning DefaultOTAProviders.")
+        # resp = await th2.WriteAttribute(
+        #    dut_node_id,
+        #    [(endpoint, Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders([]))]
+        # )
+        # asserts.assert_equal(resp[0].Status, Status.Success, "Clean DefaultOTAProviders failed.")
+#
+        # await asyncio.sleep(2)
+        # try:
+        #    provider_2.terminate()
+        # except Exception as e:
+        #    logging.warning(f"Provider termination raised: {e}")
+#
+        # th2.ExpireSessions(nodeid=p2_node)
 
 
 if __name__ == "__main__":

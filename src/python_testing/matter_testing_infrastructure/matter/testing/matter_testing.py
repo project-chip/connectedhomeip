@@ -984,9 +984,9 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         data = ""
 
-        with open(app_pipe_out, "r") as app_pipe_fp:
+        with open(app_pipe_out, "r") as app_pipe_out_fp:
             LOGGER.info(f"Reading out-of-band command response to file: {app_pipe_out}")
-            data = json.load(app_pipe_out)
+            data = json.load(app_pipe_out_fp)
 
         return data
 

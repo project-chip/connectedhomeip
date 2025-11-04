@@ -52,7 +52,7 @@ class AppServerSubprocess(Subprocess):
     PREFIX = b"[SERVER]"
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
-                 passcode: int, port: int = 5540, extra_args: list[str] = [], kvs_path: Optional[str] = None, f_stdout: BinaryIO = stdout.buffer, f_stderr: BinaryIO = stderr.buffer):
+                 passcode: int, port: int = 5540, extra_args: list[str] = [], kvs_path: Optional[str] = None, f_stdout: BinaryIO = stdout.buffer, f_stderr: BinaryIO = stderr.buffer, app_pipe: Optional[str] = None, app_pipe_out: Optional[str] = None):
         # Create a temporary KVS file and keep the descriptor to avoid leaks.
 
         if kvs_path is not None:
@@ -65,6 +65,15 @@ class AppServerSubprocess(Subprocess):
             command = [app]
             if extra_args:
                 command.extend(extra_args)
+
+            if app_pipe is not None:
+                command.extend([
+                    "--app-pipe", str(app_pipe)
+                ])
+            if app_pipe_out is not None:
+                command.extend([
+                    "--app-pipe-out", str(app_pipe_out)
+                ])
 
             command.extend([
                 "--KVS", kvs_path,
@@ -158,7 +167,7 @@ class OTAProviderSubprocess(AppServerSubprocess):
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
                  passcode: int, ota_source: Union[OtaImagePath, ImageListPath],
-                 port: int = 5541, extra_args: list[str] = [], kvs_path: Optional[str] = None, log_file: Union[str, BinaryIO] = stdout.buffer, err_log_file: Union[str, BinaryIO] = stderr.buffer):
+                 port: int = 5541, extra_args: list[str] = [], kvs_path: Optional[str] = None, log_file: Union[str, BinaryIO] = stdout.buffer, err_log_file: Union[str, BinaryIO] = stderr.buffer, app_pipe: Optional[str] = None, app_pipe_out: Optional[str] = None):
         """Initialize the OTA Provider subprocess.
 
         Args:
@@ -187,7 +196,7 @@ class OTAProviderSubprocess(AppServerSubprocess):
 
         # Initialize with the combined arguments
         super().__init__(app=app, storage_dir=storage_dir, discriminator=discriminator,
-                         passcode=passcode, port=port, extra_args=combined_extra_args, kvs_path=kvs_path, f_stdout=f_stdout, f_stderr=f_stderr)
+                         passcode=passcode, port=port, extra_args=combined_extra_args, kvs_path=kvs_path, f_stdout=f_stdout, f_stderr=f_stderr, app_pipe=app_pipe, app_pipe_out=app_pipe_out)
 
     def kill(self):
         self.p.send_signal(signal.SIGKILL)

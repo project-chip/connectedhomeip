@@ -25,24 +25,32 @@
 
 #include <string>
 
+class OtaProviderAppCommandDelegate;
+
 class OtaProviderAppCommandHandler {
 public:
-    static OtaProviderAppCommandHandler * FromJSON(const char * json);
+    static OtaProviderAppCommandHandler * FromJSON(const char * json, OtaProviderAppCommandDelegate * delegate);
 
     static void HandleCommand(intptr_t context);
+    Json::Value BuildOtaProviderSnapshot(uint16_t endpoint);
 
-    OtaProviderAppCommandHandler(Json::Value && jsonValue)
-        : mJsonValue(std::move(jsonValue))
+    OtaProviderAppCommandHandler(Json::Value && v, OtaProviderAppCommandDelegate * d)
+        : mJsonValue(std::move(v))
+        , mDelegate(d)
     {
     }
 
 private:
     Json::Value mJsonValue;
-
-    std::string GetQueryImageResponse();
+    OtaProviderAppCommandDelegate * mDelegate = nullptr;
 };
 
 class OtaProviderAppCommandDelegate : public NamedPipeCommandDelegate {
 public:
     void OnEventCommandReceived(const char * json) override;
+    void SetPipes(NamedPipeCommands * pipes) { mPipes = pipes; }
+    NamedPipeCommands * GetPipes() const { return mPipes; }
+
+private:
+    NamedPipeCommands * mPipes = nullptr;
 };

@@ -67,6 +67,9 @@ CHIP_ERROR NamedPipeCommands::Start(std::string & path, std::string & path_out, 
 
     VerifyOrReturnError((mkfifo(path_out.c_str(), 0666) == 0) || (errno == EEXIST), CHIP_ERROR_OPEN_FAILED);
 
+    mOutFd = open(path_out.c_str(), O_RDWR | O_NONBLOCK);
+    VerifyOrReturnError(mOutFd != -1, CHIP_ERROR_OPEN_FAILED);
+
     return CHIP_NO_ERROR;
 }
 
@@ -82,10 +85,16 @@ CHIP_ERROR NamedPipeCommands::Stop()
     // Wait further for the thread to terminate if we had previously created it.
     VerifyOrReturnError(pthread_join(mChipEventCommandListener, nullptr) == 0, CHIP_ERROR_SHUT_DOWN);
 
+    if (mOutFd != -1)
+    {
+        close(mOutFd);
+        mOutFd = -1;
+    }
+
     VerifyOrReturnError(unlink(mChipEventFifoPath.c_str()) == 0, CHIP_ERROR_WRITE_FAILED);
     mChipEventFifoPath.clear();
 
-    if (mChipEventFifoPath != "")
+    if (!mChipEventFifoPath.empty())
     {
         VerifyOrReturnError(unlink(mChipEventFifoPathOut.c_str()) == 0, CHIP_ERROR_WRITE_FAILED);
         mChipEventFifoPathOut.clear();
@@ -94,17 +103,14 @@ CHIP_ERROR NamedPipeCommands::Stop()
     return CHIP_NO_ERROR;
 }
 
-void NamedPipeCommands::WriteToOutPipe()
+void NamedPipeCommands::WriteToOutPipe(const std::string & json)
 {
-    // NamedPipeCommands * self = reinterpret_cast<NamedPipeCommands *>(arg);
-    //
-    // int fd = open(self->mChipEventFifoPathOut.c_str(), O_RDONLY);
-    // if (fd == -1)
-    // {
-    //     ChipLogError(NotSpecified, "Failed to open Event FIFO");
-    //     break;
-    // }
-    // write(fd, data, kChipEventCmdBufSize);
+    if (mOutFd == -1 || json.empty())
+        return;
+
+    (void) write(mOutFd, json.c_str(), json.size());
+    (void) write(mOutFd, "\n", 1);
+    close(mOutFd);
 }
 
 void * NamedPipeCommands::EventCommandListenerTask(void * arg)
