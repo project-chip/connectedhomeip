@@ -49,14 +49,14 @@ class TC_CADMIN_1_15(MatterBaseTest):
     async def OpenCommissioningWindow(self, th: ChipDeviceCtrl, expectedErrCode: Optional[Clusters.AdministratorCommissioning.Enums.StatusCode] = None) -> CommissioningParameters:
         if expectedErrCode == 0x00:
             params = await th.OpenCommissioningWindow(
-                nodeid=self.dut_node_id, timeout=self.max_window_duration, iteration=10000, discriminator=self.discriminator, option=1)
+                nodeId=self.dut_node_id, timeout=self.max_window_duration, iteration=10000, discriminator=self.discriminator, option=1)
             return params
 
         else:
             ctx = asserts.assert_raises(ChipStackError)
             with ctx:
                 await th.OpenCommissioningWindow(
-                    nodeid=self.dut_node_id, timeout=self.max_window_duration, iteration=10000, discriminator=self.discriminator, option=1)
+                    nodeId=self.dut_node_id, timeout=self.max_window_duration, iteration=10000, discriminator=self.discriminator, option=1)
             errcode = ctx.exception.chip_error
             logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
             asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
@@ -205,7 +205,7 @@ class TC_CADMIN_1_15(MatterBaseTest):
 
         self.step(11)
         removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(fabric_idx_cr2)
-        await self.th2.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
+        await self.th2.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
 
         self.step(12)
         # Verifies TH_CR2 is unable to read the Basic Information Cluster’s NodeLabel attribute of DUT_CE as no longer on network
@@ -253,11 +253,11 @@ class TC_CADMIN_1_15(MatterBaseTest):
 
         self.step(19)
         removeFabricCmd2 = Clusters.OperationalCredentials.Commands.RemoveFabric(fabric_idx_cr2_2)
-        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd2)
+        await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=removeFabricCmd2)
 
         self.step(20)
         removeFabricCmd3 = Clusters.OperationalCredentials.Commands.RemoveFabric(fabric_idx_cr3)
-        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd3)
+        await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=removeFabricCmd3)
 
         self.step(21)
         fabrics4 = await self.get_fabrics(th=self.th1)

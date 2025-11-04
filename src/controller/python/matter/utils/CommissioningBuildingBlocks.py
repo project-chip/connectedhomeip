@@ -58,7 +58,7 @@ async def GrantPrivilege(adminCtrl: ChipDeviceController, grantedCtrl: ChipDevic
             privilege:      Privilege to grant to the granted controller. If None, no privilege is granted.
             targetNodeId:   Target node to which the controller is granted privilege.
             targetCatTag:   Target 32-bit CAT tag that is granted privilege.
-                            If provided, this will be used in the subject list instead of the nodeid of that of grantedCtrl.
+                            If provided, this will be used in the subject list instead of the nodeId of that of grantedCtrl.
     '''
     data = await adminCtrl.ReadAttribute(targetNodeId, [(Clusters.AccessControl.Attributes.Acl)])
     if 0 not in data:
