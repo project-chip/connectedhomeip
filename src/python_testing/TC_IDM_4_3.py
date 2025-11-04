@@ -66,8 +66,8 @@ https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/interacti
 
 Note:
 This test builds upon foundational work by Raul, who created the SetNotifySubscriptionStillActiveCallback()
-mechanism in both the C++ and Python SDK layers to enable empty report detection and timing validation
-in subscription tests. This test completes the comprehensive test coverage for TC-IDM-4.3.
+mechanism in both the C++ and Python framework layers to enable empty report detection and timing validation
+in subscription tests. 
 '''
 
 
@@ -113,40 +113,6 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         for endpoint in self.endpoints:
             device_clusters |= set(self.endpoints[endpoint].keys())
         return device_clusters
-
-    async def all_type_attributes_for_cluster(self, cluster: ClusterObjects.Cluster, desired_type: type) -> list[ClusterObjects.ClusterAttributeDescriptor]:
-        # Function created by Raul to get all attributes of a specific type on a cluster
-        all_attributes = [attribute for attribute in cluster.Attributes.__dict__.values() if inspect.isclass(
-            attribute) and issubclass(attribute, ClusterObjects.ClusterAttributeDescriptor)]
-
-        # Hackish way to get enums to return properly -- the default behavior (under else block) returns a BLANK LIST without this workaround
-        # If type(attribute.attribute_type.Type) or type(ClusterObjects.ClusterObjectFieldDescriptor(Type=desired_type).Type are enums, they return <class 'aenum._enum.EnumType'>, which are equal!
-        if desired_type == MatterIntEnum:
-            all_attributes_of_type = [attribute for attribute in all_attributes if type(
-                attribute.attribute_type.Type) == type(ClusterObjects.ClusterObjectFieldDescriptor(Type=desired_type).Type)]
-        elif desired_type == IntFlag:
-            try:
-                feature_map = await self.read_single_attribute_check_success(cluster, attribute=cluster.Attributes.FeatureMap)
-            except signals.TestFailure:
-                print(f"{cluster} does not support Attributes.FeatureMap")
-                return []
-            if feature_map >= 1:
-                return [cluster.Attributes.FeatureMap]
-        elif desired_type == list:
-            # For list types, check if the attribute Type is a list (generic list or typed list)
-            # Matter attributes are typed lists like list[uint], list[Structs.SomeStruct], etc.
-            all_attributes_of_type = []
-            for attribute in all_attributes:
-                attr_type = attribute.attribute_type.Type
-                # Check if it's a list using typing.get_origin for generic types
-                origin = typing.get_origin(attr_type)
-                # Check for list, List, or array-like types
-                if origin is list or (hasattr(attr_type, '__origin__') and attr_type.__origin__ is list):
-                    all_attributes_of_type.append(attribute)
-        else:
-            all_attributes_of_type = [attribute for attribute in all_attributes if attribute.attribute_type ==
-                                      ClusterObjects.ClusterObjectFieldDescriptor(Type=desired_type)]
-        return all_attributes_of_type
 
     # Test configuration
     min_interval_floor_sec: int = 1
@@ -202,7 +168,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         (even with a no-op callback) to initialize the attribute.
 
         Note: SetNotifySubscriptionStillActiveCallback() was created by Raul in both
-        the underlying C++ and Python SDK code specifically to support empty report
+        the underlying C++ and Python framework specifically to support empty report
         detection in subscription tests like this one. 
 
         Args:
