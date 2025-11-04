@@ -65,10 +65,9 @@ public:
      * ICDConfigurationData If function fails, icdCounter will be unchanged
      * @return Status
      */
-    Protocols::InteractionModel::Status
-    RegisterClient(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                   const IcdManagement::Commands::RegisterClient::DecodableType & commandData,
-                   uint32_t & icdCounter);
+    Protocols::InteractionModel::Status RegisterClient(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                       const IcdManagement::Commands::RegisterClient::DecodableType & commandData,
+                                                       uint32_t & icdCounter);
 
     Protocols::InteractionModel::Status
     UnregisterClient(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
