@@ -38,7 +38,7 @@ public:
 
     OptionalAttributes & GetOptionalAttributes() { return mOptionalAttributes; }
 
-    void SetBreadCrumb(uint64_t value) override;
+    void SetBreadCrumb(uint64_t value) final;
 
     // Server cluster implementation
     CHIP_ERROR Startup(ServerClusterContext & context) override;
@@ -56,7 +56,7 @@ public:
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
     // Fabric delegate
-    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) final;
 
     // Feature map constant based on compile-time defines. This ensures feature map
     // is in sync with the actual supported features determined at build time.
