@@ -18,6 +18,7 @@ import json
 import logging
 import os
 import sys
+import shutil
 
 import click
 import coloredlogs
@@ -25,6 +26,74 @@ from builders.builder import BuilderOptions
 from runner import PrintOnlyRunner, ShellRunner
 
 import build
+
+
+class Context:
+    def __init__(self, repository_path, output_prefix, runner, ninja_jobs, verbose):
+        self.repository_path = repository_path
+        self.output_prefix = output_prefix
+        self.runner = runner
+        self.ninja_jobs = ninja_jobs
+        self.verbose = verbose
+
+        self.builders = {}
+        self.groups = {}
+        self.unified_builders = {}
+
+    def SetupBuilders(self, targets, options):
+        for target in targets:
+            logging.info('Finding builder for %s' % target)
+            builder = None
+            for target_meta in build.targets.BUILD_TARGETS:
+                if target_meta.IsCompatible(target):
+                    builder = target_meta.Create(
+                        self.output_prefix, self.runner, options)
+                    break
+
+            if not builder:
+                raise Exception('Unknown target: "%s"' % target)
+
+            if builder.unified_id:
+                if builder.unified_id not in self.unified_builders:
+                    logging.info(
+                        f'Will start a new unified build group {builder.unified_id}')
+                    self.unified_builders[builder.unified_id] = builder
+                    self.groups[builder.identifier] = builder.unified_id
+                else:
+                    logging.info(
+                        f'Adding {builder.identifier} to unified build group {builder.unified_id}')
+                    self.groups[builder.identifier] = builder.unified_id
+
+                # ensure we only have one builder for a unified build
+                self.builders[builder.identifier] = self.unified_builders[builder.unified_id]
+
+            else:
+                self.builders[builder.identifier] = builder
+
+    def CleanOutputDirectories(self):
+        for builder in self.builders.values():
+            logging.info('Cleaning %s' % builder.output_dir)
+            shutil.rmtree(builder.output_dir, ignore_errors=True)
+
+    def Generate(self):
+        for builder in self.builders.values():
+            builder.generate()
+
+    def Build(self):
+        for builder in self.builders.values():
+            builder.build()
+
+    def CopyArtifactsTo(self, directory):
+        for builder in self.builders.values():
+            builder.CopyArtifacts(directory)
+
+    def CreateArtifactArchives(self, directory):
+        for builder in self.builders.values():
+            archive_name = os.path.join(
+                directory, f'{builder.identifier}.tar.gz')
+            logging.info(f'Archiving {builder.identifier} to {archive_name}')
+            builder.CompressArtifacts(archive_name)
+
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
@@ -169,9 +238,9 @@ before running this script.
     else:
         runner = ShellRunner(root=repo)
 
-    context.obj = build.Context(
-        repository_path=repo, output_prefix=out_prefix, verbose=verbose,
-        ninja_jobs=ninja_jobs, runner=runner
+    context.obj = Context(
+        repository_path=repo, output_prefix=out_prefix, runner=runner,
+        ninja_jobs=ninja_jobs, verbose=verbose
     )
 
     requested_targets = set([t.lower() for t in target])

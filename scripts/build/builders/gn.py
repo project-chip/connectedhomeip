@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import shlex
+import os
 
 from .builder import Builder
 
@@ -29,6 +30,16 @@ class GnBuilder(Builder):
         super(GnBuilder, self).__init__(root, runner)
 
         self.build_command = None
+
+    @property
+    def output_dir(self):
+        """
+        In a unified build, the output directory is based on the unified_id, otherwise
+        it is based on the builder identifier.
+        """
+        if self.unified_id:
+            return os.path.join(self.root, 'out', self.unified_id)
+        return os.path.join(self.root, 'out', self.identifier)
 
     def GnBuildArgs(self):
         """Extra gn build `--args`

@@ -310,10 +310,10 @@ jobs:
                         --target linux-x64-tv-app-${BUILD_VARIANT} \
                         --target linux-x64-bridge-${BUILD_VARIANT} \
                         --target linux-x64-lit-icd-${BUILD_VARIANT} \
-                        --target linux-x64-microwave-oven-${BUILD_VARIIANT} \
+                        --target linux-x64-microwave-oven-${BUILD_VARIANT} \
                         --target linux-x64-rvc-${BUILD_VARIANT} \
                         --target linux-x64-network-manager-${BUILD_VARIANT} \
-                        --target linux-x64-energy-gateway-${BUILD_VARIIANT} \
+                        --target linux-x64-energy-gateway-${BUILD_VARIANT} \
                         --target linux-x64-energy-management-${BUILD_VARIANT} \
                         build \
                         --copy-artifacts-to objdir-clone \
@@ -645,6 +645,7 @@ jobs:
                         --target linux-x64-lock-${BUILD_VARIANT}-tsan-clang-test-unified \
                         --target linux-x64-microwave-oven-${BUILD_VARIANT}-tsan-clang-test-unified \
                         --target linux-x64-ota-provider-${BUILD_VARIANT}-tsan-clang-test-unified \
+                        --target linux-x64-python-bindings-${BUILD_VARIANT}-tsan-clang-test-unified \
                         --target linux-x64-rvc-${BUILD_VARIANT}-tsan-clang-test-unified \
                         --target linux-x64-thermostat-${BUILD_VARIANT}-tsan-clang-test-unified \
                         --target linux-x64-tv-app-${BUILD_VARIANT}-tsan-clang-test-unified \
@@ -655,15 +656,20 @@ jobs:
                      "
                   rm -rf out/unified-build
 
-            - name: Build linux-x64-all-clusters
+            - name: Build apps for REPL tests with triggers unified build
               env:
                   CCACHE_DIR: "${{ github.workspace }}/.ccache"
-              run: >-
-                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test
-                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test
-                  "
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test-triggers \
+                        --target linux-x64-energy-gateway-${BUILD_VARIANT}-tsan-clang-test-triggers \
+                        --target linux-x64-energy-management-${BUILD_VARIANT}-tsan-clang-test-triggers \
+                        --target linux-x64-ota-requestor-${BUILD_VARIANT}-tsan-clang-test-triggers \
+                        --pw-command-launcher=ccache \
+                        build \
+                        --copy-artifacts-to objdir-clone \
+                     "
 
             - name: Build linux-x64-lit-icd
               env:

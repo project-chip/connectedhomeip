@@ -95,26 +95,41 @@ class HostApp(Enum):
     JF_ADMIN = auto()
     CLOSURE = auto()
 
-    def UnifiedTargetName(self):
+    def UnifiedTargetName(self, unified_id: str):
         """
         returns the target name to compile an app as a unified build (i.e. with the GN
         root set to '')
         """
-        TARGETS = {
-            # keep-sorted start
-            HostApp.AIR_PURIFIER: ":linux_air_purifier_app",
-            HostApp.BRIDGE: ":linux_bridge_app",
-            HostApp.CLOSURE: ":linux_closure_app",
-            HostApp.LIGHT: ":linux_lighting_app",
-            HostApp.LOCK: ":linux_lock_app",
-            HostApp.MICROWAVE_OVEN: ":linux_microwave_oven_app",
-            HostApp.OTA_PROVIDER: ":linux_ota_provider_app",
-            HostApp.RVC: ":linux_rvc_app",
-            HostApp.THERMOSTAT: ":linux_thermostat_app",
-            HostApp.TV_APP: ":linux_tv_app",
-            HostApp.WATER_LEAK_DETECTOR: ":linux_water_leak_detector_app",
-            # keep-sorted end
-        }
+        if unified_id == 'unified':
+            TARGETS = {
+                # keep-sorted start
+                HostApp.AIR_PURIFIER: ":linux_air_purifier_app",
+                HostApp.BRIDGE: ":linux_bridge_app",
+                HostApp.CLOSURE: ":linux_closure_app",
+                HostApp.LIGHT: ":linux_lighting_app",
+                HostApp.LOCK: ":linux_lock_app",
+                HostApp.MICROWAVE_OVEN: ":linux_microwave_oven_app",
+                HostApp.OTA_PROVIDER: ":linux_ota_provider_app",
+                HostApp.PYTHON_BINDINGS: "matter-repl",
+                HostApp.RVC: ":linux_rvc_app",
+                HostApp.TERMS_AND_CONDITIONS: ":linux_terms_and_conditions_app",
+                HostApp.THERMOSTAT: ":linux_thermostat_app",
+                HostApp.TV_APP: ":linux_tv_app",
+                HostApp.WATER_LEAK_DETECTOR: ":linux_water_leak_detector_app",
+                # keep-sorted end
+            }
+        elif unified_id == 'triggers':
+            TARGETS = {
+                # keep-sorted start
+                HostApp.ALL_CLUSTERS: ":linux_all_clusters_app",
+                HostApp.ENERGY_GATEWAY: ":linux_energy_gateway_app",
+                HostApp.ENERGY_MANAGEMENT: ":linux_energy_management_app",
+                HostApp.OTA_REQUESTOR: ":linux_ota_requestor_app",
+                # keep-sorted end
+            }
+        else:
+            raise ValueError(f"Unknown unified_id: {unified_id}")
+
         return TARGETS[self]
 
     def ExamplePath(self):
@@ -401,7 +416,7 @@ class HostBuilder(GnBuilder):
                  use_googletest=False,
                  enable_webrtc=False,
                  terms_and_conditions_required: Optional[bool] = None, chip_enable_nfc_based_commissioning=None,
-                 unified=False
+                 unified=False, unified_id: Optional[str] = None
                  ):
         """
         Construct a host builder.
@@ -424,6 +439,7 @@ class HostBuilder(GnBuilder):
         self.build_env = {}
         self.fuzzing_type = fuzzing_type
         self.unified = unified
+        self._unified_id = unified_id
 
         if enable_rpcs:
             self.extra_gn_options.append('import("//with_pw_rpc.gni")')
@@ -440,7 +456,7 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.append('matter_enable_tracing_support=true')
             self.extra_gn_options.append('matter_log_json_payload_hex=true')
             self.extra_gn_options.append('matter_log_json_payload_decode_full=true')
-            self.build_command = app.UnifiedTargetName()
+            self.build_command = app.UnifiedTargetName(unified_id)
 
         if not enable_wifipaf:
             self.extra_gn_options.append(
@@ -599,6 +615,10 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.append('pw_unit_test_BACKEND="$dir_pw_unit_test:googletest"')
             self.extra_gn_options.append('dir_pw_third_party_googletest="$dir_googletest"')
             self.extra_gn_options.append('chip_build_tests_googletest=true')
+
+    @property
+    def unified_id(self):
+        return self._unified_id
 
     def GnBuildArgs(self):
         if self.board == HostBoard.NATIVE:

@@ -58,6 +58,10 @@ class Builder(ABC):
         self.output_dir = None
         self.options = BuilderOptions()
 
+    @property
+    def unified_id(self):
+        return None
+
     @abstractmethod
     def generate(self):
         """Generate the build files - generally the ninja/makefiles"""

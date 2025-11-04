@@ -204,22 +204,37 @@ def BuildHostTarget():
     target.AppendModifier('googletest', use_googletest=True).OnlyIfRe('-tests')
     target.AppendModifier('terms-and-conditions', terms_and_conditions_required=True)
     target.AppendModifier('webrtc', enable_webrtc=True)
-    target.AppendModifier('unified', unified=True).OnlyIfRe(
-        "-(" + "|".join([
+    target.AppendModifier('unified', unified_id='unified', unified=True).OnlyIfRe(
+        "-(" + "|".join(sorted([
             # keep-sorted start
             'air-purifier',
+            'all-clusters',
             'bridge',
             'closure',
+            'energy-gateway',
+            'energy-management',
             'light',
             'lock',
             'microwave-oven',
+            'network-manager',
             'ota-provider',
+            'python-bindings',
             'rvc',
+            'terms-and-conditions',
             'thermostat',
             'tv-app',
             'water-leak-detector',
             # keep-sorted end
-        ]) + ")-")
+        ])) + ")-")
+    target.AppendModifier('triggers', unified_id='triggers', unified=True).OnlyIfRe(
+        "-(" + "|".join(sorted([
+            # keep-sorted start
+            'all-clusters',
+            'energy-gateway',
+            'energy-management',
+            'ota-requestor',
+            # keep-sorted end
+        ])) + ")-")
 
     return target
 
