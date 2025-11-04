@@ -19,7 +19,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/clusters/testing/CommandTesting.h>
+#include <app/clusters/testing/MockCommandHandler.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/server-cluster/ServerClusterInterface.h>
