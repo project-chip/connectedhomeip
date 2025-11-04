@@ -929,6 +929,8 @@ CHIP_ERROR WifiInterfaceImpl::StartNetworkScan(chip::ByteSpan ssid, ::ScanCallba
     if (status != SL_STATUS_OK)
     {
         ChipLogError(DeviceLayer, "sl_wifi_start_scan failed: 0x%lx", status);
+        // Map the sl_wifi error to a CHIP_ERROR; use CHIP_ERROR_INTERNAL as a generic fallback
+        return CHIP_ERROR_INTERNAL;
     }
     return CHIP_NO_ERROR;
 }
