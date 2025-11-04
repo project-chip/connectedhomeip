@@ -17,6 +17,7 @@
 
 #include "ThermostatClusterPresets.h"
 #include "ThermostatCluster.h"
+#include "ThermostatClusterSetpoints.h"
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
@@ -252,8 +253,6 @@ namespace Clusters {
 namespace Thermostat {
 
 extern ThermostatAttrAccess gThermostatAttrAccess;
-extern int16_t EnforceHeatingSetpointLimits(int16_t HeatingSetpoint, EndpointId endpoint);
-extern int16_t EnforceCoolingSetpointLimits(int16_t CoolingSetpoint, EndpointId endpoint);
 
 /**
  * @brief Checks if the given preset handle is present in the  presets attribute
