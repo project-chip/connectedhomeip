@@ -60,11 +60,7 @@ CHIP_ERROR MockCommandHandler::AddResponseData(const ConcreteCommandPath & aRequ
     ReturnErrorOnFailure(static_cast<TLV::TLVWriter &>(writer).EndContainer(ct));
     handle->SetDataLength(static_cast<TLV::TLVWriter &>(writer).GetLengthWritten());
 
-    ResponseRecord record;
-    record.path        = aRequestCommandPath;
-    record.commandId   = aResponseCommandId;
-    record.encodedData = std::move(handle);
-    mResponses.push_back(std::move(record));
+    mResponses.emplace_back(ResponseRecord{ aResponseCommandId, std::move(handle), aRequestCommandPath });
     return CHIP_NO_ERROR;
 }
 
