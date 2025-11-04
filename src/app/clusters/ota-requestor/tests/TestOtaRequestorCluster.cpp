@@ -77,7 +77,7 @@ public:
     }
     DataModel::Nullable<uint8_t> GetCurrentUpdateStateProgress() override
     {
-        return {};
+        return mUpdateStateProgress;
     }
     uint32_t GetTargetVersion() override
     {
@@ -110,9 +110,15 @@ public:
         return mLastAnnounceCommandPayload;
     }
 
+    void SetUpdateStateProgress(DataModel::Nullable<uint8_t> updateStateProgress)
+    {
+        mUpdateStateProgress = updateStateProgress;
+    }
+
 private:
     OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType mLastAnnounceCommandPayload;
     ProviderLocationList mProviderLocations;
+    DataModel::Nullable<uint8_t> mUpdateStateProgress;
 };
 
 struct TestOtaRequestorCluster : public ::testing::Test
@@ -315,6 +321,13 @@ TEST_F(TestOtaRequestorCluster, ReadAttributesTest)
                                    updateStateProgress),
               CHIP_NO_ERROR);
     EXPECT_TRUE(updateStateProgress.IsNull());
+
+    otaRequestor.SetUpdateStateProgress(85);
+    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id,
+                                   updateStateProgress),
+              CHIP_NO_ERROR);
+    EXPECT_FALSE(updateStateProgress.IsNull());
+    EXPECT_EQ(updateStateProgress.Value(), 85);
 
     // Read and verify FeatureMap.
     uint32_t featureMap;
