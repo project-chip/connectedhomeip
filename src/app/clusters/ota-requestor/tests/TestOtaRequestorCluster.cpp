@@ -93,12 +93,11 @@ public:
     void GetProviderLocation(Optional<ProviderLocationType> & providerLocation) override {}
     CHIP_ERROR AddDefaultOtaProvider(const ProviderLocationType & providerLocation) override
     {
-        return CHIP_NO_ERROR;
+        return mProviderLocations.Add(providerLocation);
     }
     ProviderLocationList::Iterator GetDefaultOTAProviderListIterator() override
     {
-        ProviderLocationList::Iterator result(nullptr, 0);
-        return result;
+        return mProviderLocations.Begin();
     }
     void SetUpdatePossible(bool updatePossible) override {}
     bool GetUpdatePossible() override
@@ -113,6 +112,7 @@ public:
 
 private:
     OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType mLastAnnounceCommandPayload;
+    ProviderLocationList mProviderLocations;
 };
 
 struct TestOtaRequestorCluster : public ::testing::Test
@@ -276,13 +276,26 @@ TEST_F(TestOtaRequestorCluster, ReadAttributesTest)
     chip::Test::ClusterTester tester(cluster);
 
     // Read and verify DefaultOTAProviders.
-    DataModel::DecodableList<OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> defaultOtaProviders;
+    using DecodableProviderLocation = OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType;
+    OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type provider;
+    provider.providerNodeID = 1234u;
+    provider.endpoint = 8;
+    provider.fabricIndex = 2;
+    otaRequestor.AddDefaultOtaProvider(provider);
+    DataModel::DecodableList<DecodableProviderLocation> defaultOtaProviders;
     EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id,
                                    defaultOtaProviders),
               CHIP_NO_ERROR);
     size_t defaultOtaProvidersSize;
     defaultOtaProviders.ComputeSize(&defaultOtaProvidersSize);
-    EXPECT_EQ(defaultOtaProvidersSize, 0u);
+    EXPECT_EQ(defaultOtaProvidersSize, 1u);
+    DataModel::DecodableList<DecodableProviderLocation>::Iterator defaultOtaProvidersIterator =
+        defaultOtaProviders.begin();
+    EXPECT_TRUE(defaultOtaProvidersIterator.Next());
+    const DecodableProviderLocation & decodedProvider = defaultOtaProvidersIterator.GetValue();
+    EXPECT_EQ(decodedProvider.providerNodeID, 1234u);
+    EXPECT_EQ(decodedProvider.endpoint, 8);
+    EXPECT_EQ(decodedProvider.fabricIndex, 2);
 
     // Read and verify UpdatePossible.
     bool updatePossible;
