@@ -91,6 +91,10 @@ class TC_WEBRTCP_2_9(MatterBaseTest, WEBRTCPTestBase):
         await self.send_single_cmd(cmd=end_session_cmd, endpoint=endpoint)
         # EndSession command succeeds if no exception is thrown
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_WEBRTCP_2_9(self):
         """
@@ -99,7 +103,7 @@ class TC_WEBRTCP_2_9(MatterBaseTest, WEBRTCPTestBase):
 
         self.step("precondition")
         # Commission DUT - already done
-        endpoint = self.user_params.get("endpoint", 1)
+        endpoint = self.get_endpoint()
 
         self.step(1)
         # Allocate Audio and Video streams
