@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "resource-monitoring-server.h"
+#include "CodegenIntegration.h"
 #include <app/clusters/resource-monitoring-server/resource-monitoring-cluster.h>
 #include <app/static-cluster-config/ActivatedCarbonFilterMonitoring.h>
 #include <app/static-cluster-config/HepaFilterMonitoring.h>
