@@ -34,19 +34,15 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
-import inspect
 import logging
 import time
-import typing
-from enum import IntFlag
 
-from mobly import asserts, signals
+from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.ChipDeviceCtrl import ChipDeviceController
 from matter.clusters import ClusterObjects as ClusterObjects
 from matter.clusters.Attribute import AttributePath, ValueDecodeFailure
-from matter.clusters.enum import MatterIntEnum
 from matter.interaction_model import Status
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
