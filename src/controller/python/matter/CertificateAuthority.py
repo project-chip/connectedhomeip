@@ -256,7 +256,7 @@ class CertificateAuthorityManager:
             chipStack:          Reference to a matter.ChipStack object that is used to initialize
                                 CertificateAuthority instances.
 
-            persistentStorage:  An optional reference to persistentStorage, if provided, 
+            persistentStorage:  An optional reference to persistentStorage, if provided,
                                 over-rides the default instance in the provided chipStack
                                 when initializing CertificateAuthority instances.
         '''
