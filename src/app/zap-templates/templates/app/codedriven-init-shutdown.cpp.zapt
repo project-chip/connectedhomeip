@@ -10,10 +10,13 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId  clusterId) 
     switch (clusterId)
     {
     {{#all_user_clusters side='server'}}
-    {{#if (isInConfigList name "CodeDrivenClusters")}}
+    {{#if (isInConfigList name "CodeDrivenClustersWithCodegenIntegration")}}
     case app::Clusters::{{asUpperCamelCase name}}::Id:
         Matter{{asUpperCamelCase name}}ClusterInitCallback(endpoint);
         break;
+    {{else if (isInConfigList name "CodeDrivenClustersWithoutCodegenIntegration")}}
+    case app::Clusters::{{asUpperCamelCase name}}::Id:
+        #error "The {{asUpperCamelCase name}} cluster is part of the CodeDrivenClustersWithoutCodegenIntegration, but is enabled in ZAP and should be initialized directly."
     {{/if}}
     {{/all_user_clusters}}
     }
@@ -23,10 +26,13 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
     switch (clusterId)
     {
     {{#all_user_clusters side='server'}}
-    {{#if (isInConfigList name "CodeDrivenClusters")}}
+    {{#if (isInConfigList name "CodeDrivenClustersWithCodegenIntegration")}}
     case app::Clusters::{{asUpperCamelCase name}}::Id:
         Matter{{asUpperCamelCase name}}ClusterShutdownCallback(endpoint);
         break;
+    {{else if (isInConfigList name "CodeDrivenClustersWithoutCodegenIntegration")}}
+    case app::Clusters::{{asUpperCamelCase name}}::Id:
+        #error "The {{asUpperCamelCase name}} cluster is part of the CodeDrivenClustersWithoutCodegenIntegration, but is enabled in ZAP and should be shutdown directly."
     {{/if}}
     {{/all_user_clusters}}
     }
