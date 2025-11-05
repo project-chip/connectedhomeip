@@ -40,7 +40,7 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --string-arg provider_app_path:${OTA_PROVIDER_APP}
-#       --string-arg ota_image:${OTA_IMAGE_V2}
+#       --string-arg ota_image:${SU_OTA_REQUESTOR_V2}
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -446,10 +446,18 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         #   --nodeId 2
         # ------------------------------------------------------------------------------------
 
-        self.LOG_FILE_PATH = "provider.log"
-        self.KVS_PATH = "/tmp/chip_kvs_provider"
-        self.provider_app_path = self.user_params.get('provider_app_path', None)  # "./out/debug/chip-ota-provider-app"
-        self.ota_image_v2 = self.user_params.get('ota_image')
+        if self.is_pics_sdk_ci_only:
+            logger.info("Using SDK_CI_ONLY parameters for Provider app path and OTA image")
+            self.LOG_FILE_PATH = "provider.log"
+            self.KVS_PATH = "/tmp/chip_kvs_provider"
+            self.provider_app_path = self.user_params.get('provider_app_path', None)  # "./out/debug/chip-ota-provider-app"
+            self.ota_image_v2 = self.user_params.get('ota_image')
+        else:
+            logger.info("Using default parameters for Provider app path and OTA image")
+            self.LOG_FILE_PATH = "provider.log"
+            self.KVS_PATH = "/tmp/chip_kvs_provider"
+            self.provider_app_path = "./out/debug/chip-ota-provider-app"
+            self.ota_image_v2 = "firmware_requestor_v2min.ota"
 
         self.step(0)
         # Controller has already commissioned the requestor
