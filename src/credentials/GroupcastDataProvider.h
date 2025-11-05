@@ -41,7 +41,10 @@ struct Group
 
     Group & operator=(const Group & t)
     {
+        if (this == &t)
+            return *this;
         this->group_id       = t.group_id;
+        this->key_id         = t.key_id;
         this->endpoint_count = t.endpoint_count;
         memcpy(this->endpoints, t.endpoints, this->endpoint_count * sizeof(EndpointId));
         return *this;
@@ -75,7 +78,6 @@ struct DataProvider
 
     DataProvider() = default;
 
-    static DataProvider & Instance();
     CHIP_ERROR Initialize(PersistentStorageDelegate * storage, chip::Crypto::SessionKeystore * keystore);
     uint8_t GetMaxMembershipCount();
     CHIP_ERROR AddGroup(chip::FabricIndex fabric_idx, Group & grp);

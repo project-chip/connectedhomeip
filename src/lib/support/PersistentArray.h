@@ -20,21 +20,14 @@
 
 namespace chip {
 
-static constexpr size_t kPersistentArraySerializedMinSize =
-    7 + 200; // ContainerTag(1) + CountTag(1) + Count(2) + ListTag(1) + EndListTag(1) + EndContainerTag(1) + 1
-static constexpr size_t kPersistentEntrySerializedMinSize = 2; // EntryStartTag(1) + EntryEndTag(1)
-
 template <size_t kMaxListSize, size_t kMaxSerializedEntrySize, typename EntryType>
-struct PersistentArray : public PersistentData<kPersistentArraySerializedMinSize +
-                                               kMaxListSize *(kPersistentEntrySerializedMinSize + kMaxSerializedEntrySize)>
+struct PersistentArray
+    : public PersistentData<TLV::EstimateStructOverhead(sizeof(uint16_t), kMaxListSize * kMaxSerializedEntrySize)>
 {
-    PersistentArray(PersistentStorageDelegate * storage, uint16_t count = 0) :
-        PersistentData<kPersistentArraySerializedMinSize +
-                       kMaxListSize *(kPersistentEntrySerializedMinSize + kMaxSerializedEntrySize)>(storage),
-        mLimit(kMaxListSize), mCount(count)
+    PersistentArray(PersistentStorageDelegate * storage) :
+        PersistentData<TLV::EstimateStructOverhead(sizeof(uint16_t), kMaxListSize * kMaxSerializedEntrySize)>(storage)
     {}
 
-    EntryType & At(size_t index) { return (index < this->mLimit) ? mEntries[index] : mEntries[0]; }
     size_t Limit() { return this->mLimit; }
     uint16_t Count() { return this->mCount; }
 
@@ -74,11 +67,7 @@ struct PersistentArray : public PersistentData<kPersistentArraySerializedMinSize
             {
                 // Existing value, index must match
                 VerifyOrReturnError(i == index, CHIP_ERROR_DUPLICATE_KEY_ID);
-                EntryType old;
-                ReturnErrorOnFailure(Copy(old, e));
                 ReturnErrorOnFailure(Copy(e, value));
-                ReturnErrorOnFailure(this->Save());
-                OnEntryModified(old, value);
                 return CHIP_NO_ERROR;
             }
         }
@@ -87,11 +76,7 @@ struct PersistentArray : public PersistentData<kPersistentArraySerializedMinSize
         if (index < this->mCount)
         {
             // Override (implicit remove)
-            EntryType old;
-            Copy(old, mEntries[index]);
             ReturnErrorOnFailure(Copy(mEntries[index], value));
-            ReturnErrorOnFailure(this->Save());
-            OnEntryRemoved(old);
         }
         else
         {
@@ -99,9 +84,7 @@ struct PersistentArray : public PersistentData<kPersistentArraySerializedMinSize
             VerifyOrReturnError(this->mCount < this->mLimit, CHIP_ERROR_INVALID_ARGUMENT);
             VerifyOrReturnError(index == this->mCount, CHIP_ERROR_INVALID_ARGUMENT);
             ReturnErrorOnFailure(Copy(mEntries[this->mCount++], value));
-            ReturnErrorOnFailure(this->Save());
         }
-        OnEntryAdded(value);
         return CHIP_NO_ERROR;
     }
 
@@ -127,19 +110,13 @@ struct PersistentArray : public PersistentData<kPersistentArraySerializedMinSize
             {
                 // Already registered
                 VerifyOrReturnError(do_override, CHIP_ERROR_DUPLICATE_KEY_ID);
-                EntryType old;
-                ReturnErrorOnFailure(Copy(old, e));
                 ReturnErrorOnFailure(Copy(e, value));
-                ReturnErrorOnFailure(this->Save());
-                OnEntryModified(old, value);
                 return CHIP_NO_ERROR;
             }
         }
         // Insert last
         VerifyOrReturnError(this->mCount < this->mLimit, CHIP_ERROR_INVALID_LIST_LENGTH);
         ReturnErrorOnFailure(Copy(mEntries[this->mCount++], value));
-        ReturnErrorOnFailure(this->Save());
-        OnEntryAdded(value);
         return CHIP_NO_ERROR;
     }
 
@@ -212,15 +189,12 @@ struct PersistentArray : public PersistentData<kPersistentArraySerializedMinSize
         ReturnErrorOnFailure(this->Load());
         VerifyOrReturnError(index < this->mLimit, CHIP_ERROR_NOT_FOUND);
         VerifyOrReturnError(index < this->mCount, CHIP_ERROR_NOT_FOUND);
-        EntryType old;
-        Copy(old, mEntries[index]);
         this->mCount--;
         for (size_t i = index; i < this->mCount; ++i)
         {
-            Copy(mEntries[i], mEntries[i + 1]);
+            ReturnErrorOnFailure(Copy(mEntries[i], mEntries[i + 1]));
         }
         ClearEntry(mEntries[this->mCount]);
-        OnEntryRemoved(old);
         return CHIP_NO_ERROR;
     }
 
@@ -241,7 +215,7 @@ struct PersistentArray : public PersistentData<kPersistentArraySerializedMinSize
                 return Remove(i);
             }
         }
-        return CHIP_NO_ERROR;
+        return CHIP_ERROR_NOT_FOUND;
     }
 
     /**
@@ -251,12 +225,10 @@ struct PersistentArray : public PersistentData<kPersistentArraySerializedMinSize
     CHIP_ERROR RemoveAll()
     {
         ReturnErrorOnFailure(this->Load());
-        for (uint16_t i = 0; i < mLimit; ++i)
+        for (size_t i = this->mCount; (this->mCount > 0) && (i > 0); --i)
         {
-            OnEntryRemoved(mEntries[i]);
+            return Remove(i - 1);
         }
-        mCount = 0;
-        ReturnErrorOnFailure(this->Save());
         return CHIP_NO_ERROR;
     }
 
@@ -334,13 +306,10 @@ protected:
     virtual CHIP_ERROR UpdateKey(StorageKeyName & key) const override                    = 0;
     virtual CHIP_ERROR Serialize(TLV::TLVWriter & writer, const EntryType & entry) const = 0;
     virtual CHIP_ERROR Deserialize(TLV::TLVReader & reader, EntryType & entry)           = 0;
-    virtual void OnEntryAdded(const EntryType & entry) {}
-    virtual void OnEntryRemoved(const EntryType & entry) {}
-    virtual void OnEntryModified(const EntryType & old_value, const EntryType & new_value) {}
 
 private:
     EntryType mEntries[kMaxListSize];
-    const size_t mLimit = 0;
+    const size_t mLimit = kMaxListSize;
     uint16_t mCount     = 0;
 };
 
