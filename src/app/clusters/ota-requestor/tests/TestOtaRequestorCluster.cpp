@@ -344,4 +344,103 @@ TEST_F(TestOtaRequestorCluster, ReadAttributesTest)
     EXPECT_NE(tester.ReadAttribute(0xFFFF, nonExistentAttribute), CHIP_NO_ERROR);
 }
 
+TEST_F(TestOtaRequestorCluster, StateTransitionEvent)
+{
+    chip::Test::TestServerClusterContext context;
+    MockOtaRequestor otaRequestor;
+    OtaRequestorCluster cluster(kTestEndpointId, otaRequestor);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    auto & eventsGenerator = context.EventsGenerator();
+
+    cluster.OnStateTransition(OtaSoftwareUpdateRequestor::UpdateStateEnum::kQuerying,
+                              OtaSoftwareUpdateRequestor::UpdateStateEnum::kIdle,
+                              OtaSoftwareUpdateRequestor::ChangeReasonEnum::kFailure,
+                              1000u);
+    auto event = eventsGenerator.GetNextEvent();
+    ASSERT_TRUE(event.has_value());
+    EXPECT_EQ(event->eventOptions.mPath,
+              ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id,
+                                OtaSoftwareUpdateRequestor::Events::StateTransition::Id));
+    OtaSoftwareUpdateRequestor::Events::StateTransition::DecodableType decodedEvent;
+    ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR);
+    EXPECT_EQ(decodedEvent.previousState, OtaSoftwareUpdateRequestor::UpdateStateEnum::kQuerying);
+    EXPECT_EQ(decodedEvent.newState, OtaSoftwareUpdateRequestor::UpdateStateEnum::kIdle);
+    EXPECT_EQ(decodedEvent.reason, OtaSoftwareUpdateRequestor::ChangeReasonEnum::kFailure);
+    EXPECT_EQ(decodedEvent.targetSoftwareVersion, DataModel::MakeNullable(1000u));
+}
+
+TEST_F(TestOtaRequestorCluster, NoStateTransitionEventWithIdenticalStates)
+{
+    chip::Test::TestServerClusterContext context;
+    MockOtaRequestor otaRequestor;
+    OtaRequestorCluster cluster(kTestEndpointId, otaRequestor);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    auto & eventsGenerator = context.EventsGenerator();
+
+    cluster.OnStateTransition(OtaSoftwareUpdateRequestor::UpdateStateEnum::kApplying,
+                              OtaSoftwareUpdateRequestor::UpdateStateEnum::kApplying,
+                              OtaSoftwareUpdateRequestor::ChangeReasonEnum::kTimeOut,
+                              2000u);
+    auto event = eventsGenerator.GetNextEvent();
+    ASSERT_FALSE(event.has_value());
+}
+
+TEST_F(TestOtaRequestorCluster, VersionAppliedEvent)
+{
+    chip::Test::TestServerClusterContext context;
+    MockOtaRequestor otaRequestor;
+    OtaRequestorCluster cluster(kTestEndpointId, otaRequestor);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    auto & eventsGenerator = context.EventsGenerator();
+
+    cluster.OnVersionApplied(3000u, 1234u);
+    auto event = eventsGenerator.GetNextEvent();
+    ASSERT_TRUE(event.has_value());
+    EXPECT_EQ(event->eventOptions.mPath,
+              ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id,
+                                OtaSoftwareUpdateRequestor::Events::VersionApplied::Id));
+    OtaSoftwareUpdateRequestor::Events::VersionApplied::DecodableType decodedEvent;
+    ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR);
+    EXPECT_EQ(decodedEvent.softwareVersion, 3000u);
+    EXPECT_EQ(decodedEvent.productID, 1234u);
+}
+
+TEST_F(TestOtaRequestorCluster, DownloadErrorEvents)
+{
+    chip::Test::TestServerClusterContext context;
+    MockOtaRequestor otaRequestor;
+    OtaRequestorCluster cluster(kTestEndpointId, otaRequestor);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    auto & eventsGenerator = context.EventsGenerator();
+
+    cluster.OnDownloadError(4000u, 10000u, 82u, 1234567890l);
+    auto event = eventsGenerator.GetNextEvent();
+    ASSERT_TRUE(event.has_value());
+    EXPECT_EQ(event->eventOptions.mPath,
+              ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id,
+                                OtaSoftwareUpdateRequestor::Events::DownloadError::Id));
+    OtaSoftwareUpdateRequestor::Events::DownloadError::DecodableType decodedEvent;
+    ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR);
+    EXPECT_EQ(decodedEvent.softwareVersion, 4000u);
+    EXPECT_EQ(decodedEvent.bytesDownloaded, 10000u);
+    EXPECT_EQ(decodedEvent.progressPercent, DataModel::MakeNullable(static_cast<uint8_t>(82u)));
+    EXPECT_EQ(decodedEvent.platformCode, DataModel::MakeNullable(1234567890l));
+
+    cluster.OnDownloadError(5000u, 12000u, DataModel::NullNullable, DataModel::NullNullable);
+    event = eventsGenerator.GetNextEvent();
+    ASSERT_TRUE(event.has_value());
+    EXPECT_EQ(event->eventOptions.mPath,
+              ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id,
+                                OtaSoftwareUpdateRequestor::Events::DownloadError::Id));
+    ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR);
+    EXPECT_EQ(decodedEvent.softwareVersion, 5000u);
+    EXPECT_EQ(decodedEvent.bytesDownloaded, 12000u);
+    EXPECT_TRUE(decodedEvent.progressPercent.IsNull());
+    EXPECT_TRUE(decodedEvent.platformCode.IsNull());
+}
+
 }  // namespace

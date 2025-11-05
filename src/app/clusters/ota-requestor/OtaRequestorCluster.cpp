@@ -108,4 +108,34 @@ CHIP_ERROR OtaRequestorCluster::AcceptedCommands(const ConcreteClusterPath & pat
     return builder.ReferenceExisting(kAcceptedCommands);
 }
 
+void OtaRequestorCluster::OnStateTransition(OtaSoftwareUpdateRequestor::UpdateStateEnum previousState,
+                                            OtaSoftwareUpdateRequestor::UpdateStateEnum newState,
+                                            OtaSoftwareUpdateRequestor::ChangeReasonEnum reason,
+                                            DataModel::Nullable<uint32_t> const & targetSoftwareVersion)
+{
+    if (previousState == newState)
+    {
+        ChipLogError(Zcl, "Previous state and new state are the same (%d), no event to log", to_underlying(newState));
+        return;
+    }
+    OtaSoftwareUpdateRequestor::Events::StateTransition::Type event =
+        { previousState, newState, reason, targetSoftwareVersion };
+    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+}
+
+void OtaRequestorCluster::OnVersionApplied(uint32_t softwareVersion, uint16_t productId)
+{
+    OtaSoftwareUpdateRequestor::Events::VersionApplied::Type event = { softwareVersion, productId };
+    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+}
+
+void OtaRequestorCluster::OnDownloadError(uint32_t softwareVersion, uint64_t bytesDownloaded,
+                                          DataModel::Nullable<uint8_t> progressPercent,
+                                          DataModel::Nullable<int64_t> platformCode)
+{
+    OtaSoftwareUpdateRequestor::Events::DownloadError::Type event =
+        { softwareVersion, bytesDownloaded, progressPercent, platformCode };
+    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+}
+
 }  // namespace chip::app::Clusters

@@ -18,12 +18,13 @@
 
 #pragma once
 
+#include <app/clusters/ota-requestor/OTARequestorEventHandler.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 
 namespace chip::app::Clusters {
 
-class OtaRequestorCluster : public DefaultServerCluster
+class OtaRequestorCluster : public DefaultServerCluster, public OtaRequestorEventHandler
 {
 public:
     OtaRequestorCluster(EndpointId endpointId, OTARequestorInterface & otaRequestor);
@@ -40,6 +41,17 @@ public:
 
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+
+    void OnStateTransition(OtaSoftwareUpdateRequestor::UpdateStateEnum previousState,
+                           OtaSoftwareUpdateRequestor::UpdateStateEnum newState,
+                           OtaSoftwareUpdateRequestor::ChangeReasonEnum reason,
+                           DataModel::Nullable<uint32_t> const & targetSoftwareVersion) override;
+
+    void OnVersionApplied(uint32_t softwareVersion, uint16_t productId) override;
+
+    void OnDownloadError(uint32_t softwareVersion, uint64_t bytesDownloaded,
+                         DataModel::Nullable<uint8_t> progressPercent,
+                         DataModel::Nullable<int64_t> platformCode) override;
 
 private:
     OTARequestorInterface & mOtaRequestor;
