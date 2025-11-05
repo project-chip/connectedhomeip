@@ -20,14 +20,16 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
-#include <getopt.h>
+
+#include <algorithm>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::BooleanStateConfiguration;
 using namespace chip::app::Clusters::BooleanStateConfiguration::Attributes;
-
+using namespace chip::Protocols::InteractionModel;
+using namespace chip::app::Clusters::BooleanStateConfiguration::Attributes;
 namespace {
 
 constexpr size_t kBooleanStateConfigurationFixedClusterCount =
@@ -43,8 +45,30 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
+        uint8_t supportedSensitivityLevels{};
+        if (SupportedSensitivityLevels::Get(endpointId, &supportedSensitivityLevels) != Status::Success)
+        {
+            supportedSensitivityLevels = BooleanStateConfigurationCluster::kMinSupportedSensitivityLevels;
+        }
+        uint8_t defaultSensitivityLevel{};
+        if (DefaultSensitivityLevel::Get(endpointId, &defaultSensitivityLevel) != Status::Success)
+        {
+            defaultSensitivityLevel = supportedSensitivityLevels - 1;
+        }
+
+        BooleanStateConfigurationCluster::AlarmModeBitMask alarmsSupported{};
+        if (AlarmsSupported::Get(endpointId, &alarmsSupported) != Status::Success)
+        {
+            alarmsSupported.ClearAll();
+        }
+
         gServers[clusterInstanceIndex].Create(endpointId, BitMask<BooleanStateConfiguration::Feature>(featureMap),
-                                              BooleanStateConfigurationCluster::OptionalAttributesSet(optionalAttributeBits));
+                                              BooleanStateConfigurationCluster::OptionalAttributesSet(optionalAttributeBits),
+                                              BooleanStateConfigurationCluster::StartupConfiguration{
+                                                  .supportedSensitivityLevels = supportedSensitivityLevels,
+                                                  .defaultSensitivityLevel    = defaultSensitivityLevel,
+                                                  .alarmsSupported            = alarmsSupported,
+                                              });
         return gServers[clusterInstanceIndex].Registration();
     }
 

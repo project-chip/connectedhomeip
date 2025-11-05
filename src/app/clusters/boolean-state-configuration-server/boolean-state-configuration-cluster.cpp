@@ -1,6 +1,5 @@
 /**
- *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,6 +17,7 @@
 
 #include "boolean-state-configuration-cluster.h"
 
+#include <algorithm>
 #include <app/SafeAttributePersistenceProvider.h>
 #include <app/data-model/Decode.h>
 #include <app/server-cluster/AttributeListBuilder.h>
@@ -28,19 +28,41 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 
-// TODO:
-//   - startup load the initial sensitivity values
-//   - do we need to validate min/max supported sensitivity levels?
-//
-// static constexpr uint8_t kMinSupportedSensitivityLevels = 2;
-// static constexpr uint8_t kMaxSupportedSensitivityLevels = 10;
-
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::BooleanStateConfiguration;
 using namespace chip::app::Clusters::BooleanStateConfiguration::Attributes;
 using namespace chip::Protocols::InteractionModel;
 
 namespace chip::app::Clusters {
+
+BooleanStateConfigurationCluster::BooleanStateConfigurationCluster(EndpointId endpointId,
+                                                                   BitMask<BooleanStateConfiguration::Feature> features,
+                                                                   OptionalAttributesSet optionalAttributes,
+                                                                   const StartupConfiguration & config) :
+    DefaultServerCluster({ endpointId, BooleanStateConfiguration::Id }), mFeatures(features),
+    mOptionalAttributes(optionalAttributes),
+    mSupportedSensitivityLevels(
+        std::clamp(config.supportedSensitivityLevels, kMinSupportedSensitivityLevels, kMaxSupportedSensitivityLevels)),
+    mDefaultSensitivityLevel(std::max(config.defaultSensitivityLevel, static_cast<uint8_t>(mSupportedSensitivityLevels - 1))),
+    mAlarmsSupported(config.alarmsSupported)
+{}
+
+CHIP_ERROR BooleanStateConfigurationCluster::Startup(ServerClusterContext & context)
+{
+    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+
+    if (GetSafeAttributePersistenceProvider()->ReadScalarValue({ mPath.mEndpointId, mPath.mClusterId, CurrentSensitivityLevel::Id },
+                                                               mCurrentSensitivityLevel) != CHIP_NO_ERROR)
+    {
+        mCurrentSensitivityLevel = mDefaultSensitivityLevel;
+    }
+
+    if (mCurrentSensitivityLevel >= mSupportedSensitivityLevels)
+    {
+        mCurrentSensitivityLevel = mSupportedSensitivityLevels - 1;
+    }
+    return CHIP_NO_ERROR;
+}
 
 CHIP_ERROR BooleanStateConfigurationCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                                               ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)

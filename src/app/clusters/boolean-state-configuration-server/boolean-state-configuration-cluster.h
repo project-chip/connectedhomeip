@@ -20,12 +20,16 @@
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/BooleanStateConfiguration/AttributeIds.h>
 #include <clusters/BooleanStateConfiguration/ClusterId.h>
+#include <cstdint>
 
 namespace chip::app::Clusters {
 
 class BooleanStateConfigurationCluster : public DefaultServerCluster
 {
 public:
+    static constexpr uint8_t kMinSupportedSensitivityLevels = 2;
+    static constexpr uint8_t kMaxSupportedSensitivityLevels = 10;
+
     using OptionalAttributesSet = OptionalAttributeSet<                     //
         BooleanStateConfiguration::Attributes::DefaultSensitivityLevel::Id, // optional if sensitivity level feature is enabled
         BooleanStateConfiguration::Attributes::AlarmsEnabled::Id,           // optional if VIS or Aud enabled
@@ -35,11 +39,15 @@ public:
     using AlarmModeBitMask   = chip::BitMask<BooleanStateConfiguration::AlarmModeBitmap>;
     using SensorFaultBitMask = chip::BitMask<BooleanStateConfiguration::SensorFaultBitmap>;
 
+    struct StartupConfiguration
+    {
+        const uint8_t supportedSensitivityLevels;
+        const uint8_t defaultSensitivityLevel;
+        const AlarmModeBitMask alarmsSupported;
+    };
+
     BooleanStateConfigurationCluster(EndpointId endpointId, BitMask<BooleanStateConfiguration::Feature> features,
-                                     OptionalAttributesSet optionalAttributes) :
-        DefaultServerCluster({ endpointId, BooleanStateConfiguration::Id }), mFeatures(features),
-        mOptionalAttributes(optionalAttributes)
-    {}
+                                     OptionalAttributesSet optionalAttributes, const StartupConfiguration & config);
 
     const BitMask<BooleanStateConfiguration::Feature> & GetFeatures() const { return mFeatures; }
 
@@ -54,6 +62,7 @@ public:
     Protocols::InteractionModel::Status SetAllEnabledAlarmsActive();
 
     // ServerClusterInterface/DefaultServerCluster implementation
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
@@ -72,12 +81,12 @@ private:
 
     // attributes that are maintained by this cluster
     uint8_t mCurrentSensitivityLevel    = 0;
-    uint8_t mSupportedSensitivityLevels = 2;
-    uint8_t mDefaultSensitivityLevel    = 0;
+    const uint8_t mSupportedSensitivityLevels;
+    const uint8_t mDefaultSensitivityLevel;
     AlarmModeBitMask mAlarmsActive{ 0 };
     AlarmModeBitMask mAlarmsSuppressed{ 0 };
     AlarmModeBitMask mAlarmsEnabled{ 0 };
-    AlarmModeBitMask mAlarmsSupported{ 0 };
+    const AlarmModeBitMask mAlarmsSupported;
     SensorFaultBitMask mSensorFault{ 0 };
 
     void EmitAlarmsStateChangedEvent();
