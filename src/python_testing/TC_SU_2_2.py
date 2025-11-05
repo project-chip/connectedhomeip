@@ -26,6 +26,7 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --secured-device-port 5541
+#       --autoApplyImage
 #       --KVS /tmp/chip_kvs_requestor
 #       --trace-to json:${TRACE_APP}.json
 #     script-args: >
@@ -33,11 +34,13 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --vendor-id 65521
-#       --product-id 32769
-#       --endpoint 0
+#       --nodeId 2
+#       --admin-vendor-id 65521
+#       --int-arg product-id:32769
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --string-arg provider_app_path:${OTA_PROVIDER_APP}
+#       --string-arg ota_image:${OTA_IMAGE_V2}
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -62,10 +65,10 @@ logger = logging.getLogger(__name__)
 
 class TC_SU_2_2(SoftwareUpdateBaseTest):
 
-    LOG_FILE_PATH = "provider.log"
-    KVS_PATH = "/tmp/chip_kvs_provider"
-    provider_app_path = "./out/debug/chip-ota-provider-app"
-    ota_image_v2 = "firmware_requestor_v2min.ota"
+    # LOG_FILE_PATH = "provider.log"
+    # KVS_PATH = "/tmp/chip_kvs_provider"
+    # provider_app_path = "./out/debug/chip-ota-provider-app"
+    # ota_image_v2 = "firmware_requestor_v2min.ota"
 
     async def add_single_ota_provider(self, controller, requestor_node_id: int, provider_node_id: int):
         """
@@ -442,6 +445,11 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         #   --int-arg product-id:32769 \
         #   --nodeId 2
         # ------------------------------------------------------------------------------------
+
+        self.LOG_FILE_PATH = "provider.log"
+        self.KVS_PATH = "/tmp/chip_kvs_provider"
+        self.provider_app_path = self.user_params.get('provider_app_path', None)  # "./out/debug/chip-ota-provider-app"
+        self.ota_image_v2 = self.user_params.get('ota_image')
 
         self.step(0)
         # Controller has already commissioned the requestor
