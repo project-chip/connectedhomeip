@@ -20,22 +20,14 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter import ChipDeviceCtrl
 from matter.commissioning import ROOT_ENDPOINT_ID
-from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 
 class TC_CNET_4_23(MatterBaseTest):
-
-    async def verify_networking_status(self, response) -> bool:
-        """ Verifies if networkingStatus is 0 (kSuccess) """
-        return (
-            hasattr(response, "networkingStatus") and
-            response.networkingStatus == Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess
-        )
 
     def steps_TC_CNET_4_23(self):
         return [
@@ -80,14 +72,10 @@ class TC_CNET_4_23(MatterBaseTest):
         ]
 
     def desc_TC_CNET_4_23(self):
-        return "[TC-CNET-4.23] [Wi-Fi][Thread] Verification for Commissioning [DUT-Server]"
+        return "[TC-CNET-4.23] [Wi-Fi] Verification for Commissioning [DUT-Server]"
 
-    @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))
+    @async_test_body
     async def test_TC_CNET_4_23(self):
-
-        # asserts.assert_true("PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID" in self.matter_test_config.global_test_params,
-        #                     "PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID must be included on the command line in "
-        #                     "the --string-arg flag as PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID:<hex:7A6967626565686F6D65>")
 
         wifi_ap_ssid = self.matter_test_config.wifi_ssid
         wifi_ap_credentials = self.matter_test_config.wifi_passphrase
@@ -111,10 +99,27 @@ class TC_CNET_4_23(MatterBaseTest):
         self.default_controller.SetSkipCommissioningComplete(True)
         self.matter_test_config.commissioning_method = self.matter_test_config.in_test_commissioning_method
 
+        # Clear WiFi credentials to prevent automatic WiFi configuration during commissioning
+        # We will configure WiFi manually in the test steps
+        self.matter_test_config.wifi_ssid = None
+        self.matter_test_config.wifi_passphrase = None
+
         # * Establish PASE session
         # * Arm fail-safe timer (900 seconds)
         # * Configure regulatory and time information
         await self.commission_devices()
+
+        feature_map = await self.read_single_attribute(
+            dev_ctrl=self.default_controller,
+            node_id=self.dut_node_id,
+            endpoint=endpoint,
+            attribute=cnet.Attributes.FeatureMap,
+        )
+
+        if not (feature_map & cnet.Bitmaps.Feature.kWiFiNetworkInterface):
+            logger.info("Device does not support WiFi on endpoint 0, skipping remaining steps")
+            self.skip_all_remaining_steps(2)
+            return
 
         # AddOrUpdateWiFiNetwork with INCORRECT credentials and Breadcrumb field set to 1
         self.step(2)
@@ -172,9 +177,10 @@ class TC_CNET_4_23(MatterBaseTest):
         self.step(4)
 
         response = await self.read_single_attribute(
+            dev_ctrl=self.default_controller,
+            node_id=self.dut_node_id,
             endpoint=endpoint,
-            cluster=cnet,
-            attr=cnet.Attributes.LastNetworkingStatus,
+            attribute=cnet.Attributes.LastNetworkingStatus,
         )
 
         # Verify LastNetworkingStatus to be 'kAuthFailure'
@@ -215,7 +221,7 @@ class TC_CNET_4_23(MatterBaseTest):
         asserts.assert_true(isinstance(response, cnet.Commands.ScanNetworksResponse),
                             "Unexpected value returned from ScanNetworks")
         # 1. wiFiScanResults contains the target network SSID
-        ssids_found = [network.networkID for network in response.wiFiScanResults]
+        ssids_found = [network.ssid for network in response.wiFiScanResults]
         asserts.assert_true(correct_ssid in ssids_found,
                             f"Expected to find SSID '{correct_ssid.decode('utf-8')}' in scan results")
         logger.info(f"ScanNetworks found SSID: {correct_ssid.decode('utf-8')}")
@@ -274,9 +280,10 @@ class TC_CNET_4_23(MatterBaseTest):
         self.step(9)
 
         response = await self.read_single_attribute(
+            dev_ctrl=self.default_controller,
+            node_id=self.dut_node_id,
             endpoint=endpoint,
-            cluster=cnet,
-            attr=cnet.Attributes.LastNetworkingStatus,
+            attribute=cnet.Attributes.LastNetworkingStatus,
         )
 
         # Verify LastNetworkingStatus to be 'kSuccess'
@@ -287,9 +294,10 @@ class TC_CNET_4_23(MatterBaseTest):
         self.step(10)
 
         response = await self.read_single_attribute(
+            dev_ctrl=self.default_controller,
+            node_id=self.dut_node_id,
             endpoint=endpoint,
-            cluster=cnet,
-            attr=cnet.Attributes.Networks,
+            attribute=cnet.Attributes.Networks,
         )
         # Verify device is connected to correct network
         connected_networks = [network.networkID for network in response if network.connected]
