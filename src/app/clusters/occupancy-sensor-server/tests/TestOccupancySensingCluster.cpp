@@ -30,12 +30,11 @@ using namespace chip::app::Clusters::OccupancySensing;
 namespace {
 
 constexpr EndpointId kTestEndpointId = 1;
-constexpr uint32_t kDefaultFeatureMap = 0;
 
 constexpr OccupancySensing::Structs::HoldTimeLimitsStruct::Type kDefaultHoldTimeLimits = {
-    .holdTimeMin = 0,
-    .holdTimeMax = 0,
-    .holdTimeDefault = 0,
+    .holdTimeMin = 1,
+    .holdTimeMax = 10,
+    .holdTimeDefault = 1,
 };
 
 constexpr BitMask<OccupancySensing::OccupancyBitmap> kOccupancyUnoccupied = 0;
@@ -101,26 +100,37 @@ TEST_F(TestOccupancySensingCluster, TestReadClusterRevision)
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     uint16_t clusterRevision;
-    EXPECT_EQ(ReadNumericAttribute(cluster, Globals::Attributes::ClusterRevision::Id, clusterRevision), CHIP_NO_ERROR);
+    EXPECT_EQ(ReadNumericAttribute(cluster, Attributes::ClusterRevision::Id, clusterRevision), CHIP_NO_ERROR);
     EXPECT_EQ(clusterRevision, OccupancySensing::kRevision);
 }
 
 TEST_F(TestOccupancySensingCluster, TestReadFeatureMap)
 {
     chip::Test::TestServerClusterContext context;
-    OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}.WithFeature(kDefaultFeatureMap)};
-    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-
     uint32_t featureMap;
-    EXPECT_EQ(ReadNumericAttribute(cluster, Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
-    EXPECT_EQ(featureMap, kDefaultFeatureMap);
+
+    {
+        constexpr uint32_t featureMapPir = 0x1; // PassiveInfrared
+        OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}.WithFeatures(OccupancySensing::Feature(featureMapPir))};
+        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+        EXPECT_EQ(ReadNumericAttribute(cluster, Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
+        EXPECT_EQ(featureMap, featureMapPir);
+    }
+
+    {
+        constexpr uint32_t featureMapUltrasonic = 0x2; // Ultrasonic
+        OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}.WithFeatures(OccupancySensing::Feature(featureMapUltrasonic))};
+        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+        EXPECT_EQ(ReadNumericAttribute(cluster, Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
+        EXPECT_EQ(featureMap, featureMapUltrasonic);
+    }
 }
 
 TEST_F(TestOccupancySensingCluster, TestReadHoldTime)
 {
     chip::Test::TestServerClusterContext context;
     constexpr uint16_t kHoldTime = 100;
-    OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}.WithHoldTime(kHoldTime)};
+    OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}.WithHoldTime(kHoldTime, kDefaultHoldTimeLimits)};
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     uint16_t holdTime;
@@ -137,19 +147,6 @@ TEST_F(TestOccupancySensingCluster, TestReadHoldTime)
     EXPECT_EQ(holdTime, kHoldTime);
 }
 
-TEST_F(TestOccupancySensingCluster, TestReadHoldTimeLimits)
-{
-    chip::Test::TestServerClusterContext context;
-    OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}.WithHoldTimeLimits(kDefaultHoldTimeLimits)};
-    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-
-    OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimits;
-    EXPECT_EQ(ReadAttribute(cluster, Attributes::HoldTimeLimits::Id, holdTimeLimits), CHIP_NO_ERROR);
-    EXPECT_EQ(holdTimeLimits.holdTimeMin, kDefaultHoldTimeLimits.holdTimeMin);
-    EXPECT_EQ(holdTimeLimits.holdTimeMax, kDefaultHoldTimeLimits.holdTimeMax);
-    EXPECT_EQ(holdTimeLimits.holdTimeDefault, kDefaultHoldTimeLimits.holdTimeDefault);
-}
-
 TEST_F(TestOccupancySensingCluster, TestReadOccupancy)
 {
     chip::Test::TestServerClusterContext context;
@@ -161,145 +158,228 @@ TEST_F(TestOccupancySensingCluster, TestReadOccupancy)
     EXPECT_EQ(occupancy, kOccupancyUnoccupied);
 }
 
-TEST_F(TestOccupancySensingCluster, TestReadOccupancySensorType)
+TEST_F(TestOccupancySensingCluster, TestOccupancySensorTypeAttributesFromFeatures)
 {
     chip::Test::TestServerClusterContext context;
-    OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}.WithOccupancySensorTypeBitmap(OccupancySensing::OccupancySensorTypeBitmap::kPir)};
-    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-
-    OccupancySensing::OccupancySensorTypeEnum occupancySensorType;
-    EXPECT_EQ(ReadAttribute(cluster, Attributes::OccupancySensorType::Id, occupancySensorType), CHIP_NO_ERROR);
-    EXPECT_EQ(occupancySensorType, OccupancySensing::OccupancySensorTypeEnum::kPir);
-}
-
-TEST_F(TestOccupancySensingCluster, TestReadOccupancySensorTypeBitmap)
-{
-    chip::Test::TestServerClusterContext context;
-    OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}.WithOccupancySensorTypeBitmap(OccupancySensing::OccupancySensorTypeBitmap::kPir)};
-    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-
-    BitMask<OccupancySensing::OccupancySensorTypeBitmap> occupancySensorTypeBitmap;
-    EXPECT_EQ(ReadAttribute(cluster, Attributes::OccupancySensorTypeBitmap::Id, occupancySensorTypeBitmap), CHIP_NO_ERROR);
-    EXPECT_EQ(occupancySensorTypeBitmap, OccupancySensing::OccupancySensorTypeBitmap::kPir);
-}
-
-TEST_F(TestOccupancySensingCluster, TestOccupancySensorTypeEnumFromBitmap)
-{
-    chip::Test::TestServerClusterContext context;
-
-    // Test case: PIR
-    OccupancySensingCluster clusterPIR{OccupancySensingCluster::Config{kTestEndpointId}.WithOccupancySensorTypeBitmap(OccupancySensing::OccupancySensorTypeBitmap::kPir)};
-    EXPECT_EQ(clusterPIR.Startup(context.Get()), CHIP_NO_ERROR);
-    OccupancySensing::OccupancySensorTypeEnum occupancySensorTypePIR;
-    EXPECT_EQ(ReadAttribute(clusterPIR, Attributes::OccupancySensorType::Id, occupancySensorTypePIR), CHIP_NO_ERROR);
-    EXPECT_EQ(occupancySensorTypePIR, OccupancySensing::OccupancySensorTypeEnum::kPir);
-
-    // Test case: Ultrasonic
-    OccupancySensingCluster clusterUltrasonic{OccupancySensingCluster::Config{kTestEndpointId}.WithOccupancySensorTypeBitmap(OccupancySensing::OccupancySensorTypeBitmap::kUltrasonic)};
-    EXPECT_EQ(clusterUltrasonic.Startup(context.Get()), CHIP_NO_ERROR);
-    OccupancySensing::OccupancySensorTypeEnum occupancySensorTypeUltrasonic;
-    EXPECT_EQ(ReadAttribute(clusterUltrasonic, Attributes::OccupancySensorType::Id, occupancySensorTypeUltrasonic), CHIP_NO_ERROR);
-    EXPECT_EQ(occupancySensorTypeUltrasonic, OccupancySensing::OccupancySensorTypeEnum::kUltrasonic);
-
-    // Test case: PhysicalContact
-    OccupancySensingCluster clusterPhysicalContact{OccupancySensingCluster::Config{kTestEndpointId}.WithOccupancySensorTypeBitmap(OccupancySensing::OccupancySensorTypeBitmap::kPhysicalContact)};
-    EXPECT_EQ(clusterPhysicalContact.Startup(context.Get()), CHIP_NO_ERROR);
-    OccupancySensing::OccupancySensorTypeEnum occupancySensorTypePhysicalContact;
-    EXPECT_EQ(ReadAttribute(clusterPhysicalContact, Attributes::OccupancySensorType::Id, occupancySensorTypePhysicalContact), CHIP_NO_ERROR);
-    EXPECT_EQ(occupancySensorTypePhysicalContact, OccupancySensing::OccupancySensorTypeEnum::kPhysicalContact);
-
-    // Test case: PIR + Ultrasonic
-    BitMask<OccupancySensing::OccupancySensorTypeBitmap> pirAndUltrasonicBitmap;
-    pirAndUltrasonicBitmap.Set(OccupancySensing::OccupancySensorTypeBitmap::kPir);
-    pirAndUltrasonicBitmap.Set(OccupancySensing::OccupancySensorTypeBitmap::kUltrasonic);
-    OccupancySensingCluster clusterPIRAndUltrasonic{OccupancySensingCluster::Config{kTestEndpointId}.WithOccupancySensorTypeBitmap(pirAndUltrasonicBitmap)};
-    EXPECT_EQ(clusterPIRAndUltrasonic.Startup(context.Get()), CHIP_NO_ERROR);
-    OccupancySensing::OccupancySensorTypeEnum occupancySensorTypePIRAndUltrasonic;
-    EXPECT_EQ(ReadAttribute(clusterPIRAndUltrasonic, Attributes::OccupancySensorType::Id, occupancySensorTypePIRAndUltrasonic), CHIP_NO_ERROR);
-    EXPECT_EQ(occupancySensorTypePIRAndUltrasonic, OccupancySensing::OccupancySensorTypeEnum::kPIRAndUltrasonic);
-
-    // Test case: PhysicalContact + PIR
-    BitMask<OccupancySensing::OccupancySensorTypeBitmap> physicalContactAndPirBitmap;
-    physicalContactAndPirBitmap.Set(OccupancySensing::OccupancySensorTypeBitmap::kPhysicalContact);
-    physicalContactAndPirBitmap.Set(OccupancySensing::OccupancySensorTypeBitmap::kPir);
-    OccupancySensingCluster clusterPhysicalContactAndPir{OccupancySensingCluster::Config{kTestEndpointId}.WithOccupancySensorTypeBitmap(physicalContactAndPirBitmap)};
-    EXPECT_EQ(clusterPhysicalContactAndPir.Startup(context.Get()), CHIP_NO_ERROR);
-    OccupancySensing::OccupancySensorTypeEnum occupancySensorTypePhysicalContactAndPir;
-    EXPECT_EQ(ReadAttribute(clusterPhysicalContactAndPir, Attributes::OccupancySensorType::Id, occupancySensorTypePhysicalContactAndPir), CHIP_NO_ERROR);
-    EXPECT_EQ(occupancySensorTypePhysicalContactAndPir, OccupancySensing::OccupancySensorTypeEnum::kPir);
-
-    // Test case: PhysicalContact + Ultrasonic
-    BitMask<OccupancySensing::OccupancySensorTypeBitmap> physicalContactAndUltrasonicBitmap;
-    physicalContactAndUltrasonicBitmap.Set(OccupancySensing::OccupancySensorTypeBitmap::kPhysicalContact);
-    physicalContactAndUltrasonicBitmap.Set(OccupancySensing::OccupancySensorTypeBitmap::kUltrasonic);
-    OccupancySensingCluster clusterPhysicalContactAndUltrasonic{OccupancySensingCluster::Config{kTestEndpointId}.WithOccupancySensorTypeBitmap(physicalContactAndUltrasonicBitmap)};
-    EXPECT_EQ(clusterPhysicalContactAndUltrasonic.Startup(context.Get()), CHIP_NO_ERROR);
-    OccupancySensing::OccupancySensorTypeEnum occupancySensorTypePhysicalContactAndUltrasonic;
-    EXPECT_EQ(ReadAttribute(clusterPhysicalContactAndUltrasonic, Attributes::OccupancySensorType::Id, occupancySensorTypePhysicalContactAndUltrasonic), CHIP_NO_ERROR);
-    EXPECT_EQ(occupancySensorTypePhysicalContactAndUltrasonic, OccupancySensing::OccupancySensorTypeEnum::kUltrasonic);
-
-    // Test case: PhysicalContact + PIR + Ultrasonic
-    BitMask<OccupancySensing::OccupancySensorTypeBitmap> allBitmap;
-    allBitmap.Set(OccupancySensing::OccupancySensorTypeBitmap::kPhysicalContact);
-    allBitmap.Set(OccupancySensing::OccupancySensorTypeBitmap::kPir);
-    allBitmap.Set(OccupancySensing::OccupancySensorTypeBitmap::kUltrasonic);
-    OccupancySensingCluster clusterAll{OccupancySensingCluster::Config{kTestEndpointId}.WithOccupancySensorTypeBitmap(allBitmap)};
-    EXPECT_EQ(clusterAll.Startup(context.Get()), CHIP_NO_ERROR);
-    OccupancySensing::OccupancySensorTypeEnum occupancySensorTypeAll;
-    EXPECT_EQ(ReadAttribute(clusterAll, Attributes::OccupancySensorType::Id, occupancySensorTypeAll), CHIP_NO_ERROR);
-    EXPECT_EQ(occupancySensorTypeAll, OccupancySensing::OccupancySensorTypeEnum::kPIRAndUltrasonic);
+    // Mapping table from spec:
+    //
+    //  | Feature Flag Value    | Value of OccupancySensorTypeBitmap    | Value of OccupancySensorType
+    //  | PIR | US | PHY        | ===================================== | ============================
+    //  | 0   | 0  | 0          | PIR ^*^                               | PIR
+    //  | 1   | 0  | 0          | PIR                                   | PIR
+    //  | 0   | 1  | 0          | Ultrasonic                            | Ultrasonic
+    //  | 1   | 1  | 0          | PIR + Ultrasonic                      | PIRAndUltrasonic
+    //  | 0   | 0  | 1          | PhysicalContact                       | PhysicalContact
+    //  | 1   | 0  | 1          | PhysicalContact + PIR                 | PIR
+    //  | 0   | 1  | 1          | PhysicalContact + Ultrasonic          | Ultrasonic
+    //  | 1   | 1  | 1          | PhysicalContact + PIR + Ultrasonic    | PIRAndUltrasonic
 
     // Test case: No bits set (000) -> PIR
-    OccupancySensingCluster clusterNone{OccupancySensingCluster::Config{kTestEndpointId}.WithOccupancySensorTypeBitmap(0)};
-    EXPECT_EQ(clusterNone.Startup(context.Get()), CHIP_NO_ERROR);
-    OccupancySensing::OccupancySensorTypeEnum occupancySensorTypeNone;
-    EXPECT_EQ(ReadAttribute(clusterNone, Attributes::OccupancySensorType::Id, occupancySensorTypeNone), CHIP_NO_ERROR);
-    EXPECT_EQ(occupancySensorTypeNone, OccupancySensing::OccupancySensorTypeEnum::kPir);
-}
+    {
+        OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}.WithFeatures(BitFlags<OccupancySensing::Feature>())};
+        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+        BitMask<OccupancySensing::OccupancySensorTypeBitmap> occupancySensorTypeBitmap;
+        EXPECT_EQ(ReadAttribute(cluster, Attributes::OccupancySensorTypeBitmap::Id, occupancySensorTypeBitmap), CHIP_NO_ERROR);
+        EXPECT_EQ(occupancySensorTypeBitmap, OccupancySensing::OccupancySensorTypeBitmap::kPir);
+        OccupancySensing::OccupancySensorTypeEnum occupancySensorTypeEnum;
+        EXPECT_EQ(ReadAttribute(cluster, Attributes::OccupancySensorType::Id, occupancySensorTypeEnum), CHIP_NO_ERROR);
+        EXPECT_EQ(occupancySensorTypeEnum, OccupancySensing::OccupancySensorTypeEnum::kPir);
+    }
 
-TEST_F(TestOccupancySensingCluster, TestReadUnoccupiedToOccupiedAttributes)
-{
-    chip::Test::TestServerClusterContext context;
-    constexpr uint16_t kPirUnoccupiedToOccupiedDelay = 10;
-    constexpr uint8_t kPirUnoccupiedToOccupiedThreshold = 20;
-    constexpr uint16_t kUltrasonicUnoccupiedToOccupiedDelay = 30;
-    constexpr uint8_t kUltrasonicUnoccupiedToOccupiedThreshold = 40;
-    constexpr uint16_t kPhysicalContactUnoccupiedToOccupiedDelay = 50;
-    constexpr uint8_t kPhysicalContactUnoccupiedToOccupiedThreshold = 60;
+    // Test case: PIR
+    {
+        OccupancySensingCluster cluster{
+            OccupancySensingCluster::Config{kTestEndpointId}.WithFeatures(OccupancySensing::Feature::kPassiveInfrared)};
+        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+        BitMask<OccupancySensing::OccupancySensorTypeBitmap> occupancySensorTypeBitmap;
+        EXPECT_EQ(ReadAttribute(cluster, Attributes::OccupancySensorTypeBitmap::Id, occupancySensorTypeBitmap), CHIP_NO_ERROR);
+        EXPECT_EQ(occupancySensorTypeBitmap, OccupancySensing::OccupancySensorTypeBitmap::kPir);
+        OccupancySensing::OccupancySensorTypeEnum occupancySensorTypeEnum;
+        EXPECT_EQ(ReadAttribute(cluster, Attributes::OccupancySensorType::Id, occupancySensorTypeEnum), CHIP_NO_ERROR);
+        EXPECT_EQ(occupancySensorTypeEnum, OccupancySensing::OccupancySensorTypeEnum::kPir);
+    }
 
-    OccupancySensingCluster cluster{
-        OccupancySensingCluster::Config(kTestEndpointId)
-            .WithPIRUnoccupiedToOccupiedDelay(kPirUnoccupiedToOccupiedDelay)
-            .WithPIRUnoccupiedToOccupiedThreshold(kPirUnoccupiedToOccupiedThreshold)
-            .WithUltrasonicUnoccupiedToOccupiedDelay(kUltrasonicUnoccupiedToOccupiedDelay)
-            .WithUltrasonicUnoccupiedToOccupiedThreshold(kUltrasonicUnoccupiedToOccupiedThreshold)
-            .WithPhysicalContactUnoccupiedToOccupiedDelay(kPhysicalContactUnoccupiedToOccupiedDelay)
-            .WithPhysicalContactUnoccupiedToOccupiedThreshold(kPhysicalContactUnoccupiedToOccupiedThreshold)};
-    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    // Test case: Ultrasonic
+    {
+        OccupancySensingCluster cluster{
+            OccupancySensingCluster::Config{kTestEndpointId}.WithFeatures(OccupancySensing::Feature::kUltrasonic)};
+        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+        BitMask<OccupancySensing::OccupancySensorTypeBitmap> occupancySensorTypeBitmap;
+        EXPECT_EQ(ReadAttribute(cluster, Attributes::OccupancySensorTypeBitmap::Id, occupancySensorTypeBitmap), CHIP_NO_ERROR);
+        EXPECT_EQ(occupancySensorTypeBitmap, OccupancySensing::OccupancySensorTypeBitmap::kUltrasonic);
+        OccupancySensing::OccupancySensorTypeEnum occupancySensorTypeEnum;
+        EXPECT_EQ(ReadAttribute(cluster, Attributes::OccupancySensorType::Id, occupancySensorTypeEnum), CHIP_NO_ERROR);
+        EXPECT_EQ(occupancySensorTypeEnum, OccupancySensing::OccupancySensorTypeEnum::kUltrasonic);
+    }
 
-    uint16_t pirUnoccupiedToOccupiedDelay;
-    EXPECT_EQ(ReadNumericAttribute(cluster, Attributes::PIRUnoccupiedToOccupiedDelay::Id, pirUnoccupiedToOccupiedDelay), CHIP_NO_ERROR);
-    EXPECT_EQ(pirUnoccupiedToOccupiedDelay, kPirUnoccupiedToOccupiedDelay);
+    // Test case: PIR + Ultrasonic
+    {
+        OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}.WithFeatures(
+            BitFlags<OccupancySensing::Feature>(OccupancySensing::Feature::kPassiveInfrared, OccupancySensing::Feature::kUltrasonic))};
+        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+        BitMask<OccupancySensing::OccupancySensorTypeBitmap> occupancySensorTypeBitmap;
+        EXPECT_EQ(ReadAttribute(cluster, Attributes::OccupancySensorTypeBitmap::Id, occupancySensorTypeBitmap), CHIP_NO_ERROR);
+        EXPECT_EQ(occupancySensorTypeBitmap,
+                  BitMask<OccupancySensing::OccupancySensorTypeBitmap>(OccupancySensing::OccupancySensorTypeBitmap::kPir,
+                                                                       OccupancySensing::OccupancySensorTypeBitmap::kUltrasonic));
+        OccupancySensing::OccupancySensorTypeEnum occupancySensorTypeEnum;
+        EXPECT_EQ(ReadAttribute(cluster, Attributes::OccupancySensorType::Id, occupancySensorTypeEnum), CHIP_NO_ERROR);
+        EXPECT_EQ(occupancySensorTypeEnum, OccupancySensing::OccupancySensorTypeEnum::kPIRAndUltrasonic);
+    }
 
-    uint8_t pirUnoccupiedToOccupiedThreshold;
-    EXPECT_EQ(ReadNumericAttribute(cluster, Attributes::PIRUnoccupiedToOccupiedThreshold::Id, pirUnoccupiedToOccupiedThreshold), CHIP_NO_ERROR);
-    EXPECT_EQ(pirUnoccupiedToOccupiedThreshold, kPirUnoccupiedToOccupiedThreshold);
+    // Test case: PhysicalContact
+    {
+        OccupancySensingCluster cluster{
+            OccupancySensingCluster::Config{kTestEndpointId}.WithFeatures(OccupancySensing::Feature::kPhysicalContact)};
+        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+        BitMask<OccupancySensing::OccupancySensorTypeBitmap> occupancySensorTypeBitmap;
+        EXPECT_EQ(ReadAttribute(cluster, Attributes::OccupancySensorTypeBitmap::Id, occupancySensorTypeBitmap), CHIP_NO_ERROR);
+        EXPECT_EQ(occupancySensorTypeBitmap, OccupancySensing::OccupancySensorTypeBitmap::kPhysicalContact);
+        OccupancySensing::OccupancySensorTypeEnum occupancySensorTypeEnum;
+        EXPECT_EQ(ReadAttribute(cluster, Attributes::OccupancySensorType::Id, occupancySensorTypeEnum), CHIP_NO_ERROR);
+        EXPECT_EQ(occupancySensorTypeEnum, OccupancySensing::OccupancySensorTypeEnum::kPhysicalContact);
+    }
 
-    uint16_t ultrasonicUnoccupiedToOccupiedDelay;
-    EXPECT_EQ(ReadNumericAttribute(cluster, Attributes::UltrasonicUnoccupiedToOccupiedDelay::Id, ultrasonicUnoccupiedToOccupiedDelay), CHIP_NO_ERROR);
-    EXPECT_EQ(ultrasonicUnoccupiedToOccupiedDelay, kUltrasonicUnoccupiedToOccupiedDelay);
+    // Test case: PhysicalContact + PIR
+    {
+        OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}.WithFeatures(
+            BitFlags<OccupancySensing::Feature>(OccupancySensing::Feature::kPhysicalContact, OccupancySensing::Feature::kPassiveInfrared))};
+        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+        BitMask<OccupancySensing::OccupancySensorTypeBitmap> occupancySensorTypeBitmap;
+        EXPECT_EQ(ReadAttribute(cluster, Attributes::OccupancySensorTypeBitmap::Id, occupancySensorTypeBitmap), CHIP_NO_ERROR);
+        EXPECT_EQ(occupancySensorTypeBitmap,
+                  BitMask<OccupancySensing::OccupancySensorTypeBitmap>(OccupancySensing::OccupancySensorTypeBitmap::kPhysicalContact,
+                                                                       OccupancySensing::OccupancySensorTypeBitmap::kPir));
+        OccupancySensing::OccupancySensorTypeEnum occupancySensorTypeEnum;
+        EXPECT_EQ(ReadAttribute(cluster, Attributes::OccupancySensorType::Id, occupancySensorTypeEnum), CHIP_NO_ERROR);
+        EXPECT_EQ(occupancySensorTypeEnum, OccupancySensing::OccupancySensorTypeEnum::kPir);
+    }
 
-    uint8_t ultrasonicUnoccupiedToOccupiedThreshold;
-    EXPECT_EQ(ReadNumericAttribute(cluster, Attributes::UltrasonicUnoccupiedToOccupiedThreshold::Id, ultrasonicUnoccupiedToOccupiedThreshold), CHIP_NO_ERROR);
-    EXPECT_EQ(ultrasonicUnoccupiedToOccupiedThreshold, kUltrasonicUnoccupiedToOccupiedThreshold);
+    // Test case: PhysicalContact + Ultrasonic
+    {
+        OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}.WithFeatures(
+            BitFlags<OccupancySensing::Feature>(OccupancySensing::Feature::kPhysicalContact, OccupancySensing::Feature::kUltrasonic))};
+        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+        BitMask<OccupancySensing::OccupancySensorTypeBitmap> occupancySensorTypeBitmap;
+        EXPECT_EQ(ReadAttribute(cluster, Attributes::OccupancySensorTypeBitmap::Id, occupancySensorTypeBitmap), CHIP_NO_ERROR);
+        EXPECT_EQ(occupancySensorTypeBitmap,
+                  BitMask<OccupancySensing::OccupancySensorTypeBitmap>(OccupancySensing::OccupancySensorTypeBitmap::kPhysicalContact,
+                                                                       OccupancySensing::OccupancySensorTypeBitmap::kUltrasonic));
+        OccupancySensing::OccupancySensorTypeEnum occupancySensorTypeEnum;
+        EXPECT_EQ(ReadAttribute(cluster, Attributes::OccupancySensorType::Id, occupancySensorTypeEnum), CHIP_NO_ERROR);
+        EXPECT_EQ(occupancySensorTypeEnum, OccupancySensing::OccupancySensorTypeEnum::kUltrasonic);
+    }
 
-    uint16_t physicalContactUnoccupiedToOccupiedDelay;
-    EXPECT_EQ(ReadNumericAttribute(cluster, Attributes::PhysicalContactUnoccupiedToOccupiedDelay::Id, physicalContactUnoccupiedToOccupiedDelay), CHIP_NO_ERROR);
-    EXPECT_EQ(physicalContactUnoccupiedToOccupiedDelay, kPhysicalContactUnoccupiedToOccupiedDelay);
-
-    uint8_t physicalContactUnoccupiedToOccupiedThreshold;
-    EXPECT_EQ(ReadNumericAttribute(cluster, Attributes::PhysicalContactUnoccupiedToOccupiedThreshold::Id, physicalContactUnoccupiedToOccupiedThreshold), CHIP_NO_ERROR);
-    EXPECT_EQ(physicalContactUnoccupiedToOccupiedThreshold, kPhysicalContactUnoccupiedToOccupiedThreshold);
+    // Test case: PhysicalContact + PIR + Ultrasonic
+    {
+        OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}.WithFeatures(BitFlags<OccupancySensing::Feature>(
+            OccupancySensing::Feature::kPhysicalContact, OccupancySensing::Feature::kPassiveInfrared,
+            OccupancySensing::Feature::kUltrasonic))};
+        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+        BitMask<OccupancySensing::OccupancySensorTypeBitmap> occupancySensorTypeBitmap;
+        EXPECT_EQ(ReadAttribute(cluster, Attributes::OccupancySensorTypeBitmap::Id, occupancySensorTypeBitmap), CHIP_NO_ERROR);
+        EXPECT_EQ(occupancySensorTypeBitmap,
+                  BitMask<OccupancySensing::OccupancySensorTypeBitmap>(OccupancySensing::OccupancySensorTypeBitmap::kPhysicalContact,
+                                                                       OccupancySensing::OccupancySensorTypeBitmap::kPir,
+                                                                       OccupancySensing::OccupancySensorTypeBitmap::kUltrasonic));
+        OccupancySensing::OccupancySensorTypeEnum occupancySensorTypeEnum;
+        EXPECT_EQ(ReadAttribute(cluster, Attributes::OccupancySensorType::Id, occupancySensorTypeEnum), CHIP_NO_ERROR);
+        EXPECT_EQ(occupancySensorTypeEnum, OccupancySensing::OccupancySensorTypeEnum::kPIRAndUltrasonic);
+    }
 }
 
 } // namespace
+
+TEST_F(TestOccupancySensingCluster, TestReadOptionalHoldTimeAttributes)
+{
+    chip::Test::TestServerClusterContext context;
+
+    // Case 1: WithHoldTime is not called, so attributes should be unsupported.
+    {
+        OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}};
+        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+        uint16_t holdTime;
+        EXPECT_EQ(ReadNumericAttribute(cluster, Attributes::HoldTime::Id, holdTime),
+                  CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+
+        OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimits;
+        EXPECT_EQ(ReadAttribute(cluster, Attributes::HoldTimeLimits::Id, holdTimeLimits),
+                  CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+    }
+
+    // Case 2: WithHoldTime is called, so attributes should be readable.
+    {
+        constexpr uint16_t kHoldTime = 100;
+        OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin = 10, .holdTimeMax = 200, .holdTimeDefault = kHoldTime };
+        OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}.WithHoldTime(kHoldTime, holdTimeLimitsConfig)};
+        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+        uint16_t holdTime;
+        EXPECT_EQ(ReadNumericAttribute(cluster, Attributes::HoldTime::Id, holdTime), CHIP_NO_ERROR);
+        EXPECT_EQ(holdTime, kHoldTime);
+
+        OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimits;
+        EXPECT_EQ(ReadAttribute(cluster, Attributes::HoldTimeLimits::Id, holdTimeLimits), CHIP_NO_ERROR);
+        EXPECT_EQ(holdTimeLimits.holdTimeMin, holdTimeLimitsConfig.holdTimeMin);
+        EXPECT_EQ(holdTimeLimits.holdTimeMax, holdTimeLimitsConfig.holdTimeMax);
+        EXPECT_EQ(holdTimeLimits.holdTimeDefault, holdTimeLimitsConfig.holdTimeDefault);
+    }
+}
+
+TEST_F(TestOccupancySensingCluster, TestHoldTimeLimitsConstraints)
+{
+    chip::Test::TestServerClusterContext context;
+
+    // Test case: holdTimeMin is 0, should be coerced to 1.
+    {
+        OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin = 0, .holdTimeMax = 20, .holdTimeDefault = 10 };
+        OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}.WithHoldTime(10, holdTimeLimitsConfig)};
+        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+        OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimits;
+        EXPECT_EQ(ReadAttribute(cluster, Attributes::HoldTimeLimits::Id, holdTimeLimits), CHIP_NO_ERROR);
+        EXPECT_EQ(holdTimeLimits.holdTimeMin, 1);
+        EXPECT_EQ(holdTimeLimits.holdTimeMax, 20);
+        EXPECT_EQ(holdTimeLimits.holdTimeDefault, 10);
+    }
+
+    // Test case: holdTimeMax is less than holdTimeMin, should be coerced to holdTimeMin.
+    {
+        OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin = 15, .holdTimeMax = 10, .holdTimeDefault = 15 };
+        OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}.WithHoldTime(15, holdTimeLimitsConfig)};
+        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+        OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimits;
+        EXPECT_EQ(ReadAttribute(cluster, Attributes::HoldTimeLimits::Id, holdTimeLimits), CHIP_NO_ERROR);
+        EXPECT_EQ(holdTimeLimits.holdTimeMin, 15);
+        EXPECT_EQ(holdTimeLimits.holdTimeMax, 15);
+        EXPECT_EQ(holdTimeLimits.holdTimeDefault, 15);
+    }
+
+    // Test case: holdTimeDefault is less than holdTimeMin, should be coerced to holdTimeMin.
+    {
+        OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin = 10, .holdTimeMax = 20, .holdTimeDefault = 5 };
+        OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}.WithHoldTime(10, holdTimeLimitsConfig)};
+        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+        OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimits;
+        EXPECT_EQ(ReadAttribute(cluster, Attributes::HoldTimeLimits::Id, holdTimeLimits), CHIP_NO_ERROR);
+        EXPECT_EQ(holdTimeLimits.holdTimeMin, 10);
+        EXPECT_EQ(holdTimeLimits.holdTimeMax, 20);
+        EXPECT_EQ(holdTimeLimits.holdTimeDefault, 10);
+    }
+
+    // Test case: holdTimeDefault is greater than holdTimeMax, should be coerced to holdTimeMax.
+    {
+        OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin = 10, .holdTimeMax = 20, .holdTimeDefault = 25 };
+        OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}.WithHoldTime(10, holdTimeLimitsConfig)};
+        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+        OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimits;
+        EXPECT_EQ(ReadAttribute(cluster, Attributes::HoldTimeLimits::Id, holdTimeLimits), CHIP_NO_ERROR);
+        EXPECT_EQ(holdTimeLimits.holdTimeMin, 10);
+        EXPECT_EQ(holdTimeLimits.holdTimeMax, 20);
+        EXPECT_EQ(holdTimeLimits.holdTimeDefault, 20);
+    }
+}

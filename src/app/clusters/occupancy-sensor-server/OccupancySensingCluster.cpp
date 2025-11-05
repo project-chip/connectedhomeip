@@ -1,5 +1,6 @@
 /*
  *    Copyright (c) 2025 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,6 +17,7 @@
 
 #include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
 
+#include <algorithm>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/OccupancySensing/Attributes.h>
 #include <clusters/OccupancySensing/Commands.h>
@@ -27,43 +29,84 @@ using namespace OccupancySensing::Attributes;
 using namespace chip::app::Clusters::OccupancySensing;
 
 namespace {
-OccupancySensing::OccupancySensorTypeEnum OccupancySensorTypeEnumFromBitmap(BitMask<OccupancySensing::OccupancySensorTypeBitmap> bitmap)
+
+// Mapping table from spec:
+//
+//  | Feature Flag Value    | Value of OccupancySensorTypeBitmap    | Value of OccupancySensorType
+//  | PIR | US | PHY        | ===================================== | ============================
+//  | 0   | 0  | 0          | PIR ^*^                               | PIR
+//  | 1   | 0  | 0          | PIR                                   | PIR
+//  | 0   | 1  | 0          | Ultrasonic                            | Ultrasonic
+//  | 1   | 1  | 0          | PIR + Ultrasonic                      | PIRAndUltrasonic
+//  | 0   | 0  | 1          | PhysicalContact                       | PhysicalContact
+//  | 1   | 0  | 1          | PhysicalContact + PIR                 | PIR
+//  | 0   | 1  | 1          | PhysicalContact + Ultrasonic          | Ultrasonic
+//  | 1   | 1  | 1          | PhysicalContact + PIR + Ultrasonic    | PIRAndUltrasonic
+
+BitMask<OccupancySensing::OccupancySensorTypeBitmap> FeaturesToOccupancySensorTypeBitmap(BitFlags<OccupancySensing::Feature> features)
 {
-    if (bitmap.Has(OccupancySensing::OccupancySensorTypeBitmap::kPir) && bitmap.Has(OccupancySensing::OccupancySensorTypeBitmap::kUltrasonic) && bitmap.Has(OccupancySensing::OccupancySensorTypeBitmap::kPhysicalContact))
+    BitMask<OccupancySensing::OccupancySensorTypeBitmap> occupancySensorTypeBitmap{};
+
+    if (!features.HasAny(OccupancySensing::Feature::kPassiveInfrared, OccupancySensing::Feature::kUltrasonic, OccupancySensing::Feature::kPhysicalContact))
     {
-        return OccupancySensing::OccupancySensorTypeEnum::kPIRAndUltrasonic;
+        // If no features are set, default to PIR
+        occupancySensorTypeBitmap.Set(OccupancySensing::OccupancySensorTypeBitmap::kPir);
     }
-    if (bitmap.Has(OccupancySensing::OccupancySensorTypeBitmap::kPir) && bitmap.Has(OccupancySensing::OccupancySensorTypeBitmap::kUltrasonic))
+    else
     {
-        return OccupancySensing::OccupancySensorTypeEnum::kPIRAndUltrasonic;
+        occupancySensorTypeBitmap.Set(OccupancySensing::OccupancySensorTypeBitmap::kPir, features.Has(OccupancySensing::Feature::kPassiveInfrared));
+        occupancySensorTypeBitmap.Set(OccupancySensing::OccupancySensorTypeBitmap::kUltrasonic, features.Has(OccupancySensing::Feature::kUltrasonic));
+        occupancySensorTypeBitmap.Set(OccupancySensing::OccupancySensorTypeBitmap::kPhysicalContact, features.Has(OccupancySensing::Feature::kPhysicalContact));
     }
-    if (bitmap.Has(OccupancySensing::OccupancySensorTypeBitmap::kPhysicalContact) && bitmap.Has(OccupancySensing::OccupancySensorTypeBitmap::kPir))
-    {
-        return OccupancySensing::OccupancySensorTypeEnum::kPir;
-    }
-    if (bitmap.Has(OccupancySensing::OccupancySensorTypeBitmap::kPhysicalContact) && bitmap.Has(OccupancySensing::OccupancySensorTypeBitmap::kUltrasonic))
-    {
-        return OccupancySensing::OccupancySensorTypeEnum::kUltrasonic;
-    }
-    if (bitmap.Has(OccupancySensing::OccupancySensorTypeBitmap::kPir))
-    {
-        return OccupancySensing::OccupancySensorTypeEnum::kPir;
-    }
-    if (bitmap.Has(OccupancySensing::OccupancySensorTypeBitmap::kUltrasonic))
-    {
-        return OccupancySensing::OccupancySensorTypeEnum::kUltrasonic;
-    }
-    if (bitmap.Has(OccupancySensing::OccupancySensorTypeBitmap::kPhysicalContact))
-    {
-        return OccupancySensing::OccupancySensorTypeEnum::kPhysicalContact;
-    }
-    return OccupancySensing::OccupancySensorTypeEnum::kPir; // Default to PIR if no bits are set, as per spec table for 000
+
+    return occupancySensorTypeBitmap;
 }
+
+OccupancySensing::OccupancySensorTypeEnum FeaturesToOccupancySensorType(BitFlags<Feature> features)
+{
+    // Note how the truth table in the comment at the top of this section has
+    // the PIR/US/PHY columns not in MSB-descending order. This is OK as we apply the correct
+    // bit weighing to make the table equal below.
+    unsigned maskFromFeatures = (features.Has(Feature::kPhysicalContact) ? (1 << 2) : 0) |
+    (features.Has(Feature::kUltrasonic) ? (1 << 1) : 0) |
+    (features.Has(Feature::kPassiveInfrared) ? (1 << 0) : 0);
+
+    const OccupancySensorTypeEnum mappingTable[8] = {  //  | PIR | US | PHY | Type value
+      OccupancySensorTypeEnum::kPir,                   //  | 0   | 0  | 0   | PIR
+      OccupancySensorTypeEnum::kPir,                   //  | 1   | 0  | 0   | PIR
+      OccupancySensorTypeEnum::kUltrasonic,            //  | 0   | 1  | 0   | Ultrasonic
+      OccupancySensorTypeEnum::kPIRAndUltrasonic,      //  | 1   | 1  | 0   | PIRAndUltrasonic
+      OccupancySensorTypeEnum::kPhysicalContact,       //  | 0   | 0  | 1   | PhysicalContact
+      OccupancySensorTypeEnum::kPir,                   //  | 1   | 0  | 1   | PIR
+      OccupancySensorTypeEnum::kUltrasonic,            //  | 0   | 1  | 1   | Ultrasonic
+      OccupancySensorTypeEnum::kPIRAndUltrasonic,      //  | 1   | 1  | 1   | PIRAndUltrasonic
+    };
+
+    // This check is to ensure that no changes to the mapping table in the future can overrun.
+    if (maskFromFeatures >= sizeof(mappingTable))
+    {
+        return OccupancySensorTypeEnum::kPir;
+    }
+
+    return mappingTable[maskFromFeatures];
+}
+
 } // namespace
 
 OccupancySensingCluster::OccupancySensingCluster(const Config & config) :
-    DefaultServerCluster({ config.endpointId, OccupancySensing::Id }), mFeature(config.feature), mHoldTime(config.holdTime), mHoldTimeLimits(config.holdTimeLimits), mOccupancySensorTypeBitmap(config.occupancySensorTypeBitmap), mPIRUnoccupiedToOccupiedDelay(config.pirUnoccupiedToOccupiedDelay), mPIRUnoccupiedToOccupiedThreshold(config.pirUnoccupiedToOccupiedThreshold), mUltrasonicUnoccupiedToOccupiedDelay(config.ultrasonicUnoccupiedToOccupiedDelay), mUltrasonicUnoccupiedToOccupiedThreshold(config.ultrasonicUnoccupiedToOccupiedThreshold), mPhysicalContactUnoccupiedToOccupiedDelay(config.physicalContactUnoccupiedToOccupiedDelay), mPhysicalContactUnoccupiedToOccupiedThreshold(config.physicalContactUnoccupiedToOccupiedThreshold)
-{}
+    DefaultServerCluster({ config.mEndpointId, OccupancySensing::Id }),
+                         mFeatureMap(config.mFeatureMap),
+                         mHasHoldTime(config.mHasHoldTime),
+                         mHoldTime(config.mHoldTime),
+                         mHoldTimeLimits(config.mHoldTimeLimits)
+{
+    if (mHasHoldTime)
+    {
+        mHoldTimeLimits.holdTimeMin = std::max(static_cast<uint16_t>(1), mHoldTimeLimits.holdTimeMin);
+        mHoldTimeLimits.holdTimeMax = std::max(mHoldTimeLimits.holdTimeMin, mHoldTimeLimits.holdTimeMax);
+        mHoldTimeLimits.holdTimeDefault = std::clamp(mHoldTimeLimits.holdTimeDefault, mHoldTimeLimits.holdTimeMin, mHoldTimeLimits.holdTimeMax);
+    }
+}
 
 DataModel::ActionReturnStatus OccupancySensingCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                      AttributeValueEncoder & encoder)
@@ -73,32 +116,28 @@ DataModel::ActionReturnStatus OccupancySensingCluster::ReadAttribute(const DataM
     case Attributes::ClusterRevision::Id:
         return encoder.Encode(OccupancySensing::kRevision);
     case Attributes::FeatureMap::Id:
-        return encoder.Encode(mFeature);
+        return encoder.Encode(mFeatureMap);
+    case Attributes::Occupancy::Id:
+        return encoder.Encode(mOccupancy);
+    case Attributes::OccupancySensorType::Id:
+    return encoder.Encode(FeaturesToOccupancySensorType(mFeatureMap));
+    case Attributes::OccupancySensorTypeBitmap::Id:
+        return encoder.Encode(FeaturesToOccupancySensorTypeBitmap(mFeatureMap));
     case Attributes::HoldTime::Id:
     case Attributes::PIROccupiedToUnoccupiedDelay::Id:
     case Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id:
     case Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Id:
+        if (!mHasHoldTime)
+        {
+            return Protocols::InteractionModel::Status::UnsupportedAttribute;
+        }
         return encoder.Encode(mHoldTime);
     case Attributes::HoldTimeLimits::Id:
+        if (!mHasHoldTime)
+        {
+            return Protocols::InteractionModel::Status::UnsupportedAttribute;
+        }
         return encoder.Encode(mHoldTimeLimits);
-    case Attributes::Occupancy::Id:
-        return encoder.Encode(mOccupancy);
-    case Attributes::OccupancySensorType::Id:
-        return encoder.Encode(OccupancySensorTypeEnumFromBitmap(mOccupancySensorTypeBitmap));
-    case Attributes::OccupancySensorTypeBitmap::Id:
-        return encoder.Encode(mOccupancySensorTypeBitmap);
-    case Attributes::PIRUnoccupiedToOccupiedDelay::Id:
-        return encoder.Encode(mPIRUnoccupiedToOccupiedDelay);
-    case Attributes::PIRUnoccupiedToOccupiedThreshold::Id:
-        return encoder.Encode(mPIRUnoccupiedToOccupiedThreshold);
-    case Attributes::UltrasonicUnoccupiedToOccupiedDelay::Id:
-        return encoder.Encode(mUltrasonicUnoccupiedToOccupiedDelay);
-    case Attributes::UltrasonicUnoccupiedToOccupiedThreshold::Id:
-        return encoder.Encode(mUltrasonicUnoccupiedToOccupiedThreshold);
-    case Attributes::PhysicalContactUnoccupiedToOccupiedDelay::Id:
-        return encoder.Encode(mPhysicalContactUnoccupiedToOccupiedDelay);
-    case Attributes::PhysicalContactUnoccupiedToOccupiedThreshold::Id:
-        return encoder.Encode(mPhysicalContactUnoccupiedToOccupiedThreshold);
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }

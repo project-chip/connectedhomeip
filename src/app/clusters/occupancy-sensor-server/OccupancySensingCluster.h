@@ -21,86 +21,28 @@
 
 namespace chip::app::Clusters {
 
-constexpr uint32_t kDefaultFeatureMap = 0;
-
 class OccupancySensingCluster : public DefaultServerCluster
 {
 public:
     struct Config
     {
-        Config(EndpointId aEndpointId) : endpointId(aEndpointId) {}
+        Config(EndpointId endpointId) : mEndpointId(endpointId), mHoldTime(1), mHoldTimeLimits({ .holdTimeMin = 1, .holdTimeMax = 10, .holdTimeDefault = 1 }) {}
 
-        Config & WithFeature(BitMask<OccupancySensing::Feature> aFeature)
+        Config & WithFeatures(OccupancySensing::Feature featureMap) { mFeatureMap = featureMap; return *this; }
+
+        Config & WithHoldTime(uint16_t aHoldTime, const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & aHoldTimeLimits)
         {
-            this->feature = aFeature;
+            mHasHoldTime    = true;
+            mHoldTime       = aHoldTime;
+            mHoldTimeLimits = aHoldTimeLimits;
             return *this;
         }
 
-        Config & WithHoldTime(uint16_t aHoldTime)
-        {
-            this->holdTime = aHoldTime;
-            return *this;
-        }
-
-        Config & WithHoldTimeLimits(const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & aHoldTimeLimits)
-        {
-            this->holdTimeLimits = aHoldTimeLimits;
-            return *this;
-        }
-
-        Config & WithOccupancySensorTypeBitmap(BitMask<OccupancySensing::OccupancySensorTypeBitmap> aOccupancySensorTypeBitmap)
-        {
-            this->occupancySensorTypeBitmap = aOccupancySensorTypeBitmap;
-            return *this;
-        }
-
-        Config & WithPIRUnoccupiedToOccupiedDelay(uint16_t aDelay)
-        {
-            this->pirUnoccupiedToOccupiedDelay = aDelay;
-            return *this;
-        }
-
-        Config & WithPIRUnoccupiedToOccupiedThreshold(uint8_t aThreshold)
-        {
-            this->pirUnoccupiedToOccupiedThreshold = aThreshold;
-            return *this;
-        }
-
-        Config & WithUltrasonicUnoccupiedToOccupiedDelay(uint16_t aDelay)
-        {
-            this->ultrasonicUnoccupiedToOccupiedDelay = aDelay;
-            return *this;
-        }
-
-        Config & WithUltrasonicUnoccupiedToOccupiedThreshold(uint8_t aThreshold)
-        {
-            this->ultrasonicUnoccupiedToOccupiedThreshold = aThreshold;
-            return *this;
-        }
-
-        Config & WithPhysicalContactUnoccupiedToOccupiedDelay(uint16_t aDelay)
-        {
-            this->physicalContactUnoccupiedToOccupiedDelay = aDelay;
-            return *this;
-        }
-
-        Config & WithPhysicalContactUnoccupiedToOccupiedThreshold(uint8_t aThreshold)
-        {
-            this->physicalContactUnoccupiedToOccupiedThreshold = aThreshold;
-            return *this;
-        }
-
-        EndpointId endpointId;
-        BitMask<OccupancySensing::Feature> feature = 0;
-        uint16_t holdTime = 1;
-        OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimits = { .holdTimeMin = 0, .holdTimeMax = 0, .holdTimeDefault = 0 };
-        BitMask<OccupancySensing::OccupancySensorTypeBitmap> occupancySensorTypeBitmap = OccupancySensing::OccupancySensorTypeBitmap::kPir;
-        uint16_t pirUnoccupiedToOccupiedDelay = 0;
-        uint8_t pirUnoccupiedToOccupiedThreshold = 1;
-        uint16_t ultrasonicUnoccupiedToOccupiedDelay = 0;
-        uint8_t ultrasonicUnoccupiedToOccupiedThreshold = 1;
-        uint16_t physicalContactUnoccupiedToOccupiedDelay = 0;
-        uint8_t physicalContactUnoccupiedToOccupiedThreshold = 1;
+        EndpointId mEndpointId;
+        BitMask<OccupancySensing::Feature> mFeatureMap = 0;
+        bool mHasHoldTime = false;
+        uint16_t mHoldTime = 1; // New member
+        OccupancySensing::Structs::HoldTimeLimitsStruct::Type mHoldTimeLimits = { .holdTimeMin = 1, .holdTimeMax = 10, .holdTimeDefault = 1 }; // New member
     };
 
     OccupancySensingCluster(const Config & config);
@@ -109,17 +51,11 @@ public:
                                                 AttributeValueEncoder & encoder) override;
 
 private:
-    BitMask<OccupancySensing::Feature> mFeature;
+    BitMask<OccupancySensing::Feature> mFeatureMap;
+    bool mHasHoldTime = false;
     uint16_t mHoldTime;
     OccupancySensing::Structs::HoldTimeLimitsStruct::Type mHoldTimeLimits;
     BitMask<OccupancySensing::OccupancyBitmap> mOccupancy = 0;
-    BitMask<OccupancySensing::OccupancySensorTypeBitmap> mOccupancySensorTypeBitmap;
-    uint16_t mPIRUnoccupiedToOccupiedDelay;
-    uint8_t mPIRUnoccupiedToOccupiedThreshold;
-    uint16_t mUltrasonicUnoccupiedToOccupiedDelay;
-    uint8_t mUltrasonicUnoccupiedToOccupiedThreshold;
-    uint16_t mPhysicalContactUnoccupiedToOccupiedDelay;
-    uint8_t mPhysicalContactUnoccupiedToOccupiedThreshold;
 };
 
 } // namespace chip::app::Clusters
