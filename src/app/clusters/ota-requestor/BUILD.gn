@@ -36,7 +36,6 @@ source_set("ota-requestor") {
     "OTARequestorEventHandlerRegistry.cpp",
     "OTARequestorEventHandlerRegistry.h",
     "OTARequestorStorage.h",
-    "ota-requestor-server.h",
   ]
 
   public_deps = [

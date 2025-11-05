@@ -308,6 +308,26 @@ private:
     void LoadCurrentUpdateInfo();
 
     /**
+     * Send a StateTransition event to all registered event handlers
+     */
+    void SendStateTransitionEvent(OTAUpdateStateEnum previousState,
+                                  OTAUpdateStateEnum newState,
+                                  OTAChangeReasonEnum reason,
+                                  app::DataModel::Nullable<uint32_t> const & targetSoftwareVersion);
+
+    /**
+     * Send a VersionApplied event to all registered event handlers
+     */
+    void SendVersionAppliedEvent(uint32_t softwareVersion, uint16_t productId);
+
+    /**
+     * Send a StateTransition event to all registered event handlers
+     */
+    void SendDownloadErrorEvent(uint32_t softwareVersion, uint64_t bytesDownloaded,
+                                app::DataModel::Nullable<uint8_t> progressPercent,
+                                app::DataModel::Nullable<int64_t> platformCode);
+
+    /**
      * Session connection callbacks
      */
     static void OnConnected(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);

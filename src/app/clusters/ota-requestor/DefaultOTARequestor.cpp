@@ -21,7 +21,6 @@
  */
 
 #include <app/clusters/basic-information/BasicInformationCluster.h>
-#include <app/clusters/ota-requestor/ota-requestor-server.h>
 #include <controller/CHIPCluster.h>
 #include <lib/core/CHIPEncoding.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -564,7 +563,7 @@ void DefaultOTARequestor::NotifyUpdateApplied()
         return;
     }
 
-    OtaRequestorServerOnVersionApplied(mCurrentVersion, productId);
+    SendVersionAppliedEvent(mCurrentVersion, productId);
 
     ConnectToProvider(kNotifyUpdateApplied);
 }
@@ -655,7 +654,7 @@ void DefaultOTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAC
     {
         targetSoftwareVersion.SetNonNull(mTargetVersion);
     }
-    OtaRequestorServerOnStateTransition(mCurrentUpdateState, newState, reason, targetSoftwareVersion);
+    SendStateTransitionEvent(mCurrentUpdateState, newState, reason, targetSoftwareVersion);
 
     OTAUpdateStateEnum prevState = mCurrentUpdateState;
     // Update the new state before handling the state transition
@@ -679,7 +678,7 @@ void DefaultOTARequestor::RecordErrorUpdateState(CHIP_ERROR error, OTAChangeReas
     VerifyOrDie(imageProcessor != nullptr);
     Nullable<uint8_t> progressPercent = imageProcessor->GetPercentComplete();
     Nullable<int64_t> platformCode;
-    OtaRequestorServerOnDownloadError(mTargetVersion, imageProcessor->GetBytesDownloaded(), progressPercent, platformCode);
+    SendDownloadErrorEvent(mTargetVersion, imageProcessor->GetBytesDownloaded(), progressPercent, platformCode);
 
     // Whenever an error occurs, always reset to Idle state
     RecordNewUpdateState(OTAUpdateStateEnum::kIdle, reason, error);
@@ -926,6 +925,35 @@ void DefaultOTARequestor::OnCommissioningCompleteRequestor(const DeviceLayer::Ch
     // Schedule a query. At the end of this query/update process the Default Provider timer is started
     OTARequestorDriver * driver = (reinterpret_cast<DefaultOTARequestor *>(arg))->mOtaRequestorDriver;
     driver->OTACommissioningCallback();
+}
+
+void DefaultOTARequestor::SendStateTransitionEvent(OTAUpdateStateEnum previousState,
+                                                   OTAUpdateStateEnum newState,
+                                                   OTAChangeReasonEnum reason,
+                                                   DataModel::Nullable<uint32_t> const & targetSoftwareVersion)
+{
+    for (auto iterator = mEventHandlers.begin(); iterator != mEventHandlers.end(); ++iterator)
+    {
+        iterator->eventHandler->OnStateTransition(previousState, newState, reason, targetSoftwareVersion);
+    }
+}
+
+void DefaultOTARequestor::SendVersionAppliedEvent(uint32_t softwareVersion, uint16_t productId)
+{
+    for (auto iterator = mEventHandlers.begin(); iterator != mEventHandlers.end(); ++iterator)
+    {
+        iterator->eventHandler->OnVersionApplied(softwareVersion, productId);
+    }
+}
+
+void DefaultOTARequestor::SendDownloadErrorEvent(uint32_t softwareVersion, uint64_t bytesDownloaded,
+                                                 DataModel::Nullable<uint8_t> progressPercent,
+                                                 DataModel::Nullable<int64_t> platformCode)
+{
+    for (auto iterator = mEventHandlers.begin(); iterator != mEventHandlers.end(); ++iterator)
+    {
+        iterator->eventHandler->OnDownloadError(softwareVersion, bytesDownloaded, progressPercent, platformCode);
+    }
 }
 
 } // namespace chip

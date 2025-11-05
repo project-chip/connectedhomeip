@@ -37,7 +37,7 @@ namespace app {
 struct OTARequestorEventHandlerRegistration
 {
     OTARequestorEventHandler * const eventHandler;
-    EndpointId endpointId;  // TODO: Make this the endpoint ID.
+    EndpointId endpointId;
     OTARequestorEventHandlerRegistration * next;
 
     OTARequestorEventHandlerRegistration(OTARequestorEventHandler & handler, EndpointId endpointId,
