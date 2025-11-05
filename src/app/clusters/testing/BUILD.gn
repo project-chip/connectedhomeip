@@ -20,12 +20,15 @@ source_set("testing") {
   sources = [
     "AttributeTesting.cpp",
     "AttributeTesting.h",
-    "TestReadWriteAttribute.h",
+    "ClusterTester.h",
+    "ValidateGlobalAttributes.h",
   ]
 
   public_deps = [
     "${chip_root}/src/app/data-model-provider:metadata",
     "${chip_root}/src/app/data-model-provider/tests:encode-decode",
+    "${chip_root}/src/app/server-cluster:server-cluster",
+    "${chip_root}/src/app/server-cluster/testing:testing",
     "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support",
   ]

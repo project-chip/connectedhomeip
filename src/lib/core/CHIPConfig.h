@@ -1622,7 +1622,8 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *  Scene Max name size + OnOff : 55 bytes
  *  Scene Max name size + LevelControl : 64 bytes
  *  Scene Max name size + ColorControl : 130 bytes
- *  Scene Max name size + OnOff + LevelControl + ColoControl : 175 bytes
+ *  Scene Max name size + ModeSelect : 55 bytes
+ *  Scene Max name size + OnOff + LevelControl + ColorControl + ModeSelect : 230 bytes
  *
  *  Cluster Sizes:
  *  OnOff Cluster Max Size: 21 bytes
@@ -1631,17 +1632,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * */
 #ifndef CHIP_CONFIG_SCENES_MAX_SERIALIZED_SCENE_SIZE_BYTES
 #define CHIP_CONFIG_SCENES_MAX_SERIALIZED_SCENE_SIZE_BYTES 256
-#endif
-
-/**
- * @def CHIP_CONFIG_MAX_SCENES_CONCURRENT_ITERATORS
- *
- * @brief Defines the number of simultaneous Scenes iterators that can be allocated
- *
- * Number of iterator instances that can be allocated at any one time
- */
-#ifndef CHIP_CONFIG_MAX_SCENES_CONCURRENT_ITERATORS
-#define CHIP_CONFIG_MAX_SCENES_CONCURRENT_ITERATORS 2
 #endif
 
 /**

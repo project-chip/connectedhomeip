@@ -472,29 +472,6 @@ exit:
     return CHIP_ERROR_INTERNAL;
 }
 
-bool ThreadStackManagerImpl::_HaveMeshConnectivity()
-{
-    return false;
-}
-
-CHIP_ERROR ThreadStackManagerImpl::_GetAndLogThreadStatsCounters()
-{
-    ChipLogError(DeviceLayer, "Not implemented");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR ThreadStackManagerImpl::_GetAndLogThreadTopologyMinimal()
-{
-    ChipLogError(DeviceLayer, "Not implemented");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR ThreadStackManagerImpl::_GetAndLogThreadTopologyFull()
-{
-    ChipLogError(DeviceLayer, "Not implemented");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
 CHIP_ERROR ThreadStackManagerImpl::_GetPrimary802154MACAddress(uint8_t * buf)
 {
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_UNINITIALIZED);
@@ -512,12 +489,6 @@ CHIP_ERROR ThreadStackManagerImpl::_GetPrimary802154MACAddress(uint8_t * buf)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ThreadStackManagerImpl::_GetExternalIPv6Address(chip::Inet::IPAddress & addr)
-{
-    ChipLogError(DeviceLayer, "Not implemented");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
 CHIP_ERROR ThreadStackManagerImpl::_GetThreadVersion(uint16_t & version)
 {
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_UNINITIALIZED);
@@ -531,12 +502,6 @@ CHIP_ERROR ThreadStackManagerImpl::_GetThreadVersion(uint16_t & version)
 #else
     return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
-}
-
-CHIP_ERROR ThreadStackManagerImpl::_GetPollPeriod(uint32_t & buf)
-{
-    ChipLogError(DeviceLayer, "Not implemented");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback)

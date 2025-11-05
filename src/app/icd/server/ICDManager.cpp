@@ -136,9 +136,10 @@ uint32_t ICDManager::StayActiveRequest(uint32_t stayActiveDuration)
 }
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-void ICDManager::SendCheckInMsgs()
+void ICDManager::SendCheckInMsgs(Optional<Access::SubjectDescriptor> specificSubject)
 {
 #if !(CONFIG_BUILD_FOR_HOST_UNIT_TEST)
+    VerifyOrDie(SupportsFeature(Feature::kCheckInProtocolSupport));
     VerifyOrDie(mStorage != nullptr);
     VerifyOrDie(mFabricTable != nullptr);
 
@@ -173,7 +174,13 @@ void ICDManager::SendCheckInMsgs()
                 continue;
             }
 
-            if (!ShouldCheckInMsgsBeSentAtActiveModeFunction(entry.fabricIndex, entry.monitoredSubject))
+            if (specificSubject.HasValue() && !ShouldSendCheckInMessageForSpecificSubject(entry, specificSubject.Value()))
+            {
+                continue;
+            }
+
+            if (!specificSubject.HasValue() &&
+                !ShouldCheckInMsgsBeSentAtActiveModeFunction(entry.fabricIndex, entry.monitoredSubject))
             {
                 continue;
             }
@@ -207,6 +214,24 @@ void ICDManager::SendCheckInMsgs()
         }
     }
 #endif // !(CONFIG_BUILD_FOR_HOST_UNIT_TEST)
+}
+
+bool ICDManager::ShouldSendCheckInMessageForSpecificSubject(const ICDMonitoringEntry & entry,
+                                                            const Access::SubjectDescriptor & specificSubject)
+{
+    if (specificSubject.fabricIndex != entry.fabricIndex)
+    {
+        return false;
+    }
+
+    if (specificSubject.cats.CheckSubjectAgainstCATs(entry.monitoredSubject) || entry.monitoredSubject == specificSubject.subject)
+    {
+        ChipLogProgress(AppServer, "Proceed to send Check-In msg for specific subject: " ChipLogFormatX64,
+                        ChipLogValueX64(specificSubject.subject));
+        return true;
+    }
+
+    return false;
 }
 
 bool ICDManager::CheckInMessagesWouldBeSent(const std::function<ShouldCheckInMsgsBeSentFunction> & shouldCheckInMsgsBeSentFunction)
@@ -479,10 +504,7 @@ void ICDManager::UpdateOperationState(OperationalState state)
             }
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-            if (SupportsFeature(Feature::kCheckInProtocolSupport))
-            {
-                SendCheckInMsgs();
-            }
+            SendCheckInMsgs();
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
             postObserverEvent(ObserverEventType::EnterActiveMode);
@@ -660,6 +682,14 @@ void ICDManager::OnSubscriptionReport()
     VerifyOrReturn(mOperationalState == OperationalState::IdleMode);
     this->UpdateOperationState(OperationalState::ActiveMode);
 }
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
+void ICDManager::OnSendCheckIn(const Access::SubjectDescriptor & subject)
+{
+    ChipLogProgress(AppServer, "Received OnSendCheckIn for subject: " ChipLogFormatX64, ChipLogValueX64(subject.subject));
+    SendCheckInMsgs(MakeOptional(subject));
+}
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
 
 void ICDManager::ExtendActiveMode(Milliseconds16 extendDuration)
 {

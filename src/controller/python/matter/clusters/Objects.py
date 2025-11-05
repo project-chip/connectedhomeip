@@ -2627,6 +2627,7 @@ class AccessControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="accessControlEntriesPerFabric", Tag=0x00000004, Type=uint),
                 ClusterObjectFieldDescriptor(Label="commissioningARL", Tag=0x00000005, Type=typing.Optional[typing.List[AccessControl.Structs.CommissioningAccessRestrictionEntryStruct]]),
                 ClusterObjectFieldDescriptor(Label="arl", Tag=0x00000006, Type=typing.Optional[typing.List[AccessControl.Structs.AccessRestrictionEntryStruct]]),
+                ClusterObjectFieldDescriptor(Label="auxiliaryACL", Tag=0x00000007, Type=typing.Optional[typing.List[AccessControl.Structs.AccessControlEntryStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -2641,6 +2642,7 @@ class AccessControl(Cluster):
     accessControlEntriesPerFabric: uint = 0
     commissioningARL: typing.Optional[typing.List[AccessControl.Structs.CommissioningAccessRestrictionEntryStruct]] = None
     arl: typing.Optional[typing.List[AccessControl.Structs.AccessRestrictionEntryStruct]] = None
+    auxiliaryACL: typing.Optional[typing.List[AccessControl.Structs.AccessControlEntryStruct]] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -2648,6 +2650,15 @@ class AccessControl(Cluster):
     clusterRevision: uint = 0
 
     class Enums:
+        class AccessControlAuxiliaryTypeEnum(MatterIntEnum):
+            kSystem = 0x00
+            kGroupcast = 0x01
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 2
+
         class AccessControlEntryAuthModeEnum(MatterIntEnum):
             kPase = 0x01
             kCase = 0x02
@@ -2695,6 +2706,7 @@ class AccessControl(Cluster):
         class Feature(IntFlag):
             kExtension = 0x1
             kManagedDevice = 0x2
+            kAuxiliary = 0x4
 
     class Structs:
         @dataclass
@@ -2767,6 +2779,7 @@ class AccessControl(Cluster):
                         ClusterObjectFieldDescriptor(Label="authMode", Tag=2, Type=AccessControl.Enums.AccessControlEntryAuthModeEnum),
                         ClusterObjectFieldDescriptor(Label="subjects", Tag=3, Type=typing.Union[Nullable, typing.List[uint]]),
                         ClusterObjectFieldDescriptor(Label="targets", Tag=4, Type=typing.Union[Nullable, typing.List[AccessControl.Structs.AccessControlTargetStruct]]),
+                        ClusterObjectFieldDescriptor(Label="auxiliaryType", Tag=5, Type=typing.Optional[AccessControl.Enums.AccessControlAuxiliaryTypeEnum]),
                         ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
@@ -2774,6 +2787,7 @@ class AccessControl(Cluster):
             authMode: 'AccessControl.Enums.AccessControlEntryAuthModeEnum' = 0
             subjects: 'typing.Union[Nullable, typing.List[uint]]' = NullValue
             targets: 'typing.Union[Nullable, typing.List[AccessControl.Structs.AccessControlTargetStruct]]' = NullValue
+            auxiliaryType: 'typing.Optional[AccessControl.Enums.AccessControlAuxiliaryTypeEnum]' = None
             fabricIndex: 'uint' = 0
 
         @dataclass
@@ -2936,6 +2950,22 @@ class AccessControl(Cluster):
             value: typing.Optional[typing.List[AccessControl.Structs.AccessRestrictionEntryStruct]] = None
 
         @dataclass
+        class AuxiliaryACL(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000001F
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000007
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[AccessControl.Structs.AccessControlEntryStruct]])
+
+            value: typing.Optional[typing.List[AccessControl.Structs.AccessControlEntryStruct]] = None
+
+        @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
@@ -3093,6 +3123,27 @@ class AccessControl(Cluster):
             token: uint = 0
             instruction: typing.Optional[str] = None
             ARLRequestFlowUrl: typing.Optional[str] = None
+            fabricIndex: uint = 0
+
+        @dataclass
+        class AuxiliaryAccessUpdated(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000001F
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000003
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="adminNodeID", Tag=0, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
+                    ])
+
+            adminNodeID: typing.Union[Nullable, uint] = NullValue
             fabricIndex: uint = 0
 
 
@@ -45709,6 +45760,9 @@ class ContentControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="screenDailyTime", Tag=0x00000005, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="remainingScreenTime", Tag=0x00000006, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="blockUnrated", Tag=0x00000007, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="blockChannelList", Tag=0x00000008, Type=typing.Optional[typing.List[ContentControl.Structs.BlockChannelStruct]]),
+                ClusterObjectFieldDescriptor(Label="blockApplicationList", Tag=0x00000009, Type=typing.Optional[typing.List[ContentControl.Structs.AppInfoStruct]]),
+                ClusterObjectFieldDescriptor(Label="blockContentTimeWindow", Tag=0x0000000A, Type=typing.Optional[typing.List[ContentControl.Structs.TimeWindowStruct]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -45724,21 +45778,116 @@ class ContentControl(Cluster):
     screenDailyTime: typing.Optional[uint] = None
     remainingScreenTime: typing.Optional[uint] = None
     blockUnrated: typing.Optional[bool] = None
+    blockChannelList: typing.Optional[typing.List[ContentControl.Structs.BlockChannelStruct]] = None
+    blockApplicationList: typing.Optional[typing.List[ContentControl.Structs.AppInfoStruct]] = None
+    blockContentTimeWindow: typing.Optional[typing.List[ContentControl.Structs.TimeWindowStruct]] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
     featureMap: uint = 0
     clusterRevision: uint = 0
 
+    class Enums:
+        class StatusCodeEnum(MatterIntEnum):
+            kInvalidPINCode = 0x02
+            kInvalidRating = 0x03
+            kInvalidChannel = 0x04
+            kChannelAlreadyExist = 0x05
+            kChannelNotExist = 0x06
+            kUnidentifiableApplication = 0x07
+            kApplicationAlreadyExist = 0x08
+            kApplicationNotExist = 0x09
+            kTimeWindowAlreadyExist = 0x0A
+            kTimeWindowNotExist = 0x0B
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 0
+
     class Bitmaps:
+        class DayOfWeekBitmap(IntFlag):
+            kSunday = 0x1
+            kMonday = 0x2
+            kTuesday = 0x4
+            kWednesday = 0x8
+            kThursday = 0x10
+            kFriday = 0x20
+            kSaturday = 0x40
+
         class Feature(IntFlag):
             kScreenTime = 0x1
             kPINManagement = 0x2
             kBlockUnrated = 0x4
             kOnDemandContentRating = 0x8
             kScheduledContentRating = 0x10
+            kBlockChannels = 0x20
+            kBlockApplications = 0x40
+            kBlockContentTimeWindow = 0x80
 
     class Structs:
+        @dataclass
+        class TimePeriodStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="startHour", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="startMinute", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="endHour", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="endMinute", Tag=3, Type=uint),
+                    ])
+
+            startHour: 'uint' = 0
+            startMinute: 'uint' = 0
+            endHour: 'uint' = 0
+            endMinute: 'uint' = 0
+
+        @dataclass
+        class TimeWindowStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="timeWindowIndex", Tag=0, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="dayOfWeek", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="timePeriod", Tag=2, Type=typing.List[ContentControl.Structs.TimePeriodStruct]),
+                    ])
+
+            timeWindowIndex: 'typing.Union[Nullable, uint]' = NullValue
+            dayOfWeek: 'uint' = 0
+            timePeriod: 'typing.List[ContentControl.Structs.TimePeriodStruct]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class AppInfoStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="catalogVendorID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="applicationID", Tag=1, Type=str),
+                    ])
+
+            catalogVendorID: 'uint' = 0
+            applicationID: 'str' = ""
+
+        @dataclass
+        class BlockChannelStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="blockChannelIndex", Tag=0, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="majorNumber", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="minorNumber", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="identifier", Tag=3, Type=typing.Optional[str]),
+                    ])
+
+            blockChannelIndex: 'typing.Union[Nullable, uint]' = NullValue
+            majorNumber: 'uint' = 0
+            minorNumber: 'uint' = 0
+            identifier: 'typing.Optional[str]' = None
+
         @dataclass
         class RatingNameStruct(ClusterObject):
             @ChipUtility.classproperty
@@ -45764,11 +45913,15 @@ class ContentControl(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="oldPIN", Tag=0, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="oldPIN", Tag=0, Type=str),
                         ClusterObjectFieldDescriptor(Label="newPIN", Tag=1, Type=str),
                     ])
 
-            oldPIN: typing.Optional[str] = None
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
+
+            oldPIN: str = ""
             newPIN: str = ""
 
         @dataclass
@@ -45783,6 +45936,10 @@ class ContentControl(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                     ])
+
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
 
         @dataclass
         class ResetPINResponse(ClusterCommand):
@@ -45813,6 +45970,10 @@ class ContentControl(Cluster):
                     Fields=[
                     ])
 
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
+
         @dataclass
         class Disable(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0000050F
@@ -45826,6 +45987,10 @@ class ContentControl(Cluster):
                     Fields=[
                     ])
 
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
+
         @dataclass
         class AddBonusTime(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0000050F
@@ -45838,11 +46003,11 @@ class ContentControl(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="PINCode", Tag=0, Type=typing.Optional[str]),
-                        ClusterObjectFieldDescriptor(Label="bonusTime", Tag=1, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="bonusTime", Tag=1, Type=uint),
                     ])
 
             PINCode: typing.Optional[str] = None
-            bonusTime: typing.Optional[uint] = None
+            bonusTime: uint = 0
 
         @dataclass
         class SetScreenDailyTime(ClusterCommand):
@@ -45917,6 +46082,102 @@ class ContentControl(Cluster):
                     ])
 
             rating: str = ""
+
+        @dataclass
+        class AddBlockChannels(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0000050F
+            command_id: typing.ClassVar[int] = 0x0000000B
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="channels", Tag=0, Type=typing.List[ContentControl.Structs.BlockChannelStruct]),
+                    ])
+
+            channels: typing.List[ContentControl.Structs.BlockChannelStruct] = field(default_factory=lambda: [])
+
+        @dataclass
+        class RemoveBlockChannels(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0000050F
+            command_id: typing.ClassVar[int] = 0x0000000C
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="channelIndexes", Tag=0, Type=typing.List[uint]),
+                    ])
+
+            channelIndexes: typing.List[uint] = field(default_factory=lambda: [])
+
+        @dataclass
+        class AddBlockApplications(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0000050F
+            command_id: typing.ClassVar[int] = 0x0000000D
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="applications", Tag=0, Type=typing.List[ContentControl.Structs.AppInfoStruct]),
+                    ])
+
+            applications: typing.List[ContentControl.Structs.AppInfoStruct] = field(default_factory=lambda: [])
+
+        @dataclass
+        class RemoveBlockApplications(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0000050F
+            command_id: typing.ClassVar[int] = 0x0000000E
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="applications", Tag=0, Type=typing.List[ContentControl.Structs.AppInfoStruct]),
+                    ])
+
+            applications: typing.List[ContentControl.Structs.AppInfoStruct] = field(default_factory=lambda: [])
+
+        @dataclass
+        class SetBlockContentTimeWindow(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0000050F
+            command_id: typing.ClassVar[int] = 0x0000000F
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="timeWindow", Tag=0, Type=ContentControl.Structs.TimeWindowStruct),
+                    ])
+
+            timeWindow: ContentControl.Structs.TimeWindowStruct = field(default_factory=lambda: ContentControl.Structs.TimeWindowStruct())
+
+        @dataclass
+        class RemoveBlockContentTimeWindow(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0000050F
+            command_id: typing.ClassVar[int] = 0x00000010
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="timeWindowIndexes", Tag=0, Type=typing.List[uint]),
+                    ])
+
+            timeWindowIndexes: typing.List[uint] = field(default_factory=lambda: [])
 
     class Attributes:
         @dataclass
@@ -46048,6 +46309,54 @@ class ContentControl(Cluster):
             value: typing.Optional[bool] = None
 
         @dataclass
+        class BlockChannelList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000050F
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000008
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[ContentControl.Structs.BlockChannelStruct]])
+
+            value: typing.Optional[typing.List[ContentControl.Structs.BlockChannelStruct]] = None
+
+        @dataclass
+        class BlockApplicationList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000050F
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000009
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[ContentControl.Structs.AppInfoStruct]])
+
+            value: typing.Optional[typing.List[ContentControl.Structs.AppInfoStruct]] = None
+
+        @dataclass
+        class BlockContentTimeWindow(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000050F
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000000A
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[ContentControl.Structs.TimeWindowStruct]])
+
+            value: typing.Optional[typing.List[ContentControl.Structs.TimeWindowStruct]] = None
+
+        @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
@@ -46137,6 +46446,22 @@ class ContentControl(Cluster):
             @ChipUtility.classproperty
             def event_id(cls) -> int:
                 return 0x00000000
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                    ])
+
+        @dataclass
+        class EnteringBlockContentTimeWindow(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0000050F
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000001
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:

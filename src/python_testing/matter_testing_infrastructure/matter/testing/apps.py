@@ -173,11 +173,16 @@ class OTAProviderSubprocess(AppServerSubprocess):
             err_log_file(str,BinaryIO): Path to create the BinaryIO logger for stderr, if not use the default stderr.buffer.
         """
         # Create the BinaryIO fp allow to use if path is provided.
+        # Or assign it to the previously opened fp.
         if isinstance(log_file, str):
             self.log_file = open(log_file, "ab")
+        else:
+            self.log_file = log_file
 
         if isinstance(err_log_file, str):
             self.err_log_file = open(err_log_file, "ab")
+        else:
+            self.err_log_file = err_log_file
 
         # Build OTA-specific arguments using the ota_source property
         combined_extra_args = ota_source.ota_args + extra_args
@@ -191,43 +196,3 @@ class OTAProviderSubprocess(AppServerSubprocess):
 
     def get_pid(self) -> int:
         return self.p.pid
-
-    def read_from_logs(self, pattern: str, before: int = 4, after: int = 4) -> list[dict]:
-        """Search for a string a return the matches. 
-
-        Args:
-            pattern (str): _description_
-            before (int, optional): Number of lines before the found line. Defaults to 4.
-            after (int, optional): Number of lines after the found line. Defaults to 4.
-
-        Raises:
-            FileNotFoundError: _description_
-
-        Returns:
-            list[dict]: List with a dict of the info retrieved.
-        """
-        if not os.path.exists(self.log_file.name):
-            raise FileNotFoundError
-
-        # read all lines at the moment
-        all_lines = None
-
-        with open(self.log_file.name, 'rb') as fp:
-            all_lines = fp.readlines()
-
-        found_lines = []
-
-        for index, line in enumerate(all_lines):
-            n_line = line.decode("utf-8", 'replace')
-            if pattern in n_line:
-                before_lines = all_lines[(index-before):index]
-                after_lines = all_lines[index+1:(index+after+1)]
-                match = {
-                    'before': list(map(lambda x: x.decode("utf-8"), before_lines)),
-                    'match': n_line,
-                    'line': index,
-                    'after': list(map(lambda x: x.decode("utf-8"), after_lines))
-                }
-                found_lines.append(match)
-
-        return found_lines

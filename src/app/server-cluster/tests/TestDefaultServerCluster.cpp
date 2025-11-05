@@ -109,11 +109,11 @@ TEST(TestDefaultServerCluster, AttributesDefault)
     // 5 global attributes are currently supported. Ensure they are returned.
     ASSERT_EQ(data.size(), 5u);
 
-    ASSERT_EQ(data[0].attributeId, Globals::Attributes::ClusterRevision::Id);
-    ASSERT_EQ(data[1].attributeId, Globals::Attributes::FeatureMap::Id);
-    ASSERT_EQ(data[2].attributeId, Globals::Attributes::AttributeList::Id);
+    ASSERT_EQ(data[0].attributeId, Globals::Attributes::FeatureMap::Id);
+    ASSERT_EQ(data[1].attributeId, Globals::Attributes::ClusterRevision::Id);
+    ASSERT_EQ(data[2].attributeId, Globals::Attributes::GeneratedCommandList::Id);
     ASSERT_EQ(data[3].attributeId, Globals::Attributes::AcceptedCommandList::Id);
-    ASSERT_EQ(data[4].attributeId, Globals::Attributes::GeneratedCommandList::Id);
+    ASSERT_EQ(data[4].attributeId, Globals::Attributes::AttributeList::Id);
 
     // first 2 are normal, the rest are list
     for (size_t i = 0; i < 5; i++)

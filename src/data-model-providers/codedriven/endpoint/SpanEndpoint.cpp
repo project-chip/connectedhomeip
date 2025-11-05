@@ -33,27 +33,27 @@ SpanEndpoint::Builder & SpanEndpoint::Builder::SetClientClusters(Span<const Clus
     return *this;
 }
 
-SpanEndpoint::Builder & SpanEndpoint::Builder::SetSemanticTags(Span<const SemanticTag> semanticTags)
-{
-    mSemanticTags = semanticTags;
-    return *this;
-}
-
 SpanEndpoint::Builder & SpanEndpoint::Builder::SetDeviceTypes(Span<const DataModel::DeviceTypeEntry> deviceTypes)
 {
     mDeviceTypes = deviceTypes;
     return *this;
 }
 
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+SpanEndpoint::Builder & SpanEndpoint::Builder::SetEndpointUniqueId(CharSpan endpointUniqueId)
+{
+    mEndpointUniqueId = endpointUniqueId;
+    return *this;
+}
+#endif
+
 SpanEndpoint SpanEndpoint::Builder::Build()
 {
-    return SpanEndpoint(mClientClusters, mSemanticTags, mDeviceTypes);
-}
-
-CHIP_ERROR
-SpanEndpoint::SemanticTags(ReadOnlyBufferBuilder<SemanticTag> & out) const
-{
-    return out.ReferenceExisting(mSemanticTags);
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+    return SpanEndpoint(mClientClusters, mDeviceTypes, mEndpointUniqueId);
+#else
+    return SpanEndpoint(mClientClusters, mDeviceTypes);
+#endif
 }
 
 CHIP_ERROR SpanEndpoint::DeviceTypes(ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> & out) const
@@ -66,12 +66,27 @@ CHIP_ERROR SpanEndpoint::ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) 
     return out.ReferenceExisting(mClientClusters);
 }
 
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+CharSpan SpanEndpoint::EndpointUniqueId() const
+{
+    return mEndpointUniqueId;
+}
+#endif
+
 // Private constructor for Builder
-SpanEndpoint::SpanEndpoint(const Span<const ClusterId> & clientClusters, const Span<const SemanticTag> & semanticTags,
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+SpanEndpoint::SpanEndpoint(const Span<const ClusterId> & clientClusters, const Span<const DataModel::DeviceTypeEntry> & deviceTypes,
+                           const CharSpan & uniqueEndpointId) :
+    mDeviceTypes(deviceTypes),
+    mClientClusters(clientClusters), mEndpointUniqueId(uniqueEndpointId)
+{}
+#else
+SpanEndpoint::SpanEndpoint(const Span<const ClusterId> & clientClusters,
                            const Span<const DataModel::DeviceTypeEntry> & deviceTypes) :
     mDeviceTypes(deviceTypes),
-    mSemanticTags(semanticTags), mClientClusters(clientClusters)
+    mClientClusters(clientClusters)
 {}
+#endif
 
 } // namespace app
 } // namespace chip

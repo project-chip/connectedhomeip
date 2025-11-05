@@ -199,7 +199,8 @@ public:
     void EnableReceive()
     {
         mReceiveEnabled = true;
-        DriveReceiving();
+        TCPEndPointHandle handle(this);
+        DriveReceiving(handle);
     }
 
     /**
@@ -455,7 +456,7 @@ public:
      *  member to process connection termination events on \c endPoint. The
      *  \c err argument distinguishes successful terminations from failures.
      */
-    typedef void (*OnConnectionClosedFunct)(TCPEndPoint & endPoint, CHIP_ERROR err);
+    typedef void (*OnConnectionClosedFunct)(const TCPEndPointHandle & endPoint, CHIP_ERROR err);
 
     /** The endpoint's close event handling function delegate. */
     OnConnectionClosedFunct OnConnectionClosed;
@@ -469,7 +470,7 @@ public:
      *  Provide a function of this type to the \c OnPeerClose delegate member
      *  to process connection termination events on \c endPoint.
      */
-    typedef void (*OnPeerCloseFunct)(TCPEndPoint & endPoint);
+    typedef void (*OnPeerCloseFunct)(const TCPEndPointHandle & endPoint);
 
     /** The endpoint's half-close receive event handling function delegate. */
     OnPeerCloseFunct OnPeerClose;
@@ -497,15 +498,15 @@ public:
     /**
      * @brief   Type of connection acceptance error event handling function.
      *
-     * @param[in]   endPoint    The TCP endpoint associated with the event.
-     * @param[in]   err         The reason for the error.
+     * @param[in]   listeningEndpoint    The listening TCP endpoint associated with the event.
+     * @param[in]   err                  The reason for the error.
      *
      * @details
      *  Provide a function of this type to the \c OnAcceptError delegate
-     *  member to process connection acceptance error events on \c endPoint. The
+     *  member to process connection acceptance error events on \c listeningEndpoint. The
      *  \c err argument provides specific detail about the type of the error.
      */
-    typedef void (*OnAcceptErrorFunct)(const TCPEndPointHandle & endPoint, CHIP_ERROR err);
+    typedef void (*OnAcceptErrorFunct)(const TCPEndPointHandle & listeningEndpoint, CHIP_ERROR err);
 
     /**
      * The endpoint's connection acceptance event handling function delegate.
@@ -593,7 +594,8 @@ protected:
     TCPEndPoint(const TCPEndPoint &) = delete;
 
     CHIP_ERROR DriveSending();
-    void DriveReceiving();
+    // Take in a handle to self to guarantee this sticks around until we're done
+    void DriveReceiving(const TCPEndPointHandle & handle);
     void HandleConnectComplete(CHIP_ERROR err);
     void HandleAcceptError(CHIP_ERROR err);
     void DoClose(CHIP_ERROR err, bool suppressCallback);
