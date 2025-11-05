@@ -38,10 +38,11 @@
 import logging
 
 from mobly import asserts
-from TC_AVSMTestBase import AVSMTestBase
+from TC_AVSMTestBase import AVSMTestBase, wmark_osd_matcher
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 
 logger = logging.getLogger(__name__)
@@ -79,11 +80,19 @@ class TC_AVSM_2_8(MatterBaseTest, AVSMTestBase):
             ),
             TestStep(
                 5,
+                "Establish a subscription to the AllocatedVideoStreams attribute"
+            ),
+            TestStep(
+                6,
                 "TH sends the VideoStreamModify command with VideoStreamID set to aStreamID. If WMARK is supported, set WaterMarkEnabled to !aWmark and if OSD is supported, set OSDEnabled to !aOSD in the command.",
                 "DUT responds with a SUCCESS status code.",
             ),
             TestStep(
-                6,
+                7,
+                "Wait until a subscription report with AllocatedVideoStreams attribute is received",
+            ),
+            TestStep(
+                8,
                 "TH reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify the following: If WMARK is supported, verify WaterMarkEnabled == !aWmark. If OSD is supported, verify OSDEnabled == !aOSD.",
             ),
@@ -151,6 +160,13 @@ class TC_AVSM_2_8(MatterBaseTest, AVSMTestBase):
             pass
 
         self.step(5)
+        # Establish subscription to AllocatedSnapshotStreams
+        sub_handler = AttributeSubscriptionHandler(cluster, attr.AllocatedVideoStreams)
+        await sub_handler.start(self.default_controller, self.dut_node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
+
+        sub_handler.reset()
+
+        self.step(6)
         try:
             videoStreamModifyCmd = commands.VideoStreamModify(
                 videoStreamID=aStreamID,
@@ -162,7 +178,13 @@ class TC_AVSM_2_8(MatterBaseTest, AVSMTestBase):
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
             pass
 
-        self.step(6)
+        self.step(7)
+        expected_wmark = not aWmark
+        expected_osd = not aOSD
+        sub_handler.await_all_expected_report_matches(expected_matchers=[wmark_osd_matcher(
+            attr.AllocatedVideoStreams, expected_wmark, expected_osd, wmarkSupport, osdSupport)], timeout_sec=20)
+
+        self.step(8)
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
         )

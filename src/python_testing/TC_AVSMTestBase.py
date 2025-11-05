@@ -22,8 +22,29 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters import Globals
 from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import AttributeMatcher
 
 logger = logging.getLogger(__name__)
+
+
+def wmark_osd_matcher(attribute_id: int, wmark: bool, osd: bool, wmark_check: bool, osd_check: bool) -> "AttributeMatcher":
+    def predicate(report: "AttributeValue") -> bool:
+        if report.attribute != attribute_id:
+            return False
+
+        if len(report.value) == 0:
+            return False
+
+        stream = report.value[0]
+        wmark_match = (not wmark_check) or (stream.watermarkEnabled == wmark)
+        osd_match = (not osd_check) or (stream.OSDEnabled == osd)
+
+        return wmark_match and osd_match
+
+    return AttributeMatcher.from_callable(
+        description=f"check watermarkEnabled is {wmark} and OSDEnabled is {osd}",
+        matcher=predicate
+    )
 
 
 class AVSMTestBase:
