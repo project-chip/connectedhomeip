@@ -53,8 +53,6 @@ struct Instance
 
     CHIP_ERROR Init() { return mCluster.Cluster().Init(); };
 
-    Instance * nextInstance = nullptr;
-
     chip::app::RegisteredServerCluster<chip::app::Clusters::ResourceMonitoring::ResourceMonitoringCluster> mCluster;
 };
 

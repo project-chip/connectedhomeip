@@ -52,61 +52,9 @@ using namespace chip::app::Clusters::ResourceMonitoring;
 
 using chip::Protocols::InteractionModel::Status;
 
-Instance * firstLegacyInstance = nullptr;
-
-Instance * GetLegacyInstance(EndpointId endpoint, ClusterId cluster)
-{
-    Instance * current = firstLegacyInstance;
-    while (current != nullptr &&
-           (current->mCluster.Cluster().GetEndpointId() != endpoint && current->mCluster.Cluster().GetClusterId() != cluster))
-    {
-        current = current->nextInstance;
-    }
-    return current;
-}
-
-inline void RegisterLegacyInstance(Instance * inst)
-{
-    inst->nextInstance  = firstLegacyInstance;
-    firstLegacyInstance = inst;
-}
-
-inline void UnregisterLegacyInstance(Instance * inst)
-{
-    if (firstLegacyInstance == inst)
-    {
-        firstLegacyInstance = firstLegacyInstance->nextInstance;
-    }
-    else if (firstLegacyInstance != nullptr)
-    {
-        Instance * previous = firstLegacyInstance;
-        Instance * current  = firstLegacyInstance->nextInstance;
-
-        while (current != nullptr && current != inst)
-        {
-            previous = current;
-            current  = current->nextInstance;
-        }
-
-        if (current != nullptr)
-        {
-            previous->nextInstance = current->nextInstance;
-        }
-    }
-}
-
 // Helper function to register a legacy instance with the codegen data model provider
-inline void RegisterInstanceWithCodegen(Instance * instance, EndpointId endpointId, ClusterId clusterId)
+inline void RegisterInstance(Instance * instance, EndpointId endpointId, ClusterId clusterId)
 {
-    if (instance == nullptr)
-    {
-#if CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
-        ChipLogError(AppServer, "Failed to find Instance of cluster " ChipLogFormatMEI " for endpoint %u",
-                     ChipLogValueMEI(clusterId), endpointId);
-#endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
-        return;
-    }
-
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(instance->mCluster.Registration());
 
     if (err != CHIP_NO_ERROR)
@@ -134,13 +82,12 @@ Instance::Instance(Delegate * delegate, EndpointId endpointId, ClusterId cluster
              degradationDirection, resetConditionCommandSupported)
 {
     mCluster.Cluster().SetDelegate(delegate);
-    RegisterLegacyInstance(this);
-    RegisterInstanceWithCodegen(GetLegacyInstance(endpointId, clusterId), endpointId, clusterId);
+    RegisterInstance(this, endpointId, clusterId);
 }
 
 Instance::~Instance()
 {
-    UnregisterLegacyInstance(this);
+    CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster());
 }
 
 } // namespace ResourceMonitoring
