@@ -23,6 +23,7 @@ source_set("testing") {
     "ClusterTester.h",
     "MockCommandHandler.cpp",
     "MockCommandHandler.h",
+    "ValidateGlobalAttributes.h",
   ]
 
   public_deps = [
@@ -35,6 +36,7 @@ source_set("testing") {
     "${chip_root}/src/app/data-model-provider:metadata",
     "${chip_root}/src/app/data-model-provider/tests:encode-decode",
     "${chip_root}/src/app/server-cluster:server-cluster",
+    "${chip_root}/src/app/server-cluster/testing:testing",
     "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging:messaging",
