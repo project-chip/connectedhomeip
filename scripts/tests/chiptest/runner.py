@@ -130,11 +130,14 @@ class Subprocess:
     def __post_init__(self):
         self.path = pathlib.Path(self.path)
 
-    def add_args(self, args: tuple[str, ...]):
-        return Subprocess(kind=self.kind, path=self.path, wrapper=self.wrapper, args=self.args + args)
+    def __repr__(self) -> str:
+        return 'Subprocess(kind={}, path={}, wrapper={}, args={})'.format(self.kind, self.path, self.wrapper, self.args)
 
-    def wrap_with(self, wrapper: tuple[str, ...]):
-        return Subprocess(kind=self.kind, path=self.path, wrapper=wrapper + self.wrapper, args=self.args)
+    def add_args(self, *args: str):
+        return Subprocess(kind=self.kind, path=self.path, wrapper=self.wrapper, args=self.args + tuple(args))
+
+    def wrap_with(self, *args: str):
+        return Subprocess(kind=self.kind, path=self.path, wrapper=tuple(args) + self.wrapper, args=self.args)
 
     def to_cmd(self) -> typing.List[str]:
         return list(self.wrapper) + [str(self.path)] + list(self.args)
@@ -198,6 +201,6 @@ class NamespacedRunner(Runner):
         super().__init__(capture_delegate)
         self.ns = ns
 
-    def RunSubprocess(self, subprocess, name, wait=True, dependencies=[], timeout_seconds: typing.Optional[int] = None, stdin=None):
+    def RunSubprocess(self, subprocess: Subprocess, name: str, wait=True, dependencies=[], timeout_seconds: typing.Optional[int] = None, stdin=None):
         wrapped_subprocess = self.ns.wrap_in_namespace(subprocess)
         return super().RunSubprocess(wrapped_subprocess, name, wait, dependencies, timeout_seconds, stdin)

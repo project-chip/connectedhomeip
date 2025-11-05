@@ -113,10 +113,10 @@ def cmd_run(context, darwin_framework_tool, ota_requestor_app, ota_data_file, ot
         ota_requestor_app = paths_finder.get('chip-ota-requestor-app')
 
     if darwin_framework_tool is not None:
-        darwin_framework_tool = Subprocess(kind='tool', path=Path(darwin_framework_tool))
+        darwin_framework_tool = Subprocess(kind='tool', path=darwin_framework_tool)
 
     if ota_requestor_app is not None:
-        ota_requestor_app = Subprocess(kind='app', path=Path(ota_requestor_app)
+        ota_requestor_app = Subprocess(kind='app', path=ota_requestor_app
                                        ).add_args(('--otaDownloadPath', ota_destination_file))
 
     runner = Runner()

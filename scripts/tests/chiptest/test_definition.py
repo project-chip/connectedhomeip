@@ -35,11 +35,11 @@ TEST_SETUP_QR_CODE = 'MT:-24J042C00KA0648G00'
 
 class App:
 
-    def __init__(self, runner, application):
+    def __init__(self, runner, subprocess, kvs_path):
         self.process = None
         self.outpipe = None
         self.runner = runner
-        self.application = application
+        self.subprocess = subprocess
         self.cv_stopped = threading.Condition()
         self.stopped = True
         self.lastLogIndex = 0
@@ -48,7 +48,7 @@ class App:
         self.killed = False
 
     def __repr__(self) -> str:
-        return f'App[{self.application.path!r} {self.application.args} - status {self.returncode}]'
+        return repr(self.subprocess)
 
     @property
     def returncode(self):
@@ -131,7 +131,7 @@ class App:
                     self.cv_stopped.wait()
 
     def __startServer(self):
-        application = self.application.add_args(('--interface-id', str(-1)))
+        subprocess = self.subprocess.add_args(('--interface-id', str(-1)))
 
         if not self.options:
             logging.debug('Executing application under test with default args')
@@ -139,10 +139,10 @@ class App:
             logging.debug('Executing application under test with the following args:')
             for key, value in self.options.items():
                 logging.debug('   %s: %s' % (key, value))
-                application = application.add_args((key, value))
+                subprocess = subprocess.add_args((key, value))
                 if key == '--KVS':
                     self.kvsPathSet.add(value)
-        return self.runner.RunSubprocess(application, name='APP ', wait=False)
+        return self.runner.RunSubprocess(subprocess, name='APP ', wait=False)
 
     def __waitFor(self, waitForString, server_process, outpipe, timeoutInSeconds=10):
         logging.debug('Waiting for %s' % waitForString)
@@ -456,13 +456,10 @@ class TestDefinition:
                 setupCode = app.setupCode
 
             if test_runtime == TestRunTime.MATTER_REPL_PYTHON:
-                python_cmd = apps.matter_repl_yaml_tester_cmd \
-                    .add_args(('--setup-code', setupCode)) \
-                    .add_args(('--yaml-path', self.run_name)) \
-                    .add_args(("--pics-file", pics_file))
+                python_cmd = apps.matter_repl_yaml_tester_cmd.add_args(('--setup-code', setupCode, '--yaml-path', self.run_name, "--pics-file", pics_file))
 
                 if dry_run:
-                    logging.info("{} {}".format(python_cmd.path, " ".join(python_cmd.args)))
+                    logging.info(python_cmd)
                 else:
                     runner.RunSubprocess(python_cmd, name='MATTER_REPL_YAML_TESTER',
                                          dependencies=[apps_register], timeout_seconds=timeout_seconds)

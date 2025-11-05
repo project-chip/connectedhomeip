@@ -134,7 +134,7 @@ class IsolatedNetworkNamespace:
         "ip netns del app-{index}",
     ]
 
-    def __init__(self, index, setup_app_link_up=True, setup_tool_link_up=True,
+    def __init__(self, index=0, setup_app_link_up=True, setup_tool_link_up=True,
                  app_link_name='eth-app', tool_link_name='eth-tool',
                  unshared=False):
 
