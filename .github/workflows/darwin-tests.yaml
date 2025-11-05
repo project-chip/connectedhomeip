@@ -39,7 +39,7 @@ jobs:
     strategy:
       matrix:
         include:
-        - os: macos-14
+        - os: macos-26
           arch: arm64     # observed, not configured
           dry-run: true
           build_variant: no-ble-no-shell-asan-clang

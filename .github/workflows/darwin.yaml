@@ -84,7 +84,7 @@ jobs:
         runs-on: ${{ matrix.os }}
         strategy:
             matrix:
-                os: [ macos-14 ]
+                os: [ macos-26 ]
                 options: # We don't need a full matrix
                     - flavor: asan
                       arguments:
