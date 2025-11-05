@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,13 +22,10 @@
 #include <system/SystemClock.h>
 
 namespace chip {
-namespace app {
 
 class TimerDelegateMock : public TimerDelegate
 {
 public:
-    using TimerContext = chip::app::TimerContext;
-
     CHIP_ERROR StartTimer(TimerContext * context, chip::System::Clock::Timeout aTimeout) override
     {
         mTimerContext = context;
@@ -61,5 +58,4 @@ private:
     chip::System::Clock::Timestamp mMockSystemTimestamp = chip::System::Clock::Milliseconds64(0);
 };
 
-} // namespace app
 } // namespace chip

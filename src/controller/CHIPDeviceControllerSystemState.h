@@ -145,7 +145,7 @@ struct DeviceControllerSystemStateParams
     SessionSetupPool * sessionSetupPool                                           = nullptr;
     CASEClientPool * caseClientPool                                               = nullptr;
     FabricTable::Delegate * fabricTableDelegate                                   = nullptr;
-    chip::app::TimerDelegate * timerDelegate                                      = nullptr;
+    TimerDelegate * timerDelegate                                                 = nullptr;
     chip::app::reporting::ReportScheduler * reportScheduler                       = nullptr;
 };
 
@@ -280,7 +280,7 @@ private:
     SessionSetupPool * mSessionSetupPool                                           = nullptr;
     CASEClientPool * mCASEClientPool                                               = nullptr;
     Credentials::GroupDataProvider * mGroupDataProvider                            = nullptr;
-    app::TimerDelegate * mTimerDelegate                                            = nullptr;
+    TimerDelegate * mTimerDelegate                                                 = nullptr;
     app::reporting::ReportScheduler * mReportScheduler                             = nullptr;
     Crypto::SessionKeystore * mSessionKeystore                                     = nullptr;
     FabricTable::Delegate * mFabricTableDelegate                                   = nullptr;

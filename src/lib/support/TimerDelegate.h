@@ -21,7 +21,6 @@
 #include <system/SystemClock.h>
 
 namespace chip {
-namespace app {
 
 class TimerContext
 {
@@ -47,5 +46,5 @@ public:
     virtual bool IsTimerActive(TimerContext * context)              = 0;
     virtual System::Clock::Timestamp GetCurrentMonotonicTimestamp() = 0;
 };
-} // namespace app
+
 } // namespace chip
