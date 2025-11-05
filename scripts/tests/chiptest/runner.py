@@ -142,9 +142,28 @@ class Subprocess:
     def to_cmd(self) -> typing.List[str]:
         return list(self.wrapper) + [str(self.path)] + list(self.args)
 
+class Executor:
+    def run(self, subproc: Subprocess, stdin, outpipe, errpipe):
+        s = subprocess.Popen(subproc.to_cmd(), stdin=stdin, stdout=outpipe, stderr=errpipe)
+        outpipe.close()
+        errpipe.close()
+        return s, outpipe, errpipe
+
+class LinuxNamespacedExecutor(Runner):
+    def __init__(self, ns):
+        self.ns = ns
+
+    def run(self, subproc: Subprocess, stdin, outpipe, errpipe):
+        wrapped = self.ns.wrap_in_namespace(subproc)
+        s = subprocess.Popen(wrapped.to_cmd(), stdin=stdin, stdout=outpipe, stderr=errpipe)
+        outpipe.close()
+        errpipe.close()
+        return s, outpipe, errpipe
+
 
 class Runner:
-    def __init__(self, capture_delegate=None):
+    def __init__(self, executor=None, capture_delegate=None):
+        self.executor = Executor() if executor is None else executor
         self.capture_delegate = capture_delegate
 
     def RunSubprocess(self, subproc: Subprocess, name: str, wait=True, dependencies=[], timeout_seconds: typing.Optional[int] = None, stdin=None):
@@ -165,9 +184,7 @@ class Runner:
         if self.capture_delegate:
             self.capture_delegate.Log(name, 'EXECUTING %r' % cmd)
 
-        s = subprocess.Popen(cmd, stdin=stdin, stdout=outpipe, stderr=errpipe)
-        outpipe.close()
-        errpipe.close()
+        s, outpipe, errpipe = self.executor.run(subproc, stdin, outpipe, errpipe)
 
         if not wait:
             return s, outpipe, errpipe
@@ -196,11 +213,11 @@ class Runner:
         logging.debug('Command %r completed with error code 0', cmd)
 
 
-class NamespacedRunner(Runner):
-    def __init__(self, ns, capture_delegate=None):
-        super().__init__(capture_delegate)
-        self.ns = ns
+# class NamespacedRunner(Runner):
+#     def __init__(self, ns, capture_delegate=None):
+#         super().__init__(capture_delegate)
+#         self.ns = ns
 
-    def RunSubprocess(self, subprocess: Subprocess, name: str, wait=True, dependencies=[], timeout_seconds: typing.Optional[int] = None, stdin=None):
-        wrapped_subprocess = self.ns.wrap_in_namespace(subprocess)
-        return super().RunSubprocess(wrapped_subprocess, name, wait, dependencies, timeout_seconds, stdin)
+#     def RunSubprocess(self, subprocess: Subprocess, name: str, wait=True, dependencies=[], timeout_seconds: typing.Optional[int] = None, stdin=None):
+#         wrapped_subprocess = self.ns.wrap_in_namespace(subprocess)
+#         return super().RunSubprocess(wrapped_subprocess, name, wait, dependencies, timeout_seconds, stdin)
