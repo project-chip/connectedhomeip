@@ -244,6 +244,22 @@ public:
     virtual CHIP_ERROR ValidateAudioStreamID(uint16_t audioStreamId) = 0;
 
     /**
+     * @brief
+     *   Checks if the given StreamUsage is in the StreamUsagePriorities list.
+     *
+     *   This method is called during SolicitOffer and ProvideOffer command processing
+     *   to ensure that the requested stream usage is supported by the device according
+     *   to its configured priorities.
+     *
+     * @param[in] streamUsage  The stream usage to check.
+     *
+     * @return CHIP_ERROR
+     *   - CHIP_NO_ERROR if the StreamUsage is found in StreamUsagePriorities.
+     *   - CHIP_ERROR_NOT_FOUND or other appropriate error if the StreamUsage is not supported.
+     */
+    virtual CHIP_ERROR IsStreamUsageSupported(Globals::StreamUsageEnum streamUsage) = 0;
+
+    /**
      * @brief Check whether hard privacy mode is active.
      *
      * Reads the HardPrivacyModeOn attribute from the CameraAvStreamManagement cluster.

@@ -562,7 +562,13 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
         return;
     }
 
-    // TODO:#41458 If the passed in StreamUsage is not found in the StreamUsagePriorities, return DYNAMIC_CONSTRAINT_ERROR
+    // Validate that the StreamUsage is in the StreamUsagePriorities list
+    if (mDelegate.IsStreamUsageSupported(req.streamUsage) != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "HandleSolicitOffer: StreamUsage %u is not in StreamUsagePriorities", to_underlying(req.streamUsage));
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
+        return;
+    }
 
     // Validate VideoStreamID against AllocatedVideoStreams.
     // If present and null then a stream has to have been allocated.
@@ -845,7 +851,13 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
             return;
         }
 
-        // TODO:#41458 If the passed in StreamUsage is not found in the StreamUsagePriorities, return DYNAMIC_CONSTRAINT_ERROR
+        // Validate that the StreamUsage is in the StreamUsagePriorities list
+        if (mDelegate.IsStreamUsageSupported(req.streamUsage) != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "HandleProvideOffer: StreamUsage %u is not in StreamUsagePriorities", to_underlying(req.streamUsage));
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
+            return;
+        }
 
         // If VideoStreamID is present and is not null and does not match a value in AllocatedVideoStreams:
         // Fail the command with the status code DYNAMIC_CONSTRAINT_ERROR
