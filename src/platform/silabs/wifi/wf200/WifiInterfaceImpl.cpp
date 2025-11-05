@@ -698,13 +698,11 @@ CHIP_ERROR WifiInterfaceImpl::GetAccessPointInfo(wfx_wifi_scan_result_t & info)
 {
     uint32_t signal_strength = 0;
 
-    // TODO: The ap_info.ssid isn't populated anywhere. The returned value is always 0.
     chip::ByteSpan apSsidSpan(ap_info.ssid, ap_info.ssid_length);
     chip::MutableByteSpan apSsidMutableSpan(info.ssid, WFX_MAX_SSID_LENGTH);
     chip::CopySpanToMutableSpan(apSsidSpan, apSsidMutableSpan);
     info.ssid_length = apSsidMutableSpan.size();
 
-    // TODO: The ap_info.bssid isn't populated anywhere. The returned value is always 0.
     chip::ByteSpan apBssidSpan(ap_info.bssid, kWifiMacAddressLength);
     chip::MutableByteSpan apBssidMutableSpan(info.bssid, kWifiMacAddressLength);
     chip::CopySpanToMutableSpan(apBssidSpan, apBssidMutableSpan);
@@ -873,6 +871,15 @@ void WifiInterfaceImpl::ConnectionEventCallback(sl_wfx_connect_ind_body_t connec
     uint32_t status = connect_indication_body.status;
     ap_info.chan    = connect_indication_body.channel;
     memcpy(&ap_info.security, &wifi_provision.security, sizeof(wifi_provision.security));
+
+    // Store SSID
+    chip::MutableByteSpan apSsidSpan(ap_info.ssid, WFX_MAX_SSID_LENGTH);
+    chip::CopySpanToMutableSpan(chip::ByteSpan(wifi_provision.ssid, wifi_provision.ssidLength), apSsidSpan);
+    ap_info.ssid_length = wifi_provision.ssidLength;
+
+    // Store BSSID
+    memcpy(ap_info.bssid, mac, kWifiMacAddressLength);
+
     switch (status)
     {
     case WFM_STATUS_SUCCESS: {
