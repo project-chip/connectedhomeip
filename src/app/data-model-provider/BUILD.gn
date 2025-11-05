@@ -33,7 +33,6 @@ source_set("core") {
   public_deps = [
     "${chip_root}/src/access:types",
     "${chip_root}/src/app:paths",
-    "${chip_root}/src/app:timer-delegate",
     "${chip_root}/src/app/data-model",
   ]
 }
