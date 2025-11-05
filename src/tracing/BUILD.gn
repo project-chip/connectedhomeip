@@ -60,13 +60,5 @@ source_set("macros") {
 
   if (matter_enable_tracing_support) {
     public_deps += [ matter_trace_config ]
-
-    # Perfetto backend requires the static library implementation on Linux/Android
-    if (current_os == "linux" || current_os == "android") {
-      public_deps += [
-        "${chip_root}/src/tracing/perfetto:perfetto",
-        "${chip_root}/src/tracing/perfetto:simple_initialization",
-      ]
-    }
   }
 }

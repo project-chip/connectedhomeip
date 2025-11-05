@@ -17,6 +17,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/openthread.gni")
 
 import("${chip_root}/build/chip/tools.gni")
+import("${chip_root}/src/tracing/tracing_args.gni")
 
 assert(chip_build_tools)
 
@@ -31,6 +32,18 @@ executable("chip-shell") {
     "${chip_root}/src/platform/logging:default",
     "${project_dir}/shell_common:shell_common",
   ]
+
+  if (matter_enable_tracing_support) {
+    deps += [ "${chip_root}/src/tracing:macros" ]
+
+    # Perfetto implementation is only available on Linux and Android
+    if (current_os == "linux" || current_os == "android") {
+      deps += [
+        "${chip_root}/src/tracing/perfetto:perfetto",
+        "${chip_root}/src/tracing/perfetto:simple_initialization",
+      ]
+    }
+  }
 
   cflags = [ "-Wconversion" ]
 
