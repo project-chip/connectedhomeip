@@ -142,12 +142,14 @@ class Subprocess:
     def to_cmd(self) -> typing.List[str]:
         return list(self.wrapper) + [str(self.path)] + list(self.args)
 
+
 class Executor:
     def run(self, subproc: Subprocess, stdin, outpipe, errpipe):
         s = subprocess.Popen(subproc.to_cmd(), stdin=stdin, stdout=outpipe, stderr=errpipe)
         outpipe.close()
         errpipe.close()
         return s, outpipe, errpipe
+
 
 class LinuxNamespacedExecutor(Runner):
     def __init__(self, ns):

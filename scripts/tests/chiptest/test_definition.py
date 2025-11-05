@@ -456,7 +456,8 @@ class TestDefinition:
                 setupCode = app.setupCode
 
             if test_runtime == TestRunTime.MATTER_REPL_PYTHON:
-                python_cmd = apps.matter_repl_yaml_tester_cmd.with_args('--setup-code', setupCode, '--yaml-path', self.run_name, "--pics-file", pics_file)
+                python_cmd = apps.matter_repl_yaml_tester_cmd.with_args(
+                    '--setup-code', setupCode, '--yaml-path', self.run_name, "--pics-file", pics_file)
 
                 if dry_run:
                     logging.info(python_cmd)
