@@ -322,10 +322,34 @@ void OTAProviderExample::SendQueryImageResponse(app::CommandHandler * commandObj
     commandObj->AddResponse(commandPath, response);
 }
 
+void OTAProviderExample::SaveCommandSnapshot(const QueryImage::DecodableType & commandData)
+{
+    mVendorId            = commandData.vendorID;
+    mProductId           = commandData.productID;
+    mHardwareVersion     = commandData.hardwareVersion.ValueOr(0);
+    mSoftwareVersion     = commandData.softwareVersion;
+    mRequestorCanConsent = commandData.requestorCanConsent.ValueOr(false);
+
+    mLocation.clear();
+    if (commandData.location.HasValue())
+    {
+        mLocation = NullTerminated(commandData.location.Value()).c_str();
+    }
+
+    mProtocolsSupported.clear();
+    auto iter = commandData.protocolsSupported.begin();
+    while (iter.Next())
+    {
+        mProtocolsSupported.push_back(iter.GetValue());
+    }
+}
+
 void OTAProviderExample::HandleQueryImage(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                           const QueryImage::DecodableType & commandData)
 {
     bool requestorCanConsent = commandData.requestorCanConsent.ValueOr(false);
+
+    SaveCommandSnapshot(commandData);
 
     if (mIgnoreQueryImageCount > 0)
     {

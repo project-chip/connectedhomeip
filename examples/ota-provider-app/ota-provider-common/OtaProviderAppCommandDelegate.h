@@ -21,11 +21,13 @@
 #include "NamedPipeCommands.h"
 
 #include <json/json.h>
+#include <ota-provider-common/OTAProviderExample.h>
 #include <platform/DiagnosticDataProvider.h>
 
 #include <string>
 
 class OtaProviderAppCommandDelegate;
+extern OTAProviderExample gOtaProvider;
 
 class OtaProviderAppCommandHandler {
 public:

@@ -29,21 +29,19 @@
 /**
  * A reference implementation for an OTA Provider. Includes a method for providing a path to a local OTA file to serve.
  */
-class OTAProviderExample : public chip::app::Clusters::OTAProviderDelegate
-{
+class OTAProviderExample : public chip::app::Clusters::OTAProviderDelegate {
 public:
     OTAProviderExample();
 
-    using OTAQueryStatus       = chip::app::Clusters::OtaSoftwareUpdateProvider::OTAQueryStatus;
+    using OTAQueryStatus = chip::app::Clusters::OtaSoftwareUpdateProvider::OTAQueryStatus;
     using OTAApplyUpdateAction = chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction;
 
     static constexpr uint16_t SW_VER_STR_MAX_LEN = 64;
-    static constexpr uint16_t OTA_URL_MAX_LEN    = 512;
-    static constexpr size_t kFilepathBufLen      = 256;
-    static constexpr size_t kUriMaxLen           = 256;
+    static constexpr uint16_t OTA_URL_MAX_LEN = 512;
+    static constexpr size_t kFilepathBufLen = 256;
+    static constexpr size_t kUriMaxLen = 256;
 
-    typedef struct DeviceSoftwareVersionModel
-    {
+    typedef struct DeviceSoftwareVersionModel {
         chip::VendorId vendorId;
         uint16_t productId;
         uint32_t softwareVersion;
@@ -91,15 +89,23 @@ public:
 
     void SetMaxBDXBlockSize(uint16_t blockSize) { mMaxBDXBlockSize = blockSize; }
 
+    uint32_t GetVendorId() { return mVendorId; }
+    uint32_t GetProductId() { return mProductId; }
+    short unsigned int GetHardwareVersion() { return mHardwareVersion; }
+    uint32_t GetSoftwareVersion() { return mSoftwareVersion; }
+    std::vector<chip::app::Clusters::OtaSoftwareUpdateProvider::DownloadProtocolEnum> GetProtocolsSupported() { return mProtocolsSupported; }
+    bool GetRequestorCanConsent() { return mRequestorCanConsent; }
+    std::string GetLocation() { return mLocation; }
+
 private:
     bool SelectOTACandidate(const uint16_t requestorVendorID, const uint16_t requestorProductID,
-                            const uint32_t requestorSoftwareVersion,
-                            OTAProviderExample::DeviceSoftwareVersionModel & finalCandidate);
+        const uint32_t requestorSoftwareVersion,
+        OTAProviderExample::DeviceSoftwareVersionModel & finalCandidate);
 
     chip::ota::UserConsentSubject
     GetUserConsentSubject(const chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                          const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData,
-                          uint32_t targetVersion);
+        const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData,
+        uint32_t targetVersion);
 
     bool ParseOTAHeader(chip::OTAImageHeaderParser & parser, const char * otaFilePath, chip::OTAImageHeader & header);
 
@@ -108,7 +114,8 @@ private:
      */
     void
     SendQueryImageResponse(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                           const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData);
+        const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData);
+    void SaveCommandSnapshot(const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData);
 
     BdxOtaSender mBdxOtaSender;
     std::vector<DeviceSoftwareVersionModel> mCandidates;
@@ -122,8 +129,14 @@ private:
     uint32_t mDelayedApplyActionTimeSec;
     chip::ota::OTAProviderUserConsentDelegate * mUserConsentDelegate;
     bool mUserConsentNeeded;
-    uint32_t mSoftwareVersion;
     char mSoftwareVersionString[SW_VER_STR_MAX_LEN];
     uint32_t mPollInterval;
     uint16_t mMaxBDXBlockSize;
+    uint32_t mVendorId;
+    uint32_t mProductId;
+    short unsigned int mHardwareVersion;
+    uint32_t mSoftwareVersion;
+    std::vector<chip::app::Clusters::OtaSoftwareUpdateProvider::DownloadProtocolEnum> mProtocolsSupported;
+    bool mRequestorCanConsent;
+    std::string mLocation;
 };

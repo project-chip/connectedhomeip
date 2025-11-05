@@ -971,6 +971,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         return write_result[0].Status
 
     def read_from_app_pipe(self, app_pipe_out: Optional[str] = None):
+        BUFFER_SIZE = 1024
+
         # If is not empty from the args, verify if the fifo file exists.
         if app_pipe_out is not None and not os.path.exists(app_pipe_out):
             LOGGER.error("Named pipe %r does NOT exist" % app_pipe_out)
@@ -982,17 +984,13 @@ class MatterBaseTest(base_test.BaseTestClass):
         if not isinstance(app_pipe_out, str):
             raise TypeError("The named pipe must be provided as a string value")
 
-        line = ""
-        f = self.open_fifo_nonblocking(app_pipe_out)
-        LOGGER.info(f"Reading out-of-band command response to file: {app_pipe_out}")
-        line = f.readline()
-        f.close()
-
-        return line
-
-    def open_fifo_nonblocking(self, app_pipe_out):
-        fd = os.open(app_pipe_out, os.O_RDONLY | os.O_NONBLOCK)
-        return os.fdopen(fd, "r", buffering=1)
+        data = ""
+        with open(app_pipe_out, "r") as app_pipe_out_fp:
+            LOGGER.info(f"Reading out-of-band command response to file: {app_pipe_out}")
+            data = app_pipe_out_fp.read(BUFFER_SIZE)
+        LOGGER.info(data)
+        data = json.loads(data)
+        return data
 
     def write_to_app_pipe(self, command_dict: dict, app_pipe: Optional[str] = None):
         """

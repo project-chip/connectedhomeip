@@ -62,7 +62,14 @@ Json::Value OtaProviderAppCommandHandler::BuildOtaProviderSnapshot(uint16_t endp
 {
     Json::Value payload(Json::objectValue);
 
-    payload["QueryImageStatus"] = "Test"; // static_cast<uint32_t>(gQueryImageStatus);
+    // payload["QueryImageStatus"]    = static_cast<uint32_t>(gOtaProvider.GetQueryImageStatus());
+    payload["VendorID"]        = gOtaProvider.GetVendorId();
+    payload["ProductID"]       = gOtaProvider.GetProductId();
+    payload["SoftwareVersion"] = gOtaProvider.GetSoftwareVersion();
+    payload["HardwareVersion"] = gOtaProvider.GetHardwareVersion();
+    // payload["ProtocolsSupported"]  = gOtaProvider.GetProtocolsSupported();
+    payload["Location"]            = gOtaProvider.GetLocation();
+    payload["RequestorCanConsent"] = gOtaProvider.GetRequestorCanConsent();
 
     return payload;
 }

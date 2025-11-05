@@ -67,9 +67,6 @@ CHIP_ERROR NamedPipeCommands::Start(std::string & path, std::string & path_out, 
 
     VerifyOrReturnError((mkfifo(path_out.c_str(), 0666) == 0) || (errno == EEXIST), CHIP_ERROR_OPEN_FAILED);
 
-    mOutFd = open(path_out.c_str(), O_RDWR | O_NONBLOCK);
-    VerifyOrReturnError(mOutFd != -1, CHIP_ERROR_OPEN_FAILED);
-
     return CHIP_NO_ERROR;
 }
 
@@ -105,6 +102,8 @@ CHIP_ERROR NamedPipeCommands::Stop()
 
 void NamedPipeCommands::WriteToOutPipe(const std::string & json)
 {
+    mOutFd = open(mChipEventFifoPathOut.c_str(), O_WRONLY);
+
     if (mOutFd == -1 || json.empty())
         return;
 

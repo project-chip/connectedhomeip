@@ -204,7 +204,7 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         self.write_to_app_pipe(command, fifo_in)
         response_data = self.read_from_app_pipe(fifo_out)
 
-        logging.info(f"Response data: {response_data}")
+        # logging.info(f"Response data: {response_data}")
 
         # # Check VendorID
         # vendor_id_basic_information = await self.read_single_attribute_check_success(
