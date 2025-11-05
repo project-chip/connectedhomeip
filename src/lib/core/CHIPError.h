@@ -1866,4 +1866,15 @@ extern void RegisterCHIPLayerErrorFormatter();
 extern void DeregisterCHIPLayerErrorFormatter();
 extern bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err);
 
+// Helper method to ignore common failures which are expected
+__attribute__((always_inline)) inline CHIP_ERROR SuppressNotFound(CHIP_ERROR err)
+{
+    return (err == CHIP_ERROR_NOT_FOUND) ? CHIP_NO_ERROR : err;
+}
+
+__attribute__((always_inline)) inline CHIP_ERROR SuppressEndOfTLV(CHIP_ERROR err)
+{
+    return (err == CHIP_END_OF_TLV) ? CHIP_NO_ERROR : err;
+}
+
 } // namespace chip
