@@ -18,6 +18,7 @@
 
 #include <app/data-model-provider/MetadataTypes.h>
 #include <map>
+#include <set>
 
 namespace chip {
 namespace Testing {
@@ -32,7 +33,7 @@ bool EqualAttributeSets(Span<const app::DataModel::AttributeEntry> a, Span<const
     {
         if (!entriesA.emplace(entry.attributeId, &entry).second)
         {
-            ChipLogError(Test, "Duplicate attribute ID in span A: 0x%08X", static_cast<int>(entry.attributeId));
+            ChipLogError(Test, "Duplicate attribute ID in span A: 0x%08X", static_cast<unsigned int>(entry.attributeId));
             return false;
         }
     }
@@ -41,7 +42,7 @@ bool EqualAttributeSets(Span<const app::DataModel::AttributeEntry> a, Span<const
     {
         if (!entriesB.emplace(entry.attributeId, &entry).second)
         {
-            ChipLogError(Test, "Duplicate attribute ID in span B: 0x%08X", static_cast<int>(entry.attributeId));
+            ChipLogError(Test, "Duplicate attribute ID in span B: 0x%08X", static_cast<unsigned int>(entry.attributeId));
             return false;
         }
     }
@@ -54,7 +55,7 @@ bool EqualAttributeSets(Span<const app::DataModel::AttributeEntry> a, Span<const
         {
             if (entriesB.find(it.first) == entriesB.end())
             {
-                ChipLogError(Test, "Attribute 0x%08X missing in B", static_cast<int>(it.first));
+                ChipLogError(Test, "Attribute 0x%08X missing in B", static_cast<unsigned int>(it.first));
             }
         }
 
@@ -62,7 +63,7 @@ bool EqualAttributeSets(Span<const app::DataModel::AttributeEntry> a, Span<const
         {
             if (entriesA.find(it.first) == entriesA.end())
             {
-                ChipLogError(Test, "Attribute 0x%08X missing in A", static_cast<int>(it.first));
+                ChipLogError(Test, "Attribute 0x%08X missing in A", static_cast<unsigned int>(it.first));
             }
         }
 
@@ -75,14 +76,14 @@ bool EqualAttributeSets(Span<const app::DataModel::AttributeEntry> a, Span<const
         if (other == entriesB.end())
         {
 
-            ChipLogError(Test, "Missing entry: 0x%08X", static_cast<int>(it.first));
+            ChipLogError(Test, "Missing entry: 0x%08X", static_cast<unsigned int>(it.first));
             return false;
         }
 
         if (*it.second != *other->second)
         {
 
-            ChipLogError(Test, "Different content (different flags?): 0x%08X", static_cast<int>(it.first));
+            ChipLogError(Test, "Different content (different flags?): 0x%08X", static_cast<unsigned int>(it.first));
             return false;
         }
     }
@@ -101,7 +102,7 @@ bool EqualAcceptedCommandSets(Span<const app::DataModel::AcceptedCommandEntry> a
     {
         if (!entriesA.emplace(entry.commandId, &entry).second)
         {
-            ChipLogError(Test, "Duplicate command ID in span A: 0x%08X", static_cast<int>(entry.commandId));
+            ChipLogError(Test, "Duplicate command ID in span A: 0x%08X", static_cast<unsigned int>(entry.commandId));
             return false;
         }
     }
@@ -110,7 +111,7 @@ bool EqualAcceptedCommandSets(Span<const app::DataModel::AcceptedCommandEntry> a
     {
         if (!entriesB.emplace(entry.commandId, &entry).second)
         {
-            ChipLogError(Test, "Duplicate command ID in span B: 0x%08X", static_cast<int>(entry.commandId));
+            ChipLogError(Test, "Duplicate command ID in span B: 0x%08X", static_cast<unsigned int>(entry.commandId));
             return false;
         }
     }
@@ -123,7 +124,7 @@ bool EqualAcceptedCommandSets(Span<const app::DataModel::AcceptedCommandEntry> a
         {
             if (entriesB.find(it.first) == entriesB.end())
             {
-                ChipLogError(Test, "Command 0x%08X missing in B", static_cast<int>(it.first));
+                ChipLogError(Test, "Command 0x%08X missing in B", static_cast<unsigned int>(it.first));
             }
         }
 
@@ -131,7 +132,7 @@ bool EqualAcceptedCommandSets(Span<const app::DataModel::AcceptedCommandEntry> a
         {
             if (entriesA.find(it.first) == entriesA.end())
             {
-                ChipLogError(Test, "Command 0x%08X missing in A", static_cast<int>(it.first));
+                ChipLogError(Test, "Command 0x%08X missing in A", static_cast<unsigned int>(it.first));
             }
         }
 
@@ -144,14 +145,72 @@ bool EqualAcceptedCommandSets(Span<const app::DataModel::AcceptedCommandEntry> a
         if (other == entriesB.end())
         {
 
-            ChipLogError(Test, "Missing entry: 0x%08X", static_cast<int>(it.first));
+            ChipLogError(Test, "Missing entry: 0x%08X", static_cast<unsigned int>(it.first));
             return false;
         }
 
         if (*it.second != *other->second)
         {
 
-            ChipLogError(Test, "Different content (different flags?): 0x%08X", static_cast<int>(it.first));
+            ChipLogError(Test, "Different content (different flags?): 0x%08X", static_cast<unsigned int>(it.first));
+            return false;
+        }
+    }
+    // set sizes are the same and all entriesA have a corresponding entriesB, so sets should match
+    return true;
+}
+
+bool EqualGeneratedCommandSets(Span<const CommandId> a, Span<const CommandId> b)
+{
+    std::set<CommandId> entriesA;
+    std::set<CommandId> entriesB;
+
+    for (CommandId entry : a)
+    {
+        if (!entriesA.insert(entry).second)
+        {
+            ChipLogError(Test, "Duplicate command ID in span A: 0x%08X", static_cast<unsigned int>(entry));
+            return false;
+        }
+    }
+
+    for (CommandId entry : b)
+    {
+        if (!entriesB.insert(entry).second)
+        {
+            ChipLogError(Test, "Duplicate command ID in span B: 0x%08X", static_cast<unsigned int>(entry));
+            return false;
+        }
+    }
+
+    if (entriesA.size() != entriesB.size())
+    {
+        ChipLogError(Test, "Sets of different sizes.");
+
+        for (const auto id : entriesA)
+        {
+            if (entriesB.find(id) == entriesB.end())
+            {
+                ChipLogError(Test, "Command 0x%08X missing in B", static_cast<unsigned int>(id));
+            }
+        }
+
+        for (const auto id : entriesB)
+        {
+            if (entriesA.find(id) == entriesA.end())
+            {
+                ChipLogError(Test, "Command 0x%08X missing in A", static_cast<unsigned int>(id));
+            }
+        }
+
+        return false;
+    }
+
+    for (const auto id : entriesA)
+    {
+        if (entriesB.find(id) == entriesB.end())
+        {
+            ChipLogError(Test, "Missing entry: 0x%08X", static_cast<unsigned int>(id));
             return false;
         }
     }
