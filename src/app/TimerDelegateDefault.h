@@ -33,5 +33,6 @@ public:
     bool IsTimerActive(TimerContext * context) override;
     System::Clock::Timestamp GetCurrentMonotonicTimestamp() override;
 };
+
 } // namespace app
 } // namespace chip
