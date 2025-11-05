@@ -201,90 +201,105 @@ shared_library("ChipDeviceCtrl") {
   configs += [ ":controller_wno_deprecate" ]
 }
 
+core_sources = [
+  "matter/CertificateAuthority.py",
+  "matter/ChipBleBase.py",
+  "matter/ChipBleUtility.py",
+  "matter/ChipBluezMgr.py",
+  "matter/ChipCommissionableNodeCtrl.py",
+  "matter/ChipStack.py",
+  "matter/FabricAdmin.py",
+  "matter/MatterTlvJson.py",
+  "matter/__init__.py",
+  "matter/bdx/Bdx.py",
+  "matter/bdx/BdxProtocol.py",
+  "matter/bdx/BdxTransfer.py",
+  "matter/bdx/__init__.py",
+  "matter/ble/__init__.py",
+  "matter/ble/commissioning/__init__.py",
+  "matter/ble/get_adapters.py",
+  "matter/ble/library_handle.py",
+  "matter/ble/scan_devices.py",
+  "matter/ble/types.py",
+  "matter/clusters/Attribute.py",
+  "matter/clusters/Command.py",
+  "matter/clusters/__init__.py",
+  "matter/commissioning/__init__.py",
+  "matter/commissioning/commissioning_flow_blocks.py",
+  "matter/commissioning/pase.py",
+  "matter/configuration/__init__.py",
+  "matter/credentials/__init__.py",
+  "matter/credentials/cert.py",
+  "matter/crypto/__init__.py",
+  "matter/crypto/fabric.py",
+  "matter/crypto/p256keypair.py",
+  "matter/discovery/__init__.py",
+  "matter/discovery/library_handle.py",
+  "matter/discovery/types.py",
+  "matter/exceptions/__init__.py",
+  "matter/fault_injection/__init__.py",
+  "matter/interaction_model/__init__.py",
+  "matter/interaction_model/delegate.py",
+  "matter/internal/__init__.py",
+  "matter/internal/commissioner.py",
+  "matter/internal/thread.py",
+  "matter/internal/types.py",
+  "matter/logging/__init__.py",
+  "matter/logging/library_handle.py",
+  "matter/logging/types.py",
+  "matter/native/__init__.py",
+  "matter/setup_payload/__init__.py",
+  "matter/setup_payload/setup_payload.py",
+  "matter/storage/__init__.py",
+  "matter/tracing/__init__.py",
+  "matter/utils/CommissioningBuildingBlocks.py",
+  "matter/utils/__init__.py",
+  "matter/yaml/__init__.py",
+  "matter/yaml/data_model_lookup.py",
+  "matter/yaml/errors.py",
+  "matter/yaml/format_converter.py",
+  "matter/yaml/runner.py",
+]
+if (chip_support_webrtc_python_bindings) {
+  core_sources += [
+    "matter/webrtc/__init__.py",
+    "matter/webrtc/async_websocket_client.py",
+    "matter/webrtc/browser_peer_connection.py",
+    "matter/webrtc/browser_webrtc_client.py",
+    "matter/webrtc/command.py",
+    "matter/webrtc/libdatachannel_peer_connection.py",
+    "matter/webrtc/libdatachannel_webrtc_client.py",
+    "matter/webrtc/library_handle.py",
+    "matter/webrtc/types.py",
+    "matter/webrtc/utils.py",
+    "matter/webrtc/webrtc_manager.py",
+  ]
+}
+
+if (chip_support_commissioning_in_controller) {
+  core_sources += [ "matter/ChipDeviceCtrl.py" ]
+} else {
+  core_sources += [ "matter/server/__init__.py" ]
+}
+
+core_py_package_reqs = [
+  "coloredlogs",
+  "construct",
+  "cryptography",
+  "dacite",
+  "deprecation",
+  "ecdsa",
+  "ipdb",
+  "matter-clusters",
+  "pyyaml",
+  "rich",
+]
+
 matter_python_wheel_action("matter-core") {
   py_manifest_files = [
     {
       src_dir = "."
-      sources = [
-        "matter/CertificateAuthority.py",
-        "matter/ChipBleBase.py",
-        "matter/ChipBleUtility.py",
-        "matter/ChipBluezMgr.py",
-        "matter/ChipCommissionableNodeCtrl.py",
-        "matter/ChipStack.py",
-        "matter/FabricAdmin.py",
-        "matter/MatterTlvJson.py",
-        "matter/__init__.py",
-        "matter/bdx/Bdx.py",
-        "matter/bdx/BdxProtocol.py",
-        "matter/bdx/BdxTransfer.py",
-        "matter/bdx/__init__.py",
-        "matter/ble/__init__.py",
-        "matter/ble/commissioning/__init__.py",
-        "matter/ble/get_adapters.py",
-        "matter/ble/library_handle.py",
-        "matter/ble/scan_devices.py",
-        "matter/ble/types.py",
-        "matter/clusters/Attribute.py",
-        "matter/clusters/Command.py",
-        "matter/clusters/__init__.py",
-        "matter/commissioning/__init__.py",
-        "matter/commissioning/commissioning_flow_blocks.py",
-        "matter/commissioning/pase.py",
-        "matter/configuration/__init__.py",
-        "matter/credentials/__init__.py",
-        "matter/credentials/cert.py",
-        "matter/crypto/__init__.py",
-        "matter/crypto/fabric.py",
-        "matter/crypto/p256keypair.py",
-        "matter/discovery/__init__.py",
-        "matter/discovery/library_handle.py",
-        "matter/discovery/types.py",
-        "matter/exceptions/__init__.py",
-        "matter/fault_injection/__init__.py",
-        "matter/interaction_model/__init__.py",
-        "matter/interaction_model/delegate.py",
-        "matter/internal/__init__.py",
-        "matter/internal/commissioner.py",
-        "matter/internal/thread.py",
-        "matter/internal/types.py",
-        "matter/logging/__init__.py",
-        "matter/logging/library_handle.py",
-        "matter/logging/types.py",
-        "matter/native/__init__.py",
-        "matter/setup_payload/__init__.py",
-        "matter/setup_payload/setup_payload.py",
-        "matter/storage/__init__.py",
-        "matter/tracing/__init__.py",
-        "matter/utils/CommissioningBuildingBlocks.py",
-        "matter/utils/__init__.py",
-        "matter/yaml/__init__.py",
-        "matter/yaml/data_model_lookup.py",
-        "matter/yaml/errors.py",
-        "matter/yaml/format_converter.py",
-        "matter/yaml/runner.py",
-      ]
-      if (chip_support_webrtc_python_bindings) {
-        sources += [
-          "matter/webrtc/__init__.py",
-          "matter/webrtc/async_websocket_client.py",
-          "matter/webrtc/browser_peer_connection.py",
-          "matter/webrtc/browser_webrtc_client.py",
-          "matter/webrtc/command.py",
-          "matter/webrtc/libdatachannel_peer_connection.py",
-          "matter/webrtc/libdatachannel_webrtc_client.py",
-          "matter/webrtc/library_handle.py",
-          "matter/webrtc/types.py",
-          "matter/webrtc/utils.py",
-          "matter/webrtc/webrtc_manager.py",
-        ]
-      }
-
-      if (chip_support_commissioning_in_controller) {
-        sources += [ "matter/ChipDeviceCtrl.py" ]
-      } else {
-        sources += [ "matter/server/__init__.py" ]
-      }
+      sources = core_sources
     },
     {
       src_dir = target_out_dir
@@ -334,19 +349,6 @@ matter_python_wheel_action("matter-core") {
     py_packages += [ "matter.server" ]
   }
 
-  py_package_reqs = [
-    "coloredlogs",
-    "construct",
-    "cryptography",
-    "dacite",
-    "deprecation",
-    "ecdsa",
-    "ipdb",
-    "matter-clusters",
-    "pyyaml",
-    "rich",
-  ]
-
   if (current_cpu == "x64") {
     cpu_tag = "x86_64"
   } else if (current_cpu == "arm64" && current_os == "linux") {
@@ -356,6 +358,8 @@ matter_python_wheel_action("matter-core") {
   } else {
     cpu_tag = current_cpu
   }
+
+  py_package_reqs = core_py_package_reqs
 
   if (current_os == "mac") {
     py_platform_tag = string_replace(
@@ -381,21 +385,49 @@ matter_python_wheel_action("matter-core") {
   output_name = "${py_package_name}-${chip_python_version}-cp37-abi3-${py_platform_tag}.whl"
 }
 
+pw_python_package("matter-core-module") {
+  generate_setup = {
+    metadata = {
+      name = "matter-core"
+      version = "1.5.0"
+      description = "Matter IoT development controller core files"
+      url = "https://github.com/project-chip/connectedhomeip"
+      classifiers = [
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: Apache Software License",
+        "Programming Language :: Python :: 3",
+      ]
+    }
+    options = {
+      install_requires = core_py_package_reqs
+    }
+  }
+
+  sources = core_sources
+}
+
+cluster_sources = [
+  "matter/ChipUtility.py",
+  "matter/clusters/CHIPClusters.py",
+  "matter/clusters/ClusterObjects.py",
+  "matter/clusters/Objects.py",
+  "matter/clusters/TestObjects.py",
+  "matter/clusters/Types.py",
+  "matter/clusters/enum.py",
+  "matter/tlv/__init__.py",
+  "matter/tlv/tlvlist.py",
+]
+
+cluster_py_package_reqs = [
+  "aenum",
+  "dacite",
+]
+
 matter_python_wheel_action("matter-clusters") {
   py_manifest_files = [
     {
       src_dir = "."
-      sources = [
-        "matter/ChipUtility.py",
-        "matter/clusters/CHIPClusters.py",
-        "matter/clusters/ClusterObjects.py",
-        "matter/clusters/Objects.py",
-        "matter/clusters/TestObjects.py",
-        "matter/clusters/Types.py",
-        "matter/clusters/enum.py",
-        "matter/tlv/__init__.py",
-        "matter/tlv/tlvlist.py",
-      ]
+      sources = cluster_sources
     },
     {
       src_dir = "//"
@@ -411,10 +443,7 @@ matter_python_wheel_action("matter-clusters") {
     "matter.tlv",
   ]
 
-  py_package_reqs = [
-    "aenum",
-    "dacite",
-  ]
+  py_package_reqs = cluster_py_package_reqs
 
   py_package_name = "${chip_python_package_prefix}-clusters"
   py_platform_tag = "any"
@@ -422,18 +451,59 @@ matter_python_wheel_action("matter-clusters") {
   output_name = "${py_package_name}-${chip_python_version}-py3-none-${py_platform_tag}.whl"
 }
 
-matter_python_wheel_action("matter-repl") {
-  py_scripts = [ "matter-repl.py" ]
+pw_python_package("matter-clusters-module") {
+  generate_setup = {
+    metadata = {
+      name = "matter-clusters"
+      version = "1.5.0"
+      description = "Matter IoT development controller cluster files"
+      url = "https://github.com/project-chip/connectedhomeip"
+      classifiers = [
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: Apache Software License",
+        "Programming Language :: Python :: 3",
+      ]
+    }
+    options = {
+      install_requires = cluster_py_package_reqs
+    }
+  }
 
+  sources = cluster_sources
+}
+
+repl_py_scripts = [ "matter-repl.py" ]
+repl_sources = [
+  "matter/ChipBluezMgr.py",
+  "matter/ChipCoreBluetoothMgr.py",
+  "matter/ReplStartup.py",
+]
+
+repl_py_package_reqs = [
+  "coloredlogs",
+
+  #
+  # IPython 7.30.0 has a bug which results in the use of await ... failing on some platforms (see https://github.com/ipython/ipython/pull/13269)
+  # For now, let's just avoid that version.
+  #
+  # IPython 8.1.0 has a bug which causes issues: https://github.com/ipython/ipython/issues/13554
+  #
+  #
+  "ipython!=8.1.0",
+  "rich",
+  "ipykernel",
+  "pyobjc-framework-corebluetooth ; sys_platform==\"darwin\"",
+  "dbus-python==1.2.18 ; sys_platform==\"linux\"",
+  "pygobject==3.50.0 ; sys_platform==\"linux\"",
+  "matter-core",
+]
+
+matter_python_wheel_action("matter-repl") {
+  py_scripts = repl_py_scripts
   py_manifest_files = [
     {
       src_dir = "."
-      sources = [
-        "matter/ChipBluezMgr.py",
-        "matter/ChipCoreBluetoothMgr.py",
-        "matter/ReplStartup.py",
-      ]
-      sources += py_scripts
+      sources = repl_sources + py_scripts
     },
     {
       src_dir = "//"
@@ -445,24 +515,7 @@ matter_python_wheel_action("matter-repl") {
 
   py_packages = [ "matter" ]
 
-  py_package_reqs = [
-    "coloredlogs",
-
-    #
-    # IPython 7.30.0 has a bug which results in the use of await ... failing on some platforms (see https://github.com/ipython/ipython/pull/13269)
-    # For now, let's just avoid that version.
-    #
-    # IPython 8.1.0 has a bug which causes issues: https://github.com/ipython/ipython/issues/13554
-    #
-    #
-    "ipython!=8.1.0",
-    "rich",
-    "ipykernel",
-    "pyobjc-framework-corebluetooth ; sys_platform==\"darwin\"",
-    "dbus-python==1.2.18 ; sys_platform==\"linux\"",
-    "pygobject==3.50.0 ; sys_platform==\"linux\"",
-    "matter-core",
-  ]
+  py_package_reqs = repl_py_package_reqs
 
   py_package_name = "${chip_python_package_prefix}-repl"
   py_platform_tag = "any"
@@ -473,4 +526,25 @@ matter_python_wheel_action("matter-repl") {
   ]
 
   output_name = "${py_package_name}-${chip_python_version}-py3-none-${py_platform_tag}.whl"
+}
+
+pw_python_package("matter-repl-module") {
+  generate_setup = {
+    metadata = {
+      name = "matter-clusters"
+      version = "1.5.0"
+      description = "Matter IoT development controller cluster files"
+      url = "https://github.com/project-chip/connectedhomeip"
+      classifiers = [
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: Apache Software License",
+        "Programming Language :: Python :: 3",
+      ]
+    }
+    options = {
+      install_requires = repl_py_package_reqs
+    }
+  }
+
+  sources = cluster_sources
 }

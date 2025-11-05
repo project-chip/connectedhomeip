@@ -132,6 +132,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       deps = [
         "${chip_root}/scripts:matter_yamltests_distribution.wheel",
         "${chip_root}/scripts/py_matter_yamltests:matter-yamltests.wheel",
+        "${chip_root}/src/controller/python:matter-core-module.wheel",
         "${chip_root}/src/controller/python:matter-repl",
         "${chip_root}/src/python_testing/matter_testing_infrastructure:matter-testing.wheel",
         "${chip_root}/src/python_testing/post_certification_tests:matter-post-certification-tests.wheel",

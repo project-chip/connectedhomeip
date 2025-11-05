@@ -20,11 +20,24 @@ import("$dir_pw_build/python.gni")
 import("$dir_pw_build/python_dist.gni")
 import("$dir_pw_build/zip.gni")
 
+testing_package_reqs = [
+  "click",
+  "colorama",
+  "ifaddr",
+  "langcodes",
+  "mobly",
+  "pyasn1",
+  "pyasn1_modules",
+  "requests",
+  "zeroconf",
+]
+
 pw_python_package("matter-testing-module") {
   generate_setup = {
     metadata = {
       name = "matter-testing-module"
-      version = "1.4.0"
+      description = "Matter python testing framework"
+      version = "1.5.0"
       description = "Testing support for Matter SDK"
       url = "https://github.com/project-chip/connectedhomeip"
       classifiers = [
@@ -32,6 +45,9 @@ pw_python_package("matter-testing-module") {
         "License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python :: 3",
       ]
+    }
+    options = {
+      install_requires = testing_package_reqs
     }
   }
 
@@ -130,7 +146,7 @@ pw_python_distribution("matter-testing") {
 
   generate_setup_cfg = {
     name = "matter-testing"
-    version = "1.4.2"
+    version = "1.5.0"
     include_default_pyproject_file = true
     include_extra_files_in_package_data = true
   }
