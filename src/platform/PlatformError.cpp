@@ -20,8 +20,8 @@
 
 #include <lib/core/ErrorStr.h>
 
-#include <string.h>
 #include "../system/StrErrorUtil.h"
+#include <string.h>
 
 namespace chip {
 namespace Platform {
