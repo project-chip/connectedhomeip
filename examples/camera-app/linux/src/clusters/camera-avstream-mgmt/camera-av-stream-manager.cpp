@@ -614,6 +614,10 @@ void CameraAVStreamManager::OnAttributeChanged(AttributeId attributeId)
         mCameraDeviceHAL->GetCameraHALInterface().SetHDRMode(GetCameraAVStreamMgmtServer()->GetHDRModeEnabled());
         break;
     }
+    case StreamUsagePriorities::Id: {
+        mCameraDeviceHAL->GetCameraHALInterface().SetStreamUsagePriorities(GetCameraAVStreamMgmtServer()->GetStreamUsagePriorities());
+        break;
+    }
     case SoftRecordingPrivacyModeEnabled::Id: {
         mCameraDeviceHAL->GetCameraHALInterface().SetSoftRecordingPrivacyModeEnabled(
             GetCameraAVStreamMgmtServer()->GetSoftRecordingPrivacyModeEnabled());
