@@ -971,7 +971,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         logger.info(f'{step_number_s4}: Step #4.4 - 180s interval: {interval_duration_busy_180:.2f}s, '
                     f'unexpected states: {list(observed_states_during_interval)}')
 
-        # Assert Busy 180s sequence: only ensure the expected start state and Downloadimng appears in the flow
+        # Assert Busy 180s sequence: only ensure the expected start state and Downloading appears in the flow
         expected_start_state = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnQuery
         expected_final_state = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading
 
@@ -979,7 +979,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
                             f"Expected start state {expected_start_state} not found in observed sequence: {state_sequence_busy_180}")
 
         asserts.assert_true(expected_final_state in state_sequence_busy_180,
-                            f"Expected final state {expected_start_state} not found in observed sequence: {state_sequence_busy_180}")
+                            f"Expected final state {expected_final_state} not found in observed sequence: {state_sequence_busy_180}")
 
         # Assert 180s interval duration and absence of unexpected states
         asserts.assert_true(interval_duration_busy_180 >= 180,
@@ -1213,7 +1213,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
         # ------------------------------------------------------------------------------------
         # [STEP_7]: Step #7.3 - Start tasks to track OTA events:
-        # StateTransition two events: Idle > Querying, Querying > Idle, ensuring no image transfer occurs due invalid BDX ImageURI.
+        # StateTransition two events: Idle > Querying, Querying > Idle, ensuring no image transfer occurs due to invalid BDX ImageURI.
         # ------------------------------------------------------------------------------------
         try:
             timeout_total = 60  # 1 min
@@ -1227,7 +1227,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
                     continue
         finally:
             logger.info(f'{step_number_s7}: Step #7.3 - StateTransition two events: '
-                        '(1) Idle > Querying, (2) Querying > Idle, due invalid BDX ImageURI, '
+                        '(1) Idle > Querying, (2) Querying > Idle, due to invalid BDX ImageURI, '
                         'successfully observed.')
             await subscription_state_invalid_uri.cancel()
 
