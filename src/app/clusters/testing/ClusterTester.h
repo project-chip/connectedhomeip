@@ -136,6 +136,11 @@ public:
     };
 
     // Invoke a command and return the decoded result.
+    // The `RequestType`, `ResponseType` type-parameters must be of the correct type for the command being invoked.
+    // Use `app::Clusters::<ClusterName>::Commands::<CommandName>::Type` for the `RequestType` type-parameter to be spec compliant
+    // Use `app::Clusters::<ClusterName>::Commands::<CommandName>::Type::ResponseType` for the `ResponseType` type-parameter to be spec compliant
+    // Will construct the command path using the first path returned by `GetPaths()` on the cluster.
+    // @returns `CHIP_ERROR_INCORRECT_STATE` if `GetPaths()` doesn't return a list with one path.
     template <typename ResponseType, typename RequestType>
     [[nodiscard]] InvokeResult<ResponseType> Invoke(chip::CommandId commandId, const RequestType & request)
     {
@@ -177,6 +182,13 @@ public:
 
     // Simplified overload to invoke a command with just the command ID and data.
     // Builds the request automatically using the internal cluster's paths.
+
+    // Invoke a command with `data` as arguments.
+    // The `data` parameter must be of the correct type for the command being invoked.
+    // Use `app::Clusters::<ClusterName>::Commands::<CommandName>::Type` for the `data` parameter to be spec compliant (see the
+    // comment of the class for usage example).
+    // Will construct the command path using the first path returned by `GetPaths()` on the cluster.
+    // @returns `CHIP_ERROR_INCORRECT_STATE` if `GetPaths()` doesn't return a list with one path.
     template <typename T>
     [[nodiscard]] std::optional<chip::app::DataModel::ActionReturnStatus> Invoke(chip::CommandId commandId, const T & data,
                                                                                  app::CommandHandler * handler = nullptr)
@@ -218,7 +230,6 @@ private:
 
     TestServerClusterContext mTestServerClusterContext{};
     app::ServerClusterInterface & mCluster;
-    std::unique_ptr<app::Testing::ReadOperation> mReadOperation;
 
     // Buffer size for TLV encoding/decoding of command payloads.
     // 256 bytes was chosen as a conservative upper bound for typical command payloads in tests.
