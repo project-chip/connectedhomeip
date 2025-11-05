@@ -159,7 +159,7 @@ executable("chip-tool") {
 
   if (matter_enable_tracing_support) {
     deps += [ "${chip_root}/src/tracing:macros" ]
-    
+
     # Perfetto is only available on Linux and Android
     if (current_os == "linux" || current_os == "android") {
       deps += [
