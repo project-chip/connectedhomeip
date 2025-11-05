@@ -278,12 +278,13 @@ CHIP_ERROR CheckAdmin(CommandHandler * commandObj, const ConcreteCommandPath & c
 
 } // namespace
 
-namespace chip {
-namespace app {
-namespace Clusters {
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+
+namespace chip::app::Clusters {
 
 ICDManagementServer ICDManagementServer::instance;
 
+#if CHIP_CONFIG_ENABLE_ICD_CIP
 Status ICDManagementServer::RegisterClient(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                            const Commands::RegisterClient::DecodableType & commandData, uint32_t & icdCounter)
 {
@@ -425,9 +426,7 @@ void ICDManagementServer::OnICDModeChange()
     MatterReportingAttributeChangeCallback(kRootEndpointId, IcdManagement::Id, IcdManagement::Attributes::OperatingMode::Id);
 }
 
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::app::Clusters
 
 /**********************************************************
  * Callbacks Implementation
@@ -535,4 +534,3 @@ void MatterIcdManagementPluginServerShutdownCallback()
     Server::GetInstance().GetICDManager().ReleaseObserver(&ICDManagementServer::GetInstance());
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 }
-
