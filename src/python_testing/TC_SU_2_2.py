@@ -51,14 +51,11 @@ import time
 from mobly import asserts
 from TC_SUTestBase import SoftwareUpdateBaseTest
 
-
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.interaction_model import Status
-from matter.clusters.Types import NullValue
-from matter.testing.apps import OTAProviderSubprocess
 from matter.testing.event_attribute_reporting import AttributeMatcher, AttributeSubscriptionHandler, EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
 
 # Create a logger
 logger = logging.getLogger(__name__)
@@ -113,8 +110,9 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         attr = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(value=updated_providers)
         resp = await controller.WriteAttribute(
             attributes=[(0, attr)],
-            nodeid=requestor_node_id
+            nodeId=requestor_node_id
         )
+        # ChipDeviceCtrl.writeattribute_log(resp)
         logger.info(f'Prerequisite #4.0 - Write DefaultOTAProviders response: {resp}')
         asserts.assert_equal(resp[0].Status, Status.Success, "Failed to write DefaultOTAProviders attribute")
 
@@ -133,7 +131,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         attr_clear = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(value=[])
         resp = await controller.WriteAttribute(
             attributes=[(0, attr_clear)],
-            nodeid=requestor_node_id
+            nodeId=requestor_node_id
         )
         logger.info('Cleanup - DefaultOTAProviders cleared')
 
@@ -290,8 +288,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             AssertionError: If writing the ACL attribute fails (status is not Status.Success).
         """
         result = await controller.WriteAttribute(
-            node_id,
-            [(0, Clusters.AccessControl.Attributes.Acl(acl))]
+            nodeId=node_id,
+            attributes=[(0, Clusters.AccessControl.Attributes.Acl(acl))]
         )
         asserts.assert_equal(result[0].Status, Status.Success, "ACL write failed")
         return True
@@ -323,6 +321,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         t_end_interval = None
         interval_duration = [None]
         tolerance_sec = 0.5
+
+        logger.info(f'{step_name}: OTA matcher: start={start_states}, allowed={allowed_states}')
 
         def matcher(report):
             nonlocal final_seen, t_start_interval, t_end_interval
