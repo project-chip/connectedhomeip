@@ -158,11 +158,15 @@ executable("chip-tool") {
   ]
 
   if (matter_enable_tracing_support) {
-    deps += [
-      "${chip_root}/src/tracing:macros",
-      "${chip_root}/src/tracing/perfetto:perfetto",
-      "${chip_root}/src/tracing/perfetto:simple_initialization",
-    ]
+    deps += [ "${chip_root}/src/tracing:macros" ]
+    
+    # Perfetto is only available on Linux and Android
+    if (current_os == "linux" || current_os == "android") {
+      deps += [
+        "${chip_root}/src/tracing/perfetto:perfetto",
+        "${chip_root}/src/tracing/perfetto:simple_initialization",
+      ]
+    }
   }
 
   output_dir = root_out_dir
