@@ -36,7 +36,7 @@ void RGBLEDWidget::SetColor(uint8_t red, uint8_t green, uint8_t blue)
 {
     if (GetPlatform().GetRGBLedState(GetLED()))
     {
-        ChipLogProgress(Zcl, "SetColor : %u|%u|%u", red, green, blue);
+        ChipLogProgress(Zcl, "SetColor : R:%u|G:%u|B:%u", red, green, blue);
         GetPlatform().SetLedColor(GetLED(), red, green, blue);
     }
 }
@@ -54,16 +54,76 @@ void RGBLEDWidget::GetColor(uint16_t & r, uint16_t & g, uint16_t & b)
 
     ChipLogProgress(Zcl, "RGB Values: R=%u G=%u B=%u", r, g, b);
 }
-
+/**
+ * @brief Convert Data model hue and saturation to RGB and set the color
+ *        As per spec, hue range from 0 to 254 and saturation from 0 to 254
+ *        Since the equation expects hue in 0-360 and saturation in percentage, we scale them accordingly
+ *
+ * @param hue
+ * @param saturation
+ */
 void RGBLEDWidget::SetColorFromHSV(uint8_t hue, uint8_t saturation)
 {
-    RGBLEDWidget::HsvColor_t hsv;
-    hsv.h = hue;
-    hsv.s = saturation;
-    hsv.v = GetLevel();
-    ChipLogProgress(Zcl, "SetColorFromHSV : %u|%u", hsv.h, hsv.s);
-    RGBLEDWidget::RgbColor_t rgb = RGBLEDWidget::HsvToRgb(hsv);
-    SetColor(rgb.r, rgb.g, rgb.b);
+    ChipLogDetails(Zcl, "SetColorFromHSV : H:%u|S:%u|V:%u", hue, saturation, GetLevel());
+
+    float h = (hue * 360.0f) / 254.0f, s = (saturation / 254.0f), v = 1.0;
+    float hh, p, q, t, ff, r, g, b;
+    long i;
+
+    ChipLogDetails(Zcl, "HUE Values: H=%u S=%u V=%u", static_cast<uint8_t>(h), static_cast<uint8_t>(s * 100.0),
+                   static_cast<uint8_t>(v * 100.0));
+
+    if (s <= 0.0)
+    { // Achromatic (grey)
+        SetColor(static_cast<uint8_t>(v * 255), static_cast<uint8_t>(v * 255), static_cast<uint8_t>(v * 255));
+    }
+
+    hh = h;
+    if (hh >= 360.0)
+        hh = 0.0;
+    hh /= 60.0;
+    i  = (long) hh;
+    ff = hh - i;
+    p  = v * (1.0 - s);
+    q  = v * (1.0 - (s * ff));
+    t  = v * (1.0 - (s * (1.0 - ff)));
+
+    switch (i)
+    {
+    case 0:
+        r = v;
+        g = t;
+        b = p;
+        break;
+    case 1:
+        r = q;
+        g = v;
+        b = p;
+        break;
+    case 2:
+        r = p;
+        g = v;
+        b = t;
+        break;
+    case 3:
+        r = p;
+        g = q;
+        b = v;
+        break;
+    case 4:
+        r = t;
+        g = p;
+        b = v;
+        break;
+    case 5:
+    default:
+        r = v;
+        g = p;
+        b = q;
+        break;
+    }
+
+    SetColor(static_cast<uint8_t>(r * 255), static_cast<uint8_t>(g * 255), static_cast<uint8_t>(b * 255));
 }
 
 void RGBLEDWidget::SetColorFromXY(uint16_t currentX, uint16_t currentY)
@@ -214,55 +274,6 @@ RgbColor_t RGBLEDWidget::ConvertXYZToRGB(float X, float Y, float Z)
     return rgb;
 }
 
-// Calculate the P value for HSV to RGB conversion
-uint8_t RGBLEDWidget::CalculateP(uint8_t v, uint8_t s)
-{
-    // RGB value when the hue is at its minimum for the current region.
-    return (v * (kMaxColorValue - s)) >> 8;
-}
-
-// Calculate the Q value for HSV to RGB conversion
-uint8_t RGBLEDWidget::CalculateQ(uint8_t v, uint8_t s, uint32_t remainder)
-{
-    // RGB value when the hue is transitioning from one primary color to another within the current region.
-    return (v * (kMaxColorValue - ((s * remainder) >> 8))) >> 8;
-}
-
-// Calculate the T value for HSV to RGB conversion
-uint8_t RGBLEDWidget::CalculateT(uint8_t v, uint8_t s, uint32_t remainder)
-{
-    // RGB value when the hue is transitioning from one primary color to another within the current region, but in the opposite
-    // direction of q.
-
-    return (v * (kMaxColorValue - ((s * (kMaxColorValue - remainder)) >> 8))) >> 8;
-}
-
-// Set RGB values based on the region for HSV to RGB conversion
-void RGBLEDWidget::SetRgbByRegion(uint8_t region, uint8_t v, uint8_t p, uint8_t q, uint8_t t, RgbColor_t & rgb)
-{
-    switch (region)
-    {
-    case 0:
-        rgb.r = v, rgb.g = t, rgb.b = p;
-        break;
-    case 1:
-        rgb.r = q, rgb.g = v, rgb.b = p;
-        break;
-    case 2:
-        rgb.r = p, rgb.g = v, rgb.b = t;
-        break;
-    case 3:
-        rgb.r = p, rgb.g = q, rgb.b = v;
-        break;
-    case 4:
-        rgb.r = t, rgb.g = p, rgb.b = v;
-        break;
-    default:
-        rgb.r = v, rgb.g = p, rgb.b = q;
-        break;
-    }
-}
-
 // Convert color temperature to RGB color space
 RgbColor_t RGBLEDWidget::CTToRgb(uint16_t ctMireds)
 {
@@ -274,39 +285,6 @@ RgbColor_t RGBLEDWidget::CTToRgb(uint16_t ctMireds)
     rgb.b = CalculateBlue(ctCentiKelvin);
 
     rgb = RgbClamp(rgb, 0, kMaxColorValue);
-
-    return rgb;
-}
-
-// Convert HSV color space to RGB color space
-RgbColor_t RGBLEDWidget::HsvToRgb(HsvColor_t hsv)
-{
-    RgbColor_t rgb;
-
-    uint8_t region, p, q, t;
-    uint32_t remainder;
-
-    if (hsv.s == 0)
-    {
-        rgb.r = rgb.g = rgb.b = hsv.v;
-    }
-    else
-    {
-        // region variable is calculated by dividing the hue value by 43 (since the hue value ranges from 0 to 255, and there
-        // are 6 regions, each region spans approximately 43 units)
-        region = hsv.h / kHueRegionDivider;
-
-        // Calculates the position of h within the current region.Multiplying by 6 scales this position to a range of 0 to 255,
-        // which is used to calculate intermediate RGB values.
-        remainder = (hsv.h - (region * kHueRegionDivider)) * 6;
-
-        // p,q and t intermediate values used to calculate the final RGB values
-        p = CalculateP(hsv.v, hsv.s);
-        q = CalculateQ(hsv.v, hsv.s, remainder);
-        t = CalculateT(hsv.v, hsv.s, remainder);
-
-        SetRgbByRegion(region, hsv.v, p, q, t, rgb);
-    }
 
     return rgb;
 }
