@@ -451,7 +451,7 @@ NetworkCommissioningCluster::HandleAddOrUpdateWiFiNetwork(CommandHandler & handl
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 std::optional<ActionReturnStatus>
-NetworkCommissioningCluster::HandleAddOrUpdateWiFiNetworkWithPDC(HandlerContext & handler, const ConcreteCommandPath & commandPath,
+NetworkCommissioningCluster::HandleAddOrUpdateWiFiNetworkWithPDC(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                                                                  const Commands::AddOrUpdateWiFiNetwork::DecodableType & req)
 {
     // Credentials must be empty when configuring for PDC, it's only present to keep the command shape compatible.
