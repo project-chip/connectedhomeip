@@ -35,11 +35,11 @@ TEST_SETUP_QR_CODE = 'MT:-24J042C00KA0648G00'
 
 class App:
 
-    def __init__(self, runner, subprocess, kvs_path):
+    def __init__(self, runner, subproc):
         self.process = None
         self.outpipe = None
         self.runner = runner
-        self.subprocess = subprocess
+        self.subproc = subproc
         self.cv_stopped = threading.Condition()
         self.stopped = True
         self.lastLogIndex = 0
@@ -48,7 +48,7 @@ class App:
         self.killed = False
 
     def __repr__(self) -> str:
-        return repr(self.subprocess)
+        return repr(self.subproc)
 
     @property
     def returncode(self):
@@ -131,7 +131,7 @@ class App:
                     self.cv_stopped.wait()
 
     def __startServer(self):
-        subprocess = self.subprocess.with_args('--interface-id', str(-1))
+        subproc = self.subproc.with_args('--interface-id', str(-1))
 
         if not self.options:
             logging.debug('Executing application under test with default args')
@@ -139,10 +139,10 @@ class App:
             logging.debug('Executing application under test with the following args:')
             for key, value in self.options.items():
                 logging.debug('   %s: %s' % (key, value))
-                subprocess = subprocess.with_args(key, value)
+                subproc = subproc.with_args(key, value)
                 if key == '--KVS':
                     self.kvsPathSet.add(value)
-        return self.runner.RunSubprocess(subprocess, name='APP ', wait=False)
+        return self.runner.RunSubprocess(subproc, name='APP ', wait=False)
 
     def __waitFor(self, waitForString, server_process, outpipe, timeoutInSeconds=10):
         logging.debug('Waiting for %s' % waitForString)
