@@ -56,7 +56,11 @@ executable("chip-im-initiator") {
   ]
 
   if (matter_enable_tracing_support) {
-    deps += [ "${chip_root}/src/tracing:macros" ]
+    deps += [
+      "${chip_root}/src/tracing:macros",
+      "${chip_root}/src/tracing/perfetto",
+      "${chip_root}/src/tracing/perfetto:simple_initialization",
+    ]
   }
 
   output_dir = root_out_dir
@@ -85,7 +89,11 @@ executable("chip-im-responder") {
   ]
 
   if (matter_enable_tracing_support) {
-    deps += [ "${chip_root}/src/tracing:macros" ]
+    deps += [
+      "${chip_root}/src/tracing:macros",
+      "${chip_root}/src/tracing/perfetto",
+      "${chip_root}/src/tracing/perfetto:simple_initialization",
+    ]
   }
 
   cflags = [ "-Wconversion" ]

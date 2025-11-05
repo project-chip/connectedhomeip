@@ -452,7 +452,6 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.append('chip_enable_ble=false')
 
         if unified:
-            self.extra_gn_options.append('target_os="all"')
             self.extra_gn_options.append('matter_enable_tracing_support=true')
             self.extra_gn_options.append('matter_log_json_payload_hex=true')
             self.extra_gn_options.append('matter_log_json_payload_decode_full=true')
