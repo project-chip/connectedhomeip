@@ -2175,6 +2175,11 @@ PICS:
       id: OPCREDS.S.C0b.Rsp
 
     - label:
+          "Does the Device(Server) implement receiving the
+          SignVIDVerificationResponse command?"
+      id: OPCREDS.S.C0e.Rsp
+
+    - label:
           "Does the Device(Server) implement receiving the ScanNetworks command?"
       id: CNET.S.C00.Rsp
 
@@ -2223,6 +2228,16 @@ PICS:
     - label:
           "Does the Device(Server) invoking/generating the NOCResponse command?"
       id: OPCREDS.S.C08.Tx
+
+    - label:
+          "Does the Device(Server) invoking/generating the
+          SetVIDVerificationStatement command?"
+      id: OPCREDS.S.C0c.Tx
+
+    - label:
+          "Does the Device(Server) invoking/generating the
+          SignVIDVerificationRequest command?"
+      id: OPCREDS.S.C0d.Tx
 
     - label:
           "Does the Device(Server) invoking/generating the ScanNetworksResponse
