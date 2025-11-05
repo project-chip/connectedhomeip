@@ -17,8 +17,8 @@
 
 #include "ClusterActions.h"
 
-#include <app/TimerDelegatesTest.h>
 #include <app/ConcreteClusterPath.h>
+#include <app/TimerDelegatesTest.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
