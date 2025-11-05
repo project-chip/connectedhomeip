@@ -165,6 +165,19 @@ JNI_METHOD(void, disconnect)
     castingPlayer->Disconnect();
 }
 
+JNI_METHOD(void, removeFabric)
+(JNIEnv * env, jobject thiz)
+{
+    chip::DeviceLayer::StackLock lock;
+    ChipLogProgress(AppServer, "MatterCastingPlayer-JNI::removeFabric()");
+
+    core::CastingPlayer * castingPlayer = support::convertCastingPlayerFromJavaToCpp(thiz);
+    VerifyOrReturn(castingPlayer != nullptr,
+                   ChipLogError(AppServer, "MatterCastingPlayer-JNI::removeFabric() castingPlayer == nullptr"));
+
+    castingPlayer->RemoveFabric();
+}
+
 JNI_METHOD(jstring, getConnectionStateNative)
 (JNIEnv * env, jobject thiz)
 {
