@@ -158,7 +158,7 @@ executable("chip-tool") {
   ]
 
   if (matter_enable_tracing_support) {
-    deps += [ "${chip_root}/src/tracing" ]
+    deps += [ "${chip_root}/src/tracing:macros" ]
   }
 
   output_dir = root_out_dir

@@ -56,7 +56,7 @@ executable("chip-im-initiator") {
   ]
 
   if (matter_enable_tracing_support) {
-    deps += [ "${chip_root}/src/tracing" ]
+    deps += [ "${chip_root}/src/tracing:macros" ]
   }
 
   output_dir = root_out_dir
@@ -85,7 +85,7 @@ executable("chip-im-responder") {
   ]
 
   if (matter_enable_tracing_support) {
-    deps += [ "${chip_root}/src/tracing" ]
+    deps += [ "${chip_root}/src/tracing:macros" ]
   }
 
   cflags = [ "-Wconversion" ]
