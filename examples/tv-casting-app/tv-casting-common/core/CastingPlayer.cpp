@@ -641,7 +641,6 @@ void CastingPlayer::OnCommissioningSessionStopped()
     ChipLogProgress(AppServer, "CastingPlayer::OnCommissioningSessionStopped()");
     if (mOnCompleted != nullptr)
     {
-        // stopped?
         mOnCompleted(CHIP_ERROR_CANCELLED, nullptr);
     }
 }
