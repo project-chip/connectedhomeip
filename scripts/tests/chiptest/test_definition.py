@@ -131,7 +131,7 @@ class App:
                     self.cv_stopped.wait()
 
     def __startServer(self):
-        subprocess = self.subprocess.add_args(('--interface-id', str(-1)))
+        subprocess = self.subprocess.with_args('--interface-id', str(-1))
 
         if not self.options:
             logging.debug('Executing application under test with default args')
@@ -139,7 +139,7 @@ class App:
             logging.debug('Executing application under test with the following args:')
             for key, value in self.options.items():
                 logging.debug('   %s: %s' % (key, value))
-                subprocess = subprocess.add_args((key, value))
+                subprocess = subprocess.with_args(key, value)
                 if key == '--KVS':
                     self.kvsPathSet.add(value)
         return self.runner.RunSubprocess(subprocess, name='APP ', wait=False)
@@ -424,7 +424,7 @@ class TestDefinition:
                     if command == target_app:
                         key = 'default'
                     if ble_controller_app is not None:
-                        command = command.add_args(("--ble-controller", str(ble_controller_app), "--wifi"))
+                        command = command.with_args("--ble-controller", str(ble_controller_app), "--wifi")
                     app = App(runner, command)
                     # Add the App to the register immediately, so if it fails during
                     # start() we will be able to clean things up properly.
@@ -456,7 +456,7 @@ class TestDefinition:
                 setupCode = app.setupCode
 
             if test_runtime == TestRunTime.MATTER_REPL_PYTHON:
-                python_cmd = apps.matter_repl_yaml_tester_cmd.add_args(('--setup-code', setupCode, '--yaml-path', self.run_name, "--pics-file", pics_file))
+                python_cmd = apps.matter_repl_yaml_tester_cmd.with_args('--setup-code', setupCode, '--yaml-path', self.run_name, "--pics-file", pics_file)
 
                 if dry_run:
                     logging.info(python_cmd)
@@ -467,18 +467,16 @@ class TestDefinition:
                 pairing_server_args = ()
 
                 if ble_controller_tool is not None:
-                    pairing_cmd = apps.chip_tool_with_python_cmd.add_args((
-                        "pairing", "code-wifi", TEST_NODE_ID, "MatterAP", "MatterAPPassword", TEST_SETUP_QR_CODE))
+                    pairing_cmd = apps.chip_tool_with_python_cmd.with_args(
+                        "pairing", "code-wifi", TEST_NODE_ID, "MatterAP", "MatterAPPassword", TEST_SETUP_QR_CODE)
                     pairing_server_args = ("--ble-controller", str(ble_controller_tool))
                 else:
-                    pairing_cmd = apps.chip_tool_with_python_cmd.add_args(('pairing', 'code', TEST_NODE_ID, setupCode))
+                    pairing_cmd = apps.chip_tool_with_python_cmd.with_args('pairing', 'code', TEST_NODE_ID, setupCode)
 
                 if self.target == TestTarget.LIT_ICD and test_runtime == TestRunTime.CHIP_TOOL_PYTHON:
-                    pairing_cmd = pairing_cmd.add_args(('--icd-registration', 'true'))
+                    pairing_cmd = pairing_cmd.with_args('--icd-registration', 'true')
 
-                test_cmd = apps.chip_tool_with_python_cmd \
-                    .add_args(('tests', self.run_name)) \
-                    .add_args(('--PICS', pics_file))
+                test_cmd = apps.chip_tool_with_python_cmd.with_args('tests', self.run_name, '--PICS', pics_file)
 
                 interactive_server_args = ('interactive server',) + tool_storage_args + pairing_server_args
 
@@ -489,8 +487,8 @@ class TestDefinition:
                     '--server_path', str(apps.chip_tool.path),
                     '--server_arguments', ' '.join(interactive_server_args))
 
-                pairing_cmd = pairing_cmd.add_args(server_args)
-                test_cmd = test_cmd.add_args(server_args)
+                pairing_cmd = pairing_cmd.with_args(server_args)
+                test_cmd = test_cmd.with_args(server_args)
 
                 if dry_run:
                     # Some of our command arguments have spaces in them, so if we are

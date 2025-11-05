@@ -117,7 +117,7 @@ def cmd_run(context, darwin_framework_tool, ota_requestor_app, ota_data_file, ot
 
     if ota_requestor_app is not None:
         ota_requestor_app = Subprocess(kind='app', path=ota_requestor_app
-                                       ).add_args(('--otaDownloadPath', ota_destination_file))
+                                       ).with_args('--otaDownloadPath', ota_destination_file)
 
     runner = Runner()
     runner.capture_delegate = ExecutionCapture()
@@ -150,11 +150,11 @@ def cmd_run(context, darwin_framework_tool, ota_requestor_app, ota_data_file, ot
 
         requestor_app.start()
 
-        pairing_cmd = darwin_framework_tool.add_args(('pairing', 'code', TEST_NODE_ID, requestor_app.setupCode))
+        pairing_cmd = darwin_framework_tool.with_args('pairing', 'code', TEST_NODE_ID, requestor_app.setupCode)
         runner.RunSubprocess(pairing_cmd, name='PAIR', dependencies=[apps_register])
 
         # pairing get-commissioner-node-id does not seem to work right in interactive mode for some reason
-        darwin_tool = DarwinToolRunner(runner, darwin_framework_tool.add_args(('pairing', 'get-commissioner-node-id')))
+        darwin_tool = DarwinToolRunner(runner, darwin_framework_tool.with_args('pairing', 'get-commissioner-node-id'))
         darwin_tool.start()
         darwin_tool.waitForMessage(": Commissioner Node Id")
         nodeIdLine = darwin_tool.outpipe.FindLastMatchingLine('.*: Commissioner Node Id (0x[0-9A-F]+)')
@@ -164,7 +164,7 @@ def cmd_run(context, darwin_framework_tool, ota_requestor_app, ota_data_file, ot
         darwin_tool.stop()
 
         prompt = "WAITING FOR COMMANDS NOW"
-        darwin_tool = InteractiveDarwinTool(runner, prompt, darwin_framework_tool.add_args(
+        darwin_tool = InteractiveDarwinTool(runner, prompt, darwin_framework_tool.with_args(
             ("interactive", "start", "--additional-prompt", prompt)))
         darwin_tool.start()
 

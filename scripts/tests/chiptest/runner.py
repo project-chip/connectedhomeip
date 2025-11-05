@@ -133,7 +133,7 @@ class Subprocess:
     def __repr__(self) -> str:
         return 'Subprocess(kind={}, path={}, wrapper={}, args={})'.format(self.kind, self.path, self.wrapper, self.args)
 
-    def add_args(self, *args: str):
+    def with_args(self, *args: str):
         return Subprocess(kind=self.kind, path=self.path, wrapper=self.wrapper, args=self.args + tuple(args))
 
     def wrap_with(self, *args: str):
