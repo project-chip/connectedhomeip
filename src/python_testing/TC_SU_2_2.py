@@ -45,7 +45,6 @@
 import asyncio
 import logging
 import queue
-import threading
 import time
 
 from mobly import asserts
@@ -174,7 +173,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         Launch an OTA Provider process with the specified image and extra arguments.
 
         Args:
-            provider_app_path: (str): Path to the OTA provider application executable.
+            provider_app_path (str): Path to the OTA provider application executable.
             ota_image_path (str): Path to the OTA image file.
             extra_args (list[str]): Additional command-line arguments to pass to the provider.
 
@@ -331,7 +330,6 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
                 return False
 
             current_time = time.time()
-            # current_time = report.timestamp_utc.timestamp()     # Use timestamp_utc for consistent timing
 
             # Record sequence states
             if val not in seen_states:
@@ -537,7 +535,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
         # ------------------------------------------------------------------------------------
         # [STEP_1]: Step #1.2   - Track OTA attributes: UpdateState and UpdateStateProgress
-        # [STEP_1]: Step #1.2.1 - UpdateState matcher: Track "Downloading > Applying > Idle"
+        # [STEP_1]: Step #1.2.1 - UpdateState matcher: Track "Downloading"
         # [STEP_1]: Step #1.2.2 - UpdateStateProgress matcher: Track non-null values "rage 1–99" and final "None"
         # ------------------------------------------------------------------------------------
         logger.info(
@@ -843,7 +841,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         logger.info(f'{step_number_s3}: Step #3.4 - 120s interval: {interval_duration_notavailable:.2f}s, '
                     f'unexpected states: {list(observed_states_during_interval)}')
 
-        # Assert Busy sequence: only ensure the expected start state appears in the state_sequence_busy
+        # Assert notAvailable sequence: only ensure the expected start state appears in the state_sequence_notavailable
         expected_start = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
 
         asserts.assert_true(expected_start in state_sequence_notavailable,
@@ -1179,11 +1177,11 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
         def matcher_idle_state_no_download_invalid_uri(report):
             """
-            Step #7.2 matcher function to track OTA StateTransition event (should stay Idle due invalid BDX ImageURI in UpdateAvailable)
+            Step #7.2 matcher function to track OTA StateTransition event (should stay Idle due to invalid BDX ImageURI in UpdateAvailable)
             Tracks state transitions events:
             First event: Idle > Querying
             Second event: Querying > Idle
-            Records each observed transition only once and validates that no image transfer occurs due invalid BDX ImageURI.
+            Records each observed transition only once and validates that no image transfer occurs due to invalid BDX ImageURI.
             """
             nonlocal state_sequence_notavailable
             val = report.Data.newState
