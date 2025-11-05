@@ -643,7 +643,6 @@ jobs:
                         --target linux-x64-bridge-${BUILD_VARIANT}-tsan-clang-test-unified \
                         --target linux-x64-closure-${BUILD_VARIANT}-tsan-clang-test-unified \
                         --target linux-x64-energy-gateway-${BUILD_VARIANT}-tsan-clang-test-unified \
-                        --target linux-x64-fabric-bridge-${BUILD_VARIANT}-tsan-clang-test-unified \
                         --target linux-x64-light-${BUILD_VARIANT}-tsan-clang-test-unified \
                         --target linux-x64-lock-${BUILD_VARIANT}-tsan-clang-test-unified \
                         --target linux-x64-microwave-oven-${BUILD_VARIANT}-tsan-clang-test-unified \

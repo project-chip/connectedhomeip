@@ -212,7 +212,6 @@ def BuildHostTarget():
             'bridge',
             'closure',
             'energy-gateway',
-            'fabric-bridge',
             'light',
             'lock',
             'microwave-oven',
