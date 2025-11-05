@@ -212,11 +212,10 @@ def BuildHostTarget():
             'bridge',
             'closure',
             'energy-gateway',
-            'energy-management',
+            'fabric-bridge',
             'light',
             'lock',
             'microwave-oven',
-            'network-manager',
             'ota-provider',
             'python-bindings',
             'rvc',
@@ -229,10 +228,25 @@ def BuildHostTarget():
     target.AppendModifier('triggers', unified_id='triggers', unified=True).OnlyIfRe(
         "-(" + "|".join(sorted([
             # keep-sorted start
-            'all-clusters',
-            'energy-gateway',
-            'energy-management',
             'ota-requestor',
+            # keep-sorted end
+        ])) + ")-")
+    # Unified group for apps that disable read_client
+    target.AppendModifier('no-read-client', unified_id='no-read-client', unified=True).OnlyIfRe(
+        "-(" + "|".join(sorted([
+            # keep-sorted start
+            'energy-management',
+            'jf-admin-app',
+            'lighting-app-data-mode-no-unique-id',
+            # keep-sorted end
+        ])) + ")-")
+    # Unified group for apps with strict TLV validation
+    target.AppendModifier('strict-tlv', unified_id='strict-tlv', unified=True).OnlyIfRe(
+        "-(" + "|".join(sorted([
+            # keep-sorted start
+            'camera-controller',
+            'fabric-admin',
+            'jf-control-app',
             # keep-sorted end
         ])) + ")-")
 
