@@ -16,8 +16,7 @@
  */
 
 #include "ClusterActions.h"
-#include "TestTimerDelegate.h"
-#include <app/ConcreteClusterPath.h>
+#include <app/TimerDelegatesTest.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <gtest/gtest.h>

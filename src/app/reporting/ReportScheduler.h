@@ -162,7 +162,7 @@ public:
         BitFlags<ReadHandlerNodeFlags> mFlags;
     };
 
-    ReportScheduler(chip::app::TimerDelegate * aTimerDelegate) : mTimerDelegate(aTimerDelegate) {}
+    ReportScheduler(TimerDelegate * aTimerDelegate) : mTimerDelegate(aTimerDelegate) {}
 
     virtual ~ReportScheduler() = default;
 
@@ -212,7 +212,7 @@ protected:
     ReadHandlerNode * FindReadHandlerNode(const ReadHandler * aReadHandler)
     {
         ReadHandlerNode * foundNode = nullptr;
-        mNodesPool.ForEachActiveObject([&foundNode, aReadHandler](ReadHandlerNode * node) { // Removed 'this->'
+        mNodesPool.ForEachActiveObject([&foundNode, aReadHandler](ReadHandlerNode * node) {
             if (node->GetReadHandler() == aReadHandler)
             {
                 foundNode = node;
@@ -225,7 +225,7 @@ protected:
     }
 
     ObjectPool<ReadHandlerNode, CHIP_IM_MAX_NUM_READS + CHIP_IM_MAX_NUM_SUBSCRIPTIONS> mNodesPool;
-    chip::app::TimerDelegate * mTimerDelegate;
+    TimerDelegate * mTimerDelegate;
 };
 }; // namespace reporting
 }; // namespace app

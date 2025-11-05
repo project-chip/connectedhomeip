@@ -65,7 +65,7 @@ struct TestIdentifyCluster : public ::testing::Test
         onEffectIdentifierCalled = false;
     }
 
-    TimerDelegatTest mTestTimerDelegate;
+    TimerDelegateTest mTestTimerDelegate;
 };
 
 TEST_F(TestIdentifyCluster, TestCreate)

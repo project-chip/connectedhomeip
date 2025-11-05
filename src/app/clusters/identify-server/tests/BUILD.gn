@@ -54,6 +54,7 @@ chip_test_suite("tests-backwards-compatibility") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    "${chip_root}/src/app:timer-delegate-test",
     "${chip_root}/src/app/clusters/identify-server",
     "${chip_root}/src/app/clusters/testing",
     "${chip_root}/src/app/data-model-provider/tests:encode-decode",
