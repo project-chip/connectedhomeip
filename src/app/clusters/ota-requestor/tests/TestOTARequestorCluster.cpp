@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/ota-requestor/OtaRequestorCluster.h>
+#include <app/clusters/ota-requestor/OTARequestorCluster.h>
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>

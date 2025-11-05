@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/ota-requestor/OtaRequestorCluster.h>
+#include <app/clusters/ota-requestor/OTARequestorCluster.h>
 
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <app/server-cluster/AttributeListBuilder.h>
