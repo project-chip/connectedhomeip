@@ -615,10 +615,10 @@ CHIP_ERROR BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const Chi
         ExitNow();
     }
 
-    err = MapBLEError(ble_gattc_indicate_custom(conId, mTXCharCCCDAttrHandle, om));
+    err = MapBLEError(ble_gatts_indicate_custom(conId, mTXCharCCCDAttrHandle, om));
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "ble_gattc_indicate_custom() failed: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(DeviceLayer, "ble_gatts_indicate_custom() failed: %" CHIP_ERROR_FORMAT, err.Format());
         ExitNow();
     }
 
