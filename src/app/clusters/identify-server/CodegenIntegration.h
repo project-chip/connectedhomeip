@@ -18,7 +18,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-enums.h>
-#include <app/TimerDelegates.h>
+#include <app/TimerDelegateDefault.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <app/util/basic-types.h>

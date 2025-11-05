@@ -163,23 +163,6 @@ source_set("event-reporter") {
   sources = [ "EventReporter.h" ]
 }
 
-source_set("timer-delegate") {
-  sources = [ "TimerDelegates.h" ]
-  public_deps = [
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/support",
-  ]
-}
-
-source_set("timer-delegate-test") {
-  sources = [ "TimerDelegatesTest.h" ]
-  public_deps = [
-    ":timer-delegate",
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/support",
-  ]
-}
-
 # interaction-model is a static-library because it currently requires global functions (app/util/...) that are stubbed in different test files that depend on the app static_library
 # which in tern depens on the interaction-model.
 # Using source_set prevents the unit test to build correctly.
@@ -213,6 +196,8 @@ static_library("interaction-model") {
     "TimedHandler.h",
     "TimedRequest.cpp",
     "TimedRequest.h",
+    "TimerDelegateDefault.cpp",
+    "TimerDelegateDefault.h",
     "WriteClient.cpp",
     "WriteClient.h",
     "reporting/Engine.cpp",
@@ -239,7 +224,6 @@ static_library("interaction-model") {
     ":event-reporter",
     ":paths",
     ":subscription-info-provider",
-    ":timer-delegate",
     "${chip_root}/src/access",
     "${chip_root}/src/app/MessageDef",
     "${chip_root}/src/app/data-model-provider",
@@ -250,6 +234,7 @@ static_library("interaction-model") {
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/lib/support:static-support",
+    "${chip_root}/src/lib/support:timer-delegate",
     "${chip_root}/src/protocols/interaction_model",
     "${chip_root}/src/protocols/secure_channel",
     "${chip_root}/src/system",
@@ -556,7 +541,6 @@ static_library("app") {
     "FailSafeContext.cpp",
     "FailSafeContext.h",
     "ReadHandler.cpp",
-    "TimerDelegateDefault.cpp",
     "WriteHandler.cpp",
 
     # TODO: the following items cannot be included due to interaction-model circularity
@@ -575,7 +559,6 @@ static_library("app") {
     ":global-attributes",
     ":interaction-model",
     ":path-expansion",
-    ":timer-delegate",
     "${chip_root}/src/app/data-model",
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/icd/server:icd-server-config",

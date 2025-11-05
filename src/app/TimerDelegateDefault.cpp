@@ -16,7 +16,7 @@
  */
 
 #include <app/InteractionModelEngine.h>
-#include <app/TimerDelegates.h>
+#include <app/TimerDelegateDefault.h>
 #include <system/SystemClock.h>
 
 using Timeout = chip::System::Clock::Timeout;

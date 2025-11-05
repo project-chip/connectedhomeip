@@ -26,7 +26,7 @@
 
 #include <app/InteractionModelEngine.h>
 #include <app/OperationalSessionSetup.h>
-#include <app/TimerDelegates.h>
+#include <app/TimerDelegateDefault.h>
 #include <app/reporting/ReportSchedulerImpl.h>
 #include <app/util/DataModelHandler.h>
 #include <lib/core/ErrorStr.h>

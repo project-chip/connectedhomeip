@@ -17,14 +17,14 @@
 
 #pragma once
 
-#include <app/TimerDelegates.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/TimerDelegate.h>
 #include <system/SystemClock.h>
 
 namespace chip {
 namespace app {
 
-class TimerDelegateTest : public TimerDelegate
+class TimerDelegateMock : public TimerDelegate
 {
 public:
     using TimerContext = chip::app::TimerContext;

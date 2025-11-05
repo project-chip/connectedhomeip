@@ -183,6 +183,17 @@ source_set("static-support") {
   sources = [ "static_support_smart_ptr.h" ]
 }
 
+source_set("timer-delegate") {
+  sources = [
+    "TimerDelegate.h",
+    "TimerDelegateMock.h",
+  ]
+  public_deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
+}
+
 static_library("support") {
   output_name = "libSupportLayer"
 

@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <app/TimerDelegates.h>
 #include <app/reporting/ReportSchedulerImpl.h>
+#include <lib/support/TimerDelegate.h>
 
 namespace chip {
 namespace app {

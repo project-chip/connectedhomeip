@@ -31,12 +31,12 @@
 
 #include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
-#include <app/TimerDelegates.h>
 #include <app/reporting/ReportScheduler.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
 #include <crypto/SessionKeystore.h>
 #include <lib/core/CHIPConfig.h>
+#include <lib/support/TimerDelegate.h>
 #include <protocols/bdx/BdxTransferServer.h>
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>

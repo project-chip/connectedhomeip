@@ -16,7 +16,7 @@
  */
 
 #include <app/TestEventTriggerDelegate.h>
-#include <app/TimerDelegates.h>
+#include <app/TimerDelegateDefault.h>
 #include <app/reporting/ReportSchedulerImpl.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>

@@ -19,9 +19,9 @@
 #pragma once
 
 #include <app/ReadHandler.h>
-#include <app/TimerDelegates.h>
 #include <app/icd/server/ICDStateObserver.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/TimerDelegate.h>
 #include <system/SystemClock.h>
 
 namespace chip {

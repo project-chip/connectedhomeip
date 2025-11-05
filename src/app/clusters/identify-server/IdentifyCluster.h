@@ -17,7 +17,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/TimerDelegates.h>
+#include <app/TimerDelegateDefault.h>
 #include <app/reporting/reporting.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 

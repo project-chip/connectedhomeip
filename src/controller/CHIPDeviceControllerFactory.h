@@ -29,13 +29,13 @@
 
 #pragma once
 
-#include <app/TimerDelegates.h>
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerSystemState.h>
 #include <credentials/GroupDataProvider.h>
 #include <credentials/OperationalCertificateStore.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <inet/InetInterface.h>
+#include <lib/support/TimerDelegate.h>
 #include <protocols/secure_channel/SessionResumptionStorage.h>
 
 #include <optional>
