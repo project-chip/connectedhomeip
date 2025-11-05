@@ -36,7 +36,7 @@ executable("chip-shell") {
   if (matter_enable_tracing_support) {
     deps += [
       "${chip_root}/src/tracing:macros",
-      "${chip_root}/src/tracing/perfetto",
+      "${chip_root}/src/tracing/perfetto:perfetto",
       "${chip_root}/src/tracing/perfetto:simple_initialization",
     ]
   }
