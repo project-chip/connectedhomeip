@@ -223,6 +223,14 @@ public:
     void Disconnect();
 
     /**
+     * @brief Removes any fabric associated with this player in order to cause the UDC flow when
+     * verifyOrEstablishConnection is called
+     *
+     * @note This method will set nodeId and fabricIndex to 0.
+     */
+    void RemoveFabric();
+
+    /**
      * @brief Find an existing session for this CastingPlayer, or trigger a new session
      * request.
      *

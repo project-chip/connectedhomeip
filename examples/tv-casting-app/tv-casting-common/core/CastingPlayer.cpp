@@ -119,40 +119,71 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
                 ChipLogProgress(
                     AppServer,
                     "CastingPlayer::VerifyOrEstablishConnection() Attempting to Re-establish CASE with cached CastingPlayer");
+
+                // Preserve the IP addresses from the discovered CastingPlayer before overwriting with cached data
+                unsigned int discoveredNumIPs = mAttributes.numIPs;
+                chip::Inet::IPAddress discoveredIpAddresses[chip::Dnssd::CommonResolutionData::kMaxIPAddresses];
+                for (unsigned int i = 0; i < discoveredNumIPs; i++)
+                {
+                    discoveredIpAddresses[i] = mAttributes.ipAddresses[i];
+                }
+                chip::Inet::InterfaceId discoveredInterfaceId = mAttributes.interfaceId;
+
                 *this                          = cachedCastingPlayers[index];
                 mConnectionState               = CASTING_PLAYER_CONNECTING;
                 mOnCompleted                   = connectionCallbacks.mOnConnectionComplete;
                 mCommissioningWindowTimeoutSec = commissioningWindowTimeoutSec;
 
-                FindOrEstablishSession(
-                    nullptr,
-                    [](void * context, chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle) {
-                        ChipLogProgress(AppServer,
-                                        "CastingPlayer::VerifyOrEstablishConnection() FindOrEstablishSession Connection to "
-                                        "CastingPlayer successful");
-                        CastingPlayer::GetTargetCastingPlayer()->mConnectionState = CASTING_PLAYER_CONNECTED;
+                // Restore the IP addresses from the discovered CastingPlayer
+                mAttributes.numIPs = discoveredNumIPs;
+                for (unsigned int i = 0; i < discoveredNumIPs; i++)
+                {
+                    mAttributes.ipAddresses[i] = discoveredIpAddresses[i];
+                }
+                mAttributes.interfaceId = discoveredInterfaceId;
+                ChipLogProgress(AppServer, "Restored discovered CastingPlayer numIPs: %u", mAttributes.numIPs);
 
-                        // this async call will Load all the endpoints with their respective attributes into the TargetCastingPlayer
-                        // persist the TargetCastingPlayer information into the CastingStore and call mOnCompleted()
-                        support::EndpointListLoader::GetInstance()->Initialize(&exchangeMgr, &sessionHandle);
-                        support::EndpointListLoader::GetInstance()->Load();
-                    },
-                    [](void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error) {
-                        ChipLogError(AppServer,
-                                     "CastingPlayer::VerifyOrEstablishConnection() FindOrEstablishSession Connection to "
-                                     "CastingPlayer failed");
-                        CastingPlayer::GetTargetCastingPlayer()->mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
-                        CHIP_ERROR e = support::CastingStore::GetInstance()->Delete(*CastingPlayer::GetTargetCastingPlayer());
-                        if (e != CHIP_NO_ERROR)
-                        {
-                            ChipLogError(AppServer, "CastingStore::Delete() failed. Err: %" CHIP_ERROR_FORMAT, e.Format());
-                        }
+                // make sure to copy fields passed in which are needed for UDC
+                mIdOptions                                     = idOptions;
+                mClientProvidedCommissionerDeclarationCallback = connectionCallbacks.mCommissionerDeclarationCallback != nullptr;
 
-                        VerifyOrReturn(CastingPlayer::GetTargetCastingPlayer()->mOnCompleted);
-                        CastingPlayer::GetTargetCastingPlayer()->mOnCompleted(error, nullptr);
-                        mTargetCastingPlayer.reset();
-                    });
-                return; // FindOrEstablishSession called. Return early.
+                // don't attempt to connect with the cached CastingPlayer if the nodeId is not set
+                // instead, fall through to trigger UDC
+                if (mAttributes.nodeId != 0)
+                {
+                    FindOrEstablishSession(
+                        nullptr,
+                        [](void * context, chip::Messaging::ExchangeManager & exchangeMgr,
+                           const chip::SessionHandle & sessionHandle) {
+                            ChipLogProgress(AppServer,
+                                            "CastingPlayer::VerifyOrEstablishConnection() FindOrEstablishSession Connection to "
+                                            "CastingPlayer successful");
+                            CastingPlayer::GetTargetCastingPlayer()->mConnectionState = CASTING_PLAYER_CONNECTED;
+
+                            // this async call will Load all the endpoints with their respective attributes into the
+                            // TargetCastingPlayer.
+                            //
+                            // persist the TargetCastingPlayer information into the CastingStore and call mOnCompleted()
+                            support::EndpointListLoader::GetInstance()->Initialize(&exchangeMgr, &sessionHandle);
+                            support::EndpointListLoader::GetInstance()->Load();
+                        },
+                        [](void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error) {
+                            ChipLogError(AppServer,
+                                         "CastingPlayer::VerifyOrEstablishConnection() FindOrEstablishSession Connection to "
+                                         "CastingPlayer failed");
+                            CastingPlayer::GetTargetCastingPlayer()->mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
+                            CHIP_ERROR e = support::CastingStore::GetInstance()->Delete(*CastingPlayer::GetTargetCastingPlayer());
+                            if (e != CHIP_NO_ERROR)
+                            {
+                                ChipLogError(AppServer, "CastingStore::Delete() failed. Err: %" CHIP_ERROR_FORMAT, e.Format());
+                            }
+
+                            VerifyOrReturn(CastingPlayer::GetTargetCastingPlayer()->mOnCompleted);
+                            CastingPlayer::GetTargetCastingPlayer()->mOnCompleted(error, nullptr);
+                            mTargetCastingPlayer.reset();
+                        });
+                    return; // FindOrEstablishSession called. Return early.
+                }
             }
         }
     }
@@ -313,6 +344,20 @@ void CastingPlayer::Disconnect()
     mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
     mTargetCastingPlayer.reset();
     CastingPlayerDiscovery::GetInstance()->ClearCastingPlayersInternal();
+}
+
+void CastingPlayer::RemoveFabric()
+{
+    ChipLogProgress(AppServer, "CastingPlayer::RemoveFabric()");
+    chip::Server::GetInstance().GetFabricTable().Delete(mAttributes.fabricIndex);
+    mAttributes.fabricIndex = 0;
+    mAttributes.nodeId      = 0;
+
+    CHIP_ERROR err = support::CastingStore::GetInstance()->AddOrUpdate(*this);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "CastingStore::AddOrUpdate() failed. Err: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 }
 
 void CastingPlayer::RegisterEndpoint(const memory::Strong<Endpoint> endpoint)
