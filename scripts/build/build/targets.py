@@ -225,12 +225,6 @@ def BuildHostTarget():
             'water-leak-detector',
             # keep-sorted end
         ])) + ")-")
-    target.AppendModifier('triggers', unified_id='triggers', unified=True).OnlyIfRe(
-        "-(" + "|".join(sorted([
-            # keep-sorted start
-            'ota-requestor',
-            # keep-sorted end
-        ])) + ")-")
     # Unified group for apps that disable read_client
     target.AppendModifier('no-read-client', unified_id='no-read-client', unified=True).OnlyIfRe(
         "-(" + "|".join(sorted([
