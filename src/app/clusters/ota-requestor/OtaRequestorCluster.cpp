@@ -36,8 +36,21 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
 
 OtaRequestorCluster::OtaRequestorCluster(EndpointId endpointId, OTARequestorInterface & otaRequestor)
     : DefaultServerCluster(ConcreteClusterPath(endpointId, OtaSoftwareUpdateRequestor::Id)),
+      mEventHandlerRegistration(*this, endpointId),
       mOtaRequestor(otaRequestor)
 {
+}
+
+CHIP_ERROR OtaRequestorCluster::Startup(ServerClusterContext & context)
+{
+    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+    return mOtaRequestor.RegisterEventHandler(mEventHandlerRegistration);
+}
+
+void OtaRequestorCluster::Shutdown()
+{
+    mOtaRequestor.UnregisterEventHandler(mPath.mEndpointId);
+    DefaultServerCluster::Shutdown();
 }
 
 DataModel::ActionReturnStatus OtaRequestorCluster::ReadAttribute(

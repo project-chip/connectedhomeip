@@ -19,15 +19,20 @@
 #pragma once
 
 #include <app/clusters/ota-requestor/OTARequestorEventHandler.h>
+#include <app/clusters/ota-requestor/OTARequestorEventHandlerRegistry.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 
 namespace chip::app::Clusters {
 
-class OtaRequestorCluster : public DefaultServerCluster, public OtaRequestorEventHandler
+class OtaRequestorCluster : public DefaultServerCluster, public OTARequestorEventHandler
 {
 public:
     OtaRequestorCluster(EndpointId endpointId, OTARequestorInterface & otaRequestor);
+
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+
+    void Shutdown() override;
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
@@ -54,6 +59,7 @@ public:
                          DataModel::Nullable<int64_t> platformCode) override;
 
 private:
+    OTARequestorEventHandlerRegistration mEventHandlerRegistration;
     OTARequestorInterface & mOtaRequestor;
 };
 

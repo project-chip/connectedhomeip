@@ -18,8 +18,25 @@ import("//build_overrides/chip.gni")
 # the right dependencies
 source_set("ota-requestor") {
   sources = [
+    "BDXDownloader.cpp",
+    "BDXDownloader.h",
+    "DefaultOTARequestor.cpp",
+    "DefaultOTARequestor.h",
+    "DefaultOTARequestorDriver.cpp",
+    "DefaultOTARequestorDriver.h",
+    "DefaultOTARequestorStorage.cpp",
+    "DefaultOTARequestorStorage.h",
+    "DefaultOTARequestorUserConsent.h",
+    "ExtendedOTARequestorDriver.cpp",
+    "ExtendedOTARequestorDriver.h",
     "OtaRequestorCluster.cpp",
     "OtaRequestorCluster.h",
+    "OTARequestorDriver.h",
+    "OTARequestorEventHandler.h",
+    "OTARequestorEventHandlerRegistry.cpp",
+    "OTARequestorEventHandlerRegistry.h",
+    "OTARequestorStorage.h",
+    "ota-requestor-server.h",
   ]
 
   public_deps = [

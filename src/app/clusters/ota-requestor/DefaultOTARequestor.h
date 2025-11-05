@@ -109,7 +109,19 @@ public:
     virtual void SetUpdatePossible(bool updatePossible) override { mUpdatePossible = updatePossible; }
 
     // Retrieve the attribute that indicates whether updates are possible
-    virtual bool GetUpdatePossible() { return mUpdatePossible; }
+    virtual bool GetUpdatePossible() override { return mUpdatePossible; }
+
+    // Register a handler for generated cluster events
+    CHIP_ERROR RegisterEventHandler(app::OTARequestorEventHandlerRegistration & eventHandler) override
+    {
+        return mEventHandlers.Register(eventHandler);
+    }
+
+    // Unregister a previously-registered event handler
+    CHIP_ERROR UnregisterEventHandler(EndpointId endpointId) override
+    {
+        return mEventHandlers.Unregister(endpointId);;
+    }
 
     //////////// BDXDownloader::StateDelegate Implementation ///////////////
     void OnDownloadStateChanged(OTADownloader::State state,
@@ -349,6 +361,7 @@ private:
     Optional<ProviderLocationType> mProviderLocation;
     SessionHolder mSessionHolder;
     bool mUpdatePossible = true;
+    app::OTARequestorEventHandlerRegistry mEventHandlers;
 };
 
 } // namespace chip

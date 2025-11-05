@@ -104,6 +104,14 @@ public:
     {
         return true;
     }
+    CHIP_ERROR RegisterEventHandler(OTARequestorEventHandlerRegistration & eventHandler) override
+    {
+        return mEventHandlerRegistry.Register(eventHandler);
+    }
+    CHIP_ERROR UnregisterEventHandler(EndpointId endpointId) override
+    {
+        return mEventHandlerRegistry.Unregister(endpointId);
+    }
 
     OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType GetLastAnnounceCommandPayload() const
     {
@@ -115,10 +123,16 @@ public:
         mUpdateStateProgress = updateStateProgress;
     }
 
+    OTARequestorEventHandler * GetEventHandler(EndpointId endpointId)
+    {
+        return mEventHandlerRegistry.Get(endpointId);
+    }
+
 private:
     OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType mLastAnnounceCommandPayload;
     ProviderLocationList mProviderLocations;
     DataModel::Nullable<uint8_t> mUpdateStateProgress;
+    OTARequestorEventHandlerRegistry mEventHandlerRegistry;
 };
 
 struct TestOtaRequestorCluster : public ::testing::Test
@@ -441,6 +455,21 @@ TEST_F(TestOtaRequestorCluster, DownloadErrorEvents)
     EXPECT_EQ(decodedEvent.bytesDownloaded, 12000u);
     EXPECT_TRUE(decodedEvent.progressPercent.IsNull());
     EXPECT_TRUE(decodedEvent.platformCode.IsNull());
+}
+
+TEST_F(TestOtaRequestorCluster, RegistersAsEventHandler)
+{
+    chip::Test::TestServerClusterContext context;
+    MockOtaRequestor otaRequestor;
+    OtaRequestorCluster cluster(kTestEndpointId, otaRequestor);
+
+    EXPECT_EQ(otaRequestor.GetEventHandler(kTestEndpointId), nullptr);
+
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    EXPECT_EQ(otaRequestor.GetEventHandler(kTestEndpointId), &cluster);
+
+    cluster.Shutdown();
+    EXPECT_EQ(otaRequestor.GetEventHandler(kTestEndpointId), nullptr);
 }
 
 }  // namespace

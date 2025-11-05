@@ -22,6 +22,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 
+#include <app/clusters/ota-requestor/OTARequestorEventHandlerRegistry.h>
 #include <lib/core/ClusterEnums.h>
 
 #pragma once
@@ -224,6 +225,12 @@ public:
 
     // Retrieve the attribute that indicates whether updates are possible
     virtual bool GetUpdatePossible() = 0;
+
+    // Register a handler for generated cluster events
+    virtual CHIP_ERROR RegisterEventHandler(app::OTARequestorEventHandlerRegistration & eventHandler) = 0;
+
+    // Unregister a previously-registered event handler
+    virtual CHIP_ERROR UnregisterEventHandler(EndpointId endpointId) = 0;
 };
 
 // The instance of the class implementing OTARequestorInterface must be managed through
