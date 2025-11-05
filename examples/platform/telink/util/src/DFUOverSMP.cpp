@@ -36,13 +36,6 @@ LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
-
-constexpr uint8_t kAdvertisingPriority     = UINT8_MAX;
-constexpr uint32_t kAdvertisingOptions     = BT_LE_ADV_OPT_CONNECTABLE;
-constexpr uint16_t kAdvertisingIntervalMin = 400;
-constexpr uint16_t kAdvertisingIntervalMax = 500;
-constexpr uint8_t kAdvertisingFlags        = BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR;
-
 namespace {
 enum mgmt_cb_return UploadConfirmHandler(uint32_t event, enum mgmt_cb_return prev_status, int32_t * rc, uint16_t * group,
                                          bool * abort_more, void * data, size_t data_size)
@@ -51,7 +44,7 @@ enum mgmt_cb_return UploadConfirmHandler(uint32_t event, enum mgmt_cb_return pre
     IgnoreUnusedVariable(imgData);
 
     LOG_INF("[DFU] DFU over SMP progress: %u/%u B of image %u", static_cast<unsigned>(imgData.req->off),
-                    static_cast<unsigned>(imgData.action->size), static_cast<unsigned>(imgData.req->image));
+            static_cast<unsigned>(imgData.action->size), static_cast<unsigned>(imgData.req->image));
 
     return MGMT_CB_OK;
 }
@@ -67,40 +60,5 @@ DFUOverSMP DFUOverSMP::sDFUOverSMP;
 
 void DFUOverSMP::Init()
 {
-    const char * name = bt_get_name();
-
-    mAdvertisingItems[0] = BT_DATA(BT_DATA_FLAGS, &kAdvertisingFlags, sizeof(kAdvertisingFlags));
-    mAdvertisingItems[1] = BT_DATA(BT_DATA_NAME_COMPLETE, name, static_cast<uint8_t>(strlen(name)));
-
-    mAdvertisingRequest.priority        = kAdvertisingPriority;
-    mAdvertisingRequest.options         = kAdvertisingOptions;
-    mAdvertisingRequest.minInterval     = kAdvertisingIntervalMin;
-    mAdvertisingRequest.maxInterval     = kAdvertisingIntervalMax;
-    mAdvertisingRequest.advertisingData = Span<bt_data>(mAdvertisingItems);
-
-    mAdvertisingRequest.onStarted = [](int rc) {
-        if (rc == 0)
-        {
-            LOG_INF("[DFU] SMP BLE advertising started");
-        }
-        else
-        {
-            LOG_ERR("[DFU] Failed to start SMP BLE advertising: %d", rc);
-        }
-    };
-
     mgmt_callback_register(&sUploadCallback);
-}
-
-void DFUOverSMP::StartServer()
-{
-    VerifyOrReturn(!mIsStarted, ChipLogProgress(SoftwareUpdate, "DFU over SMP was already started"));
-
-    // Synchronize access to the advertising arbiter that normally runs on the CHIP thread.
-    PlatformMgr().LockChipStack();
-    BLEAdvertisingArbiter::InsertRequest(mAdvertisingRequest);
-    PlatformMgr().UnlockChipStack();
-
-    mIsStarted = true;
-    LOG_INF("[DFU] DFU over SMP started");
 }
