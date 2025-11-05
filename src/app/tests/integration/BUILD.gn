@@ -16,6 +16,7 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/build/chip/tools.gni")
+import("${chip_root}/src/tracing/tracing_args.gni")
 
 assert(chip_build_tools)
 
@@ -54,6 +55,10 @@ executable("chip-im-initiator") {
     "${chip_root}/src/system",
   ]
 
+  if (matter_enable_tracing_support) {
+    deps += [ "${chip_root}/src/tracing" ]
+  }
+
   output_dir = root_out_dir
 }
 
@@ -78,6 +83,10 @@ executable("chip-im-responder") {
     "${chip_root}/src/protocols",
     "${chip_root}/src/system",
   ]
+
+  if (matter_enable_tracing_support) {
+    deps += [ "${chip_root}/src/tracing" ]
+  }
 
   cflags = [ "-Wconversion" ]
 

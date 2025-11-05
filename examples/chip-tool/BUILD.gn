@@ -18,6 +18,7 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/tools.gni")
 import("${chip_root}/examples/chip-tool/chip-tool.gni")
 import("${chip_root}/src/lib/core/core.gni")
+import("${chip_root}/src/tracing/tracing_args.gni")
 
 if (config_use_interactive_mode) {
   import("//build_overrides/editline.gni")
@@ -155,6 +156,10 @@ executable("chip-tool") {
     ":chip-tool-utils",
     "${chip_root}/src/platform/logging:stdio",
   ]
+
+  if (matter_enable_tracing_support) {
+    deps += [ "${chip_root}/src/tracing" ]
+  }
 
   output_dir = root_out_dir
 }
