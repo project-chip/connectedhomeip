@@ -63,13 +63,21 @@ Json::Value OtaProviderAppCommandHandler::BuildOtaProviderSnapshot(uint16_t endp
     Json::Value payload(Json::objectValue);
 
     // payload["QueryImageStatus"]    = static_cast<uint32_t>(gOtaProvider.GetQueryImageStatus());
-    payload["VendorID"]        = gOtaProvider.GetVendorId();
-    payload["ProductID"]       = gOtaProvider.GetProductId();
-    payload["SoftwareVersion"] = gOtaProvider.GetSoftwareVersion();
-    payload["HardwareVersion"] = gOtaProvider.GetHardwareVersion();
-    // payload["ProtocolsSupported"]  = gOtaProvider.GetProtocolsSupported();
+    payload["VendorID"]            = gOtaProvider.GetVendorId();
+    payload["ProductID"]           = gOtaProvider.GetProductId();
+    payload["SoftwareVersion"]     = gOtaProvider.GetSoftwareVersion();
+    payload["HardwareVersion"]     = gOtaProvider.GetHardwareVersion();
     payload["Location"]            = gOtaProvider.GetLocation();
     payload["RequestorCanConsent"] = gOtaProvider.GetRequestorCanConsent();
+
+    const auto & protos = gOtaProvider.GetProtocolsSupported();
+
+    Json::Value arr(Json::arrayValue);
+    for (chip::app::Clusters::OtaSoftwareUpdateProvider::DownloadProtocolEnum p : protos)
+    {
+        arr.append(Json::UInt(p));
+    }
+    payload["ProtocolsSupported"] = arr;
 
     return payload;
 }
