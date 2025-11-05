@@ -138,8 +138,8 @@ public:
     // Invoke a command and return the decoded result.
     // The `RequestType`, `ResponseType` type-parameters must be of the correct type for the command being invoked.
     // Use `app::Clusters::<ClusterName>::Commands::<CommandName>::Type` for the `RequestType` type-parameter to be spec compliant
-    // Use `app::Clusters::<ClusterName>::Commands::<CommandName>::Type::ResponseType` for the `ResponseType` type-parameter to be spec compliant
-    // Will construct the command path using the first path returned by `GetPaths()` on the cluster.
+    // Use `app::Clusters::<ClusterName>::Commands::<CommandName>::Type::ResponseType` for the `ResponseType` type-parameter to be
+    // spec compliant Will construct the command path using the first path returned by `GetPaths()` on the cluster.
     // @returns `CHIP_ERROR_INCORRECT_STATE` if `GetPaths()` doesn't return a list with one path.
     template <typename ResponseType, typename RequestType>
     [[nodiscard]] InvokeResult<ResponseType> Invoke(chip::CommandId commandId, const RequestType & request)
@@ -191,7 +191,7 @@ public:
     // @returns `CHIP_ERROR_INCORRECT_STATE` if `GetPaths()` doesn't return a list with one path.
     template <typename T>
     [[nodiscard]] std::optional<app::DataModel::ActionReturnStatus> Invoke(chip::CommandId commandId, const T & data,
-                                                                                 app::CommandHandler * handler = nullptr)
+                                                                           app::CommandHandler * handler = nullptr)
     {
         VerifyOrReturnError(VerifyClusterPathsValid(), CHIP_ERROR_INCORRECT_STATE);
         auto path                                   = mCluster.GetPaths()[0];
