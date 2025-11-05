@@ -104,8 +104,10 @@ class HostApp(Enum):
             TARGETS = {
                 # keep-sorted start
                 HostApp.AIR_PURIFIER: ":linux_air_purifier_app",
+                HostApp.ALL_CLUSTERS: ":linux_all_clusters_app",
                 HostApp.BRIDGE: ":linux_bridge_app",
                 HostApp.CLOSURE: ":linux_closure_app",
+                HostApp.ENERGY_GATEWAY: ":linux_energy_gateway_app",
                 HostApp.LIGHT: ":linux_lighting_app",
                 HostApp.LOCK: ":linux_lock_app",
                 HostApp.MICROWAVE_OVEN: ":linux_microwave_oven_app",
@@ -118,13 +120,20 @@ class HostApp(Enum):
                 HostApp.WATER_LEAK_DETECTOR: ":linux_water_leak_detector_app",
                 # keep-sorted end
             }
-        elif unified_id == 'triggers':
+        elif unified_id == 'no-read-client':
             TARGETS = {
                 # keep-sorted start
-                HostApp.ALL_CLUSTERS: ":linux_all_clusters_app",
-                HostApp.ENERGY_GATEWAY: ":linux_energy_gateway_app",
                 HostApp.ENERGY_MANAGEMENT: ":linux_energy_management_app",
-                HostApp.OTA_REQUESTOR: ":linux_ota_requestor_app",
+                HostApp.JF_ADMIN: ":jfa-app",
+                HostApp.LIGHT_DATA_MODEL_NO_UNIQUE_ID: ":chip-lighting-app",
+                # keep-sorted end
+            }
+        elif unified_id == 'strict-tlv':
+            TARGETS = {
+                # keep-sorted start
+                HostApp.CAMERA_CONTROLLER: ":chip-camera-controller",
+                HostApp.FABRIC_ADMIN: ":fabric-admin",
+                HostApp.JF_CONTROL: ":jfc-app",
                 # keep-sorted end
             }
         else:
