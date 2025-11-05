@@ -76,7 +76,7 @@ ecdsa==0.19.0
     #   esptool
 esp-coredump==1.14.0
     # via esp-idf-monitor
-esp-idf-kconfig==1.5.0
+esp-idf-kconfig==2.5.0
     # via -r requirements.esp32.txt
 esp-idf-monitor==1.8.0
     # via -r requirements.esp32.txt

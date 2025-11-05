@@ -107,13 +107,6 @@ jobs:
               with:
                 platform: esp32
 
-            # Install esp-idf-kconfig==2.5.0 in the virtual environment here
-            # so it will not affect other workflows
-            - name: Install esp-idf-kconfig
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                    "pip install esp-idf-kconfig==2.5.0"
-
             - name: CI Examples ESP32
               shell: bash
               run: |
