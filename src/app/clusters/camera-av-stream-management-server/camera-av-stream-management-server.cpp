@@ -1001,15 +1001,22 @@ void CameraAVStreamMgmtServer::ModifyVideoStream(const uint16_t streamID, const 
     {
         if (stream.videoStreamID == streamID)
         {
+            bool wasModified = false;
             if (waterMarkEnabled.HasValue())
             {
+                wasModified             = (stream.watermarkEnabled != waterMarkEnabled);
                 stream.watermarkEnabled = waterMarkEnabled;
             }
             if (osdEnabled.HasValue())
             {
+                wasModified       = wasModified || (stream.OSDEnabled != osdEnabled);
                 stream.OSDEnabled = osdEnabled;
             }
-            ChipLogError(Camera, "Modified video stream with ID: %d", streamID);
+            if (wasModified)
+            {
+                PersistAndNotify<Attributes::AllocatedVideoStreams::Id>();
+            }
+            ChipLogProgress(Camera, "Modified video stream with ID: %d", streamID);
             return;
         }
     }
@@ -1022,15 +1029,22 @@ void CameraAVStreamMgmtServer::ModifySnapshotStream(const uint16_t streamID, con
     {
         if (stream.snapshotStreamID == streamID)
         {
+            bool wasModified = false;
             if (waterMarkEnabled.HasValue())
             {
+                wasModified             = (stream.watermarkEnabled != waterMarkEnabled);
                 stream.watermarkEnabled = waterMarkEnabled;
             }
             if (osdEnabled.HasValue())
             {
+                wasModified       = wasModified || (stream.OSDEnabled != osdEnabled);
                 stream.OSDEnabled = osdEnabled;
             }
-            ChipLogError(Camera, "Modified snapshot stream with ID: %d", streamID);
+            if (wasModified)
+            {
+                PersistAndNotify<Attributes::AllocatedSnapshotStreams::Id>();
+            }
+            ChipLogProgress(Camera, "Modified snapshot stream with ID: %d", streamID);
             return;
         }
     }
