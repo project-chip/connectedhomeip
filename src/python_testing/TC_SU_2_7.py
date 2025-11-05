@@ -74,13 +74,10 @@
 
 import asyncio
 import logging
-from os import kill
-from signal import SIGTERM
 from time import sleep, time
 
-import psutil
 from mobly import asserts
-from TC_SUTestBase import SoftwareUpdateBaseTest, ACLHandler
+from TC_SUTestBase import SoftwareUpdateBaseTest
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
