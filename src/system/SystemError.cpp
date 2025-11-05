@@ -40,6 +40,7 @@
 #include <limits>
 #include <stddef.h>
 #include <string.h>
+#include "StrErrorUtil.h"
 
 namespace chip {
 namespace System {
@@ -90,10 +91,10 @@ DLL_EXPORT const char * DescribeErrorPOSIX(CHIP_ERROR aError)
 #else
     static char errBuf[128];
 #endif // CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE
-    if (strerror_r(lError, errBuf, sizeof(errBuf)) == 0)
-    {
-        return errBuf;
-    }
+    const char * res = chip::System::PlatformStrError(lError, errBuf, sizeof(errBuf));
+    if (res != nullptr)
+        return res;
+
     return "Unknown platform error";
 }
 
