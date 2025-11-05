@@ -334,7 +334,7 @@ Status BooleanStateConfigurationCluster::SuppressAlarms(AlarmModeBitMask alarms)
     VerifyOrReturnError(mAlarmsActive.HasAll(alarms), Status::InvalidInState);
 
     // validate this is not a NOOP
-    VerifyOrReturnError(!mAlarmsSupported.HasAll(alarms), Status::Success);
+    VerifyOrReturnError(!mAlarmsSuppressed.HasAll(alarms), Status::Success);
 
     if (mDelegate != nullptr)
     {
