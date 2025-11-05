@@ -4,7 +4,6 @@ import io
 import json
 import logging
 import time
-from pathlib import Path
 from subprocess import PIPE
 
 import click
