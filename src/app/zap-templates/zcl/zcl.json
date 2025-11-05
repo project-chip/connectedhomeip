@@ -765,12 +765,12 @@
         "Power Source": ["ClusterRevision"],
         "Valve Configuration and Control": ["RemainingDuration"],
         "Boolean State Configuration": [
-          "AlarmsActive",
-          "AlarmsEnabled",
-          "AlarmsSuppressed",
-          "ClusterRevision",
-          "CurrentSensitivityLevel",
-          "SensorFault"
+            "AlarmsActive",
+            "AlarmsEnabled",
+            "AlarmsSuppressed",
+            "ClusterRevision",
+            "CurrentSensitivityLevel",
+            "SensorFault"
         ],
         "Water Heater Management": [
             "HeaterTypes",
