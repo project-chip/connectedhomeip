@@ -17,7 +17,9 @@
 #include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
 #include <pw_unit_test/framework.h>
 
+#include <app/clusters/testing/AttributeTesting.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
+#include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/OccupancySensing/Attributes.h>
 #include <clusters/OccupancySensing/Metadata.h>
@@ -26,6 +28,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OccupancySensing;
+using namespace chip::Testing;
 
 namespace {
 
@@ -382,4 +385,56 @@ TEST_F(TestOccupancySensingCluster, TestHoldTimeLimitsConstraints)
         EXPECT_EQ(holdTimeLimits.holdTimeMax, 20);
         EXPECT_EQ(holdTimeLimits.holdTimeDefault, 20);
     }
+}
+
+TEST_F(TestOccupancySensingCluster, TestAttributeListMandatoryOnly)
+{
+    chip::Test::TestServerClusterContext context;
+    OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}};
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
+    EXPECT_EQ(cluster.Attributes(ConcreteClusterPath(kTestEndpointId, OccupancySensing::Id), attributes), CHIP_NO_ERROR);
+
+    const DataModel::AttributeEntry expectedAttributes[] = {
+        Attributes::Occupancy::kMetadataEntry,
+        Attributes::OccupancySensorType::kMetadataEntry,
+        Attributes::OccupancySensorTypeBitmap::kMetadataEntry,
+    };
+
+    ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
+    AttributeListBuilder listBuilder(expected);
+    EXPECT_EQ(listBuilder.Append(Span(expectedAttributes), {}), CHIP_NO_ERROR);
+    EXPECT_TRUE(EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
+}
+
+TEST_F(TestOccupancySensingCluster, TestAttributeListWithHoldTime)
+{
+    chip::Test::TestServerClusterContext context;
+    constexpr uint16_t kHoldTime = 100;
+    OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin = 10, .holdTimeMax = 200, .holdTimeDefault = kHoldTime };
+    OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}.WithHoldTime(kHoldTime, holdTimeLimitsConfig)};
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
+    EXPECT_EQ(cluster.Attributes(ConcreteClusterPath(kTestEndpointId, OccupancySensing::Id), attributes), CHIP_NO_ERROR);
+
+    const DataModel::AttributeEntry expectedMandatoryAttributes[] = {
+        Attributes::Occupancy::kMetadataEntry,
+        Attributes::OccupancySensorType::kMetadataEntry,
+        Attributes::OccupancySensorTypeBitmap::kMetadataEntry,
+    };
+
+    const AttributeListBuilder::OptionalAttributeEntry expectedOptionalAttributes[] = {
+        { true, Attributes::HoldTime::kMetadataEntry },
+        { true, Attributes::HoldTimeLimits::kMetadataEntry },
+        { true, Attributes::PIROccupiedToUnoccupiedDelay::kMetadataEntry },
+        { true, Attributes::UltrasonicOccupiedToUnoccupiedDelay::kMetadataEntry },
+        { true, Attributes::PhysicalContactOccupiedToUnoccupiedDelay::kMetadataEntry },
+    };
+
+    ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
+    AttributeListBuilder listBuilder(expected);
+    EXPECT_EQ(listBuilder.Append(Span(expectedMandatoryAttributes), Span(expectedOptionalAttributes)), CHIP_NO_ERROR);
+    EXPECT_TRUE(EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
 }

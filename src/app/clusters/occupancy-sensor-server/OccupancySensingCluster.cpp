@@ -1,6 +1,5 @@
 /*
  *    Copyright (c) 2025 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,6 +21,7 @@
 #include <clusters/OccupancySensing/Attributes.h>
 #include <clusters/OccupancySensing/Commands.h>
 #include <clusters/OccupancySensing/Metadata.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip::app::Clusters {
 
@@ -113,10 +113,10 @@ DataModel::ActionReturnStatus OccupancySensingCluster::ReadAttribute(const DataM
 {
     switch (request.path.mAttributeId)
     {
-    case Attributes::ClusterRevision::Id:
-        return encoder.Encode(OccupancySensing::kRevision);
     case Attributes::FeatureMap::Id:
         return encoder.Encode(mFeatureMap);
+    case Attributes::ClusterRevision::Id:
+        return encoder.Encode(OccupancySensing::kRevision);
     case Attributes::Occupancy::Id:
         return encoder.Encode(mOccupancy);
     case Attributes::OccupancySensorType::Id:
@@ -141,6 +141,22 @@ DataModel::ActionReturnStatus OccupancySensingCluster::ReadAttribute(const DataM
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
+}
+
+CHIP_ERROR OccupancySensingCluster::Attributes(const ConcreteClusterPath & clusterPath,
+                                             ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+{
+    AttributeListBuilder listBuilder(builder);
+
+    const AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
+        { mHasHoldTime, Attributes::HoldTime::kMetadataEntry },
+        { mHasHoldTime, Attributes::HoldTimeLimits::kMetadataEntry },
+        { mHasHoldTime, Attributes::PIROccupiedToUnoccupiedDelay::kMetadataEntry },
+        { mHasHoldTime, Attributes::UltrasonicOccupiedToUnoccupiedDelay::kMetadataEntry },
+        { mHasHoldTime, Attributes::PhysicalContactOccupiedToUnoccupiedDelay::kMetadataEntry },
+    };
+
+    return listBuilder.Append(Span(OccupancySensing::Attributes::kMandatoryMetadata), Span(optionalAttributes));
 }
 
 } // namespace chip::app::Clusters
