@@ -31,6 +31,7 @@
 #       --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
+#       --commissioning-method on-network
 #       --discriminator 123
 #       --passcode 2123
 #       --endpoint 0
@@ -38,12 +39,8 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --string-arg provider_app_path:${OTA_PROVIDER_APP}
-#       --string-arg ota_image_step1:${OTA_IMAGE_V2}
-#       --string-arg ota_image_step1_expected_version:2
-#       --string-arg ota_image_step2:${OTA_IMAGE_V3}
-#       --string-arg ota_image_step3:${OTA_IMAGE_V3}
-#       --string-arg ota_image_step5:${OTA_IMAGE_V3}
-#       --string-arg ota_image_step6:${OTA_IMAGE_V4}
+#       --string-arg ota_image:${SU_OTA_REQUESTOR_V2}
+#       --int-arg ota_image_expected_version:2
 #       --tests test_TC_SU_2_7_1
 #     factory-reset: true
 #     quiet: true
@@ -59,6 +56,7 @@
 #       --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
+#       --commissioning-method on-network
 #       --discriminator 123
 #       --passcode 2123
 #       --endpoint 0
@@ -66,7 +64,7 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --string-arg provider_app_path:${OTA_PROVIDER_APP}
-#       --string-arg ota_image_step4:${OTA_IMAGE_V2}
+#       --string-arg ota_image:${SU_OTA_REQUESTOR_V2}
 #       --tests test_TC_SU_2_7_2
 #     factory-reset: true
 #     quiet: true
@@ -176,11 +174,11 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         self.step(0)
         controller = self.default_controller
         provider_app_path = self.user_params.get('provider_app_path', None)
-        ota_image = self.user_params.get('ota_image_step1')
-        expected_version = self.user_params.get('ota_image_step1_expected_version')
+        ota_image = self.user_params.get('ota_image')
+        expected_version = self.user_params.get('ota_image_expected_version')
 
         self.start_provider(
-            provier_app_path=provider_app_path,
+            provider_app_path=provider_app_path,
             ota_image_path=ota_image,
             setup_pincode=self.provider_data['setup_pincode'],
             discriminator=self.provider_data['discriminator'],
@@ -257,9 +255,9 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         self.current_provider_app_proc.terminate()
 
         self.step(2)
-        ota_image = self.user_params.get('ota_image_step2')
+        ota_image = self.user_params.get('ota_image')
         self.start_provider(
-            provier_app_path=provider_app_path,
+            provider_app_path=provider_app_path,
             ota_image_path=ota_image,
             setup_pincode=self.provider_data['setup_pincode'],
             discriminator=self.provider_data['discriminator'],
@@ -286,9 +284,8 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         self.current_provider_app_proc.terminate()
 
         self.step(3)
-        # ota_image = self.user_params.get('ota_image_step3')
         self.start_provider(
-            provier_app_path=provider_app_path,
+            provider_app_path=provider_app_path,
             ota_image_path=ota_image,
             setup_pincode=self.provider_data['setup_pincode'],
             discriminator=self.provider_data['discriminator'],
@@ -315,15 +312,16 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         state_transition_event_handler.reset()
         await state_transition_event_handler.cancel()
         self.current_provider_app_proc.terminate()
+        self.restart_requestor(controller)
 
         # # This step is executed with TC_2_7_2
         self.skip_step(4)
 
         self.step(5)
-        ota_image = self.user_params.get('ota_image_step5')
-        expected_version = self.user_params.get('ota_image_step5_expected_version')
+        ota_image = self.user_params.get('ota_image')
+        expected_version = self.user_params.get('ota_image_expected_version')
         self.start_provider(
-            provier_app_path=provider_app_path,
+            provider_app_path=provider_app_path,
             ota_image_path=ota_image,
             setup_pincode=self.provider_data['setup_pincode'],
             discriminator=self.provider_data['discriminator'],
@@ -379,10 +377,10 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         self.current_provider_app_proc.terminate()
 
         self.step(6)
-        ota_image = self.user_params.get('ota_image_step6')
-        expected_version = self.user_params.get('ota_image_step6_expected_version')
+        ota_image = self.user_params.get('ota_image')
+        expected_version = self.user_params.get('ota_image_expected_version')
         self.start_provider(
-            provier_app_path=provider_app_path,
+            provider_app_path=provider_app_path,
             ota_image_path=ota_image,
             setup_pincode=self.provider_data['setup_pincode'],
             discriminator=self.provider_data['discriminator'],
@@ -463,18 +461,18 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         # Launch the requestor with flags:
         #       --requestorCanConsent true
         #       --userConsentState deferred
-        # These flags are needed by the provider to work properly
+        # These flags are needed by the provider to work properly to trigger DelayedOnUserConsent
         # Retrieve the data from the args
         controller = self.default_controller
         provider_app_path = self.user_params.get('provider_app_path', None)
-        ota_image = self.user_params.get('ota_image_step4')
+        ota_image = self.user_params.get('ota_image')
         self.step(0)
         self.skip_step(1)
         self.skip_step(2)
         self.skip_step(3)
         self.step(4)
         self.start_provider(
-            provier_app_path=provider_app_path,
+            provider_app_path=provider_app_path,
             ota_image_path=ota_image,
             setup_pincode=self.provider_data['setup_pincode'],
             discriminator=self.provider_data['discriminator'],
