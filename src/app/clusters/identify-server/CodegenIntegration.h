@@ -53,7 +53,7 @@ struct Identify
         chip::app::Clusters::Identify::EffectIdentifierEnum effectIdentifier =
             chip::app::Clusters::Identify::EffectIdentifierEnum::kBlink,
         chip::app::Clusters::Identify::EffectVariantEnum effectVariant = chip::app::Clusters::Identify::EffectVariantEnum::kDefault,
-        TimerDelegate * timerDelegate                                  = nullptr);
+        chip::TimerDelegate * timerDelegate                            = nullptr);
     ~Identify();
 
     onIdentifyStartCb mOnIdentifyStart = nullptr;
