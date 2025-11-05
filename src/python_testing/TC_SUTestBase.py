@@ -18,6 +18,7 @@
 import logging
 import tempfile
 from os import path
+from time import sleep
 from typing import Optional
 
 from mobly import asserts
@@ -300,3 +301,39 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             nodeId=provider_node_id,
             attributes=[(0, acl_attribute)]
         )
+
+    def restart_requestor(self, requestor_th):
+        """This method restart the requestor so stops using updated requestor image.
+
+        Args:
+            controller (_type_): _description_
+        """
+        restart_flag_file = self.get_restart_flag_file()
+        logger.info(f"RESTART FILE at {restart_flag_file}")
+        if not restart_flag_file:
+            # No restart flag file: ask user to manually reboot
+            self.wait_for_user_input(prompt_msg="Reboot the DUT. Press Enter when ready.\n")
+
+            # After manual reboot, expire previous sessions so that we can re-establish connections
+            logging.info("Expiring sessions after manual device reboot")
+            requestor_th.ExpireSessions(self.requestor_node_id)
+            logging.info("Manual device reboot completed")
+
+        else:
+            try:
+                # Create the restart flag file to signal the test runner
+                with open(restart_flag_file, "w") as f:
+                    f.write("restart")
+                logging.info("Created restart flag file to signal app restart")
+
+                # The test runner will automatically wait for the app-ready-pattern before continuing
+                # Waiting 1 second after the app-ready-pattern is detected as we need to wait a tad longer for the app to be ready and stable, otherwise TH2 connection fails later on in test step 14.
+                sleep(1)
+
+                # Expire sessions and re-establish connections
+                requestor_th.ExpireSessions(self.requestor_node_id)
+                logging.info("App restart completed successfully")
+
+            except Exception as e:
+                logging.error(f"Failed to restart Requestor: {e}")
+                asserts.fail(f"Requestor restart failed: {e}")
