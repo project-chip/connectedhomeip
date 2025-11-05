@@ -873,12 +873,15 @@ void WifiInterfaceImpl::ConnectionEventCallback(sl_wfx_connect_ind_body_t connec
     memcpy(&ap_info.security, &wifi_provision.security, sizeof(wifi_provision.security));
 
     // Store SSID
-    chip::MutableByteSpan apSsidSpan(ap_info.ssid, WFX_MAX_SSID_LENGTH);
-    chip::CopySpanToMutableSpan(chip::ByteSpan(wifi_provision.ssid, wifi_provision.ssidLength), apSsidSpan);
+    chip::ByteSpan apSsidSpan(wifi_provision.ssid, wifi_provision.ssidLength);
+    chip::MutableByteSpan apSsidMutableSpan(ap_info.ssid, WFX_MAX_SSID_LENGTH);
+    chip::CopySpanToMutableSpan(apSsidSpan, apSsidMutableSpan);
     ap_info.ssid_length = wifi_provision.ssidLength;
 
     // Store BSSID
-    memcpy(ap_info.bssid, mac, kWifiMacAddressLength);
+    chip::ByteSpan macSpan(mac, kWifiMacAddressLength);
+    chip::MutableByteSpan apBssidMutableSpan(ap_info.bssid, kWifiMacAddressLength);
+    chip::CopySpanToMutableSpan(macSpan, apBssidMutableSpan);
 
     switch (status)
     {
