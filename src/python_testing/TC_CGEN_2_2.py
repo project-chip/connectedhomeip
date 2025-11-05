@@ -361,7 +361,8 @@ class TC_CGEN_2_2(MatterBaseTest):
         # the configuration parameter 'PIXIT.CGEN.FailsafeExpiryLengthSeconds'. If not specified, the default is used.
 
         logger.info(
-            f'Step #7: {run_type} - Forcing failsafe expiration by sending an ArmFailSafe command to the DUT with ExpiryLengthSeconds set to {failsafe_expiration_seconds} seconds.'
+            f'Step #7: {run_type} - Forcing failsafe expiration by sending an ArmFailSafe command to '
+            f'the DUT with ExpiryLengthSeconds set to {failsafe_expiration_seconds} seconds.'
         )
 
         resp = await self.set_failsafe_timer(
@@ -370,7 +371,8 @@ class TC_CGEN_2_2(MatterBaseTest):
             expiration_time_seconds=1)
 
         logger.info(
-            f'Step #7: {run_type} - Failsafe timer expired after sending ArmFailSafe command. ExpiryLengthSeconds was set to {failsafe_expiration_seconds} seconds.'
+            f'Step #7: {run_type} - Failsafe timer expired after sending ArmFailSafe command. '
+            f'ExpiryLengthSeconds was set to {failsafe_expiration_seconds} seconds.'
         )
 
         # TH1 steps #8 through #9 using the function run_steps_8_to_9
@@ -429,7 +431,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         TH2 = TH2_fabric_admin_real.NewController(nodeId=TH2_nodeid)
         newNodeId = self.dut_node_id + 1
 
-        resp = await TH2.FindOrEstablishPASESession(setupCode=setup_qr_code, nodeid=newNodeId)
+        resp = await TH2.FindOrEstablishPASESession(setupCode=setup_qr_code, nodeId=newNodeId)
         logger.info('Step #15 - TH2 successfully establish PASE session completed')
 
         self.step(16)
@@ -497,7 +499,7 @@ class TC_CGEN_2_2(MatterBaseTest):
 
         self.step(22)
         logger.info("Step #22 - TH1 Waiting for PASE session to stabilize...")
-        resp = await TH2.FindOrEstablishPASESession(setupCode=setup_qr_code, nodeid=newNodeId)
+        resp = await TH2.FindOrEstablishPASESession(setupCode=setup_qr_code, nodeId=newNodeId)
         logger.info('Step #22 - TH2 successfully establish PASE session completed')
 
         # This is expected to fail because the device is not fully commissioned.
@@ -766,7 +768,8 @@ class TC_CGEN_2_2(MatterBaseTest):
                 node_id=self.dut_node_id,
                 expiration_time_seconds=failsafe_expiration_seconds)
             logger.info(
-                f'Step #43 {run_type} - Failsafe timer expiration bypassed for TH1 by setting expiration time to {failsafe_expiration_seconds} seconds. '
+                f'Step #43 {run_type} - Failsafe timer expiration bypassed for TH1 by setting '
+                f'expiration time to {failsafe_expiration_seconds} seconds. '
                 f'Test continues without the original wait.'
             )
         else:

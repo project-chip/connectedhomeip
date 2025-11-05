@@ -48,8 +48,6 @@ using namespace chip::Tracing;
 
 namespace chip {
 
-System::Clock::Timeout sAdditionalLitBackoffInterval = System::Clock::Milliseconds32(CHIP_CONFIG_ADDITIONAL_LIT_BACKOFF_INTERVAL);
-
 void OperationalSessionSetup::MoveToState(State aTargetState)
 {
     if (mState != aTargetState)
@@ -296,33 +294,22 @@ void OperationalSessionSetup::UpdateDeviceData(const ResolveResult & result)
     // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
 }
 
-void OperationalSessionSetup::SetAdditionalLitBackoffInterval(const Optional<System::Clock::Milliseconds32> & additionalTime)
-{
-    assertChipStackLockedByCurrentThread();
-    sAdditionalLitBackoffInterval =
-        additionalTime.ValueOr(System::Clock::Milliseconds32(CHIP_CONFIG_ADDITIONAL_LIT_BACKOFF_INTERVAL));
-}
-
-System::Clock::Milliseconds32 OperationalSessionSetup::GetAdditionalLitBackoffInterval()
-{
-    assertChipStackLockedByCurrentThread();
-    return sAdditionalLitBackoffInterval;
-}
-
 CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ResolveResult & result)
 {
     auto config = result.mrpRemoteConfig;
 
     if (result.isICDOperatingAsLIT)
     {
-        // When an ICD operates as a LIT, the SII is missing in DNS-SD advertisement, resulting in
-        // mIdleRetransTimeout being 0, which is not a usable value. Since CASE
-        // is set up for LIT ICDs only when they are active, it is known that
-        // the ICD is in active mode. Therefore, using mActiveRetransTimeout
-        // for the initial message in the exchange is appropriate. If
-        // mActiveRetransTimeout is insufficient, consider increasing it further
-        // using sAdditionalLitBackoffInterval.
-        config.mIdleRetransTimeout = config.mActiveRetransTimeout + sAdditionalLitBackoffInterval;
+        // When an ICD operates as a LIT, the DNS-SD advertisement lacks the Session Idle Interval
+        // (SII). This would cause mIdleRetransTimeout to be 0, which is not a usable value. Since
+        // CASE is established with LIT ICDs only when they are active, we can base
+        // mIdleRetransTimeout on active mode parameters. To ensure sufficient time for MRP
+        // retransmissions, particularly in Thread networks where mActiveRetransTimeout might be too
+        // small, we use the maximum of config.mActiveRetransTimeout and
+        // mInitParams.minimumLITBackoffInterval
+
+        config.mIdleRetransTimeout =
+            std::max(config.mActiveRetransTimeout, System::Clock::Milliseconds32(mInitParams.minimumLITBackoffInterval.ValueOr(0)));
     }
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (mTransportPayloadCapability == TransportPayloadCapability::kLargePayload)

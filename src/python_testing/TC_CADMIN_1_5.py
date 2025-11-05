@@ -135,7 +135,7 @@ class TC_CADMIN_1_5(CADMINBaseTest):
 
         self.step(6)
         revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
-        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
+        await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
         sleep(1)
 
         self.step(7)
@@ -144,7 +144,7 @@ class TC_CADMIN_1_5(CADMINBaseTest):
         self.step(8)
         try:
             revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
-            await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
+            await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
         except IME as e:
             asserts.assert_true(e.clusterStatus, Clusters.AdministratorCommissioning.Enums.StatusCode.kWindowNotOpen,
                                 "Cluster status must be 4 to pass this step as window should be reported as not open")
@@ -156,7 +156,7 @@ class TC_CADMIN_1_5(CADMINBaseTest):
         try:
             cmd = Clusters.AdministratorCommissioning.Commands.OpenCommissioningWindow(
                 iterations=999, discriminator=3045, PAKEPasscodeVerifier=iter999, commissioningTimeout=180, salt=b"SPAKE2P_Key_Salt")
-            await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd, timedRequestTimeoutMs=2000000)
+            await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=cmd, timedRequestTimeoutMs=2000000)
         except IME as e:
             asserts.assert_equal(e.clusterStatus, Clusters.AdministratorCommissioning.Enums.StatusCode.kPAKEParameterError,
                                  f'Failed to open commissioning window due to an unexpected error code of {e.clusterStatus}')
@@ -168,7 +168,7 @@ class TC_CADMIN_1_5(CADMINBaseTest):
         try:
             cmd = Clusters.AdministratorCommissioning.Commands.OpenCommissioningWindow(
                 iterations=100001, discriminator=3045, PAKEPasscodeVerifier=iter100001, commissioningTimeout=180, salt=b"SPAKE2P_Key_Salt")
-            await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd, timedRequestTimeoutMs=2000000)
+            await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=cmd, timedRequestTimeoutMs=2000000)
         except IME as e:
             asserts.assert_equal(e.clusterStatus, Clusters.AdministratorCommissioning.Enums.StatusCode.kPAKEParameterError,
                                  f'Failed to open commissioning window due to an unexpected error code of {e.clusterStatus}')
@@ -180,7 +180,7 @@ class TC_CADMIN_1_5(CADMINBaseTest):
         try:
             cmd = Clusters.AdministratorCommissioning.Commands.OpenCommissioningWindow(
                 iterations=10000, discriminator=3045, PAKEPasscodeVerifier=short_salt, commissioningTimeout=180, salt=b"too_short")
-            await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd, timedRequestTimeoutMs=2000000)
+            await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=cmd, timedRequestTimeoutMs=2000000)
         except IME as e:
             asserts.assert_equal(e.clusterStatus, Clusters.AdministratorCommissioning.Enums.StatusCode.kPAKEParameterError,
                                  f'Failed to open commissioning window due to an unexpected error code of {e.clusterStatus}')
@@ -192,7 +192,7 @@ class TC_CADMIN_1_5(CADMINBaseTest):
         try:
             cmd = Clusters.AdministratorCommissioning.Commands.OpenCommissioningWindow(
                 iterations=10000, discriminator=3045, PAKEPasscodeVerifier=long_salt, commissioningTimeout=180, salt=b"'this pake salt very very very long'")
-            await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd, timedRequestTimeoutMs=2000000)
+            await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=cmd, timedRequestTimeoutMs=2000000)
         except IME as e:
             asserts.assert_equal(e.clusterStatus, Clusters.AdministratorCommissioning.Enums.StatusCode.kPAKEParameterError,
                                  f'Failed to open commissioning window due to an unexpected error code of {e.clusterStatus}')
@@ -219,7 +219,7 @@ class TC_CADMIN_1_5(CADMINBaseTest):
         self.step(16)
         try:
             revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
-            await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
+            await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
         except IME as e:
             asserts.assert_equal(e.clusterStatus, Clusters.AdministratorCommissioning.Enums.StatusCode.kWindowNotOpen,
                                  f'Failed to open commissioning window due to an unexpected error code of {e.clusterStatus}')
@@ -227,7 +227,7 @@ class TC_CADMIN_1_5(CADMINBaseTest):
         self.step(17)
         TH2_fabric_index = await self.read_single_attribute_check_success(dev_ctrl=self.th2, endpoint=0, cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)
         removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(TH2_fabric_index)
-        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
+        await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
 
 
 if __name__ == "__main__":

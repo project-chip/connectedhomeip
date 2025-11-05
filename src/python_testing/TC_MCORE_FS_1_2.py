@@ -186,7 +186,7 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
             (root_endpoint, Clusters.Descriptor.Attributes.PartsList)
         ]
         self._partslist_subscription = await self.default_controller.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=subscription_contents,
             reportInterval=(min_report_interval_sec, max_report_interval_sec),
             keepSubscriptions=True
