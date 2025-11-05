@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 class TC_DD_3_23(MatterBaseTest):
     def desc_TC_DD_3_23(self) -> str:
-        return " [TC-DD-3.23] NFC-based commissioning [DUT as Commissionee]"
+        return "[TC-DD-3.23] NFC-based commissioning [DUT as Commissionee]"
 
     def steps_TC_DD_3_23(self) -> list[TestStep]:
         return [

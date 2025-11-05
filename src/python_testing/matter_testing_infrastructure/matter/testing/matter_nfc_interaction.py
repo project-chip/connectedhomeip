@@ -286,7 +286,7 @@ def connect_read_nfc_tag_data(nfc_reader_index: int) -> str:
         nfc_reader_index (int): Index of the NFC reader to use from the available readers.
 
     Returns:
-        str: The decoded NDEF record data with non-printable characters removed.
+        str: The decoded NDEF record data.
 
     Raises:
         AssertionError: If no NFC readers are found or if any message transmission fails.
