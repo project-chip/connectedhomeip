@@ -182,7 +182,7 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
                             CastingPlayer::GetTargetCastingPlayer()->mOnCompleted(error, nullptr);
                             mTargetCastingPlayer.reset();
                         });
-                    return; // FindOrEstablishSession called. Return early.                  
+                    return; // FindOrEstablishSession called. Return early.
                 }
             }
         }
