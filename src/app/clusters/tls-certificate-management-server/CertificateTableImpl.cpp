@@ -579,7 +579,7 @@ CHIP_ERROR CertificateTableImpl::RemoveFabric(FabricIndex fabric)
     // We want to release as many resources as possible; if anything fails,
     // hold on to the error until we've had a chance to try to free other resources
     CHIP_ERROR clientResult = mClientCertificates.RemoveFabric(fabric).NoErrorIf(CHIP_ERROR_NOT_FOUND);
-    CHIP_ERROR rootResult   = mRootCertificates.RemoveFabric(fabric).NoErroIf(CHIP_ERROR_NOT_FOUND);
+    CHIP_ERROR rootResult   = mRootCertificates.RemoveFabric(fabric).NoErrorIf(CHIP_ERROR_NOT_FOUND);
 
     GlobalCertificateData globalData(mEndpointId);
     CHIP_ERROR globalDataResult = globalData.Load(mStorage);
