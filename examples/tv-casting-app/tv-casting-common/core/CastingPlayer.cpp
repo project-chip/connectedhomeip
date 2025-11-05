@@ -332,10 +332,10 @@ void CastingPlayer::resetState(CHIP_ERROR err)
     support::ChipDeviceEventHandler::SetUdcStatus(false);
     mConnectionState               = CASTING_PLAYER_NOT_CONNECTED;
     mCommissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec;
-    
+
     // Unregister from CommissioningWindowManager when unsetting mTargetCastingPlayer
     chip::Server::GetInstance().GetCommissioningWindowManager().SetAppDelegate(nullptr);
-    
+
     mTargetCastingPlayer.reset();
     if (mOnCompleted)
     {
@@ -349,10 +349,10 @@ void CastingPlayer::Disconnect()
 {
     ChipLogProgress(AppServer, "CastingPlayer::Disconnect()");
     mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
-    
+
     // Unregister from CommissioningWindowManager when unsetting mTargetCastingPlayer
     chip::Server::GetInstance().GetCommissioningWindowManager().SetAppDelegate(nullptr);
-    
+
     mTargetCastingPlayer.reset();
     CastingPlayerDiscovery::GetInstance()->ClearCastingPlayersInternal();
 }
