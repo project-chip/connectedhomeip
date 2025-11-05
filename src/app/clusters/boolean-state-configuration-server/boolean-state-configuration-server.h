@@ -23,6 +23,8 @@
 
 #include <app/clusters/boolean-state-configuration-server/boolean-state-configuration-cluster.h>
 #include <app/clusters/boolean-state-configuration-server/boolean-state-configuration-delegate.h>
+#include <lib/core/CHIPError.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {
@@ -58,15 +60,16 @@ inline CHIP_ERROR SetAlarmsActive(EndpointId ep, chip::BitMask<AlarmModeBitmap> 
 {
     auto cluster = FindClusterOnEndpoint(ep);
     VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_NO_ENDPOINT);
-    cluster->SetAlarmsActive(alarms);
-    return CHIP_NO_ERROR;
+    auto status = cluster->SetAlarmsActive(alarms);
+    return (status == Protocols::InteractionModel::Status::Success) ? CHIP_NO_ERROR : CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(status);
 }
 
 inline CHIP_ERROR SetAllEnabledAlarmsActive(EndpointId ep)
 {
     auto cluster = FindClusterOnEndpoint(ep);
     VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_NO_ENDPOINT);
-    return cluster->SetAllEnabledAlarmsActive();
+    auto status = cluster->SetAllEnabledAlarmsActive();
+    return (status == Protocols::InteractionModel::Status::Success) ? CHIP_NO_ERROR : CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(status);
 }
 
 inline CHIP_ERROR ClearAllAlarms(EndpointId ep)
@@ -81,8 +84,8 @@ inline CHIP_ERROR SuppressAlarms(EndpointId ep, chip::BitMask<BooleanStateConfig
 {
     auto cluster = FindClusterOnEndpoint(ep);
     VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_NO_ENDPOINT);
-    cluster->SuppressAlarms(alarms);
-    return CHIP_NO_ERROR;
+    auto status = cluster->SuppressAlarms(alarms);
+    return (status == Protocols::InteractionModel::Status::Success) ? CHIP_NO_ERROR : CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(status);
 }
 
 inline CHIP_ERROR SetCurrentSensitivityLevel(EndpointId ep, uint8_t level)

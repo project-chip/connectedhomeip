@@ -22,6 +22,7 @@ source_set("boolean-state-configuration-server") {
   ]
 
   public_deps = [
+    "${chip_root}/src/app:attribute-persistence",
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/zzz_generated/app-common/clusters/BooleanStateConfiguration",
   ]

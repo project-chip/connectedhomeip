@@ -23,73 +23,47 @@
 
 namespace chip::app::Clusters {
 
-class BooleanStateConfigurationCluster : public DefaultServerCluster {
+class BooleanStateConfigurationCluster : public DefaultServerCluster
+{
 public:
-    using OptionalAttributesSet = OptionalAttributeSet< //
+    using OptionalAttributesSet = OptionalAttributeSet<                     //
         BooleanStateConfiguration::Attributes::DefaultSensitivityLevel::Id, // optional if sensitivity level feature is enabled
-        BooleanStateConfiguration::Attributes::AlarmsEnabled::Id, // optional if VIS or Aud enabled
-        BooleanStateConfiguration::Attributes::SensorFault::Id // fully optional
+        BooleanStateConfiguration::Attributes::AlarmsEnabled::Id,           // optional if VIS or Aud enabled
+        BooleanStateConfiguration::Attributes::SensorFault::Id              // fully optional
         >;
 
-    using AlarmModeBitMask = chip::BitMask<BooleanStateConfiguration::AlarmModeBitmap>;
+    using AlarmModeBitMask   = chip::BitMask<BooleanStateConfiguration::AlarmModeBitmap>;
     using SensorFaultBitMask = chip::BitMask<BooleanStateConfiguration::SensorFaultBitmap>;
 
     BooleanStateConfigurationCluster(EndpointId endpointId, BitMask<BooleanStateConfiguration::Feature> features,
-        OptionalAttributesSet optionalAttributes)
-        : DefaultServerCluster({ endpointId, BooleanStateConfiguration::Id })
-        , mFeatures(features)
-        , mOptionalAttributes(optionalAttributes)
-    {
-    }
+                                     OptionalAttributesSet optionalAttributes) :
+        DefaultServerCluster({ endpointId, BooleanStateConfiguration::Id }), mFeatures(features),
+        mOptionalAttributes(optionalAttributes)
+    {}
 
     const BitMask<BooleanStateConfiguration::Feature> & GetFeatures() const { return mFeatures; }
 
     void SetDelegate(BooleanStateConfiguration::Delegate * delegate) { mDelegate = delegate; }
     BooleanStateConfiguration::Delegate * GetDelegate() const { return mDelegate; }
 
-    void SetAlarmsActive(AlarmModeBitMask alarms)
-    {
-        VerifyOrReturn(alarms != mAlarmsActive);
-        mAlarmsActive = alarms;
-        NotifyAttributeChanged(BooleanStateConfiguration::Attributes::AlarmsActive::Id);
-    }
-
-    void SuppressAlarms(AlarmModeBitMask alarms)
-    {
-        VerifyOrReturn(alarms != mAlarmsSuppressed);
-        mAlarmsSuppressed = alarms;
-        NotifyAttributeChanged(BooleanStateConfiguration::Attributes::AlarmsSuppressed::Id);
-    }
-    void SetCurrentSensitivityLevel(uint8_t level)
-    {
-        VerifyOrReturn(mCurrentSensitivityLevel != level);
-        mCurrentSensitivityLevel = level;
-        NotifyAttributeChanged(BooleanStateConfiguration::Attributes::CurrentSensitivityLevel::Id);
-    }
-    void ClearAllAlarms()
-    {
-        VerifyOrReturn(mAlarmsActive.Raw() != 0);
-        mAlarmsActive.ClearAll();
-        NotifyAttributeChanged(BooleanStateConfiguration::Attributes::AlarmsActive::Id);
-    }
-
-    void EmitSensorFault(SensorFaultBitMask fault) {
-        VerifyOrReturn(mSensorFault != fault);
-        mSensorFault = fault;
-        NotifyAttributeChanged(BooleanStateConfiguration::Attributes::SensorFault::Id);
-    }
-
-    CHIP_ERROR SetAllEnabledAlarmsActive() {
-        // FIXME: how do I figure this one out ???
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
+    Protocols::InteractionModel::Status SetAlarmsActive(AlarmModeBitMask alarms);
+    Protocols::InteractionModel::Status SuppressAlarms(AlarmModeBitMask alarms);
+    CHIP_ERROR SetCurrentSensitivityLevel(uint8_t level);
+    void ClearAllAlarms();
+    void EmitSensorFault(SensorFaultBitMask fault);
+    Protocols::InteractionModel::Status SetAllEnabledAlarmsActive();
 
     // ServerClusterInterface/DefaultServerCluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
-        AttributeValueEncoder & encoder) override;
+                                                AttributeValueEncoder & encoder) override;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
-        AttributeValueDecoder & decoder) override;
+                                                 AttributeValueDecoder & decoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               chip::TLV::TLVReader & input_arguments,
+                                                               CommandHandler * handler) override;
 
 private:
     const BitMask<BooleanStateConfiguration::Feature> mFeatures;
@@ -97,14 +71,16 @@ private:
     BooleanStateConfiguration::Delegate * mDelegate = nullptr;
 
     // attributes that are maintained by this cluster
-    uint8_t mCurrentSensitivityLevel = 0;
+    uint8_t mCurrentSensitivityLevel    = 0;
     uint8_t mSupportedSensitivityLevels = 2;
-    uint8_t mDefaultSensitivityLevel = 0;
-    AlarmModeBitMask mAlarmsActive { 0 };
-    AlarmModeBitMask mAlarmsSuppressed { 0 };
-    AlarmModeBitMask mAlarmsEnabled { 0 };
-    AlarmModeBitMask mAlarmsSupported { 0 };
-    SensorFaultBitMask mSensorFault { 0 };
+    uint8_t mDefaultSensitivityLevel    = 0;
+    AlarmModeBitMask mAlarmsActive{ 0 };
+    AlarmModeBitMask mAlarmsSuppressed{ 0 };
+    AlarmModeBitMask mAlarmsEnabled{ 0 };
+    AlarmModeBitMask mAlarmsSupported{ 0 };
+    SensorFaultBitMask mSensorFault{ 0 };
+
+    void EmitAlarmsStateChangedEvent();
 };
 
 } // namespace chip::app::Clusters
