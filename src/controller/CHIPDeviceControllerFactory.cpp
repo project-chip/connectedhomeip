@@ -333,7 +333,8 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         .groupDataProvider         = stateParams.groupDataProvider,
         // Don't provide an MRP local config, so each CASE initiation will use
         // the then-current value.
-        .mrpLocalConfig = NullOptional,
+        .mrpLocalConfig            = NullOptional,
+        .minimumLITBackoffInterval = params.minimumLITBackoffInterval,
     };
 
     CASESessionManagerConfig sessionManagerConfig = {

@@ -52,6 +52,9 @@ struct CertificateId
 
     bool IsValid() { return (mCertificateId != kUndefinedCertificateId); }
 
+    uint16_t & Value() { return mCertificateId; }
+    const uint16_t & Value() const { return mCertificateId; }
+
     bool operator==(const CertificateId & other) const { return (mCertificateId == other.mCertificateId); }
 };
 

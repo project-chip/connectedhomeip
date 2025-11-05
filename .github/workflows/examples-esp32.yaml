@@ -37,7 +37,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32:172
+            image: ghcr.io/project-chip/chip-build-esp32:174
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -55,8 +55,10 @@ jobs:
               with:
                 gh-context: ${{ toJson(github) }}
 
-            # Install esp-idf-kconfig==2.5.0 in the virtual environment here
-            # so it will not affect other workflows
+            # We cannot add esp-idf-kconfig==2.5.0 to rquirements.txt because it
+            # will break the nuttx workflow which requires the older version of
+            # the kconfiglib and esp-idf-kconfig==2.5.0 installs newer version
+            # so, install it in in the virtual environment here
             - name: Install esp-idf-kconfig
               run: |
                   ./scripts/run_in_build_env.sh \
@@ -78,6 +80,9 @@ jobs:
                      esp32 c3devkit all-clusters-app \
                      out/esp32-c3devkit-all-clusters/chip-all-clusters-app.elf \
                      /tmp/bloat_reports/
+
+            - name: Remove built artifacts for all-clusters
+              run: rm -rf out/esp32-c3devkit-all-clusters
 
             - name: Prepare code pregen and ensure compile time pregen not possible
               run: |
@@ -103,6 +108,9 @@ jobs:
                   rm -rf ./zzz_pregenerated
                   mv scripts/codegen.py.renamed scripts/codegen.py
                   mv scripts/tools/zap/generate.py.renamed scripts/tools/zap/generate.py
+
+            - name: Remove built artifacts for all-clusters-minimal
+              run: rm -rf out/esp32-m5stack-all-clusters-minimal
 
             - name: Check for changed paths
               uses: dorny/paths-filter@v3
@@ -139,6 +147,9 @@ jobs:
                         --copy-artifacts-to out/artifacts \
                      "
 
+            - name: Remove built artifacts for all-clusters-rpc-ipv6only
+              run: rm -rf out/esp32-devkitc-all-clusters-rpc-ipv6only
+
             - name: Build example Lighting App (Target:ESP32C6)
               run: scripts/examples/esp_example.sh lighting-app sdkconfig.wifi_thread.defaults esp32c6
 
@@ -166,7 +177,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]' &&  github.repository_owner == 'espressif'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32:172
+            image: ghcr.io/project-chip/chip-build-esp32:174
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 

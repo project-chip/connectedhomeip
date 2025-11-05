@@ -90,7 +90,8 @@ extern "C" void __wrap_exit(int __status)
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 extern "C" int wlan_event_callback(enum wlan_event_reason reason, void * data)
 {
-    return 0;
+    /* Could be called by wifi driver for specific event scenarios like when the driver hangs */
+    return chip::DeviceLayer::ConnectivityMgrImpl()._WlanEventCallback(reason, data);
 }
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_WPA */
 

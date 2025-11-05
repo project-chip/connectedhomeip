@@ -67,6 +67,8 @@ not_automated:
       reason: Shared code for TC_SEPR, not a standalone test
     - name: TC_SETRF_TestBase.py
       reason: Shared code for TC_SETRF, not a standalone test
+    - name: TC_SUTestBase.py
+      reason: Shared code for TC_SU, not a standalone test
     - name: TC_COMMTR_TestBase.py
       reason: Shared code for TC_COMMTR, not a standalone test
     - name: TC_MTRIDTestBase.py
@@ -130,6 +132,9 @@ not_automated:
       reason: Depends on a browser peer for webrtc. CI is not supported.
     - name: TC_CHIMETestBase.py
       reason: Shared code for the Chime Cluster, not a standalone test.
+    - name: TC_WEBRTCRTestBase.py
+      reason:
+          Shared code for the WebRTC Requestor Cluster, not a standalone test.
     - name: TC_WEBRTCPTestBase.py
       reason:
           Shared code for the WebRTC Provider Cluster, not a standalone test.

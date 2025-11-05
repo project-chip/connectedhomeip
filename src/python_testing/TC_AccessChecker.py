@@ -299,7 +299,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                 # Use an empty list for writes in case the list is large and does not fit
                 val = []
 
-            resp = await self.TH2.WriteAttribute(nodeid=self.dut_node_id, attributes=[(endpoint_id, attribute(val))])
+            resp = await self.TH2.WriteAttribute(nodeId=self.dut_node_id, attributes=[(endpoint_id, attribute(val))])
             if spec_requires == Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue:
                 # not writeable - expect either an unsupported write response or an unsupported access response (since ACL privilege check happens before writable check)
                 if resp[0].Status not in (Status.UnsupportedWrite, Status.UnsupportedAccess):
@@ -328,7 +328,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             if resp[0].Status == Status.Success and isinstance(val, list):
                 # Reset the value to the original if we managed to write an empty list
                 val = wildcard_read.attributes[endpoint_id][cluster_class][attribute]
-                await self.TH2.WriteAttribute(nodeid=self.dut_node_id, attributes=[(endpoint_id, attribute(val))])
+                await self.TH2.WriteAttribute(nodeId=self.dut_node_id, attributes=[(endpoint_id, attribute(val))])
 
     async def run_access_test(self, test_type: AccessTestType):
         # Step precondition, 1 and 2 are handled in the class setup, but need to be marked for every test

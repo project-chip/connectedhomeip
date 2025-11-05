@@ -229,6 +229,7 @@ config CHIP_ENABLE_APPLICATION_STATUS_LED
 
 config CHIP_ENABLE_PM_DURING_BLE
 	bool "Enable PM during BLE operation"
+	default n if SOC_RISCV_TELINK_W91
 	default PM
 	help
 	  Enable PM during BLE operation.
@@ -247,7 +248,7 @@ config CHIP_ENABLE_POWER_ON_FACTORY_RESET
 config CHIP_TASK_STACK_SIZE
 	int
 	default 6192 if SOC_RISCV_TELINK_TL321X
-	default 5480 if PM
+	default 5480 if PM && !SOC_RISCV_TELINK_W91
 	default 8448
 
 config CHIP_USE_MARS_SENSOR

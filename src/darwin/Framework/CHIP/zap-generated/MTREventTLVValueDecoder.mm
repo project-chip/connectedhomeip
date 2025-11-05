@@ -5055,6 +5055,17 @@ static id _Nullable DecodeEventPayloadForContentControlCluster(EventId aEventId,
 
         return value;
     }
+    case Events::EnteringBlockContentTimeWindow::Id: {
+        Events::EnteringBlockContentTimeWindow::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRContentControlClusterEnteringBlockContentTimeWindowEvent new];
+
+        return value;
+    }
     default: {
         // Not a known ContentControl event.
         break;

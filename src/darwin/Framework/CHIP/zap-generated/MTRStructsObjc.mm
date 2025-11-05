@@ -9563,6 +9563,141 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRContentControlClusterTimePeriodStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _startHour = @(0);
+
+        _startMinute = @(0);
+
+        _endHour = @(0);
+
+        _endMinute = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRContentControlClusterTimePeriodStruct alloc] init];
+
+    other.startHour = self.startHour;
+    other.startMinute = self.startMinute;
+    other.endHour = self.endHour;
+    other.endMinute = self.endMinute;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: startHour:%@; startMinute:%@; endHour:%@; endMinute:%@; >", NSStringFromClass([self class]), _startHour, _startMinute, _endHour, _endMinute];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRContentControlClusterTimeWindowStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _timeWindowIndex = nil;
+
+        _dayOfWeek = @(0);
+
+        _timePeriod = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRContentControlClusterTimeWindowStruct alloc] init];
+
+    other.timeWindowIndex = self.timeWindowIndex;
+    other.dayOfWeek = self.dayOfWeek;
+    other.timePeriod = self.timePeriod;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: timeWindowIndex:%@; dayOfWeek:%@; timePeriod:%@; >", NSStringFromClass([self class]), _timeWindowIndex, _dayOfWeek, _timePeriod];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRContentControlClusterAppInfoStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _catalogVendorID = @(0);
+
+        _applicationID = @"";
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRContentControlClusterAppInfoStruct alloc] init];
+
+    other.catalogVendorID = self.catalogVendorID;
+    other.applicationID = self.applicationID;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: catalogVendorID:%@; applicationID:%@; >", NSStringFromClass([self class]), _catalogVendorID, _applicationID];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRContentControlClusterBlockChannelStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _blockChannelIndex = nil;
+
+        _majorNumber = @(0);
+
+        _minorNumber = @(0);
+
+        _identifier = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRContentControlClusterBlockChannelStruct alloc] init];
+
+    other.blockChannelIndex = self.blockChannelIndex;
+    other.majorNumber = self.majorNumber;
+    other.minorNumber = self.minorNumber;
+    other.identifier = self.identifier;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: blockChannelIndex:%@; majorNumber:%@; minorNumber:%@; identifier:%@; >", NSStringFromClass([self class]), _blockChannelIndex, _majorNumber, _minorNumber, _identifier];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRContentControlClusterRatingNameStruct
 - (instancetype)init
 {
@@ -9604,6 +9739,29 @@ NS_ASSUME_NONNULL_BEGIN
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRContentControlClusterRemainingScreenTimeExpiredEvent alloc] init];
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRContentControlClusterEnteringBlockContentTimeWindowEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRContentControlClusterEnteringBlockContentTimeWindowEvent alloc] init];
 
     return other;
 }

@@ -2287,6 +2287,35 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
+@interface MTRContentControlClusterTimePeriodStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull startHour MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull startMinute MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull endHour MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull endMinute MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRContentControlClusterTimeWindowStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nullable timeWindowIndex MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull dayOfWeek MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull timePeriod MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRContentControlClusterAppInfoStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull catalogVendorID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull applicationID MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRContentControlClusterBlockChannelStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nullable blockChannelIndex MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull majorNumber MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull minorNumber MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable identifier MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
 @interface MTRContentControlClusterRatingNameStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSString * _Nonnull ratingName MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSString * _Nullable ratingNameDesc MTR_PROVISIONALLY_AVAILABLE;
@@ -2294,6 +2323,10 @@ MTR_PROVISIONALLY_AVAILABLE
 
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRContentControlClusterRemainingScreenTimeExpiredEvent : NSObject <NSCopying>
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRContentControlClusterEnteringBlockContentTimeWindowEvent : NSObject <NSCopying>
 @end
 
 MTR_PROVISIONALLY_AVAILABLE

@@ -17603,6 +17603,134 @@ static id _Nullable DecodeAttributeValueForContentControlCluster(AttributeId aAt
         value = [NSNumber numberWithBool:cppValue];
         return value;
     }
+    case Attributes::BlockChannelList::Id: {
+        using TypeInfo = Attributes::BlockChannelList::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRContentControlClusterBlockChannelStruct * newElement_0;
+                newElement_0 = [MTRContentControlClusterBlockChannelStruct new];
+                if (entry_0.blockChannelIndex.IsNull()) {
+                    newElement_0.blockChannelIndex = nil;
+                } else {
+                    newElement_0.blockChannelIndex = [NSNumber numberWithUnsignedShort:entry_0.blockChannelIndex.Value()];
+                }
+                newElement_0.majorNumber = [NSNumber numberWithUnsignedShort:entry_0.majorNumber];
+                newElement_0.minorNumber = [NSNumber numberWithUnsignedShort:entry_0.minorNumber];
+                if (entry_0.identifier.HasValue()) {
+                    newElement_0.identifier = AsString(entry_0.identifier.Value());
+                    if (newElement_0.identifier == nil) {
+                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                        *aError = err;
+                        return nil;
+                    }
+                } else {
+                    newElement_0.identifier = nil;
+                }
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
+    case Attributes::BlockApplicationList::Id: {
+        using TypeInfo = Attributes::BlockApplicationList::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRContentControlClusterAppInfoStruct * newElement_0;
+                newElement_0 = [MTRContentControlClusterAppInfoStruct new];
+                newElement_0.catalogVendorID = [NSNumber numberWithUnsignedShort:entry_0.catalogVendorID];
+                newElement_0.applicationID = AsString(entry_0.applicationID);
+                if (newElement_0.applicationID == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
+    case Attributes::BlockContentTimeWindow::Id: {
+        using TypeInfo = Attributes::BlockContentTimeWindow::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRContentControlClusterTimeWindowStruct * newElement_0;
+                newElement_0 = [MTRContentControlClusterTimeWindowStruct new];
+                if (entry_0.timeWindowIndex.IsNull()) {
+                    newElement_0.timeWindowIndex = nil;
+                } else {
+                    newElement_0.timeWindowIndex = [NSNumber numberWithUnsignedShort:entry_0.timeWindowIndex.Value()];
+                }
+                newElement_0.dayOfWeek = [NSNumber numberWithUnsignedChar:entry_0.dayOfWeek.Raw()];
+                { // Scope for our temporary variables
+                    auto * array_2 = [NSMutableArray new];
+                    auto iter_2 = entry_0.timePeriod.begin();
+                    while (iter_2.Next()) {
+                        auto & entry_2 = iter_2.GetValue();
+                        MTRContentControlClusterTimePeriodStruct * newElement_2;
+                        newElement_2 = [MTRContentControlClusterTimePeriodStruct new];
+                        newElement_2.startHour = [NSNumber numberWithUnsignedChar:entry_2.startHour];
+                        newElement_2.startMinute = [NSNumber numberWithUnsignedChar:entry_2.startMinute];
+                        newElement_2.endHour = [NSNumber numberWithUnsignedChar:entry_2.endHour];
+                        newElement_2.endMinute = [NSNumber numberWithUnsignedChar:entry_2.endMinute];
+                        [array_2 addObject:newElement_2];
+                    }
+                    CHIP_ERROR err = iter_2.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        *aError = err;
+                        return nil;
+                    }
+                    newElement_0.timePeriod = array_2;
+                }
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
+        return value;
+    }
     default: {
         // Not a known ContentControl attribute.
         break;

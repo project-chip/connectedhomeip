@@ -1849,6 +1849,17 @@ using CHIP_ERROR = ::chip::ChipError;
 // of error codes to strings in CHIPError.cpp, and add them to kTestElements[]
 // in core/tests/TestCHIPErrorStr.cpp
 
+// Prior to ChipError being marked [[nodiscard]], there were numerous places
+// where the return value was ignored.
+// This grandfathers those usages.
+// NEW CODE SHOULD NOT USE THIS
+#define TEMPORARY_RETURN_IGNORED (void)
+
+// Explicitly ignores a ChipError returned from a method, if a failure can be safely ignored.
+// USE WITH EXTREME CAUTION
+// LogOnFailure may be a better approach
+#define RETURN_SAFELY_IGNORED (void)
+
 namespace chip {
 
 extern void RegisterCHIPLayerErrorFormatter();

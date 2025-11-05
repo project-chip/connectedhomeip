@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -475,7 +476,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             TH2.Shutdown()
 
     async def _read_all_events_attributes(self):
-        return await self.default_controller.Read(nodeid=self.dut_node_id, attributes=[()], events=[()])
+        return await self.default_controller.Read(nodeId=self.dut_node_id, attributes=[()], events=[()])
 
     async def _read_data_version_filter_multiple_clusters(self, endpoint, cluster, attribute, other_cluster, other_attribute):
         read_a = await self.default_controller.ReadAttribute(
