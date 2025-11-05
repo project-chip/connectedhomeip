@@ -16,7 +16,7 @@
  */
 
 #include "CommonDACProvider.h"
-#include <platform/realtek/BEE/RTK/RTKDACVendorProvider.h>
+#include <platform/realtek/freertos/RTK/RTKDACVendorProvider.h>
 
 using namespace chip::DeviceLayer;
 

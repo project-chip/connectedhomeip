@@ -403,7 +403,7 @@ class PAVSTTestBase:
         self.th1 = self.default_controller
         self.discriminator = random.randint(0, 4095)
         params = await self.th1.OpenCommissioningWindow(
-            nodeid=self.dut_node_id, timeout=900, iteration=10000, discriminator=self.discriminator, option=1)
+            nodeId=self.dut_node_id, timeout=900, iteration=10000, discriminator=self.discriminator, option=1)
 
         th2_certificate_authority = (
             self.certificate_authority_manager.NewCertificateAuthority()
@@ -432,7 +432,7 @@ class PAVSTTestBase:
     async def psvt_remove_current_fabric(self, devCtrl):
         fabric_idx_cr2_2 = await self.read_currentfabricindex(th=devCtrl)
         removeFabricCmd2 = Clusters.OperationalCredentials.Commands.RemoveFabric(fabric_idx_cr2_2)
-        resp = await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd2)
+        resp = await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=removeFabricCmd2)
         return resp
         asserts.assert_equal(
             resp.statusCode, Clusters.OperationalCredentials.Enums.NodeOperationalCertStatusEnum.kOk, "Expected removal of TH2's fabric to succeed")

@@ -17,6 +17,7 @@
 
 import random
 import string
+from datetime import timedelta
 
 import test_plan_support
 # === BEGIN CI TEST ARGUMENTS ===
@@ -53,6 +54,11 @@ class TC_TLSCLIENT(MatterBaseTest):
         def __init__(self, cr1_cmd: TLSUtils, cr2_cmd: TLSUtils):
             self.cr1_cmd = cr1_cmd
             self.cr2_cmd = cr2_cmd
+
+    # This test creates the maximum number of endpoints, which can take some time
+    @property
+    def default_timeout(self) -> int:
+        return timedelta(minutes=5).total_seconds()
 
     async def common_setup(self):
         self.step(1)

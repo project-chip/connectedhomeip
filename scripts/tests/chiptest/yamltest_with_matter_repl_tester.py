@@ -39,7 +39,7 @@ from matter.ChipStack import ChipStack
 from matter.storage import PersistentStorageJSON
 from matter.yaml.runner import ReplTestRunner
 from matter.yamltests.definitions import SpecDefinitionsFromPaths
-from matter.yamltests.parser import PostProcessCheckStatus, TestParser, TestParserConfig
+from matter.yamltests.parser import PostProcessCheckStatus, TestParser, TestParserConfig, build_revision_var_name
 
 _DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", ".."))
@@ -54,6 +54,21 @@ async def execute_test(yaml, runner):
     for test_step in yaml.tests:
         if not test_step.is_pics_enabled:
             continue
+
+        if not test_step.is_revision_condition_passed:
+            # Try to get the var name and value for a more informative message
+            try:
+                var_name = build_revision_var_name(
+                    test_step.endpoint, test_step.cluster)
+                current_val = test_step.get_runtime_variable(var_name)
+            except (ValueError, IndexError, KeyError):
+                current_val = "unknown"
+
+            logging.warning(f"Step {test_step.label} skipped due to ClusterRevision range not matching (val={current_val}, "
+                            f"min={test_step.min_revision}, "
+                            f"max={test_step.max_revision})")
+            continue
+
         test_action = runner.encode(test_step)
         if test_action is None:
             raise Exception(

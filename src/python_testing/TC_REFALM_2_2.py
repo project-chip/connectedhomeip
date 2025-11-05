@@ -139,7 +139,7 @@ class TC_REFALM_2_2(MatterBaseTest):
         status on InteractionModel is returned. For this test we consider the status 0x0 as not succesfull."""
         cmd_status = Status.Success
         try:
-            await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=self.endpoint, payload=cmd)
+            await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=self.endpoint, payload=cmd)
         except InteractionModelError as uc:
             cmd_status = uc.status
         return cmd_status
