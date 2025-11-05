@@ -354,7 +354,7 @@ CHIP_ERROR Dump(const TLVReader & aReader, DumpWriter aWriter)
     void * context          = nullptr;
     DumpContext dumpContext = { aWriter, context };
 
-    return SuppressEndOfTLV(Utilities::Iterate(aReader, DumpHandler, &dumpContext));
+    return Utilities::Iterate(aReader, DumpHandler, &dumpContext).NoErrorIf(CHIP_END_OF_TLV);
 }
 
 } // namespace Debug
