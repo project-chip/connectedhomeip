@@ -151,7 +151,7 @@ class Executor:
         return s, outpipe, errpipe
 
 
-class LinuxNamespacedExecutor(Runner):
+class LinuxNamespacedExecutor(Executor):
     def __init__(self, ns):
         self.ns = ns
 
