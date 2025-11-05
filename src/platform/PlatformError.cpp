@@ -21,8 +21,6 @@
 #include <lib/core/ErrorStr.h>
 
 #include <string.h>
-#include <mutex>
-#define CHIP_HAVE_STD_MUTEX 1
 
 namespace chip {
 namespace Platform {
@@ -55,44 +53,17 @@ const char * DescribePlatformError(CHIP_ERROR aError)
 #else
     static char errBuf[128];
 #endif // CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE
-    // Try the POSIX/XSI strerror_r variant (int strerror_r(int, char*, size_t)).
-#if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200112L && !defined(_GNU_SOURCE)
-    if (strerror_r(lError, errBuf, sizeof(errBuf)) == 0)
+    // Use strerror() and copy into a thread-local buffer. We intentionally do
+    // not attempt to use strerror_r here to avoid cross-toolchain incompatibilities
+    // between the POSIX (int) and GNU (char*) variants.
+
+    const char * s = strerror(lError);
+    if (s != nullptr)
     {
+        strncpy(errBuf, s, sizeof(errBuf) - 1);
+        errBuf[sizeof(errBuf) - 1] = '\0';
         return errBuf;
     }
-#elif defined(_GNU_SOURCE) || defined(__GLIBC__)
-    {
-        // GNU variant: char *strerror_r(int, char*, size_t)
-        char * s = strerror_r(lError, errBuf, sizeof(errBuf));
-        if (s != nullptr)
-        {
-            if (s != errBuf)
-            {
-                strncpy(errBuf, s, sizeof(errBuf) - 1);
-                errBuf[sizeof(errBuf) - 1] = '\0';
-            }
-            return errBuf;
-        }
-    }
-#else
-    // No strerror_r declared: fall back to strerror(). To make this safe in
-    // multi-threaded builds, serialize access to strerror() if std::mutex is
-    // available; otherwise do an unprotected copy (best-effort).
-#  ifdef CHIP_HAVE_STD_MUTEX
-    static std::mutex s_strerror_mutex;
-    std::lock_guard<std::mutex> lock(s_strerror_mutex);
-#  endif
-    {
-        const char * s = strerror(lError);
-        if (s != nullptr)
-        {
-            strncpy(errBuf, s, sizeof(errBuf) - 1);
-            errBuf[sizeof(errBuf) - 1] = '\0';
-            return errBuf;
-        }
-    }
-#endif
 
     return "Unknown platform error";
 }
