@@ -416,7 +416,6 @@ void ICDManagementServer::Init(PersistentStorageDelegate & storage, Crypto::Symm
     mICDConfigurationData = &icdConfigurationData;
 }
 
-
 void ICDManagementServer::OnICDModeChange()
 {
     // Notify attribute change for OperatingMode attribute
