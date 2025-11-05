@@ -40,8 +40,9 @@ source_set("ota-requestor") {
 
   public_deps = [
     "${chip_root}/src/app/clusters/basic-information",
-    "${chip_root}/src/controller:interactions",
+    "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/controller:interactions",
     "${chip_root}/zzz_generated/app-common/clusters/OtaSoftwareUpdateRequestor",
   ]
 }
