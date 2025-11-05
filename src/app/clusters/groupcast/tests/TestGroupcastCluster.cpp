@@ -115,10 +115,11 @@ TEST_F(TestGroupcastCluster, TestJoinGroupCommand)
     cmdData.gracePeriod     = MakeOptional(0U);
     cmdData.useAuxiliaryACL = MakeOptional(true);
 
+    chip::app::Testing::MockCommandHandler cmdHandler;
     chip::Test::ClusterTester tester(cluster);
-    auto status = tester.Invoke(Commands::JoinGroup::Id, cmdData);
-    ASSERT_TRUE(status.has_value());
-    EXPECT_EQ(status.value().GetStatusCode().GetStatus(),
+    auto result = tester.Invoke(Commands::JoinGroup::Id, cmdData, &cmdHandler);
+    ASSERT_TRUE(result.has_value());
+    EXPECT_EQ(result.value().GetStatusCode().GetStatus(),    // NOLINT(bugprone-unchecked-optional-access)
               Protocols::InteractionModel::Status::Failure); // Currently expect Failure as JoinGroup command returns
                                                              // CHIP_ERROR_NOT_IMPLEMENTED
 }
