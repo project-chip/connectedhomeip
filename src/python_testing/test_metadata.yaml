@@ -152,8 +152,7 @@ slow_tests:
     - { name: mobile-device-test.py, duration: 3 minutes }
     - { name: TC_AccessChecker.py, duration: 1.5 minutes }
     - { name: TC_BRBINFO_4_1.py, duration: 2 minutes }
-    - { name: TC_CADMIN_1_3.py, duration: 3.5 minutes }
-    - { name: TC_CADMIN_1_4.py, duration: 30 seconds }
+    - { name: TC_CADMIN_1_3_4.py, duration: 4 minutes }
     - { name: TC_CADMIN_1_19.py, duration: 30 seconds }
     - { name: TC_CADMIN_1_22_24.py, duration: 3 minutes }
     - { name: TC_CADMIN_1_9.py, duration: 40 seconds }
