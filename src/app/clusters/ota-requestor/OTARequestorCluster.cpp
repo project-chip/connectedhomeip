@@ -34,26 +34,26 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
 
 }  // namespace
 
-OtaRequestorCluster::OtaRequestorCluster(EndpointId endpointId, OTARequestorInterface & otaRequestor)
+OTARequestorCluster::OTARequestorCluster(EndpointId endpointId, OTARequestorInterface & otaRequestor)
     : DefaultServerCluster(ConcreteClusterPath(endpointId, OtaSoftwareUpdateRequestor::Id)),
       mEventHandlerRegistration(*this, endpointId),
       mOtaRequestor(otaRequestor)
 {
 }
 
-CHIP_ERROR OtaRequestorCluster::Startup(ServerClusterContext & context)
+CHIP_ERROR OTARequestorCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
     return mOtaRequestor.RegisterEventHandler(mEventHandlerRegistration);
 }
 
-void OtaRequestorCluster::Shutdown()
+void OTARequestorCluster::Shutdown()
 {
     mOtaRequestor.UnregisterEventHandler(mPath.mEndpointId);
     DefaultServerCluster::Shutdown();
 }
 
-DataModel::ActionReturnStatus OtaRequestorCluster::ReadAttribute(
+DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(
     const DataModel::ReadAttributeRequest & request,
     AttributeValueEncoder & encoder)
 {
@@ -84,14 +84,14 @@ DataModel::ActionReturnStatus OtaRequestorCluster::ReadAttribute(
     }
 }
 
-CHIP_ERROR OtaRequestorCluster::Attributes(const ConcreteClusterPath & path,
+CHIP_ERROR OTARequestorCluster::Attributes(const ConcreteClusterPath & path,
                                            ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder listBuilder(builder);
     return listBuilder.Append(Span(OtaSoftwareUpdateRequestor::Attributes::kMandatoryMetadata), {});
 }
 
-std::optional<DataModel::ActionReturnStatus> OtaRequestorCluster::InvokeCommand(
+std::optional<DataModel::ActionReturnStatus> OTARequestorCluster::InvokeCommand(
     const DataModel::InvokeRequest & request, chip::TLV::TLVReader & input_arguments, CommandHandler * handler)
 {
     switch (request.path.mCommandId)
@@ -115,13 +115,13 @@ std::optional<DataModel::ActionReturnStatus> OtaRequestorCluster::InvokeCommand(
     }
 }
 
-CHIP_ERROR OtaRequestorCluster::AcceptedCommands(const ConcreteClusterPath & path,
+CHIP_ERROR OTARequestorCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                                  ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     return builder.ReferenceExisting(kAcceptedCommands);
 }
 
-void OtaRequestorCluster::OnStateTransition(OtaSoftwareUpdateRequestor::UpdateStateEnum previousState,
+void OTARequestorCluster::OnStateTransition(OtaSoftwareUpdateRequestor::UpdateStateEnum previousState,
                                             OtaSoftwareUpdateRequestor::UpdateStateEnum newState,
                                             OtaSoftwareUpdateRequestor::ChangeReasonEnum reason,
                                             DataModel::Nullable<uint32_t> const & targetSoftwareVersion)
@@ -136,13 +136,13 @@ void OtaRequestorCluster::OnStateTransition(OtaSoftwareUpdateRequestor::UpdateSt
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
-void OtaRequestorCluster::OnVersionApplied(uint32_t softwareVersion, uint16_t productId)
+void OTARequestorCluster::OnVersionApplied(uint32_t softwareVersion, uint16_t productId)
 {
     OtaSoftwareUpdateRequestor::Events::VersionApplied::Type event = { softwareVersion, productId };
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
-void OtaRequestorCluster::OnDownloadError(uint32_t softwareVersion, uint64_t bytesDownloaded,
+void OTARequestorCluster::OnDownloadError(uint32_t softwareVersion, uint64_t bytesDownloaded,
                                           DataModel::Nullable<uint8_t> progressPercent,
                                           DataModel::Nullable<int64_t> platformCode)
 {

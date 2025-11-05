@@ -25,10 +25,10 @@
 
 namespace chip::app::Clusters {
 
-class OtaRequestorCluster : public DefaultServerCluster, public OTARequestorEventHandler
+class OTARequestorCluster : public DefaultServerCluster, public OTARequestorEventHandler
 {
 public:
-    OtaRequestorCluster(EndpointId endpointId, OTARequestorInterface & otaRequestor);
+    OTARequestorCluster(EndpointId endpointId, OTARequestorInterface & otaRequestor);
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
 
