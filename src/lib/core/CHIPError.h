@@ -351,7 +351,7 @@ public:
 
 #endif // CHIP_CONFIG_ERROR_SOURCE
 
-    // Helper method to ignore common failures which are expected
+    // Helper method to convert common failures which are expected into CHIP_NO_ERROR.
     ChipError NoErrorIf(ChipError suppressed);
 
 private:
