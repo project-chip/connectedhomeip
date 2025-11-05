@@ -29,10 +29,12 @@ namespace NetworkCommissioning {
 void Instance::CodegenGeneralCommissioningBreadcrumbTracker::SetBreadCrumb(uint64_t value)
 {
     GeneralCommissioningCluster * cluster = GeneralCommissioning::Instance();
-    if (cluster != nullptr)
+    if (cluster == nullptr)
     {
-        cluster->SetBreadCrumb(value);
+        ChipLogError(Zcl, "General commissioning cluster not available. Failed to set breadcrumb.");
+        return;
     }
+    cluster->SetBreadCrumb(value);
 }
 
 CHIP_ERROR Instance::Init()
