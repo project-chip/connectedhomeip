@@ -1153,13 +1153,13 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             saved_value: Value that has been saved before TestEventTrigger sending;
 
         Returns:
-            bool: - True if report is presented; 
+            bool: - True if report is presented;
                   - False if there are no reports at all;
         """
 
         try:
             asserts.assert_not_equal(reports[attribute][0].value, saved_value,
-                                     f"""Reported '{attribute_name}' value should be different from saved value. 
+                                     f"""Reported '{attribute_name}' value should be different from saved value.
                                      Subscriptions should only report when values have changed.""")
             return True
         except (KeyError, IndexError) as err:

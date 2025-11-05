@@ -1518,12 +1518,12 @@ def build_xml_global_data_types(data_model_directory: Union[PrebuiltDataModelDir
     Build XML global data types from the globals data model directory.
 
     `data_model_directory` given as a path MUST be of type Traversable (often `pathlib.Path(somepathstring)`).
-    If data_model_directory is a Traversable, it is assumed to already contain `globals` 
+    If data_model_directory is a Traversable, it is assumed to already contain `globals`
 
     Returns:
         Tuple of (global_data_types, problems) where global_data_types is a dict with keys:
         - 'structs': dict[str, XmlDataType] - global structs by name
-        - 'enums': dict[str, XmlDataType] - global enums by name  
+        - 'enums': dict[str, XmlDataType] - global enums by name
         - 'bitmaps': dict[str, XmlDataType] - global bitmaps by name
     """
 
