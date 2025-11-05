@@ -254,8 +254,9 @@ public:
      * @param[in] streamUsage  The stream usage to check.
      *
      * @return CHIP_ERROR
-     *   - CHIP_NO_ERROR if the StreamUsage is found in StreamUsagePriorities.
-     *   - CHIP_ERROR_NOT_FOUND or other appropriate error if the StreamUsage is not supported.
+     *   - CHIP_NO_ERROR - StreamUsage is found in StreamUsagePriorities.
+     *   - CHIP_ERROR_NOT_FOUND - StreamUsage is not in the StreamUsagePriorities list.
+     *   - Other error codes - For failures reading the attribute itself
      */
     virtual CHIP_ERROR IsStreamUsageSupported(Globals::StreamUsageEnum streamUsage) = 0;
 
