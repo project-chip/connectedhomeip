@@ -31,6 +31,7 @@
 
 #include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
+#include <app/TimerDelegates.h>
 #include <app/reporting/ReportScheduler.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
@@ -144,7 +145,7 @@ struct DeviceControllerSystemStateParams
     SessionSetupPool * sessionSetupPool                                           = nullptr;
     CASEClientPool * caseClientPool                                               = nullptr;
     FabricTable::Delegate * fabricTableDelegate                                   = nullptr;
-    chip::app::reporting::ReportScheduler::TimerDelegate * timerDelegate          = nullptr;
+    chip::app::TimerDelegate * timerDelegate                                      = nullptr;
     chip::app::reporting::ReportScheduler * reportScheduler                       = nullptr;
 };
 
@@ -279,7 +280,7 @@ private:
     SessionSetupPool * mSessionSetupPool                                           = nullptr;
     CASEClientPool * mCASEClientPool                                               = nullptr;
     Credentials::GroupDataProvider * mGroupDataProvider                            = nullptr;
-    app::reporting::ReportScheduler::TimerDelegate * mTimerDelegate                = nullptr;
+    app::TimerDelegate * mTimerDelegate                                            = nullptr;
     app::reporting::ReportScheduler * mReportScheduler                             = nullptr;
     Crypto::SessionKeystore * mSessionKeystore                                     = nullptr;
     FabricTable::Delegate * mFabricTableDelegate                                   = nullptr;

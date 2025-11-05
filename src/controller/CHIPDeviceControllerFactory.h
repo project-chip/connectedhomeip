@@ -29,6 +29,7 @@
 
 #pragma once
 
+#include <app/TimerDelegates.h>
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerSystemState.h>
 #include <credentials/GroupDataProvider.h>
@@ -137,7 +138,7 @@ struct FactoryInitParams
     PersistentStorageDelegate * fabricIndependentStorage               = nullptr;
     Credentials::CertificateValidityPolicy * certificateValidityPolicy = nullptr;
     Credentials::GroupDataProvider * groupDataProvider                 = nullptr;
-    app::reporting::ReportScheduler::TimerDelegate * timerDelegate     = nullptr;
+    app::TimerDelegate * timerDelegate                                 = nullptr;
     Crypto::SessionKeystore * sessionKeystore                          = nullptr;
     Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager      = nullptr;
     Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager      = nullptr;

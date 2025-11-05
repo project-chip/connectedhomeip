@@ -24,6 +24,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/InteractionModelEngine.h>
+#include <app/TimerDelegates.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
@@ -144,11 +145,10 @@ IdentifyCluster * FindIdentifyClusterOnEndpoint(EndpointId endpointId)
 
 Identify::Identify(EndpointId endpoint, onIdentifyStartCb onIdentifyStart, onIdentifyStopCb onIdentifyStop,
                    IdentifyTypeEnum identifyType, onEffectIdentifierCb onEffectIdentifier, EffectIdentifierEnum effectIdentifier,
-                   EffectVariantEnum effectVariant, reporting::ReportScheduler::TimerDelegate * timerDelegate) :
+                   EffectVariantEnum effectVariant, TimerDelegate * timerDelegate) :
 
-    mOnIdentifyStart(onIdentifyStart),
-    mOnIdentifyStop(onIdentifyStop), mIdentifyType(identifyType), mOnEffectIdentifier(onEffectIdentifier),
-    mCurrentEffectIdentifier(effectIdentifier), mEffectVariant(effectVariant),
+    mOnIdentifyStart(onIdentifyStart), mOnIdentifyStop(onIdentifyStop), mIdentifyType(identifyType),
+    mOnEffectIdentifier(onEffectIdentifier), mCurrentEffectIdentifier(effectIdentifier), mEffectVariant(effectVariant),
     mCluster(chip::app::Clusters::IdentifyCluster::Config(endpoint, timerDelegate ? *timerDelegate : sDefaultTimerDelegate)
                  .WithIdentifyType(identifyType)
                  .WithDelegate(&gLegacyDelegate)

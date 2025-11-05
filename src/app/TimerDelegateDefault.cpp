@@ -19,8 +19,7 @@
 #include <app/TimerDelegates.h>
 #include <system/SystemClock.h>
 
-using TimerContext = chip::app::reporting::TimerContext;
-using Timeout      = chip::System::Clock::Timeout;
+using Timeout = chip::System::Clock::Timeout;
 
 namespace chip {
 namespace app {

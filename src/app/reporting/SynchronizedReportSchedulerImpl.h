@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <app/TimerDelegates.h>
 #include <app/reporting/ReportSchedulerImpl.h>
 
 namespace chip {
@@ -28,7 +29,6 @@ using Timeout         = System::Clock::Timeout;
 using Timestamp       = System::Clock::Timestamp;
 using Milliseconds64  = System::Clock::Milliseconds64;
 using ReadHandlerNode = ReportScheduler::ReadHandlerNode;
-using TimerDelegate   = ReportScheduler::TimerDelegate;
 
 /**
  * @class Synchronized ReportSchedulerImpl

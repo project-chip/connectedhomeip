@@ -15,10 +15,10 @@
  */
 
 #include "ClusterActions.h"
-#include "TestTimerDelegate.h"
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <pw_unit_test/framework.h>
 
+#include <app/TimerDelegatesTest.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/server-cluster/AttributeListBuilder.h>
@@ -65,7 +65,7 @@ struct TestIdentifyCluster : public ::testing::Test
         onEffectIdentifierCalled = false;
     }
 
-    TestTimerDelegate mTestTimerDelegate;
+    TimerDelegatTest mTestTimerDelegate;
 };
 
 TEST_F(TestIdentifyCluster, TestCreate)

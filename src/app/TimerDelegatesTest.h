@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,12 +17,17 @@
 
 #pragma once
 
-#include <app/reporting/ReportScheduler.h>
+#include <app/TimerDelegates.h>
+#include <lib/core/CHIPError.h>
+#include <system/SystemClock.h>
 
-class TestTimerDelegate : public chip::app::reporting::ReportScheduler::TimerDelegate
+namespace chip {
+namespace app {
+
+class TimerDelegateTest : public TimerDelegate
 {
 public:
-    using TimerContext = chip::app::reporting::TimerContext;
+    using TimerContext = chip::app::TimerContext;
 
     CHIP_ERROR StartTimer(TimerContext * context, chip::System::Clock::Timeout aTimeout) override
     {
@@ -55,3 +60,6 @@ private:
     chip::System::Clock::Timestamp mTimerTimeout        = chip::System::Clock::Milliseconds64(0x7FFFFFFFFFFFFFFF);
     chip::System::Clock::Timestamp mMockSystemTimestamp = chip::System::Clock::Milliseconds64(0);
 };
+
+} // namespace app
+} // namespace chip
