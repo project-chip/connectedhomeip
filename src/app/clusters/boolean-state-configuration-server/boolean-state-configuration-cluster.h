@@ -80,7 +80,7 @@ private:
     BooleanStateConfiguration::Delegate * mDelegate = nullptr;
 
     // attributes that are maintained by this cluster
-    uint8_t mCurrentSensitivityLevel    = 0;
+    uint8_t mCurrentSensitivityLevel = 0;
     const uint8_t mSupportedSensitivityLevels;
     const uint8_t mDefaultSensitivityLevel;
     AlarmModeBitMask mAlarmsActive{ 0 };
