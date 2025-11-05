@@ -6,8 +6,8 @@
 #ifndef SYSTEM_STRERROR_UTIL_H
 #define SYSTEM_STRERROR_UTIL_H
 
-#include <string.h>
 #include <stddef.h>
+#include <string.h>
 
 namespace chip {
 namespace System {

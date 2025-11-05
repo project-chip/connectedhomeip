@@ -37,10 +37,10 @@
 #include <lwip/err.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
+#include "StrErrorUtil.h"
 #include <limits>
 #include <stddef.h>
 #include <string.h>
-#include "StrErrorUtil.h"
 
 namespace chip {
 namespace System {
