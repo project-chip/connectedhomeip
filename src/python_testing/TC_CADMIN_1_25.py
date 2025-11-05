@@ -158,7 +158,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
         # TH_CR1 send an OpenCommissioningWindow command to DUT_CE using a commissioning timeout of `max_window_duration`
         self.discriminator = random.randint(0, 4095)
         params = await self.th1.OpenCommissioningWindow(
-            nodeid=self.dut_node_id, timeout=max_window_duration, iteration=10000,
+            nodeId=self.dut_node_id, timeout=max_window_duration, iteration=10000,
             discriminator=self.discriminator, option=1)
 
         self.step(7)
@@ -254,7 +254,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
         self.step(13)
         # TH_CR1 sends an OpenCommissioningWindow command to DUT_CE using a commissioning timeout of `max_window_duration`
         await self.th1.OpenCommissioningWindow(
-            nodeid=self.dut_node_id, timeout=max_window_duration, iteration=10000,
+            nodeId=self.dut_node_id, timeout=max_window_duration, iteration=10000,
             discriminator=self.discriminator, option=1)
 
         self.step(14)
@@ -298,7 +298,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
         self.step(16)
         # TH_CR1 revokes the commissioning window on DUT_CE using RevokeCommissioning command
         revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
-        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
+        await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
 
         self.step(17)
         # Verify TH_CR1 receives subscription notifications which show WindowStatus value to be 0, AdminFabricIndex value to be null, AdminVendorId to be null
@@ -325,7 +325,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
         self.step(19)
         # TH_CR2 opens a commissioning window on DUT_CE using ECM with commissioning timeout of `max_window_duration`
         await self.th2.OpenCommissioningWindow(
-            nodeid=self.dut_node_id, timeout=max_window_duration, iteration=10000,
+            nodeId=self.dut_node_id, timeout=max_window_duration, iteration=10000,
             discriminator=self.discriminator, option=1)
 
         self.step(20)
@@ -365,7 +365,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
         self.step(22)
         # TH_CR1 revokes the commissioning window on DUT_CE using RevokeCommissioning command
         revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
-        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
+        await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
 
         self.step(23)
         # Verify TH_CR1 receives subscription notifications which show WindowStatus value to be 0
@@ -394,7 +394,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
         self.step(25)
         # TH_CR2 send an OpenCommissioningWindow command to DUT_CE using ECM with a commissioning timeout of `max_window_duration`
         await self.th2.OpenCommissioningWindow(
-            nodeid=self.dut_node_id, timeout=max_window_duration, iteration=10000,
+            nodeId=self.dut_node_id, timeout=max_window_duration, iteration=10000,
             discriminator=self.discriminator, option=1)
 
         self.step(26)
@@ -427,13 +427,13 @@ class TC_CADMIN_1_25(MatterBaseTest):
         # Before expiration of `max_window_duration` set in step 25,
         # TH_CR1 sends RemoveFabric command to DUT_CE with FabricIndex set to the fabric index of TH_CR2's fabric
         th2_idx = await self.th2.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=[(0, Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)])
         outer_key = list(th2_idx.keys())[0]
         inner_key = list(th2_idx[outer_key].keys())[0]
         attribute_key = list(th2_idx[outer_key][inner_key].keys())[1]
         removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(th2_idx[outer_key][inner_key][attribute_key])
-        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
+        await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
 
         self.step(29)
         # Verify TH_CR1 receives subscription notifications which show AdminFabricIndex value to be null
@@ -463,7 +463,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
         self.step(32)
         # TH_CR1 revokes the commissioning window on DUT_CE using RevokeCommissioning command
         revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
-        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
+        await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
 
         self.step(33)
         # Verify TH_CR1 receives subscription notifications which show WindowStatus value to be 0, AdminVendorId to be null

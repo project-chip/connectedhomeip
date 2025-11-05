@@ -53,8 +53,8 @@ class ICDManagementServer : public chip::app::ICDStateObserver
 public:
     ICDManagementServer() = default;
 
-    void Init(chip::PersistentStorageDelegate & storage, chip::Crypto::SymmetricKeystore * symmetricKeystore,
-              chip::ICDConfigurationData & ICDConfigurationData);
+    void Init(PersistentStorageDelegate & storage, Crypto::SymmetricKeystore * symmetricKeystore,
+              ICDConfigurationData & ICDConfigurationData);
 
     static ICDManagementServer & GetInstance() { return instance; };
 #if CHIP_CONFIG_ENABLE_ICD_CIP
@@ -65,14 +65,13 @@ public:
      * ICDConfigurationData If function fails, icdCounter will be unchanged
      * @return Status
      */
-    chip::Protocols::InteractionModel::Status
-    RegisterClient(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                   const chip::app::Clusters::IcdManagement::Commands::RegisterClient::DecodableType & commandData,
-                   uint32_t & icdCounter);
+    Protocols::InteractionModel::Status RegisterClient(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                       const IcdManagement::Commands::RegisterClient::DecodableType & commandData,
+                                                       uint32_t & icdCounter);
 
-    chip::Protocols::InteractionModel::Status
-    UnregisterClient(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                     const chip::app::Clusters::IcdManagement::Commands::UnregisterClient::DecodableType & commandData);
+    Protocols::InteractionModel::Status
+    UnregisterClient(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                     const IcdManagement::Commands::UnregisterClient::DecodableType & commandData);
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
 private:
@@ -85,11 +84,11 @@ private:
     void TriggerICDMTableUpdatedEvent();
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
-    chip::ICDConfigurationData * mICDConfigurationData;
+    ICDConfigurationData * mICDConfigurationData;
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-    chip::PersistentStorageDelegate * mStorage;
-    chip::Crypto::SymmetricKeystore * mSymmetricKeystore;
+    PersistentStorageDelegate * mStorage;
+    Crypto::SymmetricKeystore * mSymmetricKeystore;
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
     void OnEnterActiveMode() override{};
