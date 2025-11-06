@@ -328,8 +328,7 @@ def setupArgumentsParser():
         args.type = TargetType.ALL  # default instead of a list
     else:
         # convert the list into a single flag value
-        types = [t for t in map(lambda x: __TARGET_TYPES__[
-                                x.lower()], args.type)]
+        types = [__TARGET_TYPES__[x.lower()] for x in args.type]
         args.type = types[0]
         for t in types:
             args.type = args.type | t
