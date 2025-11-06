@@ -150,12 +150,12 @@ def test_case(func):
 
 
 def configurable_tests():
-    res = sorted([v for v in _configurable_test_sets])
+    res = sorted(_configurable_test_sets)
     return res
 
 
 def configurable_test_cases():
-    res = sorted([v for v in _configurable_tests])
+    res = sorted(_configurable_tests)
     return res
 
 
@@ -1096,7 +1096,7 @@ class BaseTestHelper:
         self.logger.info(
             f"Sending MoveToLevel command to device {nodeId} endpoint {endpoint}")
 
-        commonArgs = dict(transitionTime=0, optionsMask=1, optionsOverride=1)
+        commonArgs = {'transitionTime': 0, 'optionsMask': 1, 'optionsOverride': 1}
 
         async def _moveClusterLevel(setLevel):
             await self.devCtrl.SendCommand(nodeId,

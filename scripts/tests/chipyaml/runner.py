@@ -218,8 +218,8 @@ class YamlTestParserGroup(click.Group):
         ctx.custom_options = custom_options
 
 
-CONTEXT_SETTINGS = dict(
-    default_map={
+CONTEXT_SETTINGS = {
+    'default_map': {
         'chiptool': {
             'adapter': 'chipyaml.adapters.chiptool.adapter',
             'server_name': 'chip-tool',
@@ -247,8 +247,8 @@ CONTEXT_SETTINGS = dict(
             'runner': 'chipyaml.adapters.repl.runner',
         },
     },
-    max_content_width=120,
-)
+    'max_content_width': 120,
+}
 
 
 @click.group(cls=YamlTestParserGroup, context_settings=CONTEXT_SETTINGS)
