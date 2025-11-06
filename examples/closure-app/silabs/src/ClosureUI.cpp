@@ -69,7 +69,7 @@ namespace {
     }
 }
 
-// Initialize arrays using buffer sizes 
+// Initialize arrays using buffer sizes
 char ClosureUI::sPositionText[ClosureUIStrings::BUFFER_SIZE_POSITION];
 char ClosureUI::sLatchText[ClosureUIStrings::BUFFER_SIZE_LATCH];
 char ClosureUI::sSecureText[ClosureUIStrings::BUFFER_SIZE_SECURE];
@@ -79,15 +79,15 @@ char ClosureUI::sStateText[ClosureUIStrings::BUFFER_SIZE_STATE];
 // Static initializer to set default values using prefix + suffix
 struct ClosureUITextInitializer {
     ClosureUITextInitializer() {
-        FormatText(ClosureUI::sPositionText, sizeof(ClosureUI::sPositionText), 
+        FormatText(ClosureUI::sPositionText, sizeof(ClosureUI::sPositionText),
                   ClosureUIStrings::POSITION_PREFIX, ClosureUIStrings::POSITION_SUFFIX_UNKNOWN);
-        FormatText(ClosureUI::sLatchText, sizeof(ClosureUI::sLatchText), 
+        FormatText(ClosureUI::sLatchText, sizeof(ClosureUI::sLatchText),
                   ClosureUIStrings::LATCH_PREFIX, ClosureUIStrings::LATCH_SUFFIX_UNKNOWN);
-        FormatText(ClosureUI::sSecureText, sizeof(ClosureUI::sSecureText), 
+        FormatText(ClosureUI::sSecureText, sizeof(ClosureUI::sSecureText),
                   ClosureUIStrings::SECURE_PREFIX, ClosureUIStrings::SECURE_SUFFIX_UNKNOWN);
-        FormatText(ClosureUI::sSpeedText, sizeof(ClosureUI::sSpeedText), 
+        FormatText(ClosureUI::sSpeedText, sizeof(ClosureUI::sSpeedText),
                   ClosureUIStrings::SPEED_PREFIX, ClosureUIStrings::SPEED_SUFFIX_UNKNOWN);
-        FormatText(ClosureUI::sStateText, sizeof(ClosureUI::sStateText), 
+        FormatText(ClosureUI::sStateText, sizeof(ClosureUI::sStateText),
                   ClosureUIStrings::STATE_PREFIX, ClosureUIStrings::STATE_SUFFIX_UNKNOWN);
     }
 };

@@ -20,7 +20,7 @@
 
 /**
  * @file ClosureUIStrings.h
- * @brief UI string constants 
+ * @brief UI string constants
 
  * @note IMPORTANT FOR DEVELOPERS:
  *       If you modify existing strings or add new strings in this file, you MUST also
@@ -33,7 +33,7 @@
  */
 
 namespace ClosureUIStrings {
-    
+
     inline constexpr const char POSITION_PREFIX[]     = "Position: ";
     inline constexpr const char POSITION_SUFFIX_UNKNOWN[]    = "Unknown";
     inline constexpr const char POSITION_SUFFIX_CLOSED[]     = "Closed";
