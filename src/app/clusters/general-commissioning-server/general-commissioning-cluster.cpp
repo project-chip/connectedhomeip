@@ -32,10 +32,6 @@
 #include <tracing/macros.h>
 #include <transport/SecureSession.h>
 
-#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-#include <app/server/TermsAndConditionsManager.h> //nogncheck
-#endif                                            // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
