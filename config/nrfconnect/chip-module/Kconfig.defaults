@@ -75,9 +75,8 @@ config HEAP_MEM_POOL_IGNORE_MIN
     default y if CHIP_WIFI
 
 config CHIP_MALLOC_SYS_HEAP_SIZE
-    default 10240 if SOC_SERIES_NRF54LX # nRF54L requires more memory due to crypto backend
     default 14336 if CHIP_WIFI
-    default 8192 if OPENTHREAD
+    default 10240
 
 config MPSL_WORK_STACK_SIZE
     default 2048 if SOC_SERIES_NRF54LX # nRF54L requires more memory due to crypto backend
