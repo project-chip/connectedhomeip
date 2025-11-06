@@ -189,7 +189,7 @@ from matter.clusters.ClusterObjects import ClusterAttributeDescriptor, ClusterOb
 from matter.clusters.Types import Nullable
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.basic_composition import BasicCompositionTests, log_structured_data
+from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.global_attribute_ids import (AttributeIdType, ClusterIdType, CommandIdType, GlobalAttributeIds,
                                                  attribute_id_type, cluster_id_type, command_id_type)
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
@@ -966,8 +966,8 @@ class TC_DeviceBasicComposition(BasicCompositionTests, MatterBaseTest):
         json_str, txt_str = self.dump_wildcard(dump_device_composition_path)
 
         # Structured dump so we can pull these back out of the logs
-        log_structured_data('==== json: ', json_str)
-        log_structured_data('==== txt: ', txt_str)
+        self.log_structured_data('==== json: ', json_str)
+        self.log_structured_data('==== txt: ', txt_str)
 
     @async_test_body
     async def test_TC_DESC_2_1(self):
