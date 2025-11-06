@@ -37,6 +37,11 @@
 #include <esp_log.h>
 #include <lib/dnssd/Advertiser.h>
 
+#include <app/TimerDelegates.h>
+#include <app/clusters/identify-server/IdentifyCluster.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <lib/support/CHIPMem.h>
+
 #if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
 #include <app-common/zap-generated/ids/Clusters.h>
 #endif
@@ -50,9 +55,19 @@ using namespace chip::app;
 
 constexpr uint32_t kIdentifyTimerDelayMS = 250;
 
-void OnIdentifyTriggerEffect(Identify * identify)
+void IdentifyDelegateImpl::OnIdentifyStart(chip::app::Clusters::IdentifyCluster & cluster)
 {
-    switch (identify->mCurrentEffectIdentifier)
+    ChipLogProgress(Zcl, "onIdentifyStart");
+}
+
+void IdentifyDelegateImpl::OnIdentifyStop(chip::app::Clusters::IdentifyCluster & cluster)
+{
+    ChipLogProgress(Zcl, "onIdentifyStop");
+}
+
+void IdentifyDelegateImpl::OnTriggerEffect(chip::app::Clusters::IdentifyCluster & cluster)
+{
+    switch (cluster.GetEffectIdentifier())
     {
     case Clusters::Identify::EffectIdentifierEnum::kBlink:
         statusLED1.Blink(kIdentifyTimerDelayMS * 2);
@@ -74,21 +89,10 @@ void OnIdentifyTriggerEffect(Identify * identify)
     return;
 }
 
-Identify gIdentify0 = {
-    chip::EndpointId{ 0 },
-    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
-    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
-    Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
-    OnIdentifyTriggerEffect,
-};
-
-Identify gIdentify1 = {
-    chip::EndpointId{ 1 },
-    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
-    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
-    Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
-    OnIdentifyTriggerEffect,
-};
+bool IdentifyDelegateImpl::IsTriggerEffectEnabled() const
+{
+    return true;
+}
 
 void AppDeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId,
                                                      uint8_t type, uint16_t size, uint8_t * value)

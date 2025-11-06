@@ -24,7 +24,7 @@ The following example demonstrates how to use pw_unit_test to write a simple
 unit test. Each test function is defined using `TEST(NameOfFunction)`. The set
 of test functions in a given source file is called a "suite".
 
-```
+```cpp
 #include <pw_unit_test/framework.h>
 
 TEST(YourTestFunction1)
@@ -65,7 +65,7 @@ functions will be defined with `TEST_F(NameOfTestContext, NameOfFunction)`. The
 following example demonstrates how to use pw_unit_test to write a unit test that
 uses fixtures and setup/teardown behavior.
 
-```
+```cpp
 #include <pw_unit_test/framework.h>
 
 class YourTestContext : public ::testing::Test
@@ -140,7 +140,7 @@ that you can derive your test context from. It provides a network layer and a
 system layer and two secure sessions connected with each other. The following
 example demonstrates this.
 
-```
+```cpp
 #include <app/tests/AppTestContext.h>
 
 class YourTestContext : public Test::AppContext
@@ -225,7 +225,7 @@ own text context class.
 
 -   Try to use as specific an assertion as possible. For example use these
 
-    ```
+    ```cpp
     EXPECT_EQ(result, 3);
     EXPECT_GT(result, 1);
     EXPECT_STREQ(myString, "hello");
@@ -233,7 +233,7 @@ own text context class.
 
     instead of these
 
-    ```
+    ```cpp
     EXPECT_TRUE(result == 3);
     EXPECT_TRUE(result > 1);
     EXPECT_EQ(strcmp(myString, "hello"), 0);
@@ -248,7 +248,7 @@ own text context class.
     you want to prevent the test from continuing, check the value of
     `HasFailure()` and stop execution if true. Example:
 
-    ```
+    ```cpp
     void Subroutine()
     {
         ASSERT_EQ(1, 2);  // Fatal failure.
@@ -394,7 +394,7 @@ publicly inheriting from it.
 
 -   Example
 
-```
+```cpp
     #include <system/RAIIMockClock.h>
 
     // ...

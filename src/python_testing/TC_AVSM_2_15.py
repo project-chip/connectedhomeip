@@ -126,28 +126,25 @@ class TC_AVSM_2_15(MatterBaseTest):
         logger.info("Fetch feature map to check if WMark and OSD are supported")
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
         logger.info(f"Rx'd FeatureMap: {aFeatureMap}")
-        try:
-            watermark = True if (aFeatureMap & cluster.Bitmaps.Feature.kWatermark) != 0 else None
-            osd = True if (aFeatureMap & cluster.Bitmaps.Feature.kOnScreenDisplay) != 0 else None
 
-            snpStreamAllocateCmd = commands.SnapshotStreamAllocate(
-                imageCodec=aSnapshotCapabilities[0].imageCodec,
-                maxFrameRate=aSnapshotCapabilities[0].maxFrameRate,
-                minResolution=aSnapshotCapabilities[0].resolution,
-                maxResolution=aSnapshotCapabilities[0].resolution,
-                quality=90,
-                watermarkEnabled=watermark,
-                OSDEnabled=osd
-            )
-            snpStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
-            logger.info(f"Rx'd SnapshotStreamAllocateResponse: {snpStreamAllocateResponse}")
-            asserts.assert_is_not_none(
-                snpStreamAllocateResponse.snapshotStreamID, "SnapshotStreamAllocateResponse does not contain StreamID"
-            )
-            aSnapshotStreamID = snpStreamAllocateResponse.snapshotStreamID
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
+        watermark = True if (aFeatureMap & cluster.Bitmaps.Feature.kWatermark) != 0 else None
+        osd = True if (aFeatureMap & cluster.Bitmaps.Feature.kOnScreenDisplay) != 0 else None
+
+        snpStreamAllocateCmd = commands.SnapshotStreamAllocate(
+            imageCodec=aSnapshotCapabilities[0].imageCodec,
+            maxFrameRate=aSnapshotCapabilities[0].maxFrameRate,
+            minResolution=aSnapshotCapabilities[0].resolution,
+            maxResolution=aSnapshotCapabilities[0].resolution,
+            quality=90,
+            watermarkEnabled=watermark,
+            OSDEnabled=osd
+        )
+        snpStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
+        logger.info(f"Rx'd SnapshotStreamAllocateResponse: {snpStreamAllocateResponse}")
+        asserts.assert_is_not_none(
+            snpStreamAllocateResponse.snapshotStreamID, "SnapshotStreamAllocateResponse does not contain StreamID"
+        )
+        aSnapshotStreamID = snpStreamAllocateResponse.snapshotStreamID
 
         self.step(5)
         aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
@@ -157,26 +154,13 @@ class TC_AVSM_2_15(MatterBaseTest):
         asserts.assert_equal(len(aAllocatedSnapshotStreams), 1, "The number of allocated snapshot streams in the list is not 1.")
 
         self.step(6)
-        try:
-            snpStreamAllocateCmd = commands.SnapshotStreamAllocate(
-                imageCodec=aSnapshotCapabilities[0].imageCodec,
-                maxFrameRate=aSnapshotCapabilities[0].maxFrameRate,
-                minResolution=aSnapshotCapabilities[0].resolution,
-                maxResolution=aSnapshotCapabilities[0].resolution,
-                quality=90,
-                watermarkEnabled=watermark,
-                OSDEnabled=osd
-            )
-            snpStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
-            logger.info(f"Rx'd SnapshotStreamAllocateResponse: {snpStreamAllocateResponse}")
-            asserts.assert_is_not_none(
-                snpStreamAllocateResponse.snapshotStreamID, "SnapshotStreamAllocateResponse does not contain StreamID"
-            )
-            asserts.assert_equal(snpStreamAllocateResponse.snapshotStreamID, aSnapshotStreamID,
-                                 "The previous snapshot stream is not reused")
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
+        snpStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
+        logger.info(f"Rx'd SnapshotStreamAllocateResponse: {snpStreamAllocateResponse}")
+        asserts.assert_is_not_none(
+            snpStreamAllocateResponse.snapshotStreamID, "SnapshotStreamAllocateResponse does not contain StreamID"
+        )
+        asserts.assert_equal(snpStreamAllocateResponse.snapshotStreamID, aSnapshotStreamID,
+                             "The previous snapshot stream is not reused")
 
         self.step(7)
         aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
@@ -184,6 +168,17 @@ class TC_AVSM_2_15(MatterBaseTest):
         )
         logger.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
         asserts.assert_equal(len(aAllocatedSnapshotStreams), 1, "The number of allocated snapshot streams in the list is not 1.")
+
+        # Clear all allocated streams
+        aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
+        )
+
+        for stream in aAllocatedSnapshotStreams:
+            try:
+                await self.send_single_cmd(endpoint=endpoint, cmd=commands.SnapshotStreamDeallocate(snapshotStreamID=(stream.snapshotStreamID)))
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
 
 if __name__ == "__main__":

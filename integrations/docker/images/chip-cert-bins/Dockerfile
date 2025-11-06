@@ -295,14 +295,14 @@ RUN case ${TARGETPLATFORM} in \
     *) ;; \
     esac
 
-RUN source scripts/activate.sh && scripts/build_python.sh -m platform -d true -i out/python_env
+RUN source scripts/activate.sh && scripts/build_python.sh -m platform -d true --enable_nfc true -i out/python_env
 
 # Stage 3: Copy relevant cert bins to a minimal image to reduce size.
 FROM ubuntu:24.04
 ENV TZ=Etc/UTC
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apt-get update -y
-RUN apt-get install -y libssl-dev libdbus-1-dev libglib2.0-dev libavahi-client-dev avahi-utils iproute2 libcairo2-dev libgirepository1.0-dev python3-pip libpcsclite1 pcscd
+RUN apt-get install -y libssl-dev libdbus-1-dev libglib2.0-dev libavahi-client-dev avahi-utils iproute2 libcairo2-dev libgirepository1.0-dev python3-pip libpcsclite-dev libpcsclite1 pcscd libcurl4 libgstreamer1.0-0 libgstreamer-plugins-base1.0-0 libavformat60 libavcodec60 libavutil58
 WORKDIR /root/
 COPY --from=chip-build-cert-bins /root/.sdk-sha-version .sdk-sha-version
 RUN mkdir apps

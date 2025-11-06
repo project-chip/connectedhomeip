@@ -63,12 +63,6 @@ Davis, CA 95616, USA
     <revision revision="2" summary="Duplicate condition replaces Multiple condition"/>
   </revisionHistory>
   <conditions>
-    <condition name="ZHA" summary="Zigbee Home Automation standard"/>
-    <condition name="ZSE" summary="Zigbee Smart Energy standard"/>
-    <condition name="GP" summary="Zigbee Green Power standard"/>
-    <condition name="Zigbee" summary="Zigbee standard"/>
-    <condition name="SuZi" summary="Zigbee PRO Sub-GHz standard"/>
-    <condition name="Matter" summary="Matter standard"/>
     <condition name="Ethernet" summary=""/>
     <condition name="Wi-Fi" summary=""/>
     <condition name="Thread" summary=""/>

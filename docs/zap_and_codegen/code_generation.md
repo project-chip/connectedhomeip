@@ -186,7 +186,7 @@ generate other things by passing in the `-t/--templates` argument to
 generate.py. In those cases, you may also need to specify an output directory
 via `-o/--output-dir`.
 
-#### Flow for updating an application zap file:
+#### Flow for updating an application zap file
 
 ```
 # use zap UI to edit the file (or edit zap file in any other way)
@@ -308,14 +308,6 @@ creates. To invoke use:
         -B /workspace/out/esp32-m5stack-all-clusters \
         -DCHIP_CODEGEN_PREGEN_DIR=/some/pregen/dir \
         reconfigure
-
-    cmake -S /workspace/examples/lighting-app/mbed \
-          -B /workspace/out/mbed-cy8cproto_062_4343w-light \
-          -GNinja \
-          -DMBED_OS_PATH=/workspace/third_party/mbed-os/repo \
-          -DMBED_OS_PATH=/workspace/third_party/mbed-os/repo \
-          -DMBED_OS_POSIX_SOCKET_PATH=/workspace/third_party/mbed-os-posix-socket/repo \
-          -DCHIP_CODEGEN_PREGEN_DIR=/some/pregen/dir
     ```
 
 ### Code generation unit testing

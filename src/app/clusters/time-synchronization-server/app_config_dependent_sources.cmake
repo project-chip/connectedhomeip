@@ -20,6 +20,6 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/DefaultTimeSyncDelegate.h"
     "${CLUSTER_DIR}/TimeSyncDataProvider.cpp"
     "${CLUSTER_DIR}/time-synchronization-delegate.h"
-    "${CLUSTER_DIR}/time-synchronization-server.cpp"
-    "${CLUSTER_DIR}/time-synchronization-server.h"
+    "${CLUSTER_DIR}/time-synchronization-cluster.cpp"
+    "${CLUSTER_DIR}/time-synchronization-cluster.h"
 )

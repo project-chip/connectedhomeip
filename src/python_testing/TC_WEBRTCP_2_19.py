@@ -57,6 +57,7 @@ class TC_WEBRTCP_2_19(MatterBaseTest, WEBRTCPTestBase):
 
     def steps_TC_WEBRTCP_2_19(self) -> list[TestStep]:
         steps = [
+            TestStep("precondition", "DUT commissioned", is_commissioning=True),
             TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
                      "DUT responds with success and provides stream IDs"),
             TestStep(2, "TH sends the SolicitOffer command with valid stream IDs",
@@ -75,8 +76,13 @@ class TC_WEBRTCP_2_19(MatterBaseTest, WEBRTCPTestBase):
     def pics_TC_WEBRTCP_2_19(self) -> list[str]:
         pics = [
             "WEBRTCP.S",
-            "WEBRTCP.S.C02.Rsp",  # ProvideAnswer command
+            "WEBRTCP.S.C00.Rsp",   # SolicitOffer command
+            "WEBRTCP.S.C01.Tx",    # SolicitOfferResponse command
+            "WEBRTCR.S.C04.Rsp",   # ProvideAnswer command
+            "WEBRTCP.S.C06.Rsp",   # EndSession command
             "AVSM.S",
+            "AVSM.S.F00",          # Audio Data Output feature
+            "AVSM.S.F01",          # Video Data Output feature
         ]
         return pics
 
@@ -86,6 +92,8 @@ class TC_WEBRTCP_2_19(MatterBaseTest, WEBRTCPTestBase):
         Executes the test steps for validating ProvideAnswer with invalid session.
         """
 
+        self.step("precondition")
+        # Commission DUT - already done
         endpoint = self.get_endpoint(default=1)
 
         self.step(1)

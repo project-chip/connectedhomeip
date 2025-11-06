@@ -280,7 +280,13 @@ class SpecDefinitions:
             return global_target
         if global_target is None:
             return target
-        return target | global_target
+
+        # If there is a cluster-specific type with the same name as a global
+        # one, it should take precedence over the global type.  That means
+        # "target" should be on the right of the "|" operator here: when
+        # combining dictionaries with "|", if both have a value for a key the
+        # value from the right-hand dictionary is used.
+        return global_target | target
 
 
 def SpecDefinitionsFromPaths(paths: str, pseudo_clusters: Optional[PseudoClusters] = PseudoClusters([])):

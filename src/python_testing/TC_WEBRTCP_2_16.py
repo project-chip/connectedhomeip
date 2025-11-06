@@ -57,6 +57,7 @@ class TC_WEBRTCP_2_16(MatterBaseTest, WEBRTCPTestBase):
 
     def steps_TC_WEBRTCP_2_16(self) -> list[TestStep]:
         steps = [
+            TestStep("precondition", "DUT commissioned", is_commissioning=True),
             TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
                      "DUT responds with success and provides stream IDs"),
             TestStep(2, "TH sends multiple ProvideOffer commands to exhaust DUT's session capacity (DUT-specific limit)",
@@ -69,7 +70,11 @@ class TC_WEBRTCP_2_16(MatterBaseTest, WEBRTCPTestBase):
     def pics_TC_WEBRTCP_2_16(self) -> list[str]:
         pics = [
             "WEBRTCP.S",
+            "WEBRTCP.S.C02.Rsp",   # ProvideOffer command
+            "WEBRTCP.S.C03.Tx",    # ProvideOfferResponse command
             "AVSM.S",
+            "AVSM.S.F00",          # Audio Data Output feature
+            "AVSM.S.F01",          # Video Data Output feature
         ]
         return pics
 
@@ -79,6 +84,8 @@ class TC_WEBRTCP_2_16(MatterBaseTest, WEBRTCPTestBase):
         Executes the test steps for validating ProvideOffer resource exhaustion.
         """
 
+        self.step("precondition")
+        # Commission DUT - already done
         endpoint = self.get_endpoint(default=1)
 
         self.step(1)

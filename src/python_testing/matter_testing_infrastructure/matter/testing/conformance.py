@@ -18,7 +18,7 @@
 """
 Matter Specification Conformance Engine
 
-This module implements the conformance checking system for Matter clusters, attributes, 
+This module implements the conformance checking system for Matter clusters, attributes,
 commands, and device types. It provides:
 
 - Conformance decision types (mandatory, optional, disallowed, etc.)
@@ -134,6 +134,10 @@ def is_disallowed(conformance: Callable):
     return conformance(0, [], []).decision == ConformanceDecision.DISALLOWED
 
 
+def is_provisional(conformance: Callable):
+    return conformance(0, [], []).decision == ConformanceDecision.PROVISIONAL
+
+
 @dataclass
 class Conformance:
     def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecisionWithChoice:
@@ -203,7 +207,10 @@ class provisional(Conformance):
 
 class literal(Conformance):
     def __init__(self, value: str):
-        self.value = int(value)
+        # base=0 allows automatic detection of number format from string prefix:
+        # "10" -> 10 (decimal), "0x10" -> 16 (hex), "0o10" -> 8 (octal), "0b10" -> 2 (binary)
+        # This is needed because XML literal values can be in different formats
+        self.value = int(value, 0)
 
     def __call__(self):
         # This should never be called
@@ -449,7 +456,7 @@ def parse_basic_callable_from_xml(element: ElementTree.Element) -> Conformance:
     Basic conformance elements are XML elements without children that represent
     simple conformance decisions such as:
     - mandatoryConform (M)
-    - optionalConform (O) 
+    - optionalConform (O)
     - disallowConform (X)
     - deprecateConform (D)
     - provisionalConform (P)

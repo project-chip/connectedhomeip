@@ -30,6 +30,10 @@ from chiptest.glob_matcher import GlobMatcher
 from chiptest.test_definition import TestRunTime, TestTag
 from chipyaml.paths_finder import PathsFinder
 
+# If running on Linux platform load the Linux specific code.
+if sys.platform == "linux":
+    import chiptest.linux
+
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))
 
@@ -304,11 +308,17 @@ def cmd_list(context):
     default=0,
     show_default=True,
     help='Number of tests that are expected to fail in each iteration.  Overall test will pass if the number of failures matches this.  Nonzero values require --keep-going')
+@click.option(
+    '--ble-wifi',
+    is_flag=True,
+    default=False,
+    show_default=True,
+    help='Use Bluetooth and WiFi mock servers to perform BLE-WiFi commissioning. This option is available on Linux platform only.')
 @click.pass_context
 def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app,
             fabric_bridge_app, tv_app, bridge_app, lit_icd_app, microwave_oven_app, rvc_app, network_manager_app,
             energy_gateway_app, energy_management_app, closure_app, matter_repl_yaml_tester,
-            chip_tool_with_python, pics_file, keep_going, test_timeout_seconds, expected_failures):
+            chip_tool_with_python, pics_file, keep_going, test_timeout_seconds, expected_failures, ble_wifi):
     if expected_failures != 0 and not keep_going:
         logging.exception(f"'--expected-failures {expected_failures}' used without '--keep-going'")
         sys.exit(2)
@@ -368,6 +378,9 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
         else:
             chip_tool_with_python = paths_finder.get('chiptool.py')
 
+    if ble_wifi and sys.platform != "linux":
+        raise click.BadOptionUsage("ble-wifi", "Option --ble-wifi is available on Linux platform only")
+
     # Command execution requires an array
     paths = chiptest.ApplicationPaths(
         chip_tool=[context.obj.chip_tool],
@@ -389,9 +402,23 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
         chip_tool_with_python_cmd=['python3'] + [chip_tool_with_python],
     )
 
+    ble_controller_app = None
+    ble_controller_tool = None
+
     if sys.platform == 'linux':
         ns = chiptest.linux.IsolatedNetworkNamespace(
+            # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
+            setup_app_link_up=not ble_wifi,
+            # Change the app link name so the interface will be recognized as WiFi or Ethernet
+            # depending on the commissioning method used.
+            app_link_name='wlx-app' if ble_wifi else 'eth-app',
             unshared=context.obj.in_unshare)
+        if ble_wifi:
+            bus = chiptest.linux.DBusTestSystemBus()
+            bluetooth = chiptest.linux.BluetoothMock()
+            wifi = chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns)
+            ble_controller_app = 0   # Bind app to the first BLE controller
+            ble_controller_tool = 1  # Bind tool to the second BLE controller
         paths = chiptest.linux.PathsWithNetworkNamespaces(paths)
 
     logging.info("Each test will be executed %d times" % iterations)
@@ -402,6 +429,10 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     def cleanup():
         apps_register.uninit()
         if sys.platform == 'linux':
+            if ble_wifi:
+                wifi.terminate()
+                bluetooth.terminate()
+                bus.terminate()
             ns.terminate()
 
     for i in range(iterations):
@@ -426,7 +457,10 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
                     logging.info('%-20s - Starting test' % (test.name))
                 test.Run(
                     runner, apps_register, paths, pics_file, test_timeout_seconds, context.obj.dry_run,
-                    test_runtime=context.obj.runtime)
+                    test_runtime=context.obj.runtime,
+                    ble_controller_app=ble_controller_app,
+                    ble_controller_tool=ble_controller_tool,
+                )
                 if not context.obj.dry_run:
                     test_end = time.monotonic()
                     logging.info('%-30s - Completed in %0.2f seconds' %

@@ -39,7 +39,6 @@ ALL_PLATFORMS = set([
     'nxp',
     'rw61x',
     'linux',
-    'mbed',
     'nrfconnect',
     'nuttx',
     'qpg',

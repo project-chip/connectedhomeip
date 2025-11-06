@@ -83,7 +83,7 @@ Davis, CA 95616, USA
       <item value="0" name="Success" summary="Successful transfer of logs">
         <mandatoryConform/>
       </item>
-      <item value="1" name="Exhausted" summary="All logs has been transferred">
+      <item value="1" name="Exhausted" summary="All logs have been transferred">
         <mandatoryConform/>
       </item>
       <item value="2" name="NoLogs" summary="No logs of the requested type available">

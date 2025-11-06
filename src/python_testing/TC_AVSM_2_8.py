@@ -172,6 +172,17 @@ class TC_AVSM_2_8(MatterBaseTest, AVSMTestBase):
         if osdSupport:
             asserts.assert_equal(aAllocatedVideoStreams[0].OSDEnabled, not aOSD, "OSDEnabled is not !aOSD")
 
+        # Clear all allocated streams
+        aAllocatedVideoStreams = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
+        )
+
+        for stream in aAllocatedVideoStreams:
+            try:
+                await self.send_single_cmd(endpoint=endpoint, cmd=commands.VideoStreamDeallocate(videoStreamID=(stream.videoStreamID)))
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+
 
 if __name__ == "__main__":
     default_matter_test_main()

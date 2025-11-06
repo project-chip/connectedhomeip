@@ -441,8 +441,8 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         for id in self.xml_device_types.keys():
             self.create_good_device(id)
             success, problems = self.test.check_device_type(fail_on_extra_clusters=True)
-            if problems:
-                print(problems)
+            for p in problems:
+                print(p)
             asserts.assert_false(problems, f"Unexpected problems on device type {id}")
             asserts.assert_true(success, f"Unexpected failure on device type {id}")
 

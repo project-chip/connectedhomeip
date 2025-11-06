@@ -45,7 +45,7 @@ from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_b
 class TC_ACL_2_6(MatterBaseTest):
     async def get_latest_event_number(self, acec_event: Clusters.AccessControl.Events.AccessControlEntryChanged) -> int:
         event_path = [(self.matter_test_config.endpoint, acec_event, 1)]
-        events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
+        events = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path)
 
         if not events:
             raise AssertionError(f"No events found for {acec_event} to determine latest event number.")

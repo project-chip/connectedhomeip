@@ -18,10 +18,12 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <credentials/CHIPCert.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/core/NodeId.h>
+#include <lib/support/ReadOnlyBuffer.h>
 #include <vector>
 
 namespace chip {
@@ -176,7 +178,7 @@ public:
     CHIP_ERROR AddPendingNode(NodeId nodeId, const CharSpan & friendlyName);
     CHIP_ERROR UpdateNode(NodeId nodeId, const CharSpan & friendlyName);
     CHIP_ERROR RemoveNode(NodeId nodeId);
-    CHIP_ERROR RefreshNode(NodeId nodeId);
+    CHIP_ERROR RefreshNode(NodeId nodeId, ReadOnlyBuffer<DataModel::EndpointEntry> endpointsList);
 
     CHIP_ERROR SetNode(NodeId nodeId, Clusters::JointFabricDatastore::DatastoreStateEnum state);
 
@@ -299,6 +301,9 @@ private:
                     const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlEntryStruct::DecodableType & acl2);
     bool ACLTargetMatches(const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlTargetStruct::Type & target1,
                           const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlTargetStruct::Type & target2);
+
+    CHIP_ERROR AddNodeKeySetEntry(GroupId groupId, uint16_t groupKeySetId);
+    CHIP_ERROR RemoveNodeKeySetEntry(GroupId groupId, uint16_t groupKeySetId);
 };
 
 } // namespace app

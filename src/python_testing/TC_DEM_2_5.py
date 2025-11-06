@@ -191,7 +191,7 @@ class TC_DEM_2_5(MatterBaseTest, DEMTestBase):
 
         self.step("5")
         slotAdjustments = [Clusters.DeviceEnergyManagement.Structs.SlotAdjustmentStruct(
-            slotIndex=0, duration=forecast.slots[0].minDurationAdjustment)]
+            slotIndex=0, duration=forecast.slots[0].maxDurationAdjustment)]
         await self.send_modify_forecast_request_command(forecast.forecastID, slotAdjustments, Clusters.DeviceEnergyManagement.Enums.AdjustmentCauseEnum.kGridOptimization, expected_status=Status.ConstraintError)
 
         self.step("6")

@@ -45,7 +45,7 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
-class TC_WebRTCProvider_2_8(MatterBaseTest, WEBRTCPTestBase):
+class TC_WebRTCP_2_8(MatterBaseTest, WEBRTCPTestBase):
 
     def desc_TC_WEBRTCP_2_8(self) -> str:
         """Returns a description of this test"""
@@ -53,24 +53,38 @@ class TC_WebRTCProvider_2_8(MatterBaseTest, WEBRTCPTestBase):
 
     def steps_TC_WEBRTCP_2_8(self) -> list[TestStep]:
         steps = [
+            TestStep("precondition", "DUT commissioned", is_commissioning=True),
             TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement"),
-            TestStep(2, "TH writes SoftRecordingPrivacyModeEnabled to TRUE on CameraAVStreamManagement cluster"),
-            TestStep(3, "TH sends the SolicitOffer command with valid parameters and StreamUsage = 1 (kRecording)"),
-            TestStep(4, "TH sends the SolicitOffer command with valid parameters and StreamUsage = 2 (kAnalysis)"),
-            TestStep(5, "TH sends the SolicitOffer command with valid parameters and StreamUsage = 3 (kLiveView)"),
+            TestStep(2, "TH writes SoftRecordingPrivacyModeEnabled to TRUE on CameraAVStreamManagement cluster",
+                     "DUT responds with success"),
+            TestStep(3, "TH sends the SolicitOffer command with valid parameters and StreamUsage = 1 (kRecording)",
+                     "DUT responds with INVALID_IN_STATE status code"),
+            TestStep(4, "TH sends the SolicitOffer command with valid parameters and StreamUsage = 2 (kAnalysis)",
+                     "DUT responds with INVALID_IN_STATE status code"),
+            TestStep(5, "TH sends the SolicitOffer command with valid parameters and StreamUsage = 3 (kLiveView)",
+                     "DUT responds with a valid SolicitOfferResponse"),
         ]
         return steps
 
     def pics_TC_WEBRTCP_2_8(self) -> list[str]:
         pics = [
             "WEBRTCP.S",
+            "WEBRTCP.S.C00.Rsp",   # SolicitOffer command
             "AVSM.S",
+            "AVSM.S.F00",          # Audio Data Output feature
+            "AVSM.S.F01",          # Video Data Output feature
+            "AVSM.S.A0013",        # SoftRecordingPrivacyModeEnabled attribute
         ]
         return pics
 
     @async_test_body
     async def test_TC_WEBRTCP_2_8(self):
+        """
+        Executes the test steps for validating SolicitOffer fails with SoftRecordingPrivacyModeEnabled.
+        """
 
+        self.step("precondition")
+        # Commission DUT - already done
         endpoint = self.user_params.get("endpoint", 1)
 
         self.step(1)
@@ -130,7 +144,7 @@ class TC_WebRTCProvider_2_8(MatterBaseTest, WEBRTCPTestBase):
                                  "Expected INVALID_IN_STATE when SoftRecordingPrivacyModeEnabled is True")
 
         self.step(5)
-        # Send SolicitOffer with StreamUsage = kLiveView (should fail)
+        # Send SolicitOffer with StreamUsage = kLiveView (should pass)
         solicit_offer_request_liveview = Clusters.WebRTCTransportProvider.Commands.SolicitOffer(
             streamUsage=Clusters.Globals.Enums.StreamUsageEnum.kLiveView,
             originatingEndpointID=endpoint,
@@ -138,12 +152,9 @@ class TC_WebRTCProvider_2_8(MatterBaseTest, WEBRTCPTestBase):
             audioStreamID=audioStreamID
         )
 
-        try:
-            await self.send_single_cmd(cmd=solicit_offer_request_liveview, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
-            asserts.fail("Unexpected success on SolicitOffer with SoftRecordingPrivacyModeEnabled is True")
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.InvalidInState,
-                                 "Expected INVALID_IN_STATE when SoftRecordingPrivacyModeEnabled is True")
+        resp = await self.send_single_cmd(cmd=solicit_offer_request_liveview, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
+        asserts.assert_equal(type(resp), Clusters.WebRTCTransportProvider.Commands.SolicitOfferResponse,
+                             "Incorrect response type")
 
 
 if __name__ == "__main__":

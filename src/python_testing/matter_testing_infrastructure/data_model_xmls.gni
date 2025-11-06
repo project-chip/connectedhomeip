@@ -1110,6 +1110,7 @@ data_model_XMLS_1_5 = [
   "${chip_root}/data_model/1.5/device_types/Dishwasher.xml",
   "${chip_root}/data_model/1.5/device_types/DoorLock.xml",
   "${chip_root}/data_model/1.5/device_types/DoorLockController.xml",
+  "${chip_root}/data_model/1.5/device_types/Doorbell.xml",
   "${chip_root}/data_model/1.5/device_types/EVSE.xml",
   "${chip_root}/data_model/1.5/device_types/ElectricalEnergyTariff.xml",
   "${chip_root}/data_model/1.5/device_types/ElectricalMeter.xml",

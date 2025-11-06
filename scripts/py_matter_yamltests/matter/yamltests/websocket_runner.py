@@ -107,16 +107,20 @@ class WebSocketRunner(TestRunner):
         if command:
             start_time = time.time()
 
-            command = ['stdbuf', '-o0', '-e0'] + command  # disable buffering
             instance = subprocess.Popen(
-                command, text=False, bufsize=0, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                command,
+                bufsize=0,                  # unbuffered
+                text=False,                 # keep output as bytes
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+            )
 
             # Loop to read the subprocess output with a timeout
             lines = []
             while True:
                 if time.time() - start_time > _WEBSOCKET_SERVER_MESSAGE_TIMEOUT:
                     for line in lines:
-                        print(line.decode('utf-8'), end='')
+                        print(line.decode('utf-8', errors='replace'), end='')
                     self._hooks.abort(url)
                     await self._stop_server(instance)
                     raise Exception(
@@ -125,9 +129,9 @@ class WebSocketRunner(TestRunner):
                 ready, _, _ = select.select([instance.stdout], [], [], 1)
                 if ready:
                     line = instance.stdout.readline()
-                    if len(line):
+                    if line:
                         lines.append(line)
-                        if re.search(_WEBSOCKET_SERVER_MESSAGE, line.decode('utf-8')):
+                        if re.search(_WEBSOCKET_SERVER_MESSAGE, line.decode('utf-8', errors='replace')):
                             break  # Exit the loop if the pattern is found
                 else:
                     continue
@@ -141,7 +145,8 @@ class WebSocketRunner(TestRunner):
             try:
                 instance.wait(_WEBSOCKET_SERVER_TERMINATE_TIMEOUT)
             except subprocess.TimeoutExpired:
-                LOGGER.debug('Subprocess did not terminate on SIGTERM, killing it now')
+                LOGGER.debug(
+                    'Subprocess did not terminate on SIGTERM, killing it now')
                 instance.kill()
 
     def _make_server_connection_url(self, address: str, port: int):

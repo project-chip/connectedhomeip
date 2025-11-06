@@ -149,6 +149,7 @@ enum
     kDeviceOption_Camera_DeferredOffer,
     kDeviceOption_Camera_TestVideosrc,
     kDeviceOption_Camera_TestAudiosrc,
+    kDeviceOption_Camera_AudioPlayback,
     kDeviceOption_Camera_VideoDevice,
 #endif
     kDeviceOption_VendorName,
@@ -251,6 +252,7 @@ OptionDef sDeviceOptionDefs[] = {
     { "camera-deferred-offer", kNoArgument, kDeviceOption_Camera_DeferredOffer },
     { "camera-test-videosrc", kNoArgument, kDeviceOption_Camera_TestVideosrc },
     { "camera-test-audiosrc", kNoArgument, kDeviceOption_Camera_TestAudiosrc },
+    { "camera-audio-playback", kNoArgument, kDeviceOption_Camera_AudioPlayback },
     { "camera-video-device", kArgumentRequired, kDeviceOption_Camera_VideoDevice },
 #endif
     {}
@@ -467,6 +469,9 @@ const char * sDeviceOptionHelp =
     "\n"
     "  --camera-test-audiosrc\n"
     "       Use gstreamer test audio source for streaming. Overrides --camera-video-device.\n"
+    "\n"
+    "  --camera-audio-playback\n"
+    "       Enables audio playback gstreamer pipeline to play the audio received from remote peer.\n"
     "\n"
 #endif
     "\n";
@@ -925,6 +930,10 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
     }
     case kDeviceOption_Camera_TestAudiosrc: {
         LinuxDeviceOptions::GetInstance().cameraTestAudiosrc = true;
+        break;
+    }
+    case kDeviceOption_Camera_AudioPlayback: {
+        LinuxDeviceOptions::GetInstance().cameraAudioPlayback = true;
         break;
     }
     case kDeviceOption_Camera_VideoDevice: {

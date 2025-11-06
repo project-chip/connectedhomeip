@@ -37,6 +37,7 @@ echo_bold_white() {
 CHIP_ROOT=$(_normpath "$(dirname "$0")/..")
 
 declare enable_ble=true
+declare enable_nfc=false
 declare enable_ipv4=true
 declare wifi_paf_config=""
 declare chip_detail_logging=false
@@ -70,6 +71,7 @@ Input Options:
                                                             By default it is $chip_detail_logging.
   -m, --chip_mdns           ChipMDNSValue                   Specify ChipMDNSValue as platform or minimal.
                                                             By default it is $chip_mdns.
+  -n, --enable_nfc          <true/false>                    Enable NFC in the controller (default=$enable_nfc)
   -w, --enable_webrtc       <true/false>                    Enable WebRTC support in the controller (default=$enable_webrtc)
   -t --time_between_case_retries MRPActiveRetryInterval     Specify MRPActiveRetryInterval value
                                                             Default is 300 ms
@@ -104,6 +106,14 @@ while (($#)); do
             enable_ble=$2
             if [[ "$enable_ble" != "true" && "$enable_ble" != "false" ]]; then
                 echo "Error: --enable_ble/-b should have a true/false value, not '$enable_ble'" >&2
+                exit 1
+            fi
+            shift
+            ;;
+        --enable_nfc | -n)
+            enable_nfc=$2
+            if [[ "$enable_nfc" != "true" && "$enable_nfc" != "false" ]]; then
+                echo "Error: --enable_nfc/-n should have a true/false value, not '$enable_nfc'" >&2
                 exit 1
             fi
             shift
@@ -219,6 +229,7 @@ echo "  chip_mdns=\"$chip_mdns\""
 echo "  chip_case_retry_delta=\"$chip_case_retry_delta\""
 echo "  pregen_dir=\"$pregen_dir\""
 echo "  enable_ble=\"$enable_ble\""
+echo "  enable_nfc=\"$enable_nfc\""
 if [[ -n $wifi_paf_config ]]; then
     echo "  $wifi_paf_config"
 fi
@@ -275,6 +286,7 @@ gn_args=(
     "chip_project_config_include_dirs=[\"//config/python\"]"
     "chip_config_network_layer_ble=$enable_ble"
     "chip_enable_ble=$enable_ble"
+    "chip_enable_nfc_based_commissioning=$enable_nfc"
     "chip_inet_config_enable_ipv4=$enable_ipv4"
     "chip_crypto=\"$chip_crypto\""
     "chip_build_controller_dynamic_server=$chip_build_controller_dynamic_server"

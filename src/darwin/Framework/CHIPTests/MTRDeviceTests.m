@@ -4466,7 +4466,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Delegate 4
     XCTestExpectation * gotReportEnd4 = [self expectationWithDescription:@"Report end for delegate 4"];
     __auto_type * delegate4 = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
-    delegate3.skipSetupSubscription = YES;
+    delegate4.skipSetupSubscription = YES;
     __weak __auto_type weakDelegate4 = delegate4;
     __block NSUInteger attributesReceived4 = 0;
     delegate4.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
@@ -6198,7 +6198,10 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Now we can set up waiting for onSubscriptionPoolWorkComplete from the test
     XCTestExpectation * subscriptionPoolWorkCompleteForTriggerTestExpectation = [self expectationWithDescription:@"_triggerResubscribeWithReason work completed"];
+    __weak __auto_type weakDelegate = delegate;
     delegate.onSubscriptionPoolWorkComplete = ^{
+        __strong __auto_type strongDelegate = weakDelegate;
+        strongDelegate.onSubscriptionPoolWorkComplete = nil;
         [subscriptionPoolWorkCompleteForTriggerTestExpectation fulfill];
     };
 
