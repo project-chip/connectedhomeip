@@ -49,8 +49,10 @@ struct TestGeneralCommissioningCluster : public ::testing::Test
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
 
-GeneralCommissioningCluster::Context CreateStandardContext() {
-    return {
+GeneralCommissioningCluster::Context CreateStandardContext()
+{
+    return
+    {
         .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
             .configurationManager   = DeviceLayer::ConfigurationMgr(),                       //
             .deviceControlServer    = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //

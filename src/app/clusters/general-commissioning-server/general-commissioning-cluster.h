@@ -29,6 +29,7 @@
 #include <credentials/FabricTable.h>
 #include <lib/support/BitFlags.h>
 #include <platform/ConfigurationManager.h>
+#include <platform/DeviceControlServer.h>
 #include <platform/PlatformManager.h>
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
