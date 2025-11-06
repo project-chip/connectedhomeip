@@ -51,8 +51,6 @@ source_set("network-commissioning") {
   sources = [
     "NetworkCommissioningCluster.cpp",
     "NetworkCommissioningCluster.h",
-    "NetworkCommissioningLogic.cpp",
-    "NetworkCommissioningLogic.h",
   ]
 
   public_deps = [

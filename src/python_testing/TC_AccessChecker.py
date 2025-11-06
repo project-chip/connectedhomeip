@@ -168,9 +168,9 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                     cmds[cluster_id] = set()
                 # discard MEI attributes as we do not have access information for them.
                 attrs[cluster_id].update(
-                    set([id for id in device_cluster_data[GlobalAttributeIds.ATTRIBUTE_LIST_ID] if is_standard_attribute_id(id)]))
+                    {id for id in device_cluster_data[GlobalAttributeIds.ATTRIBUTE_LIST_ID] if is_standard_attribute_id(id)})
                 cmds[cluster_id].update(
-                    set([id for id in device_cluster_data[GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID] if is_standard_command_id(id)]))
+                    {id for id in device_cluster_data[GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID] if is_standard_command_id(id)})
 
         # Remove MEI clusters - we don't have information available to check these.
         all_clusters = [id for id in all_clusters if is_standard_cluster_id(id)]

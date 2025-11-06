@@ -1067,7 +1067,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         #    --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
         if enableKey is None:
             if 'enableKey' not in self.matter_test_config.global_test_params:
-                enableKey = bytes([b for b in range(16)])
+                enableKey = bytes(list(range(16)))
             else:
                 enableKey = self.matter_test_config.global_test_params['enableKey']
 

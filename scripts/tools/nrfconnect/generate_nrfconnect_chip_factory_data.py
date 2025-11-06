@@ -226,8 +226,8 @@ class FactoryDataGenerator:
             arguments (any):All input arguments parsed using ArgParse
         """
         self._args = arguments
-        self._factory_data = list()
-        self._user_data = dict()
+        self._factory_data = []
+        self._user_data = {}
 
         # If .json extension is included in the output path, remove it, as script adds it automatically.
         if self._args.output.endswith(".json"):
