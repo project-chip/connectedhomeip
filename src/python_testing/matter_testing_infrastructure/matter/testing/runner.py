@@ -84,7 +84,7 @@ def default_paa_rootstore_from_root(root_path: pathlib.Path) -> Optional[pathlib
     dev_path = cred_path.joinpath("development")
     paa_path = dev_path.joinpath("paa-root-certs")
 
-    return paa_path.resolve() if all([path.exists() for path in [cred_path, dev_path, paa_path]]) else None
+    return paa_path.resolve() if all(path.exists() for path in [cred_path, dev_path, paa_path]) else None
 
 
 def get_default_paa_trust_store(root_path: pathlib.Path) -> pathlib.Path:

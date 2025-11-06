@@ -124,4 +124,4 @@ class BrowserWebRTCClient:
         valid_keys = ("data", "error", "type", "sessionId")
         if len(message.keys()) < len(valid_keys):
             return False
-        return all([key in message for key in valid_keys])
+        return all(key in message for key in valid_keys)
