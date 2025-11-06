@@ -291,6 +291,7 @@ void ContentAppPlatform::SetupAppPlatform()
 
 ContentApp * ContentAppPlatform::GetContentAppInternal(const CatalogVendorApp & vendorApp)
 {
+    VerifyOrReturnValue(mContentAppFactory != nullptr, nullptr);
     if (vendorApp.catalogVendorId != mContentAppFactory->GetPlatformCatalogVendorId())
     {
         return nullptr;
@@ -325,6 +326,7 @@ ContentApp * ContentAppPlatform::LoadContentAppInternal(const CatalogVendorApp &
 ContentApp * ContentAppPlatform::LoadContentAppByClient(uint16_t vendorId, uint16_t productId)
 {
     ChipLogProgress(DeviceLayer, "LoadContentAppByVendorId() - vendorId %d, productId %d", vendorId, productId);
+    VerifyOrReturnValue(mContentAppFactory != nullptr, nullptr);
 
     CatalogVendorApp vendorApp;
     CHIP_ERROR err = mContentAppFactory->LookupCatalogVendorApp(vendorId, productId, &vendorApp);
@@ -339,6 +341,7 @@ ContentApp * ContentAppPlatform::LoadContentAppByClient(uint16_t vendorId, uint1
 
 ContentApp * ContentAppPlatform::LoadContentApp(const CatalogVendorApp & vendorApp)
 {
+    VerifyOrReturnValue(mContentAppFactory != nullptr, nullptr);
     if (vendorApp.catalogVendorId == mContentAppFactory->GetPlatformCatalogVendorId())
     {
         return LoadContentAppInternal(vendorApp);
@@ -356,6 +359,7 @@ ContentApp * ContentAppPlatform::LoadContentApp(const CatalogVendorApp & vendorA
 
 ContentApp * ContentAppPlatform::GetContentApp(const CatalogVendorApp & vendorApp)
 {
+    VerifyOrReturnValue(mContentAppFactory != nullptr, nullptr);
     if (vendorApp.catalogVendorId == mContentAppFactory->GetPlatformCatalogVendorId())
     {
         return GetContentAppInternal(vendorApp);
@@ -671,6 +675,7 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & e
 {
     VerifyOrReturnError(successCb != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(failureCb != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mContentAppFactory != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     Access::Privilege vendorPrivilege = mContentAppFactory->GetVendorPrivilege(targetVendorId);
 
