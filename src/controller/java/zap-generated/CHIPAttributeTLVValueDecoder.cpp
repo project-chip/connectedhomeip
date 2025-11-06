@@ -6168,6 +6168,82 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            jnivalue, value);
             return value;
         }
+        case Attributes::DeviceLoadStatus::Id: {
+            using TypeInfo = Attributes::DeviceLoadStatus::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            jobject value_currentSubscriptions;
+            std::string value_currentSubscriptionsClassName     = "java/lang/Integer";
+            std::string value_currentSubscriptionsCtorSignature = "(I)V";
+            jint jnivalue_currentSubscriptions                  = static_cast<jint>(cppValue.currentSubscriptions);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(value_currentSubscriptionsClassName.c_str(),
+                                                                       value_currentSubscriptionsCtorSignature.c_str(),
+                                                                       jnivalue_currentSubscriptions, value_currentSubscriptions);
+            jobject value_currentSubscriptionsForFabric;
+            std::string value_currentSubscriptionsForFabricClassName     = "java/lang/Integer";
+            std::string value_currentSubscriptionsForFabricCtorSignature = "(I)V";
+            jint jnivalue_currentSubscriptionsForFabric = static_cast<jint>(cppValue.currentSubscriptionsForFabric);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                value_currentSubscriptionsForFabricClassName.c_str(), value_currentSubscriptionsForFabricCtorSignature.c_str(),
+                jnivalue_currentSubscriptionsForFabric, value_currentSubscriptionsForFabric);
+            jobject value_totalSubscriptionsEstablished;
+            std::string value_totalSubscriptionsEstablishedClassName     = "java/lang/Long";
+            std::string value_totalSubscriptionsEstablishedCtorSignature = "(J)V";
+            jlong jnivalue_totalSubscriptionsEstablished = static_cast<jlong>(cppValue.totalSubscriptionsEstablished);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                value_totalSubscriptionsEstablishedClassName.c_str(), value_totalSubscriptionsEstablishedCtorSignature.c_str(),
+                jnivalue_totalSubscriptionsEstablished, value_totalSubscriptionsEstablished);
+            jobject value_totalInteractionModelMessagesSent;
+            std::string value_totalInteractionModelMessagesSentClassName     = "java/lang/Long";
+            std::string value_totalInteractionModelMessagesSentCtorSignature = "(J)V";
+            jlong jnivalue_totalInteractionModelMessagesSent = static_cast<jlong>(cppValue.totalInteractionModelMessagesSent);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                value_totalInteractionModelMessagesSentClassName.c_str(),
+                value_totalInteractionModelMessagesSentCtorSignature.c_str(), jnivalue_totalInteractionModelMessagesSent,
+                value_totalInteractionModelMessagesSent);
+            jobject value_totalInteractionModelMessagesReceived;
+            std::string value_totalInteractionModelMessagesReceivedClassName     = "java/lang/Long";
+            std::string value_totalInteractionModelMessagesReceivedCtorSignature = "(J)V";
+            jlong jnivalue_totalInteractionModelMessagesReceived =
+                static_cast<jlong>(cppValue.totalInteractionModelMessagesReceived);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                value_totalInteractionModelMessagesReceivedClassName.c_str(),
+                value_totalInteractionModelMessagesReceivedCtorSignature.c_str(), jnivalue_totalInteractionModelMessagesReceived,
+                value_totalInteractionModelMessagesReceived);
+
+            {
+                jclass deviceLoadStructStructClass_0;
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                    env, "chip/devicecontroller/ChipStructs$GeneralDiagnosticsClusterDeviceLoadStruct",
+                    deviceLoadStructStructClass_0);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "Could not find class ChipStructs$GeneralDiagnosticsClusterDeviceLoadStruct");
+                    return nullptr;
+                }
+
+                jmethodID deviceLoadStructStructCtor_0;
+                err = chip::JniReferences::GetInstance().FindMethod(
+                    env, deviceLoadStructStructClass_0, "<init>",
+                    "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;)V",
+                    &deviceLoadStructStructCtor_0);
+                if (err != CHIP_NO_ERROR || deviceLoadStructStructCtor_0 == nullptr)
+                {
+                    ChipLogError(Zcl, "Could not find ChipStructs$GeneralDiagnosticsClusterDeviceLoadStruct constructor");
+                    return nullptr;
+                }
+
+                value = env->NewObject(deviceLoadStructStructClass_0, deviceLoadStructStructCtor_0, value_currentSubscriptions,
+                                       value_currentSubscriptionsForFabric, value_totalSubscriptionsEstablished,
+                                       value_totalInteractionModelMessagesSent, value_totalInteractionModelMessagesReceived);
+            }
+            return value;
+        }
         case Attributes::GeneratedCommandList::Id: {
             using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;

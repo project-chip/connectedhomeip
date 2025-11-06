@@ -3705,12 +3705,12 @@ class BasicInformation(Cluster):
                 ClusterObjectFieldDescriptor(Label="serialNumber", Tag=0x0000000F, Type=typing.Optional[str]),
                 ClusterObjectFieldDescriptor(Label="localConfigDisabled", Tag=0x00000010, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="reachable", Tag=0x00000011, Type=typing.Optional[bool]),
-                ClusterObjectFieldDescriptor(Label="uniqueID", Tag=0x00000012, Type=str),
+                ClusterObjectFieldDescriptor(Label="uniqueID", Tag=0x00000012, Type=typing.Optional[str]),
                 ClusterObjectFieldDescriptor(Label="capabilityMinima", Tag=0x00000013, Type=BasicInformation.Structs.CapabilityMinimaStruct),
                 ClusterObjectFieldDescriptor(Label="productAppearance", Tag=0x00000014, Type=typing.Optional[BasicInformation.Structs.ProductAppearanceStruct]),
-                ClusterObjectFieldDescriptor(Label="specificationVersion", Tag=0x00000015, Type=uint),
-                ClusterObjectFieldDescriptor(Label="maxPathsPerInvoke", Tag=0x00000016, Type=uint),
-                ClusterObjectFieldDescriptor(Label="configurationVersion", Tag=0x00000018, Type=uint),
+                ClusterObjectFieldDescriptor(Label="specificationVersion", Tag=0x00000015, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="maxPathsPerInvoke", Tag=0x00000016, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="configurationVersion", Tag=0x00000018, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -3736,12 +3736,12 @@ class BasicInformation(Cluster):
     serialNumber: typing.Optional[str] = None
     localConfigDisabled: typing.Optional[bool] = None
     reachable: typing.Optional[bool] = None
-    uniqueID: str = ""
+    uniqueID: typing.Optional[str] = None
     capabilityMinima: BasicInformation.Structs.CapabilityMinimaStruct = field(default_factory=lambda: BasicInformation.Structs.CapabilityMinimaStruct())
     productAppearance: typing.Optional[BasicInformation.Structs.ProductAppearanceStruct] = None
-    specificationVersion: uint = 0
-    maxPathsPerInvoke: uint = 0
-    configurationVersion: uint = 0
+    specificationVersion: typing.Optional[uint] = None
+    maxPathsPerInvoke: typing.Optional[uint] = None
+    configurationVersion: typing.Optional[uint] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -4132,9 +4132,9 @@ class BasicInformation(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=str)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[str])
 
-            value: str = ""
+            value: typing.Optional[str] = None
 
         @dataclass
         class CapabilityMinima(ClusterAttributeDescriptor):
@@ -4180,9 +4180,9 @@ class BasicInformation(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: uint = 0
+            value: typing.Optional[uint] = None
 
         @dataclass
         class MaxPathsPerInvoke(ClusterAttributeDescriptor):
@@ -4196,9 +4196,9 @@ class BasicInformation(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: uint = 0
+            value: typing.Optional[uint] = None
 
         @dataclass
         class ConfigurationVersion(ClusterAttributeDescriptor):
@@ -4212,9 +4212,9 @@ class BasicInformation(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: uint = 0
+            value: typing.Optional[uint] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -7926,13 +7926,14 @@ class GeneralDiagnostics(Cluster):
             Fields=[
                 ClusterObjectFieldDescriptor(Label="networkInterfaces", Tag=0x00000000, Type=typing.List[GeneralDiagnostics.Structs.NetworkInterface]),
                 ClusterObjectFieldDescriptor(Label="rebootCount", Tag=0x00000001, Type=uint),
-                ClusterObjectFieldDescriptor(Label="upTime", Tag=0x00000002, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="upTime", Tag=0x00000002, Type=uint),
                 ClusterObjectFieldDescriptor(Label="totalOperationalHours", Tag=0x00000003, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="bootReason", Tag=0x00000004, Type=typing.Optional[GeneralDiagnostics.Enums.BootReasonEnum]),
                 ClusterObjectFieldDescriptor(Label="activeHardwareFaults", Tag=0x00000005, Type=typing.Optional[typing.List[GeneralDiagnostics.Enums.HardwareFaultEnum]]),
                 ClusterObjectFieldDescriptor(Label="activeRadioFaults", Tag=0x00000006, Type=typing.Optional[typing.List[GeneralDiagnostics.Enums.RadioFaultEnum]]),
                 ClusterObjectFieldDescriptor(Label="activeNetworkFaults", Tag=0x00000007, Type=typing.Optional[typing.List[GeneralDiagnostics.Enums.NetworkFaultEnum]]),
                 ClusterObjectFieldDescriptor(Label="testEventTriggersEnabled", Tag=0x00000008, Type=bool),
+                ClusterObjectFieldDescriptor(Label="deviceLoadStatus", Tag=0x0000000A, Type=typing.Optional[GeneralDiagnostics.Structs.DeviceLoadStruct]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -7942,13 +7943,14 @@ class GeneralDiagnostics(Cluster):
 
     networkInterfaces: typing.List[GeneralDiagnostics.Structs.NetworkInterface] = field(default_factory=lambda: [])
     rebootCount: uint = 0
-    upTime: typing.Optional[uint] = None
+    upTime: uint = 0
     totalOperationalHours: typing.Optional[uint] = None
     bootReason: typing.Optional[GeneralDiagnostics.Enums.BootReasonEnum] = None
     activeHardwareFaults: typing.Optional[typing.List[GeneralDiagnostics.Enums.HardwareFaultEnum]] = None
     activeRadioFaults: typing.Optional[typing.List[GeneralDiagnostics.Enums.RadioFaultEnum]] = None
     activeNetworkFaults: typing.Optional[typing.List[GeneralDiagnostics.Enums.NetworkFaultEnum]] = None
     testEventTriggersEnabled: bool = False
+    deviceLoadStatus: typing.Optional[GeneralDiagnostics.Structs.DeviceLoadStruct] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -8028,8 +8030,28 @@ class GeneralDiagnostics(Cluster):
     class Bitmaps:
         class Feature(IntFlag):
             kDataModelTest = 0x1
+            kDeviceLoad = 0x2
 
     class Structs:
+        @dataclass
+        class DeviceLoadStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="currentSubscriptions", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="currentSubscriptionsForFabric", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="totalSubscriptionsEstablished", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="totalInteractionModelMessagesSent", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="totalInteractionModelMessagesReceived", Tag=4, Type=uint),
+                    ])
+
+            currentSubscriptions: 'uint' = 0
+            currentSubscriptionsForFabric: 'uint' = 0
+            totalSubscriptionsEstablished: 'uint' = 0
+            totalInteractionModelMessagesSent: 'uint' = 0
+            totalInteractionModelMessagesReceived: 'uint' = 0
+
         @dataclass
         class NetworkInterface(ClusterObject):
             @ChipUtility.classproperty
@@ -8186,9 +8208,9 @@ class GeneralDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: typing.Optional[uint] = None
+            value: uint = 0
 
         @dataclass
         class TotalOperationalHours(ClusterAttributeDescriptor):
@@ -8285,6 +8307,22 @@ class GeneralDiagnostics(Cluster):
                 return ClusterObjectFieldDescriptor(Type=bool)
 
             value: bool = False
+
+        @dataclass
+        class DeviceLoadStatus(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000033
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000000A
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[GeneralDiagnostics.Structs.DeviceLoadStruct])
+
+            value: typing.Optional[GeneralDiagnostics.Structs.DeviceLoadStruct] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -11607,7 +11645,7 @@ class BridgedDeviceBasicInformation(Cluster):
                 ClusterObjectFieldDescriptor(Label="productLabel", Tag=0x0000000E, Type=typing.Optional[str]),
                 ClusterObjectFieldDescriptor(Label="serialNumber", Tag=0x0000000F, Type=typing.Optional[str]),
                 ClusterObjectFieldDescriptor(Label="reachable", Tag=0x00000011, Type=bool),
-                ClusterObjectFieldDescriptor(Label="uniqueID", Tag=0x00000012, Type=str),
+                ClusterObjectFieldDescriptor(Label="uniqueID", Tag=0x00000012, Type=typing.Optional[str]),
                 ClusterObjectFieldDescriptor(Label="productAppearance", Tag=0x00000014, Type=typing.Optional[BridgedDeviceBasicInformation.Structs.ProductAppearanceStruct]),
                 ClusterObjectFieldDescriptor(Label="configurationVersion", Tag=0x00000018, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
@@ -11632,7 +11670,7 @@ class BridgedDeviceBasicInformation(Cluster):
     productLabel: typing.Optional[str] = None
     serialNumber: typing.Optional[str] = None
     reachable: bool = False
-    uniqueID: str = ""
+    uniqueID: typing.Optional[str] = None
     productAppearance: typing.Optional[BridgedDeviceBasicInformation.Structs.ProductAppearanceStruct] = None
     configurationVersion: typing.Optional[uint] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
@@ -11973,9 +12011,9 @@ class BridgedDeviceBasicInformation(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=str)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[str])
 
-            value: str = ""
+            value: typing.Optional[str] = None
 
         @dataclass
         class ProductAppearance(ClusterAttributeDescriptor):

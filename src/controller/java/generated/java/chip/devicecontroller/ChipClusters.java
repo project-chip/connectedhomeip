@@ -9425,6 +9425,7 @@ public class ChipClusters {
     private static final long ACTIVE_RADIO_FAULTS_ATTRIBUTE_ID = 6L;
     private static final long ACTIVE_NETWORK_FAULTS_ATTRIBUTE_ID = 7L;
     private static final long TEST_EVENT_TRIGGERS_ENABLED_ATTRIBUTE_ID = 8L;
+    private static final long DEVICE_LOAD_STATUS_ATTRIBUTE_ID = 10L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
@@ -9558,6 +9559,10 @@ public class ChipClusters {
 
     public interface ActiveNetworkFaultsAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Integer> value);
+    }
+
+    public interface DeviceLoadStatusAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(ChipStructs.GeneralDiagnosticsClusterDeviceLoadStruct value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -9804,6 +9809,32 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, TEST_EVENT_TRIGGERS_ENABLED_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readDeviceLoadStatusAttribute(
+        DeviceLoadStatusAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DEVICE_LOAD_STATUS_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            ChipStructs.GeneralDiagnosticsClusterDeviceLoadStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, DEVICE_LOAD_STATUS_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeDeviceLoadStatusAttribute(
+        DeviceLoadStatusAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DEVICE_LOAD_STATUS_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            ChipStructs.GeneralDiagnosticsClusterDeviceLoadStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, DEVICE_LOAD_STATUS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(

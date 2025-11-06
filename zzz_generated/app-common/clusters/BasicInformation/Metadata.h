@@ -117,7 +117,7 @@ namespace ConfigurationVersion {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ConfigurationVersion::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace ConfigurationVersion
-constexpr std::array<DataModel::AttributeEntry, 16> kMandatoryMetadata = {
+constexpr std::array<DataModel::AttributeEntry, 12> kMandatoryMetadata = {
     DataModelRevision::kMetadataEntry,
     VendorName::kMetadataEntry,
     VendorID::kMetadataEntry,
@@ -129,11 +129,7 @@ constexpr std::array<DataModel::AttributeEntry, 16> kMandatoryMetadata = {
     HardwareVersionString::kMetadataEntry,
     SoftwareVersion::kMetadataEntry,
     SoftwareVersionString::kMetadataEntry,
-    UniqueID::kMetadataEntry,
     CapabilityMinima::kMetadataEntry,
-    SpecificationVersion::kMetadataEntry,
-    MaxPathsPerInvoke::kMetadataEntry,
-    ConfigurationVersion::kMetadataEntry,
 
 };
 

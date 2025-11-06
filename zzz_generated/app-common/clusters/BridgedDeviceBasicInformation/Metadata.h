@@ -93,9 +93,8 @@ namespace ConfigurationVersion {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ConfigurationVersion::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace ConfigurationVersion
-constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
+constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
     Reachable::kMetadataEntry,
-    UniqueID::kMetadataEntry,
 
 };
 

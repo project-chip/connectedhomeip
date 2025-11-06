@@ -91,6 +91,17 @@ class GeneralDiagnosticsCluster(
     object SubscriptionEstablished : ActiveNetworkFaultsAttributeSubscriptionState()
   }
 
+  class DeviceLoadStatusAttribute(val value: GeneralDiagnosticsClusterDeviceLoadStruct?)
+
+  sealed class DeviceLoadStatusAttributeSubscriptionState {
+    data class Success(val value: GeneralDiagnosticsClusterDeviceLoadStruct?) :
+      DeviceLoadStatusAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : DeviceLoadStatusAttributeSubscriptionState()
+
+    object SubscriptionEstablished : DeviceLoadStatusAttributeSubscriptionState()
+  }
+
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
   sealed class GeneratedCommandListAttributeSubscriptionState {
@@ -441,7 +452,7 @@ class GeneralDiagnosticsCluster(
     }
   }
 
-  suspend fun readUpTimeAttribute(): ULong? {
+  suspend fun readUpTimeAttribute(): ULong {
     val ATTRIBUTE_ID: UInt = 2u
 
     val attributePath =
@@ -467,12 +478,7 @@ class GeneralDiagnosticsCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: ULong? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getULong(AnonymousTag)
-      } else {
-        null
-      }
+    val decodedValue: ULong = tlvReader.getULong(AnonymousTag)
 
     return decodedValue
   }
@@ -516,14 +522,9 @@ class GeneralDiagnosticsCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: ULong? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getULong(AnonymousTag)
-            } else {
-              null
-            }
+          val decodedValue: ULong = tlvReader.getULong(AnonymousTag)
 
-          decodedValue?.let { emit(ULongSubscriptionState.Success(it)) }
+          emit(ULongSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(ULongSubscriptionState.SubscriptionEstablished)
@@ -1109,6 +1110,99 @@ class GeneralDiagnosticsCluster(
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(BooleanSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readDeviceLoadStatusAttribute(): DeviceLoadStatusAttribute {
+    val ATTRIBUTE_ID: UInt = 10u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Deviceloadstatus attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: GeneralDiagnosticsClusterDeviceLoadStruct? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        GeneralDiagnosticsClusterDeviceLoadStruct.fromTlv(AnonymousTag, tlvReader)
+      } else {
+        null
+      }
+
+    return DeviceLoadStatusAttribute(decodedValue)
+  }
+
+  suspend fun subscribeDeviceLoadStatusAttribute(
+    minInterval: Int,
+    maxInterval: Int,
+  ): Flow<DeviceLoadStatusAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 10u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            DeviceLoadStatusAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Deviceloadstatus attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: GeneralDiagnosticsClusterDeviceLoadStruct? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              GeneralDiagnosticsClusterDeviceLoadStruct.fromTlv(AnonymousTag, tlvReader)
+            } else {
+              null
+            }
+
+          decodedValue?.let { emit(DeviceLoadStatusAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(DeviceLoadStatusAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }

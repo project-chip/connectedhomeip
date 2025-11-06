@@ -17,7 +17,7 @@ namespace app {
 namespace Clusters {
 namespace GeneralDiagnostics {
 
-inline constexpr uint32_t kRevision = 2;
+inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
 
@@ -66,9 +66,14 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(TestEventTriggersEnabl
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
                                                           std::nullopt);
 } // namespace TestEventTriggersEnabled
-constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
+namespace DeviceLoadStatus {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(DeviceLoadStatus::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
+} // namespace DeviceLoadStatus
+constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
     NetworkInterfaces::kMetadataEntry,
     RebootCount::kMetadataEntry,
+    UpTime::kMetadataEntry,
     TestEventTriggersEnabled::kMetadataEntry,
 
 };
