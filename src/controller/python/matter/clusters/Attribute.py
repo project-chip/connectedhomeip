@@ -1065,8 +1065,8 @@ def TestOnlyWriteAttributeWithMismatchedTimedRequestField(future: Future, eventL
                                                           attributes: List[AttributeWriteRequest],
                                                           timedRequestTimeoutMs: int,
                                                           timedRequestFieldValue: bool,
-                                                            interactionTimeoutMs: Union[None, int] = None,
-                                                            busyWaitMs: Union[None, int] = None) -> PyChipError:
+                                                          interactionTimeoutMs: Union[None, int] = None,
+                                                          busyWaitMs: Union[None, int] = None) -> PyChipError:
     '''
     ONLY TO BE USED FOR TEST: Writes attributes with decoupled Timed Request action and TimedRequest field.
     This allows testing TIMED_REQUEST_MISMATCH scenarios:
