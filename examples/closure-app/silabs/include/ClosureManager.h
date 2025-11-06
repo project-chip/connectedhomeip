@@ -156,7 +156,6 @@ public:
      */
     const Action_t & GetCurrentAction() const { return mCurrentAction; }
 
-
     /**
      * @brief Checks if a MoveTo action is currently in progress.
      *

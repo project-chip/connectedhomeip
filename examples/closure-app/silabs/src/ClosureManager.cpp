@@ -816,7 +816,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
 {
     MainStateEnum mClosureEndpoint1MainState;
     VerifyOrReturnError(mClosureEndpoint1.GetLogic().GetMainState(mClosureEndpoint1MainState) == CHIP_NO_ERROR, Status::Failure,
-    ChipLogError(AppServer, "Failed to get main state for SetTarget command on Endpoint 1"));
+                        ChipLogError(AppServer, "Failed to get main state for SetTarget command on Endpoint 1"));
 
     // If this command is received while the MainState attribute is currently either in Disengaged, Protected, Calibrating,
     //  SetupRequired or Error, then a status code of INVALID_IN_STATE shall be returned.
