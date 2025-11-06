@@ -19,7 +19,6 @@ import pty
 import queue
 import re
 import subprocess
-import sys
 import threading
 import typing
 from dataclasses import dataclass
