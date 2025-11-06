@@ -230,11 +230,11 @@ CHIP_ERROR AmebaWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
 {
     if (!ssid.empty()) // ssid is given, only scan this network
     {
-        matter_scan_networks_with_ssid(ssid.data(), ssid.size());
+        matter_wifi_scan_networks_with_ssid(ssid.data(), ssid.size());
     }
     else // scan all networks
     {
-        matter_scan_networks();
+        matter_wifi_scan_networks();
     }
     return CHIP_NO_ERROR;
 }
