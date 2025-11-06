@@ -27,7 +27,7 @@ from matter.testing.matter_testing import AttributeMatcher, AttributeValue
 logger = logging.getLogger(__name__)
 
 
-def wmark_osd_matcher(attribute_id: int, wmark: bool, osd: bool, wmark_check: bool, osd_check: bool) -> "AttributeMatcher":
+def wmark_osd_matcher(attribute_id: int, wmark: bool | None, osd: bool | None, wmark_check: bool, osd_check: bool) -> "AttributeMatcher":
     def predicate(report: AttributeValue) -> bool:
         if report.attribute != attribute_id:
             return False
