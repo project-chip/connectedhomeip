@@ -24,6 +24,7 @@ source_set("icd-management-server") {
   public_deps = [
     "${chip_root}/src/app/icd/server:configuration-data",
     "${chip_root}/src/app/icd/server:icd-server-config",
+    "${chip_root}/src/app/icd/server:observer",
     "${chip_root}/src/app/server-cluster",
   ]
   if (chip_enable_icd_server) {

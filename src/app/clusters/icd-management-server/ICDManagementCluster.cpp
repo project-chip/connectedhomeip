@@ -26,7 +26,6 @@
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/server/Server.h> // nogncheck
 #endif
-#include <app/reporting/reporting.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -106,6 +105,30 @@ ICDManagementCluster::ICDManagementCluster(EndpointId endpointId, Crypto::Symmet
     MutableCharSpan buffer(mUserActiveModeTriggerInstruction);
     CopyCharSpanToMutableCharSpanWithTruncation(userActiveModeTriggerInstruction, buffer);
     mUserActiveModeTriggerInstructionLength = static_cast<uint8_t>(buffer.size());
+}
+
+CHIP_ERROR ICDManagementCluster::Startup(ServerClusterContext & context)
+{
+    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+// TODO(#32321): Remove #if after issue is resolved
+// Note: We only need this #if statement for platform examples that enable the ICD management server without building the sample
+// as an ICD. Since this is not spec compliant, we should remove this #if statement once we stop compiling the ICD management
+// server in those examples.
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    Server::GetInstance().GetICDManager().RegisterObserver(this);
+#endif
+    return CHIP_NO_ERROR;
+}
+
+void ICDManagementCluster::Shutdown()
+{
+// TODO(#32321): Remove #if after issue is resolved
+// Note: We only need this #if statement for platform examples that enable the ICD management server without building the sample
+// as an ICD. Since this is not spec compliant, we should remove this #if statement once we stop compiling the ICD management
+// server in those examples.
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    Server::GetInstance().GetICDManager().ReleaseObserver(this);
+#endif
 }
 
 DataModel::ActionReturnStatus ICDManagementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -216,6 +239,12 @@ CHIP_ERROR ICDManagementCluster::GeneratedCommands(const ConcreteClusterPath & p
     return CHIP_NO_ERROR;
 }
 
+void ICDManagementCluster::OnICDModeChange()
+{
+    // Notify attribute change for OperatingMode attribute
+    NotifyAttributeChanged(IcdManagement::Attributes::OperatingMode::Id);
+}
+
 #if CHIP_CONFIG_ENABLE_ICD_LIT
 CHIP_ERROR ICDManagementCluster::ReadOperatingMode(AttributeValueEncoder & encoder)
 {
@@ -224,8 +253,8 @@ CHIP_ERROR ICDManagementCluster::ReadOperatingMode(AttributeValueEncoder & encod
         : encoder.Encode(IcdManagement::OperatingModeEnum::kLit);
 }
 #endif // CHIP_CONFIG_ENABLE_ICD_LIT
-#if CHIP_CONFIG_ENABLE_ICD_CIP
 
+#if CHIP_CONFIG_ENABLE_ICD_CIP
 ICDManagementClusterWithCIP::ICDManagementClusterWithCIP(
     EndpointId endpointId, Crypto::SymmetricKeystore & symmetricKeystore, FabricTable & fabricTable,
     ICDConfigurationData & icdConfigurationData, OptionalAttributeSet optionalAttributeSet,
@@ -488,8 +517,8 @@ Status ICDManagementClusterWithCIP::RegisterClient(CommandHandler * commandObj, 
         // Notify subscribers that the first entry for the fabric was successfully added
         TriggerICDMTableUpdatedEvent();
     }
-    MatterReportingAttributeChangeCallback(kRootEndpointId, IcdManagement::Id, IcdManagement::Attributes::RegisteredClients::Id);
-    icdCounter = mICDConfigurationData->GetICDCounter().GetValue();
+    MarkRegisteredClientsListChanged();
+    icdCounter = mICDConfigurationData.GetICDCounter().GetValue();
 
     return Status::Success;
 }
@@ -529,16 +558,14 @@ Status ICDManagementClusterWithCIP::UnregisterClient(CommandHandler * commandObj
         TriggerICDMTableUpdatedEvent();
     }
 
-    MatterReportingAttributeChangeCallback(kRootEndpointId, IcdManagement::Id, IcdManagement::Attributes::RegisteredClients::Id);
+    MarkRegisteredClientsListChanged();
     return Status::Success;
 }
 
-#endif // CHIP_CONFIG_ENABLE_ICD_CIP
-
-void ICDManagementServer::OnICDModeChange()
+void ICDManagementClusterWithCIP::MarkRegisteredClientsListChanged()
 {
-    // Notify attribute change for OperatingMode attribute
-    MatterReportingAttributeChangeCallback(kRootEndpointId, IcdManagement::Id, IcdManagement::Attributes::OperatingMode::Id);
+    NotifyAttributeChanged(IcdManagement::Attributes::RegisteredClients::Id);
 }
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
 } // namespace chip::app::Clusters

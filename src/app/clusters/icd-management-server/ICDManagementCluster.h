@@ -85,6 +85,9 @@ public:
                          BitMask<IcdManagement::UserActiveModeTriggerBitmap> userActiveModeTriggerBitmap,
                          CharSpan userActiveModeTriggerInstruction);
 
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+    void Shutdown() override;
+
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
@@ -174,6 +177,8 @@ public:
     CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
 
 private:
+    void MarkRegisteredClientsListChanged();
+
     CHIP_ERROR ReadRegisteredClients(AttributeValueEncoder & encoder);
 
     /**
