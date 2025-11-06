@@ -302,7 +302,7 @@ FROM ubuntu:24.04
 ENV TZ=Etc/UTC
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apt-get update -y
-RUN apt-get install -y           \ 
+RUN apt-get install -y           \
   avahi-utils                    \
   gstreamer1.0-plugins-good      \
   gstreamer1.0-plugins-ugly      \
