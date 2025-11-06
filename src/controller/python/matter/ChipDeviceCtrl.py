@@ -1608,7 +1608,7 @@ class ChipDeviceControllerBase():
         return await future
 
     def _prepare_write_attribute_requests(
-        self, 
+        self,
         attributes: typing.List[typing.Union[
             typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor],
             typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]
