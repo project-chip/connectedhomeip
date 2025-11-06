@@ -21,12 +21,14 @@
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server/Server.h>
 #include <clusters/GeneralCommissioning/Enums.h>
 #include <clusters/GeneralCommissioning/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/Span.h>
+#include <platform/DeviceControlServer.h>
 #include <platform/NetworkCommissioning.h>
 
 namespace {
@@ -51,7 +53,17 @@ TEST_F(TestGeneralCommissioningCluster, TestAttributes)
 {
     // test without optional attributes
     {
-        GeneralCommissioningCluster cluster;
+        GeneralCommissioningCluster cluster(GeneralCommissioningCluster::Context {
+            .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
+                .configurationManager   = DeviceLayer::ConfigurationMgr(),                       //
+                .deviceControlServer    = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
+                .fabricTable            = Server::GetInstance().GetFabricTable(),                //
+                .failsafeContext        = Server::GetInstance().GetFailSafeContext(),            //
+                .platformManager        = DeviceLayer::PlatformMgr(),                            //
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+                .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+        });
         auto & optionalAttributes = cluster.GetOptionalAttributes();
         optionalAttributes        = GeneralCommissioningCluster::OptionalAttributes(0);
 
@@ -87,7 +99,17 @@ TEST_F(TestGeneralCommissioningCluster, TestAttributes)
 
     // test with optional attributes
     {
-        GeneralCommissioningCluster cluster;
+        GeneralCommissioningCluster cluster(GeneralCommissioningCluster::Context {
+            .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
+                .configurationManager   = DeviceLayer::ConfigurationMgr(),                       //
+                .deviceControlServer    = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
+                .fabricTable            = Server::GetInstance().GetFabricTable(),                //
+                .failsafeContext        = Server::GetInstance().GetFailSafeContext(),            //
+                .platformManager        = DeviceLayer::PlatformMgr(),                            //
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+                .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+        });
         auto & optionalAttributes = cluster.GetOptionalAttributes();
         optionalAttributes.Set<IsCommissioningWithoutPower::Id>();
 
@@ -130,9 +152,20 @@ TEST_F(TestGeneralCommissioningCluster, TestAttributes)
 
 TEST_F(TestGeneralCommissioningCluster, TestAcceptedCommands)
 {
+    GeneralCommissioningCluster cluster(GeneralCommissioningCluster::Context {
+        .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
+            .configurationManager   = DeviceLayer::ConfigurationMgr(),                       //
+            .deviceControlServer    = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
+            .fabricTable            = Server::GetInstance().GetFabricTable(),                //
+            .failsafeContext        = Server::GetInstance().GetFailSafeContext(),            //
+            .platformManager        = DeviceLayer::PlatformMgr(),                            //
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+            .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    });
+
     {
         ReadOnlyBufferBuilder<AcceptedCommandEntry> builder;
-        GeneralCommissioningCluster cluster;
         ASSERT_EQ(cluster.AcceptedCommands({ kRootEndpointId, GeneralCommissioning::Id }, builder), CHIP_NO_ERROR);
 
         ReadOnlyBufferBuilder<AcceptedCommandEntry> expectedBuilder;

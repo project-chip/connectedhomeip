@@ -29,6 +29,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/clusters/general-commissioning-server/CodegenIntegration.h>
+#include <app/clusters/general-commissioning-server/general-commissioning-cluster.h>
 #include <app/data-model/Nullable.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/Optional.h>
