@@ -59,15 +59,16 @@ static const uint8_t threadLogo[]       = { THREAD_BITMAP };
 static const uint8_t bleLogo[]          = { BLUETOOTH_ICON_SMALL };
 
 // Static variables to hold the current closure state
-chip::app::Clusters::ClosureControl::MainStateEnum ClosureUI::sMainState = chip::app::Clusters::ClosureControl::MainStateEnum::kUnknownEnumValue;
+chip::app::Clusters::ClosureControl::MainStateEnum ClosureUI::sMainState =
+    chip::app::Clusters::ClosureControl::MainStateEnum::kUnknownEnumValue;
 
 // Helper function to format text using prefix + suffix
 namespace {
-    inline void FormatText(char * dest, size_t destSize, const char * prefix, const char * suffix)
-    {
-        snprintf(dest, destSize, "%s%s", prefix, suffix);
-    }
+inline void FormatText(char * dest, size_t destSize, const char * prefix, const char * suffix)
+{
+    snprintf(dest, destSize, "%s%s", prefix, suffix);
 }
+} // namespace
 
 // Initialize arrays using buffer sizes
 char ClosureUI::sPositionText[ClosureUIStrings::BUFFER_SIZE_POSITION];
@@ -77,18 +78,20 @@ char ClosureUI::sSpeedText[ClosureUIStrings::BUFFER_SIZE_SPEED];
 char ClosureUI::sStateText[ClosureUIStrings::BUFFER_SIZE_STATE];
 
 // Static initializer to set default values using prefix + suffix
-struct ClosureUITextInitializer {
-    ClosureUITextInitializer() {
-        FormatText(ClosureUI::sPositionText, sizeof(ClosureUI::sPositionText),
-                  ClosureUIStrings::POSITION_PREFIX, ClosureUIStrings::POSITION_SUFFIX_UNKNOWN);
-        FormatText(ClosureUI::sLatchText, sizeof(ClosureUI::sLatchText),
-                  ClosureUIStrings::LATCH_PREFIX, ClosureUIStrings::LATCH_SUFFIX_UNKNOWN);
-        FormatText(ClosureUI::sSecureText, sizeof(ClosureUI::sSecureText),
-                  ClosureUIStrings::SECURE_PREFIX, ClosureUIStrings::SECURE_SUFFIX_UNKNOWN);
-        FormatText(ClosureUI::sSpeedText, sizeof(ClosureUI::sSpeedText),
-                  ClosureUIStrings::SPEED_PREFIX, ClosureUIStrings::SPEED_SUFFIX_UNKNOWN);
-        FormatText(ClosureUI::sStateText, sizeof(ClosureUI::sStateText),
-                  ClosureUIStrings::STATE_PREFIX, ClosureUIStrings::STATE_SUFFIX_UNKNOWN);
+struct ClosureUITextInitializer
+{
+    ClosureUITextInitializer()
+    {
+        FormatText(ClosureUI::sPositionText, sizeof(ClosureUI::sPositionText), ClosureUIStrings::POSITION_PREFIX,
+                   ClosureUIStrings::POSITION_SUFFIX_UNKNOWN);
+        FormatText(ClosureUI::sLatchText, sizeof(ClosureUI::sLatchText), ClosureUIStrings::LATCH_PREFIX,
+                   ClosureUIStrings::LATCH_SUFFIX_UNKNOWN);
+        FormatText(ClosureUI::sSecureText, sizeof(ClosureUI::sSecureText), ClosureUIStrings::SECURE_PREFIX,
+                   ClosureUIStrings::SECURE_SUFFIX_UNKNOWN);
+        FormatText(ClosureUI::sSpeedText, sizeof(ClosureUI::sSpeedText), ClosureUIStrings::SPEED_PREFIX,
+                   ClosureUIStrings::SPEED_SUFFIX_UNKNOWN);
+        FormatText(ClosureUI::sStateText, sizeof(ClosureUI::sStateText), ClosureUIStrings::STATE_PREFIX,
+                   ClosureUIStrings::STATE_SUFFIX_UNKNOWN);
     }
 };
 static ClosureUITextInitializer sInitializer;
@@ -133,7 +136,8 @@ void ClosureUI::SetOverallCurrentState(const char * positionText, const char * l
     }
     else
     {
-        FormatText(sPositionText, sizeof(sPositionText), ClosureUIStrings::POSITION_PREFIX, ClosureUIStrings::POSITION_SUFFIX_UNKNOWN);
+        FormatText(sPositionText, sizeof(sPositionText), ClosureUIStrings::POSITION_PREFIX,
+                   ClosureUIStrings::POSITION_SUFFIX_UNKNOWN);
     }
 
     if (latchText != nullptr)
@@ -235,7 +239,6 @@ void ClosureUI::DrawFooter(GLIB_Context_t * glibContext)
 {
     GLIB_drawStringOnLine(glibContext, ClosureUIStrings::FOOTER_TEXT, FOOTER_DISPLAY_LINE, GLIB_ALIGN_CENTER, 0, 0, true);
 }
-
 
 void ClosureUI::FormatAndSetPosition(const char * suffix)
 {

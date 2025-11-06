@@ -18,9 +18,9 @@
 
 #pragma once
 
+#include "ClosureUIStrings.h"
 #include "glib.h"
 #include "lcd.h"
-#include "ClosureUIStrings.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/closure-control-server/closure-control-cluster-objects.h>
 #include <app/data-model/Nullable.h>

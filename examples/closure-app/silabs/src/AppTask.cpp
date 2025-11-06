@@ -45,11 +45,11 @@
 #include <lib/support/BitMask.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <stdio.h>
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
+#include <stdio.h>
 
 #define APP_FUNCTION_BUTTON 0
 #define APP_CLOSURE_BUTTON 1
@@ -151,7 +151,6 @@ void AppTask::UpdateClosureUI()
 {
     ClosureManager & closureManager = ClosureManager::GetInstance();
 
-
     DeviceLayer::PlatformMgr().LockChipStack();
     auto uiData = closureManager.GetClosureUIData();
     DeviceLayer::PlatformMgr().UnlockChipStack();
@@ -190,14 +189,16 @@ void AppTask::UpdateClosureUI()
     if (!uiData.overallCurrentState.IsNull() && uiData.overallCurrentState.Value().latch.HasValue() &&
         !uiData.overallCurrentState.Value().latch.Value().IsNull())
     {
-        latchSuffix = uiData.overallCurrentState.Value().latch.Value().Value() ? ClosureUIStrings::LATCH_SUFFIX_ENGAGED : ClosureUIStrings::LATCH_SUFFIX_RELEASED;
+        latchSuffix = uiData.overallCurrentState.Value().latch.Value().Value() ? ClosureUIStrings::LATCH_SUFFIX_ENGAGED
+                                                                               : ClosureUIStrings::LATCH_SUFFIX_RELEASED;
     }
     ClosureUI::FormatAndSetLatch(latchSuffix);
 
     const char * secureSuffix = ClosureUIStrings::SECURE_SUFFIX_UNKNOWN;
     if (!uiData.overallCurrentState.IsNull() && !uiData.overallCurrentState.Value().secureState.IsNull())
     {
-        secureSuffix = uiData.overallCurrentState.Value().secureState.Value() ? ClosureUIStrings::SECURE_SUFFIX_YES : ClosureUIStrings::SECURE_SUFFIX_NO;
+        secureSuffix = uiData.overallCurrentState.Value().secureState.Value() ? ClosureUIStrings::SECURE_SUFFIX_YES
+                                                                              : ClosureUIStrings::SECURE_SUFFIX_NO;
     }
     ClosureUI::FormatAndSetSecure(secureSuffix);
 
