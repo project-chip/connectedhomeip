@@ -132,7 +132,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
 
         return steps
 
-    @ async_test_body
+    @async_test_body
     async def test_TC_TSTAT_4_3(self):
         endpoint = self.get_endpoint()
 

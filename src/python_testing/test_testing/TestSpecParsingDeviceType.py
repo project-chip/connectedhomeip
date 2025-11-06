@@ -554,9 +554,9 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         supersets = get_supersets(self.xml_device_types)
 
         expected_light_superset = {self.dt_ids['extendedcolorlight'],
-                                       self.dt_ids['colortemperaturelight'], self.dt_ids['dimmablelight'], self.dt_ids['onofflight']}
+                                   self.dt_ids['colortemperaturelight'], self.dt_ids['dimmablelight'], self.dt_ids['onofflight']}
         expected_dimmer_switch = {self.dt_ids['colordimmerswitch'],
-                                     self.dt_ids['dimmerswitch'], self.dt_ids['onofflightswitch']}
+                                  self.dt_ids['dimmerswitch'], self.dt_ids['onofflightswitch']}
 
         asserts.assert_in(expected_light_superset, supersets, "Did not find expected light superset")
         asserts.assert_in(expected_dimmer_switch, supersets, "Did not find expected switch superset")
@@ -569,9 +569,9 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         expected_onoff_plugin = {self.dt_ids['mountedonoffcontrol'], self.dt_ids['onoffpluginunit']}
         expected_dimmable_plugin = {self.dt_ids['mounteddimmableloadcontrol'], self.dt_ids['dimmablepluginunit']}
         expected_light_superset = {self.dt_ids['extendedcolorlight'],
-                                       self.dt_ids['colortemperaturelight'], self.dt_ids['dimmablelight'], self.dt_ids['onofflight']}
+                                   self.dt_ids['colortemperaturelight'], self.dt_ids['dimmablelight'], self.dt_ids['onofflight']}
         expected_dimmer_switch = {self.dt_ids['colordimmerswitch'],
-                                     self.dt_ids['dimmerswitch'], self.dt_ids['onofflightswitch']}
+                                  self.dt_ids['dimmerswitch'], self.dt_ids['onofflightswitch']}
 
         asserts.assert_in(expected_light_superset, supersets, "Did not find expected light superset")
         asserts.assert_in(expected_dimmer_switch, supersets, "Did not find expected switch superset")

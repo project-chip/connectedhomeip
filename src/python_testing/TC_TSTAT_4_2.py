@@ -714,7 +714,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             ScenarioHeadroom = namedtuple("ScenarioHeadroom", "presetScenario remaining")
             # Generate list of tuples of scenarios and number of remaining presets per scenario allowed
             presetScenarioHeadrooms = [ScenarioHeadroom(presetType.presetScenario,
-                                           presetType.numberOfPresets - presetScenarioCounts.get(presetType.presetScenario, 0)) for presetType in presetTypes]
+                                                        presetType.numberOfPresets - presetScenarioCounts.get(presetType.presetScenario, 0)) for presetType in presetTypes]
 
             if presetScenarioHeadrooms:
                 # Find the preset scenario with the smallest number of remaining allowed presets
