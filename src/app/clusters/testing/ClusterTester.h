@@ -140,7 +140,6 @@ public:
                 return status.has_value() && status->IsSuccess();
             else
                 return status.has_value() && status->IsSuccess() && response.has_value();
-
         }
     };
 
