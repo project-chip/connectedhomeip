@@ -22,6 +22,6 @@ from .runner import Executor, SubprocessInfo
 class DarwinExecutor(Executor):
     def run(self, subproc: SubprocessInfo, stdin, stdout, stderr):
         # Try harder to avoid any stdout buffering in our tests
-        wrapped = wrapped.wrap_with('stdbuf', '-o0', '-i0')
+        wrapped = subproc.wrap_with('stdbuf', '-o0', '-i0')
         s = subprocess.Popen(wrapped.to_cmd(), stdin=stdin, stdout=stdout, stderr=stderr)
         return s
