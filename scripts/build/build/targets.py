@@ -208,10 +208,8 @@ def BuildHostTarget():
         "-(" + "|".join(sorted([
             # keep-sorted start
             'air-purifier',
-            'all-clusters',
             'bridge',
             'closure',
-            'energy-gateway',
             'light',
             'lock',
             'microwave-oven',

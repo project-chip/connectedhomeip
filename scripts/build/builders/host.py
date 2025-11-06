@@ -104,10 +104,8 @@ class HostApp(Enum):
             TARGETS = {
                 # keep-sorted start
                 HostApp.AIR_PURIFIER: ":linux_air_purifier_app",
-                HostApp.ALL_CLUSTERS: ":linux_all_clusters_app",
                 HostApp.BRIDGE: ":linux_bridge_app",
                 HostApp.CLOSURE: ":linux_closure_app",
-                HostApp.ENERGY_GATEWAY: ":linux_energy_gateway_app",
                 HostApp.LIGHT: ":linux_lighting_app",
                 HostApp.LOCK: ":linux_lock_app",
                 HostApp.MICROWAVE_OVEN: ":linux_microwave_oven_app",
