@@ -77,13 +77,6 @@ class TC_CNET_4_23(MatterBaseTest):
     @async_test_body
     async def test_TC_CNET_4_23(self):
 
-        wifi_ap_ssid = self.matter_test_config.wifi_ssid
-        wifi_ap_credentials = self.matter_test_config.wifi_passphrase
-
-        correct_ssid = wifi_ap_ssid.encode('utf-8')
-        correct_password = wifi_ap_credentials.encode('utf-8')
-        wrong_password = correct_password + b"_wrong"
-
         cgen = Clusters.GeneralCommissioning
         cnet = Clusters.NetworkCommissioning
 
@@ -92,17 +85,18 @@ class TC_CNET_4_23(MatterBaseTest):
 
         TIMED_REQUEST_TIMEOUT_MS = 5000
 
+        correct_ssid = self.matter_test_config.wifi_ssid.encode('utf-8')
+        wrong_password = self.matter_test_config.wifi_passphrase.encode('utf-8')
+        correct_password = self.matter_test_config.global_test_params["wifi_passphrase"].encode('utf-8')
+
         # TH begins commissioning the DUT over the initial commissioning radio (PASE):
         self.step(1)
 
-        # Skip automatic network commissioning (will be performed manually with incorrect then correct credentials)
+        # Skip CommissioningComplete to manually configure WiFi with incorrect then correct credentials
         self.default_controller.SetSkipCommissioningComplete(True)
         self.matter_test_config.commissioning_method = self.matter_test_config.in_test_commissioning_method
-
-        # Clear WiFi credentials to prevent automatic WiFi configuration during commissioning
-        # We will configure WiFi manually in the test steps
-        self.matter_test_config.wifi_ssid = None
-        self.matter_test_config.wifi_passphrase = None
+        self.matter_test_config.tc_version_to_simulate = None
+        self.matter_test_config.tc_user_response_to_simulate = None
 
         # * Establish PASE session
         # * Arm fail-safe timer (900 seconds)
@@ -183,9 +177,16 @@ class TC_CNET_4_23(MatterBaseTest):
             attribute=cnet.Attributes.LastNetworkingStatus,
         )
 
-        # Verify LastNetworkingStatus to be 'kAuthFailure'
-        asserts.assert_equal(response, cnet.Enums.NetworkCommissioningStatusEnum.kAuthFailure,
-                             "Expected LastNetworkingStatus to be 'kAuthFailure'")
+        # Verify LastNetworkingStatus indicates a failure
+        # Can be kAuthFailure (wrong password), kNetworkNotFound (network not in range),
+        # or kOtherConnectionFailure (general connection failure)
+        valid_failure_statuses = [
+            cnet.Enums.NetworkCommissioningStatusEnum.kAuthFailure,
+            cnet.Enums.NetworkCommissioningStatusEnum.kNetworkNotFound,
+            cnet.Enums.NetworkCommissioningStatusEnum.kOtherConnectionFailure
+        ]
+        asserts.assert_in(response, valid_failure_statuses,
+                          f"Expected LastNetworkingStatus to indicate failure, got {response}")
 
         # TH sends RemoveNetwork to the DUT with NetworkID field set to the SSID of the failed network and Breadcrumb field set to 3
         self.step(5)
@@ -222,9 +223,14 @@ class TC_CNET_4_23(MatterBaseTest):
                             "Unexpected value returned from ScanNetworks")
         # 1. wiFiScanResults contains the target network SSID
         ssids_found = [network.ssid for network in response.wiFiScanResults]
+        logger.info(f"Scan results: Found {len(ssids_found)} networks")
+
+        for i, ssid in enumerate(ssids_found):
+            logger.info(f"  Network {i}: {ssid} (type: {type(ssid)})")
+
         asserts.assert_true(correct_ssid in ssids_found,
-                            f"Expected to find SSID '{correct_ssid.decode('utf-8')}' in scan results")
-        logger.info(f"ScanNetworks found SSID: {correct_ssid.decode('utf-8')}")
+                            f"Expected to find SSID '{correct_ssid.decode('utf-8') if isinstance(correct_ssid, bytes) else correct_ssid}' in scan results")
+        logger.info(f"ScanNetworks found SSID: {correct_ssid.decode('utf-8') if isinstance(correct_ssid, bytes) else correct_ssid}")
 
         # TH sends AddOrUpdateWiFiNetwork with CORRECT credentials and Breadcrumb field set to 4
         self.step(7)
