@@ -39,16 +39,9 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --string-arg provider_app_path:${OTA_PROVIDER_APP}
-#       --string-arg ota_image_step1:${OTA_IMAGE_V2}
-#       --int-arg ota_image_step1_expected_version:2
-#       --string-arg ota_image_step2:${OTA_IMAGE_V3}
-#       --int-arg ota_image_step2_expected_version:3
-#       --string-arg ota_image_step3:${OTA_IMAGE_V4}
-#       --int-arg ota_image_step3_expected_version:4
-#       --string-arg ota_image_step4:${OTA_IMAGE_V5}
-#       --int-arg ota_image_step4_expected_version:5
-#       --string-arg ota_image_step5:${OTA_IMAGE_V6}
-#       --int-arg ota_image_step5_expected_version:6
+#       --string-arg ota_image:${SU_OTA_REQUESTOR_V2}
+#       --int-arg ota_image_expected_version:2
+#       --int-arg ota_provider_port:5541
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -92,9 +85,10 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
     @async_test_body
     async def setup_test(self):
         # Set up Provider configuration and values for step1
-        ota_image = self.user_params.get('ota_image_step1', None)
-        self.expected_software_version = self.user_params.get('ota_image_step1_expected_version')
+        self.ota_image = self.user_params.get('ota_image', None)
+        self.expected_software_version = self.user_params.get('ota_image_expected_version')
         self.provider_app_path = self.user_params.get('provider_app_path', None)
+        self.ota_provider_port = self.user_params.get('ota_provider_port', 5541)
 
         self.requestor_node_id = self.dut_node_id  # 123 with discriminator 123
         self.controller = self.default_controller
@@ -102,11 +96,11 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         extra_arguments = ['--applyUpdateAction', 'proceed', '--delayedApplyActionTimeSec', '0']
 
         self.start_provider(
-            provier_app_path=self.provider_app_path,
-            ota_image_path=ota_image,
+            provider_app_path=self.provider_app_path,
+            ota_image_path=self.ota_image,
             setup_pincode=self.provider_data['setup_pincode'],
             discriminator=self.provider_data['discriminator'],
-            port=5541,
+            port=self.ota_provider_port,
             kvs_path=self.kvs_path,
             log_file=self.provider_log,
             extra_args=extra_arguments,
@@ -160,29 +154,31 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         self.step(0)
 
         self.step(1)
+        update_state_attr_handler = AttributeSubscriptionHandler(
+            expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
+            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
+        )
+        await update_state_attr_handler.start(dev_ctrl=self.controller, node_id=self.requestor_node_id, endpoint=0,
+                                              fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
         basicinformation_handler = EventSubscriptionHandler(
             expected_cluster=Clusters.BasicInformation, expected_event_id=Clusters.BasicInformation.Events.ShutDown.event_id)
-        await basicinformation_handler.start(self.controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=60*8)
-        event_state_transition = EventSubscriptionHandler(expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
-                                                          expected_event_id=Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition.event_id)
-        await event_state_transition.start(self.controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=60*7)
+        await basicinformation_handler.start(self.controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=60*2)
         await self.announce_ota_provider(self.controller, self.provider_data['node_id'], self.requestor_node_id)
 
-        # Wait for Download event this means updating has started
-        event_report = event_state_transition.wait_for_event_report(
-            Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition, timeout_sec=30)
-        logger.info(f"Event report for Querying : {event_report}")
+        update_state_match = AttributeMatcher.from_callable(
+            "Update state is Downloading",
+            lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading)
+        update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=60)
 
-        # Wait for Download event this means updating has started
-        event_report = event_state_transition.wait_for_event_report(
-            Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition, timeout_sec=30)
-        logger.info(f"Event report for Downloading : {event_report}")
-
-        event_state_transition.flush_events()
-        await event_state_transition.cancel()
+        update_state_match = AttributeMatcher.from_callable(
+            "Update state is Applying",
+            lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying)
+        update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=60*5)
 
         # Wait for shutdown event ( this is triggered after the SU Completition)
-        shutdown_event = basicinformation_handler.wait_for_event_report(Clusters.BasicInformation.Events.ShutDown, timeout_sec=60*6)
+        update_state_attr_handler.flush_reports()
+        await update_state_attr_handler.cancel()
+        shutdown_event = basicinformation_handler.wait_for_event_report(Clusters.BasicInformation.Events.ShutDown, timeout_sec=60)
         logger.info(f"Event report for ShutDown : {shutdown_event}")
         # Cancel eventhandlers
 
@@ -201,11 +197,10 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         asserts.assert_equal(update_state, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
                              "Update state should be idle")
         self.current_provider_app_proc.terminate()
+        self.restart_requestor(self.controller)
 
         self.step(2)
         # Set values for step 2
-        ota_image = self.user_params.get('ota_image_step2', None)
-        self.expected_software_version = self.user_params.get("ota_image_step2_expected_version")
         delayed_apply_action_time = 60*3
         current_sw_version = await self.read_single_attribute_check_success(
             dev_ctrl=self.controller,
@@ -214,11 +209,11 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             node_id=self.requestor_node_id)
         extra_arguments = ['--applyUpdateAction', 'proceed', '--delayedApplyActionTimeSec', str(delayed_apply_action_time)]
         self.start_provider(
-            provier_app_path=self.provider_app_path,
-            ota_image_path=ota_image,
+            provider_app_path=self.provider_app_path,
+            ota_image_path=self.ota_image,
             setup_pincode=self.provider_data['setup_pincode'],
             discriminator=self.provider_data['discriminator'],
-            port=5541,
+            port=self.ota_provider_port,
             kvs_path=self.kvs_path,
             log_file=self.provider_log,
             extra_args=extra_arguments,
@@ -264,8 +259,6 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         asserts.assert_greater_equal(
             total_wait_time, delayed_apply_action_time, f"Software Udpate occured before the defined time of: {total_wait_time}")
         logger.info(f"Time taken after the update was done applied {total_wait_time} seconds.")
-        update_state_attr_handler.flush_reports()
-        await update_state_attr_handler.cancel()
         software_version_attr_handler.flush_reports()
         await software_version_attr_handler.cancel()
         update_state_after = await self.read_single_attribute_check_success(
@@ -278,19 +271,18 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
         # Terminate the provider
         self.current_provider_app_proc.terminate()
+        self.restart_requestor(self.controller)
 
         self.step(3)
-        ota_image = self.user_params.get('ota_image_step3', None)
-        self.expected_software_version = self.user_params.get("ota_image_step3_expected_version")
         delayed_apply_action_time = 60
         spec_wait_time = 120
         extra_arguments = ['--applyUpdateAction', 'awaitNextAction', '--delayedApplyActionTimeSec', str(delayed_apply_action_time)]
         self.start_provider(
-            provier_app_path=self.provider_app_path,
-            ota_image_path=ota_image,
+            provider_app_path=self.provider_app_path,
+            ota_image_path=self.ota_image,
             setup_pincode=self.provider_data['setup_pincode'],
             discriminator=self.provider_data['discriminator'],
-            port=5541,
+            port=self.ota_provider_port,
             kvs_path=self.kvs_path,
             log_file=self.provider_log,
             extra_args=extra_arguments,
@@ -316,31 +308,15 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
                                               fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
         await self.announce_ota_provider(self.controller, self.provider_data['node_id'], self.requestor_node_id)
 
-        update_state_states_seen = set()
-        update_state_states_stack = []
-        update_state_previous_state = None
+        update_state_match = AttributeMatcher.from_callable(
+            "Update state is Downloading",
+            lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading)
+        update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=60)
 
-        def collect_update_state_data(report):
-            current_state_value = report.value
-            nonlocal update_state_states_seen, update_state_states_stack, update_state_previous_state
-            if current_state_value is None:
-                return False
-            if current_state_value not in update_state_states_seen:
-                update_state_states_seen.add(current_state_value)
-                update_state_states_stack.append(current_state_value)
-
-            if current_state_value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnApply:
-                return True
-
-            update_state_previous_state = current_state_value
-            return False
-
-        callable_collect_update_state_data = AttributeMatcher.from_callable(
-            description="Record the Event Transition Until kDelayedOnApply",
-            matcher=collect_update_state_data
-        )
-        update_state_attr_handler.await_all_expected_report_matches([callable_collect_update_state_data], timeout_sec=60*6)
-        logger.info(f"Update State Stack secuence: {update_state_states_stack}")
+        update_state_match = AttributeMatcher.from_callable(
+            "Update state is kDelayedOnApply",
+            lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnApply)
+        update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=60*6)
         update_state_attr_handler.reset()
         await update_state_attr_handler.cancel()
 
@@ -354,6 +330,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
 
         start_time = time()
         # Waiting for Software Version to change in the range for spec wait time then verify it did took more than 120 seconds to change the version
+        # To Apply the new version it should have re send the ApplyUpdateRequest
         update_sw_version = AttributeMatcher.from_callable(
             f"Sofware version was updated to {self.expected_software_version}",
             lambda report: report.value > start_software_version)
@@ -373,18 +350,17 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         # Now software version should be in the expected software version
         await self.verify_version_applied_basic_information(controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
         self.current_provider_app_proc.terminate()
+        self.restart_requestor(self.controller)
 
         self.step(4)
-        self.expected_software_version = self.user_params.get("ota_image_step4_expected_version")
-        ota_image = self.user_params.get('ota_image_step4', None)
         delayed_apply_action_time = 180
         extra_arguments = ['--applyUpdateAction', 'awaitNextAction', '--delayedApplyActionTimeSec', str(delayed_apply_action_time)]
         self.start_provider(
-            provier_app_path=self.provider_app_path,
-            ota_image_path=ota_image,
+            provider_app_path=self.provider_app_path,
+            ota_image_path=self.ota_image,
             setup_pincode=self.provider_data['setup_pincode'],
             discriminator=self.provider_data['discriminator'],
-            port=5541,
+            port=self.ota_provider_port,
             kvs_path=self.kvs_path,
             log_file=self.provider_log,
             extra_args=extra_arguments,
@@ -438,7 +414,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         logger.info(f"Update State Stack secuence: {update_state_states_stack}")
         update_state_attr_handler.reset()
         await update_state_attr_handler.cancel()
-        # Waiting for Software Version to change in the range for spec wait time then verify it did took more than 120 seconds to change the version
+        # Waiting for Software Version to change in the range defined in the delayedApplyTimeSec of 180 seconds
         update_sw_version = AttributeMatcher.from_callable(
             f"Sofware version was updated to {self.expected_software_version}",
             lambda report: report.value > start_software_version)
@@ -452,19 +428,17 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         await software_version_attr_handler.cancel()
         # Verify the version is the same
         await self.verify_version_applied_basic_information(controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
-
         self.current_provider_app_proc.terminate()
+        self.restart_requestor(self.controller)
 
         self.step(5)
-        self.expected_software_version = self.user_params.get("ota_image_step5_expected_version")
-        ota_image = self.user_params.get('ota_image_step5', None)
         extra_arguments = ['--applyUpdateAction', 'discontinue']
         self.start_provider(
-            provier_app_path=self.provider_app_path,
-            ota_image_path=ota_image,
+            provider_app_path=self.provider_app_path,
+            ota_image_path=self.ota_image,
             setup_pincode=self.provider_data['setup_pincode'],
             discriminator=self.provider_data['discriminator'],
-            port=5541,
+            port=self.ota_provider_port,
             kvs_path=self.kvs_path,
             log_file=self.provider_log,
             extra_args=extra_arguments,
@@ -525,7 +499,6 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             Clusters.OtaSoftwareUpdateRequestor, Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateStateProgress, self.controller, self.requestor_node_id, 0)
         asserts.assert_equal(update_state_progress, NullValue, "Progress is not Null")
         logger.info(f"Progress is {update_state_progress}")
-
         # Verify version is the same as when it  started
         await self.verify_version_applied_basic_information(self.controller, self.requestor_node_id, current_sw_version)
 
