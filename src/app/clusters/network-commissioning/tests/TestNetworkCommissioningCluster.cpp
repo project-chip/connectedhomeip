@@ -13,7 +13,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <cstdint>
 #include <pw_unit_test/framework.h>
 
 #include <app/AttributePathParams.h>
@@ -26,7 +25,6 @@
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
-#include <app/server/Server.h>
 #include <clusters/GeneralCommissioning/Attributes.h>
 #include <clusters/NetworkCommissioning/Commands.h>
 #include <clusters/NetworkCommissioning/Enums.h>
@@ -36,7 +34,6 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/ReadOnlyBuffer.h>
-#include <platform/DeviceControlServer.h>
 #include <platform/NetworkCommissioning.h>
 
 #include "FakeWifiDriver.h"
