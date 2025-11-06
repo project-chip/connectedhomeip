@@ -38,6 +38,259 @@ namespace app {
 namespace Clusters {
 namespace CommodityTariff {
 
+CHIP_ERROR Instance::Init()
+{
+    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
+    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
+
+    return CHIP_NO_ERROR;
+}
+
+void Instance::Shutdown()
+{
+    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
+}
+
+bool Instance::HasFeature(Feature aFeature) const
+{
+    return mFeature.Has(aFeature);
+}
+
+// AttributeAccessInterface
+CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    switch (aPath.mAttributeId)
+    {
+    // Simple attributes (non-list)
+    case TariffInfo::Id:
+        return aEncoder.Encode(mDelegate.GetTariffInfo());
+    case TariffUnit::Id:
+        return aEncoder.Encode(mDelegate.GetTariffUnit());
+    case StartDate::Id:
+        return aEncoder.Encode(mDelegate.GetStartDate());
+    case CurrentDay::Id:
+        return aEncoder.Encode(GetCurrentDay());
+    case NextDay::Id:
+        return aEncoder.Encode(GetNextDay());
+    case CurrentDayEntry::Id:
+        return aEncoder.Encode(GetCurrentDayEntry());
+    case CurrentDayEntryDate::Id:
+        return aEncoder.Encode(GetCurrentDayEntryDate());
+    case NextDayEntry::Id:
+        return aEncoder.Encode(GetNextDayEntry());
+    case NextDayEntryDate::Id:
+        return aEncoder.Encode(GetNextDayEntryDate());
+    case DefaultRandomizationOffset::Id:
+        if (!HasFeature(Feature::kRandomization))
+        {
+            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+        }
+        return aEncoder.Encode(mDelegate.GetDefaultRandomizationOffset());
+    case DefaultRandomizationType::Id:
+        if (!HasFeature(Feature::kRandomization))
+        {
+            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+        }
+        return aEncoder.Encode(mDelegate.GetDefaultRandomizationType());
+    case FeatureMap::Id:
+        return aEncoder.Encode(mFeature);
+
+    // List attributes (using proper chunking)
+    case DayEntries::Id: {
+        const auto & entries = mDelegate.GetDayEntries();
+        if (entries.IsNull())
+        {
+            return aEncoder.EncodeNull();
+        }
+        return aEncoder.EncodeList([&entries](const auto & encoder) {
+            for (const auto & entry : entries.Value())
+            {
+                ReturnErrorOnFailure(encoder.Encode(entry));
+            }
+            return CHIP_NO_ERROR;
+        });
+    }
+    case DayPatterns::Id: {
+        const auto & patterns = mDelegate.GetDayPatterns();
+        if (patterns.IsNull())
+        {
+            return aEncoder.EncodeNull();
+        }
+        return aEncoder.EncodeList([&patterns](const auto & encoder) {
+            for (const auto & pattern : patterns.Value())
+            {
+                ReturnErrorOnFailure(encoder.Encode(pattern));
+            }
+            return CHIP_NO_ERROR;
+        });
+    }
+    case CalendarPeriods::Id: {
+        const auto & periods = mDelegate.GetCalendarPeriods();
+        if (periods.IsNull())
+        {
+            return aEncoder.EncodeNull();
+        }
+        return aEncoder.EncodeList([&periods](const auto & encoder) {
+            for (const auto & period : periods.Value())
+            {
+                ReturnErrorOnFailure(encoder.Encode(period));
+            }
+            return CHIP_NO_ERROR;
+        });
+    }
+    case IndividualDays::Id: {
+        const auto & days = mDelegate.GetIndividualDays();
+        if (days.IsNull())
+        {
+            return aEncoder.EncodeNull();
+        }
+        return aEncoder.EncodeList([&days](const auto & encoder) {
+            for (const auto & day : days.Value())
+            {
+                ReturnErrorOnFailure(encoder.Encode(day));
+            }
+            return CHIP_NO_ERROR;
+        });
+    }
+    case TariffComponents::Id: {
+        const auto & components = mDelegate.GetTariffComponents();
+        if (components.IsNull())
+        {
+            return aEncoder.EncodeNull();
+        }
+        return aEncoder.EncodeList([&components](const auto & encoder) {
+            for (const auto & component : components.Value())
+            {
+                ReturnErrorOnFailure(encoder.Encode(component));
+            }
+            return CHIP_NO_ERROR;
+        });
+    }
+    case TariffPeriods::Id: {
+        const auto & periods = mDelegate.GetTariffPeriods();
+        if (periods.IsNull())
+        {
+            return aEncoder.EncodeNull();
+        }
+        return aEncoder.EncodeList([&periods](const auto & encoder) {
+            for (const auto & period : periods.Value())
+            {
+                ReturnErrorOnFailure(encoder.Encode(period));
+            }
+            return CHIP_NO_ERROR;
+        });
+    }
+    case CurrentTariffComponents::Id: {
+        const auto & components = GetCurrentTariffComponents();
+        if (components.IsNull())
+        {
+            return aEncoder.EncodeNull();
+        }
+        return aEncoder.EncodeList([&components](const auto & encoder) {
+            for (const auto & component : components.Value())
+            {
+                ReturnErrorOnFailure(encoder.Encode(component));
+            }
+            return CHIP_NO_ERROR;
+        });
+    }
+    case NextTariffComponents::Id: {
+        const auto & components = GetNextTariffComponents();
+        if (components.IsNull())
+        {
+            return aEncoder.EncodeNull();
+        }
+        return aEncoder.EncodeList([&components](const auto & encoder) {
+            for (const auto & component : components.Value())
+            {
+                ReturnErrorOnFailure(encoder.Encode(component));
+            }
+            return CHIP_NO_ERROR;
+        });
+    }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+template <typename T>
+CHIP_ERROR Instance::SetValue(T & currValue, T & newValue, uint32_t attrId)
+{
+    bool hasChanged = false;
+
+    if (currValue.IsNull() || newValue.IsNull())
+    {
+        hasChanged = currValue.IsNull() != newValue.IsNull();
+    }
+    else
+    {
+        hasChanged = (currValue.Value() != newValue.Value());
+    }
+
+    if (hasChanged)
+    {
+        currValue = newValue;
+        AttributeUpdCb(attrId);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+void Instance::InvokeCommand(HandlerContext & handlerContext)
+{
+    using namespace Commands;
+
+    switch (handlerContext.mRequestPath.mCommandId)
+    {
+    case GetTariffComponent::Id:
+        HandleCommand<GetTariffComponent::DecodableType>(
+            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleGetTariffComponent(ctx, commandData); });
+        return;
+    case GetDayEntry::Id:
+        HandleCommand<GetDayEntry::DecodableType>(
+            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleGetDayEntry(ctx, commandData); });
+        return;
+    }
+}
+
+void Instance::ResetCurrentAttributes()
+{
+    mCurrentDay.SetNull();
+    mNextDay.SetNull();
+    mCurrentDayEntry.SetNull();
+    mNextDayEntry.SetNull();
+    mCurrentDayEntryDate.SetNull();
+    mNextDayEntryDate.SetNull();
+
+    mCurrentTariffComponents_MgmtObj.Cleanup();
+    mNextTariffComponents_MgmtObj.Cleanup();
+}
+
+void Instance::TariffDataUpdatedCb(bool is_erased, const AttributeId * aUpdatedAttrIds, size_t aCount)
+{
+    // Process each updated attribute
+    for (size_t i = 0; i < aCount; i++)
+    {
+        AttributeUpdCb(aUpdatedAttrIds[i]);
+    }
+
+    DeinitCurrentAttrs();
+
+    // Check if essential tariff data is available
+    if (mDelegate.GetTariffUnit().IsNull() || mDelegate.GetStartDate().IsNull() || mDelegate.GetTariffInfo().IsNull() ||
+        mDelegate.GetDayEntries().IsNull() || mDelegate.GetTariffPeriods().IsNull() || mDelegate.GetTariffComponents().IsNull())
+    {
+        ChipLogError(AppServer, "Seems the new tariff is unavailable - skip the current/next attrs init");
+        return;
+    }
+
+    if (!is_erased)
+    {
+        InitCurrentAttrs();
+    }
+}
+
 namespace Utils {
 
 using CurrentTariffAttrsCtx = CommodityTariff::Instance::CurrentTariffAttrsCtx;
@@ -333,259 +586,6 @@ exit:
     return err;
 }
 } // namespace Utils
-
-CHIP_ERROR Instance::Init()
-{
-    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
-    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
-
-    return CHIP_NO_ERROR;
-}
-
-void Instance::Shutdown()
-{
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
-    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
-}
-
-bool Instance::HasFeature(Feature aFeature) const
-{
-    return mFeature.Has(aFeature);
-}
-
-// AttributeAccessInterface
-CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
-{
-    switch (aPath.mAttributeId)
-    {
-    // Simple attributes (non-list)
-    case TariffInfo::Id:
-        return aEncoder.Encode(mDelegate.GetTariffInfo());
-    case TariffUnit::Id:
-        return aEncoder.Encode(mDelegate.GetTariffUnit());
-    case StartDate::Id:
-        return aEncoder.Encode(mDelegate.GetStartDate());
-    case CurrentDay::Id:
-        return aEncoder.Encode(GetCurrentDay());
-    case NextDay::Id:
-        return aEncoder.Encode(GetNextDay());
-    case CurrentDayEntry::Id:
-        return aEncoder.Encode(GetCurrentDayEntry());
-    case CurrentDayEntryDate::Id:
-        return aEncoder.Encode(GetCurrentDayEntryDate());
-    case NextDayEntry::Id:
-        return aEncoder.Encode(GetNextDayEntry());
-    case NextDayEntryDate::Id:
-        return aEncoder.Encode(GetNextDayEntryDate());
-    case DefaultRandomizationOffset::Id:
-        if (!HasFeature(Feature::kRandomization))
-        {
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-        }
-        return aEncoder.Encode(mDelegate.GetDefaultRandomizationOffset());
-    case DefaultRandomizationType::Id:
-        if (!HasFeature(Feature::kRandomization))
-        {
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-        }
-        return aEncoder.Encode(mDelegate.GetDefaultRandomizationType());
-    case FeatureMap::Id:
-        return aEncoder.Encode(mFeature);
-
-    // List attributes (using proper chunking)
-    case DayEntries::Id: {
-        const auto & entries = mDelegate.GetDayEntries();
-        if (entries.IsNull())
-        {
-            return aEncoder.EncodeNull();
-        }
-        return aEncoder.EncodeList([&entries](const auto & encoder) {
-            for (const auto & entry : entries.Value())
-            {
-                ReturnErrorOnFailure(encoder.Encode(entry));
-            }
-            return CHIP_NO_ERROR;
-        });
-    }
-    case DayPatterns::Id: {
-        const auto & patterns = mDelegate.GetDayPatterns();
-        if (patterns.IsNull())
-        {
-            return aEncoder.EncodeNull();
-        }
-        return aEncoder.EncodeList([&patterns](const auto & encoder) {
-            for (const auto & pattern : patterns.Value())
-            {
-                ReturnErrorOnFailure(encoder.Encode(pattern));
-            }
-            return CHIP_NO_ERROR;
-        });
-    }
-    case CalendarPeriods::Id: {
-        const auto & periods = mDelegate.GetCalendarPeriods();
-        if (periods.IsNull())
-        {
-            return aEncoder.EncodeNull();
-        }
-        return aEncoder.EncodeList([&periods](const auto & encoder) {
-            for (const auto & period : periods.Value())
-            {
-                ReturnErrorOnFailure(encoder.Encode(period));
-            }
-            return CHIP_NO_ERROR;
-        });
-    }
-    case IndividualDays::Id: {
-        const auto & days = mDelegate.GetIndividualDays();
-        if (days.IsNull())
-        {
-            return aEncoder.EncodeNull();
-        }
-        return aEncoder.EncodeList([&days](const auto & encoder) {
-            for (const auto & day : days.Value())
-            {
-                ReturnErrorOnFailure(encoder.Encode(day));
-            }
-            return CHIP_NO_ERROR;
-        });
-    }
-    case TariffComponents::Id: {
-        const auto & components = mDelegate.GetTariffComponents();
-        if (components.IsNull())
-        {
-            return aEncoder.EncodeNull();
-        }
-        return aEncoder.EncodeList([&components](const auto & encoder) {
-            for (const auto & component : components.Value())
-            {
-                ReturnErrorOnFailure(encoder.Encode(component));
-            }
-            return CHIP_NO_ERROR;
-        });
-    }
-    case TariffPeriods::Id: {
-        const auto & periods = mDelegate.GetTariffPeriods();
-        if (periods.IsNull())
-        {
-            return aEncoder.EncodeNull();
-        }
-        return aEncoder.EncodeList([&periods](const auto & encoder) {
-            for (const auto & period : periods.Value())
-            {
-                ReturnErrorOnFailure(encoder.Encode(period));
-            }
-            return CHIP_NO_ERROR;
-        });
-    }
-    case CurrentTariffComponents::Id: {
-        const auto & components = GetCurrentTariffComponents();
-        if (components.IsNull())
-        {
-            return aEncoder.EncodeNull();
-        }
-        return aEncoder.EncodeList([&components](const auto & encoder) {
-            for (const auto & component : components.Value())
-            {
-                ReturnErrorOnFailure(encoder.Encode(component));
-            }
-            return CHIP_NO_ERROR;
-        });
-    }
-    case NextTariffComponents::Id: {
-        const auto & components = GetNextTariffComponents();
-        if (components.IsNull())
-        {
-            return aEncoder.EncodeNull();
-        }
-        return aEncoder.EncodeList([&components](const auto & encoder) {
-            for (const auto & component : components.Value())
-            {
-                ReturnErrorOnFailure(encoder.Encode(component));
-            }
-            return CHIP_NO_ERROR;
-        });
-    }
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-template <typename T>
-CHIP_ERROR Instance::SetValue(T & currValue, T & newValue, uint32_t attrId)
-{
-    bool hasChanged = false;
-
-    if (currValue.IsNull() || newValue.IsNull())
-    {
-        hasChanged = currValue.IsNull() != newValue.IsNull();
-    }
-    else
-    {
-        hasChanged = (currValue.Value() != newValue.Value());
-    }
-
-    if (hasChanged)
-    {
-        currValue = newValue;
-        AttributeUpdCb(attrId);
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-void Instance::InvokeCommand(HandlerContext & handlerContext)
-{
-    using namespace Commands;
-
-    switch (handlerContext.mRequestPath.mCommandId)
-    {
-    case GetTariffComponent::Id:
-        HandleCommand<GetTariffComponent::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleGetTariffComponent(ctx, commandData); });
-        return;
-    case GetDayEntry::Id:
-        HandleCommand<GetDayEntry::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleGetDayEntry(ctx, commandData); });
-        return;
-    }
-}
-
-void Instance::ResetCurrentAttributes()
-{
-    mCurrentDay.SetNull();
-    mNextDay.SetNull();
-    mCurrentDayEntry.SetNull();
-    mNextDayEntry.SetNull();
-    mCurrentDayEntryDate.SetNull();
-    mNextDayEntryDate.SetNull();
-
-    mCurrentTariffComponents_MgmtObj.Cleanup();
-    mNextTariffComponents_MgmtObj.Cleanup();
-}
-
-void Instance::TariffDataUpdatedCb(bool is_erased, const AttributeId * aUpdatedAttrIds, size_t aCount)
-{
-    // Process each updated attribute
-    for (size_t i = 0; i < aCount; i++)
-    {
-        AttributeUpdCb(aUpdatedAttrIds[i]);
-    }
-
-    DeinitCurrentAttrs();
-
-    // Check if essential tariff data is available
-    if (mDelegate.GetTariffUnit().IsNull() || mDelegate.GetStartDate().IsNull() || mDelegate.GetTariffInfo().IsNull() ||
-        mDelegate.GetDayEntries().IsNull() || mDelegate.GetTariffPeriods().IsNull() || mDelegate.GetTariffComponents().IsNull())
-    {
-        ChipLogError(AppServer, "Seems the new tariff is unavailable - skip the current/next attrs init");
-        return;
-    }
-
-    if (!is_erased)
-    {
-        InitCurrentAttrs();
-    }
-}
 
 using CurrentTariffAttrsCtx = CommodityTariff::Instance::CurrentTariffAttrsCtx;
 
