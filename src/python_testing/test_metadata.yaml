@@ -150,7 +150,7 @@ not_automated:
 # to consider improving. May not be exhaustive
 slow_tests:
     - { name: mobile-device-test.py, duration: 3 minutes }
-    - { name: TC_AccessChecker.py, duration: 1.5 minutes }
+    - { name: TC_AccessChecker.py, duration: 8 minutes }
     - { name: TC_BRBINFO_4_1.py, duration: 2 minutes }
     - { name: TC_CADMIN_1_19.py, duration: 30 seconds }
     - { name: TC_CADMIN_1_22_24.py, duration: 3 minutes }
