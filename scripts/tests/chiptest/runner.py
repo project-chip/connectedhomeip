@@ -146,9 +146,7 @@ class SubprocessInfo:
 class Executor:
     def run(self, subproc: SubprocessInfo, stdin, stdout, stderr):
         s = subprocess.Popen(subproc.to_cmd(), stdin=stdin, stdout=stdout, stderr=stderr)
-        outpipe.close()
-        errpipe.close()
-        return s, outpipe, errpipe
+        return s
 
 
 class LinuxNamespacedExecutor(Executor):
@@ -158,9 +156,7 @@ class LinuxNamespacedExecutor(Executor):
     def run(self, subproc: SubprocessInfo, stdin, stdout, stderr):
         wrapped = self.ns.wrap_in_namespace(subproc)
         s = subprocess.Popen(wrapped.to_cmd(), stdin=stdin, stdout=stdout, stderr=stderr)
-        outpipe.close()
-        errpipe.close()
-        return s, outpipe, errpipe
+        return s
 
 
 class Runner:
@@ -186,7 +182,7 @@ class Runner:
         if self.capture_delegate:
             self.capture_delegate.Log(name, 'EXECUTING %r' % cmd)
 
-        s, outpipe, errpipe = self.executor.run(subproc, stdin=stdin, stdout=outpipe, stderr=errpipe)
+        s = self.executor.run(subproc, stdin=stdin, stdout=outpipe, stderr=errpipe)
 
         if not wait:
             return s, outpipe, errpipe
