@@ -164,7 +164,7 @@ def cmd_run(context, darwin_framework_tool, ota_requestor_app, ota_data_file, ot
 
         prompt = "WAITING FOR COMMANDS NOW"
         darwin_tool = InteractiveDarwinTool(runner, prompt, darwin_framework_tool.with_args(
-            ("interactive", "start", "--additional-prompt", prompt)))
+            "interactive", "start", "--additional-prompt", prompt))
         darwin_tool.start()
 
         darwin_tool.waitForPrompt()

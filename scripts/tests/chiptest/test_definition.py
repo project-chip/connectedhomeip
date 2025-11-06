@@ -488,8 +488,8 @@ class TestDefinition:
                     '--server_path', str(apps.chip_tool.path),
                     '--server_arguments', ' '.join(interactive_server_args))
 
-                pairing_cmd = pairing_cmd.with_args(server_args)
-                test_cmd = test_cmd.with_args(server_args)
+                pairing_cmd = pairing_cmd.with_args(*server_args)
+                test_cmd = test_cmd.with_args(*server_args)
 
                 if dry_run:
                     # Some of our command arguments have spaces in them, so if we are

@@ -151,7 +151,7 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
         runtime = TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON
 
     if chip_tool is not None:
-        chip_tool = SubprocessInfo(kind='tool', path=Path(chip_tool))
+        chip_tool = SubprocessInfo(kind='tool', path=chip_tool)
     else:
         if not runtime == TestRunTime.MATTER_REPL_PYTHON:
             paths_finder = PathsFinder()
@@ -161,7 +161,7 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
                 chip_tool_path = paths_finder.get('darwin-framework-tool')
 
             if chip_tool_path is not None:
-                chip_tool = SubprocessInfo(kind='tool', path=Path(chip_tool_path)).wrap_with(('python3',))
+                chip_tool = SubprocessInfo(kind='tool', path=chip_tool_path).wrap_with('python3')
 
     if include_tags:
         include_tags = set([TestTag.__members__[t] for t in include_tags])
@@ -336,7 +336,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     def build_app(arg_value, kind: str, key: str):
         app_path = arg_value if arg_value else paths_finder.get(key)
         if app_path is not None:
-            return SubprocessInfo(kind=kind, path=Path(app_path))
+            return SubprocessInfo(kind=kind, path=app_path)
         return None
 
     all_clusters_app = build_app(all_clusters_app, 'app', 'chip-all-clusters-app')
