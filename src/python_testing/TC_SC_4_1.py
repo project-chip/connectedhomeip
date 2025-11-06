@@ -191,7 +191,7 @@ class TC_SC_4_1(MatterBaseTest):
                      """See the 'AAAA Record Verifications' table in the Notes/Testing considerations
                         section of the Test Plan for the list of verifications to be performed"""),
 
-            TestStep(21 , """Close commissioning window""",
+            TestStep(21, """Close commissioning window""",
                      """DUT stops advertising Commissionable Node Discovery services"""),
 
             # EXTENDED DISCOVERY MODE
