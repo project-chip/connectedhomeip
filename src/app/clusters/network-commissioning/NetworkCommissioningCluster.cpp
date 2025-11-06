@@ -184,16 +184,18 @@ NetworkCommissioningCluster::NetworkCommissioningCluster(EndpointId endpointId, 
 
 NetworkCommissioningCluster::NetworkCommissioningCluster(EndpointId endpointId, ThreadDriver * driver,
                                                          BreadCrumbTracker & tracker) :
-    DefaultServerCluster({ endpointId, NetworkCommissioning::Id }), mEndpointId(endpointId),
-    mFeatureFlags(Feature::kThreadNetworkInterface), mpWirelessDriver(driver), mpBaseDriver(driver), mBreadcrumbTracker(tracker)
+    DefaultServerCluster({ endpointId, NetworkCommissioning::Id }),
+    mEndpointId(endpointId), mFeatureFlags(Feature::kThreadNetworkInterface), mpWirelessDriver(driver), mpBaseDriver(driver),
+    mBreadcrumbTracker(tracker)
 {
     mpDriver.Set<ThreadDriver *>(driver);
 }
 
 NetworkCommissioningCluster::NetworkCommissioningCluster(EndpointId endpointId, EthernetDriver * driver,
                                                          BreadCrumbTracker & tracker) :
-    DefaultServerCluster({ endpointId, NetworkCommissioning::Id }), mEndpointId(endpointId),
-    mFeatureFlags(Feature::kEthernetNetworkInterface), mpWirelessDriver(nullptr), mpBaseDriver(driver), mBreadcrumbTracker(tracker)
+    DefaultServerCluster({ endpointId, NetworkCommissioning::Id }),
+    mEndpointId(endpointId), mFeatureFlags(Feature::kEthernetNetworkInterface), mpWirelessDriver(nullptr), mpBaseDriver(driver),
+    mBreadcrumbTracker(tracker)
 {}
 
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
@@ -1176,8 +1178,7 @@ CHIP_ERROR NetworkCommissioningCluster::AcceptedCommands(const ConcreteClusterPa
     }
     else
 #endif // (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
-    {
-    }
+    {}
 
     if (Features().Has(Feature::kPerDeviceCredentials))
     {
@@ -1255,8 +1256,7 @@ CHIP_ERROR NetworkCommissioningCluster::Attributes(const ConcreteClusterPath & p
     }
     else
 #endif // (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
-    {
-    }
+    {}
 
     return attributeListBuilder.Append(Span(kMandatoryMetadata), Span(kOptionalAttributes), optionalAttributes);
 }
