@@ -412,7 +412,8 @@ PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * 
 
     VerifyOrExit(device != nullptr && device->GetSecureSession().HasValue(), err = CHIP_ERROR_MISSING_SECURE_SESSION);
 
-    SuccessOrExit(err = ProcessWriteAttributesData(client.get(), writeAttributesData, attributeDataLength, forceLegacyListEncoding));
+    SuccessOrExit(err =
+                      ProcessWriteAttributesData(client.get(), writeAttributesData, attributeDataLength, forceLegacyListEncoding));
 
     SuccessOrExit(err = client->SendWriteRequest(device->GetSecureSession().Value(),
                                                  interactionTimeoutMs != 0 ? System::Clock::Milliseconds32(interactionTimeoutMs)
