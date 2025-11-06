@@ -20,6 +20,7 @@
 
 #include "glib.h"
 #include "lcd.h"
+#include "ClosureUIStrings.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/closure-control-server/closure-control-cluster-objects.h>
 #include <app/data-model/Nullable.h>
@@ -33,39 +34,33 @@ struct ClosureUIData
     chip::app::DataModel::Nullable<chip::app::Clusters::ClosureControl::GenericOverallCurrentState> overallCurrentState;
 };
 
+struct ClosureUITextInitializer;
+
 class ClosureUI
 {
 public:
-    // MainState enum values matching the ClosureControl cluster MainStateEnum
-    enum MainState
-    {
-        STATE_STOPPED            = 0x00,
-        STATE_MOVING             = 0x01,
-        STATE_WAITING_FOR_MOTION = 0x02,
-        STATE_ERROR              = 0x03,
-        STATE_CALIBRATING        = 0x04,
-        STATE_PROTECTED          = 0x05,
-        STATE_DISENGAGED         = 0x06,
-        STATE_SETUP_REQUIRED     = 0x07,
-        STATE_UNKNOWN            = 0x08,
-    };
-
     static void DrawUI(GLIB_Context_t * glibContext);
-    static void SetMainState(uint8_t state);
+    static void SetMainState(chip::app::Clusters::ClosureControl::MainStateEnum state);
     static void SetOverallCurrentState(const char * positionText, const char * latchText, const char * secureText,
                                        const char * speedText);
+  
+    static void FormatAndSetPosition(const char * suffix);
+    static void FormatAndSetLatch(const char * suffix);
+    static void FormatAndSetSecure(const char * suffix);
+    static void FormatAndSetSpeed(const char * suffix);
 
 private:
+    friend struct ClosureUITextInitializer;
     static void DrawHeader(GLIB_Context_t * glibContext);
     static void DrawFooter(GLIB_Context_t * glibContext);
     static void DrawMainState(GLIB_Context_t * glibContext);
     static void DrawOverallCurrentState(GLIB_Context_t * glibContext);
-    static void DrawStateIcon(GLIB_Context_t * glibContext, MainState state);
 
     // Static variables to store the current closure state
-    static MainState sMainState;
-    static char sPositionText[24]; // "Position: Pedestrian" = 21 chars + null + safety margin
-    static char sLatchText[20];    // "Latch: Engaged" = 14 chars + null + safety margin
-    static char sSecureText[20];   // "Secure: Unknown" = 15 chars + null + safety margin
-    static char sSpeedText[18];    // "Speed: Unknown" = 14 chars + null + safety margin
+    static chip::app::Clusters::ClosureControl::MainStateEnum sMainState;
+    static char sPositionText[ClosureUIStrings::BUFFER_SIZE_POSITION];
+    static char sLatchText[ClosureUIStrings::BUFFER_SIZE_LATCH];
+    static char sSecureText[ClosureUIStrings::BUFFER_SIZE_SECURE];
+    static char sSpeedText[ClosureUIStrings::BUFFER_SIZE_SPEED];
+    static char sStateText[ClosureUIStrings::BUFFER_SIZE_STATE];
 };

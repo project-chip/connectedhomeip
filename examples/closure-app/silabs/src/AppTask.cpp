@@ -24,6 +24,7 @@
 
 #ifdef DISPLAY_ENABLED
 #include "ClosureUI.h"
+#include "ClosureUIStrings.h"
 #include "lcd.h"
 #ifdef QR_CODE_ENABLED
 #include "qrcodegen.h"
@@ -44,6 +45,7 @@
 #include <lib/support/BitMask.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <stdio.h>
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
@@ -149,86 +151,79 @@ void AppTask::UpdateClosureUI()
 {
     ClosureManager & closureManager = ClosureManager::GetInstance();
 
-    // Lock ChipStack for thread-safe cluster data access
+
     DeviceLayer::PlatformMgr().LockChipStack();
-
-    // Get UI-specific data from ClosureManager
     auto uiData = closureManager.GetClosureUIData();
-
-    // Unlock ChipStack as UI updates don't need cluster access
     DeviceLayer::PlatformMgr().UnlockChipStack();
 
-    // Set main state in UI
-    ClosureUI::SetMainState(static_cast<uint8_t>(uiData.mainState));
+    ClosureUI::SetMainState(uiData.mainState);
 
-    // Format position text
-    const char * positionText = "Position: Unknown";
+    const char * positionSuffix = ClosureUIStrings::POSITION_SUFFIX_UNKNOWN;
     if (!uiData.overallCurrentState.IsNull() && uiData.overallCurrentState.Value().position.HasValue() &&
         !uiData.overallCurrentState.Value().position.Value().IsNull())
     {
         switch (uiData.overallCurrentState.Value().position.Value().Value())
         {
         case chip::app::Clusters::ClosureControl::CurrentPositionEnum::kFullyClosed:
-            positionText = "Position: Closed";
+            positionSuffix = ClosureUIStrings::POSITION_SUFFIX_CLOSED;
             break;
         case chip::app::Clusters::ClosureControl::CurrentPositionEnum::kFullyOpened:
-            positionText = "Position: Open";
+            positionSuffix = ClosureUIStrings::POSITION_SUFFIX_OPEN;
             break;
         case chip::app::Clusters::ClosureControl::CurrentPositionEnum::kPartiallyOpened:
-            positionText = "Position: Partial";
+            positionSuffix = ClosureUIStrings::POSITION_SUFFIX_PARTIAL;
             break;
         case chip::app::Clusters::ClosureControl::CurrentPositionEnum::kOpenedForPedestrian:
-            positionText = "Position: Pedestrian";
+            positionSuffix = ClosureUIStrings::POSITION_SUFFIX_PEDESTRIAN;
             break;
         case chip::app::Clusters::ClosureControl::CurrentPositionEnum::kOpenedForVentilation:
-            positionText = "Position: Ventilation";
+            positionSuffix = ClosureUIStrings::POSITION_SUFFIX_VENTILATION;
             break;
         default:
-            positionText = "Position: Unknown";
+            positionSuffix = ClosureUIStrings::POSITION_SUFFIX_UNKNOWN;
             break;
         }
     }
+    ClosureUI::FormatAndSetPosition(positionSuffix);
 
-    // Format latch text
-    const char * latchText = "Latch: Unknown";
+    const char * latchSuffix = ClosureUIStrings::LATCH_SUFFIX_UNKNOWN;
     if (!uiData.overallCurrentState.IsNull() && uiData.overallCurrentState.Value().latch.HasValue() &&
         !uiData.overallCurrentState.Value().latch.Value().IsNull())
     {
-        latchText = uiData.overallCurrentState.Value().latch.Value().Value() ? "Latch: Engaged" : "Latch: Released";
+        latchSuffix = uiData.overallCurrentState.Value().latch.Value().Value() ? ClosureUIStrings::LATCH_SUFFIX_ENGAGED : ClosureUIStrings::LATCH_SUFFIX_RELEASED;
     }
+    ClosureUI::FormatAndSetLatch(latchSuffix);
 
-    // Format secure state text
-    const char * secureText = "Secure: Unknown";
+    const char * secureSuffix = ClosureUIStrings::SECURE_SUFFIX_UNKNOWN;
     if (!uiData.overallCurrentState.IsNull() && !uiData.overallCurrentState.Value().secureState.IsNull())
     {
-        secureText = uiData.overallCurrentState.Value().secureState.Value() ? "Secure: Yes" : "Secure: No";
+        secureSuffix = uiData.overallCurrentState.Value().secureState.Value() ? ClosureUIStrings::SECURE_SUFFIX_YES : ClosureUIStrings::SECURE_SUFFIX_NO;
     }
+    ClosureUI::FormatAndSetSecure(secureSuffix);
 
-    // Format speed text
-    const char * speedText = "Speed: Unknown";
+    const char * speedSuffix = ClosureUIStrings::SPEED_SUFFIX_UNKNOWN;
     if (!uiData.overallCurrentState.IsNull() && uiData.overallCurrentState.Value().speed.HasValue())
     {
         switch (uiData.overallCurrentState.Value().speed.Value())
         {
         case chip::app::Clusters::Globals::ThreeLevelAutoEnum::kLow:
-            speedText = "Speed: Low";
+            speedSuffix = ClosureUIStrings::SPEED_SUFFIX_LOW;
             break;
         case chip::app::Clusters::Globals::ThreeLevelAutoEnum::kMedium:
-            speedText = "Speed: Medium";
+            speedSuffix = ClosureUIStrings::SPEED_SUFFIX_MEDIUM;
             break;
         case chip::app::Clusters::Globals::ThreeLevelAutoEnum::kHigh:
-            speedText = "Speed: High";
+            speedSuffix = ClosureUIStrings::SPEED_SUFFIX_HIGH;
             break;
         case chip::app::Clusters::Globals::ThreeLevelAutoEnum::kAuto:
-            speedText = "Speed: Auto";
+            speedSuffix = ClosureUIStrings::SPEED_SUFFIX_AUTO;
             break;
         default:
-            speedText = "Speed: Unknown";
+            speedSuffix = ClosureUIStrings::SPEED_SUFFIX_UNKNOWN;
             break;
         }
     }
-
-    ClosureUI::SetOverallCurrentState(positionText, latchText, secureText, speedText);
+    ClosureUI::FormatAndSetSpeed(speedSuffix);
 
 #ifdef SL_WIFI
     if (ConnectivityMgr().IsWiFiStationProvisioned())

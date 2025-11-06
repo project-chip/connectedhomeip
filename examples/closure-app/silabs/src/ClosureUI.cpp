@@ -17,10 +17,10 @@
  */
 
 #include <stdio.h>
-#include <string.h>
 
 #include "AppConfig.h"
 #include "ClosureUI.h"
+#include "ClosureUIStrings.h"
 #include "demo-ui-bitmaps.h"
 #include "dmd.h"
 #include "glib.h"
@@ -59,17 +59,39 @@ static const uint8_t threadLogo[]       = { THREAD_BITMAP };
 static const uint8_t bleLogo[]          = { BLUETOOTH_ICON_SMALL };
 
 // Static variables to hold the current closure state
-ClosureUI::MainState ClosureUI::sMainState = ClosureUI::STATE_UNKNOWN;
-char ClosureUI::sPositionText[24]          = "Position: Unknown";
-char ClosureUI::sLatchText[20]             = "Latch: Unknown";
-char ClosureUI::sSecureText[20]            = "Secure: Unknown";
-char ClosureUI::sSpeedText[18]             = "Speed: Unknown";
+chip::app::Clusters::ClosureControl::MainStateEnum ClosureUI::sMainState = chip::app::Clusters::ClosureControl::MainStateEnum::kUnknownEnumValue;
 
-#ifdef SL_WIFI
-#define UI_WIFI 1
-#else
-#define UI_WIFI 0
-#endif
+// Helper function to format text using prefix + suffix
+namespace {
+    inline void FormatText(char * dest, size_t destSize, const char * prefix, const char * suffix)
+    {
+        snprintf(dest, destSize, "%s%s", prefix, suffix);
+    }
+}
+
+// Initialize arrays using buffer sizes 
+char ClosureUI::sPositionText[ClosureUIStrings::BUFFER_SIZE_POSITION];
+char ClosureUI::sLatchText[ClosureUIStrings::BUFFER_SIZE_LATCH];
+char ClosureUI::sSecureText[ClosureUIStrings::BUFFER_SIZE_SECURE];
+char ClosureUI::sSpeedText[ClosureUIStrings::BUFFER_SIZE_SPEED];
+char ClosureUI::sStateText[ClosureUIStrings::BUFFER_SIZE_STATE];
+
+// Static initializer to set default values using prefix + suffix
+struct ClosureUITextInitializer {
+    ClosureUITextInitializer() {
+        FormatText(ClosureUI::sPositionText, sizeof(ClosureUI::sPositionText), 
+                  ClosureUIStrings::POSITION_PREFIX, ClosureUIStrings::POSITION_SUFFIX_UNKNOWN);
+        FormatText(ClosureUI::sLatchText, sizeof(ClosureUI::sLatchText), 
+                  ClosureUIStrings::LATCH_PREFIX, ClosureUIStrings::LATCH_SUFFIX_UNKNOWN);
+        FormatText(ClosureUI::sSecureText, sizeof(ClosureUI::sSecureText), 
+                  ClosureUIStrings::SECURE_PREFIX, ClosureUIStrings::SECURE_SUFFIX_UNKNOWN);
+        FormatText(ClosureUI::sSpeedText, sizeof(ClosureUI::sSpeedText), 
+                  ClosureUIStrings::SPEED_PREFIX, ClosureUIStrings::SPEED_SUFFIX_UNKNOWN);
+        FormatText(ClosureUI::sStateText, sizeof(ClosureUI::sStateText), 
+                  ClosureUIStrings::STATE_PREFIX, ClosureUIStrings::STATE_SUFFIX_UNKNOWN);
+    }
+};
+static ClosureUITextInitializer sInitializer;
 
 void ClosureUI::DrawUI(GLIB_Context_t * glibContext)
 {
@@ -95,34 +117,51 @@ void ClosureUI::DrawUI(GLIB_Context_t * glibContext)
 #endif // SL_LCDCTRL_MUX
 }
 
-void ClosureUI::SetMainState(uint8_t state)
+void ClosureUI::SetMainState(chip::app::Clusters::ClosureControl::MainStateEnum state)
 {
-    // Validate state value is within valid range
-    if (state > STATE_UNKNOWN)
-    {
-        sMainState = STATE_UNKNOWN;
-    }
-    else
-    {
-        sMainState = static_cast<MainState>(state);
-    }
+    sMainState = state;
 }
 
 void ClosureUI::SetOverallCurrentState(const char * positionText, const char * latchText, const char * secureText,
                                        const char * speedText)
 {
-    // Use fallback values for null parameters - default to "Unknown" state
-    strncpy(sPositionText, (positionText != nullptr) ? positionText : "Position: Unknown", sizeof(sPositionText) - 1);
-    sPositionText[sizeof(sPositionText) - 1] = '\0';
+    // Use fallback values for null parameters - build from prefix + suffix to avoid duplication
+    // Use snprintf for all cases to ensure null termination and avoid buffer overflows
+    if (positionText != nullptr)
+    {
+        snprintf(sPositionText, sizeof(sPositionText), "%s", positionText);
+    }
+    else
+    {
+        FormatText(sPositionText, sizeof(sPositionText), ClosureUIStrings::POSITION_PREFIX, ClosureUIStrings::POSITION_SUFFIX_UNKNOWN);
+    }
 
-    strncpy(sLatchText, (latchText != nullptr) ? latchText : "Latch: Unknown", sizeof(sLatchText) - 1);
-    sLatchText[sizeof(sLatchText) - 1] = '\0';
+    if (latchText != nullptr)
+    {
+        snprintf(sLatchText, sizeof(sLatchText), "%s", latchText);
+    }
+    else
+    {
+        FormatText(sLatchText, sizeof(sLatchText), ClosureUIStrings::LATCH_PREFIX, ClosureUIStrings::LATCH_SUFFIX_UNKNOWN);
+    }
 
-    strncpy(sSecureText, (secureText != nullptr) ? secureText : "Secure: Unknown", sizeof(sSecureText) - 1);
-    sSecureText[sizeof(sSecureText) - 1] = '\0';
+    if (secureText != nullptr)
+    {
+        snprintf(sSecureText, sizeof(sSecureText), "%s", secureText);
+    }
+    else
+    {
+        FormatText(sSecureText, sizeof(sSecureText), ClosureUIStrings::SECURE_PREFIX, ClosureUIStrings::SECURE_SUFFIX_UNKNOWN);
+    }
 
-    strncpy(sSpeedText, (speedText != nullptr) ? speedText : "Speed: Unknown", sizeof(sSpeedText) - 1);
-    sSpeedText[sizeof(sSpeedText) - 1] = '\0';
+    if (speedText != nullptr)
+    {
+        snprintf(sSpeedText, sizeof(sSpeedText), "%s", speedText);
+    }
+    else
+    {
+        FormatText(sSpeedText, sizeof(sSpeedText), ClosureUIStrings::SPEED_PREFIX, ClosureUIStrings::SPEED_SUFFIX_UNKNOWN);
+    }
 }
 
 void ClosureUI::DrawHeader(GLIB_Context_t * glibContext)
@@ -132,74 +171,92 @@ void ClosureUI::DrawHeader(GLIB_Context_t * glibContext)
     // Draw BLE Icon
     GLIB_drawBitmap(glibContext, BLE_ICON_POSITION_X, STATUS_ICON_LINE, BLUETOOTH_ICON_SIZE, BLUETOOTH_ICON_SIZE, bleLogo);
     // Draw WiFi/OpenThread Icon
-    GLIB_drawBitmap(glibContext, NETWORK_ICON_POSITION_X, STATUS_ICON_LINE, (UI_WIFI) ? WIFI_BITMAP_WIDTH : THREAD_BITMAP_WIDTH,
-                    (UI_WIFI) ? WIFI_BITMAP_HEIGHT : THREAD_BITMAP_HEIGHT, (UI_WIFI) ? wifiLogo : threadLogo);
+#ifdef SL_WIFI
+    GLIB_drawBitmap(glibContext, NETWORK_ICON_POSITION_X, STATUS_ICON_LINE, WIFI_BITMAP_WIDTH, WIFI_BITMAP_HEIGHT, wifiLogo);
+#else
+    GLIB_drawBitmap(glibContext, NETWORK_ICON_POSITION_X, STATUS_ICON_LINE, THREAD_BITMAP_WIDTH, THREAD_BITMAP_HEIGHT, threadLogo);
+#endif // SL_WIFI
     // Draw Matter Icon
     GLIB_drawBitmap(glibContext, MATTER_ICON_POSITION_X, STATUS_ICON_LINE, MATTER_LOGO_WIDTH, MATTER_LOGO_HEIGHT, matterLogoBitmap);
 }
 
 void ClosureUI::DrawMainState(GLIB_Context_t * glibContext)
 {
-    const char * stateText = "";
+    const char * stateSuffix = ClosureUIStrings::STATE_SUFFIX_UNKNOWN;
 
     switch (sMainState)
     {
-    case STATE_STOPPED:
-        stateText = "State: Stopped";
+    case chip::app::Clusters::ClosureControl::MainStateEnum::kStopped:
+        stateSuffix = ClosureUIStrings::STATE_SUFFIX_STOPPED;
         break;
-    case STATE_MOVING:
-        stateText = "State: Moving";
+    case chip::app::Clusters::ClosureControl::MainStateEnum::kMoving:
+        stateSuffix = ClosureUIStrings::STATE_SUFFIX_MOVING;
         break;
-    case STATE_WAITING_FOR_MOTION:
-        stateText = "State: Waiting";
+    case chip::app::Clusters::ClosureControl::MainStateEnum::kWaitingForMotion:
+        stateSuffix = ClosureUIStrings::STATE_SUFFIX_WAITING;
         break;
-    case STATE_ERROR:
-        stateText = "State: Error";
+    case chip::app::Clusters::ClosureControl::MainStateEnum::kError:
+        stateSuffix = ClosureUIStrings::STATE_SUFFIX_ERROR;
         break;
-    case STATE_CALIBRATING:
-        stateText = "State: Calibrating";
+    case chip::app::Clusters::ClosureControl::MainStateEnum::kCalibrating:
+        stateSuffix = ClosureUIStrings::STATE_SUFFIX_CALIBRATING;
         break;
-    case STATE_PROTECTED:
-        stateText = "State: Protected";
+    case chip::app::Clusters::ClosureControl::MainStateEnum::kProtected:
+        stateSuffix = ClosureUIStrings::STATE_SUFFIX_PROTECTED;
         break;
-    case STATE_DISENGAGED:
-        stateText = "State: Disengaged";
+    case chip::app::Clusters::ClosureControl::MainStateEnum::kDisengaged:
+        stateSuffix = ClosureUIStrings::STATE_SUFFIX_DISENGAGED;
         break;
-    case STATE_SETUP_REQUIRED:
-        stateText = "State: Setup Required";
+    case chip::app::Clusters::ClosureControl::MainStateEnum::kSetupRequired:
+        stateSuffix = ClosureUIStrings::STATE_SUFFIX_SETUP_REQUIRED;
         break;
-    case STATE_UNKNOWN:
+    case chip::app::Clusters::ClosureControl::MainStateEnum::kUnknownEnumValue:
     default:
-        stateText = "State: Unknown";
+        stateSuffix = ClosureUIStrings::STATE_SUFFIX_UNKNOWN;
         break;
     }
 
-    GLIB_drawStringOnLine(glibContext, stateText, STATE_DISPLAY_LINE, GLIB_ALIGN_CENTER, 0, 0, true);
+    FormatText(sStateText, sizeof(sStateText), ClosureUIStrings::STATE_PREFIX, stateSuffix);
+    GLIB_drawStringOnLine(glibContext, sStateText, STATE_DISPLAY_LINE, GLIB_ALIGN_CENTER, 0, 0, true);
 }
 
 void ClosureUI::DrawOverallCurrentState(GLIB_Context_t * glibContext)
 {
-    // Draw position information
     GLIB_drawStringOnLine(glibContext, sPositionText, POSITION_DISPLAY_LINE, GLIB_ALIGN_LEFT, 0, 0, true);
 
-    // Draw latch information
     GLIB_drawStringOnLine(glibContext, sLatchText, LATCH_DISPLAY_LINE, GLIB_ALIGN_LEFT, 0, 0, true);
 
-    // Draw secure state information
     GLIB_drawStringOnLine(glibContext, sSecureText, SECURE_DISPLAY_LINE, GLIB_ALIGN_LEFT, 0, 0, true);
 
-    // Draw speed information
     GLIB_drawStringOnLine(glibContext, sSpeedText, SPEED_DISPLAY_LINE, GLIB_ALIGN_LEFT, 0, 0, true);
 }
 
 void ClosureUI::DrawFooter(GLIB_Context_t * glibContext)
 {
-    // Draw a simple footer indicating this is the closure app
-    GLIB_drawStringOnLine(glibContext, "Closure App", FOOTER_DISPLAY_LINE, GLIB_ALIGN_CENTER, 0, 0, true);
+    GLIB_drawStringOnLine(glibContext, ClosureUIStrings::FOOTER_TEXT, FOOTER_DISPLAY_LINE, GLIB_ALIGN_CENTER, 0, 0, true);
 }
 
-void ClosureUI::DrawStateIcon(GLIB_Context_t * glibContext, MainState state)
+
+void ClosureUI::FormatAndSetPosition(const char * suffix)
 {
-    // For future enhancement: draw visual icons based on closure state
-    // This could include door/window icons, arrows for movement, etc.
+    const char * safeSuffix = (suffix != nullptr) ? suffix : ClosureUIStrings::POSITION_SUFFIX_UNKNOWN;
+    FormatText(sPositionText, sizeof(sPositionText), ClosureUIStrings::POSITION_PREFIX, safeSuffix);
+}
+
+void ClosureUI::FormatAndSetLatch(const char * suffix)
+{
+    const char * safeSuffix = (suffix != nullptr) ? suffix : ClosureUIStrings::LATCH_SUFFIX_UNKNOWN;
+    FormatText(sLatchText, sizeof(sLatchText), ClosureUIStrings::LATCH_PREFIX, safeSuffix);
+}
+
+void ClosureUI::FormatAndSetSecure(const char * suffix)
+{
+    const char * safeSuffix = (suffix != nullptr) ? suffix : ClosureUIStrings::SECURE_SUFFIX_UNKNOWN;
+    FormatText(sSecureText, sizeof(sSecureText), ClosureUIStrings::SECURE_PREFIX, safeSuffix);
+}
+
+void ClosureUI::FormatAndSetSpeed(const char * suffix)
+{
+    const char * safeSuffix = (suffix != nullptr) ? suffix : ClosureUIStrings::SPEED_SUFFIX_UNKNOWN;
+    FormatText(sSpeedText, sizeof(sSpeedText), ClosureUIStrings::SPEED_PREFIX, safeSuffix);
 }
