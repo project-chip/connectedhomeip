@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2025 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,39 +16,12 @@
  *    limitations under the License.
  */
 
-/**
- * @file
- *   This file implements the handler for data model messages.
- */
-
-#include <AppConfig.h>
-
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
-#include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/ConcreteCommandPath.h>
-#include <app/clusters/closure-control-server/closure-control-server.h>
+#include <lib/support/logging/CHIPLogging.h>
 
-using namespace ::chip;
-using namespace ::chip::app::Clusters::ClosureControl;
-
-void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
-                                       uint8_t * value)
-{
-    switch (attributePath.mClusterId)
-    {
-    case app::Clusters::Identify::Id:
-        ChipLogProgress(Zcl, "Identify cluster ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
-                        ChipLogValueMEI(attributePath.mAttributeId), type, *value, size);
-        break;
-    default:
-        break;
-    }
-}
+using namespace chip;
+using namespace chip::app;
 
 /* Forwards all attributes changes */
 void MatterClosureControlClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
