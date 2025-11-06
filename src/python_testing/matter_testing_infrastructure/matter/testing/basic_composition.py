@@ -40,24 +40,6 @@ from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_cl
 
 LOGGER = logging.getLogger(__name__)
 
-
-def log_structured_data(start_tag: str, dump_string: str):
-    """Log structured data with a clear start and end marker.
-
-    This function is used to output device attribute dumps and other structured 
-    data to logs in a format that can be easily extracted for debugging.
-
-    Args:
-        start_tag: A prefix tag to identify the type of data being logged
-        dump_string: The data to be logged
-    """
-    lines = dump_string.splitlines()
-    LOGGER.info(f'{start_tag}BEGIN ({len(lines)} lines)====')
-    for line in lines:
-        LOGGER.info(f'{start_tag}{line}')
-    LOGGER.info(f'{start_tag}END ====')
-
-
 @dataclass
 class ArlData:
     have_arl: bool

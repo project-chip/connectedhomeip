@@ -242,12 +242,12 @@ class MatterBaseTest(base_test.BaseTestClass):
                 if hasattr(self, 'dump_wildcard'):
                     _, txt_str = self.dump_wildcard(None)
                     # Only dump the text format - it's more readable for debugging
-                    self._log_structured_data('==== FAILURE_DUMP_txt: ', txt_str)
+                    self.log_structured_data('==== FAILURE_DUMP_txt: ', txt_str)
         except (AttributeError, KeyError, ValueError, TypeError):
             # Don't let data access or serialization errors interfere with the original test failure
             pass
 
-    def _log_structured_data(self, start_tag: str, dump_string: str):
+    def log_structured_data(self, start_tag: str, dump_string: str):
         """Log structured data with a clear start and end marker.
 
         This function is used to output device attribute dumps and other structured 
