@@ -632,26 +632,20 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnMoveToCommand(const 
         }
     }
 
-    // Lock the chip stack before calling SetTargetState to prevent assertion failures
-    DeviceLayer::PlatformMgr().LockChipStack();
-
     if (mClosurePanelEndpoint2.GetLogic().SetTargetState(DataModel::MakeNullable(mClosurePanelEndpoint2Target)) != CHIP_NO_ERROR)
     {
-        DeviceLayer::PlatformMgr().UnlockChipStack();
         ChipLogError(AppServer, "Failed to set target for Endpoint 2");
         return Status::Failure;
     }
 
     if (mClosurePanelEndpoint3.GetLogic().SetTargetState(DataModel::MakeNullable(mClosurePanelEndpoint3Target)) != CHIP_NO_ERROR)
     {
-        DeviceLayer::PlatformMgr().UnlockChipStack();
         ChipLogError(AppServer, "Failed to set target for Endpoint 3");
         return Status::Failure;
     }
 
     if (mClosureEndpoint1.GetLogic().SetCountdownTimeFromDelegate(kDefaultCountdownTimeSeconds) != CHIP_NO_ERROR)
     {
-        DeviceLayer::PlatformMgr().UnlockChipStack();
         ChipLogError(AppServer, "Failed to set countdown time for move to command on Endpoint 1");
         return Status::Failure;
     }
@@ -668,7 +662,6 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnMoveToCommand(const 
         SetCurrentAction(MOVE_TO_ACTION);
     }
     mIsMoveToInProgress = true;
-    DeviceLayer::PlatformMgr().UnlockChipStack();
 
     // Post an event to initiate the move to action asynchronously.
     // MoveTo Command can only be initiated from Closure Control Endpoint (Endpoint 1).
@@ -827,18 +820,13 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
                                                                              const Optional<Globals::ThreeLevelAutoEnum> & speed,
                                                                              const chip::EndpointId endpointId)
 {
-    // Lock chip stack to safely access cluster state
-    DeviceLayer::PlatformMgr().LockChipStack();
-
     MainStateEnum mClosureEndpoint1MainState;
     if (mClosureEndpoint1.GetLogic().GetMainState(mClosureEndpoint1MainState) != CHIP_NO_ERROR)
     {
-        DeviceLayer::PlatformMgr().UnlockChipStack();
         ChipLogError(AppServer, "Failed to get main state for SetTarget command on Endpoint 1");
         return Status::Failure;
     }
 
-    DeviceLayer::PlatformMgr().UnlockChipStack();
 
     // If this command is received while the MainState attribute is currently either in Disengaged, Protected, Calibrating,
     //  SetupRequired or Error, then a status code of INVALID_IN_STATE shall be returned.
@@ -1315,12 +1303,6 @@ bool ClosureManager::GetPanelNextPosition(const GenericDimensionStateStruct & cu
     }
     return true;
 }
-
-CHIP_ERROR ClosureManager::GetClosureControlCurrentState(DataModel::Nullable<GenericOverallCurrentState> & currentState)
-{
-    return mClosureEndpoint1.GetLogic().GetOverallCurrentState(currentState);
-}
-
 bool ClosureManager::IsClosureControlMotionInProgress() const
 {
     return mIsMoveToInProgress;
