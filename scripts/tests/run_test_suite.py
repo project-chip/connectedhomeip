@@ -409,7 +409,10 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
             ble_controller_tool = 1  # Bind tool to the second BLE controller
 
         executor = chiptest.linux.LinuxNamespacedExecutor(ns)
-        runner = runner = chiptest.runner.Runner(executor=executor)
+        runner = chiptest.runner.Runner(executor=executor)
+    elif sys.platform == 'darwin':
+        executor = chiptest.darwin.DarwinExecutor()
+        runner = chiptest.runner.Runner(executor=executor)
     else:
         runner = chiptest.runner.Runner()
 
