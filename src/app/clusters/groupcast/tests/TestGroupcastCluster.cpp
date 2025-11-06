@@ -117,9 +117,10 @@ TEST_F(TestGroupcastCluster, TestJoinGroupCommand)
 
     chip::app::Testing::MockCommandHandler cmdHandler;
     chip::Test::ClusterTester tester(cluster);
-    auto result = tester.Invoke(Commands::JoinGroup::Id, cmdData, &cmdHandler);
-    ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(result.value().GetStatusCode().GetStatus(),    // NOLINT(bugprone-unchecked-optional-access)
+    auto result = tester.Invoke<Commands::JoinGroup::Type::ResponseType,
+                            Commands::JoinGroup::Type>(Commands::JoinGroup::Id, cmdData);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(),    // NOLINT(bugprone-unchecked-optional-access)
               Protocols::InteractionModel::Status::Failure); // Currently expect Failure as JoinGroup command returns
                                                              // CHIP_ERROR_NOT_IMPLEMENTED
 }
