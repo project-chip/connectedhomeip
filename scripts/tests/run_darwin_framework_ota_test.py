@@ -116,7 +116,7 @@ def cmd_run(context, darwin_framework_tool, ota_requestor_app, ota_data_file, ot
 
     if ota_requestor_app is not None:
         ota_requestor_app = SubprocessInfo(kind='app', path=ota_requestor_app
-                                       ).with_args('--otaDownloadPath', ota_destination_file)
+                                           ).with_args('--otaDownloadPath', ota_destination_file)
 
     runner = Runner()
     runner.capture_delegate = ExecutionCapture()

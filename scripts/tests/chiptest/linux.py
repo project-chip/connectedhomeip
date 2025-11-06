@@ -202,6 +202,7 @@ class IsolatedNetworkNamespace:
     def wrap_in_namespace(self, subproc: SubprocessInfo):
         return subproc.wrap_with(("ip", "netns", "exec", "{}-{}".format(subproc.kind, self.index)))
 
+
 class LinuxNamespacedExecutor(Executor):
     def __init__(self, ns):
         self.ns = ns
@@ -210,6 +211,7 @@ class LinuxNamespacedExecutor(Executor):
         wrapped = self.ns.wrap_in_namespace(subproc)
         s = subprocess.Popen(wrapped.to_cmd(), stdin=stdin, stdout=stdout, stderr=stderr)
         return s
+
 
 class DBusTestSystemBus(subprocess.Popen):
     """Run a dbus-daemon in a subprocess as a test system bus."""
