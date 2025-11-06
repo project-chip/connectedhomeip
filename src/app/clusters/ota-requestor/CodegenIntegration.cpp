@@ -55,6 +55,7 @@ public:
     void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServers[clusterInstanceIndex].Destroy(); }
 
 private:
+    // TODO: Call this somewhere appropriate.
     void LoadUpdatePossible()
     {
         // TODO: Verify if this is the correct traits.
