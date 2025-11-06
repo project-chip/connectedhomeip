@@ -85,6 +85,43 @@ cluster is a good example of this pattern.
         interactions. We recommend the term `Driver` to avoid confusion with the
         overloaded term `Delegate`.
 
+### Choosing the Right Implementation Pattern
+
+When implementing a cluster, you have two primary architectural choices: a
+**combined implementation** and a **modular implementation**. The best choice
+depends on the cluster's complexity and the constraints of the target device,
+particularly flash and RAM usage.
+
+-   **Combined Implementation (Logic and Data in One Class):**
+
+    -   **Description:** In this pattern, the cluster's logic, data storage, and
+        `ServerClusterInterface` implementation are all contained within a
+        single class.
+    -   **Pros:** Simpler to write and can result in a smaller flash footprint,
+        making it ideal for simple clusters or resource-constrained devices.
+    -   **Cons:** Can be harder to test and maintain as the cluster's complexity
+        grows.
+    -   **Example:** The
+        [Basic Information](https://github.com/project-chip/connectedhomeip/tree/master/src/app/clusters/basic-information)
+        cluster is a good example of a combined implementation.
+
+-   **Modular Implementation (Logic Separated from Data Model):**
+    -   **Description:** This pattern separates the core business logic into a
+        `ClusterLogic` class, while the `ClusterImplementation` class handles
+        the translation between the data model and the logic.
+    -   **Pros:** Promotes better testability, as the `ClusterLogic` can be
+        unit-tested in isolation. It is also more maintainable for complex
+        clusters.
+    -   **Cons:** May use slightly more flash and RAM due to the additional
+        class and virtual function calls.
+    -   **Example:** The
+        [Software Diagnostics](https://github.com/project-chip/connectedhomeip/tree/master/src/app/clusters/software-diagnostics-server)
+        cluster demonstrates a modular implementation.
+
+**Recommendation:** Start with a combined implementation for simpler clusters.
+If the cluster's logic is complex or if you need to maximize testability, choose
+the modular approach.
+
 ### BUILD file layout
 
 The description below will describe build files under
@@ -218,6 +255,42 @@ attribute's value changes.
 For common or large clusters, you may need to optimize for resource usage.
 Consider using `C++` templates to compile-time select features and attributes,
 which can significantly reduce flash and RAM footprint.
+
+### Advanced `ServerClusterInterface` Details
+
+While `ReadAttribute`, `WriteAttribute`, and `InvokeCommand` are the most
+commonly implemented methods, the `ServerClusterInterface` has other methods for
+more advanced use cases.
+
+#### List Attribute Writes (`ListAttributeWriteNotification`)
+
+This method is an advanced callback for handling large list attributes that may
+require special handling, such as persisting them to storage in chunks. A
+typical example of a cluster that might use this is the **Binding cluster**. For
+most clusters, the default implementation is sufficient.
+
+#### Event Permissions (`EventInfo`)
+
+You must implement the `EventInfo` method if your cluster emits any events that
+require non-default permissions to be read. For example, an event might require
+`Administrator` privileges. While not common, this should be verified for every
+new cluster implementation and checked during code reviews to ensure event
+access is correctly restricted.
+
+#### Accepted vs. Generated Commands
+
+The distinction between `AcceptedCommands` and `GeneratedCommands` can be
+understood using a REST API analogy:
+
+-   **`AcceptedCommands`**: These are the "requests" that the server cluster can
+    process. In the Matter specification, these are commands sent from the
+    client to the server (`client => server`).
+-   **`GeneratedCommands`**: These are the "responses" that the server cluster
+    can generate after processing an accepted command. In the spec, these are
+    commands sent from the server back to the client (`server => client`).
+
+These lists are built based on the cluster's definition in the Matter
+specification.
 
 ### Unit Testing
 

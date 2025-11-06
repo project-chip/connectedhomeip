@@ -18,7 +18,7 @@
 """
 Matter Specification Conformance Engine
 
-This module implements the conformance checking system for Matter clusters, attributes, 
+This module implements the conformance checking system for Matter clusters, attributes,
 commands, and device types. It provides:
 
 - Conformance decision types (mandatory, optional, disallowed, etc.)
@@ -364,7 +364,7 @@ class and_operation(Conformance):
         for op in self.op_list:
             decision_with_choice = op(feature_map, attribute_list, all_command_list)
             # and operations can't happen on optional or disallowed
-            if decision_with_choice.decision == ConformanceDecision.OPTIONAL and all([type(op) == device_feature for op in self.op_list]):
+            if decision_with_choice.decision == ConformanceDecision.OPTIONAL and all(type(op) == device_feature for op in self.op_list):
                 return decision_with_choice
             elif decision_with_choice.decision in [ConformanceDecision.OPTIONAL, ConformanceDecision.DISALLOWED, ConformanceDecision.PROVISIONAL]:
                 raise ConformanceException('AND operation on optional or disallowed item')
@@ -456,7 +456,7 @@ def parse_basic_callable_from_xml(element: ElementTree.Element) -> Conformance:
     Basic conformance elements are XML elements without children that represent
     simple conformance decisions such as:
     - mandatoryConform (M)
-    - optionalConform (O) 
+    - optionalConform (O)
     - disallowConform (X)
     - deprecateConform (D)
     - provisionalConform (P)

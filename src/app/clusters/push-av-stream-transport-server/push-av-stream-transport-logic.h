@@ -159,10 +159,19 @@ private:
     /**
      * @brief Schedule deallocate with a given timeout
      *
-     * @param endpointId    endpoint where PushAvStreamTransportServer is running
-     * @param timeoutSec    timeout in seconds
+     * @param connectionID    ID of the connection to deallocate
+     * @param timeoutSec      timeout in seconds
+     * @return               CHIP_ERROR code indicating the result of the operation
      */
     CHIP_ERROR ScheduleTransportDeallocate(uint16_t connectionID, uint32_t timeoutSec);
+
+    /**
+     * @brief Validates the provided URL.
+     *
+     * @param url The URL to validate
+     * @return true if URL is valid, false otherwise
+     */
+    bool ValidateUrl(const std::string & url);
 };
 
 } // namespace Clusters

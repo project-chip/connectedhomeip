@@ -592,8 +592,9 @@ class PushAvServer:
                     track_name = stream.get('trackName', None)
                     if track_name and track_name != track_name_in_path:
                         is_valid = False
-                        validation_error_reason = f"Track name mismatch: {track_name_in_path} != {
-                            track_name}, must match TrackName provided in ContainerOptions"
+                        validation_error_reason = ("Track name mismatch: "
+                                                   f"{track_name_in_path} != {track_name}, "
+                                                   "must match TrackName provided in ContainerOptions")
 
         dst = self.wd.mkdir("streams", str(stream_id), f"{file_path}.{ext}", is_file=True)
         extended_path = f"{file_path}.{ext}"
@@ -790,7 +791,7 @@ if __name__ == "__main__":
         level=logging.DEBUG,
         datefmt="%H:%M:%S",
     )
-    logging.getLogger("hpack").setLevel(logging.WARN)
+    logging.getLogger("hpack").setLevel(logging.WARNING)
 
     parser = argparse.ArgumentParser(
         prog="push_av_tool.py",

@@ -33,7 +33,7 @@ uint8_t __attribute__((section(".heap"))) ucHeap[configTOTAL_HEAP_SIZE];
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
-void main_task(void * pvParameters)
+void test_task(void * pvParameters)
 {
     chip::Platform::MemoryInit();
     chip::DeviceLayer::PlatformManagerImpl().ServiceInit();
@@ -41,21 +41,38 @@ void main_task(void * pvParameters)
     int status = chip::test::RunAllTests();
 }
 
+#if FSL_OSA_MAIN_FUNC_ENABLE
+extern "C" void main_task(void const * argument)
+{
+    TaskHandle_t taskHandle;
+#if CONFIG_ENABLE_PW_RPC
+    chip::NXP::App::Rpc::Init();
+#endif
+
+    PlatformMgrImpl().HardwareInit();
+
+    test_task(nullptr);
+    // do not exit this task function to prevent logging issue
+    while (1)
+        ;
+}
+#else
 extern "C" int main(int argc, char * argv[])
 {
     TaskHandle_t taskHandle;
 
     PlatformMgrImpl().HardwareInit();
 
-    if (xTaskCreate(&main_task, "main_task", MAIN_TASK_SIZE, NULL, configMAX_PRIORITIES - 4, &taskHandle) != pdPASS)
+    if (xTaskCreate(&test_task, "test_task", MAIN_TASK_SIZE, NULL, configMAX_PRIORITIES - 4, &taskHandle) != pdPASS)
     {
-        ChipLogError(DeviceLayer, "Failed to start main task");
+        ChipLogError(DeviceLayer, "Failed to start test task");
         assert(false);
     }
 
     ChipLogProgress(DeviceLayer, "Starting FreeRTOS scheduler");
     vTaskStartScheduler();
 }
+#endif
 
 #if (defined(configCHECK_FOR_STACK_OVERFLOW) && (configCHECK_FOR_STACK_OVERFLOW > 0))
 void vApplicationStackOverflowHook(TaskHandle_t xTask, char * pcTaskName)

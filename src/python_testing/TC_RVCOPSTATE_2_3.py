@@ -221,7 +221,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
         defined_states = [state.value for state in Clusters.OperationalState.Enums.OperationalStateEnum
                           if state is not Clusters.OperationalState.Enums.OperationalStateEnum.kUnknownEnumValue]
 
-        state_ids = set([s.operationalStateID for s in op_state_list])
+        state_ids = {s.operationalStateID for s in op_state_list}
 
         asserts.assert_true(all(id in state_ids for id in defined_states), "OperationalStateList is missing a required entry")
 

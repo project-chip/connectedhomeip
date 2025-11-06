@@ -246,7 +246,7 @@
             "TariffUnit",
             "MaximumMeteredQuantities"
         ],
-        "Descriptor": ["ClusterRevision", "FeatureMap"],
+        "Descriptor": ["ClusterRevision", "FeatureMap", "EndpointUniqueID"],
         "Device Energy Management": [
             "ESAType",
             "ESACanGenerate",
@@ -350,7 +350,12 @@
             "OperatingMode",
             "FeatureMap"
         ],
-        "Identify": ["ClusterRevision"],
+        "Identify": [
+            "ClusterRevision",
+            "FeatureMap",
+            "IdentifyTime",
+            "IdentifyType"
+        ],
         "Joint Fabric Datastore": ["Status"],
         "Meter Identification": [
             "MeterType",
@@ -407,6 +412,7 @@
             "global_struct",
             "nullable_global_struct"
         ],
+        "User Label": ["LabelList", "ClusterRevision", "FeatureMap"],
         "Thread Border Router Management": [
             "BorderRouterName",
             "BorderAgentID",
@@ -823,6 +829,7 @@
             "FeatureMap"
         ],
         "Unit Localization": ["TemperatureUnit"],
+        "Localization Configuration": ["ClusterRevision", "SupportedLocales"],
         "TLS Certificate Management": [
             "ClusterRevision",
             "MaxRootCertificates",

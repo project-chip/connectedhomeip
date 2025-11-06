@@ -657,6 +657,16 @@ void emberAfActivatedCarbonFilterMonitoringClusterShutdownCallback(chip::Endpoin
 /**
  * @param endpoint    Endpoint that is being initialized
  */
+void emberAfWaterTankLevelMonitoringClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void emberAfWaterTankLevelMonitoringClusterShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
 void emberAfBooleanStateConfigurationClusterInitCallback(chip::EndpointId endpoint);
 
 /**
@@ -3841,6 +3851,44 @@ chip::Protocols::InteractionModel::Status MatterActivatedCarbonFilterMonitoringC
 void emberAfActivatedCarbonFilterMonitoringClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
+// Water Tank Level Monitoring Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfWaterTankLevelMonitoringClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterWaterTankLevelMonitoringClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfWaterTankLevelMonitoringClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterWaterTankLevelMonitoringClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterWaterTankLevelMonitoringClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfWaterTankLevelMonitoringClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
 // Boolean State Configuration Cluster
 //
 
@@ -6896,18 +6944,6 @@ void emberAfSampleMeiClusterServerTickCallback(chip::EndpointId endpoint);
 // Cluster Commands Callback
 
 /**
- * @brief Identify Cluster Identify Command callback (from client)
- */
-bool emberAfIdentifyClusterIdentifyCallback(chip::app::CommandHandler * commandObj,
-                                            const chip::app::ConcreteCommandPath & commandPath,
-                                            const chip::app::Clusters::Identify::Commands::Identify::DecodableType & commandData);
-/**
- * @brief Identify Cluster TriggerEffect Command callback (from client)
- */
-bool emberAfIdentifyClusterTriggerEffectCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Identify::Commands::TriggerEffect::DecodableType & commandData);
-/**
  * @brief Groups Cluster AddGroup Command callback (from client)
  */
 bool emberAfGroupsClusterAddGroupCallback(chip::app::CommandHandler * commandObj,
@@ -7149,35 +7185,11 @@ bool emberAfDishwasherAlarmClusterModifyEnabledAlarmsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DishwasherAlarm::Commands::ModifyEnabledAlarms::DecodableType & commandData);
 /**
- * @brief Groupcast Cluster JoinGroup Command callback (from client)
+ * @brief Water Tank Level Monitoring Cluster ResetCondition Command callback (from client)
  */
-bool emberAfGroupcastClusterJoinGroupCallback(
+bool emberAfWaterTankLevelMonitoringClusterResetConditionCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Groupcast::Commands::JoinGroup::DecodableType & commandData);
-/**
- * @brief Groupcast Cluster LeaveGroup Command callback (from client)
- */
-bool emberAfGroupcastClusterLeaveGroupCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Groupcast::Commands::LeaveGroup::DecodableType & commandData);
-/**
- * @brief Groupcast Cluster UpdateGroupKey Command callback (from client)
- */
-bool emberAfGroupcastClusterUpdateGroupKeyCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Groupcast::Commands::UpdateGroupKey::DecodableType & commandData);
-/**
- * @brief Groupcast Cluster ExpireGracePeriod Command callback (from client)
- */
-bool emberAfGroupcastClusterExpireGracePeriodCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Groupcast::Commands::ExpireGracePeriod::DecodableType & commandData);
-/**
- * @brief Groupcast Cluster ConfigureAuxiliaryACL Command callback (from client)
- */
-bool emberAfGroupcastClusterConfigureAuxiliaryACLCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Groupcast::Commands::ConfigureAuxiliaryACL::DecodableType & commandData);
+    const chip::app::Clusters::WaterTankLevelMonitoring::Commands::ResetCondition::DecodableType & commandData);
 /**
  * @brief Boolean State Configuration Cluster SuppressAlarm Command callback (from client)
  */
@@ -7837,6 +7849,42 @@ bool emberAfContentControlClusterSetOnDemandRatingThresholdCallback(
 bool emberAfContentControlClusterSetScheduledContentRatingThresholdCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ContentControl::Commands::SetScheduledContentRatingThreshold::DecodableType & commandData);
+/**
+ * @brief Content Control Cluster AddBlockChannels Command callback (from client)
+ */
+bool emberAfContentControlClusterAddBlockChannelsCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ContentControl::Commands::AddBlockChannels::DecodableType & commandData);
+/**
+ * @brief Content Control Cluster RemoveBlockChannels Command callback (from client)
+ */
+bool emberAfContentControlClusterRemoveBlockChannelsCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ContentControl::Commands::RemoveBlockChannels::DecodableType & commandData);
+/**
+ * @brief Content Control Cluster AddBlockApplications Command callback (from client)
+ */
+bool emberAfContentControlClusterAddBlockApplicationsCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ContentControl::Commands::AddBlockApplications::DecodableType & commandData);
+/**
+ * @brief Content Control Cluster RemoveBlockApplications Command callback (from client)
+ */
+bool emberAfContentControlClusterRemoveBlockApplicationsCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ContentControl::Commands::RemoveBlockApplications::DecodableType & commandData);
+/**
+ * @brief Content Control Cluster SetBlockContentTimeWindow Command callback (from client)
+ */
+bool emberAfContentControlClusterSetBlockContentTimeWindowCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ContentControl::Commands::SetBlockContentTimeWindow::DecodableType & commandData);
+/**
+ * @brief Content Control Cluster RemoveBlockContentTimeWindow Command callback (from client)
+ */
+bool emberAfContentControlClusterRemoveBlockContentTimeWindowCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ContentControl::Commands::RemoveBlockContentTimeWindow::DecodableType & commandData);
 /**
  * @brief Content App Observer Cluster ContentAppMessage Command callback (from client)
  */

@@ -20,6 +20,9 @@
 #include <lib/core/DataModelTypes.h>
 
 namespace chip {
+namespace app {
+namespace Clusters {
+namespace Binding {
 
 /**
  * Application callback function when a context used in PendingNotificationEntry will not be needed and should be
@@ -67,7 +70,7 @@ public:
 class PendingNotificationMap
 {
 public:
-    static constexpr uint8_t kMaxPendingNotifications = BindingTable::kMaxBindingEntries;
+    static constexpr uint8_t kMaxPendingNotifications = Table::kMaxBindingEntries;
 
     friend class Iterator;
 
@@ -128,4 +131,7 @@ private:
     uint8_t mNumEntries = 0;
 };
 
+} // namespace Binding
+} // namespace Clusters
+} // namespace app
 } // namespace chip

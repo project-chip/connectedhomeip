@@ -29,6 +29,8 @@ logger = logging.getLogger(__name__)
 
 
 class PAVSTTestBase:
+    DEFAULT_AV_TRANSPORT_EXPIRY_TIME_SEC = 30  # 30 seconds
+
     async def read_pavst_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.PushAvStreamTransport
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
@@ -187,8 +189,8 @@ class PAVSTTestBase:
 
     async def allocate_one_pushav_transport(self, endpoint, triggerType=Clusters.PushAvStreamTransport.Enums.TransportTriggerTypeEnum.kContinuous,
                                             trigger_Options=None, ingestMethod=Clusters.PushAvStreamTransport.Enums.IngestMethodsEnum.kCMAFIngest,
-                                            url="https://localhost:1234/streams/1", stream_Usage=None, container_Options=None,
-                                            videoStream_ID=None, audioStream_ID=None, expected_cluster_status=None, tlsEndPoint=1, expiryTime=10):
+                                            url="https://localhost:1234/streams/1/", stream_Usage=None, container_Options=None,
+                                            videoStream_ID=None, audioStream_ID=None, expected_cluster_status=None, tlsEndPoint=1, expiryTime=DEFAULT_AV_TRANSPORT_EXPIRY_TIME_SEC):
         endpoint = self.get_endpoint(default=1)
         cluster = Clusters.PushAvStreamTransport
 
@@ -233,7 +235,7 @@ class PAVSTTestBase:
         containerOptions = {
             "containerType": cluster.Enums.ContainerFormatEnum.kCmaf,
             "CMAFContainerOptions": {"CMAFInterface": cluster.Enums.CMAFInterfaceEnum.kInterface1, "chunkDuration": 4, "segmentDuration": 4000,
-                                     "sessionGroup": 3, "trackName": " "},
+                                     "sessionGroup": 3, "trackName": "media"},
         }
 
         if (container_Options is not None):
@@ -268,6 +270,8 @@ class PAVSTTestBase:
                     e.clusterStatus == expected_cluster_status, "Unexpected error returned"
                 )
                 return e.clusterStatus
+            if (e.status == Status.ResourceExhausted):
+                asserts.fail("RESOURCE_EXHAUSTED")
             return e.status
         pass
 
@@ -399,7 +403,7 @@ class PAVSTTestBase:
         self.th1 = self.default_controller
         self.discriminator = random.randint(0, 4095)
         params = await self.th1.OpenCommissioningWindow(
-            nodeid=self.dut_node_id, timeout=900, iteration=10000, discriminator=self.discriminator, option=1)
+            nodeId=self.dut_node_id, timeout=900, iteration=10000, discriminator=self.discriminator, option=1)
 
         th2_certificate_authority = (
             self.certificate_authority_manager.NewCertificateAuthority()
@@ -428,7 +432,7 @@ class PAVSTTestBase:
     async def psvt_remove_current_fabric(self, devCtrl):
         fabric_idx_cr2_2 = await self.read_currentfabricindex(th=devCtrl)
         removeFabricCmd2 = Clusters.OperationalCredentials.Commands.RemoveFabric(fabric_idx_cr2_2)
-        resp = await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd2)
+        resp = await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=removeFabricCmd2)
         return resp
         asserts.assert_equal(
             resp.statusCode, Clusters.OperationalCredentials.Enums.NodeOperationalCertStatusEnum.kOk, "Expected removal of TH2's fabric to succeed")

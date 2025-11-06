@@ -17,6 +17,7 @@
 
 import random
 import string
+from datetime import timedelta
 
 import test_plan_support
 # === BEGIN CI TEST ARGUMENTS ===
@@ -53,6 +54,11 @@ class TC_TLSCLIENT(MatterBaseTest):
         def __init__(self, cr1_cmd: TLSUtils, cr2_cmd: TLSUtils):
             self.cr1_cmd = cr1_cmd
             self.cr2_cmd = cr2_cmd
+
+    # This test creates the maximum number of endpoints, which can take some time
+    @property
+    def default_timeout(self) -> int:
+        return timedelta(minutes=5).total_seconds()
 
     async def common_setup(self):
         self.step(1)
@@ -142,16 +148,16 @@ class TC_TLSCLIENT(MatterBaseTest):
             TestStep(15, "CR1 sends ProvisionEndpoint command with valid Hostname myHostname, Port myPort[0], CAID myCaid[0], CCDID myCcdid[0] and null EndpointID.",
                      "DUT replies with a TLSEndpointID value. Store the returned value as myEndpoint[0]."),
             TestStep(16, "CR1 reads ProvisionedEndpoints attribute.",
-                     "DUT replies with a list of TLSEndpointStruct with one entry. The entry should correspond to (myEndpoint[1], myHostname, myPort[0], myCaid[0], myCcdid[0], myReferenceCount) where myReferenceCount is 0"),
+                     "DUT replies with a list of TLSEndpointStruct with one entry. The entry should correspond to (myEndpoint[0], myHostname, myPort[0], myCaid[0], myCcdid[0], myReferenceCount) where myReferenceCount is 0"),
             TestStep(17, "CR2 reads ProvisionedEndpoints attribute.", "DUT replies with an empty list of TLSEndpointStruct."),
             TestStep(18, "CR2 sends ProvisionEndpoint command with valid Hostname myHostname, Port myPort[1], CAID myCaid[1], CCDID myCcdid[1] and null EndpointID.",
-                     "DUT replies with a TLSEndpointID value equal to myEndpoint[0]."),
+                     "DUT replies with a TLSEndpointID value equal to myEndpoint[1]."),
             TestStep(19, "CR1 sends ProvisionEndpoint command with valid Hostname myHostname, Port myPort[2], CAID myCaid[0], CCDID myCcdid[0] and EndpointID myEndpoint[0].",
                      "DUT replies with a TLSEndpointID value equal to myEndpoint[0]."),
             TestStep(20, "CR1 reads ProvisionedEndpoints attribute.",
                      "DUT replies with a list of TLSEndpointStruct with one entry. The entry should correspond to (myEndpoint[0], myHostname, myPort[2], myCaid[0], myCcdid[0], myReferenceCount) where myReferenceCount is 0"),
             TestStep(21, "CR2 reads ProvisionedEndpoints attribute.",
-                     "DUT replies with a list of TLSEndpointStruct with one entry. The entry should correspond to (myEndpoint[1], myHostname, myPort[1], myCaid[0], myCcdid[1], myReferenceCount) where myReferenceCount is 0"),
+                     "DUT replies with a list of TLSEndpointStruct with one entry. The entry should correspond to (myEndpoint[1], myHostname, myPort[1], myCaid[1], myCcdid[1], myReferenceCount) where myReferenceCount is 0"),
             TestStep(
                 22, "CR1 sends RemoveEndpoint command with EndpointID set to myEndpoint[0].", test_plan_support.verify_success()),
             TestStep(23, test_plan_support.remove_fabric('CR2', 'CR1'), test_plan_support.verify_success()),
@@ -298,7 +304,7 @@ class TC_TLSCLIENT(MatterBaseTest):
             TestStep(16, "CR2 sends ProvisionEndpoint command with valid Hostname myHostname, Port myPort[i], CAID myCaid[1], CCDID myCcdid[1] and null EndpointID, for i in (1..myMaxProvisioned+1).",
                      "DUT replies with a TLSEndpointID value. Store the returned value as myEndpoint[i]."),
             TestStep(17, "CR1 reads ProvisionedEndpoints attribute.",
-                     "DUT replies with a list of TLSEndpointStruct with 2 entries. The entries should correspond to (myEndpoint[i], myHostname, myPort[i], myCaid[0], myCcdid[0], myReferenceCount) where myReferenceCount is 0, and i is [0..1]."),
+                     "DUT replies with a list of TLSEndpointStruct with 1 entry. The entries should correspond to (myEndpoint[0], myHostname, myPort[i], myCaid[0], myCcdid[0], myReferenceCount) where myReferenceCount is 0"),
             TestStep(18, "CR2 reads ProvisionedEndpoints attribute.",
                      "DUT replies with a list of TLSEndpointStruct with myMaxProvisioned entries. The entries should correspond to (myEndpoint[i], myHostname, myPort[i], myCaid[1], myCcdid[1], myReferenceCount) where myReferenceCount is 0, and i is [2..myMaxProvisioned-1]."),
             TestStep(19, "CR2 sends ProvisionEndpoint command with valid Hostname myHostname, Port myPort[myMaxProvisioned], CAID myCaid[1], CCDID myCcdid[1] and null EndpointID.", test_plan_support.verify_status(
@@ -310,9 +316,9 @@ class TC_TLSCLIENT(MatterBaseTest):
             TestStep(22, "CR2 sends ProvisionEndpoint command with valid Hostname myHostname, Port myPort[myMaxProvisioned+2], CAID myCaid[1], CCDID myCcdid[1] and null EndpointID, for i in (1..myMaxProvisioned+1).",
                      "DUT replies with a TLSEndpointID value. Store the returned value as myEndpoint[myMaxProvisioned+1]."),
             TestStep(23, "CR2 reads ProvisionedEndpoints attribute.",
-                     "DUT replies with a list of TLSEndpointStruct with myMaxProvisioned entries. The entries should correspond to (myEndpoint[i], myHostname, myPort[i], myCaid[1], myCcdid[1], myReferenceCount) where myReferenceCount is 0, and i is [3..myMaxProvisioned+1]."),
+                     "DUT replies with a list of TLSEndpointStruct with myMaxProvisioned entries. The entries should correspond to (myEndpoint[i], myHostname, myPort[i], myCaid[1], myCcdid[1], myReferenceCount) where myReferenceCount is 0, and i is [2..myMaxProvisioned+2]."),
             TestStep(
-                24, "CR1 sends RemoveEndpoint command with EndpointID set to myEndpoint[i] for i in (0..2).", test_plan_support.verify_success()),
+                24, "CR1 sends RemoveEndpoint command with EndpointID set to myEndpoint[0]", test_plan_support.verify_success()),
             TestStep(25, test_plan_support.remove_fabric('CR2', 'CR1'), test_plan_support.verify_success()),
         ]
 
@@ -391,6 +397,16 @@ class TC_TLSCLIENT(MatterBaseTest):
         self.step(18)
         endpoints2 = await cr2_cmd.read_tls_client_attribute(attributes.ProvisionedEndpoints)
         asserts.assert_equal(len(endpoints2), max_provisioned)
+        found_endpoints = {}
+        for ep in endpoints2:
+            found_endpoints[ep.endpointID] = ep
+        for i in range(1, max_provisioned+1):
+            ep = found_endpoints[my_endpoint[i]]
+            asserts.assert_equal(ep.hostname, my_hostname)
+            asserts.assert_equal(ep.port, my_port[i])
+            asserts.assert_equal(ep.caid, my_caid[1])
+            asserts.assert_equal(ep.ccdid, my_ccdid[1])
+            asserts.assert_equal(ep.referenceCount, 0)
 
         self.step(19)
         await cr2_cmd.send_provision_tls_endpoint_command(hostname=my_hostname, port=my_port[max_provisioned+1], caid=my_caid[1], ccdid=my_ccdid[1], expected_status=Status.ResourceExhausted)
@@ -410,7 +426,7 @@ class TC_TLSCLIENT(MatterBaseTest):
         self.step(23)
         endpoints2 = await cr2_cmd.read_tls_client_attribute(attributes.ProvisionedEndpoints)
         asserts.assert_equal(len(endpoints2), max_provisioned)
-        found_endpoints = dict()
+        found_endpoints = {}
         for ep in endpoints2:
             found_endpoints[ep.endpointID] = ep
         for i in range(2, max_provisioned+2):
@@ -656,6 +672,7 @@ class TC_TLSCLIENT(MatterBaseTest):
         asserts.assert_equal(res.endpoint.port, my_port)
         asserts.assert_equal(res.endpoint.caid, my_caid)
         asserts.assert_equal(res.endpoint.ccdid, my_ccdid)
+        asserts.assert_equal(res.endpoint.referenceCount, 0)
 
         self.step(15)
         await cr1_cmd.send_find_tls_endpoint_command(endpoint_id=my_endpoint + 1, expected_status=Status.NotFound)

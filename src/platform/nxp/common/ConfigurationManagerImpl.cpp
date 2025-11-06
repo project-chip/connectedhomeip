@@ -66,7 +66,7 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
     return sInstance;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::DetermineBootReason(uint8_t rebootCause)
+CHIP_ERROR ConfigurationManagerImpl::DetermineBootReason(uint32_t rebootCause)
 {
 #if CONFIG_BOOT_REASON_SDK_SUPPORT
     /*
@@ -114,7 +114,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     uint32_t rebootCount = 0;
 
 #if CONFIG_BOOT_REASON_SDK_SUPPORT
-    uint8_t rebootCause = POWER_GetResetCause();
+    uint32_t rebootCause = POWER_GetResetCause();
     POWER_ClearResetCause(rebootCause);
 #endif
 

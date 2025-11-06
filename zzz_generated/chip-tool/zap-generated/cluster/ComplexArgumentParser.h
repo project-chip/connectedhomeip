@@ -107,11 +107,6 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs
 
 static void Finalize(chip::app::Clusters::detail::Structs::MeasurementAccuracyStruct::Type & request);
 
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs::ApplicationStruct::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::detail::Structs::ApplicationStruct::Type & request);
-
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::detail::Structs::ErrorStateStruct::Type & request,
                         Json::Value & value);
 
@@ -370,6 +365,12 @@ static CHIP_ERROR Setup(const char * label,
 static void Finalize(chip::app::Clusters::ActivatedCarbonFilterMonitoring::Structs::ReplacementProductStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::WaterTankLevelMonitoring::Structs::ReplacementProductStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::WaterTankLevelMonitoring::Structs::ReplacementProductStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::Type & request,
                         Json::Value & value);
 
@@ -471,6 +472,11 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::EnergyPreferenc
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::EnergyPreference::Structs::BalanceStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::PowerTopology::Structs::CircuitNodeStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::PowerTopology::Structs::CircuitNodeStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::ElectricalGridConditions::Structs::ElectricalGridConditionsStruct::Type & request,
@@ -698,10 +704,40 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::AudioOutput::St
 
 static void Finalize(chip::app::Clusters::AudioOutput::Structs::OutputInfoStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ApplicationLauncher::Structs::ApplicationStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEPStruct::Type & request,
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEPStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ApplicationBasic::Structs::ApplicationStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ApplicationBasic::Structs::ApplicationStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentControl::Structs::TimePeriodStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ContentControl::Structs::TimePeriodStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentControl::Structs::TimeWindowStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ContentControl::Structs::TimeWindowStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentControl::Structs::AppInfoStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ContentControl::Structs::AppInfoStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentControl::Structs::BlockChannelStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ContentControl::Structs::BlockChannelStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentControl::Structs::RatingNameStruct::Type & request,
                         Json::Value & value);

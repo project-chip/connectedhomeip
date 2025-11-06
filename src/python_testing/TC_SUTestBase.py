@@ -16,9 +16,9 @@
 
 
 import logging
-from datetime import datetime
-from os import environ, getcwd, path
-from typing import Optional, Union
+import tempfile
+from os import path
+from typing import Optional
 
 from mobly import asserts
 
@@ -35,11 +35,12 @@ logger = logging.getLogger(__name__)
 class SoftwareUpdateBaseTest(MatterBaseTest):
     """This is the base test class for SoftwareUpdate Test Cases"""
 
-    current_provider_app_proc: Union[OTAProviderSubprocess, None] = None
-    current_requestor_app_proc: Union[OTAProviderSubprocess, None] = None
+    current_provider_app_proc: Optional[OTAProviderSubprocess] = None
+    provider_app_path: Optional[str] = None
 
     def start_provider(self,
-                       version: int = 2,
+                       provider_app_path: str = "",
+                       ota_image_path: str = "",
                        setup_pincode: int = 20202021,
                        discriminator: int = 1234,
                        port: int = 5541,
@@ -51,7 +52,8 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         """Start the provider process using the provided configuration.
 
         Args:
-            version (int, optional): Provider app version to load. Defaults to 2.
+            provider_app_path (str): Path of Requestor app to load.
+            ota_image_path (str): Ota image to load within the provider.
             setup_pincode (int, optional): Setup pincode for the provider process. Defaults to 20202021.
             discriminator (int, optional): Discriminator for the provider process. Defaults to 1234.
             port (int, optional): Port for the provider process. Defaults to 5541.
@@ -62,26 +64,29 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             expected_output (str): Expected string to see after a default timeout. Defaults to "Status: Satisfied".
             timeout (int): Timeout to wait for the expected output. Defaults to 10 seconds
         """
-        logger.info(f"Launching provider app with version {version}")
+        logger.info(f"Launching provider app with with ota image {ota_image_path}")
         # Image to launch
-        ota_app = ""
-        if environ.get("OTA_PROVIDER_APP") is not None:
-            ota_app = environ.get("OTA_PROVIDER_APP")
-        else:
-            ota_app = f"{getcwd()}/out/debug/chip-ota-provider-app"
+        self.provider_app_path = provider_app_path
+        if not path.exists(provider_app_path):
+            raise FileNotFoundError(f"Provider app not found {provider_app_path}")
+
+        if not path.exists(ota_image_path):
+            raise FileNotFoundError(f"Ota image provided does not exists {ota_image_path}")
 
         # Ota image
-        ota_image_path = OtaImagePath(path=self.get_ota_image_path(version=version))
+        ota_image_path = OtaImagePath(path=ota_image_path)
         # Ideally we send the logs to a fixed location to avoid conflicts
 
         if log_file is None:
-            now = datetime.now()
-            ts = int(now.timestamp())
-            log_file = f'/tmp/provider_{ts}.log'
-        logger.info(f"Writing Provider logs at : {log_file}")
+            # Assign the file descriptor to log_file
+            log_file = tempfile.NamedTemporaryFile(
+                dir=storage_dir, prefix='provider_', suffix='.log', mode='ab')
+            logger.info(f"Writing Provider logs at :{log_file.name}")
+        else:
+            logger.info(f"Writing Provider logs at : {log_file}")
         # Launch the Provider subprocess using the Wrapper
         proc = OTAProviderSubprocess(
-            ota_app,
+            provider_app_path,
             storage_dir=storage_dir,
             port=port,
             discriminator=discriminator,
@@ -98,24 +103,6 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         self.current_provider_app_proc = proc
         logger.info(f"Provider started with PID:  {self.current_provider_app_proc.get_pid()}")
 
-    def get_ota_image_path(self, version: int = 2) -> str:
-        """Get the path ota image used for the provider.
-
-        Args:
-            version (int): App version . Defaults to 2.
-
-        Returns:
-            str: Path of the ota image
-        """
-
-        ota_image = ""
-        if environ.get(f"SU_OTA_REQUESTOR_V{version}") is not None:
-            ota_image = environ.get(f"SU_OTA_REQUESTOR_V{version}")
-        else:
-            ota_image = f"{getcwd()}/chip-ota-requestor-app_v{version}.min.ota"
-
-        return ota_image
-
     async def announce_ota_provider(self,
                                     controller: ChipDeviceCtrl,
                                     provider_node_id: int,
@@ -123,8 +110,8 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
                                     reason: Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum = Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum.kUpdateAvailable,
                                     vendor_id: int = 0xFFF1,
                                     endpoint: int = 0):
-        """Announce the OTA provider that a software update is requested.
-
+        """ Launch the requestor.AnnounceOTAProvider method with the specific configuration.
+            Starts the communication from the requestor to the provider to start a software update.
         Args:
             controller (ChipDeviceCtrl): Controller for DUT
             provider_node_id (int): Node id for the provider
@@ -134,7 +121,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             endpoint (int, optional): Endpoint id. Defaults to 0.
 
         Returns:
-            _type_: _description_
+            object: Return the data from the OtaSoftwareUpdateRequestor.AnnounceOTAProvider command.
         """
         cmd_announce_ota_provider = Clusters.OtaSoftwareUpdateRequestor.Commands.AnnounceOTAProvider(
             providerNodeID=provider_node_id,
@@ -153,12 +140,13 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         logger.info(f"Announce command sent {cmd_resp}")
         return cmd_resp
 
-    async def write_ota_providers(self, controller: ChipDeviceCtrl, provider_node_id: int, endpoint: int = 0):
-        """Write the provider list in the requestor to initiate the SU.
+    async def set_default_ota_providers_list(self, controller: ChipDeviceCtrl, provider_node_id: int, requestor_node_id: int, endpoint: int = 0):
+        """Write the provider list in the requestor to initiate the Software Update.
 
         Args:
             controller (ChipDeviceCtrl): Controller to write the providers.
             provider_node_id (int): Node where the provider is localted.
+            requestor_node_id (int): Node of the requestor to write the providers.
             endpoint (int, optional): Endpoint to write the providerss. Defaults to 0.
         """
 
@@ -182,7 +170,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         # Write the Attribute
         resp = await controller.WriteAttribute(
             attributes=[(endpoint, ota_providers_attr)],
-            nodeid=self.dut_node_id,
+            nodeId=requestor_node_id,
         )
         asserts.assert_equal(resp[0].Status, Status.Success, "Failed to write Default OTA Providers Attribute")
 
@@ -198,7 +186,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         """Verify the version from the BasicInformationCluster and compares against the provider target version.
 
         Args:
-            controller (ChipDeviceCtrl): Controller 
+            controller (ChipDeviceCtrl): Controller
             node_id (int): Node to request
             target_version (int): Version to compare
         """
@@ -236,10 +224,10 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
 
     def verify_state_transition_event(self,
                                       event_report: Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition,
-                                      previous_state,
-                                      new_state,
-                                      target_version: Optional[int] = None,
-                                      reason: Optional[int] = None):
+                                      expected_previous_state,
+                                      expected_new_state,
+                                      expected_target_version: Optional[int] = None,
+                                      expected_reason: Optional[int] = None):
         """Verify the values of the StateTransitionEvent from the EventHandler given the provided arguments.
 
         Args:
@@ -250,12 +238,14 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             reason (Optional[int], optional): UpdateStateEnum reason of the event, if not provided ignore. Defaults to None.
         """
         logger.info(f"Verifying the event {event_report}")
-        asserts.assert_equal(event_report.previousState, previous_state, f"Previous state was not {previous_state}")
-        asserts.assert_equal(event_report.newState,  new_state, f"New state is not {new_state}")
-        if target_version is not None:
-            asserts.assert_equal(event_report.targetSoftwareVersion,  target_version, f"Target version is not {target_version}")
-        if reason is not None:
-            asserts.assert_equal(event_report.reason,  reason, f"Reason is not {reason}")
+        asserts.assert_equal(event_report.previousState, expected_previous_state,
+                             f"Previous state was not {expected_previous_state}")
+        asserts.assert_equal(event_report.newState,  expected_new_state, f"New state is not {expected_new_state}")
+        if expected_target_version is not None:
+            asserts.assert_equal(event_report.targetSoftwareVersion,  expected_target_version,
+                                 f"Target version is not {expected_target_version}")
+        if expected_reason is not None:
+            asserts.assert_equal(event_report.reason,  expected_reason, f"Reason is not {expected_reason}")
 
     def create_acl_entry(self,
                          dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
@@ -307,186 +297,6 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         acl_attribute = Clusters.AccessControl.Attributes.Acl(acl_entries)
 
         return dev_ctrl.WriteAttribute(
-            nodeid=provider_node_id,
+            nodeId=provider_node_id,
             attributes=[(0, acl_attribute)]
         )
-
-
-class ACLHandler:
-    """
-    Utility class to handle Access Control List (ACL) operations for OTA Provider and Requestor.
-    """
-
-    DEFAULT_ADMIN_NODE_ID = 112233
-
-    def __init__(self, controller):
-        """
-        Initialize the ACL handler.
-
-        Args:
-            controller: The controller used to perform ACL write operations.
-        """
-        self.controller = controller
-
-    async def write_acl(self, node_id: int, acl: list):
-        """
-        Writes the Access Control List (ACL) to the DUT device using the specified controller.
-
-        Args:
-            node_id: Node ID of the target device (provider or requestor).
-            acl (list): List of AccessControlEntryStruct objects defining ACL permissions.
-
-        Raises:
-            AssertionError: If writing the ACL attribute fails (status is not Status.Success).
-        """
-        acl_attribute = Clusters.AccessControl.Attributes.Acl(acl)
-        result = await self.controller.WriteAttribute(
-            nodeid=node_id,
-            attributes=[(0, acl_attribute)]
-        )
-        if result[0].Status != Status.Success:
-            raise RuntimeError(f"ACL write failed for node {node_id}: {result[0].Status}")
-        return True
-
-    def create_acl_entry(self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController, provider_node_id: int, requestor_node_id: Optional[int] = None):
-        """Create ACL entries to allow OTA requestors to access the provider.
-
-        Args:
-            dev_ctrl: Device controller for sending commands
-            provider_node_id: Node ID of the OTA provider
-            requestor_node_id: Optional specific requestor node ID for targeted access
-
-        Returns:
-            Result of the ACL write operation
-        """
-        # Standard ACL entry for OTA Provider cluster
-        admin_node_id = dev_ctrl.nodeId if hasattr(dev_ctrl, 'nodeId') else self.DEFAULT_ADMIN_NODE_ID
-        requestor_subjects = [requestor_node_id] if requestor_node_id else NullValue
-
-        # Create ACL entries using proper struct constructors
-        acl_entries = [
-            # Admin entry
-            Clusters.AccessControl.Structs.AccessControlEntryStruct(  # type: ignore
-                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,  # type: ignore
-                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,  # type: ignore
-                subjects=[admin_node_id],  # type: ignore
-                targets=NullValue
-            ),
-            # Operate entry
-            Clusters.AccessControl.Structs.AccessControlEntryStruct(  # type: ignore
-                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,  # type: ignore
-                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,  # type: ignore
-                subjects=requestor_subjects,  # type: ignore
-                targets=[
-                    Clusters.AccessControl.Structs.AccessControlTargetStruct(  # type: ignore
-                        cluster=Clusters.OtaSoftwareUpdateProvider.id,  # type: ignore
-                        endpoint=NullValue,
-                        deviceType=NullValue
-                    )
-                ],
-            )
-        ]
-
-        # Create the attribute descriptor for the ACL attribute
-        acl_attribute = Clusters.AccessControl.Attributes.Acl(acl_entries)
-
-        return dev_ctrl.WriteAttribute(
-            nodeid=provider_node_id,
-            attributes=[(0, acl_attribute)]
-        )
-
-    async def set_acl_for_requestor(
-            self,
-            requestor_node: int,
-            provider_node: int,
-            fabric_index: int,
-            original_requestor_acls: list
-    ):
-        """
-        Read existing ACLs on Requestor, add minimal ACL for Provider, and write back.
-
-        Args:
-            requestor_node: Node ID of the Requestor device.
-            provider_node: Node ID of the Provider device.
-            fabric_index: Fabric index for the ACL entry.
-            original_requestor_acls: Existing ACLs for the Requestor.
-
-        Returns:
-            The original requestor ACLs (unchanged).
-        """
-
-        # Add minimal ACL for Provider
-        acl_operate_provider = Clusters.AccessControl.Structs.AccessControlEntryStruct(
-            fabricIndex=fabric_index,
-            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
-            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-            subjects=[provider_node],
-            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
-                endpoint=0,
-                cluster=Clusters.OtaSoftwareUpdateRequestor.id
-            )]
-        )
-
-        # Combine existing + new ACLs
-        combined_acls = original_requestor_acls + [acl_operate_provider]
-        await self.write_acl(requestor_node, combined_acls)
-
-    async def set_acl_for_provider(
-            self,
-            provider_node: int,
-            requestor_node: int,
-            fabric_index: int,
-            original_provider_acls: list
-    ):
-        """
-        Read existing ACLs on Provider, add minimal ACL for Requestor, and write back.
-
-        Args:
-            provider_node: Node ID of the Provider device.
-            requestor_node: Node ID of the Requestor device.
-            fabric_index: Fabric index for the ACL entry.
-            original_provider_acls: Existing ACLs for the Provider.
-
-        Returns:
-            The original provider ACLs (unchanged).
-        """
-
-        # Add minimal ACL for Requestor
-        acl_operate_requestor = Clusters.AccessControl.Structs.AccessControlEntryStruct(
-            fabricIndex=fabric_index,
-            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
-            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-            subjects=[requestor_node],
-            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
-                endpoint=0,
-                cluster=Clusters.OtaSoftwareUpdateProvider.id
-            )]
-        )
-
-        # Combine existing + new ACLs
-        combined_acls = original_provider_acls + [acl_operate_requestor]
-        await self.write_acl(provider_node, combined_acls)
-
-    async def set_ota_acls(
-            self,
-            requestor_node: int,
-            provider_node: int,
-            fabric_index: int,
-            original_requestor_acls: list,
-            original_provider_acls: list
-    ):
-        """
-        Set ACLs both ways and preserve originals.
-
-        Args:
-            requestor_node: Node ID of the Requestor.
-            provider_node: Node ID of the Provider.
-            fabric_index: Fabric index for ACL entries.
-            original_requestor_acls: Existing ACLs on Requestor.
-            original_provider_acls: Existing ACLs on Provider.
-
-        Returns:
-            original_requestor_acls, original_provider_acls
-        """
-        await self.set_acl_for_requestor(requestor_node, provider_node, fabric_index, original_requestor_acls)
-        await self.set_acl_for_provider(provider_node, requestor_node, fabric_index, original_provider_acls)

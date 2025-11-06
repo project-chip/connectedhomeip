@@ -10,9 +10,12 @@ Wi-Fi Boards.
     -   [Building](#building)
     -   [Flashing the Application](#flashing-the-application)
     -   [Viewing Logging Output](#viewing-logging-output)
-        -   [SeggerRTT](#segger-rtt)
-        -   [Serial Console](#console-log)
+        -   [SEGGER RTT](#segger-rtt)
+        -   [Console Log](#console-log)
+            -   [Configuring the VCOM](#configuring-the-vcom)
+        -   [Using the console](#using-the-console)
     -   [Running the Complete Example](#running-the-complete-example)
+    -   [Trigger events from Matter CLI](#trigger-events-from-matter-cli)
         -   [Notes](#notes)
     -   [OTA Software Update](#ota-software-update)
     -   [Building options](#building-options)
@@ -27,7 +30,7 @@ Wi-Fi Boards.
 > frequent releases thoroughly tested and validated. Developers looking to
 > develop matter products with silabs hardware are encouraged to use our latest
 > release with added tools and documentation.
-> [Silabs Matter Github](https://github.com/SiliconLabs/matter/releases)
+> [Silabs matter_sdk Github](https://github.com/SiliconLabsSoftware/matter_sdk/tags)
 
 ## Introduction
 
@@ -64,17 +67,17 @@ real products based on the Silicon Labs platform.
 
 -   Install some additional tools(likely already present for CHIP developers):
 
-           # Linux
-           $ sudo apt-get install git ninja-build
+             # Linux
+             $ sudo apt-get install git ninja-build
 
-           # Mac OS X
-           $ brew install ninja
+             # Mac OS X
+             $ brew install ninja
 
 -   Supported hardware:
 
     -   > For the latest supported hardware please refer to the
-        > [Hardware Requirements](https://github.com/SiliconLabs/matter/blob/latest/docs/silabs/general/HARDWARE_REQUIREMENTS.md)
-        > in the Silicon Labs Matter Github Repo
+        > [Hardware Requirements](https://docs.silabs.com/matter/latest/matter-prerequisites/hardware-requirements)
+        > in the Silicon Labs Matter Documentation
 
     Silabs boards :
 
@@ -96,48 +99,48 @@ real products based on the Silicon Labs platform.
 
 *   Build the example application:
 
-          cd ~/connectedhomeip
-          ./scripts/examples/gn_silabs_example.sh ./examples/refrigerator-app/silabs/ ./out/refrigerator-app BRD4187C
+            cd ~/connectedhomeip
+            ./scripts/examples/gn_silabs_example.sh ./examples/refrigerator-app/silabs/ ./out/refrigerator-app BRD4187C
 
 -   To delete generated executable, libraries and object files use:
 
-          $ cd ~/connectedhomeip
-          $ rm -rf ./out/
+            $ cd ~/connectedhomeip
+            $ rm -rf ./out/
 
     OR use GN/Ninja directly
 
-          $ cd ~/connectedhomeip/examples/refrigerator-app/silabs
-          $ git submodule update --init
-          $ source third_party/connectedhomeip/scripts/activate.sh
-          $ export SILABS_BOARD=BRD4187C
-          $ gn gen out/debug
-          $ ninja -C out/debug
+            $ cd ~/connectedhomeip/examples/refrigerator-app/silabs
+            $ git submodule update --init
+            $ source third_party/connectedhomeip/scripts/activate.sh
+            $ export SILABS_BOARD=BRD4187C
+            $ gn gen out/debug
+            $ ninja -C out/debug
 
 -   To delete generated executable, libraries and object files use:
 
-          $ cd ~/connectedhomeip/examples/refrigerator-app/silabs
-          $ rm -rf out/
+            $ cd ~/connectedhomeip/examples/refrigerator-app/silabs
+            $ rm -rf out/
 
 *   Build the example as Intermittently Connected Device (ICD)
 
-          $ ./scripts/examples/gn_silabs_example.sh ./examples/refrigerator-app/silabs/ ./out/refrigerator-app_ICD BRD4187C --icd
+            $ ./scripts/examples/gn_silabs_example.sh ./examples/refrigerator-app/silabs/ ./out/refrigerator-app_ICD BRD4187C --icd
 
     or use gn as previously mentioned but adding the following arguments:
 
-          $ gn gen out/debug '--args=SILABS_BOARD="BRD4187C" enable_sleepy_device=true chip_openthread_ftd=false'
+            $ gn gen out/debug '--args=SILABS_BOARD="BRD4187C" enable_sleepy_device=true chip_openthread_ftd=false'
 
 *   Build the example with pigweed RCP
 
-          $ ./scripts/examples/gn_silabs_example.sh examples/refrigerator-app/silabs/ out/refrigerator_app_rpc BRD4187C 'import("//with_pw_rpc.gni")'
+            $ ./scripts/examples/gn_silabs_example.sh examples/refrigerator-app/silabs/ out/refrigerator_app_rpc BRD4187C 'import("//with_pw_rpc.gni")'
 
     or use GN/Ninja Directly
 
-          $ cd ~/connectedhomeip/examples/refrigerator-app/silabs
-          $ git submodule update --init
-          $ source third_party/connectedhomeip/scripts/activate.sh
-          $ export SILABS_BOARD=BRD4187C
-          $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
-          $ ninja -C out/debug
+            $ cd ~/connectedhomeip/examples/refrigerator-app/silabs
+            $ git submodule update --init
+            $ source third_party/connectedhomeip/scripts/activate.sh
+            $ export SILABS_BOARD=BRD4187C
+            $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
+            $ ninja -C out/debug
 
 For more build options, help is provided when running the build script without
 arguments
@@ -148,15 +151,14 @@ arguments
 
 -   On the command line:
 
-          $ cd ~/connectedhomeip/examples/refrigerator-app/silabs
-          $ python3 out/debug/matter-silabs-refrigerator-example.flash.py
+            $ cd ~/connectedhomeip/examples/refrigerator-app/silabs
+            $ python3 out/debug/matter-silabs-refrigerator-example.flash.py
 
 -   Or with the Ozone debugger, just load the .out file.
 
 All EFR32 boards require a bootloader, see Silicon Labs documentation for more
-info. Pre-built bootloader binaries are available in the Assets section of the
-Releases page on
-[Silabs Matter Github](https://github.com/SiliconLabs/matter/releases) .
+info. Pre-built bootloader binaries are available on the
+[Matter Software Artifacts page](https://docs.silabs.com/matter/latest/matter-prerequisites/matter-artifacts#matter-bootloader-binaries).
 
 ## Viewing Logging Output
 
@@ -182,14 +184,14 @@ after flashing the .out file.
 
 *   Install the J-Link software
 
-          $ cd ~/Downloads
-          $ sudo dpkg -i JLink_Linux_V*_x86_64.deb
+            $ cd ~/Downloads
+            $ sudo dpkg -i JLink_Linux_V*_x86_64.deb
 
 *   In Linux, grant the logged in user the ability to talk to the development
     hardware via the linux tty device (/dev/ttyACMx) by adding them to the
     dialout group.
 
-          $ sudo usermod -a -G dialout ${USER}
+            $ sudo usermod -a -G dialout ${USER}
 
 Once the above is complete, log output can be viewed using the JLinkExe tool in
 combination with JLinkRTTClient as follows:
@@ -198,13 +200,13 @@ combination with JLinkRTTClient as follows:
 
     For MG24 use:
 
-          ```
-          $ JLinkExe -device EFR32MG24AXXXF1536 -if SWD -speed 4000 -autoconnect 1
-          ```
+            ```
+            $ JLinkExe -device EFR32MG24AXXXF1536 -if SWD -speed 4000 -autoconnect 1
+            ```
 
 -   In a second terminal, run the JLinkRTTClient to view logs:
 
-          $ JLinkRTTClient
+            $ JLinkRTTClient
 
 ### Console Log
 
@@ -245,52 +247,52 @@ With any serial terminal application such as screen, putty, minicom etc.
     Code is be scanned by the CHIP Tool app For the Rendez-vous procedure over
     BLE
 
-        * On devices that do not have or support the LCD Display like the BRD4166A Thunderboard Sense 2,
-          a URL can be found in the RTT logs.
+          * On devices that do not have or support the LCD Display like the BRD4166A Thunderboard Sense 2,
+            a URL can be found in the RTT logs.
 
-          <info  > [SVR] Copy/paste the below URL in a browser to see the QR Code:
-          <info  > [SVR] https://project-chip.github.io/connectedhomeip/qrcode.html?data=CH%3AI34NM%20-00%200C9SS0
+            <info  > [SVR] Copy/paste the below URL in a browser to see the QR Code:
+            <info  > [SVR] https://project-chip.github.io/connectedhomeip/qrcode.html?data=CH%3AI34NM%20-00%200C9SS0
 
     **LED 0** shows the overall state of the device and its connectivity. The
     following states are possible:
 
-        -   _Short Flash On (50 ms on/950 ms off)_ ; The device is in the
-            unprovisioned (unpaired) state and is waiting for a commissioning
-            application to connect.
+          -   _Short Flash On (50 ms on/950 ms off)_ ; The device is in the
+              unprovisioned (unpaired) state and is waiting for a commissioning
+              application to connect.
 
-        -   _Rapid Even Flashing_ ; (100 ms on/100 ms off)_ &mdash; The device is in the
-            unprovisioned state and a commissioning application is connected through
-            Bluetooth LE.
+          -   _Rapid Even Flashing_ ; (100 ms on/100 ms off)_ &mdash; The device is in the
+              unprovisioned state and a commissioning application is connected through
+              Bluetooth LE.
 
-        -   _Short Flash Off_ ; (950ms on/50ms off)_ &mdash; The device is fully
-            provisioned, but does not yet have full Thread network or service
-            connectivity.
+          -   _Short Flash Off_ ; (950ms on/50ms off)_ &mdash; The device is fully
+              provisioned, but does not yet have full Thread network or service
+              connectivity.
 
-        -   _Solid On_ ; The device is fully provisioned and has full Thread
-            network and service connectivity.
+          -   _Solid On_ ; The device is fully provisioned and has full Thread
+              network and service connectivity.
 
     **LED 1** Shows the state of the refrigerator and temperature controlled
     cabinet
 
-        -   temperature ; No implementation is present. this feature will be available in a future update.
-        -   _Off_ ; No implementation is present. this feature will be available in a future update.
-        -   _Blinking slowly_ ; No implementation is present. this feature will be available in a future update.
-        -   _Blinking quickly_ ; No implementation is present. this feature will be available in a future update.
+          -   temperature ; No implementation is present. this feature will be available in a future update.
+          -   _Off_ ; No implementation is present. this feature will be available in a future update.
+          -   _Blinking slowly_ ; No implementation is present. this feature will be available in a future update.
+          -   _Blinking quickly_ ; No implementation is present. this feature will be available in a future update.
 
     **Push Button 0** Function button and factory reset
 
-        -   Pressed and release: No implementation is present. this feature will be available in a future update.
+          -   Pressed and release: No implementation is present. this feature will be available in a future update.
 
-        -   Pressed and hold for 6 s: Initiates the factory reset of the device.
-            Releasing the button within the 6-second window cancels the factory reset
-            procedure. **LEDs** blink in unison when the factory reset procedure is
-            initiated.
+          -   Pressed and hold for 6 s: Initiates the factory reset of the device.
+              Releasing the button within the 6-second window cancels the factory reset
+              procedure. **LEDs** blink in unison when the factory reset procedure is
+              initiated.
 
     **Push Button 1** Application button
 
-        -   Pressed and release: No implementation is present. this feature will be available in a future update.
+          -   Pressed and release: No implementation is present. this feature will be available in a future update.
 
-        -   Press and hold for 3 s: No implementation is present. this feature will be available in a future update.
+          -   Press and hold for 3 s: No implementation is present. this feature will be available in a future update.
 
 *   Once the device is provisioned, it will join the Thread network is
     established, look for the RTT log
@@ -375,14 +377,14 @@ With any serial terminal application such as screen, putty, minicom etc.
     need to add a static ipv6 addresses on both device and then an ipv6 route to
     the border router on your PC
 
-          # On Border Router :
-          $ sudo ip addr add dev <Network interface> 2002::2/64
+            # On Border Router :
+            $ sudo ip addr add dev <Network interface> 2002::2/64
 
-          # On PC (Linux) :
-          $ sudo ip addr add dev <Network interface> 2002::1/64
+            # On PC (Linux) :
+            $ sudo ip addr add dev <Network interface> 2002::1/64
 
-          # Add Ipv6 route on PC (Linux)
-          $ sudo ip route add <Thread global ipv6 prefix>/64 via 2002::2
+            # Add Ipv6 route on PC (Linux)
+            $ sudo ip route add <Thread global ipv6 prefix>/64 via 2002::2
 
 ## OTA Software Update
 

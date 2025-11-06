@@ -23,6 +23,8 @@ class ImageListPath:
 
 class AppServerSubprocess(Subprocess):
     PREFIX: bytes
+    log_file = ""
+    err_log_file = ""
     def __init__(self, app: str, storage_dir: str, discriminator: int,
                  passcode: int, port: int = 5540, app_pipe: Optional[str] = None, app_pipe_out: Optional[str] = None, extra_args: List[str] = ...) -> None: ...
 

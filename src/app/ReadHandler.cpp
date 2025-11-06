@@ -42,7 +42,10 @@ using Status = Protocols::InteractionModel::Status;
 uint16_t ReadHandler::GetPublisherSelectedIntervalLimit()
 {
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    return std::chrono::duration_cast<System::Clock::Seconds16>(ICDConfigurationData::GetInstance().GetIdleModeDuration()).count();
+    // We don't need to check for precision loss since the max value of the IdleModeDuration can fit inside a uint16_t
+    const auto idleModeDuration =
+        std::chrono::duration_cast<System::Clock::Seconds16>(ICDConfigurationData::GetInstance().GetIdleModeDuration()).count();
+    return std::max(idleModeDuration, kSubscriptionMaxIntervalPublisherLimit);
 #else
     return kSubscriptionMaxIntervalPublisherLimit;
 #endif
@@ -246,7 +249,6 @@ CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchange
                 err = SendSubscribeResponse();
 
                 SetStateFlag(ReadHandlerFlags::ActiveSubscription);
-
                 auto * appCallback = mManagementCallback.GetAppCallback();
                 if (appCallback)
                 {
@@ -407,6 +409,31 @@ void ReadHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeConte
 {
     ChipLogError(DataManagement, "Time out! failed to receive status response from Exchange: " ChipLogFormatExchange,
                  ChipLogValueExchange(apExchangeContext));
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
+    switch (mState)
+    {
+    case HandlerState::AwaitingReportResponse:
+        if (IsType(InteractionType::Subscribe) && !IsPriming())
+        {
+            // Trigger check-in message when a non-priming subscription report times out.
+            ChipLogError(DataManagement, "Trigger check-in message when non-priming subscription report times out");
+            if (mSessionHandle)
+            {
+                ICDNotifier::GetInstance().NotifySendCheckIn(GetSubjectDescriptor());
+            }
+            else
+            {
+                ChipLogError(DataManagement, "Failed to get subject descriptor for sending check-in message on report timeout");
+            }
+        }
+        break;
+    case HandlerState::CanStartReporting:
+    case HandlerState::Idle:
+    default:
+        break;
+    }
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_SERVER
+
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     Close(CloseOptions::kKeepPersistedSubscription);
 #else
@@ -754,8 +781,7 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     // If the next interval is greater than the MaxIntervalCeiling, use the MaxIntervalCeiling.
     // Otherwise, use IdleModeDuration as MaxInterval
 
-    // GetPublisherSelectedIntervalLimit() returns the IdleModeDuration if the device is an ICD
-    uint32_t decidedMaxInterval = GetPublisherSelectedIntervalLimit();
+    uint32_t decidedMaxInterval = ICDConfigurationData::GetInstance().GetIdleModeDuration().count();
 
     // Check if the PublisherSelectedIntervalLimit is 0. If so, set decidedMaxInterval to MaxIntervalCeiling
     if (decidedMaxInterval == 0)

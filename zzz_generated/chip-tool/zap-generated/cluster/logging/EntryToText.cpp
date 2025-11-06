@@ -149,6 +149,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "HepaFilterMonitoring";
     case chip::app::Clusters::ActivatedCarbonFilterMonitoring::Id:
         return "ActivatedCarbonFilterMonitoring";
+    case chip::app::Clusters::WaterTankLevelMonitoring::Id:
+        return "WaterTankLevelMonitoring";
     case chip::app::Clusters::BooleanStateConfiguration::Id:
         return "BooleanStateConfiguration";
     case chip::app::Clusters::ValveConfigurationAndControl::Id:
@@ -510,6 +512,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "CommissioningARL";
         case chip::app::Clusters::AccessControl::Attributes::Arl::Id:
             return "Arl";
+        case chip::app::Clusters::AccessControl::Attributes::AuxiliaryACL::Id:
+            return "AuxiliaryACL";
         case chip::app::Clusters::AccessControl::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::AccessControl::Attributes::AcceptedCommandList::Id:
@@ -2150,6 +2154,35 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Unknown";
         }
     }
+    case chip::app::Clusters::WaterTankLevelMonitoring::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::Condition::Id:
+            return "Condition";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::DegradationDirection::Id:
+            return "DegradationDirection";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::ChangeIndication::Id:
+            return "ChangeIndication";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::InPlaceIndicator::Id:
+            return "InPlaceIndicator";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::LastChangedTime::Id:
+            return "LastChangedTime";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::ReplacementProductList::Id:
+            return "ReplacementProductList";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::WaterTankLevelMonitoring::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::BooleanStateConfiguration::Id: {
         switch (id)
         {
@@ -2511,6 +2544,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "AvailableEndpoints";
         case chip::app::Clusters::PowerTopology::Attributes::ActiveEndpoints::Id:
             return "ActiveEndpoints";
+        case chip::app::Clusters::PowerTopology::Attributes::ElectricalCircuitNodes::Id:
+            return "ElectricalCircuitNodes";
         case chip::app::Clusters::PowerTopology::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::PowerTopology::Attributes::AcceptedCommandList::Id:
@@ -4273,6 +4308,12 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "RemainingScreenTime";
         case chip::app::Clusters::ContentControl::Attributes::BlockUnrated::Id:
             return "BlockUnrated";
+        case chip::app::Clusters::ContentControl::Attributes::BlockChannelList::Id:
+            return "BlockChannelList";
+        case chip::app::Clusters::ContentControl::Attributes::BlockApplicationList::Id:
+            return "BlockApplicationList";
+        case chip::app::Clusters::ContentControl::Attributes::BlockContentTimeWindow::Id:
+            return "BlockContentTimeWindow";
         case chip::app::Clusters::ContentControl::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::ContentControl::Attributes::AcceptedCommandList::Id:
@@ -5600,6 +5641,15 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "Unknown";
         }
     }
+    case chip::app::Clusters::WaterTankLevelMonitoring::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::WaterTankLevelMonitoring::Commands::ResetCondition::Id:
+            return "ResetCondition";
+        default:
+            return "Unknown";
+        }
+    }
     case chip::app::Clusters::BooleanStateConfiguration::Id: {
         switch (id)
         {
@@ -6114,6 +6164,18 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "SetOnDemandRatingThreshold";
         case chip::app::Clusters::ContentControl::Commands::SetScheduledContentRatingThreshold::Id:
             return "SetScheduledContentRatingThreshold";
+        case chip::app::Clusters::ContentControl::Commands::AddBlockChannels::Id:
+            return "AddBlockChannels";
+        case chip::app::Clusters::ContentControl::Commands::RemoveBlockChannels::Id:
+            return "RemoveBlockChannels";
+        case chip::app::Clusters::ContentControl::Commands::AddBlockApplications::Id:
+            return "AddBlockApplications";
+        case chip::app::Clusters::ContentControl::Commands::RemoveBlockApplications::Id:
+            return "RemoveBlockApplications";
+        case chip::app::Clusters::ContentControl::Commands::SetBlockContentTimeWindow::Id:
+            return "SetBlockContentTimeWindow";
+        case chip::app::Clusters::ContentControl::Commands::RemoveBlockContentTimeWindow::Id:
+            return "RemoveBlockContentTimeWindow";
         default:
             return "Unknown";
         }

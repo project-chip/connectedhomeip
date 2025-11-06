@@ -56,6 +56,7 @@ class TC_WEBRTCP_2_18(MatterBaseTest, WEBRTCPTestBase):
 
     def steps_TC_WEBRTCP_2_18(self) -> list[TestStep]:
         steps = [
+            TestStep("precondition", "DUT commissioned", is_commissioning=True),
             TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
                      "DUT responds with success and provides stream IDs"),
             TestStep(2, "TH sends the SolicitOffer command with valid stream IDs",
@@ -90,6 +91,8 @@ class TC_WEBRTCP_2_18(MatterBaseTest, WEBRTCPTestBase):
         Executes the test steps for validating ProvideAnswer command processing.
         """
 
+        self.step("precondition")
+        # Commission DUT - already done
         endpoint = self.get_endpoint(default=1)
 
         self.step(1)

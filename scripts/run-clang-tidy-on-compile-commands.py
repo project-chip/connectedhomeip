@@ -163,7 +163,7 @@ class ClangTidyEntry:
                 for line in err.decode("utf-8").split("\n"):
                     line = line.strip()
 
-                    if any(map(lambda s: s in line, skip_strings)):
+                    if any((s in line for s in skip_strings)):
                         continue
 
                     if not line:
@@ -371,7 +371,7 @@ class ClangTidyRunner:
 __LOG_LEVELS__ = {
     "debug": logging.DEBUG,
     "info": logging.INFO,
-    "warn": logging.WARN,
+    "warn": logging.WARNING,
     "fatal": logging.FATAL,
 }
 

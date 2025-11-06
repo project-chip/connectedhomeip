@@ -132,7 +132,7 @@ jobs:
                   mkdir -p /tmp/darwin/framework-tests
                   find ~/Library/Developer/Xcode/DerivedData /Library/Logs/DiagnosticReports -name '*.ips' -print0 | xargs -0 -J % cp % /tmp/darwin/framework-tests
             - name: Uploading log files
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v5
               if: failure() && !env.ACT
               with:
                   name: darwin-framework-test-logs-${{ matrix.options.flavor }}

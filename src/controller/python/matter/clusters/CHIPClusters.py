@@ -723,6 +723,12 @@ class ChipClusters:
                 "type": "",
                 "reportable": True,
             },
+            0x00000007: {
+                "attributeName": "AuxiliaryACL",
+                "attributeId": 0x00000007,
+                "type": "",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -5751,6 +5757,87 @@ class ChipClusters:
             },
         },
     }
+    _WATER_TANK_LEVEL_MONITORING_CLUSTER_INFO = {
+        "clusterName": "WaterTankLevelMonitoring",
+        "clusterId": 0x00000079,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "ResetCondition",
+                "args": {
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "Condition",
+                "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "DegradationDirection",
+                "attributeId": 0x00000001,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "ChangeIndication",
+                "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "InPlaceIndicator",
+                "attributeId": 0x00000003,
+                "type": "bool",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "LastChangedTime",
+                "attributeId": 0x00000004,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000005: {
+                "attributeName": "ReplacementProductList",
+                "attributeId": 0x00000005,
+                "type": "",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
     _BOOLEAN_STATE_CONFIGURATION_CLUSTER_INFO = {
         "clusterName": "BooleanStateConfiguration",
         "clusterId": 0x00000080,
@@ -6891,6 +6978,13 @@ class ChipClusters:
                 "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "ElectricalCircuitNodes",
+                "attributeId": 0x00000002,
+                "type": "",
+                "reportable": True,
+                "writable": True,
             },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
@@ -12567,6 +12661,48 @@ class ChipClusters:
                     "rating": "str",
                 },
             },
+            0x0000000B: {
+                "commandId": 0x0000000B,
+                "commandName": "AddBlockChannels",
+                "args": {
+                    "channels": "BlockChannelStruct",
+                },
+            },
+            0x0000000C: {
+                "commandId": 0x0000000C,
+                "commandName": "RemoveBlockChannels",
+                "args": {
+                    "channelIndexes": "int",
+                },
+            },
+            0x0000000D: {
+                "commandId": 0x0000000D,
+                "commandName": "AddBlockApplications",
+                "args": {
+                    "applications": "AppInfoStruct",
+                },
+            },
+            0x0000000E: {
+                "commandId": 0x0000000E,
+                "commandName": "RemoveBlockApplications",
+                "args": {
+                    "applications": "AppInfoStruct",
+                },
+            },
+            0x0000000F: {
+                "commandId": 0x0000000F,
+                "commandName": "SetBlockContentTimeWindow",
+                "args": {
+                    "timeWindow": "TimeWindowStruct",
+                },
+            },
+            0x00000010: {
+                "commandId": 0x00000010,
+                "commandName": "RemoveBlockContentTimeWindow",
+                "args": {
+                    "timeWindowIndexes": "int",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -12615,6 +12751,24 @@ class ChipClusters:
                 "attributeName": "BlockUnrated",
                 "attributeId": 0x00000007,
                 "type": "bool",
+                "reportable": True,
+            },
+            0x00000008: {
+                "attributeName": "BlockChannelList",
+                "attributeId": 0x00000008,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000009: {
+                "attributeName": "BlockApplicationList",
+                "attributeId": 0x00000009,
+                "type": "",
+                "reportable": True,
+            },
+            0x0000000A: {
+                "attributeName": "BlockContentTimeWindow",
+                "attributeId": 0x0000000A,
+                "type": "",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -15757,6 +15911,7 @@ class ChipClusters:
         0x00000065: _GROUPCAST_CLUSTER_INFO,
         0x00000071: _HEPA_FILTER_MONITORING_CLUSTER_INFO,
         0x00000072: _ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER_INFO,
+        0x00000079: _WATER_TANK_LEVEL_MONITORING_CLUSTER_INFO,
         0x00000080: _BOOLEAN_STATE_CONFIGURATION_CLUSTER_INFO,
         0x00000081: _VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_INFO,
         0x00000090: _ELECTRICAL_POWER_MEASUREMENT_CLUSTER_INFO,
@@ -15901,6 +16056,7 @@ class ChipClusters:
         "Groupcast": _GROUPCAST_CLUSTER_INFO,
         "HepaFilterMonitoring": _HEPA_FILTER_MONITORING_CLUSTER_INFO,
         "ActivatedCarbonFilterMonitoring": _ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER_INFO,
+        "WaterTankLevelMonitoring": _WATER_TANK_LEVEL_MONITORING_CLUSTER_INFO,
         "BooleanStateConfiguration": _BOOLEAN_STATE_CONFIGURATION_CLUSTER_INFO,
         "ValveConfigurationAndControl": _VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_INFO,
         "ElectricalPowerMeasurement": _ELECTRICAL_POWER_MEASUREMENT_CLUSTER_INFO,

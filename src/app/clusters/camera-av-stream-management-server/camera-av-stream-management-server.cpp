@@ -1692,7 +1692,7 @@ struct StreamTraits<Attributes::AllocatedSnapshotStreams::Id>
 template <AttributeId TAttributeId>
 CHIP_ERROR CameraAVStreamMgmtServer::PersistAndNotify()
 {
-    LogAndReturnErrorOnFailure(StoreAllocatedStreams<TAttributeId>(), Zcl,
+    ReturnErrorAndLogOnFailure(StoreAllocatedStreams<TAttributeId>(), Zcl,
                                "CameraAVStreamMgmt[ep=%d]: Failed to persist allocated streams", mEndpointId);
 
     auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, TAttributeId);

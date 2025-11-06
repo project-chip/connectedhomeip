@@ -216,11 +216,14 @@ void pychip_Bdx_InitCallbacks(OnTransferObtainedCallback onTransferObtainedCallb
 }
 
 // Prepares the BDX system to expect a new transfer.
-PyChipError pychip_Bdx_ExpectBdxTransfer(PyObject transferObtainedContext)
+// If max_block_size != 0, it overrides the default cap for the next transfer only.
+PyChipError pychip_Bdx_ExpectBdxTransfer(PyObject transferObtainedContext, uint16_t max_block_size)
 {
     TransferInfo * transferInfo = gTransfers.CreateUnassociatedTransferInfo();
     VerifyOrReturnValue(transferInfo != nullptr, ToPyChipError(CHIP_ERROR_NO_MEMORY));
     transferInfo->OnTransferObtainedContext = transferObtainedContext;
+    if (max_block_size != 0)
+        chip::bdx::SetControllerBdxMaxBlockSizeForNextTransfer(max_block_size);
     gBdxTransferServer.ExpectATransfer();
     return ToPyChipError(CHIP_NO_ERROR);
 }

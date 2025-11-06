@@ -42,7 +42,8 @@ class PushAvStreamTransportManager : public PushAvStreamTransportDelegate
 {
 public:
     Protocols::InteractionModel::Status AllocatePushTransport(const TransportOptionsStruct & transportOptions,
-                                                              const uint16_t connectionID) override;
+                                                              const uint16_t connectionID,
+                                                              FabricIndex accessingFabricIndex) override;
 
     Protocols::InteractionModel::Status DeallocatePushTransport(const uint16_t connectionID) override;
 
@@ -55,8 +56,6 @@ public:
     Protocols::InteractionModel::Status ManuallyTriggerTransport(
         const uint16_t connectionID, TriggerActivationReasonEnum activationReason,
         const Optional<Structs::TransportMotionTriggerTimeControlStruct::DecodableType> & timeControl) override;
-
-    bool ValidateUrl(const std::string & url) override;
 
     Protocols::InteractionModel::Status
     ValidateBandwidthLimit(StreamUsageEnum streamUsage, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,

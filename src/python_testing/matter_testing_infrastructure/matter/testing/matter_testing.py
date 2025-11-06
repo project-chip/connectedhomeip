@@ -845,7 +845,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         if node_id is None:
             node_id = self.dut_node_id
         try:
-            commissioning_params = await dev_ctrl.OpenCommissioningWindow(nodeid=node_id, timeout=timeout, iteration=1000,
+            commissioning_params = await dev_ctrl.OpenCommissioningWindow(nodeId=node_id, timeout=timeout, iteration=1000,
                                                                           discriminator=rnd_discriminator, option=dev_ctrl.CommissioningWindowPasscode.kTokenWithRandomPin)
             params = CustomCommissioningParameters(commissioning_params, rnd_discriminator)
             return params
@@ -1073,7 +1073,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         if endpoint is None:
             endpoint = self.get_endpoint()
 
-        result = await dev_ctrl.SendCommand(nodeid=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs,
+        result = await dev_ctrl.SendCommand(nodeId=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs,
                                             payloadCapability=payloadCapability)
         return result
 
@@ -1089,7 +1089,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         #    --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
         if enableKey is None:
             if 'enableKey' not in self.matter_test_config.global_test_params:
-                enableKey = bytes([b for b in range(16)])
+                enableKey = bytes(list(range(16)))
             else:
                 enableKey = self.matter_test_config.global_test_params['enableKey']
 

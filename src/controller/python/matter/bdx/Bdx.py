@@ -113,9 +113,11 @@ def _OnTransferCompletedCallback(transaction: AsyncTransferCompletedTransaction,
     transaction.handleResult(result)
 
 
-def _PrepareForBdxTransfer(future: Future, data: Optional[bytes]) -> PyChipError:
+def _PrepareForBdxTransfer(future: Future, data: Optional[bytes], max_block_size: Optional[int] = None) -> PyChipError:
     ''' Prepares the BDX system for a BDX transfer. The BDX transfer is set as the future's result. This must be called
     before the BDX transfer is initiated.
+
+    If max_block_size is provided (1..65535), it overrides the controller's default cap.
 
     Returns the CHIP_ERROR result from the C++ side.
     '''
@@ -137,22 +139,32 @@ def _PrepareForBdxTransfer(future: Future, data: Optional[bytes]) -> PyChipError
 
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
     res = builtins.chipStack.Call(
-        lambda: handle.pychip_Bdx_ExpectBdxTransfer(ctypes.py_object(transaction))
+        lambda: handle.pychip_Bdx_ExpectBdxTransfer(
+            ctypes.py_object(transaction),
+            # 0 means “use default”.
+            ctypes.c_uint16(0 if max_block_size is None else max_block_size),
+        )
     )
     if not res.is_success:
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
     return res
 
 
-def PrepareToReceiveBdxData(future: Future) -> PyChipError:
+def PrepareToReceiveBdxData(future: Future, max_block_size: Optional[int] = None) -> PyChipError:
     ''' Prepares the BDX system for a BDX transfer where this device receives data. This must be called before the BDX
     transfer is initiated.
 
     When a BDX transfer is found it's set as the future's result. If an error occurs while waiting it is set as the future's exception.
 
+    If max_block_size is provided (1..65535), it overrides the controller's default cap.
+
     Returns an error if there was an issue preparing to wait a BDX transfer.
     '''
-    return _PrepareForBdxTransfer(future, None)
+    # Validate max_block_size to fit in uint16.
+    if max_block_size is not None and not (1 <= max_block_size <= 0xFFFF):
+        raise ValueError("max_block_size must be in [1, 65535]")
+
+    return _PrepareForBdxTransfer(future, None, max_block_size)
 
 
 def PrepareToSendBdxData(future: Future, data: bytes) -> PyChipError:
@@ -224,7 +236,7 @@ def Init():
         setter = NativeLibraryHandleMethodArguments(handle)
 
         setter.Set('pychip_Bdx_ExpectBdxTransfer',
-                   PyChipError, [py_object])
+                   PyChipError, [py_object, c_uint16])
         setter.Set('pychip_Bdx_StopExpectingBdxTransfer',
                    PyChipError, [py_object])
         setter.Set('pychip_Bdx_AcceptTransferAndReceiveData',

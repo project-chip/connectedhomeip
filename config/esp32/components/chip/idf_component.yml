@@ -40,3 +40,8 @@ dependencies:
         version: "^0.7.0"
         rules:
             - if: "target in [esp32p4]"
+
+    espressif/esp_hosted:
+        version: "~2"
+        rules:
+            - if: "target in [esp32p4]"
