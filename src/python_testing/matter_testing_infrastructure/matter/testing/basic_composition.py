@@ -40,6 +40,7 @@ from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_cl
 
 LOGGER = logging.getLogger(__name__)
 
+
 @dataclass
 class ArlData:
     have_arl: bool
