@@ -205,9 +205,9 @@ class MdnsDiscovery:
         """
         Asynchronously discovers the SRV record associated with an mDNS service.
 
-        This method performs an mDNS browse and then issues a targeted SRV query 
+        This method performs an mDNS browse and then issues a targeted SRV query
         for the specified service instance. If a response is received within the timeout,
-        it returns an MdnsServiceInfo object populated with SRV record details 
+        it returns an MdnsServiceInfo object populated with SRV record details
         (including target host and port).
 
         Args:
@@ -245,7 +245,7 @@ class MdnsDiscovery:
         """
         Asynchronously discovers the TXT record associated with an mDNS service.
 
-        This method performs an mDNS browse and then issues a targeted TXT query 
+        This method performs an mDNS browse and then issues a targeted TXT query
         for the specified service instance. If a response is received within the timeout,
         it returns an MdnsServiceInfo object populated with TXT record key-value metadata.
 
