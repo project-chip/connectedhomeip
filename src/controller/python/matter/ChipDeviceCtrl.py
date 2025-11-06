@@ -1635,8 +1635,10 @@ class ChipDeviceControllerBase():
 
     async def TestOnlyWriteAttributeWithMismatchedTimedRequestField(self, nodeid: int,
                                                                     attributes: typing.List[typing.Union[
-                                                                        typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor],
-                                                                        typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]
+                                                                        typing.Tuple[int,
+                                                                                     ClusterObjects.ClusterAttributeDescriptor],
+                                                                        typing.Tuple[int,
+                                                                                     ClusterObjects.ClusterAttributeDescriptor, int]
                                                                     ]],
                                                                     timedRequestTimeoutMs: int,
                                                                     timedRequestFieldValue: bool,
