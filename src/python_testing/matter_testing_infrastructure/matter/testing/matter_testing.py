@@ -250,7 +250,7 @@ class MatterBaseTest(base_test.BaseTestClass):
     def log_structured_data(self, start_tag: str, dump_string: str):
         """Log structured data with a clear start and end marker.
 
-        This function is used to output device attribute dumps and other structured 
+        This function is used to output device attribute dumps and other structured
         data to logs in a format that can be easily extracted for debugging.
 
         Args:
