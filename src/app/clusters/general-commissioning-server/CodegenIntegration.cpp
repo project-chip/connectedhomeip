@@ -29,7 +29,7 @@
 #include <platform/PlatformManager.h>
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-#include <app/server/TermsAndConditionsManager.h>
+#include <app/server/TermsAndConditionsManager.h> // nogncheck
 #endif
 
 using namespace chip;
