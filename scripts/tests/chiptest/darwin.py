@@ -17,6 +17,7 @@
 import subprocess
 from .runner import Executor, SubprocessInfo
 
+
 class DarwinExecutor(Executor):
     def run(self, subproc: SubprocessInfo, stdin, stdout, stderr):
         # Try harder to avoid any stdout buffering in our tests
