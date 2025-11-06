@@ -41,7 +41,7 @@ public:
 
 protected:
     /// The caller creating a SingleEndpointDevice MUST ensure that the underlying data for the Span of
-    /// deviceTypes remains valid for the entire liefetime of the SingleEndpointDevice object instance.
+    /// deviceTypes remains valid for the entire lifetime of the SingleEndpointDevice object instance.
     SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry> deviceTypes) : DeviceInterface(deviceTypes) {}
 
     /// Internal registration function for common device clusters and endpoint registration.
