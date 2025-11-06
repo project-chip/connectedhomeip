@@ -143,7 +143,8 @@ class TC_WebRTCR_2_2(MatterBaseTest):
         self.step(3)
         # Prompt user with instructions
         prompt_msg = (
-            f"\nPlease commission the server app from DUT: manual code='{params.setupManualCode}' QR code='{params.setupQRCode}' :\n"
+            f"\nPlease commission the server app from DUT: manual code='{
+                params.setupManualCode}' QR code='{params.setupQRCode}' :\n"
             f"  pairing onnetwork 1 {passcode}\n"
             "Input 'Y' if DUT successfully commissions without any warnings\n"
             "Input 'N' if commissioner warns about commissioning the non-genuine device, "
