@@ -68,11 +68,8 @@ CHIP_ERROR ReadLabelList(EndpointId endpoint, AttributeValueEncoder & encoder)
 /// Matches constraints on a LabelStruct.
 bool IsValidLabelEntry(const Structs::LabelStruct::Type & entry)
 {
-    constexpr size_t kMaxLabelSize = 16;
-    constexpr size_t kMaxValueSize = 16;
-
     // NOTE: spec default for label and value is empty, so empty is accepted here
-    return (entry.label.size() <= kMaxLabelSize) && (entry.value.size() <= kMaxValueSize);
+    return (entry.label.size() <= UserLabelCluster::kMaxLabelSize) && (entry.value.size() <= UserLabelCluster::kMaxValueSize);
 }
 
 CHIP_ERROR WriteLabelList(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder)
