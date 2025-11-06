@@ -110,7 +110,7 @@ class TC_CC_6_5(MatterBaseTest):
                 [(self.endpoint, Clusters.Descriptor.Attributes.ServerList)]
             )
             self.logger.info(f"Device supported clusters on endpoint {self.endpoint}: {descriptor}")
-            
+
             # Extract the server list from the nested structure
             server_list = None
             for endpoint_data in descriptor.values():
@@ -141,7 +141,7 @@ class TC_CC_6_5(MatterBaseTest):
         cluster = Clusters.Objects.ColorControl
         attributes = cluster.Attributes
         self.logger.info(f"Starting test with endpoint {self.endpoint}")
-        
+
         # commissioning - already done
         self.step("0")
 
@@ -155,7 +155,7 @@ class TC_CC_6_5(MatterBaseTest):
         except Exception as e:
             self.logger.error(f"Failed to write Options attribute: {e}")
             raise
-    
+
         self.step("0b")
         self.logger.info(f"Sending MoveToColorTemperature command to endpoint {self.endpoint}")
         try:
@@ -236,14 +236,16 @@ class TC_CC_6_5(MatterBaseTest):
                 self.dut_node_id, [(self.endpoint, attributes.StartUpColorTemperatureMireds)]
             )
             self.logger.info(f"Startup color temperature response: {startup_color_temp}")
-            startup_color_temp_value = extract_attribute_value(startup_color_temp, self.endpoint, attributes.StartUpColorTemperatureMireds)
+            startup_color_temp_value = extract_attribute_value(
+                startup_color_temp, self.endpoint, attributes.StartUpColorTemperatureMireds)
             self.logger.info(f"Extracted startup color temperature value: {startup_color_temp_value}")
             if startup_color_temp_value is not None:
-                asserts.assert_true(isinstance(startup_color_temp_value, int), "Startup color temperature value should be an integer")
-                asserts.assert_greater_equal(startup_color_temp_value, MIN_STARTUP_COLOR_TEMP, 
-                    f"Startup color temperature {startup_color_temp_value} should be >= {MIN_STARTUP_COLOR_TEMP}")
+                asserts.assert_true(isinstance(startup_color_temp_value, int),
+                                    "Startup color temperature value should be an integer")
+                asserts.assert_greater_equal(startup_color_temp_value, MIN_STARTUP_COLOR_TEMP,
+                                             f"Startup color temperature {startup_color_temp_value} should be >= {MIN_STARTUP_COLOR_TEMP}")
                 asserts.assert_less_equal(startup_color_temp_value, MAX_STARTUP_COLOR_TEMP,
-                    f"Startup color temperature {startup_color_temp_value} should be <= {MAX_STARTUP_COLOR_TEMP}")
+                                          f"Startup color temperature {startup_color_temp_value} should be <= {MAX_STARTUP_COLOR_TEMP}")
         except Exception as e:
             self.logger.error(f"Failed to read StartUpColorTemperatureMireds: {e}")
             raise
@@ -258,12 +260,12 @@ class TC_CC_6_5(MatterBaseTest):
                 target_color_temp = MIN_STARTUP_COLOR_TEMP
             elif target_color_temp > MAX_STARTUP_COLOR_TEMP:
                 target_color_temp = MAX_STARTUP_COLOR_TEMP
-            
+
             self.logger.info(f"Writing StartUpColorTemperatureMireds with value {target_color_temp}")
-            
+
             # Add a small delay before writing
             await asyncio.sleep(0.3)
-            
+
             # Try to reset the session before writing
             try:
                 # First try to close any existing session
@@ -274,7 +276,7 @@ class TC_CC_6_5(MatterBaseTest):
                 self.logger.info("Successfully established new session")
             except Exception as e:
                 self.logger.warning(f"Failed to reset session: {e}")
-            
+
             # Try to write the attribute with a simpler format
             try:
                 # First attempt: Write with minimal parameters
@@ -291,16 +293,16 @@ class TC_CC_6_5(MatterBaseTest):
                     self.dut_node_id,
                     [(self.endpoint, attributes.StartUpColorTemperatureMireds, target_color_temp)]
                 )
-            
+
             self.logger.info(f"Write StartUpColorTemperatureMireds response: {response}")
-            
+
             # Check if the write was successful
             if hasattr(response, 'status'):
                 asserts.assert_equal(response.status, Status.Success, "Write operation should succeed")
             else:
                 self.logger.error(f"Unexpected response format: {response}")
                 raise Exception("Write operation failed: unexpected response format")
-                
+
         except Exception as e:
             self.logger.error(f"Failed to write StartUpColorTemperatureMireds: {e}")
             raise
@@ -336,9 +338,11 @@ class TC_CC_6_5(MatterBaseTest):
                 self.dut_node_id, [(self.endpoint, attributes.StartUpColorTemperatureMireds)]
             )
             self.logger.info(f"Post cycle startup response: {post_cycle_startup}")
-            post_cycle_startup_value = extract_attribute_value(post_cycle_startup, self.endpoint, attributes.StartUpColorTemperatureMireds)
+            post_cycle_startup_value = extract_attribute_value(
+                post_cycle_startup, self.endpoint, attributes.StartUpColorTemperatureMireds)
             self.logger.info(f"Extracted post cycle startup value: {post_cycle_startup_value}")
-            asserts.assert_equal(post_cycle_startup_value, target_color_temp, "Post cycle startup color temperature should match target value")
+            asserts.assert_equal(post_cycle_startup_value, target_color_temp,
+                                 "Post cycle startup color temperature should match target value")
         except Exception as e:
             self.logger.error(f"Failed to read post cycle StartUpColorTemperatureMireds: {e}")
             raise
@@ -351,7 +355,8 @@ class TC_CC_6_5(MatterBaseTest):
             self.logger.info(f"Post cycle color response: {post_cycle_color}")
             post_cycle_color_value = extract_attribute_value(post_cycle_color, self.endpoint, attributes.ColorTemperatureMireds)
             self.logger.info(f"Extracted post cycle color value: {post_cycle_color_value}")
-            asserts.assert_equal(post_cycle_color_value, target_color_temp, "Post cycle color temperature should match target value")
+            asserts.assert_equal(post_cycle_color_value, target_color_temp,
+                                 "Post cycle color temperature should match target value")
         except Exception as e:
             self.logger.error(f"Failed to read post cycle ColorTemperatureMireds: {e}")
             raise
