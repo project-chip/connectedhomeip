@@ -62,7 +62,6 @@ Json::Value OtaProviderAppCommandHandler::BuildOtaProviderSnapshot(uint16_t endp
 {
     Json::Value payload(Json::objectValue);
 
-    // payload["QueryImageStatus"]    = static_cast<uint32_t>(gOtaProvider.GetQueryImageStatus());
     payload["VendorID"]            = gOtaProvider.GetVendorId();
     payload["ProductID"]           = gOtaProvider.GetProductId();
     payload["SoftwareVersion"]     = gOtaProvider.GetSoftwareVersion();
@@ -97,7 +96,7 @@ void OtaProviderAppCommandHandler::HandleCommand(intptr_t context)
     endpoint = static_cast<uint16_t>(self->mJsonValue.get("Endpoint", 0).asUInt());
     delegate = self->mDelegate;
 
-    if (name == "Snapshot")
+    if (name == "QueryImageSnapshot")
     {
         Json::Value out(Json::objectValue);
         out["Name"]     = "SnapshotResponse";
