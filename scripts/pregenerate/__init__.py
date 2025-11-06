@@ -111,7 +111,7 @@ def FindPregenerationTargets(sdk_root: str, external_roots: Optional[List[str]],
                 continue
 
         if path_matchers:
-            if all([not matcher.matches(idl.relative_path) for matcher in path_matchers]):
+            if all(not matcher.matches(idl.relative_path) for matcher in path_matchers):
                 logging.debug(f"Glob not matched for {idl.relative_path}")
                 continue
 
