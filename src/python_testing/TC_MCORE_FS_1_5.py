@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 #
 #    Copyright (c) 2024 Project CHIP Authors
 #    All rights reserved.
@@ -193,7 +194,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
             (root_endpoint, Clusters.Descriptor.Attributes.PartsList)
         ]
         self._partslist_subscription = await self.default_controller.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=parts_list_subscription_contents,
             reportInterval=(min_report_interval_sec, max_report_interval_sec),
             keepSubscriptions=True
@@ -279,7 +280,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
             (newly_added_endpoint, Clusters.AdministratorCommissioning)
         ]
         self._cadmin_subscription = await self.default_controller.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=cadmin_subscription_contents,
             reportInterval=(min_report_interval_sec, max_report_interval_sec),
             keepSubscriptions=True
@@ -293,7 +294,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
         await asyncio.sleep(1)
 
         self.step(7)
-        await self.default_controller.OpenCommissioningWindow(nodeid=self.th_server_local_nodeid, timeout=180, iteration=1000, discriminator=3840, option=1)
+        await self.default_controller.OpenCommissioningWindow(nodeId=self.th_server_local_nodeid, timeout=180, iteration=1000, discriminator=3840, option=1)
 
         self.step(8)
         current_fabric_index = await self.read_single_attribute_check_success(node_id=self.th_server_local_nodeid, cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)
