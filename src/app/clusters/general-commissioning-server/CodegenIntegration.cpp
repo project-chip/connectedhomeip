@@ -15,9 +15,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app/clusters/general-commissioning-server/CodegenIntegration.h>
+
 #include <app/clusters/general-commissioning-server/general-commissioning-cluster.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <app/static-cluster-config/GeneralCommissioning.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
+#include <lib/support/CodeUtils.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -42,7 +46,7 @@ static_assert((kGeneralCommissioningFixedClusterCount == 0) ||
                    GeneralCommissioning::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId),
               "General Commissioning cluster MUST be on endpoint 0");
 
-ServerClusterRegistration gRegistration(GeneralCommissioningCluster::Instance());
+RegisteredServerCluster<GeneralCommissioningCluster> gRegistration;
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
@@ -51,22 +55,29 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         // Configure optional attributes based on fetched bits
-        GeneralCommissioningCluster::Instance().GetOptionalAttributes() =
-            GeneralCommissioningCluster::OptionalAttributes(optionalAttributeBits);
+        gRegistration.Cluster().GetOptionalAttributes() = GeneralCommissioningCluster::OptionalAttributes(optionalAttributeBits);
 
-        return gRegistration;
+        return gRegistration.Registration();
     }
 
-    ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
-    {
-        return &GeneralCommissioningCluster::Instance();
-    }
+    ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override { return &gRegistration.Cluster(); }
 
-    // Nothing to destroy: separate singleton class without constructor/destructor is used
+    // Nothing to destroy: gRegistration is a global static that handles destruction
     void ReleaseRegistration(unsigned clusterInstanceIndex) override {}
 };
 
 } // namespace
+
+namespace chip::app::Clusters::GeneralCommissioning {
+
+GeneralCommissioningCluster * Instance()
+{
+    // we ALWAYS return this for now, however in the future this may be instantiated
+    // at runtime (i.e only after server is initialized.)
+    return &gRegistration.Cluster();
+}
+
+} // namespace chip::app::Clusters::GeneralCommissioning
 
 void MatterGeneralCommissioningClusterInitCallback(EndpointId endpointId)
 {

@@ -19,6 +19,7 @@
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model/Nullable.h>
 #include <clusters/NetworkCommissioning/Attributes.h>
@@ -208,6 +209,7 @@ private:
     uint8_t mLastNetworkIDLen = 0;
     Optional<uint64_t> mCurrentOperationBreadcrumb;
     bool mScanningWasDirected = false;
+    BreadCrumbTracker & mBreadcrumbTracker;
 
     void SetLastNetworkingStatusValue(NetworkCommissioning::Attributes::LastNetworkingStatus::TypeInfo::Type networkingStatusValue);
     void SetLastConnectErrorValue(NetworkCommissioning::Attributes::LastConnectErrorValue::TypeInfo::Type connectErrorValue);
@@ -227,9 +229,9 @@ private:
     void UpdateBreadcrumb(const Optional<uint64_t> & breadcrumbValue);
 
 public:
-    NetworkCommissioningLogic(EndpointId aEndpointId, WiFiDriver * apDelegate);
-    NetworkCommissioningLogic(EndpointId aEndpointId, ThreadDriver * apDelegate);
-    NetworkCommissioningLogic(EndpointId aEndpointId, EthernetDriver * apDelegate);
+    NetworkCommissioningLogic(EndpointId aEndpointId, WiFiDriver * apDelegate, BreadCrumbTracker & tracker);
+    NetworkCommissioningLogic(EndpointId aEndpointId, ThreadDriver * apDelegate, BreadCrumbTracker & tracker);
+    NetworkCommissioningLogic(EndpointId aEndpointId, EthernetDriver * apDelegate, BreadCrumbTracker & tracker);
     virtual ~NetworkCommissioningLogic()
     {
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION

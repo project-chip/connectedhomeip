@@ -235,7 +235,7 @@ public:
             VerifyOrReturnError(decodePair.attributeID == Attributes::CurrentMode::Id, CHIP_ERROR_INVALID_ARGUMENT);
             VerifyOrReturnError(decodePair.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
             ReturnErrorOnFailure(mSceneEndpointStatePairs.InsertPair(
-                ModeSelectEndPointPair(endpoint, static_cast<uint8_t>(decodePair.valueUnsigned8.HasValue()))));
+                ModeSelectEndPointPair(endpoint, static_cast<uint8_t>(decodePair.valueUnsigned8.Value()))));
         }
         // Verify that the EFS was completely read
         CHIP_ERROR err = pair_iterator.GetStatus();

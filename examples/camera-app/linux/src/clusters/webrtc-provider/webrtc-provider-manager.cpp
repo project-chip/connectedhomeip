@@ -138,6 +138,13 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
 
     transport->SetRequestArgs(requestArgs);
 
+    // Store SFrameConfig in Transport base class if provided for later use in frame encryption
+    if (args.sFrameConfig.HasValue())
+    {
+        transport->sFrameConfig = args.sFrameConfig;
+        ChipLogProgress(Camera, "SFrame encryption enabled for session %u", args.sessionId);
+    }
+
     // Check resource availability before proceeding
     // If we cannot allocate resources, send End command with OutOfResources reason
     if (mWebrtcTransportMap.size() > kMaxConcurrentWebRTCSessions)
@@ -331,6 +338,14 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
     }
 
     transport->SetRequestArgs(requestArgs);
+
+    // Store SFrameConfig in Transport base class if provided for later use in frame encryption
+    if (args.sFrameConfig.HasValue())
+    {
+        transport->sFrameConfig = args.sFrameConfig;
+        ChipLogProgress(Camera, "SFrame encryption enabled for session %u", args.sessionId);
+    }
+
     transport->Start();
     auto peerConnection  = transport->GetPeerConnection();
     std::string audioMid = ExtractMidFromSdp(args.sdp, "audio");
@@ -514,6 +529,30 @@ CHIP_ERROR WebRTCProviderManager::ValidateAudioStreamID(uint16_t audioStreamId)
     return avsmController.ValidateAudioStreamID(audioStreamId);
 }
 
+CHIP_ERROR WebRTCProviderManager::IsStreamUsageSupported(StreamUsageEnum streamUsage)
+{
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    auto & hal                   = mCameraDevice->GetCameraHALInterface();
+    auto & streamUsagePriorities = hal.GetStreamUsagePriorities();
+
+    // Check if the streamUsage is in the StreamUsagePriorities list
+    for (const auto & usage : streamUsagePriorities)
+    {
+        if (usage == streamUsage)
+        {
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    ChipLogError(Camera, "StreamUsage %u not found in StreamUsagePriorities", to_underlying(streamUsage));
+    return CHIP_ERROR_NOT_FOUND;
+}
+
 CHIP_ERROR WebRTCProviderManager::IsHardPrivacyModeActive(bool & isActive)
 {
     if (mCameraDevice == nullptr)
@@ -577,6 +616,53 @@ bool WebRTCProviderManager::HasAllocatedAudioStreams()
     auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
 
     return avsmController.HasAllocatedAudioStreams();
+}
+
+CHIP_ERROR WebRTCProviderManager::ValidateSFrameConfig(uint16_t cipherSuite, size_t baseKeyLength)
+{
+    // Define supported cipher suites and their expected key lengths
+    // Based on SFrame RFC: https://datatracker.ietf.org/doc/html/draft-ietf-sframe-enc
+    // 0x0001: AES-128-GCM-SHA256 (16 byte key)
+    // 0x0002: AES-256-GCM-SHA512 (32 byte key)
+    constexpr uint16_t kCipherSuite_AES_128_GCM = 0x0001;
+    constexpr uint16_t kCipherSuite_AES_256_GCM = 0x0002;
+    constexpr size_t kAES_128_KeyLength         = 16;
+    constexpr size_t kAES_256_KeyLength         = 32;
+
+    size_t expectedKeyLength = 0;
+
+    // Validate cipher suite and determine expected key length
+    switch (cipherSuite)
+    {
+    case kCipherSuite_AES_128_GCM:
+        expectedKeyLength = kAES_128_KeyLength;
+        break;
+    case kCipherSuite_AES_256_GCM:
+        expectedKeyLength = kAES_256_KeyLength;
+        break;
+    default:
+        ChipLogError(Camera, "Unsupported SFrame cipher suite 0x%04X", cipherSuite);
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    // Validate base key length matches the expected length for the cipher suite
+    if (baseKeyLength != expectedKeyLength)
+    {
+        ChipLogError(Camera, "SFrame base key length mismatch - expected %u bytes for cipher suite 0x%04X, got %u bytes",
+                     static_cast<unsigned int>(expectedKeyLength), cipherSuite, static_cast<unsigned int>(baseKeyLength));
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR WebRTCProviderManager::IsUTCTimeNull(bool & isNull)
+{
+    // TODO: The implementation SHALL:
+    //  - Read the UTCTime attribute from the Time Synchronization cluster (0x0038)
+    //  - Return whether the attribute is null or has a valid value
+
+    return CHIP_NO_ERROR;
 }
 
 void WebRTCProviderManager::ScheduleOfferSend(uint16_t sessionId)

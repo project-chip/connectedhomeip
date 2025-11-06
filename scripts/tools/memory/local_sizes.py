@@ -17,11 +17,11 @@
 """
 This Python script analyzes the memory usage of a compiled binary and generates
 a JSON report. It collects memory usage details and outputs them in a structured
-JSON format. 
+JSON format.
 
-While similar to scripts/tools/memory/gh_sizes.py, this version extracts memory 
+While similar to scripts/tools/memory/gh_sizes.py, this version extracts memory
 information directly from a binary built from the current working directory
-(rather than a GitHub workflow) and uses the tip of the current branch instead of 
+(rather than a GitHub workflow) and uses the tip of the current branch instead of
 targeting a specific commit.
 
 Usage: local_sizes.py ‹platform› ‹config› ‹target› ‹binary› [‹output›] [‹option›…]
