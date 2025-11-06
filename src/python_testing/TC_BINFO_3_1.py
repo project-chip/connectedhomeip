@@ -63,21 +63,16 @@ class TC_BINFO_3_1(MatterBaseTest):
     def steps_TC_BINFO_3_1(self) -> list[TestStep]:
         steps = [
             TestStep(1, "TH reads ProductAppearance from the DUT.",
-                     ("Verify that TH reads ProductAppearance attribute from the DUT successfully "
-                      "and the value is in ProductAppearanceStruct. "
-                      "Finish value is in range 0-5.")),
+                     ("ProductAppearance.Finish Value has to be between a range of [min=Other(0), "
+                      "max=Fabric(5)]")),
             TestStep(2, "TH reads ProductAppearance from the DUT.",
-                     ("Verify that TH reads ProductAppearance attribute from the DUT successfully "
-                      "and the value is in ProductAppearanceStruct. "
-                      "PrimaryColor is in range 0-20.")),
+                     ("ProductAppearance.PrimaryColor Value has to be between a range of [min=Black(0), "
+                      "max=Gold(20) ]")),
             TestStep(3, "TH reads ProductAppearance from the DUT.",
-                     ("Vendor specific test-step. "
-                      "Verify that TH reads ProductAppearance attribute "
-                      "from the DUT successfully.")),
+                     ("ProductAppearance.Finish Value has to be equal to PIXIT.BINFO.Finish")),
             TestStep(4, "TH reads ProductAppearance from the DUT.",
-                     ("Vendor specific test-step. "
-                      "Verify that TH reads ProductAppearance attribute "
-                      "from the DUT successfully.")),
+                     ("ProductAppearance.PrimaryColor Value has to be equal to "
+                      "PIXIT.BINFO.PrimaryColor")),
         ]
         return steps
 
