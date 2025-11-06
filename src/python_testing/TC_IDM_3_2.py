@@ -62,7 +62,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
     ) -> tuple[Optional[int], Optional[type[ClusterObjects.ClusterAttributeDescriptor]]]:
         """
         Find an attribute that requires timed write on the actual device
-        Uses the wildcard read data that's already in endpoints_data 
+        Uses the wildcard read data that's already in endpoints_data
         """
         logging.info(f"Searching for timed write attributes across {len(endpoints_data)} endpoints")
 
@@ -344,20 +344,20 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         if timed_attr:
             self.step(7)
             '''
-            TH sends the WriteRequestMessage to the DUT to modify the value of a specific attribute data that needs 
+            TH sends the WriteRequestMessage to the DUT to modify the value of a specific attribute data that needs
             timed write transaction to write and this action is not part of a timed write transaction.
-            
+
             This step tests the following 3 timed write error scenarios:
             1. NEEDS_TIMED_INTERACTION: Writing timed-write-required attribute without timed transaction
             2. TIMED_REQUEST_MISMATCH: Writing with TimedRequest flag but no actual timed transaction
                                         (Timed Request ACTION = No, TimedRequest FLAG = True)
             3. TIMED_REQUEST_MISMATCH: Writing with timed action performed but TimedRequest flag set to false
                                         (Timed Request ACTION = Yes, TimedRequest FLAG = False)
-            
+
             Understanding the distinction:
             - TIMED REQUEST ACTION: The TimedRequest protocol message sent BEFORE the WriteRequest
             - TIMEDREQUEST FLAG: A boolean field IN the WriteRequest message itself
-            
+
             Normal timed write: Action=Yes, Flag=True (both must match)
             '''
 
