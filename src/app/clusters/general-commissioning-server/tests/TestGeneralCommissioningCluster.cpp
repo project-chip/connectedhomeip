@@ -49,23 +49,25 @@ struct TestGeneralCommissioningCluster : public ::testing::Test
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
 
+GeneralCommissioningCluster::Context CreateStandardContext() {
+    return {
+        .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
+            .configurationManager   = DeviceLayer::ConfigurationMgr(),                       //
+            .deviceControlServer    = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
+            .fabricTable            = Server::GetInstance().GetFabricTable(),                //
+            .failsafeContext        = Server::GetInstance().GetFailSafeContext(),            //
+            .platformManager        = DeviceLayer::PlatformMgr(),                            //
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+            .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    };
+}
+
 TEST_F(TestGeneralCommissioningCluster, TestAttributes)
 {
     // test without optional attributes
     {
-        GeneralCommissioningCluster cluster(
-            GeneralCommissioningCluster::Context {
-                .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
-                    .configurationManager   = DeviceLayer::ConfigurationMgr(),                       //
-                    .deviceControlServer    = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
-                    .fabricTable            = Server::GetInstance().GetFabricTable(),                //
-                    .failsafeContext        = Server::GetInstance().GetFailSafeContext(),            //
-                    .platformManager        = DeviceLayer::PlatformMgr(),                            //
-#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-                    .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
-#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-            },
-            GeneralCommissioningCluster::OptionalAttributes(0));
+        GeneralCommissioningCluster cluster(CreateStandardContext(), GeneralCommissioningCluster::OptionalAttributes(0));
 
         ReadOnlyBufferBuilder<AttributeEntry> builder;
         ASSERT_EQ(cluster.Attributes({ kRootEndpointId, GeneralCommissioning::Id }, builder), CHIP_NO_ERROR);
@@ -100,18 +102,7 @@ TEST_F(TestGeneralCommissioningCluster, TestAttributes)
     // test with optional attributes
     {
         GeneralCommissioningCluster cluster(
-            GeneralCommissioningCluster::Context {
-                .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
-                    .configurationManager   = DeviceLayer::ConfigurationMgr(),                       //
-                    .deviceControlServer    = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
-                    .fabricTable            = Server::GetInstance().GetFabricTable(),                //
-                    .failsafeContext        = Server::GetInstance().GetFailSafeContext(),            //
-                    .platformManager        = DeviceLayer::PlatformMgr(),                            //
-#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-                    .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
-#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-            },
-            GeneralCommissioningCluster::OptionalAttributes().Set<IsCommissioningWithoutPower::Id>());
+            CreateStandardContext(), GeneralCommissioningCluster::OptionalAttributes().Set<IsCommissioningWithoutPower::Id>());
 
         ReadOnlyBufferBuilder<AttributeEntry> builder;
         ASSERT_EQ(cluster.Attributes({ kRootEndpointId, GeneralCommissioning::Id }, builder), CHIP_NO_ERROR);
@@ -152,19 +143,7 @@ TEST_F(TestGeneralCommissioningCluster, TestAttributes)
 
 TEST_F(TestGeneralCommissioningCluster, TestAcceptedCommands)
 {
-    GeneralCommissioningCluster cluster(
-        GeneralCommissioningCluster::Context {
-            .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
-                .configurationManager   = DeviceLayer::ConfigurationMgr(),                       //
-                .deviceControlServer    = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
-                .fabricTable            = Server::GetInstance().GetFabricTable(),                //
-                .failsafeContext        = Server::GetInstance().GetFailSafeContext(),            //
-                .platformManager        = DeviceLayer::PlatformMgr(),                            //
-#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-                .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
-#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-        },
-        GeneralCommissioningCluster::OptionalAttributes());
+    GeneralCommissioningCluster cluster(CreateStandardContext(), GeneralCommissioningCluster::OptionalAttributes());
 
     {
         ReadOnlyBufferBuilder<AcceptedCommandEntry> builder;
