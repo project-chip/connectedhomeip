@@ -21,7 +21,6 @@ import sys
 import time
 import typing
 from dataclasses import dataclass, field
-from pathlib import Path
 
 import chiptest
 import click
