@@ -25,7 +25,7 @@
 #     app-args: >
 #       --discriminator 1234
 #       --passcode 20202021
-#       --secured-device-port 5541
+#       --secured-device-port 5540
 #       --autoApplyImage
 #       --KVS /tmp/chip_kvs_requestor
 #       --trace-to json:${TRACE_APP}.json
@@ -41,6 +41,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --string-arg provider_app_path:${OTA_PROVIDER_APP}
 #       --string-arg ota_image:${SU_OTA_REQUESTOR_V2}
+#       --int-arg ota_provider_port:5541
 #     factory-reset: true
 #     quiet: false
 # === END CI TEST ARGUMENTS ===
@@ -198,7 +199,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             kvs_path=self.KVS_PATH,
             log_file=self.LOG_FILE_PATH,
             expected_output="Server initialization complete",
-            timeout=10
+            timeout=30
         )
 
     async def extend_ota_acls(self, controller, provider_node_id, requestor_node_id):
@@ -457,7 +458,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         provider_node_id = 1
         provider_discriminator = 1111
         provider_setupPinCode = 20202021
-        provider_port = 5540
+        provider_port = self.user_params.get('ota_provider_port', 5541)
 
         self.provider_data = {
             "discriminator": provider_discriminator,
