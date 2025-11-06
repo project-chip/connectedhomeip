@@ -189,8 +189,8 @@ class TC_AVSM_2_3(MatterBaseTest, AVSMTestBase):
 
         self.step(7)
         if aHardwareEncoder:
-            expected_wmark = not aWmark
-            expected_osd = not aOSD
+            expected_wmark = None if aWmark is None else not aWmark,
+            expected_osd = None if aOSD is None else not aOSD,
             sub_handler.await_all_expected_report_matches(expected_matchers=[wmark_osd_matcher(
                 attr.AllocatedSnapshotStreams, expected_wmark, expected_osd, wmarkSupport, osdSupport)], timeout_sec=20)
 

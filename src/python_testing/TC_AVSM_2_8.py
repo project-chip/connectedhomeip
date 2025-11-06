@@ -160,7 +160,7 @@ class TC_AVSM_2_8(MatterBaseTest, AVSMTestBase):
             pass
 
         self.step(5)
-        # Establish subscription to AllocatedSnapshotStreams
+        # Establish subscription to AllocatedVideoStreams
         sub_handler = AttributeSubscriptionHandler(cluster, attr.AllocatedVideoStreams)
         await sub_handler.start(self.default_controller, self.dut_node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
 
@@ -179,8 +179,8 @@ class TC_AVSM_2_8(MatterBaseTest, AVSMTestBase):
             pass
 
         self.step(7)
-        expected_wmark = not aWmark
-        expected_osd = not aOSD
+        expected_wmark = None if aWmark is None else not aWmark
+        expected_osd = None if aOSD is None else not aOSD
         sub_handler.await_all_expected_report_matches(expected_matchers=[wmark_osd_matcher(
             attr.AllocatedVideoStreams, expected_wmark, expected_osd, wmarkSupport, osdSupport)], timeout_sec=20)
 

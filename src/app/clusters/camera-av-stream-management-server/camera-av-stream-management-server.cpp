@@ -1004,12 +1004,15 @@ void CameraAVStreamMgmtServer::ModifyVideoStream(const uint16_t streamID, const 
             bool wasModified = false;
             if (waterMarkEnabled.HasValue())
             {
-                wasModified             = (stream.watermarkEnabled != waterMarkEnabled);
+                wasModified = (stream.watermarkEnabled.HasValue() != waterMarkEnabled.HasValue()) ||
+                    (stream.watermarkEnabled.HasValue() && waterMarkEnabled.HasValue() &&
+                     stream.watermarkEnabled.Value() != waterMarkEnabled.Value());
                 stream.watermarkEnabled = waterMarkEnabled;
             }
             if (osdEnabled.HasValue())
             {
-                wasModified       = wasModified || (stream.OSDEnabled != osdEnabled);
+                wasModified = wasModified || (stream.OSDEnabled.HasValue() != osdEnabled.HasValue()) ||
+                    (stream.OSDEnabled.HasValue() && osdEnabled.HasValue() && stream.OSDEnabled.Value() != osdEnabled.Value());
                 stream.OSDEnabled = osdEnabled;
             }
             if (wasModified)
@@ -1032,12 +1035,15 @@ void CameraAVStreamMgmtServer::ModifySnapshotStream(const uint16_t streamID, con
             bool wasModified = false;
             if (waterMarkEnabled.HasValue())
             {
-                wasModified             = (stream.watermarkEnabled != waterMarkEnabled);
+                wasModified = (stream.watermarkEnabled.HasValue() != waterMarkEnabled.HasValue()) ||
+                    (stream.watermarkEnabled.HasValue() && waterMarkEnabled.HasValue() &&
+                     stream.watermarkEnabled.Value() != waterMarkEnabled.Value());
                 stream.watermarkEnabled = waterMarkEnabled;
             }
             if (osdEnabled.HasValue())
             {
-                wasModified       = wasModified || (stream.OSDEnabled != osdEnabled);
+                wasModified = wasModified || (stream.OSDEnabled.HasValue() != osdEnabled.HasValue()) ||
+                    (stream.OSDEnabled.HasValue() && osdEnabled.HasValue() && stream.OSDEnabled.Value() != osdEnabled.Value());
                 stream.OSDEnabled = osdEnabled;
             }
             if (wasModified)
