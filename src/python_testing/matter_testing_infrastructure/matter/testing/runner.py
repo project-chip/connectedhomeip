@@ -666,9 +666,7 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
     #
     # For this reason, commissioning data validation is intentionally skipped in this scenario.
 
-    skip_nfc_intest_commission_data_validation = (args.in_test_commissioning_method is not None and
-                                                  'nfc' in args.in_test_commissioning_method)
-    if not skip_nfc_intest_commission_data_validation:
+    if 'nfc' not in (args.in_test_commissioning_method or []):
         if len(config.dut_node_ids) > len(device_descriptors):
             print("error: More node IDs provided than discriminators")
             return False
@@ -755,21 +753,21 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     for name, value in all_global_args:
         config.global_test_params[name] = value
 
-    if args.commissioning_method and "nfc" in args.commissioning_method:
-        missing_nfc_index = "NFC_Reader_index" not in config.global_test_params
-        has_commissioning_data = any([args.passcodes, args.discriminators, args.manual_code, args.qr_code])
-        if not missing_nfc_index and not has_commissioning_data:
-            from matter.testing.matter_nfc_interaction import connect_read_nfc_tag_data
-            nfc_tag_data = connect_read_nfc_tag_data(config.global_test_params.get("NFC_Reader_index", 0))
-            args.qr_code.append(nfc_tag_data)
-        elif missing_nfc_index:
-            print(
-                "Error: Missing required argument --int-arg NFC_Reader_index:<int-value> for NFC NFC commissioning tests.")
+    if "nfc" in (args.commissioning_method or []):
+
+        if "NFC_Reader_index" not in config.global_test_params:
+            LOGGER.error("Error: Missing required argument --int-arg NFC_Reader_index:<int-value> for "
+                         "NFC commissioning tests")
             sys.exit(1)
-        elif has_commissioning_data:
-            print(
-                "Error: Do not provide discriminator, passcode, manual code or qr-code for NFC commissioning. The payload is read directly from the NFC tag.")
+
+        if any([args.passcodes, args.discriminators, args.manual_code, args.qr_code]):
+            LOGGER.error("Error: Do not provide discriminator, passcode, manual code or qr-code for NFC commissioning. "
+                         "The payload is read directly from the NFC tag.")
             sys.exit(1)
+
+        from matter.testing.matter_nfc_interaction import connect_read_nfc_tag_data
+        nfc_tag_data = connect_read_nfc_tag_data(config.global_test_params.get("NFC_Reader_index", 0))
+        args.qr_code.append(nfc_tag_data)
 
     # Populate commissioning config if present, exiting on error
     if not populate_commissioning_args(args, config):
