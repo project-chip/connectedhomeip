@@ -111,7 +111,6 @@ class HostApp(Enum):
                 HostApp.MICROWAVE_OVEN: ":linux_microwave_oven_app",
                 HostApp.OTA_PROVIDER: ":linux_ota_provider_app",
                 HostApp.RVC: ":linux_rvc_app",
-                HostApp.TERMS_AND_CONDITIONS: ":linux_terms_and_conditions_app",
                 HostApp.THERMOSTAT: ":linux_thermostat_app",
                 HostApp.TV_APP: ":linux_tv_app",
                 HostApp.WATER_LEAK_DETECTOR: ":linux_water_leak_detector_app",

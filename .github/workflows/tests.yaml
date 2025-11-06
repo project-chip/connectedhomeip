@@ -646,7 +646,6 @@ jobs:
                         --target linux-x64-microwave-oven-${BUILD_VARIANT}-tsan-clang-test-unified \
                         --target linux-x64-ota-provider-${BUILD_VARIANT}-tsan-clang-test-unified \
                         --target linux-x64-rvc-${BUILD_VARIANT}-tsan-clang-test-unified \
-                        --target linux-x64-terms-and-conditions-${BUILD_VARIANT}-tsan-clang-test-unified \
                         --target linux-x64-thermostat-${BUILD_VARIANT}-tsan-clang-test-unified \
                         --target linux-x64-tv-app-${BUILD_VARIANT}-tsan-clang-test-unified \
                         --target linux-x64-water-leak-detector-${BUILD_VARIANT}-tsan-clang-test-unified \
@@ -723,6 +722,15 @@ jobs:
                   --target linux-x64-network-manager-${BUILD_VARIANT}-tsan-clang-test
                   --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-network-manager-${BUILD_VARIANT}-tsan-clang-test"
+
+            - name: Build linux-x64-terms-and-conditions
+              env:
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-terms-and-conditions-${BUILD_VARIANT}-tsan-clang-test
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-terms-and-conditions-${BUILD_VARIANT}-tsan-clang-test"
 
             # fabric-admin-rpc now built in strict-tlv unified group
 
@@ -821,7 +829,7 @@ jobs:
                   echo "FABRIC_BRIDGE_APP: objdir-clone/linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang/fabric-bridge-app" >> /tmp/test_env.yaml
                   echo "FABRIC_SYNC_APP: objdir-clone/linux-x64-fabric-sync-${BUILD_VARIANT}-clang/fabric-sync" >> /tmp/test_env.yaml
                   echo "LIGHTING_APP_NO_UNIQUE_ID: objdir-clone/linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang-test-no-read-client/chip-lighting-app" >> /tmp/test_env.yaml
-                  echo "TERMS_AND_CONDITIONS_APP: objdir-clone/linux-x64-terms-and-conditions-${BUILD_VARIANT}-tsan-clang-test-unified/chip-terms-and-conditions-app" >> /tmp/test_env.yaml
+                  echo "TERMS_AND_CONDITIONS_APP: objdir-clone/linux-x64-terms-and-conditions-${BUILD_VARIANT}-tsan-clang-test/chip-terms-and-conditions-app" >> /tmp/test_env.yaml
                   echo "OTA_PROVIDER_APP: objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-tsan-clang-test-unified/chip-ota-provider-app" >> /tmp/test_env.yaml
                   echo "OTA_REQUESTOR_APP: objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}-tsan-clang-test/chip-ota-requestor-app" >> /tmp/test_env.yaml
                   echo "TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml

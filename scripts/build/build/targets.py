@@ -215,7 +215,6 @@ def BuildHostTarget():
             'microwave-oven',
             'ota-provider',
             'rvc',
-            'terms-and-conditions',
             'thermostat',
             'tv-app',
             'water-leak-detector',
