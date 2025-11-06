@@ -29,6 +29,8 @@ select = [
     "COM",
     # Ensure that scripts are executable
     "EXE",
+    # Check for common logging issues
+    "LOG",
     # Check for common optimization issues
     "SLOT",
 ]
