@@ -42,7 +42,7 @@
 #       --string-arg provider_app_path:${OTA_PROVIDER_APP}
 #       --string-arg ota_image:${SU_OTA_REQUESTOR_V2}
 #     factory-reset: true
-#     quiet: true
+#     quiet: false
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
@@ -64,11 +64,6 @@ logger = logging.getLogger(__name__)
 
 
 class TC_SU_2_2(SoftwareUpdateBaseTest):
-
-    # LOG_FILE_PATH = "provider.log"
-    # KVS_PATH = "/tmp/chip_kvs_provider"
-    # provider_app_path = "./out/debug/chip-ota-provider-app"
-    # ota_image_v2 = "firmware_requestor_v2min.ota"
 
     async def add_single_ota_provider(self, controller, requestor_node_id: int, provider_node_id: int):
         """
@@ -114,7 +109,6 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             attributes=[(0, attr)],
             nodeId=requestor_node_id
         )
-        # ChipDeviceCtrl.writeattribute_log(resp)
         logger.info(f'Prerequisite #4.0 - Write DefaultOTAProviders response: {resp}')
         asserts.assert_equal(resp[0].Status, Status.Success, "Failed to write DefaultOTAProviders attribute")
 
@@ -451,19 +445,6 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         self.provider_app_path = self.user_params.get('provider_app_path', None)
         self.ota_image_v2 = self.user_params.get('ota_image')
 
-        # if self.is_pics_sdk_ci_only:
-        #     logger.info("Using SDK_CI_ONLY parameters for Provider app path and OTA image")
-        #     self.LOG_FILE_PATH = "provider.log"
-        #     self.KVS_PATH = "/tmp/chip_kvs_provider"
-        #     self.provider_app_path = self.user_params.get('provider_app_path', None)  # "./out/debug/chip-ota-provider-app"
-        #     self.ota_image_v2 = self.user_params.get('ota_image')
-        # else:
-        #     logger.info("Using default parameters for Provider app path and OTA image")
-        #     self.LOG_FILE_PATH = "provider.log"
-        #     self.KVS_PATH = "/tmp/chip_kvs_provider"
-        #     self.provider_app_path = "./out/debug/chip-ota-provider-app"
-        #     self.ota_image_v2 = "firmware_requestor_v2min.ota"
-
         self.step(0)
         # Controller has already commissioned the requestor
 
@@ -557,7 +538,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # ------------------------------------------------------------------------------------
         # [STEP_1]: Step #1.2   - Track OTA attributes: UpdateState and UpdateStateProgress
         # [STEP_1]: Step #1.2.1 - UpdateState matcher: Track "Downloading"
-        # [STEP_1]: Step #1.2.2 - UpdateStateProgress matcher: Track non-null values "rage 1–99" and final "None"
+        # [STEP_1]: Step #1.2.2 - UpdateStateProgress matcher: Track non-null values "rage 1–100" and final "None"
         # ------------------------------------------------------------------------------------
         logger.info(
             f'{step_number}: Step #1.1 - Started subscription for UpdateState and UpdateStateProgress attributes '
@@ -1085,8 +1066,6 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             nonlocal state_sequence_notavailable
             val = report.Data.newState
             prev_state = report.Data.previousState
-            # event_reason = report.Data.reason
-            # event_target_sw = report.Data.targetSoftwareVersion
 
             if val is None:
                 return False
@@ -1207,8 +1186,6 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             nonlocal state_sequence_notavailable
             val = report.Data.newState
             prev_state = report.Data.previousState
-            # event_reason = report.Data.reason
-            # event_target_sw = report.Data.targetSoftwareVersion
 
             if val is None:
                 return False
