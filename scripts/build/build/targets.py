@@ -214,7 +214,6 @@ def BuildHostTarget():
             'lock',
             'microwave-oven',
             'ota-provider',
-            'python-bindings',
             'rvc',
             'terms-and-conditions',
             'thermostat',

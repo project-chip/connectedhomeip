@@ -645,7 +645,6 @@ jobs:
                         --target linux-x64-lock-${BUILD_VARIANT}-tsan-clang-test-unified \
                         --target linux-x64-microwave-oven-${BUILD_VARIANT}-tsan-clang-test-unified \
                         --target linux-x64-ota-provider-${BUILD_VARIANT}-tsan-clang-test-unified \
-                        --target linux-x64-python-bindings-${BUILD_VARIANT}-tsan-clang-test-unified \
                         --target linux-x64-rvc-${BUILD_VARIANT}-tsan-clang-test-unified \
                         --target linux-x64-terms-and-conditions-${BUILD_VARIANT}-tsan-clang-test-unified \
                         --target linux-x64-thermostat-${BUILD_VARIANT}-tsan-clang-test-unified \
