@@ -16,7 +16,6 @@
  */
 
 #include "general-commissioning-cluster.h"
-#include "platform/ConfigurationManager.h"
 
 #include <app/AppConfig.h>
 #include <app/reporting/reporting.h>
@@ -27,6 +26,7 @@
 #include <clusters/GeneralCommissioning/Metadata.h>
 #include <cstdint>
 #include <optional>
+#include <platform/ConfigurationManager.h>
 #include <platform/DeviceControlServer.h>
 #include <platform/PlatformManager.h>
 #include <tracing/macros.h>

@@ -28,6 +28,10 @@
 #include <platform/DeviceControlServer.h>
 #include <platform/PlatformManager.h>
 
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+#include <app/server/TermsAndConditionsManager.h>
+#endif
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -83,8 +87,7 @@ public:
         return &gServer.Cluster();
     }
 
-    // Nothing to destroy: gRegistration is a global static that handles destruction
-    void ReleaseRegistration(unsigned clusterInstanceIndex) override {}
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServer.Destroy(); }
 };
 
 } // namespace
