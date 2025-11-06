@@ -168,12 +168,15 @@ public:
         result.status = mCluster.InvokeCommand(invokeRequest, reader, &mHandler);
 
         // If command was successful and there's a response, decode it
-        if (result.status.has_value() && result.status->IsSuccess() && mHandler.HasResponse())
-        {
+        if (result.status.has_value() && result.status->IsSuccess() && mHandler.HasResponse()) {
             ResponseType decodedResponse;
-            if (mHandler.DecodeResponse(decodedResponse) == CHIP_NO_ERROR)
-            {
+            CHIP_ERROR decodeError = mHandler.DecodeResponse(decodedResponse);
+            if (decodeError == CHIP_NO_ERROR) {
                 result.response = std::move(decodedResponse);
+            } else {
+                // Decode failed; reflect error in status and log
+                result.status = app::DataModel::ActionReturnStatus(decodeError);
+                ChipLogError(Test, "DecodeResponse failed: %s", decodeError.AsString());
             }
         }
 
