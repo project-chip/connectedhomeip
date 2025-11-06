@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <app/server-cluster/AttributeListBuilder.h>
+#include <app/InteractionModelEngine.h>
 #include <clusters/OccupancySensing/Attributes.h>
 #include <clusters/OccupancySensing/Commands.h>
 #include <clusters/OccupancySensing/Metadata.h>
@@ -102,9 +103,7 @@ OccupancySensingCluster::OccupancySensingCluster(const Config & config) :
 {
     if (mHasHoldTime)
     {
-        mHoldTimeLimits.holdTimeMin = std::max(static_cast<uint16_t>(1), mHoldTimeLimits.holdTimeMin);
-        mHoldTimeLimits.holdTimeMax = std::max(mHoldTimeLimits.holdTimeMin, mHoldTimeLimits.holdTimeMax);
-        mHoldTimeLimits.holdTimeDefault = std::clamp(mHoldTimeLimits.holdTimeDefault, mHoldTimeLimits.holdTimeMin, mHoldTimeLimits.holdTimeMax);
+        SetHoldTimeLimits(config.mHoldTimeLimits);
     }
 }
 
@@ -143,6 +142,29 @@ DataModel::ActionReturnStatus OccupancySensingCluster::ReadAttribute(const DataM
     }
 }
 
+DataModel::ActionReturnStatus OccupancySensingCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & aDecoder)
+{
+    VerifyOrDie(request.path.mClusterId == OccupancySensing::Id);
+
+    switch (request.path.mAttributeId)
+    {
+    case Attributes::HoldTime::Id:
+    case Attributes::PIROccupiedToUnoccupiedDelay::Id:
+    case Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id:
+    case Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Id: {
+        if (!mHasHoldTime)
+        {
+            return Protocols::InteractionModel::Status::UnsupportedAttribute;
+        }
+        uint16_t newHoldTime;
+        ReturnErrorOnFailure(aDecoder.Decode(newHoldTime));
+        return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, SetHoldTime(newHoldTime));
+    }
+    default:
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
+    }
+}
+
 CHIP_ERROR OccupancySensingCluster::Attributes(const ConcreteClusterPath & clusterPath,
                                              ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
@@ -157,6 +179,36 @@ CHIP_ERROR OccupancySensingCluster::Attributes(const ConcreteClusterPath & clust
     };
 
     return listBuilder.Append(Span(OccupancySensing::Attributes::kMandatoryMetadata), Span(optionalAttributes));
+}
+
+DataModel::ActionReturnStatus OccupancySensingCluster::SetHoldTime(uint16_t holdTime)
+{
+    VerifyOrReturnError(holdTime >= mHoldTimeLimits.holdTimeMin, Protocols::InteractionModel::Status::ConstraintError);
+    VerifyOrReturnError(holdTime <= mHoldTimeLimits.holdTimeMax, Protocols::InteractionModel::Status::ConstraintError);
+
+    if (mHoldTime == holdTime)
+    {
+        return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
+    }
+
+    mHoldTime = holdTime;
+    return Protocols::InteractionModel::Status::Success;
+}
+
+DataModel::ActionReturnStatus OccupancySensingCluster::SetHoldTimeLimits(const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & holdTimeLimits)
+{
+    OccupancySensing::Structs::HoldTimeLimitsStruct::Type newLimits;
+    newLimits.holdTimeMin = std::max(static_cast<uint16_t>(1), holdTimeLimits.holdTimeMin);
+    newLimits.holdTimeMax = std::max(newLimits.holdTimeMin, holdTimeLimits.holdTimeMax);
+    newLimits.holdTimeDefault = std::clamp(holdTimeLimits.holdTimeDefault, newLimits.holdTimeMin, newLimits.holdTimeMax);
+
+    if (mHoldTimeLimits.holdTimeMin == newLimits.holdTimeMin && mHoldTimeLimits.holdTimeMax == newLimits.holdTimeMax && mHoldTimeLimits.holdTimeDefault == newLimits.holdTimeDefault)
+    {
+        return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
+    }
+
+    mHoldTimeLimits = newLimits;
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace chip::app::Clusters

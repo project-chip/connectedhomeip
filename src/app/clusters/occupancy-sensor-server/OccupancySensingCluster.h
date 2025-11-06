@@ -41,15 +41,19 @@ public:
         EndpointId mEndpointId;
         BitMask<OccupancySensing::Feature> mFeatureMap = 0;
         bool mHasHoldTime = false;
-        uint16_t mHoldTime = 1; // New member
-        OccupancySensing::Structs::HoldTimeLimitsStruct::Type mHoldTimeLimits = { .holdTimeMin = 1, .holdTimeMax = 10, .holdTimeDefault = 1 }; // New member
+        uint16_t mHoldTime = 1;
+        OccupancySensing::Structs::HoldTimeLimitsStruct::Type mHoldTimeLimits = { .holdTimeMin = 1, .holdTimeMax = 10, .holdTimeDefault = 1 };
     };
 
     OccupancySensingCluster(const Config & config);
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
+    DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & aDecoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+
+    DataModel::ActionReturnStatus SetHoldTime(uint16_t holdTime);
+    DataModel::ActionReturnStatus SetHoldTimeLimits(const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & holdTimeLimits);
 
 private:
     BitMask<OccupancySensing::Feature> mFeatureMap;

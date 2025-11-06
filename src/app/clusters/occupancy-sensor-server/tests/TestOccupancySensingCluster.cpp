@@ -19,6 +19,7 @@
 
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
+#include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/OccupancySensing/Attributes.h>
@@ -65,6 +66,19 @@ CHIP_ERROR ReadNumericAttribute(chip::app::DefaultServerCluster & cluster, chip:
     VerifyOrReturnError(attributeData.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
 
     return chip::app::DataModel::Decode(attributeData[0].dataReader, value);
+}
+
+// Helper function to write a value to an attribute.
+template <typename T>
+CHIP_ERROR WriteAttribute(chip::app::DefaultServerCluster & cluster, chip::AttributeId attributeId, const T & value)
+{
+    chip::Span<const chip::app::ConcreteClusterPath> paths = cluster.GetPaths();
+    VerifyOrReturnError(paths.size() == 1, CHIP_ERROR_INVALID_ARGUMENT);
+    const chip::app::ConcreteDataAttributePath path = { paths[0].mEndpointId, paths[0].mClusterId, attributeId };
+
+    chip::app::Testing::WriteOperation writeOperation(path);
+    chip::app::AttributeValueDecoder decoder = writeOperation.DecoderFor(value);
+    return cluster.WriteAttribute(writeOperation.GetRequest(), decoder).GetUnderlyingError();
 }
 
 // Helper function to read a struct attribute and decode its value.
@@ -150,11 +164,107 @@ TEST_F(TestOccupancySensingCluster, TestReadHoldTime)
     EXPECT_EQ(holdTime, kHoldTime);
 }
 
+TEST_F(TestOccupancySensingCluster, TestSetHoldTime)
+{
+    chip::Test::TestServerClusterContext context;
+    OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin = 10, .holdTimeMax = 200, .holdTimeDefault = 100 };
+    OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}.WithHoldTime(100, holdTimeLimitsConfig)};
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    // Verify that we can set a valid hold time
+    EXPECT_EQ(cluster.SetHoldTime(150), CHIP_NO_ERROR);
+    uint16_t holdTime;
+    EXPECT_EQ(ReadNumericAttribute(cluster, Attributes::HoldTime::Id, holdTime), CHIP_NO_ERROR);
+    EXPECT_EQ(holdTime, 150);
+
+    // Verify that setting the same value returns NoOp
+    EXPECT_EQ(cluster.SetHoldTime(150), DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
+
+    // Verify that we cannot set a hold time less than the minimum
+    EXPECT_EQ(cluster.SetHoldTime(5), Protocols::InteractionModel::Status::ConstraintError);
+
+    // Verify that we cannot set a hold time greater than the maximum
+    EXPECT_EQ(cluster.SetHoldTime(250), Protocols::InteractionModel::Status::ConstraintError);
+}
+
+TEST_F(TestOccupancySensingCluster, TestWriteHoldTimeAttribute)
+{
+    chip::Test::TestServerClusterContext context;
+    OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin = 10, .holdTimeMax = 200, .holdTimeDefault = 100 };
+    OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}.WithHoldTime(100, holdTimeLimitsConfig)};
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    // Verify that we can write a valid hold time
+    EXPECT_EQ(WriteAttribute(cluster, Attributes::HoldTime::Id, static_cast<uint16_t>(150)), CHIP_NO_ERROR);
+    uint16_t holdTime;
+    EXPECT_EQ(ReadNumericAttribute(cluster, Attributes::HoldTime::Id, holdTime), CHIP_NO_ERROR);
+    EXPECT_EQ(holdTime, 150);
+
+    // Verify that writing to an alias also works
+    EXPECT_EQ(WriteAttribute(cluster, Attributes::PIROccupiedToUnoccupiedDelay::Id, static_cast<uint16_t>(120)), CHIP_NO_ERROR);
+    EXPECT_EQ(ReadNumericAttribute(cluster, Attributes::HoldTime::Id, holdTime), CHIP_NO_ERROR);
+    EXPECT_EQ(holdTime, 120);
+
+    // Verify that we cannot write a hold time less than the minimum
+    EXPECT_EQ(WriteAttribute(cluster, Attributes::HoldTime::Id, static_cast<uint16_t>(5)), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+    // Verify that we cannot write a hold time greater than the maximum
+    EXPECT_EQ(WriteAttribute(cluster, Attributes::HoldTime::Id, static_cast<uint16_t>(250)), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+}
+
+TEST_F(TestOccupancySensingCluster, TestSetHoldTimeLimits)
+{
+    chip::Test::TestServerClusterContext context;
+    OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}.WithHoldTime(100, kDefaultHoldTimeLimits)};
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    // Verify that we can set valid hold time limits
+    OccupancySensing::Structs::HoldTimeLimitsStruct::Type newLimits = { .holdTimeMin = 20, .holdTimeMax = 100, .holdTimeDefault = 50 };
+    EXPECT_EQ(cluster.SetHoldTimeLimits(newLimits), Protocols::InteractionModel::Status::Success);
+
+    OccupancySensing::Structs::HoldTimeLimitsStruct::Type storedLimits;
+    EXPECT_EQ(ReadAttribute(cluster, Attributes::HoldTimeLimits::Id, storedLimits), CHIP_NO_ERROR);
+    EXPECT_EQ(storedLimits.holdTimeMin, 20);
+    EXPECT_EQ(storedLimits.holdTimeMax, 100);
+    EXPECT_EQ(storedLimits.holdTimeDefault, 50);
+
+    // Verify that setting the same value returns NoOp
+    EXPECT_EQ(cluster.SetHoldTimeLimits(newLimits), DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
+
+    // Verify coercion logic
+    newLimits = { .holdTimeMin = 0, .holdTimeMax = 10, .holdTimeDefault = 5 };
+    EXPECT_EQ(cluster.SetHoldTimeLimits(newLimits), Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(ReadAttribute(cluster, Attributes::HoldTimeLimits::Id, storedLimits), CHIP_NO_ERROR);
+    EXPECT_EQ(storedLimits.holdTimeMin, 1);
+    EXPECT_EQ(storedLimits.holdTimeMax, 10);
+    EXPECT_EQ(storedLimits.holdTimeDefault, 5);
+
+    newLimits = { .holdTimeMin = 15, .holdTimeMax = 10, .holdTimeDefault = 15 };
+    EXPECT_EQ(cluster.SetHoldTimeLimits(newLimits), Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(ReadAttribute(cluster, Attributes::HoldTimeLimits::Id, storedLimits), CHIP_NO_ERROR);
+    EXPECT_EQ(storedLimits.holdTimeMin, 15);
+    EXPECT_EQ(storedLimits.holdTimeMax, 15);
+    EXPECT_EQ(storedLimits.holdTimeDefault, 15);
+
+    newLimits = { .holdTimeMin = 10, .holdTimeMax = 20, .holdTimeDefault = 5 };
+    EXPECT_EQ(cluster.SetHoldTimeLimits(newLimits), Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(ReadAttribute(cluster, Attributes::HoldTimeLimits::Id, storedLimits), CHIP_NO_ERROR);
+    EXPECT_EQ(storedLimits.holdTimeMin, 10);
+    EXPECT_EQ(storedLimits.holdTimeMax, 20);
+    EXPECT_EQ(storedLimits.holdTimeDefault, 10);
+
+    newLimits = { .holdTimeMin = 10, .holdTimeMax = 20, .holdTimeDefault = 25 };
+    EXPECT_EQ(cluster.SetHoldTimeLimits(newLimits), Protocols::InteractionModel::Status::Success);
+    EXPECT_EQ(ReadAttribute(cluster, Attributes::HoldTimeLimits::Id, storedLimits), CHIP_NO_ERROR);
+    EXPECT_EQ(storedLimits.holdTimeMin, 10);
+    EXPECT_EQ(storedLimits.holdTimeMax, 20);
+    EXPECT_EQ(storedLimits.holdTimeDefault, 20);
+}
+
 TEST_F(TestOccupancySensingCluster, TestReadOccupancy)
 {
     chip::Test::TestServerClusterContext context;
-    OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}};
-    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}};    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     BitMask<OccupancySensing::OccupancyBitmap> occupancy;
     EXPECT_EQ(ReadAttribute(cluster, Attributes::Occupancy::Id, occupancy), CHIP_NO_ERROR);
@@ -387,7 +497,7 @@ TEST_F(TestOccupancySensingCluster, TestHoldTimeLimitsConstraints)
     }
 }
 
-TEST_F(TestOccupancySensingCluster, TestAttributeListMandatoryOnly)
+TEST_F(TestOccupancySensingCluster, TestAttributesMandatoryOnly)
 {
     chip::Test::TestServerClusterContext context;
     OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}};
@@ -408,7 +518,7 @@ TEST_F(TestOccupancySensingCluster, TestAttributeListMandatoryOnly)
     EXPECT_TRUE(EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
 }
 
-TEST_F(TestOccupancySensingCluster, TestAttributeListWithHoldTime)
+TEST_F(TestOccupancySensingCluster, TestAttributesWithHoldTime)
 {
     chip::Test::TestServerClusterContext context;
     constexpr uint16_t kHoldTime = 100;
