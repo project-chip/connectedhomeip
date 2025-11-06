@@ -43,7 +43,7 @@ DeviceInfoProvider::SupportedLocalesIterator * AllDevicesExampleDeviceInfoProvid
 size_t AllDevicesExampleDeviceInfoProviderImpl::AllDevicesSupportedLocalesIteratorImpl::Count()
 {
     // Hardcoded list of locales
-    // {("en-US")
+    // {("en-US")}
 
     return kNumSupportedLocales;
 }
