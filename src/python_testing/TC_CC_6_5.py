@@ -37,11 +37,10 @@ import asyncio
 import logging
 
 import chip.clusters as Clusters
-from chip.clusters import OnOff, Descriptor
+from chip.clusters import Descriptor, OnOff
 from chip.interaction_model import Status
-from matter_testing_infrastructure.chip.testing.matter_testing import (
-    MatterBaseTest, TestStep, async_test_body, default_matter_test_main,
-)
+from matter_testing_infrastructure.chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body,
+                                                                       default_matter_test_main)
 from mobly import asserts
 
 BOOT_WAIT_TIME = 10  # seconds
