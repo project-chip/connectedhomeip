@@ -37,7 +37,8 @@ select = [
     "SLOT",
 ]
 ignore = [
-    "COM812", # Do not enforce trailing commas in multi-line collections
+    "COM812", # Do not enforce trailing commas in multi-line collections for now
+    "LOG015", # Do not enforce non-root loggers in the entire codebase for now
     "E501", # Do not report line length issues (formatter should handle this)
     "E721", # We use it for good reasons
 ]

@@ -50,7 +50,7 @@ with open(compile_commands_path) as compile_commands_json:
         ]
 
         if len(compile_command) != 1:
-            raise Exception("Failed to resolve compile flags for %s" % src_file)
+            raise Exception(f"Failed to resolve compile flags for {src_file}")
 
         compile_command = compile_command[0]
         # Trim compiler, input and output
