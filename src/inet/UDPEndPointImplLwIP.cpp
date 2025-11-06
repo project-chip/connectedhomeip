@@ -221,19 +221,7 @@ void UDPEndPointImplLwIP::CloseImpl()
     if (mDelayReleaseCount != 0)
     {
         Ref();
-        // Capture the instance ID to validate this is still the same endpoint instance
-        uint32_t expectedInstanceId = mInstanceId.load();
-        CHIP_ERROR err              = GetSystemLayer().ScheduleLambda([this, expectedInstanceId] {
-            // Verify this is still the same endpoint instance by checking the instance ID
-            if (mInstanceId.load() != expectedInstanceId)
-            {
-                // This endpoint memory was reused for a new endpoint with different instance ID.
-                // The original endpoint this Unref was intended for is already gone.
-                return;
-            }
-
-            Unref();
-        });
+        CHIP_ERROR err = GetSystemLayer().ScheduleLambda([this] { Unref(); });
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Inet, "Unable to schedule lambda: %" CHIP_ERROR_FORMAT, err.Format());
@@ -390,24 +378,8 @@ void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb
     // pending on it.
     ep->mDelayReleaseCount++;
 
-    // Capture the instance ID to validate this is still the same endpoint instance
-    uint32_t expectedInstanceId = ep->mInstanceId.load();
-    CHIP_ERROR err              = ep->GetSystemLayer().ScheduleLambda(
-        [ep, expectedInstanceId, p = System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(buf), pktInfo = pktInfo.get()] {
-            // Critical check: Verify this lambda is for the correct endpoint instance
-            // by comparing the instance ID. If they don't match, the endpoint was
-            // deleted and new endpoint wascreated at the same memory address.
-            if (ep->mInstanceId.load() != expectedInstanceId)
-            {
-                // This is a stale lambda for a previously deleted endpoint.
-                // The memory was reused for a new endpoint with different instance ID.
-                // Note: We don't decrement mDelayReleaseCount here because:
-                // - The original endpoint's count is gone with the deleted endpoint
-                // - The new endpoint's count should not be decremented (it never had this packet)
-                pbuf_free(p);
-                return;
-            }
-
+    CHIP_ERROR err = ep->GetSystemLayer().ScheduleLambda(
+        [ep, p = System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(buf), pktInfo = pktInfo.get()] {
             ep->mDelayReleaseCount--;
 
             auto handle = System::PacketBufferHandle::Adopt(p);
@@ -430,6 +402,7 @@ void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb
             (void) sQueueFilter->FilterAfterDequeue(ep, *(pktInfo.get()), buf);
             ChipLogError(Inet, "Dequeue ERROR err = %" CHIP_ERROR_FORMAT, err.Format());
         }
+
         ep->mDelayReleaseCount--;
     }
 }

@@ -33,12 +33,7 @@ namespace Inet {
 class UDPEndPointImplLwIP : public UDPEndPoint, public EndPointStateLwIP
 {
 public:
-    UDPEndPointImplLwIP(EndPointManager<UDPEndPoint> & endPointManager) : UDPEndPoint(endPointManager), mUDP(nullptr)
-    {
-        // Generate a unique instance ID to detect endpoint reuse
-        static std::atomic<uint32_t> sNextInstanceId{ 1 };
-        mInstanceId.store(sNextInstanceId.fetch_add(1));
-    }
+    UDPEndPointImplLwIP(EndPointManager<UDPEndPoint> & endPointManager) : UDPEndPoint(endPointManager), mUDP(nullptr) {}
 
     // UDPEndPoint overrides.
     CHIP_ERROR SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback) override;
@@ -81,7 +76,6 @@ private:
 
     udp_pcb * mUDP; // LwIP User datagram protocol (UDP) control block.
     std::atomic_int mDelayReleaseCount{ 0 };
-    std::atomic<uint32_t> mInstanceId{ 0 }; // Unique endpoint ID
 
     static EndpointQueueFilter * sQueueFilter;
 };
