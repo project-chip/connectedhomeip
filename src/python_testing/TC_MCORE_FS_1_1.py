@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 #
 #    Copyright (c) 2024 Project CHIP Authors
 #    All rights reserved.
@@ -183,7 +184,7 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
         th_fsa_server_pid = await self.read_single_attribute_check_success(cluster=Clusters.BasicInformation, attribute=Clusters.BasicInformation.Attributes.ProductID, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0)
 
         event_path = [(dut_commissioning_control_endpoint, Clusters.CommissionerControl.Events.CommissioningRequestResult, 1)]
-        events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
+        events = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path)
 
         self.step("3a")
         good_request_id = 0x1234567812345678
@@ -195,10 +196,10 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
             self.wait_for_user_input("Approve Commissioning approval request on DUT using manufacturer specified mechanism")
 
         if not events:
-            new_event = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
+            new_event = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path)
         else:
             event_nums = [e.Header.EventNumber for e in events]
-            new_event = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path, eventNumberFilter=max(event_nums)+1)
+            new_event = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path, eventNumberFilter=max(event_nums)+1)
 
         asserts.assert_equal(len(new_event), 1, "Unexpected event list len")
         asserts.assert_equal(new_event[0].Data.statusCode, 0, "Unexpected status code")

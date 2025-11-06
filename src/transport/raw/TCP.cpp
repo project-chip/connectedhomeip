@@ -141,10 +141,9 @@ ActiveTCPConnectionState * TCPBase::AllocateConnection(const Inet::TCPEndPointHa
     {
         for (size_t i = 0; i < mActiveConnectionsSize; i++)
         {
-            if (!mActiveConnections[i].InUse())
+            ActiveTCPConnectionState * activeConnection = &mActiveConnections[i];
+            if (!activeConnection->InUse() && (activeConnection->GetReferenceCount() == 0))
             {
-                ActiveTCPConnectionState * activeConnection = &mActiveConnections[i];
-                VerifyOrDie(activeConnection->GetReferenceCount() == 0);
                 // Update state for the active connection
                 activeConnection->Init(endpoint, address, [this](auto & conn) { TCPDisconnect(conn, true); });
                 return activeConnection;
@@ -155,7 +154,14 @@ ActiveTCPConnectionState * TCPBase::AllocateConnection(const Inet::TCPEndPointHa
         // (i.e. that have a ref count of 0)
         for (size_t i = 0; i < mActiveConnectionsSize; i++)
         {
-            ActiveTCPConnectionHandle releaseUnclaimed(&mActiveConnections[i]);
+            ActiveTCPConnectionState * activeConnection = &mActiveConnections[i];
+            if (!activeConnection->InUse() && (activeConnection->GetReferenceCount() != 0))
+            {
+                char addrStr[Transport::PeerAddress::kMaxToStringSize];
+                activeConnection->mPeerAddr.ToString(addrStr);
+                ChipLogError(Inet, "Leaked TCP connection %p to %s.", activeConnection, addrStr);
+            }
+            ActiveTCPConnectionHandle releaseUnclaimed(activeConnection);
         }
     }
     return nullptr;
@@ -626,7 +632,15 @@ CHIP_ERROR TCPBase::DoHandleIncomingConnection(const Inet::TCPEndPointHandle & l
                                                uint16_t peerPort)
 {
     PeerAddress addr;
-    ReturnErrorOnFailure(GetPeerAddress(*endPoint, addr));
+    CHIP_ERROR getPeerError = GetPeerAddress(*endPoint, addr);
+    // See https://github.com/project-chip/connectedhomeip/issues/41746
+    // Failures here must be handled carefully so that broken connections
+    // continue to propagate to failure callbacks to avoid flaky tests
+    if (getPeerError != CHIP_NO_ERROR)
+    {
+        ChipLogFailure(getPeerError, Inet, "Failure getting peer info, using fallback");
+        addr = PeerAddress::TCP(peerAddress, peerPort, Inet::InterfaceId::Null());
+    }
     ActiveTCPConnectionState * activeConnection = AllocateConnection(endPoint, addr);
     if (activeConnection == nullptr)
     {
