@@ -1634,7 +1634,10 @@ class ChipDeviceControllerBase():
         return attrs
 
     async def TestOnlyWriteAttributeWithMismatchedTimedRequestField(self, nodeid: int,
-                                                                    attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor]],
+                                                                    attributes: typing.List[typing.Union[
+                                                                        typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor],
+                                                                        typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]
+                                                                    ]],
                                                                     timedRequestTimeoutMs: int,
                                                                     timedRequestFieldValue: bool,
                                                                     interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
@@ -1805,7 +1808,10 @@ class ChipDeviceControllerBase():
                                           forceLegacyListEncoding=False)
 
     async def _WriteAttribute(self, nodeId: int,
-                              attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor]],
+                              attributes: typing.List[typing.Union[
+                                  typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor],
+                                  typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]
+                              ]],
                               timedRequestTimeoutMs: typing.Optional[int] = None,
                               interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
                               payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD, forceLegacyListEncoding: bool = False):
