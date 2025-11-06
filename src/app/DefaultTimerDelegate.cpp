@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
+#include <app/DefaultTimerDelegate.h>
 #include <app/InteractionModelEngine.h>
-#include <app/TimerDelegateDefault.h>
 #include <system/SystemClock.h>
 
 using Timeout = chip::System::Clock::Timeout;
@@ -31,6 +31,7 @@ static void TimerCallbackInterface(System::Layer * aLayer, void * aAppState)
 }
 CHIP_ERROR DefaultTimerDelegate::StartTimer(TimerContext * context, Timeout aTimeout)
 {
+    // TODO(#41825): Remove the coupling of InteractionModelEngine
     return InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
         aTimeout, TimerCallbackInterface, context);
 }

@@ -184,11 +184,17 @@ source_set("static-support") {
 }
 
 source_set("timer-delegate") {
-  sources = [
-    "TimerDelegate.h",
-    "TimerDelegateMock.h",
-  ]
+  sources = [ "TimerDelegate.h" ]
   public_deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
+}
+
+source_set("timer-delegate-mock") {
+  sources = [ "TimerDelegateMock.h" ]
+  public_deps = [
+    ":timer-delegate",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
   ]

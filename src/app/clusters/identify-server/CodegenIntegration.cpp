@@ -23,8 +23,8 @@
 #include <app-common/zap-generated/ids/Commands.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/DefaultTimerDelegate.h>
 #include <app/InteractionModelEngine.h>
-#include <app/TimerDelegateDefault.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
@@ -148,9 +148,8 @@ Identify::Identify(EndpointId endpoint, onIdentifyStartCb onIdentifyStart, onIde
                    IdentifyTypeEnum identifyType, onEffectIdentifierCb onEffectIdentifier, EffectIdentifierEnum effectIdentifier,
                    EffectVariantEnum effectVariant, chip::TimerDelegate * timerDelegate) :
 
-    mOnIdentifyStart(onIdentifyStart),
-    mOnIdentifyStop(onIdentifyStop), mIdentifyType(identifyType), mOnEffectIdentifier(onEffectIdentifier),
-    mCurrentEffectIdentifier(effectIdentifier), mEffectVariant(effectVariant),
+    mOnIdentifyStart(onIdentifyStart), mOnIdentifyStop(onIdentifyStop), mIdentifyType(identifyType),
+    mOnEffectIdentifier(onEffectIdentifier), mCurrentEffectIdentifier(effectIdentifier), mEffectVariant(effectVariant),
     mCluster(chip::app::Clusters::IdentifyCluster::Config(endpoint, timerDelegate ? *timerDelegate : sDefaultTimerDelegate)
                  .WithIdentifyType(identifyType)
                  .WithDelegate(&gLegacyDelegate)

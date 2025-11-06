@@ -69,8 +69,8 @@
 static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeystore;
 #endif
 
+#include <app/DefaultTimerDelegate.h>
 #include <app/InteractionModelEngine.h>
-#include <app/TimerDelegateDefault.h>
 #include <data-model-providers/codegen/Instance.h>
 #include <headers/ProvisionManager.h>
 
