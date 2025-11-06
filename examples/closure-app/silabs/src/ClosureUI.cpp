@@ -125,49 +125,6 @@ void ClosureUI::SetMainState(chip::app::Clusters::ClosureControl::MainStateEnum 
     sMainState = state;
 }
 
-void ClosureUI::SetOverallCurrentState(const char * positionText, const char * latchText, const char * secureText,
-                                       const char * speedText)
-{
-    // Use fallback values for null parameters - build from prefix + suffix to avoid duplication
-    // Use snprintf for all cases to ensure null termination and avoid buffer overflows
-    if (positionText != nullptr)
-    {
-        snprintf(sPositionText, sizeof(sPositionText), "%s", positionText);
-    }
-    else
-    {
-        FormatText(sPositionText, sizeof(sPositionText), ClosureUIStrings::POSITION_PREFIX,
-                   ClosureUIStrings::POSITION_SUFFIX_UNKNOWN);
-    }
-
-    if (latchText != nullptr)
-    {
-        snprintf(sLatchText, sizeof(sLatchText), "%s", latchText);
-    }
-    else
-    {
-        FormatText(sLatchText, sizeof(sLatchText), ClosureUIStrings::LATCH_PREFIX, ClosureUIStrings::LATCH_SUFFIX_UNKNOWN);
-    }
-
-    if (secureText != nullptr)
-    {
-        snprintf(sSecureText, sizeof(sSecureText), "%s", secureText);
-    }
-    else
-    {
-        FormatText(sSecureText, sizeof(sSecureText), ClosureUIStrings::SECURE_PREFIX, ClosureUIStrings::SECURE_SUFFIX_UNKNOWN);
-    }
-
-    if (speedText != nullptr)
-    {
-        snprintf(sSpeedText, sizeof(sSpeedText), "%s", speedText);
-    }
-    else
-    {
-        FormatText(sSpeedText, sizeof(sSpeedText), ClosureUIStrings::SPEED_PREFIX, ClosureUIStrings::SPEED_SUFFIX_UNKNOWN);
-    }
-}
-
 void ClosureUI::DrawHeader(GLIB_Context_t * glibContext)
 {
     // Draw Silabs Corner icon

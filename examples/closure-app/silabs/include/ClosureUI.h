@@ -41,8 +41,6 @@ class ClosureUI
 public:
     static void DrawUI(GLIB_Context_t * glibContext);
     static void SetMainState(chip::app::Clusters::ClosureControl::MainStateEnum state);
-    static void SetOverallCurrentState(const char * positionText, const char * latchText, const char * secureText,
-                                       const char * speedText);
 
     static void FormatAndSetPosition(const char * suffix);
     static void FormatAndSetLatch(const char * suffix);
