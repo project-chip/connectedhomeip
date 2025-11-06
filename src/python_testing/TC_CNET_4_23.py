@@ -15,6 +15,7 @@
 #    limitations under the License.
 #
 
+import asyncio
 import logging
 
 from mobly import asserts
@@ -213,24 +214,53 @@ class TC_CNET_4_23(MatterBaseTest):
         # TH sends ScanNetworks command
         self.step(6)
 
-        response = await self.send_single_cmd(
-            endpoint=endpoint,
-            cmd=cnet.Commands.ScanNetworks()
-        )
+        # Retry scan up to 3 times if no networks found or target SSID not found
+        # WiFi scanning can be intermittent during commissioning
+        max_scan_retries = 3
+        scan_retry_delay = 2
+        ssids_found = []
+        target_ssid_found = False
 
-        # Verify that DUT sends the ScanNetworksResponse command to the TH with the following response fields:
-        asserts.assert_true(isinstance(response, cnet.Commands.ScanNetworksResponse),
-                            "Unexpected value returned from ScanNetworks")
-        # 1. wiFiScanResults contains the target network SSID
-        ssids_found = [network.ssid for network in response.wiFiScanResults]
-        logger.info(f"Scan results: Found {len(ssids_found)} networks")
+        for scan_attempt in range(max_scan_retries):
+            logger.info(f"ScanNetworks attempt {scan_attempt + 1}/{max_scan_retries}")
 
-        for i, ssid in enumerate(ssids_found):
-            logger.info(f"  Network {i}: {ssid} (type: {type(ssid)})")
+            response = await self.send_single_cmd(
+                endpoint=endpoint,
+                cmd=cnet.Commands.ScanNetworks()
+            )
 
-        asserts.assert_true(correct_ssid in ssids_found,
-                            f"Expected to find SSID '{correct_ssid.decode('utf-8') if isinstance(correct_ssid, bytes) else correct_ssid}' in scan results")
-        logger.info(f"ScanNetworks found SSID: {correct_ssid.decode('utf-8') if isinstance(correct_ssid, bytes) else correct_ssid}")
+            # Verify that DUT sends the ScanNetworksResponse command to the TH with the following response fields:
+            asserts.assert_true(isinstance(response, cnet.Commands.ScanNetworksResponse),
+                                "Unexpected value returned from ScanNetworks")
+
+            # 1. wiFiScanResults contains the target network SSID
+            ssids_found = [network.ssid for network in response.wiFiScanResults]
+            logger.info(f"Scan results: Found {len(ssids_found)} networks")
+
+            if len(ssids_found) > 0:
+                for i, ssid in enumerate(ssids_found):
+                    logger.info(f"Network {i}: {ssid} (type: {type(ssid)})")
+
+                # Check if target SSID is in the results
+                if correct_ssid in ssids_found:
+                    target_ssid_found = True
+                    logger.info(f"ScanNetworks found target SSID: {correct_ssid.decode('utf-8')} on attempt {scan_attempt + 1}")
+                    break
+                else:
+                    logger.warning(
+                        f"Target SSID '{correct_ssid.decode('utf-8')}' not found in scan results (attempt {scan_attempt + 1})")
+            else:
+                logger.warning(f"No networks found in scan (attempt {scan_attempt + 1})")
+
+            # If not found and not last attempt, wait before retry
+            if not target_ssid_found and scan_attempt < max_scan_retries - 1:
+                logger.info(f"Waiting {scan_retry_delay} seconds before retry...")
+                await asyncio.sleep(scan_retry_delay)
+
+        # After all retries, verify target SSID was found
+        asserts.assert_true(target_ssid_found,
+                            f"Expected to find SSID '{correct_ssid.decode('utf-8')}' in scan results after {max_scan_retries} attempts. "
+                            f"Last scan found {len(ssids_found)} network(s).")
 
         # TH sends AddOrUpdateWiFiNetwork with CORRECT credentials and Breadcrumb field set to 4
         self.step(7)
@@ -314,7 +344,9 @@ class TC_CNET_4_23(MatterBaseTest):
         # TH sends CommissioningComplete to finalize commissioning
         self.step(11)
 
+        # Send CommissioningComplete over the active PASE session
         response = await self.send_single_cmd(
+            endpoint=endpoint,
             cmd=cgen.Commands.CommissioningComplete(),
             timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
         )
