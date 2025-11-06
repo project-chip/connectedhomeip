@@ -121,7 +121,7 @@ class RunnerWaitQueue:
 
 
 @dataclass
-class Subprocess:
+class SubprocessInfo:
     kind: str
     path: pathlib.Path | str
     wrapper: tuple[str, ...] = ()
@@ -131,20 +131,20 @@ class Subprocess:
         self.path = pathlib.Path(self.path)
 
     def __repr__(self) -> str:
-        return 'Subprocess(kind={}, path={}, wrapper={}, args={})'.format(self.kind, self.path, self.wrapper, self.args)
+        return 'SubprocessInfo(kind={}, path={}, wrapper={}, args={})'.format(self.kind, self.path, self.wrapper, self.args)
 
     def with_args(self, *args: str):
-        return Subprocess(kind=self.kind, path=self.path, wrapper=self.wrapper, args=self.args + tuple(args))
+        return SubprocessInfo(kind=self.kind, path=self.path, wrapper=self.wrapper, args=self.args + tuple(args))
 
     def wrap_with(self, *args: str):
-        return Subprocess(kind=self.kind, path=self.path, wrapper=tuple(args) + self.wrapper, args=self.args)
+        return SubprocessInfo(kind=self.kind, path=self.path, wrapper=tuple(args) + self.wrapper, args=self.args)
 
     def to_cmd(self) -> typing.List[str]:
         return list(self.wrapper) + [str(self.path)] + list(self.args)
 
 
 class Executor:
-    def run(self, subproc: Subprocess, stdin, outpipe, errpipe):
+    def run(self, subproc: SubprocessInfo, stdin, outpipe, errpipe):
         s = subprocess.Popen(subproc.to_cmd(), stdin=stdin, stdout=outpipe, stderr=errpipe)
         outpipe.close()
         errpipe.close()
@@ -155,7 +155,7 @@ class LinuxNamespacedExecutor(Executor):
     def __init__(self, ns):
         self.ns = ns
 
-    def run(self, subproc: Subprocess, stdin, outpipe, errpipe):
+    def run(self, subproc: SubprocessInfo, stdin, outpipe, errpipe):
         wrapped = self.ns.wrap_in_namespace(subproc)
         s = subprocess.Popen(wrapped.to_cmd(), stdin=stdin, stdout=outpipe, stderr=errpipe)
         outpipe.close()
@@ -168,7 +168,7 @@ class Runner:
         self.executor = Executor() if executor is None else executor
         self.capture_delegate = capture_delegate
 
-    def RunSubprocess(self, subproc: Subprocess, name: str, wait=True, dependencies=[], timeout_seconds: typing.Optional[int] = None, stdin=None):
+    def RunSubprocess(self, subproc: SubprocessInfo, name: str, wait=True, dependencies=[], timeout_seconds: typing.Optional[int] = None, stdin=None):
         if sys.platform == 'darwin':
             # Try harder to avoid any stdout buffering in our tests
             subproc = subproc.wrap_with(('stdbuf', '-o0', '-i0'))

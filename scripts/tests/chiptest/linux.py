@@ -29,7 +29,7 @@ import time
 
 import sdbus
 
-from .runner import Subprocess
+from .runner import SubprocessInfo
 
 test_environ = os.environ.copy()
 
@@ -199,8 +199,8 @@ class IsolatedNetworkNamespace:
         for command in self.COMMANDS_TERMINATE:
             self.run(command)
 
-    def wrap_in_namespace(self, subprocess: Subprocess):
-        return subprocess.wrap_with(("ip", "netns", "exec", "{}-{}".format(subprocess.kind, self.index)))
+    def wrap_in_namespace(self, subproc: SubprocessInfo):
+        return subproc.wrap_with(("ip", "netns", "exec", "{}-{}".format(subproc.kind, self.index)))
 
 
 class DBusTestSystemBus(subprocess.Popen):
