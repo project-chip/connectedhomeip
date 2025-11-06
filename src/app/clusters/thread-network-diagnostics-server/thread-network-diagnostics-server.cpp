@@ -152,7 +152,7 @@ class ThreadDiagnosticsDelegate : public DeviceLayer::ThreadDiagnosticsDelegate
 
         Events::ConnectionStatus::Type event{ newConnectionStatus };
 
-        // ThreadNetworkDiagnostics cluster should exist only for endpoint 0.
+        // TODO: ThreadNetworkDiagnostics cluster can exist on other endpoints (SNI or NIM/TBR device types)
         if (emberAfContainsServer(kRootEndpointId, ThreadNetworkDiagnostics::Id))
         {
             // If Thread Network Diagnostics cluster is implemented on this endpoint
@@ -181,7 +181,7 @@ class ThreadDiagnosticsDelegate : public DeviceLayer::ThreadDiagnosticsDelegate
 
         Events::NetworkFaultChange::Type event{ currentList, previousList };
 
-        // ThreadNetworkDiagnostics cluster should exist only for endpoint 0.
+        // TODO: ThreadNetworkDiagnostics cluster can exist on other endpoints (SNI or NIM/TBR device types)
         if (emberAfContainsServer(kRootEndpointId, ThreadNetworkDiagnostics::Id))
         {
             // If Thread Network Diagnostics cluster is implemented on this endpoint

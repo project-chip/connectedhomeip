@@ -260,7 +260,7 @@ class TC_DRLK_2_13(MatterBaseTest):
             self.step(step)
         try:
             flags = ["DRLK.S.F0d", "DRLK.S.C24.Rsp", "DRLK.S.C25.Tx"]
-            if self.pics_guard(all([self.check_pics(p) for p in flags])):
+            if self.pics_guard(all(self.check_pics(p) for p in flags)):
                 credentials_struct = cluster.Structs.CredentialStruct(credentialIndex=credentialIndex,
                                                                       credentialType=credentialType)
                 response = await self.send_single_cmd(endpoint=self.app_cluster_endpoint, timedRequestTimeoutMs=1000,

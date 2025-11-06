@@ -563,6 +563,10 @@
 #include <clusters/WaterHeaterMode/Commands.ipp>
 #include <clusters/WaterHeaterMode/Events.ipp>
 #include <clusters/WaterHeaterMode/Structs.ipp>
+#include <clusters/WaterTankLevelMonitoring/Attributes.ipp>
+#include <clusters/WaterTankLevelMonitoring/Commands.ipp>
+#include <clusters/WaterTankLevelMonitoring/Events.ipp>
+#include <clusters/WaterTankLevelMonitoring/Structs.ipp>
 #include <clusters/WebRTCTransportProvider/Attributes.ipp>
 #include <clusters/WebRTCTransportProvider/Commands.ipp>
 #include <clusters/WebRTCTransportProvider/Events.ipp>
@@ -1080,6 +1084,13 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
         }
     }
     case Clusters::ActivatedCarbonFilterMonitoring::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::WaterTankLevelMonitoring::Id: {
         switch (aCommand)
         {
         default:

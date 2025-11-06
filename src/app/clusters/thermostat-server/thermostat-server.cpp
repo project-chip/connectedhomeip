@@ -633,7 +633,22 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
     }
     break;
     case ScheduleTypes::Id: {
-        return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR { return CHIP_NO_ERROR; });
+        auto delegate = GetDelegate(aPath.mEndpointId);
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
+
+        return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
+            for (uint8_t i = 0; true; i++)
+            {
+                ScheduleTypeStruct::Type scheduleType;
+                auto err = delegate->GetScheduleTypeAtIndex(i, scheduleType);
+                if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+                {
+                    return CHIP_NO_ERROR;
+                }
+                ReturnErrorOnFailure(err);
+                ReturnErrorOnFailure(encoder.Encode(scheduleType));
+            }
+        });
     }
     break;
     case Schedules::Id: {
@@ -1070,7 +1085,7 @@ Status MatterThermostatClusterServerPreAttributeChangedCallback(const app::Concr
         requested = *value;
         if (!AutoSupported)
             return Status::UnsupportedAttribute;
-        if (requested < 0 || requested > 25)
+        if (requested < 0 || requested > 127)
             return Status::InvalidValue;
         return Status::Success;
     }

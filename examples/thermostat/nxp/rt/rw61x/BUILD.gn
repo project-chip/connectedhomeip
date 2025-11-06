@@ -89,6 +89,9 @@ rt_sdk("sdk") {
   # Indicate the default path to OpenThreadConfig.h
   include_dirs += [ "${example_platform_dir}/app/project_include/openthread" ]
 
+  # Indicate the default path to WiFiUserConfig.h
+  include_dirs += [ "${example_platform_dir}/app/project_include/WiFi" ]
+
   # For matter with BR feature, increase FreeRTOS heap size and enable TBR cluster
   # Additionally in the context of OTBR support the freeRTOS heap should be big enough to allow to handle a large number of mDNS packets
   if (chip_enable_wifi && chip_enable_openthread) {
@@ -96,6 +99,10 @@ rt_sdk("sdk") {
       "configTOTAL_HEAP_SIZE=(size_t)(250 * 1024)",
       "CHIP_DEVICE_CONFIG_ENABLE_TBR=1",
     ]
+  }
+
+  if (chip_enable_wifi) {
+    defines += [ "WIFI_USER_CONFIG_FILE=<WiFiUserConfig.h>" ]
   }
 
   defines += [

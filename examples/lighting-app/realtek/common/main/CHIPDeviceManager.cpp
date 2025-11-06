@@ -31,11 +31,11 @@
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <core/ErrorStr.h>
 #include <dac_provider/CommonDACProvider.h>
-#include <platform/realtek/BEE/FactoryDataProvider.h>
+#include <platform/realtek/freertos/FactoryDataProvider.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #if CONFIG_USE_CG_SECURE_DAC_VENDOR
-#include <platform/realtek/BEE/CG/CGSecureDACVendorProvider.h>
+#include <platform/realtek/freertos/CG/CGSecureDACVendorProvider.h>
 #endif
 
 #if CHIP_ENABLE_OPENTHREAD
