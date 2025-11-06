@@ -60,12 +60,11 @@ public:
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     };
 
-    GeneralCommissioningCluster(Context && context) :
+    GeneralCommissioningCluster(Context && context, const OptionalAttributes & attrs) :
         DefaultServerCluster({ kRootEndpointId, GeneralCommissioning::Id }), mClusterContext(std::move(context)),
-        mOptionalAttributes(0)
+        mOptionalAttributes(attrs)
     {}
 
-    OptionalAttributes & GetOptionalAttributes() { return mOptionalAttributes; }
     Context & ClusterContext() { return mClusterContext; }
 
     void SetBreadCrumb(uint64_t value) final;
@@ -99,7 +98,7 @@ public:
 
 private:
     Context mClusterContext;
-    OptionalAttributes mOptionalAttributes;
+    const OptionalAttributes mOptionalAttributes;
     uint64_t mBreadCrumb = 0;
 
     std::optional<DataModel::ActionReturnStatus>

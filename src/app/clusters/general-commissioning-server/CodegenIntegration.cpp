@@ -60,20 +60,19 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
 
-        gServer.Create(GeneralCommissioningCluster::Context {
-            .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
-                .configurationManager   = DeviceLayer::ConfigurationMgr(),                       //
-                .deviceControlServer    = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
-                .fabricTable            = Server::GetInstance().GetFabricTable(),                //
-                .failsafeContext        = Server::GetInstance().GetFailSafeContext(),            //
-                .platformManager        = DeviceLayer::PlatformMgr(),                            //
+        gServer.Create(
+            GeneralCommissioningCluster::Context {
+                .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
+                    .configurationManager   = DeviceLayer::ConfigurationMgr(),                       //
+                    .deviceControlServer    = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
+                    .fabricTable            = Server::GetInstance().GetFabricTable(),                //
+                    .failsafeContext        = Server::GetInstance().GetFailSafeContext(),            //
+                    .platformManager        = DeviceLayer::PlatformMgr(),                            //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-                .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+                    .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-        });
-
-        // Configure optional attributes based on fetched bits
-        gServer.Cluster().GetOptionalAttributes() = GeneralCommissioningCluster::OptionalAttributes(optionalAttributeBits);
+            },
+            GeneralCommissioningCluster::OptionalAttributes(optionalAttributeBits));
 
         return gServer.Registration();
     }
