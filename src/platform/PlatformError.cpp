@@ -53,9 +53,6 @@ const char * DescribePlatformError(CHIP_ERROR aError)
 #else
     static char errBuf[128];
 #endif // CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE
-    // Use strerror() and copy into a thread-local buffer. We intentionally do
-    // not attempt to use strerror_r here to avoid cross-toolchain incompatibilities
-    // between the POSIX (int) and GNU (char*) variants.
 
     const char * s = strerror(lError);
     if (s != nullptr)
