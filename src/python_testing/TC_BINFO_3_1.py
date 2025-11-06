@@ -45,6 +45,15 @@ from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_b
 
 class TC_BINFO_3_1(MatterBaseTest):
     async def read_binfo_attribute_expect_success(self, endpoint, attribute):
+        """Read a Basic Information cluster attribute and verify the read succeeds.
+
+        Args:
+            endpoint: The endpoint ID to read the attribute from.
+            attribute: The Basic Information cluster attribute to read.
+
+        Returns:
+            The attribute value read from the device.
+        """
         cluster = Clusters.Objects.BasicInformation
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
@@ -79,46 +88,53 @@ class TC_BINFO_3_1(MatterBaseTest):
         return pics
 
     @async_test_body
+    async def setup_test(self):
+        """Validate required PIXIT parameters before test execution."""
+        asserts.assert_true("PIXIT.BINFO.Finish" in self.matter_test_config.global_test_params,
+                            "PIXIT.BINFO.Finish must be included on the command line in "
+                            "the --int-arg flag as PIXIT.BINFO.Finish:<finish_value>")
+        self.pixit_finish = self.matter_test_config.global_test_params["PIXIT.BINFO.Finish"]
+
+        asserts.assert_true("PIXIT.BINFO.PrimaryColor" in self.matter_test_config.global_test_params,
+                            "PIXIT.BINFO.PrimaryColor must be included on the command line in "
+                            "the --int-arg flag as PIXIT.BINFO.PrimaryColor:<primary_color_value>")
+        self.pixit_primary_color = self.matter_test_config.global_test_params["PIXIT.BINFO.PrimaryColor"]
+
+        await super().setup_test()
+
+    @async_test_body
     async def test_TC_BINFO_3_1(self):
 
         endpoint = self.get_endpoint(default=0)
         attributes = Clusters.BasicInformation.Attributes
 
         # Read ProductAppearance once and reuse for all steps since the attribute value doesn't change
-        productAppearance = await self.read_binfo_attribute_expect_success(
+        product_appearance = await self.read_binfo_attribute_expect_success(
             endpoint=endpoint, attribute=attributes.ProductAppearance)
-        asserts.assert_is_not_none(productAppearance, "ProductAppearance attribute read failed")
+        asserts.assert_is_not_none(product_appearance, "ProductAppearance attribute read failed")
 
         self.step(1)
-        asserts.assert_greater_equal(productAppearance.finish, 0, "Finish value is below minimum range")
-        asserts.assert_less_equal(productAppearance.finish, 5, "Finish value is above maximum range")
+        asserts.assert_greater_equal(product_appearance.finish, 0, "Finish value is below minimum range")
+        asserts.assert_less_equal(product_appearance.finish, 5, "Finish value is above maximum range")
 
         self.step(2)
-        asserts.assert_greater_equal(productAppearance.primaryColor, 0, "PrimaryColor value is below minimum range")
-        asserts.assert_less_equal(productAppearance.primaryColor, 20, "PrimaryColor value is above maximum range")
+        asserts.assert_greater_equal(product_appearance.primaryColor, 0, "PrimaryColor value is below minimum range")
+        asserts.assert_less_equal(product_appearance.primaryColor, 20, "PrimaryColor value is above maximum range")
 
         self.step(3)
         # Vendor specific test: This step should verify the actual Finish value matches PIXIT.BINFO.Finish
         # For example, if PIXIT.BINFO.Finish is satin(2), the test should verify finish == 2
-        asserts.assert_true("PIXIT.BINFO.Finish" in self.matter_test_config.global_test_params,
-                            "PIXIT.BINFO.Finish must be included on the command line in "
-                            "the --int-arg flag as PIXIT.BINFO.Finish:<finish_value>")
-        pixit_finish = self.matter_test_config.global_test_params["PIXIT.BINFO.Finish"]
-        asserts.assert_equal(productAppearance.finish, pixit_finish,
-                             (f"ProductAppearance.Finish ({productAppearance.finish}) "
-                              f"does not match PIXIT.BINFO.Finish ({pixit_finish})\n"
+        asserts.assert_equal(product_appearance.finish, self.pixit_finish,
+                             (f"ProductAppearance.Finish ({product_appearance.finish}) "
+                              f"does not match PIXIT.BINFO.Finish ({self.pixit_finish})\n"
                               "Please verify the PIXIT.BINFO.Finish setting and try again."))
 
         self.step(4)
         # Vendor specific test: This step should verify the actual PrimaryColor value matches PIXIT.BINFO.PrimaryColor
         # For example, if PIXIT.BINFO.PrimaryColor is purple(5), the test should verify primaryColor == 5
-        asserts.assert_true("PIXIT.BINFO.PrimaryColor" in self.matter_test_config.global_test_params,
-                            "PIXIT.BINFO.PrimaryColor must be included on the command line in "
-                            "the --int-arg flag as PIXIT.BINFO.PrimaryColor:<primary_color_value>")
-        pixit_primary_color = self.matter_test_config.global_test_params["PIXIT.BINFO.PrimaryColor"]
-        asserts.assert_equal(productAppearance.primaryColor, pixit_primary_color,
-                             (f"ProductAppearance.PrimaryColor ({productAppearance.primaryColor})\n"
-                              f"does not match PIXIT.BINFO.PrimaryColor ({pixit_primary_color})\n"
+        asserts.assert_equal(product_appearance.primaryColor, self.pixit_primary_color,
+                             (f"ProductAppearance.PrimaryColor ({product_appearance.primaryColor}) "
+                              f"does not match PIXIT.BINFO.PrimaryColor ({self.pixit_primary_color})\n"
                               "Please verify the PIXIT.BINFO.PrimaryColor setting and try again."))
 
 
