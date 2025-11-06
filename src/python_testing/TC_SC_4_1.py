@@ -677,7 +677,7 @@ class TC_SC_4_1(MatterBaseTest):
 
     async def close_commissioning_window(self) -> None:
         revoke_cmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
-        await self.default_controller.SendCommand(nodeid=self.dut_node_id,
+        await self.default_controller.SendCommand(nodeId=self.dut_node_id,
                                                   endpoint=0,
                                                   payload=revoke_cmd,
                                                   timedRequestTimeoutMs=6000)
@@ -756,7 +756,7 @@ class TC_SC_4_1(MatterBaseTest):
             self.step(6)
             logging.info("\n\n\t ** Open Basic Commissioning Window supported\n")
             await self.default_controller.SendCommand(
-                nodeid=self.dut_node_id,
+                nodeId=self.dut_node_id,
                 endpoint=0,
                 payload=obcw_cmd,
                 timedRequestTimeoutMs=6000
@@ -811,7 +811,7 @@ class TC_SC_4_1(MatterBaseTest):
         #   - DUT starts advertising Commissionable Node Discovery services
         self.step(15)
         await self.default_controller.OpenCommissioningWindow(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             timeout=180,
             iteration=10000,
             discriminator=long_discriminator,
