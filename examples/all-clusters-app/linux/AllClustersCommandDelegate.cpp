@@ -52,6 +52,9 @@ using namespace chip::DeviceLayer;
 
 namespace {
 
+// Maximum value for TotalOperationalHours per specification (0xFFFFFFFE)
+constexpr uint32_t kMaxTotalOperationalHours = 0xFFFFFFFE;
+
 std::unique_ptr<ButtonEventsSimulator> sButtonSimulatorInstance{ nullptr };
 
 bool HasNumericField(Json::Value & jsonValue, const std::string & field)
@@ -606,9 +609,10 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
 
         uint32_t hours = static_cast<uint32_t>(self->mJsonValue["Hours"].asUInt());
         // Validate the value is within valid range (max value is 0xFFFFFFFE per specification)
-        if (hours > 0xFFFFFFFE)
+        if (hours > kMaxTotalOperationalHours)
         {
-            ChipLogError(NotSpecified, "TotalOperationalHours value %u is out of valid range (0 to 0xFFFFFFFE)", hours);
+            ChipLogError(NotSpecified, "TotalOperationalHours value %u is out of valid range (0 to %u)", hours,
+                         kMaxTotalOperationalHours);
             return;
         }
 
