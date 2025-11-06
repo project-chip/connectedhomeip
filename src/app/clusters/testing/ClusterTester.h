@@ -134,7 +134,14 @@ public:
         std::optional<ResponseType> response;
 
         // Returns true if the command was successful and response is available
-        bool IsSuccess() const { return status.has_value() && status->IsSuccess() && response.has_value(); }
+        bool IsSuccess() const
+        { 
+            if constexpr (std::is_same_v<ResponseType, app::DataModel::NullObjectType>)
+                return status.has_value() && status->IsSuccess();
+            else
+                return status.has_value() && status->IsSuccess() && response.has_value();
+
+        }
     };
 
     // Invoke a command and return the decoded result.
