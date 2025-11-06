@@ -52,6 +52,7 @@ public:
         StreamUsageEnum streamUsage;
         Optional<DataModel::Nullable<uint16_t>> videoStreamId;
         Optional<DataModel::Nullable<uint16_t>> audioStreamId;
+        Optional<Structs::SFrameStruct::Type> sFrameConfig;
         Optional<std::vector<ICEServerDecodableStruct>> iceServers;
         Optional<std::string> iceTransportPolicy;
         NodeId peerNodeId;
@@ -243,6 +244,23 @@ public:
     virtual CHIP_ERROR ValidateAudioStreamID(uint16_t audioStreamId) = 0;
 
     /**
+     * @brief
+     *   Checks if the given StreamUsage is in the StreamUsagePriorities list.
+     *
+     *   This method is called during SolicitOffer and ProvideOffer command processing
+     *   to ensure that the requested stream usage is supported by the device according
+     *   to its configured priorities.
+     *
+     * @param[in] streamUsage  The stream usage to check.
+     *
+     * @return CHIP_ERROR
+     *   - CHIP_NO_ERROR - StreamUsage is found in StreamUsagePriorities.
+     *   - CHIP_ERROR_NOT_FOUND - StreamUsage is not in the StreamUsagePriorities list.
+     *   - Other error codes - For failures reading the attribute itself
+     */
+    virtual CHIP_ERROR IsStreamUsageSupported(Globals::StreamUsageEnum streamUsage) = 0;
+
+    /**
      * @brief Check whether hard privacy mode is active.
      *
      * Reads the HardPrivacyModeOn attribute from the CameraAvStreamManagement cluster.
@@ -293,6 +311,40 @@ public:
      * @return false if no audio streams are currently allocated.
      */
     virtual bool HasAllocatedAudioStreams() = 0;
+
+    /**
+     * @brief Validates the SFrame configuration including cipher suite and base key length.
+     *
+     * The implementation SHALL ensure:
+     *  - The cipher suite is a supported value (e.g., AES-128-GCM or AES-256-GCM).
+     *  - The base key length matches the expected length for the specified cipher suite.
+     *
+     * @param[in] cipherSuite    The cipher suite identifier from the SFrame configuration.
+     * @param[in] baseKeyLength  The length of the base key in bytes.
+     *
+     * @return CHIP_ERROR CHIP_NO_ERROR if the SFrame configuration is valid; an appropriate error code otherwise.
+     */
+    virtual CHIP_ERROR ValidateSFrameConfig(uint16_t cipherSuite, size_t baseKeyLength) = 0;
+
+    /**
+     * @brief Checks if the Time Synchronization cluster's UTCTime attribute is null.
+     *
+     * Per the Matter spec, when ICEServer URLs with scheme 'turns' or 'stuns' are provided,
+     * the Time Synchronization cluster's UTCTime attribute must not be null. This method
+     * allows the WebRTC Transport Provider cluster to perform this cross-cluster validation.
+     *
+     * The implementation SHALL:
+     *  - Read the UTCTime attribute from the Time Synchronization cluster (0x0038)
+     *  - Return whether the attribute is null or has a valid value
+     *
+     * @param[out] isNull  Set to true if UTCTime is null, false if it has a valid value.
+     *
+     * @return CHIP_ERROR
+     *   - CHIP_NO_ERROR on success (isNull indicates the state)
+     *   - CHIP_ERROR_NOT_FOUND if Time Synchronization cluster is not present
+     *   - Other appropriate error codes for read failures
+     */
+    virtual CHIP_ERROR IsUTCTimeNull(bool & isNull) = 0;
 };
 
 class WebRTCTransportProviderServer : public AttributeAccessInterface, public CommandHandlerInterface
@@ -362,6 +414,9 @@ private:
     UpsertResultEnum UpsertSession(const WebRTCSessionStruct & session);
     CHIP_ERROR GenerateSessionId(uint16_t & outSessionId);
     Protocols::InteractionModel::Status CheckPrivacyModes(const char * commandName, StreamUsageEnum streamUsage);
+    Protocols::InteractionModel::Status
+    CheckTurnsOrStunsRequiresUTCTime(const char * commandName,
+                                     const Optional<DataModel::DecodableList<ICEServerDecodableStruct>> & iceServers);
 
     // Command Handlers
     void HandleSolicitOffer(HandlerContext & ctx, const Commands::SolicitOffer::DecodableType & req);

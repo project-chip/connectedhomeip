@@ -42,7 +42,10 @@ using Status = Protocols::InteractionModel::Status;
 uint16_t ReadHandler::GetPublisherSelectedIntervalLimit()
 {
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    return std::chrono::duration_cast<System::Clock::Seconds16>(ICDConfigurationData::GetInstance().GetIdleModeDuration()).count();
+    // We don't need to check for precision loss since the max value of the IdleModeDuration can fit inside a uint16_t
+    const auto idleModeDuration =
+        std::chrono::duration_cast<System::Clock::Seconds16>(ICDConfigurationData::GetInstance().GetIdleModeDuration()).count();
+    return std::max(idleModeDuration, kSubscriptionMaxIntervalPublisherLimit);
 #else
     return kSubscriptionMaxIntervalPublisherLimit;
 #endif
@@ -416,7 +419,7 @@ void ReadHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeConte
             ChipLogError(DataManagement, "Trigger check-in message when non-priming subscription report times out");
             if (mSessionHandle)
             {
-                chip::app::ICDNotifier::GetInstance().NotifySendCheckIn(GetSubjectDescriptor());
+                ICDNotifier::GetInstance().NotifySendCheckIn(GetSubjectDescriptor());
             }
             else
             {
@@ -778,8 +781,7 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     // If the next interval is greater than the MaxIntervalCeiling, use the MaxIntervalCeiling.
     // Otherwise, use IdleModeDuration as MaxInterval
 
-    // GetPublisherSelectedIntervalLimit() returns the IdleModeDuration if the device is an ICD
-    uint32_t decidedMaxInterval = GetPublisherSelectedIntervalLimit();
+    uint32_t decidedMaxInterval = ICDConfigurationData::GetInstance().GetIdleModeDuration().count();
 
     // Check if the PublisherSelectedIntervalLimit is 0. If so, set decidedMaxInterval to MaxIntervalCeiling
     if (decidedMaxInterval == 0)

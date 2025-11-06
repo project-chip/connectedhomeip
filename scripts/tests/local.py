@@ -38,7 +38,18 @@ import coloredlogs
 import tabulate
 import yaml
 
-from matter.testing.metadata import extract_runs_args
+try:
+    from matter.testing.metadata import extract_runs_args  # May fail if python environment not built yet
+except ImportError:
+    # Fallback to manual import from source tree
+    _MATTER_TESTING_PATH = os.path.join(os.path.dirname(
+        __file__), '..', '..', 'src', 'python_testing', 'matter_testing_infrastructure')
+    if _MATTER_TESTING_PATH not in sys.path:
+        sys.path.insert(0, _MATTER_TESTING_PATH)
+    try:
+        from matter.testing.metadata import extract_runs_args
+    except ImportError:
+        extract_runs_args = None  # filtering by app (--app-filter) will not work.
 
 
 def _get_apps_from_script(path: str) -> List[str]:
@@ -341,7 +352,7 @@ __RUNNERS__ = {
 __LOG_LEVELS__ = {
     "debug": logging.DEBUG,
     "info": logging.INFO,
-    "warn": logging.WARN,
+    "warn": logging.WARNING,
     "fatal": logging.FATAL,
 }
 
@@ -446,7 +457,7 @@ def _do_build_basic_apps(coverage: Optional[bool]):
     """
     logging.info("Building example apps...")
 
-    all_targets = dict([(t.key, t) for t in _get_targets(coverage)])
+    all_targets = {t.key: t for t in _get_targets(coverage)}
     targets = [
         all_targets["CHIP_TOOL"].target,
         all_targets["ALL_CLUSTERS_APP"].target,
@@ -563,7 +574,7 @@ class FilterList:
     filters: list[GlobFilter]
 
     def any_matches(self, txt: str) -> bool:
-        return any([f.matches(txt) for f in self.filters])
+        return any(f.matches(txt) for f in self.filters)
 
 
 def _parse_filters(entry: str) -> FilterList:
@@ -866,6 +877,8 @@ def python_tests(
 
     app_filter_list = None
     if app_filter:
+        if not extract_runs_args:
+            raise Exception("`--app-filter` requires the python testing environment: ./scripts/tests/local.py build-python")
         app_filter_list = _parse_filters(app_filter)
 
     if skip:
@@ -892,12 +905,12 @@ def python_tests(
         os.mkdir(fail_log_dir)
 
     metadata = yaml.full_load(open("src/python_testing/test_metadata.yaml"))
-    excluded_patterns = set([item["name"] for item in metadata["not_automated"]])
+    excluded_patterns = {item["name"] for item in metadata["not_automated"]}
 
     # NOTE: for slow tests. we add logs to not get impatient
-    slow_test_duration = dict(
-        [(item["name"], item["duration"]) for item in metadata["slow_tests"]]
-    )
+    slow_test_duration = {
+        item["name"]: item["duration"] for item in metadata["slow_tests"]
+    }
 
     if not os.path.isdir("src/python_testing"):
         raise Exception(
@@ -1220,9 +1233,9 @@ def chip_tool_tests(
     cmd.extend(["--exclude-tags", "EXTRA_SLOW"])
     cmd.extend(["--exclude-tags", "PURPOSEFUL_FAILURE"])
 
-    paths = dict(
-        [(t.key, f"./out/{t.target}/{t.binary}") for t in _get_targets(coverage)]
-    )
+    paths = {
+        t.key: f"./out/{t.target}/{t.binary}" for t in _get_targets(coverage)
+    }
 
     if runner == BinaryRunner.COVERAGE:
         # when running with coveage, chip-tool also is covered

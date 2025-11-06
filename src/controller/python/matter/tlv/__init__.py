@@ -716,19 +716,17 @@ def tlvTagToSortKey(tag):
 
 
 if __name__ == "__main__":
-    val = dict(
-        [
-            (1, 0),
-            (2, 65536),
-            (3, True),
-            (4, None),
-            (5, "Hello!"),
-            (6, bytearray([0xDE, 0xAD, 0xBE, 0xEF])),
-            (7, ["Goodbye!", 71024724507, False]),
-            ((0x235A0000, 42), "FOO"),
-            ((None, 42), "BAR"),
-        ]
-    )
+    val = {
+        1: 0,
+        2: 65536,
+        3: True,
+        4: None,
+        5: "Hello!",
+        6: bytearray([0xDE, 0xAD, 0xBE, 0xEF]),
+        7: ["Goodbye!", 71024724507, False],
+        (0x235A0000, 42): "FOO",
+        (None, 42): "BAR",
+    }
 
     writer = TLVWriter()
     encodedVal = writer.put(None, val)

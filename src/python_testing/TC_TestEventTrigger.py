@@ -49,7 +49,7 @@ from matter.testing.matter_testing import MatterBaseTest, async_test_body, defau
 
 # Assumes `--enable-key 000102030405060708090a0b0c0d0e0f` on Linux app command line, or a DUT
 # that has that Enable Key
-kExpectedKey = bytes([b for b in range(16)])
+kExpectedKey = bytes(list(range(16)))
 
 kBadKey = bytes([(b + 1) for b in range(16)])
 

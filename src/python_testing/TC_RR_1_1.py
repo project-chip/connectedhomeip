@@ -299,7 +299,7 @@ class TC_RR_1_1(MatterBaseTest):
             logging.info(
                 f"-> Fabric at FabricIndex={fabric.fabricIndex}, FabricID: {fabric.fabricID}, NodeID: {fabric.nodeID}, Root Public key: {base64.b64encode(fabric.rootPublicKey)}")
 
-        asserts.assert_equal(set([f.fabricIndex for f in fabric_table]), set(fabric_table_entries_to_check.keys(
+        asserts.assert_equal({f.fabricIndex for f in fabric_table}, set(fabric_table_entries_to_check.keys(
         )), "Fabric table read did not have matching fabricIndex entries compared to expected fabrics configured!")
 
         for fabric in fabric_table:
@@ -370,7 +370,7 @@ class TC_RR_1_1(MatterBaseTest):
             logging.info("Establishing subscription %d/%d from controller node %s" % (sub_idx + 1, len(client_list), client.name))
 
             sub = await client.ReadAttribute(
-                nodeid=self.dut_node_id,
+                nodeId=self.dut_node_id,
                 attributes=subscription_contents,
                 reportInterval=(min_report_interval_sec, max_report_interval_sec),
                 keepSubscriptions=False

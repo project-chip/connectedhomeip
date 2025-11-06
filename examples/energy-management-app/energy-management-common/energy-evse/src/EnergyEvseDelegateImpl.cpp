@@ -368,6 +368,10 @@ Status EnergyEvseDelegate::SetTargets(
     VerifyOrReturnError(targets != nullptr, Status::Failure);
 
     CHIP_ERROR err = targets->SetTargets(chargingTargetSchedules);
+    if (err == CHIP_ERROR_NO_MEMORY)
+    {
+        return Status::ResourceExhausted;
+    }
     VerifyOrReturnError(err == CHIP_NO_ERROR, StatusIB(err).mStatus);
 
     /* The Application needs to be told that the Targets have been updated

@@ -58,7 +58,7 @@ jobs:
                         --copy-artifacts-to objdir-clone \
                      "
             - name: Uploading binaries
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v5
               if: ${{ !env.ACT }}
               with:
                   name: objdir-linux
@@ -92,7 +92,7 @@ jobs:
                         --copy-artifacts-to objdir-clone \
                      "
             - name: Uploading binaries
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v5
               if: ${{ !env.ACT }}
               with:
                   name: crash-darwin

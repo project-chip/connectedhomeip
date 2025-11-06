@@ -397,7 +397,7 @@ class TC_TLSCLIENT(MatterBaseTest):
         self.step(18)
         endpoints2 = await cr2_cmd.read_tls_client_attribute(attributes.ProvisionedEndpoints)
         asserts.assert_equal(len(endpoints2), max_provisioned)
-        found_endpoints = dict()
+        found_endpoints = {}
         for ep in endpoints2:
             found_endpoints[ep.endpointID] = ep
         for i in range(1, max_provisioned+1):
@@ -426,7 +426,7 @@ class TC_TLSCLIENT(MatterBaseTest):
         self.step(23)
         endpoints2 = await cr2_cmd.read_tls_client_attribute(attributes.ProvisionedEndpoints)
         asserts.assert_equal(len(endpoints2), max_provisioned)
-        found_endpoints = dict()
+        found_endpoints = {}
         for ep in endpoints2:
             found_endpoints[ep.endpointID] = ep
         for i in range(2, max_provisioned+2):
