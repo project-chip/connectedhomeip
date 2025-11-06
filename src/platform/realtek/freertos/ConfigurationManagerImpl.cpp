@@ -24,10 +24,10 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include "RTKConfig.h"
 #include <platform/ConfigurationManager.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
-#include <platform/realtek/BEE/BeeConfig.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
@@ -48,10 +48,10 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     uint32_t rebootCount;
 
     // Force initialization of NVS namespaces if they doesn't already exist.
-    err = BeeConfig::InitNamespace();
+    err = RTKConfig::InitNamespace();
     SuccessOrExit(err);
 
-    if (BeeConfig::ConfigValueExists(BeeConfig::kCounterKey_RebootCount))
+    if (RTKConfig::ConfigValueExists(RTKConfig::kCounterKey_RebootCount))
     {
         err = GetRebootCount(rebootCount);
         SuccessOrExit(err);
@@ -66,20 +66,20 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         SuccessOrExit(err);
     }
 
-    if (!BeeConfig::ConfigValueExists(BeeConfig::kCounterKey_TotalOperationalHours))
+    if (!RTKConfig::ConfigValueExists(RTKConfig::kCounterKey_TotalOperationalHours))
     {
         err = StoreTotalOperationalHours(0);
         SuccessOrExit(err);
     }
 
-    if (!BeeConfig::ConfigValueExists(BeeConfig::kCounterKey_BootReason))
+    if (!RTKConfig::ConfigValueExists(RTKConfig::kCounterKey_BootReason))
     {
         err = StoreBootReason(to_underlying(BootReasonType::kUnspecified));
         SuccessOrExit(err);
     }
 
     // Initialize the generic implementation base class.
-    err = Internal::GenericConfigurationManagerImpl<BeeConfig>::Init();
+    err = Internal::GenericConfigurationManagerImpl<RTKConfig>::Init();
     SuccessOrExit(err);
 
     err = CHIP_NO_ERROR;
@@ -90,32 +90,32 @@ exit:
 
 CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
 {
-    return ReadConfigValue(BeeConfig::kCounterKey_RebootCount, rebootCount);
+    return ReadConfigValue(RTKConfig::kCounterKey_RebootCount, rebootCount);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::StoreRebootCount(uint32_t rebootCount)
 {
-    return WriteConfigValue(BeeConfig::kCounterKey_RebootCount, rebootCount);
+    return WriteConfigValue(RTKConfig::kCounterKey_RebootCount, rebootCount);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
 {
-    return ReadConfigValue(BeeConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
+    return ReadConfigValue(RTKConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOperationalHours)
 {
-    return WriteConfigValue(BeeConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
+    return WriteConfigValue(RTKConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
 {
-    return ReadConfigValue(BeeConfig::kCounterKey_BootReason, bootReason);
+    return ReadConfigValue(RTKConfig::kCounterKey_BootReason, bootReason);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::StoreBootReason(uint32_t bootReason)
 {
-    return WriteConfigValue(BeeConfig::kCounterKey_BootReason, bootReason);
+    return WriteConfigValue(RTKConfig::kCounterKey_BootReason, bootReason);
 }
 
 bool ConfigurationManagerImpl::CanFactoryReset()
@@ -131,7 +131,7 @@ void ConfigurationManagerImpl::InitiateFactoryReset()
 
 CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
 {
-    BeeConfig::Key configKey{ BeeConfig::kConfigNamespace_ChipCounters, key };
+    RTKConfig::Key configKey{ RTKConfig::kConfigNamespace_ChipCounters, key };
 
     CHIP_ERROR err = ReadConfigValue(configKey, value);
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
@@ -143,68 +143,68 @@ CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform:
 
 CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)
 {
-    BeeConfig::Key configKey{ BeeConfig::kConfigNamespace_ChipCounters, key };
+    RTKConfig::Key configKey{ RTKConfig::kConfigNamespace_ChipCounters, key };
     return WriteConfigValue(configKey, value);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, bool & val)
 {
-    return BeeConfig::ReadConfigValue(key, val);
+    return RTKConfig::ReadConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, uint32_t & val)
 {
-    return BeeConfig::ReadConfigValue(key, val);
+    return RTKConfig::ReadConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, uint64_t & val)
 {
-    return BeeConfig::ReadConfigValue(key, val);
+    return RTKConfig::ReadConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
-    return BeeConfig::ReadConfigValueStr(key, buf, bufSize, outLen);
+    return RTKConfig::ReadConfigValueStr(key, buf, bufSize, outLen);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
-    return BeeConfig::ReadConfigValueBin(key, buf, bufSize, outLen);
+    return RTKConfig::ReadConfigValueBin(key, buf, bufSize, outLen);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, bool val)
 {
-    return BeeConfig::WriteConfigValue(key, val);
+    return RTKConfig::WriteConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, uint32_t val)
 {
-    return BeeConfig::WriteConfigValue(key, val);
+    return RTKConfig::WriteConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, uint64_t val)
 {
-    return BeeConfig::WriteConfigValue(key, val);
+    return RTKConfig::WriteConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(Key key, const char * str)
 {
-    return BeeConfig::WriteConfigValueStr(key, str);
+    return RTKConfig::WriteConfigValueStr(key, str);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(Key key, const char * str, size_t strLen)
 {
-    return BeeConfig::WriteConfigValueStr(key, str, strLen);
+    return RTKConfig::WriteConfigValueStr(key, str, strLen);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
-    return BeeConfig::WriteConfigValueBin(key, data, dataLen);
+    return RTKConfig::WriteConfigValueBin(key, data, dataLen);
 }
 
 void ConfigurationManagerImpl::RunConfigUnitTest(void)
 {
-    BeeConfig::RunConfigUnitTest();
+    RTKConfig::RunConfigUnitTest();
 }
 
 void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
@@ -214,7 +214,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     ChipLogProgress(DeviceLayer, "Performing factory reset");
 
     // Erase all values in the chip-config NVS namespace.
-    err = BeeConfig::ClearNamespace();
+    err = RTKConfig::ClearNamespace();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "ClearNamespace() failed: %" CHIP_ERROR_FORMAT, err.Format());

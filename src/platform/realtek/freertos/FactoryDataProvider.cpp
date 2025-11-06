@@ -16,6 +16,7 @@
  */
 
 #include "FactoryDataProvider.h"
+#include "CHIPDevicePlatformConfig.h"
 #include "FactoryDataDecoder.h"
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
@@ -27,7 +28,6 @@
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
-#include <platform/realtek/BEE/CHIPDevicePlatformConfig.h>
 
 #if CONFIG_FACTORY_DATA
 #define FACTORY_DATA_BUFFER_LEN (2560)

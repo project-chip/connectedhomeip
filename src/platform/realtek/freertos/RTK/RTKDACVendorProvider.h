@@ -21,7 +21,7 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
-#include <platform/realtek/BEE/FactoryDataProvider.h>
+#include <platform/realtek/freertos/FactoryDataProvider.h>
 #if FEATURE_TRUSTZONE_ENABLE && CONFIG_DAC_KEY_ENC
 #include "rtk/include/nsc_veneer_customize.h"
 #endif

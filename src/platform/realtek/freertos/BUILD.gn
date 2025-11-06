@@ -22,14 +22,12 @@ declare_args() {
   chip_use_cg_secure_dac_vendor = false
 }
 
-static_library("BEE") {
+static_library("freertos") {
   sources = [
     "//src/platform/FreeRTOS/SystemTimeSupport.cpp",
     "//src/platform/SingletonConfigurationManager.cpp",
     "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
-    "BeeConfig.cpp",
-    "BeeConfig.h",
     "BlePlatformConfig.h",
     "CHIPDevicePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
@@ -51,6 +49,8 @@ static_library("BEE") {
     "OTAImageProcessorImpl.h",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
+    "RTKConfig.cpp",
+    "RTKConfig.h",
     "SystemPlatformConfig.h",
   ]
 

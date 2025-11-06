@@ -133,7 +133,7 @@ class TC_CNET_4_9(MatterBaseTest):
 
         # Verify that there is a single connected network across ALL network commissioning clusters
         for ep in networks_dict:
-            connected_network_count[ep] = sum(map(lambda x: x.connected, networks_dict[ep]))
+            connected_network_count[ep] = sum((x.connected for x in networks_dict[ep]))
             logging.info(f"Connected networks count by endpoint: {connected_network_count}")
             asserts.assert_equal(sum(connected_network_count.values()), 1,
                                  "Verify that only one entry has connected status as TRUE across ALL endpoints")

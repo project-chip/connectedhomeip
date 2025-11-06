@@ -503,7 +503,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         # Heating/cooling unit was provisional, then removed in 1.3
         # https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/5541
         asserts.assert_equal(set(one_two.keys() - set(one_three.keys())),
-                             set([0x0300]), "1.2 contains unexpected device types not in 1.3")
+                             {0x0300}, "1.2 contains unexpected device types not in 1.3")
         asserts.assert_equal(len(one_four.keys()), len(one_four_one.keys()),
                              "Number of device types in 1.4 and 1.4.1 does not match")
         asserts.assert_equal(set(one_three.keys()) - set(one_four.keys()),
@@ -553,10 +553,10 @@ class TestSpecParsingDeviceType(MatterBaseTest):
                 print(f'{d.name}: {d.superset_of_device_type_name} {d.superset_of_device_type_id}')
         supersets = get_supersets(self.xml_device_types)
 
-        expected_light_superset = set([self.dt_ids['extendedcolorlight'],
-                                       self.dt_ids['colortemperaturelight'], self.dt_ids['dimmablelight'], self.dt_ids['onofflight']])
-        expected_dimmer_switch = set([self.dt_ids['colordimmerswitch'],
-                                     self.dt_ids['dimmerswitch'], self.dt_ids['onofflightswitch']])
+        expected_light_superset = {self.dt_ids['extendedcolorlight'],
+                                   self.dt_ids['colortemperaturelight'], self.dt_ids['dimmablelight'], self.dt_ids['onofflight']}
+        expected_dimmer_switch = {self.dt_ids['colordimmerswitch'],
+                                  self.dt_ids['dimmerswitch'], self.dt_ids['onofflightswitch']}
 
         asserts.assert_in(expected_light_superset, supersets, "Did not find expected light superset")
         asserts.assert_in(expected_dimmer_switch, supersets, "Did not find expected switch superset")
@@ -566,12 +566,12 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         self._create_xmls(PrebuiltDataModelDirectory.k1_4_2)
         supersets = get_supersets(self.xml_device_types)
 
-        expected_onoff_plugin = set([self.dt_ids['mountedonoffcontrol'], self.dt_ids['onoffpluginunit']])
-        expected_dimmable_plugin = set([self.dt_ids['mounteddimmableloadcontrol'], self.dt_ids['dimmablepluginunit']])
-        expected_light_superset = set([self.dt_ids['extendedcolorlight'],
-                                       self.dt_ids['colortemperaturelight'], self.dt_ids['dimmablelight'], self.dt_ids['onofflight']])
-        expected_dimmer_switch = set([self.dt_ids['colordimmerswitch'],
-                                     self.dt_ids['dimmerswitch'], self.dt_ids['onofflightswitch']])
+        expected_onoff_plugin = {self.dt_ids['mountedonoffcontrol'], self.dt_ids['onoffpluginunit']}
+        expected_dimmable_plugin = {self.dt_ids['mounteddimmableloadcontrol'], self.dt_ids['dimmablepluginunit']}
+        expected_light_superset = {self.dt_ids['extendedcolorlight'],
+                                   self.dt_ids['colortemperaturelight'], self.dt_ids['dimmablelight'], self.dt_ids['onofflight']}
+        expected_dimmer_switch = {self.dt_ids['colordimmerswitch'],
+                                  self.dt_ids['dimmerswitch'], self.dt_ids['onofflightswitch']}
 
         asserts.assert_in(expected_light_superset, supersets, "Did not find expected light superset")
         asserts.assert_in(expected_dimmer_switch, supersets, "Did not find expected switch superset")
@@ -603,8 +603,8 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         superset_tree = self._build_superset_tree()
         supersets = get_supersets(superset_tree)
         # We should see separate lines
-        asserts.assert_in(set([1, 2, 3]), supersets, "Did not find expected superset in tree")
-        asserts.assert_in(set([4, 3]), supersets, "Did not find expected superset in tree")
+        asserts.assert_in({1, 2, 3}, supersets, "Did not find expected superset in tree")
+        asserts.assert_in({4, 3}, supersets, "Did not find expected superset in tree")
 
     @run_against_all_spec_revisions
     def test_supersets_on_endpoints_mocks(self):

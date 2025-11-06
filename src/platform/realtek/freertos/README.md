@@ -3,7 +3,8 @@
 The following is an overview of the Realtek adaptation of CHIP. Most of this
 code will have parallels in any new adaptation.
 
-(All file names are relative to `connectedhomeip/src/platform/realtek/BEE...`).
+(All file names are relative to
+`connectedhomeip/src/platform/realtek/freertos...`).
 
 `PlatformManagerImpl.h`<br>`PlatformManagerImpl.cpp`
 

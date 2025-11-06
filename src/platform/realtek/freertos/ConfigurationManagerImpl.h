@@ -19,14 +19,14 @@
 /**
  *    @file
  *          Provides an implementation of the ConfigurationManager object
- *          for the Bee platform.
+ *          for the Realtek platform.
  */
 
 #pragma once
 
+#include "RTKConfig.h"
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
-#include <platform/realtek/BEE/BeeConfig.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -34,7 +34,7 @@ namespace DeviceLayer {
 /**
  * Concrete implementation of the ConfigurationManager singleton object for the Bee platform.
  */
-class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<Internal::BeeConfig>
+class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<Internal::RTKConfig>
 {
 public:
     // This returns an instance of this class.

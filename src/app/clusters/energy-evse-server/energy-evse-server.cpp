@@ -449,6 +449,12 @@ Status Instance::ValidateTargets(
             innerIdx++;
         }
 
+        if (innerIdx > kEvseTargetsMaxTargetsPerDay)
+        {
+            ChipLogError(AppServer, "Too many targets in a single ChargingTargetScheduleStruct (%d)", innerIdx);
+            return Status::ResourceExhausted;
+        }
+
         if (iterInner.GetStatus() != CHIP_NO_ERROR)
         {
             return Status::InvalidCommand;
