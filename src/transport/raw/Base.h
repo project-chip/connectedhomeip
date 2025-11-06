@@ -40,7 +40,7 @@ namespace Transport {
 struct MessageTransportContext
 {
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    ActiveTCPConnectionHolder conn;
+    ActiveTCPConnectionHandle conn;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 };
 
@@ -53,7 +53,7 @@ public:
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     virtual void HandleConnectionReceived(ActiveTCPConnectionState & conn){};
-    virtual void HandleConnectionAttemptComplete(ActiveTCPConnectionHolder & conn, CHIP_ERROR conErr){};
+    virtual void HandleConnectionAttemptComplete(ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr){};
     virtual void HandleConnectionClosed(ActiveTCPConnectionState & conn, CHIP_ERROR conErr){};
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 };
@@ -100,7 +100,7 @@ public:
      * Connect to the specified peer.
      */
     virtual CHIP_ERROR TCPConnect(const PeerAddress & address, Transport::AppTCPConnectionCallbackCtxt * appState,
-                                  ActiveTCPConnectionHolder & peerConnState)
+                                  ActiveTCPConnectionHandle & peerConnState)
     {
         return CHIP_NO_ERROR;
     }
@@ -133,7 +133,7 @@ protected:
 
     // Callback during connection establishment to notify of success or any
     // error.
-    void HandleConnectionAttemptComplete(ActiveTCPConnectionHolder & conn, CHIP_ERROR conErr)
+    void HandleConnectionAttemptComplete(ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr)
     {
         mDelegate->HandleConnectionAttemptComplete(conn, conErr);
     }

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020, 2025 Project CHIP Authors
  *    Copyright (c) 2020 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -20,7 +20,7 @@
 /**
  *    @file
  *          Provides the implementation of the Device Layer ConfigurationManager object
- *          for K32W platforms using the NXP SDK.
+ *          for NXP MCXW7X platforms using the NXP SDK.
  */
 
 /* this file behaves like a config.h, comes first */
@@ -33,16 +33,17 @@
 #include <src/platform/nxp/mcxw71/SMU2Manager.h>
 #endif
 
-// #include <openthread/platform/misc.h>
 #include "fsl_cmc.h"
 #include "fsl_device_registers.h"
+
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+#include "OtaSupport.h"
+#endif
 
 namespace chip {
 namespace DeviceLayer {
 
 using namespace ::chip::DeviceLayer::Internal;
-
-// TODO: Define a Singleton instance of CHIP Group Key Store here
 
 ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 {
@@ -50,10 +51,51 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
     return sInstance;
 }
 
+CHIP_ERROR ConfigurationManagerImpl::DetermineBootReason(uint32_t reason)
+{
+    BootReasonType bootReason = BootReasonType::kUnspecified;
+
+    if ((reason & CMC_SRS_POR_MASK) || (reason & CMC_SRS_PIN_MASK))
+    {
+        bootReason = BootReasonType::kPowerOnReboot;
+    }
+    else if (reason & CMC_SRS_SW_MASK)
+    {
+        bootReason = BootReasonType::kSoftwareReset;
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+        OtaImgState_t img_state = OTA_GetImgState();
+        if (img_state == OtaImgState_RunCandidate)
+        {
+            bootReason = BootReasonType::kSoftwareUpdateCompleted;
+        }
+#endif
+    }
+    else if ((reason & CMC_SRS_WDOG0_MASK) || (reason & CMC_SRS_WDOG1_MASK))
+    {
+        bootReason = BootReasonType::kSoftwareWatchdogReset;
+    }
+    else
+    {
+        bootReason = BootReasonType::kUnspecified;
+    }
+
+    return StoreBootReason(to_underlying(bootReason));
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreSoftwareUpdateCompleted()
+{
+    /* Empty implementation*/
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
     uint32_t rebootCount = 0;
+
+    // Initialize the generic implementation base class.
+    err = Internal::GenericConfigurationManagerImpl<NXPConfig>::Init();
+    SuccessOrExit(err);
 
     if (NXPConfig::ConfigValueExists(NXPConfig::kCounterKey_RebootCount))
     {
@@ -76,15 +118,14 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         SuccessOrExit(err);
     }
 
+    err = DetermineBootReason(CMC_GetSystemResetStatus(CMC0));
+    SuccessOrExit(err);
+
     if (!NXPConfig::ConfigValueExists(NXPConfig::kCounterKey_BootReason))
     {
         err = StoreBootReason(to_underlying(BootReasonType::kUnspecified));
         SuccessOrExit(err);
     }
-
-    // Initialize the generic implementation base class.
-    err = Internal::GenericConfigurationManagerImpl<NXPConfig>::Init();
-    SuccessOrExit(err);
 
     // TODO: Initialize the global GroupKeyStore object here
 
@@ -94,61 +135,34 @@ exit:
     return err;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::StoreSoftwareUpdateCompleted()
+CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
-    /* Empty implementation*/
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
+CHIP_ERROR ConfigurationManagerImpl::GetUniqueId(char * buf, size_t bufSize)
 {
-    return ReadConfigValue(NXPConfig::kCounterKey_RebootCount, rebootCount);
+    CHIP_ERROR err;
+    size_t uniqueIdLen = 0; // without counting null-terminator
+    err                = ReadConfigValueStr(NXPConfig::kConfigKey_UniqueId, buf, bufSize, uniqueIdLen);
+
+    ReturnErrorOnFailure(err);
+
+    VerifyOrReturnError(uniqueIdLen < bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(buf[uniqueIdLen] == 0, CHIP_ERROR_INVALID_STRING_LENGTH);
+
+    return err;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::StoreRebootCount(uint32_t rebootCount)
+CHIP_ERROR ConfigurationManagerImpl::StoreUniqueId(const char * uniqueId, size_t uniqueIdLen)
 {
-    return WriteConfigValue(NXPConfig::kCounterKey_RebootCount, rebootCount);
+    return WriteConfigValueStr(NXPConfig::kConfigKey_UniqueId, uniqueId, uniqueIdLen);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
+CHIP_ERROR ConfigurationManagerImpl::GenerateUniqueId(char * buf, size_t bufSize)
 {
-    return ReadConfigValue(NXPConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
-}
-
-CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOperationalHours)
-{
-    return WriteConfigValue(NXPConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
-}
-
-CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
-{
-    bootReason = to_underlying(BootReasonType::kUnspecified);
-
-    uint32_t reason = CMC_GetSystemResetStatus(CMC0);
-
-    if ((reason & CMC_SRS_POR_MASK) || (reason & CMC_SRS_PIN_MASK))
-    {
-        bootReason = to_underlying(BootReasonType::kPowerOnReboot);
-    }
-    else if (reason & CMC_SRS_SW_MASK)
-    {
-        bootReason = to_underlying(BootReasonType::kSoftwareReset);
-    }
-    else if ((reason & CMC_SRS_WDOG0_MASK) || (reason & CMC_SRS_WDOG1_MASK))
-    {
-        bootReason = to_underlying(BootReasonType::kSoftwareWatchdogReset);
-    }
-    else
-    {
-        bootReason = to_underlying(BootReasonType::kUnspecified);
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConfigurationManagerImpl::StoreBootReason(uint32_t bootReason)
-{
-    return WriteConfigValue(NXPConfig::kCounterKey_BootReason, bootReason);
+    uint64_t randomUniqueId = Crypto::GetRandU64();
+    return Encoding::BytesToUppercaseHexString(reinterpret_cast<uint8_t *>(&randomUniqueId), sizeof(uint64_t), buf, bufSize);
 }
 
 bool ConfigurationManagerImpl::CanFactoryReset()
@@ -280,11 +294,41 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     // Restart the system.
     ChipLogProgress(DeviceLayer, "System restarting");
 
-    NVIC_SystemReset();
+#if CONFIG_CHIP_NXP_PLATFORM_MCXW71
+    PlatformMgrImpl().Reset();
+#else
+    PlatformMgrImpl().ScheduleResetInIdle();
+#endif
+}
 
-    while (1)
-    {
-    }
+CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
+{
+    return ReadConfigValue(NXPConfig::kCounterKey_RebootCount, rebootCount);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreRebootCount(uint32_t rebootCount)
+{
+    return WriteConfigValue(NXPConfig::kCounterKey_RebootCount, rebootCount);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
+{
+    return ReadConfigValue(NXPConfig::kCounterKey_BootReason, bootReason);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreBootReason(uint32_t bootReason)
+{
+    return WriteConfigValue(NXPConfig::kCounterKey_BootReason, bootReason);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
+{
+    return ReadConfigValue(NXPConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOperationalHours)
+{
+    return WriteConfigValue(NXPConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
 }
 
 ConfigurationManager & ConfigurationMgrImpl()

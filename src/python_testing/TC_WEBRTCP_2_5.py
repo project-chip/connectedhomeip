@@ -58,7 +58,7 @@ class TC_WebRTCP_2_5(MatterBaseTest, WEBRTCPTestBase):
         Define the step-by-step sequence for the test.
         """
         steps = [
-            TestStep("precondition", "DUT commissioned ", is_commissioning=True),
+            TestStep("precondition", "DUT commissioned", is_commissioning=True),
             TestStep(1, "Read CurrentSessions attribute => expect 0"),
             TestStep(2, "Send SolicitOffer with no audio or video id => expect INVALID_COMMAND"),
             TestStep(3, "Send SolicitOffer with valid parameters, audio and video stream IDs are Null => expect INVALID_IN_STATE"),

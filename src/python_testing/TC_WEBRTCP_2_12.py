@@ -56,6 +56,7 @@ class TC_WEBRTCP_2_12(MatterBaseTest, WEBRTCPTestBase):
 
     def steps_TC_WEBRTCP_2_12(self) -> list[TestStep]:
         steps = [
+            TestStep("precondition", "DUT commissioned", is_commissioning=True),
             TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
                      "DUT responds with success and provides stream IDs"),
             TestStep(2, "TH sends multiple SolicitOffer commands to exhaust the DUT's capacity for WebRTC sessions (DUT-specific limit)",
@@ -84,6 +85,8 @@ class TC_WEBRTCP_2_12(MatterBaseTest, WEBRTCPTestBase):
         Executes the test steps for validating SolicitOffer resource exhaustion.
         """
 
+        self.step("precondition")
+        # Commission DUT - already done
         endpoint = self.get_endpoint(default=1)
 
         self.step(1)

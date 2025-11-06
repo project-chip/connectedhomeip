@@ -796,7 +796,12 @@ cluster Binding = 30 {
       and enforce Access Control for the Node's endpoints and their associated
       cluster instances. */
 cluster AccessControl = 31 {
-  revision 2;
+  revision 3;
+
+  enum AccessControlAuxiliaryTypeEnum : enum8 {
+    kSystem = 0;
+    kGroupcast = 1;
+  }
 
   enum AccessControlEntryAuthModeEnum : enum8 {
     kPASE = 1 [spec_name = "PASE"];
@@ -828,6 +833,7 @@ cluster AccessControl = 31 {
   bitmap Feature : bitmap32 {
     kExtension = 0x1;
     kManagedDevice = 0x2;
+    kAuxiliary = 0x4;
   }
 
   struct AccessRestrictionStruct {
@@ -859,6 +865,7 @@ cluster AccessControl = 31 {
     fabric_sensitive AccessControlEntryAuthModeEnum authMode = 2;
     nullable fabric_sensitive int64u subjects[] = 3;
     nullable fabric_sensitive AccessControlTargetStruct targets[] = 4;
+    optional fabric_sensitive AccessControlAuxiliaryTypeEnum auxiliaryType = 5;
     fabric_idx fabricIndex = 254;
   }
 
@@ -890,6 +897,11 @@ cluster AccessControl = 31 {
     fabric_idx fabricIndex = 254;
   }
 
+  fabric_sensitive info event access(read: administer) AuxiliaryAccessUpdated = 3 {
+    nullable node_id adminNodeID = 0;
+    fabric_idx fabricIndex = 254;
+  }
+
   attribute access(read: administer, write: administer) AccessControlEntryStruct acl[] = 0;
   attribute access(read: administer, write: administer) optional AccessControlExtensionStruct extension[] = 1;
   readonly attribute int16u subjectsPerAccessControlEntry = 2;
@@ -897,6 +909,7 @@ cluster AccessControl = 31 {
   readonly attribute int16u accessControlEntriesPerFabric = 4;
   readonly attribute optional CommissioningAccessRestrictionEntryStruct commissioningARL[] = 5;
   readonly attribute optional AccessRestrictionEntryStruct arl[] = 6;
+  readonly attribute access(read: administer) optional AccessControlEntryStruct auxiliaryACL[] = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -3087,12 +3100,12 @@ cluster IcdManagement = 70 {
     int32u promisedActiveDuration = 0;
   }
 
-  /** Register a client to the end device */
+  /** This command allows a client to register itself with the ICD to be notified when the device is available for communication. */
   fabric command access(invoke: manage) RegisterClient(RegisterClientRequest): RegisterClientResponse = 0;
-  /** Unregister a client from an end device */
+  /** This command allows a client to unregister itself with the ICD. */
   fabric command access(invoke: manage) UnregisterClient(UnregisterClientRequest): DefaultSuccess = 2;
-  /** Request the end device to stay in Active Mode for an additional ActiveModeThreshold */
-  command access(invoke: manage) StayActiveRequest(StayActiveRequestRequest): StayActiveResponse = 3;
+  /** This command allows a client to request that the server stays in active mode for at least a given time duration (in milliseconds) from when this command is received. */
+  command StayActiveRequest(StayActiveRequestRequest): StayActiveResponse = 3;
 }
 
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of an Oven. */
@@ -5106,10 +5119,19 @@ cluster PowerTopology = 156 {
     kTreeTopology = 0x2;
     kSetTopology = 0x4;
     kDynamicPowerFlow = 0x8;
+    kElectricalCircuit = 0x10;
+  }
+
+  fabric_scoped struct CircuitNodeStruct {
+    node_id node = 1;
+    optional endpoint_no endpoint = 2;
+    optional char_string<128> label = 3;
+    fabric_idx fabricIndex = 254;
   }
 
   readonly attribute optional endpoint_no availableEndpoints[] = 0;
   readonly attribute optional endpoint_no activeEndpoints[] = 1;
+  attribute optional CircuitNodeStruct electricalCircuitNodes[] = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -7877,13 +7899,13 @@ endpoint 0 {
   }
 
   server cluster LocalizationConfiguration {
-    persist  attribute activeLocale default = "en-US";
+    ram      attribute activeLocale default = "en-US";
     callback attribute supportedLocales;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap default = 0;
+    callback attribute clusterRevision;
   }
 
   server cluster TimeFormatLocalization {
@@ -8236,8 +8258,8 @@ endpoint 0 {
 
   server cluster UserLabel {
     callback attribute labelList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster IcdManagement {
@@ -8279,12 +8301,12 @@ endpoint 1 {
   binding cluster OnOff;
 
   server cluster Identify {
-    ram      attribute identifyTime default = 0x0000;
-    ram      attribute identifyType default = 0x0;
+    callback attribute identifyTime;
+    callback attribute identifyType;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
 
     handle command Identify;
@@ -8418,8 +8440,8 @@ endpoint 1 {
 
   server cluster UserLabel {
     callback attribute labelList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster BooleanState {
@@ -9620,12 +9642,12 @@ endpoint 2 {
 
 
   server cluster Identify {
-    ram      attribute identifyTime default = 0x0000;
-    ram      attribute identifyType default = 0x00;
+    callback attribute identifyTime;
+    callback attribute identifyType;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
 
     handle command Identify;
@@ -9742,12 +9764,12 @@ endpoint 3 {
 
 
   server cluster Identify {
-    ram      attribute identifyTime default = 0x0000;
-    ram      attribute identifyType default = 0x00;
+    callback attribute identifyTime;
+    callback attribute identifyType;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
 
     handle command Identify;
@@ -9784,12 +9806,12 @@ endpoint 4 {
 
 
   server cluster Identify {
-    ram      attribute identifyTime default = 0x0000;
-    ram      attribute identifyType default = 0x00;
+    callback attribute identifyTime;
+    callback attribute identifyType;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 

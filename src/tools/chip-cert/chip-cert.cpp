@@ -32,7 +32,7 @@ namespace {
 
 // clang-format off
 const char * const sHelp =
-    "Usage: chip <command> [ <args...> ]\n"
+    "Usage: chip-cert <command> [ <args...> ]\n"
     "\n"
     "Commands:\n"
     "\n"
@@ -55,6 +55,8 @@ const char * const sHelp =
     "    gen-cd -- Generate a CHIP certification declaration signed message.\n"
     "\n"
     "    print-cd -- Print a CHIP certification declaration (CD) content.\n"
+    "\n"
+    "    print-tlv -- Print a CHIP TLV structure.\n"
     "\n"
     "    version -- Print the program version and exit.\n"
     "\n";
@@ -132,6 +134,10 @@ int main(int argc, char * argv[])
     else if (strcasecmp(argv[1], "print-cd") == 0 || strcasecmp(argv[1], "printcd") == 0)
     {
         res = Cmd_PrintCD(argc - 1, argv + 1);
+    }
+    else if (strcasecmp(argv[1], "print-tlv") == 0 || strcasecmp(argv[1], "printtlv") == 0)
+    {
+        res = Cmd_PrintTLV(argc - 1, argv + 1);
     }
     else
     {

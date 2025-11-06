@@ -693,6 +693,18 @@ bool CommandNeedsTimedInvoke(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
+    case Clusters::ContentControl::Id: {
+        switch (aCommand)
+        {
+        case Clusters::ContentControl::Commands::UpdatePIN::Id:
+        case Clusters::ContentControl::Commands::ResetPIN::Id:
+        case Clusters::ContentControl::Commands::Enable::Id:
+        case Clusters::ContentControl::Commands::Disable::Id:
+            return true;
+        default:
+            return false;
+        }
+    }
     case Clusters::UnitTesting::Id: {
         switch (aCommand)
         {

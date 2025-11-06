@@ -155,7 +155,7 @@ class TC_SC_3_5(MatterBaseTest):
 
         # Instructing TH Server to accept a new Commissioner, which is the DUT
         params = await self.th_client.OpenCommissioningWindow(
-            nodeid=self.th_server_local_nodeid, timeout=3*60, iteration=10000, discriminator=self.th_server_discriminator, option=1)
+            nodeId=self.th_server_local_nodeid, timeout=3*60, iteration=10000, discriminator=self.th_server_discriminator, option=1)
         new_random_passcode = params.setupPinCode
         sleep(1)
         logging.info("OpenCommissioningWindow complete")
@@ -166,7 +166,7 @@ class TC_SC_3_5(MatterBaseTest):
         ''' Before reopening Commissioning Window, we need to instruct TH_Server to revoke any active OpenCommissioningWindows '''
 
         revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
-        await self.th_client.SendCommand(nodeid=self.th_server_local_nodeid, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=9000)
+        await self.th_client.SendCommand(nodeId=self.th_server_local_nodeid, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=9000)
         sleep(1)
 
         return await self.open_commissioning_window()
@@ -183,7 +183,7 @@ class TC_SC_3_5(MatterBaseTest):
 
         try:
             await self.th_client.SendCommand(
-                nodeid=self.th_server_local_nodeid,
+                nodeId=self.th_server_local_nodeid,
                 endpoint=0,  # Fault‑Injection cluster lives on EP0
                 payload=command,
             )

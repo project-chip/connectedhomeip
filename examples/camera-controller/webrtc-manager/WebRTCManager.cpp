@@ -238,7 +238,7 @@ void WebRTCManager::Disconnect()
 
     // Reset track
     mTrack.reset();
-    audioTrack.reset();
+    mAudioTrack.reset();
 
     // Clear state
     mCurrentVideoStreamId = 0;
@@ -277,13 +277,38 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
         mLocalDescription = std::string(desc);
         ChipLogProgress(Camera, "Local Description:");
         ChipLogProgress(Camera, "%s", mLocalDescription.c_str());
+
+        // Extract any candidates embedded in the SDP description
+        std::vector<rtc::Candidate> candidates = desc.candidates();
+        ChipLogProgress(Camera, "Extracted %lu candidates from SDP description", candidates.size());
+
+        for (const auto & candidate : candidates)
+        {
+            ICECandidateInfo candidateInfo;
+            candidateInfo.candidate  = std::string(candidate);
+            candidateInfo.mid        = candidate.mid();
+            candidateInfo.mlineIndex = -1; // libdatachannel doesn't provide mlineIndex
+
+            ChipLogProgress(Camera, "[From SDP] Candidate: %s, mid: %s", candidateInfo.candidate.c_str(),
+                            candidateInfo.mid.c_str());
+
+            mLocalCandidates.push_back(candidateInfo);
+        }
     });
 
     mPeerConnection->onLocalCandidate([this](rtc::Candidate candidate) {
-        std::string candidateStr = std::string(candidate);
-        mLocalCandidates.push_back(candidateStr);
+        ICECandidateInfo candidateInfo;
+        candidateInfo.candidate = std::string(candidate);
+        candidateInfo.mid       = candidate.mid();
+
+        // Note: libdatachannel doesn't directly provide mlineIndex, so we use -1 to indicate it is not present.
+        candidateInfo.mlineIndex = -1;
+
         ChipLogProgress(Camera, "Local Candidate:");
-        ChipLogProgress(Camera, "%s", candidateStr.c_str());
+        ChipLogProgress(Camera, "%s", candidateInfo.candidate.c_str());
+        ChipLogProgress(Camera, "  mid: %s, mlineIndex: %d", candidateInfo.mid.c_str(), candidateInfo.mlineIndex);
+
+        mLocalCandidates.push_back(candidateInfo);
     });
 
     mPeerConnection->onStateChange([this](rtc::PeerConnection::State state) {
@@ -298,11 +323,10 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
                 mSessionEstablishedCallback(mCurrentVideoStreamId);
             }
         }
-        else if (state == rtc::PeerConnection::State::Disconnected || state == rtc::PeerConnection::State::Failed ||
-                 state == rtc::PeerConnection::State::Closed)
+        else if (state == rtc::PeerConnection::State::Failed || state == rtc::PeerConnection::State::Closed)
         {
-            // Clean up resources when connection is lost
-            CloseRTPSocket();
+            // Limit the clearup to Failed and Closed only to avoid prematurely ending sessions.
+            Disconnect();
         }
     });
 
@@ -355,12 +379,12 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
     rtc::Description::Audio audioMedia("audio", rtc::Description::Direction::RecvOnly);
     audioMedia.addOpusCodec(kOpusPayloadType);
     audioMedia.setBitrate(kAudioBitRate);
-    audioTrack = mPeerConnection->addTrack(audioMedia);
+    mAudioTrack = mPeerConnection->addTrack(audioMedia);
 
     auto audioSession = std::make_shared<rtc::RtcpReceivingSession>();
-    audioTrack->setMediaHandler(audioSession);
+    mAudioTrack->setMediaHandler(audioSession);
 
-    audioTrack->onMessage(
+    mAudioTrack->onMessage(
         [this, audioAddr](rtc::binary message) {
             // This is an RTP Audio packet
             sendto(mAudioRTPSocket, reinterpret_cast<const char *>(message.data()), static_cast<size_t>(message.size()), 0,

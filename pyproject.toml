@@ -22,8 +22,18 @@ exclude = [
 ]
 
 [tool.ruff.lint]
-select = ["COM", "E1", "E4", "E7", "E9", "F", "W6"]
+select = [
+    # Standard errors and warnings
+    "E", "W", "F",
+    # Consistent commas
+    "COM",
+    # Ensure that scripts are executable
+    "EXE",
+    # Check for common optimization issues
+    "SLOT",
+]
 ignore = [
     "COM812", # Do not enforce trailing commas in multi-line collections
+    "E501", # Do not report line length issues (formatter should handle this)
     "E721", # We use it for good reasons
 ]

@@ -108,8 +108,6 @@ class DLL_EXPORT UDP : public Base
     };
 
 public:
-    ~UDP() override;
-
     /**
      * Initialize a UDP transport on a given port.
      *
@@ -151,7 +149,7 @@ private:
 
     static void OnUdpError(Inet::UDPEndPoint * endPoint, CHIP_ERROR err, const Inet::IPPacketInfo * pktInfo);
 
-    Inet::UDPEndPoint * mUDPEndPoint     = nullptr;                       ///< UDP socket used by the transport
+    Inet::UDPEndPointHandle mUDPEndPoint;                                 ///< UDP socket used by the transport
     Inet::IPAddressType mUDPEndpointType = Inet::IPAddressType::kUnknown; ///< Socket listening type
     State mState                         = State::kNotReady;              ///< State of the UDP transport
 };

@@ -948,7 +948,12 @@ cluster Descriptor = 29 {
       and enforce Access Control for the Node's endpoints and their associated
       cluster instances. */
 cluster AccessControl = 31 {
-  revision 2;
+  revision 3;
+
+  enum AccessControlAuxiliaryTypeEnum : enum8 {
+    kSystem = 0;
+    kGroupcast = 1;
+  }
 
   enum AccessControlEntryAuthModeEnum : enum8 {
     kPASE = 1 [spec_name = "PASE"];
@@ -980,6 +985,7 @@ cluster AccessControl = 31 {
   bitmap Feature : bitmap32 {
     kExtension = 0x1;
     kManagedDevice = 0x2;
+    kAuxiliary = 0x4;
   }
 
   struct AccessRestrictionStruct {
@@ -1011,6 +1017,7 @@ cluster AccessControl = 31 {
     fabric_sensitive AccessControlEntryAuthModeEnum authMode = 2;
     nullable fabric_sensitive int64u subjects[] = 3;
     nullable fabric_sensitive AccessControlTargetStruct targets[] = 4;
+    optional fabric_sensitive AccessControlAuxiliaryTypeEnum auxiliaryType = 5;
     fabric_idx fabricIndex = 254;
   }
 
@@ -1042,6 +1049,11 @@ cluster AccessControl = 31 {
     fabric_idx fabricIndex = 254;
   }
 
+  fabric_sensitive info event access(read: administer) AuxiliaryAccessUpdated = 3 {
+    nullable node_id adminNodeID = 0;
+    fabric_idx fabricIndex = 254;
+  }
+
   attribute access(read: administer, write: administer) AccessControlEntryStruct acl[] = 0;
   attribute access(read: administer, write: administer) optional AccessControlExtensionStruct extension[] = 1;
   readonly attribute int16u subjectsPerAccessControlEntry = 2;
@@ -1049,6 +1061,7 @@ cluster AccessControl = 31 {
   readonly attribute int16u accessControlEntriesPerFabric = 4;
   readonly attribute optional CommissioningAccessRestrictionEntryStruct commissioningARL[] = 5;
   readonly attribute optional AccessRestrictionEntryStruct arl[] = 6;
+  readonly attribute access(read: administer) optional AccessControlEntryStruct auxiliaryACL[] = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -8406,7 +8419,7 @@ cluster AudioOutput = 1291 {
 
 /** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
 cluster ApplicationLauncher = 1292 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum StatusEnum : enum8 {
     kSuccess = 0;
@@ -8421,7 +8434,7 @@ cluster ApplicationLauncher = 1292 {
     kApplicationPlatform = 0x1;
   }
 
-  shared struct ApplicationStruct {
+  struct ApplicationStruct {
     int16u catalogVendorID = 0;
     char_string applicationID = 1;
   }
@@ -8457,17 +8470,17 @@ cluster ApplicationLauncher = 1292 {
     optional octet_string data = 1;
   }
 
-  /** Upon receipt, this SHALL launch the specified app with optional data. The TV Device SHALL launch and bring to foreground the identified application in the command if the application is not already launched and in foreground. The TV Device SHALL update state attribute on the Application Basic cluster of the Endpoint corresponding to the launched application. This command returns a Launch Response. */
+  /** Upon receipt of this command, the server SHALL launch the application with optional data. */
   command LaunchApp(LaunchAppRequest): LauncherResponse = 0;
-  /** Upon receipt on a Video Player endpoint this SHALL stop the specified application if it is running. */
+  /** Upon receipt of this command, the server SHALL stop the application if it is running. */
   command StopApp(StopAppRequest): LauncherResponse = 1;
-  /** Upon receipt on a Video Player endpoint this SHALL hide the specified application if it is running and visible. */
+  /** Upon receipt of this command, the server SHALL hide the application. */
   command HideApp(HideAppRequest): LauncherResponse = 2;
 }
 
 /** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
 cluster ApplicationLauncher = 1292 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum StatusEnum : enum8 {
     kSuccess = 0;
@@ -8482,7 +8495,7 @@ cluster ApplicationLauncher = 1292 {
     kApplicationPlatform = 0x1;
   }
 
-  shared struct ApplicationStruct {
+  struct ApplicationStruct {
     int16u catalogVendorID = 0;
     char_string applicationID = 1;
   }
@@ -8518,17 +8531,17 @@ cluster ApplicationLauncher = 1292 {
     optional octet_string data = 1;
   }
 
-  /** Upon receipt, this SHALL launch the specified app with optional data. The TV Device SHALL launch and bring to foreground the identified application in the command if the application is not already launched and in foreground. The TV Device SHALL update state attribute on the Application Basic cluster of the Endpoint corresponding to the launched application. This command returns a Launch Response. */
+  /** Upon receipt of this command, the server SHALL launch the application with optional data. */
   command LaunchApp(LaunchAppRequest): LauncherResponse = 0;
-  /** Upon receipt on a Video Player endpoint this SHALL stop the specified application if it is running. */
+  /** Upon receipt of this command, the server SHALL stop the application if it is running. */
   command StopApp(StopAppRequest): LauncherResponse = 1;
-  /** Upon receipt on a Video Player endpoint this SHALL hide the specified application if it is running and visible. */
+  /** Upon receipt of this command, the server SHALL hide the application. */
   command HideApp(HideAppRequest): LauncherResponse = 2;
 }
 
 /** This cluster provides information about an application running on a TV or media player device which is represented as an endpoint. */
 cluster ApplicationBasic = 1293 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum ApplicationStatusEnum : enum8 {
     kStopped = 0;
@@ -8537,7 +8550,7 @@ cluster ApplicationBasic = 1293 {
     kActiveVisibleNotFocus = 3;
   }
 
-  shared struct ApplicationStruct {
+  struct ApplicationStruct {
     int16u catalogVendorID = 0;
     char_string applicationID = 1;
   }
@@ -8559,7 +8572,7 @@ cluster ApplicationBasic = 1293 {
 
 /** This cluster provides information about an application running on a TV or media player device which is represented as an endpoint. */
 cluster ApplicationBasic = 1293 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum ApplicationStatusEnum : enum8 {
     kStopped = 0;
@@ -8568,7 +8581,7 @@ cluster ApplicationBasic = 1293 {
     kActiveVisibleNotFocus = 3;
   }
 
-  shared struct ApplicationStruct {
+  struct ApplicationStruct {
     int16u catalogVendorID = 0;
     char_string applicationID = 1;
   }
@@ -9464,12 +9477,12 @@ endpoint 1 {
   binding cluster ColorControl;
 
   server cluster Identify {
-    ram      attribute identifyTime default = 0x0;
-    ram      attribute identifyType default = 0x0;
+    callback attribute identifyTime;
+    callback attribute identifyType;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
 
     handle command Identify;
@@ -9561,8 +9574,8 @@ endpoint 1 {
 
   server cluster UserLabel {
     callback attribute labelList;
-    ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster ScenesManagement {

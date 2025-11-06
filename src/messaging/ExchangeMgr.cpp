@@ -465,7 +465,7 @@ void ExchangeManager::OnTCPConnectionClosed(const Transport::ActiveTCPConnection
     });
 }
 
-bool ExchangeManager::OnTCPConnectionAttemptComplete(Transport::ActiveTCPConnectionHolder & conn, CHIP_ERROR conErr)
+bool ExchangeManager::OnTCPConnectionAttemptComplete(Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr)
 {
     bool foundHandler = false;
     mContextPool.ForEachActiveObject([&](auto * ec) {

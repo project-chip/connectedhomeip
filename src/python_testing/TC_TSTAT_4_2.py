@@ -261,7 +261,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
         logger.info("Commissioning under second controller")
         params = await self.default_controller.OpenCommissioningWindow(
-            nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=1234, option=1)
+            nodeId=self.dut_node_id, timeout=600, iteration=10000, discriminator=1234, option=1)
 
         secondary_authority = self.certificate_authority_manager.NewCertificateAuthority()
         secondary_fabric_admin = secondary_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=2)
@@ -463,7 +463,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 await self.send_atomic_request_begin_command()
 
                 # Write to the presets attribute after removing the preset that was set as the active preset handle.
-                test_presets = list(preset for preset in current_presets if preset.presetHandle is not activePresetHandle)
+                test_presets = list(preset for preset in current_presets if preset.presetHandle != activePresetHandle)
                 logger.info(f"Sending Presets: {test_presets}")
                 await self.write_presets(endpoint=endpoint, presets=test_presets)
 

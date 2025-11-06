@@ -373,8 +373,10 @@ class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                 )
 
             status = await self.psvt_manually_trigger_transport(cmd, expected_status=Status.InvalidInState)
-            asserts.assert_true(status == Status.InvalidInState, f"Unexpected response {
-                                status} received on Manually Triggered push with privacy mode enabled")
+            asserts.assert_true(status == Status.InvalidInState,
+                                (f"Unexpected response {status} received on Manually Triggered push "
+                                 "with privacy mode enabled")
+                                )
 
             await self.write_single_attribute(
                 attribute_value=Clusters.CameraAvStreamManagement.Attributes.SoftRecordingPrivacyModeEnabled(False),

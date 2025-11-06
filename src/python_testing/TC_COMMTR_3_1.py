@@ -92,7 +92,7 @@ class TC_COMMTR_3_1(CommodityMeteringTestBaseHelper):
                      - DUT replies a TariffUnitEnum value in range 0-1, or null;
                      - Value is saved as TariffUnitValue."""),
             TestStep("7", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster.", "Values is True."),
-            TestStep("8", """TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.COMMTR.TEST_EVENT_TRIGGER_KEY 
+            TestStep("8", """TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.COMMTR.TEST_EVENT_TRIGGER_KEY
                      and EventTrigger field set to PIXIT.COMMTR.TEST_EVENT_TRIGGER for Attributes Value Set Test Event.""",
                      "Status code must be SUCCESS."),
             TestStep("9", "TH awaits a MaximumMeteredQuantities attribute with 10s timeout.", """
@@ -110,7 +110,7 @@ class TC_COMMTR_3_1(CommodityMeteringTestBaseHelper):
             TestStep("12", "TH awaits a TariffUnit attribute with 10s timeout.", """
                      - Verify the report is received and it contains a TariffUnitEnum value in range 0-1, or null;
                      - The value does not match the TariffUnitValue."""),
-            TestStep("13", """TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.COMMTR.TEST_EVENT_TRIGGER_KEY and 
+            TestStep("13", """TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.COMMTR.TEST_EVENT_TRIGGER_KEY and
                      EventTrigger field set to PIXIT.COMMTR.TEST_EVENT_TRIGGER for Test Event Clear.""", "Status code must be SUCCESS."),
             TestStep("14", "TH removes the subscription the Commodity Metering cluster.", "Subscription is removed successfully."),
         ]
@@ -192,11 +192,11 @@ class TC_COMMTR_3_1(CommodityMeteringTestBaseHelper):
         self.step("13")
         # TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.COMMTR.TEST_EVENT_TRIGGER_KEY
         # and EventTrigger field set to PIXIT.COMMTR.TEST_EVENT_TRIGGER for Test Event Clear.
-        self.send_test_event_trigger_clear()
+        await self.send_test_event_trigger_clear()
 
         self.step("14")
         # TH removes the subscription to MeteredQuantity attribute.
-        subscription_handler.cancel()
+        await subscription_handler.cancel()
 
 
 if __name__ == "__main__":

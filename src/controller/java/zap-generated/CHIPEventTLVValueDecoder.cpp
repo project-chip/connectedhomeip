@@ -284,6 +284,25 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                         chip::JniReferences::GetInstance().AddToList(value_latestValue_targets, newElement_3);
                     }
                 }
+                jobject value_latestValue_auxiliaryType;
+                if (!cppValue.latestValue.Value().auxiliaryType.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, value_latestValue_auxiliaryType);
+                }
+                else
+                {
+                    jobject value_latestValue_auxiliaryTypeInsideOptional;
+                    std::string value_latestValue_auxiliaryTypeInsideOptionalClassName     = "java/lang/Integer";
+                    std::string value_latestValue_auxiliaryTypeInsideOptionalCtorSignature = "(I)V";
+                    jint jnivalue_latestValue_auxiliaryTypeInsideOptional =
+                        static_cast<jint>(cppValue.latestValue.Value().auxiliaryType.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                        value_latestValue_auxiliaryTypeInsideOptionalClassName.c_str(),
+                        value_latestValue_auxiliaryTypeInsideOptionalCtorSignature.c_str(),
+                        jnivalue_latestValue_auxiliaryTypeInsideOptional, value_latestValue_auxiliaryTypeInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(value_latestValue_auxiliaryTypeInsideOptional,
+                                                                      value_latestValue_auxiliaryType);
+                }
                 jobject value_latestValue_fabricIndex;
                 std::string value_latestValue_fabricIndexClassName     = "java/lang/Integer";
                 std::string value_latestValue_fabricIndexCtorSignature = "(I)V";
@@ -306,7 +325,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                     jmethodID accessControlEntryStructStructCtor_1;
                     err = chip::JniReferences::GetInstance().FindMethod(
                         env, accessControlEntryStructStructClass_1, "<init>",
-                        "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/ArrayList;Ljava/util/ArrayList;Ljava/lang/Integer;)V",
+                        "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/ArrayList;Ljava/util/ArrayList;Ljava/util/"
+                        "Optional;Ljava/lang/Integer;)V",
                         &accessControlEntryStructStructCtor_1);
                     if (err != CHIP_NO_ERROR || accessControlEntryStructStructCtor_1 == nullptr)
                     {
@@ -317,7 +337,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                     value_latestValue =
                         env->NewObject(accessControlEntryStructStructClass_1, accessControlEntryStructStructCtor_1,
                                        value_latestValue_privilege, value_latestValue_authMode, value_latestValue_subjects,
-                                       value_latestValue_targets, value_latestValue_fabricIndex);
+                                       value_latestValue_targets, value_latestValue_auxiliaryType, value_latestValue_fabricIndex);
                 }
             }
 
@@ -560,6 +580,61 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
 
             jobject value = env->NewObject(fabricRestrictionReviewUpdateStructClass, fabricRestrictionReviewUpdateStructCtor,
                                            value_token, value_instruction, value_ARLRequestFlowUrl, value_fabricIndex);
+
+            return value;
+        }
+        case Events::AuxiliaryAccessUpdated::Id: {
+            Events::AuxiliaryAccessUpdated::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_adminNodeID;
+            if (cppValue.adminNodeID.IsNull())
+            {
+                value_adminNodeID = nullptr;
+            }
+            else
+            {
+                std::string value_adminNodeIDClassName     = "java/lang/Long";
+                std::string value_adminNodeIDCtorSignature = "(J)V";
+                jlong jnivalue_adminNodeID                 = static_cast<jlong>(cppValue.adminNodeID.Value());
+                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(value_adminNodeIDClassName.c_str(),
+                                                                            value_adminNodeIDCtorSignature.c_str(),
+                                                                            jnivalue_adminNodeID, value_adminNodeID);
+            }
+
+            jobject value_fabricIndex;
+            std::string value_fabricIndexClassName     = "java/lang/Integer";
+            std::string value_fabricIndexCtorSignature = "(I)V";
+            jint jnivalue_fabricIndex                  = static_cast<jint>(cppValue.fabricIndex);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(value_fabricIndexClassName.c_str(),
+                                                                       value_fabricIndexCtorSignature.c_str(), jnivalue_fabricIndex,
+                                                                       value_fabricIndex);
+
+            jclass auxiliaryAccessUpdatedStructClass;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$AccessControlClusterAuxiliaryAccessUpdatedEvent",
+                auxiliaryAccessUpdatedStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$AccessControlClusterAuxiliaryAccessUpdatedEvent");
+                return nullptr;
+            }
+
+            jmethodID auxiliaryAccessUpdatedStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(env, auxiliaryAccessUpdatedStructClass, "<init>",
+                                                                "(Ljava/lang/Long;Ljava/lang/Integer;)V",
+                                                                &auxiliaryAccessUpdatedStructCtor);
+            if (err != CHIP_NO_ERROR || auxiliaryAccessUpdatedStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$AccessControlClusterAuxiliaryAccessUpdatedEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(auxiliaryAccessUpdatedStructClass, auxiliaryAccessUpdatedStructCtor, value_adminNodeID,
+                                           value_fabricIndex);
 
             return value;
         }
@@ -9064,6 +9139,37 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jobject value = env->NewObject(remainingScreenTimeExpiredStructClass, remainingScreenTimeExpiredStructCtor);
+
+            return value;
+        }
+        case Events::EnteringBlockContentTimeWindow::Id: {
+            Events::EnteringBlockContentTimeWindow::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jclass enteringBlockContentTimeWindowStructClass;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$ContentControlClusterEnteringBlockContentTimeWindowEvent",
+                enteringBlockContentTimeWindowStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$ContentControlClusterEnteringBlockContentTimeWindowEvent");
+                return nullptr;
+            }
+
+            jmethodID enteringBlockContentTimeWindowStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(env, enteringBlockContentTimeWindowStructClass, "<init>", "()V",
+                                                                &enteringBlockContentTimeWindowStructCtor);
+            if (err != CHIP_NO_ERROR || enteringBlockContentTimeWindowStructCtor == nullptr)
+            {
+                ChipLogError(
+                    Zcl, "Could not find ChipEventStructs$ContentControlClusterEnteringBlockContentTimeWindowEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(enteringBlockContentTimeWindowStructClass, enteringBlockContentTimeWindowStructCtor);
 
             return value;
         }

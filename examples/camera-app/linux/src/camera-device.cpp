@@ -90,6 +90,38 @@ GstFlowReturn OnNewVideoSampleFromAppSink(GstAppSink * appsink, gpointer user_da
     GstMapInfo map;
     if (gst_buffer_map(buffer, &map, GST_MAP_READ))
     {
+        // Check if SFrame encryption is enabled for this stream
+        auto & mediaController = self->GetMediaController();
+        Transport * transport  = mediaController.GetTransportForVideoStream(videoStreamID);
+
+        if (transport != nullptr && transport->sFrameConfig.HasValue())
+        {
+            auto & sframeConfig = transport->sFrameConfig.Value();
+            ChipLogProgress(Camera, "SFrame encryption enabled for video stream %u: cipherSuite=0x%04X, keyLen=%u", videoStreamID,
+                            sframeConfig.cipherSuite, static_cast<unsigned int>(sframeConfig.baseKey.size()));
+
+            // TODO: Implement SFrame encryption (occurs AFTER H.264 encoding, BEFORE RTP packetization)
+            // Current state: map.data contains H.264 encoded frames from GStreamer
+            //
+            // SFrame encryption steps:
+            // 1. Take the H.264 compressed payload (map.data, map.size)
+            // 2. Select encryption algorithm based on cipherSuite:
+            //    - 0x0001: AES-128-GCM-SHA256 (16 byte key)
+            //    - 0x0002: AES-256-GCM-SHA512 (32 byte key)
+            // 3. Encrypt the H.264 payload using sframeConfig.baseKey
+            // 4. Build SFrame header containing:
+            //    - Key ID (kid) from sframeConfig.kid
+            //    - Frame counter (incremented per frame)
+            // 5. Prepend SFrame header to encrypted payload:
+            //    Result: [SFrame Header | Encrypted(H.264 Payload)]
+            // 6. This will later be packed into RTP as:
+            //    [RTP Header | SFrame Header | Encrypted(H.264 Payload)]
+            //    SFUs can inspect RTP headers but payload remains encrypted
+        }
+
+        // If SFrame is enabled above, this should be: [SFrame Header | Encrypted(H.264)]
+        // If SFrame is disabled, this is raw H.264 encoded frames
+
         // Forward H.264 RTP data to media controller with the correct videoStreamID
         self->GetMediaController().DistributeVideo(reinterpret_cast<const uint8_t *>(map.data), map.size, videoStreamID);
         gst_buffer_unmap(buffer, &map);
@@ -132,6 +164,38 @@ static GstFlowReturn OnNewAudioSampleFromAppSink(GstAppSink * appsink, gpointer 
     GstMapInfo map;
     if (gst_buffer_map(buffer, &map, GST_MAP_READ))
     {
+        // Check if SFrame encryption is enabled for this stream
+        auto & mediaController = self->GetMediaController();
+        Transport * transport  = mediaController.GetTransportForAudioStream(audioStreamID);
+
+        if (transport != nullptr && transport->sFrameConfig.HasValue())
+        {
+            auto & sframeConfig = transport->sFrameConfig.Value();
+            ChipLogProgress(Camera, "SFrame encryption enabled for audio stream %u: cipherSuite=0x%04X, keyLen=%u", audioStreamID,
+                            sframeConfig.cipherSuite, static_cast<unsigned int>(sframeConfig.baseKey.size()));
+
+            // TODO: Implement SFrame encryption (occurs AFTER Opus encoding, BEFORE RTP packetization)
+            // Current state: map.data contains Opus encoded frames from GStreamer
+            //
+            // SFrame encryption steps:
+            // 1. Take the Opus compressed payload (map.data, map.size)
+            // 2. Select encryption algorithm based on cipherSuite:
+            //    - 0x0001: AES-128-GCM-SHA256 (16 byte key)
+            //    - 0x0002: AES-256-GCM-SHA512 (32 byte key)
+            // 3. Encrypt the Opus payload using sframeConfig.baseKey
+            // 4. Build SFrame header containing:
+            //    - Key ID (kid) from sframeConfig.kid
+            //    - Frame counter (incremented per frame)
+            // 5. Prepend SFrame header to encrypted payload:
+            //    Result: [SFrame Header | Encrypted(Opus Payload)]
+            // 6. This will later be packed into RTP as:
+            //    [RTP Header | SFrame Header | Encrypted(Opus Payload)]
+            //    SFUs can inspect RTP headers but payload remains encrypted
+        }
+
+        // If SFrame is enabled above, this should be: [SFrame Header | Encrypted(Opus)]
+        // If SFrame is disabled, this is raw Opus encoded frames
+
         // Send raw Opus frames to the media controller
         self->GetMediaController().DistributeAudio(reinterpret_cast<const uint8_t *>(map.data), map.size, audioStreamID);
         gst_buffer_unmap(buffer, &map);
@@ -849,6 +913,42 @@ CameraError CameraDevice::StartVideoStream(const VideoStreamStruct & allocatedSt
     GstStateChangeReturn result = gst_element_set_state(videoPipeline, GST_STATE_PLAYING);
     if (result == GST_STATE_CHANGE_FAILURE)
     {
+        // Get error message from GStreamer bus
+        GstBus * bus = gst_element_get_bus(videoPipeline);
+        if (bus)
+        {
+            GstMessage * msg = gst_bus_pop_filtered(bus, (GstMessageType) (GST_MESSAGE_ERROR | GST_MESSAGE_WARNING));
+            if (msg)
+            {
+                GError * err       = nullptr;
+                gchar * debug_info = nullptr;
+
+                if (GST_MESSAGE_TYPE(msg) == GST_MESSAGE_ERROR)
+                {
+                    gst_message_parse_error(msg, &err, &debug_info);
+                    ChipLogError(Camera, "GStreamer Error: %s", err ? err->message : "unknown");
+                    if (debug_info)
+                    {
+                        ChipLogError(Camera, "Debug info: %s", debug_info);
+                    }
+                }
+                else if (GST_MESSAGE_TYPE(msg) == GST_MESSAGE_WARNING)
+                {
+                    gst_message_parse_warning(msg, &err, &debug_info);
+                    ChipLogError(Camera, "GStreamer Warning: %s", err ? err->message : "unknown");
+                    if (debug_info)
+                    {
+                        ChipLogError(Camera, "Debug info: %s", debug_info);
+                    }
+                }
+
+                g_error_free(err);
+                g_free(debug_info);
+                gst_message_unref(msg);
+            }
+            gst_object_unref(bus);
+        }
+
         ChipLogError(Camera, "Failed to start video pipeline.");
         gst_object_unref(videoPipeline);
         it->videoContext = nullptr;

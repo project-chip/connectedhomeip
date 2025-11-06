@@ -71,6 +71,8 @@ not_automated:
       reason: Shared code for TC_SEPR, not a standalone test
     - name: TC_SETRF_TestBase.py
       reason: Shared code for TC_SETRF, not a standalone test
+    - name: TC_SUTestBase.py
+      reason: Shared code for TC_SU, not a standalone test
     - name: TC_COMMTR_TestBase.py
       reason: Shared code for TC_COMMTR, not a standalone test
     - name: TC_MTRIDTestBase.py
@@ -134,6 +136,9 @@ not_automated:
       reason: Depends on a browser peer for webrtc. CI is not supported.
     - name: TC_CHIMETestBase.py
       reason: Shared code for the Chime Cluster, not a standalone test.
+    - name: TC_WEBRTCRTestBase.py
+      reason:
+          Shared code for the WebRTC Requestor Cluster, not a standalone test.
     - name: TC_WEBRTCPTestBase.py
       reason:
           Shared code for the WebRTC Provider Cluster, not a standalone test.
@@ -153,10 +158,12 @@ slow_tests:
     - { name: mobile-device-test.py, duration: 3 minutes }
     - { name: TC_AccessChecker.py, duration: 1.5 minutes }
     - { name: TC_BRBINFO_4_1.py, duration: 2 minutes }
+    - { name: TC_CADMIN_1_3_4.py, duration: 4 minutes }
     - { name: TC_CADMIN_1_19.py, duration: 30 seconds }
     - { name: TC_CADMIN_1_22_24.py, duration: 3 minutes }
     - { name: TC_CADMIN_1_9.py, duration: 40 seconds }
     - { name: TC_CC_2_2.py, duration: 1.5 minutes }
+    - { name: TC_CLCTRL_4_1.py, duration: 45 seconds }
     - { name: TC_DEM_2_10.py, duration: 40 seconds }
     - { name: TC_DeviceBasicComposition.py, duration: 25 seconds }
     - { name: TC_DRLK_2_12.py, duration: 30 seconds }
@@ -175,4 +182,3 @@ slow_tests:
     - { name: TC_TIMESYNC_2_12.py, duration: 20 seconds }
     - { name: TC_TIMESYNC_2_7.py, duration: 20 seconds }
     - { name: TC_TIMESYNC_2_8.py, duration: 1.5 minutes }
-    - { name: TC_CLCTRL_4_1.py, duration: 45 seconds }

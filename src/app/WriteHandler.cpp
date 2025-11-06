@@ -260,7 +260,8 @@ void WriteHandler::DeliverListWriteBegin(const ConcreteAttributePath & aPath)
 {
     if (mDataModelProvider != nullptr)
     {
-        mDataModelProvider->ListAttributeWriteNotification(aPath, DataModel::ListWriteOperation::kListWriteBegin);
+        mDataModelProvider->ListAttributeWriteNotification(aPath, DataModel::ListWriteOperation::kListWriteBegin,
+                                                           GetAccessingFabricIndex());
     }
 }
 
@@ -270,7 +271,8 @@ void WriteHandler::DeliverListWriteEnd(const ConcreteAttributePath & aPath, bool
     {
         mDataModelProvider->ListAttributeWriteNotification(aPath,
                                                            writeWasSuccessful ? DataModel::ListWriteOperation::kListWriteSuccess
-                                                                              : DataModel::ListWriteOperation::kListWriteFailure);
+                                                                              : DataModel::ListWriteOperation::kListWriteFailure,
+                                                           GetAccessingFabricIndex());
     }
 }
 

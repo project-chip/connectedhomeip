@@ -241,7 +241,7 @@ class TC_AVSM_VideoStreamsPersistence(MatterBaseTest):
             takeMutex=False,
         )
         await self.default_controller.SendCommand(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             endpoint=0,  # Fault‑Injection cluster lives on EP0
             payload=command,
         )
@@ -271,7 +271,7 @@ class TC_AVSM_VideoStreamsPersistence(MatterBaseTest):
             takeMutex=False,
         )
         await self.default_controller.SendCommand(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             endpoint=0,  # Fault‑Injection cluster lives on EP0
             payload=command,
         )
