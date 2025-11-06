@@ -22,13 +22,13 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters import Globals
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import AttributeMatcher
+from matter.testing.matter_testing import AttributeMatcher, AttributeValue
 
 logger = logging.getLogger(__name__)
 
 
 def wmark_osd_matcher(attribute_id: int, wmark: bool, osd: bool, wmark_check: bool, osd_check: bool) -> "AttributeMatcher":
-    def predicate(report: "AttributeValue") -> bool:
+    def predicate(report: AttributeValue) -> bool:
         if report.attribute != attribute_id:
             return False
 
