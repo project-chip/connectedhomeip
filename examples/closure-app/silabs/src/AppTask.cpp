@@ -198,7 +198,7 @@ void AppTask::ClosureButtonActionEventHandler(AppEvent * aEvent)
                 ? ClosureControl::TargetPositionEnum::kMoveToFullyClosed
                 : ClosureControl::TargetPositionEnum::kMoveToFullyOpen;
                 ChipLogProgress(AppServer, "Target position: %d", to_underlying(targetPosition));
-                
+
                 Optional<bool> latch = chip::NullOptional;
                 if (currentState.Value().latch.HasValue() && !currentState.Value().latch.Value().IsNull())
                 {
