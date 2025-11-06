@@ -243,15 +243,15 @@ _OnCommandResponseProtocolErrorFunct = CFUNCTYPE(None, c_uint64, c_uint8)
 _OnCommandResponseFunct = CFUNCTYPE(None, c_uint64, c_uint32)
 _OnWriteResponseStatusFunct = CFUNCTYPE(None, c_void_p, c_uint32)
 
-_commandStatusDict: Dict[int, Any] = dict()
-_commandIndexStatusDict: Dict[int, Any] = dict()
+_commandStatusDict: Dict[int, Any] = {}
+_commandIndexStatusDict: Dict[int, Any] = {}
 _commandStatusLock = threading.RLock()
 _commandStatusCV = threading.Condition(_commandStatusLock)
 
-_attributeDict: Dict[int, Any] = dict()
+_attributeDict: Dict[int, Any] = {}
 _attributeDictLock = threading.RLock()
 
-_writeStatusDict: Dict[int, Any] = dict()
+_writeStatusDict: Dict[int, Any] = {}
 _writeStatusDictLock = threading.RLock()
 
 # A placeholder commandHandle, will be removed once we decouple CommandSender with CHIPClusters

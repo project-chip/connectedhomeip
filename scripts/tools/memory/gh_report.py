@@ -342,7 +342,7 @@ class V1Comment:
     @staticmethod
     def summary(df: pd.DataFrame) -> str:
         count = df[['platform', 'target', 'config']].drop_duplicates().shape[0]
-        platforms = ', '.join(sorted(list(set(df['platform']))))
+        platforms = ', '.join(sorted(set(df['platform'])))
         return f'{count} build{"" if count == 1 else "s"} for {platforms}'
 
     @staticmethod
