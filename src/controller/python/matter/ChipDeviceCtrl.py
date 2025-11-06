@@ -1607,16 +1607,30 @@ class ChipDeviceControllerBase():
             ), payload).raise_on_error()
         return await future
 
-    def _prepare_write_attribute_requests(self, attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor]]) -> typing.List[ClusterAttribute.AttributeWriteRequest]:
+    def _prepare_write_attribute_requests(
+        self, 
+        attributes: typing.List[typing.Union[
+            typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor],
+            typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]
+        ]]
+    ) -> typing.List[ClusterAttribute.AttributeWriteRequest]:
         """Helper method to prepare attribute write requests."""
         attrs = []
         for v in attributes:
             if len(v) == 2:
                 attrs.append(ClusterAttribute.AttributeWriteRequest(
-                    v[0], v[1], 0, 0, v[1].value))  # type: ignore[attr-defined]
+                    EndpointId=v[0],
+                    Attribute=v[1],
+                    DataVersion=0,
+                    HasDataVersion=0,
+                    Data=v[1].value))  # type: ignore[attr-defined]
             else:
                 attrs.append(ClusterAttribute.AttributeWriteRequest(
-                    v[0], v[1], v[2], 1, v[1].value))
+                    EndpointId=v[0],
+                    Attribute=v[1],
+                    DataVersion=v[2],
+                    HasDataVersion=1,
+                    Data=v[1].value))
         return attrs
 
     async def TestOnlyWriteAttributeWithMismatchedTimedRequestField(self, nodeid: int,

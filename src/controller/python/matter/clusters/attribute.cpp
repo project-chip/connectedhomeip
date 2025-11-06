@@ -325,7 +325,7 @@ using namespace chip::python;
 namespace {
 // Helper function to process write attributes data - reduces code duplication
 CHIP_ERROR ProcessWriteAttributesData(WriteClient * client, python::PyWriteAttributeData * writeAttributesData,
-                                      size_t attributeDataLength)
+                                      size_t attributeDataLength, bool forceLegacyListEncoding = false)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -346,9 +346,19 @@ CHIP_ERROR ProcessWriteAttributesData(WriteClient * client, python::PyWriteAttri
             dataVersion.SetValue(path.dataVersion);
         }
 
-        SuccessOrExit(
-            err = client->PutPreencodedAttribute(
-                chip::app::ConcreteDataAttributePath(path.endpointId, path.clusterId, path.attributeId, dataVersion), reader));
+        if (forceLegacyListEncoding)
+        {
+            auto listEncodingOverride = WriteClient::TestListEncodingOverride::kForceLegacyEncoding;
+            SuccessOrExit(err = client->PutPreencodedAttribute(
+                              chip::app::ConcreteDataAttributePath(path.endpointId, path.clusterId, path.attributeId, dataVersion),
+                              reader, listEncodingOverride));
+        }
+        else
+        {
+            SuccessOrExit(
+                err = client->PutPreencodedAttribute(
+                    chip::app::ConcreteDataAttributePath(path.endpointId, path.clusterId, path.attributeId, dataVersion), reader));
+        }
     }
 
 exit:
@@ -402,37 +412,7 @@ PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * 
 
     VerifyOrExit(device != nullptr && device->GetSecureSession().HasValue(), err = CHIP_ERROR_MISSING_SECURE_SESSION);
 
-    // Handle legacy list encoding override if needed
-    if (forceLegacyListEncoding)
-    {
-        for (size_t i = 0; i < attributeDataLength; i++)
-        {
-            python::PyAttributePath path = writeAttributesData[i].attributePath;
-            void * tlv                   = writeAttributesData[i].tlvData;
-            size_t length                = writeAttributesData[i].tlvLength;
-
-            uint8_t * tlvBuffer = reinterpret_cast<uint8_t *>(tlv);
-
-            TLV::TLVReader reader;
-            reader.Init(tlvBuffer, static_cast<uint32_t>(length));
-            reader.Next();
-            Optional<DataVersion> dataVersion;
-            if (path.hasDataVersion == 1)
-            {
-                dataVersion.SetValue(path.dataVersion);
-            }
-
-            auto listEncodingOverride = WriteClient::TestListEncodingOverride::kForceLegacyEncoding;
-
-            SuccessOrExit(err = client->PutPreencodedAttribute(
-                              chip::app::ConcreteDataAttributePath(path.endpointId, path.clusterId, path.attributeId, dataVersion),
-                              reader, listEncodingOverride));
-        }
-    }
-    else
-    {
-        SuccessOrExit(err = ProcessWriteAttributesData(client.get(), writeAttributesData, attributeDataLength));
-    }
+    SuccessOrExit(err = ProcessWriteAttributesData(client.get(), writeAttributesData, attributeDataLength, forceLegacyListEncoding));
 
     SuccessOrExit(err = client->SendWriteRequest(device->GetSecureSession().Value(),
                                                  interactionTimeoutMs != 0 ? System::Clock::Milliseconds32(interactionTimeoutMs)
