@@ -1015,8 +1015,8 @@ void CameraAVStreamMgmtServer::ModifyVideoStream(const uint16_t streamID, const 
             if (wasModified)
             {
                 PersistAndNotify<Attributes::AllocatedVideoStreams::Id>();
+                ChipLogProgress(Camera, "Modified video stream with ID: %d", streamID);
             }
-            ChipLogProgress(Camera, "Modified video stream with ID: %d", streamID);
             return;
         }
     }
@@ -1043,8 +1043,8 @@ void CameraAVStreamMgmtServer::ModifySnapshotStream(const uint16_t streamID, con
             if (wasModified)
             {
                 PersistAndNotify<Attributes::AllocatedSnapshotStreams::Id>();
+                ChipLogProgress(Camera, "Modified snapshot stream with ID: %d", streamID);
             }
-            ChipLogProgress(Camera, "Modified snapshot stream with ID: %d", streamID);
             return;
         }
     }
