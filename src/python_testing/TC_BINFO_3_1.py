@@ -62,6 +62,7 @@ class TC_BINFO_3_1(MatterBaseTest):
 
     def steps_TC_BINFO_3_1(self) -> list[TestStep]:
         steps = [
+            TestStep(0, "Commissioning, already done", is_commissioning=True),
             TestStep(1, "TH reads ProductAppearance from the DUT.",
                      ("ProductAppearance.Finish Value has to be between a range of [min=Other(0), "
                       "max=Fabric(5)]")),
@@ -99,6 +100,7 @@ class TC_BINFO_3_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_BINFO_3_1(self):
+        self.step(0)
 
         endpoint = self.get_endpoint(default=0)
         attributes = Clusters.BasicInformation.Attributes
