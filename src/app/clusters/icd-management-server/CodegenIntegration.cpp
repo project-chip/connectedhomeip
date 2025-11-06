@@ -40,11 +40,11 @@ LazyRegisteredServerCluster<ICDManagementCluster> gServer;
 
 constexpr chip::BitMask<OptionalCommands> kEnabledCommands()
 {
-    chip::BitMask<OptionalCommands> result;
 #if defined(ICD_MANAGEMENT_STAY_ACTIVE_REQUEST_COMMAND)
-    result.Set(kStayActive);
+    return chip::BitMask<OptionalCommands>(kStayActive);
+#else
+    return chip::BitMask<OptionalCommands>();
 #endif
-    return result;
 }
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
@@ -77,8 +77,8 @@ public:
         }
 
         gServer.Create(endpointId, *Server::GetInstance().GetSessionKeystore(), Server::GetInstance().GetFabricTable(),
-                       ICDConfigurationData::GetInstance().GetInstance(), optionalAttributeSet, enabledCommands,
-                       userActiveModeTriggerHint, instructionSpan);
+                       ICDConfigurationData::GetInstance(), optionalAttributeSet, enabledCommands, userActiveModeTriggerHint,
+                       instructionSpan);
         return gServer.Registration();
     }
 
