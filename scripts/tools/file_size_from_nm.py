@@ -424,7 +424,15 @@ def build_treemap(
     root = f"FILE: {name}"
     if zoom:
         root = root + f" (FILTER: {zoom})"
-    data: dict[str, list] = dict(name=[root], parent=[""], size=[0], hover=[""], name_with_size=[""], short_name=[""], id=[root])
+    data: dict[str, list] = {
+        "name": [root],
+        "parent": [""],
+        "size": [0],
+        "hover": [""],
+        "name_with_size": [""],
+        "short_name": [""],
+        "id": [root],
+    }
 
     known_parents: set[str] = set()
     total_sizes: dict = {}
@@ -754,8 +762,8 @@ def compute_symbol_diff(orig: list[Symbol], base: list[Symbol]) -> list[Symbol]:
 
     Symbols are the same if their "name" if the have the same tree path.
     """
-    orig_items = dict([(list_id(v.tree_path), v) for v in orig])
-    base_items = dict([(list_id(v.tree_path), v) for v in base])
+    orig_items = {list_id(v.tree_path): v for v in orig}
+    base_items = {list_id(v.tree_path): v for v in base}
 
     unique_paths = set(orig_items.keys()).union(set(base_items.keys()))
 

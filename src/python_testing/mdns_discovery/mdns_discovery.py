@@ -317,7 +317,7 @@ class MdnsDiscovery:
                     quada_records = [AaaaRecord(ipv6) for ipv6 in ipv6_addresses]
 
                 # Adds service to discovered services
-                self._discovered_services = {hostname: [ipv6 for ipv6 in quada_records]}
+                self._discovered_services = {hostname: list(quada_records)}
 
                 if log_output:
                     self._log_output()

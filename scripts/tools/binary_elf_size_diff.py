@@ -244,18 +244,18 @@ class SankeyData:
             value.append(link.value)
 
         return go.Sankey(
-            node=dict(
-                pad=15,
-                thickness=20,
-                line=dict(color="black", width=0.5),
-                label=self.labels,
-                color=self.colors,
-            ),
-            link=dict(
-                source=source,
-                target=target,
-                value=value,
-            ),
+            node={
+                "pad": 15,
+                "thickness": 20,
+                "line": {"color": "black", "width": 0.5},
+                "label": self.labels,
+                "color": self.colors,
+            },
+            link={
+                "source": source,
+                "target": target,
+                "value": value,
+            },
         )
 
 

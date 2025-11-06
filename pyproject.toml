@@ -27,6 +27,8 @@ select = [
     "E", "W", "F",
     # Consistent commas
     "COM",
+    # Simplify the code if possible
+    "C4",
     # Ensure that scripts are executable
     "EXE",
     # Check for common logging issues

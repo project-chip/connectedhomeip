@@ -266,7 +266,7 @@ class TestSpecParsingSupport(MatterBaseTest):
         super().setup_class()
         # Latest fully certified build
         self.spec_xml_clusters, self.spec_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)
-        self.all_spec_clusters = set([(id, c.name, c.pics) for id, c in self.spec_xml_clusters.items()])
+        self.all_spec_clusters = {(id, c.name, c.pics) for id, c in self.spec_xml_clusters.items()}
 
     def test_build_xml_override(self):
         one_two_clusters, one_two_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_2)
@@ -300,16 +300,16 @@ class TestSpecParsingSupport(MatterBaseTest):
                                0, "1.5 dir does not contain any clusters not in 1.4.2")
 
         # The following clusters were removed in 1.3: Scenes, Leaf Wetness Measurement, Soil Moisture Measurement
-        one_two_removed = set([0x0005, 0x0407, 0x0408])
+        one_two_removed = {0x0005, 0x0407, 0x0408}
         asserts.assert_equal(set(one_two_clusters.keys()) - set(one_three_clusters.keys()),
                              one_two_removed, "There are some 1.3 clusters that are unexpectedly not included in the 1.4 spec")
         # only the pulse width modulation cluster was removed post 1.3
-        one_four_removed = set([Clusters.PulseWidthModulation.id])
+        one_four_removed = {Clusters.PulseWidthModulation.id}
         asserts.assert_equal(set(one_three_clusters.keys()) - set(one_four_clusters.keys()),
                              one_four_removed, "There are some 1.3 clusters that are unexpectedly not included in the 1.4 spec")
         # Ballast and all the proxy clusters are being removed in 1.4.2
-        one_four_two_removed = set([Clusters.BallastConfiguration.id, Clusters.ProxyConfiguration.id,
-                                    Clusters.ProxyDiscovery.id, Clusters.ProxyValid.id])
+        one_four_two_removed = {Clusters.BallastConfiguration.id, Clusters.ProxyConfiguration.id,
+                                    Clusters.ProxyDiscovery.id, Clusters.ProxyValid.id}
         asserts.assert_equal(set(one_four_clusters.keys())-set(one_four_two_xml_clusters.keys()),
                              one_four_two_removed, "There are some 1.4 clusters that are unexpectedly not included in the 1.4.2 spec")
         asserts.assert_equal(set(one_three_clusters.keys())-set(one_four_two_xml_clusters.keys()),
@@ -381,16 +381,16 @@ class TestSpecParsingSupport(MatterBaseTest):
         asserts.assert_true(0xFFFF in clusters, "Derived ID not found in clusters")
         asserts.assert_equal(set(clusters[0xFFFF].attributes.keys()), set(
             [0, 2, 3] + expected_global_attrs), "Unexpected attribute list")
-        asserts.assert_equal(set(clusters[0xFFFF].accepted_commands.keys()), set([]), "Unexpected accepted commands")
-        asserts.assert_equal(set(clusters[0xFFFF].generated_commands.keys()), set([]), "Unexpected generated commands")
+        asserts.assert_equal(set(clusters[0xFFFF].accepted_commands.keys()), set(), "Unexpected accepted commands")
+        asserts.assert_equal(set(clusters[0xFFFF].generated_commands.keys()), set(), "Unexpected generated commands")
 
         asserts.assert_true("Test Base" in pure_base_clusters, "Base ID not found in derived clusters")
         asserts.assert_equal(set(pure_base_clusters["Test Base"].attributes.keys()), set(
             [0, 1, 2, 3] + expected_global_attrs), "Unexpected attribute list")
         asserts.assert_equal(set(pure_base_clusters["Test Base"].accepted_commands.keys()),
-                             set([0]), "Unexpected accepted commands")
+                             {0}, "Unexpected accepted commands")
         asserts.assert_equal(set(pure_base_clusters["Test Base"].generated_commands.keys()),
-                             set([1]), "Unexpected generated commands")
+                             {1}, "Unexpected generated commands")
         asserts.assert_equal(str(pure_base_clusters["Test Base"].accepted_commands[0].conformance),
                              "M", "Unexpected conformance on base accepted command")
         asserts.assert_equal(str(pure_base_clusters["Test Base"].generated_commands[1].conformance),
@@ -412,8 +412,8 @@ class TestSpecParsingSupport(MatterBaseTest):
 
         # Ensure both the accepted and generated command overrides work
         asserts.assert_true(set(clusters[0xFFFF].accepted_commands.keys()),
-                            set([0]), "Unexpected accepted command list after merge")
-        asserts.assert_true(set(clusters[0xFFFF].generated_commands.keys()), set([1]),
+                            {0}, "Unexpected accepted command list after merge")
+        asserts.assert_true(set(clusters[0xFFFF].generated_commands.keys()), {1},
                             "Unexpected generated command list after merge")
         asserts.assert_equal(str(clusters[0xFFFF].accepted_commands[0].conformance),
                              "X", "Unexpected conformance on accepted commands")
@@ -456,36 +456,40 @@ class TestSpecParsingSupport(MatterBaseTest):
         asserts.assert_true(clusters[0xFFFD].is_provisional, "Test Alias2 is not marked as provisional and should be")
 
     def test_known_aliased_clusters(self):
-        known_aliased_clusters = set([(0x040C, 'Carbon Monoxide Concentration Measurement', 'CMOCONC'),
-                                      (0x040D, 'Carbon Dioxide Concentration Measurement', 'CDOCONC'),
-                                      (0x0413, 'Nitrogen Dioxide Concentration Measurement', 'NDOCONC'),
-                                      (0x0415, 'Ozone Concentration Measurement', 'OZCONC'),
-                                      (0x042A, 'PM2.5 Concentration Measurement', 'PMICONC'),
-                                      (0x042B, 'Formaldehyde Concentration Measurement', 'FLDCONC'),
-                                      (0x042C, 'PM1 Concentration Measurement', 'PMHCONC'),
-                                      (0x042D, 'PM10 Concentration Measurement', 'PMKCONC'),
-                                      (0x042E, 'Total Volatile Organic Compounds Concentration Measurement', 'TVOCCONC'),
-                                      (0x042F, 'Radon Concentration Measurement', 'RNCONC'),
-                                      (0x0071, 'HEPA Filter Monitoring', 'HEPAFREMON'),
-                                      (0x0072, 'Activated Carbon Filter Monitoring', 'ACFREMON'),
-                                      (0x0405, 'Relative Humidity Measurement', 'RH')])
+        known_aliased_clusters = {
+            (0x040C, 'Carbon Monoxide Concentration Measurement', 'CMOCONC'),
+            (0x040D, 'Carbon Dioxide Concentration Measurement', 'CDOCONC'),
+            (0x0413, 'Nitrogen Dioxide Concentration Measurement', 'NDOCONC'),
+            (0x0415, 'Ozone Concentration Measurement', 'OZCONC'),
+            (0x042A, 'PM2.5 Concentration Measurement', 'PMICONC'),
+            (0x042B, 'Formaldehyde Concentration Measurement', 'FLDCONC'),
+            (0x042C, 'PM1 Concentration Measurement', 'PMHCONC'),
+            (0x042D, 'PM10 Concentration Measurement', 'PMKCONC'),
+            (0x042E, 'Total Volatile Organic Compounds Concentration Measurement', 'TVOCCONC'),
+            (0x042F, 'Radon Concentration Measurement', 'RNCONC'),
+            (0x0071, 'HEPA Filter Monitoring', 'HEPAFREMON'),
+            (0x0072, 'Activated Carbon Filter Monitoring', 'ACFREMON'),
+            (0x0405, 'Relative Humidity Measurement', 'RH'),
+        }
 
         missing_clusters = known_aliased_clusters - self.all_spec_clusters
         asserts.assert_equal(len(missing_clusters), 0, f"Missing aliased clusters from DM XML - {missing_clusters}")
 
     def test_known_derived_clusters(self):
-        known_derived_clusters = set([(0x0048, 'Oven Cavity Operational State', 'OVENOPSTATE'),
-                                      (0x0049, 'Oven Mode', 'OTCCM'),
-                                      (0x0051, 'Laundry Washer Mode', 'LWM'),
-                                      (0x0052, 'Refrigerator And Temperature Controlled Cabinet Mode', 'TCCM'),
-                                      (0x0054, 'RVC Run Mode', 'RVCRUNM'),
-                                      (0x0055, 'RVC Clean Mode', 'RVCCLEANM'),
-                                      (0x0057, 'Refrigerator Alarm', 'REFALM'),
-                                      (0x0059, 'Dishwasher Mode', 'DISHM'),
-                                      (0x005c, 'Smoke CO Alarm', 'SMOKECO'),
-                                      (0x005d, 'Dishwasher Alarm', 'DISHALM'),
-                                      (0x005e, 'Microwave Oven Mode', 'MWOM'),
-                                      (0x0061, 'RVC Operational State', 'RVCOPSTATE')])
+        known_derived_clusters = {
+            (0x0048, 'Oven Cavity Operational State', 'OVENOPSTATE'),
+            (0x0049, 'Oven Mode', 'OTCCM'),
+            (0x0051, 'Laundry Washer Mode', 'LWM'),
+            (0x0052, 'Refrigerator And Temperature Controlled Cabinet Mode', 'TCCM'),
+            (0x0054, 'RVC Run Mode', 'RVCRUNM'),
+            (0x0055, 'RVC Clean Mode', 'RVCCLEANM'),
+            (0x0057, 'Refrigerator Alarm', 'REFALM'),
+            (0x0059, 'Dishwasher Mode', 'DISHM'),
+            (0x005c, 'Smoke CO Alarm', 'SMOKECO'),
+            (0x005d, 'Dishwasher Alarm', 'DISHALM'),
+            (0x005e, 'Microwave Oven Mode', 'MWOM'),
+            (0x0061, 'RVC Operational State', 'RVCOPSTATE'),
+        }
 
         missing_clusters = known_derived_clusters - self.all_spec_clusters
         asserts.assert_equal(len(missing_clusters), 0, f"Missing aliased clusters from DM XML - {missing_clusters}")

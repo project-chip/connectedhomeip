@@ -120,7 +120,7 @@ class Canceller:
                     logging.warning("    Workflow %s Failed", workflow.name)
                     failed_check_names.add(workflow.name)
 
-        if not any([name in failed_check_names for name in required_runs]):
+        if not any(name in failed_check_names for name in required_runs):
             logging.info("No critical failures found")
             return
 

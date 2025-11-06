@@ -78,10 +78,10 @@ class TC_MWOM_1_2(MatterBaseTest):
         supported_modes = await self.read_mod_attribute_expect_success(endpoint=endpoint, attribute=attributes.SupportedModes)
         asserts.assert_greater_equal(len(supported_modes), 2, "SupportedModes must have at least 2 entries!")
         asserts.assert_less_equal(len(supported_modes), 255, "SupportedModes must have at most 255 entries!")
-        modes = set([m.mode for m in supported_modes])
+        modes = {m.mode for m in supported_modes}
         asserts.assert_equal(len(modes), len(supported_modes), "SupportedModes must have unique mode values")
 
-        labels = set([m.label for m in supported_modes])
+        labels = {m.label for m in supported_modes}
         asserts.assert_equal(len(labels), len(supported_modes), "SupportedModes must have unique mode label values")
 
         # common mode tags
