@@ -149,16 +149,6 @@ class Executor:
         return s
 
 
-class LinuxNamespacedExecutor(Executor):
-    def __init__(self, ns):
-        self.ns = ns
-
-    def run(self, subproc: SubprocessInfo, stdin, stdout, stderr):
-        wrapped = self.ns.wrap_in_namespace(subproc)
-        s = subprocess.Popen(wrapped.to_cmd(), stdin=stdin, stdout=stdout, stderr=stderr)
-        return s
-
-
 class Runner:
     def __init__(self, executor=None, capture_delegate=None):
         self.executor = Executor() if executor is None else executor
