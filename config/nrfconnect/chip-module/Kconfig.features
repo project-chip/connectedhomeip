@@ -114,7 +114,7 @@ config BT_DEVICE_APPEARANCE
 
 if !LOG
 
-config BT_FIXED_PASSKEY
+config BT_APP_PASSKEY
 	default y
 
 endif
@@ -128,7 +128,7 @@ config CHIP_NUS_MAX_COMMAND_LEN
 
 config CHIP_NUS_FIXED_PASSKEY
 	int "Define the default passkey for NUS"
-	depends on BT_FIXED_PASSKEY
+	depends on BT_APP_PASSKEY
 	default 123456
 	help
 	  Define the default password for pairing with the Bluetooth LE device.
