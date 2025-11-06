@@ -19,7 +19,20 @@ group("ota-requestor") {
   # TODO: DefaultOTARequestor depends on controller, however the cluster server itself does not.
   # Maybe DefaultOTARequestor and related code should have its own source set.
   public_deps = [
+    ":storage",
     "${chip_root}/src/app/clusters/basic-information",
     "${chip_root}/src/controller:interactions",
+  ]
+}
+
+source_set("storage") {
+  sources = [
+    "DefaultOTARequestorStorage.cpp",
+    "DefaultOTARequestorStorage.h",
+    "OTARequestorStorage.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app/common:cluster-objects",
   ]
 }

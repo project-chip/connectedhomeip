@@ -22,15 +22,21 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/DefaultOTARequestor.h"
     "${CLUSTER_DIR}/DefaultOTARequestorDriver.cpp"
     "${CLUSTER_DIR}/DefaultOTARequestorDriver.h"
-    "${CLUSTER_DIR}/DefaultOTARequestorStorage.cpp"
-    "${CLUSTER_DIR}/DefaultOTARequestorStorage.h"
     "${CLUSTER_DIR}/DefaultOTARequestorUserConsent.h"
     "${CLUSTER_DIR}/ExtendedOTARequestorDriver.cpp"
     "${CLUSTER_DIR}/ExtendedOTARequestorDriver.h"
     "${CLUSTER_DIR}/OTARequestorDriver.h"
-    "${CLUSTER_DIR}/OTARequestorStorage.h"
     "${CLUSTER_DIR}/OTATestEventTriggerHandler.cpp"
     "${CLUSTER_DIR}/OTATestEventTriggerHandler.h"
     "${CLUSTER_DIR}/ota-requestor-server.cpp"
     "${CLUSTER_DIR}/ota-requestor-server.h"
+)
+
+# These are things that BUILD.gn dependencies would pull
+TARGET_SOURCES(
+  ${APP_TARGET}
+  PRIVATE
+    "${CLUSTER_DIR}/DefaultOTARequestorStorage.cpp"
+    "${CLUSTER_DIR}/DefaultOTARequestorStorage.h"
+    "${CLUSTER_DIR}/OTARequestorStorage.h"
 )

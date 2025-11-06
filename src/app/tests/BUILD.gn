@@ -46,19 +46,6 @@ static_library("helpers") {
   ]
 }
 
-source_set("ota-requestor-test-srcs") {
-  sources = [
-    "${chip_root}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp",
-    "${chip_root}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.h",
-    "${chip_root}/src/app/clusters/ota-requestor/OTARequestorStorage.h",
-  ]
-
-  public_deps = [
-    "${chip_root}/src/app/common:cluster-objects",
-    "${chip_root}/src/lib/core",
-  ]
-}
-
 source_set("thread-network-directory-test-srcs") {
   sources = [
     "${chip_root}/src/app/clusters/thread-network-directory-server/DefaultThreadNetworkDirectoryStorage.cpp",
@@ -256,7 +243,6 @@ chip_test_suite("tests") {
     "TestCommandPathParams.cpp",
     "TestConcreteAttributePath.cpp",
     "TestDataModelSerialization.cpp",
-    "TestDefaultOTARequestorStorage.cpp",
     "TestDefaultSafeAttributePersistenceProvider.cpp",
     "TestDefaultTermsAndConditionsProvider.cpp",
     "TestDefaultThreadNetworkDirectoryStorage.cpp",
@@ -291,7 +277,6 @@ chip_test_suite("tests") {
     ":closure-dimension-test-srcs",
     ":ecosystem-information-test-srcs",
     ":operational-state-test-srcs",
-    ":ota-requestor-test-srcs",
     ":thread-network-directory-test-srcs",
     ":time-sync-data-provider-test-srcs",
     "${chip_root}/src/app",
