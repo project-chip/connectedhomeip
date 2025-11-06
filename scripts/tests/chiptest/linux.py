@@ -200,7 +200,7 @@ class IsolatedNetworkNamespace:
             self.run(command)
 
     def wrap_in_namespace(self, subproc: SubprocessInfo):
-        return subproc.wrap_with(("ip", "netns", "exec", "{}-{}".format(subproc.kind, self.index)))
+        return subproc.wrap_with("ip", "netns", "exec", "{}-{}".format(subproc.kind, self.index))
 
 
 class LinuxNamespacedExecutor(Executor):

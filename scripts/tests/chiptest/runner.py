@@ -157,7 +157,7 @@ class Runner:
     def RunSubprocess(self, subproc: SubprocessInfo, name: str, wait=True, dependencies=[], timeout_seconds: typing.Optional[int] = None, stdin=None):
         if sys.platform == 'darwin':
             # Try harder to avoid any stdout buffering in our tests
-            subproc = subproc.wrap_with(('stdbuf', '-o0', '-i0'))
+            subproc = subproc.wrap_with('stdbuf', '-o0', '-i0')
 
         logging.info('RunSubprocess starting application %s' % subproc)
         cmd = subproc.to_cmd()

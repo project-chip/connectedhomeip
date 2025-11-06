@@ -131,7 +131,7 @@ class App:
                     self.cv_stopped.wait()
 
     def __startServer(self):
-        subproc = self.subproc.with_args('--interface-id', str(-1))
+        subproc = self.subproc.with_args('--interface-id', '-1')
 
         if not self.options:
             logging.debug('Executing application under test with default args')
