@@ -326,7 +326,7 @@ ContentApp * ContentAppPlatform::LoadContentAppInternal(const CatalogVendorApp &
 ContentApp * ContentAppPlatform::LoadContentAppByClient(uint16_t vendorId, uint16_t productId)
 {
     ChipLogProgress(DeviceLayer, "LoadContentAppByVendorId() - vendorId %d, productId %d", vendorId, productId);
-    VerifyOrReturnValue(mContentAppFactory != nullptr, nullptr);
+    VerifyOrReturnValue(mContentAppFactory != nullptr, nullptr, ChipLogError(DeviceLayer, "mContentAppFactory is null"));
 
     CatalogVendorApp vendorApp;
     CHIP_ERROR err = mContentAppFactory->LookupCatalogVendorApp(vendorId, productId, &vendorApp);
@@ -341,7 +341,7 @@ ContentApp * ContentAppPlatform::LoadContentAppByClient(uint16_t vendorId, uint1
 
 ContentApp * ContentAppPlatform::LoadContentApp(const CatalogVendorApp & vendorApp)
 {
-    VerifyOrReturnValue(mContentAppFactory != nullptr, nullptr);
+    VerifyOrReturnValue(mContentAppFactory != nullptr, nullptr, ChipLogError(DeviceLayer, "mContentAppFactory is null"));
     if (vendorApp.catalogVendorId == mContentAppFactory->GetPlatformCatalogVendorId())
     {
         return LoadContentAppInternal(vendorApp);
