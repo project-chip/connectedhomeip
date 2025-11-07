@@ -67,6 +67,15 @@ Davis, CA 95616, USA
   <clusters>
     <cluster id="0x0003" name="Identify" side="server">
       <mandatoryConform/>
+      <features>
+        <feature code="QRY">
+          <mandatoryConform>
+            <notTerm>
+              <condition name="Matter"/>
+            </notTerm>
+          </mandatoryConform>
+        </feature>
+      </features>
       <commands>
         <command id="0x0040" name="TriggerEffect">
           <mandatoryConform/>
@@ -77,35 +86,23 @@ Davis, CA 95616, USA
       <mandatoryConform/>
     </cluster>
     <cluster id="0x0005" name="Scenes" side="server">
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <mandatoryConform/>
       <commands>
         <command id="0x0040" name="EnhancedAddScene">
-          <otherwiseConform>
-            <provisionalConform/>
-            <mandatoryConform/>
-          </otherwiseConform>
+          <mandatoryConform/>
         </command>
         <command id="0x0041" name="EnhancedViewScene">
-          <otherwiseConform>
-            <provisionalConform/>
-            <mandatoryConform/>
-          </otherwiseConform>
+          <mandatoryConform/>
         </command>
         <command id="0x0042" name="CopyScene">
-          <otherwiseConform>
-            <provisionalConform/>
-            <mandatoryConform/>
-          </otherwiseConform>
+          <mandatoryConform/>
         </command>
       </commands>
     </cluster>
     <cluster id="0x0006" name="On/Off" side="server">
       <mandatoryConform/>
       <features>
-        <feature code="LT" name="LT">
+        <feature code="LT">
           <mandatoryConform/>
         </feature>
       </features>
@@ -113,10 +110,10 @@ Davis, CA 95616, USA
     <cluster id="0x0008" name="Level Control" side="server">
       <optionalConform/>
       <features>
-        <feature code="OO" name="OO">
+        <feature code="OO">
           <mandatoryConform/>
         </feature>
-        <feature code="LT" name="LT">
+        <feature code="LT">
           <mandatoryConform/>
         </feature>
       </features>

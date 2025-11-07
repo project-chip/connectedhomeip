@@ -66,9 +66,9 @@ Davis, CA 95616, USA
   <clusterIds>
     <clusterId id="0x0403" name="Pressure Measurement"/>
   </clusterIds>
-  <classification hierarchy="base" role="application" picsCode="PRS" scope="Endpoint"/>
+  <classification hierarchy="base" role="application" picsCode="PRS" scope="Type 2 (server to client)"/>
   <features>
-    <feature bit="0" code="EXT" name="Extended" summary="Extended range and resolution">
+    <feature bit="0" code="EXT" name="Extended" summary="The cluster is capable of extended range and resolution">
       <optionalConform/>
     </feature>
   </features>
@@ -95,7 +95,15 @@ Davis, CA 95616, USA
       <constraint>
         <between>
           <from value="-32767"/>
-          <to value="MaxMeasuredValue - 1"/>
+          <to>
+            <compute>
+              <operation>subtract</operation>
+              <left>
+                <attribute name="MaxMeasuredValue"/>
+              </left>
+              <right value="1"/>
+            </compute>
+          </to>
         </between>
       </constraint>
     </attribute>
@@ -105,7 +113,15 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <constraint>
         <between>
-          <from value="MinMeasuredValue + 1"/>
+          <from>
+            <compute>
+              <operation>add</operation>
+              <left>
+                <attribute name="MinMeasuredValue"/>
+              </left>
+              <right value="1"/>
+            </compute>
+          </from>
           <to value="32767"/>
         </between>
       </constraint>
@@ -146,7 +162,15 @@ Davis, CA 95616, USA
       <constraint>
         <between>
           <from value="-32767"/>
-          <to value="MaxScaledValue - 1"/>
+          <to>
+            <compute>
+              <operation>subtract</operation>
+              <left>
+                <attribute name="MaxScaledValue"/>
+              </left>
+              <right value="1"/>
+            </compute>
+          </to>
         </between>
       </constraint>
     </attribute>
@@ -158,7 +182,15 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint>
         <between>
-          <from value="MinScaledValue + 1"/>
+          <from>
+            <compute>
+              <operation>add</operation>
+              <left>
+                <attribute name="MinScaledValue"/>
+              </left>
+              <right value="1"/>
+            </compute>
+          </from>
           <to value="32767"/>
         </between>
       </constraint>

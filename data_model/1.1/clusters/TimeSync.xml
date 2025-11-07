@@ -57,10 +57,9 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" name="Time Synchronization Cluster Clusters" revision="2">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" name="Time Synchronization Cluster Clusters" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
-    <revision revision="2" summary="Make TrustedTimeSource fabric-aware, add TSC feature, define list max sizes, change writable attributes to commands, remote port, add attribute for DNS support"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0038" name="Time Sync" picsCode="TIMESYNC"/>
@@ -76,89 +75,75 @@ Davis, CA 95616, USA
     <feature bit="2" code="NTPS" name="NTPServer" summary="Server supports an NTP server role.">
       <optionalConform/>
     </feature>
-    <feature bit="3" code="TSC" name="TimeSyncClient" summary="Time synchronization client cluster is present.">
-      <optionalConform/>
-    </feature>
   </features>
   <dataTypes>
     <enum name="GranularityEnum">
-      <item value="0" name="NoTimeGranularity" summary="This indicates that the node is not currently synchronized with a UTC Time source and its clock is based on the Last Known Good UTC Time only.">
+      <item value="0" name="NoTimeGranularity" summary="This indicates that the server is not currently synchronized with a UTC Time source and its clock is based on the Last Known Good UTC Time only.">
         <mandatoryConform/>
       </item>
-      <item value="1" name="MinutesGranularity" summary="This indicates the node was synchronized to an upstream source in the past, but sufficient clock drift has occurred such that the clock error is now &gt; 5 seconds.">
+      <item value="1" name="MinutesGranularity" summary="This indicates the server was synchronized to an upstream source in the past, but sufficient clock drift has occurred such that the clock error is now &gt; 5 seconds.">
         <mandatoryConform/>
       </item>
-      <item value="2" name="SecondsGranularity" summary="This indicates the node is synchronized to an upstream source using a low resolution protocol. UTC Time is accurate to ± 5 seconds.">
+      <item value="2" name="SecondsGranularity" summary="This indicates the server is synchronized to an upstream source using a low resolution protocol. UTC Time is accurate to ± 5 seconds.">
         <mandatoryConform/>
       </item>
-      <item value="3" name="MillisecondsGranularity" summary="This indicates the node is synchronized to an upstream source using high resolution time-synchronization protocol such as NTP, or has built-in GNSS with some amount of jitter applying its GNSS timestamp. UTC Time is accurate to ± 50ms.">
+      <item value="3" name="MillisecondsGranularity" summary="This indicates the server is synchronized to an upstream source using high resolution time-synchronization protocol such as NTP, or has built-in GNSS with some amount of jitter applying its GNSS timestamp. UTC Time is accurate to ± 50ms.">
         <mandatoryConform/>
       </item>
-      <item value="4" name="MicrosecondsGranularity" summary="This indicates the node is synchronized to an upstream source using a highly precise time-synchronization protocol such as PTP, or has built-in GNSS. UTC time is accurate to ± 10 μs.">
+      <item value="4" name="MicrosecondsGranularity" summary="This indicates the server is synchronized to an upstream source using a highly precise time-synchronization protocol such as PTP, or has built-in GNSS. UTC time is accurate to ± 10 μs.">
         <mandatoryConform/>
       </item>
     </enum>
     <enum name="TimeSourceEnum">
-      <item value="0" name="None" summary="Node is not currently synchronized with a UTC Time source.">
+      <item value="0" name="None" summary="Server is not currently synchronized with a UTC Time source.">
         <mandatoryConform/>
       </item>
-      <item value="1" name="Unknown" summary="Node uses an unlisted time source.">
+      <item value="1" name="Unknown" summary="Server uses an unlisted time source.">
         <mandatoryConform/>
       </item>
-      <item value="2" name="Admin" summary="Node received time from a client using the SetUTCTime Command.">
+      <item value="2" name="Admin" summary="Server received time from the SetUtcTime.">
         <mandatoryConform/>
       </item>
-      <item value="3" name="NodeTimeCluster" summary="Synchronized time by querying the Time Synchronization cluster of another Node.">
+      <item value="3" name="NodeTimeCluster" summary="Synchronized time by querying the Time Cluster of another Node.">
         <mandatoryConform/>
       </item>
-      <item value="4" name="NonMatterSNTP" summary="SNTP from a server not in the Matter network. NTS is not used.">
+      <item value="4" name="NonFabricSntp" summary="SNTP from a server not in the Fabric. NTS is not used.">
         <mandatoryConform/>
       </item>
-      <item value="5" name="NonMatterNTP" summary="NTP from servers not in the Matter network. None of the servers used NTS.">
+      <item value="5" name="NonFabricNtp" summary="NTP from servers not in the Fabric. None of the servers used NTS.">
         <mandatoryConform/>
       </item>
-      <item value="6" name="MatterSNTP" summary="SNTP from a server within the Matter network. NTS is not used.">
+      <item value="6" name="FabricSntp" summary="SNTP from a server within the Fabric. NTS is not used.">
         <mandatoryConform/>
       </item>
-      <item value="7" name="MatterNTP" summary="NTP from servers within the Matter network. None of the servers used NTS.">
+      <item value="7" name="FabricNtp" summary="NTP from a servers within the Fabric. None of the servers used NTS.">
         <mandatoryConform/>
       </item>
-      <item value="8" name="MixedNTP" summary="NTP from multiple servers in the Matter network and external. None of the servers used NTS.">
+      <item value="8" name="MixedNtp" summary="NTP from multiple servers on Fabric and external. None of the servers used NTS.">
         <mandatoryConform/>
       </item>
-      <item value="9" name="NonMatterSNTPNTS" summary="SNTP from a server not in the Matter network. NTS is used.">
+      <item value="9" name="NonFabricSntpNts" summary="SNTP from a server not in the Fabric. NTS is used.">
         <mandatoryConform/>
       </item>
-      <item value="10" name="NonMatterNTPNTS" summary="NTP from servers not in the Matter network. NTS is used on at least one server.">
+      <item value="10" name="NonFabricNtpNts" summary="NTP from servers not in the Fabric. NTS is used on at least one server.">
         <mandatoryConform/>
       </item>
-      <item value="11" name="MatterSNTPNTS" summary="SNTP from a server within the Matter network. NTS is used.">
+      <item value="11" name="FabricSntpNts" summary="SNTP from a server within the Fabric. NTS is used.">
         <mandatoryConform/>
       </item>
-      <item value="12" name="MatterNTPNTS" summary="NTP from a server within the Matter network. NTS is used on at least one server.">
+      <item value="12" name="FabricNtpNts" summary="NTP from a server within the Fabric. NTS is used on at least one server.">
         <mandatoryConform/>
       </item>
-      <item value="13" name="MixedNTPNTS" summary="NTP from multiple servers in the Matter network and external. NTS is used on at least one server.">
+      <item value="13" name="MixedNtpNts" summary="NTP from multiple servers on the Fabric and external. NTS is used on at least one server.">
         <mandatoryConform/>
       </item>
       <item value="14" name="CloudSource" summary="Time synchronization comes from a vendor cloud-based source (e.g. &quot;Date&quot; header in authenticated HTTPS connection).">
         <mandatoryConform/>
       </item>
-      <item value="15" name="PTP" summary="Time synchronization comes from PTP.">
+      <item value="15" name="Ptp" summary="Time synchronization comes from PTP.">
         <mandatoryConform/>
       </item>
-      <item value="16" name="GNSS" summary="Time synchronization comes from a GNSS source.">
-        <mandatoryConform/>
-      </item>
-    </enum>
-    <enum name="TimeZoneDatabaseEnum">
-      <item value="0" name="Full" summary="Node has a full list of the available time zones">
-        <mandatoryConform/>
-      </item>
-      <item value="1" name="Partial" summary="Node has a partial list of the available time zones">
-        <mandatoryConform/>
-      </item>
-      <item value="2" name="None" summary="Node does not have a time zone database">
+      <item value="16" name="Gnss" summary="Time synchronization comes from a GNSS source.">
         <mandatoryConform/>
       </item>
     </enum>
@@ -173,15 +158,6 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
       <field id="2" name="ValidUntil" type="epoch-us">
-        <quality nullable="true"/>
-        <mandatoryConform/>
-      </field>
-    </struct>
-    <struct name="FabricScopedTrustedTimeSourceStruct">
-      <field id="0" name="NodeID" type="node-id">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="Endpoint" type="endpoint-no">
         <mandatoryConform/>
       </field>
     </struct>
@@ -206,17 +182,6 @@ Davis, CA 95616, USA
             <to value="64"/>
           </lengthBetween>
         </constraint>
-      </field>
-    </struct>
-    <struct name="TrustedTimeSourceStruct">
-      <field id="0" name="FabricIndex" type="fabric-idx">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="NodeID" type="node-id">
-        <mandatoryConform/>
-      </field>
-      <field id="2" name="Endpoint" type="endpoint-no">
-        <mandatoryConform/>
       </field>
     </struct>
   </dataTypes>
@@ -246,16 +211,14 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0003" name="TrustedTimeSource" type="TrustedTimeSourceStruct" default="null">
-      <access read="true" readPrivilege="view"/>
-      <quality nullable="true" persistence="nonVolatile"/>
-      <mandatoryConform>
-        <feature name="TSC"/>
-      </mandatoryConform>
+    <attribute id="0x0003" name="TrustedTimeNodeId" type="node-id" default="null">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
     </attribute>
-    <attribute id="0x0004" name="DefaultNTP" type="string" default="null">
-      <access read="true" readPrivilege="view"/>
-      <quality nullable="true" persistence="nonVolatile"/>
+    <attribute id="0x0004" name="DefaultNtp" type="string" default="null">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
+      <quality nullable="true"/>
       <mandatoryConform>
         <feature name="NTPC"/>
       </mandatoryConform>
@@ -263,10 +226,9 @@ Davis, CA 95616, USA
         <maxLength value="128"/>
       </constraint>
     </attribute>
-    <attribute id="0x0005" name="TimeZone" type="list" default="[{0,0}]">
+    <attribute id="0x0005" name="TimeZone" type="list">
       <entry type="TimeZoneStruct"/>
-      <access read="true" readPrivilege="view"/>
-      <quality persistence="nonVolatile"/>
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <mandatoryConform>
         <feature name="TZ"/>
       </mandatoryConform>
@@ -279,71 +241,41 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0006" name="DSTOffset" type="list" default="empty">
       <entry type="DSTOffsetStruct"/>
-      <access read="true" readPrivilege="view"/>
-      <quality persistence="nonVolatile"/>
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <mandatoryConform>
         <feature name="TZ"/>
       </mandatoryConform>
+      <constraint>
+        <maxCount value="20"/>
+      </constraint>
     </attribute>
-    <attribute id="0x0007" name="LocalTime" type="epoch-us" default="null">
+    <attribute id="0x0007" name="LocalTime" type="epoch-us" default="0">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="true" nullable="true"/>
       <mandatoryConform>
         <feature name="TZ"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0008" name="TimeZoneDatabase" type="TimeZoneDatabaseEnum">
-      <default>
-        <enum default="None"/>
-      </default>
+    <attribute id="0x0008" name="TimeZoneDatabase" type="bool" default="false">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="TZ"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0009" name="NTPServerAvailable" type="bool" default="false">
+    <attribute id="0x0009" name="NtpServerPort" type="uint16" default="null">
       <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
       <mandatoryConform>
         <feature name="NTPS"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x000A" name="TimeZoneListMaxSize" type="uint8">
-      <access read="true" readPrivilege="view"/>
-      <quality persistence="fixed"/>
-      <mandatoryConform>
-        <feature name="TZ"/>
-      </mandatoryConform>
-      <constraint>
-        <between>
-          <from value="1"/>
-          <to value="2"/>
-        </between>
-      </constraint>
-    </attribute>
-    <attribute id="0x000B" name="DSTOffsetListMaxSize" type="uint8">
-      <access read="true" readPrivilege="view"/>
-      <quality persistence="fixed"/>
-      <mandatoryConform>
-        <feature name="TZ"/>
-      </mandatoryConform>
-      <constraint>
-        <min value="1"/>
-      </constraint>
-    </attribute>
-    <attribute id="0x000C" name="SupportsDNSResolve" type="bool" default="false">
-      <access read="true" readPrivilege="view"/>
-      <quality persistence="fixed"/>
-      <mandatoryConform>
-        <feature name="NTPC"/>
-      </mandatoryConform>
-    </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="SetUTCTime" direction="commandToServer" response="Y">
+    <command id="0x00" name="SetUtcTime" direction="commandToServer" response="Y">
       <access invokePrivilege="admin"/>
       <mandatoryConform/>
-      <field id="0" name="UTCTime" type="epoch-us" default="0">
+      <field id="0" name="UtcTime" type="epoch-us" default="0">
         <mandatoryConform/>
       </field>
       <field id="1" name="Granularity" type="GranularityEnum">
@@ -359,63 +291,6 @@ Davis, CA 95616, USA
         <optionalConform/>
       </field>
     </command>
-    <command id="0x01" name="SetTrustedTimeSource" direction="commandToServer" response="Y">
-      <access invokePrivilege="admin" fabricScoped="true"/>
-      <mandatoryConform>
-        <feature name="TSC"/>
-      </mandatoryConform>
-      <field id="0" name="TrustedTimeSource" type="FabricScopedTrustedTimeSourceStruct">
-        <quality nullable="true"/>
-        <mandatoryConform/>
-      </field>
-    </command>
-    <command id="0x02" name="SetTimeZone" direction="commandToServer" response="SetTimeZoneResponse">
-      <access invokePrivilege="manage"/>
-      <mandatoryConform>
-        <feature name="TZ"/>
-      </mandatoryConform>
-      <field id="0" name="TimeZone" type="list">
-        <entry type="TimeZoneStruct"/>
-        <mandatoryConform/>
-        <constraint>
-          <countBetween>
-            <from value="1"/>
-            <to value="2"/>
-          </countBetween>
-        </constraint>
-      </field>
-    </command>
-    <command id="0x03" name="SetTimeZoneResponse" direction="responseFromServer">
-      <mandatoryConform>
-        <feature name="TZ"/>
-      </mandatoryConform>
-      <field id="0" name="DSTOffsetsRequired" type="bool" default="true">
-        <mandatoryConform/>
-      </field>
-    </command>
-    <command id="0x04" name="SetDSTOffset" direction="commandToServer" response="Y">
-      <access invokePrivilege="manage"/>
-      <mandatoryConform>
-        <feature name="TZ"/>
-      </mandatoryConform>
-      <field id="0" name="DSTOffset" type="list">
-        <entry type="DSTOffsetStruct"/>
-        <mandatoryConform/>
-      </field>
-    </command>
-    <command id="0x05" name="SetDefaultNTP" direction="commandToServer" response="Y">
-      <access invokePrivilege="admin"/>
-      <mandatoryConform>
-        <feature name="NTPC"/>
-      </mandatoryConform>
-      <field id="0" name="DefaultNTP" type="string">
-        <quality nullable="true"/>
-        <mandatoryConform/>
-        <constraint>
-          <maxLength value="128"/>
-        </constraint>
-      </field>
-    </command>
   </commands>
   <events>
     <event id="0x00" name="DSTTableEmpty" priority="info">
@@ -429,9 +304,6 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="TZ"/>
       </mandatoryConform>
-      <field id="0" name="DSTOffsetActive" type="bool">
-        <mandatoryConform/>
-      </field>
     </event>
     <event id="0x02" name="TimeZoneStatus" priority="info">
       <access readPrivilege="view"/>
@@ -449,17 +321,13 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="Name" type="string">
         <optionalConform/>
+        <constraint>
+          <lengthBetween>
+            <from value="0"/>
+            <to value="64"/>
+          </lengthBetween>
+        </constraint>
       </field>
-    </event>
-    <event id="0x03" name="TimeFailure" priority="info">
-      <access readPrivilege="view"/>
-      <mandatoryConform/>
-    </event>
-    <event id="0x04" name="MissingTrustedTimeSource" priority="info">
-      <access readPrivilege="view"/>
-      <mandatoryConform>
-        <feature name="TSC"/>
-      </mandatoryConform>
     </event>
   </events>
 </cluster>

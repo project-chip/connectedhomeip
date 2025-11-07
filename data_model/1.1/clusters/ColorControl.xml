@@ -57,14 +57,13 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0300" name="Color Control Cluster" revision="6">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0300" name="Color Control Cluster" revision="5">
   <revisionHistory>
     <revision revision="1" summary="mandatory global ClusterRevision attribute added; CCB 2028"/>
     <revision revision="2" summary="added Options attribute, CCB 2085 2104 2124 2230; ZLO 1.0"/>
     <revision revision="3" summary="CCB 2501 2814 2839 2840 2843 2861"/>
     <revision revision="4" summary="All Hubs changes"/>
     <revision revision="5" summary="new data model format and notation, FeatureMap support"/>
-    <revision revision="6" summary="Added clarifications to Scenes support for Matter"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0300" name="Color Control"/>
@@ -150,7 +149,7 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0005" name="DriftCompensation" type="enum8" default="">
+    <attribute id="0x0005" name="DriftCompensation" type="enum8">
       <enum>
         <item value="0" name="None" summary="None">
           <mandatoryConform/>
@@ -177,7 +176,7 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0006" name="CompensationText" type="string" default="">
+    <attribute id="0x0006" name="CompensationText" type="string">
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
       <constraint>
@@ -231,7 +230,7 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0010" name="NumberOfPrimaries" type="uint8" default="">
+    <attribute id="0x0010" name="NumberOfPrimaries" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" persistence="fixed"/>
       <mandatoryConform/>
@@ -242,7 +241,7 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0011" name="Primary1X" type="uint16" default="">
+    <attribute id="0x0011" name="Primary1X" type="uint16">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
@@ -253,7 +252,7 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0012" name="Primary1Y" type="uint16" default="">
+    <attribute id="0x0012" name="Primary1Y" type="uint16">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
@@ -264,12 +263,12 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0013" name="Primary1Intensity" type="uint8" default="">
+    <attribute id="0x0013" name="Primary1Intensity" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0015" name="Primary2X" type="uint16" default="">
+    <attribute id="0x0015" name="Primary2X" type="uint16">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
@@ -280,7 +279,7 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0016" name="Primary2Y" type="uint16" default="">
+    <attribute id="0x0016" name="Primary2Y" type="uint16">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
@@ -291,12 +290,12 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0017" name="Primary2Intensity" type="uint8" default="">
+    <attribute id="0x0017" name="Primary2Intensity" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0019" name="Primary3X" type="uint16" default="">
+    <attribute id="0x0019" name="Primary3X" type="uint16">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
@@ -307,7 +306,7 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x001A" name="Primary3Y" type="uint16" default="">
+    <attribute id="0x001A" name="Primary3Y" type="uint16">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
@@ -318,12 +317,12 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x001B" name="Primary3Intensity" type="uint8" default="">
+    <attribute id="0x001B" name="Primary3Intensity" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0020" name="Primary4X" type="uint16" default="">
+    <attribute id="0x0020" name="Primary4X" type="uint16">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
@@ -334,7 +333,7 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0021" name="Primary4Y" type="uint16" default="">
+    <attribute id="0x0021" name="Primary4Y" type="uint16">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
@@ -345,12 +344,12 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0022" name="Primary4Intensity" type="uint8" default="">
+    <attribute id="0x0022" name="Primary4Intensity" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0024" name="Primary5X" type="uint16" default="">
+    <attribute id="0x0024" name="Primary5X" type="uint16">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
@@ -361,7 +360,7 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0025" name="Primary5Y" type="uint16" default="">
+    <attribute id="0x0025" name="Primary5Y" type="uint16">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
@@ -372,12 +371,12 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0026" name="Primary5Intensity" type="uint8" default="">
+    <attribute id="0x0026" name="Primary5Intensity" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0028" name="Primary6X" type="uint16" default="">
+    <attribute id="0x0028" name="Primary6X" type="uint16">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
@@ -388,7 +387,7 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0029" name="Primary6Y" type="uint16" default="">
+    <attribute id="0x0029" name="Primary6Y" type="uint16">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
@@ -399,12 +398,12 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x002A" name="Primary6Intensity" type="uint8" default="">
+    <attribute id="0x002A" name="Primary6Intensity" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" persistence="fixed"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0030" name="WhitePointX" type="uint16" default="">
+    <attribute id="0x0030" name="WhitePointX" type="uint16">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform/>
       <constraint>
@@ -414,7 +413,7 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0031" name="WhitePointY" type="uint16" default="">
+    <attribute id="0x0031" name="WhitePointY" type="uint16">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform/>
       <constraint>
@@ -424,7 +423,7 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0032" name="ColorPointRX" type="uint16" default="">
+    <attribute id="0x0032" name="ColorPointRX" type="uint16">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform/>
       <constraint>
@@ -434,7 +433,7 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0033" name="ColorPointRY" type="uint16" default="">
+    <attribute id="0x0033" name="ColorPointRY" type="uint16">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform/>
       <constraint>
@@ -444,12 +443,12 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0034" name="ColorPointRIntensity" type="uint8" default="">
+    <attribute id="0x0034" name="ColorPointRIntensity" type="uint8">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality nullable="true"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x0036" name="ColorPointGX" type="uint16" default="">
+    <attribute id="0x0036" name="ColorPointGX" type="uint16">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform/>
       <constraint>
@@ -459,7 +458,7 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0037" name="ColorPointGY" type="uint16" default="">
+    <attribute id="0x0037" name="ColorPointGY" type="uint16">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform/>
       <constraint>
@@ -469,12 +468,12 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0038" name="ColorPointGIntensity" type="uint8" default="">
+    <attribute id="0x0038" name="ColorPointGIntensity" type="uint8">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality nullable="true"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x003A" name="ColorPointBX" type="uint16" default="">
+    <attribute id="0x003A" name="ColorPointBX" type="uint16">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform/>
       <constraint>
@@ -484,7 +483,7 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x003B" name="ColorPointBY" type="uint16" default="">
+    <attribute id="0x003B" name="ColorPointBY" type="uint16">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform/>
       <constraint>
@@ -494,7 +493,7 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x003C" name="ColorPointBIntensity" type="uint8" default="">
+    <attribute id="0x003C" name="ColorPointBIntensity" type="uint8">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality nullable="true"/>
       <optionalConform/>
@@ -522,7 +521,7 @@ Davis, CA 95616, USA
         </item>
       </enum>
       <access read="true" readPrivilege="view"/>
-      <quality scene="true" persistence="nonVolatile"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
       <constraint>
         <between>
@@ -619,7 +618,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x4010" name="StartUpColorTemperatureMireds" type="uint16" default="MS">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality nullable="true" persistence="nonVolatile"/>
+      <quality nullable="true"/>
       <mandatoryConform>
         <orTerm>
           <feature name="CT"/>
@@ -860,9 +859,6 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="StepMode" type="enum8">
         <enum>
-          <item value="0" name="Reserved" summary="Reserved">
-            <mandatoryConform/>
-          </item>
           <item value="1" name="Up" summary="Up">
             <mandatoryConform/>
           </item>
@@ -1225,19 +1221,19 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="UpdateFlags" type="map8">
         <bitmap>
-          <bitfield name="UpdateAction" bit="0" summary="UpdateAction">
+          <bitfield name="" bit="0" summary="">
             <mandatoryConform/>
           </bitfield>
-          <bitfield name="UpdateDirection" bit="1" summary="UpdateDirection">
+          <bitfield name="" bit="1" summary="">
             <mandatoryConform/>
           </bitfield>
-          <bitfield name="UpdateTime" bit="2" summary="UpdateTime">
+          <bitfield name="" bit="2" summary="">
             <mandatoryConform/>
           </bitfield>
-          <bitfield name="UpdateStartHue" bit="3" summary="UpdateStartHue">
+          <bitfield name="" bit="3" summary="">
             <mandatoryConform/>
           </bitfield>
-          <bitfield name="(Reserved)" from="0x00000004" to="0x00000007" summary="(Reserved)">
+          <bitfield name="" from="0x00000004" to="0x00000007" summary="">
             <mandatoryConform/>
           </bitfield>
         </bitmap>

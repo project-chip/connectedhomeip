@@ -59,30 +59,15 @@ Davis, CA 95616, USA
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0301" name="Ballast Configuration Cluster" revision="4">
   <revisionHistory>
-    <revision revision="1" summary="Mandatory global ClusterRevision attribute added"/>
+    <revision revision="1" summary="mandatory global ClusterRevision attribute added"/>
     <revision revision="2" summary="CCB 2104 2193 2230 2393 Deprecated some attributes"/>
     <revision revision="3" summary="CCB 2881"/>
-    <revision revision="4" summary="New data model format and notation"/>
+    <revision revision="4" summary="new data model format and notation"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0301" name="Ballast Configuration"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="BC" scope="Endpoint"/>
-  <dataTypes>
-    <bitmap name="BallastStatusBitmap">
-      <bitfield name="BallastNonOperational" bit="0" summary="Operational state of the ballast.">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="LampFailure" bit="1" summary="Operational state of the lamps.">
-        <mandatoryConform/>
-      </bitfield>
-    </bitmap>
-    <bitmap name="LampAlarmModeBitmap">
-      <bitfield name="LampBurnHours" bit="0" summary="State of LampBurnHours alarm generation">
-        <mandatoryConform/>
-      </bitfield>
-    </bitmap>
-  </dataTypes>
   <attributes>
     <attribute id="0x0000" name="PhysicalMinLevel" type="uint8" default="1">
       <access read="true" readPrivilege="view"/>
@@ -104,9 +89,20 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0002" name="BallastStatus" type="BallastStatusBitmap" default="0">
+    <attribute id="0x0002" name="BallastStatus" type="map8" default="0">
+      <bitmap>
+        <bitfield name="" bit="0" summary="">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="" bit="1" summary="">
+          <mandatoryConform/>
+        </bitfield>
+      </bitmap>
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
+      <constraint>
+        <max value="3"/>
+      </constraint>
     </attribute>
     <attribute id="0x0010" name="MinLevel" type="uint8">
       <default>
@@ -116,12 +112,8 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <constraint>
         <between>
-          <from>
-            <attribute name="PhysicalMinLevel"/>
-          </from>
-          <to>
-            <attribute name="MaxLevel"/>
-          </to>
+          <from value="1"/>
+          <to value="254"/>
         </between>
       </constraint>
     </attribute>
@@ -133,19 +125,26 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <constraint>
         <between>
-          <from>
-            <attribute name="MinLevel"/>
-          </from>
-          <to>
-            <attribute name="PhysicalMaxLevel"/>
-          </to>
+          <from value="1"/>
+          <to value="254"/>
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0012" name="PowerOnLevel">
+    <attribute id="0x0012" name="PowerOnLevel" type="uint8">
+      <default>
+        <attribute name="PhysicalMaxLevel"/>
+      </default>
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <deprecateConform/>
+      <constraint>
+        <between>
+          <from value="1"/>
+          <to value="254"/>
+        </between>
+      </constraint>
     </attribute>
-    <attribute id="0x0013" name="PowerOnFadeTime">
+    <attribute id="0x0013" name="PowerOnFadeTime" type="uint16" default="0">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <deprecateConform/>
     </attribute>
     <attribute id="0x0014" name="IntrinsicBallastFactor" type="uint8">
@@ -192,9 +191,17 @@ Davis, CA 95616, USA
       <quality nullable="true"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x0034" name="LampAlarmMode" type="LampAlarmModeBitmap" default="0">
+    <attribute id="0x0034" name="LampAlarmMode" type="map8" default="0">
+      <bitmap>
+        <bitfield name="" bit="0" summary="">
+          <mandatoryConform/>
+        </bitfield>
+      </bitmap>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform/>
+      <constraint>
+        <max value="1"/>
+      </constraint>
     </attribute>
     <attribute id="0x0035" name="LampBurnHoursTripPoint" type="uint24" default="null">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>

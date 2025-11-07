@@ -135,9 +135,6 @@ Davis, CA 95616, USA
       <item value="5" name="ax" summary="Indicate the network interface is currently using 802.11ax against the wireless access point.">
         <mandatoryConform/>
       </item>
-      <item value="6" name="ah" summary="Indicate the network interface is currently using 802.11ah against the wireless access point.">
-        <mandatoryConform/>
-      </item>
     </enum>
   </dataTypes>
   <attributes>

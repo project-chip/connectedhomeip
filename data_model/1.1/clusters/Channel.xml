@@ -66,16 +66,16 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="CHANNEL" scope="Endpoint"/>
   <features>
-    <feature bit="0" code="CL" name="ChannelList" summary="Provides list of available channels.">
+    <feature bit="0" code="CL" name="Channel List" summary="Provides list of available channels.">
       <optionalConform/>
     </feature>
-    <feature bit="1" code="LI" name="LineupInfo" summary="Provides lineup info, which is a reference to an external source of lineup information.">
+    <feature bit="1" code="LI" name="Lineup Info" summary="Provides lineup info, which is a reference to an external source of lineup information.">
       <optionalConform/>
     </feature>
   </features>
   <dataTypes>
     <enum name="LineupInfoTypeEnum">
-      <item value="0" name="MSO" summary="Multi System Operator">
+      <item value="0" name="MSO" summary="MultiSystemOperator">
         <mandatoryConform/>
       </item>
     </enum>
@@ -177,7 +177,7 @@ Davis, CA 95616, USA
           <desc/>
         </constraint>
       </field>
-      <field id="1" name="Data" type="string">
+      <field id="1" name="Data" type="octstr">
         <optionalConform/>
       </field>
     </command>

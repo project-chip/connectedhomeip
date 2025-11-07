@@ -57,12 +57,12 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0503" name="Wake On LAN Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0503" name="Wake on LAN Cluster" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0503" name="Wake On LAN"/>
+    <clusterId id="0x0503" name="Wake on LAN"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="WAKEONLAN" scope="Endpoint"/>
   <attributes>
@@ -73,6 +73,12 @@ Davis, CA 95616, USA
       <constraint>
         <desc/>
       </constraint>
+      <constraint>
+        <allowed value="6"/>
+      </constraint>
+      <constraint>
+        <allowed value="8"/>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="LinkLocalAddress" type="ipv6adr">
       <access read="true" readPrivilege="view"/>
@@ -80,6 +86,9 @@ Davis, CA 95616, USA
       <optionalConform/>
       <constraint>
         <desc/>
+      </constraint>
+      <constraint>
+        <allowed value="16"/>
       </constraint>
     </attribute>
   </attributes>

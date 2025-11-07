@@ -123,7 +123,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
     </enum>
-    <struct name="ProviderLocation">
+    <struct name="ProviderLocationStruct">
       <field id="1" name="ProviderNodeID" type="node-id">
         <mandatoryConform/>
       </field>
@@ -135,7 +135,7 @@ Davis, CA 95616, USA
   </dataTypes>
   <attributes>
     <attribute id="0x0000" name="DefaultOTAProviders" type="list" default="empty">
-      <entry type="ProviderLocation"/>
+      <entry type="ProviderLocationStruct"/>
       <access read="true" write="true" readPrivilege="view" writePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
       <constraint>
@@ -189,57 +189,4 @@ Davis, CA 95616, USA
       </field>
     </command>
   </commands>
-  <events>
-    <event id="0x00" name="StateTransition" priority="info">
-      <access readPrivilege="view"/>
-      <mandatoryConform/>
-      <field id="0" name="PreviousState" type="UpdateStateEnum" default="Unknown">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="NewState" type="UpdateStateEnum">
-        <mandatoryConform/>
-      </field>
-      <field id="2" name="Reason" type="ChangeReasonEnum">
-        <mandatoryConform/>
-      </field>
-      <field id="3" name="TargetSoftwareVersion" type="uint32" default="null">
-        <quality nullable="true"/>
-        <mandatoryConform/>
-      </field>
-    </event>
-    <event id="0x01" name="VersionApplied" priority="critical">
-      <access readPrivilege="view"/>
-      <mandatoryConform/>
-      <field id="0" name="SoftwareVersion" type="uint32">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="ProductID" type="uint16">
-        <mandatoryConform/>
-      </field>
-    </event>
-    <event id="0x02" name="DownloadError" priority="info">
-      <access readPrivilege="view"/>
-      <mandatoryConform/>
-      <field id="0" name="SoftwareVersion" type="uint32">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="BytesDownloaded" type="uint64">
-        <mandatoryConform/>
-      </field>
-      <field id="2" name="ProgressPercent" type="uint8" default="null">
-        <quality nullable="true"/>
-        <mandatoryConform/>
-        <constraint>
-          <between>
-            <from value="0"/>
-            <to value="100"/>
-          </between>
-        </constraint>
-      </field>
-      <field id="3" name="PlatformCode" type="int64" default="null">
-        <quality nullable="true"/>
-        <mandatoryConform/>
-      </field>
-    </event>
-  </events>
 </cluster>

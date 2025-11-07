@@ -67,20 +67,28 @@ Davis, CA 95616, USA
   <clusters>
     <cluster id="0x0003" name="Identify" side="server">
       <mandatoryConform/>
+      <features>
+        <feature code="QRY">
+          <mandatoryConform>
+            <notTerm>
+              <condition name="Matter"/>
+            </notTerm>
+          </mandatoryConform>
+        </feature>
+      </features>
     </cluster>
     <cluster id="0x0004" name="Groups" side="server">
       <otherwiseConform>
         <mandatoryConform>
-          <condition name="Active"/>
+          <condition name="Awake"/>
         </mandatoryConform>
         <optionalConform/>
       </otherwiseConform>
     </cluster>
     <cluster id="0x0005" name="Scenes" side="server">
       <otherwiseConform>
-        <provisionalConform/>
         <mandatoryConform>
-          <condition name="Active"/>
+          <condition name="Awake"/>
         </mandatoryConform>
         <optionalConform/>
       </otherwiseConform>
@@ -88,12 +96,44 @@ Davis, CA 95616, USA
     <cluster id="0x0102" name="Window Covering" side="server">
       <mandatoryConform/>
       <features>
-        <feature code="" name="Absolute Position">
+        <feature code="ABS">
           <mandatoryConform>
-            <condition name="Zigbee"/>
+            <notTerm>
+              <condition name="Matter"/>
+            </notTerm>
           </mandatoryConform>
         </feature>
       </features>
+      <commands>
+        <command id="0x0005" name="GoToLiftPercentage">
+          <field name="LiftPercentageValue">
+            <mandatoryConform>
+              <notTerm>
+                <condition name="Matter"/>
+              </notTerm>
+            </mandatoryConform>
+          </field>
+          <field name="LiftPercent100thsValue">
+            <mandatoryConform>
+              <condition name="Matter"/>
+            </mandatoryConform>
+          </field>
+        </command>
+        <command id="0x0008" name="GoToTiltPercentage">
+          <field name="TiltPercentageValue">
+            <mandatoryConform>
+              <notTerm>
+                <condition name="Matter"/>
+              </notTerm>
+            </mandatoryConform>
+          </field>
+          <field name="TiltPercent100thsValue">
+            <mandatoryConform>
+              <condition name="Matter"/>
+            </mandatoryConform>
+          </field>
+        </command>
+      </commands>
     </cluster>
   </clusters>
 </deviceType>

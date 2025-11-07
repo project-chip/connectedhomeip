@@ -64,10 +64,7 @@ Davis, CA 95616, USA
   </revisionHistory>
   <classification class="dynamic utility" scope="endpoint"/>
   <clusters>
-    <cluster id="0x0003" name="Identify" side="server">
-      <optionalConform/>
-    </cluster>
-    <cluster id="0x0025" name="Actions" side="server">
+    <cluster id="" name="Actions" side="server">
       <optionalConform/>
     </cluster>
   </clusters>

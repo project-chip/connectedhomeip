@@ -57,51 +57,23 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0006" name="On/Off Cluster" revision="5">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0006" name="On/Off Cluster" revision="4">
   <revisionHistory>
-    <revision revision="1" summary="Global mandatory ClusterRevision attribute added; CCB 1555"/>
+    <revision revision="1" summary="global mandatory ClusterRevision attribute added; CCB 1555"/>
     <revision revision="2" summary="ZLO 1.0: StartUpOnOff"/>
     <revision revision="3" summary="FeatureMap global attribute support with Level Control and Lighting feature"/>
-    <revision revision="4" summary="New data model format and notation"/>
-    <revision revision="5" summary="Addition of Dead Front behavior and associated FeatureMap entry"/>
+    <revision revision="4" summary="new data model format and notation"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0006" name="On/Off"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="OO" scope="Endpoint"/>
   <features>
-    <feature bit="0" code="LT" name="Lighting" summary="Behavior that supports lighting applications.">
-      <optionalConform/>
-    </feature>
-    <feature bit="1" code="DF" name="DeadFrontBehaviour" summary="Device has Dead Front behavior">
+    <feature bit="0" code="LT" name="Level Control for Lighting" summary="Behavior that supports lighting applications.">
       <optionalConform/>
     </feature>
   </features>
   <dataTypes>
-    <enum name="DelayedAllOffEffectVariantEnum">
-      <item value="0x00" name="DelayedOffFastFade" summary="Fade to off in 0.8 seconds">
-        <mandatoryConform/>
-      </item>
-      <item value="0x01" name="NoFade" summary="No fade">
-        <mandatoryConform/>
-      </item>
-      <item value="0x02" name="DelayedOffSlowFade" summary="50% dim down in 0.8 seconds then fade to off in 12 seconds">
-        <mandatoryConform/>
-      </item>
-    </enum>
-    <enum name="DyingLightEffectVariantEnum">
-      <item value="0x00" name="DyingLightFadeOff" summary="20% dim up in 0.5s then fade to off in 1 second">
-        <mandatoryConform/>
-      </item>
-    </enum>
-    <enum name="EffectIdentifierEnum">
-      <item value="0x00" name="DelayedAllOff" summary="Delayed All Off">
-        <mandatoryConform/>
-      </item>
-      <item value="0x01" name="DyingLight" summary="Dying Light">
-        <mandatoryConform/>
-      </item>
-    </enum>
     <enum name="StartUpOnOffEnum">
       <item value="0" name="Off" summary="Set the OnOff attribute to FALSE">
         <mandatoryConform/>
@@ -113,11 +85,6 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
     </enum>
-    <bitmap name="OnOffControlBitmap">
-      <bitfield name="AcceptOnlyWhenOn" bit="0" summary="Indicates a command is only accepted when in On state.">
-        <mandatoryConform/>
-      </bitfield>
-    </bitmap>
   </dataTypes>
   <attributes>
     <attribute id="0x0000" name="OnOff" type="bool" default="false">
@@ -133,12 +100,14 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x4001" name="OnTime" type="uint16" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality nullable="true"/>
       <mandatoryConform>
         <feature name="LT"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x4002" name="OffWaitTime" type="uint16" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality nullable="true"/>
       <mandatoryConform>
         <feature name="LT"/>
       </mandatoryConform>
@@ -172,13 +141,13 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="LT"/>
       </mandatoryConform>
-      <field id="0" name="EffectIdentifier" type="EffectIdentifierEnum">
+      <field id="0" name="EffectIdentifier" type="uint8">
         <mandatoryConform/>
         <constraint>
           <desc/>
         </constraint>
       </field>
-      <field id="1" name="EffectVariant" type="enum8" default="0">
+      <field id="1" name="EffectVariant" type="uint8">
         <mandatoryConform/>
         <constraint>
           <desc/>
@@ -196,7 +165,15 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="LT"/>
       </mandatoryConform>
-      <field id="0" name="OnOffControl" type="OnOffControlBitmap">
+      <field id="0" name="OnOffControl" type="map8">
+        <bitmap>
+          <bitfield name="AcceptOnlyWhenOn" bit="0" summary="AcceptOnlyWhenOn">
+            <mandatoryConform/>
+          </bitfield>
+          <bitfield name="Reserved" from="0x00000001" to="0x00000007" summary="(Reserved)">
+            <mandatoryConform/>
+          </bitfield>
+        </bitmap>
         <mandatoryConform/>
         <constraint>
           <between>
@@ -206,16 +183,12 @@ Davis, CA 95616, USA
         </constraint>
       </field>
       <field id="1" name="OnTime" type="uint16">
+        <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint>
-          <max value="0xFFFE"/>
-        </constraint>
       </field>
       <field id="2" name="OffWaitTime" type="uint16">
+        <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint>
-          <max value="0xFFFE"/>
-        </constraint>
       </field>
     </command>
   </commands>

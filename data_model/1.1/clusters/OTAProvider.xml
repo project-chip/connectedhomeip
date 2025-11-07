@@ -108,7 +108,6 @@ Davis, CA 95616, USA
   </dataTypes>
   <commands>
     <command id="0x00" name="QueryImage" direction="commandToServer" response="QueryImageResponse">
-      <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="VendorID" type="vendor-id">
         <mandatoryConform/>
@@ -191,7 +190,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x02" name="ApplyUpdateRequest" direction="commandToServer" response="ApplyUpdateResponse">
-      <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="UpdateToken" type="octstr">
         <mandatoryConform/>
@@ -216,7 +214,6 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x04" name="NotifyUpdateApplied" direction="commandToServer" response="Y">
-      <access invokePrivilege="operate"/>
       <mandatoryConform/>
       <field id="0" name="UpdateToken" type="octstr">
         <mandatoryConform/>

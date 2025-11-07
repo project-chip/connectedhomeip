@@ -66,7 +66,7 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="AUDIOOUTPUT" scope="Endpoint"/>
   <features>
-    <feature bit="0" code="NU" name="NameUpdates" summary="Supports updates to output names">
+    <feature bit="0" code="NU" name="Name Updates" summary="Supports updates to output names">
       <optionalConform/>
     </feature>
   </features>
@@ -121,9 +121,6 @@ Davis, CA 95616, USA
     <command id="0x00" name="SelectOutput" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
-      <field id="0" name="Index" type="uint8">
-        <mandatoryConform/>
-      </field>
     </command>
     <command id="0x01" name="RenameOutput" direction="commandToServer" response="Y">
       <access invokePrivilege="manage"/>

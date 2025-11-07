@@ -59,76 +59,65 @@ Davis, CA 95616, USA
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0204" name="Thermostat User Interface Configuration Cluster" revision="2">
   <revisionHistory>
-    <revision revision="1" summary="Global mandatory ClusterRevision attribute added"/>
+    <revision revision="1" summary="global mandatory ClusterRevision attribute added"/>
     <revision revision="2" summary="New data model format and notation, added &quot;Conversion of Temperature Values for Display&quot; section"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0204" name="Thermostat User Interface Configuration"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="TSUIC" scope="Endpoint"/>
-  <dataTypes>
-    <enum name="KeypadLockoutEnum">
-      <item value="0" name="NoLockout" summary="All functionality available to the user">
-        <mandatoryConform/>
-      </item>
-      <item value="1" name="Lockout1" summary="Level 1 reduced functionality">
-        <mandatoryConform/>
-      </item>
-      <item value="2" name="Lockout2" summary="Level 2 reduced functionality">
-        <mandatoryConform/>
-      </item>
-      <item value="3" name="Lockout3" summary="Level 3 reduced functionality">
-        <mandatoryConform/>
-      </item>
-      <item value="4" name="Lockout4" summary="Level 4 reduced functionality">
-        <mandatoryConform/>
-      </item>
-      <item value="5" name="Lockout5" summary="Least functionality available to the user">
-        <mandatoryConform/>
-      </item>
-    </enum>
-    <enum name="ScheduleProgrammingVisibilityEnum">
-      <item value="0" name="ScheduleProgrammingPermitted" summary="Local schedule programming functionality is enabled at the thermostat">
-        <mandatoryConform/>
-      </item>
-      <item value="1" name="ScheduleProgrammingDenied" summary="Local schedule programming functionality is disabled at the thermostat">
-        <mandatoryConform/>
-      </item>
-    </enum>
-    <enum name="TemperatureDisplayModeEnum">
-      <item value="0" name="Celsius" summary="Temperature displayed in °C">
-        <mandatoryConform/>
-      </item>
-      <item value="1" name="Fahrenheit" summary="Temperature displayed in °F">
-        <mandatoryConform/>
-      </item>
-    </enum>
-  </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="TemperatureDisplayMode" type="TemperatureDisplayModeEnum">
-      <default>
-        <enum default="Celsius"/>
-      </default>
+    <attribute id="0x0000" name="TemperatureDisplayMode" type="enum8" default="0">
+      <enum>
+        <item value="0" name="TemperatureDisplayedInC" summary="Temperature displayed in °C">
+          <mandatoryConform/>
+        </item>
+        <item value="1" name="TemperatureDisplayedInF" summary="Temperature displayed in °F">
+          <mandatoryConform/>
+        </item>
+      </enum>
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <mandatoryConform/>
       <constraint>
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0001" name="KeypadLockout" type="KeypadLockoutEnum">
-      <default>
-        <enum default="NoLockout"/>
-      </default>
+    <attribute id="0x0001" name="KeypadLockout" type="enum8" default="0">
+      <enum>
+        <item value="0" name="AllFunctionalityAvailableToTheUser" summary="All functionality available to the user">
+          <mandatoryConform/>
+        </item>
+        <item value="1" name="Level1ReducedFunctionality" summary="Level 1 reduced functionality">
+          <mandatoryConform/>
+        </item>
+        <item value="2" name="Level2ReducedFunctionality" summary="Level 2 reduced functionality">
+          <mandatoryConform/>
+        </item>
+        <item value="3" name="Level3ReducedFunctionality" summary="Level 3 reduced functionality">
+          <mandatoryConform/>
+        </item>
+        <item value="4" name="Level4ReducedFunctionality" summary="Level 4 reduced functionality">
+          <mandatoryConform/>
+        </item>
+        <item value="5" name="LeastFunctionalityAvailableToTheUser" summary="Least functionality available to the user">
+          <mandatoryConform/>
+        </item>
+      </enum>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <mandatoryConform/>
       <constraint>
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0002" name="ScheduleProgrammingVisibility" type="ScheduleProgrammingVisibilityEnum">
-      <default>
-        <enum default="ScheduleProgrammingPermitted"/>
-      </default>
+    <attribute id="0x0002" name="ScheduleProgrammingVisibility" type="enum8" default="0">
+      <enum>
+        <item value="0" name="LocalScheduleProgrammingFunctionalityIsEnabledAtTheThermostat" summary="Local schedule programming functionality is enabled at the thermostat">
+          <mandatoryConform/>
+        </item>
+        <item value="1" name="LocalScheduleProgrammingFunctionalityIsDisabledAtTheThermostat" summary="Local schedule programming functionality is disabled at the thermostat">
+          <mandatoryConform/>
+        </item>
+      </enum>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform/>
       <constraint>

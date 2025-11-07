@@ -297,6 +297,9 @@ Davis, CA 95616, USA
           <feature name="AUTO"/>
         </optionalConform>
       </otherwiseConform>
+      <constraint>
+        <min value="-27315"/>
+      </constraint>
     </attribute>
     <attribute id="0x000C" name="MaxConstTemp" type="int16" default="null">
       <access read="true" readPrivilege="view"/>
@@ -309,6 +312,9 @@ Davis, CA 95616, USA
           <feature name="AUTO"/>
         </optionalConform>
       </otherwiseConform>
+      <constraint>
+        <min value="-27315"/>
+      </constraint>
     </attribute>
     <attribute id="0x0010" name="PumpStatus" type="PumpStatusBitmap" default="0">
       <access read="true" readPrivilege="view"/>

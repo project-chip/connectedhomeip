@@ -57,13 +57,13 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" name="Level Control Cluster Clusters" revision="5">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" name="Level Control Clusters" revision="5">
   <revisionHistory>
-    <revision revision="1" summary="Global mandatory ClusterRevision attribute added"/>
-    <revision revision="2" summary="Added Options attribute, state change table; ZLO 1.0; Base cluster (no change) CCB 2085 1775 2281 2147"/>
+    <revision revision="1" summary="global mandatory ClusterRevision attribute added"/>
+    <revision revision="2" summary="added Options attribute, state change table; ZLO 1.0; Base cluster (no change) CCB 2085 1775 2281 2147"/>
     <revision revision="3" summary="CCB 2574 2616 2659 2702 2814 2818 2819 2898"/>
     <revision revision="4" summary="FeatureMap support with On/Off, Lighting and Frequency features"/>
-    <revision revision="5" summary="New data model format and notation"/>
+    <revision revision="5" summary="new data model format and notation"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0008" name="Level Control" picsCode="LVL"/>
@@ -71,7 +71,7 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="LVL" scope="Endpoint"/>
   <features>
-    <feature bit="0" code="OO" name="OnOff" summary="Dependency with the On/Off cluster">
+    <feature bit="0" code="OO" name="On/Off" summary="Dependency with the On/Off cluster">
       <optionalConform/>
     </feature>
     <feature bit="1" code="LT" name="Lighting" summary="Behavior that supports lighting applications">
@@ -81,31 +81,6 @@ Davis, CA 95616, USA
       <optionalConform/>
     </feature>
   </features>
-  <dataTypes>
-    <enum name="MoveModeEnum">
-      <item value="0" name="Up" summary="Increase the level">
-        <mandatoryConform/>
-      </item>
-      <item value="1" name="Down" summary="Decrease the level">
-        <mandatoryConform/>
-      </item>
-    </enum>
-    <bitmap name="OptionsBitmap">
-      <bitfield name="ExecuteIfOff" bit="0" summary="Dependency on On/Off cluster">
-        <mandatoryConform>
-          <orTerm>
-            <feature name="LT"/>
-            <feature name="OO"/>
-          </orTerm>
-        </mandatoryConform>
-      </bitfield>
-      <bitfield name="CoupleColorTempToLevel" bit="1" summary="Dependency on Color Control cluster">
-        <mandatoryConform>
-          <feature name="LT"/>
-        </mandatoryConform>
-      </bitfield>
-    </bitmap>
-  </dataTypes>
   <attributes>
     <attribute id="0x0000" name="CurrentLevel" type="uint8" default="null">
       <access read="true" readPrivilege="view"/>
@@ -128,20 +103,6 @@ Davis, CA 95616, USA
         <feature name="LT"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0002" name="MinLevel" type="uint8" default="1">
-      <access read="true" readPrivilege="view"/>
-      <optionalConform>
-        <feature name="LT"/>
-      </optionalConform>
-      <constraint>
-        <between>
-          <from value="1"/>
-          <to>
-            <attribute name="MaxLevel"/>
-          </to>
-        </between>
-      </constraint>
-    </attribute>
     <attribute id="0x0002" name="MinLevel" type="uint8" default="0">
       <access read="true" readPrivilege="view"/>
       <optionalConform>
@@ -152,6 +113,20 @@ Davis, CA 95616, USA
       <constraint>
         <between>
           <from value="0"/>
+          <to>
+            <attribute name="MaxLevel"/>
+          </to>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0002" name="MinLevel" type="uint8" default="1">
+      <access read="true" readPrivilege="view"/>
+      <optionalConform>
+        <feature name="LT"/>
+      </optionalConform>
+      <constraint>
+        <between>
+          <from value="1"/>
           <to>
             <attribute name="MaxLevel"/>
           </to>
@@ -206,8 +181,21 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="FQ"/>
       </mandatoryConform>
+      <constraint>
+        <min>
+          <attribute name="MinFrequency"/>
+        </min>
+      </constraint>
     </attribute>
-    <attribute id="0x000F" name="Options" type="OptionsBitmap" default="0">
+    <attribute id="0x000F" name="Options" type="map8" default="0">
+      <bitmap>
+        <bitfield name="ExecuteIfOff" bit="0" summary="ExecuteIfOff">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="CoupleColorTempToLevel" bit="1" summary="CoupleColorTempToLevel">
+          <mandatoryConform/>
+        </bitfield>
+      </bitmap>
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <mandatoryConform/>
       <constraint>
@@ -282,7 +270,7 @@ Davis, CA 95616, USA
           <desc/>
         </constraint>
       </field>
-      <field id="3" name="OptionsOverride" type="OptionsBitmap" default="0">
+      <field id="3" name="OptionsOverride" type="map8" default="0">
         <mandatoryConform/>
         <constraint>
           <desc/>
@@ -292,7 +280,7 @@ Davis, CA 95616, USA
     <command id="0x01" name="Move" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
-      <field id="0" name="MoveMode" type="MoveModeEnum">
+      <field id="0" name="MoveMode" type="enum8">
         <mandatoryConform/>
         <constraint>
           <desc/>
@@ -308,7 +296,7 @@ Davis, CA 95616, USA
           <desc/>
         </constraint>
       </field>
-      <field id="3" name="OptionsOverride" type="OptionsBitmap" default="0">
+      <field id="3" name="OptionsOverride" type="map8" default="0">
         <mandatoryConform/>
         <constraint>
           <desc/>
@@ -318,7 +306,7 @@ Davis, CA 95616, USA
     <command id="0x02" name="Step" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
-      <field id="0" name="StepMode" type="MoveModeEnum">
+      <field id="0" name="StepMode" type="enum8">
         <mandatoryConform/>
         <constraint>
           <desc/>
@@ -337,7 +325,7 @@ Davis, CA 95616, USA
           <desc/>
         </constraint>
       </field>
-      <field id="4" name="OptionsOverride" type="OptionsBitmap" default="0">
+      <field id="4" name="OptionsOverride" type="map8" default="0">
         <mandatoryConform/>
         <constraint>
           <desc/>
@@ -353,7 +341,7 @@ Davis, CA 95616, USA
           <desc/>
         </constraint>
       </field>
-      <field id="1" name="OptionsOverride" type="OptionsBitmap" default="0">
+      <field id="1" name="OptionsOverride" type="map8" default="0">
         <mandatoryConform/>
         <constraint>
           <desc/>

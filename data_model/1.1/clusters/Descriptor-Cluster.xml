@@ -57,20 +57,14 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x001D" name="Descriptor Cluster" revision="2">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x001D" name="Descriptor Cluster" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
-    <revision revision="2" summary="Semantic tag list; TagList feature"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x001D" name="Descriptor"/>
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="DESC" scope="Endpoint"/>
-  <features>
-    <feature bit="0" code="TAGLIST" name="TagList" summary="The TagList attribute is present">
-      <describedConform/>
-    </feature>
-  </features>
   <dataTypes>
     <struct name="DeviceTypeStruct">
       <field id="0" name="DeviceType" type="devtype-id">
@@ -110,20 +104,6 @@ Davis, CA 95616, USA
       <entry type="endpoint-no"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
-    </attribute>
-    <attribute id="0x0004" name="TagList" type="list" default="MS">
-      <entry type="SemanticTagStruct"/>
-      <access read="true" readPrivilege="view"/>
-      <quality persistence="fixed"/>
-      <mandatoryConform>
-        <feature name="TAGLIST"/>
-      </mandatoryConform>
-      <constraint>
-        <countBetween>
-          <from value="1"/>
-          <to value="6"/>
-        </countBetween>
-      </constraint>
     </attribute>
   </attributes>
 </cluster>

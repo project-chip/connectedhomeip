@@ -57,101 +57,15 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0039" name="Bridged Device Basic Information Cluster" revision="2">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0039" name="Bridged Device Basic Information Cluster" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
-    <revision revision="2" summary="Added ProductAppearance attribute"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0039" name="Bridged Device Basic Information"/>
   </clusterIds>
-  <classification hierarchy="derived" baseCluster="Basic Information" role="utility" picsCode="BRBINFO" scope="Endpoint"/>
+  <classification hierarchy="derived" baseCluster="Derived from Basic Information" role="utility" picsCode="BRBINFO" scope="Endpoint"/>
   <dataTypes>
-    <enum name="ColorEnum">
-      <item value="0" name="Black" summary="Approximately RGB #000000.">
-        <mandatoryConform/>
-      </item>
-      <item value="1" name="Navy" summary="Approximately RGB #000080.">
-        <mandatoryConform/>
-      </item>
-      <item value="2" name="Green" summary="Approximately RGB #008000.">
-        <mandatoryConform/>
-      </item>
-      <item value="3" name="Teal" summary="Approximately RGB #008080.">
-        <mandatoryConform/>
-      </item>
-      <item value="4" name="Maroon" summary="Approximately RGB #800080.">
-        <mandatoryConform/>
-      </item>
-      <item value="5" name="Purple" summary="Approximately RGB #800080.">
-        <mandatoryConform/>
-      </item>
-      <item value="6" name="Olive" summary="Approximately RGB #808000.">
-        <mandatoryConform/>
-      </item>
-      <item value="7" name="Gray" summary="Approximately RGB #808080.">
-        <mandatoryConform/>
-      </item>
-      <item value="8" name="Blue" summary="Approximately RGB #0000FF.">
-        <mandatoryConform/>
-      </item>
-      <item value="9" name="Lime" summary="Approximately RGB #00FF00.">
-        <mandatoryConform/>
-      </item>
-      <item value="10" name="Aqua" summary="Approximately RGB #00FFFF.">
-        <mandatoryConform/>
-      </item>
-      <item value="11" name="Red" summary="Approximately RGB #FF0000.">
-        <mandatoryConform/>
-      </item>
-      <item value="12" name="Fuchsia" summary="Approximately RGB #FF00FF.">
-        <mandatoryConform/>
-      </item>
-      <item value="13" name="Yellow" summary="Approximately RGB #FFFF00.">
-        <mandatoryConform/>
-      </item>
-      <item value="14" name="White" summary="Approximately RGB #FFFFFF.">
-        <mandatoryConform/>
-      </item>
-      <item value="15" name="Nickel" summary="Typical hardware &quot;Nickel&quot; color.">
-        <mandatoryConform/>
-      </item>
-      <item value="16" name="Chrome" summary="Typical hardware &quot;Chrome&quot; color.">
-        <mandatoryConform/>
-      </item>
-      <item value="17" name="Brass" summary="Typical hardware &quot;Brass&quot; color.">
-        <mandatoryConform/>
-      </item>
-      <item value="18" name="Copper" summary="Typical hardware &quot;Copper&quot; color.">
-        <mandatoryConform/>
-      </item>
-      <item value="19" name="Silver" summary="Typical hardware &quot;Silver&quot; color.">
-        <mandatoryConform/>
-      </item>
-      <item value="20" name="Gold" summary="Typical hardware &quot;Gold&quot; color.">
-        <mandatoryConform/>
-      </item>
-    </enum>
-    <enum name="ProductFinishEnum">
-      <item value="0" name="Other" summary="Product has some other finish not listed below.">
-        <mandatoryConform/>
-      </item>
-      <item value="1" name="Matte" summary="Product has a matte finish.">
-        <mandatoryConform/>
-      </item>
-      <item value="2" name="Satin" summary="Product has a satin finish.">
-        <mandatoryConform/>
-      </item>
-      <item value="3" name="Polished" summary="Product has a polished or shiny finish.">
-        <mandatoryConform/>
-      </item>
-      <item value="4" name="Rugged" summary="Product has a rugged finish.">
-        <mandatoryConform/>
-      </item>
-      <item value="5" name="Fabric" summary="Product has a fabric finish.">
-        <mandatoryConform/>
-      </item>
-    </enum>
     <struct name="CapabilityMinimaStruct">
       <field id="0" name="CaseSessionsPerFabric" type="uint16" default="3">
         <mandatoryConform/>
@@ -164,15 +78,6 @@ Davis, CA 95616, USA
         <constraint>
           <min value="3"/>
         </constraint>
-      </field>
-    </struct>
-    <struct name="ProductAppearanceStruct">
-      <field id="0" name="Finish" type="ProductFinishEnum">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="PrimaryColor" type="ColorEnum">
-        <quality nullable="true"/>
-        <mandatoryConform/>
       </field>
     </struct>
   </dataTypes>
@@ -323,11 +228,6 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <disallowConform/>
-    </attribute>
-    <attribute id="0x0014" name="ProductAppearance" type="ProductAppearanceStruct" default="MS">
-      <access read="true" readPrivilege="view"/>
-      <quality persistence="fixed"/>
-      <optionalConform/>
     </attribute>
   </attributes>
   <events>

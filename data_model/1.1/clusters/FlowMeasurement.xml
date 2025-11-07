@@ -66,7 +66,7 @@ Davis, CA 95616, USA
   <clusterIds>
     <clusterId id="0x0404" name="Flow Measurement"/>
   </clusterIds>
-  <classification hierarchy="base" role="application" picsCode="FLW" scope="Endpoint"/>
+  <classification hierarchy="base" role="application" picsCode="FLW" scope="Type 2 (server to client)"/>
   <attributes>
     <attribute id="0x0000" name="MeasuredValue" type="uint16" default="null">
       <access read="true" readPrivilege="view"/>
@@ -90,7 +90,15 @@ Davis, CA 95616, USA
       <constraint>
         <between>
           <from value="0"/>
-          <to value="MaxMeasuredValue - 1"/>
+          <to>
+            <compute>
+              <operation>subtract</operation>
+              <left>
+                <attribute name="MaxMeasuredValue"/>
+              </left>
+              <right value="1"/>
+            </compute>
+          </to>
         </between>
       </constraint>
     </attribute>
@@ -100,7 +108,15 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <constraint>
         <between>
-          <from value="MinMeasuredValue + 1"/>
+          <from>
+            <compute>
+              <operation>add</operation>
+              <left>
+                <attribute name="MinMeasuredValue"/>
+              </left>
+              <right value="1"/>
+            </compute>
+          </from>
           <to value="65534"/>
         </between>
       </constraint>

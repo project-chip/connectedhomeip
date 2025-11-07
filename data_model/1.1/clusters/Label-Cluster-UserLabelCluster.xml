@@ -64,13 +64,16 @@ Davis, CA 95616, USA
   <clusterIds>
     <clusterId id="0x0041" name="User Label"/>
   </clusterIds>
-  <classification hierarchy="derived" baseCluster="Label" role="utility" picsCode="ULABEL" scope="Endpoint"/>
+  <classification hierarchy="derived" baseCluster="Derived from Label" role="utility" picsCode="ULABEL" scope="Endpoint"/>
   <attributes>
     <attribute id="0x0000" name="LabelList" type="list" default="empty">
       <entry type="LabelStruct"/>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
       <mandatoryConform/>
+      <constraint>
+        <minCount value="4"/>
+      </constraint>
     </attribute>
   </attributes>
 </cluster>

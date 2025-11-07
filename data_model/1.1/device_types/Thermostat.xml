@@ -67,35 +67,29 @@ Davis, CA 95616, USA
   <clusters>
     <cluster id="0x0003" name="Identify" side="server">
       <mandatoryConform/>
+      <features>
+        <feature code="QRY">
+          <mandatoryConform>
+            <condition name="Zigbee"/>
+          </mandatoryConform>
+        </feature>
+      </features>
     </cluster>
     <cluster id="0x0004" name="Groups" side="server">
       <mandatoryConform>
-        <condition name="Active"/>
+        <condition name="Awake"/>
       </mandatoryConform>
     </cluster>
     <cluster id="0x0005" name="Scenes" side="server">
+      <optionalConform/>
+    </cluster>
+    <cluster id="0x0038" name="Time Sync" side="server">
       <otherwiseConform>
         <provisionalConform/>
         <optionalConform/>
       </otherwiseConform>
     </cluster>
-    <cluster id="0x0009" name="Alarms" side="server">
-      <optionalConform>
-        <condition name="Zigbee"/>
-      </optionalConform>
-    </cluster>
-    <cluster id="0x000A" name="Time" side="client">
-      <optionalConform>
-        <condition name="Zigbee"/>
-      </optionalConform>
-    </cluster>
-    <cluster id="0x0038" name="TimeSync" side="server">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform/>
-      </otherwiseConform>
-    </cluster>
-    <cluster id="0x0038" name="TimeSync" side="client">
+    <cluster id="0x0038" name="Time Sync" side="client">
       <otherwiseConform>
         <provisionalConform/>
         <optionalConform/>
@@ -104,7 +98,7 @@ Davis, CA 95616, USA
     <cluster id="0x0201" name="Thermostat" side="server">
       <mandatoryConform/>
       <features>
-        <feature code="" name="Schedule Configuration">
+        <feature code="SCH">
           <otherwiseConform>
             <optionalConform>
               <condition name="Zigbee"/>
@@ -120,6 +114,18 @@ Davis, CA 95616, USA
           </optionalConform>
         </attribute>
       </attributes>
+      <commands>
+        <command id="0x0004" name="GetRelayStatusLog">
+          <optionalConform>
+            <condition name="Zigbee"/>
+          </optionalConform>
+        </command>
+        <command id="0x0001" name="GetRelayStatusLogResponse">
+          <optionalConform>
+            <condition name="Zigbee"/>
+          </optionalConform>
+        </command>
+      </commands>
     </cluster>
     <cluster id="0x0202" name="Fan Control" side="client">
       <otherwiseConform>

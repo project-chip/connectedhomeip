@@ -66,7 +66,7 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="MEDIAINPUT" scope="Endpoint"/>
   <features>
-    <feature bit="0" code="NU" name="NameUpdates" summary="Supports updates to the input names">
+    <feature bit="0" code="NU" name="Name Updates" summary="Supports updates to the input names">
       <optionalConform/>
     </feature>
   </features>

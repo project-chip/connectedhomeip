@@ -59,7 +59,7 @@ Davis, CA 95616, USA
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0201" name="Thermostat Cluster" revision="6">
   <revisionHistory>
-    <revision revision="1" summary="Mandatory global ClusterRevision attribute added; fixed some defaults; CCB 1823, 1480"/>
+    <revision revision="1" summary="mandatory global ClusterRevision attribute added; fixed some defaults; CCB 1823, 1480"/>
     <revision revision="2" summary="CCB 1981 2186 2249 2250 2251; NFR Thermostat Setback"/>
     <revision revision="3" summary="CCB 2477 2560 2773 2777 2815 2816 3029"/>
     <revision revision="4" summary="All Hubs changes"/>
@@ -104,342 +104,10 @@ Davis, CA 95616, USA
     </feature>
   </features>
   <dataTypes>
-    <number name="SignedTemperature" type="int8"/>
-    <number name="TemperatureDifference" type="int16"/>
-    <number name="UnsignedTemperature" type="uint8"/>
-    <enum name="ACCapacityFormatEnum">
-      <item value="0" name="BTUh" summary="British Thermal Unit per Hour">
-        <optionalConform/>
-      </item>
-    </enum>
-    <enum name="ACCompressorTypeEnum">
-      <item value="0" name="Unknown" summary="Unknown compressor type">
-        <optionalConform/>
-      </item>
-      <item value="1" name="T1" summary="Max working ambient 43 °C">
-        <optionalConform/>
-      </item>
-      <item value="2" name="T2" summary="Max working ambient 35 °C">
-        <optionalConform/>
-      </item>
-      <item value="3" name="T3" summary="Max working ambient 52 °C">
-        <optionalConform/>
-      </item>
-    </enum>
-    <enum name="ACLouverPositionEnum">
-      <item value="1" name="Closed" summary="Fully Closed">
-        <optionalConform/>
-      </item>
-      <item value="2" name="Open" summary="Fully Open">
-        <optionalConform/>
-      </item>
-      <item value="3" name="Quarter" summary="Quarter Open">
-        <optionalConform/>
-      </item>
-      <item value="4" name="Half" summary="Half Open">
-        <optionalConform/>
-      </item>
-      <item value="5" name="ThreeQuarters" summary="Three Quarters Open">
-        <optionalConform/>
-      </item>
-    </enum>
-    <enum name="ACRefrigerantTypeEnum">
-      <item value="0" name="Unknown" summary="Unknown Refrigerant Type">
-        <optionalConform/>
-      </item>
-      <item value="1" name="R22" summary="R22 Refrigerant">
-        <optionalConform/>
-      </item>
-      <item value="2" name="R410a" summary="R410a Refrigerant">
-        <optionalConform/>
-      </item>
-      <item value="3" name="R407c" summary="R407c Refrigerant">
-        <optionalConform/>
-      </item>
-    </enum>
-    <enum name="ACTypeEnum">
-      <item value="0" name="Unknown" summary="Unknown AC Type">
-        <optionalConform/>
-      </item>
-      <item value="1" name="CoolingFixed" summary="Cooling and Fixed Speed">
-        <optionalConform/>
-      </item>
-      <item value="2" name="HeatPumpFixed" summary="Heat Pump and Fixed Speed">
-        <optionalConform/>
-      </item>
-      <item value="3" name="CoolingInverter" summary="Cooling and Inverter">
-        <optionalConform/>
-      </item>
-      <item value="4" name="HeatPumpInverter" summary="Heat Pump and Inverter">
-        <optionalConform/>
-      </item>
-    </enum>
-    <enum name="SetpointChangeSourceEnum">
-      <item value="0" name="Manual" summary="Manual, user-initiated setpoint change via the thermostat">
-        <optionalConform/>
-      </item>
-      <item value="1" name="Schedule" summary="Schedule/internal programming-initiated setpoint change">
-        <optionalConform>
-          <feature name="SCH"/>
-        </optionalConform>
-      </item>
-      <item value="2" name="External" summary="Externally-initiated setpoint change (e.g., DRLC cluster command, attribute write)">
-        <optionalConform/>
-      </item>
-    </enum>
-    <enum name="StartOfWeek">
-      <item value="0" name="Sunday">
-        <mandatoryConform/>
-      </item>
-      <item value="1" name="Monday">
-        <mandatoryConform/>
-      </item>
-      <item value="2" name="Tuesday">
-        <mandatoryConform/>
-      </item>
-      <item value="3" name="Wednesday">
-        <mandatoryConform/>
-      </item>
-      <item value="4" name="Thursday">
-        <mandatoryConform/>
-      </item>
-      <item value="5" name="Friday">
-        <mandatoryConform/>
-      </item>
-      <item value="6" name="Saturday">
-        <mandatoryConform/>
-      </item>
-    </enum>
-    <enum name="TemperatureSetpointHold">
-      <item value="0" name="SetpointHoldOff" summary="Follow scheduling program">
-        <mandatoryConform/>
-      </item>
-      <item value="1" name="SetpointHoldOn" summary="Maintain current setpoint, regardless of schedule transitions">
-        <mandatoryConform/>
-      </item>
-    </enum>
-    <enum name="ThermostatControlSequence">
-      <item value="0" name="CoolingOnly" summary="Heat and Emergency are not possible">
-        <optionalConform>
-          <feature name="COOL"/>
-        </optionalConform>
-      </item>
-      <item value="1" name="CoolingWithReheat" summary="Heat and Emergency are not possible">
-        <optionalConform>
-          <feature name="COOL"/>
-        </optionalConform>
-      </item>
-      <item value="2" name="HeatingOnly" summary="Cool and precooling (see Terms) are not possible">
-        <optionalConform>
-          <feature name="HEAT"/>
-        </optionalConform>
-      </item>
-      <item value="3" name="HeatingWithReheat" summary="Cool and precooling are not possible">
-        <optionalConform>
-          <feature name="HEAT"/>
-        </optionalConform>
-      </item>
-      <item value="4" name="CoolingAndHeating" summary="All modes are possible">
-        <optionalConform>
-          <andTerm>
-            <feature name="HEAT"/>
-            <feature name="COOL"/>
-          </andTerm>
-        </optionalConform>
-      </item>
-      <item value="5" name="CoolingAndHeatingWithReheat" summary="All modes are possible">
-        <optionalConform>
-          <andTerm>
-            <feature name="HEAT"/>
-            <feature name="COOL"/>
-          </andTerm>
-        </optionalConform>
-      </item>
-    </enum>
-    <enum name="ThermostatSystemMode">
-      <item value="0" name="Off" summary="The Thermostat does not generate demand for Cooling or Heating">
-        <optionalConform/>
-      </item>
-      <item value="1" name="Auto" summary="Demand is generated for either Cooling or Heating, as required">
-        <mandatoryConform>
-          <feature name="AUTO"/>
-        </mandatoryConform>
-      </item>
-      <item value="3" name="Cool" summary="Demand is only generated for Cooling">
-        <optionalConform>
-          <feature name="COOL"/>
-        </optionalConform>
-      </item>
-      <item value="4" name="Heat" summary="Demand is only generated for Heating">
-        <optionalConform>
-          <feature name="HEAT"/>
-        </optionalConform>
-      </item>
-      <item value="5" name="EmergencyHeat" summary="2nd stage heating is in use to achieve desired temperature">
-        <optionalConform>
-          <feature name="HEAT"/>
-        </optionalConform>
-      </item>
-      <item value="6" name="Precooling" summary="(see Terms)">
-        <optionalConform>
-          <feature name="COOL"/>
-        </optionalConform>
-      </item>
-      <item value="7" name="FanOnly">
-        <optionalConform/>
-      </item>
-      <item value="8" name="Dry">
-        <optionalConform/>
-      </item>
-      <item value="9" name="Sleep">
-        <optionalConform/>
-      </item>
-    </enum>
-    <bitmap name="ACErrorCodeBitmap">
-      <bitfield name="CompressorFail" bit="0" summary="Compressor Failure or Refrigerant Leakage">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="RoomSensorFail" bit="1" summary="Room Temperature Sensor Failure">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="OutdoorSensorFail" bit="2" summary="Outdoor Temperature Sensor Failure">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="CoilSensorFail" bit="3" summary="Indoor Coil Temperature Sensor Failure">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="FanFail" bit="4" summary="Fan Failure">
-        <mandatoryConform/>
-      </bitfield>
-    </bitmap>
-    <bitmap name="AlarmCodeBitmap">
-      <bitfield name="Initialization" bit="0" summary="Initialization failure. The device failed to complete initialization at power-up.">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="Hardware" bit="1" summary="Hardware failure">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="SelfCalibration" bit="2" summary="Self-calibration failure">
-        <mandatoryConform/>
-      </bitfield>
-    </bitmap>
-    <bitmap name="DayOfWeek">
-      <bitfield name="Sunday" bit="0" summary="Sunday">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="Monday" bit="1" summary="Monday">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="Tuesday" bit="2" summary="Tuesday">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="Wednesday" bit="3" summary="Wednesday">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="Thursday" bit="4" summary="Thursday">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="Friday" bit="5" summary="Friday">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="Saturday" bit="6" summary="Saturday">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="Away" bit="7" summary="Away or Vacation">
-        <mandatoryConform/>
-      </bitfield>
-    </bitmap>
-    <bitmap name="HVACSystemTypeBitmap">
-      <bitfield name="CoolingStage" from="0x00" to="0x01" summary="Stage of cooling the HVAC system is using.">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="HeatingStage" from="0x02" to="0x03" summary="Stage of heating the HVAC system is using.">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="HeatingType" bit="4" summary="Type of heating used by the HVAC system.">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="HeatingFuel" bit="5" summary="Type of fuel used by the HVAC system.">
-        <mandatoryConform/>
-      </bitfield>
-    </bitmap>
-    <bitmap name="ModeForSequence">
-      <bitfield name="HeatSetpointPresent" bit="0" summary="Adjust Heat Setpoint">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="CoolSetpointPresent" bit="1" summary="Adjust Cool Setpoint">
-        <mandatoryConform/>
-      </bitfield>
-    </bitmap>
-    <bitmap name="ProgrammingOperationModeBitmap">
-      <bitfield name="ScheduleActive" bit="0" summary="Schedule programming mode. This enables any programmed weekly schedule configurations.">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="AutoRecovery" bit="1" summary="Auto/recovery mode">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="Economy" bit="2" summary="Economy/EnergyStar mode">
-        <mandatoryConform/>
-      </bitfield>
-    </bitmap>
-    <bitmap name="RelayStateBitmap">
-      <bitfield name="Heat" bit="0" summary="Heat State On">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="Cool" bit="1" summary="Cool State On">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="Fan" bit="2" summary="Fan State On">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="HeatStage2" bit="3" summary="Heat 2nd State On">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="CoolStage2" bit="4" summary="Cool 2nd State On">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="FanStage2" bit="5" summary="Fan 2nd State On">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="FanStage3" bit="6" summary="Fan 3rd Stage On">
-        <mandatoryConform/>
-      </bitfield>
-    </bitmap>
-    <bitmap name="RemoteSensingBitmap">
-      <bitfield name="LocalTemperature" bit="0" summary="Calculated Local Temperature is derived from a remote node">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="OutdoorTemperature" bit="1" summary="OutdoorTemperature is derived from a remote node">
-        <mandatoryConform>
-          <attribute name="OutdoorTemperature"/>
-        </mandatoryConform>
-      </bitfield>
-      <bitfield name="Occupancy" bit="2" summary="Occupancy is derived from a remote node">
-        <mandatoryConform>
-          <feature name="OCC"/>
-        </mandatoryConform>
-      </bitfield>
-    </bitmap>
-    <bitmap name="SetpointAdjustMode">
-      <bitfield name="Heat" bit="0" summary="Adjust Heat Setpoint">
-        <mandatoryConform>
-          <feature name="HEAT"/>
-        </mandatoryConform>
-      </bitfield>
-      <bitfield name="Cool" bit="1" summary="Adjust Cool Setpoint">
-        <mandatoryConform>
-          <feature name="COOL"/>
-        </mandatoryConform>
-      </bitfield>
-      <bitfield name="Both" bit="2" summary="Adjust Heat Setpoint and Cool Setpoint">
-        <mandatoryConform>
-          <orTerm>
-            <feature name="HEAT"/>
-            <feature name="COOL"/>
-          </orTerm>
-        </mandatoryConform>
-      </bitfield>
-    </bitmap>
+    <number name="SignedTemperatureCX10tempS8Type" type="int8"/>
+    <number name="TemperatureDifferencetempDiffType" type="int16"/>
+    <number name="TemperaturetemperatureType" type="int16"/>
+    <number name="UnsignedTemperatureCX10tempU8Type" type="uint8"/>
     <struct name="ThermostatScheduleTransition">
       <field id="0" name="TransitionTime" type="uint16">
         <mandatoryConform/>
@@ -469,7 +137,7 @@ Davis, CA 95616, USA
       <quality nullable="true"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x0002" name="Occupancy" type="OccupancyBitmap" default="1">
+    <attribute id="0x0002" name="Occupancy" type="map8" default="1">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="OCC"/>
@@ -518,7 +186,7 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0007" name="PICoolingDemand" type="uint8" default="">
+    <attribute id="0x0007" name="PICoolingDemand" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality reportable="true"/>
       <optionalConform>
@@ -531,7 +199,7 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0008" name="PIHeatingDemand" type="uint8" default="">
+    <attribute id="0x0008" name="PIHeatingDemand" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality reportable="true"/>
       <optionalConform>
@@ -544,7 +212,21 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0009" name="HVACSystemTypeConfiguration" type="HVACSystemTypeBitmap" default="0">
+    <attribute id="0x0009" name="HVACSystemTypeConfiguration" type="map8" default="0">
+      <bitmap>
+        <bitfield name="CoolingStage" from="0x00000000" to="0x00000001" summary="00 – Cool Stage 1 01 – Cool Stage 2 10 – Cool Stage 3 11 – Reserved">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="HeatingStage" from="0x00000002" to="0x00000003" summary="00 – Heat Stage 1 01 – Heat Stage 2 10 – Heat Stage 3 11 – Reserved">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="HeatingType" bit="4" summary="0 – Conventional 1 – Heat Pump">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="HeatingFuel" bit="5" summary="0 – Electric / B 1 – Gas / O">
+          <mandatoryConform/>
+        </bitfield>
+      </bitmap>
       <access read="true" write="optional" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
       <deprecateConform/>
@@ -552,7 +234,7 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0010" name="LocalTemperatureCalibration" type="SignedTemperature" default="0">
+    <attribute id="0x0010" name="LocalTemperatureCalibration" type="SignedTemperatureCX10tempS8Type" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
       <optionalConform>
@@ -562,8 +244,8 @@ Davis, CA 95616, USA
       </optionalConform>
       <constraint>
         <between>
-          <from value="-25"/>
-          <to value="25"/>
+          <from value="0"/>
+          <to value="0"/>
         </between>
       </constraint>
     </attribute>
@@ -665,7 +347,7 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0019" name="MinSetpointDeadBand" type="SignedTemperature" default="25">
+    <attribute id="0x0019" name="MinSetpointDeadBand" type="SignedTemperatureCX10tempS8Type" default="0">
       <access read="true" write="optional" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
       <mandatoryConform>
@@ -674,16 +356,50 @@ Davis, CA 95616, USA
       <constraint>
         <between>
           <from value="0"/>
-          <to value="25"/>
+          <to value="0"/>
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x001A" name="RemoteSensing" type="RemoteSensingBitmap" default="0">
+    <attribute id="0x001A" name="RemoteSensing" type="map8" default="0">
+      <bitmap>
+        <bitfield name="LocalTemperature" bit="0" summary="When set, LocalTemperature Value is derived from a remote node">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="OutdoorTemperature" bit="1" summary="When set, OutdoorTemperature is derived from a remote node">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="Occupancy" bit="2" summary="When set, Occupancy is derived from a remote node">
+          <mandatoryConform/>
+        </bitfield>
+      </bitmap>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
       <optionalConform/>
+      <constraint>
+        <max value="7"/>
+      </constraint>
     </attribute>
-    <attribute id="0x001B" name="ControlSequenceOfOperation" type="ThermostatControlSequence" default="4">
+    <attribute id="0x001B" name="ControlSequenceOfOperation" type="enum8" default="4">
+      <enum>
+        <item value="0" name="HeatAndEmergencyAreNotPossible" summary="Heat and Emergency are not possible">
+          <mandatoryConform/>
+        </item>
+        <item value="1" name="HeatAndEmergencyAreNotPossible" summary="Heat and Emergency are not possible">
+          <mandatoryConform/>
+        </item>
+        <item value="2" name="CoolAndPrecoolingseeTermsAreNotPossible" summary="Cool and precooling (see Terms) are not possible">
+          <mandatoryConform/>
+        </item>
+        <item value="3" name="CoolAndPrecoolingAreNotPossible" summary="Cool and precooling are not possible">
+          <mandatoryConform/>
+        </item>
+        <item value="4" name="AllModesArePossible" summary="All modes are possible">
+          <mandatoryConform/>
+        </item>
+        <item value="5" name="AllModesArePossible" summary="All modes are possible">
+          <mandatoryConform/>
+        </item>
+      </enum>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
       <mandatoryConform/>
@@ -691,7 +407,36 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x001C" name="SystemMode" type="ThermostatSystemMode" default="1">
+    <attribute id="0x001C" name="SystemMode" type="enum8" default="1">
+      <enum>
+        <item value="0" name="TheThermostatDoesNotGenerateDemandForCoolingOrHeating" summary="The Thermostat does not generate demand for Cooling or Heating">
+          <mandatoryConform/>
+        </item>
+        <item value="1" name="DemandIsGeneratedForEitherCoolingOrHeatingAsRequired" summary="Demand is generated for either Cooling or Heating, as required">
+          <mandatoryConform/>
+        </item>
+        <item value="3" name="DemandIsOnlyGeneratedForCooling" summary="Demand is only generated for Cooling">
+          <mandatoryConform/>
+        </item>
+        <item value="4" name="DemandIsOnlyGeneratedForHeating" summary="Demand is only generated for Heating">
+          <mandatoryConform/>
+        </item>
+        <item value="5" name="2NdStageHeatingIsInUseToAchieveDesiredTemperature" summary="2nd stage heating is in use to achieve desired temperature">
+          <mandatoryConform/>
+        </item>
+        <item value="6" name="seeTerms" summary="(see Terms)">
+          <mandatoryConform/>
+        </item>
+        <item value="7" name="FanOnly" summary="Fan only">
+          <mandatoryConform/>
+        </item>
+        <item value="8" name="Dry" summary="Dry">
+          <mandatoryConform/>
+        </item>
+        <item value="9" name="Sleep" summary="Sleep">
+          <mandatoryConform/>
+        </item>
+      </enum>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality scene="true" persistence="nonVolatile"/>
       <mandatoryConform/>
@@ -699,14 +444,14 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x001D" name="AlarmMask" type="AlarmCodeBitmap" default="0">
+    <attribute id="0x001D" name="AlarmMask" type="map8" default="0">
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
       <constraint>
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x001E" name="ThermostatRunningMode" type="ThermostatSystemMode" default="0">
+    <attribute id="0x001E" name="ThermostatRunningMode" type="enum8" default="0">
       <access read="true" readPrivilege="view"/>
       <optionalConform>
         <feature name="AUTO"/>
@@ -715,7 +460,30 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0020" name="StartOfWeek" type="StartOfWeek" default="">
+    <attribute id="0x0020" name="StartOfWeek" type="enum8">
+      <enum>
+        <item value="0" name="Sunday" summary="Sunday">
+          <mandatoryConform/>
+        </item>
+        <item value="1" name="Monday" summary="Monday">
+          <mandatoryConform/>
+        </item>
+        <item value="2" name="Tuesday" summary="Tuesday">
+          <mandatoryConform/>
+        </item>
+        <item value="3" name="Wednesday" summary="Wednesday">
+          <mandatoryConform/>
+        </item>
+        <item value="4" name="Thursday" summary="Thursday">
+          <mandatoryConform/>
+        </item>
+        <item value="5" name="Friday" summary="Friday">
+          <mandatoryConform/>
+        </item>
+        <item value="6" name="Saturday" summary="Saturday">
+          <mandatoryConform/>
+        </item>
+      </enum>
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform>
@@ -739,7 +507,15 @@ Davis, CA 95616, USA
         <feature name="SCH"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0023" name="TemperatureSetpointHold" type="TemperatureSetpointHold" default="0">
+    <attribute id="0x0023" name="TemperatureSetpointHold" type="enum8" default="0">
+      <enum>
+        <item value="0" name="FollowSchedulingProgram" summary="Follow scheduling program">
+          <mandatoryConform/>
+        </item>
+        <item value="1" name="MaintainCurrentSetpointRegardlessOfScheduleTransitions" summary="Maintain current setpoint, regardless of schedule transitions">
+          <mandatoryConform/>
+        </item>
+      </enum>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
       <optionalConform/>
@@ -758,7 +534,18 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0025" name="ThermostatProgrammingOperationMode" type="ProgrammingOperationModeBitmap" default="0">
+    <attribute id="0x0025" name="ThermostatProgrammingOperationMode" type="map8" default="0">
+      <bitmap>
+        <bitfield name="ScheduleActive" bit="0" summary="Schedule programming mode. This enables any programmed weekly schedule configurations.">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="AutoRecovery" bit="1" summary="Auto/recovery mode">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="Economy" bit="2" summary="Economy/EnergyStar mode">
+          <mandatoryConform/>
+        </bitfield>
+      </bitmap>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality reportable="true"/>
       <optionalConform/>
@@ -766,21 +553,55 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0029" name="ThermostatRunningState" type="RelayStateBitmap" default="">
+    <attribute id="0x0029" name="ThermostatRunningState" type="map16">
+      <bitmap>
+        <bitfield name="Heat" bit="0" summary="Heat State On">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="Cool" bit="1" summary="Cool State On">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="Fan" bit="2" summary="Fan State On">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="HeatStage2" bit="3" summary="Heat 2nd Stage State On">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="CoolStage2" bit="4" summary="Cool 2nd Stage State On">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="FanStage2" bit="5" summary="Fan 2nd Stage State On">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="FanStage3" bit="6" summary="Fan 3rd Stage Stage On">
+          <mandatoryConform/>
+        </bitfield>
+      </bitmap>
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
       <constraint>
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0030" name="SetpointChangeSource" type="SetpointChangeSourceEnum" default="0">
+    <attribute id="0x0030" name="SetpointChangeSource" type="enum8" default="0">
+      <enum>
+        <item value="0" name="ManualUserInitiatedSetpointChangeViaTheThermostat" summary="Manual, user-initiated setpoint change via the thermostat">
+          <mandatoryConform/>
+        </item>
+        <item value="1" name="ScheduleinternalProgrammingInitiatedSetpointChange" summary="Schedule/internal programming-initiated setpoint change">
+          <mandatoryConform/>
+        </item>
+        <item value="2" name="ExternallyInitiatedSetpointChangeeGDrlcClusterCommandAttributeWrite" summary="Externally-initiated setpoint change (e.g., DRLC cluster command, attribute write)">
+          <mandatoryConform/>
+        </item>
+      </enum>
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
       <constraint>
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0031" name="SetpointChangeAmount" type="int16s" default="null">
+    <attribute id="0x0031" name="SetpointChangeAmount" type="TemperatureDifferencetempDiffType" default="null">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <optionalConform/>
@@ -789,7 +610,7 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x0034" name="OccupiedSetback" type="UnsignedTemperature" default="null">
+    <attribute id="0x0034" name="OccupiedSetback" type="UnsignedTemperatureCX10tempU8Type" default="null">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform>
@@ -806,7 +627,7 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0035" name="OccupiedSetbackMin" type="UnsignedTemperature" default="null">
+    <attribute id="0x0035" name="OccupiedSetbackMin" type="UnsignedTemperatureCX10tempU8Type" default="null">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" persistence="fixed"/>
       <mandatoryConform>
@@ -821,7 +642,7 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0036" name="OccupiedSetbackMax" type="UnsignedTemperature" default="null">
+    <attribute id="0x0036" name="OccupiedSetbackMax" type="UnsignedTemperatureCX10tempU8Type" default="null">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" persistence="fixed"/>
       <mandatoryConform>
@@ -832,11 +653,11 @@ Davis, CA 95616, USA
           <from>
             <attribute name="OccupiedSetbackMin"/>
           </from>
-          <to value="254"/>
+          <to value="0"/>
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0037" name="UnoccupiedSetback" type="UnsignedTemperature" default="null">
+    <attribute id="0x0037" name="UnoccupiedSetback" type="UnsignedTemperatureCX10tempU8Type" default="null">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform>
@@ -856,7 +677,7 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0038" name="UnoccupiedSetbackMin" type="UnsignedTemperature" default="null">
+    <attribute id="0x0038" name="UnoccupiedSetbackMin" type="UnsignedTemperatureCX10tempU8Type" default="null">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" persistence="fixed"/>
       <mandatoryConform>
@@ -874,7 +695,7 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0039" name="UnoccupiedSetbackMax" type="UnsignedTemperature" default="null">
+    <attribute id="0x0039" name="UnoccupiedSetbackMax" type="UnsignedTemperatureCX10tempU8Type" default="null">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" persistence="fixed"/>
       <mandatoryConform>
@@ -888,16 +709,33 @@ Davis, CA 95616, USA
           <from>
             <attribute name="UnoccupiedSetbackMin"/>
           </from>
-          <to value="254"/>
+          <to value="0"/>
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x003A" name="EmergencyHeatDelta" type="UnsignedTemperature" default="255">
+    <attribute id="0x003A" name="EmergencyHeatDelta" type="UnsignedTemperatureCX10tempU8Type" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x0040" name="ACType" type="ACTypeEnum" default="0">
+    <attribute id="0x0040" name="ACType" type="enum8" default="0">
+      <enum>
+        <item value="0" name="UnknownAcType" summary="Unknown AC Type">
+          <mandatoryConform/>
+        </item>
+        <item value="1" name="CoolingAndFixedSpeed" summary="Cooling and Fixed Speed">
+          <mandatoryConform/>
+        </item>
+        <item value="2" name="HeatPumpAndFixedSpeed" summary="Heat Pump and Fixed Speed">
+          <mandatoryConform/>
+        </item>
+        <item value="3" name="CoolingAndInverter" summary="Cooling and Inverter">
+          <mandatoryConform/>
+        </item>
+        <item value="4" name="HeatPumpAndInverter" summary="Heat Pump and Inverter">
+          <mandatoryConform/>
+        </item>
+      </enum>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
       <optionalConform/>
@@ -910,7 +748,21 @@ Davis, CA 95616, USA
       <quality persistence="nonVolatile"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x0042" name="ACRefrigerantType" type="ACRefrigerantTypeEnum" default="0">
+    <attribute id="0x0042" name="ACRefrigerantType" type="enum8" default="0">
+      <enum>
+        <item value="0" name="UnknownRefrigerantType" summary="Unknown Refrigerant Type">
+          <mandatoryConform/>
+        </item>
+        <item value="1" name="R22Refrigerant" summary="R22 Refrigerant">
+          <mandatoryConform/>
+        </item>
+        <item value="2" name="R410ARefrigerant" summary="R410a Refrigerant">
+          <mandatoryConform/>
+        </item>
+        <item value="3" name="R407CRefrigerant" summary="R407c Refrigerant">
+          <mandatoryConform/>
+        </item>
+      </enum>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
       <optionalConform/>
@@ -918,7 +770,21 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0043" name="ACCompressorType" type="ACCompressorTypeEnum" default="0">
+    <attribute id="0x0043" name="ACCompressorType" type="enum8" default="0">
+      <enum>
+        <item value="0" name="UnknownCompressorType" summary="Unknown compressor type">
+          <mandatoryConform/>
+        </item>
+        <item value="1" name="MaxWorkingAmbient43C" summary="Max working ambient 43 °C">
+          <mandatoryConform/>
+        </item>
+        <item value="2" name="MaxWorkingAmbient35C" summary="Max working ambient 35 °C">
+          <mandatoryConform/>
+        </item>
+        <item value="3" name="MaxWorkingAmbient52C" summary="Max working ambient 52 °C">
+          <mandatoryConform/>
+        </item>
+      </enum>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
       <optionalConform/>
@@ -926,11 +792,45 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0044" name="ACErrorCode" type="ACErrorCodeBitmap" default="0">
+    <attribute id="0x0044" name="ACErrorCode" type="map32" default="0">
+      <bitmap>
+        <bitfield name="CompressorFail" bit="0" summary="Compressor Failure or Refrigerant Leakage">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="RoomSensorFail" bit="1" summary="Room Temperature Sensor Failure">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="OutdoorSensorFail" bit="2" summary="Outdoor Temperature Sensor Failure">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="CoilSensorFail" bit="3" summary="Indoor Coil Temperature Sensor Failure">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="FanFail" bit="4" summary="Fan Failure">
+          <mandatoryConform/>
+        </bitfield>
+      </bitmap>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x0045" name="ACLouverPosition" type="ACLouverPositionEnum" default="0">
+    <attribute id="0x0045" name="ACLouverPosition" type="enum8" default="0">
+      <enum>
+        <item value="1" name="FullyClosed" summary="Fully Closed">
+          <mandatoryConform/>
+        </item>
+        <item value="2" name="FullyOpen" summary="Fully Open">
+          <mandatoryConform/>
+        </item>
+        <item value="3" name="QuarterOpen" summary="Quarter Open">
+          <mandatoryConform/>
+        </item>
+        <item value="4" name="HalfOpen" summary="Half Open">
+          <mandatoryConform/>
+        </item>
+        <item value="5" name="ThreeQuartersOpen" summary="Three Quarters Open">
+          <mandatoryConform/>
+        </item>
+      </enum>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
       <optionalConform/>
@@ -943,7 +843,12 @@ Davis, CA 95616, USA
       <quality nullable="true"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x0047" name="ACCapacityFormat" type="ACCapacityFormatEnum" default="0">
+    <attribute id="0x0047" name="ACCapacityFormat" type="enum8" default="0">
+      <enum>
+        <item value="0" name="BritishThermalUnitPerHour" summary="British Thermal Unit per Hour">
+          <mandatoryConform/>
+        </item>
+      </enum>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
       <optionalConform/>
@@ -956,15 +861,6 @@ Davis, CA 95616, USA
     <command id="0x00" name="SetpointRaiseLower" direction="commandToServer" response="Y">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
-      <field id="0" name="Mode" type="SetpointAdjustMode">
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-      <field id="1" name="Amount" type="int8">
-        <mandatoryConform/>
-      </field>
     </command>
     <command id="0x00" name="GetWeeklyScheduleResponse" direction="responseFromServer">
       <mandatoryConform>
@@ -976,88 +872,17 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="SCH"/>
       </mandatoryConform>
-      <field id="0" name="NumberOfTransitionsForSequence" type="uint8">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="DayOfWeekforSequence" type="DayOfWeek">
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-      <field id="2" name="ModeForSequence" type="ModeForSequence">
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-      <field id="3" name="Transitions" type="list">
-        <entry type="ThermostatScheduleTransition"/>
-        <mandatoryConform/>
-        <constraint>
-          <maxCount value="10"/>
-        </constraint>
-      </field>
     </command>
     <command id="0x01" name="GetRelayStatusLogResponse" direction="responseFromServer">
-      <mandatoryConform>
-        <command name="GetRelayStatusLog"/>
-      </mandatoryConform>
-      <field id="0" name="TimeOfDay" type="uint16">
-        <mandatoryConform/>
-        <constraint>
-          <between>
-            <from value="0"/>
-            <to value="1439"/>
-          </between>
-        </constraint>
-      </field>
-      <field id="1" name="RelayStatus" type="RelayStateBitmap">
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-      <field id="2" name="LocalTemperature" type="temperature">
-        <quality nullable="true"/>
-        <mandatoryConform/>
-      </field>
-      <field id="3" name="HumidityInPercentage" type="uint8">
-        <quality nullable="true"/>
-        <mandatoryConform/>
-        <constraint>
-          <between>
-            <from value="0"/>
-            <to value="100"/>
-          </between>
-        </constraint>
-      </field>
-      <field id="4" name="SetPoint" type="temperature">
-        <mandatoryConform/>
-      </field>
-      <field id="5" name="UnreadEntries" type="uint16">
-        <mandatoryConform/>
-      </field>
+      <optionalConform/>
     </command>
     <command id="0x02" name="GetWeeklySchedule" direction="commandToServer" response="GetWeeklyScheduleResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="SCH"/>
       </mandatoryConform>
-      <field id="0" name="DaysToReturn" type="DayOfWeek">
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-      <field id="1" name="ModeToReturn" type="ModeForSequence">
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
     </command>
-    <command id="0x03" name="ClearWeeklySchedule" direction="commandToServer" response="N">
+    <command id="0x03" name="ClearWeeklySchedule" direction="commandToServer">
       <access invokePrivilege="manage"/>
       <mandatoryConform>
         <feature name="SCH"/>

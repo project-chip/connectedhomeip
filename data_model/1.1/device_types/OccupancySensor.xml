@@ -57,22 +57,28 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0107" name="Occupancy Sensor" revision="3">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0107" name="Occupancy Sensor" revision="2">
   <revisionHistory>
     <revision revision="0" summary="Represents device definitions prior to Zigbee 3.0"/>
     <revision revision="1" summary="Initial Zigbee 3.0 release"/>
     <revision revision="2" summary="New data model format and notation"/>
-    <revision revision="3" summary="Restricting Groups client to Zigbee."/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <clusters>
     <cluster id="0x0003" name="Identify" side="server">
       <mandatoryConform/>
+      <features>
+        <feature code="QRY">
+          <mandatoryConform>
+            <notTerm>
+              <condition name="Matter"/>
+            </notTerm>
+          </mandatoryConform>
+        </feature>
+      </features>
     </cluster>
     <cluster id="0x0004" name="Groups" side="client">
-      <optionalConform>
-        <condition name="Zigbee"/>
-      </optionalConform>
+      <optionalConform/>
     </cluster>
     <cluster id="0x0406" name="Occupancy Sensing" side="server">
       <mandatoryConform/>

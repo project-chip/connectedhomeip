@@ -57,143 +57,57 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0005" name="Scenes Cluster" revision="5">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0005" name="Scenes Cluster" revision="4">
   <revisionHistory>
     <revision revision="1" summary="global mandatory ClusterRevision attribute added; CCB 1745"/>
     <revision revision="2" summary="TransitionTime field added to the RecallScene command"/>
     <revision revision="3" summary="CCB 2427 3026"/>
-    <revision revision="4" summary="new data model format and notation: provisional"/>
-    <revision revision="5" summary="not provisional; Explicit, TableSize and FabricScenes features; support multi-fabric environment; adding attributes SceneTableSize and RemainingCapacity; add fabric-scoped scene information list"/>
+    <revision revision="4" summary="new data model format and notation"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0005" name="Scenes"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="S" scope="Endpoint"/>
   <features>
-    <feature bit="0" code="SN" name="SceneNames" summary="The ability to store a name for a scene.">
+    <feature bit="0" code="SN" name="Scene Names" summary="The ability to store a name for a scene.">
       <optionalConform/>
-    </feature>
-    <feature bit="1" code="EX" name="Explicit" summary="Use explicit attribute IDs, not implicit based on order">
-      <mandatoryConform/>
-    </feature>
-    <feature bit="2" code="TS" name="TableSize" summary="Table size and remaining capacity supported">
-      <mandatoryConform/>
-    </feature>
-    <feature bit="3" code="FS" name="FabricScenes" summary="Supports current scene, count, group etc, as fabric-scoped.">
-      <mandatoryConform/>
     </feature>
   </features>
   <dataTypes>
-    <bitmap name="CopyModeMap">
-      <bitfield name="CopyAllScenes" bit="0" summary="CopyAllScenes">
-        <mandatoryConform/>
-      </bitfield>
-    </bitmap>
-    <struct name="AttributeValuePairStruct">
+    <struct name="AttributeValuePair">
       <field id="0" name="AttributeID" type="attribute-id">
-        <otherwiseConform>
-          <mandatoryConform>
-            <feature name="EX"/>
-          </mandatoryConform>
-          <optionalConform/>
-        </otherwiseConform>
+        <mandatoryConform/>
       </field>
-      <field id="1" name="ValueUnsigned8" type="uint8">
-        <optionalConform choice="a"/>
-      </field>
-      <field id="2" name="ValueSigned8" type="int8">
-        <optionalConform choice="a"/>
-      </field>
-      <field id="3" name="ValueUnsigned16" type="uint16">
-        <optionalConform choice="a"/>
-      </field>
-      <field id="4" name="ValueSigned16" type="int16">
-        <optionalConform choice="a"/>
-      </field>
-      <field id="5" name="ValueUnsigned32" type="uint32">
-        <optionalConform choice="a"/>
-      </field>
-      <field id="6" name="ValueSigned32" type="int32">
-        <optionalConform choice="a"/>
-      </field>
-      <field id="7" name="ValueUnsigned64" type="uint64">
-        <optionalConform choice="a"/>
-      </field>
-      <field id="8" name="ValueSigned64" type="int64">
-        <optionalConform choice="a"/>
+      <field id="1" name="AttributeValue">
+        <mandatoryConform/>
       </field>
     </struct>
-    <struct name="ExtensionFieldSetStruct">
+    <struct name="ExtensionFieldSet">
       <field id="0" name="ClusterID" type="cluster-id">
         <mandatoryConform/>
       </field>
       <field id="1" name="AttributeValueList" type="list">
-        <entry type="AttributeValuePairStruct"/>
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-    </struct>
-    <struct name="SceneInfoStruct">
-      <field id="0" name="SceneCount" type="uint8" default="0">
+        <entry type="AttributeValuePair"/>
         <mandatoryConform/>
       </field>
-      <field id="1" name="CurrentScene" type="uint8" default="0">
-        <access fabricSensitive="true"/>
-        <mandatoryConform/>
-      </field>
-      <field id="2" name="CurrentGroup" type="group-id" default="0">
-        <access fabricSensitive="true"/>
-        <mandatoryConform/>
-      </field>
-      <field id="3" name="SceneValid" type="bool" default="false">
-        <access fabricSensitive="true"/>
-        <mandatoryConform/>
-      </field>
-      <field id="4" name="RemainingCapacity" type="uint8" default="MS">
-        <mandatoryConform>
-          <feature name="TS"/>
-        </mandatoryConform>
-        <constraint>
-          <max value="253"/>
-        </constraint>
-      </field>
-      <access fabricScoped="true"/>
     </struct>
   </dataTypes>
   <attributes>
     <attribute id="0x0000" name="SceneCount" type="uint8" default="0">
       <access read="true" readPrivilege="view"/>
-      <mandatoryConform>
-        <notTerm>
-          <feature name="FS"/>
-        </notTerm>
-      </mandatoryConform>
+      <mandatoryConform/>
     </attribute>
     <attribute id="0x0001" name="CurrentScene" type="uint8" default="0">
       <access read="true" readPrivilege="view"/>
-      <mandatoryConform>
-        <notTerm>
-          <feature name="FS"/>
-        </notTerm>
-      </mandatoryConform>
+      <mandatoryConform/>
     </attribute>
     <attribute id="0x0002" name="CurrentGroup" type="group-id" default="0">
       <access read="true" readPrivilege="view"/>
-      <mandatoryConform>
-        <notTerm>
-          <feature name="FS"/>
-        </notTerm>
-      </mandatoryConform>
+      <mandatoryConform/>
     </attribute>
     <attribute id="0x0003" name="SceneValid" type="bool" default="false">
       <access read="true" readPrivilege="view"/>
-      <mandatoryConform>
-        <notTerm>
-          <feature name="FS"/>
-        </notTerm>
-      </mandatoryConform>
+      <mandatoryConform/>
     </attribute>
     <attribute id="0x0004" name="NameSupport" type="map8" default="0">
       <bitmap>
@@ -211,23 +125,9 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <optionalConform/>
-    </attribute>
-    <attribute id="0x0006" name="SceneTableSize" type="uint16" default="16">
-      <access read="true" readPrivilege="view"/>
-      <quality persistence="fixed"/>
-      <mandatoryConform>
-        <feature name="TS"/>
-      </mandatoryConform>
       <constraint>
-        <desc/>
+        <allowed/>
       </constraint>
-    </attribute>
-    <attribute id="0x0007" name="FabricSceneInfo" type="list">
-      <entry type="SceneInfoStruct"/>
-      <access read="true" readPrivilege="view" fabricScoped="true"/>
-      <mandatoryConform>
-        <feature name="FS"/>
-      </mandatoryConform>
     </attribute>
   </attributes>
   <commands>
@@ -242,9 +142,6 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="TransitionTime" type="uint16">
         <mandatoryConform/>
-        <constraint>
-          <max value="6000"/>
-        </constraint>
       </field>
       <field id="3" name="SceneName" type="string">
         <mandatoryConform/>
@@ -252,17 +149,14 @@ Davis, CA 95616, USA
           <maxLength value="16"/>
         </constraint>
       </field>
-      <field id="4" name="ExtensionFieldSetStructs" type="list">
-        <entry type="ExtensionFieldSetStruct"/>
+      <field id="4" name="ExtensionFieldSets" type="list">
+        <entry type="ExtensionFieldSet"/>
         <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
     </command>
     <command id="0x00" name="AddSceneResponse" direction="responseFromServer">
       <mandatoryConform/>
-      <field id="0" name="Status" type="status">
+      <field id="0" name="Status" type="enum8">
         <mandatoryConform/>
         <constraint>
           <desc/>
@@ -287,7 +181,7 @@ Davis, CA 95616, USA
     </command>
     <command id="0x01" name="ViewSceneResponse" direction="responseFromServer">
       <mandatoryConform/>
-      <field id="0" name="Status" type="status">
+      <field id="0" name="Status" type="enum8">
         <mandatoryConform/>
         <constraint>
           <desc/>
@@ -301,9 +195,6 @@ Davis, CA 95616, USA
       </field>
       <field id="3" name="TransitionTime" type="uint16">
         <describedConform/>
-        <constraint>
-          <max value="6000"/>
-        </constraint>
       </field>
       <field id="4" name="SceneName" type="string">
         <describedConform/>
@@ -311,8 +202,8 @@ Davis, CA 95616, USA
           <maxLength value="16"/>
         </constraint>
       </field>
-      <field id="5" name="ExtensionFieldSetStructs" type="list">
-        <entry type="ExtensionFieldSetStruct"/>
+      <field id="5" name="ExtensionFieldSets" type="list">
+        <entry type="ExtensionFieldSet"/>
         <describedConform/>
       </field>
     </command>
@@ -328,7 +219,7 @@ Davis, CA 95616, USA
     </command>
     <command id="0x02" name="RemoveSceneResponse" direction="responseFromServer">
       <mandatoryConform/>
-      <field id="0" name="Status" type="status">
+      <field id="0" name="Status" type="enum8">
         <mandatoryConform/>
         <constraint>
           <desc/>
@@ -350,7 +241,7 @@ Davis, CA 95616, USA
     </command>
     <command id="0x03" name="RemoveAllScenesResponse" direction="responseFromServer">
       <mandatoryConform/>
-      <field id="0" name="Status" type="status">
+      <field id="0" name="Status" type="enum8">
         <mandatoryConform/>
         <constraint>
           <desc/>
@@ -372,7 +263,7 @@ Davis, CA 95616, USA
     </command>
     <command id="0x04" name="StoreSceneResponse" direction="responseFromServer">
       <mandatoryConform/>
-      <field id="0" name="Status" type="status">
+      <field id="0" name="Status" type="enum8">
         <mandatoryConform/>
         <constraint>
           <desc/>
@@ -397,9 +288,6 @@ Davis, CA 95616, USA
       <field id="2" name="TransitionTime" type="uint16">
         <quality nullable="true"/>
         <optionalConform/>
-        <constraint>
-          <max value="60000"/>
-        </constraint>
       </field>
     </command>
     <command id="0x06" name="GetSceneMembership" direction="commandToServer" response="GetSceneMembershipResponse">
@@ -411,7 +299,7 @@ Davis, CA 95616, USA
     </command>
     <command id="0x06" name="GetSceneMembershipResponse" direction="responseFromServer">
       <mandatoryConform/>
-      <field id="0" name="Status" type="status">
+      <field id="0" name="Status" type="enum8">
         <mandatoryConform/>
         <constraint>
           <desc/>
@@ -426,89 +314,35 @@ Davis, CA 95616, USA
       </field>
       <field id="3" name="SceneList" type="list">
         <entry type="uint8"/>
-        <mandatoryConform>
-          <equalTerm>
-            <field name="Status"/>
-            <status name="SUCCESS"/>
-          </equalTerm>
-        </mandatoryConform>
+        <optionalConform/>
       </field>
     </command>
     <command id="0x40" name="EnhancedAddScene" direction="commandToServer" response="EnhancedAddSceneResponse">
       <access invokePrivilege="manage"/>
       <optionalConform/>
-      <field id="0" name="GroupID" type="group-id">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="SceneID" type="uint8">
-        <mandatoryConform/>
-      </field>
-      <field id="2" name="TransitionTime" type="uint16">
-        <mandatoryConform/>
-        <constraint>
-          <max value="60000"/>
-        </constraint>
-      </field>
-      <field id="3" name="SceneName" type="string">
-        <mandatoryConform/>
-        <constraint>
-          <maxLength value="16"/>
-        </constraint>
-      </field>
-      <field id="4" name="ExtensionFieldSetStructs" type="list">
-        <entry type="ExtensionFieldSetStruct"/>
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
     </command>
     <command id="0x40" name="EnhancedAddSceneResponse" direction="responseFromServer">
-      <mandatoryConform>
-        <command name="EnhancedAddScene"/>
-      </mandatoryConform>
+      <optionalConform/>
     </command>
     <command id="0x41" name="EnhancedViewScene" direction="commandToServer" response="EnhancedViewSceneResponse">
       <access invokePrivilege="operate"/>
       <optionalConform/>
     </command>
     <command id="0x41" name="EnhancedViewSceneResponse" direction="responseFromServer">
-      <mandatoryConform>
-        <command name="EnhancedViewScene"/>
-      </mandatoryConform>
-      <field id="0" name="Status" type="status">
-        <mandatoryConform/>
-        <constraint>
-          <desc/>
-        </constraint>
-      </field>
-      <field id="1" name="GroupID" type="group-id">
-        <mandatoryConform/>
-      </field>
-      <field id="2" name="SceneID" type="uint8">
-        <mandatoryConform/>
-      </field>
-      <field id="3" name="TransitionTime" type="uint16">
-        <describedConform/>
-        <constraint>
-          <max value="60000"/>
-        </constraint>
-      </field>
-      <field id="4" name="SceneName" type="string">
-        <describedConform/>
-        <constraint>
-          <maxLength value="16"/>
-        </constraint>
-      </field>
-      <field id="5" name="ExtensionFieldSetStructs" type="list">
-        <entry type="ExtensionFieldSetStruct"/>
-        <describedConform/>
-      </field>
+      <optionalConform/>
     </command>
     <command id="0x42" name="CopyScene" direction="commandToServer" response="CopySceneResponse">
       <access invokePrivilege="manage"/>
       <optionalConform/>
-      <field id="0" name="Mode" type="CopyModeMap">
+      <field id="0" name="Mode" type="map8">
+        <bitmap>
+          <bitfield name="CopyAllScenes" bit="0" summary="CopyAllScenes">
+            <mandatoryConform/>
+          </bitfield>
+          <bitfield name="Reserved" from="0x00000001" to="0x00000007" summary="(Reserved)">
+            <mandatoryConform/>
+          </bitfield>
+        </bitmap>
         <mandatoryConform/>
         <constraint>
           <desc/>
@@ -528,10 +362,8 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x42" name="CopySceneResponse" direction="responseFromServer">
-      <mandatoryConform>
-        <command name="CopyScene"/>
-      </mandatoryConform>
-      <field id="0" name="Status" type="status">
+      <optionalConform/>
+      <field id="0" name="Status" type="enum8">
         <mandatoryConform/>
         <constraint>
           <desc/>

@@ -66,18 +66,18 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="SWTCH" scope="Endpoint"/>
   <features>
-    <feature bit="0" code="LS" name="LatchingSwitch" summary="Switch is latching">
+    <feature bit="0" code="LS" name="Latching Switch">
       <optionalConform choice="a"/>
     </feature>
-    <feature bit="1" code="MS" name="MomentarySwitch" summary="Switch is momentary">
+    <feature bit="1" code="MS" name="Momentary Switch">
       <optionalConform choice="a"/>
     </feature>
-    <feature bit="2" code="MSR" name="MomentarySwitchRelease" summary="Switch supports release">
+    <feature bit="2" code="MSR" name="Momentary Switch Release">
       <optionalConform>
         <feature name="MS"/>
       </optionalConform>
     </feature>
-    <feature bit="3" code="MSL" name="MomentarySwitchLongPress" summary="Switch supports long press">
+    <feature bit="3" code="MSL" name="Momentary Switch LongPress">
       <optionalConform>
         <andTerm>
           <feature name="MS"/>
@@ -85,7 +85,7 @@ Davis, CA 95616, USA
         </andTerm>
       </optionalConform>
     </feature>
-    <feature bit="4" code="MSM" name="MomentarySwitchMultiPress" summary="Switch supports multi-press">
+    <feature bit="4" code="MSM" name="Momentary Switch MultiPress">
       <optionalConform>
         <andTerm>
           <feature name="MS"/>
@@ -99,6 +99,9 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
+      <constraint>
+        <min value="2"/>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="CurrentPosition" type="uint8" default="0">
       <access read="true" readPrivilege="view"/>
@@ -107,7 +110,15 @@ Davis, CA 95616, USA
       <constraint>
         <between>
           <from value="0"/>
-          <to value="NumberOfPositions - 1"/>
+          <to>
+            <compute>
+              <operation>subtract</operation>
+              <left>
+                <attribute name="NumberOfPositions"/>
+              </left>
+              <right value="1"/>
+            </compute>
+          </to>
         </between>
       </constraint>
     </attribute>
@@ -117,10 +128,13 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="MSM"/>
       </mandatoryConform>
+      <constraint>
+        <min value="2"/>
+      </constraint>
     </attribute>
   </attributes>
   <events>
-    <event id="0x00" name="SwitchLatched" priority="info">
+    <event id="0x00" name="SwitchLatched">
       <access readPrivilege="view"/>
       <mandatoryConform>
         <feature name="LS"/>
@@ -130,12 +144,20 @@ Davis, CA 95616, USA
         <constraint>
           <between>
             <from value="0"/>
-            <to value="NumberOfPositions - 1"/>
+            <to>
+              <compute>
+                <operation>subtract</operation>
+                <left>
+                  <attribute name="NumberOfPositions"/>
+                </left>
+                <right value="1"/>
+              </compute>
+            </to>
           </between>
         </constraint>
       </field>
     </event>
-    <event id="0x01" name="InitialPress" priority="info">
+    <event id="0x01" name="InitialPress">
       <access readPrivilege="view"/>
       <mandatoryConform>
         <feature name="MS"/>
@@ -145,12 +167,20 @@ Davis, CA 95616, USA
         <constraint>
           <between>
             <from value="0"/>
-            <to value="NumberOfPositions - 1"/>
+            <to>
+              <compute>
+                <operation>subtract</operation>
+                <left>
+                  <attribute name="NumberOfPositions"/>
+                </left>
+                <right value="1"/>
+              </compute>
+            </to>
           </between>
         </constraint>
       </field>
     </event>
-    <event id="0x02" name="LongPress" priority="info">
+    <event id="0x02" name="LongPress">
       <access readPrivilege="view"/>
       <mandatoryConform>
         <feature name="MSL"/>
@@ -160,12 +190,20 @@ Davis, CA 95616, USA
         <constraint>
           <between>
             <from value="0"/>
-            <to value="NumberOfPositions - 1"/>
+            <to>
+              <compute>
+                <operation>subtract</operation>
+                <left>
+                  <attribute name="NumberOfPositions"/>
+                </left>
+                <right value="1"/>
+              </compute>
+            </to>
           </between>
         </constraint>
       </field>
     </event>
-    <event id="0x03" name="ShortRelease" priority="info">
+    <event id="0x03" name="ShortRelease">
       <access readPrivilege="view"/>
       <mandatoryConform>
         <feature name="MSR"/>
@@ -175,12 +213,20 @@ Davis, CA 95616, USA
         <constraint>
           <between>
             <from value="0"/>
-            <to value="NumberOfPositions - 1"/>
+            <to>
+              <compute>
+                <operation>subtract</operation>
+                <left>
+                  <attribute name="NumberOfPositions"/>
+                </left>
+                <right value="1"/>
+              </compute>
+            </to>
           </between>
         </constraint>
       </field>
     </event>
-    <event id="0x04" name="LongRelease" priority="info">
+    <event id="0x04" name="LongRelease">
       <access readPrivilege="view"/>
       <mandatoryConform>
         <feature name="MSL"/>
@@ -190,12 +236,20 @@ Davis, CA 95616, USA
         <constraint>
           <between>
             <from value="0"/>
-            <to value="NumberOfPositions - 1"/>
+            <to>
+              <compute>
+                <operation>subtract</operation>
+                <left>
+                  <attribute name="NumberOfPositions"/>
+                </left>
+                <right value="1"/>
+              </compute>
+            </to>
           </between>
         </constraint>
       </field>
     </event>
-    <event id="0x05" name="MultiPressOngoing" priority="info">
+    <event id="0x05" name="MultiPressOngoing">
       <access readPrivilege="view"/>
       <mandatoryConform>
         <feature name="MSM"/>
@@ -205,7 +259,15 @@ Davis, CA 95616, USA
         <constraint>
           <between>
             <from value="0"/>
-            <to value="NumberOfPositions - 1"/>
+            <to>
+              <compute>
+                <operation>subtract</operation>
+                <left>
+                  <attribute name="NumberOfPositions"/>
+                </left>
+                <right value="1"/>
+              </compute>
+            </to>
           </between>
         </constraint>
       </field>
@@ -221,7 +283,7 @@ Davis, CA 95616, USA
         </constraint>
       </field>
     </event>
-    <event id="0x06" name="MultiPressComplete" priority="info">
+    <event id="0x06" name="MultiPressComplete">
       <access readPrivilege="view"/>
       <mandatoryConform>
         <feature name="MSM"/>
@@ -231,7 +293,15 @@ Davis, CA 95616, USA
         <constraint>
           <between>
             <from value="0"/>
-            <to value="NumberOfPositions - 1"/>
+            <to>
+              <compute>
+                <operation>subtract</operation>
+                <left>
+                  <attribute name="NumberOfPositions"/>
+                </left>
+                <right value="1"/>
+              </compute>
+            </to>
           </between>
         </constraint>
       </field>

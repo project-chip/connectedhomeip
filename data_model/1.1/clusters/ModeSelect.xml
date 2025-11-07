@@ -60,18 +60,35 @@ Davis, CA 95616, USA
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0050" name="Mode Select Cluster" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial version"/>
-    <revision revision="2" summary="The MfgCode field was marked non-nullable. Updated the related text. Reorder sections."/>
+    <revision revision="2" summary="Added EXT feature and ChangeToModeWithStatus"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0050" name="Mode Select"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="MOD" scope="Endpoint"/>
   <features>
-    <feature bit="0" code="DEPONOFF" name="OnOff" summary="Dependency with the OnOff cluster">
+    <feature bit="0" code="DEPONOFF" name="On/Off" summary="Dependency with the On/Off cluster">
+      <optionalConform/>
+    </feature>
+    <feature bit="1" code="EXT" name="Extended Status" summary="Support extended status response">
       <optionalConform/>
     </feature>
   </features>
   <dataTypes>
+    <enum name="ChangeToModeStatusEnum">
+      <item value="0" name="Success" summary="The mode change was successful">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="UnsupportedMode" summary="The new mode requested is not supported">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="InvalidTransition" summary="The new mode cannot be selected given current mode">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="ErrorAsDescribed" summary="The new mode does not apply, in a way that can only be conveyed by message to the client.">
+        <mandatoryConform/>
+      </item>
+    </enum>
     <struct name="ModeOptionStruct">
       <field id="0" name="Label" type="string" default="MS">
         <quality persistence="fixed"/>
@@ -95,7 +112,7 @@ Davis, CA 95616, USA
     </struct>
     <struct name="SemanticTagStruct">
       <field id="0" name="MfgCode" type="vendor-id">
-        <quality persistence="fixed"/>
+        <quality nullable="true" persistence="fixed"/>
         <mandatoryConform/>
         <constraint>
           <desc/>
@@ -168,6 +185,29 @@ Davis, CA 95616, USA
         <mandatoryConform/>
         <constraint>
           <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x01" name="ChangeToModeWithStatus" direction="commandToServer" response="ChangeToModeResponse">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="EXT"/>
+      </mandatoryConform>
+      <field id="0" name="NewMode" type="uint8">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x02" name="ChangeToModeResponse" direction="responseFromServer">
+      <mandatoryConform>
+        <feature name="EXT"/>
+      </mandatoryConform>
+      <field id="0" name="Status" type="ChangeToModeStatusEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="StatusText" type="string">
+        <optionalConform/>
+        <constraint>
+          <maxLength value="512"/>
         </constraint>
       </field>
     </command>

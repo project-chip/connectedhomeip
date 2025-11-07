@@ -57,68 +57,112 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x005B" name="Air Quality Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" name="Client Monitoring Cluster" revision="1">
   <revisionHistory>
-    <revision revision="1" summary="Initial version of the Air Quality cluster"/>
+    <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x005B" name="Air Quality"/>
+    <clusterId name="Client Monitoring"/>
   </clusterIds>
-  <classification hierarchy="base" role="application" picsCode="AIRQUAL" scope="Endpoint"/>
-  <features>
-    <feature bit="0" code="FAIR" name="Fair" summary="Cluster supports the Fair air quality level">
-      <optionalConform/>
-    </feature>
-    <feature bit="1" code="MOD" name="Moderate" summary="Cluster supports the Moderate air quality level">
-      <optionalConform/>
-    </feature>
-    <feature bit="2" code="VPOOR" name="VeryPoor" summary="Cluster supports the Very poor air quality level">
-      <optionalConform/>
-    </feature>
-    <feature bit="3" code="XPOOR" name="ExtremelyPoor" summary="Cluster supports the Extremely poor air quality level">
-      <optionalConform/>
-    </feature>
-  </features>
+  <classification hierarchy="base" role="utility" picsCode="CMON" scope="Node"/>
   <dataTypes>
-    <enum name="AirQualityEnum">
-      <item value="0" name="Unknown" summary="The air quality is unknown.">
+    <enum name="ClientConditionEnum">
+      <item value="1" name="Subscription" summary="The server SHALL monitor for one or more subscriptions originating from the client">
         <mandatoryConform/>
       </item>
-      <item value="1" name="Good" summary="The air quality is good.">
+      <item value="2" name="Session" summary="The server SHALL monitor for existence of at least one CASE session established and active with the client">
         <mandatoryConform/>
-      </item>
-      <item value="2" name="Fair" summary="The air quality is fair.">
-        <mandatoryConform>
-          <feature name="FAIR"/>
-        </mandatoryConform>
-      </item>
-      <item value="3" name="Moderate" summary="The air quality is moderate.">
-        <mandatoryConform>
-          <feature name="MOD"/>
-        </mandatoryConform>
-      </item>
-      <item value="4" name="Poor" summary="The air quality is poor.">
-        <mandatoryConform/>
-      </item>
-      <item value="5" name="VeryPoor" summary="The air quality is very poor.">
-        <mandatoryConform>
-          <feature name="VPOOR"/>
-        </mandatoryConform>
-      </item>
-      <item value="6" name="ExtremelyPoor" summary="The air quality is extremely poor.">
-        <mandatoryConform>
-          <feature name="XPOOR"/>
-        </mandatoryConform>
       </item>
     </enum>
+    <struct name="MonitoringStruct">
+      <field id="1" name="Condition" type="ClientConditionEnum" default="Subscription">
+        <access fabricSensitive="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="ExpectedNode" type="node-id">
+        <access fabricSensitive="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="Node" type="node-id">
+        <access fabricSensitive="true"/>
+        <mandatoryConform>
+          <field name="Endpoint"/>
+        </mandatoryConform>
+      </field>
+      <field id="4" name="Group" type="group-id">
+        <access fabricSensitive="true"/>
+        <mandatoryConform>
+          <notTerm>
+            <field name="Endpoint"/>
+          </notTerm>
+        </mandatoryConform>
+      </field>
+      <field id="5" name="Endpoint" type="endpoint-no">
+        <access fabricSensitive="true"/>
+        <mandatoryConform>
+          <notTerm>
+            <field name="Group"/>
+          </notTerm>
+        </mandatoryConform>
+      </field>
+      <field id="6" name="Cluster" type="cluster-id">
+        <access fabricSensitive="true"/>
+        <optionalConform/>
+      </field>
+      <access fabricScoped="true"/>
+    </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="AirQuality" type="AirQualityEnum" default="0">
+    <attribute id="0x0000" name="IdleModeInterval" type="uint32" default="300">
       <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
       <mandatoryConform/>
       <constraint>
-        <desc/>
+        <between>
+          <from value="300"/>
+          <to value="86400000"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0001" name="ActiveModeInterval" type="uint32" default="300">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+      <constraint>
+        <between>
+          <from value="300"/>
+          <to value="86400000"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0002" name="ActiveModeThreshold" type="uint16" default="4000">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+      <constraint>
+        <between>
+          <from value="300"/>
+          <to value="60000"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0003" name="ExpectedClients" type="list" default="empty">
+      <entry type="MonitoringStruct"/>
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage" fabricScoped="true"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+      <constraint>
+        <maxCount value="4"/>
       </constraint>
     </attribute>
   </attributes>
+  <commands>
+    <command id="0x00" name="ConditionTriggered" direction="responseFromServer">
+      <mandatoryConform/>
+    </command>
+    <command id="0x01" name="StayAwakeRequest" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+    </command>
+  </commands>
 </cluster>

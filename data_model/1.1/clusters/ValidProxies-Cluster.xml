@@ -79,9 +79,6 @@ Davis, CA 95616, USA
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint>
-        <allowed value=""/>
-      </constraint>
     </attribute>
   </attributes>
   <commands>
@@ -89,12 +86,8 @@ Davis, CA 95616, USA
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
     </command>
-    <command id="0x01" name="GetValidProxiesResponse" direction="responseFromServer">
+    <command id="0x01" name="Get Valid Proxies Response" direction="responseFromServer">
       <mandatoryConform/>
-      <field id="0" name="ProxyNodeIdList" type="list">
-        <entry type="node-id"/>
-        <mandatoryConform/>
-      </field>
     </command>
   </commands>
 </cluster>

@@ -64,7 +64,7 @@ Davis, CA 95616, USA
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <clusters>
-    <cluster id="0x0006" name="OnOff" side="server">
+    <cluster id="0x0006" name="On/Off" side="server">
       <mandatoryConform/>
     </cluster>
     <cluster id="0x0008" name="Level Control" side="server">

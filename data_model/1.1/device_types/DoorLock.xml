@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version="1.0"?>
 <!--
 Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
@@ -67,6 +67,13 @@ Davis, CA 95616, USA
   <clusters>
     <cluster id="0x0003" name="Identify" side="server">
       <mandatoryConform/>
+      <features>
+        <feature code="QRY">
+          <mandatoryConform>
+            <condition name="Zigbee"/>
+          </mandatoryConform>
+        </feature>
+      </features>
     </cluster>
     <cluster id="0x0004" name="Groups" side="server">
       <optionalConform>
@@ -74,32 +81,20 @@ Davis, CA 95616, USA
       </optionalConform>
     </cluster>
     <cluster id="0x0005" name="Scenes" side="server">
+      <optionalConform>
+        <condition name="Zigbee"/>
+      </optionalConform>
+    </cluster>
+    <cluster id="0x0038" name="Time Sync" side="client">
       <otherwiseConform>
-        <optionalConform>
-          <condition name="Zigbee"/>
-        </optionalConform>
         <provisionalConform/>
+        <optionalConform/>
       </otherwiseConform>
-    </cluster>
-    <cluster id="0x0009" name="Alarms" side="server">
-      <optionalConform>
-        <condition name="Zigbee"/>
-      </optionalConform>
-    </cluster>
-    <cluster id="0x000A" name="Time" side="client">
-      <optionalConform>
-        <condition name="Zigbee"/>
-      </optionalConform>
-    </cluster>
-    <cluster id="0x0020" name="Poll Control" side="server">
-      <optionalConform>
-        <condition name="Zigbee"/>
-      </optionalConform>
     </cluster>
     <cluster id="0x0101" name="Door Lock" side="server">
       <mandatoryConform/>
       <features>
-        <feature code="" name="RID (RFID Credential)">
+        <feature code="RID">
           <otherwiseConform>
             <optionalConform>
               <condition name="Zigbee"/>
@@ -108,36 +103,31 @@ Davis, CA 95616, USA
             <optionalConform/>
           </otherwiseConform>
         </feature>
-        <feature code="" name="LOG (Logging)">
+        <feature code="LOG">
           <optionalConform>
             <condition name="Zigbee"/>
           </optionalConform>
         </feature>
-        <feature code="" name="USR (User)">
+        <feature code="USR">
           <mandatoryConform>
             <andTerm>
               <condition name="Matter"/>
               <orTerm>
                 <feature name="PIN"/>
                 <feature name="RID"/>
-                <feature name="FGP"/>
+                <condition name="FPG"/>
                 <feature name="FACE"/>
               </orTerm>
             </andTerm>
           </mandatoryConform>
         </feature>
-        <feature code="" name="NOT (Notification)">
+        <feature code="NOT">
           <optionalConform>
             <condition name="Zigbee"/>
           </optionalConform>
         </feature>
       </features>
       <attributes>
-        <attribute code="0x0040" name="AlarmMask">
-          <optionalConform>
-            <condition name="Alarms"/>
-          </optionalConform>
-        </attribute>
         <attribute code="0x0041" name="KeypadOperationEventMask">
           <optionalConform>
             <condition name="Zigbee"/>
@@ -176,6 +166,11 @@ Davis, CA 95616, USA
       </attributes>
       <commands>
         <command id="0x0020" name="Operating Event Notification">
+          <optionalConform>
+            <condition name="Zigbee"/>
+          </optionalConform>
+        </command>
+        <command id="0x0021" name="ProgrammingEventNotification">
           <optionalConform>
             <condition name="Zigbee"/>
           </optionalConform>

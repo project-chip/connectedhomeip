@@ -134,9 +134,6 @@ Davis, CA 95616, USA
       <item value="4" name="60G" summary="60GHz - 57.24GHz to 70.20GHz (802.11ad/ay)">
         <optionalConform choice="a" more="true" min="1"/>
       </item>
-      <item value="5" name="1G" summary="Sub-1GHz - 755MHz to 931MHz (802.11ah)">
-        <optionalConform choice="a" more="true" min="1"/>
-      </item>
     </enum>
     <bitmap name="WiFiSecurityBitmap">
       <bitfield name="Unencrypted" bit="0" summary="Supports unencrypted Wi-Fi">
@@ -277,13 +274,14 @@ Davis, CA 95616, USA
         <min value="1"/>
       </constraint>
     </attribute>
-    <attribute id="0x0001" name="Networks" default="empty">
+    <attribute id="0x0001" name="Networks" type="list" default="empty">
+      <entry type="NetworkInfoStruct"/>
       <access read="true" readPrivilege="admin"/>
       <mandatoryConform/>
       <constraint>
-        <max>
+        <maxCount>
           <attribute name="MaxNetworks"/>
-        </max>
+        </maxCount>
       </constraint>
     </attribute>
     <attribute id="0x0002" name="ScanMaxTimeSeconds" type="uint8">
@@ -483,7 +481,15 @@ Davis, CA 95616, USA
         <constraint>
           <between>
             <from value="0"/>
-            <to value="MaxNetworks - 1"/>
+            <to>
+              <compute>
+                <operation>subtract</operation>
+                <left>
+                  <attribute name="MaxNetworks"/>
+                </left>
+                <right value="1"/>
+              </compute>
+            </to>
           </between>
         </constraint>
       </field>

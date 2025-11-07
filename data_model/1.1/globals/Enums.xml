@@ -57,18 +57,19 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<namespace xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd namespace namespace.xsd" id="0x0008" name="Common Position">
-  <tags>
-    <tag id="0x0000" name="Left"/>
-    <tag id="0x0001" name="Right"/>
-    <tag id="0x0002" name="Top"/>
-    <tag id="0x0003" name="Bottom"/>
-    <tag id="0x0004" name="Middle"/>
-    <tag id="0x0005" name="Row">
-      <description>Numeric value provided in Label field</description>
-    </tag>
-    <tag id="0x0006" name="Column">
-      <description>Numeric value provided in Label field</description>
-    </tag>
-  </tags>
-</namespace>
+<enums>
+  <enum name="SoftwareVersionCertificationStatusEnum">
+    <item value="0" name="dev-test" summary="used for development and test purposes (Note: these will typically not be placed in DCL)">
+      <mandatoryConform/>
+    </item>
+    <item value="1" name="provisional" summary="used for a SoftwareVersion when going into certification testing (Note: these might or might not be placed in DCL, depending on CSA policy and procedures)">
+      <mandatoryConform/>
+    </item>
+    <item value="2" name="certified" summary="used for a SoftwareVersion which has been certified">
+      <mandatoryConform/>
+    </item>
+    <item value="3" name="revoked" summary="used for a SoftwareVersion which has been revoked">
+      <mandatoryConform/>
+    </item>
+  </enum>
+</enums>

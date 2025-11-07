@@ -57,49 +57,62 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0052" name="Refrigerator And Temperature Controlled Cabinet Mode Cluster" revision="1">
-  <revisionHistory>
-    <revision revision="1" summary="Initial Release"/>
-  </revisionHistory>
-  <clusterIds>
-    <clusterId id="0x0052" name="Refrigerator And Temperature Controlled Cabinet Mode"/>
-  </clusterIds>
-  <classification hierarchy="derived" baseCluster="Mode Base" role="application" picsCode="TCCM" scope="Endpoint"/>
-  <dataTypes>
-    <enum name="ModeTag">
-      <item value="0x4000" name="RapidCool"/>
-      <item value="0x4001" name="RapidFreeze"/>
-    </enum>
-    <struct name="ModeOptionStruct">
-      <field id="0" name="Label">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="Mode">
-        <mandatoryConform/>
-      </field>
-      <field id="2" name="ModeTags">
-        <mandatoryConform/>
-        <constraint>
-          <between>
-            <from value="1"/>
-            <to value="8"/>
-          </between>
-        </constraint>
-      </field>
-    </struct>
-  </dataTypes>
-  <attributes>
-    <attribute id="0x0000" name="SupportedModes">
-      <mandatoryConform/>
-    </attribute>
-    <attribute id="0x0001" name="CurrentMode">
-      <mandatoryConform/>
-    </attribute>
-    <attribute id="0x0002" name="StartUpMode">
-      <provisionalConform/>
-    </attribute>
-    <attribute id="0x0003" name="OnMode">
-      <provisionalConform/>
-    </attribute>
-  </attributes>
-</cluster>
+<structs>
+  <struct name="Choice">
+    <field id="43" name="AbsoluteValue" type="uint16" default="0">
+      <otherwiseConform>
+        <mandatoryConform>
+          <condition name="AB"/>
+        </mandatoryConform>
+        <optionalConform choice="a" more="true" min="1"/>
+      </otherwiseConform>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="5000"/>
+        </between>
+      </constraint>
+    </field>
+    <field id="44" name="PercentValue" type="uint8" default="0">
+      <otherwiseConform>
+        <mandatoryConform>
+          <condition name="CD"/>
+        </mandatoryConform>
+        <optionalConform choice="a" more="true" min="1"/>
+      </otherwiseConform>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="100"/>
+        </between>
+      </constraint>
+    </field>
+  </struct>
+  <struct name="List">
+    <field id="43" name="MinLevel" type="uint8" default="1">
+      <mandatoryConform>
+        <condition name="LT"/>
+      </mandatoryConform>
+      <constraint>
+        <between>
+          <from value="1"/>
+          <to value="100"/>
+        </between>
+      </constraint>
+    </field>
+    <field id="43" name="MinLevel" type="uint8" default="0">
+      <otherwiseConform>
+        <mandatoryConform>
+          <condition name="AB"/>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="100"/>
+        </between>
+      </constraint>
+    </field>
+  </struct>
+</structs>

@@ -59,29 +59,27 @@ Davis, CA 95616, USA
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0004" name="Groups Cluster" revision="4">
   <revisionHistory>
-    <revision revision="1" summary="Global mandatory ClusterRevision attribute added; CCB 1745 2100"/>
+    <revision revision="1" summary="global mandatory ClusterRevision attribute added; CCB 1745 2100"/>
     <revision revision="2" summary="CCB 2289"/>
     <revision revision="3" summary="CCB 2310 2704"/>
-    <revision revision="4" summary="New data model format and notation"/>
+    <revision revision="4" summary="new data model format and notation"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0004" name="Groups"/>
   </clusterIds>
-  <classification hierarchy="base" role="utility" picsCode="G" scope="Endpoint"/>
+  <classification hierarchy="base" role="utility" picsCode="G" scope=""/>
   <features>
-    <feature bit="0" code="GN" name="GroupNames" summary="The ability to store a name for a group.">
+    <feature bit="0" code="GN" name="Group Names" summary="The ability to store a name for a group.">
       <optionalConform/>
     </feature>
   </features>
-  <dataTypes>
-    <bitmap name="NameSupportBitmap">
-      <bitfield name="GroupNames" bit="7" summary="The ability to store a name for a group.">
-        <mandatoryConform/>
-      </bitfield>
-    </bitmap>
-  </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="NameSupport" type="NameSupportBitmap" default="0">
+    <attribute id="0x0000" name="NameSupport" type="map8" default="0">
+      <bitmap>
+        <bitfield name="Group Names" bit="7" summary="The ability to store a name for a group.">
+          <mandatoryConform/>
+        </bitfield>
+      </bitmap>
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
@@ -96,6 +94,9 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="GroupID" type="group-id">
         <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
       </field>
       <field id="1" name="GroupName" type="string">
         <mandatoryConform/>
@@ -114,6 +115,9 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="GroupID" type="group-id">
         <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
       </field>
     </command>
     <command id="0x01" name="ViewGroup" direction="commandToServer" response="ViewGroupResponse">
@@ -121,6 +125,9 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="GroupID" type="group-id">
         <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
       </field>
     </command>
     <command id="0x01" name="ViewGroupResponse" direction="responseFromServer">
@@ -133,6 +140,9 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="GroupID" type="group-id">
         <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
       </field>
       <field id="2" name="GroupName" type="string">
         <mandatoryConform/>
@@ -145,7 +155,11 @@ Davis, CA 95616, USA
       <access invokePrivilege="operate" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="GroupList" type="list">
-        <entry type="group-id"/>
+        <entry type="group-id">
+          <constraint>
+            <min value="1"/>
+          </constraint>
+        </entry>
         <mandatoryConform/>
       </field>
     </command>
@@ -156,7 +170,11 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
       <field id="1" name="GroupList" type="list">
-        <entry type="group-id"/>
+        <entry type="group-id">
+          <constraint>
+            <min value="1"/>
+          </constraint>
+        </entry>
         <mandatoryConform/>
       </field>
     </command>
@@ -165,6 +183,9 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="GroupID" type="group-id">
         <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
       </field>
     </command>
     <command id="0x03" name="RemoveGroupResponse" direction="responseFromServer">
@@ -177,6 +198,9 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="GroupID" type="group-id">
         <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
       </field>
     </command>
     <command id="0x04" name="RemoveAllGroups" direction="commandToServer" response="Y">
@@ -188,6 +212,9 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="GroupID" type="group-id">
         <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
       </field>
       <field id="1" name="GroupName" type="string">
         <mandatoryConform/>

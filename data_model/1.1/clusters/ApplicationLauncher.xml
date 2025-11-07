@@ -66,7 +66,7 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="APPLAUNCHER" scope="Endpoint"/>
   <features>
-    <feature bit="0" code="AP" name="ApplicationPlatform" summary="Support for attributes and commands required for endpoint to support launching any application within the supported application catalogs">
+    <feature bit="0" code="AP" name="Application Platform" summary="Support for attributes and commands required for endpoint to support launching any application within the supported application catalogs">
       <optionalConform/>
     </feature>
   </features>

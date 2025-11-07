@@ -66,25 +66,25 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="KEYPADINPUT" scope="Endpoint"/>
   <features>
-    <feature bit="0" code="NV" name="NavigationKeyCodes" summary="Supports UP, DOWN, LEFT, RIGHT, SELECT, BACK, EXIT, MENU">
+    <feature bit="0" code="NV" name="Navigation KeyCodes" summary="Supports UP, DOWN, LEFT, RIGHT, SELECT, BACK, EXIT, MENU">
       <optionalConform/>
     </feature>
-    <feature bit="1" code="LK" name="LocationKeys" summary="Supports CEC keys 0x0A (Settings) and 0x09 (Home)">
+    <feature bit="1" code="LK" name="Location Keys" summary="Supports CEC keys 0x0A (Settings) and 0x09 (Home)">
       <optionalConform/>
     </feature>
-    <feature bit="2" code="NK" name="NumberKeys" summary="Supports numeric input 0..9">
+    <feature bit="2" code="NK" name="Number Keys" summary="Supports numeric input 0..9">
       <optionalConform/>
     </feature>
   </features>
   <dataTypes>
     <enum name="StatusEnum">
-      <item value="0" name="Success" summary="Succeeded">
+      <item value="0" name="Success" summary="Command succeeded">
         <mandatoryConform/>
       </item>
-      <item value="1" name="UnsupportedKey" summary="Key code is not supported.">
+      <item value="1" name="UnsupportedKey" summary="Command failed: Key code is not supported.">
         <mandatoryConform/>
       </item>
-      <item value="2" name="InvalidKeyInCurrentState" summary="Requested key code is invalid in the context of the responder&apos;s current state.">
+      <item value="2" name="InvalidKeyInCurrentState" summary="Command failed: Requested key code is invalid in the context of the responder&apos;s current state.">
         <mandatoryConform/>
       </item>
     </enum>

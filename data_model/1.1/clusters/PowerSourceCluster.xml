@@ -57,10 +57,9 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x002F" name="Power Source Cluster" revision="2">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x002F" name="Power Source Cluster" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
-    <revision revision="2" summary="Added EndpointList attribute that maps a power source to a list of endpoints"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x002F" name="Power Source"/>
@@ -795,11 +794,6 @@ Davis, CA 95616, USA
       <constraint>
         <maxCount value="16"/>
       </constraint>
-    </attribute>
-    <attribute id="0x001F" name="EndpointList" type="list">
-      <entry type="endpoint-no"/>
-      <access read="true" readPrivilege="view"/>
-      <mandatoryConform/>
     </attribute>
   </attributes>
   <events>

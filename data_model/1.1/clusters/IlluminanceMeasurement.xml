@@ -59,24 +59,14 @@ Davis, CA 95616, USA
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0400" name="Illuminance Measurement Cluster" revision="3">
   <revisionHistory>
-    <revision revision="1" summary="Mandatory global ClusterRevision attribute added; CCB 2048 2049 2050"/>
+    <revision revision="1" summary="mandatory global ClusterRevision attribute added; CCB 2048 2049 2050"/>
     <revision revision="2" summary="CCB 2167"/>
-    <revision revision="3" summary="New data model format and notation"/>
+    <revision revision="3" summary="new data model format and notation"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0400" name="Illuminance Measurement"/>
   </clusterIds>
-  <classification hierarchy="base" role="application" picsCode="ILL" scope="Endpoint"/>
-  <dataTypes>
-    <enum name="LightSensorTypeEnum">
-      <item value="0" name="Photodiode" summary="Indicates photodiode sensor type">
-        <mandatoryConform/>
-      </item>
-      <item value="1" name="CMOS" summary="Indicates CMOS sensor type">
-        <mandatoryConform/>
-      </item>
-    </enum>
-  </dataTypes>
+  <classification hierarchy="base" role="application" picsCode="ILL" scope=""/>
   <attributes>
     <attribute id="0x0000" name="MeasuredValue" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
@@ -103,7 +93,15 @@ Davis, CA 95616, USA
       <constraint>
         <between>
           <from value="1"/>
-          <to value="MaxMeasuredValue - 1"/>
+          <to>
+            <compute>
+              <operation>subtract</operation>
+              <left>
+                <attribute name="MaxMeasuredValue"/>
+              </left>
+              <right value="1"/>
+            </compute>
+          </to>
         </between>
       </constraint>
     </attribute>
@@ -113,7 +111,15 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <constraint>
         <between>
-          <from value="MinMeasuredValue + 1"/>
+          <from>
+            <compute>
+              <operation>add</operation>
+              <left>
+                <attribute name="MinMeasuredValue"/>
+              </left>
+              <right value="1"/>
+            </compute>
+          </from>
           <to value="65534"/>
         </between>
       </constraint>
@@ -128,7 +134,18 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0004" name="LightSensorType" type="LightSensorTypeEnum" default="null">
+    <attribute id="0x0004" name="LightSensorType" type="enum8" default="null">
+      <enum>
+        <item value="0" name="Photodiode" summary="Photodiode">
+          <mandatoryConform/>
+        </item>
+        <item value="1" name="CMOS" summary="CMOS">
+          <mandatoryConform/>
+        </item>
+        <item from="0x40" to="0xFE" name="ReservedForManufacturerSpecificLightSensorTypes" summary="Reserved for manufacturer specific light sensor types">
+          <mandatoryConform/>
+        </item>
+      </enum>
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <optionalConform/>

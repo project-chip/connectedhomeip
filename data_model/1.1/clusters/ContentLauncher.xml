@@ -66,24 +66,24 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="CONTENTLAUNCHER" scope="Endpoint"/>
   <features>
-    <feature bit="0" code="CS" name="ContentSearch" summary="Device supports content search (non-app specific)">
+    <feature bit="0" code="CS" name="Content Search" summary="Device supports content search (non-app specific)">
       <optionalConform/>
     </feature>
-    <feature bit="1" code="UP" name="URLPlayback" summary="Device supports basic URL-based file playback">
+    <feature bit="1" code="UP" name="URL Playback" summary="Device supports basic URL-based file playback">
       <optionalConform/>
     </feature>
   </features>
   <dataTypes>
     <enum name="MetricTypeEnum">
-      <item value="0" name="Pixels" summary="Dimensions defined in a number of Pixels">
+      <item value="0" name="Pixels">
         <mandatoryConform/>
       </item>
-      <item value="1" name="Percentage" summary="Dimensions defined as a percentage">
+      <item value="1" name="Percentage">
         <mandatoryConform/>
       </item>
     </enum>
     <enum name="ParameterEnum">
-      <item value="0" name="Actor" summary="Actor represents an actor credited in video media content; for example, “Gaby Hoffman”">
+      <item value="0" name="Actor" summary="Actor represents an actor credited in video media content; for example, “Gaby sHoffman”">
         <mandatoryConform/>
       </item>
       <item value="1" name="Channel" summary="Channel represents the identifying data for a television channel; for example, &quot;PBS&quot;">
@@ -137,14 +137,6 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
     </enum>
-    <bitmap name="SupportedProtocolsBitmap">
-      <bitfield name="DASH" bit="0" summary="Device supports Dynamic Adaptive Streaming over HTTP (DASH)">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="HLS" bit="1" summary="Device supports HTTP Live Streaming (HLS)">
-        <mandatoryConform/>
-      </bitfield>
-    </bitmap>
     <struct name="AdditionalInfoStruct">
       <field id="0" name="Name" type="string">
         <mandatoryConform/>
@@ -251,7 +243,7 @@ Davis, CA 95616, USA
         <maxCount value="100"/>
       </constraint>
     </attribute>
-    <attribute id="0x0001" name="SupportedStreamingProtocols" type="SupportedProtocolsBitmap" default="0">
+    <attribute id="0x0001" name="SupportedStreamingProtocols" type="map32" default="0">
       <access read="true" readPrivilege="view"/>
       <quality persistence="nonVolatile"/>
       <mandatoryConform>
@@ -277,7 +269,7 @@ Davis, CA 95616, USA
           <desc/>
         </constraint>
       </field>
-      <field id="2" name="Data" type="string" default="MS">
+      <field id="2" name="Data" type="octstr" default="MS">
         <optionalConform/>
       </field>
     </command>
@@ -306,7 +298,7 @@ Davis, CA 95616, USA
       <field id="0" name="Status" type="StatusEnum">
         <mandatoryConform/>
       </field>
-      <field id="1" name="Data" type="string" default="MS">
+      <field id="1" name="Data" type="octstr" default="MS">
         <optionalConform/>
       </field>
     </command>

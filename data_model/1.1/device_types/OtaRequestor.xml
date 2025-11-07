@@ -64,10 +64,10 @@ Davis, CA 95616, USA
   </revisionHistory>
   <classification class="utility" scope="node"/>
   <clusters>
-    <cluster id="0x002A" name="OTA Software Update Requestor" side="server">
+    <cluster id="" name="OTA Software Update Requestor" side="server">
       <mandatoryConform/>
     </cluster>
-    <cluster id="0x0029" name="OTA Software Update Provider" side="client">
+    <cluster id="" name="OTA Software Update Provider" side="client">
       <mandatoryConform/>
     </cluster>
   </clusters>

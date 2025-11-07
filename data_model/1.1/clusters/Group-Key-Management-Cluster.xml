@@ -57,10 +57,9 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x003F" name="Group Key Management Cluster" revision="2">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x003F" name="Group Key Management Cluster" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
-    <revision revision="2" summary="Clarify KeySetWrite validation and behavior on invalid epoch key lengths"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x003F" name="Group Key Management"/>
@@ -178,6 +177,7 @@ Davis, CA 95616, USA
           <mandatoryConform/>
         </otherwiseConform>
       </field>
+      <access fabricScoped="true"/>
     </struct>
   </dataTypes>
   <attributes>
@@ -246,9 +246,6 @@ Davis, CA 95616, USA
     <command id="0x04" name="KeySetReadAllIndices" direction="commandToServer" response="KeySetReadAllIndicesResponse">
       <access invokePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
-      <field id="0" name="reserved">
-        <disallowConform/>
-      </field>
     </command>
     <command id="0x05" name="KeySetReadAllIndicesResponse" direction="responseFromServer">
       <mandatoryConform/>

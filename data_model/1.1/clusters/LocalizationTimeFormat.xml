@@ -73,40 +73,40 @@ Davis, CA 95616, USA
   <dataTypes>
     <enum name="CalendarTypeEnum">
       <item value="0" name="Buddhist" summary="Dates conveyed using the Buddhist calendar">
-        <optionalConform choice="a" more="true" min="1"/>
+        <mandatoryConform/>
       </item>
       <item value="1" name="Chinese" summary="Dates conveyed using the Chinese calendar">
-        <optionalConform choice="a" more="true" min="1"/>
+        <mandatoryConform/>
       </item>
       <item value="2" name="Coptic" summary="Dates conveyed using the Coptic calendar">
-        <optionalConform choice="a" more="true" min="1"/>
+        <mandatoryConform/>
       </item>
       <item value="3" name="Ethiopian" summary="Dates conveyed using the Ethiopian calendar">
-        <optionalConform choice="a" more="true" min="1"/>
+        <mandatoryConform/>
       </item>
       <item value="4" name="Gregorian" summary="Dates conveyed using the Gregorian calendar">
-        <optionalConform choice="a" more="true" min="1"/>
+        <mandatoryConform/>
       </item>
       <item value="5" name="Hebrew" summary="Dates conveyed using the Hebrew calendar">
-        <optionalConform choice="a" more="true" min="1"/>
+        <mandatoryConform/>
       </item>
       <item value="6" name="Indian" summary="Dates conveyed using the Indian calendar">
-        <optionalConform choice="a" more="true" min="1"/>
+        <mandatoryConform/>
       </item>
       <item value="7" name="Islamic" summary="Dates conveyed using the Islamic calendar">
-        <optionalConform choice="a" more="true" min="1"/>
+        <mandatoryConform/>
       </item>
       <item value="8" name="Japanese" summary="Dates conveyed using the Japanese calendar">
-        <optionalConform choice="a" more="true" min="1"/>
+        <mandatoryConform/>
       </item>
       <item value="9" name="Korean" summary="Dates conveyed using the Korean calendar">
-        <optionalConform choice="a" more="true" min="1"/>
+        <mandatoryConform/>
       </item>
       <item value="10" name="Persian" summary="Dates conveyed using the Persian calendar">
-        <optionalConform choice="a" more="true" min="1"/>
+        <mandatoryConform/>
       </item>
       <item value="11" name="Taiwanese" summary="Dates conveyed using the Taiwanese calendar">
-        <optionalConform choice="a" more="true" min="1"/>
+        <mandatoryConform/>
       </item>
     </enum>
     <enum name="HourFormatEnum">
@@ -131,7 +131,7 @@ Davis, CA 95616, USA
         <feature name="CALFMT"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0002" name="SupportedCalendarTypes" type="list" default="">
+    <attribute id="0x0002" name="SupportedCalendarTypes" type="list">
       <entry type="CalendarTypeEnum"/>
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>

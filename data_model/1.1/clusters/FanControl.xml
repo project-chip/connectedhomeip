@@ -57,19 +57,17 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0202" name="Fan Control Cluster" revision="4">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0202" name="Fan Control Cluster" revision="2">
   <revisionHistory>
-    <revision revision="1" summary="Global mandatory ClusterRevision attribute added"/>
+    <revision revision="1" summary="global mandatory ClusterRevision attribute added"/>
     <revision revision="2" summary="New data model format and notation; Percent, speed and motion settings; General cleanup"/>
-    <revision revision="3" summary="Addition of Airflow Direction and Step command"/>
-    <revision revision="4" summary="Change conformance for FanModeSequenceEnum"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0202" name="Fan Control"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="FAN" scope="Endpoint"/>
   <features>
-    <feature bit="0" code="SPD" name="MultiSpeed" summary="1-100 speeds">
+    <feature bit="0" code="SPD" name="Multi-Speed" summary="1-100 speeds">
       <optionalConform/>
     </feature>
     <feature bit="1" code="AUT" name="Auto" summary="Automatic mode supported for fan speed">
@@ -81,115 +79,32 @@ Davis, CA 95616, USA
     <feature bit="3" code="WND" name="Wind" summary="Wind emulation supported">
       <optionalConform/>
     </feature>
-    <feature bit="4" code="STEP" name="Step" summary="Step command supported">
-      <optionalConform/>
-    </feature>
-    <feature bit="5" code="DIR" name="Airflow Direction" summary="Airflow Direction attribute is supported">
-      <optionalConform/>
-    </feature>
   </features>
-  <dataTypes>
-    <enum name="AirflowDirectionEnum">
-      <item value="0" name="Forward" summary="Airflow is in the forward direction">
-        <mandatoryConform/>
-      </item>
-      <item value="1" name="Reverse" summary="Airflow is in the reverse direction">
-        <mandatoryConform/>
-      </item>
-    </enum>
-    <enum name="FanModeEnum">
-      <item value="0" name="Off" summary="Fan is off">
-        <mandatoryConform/>
-      </item>
-      <item value="1" name="Low" summary="Fan using low speed">
-        <describedConform/>
-      </item>
-      <item value="2" name="Medium" summary="Fan using medium speed">
-        <describedConform/>
-      </item>
-      <item value="3" name="High" summary="Fan using high speed">
-        <mandatoryConform/>
-      </item>
-      <item value="4" name="On">
-        <deprecateConform/>
-      </item>
-      <item value="5" name="Auto" summary="Fan is using auto mode">
-        <mandatoryConform>
-          <feature name="AUT"/>
-        </mandatoryConform>
-      </item>
-      <item value="6" name="Smart" summary="Fan is using smart mode">
-        <deprecateConform/>
-      </item>
-    </enum>
-    <enum name="FanModeSequenceEnum">
-      <item value="0" name="Off/Low/Med/High" summary="Fan is capable of off, low, medium and high modes">
-        <optionalConform choice="a">
-          <notTerm>
-            <feature name="AUT"/>
-          </notTerm>
-        </optionalConform>
-      </item>
-      <item value="1" name="Off/Low/High" summary="Fan is capable of off, low and high modes">
-        <optionalConform choice="a">
-          <notTerm>
-            <feature name="AUT"/>
-          </notTerm>
-        </optionalConform>
-      </item>
-      <item value="2" name="Off/Low/Med/High/Auto" summary="Fan is capable of off, low, medium, high and auto modes">
-        <optionalConform choice="a">
-          <feature name="AUT"/>
-        </optionalConform>
-      </item>
-      <item value="3" name="Off/Low/High/Auto" summary="Fan is capable of off, low, high and auto modes">
-        <optionalConform choice="a">
-          <feature name="AUT"/>
-        </optionalConform>
-      </item>
-      <item value="4" name="Off/High/Auto" summary="Fan is capable of off, high and auto modes">
-        <optionalConform choice="a">
-          <feature name="AUT"/>
-        </optionalConform>
-      </item>
-      <item value="5" name="Off/High" summary="Fan is capable of off and high modes">
-        <optionalConform choice="a">
-          <notTerm>
-            <feature name="AUT"/>
-          </notTerm>
-        </optionalConform>
-      </item>
-    </enum>
-    <enum name="StepDirectionEnum">
-      <item value="0" name="Increase" summary="Step moves in increasing direction">
-        <mandatoryConform/>
-      </item>
-      <item value="1" name="Decrease" summary="Step moves in decreasing direction">
-        <mandatoryConform/>
-      </item>
-    </enum>
-    <bitmap name="RockBitmap">
-      <bitfield name="RockLeftRight" bit="0" summary="Indicate rock left to right">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="RockUpDown" bit="1" summary="Indicate rock up and down">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="RockRound" bit="2" summary="Indicate rock around">
-        <mandatoryConform/>
-      </bitfield>
-    </bitmap>
-    <bitmap name="WindBitmap">
-      <bitfield name="SleepWind" bit="0" summary="Indicate sleep wind">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="NaturalWind" bit="1" summary="Indicate natural wind">
-        <mandatoryConform/>
-      </bitfield>
-    </bitmap>
-  </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="FanMode" type="FanModeEnum" default="0">
+    <attribute id="0x0000" name="FanMode" type="enum8" default="0">
+      <enum>
+        <item value="0" name="Off" summary="Off">
+          <mandatoryConform/>
+        </item>
+        <item value="1" name="Low" summary="Low">
+          <mandatoryConform/>
+        </item>
+        <item value="2" name="Medium" summary="Medium">
+          <mandatoryConform/>
+        </item>
+        <item value="3" name="High" summary="High">
+          <mandatoryConform/>
+        </item>
+        <item value="4" name="On" summary="On">
+          <mandatoryConform/>
+        </item>
+        <item value="5" name="Auto" summary="Auto">
+          <mandatoryConform/>
+        </item>
+        <item value="6" name="Smart" summary="Smart">
+          <mandatoryConform/>
+        </item>
+      </enum>
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <quality persistence="nonVolatile"/>
       <mandatoryConform/>
@@ -200,9 +115,29 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0001" name="FanModeSequence" type="" default="MS">
-      <access read="true" readPrivilege="view"/>
-      <quality persistence="fixed"/>
+    <attribute id="0x0001" name="FanModeSequence" type="enum8" default="MS">
+      <enum>
+        <item value="0" name="Off/Low/Med/High" summary="Off/Low/Med/High">
+          <mandatoryConform/>
+        </item>
+        <item value="1" name="Off/Low/High" summary="Off/Low/High">
+          <mandatoryConform/>
+        </item>
+        <item value="2" name="Off/Low/Med/High/Auto" summary="Off/Low/Med/High/Auto">
+          <mandatoryConform/>
+        </item>
+        <item value="3" name="Off/Low/High/Auto" summary="Off/Low/High/Auto">
+          <mandatoryConform/>
+        </item>
+        <item value="4" name="Off/On/Auto" summary="Off/On/Auto">
+          <mandatoryConform/>
+        </item>
+        <item value="5" name="Off/On" summary="Off/On">
+          <mandatoryConform/>
+        </item>
+      </enum>
+      <access read="true" write="optional" readPrivilege="view" writePrivilege="operate"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
       <constraint>
         <between>
@@ -211,7 +146,7 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0002" name="PercentSetting" type="percent" default="0">
+    <attribute id="0x0002" name="PercentSetting" type="uint8" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <quality nullable="true"/>
       <mandatoryConform/>
@@ -222,7 +157,7 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0003" name="PercentCurrent" type="percent" default="desc">
+    <attribute id="0x0003" name="PercentCurrent" type="uint8" default="desc">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
       <constraint>
@@ -275,7 +210,18 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0007" name="RockSupport" type="RockBitmap" default="0">
+    <attribute id="0x0007" name="RockSupport" type="map8" default="0">
+      <bitmap>
+        <bitfield name="RockLeftRight" bit="0" summary="RockLeftRight">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="RockUpDown" bit="1" summary="RockUpDown">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="RockRound" bit="2" summary="RockRound">
+          <mandatoryConform/>
+        </bitfield>
+      </bitmap>
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform>
@@ -285,7 +231,18 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0008" name="RockSetting" type="RockBitmap" default="0">
+    <attribute id="0x0008" name="RockSetting" type="map8" default="0">
+      <bitmap>
+        <bitfield name="RockLeftRight" bit="0" summary="RockLeftRight">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="RockUpDown" bit="1" summary="RockUpDown">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="RockRound" bit="2" summary="RockRound">
+          <mandatoryConform/>
+        </bitfield>
+      </bitmap>
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <quality reportable="true"/>
       <mandatoryConform>
@@ -295,7 +252,15 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0009" name="WindSupport" type="WindBitmap" default="0">
+    <attribute id="0x0009" name="WindSupport" type="map8" default="0">
+      <bitmap>
+        <bitfield name="SleepWind" bit="0" summary="Sleep Wind">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="NaturalWind" bit="1" summary="Natural Wind">
+          <mandatoryConform/>
+        </bitfield>
+      </bitmap>
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform>
@@ -305,45 +270,23 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x000A" name="WindSetting" type="WindBitmap" default="0">
+    <attribute id="0x000A" name="WindSetting" type="map8" default="0">
+      <bitmap>
+        <bitfield name="SleepWind" bit="0" summary="Sleep Wind">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="NaturalWind" bit="1" summary="Natural Wind">
+          <mandatoryConform/>
+        </bitfield>
+      </bitmap>
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <quality reportable="true"/>
       <mandatoryConform>
         <feature name="WND"/>
-      </mandatoryConform>
-      <constraint>
-        <desc/>
-      </constraint>
-    </attribute>
-    <attribute id="0x000B" name="AirflowDirection" type="AirflowDirectionEnum" default="0">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality reportable="true"/>
-      <mandatoryConform>
-        <feature name="DIR"/>
       </mandatoryConform>
       <constraint>
         <desc/>
       </constraint>
     </attribute>
   </attributes>
-  <commands>
-    <command id="0x00" name="Step" direction="commandToServer" response="Y">
-      <access invokePrivilege="operate"/>
-      <mandatoryConform>
-        <feature name="STEP"/>
-      </mandatoryConform>
-      <field id="0" name="Direction" type="StepDirectionEnum">
-        <default>
-          <enum default="Increase"/>
-        </default>
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="Wrap" type="bool" default="false">
-        <optionalConform/>
-      </field>
-      <field id="2" name="LowestOff" type="bool" default="true">
-        <optionalConform/>
-      </field>
-    </command>
-  </commands>
 </cluster>

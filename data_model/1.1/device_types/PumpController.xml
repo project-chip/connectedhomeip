@@ -67,18 +67,33 @@ Davis, CA 95616, USA
   <clusters>
     <cluster id="0x0003" name="Identify" side="server">
       <mandatoryConform/>
+      <features>
+        <feature code="QRY">
+          <mandatoryConform>
+            <notTerm>
+              <condition name="Matter"/>
+            </notTerm>
+          </mandatoryConform>
+        </feature>
+      </features>
     </cluster>
     <cluster id="0x0003" name="Identify" side="client">
       <optionalConform/>
+      <features>
+        <feature code="QRY">
+          <mandatoryConform>
+            <notTerm>
+              <condition name="Matter"/>
+            </notTerm>
+          </mandatoryConform>
+        </feature>
+      </features>
     </cluster>
     <cluster id="0x0004" name="Groups" side="client">
       <optionalConform/>
     </cluster>
     <cluster id="0x0005" name="Scenes" side="client">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform/>
-      </otherwiseConform>
+      <optionalConform/>
     </cluster>
     <cluster id="0x0006" name="On/Off" side="client">
       <mandatoryConform/>

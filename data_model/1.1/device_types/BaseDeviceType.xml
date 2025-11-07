@@ -57,11 +57,10 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" name="Base Device Type" revision="2">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" name="Base Device Type" revision="1">
   <revisionHistory>
     <revision revision="0" summary="Represents device definitions prior to device type revision numbers"/>
     <revision revision="1" summary="Initial release of this document"/>
-    <revision revision="2" summary="Duplicate condition replaces Multiple condition"/>
   </revisionHistory>
   <conditions>
     <condition name="ZHA" summary="Zigbee Home Automation standard"/>
@@ -81,9 +80,8 @@ Davis, CA 95616, USA
     <condition name="LanguageLocale" summary="The node supports localization for conveying text to the user"/>
     <condition name="TimeLocale" summary="The node supports localization for conveying time to the user"/>
     <condition name="UnitLocale" summary="The node supports localization for conveying units of measure to the user"/>
-    <condition name="SIT" summary="The node is a short idle time intermittently connected device"/>
-    <condition name="LIT" summary="The node is a long idle time intermittently connected device"/>
-    <condition name="Active" summary="The node is always able to communicate"/>
+    <condition name="Sleepy" summary="The node is normally asleep and wakes to perform function"/>
+    <condition name="Awake" summary="The node is always able to communicate"/>
     <condition name="Simplex" summary="One way communication, client to server"/>
     <condition name="Node" summary="the device type is classified as a Node device type (see Data Model specification)"/>
     <condition name="App" summary="the device type is classified as an Application device type (see Data Model specification)"/>
@@ -92,7 +90,7 @@ Davis, CA 95616, USA
     <condition name="Client" summary="there exists a client application cluster on the endpoint"/>
     <condition name="Server" summary="there exists a server application cluster on the endpoint"/>
     <condition name="Composed" summary="the device type is composed of 2 or more device types (see System Model specification)"/>
-    <condition name="Duplicate" summary="see &lt;&lt;ref_Duplicate, Duplicate Condition&gt;&gt;"/>
+    <condition name="Multiple" summary="a Composed device type that is composed of 2 or more endpoints with the same device type (see System Model specification)"/>
     <condition name="EZ-Initiator" summary="the endpoint is an Initiator for Zigbee EZ-Mode Finding &amp; Binding"/>
     <condition name="EZ-Target" summary="the endpoint is a Target for Zigbee EZ-Mode Finding &amp; Binding"/>
     <condition name="BridgedPowerSourceInfo" summary="the endpoint represents a Bridged Device, for which information about the state of its power source is available to the Bridge"/>
@@ -100,13 +98,6 @@ Davis, CA 95616, USA
   <clusters>
     <cluster id="0x001D" name="Descriptor" side="server">
       <mandatoryConform/>
-      <features>
-        <feature code="" name="TagList">
-          <mandatoryConform>
-            <condition name="Duplicate"/>
-          </mandatoryConform>
-        </feature>
-      </features>
     </cluster>
     <cluster id="0x001E" name="Binding" side="server">
       <mandatoryConform>
@@ -117,10 +108,22 @@ Davis, CA 95616, USA
       </mandatoryConform>
     </cluster>
     <cluster id="0x0040" name="Fixed Label" side="server">
-      <optionalConform/>
+      <optionalConform>
+        <andTerm>
+          <condition name="App"/>
+          <condition name="Server"/>
+          <condition name="Multiple"/>
+        </andTerm>
+      </optionalConform>
     </cluster>
     <cluster id="0x0041" name="User Label" side="server">
-      <optionalConform/>
+      <optionalConform>
+        <andTerm>
+          <condition name="App"/>
+          <condition name="Server"/>
+          <condition name="Multiple"/>
+        </andTerm>
+      </optionalConform>
     </cluster>
   </clusters>
 </deviceType>

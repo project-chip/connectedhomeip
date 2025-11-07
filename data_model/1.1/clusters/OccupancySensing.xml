@@ -59,14 +59,14 @@ Davis, CA 95616, USA
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0406" name="Occupancy Sensing Cluster" revision="3">
   <revisionHistory>
-    <revision revision="1" summary="Mandatory global ClusterRevision attribute added"/>
+    <revision revision="1" summary="mandatory global ClusterRevision attribute added"/>
     <revision revision="2" summary="Physical Contact Occupancy feature with mandatory OccupancySensorTypeBitmap"/>
-    <revision revision="3" summary="New data model format and notation"/>
+    <revision revision="3" summary="new data model format and notation"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0406" name="Occupancy Sensing"/>
   </clusterIds>
-  <classification hierarchy="base" role="application" picsCode="OCC" scope="Endpoint"/>
+  <classification hierarchy="base" role="application" picsCode="OCC" scope=""/>
   <dataTypes>
     <enum name="OccupancySensorTypeEnum">
       <item value="0" name="PIR" summary="Indicates a passive infrared sensor.">
@@ -83,7 +83,7 @@ Davis, CA 95616, USA
       </item>
     </enum>
     <bitmap name="OccupancyBitmap">
-      <bitfield name="Occupied" bit="0" summary="Indicates the sensed occupancy state">
+      <bitfield name="Occupied" bit="0" summary="Indicates the sensed occupancy state; 1 = occupied, 0 = unoccupied.">
         <mandatoryConform/>
       </bitfield>
     </bitmap>
@@ -105,10 +105,7 @@ Davis, CA 95616, USA
       <quality reportable="true"/>
       <mandatoryConform/>
       <constraint>
-        <between>
-          <from value="0"/>
-          <to value="1"/>
-        </between>
+        <max value="1"/>
       </constraint>
     </attribute>
     <attribute id="0x0001" name="OccupancySensorType" type="OccupancySensorTypeEnum" default="MS">
@@ -122,10 +119,7 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
       <constraint>
-        <between>
-          <from value="0"/>
-          <to value="7"/>
-        </between>
+        <max value="7"/>
       </constraint>
     </attribute>
     <attribute id="0x0010" name="PIROccupiedToUnoccupiedDelay" type="uint16" default="0">
@@ -134,21 +128,11 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0011" name="PIRUnoccupiedToOccupiedDelay" type="uint16" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <otherwiseConform>
-        <mandatoryConform>
-          <attribute name="PIRUnoccupiedToOccupiedThreshold"/>
-        </mandatoryConform>
-        <optionalConform/>
-      </otherwiseConform>
+      <optionalConform/>
     </attribute>
     <attribute id="0x0012" name="PIRUnoccupiedToOccupiedThreshold" type="uint8" default="1">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <otherwiseConform>
-        <mandatoryConform>
-          <attribute name="PIRUnoccupiedToOccupiedDelay"/>
-        </mandatoryConform>
-        <optionalConform/>
-      </otherwiseConform>
+      <optionalConform/>
       <constraint>
         <between>
           <from value="1"/>
@@ -162,21 +146,11 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0021" name="UltrasonicUnoccupiedToOccupiedDelay" type="uint16" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <otherwiseConform>
-        <mandatoryConform>
-          <attribute name="UltrasonicUnoccupiedToOccupiedThreshold"/>
-        </mandatoryConform>
-        <optionalConform/>
-      </otherwiseConform>
+      <optionalConform/>
     </attribute>
     <attribute id="0x0022" name="UltrasonicUnoccupiedToOccupiedThreshold" type="uint8" default="1">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <otherwiseConform>
-        <mandatoryConform>
-          <attribute name="UltrasonicUnoccupiedToOccupiedDelay"/>
-        </mandatoryConform>
-        <optionalConform/>
-      </otherwiseConform>
+      <optionalConform/>
       <constraint>
         <between>
           <from value="1"/>
@@ -196,12 +170,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0032" name="PhysicalContactUnoccupiedToOccupiedThreshold" type="uint8" default="1">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <otherwiseConform>
-        <mandatoryConform>
-          <attribute name="PhysicalContactUnoccupiedToOccupiedDelay"/>
-        </mandatoryConform>
-        <optionalConform/>
-      </otherwiseConform>
+      <optionalConform/>
       <constraint>
         <between>
           <from value="1"/>

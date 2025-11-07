@@ -313,6 +313,12 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform/>
+      <constraint>
+        <between>
+          <from value="1"/>
+          <to value="17"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x0006" name="OverrunCount" type="uint64" default="0">
       <access read="true" readPrivilege="view"/>
@@ -336,37 +342,25 @@ Davis, CA 95616, USA
       <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x000A" name="Weighting" type="uint16">
+    <attribute id="0x000A" name="Weighting" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform/>
-      <constraint>
-        <max value="255"/>
-      </constraint>
     </attribute>
-    <attribute id="0x000B" name="DataVersion" type="uint16">
+    <attribute id="0x000B" name="DataVersion" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform/>
-      <constraint>
-        <max value="255"/>
-      </constraint>
     </attribute>
-    <attribute id="0x000C" name="StableDataVersion" type="uint16">
+    <attribute id="0x000C" name="StableDataVersion" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform/>
-      <constraint>
-        <max value="255"/>
-      </constraint>
     </attribute>
     <attribute id="0x000D" name="LeaderRouterId" type="uint8">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform/>
-      <constraint>
-        <max value="62"/>
-      </constraint>
     </attribute>
     <attribute id="0x000E" name="DetachedRoleCount" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
@@ -634,7 +628,7 @@ Davis, CA 95616, USA
         <feature name="MACCNT"/>
       </optionalConform>
     </attribute>
-    <attribute id="0x0034" name="RxErrInvalidSrcAddrCount" type="uint32" default="0">
+    <attribute id="0x0034" name="RxErrInvalidScrAddrCount" type="uint32" default="0">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="true"/>
       <optionalConform>
