@@ -222,7 +222,7 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
     }
 
     {
-        typename TimeSynchronizationCluster::OptionalAttributeSet optionalAttributeSet;
+        TimeSynchronizationCluster::OptionalAttributeSet optionalAttributeSet;
         optionalAttributeSet.Set<TimeSource::Id>();
         const BitFlags<Feature> features{ 0U };
         TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features, optionalAttributeSet,

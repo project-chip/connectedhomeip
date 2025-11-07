@@ -164,22 +164,14 @@ void EmitMissingTrustedTimeSourceEvent(DataModel::EventsGenerator * eventsGenera
 
 } // namespace
 
-TimeSynchronization::Delegate * TimeSynchronizationCluster::GetDelegate()
-{
-    if (mDelegate == nullptr)
-    {
-        static TimeSynchronization::DefaultTimeSyncDelegate dg;
-        mDelegate = &dg;
-    }
-    return mDelegate;
-}
+static TimeSynchronization::DefaultTimeSyncDelegate gDelegate;
 
 TimeSynchronizationCluster::TimeSynchronizationCluster(EndpointId endpoint, const BitFlags<TimeSynchronization::Feature> features,
                                                        const OptionalAttributeSet & optionalAttributeSet,
                                                        const StartupConfiguration & config) :
-    DefaultServerCluster({ endpoint, TimeSynchronization::Id }),
-    mFeatures(features), mOptionalAttributeSet(optionalAttributeSet), mSupportsDNSResolve(config.supportsDNSResolve),
-    mNTPServerAvailable(config.ntpServerAvailable), mTimeZoneDatabase(config.timeZoneDatabase), mTimeSource(config.timeSource),
+    DefaultServerCluster({ endpoint, TimeSynchronization::Id }), mFeatures(features), mOptionalAttributeSet(optionalAttributeSet),
+    mSupportsDNSResolve(config.supportsDNSResolve), mNTPServerAvailable(config.ntpServerAvailable),
+    mTimeZoneDatabase(config.timeZoneDatabase), mTimeSource(config.timeSource), mDelegate(&gDelegate),
 #if TIME_SYNC_ENABLE_TSC_FEATURE
     mOnDeviceConnectedCallback(OnDeviceConnectedWrapper, this),
     mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureWrapper, this),
@@ -507,19 +499,33 @@ void TimeSynchronizationCluster::OnTimeSyncCompletionFn(TimeSourceEnum timeSourc
         }
         return;
     }
-    mGranularity = granularity;
-    mTimeSource  = timeSource;
-    NotifyAttributeChanged(TimeSource::Id);
+    if (mGranularity != granularity)
+    {
+        mGranularity = granularity;
+        NotifyAttributeChanged(Granularity::Id);
+    }
+    if (mTimeSource != timeSource)
+    {
+        mTimeSource = timeSource;
+        NotifyAttributeChanged(TimeSource::Id);
+    }
 }
 
 void TimeSynchronizationCluster::OnFallbackNTPCompletionFn(bool timeSyncSuccessful)
 {
     if (timeSyncSuccessful)
     {
-        mGranularity = GranularityEnum::kMillisecondsGranularity;
+        if (mGranularity != GranularityEnum::kMillisecondsGranularity)
+        {
+            mGranularity = GranularityEnum::kMillisecondsGranularity;
+            NotifyAttributeChanged(Granularity::Id);
+        }
         // Non-matter SNTP because we know it's external and there's only one source
-        mTimeSource = TimeSourceEnum::kNonMatterSNTP;
-        NotifyAttributeChanged(TimeSource::Id);
+        if (mTimeSource != TimeSourceEnum::kNonMatterSNTP)
+        {
+            mTimeSource = TimeSourceEnum::kNonMatterSNTP;
+            NotifyAttributeChanged(TimeSource::Id);
+        }
     }
     else
     {
@@ -860,7 +866,7 @@ inline DataModel::List<Structs::DSTOffsetStruct::Type> & TimeSynchronizationClus
 
 CHIP_ERROR TimeSynchronizationCluster::SetUTCTime(uint64_t utcTime, GranularityEnum granularity, TimeSourceEnum source)
 {
-    auto setAttribute = [this](uint64_t utct, GranularityEnum gran, TimeSourceEnum src) {
+    auto setAttribute = [this](uint64_t utct, GranularityEnum gran, TimeSourceEnum tsrc) {
         CHIP_ERROR err = UpdateUTCTime(utct);
         if (err != CHIP_NO_ERROR && !RuntimeOptionsProvider::Instance().GetSimulateNoInternalTime())
         {
@@ -868,8 +874,16 @@ CHIP_ERROR TimeSynchronizationCluster::SetUTCTime(uint64_t utcTime, GranularityE
             return err;
         }
         GetDelegate()->UTCTimeAvailabilityChanged(utct);
-        mGranularity = gran;
-        mTimeSource  = src;
+        if (mGranularity != gran)
+        {
+            mGranularity = gran;
+            NotifyAttributeChanged(Granularity::Id);
+        }
+        if (mTimeSource != tsrc)
+        {
+            mTimeSource = tsrc;
+            NotifyAttributeChanged(TimeSource::Id);
+        }
         return CHIP_NO_ERROR;
     };
 

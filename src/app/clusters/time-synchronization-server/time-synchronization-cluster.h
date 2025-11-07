@@ -125,8 +125,14 @@ public:
 
     const TimeSynchronization::GranularityEnum & GetGranularity() const { return mGranularity; }
 
-    TimeSynchronization::Delegate * GetDelegate();
-    void SetDelegate(TimeSynchronization::Delegate * delegate) { mDelegate = delegate; }
+    TimeSynchronization::Delegate * GetDelegate() const { return mDelegate; }
+    void SetDelegate(TimeSynchronization::Delegate * delegate)
+    {
+        if (delegate != nullptr)
+        {
+            mDelegate = delegate;
+        }
+    }
 
 private:
     CHIP_ERROR SetTrustedTimeSource(const DataModel::Nullable<TimeSynchronization::Structs::TrustedTimeSourceStruct::Type> & tts);
