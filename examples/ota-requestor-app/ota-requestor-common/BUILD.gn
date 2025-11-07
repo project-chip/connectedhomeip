@@ -23,6 +23,7 @@ config("config") {
 chip_data_model("ota-requestor-common") {
   zap_file = "ota-requestor-app.zap"
 
+  public_deps = [ "${chip_root}/src/app/clusters/ota-requestor" ]
   deps = [ "${chip_root}/src/lib" ]
 
   public_configs = [ ":config" ]
