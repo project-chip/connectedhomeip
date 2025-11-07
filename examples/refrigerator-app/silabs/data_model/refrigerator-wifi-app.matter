@@ -1822,14 +1822,14 @@ endpoint 0 {
 
   server cluster OtaSoftwareUpdateRequestor {
     callback attribute defaultOTAProviders;
-    ram      attribute updatePossible default = true;
-    ram      attribute updateState default = 0;
-    ram      attribute updateStateProgress;
+    callback attribute updatePossible;
+    callback attribute updateState;
+    callback attribute updateStateProgress;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster GeneralCommissioning {

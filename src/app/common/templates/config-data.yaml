@@ -59,6 +59,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Microwave Oven Control
     - Network Commissioning
     - OTA Software Update Provider
+    - OTA Software Update Requestor
     - Operational Credentials
     - Operational State
     - Oven Cavity Operational State

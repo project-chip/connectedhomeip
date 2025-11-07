@@ -1965,11 +1965,11 @@ endpoint 0 {
     emits event VersionApplied;
     emits event DownloadError;
     callback attribute defaultOTAProviders;
-    ram      attribute updatePossible default = 1;
-    ram      attribute updateState default = 0;
-    ram      attribute updateStateProgress default = 0;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute updatePossible;
+    callback attribute updateState;
+    callback attribute updateStateProgress;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command AnnounceOTAProvider;
   }
