@@ -574,17 +574,12 @@ CHIP_ERROR CertificateTableImpl::GetClientCertificateCount(FabricIndex fabric, u
     return mClientCertificates.GetFabricEntryCount(fabric, outCount);
 }
 
-inline CHIP_ERROR SwallowNotFound(CHIP_ERROR err)
-{
-    return (err == CHIP_ERROR_NOT_FOUND) ? CHIP_NO_ERROR : err;
-}
-
 CHIP_ERROR CertificateTableImpl::RemoveFabric(FabricIndex fabric)
 {
     // We want to release as many resources as possible; if anything fails,
     // hold on to the error until we've had a chance to try to free other resources
-    CHIP_ERROR clientResult = SwallowNotFound(mClientCertificates.RemoveFabric(fabric));
-    CHIP_ERROR rootResult   = SwallowNotFound(mRootCertificates.RemoveFabric(fabric));
+    CHIP_ERROR clientResult = mClientCertificates.RemoveFabric(fabric).NoErrorIf(CHIP_ERROR_NOT_FOUND);
+    CHIP_ERROR rootResult   = mRootCertificates.RemoveFabric(fabric).NoErrorIf(CHIP_ERROR_NOT_FOUND);
 
     GlobalCertificateData globalData(mEndpointId);
     CHIP_ERROR globalDataResult = globalData.Load(mStorage);
@@ -597,10 +592,10 @@ CHIP_ERROR CertificateTableImpl::RemoveFabric(FabricIndex fabric)
 
     if (rootResult == CHIP_NO_ERROR)
     {
-        rootResult = SwallowNotFound(globalData.RemoveAllRootCertificates(*mStorage, fabric));
+        rootResult = globalData.RemoveAllRootCertificates(*mStorage, fabric).NoErrorIf(CHIP_ERROR_NOT_FOUND);
     }
 
-    ReturnErrorOnFailure(SwallowNotFound(globalData.RemoveAllClientCertificates(*mStorage, fabric)));
+    ReturnErrorOnFailure(globalData.RemoveAllClientCertificates(*mStorage, fabric).NoErrorIf(CHIP_ERROR_NOT_FOUND));
     ReturnErrorOnFailure(clientResult);
     return rootResult;
 }
