@@ -63,26 +63,17 @@ TEST_F(TestBasicInformationCluster, TestAttributes)
         BasicInformationCluster::Instance().OptionalAttributes() =
             BasicInformationCluster::OptionalAttributesSet().Set<UniqueID::Id>();
 
-        EXPECT_TRUE(Testing::IsAttributesListEqualTo(BasicInformationCluster::Instance(),
-                                                     {
+        EXPECT_TRUE(Testing::IsAttributesListEqualTo(
+            BasicInformationCluster::Instance(),
+            {
 
-                                                         DataModelRevision::kMetadataEntry,
-                                                         VendorName::kMetadataEntry,
-                                                         VendorID::kMetadataEntry,
-                                                         ProductName::kMetadataEntry,
-                                                         ProductID::kMetadataEntry,
-                                                         NodeLabel::kMetadataEntry,
-                                                         Location::kMetadataEntry,
-                                                         HardwareVersion::kMetadataEntry,
-                                                         HardwareVersionString::kMetadataEntry,
-                                                         SoftwareVersion::kMetadataEntry,
-                                                         SoftwareVersionString::kMetadataEntry,
-                                                         CapabilityMinima::kMetadataEntry,
-                                                         SpecificationVersion::kMetadataEntry,
-                                                         MaxPathsPerInvoke::kMetadataEntry,
-                                                         ConfigurationVersion::kMetadataEntry,
-                                                         UniqueID::kMetadataEntry, // required in latest spec
-                                                     }));
+                DataModelRevision::kMetadataEntry, VendorName::kMetadataEntry, VendorID::kMetadataEntry,
+                ProductName::kMetadataEntry, ProductID::kMetadataEntry, NodeLabel::kMetadataEntry, Location::kMetadataEntry,
+                HardwareVersion::kMetadataEntry, HardwareVersionString::kMetadataEntry, SoftwareVersion::kMetadataEntry,
+                SoftwareVersionString::kMetadataEntry, CapabilityMinima::kMetadataEntry, SpecificationVersion::kMetadataEntry,
+                MaxPathsPerInvoke::kMetadataEntry, ConfigurationVersion::kMetadataEntry,
+                UniqueID::kMetadataEntry, // required in latest spec
+            }));
     }
 
     // Check that disabling unique id works
