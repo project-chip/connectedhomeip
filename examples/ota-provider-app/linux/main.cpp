@@ -111,7 +111,7 @@ static bool ParseJsonFileAndPopulateCandidates(const char * filepath,
     }
     else
     {
-        for (auto iter : devSofVerModValue)
+        for (auto & iter : devSofVerModValue)
         {
             OTAProviderExample::DeviceSoftwareVersionModel candidate;
             candidate.vendorId        = static_cast<chip::VendorId>(iter.get("vendorId", 1).asUInt());
