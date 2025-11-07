@@ -98,10 +98,10 @@ void ApplicationInit()
         SetDeviceInstanceInfoProvider(&gExampleDeviceInstanceInfoProvider);
     }
 
-    JFAMgr().Init(Server::GetInstance());
-    Server::GetInstance().GetJointFabricAdministrator().SetDelegate(&JFAMgr());
+    SuccessOrDie(JFAMgr().Init(Server::GetInstance()));
+    SuccessOrDie(Server::GetInstance().GetJointFabricAdministrator().SetDelegate(&JFAMgr()));
 
-    PlatformMgrImpl().AddEventHandler(EventHandler, 0);
+    SuccessOrDie(PlatformMgrImpl().AddEventHandler(EventHandler, 0));
 }
 
 void ApplicationShutdown() {}

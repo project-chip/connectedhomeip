@@ -63,7 +63,7 @@ static CHIP_ERROR CmdAppServerStart(int argc, char ** argv)
     initParams.operationalServicePort        = sServerPortOperational;
     initParams.userDirectedCommissioningPort = sServerPortCommissioning;
 
-    chip::Server::GetInstance().Init(initParams);
+    TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
@@ -157,9 +157,7 @@ static bool PrintServerSession(void * context, SessionHandle & session)
 
 static CHIP_ERROR CmdAppServerSessions(int argc, char ** argv)
 {
-    Server::GetInstance().GetSecureSessionManager().ForEachSessionHandle(nullptr, PrintServerSession);
-
-    return CHIP_NO_ERROR;
+    return Server::GetInstance().GetSecureSessionManager().ForEachSessionHandle(nullptr, PrintServerSession);
 }
 
 static CHIP_ERROR CmdAppServerExchanges(int argc, char ** argv)
@@ -220,7 +218,7 @@ static CHIP_ERROR CmdAppServer(int argc, char ** argv)
 
 static void CmdAppServerAtExit()
 {
-    CmdAppServerStop(0, nullptr);
+    TEMPORARY_RETURN_IGNORED CmdAppServerStop(0, nullptr);
 }
 
 void cmd_app_server_init()

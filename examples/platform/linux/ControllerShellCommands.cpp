@@ -83,7 +83,7 @@ static CHIP_ERROR discover(bool printHeader)
     }
 
     Dnssd::DiscoveryFilter filter(Dnssd::DiscoveryFilterType::kNone, (uint64_t) 0);
-    GetDeviceCommissioner()->DiscoverCommissionableNodes(filter);
+    ReturnErrorOnFailure(GetDeviceCommissioner()->DiscoverCommissionableNodes(filter));
 
     streamer_printf(sout, "done\r\n");
 
@@ -100,7 +100,7 @@ static CHIP_ERROR discover(bool printHeader, char * instance)
     }
 
     Dnssd::DiscoveryFilter filter(Dnssd::DiscoveryFilterType::kInstanceName, instance);
-    GetDeviceCommissioner()->DiscoverCommissionableNodes(filter);
+    ReturnErrorOnFailure(GetDeviceCommissioner()->DiscoverCommissionableNodes(filter));
 
     streamer_printf(sout, "done\r\n");
 

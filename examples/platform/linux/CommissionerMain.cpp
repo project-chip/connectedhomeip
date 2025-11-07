@@ -108,7 +108,7 @@ class MyCommissionerCallback : public CommissionerCallback
 {
     void ReadyForCommissioning(uint32_t pincode, uint16_t longDiscriminator, PeerAddress peerAddress) override
     {
-        CommissionerPairOnNetwork(pincode, longDiscriminator, peerAddress);
+        TEMPORARY_RETURN_IGNORED CommissionerPairOnNetwork(pincode, longDiscriminator, peerAddress);
     }
 };
 
@@ -142,7 +142,7 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, F
 
     params.operationalCredentialsDelegate = &gOpCredsIssuer;
     uint16_t vendorId;
-    DeviceLayer::GetDeviceInstanceInfoProvider()->GetVendorId(vendorId);
+    ReturnErrorOnFailure(DeviceLayer::GetDeviceInstanceInfoProvider()->GetVendorId(vendorId));
     ChipLogProgress(Support, " ----- Commissioner using vendorId 0x%04X", vendorId);
     params.controllerVendorId = static_cast<VendorId>(vendorId);
 
@@ -195,7 +195,7 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, F
     // assign prefered feature settings
     CommissioningParameters commissioningParams = gAutoCommissioner.GetCommissioningParameters();
     commissioningParams.SetCheckForMatchingFabric(true);
-    gAutoCommissioner.SetCommissioningParameters(commissioningParams);
+    ReturnErrorOnFailure(gAutoCommissioner.SetCommissioningParameters(commissioningParams));
 
     auto & factory = Controller::DeviceControllerFactory::GetInstance();
     ReturnErrorOnFailure(factory.Init(factoryParams));
@@ -324,8 +324,9 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
         ChipLogProgress(AppServer, "Device commissioning completed with success - getting OperationalDeviceProxy");
 
-        gCommissioner.GetConnectedDevice(gAutoCommissioner.GetCommissioningParameters().GetRemoteNodeId().ValueOr(nodeId),
-                                         &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+        TEMPORARY_RETURN_IGNORED gCommissioner.GetConnectedDevice(
+            gAutoCommissioner.GetCommissioningParameters().GetRemoteNodeId().ValueOr(nodeId), &mOnDeviceConnectedCallback,
+            &mOnDeviceConnectionFailureCallback);
 #else  // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
         ChipLogProgress(AppServer, "Device commissioning completed with success");
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
@@ -427,11 +428,9 @@ CHIP_ERROR CommissionerPairOnNetwork(uint32_t pincode, uint16_t disc, Transport:
 {
     RendezvousParameters params = RendezvousParameters().SetSetupPINCode(pincode).SetDiscriminator(disc).SetPeerAddress(address);
 
-    gOpCredsIssuer.GetRandomOperationalNodeId(&gRemoteId);
+    ReturnErrorOnFailure(gOpCredsIssuer.GetRandomOperationalNodeId(&gRemoteId));
     gCommissioner.RegisterPairingDelegate(&gPairingCommand);
-    gCommissioner.PairDevice(gRemoteId, params);
-
-    return CHIP_NO_ERROR;
+    return gCommissioner.PairDevice(gRemoteId, params);
 }
 
 CHIP_ERROR CommissionerPairUDC(uint32_t pincode, size_t index)
