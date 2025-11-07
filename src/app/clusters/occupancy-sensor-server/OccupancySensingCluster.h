@@ -18,6 +18,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/ServerClusterContext.h>
 
 namespace chip::app::Clusters {
 
@@ -47,13 +48,14 @@ public:
 
     OccupancySensingCluster(const Config & config);
 
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & aDecoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
     DataModel::ActionReturnStatus SetHoldTime(uint16_t holdTime);
-    DataModel::ActionReturnStatus SetHoldTimeLimits(const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & holdTimeLimits);
+    void SetOccupancy(bool occupied);
 
 private:
     BitMask<OccupancySensing::Feature> mFeatureMap;

@@ -15,10 +15,13 @@
  */
 
 #include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
+#include <clusters/OccupancySensing/Events.h>
+
 
 #include <algorithm>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/InteractionModelEngine.h>
+#include <app/persistence/AttributePersistence.h>
 #include <clusters/OccupancySensing/Attributes.h>
 #include <clusters/OccupancySensing/Commands.h>
 #include <clusters/OccupancySensing/Metadata.h>
@@ -103,8 +106,37 @@ OccupancySensingCluster::OccupancySensingCluster(const Config & config) :
 {
     if (mHasHoldTime)
     {
-        SetHoldTimeLimits(config.mHoldTimeLimits);
+        mHoldTimeLimits.holdTimeMin = std::max(static_cast<uint16_t>(1), mHoldTimeLimits.holdTimeMin);
+        mHoldTimeLimits.holdTimeMax = std::max(mHoldTimeLimits.holdTimeMin, mHoldTimeLimits.holdTimeMax);
+        mHoldTimeLimits.holdTimeDefault = std::clamp(mHoldTimeLimits.holdTimeDefault, mHoldTimeLimits.holdTimeMin, mHoldTimeLimits.holdTimeMax);
     }
+}
+
+CHIP_ERROR OccupancySensingCluster::Startup(ServerClusterContext & context)
+{
+    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+
+    if (mHasHoldTime)
+    {
+        AttributePersistence persistence(context.attributeStorage);
+        uint16_t storedHoldTime;
+
+        if (persistence.LoadNativeEndianValue({ mPath.mEndpointId, OccupancySensing::Id, Attributes::HoldTime::Id }, storedHoldTime, mHoldTime))
+        {
+            // A value was found in persistence, so we'll use it.
+            // We ignore the return status as we don't want to fail startup if the value is invalid.
+            // The value will be coerced in SetHoldTime if it's out of bounds.
+            (void) SetHoldTime(storedHoldTime);
+        }
+        else
+        {
+            // No value in persistence, so store the default value.
+            ReturnErrorOnFailure(
+                context.attributeStorage.WriteValue({ mPath.mEndpointId, OccupancySensing::Id, Attributes::HoldTime::Id }, { reinterpret_cast<const uint8_t *>(&mHoldTime), sizeof(mHoldTime) }));
+        }
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 DataModel::ActionReturnStatus OccupancySensingCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -192,23 +224,37 @@ DataModel::ActionReturnStatus OccupancySensingCluster::SetHoldTime(uint16_t hold
     }
 
     mHoldTime = holdTime;
+
+    if (mContext != nullptr)
+    {
+        CHIP_ERROR err = mContext->attributeStorage.WriteValue({ mPath.mEndpointId, OccupancySensing::Id, Attributes::HoldTime::Id }, { reinterpret_cast<const uint8_t *>(&mHoldTime), sizeof(mHoldTime) });
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "Failed to store holdTime in persistence: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+    }
+
     return Protocols::InteractionModel::Status::Success;
 }
 
-DataModel::ActionReturnStatus OccupancySensingCluster::SetHoldTimeLimits(const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & holdTimeLimits)
+void OccupancySensingCluster::SetOccupancy(bool occupied)
 {
-    OccupancySensing::Structs::HoldTimeLimitsStruct::Type newLimits;
-    newLimits.holdTimeMin = std::max(static_cast<uint16_t>(1), holdTimeLimits.holdTimeMin);
-    newLimits.holdTimeMax = std::max(newLimits.holdTimeMin, holdTimeLimits.holdTimeMax);
-    newLimits.holdTimeDefault = std::clamp(holdTimeLimits.holdTimeDefault, newLimits.holdTimeMin, newLimits.holdTimeMax);
+    BitMask<OccupancySensing::OccupancyBitmap> newOccupancy =
+        occupied ? OccupancySensing::OccupancyBitmap::kOccupied : static_cast<OccupancySensing::OccupancyBitmap>(0);
 
-    if (mHoldTimeLimits.holdTimeMin == newLimits.holdTimeMin && mHoldTimeLimits.holdTimeMax == newLimits.holdTimeMax && mHoldTimeLimits.holdTimeDefault == newLimits.holdTimeDefault)
+    if (mOccupancy == newOccupancy)
     {
-        return DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp;
+        return;
     }
 
-    mHoldTimeLimits = newLimits;
-    return Protocols::InteractionModel::Status::Success;
+    mOccupancy = newOccupancy;
+    NotifyAttributeChanged(Attributes::Occupancy::Id);
+
+    if (mContext != nullptr)
+    {
+        Events::OccupancyChanged::Type event;
+        event.occupancy = mOccupancy;
+                    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);    }
 }
 
 } // namespace chip::app::Clusters
