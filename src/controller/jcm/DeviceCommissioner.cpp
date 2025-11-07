@@ -374,10 +374,10 @@ TrustVerificationError DeviceCommissioner::VerifyAdministratorInformation()
     }
 
     CATValues cats;
-    auto nocSpan = mInfo.adminNOC.Span();
-    Credentials::ExtractCATsFromOpCert(nocSpan, cats);
+    auto nocSpan   = mInfo.adminNOC.Span();
+    CHIP_ERROR err = Credentials::ExtractCATsFromOpCert(nocSpan, cats);
 
-    if (!cats.ContainsIdentifier(kAdminCATIdentifier))
+    if ((err != CHIP_NO_ERROR) || !cats.ContainsIdentifier(kAdminCATIdentifier))
     {
         return TrustVerificationError::kInvalidAdministratorCAT;
     }
