@@ -75,11 +75,11 @@ struct LinuxDeviceOptions
     uint16_t securedCommissionerPort    = CHIP_PORT + 12; // TODO: why + 12?
     chip::FabricId commissionerFabricId = chip::kUndefinedFabricId;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-    const char * command      = nullptr;
-    const char * PICS         = nullptr;
-    const char * KVS          = nullptr;
-    const char * app_pipe     = "";
-    const char * app_pipe_out = "";
+    const char * command                = nullptr;
+    const char * PICS                   = nullptr;
+    const char * KVS                    = nullptr;
+    const char * app_pipe               = "";
+    const char * app_pipe_out           = "";
     chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId::Null();
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     bool traceStreamDecodeEnabled = false;

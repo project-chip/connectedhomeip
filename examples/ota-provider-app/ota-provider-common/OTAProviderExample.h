@@ -34,7 +34,7 @@ class OTAProviderExample : public chip::app::Clusters::OTAProviderDelegate
 public:
     OTAProviderExample();
 
-    using OTAQueryStatus = chip::app::Clusters::OtaSoftwareUpdateProvider::OTAQueryStatus;
+    using OTAQueryStatus       = chip::app::Clusters::OtaSoftwareUpdateProvider::OTAQueryStatus;
     using OTAApplyUpdateAction = chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction;
 
     static constexpr uint16_t SW_VER_STR_MAX_LEN = 64;
