@@ -52,7 +52,8 @@ public:
         uint8_t defaultSensitivityLevel{};
         if (DefaultSensitivityLevel::Get(endpointId, &defaultSensitivityLevel) != Status::Success)
         {
-            defaultSensitivityLevel = supportedSensitivityLevels - 1;
+            // this assumes min is at least 2
+            defaultSensitivityLevel = static_cast<uint8_t>(supportedSensitivityLevels - 1);
         }
 
         BooleanStateConfigurationCluster::AlarmModeBitMask alarmsSupported{};
