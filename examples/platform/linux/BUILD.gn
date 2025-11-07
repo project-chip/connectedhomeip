@@ -117,7 +117,15 @@ source_set("commodity-tariff-test-event-trigger") {
   sources = [ "${chip_root}/src/app/clusters/commodity-tariff-server/CommodityTariffTestEventTriggerHandler.h" ]
 }
 
-source_set("app-main") {
+source_set("app-main-loop") {
+  sources = [
+    "AppMainLoop.h"
+  ]
+
+  public_configs = [ ":app-main-config" ]
+}
+
+source_set("app-options") {
   defines = [
     "ENABLE_TRACING=${matter_enable_tracing_support}",
     "ENABLE_CAMERA_SERVER=${matter_enable_camera_server}",
@@ -125,12 +133,6 @@ source_set("app-main") {
   ]
 
   sources = [
-    "AppMain.cpp",
-    "AppMain.h",
-    "CommissionableInit.cpp",
-    "CommissionableInit.h",
-    "NamedPipeCommands.cpp",
-    "NamedPipeCommands.h",
     "Options.cpp",
     "Options.h",
     "testing/CustomCSRResponse.cpp",
@@ -140,6 +142,32 @@ source_set("app-main") {
   ]
 
   public_deps = [
+    "${chip_root}/src/lib",
+    "${chip_root}/src/app/tests/suites/credentials:dac_provider",
+  ]
+
+  if (current_os != "nuttx") {
+    public_deps += [ jsoncpp_root ]
+  }
+
+  public_configs = [ ":app-main-config" ]
+}
+
+source_set("app-main") {
+  defines = []
+
+  sources = [
+    "AppMain.cpp",
+    "AppMain.h",
+    "CommissionableInit.cpp",
+    "CommissionableInit.h",
+    "NamedPipeCommands.cpp",
+    "NamedPipeCommands.h",    
+  ]
+
+  public_deps = [
+    ":app-options",
+    ":app-main-loop",
     ":boolean-state-configuration-test-event-trigger",
     ":commissioner-main",
     ":commodity-metering-test-event-trigger",
@@ -164,13 +192,8 @@ source_set("app-main") {
     "${chip_root}/examples/providers:all_clusters_device_info_provider",
     "${chip_root}/examples/providers:device_info_provider_please_do_not_reuse_as_is",
     "${chip_root}/src/app/server",
-    "${chip_root}/src/app/tests/suites/credentials:dac_provider",
     "${chip_root}/src/setup_payload:onboarding-codes-utils",
   ]
-
-  if (current_os != "nuttx") {
-    public_deps += [ jsoncpp_root ]
-  }
 
   if (chip_enable_pw_rpc) {
     defines += [ "PW_RPC_ENABLED" ]

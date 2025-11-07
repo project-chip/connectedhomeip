@@ -135,7 +135,7 @@ CHIP_ERROR WifiRootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataMod
                                    BitFlags<WiFiNetworkDiagnostics::Feature>{});
     ReturnErrorOnFailure(provider.AddCluster(mWifiDiagnosticsCluster.Registration()));
 
-    mNetworkCommissioningCluster.Create(endpointId, mWifiDriver);
+    mNetworkCommissioningCluster.Create(endpointId, mWifiDriver, mGeneralCommissioningCluster.Cluster());
     ReturnErrorOnFailure(provider.AddCluster(mNetworkCommissioningCluster.Registration()));
 
     return CHIP_NO_ERROR;

@@ -22,7 +22,7 @@
 #include <app/clusters/general-commissioning-server/general-commissioning-cluster.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-cluster.h>
 #include <app/clusters/group-key-mgmt-server/group-key-mgmt-cluster.h>
-#include <app/clusters/network-commissioning/network-commissioning.h>
+#include <app/clusters/network-commissioning/NetworkCommissioningCluster.h>
 #include <app/clusters/operational-credentials-server/operational-credentials-cluster.h>
 #include <app/clusters/software-diagnostics-server/software-diagnostics-cluster.h>
 #include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-cluster.h>
@@ -30,6 +30,7 @@
 #include <devices/Types.h>
 #include <devices/interface/SingleEndpointDevice.h>
 #include <platform/NetworkCommissioning.h>
+#include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 
 namespace chip {
 namespace app {
@@ -46,10 +47,10 @@ public:
 protected:
     // Most implementations require network commissioning, so only subclasses have access to this.
     RootNodeDevice() : SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kRootNode, 1)) {}
+    LazyRegisteredServerCluster<Clusters::GeneralCommissioningCluster> mGeneralCommissioningCluster;
 
 private:
     LazyRegisteredServerCluster<Clusters::BasicInformationCluster> mBasicInformationCluster;
-    LazyRegisteredServerCluster<Clusters::GeneralCommissioningCluster> mGeneralCommissioningCluster;
     LazyRegisteredServerCluster<Clusters::AdministratorCommissioningWithBasicCommissioningWindowCluster>
         mAdministratorCommissioningCluster;
     LazyRegisteredServerCluster<Clusters::GeneralDiagnosticsCluster> mGeneralDiagnosticsCluster;

@@ -17,7 +17,7 @@
  */
 
 #include <AllDevicesExampleDeviceInfoProviderImpl.h>
-#include <AppMain.h>
+#include <AppMainLoop.h>
 #include <LinuxCommissionableDataProvider.h>
 #include <TracingCommandLineArgument.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>

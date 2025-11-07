@@ -36,7 +36,7 @@ executable("all-devices-app") {
     "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node",
     "${chip_root}/examples/all-devices-app/linux/app_options:app-options",
     "${chip_root}/examples/common/tracing:commandline",
-    "${chip_root}/examples/platform/linux:app-main",
+    "${chip_root}/examples/platform/linux:app-main-loop",
     "${chip_root}/examples/platform/linux:linux-commissionable-data-provider",
     "${chip_root}/examples/providers:all_devices_device_info_provider",
     "${chip_root}/src/app/persistence",

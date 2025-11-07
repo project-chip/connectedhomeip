@@ -26,6 +26,7 @@ source_set("root-node") {
     "${chip_root}/src/app/clusters/access-control-server",
     "${chip_root}/src/app/clusters/administrator-commissioning-server",
     "${chip_root}/src/app/clusters/basic-information",
+    "${chip_root}/src/app/clusters/general-commissioning-server:bread-crumb-tracker",
     "${chip_root}/src/app/clusters/general-commissioning-server",
     "${chip_root}/src/app/clusters/general-diagnostics-server",
     "${chip_root}/src/app/clusters/group-key-mgmt-server",
