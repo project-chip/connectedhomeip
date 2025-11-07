@@ -42,7 +42,8 @@ bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster,
 // Compare the accepted commands of the cluster against the expected set.
 // Will use the first path returned by `GetPaths()` on the cluster.
 // Dies if `GetPaths()` doesn't return a list with one path.
-bool IsAcceptedCommandsListEqualTo(app::ServerClusterInterface & cluster, Span<app::DataModel::AcceptedCommandEntry> expected)
+bool IsAcceptedCommandsListEqualTo(app::ServerClusterInterface & cluster,
+                                   std::initializer_list<const app::DataModel::AcceptedCommandEntry> expected)
 {
     VerifyOrDie(cluster.GetPaths().size() == 1);
     auto path = cluster.GetPaths()[0];
@@ -51,7 +52,16 @@ bool IsAcceptedCommandsListEqualTo(app::ServerClusterInterface & cluster, Span<a
     {
         return false;
     }
-    return EqualAcceptedCommandSets(commandsBuilder.TakeBuffer(), expected);
+
+    ReadOnlyBufferBuilder<app::DataModel::AcceptedCommandEntry> expectedBuilder;
+
+    VerifyOrDie(expectedBuilder.EnsureAppendCapacity(expected.size()) == CHIP_NO_ERROR);
+    for (const auto entry : expected)
+    {
+        VerifyOrDie(expectedBuilder.Append(entry) == CHIP_NO_ERROR);
+    }
+
+    return EqualAcceptedCommandSets(commandsBuilder.TakeBuffer(), expectedBuilder.TakeBuffer());
 }
 
 // Compare the generated commands of the cluster against the expected set.

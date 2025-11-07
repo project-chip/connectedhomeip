@@ -13,12 +13,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "app/clusters/testing/ValidateGlobalAttributes.h"
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/boolean-state-configuration-server/boolean-state-configuration-cluster.h>
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/clusters/testing/ClusterTester.h>
+#include <app/clusters/testing/ValidateGlobalAttributes.h>
 #include <clusters/BooleanStateConfiguration/Enums.h>
 #include <clusters/BooleanStateConfiguration/Metadata.h>
 #include <lib/core/CHIPError.h>
@@ -34,6 +34,7 @@ using namespace chip::app::Clusters::BooleanStateConfiguration;
 using chip::app::DataModel::AcceptedCommandEntry;
 using chip::app::DataModel::AttributeEntry;
 using chip::Test::ClusterTester;
+using chip::Testing::IsAcceptedCommandsListEqualTo;
 using chip::Testing::IsAttributesListEqualTo;
 
 // initialize memory as ReadOnlyBufferBuilder may allocate
@@ -131,78 +132,50 @@ TEST_F(TestBooleanStateConfigurationCluster, TestAcceptedCommandList)
     // cluster without any features
     {
         BooleanStateConfigurationCluster cluster(kTestEndpointId, {}, {}, DefaultConfig());
-        ReadOnlyBufferBuilder<AcceptedCommandEntry> builder;
-        ASSERT_EQ(cluster.AcceptedCommands({ kTestEndpointId, Id }, builder), CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<AcceptedCommandEntry> expectedBuilder;
-        ASSERT_TRUE(Testing::EqualAcceptedCommandSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+        ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster, {}));
     }
     // cluster supporting only visual alarms
     {
         BooleanStateConfigurationCluster cluster(kTestEndpointId, BitMask<Feature>(Feature::kVisual), {}, DefaultConfig());
-        ReadOnlyBufferBuilder<AcceptedCommandEntry> builder;
-        ASSERT_EQ(cluster.AcceptedCommands({ kTestEndpointId, Id }, builder), CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<AcceptedCommandEntry> expectedBuilder;
-        ASSERT_EQ(expectedBuilder.AppendElements({
-                      Commands::EnableDisableAlarm::kMetadataEntry,
-                  }),
-                  CHIP_NO_ERROR);
-        ASSERT_TRUE(Testing::EqualAcceptedCommandSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+        ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
+                                                  {
+                                                      Commands::EnableDisableAlarm::kMetadataEntry,
+                                                  }));
     }
     // cluster supporting only audible alarms
     {
         BooleanStateConfigurationCluster cluster(kTestEndpointId, BitMask<Feature>(Feature::kAudible), {}, DefaultConfig());
-        ReadOnlyBufferBuilder<AcceptedCommandEntry> builder;
-        ASSERT_EQ(cluster.AcceptedCommands({ kTestEndpointId, Id }, builder), CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<AcceptedCommandEntry> expectedBuilder;
-        ASSERT_EQ(expectedBuilder.AppendElements({
-                      Commands::EnableDisableAlarm::kMetadataEntry,
-                  }),
-                  CHIP_NO_ERROR);
-        ASSERT_TRUE(Testing::EqualAcceptedCommandSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+        ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
+                                                  {
+                                                      Commands::EnableDisableAlarm::kMetadataEntry,
+                                                  }));
     }
     // cluster supporting alarm suppression (but not visual or audible)
     // This is not a valid configuration, but we should handle it gracefully
     {
         BooleanStateConfigurationCluster cluster(kTestEndpointId, BitMask<Feature>(Feature::kAlarmSuppress), {}, DefaultConfig());
-        ReadOnlyBufferBuilder<AcceptedCommandEntry> builder;
-        ASSERT_EQ(cluster.AcceptedCommands({ kTestEndpointId, Id }, builder), CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<AcceptedCommandEntry> expectedBuilder;
-        ASSERT_TRUE(Testing::EqualAcceptedCommandSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+        ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster, {}));
     }
     // cluster supporting visual alarms and alarm suppression
     {
         BooleanStateConfigurationCluster cluster(kTestEndpointId, { Feature::kVisual, Feature::kAlarmSuppress }, {},
                                                  DefaultConfig());
-        ReadOnlyBufferBuilder<AcceptedCommandEntry> builder;
-        ASSERT_EQ(cluster.AcceptedCommands({ kTestEndpointId, Id }, builder), CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<AcceptedCommandEntry> expectedBuilder;
-        ASSERT_EQ(expectedBuilder.AppendElements({
-                      Commands::EnableDisableAlarm::kMetadataEntry,
-                      Commands::SuppressAlarm::kMetadataEntry,
-                  }),
-                  CHIP_NO_ERROR);
-        ASSERT_TRUE(Testing::EqualAcceptedCommandSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+        ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
+                                                  {
+                                                      Commands::EnableDisableAlarm::kMetadataEntry,
+                                                      Commands::SuppressAlarm::kMetadataEntry,
+                                                  }));
     }
     // cluster supporting all features
     {
         BooleanStateConfigurationCluster cluster(
             kTestEndpointId, { Feature::kVisual, Feature::kAudible, Feature::kAlarmSuppress, Feature::kSensitivityLevel }, {},
             DefaultConfig());
-        ReadOnlyBufferBuilder<AcceptedCommandEntry> builder;
-        ASSERT_EQ(cluster.AcceptedCommands({ kTestEndpointId, Id }, builder), CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<AcceptedCommandEntry> expectedBuilder;
-        ASSERT_EQ(expectedBuilder.AppendElements({
-                      Commands::EnableDisableAlarm::kMetadataEntry,
-                      Commands::SuppressAlarm::kMetadataEntry,
-                  }),
-                  CHIP_NO_ERROR);
-        ASSERT_TRUE(Testing::EqualAcceptedCommandSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+        ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
+                                                  {
+                                                      Commands::EnableDisableAlarm::kMetadataEntry,
+                                                      Commands::SuppressAlarm::kMetadataEntry,
+                                                  }));
     }
 }
 
