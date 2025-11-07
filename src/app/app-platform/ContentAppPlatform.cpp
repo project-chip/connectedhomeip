@@ -675,7 +675,8 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & e
 {
     VerifyOrReturnError(successCb != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(failureCb != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(mContentAppFactory != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(DeviceLayer, "mContentAppFactory is null"));
+    VerifyOrReturnError(mContentAppFactory != nullptr, CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogError(DeviceLayer, "mContentAppFactory is null"));
 
     Access::Privilege vendorPrivilege = mContentAppFactory->GetVendorPrivilege(targetVendorId);
 
