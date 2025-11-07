@@ -144,6 +144,12 @@ source_set("app-options") {
     "${chip_root}/src/lib",
   ]
 
+  if (matter_enable_tracing_support) {
+    public_deps += [
+      "${chip_root}/examples/common/tracing:commandline",
+      "${chip_root}/src/tracing",
+    ]
+  }
   if (current_os != "nuttx") {
     public_deps += [ jsoncpp_root ]
   }
@@ -152,7 +158,11 @@ source_set("app-options") {
 }
 
 source_set("app-main") {
-  defines = []
+  defines = [
+    "ENABLE_TRACING=${matter_enable_tracing_support}",
+    "ENABLE_CAMERA_SERVER=${matter_enable_camera_server}",
+    "CHIP_ATTESTATION_TRUSTY_OS=${chip_with_trusty_os}",
+  ]
 
   sources = [
     "AppMain.cpp",
