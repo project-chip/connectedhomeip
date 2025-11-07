@@ -4189,7 +4189,7 @@ cluster RvcOperationalState = 97 {
 }
 
 /** Attributes and commands for scene configuration and manipulation. */
-provisional cluster ScenesManagement = 98 {
+cluster ScenesManagement = 98 {
   revision 1;
 
   bitmap CopyModeBitmap : bitmap8 {
@@ -10401,7 +10401,7 @@ provisional cluster Chime = 1366 {
 }
 
 /** The CommodityTariffCluster provides the mechanism for communicating Commodity Tariff information within the premises. */
-cluster CommodityTariff = 1792 {
+provisional cluster CommodityTariff = 1792 {
   revision 1;
 
   enum AuxiliaryLoadSettingEnum : enum8 {
@@ -11236,7 +11236,7 @@ provisional cluster MeterIdentification = 2822 {
 }
 
 /** The Commodity Metering Cluster provides the mechanism for communicating commodity consumption information within a premises. */
-cluster CommodityMetering = 2823 {
+provisional cluster CommodityMetering = 2823 {
   revision 1;
 
   shared enum MeasurementTypeEnum : enum16 {

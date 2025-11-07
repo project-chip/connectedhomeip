@@ -2195,7 +2195,7 @@ cluster UserLabel = 65 {
 }
 
 /** Attributes and commands for scene configuration and manipulation. */
-provisional cluster ScenesManagement = 98 {
+cluster ScenesManagement = 98 {
   revision 1;
 
   bitmap CopyModeBitmap : bitmap8 {

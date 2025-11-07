@@ -28,7 +28,7 @@ Git: 0.7-summer-2025-606-g329573d34
     <item fieldId="1" name="Quantity" type="int64s"/>
   </struct>
 
-  <cluster>
+  <cluster apiMaturity="provisional">
     <domain>Energy Management</domain>
     <name>Commodity Metering</name>
     <code>0x0B07</code>

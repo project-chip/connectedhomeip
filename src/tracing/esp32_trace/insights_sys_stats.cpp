@@ -16,7 +16,7 @@
  */
 
 #include "insights_sys_stats.h"
-#include <esp_diagnostics_metrics.h>
+#include "matter_esp_insights.h"
 #include <esp_err.h>
 #include <esp_log.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -39,7 +39,7 @@ void InsightsSystemMetrics::SamplingHandler(Layer * systemLayer, void * context)
     count_t * highwatermarks = GetHighWatermarks();
     for (int i = 0; i < System::Stats::kNumEntries; i++)
     {
-        esp_err_t err = esp_diag_metrics_add_uint(instance->mLabels[i], static_cast<uint32_t>(highwatermarks[i]));
+        esp_err_t err = matter_esp_insights_add_uint("SYS_MTR", instance->mLabels[i], static_cast<uint32_t>(highwatermarks[i]));
         if (err != ESP_OK)
         {
             ESP_LOGE(kTag, "Failed to add the metric:%s, err:%d", instance->mLabels[i], err);
