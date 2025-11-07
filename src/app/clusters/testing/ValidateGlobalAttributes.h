@@ -1,10 +1,10 @@
 #pragma once
 
 #include "AttributeTesting.h"
-#include "lib/core/CHIPError.h"
 
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/ServerClusterInterface.h>
+#include <lib/core/CHIPError.h>
 #include <lib/support/ReadOnlyBuffer.h>
 
 namespace chip {
