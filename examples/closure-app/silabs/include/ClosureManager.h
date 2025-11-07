@@ -31,6 +31,10 @@
 #include <AppEvent.h>
 #include <lib/core/DataModelTypes.h>
 
+#ifdef DISPLAY_ENABLED
+#include "ClosureUI.h"
+#endif
+
 class ClosureManager
 {
 public:
@@ -155,6 +159,16 @@ public:
      * @return The current action as defined by chip::app::Clusters::ClosureControl::Action_t.
      */
     const Action_t & GetCurrentAction() const { return mCurrentAction; }
+
+#ifdef DISPLAY_ENABLED
+    /**
+     * @brief Gets closure data specifically for UI display.
+     *
+     * @return ClosureUIData structure containing main state and overall current state
+     */
+    ClosureUIData GetClosureUIData();
+
+#endif // DISPLAY_ENABLED
 
     /**
      * @brief Checks if a MoveTo action is currently in progress.
