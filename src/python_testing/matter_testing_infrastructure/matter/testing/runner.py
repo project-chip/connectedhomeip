@@ -84,7 +84,7 @@ def default_paa_rootstore_from_root(root_path: pathlib.Path) -> Optional[pathlib
     dev_path = cred_path.joinpath("development")
     paa_path = dev_path.joinpath("paa-root-certs")
 
-    return paa_path.resolve() if all([path.exists() for path in [cred_path, dev_path, paa_path]]) else None
+    return paa_path.resolve() if all(path.exists() for path in [cred_path, dev_path, paa_path]) else None
 
 
 def get_default_paa_trust_store(root_path: pathlib.Path) -> pathlib.Path:
@@ -656,49 +656,68 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
     if not commissioning_method:
         return True
 
-    if len(config.dut_node_ids) > len(device_descriptors):
-        print("error: More node IDs provided than discriminators")
-        return False
+    # For NFC transport (when using the --commissioning-method argument), the NFC tag data is
+    # read beforehand and commissioning data (QR code) is already populated from the tag.
+    # Therefore, it does not need to be passed explicitly.
+    #
+    # However, during in-test commissioning, the user must manually read the NFC tag
+    # (containing the commissioning credentials) within the main test body
+    # and supply it later for commissioning with the DUT.
+    #
+    # For this reason, commissioning data validation is intentionally skipped in this scenario.
 
-    if len(config.dut_node_ids) < len(device_descriptors):
-        # We generate new node IDs sequentially from the last one seen for all
-        # missing NodeIDs when commissioning many nodes at once.
-        missing = len(device_descriptors) - len(config.dut_node_ids)
-        for i in range(missing):
-            config.dut_node_ids.append(config.dut_node_ids[-1] + 1)
+    if 'nfc' not in (args.in_test_commissioning_method or []):
+        if len(config.dut_node_ids) > len(device_descriptors):
+            print("error: More node IDs provided than discriminators")
+            return False
 
-    if len(config.dut_node_ids) != len(set(config.dut_node_ids)):
-        print("error: Duplicate values in node id list")
-        return False
+        if len(config.dut_node_ids) < len(device_descriptors):
+            # We generate new node IDs sequentially from the last one seen for all
+            # missing NodeIDs when commissioning many nodes at once.
+            missing = len(device_descriptors) - len(config.dut_node_ids)
+            for i in range(missing):
+                config.dut_node_ids.append(config.dut_node_ids[-1] + 1)
 
-    if len(config.discriminators) != len(set(config.discriminators)):
-        print("error: Duplicate value in discriminator list")
-        return False
+        if len(config.dut_node_ids) != len(set(config.dut_node_ids)):
+            print("error: Duplicate values in node id list")
+            return False
 
-    if args.discriminators == [] and (args.qr_code == [] and args.manual_code == []):
-        print("error: Missing --discriminator when no --qr-code/--manual-code present!")
-        return False
+        if len(config.discriminators) != len(set(config.discriminators)):
+            print("error: Duplicate value in discriminator list")
+            return False
 
-    if args.passcodes == [] and (args.qr_code == [] and args.manual_code == []):
-        print("error: Missing --passcode when no --qr-code/--manual-code present!")
-        return False
+        if args.discriminators == [] and (args.qr_code == [] and args.manual_code == []):
+            print("error: Missing --discriminator when no --qr-code/--manual-code present!")
+            return False
+
+        if args.passcodes == [] and (args.qr_code == [] and args.manual_code == []):
+            print("error: Missing --passcode when no --qr-code/--manual-code present!")
+            return False
+    else:
+        # For NFC in-test commissioning, we still need to ensure node IDs are unique if provided
+        if len(config.dut_node_ids) != len(set(config.dut_node_ids)):
+            print("error: Duplicate values in node id list")
+            return False
 
     wifi_args = ['ble-wifi']
     thread_args = ['ble-thread', 'nfc-thread']
     if commissioning_method in wifi_args:
         if args.wifi_ssid is None:
-            print("error: missing --wifi-ssid <SSID> for --commissioning-method ble-wifi!")
+            print("error: missing --wifi-ssid <SSID> for --commissioning-method "
+                  "or --in-test-commissioning-method ble-wifi!")
             return False
 
         if args.wifi_passphrase is None:
-            print("error: missing --wifi-passphrase <passphrasse> for --commissioning-method ble-wifi!")
+            print("error: missing --wifi-passphrase <passphrase> for --commissioning-method or "
+                  "--in-test-commissioning-method ble-wifi!")
             return False
 
         config.wifi_ssid = args.wifi_ssid
         config.wifi_passphrase = args.wifi_passphrase
     elif commissioning_method in thread_args:
         if args.thread_dataset_hex is None:
-            print("error: missing --thread-dataset-hex <DATASET_HEX> for --commissioning-method ble-thread or nfc-thread!")
+            print("error: missing --thread-dataset-hex <DATASET_HEX> for --commissioning-method or "
+                  "--in-test-commissioning-method ble-thread or nfc-thread!")
             return False
         config.thread_operational_dataset = args.thread_dataset_hex
     elif config.commissioning_method == "on-network-ip":
@@ -722,6 +741,33 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     from matter.testing.matter_test_config import MatterTestConfig
 
     config = MatterTestConfig()
+
+    # Accumulate all command-line-passed named args
+    all_global_args = []
+    argsets = [item for item in (args.int_arg, args.float_arg, args.string_arg, args.json_arg,
+                                 args.hex_arg, args.bool_arg) if item is not None]
+    for argset in chain.from_iterable(argsets):
+        all_global_args.extend(argset)
+
+    config.global_test_params = {}
+    for name, value in all_global_args:
+        config.global_test_params[name] = value
+
+    if "nfc" in (args.commissioning_method or []):
+
+        if "NFC_Reader_index" not in config.global_test_params:
+            LOGGER.error("Error: Missing required argument --int-arg NFC_Reader_index:<int-value> for "
+                         "NFC commissioning tests")
+            sys.exit(1)
+
+        if any([args.passcodes, args.discriminators, args.manual_code, args.qr_code]):
+            LOGGER.error("Error: Do not provide discriminator, passcode, manual code or qr-code for NFC commissioning. "
+                         "The payload is read directly from the NFC tag.")
+            sys.exit(1)
+
+        from matter.testing.matter_nfc_interaction import connect_read_nfc_tag_data
+        nfc_tag_data = connect_read_nfc_tag_data(config.global_test_params.get("NFC_Reader_index", 0))
+        args.qr_code.append(nfc_tag_data)
 
     # Populate commissioning config if present, exiting on error
     if not populate_commissioning_args(args, config):
@@ -758,17 +804,6 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     config.tc_version_to_simulate = args.tc_version_to_simulate
     config.tc_user_response_to_simulate = args.tc_user_response_to_simulate
     config.dac_revocation_set_path = args.dac_revocation_set_path
-
-    # Accumulate all command-line-passed named args
-    all_global_args = []
-    argsets = [item for item in (args.int_arg, args.float_arg, args.string_arg, args.json_arg,
-                                 args.hex_arg, args.bool_arg) if item is not None]
-    for argset in chain.from_iterable(argsets):
-        all_global_args.extend(argset)
-
-    config.global_test_params = {}
-    for name, value in all_global_args:
-        config.global_test_params[name] = value
 
     # Embed the rest of the config in the global test params dict which will be passed to Mobly tests
     config.global_test_params["meta_config"] = {k: v for k, v in dataclass_asdict(config).items() if k != "global_test_params"}

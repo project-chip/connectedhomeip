@@ -146,7 +146,7 @@ class TC_ACL_2_9(MatterBaseTest):
 
         # Open commissioning window on TH1
         params = await self.th1.OpenCommissioningWindow(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             timeout=self.max_window_duration,
             iteration=1000,
             discriminator=self.discriminator,
@@ -269,7 +269,7 @@ class TC_ACL_2_9(MatterBaseTest):
         self.step(14)
         # TH1 sends the RemoveFabric command to the DUT with the FabricIndex set to th2_idx
         removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(th2_idx)
-        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
+        await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
 
 
 if __name__ == "__main__":

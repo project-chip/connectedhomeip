@@ -166,7 +166,7 @@ def normalize_order(idl: Idl):
 __LOG_LEVELS__ = {
     'debug': logging.DEBUG,
     'info': logging.INFO,
-    'warn': logging.WARN,
+    'warn': logging.WARNING,
     'fatal': logging.FATAL,
 }
 
@@ -241,7 +241,7 @@ def main(log_level, no_print, output, compare, compare_output, filenames):
 
         # ensure that input file is filtered to only interesting
         # clusters
-        loaded_clusters = set([c.code for c in data.clusters])
+        loaded_clusters = {c.code for c in data.clusters}
         other_idl.clusters = [
             c for c in other_idl.clusters if c.code in loaded_clusters]
 
