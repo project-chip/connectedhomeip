@@ -27,7 +27,6 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::BooleanStateConfiguration;
-using namespace chip::app::Clusters::BooleanStateConfiguration::Attributes;
 using namespace chip::Protocols::InteractionModel;
 using namespace chip::app::Clusters::BooleanStateConfiguration::Attributes;
 namespace {
