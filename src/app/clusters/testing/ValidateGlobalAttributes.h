@@ -1,15 +1,22 @@
+#pragma once
+
 #include "AttributeTesting.h"
+#include "lib/core/CHIPError.h"
+
+#include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/ServerClusterInterface.h>
 #include <lib/support/ReadOnlyBuffer.h>
 
 namespace chip {
-
 namespace Testing {
 
 // Compare the attributes of the cluster against the expected set.
 // Will use the first path returned by `GetPaths()` on the cluster.
 // Dies if `GetPaths()` doesn't return a list with one path.
-bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster, Span<app::DataModel::AttributeEntry> expected)
+//
+// NOTE: will AUTOMATICALLY add global attributes to the expected list, as those MUST always be available
+bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster,
+                             std::initializer_list<const app::DataModel::AttributeEntry> expected)
 {
     VerifyOrDie(cluster.GetPaths().size() == 1);
     auto path = cluster.GetPaths()[0];
@@ -18,7 +25,18 @@ bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster, Span<app::Da
     {
         return false;
     }
-    return EqualAttributeSets(attributesBuilder.TakeBuffer(), expected);
+
+    // build expectation with global attributes
+    ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> expectedBuilder;
+
+    VerifyOrDie(expectedBuilder.EnsureAppendCapacity(expected.size()) == CHIP_NO_ERROR);
+    for (const auto entry : expected)
+    {
+        VerifyOrDie(expectedBuilder.Append(entry) == CHIP_NO_ERROR);
+    }
+    VerifyOrDie(expectedBuilder.AppendElements(app::DefaultServerCluster::GlobalAttributes()) == CHIP_NO_ERROR);
+
+    return EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer());
 }
 
 // Compare the accepted commands of the cluster against the expected set.
@@ -52,5 +70,4 @@ bool IsGeneratedCommandsListEqualTo(app::ServerClusterInterface & cluster, Span<
 }
 
 } // namespace Testing
-
 } // namespace chip

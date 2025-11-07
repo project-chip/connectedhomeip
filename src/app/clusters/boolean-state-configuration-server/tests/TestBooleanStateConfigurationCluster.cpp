@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/clusters/testing/ValidateGlobalAttributes.h"
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/boolean-state-configuration-server/boolean-state-configuration-cluster.h>
@@ -33,6 +34,7 @@ using namespace chip::app::Clusters::BooleanStateConfiguration;
 using chip::app::DataModel::AcceptedCommandEntry;
 using chip::app::DataModel::AttributeEntry;
 using chip::Test::ClusterTester;
+using chip::Testing::IsAttributesListEqualTo;
 
 // initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestBooleanStateConfigurationCluster : public ::testing::Test
@@ -53,12 +55,8 @@ TEST_F(TestBooleanStateConfigurationCluster, TestAttributeList)
     // cluster without any attributes
     {
         BooleanStateConfigurationCluster cluster(kTestEndpointId, {}, {}, DefaultConfig());
-        ReadOnlyBufferBuilder<AttributeEntry> builder;
-        ASSERT_EQ(cluster.Attributes({ kTestEndpointId, Id }, builder), CHIP_NO_ERROR);
 
-        ReadOnlyBufferBuilder<AttributeEntry> expectedBuilder;
-        ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-        ASSERT_TRUE(Testing::EqualAttributeSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+        ASSERT_TRUE(IsAttributesListEqualTo(cluster, {}));
     }
 
     // cluster supporting some things
@@ -66,75 +64,44 @@ TEST_F(TestBooleanStateConfigurationCluster, TestAttributeList)
         BooleanStateConfigurationCluster cluster(
             kTestEndpointId, { Feature::kSensitivityLevel, Feature::kAudible },
             { BooleanStateConfigurationCluster::OptionalAttributesSet().Set<Attributes::SensorFault::Id>() }, DefaultConfig());
-        ReadOnlyBufferBuilder<AttributeEntry> builder;
-        ASSERT_EQ(cluster.Attributes({ kTestEndpointId, Id }, builder), CHIP_NO_ERROR);
 
-        ReadOnlyBufferBuilder<AttributeEntry> expectedBuilder;
-
-        ASSERT_EQ(expectedBuilder.AppendElements({
-                      Attributes::CurrentSensitivityLevel::kMetadataEntry,
-                      Attributes::SupportedSensitivityLevels::kMetadataEntry,
-                      Attributes::AlarmsActive::kMetadataEntry,
-                      Attributes::AlarmsSupported::kMetadataEntry,
-                      Attributes::SensorFault::kMetadataEntry,
-                  }),
-                  CHIP_NO_ERROR);
-        ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-
-        ASSERT_TRUE(Testing::EqualAttributeSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+        ASSERT_TRUE(IsAttributesListEqualTo(cluster,
+                                            {
+                                                Attributes::CurrentSensitivityLevel::kMetadataEntry,
+                                                Attributes::SupportedSensitivityLevels::kMetadataEntry,
+                                                Attributes::AlarmsActive::kMetadataEntry,
+                                                Attributes::AlarmsSupported::kMetadataEntry,
+                                                Attributes::SensorFault::kMetadataEntry,
+                                            }));
     }
     // cluster supporting only visual alarms
     {
         BooleanStateConfigurationCluster cluster(kTestEndpointId, BitMask<Feature>(Feature::kVisual), {}, DefaultConfig());
-        ReadOnlyBufferBuilder<AttributeEntry> builder;
-        ASSERT_EQ(cluster.Attributes({ kTestEndpointId, Id }, builder), CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<AttributeEntry> expectedBuilder;
-
-        ASSERT_EQ(expectedBuilder.AppendElements({
-                      Attributes::AlarmsActive::kMetadataEntry,
-                      Attributes::AlarmsSupported::kMetadataEntry,
-                  }),
-                  CHIP_NO_ERROR);
-        ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-
-        ASSERT_TRUE(Testing::EqualAttributeSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+        ASSERT_TRUE(IsAttributesListEqualTo(cluster,
+                                            {
+                                                Attributes::AlarmsActive::kMetadataEntry,
+                                                Attributes::AlarmsSupported::kMetadataEntry,
+                                            }));
     }
     // cluster supporting alarm suppression (but not visual or audible)
     // This is not a valid configuration, but we should handle it gracefully
     {
         BooleanStateConfigurationCluster cluster(kTestEndpointId, BitMask<Feature>(Feature::kAlarmSuppress), {}, DefaultConfig());
-        ReadOnlyBufferBuilder<AttributeEntry> builder;
-        ASSERT_EQ(cluster.Attributes({ kTestEndpointId, Id }, builder), CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<AttributeEntry> expectedBuilder;
-        ASSERT_EQ(expectedBuilder.AppendElements({
-                      Attributes::AlarmsSuppressed::kMetadataEntry,
-                  }),
-                  CHIP_NO_ERROR);
-
-        ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-
-        ASSERT_TRUE(Testing::EqualAttributeSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+        ASSERT_TRUE(IsAttributesListEqualTo(cluster,
+                                            {
+                                                Attributes::AlarmsSuppressed::kMetadataEntry,
+                                            }));
     }
     // cluster supporting visual alarms and alarm suppression
     {
         BooleanStateConfigurationCluster cluster(kTestEndpointId, { Feature::kVisual, Feature::kAlarmSuppress }, {},
                                                  DefaultConfig());
-        ReadOnlyBufferBuilder<AttributeEntry> builder;
-        ASSERT_EQ(cluster.Attributes({ kTestEndpointId, Id }, builder), CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<AttributeEntry> expectedBuilder;
-
-        ASSERT_EQ(expectedBuilder.AppendElements({
-                      Attributes::AlarmsActive::kMetadataEntry,
-                      Attributes::AlarmsSuppressed::kMetadataEntry,
-                      Attributes::AlarmsSupported::kMetadataEntry,
-                  }),
-                  CHIP_NO_ERROR);
-        ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-
-        ASSERT_TRUE(Testing::EqualAttributeSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+        ASSERT_TRUE(IsAttributesListEqualTo(cluster,
+                                            {
+                                                Attributes::AlarmsActive::kMetadataEntry,
+                                                Attributes::AlarmsSuppressed::kMetadataEntry,
+                                                Attributes::AlarmsSupported::kMetadataEntry,
+                                            }));
     }
     // cluster supporting all features and optional attributes
     {
@@ -145,25 +112,17 @@ TEST_F(TestBooleanStateConfigurationCluster, TestAttributeList)
                   .Set<Attributes::AlarmsEnabled::Id>()
                   .Set<Attributes::SensorFault::Id>() },
             DefaultConfig());
-        ReadOnlyBufferBuilder<AttributeEntry> builder;
-        ASSERT_EQ(cluster.Attributes({ kTestEndpointId, Id }, builder), CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<AttributeEntry> expectedBuilder;
-
-        ASSERT_EQ(expectedBuilder.AppendElements({
-                      Attributes::CurrentSensitivityLevel::kMetadataEntry,
-                      Attributes::SupportedSensitivityLevels::kMetadataEntry,
-                      Attributes::DefaultSensitivityLevel::kMetadataEntry,
-                      Attributes::AlarmsActive::kMetadataEntry,
-                      Attributes::AlarmsSuppressed::kMetadataEntry,
-                      Attributes::AlarmsEnabled::kMetadataEntry,
-                      Attributes::AlarmsSupported::kMetadataEntry,
-                      Attributes::SensorFault::kMetadataEntry,
-                  }),
-                  CHIP_NO_ERROR);
-        ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-
-        ASSERT_TRUE(Testing::EqualAttributeSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+        ASSERT_TRUE(IsAttributesListEqualTo(cluster,
+                                            {
+                                                Attributes::CurrentSensitivityLevel::kMetadataEntry,
+                                                Attributes::SupportedSensitivityLevels::kMetadataEntry,
+                                                Attributes::DefaultSensitivityLevel::kMetadataEntry,
+                                                Attributes::AlarmsActive::kMetadataEntry,
+                                                Attributes::AlarmsSuppressed::kMetadataEntry,
+                                                Attributes::AlarmsEnabled::kMetadataEntry,
+                                                Attributes::AlarmsSupported::kMetadataEntry,
+                                                Attributes::SensorFault::kMetadataEntry,
+                                            }));
     }
 }
 
