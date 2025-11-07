@@ -23,7 +23,10 @@
 #include <app/clusters/ota-requestor/OTARequestorCluster.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <app/static-cluster-config/OtaSoftwareUpdateRequestor.h>
+#include <app/util/attribute-table.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <data-model-providers/codegen/CodegenProcessingConfig.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -34,6 +37,8 @@ namespace {
 static constexpr size_t kOtaRequestorFixedClusterCount = OtaSoftwareUpdateRequestor::StaticApplicationConfig::kFixedClusterConfig.size();
 static constexpr size_t kOtaRequestorMaxClusterCount   = kOtaRequestorFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
+bool gUpdatePossibleInitialized = false;
+
 LazyRegisteredServerCluster<OTARequestorCluster> gServers[kOtaRequestorMaxClusterCount];
 
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
@@ -42,7 +47,7 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        gServers[clusterInstanceIndex].Create(endpointId);
+        gServers[clusterInstanceIndex].Create(endpointId, *GetRequestorInstance());
         return gServers[clusterInstanceIndex].Registration();
     }
 
@@ -53,34 +58,46 @@ public:
     }
 
     void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServers[clusterInstanceIndex].Destroy(); }
-
-private:
-    // TODO: Call this somewhere appropriate.
-    void LoadUpdatePossible()
-    {
-        // TODO: Verify if this is the correct traits.
-        using Traits = NumericAttributeTraits<bool>;
-        Traits::StorageType temp;
-        uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
-        Protocols::InteractionModel::Status status =
-            emberAfReadAttribute(endpointId, clusterId, OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id, readable, sizeof(temp));
-        if (status != Protocols::InteractionModel::Status::Success)
-        {
-#if CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
-            ChipLogError(AppServer, "Failed to load UpdatePossible for %u/" ChipLogFormatMEI " (Status %d",
-                         endpointId, ChipLogValueMEI(clusterId), static_cast<int>(status));
-#endif
-            return;
-        }
-        // TODO: Check that the value is representable.
-        Traits::StorageToWorking(temp);
-    }
 };
+
+void LoadUpdatePossible(EndpointId endpointId)
+{
+    OTARequestorInterface * requestor = GetRequestorInstance();
+    if (requestor == nullptr)
+    {
+        return;
+    }
+
+    using Traits = NumericAttributeTraits<bool>;
+    Traits::StorageType temp;
+    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
+    Protocols::InteractionModel::Status status =
+        emberAfReadAttribute(endpointId, OtaSoftwareUpdateRequestor::Id,
+                             OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id,
+                             readable, sizeof(temp));
+    if (status != Protocols::InteractionModel::Status::Success ||
+        !Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+#if CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
+        ChipLogError(AppServer, "Failed to load UpdatePossible for %u/" ChipLogFormatMEI " (Status %d",
+                     endpointId, ChipLogValueMEI(OtaSoftwareUpdateRequestor::Id),
+                     static_cast<int>(status));
+#endif
+        return;
+    }
+    requestor->SetUpdatePossible(Traits::StorageToWorking(temp));
+}
 
 }  // namespace
 
 void MatterOtaSoftwareUpdateRequestorClusterInitCallback(EndpointId endpointId)
 {
+    if (!gUpdatePossibleInitialized)
+    {
+        LoadUpdatePossible(endpointId);
+        gUpdatePossibleInitialized = true;
+    }
+
     IntegrationDelegate integrationDelegate;
 
     CodegenClusterIntegration::RegisterServer(
@@ -106,7 +123,7 @@ void MatterOtaSoftwareUpdateRequestorClusterShutdownCallback(EndpointId endpoint
             .fixedClusterInstanceCount = kOtaRequestorFixedClusterCount,
             .maxClusterInstanceCount   = kOtaRequestorMaxClusterCount,
         },
-        integrationDelegate;
+        integrationDelegate);
 }
 
 void MatterOtaSoftwareUpdateRequestorPluginServerInitCallback() {}
