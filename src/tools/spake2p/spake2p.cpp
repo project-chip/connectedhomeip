@@ -66,7 +66,7 @@ int main(int argc, char * argv[])
 {
     bool res = false;
 
-    chip::Platform::MemoryInit();
+    TEMPORARY_RETURN_IGNORED chip::Platform::MemoryInit();
 
     if (argc == 1)
     {
