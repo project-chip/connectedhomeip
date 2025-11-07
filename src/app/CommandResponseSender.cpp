@@ -61,12 +61,12 @@ CHIP_ERROR CommandResponseSender::OnMessageReceived(Messaging::ExchangeContext *
         failureStatusToSend.SetValue(Status::Failure);
         ExitNow();
     }
-    StatusResponse::Send(Status::InvalidAction, mExchangeCtx.Get(), false /*aExpectResponse*/);
+    TEMPORARY_RETURN_IGNORED StatusResponse::Send(Status::InvalidAction, mExchangeCtx.Get(), false /*aExpectResponse*/);
     return err;
 exit:
     if (failureStatusToSend.HasValue())
     {
-        StatusResponse::Send(failureStatusToSend.Value(), mExchangeCtx.Get(), false /*aExpectResponse*/);
+        TEMPORARY_RETURN_IGNORED StatusResponse::Send(failureStatusToSend.Value(), mExchangeCtx.Get(), false /*aExpectResponse*/);
     }
     Close();
     return err;

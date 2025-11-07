@@ -76,7 +76,7 @@ bool SimpleSubscriptionResumptionStorage::SimpleSubscriptionInfoIterator::Next(S
         {
             ChipLogError(DataManagement, "Failed to load subscription at index %u error %" CHIP_ERROR_FORMAT,
                          static_cast<unsigned>(mNextIndex), err.Format());
-            mStorage.Delete(mNextIndex);
+            TEMPORARY_RETURN_IGNORED mStorage.Delete(mNextIndex);
         }
     }
 
@@ -103,7 +103,7 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::Init(PersistentStorageDelegate *
     {
         for (uint16_t subscriptionIndex = CHIP_IM_MAX_NUM_SUBSCRIPTIONS; subscriptionIndex < countMax; subscriptionIndex++)
         {
-            Delete(subscriptionIndex);
+            TEMPORARY_RETURN_IGNORED Delete(subscriptionIndex);
         }
     }
 
@@ -352,7 +352,7 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::Save(SubscriptionInfo & subscrip
                 (subscriptionInfo.mFabricIndex == currentSubscriptionInfo.mFabricIndex) &&
                 (subscriptionInfo.mSubscriptionId == currentSubscriptionInfo.mSubscriptionId))
             {
-                Delete(subscriptionIndex);
+                TEMPORARY_RETURN_IGNORED Delete(subscriptionIndex);
                 // if duplicate is the first empty spot, then also set it
                 if (firstEmptySubscriptionIndex == CHIP_IM_MAX_NUM_SUBSCRIPTIONS)
                 {
@@ -380,7 +380,7 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::Save(SubscriptionInfo & subscrip
     const auto len = writer.GetLengthWritten();
     VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    writer.Finalize(backingBuffer);
+    TEMPORARY_RETURN_IGNORED writer.Finalize(backingBuffer);
 
     ReturnErrorOnFailure(
         mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::SubscriptionResumption(firstEmptySubscriptionIndex).KeyName(),
@@ -423,7 +423,7 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::Delete(NodeId nodeId, FabricInde
     // if there are no persisted subscriptions, the MaxCount can also be deleted
     if (remainingSubscriptionsCount == 0)
     {
-        DeleteMaxCount();
+        TEMPORARY_RETURN_IGNORED DeleteMaxCount();
     }
 
     if (lastDeleteErr != CHIP_NO_ERROR)
