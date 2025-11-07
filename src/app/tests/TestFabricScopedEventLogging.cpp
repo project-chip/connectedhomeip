@@ -106,8 +106,9 @@ void PrintEventLog(chip::app::PriorityLevel aPriorityLevel)
 
     EXPECT_SUCCESS(chip::TLV::Utilities::Count(reader, elementCount, false));
     printf("Found %u elements \n", static_cast<unsigned int>(elementCount));
-    CHIP_ERROR err = chip::TLV::Debug::Dump(reader, SimpleDumpWriter);
-    EXPECT_SUCCESS((err != CHIP_ERROR_INVALID_TLV_ELEMENT) ? err : CHIP_NO_ERROR);
+    EXPECT_SUCCESS(chip::TLV::Debug::Dump(reader, SimpleDumpWriter)
+                       .NoErrorIf(CHIP_ERROR_INVALID_TLV_ELEMENT)
+                       .NoErrorIf(CHIP_ERROR_INVALID_TLV_TAG));
 }
 
 static void CheckLogState(chip::app::EventManagement & aLogMgmt, size_t expectedNumEvents, chip::app::PriorityLevel aPriority)
