@@ -3799,10 +3799,18 @@ class BasicInformation(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="caseSessionsPerFabric", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="subscriptionsPerFabric", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="simultaneousInvocationsSupported", Tag=2, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="simultaneousWritesSupported", Tag=3, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="readPathsSupported", Tag=4, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="subscribePathsSupported", Tag=5, Type=typing.Optional[uint]),
                     ])
 
             caseSessionsPerFabric: 'uint' = 0
             subscriptionsPerFabric: 'uint' = 0
+            simultaneousInvocationsSupported: 'typing.Optional[uint]' = None
+            simultaneousWritesSupported: 'typing.Optional[uint]' = None
+            readPathsSupported: 'typing.Optional[uint]' = None
+            subscribePathsSupported: 'typing.Optional[uint]' = None
 
         @dataclass
         class ProductAppearanceStruct(ClusterObject):

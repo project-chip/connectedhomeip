@@ -1377,6 +1377,38 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
         ComplexArgumentParser::Setup(labelWithMember, request.subscriptionsPerFabric, value["subscriptionsPerFabric"]));
     valueCopy.removeMember("subscriptionsPerFabric");
 
+    if (value.isMember("simultaneousInvocationsSupported"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "simultaneousInvocationsSupported");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.simultaneousInvocationsSupported,
+                                                          value["simultaneousInvocationsSupported"]));
+    }
+    valueCopy.removeMember("simultaneousInvocationsSupported");
+
+    if (value.isMember("simultaneousWritesSupported"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "simultaneousWritesSupported");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.simultaneousWritesSupported,
+                                                          value["simultaneousWritesSupported"]));
+    }
+    valueCopy.removeMember("simultaneousWritesSupported");
+
+    if (value.isMember("readPathsSupported"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "readPathsSupported");
+        ReturnErrorOnFailure(
+            ComplexArgumentParser::Setup(labelWithMember, request.readPathsSupported, value["readPathsSupported"]));
+    }
+    valueCopy.removeMember("readPathsSupported");
+
+    if (value.isMember("subscribePathsSupported"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "subscribePathsSupported");
+        ReturnErrorOnFailure(
+            ComplexArgumentParser::Setup(labelWithMember, request.subscribePathsSupported, value["subscribePathsSupported"]));
+    }
+    valueCopy.removeMember("subscribePathsSupported");
+
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
@@ -1384,6 +1416,10 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::BasicInformation::Stru
 {
     ComplexArgumentParser::Finalize(request.caseSessionsPerFabric);
     ComplexArgumentParser::Finalize(request.subscriptionsPerFabric);
+    ComplexArgumentParser::Finalize(request.simultaneousInvocationsSupported);
+    ComplexArgumentParser::Finalize(request.simultaneousWritesSupported);
+    ComplexArgumentParser::Finalize(request.readPathsSupported);
+    ComplexArgumentParser::Finalize(request.subscribePathsSupported);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,

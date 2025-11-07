@@ -1048,7 +1048,7 @@ cluster Actions = 37 {
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
 cluster BasicInformation = 40 {
-  revision 5;
+  revision 6;
 
   enum ColorEnum : enum8 {
     kBlack = 0;
@@ -1086,6 +1086,10 @@ cluster BasicInformation = 40 {
   struct CapabilityMinimaStruct {
     int16u caseSessionsPerFabric = 0;
     int16u subscriptionsPerFabric = 1;
+    optional int16u simultaneousInvocationsSupported = 2;
+    optional int16u simultaneousWritesSupported = 3;
+    optional int16u readPathsSupported = 4;
+    optional int16u subscribePathsSupported = 5;
   }
 
   struct ProductAppearanceStruct {
@@ -2586,7 +2590,7 @@ cluster TimeSynchronization = 56 {
           collection of attributes that the Node MAY collect to aid in conveying information regarding the Bridged Device to a user,
           such as the vendor name, the model name, or user-assigned name. */
 cluster BridgedDeviceBasicInformation = 57 {
-  revision 5;
+  revision 6;
 
   enum ColorEnum : enum8 {
     kBlack = 0;
