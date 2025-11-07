@@ -1399,7 +1399,7 @@ cluster GroupKeyManagement = 63 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster RvcRunMode = 84 {
-  revision 3;
+  revision 4;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -1429,7 +1429,7 @@ cluster RvcRunMode = 84 {
   }
 
   bitmap Feature : bitmap32 {
-    kDirectModeChange = 0x10000;
+    kDirectModeChange = 0x100000;
   }
 
   shared struct ModeTagStruct {
@@ -1467,7 +1467,7 @@ cluster RvcRunMode = 84 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster RvcCleanMode = 85 {
-  revision 3;
+  revision 5;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -1491,7 +1491,7 @@ cluster RvcCleanMode = 85 {
   }
 
   bitmap Feature : bitmap32 {
-    kDirectModeChange = 0x10000;
+    kDirectModeChange = 0x100000;
   }
 
   shared struct ModeTagStruct {
