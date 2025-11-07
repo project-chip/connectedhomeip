@@ -34,49 +34,48 @@
 
 namespace ClosureUIStrings {
 
-inline constexpr const char POSITION_PREFIX[]             = "Position: ";
-inline constexpr const char POSITION_SUFFIX_UNKNOWN[]     = "Unknown";
+// Shared suffix for unknown state
+inline constexpr const char SUFFIX_UNKNOWN[]              = "Unknown";
+
+inline constexpr const char POSITION_PREFIX[]             = "Pos: ";
 inline constexpr const char POSITION_SUFFIX_CLOSED[]      = "Closed";
 inline constexpr const char POSITION_SUFFIX_OPEN[]        = "Open";
 inline constexpr const char POSITION_SUFFIX_PARTIAL[]     = "Partial";
-inline constexpr const char POSITION_SUFFIX_PEDESTRIAN[]  = "Pedestrian";
-inline constexpr const char POSITION_SUFFIX_VENTILATION[] = "Ventilation";
+inline constexpr const char POSITION_SUFFIX_PEDESTRIAN[]  = "Pedest";
+inline constexpr const char POSITION_SUFFIX_VENTILATION[] = "Ventil";
+inline constexpr const char POSITION_SUFFIX_SIGNATURE[]   = "Sign";
 
-inline constexpr const char LATCH_PREFIX[]          = "Latch: ";
-inline constexpr const char LATCH_SUFFIX_UNKNOWN[]  = "Unknown";
-inline constexpr const char LATCH_SUFFIX_ENGAGED[]  = "Engaged";
-inline constexpr const char LATCH_SUFFIX_RELEASED[] = "Released";
+inline constexpr const char LATCH_PREFIX[]                = "Latch: ";
+inline constexpr const char LATCH_SUFFIX_ENGAGED[]        = "Yes";
+inline constexpr const char LATCH_SUFFIX_RELEASED[]       = "No";
 
-inline constexpr const char SECURE_PREFIX[]         = "Secure: ";
-inline constexpr const char SECURE_SUFFIX_UNKNOWN[] = "Unknown";
-inline constexpr const char SECURE_SUFFIX_YES[]     = "Yes";
-inline constexpr const char SECURE_SUFFIX_NO[]      = "No";
+inline constexpr const char SECURE_PREFIX[]               = "Secure: ";
+inline constexpr const char SECURE_SUFFIX_YES[]           = "Yes";
+inline constexpr const char SECURE_SUFFIX_NO[]            = "No";
 
-inline constexpr const char SPEED_PREFIX[]         = "Speed: ";
-inline constexpr const char SPEED_SUFFIX_UNKNOWN[] = "Unknown";
-inline constexpr const char SPEED_SUFFIX_LOW[]     = "Low";
-inline constexpr const char SPEED_SUFFIX_MEDIUM[]  = "Medium";
-inline constexpr const char SPEED_SUFFIX_HIGH[]    = "High";
-inline constexpr const char SPEED_SUFFIX_AUTO[]    = "Auto";
+inline constexpr const char SPEED_PREFIX[]                = "Speed: ";
+inline constexpr const char SPEED_SUFFIX_LOW[]            = "Low";
+inline constexpr const char SPEED_SUFFIX_MEDIUM[]         = "Med";
+inline constexpr const char SPEED_SUFFIX_HIGH[]           = "High";
+inline constexpr const char SPEED_SUFFIX_AUTO[]           = "Auto";
 
 inline constexpr const char STATE_PREFIX[]                = "State: ";
 inline constexpr const char STATE_SUFFIX_STOPPED[]        = "Stopped";
 inline constexpr const char STATE_SUFFIX_MOVING[]         = "Moving";
 inline constexpr const char STATE_SUFFIX_WAITING[]        = "Waiting";
 inline constexpr const char STATE_SUFFIX_ERROR[]          = "Error";
-inline constexpr const char STATE_SUFFIX_CALIBRATING[]    = "Calibrating";
-inline constexpr const char STATE_SUFFIX_PROTECTED[]      = "Protected";
-inline constexpr const char STATE_SUFFIX_DISENGAGED[]     = "Disengaged";
-inline constexpr const char STATE_SUFFIX_SETUP_REQUIRED[] = "Setup Required";
-inline constexpr const char STATE_SUFFIX_UNKNOWN[]        = "Unknown";
+inline constexpr const char STATE_SUFFIX_CALIBRATING[]    = "Calib";
+inline constexpr const char STATE_SUFFIX_PROTECTED[]      = "Protect";
+inline constexpr const char STATE_SUFFIX_DISENGAGED[]     = "Diseng";
+inline constexpr const char STATE_SUFFIX_SETUP_REQUIRED[] = "SetupReq";
 
 inline constexpr const char FOOTER_TEXT[] = "Closure App";
 
 // Buffer sizes for UI text arrays (single source of truth)
 // These are calculated as: (prefix length + longest suffix length) + 1 (for null terminator)
-inline constexpr size_t BUFFER_SIZE_POSITION = 23;
-inline constexpr size_t BUFFER_SIZE_LATCH    = 16;
+inline constexpr size_t BUFFER_SIZE_POSITION = 13;
+inline constexpr size_t BUFFER_SIZE_LATCH    = 15;
 inline constexpr size_t BUFFER_SIZE_SECURE   = 16;
 inline constexpr size_t BUFFER_SIZE_SPEED    = 15;
-inline constexpr size_t BUFFER_SIZE_STATE    = 23;
+inline constexpr size_t BUFFER_SIZE_STATE    = 16;
 } // namespace ClosureUIStrings

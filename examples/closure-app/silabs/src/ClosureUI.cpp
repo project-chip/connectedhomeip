@@ -62,13 +62,6 @@ static const uint8_t bleLogo[]          = { BLUETOOTH_ICON_SMALL };
 chip::app::Clusters::ClosureControl::MainStateEnum ClosureUI::sMainState =
     chip::app::Clusters::ClosureControl::MainStateEnum::kUnknownEnumValue;
 
-// Helper function to format text using prefix + suffix
-namespace {
-inline void FormatText(char * dest, size_t destSize, const char * prefix, const char * suffix)
-{
-    snprintf(dest, destSize, "%s%s", prefix, suffix);
-}
-} // namespace
 
 // Initialize arrays using buffer sizes
 char ClosureUI::sPositionText[ClosureUIStrings::BUFFER_SIZE_POSITION];
@@ -82,16 +75,16 @@ struct ClosureUITextInitializer
 {
     ClosureUITextInitializer()
     {
-        FormatText(ClosureUI::sPositionText, sizeof(ClosureUI::sPositionText), ClosureUIStrings::POSITION_PREFIX,
-                   ClosureUIStrings::POSITION_SUFFIX_UNKNOWN);
-        FormatText(ClosureUI::sLatchText, sizeof(ClosureUI::sLatchText), ClosureUIStrings::LATCH_PREFIX,
-                   ClosureUIStrings::LATCH_SUFFIX_UNKNOWN);
-        FormatText(ClosureUI::sSecureText, sizeof(ClosureUI::sSecureText), ClosureUIStrings::SECURE_PREFIX,
-                   ClosureUIStrings::SECURE_SUFFIX_UNKNOWN);
-        FormatText(ClosureUI::sSpeedText, sizeof(ClosureUI::sSpeedText), ClosureUIStrings::SPEED_PREFIX,
-                   ClosureUIStrings::SPEED_SUFFIX_UNKNOWN);
-        FormatText(ClosureUI::sStateText, sizeof(ClosureUI::sStateText), ClosureUIStrings::STATE_PREFIX,
-                   ClosureUIStrings::STATE_SUFFIX_UNKNOWN);
+        snprintf(ClosureUI::sPositionText, sizeof(ClosureUI::sPositionText), "%s%s", ClosureUIStrings::POSITION_PREFIX,
+                 ClosureUIStrings::SUFFIX_UNKNOWN);
+        snprintf(ClosureUI::sLatchText, sizeof(ClosureUI::sLatchText), "%s%s", ClosureUIStrings::LATCH_PREFIX,
+                 ClosureUIStrings::SUFFIX_UNKNOWN);
+        snprintf(ClosureUI::sSecureText, sizeof(ClosureUI::sSecureText), "%s%s", ClosureUIStrings::SECURE_PREFIX,
+                 ClosureUIStrings::SUFFIX_UNKNOWN);
+        snprintf(ClosureUI::sSpeedText, sizeof(ClosureUI::sSpeedText), "%s%s", ClosureUIStrings::SPEED_PREFIX,
+                 ClosureUIStrings::SUFFIX_UNKNOWN);
+        snprintf(ClosureUI::sStateText, sizeof(ClosureUI::sStateText), "%s%s", ClosureUIStrings::STATE_PREFIX,
+                 ClosureUIStrings::SUFFIX_UNKNOWN);
     }
 };
 static ClosureUITextInitializer sInitializer;
@@ -143,7 +136,7 @@ void ClosureUI::DrawHeader(GLIB_Context_t * glibContext)
 
 void ClosureUI::DrawMainState(GLIB_Context_t * glibContext)
 {
-    const char * stateSuffix = ClosureUIStrings::STATE_SUFFIX_UNKNOWN;
+    const char * stateSuffix = ClosureUIStrings::SUFFIX_UNKNOWN;
 
     switch (sMainState)
     {
@@ -173,11 +166,11 @@ void ClosureUI::DrawMainState(GLIB_Context_t * glibContext)
         break;
     case chip::app::Clusters::ClosureControl::MainStateEnum::kUnknownEnumValue:
     default:
-        stateSuffix = ClosureUIStrings::STATE_SUFFIX_UNKNOWN;
+        stateSuffix = ClosureUIStrings::SUFFIX_UNKNOWN;
         break;
     }
 
-    FormatText(sStateText, sizeof(sStateText), ClosureUIStrings::STATE_PREFIX, stateSuffix);
+    snprintf(sStateText, sizeof(sStateText), "%s%s", ClosureUIStrings::STATE_PREFIX, stateSuffix);
     GLIB_drawStringOnLine(glibContext, sStateText, STATE_DISPLAY_LINE, GLIB_ALIGN_CENTER, 0, 0, true);
 }
 
@@ -199,24 +192,24 @@ void ClosureUI::DrawFooter(GLIB_Context_t * glibContext)
 
 void ClosureUI::FormatAndSetPosition(const char * suffix)
 {
-    const char * safeSuffix = (suffix != nullptr) ? suffix : ClosureUIStrings::POSITION_SUFFIX_UNKNOWN;
-    FormatText(sPositionText, sizeof(sPositionText), ClosureUIStrings::POSITION_PREFIX, safeSuffix);
+    const char * safeSuffix = (suffix != nullptr) ? suffix : ClosureUIStrings::SUFFIX_UNKNOWN;
+    snprintf(sPositionText, sizeof(sPositionText), "%s%s", ClosureUIStrings::POSITION_PREFIX, safeSuffix);
 }
 
 void ClosureUI::FormatAndSetLatch(const char * suffix)
 {
-    const char * safeSuffix = (suffix != nullptr) ? suffix : ClosureUIStrings::LATCH_SUFFIX_UNKNOWN;
-    FormatText(sLatchText, sizeof(sLatchText), ClosureUIStrings::LATCH_PREFIX, safeSuffix);
+    const char * safeSuffix = (suffix != nullptr) ? suffix : ClosureUIStrings::SUFFIX_UNKNOWN;
+    snprintf(sLatchText, sizeof(sLatchText), "%s%s", ClosureUIStrings::LATCH_PREFIX, safeSuffix);
 }
 
 void ClosureUI::FormatAndSetSecure(const char * suffix)
 {
-    const char * safeSuffix = (suffix != nullptr) ? suffix : ClosureUIStrings::SECURE_SUFFIX_UNKNOWN;
-    FormatText(sSecureText, sizeof(sSecureText), ClosureUIStrings::SECURE_PREFIX, safeSuffix);
+    const char * safeSuffix = (suffix != nullptr) ? suffix : ClosureUIStrings::SUFFIX_UNKNOWN;
+    snprintf(sSecureText, sizeof(sSecureText), "%s%s", ClosureUIStrings::SECURE_PREFIX, safeSuffix);
 }
 
 void ClosureUI::FormatAndSetSpeed(const char * suffix)
 {
-    const char * safeSuffix = (suffix != nullptr) ? suffix : ClosureUIStrings::SPEED_SUFFIX_UNKNOWN;
-    FormatText(sSpeedText, sizeof(sSpeedText), ClosureUIStrings::SPEED_PREFIX, safeSuffix);
+    const char * safeSuffix = (suffix != nullptr) ? suffix : ClosureUIStrings::SUFFIX_UNKNOWN;
+    snprintf(sSpeedText, sizeof(sSpeedText), "%s%s", ClosureUIStrings::SPEED_PREFIX, safeSuffix);
 }

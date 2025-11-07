@@ -253,7 +253,7 @@ void AppTask::UpdateClosureUI()
 
     ClosureUI::SetMainState(uiData.mainState);
 
-    const char * positionSuffix = ClosureUIStrings::POSITION_SUFFIX_UNKNOWN;
+    const char * positionSuffix = ClosureUIStrings::SUFFIX_UNKNOWN;
     if (!uiData.overallCurrentState.IsNull() && uiData.overallCurrentState.Value().position.HasValue() &&
         !uiData.overallCurrentState.Value().position.Value().IsNull())
     {
@@ -275,13 +275,13 @@ void AppTask::UpdateClosureUI()
             positionSuffix = ClosureUIStrings::POSITION_SUFFIX_VENTILATION;
             break;
         default:
-            positionSuffix = ClosureUIStrings::POSITION_SUFFIX_UNKNOWN;
+            positionSuffix = ClosureUIStrings::SUFFIX_UNKNOWN;
             break;
         }
     }
     ClosureUI::FormatAndSetPosition(positionSuffix);
 
-    const char * latchSuffix = ClosureUIStrings::LATCH_SUFFIX_UNKNOWN;
+    const char * latchSuffix = ClosureUIStrings::SUFFIX_UNKNOWN;
     if (!uiData.overallCurrentState.IsNull() && uiData.overallCurrentState.Value().latch.HasValue() &&
         !uiData.overallCurrentState.Value().latch.Value().IsNull())
     {
@@ -290,7 +290,7 @@ void AppTask::UpdateClosureUI()
     }
     ClosureUI::FormatAndSetLatch(latchSuffix);
 
-    const char * secureSuffix = ClosureUIStrings::SECURE_SUFFIX_UNKNOWN;
+    const char * secureSuffix = ClosureUIStrings::SUFFIX_UNKNOWN;
     if (!uiData.overallCurrentState.IsNull() && !uiData.overallCurrentState.Value().secureState.IsNull())
     {
         secureSuffix = uiData.overallCurrentState.Value().secureState.Value() ? ClosureUIStrings::SECURE_SUFFIX_YES
@@ -298,7 +298,7 @@ void AppTask::UpdateClosureUI()
     }
     ClosureUI::FormatAndSetSecure(secureSuffix);
 
-    const char * speedSuffix = ClosureUIStrings::SPEED_SUFFIX_UNKNOWN;
+    const char * speedSuffix = ClosureUIStrings::SUFFIX_UNKNOWN;
     if (!uiData.overallCurrentState.IsNull() && uiData.overallCurrentState.Value().speed.HasValue())
     {
         switch (uiData.overallCurrentState.Value().speed.Value())
@@ -316,7 +316,7 @@ void AppTask::UpdateClosureUI()
             speedSuffix = ClosureUIStrings::SPEED_SUFFIX_AUTO;
             break;
         default:
-            speedSuffix = ClosureUIStrings::SPEED_SUFFIX_UNKNOWN;
+            speedSuffix = ClosureUIStrings::SUFFIX_UNKNOWN;
             break;
         }
     }
