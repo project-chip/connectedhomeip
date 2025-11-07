@@ -17,17 +17,17 @@
 
 #pragma once
 
-#include <app/reporting/ReportScheduler.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/TimerDelegate.h>
 #include <system/SystemClock.h>
 
 namespace chip {
 namespace app {
 
-class DefaultTimerDelegate : public reporting::ReportScheduler::TimerDelegate
+class DefaultTimerDelegate : public TimerDelegate
 {
 public:
-    using TimerContext = reporting::TimerContext;
-    using Timeout      = System::Clock::Timeout;
+    using Timeout = System::Clock::Timeout;
     CHIP_ERROR StartTimer(TimerContext * context, Timeout aTimeout) override;
     void CancelTimer(TimerContext * context) override;
     bool IsTimerActive(TimerContext * context) override;
