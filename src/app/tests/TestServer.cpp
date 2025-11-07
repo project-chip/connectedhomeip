@@ -62,7 +62,8 @@ TEST_F(TestServer, TestFactoryResetEvent)
 
     Server::GetInstance().ScheduleFactoryReset();
 
-    EXPECT_SUCCESS(PlatformMgr().ScheduleWork([](intptr_t) -> void { EXPECT_SUCCESS(PlatformMgr().StopEventLoopTask()); }));
+    CHIP_ERROR initResult = PlatformMgr().ScheduleWork([](intptr_t) -> void { EXPECT_SUCCESS(PlatformMgr().StopEventLoopTask()); });
+    EXPECT_SUCCESS(initResult);
     PlatformMgr().RunEventLoop();
 
     EXPECT_EQ(handler.mEvent.Type, DeviceEventType::kFactoryReset);
