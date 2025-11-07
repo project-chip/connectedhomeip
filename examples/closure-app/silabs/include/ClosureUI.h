@@ -56,9 +56,9 @@ private:
 
     // Static variables to store the current closure state
     static chip::app::Clusters::ClosureControl::MainStateEnum sMainState;
-    static char sPositionText[ClosureUIStrings::BUFFER_SIZE_POSITION];
-    static char sLatchText[ClosureUIStrings::BUFFER_SIZE_LATCH];
-    static char sSecureText[ClosureUIStrings::BUFFER_SIZE_SECURE];
-    static char sSpeedText[ClosureUIStrings::BUFFER_SIZE_SPEED];
-    static char sStateText[ClosureUIStrings::BUFFER_SIZE_STATE];
+    static char sPositionText[ClosureUIStrings::LCD_STRING_BUFFER_SIZE];
+    static char sLatchText[ClosureUIStrings::LCD_STRING_BUFFER_SIZE];
+    static char sSecureText[ClosureUIStrings::LCD_STRING_BUFFER_SIZE];
+    static char sSpeedText[ClosureUIStrings::LCD_STRING_BUFFER_SIZE];
+    static char sStateText[ClosureUIStrings::LCD_STRING_BUFFER_SIZE];
 };

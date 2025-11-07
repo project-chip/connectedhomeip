@@ -18,18 +18,17 @@
 
 #pragma once
 
+#include <cstddef>
+
 /**
  * @file ClosureUIStrings.h
  * @brief UI string constants
 
  * @note IMPORTANT FOR DEVELOPERS:
- *       If you modify existing strings or add new strings in this file, you MUST also
- *       check and update the corresponding buffer sizes.
- *       - sPositionText[] - must accommodate longest "Position: " + suffix combination
- *       - sLatchText[] - must accommodate longest "Latch: " + suffix combination
- *       - sSecureText[] - must accommodate longest "Secure: " + suffix combination
- *       - sSpeedText[] - must accommodate longest "Speed: " + suffix combination
- *       - sStateText[] - must accommodate longest "State: " + suffix combination
+ *       If you modify existing strings or add new strings in this file, you MUST ensure
+ *       that all prefix + suffix combinations fit within LCD_CH_LINE_LEN (16 characters),
+ *       as the LCD display can only show 16 characters per line. All text buffers are
+ *       sized to LCD_STRING_BUFFER_SIZE (17 bytes: 16 characters + null terminator).
  */
 
 namespace ClosureUIStrings {
@@ -71,11 +70,9 @@ inline constexpr const char STATE_SUFFIX_SETUP_REQUIRED[] = "SetupReq";
 
 inline constexpr const char FOOTER_TEXT[] = "Closure App";
 
-// Buffer sizes for UI text arrays (single source of truth)
-// These are calculated as: (prefix length + longest suffix length) + 1 (for null terminator)
-inline constexpr size_t BUFFER_SIZE_POSITION = 13;
-inline constexpr size_t BUFFER_SIZE_LATCH    = 15;
-inline constexpr size_t BUFFER_SIZE_SECURE   = 16;
-inline constexpr size_t BUFFER_SIZE_SPEED    = 15;
-inline constexpr size_t BUFFER_SIZE_STATE    = 16;
+// LCD display line maximum length
+inline constexpr size_t LCD_CH_LINE_LEN = 16;
+
+// LCD string buffer size (lcd line length + null terminator)
+inline constexpr size_t LCD_STRING_BUFFER_SIZE = LCD_CH_LINE_LEN + 1;
 } // namespace ClosureUIStrings

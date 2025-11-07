@@ -62,27 +62,27 @@ static const uint8_t bleLogo[]          = { BLUETOOTH_ICON_SMALL };
 chip::app::Clusters::ClosureControl::MainStateEnum ClosureUI::sMainState =
     chip::app::Clusters::ClosureControl::MainStateEnum::kUnknownEnumValue;
 
-// Initialize arrays using buffer sizes
-char ClosureUI::sPositionText[ClosureUIStrings::BUFFER_SIZE_POSITION];
-char ClosureUI::sLatchText[ClosureUIStrings::BUFFER_SIZE_LATCH];
-char ClosureUI::sSecureText[ClosureUIStrings::BUFFER_SIZE_SECURE];
-char ClosureUI::sSpeedText[ClosureUIStrings::BUFFER_SIZE_SPEED];
-char ClosureUI::sStateText[ClosureUIStrings::BUFFER_SIZE_STATE];
+// Initialize arrays using LCD string buffer size
+char ClosureUI::sPositionText[ClosureUIStrings::LCD_STRING_BUFFER_SIZE];
+char ClosureUI::sLatchText[ClosureUIStrings::LCD_STRING_BUFFER_SIZE];
+char ClosureUI::sSecureText[ClosureUIStrings::LCD_STRING_BUFFER_SIZE];
+char ClosureUI::sSpeedText[ClosureUIStrings::LCD_STRING_BUFFER_SIZE];
+char ClosureUI::sStateText[ClosureUIStrings::LCD_STRING_BUFFER_SIZE];
 
 // Static initializer to set default values using prefix + suffix
 struct ClosureUITextInitializer
 {
     ClosureUITextInitializer()
     {
-        snprintf(ClosureUI::sPositionText, sizeof(ClosureUI::sPositionText), "%s%s", ClosureUIStrings::POSITION_PREFIX,
+        snprintf(ClosureUI::sPositionText, ClosureUIStrings::LCD_STRING_BUFFER_SIZE, "%s%s", ClosureUIStrings::POSITION_PREFIX,
                  ClosureUIStrings::SUFFIX_UNKNOWN);
-        snprintf(ClosureUI::sLatchText, sizeof(ClosureUI::sLatchText), "%s%s", ClosureUIStrings::LATCH_PREFIX,
+        snprintf(ClosureUI::sLatchText, ClosureUIStrings::LCD_STRING_BUFFER_SIZE, "%s%s", ClosureUIStrings::LATCH_PREFIX,
                  ClosureUIStrings::SUFFIX_UNKNOWN);
-        snprintf(ClosureUI::sSecureText, sizeof(ClosureUI::sSecureText), "%s%s", ClosureUIStrings::SECURE_PREFIX,
+        snprintf(ClosureUI::sSecureText, ClosureUIStrings::LCD_STRING_BUFFER_SIZE, "%s%s", ClosureUIStrings::SECURE_PREFIX,
                  ClosureUIStrings::SUFFIX_UNKNOWN);
-        snprintf(ClosureUI::sSpeedText, sizeof(ClosureUI::sSpeedText), "%s%s", ClosureUIStrings::SPEED_PREFIX,
+        snprintf(ClosureUI::sSpeedText, ClosureUIStrings::LCD_STRING_BUFFER_SIZE, "%s%s", ClosureUIStrings::SPEED_PREFIX,
                  ClosureUIStrings::SUFFIX_UNKNOWN);
-        snprintf(ClosureUI::sStateText, sizeof(ClosureUI::sStateText), "%s%s", ClosureUIStrings::STATE_PREFIX,
+        snprintf(ClosureUI::sStateText, ClosureUIStrings::LCD_STRING_BUFFER_SIZE, "%s%s", ClosureUIStrings::STATE_PREFIX,
                  ClosureUIStrings::SUFFIX_UNKNOWN);
     }
 };
@@ -169,7 +169,7 @@ void ClosureUI::DrawMainState(GLIB_Context_t * glibContext)
         break;
     }
 
-    snprintf(sStateText, sizeof(sStateText), "%s%s", ClosureUIStrings::STATE_PREFIX, stateSuffix);
+    snprintf(sStateText, ClosureUIStrings::LCD_STRING_BUFFER_SIZE, "%s%s", ClosureUIStrings::STATE_PREFIX, stateSuffix);
     GLIB_drawStringOnLine(glibContext, sStateText, STATE_DISPLAY_LINE, GLIB_ALIGN_CENTER, 0, 0, true);
 }
 
@@ -192,23 +192,23 @@ void ClosureUI::DrawFooter(GLIB_Context_t * glibContext)
 void ClosureUI::FormatAndSetPosition(const char * suffix)
 {
     const char * safeSuffix = (suffix != nullptr) ? suffix : ClosureUIStrings::SUFFIX_UNKNOWN;
-    snprintf(sPositionText, sizeof(sPositionText), "%s%s", ClosureUIStrings::POSITION_PREFIX, safeSuffix);
+    snprintf(sPositionText, ClosureUIStrings::LCD_STRING_BUFFER_SIZE, "%s%s", ClosureUIStrings::POSITION_PREFIX, safeSuffix);
 }
 
 void ClosureUI::FormatAndSetLatch(const char * suffix)
 {
     const char * safeSuffix = (suffix != nullptr) ? suffix : ClosureUIStrings::SUFFIX_UNKNOWN;
-    snprintf(sLatchText, sizeof(sLatchText), "%s%s", ClosureUIStrings::LATCH_PREFIX, safeSuffix);
+    snprintf(sLatchText, ClosureUIStrings::LCD_STRING_BUFFER_SIZE, "%s%s", ClosureUIStrings::LATCH_PREFIX, safeSuffix);
 }
 
 void ClosureUI::FormatAndSetSecure(const char * suffix)
 {
     const char * safeSuffix = (suffix != nullptr) ? suffix : ClosureUIStrings::SUFFIX_UNKNOWN;
-    snprintf(sSecureText, sizeof(sSecureText), "%s%s", ClosureUIStrings::SECURE_PREFIX, safeSuffix);
+    snprintf(sSecureText, ClosureUIStrings::LCD_STRING_BUFFER_SIZE, "%s%s", ClosureUIStrings::SECURE_PREFIX, safeSuffix);
 }
 
 void ClosureUI::FormatAndSetSpeed(const char * suffix)
 {
     const char * safeSuffix = (suffix != nullptr) ? suffix : ClosureUIStrings::SUFFIX_UNKNOWN;
-    snprintf(sSpeedText, sizeof(sSpeedText), "%s%s", ClosureUIStrings::SPEED_PREFIX, safeSuffix);
+    snprintf(sSpeedText, ClosureUIStrings::LCD_STRING_BUFFER_SIZE, "%s%s", ClosureUIStrings::SPEED_PREFIX, safeSuffix);
 }
