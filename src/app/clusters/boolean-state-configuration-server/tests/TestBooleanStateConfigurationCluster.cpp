@@ -13,13 +13,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "clusters/BooleanStateConfiguration/Enums.h"
-#include "clusters/BooleanStateConfiguration/Metadata.h"
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/boolean-state-configuration-server/boolean-state-configuration-cluster.h>
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/clusters/testing/ClusterTester.h>
+#include <clusters/BooleanStateConfiguration/Enums.h>
+#include <clusters/BooleanStateConfiguration/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/ReadOnlyBuffer.h>
@@ -119,7 +119,8 @@ TEST_F(TestBooleanStateConfigurationCluster, TestAttributeList)
     }
     // cluster supporting visual alarms and alarm suppression
     {
-        BooleanStateConfigurationCluster cluster(kTestEndpointId, { Feature::kVisual, Feature::kAlarmSuppress }, {}, DefaultConfig());
+        BooleanStateConfigurationCluster cluster(kTestEndpointId, { Feature::kVisual, Feature::kAlarmSuppress }, {},
+                                                 DefaultConfig());
         ReadOnlyBufferBuilder<AttributeEntry> builder;
         ASSERT_EQ(cluster.Attributes({ kTestEndpointId, Id }, builder), CHIP_NO_ERROR);
 
@@ -215,7 +216,8 @@ TEST_F(TestBooleanStateConfigurationCluster, TestAcceptedCommandList)
     }
     // cluster supporting visual alarms and alarm suppression
     {
-        BooleanStateConfigurationCluster cluster(kTestEndpointId, { Feature::kVisual, Feature::kAlarmSuppress }, {}, DefaultConfig());
+        BooleanStateConfigurationCluster cluster(kTestEndpointId, { Feature::kVisual, Feature::kAlarmSuppress }, {},
+                                                 DefaultConfig());
         ReadOnlyBufferBuilder<AcceptedCommandEntry> builder;
         ASSERT_EQ(cluster.AcceptedCommands({ kTestEndpointId, Id }, builder), CHIP_NO_ERROR);
 
