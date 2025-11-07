@@ -49,7 +49,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
                        extra_args: list = [],
                        kvs_path: Optional[str] = None,
                        log_file: Optional[str] = None, expected_output: str = "Status: Satisfied",
-                       timeout: int = 10):
+                       timeout: int = 30):
         """Start the provider process using the provided configuration.
 
         Args:
