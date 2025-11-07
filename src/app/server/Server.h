@@ -22,6 +22,8 @@
 
 #include <access/AccessControl.h>
 #include <access/examples/ExampleAccessControlDelegate.h>
+#include <access/examples/ExtendedAccessControlDelegate.h>
+#include <access/examples/GroupcastAccessControlDelegate.h>
 #include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
 #include <app/DefaultSafeAttributePersistenceProvider.h>
@@ -37,6 +39,7 @@
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
 #include <credentials/GroupDataProviderImpl.h>
+#include <credentials/GroupcastDataProvider.h>
 #include <credentials/OperationalCertificateStore.h>
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <crypto/DefaultSessionKeystore.h>
@@ -173,6 +176,8 @@ struct ServerInitParams
     // Group data provider: MUST be injected. Used to maintain critical keys such as the Identity
     // Protection Key (IPK) for CASE. Must be initialized before being provided.
     Credentials::GroupDataProvider * groupDataProvider = nullptr;
+    // Groupcast data provider: To be injected. Must be initialized before being provided.
+    Groupcast::DataProvider * groupcastDataProvider = nullptr;
     // Session keystore: MUST be injected. Used to derive and manage lifecycle of symmetric keys.
     Crypto::SessionKeystore * sessionKeystore = nullptr;
     // Access control delegate: MUST be injected. Used to look up access control rules. Must be
@@ -305,6 +310,9 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
         sGroupDataProvider.SetSessionKeystore(this->sessionKeystore);
         ReturnErrorOnFailure(sGroupDataProvider.Init());
         this->groupDataProvider = &sGroupDataProvider;
+        // Groupcast
+        sGroupcastDataProvider.Initialize(this->persistentStorageDelegate, this->sessionKeystore);
+        this->groupcastDataProvider = &sGroupcastDataProvider;
 
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
         ReturnErrorOnFailure(sSessionResumptionStorage.Init(this->persistentStorageDelegate));
@@ -314,7 +322,8 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
 #endif
 
         // Inject access control delegate
-        this->accessDelegate = Access::Examples::GetAccessControlDelegate();
+        sExtendedAccessControlDelegate.Init(Access::Examples::GetAccessControlDelegate(), Access::Groupcast::GetAccessControlDelegate(this->persistentStorageDelegate));
+        this->accessDelegate = &sExtendedAccessControlDelegate;;
 
         // Inject ACL storage. (Don't initialize it.)
         this->aclStorage = &sAclStorage;
@@ -342,6 +351,8 @@ private:
     static PersistentStorageOperationalKeystore sPersistentStorageOperationalKeystore;
     static Credentials::PersistentStorageOpCertStore sPersistentStorageOpCertStore;
     static Credentials::GroupDataProviderImpl sGroupDataProvider;
+	static Groupcast::DataProvider sGroupcastDataProvider;
+    static chip::Access::ExtendedAccessControlDelegate sExtendedAccessControlDelegate;
     static chip::app::DefaultTimerDelegate sTimerDelegate;
     static app::reporting::ReportSchedulerImpl sReportScheduler;
 
@@ -413,6 +424,8 @@ public:
     TransportMgrBase & GetTransportManager() { return mTransports; }
 
     Credentials::GroupDataProvider * GetGroupDataProvider() { return mGroupsProvider; }
+
+    Groupcast::DataProvider * GetGroupcastDataProvider() { return mGroupcastProvider; }
 
     Crypto::SessionKeystore * GetSessionKeystore() const { return mSessionKeystore; }
 
@@ -711,6 +724,7 @@ private:
     SessionResumptionStorage * mSessionResumptionStorage;
     app::SubscriptionResumptionStorage * mSubscriptionResumptionStorage;
     Credentials::GroupDataProvider * mGroupsProvider;
+    Groupcast::DataProvider * mGroupcastProvider;
     Crypto::SessionKeystore * mSessionKeystore;
     app::DefaultSafeAttributePersistenceProvider mAttributePersister;
     GroupDataProviderListener mListener;

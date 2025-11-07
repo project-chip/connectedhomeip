@@ -54,6 +54,7 @@ const chip::Credentials::AttestationTrustStore * CHIPCommand::sTrustStore       
 chip::Credentials::DeviceAttestationRevocationDelegate * CHIPCommand::sRevocationDelegate = nullptr;
 
 chip::Credentials::GroupDataProviderImpl CHIPCommand::sGroupDataProvider{ kMaxGroupsPerFabric, kMaxGroupKeysPerFabric };
+chip::Groupcast::DataProvider CHIPCommand::sGroupcastDataProvider;
 // All fabrics share the same ICD client storage.
 chip::app::DefaultICDClientStorage CHIPCommand::sICDClientStorage;
 chip::Crypto::RawKeySessionKeystore CHIPCommand::sSessionKeystore;
@@ -150,6 +151,10 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     ReturnLogErrorOnFailure(sGroupDataProvider.Init());
     chip::Credentials::SetGroupDataProvider(&sGroupDataProvider);
     factoryInitParams.groupDataProvider = &sGroupDataProvider;
+    // Groupcast
+    ReturnLogErrorOnFailure(sGroupcastDataProvider.Initialize(&mDefaultStorage, factoryInitParams.sessionKeystore));
+    chip::Groupcast::SetDataProvider(&sGroupcastDataProvider);
+    factoryInitParams.groupcastDataProvider = &sGroupcastDataProvider;
 
     uint16_t port = mDefaultStorage.GetListenPort();
     if (port != 0)
@@ -536,7 +541,7 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, 
         chip::MutableByteSpan compressed_fabric_id_span(compressed_fabric_id);
         ReturnLogErrorOnFailure(commissioner->GetCompressedFabricIdBytes(compressed_fabric_id_span));
 
-        ReturnLogErrorOnFailure(chip::GroupTesting::InitData(&sGroupDataProvider, fabricIndex, compressed_fabric_id_span));
+        ReturnLogErrorOnFailure(chip::GroupTesting::InitData(&sGroupDataProvider, &sGroupcastDataProvider, fabricIndex, compressed_fabric_id_span));
 
         // Configure the default IPK for all fabrics used by CHIP-tool. The epoch
         // key is the same, but the derived keys will be different for each fabric.

@@ -51,6 +51,8 @@
 #include <transport/raw/Base.h>
 #include <transport/raw/PeerAddress.h>
 #include <transport/raw/Tuple.h>
+#include <credentials/GroupDataProvider.h>
+#include <credentials/GroupcastDataProvider.h>
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 #include <transport/SessionConnectionDelegate.h>
@@ -621,6 +623,13 @@ private:
         return payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq) ||
             payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp);
     }
+
+    bool GroupDecrypt(const PacketHeader & partialPacketHeader, PacketHeader & packetHeader,
+                      PayloadHeader & payloadHeader, MessageAuthenticationCode & mac,
+                      Credentials::GroupDataProvider::GroupSession & session, System::PacketBufferHandle && msg);
+    bool GroupcastDecrypt(const PacketHeader & partialPacketHeader, PacketHeader & packetHeader,
+                         PayloadHeader & payloadHeader, MessageAuthenticationCode & mac,
+                         Credentials::GroupDataProvider::GroupSession & session, System::PacketBufferHandle && msg);
 };
 
 namespace MessagePacketBuffer {

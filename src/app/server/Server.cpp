@@ -206,6 +206,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
     mGroupsProvider = initParams.groupDataProvider;
     SetGroupDataProvider(mGroupsProvider);
+    mGroupcastProvider = initParams.groupcastDataProvider;
+    Groupcast::SetDataProvider(mGroupcastProvider);
 
     mReportScheduler = initParams.reportScheduler;
 
@@ -840,6 +842,8 @@ KvsPersistentStorageDelegate CommonCaseDeviceServerInitParams::sKvsPersistenStor
 PersistentStorageOperationalKeystore CommonCaseDeviceServerInitParams::sPersistentStorageOperationalKeystore;
 Credentials::PersistentStorageOpCertStore CommonCaseDeviceServerInitParams::sPersistentStorageOpCertStore;
 Credentials::GroupDataProviderImpl CommonCaseDeviceServerInitParams::sGroupDataProvider;
+Groupcast::DataProvider CommonCaseDeviceServerInitParams::sGroupcastDataProvider;
+chip::Access::ExtendedAccessControlDelegate CommonCaseDeviceServerInitParams::sExtendedAccessControlDelegate;
 app::DefaultTimerDelegate CommonCaseDeviceServerInitParams::sTimerDelegate;
 app::reporting::ReportSchedulerImpl
     CommonCaseDeviceServerInitParams::sReportScheduler(&CommonCaseDeviceServerInitParams::sTimerDelegate);

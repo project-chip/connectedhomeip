@@ -507,7 +507,7 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, 
         chip::MutableByteSpan compressed_fabric_id_span(compressed_fabric_id);
         ReturnLogErrorOnFailure(commissioner->GetCompressedFabricIdBytes(compressed_fabric_id_span));
 
-        ReturnLogErrorOnFailure(chip::GroupTesting::InitData(&sGroupDataProvider, fabricIndex, compressed_fabric_id_span));
+        ReturnLogErrorOnFailure(chip::GroupTesting::InitData(&sGroupDataProvider, &sGroupcastDataProvider, fabricIndex, compressed_fabric_id_span));
 
         // Configure the default IPK for all fabrics used by CHIP-tool. The epoch
         // key is the same, but the derived keys will be different for each fabric.

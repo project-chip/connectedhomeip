@@ -168,6 +168,7 @@ protected:
     static chip::Crypto::RawKeySessionKeystore sSessionKeystore;
 
     static chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
+    static chip::Groupcast::DataProvider sGroupcastDataProvider;
     static chip::app::DefaultICDClientStorage sICDClientStorage;
     static chip::app::DefaultCheckInDelegate sCheckInDelegate;
     static chip::app::CheckInHandler sCheckInHandler;

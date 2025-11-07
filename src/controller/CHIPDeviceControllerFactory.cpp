@@ -96,6 +96,7 @@ CHIP_ERROR DeviceControllerFactory::ReinitSystemStateIfNecessary()
     params.fabricIndependentStorage  = mFabricIndependentStorage;
     params.enableServerInteractions  = mEnableServerInteractions;
     params.groupDataProvider         = mSystemState->GetGroupDataProvider();
+    params.groupcastDataProvider     = mSystemState->GetGroupcastDataProvider();
     params.sessionKeystore           = mSystemState->GetSessionKeystore();
     params.fabricTable               = mSystemState->Fabrics();
     params.operationalKeystore       = mOperationalKeystore;
@@ -219,6 +220,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.exchangeMgr               = chip::Platform::New<Messaging::ExchangeManager>();
     stateParams.messageCounterManager     = chip::Platform::New<secure_channel::MessageCounterManager>();
     stateParams.groupDataProvider         = params.groupDataProvider;
+    stateParams.groupcastDataProvider     = params.groupcastDataProvider;
     stateParams.timerDelegate             = chip::Platform::New<chip::app::DefaultTimerDelegate>();
     stateParams.reportScheduler           = chip::Platform::New<app::reporting::ReportSchedulerImpl>(stateParams.timerDelegate);
     stateParams.sessionKeystore           = params.sessionKeystore;

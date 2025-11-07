@@ -52,9 +52,11 @@ struct PersistentStore
         writer.Init(mBuffer, sizeof(mBuffer));
 
         ReturnErrorOnFailure(persistent.Serialize(writer));
+        volatile size_t written = writer.GetLengthWritten();
+        ChipLogProgress(DeviceLayer, "~~~ PersistentStore::Save(%u)", (unsigned)written);
 
         // Save serialized data
-        return storage->SyncSetKeyValue(key.KeyName(), mBuffer, static_cast<uint16_t>(writer.GetLengthWritten()));
+        return storage->SyncSetKeyValue(key.KeyName(), mBuffer, static_cast<uint16_t>(written));
     }
 
     CHIP_ERROR Load(DataAccessor & persistent, PersistentStorageDelegate * storage)
