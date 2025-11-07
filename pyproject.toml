@@ -1,5 +1,5 @@
 [project]
-python_requires = ">=3.11"
+requires-python = ">=3.11"
 
 [tool.autopep8]
 max_line_length = 132
