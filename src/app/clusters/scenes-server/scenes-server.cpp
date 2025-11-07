@@ -317,7 +317,7 @@ class ScenesClusterFabricDelegate : public chip::FabricTable::Delegate
         SceneTable * sceneTable = scenes::GetSceneTableImpl();
         VerifyOrReturn(nullptr != sceneTable);
         // The implementation of SceneTable::RemoveFabric() must not call back into the FabricTable
-        sceneTable->RemoveFabric(fabricIndex);
+        TEMPORARY_RETURN_IGNORED sceneTable->RemoveFabric(fabricIndex);
     }
 };
 
@@ -343,7 +343,7 @@ CHIP_ERROR ScenesServer::Init()
 void ScenesServer::Shutdown()
 {
     Server::GetInstance().GetFabricTable().RemoveFabricDelegate(&gFabricDelegate);
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 
     mGroupProvider = nullptr;
@@ -420,7 +420,7 @@ void AddSceneParse(CommandHandlerInterface::HandlerContext & ctx, const CommandD
 
         if (!tempEFS.IsEmpty())
         {
-            storageData.mExtensionFieldSets.InsertFieldSet(tempEFS);
+            TEMPORARY_RETURN_IGNORED storageData.mExtensionFieldSets.InsertFieldSet(tempEFS);
         }
     }
     ReturnOnFailure(AddResponseOnError(ctx, response, fieldSetIter.GetStatus()));
@@ -507,7 +507,7 @@ void ViewSceneParse(HandlerContext & ctx, const CommandData & req, GroupDataProv
     {
         // gets data from the field in the scene
         ExtensionFieldSet tempField;
-        scene.mStorageData.mExtensionFieldSets.GetFieldSetAtPosition(tempField, i);
+        TEMPORARY_RETURN_IGNORED scene.mStorageData.mExtensionFieldSets.GetFieldSetAtPosition(tempField, i);
         ByteSpan efsSpan(tempField.mBytesBuffer, tempField.mUsedBytes);
 
         // This should only find one handle per cluster
@@ -581,7 +581,7 @@ CHIP_ERROR StoreSceneParse(const FabricIndex & fabricIdx, const EndpointId & end
     }
 
     // Gets the EFS
-    ReturnErrorOnFailure(sceneTable->SceneSaveEFS(scene));
+    TEMPORARY_RETURN_IGNORED sceneTable->SceneSaveEFS(scene);
     // Insert in Scene Table
     ReturnErrorOnFailure(sceneTable->SetSceneTableEntry(fabricIdx, scene));
 
@@ -628,7 +628,7 @@ CHIP_ERROR RecallSceneParse(const FabricIndex & fabricIdx, const EndpointId & en
         }
     }
 
-    ReturnErrorOnFailure(sceneTable->SceneApplyEFS(scene));
+    TEMPORARY_RETURN_IGNORED sceneTable->SceneApplyEFS(scene);
 
     // Update FabricSceneInfo, at this point the scene is considered valid
     ReturnErrorOnFailure(
@@ -694,7 +694,7 @@ CHIP_ERROR ScenesServer::Read(const ConcreteReadAttributePath & aPath, Attribute
             for (auto & info : fabricSceneInfoSpan)
             {
                 // Update the SceneInfoStruct's Capacity in case it's capacity was limited by other fabrics
-                sceneTable->GetRemainingCapacity(info.fabricIndex, info.remainingCapacity);
+                TEMPORARY_RETURN_IGNORED sceneTable->GetRemainingCapacity(info.fabricIndex, info.remainingCapacity);
                 ReturnErrorOnFailure(encoder.Encode(info));
             }
             return CHIP_NO_ERROR;
@@ -731,7 +731,7 @@ void ScenesServer::GroupWillBeRemoved(FabricIndex aFabricIx, EndpointId aEndpoin
     // because the scene we have (if any) will also be removed.
     if (aGroupId == currentGroup)
     {
-        MakeSceneInvalid(aEndpointId, aFabricIx);
+        TEMPORARY_RETURN_IGNORED MakeSceneInvalid(aEndpointId, aFabricIx);
     }
 
     VerifyOrReturn(nullptr != mGroupProvider);
@@ -740,31 +740,32 @@ void ScenesServer::GroupWillBeRemoved(FabricIndex aFabricIx, EndpointId aEndpoin
         return;
     }
 
-    sceneTable->DeleteAllScenesInGroup(aFabricIx, aGroupId);
+    TEMPORARY_RETURN_IGNORED sceneTable->DeleteAllScenesInGroup(aFabricIx, aGroupId);
 }
 
 void ScenesServer::MakeSceneInvalid(EndpointId aEndpointId, FabricIndex aFabricIx)
 {
-    UpdateFabricSceneInfo(aEndpointId, aFabricIx, Optional<GroupId>(), Optional<SceneId>(), Optional<bool>(false));
+    TEMPORARY_RETURN_IGNORED UpdateFabricSceneInfo(aEndpointId, aFabricIx, Optional<GroupId>(), Optional<SceneId>(),
+                                                   Optional<bool>(false));
 }
 
 void ScenesServer::MakeSceneInvalidForAllFabrics(EndpointId aEndpointId)
 {
     for (auto & info : chip::Server::GetInstance().GetFabricTable())
     {
-        MakeSceneInvalid(aEndpointId, info.GetFabricIndex());
+        TEMPORARY_RETURN_IGNORED MakeSceneInvalid(aEndpointId, info.GetFabricIndex());
     }
 }
 
 void ScenesServer::StoreCurrentScene(FabricIndex aFabricIx, EndpointId aEndpointId, GroupId aGroupId, SceneId aSceneId)
 {
-    StoreSceneParse(aFabricIx, aEndpointId, aGroupId, aSceneId, mGroupProvider);
+    TEMPORARY_RETURN_IGNORED StoreSceneParse(aFabricIx, aEndpointId, aGroupId, aSceneId, mGroupProvider);
 }
 void ScenesServer::RecallScene(FabricIndex aFabricIx, EndpointId aEndpointId, GroupId aGroupId, SceneId aSceneId)
 {
     Optional<DataModel::Nullable<uint32_t>> transitionTime;
 
-    RecallSceneParse(aFabricIx, aEndpointId, aGroupId, aSceneId, transitionTime, mGroupProvider);
+    TEMPORARY_RETURN_IGNORED RecallSceneParse(aFabricIx, aEndpointId, aGroupId, aSceneId, transitionTime, mGroupProvider);
 }
 
 bool ScenesServer::IsHandlerRegistered(EndpointId aEndpointId, scenes::SceneHandler * handler)
@@ -796,7 +797,7 @@ void ScenesServer::UnregisterSceneHandler(EndpointId aEndpointId, scenes::SceneH
 void ScenesServer::RemoveFabric(EndpointId aEndpointId, FabricIndex aFabricIndex)
 {
     SceneTable * sceneTable = scenes::GetSceneTableImpl(aEndpointId);
-    sceneTable->RemoveFabric(aFabricIndex);
+    TEMPORARY_RETURN_IGNORED sceneTable->RemoveFabric(aFabricIndex);
     mFabricSceneInfo.ClearSceneInfoStruct(aEndpointId, aFabricIndex);
 }
 
@@ -1098,8 +1099,7 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
 
             scene.mStorageId = SceneStorageId(sceneId, req.groupIdentifierTo);
 
-            ReturnOnFailure(AddResponseOnError(
-                ctx, response, sceneTable->SetSceneTableEntry(ctx.mCommandHandler.GetAccessingFabricIndex(), scene)));
+            TEMPORARY_RETURN_IGNORED sceneTable->SetSceneTableEntry(ctx.mCommandHandler.GetAccessingFabricIndex(), scene);
 
             // Update SceneInfoStruct Attributes after each insert in case we hit max capacity in the middle of the loop
             ReturnOnFailure(AddResponseOnError(
@@ -1119,8 +1119,7 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
 
     scene.mStorageId = SceneStorageId(req.sceneIdentifierTo, req.groupIdentifierTo);
 
-    ReturnOnFailure(
-        AddResponseOnError(ctx, response, sceneTable->SetSceneTableEntry(ctx.mCommandHandler.GetAccessingFabricIndex(), scene)));
+    TEMPORARY_RETURN_IGNORED sceneTable->SetSceneTableEntry(ctx.mCommandHandler.GetAccessingFabricIndex(), scene);
 
     // Update Attributes
     ReturnOnFailure(
@@ -1147,7 +1146,8 @@ void emberAfScenesManagementClusterServerInitCallback(EndpointId endpoint)
     for (auto & info : chip::Server::GetInstance().GetFabricTable())
     {
         auto fabric = info.GetFabricIndex();
-        UpdateFabricSceneInfo(endpoint, fabric, Optional<GroupId>(), Optional<SceneId>(), Optional<bool>());
+        TEMPORARY_RETURN_IGNORED UpdateFabricSceneInfo(endpoint, fabric, Optional<GroupId>(), Optional<SceneId>(),
+                                                       Optional<bool>());
     }
 }
 
@@ -1158,7 +1158,7 @@ void MatterScenesManagementClusterServerShutdownCallback(EndpointId endpoint)
 
     // Get Scene Table Instance
     SceneTable * sceneTable = scenes::GetSceneTableImpl(endpoint, endpointTableSize);
-    sceneTable->RemoveEndpoint();
+    TEMPORARY_RETURN_IGNORED sceneTable->RemoveEndpoint();
 }
 
 void MatterScenesManagementPluginServerInitCallback()

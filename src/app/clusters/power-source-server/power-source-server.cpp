@@ -168,7 +168,7 @@ CHIP_ERROR PowerSourceServer::SetEndpointList(EndpointId powerSourceClusterEndpo
     else
     {
         sPowerSourceClusterInfo[idx] = PowerSourceClusterInfo(powerSourceClusterEndpoint);
-        sPowerSourceClusterInfo[idx].SetEndpointList(endpointList);
+        TEMPORARY_RETURN_IGNORED sPowerSourceClusterInfo[idx].SetEndpointList(endpointList);
     }
     return CHIP_NO_ERROR;
 }

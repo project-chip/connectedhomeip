@@ -228,7 +228,7 @@ public:
         CHIP_ERROR err = pair_iterator.GetStatus();
         if (CHIP_NO_ERROR != err)
         {
-            mSceneEndpointStatePairs.RemovePair(endpoint);
+            TEMPORARY_RETURN_IGNORED mSceneEndpointStatePairs.RemovePair(endpoint);
             return err;
         }
 
@@ -249,7 +249,7 @@ static void sceneOnOffCallback(EndpointId endpoint)
     ReturnOnFailure(sOnOffSceneHandler.mSceneEndpointStatePairs.GetPair(endpoint, savedState));
     CommandId command = (savedState.mValue) ? Commands::On::Id : Commands::Off::Id;
     OnOffServer::Instance().setOnOffValue(endpoint, command, false);
-    ReturnOnFailure(sOnOffSceneHandler.mSceneEndpointStatePairs.RemovePair(endpoint));
+    TEMPORARY_RETURN_IGNORED sOnOffSceneHandler.mSceneEndpointStatePairs.RemovePair(endpoint);
 }
 #endif // defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 

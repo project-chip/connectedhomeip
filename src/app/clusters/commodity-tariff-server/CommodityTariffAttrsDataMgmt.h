@@ -704,7 +704,7 @@ public:
             if (aValue.IsNull())
             {
                 mUpdateState.store(UpdateState::kInitialized);
-                MarkAsAssigned();
+                TEMPORARY_RETURN_IGNORED MarkAsAssigned();
                 return CHIP_NO_ERROR;
             }
         }
@@ -792,7 +792,7 @@ public:
 
         if (err == CHIP_NO_ERROR)
         {
-            MarkAsAssigned();
+            TEMPORARY_RETURN_IGNORED MarkAsAssigned();
         }
 
         return err;

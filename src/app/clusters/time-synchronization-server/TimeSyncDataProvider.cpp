@@ -122,7 +122,7 @@ CHIP_ERROR TimeSyncDataProvider::LoadTimeZone(TimeZoneObj & timeZoneObj)
     reader.Init(bufferSpan);
     ReturnErrorOnFailure(reader.Next(TLV::TLVType::kTLVType_Array, TLV::AnonymousTag()));
     ReturnErrorOnFailure(reader.EnterContainer(outerType));
-    reader.CountRemainingInContainer(&count);
+    ReturnErrorOnFailure(reader.CountRemainingInContainer(&count));
     VerifyOrReturnError(count <= tzStoreList.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     while ((err = reader.Next()) == CHIP_NO_ERROR)
@@ -195,7 +195,7 @@ CHIP_ERROR TimeSyncDataProvider::LoadDSTOffset(DSTOffsetObj & dstOffsetObj)
     reader.Init(bufferSpan);
     ReturnErrorOnFailure(reader.Next(TLV::TLVType::kTLVType_Array, TLV::AnonymousTag()));
     ReturnErrorOnFailure(reader.EnterContainer(outerType));
-    reader.CountRemainingInContainer(&count);
+    ReturnErrorOnFailure(reader.CountRemainingInContainer(&count));
     VerifyOrReturnError(count <= dstOffsetObj.dstOffsetList.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
     auto dst = dstOffsetObj.dstOffsetList.begin();
 

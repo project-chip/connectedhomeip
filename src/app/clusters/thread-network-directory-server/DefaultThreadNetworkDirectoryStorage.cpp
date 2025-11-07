@@ -104,7 +104,7 @@ CHIP_ERROR DefaultThreadNetworkDirectoryStorage::AddOrUpdateNetwork(const Extend
         if (err != CHIP_NO_ERROR)
         {
             mCount--;
-            mStorage.SyncDeleteKeyValue(key.KeyName());
+            ReturnErrorOnFailure(mStorage.SyncDeleteKeyValue(key.KeyName()));
             return err;
         }
     }
@@ -137,8 +137,7 @@ CHIP_ERROR DefaultThreadNetworkDirectoryStorage::RemoveNetwork(const ExtendedPan
 
     // Delete the dataset itself. Ignore errors since we successfully updated the index.
     StorageKeyName key = DefaultStorageKeyAllocator::ThreadNetworkDirectoryDataset(exPanId.AsNumber());
-    mStorage.SyncDeleteKeyValue(key.KeyName());
-    return CHIP_NO_ERROR;
+    return mStorage.SyncDeleteKeyValue(key.KeyName());
 }
 
 } // namespace app
