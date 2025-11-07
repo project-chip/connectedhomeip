@@ -79,7 +79,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
 
     @async_test_body
     async def teardown_test(self):
-        self.current_provider_app_proc.terminate()
+        self.terminate_provider()
         super().teardown_test()
 
     @async_test_body
@@ -196,7 +196,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             Clusters.OtaSoftwareUpdateRequestor, Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState, self.controller, self.requestor_node_id, 0)
         asserts.assert_equal(update_state, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
                              "Update state should be idle")
-        self.current_provider_app_proc.terminate()
+        self.terminate_provider()
         self.restart_requestor(self.controller)
 
         self.step(2)
@@ -270,7 +270,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         await self.verify_version_applied_basic_information(
             controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
         # Terminate the provider
-        self.current_provider_app_proc.terminate()
+        self.terminate_provider()
         self.restart_requestor(self.controller)
 
         self.step(3)
@@ -349,7 +349,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
 
         # Now software version should be in the expected software version
         await self.verify_version_applied_basic_information(controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
-        self.current_provider_app_proc.terminate()
+        self.terminate_provider()
         self.restart_requestor(self.controller)
 
         self.step(4)
@@ -428,7 +428,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         await software_version_attr_handler.cancel()
         # Verify the version is the same
         await self.verify_version_applied_basic_information(controller=self.controller, node_id=self.requestor_node_id, target_version=self.expected_software_version)
-        self.current_provider_app_proc.terminate()
+        self.terminate_provider()
         self.restart_requestor(self.controller)
 
         self.step(5)
