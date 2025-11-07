@@ -43,16 +43,16 @@ struct TestBooleanStateConfigurationCluster : public ::testing::Test
 
 constexpr EndpointId kTestEndpointId = 1;
 
+BooleanStateConfigurationCluster::StartupConfiguration DefaultConfig()
+{
+    return { .supportedSensitivityLevels = 7, .defaultSensitivityLevel = 3, .alarmsSupported = 0 };
+}
+
 TEST_F(TestBooleanStateConfigurationCluster, TestAttributeList)
 {
     // cluster without any attributes
     {
-        BooleanStateConfigurationCluster cluster(kTestEndpointId, {}, {},
-                                                 {
-                                                     .supportedSensitivityLevels = 7,
-                                                     .defaultSensitivityLevel    = 4,
-                                                     .alarmsSupported            = 0,
-                                                 });
+        BooleanStateConfigurationCluster cluster(kTestEndpointId, {}, {}, DefaultConfig());
         ReadOnlyBufferBuilder<AttributeEntry> builder;
         ASSERT_EQ(cluster.Attributes({ kTestEndpointId, Id }, builder), CHIP_NO_ERROR);
 
@@ -65,12 +65,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestAttributeList)
     {
         BooleanStateConfigurationCluster cluster(
             kTestEndpointId, { Feature::kSensitivityLevel, Feature::kAudible },
-            { BooleanStateConfigurationCluster::OptionalAttributesSet().Set<Attributes::SensorFault::Id>() },
-            {
-                .supportedSensitivityLevels = 3,
-                .defaultSensitivityLevel    = 1,
-                .alarmsSupported            = AlarmModeBitmap::kAudible,
-            });
+            { BooleanStateConfigurationCluster::OptionalAttributesSet().Set<Attributes::SensorFault::Id>() }, DefaultConfig());
         ReadOnlyBufferBuilder<AttributeEntry> builder;
         ASSERT_EQ(cluster.Attributes({ kTestEndpointId, Id }, builder), CHIP_NO_ERROR);
 
@@ -90,12 +85,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestAttributeList)
     }
     // cluster supporting only visual alarms
     {
-        BooleanStateConfigurationCluster cluster(kTestEndpointId, BitMask<Feature>(Feature::kVisual), {},
-                                                 {
-                                                     .supportedSensitivityLevels = 0,
-                                                     .defaultSensitivityLevel    = 0,
-                                                     .alarmsSupported            = AlarmModeBitmap::kVisual,
-                                                 });
+        BooleanStateConfigurationCluster cluster(kTestEndpointId, BitMask<Feature>(Feature::kVisual), {}, DefaultConfig());
         ReadOnlyBufferBuilder<AttributeEntry> builder;
         ASSERT_EQ(cluster.Attributes({ kTestEndpointId, Id }, builder), CHIP_NO_ERROR);
 
@@ -113,12 +103,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestAttributeList)
     // cluster supporting alarm suppression (but not visual or audible)
     // This is not a valid configuration, but we should handle it gracefully
     {
-        BooleanStateConfigurationCluster cluster(kTestEndpointId, BitMask<Feature>(Feature::kAlarmSuppress), {},
-                                                 {
-                                                     .supportedSensitivityLevels = 0,
-                                                     .defaultSensitivityLevel    = 0,
-                                                     .alarmsSupported            = 0,
-                                                 });
+        BooleanStateConfigurationCluster cluster(kTestEndpointId, BitMask<Feature>(Feature::kAlarmSuppress), {}, DefaultConfig());
         ReadOnlyBufferBuilder<AttributeEntry> builder;
         ASSERT_EQ(cluster.Attributes({ kTestEndpointId, Id }, builder), CHIP_NO_ERROR);
 
@@ -134,12 +119,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestAttributeList)
     }
     // cluster supporting visual alarms and alarm suppression
     {
-        BooleanStateConfigurationCluster cluster(kTestEndpointId, { Feature::kVisual, Feature::kAlarmSuppress }, {},
-                                                 {
-                                                     .supportedSensitivityLevels = 0,
-                                                     .defaultSensitivityLevel    = 0,
-                                                     .alarmsSupported            = AlarmModeBitmap::kVisual,
-                                                 });
+        BooleanStateConfigurationCluster cluster(kTestEndpointId, { Feature::kVisual, Feature::kAlarmSuppress }, {}, DefaultConfig());
         ReadOnlyBufferBuilder<AttributeEntry> builder;
         ASSERT_EQ(cluster.Attributes({ kTestEndpointId, Id }, builder), CHIP_NO_ERROR);
 
@@ -163,11 +143,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestAttributeList)
                   .Set<Attributes::DefaultSensitivityLevel::Id>()
                   .Set<Attributes::AlarmsEnabled::Id>()
                   .Set<Attributes::SensorFault::Id>() },
-            {
-                .supportedSensitivityLevels = 5,
-                .defaultSensitivityLevel    = 2,
-                .alarmsSupported            = { AlarmModeBitmap::kVisual, AlarmModeBitmap::kAudible },
-            });
+            DefaultConfig());
         ReadOnlyBufferBuilder<AttributeEntry> builder;
         ASSERT_EQ(cluster.Attributes({ kTestEndpointId, Id }, builder), CHIP_NO_ERROR);
 
@@ -187,6 +163,85 @@ TEST_F(TestBooleanStateConfigurationCluster, TestAttributeList)
         ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
 
         ASSERT_TRUE(Testing::EqualAttributeSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+    }
+}
+
+TEST_F(TestBooleanStateConfigurationCluster, TestAcceptedCommandList)
+{
+    // cluster without any features
+    {
+        BooleanStateConfigurationCluster cluster(kTestEndpointId, {}, {}, DefaultConfig());
+        ReadOnlyBufferBuilder<AcceptedCommandEntry> builder;
+        ASSERT_EQ(cluster.AcceptedCommands({ kTestEndpointId, Id }, builder), CHIP_NO_ERROR);
+
+        ReadOnlyBufferBuilder<AcceptedCommandEntry> expectedBuilder;
+        ASSERT_TRUE(Testing::EqualAcceptedCommandSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+    }
+    // cluster supporting only visual alarms
+    {
+        BooleanStateConfigurationCluster cluster(kTestEndpointId, BitMask<Feature>(Feature::kVisual), {}, DefaultConfig());
+        ReadOnlyBufferBuilder<AcceptedCommandEntry> builder;
+        ASSERT_EQ(cluster.AcceptedCommands({ kTestEndpointId, Id }, builder), CHIP_NO_ERROR);
+
+        ReadOnlyBufferBuilder<AcceptedCommandEntry> expectedBuilder;
+        ASSERT_EQ(expectedBuilder.AppendElements({
+                      Commands::EnableDisableAlarm::kMetadataEntry,
+                  }),
+                  CHIP_NO_ERROR);
+        ASSERT_TRUE(Testing::EqualAcceptedCommandSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+    }
+    // cluster supporting only audible alarms
+    {
+        BooleanStateConfigurationCluster cluster(kTestEndpointId, BitMask<Feature>(Feature::kAudible), {}, DefaultConfig());
+        ReadOnlyBufferBuilder<AcceptedCommandEntry> builder;
+        ASSERT_EQ(cluster.AcceptedCommands({ kTestEndpointId, Id }, builder), CHIP_NO_ERROR);
+
+        ReadOnlyBufferBuilder<AcceptedCommandEntry> expectedBuilder;
+        ASSERT_EQ(expectedBuilder.AppendElements({
+                      Commands::EnableDisableAlarm::kMetadataEntry,
+                  }),
+                  CHIP_NO_ERROR);
+        ASSERT_TRUE(Testing::EqualAcceptedCommandSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+    }
+    // cluster supporting alarm suppression (but not visual or audible)
+    // This is not a valid configuration, but we should handle it gracefully
+    {
+        BooleanStateConfigurationCluster cluster(kTestEndpointId, BitMask<Feature>(Feature::kAlarmSuppress), {}, DefaultConfig());
+        ReadOnlyBufferBuilder<AcceptedCommandEntry> builder;
+        ASSERT_EQ(cluster.AcceptedCommands({ kTestEndpointId, Id }, builder), CHIP_NO_ERROR);
+
+        ReadOnlyBufferBuilder<AcceptedCommandEntry> expectedBuilder;
+        ASSERT_TRUE(Testing::EqualAcceptedCommandSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+    }
+    // cluster supporting visual alarms and alarm suppression
+    {
+        BooleanStateConfigurationCluster cluster(kTestEndpointId, { Feature::kVisual, Feature::kAlarmSuppress }, {}, DefaultConfig());
+        ReadOnlyBufferBuilder<AcceptedCommandEntry> builder;
+        ASSERT_EQ(cluster.AcceptedCommands({ kTestEndpointId, Id }, builder), CHIP_NO_ERROR);
+
+        ReadOnlyBufferBuilder<AcceptedCommandEntry> expectedBuilder;
+        ASSERT_EQ(expectedBuilder.AppendElements({
+                      Commands::EnableDisableAlarm::kMetadataEntry,
+                      Commands::SuppressAlarm::kMetadataEntry,
+                  }),
+                  CHIP_NO_ERROR);
+        ASSERT_TRUE(Testing::EqualAcceptedCommandSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+    }
+    // cluster supporting all features
+    {
+        BooleanStateConfigurationCluster cluster(
+            kTestEndpointId, { Feature::kVisual, Feature::kAudible, Feature::kAlarmSuppress, Feature::kSensitivityLevel }, {},
+            DefaultConfig());
+        ReadOnlyBufferBuilder<AcceptedCommandEntry> builder;
+        ASSERT_EQ(cluster.AcceptedCommands({ kTestEndpointId, Id }, builder), CHIP_NO_ERROR);
+
+        ReadOnlyBufferBuilder<AcceptedCommandEntry> expectedBuilder;
+        ASSERT_EQ(expectedBuilder.AppendElements({
+                      Commands::EnableDisableAlarm::kMetadataEntry,
+                      Commands::SuppressAlarm::kMetadataEntry,
+                  }),
+                  CHIP_NO_ERROR);
+        ASSERT_TRUE(Testing::EqualAcceptedCommandSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
     }
 }
 
