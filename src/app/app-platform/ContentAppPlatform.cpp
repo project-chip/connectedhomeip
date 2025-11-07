@@ -359,7 +359,7 @@ ContentApp * ContentAppPlatform::LoadContentApp(const CatalogVendorApp & vendorA
 
 ContentApp * ContentAppPlatform::GetContentApp(const CatalogVendorApp & vendorApp)
 {
-    VerifyOrReturnValue(mContentAppFactory != nullptr, nullptr);
+    VerifyOrReturnValue(mContentAppFactory != nullptr, nullptr, ChipLogError(DeviceLayer, "mContentAppFactory is null"));
     if (vendorApp.catalogVendorId == mContentAppFactory->GetPlatformCatalogVendorId())
     {
         return GetContentAppInternal(vendorApp);
