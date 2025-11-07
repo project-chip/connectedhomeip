@@ -141,10 +141,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
 
     @async_test_body
     async def teardown_test(self):
-        if hasattr(self, "current_provider_app_proc") and self.current_provider_app_proc is not None:
-            logger.info("Terminating existing OTA Provider")
-            self.current_provider_app_proc.terminate()
-            self.current_provider_app_proc = None
+        self.terminate_provider()
         super().teardown_test()
 
     def desc_TC_SU_2_7_1(self) -> str:
@@ -252,7 +249,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
                                            self.ota_req.Enums.UpdateStateEnum.kIdle)
 
         logger.info(f"UpdateAppliedEvent response: {events_response}")
-        self.current_provider_app_proc.terminate()
+        self.terminate_provider()
 
         self.step(2)
         ota_image = self.user_params.get('ota_image')
@@ -281,7 +278,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         state_transition_event_handler.reset()
         await state_transition_event_handler.cancel()
         logger.info(f"About close the provider app with proc {self.current_provider_app_proc}")
-        self.current_provider_app_proc.terminate()
+        self.terminate_provider()
 
         self.step(3)
         self.start_provider(
@@ -311,7 +308,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
                                            expected_new_state=self.ota_req.Enums.UpdateStateEnum.kIdle, expected_reason=self.ota_req.Enums.ChangeReasonEnum.kFailure)
         state_transition_event_handler.reset()
         await state_transition_event_handler.cancel()
-        self.current_provider_app_proc.terminate()
+        self.terminate_provider()
         self.restart_requestor(controller)
 
         # # This step is executed with TC_2_7_2
@@ -374,7 +371,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         await error_download_event_handler.cancel()
         state_transition_event_handler.reset()
         await state_transition_event_handler.cancel()
-        self.current_provider_app_proc.terminate()
+        self.terminate_provider()
 
         self.step(6)
         ota_image = self.user_params.get('ota_image')
