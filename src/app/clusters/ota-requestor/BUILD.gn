@@ -11,41 +11,23 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 # transitional dependencies so that chip_data_model sets
 # the right dependencies
 source_set("ota-requestor") {
   sources = [
-    "BDXDownloader.cpp",
-    "BDXDownloader.h",
-    "DefaultOTARequestor.cpp",
-    "DefaultOTARequestor.h",
-    "DefaultOTARequestorDriver.cpp",
-    "DefaultOTARequestorDriver.h",
-    "DefaultOTARequestorStorage.cpp",
-    "DefaultOTARequestorStorage.h",
-    "DefaultOTARequestorUserConsent.h",
-    "ExtendedOTARequestorDriver.cpp",
-    "ExtendedOTARequestorDriver.h",
     "OTARequestorCluster.cpp",
     "OTARequestorCluster.h",
-    "OTARequestorDriver.h",
     "OTARequestorEventHandler.h",
     "OTARequestorEventHandlerRegistry.cpp",
     "OTARequestorEventHandlerRegistry.h",
-    "OTARequestorInterface.h",
-    "OTARequestorStorage.h",
-    "OTARequestorUserConsentDelegate.h",
-    "ota-requestor-server.h",
   ]
 
+  # TODO: DefaultOTARequestor depends on controller, however the cluster server itself does not.
+  # Maybe DefaultOTARequestor and related code should have its own source set.
   public_deps = [
     "${chip_root}/src/app/clusters/basic-information",
-    "${chip_root}/src/app/data-model-provider",
-    "${chip_root}/src/app/server-cluster",
     "${chip_root}/src/controller:interactions",
-    "${chip_root}/zzz_generated/app-common/clusters/OtaSoftwareUpdateRequestor",
   ]
 }
