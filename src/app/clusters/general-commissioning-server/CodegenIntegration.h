@@ -1,6 +1,6 @@
 /*
- *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,25 +14,21 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
-#include <app/reporting/ReportScheduler.h>
-#include <system/SystemClock.h>
+#include <app/clusters/general-commissioning-server/general-commissioning-cluster.h>
 
 namespace chip {
 namespace app {
+namespace Clusters {
+namespace GeneralCommissioning {
 
-class DefaultTimerDelegate : public reporting::ReportScheduler::TimerDelegate
-{
-public:
-    using TimerContext = reporting::TimerContext;
-    using Timeout      = System::Clock::Timeout;
-    CHIP_ERROR StartTimer(TimerContext * context, Timeout aTimeout) override;
-    void CancelTimer(TimerContext * context) override;
-    bool IsTimerActive(TimerContext * context) override;
-    System::Clock::Timestamp GetCurrentMonotonicTimestamp() override;
-};
+/// Returns the singleton instance of the general commissioning cluster, if enabled.
+///
+/// This is a temporary integration point for ember-based apps.
+GeneralCommissioningCluster * Instance();
 
+} // namespace GeneralCommissioning
+} // namespace Clusters
 } // namespace app
 } // namespace chip

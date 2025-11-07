@@ -406,8 +406,8 @@ class CommandHandler(BaseHandler):
         elif ("direction" in attrs) and attrs["direction"] == "responseFromServer":
             is_command = False  # response
         else:
-            LOGGER.warning("Could not clearly determine command direction: %s" %
-                           [item for item in attrs.items()])
+            LOGGER.warning("Could not clearly determine command direction: %s",
+                           list(attrs.items()))
             # Do a best-guess. However we should NOT need to guess once
             # we have a good data set
             is_command = not attrs["name"].endswith("Response")

@@ -49,6 +49,7 @@ matter_add_gn_arg_bool("chip_enable_ethernet" CONFIG_CHIP_ETHERNET)
 matter_add_gn_arg_bool("chip_system_config_provide_statistics" CONFIG_CHIP_STATISTICS)
 matter_add_gn_arg_bool("chip_enable_icd_server" CONFIG_CHIP_ENABLE_ICD_SUPPORT)
 matter_add_gn_arg_bool("chip_enable_icd_lit" CONFIG_CHIP_ICD_LIT_SUPPORT)
+matter_add_gn_arg_bool("chip_enable_icd_dsls" CONFIG_CHIP_ICD_DSLS_SUPPORT)
 matter_add_gn_arg_bool("chip_enable_ota_requestor" CONFIG_CHIP_OTA_REQUESTOR)
 matter_add_gn_arg_bool("chip_system_config_use_openthread_inet_endpoints" CONFIG_CHIP_USE_OT_ENDPOINT)
 

@@ -53,7 +53,7 @@ ROTATING_DEVICE_ID_UNIQUE_ID_LEN = 16
 HEX_PREFIX = "hex:"
 DEV_SN_CSV_HDR = "Serial Number,\n"
 
-NVS_MEMORY = dict()
+NVS_MEMORY = {}
 
 
 def nvs_memory_append(key, value):
@@ -362,7 +362,7 @@ def use_dac_cert_from_args(args, out_dirs):
 
 
 def get_manualcode_args(vid, pid, flow, discriminator, passcode):
-    payload_args = list()
+    payload_args = []
     payload_args.append('--discriminator')
     payload_args.append(str(discriminator))
     payload_args.append('--setup-pin-code')
@@ -485,7 +485,7 @@ def generate_partition(args, out_dirs):
 
 
 def generate_json_summary(args, out_dirs, pai_certs, dacs_cert, serial_num: str):
-    json_dict = dict()
+    json_dict = {}
 
     json_dict['serial_num'] = serial_num
 

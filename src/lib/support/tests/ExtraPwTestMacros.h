@@ -68,3 +68,19 @@
     {                                                                                                                              \
         test_name();                                                                                                               \
     }
+
+/**
+ *  @def EXPECT_SUCCESS(expr)
+ *
+ *  @brief
+ *    Shorthand for EXPECT_EQ(expr, CHIP_NO_ERROR)
+ *
+ *  Example usage:
+ *
+ *  @code
+ *    EXPECT_SUCCESS(channel->SendMsg(msg));
+ *  @endcode
+ *
+ *  @param[in]  expr        A scalar expression to be evaluated against CHIP_NO_ERROR.
+ */
+#define EXPECT_SUCCESS(expr) EXPECT_EQ((expr), CHIP_NO_ERROR)

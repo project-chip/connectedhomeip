@@ -82,7 +82,7 @@ class TestPicsHelpers(MatterBaseTest):
         lock_expected.append('DRLK.S')
 
         def check_expected_pics(pics_list: dict[int, list[str]]):
-            asserts.assert_equal(set(pics_list.keys()), set([0, 1]), "Unexpected endpoints in PICS list")
+            asserts.assert_equal(set(pics_list.keys()), {0, 1}, "Unexpected endpoints in PICS list")
             asserts.assert_equal(set(pics_list[0]), set(desc_expected + opcreds_expected + cadmin_expected +
                                  ['IDM.S', 'MCORE.ROLE.COMMISSIONEE']), "Incorrect PICS list on EP0")
             asserts.assert_equal(set(pics_list[1]), set(lock_expected + ['IDM.S']), "Incorrect PICS list on EP1")
