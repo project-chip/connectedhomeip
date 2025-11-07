@@ -104,7 +104,8 @@ CHIP_ERROR DefaultThreadNetworkDirectoryStorage::AddOrUpdateNetwork(const Extend
         if (err != CHIP_NO_ERROR)
         {
             mCount--;
-            ReturnErrorOnFailure(mStorage.SyncDeleteKeyValue(key.KeyName()));
+            // Return the primary error
+            RETURN_SAFELY_IGNORED mStorage.SyncDeleteKeyValue(key.KeyName());
             return err;
         }
     }
