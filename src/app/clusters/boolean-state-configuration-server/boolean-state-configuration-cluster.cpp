@@ -35,6 +35,9 @@ using namespace chip::Protocols::InteractionModel;
 
 namespace chip::app::Clusters {
 
+constexpr uint8_t kAllKnownAlarmModes =
+    static_cast<uint8_t>(AlarmModeBitmap::kAudible) | static_cast<uint8_t>(AlarmModeBitmap::kVisual);
+
 BooleanStateConfigurationCluster::BooleanStateConfigurationCluster(EndpointId endpointId,
                                                                    BitMask<BooleanStateConfiguration::Feature> features,
                                                                    OptionalAttributesSet optionalAttributes,
@@ -117,7 +120,8 @@ BooleanStateConfigurationCluster::InvokeCommand(const DataModel::InvokeRequest &
 
         // This inverts the bits (0x03 is the current max bitmap):
         //   - every "known" bit that is set to 0 in the request will be set to 1 in the `alarmsToDisable`
-        BitMask<BooleanStateConfiguration::AlarmModeBitmap> alarmsToDisable(static_cast<uint8_t>(~alarms.Raw() & 0x03));
+        const BitMask<BooleanStateConfiguration::AlarmModeBitmap> alarmsToDisable{ static_cast<uint8_t>(~alarms.Raw() &
+                                                                                                        kAllKnownAlarmModes) };
 
         bool emit = false;
         if (mAlarmsActive.HasAny(alarmsToDisable))
@@ -326,7 +330,7 @@ void BooleanStateConfigurationCluster::ClearAllAlarms()
 Status BooleanStateConfigurationCluster::SuppressAlarms(AlarmModeBitMask alarms)
 {
     // Need SPRS feature and that is only available if [VIS | AUD]. These are all checked here.
-    VerifyOrReturnError(mFeatures.HasAll(Feature::kAlarmSuppress), Status::UnsupportedCommand);
+    VerifyOrReturnError(mFeatures.Has(Feature::kAlarmSuppress), Status::UnsupportedCommand);
     VerifyOrReturnError(mFeatures.HasAny(Feature::kAudible, Feature::kVisual), Status::UnsupportedCommand);
 
     // can only suppress valid active alarms
