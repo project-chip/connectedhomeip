@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <app/TimerDelegates.h>
+#include <app/DefaultTimerDelegate.h>
 #include <app/reporting/ReportSchedulerImpl.h>
 #include <app/reporting/SynchronizedReportSchedulerImpl.h>
 

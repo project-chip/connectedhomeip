@@ -67,7 +67,7 @@ class TCP_Tests(MatterBaseTest):
         self.step(1)
         try:
             self.step(2)
-            device = await self.default_controller.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000,
+            device = await self.default_controller.GetConnectedDevice(nodeId=self.dut_node_id, allowPASE=False, timeoutMs=1000,
                                                                       payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
         except TimeoutError:
             asserts.fail("Unable to establish a CASE session over TCP to the device")
@@ -94,7 +94,7 @@ class TCP_Tests(MatterBaseTest):
         self.step(1)
         try:
             self.step(2)
-            device = await self.default_controller.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000,
+            device = await self.default_controller.GetConnectedDevice(nodeId=self.dut_node_id, allowPASE=False, timeoutMs=1000,
                                                                       payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
         except TimeoutError:
             asserts.fail("Unable to establish a CASE session over TCP to the device")
@@ -122,7 +122,7 @@ class TCP_Tests(MatterBaseTest):
         self.step(1)
         try:
             self.step(2)
-            device = await self.default_controller.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000,
+            device = await self.default_controller.GetConnectedDevice(nodeId=self.dut_node_id, allowPASE=False, timeoutMs=1000,
                                                                       payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
         except TimeoutError:
             asserts.fail("Unable to establish a CASE session over TCP to the device")
@@ -160,7 +160,7 @@ class TCP_Tests(MatterBaseTest):
         self.step(1)
         try:
             self.step(2)
-            device = await self.default_controller.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000,
+            device = await self.default_controller.GetConnectedDevice(nodeId=self.dut_node_id, allowPASE=False, timeoutMs=1000,
                                                                       payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
         except TimeoutError:
             asserts.fail("Unable to establish a CASE session over TCP to the device")
@@ -178,7 +178,7 @@ class TCP_Tests(MatterBaseTest):
         # Connect again
         try:
             self.step(6)
-            device = await self.default_controller.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000,
+            device = await self.default_controller.GetConnectedDevice(nodeId=self.dut_node_id, allowPASE=False, timeoutMs=1000,
                                                                       payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
         except TimeoutError:
             asserts.fail("Unable to establish a CASE session over TCP to the device")
@@ -209,7 +209,7 @@ class TCP_Tests(MatterBaseTest):
         self.step(1)
         try:
             self.step(2)
-            device = await self.default_controller.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000,
+            device = await self.default_controller.GetConnectedDevice(nodeId=self.dut_node_id, allowPASE=False, timeoutMs=1000,
                                                                       payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
         except TimeoutError:
             asserts.fail("Unable to establish a CASE session over TCP to the device")
@@ -249,7 +249,7 @@ class TCP_Tests(MatterBaseTest):
         self.step(1)
         try:
             self.step(2)
-            device = await self.default_controller.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000,
+            device = await self.default_controller.GetConnectedDevice(nodeId=self.dut_node_id, allowPASE=False, timeoutMs=1000,
                                                                       payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
         except TimeoutError:
             asserts.fail("Unable to establish a CASE session over TCP to the device")
@@ -290,7 +290,7 @@ class TCP_Tests(MatterBaseTest):
 
         try:
             self.step(2)
-            device = await self.default_controller.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000,
+            device = await self.default_controller.GetConnectedDevice(nodeId=self.dut_node_id, allowPASE=False, timeoutMs=1000,
                                                                       payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
         except TimeoutError:
             asserts.fail("Unable to establish a CASE session over TCP to the device")

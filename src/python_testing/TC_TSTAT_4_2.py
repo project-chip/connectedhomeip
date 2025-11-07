@@ -105,8 +105,8 @@ class TC_TSTAT_4_2(MatterBaseTest):
         return presetScenarios
 
     def get_available_scenario(self, presetTypes: list, presetScenarioCounts: map):
-        availableScenarios = list(presetType.presetScenario for presetType in presetTypes if presetScenarioCounts.get(
-            presetType.presetScenario, 0) < presetType.numberOfPresets)
+        availableScenarios = [presetType.presetScenario for presetType in presetTypes if presetScenarioCounts.get(
+            presetType.presetScenario, 0) < presetType.numberOfPresets]
         if len(availableScenarios) > 0:
             return availableScenarios[0]
         return None
@@ -261,7 +261,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
         logger.info("Commissioning under second controller")
         params = await self.default_controller.OpenCommissioningWindow(
-            nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=1234, option=1)
+            nodeId=self.dut_node_id, timeout=600, iteration=10000, discriminator=1234, option=1)
 
         secondary_authority = self.certificate_authority_manager.NewCertificateAuthority()
         secondary_fabric_admin = secondary_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=2)
@@ -394,7 +394,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             test_presets = copy.deepcopy(current_presets)
 
             if availableScenario is not None:
-                builtInPresets = list(preset for preset in test_presets if preset.builtIn)
+                builtInPresets = [preset for preset in test_presets if preset.builtIn]
 
                 if len(builtInPresets) > 0:
                     builtInPresets[0].builtIn = NullValue
@@ -426,7 +426,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             # Write to the presets attribute after removing a built in preset from the list. Remove the first entry.
             test_presets = current_presets.copy()
 
-            builtInPresets = list(preset for preset in test_presets if preset.builtIn)
+            builtInPresets = [preset for preset in test_presets if preset.builtIn]
             if len(builtInPresets) > 0:
                 builtInPreset = builtInPresets[0]
                 test_presets.remove(builtInPreset)
@@ -446,7 +446,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
         self.step("6")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.C06.Rsp") and self.check_pics("TSTAT.S.Cfe.Rsp")):
 
-            notBuiltInPresets = list(preset for preset in current_presets if preset.builtIn is False)
+            notBuiltInPresets = [preset for preset in current_presets if preset.builtIn is False]
             if len(notBuiltInPresets) > 0:
                 activePreset = notBuiltInPresets[0]
 
@@ -463,7 +463,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
                 await self.send_atomic_request_begin_command()
 
                 # Write to the presets attribute after removing the preset that was set as the active preset handle.
-                test_presets = list(preset for preset in current_presets if preset.presetHandle is not activePresetHandle)
+                test_presets = [preset for preset in current_presets if preset.presetHandle != activePresetHandle]
                 logger.info(f"Sending Presets: {test_presets}")
                 await self.write_presets(endpoint=endpoint, presets=test_presets)
 
@@ -495,7 +495,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
             # Write to the presets attribute after setting the builtIn flag to False for a built-in preset.
             test_presets = copy.deepcopy(current_presets)
 
-            builtInPresets = list(preset for preset in test_presets if preset.builtIn is True)
+            builtInPresets = [preset for preset in test_presets if preset.builtIn is True]
             if len(builtInPresets) > 0:
 
                 # Send the AtomicRequest begin command
@@ -580,7 +580,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
             test_presets = copy.deepcopy(current_presets)
 
-            notBuiltInPresets = list(preset for preset in test_presets if preset.builtIn is False)
+            notBuiltInPresets = [preset for preset in test_presets if preset.builtIn is False]
 
             if len(notBuiltInPresets) > 0:
                 # Write to the presets attribute after setting the builtIn flag to True for a non-built-in preset.
@@ -600,11 +600,11 @@ class TC_TSTAT_4_2(MatterBaseTest):
         self.step("12")
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
 
-            availableScenarios = list(presetType.presetScenario for presetType in presetTypes if (presetType.presetTypeFeatures & cluster.Bitmaps.PresetTypeFeaturesBitmap.kSupportsNames) == 0 and presetScenarioCounts.get(
-                presetType.presetScenario, 0) <= presetType.numberOfPresets)
+            availableScenarios = [presetType.presetScenario for presetType in presetTypes if (presetType.presetTypeFeatures & cluster.Bitmaps.PresetTypeFeaturesBitmap.kSupportsNames) == 0 and presetScenarioCounts.get(
+                presetType.presetScenario, 0) <= presetType.numberOfPresets]
 
             test_presets = copy.deepcopy(current_presets)
-            presets_without_name_support = list(preset for preset in test_presets if preset.presetScenario in availableScenarios)
+            presets_without_name_support = [preset for preset in test_presets if preset.presetScenario in availableScenarios]
 
             if len(presets_without_name_support) == 0 and len(availableScenarios) > 0:
                 new_preset = self.make_preset(availableScenarios[0], coolSetpoint, heatSetpoint, builtIn=True)
@@ -690,9 +690,9 @@ class TC_TSTAT_4_2(MatterBaseTest):
         if self.pics_guard(self.check_pics("TSTAT.S.F08") and self.check_pics("TSTAT.S.A0050") and self.check_pics("TSTAT.S.Cfe.Rsp")):
 
             # Find a preset scenario not present in PresetTypes to run this test.
-            supportedScenarios = set(presetType.presetScenario for presetType in presetTypes)
-            unavailableScenarios = list(
-                presetScenario for presetScenario in cluster.Enums.PresetScenarioEnum if presetScenario not in supportedScenarios)
+            supportedScenarios = {presetType.presetScenario for presetType in presetTypes}
+            unavailableScenarios = [
+                presetScenario for presetScenario in cluster.Enums.PresetScenarioEnum if presetScenario not in supportedScenarios]
             if len(unavailableScenarios) > 0:
                 test_presets = current_presets.copy()
                 test_presets.append(self.make_preset(unavailableScenarios[0], coolSetpoint, heatSetpoint, name="Preset"))
@@ -713,8 +713,8 @@ class TC_TSTAT_4_2(MatterBaseTest):
 
             ScenarioHeadroom = namedtuple("ScenarioHeadroom", "presetScenario remaining")
             # Generate list of tuples of scenarios and number of remaining presets per scenario allowed
-            presetScenarioHeadrooms = list(ScenarioHeadroom(presetType.presetScenario,
-                                           presetType.numberOfPresets - presetScenarioCounts.get(presetType.presetScenario, 0)) for presetType in presetTypes)
+            presetScenarioHeadrooms = [ScenarioHeadroom(presetType.presetScenario,
+                                                        presetType.numberOfPresets - presetScenarioCounts.get(presetType.presetScenario, 0)) for presetType in presetTypes]
 
             if presetScenarioHeadrooms:
                 # Find the preset scenario with the smallest number of remaining allowed presets

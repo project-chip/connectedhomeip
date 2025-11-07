@@ -37,7 +37,7 @@ namespace Clusters {
 class GroupcastLogic
 {
 public:
-    GroupcastLogic() : mFeatures(0) {}
+    GroupcastLogic(BitFlags<Groupcast::Feature> features) : mFeatures(features) {}
     const BitFlags<Groupcast::Feature> & Features() const { return mFeatures; }
 
     CHIP_ERROR ReadMembership(EndpointId endpoint, AttributeValueEncoder & aEncoder);

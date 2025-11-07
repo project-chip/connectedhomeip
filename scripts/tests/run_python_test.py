@@ -167,9 +167,10 @@ class AppProcessManager:
               help="Do not print output from passing tests. Use this flag in CI to keep GitHub log size manageable.")
 @click.option("--load-from-env", default=None, help="YAML file that contains values for environment variables.")
 @click.option("--run", type=str, multiple=True, help="Run only the specified test run(s).")
+@click.option("--app-filter", type=str, default=None, help="Run only for the specified app(s). Comma separated.")
 def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
          app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
-         script_gdb: bool, quiet: bool, load_from_env, run):
+         script_gdb: bool, quiet: bool, load_from_env, run, app_filter):
     if load_from_env:
         reader = MetadataReader(load_from_env)
         runs = reader.parse_script(script)
@@ -195,6 +196,12 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
     if run:
         # Filter runs based on the command line arguments
         runs = [r for r in runs if r.run in run]
+
+    if app_filter:
+        allowed_apps = [s.strip() for s in app_filter.split(',')]
+        # app name in metadata is like "${APP_NAME}"
+        allowed_apps_with_format = [f"${{{app}}}" for app in allowed_apps]
+        runs = [r for r in runs if r.app in allowed_apps_with_format]
 
     # Override runs Metadata with the command line options
     for run in runs:
@@ -326,7 +333,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
 
         if quiet:
             if exit_code:
-                sys.stdout.write(stream_output.getvalue().decode('utf-8'))
+                sys.stdout.write(stream_output.getvalue().decode('utf-8', errors='replace'))
             else:
                 logging.info("Test completed successfully")
 
