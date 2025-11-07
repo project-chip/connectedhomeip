@@ -249,7 +249,7 @@ static void sceneOnOffCallback(EndpointId endpoint)
     ReturnOnFailure(sOnOffSceneHandler.mSceneEndpointStatePairs.GetPair(endpoint, savedState));
     CommandId command = (savedState.mValue) ? Commands::On::Id : Commands::Off::Id;
     OnOffServer::Instance().setOnOffValue(endpoint, command, false);
-    TEMPORARY_RETURN_IGNORED sOnOffSceneHandler.mSceneEndpointStatePairs.RemovePair(endpoint);
+    ReturnOnFailure(sOnOffSceneHandler.mSceneEndpointStatePairs.RemovePair(endpoint));
 }
 #endif // defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 

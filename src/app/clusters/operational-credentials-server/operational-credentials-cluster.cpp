@@ -1111,10 +1111,8 @@ void OperationalCredentialsCluster::FailSafeCleanup(const DeviceLayer::ChipDevic
 CHIP_ERROR OperationalCredentialsCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-    TEMPORARY_RETURN_IGNORED mOpCredsContext.fabricTable.AddFabricDelegate(this);
-    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler,
-                                                                            reinterpret_cast<intptr_t>(this));
-    return CHIP_NO_ERROR;
+    ReturnErrorOnFailure(mOpCredsContext.fabricTable.AddFabricDelegate(this));
+    return DeviceLayer::PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
 }
 
 void OperationalCredentialsCluster::Shutdown()

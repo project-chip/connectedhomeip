@@ -581,7 +581,7 @@ CHIP_ERROR StoreSceneParse(const FabricIndex & fabricIdx, const EndpointId & end
     }
 
     // Gets the EFS
-    TEMPORARY_RETURN_IGNORED sceneTable->SceneSaveEFS(scene);
+    ReturnErrorOnFailure(sceneTable->SceneSaveEFS(scene));
     // Insert in Scene Table
     ReturnErrorOnFailure(sceneTable->SetSceneTableEntry(fabricIdx, scene));
 
@@ -628,7 +628,7 @@ CHIP_ERROR RecallSceneParse(const FabricIndex & fabricIdx, const EndpointId & en
         }
     }
 
-    TEMPORARY_RETURN_IGNORED sceneTable->SceneApplyEFS(scene);
+    ReturnErrorOnFailure(sceneTable->SceneApplyEFS(scene));
 
     // Update FabricSceneInfo, at this point the scene is considered valid
     ReturnErrorOnFailure(
@@ -1099,7 +1099,8 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
 
             scene.mStorageId = SceneStorageId(sceneId, req.groupIdentifierTo);
 
-            TEMPORARY_RETURN_IGNORED sceneTable->SetSceneTableEntry(ctx.mCommandHandler.GetAccessingFabricIndex(), scene);
+            ReturnOnFailure(AddResponseOnError(
+                ctx, response, sceneTable->SetSceneTableEntry(ctx.mCommandHandler.GetAccessingFabricIndex(), scene)));
 
             // Update SceneInfoStruct Attributes after each insert in case we hit max capacity in the middle of the loop
             ReturnOnFailure(AddResponseOnError(
@@ -1119,7 +1120,8 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
 
     scene.mStorageId = SceneStorageId(req.sceneIdentifierTo, req.groupIdentifierTo);
 
-    TEMPORARY_RETURN_IGNORED sceneTable->SetSceneTableEntry(ctx.mCommandHandler.GetAccessingFabricIndex(), scene);
+    ReturnOnFailure(
+        AddResponseOnError(ctx, response, sceneTable->SetSceneTableEntry(ctx.mCommandHandler.GetAccessingFabricIndex(), scene)));
 
     // Update Attributes
     ReturnOnFailure(

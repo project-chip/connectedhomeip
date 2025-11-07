@@ -78,8 +78,7 @@ CHIP_ERROR TemperatureControlAttrAccess::Read(const ConcreteReadAttributePath & 
         TemperatureControl::SupportedTemperatureLevelsIteratorDelegate * instance = TemperatureControl::GetInstance();
         if (instance == nullptr)
         {
-            TEMPORARY_RETURN_IGNORED aEncoder.EncodeEmptyList();
-            return CHIP_NO_ERROR;
+            return aEncoder.EncodeEmptyList();
         }
         instance->Reset(aPath.mEndpointId);
         err = aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
