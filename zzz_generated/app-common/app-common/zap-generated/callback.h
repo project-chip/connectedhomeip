@@ -7191,12 +7191,6 @@ bool emberAfWaterTankLevelMonitoringClusterResetConditionCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::WaterTankLevelMonitoring::Commands::ResetCondition::DecodableType & commandData);
 /**
- * @brief Boolean State Configuration Cluster SuppressAlarm Command callback (from client)
- */
-bool emberAfBooleanStateConfigurationClusterSuppressAlarmCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::BooleanStateConfiguration::Commands::SuppressAlarm::DecodableType & commandData);
-/**
  * @brief Valve Configuration and Control Cluster Open Command callback (from client)
  */
 bool emberAfValveConfigurationAndControlClusterOpenCallback(
