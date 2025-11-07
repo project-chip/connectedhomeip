@@ -88,16 +88,16 @@ struct mDnsQueryCtx
 
     mDnsQueryCtx(void * context, DnsBrowseCallback aBrowseCallback)
     {
-        link.next = nullptr;
-        link.list = nullptr;
+        link.next          = nullptr;
+        link.list          = nullptr;
         matterCtx          = context;
         mDnsBrowseCallback = aBrowseCallback;
         error              = CHIP_NO_ERROR;
     }
     mDnsQueryCtx(void * context, DnsResolveCallback aResolveCallback)
     {
-        link.next = nullptr;
-        link.list = nullptr;
+        link.next           = nullptr;
+        link.list           = nullptr;
         matterCtx           = context;
         mDnsResolveCallback = aResolveCallback;
         error               = CHIP_NO_ERROR;
@@ -882,7 +882,7 @@ static void OtTxtCallback(otInstance * aInstance, const otMdnsTxtResult * aResul
 
         if (alloc.AnyAllocFailed())
         {
-            bSendDispatch = false;
+            bSendDispatch          = false;
             pResolveContext->error = CHIP_ERROR_NO_MEMORY;
         }
         else
