@@ -63,12 +63,9 @@ public:
         streamer_printf(streamer_get(), "   ICD is operating as a:         %s\r\n", result.isICDOperatingAsLIT ? "LIT" : "SIT");
 
         // Schedule a retry. Not called directly so we do not recurse in OnNodeAddressResolved
-        DeviceLayer::SystemLayer().ScheduleLambda([this] {
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this] {
             CHIP_ERROR err = AddressResolve::Resolver::Instance().TryNextResult(Handle());
-            if (err != CHIP_NO_ERROR && err != CHIP_ERROR_NOT_FOUND)
-            {
-                ChipLogError(Discovery, "Failed to list next result: %" CHIP_ERROR_FORMAT, err.Format());
-            }
+            SuccessOrLog((err == CHIP_ERROR_NOT_FOUND) ? CHIP_NO_ERROR : err, Discovery, "Failed to list next result");
         });
     }
 
@@ -105,7 +102,16 @@ public:
         }
 
         char rotatingId[Dnssd::kMaxRotatingIdLen * 2 + 1];
-        Encoding::BytesToUppercaseHexString(nodeData.rotatingId, nodeData.rotatingIdLen, rotatingId, sizeof(rotatingId));
+        const char * rotatingIdStr;
+        if (Encoding::BytesToUppercaseHexString(nodeData.rotatingId, nodeData.rotatingIdLen, rotatingId, sizeof(rotatingId)) ==
+            CHIP_NO_ERROR)
+        {
+            rotatingIdStr = rotatingId;
+        }
+        else
+        {
+            rotatingIdStr = "<invalid bytes>";
+        }
 
         streamer_printf(streamer_get(), "DNS browse succeeded: \r\n");
         streamer_printf(streamer_get(), "   Hostname: %s\r\n", nodeData.hostName);
@@ -117,7 +123,7 @@ public:
         streamer_printf(streamer_get(), "   Commissioning mode: %d\r\n", static_cast<int>(nodeData.commissioningMode));
         streamer_printf(streamer_get(), "   Pairing hint: %u\r\n", nodeData.pairingHint);
         streamer_printf(streamer_get(), "   Pairing instruction: %s\r\n", nodeData.pairingInstruction);
-        streamer_printf(streamer_get(), "   Rotating ID %s\r\n", rotatingId);
+        streamer_printf(streamer_get(), "   Rotating ID %s\r\n", rotatingIdStr);
 
         auto retryInterval = nodeData.GetMrpRetryIntervalIdle();
 
@@ -242,7 +248,7 @@ CHIP_ERROR BrowseCommissionableHandler(int argc, char ** argv)
 
     streamer_printf(streamer_get(), "Browsing commissionable nodes...\r\n");
 
-    sResolverProxy.Init(DeviceLayer::UDPEndPointManager());
+    ReturnErrorOnFailure(sResolverProxy.Init(DeviceLayer::UDPEndPointManager()));
     sResolverProxy.SetDiscoveryDelegate(&sDnsShellResolverDelegate);
 
     return sResolverProxy.DiscoverCommissionableNodes(filter);
@@ -255,7 +261,7 @@ CHIP_ERROR BrowseCommissionerHandler(int argc, char ** argv)
 
     streamer_printf(streamer_get(), "Browsing commissioners...\r\n");
 
-    sResolverProxy.Init(DeviceLayer::UDPEndPointManager());
+    ReturnErrorOnFailure(sResolverProxy.Init(DeviceLayer::UDPEndPointManager()));
     sResolverProxy.SetDiscoveryDelegate(&sDnsShellResolverDelegate);
 
     return sResolverProxy.DiscoverCommissioners(filter);
@@ -268,7 +274,7 @@ CHIP_ERROR BrowseOperationalHandler(int argc, char ** argv)
 
     streamer_printf(streamer_get(), "Browsing operational...\r\n");
 
-    sResolverProxy.Init(DeviceLayer::UDPEndPointManager());
+    ReturnErrorOnFailure(sResolverProxy.Init(DeviceLayer::UDPEndPointManager()));
     sResolverProxy.SetDiscoveryDelegate(&sDnsShellResolverDelegate);
 
     return sResolverProxy.DiscoverOperationalNodes(filter);
