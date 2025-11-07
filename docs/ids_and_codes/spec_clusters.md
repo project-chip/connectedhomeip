@@ -78,7 +78,7 @@ The following markers are used in this document (matches the ID master list):
 |144           |0x0090    |Electrical Power Measurement                              |EPM            |   |C  |C  |C    |C          |C  |
 |145           |0x0091    |Electrical Energy Measurement                             |EEM            |   |C  |C  |C    |C          |C  |
 |148           |0x0094    |Water Heater Management                                   |EWATERHTR      |   |   |C  |C    |C          |C  |
-|149           |0x0095    |Commodity Price                                           |SEPR           |   |   |   |     |           |P  |
+|149           |0x0095    |Commodity Price                                           |SEPR           |   |   |   |     |           |C  |
 |151           |0x0097    |Messages                                                  |MESS           |   |C  |C  |C    |C          |C  |
 |152           |0x0098    |Device Energy Management                                  |DEM            |   |P  |C  |C    |C          |C  |
 |153           |0x0099    |Energy EVSE                                               |EEVSE          |   |C  |C  |C    |C          |C  |
@@ -90,8 +90,8 @@ The following markers are used in this document (matches the ID master list):
 |160           |0x00A0    |Electrical Grid Conditions                                |EGC            |   |   |   |     |           |P  |
 |257           |0x0101    |Door Lock                                                 |DRLK           |C  |C  |C  |C    |C          |C  |
 |258           |0x0102    |Window Covering                                           |WNCV           |C  |C  |C  |C    |C          |C  |
-|260           |0x0104    |Closure Control                                           |CLCTRL         |   |   |   |     |           |P  |
-|261           |0x0105    |Closure Dimension                                         |CLDIM          |   |   |   |     |           |P  |
+|260           |0x0104    |Closure Control                                           |CLCTRL         |   |   |   |     |           |C  |
+|261           |0x0105    |Closure Dimension                                         |CLDIM          |   |   |   |     |           |C  |
 |336           |0x0150    |Service Area                                              |SEAR           |   |   |C  |C    |C          |C  |
 |512           |0x0200    |Pump Configuration and Control                            |PCC            |C  |C  |C  |C    |C          |C  |
 |513           |0x0201    |Thermostat                                                |TSTAT          |C  |C  |C  |C    |C          |C  |
@@ -117,7 +117,7 @@ The following markers are used in this document (matches the ID master list):
 |1069          |0x042D    |PM10 Concentration Measurement                            |PMKCONC        |C  |C  |C  |C    |C          |C  |
 |1070          |0x042E    |Total Volatile Organic Compounds Concentration Measurement|TVOCCONC       |C  |C  |C  |C    |C          |C  |
 |1071          |0x042F    |Radon Concentration Measurement                           |RNCONC         |C  |C  |C  |C    |C          |C  |
-|1072          |0x0430    |Soil Measurement                                          |SOIL           |   |   |   |     |           |P  |
+|1072          |0x0430    |Soil Measurement                                          |SOIL           |   |   |   |     |           |C  |
 |1105          |0x0451    |Wi-Fi Network Management                                  |WIFINM         |   |   |C  |C    |C          |C  |
 |1106          |0x0452    |Thread Border Router Management                           |TBRM           |   |   |C  |C    |C          |C  |
 |1107          |0x0453    |Thread Network Directory                                  |THNETDIR       |   |   |C  |C    |C          |C  |
@@ -135,19 +135,19 @@ The following markers are used in this document (matches the ID master list):
 |1294          |0x050E    |Account Login                                             |ALOGIN         |C  |C  |C  |C    |C          |C  |
 |1295          |0x050F    |Content Control                                           |CONCON         |   |P  |P  |P    |P          |P  |
 |1296          |0x0510    |Content App Observer                                      |APPOBSERVER    |   |C  |C  |C    |C          |C  |
-|1360          |0x0550    |Zone Management                                           |ZONEMGMT       |   |   |   |     |           |P  |
-|1361          |0x0551    |Camera AV Stream Management                               |AVSM           |   |   |   |     |           |P  |
-|1362          |0x0552    |Camera AV Settings User Level Management                  |AVSUM          |   |   |   |     |           |P  |
-|1363          |0x0553    |WebRTC Transport Provider                                 |WEBRTCP        |   |   |   |     |           |P  |
-|1364          |0x0554    |WebRTC Transport Requestor                                |WEBRTCR        |   |   |   |     |           |P  |
-|1365          |0x0555    |Push AV Stream Transport                                  |PAVST          |   |   |   |     |           |P  |
-|1366          |0x0556    |Chime                                                     |CHIME          |   |   |   |     |           |P  |
+|1360          |0x0550    |Zone Management                                           |ZONEMGMT       |   |   |   |     |           |C  |
+|1361          |0x0551    |Camera AV Stream Management                               |AVSM           |   |   |   |     |           |C  |
+|1362          |0x0552    |Camera AV Settings User Level Management                  |AVSUM          |   |   |   |     |           |C  |
+|1363          |0x0553    |WebRTC Transport Provider                                 |WEBRTCP        |   |   |   |     |           |C  |
+|1364          |0x0554    |WebRTC Transport Requestor                                |WEBRTCR        |   |   |   |     |           |C  |
+|1365          |0x0555    |Push AV Stream Transport                                  |PAVST          |   |   |   |     |           |C  |
+|1366          |0x0556    |Chime                                                     |CHIME          |   |   |   |     |           |C  |
 |1792          |0x0700    |Commodity Tariff                                          |SETRF          |   |   |   |     |           |P  |
 |1872          |0x0750    |Ecosystem Information                                     |ECOINFO        |   |   |C  |C    |C          |C  |
 |1873          |0x0751    |Commissioner Control                                      |CCTRL          |   |   |C  |C    |C          |C  |
 |1874          |0x0752    |Joint Fabric Datastore                                    |JFDS           |   |   |P  |P    |P          |P  |
 |1875          |0x0753    |Joint Fabric Administrator                                |JFPKI          |   |   |P  |P    |P          |P  |
-|2049          |0x0801    |TLS Certificate Management                                |TLSCERT        |   |   |   |     |           |P  |
-|2050          |0x0802    |TLS Client Management                                     |TLSCLIENT      |   |   |   |     |           |P  |
-|2822          |0x0B06    |Meter Identification                                      |MTRID          |   |   |   |     |           |P  |
+|2049          |0x0801    |TLS Certificate Management                                |TLSCERT        |   |   |   |     |           |C  |
+|2050          |0x0802    |TLS Client Management                                     |TLSCLIENT      |   |   |   |     |           |C  |
+|2822          |0x0B06    |Meter Identification                                      |MTRID          |   |   |   |     |           |C  |
 |2823          |0x0B07    |Commodity Metering                                        |COMMTR         |   |   |   |     |           |P  |
