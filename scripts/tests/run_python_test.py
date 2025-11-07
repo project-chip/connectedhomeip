@@ -333,7 +333,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
 
         if quiet:
             if exit_code:
-                sys.stdout.write(stream_output.getvalue().decode('utf-8'))
+                sys.stdout.write(stream_output.getvalue().decode('utf-8', errors='replace'))
             else:
                 logging.info("Test completed successfully")
 

@@ -69,12 +69,12 @@ def splash() -> None:
 
 
 def load_config() -> None:
-    config = dict()
-    config["nrfconnect"] = dict()
-    config["esp32"] = dict()
-    config["silabs-thread"] = dict()
-    config["ameba"] = dict()
-    config["telink"] = dict()
+    config = {}
+    config["nrfconnect"] = {}
+    config["esp32"] = {}
+    config["silabs-thread"] = {}
+    config["ameba"] = {}
+    config["telink"] = {}
     configFile = f"{_CHEF_SCRIPT_PATH}/config.yaml"
     if (os.path.exists(configFile)):
         configStream = open(configFile, 'r')

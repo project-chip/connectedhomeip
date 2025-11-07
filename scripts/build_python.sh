@@ -37,7 +37,7 @@ echo_bold_white() {
 CHIP_ROOT=$(_normpath "$(dirname "$0")/..")
 
 declare enable_ble=true
-declare enable_nfc=true
+declare enable_nfc=false
 declare enable_ipv4=true
 declare wifi_paf_config=""
 declare chip_detail_logging=false
