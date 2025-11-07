@@ -57,7 +57,7 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0008" name="Level Control Cluster" revision="7">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0008" name="Level Control Cluster" revision="6">
   <revisionHistory>
     <revision revision="1" summary="Mandatory global ClusterRevision attribute added"/>
     <revision revision="2" summary="Added Options attribute, state change table; ZLO 1.0; Base cluster (no change) CCB 2085 1775 2281 2147"/>
@@ -65,7 +65,6 @@ Davis, CA 95616, USA
     <revision revision="4" summary="FeatureMap support with On/Off, Lighting and Frequency features"/>
     <revision revision="5" summary="New data model format and notation"/>
     <revision revision="6" summary="Added Q quality for CurrentLevel, CurrentFrequency and RemainingTime attributes, added clarifications for behavior related to Step value and adjusted constraint of DefaultMoveRate"/>
-    <revision revision="7" summary="Simplify MinLevel and MaxLevel constraint, add F quality, and make them mandatory in version 7 and later."/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0008" name="Level Control"/>
@@ -140,32 +139,30 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0002" name="MinLevel" type="uint8" default="1">
       <access read="true" readPrivilege="view"/>
-      <quality persistence="fixed"/>
-      <otherwiseConform>
-        <mandatoryConform>
-          <greaterOrEqualTerm>
-            <revision value="current"/>
-            <revision value="7"/>
-          </greaterOrEqualTerm>
-        </mandatoryConform>
-        <optionalConform/>
-      </otherwiseConform>
+      <optionalConform>
+        <feature name="LT"/>
+      </optionalConform>
+      <constraint>
+        <between>
+          <from value="1"/>
+          <to value="254"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0002" name="MinLevel" type="uint8" default="0">
+      <access read="true" readPrivilege="view"/>
+      <optionalConform>
+        <notTerm>
+          <feature name="LT"/>
+        </notTerm>
+      </optionalConform>
       <constraint>
         <max value="254"/>
       </constraint>
     </attribute>
     <attribute id="0x0003" name="MaxLevel" type="uint8" default="254">
       <access read="true" readPrivilege="view"/>
-      <quality persistence="fixed"/>
-      <otherwiseConform>
-        <mandatoryConform>
-          <greaterOrEqualTerm>
-            <revision value="current"/>
-            <revision value="7"/>
-          </greaterOrEqualTerm>
-        </mandatoryConform>
-        <optionalConform/>
-      </otherwiseConform>
+      <optionalConform/>
       <constraint>
         <between>
           <from>

@@ -93,9 +93,6 @@ Davis, CA 95616, USA
       <item value="0x4007" name="Warming"/>
       <item value="0x4008" name="Proofing"/>
       <item value="0x4009" name="Steam"/>
-      <item value="0x400A" name="Air Fry"/>
-      <item value="0x400B" name="Air Sous Vide"/>
-      <item value="0x400C" name="Frozen Food"/>
     </enum>
     <struct name="ModeOptionStruct">
       <field id="0" name="Label">

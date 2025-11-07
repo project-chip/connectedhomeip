@@ -87,7 +87,7 @@ The following markers are used in this document (matches the ID master list):
 |157           |0x009D    |Energy EVSE Mode                                          |EEVSEM         |   |C  |C  |C    |C          |C  |
 |158           |0x009E    |Water Heater Mode                                         |WHM            |   |   |C  |C    |C          |C  |
 |159           |0x009F    |Device Energy Management Mode                             |DEMM           |   |P  |C  |C    |C          |C  |
-|160           |0x00A0    |Electrical Grid Conditions                                |EGC            |   |   |   |     |           |P  |
+|160           |0x00A0    |Electrical Grid Conditions                                |EGC            |   |   |   |     |           |C  |
 |257           |0x0101    |Door Lock                                                 |DRLK           |C  |C  |C  |C    |C          |C  |
 |258           |0x0102    |Window Covering                                           |WNCV           |C  |C  |C  |C    |C          |C  |
 |260           |0x0104    |Closure Control                                           |CLCTRL         |   |   |   |     |           |C  |
