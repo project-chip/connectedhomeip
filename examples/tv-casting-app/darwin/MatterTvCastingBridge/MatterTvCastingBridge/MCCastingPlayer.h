@@ -159,6 +159,12 @@ typedef enum {
 - (void)disconnect;
 
 /**
+ * @brief Removes any fabric associated with this player in order to cause the UDC flow when
+ *     verifyOrEstablishConnection is called
+ */
+- (void)removeFabric;
+
+/**
  * @brief Get the CastingPlayer's connection state
  * @param state The current connection state that will be return.
  * @return nil if request submitted successfully, otherwise a NSError object corresponding to the error.
