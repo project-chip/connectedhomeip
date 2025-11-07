@@ -27,7 +27,7 @@ class OrderedPropsMeta(type):
     """
     @classmethod
     def __prepare__(mcls, name, bases, **kwargs):
-        return dict()  # preserve definition order
+        return {}  # preserve definition order
 
     def __new__(mcls, name, bases, namespace, **kwargs):
         cls = super().__new__(mcls, name, bases, dict(namespace))

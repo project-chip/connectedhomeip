@@ -1070,7 +1070,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             List[int]: List of all DayEntryIDs from the list of TariffPeriodStruct where particular TariffComponentID is present.
         """
 
-        return sorted(set([dayEntryID for tariff_period in self.tariffPeriodsValue if tariff_componentID in tariff_period.tariffComponentIDs for dayEntryID in tariff_period.dayEntryIDs]))
+        return sorted({dayEntryID for tariff_period in self.tariffPeriodsValue if tariff_componentID in tariff_period.tariffComponentIDs for dayEntryID in tariff_period.dayEntryIDs})
 
     async def get_tariff_period_label_for_particular_tariff_component(self, tariff_componentID: int) -> List[int]:
         """Gets Label field from the TariffPeriodStruct where particular TariffComponentID is present.

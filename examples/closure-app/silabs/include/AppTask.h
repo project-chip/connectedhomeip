@@ -85,6 +85,14 @@ public:
     static void UpdateClosureUI();
 #endif // DISPLAY_ENABLED
 
+    /**
+     * @brief Closure button action event handler
+     * Handles button press events for closure control operations
+     *
+     * @param aEvent pointer to the button event being processed
+     */
+    static void ClosureButtonActionEventHandler(AppEvent * aEvent);
+
 private:
     static AppTask sAppTask;
 
