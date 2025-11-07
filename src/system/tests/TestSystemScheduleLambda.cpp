@@ -19,6 +19,7 @@
 #include <lib/core/ErrorStr.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <system/SystemConfig.h>
 
@@ -41,10 +42,10 @@ public:
 TEST_F(TestSystemScheduleLambda, CheckScheduleLambda)
 {
     bool called = false;
-    chip::DeviceLayer::SystemLayer().ScheduleLambda([&called] {
+    EXPECT_SUCCESS(chip::DeviceLayer::SystemLayer().ScheduleLambda([&called] {
         called = true;
-        chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
-    });
+        EXPECT_SUCCESS(chip::DeviceLayer::PlatformMgr().StopEventLoopTask());
+    }));
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
     EXPECT_TRUE(called);
 }

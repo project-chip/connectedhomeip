@@ -29,6 +29,7 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <protocols/secure_channel/PairingSession.h>
 #include <system/SystemClock.h>
@@ -139,16 +140,19 @@ void EncodeSessionParamsHelper(const DecodeSessionParamsTestCase & testCase, TLV
     EXPECT_EQ(writer.StartContainer(ContextTag(kSessionParamsStructTag), kTLVType_Structure, sessionParamsContainer),
               CHIP_NO_ERROR);
 
-    writer.Put(ContextTag(SessionParameters::Tag::kSessionIdleInterval), testCase.mrpConfig.mIdleRetransTimeout.count());
-    writer.Put(ContextTag(SessionParameters::Tag::kSessionActiveInterval), testCase.mrpConfig.mActiveRetransTimeout.count());
-    writer.Put(ContextTag(SessionParameters::Tag::kSessionActiveThreshold), testCase.mrpConfig.mActiveThresholdTime.count());
+    EXPECT_SUCCESS(
+        writer.Put(ContextTag(SessionParameters::Tag::kSessionIdleInterval), testCase.mrpConfig.mIdleRetransTimeout.count()));
+    EXPECT_SUCCESS(
+        writer.Put(ContextTag(SessionParameters::Tag::kSessionActiveInterval), testCase.mrpConfig.mActiveRetransTimeout.count()));
+    EXPECT_SUCCESS(
+        writer.Put(ContextTag(SessionParameters::Tag::kSessionActiveThreshold), testCase.mrpConfig.mActiveThresholdTime.count()));
 
     if (testCase.includeVersionInfo)
     {
-        writer.Put(ContextTag(SessionParameters::Tag::kDataModelRevision), testCase.dataModelRev);
-        writer.Put(ContextTag(SessionParameters::Tag::kInteractionModelRevision), testCase.interactionModelRev);
-        writer.Put(ContextTag(SessionParameters::Tag::kSpecificationVersion), testCase.specVersion);
-        writer.Put(ContextTag(SessionParameters::Tag::kMaxPathsPerInvoke), testCase.maxPaths);
+        EXPECT_SUCCESS(writer.Put(ContextTag(SessionParameters::Tag::kDataModelRevision), testCase.dataModelRev));
+        EXPECT_SUCCESS(writer.Put(ContextTag(SessionParameters::Tag::kInteractionModelRevision), testCase.interactionModelRev));
+        EXPECT_SUCCESS(writer.Put(ContextTag(SessionParameters::Tag::kSpecificationVersion), testCase.specVersion));
+        EXPECT_SUCCESS(writer.Put(ContextTag(SessionParameters::Tag::kMaxPathsPerInvoke), testCase.maxPaths));
     }
 
     if (testCase.testFutureProofing)
@@ -157,7 +161,7 @@ void EncodeSessionParamsHelper(const DecodeSessionParamsTestCase & testCase, TLV
         constexpr uint8_t kFutureProofTlvElementTag = 17;
 
         uint32_t futureProofTlvElement = 0x777666;
-        writer.Put(ContextTag(kFutureProofTlvElementTag), futureProofTlvElement);
+        EXPECT_SUCCESS(writer.Put(ContextTag(kFutureProofTlvElementTag), futureProofTlvElement));
     }
 
     if (testCase.includeEndContainer)

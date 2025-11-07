@@ -31,6 +31,7 @@
 #include <lib/core/TLV.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/Span.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
 #include <algorithm>
@@ -241,7 +242,7 @@ protected:
 
     ~TestCodeDrivenDataModelProvider() override
     {
-        mProvider.Shutdown();
+        EXPECT_SUCCESS(mProvider.Shutdown());
         mEndpointStorage.clear();
         mOwnedRegistrations.clear();
     }
@@ -472,7 +473,7 @@ TEST_F(TestCodeDrivenDataModelProvider, EndpointWithStaticData)
     ASSERT_EQ(eps.size(), 1u);
     EXPECT_EQ(eps[0].id, endpointEntry4.id);
 
-    localProvider.Shutdown();
+    EXPECT_SUCCESS(localProvider.Shutdown());
 }
 
 TEST_F(TestCodeDrivenDataModelProvider, EndpointWithEmptyStaticData)
@@ -504,7 +505,7 @@ TEST_F(TestCodeDrivenDataModelProvider, AddClusterFailsIfEndpointExists)
     EXPECT_EQ(localProvider.AddCluster(registration), CHIP_ERROR_INCORRECT_STATE);
     EXPECT_EQ(testCluster.startupCallCount, 0);
 
-    localProvider.Shutdown();
+    EXPECT_SUCCESS(localProvider.Shutdown());
 }
 
 TEST_F(TestCodeDrivenDataModelProvider, AddClusterDoesntStartCluster)
@@ -520,7 +521,7 @@ TEST_F(TestCodeDrivenDataModelProvider, AddClusterDoesntStartCluster)
     EXPECT_EQ(localProvider.AddCluster(registration), CHIP_NO_ERROR);
     EXPECT_EQ(testCluster.startupCallCount, 0);
 
-    localProvider.Shutdown();
+    EXPECT_SUCCESS(localProvider.Shutdown());
 }
 
 TEST_F(TestCodeDrivenDataModelProvider, AddClusterWithEmptyPathFails)
@@ -555,7 +556,7 @@ TEST_F(TestCodeDrivenDataModelProvider, ClusterStartupNotCalledWhenAddingToNonSt
     ASSERT_EQ(localProvider.Startup(mContext), CHIP_NO_ERROR);
     EXPECT_EQ(testCluster.startupCallCount, 1);
 
-    localProvider.Shutdown();
+    EXPECT_SUCCESS(localProvider.Shutdown());
 }
 
 TEST_F(TestCodeDrivenDataModelProvider, RemoveClusterFailsIfEndpointExists)
@@ -576,7 +577,7 @@ TEST_F(TestCodeDrivenDataModelProvider, RemoveClusterFailsIfEndpointExists)
     EXPECT_EQ(localProvider.RemoveCluster(&testCluster), CHIP_ERROR_INCORRECT_STATE);
     EXPECT_EQ(testCluster.shutdownCallCount, 0);
 
-    localProvider.Shutdown();
+    EXPECT_SUCCESS(localProvider.Shutdown());
 }
 
 TEST_F(TestCodeDrivenDataModelProvider, RemoveClusterSucceedsIfEndpointRemoved)
@@ -598,7 +599,7 @@ TEST_F(TestCodeDrivenDataModelProvider, RemoveClusterSucceedsIfEndpointRemoved)
     EXPECT_EQ(localProvider.RemoveCluster(&testCluster), CHIP_NO_ERROR);
     EXPECT_EQ(testCluster.shutdownCallCount, 1);
 
-    localProvider.Shutdown();
+    EXPECT_SUCCESS(localProvider.Shutdown());
 }
 
 TEST_F(TestCodeDrivenDataModelProvider, ClusterShutdownNotCalledWhenRemovingFromNonStartedProvider)
@@ -644,17 +645,17 @@ TEST_F(TestCodeDrivenDataModelProvider, ReadAttribute)
 {
     static MockServerCluster testCluster({ 1, 10 }, 1, {});
     static ServerClusterRegistration registration(testCluster);
-    mProvider.AddCluster(registration);
+    EXPECT_SUCCESS(mProvider.AddCluster(registration));
 
     auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
     mEndpointStorage.push_back(std::move(endpoint));
     mOwnedRegistrations.push_back(
         std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
-    mProvider.AddEndpoint(*mOwnedRegistrations.back());
+    EXPECT_SUCCESS(mProvider.AddEndpoint(*mOwnedRegistrations.back()));
 
     uint32_t expectedValue = testCluster.mAttributeValue;
     uint32_t readValue;
-    ReadU32Attribute(mProvider, ConcreteDataAttributePath(1, 10, 1), readValue);
+    EXPECT_SUCCESS(ReadU32Attribute(mProvider, ConcreteDataAttributePath(1, 10, 1), readValue));
     EXPECT_EQ(expectedValue, readValue);
 }
 
@@ -662,13 +663,13 @@ TEST_F(TestCodeDrivenDataModelProvider, WriteAttribute)
 {
     static MockServerCluster testCluster({ 1, 10 }, 1, {});
     static ServerClusterRegistration registration(testCluster);
-    mProvider.AddCluster(registration);
+    EXPECT_SUCCESS(mProvider.AddCluster(registration));
 
     auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
     mEndpointStorage.push_back(std::move(endpoint));
     mOwnedRegistrations.push_back(
         std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
-    mProvider.AddEndpoint(*mOwnedRegistrations.back());
+    EXPECT_SUCCESS(mProvider.AddEndpoint(*mOwnedRegistrations.back()));
 
     auto path             = ConcreteDataAttributePath(1, 10, 1);
     uint32_t valueToWrite = 123;
@@ -676,7 +677,7 @@ TEST_F(TestCodeDrivenDataModelProvider, WriteAttribute)
     EXPECT_EQ(testCluster.mLastWriteRequest.path, path);
 
     uint32_t readValue;
-    ReadU32Attribute(mProvider, path, readValue);
+    EXPECT_SUCCESS(ReadU32Attribute(mProvider, path, readValue));
     EXPECT_EQ(readValue, valueToWrite);
 }
 
@@ -684,13 +685,13 @@ TEST_F(TestCodeDrivenDataModelProvider, InvokeCommand)
 {
     static MockServerCluster testCluster({ 1, 10 }, 1, {});
     static ServerClusterRegistration registration(testCluster);
-    mProvider.AddCluster(registration);
+    EXPECT_SUCCESS(mProvider.AddCluster(registration));
 
     auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
     mEndpointStorage.push_back(std::move(endpoint));
     mOwnedRegistrations.push_back(
         std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
-    mProvider.AddEndpoint(*mOwnedRegistrations.back());
+    EXPECT_SUCCESS(mProvider.AddEndpoint(*mOwnedRegistrations.back()));
 
     System::PacketBufferHandle buffer = System::PacketBufferHandle::New(128);
     TLV::TLVReader reader;
@@ -709,13 +710,13 @@ TEST_F(TestCodeDrivenDataModelProvider, IterateOverAttributes)
 {
     static MockServerCluster testCluster({ 1, 10 }, 1, {});
     static ServerClusterRegistration registration(testCluster);
-    mProvider.AddCluster(registration);
+    EXPECT_SUCCESS(mProvider.AddCluster(registration));
 
     auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
     mEndpointStorage.push_back(std::move(endpoint));
     mOwnedRegistrations.push_back(
         std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
-    mProvider.AddEndpoint(*mOwnedRegistrations.back());
+    EXPECT_SUCCESS(mProvider.AddEndpoint(*mOwnedRegistrations.back()));
 
     ReadOnlyBufferBuilder<DataModel::AttributeEntry> builder;
     EXPECT_EQ(mProvider.Attributes(ConcreteClusterPath(1, 10), builder), CHIP_NO_ERROR);
@@ -728,13 +729,13 @@ TEST_F(TestCodeDrivenDataModelProvider, IterateOverAcceptedCommands)
 {
     static MockServerCluster testCluster({ 1, 10 }, 1, {});
     static ServerClusterRegistration registration(testCluster);
-    mProvider.AddCluster(registration);
+    EXPECT_SUCCESS(mProvider.AddCluster(registration));
 
     auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
     mEndpointStorage.push_back(std::move(endpoint));
     mOwnedRegistrations.push_back(
         std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
-    mProvider.AddEndpoint(*mOwnedRegistrations.back());
+    EXPECT_SUCCESS(mProvider.AddEndpoint(*mOwnedRegistrations.back()));
 
     ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> builder;
     EXPECT_EQ(mProvider.AcceptedCommands(ConcreteClusterPath(1, 10), builder), CHIP_NO_ERROR);
@@ -747,13 +748,13 @@ TEST_F(TestCodeDrivenDataModelProvider, IterateOverGeneratedCommands)
 {
     static MockServerCluster testCluster({ 1, 10 }, 1, {});
     static ServerClusterRegistration registration(testCluster);
-    mProvider.AddCluster(registration);
+    EXPECT_SUCCESS(mProvider.AddCluster(registration));
 
     auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
     mEndpointStorage.push_back(std::move(endpoint));
     mOwnedRegistrations.push_back(
         std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
-    mProvider.AddEndpoint(*mOwnedRegistrations.back());
+    EXPECT_SUCCESS(mProvider.AddEndpoint(*mOwnedRegistrations.back()));
 
     ReadOnlyBufferBuilder<CommandId> builder;
     EXPECT_EQ(mProvider.GeneratedCommands(ConcreteClusterPath(1, 10), builder), CHIP_NO_ERROR);
@@ -766,13 +767,13 @@ TEST_F(TestCodeDrivenDataModelProvider, GetEventInfo)
 {
     static MockServerCluster testCluster({ 1, 10 }, 1, {});
     static ServerClusterRegistration registration(testCluster);
-    mProvider.AddCluster(registration);
+    EXPECT_SUCCESS(mProvider.AddCluster(registration));
 
     auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
     mEndpointStorage.push_back(std::move(endpoint));
     mOwnedRegistrations.push_back(
         std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
-    mProvider.AddEndpoint(*mOwnedRegistrations.back());
+    EXPECT_SUCCESS(mProvider.AddEndpoint(*mOwnedRegistrations.back()));
 
     DataModel::EventEntry eventInfo;
     testCluster.mEventEntry = { .readPrivilege = Access::Privilege::kView };
@@ -784,13 +785,13 @@ TEST_F(TestCodeDrivenDataModelProvider, ListAttributeWriteNotification)
 {
     static MockServerCluster testCluster({ 1, 10 }, 1, {});
     static ServerClusterRegistration registration(testCluster);
-    mProvider.AddCluster(registration);
+    EXPECT_SUCCESS(mProvider.AddCluster(registration));
 
     auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
     mEndpointStorage.push_back(std::move(endpoint));
     mOwnedRegistrations.push_back(
         std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
-    mProvider.AddEndpoint(*mOwnedRegistrations.back());
+    EXPECT_SUCCESS(mProvider.AddEndpoint(*mOwnedRegistrations.back()));
 
     ConcreteAttributePath path(1, 10, 1);
     mProvider.ListAttributeWriteNotification(path, DataModel::ListWriteOperation::kListWriteSuccess, 1);
@@ -815,13 +816,13 @@ TEST_F(TestCodeDrivenDataModelProvider, Temporary_ReportAttributeChanged)
 {
     static MockServerCluster testCluster({ 1, 10 }, 1, {});
     static ServerClusterRegistration registration(testCluster);
-    mProvider.AddCluster(registration);
+    EXPECT_SUCCESS(mProvider.AddCluster(registration));
 
     auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
     mEndpointStorage.push_back(std::move(endpoint));
     mOwnedRegistrations.push_back(
         std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
-    mProvider.AddEndpoint(*mOwnedRegistrations.back());
+    EXPECT_SUCCESS(mProvider.AddEndpoint(*mOwnedRegistrations.back()));
 
     AttributePathParams path(1, 10, 1);
     mProvider.Temporary_ReportAttributeChanged(path);
@@ -855,7 +856,7 @@ TEST_F(TestCodeDrivenDataModelProvider, ReadAttributeOnInvalidPath)
     mEndpointStorage.push_back(std::move(endpoint));
     mOwnedRegistrations.push_back(
         std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
-    mProvider.AddEndpoint(*mOwnedRegistrations.back());
+    EXPECT_SUCCESS(mProvider.AddEndpoint(*mOwnedRegistrations.back()));
 
     uint32_t readValue;
     EXPECT_EQ(ReadU32Attribute(mProvider, ConcreteDataAttributePath(1, 99, 1), readValue), CHIP_ERROR_KEY_NOT_FOUND);
@@ -868,7 +869,7 @@ TEST_F(TestCodeDrivenDataModelProvider, WriteAttributeOnInvalidPath)
     mEndpointStorage.push_back(std::move(endpoint));
     mOwnedRegistrations.push_back(
         std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
-    mProvider.AddEndpoint(*mOwnedRegistrations.back());
+    EXPECT_SUCCESS(mProvider.AddEndpoint(*mOwnedRegistrations.back()));
 
     uint32_t valueToWrite = 123;
     EXPECT_EQ(WriteU32Attribute(mProvider, ConcreteDataAttributePath(1, 99, 1), valueToWrite), CHIP_ERROR_KEY_NOT_FOUND);
@@ -886,7 +887,7 @@ TEST_F(TestCodeDrivenDataModelProvider, InvokeCommandOnInvalidEndpoint)
     mEndpointStorage.push_back(std::move(endpoint));
     mOwnedRegistrations.push_back(
         std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
-    mProvider.AddEndpoint(*mOwnedRegistrations.back());
+    EXPECT_SUCCESS(mProvider.AddEndpoint(*mOwnedRegistrations.back()));
 
     System::PacketBufferHandle buffer = System::PacketBufferHandle::New(128);
     TLV::TLVReader reader;
@@ -907,7 +908,7 @@ TEST_F(TestCodeDrivenDataModelProvider, InvokeCommandOnInvalidCluster)
     mEndpointStorage.push_back(std::move(endpoint));
     mOwnedRegistrations.push_back(
         std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
-    mProvider.AddEndpoint(*mOwnedRegistrations.back());
+    EXPECT_SUCCESS(mProvider.AddEndpoint(*mOwnedRegistrations.back()));
 
     System::PacketBufferHandle buffer = System::PacketBufferHandle::New(128);
     TLV::TLVReader reader;
@@ -1012,7 +1013,7 @@ TEST_F(TestCodeDrivenDataModelProvider, AddEndpointStartsClusterWithMultipleEndp
     ASSERT_EQ(localProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
     ASSERT_EQ(testCluster.startupCallCount, 1); // Should not start again
 
-    localProvider.Shutdown();
+    EXPECT_SUCCESS(localProvider.Shutdown());
 }
 
 TEST_F(TestCodeDrivenDataModelProvider, RemoveEndpointShutsDownClusterWithMultipleEndpoints)
@@ -1042,7 +1043,7 @@ TEST_F(TestCodeDrivenDataModelProvider, RemoveEndpointShutsDownClusterWithMultip
     ASSERT_EQ(localProvider.RemoveEndpoint(endpointEntry2.id), CHIP_NO_ERROR);
     ASSERT_EQ(testCluster.shutdownCallCount, 1);
 
-    localProvider.Shutdown();
+    EXPECT_SUCCESS(localProvider.Shutdown());
 }
 
 TEST_F(TestCodeDrivenDataModelProvider, RemoveEndpointThenRemoveClusterCallsShutdownOnce)
@@ -1065,7 +1066,7 @@ TEST_F(TestCodeDrivenDataModelProvider, RemoveEndpointThenRemoveClusterCallsShut
     ASSERT_EQ(localProvider.RemoveCluster(&testCluster), CHIP_NO_ERROR);
     EXPECT_EQ(testCluster.shutdownCallCount, 1);
 
-    localProvider.Shutdown();
+    EXPECT_SUCCESS(localProvider.Shutdown());
 }
 
 TEST_F(TestCodeDrivenDataModelProvider, StartupOnlyStartsClustersWithRegisteredEndpoints)
@@ -1091,5 +1092,5 @@ TEST_F(TestCodeDrivenDataModelProvider, StartupOnlyStartsClustersWithRegisteredE
     EXPECT_EQ(clusterWithRegisteredEndpoint.startupCallCount, 1);
     EXPECT_EQ(clusterWithoutRegisteredEndpoint.startupCallCount, 0);
 
-    localProvider.Shutdown();
+    EXPECT_SUCCESS(localProvider.Shutdown());
 }

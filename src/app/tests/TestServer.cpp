@@ -19,6 +19,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/server/Server.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <platform/CHIPDeviceLayer.h>
 
 namespace chip {
@@ -57,11 +58,11 @@ public:
 TEST_F(TestServer, TestFactoryResetEvent)
 {
     TestEventHandler handler;
-    PlatformMgr().AddEventHandler(TestEventHandler::EventHandler, reinterpret_cast<intptr_t>(&handler));
+    EXPECT_SUCCESS(PlatformMgr().AddEventHandler(TestEventHandler::EventHandler, reinterpret_cast<intptr_t>(&handler)));
 
     Server::GetInstance().ScheduleFactoryReset();
 
-    PlatformMgr().ScheduleWork([](intptr_t) -> void { PlatformMgr().StopEventLoopTask(); });
+    EXPECT_SUCCESS(PlatformMgr().ScheduleWork([](intptr_t) -> void { EXPECT_SUCCESS(PlatformMgr().StopEventLoopTask()); }));
     PlatformMgr().RunEventLoop();
 
     EXPECT_EQ(handler.mEvent.Type, DeviceEventType::kFactoryReset);

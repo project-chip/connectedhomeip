@@ -39,6 +39,7 @@
 #include <lib/asn1/ASN1.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 #include <platform/ConfigurationManager.h>
 
@@ -224,7 +225,7 @@ CHIP_ERROR VerifySignatureWithNocPublicKey(FabricTable & fabricTable, FabricInde
     VerifyOrReturnError(signatureBytes.size() >= Crypto::P256ECDSASignature::Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
     Crypto::P256ECDSASignature signature;
     memcpy(signature.Bytes(), signatureBytes.data(), signature.Capacity());
-    signature.SetLength(signature.Capacity());
+    EXPECT_SUCCESS(signature.SetLength(signature.Capacity()));
 
     return nocPublicKey.ECDSA_validate_msg_signature(message.data(), message.size(), signature);
 }
@@ -252,7 +253,7 @@ struct TestFabricTable : public ::testing::Test
 
         uint8_t csrBuf[chip::Crypto::kMIN_CSR_Buffer_Size];
         MutableByteSpan csrSpan{ csrBuf };
-        VerifyOrDie(fabricTable.AllocatePendingOperationalKey(chip::NullOptional, csrSpan) == CHIP_NO_ERROR);
+        SuccessOrDie(fabricTable.AllocatePendingOperationalKey(chip::NullOptional, csrSpan));
 
         VerifyOrDie(fabricCertAuthority.SetIncludeIcac(true).GenerateNocChain(fabricId, kNodeId, csrSpan).GetStatus() ==
                     CHIP_NO_ERROR);
@@ -260,10 +261,10 @@ struct TestFabricTable : public ::testing::Test
         ByteSpan icac = fabricCertAuthority.GetIcac();
         ByteSpan noc  = fabricCertAuthority.GetNoc();
 
-        VerifyOrDie(fabricTable.AddNewPendingTrustedRootCert(rcac) == CHIP_NO_ERROR);
+        SuccessOrDie(fabricTable.AddNewPendingTrustedRootCert(rcac));
         FabricIndex newFabricIndex = kUndefinedFabricIndex;
-        VerifyOrDie(fabricTable.AddNewPendingFabricWithOperationalKeystore(noc, icac, vendorId, &newFabricIndex) == CHIP_NO_ERROR);
-        VerifyOrDie(fabricTable.CommitPendingFabricData() == CHIP_NO_ERROR);
+        SuccessOrDie(fabricTable.AddNewPendingFabricWithOperationalKeystore(noc, icac, vendorId, &newFabricIndex));
+        SuccessOrDie(fabricTable.CommitPendingFabricData());
 
         // Validate contents
         const auto * fabricInfo = fabricTable.FindFabricWithIndex(newFabricIndex);
@@ -1218,7 +1219,7 @@ TEST_F(TestFabricTable, TestAddMultipleSameRootDifferentFabricId)
         EXPECT_EQ(fabricCertAuthority.SetIncludeIcac(true).GenerateNocChain(fabricId, nodeId, csrSpan).GetStatus(), CHIP_NO_ERROR);
         ByteSpan rcac = fabricCertAuthority.GetRcac();
         // Keep a copy for second scope check
-        CopySpanToMutableSpan(rcac, rcac1Span);
+        EXPECT_SUCCESS(CopySpanToMutableSpan(rcac, rcac1Span));
 
         ByteSpan icac = fabricCertAuthority.GetIcac();
         ByteSpan noc  = fabricCertAuthority.GetNoc();
@@ -1342,7 +1343,7 @@ TEST_F(TestFabricTable, TestAddMultipleSameFabricIdDifferentRoot)
         EXPECT_EQ(fabricCertAuthority1.SetIncludeIcac(true).GenerateNocChain(fabricId, nodeId, csrSpan).GetStatus(), CHIP_NO_ERROR);
         ByteSpan rcac = fabricCertAuthority1.GetRcac();
         // Keep a copy for second scope check
-        CopySpanToMutableSpan(rcac, rcac1Span);
+        EXPECT_SUCCESS(CopySpanToMutableSpan(rcac, rcac1Span));
 
         ByteSpan icac = fabricCertAuthority1.GetIcac();
         ByteSpan noc  = fabricCertAuthority1.GetNoc();
@@ -3148,7 +3149,7 @@ TEST_F(TestFabricTable, DeleteFabricCallsDelegate)
     ByteSpan icac = fabricCertAuthority.GetIcac();
     ByteSpan noc  = fabricCertAuthority.GetNoc();
 
-    fabricTable.AddNewPendingTrustedRootCert(rcac);
+    EXPECT_SUCCESS(fabricTable.AddNewPendingTrustedRootCert(rcac));
 
     constexpr uint16_t kVendorId = 0xFFF1u;
     FabricIndex newFabricIndex   = kUndefinedFabricIndex;
@@ -3158,10 +3159,10 @@ TEST_F(TestFabricTable, DeleteFabricCallsDelegate)
     EXPECT_EQ(fabricTableHolder.ReinitFabricTable(&storage), CHIP_NO_ERROR);
 
     TestFabricTableDelegate fabricDelegate;
-    fabricTable.AddFabricDelegate(&fabricDelegate);
+    EXPECT_SUCCESS(fabricTable.AddFabricDelegate(&fabricDelegate));
 
     // Check if calling Delete invokes OnFabricRemoved on delegates
-    fabricTable.Delete(newFabricIndex);
+    EXPECT_EQ(fabricTable.Delete(newFabricIndex), CHIP_ERROR_NOT_FOUND);
     EXPECT_TRUE(fabricDelegate.willBeRemovedCalled);
     EXPECT_TRUE(fabricDelegate.onRemovedCalled);
 
@@ -3193,7 +3194,7 @@ TEST_F(TestFabricTable, VidVerificationSigningWorksWithoutVvs)
         memcpy(rootKeyForTestSerialized.Bytes(), kTestCert_Root02_PublicKey.data(), kTestCert_Root02_PublicKey.size());
         memcpy(rootKeyForTestSerialized.Bytes() + kTestCert_Root02_PublicKey.size(), kTestCert_Root02_PrivateKey.data(),
                kTestCert_Root02_PrivateKey.size());
-        rootKeyForTestSerialized.SetLength(rootKeyForTestSerialized.Capacity());
+        EXPECT_SUCCESS(rootKeyForTestSerialized.SetLength(rootKeyForTestSerialized.Capacity()));
     }
 
     // Initialize a fabric table.
@@ -3762,7 +3763,7 @@ TEST_F(TestFabricTable, VidVerificationSigningFailsOnBadInput)
         memcpy(rootKeyForTestSerialized.Bytes(), kTestCert_Root02_PublicKey.data(), kTestCert_Root02_PublicKey.size());
         memcpy(rootKeyForTestSerialized.Bytes() + kTestCert_Root02_PublicKey.size(), kTestCert_Root02_PrivateKey.data(),
                kTestCert_Root02_PrivateKey.size());
-        rootKeyForTestSerialized.SetLength(rootKeyForTestSerialized.Capacity());
+        EXPECT_SUCCESS(rootKeyForTestSerialized.SetLength(rootKeyForTestSerialized.Capacity()));
     }
 
     // Initialize a fabric table.

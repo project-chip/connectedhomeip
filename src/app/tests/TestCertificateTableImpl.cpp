@@ -22,6 +22,7 @@
 #include <lib/support/TestPersistentStorageDelegate.h>
 
 #include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 using namespace chip;
@@ -76,8 +77,8 @@ public:
 
     static void ResetCertificateTable()
     {
-        sCertificateTable.RemoveFabric(kFabric1);
-        sCertificateTable.RemoveFabric(kFabric2);
+        EXPECT_SUCCESS(sCertificateTable.RemoveFabric(kFabric1));
+        EXPECT_SUCCESS(sCertificateTable.RemoveFabric(kFabric2));
     }
 
 protected:

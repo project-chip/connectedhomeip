@@ -3,6 +3,7 @@
 #include <app/data-model-provider/MetadataTypes.h>
 #include <data-model-providers/codedriven/endpoint/EndpointInterfaceRegistry.h>
 #include <data-model-providers/codedriven/endpoint/SpanEndpoint.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 #include <algorithm>
 #include <array>
@@ -138,8 +139,8 @@ TEST(TestEndpointInterfaceRegistry, IteratorTest)
     EndpointInterfaceRegistration registration1(*endpoint1, { .id = kTestEndpointId1 });
     EndpointInterfaceRegistration registration2(*endpoint2, { .id = kTestEndpointId2 });
 
-    registry.Register(registration1);
-    registry.Register(registration2); // Registry stores in LIFO order for simple list prepend
+    EXPECT_SUCCESS(registry.Register(registration1));
+    EXPECT_SUCCESS(registry.Register(registration2)); // Registry stores in LIFO order for simple list prepend
 
     size_t count = 0;
     bool found1  = false;

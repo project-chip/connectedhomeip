@@ -37,6 +37,7 @@
 #include <lib/core/TLVDebug.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CHIPCounter.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
 #include <protocols/interaction_model/Constants.h>
@@ -170,7 +171,7 @@ public:
         AppContext::SetUp();
 
         Access::GetAccessControl().Finish();
-        Access::GetAccessControl().Init(GetTestAccessControlDelegate(), gDeviceTypeResolver);
+        EXPECT_SUCCESS(Access::GetAccessControl().Init(GetTestAccessControlDelegate(), gDeviceTypeResolver));
         mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&TestImCustomDataModel::Instance());
         chip::Test::SetMockNodeConfig(TestMockNodeConfig());
     }

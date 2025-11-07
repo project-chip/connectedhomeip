@@ -20,6 +20,7 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/dnssd/IPAddressSorter.h>
 #include <lib/support/StringBuilder.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <system/RAIIMockClock.h>
 #include <system/SystemLayerImpl.h>
 #include <transport/raw/PeerAddress.h>
@@ -550,7 +551,7 @@ public:
 class TestAddressResolveDefaultImplWithSystemLayer : public ::testing::Test
 {
 public:
-    void SetUp() { mSystemLayer.Init(); }
+    void SetUp() { EXPECT_SUCCESS(mSystemLayer.Init()); }
 
     void TearDown() { mSystemLayer.Shutdown(); }
 
@@ -709,7 +710,7 @@ TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, CancellingLo
     }
 
     // push some NodeLookup handle into Resolver's internal list
-    resolver.LookupNode(request, handle);
+    EXPECT_SUCCESS(resolver.LookupNode(request, handle));
 
     // set up a failure listener
     CHIP_ERROR expectedError = CHIP_NO_ERROR;

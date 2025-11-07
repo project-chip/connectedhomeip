@@ -33,6 +33,7 @@
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/LinkedList.h>
 #include <lib/support/logging/Constants.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -101,11 +102,12 @@ void PrintEventLog(chip::app::PriorityLevel aPriorityLevel)
     chip::TLV::TLVReader reader;
     size_t elementCount;
     chip::app::CircularEventBufferWrapper bufWrapper;
-    chip::app::EventManagement::GetInstance().GetEventReader(reader, aPriorityLevel, &bufWrapper);
+    EXPECT_SUCCESS(chip::app::EventManagement::GetInstance().GetEventReader(reader, aPriorityLevel, &bufWrapper));
 
-    chip::TLV::Utilities::Count(reader, elementCount, false);
+    EXPECT_SUCCESS(chip::TLV::Utilities::Count(reader, elementCount, false));
     printf("Found %u elements \n", static_cast<unsigned int>(elementCount));
-    chip::TLV::Debug::Dump(reader, SimpleDumpWriter);
+    CHIP_ERROR err = chip::TLV::Debug::Dump(reader, SimpleDumpWriter);
+    EXPECT_SUCCESS((err != CHIP_ERROR_INVALID_TLV_ELEMENT) ? err : CHIP_NO_ERROR);
 }
 
 static void CheckLogState(chip::app::EventManagement & aLogMgmt, size_t expectedNumEvents, chip::app::PriorityLevel aPriority)
@@ -146,7 +148,7 @@ static void CheckLogReadOut(chip::app::EventManagement & alogMgmt, chip::EventNu
     EXPECT_EQ(totalNumElements, eventCount);
 
     reader.Init(backingStore, writer.GetLengthWritten());
-    chip::TLV::Debug::Dump(reader, SimpleDumpWriter);
+    EXPECT_SUCCESS(chip::TLV::Debug::Dump(reader, SimpleDumpWriter));
 }
 
 class TestEventGenerator : public chip::app::EventLoggingDelegate
@@ -242,12 +244,12 @@ TEST_F(TestFabricScopedEventLogging, TestCheckLogEventWithEvictToNextBuffer)
 
     // Invalidate 3 event with fabric 1
     descriptor.fabricIndex = 1;
-    logMgmt.FabricRemoved(descriptor.fabricIndex);
+    EXPECT_SUCCESS(logMgmt.FabricRemoved(descriptor.fabricIndex));
     CheckLogReadOut(logMgmt, 0, 0, &pathsWithWildcard[1], descriptor);
 
     // Invalidate 1 event with fabric 2
     descriptor.fabricIndex = 2;
-    logMgmt.FabricRemoved(descriptor.fabricIndex);
+    EXPECT_SUCCESS(logMgmt.FabricRemoved(descriptor.fabricIndex));
     CheckLogReadOut(logMgmt, 0, 0, &pathsWithWildcard[1], descriptor);
 }
 
