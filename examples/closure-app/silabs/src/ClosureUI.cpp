@@ -62,7 +62,6 @@ static const uint8_t bleLogo[]          = { BLUETOOTH_ICON_SMALL };
 chip::app::Clusters::ClosureControl::MainStateEnum ClosureUI::sMainState =
     chip::app::Clusters::ClosureControl::MainStateEnum::kUnknownEnumValue;
 
-
 // Initialize arrays using buffer sizes
 char ClosureUI::sPositionText[ClosureUIStrings::BUFFER_SIZE_POSITION];
 char ClosureUI::sLatchText[ClosureUIStrings::BUFFER_SIZE_LATCH];
