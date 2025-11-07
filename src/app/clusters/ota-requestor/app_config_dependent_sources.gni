@@ -28,6 +28,4 @@ app_config_dependent_sources = [
   "OTARequestorStorage.h",
   "OTATestEventTriggerHandler.cpp",
   "OTATestEventTriggerHandler.h",
-  "ota-requestor-server.cpp",
-  "ota-requestor-server.h",
 ]

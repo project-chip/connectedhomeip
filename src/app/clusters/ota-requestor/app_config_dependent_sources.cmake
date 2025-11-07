@@ -32,6 +32,4 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/OTARequestorStorage.h"
     "${CLUSTER_DIR}/OTATestEventTriggerHandler.cpp"
     "${CLUSTER_DIR}/OTATestEventTriggerHandler.h"
-    "${CLUSTER_DIR}/ota-requestor-server.cpp"
-    "${CLUSTER_DIR}/ota-requestor-server.h"
 )
