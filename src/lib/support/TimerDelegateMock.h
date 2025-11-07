@@ -17,13 +17,15 @@
 
 #pragma once
 
-#include <app/reporting/ReportScheduler.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/TimerDelegate.h>
+#include <system/SystemClock.h>
 
-class TestTimerDelegate : public chip::app::reporting::ReportScheduler::TimerDelegate
+namespace chip {
+
+class TimerDelegateMock : public TimerDelegate
 {
 public:
-    using TimerContext = chip::app::reporting::TimerContext;
-
     CHIP_ERROR StartTimer(TimerContext * context, chip::System::Clock::Timeout aTimeout) override
     {
         mTimerContext = context;
@@ -55,3 +57,5 @@ private:
     chip::System::Clock::Timestamp mTimerTimeout        = chip::System::Clock::Milliseconds64(0x7FFFFFFFFFFFFFFF);
     chip::System::Clock::Timestamp mMockSystemTimestamp = chip::System::Clock::Milliseconds64(0);
 };
+
+} // namespace chip

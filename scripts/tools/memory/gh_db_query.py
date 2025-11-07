@@ -100,7 +100,7 @@ def postprocess_canned_sql_option(config: Config, key: str,
             args = {metavar: value}
         title = title.format(**args)
     else:
-        values = tuple()
+        values = ()
 
     if config['queries'] is None:
         config['queries'] = []

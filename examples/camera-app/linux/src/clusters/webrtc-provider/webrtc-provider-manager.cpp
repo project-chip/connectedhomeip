@@ -529,6 +529,30 @@ CHIP_ERROR WebRTCProviderManager::ValidateAudioStreamID(uint16_t audioStreamId)
     return avsmController.ValidateAudioStreamID(audioStreamId);
 }
 
+CHIP_ERROR WebRTCProviderManager::IsStreamUsageSupported(StreamUsageEnum streamUsage)
+{
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    auto & hal                   = mCameraDevice->GetCameraHALInterface();
+    auto & streamUsagePriorities = hal.GetStreamUsagePriorities();
+
+    // Check if the streamUsage is in the StreamUsagePriorities list
+    for (const auto & usage : streamUsagePriorities)
+    {
+        if (usage == streamUsage)
+        {
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    ChipLogError(Camera, "StreamUsage %u not found in StreamUsagePriorities", to_underlying(streamUsage));
+    return CHIP_ERROR_NOT_FOUND;
+}
+
 CHIP_ERROR WebRTCProviderManager::IsHardPrivacyModeActive(bool & isActive)
 {
     if (mCameraDevice == nullptr)

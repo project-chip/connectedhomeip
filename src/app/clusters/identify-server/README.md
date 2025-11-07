@@ -56,7 +56,7 @@ for each endpoint that requires it. Using `RegisteredServerCluster` simplifies
 registration.
 
 ```cpp
-#include "app/TimerDelegates.h"
+#include "app/DefaultTimerDelegate.h"
 #include "app/server-cluster/ServerClusterInterfaceRegistry.h"
 
 // In a .cpp file
@@ -113,7 +113,7 @@ you more control and results in a smaller, more efficient binary.
 // In a header or source file:
 #include "app/clusters/identify-server/IdentifyCluster.h"
 #include "app/server-cluster/ServerClusterInterfaceRegistry.h"
-#include "app/TimerDelegates.h"
+#include "app/DefaultTimerDelegate.h"
 
 class MyIdentifyDelegate : public chip::app::Clusters::IdentifyDelegate { /* ... */ };
 

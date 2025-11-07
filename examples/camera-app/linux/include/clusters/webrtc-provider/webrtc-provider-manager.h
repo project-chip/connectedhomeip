@@ -80,6 +80,8 @@ public:
 
     CHIP_ERROR ValidateAudioStreamID(uint16_t audioStreamId) override;
 
+    CHIP_ERROR IsStreamUsageSupported(StreamUsageEnum streamUsage) override;
+
     CHIP_ERROR IsHardPrivacyModeActive(bool & isActive) override;
 
     CHIP_ERROR IsSoftRecordingPrivacyModeActive(bool & isActive) override;

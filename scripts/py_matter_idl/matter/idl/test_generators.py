@@ -149,8 +149,7 @@ class GeneratorTest:
                 generator = self._create_generator(storage, idl)
                 generator.render(dry_run=False)
 
-                checker.assertEqual(storage.checked_files, set(
-                    map(lambda x: x.file_name, test.outputs)))
+                checker.assertEqual(storage.checked_files, {x.file_name for x in test.outputs})
 
 
 def build_tests(yaml_data) -> List[GeneratorTest]:
