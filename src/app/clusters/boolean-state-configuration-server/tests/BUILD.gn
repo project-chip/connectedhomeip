@@ -20,9 +20,7 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libTestBooleanStateConfigurationCluster"
 
-  test_sources = [
-    "TestBooleanStateConfigurationCluster.cpp",
-  ]
+  test_sources = [ "TestBooleanStateConfigurationCluster.cpp" ]
 
   cflags = [ "-Wconversion" ]
 
