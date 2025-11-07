@@ -22,6 +22,8 @@
 
 #include <system/SystemClock.h>
 
+#include <variant>
+
 #if TIME_SYNC_ENABLE_TSC_FEATURE
 #include <app/InteractionModelEngine.h>
 #endif
@@ -176,9 +178,9 @@ TimeSynchronizationCluster::TimeSynchronizationCluster(
     EndpointId endpoint, const TimeSynchronizationCluster::OptionalAttributeSet & optionalAttributeSet,
     const BitFlags<Feature> features, SupportsDNSResolve::TypeInfo::Type supportsDNSResolve, TimeZoneDatabaseEnum timeZoneDatabase,
     TimeSourceEnum timeSource, NTPServerAvailable::TypeInfo::Type ntpServerAvailable) :
-    DefaultServerCluster({ endpoint, TimeSynchronization::Id }),
-    mOptionalAttributeSet(optionalAttributeSet), mFeatures(features), mSupportsDNSResolve(supportsDNSResolve),
-    mTimeZoneDatabase(timeZoneDatabase), mTimeSource(timeSource), mNTPServerAvailable(ntpServerAvailable),
+    DefaultServerCluster({ endpoint, TimeSynchronization::Id }), mOptionalAttributeSet(optionalAttributeSet), mFeatures(features),
+    mSupportsDNSResolve(supportsDNSResolve), mTimeZoneDatabase(timeZoneDatabase), mTimeSource(timeSource),
+    mNTPServerAvailable(ntpServerAvailable),
 #if TIME_SYNC_ENABLE_TSC_FEATURE
     mOnDeviceConnectedCallback(OnDeviceConnectedWrapper, this),
     mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureWrapper, this),
@@ -574,33 +576,38 @@ void TimeSynchronizationCluster::OnPlatformEventFn(const DeviceLayer::ChipDevice
 
 CHIP_ERROR TimeSynchronizationCluster::SetTrustedTimeSource(const DataModel::Nullable<Structs::TrustedTimeSourceStruct::Type> & tts)
 {
-    CHIP_ERROR err     = CHIP_NO_ERROR;
-    mTrustedTimeSource = tts;
-    NotifyAttributeChanged(TrustedTimeSource::Id);
-    if (!mTrustedTimeSource.IsNull())
-    {
-        err = mTimeSyncDataProvider.StoreTrustedTimeSource(mTrustedTimeSource.Value());
-    }
-    else
-    {
-        err = mTimeSyncDataProvider.ClearTrustedTimeSource();
-    }
-    if (mGranularity == GranularityEnum::kNoTimeGranularity)
-    {
-        AttemptToGetTime();
-    }
-    GetDelegate()->TrustedTimeSourceAvailabilityChanged(!mTrustedTimeSource.IsNull(), mGranularity);
-    return err;
+    auto setAttribute = [this](const DataModel::Nullable<Structs::TrustedTimeSourceStruct::Type> & trustedTimeSource) {
+        CHIP_ERROR err     = CHIP_NO_ERROR;
+        mTrustedTimeSource = trustedTimeSource;
+        if (!mTrustedTimeSource.IsNull())
+        {
+            err = mTimeSyncDataProvider.StoreTrustedTimeSource(mTrustedTimeSource.Value());
+        }
+        else
+        {
+            err = mTimeSyncDataProvider.ClearTrustedTimeSource();
+        }
+        if (mGranularity == GranularityEnum::kNoTimeGranularity)
+        {
+            AttemptToGetTime();
+        }
+        GetDelegate()->TrustedTimeSourceAvailabilityChanged(!mTrustedTimeSource.IsNull(), mGranularity);
+        return err;
+    };
+    return NotifyAttributeChangedIfSuccess(TrustedTimeSource::Id, setAttribute(tts)).GetUnderlyingError();
 }
 
 inline CHIP_ERROR TimeSynchronizationCluster::SetDefaultNTP(const DataModel::Nullable<CharSpan> & dntp)
 {
-    NotifyAttributeChanged(DefaultNTP::Id);
-    if (!dntp.IsNull())
-    {
-        return mTimeSyncDataProvider.StoreDefaultNtp(dntp.Value());
-    }
-    return mTimeSyncDataProvider.ClearDefaultNtp();
+    auto setAttribute = [this](const DataModel::Nullable<CharSpan> & defaultNtp) {
+        if (!defaultNtp.IsNull())
+        {
+            return mTimeSyncDataProvider.StoreDefaultNtp(defaultNtp.Value());
+        }
+        return mTimeSyncDataProvider.ClearDefaultNtp();
+    };
+
+    return NotifyAttributeChangedIfSuccess(DefaultNTP::Id, setAttribute(dntp)).GetUnderlyingError();
 }
 
 void TimeSynchronizationCluster::InitTimeZone()
@@ -616,113 +623,115 @@ void TimeSynchronizationCluster::InitTimeZone()
 
 CHIP_ERROR TimeSynchronizationCluster::SetTimeZone(const DataModel::DecodableList<Structs::TimeZoneStruct::Type> & tzL)
 {
-    size_t items;
-    VerifyOrReturnError(CHIP_NO_ERROR == tzL.ComputeSize(&items), CHIP_IM_GLOBAL_STATUS(InvalidCommand));
+    auto setAttribute = [this](const DataModel::DecodableList<Structs::TimeZoneStruct::Type> & tzList) {
+        size_t items;
+        VerifyOrReturnError(CHIP_NO_ERROR == tzList.ComputeSize(&items), CHIP_IM_GLOBAL_STATUS(InvalidCommand));
 
-    if (items > CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE)
-    {
-        return CHIP_ERROR_BUFFER_TOO_SMALL;
-    }
-
-    if (items == 0)
-    {
-        NotifyAttributeChanged(TimeZone::Id);
-        return ClearTimeZone();
-    }
-
-    char name[TimeSyncDataProvider::kTimeZoneNameLength];
-    Structs::TimeZoneStruct::Type lastTz;
-    TimeState lastTzState = UpdateTimeZoneState();
-
-    if (lastTzState != TimeState::kInvalid)
-    {
-        const auto & tzStore = GetTimeZone()[0];
-        lastTz.offset        = tzStore.timeZone.offset;
-        if (tzStore.timeZone.name.HasValue())
+        if (items > CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE)
         {
-            lastTz.name.SetValue(CharSpan(name));
-            memcpy(name, tzStore.name, sizeof(tzStore.name));
+            return CHIP_ERROR_BUFFER_TOO_SMALL;
         }
-    }
 
-    auto newTzL = tzL.begin();
-    uint8_t i   = 0;
-    InitTimeZone();
+        if (items == 0)
+        {
+            return ClearTimeZone();
+        }
 
-    while (newTzL.Next())
-    {
-        auto & tzStore     = mTimeZoneObj.timeZoneList[i];
-        const auto & newTz = newTzL.GetValue();
-        if (newTz.offset < -43200 || newTz.offset > 50400)
+        char name[TimeSyncDataProvider::kTimeZoneNameLength];
+        Structs::TimeZoneStruct::Type lastTz;
+        TimeState lastTzState = UpdateTimeZoneState();
+
+        if (lastTzState != TimeState::kInvalid)
         {
-            ReturnErrorOnFailure(LoadTimeZone());
-            return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
+            const auto & tzStore = GetTimeZone()[0];
+            lastTz.offset        = tzStore.timeZone.offset;
+            if (tzStore.timeZone.name.HasValue())
+            {
+                lastTz.name.SetValue(CharSpan(name));
+                memcpy(name, tzStore.name, sizeof(tzStore.name));
+            }
         }
-        // first element shall have validAt entry of 0
-        if (i == 0 && newTz.validAt != 0)
+
+        auto newTzL = tzList.begin();
+        uint8_t i   = 0;
+        InitTimeZone();
+
+        while (newTzL.Next())
         {
-            ReturnErrorOnFailure(LoadTimeZone());
-            return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
-        }
-        // if second element, it shall have validAt entry of non-0
-        if (i != 0 && newTz.validAt == 0)
-        {
-            ReturnErrorOnFailure(LoadTimeZone());
-            return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
-        }
-        tzStore.timeZone.offset  = newTz.offset;
-        tzStore.timeZone.validAt = newTz.validAt;
-        if (newTz.name.HasValue() && newTz.name.Value().size() > 0)
-        {
-            size_t len = newTz.name.Value().size();
-            if (len > sizeof(tzStore.name))
+            auto & tzStore     = mTimeZoneObj.timeZoneList[i];
+            const auto & newTz = newTzL.GetValue();
+            if (newTz.offset < -43200 || newTz.offset > 50400)
             {
                 ReturnErrorOnFailure(LoadTimeZone());
                 return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
             }
-            memset(tzStore.name, 0, sizeof(tzStore.name));
-            MutableCharSpan tempSpan(tzStore.name, len);
-            if (CHIP_NO_ERROR != CopyCharSpanToMutableCharSpan(newTz.name.Value(), tempSpan))
+            // first element shall have validAt entry of 0
+            if (i == 0 && newTz.validAt != 0)
             {
                 ReturnErrorOnFailure(LoadTimeZone());
-                return CHIP_IM_GLOBAL_STATUS(InvalidCommand);
+                return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
             }
-            tzStore.timeZone.name.SetValue(CharSpan(tzStore.name, len));
+            // if second element, it shall have validAt entry of non-0
+            if (i != 0 && newTz.validAt == 0)
+            {
+                ReturnErrorOnFailure(LoadTimeZone());
+                return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
+            }
+            tzStore.timeZone.offset  = newTz.offset;
+            tzStore.timeZone.validAt = newTz.validAt;
+            if (newTz.name.HasValue() && newTz.name.Value().size() > 0)
+            {
+                size_t len = newTz.name.Value().size();
+                if (len > sizeof(tzStore.name))
+                {
+                    ReturnErrorOnFailure(LoadTimeZone());
+                    return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
+                }
+                memset(tzStore.name, 0, sizeof(tzStore.name));
+                MutableCharSpan tempSpan(tzStore.name, len);
+                if (CHIP_NO_ERROR != CopyCharSpanToMutableCharSpan(newTz.name.Value(), tempSpan))
+                {
+                    ReturnErrorOnFailure(LoadTimeZone());
+                    return CHIP_IM_GLOBAL_STATUS(InvalidCommand);
+                }
+                tzStore.timeZone.name.SetValue(CharSpan(tzStore.name, len));
+            }
+            else
+            {
+                tzStore.timeZone.name.ClearValue();
+            }
+            i++;
         }
-        else
+        if (CHIP_NO_ERROR != newTzL.GetStatus())
         {
-            tzStore.timeZone.name.ClearValue();
+            ReturnErrorOnFailure(LoadTimeZone());
+            return CHIP_IM_GLOBAL_STATUS(InvalidCommand);
         }
-        i++;
-    }
-    if (CHIP_NO_ERROR != newTzL.GetStatus())
-    {
-        ReturnErrorOnFailure(LoadTimeZone());
-        return CHIP_IM_GLOBAL_STATUS(InvalidCommand);
-    }
 
-    mTimeZoneObj.validSize = i;
+        mTimeZoneObj.validSize = i;
 
-    if (lastTzState != TimeState::kInvalid && TimeState::kInvalid != UpdateTimeZoneState())
-    {
-        bool emit       = false;
-        const auto & tz = GetTimeZone()[0].timeZone;
-        if (tz.offset != lastTz.offset)
+        if (lastTzState != TimeState::kInvalid && TimeState::kInvalid != UpdateTimeZoneState())
         {
-            emit = true;
+            bool emit       = false;
+            const auto & tz = GetTimeZone()[0].timeZone;
+            if (tz.offset != lastTz.offset)
+            {
+                emit = true;
+            }
+            if ((tz.name.HasValue() && lastTz.name.HasValue()) && !(tz.name.Value().data_equal(lastTz.name.Value())))
+            {
+                emit = true;
+            }
+            if (emit)
+            {
+                mEventFlag = TimeSyncEventFlag::kTimeZoneStatus;
+            }
         }
-        if ((tz.name.HasValue() && lastTz.name.HasValue()) && !(tz.name.Value().data_equal(lastTz.name.Value())))
-        {
-            emit = true;
-        }
-        if (emit)
-        {
-            mEventFlag = TimeSyncEventFlag::kTimeZoneStatus;
-        }
-    }
 
-    NotifyAttributeChanged(TimeZone::Id);
-    return mTimeSyncDataProvider.StoreTimeZone(GetTimeZone());
+        return mTimeSyncDataProvider.StoreTimeZone(GetTimeZone());
+    };
+
+    return NotifyAttributeChangedIfSuccess(TimeZone::Id, setAttribute(tzL)).GetUnderlyingError();
 }
 
 CHIP_ERROR TimeSynchronizationCluster::LoadTimeZone()
@@ -745,68 +754,70 @@ void TimeSynchronizationCluster::InitDSTOffset()
 
 CHIP_ERROR TimeSynchronizationCluster::SetDSTOffset(const DataModel::DecodableList<Structs::DSTOffsetStruct::Type> & dstL)
 {
-    size_t items;
-    VerifyOrReturnError(CHIP_NO_ERROR == dstL.ComputeSize(&items), CHIP_IM_GLOBAL_STATUS(InvalidCommand));
+    auto setAttribute = [this](const DataModel::DecodableList<Structs::DSTOffsetStruct::Type> & dstList) {
+        size_t items;
+        VerifyOrReturnError(CHIP_NO_ERROR == dstList.ComputeSize(&items), CHIP_IM_GLOBAL_STATUS(InvalidCommand));
 
-    if (items > CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE)
-    {
-        return CHIP_ERROR_BUFFER_TOO_SMALL;
-    }
+        if (items > CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE)
+        {
+            return CHIP_ERROR_BUFFER_TOO_SMALL;
+        }
 
-    if (items == 0)
-    {
-        NotifyAttributeChanged(DSTOffset::Id);
-        return ClearDSTOffset();
-    }
+        if (items == 0)
+        {
+            return ClearDSTOffset();
+        }
 
-    auto newDstL = dstL.begin();
-    size_t i     = 0;
-    InitDSTOffset();
+        auto newDstL = dstList.begin();
+        size_t i     = 0;
+        InitDSTOffset();
 
-    while (newDstL.Next())
-    {
-        auto & dst = mDstOffsetObj.dstOffsetList[i];
-        dst        = newDstL.GetValue();
-        i++;
-    }
+        while (newDstL.Next())
+        {
+            auto & dst = mDstOffsetObj.dstOffsetList[i];
+            dst        = newDstL.GetValue();
+            i++;
+        }
 
-    if (CHIP_NO_ERROR != newDstL.GetStatus())
-    {
-        ReturnErrorOnFailure(LoadDSTOffset());
-        return CHIP_IM_GLOBAL_STATUS(InvalidCommand);
-    }
-
-    mDstOffsetObj.validSize = i;
-
-    // only 1 validuntil null value and shall be last in the list
-    uint64_t lastValidUntil = 0;
-    for (i = 0; i < mDstOffsetObj.validSize; i++)
-    {
-        const auto & dstItem = GetDSTOffset()[i];
-        // list should be sorted by validStarting
-        // validUntil shall be larger than validStarting
-        if (!dstItem.validUntil.IsNull() && dstItem.validStarting >= dstItem.validUntil.Value())
+        if (CHIP_NO_ERROR != newDstL.GetStatus())
         {
             ReturnErrorOnFailure(LoadDSTOffset());
-            return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
+            return CHIP_IM_GLOBAL_STATUS(InvalidCommand);
         }
-        // validStarting shall not be smaller than validUntil of previous entry
-        if (dstItem.validStarting < lastValidUntil)
-        {
-            ReturnErrorOnFailure(LoadDSTOffset());
-            return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
-        }
-        lastValidUntil = !dstItem.validUntil.IsNull() ? dstItem.validUntil.Value() : lastValidUntil;
-        // only 1 validUntil null value and shall be last in the list
-        if (dstItem.validUntil.IsNull() && (i != mDstOffsetObj.validSize - 1))
-        {
-            ReturnErrorOnFailure(LoadDSTOffset());
-            return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
-        }
-    }
 
-    NotifyAttributeChanged(DSTOffset::Id);
-    return mTimeSyncDataProvider.StoreDSTOffset(GetDSTOffset());
+        mDstOffsetObj.validSize = i;
+
+        // only 1 validuntil null value and shall be last in the list
+        uint64_t lastValidUntil = 0;
+        for (i = 0; i < mDstOffsetObj.validSize; i++)
+        {
+            const auto & dstItem = GetDSTOffset()[i];
+            // list should be sorted by validStarting
+            // validUntil shall be larger than validStarting
+            if (!dstItem.validUntil.IsNull() && dstItem.validStarting >= dstItem.validUntil.Value())
+            {
+                ReturnErrorOnFailure(LoadDSTOffset());
+                return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
+            }
+            // validStarting shall not be smaller than validUntil of previous entry
+            if (dstItem.validStarting < lastValidUntil)
+            {
+                ReturnErrorOnFailure(LoadDSTOffset());
+                return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
+            }
+            lastValidUntil = !dstItem.validUntil.IsNull() ? dstItem.validUntil.Value() : lastValidUntil;
+            // only 1 validUntil null value and shall be last in the list
+            if (dstItem.validUntil.IsNull() && (i != mDstOffsetObj.validSize - 1))
+            {
+                ReturnErrorOnFailure(LoadDSTOffset());
+                return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
+            }
+        }
+
+        return mTimeSyncDataProvider.StoreDSTOffset(GetDSTOffset());
+    };
+
+    return NotifyAttributeChangedIfSuccess(DSTOffset::Id, setAttribute(dstL)).GetUnderlyingError();
 }
 
 CHIP_ERROR TimeSynchronizationCluster::LoadDSTOffset()
@@ -849,17 +860,20 @@ inline DataModel::List<Structs::DSTOffsetStruct::Type> & TimeSynchronizationClus
 
 CHIP_ERROR TimeSynchronizationCluster::SetUTCTime(uint64_t utcTime, GranularityEnum granularity, TimeSourceEnum source)
 {
-    CHIP_ERROR err = UpdateUTCTime(utcTime);
-    if (err != CHIP_NO_ERROR && !RuntimeOptionsProvider::Instance().GetSimulateNoInternalTime())
-    {
-        ChipLogError(Zcl, "Error setting UTC time on the device: %" CHIP_ERROR_FORMAT, err.Format());
-        return err;
-    }
-    NotifyAttributeChanged(UTCTime::Id);
-    GetDelegate()->UTCTimeAvailabilityChanged(utcTime);
-    mGranularity = granularity;
-    mTimeSource  = source;
-    return CHIP_NO_ERROR;
+    auto setAttribute = [this](uint64_t utct, GranularityEnum gran, TimeSourceEnum src) {
+        CHIP_ERROR err = UpdateUTCTime(utct);
+        if (err != CHIP_NO_ERROR && !RuntimeOptionsProvider::Instance().GetSimulateNoInternalTime())
+        {
+            ChipLogError(Zcl, "Error setting UTC time on the device: %" CHIP_ERROR_FORMAT, err.Format());
+            return err;
+        }
+        GetDelegate()->UTCTimeAvailabilityChanged(utct);
+        mGranularity = gran;
+        mTimeSource  = src;
+        return CHIP_NO_ERROR;
+    };
+
+    return NotifyAttributeChangedIfSuccess(UTCTime::Id, setAttribute(utcTime, granularity, source)).GetUnderlyingError();
 }
 
 CHIP_ERROR TimeSynchronizationCluster::GetLocalTime(DataModel::Nullable<uint64_t> & localTime)
