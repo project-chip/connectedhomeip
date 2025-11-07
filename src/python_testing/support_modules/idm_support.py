@@ -77,17 +77,6 @@ def client_cmd(cmd_class):
 
 
 # ============================================================================
-# IDMSupport Helper Class
-# ============================================================================
-
-class IDMSupport:
-    """Helper class for IDM test support functionality."""
-
-    def __init__(self, test_instance):
-        self.test = test_instance
-
-
-# ============================================================================
 # IDMBaseTest - Main Base Class
 # ============================================================================
 
@@ -166,7 +155,7 @@ class IDMBaseTest(MatterBaseTest):
             ACL list from the DUT
         """
         sub = await ctrl.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=[(ep, Clusters.AccessControl.Attributes.Acl)],
             keepSubscriptions=False,
             fabricFiltered=True
@@ -712,7 +701,7 @@ class IDMBaseTest(MatterBaseTest):
         Returns:
             Read response with events and attributes
         """
-        return await self.default_controller.Read(nodeid=self.dut_node_id, attributes=[()], events=[()])
+        return await self.default_controller.Read(nodeId=self.dut_node_id, attributes=[()], events=[()])
 
     async def read_data_version_filter_multiple_clusters(self, endpoint, cluster, attribute, other_cluster, other_attribute):
         """Read from multiple clusters with data version filter on one cluster.
