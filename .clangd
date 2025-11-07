@@ -1,0 +1,15 @@
+CompileFlags:
+  # CompilationDatabase: /usr/local/google/home/andreilitvin/devel/connectedhomeip/out/linux-x64-all-clusters-clang
+  CompilationDatabase: /usr/local/google/home/andreilitvin/devel/connectedhomeip/out/linux-x64-tests-clang-googletest
+
+  # CompilationDatabase: /usr/local/google/home/andreilitvin/devel/connectedhomeip/out/linux-x64-tests-clang
+  # CompilationDatabase: /usr/local/google/home/andreilitvin/devel/connectedhomeip/out/linux-x64-chip-tool-clang/
+
+Diagnostics:
+  ClangTidy:
+    Add: modernize*
+    Remove:
+      - modernize-avoid-c-arrays
+      - modernize-concat-nested-namespaces
+      - modernize-use-nodiscard
+      - modernize-use-trailing-return-type
