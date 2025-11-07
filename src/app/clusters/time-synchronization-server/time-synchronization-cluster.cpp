@@ -177,9 +177,9 @@ TimeSynchronization::Delegate * TimeSynchronizationCluster::GetDelegate()
 TimeSynchronizationCluster::TimeSynchronizationCluster(EndpointId endpoint, const BitFlags<TimeSynchronization::Feature> features,
                                                        const OptionalAttributeSet & optionalAttributeSet,
                                                        const StartupConfiguration & config) :
-    DefaultServerCluster({ endpoint, TimeSynchronization::Id }), mFeatures(features), mOptionalAttributeSet(optionalAttributeSet),
-    mSupportsDNSResolve(config.supportsDNSResolve), mNTPServerAvailable(config.ntpServerAvailable),
-    mTimeZoneDatabase(config.timeZoneDatabase), mTimeSource(config.timeSource),
+    DefaultServerCluster({ endpoint, TimeSynchronization::Id }),
+    mFeatures(features), mOptionalAttributeSet(optionalAttributeSet), mSupportsDNSResolve(config.supportsDNSResolve),
+    mNTPServerAvailable(config.ntpServerAvailable), mTimeZoneDatabase(config.timeZoneDatabase), mTimeSource(config.timeSource),
 #if TIME_SYNC_ENABLE_TSC_FEATURE
     mOnDeviceConnectedCallback(OnDeviceConnectedWrapper, this),
     mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureWrapper, this),
