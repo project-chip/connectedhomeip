@@ -58,10 +58,10 @@ void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAdd
 
     uint8_t udcPayload[IdentificationDeclaration::kUdcTLVDataMaxBytes];
     size_t udcPayloadLength = std::min<size_t>(msg->DataLength(), sizeof(udcPayload));
-    msg->Read(udcPayload, udcPayloadLength);
+    TEMPORARY_RETURN_IGNORED msg->Read(udcPayload, udcPayloadLength);
 
     IdentificationDeclaration id;
-    id.ReadPayload(udcPayload, sizeof(udcPayload));
+    TEMPORARY_RETURN_IGNORED id.ReadPayload(udcPayload, sizeof(udcPayload));
 
     if (id.GetCancelPasscode())
     {
@@ -568,13 +568,17 @@ void UserDirectedCommissioningServer::PrintUDCClients()
             state->GetPeerAddress().ToString(addrBuffer);
 
             char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
-            Encoding::BytesToUppercaseHexString(state->GetRotatingId(), chip::Dnssd::kMaxRotatingIdLen, rotatingIdString,
-                                                sizeof(rotatingIdString));
+            const char * rotatingIdStringPtr                              = rotatingIdString;
+            if (Encoding::BytesToUppercaseHexString(state->GetRotatingId(), chip::Dnssd::kMaxRotatingIdLen, rotatingIdString,
+                                                    sizeof(rotatingIdString)) != CHIP_NO_ERROR)
+            {
+                rotatingIdStringPtr = "<invalid id>";
+            }
 
             ChipLogProgress(AppServer,
                             "PrintUDCClients() UDC Client[%d] instance=%s deviceName=%s address=%s, vid/pid=%d/%d disc=%d rid=%s",
                             i, state->GetInstanceName(), state->GetDeviceName(), addrBuffer, state->GetVendorId(),
-                            state->GetProductId(), state->GetLongDiscriminator(), rotatingIdString);
+                            state->GetProductId(), state->GetLongDiscriminator(), rotatingIdStringPtr);
         }
     }
 }

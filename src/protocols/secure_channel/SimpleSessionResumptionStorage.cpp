@@ -205,7 +205,7 @@ CHIP_ERROR SimpleSessionResumptionStorage::SaveState(const ScopedNodeId & node, 
     ReturnErrorOnFailure(writer.Put(kSharedSecretTag, ByteSpan(sharedSecret.ConstBytes(), sharedSecret.Length())));
 
     CATValues::Serialized cat;
-    peerCATs.Serialize(cat);
+    ReturnErrorOnFailure(peerCATs.Serialize(cat));
     ReturnErrorOnFailure(writer.Put(kCATTag, ByteSpan(cat)));
 
     ReturnErrorOnFailure(writer.EndContainer(outerType));
@@ -243,7 +243,7 @@ CHIP_ERROR SimpleSessionResumptionStorage::LoadState(const ScopedNodeId & node, 
     ReturnErrorOnFailure(reader.Get(sharedSecretSpan));
     VerifyOrReturnError(sharedSecretSpan.size() <= sharedSecret.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
     ::memcpy(sharedSecret.Bytes(), sharedSecretSpan.data(), sharedSecretSpan.size());
-    sharedSecret.SetLength(sharedSecretSpan.size());
+    ReturnErrorOnFailure(sharedSecret.SetLength(sharedSecretSpan.size()));
 
     ByteSpan catSpan;
     ReturnErrorOnFailure(reader.Next(kCATTag));
@@ -251,18 +251,15 @@ CHIP_ERROR SimpleSessionResumptionStorage::LoadState(const ScopedNodeId & node, 
     CATValues::Serialized cat;
     VerifyOrReturnError(sizeof(cat) == catSpan.size(), CHIP_ERROR_INVALID_TLV_ELEMENT);
     ::memcpy(cat, catSpan.data(), catSpan.size());
-    peerCATs.Deserialize(cat);
+    ReturnErrorOnFailure(peerCATs.Deserialize(cat));
 
     ReturnErrorOnFailure(reader.ExitContainer(containerType));
-    ReturnErrorOnFailure(reader.VerifyEndOfContainer());
-
-    return CHIP_NO_ERROR;
+    return reader.VerifyEndOfContainer();
 }
 
 CHIP_ERROR SimpleSessionResumptionStorage::DeleteState(const ScopedNodeId & node)
 {
-    ReturnErrorOnFailure(mStorage->SyncDeleteKeyValue(GetStorageKey(node).KeyName()));
-    return CHIP_NO_ERROR;
+    return mStorage->SyncDeleteKeyValue(GetStorageKey(node).KeyName());
 }
 
 } // namespace chip
