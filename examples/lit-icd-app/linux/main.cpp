@@ -38,8 +38,9 @@ void notifyIcdActive(System::Layer * layer, void *)
 
 int main(int argc, char * argv[])
 {
-    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(10000_ms32, notifyIcdActive, nullptr);
-    TEMPORARY_RETURN_IGNORED IdentifyInit();
+    VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
+    SuccessOrDie(DeviceLayer::SystemLayer().StartTimer(10000_ms32, notifyIcdActive, nullptr));
+    SuccessOrDie(IdentifyInit());
     ChipLinuxAppMainLoop();
     return 0;
 }
