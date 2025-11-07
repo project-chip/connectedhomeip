@@ -43,7 +43,7 @@ BooleanStateConfigurationCluster::BooleanStateConfigurationCluster(EndpointId en
     mFeatures(features), mOptionalAttributes(optionalAttributes),
     mSupportedSensitivityLevels(
         std::clamp(config.supportedSensitivityLevels, kMinSupportedSensitivityLevels, kMaxSupportedSensitivityLevels)),
-    mDefaultSensitivityLevel(std::max(config.defaultSensitivityLevel, static_cast<uint8_t>(mSupportedSensitivityLevels - 1))),
+    mDefaultSensitivityLevel(std::min(config.defaultSensitivityLevel, static_cast<uint8_t>(mSupportedSensitivityLevels - 1))),
     mAlarmsSupported(config.alarmsSupported)
 {}
 
