@@ -1059,7 +1059,7 @@ ClosureDimensionEndpoint * ClosureManager::GetCurrentPanelInstance(EndpointId en
     {
         return &instance.mClosurePanelEndpoint2;
     }
-    else if (endpointId == instance.mClosurePanelEndpoint3.GetEndpointId())
+    if (endpointId == instance.mClosurePanelEndpoint3.GetEndpointId())
     {
         return &instance.mClosurePanelEndpoint3;
     }
