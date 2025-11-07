@@ -136,11 +136,11 @@ void NotifyTermsAndConditionsAttributeChangeIfRequired(const TermsAndConditionsS
 }
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 
-void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
+void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t self_ptr_arg)
 {
     if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
     {
-        auto self = reinterpret_cast<GeneralCommissioningCluster *>(arg);
+        auto self = reinterpret_cast<GeneralCommissioningCluster *>(self_ptr_arg);
 
         // Spec says to reset Breadcrumb attribute to 0.
         self->SetBreadCrumb(0);

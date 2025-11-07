@@ -54,7 +54,6 @@ class NoopBreadcrumbTracker : public BreadCrumbTracker
 public:
     void SetBreadCrumb(uint64_t v) override {}
 };
-
 // initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestNetworkCommissioningCluster : public ::testing::Test
 {
@@ -67,6 +66,7 @@ TEST_F(TestNetworkCommissioningCluster, TestAttributes)
     NoopBreadcrumbTracker tracker;
     {
         Testing::FakeWiFiDriver fakeWifiDriver;
+
         NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, tracker);
 
         ReadOnlyBufferBuilder<AttributeEntry> builder;
