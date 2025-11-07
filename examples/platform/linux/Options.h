@@ -45,44 +45,45 @@
 #include <access/AccessRestrictionProvider.h>
 #endif
 
-struct LinuxDeviceOptions {
+struct LinuxDeviceOptions
+{
     chip::PayloadContents payload;
     chip::Optional<uint16_t> discriminator;
     chip::Optional<std::vector<uint8_t>> spake2pVerifier;
     chip::Optional<std::vector<uint8_t>> spake2pSalt;
     chip::Optional<std::string> dacProviderFile;
     uint32_t spake2pIterations = 0; // When not provided (0), will default elsewhere
-    uint32_t mBleDevice = 0;
-    bool wifiSupports5g = false;
-    bool mWiFi = false;
-    bool mThread = false;
-    bool cameraDeferredOffer = false;
-    bool cameraTestVideosrc = false;
-    bool cameraTestAudiosrc = false;
-    bool cameraAudioPlayback = false;
+    uint32_t mBleDevice        = 0;
+    bool wifiSupports5g        = false;
+    bool mWiFi                 = false;
+    bool mThread               = false;
+    bool cameraDeferredOffer   = false;
+    bool cameraTestVideosrc    = false;
+    bool cameraTestAudiosrc    = false;
+    bool cameraAudioPlayback   = false;
     chip::Optional<std::string> cameraVideoDevice;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    bool mWiFiPAF = false;
+    bool mWiFiPAF                = false;
     const char * mWiFiPAFExtCmds = nullptr;
-    uint32_t mPublishId = 0;
+    uint32_t mPublishId          = 0;
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE || CHIP_DEVICE_ENABLE_PORT_PARAMS
-    uint16_t securedDevicePort = CHIP_PORT;
+    uint16_t securedDevicePort         = CHIP_PORT;
     uint16_t unsecuredCommissionerPort = CHIP_UDC_PORT;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE || CHIP_DEVICE_ENABLE_PORT_PARAMS
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-    uint16_t securedCommissionerPort = CHIP_PORT + 12; // TODO: why + 12?
+    uint16_t securedCommissionerPort    = CHIP_PORT + 12; // TODO: why + 12?
     chip::FabricId commissionerFabricId = chip::kUndefinedFabricId;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-    const char * command = nullptr;
-    const char * PICS = nullptr;
-    const char * KVS = nullptr;
-    const char * app_pipe = "";
+    const char * command      = nullptr;
+    const char * PICS         = nullptr;
+    const char * KVS          = nullptr;
+    const char * app_pipe     = "";
     const char * app_pipe_out = "";
     chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId::Null();
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     bool traceStreamDecodeEnabled = false;
-    bool traceStreamToLogEnabled = false;
+    bool traceStreamToLogEnabled  = false;
     chip::Optional<std::string> traceStreamFilename;
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     chip::Credentials::DeviceAttestationCredentialsProvider * dacProvider = nullptr;
@@ -94,7 +95,7 @@ struct LinuxDeviceOptions {
     uint16_t rpcServerPort = 33000;
 #endif
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-    int32_t subscriptionCapacity = CHIP_IM_MAX_NUM_SUBSCRIPTIONS;
+    int32_t subscriptionCapacity                   = CHIP_IM_MAX_NUM_SUBSCRIPTIONS;
     int32_t subscriptionResumptionRetryIntervalSec = -1;
 #endif
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS

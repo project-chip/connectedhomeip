@@ -29,25 +29,23 @@
 class OtaProviderAppCommandDelegate;
 extern OTAProviderExample gOtaProvider;
 
-class OtaProviderAppCommandHandler {
+class OtaProviderAppCommandHandler
+{
 public:
     static OtaProviderAppCommandHandler * FromJSON(const char * json, OtaProviderAppCommandDelegate * delegate);
 
     static void HandleCommand(intptr_t context);
     Json::Value BuildOtaProviderSnapshot(uint16_t endpoint);
 
-    OtaProviderAppCommandHandler(Json::Value && v, OtaProviderAppCommandDelegate * d)
-        : mJsonValue(std::move(v))
-        , mDelegate(d)
-    {
-    }
+    OtaProviderAppCommandHandler(Json::Value && v, OtaProviderAppCommandDelegate * d) : mJsonValue(std::move(v)), mDelegate(d) {}
 
 private:
     Json::Value mJsonValue;
     OtaProviderAppCommandDelegate * mDelegate = nullptr;
 };
 
-class OtaProviderAppCommandDelegate : public NamedPipeCommandDelegate {
+class OtaProviderAppCommandDelegate : public NamedPipeCommandDelegate
+{
 public:
     void OnEventCommandReceived(const char * json) override;
     void SetPipes(NamedPipeCommands * pipes) { mPipes = pipes; }

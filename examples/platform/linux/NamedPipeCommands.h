@@ -22,13 +22,15 @@
 #include <pthread.h>
 #include <string>
 
-class NamedPipeCommandDelegate {
+class NamedPipeCommandDelegate
+{
 public:
-    virtual ~NamedPipeCommandDelegate() = default;
+    virtual ~NamedPipeCommandDelegate()                    = default;
     virtual void OnEventCommandReceived(const char * json) = 0;
 };
 
-class NamedPipeCommands {
+class NamedPipeCommands
+{
 public:
     CHIP_ERROR Start(std::string & path, NamedPipeCommandDelegate * delegate);
     CHIP_ERROR Start(std::string & path, std::string & path_out, NamedPipeCommandDelegate * delegate);
@@ -42,7 +44,7 @@ private:
     std::string mChipEventFifoPath;
     std::string mChipEventFifoPathOut;
     NamedPipeCommandDelegate * mDelegate = nullptr;
-    int mOutFd = -1;
+    int mOutFd                           = -1;
 
     static void * EventCommandListenerTask(void * arg);
 };
