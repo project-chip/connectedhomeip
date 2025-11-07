@@ -199,7 +199,7 @@ class ScopedNodeId(Structure):
 _OnCheckInCompleteFunct = CFUNCTYPE(None, ScopedNodeId)
 
 _OnCheckInCompleteWaitListLock = threading.Lock()
-_OnCheckInCompleteWaitList: typing.Dict[ScopedNodeId, set] = dict()
+_OnCheckInCompleteWaitList: typing.Dict[ScopedNodeId, set] = {}
 
 
 @_OnCheckInCompleteFunct

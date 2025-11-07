@@ -205,8 +205,8 @@ class TC_ACL_2_6(MatterBaseTest):
             self._validate_event_fields(e1, Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded, acl_entries[1], f1)
 
         # Set comparison for debugging
-        subscription_event_set = set(self.event_key(e) for e in received_subscription_events)
-        read_event_set = set(self.event_key(e) for e in read_events)
+        subscription_event_set = {self.event_key(e) for e in received_subscription_events}
+        read_event_set = {self.event_key(e) for e in read_events}
         if subscription_event_set != read_event_set:
             sub_only = subscription_event_set - read_event_set
             read_only = read_event_set - subscription_event_set

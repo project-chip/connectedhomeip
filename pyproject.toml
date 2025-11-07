@@ -22,8 +22,23 @@ exclude = [
 ]
 
 [tool.ruff.lint]
-select = ["COM", "E1", "E4", "E7", "E9", "F", "W6"]
+select = [
+    # Standard errors and warnings
+    "E", "W", "F",
+    # Consistent commas
+    "COM",
+    # Simplify the code if possible
+    "C4",
+    # Ensure that scripts are executable
+    "EXE",
+    # Check for common logging issues
+    "LOG",
+    # Check for common optimization issues
+    "SLOT",
+]
 ignore = [
-    "COM812", # Do not enforce trailing commas in multi-line collections
+    "COM812", # Do not enforce trailing commas in multi-line collections for now
+    "LOG015", # Do not enforce non-root loggers in the entire codebase for now
+    "E501", # Do not report line length issues (formatter should handle this)
     "E721", # We use it for good reasons
 ]

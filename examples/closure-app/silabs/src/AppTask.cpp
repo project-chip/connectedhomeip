@@ -42,6 +42,7 @@
 #include <assert.h>
 #include <lib/support/BitMask.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 #include <setup_payload/OnboardingCodesUtil.h>
@@ -116,11 +117,11 @@ void AppTask::AppTaskMain(void * pvParameter)
     CHIP_ERROR err = sAppTask.Init();
     if (err != CHIP_NO_ERROR)
     {
-        SILABS_LOG("AppTask.Init() failed");
+        ChipLogError(AppServer, "AppTask Init failed");
         appError(err);
     }
 
-    SILABS_LOG("App Task started");
+    ChipLogProgress(AppServer, "App Task started");
 
     while (true)
     {
@@ -138,6 +139,92 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
     AppEvent button_event           = {};
     button_event.Type               = AppEvent::kEventType_Button;
     button_event.ButtonEvent.Action = btnAction;
-    button_event.Handler            = BaseApplication::ButtonHandler;
-    AppTask::GetAppTask().PostEvent(&button_event);
+
+    if (button == APP_CLOSURE_BUTTON && btnAction == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed))
+    {
+        button_event.Handler = ClosureButtonActionEventHandler;
+        sAppTask.PostEvent(&button_event);
+    }
+    else if (button == APP_FUNCTION_BUTTON)
+    {
+        button_event.Handler = BaseApplication::ButtonHandler;
+        sAppTask.PostEvent(&button_event);
+    }
+}
+
+void AppTask::ClosureButtonActionEventHandler(AppEvent * aEvent)
+{
+    if (aEvent->Type == AppEvent::kEventType_Button)
+    {
+        // Schedule work on the chip stack thread to ensure all CHIP API calls are safe
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(
+            [](intptr_t) {
+                // Check if an action is already in progress
+                if (ClosureManager::GetInstance().IsClosureControlMotionInProgress())
+                {
+                    // Stop the current action
+                    auto status = ClosureManager::GetInstance().GetClosureControlLogic().HandleStop();
+                    if (status != Protocols::InteractionModel::Status::Success)
+                    {
+                        ChipLogError(AppServer, "Failed to stop closure action: %u", to_underlying(status));
+                    }
+                }
+                else
+                {
+                    DataModel::Nullable<ClosureControl::GenericOverallCurrentState> currentState;
+                    CHIP_ERROR err = ClosureManager::GetInstance().GetClosureControlLogic().GetOverallCurrentState(currentState);
+
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        ChipLogError(AppServer, "Failed to get current closure state: %s", chip::ErrorStr(err));
+                        return;
+                    }
+                    if (currentState.IsNull())
+                    {
+                        ChipLogError(AppServer, "Failed to get current closure state: currentState is null");
+                        return;
+                    }
+                    if (!currentState.Value().position.HasValue() || currentState.Value().position.Value().IsNull())
+                    {
+                        ChipLogError(AppServer, "Failed to get current closure state: position is null");
+                        return;
+                    }
+
+                    // Get current position and determine target position (toggle)
+                    auto currentPosition = currentState.Value().position.Value().Value();
+                    ChipLogProgress(AppServer, "Current state - Position: %d", to_underlying(currentPosition));
+
+                    ClosureControl::TargetPositionEnum targetPosition =
+                        (currentPosition == ClosureControl::CurrentPositionEnum::kFullyOpened)
+                        ? ClosureControl::TargetPositionEnum::kMoveToFullyClosed
+                        : ClosureControl::TargetPositionEnum::kMoveToFullyOpen;
+                    ChipLogProgress(AppServer, "Target position: %d", to_underlying(targetPosition));
+
+                    Optional<bool> latch = chip::NullOptional;
+                    if (currentState.Value().latch.HasValue() && !currentState.Value().latch.Value().IsNull())
+                    {
+                        latch = MakeOptional(false);
+                    }
+
+                    Optional<Globals::ThreeLevelAutoEnum> speed = NullOptional;
+                    if (currentState.Value().speed.HasValue())
+                    {
+                        speed = chip::MakeOptional(currentState.Value().speed.Value());
+                    }
+
+                    // Move to the target position with latch set to false and preserved speed value
+                    auto status = ClosureManager::GetInstance().GetClosureControlLogic().HandleMoveTo(MakeOptional(targetPosition),
+                                                                                                      latch, speed);
+                    if (status != Protocols::InteractionModel::Status::Success)
+                    {
+                        ChipLogError(AppServer, "Failed to move closure to target position: %u", to_underlying(status));
+                    }
+                }
+            },
+            0);
+    }
+    else
+    {
+        ChipLogError(AppServer, "Unhandled event type in ClosureButtonActionEventHandler");
+    }
 }

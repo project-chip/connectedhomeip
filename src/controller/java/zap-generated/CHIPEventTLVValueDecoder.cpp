@@ -4038,6 +4038,16 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
+    case app::Clusters::WaterTankLevelMonitoring::Id: {
+        using namespace app::Clusters::WaterTankLevelMonitoring;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
     case app::Clusters::BooleanStateConfiguration::Id: {
         using namespace app::Clusters::BooleanStateConfiguration;
         switch (aPath.mEventId)

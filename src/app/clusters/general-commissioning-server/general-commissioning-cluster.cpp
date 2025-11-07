@@ -139,12 +139,12 @@ void NotifyTermsAndConditionsAttributeChangeIfRequired(const TermsAndConditionsS
 }
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 
-void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t /* arg */)
+void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t self)
 {
     if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
     {
         // Spec says to reset Breadcrumb attribute to 0.
-        GeneralCommissioningCluster::Instance().SetBreadCrumb(0);
+        reinterpret_cast<GeneralCommissioningCluster *>(self)->SetBreadCrumb(0);
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         if (event->FailSafeTimerExpired.updateTermsAndConditionsHasBeenInvoked)
@@ -161,15 +161,9 @@ void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t
     }
 }
 
-GeneralCommissioningCluster gInstance;
 } // anonymous namespace
 
 namespace chip::app::Clusters {
-
-GeneralCommissioningCluster & GeneralCommissioningCluster::Instance()
-{
-    return gInstance;
-}
 
 DataModel::ActionReturnStatus GeneralCommissioningCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                          AttributeValueEncoder & encoder)
@@ -403,14 +397,14 @@ void GeneralCommissioningCluster::SetBreadCrumb(uint64_t value)
 CHIP_ERROR GeneralCommissioningCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-    PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler, 0);
+    PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
     Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
     return CHIP_NO_ERROR;
 }
 
 void GeneralCommissioningCluster::Shutdown()
 {
-    PlatformMgrImpl().RemoveEventHandler(OnPlatformEventHandler, 0);
+    PlatformMgrImpl().RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
     Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
     DefaultServerCluster::Shutdown();
 }
