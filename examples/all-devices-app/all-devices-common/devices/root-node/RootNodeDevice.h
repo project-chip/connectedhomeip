@@ -19,6 +19,7 @@
 #include <app/clusters/access-control-server/access-control-cluster.h>
 #include <app/clusters/administrator-commissioning-server/AdministratorCommissioningCluster.h>
 #include <app/clusters/basic-information/BasicInformationCluster.h>
+#include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/general-commissioning-server/general-commissioning-cluster.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-cluster.h>
 #include <app/clusters/group-key-mgmt-server/group-key-mgmt-cluster.h>
@@ -30,7 +31,6 @@
 #include <devices/Types.h>
 #include <devices/interface/SingleEndpointDevice.h>
 #include <platform/NetworkCommissioning.h>
-#include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 
 namespace chip {
 namespace app {
