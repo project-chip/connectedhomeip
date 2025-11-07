@@ -233,7 +233,7 @@ CHIP_ERROR SimpleSubscriptionResumptionStorage::Load(uint16_t subscriptionIndex,
             TLV::TLVType eventContainerType;
             ReturnErrorOnFailure(reader.EnterContainer(eventContainerType));
 
-            EventPathType eventPathType;
+            EventPathType eventPathType = EventPathType::kNonUrgent;
             ReturnErrorOnFailure(reader.Next(kEventPathTypeTag));
             ReturnErrorOnFailure(reader.Get(eventPathType));
 
