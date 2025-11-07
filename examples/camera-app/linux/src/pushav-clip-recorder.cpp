@@ -51,8 +51,7 @@ AVDictionary * options = NULL;
 
 PushAVClipRecorder::PushAVClipRecorder(ClipInfoStruct & aClipInfo, AudioInfoStruct & aAudioInfo, VideoInfoStruct & aVideoInfo,
                                        PushAVUploader * aUploader) :
-    mClipInfo(aClipInfo),
-    mAudioInfo(aAudioInfo), mVideoInfo(aVideoInfo), mUploader(aUploader)
+    mClipInfo(aClipInfo), mAudioInfo(aAudioInfo), mVideoInfo(aVideoInfo), mUploader(aUploader)
 {
     mFormatContext        = nullptr;
     mInputFormatContext   = nullptr;
@@ -669,8 +668,6 @@ int PushAVClipRecorder::ProcessBuffersAndWrite()
         mMetadataSet = true;
     }
 
-    AVRational outputTimeBase = useVideo ? mVideoInfo.mVideoTimeBase : mAudioInfo.mAudioTimeBase;
-
     if (pkt->pts == AV_NOPTS_VALUE && pkt->dts == AV_NOPTS_VALUE)
     {
         ChipLogError(Camera, "Warning packet has no valid timestamps\n");
@@ -684,10 +681,7 @@ int PushAVClipRecorder::ProcessBuffersAndWrite()
         mCurrentClipStartPts = currentPts;
     }
 
-    pkt->pts      = av_rescale_q(pkt->pts, mClipInfo.mInputTimeBase, outputTimeBase);
-    pkt->dts      = av_rescale_q(pkt->dts, mClipInfo.mInputTimeBase, outputTimeBase);
-    pkt->duration = av_rescale_q(pkt->duration, mClipInfo.mInputTimeBase, outputTimeBase);
-    pkt->pos      = -1;
+    pkt->pos = -1;
 
     if (pkt->pts < 0)
     {
@@ -841,7 +835,28 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
     int64_t clipLengthInPTS = currentPts - mCurrentClipStartPts;
     // Final duration has to be (clipDuration + preRollLen) seconds
     const int64_t remainingDuration = mClipInfo.mInitialDurationS - mClipInfo.mElapsedTimeS + (mClipInfo.mPreRollLengthMs / 1000);
-    const int64_t clipDuration      = (remainingDuration > 0) ? remainingDuration * AV_TIME_BASE_Q.den : 0;
+    int64_t clipDuration            = 0;
+
+    if (remainingDuration <= 0)
+    {
+        ChipLogError(Camera, "Invalid remaining duration: %ld for sessionID: %lu Track name: %s - stopping recording",
+                     remainingDuration, mClipInfo.mSessionNumber, mClipInfo.mTrackName.c_str());
+        reason = 1; // Set reason to trigger existing stop logic
+    }
+    else
+    {
+        const auto & timeBase = mClipInfo.mHasVideo ? mVideoInfo.mVideoTimeBase : mAudioInfo.mAudioTimeBase;
+        if (timeBase.num == 0)
+        {
+            ChipLogError(Camera, "Invalid timebase (num=0) for %s stream in sessionID: %lu Track name: %s",
+                         mClipInfo.mHasVideo ? "video" : "audio", mClipInfo.mSessionNumber, mClipInfo.mTrackName.c_str());
+        }
+        else
+        {
+            clipDuration = (remainingDuration * timeBase.den) / timeBase.num;
+        }
+    }
+
     // Pre-calculate common path components
     std::filesystem::path basePath = std::filesystem::path(mClipInfo.mOutputPath) /
         ("session_" + std::to_string(mClipInfo.mSessionNumber)) / mClipInfo.mTrackName;
@@ -889,7 +904,6 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
         if (!mUploadedInitSegment)
         {
             std::filesystem::path init_path = basePath / (mClipInfo.mTrackName + ".init");
-            ChipLogProgress(Camera, "Recorder:Init segment upload ready [%s]", init_path.c_str());
             if (std::filesystem::exists(init_path) && !std::filesystem::exists(init_path.string() + ".tmp"))
             {
                 CheckAndUploadFile(init_path.string());
@@ -901,7 +915,6 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
 
 bool PushAVClipRecorder::CheckAndUploadFile(std::string filename)
 {
-    ChipLogProgress(Camera, "Recorder:File upload ready [%s] to [%s]", filename.c_str(), mClipInfo.mUrl.c_str());
     mUploader->AddUploadData(filename, mClipInfo.mUrl);
     return true;
 }
