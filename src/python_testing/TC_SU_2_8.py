@@ -102,8 +102,8 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         p2_node = 11
         p2_disc = 1111
 
+        # Common variables
         p_pass = 20202021
-
         provider_port = 5540
 
         app_path = "./out/debug/chip-ota-provider-app"
@@ -172,7 +172,7 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         await self.create_acl_entry(dev_ctrl=th1, provider_node_id=p1_node, requestor_node_id=requestor_node_id)
 
         # Write default OTA providers
-        await self.write_ota_providers(th1, p1_node, endpoint)
+        await self.set_default_ota_providers_list(th1, p1_node, requestor_node_id, endpoint)
 
         # Announce after subscription
         await self.announce_ota_provider(controller=th1, provider_node_id=p1_node, requestor_node_id=requestor_node_id, vendor_id=vendor_id, endpoint=endpoint)
@@ -268,7 +268,7 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         except Exception as e:
             logging.warning(f"Provider termination raised: {e}")
 
-        th1.ExpireSessions(nodeid=p1_node)
+        th1.ExpireSessions(nodeId=p1_node)
         await asyncio.sleep(2)
 
         event_cb.reset()
@@ -336,7 +336,7 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
                              fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
 
         # Write default OTA providers TH1 with p1_node which does not exist
-        await self.write_ota_providers(th1, p1_node_invalid, endpoint)
+        await self.set_default_ota_providers_list(th1, p1_node_invalid, requestor_node_id, endpoint)
 
         # Announce TH1-OTA Provider
         await self.announce_ota_provider(controller=th1, provider_node_id=p1_node_invalid, requestor_node_id=requestor_node_id, vendor_id=vendor_id, endpoint=endpoint)
@@ -370,7 +370,7 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         await self.create_acl_entry(dev_ctrl=th2, provider_node_id=p2_node, requestor_node_id=requestor_node_id)
 
         # Write default OTA providers TH2
-        await self.write_ota_providers(th2, p2_node, endpoint)
+        await self.set_default_ota_providers_list(th2, p2_node, requestor_node_id, endpoint)
 
         # Announce after subscription
         await self.announce_ota_provider(controller=th2, provider_node_id=p2_node, requestor_node_id=requestor_node_id, vendor_id=vendor_id, endpoint=endpoint)
@@ -378,13 +378,14 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         event_idle_to_querying = event_cb.wait_for_event_report(
             Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)
 
-        self.verify_state_transition_event(event_report=event_idle_to_querying, previous_state=idle, new_state=querying)
+        self.verify_state_transition_event(event_report=event_idle_to_querying,
+                                           expected_previous_state=idle, expected_new_state=querying)
 
         event_querying_to_downloading = event_cb.wait_for_event_report(
             Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)
 
         self.verify_state_transition_event(event_report=event_querying_to_downloading,
-                                           previous_state=querying, new_state=downloading, target_version=target_version)
+                                           expected_previous_state=querying, expected_new_state=downloading, expected_target_version=target_version)
 
         event_cb.reset()
         await event_cb.cancel()
@@ -402,7 +403,7 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         except Exception as e:
             logging.warning(f"Provider termination raised: {e}")
 
-        th2.ExpireSessions(nodeid=p2_node)
+        th2.ExpireSessions(nodeId=p2_node)
 
 
 if __name__ == "__main__":

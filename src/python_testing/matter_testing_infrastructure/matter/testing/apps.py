@@ -55,7 +55,7 @@ class AppServerSubprocess(Subprocess):
     err_log_file: BinaryIO = stderr.buffer
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
-                 passcode: int, port: int = 5540, extra_args: list[str] = [], kvs_path: Optional[str] = None, f_stdout: BinaryIO = stdout.buffer, f_stderr: BinaryIO = stderr.buffer):
+                 passcode: int, port: int = 5540, extra_args: list[str] = [], kvs_path: Optional[str] = None, f_stdout: BinaryIO = stdout.buffer, f_stderr: BinaryIO = stderr.buffer, app_pipe: Optional[str] = None, app_pipe_out: Optional[str] = None):
         # Create a temporary KVS file and keep the descriptor to avoid leaks.
 
         if kvs_path is not None:
@@ -198,7 +198,7 @@ class OTAProviderSubprocess(AppServerSubprocess):
 
         # Initialize with the combined arguments
         super().__init__(app=app, storage_dir=storage_dir, discriminator=discriminator, passcode=passcode, port=port,
-                         extra_args=combined_extra_args, kvs_path=kvs_path, f_stdout=self.log_file, f_stderr=self.err_log_file)
+                         extra_args=combined_extra_args, kvs_path=kvs_path, f_stdout=self.log_file, f_stderr=self.err_log_file, app_pipe=app_pipe, app_pipe_out=app_pipe_out)
 
     def kill(self):
         self.p.send_signal(signal.SIGKILL)
