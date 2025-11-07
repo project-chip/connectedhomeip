@@ -743,7 +743,7 @@ static CHIP_ERROR DriveSendForDestination(const IPAddress & aAddress, uint16_t a
         lBuffer = Common::MakeDataBuffer(aSize, uint8_t(lFirstValue));
         VerifyOrReturnError(!lBuffer.IsNull(), CHIP_ERROR_NO_MEMORY);
 
-        TEMPORARY_RETURN_IGNORED sTCPIPEndPoint->Send(std::move(lBuffer));
+        ReturnErrorOnFailure(sTCPIPEndPoint->Send(std::move(lBuffer)));
     }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
