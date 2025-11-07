@@ -13,13 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/pigweed.gni")
-
-import("${chip_root}/build/chip/tools.gni")
-import("${chip_root}/examples/common/pigweed/rpc_config.gni")
 import("${chip_root}/src/app/common_flags.gni")
-
-import("$dir_pw_build/target_types.gni")
 
 config("includes") {
   include_dirs = [
@@ -44,7 +38,6 @@ executable("all-devices-app") {
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/lib",
   ]
-  deps += pw_build_LINK_DEPS
 
   include_dirs = [
     "include",
