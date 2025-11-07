@@ -174,13 +174,12 @@ TimeSynchronization::Delegate * TimeSynchronizationCluster::GetDelegate()
     return mDelegate;
 }
 
-TimeSynchronizationCluster::TimeSynchronizationCluster(
-    EndpointId endpoint, const TimeSynchronizationCluster::OptionalAttributeSet & optionalAttributeSet,
-    const BitFlags<Feature> features, SupportsDNSResolve::TypeInfo::Type supportsDNSResolve, TimeZoneDatabaseEnum timeZoneDatabase,
-    TimeSourceEnum timeSource, NTPServerAvailable::TypeInfo::Type ntpServerAvailable) :
-    DefaultServerCluster({ endpoint, TimeSynchronization::Id }),
-    mOptionalAttributeSet(optionalAttributeSet), mFeatures(features), mSupportsDNSResolve(supportsDNSResolve),
-    mTimeZoneDatabase(timeZoneDatabase), mTimeSource(timeSource), mNTPServerAvailable(ntpServerAvailable),
+TimeSynchronizationCluster::TimeSynchronizationCluster(EndpointId endpoint, const BitFlags<TimeSynchronization::Feature> features,
+                                                       const OptionalAttributeSet & optionalAttributeSet,
+                                                       const StartupConfiguration & config) :
+    DefaultServerCluster({ endpoint, TimeSynchronization::Id }), mFeatures(features), mOptionalAttributeSet(optionalAttributeSet),
+    mSupportsDNSResolve(config.supportsDNSResolve), mNTPServerAvailable(config.ntpServerAvailable),
+    mTimeZoneDatabase(config.timeZoneDatabase), mTimeSource(config.timeSource),
 #if TIME_SYNC_ENABLE_TSC_FEATURE
     mOnDeviceConnectedCallback(OnDeviceConnectedWrapper, this),
     mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureWrapper, this),
@@ -286,8 +285,8 @@ DataModel::ActionReturnStatus TimeSynchronizationCluster::ReadAttribute(const Da
         ReturnErrorOnFailure(err);
         return encoder.Encode(CharSpan(buffer, dntp.size()));
     }
-    case TimeZone::Id: {
-        CHIP_ERROR err = encoder.EncodeList([this](const auto & encod) -> CHIP_ERROR {
+    case TimeZone::Id:
+        return encoder.EncodeList([this](const auto & encod) -> CHIP_ERROR {
             const auto & tzList = GetTimeZone();
             for (const auto & tzStore : tzList)
             {
@@ -295,20 +294,15 @@ DataModel::ActionReturnStatus TimeSynchronizationCluster::ReadAttribute(const Da
             }
             return CHIP_NO_ERROR;
         });
-        return err;
-    }
-    case DSTOffset::Id: {
-        CHIP_ERROR err = encoder.EncodeList([this](const auto & encod) -> CHIP_ERROR {
+    case DSTOffset::Id:
+        return encoder.EncodeList([this](const auto & encod) -> CHIP_ERROR {
             const auto & dstList = GetDSTOffset();
             for (const auto & dstOffset : dstList)
             {
                 ReturnErrorOnFailure(encod.Encode(dstOffset));
             }
-
             return CHIP_NO_ERROR;
         });
-        return err;
-    }
     case TimeZoneListMaxSize::Id:
         return encoder.Encode<uint8_t>(CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE);
     case DSTOffsetListMaxSize::Id:
@@ -369,10 +363,13 @@ CHIP_ERROR TimeSynchronizationCluster::Startup(ServerClusterContext & context)
     CHIP_ERROR err = Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "Unable to register Fabric table delegate for time sync");
+        ChipLogError(Zcl, "Unable to register Fabric table delegate for time sync: %" CHIP_ERROR_FORMAT, err.Format());
     }
-    PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
-
+    err = PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Unable to add event handler for time sync: %" CHIP_ERROR_FORMAT, err.Format());
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -512,6 +509,7 @@ void TimeSynchronizationCluster::OnTimeSyncCompletionFn(TimeSourceEnum timeSourc
     }
     mGranularity = granularity;
     mTimeSource  = timeSource;
+    NotifyAttributeChanged(TimeSource::Id);
 }
 
 void TimeSynchronizationCluster::OnFallbackNTPCompletionFn(bool timeSyncSuccessful)
@@ -521,6 +519,7 @@ void TimeSynchronizationCluster::OnFallbackNTPCompletionFn(bool timeSyncSuccessf
         mGranularity = GranularityEnum::kMillisecondsGranularity;
         // Non-matter SNTP because we know it's external and there's only one source
         mTimeSource = TimeSourceEnum::kNonMatterSNTP;
+        NotifyAttributeChanged(TimeSource::Id);
     }
     else
     {
@@ -594,6 +593,7 @@ CHIP_ERROR TimeSynchronizationCluster::SetTrustedTimeSource(const DataModel::Nul
         GetDelegate()->TrustedTimeSourceAvailabilityChanged(!mTrustedTimeSource.IsNull(), mGranularity);
         return err;
     };
+
     return NotifyAttributeChangedIfSuccess(TrustedTimeSource::Id, setAttribute(tts)).GetUnderlyingError();
 }
 

@@ -79,12 +79,16 @@ public:
     //       as other attributes are controlled by feature flags
     using OptionalAttributeSet = app::OptionalAttributeSet<TimeSynchronization::Attributes::TimeSource::Id>;
 
-    TimeSynchronizationCluster(EndpointId endpoint, const OptionalAttributeSet & optionalAttributeSet,
-                               const BitFlags<TimeSynchronization::Feature> features,
-                               TimeSynchronization::Attributes::SupportsDNSResolve::TypeInfo::Type supportsDNSResolve,
-                               TimeSynchronization::TimeZoneDatabaseEnum timeZoneDatabase,
-                               TimeSynchronization::TimeSourceEnum timeSource,
-                               TimeSynchronization::Attributes::NTPServerAvailable::TypeInfo::Type ntpServerAvailable);
+    struct StartupConfiguration
+    {
+        TimeSynchronization::Attributes::SupportsDNSResolve::TypeInfo::Type supportsDNSResolve{ false };
+        TimeSynchronization::Attributes::NTPServerAvailable::TypeInfo::Type ntpServerAvailable{ false };
+        TimeSynchronization::TimeZoneDatabaseEnum timeZoneDatabase{ TimeSynchronization::TimeZoneDatabaseEnum::kNone };
+        TimeSynchronization::TimeSourceEnum timeSource{ TimeSynchronization::TimeSourceEnum::kNone };
+    };
+
+    TimeSynchronizationCluster(EndpointId endpoint, const BitFlags<TimeSynchronization::Feature> features,
+                               const OptionalAttributeSet & optionalAttributeSet, const StartupConfiguration & config);
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown() override;
@@ -122,8 +126,7 @@ public:
     const TimeSynchronization::GranularityEnum & GetGranularity() const { return mGranularity; }
 
     TimeSynchronization::Delegate * GetDelegate();
-    void SetDefaultDelegate(TimeSynchronization::Delegate * delegate) { mDelegate = delegate; }
-    TimeSynchronization::Delegate * GetDefaultDelegate() { return GetDelegate(); }
+    void SetDelegate(TimeSynchronization::Delegate * delegate) { mDelegate = delegate; }
 
 private:
     CHIP_ERROR SetTrustedTimeSource(const DataModel::Nullable<TimeSynchronization::Structs::TrustedTimeSourceStruct::Type> & tts);
@@ -162,13 +165,13 @@ private:
     TimeSyncDataProvider::TimeZoneStore mTz[CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE];
     TimeSynchronization::Structs::DSTOffsetStruct::Type mDst[CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE];
 
-    const OptionalAttributeSet mOptionalAttributeSet;
     const BitFlags<TimeSynchronization::Feature> mFeatures;
+    const OptionalAttributeSet mOptionalAttributeSet;
 
     TimeSynchronization::Attributes::SupportsDNSResolve::TypeInfo::Type mSupportsDNSResolve;
+    TimeSynchronization::Attributes::NTPServerAvailable::TypeInfo::Type mNTPServerAvailable;
     TimeSynchronization::TimeZoneDatabaseEnum mTimeZoneDatabase;
     TimeSynchronization::TimeSourceEnum mTimeSource;
-    TimeSynchronization::Attributes::NTPServerAvailable::TypeInfo::Type mNTPServerAvailable;
     TimeSynchronization::Delegate * mDelegate = nullptr;
 
     TimeSyncDataProvider mTimeSyncDataProvider;

@@ -53,8 +53,9 @@ TEST_F(TestTimeSynchronizationCluster, AttributeTest)
 {
     {
         const BitFlags<Feature> features{ 0U };
-        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, OptionalAttributeSet(), features, false,
-                                                       TimeZoneDatabaseEnum::kNone, TimeSourceEnum::kNone, false);
+        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features,
+                                                       TimeSynchronizationCluster::OptionalAttributeSet(),
+                                                       TimeSynchronizationCluster::StartupConfiguration());
         ASSERT_EQ(timeSynchronization.Startup(context), CHIP_NO_ERROR);
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
@@ -71,11 +72,11 @@ TEST_F(TestTimeSynchronizationCluster, AttributeTest)
 
     {
         const DataModel::AttributeEntry optionalAttributes[] = { TimeSource::kMetadataEntry };
-        OptionalAttributeSet<TimeSource::Id> optionalAttributeSet;
+        TimeSynchronizationCluster::OptionalAttributeSet optionalAttributeSet;
         optionalAttributeSet.Set<TimeSource::Id>();
         const BitFlags<Feature> features{ 0U };
-        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, optionalAttributeSet, features, false,
-                                                       TimeZoneDatabaseEnum::kNone, TimeSourceEnum::kNone, false);
+        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features, optionalAttributeSet,
+                                                       TimeSynchronizationCluster::StartupConfiguration());
         ASSERT_EQ(timeSynchronization.Startup(context), CHIP_NO_ERROR);
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
@@ -92,8 +93,9 @@ TEST_F(TestTimeSynchronizationCluster, AttributeTest)
 
     {
         const BitFlags<Feature> features{ Feature::kTimeSyncClient };
-        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, OptionalAttributeSet(), features, false,
-                                                       TimeZoneDatabaseEnum::kNone, TimeSourceEnum::kNone, false);
+        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features,
+                                                       TimeSynchronizationCluster::OptionalAttributeSet(),
+                                                       TimeSynchronizationCluster::StartupConfiguration());
         ASSERT_EQ(timeSynchronization.Startup(context), CHIP_NO_ERROR);
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
@@ -114,8 +116,9 @@ TEST_F(TestTimeSynchronizationCluster, AttributeTest)
 
     {
         const BitFlags<Feature> features{ Feature::kNTPClient };
-        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, OptionalAttributeSet(), features, false,
-                                                       TimeZoneDatabaseEnum::kNone, TimeSourceEnum::kNone, false);
+        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features,
+                                                       TimeSynchronizationCluster::OptionalAttributeSet(),
+                                                       TimeSynchronizationCluster::StartupConfiguration());
         ASSERT_EQ(timeSynchronization.Startup(context), CHIP_NO_ERROR);
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
@@ -137,8 +140,9 @@ TEST_F(TestTimeSynchronizationCluster, AttributeTest)
 
     {
         const BitFlags<Feature> features{ Feature::kNTPServer };
-        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, OptionalAttributeSet(), features, false,
-                                                       TimeZoneDatabaseEnum::kNone, TimeSourceEnum::kNone, false);
+        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features,
+                                                       TimeSynchronizationCluster::OptionalAttributeSet(),
+                                                       TimeSynchronizationCluster::StartupConfiguration());
         ASSERT_EQ(timeSynchronization.Startup(context), CHIP_NO_ERROR);
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
@@ -159,8 +163,9 @@ TEST_F(TestTimeSynchronizationCluster, AttributeTest)
 
     {
         const BitFlags<Feature> features{ Feature::kTimeZone };
-        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, OptionalAttributeSet(), features, false,
-                                                       TimeZoneDatabaseEnum::kNone, TimeSourceEnum::kNone, false);
+        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features,
+                                                       TimeSynchronizationCluster::OptionalAttributeSet(),
+                                                       TimeSynchronizationCluster::StartupConfiguration());
         ASSERT_EQ(timeSynchronization.Startup(context), CHIP_NO_ERROR);
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
@@ -194,8 +199,9 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
 {
     {
         const BitFlags<Feature> features{ 0U };
-        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, OptionalAttributeSet(), features, false,
-                                                       TimeZoneDatabaseEnum::kNone, TimeSourceEnum::kNone, false);
+        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features,
+                                                       TimeSynchronizationCluster::OptionalAttributeSet(),
+                                                       TimeSynchronizationCluster::StartupConfiguration());
         ASSERT_EQ(timeSynchronization.Startup(context), CHIP_NO_ERROR);
 
         ClusterTester tester(timeSynchronization);
@@ -216,11 +222,11 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
     }
 
     {
-        OptionalAttributeSet<TimeSource::Id> optionalAttributeSet;
+        typename TimeSynchronizationCluster::OptionalAttributeSet optionalAttributeSet;
         optionalAttributeSet.Set<TimeSource::Id>();
         const BitFlags<Feature> features{ 0U };
-        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, optionalAttributeSet, features, false,
-                                                       TimeZoneDatabaseEnum::kNone, TimeSourceEnum::kNone, false);
+        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features, optionalAttributeSet,
+                                                       TimeSynchronizationCluster::StartupConfiguration());
         ASSERT_EQ(timeSynchronization.Startup(context), CHIP_NO_ERROR);
 
         ClusterTester tester(timeSynchronization);
@@ -245,8 +251,9 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
 
     {
         const BitFlags<Feature> features{ Feature::kTimeSyncClient };
-        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, OptionalAttributeSet(), features, false,
-                                                       TimeZoneDatabaseEnum::kNone, TimeSourceEnum::kNone, false);
+        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features,
+                                                       TimeSynchronizationCluster::OptionalAttributeSet(),
+                                                       TimeSynchronizationCluster::StartupConfiguration());
         ASSERT_EQ(timeSynchronization.Startup(context), CHIP_NO_ERROR);
 
         ClusterTester tester(timeSynchronization);
@@ -271,8 +278,9 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
 
     {
         const BitFlags<Feature> features{ Feature::kNTPClient };
-        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, OptionalAttributeSet(), features, false,
-                                                       TimeZoneDatabaseEnum::kNone, TimeSourceEnum::kNone, false);
+        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features,
+                                                       TimeSynchronizationCluster::OptionalAttributeSet(),
+                                                       TimeSynchronizationCluster::StartupConfiguration());
         ASSERT_EQ(timeSynchronization.Startup(context), CHIP_NO_ERROR);
 
         ClusterTester tester(timeSynchronization);
@@ -300,8 +308,9 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
 
     {
         const BitFlags<Feature> features{ Feature::kNTPServer };
-        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, OptionalAttributeSet(), features, false,
-                                                       TimeZoneDatabaseEnum::kNone, TimeSourceEnum::kNone, false);
+        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features,
+                                                       TimeSynchronizationCluster::OptionalAttributeSet(),
+                                                       TimeSynchronizationCluster::StartupConfiguration());
         ASSERT_EQ(timeSynchronization.Startup(context), CHIP_NO_ERROR);
 
         ClusterTester tester(timeSynchronization);
@@ -326,8 +335,9 @@ TEST_F(TestTimeSynchronizationCluster, ReadAttributeTest)
 
     {
         const BitFlags<Feature> features{ Feature::kTimeZone };
-        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, OptionalAttributeSet(), features, false,
-                                                       TimeZoneDatabaseEnum::kNone, TimeSourceEnum::kNone, false);
+        TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features,
+                                                       TimeSynchronizationCluster::OptionalAttributeSet(),
+                                                       TimeSynchronizationCluster::StartupConfiguration());
         ASSERT_EQ(timeSynchronization.Startup(context), CHIP_NO_ERROR);
 
         ClusterTester tester(timeSynchronization);

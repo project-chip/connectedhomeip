@@ -53,30 +53,35 @@ public:
         SupportsDNSResolve::TypeInfo::Type supportsDNSResolve = false;
         if (featureMap.Has(Feature::kNTPClient))
         {
-            SupportsDNSResolve::Get(endpointId, &supportsDNSResolve);
+            VerifyOrDie(SupportsDNSResolve::Get(endpointId, &supportsDNSResolve) == Status::Success);
         }
 
         TimeZoneDatabaseEnum timeZoneDatabase = TimeZoneDatabaseEnum::kNone;
         if (featureMap.Has(Feature::kTimeZone))
         {
-            TimeZoneDatabase::Get(endpointId, &timeZoneDatabase);
+            VerifyOrDie(TimeZoneDatabase::Get(endpointId, &timeZoneDatabase) == Status::Success);
         }
 
         TimeSynchronizationCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
         TimeSourceEnum timeSource = TimeSourceEnum::kNone;
         if (optionalAttributeSet.IsSet(TimeSource::Id))
         {
-            TimeSource::Get(endpointId, &timeSource);
+            VerifyOrDie(TimeSource::Get(endpointId, &timeSource) == Status::Success);
         }
 
         NTPServerAvailable::TypeInfo::Type ntpServerAvailable = false;
         if (featureMap.Has(Feature::kNTPServer))
         {
-            SupportsDNSResolve::Get(endpointId, &ntpServerAvailable);
+            VerifyOrDie(SupportsDNSResolve::Get(endpointId, &ntpServerAvailable) == Status::Success);
         }
 
-        gServer.Create(endpointId, optionalAttributeSet, featureMap, supportsDNSResolve, timeZoneDatabase, timeSource,
-                       ntpServerAvailable);
+        gServer.Create(endpointId, featureMap, optionalAttributeSet,
+                       TimeSynchronizationCluster::StartupConfiguration{
+                           .supportsDNSResolve = supportsDNSResolve,
+                           .ntpServerAvailable = ntpServerAvailable,
+                           .timeZoneDatabase   = timeZoneDatabase,
+                           .timeSource         = timeSource,
+                       });
         return gServer.Registration();
     }
 
@@ -141,7 +146,7 @@ void SetDefaultDelegate(TimeSynchronization::Delegate * delegate)
     VerifyOrDie(timeSynchronization != nullptr);
 
     // The delegate can only be set if GetClusterInstance() returns a valid instance
-    return timeSynchronization->SetDefaultDelegate(delegate);
+    return timeSynchronization->SetDelegate(delegate);
 }
 
 TimeSynchronization::Delegate * GetDefaultDelegate()
@@ -150,7 +155,7 @@ TimeSynchronization::Delegate * GetDefaultDelegate()
     VerifyOrDie(timeSynchronization != nullptr);
 
     // The delegate can only be get if GetClusterInstance() returns a valid instance
-    return timeSynchronization->GetDefaultDelegate();
+    return timeSynchronization->GetDelegate();
 }
 
 } // namespace chip::app::Clusters::TimeSynchronization
