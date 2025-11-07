@@ -83,6 +83,14 @@ public:
      * @brief Updates the closure UI with current closure state
      */
     static void UpdateClosureUI();
+
+    /**
+     * @brief Event handler for UI update events
+     * Called from app task context to safely update UI with chip stack locked
+     *
+     * @param aEvent pointer to the UI update event being processed
+     */
+    static void UpdateClosureUIHandler(AppEvent * aEvent);
 #endif // DISPLAY_ENABLED
 
     /**

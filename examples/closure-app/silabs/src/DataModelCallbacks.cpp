@@ -57,13 +57,16 @@ void MatterClosureControlClusterServerAttributeChangedCallback(const app::Concre
 #ifdef DISPLAY_ENABLED
     using namespace chip::app::Clusters::ClosureControl::Attributes;
 
-    // Update UI only for attributes we display
     switch (attributePath.mAttributeId)
     {
     case MainState::Id:
-    case OverallCurrentState::Id:
-        AppTask::GetAppTask().UpdateClosureUI();
+    case OverallCurrentState::Id: {
+        AppEvent event;
+        event.Type    = AppEvent::kEventType_UpdateUI;
+        event.Handler = AppTask::UpdateClosureUIHandler;
+        AppTask::GetAppTask().PostEvent(&event);
         break;
+    }
     default:
         break;
     }

@@ -234,10 +234,19 @@ void AppTask::ClosureButtonActionEventHandler(AppEvent * aEvent)
 }
 
 #ifdef DISPLAY_ENABLED
+void AppTask::UpdateClosureUIHandler(AppEvent * aEvent)
+{
+    if (aEvent->Type == AppEvent::kEventType_UpdateUI)
+    {
+        UpdateClosureUI();
+    }
+}
+
 void AppTask::UpdateClosureUI()
 {
     ClosureManager & closureManager = ClosureManager::GetInstance();
 
+    // Lock chip stack when accessing CHIP attributes from app task context
     DeviceLayer::PlatformMgr().LockChipStack();
     auto uiData = closureManager.GetClosureUIData();
     DeviceLayer::PlatformMgr().UnlockChipStack();
