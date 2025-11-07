@@ -118,9 +118,7 @@ source_set("commodity-tariff-test-event-trigger") {
 }
 
 source_set("app-main-loop") {
-  sources = [
-    "AppMainLoop.h"
-  ]
+  sources = [ "AppMainLoop.h" ]
 
   public_configs = [ ":app-main-config" ]
 }
@@ -142,8 +140,8 @@ source_set("app-options") {
   ]
 
   public_deps = [
-    "${chip_root}/src/lib",
     "${chip_root}/src/app/tests/suites/credentials:dac_provider",
+    "${chip_root}/src/lib",
   ]
 
   if (current_os != "nuttx") {
@@ -162,12 +160,12 @@ source_set("app-main") {
     "CommissionableInit.cpp",
     "CommissionableInit.h",
     "NamedPipeCommands.cpp",
-    "NamedPipeCommands.h",    
+    "NamedPipeCommands.h",
   ]
 
   public_deps = [
-    ":app-options",
     ":app-main-loop",
+    ":app-options",
     ":boolean-state-configuration-test-event-trigger",
     ":commissioner-main",
     ":commodity-metering-test-event-trigger",
