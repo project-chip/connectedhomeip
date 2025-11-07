@@ -29,6 +29,7 @@
 #include <clusters/HepaFilterMonitoring/Enums.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/core/Optional.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <stdint.h>
 
@@ -60,7 +61,7 @@ public:
      */
     ResourceMonitoringCluster(EndpointId aEndpointId, ClusterId aClusterId,
                               const BitFlags<ResourceMonitoring::Feature> enabledFeatures,
-                              OptionalAttributeSet optionalAttributeSet,
+                              chip::Optional<OptionalAttributeSet> optionalAttributeSet,
                               ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
                               bool aResetConditionCommandSupported);
 
@@ -153,7 +154,7 @@ private:
     bool mResetConditionCommandSupported{ false };
 
     const BitFlags<ResourceMonitoring::Feature> mEnabledFeatures;
-    const OptionalAttributeSet mOptionalAttributeSet;
+    const chip::Optional<OptionalAttributeSet> mOptionalAttributeSet;
 };
 
 class Delegate

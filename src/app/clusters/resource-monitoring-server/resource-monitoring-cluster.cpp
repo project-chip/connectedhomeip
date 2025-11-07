@@ -47,7 +47,7 @@ namespace ResourceMonitoring {
 
 ResourceMonitoringCluster::ResourceMonitoringCluster(
     EndpointId aEndpointId, ClusterId aClusterId, const BitFlags<ResourceMonitoring::Feature> enabledFeatures,
-    OptionalAttributeSet optionalAttributeSet,
+    chip::Optional<OptionalAttributeSet> optionalAttributeSet,
     ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
     bool aResetConditionCommandSupported) :
     DefaultServerCluster(ConcreteClusterPath(aEndpointId, aClusterId)),
@@ -138,8 +138,10 @@ CHIP_ERROR ResourceMonitoringCluster::Attributes(const ConcreteClusterPath & pat
     AttributeListBuilder::OptionalAttributeEntry optionalAttributesEntries[] = {
         { haveCondition, Condition::kMetadataEntry },
         { haveCondition, DegradationDirection::kMetadataEntry },
-        { mOptionalAttributeSet.IsSet(InPlaceIndicator::Id), InPlaceIndicator::kMetadataEntry },
-        { mOptionalAttributeSet.IsSet(LastChangedTime::Id), LastChangedTime::kMetadataEntry },
+        { mOptionalAttributeSet.HasValue() && mOptionalAttributeSet.Value().IsSet(InPlaceIndicator::Id),
+          InPlaceIndicator::kMetadataEntry },
+        { mOptionalAttributeSet.HasValue() && mOptionalAttributeSet.Value().IsSet(LastChangedTime::Id),
+          LastChangedTime::kMetadataEntry },
     };
 
     return listBuilder.Append(Span(kMandatoryAttributes), Span(optionalAttributesEntries));
@@ -387,7 +389,7 @@ bool ResourceMonitoringCluster::HasFeature(ResourceMonitoring::Feature aFeature)
 
 bool ResourceMonitoringCluster::HasOptionalAttribute(AttributeId aAttribute) const
 {
-    return mOptionalAttributeSet.IsSet(aAttribute);
+    return mOptionalAttributeSet.HasValue() && mOptionalAttributeSet.Value().IsSet(aAttribute);
 }
 
 Protocols::InteractionModel::Status Delegate::OnResetCondition()

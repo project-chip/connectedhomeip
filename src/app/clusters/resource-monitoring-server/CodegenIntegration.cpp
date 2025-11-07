@@ -66,6 +66,37 @@ inline void RegisterInstance(Instance * instance, EndpointId endpointId, Cluster
     }
 }
 
+// Helper function to construct Optional Attribute Set for ResourceMonitoring
+inline chip::Optional<ResourceMonitoringCluster::OptionalAttributeSet> ConstructOptionalAttributeSet(EndpointId endpointId,
+                                                                                                     ClusterId clusterId)
+{
+    VerifyOrDie(emberAfContainsServer(endpointId, clusterId));
+
+    ResourceMonitoringCluster::OptionalAttributeSet optionalAttributeSet;
+
+    if (emberAfContainsAttribute(endpointId, clusterId, ResourceMonitoring::Attributes::Condition::Id))
+    {
+        optionalAttributeSet.Set<ResourceMonitoring::Attributes::Condition::Id>();
+    }
+
+    if (emberAfContainsAttribute(endpointId, clusterId, ResourceMonitoring::Attributes::DegradationDirection::Id))
+    {
+        optionalAttributeSet.Set<ResourceMonitoring::Attributes::DegradationDirection::Id>();
+    }
+
+    if (emberAfContainsAttribute(endpointId, clusterId, ResourceMonitoring::Attributes::InPlaceIndicator::Id))
+    {
+        optionalAttributeSet.Set<ResourceMonitoring::Attributes::InPlaceIndicator::Id>();
+    }
+
+    if (emberAfContainsAttribute(endpointId, clusterId, ResourceMonitoring::Attributes::LastChangedTime::Id))
+    {
+        optionalAttributeSet.Set<ResourceMonitoring::Attributes::LastChangedTime::Id>();
+    }
+
+    return chip::Optional<ResourceMonitoringCluster::OptionalAttributeSet>{ optionalAttributeSet };
+}
+
 } // namespace
 
 namespace chip {
@@ -76,10 +107,7 @@ namespace ResourceMonitoring {
 Instance::Instance(Delegate * delegate, EndpointId endpointId, ClusterId clusterId, uint32_t featureMap,
                    DegradationDirectionEnum degradationDirection, bool resetConditionCommandSupported) :
     mCluster(endpointId, clusterId, BitFlags<ResourceMonitoring::Feature>{ featureMap },
-             OptionalAttributeSet{
-                 ResourceMonitoring::Attributes::Condition::Id | ResourceMonitoring::Attributes::DegradationDirection::Id |
-                 ResourceMonitoring::Attributes::InPlaceIndicator::Id | ResourceMonitoring::Attributes::LastChangedTime::Id },
-             degradationDirection, resetConditionCommandSupported)
+             ConstructOptionalAttributeSet(endpointId, clusterId), degradationDirection, resetConditionCommandSupported)
 {
     mCluster.Cluster().SetDelegate(delegate);
     RegisterInstance(this, endpointId, clusterId);
