@@ -94,7 +94,7 @@ public:
     uint32_t GetVendorId() { return mVendorId; }
     uint32_t GetProductId() { return mProductId; }
     short unsigned int GetHardwareVersion() { return mHardwareVersion; }
-    uint32_t GetSoftwareVersion() { return mSoftwareVersion; }
+    uint32_t GetSoftwareVersion() { return mRequestorSoftwareVersion; }
     std::vector<chip::app::Clusters::OtaSoftwareUpdateProvider::DownloadProtocolEnum> GetProtocolsSupported()
     {
         return mProtocolsSupported;
@@ -135,13 +135,14 @@ private:
     uint32_t mDelayedApplyActionTimeSec;
     chip::ota::OTAProviderUserConsentDelegate * mUserConsentDelegate;
     bool mUserConsentNeeded;
+    uint32_t mSoftwareVersion;
     char mSoftwareVersionString[SW_VER_STR_MAX_LEN];
     uint32_t mPollInterval;
     uint16_t mMaxBDXBlockSize;
     uint32_t mVendorId;
     uint32_t mProductId;
     short unsigned int mHardwareVersion;
-    uint32_t mSoftwareVersion;
+    uint32_t mRequestorSoftwareVersion;
     std::vector<chip::app::Clusters::OtaSoftwareUpdateProvider::DownloadProtocolEnum> mProtocolsSupported;
     bool mRequestorCanConsent;
     std::string mLocation;

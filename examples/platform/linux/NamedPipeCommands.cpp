@@ -91,7 +91,7 @@ CHIP_ERROR NamedPipeCommands::Stop()
     VerifyOrReturnError(unlink(mChipEventFifoPath.c_str()) == 0, CHIP_ERROR_WRITE_FAILED);
     mChipEventFifoPath.clear();
 
-    if (!mChipEventFifoPath.empty())
+    if (!mChipEventFifoPathOut.empty())
     {
         VerifyOrReturnError(unlink(mChipEventFifoPathOut.c_str()) == 0, CHIP_ERROR_WRITE_FAILED);
         mChipEventFifoPathOut.clear();
