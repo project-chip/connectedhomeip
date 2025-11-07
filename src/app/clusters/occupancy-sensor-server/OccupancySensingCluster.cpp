@@ -257,4 +257,14 @@ void OccupancySensingCluster::SetOccupancy(bool occupied)
                     mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);    }
 }
 
+void OccupancySensingCluster::SetHoldTimeLimits(const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & holdTimeLimits)
+{
+    if (mHoldTimeLimits.holdTimeMin != holdTimeLimits.holdTimeMin || mHoldTimeLimits.holdTimeMax != holdTimeLimits.holdTimeMax ||
+        mHoldTimeLimits.holdTimeDefault != holdTimeLimits.holdTimeDefault)
+    {
+        mHoldTimeLimits = holdTimeLimits;
+        NotifyAttributeChanged(Attributes::HoldTimeLimits::Id);
+    }
+}
+
 } // namespace chip::app::Clusters

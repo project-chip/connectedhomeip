@@ -55,6 +55,7 @@ public:
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
     DataModel::ActionReturnStatus SetHoldTime(uint16_t holdTime);
+    void SetHoldTimeLimits(const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & holdTimeLimits);
     void SetOccupancy(bool occupied);
 
 private:
