@@ -316,7 +316,7 @@ void BooleanStateConfigurationCluster::ClearAllAlarms()
     }
     if (mAlarmsSuppressed.HasAny())
     {
-        mAlarmsActive.ClearAll();
+        mAlarmsSuppressed.ClearAll();
         NotifyAttributeChanged(AlarmsSuppressed::Id);
     }
 
