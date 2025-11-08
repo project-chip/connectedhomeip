@@ -85,15 +85,15 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)
         chip::Test::ClusterTester tester(cluster);
 
         // without watermarks, no commands are accepted
-        ASSERT_TRUE(Testing::IsAcceptedCommandsListEqualTo(cluster, {}));
+        EXPECT_TRUE(Testing::IsAcceptedCommandsListEqualTo(cluster, {}));
 
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap;
         ASSERT_TRUE(tester.ReadAttribute(Attributes::FeatureMap::Id, featureMap).IsSuccess());
-        ASSERT_EQ(featureMap, BitFlags<SoftwareDiagnostics::Feature>{}.Raw());
+        EXPECT_EQ(featureMap, BitFlags<SoftwareDiagnostics::Feature>{}.Raw());
 
         // Everything is unimplemented, so attributes are just the global ones.
         // This is really not a useful cluster, but possible...
-        ASSERT_TRUE(Testing::IsAttributesListEqualTo(cluster, app::DefaultServerCluster::GlobalAttributes()));
+        EXPECT_TRUE(Testing::IsAttributesListEqualTo(cluster, app::DefaultServerCluster::GlobalAttributes()));
     }
 
     {
@@ -130,17 +130,23 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)
         
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap;
         ASSERT_TRUE(tester.ReadAttribute(Attributes::FeatureMap::Id, featureMap).IsSuccess());
-        ASSERT_EQ(featureMap, BitFlags<SoftwareDiagnostics::Feature>{ SoftwareDiagnostics::Feature::kWatermarks }.Raw());
+        EXPECT_EQ(featureMap, BitFlags<SoftwareDiagnostics::Feature>{ SoftwareDiagnostics::Feature::kWatermarks }.Raw());
 
 
-        // Everything is unimplemented, so attributes are just the global ones.
-        // This is really not a useful cluster, but possible...
-        ASSERT_TRUE(Testing::IsAttributesListEqualTo(cluster, app::DefaultServerCluster::GlobalAttributes()));
+        // attribute list (only heap high watermark supported)
+        ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> expectedBuilder;
+        ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
+        ASSERT_EQ(expectedBuilder.AppendElements({
+                      SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::kMetadataEntry
+                  }),
+                  CHIP_NO_ERROR);
+
+        EXPECT_TRUE(Testing::IsAttributesListEqualTo(cluster, expectedBuilder.TakeBuffer()));
 
         // Call the command, and verify it calls through to the provider
-        ASSERT_FALSE(watermarksProvider.GetProvider().resetCalled);
-        ASSERT_TRUE(tester.Invoke(Commands::ResetWatermarks::Id, Commands::ResetWatermarks::Type{}).IsSuccess());
-        ASSERT_TRUE(watermarksProvider.GetProvider().resetCalled);
+        EXPECT_FALSE(watermarksProvider.GetProvider().resetCalled);
+        EXPECT_TRUE(tester.Invoke(Commands::ResetWatermarks::Id, Commands::ResetWatermarks::Type{}).IsSuccess());
+        EXPECT_TRUE(watermarksProvider.GetProvider().resetCalled);
     }
 
     {
@@ -197,7 +203,7 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)
             cluster, { &Commands::ResetWatermarks::kMetadataEntry, 1 }));
 
         // generated commands list
-        ASSERT_TRUE(Testing::IsGeneratedCommandsListEqualTo(cluster, {}));
+        EXPECT_TRUE(Testing::IsGeneratedCommandsListEqualTo(cluster, {}));
 
         // attribute list
         ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> expectedBuilder;
@@ -216,53 +222,53 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)
         // cluster revision
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision;
         ASSERT_TRUE(tester.ReadAttribute(Attributes::ClusterRevision::Id, clusterRevision).IsSuccess());
-        ASSERT_EQ(clusterRevision, SoftwareDiagnostics::kRevision);
+        EXPECT_EQ(clusterRevision, SoftwareDiagnostics::kRevision);
 
         // feature map
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap;
         ASSERT_TRUE(tester.ReadAttribute(Attributes::FeatureMap::Id, featureMap).IsSuccess());
-        ASSERT_EQ(featureMap, BitFlags<SoftwareDiagnostics::Feature>{ SoftwareDiagnostics::Feature::kWatermarks }.Raw());
+        EXPECT_EQ(featureMap, BitFlags<SoftwareDiagnostics::Feature>{ SoftwareDiagnostics::Feature::kWatermarks }.Raw());
 
         // heapfree
         Attributes::CurrentHeapFree::TypeInfo::DecodableType heapFree;
         ASSERT_TRUE(tester.ReadAttribute(Attributes::CurrentHeapFree::Id, heapFree).IsSuccess());
-        ASSERT_EQ(heapFree, 123u);
+        EXPECT_EQ(heapFree, 123u);
 
         // heapused
         Attributes::CurrentHeapUsed::TypeInfo::DecodableType heapUsed;
         ASSERT_TRUE(tester.ReadAttribute(Attributes::CurrentHeapUsed::Id, heapUsed).IsSuccess());
-        ASSERT_EQ(heapUsed, 234u);
+        EXPECT_EQ(heapUsed, 234u);
 
         // highwatermark
         Attributes::CurrentHeapHighWatermark::TypeInfo::DecodableType highWatermark;
         ASSERT_TRUE(tester.ReadAttribute(Attributes::CurrentHeapHighWatermark::Id, highWatermark).IsSuccess());
-        ASSERT_EQ(highWatermark, 456u);
+        EXPECT_EQ(highWatermark, 456u);
 
         // threadmetrics
         Attributes::ThreadMetrics::TypeInfo::DecodableType threadMetrics;
         ASSERT_TRUE(tester.ReadAttribute(Attributes::ThreadMetrics::Id, threadMetrics).IsSuccess());
-        ASSERT_TRUE(allProvider.GetProvider().releaseCalled);
+        EXPECT_TRUE(allProvider.GetProvider().releaseCalled);
         {
             auto it = threadMetrics.begin();
             ASSERT_TRUE(it.Next());
             const auto & tm1 = it.GetValue();
-            ASSERT_EQ(tm1.id, 1u);
-            ASSERT_FALSE(tm1.name.HasValue());
-            ASSERT_FALSE(tm1.stackFreeCurrent.HasValue());
-            ASSERT_FALSE(tm1.stackFreeMinimum.HasValue());
-            ASSERT_FALSE(tm1.stackSize.HasValue());
+            EXPECT_EQ(tm1.id, 1u);
+            EXPECT_FALSE(tm1.name.HasValue());
+            EXPECT_FALSE(tm1.stackFreeCurrent.HasValue());
+            EXPECT_FALSE(tm1.stackFreeMinimum.HasValue());
+            EXPECT_FALSE(tm1.stackSize.HasValue());
 
             ASSERT_TRUE(it.Next());
             const auto & tm2 = it.GetValue();
-            ASSERT_EQ(tm2.id, 2u);
-            ASSERT_FALSE(tm2.name.HasValue());
-            ASSERT_FALSE(tm2.stackFreeCurrent.HasValue());
+            EXPECT_EQ(tm2.id, 2u);
+            EXPECT_FALSE(tm2.name.HasValue());
+            EXPECT_FALSE(tm2.stackFreeCurrent.HasValue());
             ASSERT_TRUE(tm2.stackFreeMinimum.HasValue());
-            ASSERT_EQ(tm2.stackFreeMinimum.Value(), 512u);
-            ASSERT_FALSE(tm2.stackSize.HasValue());
+            EXPECT_EQ(tm2.stackFreeMinimum.Value(), 512u);
+            EXPECT_FALSE(tm2.stackSize.HasValue());
 
-            ASSERT_FALSE(it.Next());
-            ASSERT_EQ(it.GetStatus(), CHIP_NO_ERROR);
+            EXPECT_FALSE(it.Next());
+            EXPECT_EQ(it.GetStatus(), CHIP_NO_ERROR);
         }
     }
 }
@@ -290,11 +296,11 @@ TEST_F(TestSoftwareDiagnosticsCluster, TestEventGeneration)
     ASSERT_TRUE(event.has_value());
     ASSERT_EQ(event->GetEventData(decodedFault), CHIP_NO_ERROR); // NOLINT(bugprone-unchecked-optional-access)
 
-    ASSERT_EQ(decodedFault.id, fault.id);
+    EXPECT_EQ(decodedFault.id, fault.id);
     ASSERT_TRUE(decodedFault.name.HasValue());
-    ASSERT_TRUE(decodedFault.name.Value().data_equal(fault.name.Value()));
+    EXPECT_TRUE(decodedFault.name.Value().data_equal(fault.name.Value()));
     ASSERT_TRUE(decodedFault.faultRecording.HasValue());
-    ASSERT_TRUE(decodedFault.faultRecording.Value().data_equal(fault.faultRecording.Value()));
+    EXPECT_TRUE(decodedFault.faultRecording.Value().data_equal(fault.faultRecording.Value()));
 
     cluster.Shutdown();
 }
