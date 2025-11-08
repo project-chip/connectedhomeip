@@ -48,7 +48,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
                        storage_dir='/tmp',
                        extra_args: list = [],
                        kvs_path: Optional[str] = None,
-                       log_file: Optional[str] = None, expected_output: str = "Status: Satisfied",
+                       log_file: Optional[str] = None, expected_output: str = "Server initialization complete",
                        timeout: int = 30):
         """Start the provider process using the provided configuration.
 
@@ -62,7 +62,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             extra_args (list, optional): Extra args to send to the provider process. Defaults to [].
             kvs_path(str): Str of the path for the kvs path, if not will use temp file.
             log_file (Optional[str], optional): Destination for the app process logs. Defaults to None.
-            expected_output (str): Expected string to see after a default timeout. Defaults to "Status: Satisfied".
+            expected_output (str): Expected string to see after a default timeout. Defaults to "Server initialization complete".
             timeout (int): Timeout to wait for the expected output. Defaults to 10 seconds
         """
         logger.info(f"Launching provider app with with ota image {ota_image_path} over the port: {port}")
