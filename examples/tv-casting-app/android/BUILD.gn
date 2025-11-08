@@ -53,11 +53,35 @@ shared_library("jni") {
     "${chip_root}/third_party/inipp",
   ]
 
-  cflags = [ "-Wconversion" ]
+  cflags = [
+    "-Wconversion",
+    "-Os",  # Optimize for size instead of speed (more aggressive than -Oz)
+    "-flto",  # Link-Time Optimization
+    "-g0",  # No debug information
+    "-ffunction-sections",  # Place each function in its own section
+    "-fdata-sections",  # Place each data item in its own section
+    "-fvisibility=hidden",  # Hide symbols by default
+    "-fno-exceptions",  # Disable exception handling if not needed
+    "-fno-rtti",  # Disable runtime type information if not needed
+    "-Wno-unused-but-set-variable",
+  ]
 
   output_dir = "${root_out_dir}/lib/jni/${android_abi}"
 
-  ldflags = [ "-Wl,--gc-sections" ]
+  ldflags = [
+    "-flto",  # Link-Time Optimization
+    "-Wl,--gc-sections",  # Remove unused sections
+    "-Wl,--as-needed",  # Only link needed shared libraries
+    "-Wl,--strip-all",  # Strip all symbols
+    "-Wl,--icf=all",  # Identical code folding
+    "-Wl,--merge-exidx-entries",  # Merge exception index entries
+  ]
+
+  if (android_abi == "arm64-v8a") {
+    ldflags += [ "-Ltoolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/aarch64-linux-android" ]
+  } else if (android_abi == "armeabi-v7a") {
+    ldflags += [ "-Ltoolchains/llvm/prebuilt/darwin-x86_64/sysroot/usr/lib/arm-linux-androideabi" ]
+  }
 }
 
 android_library("java") {
