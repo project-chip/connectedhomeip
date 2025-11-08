@@ -41,7 +41,7 @@
 #       --string-arg provider_app_path:${OTA_PROVIDER_APP}
 #       --string-arg ota_image:${SU_OTA_REQUESTOR_V2}
 #       --int-arg ota_image_expected_version:2
-#       --int-arg ota_provider_port:5541
+#       --int-arg ota_provider_port:5543
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
