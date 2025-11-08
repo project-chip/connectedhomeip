@@ -70,7 +70,8 @@ TEST_F(TestSoftwareDiagnosticsCluster, CompileTest)
     SoftwareDiagnosticsServerCluster cluster({});
 
     // Essentially say "code executes"
-    ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, SoftwareDiagnostics::Id }), BitFlags<app::DataModel::ClusterQualityFlags>());
+    ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, SoftwareDiagnostics::Id }),
+              BitFlags<app::DataModel::ClusterQualityFlags>());
 }
 
 TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)
@@ -112,12 +113,11 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)
         };
 
         ScopedDiagnosticsProvider<WatermarksProvider> watermarksProvider;
-        SoftwareDiagnosticsServerCluster cluster(SoftwareDiagnosticsLogic::OptionalAttributeSet().Set<Attributes::CurrentHeapHighWatermark::Id>());
+        SoftwareDiagnosticsServerCluster cluster(
+            SoftwareDiagnosticsLogic::OptionalAttributeSet().Set<Attributes::CurrentHeapHighWatermark::Id>());
         chip::Test::ClusterTester tester(cluster);
 
-        ASSERT_TRUE(Testing::IsAcceptedCommandsListEqualTo(
-            cluster, { &Commands::ResetWatermarks::kMetadataEntry, 1 }));
-
+        ASSERT_TRUE(Testing::IsAcceptedCommandsListEqualTo(cluster, { &Commands::ResetWatermarks::kMetadataEntry, 1 }));
 
         // ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
         // ASSERT_EQ(diag.AcceptedCommands(commandsBuilder), CHIP_NO_ERROR);
@@ -132,13 +132,10 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)
         ASSERT_TRUE(tester.ReadAttribute(Attributes::FeatureMap::Id, featureMap).IsSuccess());
         EXPECT_EQ(featureMap, BitFlags<SoftwareDiagnostics::Feature>{ SoftwareDiagnostics::Feature::kWatermarks }.Raw());
 
-
         // attribute list (only heap high watermark supported)
         ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> expectedBuilder;
         ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-        ASSERT_EQ(expectedBuilder.AppendElements({
-                      SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::kMetadataEntry
-                  }),
+        ASSERT_EQ(expectedBuilder.AppendElements({ SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::kMetadataEntry }),
                   CHIP_NO_ERROR);
 
         EXPECT_TRUE(Testing::IsAttributesListEqualTo(cluster, expectedBuilder.TakeBuffer()));
@@ -175,9 +172,9 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)
             {
                 static DeviceLayer::ThreadMetrics metrics[2];
                 metrics[0].Next = &metrics[1];
-                metrics[0].id = 1;
+                metrics[0].id   = 1;
                 metrics[1].Next = nullptr;
-                metrics[1].id = 2;
+                metrics[1].id   = 2;
                 metrics[1].stackFreeMinimum.SetValue(512u);
                 *threadMetricsList = metrics;
                 return CHIP_NO_ERROR;
@@ -191,16 +188,15 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)
 
         ScopedDiagnosticsProvider<AllProvider> allProvider;
         SoftwareDiagnosticsServerCluster cluster(SoftwareDiagnosticsLogic::OptionalAttributeSet()
-                                          .Set<Attributes::ThreadMetrics::Id>()
-                                          .Set<Attributes::CurrentHeapFree::Id>()
-                                          .Set<Attributes::CurrentHeapUsed::Id>()
-                                          .Set<Attributes::CurrentHeapHighWatermark::Id>());
+                                                     .Set<Attributes::ThreadMetrics::Id>()
+                                                     .Set<Attributes::CurrentHeapFree::Id>()
+                                                     .Set<Attributes::CurrentHeapUsed::Id>()
+                                                     .Set<Attributes::CurrentHeapHighWatermark::Id>());
 
         chip::Test::ClusterTester tester(cluster);
 
         // accepted commands list
-        ASSERT_TRUE(Testing::IsAcceptedCommandsListEqualTo(
-            cluster, { &Commands::ResetWatermarks::kMetadataEntry, 1 }));
+        ASSERT_TRUE(Testing::IsAcceptedCommandsListEqualTo(cluster, { &Commands::ResetWatermarks::kMetadataEntry, 1 }));
 
         // generated commands list
         EXPECT_TRUE(Testing::IsGeneratedCommandsListEqualTo(cluster, {}));
@@ -282,11 +278,10 @@ TEST_F(TestSoftwareDiagnosticsCluster, TestEventGeneration)
 
     // Notify a fault, and verify it is received
     const char faultData[] = "faultdata";
-    Events::SoftwareFault::Type fault
-    {
+    Events::SoftwareFault::Type fault{
         .id             = 1234,
-        .name           = Optional{CharSpan::fromCharString("test")},
-        .faultRecording = Optional{ByteSpan(Uint8::from_const_char(faultData), strlen(faultData))},
+        .name           = Optional{ CharSpan::fromCharString("test") },
+        .faultRecording = Optional{ ByteSpan(Uint8::from_const_char(faultData), strlen(faultData)) },
     };
 
     SoftwareDiagnostics::SoftwareFaultListener::GlobalNotifySoftwareFaultDetect(fault);
