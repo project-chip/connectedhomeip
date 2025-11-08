@@ -30,12 +30,13 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/ReadOnlyBuffer.h>
+
+namespace {
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
 using namespace chip::Test;
-namespace {
 
 struct TestGroupKeyManagementCluster : public ::testing::Test
 {
@@ -102,16 +103,16 @@ TEST_F(TestGroupKeyManagementCluster, AttributesTest)
     ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
 }
 
-class MockSessionKeystore : public chip::Crypto::SessionKeystore
+class MockSessionKeystore : public Crypto::SessionKeystore
 {
 public:
-    using P256ECDHDerivedSecret        = chip::Crypto::P256ECDHDerivedSecret;
-    using Symmetric128BitsKeyByteArray = chip::Crypto::Symmetric128BitsKeyByteArray;
-    using Aes128KeyHandle              = chip::Crypto::Aes128KeyHandle;
-    using Hmac128KeyHandle             = chip::Crypto::Hmac128KeyHandle;
-    using HkdfKeyHandle                = chip::Crypto::HkdfKeyHandle;
-    using Symmetric128BitsKeyHandle    = chip::Crypto::Symmetric128BitsKeyHandle;
-    using AttestationChallenge         = chip::Crypto::AttestationChallenge;
+    using P256ECDHDerivedSecret        = Crypto::P256ECDHDerivedSecret;
+    using Symmetric128BitsKeyByteArray = Crypto::Symmetric128BitsKeyByteArray;
+    using Aes128KeyHandle              = Crypto::Aes128KeyHandle;
+    using Hmac128KeyHandle             = Crypto::Hmac128KeyHandle;
+    using HkdfKeyHandle                = Crypto::HkdfKeyHandle;
+    using Symmetric128BitsKeyHandle    = Crypto::Symmetric128BitsKeyHandle;
+    using AttestationChallenge         = Crypto::AttestationChallenge;
 
     CHIP_ERROR CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Aes128KeyHandle & key) override { return CHIP_NO_ERROR; }
     CHIP_ERROR CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Hmac128KeyHandle & key) override
@@ -141,11 +142,10 @@ public:
 };
 namespace TestHelpers {
 
-constexpr chip::GroupId kTestGroupId = 0x1001;
-constexpr uint16_t kTestKeySetId     = 1;
+constexpr GroupId kTestGroupId   = 0x1001;
+constexpr uint16_t kTestKeySetId = 1;
 
-GroupKeyManagement::Structs::GroupKeyMapStruct::Type CreateKey(chip::GroupId groupId, uint16_t keySetId,
-                                                               chip::FabricIndex fabricIndex)
+GroupKeyManagement::Structs::GroupKeyMapStruct::Type CreateKey(GroupId groupId, uint16_t keySetId, FabricIndex fabricIndex)
 {
     GroupKeyManagement::Structs::GroupKeyMapStruct::Type key;
     key.groupId       = groupId;
@@ -154,14 +154,14 @@ GroupKeyManagement::Structs::GroupKeyMapStruct::Type CreateKey(chip::GroupId gro
     return key;
 }
 std::vector<GroupKeyManagement::Structs::GroupKeyMapStruct::Type>
-CreateGroupKeyMapList(size_t count, chip::FabricIndex fabricIndex, chip::GroupId startGroupId = kTestGroupId,
+CreateGroupKeyMapList(size_t count, FabricIndex fabricIndex, GroupId startGroupId = kTestGroupId,
                       uint16_t startKeySetId = kTestKeySetId, uint16_t groupIdIncrement = 1, uint16_t keySetIdIncrement = 1)
 {
     std::vector<GroupKeyManagement::Structs::GroupKeyMapStruct::Type> list;
     for (size_t i = 0; i < count; ++i)
     {
-        chip::GroupId currentGroupId = static_cast<chip::GroupId>(startGroupId + (i * groupIdIncrement));
-        uint16_t currentKeySetId     = static_cast<uint16_t>(startKeySetId + (i * keySetIdIncrement));
+        GroupId currentGroupId   = static_cast<GroupId>(startGroupId + (i * groupIdIncrement));
+        uint16_t currentKeySetId = static_cast<uint16_t>(startKeySetId + (i * keySetIdIncrement));
         list.push_back(CreateKey(currentGroupId, currentKeySetId, fabricIndex));
     }
     return list;
@@ -174,27 +174,27 @@ struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementC
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
-    chip::Test::TestServerClusterContext mTestStack;
-    chip::Credentials::GroupDataProviderImpl mRealProvider;
+    chip::Test::TestServerClusterContext mTestContext;
+    Credentials::GroupDataProviderImpl mRealProvider;
     MockSessionKeystore mMockKeystore;
     GroupKeyManagementCluster mCluster;
     // This context object is non-assignable
-    decltype(mTestStack.Create()) mContext;
+    decltype(mTestContext.Create()) mContext;
     chip::Test::ClusterTester tester;
 
     // We initialize mContext here
-    TestGroupKeyManagementClusterWithStorage() : mContext(mTestStack.Create()), tester(mCluster) {}
+    TestGroupKeyManagementClusterWithStorage() : mContext(mTestContext.Create()), tester(mCluster) {}
 
     void SetUp() override
     {
-        auto * storage = &mTestStack.StorageDelegate();
+        auto * storage = &mTestContext.StorageDelegate();
         ASSERT_NE(storage, nullptr);
 
         mRealProvider.SetStorageDelegate(storage);
         mRealProvider.SetSessionKeystore(&mMockKeystore);
         ASSERT_EQ(mRealProvider.Init(), CHIP_NO_ERROR);
 
-        chip::Credentials::SetGroupDataProvider(&mRealProvider);
+        Credentials::SetGroupDataProvider(&mRealProvider);
 
         ASSERT_EQ(mCluster.Startup(mContext), CHIP_NO_ERROR);
     }
@@ -202,21 +202,21 @@ struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementC
     void TearDown() override
     {
         mCluster.Shutdown();
-        chip::Credentials::SetGroupDataProvider(nullptr);
+        Credentials::SetGroupDataProvider(nullptr);
         mRealProvider.Finish();
     }
 
     void PrepopulateGroupKeyMap(const std::vector<GroupKeyManagement::Structs::GroupKeyMapStruct::Type> & keys,
-                                chip::FabricIndex fabricIndex)
+                                FabricIndex fabricIndex)
     {
         auto listToWrite =
-            chip::app::DataModel::List<const GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(keys.data(), keys.size());
+            app::DataModel::List<const GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(keys.data(), keys.size());
 
         CHIP_ERROR err = tester.WriteAttribute(GroupKeyManagement::Attributes::GroupKeyMap::Id, listToWrite, fabricIndex);
         ASSERT_EQ(err, CHIP_NO_ERROR);
     }
 
-    void VerifyGroupKeysMatch(const chip::FabricIndex fabricIndex,
+    void VerifyGroupKeysMatch(const FabricIndex fabricIndex,
                               const std::vector<GroupKeyManagement::Structs::GroupKeyMapStruct::Type> & expectedKeys)
     {
         auto * iterator = mRealProvider.IterateGroupKeys(fabricIndex);
@@ -224,7 +224,7 @@ struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementC
         ASSERT_EQ(iterator->Count(), expectedKeys.size());
 
         size_t i = 0;
-        chip::Credentials::GroupDataProvider::GroupKey storedKey;
+        Credentials::GroupDataProvider::GroupKey storedKey;
         while (iterator->Next(storedKey))
         {
             ASSERT_LT(i, expectedKeys.size());
@@ -240,7 +240,7 @@ struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementC
 // Cluster should accept writing multiple group keys with the same KeySetID but different Group IDs
 TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttributeSameKeySetDifferentGroup)
 {
-    const chip::FabricIndex fabricIndex = chip::app::Testing::kTestFabrixIndex;
+    const FabricIndex fabricIndex = app::Testing::kTestFabrixIndex;
 
     auto keys = TestHelpers::CreateGroupKeyMapList(2, fabricIndex, TestHelpers::kTestGroupId, TestHelpers::kTestKeySetId, 1, 0);
     PrepopulateGroupKeyMap(keys, fabricIndex);
@@ -250,11 +250,10 @@ TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttributeSa
 // Cluster should reject a write containing duplicate keys for the same group/keyset combination.
 TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttributeDuplicateKey)
 {
-    const chip::FabricIndex fabricIndex = chip::app::Testing::kTestFabrixIndex;
+    const FabricIndex fabricIndex = app::Testing::kTestFabrixIndex;
     auto keys = TestHelpers::CreateGroupKeyMapList(2, fabricIndex, TestHelpers::kTestGroupId, TestHelpers::kTestKeySetId, 0, 0);
 
-    auto listToWrite =
-        chip::app::DataModel::List<const GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(keys.data(), keys.size());
+    auto listToWrite = app::DataModel::List<const GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(keys.data(), keys.size());
 
     CHIP_ERROR err = tester.WriteAttribute(GroupKeyManagement::Attributes::GroupKeyMap::Id, listToWrite, fabricIndex);
 
@@ -268,8 +267,8 @@ TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttributeDu
 
 TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttribute)
 {
-    const chip::FabricIndex fabricIndex = chip::app::Testing::kTestFabrixIndex;
-    auto keys                           = TestHelpers::CreateGroupKeyMapList(2, fabricIndex);
+    const FabricIndex fabricIndex = app::Testing::kTestFabrixIndex;
+    auto keys                     = TestHelpers::CreateGroupKeyMapList(2, fabricIndex);
 
     PrepopulateGroupKeyMap(keys, fabricIndex);
     VerifyGroupKeysMatch(fabricIndex, keys);
