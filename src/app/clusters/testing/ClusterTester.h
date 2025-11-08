@@ -199,7 +199,10 @@ public:
     }
 
     // Returns the next generated event from the event generator in the test server cluster context
-    std::optional<LogOnlyEvents::EventInformation> GetNextGeneratedEvent() { return mTestServerClusterContext.EventsGenerator().GetNextEvent(); }
+    std::optional<LogOnlyEvents::EventInformation> GetNextGeneratedEvent()
+    {
+        return mTestServerClusterContext.EventsGenerator().GetNextEvent();
+    }
 
 private:
     bool VerifyClusterPathsValid()
