@@ -127,7 +127,7 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)
         // ASSERT_EQ(commands[0].commandId, SoftwareDiagnostics::Commands::ResetWatermarks::Id);
         // ASSERT_EQ(commands[0].GetInvokePrivilege(),
         //           SoftwareDiagnostics::Commands::ResetWatermarks::kMetadataEntry.GetInvokePrivilege());
-        
+
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap;
         ASSERT_TRUE(tester.ReadAttribute(Attributes::FeatureMap::Id, featureMap).IsSuccess());
         EXPECT_EQ(featureMap, BitFlags<SoftwareDiagnostics::Feature>{ SoftwareDiagnostics::Feature::kWatermarks }.Raw());
