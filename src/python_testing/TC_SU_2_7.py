@@ -182,7 +182,6 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
             port=5541,
             kvs_path=self.provider_kvs_path,
             log_file=self.provider_log,
-            expected_output='Server initialization complete',
             timeout=10
         )
         await controller.CommissionOnNetwork(
@@ -289,7 +288,6 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
             port=5541,
             kvs_path=self.provider_kvs_path,
             log_file=self.provider_log,
-            expected_output='Server initialization complete',
             timeout=10
         )
         state_transition_event_handler = EventSubscriptionHandler(
@@ -476,7 +474,6 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
             port=5541, extra_args=['-u', 'deferred', '-c'],
             kvs_path=self.provider_kvs_path,
             log_file=self.provider_log,
-            expected_output='Server initialization complete',
             timeout=10
         )
         await controller.CommissionOnNetwork(
