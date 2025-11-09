@@ -8,38 +8,52 @@ declare_args() {
   chip_openthread_target = ""
 }
 
+config("warnings_fix_config") {
+  include_dirs = [ "${openthread_root}/include" ]
+  cflags = [
+    "-Wno-implicit-fallthrough",
+    "-Wno-undef",
+    "-Wno-unused-parameter",
+    "-Wno-format-nonliterval",
+    "-Wno-missing-field-initializers",
+  ]
+}
+
+group("warnings_fix") {
+  public_configs = [ ":warnings_fix_config" ]
+}
+
 group("openthread-platform") {
   if (chip_openthread_target != "") {
-    public_deps = [ chip_openthread_target ]
+    deps = [ chip_openthread_target ]
   } else {
     public_deps = [
       "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
-      "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
     ]
+    deps = [ "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils" ]
   }
 }
 
 group("openthread") {
+  public_deps = [ "${openthread_root}/include/openthread" ]
   if (chip_openthread_target != "") {
-    public_deps = [
-      "${openthread_root}/include/openthread",
-      chip_openthread_target,
-    ]
+    public_deps += [ chip_openthread_target ]
   } else {
     if (chip_openthread_ftd) {
-      public_deps = [ "${openthread_root}:libopenthread-ftd" ]
+      deps = [ "${openthread_root}:libopenthread-ftd" ]
     } else {
-      public_deps = [ "${openthread_root}:libopenthread-mtd" ]
+      deps = [ "${openthread_root}:libopenthread-mtd" ]
     }
+    public_deps += [ ":warnings_fix" ]
   }
 }
 
 group("openthread_cli") {
   if (chip_openthread_target == "") {
     if (chip_openthread_ftd) {
-      public_deps = [ "${openthread_root}:libopenthread-cli-ftd" ]
+      deps = [ "${openthread_root}:libopenthread-cli-ftd" ]
     } else {
-      public_deps = [ "${openthread_root}:libopenthread-cli-mtd" ]
+      deps = [ "${openthread_root}:libopenthread-cli-mtd" ]
     }
   }
 }

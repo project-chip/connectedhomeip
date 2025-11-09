@@ -27,6 +27,11 @@
 
 #include <system/SystemPacketBuffer.h>
 
+#include <openthread/error.h>
+#include <openthread/udp.h>
+
+auto & MapOpenThreadError = chip::DeviceLayer::Internal::MapOpenThreadError;
+
 namespace chip {
 namespace Inet {
 
@@ -39,8 +44,8 @@ namespace {
 // might move it backward by up to kPacketInfoAlignmentBytes, so we need to make
 // sure we allocate enough reserved space that this will still be within our
 // buffer.
-constexpr uint16_t kPacketInfoAlignmentBytes = sizeof(uint32_t) - 1;
-constexpr uint16_t kPacketInfoReservedSize   = sizeof(IPPacketInfo) + kPacketInfoAlignmentBytes;
+constexpr size_t kPacketInfoAlignmentBytes = sizeof(uint32_t) - 1;
+constexpr size_t kPacketInfoReservedSize   = sizeof(IPPacketInfo) + kPacketInfoAlignmentBytes;
 } // namespace
 
 void UDPEndPointImplOT::handleUdpReceive(void * aContext, otMessage * aMessage, const otMessageInfo * aMessageInfo)
@@ -121,9 +126,9 @@ void UDPEndPointImplOT::handleUdpReceive(void * aContext, otMessage * aMessage, 
     }
 }
 
-CHIP_ERROR UDPEndPointImplOT::IPv6Bind(otUdpSocket & socket, const IPAddress & address, uint16_t port, InterfaceId interface)
+CHIP_ERROR UDPEndPointImplOT::IPv6Bind(otUdpSocket & socket, const IPAddress & address, uint16_t port,
+                                       [[maybe_unused]] InterfaceId interface)
 {
-    (void) interface;
     otError err = OT_ERROR_NONE;
     otSockAddr listenSockAddr;
 
@@ -134,15 +139,22 @@ CHIP_ERROR UDPEndPointImplOT::IPv6Bind(otUdpSocket & socket, const IPAddress & a
     listenSockAddr.mAddress = address.ToIPv6();
 
     LockOpenThread();
-    otUdpOpen(mOTInstance, &socket, handleUdpReceive, this);
+    err = otUdpOpen(mOTInstance, &socket, handleUdpReceive, this);
+    VerifyOrExit(err == OT_ERROR_NONE, );
 #if OPENTHREAD_API_VERSION >= 465
-    otUdpBind(mOTInstance, &socket, &listenSockAddr, OT_NETIF_THREAD_INTERNAL);
+    err = otUdpBind(mOTInstance, &socket, &listenSockAddr, OT_NETIF_THREAD_INTERNAL);
 #else
-    otUdpBind(mOTInstance, &socket, &listenSockAddr, OT_NETIF_THREAD);
+    err = otUdpBind(mOTInstance, &socket, &listenSockAddr, OT_NETIF_THREAD);
 #endif
+    if (err != OT_ERROR_NONE)
+    {
+        std::ignore = otUdpClose(mOTInstance, &socket);
+    }
+
+exit:
     UnlockOpenThread();
 
-    return chip::DeviceLayer::Internal::MapOpenThreadError(err);
+    return MapOpenThreadError(err);
 }
 
 CHIP_ERROR UDPEndPointImplOT::BindImpl(IPAddressType addressType, const IPAddress & addr, uint16_t port, InterfaceId interface)
@@ -264,7 +276,7 @@ exit:
 
     UnlockOpenThread();
 
-    return chip::DeviceLayer::Internal::MapOpenThreadError(error);
+    return MapOpenThreadError(error);
 }
 
 void UDPEndPointImplOT::CloseImpl()
@@ -272,7 +284,8 @@ void UDPEndPointImplOT::CloseImpl()
     LockOpenThread();
     if (otUdpIsOpen(mOTInstance, &mSocket))
     {
-        otUdpClose(mOTInstance, &mSocket);
+        auto err = otUdpClose(mOTInstance, &mSocket);
+        ChipLogError(Inet, "Failed to close endpoint: %s", chip::ErrorStr(MapOpenThreadError(err)));
     }
     UnlockOpenThread();
 }
@@ -294,7 +307,7 @@ CHIP_ERROR UDPEndPointImplOT::IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInter
 
     UnlockOpenThread();
 
-    return chip::DeviceLayer::Internal::MapOpenThreadError(err);
+    return MapOpenThreadError(err);
 }
 
 IPPacketInfo * UDPEndPointImplOT::GetPacketInfo(const System::PacketBufferHandle & aBuffer)

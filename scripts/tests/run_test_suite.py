@@ -322,6 +322,12 @@ def cmd_list(context):
     show_default=True,
     help='Number of tests that are expected to fail in each iteration.  Overall test will pass if the number of failures matches this.  Nonzero values require --keep-going')
 @click.option(
+    '--ble-thread',
+    is_flag=True,
+    default=False,
+    show_default=True,
+    help='Use Bluetooth and Thread simulation to perform BLE-Thread commissioning. This option is available on Linux platform only.')
+@click.option(
     '--ble-wifi',
     is_flag=True,
     default=False,
@@ -331,7 +337,7 @@ def cmd_list(context):
 def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app,
             fabric_bridge_app, tv_app, bridge_app, lit_icd_app, microwave_oven_app, rvc_app, network_manager_app,
             energy_gateway_app, energy_management_app, closure_app, matter_repl_yaml_tester,
-            chip_tool_with_python, pics_file, keep_going, test_timeout_seconds, expected_failures, ble_wifi):
+            chip_tool_with_python, pics_file, keep_going, test_timeout_seconds, expected_failures, ble_thread, ble_wifi):
     if expected_failures != 0 and not keep_going:
         log.error("--expected-failures '%s' used without '--keep-going'", expected_failures)
         sys.exit(2)
@@ -369,6 +375,9 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
 
         if chip_tool_with_python is not None:
             chip_tool_with_python = chip_tool_with_python.wrap_with('python3')
+
+    if ble_thread and sys.platform != "linux":
+        raise click.BadOptionUsage("ble-thread", "Option --ble-thread is available on Linux platform only")
 
     if ble_wifi and sys.platform != "linux":
         raise click.BadOptionUsage("ble-wifi", "Option --ble-wifi is available on Linux platform only")
@@ -413,6 +422,13 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
             wifi = chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns)
             ble_controller_app = 0   # Bind app to the first BLE controller
             ble_controller_tool = 1  # Bind tool to the second BLE controller
+        elif ble_thread:
+            bus = chiptest.linux.DBusTestSystemBus()
+            bluetooth = chiptest.linux.BluetoothMock()
+            tbr = chiptest.linux.ThreadBorderRouter(ns)
+            tbr.join_network('0e08000000000001000000030000104a0300001635060004001fffe0020884fa18779329ac770708fd269658e44aa21a030f4f70656e5468726561642d32386335010228c50c0402a0f7f8051000112233445566778899aabbccddeeff041000112233445566778899aabbccddeeff')
+            ble_controller_app = 0   # Bind app to the first BLE controller
+            ble_controller_tool = 1  # Bind tool to the second BLE controller
 
         executor = chiptest.linux.LinuxNamespacedExecutor(ns)
     elif sys.platform == 'darwin':
@@ -433,6 +449,9 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
         if sys.platform == 'linux':
             if ble_wifi:
                 wifi.terminate()
+                bluetooth.terminate()
+                bus.terminate()
+            elif ble_thread:
                 bluetooth.terminate()
                 bus.terminate()
             ns.terminate()
@@ -462,6 +481,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
                     test_runtime=context.obj.runtime,
                     ble_controller_app=ble_controller_app,
                     ble_controller_tool=ble_controller_tool,
+                    op_network='Thread' if ble_thread else 'WiFi',
                 )
                 if not context.obj.dry_run:
                     test_end = time.monotonic()

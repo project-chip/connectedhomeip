@@ -17,6 +17,7 @@ import("//build_overrides/chip.gni")
 
 import("${build_root}/config/linux/pkg_config.gni")
 
+import("${chip_root}/src/inet/inet.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
 
@@ -85,10 +86,6 @@ static_library("Linux") {
     "${chip_root}/src/setup_payload",
   ]
 
-  if (chip_enable_openthread) {
-    sources += [ "NetworkCommissioningThreadDriver.cpp" ]
-  }
-
   if (chip_enable_ble) {
     sources += [
       "BLEManagerImpl.cpp",
@@ -137,17 +134,6 @@ static_library("Linux") {
     deps += [ "${chip_root}/src/transport/raw:nfc-application-delegate" ]
   }
 
-  if (chip_mdns == "platform") {
-    sources += [
-      "DnssdImpl.cpp",
-      "DnssdImpl.h",
-    ]
-
-    deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
-
-    public_configs += [ ":avahi_client_config" ]
-  }
-
   if (chip_enable_ota_requestor) {
     sources += [
       "OTAImageProcessorImpl.cpp",
@@ -155,14 +141,52 @@ static_library("Linux") {
     ]
   }
 
-  if (chip_enable_openthread) {
+  if (chip_system_config_use_openthread_inet_endpoints) {
     sources += [
-      "ThreadStackManagerImpl.cpp",
-      "ThreadStackManagerImpl.h",
+      "../OpenThread/GenericNetworkCommissioningThreadDriver.cpp",
+      "../OpenThread/GenericNetworkCommissioningThreadDriver.h",
+      "../OpenThread/OpenThreadUtils.cpp",
+      "ThreadStackManagerImpl_OpenThread.cpp",
+      "ThreadStackManagerImpl_OpenThread.h",
     ]
 
-    deps += [ "${chip_root}/src/app:app_config" ]
-    public_deps += [ "dbus/openthread" ]
+    deps += [
+      "${chip_root}/src/app:app_config",
+      "${chip_root}/third_party/openthread/platforms/simulation",
+    ]
+
+    if (chip_mdns == "platform") {
+      sources += [
+        "../OpenThread/DnssdImpl.cpp",
+        "../OpenThread/OpenThreadDnssdImpl.cpp",
+        "../OpenThread/OpenThreadDnssdImpl.h",
+      ]
+      deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
+    }
+
+    public_deps += [ "${chip_root}/third_party/openthread:openthread" ]
+  } else {
+    if (chip_mdns == "platform") {
+      sources += [
+        "DnssdImpl.cpp",
+        "DnssdImpl.h",
+      ]
+
+      deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
+
+      public_configs += [ ":avahi_client_config" ]
+    }
+
+    if (chip_enable_openthread) {
+      sources += [
+        "NetworkCommissioningThreadDriver.cpp",
+        "ThreadStackManagerImpl.cpp",
+        "ThreadStackManagerImpl.h",
+      ]
+
+      deps += [ "${chip_root}/src/app:app_config" ]
+      public_deps += [ "dbus/openthread" ]
+    }
   }
 
   if (chip_enable_wifi) {
