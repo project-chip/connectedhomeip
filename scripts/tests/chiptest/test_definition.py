@@ -105,11 +105,12 @@ class App:
         return True
 
     def waitForApplicationUp(self):
-        # Watch for both mDNS advertisement start as well as event loop start.
+        # Historically, readiness was detected by waiting for the mDNS service to be
+        # published. This may not happen on startup for Matter over Thread device.
+        # Watch for both Manual pairing code ready as well as event loop start.
         # These two messages can appear in any order depending on the implementation.
         # Waiting for both makes the startup detection more robust.
-        assert self.process is not None and self.outpipe is not None, "waitForAnyAdvertisement can be called only after start()"
-        self.__waitFor(["mDNS service published:", "APP STATUS: Starting event loop"])
+        self.__waitFor(["Manual pairing code:", "APP STATUS: Starting event loop"])
 
     def waitForMessage(self, message: str, timeoutInSeconds: float = 10):
         self.__waitFor([message], timeoutInSeconds=timeoutInSeconds)
@@ -387,7 +388,9 @@ class TestDefinition:
             pics_file: Path, timeout_seconds: int | None, dry_run: bool = False,
             test_runtime: TestRunTime = TestRunTime.CHIP_TOOL_PYTHON,
             ble_controller_app: int | None = None,
-            ble_controller_tool: int | None = None):
+            ble_controller_tool: int | None = None,
+            op_network: str = 'WiFi',
+            ):
         """
         Executes the given test case using the provided runner for execution.
         """
@@ -446,7 +449,12 @@ class TestDefinition:
                     if command == target_app:
                         key = 'default'
                     if ble_controller_app is not None:
-                        command = command.with_args("--ble-controller", str(ble_controller_app), "--wifi")
+                        command = command.with_args("--ble-controller", str(ble_controller_app))
+                        if op_network == 'WiFi':
+                            command = command.with_args("--wifi")
+                        elif op_network == 'Thread':
+                            command = command.with_args("--thread-node-id=2")
+
                     app = App(runner, command)
                     # Add the App to the register immediately, so if it fails during
                     # start() we will be able to clean things up properly.
@@ -497,9 +505,14 @@ class TestDefinition:
                 pairing_server_args = []
 
                 if ble_controller_tool is not None:
-                    pairing_cmd = apps.chip_tool_with_python_cmd.with_args(
-                        "pairing", "code-wifi", TEST_NODE_ID, "MatterAP", "MatterAPPassword", TEST_SETUP_QR_CODE)
-                    pairing_server_args = ["--ble-controller", str(ble_controller_tool)]
+                    if op_network == 'WiFi':
+                        pairing_cmd = apps.chip_tool_with_python_cmd.with_args(
+                            "pairing", "code-wifi", TEST_NODE_ID, "MatterAP", "MatterAPPassword", TEST_SETUP_QR_CODE)
+                        pairing_server_args = ["--ble-controller", str(ble_controller_tool)]
+                    elif op_network == 'Thread':
+                        pairing_cmd = apps.chip_tool_with_python_cmd.with_args(
+                            "pairing", "code-thread", TEST_NODE_ID, "hex:0e08000000000001000000030000104a0300001635060004001fffe0020884fa18779329ac770708fd269658e44aa21a030f4f70656e5468726561642d32386335010228c50c0402a0f7f8051000112233445566778899aabbccddeeff041000112233445566778899aabbccddeeff", TEST_SETUP_QR_CODE)
+                        pairing_server_args = ["--ble-controller", str(ble_controller_tool)]
                 else:
                     pairing_cmd = apps.chip_tool_with_python_cmd.with_args('pairing', 'code', TEST_NODE_ID, setupCode)
 

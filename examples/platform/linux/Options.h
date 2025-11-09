@@ -57,11 +57,17 @@ struct LinuxDeviceOptions
     uint32_t mBleDevice        = 0;
     bool wifiSupports5g        = false;
     bool mWiFi                 = false;
-    bool mThread               = false;
-    bool cameraDeferredOffer   = false;
-    bool cameraTestVideosrc    = false;
-    bool cameraTestAudiosrc    = false;
-    bool cameraAudioPlayback   = false;
+#if CHIP_ENABLE_OPENTHREAD
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    uint16_t mThreadNodeId = 0;
+#else
+    bool mThread = false;
+#endif
+#endif
+    bool cameraDeferredOffer = false;
+    bool cameraTestVideosrc  = false;
+    bool cameraTestAudiosrc  = false;
+    bool cameraAudioPlayback = false;
     chip::Optional<std::string> cameraVideoDevice;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     bool mWiFiPAF                = false;

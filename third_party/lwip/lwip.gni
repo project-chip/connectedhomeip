@@ -75,6 +75,7 @@ template("lwip_target") {
   source_set(lwip_target_name) {
     forward_variables_from(invoker,
                            [
+                             "deps",
                              "sources",
                              "public",
                              "public_configs",

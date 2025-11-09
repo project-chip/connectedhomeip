@@ -363,6 +363,12 @@ class Terminable(Protocol):
     show_default=True,
     help='Number of tests that are expected to fail in each iteration.  Overall test will pass if the number of failures matches this.  Nonzero values require --keep-going')
 @click.option(
+    '--ble-thread',
+    is_flag=True,
+    default=False,
+    show_default=True,
+    help='Use Bluetooth and Thread simulation to perform BLE-Thread commissioning. This option is available on Linux platform only.')
+@click.option(
     '--ble-wifi',
     is_flag=True,
     default=False,
@@ -374,11 +380,12 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
             bridge_app: Path | None, lit_icd_app: Path | None, microwave_oven_app: Path | None, rvc_app: Path | None,
             network_manager_app: Path | None, energy_gateway_app: Path | None, energy_management_app: Path | None,
             closure_app: Path | None, matter_repl_yaml_tester: Path | None, chip_tool_with_python: Path | None, pics_file: Path,
-            keep_going: bool, test_timeout_seconds: int | None, expected_failures: int, ble_wifi: bool) -> None:
+            keep_going: bool, test_timeout_seconds: int | None, expected_failures: int, ble_thread: bool, ble_wifi: bool) -> None:
     assert isinstance(context.obj, RunContext)
 
     if expected_failures != 0 and not keep_going:
-        raise click.BadOptionUsage("--expected-failures", f"--expected-failures '{expected_failures}' used without '--keep-going'")
+        raise click.BadOptionUsage("--expected-failures",
+                                   f"--expected-failures '{expected_failures}' used without '--keep-going'")
 
     paths_finder = PathsFinder(context.obj.find_path)
 
@@ -414,6 +421,9 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
 
     if chip_tool_with_python_info is not None:
         chip_tool_with_python_info = chip_tool_with_python_info.wrap_with('python3')
+
+    if ble_thread and sys.platform != "linux":
+        raise click.BadOptionUsage("ble-thread", "Option --ble-thread is available on Linux platform only")
 
     if ble_wifi and sys.platform != "linux":
         raise click.BadOptionUsage("ble-wifi", "Option --ble-wifi is available on Linux platform only")
@@ -454,6 +464,9 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
 
     try:
         if sys.platform == 'linux':
+            if ble_wifi and ble_thread:
+                raise click.BadOptionUsage("ble-wifi", "Option --ble-wifi is exclusive to --ble-thread")
+
             to_terminate.append(ns := chiptest.linux.IsolatedNetworkNamespace(
                 index=0,
                 # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
@@ -466,6 +479,12 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
                 to_terminate.append(chiptest.linux.DBusTestSystemBus())
                 to_terminate.append(chiptest.linux.BluetoothMock())
                 to_terminate.append(chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns))
+                ble_controller_app = 0   # Bind app to the first BLE controller
+                ble_controller_tool = 1  # Bind tool to the second BLE controller
+            elif ble_thread:
+                to_terminate.append(chiptest.linux.DBusTestSystemBus())
+                to_terminate.append(chiptest.linux.BluetoothMock())
+                to_terminate.append(chiptest.linux.ThreadBorderRouter(ns))
                 ble_controller_app = 0   # Bind app to the first BLE controller
                 ble_controller_tool = 1  # Bind tool to the second BLE controller
 
@@ -498,6 +517,7 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
                         test_runtime=context.obj.runtime,
                         ble_controller_app=ble_controller_app,
                         ble_controller_tool=ble_controller_tool,
+                        op_network='Thread' if ble_thread else 'WiFi',
                     )
                     if not context.obj.dry_run:
                         test_end = time.monotonic()
@@ -510,7 +530,8 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
                         sys.exit(2)
 
             if observed_failures != expected_failures:
-                log.error("Iteration %d: expected failure count %d, but got %d", i, expected_failures, observed_failures)
+                log.error("Iteration %d: expected failure count %d, but got %d",
+                          i, expected_failures, observed_failures)
                 sys.exit(2)
     except KeyboardInterrupt:
         log.info("Interrupting execution on user request")
