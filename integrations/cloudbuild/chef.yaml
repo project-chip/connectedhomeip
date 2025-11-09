@@ -26,12 +26,11 @@ steps:
     # Details on why this is required - https://github.com/project-chip/connectedhomeip/pull/41741
     - name: "ghcr.io/project-chip/chip-build-vscode:174"
       args:
-          - >-
-            ./scripts/run_in_build_env.sh "pip install esp-idf-kconfig==2.5.0"
+          - pip install esp-idf-kconfig==2.5.0
       id: InstallEspIdfKconfig
       waitFor:
           - Bootstrap
-      entrypoint: /usr/bin/bash
+      entrypoint: ./scripts/run_in_build_env.sh
     - name: "ghcr.io/project-chip/chip-build-vscode:174"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
