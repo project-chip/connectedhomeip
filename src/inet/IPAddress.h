@@ -143,6 +143,19 @@ union SockAddrWithoutStorage
 };
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
+template <typename T>
+struct ToString
+{
+    ToString(const T &t) {
+        t.ToString(buf);
+    }
+    const char *c_str() const {
+        return buf;
+    }
+private:
+    char buf[T::kMaxStringLength];
+};
+
 /**
  * @brief   Internet protocol address
  *

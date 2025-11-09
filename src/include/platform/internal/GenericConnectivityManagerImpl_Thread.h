@@ -67,6 +67,7 @@ protected:
     bool _IsThreadProvisioned();
     void _ErasePersistentInfo();
     void _ResetThreadNetworkDiagnosticsCounts();
+    void _FinishProvisioning();
 
     // ===== Members for use by the implementation subclass.
 
@@ -141,6 +142,12 @@ template <class ImplClass>
 inline void GenericConnectivityManagerImpl_Thread<ImplClass>::_ResetThreadNetworkDiagnosticsCounts()
 {
     ThreadStackMgrImpl().ResetThreadNetworkDiagnosticsCounts();
+}
+
+template <class ImplClass>
+inline void GenericConnectivityManagerImpl_Thread<ImplClass>::_FinishProvisioning()
+{
+    ThreadStackMgrImpl().RendezvousStop();
 }
 
 } // namespace Internal

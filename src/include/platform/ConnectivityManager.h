@@ -219,6 +219,7 @@ public:
     bool IsThreadAttached();
     bool IsThreadProvisioned();
     void ErasePersistentInfo();
+    void FinishProvisioning();
     void ResetThreadNetworkDiagnosticsCounts();
 
     CHIP_ERROR SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);
@@ -530,6 +531,11 @@ inline bool ConnectivityManager::IsThreadProvisioned()
 inline void ConnectivityManager::ErasePersistentInfo()
 {
     static_cast<ImplClass *>(this)->_ErasePersistentInfo();
+}
+
+inline void ConnectivityManager::FinishProvisioning()
+{
+    static_cast<ImplClass *>(this)->_FinishProvisioning();
 }
 
 inline void ConnectivityManager::ResetThreadNetworkDiagnosticsCounts()

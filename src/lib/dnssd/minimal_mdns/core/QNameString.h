@@ -34,7 +34,19 @@ public:
 
     inline bool Fit() const { return mBuffer.Fit(); }
 
+    template <size_t N>
+    bool EndsWith(const char (&aSuffix)[N])
+    {
+        return EndsWith(&aSuffix[0], N - 1);
+    }
+
 private:
+    bool EndsWith(const char * aSuffix, size_t aLength)
+    {
+        const char * ptr = strstr(mBuffer.c_str(), aSuffix);
+        return ptr != nullptr && ptr[aLength] == '\0';
+    }
+
     static constexpr size_t kMaxQNameLength = 128;
     chip::StringBuilder<kMaxQNameLength> mBuffer;
 };

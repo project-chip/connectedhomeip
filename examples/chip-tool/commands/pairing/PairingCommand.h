@@ -19,10 +19,12 @@
 #pragma once
 
 #include "../common/CHIPCommand.h"
+#include "commands/common/Command.h"
 #include <controller/CommissioningDelegate.h>
 #include <controller/CurrentFabricRemover.h>
 
 #include <commands/common/CredentialIssuerCommands.h>
+#include <cstdint>
 #include <lib/support/Span.h>
 #include <lib/support/ThreadOperationalDataset.h>
 
@@ -63,8 +65,7 @@ public:
     PairingCommand(const char * commandName, PairingMode mode, PairingNetworkType networkType,
                    CredentialIssuerCommands * credIssuerCmds,
                    chip::Dnssd::DiscoveryFilterType filterType = chip::Dnssd::DiscoveryFilterType::kNone) :
-        CHIPCommand(commandName, credIssuerCmds),
-        mPairingMode(mode), mNetworkType(networkType), mFilterType(filterType),
+        CHIPCommand(commandName, credIssuerCmds), mPairingMode(mode), mNetworkType(networkType), mFilterType(filterType),
         mRemoteAddr{ IPAddress::Any, chip::Inet::InterfaceId::Null() }, mComplex_TimeZones(&mTimeZoneList),
         mComplex_DSTOffsets(&mDSTOffsetList), mCurrentFabricRemoveCallback(OnCurrentFabricRemove, this)
     {
@@ -116,6 +117,8 @@ public:
         case PairingMode::CodePaseOnly:
             AddArgument("payload", &mOnboardingPayload);
             AddArgument("discover-once", 0, 1, &mDiscoverOnce);
+            AddArgument("thread-ba-host", &mThreadBaHost, "Thread Border Agent host");
+            AddArgument("thread-ba-port", 0, UINT16_MAX, &mThreadBaPort, "Thread Border Agent port");
             AddArgument("use-only-onnetwork-discovery", 0, 1, &mUseOnlyOnNetworkDiscovery,
                         "Whether to only use DNS-SD for discovery. The default is true if no network credentials are provided, "
                         "false otherwise.");
@@ -263,6 +266,7 @@ private:
     CHIP_ERROR RunInternal(NodeId remoteId);
     CHIP_ERROR Pair(NodeId remoteId, PeerAddress address);
     CHIP_ERROR PairWithMdns(NodeId remoteId);
+    CHIP_ERROR PairWithMeshCoP();
     CHIP_ERROR PairWithCode(NodeId remoteId);
     CHIP_ERROR PaseWithCode(NodeId remoteId);
     CHIP_ERROR PairWithMdnsOrBleByIndex(NodeId remoteId, uint16_t index);
@@ -295,6 +299,8 @@ private:
     chip::Optional<char *> mDCLHostName;
     chip::Optional<uint16_t> mDCLPort;
     chip::Optional<bool> mUseDCL;
+    chip::Optional<char *> mThreadBaHost;
+    chip::Optional<uint16_t> mThreadBaPort;
     chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type> mTimeZoneList;
     TypedComplexArgument<chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>>
         mComplex_TimeZones;

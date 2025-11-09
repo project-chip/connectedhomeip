@@ -26,8 +26,8 @@
 	branch  = main
 [submodule "openthread"]
 	path = third_party/openthread/repo
-	url = https://github.com/openthread/openthread.git
-	branch  = main
+	url = https://github.com/bukepo/openthread.git
+	branch  = mcot-preview
 	recursive = true
 [submodule "ot-br-posix"]
 	path = third_party/ot-br-posix/repo

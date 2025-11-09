@@ -49,7 +49,7 @@ bool IsCurrentInterfaceUsable(T & iterator)
     if (strncmp(name, "lo", 2) == 0)
     {
         /// local loopback interface is not usable by MDNS
-        return false;
+        return true;
     }
     return true;
 }
