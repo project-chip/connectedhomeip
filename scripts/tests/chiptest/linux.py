@@ -360,6 +360,19 @@ class ThreadBorderRouter:
             if self._pattern.search(line):
                 self._event.set()
 
+    def get_border_agent_port(self) -> int:
+        cmd = f'ip netns exec {self._netns_app} ot-ctl ba port'
+        output = subprocess.check_output(shlex.split(cmd), text=True)
+        # ot-ctl output includes the port number followed by "Done"
+        # Using regex to find the first number in the output
+        match = re.search(r'(\d+)', output)
+        if not match:
+            raise RuntimeError(f"Failed to parse border agent port from: {output}")
+        return int(match.group(1))
+
+    def get_border_agent_host(self) -> str:
+        return '10.10.10.1'
+
     def terminate(self):
         if self._otbr:
             self._otbr.terminate()

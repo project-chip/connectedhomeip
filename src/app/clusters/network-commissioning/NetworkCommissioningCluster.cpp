@@ -231,6 +231,8 @@ void NetworkCommissioningCluster::SendNonConcurrentConnectNetworkResponse()
 
 #if CONFIG_NETWORK_LAYER_BLE
     DeviceLayer::ConnectivityMgr().GetBleLayer()->IndicateBleClosing();
+#else
+    LogErrorOnFailure(DeviceLayer::DeviceControlServer::DeviceControlSvr().PostOperationalNetworkStartedEvent());
 #endif // CONFIG_NETWORK_LAYER_BLE
     ChipLogProgress(NetworkProvisioning, "Non-concurrent mode. Send ConnectNetworkResponse(Success)");
     Commands::ConnectNetworkResponse::Type response;
@@ -841,7 +843,7 @@ void NetworkCommissioningCluster::OnResult(Status commissioningError, CharSpan d
     SetLastNetworkId(ByteSpan{ mConnectingNetworkID, mConnectingNetworkIDLen });
     SetLastNetworkingStatusValue(MakeNullable(commissioningError));
 
-#if CONFIG_NETWORK_LAYER_BLE && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+#if (CONFIG_NETWORK_LAYER_BLE || CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP) && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     ChipLogProgress(NetworkProvisioning, "Non-concurrent mode, ConnectNetworkResponse will NOT be sent");
     // Do not send the ConnectNetworkResponse if in non-concurrent mode
     // TODO(#30576) raised to modify CommandHandler to notify it if no response required
