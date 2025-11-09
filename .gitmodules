@@ -25,8 +25,8 @@
 	branch  = main
 [submodule "openthread"]
 	path = third_party/openthread/repo
-	url = https://github.com/openthread/openthread.git
-	branch  = main
+	url = https://github.com/bukepo/openthread.git
+	branch  = mcot-preview
 [submodule "ot-br-posix"]
 	path = third_party/ot-br-posix/repo
 	url = https://github.com/openthread/ot-br-posix.git
@@ -331,3 +331,6 @@
 	url = https://github.com/awslabs/amazon-kinesis-video-streams-webrtc-sdk-c
 	platforms = esp32
 	recursive = true
+[submodule "third_party/ot-commissioner/repo"]
+	path = third_party/ot-commissioner/repo
+	url = https://github.com/bukepo/ot-commissioner.git

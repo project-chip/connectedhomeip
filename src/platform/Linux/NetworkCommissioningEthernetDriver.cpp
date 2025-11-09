@@ -39,7 +39,9 @@ CHIP_ERROR LinuxEthernetDriver::Init(BaseDriver::NetworkStatusChangeCallback * n
 NetworkIterator * LinuxEthernetDriver::GetNetworks()
 {
     auto ret = new EthernetNetworkIterator();
+#if !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     ConnectivityUtils::GetEthInterfaceName(SafePointerCast<char *>(ret->interfaceName), sizeof(ret->interfaceName));
+#endif
     ret->interfaceNameLen = static_cast<uint8_t>(strnlen(SafePointerCast<char *>(ret->interfaceName), sizeof(ret->interfaceName)));
     return ret;
 }

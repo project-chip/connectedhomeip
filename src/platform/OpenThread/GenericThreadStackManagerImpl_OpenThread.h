@@ -26,8 +26,10 @@
 #pragma once
 
 #include <openthread/instance.h>
+#include <openthread/ip6.h>
 #include <openthread/link.h>
 #include <openthread/netdata.h>
+#include <openthread/thread.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 #include <openthread/srp_client.h>
@@ -141,8 +143,11 @@ protected:
 
     CHIP_ERROR ConfigureThreadStack(otInstance * otInst);
     CHIP_ERROR DoInit(otInstance * otInst);
+    void _RendezvousStop();
+    CHIP_ERROR _RendezvousStart();
     bool IsThreadAttachedNoLock();
     bool IsThreadInterfaceUpNoLock();
+    bool _IsCommissioning();
 
 private:
     // ===== Private members for use by this class only.
@@ -261,6 +266,8 @@ private:
                                                   otError error);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+
+    void OnRendezvousComplete(otError aError);
 
     GeneralFaults<kMaxNetworkFaults> mNetworkFaults;
 

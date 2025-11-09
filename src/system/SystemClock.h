@@ -385,10 +385,8 @@ public:
 
 } // namespace Internal
 
-#if CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS || CHIP_SYSTEM_CONFIG_USE_SOCKETS
 Microseconds64 TimevalToMicroseconds(const timeval & in);
 void ToTimeval(Microseconds64 in, timeval & out);
-#endif // CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS || CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 } // namespace Clock
 

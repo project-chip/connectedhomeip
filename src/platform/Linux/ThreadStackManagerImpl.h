@@ -17,6 +17,10 @@
 
 #pragma once
 
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+#include "ThreadStackManagerImpl_OpenThread.h"
+#else
+
 #include <memory>
 #include <vector>
 
@@ -79,6 +83,8 @@ public:
 
     bool _IsThreadProvisioned();
 
+    bool _IsCommissioning() { return false; }
+
     bool _IsThreadEnabled();
 
     bool _IsThreadAttached() const;
@@ -106,6 +112,9 @@ public:
 
     CHIP_ERROR _GetThreadVersion(uint16_t & version);
 
+    CHIP_ERROR _RendezvousStart();
+
+    void _RendezvousStop() {}
     void _ResetThreadNetworkDiagnosticsCounts();
 
     CHIP_ERROR _StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback);
@@ -147,6 +156,13 @@ private:
     static void OnDbusPropertiesChanged(OpenthreadBorderRouter * proxy, GVariant * changed_properties,
                                         const gchar * const * invalidated_properties, gpointer user_data);
     void ThreadDeviceRoleChangedHandler(const gchar * role);
+    void _OnJoinerStartFinished(GAsyncResult * res);
+    template <void (ThreadStackManagerImpl::*kMethod)(GAsyncResult *)>
+    static void _DBusMethodCallCallback(GObject * source_object, GAsyncResult * res, gpointer user_data)
+    {
+        ThreadStackManagerImpl * this_ = reinterpret_cast<ThreadStackManagerImpl *>(user_data);
+        (this_->*kMethod)(res);
+    }
 
     Thread::OperationalDataset mDataset = {};
 
@@ -165,3 +181,4 @@ inline void ThreadStackManagerImpl::_OnThreadAttachFinished(void)
 
 } // namespace DeviceLayer
 } // namespace chip
+#endif

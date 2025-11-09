@@ -92,5 +92,9 @@ void TCPEndPointImplOT::DoCloseImpl(CHIP_ERROR err, State oldState)
     // Not implemented
 }
 
+#if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
+// void TCPEndPointImplOT::TCPUserTimeoutHandler() {}
+#endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
+
 } // namespace Inet
 } // namespace chip

@@ -68,5 +68,12 @@ source_set("commands") {
     deps = [ "${chip_root}/src/setup_payload:onboarding-codes-utils" ]
   }
 
+  if (chip_system_config_use_openthread_inet_endpoints) {
+    sources += [
+      "OpenThread.cpp",
+    ]
+    deps += [ "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd" ]
+  }
+
   cflags = [ "-Wconversion" ]
 }

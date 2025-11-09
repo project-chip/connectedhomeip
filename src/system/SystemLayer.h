@@ -40,8 +40,8 @@
 #include <system/SystemError.h>
 #include <system/SystemEvent.h>
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #include <lib/support/IntrusiveList.h>
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 #include <system/SocketEvents.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
@@ -288,6 +288,7 @@ public:
      */
     virtual SocketWatchToken InvalidSocketWatchToken() = 0;
 };
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 class LayerSocketsLoop;
 
@@ -327,7 +328,12 @@ private:
     intptr_t mState = 0;
 };
 
-class LayerSocketsLoop : public LayerSockets
+class LayerSocketsLoop :
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+    public LayerSockets
+#else
+    public Layer
+#endif
 {
 public:
     virtual void Signal()          = 0;
@@ -349,8 +355,6 @@ protected:
     // Expose EventLoopHandler.mState as a non-const reference to sub-classes
     decltype(EventLoopHandler::mState) & LoopHandlerState(EventLoopHandler & handler) { return handler.mState; }
 };
-
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
 class LayerDispatch :

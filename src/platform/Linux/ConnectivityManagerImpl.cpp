@@ -107,11 +107,13 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     mpConnectCallback = nullptr;
     mpScanCallback    = nullptr;
 
+#if !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     if (ConnectivityUtils::GetEthInterfaceName(mEthIfName, Inet::InterfaceId::kMaxIfNameLength) == CHIP_NO_ERROR)
     {
         ChipLogProgress(DeviceLayer, "Got Ethernet interface: %s", mEthIfName);
     }
     else
+#endif
     {
         ChipLogError(DeviceLayer, "Failed to get Ethernet interface");
         mEthIfName[0] = '\0';

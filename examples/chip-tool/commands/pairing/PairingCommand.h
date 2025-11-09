@@ -19,13 +19,16 @@
 #pragma once
 
 #include "../common/CHIPCommand.h"
+#include "commands/common/Command.h"
 #include <controller/CommissioningDelegate.h>
 #include <controller/CurrentFabricRemover.h>
 
 #include <commands/common/CredentialIssuerCommands.h>
+#include <cstdint>
 #include <lib/support/Span.h>
 #include <lib/support/ThreadOperationalDataset.h>
 
+#include <memory>
 #include <optional>
 #include <thread>
 
@@ -87,6 +90,9 @@ public:
         switch (networkType)
         {
         case PairingNetworkType::None:
+            AddArgument("thread-dataset", &mThreadDataset, "Thread operational dataset");
+            AddArgument("thread-ba-host", &mThreadBaHost, "Thread Border Agent host");
+            AddArgument("thread-ba-port", 0, UINT16_MAX, &mThreadBaPort, "Thread Border Agent port");
             break;
         case PairingNetworkType::WiFi:
             AddArgument("ssid", &mSSID);
@@ -134,6 +140,7 @@ public:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
             AddArgument("pase-only", 0, 1, &mPaseOnly);
+            AddArgument("discriminator", 0, 4096, &mDiscriminator.emplace());
             break;
         case PairingMode::SoftAP:
             AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
@@ -270,6 +277,7 @@ private:
     CHIP_ERROR Unpair(NodeId remoteId);
     chip::Controller::CommissioningParameters GetCommissioningParameters();
     CHIP_ERROR MaybeDisplayTermsAndConditions(chip::Controller::CommissioningParameters & params);
+    CHIP_ERROR StartMeshcopCommissioning(uint8_t (&pskc)[chip::Thread::kSizePSKc], const char * host, uint16_t port, uint64_t code);
 
     const PairingMode mPairingMode;
     const PairingNetworkType mNetworkType;
@@ -295,6 +303,9 @@ private:
     chip::Optional<char *> mDCLHostName;
     chip::Optional<uint16_t> mDCLPort;
     chip::Optional<bool> mUseDCL;
+    chip::Optional<chip::ByteSpan> mThreadDataset;
+    chip::Optional<char *> mThreadBaHost;
+    chip::Optional<uint16_t> mThreadBaPort;
     chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type> mTimeZoneList;
     TypedComplexArgument<chip::app::DataModel::List<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>>
         mComplex_TimeZones;

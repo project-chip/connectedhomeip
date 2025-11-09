@@ -248,8 +248,6 @@ Milliseconds64 ClockImpl::GetMonotonicMilliseconds64()
 
 #endif // CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
 
-#if CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS || CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
 Microseconds64 TimevalToMicroseconds(const timeval & tv)
 {
     return Seconds64(tv.tv_sec) + Microseconds64(tv.tv_usec);
@@ -262,8 +260,6 @@ void ToTimeval(Microseconds64 in, timeval & out)
     out.tv_sec  = static_cast<time_t>(seconds.count());
     out.tv_usec = static_cast<suseconds_t>(in.count());
 }
-
-#endif // CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS || CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 static_assert(std::numeric_limits<Microseconds64::rep>::is_integer, "Microseconds64 must be an integer type");
 static_assert(std::numeric_limits<Microseconds32::rep>::is_integer, "Microseconds32 must be an integer type");

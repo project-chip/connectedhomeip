@@ -23,6 +23,7 @@
 #pragma once
 
 #include "system/SystemConfig.h"
+#include <functional>
 
 #if CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS
 #include <sys/select.h>
@@ -46,12 +47,19 @@
 #include <system/SystemTimer.h>
 #include <system/WakeEvent.h>
 
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+#include <openthread/instance.h>
+#endif
+
 namespace chip {
 namespace System {
 
 class LayerImplSelect : public LayerSocketsLoop
 {
 public:
+    std::function<long()> mPrepareEvents = nullptr;
+    std::function<void()> mProcessEvents = nullptr;
+
     LayerImplSelect() = default;
     ~LayerImplSelect() override { VerifyOrDie(mLayerState.Destroy()); }
 
@@ -66,6 +74,7 @@ public:
     void CancelTimer(TimerCompleteCallback onComplete, void * appState) override;
     CHIP_ERROR ScheduleWork(TimerCompleteCallback onComplete, void * appState) override;
 
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     // LayerSocket overrides.
     CHIP_ERROR StartWatchingSocket(int fd, SocketWatchToken * tokenOut) override;
     CHIP_ERROR SetCallback(SocketWatchToken token, SocketWatchCallback callback, intptr_t data) override;
@@ -75,6 +84,7 @@ public:
     CHIP_ERROR ClearCallbackOnPendingWrite(SocketWatchToken token) override;
     CHIP_ERROR StopWatchingSocket(SocketWatchToken * tokenInOut) override;
     SocketWatchToken InvalidSocketWatchToken() override { return reinterpret_cast<SocketWatchToken>(nullptr); }
+#endif
 
     // LayerSocketLoop overrides.
     void Signal() override;
@@ -83,6 +93,15 @@ public:
     void WaitForEvents() override;
     void HandleEvents() override;
     void EventLoopEnds() override {}
+
+    template <typename T>
+    void RegisterExtension(T & o)
+    {
+        mPrepareEvents = [&o, this] {
+            return o.PrepareEvents(mMaxFd, mSelected.mReadSet, mSelected.mWriteSet, mSelected.mErrorSet);
+        };
+        mProcessEvents = [&o, this] { o.ProcessEvents(mSelected.mReadSet, mSelected.mWriteSet, mSelected.mErrorSet); };
+    }
 
     void AddLoopHandler(EventLoopHandler & handler) override;
     void RemoveLoopHandler(EventLoopHandler & handler) override;
@@ -97,7 +116,12 @@ public:
     // Expose the result of WaitForEvents() for non-blocking socket implementations.
     bool IsSelectResultValid() const { return mSelectResult >= 0; }
 
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    void ConfigureOpenThread(otInstance * instance) { mOpenThread = instance; }
+#endif
+
 protected:
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     static SocketEvents SocketEventsFromFDs(int socket, const fd_set & readfds, const fd_set & writefds, const fd_set & exceptfds);
 
     static constexpr int kSocketWatchMax = (INET_CONFIG_ENABLE_TCP_ENDPOINT ? INET_CONFIG_NUM_TCP_ENDPOINTS : 0) +
@@ -118,6 +142,9 @@ protected:
         intptr_t mCallbackData;
     };
     SocketWatch mSocketWatchPool[kSocketWatchMax];
+#elif CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    otInstance * mOpenThread = nullptr;
+#endif
 
     TimerPool<TimerList::Node> mTimerPool;
     TimerList mTimerList;
@@ -142,9 +169,6 @@ protected:
     int mSelectResult;
 
     ObjectLifeCycle mLayerState;
-#if !CHIP_SYSTEM_CONFIG_USE_LIBEV
-    WakeEvent mWakeEvent;
-#endif
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     std::atomic<pthread_t> mHandleSelectThread;
@@ -152,6 +176,8 @@ protected:
 
 #if CHIP_SYSTEM_CONFIG_USE_LIBEV
     struct ev_loop * mLibEvLoopP;
+#else
+    WakeEvent mWakeEvent;
 #endif
 };
 

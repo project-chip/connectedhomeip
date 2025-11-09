@@ -216,6 +216,7 @@ constexpr double ConvertFrequencyToFloat(const iw_freq * in)
     return result;
 }
 
+#if !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 CHIP_ERROR GetWiFiParameter(int skfd,            /* Socket to the kernel */
                             const char * ifname, /* Device name */
                             int request,         /* WE ID */
@@ -244,6 +245,7 @@ CHIP_ERROR GetWiFiStats(int skfd, const char * ifname, struct iw_statistics * st
 
     return GetWiFiParameter(skfd, ifname, SIOCGIWSTATS, &wrq);
 }
+#endif
 
 } // namespace
 
@@ -476,6 +478,7 @@ CHIP_ERROR GetWiFiInterfaceName(char * ifname, size_t bufSize)
     return err;
 }
 
+#if !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 CHIP_ERROR GetWiFiChannelNumber(const char * ifname, uint16_t & channelNumber)
 {
     CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
@@ -744,6 +747,7 @@ CHIP_ERROR GetEthFullDuplex(const char * ifname, bool & fullDuplex)
 
     return err;
 }
+#endif // !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 
 } // namespace ConnectivityUtils
 } // namespace Internal

@@ -331,6 +331,9 @@ CHIP_ERROR CommissioningWindowManager::OpenBasicCommissioningWindow(Seconds32 co
 #else
     SetBLE(false);
 #endif // CONFIG_NETWORK_LAYER_BLE
+#if CHIP_ENABLE_OPENTHREAD
+    DeviceLayer::ThreadStackMgr().RendezvousStart();
+#endif
 
     mFailedCommissioningAttempts = 0;
 
@@ -342,6 +345,7 @@ CHIP_ERROR CommissioningWindowManager::OpenBasicCommissioningWindow(Seconds32 co
         Cleanup();
     }
 
+    ChipLogProgress(AppServer, "Open Basic Commissioning Window: %s", err.AsString());
     return err;
 }
 
@@ -420,6 +424,9 @@ void CommissioningWindowManager::CloseCommissioningWindow()
             // manually here.
             mServer->GetBleLayerObject()->CloseAllBleConnections();
         }
+#endif
+#if CHIP_ENABLE_OPENTHREAD
+    DeviceLayer::ThreadStackMgr().RendezvousStop();
 #endif
         ChipLogProgress(AppServer, "Closing pairing window");
         Cleanup();

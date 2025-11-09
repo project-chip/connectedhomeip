@@ -32,3 +32,27 @@ chip_enable_additional_data_advertising = true
 chip_enable_rotating_device_id = true
 
 chip_enable_read_client = false
+
+chip_enable_wifi = false
+chip_enable_ble = false
+chip_config_network_layer_ble = false
+
+chip_system_config_use_sockets = false
+chip_mdns = "platform"
+chip_system_config_use_lwip = false
+chip_system_config_use_openthread_inet_endpoints = true
+chip_inet_config_enable_ipv4 = false
+chip_inet_config_enable_tcp_endpoint = false
+chip_openthread_border_router = false
+chip_openthread_ftd = true
+
+openthread_enable_core_config_args = true
+openthread_project_core_config_file = rebase_path(get_path_info("${chip_root}/third_party/openthread/repo/examples/platforms/simulation/openthread-core-simulation-config.h", "abspath"))
+openthread_config_joiner_enable = true
+openthread_config_log_output = "platform_defined"
+openthread_config_srp_client_enable = true
+openthread_config_srp_client_enable = true
+openthread_config_tcp_enable = false
+openthread_config_ecdsa_enable = true
+openthread_config_tmf_netdata_service_enable = true
+openthread_config_full_logs = true

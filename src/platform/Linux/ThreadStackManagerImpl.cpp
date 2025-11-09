@@ -568,6 +568,15 @@ CHIP_ERROR ThreadStackManagerImpl::_GetThreadVersion(uint16_t & version)
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
+CHIP_ERROR ThreadStackManagerImpl::_RendezvousStart()
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+void ThreadStackManagerImpl::_OnJoinerStartFinished(GAsyncResult * res)
+{
+}
+
 CHIP_ERROR ThreadStackManagerImpl::GLibMatterContextCallScan(ThreadStackManagerImpl * self)
 {
     VerifyOrDie(g_main_context_get_thread_default() != nullptr);

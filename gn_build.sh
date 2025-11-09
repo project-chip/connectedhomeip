@@ -80,35 +80,35 @@ ninja_args=()
 
 while getopts :d:j:k:l:nt:vw: opt; do
     case "$opt" in
-        [nv])
-            ninja_args+=("-$opt")
-            ;;
-        [djkltw])
-            ninja_args+=("-$opt" "$OPTARG")
-            ;;
-        '?')
-            printf '\nError: unknown option -%s\n' "$OPTARG"
-            printf 'Usage: %s [ninja-options] [gn-args]\n' "$0"
-            exit 1
-            ;;
+    [nv])
+        ninja_args+=("-$opt")
+        ;;
+    [djkltw])
+        ninja_args+=("-$opt" "$OPTARG")
+        ;;
+    '?')
+        printf '\nError: unknown option -%s\n' "$OPTARG"
+        printf 'Usage: %s [ninja-options] [gn-args]\n' "$0"
+        exit 1
+        ;;
     esac
 done
 shift $((OPTIND - 1))
 
 for arg; do
     case $arg in
-        enable_qpg_builds=true)
-            qpg_enabled=1
-            ;;
-        enable_efr32_builds=true)
-            efr32_enabled=1
-            ;;
-        enable_p6_builds=true)
-            p6_builds_enabled=1
-            ;;
-        psoc6_board=*)
-            p6_board_selected=1
-            ;;
+    enable_qpg_builds=true)
+        qpg_enabled=1
+        ;;
+    enable_efr32_builds=true)
+        efr32_enabled=1
+        ;;
+    enable_p6_builds=true)
+        p6_builds_enabled=1
+        ;;
+    psoc6_board=*)
+        p6_board_selected=1
+        ;;
     esac
     user_args+=" $arg"
 done
@@ -191,8 +191,8 @@ echo
 
 _chip_banner "Build: GN configure"
 
-gn --root="$CHIP_ROOT" gen --check --fail-on-unused-args "$CHIP_ROOT/out/debug" --args='target_os="all"'"$extra_args$user_args"
-gn --root="$CHIP_ROOT" gen --check --fail-on-unused-args "$CHIP_ROOT/out/release" --args='target_os="all" is_debug=false'"$extra_args$user_args"
+gn --root="$CHIP_ROOT" gen --check --fail-on-unused-args "$CHIP_ROOT/out/debug" --add-export-compile-commands='*' --args='target_os="all" is_debug=true'"$extra_args$user_args"
+gn --root="$CHIP_ROOT" gen --check --fail-on-unused-args "$CHIP_ROOT/out/release" --add-export-compile-commands='*' --args='target_os="all" is_debug=false'"$extra_args$user_args"
 
 _chip_banner "Build: Ninja build"
 

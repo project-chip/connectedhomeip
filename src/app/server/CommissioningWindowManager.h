@@ -36,6 +36,7 @@ enum class CommissioningWindowAdvertisement
 {
     kAllSupported,
     kDnssdOnly,
+    kThreadOnly,
 };
 
 class Server;

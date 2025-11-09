@@ -296,6 +296,7 @@ static_library("support") {
     ":type-traits",
     ":verifymacros",
     ":verifymacros_no_logging",
+    "${chip_root}/src/app/common:enums",
     "${chip_root}/src/lib/core:chip_config_header",
     "${chip_root}/src/lib/core:encoding",
     "${chip_root}/src/lib/core:error",

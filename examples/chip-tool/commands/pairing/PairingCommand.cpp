@@ -17,12 +17,29 @@
  */
 
 #include "PairingCommand.h"
+#include "commissioner/error.hpp"
+#include "core/CHIPError.h"
+#include "dnssd/TxtFields.h"
+#include "dnssd/Types.h"
+#include "dnssd/minimal_mdns/Parser.h"
+#include "dnssd/minimal_mdns/QueryBuilder.h"
+#include "dnssd/minimal_mdns/RecordData.h"
+#include "dnssd/minimal_mdns/core/Constants.h"
+#include "dnssd/minimal_mdns/core/DnsHeader.h"
+#include "dnssd/minimal_mdns/core/QNameString.h"
+#include "inet/IPAddress.h"
+#include "inet/InetInterface.h"
 #include "platform/PlatformManager.h"
 #include <commands/common/DeviceScanner.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <cstddef>
+#include <future>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <memory>
+#include <netdb.h>
+#include <netinet/in.h>
 #include <protocols/secure_channel/PASESession.h>
 
 #include <setup_payload/ManualSetupPayloadParser.h>
@@ -30,9 +47,16 @@
 
 #include "../dcl/DCLClient.h"
 #include "../dcl/DisplayTermsAndConditions.h"
+#include "../third_party/ot-commissioner/repo/include/commissioner/commissioner.hpp"
+#include "support/BytesToHex.h"
+#include "support/CHIPMemString.h"
+#include "support/CodeUtils.h"
+#include "support/Span.h"
+#include "support/ThreadOperationalDataset.h"
 
 #include <iostream>
 #include <string>
+#include <sys/socket.h>
 
 using namespace ::chip;
 using namespace ::chip::Controller;
@@ -142,6 +166,10 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
         params.SetThreadOperationalDataset(mOperationalDataset);
         break;
     case PairingNetworkType::None:
+        if (mThreadDataset.HasValue())
+        {
+            params.SetThreadOperationalDataset(mThreadDataset.Value());
+        }
         break;
     }
 
@@ -357,6 +385,279 @@ CHIP_ERROR PairingCommand::PairWithMdnsOrBleByIndexWithCode(NodeId remoteId, uin
 #endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
 }
 
+class CommissionProxy : public ot::commissioner::CommissionerHandler,
+                        public mdns::Minimal::ParserDelegate,
+                        public mdns::Minimal::TxtRecordDelegate
+{
+    // DNS parser
+    chip::Dnssd::DiscoveredNodeData nodeData;
+    // struct sockaddr_in commissionerAddr;
+    int proxyFd          = -1;
+    uint16_t servicePort = 0;
+    bool notified        = false;
+
+    void OnHeader(mdns::Minimal::ConstHeaderRef & header) override
+    {
+        ChipLogProgress(chipTool, "srp update=%d, msgId=%u, zoneCount=%u, prerequisiteCount=%u updateCount=%u additionalCount=%u",
+                        header.GetFlags().IsUpdate(), header.GetMessageId(), header.GetZoneCount(), header.GetPrerequisiteCount(),
+                        header.GetUpdateCount(), header.GetAdditionalCount());
+
+        if (header.GetUpdateCount() == 0)
+        {
+            ChipLogProgress(chipTool, "srp no update");
+        }
+
+        mdns::Minimal::BitPackedFlags flags = header.GetFlags();
+
+        flags.SetResponse();
+
+        uint8_t buffer[mdns::Minimal::ConstHeaderRef::kSizeBytes];
+        mdns::Minimal::HeaderRef response{ buffer };
+        response.Clear();
+        response.SetMessageId(header.GetMessageId());
+        response.SetFlags(flags);
+
+        commissioner->SendToJoiner(mJoinerId, mSrpClientPort, buffer, sizeof(buffer));
+    }
+
+    void OnQuery(const mdns::Minimal::QueryData & data) override
+    {
+        if (notified)
+        {
+            ChipLogProgress(chipTool, "already notified");
+        }
+
+        ChipLogProgress(chipTool, "srp zone: %s", mdns::Minimal::QNameString(data.GetName()).c_str());
+        nodeData.Set<Dnssd::CommissionNodeData>();
+    }
+
+    void OnResource(mdns::Minimal::ResourceType section, const mdns::Minimal::ResourceData & data) override
+    {
+        if (notified)
+        {
+            ChipLogProgress(chipTool, "already notified");
+            return;
+        }
+
+        auto name = mdns::Minimal::QNameString(data.GetName());
+
+        auto & commissionData = nodeData.Get<Dnssd::CommissionNodeData>();
+
+        switch (data.GetType())
+        {
+        case mdns::Minimal::QType::A:
+        case mdns::Minimal::QType::AAAA:
+            Platform::CopyString(commissionData.hostName, name.c_str());
+            break;
+        case mdns::Minimal::QType::SRV: {
+            mdns::Minimal::SrvRecord srv;
+
+            Platform::CopyString(commissionData.instanceName, name.c_str());
+
+            if (!srv.Parse(data.GetData(), data.GetData()))
+            {
+                ChipLogProgress(chipTool, "failed to parse the SRV record");
+                return;
+            }
+
+#define MATTERC_SERVICE_SUFFIX "_matterc._udp.default.service.arpa"
+            if (!name.EndsWith(MATTERC_SERVICE_SUFFIX))
+            {
+                ChipLogProgress(chipTool, "unexpected service: %s", name.c_str());
+                return;
+            }
+
+            servicePort = srv.GetPort();
+
+            if (proxyFd != -1)
+            {
+                ChipLogProgress(chipTool, "already created");
+                return;
+            }
+
+            proxyFd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+            if (proxyFd < 0)
+            {
+                ChipLogProgress(chipTool, "failed to create socket: %s", strerror(errno));
+                return;
+            }
+
+            {
+                sockaddr_in addr{
+                    AF_INET,
+                    0,
+                    { htobe32(0x7f000001) },
+                };
+
+                if (bind(proxyFd, reinterpret_cast<struct sockaddr *>(&addr), sizeof(addr)) != 0)
+                {
+                    ChipLogProgress(chipTool, "failed to bind proxy: %s", strerror(errno));
+                    close(proxyFd);
+                    proxyFd = -1;
+                    return;
+                }
+
+                socklen_t addr_len = sizeof(addr);
+                if (getsockname(proxyFd, reinterpret_cast<struct sockaddr *>(&addr), &addr_len) == -1)
+                {
+                    ChipLogProgress(chipTool, "failed to getsockname: %s", strerror(errno));
+                    close(proxyFd);
+                    proxyFd = -1;
+                    return;
+                }
+
+                commissionData.numIPs = 1;
+                commissionData.port   = ntohs(addr.sin_port);
+
+                ChipLogProgress(chipTool, "created proxy port=%u", commissionData.port);
+
+                commissionData.ipAddress[0] = Inet::IPAddress::FromSockAddr(addr);
+                commissionData.interfaceId  = Inet::InterfaceId::FromIPAddress(commissionData.ipAddress[0]);
+            }
+            break;
+        }
+        case mdns::Minimal::QType::TXT:
+            mdns::Minimal::ParseTxtRecord(data.GetData(), this);
+            break;
+        default:
+            break;
+        }
+    }
+    void OnRecord(const mdns::Minimal::BytesRange & name, const mdns::Minimal::BytesRange & value) override
+    {
+        ByteSpan key(name.Start(), name.Size());
+        ByteSpan val(value.Start(), value.Size());
+
+        Dnssd::FillNodeDataFromTxt(key, val, nodeData.Get<Dnssd::CommissionNodeData>());
+    }
+
+    // Commissioner Handler
+    uint16_t mSrpClientPort = 0;
+    uint64_t mJoinerId      = 0;
+    std::promise<Dnssd::DiscoveredNodeData> mTask;
+
+    void onJoinerMessage(uint64_t joinerId, uint16_t joinerPort, const uint8_t * buf, uint16_t len) override
+    {
+        ChipLogProgress(chipTool, "get message from joiner id=0x%" PRIx64 " port=%u", joinerId, joinerPort);
+
+        if (mJoinerId == 0)
+        {
+            mJoinerId = joinerId;
+        }
+
+        if (mJoinerId != joinerId)
+        {
+            ChipLogProgress(chipTool, "Single Joiner is supported, ignoring different joiners");
+            return;
+        }
+
+        if (mSrpClientPort == 0)
+        {
+            mSrpClientPort = joinerPort;
+        }
+
+        if (mSrpClientPort == joinerPort)
+        {
+            // Always parsing the packet to generate response.
+            if (!mdns::Minimal::ParsePacket(mdns::Minimal::BytesRange(buf, buf + len), this))
+            {
+                ChipLogError(chipTool, "failed to parse parsing srp");
+                return;
+            }
+
+            if (proxyFd != -1 && !notified)
+            {
+                mTask.set_value(nodeData);
+                notified = true;
+                std::thread([this, joinerId] {
+                    struct sockaddr addr;
+                    socklen_t addr_len = sizeof(addr);
+                    uint8_t pkt[1280];
+                    ssize_t rval = -1;
+
+                    while ((rval = recvfrom(proxyFd, pkt, sizeof(pkt), 0, &addr, &addr_len)) > 0)
+                    {
+                        connect(proxyFd, &addr, addr_len);
+                        commissioner->SendToJoiner(joinerId, servicePort, pkt, static_cast<uint16_t>(rval));
+                    }
+                }).detach();
+            }
+        }
+        else if (proxyFd != -1)
+        {
+            auto sent = send(proxyFd, buf, len, 0);
+            if (sent < 0)
+            {
+                ChipLogProgress(chipTool, "failed to send to commissioner: %s", strerror(errno));
+            }
+        }
+    }
+
+    std::shared_ptr<ot::commissioner::Commissioner> commissioner = ot::commissioner::Commissioner::Create(*this);
+
+public:
+    ~CommissionProxy()
+    {
+        if (proxyFd != -1)
+        {
+            close(proxyFd);
+            proxyFd = -1;
+        }
+    }
+
+    Dnssd::DiscoveredNodeData discover(uint8_t (&pskc)[Thread::kSizePSKc], const char * host, uint16_t port, uint64_t code)
+    {
+        struct Logger : public ot::commissioner::Logger
+        {
+            void Log(ot::commissioner::LogLevel level, const std::string & region, const std::string & message) override
+            {
+                ChipLogProgress(chipTool, "[ot-commissioner][%u][%s]%s", static_cast<unsigned>(level), region.c_str(),
+                                message.c_str());
+            }
+        };
+        ot::commissioner::Config config;
+
+        config.mLogger    = std::make_shared<Logger>();
+        config.mEnableCcm = false;
+        config.mProxyMode = true;
+        config.mPSKc      = std::vector<uint8_t>(&pskc[0], &pskc[Thread::kSizePSKc]);
+
+        auto error = commissioner->Init(config);
+        VerifyOrDieWithMsg(error == ot::commissioner::ErrorCode::kNone, chipTool, "failed to init commissioner: %s",
+                           error.GetMessage().c_str());
+
+        ChipLogProgress(chipTool, "connecting to border agent");
+        std::string id;
+        error = commissioner->Petition(id, std::string(host), port);
+        VerifyOrDieWithMsg(error == ot::commissioner::ErrorCode::kNone, chipTool, "failed to connect: %s",
+                           error.GetMessage().c_str());
+
+        // TODO add single joiner
+        error = commissioner->EnableAllJoiners();
+        VerifyOrDieWithMsg(error == ot::commissioner::ErrorCode::kNone, chipTool, "failed enable joiners: %s",
+                           error.GetMessage().c_str());
+
+        return mTask.get_future().get();
+    }
+};
+
+CHIP_ERROR PairingCommand::StartMeshcopCommissioning(uint8_t (&pskc)[Thread::kSizePSKc], const char * host, uint16_t port,
+                                                     uint64_t code)
+{
+    static CommissionProxy proxy;
+
+    {
+        char pskc_hex[100];
+
+        SuccessOrDie(Encoding::BytesToLowercaseHexString(pskc, sizeof(pskc), pskc_hex, sizeof(pskc_hex)));
+        ChipLogProgress(chipTool, "starting meshcop commissioner host=%s port=%u pskc=%s", host, port, pskc_hex);
+    }
+
+    CurrentCommissioner().OnNodeDiscovered(proxy.discover(pskc, host, port, code));
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR PairingCommand::PairWithMdns(NodeId remoteId)
 {
     Dnssd::DiscoveryFilter filter(mFilterType);
@@ -383,6 +684,22 @@ CHIP_ERROR PairingCommand::PairWithMdns(NodeId remoteId)
     }
 
     CurrentCommissioner().RegisterDeviceDiscoveryDelegate(this);
+    if (mThreadBaHost.HasValue())
+    {
+        CHIP_ERROR error;
+        Thread::OperationalDatasetView dataset;
+
+        dataset.Init(mThreadDataset.Value());
+
+        uint8_t pskc[Thread::kSizePSKc];
+
+        error = dataset.GetPSKc(pskc);
+
+        VerifyOrDieWithMsg(error == CHIP_NO_ERROR, chipTool, "Failed to retrieve PSKc from dataset");
+
+        return StartMeshcopCommissioning(pskc, mThreadBaHost.Value(), mThreadBaPort.Value(), mDiscoveryFilterCode);
+    }
+
     return CurrentCommissioner().DiscoverCommissionableNodes(filter);
 }
 

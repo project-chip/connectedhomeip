@@ -23,6 +23,7 @@
  */
 
 #include "TestHelpers.h"
+#include "setup_payload/SetupPayload.h"
 
 #include <nlbyteorder.h>
 
@@ -338,7 +339,7 @@ TEST(TestQRCode, TestSetupPayloadVerify)
     test_payload                       = payload;
     RendezvousInformationFlags invalid = RendezvousInformationFlags(
         RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kSoftAP, RendezvousInformationFlag::kOnNetwork,
-        RendezvousInformationFlag::kWiFiPAF, RendezvousInformationFlag::kNFC);
+        RendezvousInformationFlag::kWiFiPAF, RendezvousInformationFlag::kNFC, RendezvousInformationFlag::kThread);
     invalid.SetRaw(static_cast<uint8_t>(invalid.Raw() + 1));
     test_payload.rendezvousInformation.SetValue(invalid);
     EXPECT_EQ(test_payload.isValidQRCodePayload(), false);

@@ -22,6 +22,7 @@
 #include <string>
 
 #include "Options.h"
+#include "lib/support/CHIPArgParser.hpp"
 
 #include <setup_payload/OnboardingCodesUtil.h>
 
@@ -172,7 +173,7 @@ OptionDef sDeviceOptionDefs[] = {
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #if CHIP_ENABLE_OPENTHREAD
-    { "thread", kNoArgument, kDeviceOption_Thread },
+    { "thread", kArgumentOptional, kDeviceOption_Thread },
 #endif // CHIP_ENABLE_OPENTHREAD
     { "version", kArgumentRequired, kDeviceOption_Version },
     { "vendor-id", kArgumentRequired, kDeviceOption_VendorID },
@@ -548,9 +549,17 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         LinuxDeviceOptions::GetInstance().wifiSupports5g = true;
         break;
 
-    case kDeviceOption_Thread:
-        LinuxDeviceOptions::GetInstance().mThread = true;
+    case kDeviceOption_Thread: {
+        if (aValue)
+        {
+            ParseInt(aValue, LinuxDeviceOptions::GetInstance().mThread);
+        }
+        else
+        {
+            LinuxDeviceOptions::GetInstance().mThread = 1;
+        }
         break;
+    }
 
     case kDeviceOption_Version:
         LinuxDeviceOptions::GetInstance().payload.version = static_cast<uint8_t>(strtoul(aValue, nullptr, 0));

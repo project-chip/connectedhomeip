@@ -30,6 +30,8 @@
 // include the CHIPProjectConfig from config/standalone
 #include <CHIPProjectConfig.h>
 
+#define CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION 1
+
 #define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY 0
 
 // Bulbs do not typically use this - enabled so we can use shell to discover commissioners
@@ -46,3 +48,6 @@
 #define CHIP_DEVICE_ENABLE_PORT_PARAMS 1
 
 #define CHIP_DEVICE_CONFIG_DEVICE_NAME "Test Bulb"
+
+// Thread-only
+#define CONFIG_RENDEZVOUS_MODE (1 << 2) // on network

@@ -56,7 +56,7 @@ struct LinuxDeviceOptions
     uint32_t mBleDevice        = 0;
     bool wifiSupports5g        = false;
     bool mWiFi                 = false;
-    bool mThread               = false;
+    int mThread                = 0;
     bool cameraDeferredOffer   = false;
     bool cameraTestVideosrc    = false;
     bool cameraTestAudiosrc    = false;

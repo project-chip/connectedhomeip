@@ -46,9 +46,12 @@ public:
     explicit BitPackedFlags(uint16_t value) : mValue(value) {}
 
     uint16_t RawValue() const { return mValue & kMdnsNonIgnoredMask; }
+    uint16_t RawValue2() const { return mValue; }
 
-    bool IsQuery() const { return (mValue & kIsResponseMask) == 0; }
+    bool IsQuery() const { return IsOpRequest(kQuery); }
     BitPackedFlags & SetQuery() { return ClearMask(kIsResponseMask); }
+
+    bool IsUpdate() const { return IsOpRequest(kUpdate); }
 
     bool IsResponse() const { return (mValue & kIsResponseMask) == kIsResponseMask; }
     BitPackedFlags & SetResponse() { return SetMask(kIsResponseMask); }
@@ -61,10 +64,18 @@ public:
 
     /// Validates that the message does not need to be ignored according to
     /// RFC 6762
-    bool IsValidMdns() const { return (mValue & (kOpcodeMask | kReturnCodeMask)) == 0; }
+    bool IsValidMdns() const { return IsQuery() || IsUpdate() || IsResponse(); }
 
 private:
     uint16_t mValue = 0;
+
+    enum Opcode : uint8_t
+    {
+        kQuery  = 0,
+        kUpdate = 5,
+    };
+
+    bool IsOpRequest(Opcode op) const { return (mValue & (kIsResponseMask | kOpcodeMask)) == (op << 11); }
 
     inline BitPackedFlags & ClearMask(uint16_t mask)
     {
@@ -84,7 +95,7 @@ private:
     static constexpr uint16_t kMdnsNonIgnoredMask = 0x8E08;
     static constexpr uint16_t kAuthoritativeMask  = 0x0400;
     static constexpr uint16_t kIsResponseMask     = 0x8000;
-    static constexpr uint16_t kOpcodeMask         = 0x7000;
+    static constexpr uint16_t kOpcodeMask         = 0x7800;
     static constexpr uint16_t kTruncationMask     = 0x0200;
     static constexpr uint16_t kReturnCodeMask     = 0x000F;
 };
@@ -116,18 +127,25 @@ public:
     uint16_t GetAuthorityCount() const { return Get16At(kAuthorityCountOffset); }
     uint16_t GetAdditionalCount() const { return Get16At(kAdditionalCountOffset); }
 
+    uint16_t GetZoneCount() const { return Get16At(kZoneCountOffset); }
+    uint16_t GetPrerequisiteCount() const { return Get16At(kPrerequisiteCountOffset); }
+    uint16_t GetUpdateCount() const { return Get16At(kUpdateCountOffset); }
+
 protected:
     const uint8_t * mBuffer;
 
     inline uint16_t Get16At(size_t offset) const { return chip::Encoding::BigEndian::Get16(mBuffer + offset); }
     uint16_t GetRawFlags() const { return Get16At(kFlagsOffset); }
 
-    static constexpr size_t kMessageIdOffset       = 0;
-    static constexpr size_t kFlagsOffset           = 2;
-    static constexpr size_t kQueryCountOffset      = 4;
-    static constexpr size_t kAnswerCountOffset     = 6;
-    static constexpr size_t kAuthorityCountOffset  = 8;
-    static constexpr size_t kAdditionalCountOffset = 10;
+    static constexpr size_t kMessageIdOffset         = 0;
+    static constexpr size_t kFlagsOffset             = 2;
+    static constexpr size_t kQueryCountOffset        = 4;
+    static constexpr size_t kZoneCountOffset         = 4;
+    static constexpr size_t kAnswerCountOffset       = 6;
+    static constexpr size_t kPrerequisiteCountOffset = 6;
+    static constexpr size_t kAuthorityCountOffset    = 8;
+    static constexpr size_t kUpdateCountOffset       = 8;
+    static constexpr size_t kAdditionalCountOffset   = 10;
 };
 
 class HeaderRef : public ConstHeaderRef
@@ -144,7 +162,7 @@ public:
     }
 
     HeaderRef & SetMessageId(uint16_t value) { return Set16At(kMessageIdOffset, value); }
-    HeaderRef & SetFlags(BitPackedFlags flags) { return Set16At(kFlagsOffset, flags.RawValue()); }
+    HeaderRef & SetFlags(BitPackedFlags flags) { return Set16At(kFlagsOffset, flags.RawValue2()); }
     HeaderRef & SetQueryCount(uint16_t value) { return Set16At(kQueryCountOffset, value); }
     HeaderRef & SetAnswerCount(uint16_t value) { return Set16At(kAnswerCountOffset, value); }
     HeaderRef & SetAuthorityCount(uint16_t value) { return Set16At(kAuthorityCountOffset, value); }

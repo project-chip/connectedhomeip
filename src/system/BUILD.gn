@@ -154,6 +154,10 @@ buildconfig_header("system_buildconfig") {
 
 config("system_config") {
   include_dirs = chip_project_config_include_dirs
+
+  if (chip_system_config_use_openthread_inet_endpoints) {
+    defines = [ "CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT=1" ]
+  }
 }
 
 source_set("system_config_header") {
@@ -294,5 +298,9 @@ static_library("system") {
       "SystemFaultInjection.h",
     ]
     public_deps += [ "${nlfaultinjection_root}:nlfaultinjection" ]
+  }
+
+  if (chip_system_config_use_openthread_inet_endpoints) {
+    deps = [ "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils" ]
   }
 }

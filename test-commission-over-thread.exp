@@ -1,0 +1,145 @@
+#!/usr/bin/expect -f
+#
+# Copyright (c) 2025 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+spawn otbr-agent -Iwpan0 -d7 -v "spinel+hdlc+forkpty://$::env(OT_RCP)?forkpty-arg=19" -B lo
+set otbr_agent $spawn_id
+expect -timeout 2 eof
+
+spawn ot-ctl -Iwpan0
+expect_after {
+    -i $otbr_agent eof { exit }
+    timeout {
+        error "timeout!"
+    }
+}
+
+send "dataset init new\n"
+expect "Done"
+send "dataset networkkey 00112233445566778899aabbccddeeff\n"
+expect "Done"
+send "dataset pskc 00112233445566778899aabbccddeeff\n"
+expect "Done"
+send "dataset commit active\n"
+expect "Done"
+
+send "dataset active -x\n"
+expect -re {[^0-9a-f]([0-9a-f]+)[\r\n]}
+set dataset $expect_out(1,string)
+expect "Done"
+send_user "active dataset is: $dataset\n"
+
+send "ifconfig up\n"
+expect "Done"
+send "routerselectionjitter 1\n"
+expect "Done"
+send "thread start\n"
+expect "Done"
+send "state leader\n"
+expect "Done"
+
+expect {
+    -timeout 1 "leader" {
+        send_user "Leader now.\n"
+    } timeout {
+        send_user "Not leader yet!\n"
+        send "state\n"
+        exp_continue
+    }
+}
+expect "Done"
+
+send "netdata show\n"
+expect "Done"
+send "srp server enable\n"
+expect "Done"
+send "br state\n"
+expect "Done"
+expect {
+    -timeout 1 -re {([1-9][0-9]+)[\r\n]} {
+        set srp_port $expect_out(1,string)
+    } timeout {
+        send "srp server port\n"
+        exp_continue
+    }
+}
+expect "Done"
+
+send "ba port\n"
+expect -re {([0-9]+)[\r\n]}
+set ba_port $expect_out(1,string)
+send_user "the border agent port is: $ba_port\n"
+
+send "\x04"
+expect eof
+
+spawn examples/lighting-app/linux/out/debug/chip-lighting-app --thread=17
+set joiner $spawn_id
+expect_after {
+    timeout {
+        error "timeout!"
+    }
+}
+expect {
+    -re {Setup Pin Code \(0 for UNKNOWN/ERROR\): (\d+)} {
+        set pincode $expect_out(1,string)
+        exp_continue
+    } -re {Setup Discriminator \(0xFFFF for UNKNOWN/ERROR\): (\d+)} {
+        set discriminator $expect_out(1,string)
+        exp_continue
+    } "Thread initialized." {
+        send_user "Matter commissionee is ready!\n"
+    } -i $otbr_agent eof {
+        error "otbr-agent exited!"
+        exit 1
+    }
+}
+
+send_user "I'm going to commission the device with the following info:\n"
+send_user "    Border agent port: $ba_port\n"
+send_user "    Pin code: $pincode\n"
+send_user "    Discriminator: $discriminator\n"
+
+spawn examples/chip-tool/out/debug/chip-tool pairing onnetwork 255 $pincode $discriminator --thread-dataset hex:$dataset --thread-ba-host 127.0.0.1 --thread-ba-port "${ba_port}"
+set chip_tool $spawn_id
+
+expect {
+    -timeout 20 "Device commissioning completed with success" {
+        send_user "OK, commissioning completed.\n"
+    } -i $otbr_agent eof {
+        error "otbr-agent exited!"
+        exit 1
+    } -i $joiner eof {
+        error "joiner exited!"
+        exit 1
+    } timeout {
+        error "timeout!"
+    }
+}
+
+send_user "Commissioned successfully!\n"
+
+send_user "chip-lighting-app will continue to run for 1000s..\nExit with CTRL-C\n"
+
+expect {
+    -timeout 1000
+    -i $otbr_agent eof {
+        error "otbr-agent exited!"
+        exit 1
+    } -i $joiner eof {
+        error "joiner exited!"
+        exit 1
+    }
+}

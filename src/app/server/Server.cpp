@@ -488,6 +488,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     ReturnErrorOnFailure(mUdcTransportMgr->Init(Transport::UdpListenParameters(DeviceLayer::UDPEndPointManager())
                                                     .SetAddressType(Inet::IPAddressType::kIPv6)
                                                     .SetListenPort(static_cast<uint16_t>(mCdcListenPort))
+                                                    .SetNativeParams(initParams.endpointNativeParams)
 #if INET_CONFIG_ENABLE_IPV4
                                                     ,
                                                 Transport::UdpListenParameters(DeviceLayer::UDPEndPointManager())
