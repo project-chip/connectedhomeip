@@ -153,6 +153,9 @@ source_set("app-options") {
   if (current_os != "nuttx") {
     public_deps += [ jsoncpp_root ]
   }
+  if (chip_enable_pw_rpc) {
+    defines += [ "PW_RPC_ENABLED" ]
+  }
 
   public_configs = [ ":app-main-config" ]
 }
