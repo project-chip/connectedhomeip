@@ -32,7 +32,7 @@ bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster,
     ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> expectedBuilder;
 
     SuccessOrDie(expectedBuilder.EnsureAppendCapacity(expected.size()));
-    for (const auto entry : expected)
+    for (const auto & entry : expected)
     {
         SuccessOrDie(expectedBuilder.Append(entry));
     }
