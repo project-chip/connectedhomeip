@@ -131,8 +131,10 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
         self.step(1)
         self.step(2)
         self.step(3)
+        # NOTE: Step skipped not implemented in spec.
         self.step(4)
         self.step(5)
+        # NOTE: Step skipped not implemented in spec.
 
 
 if __name__ == "__main__":
