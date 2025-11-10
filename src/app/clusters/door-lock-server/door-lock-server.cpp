@@ -1181,7 +1181,7 @@ void DoorLockServer::getWeekDayScheduleCommandHandler(chip::app::CommandHandler 
         return;
     }
 
-    EmberAfPluginDoorLockWeekDaySchedule scheduleInfo{};
+    EmberAfPluginDoorLockWeekDaySchedule scheduleInfo{ DaysMaskMap(0) };
     auto status = emberAfPluginDoorLockGetSchedule(endpointId, weekDayIndex, userIndex, scheduleInfo);
     if (DlStatus::kSuccess != status)
     {
