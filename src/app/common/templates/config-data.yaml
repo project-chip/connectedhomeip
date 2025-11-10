@@ -160,6 +160,7 @@ CodeDrivenClusters:
     - Identify
     - Localization Configuration
     - OTA Software Update Provider
+    - OTA Software Update Requestor
     - Operational Credentials
     - Push AV Stream Transport
     - Software Diagnostics
