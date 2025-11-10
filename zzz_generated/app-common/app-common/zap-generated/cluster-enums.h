@@ -157,6 +157,7 @@
 #include <clusters/WakeOnLan/Enums.h>
 #include <clusters/WaterHeaterManagement/Enums.h>
 #include <clusters/WaterHeaterMode/Enums.h>
+#include <clusters/WaterTankLevelMonitoring/Enums.h>
 #include <clusters/WebRTCTransportProvider/Enums.h>
 #include <clusters/WebRTCTransportRequestor/Enums.h>
 #include <clusters/WiFiNetworkDiagnostics/Enums.h>

@@ -346,13 +346,13 @@ class TypeLookupContext:
         """
         if name.lower() in ["enum8", "enum16"]:
             return True
-        return any(map(lambda e: e.name == name, self.all_enums))
+        return any((e.name == name for e in self.all_enums))
 
     def is_struct_type(self, name: str):
         """
         Determine if the given type name is type that is known to be a struct
         """
-        return any(map(lambda s: s.name == name, self.all_structs))
+        return any((s.name == name for s in self.all_structs))
 
     def is_untyped_bitmap_type(self, name: str):
         """Determine if the given type is a untyped bitmap (just an interger size)."""
@@ -368,7 +368,7 @@ class TypeLookupContext:
         if self.is_untyped_bitmap_type(name):
             return True
 
-        return any(map(lambda s: s.name == name, self.all_bitmaps))
+        return any((s.name == name for s in self.all_bitmaps))
 
 
 def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> Union[BasicInteger, BasicString, FundamentalType, IdlType, IdlEnumType, IdlBitmapType]:

@@ -599,38 +599,42 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
     });
 
     // Validate the TLS Endpoint
-    TlsClientManagementDelegate::EndpointStructType TLSEndpoint;
     if (mTLSClientManagementDelegate != nullptr)
     {
-        Status tlsEndpointValidityStatus = mTLSClientManagementDelegate->FindProvisionedEndpointByID(
-            commandPath.mEndpointId, handler.GetAccessingFabricIndex(), commandData.transportOptions.TLSEndpointID, TLSEndpoint);
+        CHIP_ERROR tlsEndpointValidityStatus = mTLSClientManagementDelegate->FindProvisionedEndpointByID(
+            commandPath.mEndpointId, handler.GetAccessingFabricIndex(), commandData.transportOptions.TLSEndpointID,
+            [&](auto & TLSEndpoint) -> CHIP_ERROR {
+                // Use heap allocation for large certificate buffers to reduce stack usage
+                auto rootCertBuffer   = std::make_unique<PersistentStore<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES>>();
+                auto clientCertBuffer = std::make_unique<PersistentStore<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES>>();
 
-        VerifyOrDo(tlsEndpointValidityStatus == Status::Success, {
+                Tls::CertificateTable::BufferedClientCert clientCertEntry(*clientCertBuffer);
+                Tls::CertificateTable::BufferedRootCert rootCertEntry(*rootCertBuffer);
+
+                if (mTlsCertificateManagementDelegate != nullptr)
+                {
+                    auto & table = mTlsCertificateManagementDelegate->GetCertificateTable();
+                    ReturnErrorOnFailure(table.GetClientCertificateEntry(handler.GetAccessingFabricIndex(),
+                                                                         TLSEndpoint.ccdid.Value(), clientCertEntry));
+                    ReturnErrorOnFailure(
+                        table.GetRootCertificateEntry(handler.GetAccessingFabricIndex(), TLSEndpoint.caid, rootCertEntry));
+                    mDelegate->SetTLSCerts(clientCertEntry, rootCertEntry);
+                }
+                else
+                {
+                    // For tests, create empty cert entries
+                    mDelegate->SetTLSCerts(clientCertEntry, rootCertEntry);
+                }
+                return CHIP_NO_ERROR;
+            });
+
+        VerifyOrDo(tlsEndpointValidityStatus == CHIP_NO_ERROR, {
             ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: TLSEndpointID of command data is not valid/Provisioned",
                          mEndpointId);
             auto status = to_underlying(StatusCodeEnum::kInvalidTLSEndpoint);
             handler.AddClusterSpecificFailure(commandPath, status);
             return std::nullopt;
         });
-        // Use heap allocation for large certificate buffers to reduce stack usage
-        auto rootCertBuffer   = std::make_unique<PersistentStore<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES>>();
-        auto clientCertBuffer = std::make_unique<PersistentStore<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES>>();
-
-        Tls::CertificateTable::BufferedClientCert clientCertEntry(*clientCertBuffer);
-        Tls::CertificateTable::BufferedRootCert rootCertEntry(*rootCertBuffer);
-
-        if (mTlsCertificateManagementDelegate != nullptr)
-        {
-            auto & table = mTlsCertificateManagementDelegate->GetCertificateTable();
-            table.GetClientCertificateEntry(handler.GetAccessingFabricIndex(), TLSEndpoint.ccdid.Value(), clientCertEntry);
-            table.GetRootCertificateEntry(handler.GetAccessingFabricIndex(), TLSEndpoint.caid, rootCertEntry);
-            mDelegate->SetTLSCerts(clientCertEntry, rootCertEntry);
-        }
-        else
-        {
-            // For tests, create empty cert entries
-            mDelegate->SetTLSCerts(clientCertEntry, rootCertEntry);
-        }
     }
     else
     {
@@ -1008,6 +1012,9 @@ PushAvStreamTransportServerLogic::HandleModifyPushTransport(CommandHandler & han
     if (status == Status::Success)
     {
         transportConfiguration->SetTransportOptionsPtr(transportOptionsPtr);
+
+        MatterReportingAttributeChangeCallback(mEndpointId, PushAvStreamTransport::Id,
+                                               PushAvStreamTransport::Attributes::CurrentConnections::Id);
     }
 
     handler.AddStatus(commandPath, status);
@@ -1075,6 +1082,9 @@ PushAvStreamTransportServerLogic::HandleSetTransportStatus(CommandHandler & hand
                 }
             }
         }
+
+        MatterReportingAttributeChangeCallback(mEndpointId, PushAvStreamTransport::Id,
+                                               PushAvStreamTransport::Attributes::CurrentConnections::Id);
     }
     handler.AddStatus(commandPath, status);
 

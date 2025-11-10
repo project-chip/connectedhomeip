@@ -3545,7 +3545,7 @@ cluster LaundryWasherControls = 83 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster RvcRunMode = 84 {
-  revision 3;
+  revision 4;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -3575,7 +3575,7 @@ cluster RvcRunMode = 84 {
   }
 
   bitmap Feature : bitmap32 {
-    kDirectModeChange = 0x10000;
+    kDirectModeChange = 0x100000;
   }
 
   shared struct ModeTagStruct {
@@ -3613,7 +3613,7 @@ cluster RvcRunMode = 84 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster RvcCleanMode = 85 {
-  revision 3;
+  revision 5;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -3637,7 +3637,7 @@ cluster RvcCleanMode = 85 {
   }
 
   bitmap Feature : bitmap32 {
-    kDirectModeChange = 0x10000;
+    kDirectModeChange = 0x100000;
   }
 
   shared struct ModeTagStruct {
@@ -4432,7 +4432,7 @@ cluster Groupcast = 101 {
 
 /** Attributes and commands for monitoring HEPA filters in a device */
 cluster HepaFilterMonitoring = 113 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   shared enum ChangeIndicationEnum : enum8 {
     kOK = 0 [spec_name = "OK"];
@@ -4476,13 +4476,13 @@ cluster HepaFilterMonitoring = 113 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  /** Reset the condition of the replaceable to the non degraded state */
+  /** Upon receipt, the device SHALL reset the Condition and ChangeIndicator attributes, indicating full resource availability and readiness for use, as initially configured. */
   command ResetCondition(): DefaultSuccess = 0;
 }
 
 /** Attributes and commands for monitoring activated carbon filters in a device */
 cluster ActivatedCarbonFilterMonitoring = 114 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   shared enum ChangeIndicationEnum : enum8 {
     kOK = 0 [spec_name = "OK"];
@@ -4526,7 +4526,57 @@ cluster ActivatedCarbonFilterMonitoring = 114 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  /** Reset the condition of the replaceable to the non degraded state */
+  /** Upon receipt, the device SHALL reset the Condition and ChangeIndicator attributes, indicating full resource availability and readiness for use, as initially configured. */
+  command ResetCondition(): DefaultSuccess = 0;
+}
+
+/** This generic cluster provides an interface to the current condition of a resource. */
+cluster WaterTankLevelMonitoring = 121 {
+  revision 1;
+
+  shared enum ChangeIndicationEnum : enum8 {
+    kOK = 0 [spec_name = "OK"];
+    kWarning = 1;
+    kCritical = 2;
+  }
+
+  shared enum DegradationDirectionEnum : enum8 {
+    kUp = 0;
+    kDown = 1;
+  }
+
+  shared enum ProductIdentifierTypeEnum : enum8 {
+    kUPC = 0 [spec_name = "UPC"];
+    kGTIN8 = 1 [spec_name = "GTIN-8"];
+    kEAN = 2 [spec_name = "EAN"];
+    kGTIN14 = 3 [spec_name = "GTIN-14"];
+    kOEM = 4 [spec_name = "OEM"];
+  }
+
+  bitmap Feature : bitmap32 {
+    kCondition = 0x1;
+    kWarning = 0x2;
+    kReplacementProductList = 0x4;
+  }
+
+  struct ReplacementProductStruct {
+    ProductIdentifierTypeEnum productIdentifierType = 0;
+    char_string<20> productIdentifierValue = 1;
+  }
+
+  readonly attribute optional percent condition = 0;
+  readonly attribute optional DegradationDirectionEnum degradationDirection = 1;
+  readonly attribute ChangeIndicationEnum changeIndication = 2;
+  readonly attribute optional boolean inPlaceIndicator = 3;
+  attribute optional nullable epoch_s lastChangedTime = 4;
+  readonly attribute optional ReplacementProductStruct replacementProductList[] = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  /** Upon receipt, the device SHALL reset the Condition and ChangeIndicator attributes, indicating full resource availability and readiness for use, as initially configured. */
   command ResetCondition(): DefaultSuccess = 0;
 }
 
@@ -9525,7 +9575,7 @@ cluster AudioOutput = 1291 {
 
 /** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
 cluster ApplicationLauncher = 1292 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum StatusEnum : enum8 {
     kSuccess = 0;
@@ -9540,7 +9590,7 @@ cluster ApplicationLauncher = 1292 {
     kApplicationPlatform = 0x1;
   }
 
-  shared struct ApplicationStruct {
+  struct ApplicationStruct {
     int16u catalogVendorID = 0;
     char_string applicationID = 1;
   }
@@ -9576,17 +9626,17 @@ cluster ApplicationLauncher = 1292 {
     optional octet_string data = 1;
   }
 
-  /** Upon receipt, this SHALL launch the specified app with optional data. The TV Device SHALL launch and bring to foreground the identified application in the command if the application is not already launched and in foreground. The TV Device SHALL update state attribute on the Application Basic cluster of the Endpoint corresponding to the launched application. This command returns a Launch Response. */
+  /** Upon receipt of this command, the server SHALL launch the application with optional data. */
   command LaunchApp(LaunchAppRequest): LauncherResponse = 0;
-  /** Upon receipt on a Video Player endpoint this SHALL stop the specified application if it is running. */
+  /** Upon receipt of this command, the server SHALL stop the application if it is running. */
   command StopApp(StopAppRequest): LauncherResponse = 1;
-  /** Upon receipt on a Video Player endpoint this SHALL hide the specified application if it is running and visible. */
+  /** Upon receipt of this command, the server SHALL hide the application. */
   command HideApp(HideAppRequest): LauncherResponse = 2;
 }
 
 /** This cluster provides information about an application running on a TV or media player device which is represented as an endpoint. */
 cluster ApplicationBasic = 1293 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum ApplicationStatusEnum : enum8 {
     kStopped = 0;
@@ -9595,7 +9645,7 @@ cluster ApplicationBasic = 1293 {
     kActiveVisibleNotFocus = 3;
   }
 
-  shared struct ApplicationStruct {
+  struct ApplicationStruct {
     int16u catalogVendorID = 0;
     char_string applicationID = 1;
   }

@@ -25,6 +25,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/CommandDataIB.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
+#include <app/clusters/testing/MockCommandHandler.h>
 #include <app/clusters/tls-client-management-server/tls-client-management-server.h>
 #include <app/tests/AppTestContext.h>
 #include <lib/core/Optional.h>
@@ -40,32 +41,10 @@
 namespace chip {
 namespace app {
 
-class MockCommandHandler : public CommandHandler
+class MockCommandHandler : public Testing::MockCommandHandler
 {
 public:
     ~MockCommandHandler() override {}
-
-    struct ResponseRecord
-    {
-        ConcreteCommandPath path;
-        CommandId commandId;
-        chip::System::PacketBufferHandle encodedData;
-    };
-
-    CHIP_ERROR FallibleAddStatus(const ConcreteCommandPath & aRequestCommandPath,
-                                 const Protocols::InteractionModel::ClusterStatusCode & aStatus,
-                                 const char * context = nullptr) override
-    {
-        mStatuses.push_back({ aRequestCommandPath, aStatus });
-        return CHIP_NO_ERROR;
-    }
-
-    void AddStatus(const ConcreteCommandPath & aRequestCommandPath, const Protocols::InteractionModel::ClusterStatusCode & aStatus,
-                   const char * context = nullptr) override
-    {
-        CHIP_ERROR err = FallibleAddStatus(aRequestCommandPath, aStatus, context);
-        VerifyOrDie(err == CHIP_NO_ERROR);
-    }
 
     CHIP_ERROR AddClusterSpecificSuccess(const ConcreteCommandPath & aRequestCommandPath, ClusterStatus aClusterStatus) override
     {
@@ -79,69 +58,19 @@ public:
                                  Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(aClusterStatus));
     }
 
-    FabricIndex GetAccessingFabricIndex() const override { return mFabricIndex; }
-
-    const std::vector<ResponseRecord> & GetResponses() const { return mResponses; }
-
-    CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
-                               const DataModel::EncodableToTLV & aEncodable) override
-    {
-        chip::System::PacketBufferHandle handle = chip::MessagePacketBuffer::New(1024);
-        VerifyOrReturnError(!handle.IsNull(), CHIP_ERROR_NO_MEMORY);
-
-        TLV::TLVWriter baseWriter;
-        baseWriter.Init(handle->Start(), handle->MaxDataLength());
-
-        FabricIndex fabricIndex = 1;
-
-        DataModel::FabricAwareTLVWriter writer(baseWriter, fabricIndex);
-
-        TLV::TLVType containerType;
-        ReturnErrorOnFailure(
-            static_cast<TLV::TLVWriter &>(writer).StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
-        ReturnErrorOnFailure(aEncodable.EncodeTo(writer, TLV::ContextTag(chip::app::CommandDataIB::Tag::kFields)));
-        ReturnErrorOnFailure(static_cast<TLV::TLVWriter &>(writer).EndContainer(containerType));
-
-        handle->SetDataLength(static_cast<TLV::TLVWriter &>(writer).GetLengthWritten());
-
-        mResponses.push_back({ aRequestCommandPath, aResponseCommandId, std::move(handle) });
-        return CHIP_NO_ERROR;
-    }
-
-    void AddResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
-                     const DataModel::EncodableToTLV & aEncodable) override
-    {
-        AddResponseData(aRequestCommandPath, aResponseCommandId, aEncodable);
-    }
-
+    // Override base class methods for testing
     bool IsTimedInvoke() const override { return mIsTimedInvoke; }
-
     void FlushAcksRightAwayOnSlowCommand() override { mAcksFlushed = true; }
-
-    Access::SubjectDescriptor GetSubjectDescriptor() const override { return mSubjectDescriptor; }
-
     Messaging::ExchangeContext * GetExchangeContext() const override { return mExchangeContext; }
 
-    // Optional for test configuration
-    void SetFabricIndex(FabricIndex index) { mFabricIndex = index; }
+    // Configuration methods for testing
     void SetTimedInvoke(bool isTimed) { mIsTimedInvoke = isTimed; }
     void SetExchangeContext(Messaging::ExchangeContext * context) { mExchangeContext = context; }
 
 private:
-    struct StatusRecord
-    {
-        ConcreteCommandPath path;
-        Protocols::InteractionModel::ClusterStatusCode status;
-    };
-
-    std::vector<ResponseRecord> mResponses;
-    std::vector<StatusRecord> mStatuses;
-
-    FabricIndex mFabricIndex                      = 0;
     bool mIsTimedInvoke                           = false;
     bool mAcksFlushed                             = false;
     Messaging::ExchangeContext * mExchangeContext = nullptr;
-    Access::SubjectDescriptor mSubjectDescriptor;
 };
 
 static uint8_t gDebugEventBuffer[120];
@@ -410,8 +339,9 @@ class TestTlsClientManagementDelegate : public TlsClientManagementDelegate
 {
 
 public:
-    CHIP_ERROR GetProvisionedEndpointByIndex(EndpointId matterEndpoint, FabricIndex fabric, size_t index,
-                                             EndpointStructType & endpoint) const override
+    CHIP_ERROR Init(PersistentStorageDelegate & storage) override { return CHIP_NO_ERROR; }
+
+    CHIP_ERROR ForEachEndpoint(EndpointId matterEndpoint, FabricIndex fabric, LoadedEndpointCallback callback) override
     {
         return CHIP_NO_ERROR;
     }
@@ -424,11 +354,10 @@ public:
         return ClusterStatusCode(Status::Success);
     }
 
-    Protocols::InteractionModel::Status FindProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                    uint16_t endpointID,
-                                                                    EndpointStructType & endpoint) const override
+    CHIP_ERROR FindProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric, uint16_t endpointID,
+                                           LoadedEndpointCallback callback) override
     {
-        return Status::Success;
+        return CHIP_NO_ERROR;
     }
 
     Protocols::InteractionModel::Status RemoveProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
@@ -448,6 +377,12 @@ public:
     }
 
     void RemoveFabric(FabricIndex fabric) override {}
+
+    CHIP_ERROR MutateEndpointReferenceCount(EndpointId matterEndpoint, FabricIndex fabric, uint16_t endpointID,
+                                            int8_t delta) override
+    {
+        return CHIP_NO_ERROR;
+    }
 };
 
 class TestPushAVStreamTransportServerLogic : public ::testing::Test

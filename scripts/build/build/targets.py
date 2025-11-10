@@ -204,6 +204,22 @@ def BuildHostTarget():
     target.AppendModifier('googletest', use_googletest=True).OnlyIfRe('-tests')
     target.AppendModifier('terms-and-conditions', terms_and_conditions_required=True)
     target.AppendModifier('webrtc', enable_webrtc=True)
+    target.AppendModifier('unified', unified=True).OnlyIfRe(
+        "-(" + "|".join([
+            # keep-sorted start
+            'air-purifier',
+            'bridge',
+            'closure',
+            'light',
+            'lock',
+            'microwave-oven',
+            'ota-provider',
+            'rvc',
+            'thermostat',
+            'tv-app',
+            'water-leak-detector',
+            # keep-sorted end
+        ]) + ")-")
 
     return target
 

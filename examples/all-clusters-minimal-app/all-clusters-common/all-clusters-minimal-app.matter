@@ -5775,7 +5775,7 @@ cluster AudioOutput = 1291 {
 
 /** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
 cluster ApplicationLauncher = 1292 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum StatusEnum : enum8 {
     kSuccess = 0;
@@ -5790,7 +5790,7 @@ cluster ApplicationLauncher = 1292 {
     kApplicationPlatform = 0x1;
   }
 
-  shared struct ApplicationStruct {
+  struct ApplicationStruct {
     int16u catalogVendorID = 0;
     char_string applicationID = 1;
   }
@@ -5826,17 +5826,17 @@ cluster ApplicationLauncher = 1292 {
     optional octet_string data = 1;
   }
 
-  /** Upon receipt, this SHALL launch the specified app with optional data. The TV Device SHALL launch and bring to foreground the identified application in the command if the application is not already launched and in foreground. The TV Device SHALL update state attribute on the Application Basic cluster of the Endpoint corresponding to the launched application. This command returns a Launch Response. */
+  /** Upon receipt of this command, the server SHALL launch the application with optional data. */
   command LaunchApp(LaunchAppRequest): LauncherResponse = 0;
-  /** Upon receipt on a Video Player endpoint this SHALL stop the specified application if it is running. */
+  /** Upon receipt of this command, the server SHALL stop the application if it is running. */
   command StopApp(StopAppRequest): LauncherResponse = 1;
-  /** Upon receipt on a Video Player endpoint this SHALL hide the specified application if it is running and visible. */
+  /** Upon receipt of this command, the server SHALL hide the application. */
   command HideApp(HideAppRequest): LauncherResponse = 2;
 }
 
 /** This cluster provides information about an application running on a TV or media player device which is represented as an endpoint. */
 cluster ApplicationBasic = 1293 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum ApplicationStatusEnum : enum8 {
     kStopped = 0;
@@ -5845,7 +5845,7 @@ cluster ApplicationBasic = 1293 {
     kActiveVisibleNotFocus = 3;
   }
 
-  shared struct ApplicationStruct {
+  struct ApplicationStruct {
     int16u catalogVendorID = 0;
     char_string applicationID = 1;
   }
