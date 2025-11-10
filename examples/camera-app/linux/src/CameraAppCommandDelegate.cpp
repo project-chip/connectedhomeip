@@ -83,7 +83,7 @@ void CameraAppCommandHandler::OnZoneTriggeredHandler(uint16_t zoneId)
 
 void CameraAppCommandHandler::OnSetHardPrivacyModeOnHandler(bool value)
 {
-    mCameraDevice->GetCameraAVStreamMgmtController().SetHardPrivacyModeOn(value);
+    TEMPORARY_RETURN_IGNORED mCameraDevice->GetCameraAVStreamMgmtController().SetHardPrivacyModeOn(value);
 }
 
 void CameraAppCommandDelegate::SetCameraDevice(Camera::CameraDevice * aCameraDevice)
@@ -101,5 +101,6 @@ void CameraAppCommandDelegate::OnEventCommandReceived(const char * json)
     }
 
     handler->SetCameraDevice(mCameraDevice);
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(CameraAppCommandHandler::HandleCommand, reinterpret_cast<intptr_t>(handler));
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(CameraAppCommandHandler::HandleCommand,
+                                                                           reinterpret_cast<intptr_t>(handler));
 }

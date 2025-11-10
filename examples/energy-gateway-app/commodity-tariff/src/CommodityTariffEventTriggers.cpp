@@ -81,7 +81,7 @@ void TestTimeManager::InitializeMockClock(uint32_t aInitialTimeValue_s)
 
     if (err == CHIP_NO_ERROR)
     {
-        pMockClock->SetClock_RealTime(realTime_us);
+        TEMPORARY_RETURN_IGNORED pMockClock->SetClock_RealTime(realTime_us);
 
         // Also set monotonic time to maintain consistency
         auto monotonicTime = std::chrono::duration_cast<Milliseconds64>(realTime_us);
@@ -93,7 +93,7 @@ void TestTimeManager::InitializeMockClock(uint32_t aInitialTimeValue_s)
     {
         // Fallback: use a reasonable default time if real time is unavailable
         Microseconds64 defaultTime(std::chrono::seconds(1704067200)); // Jan 1, 2024
-        pMockClock->SetClock_RealTime(defaultTime);
+        TEMPORARY_RETURN_IGNORED pMockClock->SetClock_RealTime(defaultTime);
         pMockClock->SetMonotonic(std::chrono::duration_cast<Milliseconds64>(defaultTime));
 
         ChipLogProgress(DeviceLayer, "Mock clock initialized with default time");
@@ -125,14 +125,14 @@ void TestTimeManager::AdvanceMockTime(Seconds32 offset)
     // Get current mock time
     Microseconds64 currentTime, newTime;
 
-    pMockClock->GetClock_RealTime(currentTime);
+    TEMPORARY_RETURN_IGNORED pMockClock->GetClock_RealTime(currentTime);
 
     // Update both real time and monotonic time consistently
     pMockClock->AdvanceRealTime(std::chrono::duration_cast<Milliseconds64>(offset));
     pMockClock->AdvanceMonotonic(std::chrono::duration_cast<Milliseconds64>(offset));
 
     // Update base time reference
-    pMockClock->GetClock_RealTime(newTime);
+    TEMPORARY_RETURN_IGNORED pMockClock->GetClock_RealTime(newTime);
 
     ChipLogProgress(DeviceLayer, "Advanced mock time: %" PRIu32 "s -> %" PRIu32 "s (+%" PRIu32 "s)",
                     std::chrono::duration_cast<Seconds32>(currentTime).count(),
@@ -231,15 +231,16 @@ void SetTestEventTrigger_TariffDataUpdated()
     };
 
     // Process optional attributes
-    process_attribute(dg->GetMgmtObj(CommodityTariffAttrTypeEnum::kDefaultRandomizationOffset),
-                      tariff_preset.DefaultRandomizationOffset, "DefaultRandomizationOffset", false);
-    process_attribute(dg->GetMgmtObj(CommodityTariffAttrTypeEnum::kDefaultRandomizationType),
-                      tariff_preset.DefaultRandomizationType, "DefaultRandomizationType", false);
-    process_attribute(dg->GetMgmtObj(CommodityTariffAttrTypeEnum::kDayPatterns), tariff_preset.DayPatterns, "DayPatterns", false);
-    process_attribute(dg->GetMgmtObj(CommodityTariffAttrTypeEnum::kIndividualDays), tariff_preset.IndividualDays, "IndividualDays",
-                      false);
-    process_attribute(dg->GetMgmtObj(CommodityTariffAttrTypeEnum::kCalendarPeriods), tariff_preset.CalendarPeriods,
-                      "CalendarPeriods", false);
+    RETURN_SAFELY_IGNORED process_attribute(dg->GetMgmtObj(CommodityTariffAttrTypeEnum::kDefaultRandomizationOffset),
+                                            tariff_preset.DefaultRandomizationOffset, "DefaultRandomizationOffset", false);
+    RETURN_SAFELY_IGNORED process_attribute(dg->GetMgmtObj(CommodityTariffAttrTypeEnum::kDefaultRandomizationType),
+                                            tariff_preset.DefaultRandomizationType, "DefaultRandomizationType", false);
+    RETURN_SAFELY_IGNORED process_attribute(dg->GetMgmtObj(CommodityTariffAttrTypeEnum::kDayPatterns), tariff_preset.DayPatterns,
+                                            "DayPatterns", false);
+    RETURN_SAFELY_IGNORED process_attribute(dg->GetMgmtObj(CommodityTariffAttrTypeEnum::kIndividualDays),
+                                            tariff_preset.IndividualDays, "IndividualDays", false);
+    RETURN_SAFELY_IGNORED process_attribute(dg->GetMgmtObj(CommodityTariffAttrTypeEnum::kCalendarPeriods),
+                                            tariff_preset.CalendarPeriods, "CalendarPeriods", false);
 
     // Process mandatory attributes
     CHIP_ERROR err = CHIP_NO_ERROR;

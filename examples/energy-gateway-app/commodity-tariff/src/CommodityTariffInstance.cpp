@@ -52,14 +52,14 @@ void CommodityTariffInstance::ScheduleTariffTimeUpdate()
 {
     constexpr auto pollInterval = kTimerPollIntervalInSec * 1_s;
 
-    DeviceLayer::SystemLayer().StartTimer(
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(
         pollInterval, [](System::Layer *, void * context) { static_cast<CommodityTariffInstance *>(context)->TariffTimeUpdCb(); },
         this);
 }
 
 void CommodityTariffInstance::CancelTariffTimeUpdate()
 {
-    DeviceLayer::SystemLayer().CancelTimer(
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().CancelTimer(
         [](System::Layer *, void * context) { static_cast<CommodityTariffInstance *>(context)->TariffTimeUpdCb(); }, this);
 }
 

@@ -109,7 +109,7 @@ static uint32_t ParseNumber(const char * pString)
 void ApplicationInit()
 {
     ChipLogDetail(AppServer, "Energy Management App: ApplicationInit()");
-    IdentifyInit();
+    SuccessOrDie(IdentifyInit());
     if (strcmp(spApp, kEvseApp) == 0)
     {
         // Disable Water Heater Endpoint

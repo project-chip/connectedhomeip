@@ -167,7 +167,7 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
 
     // Acquire the Video and Audio Streams from the CameraAVStreamManagement
     // cluster and update the reference counts.
-    AcquireAudioVideoStreams(args.sessionId);
+    TEMPORARY_RETURN_IGNORED AcquireAudioVideoStreams(args.sessionId);
 
     transport->MoveToState(WebrtcTransport::State::SendingOffer);
 
@@ -361,7 +361,7 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
 
     // Acquire the Video and Audio Streams from the CameraAVStreamManagement
     // cluster and update the reference counts.
-    AcquireAudioVideoStreams(args.sessionId);
+    TEMPORARY_RETURN_IGNORED AcquireAudioVideoStreams(args.sessionId);
 
     transport->MoveToState(WebrtcTransport::State::SendingAnswer);
 
@@ -472,7 +472,7 @@ CHIP_ERROR WebRTCProviderManager::HandleEndSession(uint16_t sessionId, WebRTCEnd
         // Release the Video and Audio Streams from the CameraAVStreamManagement
         // cluster and update the reference counts.
         // TODO: Lookup the sessionID to get the Video/Audio StreamID
-        ReleaseAudioVideoStreams(sessionId);
+        TEMPORARY_RETURN_IGNORED ReleaseAudioVideoStreams(sessionId);
 
         UnregisterWebrtcTransport(sessionId);
         mWebrtcTransportMap.erase(sessionId);
@@ -669,7 +669,7 @@ void WebRTCProviderManager::ScheduleOfferSend(uint16_t sessionId)
 {
     ChipLogProgress(Camera, "ScheduleOfferSend called.");
 
-    DeviceLayer::SystemLayer().ScheduleLambda([this, sessionId]() {
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, sessionId]() {
         WebrtcTransport * transport = GetTransport(sessionId);
         if (transport == nullptr)
         {
@@ -695,7 +695,7 @@ void WebRTCProviderManager::ScheduleAnswerSend(uint16_t sessionId)
 {
     ChipLogProgress(Camera, "ScheduleAnswerSend called.");
 
-    DeviceLayer::SystemLayer().ScheduleLambda([this, sessionId]() {
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, sessionId]() {
         WebrtcTransport * transport = GetTransport(sessionId);
         if (transport == nullptr)
         {
@@ -722,7 +722,7 @@ void WebRTCProviderManager::ScheduleEndSend(uint16_t sessionId)
 {
     ChipLogProgress(Camera, "ScheduleEndSend called.");
 
-    DeviceLayer::SystemLayer().ScheduleLambda([this, sessionId]() {
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, sessionId]() {
         WebrtcTransport * transport = GetTransport(sessionId);
         if (transport == nullptr)
         {
@@ -749,7 +749,7 @@ void WebRTCProviderManager::ScheduleICECandidatesSend(uint16_t sessionId)
 {
     ChipLogProgress(Camera, "ScheduleICECandidatesSend called.");
 
-    DeviceLayer::SystemLayer().ScheduleLambda([this, sessionId]() {
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, sessionId]() {
         WebrtcTransport * transport = GetTransport(sessionId);
         if (transport == nullptr)
         {
@@ -828,7 +828,7 @@ void WebRTCProviderManager::OnDeviceConnected(void * context, Messaging::Exchang
         err = self->SendEndCommand(exchangeMgr, sessionHandle, sessionId, endReason);
         // Release the Video and Audio Streams from the CameraAVStreamManagement
         // cluster and update the reference counts.
-        self->ReleaseAudioVideoStreams(sessionId);
+        TEMPORARY_RETURN_IGNORED self->ReleaseAudioVideoStreams(sessionId);
         self->UnregisterWebrtcTransport(sessionId);
         WebrtcTransport::RequestArgs args = transport->GetRequestArgs();
         self->mSessionIdMap.erase(ScopedNodeId(args.peerNodeId, args.fabricIndex));
@@ -976,7 +976,7 @@ void WebRTCProviderManager::OnConnectionStateChanged(bool connected, const uint1
         // Schedule cleanup on Matter thread to ensure proper locking when calling RemoveSession.
         // Safe to capture 'this' by value: WebRTCProviderManager is a member of the global CameraDevice
         // object which has static storage duration and lives for the entire program lifetime.
-        DeviceLayer::SystemLayer().ScheduleLambda([this, sessionId]() {
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, sessionId]() {
             WebrtcTransport * transport = GetTransport(sessionId);
             if (transport == nullptr)
             {
@@ -991,7 +991,7 @@ void WebRTCProviderManager::OnConnectionStateChanged(bool connected, const uint1
 
             // Release the Video and Audio Streams from the CameraAVStreamManagement
             // cluster and update the reference counts.
-            ReleaseAudioVideoStreams(sessionId);
+            TEMPORARY_RETURN_IGNORED ReleaseAudioVideoStreams(sessionId);
 
             // Capture args before unregistering in case the transport is invalidated
             WebrtcTransport::RequestArgs args = transport->GetRequestArgs();

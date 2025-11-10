@@ -280,9 +280,9 @@ CHIP_ERROR EnergyManagementCommonClustersInit(chip::EndpointId endpointId)
 {
     if (!gCommonClustersInitialized)
     {
-        DeviceEnergyManagementInit(endpointId);
-        ElectricalPowerMeasurementInit(endpointId);
-        PowerTopologyInit(endpointId);
+        TEMPORARY_RETURN_IGNORED DeviceEnergyManagementInit(endpointId);
+        TEMPORARY_RETURN_IGNORED ElectricalPowerMeasurementInit(endpointId);
+        TEMPORARY_RETURN_IGNORED PowerTopologyInit(endpointId);
     }
     VerifyOrReturnError(gDEMDelegate && gDEMInstance, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(gEPMDelegate && gEPMInstance, CHIP_ERROR_INCORRECT_STATE);
@@ -342,10 +342,10 @@ void emberAfElectricalEnergyMeasurementClusterInitCallback(chip::EndpointId endp
 
     if (gEEMAttrAccess)
     {
-        gEEMAttrAccess->Init();
+        TEMPORARY_RETURN_IGNORED gEEMAttrAccess->Init();
 
-        SetMeasurementAccuracy(endpointId, accuracy);
-        SetCumulativeReset(endpointId, MakeOptional(resetStruct));
+        TEMPORARY_RETURN_IGNORED SetMeasurementAccuracy(endpointId, accuracy);
+        TEMPORARY_RETURN_IGNORED SetCumulativeReset(endpointId, MakeOptional(resetStruct));
     }
 }
 
@@ -370,11 +370,11 @@ void EvseApplicationShutdown()
     ChipLogDetail(AppServer, "Energy Management App (EVSE): EvseApplicationShutdown()");
 
     /* Shutdown in reverse order that they were created */
-    EVSEManufacturerShutdown();           /* Free the EVSEManufacturer */
-    PowerTopologyShutdown();              /* Free the PowerTopology */
-    ElectricalPowerMeasurementShutdown(); /* Free the Electrical Power Measurement */
-    EnergyEvseShutdown();                 /* Free the EnergyEvse */
-    DeviceEnergyManagementShutdown();     /* Free the DEM */
+    TEMPORARY_RETURN_IGNORED EVSEManufacturerShutdown();           /* Free the EVSEManufacturer */
+    TEMPORARY_RETURN_IGNORED PowerTopologyShutdown();              /* Free the PowerTopology */
+    TEMPORARY_RETURN_IGNORED ElectricalPowerMeasurementShutdown(); /* Free the Electrical Power Measurement */
+    TEMPORARY_RETURN_IGNORED EnergyEvseShutdown();                 /* Free the EnergyEvse */
+    DeviceEnergyManagementShutdown();                              /* Free the DEM */
 
     Clusters::DeviceEnergyManagementMode::Shutdown();
     Clusters::EnergyEvseMode::Shutdown();
@@ -387,13 +387,13 @@ void WaterHeaterApplicationInit()
     VerifyOrDie(WhmApplicationInit(endpointId) == CHIP_NO_ERROR);
 
     /* For Device Energy Management we need the ESA to be Online and ready to accept commands */
-    gDEMDelegate->SetESAState(ESAStateEnum::kOnline);
-    gDEMDelegate->SetESAType(ESATypeEnum::kWaterHeating);
+    TEMPORARY_RETURN_IGNORED gDEMDelegate->SetESAState(ESAStateEnum::kOnline);
+    TEMPORARY_RETURN_IGNORED gDEMDelegate->SetESAType(ESATypeEnum::kWaterHeating);
     gDEMDelegate->SetDEMManufacturerDelegate(*GetWhmManufacturer());
 
     // Set the abs min and max power
-    gDEMDelegate->SetAbsMinPower(1200000); // 1.2KW
-    gDEMDelegate->SetAbsMaxPower(7600000); // 7.6KW
+    TEMPORARY_RETURN_IGNORED gDEMDelegate->SetAbsMinPower(1200000); // 1.2KW
+    TEMPORARY_RETURN_IGNORED gDEMDelegate->SetAbsMaxPower(7600000); // 7.6KW
 }
 
 void WaterHeaterApplicationShutdown()
@@ -401,10 +401,10 @@ void WaterHeaterApplicationShutdown()
     ChipLogDetail(AppServer, "Energy Management App (WaterHeater): WaterHeaterShutdown()");
 
     /* Shutdown in reverse order that they were created */
-    PowerTopologyShutdown();              /* Free the PowerTopology */
-    ElectricalPowerMeasurementShutdown(); /* Free the Energy Meter */
-    DeviceEnergyManagementShutdown();     /* Free the DEM */
-    WhmApplicationShutdown();
+    TEMPORARY_RETURN_IGNORED PowerTopologyShutdown();              /* Free the PowerTopology */
+    TEMPORARY_RETURN_IGNORED ElectricalPowerMeasurementShutdown(); /* Free the Energy Meter */
+    DeviceEnergyManagementShutdown();                              /* Free the DEM */
+    TEMPORARY_RETURN_IGNORED WhmApplicationShutdown();
 
     Clusters::DeviceEnergyManagementMode::Shutdown();
     Clusters::WaterHeaterMode::Shutdown();

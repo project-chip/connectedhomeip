@@ -188,7 +188,7 @@ CHIP_ERROR TlsCertificateManagementCommandDelegate::RootCertsForFabric(EndpointI
     VerifyOrReturnError(matterEndpoint == EndpointId(1), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     uint8_t numRootCerts;
-    mCertificateTable.GetRootCertificateCount(fabric, numRootCerts);
+    ReturnErrorOnFailure(mCertificateTable.GetRootCertificateCount(fabric, numRootCerts));
     ScopedMemoryBuffer<InlineEncodableRootCert> rootCertificatePayloads;
     ScopedMemoryBuffer<RootCertStructType> rootCertificates;
     rootCertificatePayloads.Alloc(numRootCerts);
@@ -350,7 +350,7 @@ CHIP_ERROR TlsCertificateManagementCommandDelegate::ClientCertsForFabric(Endpoin
     VerifyOrReturnError(matterEndpoint == EndpointId(1), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     uint8_t numClientCerts;
-    mCertificateTable.GetClientCertificateCount(fabric, numClientCerts);
+    ReturnErrorOnFailure(mCertificateTable.GetClientCertificateCount(fabric, numClientCerts));
     UniquePtr<InlineBufferedClientCert> certBuffer(New<InlineBufferedClientCert>());
     ScopedMemoryBuffer<RefEncodableClientCert> clientCertificatePayloads;
     ScopedMemoryBuffer<ClientCertStructType> clientCertificates;
@@ -449,11 +449,11 @@ static TlsCertificateManagementServer gTlsCertificateManagementClusterServerInst
 
 void emberAfTlsCertificateManagementClusterInitCallback(EndpointId matterEndpoint)
 {
-    gCertificateTableInstance.SetEndpoint(EndpointId(1));
-    gTlsCertificateManagementClusterServerInstance.Init();
+    TEMPORARY_RETURN_IGNORED gCertificateTableInstance.SetEndpoint(EndpointId(1));
+    TEMPORARY_RETURN_IGNORED gTlsCertificateManagementClusterServerInstance.Init();
 }
 
 void emberAfTlsCertificateManagementClusterShutdownCallback(EndpointId matterEndpoint)
 {
-    gTlsCertificateManagementClusterServerInstance.Finish();
+    TEMPORARY_RETURN_IGNORED gTlsCertificateManagementClusterServerInstance.Finish();
 }

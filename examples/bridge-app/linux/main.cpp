@@ -409,7 +409,7 @@ void CallReportingCallback(intptr_t closure)
 void ScheduleReportingCallback(Device * dev, ClusterId cluster, AttributeId attribute)
 {
     auto * path = Platform::New<app::ConcreteAttributePath>(dev->GetEndpointId(), cluster, attribute);
-    PlatformMgr().ScheduleWork(CallReportingCallback, reinterpret_cast<intptr_t>(path));
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(CallReportingCallback, reinterpret_cast<intptr_t>(path));
 }
 } // anonymous namespace
 
@@ -490,12 +490,12 @@ Protocols::InteractionModel::Status HandleReadBridgedDeviceBasicAttribute(Device
     else if ((attributeId == NodeLabel::Id) && (maxReadLength == 32))
     {
         MutableByteSpan zclNameSpan(buffer, maxReadLength);
-        MakeZclCharString(zclNameSpan, dev->GetName());
+        TEMPORARY_RETURN_IGNORED MakeZclCharString(zclNameSpan, dev->GetName());
     }
     else if ((attributeId == UniqueID::Id) && (maxReadLength == 32))
     {
         MutableByteSpan zclUniqueIdSpan(buffer, maxReadLength);
-        MakeZclCharString(zclUniqueIdSpan, dev->GetUniqueId());
+        TEMPORARY_RETURN_IGNORED MakeZclCharString(zclUniqueIdSpan, dev->GetUniqueId());
     }
     else if ((attributeId == ConfigurationVersion::Id) && (maxReadLength == 4))
     {
@@ -678,35 +678,36 @@ public:
             switch (aPath.mAttributeId)
             {
             case PowerSource::Attributes::BatChargeLevel::Id:
-                aEncoder.Encode(dev->GetBatChargeLevel());
+                TEMPORARY_RETURN_IGNORED aEncoder.Encode(dev->GetBatChargeLevel());
                 break;
             case PowerSource::Attributes::Order::Id:
-                aEncoder.Encode(dev->GetOrder());
+                TEMPORARY_RETURN_IGNORED aEncoder.Encode(dev->GetOrder());
                 break;
             case PowerSource::Attributes::Status::Id:
-                aEncoder.Encode(dev->GetStatus());
+                TEMPORARY_RETURN_IGNORED aEncoder.Encode(dev->GetStatus());
                 break;
             case PowerSource::Attributes::Description::Id:
-                aEncoder.Encode(chip::CharSpan(dev->GetDescription().c_str(), dev->GetDescription().size()));
+                TEMPORARY_RETURN_IGNORED aEncoder.Encode(
+                    chip::CharSpan(dev->GetDescription().c_str(), dev->GetDescription().size()));
                 break;
             case PowerSource::Attributes::EndpointList::Id: {
                 std::vector<chip::EndpointId> & list = dev->GetEndpointList();
                 DataModel::List<EndpointId> dm_list(chip::Span<chip::EndpointId>(list.data(), list.size()));
-                aEncoder.Encode(dm_list);
+                TEMPORARY_RETURN_IGNORED aEncoder.Encode(dm_list);
                 break;
             }
             case PowerSource::Attributes::ClusterRevision::Id:
-                aEncoder.Encode(ZCL_POWER_SOURCE_CLUSTER_REVISION);
+                TEMPORARY_RETURN_IGNORED aEncoder.Encode(ZCL_POWER_SOURCE_CLUSTER_REVISION);
                 break;
             case PowerSource::Attributes::FeatureMap::Id:
-                aEncoder.Encode(dev->GetFeatureMap());
+                TEMPORARY_RETURN_IGNORED aEncoder.Encode(dev->GetFeatureMap());
                 break;
 
             case PowerSource::Attributes::BatReplacementNeeded::Id:
-                aEncoder.Encode(false);
+                TEMPORARY_RETURN_IGNORED aEncoder.Encode(false);
                 break;
             case PowerSource::Attributes::BatReplaceability::Id:
-                aEncoder.Encode(PowerSource::BatReplaceabilityEnum::kNotReplaceable);
+                TEMPORARY_RETURN_IGNORED aEncoder.Encode(PowerSource::BatReplaceabilityEnum::kNotReplaceable);
                 break;
             default:
                 return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
@@ -751,7 +752,7 @@ void runOnOffRoomAction(Room * room, bool actionOn, EndpointId endpointId, uint1
     {
         Actions::Events::StateChanged::Type event{ actionID, invokeID, Actions::ActionStateEnum::kActive };
         EventNumber eventNumber;
-        chip::app::LogEvent(event, endpointId, eventNumber);
+        TEMPORARY_RETURN_IGNORED chip::app::LogEvent(event, endpointId, eventNumber);
     }
 
     // Check and run the action for ActionLight1 - ActionLight4
@@ -776,7 +777,7 @@ void runOnOffRoomAction(Room * room, bool actionOn, EndpointId endpointId, uint1
     {
         Actions::Events::StateChanged::Type event{ actionID, invokeID, Actions::ActionStateEnum::kInactive };
         EventNumber eventNumber;
-        chip::app::LogEvent(event, endpointId, eventNumber);
+        TEMPORARY_RETURN_IGNORED chip::app::LogEvent(event, endpointId, eventNumber);
     }
 }
 
@@ -1085,7 +1086,7 @@ void ApplicationInit()
     if ((!path.empty()) and (sChipNamedPipeCommands.Start(path, &sBridgeCommandDelegate) != CHIP_NO_ERROR))
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
-        sChipNamedPipeCommands.Stop();
+        TEMPORARY_RETURN_IGNORED sChipNamedPipeCommands.Stop();
     }
 
     AttributeAccessInterfaceRegistry::Instance().Register(&gPowerAttrAccess);
@@ -1165,5 +1166,6 @@ void BridgeCommandDelegate::OnEventCommandReceived(const char * json)
         return;
     }
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(BridgeAppCommandHandler::HandleCommand, reinterpret_cast<intptr_t>(handler));
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(BridgeAppCommandHandler::HandleCommand,
+                                                                           reinterpret_cast<intptr_t>(handler));
 }
