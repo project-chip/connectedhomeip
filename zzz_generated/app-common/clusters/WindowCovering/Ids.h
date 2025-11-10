@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster WindowCovering (cluster code: 258/0x04102)
+// Identifier constant values for cluster WindowCovering (cluster code: 258/0x0102)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

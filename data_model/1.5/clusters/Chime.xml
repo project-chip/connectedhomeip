@@ -62,9 +62,7 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial release"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0556" name="Chime">
-      <provisionalConform/>
-    </clusterId>
+    <clusterId id="0x0556" name="Chime"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="CHIME" scope="Endpoint"/>
   <dataTypes>

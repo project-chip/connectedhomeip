@@ -55,7 +55,7 @@ def get_supersets(xml_device_types: dict[int, XmlDeviceType]) -> list[set[int]]:
         To do this, we need to identify the top-level device type and generate the list of acceptable children
     '''
 
-    device_types_that_have_supersets = set([dt.superset_of_device_type_id for dt in xml_device_types.values()]) - {0}
+    device_types_that_have_supersets = {dt.superset_of_device_type_id for dt in xml_device_types.values()} - {0}
 
     # Ex. in the above example, the top level device types would be blinkable light and color temperature light
     # because they are supersets of other things, but have no device types that are supersets of them.
@@ -471,11 +471,11 @@ class DeviceConformanceTests(BasicCompositionTests):
         for endpoint_num, endpoint in self.endpoints.items():
             all_device_type_ids = [dt.deviceType for dt in endpoint[Clusters.Descriptor]
                                    [Clusters.Descriptor.Attributes.DeviceTypeList]]
-            application_device_type_ids = set([
-                dt for dt in all_device_type_ids if self.xml_device_types[dt].classification_class == 'simple'])
+            application_device_type_ids = {
+                dt for dt in all_device_type_ids if self.xml_device_types[dt].classification_class == 'simple'}
             if len(application_device_type_ids) <= 1:
                 continue
-            if any([application_device_type_ids.issubset(superset) for superset in supersets]):
+            if any(application_device_type_ids.issubset(superset) for superset in supersets):
                 continue
 
             location = AttributePathLocation(3, Clusters.Descriptor.id, Clusters.Descriptor.Attributes.DeviceTypeList.attribute_id)
