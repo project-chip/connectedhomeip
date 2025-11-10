@@ -1,6 +1,6 @@
-/*
+/**
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,20 +15,26 @@
  *    limitations under the License.
  */
 
-#pragma once
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <clusters/Thermostat/Metadata.h>
 
-#include <app/ConcreteAttributePath.h>
-#include <app/persistence/AttributePersistence.h>
-#include <protocols/interaction_model/Constants.h>
-
+#include "SetpointRange.h"
 #include "Setpoints.h"
+
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::Thermostat;
+using namespace chip::app::Clusters::Thermostat::Structs;
+using namespace chip::app::Clusters::Thermostat::Attributes;
+using namespace Protocols::InteractionModel;
 
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace Thermostat {
-
-} // namespace Thermostat
+namespace Thermostat {} // namespace Thermostat
 } // namespace Clusters
 } // namespace app
 } // namespace chip
