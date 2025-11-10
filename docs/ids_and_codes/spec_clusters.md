@@ -142,7 +142,7 @@ The following markers are used in this document (matches the ID master list):
 |1364          |0x0554    |WebRTC Transport Requestor                                |WEBRTCR        |   |   |   |     |           |C  |
 |1365          |0x0555    |Push AV Stream Transport                                  |PAVST          |   |   |   |     |           |C  |
 |1366          |0x0556    |Chime                                                     |CHIME          |   |   |   |     |           |C  |
-|1792          |0x0700    |Commodity Tariff                                          |SETRF          |   |   |   |     |           |P  |
+|1792          |0x0700    |Commodity Tariff                                          |SETRF          |   |   |   |     |           |C  |
 |1872          |0x0750    |Ecosystem Information                                     |ECOINFO        |   |   |C  |C    |C          |C  |
 |1873          |0x0751    |Commissioner Control                                      |CCTRL          |   |   |C  |C    |C          |C  |
 |1874          |0x0752    |Joint Fabric Datastore                                    |JFDS           |   |   |P  |P    |P          |P  |
@@ -150,4 +150,4 @@ The following markers are used in this document (matches the ID master list):
 |2049          |0x0801    |TLS Certificate Management                                |TLSCERT        |   |   |   |     |           |C  |
 |2050          |0x0802    |TLS Client Management                                     |TLSCLIENT      |   |   |   |     |           |C  |
 |2822          |0x0B06    |Meter Identification                                      |MTRID          |   |   |   |     |           |C  |
-|2823          |0x0B07    |Commodity Metering                                        |COMMTR         |   |   |   |     |           |P  |
+|2823          |0x0B07    |Commodity Metering                                        |COMMTR         |   |   |   |     |           |C  |
