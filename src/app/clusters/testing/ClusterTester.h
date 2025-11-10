@@ -175,10 +175,20 @@ public:
 
         result.status = mCluster.InvokeCommand(invokeRequest, reader, &mHandler);
 
-        // If InvokeCommand returned nullopt but there's a response, treat it as success
-        if (!result.status.has_value() && mHandler.HasResponse())
+        // If InvokeCommand returned nullopt, it means the command implementation handled the response.
+        // We need to check the mock handler for a data response or a status response.
+        if (!result.status.has_value())
         {
-            result.status = app::DataModel::ActionReturnStatus(CHIP_NO_ERROR);
+            if (mHandler.HasResponse())
+            {
+                // A data response was added, so the command is successful.
+                result.status = app::DataModel::ActionReturnStatus(CHIP_NO_ERROR);
+            }
+            else if (mHandler.HasStatus())
+            {
+                // A status response was added. Use the last one.
+                result.status = app::DataModel::ActionReturnStatus(mHandler.GetLastStatus().status);
+            }
         }
 
         // If command was successful and there's a response, decode it (skip for NullObjectType)

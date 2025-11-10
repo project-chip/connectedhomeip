@@ -285,9 +285,6 @@ TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotCommandTest)
     GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType response;
     InvokeTimeSnapshotAndGetResponse(cluster, response);
 
-    // Verify that systemTimeMs is present
-    EXPECT_GE(response.systemTimeMs, 0u);
-
     // Basic configuration excludes POSIX time
     EXPECT_TRUE(response.posixTimeMs.IsNull());
 }
@@ -298,17 +295,14 @@ TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotCommandWithPosixTimeTest)
     const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
     ScopedDiagnosticsProvider<NullProvider> nullProvider;
     const GeneralDiagnosticsFunctionsConfig functionsConfig{
-        .enablePosixTime      = true,
-        .enablePayloadSnaphot = false,
+        .enablePosixTime       = true,
+        .enablePayloadSnapshot = false,
     };
     GeneralDiagnosticsClusterFullConfigurable cluster(optionalAttributeSet, functionsConfig);
 
     // Invoke TimeSnapshot command and get response
     GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType response;
     InvokeTimeSnapshotAndGetResponse(cluster, response);
-
-    // Verify that systemTimeMs is present
-    EXPECT_GE(response.systemTimeMs, 0u);
 
     // POSIX time is included when available (system dependent)
     if (!response.posixTimeMs.IsNull())
@@ -327,9 +321,6 @@ TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotResponseValues)
     // First invocation. Capture initial timestamp
     GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType firstResponse;
     InvokeTimeSnapshotAndGetResponse(cluster, firstResponse);
-
-    // Verify first response is valid
-    EXPECT_GE(firstResponse.systemTimeMs, 0u);
 
     // Second invocation. Capture subsequent timestamp
     GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType secondResponse;
