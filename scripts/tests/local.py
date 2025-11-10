@@ -997,8 +997,8 @@ def python_tests(
                             f.write(result.stderr)
 
                     else:
-                        logging.info("STDOUT:\n%s", result.stdout.decode("utf8"))
-                        logging.warning("STDERR:\n%s", result.stderr.decode("utf8"))
+                        logging.info("STDOUT:\n%s", result.stdout.decode("utf8", errors='replace'))
+                        logging.warning("STDERR:\n%s", result.stderr.decode("utf8", errors='replace'))
                     if not keep_going:
                         sys.exit(1)
                     failed_tests.append(script)
