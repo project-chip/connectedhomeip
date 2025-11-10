@@ -107,14 +107,14 @@ void NamedPipeCommands::WriteToOutPipe(const std::string & json)
     if (mOutFd == -1 || json.empty())
         return;
 
-    if (write(mOutFd, json.c_str(), json.size()) < 0)  
-    {  
-        ChipLogError(NotSpecified, "Failed to write to pipe: %s", strerror(errno));  
-    }  
-    if (write(mOutFd, "\n", 1) < 0)  
-    {  
-        ChipLogError(NotSpecified, "Failed to write to pipe: %s", strerror(errno));  
-    }  
+    if (write(mOutFd, json.c_str(), json.size()) < 0)
+    {
+        ChipLogError(NotSpecified, "Failed to write to pipe: %s", strerror(errno));
+    }
+    if (write(mOutFd, "\n", 1) < 0)
+    {
+        ChipLogError(NotSpecified, "Failed to write to pipe: %s", strerror(errno));
+    }
     close(mOutFd);
 }
 
