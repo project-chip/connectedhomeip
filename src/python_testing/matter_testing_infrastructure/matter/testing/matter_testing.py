@@ -971,7 +971,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         return write_result[0].Status
 
 
-def read_from_app_pipe(self, app_pipe_out: Optional[str] = None):
+    def read_from_app_pipe(self, app_pipe_out: Optional[str] = None):
         BUFFER_SIZE = 1024
 
         # If is not empty from the args, verify if the fifo file exists.
