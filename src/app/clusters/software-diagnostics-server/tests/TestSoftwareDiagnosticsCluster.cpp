@@ -88,7 +88,8 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)
         // without watermarks, no commands are accepted
         EXPECT_TRUE(Testing::IsAcceptedCommandsListEqualTo(cluster, {}));
 
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap;
+        // feature map attribute
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap{};
         ASSERT_TRUE(tester.ReadAttribute(Attributes::FeatureMap::Id, featureMap).IsSuccess());
         EXPECT_EQ(featureMap, BitFlags<SoftwareDiagnostics::Feature>{}.Raw());
 
@@ -119,16 +120,8 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)
 
         ASSERT_TRUE(Testing::IsAcceptedCommandsListEqualTo(cluster, { &Commands::ResetWatermarks::kMetadataEntry, 1 }));
 
-        // ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
-        // ASSERT_EQ(diag.AcceptedCommands(commandsBuilder), CHIP_NO_ERROR);
-
-        // ReadOnlyBuffer<DataModel::AcceptedCommandEntry> commands = commandsBuilder.TakeBuffer();
-        // ASSERT_EQ(commands.size(), 1u);
-        // ASSERT_EQ(commands[0].commandId, SoftwareDiagnostics::Commands::ResetWatermarks::Id);
-        // ASSERT_EQ(commands[0].GetInvokePrivilege(),
-        //           SoftwareDiagnostics::Commands::ResetWatermarks::kMetadataEntry.GetInvokePrivilege());
-
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap;
+        // feature map attribute
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap{};
         ASSERT_TRUE(tester.ReadAttribute(Attributes::FeatureMap::Id, featureMap).IsSuccess());
         EXPECT_EQ(featureMap, BitFlags<SoftwareDiagnostics::Feature>{ SoftwareDiagnostics::Feature::kWatermarks }.Raw());
 
@@ -179,11 +172,7 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)
                 *threadMetricsList = metrics;
                 return CHIP_NO_ERROR;
             }
-            void ReleaseThreadMetrics(DeviceLayer::ThreadMetrics * threadMetricsList) override
-            {
-                releaseCalled = true;
-                return;
-            }
+            void ReleaseThreadMetrics(DeviceLayer::ThreadMetrics * threadMetricsList) override { releaseCalled = true; }
         };
 
         ScopedDiagnosticsProvider<AllProvider> allProvider;
