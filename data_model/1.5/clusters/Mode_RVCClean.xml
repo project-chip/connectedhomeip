@@ -57,12 +57,13 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0055" name="RVC Clean Mode Cluster" revision="4">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0055" name="RVC Clean Mode Cluster" revision="5">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Add constraint about changing cleaning modes while the RVC Run Mode cluster is in a non-Idle mode. ChangeToModeResponse command: StatusText must be provided for InvalidInMode status. Deprecate the OnMode attribute and the related feature map bit."/>
     <revision revision="3" summary="Remove constraint on changing cleaning modes while the RVC Run Mode cluster is in a non-Idle mode. Continue to allow InvalidInMode response for devices that do not support such mode changes."/>
     <revision revision="4" summary="Add Vacuum then Mop cleaning mode"/>
+    <revision revision="5" summary="DirectModeChange made non-provisional"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0055" name="RVC Clean Mode"/>
@@ -73,10 +74,7 @@ Davis, CA 95616, USA
       <disallowConform/>
     </feature>
     <feature bit="20" code="DIRECTMODECH" name="DirectModeChange" summary="Cluster supports changing clean modes from non-Idle states">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform/>
-      </otherwiseConform>
+      <optionalConform/>
     </feature>
   </features>
   <dataTypes>
