@@ -7008,10 +7008,10 @@ endpoint 1 {
   }
 
   server cluster Thermostat {
-    ram      attribute localTemperature;
-    ram      attribute occupiedHeatingSetpoint default = 0x07D0;
-    ram      attribute controlSequenceOfOperation default = 0x04;
-    ram      attribute systemMode default = 0x01;
+    callback attribute localTemperature;
+    callback attribute occupiedHeatingSetpoint;
+    callback attribute controlSequenceOfOperation;
+    callback attribute systemMode;
     ram      attribute featureMap default = 1;
     callback attribute clusterRevision;
 

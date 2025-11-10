@@ -45,237 +45,398 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-int16_t EnforceHeatingSetpointLimits(int16_t HeatingSetpoint, EndpointId endpoint)
+CHIP_ERROR Setpoints::LoadSetpointLimits(EndpointId endpoint, AttributePersistence & persistence)
 {
-    // Optional Mfg supplied limits
-    int16_t AbsMinHeatSetpointLimit = kDefaultAbsMinHeatSetpointLimit;
-    int16_t AbsMaxHeatSetpointLimit = kDefaultAbsMaxHeatSetpointLimit;
+    persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, AbsMinHeatSetpointLimit::Id }, mAbsMinHeatSetpointLimit,
+                                      kDefaultAbsMinHeatSetpointLimit);
+    persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, AbsMaxHeatSetpointLimit::Id }, mAbsMaxHeatSetpointLimit,
+                                      kDefaultAbsMaxHeatSetpointLimit);
+    persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, AbsMinCoolSetpointLimit::Id }, mAbsMinCoolSetpointLimit,
+                                      kDefaultAbsMinCoolSetpointLimit);
+    persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, AbsMaxCoolSetpointLimit::Id }, mAbsMaxCoolSetpointLimit,
+                                      kDefaultAbsMaxCoolSetpointLimit);
+    persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, MinHeatSetpointLimit::Id }, mMinHeatSetpointLimit,
+                                      kDefaultMinHeatSetpointLimit);
+    persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, MaxHeatSetpointLimit::Id }, mMaxHeatSetpointLimit,
+                                      kDefaultMaxHeatSetpointLimit);
+    persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, MinCoolSetpointLimit::Id }, mMinCoolSetpointLimit,
+                                      kDefaultMinCoolSetpointLimit);
+    persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, MaxCoolSetpointLimit::Id }, mMaxCoolSetpointLimit,
+                                      kDefaultMaxCoolSetpointLimit);
+    int8_t deadBand;
+    persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, MinSetpointDeadBand::Id }, deadBand, kDefaultDeadBand);
+    mDeadBand = static_cast<int16_t>(deadBand * 10);
+    persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, OccupiedCoolingSetpoint::Id }, mOccupiedCoolingSetpoint,
+                                      kDefaultCoolingSetpoint);
+    persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, OccupiedHeatingSetpoint::Id }, mOccupiedHeatingSetpoint,
+                                      kDefaultHeatingSetpoint);
+    persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, UnoccupiedCoolingSetpoint::Id }, mUnoccupiedCoolingSetpoint,
+                                      kDefaultCoolingSetpoint);
+    persistence.LoadNativeEndianValue({ endpoint, Thermostat::Id, UnoccupiedHeatingSetpoint::Id }, mUnoccupiedHeatingSetpoint,
+                                      kDefaultHeatingSetpoint);
 
-    // Optional User supplied limits
-    int16_t MinHeatSetpointLimit = kDefaultMinHeatSetpointLimit;
-    int16_t MaxHeatSetpointLimit = kDefaultMaxHeatSetpointLimit;
-
-    // Attempt to read the setpoint limits
-    // Absmin/max are manufacturer limits
-    // min/max are user imposed min/max
-
-    // Note that the limits are initialized above per the spec limits
-    // if they are not present Get() will not update the value so the defaults are used
-    Status status;
-
-    // https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/3724
-    // behavior is not specified when Abs * values are not present and user values are present
-    // implemented behavior accepts the user values without regard to default Abs values.
-
-    // Per global matter data model policy
-    // if a attribute is not present then it's default shall be used.
-
-    status = AbsMinHeatSetpointLimit::Get(endpoint, &AbsMinHeatSetpointLimit);
-    if (status != Status::Success)
-    {
-        ChipLogError(Zcl, "Warning: AbsMinHeatSetpointLimit missing using default");
-    }
-
-    status = AbsMaxHeatSetpointLimit::Get(endpoint, &AbsMaxHeatSetpointLimit);
-    if (status != Status::Success)
-    {
-        ChipLogError(Zcl, "Warning: AbsMaxHeatSetpointLimit missing using default");
-    }
-    status = MinHeatSetpointLimit::Get(endpoint, &MinHeatSetpointLimit);
-    if (status != Status::Success)
-    {
-        MinHeatSetpointLimit = AbsMinHeatSetpointLimit;
-    }
-
-    status = MaxHeatSetpointLimit::Get(endpoint, &MaxHeatSetpointLimit);
-    if (status != Status::Success)
-    {
-        MaxHeatSetpointLimit = AbsMaxHeatSetpointLimit;
-    }
-
-    // Make sure the user imposed limits are within the manufacturer imposed limits
-
-    // https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/3725
-    // Spec does not specify the behavior is the requested setpoint exceeds the limit allowed
-    // This implementation clamps at the limit.
-
-    // resolution of 3725 is to clamp.
-
-    if (MinHeatSetpointLimit < AbsMinHeatSetpointLimit)
-        MinHeatSetpointLimit = AbsMinHeatSetpointLimit;
-
-    if (MaxHeatSetpointLimit > AbsMaxHeatSetpointLimit)
-        MaxHeatSetpointLimit = AbsMaxHeatSetpointLimit;
-
-    if (HeatingSetpoint < MinHeatSetpointLimit)
-        HeatingSetpoint = MinHeatSetpointLimit;
-
-    if (HeatingSetpoint > MaxHeatSetpointLimit)
-        HeatingSetpoint = MaxHeatSetpointLimit;
-
-    return HeatingSetpoint;
+    return CHIP_NO_ERROR;
 }
 
-int16_t EnforceCoolingSetpointLimits(int16_t CoolingSetpoint, EndpointId endpoint)
+DataModel::ActionReturnStatus Setpoints::ChangeSetpoint(int16_t setpoint, bool isHeatingSetpoint, bool autoSupported, bool occupied,
+                                                        bool & deadbandShift, AttributeValueDecoder & decoder,
+                                                        AttributePersistence & persistence)
 {
-    // Optional Mfg supplied limits
-    int16_t AbsMinCoolSetpointLimit = kDefaultAbsMinCoolSetpointLimit;
-    int16_t AbsMaxCoolSetpointLimit = kDefaultAbsMaxCoolSetpointLimit;
+    auto minValue = isHeatingSetpoint ? mMinHeatSetpointLimit : mMinCoolSetpointLimit;
+    auto maxValue = isHeatingSetpoint ? mMaxHeatSetpointLimit : mMaxCoolSetpointLimit;
 
-    // Optional User supplied limits
-    int16_t MinCoolSetpointLimit = kDefaultMinCoolSetpointLimit;
-    int16_t MaxCoolSetpointLimit = kDefaultMaxCoolSetpointLimit;
-
-    // Attempt to read the setpoint limits
-    // Absmin/max are manufacturer limits
-    // min/max are user imposed min/max
-
-    // Note that the limits are initialized above per the spec limits
-    // if they are not present Get() will not update the value so the defaults are used
-    Status status;
-
-    // https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/3724
-    // behavior is not specified when Abs * values are not present and user values are present
-    // implemented behavior accepts the user values without regard to default Abs values.
-
-    // Per global matter data model policy
-    // if a attribute is not present then it's default shall be used.
-
-    status = AbsMinCoolSetpointLimit::Get(endpoint, &AbsMinCoolSetpointLimit);
-    if (status != Status::Success)
+    if (setpoint < minValue || setpoint > maxValue)
     {
-        ChipLogError(Zcl, "Warning: AbsMinCoolSetpointLimit missing using default");
+        return Status::ConstraintError;
     }
 
-    status = AbsMaxCoolSetpointLimit::Get(endpoint, &AbsMaxCoolSetpointLimit);
-    if (status != Status::Success)
+    int16_t & existingSetpoint = isHeatingSetpoint ? (occupied ? mOccupiedHeatingSetpoint : mUnoccupiedHeatingSetpoint)
+                                                   : (occupied ? mOccupiedCoolingSetpoint : mUnoccupiedCoolingSetpoint);
+    auto attribute             = isHeatingSetpoint ? (occupied ? OccupiedHeatingSetpoint::Id : UnoccupiedHeatingSetpoint::Id)
+                                                   : (occupied ? OccupiedCoolingSetpoint::Id : UnoccupiedCoolingSetpoint::Id);
+    if (autoSupported)
     {
-        ChipLogError(Zcl, "Warning: AbsMaxCoolSetpointLimit missing using default");
-    }
+        int16_t & rangeSetpoint = isHeatingSetpoint ? (occupied ? mOccupiedCoolingSetpoint : mUnoccupiedCoolingSetpoint)
+                                                    : (occupied ? mOccupiedHeatingSetpoint : mUnoccupiedHeatingSetpoint);
+        auto rangeAttribute     = isHeatingSetpoint ? (occupied ? OccupiedCoolingSetpoint::Id : UnoccupiedCoolingSetpoint::Id)
+                                                    : (occupied ? OccupiedHeatingSetpoint::Id : UnoccupiedHeatingSetpoint::Id);
+        if (isHeatingSetpoint)
+        {
+            int16_t minValidCoolingSetpoint = static_cast<int16_t>(setpoint + mDeadBand);
 
-    status = MinCoolSetpointLimit::Get(endpoint, &MinCoolSetpointLimit);
-    if (status != Status::Success)
+            if (minValidCoolingSetpoint > mMaxCoolSetpointLimit)
+            {
+                // Adjusting the cooling setpoint to preserve the deadband would violate the max cooling setpoint
+                return Status::ConstraintError;
+            }
+            if (minValidCoolingSetpoint > rangeSetpoint)
+            {
+                auto result = persistence.DecodeAndStoreNativeEndianValue({ mEndpoint, Thermostat::Id, rangeAttribute }, decoder,
+                                                                          minValidCoolingSetpoint);
+                if (!result.IsSuccess())
+                {
+                    return result;
+                }
+                rangeSetpoint = minValidCoolingSetpoint;
+                deadbandShift = true;
+            }
+        }
+    }
+    auto result = persistence.DecodeAndStoreNativeEndianValue({ mEndpoint, Thermostat::Id, attribute }, decoder, setpoint);
+    if (!result.IsSuccess())
     {
-        MinCoolSetpointLimit = AbsMinCoolSetpointLimit;
+        return result;
     }
-
-    status = MaxCoolSetpointLimit::Get(endpoint, &MaxCoolSetpointLimit);
-    if (status != Status::Success)
-    {
-        MaxCoolSetpointLimit = AbsMaxCoolSetpointLimit;
-    }
-
-    // Make sure the user imposed limits are within the manufacture imposed limits
-    // https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/3725
-    // Spec does not specify the behavior is the requested setpoint exceeds the limit allowed
-    // This implementation clamps at the limit.
-
-    // resolution of 3725 is to clamp.
-
-    if (MinCoolSetpointLimit < AbsMinCoolSetpointLimit)
-        MinCoolSetpointLimit = AbsMinCoolSetpointLimit;
-
-    if (MaxCoolSetpointLimit > AbsMaxCoolSetpointLimit)
-        MaxCoolSetpointLimit = AbsMaxCoolSetpointLimit;
-
-    if (CoolingSetpoint < MinCoolSetpointLimit)
-        CoolingSetpoint = MinCoolSetpointLimit;
-
-    if (CoolingSetpoint > MaxCoolSetpointLimit)
-        CoolingSetpoint = MaxCoolSetpointLimit;
-
-    return CoolingSetpoint;
+    existingSetpoint = setpoint;
+    return result;
 }
 
-Status GetSetpointLimits(EndpointId endpoint, SetpointLimits & setpointLimits)
+DataModel::ActionReturnStatus Setpoints::ChangeSetpointLimit(AttributeId attribute, int16_t limit, bool autoSupported,
+                                                             AttributeValueDecoder & decoder, AttributePersistence & persistence)
 {
-    uint32_t flags;
-    if (FeatureMap::Get(endpoint, &flags) != Status::Success)
+    switch (attribute)
     {
-        ChipLogError(Zcl, "GetSetpointLimits: could not get feature flags");
-        flags = FEATURE_MAP_DEFAULT;
+    case MinHeatSetpointLimit::Id:
+        ChipLogError(Zcl,
+                     "Changing MinHeatSetpointLimit: limit: %d, mAbsMinHeatSetpointLimit: %d, mMaxHeatSetpointLimit: %d, "
+                     "mAbsMaxCoolSetpointLimit: %d, mMinCoolSetpointLimit: %d, mDeadBand: %d",
+                     limit, mAbsMinHeatSetpointLimit, mMaxHeatSetpointLimit, mAbsMaxCoolSetpointLimit, mMinCoolSetpointLimit,
+                     mDeadBand);
+
+        if (limit < mAbsMinHeatSetpointLimit || limit > mMaxHeatSetpointLimit || limit > mAbsMaxCoolSetpointLimit)
+        {
+            return Status::ConstraintError;
+        }
+        if (autoSupported)
+        {
+            if (limit > mMinCoolSetpointLimit - mDeadBand)
+            {
+                return Status::ConstraintError;
+            }
+        }
+        break;
+    case MaxHeatSetpointLimit::Id:
+        ChipLogError(Zcl,
+                     "Changing MaxHeatSetpointLimit: limit: %d, mAbsMinHeatSetpointLimit: %d, mMinHeatSetpointLimit: %d, "
+                     "mAbsMaxHeatSetpointLimit: %d",
+                     limit, mAbsMinHeatSetpointLimit, mMinHeatSetpointLimit, mAbsMaxHeatSetpointLimit);
+        if (limit < mAbsMinHeatSetpointLimit || limit < mMinHeatSetpointLimit || limit > mAbsMaxHeatSetpointLimit)
+        {
+            return Status::ConstraintError;
+        }
+        if (autoSupported)
+        {
+            if (limit > mMaxCoolSetpointLimit - mDeadBand)
+            {
+                return Status::ConstraintError;
+            }
+        }
+        break;
+    case MinCoolSetpointLimit::Id:
+        ChipLogError(Zcl,
+                     "Changing MinCoolSetpointLimit: limit: %d, mAbsMinCoolSetpointLimit: %d, mMaxCoolSetpointLimit: %d, "
+                     "mAbsMaxCoolSetpointLimit: %d",
+                     limit, mAbsMinCoolSetpointLimit, mMaxCoolSetpointLimit, mAbsMaxCoolSetpointLimit);
+        if (limit < mAbsMinCoolSetpointLimit || limit > mMaxCoolSetpointLimit || limit > mAbsMaxCoolSetpointLimit)
+        {
+            return Status::ConstraintError;
+        }
+        if (autoSupported)
+        {
+            if (limit < mMinHeatSetpointLimit + mDeadBand)
+            {
+                return Status::ConstraintError;
+            }
+        }
+        break;
+    case MaxCoolSetpointLimit::Id:
+        ChipLogError(Zcl,
+                     "Changing MaxCoolSetpointLimit: limit: %d, mAbsMinCoolSetpointLimit: %d, mMinCoolSetpointLimit: %d, "
+                     "mAbsMaxCoolSetpointLimit: %d",
+                     limit, mAbsMinCoolSetpointLimit, mMinCoolSetpointLimit, mAbsMaxCoolSetpointLimit);
+        if (limit < mAbsMinCoolSetpointLimit || limit < mMinCoolSetpointLimit || limit > mAbsMaxCoolSetpointLimit)
+        {
+            return Status::ConstraintError;
+        }
+        if (autoSupported)
+        {
+            if (limit < mMaxHeatSetpointLimit + mDeadBand)
+            {
+                return Status::ConstraintError;
+            }
+        }
+        break;
+    default:
+        return Status::UnsupportedAttribute;
     }
 
-    auto featureMap                   = BitMask<Feature, uint32_t>(flags);
-    setpointLimits.autoSupported      = featureMap.Has(Feature::kAutoMode);
-    setpointLimits.heatSupported      = featureMap.Has(Feature::kHeating);
-    setpointLimits.coolSupported      = featureMap.Has(Feature::kCooling);
-    setpointLimits.occupancySupported = featureMap.Has(Feature::kOccupancy);
-
-    if (setpointLimits.autoSupported)
+    auto result = persistence.DecodeAndStoreNativeEndianValue({ mEndpoint, Thermostat::Id, attribute }, decoder, limit);
+    if (!result.IsSuccess())
     {
-        int8_t deadBand;
-        if (MinSetpointDeadBand::Get(endpoint, &deadBand) != Status::Success)
+        return result;
+    }
+    switch (attribute)
+    {
+    case MinHeatSetpointLimit::Id:
+        mMinHeatSetpointLimit = limit;
+        break;
+    case MaxHeatSetpointLimit::Id:
+        mMaxHeatSetpointLimit = limit;
+        break;
+    case MinCoolSetpointLimit::Id:
+        mMinCoolSetpointLimit = limit;
+        break;
+    case MaxCoolSetpointLimit::Id:
+        mMaxCoolSetpointLimit = limit;
+        break;
+    }
+    return result;
+}
+
+DataModel::ActionReturnStatus Setpoints::ChangeSetpointDeadBand(int16_t deadBand, bool autoSupported,
+                                                                AttributeValueDecoder & decoder, AttributePersistence & persistence)
+{
+    ChipLogError(Zcl, "Changing MinSetpointDeadBand: deadBand: %d", deadBand);
+    if (deadBand < 0 || deadBand > 127)
+    {
+        ChipLogError(Zcl, "Returning constraint error");
+        return Status::ConstraintError;
+    }
+    int8_t shortDeadBand = static_cast<int8_t>(deadBand);
+    auto result =
+        persistence.DecodeAndStoreNativeEndianValue({ mEndpoint, Thermostat::Id, MinSetpointDeadBand::Id }, decoder, shortDeadBand);
+    if (!result.IsSuccess())
+    {
+        return result;
+    }
+    mDeadBand = static_cast<int16_t>(deadBand * 10);
+    return result;
+}
+
+DataModel::ActionReturnStatus Setpoints::RaiseLowerSetpoint(int16_t amount, SetpointRaiseLowerModeEnum mode,
+                                                            const BitFlags<Thermostat::Feature> features, bool occupied,
+                                                            AttributePersistenceProvider & persistence)
+{
+    ChipLogError(Zcl, "Setpoints::RaiseLowerSetpoint");
+
+    auto supportsHeat = features.Has(Feature::kHeating);
+    auto supportsCool = features.Has(Feature::kCooling);
+
+    auto & coolSetpoint        = occupied ? mOccupiedCoolingSetpoint : mUnoccupiedCoolingSetpoint;
+    auto & heatSetpoint        = occupied ? mOccupiedHeatingSetpoint : mUnoccupiedHeatingSetpoint;
+    auto coolSetpointAttribute = occupied ? OccupiedCoolingSetpoint::Id : UnoccupiedCoolingSetpoint::Id;
+    auto heatSetpointAttribute = occupied ? OccupiedHeatingSetpoint::Id : UnoccupiedHeatingSetpoint::Id;
+
+    int16_t targetCoolSetpoint = coolSetpoint;
+    int16_t targetHeatSetpoint = heatSetpoint;
+
+    switch (mode)
+    {
+    case SetpointRaiseLowerModeEnum::kBoth: {
+        if (supportsHeat && supportsCool)
         {
-            deadBand = kDefaultDeadBand;
+            targetCoolSetpoint = static_cast<int16_t>(targetCoolSetpoint + amount * 10);
+            targetHeatSetpoint = static_cast<int16_t>(targetHeatSetpoint + amount * 10);
+            if (targetCoolSetpoint < mMinCoolSetpointLimit)
+            {
+                targetCoolSetpoint = mMinCoolSetpointLimit;
+                int16_t diff       = targetCoolSetpoint - targetHeatSetpoint;
+                if (diff > mDeadBand)
+                {
+                    targetHeatSetpoint = targetCoolSetpoint - mDeadBand;
+                }
+            }
+            if (targetHeatSetpoint < mMinHeatSetpointLimit)
+            {
+                targetHeatSetpoint = mMinHeatSetpointLimit;
+                int16_t diff       = targetCoolSetpoint - targetHeatSetpoint;
+                if (diff > mDeadBand)
+                {
+                    targetCoolSetpoint = targetHeatSetpoint + mDeadBand;
+                }
+            }
         }
-        setpointLimits.deadBand = static_cast<int16_t>(deadBand * 10);
+        else if (supportsHeat)
+        {
+            targetHeatSetpoint = static_cast<int16_t>(targetHeatSetpoint + amount * 10);
+            if (targetHeatSetpoint > mMaxHeatSetpointLimit)
+            {
+                targetHeatSetpoint = mMaxHeatSetpointLimit;
+            }
+            else if (targetHeatSetpoint < mMinHeatSetpointLimit)
+            {
+                targetHeatSetpoint = mMinHeatSetpointLimit;
+            }
+        }
+        else if (supportsCool)
+        {
+            targetCoolSetpoint = static_cast<int16_t>(targetCoolSetpoint + amount * 10);
+            if (targetCoolSetpoint > mMaxCoolSetpointLimit)
+            {
+                targetCoolSetpoint = mMaxCoolSetpointLimit;
+            }
+            else if (targetCoolSetpoint < mMinCoolSetpointLimit)
+            {
+                targetCoolSetpoint = mMinCoolSetpointLimit;
+            }
+        }
+
+        break;
+    }
+    case SetpointRaiseLowerModeEnum::kCool: {
+        if (!supportsCool)
+        {
+            ChipLogError(Zcl, "Setpoints::RaiseLowerSetpoint tried to change cool without supporting cool");
+            return Status::InvalidCommand;
+        }
+        targetCoolSetpoint = static_cast<int16_t>(targetCoolSetpoint + amount * 10);
+        if (targetCoolSetpoint > mMaxCoolSetpointLimit)
+        {
+            targetCoolSetpoint = mMaxCoolSetpointLimit;
+        }
+        else if (targetCoolSetpoint < mMinCoolSetpointLimit)
+        {
+            targetCoolSetpoint = mMinCoolSetpointLimit;
+        }
+        break;
     }
 
-    if (AbsMinCoolSetpointLimit::Get(endpoint, &setpointLimits.absMinCoolSetpointLimit) != Status::Success)
-        setpointLimits.absMinCoolSetpointLimit = kDefaultAbsMinCoolSetpointLimit;
-
-    if (AbsMaxCoolSetpointLimit::Get(endpoint, &setpointLimits.absMaxCoolSetpointLimit) != Status::Success)
-        setpointLimits.absMaxCoolSetpointLimit = kDefaultAbsMaxCoolSetpointLimit;
-
-    if (MinCoolSetpointLimit::Get(endpoint, &setpointLimits.minCoolSetpointLimit) != Status::Success)
-        setpointLimits.minCoolSetpointLimit = setpointLimits.absMinCoolSetpointLimit;
-
-    if (MaxCoolSetpointLimit::Get(endpoint, &setpointLimits.maxCoolSetpointLimit) != Status::Success)
-        setpointLimits.maxCoolSetpointLimit = setpointLimits.absMaxCoolSetpointLimit;
-
-    if (AbsMinHeatSetpointLimit::Get(endpoint, &setpointLimits.absMinHeatSetpointLimit) != Status::Success)
-        setpointLimits.absMinHeatSetpointLimit = kDefaultAbsMinHeatSetpointLimit;
-
-    if (AbsMaxHeatSetpointLimit::Get(endpoint, &setpointLimits.absMaxHeatSetpointLimit) != Status::Success)
-        setpointLimits.absMaxHeatSetpointLimit = kDefaultAbsMaxHeatSetpointLimit;
-
-    if (MinHeatSetpointLimit::Get(endpoint, &setpointLimits.minHeatSetpointLimit) != Status::Success)
-        setpointLimits.minHeatSetpointLimit = setpointLimits.absMinHeatSetpointLimit;
-
-    if (MaxHeatSetpointLimit::Get(endpoint, &setpointLimits.maxHeatSetpointLimit) != Status::Success)
-        setpointLimits.maxHeatSetpointLimit = setpointLimits.absMaxHeatSetpointLimit;
-
-    if (setpointLimits.coolSupported)
-    {
-        if (OccupiedCoolingSetpoint::Get(endpoint, &setpointLimits.occupiedCoolingSetpoint) != Status::Success)
+    case SetpointRaiseLowerModeEnum::kHeat: {
+        if (!supportsHeat)
         {
-            // We're substituting the failure code here for backwards-compatibility reasons
-            ChipLogError(Zcl, "Error: Can not read Occupied Cooling Setpoint");
-            return Status::Failure;
+            ChipLogError(Zcl, "Setpoints::RaiseLowerSetpoint tried to change heat without supporting heat");
+            return Status::InvalidCommand;
         }
+        targetHeatSetpoint = static_cast<int16_t>(targetHeatSetpoint + amount * 10);
+        if (targetHeatSetpoint > mMaxHeatSetpointLimit)
+        {
+            targetHeatSetpoint = mMaxHeatSetpointLimit;
+        }
+        else if (targetHeatSetpoint < mMinHeatSetpointLimit)
+        {
+            targetHeatSetpoint = mMinHeatSetpointLimit;
+        }
+        break;
     }
-
-    if (setpointLimits.heatSupported)
-    {
-        if (OccupiedHeatingSetpoint::Get(endpoint, &setpointLimits.occupiedHeatingSetpoint) != Status::Success)
-        {
-            // We're substituting the failure code here for backwards-compatibility reasons
-            ChipLogError(Zcl, "Error: Can not read Occupied Heating Setpoint");
-            return Status::Failure;
-        }
+    case SetpointRaiseLowerModeEnum::kUnknownEnumValue: {
+        return Status::InvalidCommand;
     }
-
-    if (setpointLimits.coolSupported && setpointLimits.occupancySupported)
-    {
-        if (UnoccupiedCoolingSetpoint::Get(endpoint, &setpointLimits.unoccupiedCoolingSetpoint) != Status::Success)
-        {
-            // We're substituting the failure code here for backwards-compatibility reasons
-            ChipLogError(Zcl, "Error: Can not read Unoccupied Cooling Setpoint");
-            return Status::Failure;
-        }
     }
-
-    if (setpointLimits.heatSupported && setpointLimits.occupancySupported)
+    if (targetCoolSetpoint != coolSetpoint)
     {
-        if (UnoccupiedHeatingSetpoint::Get(endpoint, &setpointLimits.unoccupiedHeatingSetpoint) != Status::Success)
+        DataModel::ActionReturnStatus result =
+            persistence.WriteValue({ mEndpoint, Thermostat::Id, coolSetpointAttribute },
+                                   { reinterpret_cast<const uint8_t *>(&targetCoolSetpoint), sizeof(targetCoolSetpoint) });
+        if (!result.IsSuccess())
         {
-            // We're substituting the failure code here for backwards-compatibility reasons
-            ChipLogError(Zcl, "Error: Can not read Unoccupied Heating Setpoint");
-            return Status::Failure;
+            return result;
         }
+        coolSetpoint = targetCoolSetpoint;
+    }
+    if (targetHeatSetpoint != heatSetpoint)
+    {
+        DataModel::ActionReturnStatus result =
+            persistence.WriteValue({ mEndpoint, Thermostat::Id, heatSetpointAttribute },
+                                   { reinterpret_cast<const uint8_t *>(&targetHeatSetpoint), sizeof(targetHeatSetpoint) });
+        if (!result.IsSuccess())
+        {
+            return result;
+        }
+        heatSetpoint = targetHeatSetpoint;
     }
     return Status::Success;
+}
+
+int16_t Setpoints::EnforceHeatingSetpointLimits(int16_t heatingSetpoint)
+{
+
+    // Optional User supplied limits
+    int16_t minHeatSetpointLimit = mMinHeatSetpointLimit;
+    int16_t maxHeatSetpointLimit = mMaxHeatSetpointLimit;
+
+    // https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/3725
+    // Spec does not specify the behavior is the requested setpoint exceeds the limit allowed
+    // This implementation clamps at the limit.
+
+    if (minHeatSetpointLimit < mAbsMinHeatSetpointLimit)
+        minHeatSetpointLimit = mAbsMinHeatSetpointLimit;
+
+    if (maxHeatSetpointLimit > mAbsMaxHeatSetpointLimit)
+        maxHeatSetpointLimit = mAbsMaxHeatSetpointLimit;
+
+    if (heatingSetpoint < minHeatSetpointLimit)
+        heatingSetpoint = minHeatSetpointLimit;
+
+    if (heatingSetpoint > maxHeatSetpointLimit)
+        heatingSetpoint = maxHeatSetpointLimit;
+
+    return heatingSetpoint;
+}
+
+int16_t Setpoints::EnforceCoolingSetpointLimits(int16_t coolingSetpoint)
+{
+
+    // Optional User supplied limits
+    int16_t minCoolSetpointLimit = mMinCoolSetpointLimit;
+    int16_t maxCoolSetpointLimit = mMaxCoolSetpointLimit;
+
+    // https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/3725
+    // Spec does not specify the behavior is the requested setpoint exceeds the limit allowed
+    // This implementation clamps at the limit.
+
+    if (minCoolSetpointLimit < mAbsMinCoolSetpointLimit)
+        minCoolSetpointLimit = mAbsMinCoolSetpointLimit;
+
+    if (maxCoolSetpointLimit > mAbsMaxCoolSetpointLimit)
+        maxCoolSetpointLimit = mAbsMaxCoolSetpointLimit;
+
+    if (coolingSetpoint < minCoolSetpointLimit)
+        coolingSetpoint = minCoolSetpointLimit;
+
+    if (coolingSetpoint > maxCoolSetpointLimit)
+        coolingSetpoint = maxCoolSetpointLimit;
+
+    return coolingSetpoint;
 }
 
 Status CheckHeatingSetpointDeadband(bool autoSupported, int16_t newCoolingSetpoint, int16_t minHeatingSetpoint, int16_t deadband)
@@ -339,6 +500,7 @@ void EnsureCoolingSetpointDeadband(EndpointId endpoint, int16_t currentCoolingSe
 void EnsureHeatingSetpointDeadband(EndpointId endpoint, int16_t currentHeatingSetpoint, int16_t newCoolingSetpoint,
                                    int16_t minHeatingSetpoint, int16_t deadband, SetpointSetter setter)
 {
+
     int16_t maxValidHeatingSetpoint = static_cast<int16_t>(newCoolingSetpoint - deadband);
     if (currentHeatingSetpoint <= maxValidHeatingSetpoint)
     {
@@ -360,277 +522,7 @@ void EnsureHeatingSetpointDeadband(EndpointId endpoint, int16_t currentHeatingSe
     }
 }
 
-void EnsureDeadband(const ConcreteAttributePath & attributePath)
-{
-    auto endpoint = attributePath.mEndpointId;
-    SetpointLimits setpointLimits;
-    auto status = GetSetpointLimits(endpoint, setpointLimits);
-    if (status != Status::Success)
-    {
-        return;
-    }
-    if (!setpointLimits.autoSupported)
-    {
-        return;
-    }
-    switch (attributePath.mAttributeId)
-    {
-    case OccupiedHeatingSetpoint::Id:
-        EnsureCoolingSetpointDeadband(endpoint, setpointLimits.occupiedCoolingSetpoint, setpointLimits.occupiedHeatingSetpoint,
-                                      setpointLimits.maxCoolSetpointLimit, setpointLimits.deadBand, OccupiedCoolingSetpoint::Set);
-        break;
-    case OccupiedCoolingSetpoint::Id:
-        EnsureHeatingSetpointDeadband(endpoint, setpointLimits.occupiedHeatingSetpoint, setpointLimits.occupiedCoolingSetpoint,
-                                      setpointLimits.minHeatSetpointLimit, setpointLimits.deadBand, OccupiedHeatingSetpoint::Set);
-        break;
-    case UnoccupiedHeatingSetpoint::Id:
-        EnsureCoolingSetpointDeadband(endpoint, setpointLimits.unoccupiedCoolingSetpoint, setpointLimits.unoccupiedHeatingSetpoint,
-                                      setpointLimits.maxCoolSetpointLimit, setpointLimits.deadBand, UnoccupiedCoolingSetpoint::Set);
-        break;
-    case UnoccupiedCoolingSetpoint::Id:
-        EnsureHeatingSetpointDeadband(endpoint, setpointLimits.unoccupiedHeatingSetpoint, setpointLimits.unoccupiedCoolingSetpoint,
-                                      setpointLimits.minHeatSetpointLimit, setpointLimits.deadBand, UnoccupiedHeatingSetpoint::Set);
-        break;
-    }
-}
-
 } // namespace Thermostat
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
-bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * commandObj,
-                                                        const app::ConcreteCommandPath & commandPath,
-                                                        const Commands::SetpointRaiseLower::DecodableType & commandData)
-{
-    auto & mode   = commandData.mode;
-    auto & amount = commandData.amount;
-
-    EndpointId aEndpointId = commandPath.mEndpointId;
-
-    int16_t HeatingSetpoint = kDefaultHeatingSetpoint, CoolingSetpoint = kDefaultCoolingSetpoint; // Set to defaults to be safe
-    Status status                     = Status::Failure;
-    Status WriteCoolingSetpointStatus = Status::Failure;
-    Status WriteHeatingSetpointStatus = Status::Failure;
-    int16_t DeadBandTemp              = 0;
-    int8_t DeadBand                   = 0;
-    uint32_t OurFeatureMap;
-    bool AutoSupported = false;
-    bool HeatSupported = false;
-    bool CoolSupported = false;
-
-    if (FeatureMap::Get(aEndpointId, &OurFeatureMap) != Status::Success)
-        OurFeatureMap = FEATURE_MAP_DEFAULT;
-
-    if (OurFeatureMap & 1 << 5) // Bit 5 is Auto Mode supported
-        AutoSupported = true;
-
-    if (OurFeatureMap & 1 << 0)
-        HeatSupported = true;
-
-    if (OurFeatureMap & 1 << 1)
-        CoolSupported = true;
-
-    if (AutoSupported)
-    {
-        if (MinSetpointDeadBand::Get(aEndpointId, &DeadBand) != Status::Success)
-            DeadBand = kDefaultDeadBand;
-        DeadBandTemp = static_cast<int16_t>(DeadBand * 10);
-    }
-
-    switch (mode)
-    {
-    case SetpointRaiseLowerModeEnum::kBoth:
-        if (HeatSupported && CoolSupported)
-        {
-            int16_t DesiredCoolingSetpoint, CoolLimit, DesiredHeatingSetpoint, HeatLimit;
-            if (OccupiedCoolingSetpoint::Get(aEndpointId, &CoolingSetpoint) == Status::Success)
-            {
-                DesiredCoolingSetpoint = static_cast<int16_t>(CoolingSetpoint + amount * 10);
-                CoolLimit              = static_cast<int16_t>(DesiredCoolingSetpoint -
-                                                              EnforceCoolingSetpointLimits(DesiredCoolingSetpoint, aEndpointId));
-                {
-                    if (OccupiedHeatingSetpoint::Get(aEndpointId, &HeatingSetpoint) == Status::Success)
-                    {
-                        DesiredHeatingSetpoint = static_cast<int16_t>(HeatingSetpoint + amount * 10);
-                        HeatLimit              = static_cast<int16_t>(DesiredHeatingSetpoint -
-                                                                      EnforceHeatingSetpointLimits(DesiredHeatingSetpoint, aEndpointId));
-                        {
-                            if (CoolLimit != 0 || HeatLimit != 0)
-                            {
-                                if (abs(CoolLimit) <= abs(HeatLimit))
-                                {
-                                    // We are limited by the Heating Limit
-                                    DesiredHeatingSetpoint = static_cast<int16_t>(DesiredHeatingSetpoint - HeatLimit);
-                                    DesiredCoolingSetpoint = static_cast<int16_t>(DesiredCoolingSetpoint - HeatLimit);
-                                }
-                                else
-                                {
-                                    // We are limited by Cooling Limit
-                                    DesiredHeatingSetpoint = static_cast<int16_t>(DesiredHeatingSetpoint - CoolLimit);
-                                    DesiredCoolingSetpoint = static_cast<int16_t>(DesiredCoolingSetpoint - CoolLimit);
-                                }
-                            }
-                            WriteCoolingSetpointStatus = OccupiedCoolingSetpoint::Set(aEndpointId, DesiredCoolingSetpoint);
-                            if (WriteCoolingSetpointStatus != Status::Success)
-                            {
-                                ChipLogError(Zcl, "Error: SetOccupiedCoolingSetpoint failed!");
-                            }
-                            WriteHeatingSetpointStatus = OccupiedHeatingSetpoint::Set(aEndpointId, DesiredHeatingSetpoint);
-                            if (WriteHeatingSetpointStatus != Status::Success)
-                            {
-                                ChipLogError(Zcl, "Error: SetOccupiedHeatingSetpoint failed!");
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        if (CoolSupported && !HeatSupported)
-        {
-            if (OccupiedCoolingSetpoint::Get(aEndpointId, &CoolingSetpoint) == Status::Success)
-            {
-                CoolingSetpoint            = static_cast<int16_t>(CoolingSetpoint + amount * 10);
-                CoolingSetpoint            = EnforceCoolingSetpointLimits(CoolingSetpoint, aEndpointId);
-                WriteCoolingSetpointStatus = OccupiedCoolingSetpoint::Set(aEndpointId, CoolingSetpoint);
-                if (WriteCoolingSetpointStatus != Status::Success)
-                {
-                    ChipLogError(Zcl, "Error: SetOccupiedCoolingSetpoint failed!");
-                }
-            }
-        }
-
-        if (HeatSupported && !CoolSupported)
-        {
-            if (OccupiedHeatingSetpoint::Get(aEndpointId, &HeatingSetpoint) == Status::Success)
-            {
-                HeatingSetpoint            = static_cast<int16_t>(HeatingSetpoint + amount * 10);
-                HeatingSetpoint            = EnforceHeatingSetpointLimits(HeatingSetpoint, aEndpointId);
-                WriteHeatingSetpointStatus = OccupiedHeatingSetpoint::Set(aEndpointId, HeatingSetpoint);
-                if (WriteHeatingSetpointStatus != Status::Success)
-                {
-                    ChipLogError(Zcl, "Error: SetOccupiedHeatingSetpoint failed!");
-                }
-            }
-        }
-
-        if ((!HeatSupported || WriteHeatingSetpointStatus == Status::Success) &&
-            (!CoolSupported || WriteCoolingSetpointStatus == Status::Success))
-            status = Status::Success;
-        break;
-
-    case SetpointRaiseLowerModeEnum::kCool:
-        if (CoolSupported)
-        {
-            if (OccupiedCoolingSetpoint::Get(aEndpointId, &CoolingSetpoint) == Status::Success)
-            {
-                CoolingSetpoint = static_cast<int16_t>(CoolingSetpoint + amount * 10);
-                CoolingSetpoint = EnforceCoolingSetpointLimits(CoolingSetpoint, aEndpointId);
-                if (AutoSupported)
-                {
-                    // Need to check if we can move the cooling setpoint while maintaining the dead band
-                    if (OccupiedHeatingSetpoint::Get(aEndpointId, &HeatingSetpoint) == Status::Success)
-                    {
-                        if (CoolingSetpoint - HeatingSetpoint < DeadBandTemp)
-                        {
-                            // Dead Band Violation
-                            // Try to adjust it
-                            HeatingSetpoint = static_cast<int16_t>(CoolingSetpoint - DeadBandTemp);
-                            if (HeatingSetpoint == EnforceHeatingSetpointLimits(HeatingSetpoint, aEndpointId))
-                            {
-                                // Desired cooling setpoint is enforcable
-                                // Set the new cooling and heating setpoints
-                                if (OccupiedHeatingSetpoint::Set(aEndpointId, HeatingSetpoint) == Status::Success)
-                                {
-                                    if (OccupiedCoolingSetpoint::Set(aEndpointId, CoolingSetpoint) == Status::Success)
-                                        status = Status::Success;
-                                }
-                                else
-                                    ChipLogError(Zcl, "Error: SetOccupiedHeatingSetpoint failed!");
-                            }
-                            else
-                            {
-                                ChipLogError(Zcl, "Error: Could Not adjust heating setpoint to maintain dead band!");
-                                status = Status::InvalidCommand;
-                            }
-                        }
-                        else
-                            status = OccupiedCoolingSetpoint::Set(aEndpointId, CoolingSetpoint);
-                    }
-                    else
-                        ChipLogError(Zcl, "Error: GetOccupiedHeatingSetpoint failed!");
-                }
-                else
-                {
-                    status = OccupiedCoolingSetpoint::Set(aEndpointId, CoolingSetpoint);
-                }
-            }
-            else
-                ChipLogError(Zcl, "Error: GetOccupiedCoolingSetpoint failed!");
-        }
-        else
-            status = Status::InvalidCommand;
-        break;
-
-    case SetpointRaiseLowerModeEnum::kHeat:
-        if (HeatSupported)
-        {
-            if (OccupiedHeatingSetpoint::Get(aEndpointId, &HeatingSetpoint) == Status::Success)
-            {
-                HeatingSetpoint = static_cast<int16_t>(HeatingSetpoint + amount * 10);
-                HeatingSetpoint = EnforceHeatingSetpointLimits(HeatingSetpoint, aEndpointId);
-                if (AutoSupported)
-                {
-                    // Need to check if we can move the cooling setpoint while maintaining the dead band
-                    if (OccupiedCoolingSetpoint::Get(aEndpointId, &CoolingSetpoint) == Status::Success)
-                    {
-                        if (CoolingSetpoint - HeatingSetpoint < DeadBandTemp)
-                        {
-                            // Dead Band Violation
-                            // Try to adjust it
-                            CoolingSetpoint = static_cast<int16_t>(HeatingSetpoint + DeadBandTemp);
-                            if (CoolingSetpoint == EnforceCoolingSetpointLimits(CoolingSetpoint, aEndpointId))
-                            {
-                                // Desired cooling setpoint is enforcable
-                                // Set the new cooling and heating setpoints
-                                if (OccupiedCoolingSetpoint::Set(aEndpointId, CoolingSetpoint) == Status::Success)
-                                {
-                                    if (OccupiedHeatingSetpoint::Set(aEndpointId, HeatingSetpoint) == Status::Success)
-                                        status = Status::Success;
-                                }
-                                else
-                                    ChipLogError(Zcl, "Error: SetOccupiedCoolingSetpoint failed!");
-                            }
-                            else
-                            {
-                                ChipLogError(Zcl, "Error: Could Not adjust cooling setpoint to maintain dead band!");
-                                status = Status::InvalidCommand;
-                            }
-                        }
-                        else
-                            status = OccupiedHeatingSetpoint::Set(aEndpointId, HeatingSetpoint);
-                    }
-                    else
-                        ChipLogError(Zcl, "Error: GetOccupiedCoolingSetpoint failed!");
-                }
-                else
-                {
-                    status = OccupiedHeatingSetpoint::Set(aEndpointId, HeatingSetpoint);
-                }
-            }
-            else
-                ChipLogError(Zcl, "Error: GetOccupiedHeatingSetpoint failed!");
-        }
-        else
-            status = Status::InvalidCommand;
-        break;
-
-    default:
-        status = Status::InvalidCommand;
-        break;
-    }
-
-    commandObj->AddStatus(commandPath, status);
-    return true;
-}

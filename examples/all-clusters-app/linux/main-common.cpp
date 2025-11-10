@@ -289,12 +289,33 @@ void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
 }
 
 using namespace chip::app::Clusters::Thermostat;
-void emberAfThermostatClusterInitCallback(EndpointId endpoint)
+void emberAfThermostatClusterInitCallback(EndpointId endpoint) {}
+
+void emberAfThermostatClusterServerInitCallback(chip::EndpointId endpoint)
 {
+    ChipLogError(Zcl, "emberAfThermostatClusterServerInitCallback!");
+    ThermostatCluster * cluster = chip::app::Clusters::Thermostat::ClusterForEndpoint(endpoint);
+    if (cluster == nullptr)
+    {
+        ChipLogError(Zcl, "No thermostat cluster!");
+        return;
+    }
     // Register the delegate for the Thermostat
     auto & delegate = ThermostatDelegate::GetInstance();
+    cluster->SetDelegate(&delegate);
 
-    SetDefaultDelegate(endpoint, &delegate);
+    // TODO
+    // Get from the "real thermostat"
+    // current mode
+    // current occupied heating setpoint
+    // current unoccupied heating setpoint
+    // current occupied cooling setpoint
+    // current unoccupied cooling setpoint
+    // and update the zcl cluster values
+    // This should be a callback defined function
+    // with weak binding so that real thermostat
+    // can get the values.
+    // or should this just be the responsibility of the thermostat application?
 }
 
 Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,

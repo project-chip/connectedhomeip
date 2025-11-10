@@ -9192,29 +9192,29 @@ endpoint 0 {
   }
 
   server cluster Thermostat {
-    ram      attribute localTemperature;
+    callback attribute localTemperature;
     callback attribute outdoorTemperature;
-    callback attribute occupancy default = 1;
-    ram      attribute absMinHeatSetpointLimit default = 0x02BC;
-    callback attribute absMaxHeatSetpointLimit default = 0x0BB8;
-    ram      attribute absMinCoolSetpointLimit default = 0x0640;
-    ram      attribute absMaxCoolSetpointLimit default = 0x0C80;
+    callback attribute occupancy;
+    callback attribute absMinHeatSetpointLimit;
+    callback attribute absMaxHeatSetpointLimit;
+    callback attribute absMinCoolSetpointLimit;
+    callback attribute absMaxCoolSetpointLimit;
     ram      attribute PICoolingDemand;
     ram      attribute PIHeatingDemand;
     callback attribute HVACSystemTypeConfiguration default = 0;
-    callback attribute localTemperatureCalibration default = 0;
-    ram      attribute occupiedCoolingSetpoint default = 0x0A28;
-    ram      attribute occupiedHeatingSetpoint default = 0x07D0;
-    callback attribute unoccupiedCoolingSetpoint default = 0x0A28;
-    callback attribute unoccupiedHeatingSetpoint default = 0x07D0;
-    ram      attribute minHeatSetpointLimit default = 0x02BC;
-    ram      attribute maxHeatSetpointLimit default = 0x0BB8;
-    ram      attribute minCoolSetpointLimit default = 0x0640;
-    ram      attribute maxCoolSetpointLimit default = 0x0C80;
-    ram      attribute minSetpointDeadBand default = 0x14;
-    callback attribute remoteSensing default = 0x0;
-    ram      attribute controlSequenceOfOperation default = 0x04;
-    ram      attribute systemMode default = 0x01;
+    callback attribute localTemperatureCalibration;
+    callback attribute occupiedCoolingSetpoint;
+    callback attribute occupiedHeatingSetpoint;
+    callback attribute unoccupiedCoolingSetpoint;
+    callback attribute unoccupiedHeatingSetpoint;
+    callback attribute minHeatSetpointLimit;
+    callback attribute maxHeatSetpointLimit;
+    callback attribute minCoolSetpointLimit;
+    callback attribute maxCoolSetpointLimit;
+    callback attribute minSetpointDeadBand;
+    callback attribute remoteSensing;
+    callback attribute controlSequenceOfOperation;
+    callback attribute systemMode;
     callback attribute thermostatRunningMode default = 0x00;
     ram      attribute startOfWeek default = 0;
     ram      attribute numberOfWeeklyTransitions default = 7;

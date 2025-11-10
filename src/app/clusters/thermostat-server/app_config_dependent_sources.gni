@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 app_config_dependent_sources = [
+  "CodegenIntegration.cpp",
   "PresetStructWithOwnedMembers.cpp",
   "PresetStructWithOwnedMembers.h",
   "ThermostatCluster.cpp",
@@ -19,8 +20,10 @@ app_config_dependent_sources = [
   "ThermostatClusterAtomic.cpp",
   "ThermostatClusterPresets.cpp",
   "ThermostatClusterPresets.h",
+  "ThermostatClusterRead.cpp",
   "ThermostatClusterSetpoints.cpp",
   "ThermostatClusterSetpoints.h",
   "ThermostatClusterSuggestions.cpp",
+  "ThermostatClusterWrite.cpp",
   "ThermostatDelegate.h",
 ]

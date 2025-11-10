@@ -2495,19 +2495,19 @@ endpoint 1 {
   }
 
   server cluster Thermostat {
-    ram      attribute localTemperature;
-    ram      attribute absMinHeatSetpointLimit default = 700;
-    ram      attribute absMaxHeatSetpointLimit default = 3000;
-    ram      attribute absMinCoolSetpointLimit default = 1600;
-    ram      attribute absMaxCoolSetpointLimit default = 3200;
-    persist  attribute occupiedCoolingSetpoint default = 0x0A28;
-    persist  attribute occupiedHeatingSetpoint default = 0x07D0;
-    ram      attribute minHeatSetpointLimit default = 700;
-    ram      attribute maxHeatSetpointLimit default = 3000;
-    ram      attribute minCoolSetpointLimit default = 1600;
-    ram      attribute maxCoolSetpointLimit default = 3200;
-    ram      attribute controlSequenceOfOperation default = 0x04;
-    persist  attribute systemMode default = 0x01;
+    callback attribute localTemperature;
+    callback attribute absMinHeatSetpointLimit;
+    callback attribute absMaxHeatSetpointLimit;
+    callback attribute absMinCoolSetpointLimit;
+    callback attribute absMaxCoolSetpointLimit;
+    callback attribute occupiedCoolingSetpoint;
+    callback attribute occupiedHeatingSetpoint;
+    callback attribute minHeatSetpointLimit;
+    callback attribute maxHeatSetpointLimit;
+    callback attribute minCoolSetpointLimit;
+    callback attribute maxCoolSetpointLimit;
+    callback attribute controlSequenceOfOperation;
+    callback attribute systemMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
