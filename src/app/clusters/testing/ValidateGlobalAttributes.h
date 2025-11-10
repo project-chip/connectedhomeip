@@ -28,28 +28,7 @@ namespace Testing {
 /// ASSERT_TRUE(IsAttributesListEqualTo(cluster, { Attributes::SomeAttribute::kMetadataEntry }));
 /// ```
 bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster,
-                             std::initializer_list<const app::DataModel::AttributeEntry> expected)
-{
-    VerifyOrDie(cluster.GetPaths().size() == 1);
-    auto path = cluster.GetPaths()[0];
-    ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> attributesBuilder;
-    if (cluster.Attributes(path, attributesBuilder) != CHIP_NO_ERROR)
-    {
-        return false;
-    }
-
-    // build expectation with global attributes
-    ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> expectedBuilder;
-
-    SuccessOrDie(expectedBuilder.EnsureAppendCapacity(expected.size()));
-    for (const auto entry : expected)
-    {
-        SuccessOrDie(expectedBuilder.Append(entry));
-    }
-    SuccessOrDie(expectedBuilder.AppendElements(app::DefaultServerCluster::GlobalAttributes()));
-
-    return EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer());
-}
+                             std::initializer_list<const app::DataModel::AttributeEntry> expected);
 
 /// Compares the accepted commands of a cluster against an expected set.
 ///
