@@ -1655,7 +1655,7 @@ cluster GroupKeyManagement = 63 {
 
 /** Attributes and commands for monitoring HEPA filters in a device */
 cluster HepaFilterMonitoring = 113 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   shared enum ChangeIndicationEnum : enum8 {
     kOK = 0 [spec_name = "OK"];
@@ -1699,13 +1699,13 @@ cluster HepaFilterMonitoring = 113 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  /** Reset the condition of the replaceable to the non degraded state */
+  /** Upon receipt, the device SHALL reset the Condition and ChangeIndicator attributes, indicating full resource availability and readiness for use, as initially configured. */
   command ResetCondition(): DefaultSuccess = 0;
 }
 
 /** Attributes and commands for monitoring activated carbon filters in a device */
 cluster ActivatedCarbonFilterMonitoring = 114 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   shared enum ChangeIndicationEnum : enum8 {
     kOK = 0 [spec_name = "OK"];
@@ -1749,7 +1749,7 @@ cluster ActivatedCarbonFilterMonitoring = 114 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  /** Reset the condition of the replaceable to the non degraded state */
+  /** Upon receipt, the device SHALL reset the Condition and ChangeIndicator attributes, indicating full resource availability and readiness for use, as initially configured. */
   command ResetCondition(): DefaultSuccess = 0;
 }
 

@@ -356,9 +356,7 @@ class CoreBluetoothManager(ChipBleBase):
         LOGGER.debug(repr(error))
 
         if not error:
-            self.characteristics[service.UUID()] = [
-                char for char in self.service.characteristics()
-            ]
+            self.characteristics[service.UUID()] = list(self.service.characteristics())
 
             self.connect_state = True
 

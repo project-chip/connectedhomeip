@@ -60,8 +60,7 @@ class ComparisonResult:
         self.sectionChanges = []
 
 
-SECTIONS_TO_WATCH = set(
-    ['.rodata', '.text', '.flash.rodata', '.flash.text', '.bss', '.data'])
+SECTIONS_TO_WATCH = {'.rodata', '.text', '.flash.rodata', '.flash.text', '.bss', '.data'}
 
 
 def filesInDirectory(dirName):
@@ -118,8 +117,8 @@ def generateBloatReport(outputFileName,
     with open(outputFileName, 'wt') as f:
         f.write(title + '\n\n')
 
-        baselineNames = set([name for name in filesInDirectory(baselineDir)])
-        outputNames = set([name for name in filesInDirectory(buildOutputDir)])
+        baselineNames = set(filesInDirectory(baselineDir))
+        outputNames = set(filesInDirectory(buildOutputDir))
 
         baselineOnly = baselineNames - outputNames
         if baselineOnly:
@@ -258,8 +257,8 @@ def main():
         return
 
     # all known artifacts
-    artifacts = [a for a in github_fetch_artifacts.getAllArtifacts(
-        args.github_api_token, args.github_repository)]
+    artifacts = list(github_fetch_artifacts.getAllArtifacts(
+        args.github_api_token, args.github_repository))
 
     # process newest artifacts first
     artifacts.sort(key=lambda x: x.created_at, reverse=True)

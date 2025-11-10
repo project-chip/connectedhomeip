@@ -795,6 +795,35 @@ jobs:
             - name: ccache stats
               run: ccache -s
 
+            - name: Build linux-x64-requestor-app
+              env:
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-ota-requestor-${BUILD_VARIANT}-tsan-clang-test
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-ota-requestor-${BUILD_VARIANT}-tsan-clang-test"
+
+            - name: Build linux-x64-provider-app
+              env:
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-ota-provider-${BUILD_VARIANT}-tsan-clang-test
+                  --pw-command-launcher=ccache build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-ota-provider-${BUILD_VARIANT}-tsan-clang-test"
+
+            - name: Build Software Update ota images with new version.
+              env:
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
+              run: >- 
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_ota_images.sh --out-prefix out/su_ota_images_min --max-range 2
+                  && mv out/su_ota_images_min-v*/*.ota objdir-clone
+                  && rm -rf out/su_ota_images_min-v*"
+
+            - name: ccache stats
+              run: ccache -s
+
             - name: Install push_av_server dependencies
               run: >-
                   ./scripts/run_in_python_env.sh out/venv \
@@ -822,6 +851,8 @@ jobs:
                   echo "FABRIC_SYNC_APP: objdir-clone/linux-x64-fabric-sync-${BUILD_VARIANT}-clang/fabric-sync" >> /tmp/test_env.yaml
                   echo "LIGHTING_APP_NO_UNIQUE_ID: objdir-clone/linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang/chip-lighting-app" >> /tmp/test_env.yaml
                   echo "TERMS_AND_CONDITIONS_APP: objdir-clone/linux-x64-terms-and-conditions/chip-terms-and-conditions-app" >> /tmp/test_env.yaml
+                  echo "OTA_PROVIDER_APP: objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-tsan-clang-test/chip-ota-provider-app" >> /tmp/test_env.yaml
+                  echo "OTA_REQUESTOR_APP: objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}-tsan-clang-test/chip-ota-requestor-app" >> /tmp/test_env.yaml
                   echo "TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
                   echo "JF_CONTROL_APP: objdir-clone/linux-x64-jf-control-app/jfc-app" >> /tmp/test_env.yaml
                   echo "JF_ADMIN_APP: objdir-clone/linux-x64-jf-admin-app/jfa-app" >> /tmp/test_env.yaml
@@ -829,12 +860,16 @@ jobs:
                   echo "WATER_LEAK_DETECTOR_APP: objdir-clone/linux-x64-water-leak-detector-${BUILD_VARIANT}-tsan-clang-test-unified/water-leak-detector-app" >> /tmp/test_env.yaml
                   echo "PUSH_AV_SERVER: src/tools/push_av_server/server.py" >> /tmp/test_env.yaml
 
+                  # SU OTA Images
+                  echo "SU_OTA_REQUESTOR_V2: objdir-clone/chip-ota-requestor-app_v2.min.ota" >> /tmp/test_env.yaml
+
                   # Generic trace setups after applications
                   echo "TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
                   echo "TRACE_TEST_PERFETTO: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
 
             - name: Verify Testing Support
               run: |
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_ota_images_versions.py -i objdir-clone/chip-ota-requestor-app_v2.min.ota -v 2' 
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_IDM_10_4.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_ICDM_2_1_full_pics.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_ICDM_2_1_min_pics.py'
@@ -853,7 +888,6 @@ jobs:
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestSpecParsingSelection.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestSpecParsingSupport.py'
                   scripts/run_in_python_env.sh out/venv 'PYTHONPATH=src/python_testing:$PYTHONPATH python3 -m unittest discover -s src/python_testing/mdns_discovery/tests -p "test_*.py"'
-
             - name: Run Tests
               run: |
                   mkdir -p out/trace_data

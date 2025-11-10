@@ -56,12 +56,12 @@ def write_gn_args(args):
         filtered_value = filter(lambda v: v != "D", filtered_value)
         filtered_value = filter(lambda v: v != "isystem", filtered_value)
         # Escaped quote and dollar sign characters
-        filtered_value = map(lambda v: v.replace('"', '\\"'), filtered_value)
-        filtered_value = map(lambda v: v.replace('$', '\\$'), filtered_value)
+        filtered_value = (v.replace('"', '\\"') for v in filtered_value)
+        filtered_value = (v.replace('$', '\\$') for v in filtered_value)
         # Remove white spaces around the argument and remove internal whitespace
         # for correct splitting in string_split() function
-        filtered_value = map(lambda v: v.strip(), filtered_value)
-        filtered_value = map(lambda v: v.replace(' ', ''), filtered_value)
+        filtered_value = (v.strip() for v in filtered_value)
+        filtered_value = (v.replace(' ', '') for v in filtered_value)
         #  Remove duplicates
         filtered_value = list(dict.fromkeys(filtered_value))
 

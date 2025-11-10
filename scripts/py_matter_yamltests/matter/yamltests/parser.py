@@ -586,7 +586,7 @@ class _TestStepWithPlaceholders:
                     target_key = value['name']
                     if mapping_type.get(target_key) is None:
                         raise TestStepValueNameError(
-                            value, target_key, [key for key in mapping_type])
+                            value, target_key, list(mapping_type))
                     mapping = mapping_type[target_key]
 
                 if key == 'value':

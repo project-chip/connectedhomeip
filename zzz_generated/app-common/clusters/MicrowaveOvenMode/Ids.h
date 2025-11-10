@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster MicrowaveOvenMode (cluster code: 94/0x045E)
+// Identifier constant values for cluster MicrowaveOvenMode (cluster code: 94/0x005E)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

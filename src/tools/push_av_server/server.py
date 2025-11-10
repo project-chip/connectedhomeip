@@ -791,7 +791,7 @@ if __name__ == "__main__":
         level=logging.DEBUG,
         datefmt="%H:%M:%S",
     )
-    logging.getLogger("hpack").setLevel(logging.WARN)
+    logging.getLogger("hpack").setLevel(logging.WARNING)
 
     parser = argparse.ArgumentParser(
         prog="push_av_tool.py",

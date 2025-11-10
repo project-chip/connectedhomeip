@@ -143,7 +143,7 @@ class TC_WebRTCR_2_5(WEBRTCRTestBase):
 
         self.step(2)
         params = await self.default_controller.OpenCommissioningWindow(
-            nodeid=self.th_server_local_nodeid, timeout=3*60, iteration=10000, discriminator=self.discriminator, option=1)
+            nodeId=self.th_server_local_nodeid, timeout=3*60, iteration=10000, discriminator=self.discriminator, option=1)
         passcode = params.setupPinCode
         sleep(1)
 

@@ -58,7 +58,7 @@ class TC_WEBRTCP_2_14(MatterBaseTest, WEBRTCPTestBase):
         Define the step-by-step sequence for the test.
         """
         steps = [
-            TestStep("precondition", "DUT commissioned and streams allocated", is_commissioning=True),
+            TestStep("precondition", "DUT commissioned", is_commissioning=True),
             TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
                      "DUT responds with success"),
             TestStep(2, "TH writes `SoftRecordingPrivacyModeEnabled` to TRUE on CameraAVStreamManagement cluster",
