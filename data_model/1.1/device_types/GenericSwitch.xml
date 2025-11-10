@@ -71,7 +71,7 @@ Davis, CA 95616, USA
       <mandatoryConform/>
     </cluster>
     <cluster id="0x0040" name="Fixed Label" side="server">
-      <describedConform/>
+      <optionalConform/>
     </cluster>
   </clusters>
 </deviceType>

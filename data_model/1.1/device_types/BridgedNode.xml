@@ -64,20 +64,20 @@ Davis, CA 95616, USA
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <clusters>
-    <cluster id="" name="Bridged Device Basic Information" side="server">
+    <cluster id="0x002E" name="Power Source Configuration" side="server">
+      <quality singleton="true"/>
+      <mandatoryConform>
+        <condition name="BridgedPowerSourceInfo"/>
+      </mandatoryConform>
+    </cluster>
+    <cluster id="0x002F" name="Power Source" side="server">
+      <mandatoryConform>
+        <condition name="BridgedPowerSourceInfo"/>
+      </mandatoryConform>
+    </cluster>
+    <cluster id="0x0039" name="Bridged Device Basic Information" side="server">
       <quality singleton="true"/>
       <mandatoryConform/>
-    </cluster>
-    <cluster id="" name="Power Source Configuration" side="server">
-      <quality singleton="true"/>
-      <mandatoryConform>
-        <condition name="BridgedPowerSourceInfo"/>
-      </mandatoryConform>
-    </cluster>
-    <cluster id="" name="Power Source" side="server">
-      <mandatoryConform>
-        <condition name="BridgedPowerSourceInfo"/>
-      </mandatoryConform>
     </cluster>
   </clusters>
 </deviceType>
