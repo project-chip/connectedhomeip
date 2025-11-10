@@ -82,8 +82,9 @@ if(CONFIG_ENABLE_PW_RPC)
   pw_set_backend(pw_sync.mutex pw_sync.esp32)
   pw_set_backend(pw_third_party.freertos idf::freertos)
 
-  add_subdirectory(third_party/connectedhomeip/third_party/pigweed/repo)
   add_subdirectory(third_party/connectedhomeip/third_party/nanopb/repo)
-  add_subdirectory(third_party/connectedhomeip/examples/platform/esp32/pw_sys_io)
-  add_subdirectory(third_party/connectedhomeip/examples/platform/esp32/pw_sync)
 endif(CONFIG_ENABLE_PW_RPC)
+
+add_subdirectory(third_party/connectedhomeip/third_party/pigweed/repo)
+add_subdirectory(third_party/connectedhomeip/examples/platform/esp32/pw_sys_io)
+add_subdirectory(third_party/connectedhomeip/examples/platform/esp32/pw_sync)

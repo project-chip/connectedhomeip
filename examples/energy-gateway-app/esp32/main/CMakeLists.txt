@@ -30,12 +30,6 @@ set(PRIV_INCLUDE_DIRS_LIST
   "${ENERGY_GATEWAY_DIR}/meter-identification/include"
   "${CMAKE_CURRENT_LIST_DIR}/include"
   "${CHIP_ROOT}/examples/platform/esp32"
-  "${CHIP_ROOT}/third_party/pigweed/repo/pw_containers/public"
-  "${CHIP_ROOT}/third_party/pigweed/repo/pw_assert/public"
-  "${CHIP_ROOT}/third_party/pigweed/repo/pw_assert/assert_compatibility_public_overrides"
-  "${CHIP_ROOT}/third_party/pigweed/repo/pw_preprocessor/public"
-  "${CHIP_ROOT}/third_party/pigweed/repo/pw_polyfill/public"
-  "${CHIP_ROOT}/third_party/pigweed/repo/pw_toolchain/public"
 )
 set(SRC_DIRS_LIST
   "${CMAKE_CURRENT_LIST_DIR}"

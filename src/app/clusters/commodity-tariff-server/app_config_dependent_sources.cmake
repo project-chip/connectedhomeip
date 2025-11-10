@@ -13,6 +13,11 @@
 # limitations under the License.
 
 # This is the equivalent to app_config_dependent_sources.gni
+target_link_libraries(${APP_TARGET} PRIVATE
+  pw_containers.algorithm
+  pw_containers.vector
+)
+
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
