@@ -1,6 +1,7 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,20 +16,9 @@
  *    limitations under the License.
  */
 
-#pragma once
+#include "thermostat-app.h"
 
-#include <app/ConcreteAttributePath.h>
-#include <app/persistence/AttributePersistence.h>
-#include <protocols/interaction_model/Constants.h>
-
-#include "Setpoints.h"
-
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace Thermostat {
-
-} // namespace Thermostat
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::Thermostat;

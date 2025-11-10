@@ -7945,59 +7945,11 @@ bool emberAfDoorLockClusterClearAliroReaderConfigCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::ClearAliroReaderConfig::DecodableType & commandData);
 /**
- * @brief Thermostat Cluster SetpointRaiseLower Command callback (from client)
+ * @brief Fan Control Cluster Step Command callback (from client)
  */
-bool emberAfThermostatClusterSetpointRaiseLowerCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::SetpointRaiseLower::DecodableType & commandData);
-/**
- * @brief Thermostat Cluster SetWeeklySchedule Command callback (from client)
- */
-bool emberAfThermostatClusterSetWeeklyScheduleCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::SetWeeklySchedule::DecodableType & commandData);
-/**
- * @brief Thermostat Cluster GetWeeklySchedule Command callback (from client)
- */
-bool emberAfThermostatClusterGetWeeklyScheduleCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::GetWeeklySchedule::DecodableType & commandData);
-/**
- * @brief Thermostat Cluster ClearWeeklySchedule Command callback (from client)
- */
-bool emberAfThermostatClusterClearWeeklyScheduleCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::ClearWeeklySchedule::DecodableType & commandData);
-/**
- * @brief Thermostat Cluster SetActiveScheduleRequest Command callback (from client)
- */
-bool emberAfThermostatClusterSetActiveScheduleRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::SetActiveScheduleRequest::DecodableType & commandData);
-/**
- * @brief Thermostat Cluster SetActivePresetRequest Command callback (from client)
- */
-bool emberAfThermostatClusterSetActivePresetRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::SetActivePresetRequest::DecodableType & commandData);
-/**
- * @brief Thermostat Cluster AddThermostatSuggestion Command callback (from client)
- */
-bool emberAfThermostatClusterAddThermostatSuggestionCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::AddThermostatSuggestion::DecodableType & commandData);
-/**
- * @brief Thermostat Cluster RemoveThermostatSuggestion Command callback (from client)
- */
-bool emberAfThermostatClusterRemoveThermostatSuggestionCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::RemoveThermostatSuggestion::DecodableType & commandData);
-/**
- * @brief Thermostat Cluster AtomicRequest Command callback (from client)
- */
-bool emberAfThermostatClusterAtomicRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::AtomicRequest::DecodableType & commandData);
+bool emberAfFanControlClusterStepCallback(chip::app::CommandHandler * commandObj,
+                                          const chip::app::ConcreteCommandPath & commandPath,
+                                          const chip::app::Clusters::FanControl::Commands::Step::DecodableType & commandData);
 /**
  * @brief Color Control Cluster MoveToHue Command callback (from client)
  */
