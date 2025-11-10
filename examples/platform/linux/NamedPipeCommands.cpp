@@ -35,15 +35,37 @@ CHIP_ERROR NamedPipeCommands::Start(std::string & path, NamedPipeCommandDelegate
     VerifyOrReturnError(!mStarted, CHIP_NO_ERROR);
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    mStarted           = true;
-    mDelegate          = delegate;
-    mChipEventFifoPath = path;
+    mStarted              = true;
+    mDelegate             = delegate;
+    mChipEventFifoPath    = path;
+    mChipEventFifoPathOut = "";
 
     // Creating the named file(FIFO)
     VerifyOrReturnError((mkfifo(path.c_str(), 0666) == 0) || (errno == EEXIST), CHIP_ERROR_OPEN_FAILED);
     VerifyOrReturnError(
         pthread_create(&mChipEventCommandListener, nullptr, EventCommandListenerTask, reinterpret_cast<void *>(this)) == 0,
         CHIP_ERROR_UNEXPECTED_EVENT);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR NamedPipeCommands::Start(std::string & path, std::string & path_out, NamedPipeCommandDelegate * delegate)
+{
+    VerifyOrReturnError(!mStarted, CHIP_NO_ERROR);
+    VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    mStarted              = true;
+    mDelegate             = delegate;
+    mChipEventFifoPath    = path;
+    mChipEventFifoPathOut = path_out;
+
+    // Creating the named file(FIFO)
+    VerifyOrReturnError((mkfifo(path.c_str(), 0666) == 0) || (errno == EEXIST), CHIP_ERROR_OPEN_FAILED);
+    VerifyOrReturnError(
+        pthread_create(&mChipEventCommandListener, nullptr, EventCommandListenerTask, reinterpret_cast<void *>(this)) == 0,
+        CHIP_ERROR_UNEXPECTED_EVENT);
+
+    VerifyOrReturnError((mkfifo(path_out.c_str(), 0666) == 0) || (errno == EEXIST), CHIP_ERROR_OPEN_FAILED);
 
     return CHIP_NO_ERROR;
 }
@@ -60,10 +82,34 @@ CHIP_ERROR NamedPipeCommands::Stop()
     // Wait further for the thread to terminate if we had previously created it.
     VerifyOrReturnError(pthread_join(mChipEventCommandListener, nullptr) == 0, CHIP_ERROR_SHUT_DOWN);
 
+    if (mOutFd != -1)
+    {
+        close(mOutFd);
+        mOutFd = -1;
+    }
+
     VerifyOrReturnError(unlink(mChipEventFifoPath.c_str()) == 0, CHIP_ERROR_WRITE_FAILED);
     mChipEventFifoPath.clear();
 
+    if (!mChipEventFifoPathOut.empty())
+    {
+        VerifyOrReturnError(unlink(mChipEventFifoPathOut.c_str()) == 0, CHIP_ERROR_WRITE_FAILED);
+        mChipEventFifoPathOut.clear();
+    }
+
     return CHIP_NO_ERROR;
+}
+
+void NamedPipeCommands::WriteToOutPipe(const std::string & json)
+{
+    mOutFd = open(mChipEventFifoPathOut.c_str(), O_WRONLY);
+
+    if (mOutFd == -1 || json.empty())
+        return;
+
+    (void) write(mOutFd, json.c_str(), json.size());
+    (void) write(mOutFd, "\n", 1);
+    close(mOutFd);
 }
 
 void * NamedPipeCommands::EventCommandListenerTask(void * arg)
