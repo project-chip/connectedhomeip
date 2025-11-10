@@ -169,6 +169,9 @@ void TlsClientManagementServer::HandleProvisionEndpoint(HandlerContext & ctx,
     if (status.IsSuccess())
     {
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+
+        MatterReportingAttributeChangeCallback(ctx.mRequestPath.mEndpointId, TlsClientManagement::Id,
+                                               TlsClientManagement::Attributes::ProvisionedEndpoints::Id);
     }
     else
     {
@@ -209,6 +212,13 @@ void TlsClientManagementServer::HandleRemoveEndpoint(HandlerContext & ctx, const
 
     auto status = mDelegate.RemoveProvisionedEndpointByID(ctx.mRequestPath.mEndpointId,
                                                           ctx.mCommandHandler.GetAccessingFabricIndex(), req.endpointID);
+
+    if (status == Status::Success)
+    {
+        MatterReportingAttributeChangeCallback(ctx.mRequestPath.mEndpointId, TlsClientManagement::Id,
+                                               TlsClientManagement::Attributes::ProvisionedEndpoints::Id);
+    }
+
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
