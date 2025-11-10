@@ -32,6 +32,7 @@ Matter example applications are supported on the following NXP platforms :
 | RT1170       | [Matter NXP Guide for RT1170 platform](./nxp_rt1170_guide.md) |
 | RT1060       | [Matter NXP Guide for RT1060 platform](./nxp_rt1060_guide.md) |
 | MCXW71       | [Matter NXP Guide for MCXW71 platform](./nxp_mcxw71_guide.md) |
+| MCXW72       | [Matter NXP Guide for MCXW72 platform](./nxp_mcxw72_guide.md) |
 
 <a name="building"></a>
 
@@ -166,35 +167,35 @@ Additional arguments that can be passed in the `west build` command line :
 
 ##### Available project configuration files and platform compatibility
 
-| Configuration File                         | Description                                            | Supported platforms           |
-| ------------------------------------------ | ------------------------------------------------------ | ----------------------------- |
-| `prj_wifi.conf`                            | Wi-Fi                                                  | RW61x, RT1060, RT1170         |
-| `prj_wifi_fdata.conf`                      | Wi-Fi, factory data                                    | RW61x, RT1060, RT1170         |
-| `prj_wifi_ota_fdata.conf`                  | Wi-Fi, factory data, OTA                               | RW61x, RT1060, RT1170         |
-| `prj_wifi_ota_fdata_v2.conf`               | Wi-Fi, factory data, OTA, with SW v2                   | RW61x, RT1060, RT1170         |
-| `prj_wifi_ota.conf`                        | Wi-Fi, OTA                                             | RW61x, RT1060, RT1170         |
-| `prj_wifi_ota_v2.conf`                     | Wi-Fi, OTA, SW v2                                      | RW61x, RT1060, RT1170         |
-| `prj_wifi_onnetwork.conf`                  | Wi-Fi onnetwork without BLE                            | RW61x, RT1060, RT1170         |
-| `prj_thread_ftd.conf`                      | Thread FTD                                             | RW61x, RT1060, RT1170, MCXW71 |
-| `prj_thread_ftd_fdata.conf`                | Thread FTD, factory data                               | RW61x, RT1060, RT1170, MCXW71 |
-| `prj_thread_ftd_ota.conf`                  | Thread FTD, OTA                                        | RW61x, RT1060, RT1170, MCXW71 |
-| `prj_thread_ftd_ota_fdata.conf`            | Thread FTD, OTA, factory data                          | RW61x, RT1060, RT1170, MCXW71 |
-| `prj_thread_ftd_wifi_br_ota.conf`          | Wi-Fi + Thread Border Router, OTA                      | RW61x, RT1060, RT1170         |
-| `prj_thread_ftd_wifi_br_ota_fdata.conf`    | Wi-Fi + Thread Border Router, OTA, factory data        | RW61x, RT1060, RT1170         |
-| `prj_thread_ftd_wifi_br_ota_fdata_v2.conf` | Wi-Fi + Thread Border Router, OTA SW v2 , factory data | RW61x, RT1060, RT1170         |
-| `prj_thread_ftd_wifi_br_ota_v2.conf`       | Wi-Fi + Thread Border Router, OTA with SW v2           | RW61x, RT1060, RT1170         |
-| `prj_thread_mtd.conf`                      | Thread MTD                                             | MCXW71                        |
-| `prj_thread_mtd_fdata.conf`                | Thread MTD, factory data                               | MCXW71                        |
-| `prj_thread_mtd_low_power.conf`            | Thread MTD operating in low power mode                 | MCXW71                        |
-| `prj_thread_mtd_low_power_lit.conf`        | Thread MTD, low power ICD LIT                          | MCXW71                        |
-| `prj_thread_mtd_fdata_low_power.conf`      | Thread MTD, factory data, low power                    | MCXW71                        |
-| `prj_thread_mtd_ota_low_power.conf`        | Thread MTD, OTA, low power                             | MCXW71                        |
-| `prj_thread_mtd_ota_fdata.conf`            | Thread MTD, OTA, factory data                          | MCXW71                        |
-| `prj_eth.conf`                             | Ethernet                                               | RW61x `frdm`                  |
-| `prj_eth_fdata.conf`                       | Ethernet, factory data                                 | RW61x `frdm`                  |
-| `prj_eth_ota.conf`                         | Ethernet, OTA                                          | RW61x `frdm`                  |
-| `prj_eth_ota_fdata.conf`                   | Ethernet, factory data, OTA                            | RW61x `frdm`                  |
-| `prj_eth_ota_fdata_v2.conf`                | Ethernet, factory data, OTA, SW v2                     | RW61x `frdm`                  |
+| Configuration File                         | Description                                            | Supported platforms                   |
+| ------------------------------------------ | ------------------------------------------------------ | ------------------------------------- |
+| `prj_wifi.conf`                            | Wi-Fi                                                  | RW61x, RT1060, RT1170                 |
+| `prj_wifi_fdata.conf`                      | Wi-Fi, factory data                                    | RW61x, RT1060, RT1170                 |
+| `prj_wifi_ota_fdata.conf`                  | Wi-Fi, factory data, OTA                               | RW61x, RT1060, RT1170                 |
+| `prj_wifi_ota_fdata_v2.conf`               | Wi-Fi, factory data, OTA, with SW v2                   | RW61x, RT1060, RT1170                 |
+| `prj_wifi_ota.conf`                        | Wi-Fi, OTA                                             | RW61x, RT1060, RT1170                 |
+| `prj_wifi_ota_v2.conf`                     | Wi-Fi, OTA, SW v2                                      | RW61x, RT1060, RT1170                 |
+| `prj_wifi_onnetwork.conf`                  | Wi-Fi onnetwork without BLE                            | RW61x, RT1060, RT1170                 |
+| `prj_thread_ftd.conf`                      | Thread FTD                                             | RW61x, RT1060, RT1170, MCXW71, MCXW72 |
+| `prj_thread_ftd_fdata.conf`                | Thread FTD, factory data                               | RW61x, RT1060, RT1170, MCXW71, MCXW72 |
+| `prj_thread_ftd_ota.conf`                  | Thread FTD, OTA                                        | RW61x, RT1060, RT1170, MCXW71, MCXW72 |
+| `prj_thread_ftd_ota_fdata.conf`            | Thread FTD, OTA, factory data                          | RW61x, RT1060, RT1170, MCXW71, MCXW72 |
+| `prj_thread_ftd_wifi_br_ota.conf`          | Wi-Fi + Thread Border Router, OTA                      | RW61x, RT1060, RT1170                 |
+| `prj_thread_ftd_wifi_br_ota_fdata.conf`    | Wi-Fi + Thread Border Router, OTA, factory data        | RW61x, RT1060, RT1170                 |
+| `prj_thread_ftd_wifi_br_ota_fdata_v2.conf` | Wi-Fi + Thread Border Router, OTA SW v2 , factory data | RW61x, RT1060, RT1170                 |
+| `prj_thread_ftd_wifi_br_ota_v2.conf`       | Wi-Fi + Thread Border Router, OTA with SW v2           | RW61x, RT1060, RT1170                 |
+| `prj_thread_mtd.conf`                      | Thread MTD                                             | MCXW71, MCXW72                        |
+| `prj_thread_mtd_fdata.conf`                | Thread MTD, factory data                               | MCXW71, MCXW72                        |
+| `prj_thread_mtd_low_power.conf`            | Thread MTD operating in low power mode                 | MCXW71, MCXW72                        |
+| `prj_thread_mtd_low_power_lit.conf`        | Thread MTD, low power ICD LIT                          | MCXW71, MCXW72                        |
+| `prj_thread_mtd_fdata_low_power.conf`      | Thread MTD, factory data, low power                    | MCXW71, MCXW72                        |
+| `prj_thread_mtd_ota_low_power.conf`        | Thread MTD, OTA, low power                             | MCXW71, MCXW72                        |
+| `prj_thread_mtd_ota_fdata.conf`            | Thread MTD, OTA, factory data                          | MCXW71, MCXW72                        |
+| `prj_eth.conf`                             | Ethernet                                               | RW61x `frdm`                          |
+| `prj_eth_fdata.conf`                       | Ethernet, factory data                                 | RW61x `frdm`                          |
+| `prj_eth_ota.conf`                         | Ethernet, OTA                                          | RW61x `frdm`                          |
+| `prj_eth_ota_fdata.conf`                   | Ethernet, factory data, OTA                            | RW61x `frdm`                          |
+| `prj_eth_ota_fdata_v2.conf`                | Ethernet, factory data, OTA, SW v2                     | RW61x `frdm`                          |
 
 The build output can be found under the `build_dir` specified in the
 `west build` command, the binary can be found under the following name :

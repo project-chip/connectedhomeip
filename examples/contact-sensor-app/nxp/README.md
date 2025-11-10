@@ -46,6 +46,7 @@ The Contact Sensor example is supported on the following platforms:
 | NXP platform | Dedicated readme                                                    |
 | ------------ | ------------------------------------------------------------------- |
 | MCXW71       | [NXP MCXW71 Guide](../../../docs/platforms/nxp/nxp_mcxw71_guide.md) |
+| MCXW72       | [NXP MCXW72 Guide](../../../docs/platforms/nxp/nxp_mcxw72_guide.md) |
 
 For details on platform-specific requirements and configurations, please refer
 to the respective platform's readme.
