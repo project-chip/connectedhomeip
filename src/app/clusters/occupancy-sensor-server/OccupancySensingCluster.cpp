@@ -99,7 +99,7 @@ OccupancySensing::OccupancySensorTypeEnum FeaturesToOccupancySensorType(BitFlags
 
 OccupancySensingCluster::OccupancySensingCluster(const Config & config) :
     DefaultServerCluster({ config.mEndpointId, OccupancySensing::Id }), mTimerDelegate(config.mTimerDelegate),
-    mFeatureMap(config.mFeatureMap), mHasHoldTime(config.mHasHoldTime), mHoldTime(config.mHoldTime),
+    mDelegate(config.mDelegate), mFeatureMap(config.mFeatureMap), mHasHoldTime(config.mHasHoldTime), mHoldTime(config.mHoldTime),
     mHoldTimeLimits(config.mHoldTimeLimits)
 {
     if (mHasHoldTime)
@@ -233,6 +233,11 @@ DataModel::ActionReturnStatus OccupancySensingCluster::SetHoldTime(uint16_t hold
 
     mHoldTime = holdTime;
 
+    if (mDelegate)
+    {
+        mDelegate->OnHoldTimeChanged(holdTime);
+    }
+
     if (mContext != nullptr)
     {
         CHIP_ERROR err = mContext->attributeStorage.WriteValue({ mPath.mEndpointId, OccupancySensing::Id, Attributes::HoldTime::Id }, { reinterpret_cast<const uint8_t *>(&mHoldTime), sizeof(mHoldTime) });
@@ -284,6 +289,11 @@ void OccupancySensingCluster::DoSetOccupancy(bool occupied)
 
     mOccupancy = newOccupancy;
     NotifyAttributeChanged(Attributes::Occupancy::Id);
+
+    if (mDelegate)
+    {
+        mDelegate->OnOccupancyChanged(occupied);
+    }
 
     if (mContext != nullptr)
     {

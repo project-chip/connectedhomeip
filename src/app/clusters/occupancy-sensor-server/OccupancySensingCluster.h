@@ -23,6 +23,26 @@
 
 namespace chip::app::Clusters {
 
+class OccupancySensingCluster;
+
+class OccupancySensingDelegate
+{
+public:
+    virtual ~OccupancySensingDelegate() = default;
+
+    /**
+     * @brief Called when the occupancy state changes.
+     * @param occupied The new occupancy state.
+     */
+    virtual void OnOccupancyChanged(bool occupied) = 0;
+
+    /**
+     * @brief Called when the hold time changes.
+     * @param holdTime The new hold time.
+     */
+    virtual void OnHoldTimeChanged(uint16_t holdTime) = 0;
+};
+
 class OccupancySensingCluster : public DefaultServerCluster, public TimerContext
 {
 public:
@@ -46,6 +66,12 @@ public:
             return *this;
         }
 
+        Config & WithDelegate(OccupancySensingDelegate * delegate)
+        {
+            mDelegate = delegate;
+            return *this;
+        }
+
         EndpointId mEndpointId;
         BitMask<OccupancySensing::Feature> mFeatureMap = 0;
         bool mHasHoldTime                                = false;
@@ -54,6 +80,7 @@ public:
                                                                                   .holdTimeMax     = 10,
                                                                                   .holdTimeDefault = 1 };
         TimerDelegate * mTimerDelegate                   = nullptr;
+        OccupancySensingDelegate * mDelegate             = nullptr;
     };
 
     OccupancySensingCluster(const Config & config);
@@ -80,6 +107,7 @@ private:
     void DoSetOccupancy(bool occupied);
 
     TimerDelegate * mTimerDelegate;
+    OccupancySensingDelegate * mDelegate;
     BitMask<OccupancySensing::Feature> mFeatureMap;
     bool mHasHoldTime = false;
     uint16_t mHoldTime;

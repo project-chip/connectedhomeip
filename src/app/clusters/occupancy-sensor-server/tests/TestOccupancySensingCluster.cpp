@@ -46,10 +46,28 @@ constexpr OccupancySensing::Structs::HoldTimeLimitsStruct::Type kDefaultHoldTime
 
 constexpr BitMask<OccupancySensing::OccupancyBitmap> kOccupancyUnoccupied = 0;
 
+bool onOccupancyChangedCalled = false;
+bool onHoldTimeChangedCalled  = false;
+
+class TestOccupancySensingDelegate : public OccupancySensingDelegate
+{
+public:
+    void OnOccupancyChanged(bool occupied) override { onOccupancyChangedCalled = true; }
+    void OnHoldTimeChanged(uint16_t holdTime) override { onHoldTimeChangedCalled = true; }
+};
+
+TestOccupancySensingDelegate gTestOccupancySensingDelegate;
+
 struct TestOccupancySensingCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { Platform::MemoryShutdown(); }
+
+    void SetUp() override
+    {
+        onOccupancyChangedCalled = false;
+        onHoldTimeChangedCalled  = false;
+    }
 
     TimerDelegateMock mMockTimerDelegate;
 };
@@ -715,10 +733,39 @@ TEST_F(TestOccupancySensingCluster, TestTimerIsCancelledOnDestruction)
 
         // 3. The cluster object is about to be destroyed as it goes out of scope. The timer should be cancelled on destruction.
     }
-        
+
     // 4. Manually advance the clock to fire the timer. The mock delegate is now holding
     // a dangling pointer to the destroyed 'cluster' object. This would crash if the OccupancySensingCluster did not cancel the timer on destruction.
     mMockTimerDelegate.AdvanceClock(System::Clock::Seconds16(kHoldTime));
+}
+
+TEST_F(TestOccupancySensingCluster, TestOnOccupancyChangedCallback)
+{
+    chip::Test::TestServerClusterContext context;
+    OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithDelegate(
+        &gTestOccupancySensingDelegate) };
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    onOccupancyChangedCalled = false;
+    cluster.SetOccupancy(true);
+    EXPECT_TRUE(onOccupancyChangedCalled);
+
+    onOccupancyChangedCalled = false;
+    cluster.SetOccupancy(false);
+    EXPECT_TRUE(onOccupancyChangedCalled);
+}
+
+TEST_F(TestOccupancySensingCluster, TestOnHoldTimeChangedCallback)
+{
+    chip::Test::TestServerClusterContext context;
+    OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }
+                                         .WithHoldTime(10, kDefaultHoldTimeLimits, mMockTimerDelegate)
+                                         .WithDelegate(&gTestOccupancySensingDelegate) };
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    onHoldTimeChangedCalled = false;
+    EXPECT_EQ(cluster.SetHoldTime(5), CHIP_NO_ERROR);
+    EXPECT_TRUE(onHoldTimeChangedCalled);
 }
 
 } // namespace
