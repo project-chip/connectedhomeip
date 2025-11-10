@@ -24,6 +24,7 @@
 #include <json/json.h>
 #include <ota-provider-common/BdxOtaSender.h>
 #include <ota-provider-common/OTAProviderExample.h>
+#include <ota-provider-common/OtaProviderAppCommandDelegate.h>
 
 #include "AppMain.h"
 
@@ -59,6 +60,8 @@ constexpr uint16_t kOptionIgnoreApplyUpdate         = 'y';
 constexpr uint16_t kOptionPollInterval              = 'P';
 
 OTAProviderExample gOtaProvider;
+NamedPipeCommands sChipNamedPipeCommands;
+OtaProviderAppCommandDelegate sOtaProviderAppCommandDelegate;
 chip::ota::DefaultOTAProviderUserConsent gUserConsentProvider;
 
 // Global variables used for passing the CLI arguments to the OTAProviderExample object
@@ -108,7 +111,7 @@ static bool ParseJsonFileAndPopulateCandidates(const char * filepath,
     }
     else
     {
-        for (auto iter : devSofVerModValue)
+        for (auto & iter : devSofVerModValue)
         {
             OTAProviderExample::DeviceSoftwareVersionModel candidate;
             candidate.vendorId        = static_cast<chip::VendorId>(iter.get("vendorId", 1).asUInt());
@@ -193,10 +196,10 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         }
         break;
     case kOptionIgnoreQueryImage:
-        gIgnoreQueryImageCount = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
+        gIgnoreQueryImageCount = static_cast<uint32_t>(strtoul(aValue, nullptr, 0));
         break;
     case kOptionIgnoreApplyUpdate:
-        gIgnoreApplyUpdateCount = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
+        gIgnoreApplyUpdateCount = static_cast<uint32_t>(strtoul(aValue, nullptr, 0));
         break;
     case kOptionUpdateAction:
         if (strcmp(aValue, "proceed") == 0)
@@ -218,10 +221,10 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         }
         break;
     case kOptionDelayedQueryActionTimeSec:
-        gDelayedQueryActionTimeSec = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
+        gDelayedQueryActionTimeSec = static_cast<uint32_t>(strtoul(aValue, nullptr, 0));
         break;
     case kOptionDelayedApplyActionTimeSec:
-        gDelayedApplyActionTimeSec = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
+        gDelayedApplyActionTimeSec = static_cast<uint32_t>(strtoul(aValue, nullptr, 0));
         break;
     case kOptionUserConsentState:
         if (strcmp(aValue, "granted") == 0)
@@ -246,10 +249,10 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         gUserConsentNeeded = true;
         break;
     case kOptionPollInterval:
-        gPollInterval = static_cast<uint32_t>(strtoul(aValue, NULL, 0));
+        gPollInterval = static_cast<uint32_t>(strtoul(aValue, nullptr, 0));
         break;
     case kOptionMaxBDXBlockSize: {
-        auto blockSize = static_cast<uint16_t>(strtoul(aValue, NULL, 0));
+        auto blockSize = static_cast<uint16_t>(strtoul(aValue, nullptr, 0));
         if (blockSize == 0)
         {
             PrintArgError("%s: ERROR: Invalid maxBDXBlockSize parameter: %s\n", aProgram, aValue);
@@ -403,9 +406,28 @@ void ApplicationInit()
     }
 
     chip::app::Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, &gOtaProvider);
+
+    std::string path     = std::string(LinuxDeviceOptions::GetInstance().app_pipe);
+    std::string path_out = std::string(LinuxDeviceOptions::GetInstance().app_pipe_out);
+
+    if ((!path.empty()) and (sChipNamedPipeCommands.Start(path, path_out, &sOtaProviderAppCommandDelegate) != CHIP_NO_ERROR))
+    {
+        ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommand");
+        sChipNamedPipeCommands.Stop();
+    }
+    else
+    {
+        sOtaProviderAppCommandDelegate.SetPipes(&sChipNamedPipeCommands);
+    }
 }
 
-void ApplicationShutdown() {}
+void ApplicationShutdown()
+{
+    if (sChipNamedPipeCommands.Stop() != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to stop CHIP NamedPipeCommands");
+    }
+}
 
 namespace {
 class OtaProviderAppMainLoopImplementation : public AppMainLoopImplementation
