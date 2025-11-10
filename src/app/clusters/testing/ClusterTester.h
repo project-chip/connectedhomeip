@@ -14,6 +14,7 @@
  *    limitations under the License.
  */
 
+#pragma once
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
