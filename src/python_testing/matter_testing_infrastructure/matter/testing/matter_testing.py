@@ -970,7 +970,28 @@ class MatterBaseTest(base_test.BaseTestClass):
                                  f"Expected write success for write to attribute {attribute_value} on endpoint {endpoint_id}")
         return write_result[0].Status
 
-    def read_from_app_pipe(self, app_pipe_out: Optional[str] = None):
+
+def read_from_app_pipe(self, app_pipe_out: Optional[str] = None):
+        BUFFER_SIZE = 1024
+
+        # If is not empty from the args, verify if the fifo file exists.
+        if app_pipe_out is not None and not os.path.exists(app_pipe_out):
+            LOGGER.error("Named pipe %r does NOT exist" % app_pipe_out)
+            raise FileNotFoundError("CANNOT FIND %r" % app_pipe_out)
+
+        if app_pipe_out is None:
+            app_pipe_out = self.matter_test_config.pipe_name_out
+
+        if not isinstance(app_pipe_out, str):
+            raise TypeError("The named pipe must be provided as a string value")
+
+        data = ""
+        with open(app_pipe_out, "r") as app_pipe_out_fp:
+            LOGGER.info(f"Reading out-of-band command response to file: {app_pipe_out}")
+            data = app_pipe_out_fp.read(BUFFER_SIZE)
+        LOGGER.info(data)
+        data = json.loads(data)
+        return data
 
     def write_to_app_pipe(self, command_dict: dict, app_pipe: Optional[str] = None):
         """
