@@ -66,7 +66,7 @@ Davis, CA 95616, USA
   <clusterIds>
     <clusterId id="0x0403" name="Pressure Measurement"/>
   </clusterIds>
-  <classification hierarchy="base" role="application" picsCode="PRS" scope="Type 2 (server to client)"/>
+  <classification hierarchy="base" role="application" picsCode="PRS" scope="Endpoint"/>
   <features>
     <feature bit="0" code="EXT" name="Extended" summary="The cluster is capable of extended range and resolution">
       <optionalConform/>

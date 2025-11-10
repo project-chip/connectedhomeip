@@ -66,7 +66,7 @@ Davis, CA 95616, USA
   <clusterIds>
     <clusterId id="0x0404" name="Flow Measurement"/>
   </clusterIds>
-  <classification hierarchy="base" role="application" picsCode="FLW" scope="Type 2 (server to client)"/>
+  <classification hierarchy="base" role="application" picsCode="FLW" scope="Endpoint"/>
   <attributes>
     <attribute id="0x0000" name="MeasuredValue" type="uint16" default="null">
       <access read="true" readPrivilege="view"/>

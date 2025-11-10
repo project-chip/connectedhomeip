@@ -64,7 +64,7 @@ Davis, CA 95616, USA
   <clusterIds>
     <clusterId id="0x0045" name="Boolean State"/>
   </clusterIds>
-  <classification hierarchy="base" role="application" picsCode="BOOL" scope="Type 2"/>
+  <classification hierarchy="base" role="application" picsCode="BOOL" scope="Endpoint"/>
   <attributes>
     <attribute id="0x0000" name="StateValue" type="bool">
       <access read="true" readPrivilege="view"/>

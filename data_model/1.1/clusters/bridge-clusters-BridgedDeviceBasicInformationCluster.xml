@@ -64,7 +64,7 @@ Davis, CA 95616, USA
   <clusterIds>
     <clusterId id="0x0039" name="Bridged Device Basic Information"/>
   </clusterIds>
-  <classification hierarchy="derived" baseCluster="Derived from Basic Information" role="utility" picsCode="BRBINFO" scope="Endpoint"/>
+  <classification hierarchy="derived" baseCluster="Basic Information" role="utility" picsCode="BRBINFO" scope="Endpoint"/>
   <dataTypes>
     <struct name="CapabilityMinimaStruct">
       <field id="0" name="CaseSessionsPerFabric" type="uint16" default="3">
