@@ -366,7 +366,7 @@ const char * sDeviceOptionHelp =
     "\n"
     "  --app-pipe <filepath>\n"
     "       Custom path for the current application to receive out of band commands from the test.\n"
-        "\n"
+    "\n"
     "  --app-pipe-out <filepath>\n"
     "       Custom path for the current application to send out of band commands to the test.\n"
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
