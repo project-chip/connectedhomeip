@@ -64,7 +64,7 @@ Davis, CA 95616, USA
   <clusterIds>
     <clusterId id="0x0040" name="Fixed Label"/>
   </clusterIds>
-  <classification hierarchy="derived" baseCluster="Derived from Label" role="utility" picsCode="FLABEL" scope="Endpoint"/>
+  <classification hierarchy="derived" baseCluster="Label" role="utility" picsCode="FLABEL" scope="Endpoint"/>
   <attributes>
     <attribute id="0x0000" name="LabelList" type="list" default="empty">
       <entry type="LabelStruct"/>
