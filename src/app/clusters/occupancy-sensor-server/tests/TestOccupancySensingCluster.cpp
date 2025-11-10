@@ -26,6 +26,7 @@
 #include <app/server-cluster/testing/TestEventGenerator.h>
 #include <clusters/OccupancySensing/Attributes.h>
 #include <clusters/OccupancySensing/Metadata.h>
+#include <lib/support/TimerDelegateMock.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -49,12 +50,14 @@ struct TestOccupancySensingCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { Platform::MemoryShutdown(); }
+
+    TimerDelegateMock mMockTimerDelegate;
 };
 
 TEST_F(TestOccupancySensingCluster, TestReadClusterRevision)
 {
     chip::Test::TestServerClusterContext context;
-    OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}};
+    OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId } };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     chip::Test::ClusterTester tester(cluster);
 
@@ -70,7 +73,8 @@ TEST_F(TestOccupancySensingCluster, TestReadFeatureMap)
 
     {
         constexpr uint32_t featureMapPir = 0x1; // PassiveInfrared
-        OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}.WithFeatures(OccupancySensing::Feature(featureMapPir))};
+        OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithFeatures(
+            OccupancySensing::Feature(featureMapPir)) };
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         chip::Test::ClusterTester tester(cluster);
         EXPECT_EQ(tester.ReadAttribute(Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
@@ -79,7 +83,8 @@ TEST_F(TestOccupancySensingCluster, TestReadFeatureMap)
 
     {
         constexpr uint32_t featureMapUltrasonic = 0x2; // Ultrasonic
-        OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}.WithFeatures(OccupancySensing::Feature(featureMapUltrasonic))};
+        OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithFeatures(
+            OccupancySensing::Feature(featureMapUltrasonic)) };
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         chip::Test::ClusterTester tester(cluster);
         EXPECT_EQ(tester.ReadAttribute(Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
@@ -90,8 +95,11 @@ TEST_F(TestOccupancySensingCluster, TestReadFeatureMap)
 TEST_F(TestOccupancySensingCluster, TestSetHoldTime)
 {
     chip::Test::TestServerClusterContext context;
-    OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin = 10, .holdTimeMax = 200, .holdTimeDefault = 100 };
-    OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}.WithHoldTime(100, holdTimeLimitsConfig)};
+    OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin     = 10,
+                                                                                  .holdTimeMax     = 200,
+                                                                                  .holdTimeDefault = 100 };
+    OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithHoldTime(100, holdTimeLimitsConfig,
+                                                                                                     mMockTimerDelegate) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     chip::Test::ClusterTester tester(cluster);
 
@@ -112,7 +120,7 @@ TEST_F(TestOccupancySensingCluster, TestSetHoldTime)
     EXPECT_EQ(cluster.SetHoldTime(250), Protocols::InteractionModel::Status::ConstraintError);
 
     // Verify that SetHoldTime returns UnsupportedAttribute if mHasHoldTime is false
-    OccupancySensingCluster clusterNoHoldTime{OccupancySensingCluster::Config{kTestEndpointId}};
+    OccupancySensingCluster clusterNoHoldTime{ OccupancySensingCluster::Config{ kTestEndpointId } };
     EXPECT_EQ(clusterNoHoldTime.Startup(context.Get()), CHIP_NO_ERROR);
     EXPECT_EQ(clusterNoHoldTime.SetHoldTime(10), Protocols::InteractionModel::Status::UnsupportedAttribute);
 }
@@ -120,8 +128,11 @@ TEST_F(TestOccupancySensingCluster, TestSetHoldTime)
 TEST_F(TestOccupancySensingCluster, TestWriteHoldTimeAttribute)
 {
     chip::Test::TestServerClusterContext context;
-    OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin = 10, .holdTimeMax = 200, .holdTimeDefault = 100 };
-    OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}.WithHoldTime(100, holdTimeLimitsConfig)};
+    OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin     = 10,
+                                                                                  .holdTimeMax     = 200,
+                                                                                  .holdTimeDefault = 100 };
+    OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithHoldTime(100, holdTimeLimitsConfig,
+                                                                                                     mMockTimerDelegate) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     chip::Test::ClusterTester tester(cluster);
 
@@ -139,12 +150,15 @@ TEST_F(TestOccupancySensingCluster, TestWriteHoldTimeAttribute)
 
     // Verify that UltrasonicOccupiedToUnoccupiedDelay is updated when HoldTime is written
     uint16_t ultrasonicOccupiedToUnoccupiedDelay;
-    EXPECT_EQ(tester.ReadAttribute(Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id, ultrasonicOccupiedToUnoccupiedDelay), CHIP_NO_ERROR);
+    EXPECT_EQ(tester.ReadAttribute(Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id, ultrasonicOccupiedToUnoccupiedDelay),
+              CHIP_NO_ERROR);
     EXPECT_EQ(ultrasonicOccupiedToUnoccupiedDelay, 150);
 
     // Verify that PhysicalContactOccupiedToUnoccupiedDelay is updated when HoldTime is written
     uint16_t physicalContactOccupiedToUnoccupiedDelay;
-    EXPECT_EQ(tester.ReadAttribute(Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Id, physicalContactOccupiedToUnoccupiedDelay), CHIP_NO_ERROR);
+    EXPECT_EQ(
+        tester.ReadAttribute(Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Id, physicalContactOccupiedToUnoccupiedDelay),
+        CHIP_NO_ERROR);
     EXPECT_EQ(physicalContactOccupiedToUnoccupiedDelay, 150);
 
     // Verify that writing to an alias also works
@@ -156,7 +170,8 @@ TEST_F(TestOccupancySensingCluster, TestWriteHoldTimeAttribute)
     EXPECT_EQ(tester.WriteAttribute(Attributes::HoldTime::Id, static_cast<uint16_t>(5)), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     // Verify that we cannot write a hold time greater than the maximum
-    EXPECT_EQ(tester.WriteAttribute(Attributes::HoldTime::Id, static_cast<uint16_t>(250)), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    EXPECT_EQ(tester.WriteAttribute(Attributes::HoldTime::Id, static_cast<uint16_t>(250)),
+              CHIP_IM_GLOBAL_STATUS(ConstraintError));
 }
 
 TEST_F(TestOccupancySensingCluster, TestHoldTimePersistence)
@@ -165,15 +180,14 @@ TEST_F(TestOccupancySensingCluster, TestHoldTimePersistence)
 
     constexpr uint16_t kDefaultHoldTime = 100;
     constexpr uint16_t kNewHoldTime     = 150;
-    OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin = 10,
-                                                                                   .holdTimeMax = 200,
+    OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin     = 10,
+                                                                                   .holdTimeMax     = 200,
                                                                                    .holdTimeDefault = kDefaultHoldTime };
 
     // 1. Create a cluster. On startup, it should store the default hold time.
     {
-        OccupancySensingCluster cluster{
-            OccupancySensingCluster::Config{ kTestEndpointId }.WithHoldTime(kDefaultHoldTime, holdTimeLimitsConfig)
-        };
+        OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithHoldTime(
+            kDefaultHoldTime, holdTimeLimitsConfig, mMockTimerDelegate) };
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         chip::Test::ClusterTester tester(cluster);
 
@@ -185,9 +199,8 @@ TEST_F(TestOccupancySensingCluster, TestHoldTimePersistence)
 
     // 2. Write a new value to the attribute. This should update the value in persistence.
     {
-        OccupancySensingCluster cluster{
-            OccupancySensingCluster::Config{ kTestEndpointId }.WithHoldTime(kDefaultHoldTime, holdTimeLimitsConfig)
-        };
+        OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithHoldTime(
+            kDefaultHoldTime, holdTimeLimitsConfig, mMockTimerDelegate) };
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR); // Startup will load the default value again
         chip::Test::ClusterTester tester(cluster);
         EXPECT_EQ(tester.WriteAttribute(Attributes::HoldTime::Id, kNewHoldTime), CHIP_NO_ERROR);
@@ -196,9 +209,8 @@ TEST_F(TestOccupancySensingCluster, TestHoldTimePersistence)
 
     // 3. Create a new cluster instance. It should load the new value from persistence on startup.
     {
-        OccupancySensingCluster cluster{
-            OccupancySensingCluster::Config{ kTestEndpointId }.WithHoldTime(kDefaultHoldTime, holdTimeLimitsConfig)
-        };
+        OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithHoldTime(
+            kDefaultHoldTime, holdTimeLimitsConfig, mMockTimerDelegate) };
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         chip::Test::ClusterTester tester(cluster);
 
@@ -208,8 +220,6 @@ TEST_F(TestOccupancySensingCluster, TestHoldTimePersistence)
         EXPECT_EQ(cluster.GetHoldTime(), kNewHoldTime);
     }
 }
-
-
 
 TEST_F(TestOccupancySensingCluster, TestOccupancySensorTypeAttributesFromFeatures)
 {
@@ -229,7 +239,8 @@ TEST_F(TestOccupancySensingCluster, TestOccupancySensorTypeAttributesFromFeature
 
     // Test case: No bits set (000) -> PIR
     {
-        OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}.WithFeatures(BitFlags<OccupancySensing::Feature>())};
+        OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithFeatures(
+            BitFlags<OccupancySensing::Feature>()) };
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         chip::Test::ClusterTester tester(cluster);
         BitMask<OccupancySensing::OccupancySensorTypeBitmap> occupancySensorTypeBitmap;
@@ -243,7 +254,8 @@ TEST_F(TestOccupancySensingCluster, TestOccupancySensorTypeAttributesFromFeature
     // Test case: PIR
     {
         OccupancySensingCluster cluster{
-            OccupancySensingCluster::Config{kTestEndpointId}.WithFeatures(OccupancySensing::Feature::kPassiveInfrared)};
+            OccupancySensingCluster::Config{ kTestEndpointId }.WithFeatures(OccupancySensing::Feature::kPassiveInfrared)
+        };
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         chip::Test::ClusterTester tester(cluster);
         BitMask<OccupancySensing::OccupancySensorTypeBitmap> occupancySensorTypeBitmap;
@@ -257,7 +269,8 @@ TEST_F(TestOccupancySensingCluster, TestOccupancySensorTypeAttributesFromFeature
     // Test case: Ultrasonic
     {
         OccupancySensingCluster cluster{
-            OccupancySensingCluster::Config{kTestEndpointId}.WithFeatures(OccupancySensing::Feature::kUltrasonic)};
+            OccupancySensingCluster::Config{ kTestEndpointId }.WithFeatures(OccupancySensing::Feature::kUltrasonic)
+        };
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         chip::Test::ClusterTester tester(cluster);
         BitMask<OccupancySensing::OccupancySensorTypeBitmap> occupancySensorTypeBitmap;
@@ -270,8 +283,9 @@ TEST_F(TestOccupancySensingCluster, TestOccupancySensorTypeAttributesFromFeature
 
     // Test case: PIR + Ultrasonic
     {
-        OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}.WithFeatures(
-            BitFlags<OccupancySensing::Feature>(OccupancySensing::Feature::kPassiveInfrared, OccupancySensing::Feature::kUltrasonic))};
+        OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithFeatures(
+            BitFlags<OccupancySensing::Feature>(OccupancySensing::Feature::kPassiveInfrared,
+                                                OccupancySensing::Feature::kUltrasonic)) };
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         chip::Test::ClusterTester tester(cluster);
         BitMask<OccupancySensing::OccupancySensorTypeBitmap> occupancySensorTypeBitmap;
@@ -287,7 +301,8 @@ TEST_F(TestOccupancySensingCluster, TestOccupancySensorTypeAttributesFromFeature
     // Test case: PhysicalContact
     {
         OccupancySensingCluster cluster{
-            OccupancySensingCluster::Config{kTestEndpointId}.WithFeatures(OccupancySensing::Feature::kPhysicalContact)};
+            OccupancySensingCluster::Config{ kTestEndpointId }.WithFeatures(OccupancySensing::Feature::kPhysicalContact)
+        };
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         chip::Test::ClusterTester tester(cluster);
         BitMask<OccupancySensing::OccupancySensorTypeBitmap> occupancySensorTypeBitmap;
@@ -300,8 +315,9 @@ TEST_F(TestOccupancySensingCluster, TestOccupancySensorTypeAttributesFromFeature
 
     // Test case: PhysicalContact + PIR
     {
-        OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}.WithFeatures(
-            BitFlags<OccupancySensing::Feature>(OccupancySensing::Feature::kPhysicalContact, OccupancySensing::Feature::kPassiveInfrared))};
+        OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithFeatures(
+            BitFlags<OccupancySensing::Feature>(OccupancySensing::Feature::kPhysicalContact,
+                                                OccupancySensing::Feature::kPassiveInfrared)) };
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         chip::Test::ClusterTester tester(cluster);
         BitMask<OccupancySensing::OccupancySensorTypeBitmap> occupancySensorTypeBitmap;
@@ -316,8 +332,9 @@ TEST_F(TestOccupancySensingCluster, TestOccupancySensorTypeAttributesFromFeature
 
     // Test case: PhysicalContact + Ultrasonic
     {
-        OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}.WithFeatures(
-            BitFlags<OccupancySensing::Feature>(OccupancySensing::Feature::kPhysicalContact, OccupancySensing::Feature::kUltrasonic))};
+        OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithFeatures(
+            BitFlags<OccupancySensing::Feature>(OccupancySensing::Feature::kPhysicalContact,
+                                                OccupancySensing::Feature::kUltrasonic)) };
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         chip::Test::ClusterTester tester(cluster);
         BitMask<OccupancySensing::OccupancySensorTypeBitmap> occupancySensorTypeBitmap;
@@ -332,9 +349,10 @@ TEST_F(TestOccupancySensingCluster, TestOccupancySensorTypeAttributesFromFeature
 
     // Test case: PhysicalContact + PIR + Ultrasonic
     {
-        OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}.WithFeatures(BitFlags<OccupancySensing::Feature>(
-            OccupancySensing::Feature::kPhysicalContact, OccupancySensing::Feature::kPassiveInfrared,
-            OccupancySensing::Feature::kUltrasonic))};
+        OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithFeatures(
+            BitFlags<OccupancySensing::Feature>(OccupancySensing::Feature::kPhysicalContact,
+                                                OccupancySensing::Feature::kPassiveInfrared,
+                                                OccupancySensing::Feature::kUltrasonic)) };
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         chip::Test::ClusterTester tester(cluster);
         BitMask<OccupancySensing::OccupancySensorTypeBitmap> occupancySensorTypeBitmap;
@@ -355,13 +373,12 @@ TEST_F(TestOccupancySensingCluster, TestReadOptionalHoldTimeAttributes)
 
     // Case 1: WithHoldTime is not called, so attributes should be unsupported.
     {
-        OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}};
+        OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId } };
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         chip::Test::ClusterTester tester(cluster);
 
         uint16_t holdTime;
-        EXPECT_EQ(tester.ReadAttribute(Attributes::HoldTime::Id, holdTime),
-                  CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+        EXPECT_EQ(tester.ReadAttribute(Attributes::HoldTime::Id, holdTime), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
 
         OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimits;
         EXPECT_EQ(tester.ReadAttribute(Attributes::HoldTimeLimits::Id, holdTimeLimits),
@@ -370,9 +387,12 @@ TEST_F(TestOccupancySensingCluster, TestReadOptionalHoldTimeAttributes)
 
     // Case 2: WithHoldTime is called, so attributes should be readable.
     {
-        constexpr uint16_t kHoldTime = 100;
-        OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin = 10, .holdTimeMax = 200, .holdTimeDefault = kHoldTime };
-        OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}.WithHoldTime(kHoldTime, holdTimeLimitsConfig)};
+        constexpr uint16_t kHoldTime                                               = 100;
+        OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin     = 10,
+                                                                                       .holdTimeMax     = 200,
+                                                                                       .holdTimeDefault = kHoldTime };
+        OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithHoldTime(
+            kHoldTime, holdTimeLimitsConfig, mMockTimerDelegate) };
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         chip::Test::ClusterTester tester(cluster);
 
@@ -403,8 +423,11 @@ TEST_F(TestOccupancySensingCluster, TestHoldTimeLimitsConstraints)
 
     // Test case: holdTimeMin is 0, should be coerced to 1.
     {
-        OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin = 0, .holdTimeMax = 20, .holdTimeDefault = 10 };
-        OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}.WithHoldTime(10, holdTimeLimitsConfig)};
+        OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin     = 0,
+                                                                                       .holdTimeMax     = 20,
+                                                                                       .holdTimeDefault = 10 };
+        OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithHoldTime(10, holdTimeLimitsConfig,
+                                                                                                         mMockTimerDelegate) };
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         chip::Test::ClusterTester tester(cluster);
 
@@ -417,8 +440,11 @@ TEST_F(TestOccupancySensingCluster, TestHoldTimeLimitsConstraints)
 
     // Test case: holdTimeMax is less than holdTimeMin, should be coerced to holdTimeMin.
     {
-        OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin = 15, .holdTimeMax = 10, .holdTimeDefault = 15 };
-        OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}.WithHoldTime(15, holdTimeLimitsConfig)};
+        OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin     = 15,
+                                                                                       .holdTimeMax     = 10,
+                                                                                       .holdTimeDefault = 15 };
+        OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithHoldTime(15, holdTimeLimitsConfig,
+                                                                                                         mMockTimerDelegate) };
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         chip::Test::ClusterTester tester(cluster);
 
@@ -431,8 +457,11 @@ TEST_F(TestOccupancySensingCluster, TestHoldTimeLimitsConstraints)
 
     // Test case: holdTimeDefault is less than holdTimeMin, should be coerced to holdTimeMin.
     {
-        OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin = 10, .holdTimeMax = 20, .holdTimeDefault = 5 };
-        OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}.WithHoldTime(10, holdTimeLimitsConfig)};
+        OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin     = 10,
+                                                                                       .holdTimeMax     = 20,
+                                                                                       .holdTimeDefault = 5 };
+        OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithHoldTime(10, holdTimeLimitsConfig,
+                                                                                                         mMockTimerDelegate) };
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         chip::Test::ClusterTester tester(cluster);
 
@@ -445,8 +474,11 @@ TEST_F(TestOccupancySensingCluster, TestHoldTimeLimitsConstraints)
 
     // Test case: holdTimeDefault is greater than holdTimeMax, should be coerced to holdTimeMax.
     {
-        OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin = 10, .holdTimeMax = 20, .holdTimeDefault = 25 };
-        OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}.WithHoldTime(10, holdTimeLimitsConfig)};
+        OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin     = 10,
+                                                                                       .holdTimeMax     = 20,
+                                                                                       .holdTimeDefault = 25 };
+        OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithHoldTime(10, holdTimeLimitsConfig,
+                                                                                                         mMockTimerDelegate) };
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         chip::Test::ClusterTester tester(cluster);
 
@@ -461,7 +493,7 @@ TEST_F(TestOccupancySensingCluster, TestHoldTimeLimitsConstraints)
 TEST_F(TestOccupancySensingCluster, TestAttributeListMandatoryOnly)
 {
     chip::Test::TestServerClusterContext context;
-    OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}};
+    OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId } };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
@@ -482,9 +514,12 @@ TEST_F(TestOccupancySensingCluster, TestAttributeListMandatoryOnly)
 TEST_F(TestOccupancySensingCluster, TestAttributeListWithOptionalAttributes)
 {
     chip::Test::TestServerClusterContext context;
-    constexpr uint16_t kHoldTime = 100;
-    OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin = 10, .holdTimeMax = 200, .holdTimeDefault = kHoldTime };
-    OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}.WithHoldTime(kHoldTime, holdTimeLimitsConfig)};
+    constexpr uint16_t kHoldTime                                               = 100;
+    OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin     = 10,
+                                                                                   .holdTimeMax     = 200,
+                                                                                   .holdTimeDefault = kHoldTime };
+    OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithHoldTime(kHoldTime, holdTimeLimitsConfig,
+                                                                                                     mMockTimerDelegate) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
@@ -513,7 +548,7 @@ TEST_F(TestOccupancySensingCluster, TestAttributeListWithOptionalAttributes)
 TEST_F(TestOccupancySensingCluster, TestSetOccupancy)
 {
     chip::Test::TestServerClusterContext context;
-    OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}};
+    OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId } };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     chip::Test::ClusterTester tester(cluster);
 
@@ -540,32 +575,37 @@ TEST_F(TestOccupancySensingCluster, TestSetOccupancy)
 TEST_F(TestOccupancySensingCluster, TestOccupancyChangedEvent)
 {
     chip::Test::TestServerClusterContext context;
-    OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}};
+    OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId } };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     OccupancySensing::Events::OccupancyChanged::DecodableType decodedEvent;
 
     // Set to occupied and verify event
     cluster.SetOccupancy(true);
-    EXPECT_EQ(context.EventsGenerator().DecodeLastEvent(decodedEvent), CHIP_NO_ERROR);
+    auto eventInfo = context.EventsGenerator().GetNextEvent();
+    ASSERT_NE(eventInfo, std::nullopt);
+    EXPECT_EQ(eventInfo->GetEventData(decodedEvent), CHIP_NO_ERROR);
     EXPECT_EQ(decodedEvent.occupancy, OccupancySensing::OccupancyBitmap::kOccupied);
 
     // Set to unoccupied and verify event
     cluster.SetOccupancy(false);
-    EXPECT_EQ(context.EventsGenerator().DecodeLastEvent(decodedEvent), CHIP_NO_ERROR);
+    eventInfo = context.EventsGenerator().GetNextEvent();
+    ASSERT_NE(eventInfo, std::nullopt);
+    EXPECT_EQ(eventInfo->GetEventData(decodedEvent), CHIP_NO_ERROR);
     EXPECT_EQ(decodedEvent.occupancy, kOccupancyUnoccupied);
 }
 
 TEST_F(TestOccupancySensingCluster, TestSetHoldTimeLimits)
 {
     chip::Test::TestServerClusterContext context;
-    OccupancySensingCluster cluster{OccupancySensingCluster::Config{kTestEndpointId}.WithHoldTime(10, kDefaultHoldTimeLimits)};
+    OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithHoldTime(10, kDefaultHoldTimeLimits,
+                                                                                                     mMockTimerDelegate) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     chip::Test::ClusterTester tester(cluster);
 
     const OccupancySensing::Structs::HoldTimeLimitsStruct::Type newHoldTimeLimits = {
-        .holdTimeMin = 5,
-        .holdTimeMax = 15,
+        .holdTimeMin     = 5,
+        .holdTimeMax     = 15,
         .holdTimeDefault = 10,
     };
 
@@ -579,6 +619,106 @@ TEST_F(TestOccupancySensingCluster, TestSetHoldTimeLimits)
     EXPECT_EQ(cluster.GetHoldTimeLimits().holdTimeMin, newHoldTimeLimits.holdTimeMin);
     EXPECT_EQ(cluster.GetHoldTimeLimits().holdTimeMax, newHoldTimeLimits.holdTimeMax);
     EXPECT_EQ(cluster.GetHoldTimeLimits().holdTimeDefault, newHoldTimeLimits.holdTimeDefault);
+}
+
+TEST_F(TestOccupancySensingCluster, TestOccupancyHoldTime)
+{
+    chip::Test::TestServerClusterContext context;
+    constexpr uint16_t kHoldTime                                               = 5;
+    OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin     = 1,
+                                                                                   .holdTimeMax     = 10,
+                                                                                   .holdTimeDefault = 1 };
+    OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithHoldTime(kHoldTime, holdTimeLimitsConfig,
+                                                                                                     mMockTimerDelegate) };
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    // 1. Set Occupancy to occupied
+    cluster.SetOccupancy(true);
+    EXPECT_TRUE(cluster.IsOccupied());
+
+    // 2. Set Occupancy to unoccupied, timer should start
+    cluster.SetOccupancy(false);
+    EXPECT_TRUE(cluster.IsOccupied()); // Should still be occupied
+    EXPECT_TRUE(mMockTimerDelegate.IsTimerActive(&cluster));
+
+    // 3. Advance clock by less than hold time, should still be occupied
+    mMockTimerDelegate.AdvanceClock(System::Clock::Seconds16(kHoldTime - 1));
+    EXPECT_TRUE(cluster.IsOccupied());
+
+    // 4. Advance clock by the remaining time, should be unoccupied
+    mMockTimerDelegate.AdvanceClock(System::Clock::Seconds16(1));
+    EXPECT_FALSE(cluster.IsOccupied());
+    EXPECT_FALSE(mMockTimerDelegate.IsTimerActive(&cluster));
+}
+
+TEST_F(TestOccupancySensingCluster, TestOccupancyHoldTimeRetrigger)
+{
+    chip::Test::TestServerClusterContext context;
+    constexpr uint16_t kHoldTime                                               = 5;
+    OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin     = 1,
+                                                                                   .holdTimeMax     = 10,
+                                                                                   .holdTimeDefault = 1 };
+    OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithHoldTime(kHoldTime, holdTimeLimitsConfig,
+                                                                                                     mMockTimerDelegate) };
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    // 1. Set Occupancy to occupied
+    cluster.SetOccupancy(true);
+    EXPECT_TRUE(cluster.IsOccupied());
+
+    // 2. Set Occupancy to unoccupied, timer should start
+    cluster.SetOccupancy(false);
+    EXPECT_TRUE(cluster.IsOccupied()); // Should still be occupied
+    EXPECT_TRUE(mMockTimerDelegate.IsTimerActive(&cluster));
+
+    // 3. Advance clock by less than hold time
+    mMockTimerDelegate.AdvanceClock(System::Clock::Seconds16(kHoldTime - 2));
+    EXPECT_TRUE(cluster.IsOccupied());
+
+    // 4. Set Occupancy to occupied again, timer should be cancelled
+    cluster.SetOccupancy(true);
+    EXPECT_TRUE(cluster.IsOccupied());
+    EXPECT_FALSE(mMockTimerDelegate.IsTimerActive(&cluster));
+
+    // 5. Set Occupancy to unoccupied again, timer should start
+    cluster.SetOccupancy(false);
+    EXPECT_TRUE(cluster.IsOccupied());
+    EXPECT_TRUE(mMockTimerDelegate.IsTimerActive(&cluster));
+
+    // 6. Advance clock by the full hold time, should be unoccupied
+    mMockTimerDelegate.AdvanceClock(System::Clock::Seconds16(kHoldTime));
+    EXPECT_FALSE(cluster.IsOccupied());
+    EXPECT_FALSE(mMockTimerDelegate.IsTimerActive(&cluster));
+}
+
+TEST_F(TestOccupancySensingCluster, TestTimerIsCancelledOnDestruction)
+{
+    chip::Test::TestServerClusterContext context;
+    constexpr uint16_t kHoldTime                                               = 5;
+    OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin     = 1,
+                                                                                   .holdTimeMax     = 10,
+                                                                                   .holdTimeDefault = 1 };
+
+    {
+        OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithHoldTime(
+            kHoldTime, holdTimeLimitsConfig, mMockTimerDelegate) };
+        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+        // 1. Set Occupancy to occupied
+        cluster.SetOccupancy(true);
+        EXPECT_TRUE(cluster.IsOccupied());
+
+        // 2. Set Occupancy to unoccupied, which starts a timer.
+        cluster.SetOccupancy(false);
+        EXPECT_TRUE(cluster.IsOccupied()); // State is still occupied.
+        EXPECT_TRUE(mMockTimerDelegate.IsTimerActive(&cluster));
+
+        // 3. The cluster object is about to be destroyed as it goes out of scope. The timer should be cancelled on destruction.
+    }
+        
+    // 4. Manually advance the clock to fire the timer. The mock delegate is now holding
+    // a dangling pointer to the destroyed 'cluster' object. This would crash if the OccupancySensingCluster did not cancel the timer on destruction.
+    mMockTimerDelegate.AdvanceClock(System::Clock::Seconds16(kHoldTime));
 }
 
 } // namespace

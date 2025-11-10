@@ -19,40 +19,54 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/ServerClusterContext.h>
+#include <lib/support/TimerDelegate.h>
 
 namespace chip::app::Clusters {
 
-class OccupancySensingCluster : public DefaultServerCluster
+class OccupancySensingCluster : public DefaultServerCluster, public TimerContext
 {
 public:
     struct Config
     {
-        Config(EndpointId endpointId) : mEndpointId(endpointId), mHoldTime(1), mHoldTimeLimits({ .holdTimeMin = 1, .holdTimeMax = 10, .holdTimeDefault = 1 }) {}
+        Config(EndpointId endpointId) : mEndpointId(endpointId) {}
 
-        Config & WithFeatures(OccupancySensing::Feature featureMap) { mFeatureMap = featureMap; return *this; }
+        Config & WithFeatures(OccupancySensing::Feature featureMap)
+        {
+            mFeatureMap = featureMap;
+            return *this;
+        }
 
-        Config & WithHoldTime(uint16_t aHoldTime, const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & aHoldTimeLimits)
+        Config & WithHoldTime(uint16_t aHoldTime, const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & aHoldTimeLimits,
+                              TimerDelegate & aTimerDelegate)
         {
             mHasHoldTime    = true;
             mHoldTime       = aHoldTime;
             mHoldTimeLimits = aHoldTimeLimits;
+            mTimerDelegate  = &aTimerDelegate;
             return *this;
         }
 
         EndpointId mEndpointId;
         BitMask<OccupancySensing::Feature> mFeatureMap = 0;
-        bool mHasHoldTime = false;
-        uint16_t mHoldTime = 1;
-        OccupancySensing::Structs::HoldTimeLimitsStruct::Type mHoldTimeLimits = { .holdTimeMin = 1, .holdTimeMax = 10, .holdTimeDefault = 1 };
+        bool mHasHoldTime                                = false;
+        uint16_t mHoldTime                               = 1;
+        OccupancySensing::Structs::HoldTimeLimitsStruct::Type mHoldTimeLimits = { .holdTimeMin     = 1,
+                                                                                  .holdTimeMax     = 10,
+                                                                                  .holdTimeDefault = 1 };
+        TimerDelegate * mTimerDelegate                   = nullptr;
     };
 
     OccupancySensingCluster(const Config & config);
+    ~OccupancySensingCluster();
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
-    DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & aDecoder) override;
+    DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                 AttributeValueDecoder & aDecoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+
+    void TimerFired() override;
 
     DataModel::ActionReturnStatus SetHoldTime(uint16_t holdTime);
     void SetHoldTimeLimits(const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & holdTimeLimits);
@@ -63,6 +77,9 @@ public:
     const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & GetHoldTimeLimits() const;
 
 private:
+    void DoSetOccupancy(bool occupied);
+
+    TimerDelegate * mTimerDelegate;
     BitMask<OccupancySensing::Feature> mFeatureMap;
     bool mHasHoldTime = false;
     uint16_t mHoldTime;

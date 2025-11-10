@@ -98,17 +98,23 @@ OccupancySensing::OccupancySensorTypeEnum FeaturesToOccupancySensorType(BitFlags
 } // namespace
 
 OccupancySensingCluster::OccupancySensingCluster(const Config & config) :
-    DefaultServerCluster({ config.mEndpointId, OccupancySensing::Id }),
-                         mFeatureMap(config.mFeatureMap),
-                         mHasHoldTime(config.mHasHoldTime),
-                         mHoldTime(config.mHoldTime),
-                         mHoldTimeLimits(config.mHoldTimeLimits)
+    DefaultServerCluster({ config.mEndpointId, OccupancySensing::Id }), mTimerDelegate(config.mTimerDelegate),
+    mFeatureMap(config.mFeatureMap), mHasHoldTime(config.mHasHoldTime), mHoldTime(config.mHoldTime),
+    mHoldTimeLimits(config.mHoldTimeLimits)
 {
     if (mHasHoldTime)
     {
-        mHoldTimeLimits.holdTimeMin = std::max(static_cast<uint16_t>(1), mHoldTimeLimits.holdTimeMin);
-        mHoldTimeLimits.holdTimeMax = std::max(mHoldTimeLimits.holdTimeMin, mHoldTimeLimits.holdTimeMax);
+        mHoldTimeLimits.holdTimeMin     = std::max(static_cast<uint16_t>(1), mHoldTimeLimits.holdTimeMin);
+        mHoldTimeLimits.holdTimeMax     = std::max(mHoldTimeLimits.holdTimeMin, mHoldTimeLimits.holdTimeMax);
         mHoldTimeLimits.holdTimeDefault = std::clamp(mHoldTimeLimits.holdTimeDefault, mHoldTimeLimits.holdTimeMin, mHoldTimeLimits.holdTimeMax);
+    }
+}
+
+OccupancySensingCluster::~OccupancySensingCluster()
+{
+    if (mTimerDelegate)
+    {
+        mTimerDelegate->CancelTimer(this);
     }
 }
 
@@ -241,6 +247,33 @@ DataModel::ActionReturnStatus OccupancySensingCluster::SetHoldTime(uint16_t hold
 
 void OccupancySensingCluster::SetOccupancy(bool occupied)
 {
+    if (mHasHoldTime && mTimerDelegate)
+    {
+        if (occupied)
+        {
+            // If the sensor is now occupied, cancel any pending timer to transition to unoccupied.
+            mTimerDelegate->CancelTimer(this);
+            DoSetOccupancy(true);
+        }
+        else
+        {
+            // If the sensor is now unoccupied, start a timer to transition to unoccupied after the hold time.
+            mTimerDelegate->StartTimer(this, System::Clock::Seconds16(mHoldTime));
+        }
+        return;
+    }
+
+    // If hold time is not supported, just set the state directly.
+    DoSetOccupancy(occupied);
+}
+
+void OccupancySensingCluster::TimerFired()
+{
+    DoSetOccupancy(false);
+}
+
+void OccupancySensingCluster::DoSetOccupancy(bool occupied)
+{
     BitMask<OccupancySensing::OccupancyBitmap> newOccupancy =
         occupied ? OccupancySensing::OccupancyBitmap::kOccupied : static_cast<OccupancySensing::OccupancyBitmap>(0);
 
@@ -256,7 +289,8 @@ void OccupancySensingCluster::SetOccupancy(bool occupied)
     {
         Events::OccupancyChanged::Type event;
         event.occupancy = mOccupancy;
-                    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);    }
+        mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+    }
 }
 
 bool OccupancySensingCluster::IsOccupied() const
