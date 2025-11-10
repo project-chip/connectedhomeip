@@ -69,26 +69,7 @@ bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster,
 /// ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster, { Commands::SomeCommand::kMetadataEntry }));
 /// ```
 bool IsAcceptedCommandsListEqualTo(app::ServerClusterInterface & cluster,
-                                   std::initializer_list<const app::DataModel::AcceptedCommandEntry> expected)
-{
-    VerifyOrDie(cluster.GetPaths().size() == 1);
-    auto path = cluster.GetPaths()[0];
-    ReadOnlyBufferBuilder<app::DataModel::AcceptedCommandEntry> commandsBuilder;
-    if (cluster.AcceptedCommands(path, commandsBuilder) != CHIP_NO_ERROR)
-    {
-        return false;
-    }
-
-    ReadOnlyBufferBuilder<app::DataModel::AcceptedCommandEntry> expectedBuilder;
-
-    SuccessOrDie(expectedBuilder.EnsureAppendCapacity(expected.size()));
-    for (const auto entry : expected)
-    {
-        SuccessOrDie(expectedBuilder.Append(entry));
-    }
-
-    return EqualAcceptedCommandSets(commandsBuilder.TakeBuffer(), expectedBuilder.TakeBuffer());
-}
+                                   std::initializer_list<const app::DataModel::AcceptedCommandEntry> expected);
 
 /// Compares the generated commands of a cluster against an expected set.
 ///
@@ -106,17 +87,7 @@ bool IsAcceptedCommandsListEqualTo(app::ServerClusterInterface & cluster,
 /// ClusterImpl cluster(kTestEndpointId, ...);
 /// ASSERT_TRUE(IsGeneratedCommandsListEqualTo(cluster, { Commands::SomeCommandResponse::kMetadataEntry }));
 /// ```
-bool IsGeneratedCommandsListEqualTo(app::ServerClusterInterface & cluster, Span<CommandId> expected)
-{
-    VerifyOrDie(cluster.GetPaths().size() == 1);
-    auto path = cluster.GetPaths()[0];
-    ReadOnlyBufferBuilder<CommandId> commandsBuilder;
-    if (cluster.GeneratedCommands(path, commandsBuilder) != CHIP_NO_ERROR)
-    {
-        return false;
-    }
-    return EqualGeneratedCommandSets(commandsBuilder.TakeBuffer(), expected);
-}
+bool IsGeneratedCommandsListEqualTo(app::ServerClusterInterface & cluster, Span<CommandId> expected);
 
 } // namespace Testing
 } // namespace chip
