@@ -215,6 +215,12 @@ void pychip_Bdx_InitCallbacks(OnTransferObtainedCallback onTransferObtainedCallb
     TEMPORARY_RETURN_IGNORED gBdxTransferServer.Init(systemLayer, factory.GetSystemState()->ExchangeMgr());
 }
 
+void pychip_Bdx_Shutdown()
+{
+    // Shut down and clean up resources associated with the TestBdxTransferServer instance.
+    gBdxTransferServer.Shutdown();
+}
+
 // Prepares the BDX system to expect a new transfer.
 // If max_block_size != 0, it overrides the default cap for the next transfer only.
 PyChipError pychip_Bdx_ExpectBdxTransfer(PyObject transferObtainedContext, uint16_t max_block_size)
