@@ -93,6 +93,7 @@ enum
     kDeviceOption_KVS,
     kDeviceOption_InterfaceId,
     kDeviceOption_AppPipe,
+    kDeviceOption_AppPipeOut,
     kDeviceOption_Spake2pVerifierBase64,
     kDeviceOption_Spake2pSaltBase64,
     kDeviceOption_Spake2pIterations,
@@ -201,6 +202,7 @@ OptionDef sDeviceOptionDefs[] = {
     { "KVS", kArgumentRequired, kDeviceOption_KVS },
     { "interface-id", kArgumentRequired, kDeviceOption_InterfaceId },
     { "app-pipe", kArgumentRequired, kDeviceOption_AppPipe },
+    { "app-pipe-out", kArgumentRequired, kDeviceOption_AppPipeOut },
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     { "trace_file", kArgumentRequired, kDeviceOption_TraceFile },
     { "trace_log", kArgumentRequired, kDeviceOption_TraceLog },
@@ -363,7 +365,10 @@ const char * sDeviceOptionHelp =
     "       A interface id to advertise on.\n"
     "\n"
     "  --app-pipe <filepath>\n"
-    "       Custom path for the current application to send out of band commands.\n"
+    "       Custom path for the current application to receive out of band commands from the test.\n"
+        "\n"
+    "  --app-pipe-out <filepath>\n"
+    "       Custom path for the current application to send out of band commands to the test.\n"
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     "\n"
     "  --trace_file <file>\n"
@@ -713,6 +718,10 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 
     case kDeviceOption_AppPipe:
         LinuxDeviceOptions::GetInstance().app_pipe = aValue;
+        break;
+
+    case kDeviceOption_AppPipeOut:
+        LinuxDeviceOptions::GetInstance().app_pipe_out = aValue;
         break;
 
     case kDeviceOption_InterfaceId:
