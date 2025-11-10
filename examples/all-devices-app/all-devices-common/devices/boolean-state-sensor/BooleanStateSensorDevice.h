@@ -18,8 +18,8 @@
 
 #include <app/clusters/boolean-state-server/boolean-state-cluster.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
-#include <app/reporting/ReportScheduler.h>
 #include <devices/interface/SingleEndpointDevice.h>
+#include <lib/support/TimerDelegate.h>
 #include <memory>
 
 namespace chip {
@@ -33,7 +33,7 @@ public:
     /// class for the sensor types that share the same core functionality through the identify and
     /// boolean state clusters. The caller creating a BooleanStateSensorDevice MUST ensure that the underlying
     /// data for the Span of deviceTypes remains valid for the entire lifetime of the BooleanStateSensorDevice object instance.
-    BooleanStateSensorDevice(reporting::ReportScheduler::TimerDelegate * timerDelegate,
+    BooleanStateSensorDevice(TimerDelegate * timerDelegate,
                              Span<const DataModel::DeviceTypeEntry> deviceType) :
         SingleEndpointDevice(deviceType),
         mTimerDelegate(timerDelegate)
@@ -47,7 +47,7 @@ public:
     Clusters::BooleanStateCluster & BooleanState() { return mBooleanStateCluster.Cluster(); }
 
 private:
-    reporting::ReportScheduler::TimerDelegate * mTimerDelegate;
+    TimerDelegate * mTimerDelegate;
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::BooleanStateCluster> mBooleanStateCluster;
 };
