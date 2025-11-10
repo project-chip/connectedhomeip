@@ -41,12 +41,12 @@ bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster,
     // build expectation with global attributes
     ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> expectedBuilder;
 
-    VerifyOrDie(expectedBuilder.EnsureAppendCapacity(expected.size()) == CHIP_NO_ERROR);
+    SuccessOrDie(expectedBuilder.EnsureAppendCapacity(expected.size()));
     for (const auto entry : expected)
     {
-        VerifyOrDie(expectedBuilder.Append(entry) == CHIP_NO_ERROR);
+        SuccessOrDie(expectedBuilder.Append(entry));
     }
-    VerifyOrDie(expectedBuilder.AppendElements(app::DefaultServerCluster::GlobalAttributes()) == CHIP_NO_ERROR);
+    SuccessOrDie(expectedBuilder.AppendElements(app::DefaultServerCluster::GlobalAttributes()));
 
     return EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer());
 }
@@ -54,7 +54,7 @@ bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster,
 /// Compares the accepted commands of a cluster against an expected set.
 ///
 /// This function retrieves the accepted commands for the first path returned by `cluster.GetPaths()`
-/// and compares them against the `expected` list.
+/// and compares them against the `expected` list of items.
 ///
 /// Parameter:
 ///     cluster - The cluster interface to test.
@@ -81,10 +81,10 @@ bool IsAcceptedCommandsListEqualTo(app::ServerClusterInterface & cluster,
 
     ReadOnlyBufferBuilder<app::DataModel::AcceptedCommandEntry> expectedBuilder;
 
-    VerifyOrDie(expectedBuilder.EnsureAppendCapacity(expected.size()) == CHIP_NO_ERROR);
+    SuccessOrDie(expectedBuilder.EnsureAppendCapacity(expected.size()));
     for (const auto entry : expected)
     {
-        VerifyOrDie(expectedBuilder.Append(entry) == CHIP_NO_ERROR);
+        SuccessOrDie(expectedBuilder.Append(entry));
     }
 
     return EqualAcceptedCommandSets(commandsBuilder.TakeBuffer(), expectedBuilder.TakeBuffer());
@@ -93,7 +93,7 @@ bool IsAcceptedCommandsListEqualTo(app::ServerClusterInterface & cluster,
 /// Compares the generated commands of a cluster against an expected set.
 ///
 /// This function retrieves the generated commands for the first path returned by `cluster.GetPaths()`
-/// and compares them against the `expected` span.
+/// and compares them against the `expected` list of items.
 ///
 /// Parameter:
 ///     cluster - The cluster interface to test.
