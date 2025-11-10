@@ -794,6 +794,11 @@ def convert_args_to_matter_config(args: argparse.Namespace):
         LOGGER.error("Named pipe %r does NOT exist" % config.pipe_name)
         raise FileNotFoundError("CANNOT FIND %r" % config.pipe_name)
 
+    config.pipe_name_out = args.app_pipe_out
+    if config.pipe_name_out is not None and not os.path.exists(config.pipe_name_out):
+        LOGGER.error("Named pipe %r does NOT exist" % config.pipe_name_out)
+        raise FileNotFoundError("CANNOT FIND %r" % config.pipe_name_out)
+
     config.fail_on_skipped_tests = args.fail_on_skipped
 
     config.legacy = args.use_legacy_test_event_triggers
@@ -841,7 +846,10 @@ def parse_matter_test_args(argv: Optional[List[str]] = None):
                              help='Node ID for primary DUT communication, '
                              'and NodeID to assign if commissioning (default: %d)' % TestingDefaults.DUT_NODE_ID, nargs="+")
     basic_group.add_argument('--endpoint', type=int, default=None, help="Endpoint under test")
-    basic_group.add_argument('--app-pipe', type=str, default=None, help="The full path of the app to send an out-of-band command")
+    basic_group.add_argument('--app-pipe', type=str, default=None,
+                             help="The full path of the app to send an out-of-band command from test to app")
+    basic_group.add_argument('--app-pipe-out', type=str, default=None,
+                             help="The full path of the app to send an out-of-band command from app to test")
     basic_group.add_argument('--restart-flag-file', type=str, default=None,
                              help="The full path of the file to use to signal a restart to the app")
     basic_group.add_argument('--timeout', type=int, help="Test timeout in seconds")

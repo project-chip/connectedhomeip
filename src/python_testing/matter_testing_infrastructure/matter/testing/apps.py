@@ -55,7 +55,7 @@ class AppServerSubprocess(Subprocess):
     err_log_file: BinaryIO = stderr.buffer
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
-                 passcode: int, port: int = 5540, extra_args: list[str] = [], kvs_path: Optional[str] = None, f_stdout: BinaryIO = stdout.buffer, f_stderr: BinaryIO = stderr.buffer):
+                 passcode: int, port: int = 5540, extra_args: list[str] = [], kvs_path: Optional[str] = None, f_stdout: BinaryIO = stdout.buffer, f_stderr: BinaryIO = stderr.buffer, app_pipe: Optional[str] = None, app_pipe_out: Optional[str] = None):
         # Create a temporary KVS file and keep the descriptor to avoid leaks.
 
         if kvs_path is not None:
@@ -69,6 +69,15 @@ class AppServerSubprocess(Subprocess):
             if extra_args:
                 command.extend(extra_args)
 
+            if app_pipe is not None:
+                command.extend([
+                    "--app-pipe", str(app_pipe)
+                ])
+            if app_pipe_out is not None:
+                command.extend([
+                    "--app-pipe-out", str(app_pipe_out)
+                ])
+
             command.extend([
                 "--KVS", kvs_path,
                 '--secured-device-port', str(port),
@@ -78,7 +87,7 @@ class AppServerSubprocess(Subprocess):
 
             # Start the server application
             super().__init__(*command,  # Pass the constructed command list
-                             output_cb=lambda line, is_stderr: self.PREFIX + line, f_stdout=f_stdout, f_stderr=f_stderr)
+                             output_cb=lambda line, is_stderr: self.PREFIX + line, f_stdout=f_stdout, f_stderr=f_stderr, app_pipe=app_pipe, app_pipe_out=app_pipe_out)
         except Exception:
             # Do not leak KVS file descriptor on failure
             if self.kvs_fd is not None:
@@ -157,7 +166,7 @@ class OTAProviderSubprocess(AppServerSubprocess):
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
                  passcode: int, ota_source: Union[OtaImagePath, ImageListPath],
-                 port: int = 5541, extra_args: list[str] = [], kvs_path: Optional[str] = None, log_file: Union[str, BinaryIO] = stdout.buffer, err_log_file: Union[str, BinaryIO] = stderr.buffer):
+                 port: int = 5541, extra_args: list[str] = [], kvs_path: Optional[str] = None, log_file: Union[str, BinaryIO] = stdout.buffer, err_log_file: Union[str, BinaryIO] = stderr.buffer, app_pipe: Optional[str] = None, app_pipe_out: Optional[str] = None):
         """Initialize the OTA Provider subprocess.
 
         Args:
@@ -171,6 +180,8 @@ class OTAProviderSubprocess(AppServerSubprocess):
             kvs_path(str): Str of the path for the kvs path, if not will use temp file.
             log_file(str,BinaryIO): Path to create the BinaryIO logger for stdoutput, if not use the default stdout.buffer.
             err_log_file(str,BinaryIO): Path to create the BinaryIO logger for stderr, if not use the default stderr.buffer.
+            app_pipe(str): Path to send out of band commands from test to app
+            app_pipe_out(str): Path to send out of band commands from app to test
         """
         # Create the BinaryIO fp allow to use if path is provided.
         # Or assign it to the previously opened fp.
@@ -189,7 +200,7 @@ class OTAProviderSubprocess(AppServerSubprocess):
 
         # Initialize with the combined arguments
         super().__init__(app=app, storage_dir=storage_dir, discriminator=discriminator, passcode=passcode, port=port,
-                         extra_args=combined_extra_args, kvs_path=kvs_path, f_stdout=self.log_file, f_stderr=self.err_log_file)
+                         extra_args=combined_extra_args, kvs_path=kvs_path, f_stdout=self.log_file, f_stderr=self.err_log_file, app_pipe=app_pipe, app_pipe_out=app_pipe_out)
 
     def kill(self):
         self.p.send_signal(signal.SIGKILL)

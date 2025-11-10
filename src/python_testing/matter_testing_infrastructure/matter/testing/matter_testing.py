@@ -970,6 +970,8 @@ class MatterBaseTest(base_test.BaseTestClass):
                                  f"Expected write success for write to attribute {attribute_value} on endpoint {endpoint_id}")
         return write_result[0].Status
 
+    def read_from_app_pipe(self, app_pipe_out: Optional[str] = None):
+
     def write_to_app_pipe(self, command_dict: dict, app_pipe: Optional[str] = None):
         """
         Send an out-of-band command to a Matter app.
