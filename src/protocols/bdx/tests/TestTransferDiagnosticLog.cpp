@@ -86,7 +86,7 @@ TEST_F(TestTransferDiagnosticLog, AccpetsTransferActingAsReceiverWhileInititator
     BDXTransferProxyDiagnosticLog proxyDiagnosticLog{};
 
     TransferSession initiator;
-    TransferSession::TransferInitData transferInitData{};
+    TransferSession::TransferInitData transferInitData{ TransferControlFlags(0) };
     transferInitData.TransferCtlFlags = TransferControlFlags::kSenderDrive;
     transferInitData.MaxBlockSize     = kMaxBlockSize;
     transferInitData.StartOffset      = 0;
@@ -147,7 +147,7 @@ TEST_F(TestTransferDiagnosticLog, RejectsInTheMiddleOfTransfer)
     BDXTransferProxyDiagnosticLog proxyDiagnosticLog{};
 
     TransferSession initiator;
-    TransferSession::TransferInitData transferInitData{};
+    TransferSession::TransferInitData transferInitData{ TransferControlFlags(0) };
     transferInitData.TransferCtlFlags = TransferControlFlags::kSenderDrive;
     transferInitData.MaxBlockSize     = kMaxBlockSize;
     transferInitData.StartOffset      = 0;

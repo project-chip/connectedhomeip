@@ -840,8 +840,8 @@ TEST_F(TestCodeDrivenDataModelProvider, Shutdown)
 
     auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
     mEndpointStorage.push_back(std::move(endpoint));
-    auto registration =
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 });
+    auto registration = std::make_unique<EndpointInterfaceRegistration>(
+        *mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1, .compositionPattern = EndpointCompositionPattern(0) });
     ASSERT_EQ(mProvider.AddEndpoint(*registration), CHIP_NO_ERROR);
     mOwnedRegistrations.push_back(std::move(registration));
 

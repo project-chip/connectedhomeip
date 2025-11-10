@@ -4032,6 +4032,7 @@ TEST_F(TestTLV, CheckCHIPUpdater)
 class OptimisticTLVWriter : public TLVWriter
 {
 public:
+    // NOLINTNEXTLINE(bugprone-derived-method-shadowing-base-method)
     void Init(uint8_t * buf, size_t maxLen);
 };
 

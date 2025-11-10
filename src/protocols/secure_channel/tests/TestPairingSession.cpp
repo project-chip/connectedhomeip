@@ -56,6 +56,7 @@ public:
 
     void OnSessionReleased() override {}
 
+    // NOLINTNEXTLINE(bugprone-derived-method-shadowing-base-method)
     const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const { return PairingSession::GetRemoteMRPConfig(); }
 
     CHIP_ERROR DeriveSecureSession(CryptoContext & session) override { return CHIP_NO_ERROR; }
