@@ -589,7 +589,7 @@ class SubscriptionTransaction:
         Sets the callback function that gets invoked when a report data message is sent. The callback
         is expected to have the following signature:
             def Callback()
-        
+
         If set to None, the callback will be unset and no longer invoked.
         '''
         self._readTransaction.register_notify_subscription_still_active_callback(callback)
