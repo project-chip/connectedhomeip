@@ -215,6 +215,8 @@ CHIP_ERROR OccupancySensingCluster::Attributes(const ConcreteClusterPath & clust
 
 DataModel::ActionReturnStatus OccupancySensingCluster::SetHoldTime(uint16_t holdTime)
 {
+    VerifyOrReturnError(mHasHoldTime, Protocols::InteractionModel::Status::UnsupportedAttribute);
+
     VerifyOrReturnError(holdTime >= mHoldTimeLimits.holdTimeMin, Protocols::InteractionModel::Status::ConstraintError);
     VerifyOrReturnError(holdTime <= mHoldTimeLimits.holdTimeMax, Protocols::InteractionModel::Status::ConstraintError);
 
@@ -255,6 +257,11 @@ void OccupancySensingCluster::SetOccupancy(bool occupied)
         Events::OccupancyChanged::Type event;
         event.occupancy = mOccupancy;
                     mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);    }
+}
+
+bool OccupancySensingCluster::IsOccupied() const
+{
+    return mOccupancy.Has(OccupancySensing::OccupancyBitmap::kOccupied);
 }
 
 void OccupancySensingCluster::SetHoldTimeLimits(const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & holdTimeLimits)

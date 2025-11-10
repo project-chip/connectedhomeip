@@ -110,6 +110,11 @@ TEST_F(TestOccupancySensingCluster, TestSetHoldTime)
 
     // Verify that we cannot set a hold time greater than the maximum
     EXPECT_EQ(cluster.SetHoldTime(250), Protocols::InteractionModel::Status::ConstraintError);
+
+    // Verify that SetHoldTime returns UnsupportedAttribute if mHasHoldTime is false
+    OccupancySensingCluster clusterNoHoldTime{OccupancySensingCluster::Config{kTestEndpointId}};
+    EXPECT_EQ(clusterNoHoldTime.Startup(context.Get()), CHIP_NO_ERROR);
+    EXPECT_EQ(clusterNoHoldTime.SetHoldTime(10), Protocols::InteractionModel::Status::UnsupportedAttribute);
 }
 
 TEST_F(TestOccupancySensingCluster, TestWriteHoldTimeAttribute)
@@ -517,16 +522,19 @@ TEST_F(TestOccupancySensingCluster, TestSetOccupancy)
     // Verify that the initial state is unoccupied
     EXPECT_EQ(tester.ReadAttribute(Attributes::Occupancy::Id, occupancy), CHIP_NO_ERROR);
     EXPECT_EQ(occupancy, kOccupancyUnoccupied);
+    EXPECT_FALSE(cluster.IsOccupied());
 
     // Set to occupied and verify
     cluster.SetOccupancy(true);
     EXPECT_EQ(tester.ReadAttribute(Attributes::Occupancy::Id, occupancy), CHIP_NO_ERROR);
     EXPECT_EQ(occupancy, OccupancySensing::OccupancyBitmap::kOccupied);
+    EXPECT_TRUE(cluster.IsOccupied());
 
     // Set to unoccupied and verify
     cluster.SetOccupancy(false);
     EXPECT_EQ(tester.ReadAttribute(Attributes::Occupancy::Id, occupancy), CHIP_NO_ERROR);
     EXPECT_EQ(occupancy, kOccupancyUnoccupied);
+    EXPECT_FALSE(cluster.IsOccupied());
 }
 
 TEST_F(TestOccupancySensingCluster, TestOccupancyChangedEvent)

@@ -57,6 +57,7 @@ public:
     DataModel::ActionReturnStatus SetHoldTime(uint16_t holdTime);
     void SetHoldTimeLimits(const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & holdTimeLimits);
     void SetOccupancy(bool occupied);
+    bool IsOccupied() const;
 
     uint16_t GetHoldTime() const;
     const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & GetHoldTimeLimits() const;
