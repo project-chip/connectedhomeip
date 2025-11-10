@@ -189,6 +189,15 @@ public:
                 // A status response was added. Use the last one.
                 result.status = app::DataModel::ActionReturnStatus(mHandler.GetLastStatus().status);
             }
+            else
+            {
+                // Neither response nor status was provided; this is unexpected.
+                // This would happen either in error (as mentioned here) or if the command is supposed
+                // to be handled asynchronously. ClusterTester does not support such asynchronous processing.
+                result.status = app::DataModel::ActionReturnStatus(CHIP_ERROR_INCORRECT_STATE);
+                ChipLogError(
+                    Test, "InvokeCommand returned nullopt, but neither HasResponse nor HasStatus is true. Setting error status.");
+            }
         }
 
         // If command was successful and there's a response, decode it (skip for NullObjectType)
