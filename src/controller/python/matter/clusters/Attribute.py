@@ -589,9 +589,10 @@ class SubscriptionTransaction:
         Sets the callback function that gets invoked when a report data message is sent. The callback
         is expected to have the following signature:
             def Callback()
+        
+        If set to None, the callback will be unset and no longer invoked.
         '''
-        if callback is not None:
-            self._readTransaction.register_notify_subscription_still_active_callback(callback)
+        self._readTransaction.register_notify_subscription_still_active_callback(callback)
 
     @property
     def OnAttributeChangeCb(self) -> Callable[[TypedAttributePath, SubscriptionTransaction], None]:
@@ -709,6 +710,7 @@ class AsyncReadTransaction:
         self._changedPathSet: Set[AttributePath] = set()
         self._pReadClient = None
         self._resultError: Optional[PyChipError] = None
+        self._notify_subscription_still_active_callback = None
 
     def SetClientObjPointers(self, pReadClient):
         self._pReadClient = pReadClient
@@ -878,12 +880,7 @@ class AsyncReadTransaction:
     def handleReportEnd(self):
         self._handleReportEnd()
 
-    # def _handleNotifySubscriptionStillActive(self):
-    #     if self._notify_subscription_still_active_callback:
-    #         self._notify_subscription_still_active_callback()
-
     def handleNotifySubscriptionStillActive(self):
-        # self._handleNotifySubscriptionStillActive()
         if self._notify_subscription_still_active_callback:
             self._notify_subscription_still_active_callback()
 
