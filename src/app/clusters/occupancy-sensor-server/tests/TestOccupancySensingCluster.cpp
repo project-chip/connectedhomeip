@@ -100,6 +100,7 @@ TEST_F(TestOccupancySensingCluster, TestSetHoldTime)
     uint16_t holdTime;
     EXPECT_EQ(tester.ReadAttribute(Attributes::HoldTime::Id, holdTime), CHIP_NO_ERROR);
     EXPECT_EQ(holdTime, 150);
+    EXPECT_EQ(cluster.GetHoldTime(), 150);
 
     // Verify that setting the same value returns NoOp
     EXPECT_EQ(cluster.SetHoldTime(150), DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
@@ -124,6 +125,7 @@ TEST_F(TestOccupancySensingCluster, TestWriteHoldTimeAttribute)
     uint16_t holdTime;
     EXPECT_EQ(tester.ReadAttribute(Attributes::HoldTime::Id, holdTime), CHIP_NO_ERROR);
     EXPECT_EQ(holdTime, 150);
+    EXPECT_EQ(cluster.GetHoldTime(), 150);
 
     // Verify that PIROccupiedToUnoccupiedDelay is updated when HoldTime is written
     uint16_t pirOccupiedToUnoccupiedDelay;
@@ -173,6 +175,7 @@ TEST_F(TestOccupancySensingCluster, TestHoldTimePersistence)
         uint16_t holdTime;
         EXPECT_EQ(tester.ReadAttribute(Attributes::HoldTime::Id, holdTime), CHIP_NO_ERROR);
         EXPECT_EQ(holdTime, kDefaultHoldTime);
+        EXPECT_EQ(cluster.GetHoldTime(), kDefaultHoldTime);
     }
 
     // 2. Write a new value to the attribute. This should update the value in persistence.
@@ -183,6 +186,7 @@ TEST_F(TestOccupancySensingCluster, TestHoldTimePersistence)
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR); // Startup will load the default value again
         chip::Test::ClusterTester tester(cluster);
         EXPECT_EQ(tester.WriteAttribute(Attributes::HoldTime::Id, kNewHoldTime), CHIP_NO_ERROR);
+        EXPECT_EQ(cluster.GetHoldTime(), kNewHoldTime);
     }
 
     // 3. Create a new cluster instance. It should load the new value from persistence on startup.
@@ -196,6 +200,7 @@ TEST_F(TestOccupancySensingCluster, TestHoldTimePersistence)
         uint16_t holdTime;
         EXPECT_EQ(tester.ReadAttribute(Attributes::HoldTime::Id, holdTime), CHIP_NO_ERROR);
         EXPECT_EQ(holdTime, kNewHoldTime);
+        EXPECT_EQ(cluster.GetHoldTime(), kNewHoldTime);
     }
 }
 
@@ -563,6 +568,9 @@ TEST_F(TestOccupancySensingCluster, TestSetHoldTimeLimits)
     EXPECT_EQ(readHoldTimeLimits.holdTimeMin, newHoldTimeLimits.holdTimeMin);
     EXPECT_EQ(readHoldTimeLimits.holdTimeMax, newHoldTimeLimits.holdTimeMax);
     EXPECT_EQ(readHoldTimeLimits.holdTimeDefault, newHoldTimeLimits.holdTimeDefault);
+    EXPECT_EQ(cluster.GetHoldTimeLimits().holdTimeMin, newHoldTimeLimits.holdTimeMin);
+    EXPECT_EQ(cluster.GetHoldTimeLimits().holdTimeMax, newHoldTimeLimits.holdTimeMax);
+    EXPECT_EQ(cluster.GetHoldTimeLimits().holdTimeDefault, newHoldTimeLimits.holdTimeDefault);
 }
 
 } // namespace

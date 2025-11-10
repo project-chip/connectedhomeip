@@ -267,4 +267,14 @@ void OccupancySensingCluster::SetHoldTimeLimits(const OccupancySensing::Structs:
     }
 }
 
+uint16_t OccupancySensingCluster::GetHoldTime() const
+{
+    return mHoldTime;
+}
+
+const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & OccupancySensingCluster::GetHoldTimeLimits() const
+{
+    return mHoldTimeLimits;
+}
+
 } // namespace chip::app::Clusters
