@@ -873,8 +873,8 @@ void WifiInterfaceImpl::ConnectionEventCallback(sl_wfx_connect_ind_body_t connec
     case WFM_STATUS_SUCCESS: {
         ChipLogProgress(DeviceLayer, "STA-Connected");
 
-        uint8_t * mac   = connect_indication_body.mac;
-        ap_info.chan    = connect_indication_body.channel;
+        uint8_t * mac = connect_indication_body.mac;
+        ap_info.chan  = connect_indication_body.channel;
         chip::ByteSpan securitySpan(reinterpret_cast<const uint8_t *>(&wifi_provision.security), sizeof(wifi_provision.security));
         chip::MutableByteSpan apSecurityMutableSpan(reinterpret_cast<uint8_t *>(&ap_info.security), sizeof(ap_info.security));
         chip::CopySpanToMutableSpan(securitySpan, apSecurityMutableSpan);
