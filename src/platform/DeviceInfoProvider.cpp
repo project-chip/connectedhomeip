@@ -112,10 +112,7 @@ DeviceInfoProvider * GetDeviceInfoProvider()
  */
 void SetDeviceInfoProvider(DeviceInfoProvider * provider)
 {
-    if (provider)
-    {
-        gDeviceInfoProvider = provider;
-    }
+    gDeviceInfoProvider = provider;
 }
 
 } // namespace DeviceLayer

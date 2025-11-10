@@ -206,7 +206,7 @@ protected:
  *
  * Callers have to externally synchronize usage of this function.
  *
- * @return The global Device Info Provider. Assume never null.
+ * @return The global Device Info Provider.
  */
 DeviceInfoProvider * GetDeviceInfoProvider();
 
@@ -214,8 +214,6 @@ DeviceInfoProvider * GetDeviceInfoProvider();
  * Instance setter for the global DeviceInfoProvider.
  *
  * Callers have to externally synchronize usage of this function.
- *
- * If the `provider` is nullptr, no change is done.
  *
  * @param[in] provider the Device Info Provider
  */
