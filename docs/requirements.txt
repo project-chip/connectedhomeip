@@ -1,4 +1,4 @@
-docutils==0.21.2
+docutils==0.22.3
 Sphinx==8.2.3
 sphinx-book-theme
 sphinxcontrib-mermaid
