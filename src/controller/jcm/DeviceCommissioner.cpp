@@ -381,7 +381,7 @@ TrustVerificationError DeviceCommissioner::VerifyAdministratorInformation()
     }
 
     CATValues cats;
-    auto nocSpan = mInfo.adminNOC.Span();
+    auto nocSpan   = mInfo.adminNOC.Span();
     CHIP_ERROR err = ExtractCATsFromOpCert(nocSpan, cats);
 
     if ((err != CHIP_NO_ERROR) || !cats.ContainsIdentifier(kAdminCATIdentifier))
