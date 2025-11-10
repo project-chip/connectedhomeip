@@ -41,11 +41,12 @@ public:
 
 TEST_F(TestSystemScheduleLambda, CheckScheduleLambda)
 {
-    bool called = false;
-    EXPECT_SUCCESS(chip::DeviceLayer::SystemLayer().ScheduleLambda([&called] {
+    bool called             = false;
+    CHIP_ERROR lambdaResult = chip::DeviceLayer::SystemLayer().ScheduleLambda([&called] {
         called = true;
         EXPECT_SUCCESS(chip::DeviceLayer::PlatformMgr().StopEventLoopTask());
-    }));
+    });
+    EXPECT_SUCCESS(lambdaResult);
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
     EXPECT_TRUE(called);
 }
