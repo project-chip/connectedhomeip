@@ -14,8 +14,8 @@
 
 import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
-import("${silabs_sdk_build_root}/efr32_sdk.gni")
 import("${chip_root}/src/platform/silabs/wifi/args.gni")  # for wifi_sdk_root
+import("${silabs_sdk_build_root}/efr32_sdk.gni")
 
 # Include paths required by the SiWx917 NCP sources (BLE bits from WiFi SDK)
 config("siwx-ncp-config") {
@@ -34,44 +34,48 @@ config("siwx-ncp-config") {
 
 source_set("siwx-ncp") {
   sources = [
-    "${chip_root}/src/platform/silabs/wifi/SiWx/ncp/sl_si91x_ncp_utility.c",
-    "${chip_root}/src/platform/silabs/wifi/SiWx/ncp/sl_board_configuration.h",
-    "${chip_root}/src/platform/silabs/wifi/ncp/spi_multiplex.h",
     # TODO: Prefer using Wiseconnect SDK provided host file instead of this copy
     "${chip_root}/src/platform/silabs/wifi/SiWx/ncp/efx32_ncp_host.c",
+    "${chip_root}/src/platform/silabs/wifi/SiWx/ncp/sl_board_configuration.h",
+    "${chip_root}/src/platform/silabs/wifi/SiWx/ncp/sl_si91x_ncp_utility.c",
+    "${chip_root}/src/platform/silabs/wifi/ncp/spi_multiplex.h",
   ]
 
   sources += [
+    # si91x_support component
     # sl_si91x_wireless component
-    "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sl_si91x_driver.c",
-    "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sl_rsi_utility.c",
+    "${wifi_sdk_root}/components/common/src/sl_utility.c",
+
+    # si91x_basic_buffers component
+    "${wifi_sdk_root}/components/device/silabs/si91x/wireless/memory/malloc_buffers.c",
+    "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ncp_interface/sl_si91x_ncp_driver.c",
+    "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ncp_interface/spi/sl_si91x_spi.c",
     "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/src/sl_net_rsi_utility.c",
     "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/src/sl_net_si91x_callback_framework.c",
     "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/src/sl_net_si91x_integration_handler.c",
     "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/src/sli_net_si91x_utility.c",
-    "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ncp_interface/spi/sl_si91x_spi.c",
-    "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ncp_interface/sl_si91x_ncp_driver.c",
-    "${wifi_sdk_root}/components/sli_si91x_wifi_event_handler/src/sli_si91x_wifi_event_handler.c",
-    "${wifi_sdk_root}/components/sli_wifi_command_engine/src/sli_wifi_command_engine.c",
+    "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sl_rsi_utility.c",
+    "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sl_si91x_driver.c",
+    "${wifi_sdk_root}/components/protocol/wifi/si91x/sl_wifi.c",
+
     # wifi component
     "${wifi_sdk_root}/components/protocol/wifi/src/sl_wifi_basic_credentials.c",
     "${wifi_sdk_root}/components/protocol/wifi/src/sl_wifi_callback_framework.c",
-    "${wifi_sdk_root}/components/protocol/wifi/si91x/sl_wifi.c",
-    # basic_network_manager component
-    "${wifi_sdk_root}/components/service/network_manager/src/sl_net_credentials.c",
-    "${wifi_sdk_root}/components/service/network_manager/src/sl_net_basic_profiles.c",
-    "${wifi_sdk_root}/components/service/network_manager/src/sl_net_for_lwip.c",
-    # si91x_basic_buffers component
-    "${wifi_sdk_root}/components/device/silabs/si91x/wireless/memory/malloc_buffers.c",
-    # si91x_support component
-    "${wifi_sdk_root}/components/common/src/sl_utility.c",
+    "${wifi_sdk_root}/components/service/network_manager/src/sl_net.c",
+
     # network_manager component
     "${wifi_sdk_root}/components/service/network_manager/src/sl_net_basic_certificate_store.c",
-    "${wifi_sdk_root}/components/service/network_manager/src/sl_net.c",
+    "${wifi_sdk_root}/components/service/network_manager/src/sl_net_basic_profiles.c",
+
+    # basic_network_manager component
+    "${wifi_sdk_root}/components/service/network_manager/src/sl_net_credentials.c",
+    "${wifi_sdk_root}/components/service/network_manager/src/sl_net_for_lwip.c",
     "${wifi_sdk_root}/components/service/network_manager/src/sli_net_common_utility.c",
+    "${wifi_sdk_root}/components/sli_si91x_wifi_event_handler/src/sli_si91x_wifi_event_handler.c",
+    "${wifi_sdk_root}/components/sli_wifi_command_engine/src/sli_wifi_command_engine.c",
   ]
 
-  public_configs = [ ":siwx-ncp-config"]
+  public_configs = [ ":siwx-ncp-config" ]
 
   deps = [ "${chip_root}/src/platform:platform_base" ]
 }

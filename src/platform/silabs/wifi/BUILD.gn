@@ -41,7 +41,7 @@ if (chip_enable_wifi && !wifi_soc && !sl_build_unit_tests) {
   assert(use_wf200 || use_SiWx917)
   import("${chip_root}/src/platform/silabs/wifi/args.gni")
 
- if (use_wf200) {
+  if (use_wf200) {
     import("${silabs_platform_dir}/wifi/wf200/wf200.gni")
   }
 }
