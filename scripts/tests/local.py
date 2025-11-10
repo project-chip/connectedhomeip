@@ -352,7 +352,7 @@ __RUNNERS__ = {
 __LOG_LEVELS__ = {
     "debug": logging.DEBUG,
     "info": logging.INFO,
-    "warn": logging.WARN,
+    "warn": logging.WARNING,
     "fatal": logging.FATAL,
 }
 
@@ -457,7 +457,7 @@ def _do_build_basic_apps(coverage: Optional[bool]):
     """
     logging.info("Building example apps...")
 
-    all_targets = dict([(t.key, t) for t in _get_targets(coverage)])
+    all_targets = {t.key: t for t in _get_targets(coverage)}
     targets = [
         all_targets["CHIP_TOOL"].target,
         all_targets["ALL_CLUSTERS_APP"].target,
@@ -574,7 +574,7 @@ class FilterList:
     filters: list[GlobFilter]
 
     def any_matches(self, txt: str) -> bool:
-        return any([f.matches(txt) for f in self.filters])
+        return any(f.matches(txt) for f in self.filters)
 
 
 def _parse_filters(entry: str) -> FilterList:
@@ -905,12 +905,12 @@ def python_tests(
         os.mkdir(fail_log_dir)
 
     metadata = yaml.full_load(open("src/python_testing/test_metadata.yaml"))
-    excluded_patterns = set([item["name"] for item in metadata["not_automated"]])
+    excluded_patterns = {item["name"] for item in metadata["not_automated"]}
 
     # NOTE: for slow tests. we add logs to not get impatient
-    slow_test_duration = dict(
-        [(item["name"], item["duration"]) for item in metadata["slow_tests"]]
-    )
+    slow_test_duration = {
+        item["name"]: item["duration"] for item in metadata["slow_tests"]
+    }
 
     if not os.path.isdir("src/python_testing"):
         raise Exception(
@@ -997,8 +997,8 @@ def python_tests(
                             f.write(result.stderr)
 
                     else:
-                        logging.info("STDOUT:\n%s", result.stdout.decode("utf8"))
-                        logging.warning("STDERR:\n%s", result.stderr.decode("utf8"))
+                        logging.info("STDOUT:\n%s", result.stdout.decode("utf8", errors='replace'))
+                        logging.warning("STDERR:\n%s", result.stderr.decode("utf8", errors='replace'))
                     if not keep_going:
                         sys.exit(1)
                     failed_tests.append(script)
@@ -1233,9 +1233,9 @@ def chip_tool_tests(
     cmd.extend(["--exclude-tags", "EXTRA_SLOW"])
     cmd.extend(["--exclude-tags", "PURPOSEFUL_FAILURE"])
 
-    paths = dict(
-        [(t.key, f"./out/{t.target}/{t.binary}") for t in _get_targets(coverage)]
-    )
+    paths = {
+        t.key: f"./out/{t.target}/{t.binary}" for t in _get_targets(coverage)
+    }
 
     if runner == BinaryRunner.COVERAGE:
         # when running with coveage, chip-tool also is covered

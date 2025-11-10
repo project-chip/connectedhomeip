@@ -170,7 +170,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         # Write the Attribute
         resp = await controller.WriteAttribute(
             attributes=[(endpoint, ota_providers_attr)],
-            nodeid=requestor_node_id,
+            nodeId=requestor_node_id,
         )
         asserts.assert_equal(resp[0].Status, Status.Success, "Failed to write Default OTA Providers Attribute")
 
@@ -186,7 +186,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         """Verify the version from the BasicInformationCluster and compares against the provider target version.
 
         Args:
-            controller (ChipDeviceCtrl): Controller 
+            controller (ChipDeviceCtrl): Controller
             node_id (int): Node to request
             target_version (int): Version to compare
         """
@@ -297,6 +297,6 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         acl_attribute = Clusters.AccessControl.Attributes.Acl(acl_entries)
 
         return dev_ctrl.WriteAttribute(
-            nodeid=provider_node_id,
+            nodeId=provider_node_id,
             attributes=[(0, acl_attribute)]
         )
