@@ -36,7 +36,7 @@ public:
     CHIP_ERROR Start(std::string & path, std::string & path_out, NamedPipeCommandDelegate * delegate);
     CHIP_ERROR Stop();
     void WriteToOutPipe(const std::string & json);
-    const str::string & OutPath() const { return mChipEventFifoPathOut; }
+    const std::string & OutPath() const { return mChipEventFifoPathOut; }
 
 private:
     bool mStarted = false;
