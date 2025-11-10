@@ -35,7 +35,7 @@ bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster,
 /// This function retrieves the accepted commands for the first path returned by `cluster.GetPaths()`
 /// and compares them against the `expected` list of items.
 ///
-/// Parameter:
+/// Parameters:
 ///     cluster - The cluster interface to test.
 ///     expected - An initializer list of expected accepted command entries. May be empty.
 ///
