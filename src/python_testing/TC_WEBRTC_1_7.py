@@ -270,7 +270,7 @@ async def webrtc_create_test_harness_controller(self):
     self.th1 = self.default_controller
     self.discriminator = random.randint(0, 4095)
     params = await self.th1.OpenCommissioningWindow(
-        nodeid=self.dut_node_id, timeout=900, iteration=10000, discriminator=self.discriminator, option=1)
+        nodeId=self.dut_node_id, timeout=900, iteration=10000, discriminator=self.discriminator, option=1)
 
     th2_certificate_authority = (
         self.certificate_authority_manager.NewCertificateAuthority()

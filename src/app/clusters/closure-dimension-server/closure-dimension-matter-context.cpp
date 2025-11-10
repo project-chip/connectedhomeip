@@ -17,8 +17,9 @@
  */
 
 #include "closure-dimension-matter-context.h"
-
+#include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/reporting/reporting.h>
 
 namespace chip {
@@ -29,6 +30,9 @@ namespace ClosureDimension {
 void MatterContext::MarkDirty(const AttributeId attributeId)
 {
     MatterReportingAttributeChangeCallback(mEndpoint, Id, attributeId);
+
+    ConcreteAttributePath attributePath(mEndpoint, Id, attributeId);
+    MatterClosureDimensionClusterServerAttributeChangedCallback(attributePath);
 }
 
 } // namespace ClosureDimension

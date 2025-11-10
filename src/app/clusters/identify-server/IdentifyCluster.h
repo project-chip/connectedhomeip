@@ -17,9 +17,9 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/TimerDelegates.h>
 #include <app/reporting/reporting.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <lib/support/TimerDelegate.h>
 
 namespace chip::app::Clusters {
 
@@ -55,7 +55,7 @@ public:
     virtual bool IsTriggerEffectEnabled() const = 0;
 };
 
-class IdentifyCluster : public DefaultServerCluster, public reporting::TimerContext
+class IdentifyCluster : public DefaultServerCluster, public TimerContext
 {
 public:
     /**
@@ -76,9 +76,7 @@ public:
      */
     struct Config
     {
-        constexpr Config(EndpointId endpoint, reporting::ReportScheduler::TimerDelegate & delegate) :
-            endpointId(endpoint), timerDelegate(delegate)
-        {}
+        constexpr Config(EndpointId endpoint, TimerDelegate & delegate) : endpointId(endpoint), timerDelegate(delegate) {}
         constexpr Config & WithIdentifyType(Identify::IdentifyTypeEnum type)
         {
             identifyType = type;
@@ -102,7 +100,7 @@ public:
 
         EndpointId endpointId;
         Identify::IdentifyTypeEnum identifyType = Identify::IdentifyTypeEnum::kNone;
-        reporting::ReportScheduler::TimerDelegate & timerDelegate;
+        TimerDelegate & timerDelegate;
         IdentifyDelegate * identifyDelegate             = nullptr;
         Identify::EffectIdentifierEnum effectIdentifier = Identify::EffectIdentifierEnum::kBlink;
         Identify::EffectVariantEnum effectVariant       = Identify::EffectVariantEnum::kDefault;
@@ -144,7 +142,7 @@ private:
     IdentifyDelegate * mIdentifyDelegate;
     Identify::EffectIdentifierEnum mEffectIdentifier;
     Identify::EffectVariantEnum mEffectVariant;
-    reporting::ReportScheduler::TimerDelegate & mTimerDelegate;
+    TimerDelegate & mTimerDelegate;
 
     enum class IdentifyTimeChangeSource
     {

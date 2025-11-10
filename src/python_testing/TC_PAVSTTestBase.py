@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 
 
 class PAVSTTestBase:
-    DEFAULT_AV_TRANSPORT_EXPIRY_TIME = 30  # 30s
+    DEFAULT_AV_TRANSPORT_EXPIRY_TIME_SEC = 30  # 30 seconds
 
     async def read_pavst_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.PushAvStreamTransport
@@ -190,7 +190,7 @@ class PAVSTTestBase:
     async def allocate_one_pushav_transport(self, endpoint, triggerType=Clusters.PushAvStreamTransport.Enums.TransportTriggerTypeEnum.kContinuous,
                                             trigger_Options=None, ingestMethod=Clusters.PushAvStreamTransport.Enums.IngestMethodsEnum.kCMAFIngest,
                                             url="https://localhost:1234/streams/1/", stream_Usage=None, container_Options=None,
-                                            videoStream_ID=None, audioStream_ID=None, expected_cluster_status=None, tlsEndPoint=1, expiryTime=DEFAULT_AV_TRANSPORT_EXPIRY_TIME):
+                                            videoStream_ID=None, audioStream_ID=None, expected_cluster_status=None, tlsEndPoint=1, expiryTime=DEFAULT_AV_TRANSPORT_EXPIRY_TIME_SEC):
         endpoint = self.get_endpoint()
         cluster = Clusters.PushAvStreamTransport
 
@@ -403,7 +403,7 @@ class PAVSTTestBase:
         self.th1 = self.default_controller
         self.discriminator = random.randint(0, 4095)
         params = await self.th1.OpenCommissioningWindow(
-            nodeid=self.dut_node_id, timeout=900, iteration=10000, discriminator=self.discriminator, option=1)
+            nodeId=self.dut_node_id, timeout=900, iteration=10000, discriminator=self.discriminator, option=1)
 
         th2_certificate_authority = (
             self.certificate_authority_manager.NewCertificateAuthority()
@@ -432,7 +432,7 @@ class PAVSTTestBase:
     async def psvt_remove_current_fabric(self, devCtrl):
         fabric_idx_cr2_2 = await self.read_currentfabricindex(th=devCtrl)
         removeFabricCmd2 = Clusters.OperationalCredentials.Commands.RemoveFabric(fabric_idx_cr2_2)
-        resp = await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd2)
+        resp = await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=removeFabricCmd2)
         return resp
         asserts.assert_equal(
             resp.statusCode, Clusters.OperationalCredentials.Enums.NodeOperationalCertStatusEnum.kOk, "Expected removal of TH2's fabric to succeed")
