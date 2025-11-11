@@ -309,7 +309,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     // unsolicited messages must be marked as being from an initiator.
     if (!msgFlags.Has(MessageFlagValues::kDuplicateMessage) && payloadHeader.IsInitiator())
     {
-        // Search for an unsolicited messSage handler that can handle the message. Prefer handlers that can explicitly
+        // Search for an unsolicited message handler that can handle the message. Prefer handlers that can explicitly
         // handle the message type over handlers that handle all messages for a profile.
         matchingUMH = nullptr;
 
