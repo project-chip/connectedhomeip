@@ -391,8 +391,7 @@ void DnssdService::ToDiscoveredOperationalNodeBrowseData(DiscoveredNodeData & no
 {
     nodeData.Set<OperationalNodeBrowseData>();
 
-    ReturnAndLogOnFailure(ExtractIdFromInstanceName(mName, &nodeData.Get<OperationalNodeBrowseData>().peerId), Discovery,
-                          "Failed to extract peerId");
+    TEMPORARY_RETURN_IGNORED ExtractIdFromInstanceName(mName, &nodeData.Get<OperationalNodeBrowseData>().peerId);
     nodeData.Get<OperationalNodeBrowseData>().hasZeroTTL = (mTtlSeconds == 0);
 }
 
