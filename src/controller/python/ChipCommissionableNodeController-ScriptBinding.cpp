@@ -74,6 +74,7 @@ pychip_CommissionableNodeController_DiscoverCommissioners(chip::Controller::Comm
 void pychip_CommissionableNodeController_PrintDiscoveredCommissioners(
     chip::Controller::CommissionableNodeController * commissionableNodeCtrl)
 {
+#if CHIP_PROGRESS_LOGGING
     for (int i = 0; i < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES; ++i)
     {
         const chip::Dnssd::CommissionNodeData * dnsSdInfo = commissionableNodeCtrl->GetDiscoveredCommissioner(i);
@@ -142,4 +143,5 @@ void pychip_CommissionableNodeController_PrintDiscoveredCommissioners(
             ChipLogProgress(Discovery, "\tAddress %d:\t\t%s", j, buf);
         }
     }
+#endif
 }
