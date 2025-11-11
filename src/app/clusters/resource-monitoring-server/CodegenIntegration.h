@@ -21,8 +21,6 @@
 #include "resource-monitoring-cluster.h"
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 
-using namespace chip::app::Clusters::ResourceMonitoring;
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -46,10 +44,11 @@ struct Instance
      * @param aDegradationDirection            The degradation direction of the cluster.
      * @param resetConditionCommandSupported   Whether the ResetCondition command is supported by the cluster.
      */
-    Instance(Delegate * delegate, chip::EndpointId endpointId, chip::ClusterId clusterId, uint32_t featureMap,
-             DegradationDirectionEnum degradationDirection, bool resetConditionCommandSupported);
+    Instance(chip::app::Clusters::ResourceMonitoring::Delegate * delegate, chip::EndpointId endpointId, chip::ClusterId clusterId,
+             uint32_t featureMap, chip::app::Clusters::ResourceMonitoring::DegradationDirectionEnum degradationDirection,
+             bool resetConditionCommandSupported);
 
-    ~Instance();
+    virtual ~Instance();
 
     CHIP_ERROR Init() { return mCluster.Cluster().Init(); };
 
