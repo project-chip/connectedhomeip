@@ -50,8 +50,6 @@ config("wifi-platform-config") {
   defines = []
   include_dirs = []
 
-
-
   if (sl_enable_wifi_debug) {
     defines += [ "WIFI_DEBUG_ENABLED=1" ]
   } else {
@@ -90,9 +88,10 @@ config("wifi-platform-config") {
     defines += [ "DISPLAY_ENABLED" ]
   }
   if (use_SiWx917 || wifi_soc) {
-     include_dirs +=[ "${chip_root}/src/platform/silabs/SiWx/ble",
-     "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc",
-     ]
+    include_dirs += [
+      "${chip_root}/src/platform/silabs/SiWx/ble",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc",
+    ]
   }
 }
 
@@ -122,9 +121,7 @@ source_set("wifi-platform") {
 
   if (use_SiWx917) {
     public_deps += [ "${silabs_platform_dir}/wifi/SiWx/ncp:siwx-ncp" ]
-    sources += [
-      "${silabs_platform_dir}/wifi/SiWx/WifiInterfaceImpl.cpp",
-    ]
+    sources += [ "${silabs_platform_dir}/wifi/SiWx/WifiInterfaceImpl.cpp" ]
   } else if (use_wf200) {
     sources += wf200_plat_src
     sources += [
