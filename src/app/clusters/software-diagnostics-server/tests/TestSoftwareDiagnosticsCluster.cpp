@@ -95,7 +95,7 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)
 
         // Everything is unimplemented, so attributes are just the global ones.
         // This is really not a useful cluster, but possible...
-        EXPECT_TRUE(Testing::IsAttributesListEqualTo(cluster, app::DefaultServerCluster::GlobalAttributes()));
+        EXPECT_TRUE(Testing::IsAttributesListEqualTo(cluster, {}));
     }
 
     {
@@ -118,7 +118,7 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)
             SoftwareDiagnosticsLogic::OptionalAttributeSet().Set<Attributes::CurrentHeapHighWatermark::Id>());
         chip::Test::ClusterTester tester(cluster);
 
-        ASSERT_TRUE(Testing::IsAcceptedCommandsListEqualTo(cluster, { &Commands::ResetWatermarks::kMetadataEntry, 1 }));
+        ASSERT_TRUE(Testing::IsAcceptedCommandsListEqualTo(cluster, { Commands::ResetWatermarks::kMetadataEntry }));
 
         // feature map attribute
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap{};
@@ -126,12 +126,7 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)
         EXPECT_EQ(featureMap, BitFlags<SoftwareDiagnostics::Feature>{ SoftwareDiagnostics::Feature::kWatermarks }.Raw());
 
         // attribute list (only heap high watermark supported)
-        ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> expectedBuilder;
-        ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-        ASSERT_EQ(expectedBuilder.AppendElements({ SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::kMetadataEntry }),
-                  CHIP_NO_ERROR);
-
-        EXPECT_TRUE(Testing::IsAttributesListEqualTo(cluster, expectedBuilder.TakeBuffer()));
+        EXPECT_TRUE(Testing::IsAttributesListEqualTo(cluster, { SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::kMetadataEntry }));
 
         // Call the command, and verify it calls through to the provider
         EXPECT_FALSE(watermarksProvider.GetProvider().resetCalled);
@@ -185,23 +180,18 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)
         chip::Test::ClusterTester tester(cluster);
 
         // accepted commands list
-        ASSERT_TRUE(Testing::IsAcceptedCommandsListEqualTo(cluster, { &Commands::ResetWatermarks::kMetadataEntry, 1 }));
+        ASSERT_TRUE(Testing::IsAcceptedCommandsListEqualTo(cluster, { Commands::ResetWatermarks::kMetadataEntry }));
 
         // generated commands list
         EXPECT_TRUE(Testing::IsGeneratedCommandsListEqualTo(cluster, {}));
 
         // attribute list
-        ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> expectedBuilder;
-        ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-        ASSERT_EQ(expectedBuilder.AppendElements({
+        ASSERT_TRUE(Testing::IsAttributesListEqualTo(cluster, {
                       SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::kMetadataEntry,
                       SoftwareDiagnostics::Attributes::CurrentHeapFree::kMetadataEntry,
                       SoftwareDiagnostics::Attributes::CurrentHeapUsed::kMetadataEntry,
                       SoftwareDiagnostics::Attributes::ThreadMetrics::kMetadataEntry,
-                  }),
-                  CHIP_NO_ERROR);
-
-        ASSERT_TRUE(Testing::IsAttributesListEqualTo(cluster, expectedBuilder.TakeBuffer()));
+                  }));
 
         // Test all attributes
         // cluster revision
