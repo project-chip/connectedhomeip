@@ -396,8 +396,8 @@ class TC_CC_10_1(MatterBaseTest):
         self.step("6c")
         if self.pics_guard(self.check_pics("CC.S.F00")):
             CurrentSaturation = await self.read_single_attribute_check_success(cluster, attributes.CurrentSaturation)
-            asserts.assert_less_equal(CurrentSaturation, 0xEF, "CurrentSaturation is above limit")
-            asserts.assert_greater_equal(CurrentSaturation, 0xD0, "CurrentSaturation is below limit")
+            asserts.assert_less_equal(CurrentSaturation, 0xE8, "CurrentSaturation is above limit")
+            asserts.assert_greater_equal(CurrentSaturation, 0xD8, "CurrentSaturation is below limit")
 
         self.step("7a")
         if self.pics_guard(self.check_pics("CC.S.F03")):
