@@ -106,7 +106,7 @@ public:
     void Shutdown() override { mShutdownCalls++; }
 
     uint32_t GetStartupCallCount() const { return mStartupCalls; }
-    uint32_t GetShutdownCallCout() const { return mShutdownCalls; }
+    uint32_t GetShutdownCallCount() const { return mShutdownCalls; }
 
 private:
     uint32_t mStartupCalls  = 0;
@@ -369,6 +369,9 @@ TEST_F(TestServerClusterInterfaceRegistry, StartupShutdownWithoutContext)
         EXPECT_EQ(cluster2.Cluster().GetStartupCallCount(), 0u);
 
         TestServerClusterContext context;
+
+        // the clusters are explicitly set to fail startup, so create SetContext returns an error.
+        // TODO: is this sane? Register() with a startup failure does NOT return a failure.
         EXPECT_EQ(registry.SetContext(context.Create()), CHIP_ERROR_HAD_FAILURES);
 
         // Startup called after registration, with failure that is NOT reported (only logged)
@@ -379,20 +382,20 @@ TEST_F(TestServerClusterInterfaceRegistry, StartupShutdownWithoutContext)
         EXPECT_EQ(cluster1.Cluster().GetStartupCallCount(), 1u);
         EXPECT_EQ(cluster2.Cluster().GetStartupCallCount(), 1u);
         EXPECT_EQ(cluster3.Cluster().GetStartupCallCount(), 1u);
-        EXPECT_EQ(cluster1.Cluster().GetShutdownCallCout(), 0u);
-        EXPECT_EQ(cluster2.Cluster().GetShutdownCallCout(), 0u);
-        EXPECT_EQ(cluster3.Cluster().GetShutdownCallCout(), 0u);
+        EXPECT_EQ(cluster1.Cluster().GetShutdownCallCount(), 0u);
+        EXPECT_EQ(cluster2.Cluster().GetShutdownCallCount(), 0u);
+        EXPECT_EQ(cluster3.Cluster().GetShutdownCallCount(), 0u);
 
         // unregister will call shutdown
         EXPECT_EQ(registry.Unregister(&cluster2.Cluster()), CHIP_NO_ERROR);
-        EXPECT_EQ(cluster2.Cluster().GetShutdownCallCout(), 1u);
+        EXPECT_EQ(cluster2.Cluster().GetShutdownCallCount(), 1u);
     }
 
     // registry deletion will call shutdown for the rest
     EXPECT_EQ(cluster1.Cluster().GetStartupCallCount(), 1u);
     EXPECT_EQ(cluster2.Cluster().GetStartupCallCount(), 1u);
     EXPECT_EQ(cluster3.Cluster().GetStartupCallCount(), 1u);
-    EXPECT_EQ(cluster1.Cluster().GetShutdownCallCout(), 1u);
-    EXPECT_EQ(cluster2.Cluster().GetShutdownCallCout(), 1u);
-    EXPECT_EQ(cluster3.Cluster().GetShutdownCallCout(), 1u);
+    EXPECT_EQ(cluster1.Cluster().GetShutdownCallCount(), 1u);
+    EXPECT_EQ(cluster2.Cluster().GetShutdownCallCount(), 1u);
+    EXPECT_EQ(cluster3.Cluster().GetShutdownCallCount(), 1u);
 }
