@@ -39,7 +39,8 @@ jobs:
     build_linux_gcc_debug:
         name: Build on Linux (gcc_debug)
 
-        runs-on: ubuntu-latest
+        # runs-on: ubuntu-latest
+        runs-on: namespace-profile-default
         if: github.actor != 'restyled-io[bot]'
 
         container:
@@ -149,7 +150,8 @@ jobs:
     build_linux:
         name: Build on Linux (fake, gcc_release, clang, simulated)
 
-        runs-on: ubuntu-latest
+        # runs-on: ubuntu-latest
+        runs-on: namespace-profile-default
         if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
 
         container:

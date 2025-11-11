@@ -34,7 +34,8 @@ jobs:
     linux_standalone:
         name: Linux Standalone
 
-        runs-on: ubuntu-latest
+        # runs-on: ubuntu-latest
+        runs-on: namespace-profile-default
         if: github.actor != 'restyled-io[bot]'
 
         container:
