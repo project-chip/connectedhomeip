@@ -233,6 +233,30 @@ DataModel::ActionReturnStatus OccupancySensingCluster::SetHoldTime(uint16_t hold
 
     mHoldTime = holdTime;
 
+    // If a timer is currently active, we need to adjust its duration to reflect the new hold time.
+    if (mTimerDelegate && mTimerDelegate->IsTimerActive(this))
+    {
+        // Calculate the time that has already elapsed since the timer was started.
+        System::Clock::Timestamp now           = mTimerDelegate->GetCurrentMonotonicTimestamp();
+        System::Clock::Timestamp elapsedTime   = now - mTimerStartedTimestamp;
+        System::Clock::Seconds16 newHoldTime16 = System::Clock::Seconds16(mHoldTime);
+
+        // If the elapsed time is already greater than or equal to the new hold time,
+        // the timer should have already fired. Cancel the current timer and immediately
+        // set the state to unoccupied.
+        if (elapsedTime >= newHoldTime16)
+        {
+            mTimerDelegate->CancelTimer(this);
+            DoSetOccupancy(false);
+        }
+        else
+        {
+            // Otherwise, restart the timer for the remaining duration.
+            System::Clock::Timeout remainingTime = newHoldTime16 - elapsedTime;
+            mTimerDelegate->StartTimer(this, remainingTime);
+        }
+    }
+
     if (mDelegate)
     {
         mDelegate->OnHoldTimeChanged(holdTime);
@@ -240,7 +264,8 @@ DataModel::ActionReturnStatus OccupancySensingCluster::SetHoldTime(uint16_t hold
 
     if (mContext != nullptr)
     {
-        CHIP_ERROR err = mContext->attributeStorage.WriteValue({ mPath.mEndpointId, OccupancySensing::Id, Attributes::HoldTime::Id }, { reinterpret_cast<const uint8_t *>(&mHoldTime), sizeof(mHoldTime) });
+        CHIP_ERROR err = mContext->attributeStorage.WriteValue({ mPath.mEndpointId, OccupancySensing::Id, Attributes::HoldTime::Id },
+                                                               { reinterpret_cast<const uint8_t *>(&mHoldTime), sizeof(mHoldTime) });
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "Failed to store holdTime in persistence: %" CHIP_ERROR_FORMAT, err.Format());
@@ -256,19 +281,17 @@ void OccupancySensingCluster::SetOccupancy(bool occupied)
     {
         if (occupied)
         {
-            // If the sensor is now occupied, cancel any pending timer to transition to unoccupied.
             mTimerDelegate->CancelTimer(this);
             DoSetOccupancy(true);
         }
         else
         {
-            // If the sensor is now unoccupied, start a timer to transition to unoccupied after the hold time.
+            mTimerStartedTimestamp = mTimerDelegate->GetCurrentMonotonicTimestamp();
             mTimerDelegate->StartTimer(this, System::Clock::Seconds16(mHoldTime));
         }
         return;
     }
 
-    // If hold time is not supported, just set the state directly.
     DoSetOccupancy(occupied);
 }
 

@@ -113,6 +113,7 @@ private:
     uint16_t mHoldTime;
     OccupancySensing::Structs::HoldTimeLimitsStruct::Type mHoldTimeLimits;
     BitMask<OccupancySensing::OccupancyBitmap> mOccupancy = 0;
+    System::Clock::Timestamp mTimerStartedTimestamp   = System::Clock::Milliseconds64(0);
 };
 
 } // namespace chip::app::Clusters

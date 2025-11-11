@@ -768,4 +768,69 @@ TEST_F(TestOccupancySensingCluster, TestOnHoldTimeChangedCallback)
     EXPECT_TRUE(onHoldTimeChangedCalled);
 }
 
+TEST_F(TestOccupancySensingCluster, TestHoldTimeDecreaseWithActiveTimer)
+{
+    chip::Test::TestServerClusterContext context;
+    constexpr uint16_t kInitialHoldTime = 20;
+    constexpr OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin = 1, .holdTimeMax = 100, .holdTimeDefault = 1 };
+    OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }
+                                         .WithHoldTime(kInitialHoldTime, holdTimeLimitsConfig, mMockTimerDelegate)
+                                         .WithDelegate(&gTestOccupancySensingDelegate) };
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    // 1. Set occupancy to true, then false to start the timer.
+    cluster.SetOccupancy(true);
+    cluster.SetOccupancy(false);
+    EXPECT_TRUE(cluster.IsOccupied());
+    EXPECT_TRUE(mMockTimerDelegate.IsTimerActive(&cluster));
+
+    // 2. Advance the clock by 10 seconds.
+    mMockTimerDelegate.AdvanceClock(System::Clock::Seconds16(10));
+    EXPECT_TRUE(cluster.IsOccupied());
+
+    // 3. Decrease the hold time to a value less than the elapsed time.
+    // This should cause an immediate transition to the unoccupied state.
+    constexpr uint16_t kDecreasedHoldTime = 5;
+    EXPECT_EQ(cluster.SetHoldTime(kDecreasedHoldTime), CHIP_NO_ERROR);
+    EXPECT_FALSE(cluster.IsOccupied());
+    EXPECT_FALSE(mMockTimerDelegate.IsTimerActive(&cluster));
+}
+
+TEST_F(TestOccupancySensingCluster, TestHoldTimeIncreaseWithActiveTimer)
+{
+    chip::Test::TestServerClusterContext context;
+    constexpr uint16_t kInitialHoldTime = 20;
+    constexpr OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin = 1, .holdTimeMax = 100, .holdTimeDefault = 1 };
+    OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }
+                                         .WithHoldTime(kInitialHoldTime, holdTimeLimitsConfig, mMockTimerDelegate)
+                                         .WithDelegate(&gTestOccupancySensingDelegate) };
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    // 1. Set occupancy to true, then false to start the timer.
+    cluster.SetOccupancy(true);
+    cluster.SetOccupancy(false);
+    EXPECT_TRUE(cluster.IsOccupied());
+
+    // 2. Advance the clock by 10 seconds.
+    mMockTimerDelegate.AdvanceClock(System::Clock::Seconds16(10));
+    EXPECT_TRUE(cluster.IsOccupied());
+
+    // 3. Increase the hold time. The timer should be restarted for the remaining duration.
+    constexpr uint16_t kIncreasedHoldTime = 30;
+    EXPECT_EQ(cluster.SetHoldTime(kIncreasedHoldTime), CHIP_NO_ERROR);
+    EXPECT_TRUE(cluster.IsOccupied());
+    EXPECT_TRUE(mMockTimerDelegate.IsTimerActive(&cluster));
+
+    // 4. Advance the clock by another 19 seconds. The state should still be occupied,
+    // as the total elapsed time is 29s, which is less than the new hold time of 30s.
+    mMockTimerDelegate.AdvanceClock(System::Clock::Seconds16(19));
+    EXPECT_TRUE(cluster.IsOccupied());
+
+    // 5. Advance the clock by 1 more second. The total elapsed time is now 30 seconds,
+    // so the state should transition to unoccupied.
+    mMockTimerDelegate.AdvanceClock(System::Clock::Seconds16(1));
+    EXPECT_FALSE(cluster.IsOccupied());
+    EXPECT_FALSE(mMockTimerDelegate.IsTimerActive(&cluster));
+}
+
 } // namespace
