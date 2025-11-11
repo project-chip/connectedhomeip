@@ -36,7 +36,7 @@ template <typename T, size_t kMaxSize>
 class CTC_UnorderedSet : public pw::Vector<T, kMaxSize>
 {
 public:
-    using Base = pw::Vector<T, kMaxSize>;
+    using Base =        pw::Vector<T, kMaxSize>;
     using ValueType     = T;
     using Iterator      = typename Base::iterator;
     using ConstIterator = typename Base::const_iterator;
@@ -115,7 +115,7 @@ template <typename Key, typename Value, size_t kMaxSize>
 class CTC_UnorderedMap : public CTC_UnorderedSet<std::pair<Key, Value>, kMaxSize>
 {
 public:
-    using Base = CTC_UnorderedSet<std::pair<Key, Value>, kMaxSize>;
+    using Base          = CTC_UnorderedSet<std::pair<Key, Value>, kMaxSize>;
     using PairType      = std::pair<Key, Value>;
     using Iterator      = typename Base::iterator;
     using ConstIterator = typename Base::const_iterator;
@@ -123,7 +123,14 @@ public:
     CTC_UnorderedMap() = default;
 
     // Modifiers
-    bool insert(const Key & key, const Value & value) { return insert(std::make_pair(key, value)); }
+    bool insert(const Key & key, const Value & value)
+    {
+        if (contains(key) || this->full())
+        {
+            return false;
+        }
+        return Base::insert(std::make_pair(key, value));
+    }
 
     // Lookup
     bool contains(const Key & key) const { return find(key) != this->end(); }
@@ -155,17 +162,8 @@ public:
             assert(!this->full());
         }
 
-        insert({ key, Value{} });
+        Base::insert({ key, Value{} });
         return this->back().second;
-    }
-private:
-    bool insert(PairType && pair)
-    {
-        if (contains(pair.first) || this->full())
-        {
-            return false;
-        }
-        return insert(std::move(pair));
     }
 };
 
