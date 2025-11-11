@@ -156,6 +156,17 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run16:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --manual-code 10054912339
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 # Run 1: runs through all tests
@@ -173,6 +184,7 @@
 # Run 13: Tests against chip-rvc app
 # Run 14: Tests against network-management-app
 # Run 15: Tests against lighting-app-data-mode-no-unique-id
+# Run 16: Tests against all-devices-app
 
 import logging
 from dataclasses import dataclass
