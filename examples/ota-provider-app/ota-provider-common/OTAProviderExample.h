@@ -95,12 +95,12 @@ public:
     uint32_t GetProductId() const { return mProductId; }
     uint16_t GetHardwareVersion() const { return mHardwareVersion; }
     uint32_t GetSoftwareVersion() const { return mRequestorSoftwareVersion; }
-    const std::vector<chip::app::Clusters::OtaSoftwareUpdateProvider::DownloadProtocolEnum>& GetProtocolsSupported() const
+    const std::vector<chip::app::Clusters::OtaSoftwareUpdateProvider::DownloadProtocolEnum> & GetProtocolsSupported() const
     {
         return mProtocolsSupported;
     }
     bool GetRequestorCanConsent() const { return mRequestorCanConsent; }
-    const std::string& GetLocation() const { return mLocation; }
+    const std::string & GetLocation() const { return mLocation; }
 
 private:
     bool SelectOTACandidate(const uint16_t requestorVendorID, const uint16_t requestorProductID,

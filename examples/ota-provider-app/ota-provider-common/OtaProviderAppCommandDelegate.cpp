@@ -48,7 +48,7 @@ OtaProviderAppCommandHandler * OtaProviderAppCommandHandler::FromJSON(const char
         return nullptr;
     }
 
-    return chip::Platform::New<OtaProviderAppCommandHandler>(std::move(value), delegate);
+    return Platform::New<OtaProviderAppCommandHandler>(std::move(value), delegate);
 }
 
 static std::string ToString(const Json::Value & v)
@@ -72,7 +72,7 @@ Json::Value OtaProviderAppCommandHandler::BuildOtaProviderSnapshot(uint16_t endp
     const auto & protos = gOtaProvider.GetProtocolsSupported();
 
     Json::Value arr(Json::arrayValue);
-    for (chip::app::Clusters::OtaSoftwareUpdateProvider::DownloadProtocolEnum p : protos)
+    for (OtaSoftwareUpdateProvider::DownloadProtocolEnum p : protos)
     {
         arr.append(Json::UInt(p));
     }
@@ -123,7 +123,7 @@ void OtaProviderAppCommandHandler::HandleCommand(intptr_t context)
     }
 
 exit:
-    chip::Platform::Delete(self);
+    Platform::Delete(self);
 }
 
 void OtaProviderAppCommandDelegate::OnEventCommandReceived(const char * json)
@@ -135,5 +135,5 @@ void OtaProviderAppCommandDelegate::OnEventCommandReceived(const char * json)
         return;
     }
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(OtaProviderAppCommandHandler::HandleCommand, reinterpret_cast<intptr_t>(handler));
+    PlatformMgr().ScheduleWork(OtaProviderAppCommandHandler::HandleCommand, reinterpret_cast<intptr_t>(handler));
 }

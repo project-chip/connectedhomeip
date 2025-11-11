@@ -824,7 +824,8 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         LinuxDeviceOptions::GetInstance().subscriptionCapacity = static_cast<int32_t>(strtol(aValue, nullptr, 10));
         break;
     case kDeviceOption_SubscriptionResumptionRetryIntervalSec:
-        LinuxDeviceOptions::GetInstance().subscriptionResumptionRetryIntervalSec = static_cast<int32_t>(strtol(aValue, nullptr , 10));
+        LinuxDeviceOptions::GetInstance().subscriptionResumptionRetryIntervalSec =
+            static_cast<int32_t>(strtol(aValue, nullptr, 10));
         break;
     case kDeviceOption_IdleRetransmitTimeout: {
         auto mrpConfig            = GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig());
