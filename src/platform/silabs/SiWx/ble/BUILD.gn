@@ -20,15 +20,14 @@ config("siwx-ble-config") {
   defines = []
   include_dirs = []
 
-  include_dirs = [ "${silabs_platform_dir}/SiWx/ble",
-  "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc",
-   ]
+  include_dirs = [
+    "${silabs_platform_dir}/SiWx/ble",
+    "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc",
+  ]
 }
 
 source_set("siwx-ble") {
   sources = [
-    "BLEManagerImpl.cpp",
-    "sl_si91x_ble_init.cpp",
     "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_ble_gap_apis.c",
     "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_ble_gatt_apis.c",
     "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_bt_ble.c",
@@ -36,6 +35,8 @@ source_set("siwx-ble") {
     "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_common_apis.c",
     "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_utils.c",
     "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/sl_si91x_ble.c",
+    "BLEManagerImpl.cpp",
+    "sl_si91x_ble_init.cpp",
   ]
 
   public_configs = [ ":siwx-ble-config" ]

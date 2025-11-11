@@ -50,8 +50,6 @@ config("wifi-platform-config") {
   defines = []
   include_dirs = []
 
-
-
   if (sl_enable_wifi_debug) {
     defines += [ "WIFI_DEBUG_ENABLED=1" ]
   } else {
@@ -90,9 +88,10 @@ config("wifi-platform-config") {
     defines += [ "DISPLAY_ENABLED" ]
   }
   if (use_SiWx917 || wifi_soc) {
-     include_dirs +=[ "${chip_root}/src/platform/silabs/SiWx/ble",
-     "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc",
-     ]
+    include_dirs += [
+      "${chip_root}/src/platform/silabs/SiWx/ble",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc",
+    ]
   }
 }
 

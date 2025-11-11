@@ -654,10 +654,9 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/service/network_manager/src/sl_net_basic_certificate_store.c",
 
       # basic_network_manager component
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/crypto/trng/src/sl_si91x_trng.c",
       "${wifi_sdk_root}/components/service/network_manager/src/sl_net_basic_profiles.c",
       "${wifi_sdk_root}/components/service/network_manager/src/sl_net_credentials.c",
-
-      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/crypto/trng/src/sl_si91x_trng.c",
 
       # si91x_basic_buffers component
       "${wifi_sdk_root}/components/board/silabs/src/rsi_board.c",

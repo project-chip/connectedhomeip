@@ -22,7 +22,6 @@ import("${chip_root}/third_party/silabs/efr32_sdk.gni")
 import("${chip_root}/third_party/silabs/silabs_board.gni")
 import("${matter_support_root}/provision/args.gni")
 
-
 assert(chip_device_platform == "efr32")
 
 if (chip_enable_openthread) {
