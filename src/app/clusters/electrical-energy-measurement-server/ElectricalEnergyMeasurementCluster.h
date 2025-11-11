@@ -61,7 +61,8 @@ public:
     {
         constexpr Config(EndpointId endpoint, BitMask<ElectricalEnergyMeasurement::Feature> featureFlags,
                          OptionalAttributesSet & optionalAttributes) :
-            endpointId(endpoint), mFeatureFlags(featureFlags), mEnabledOptionalAttributes(optionalAttributes)
+            endpointId(endpoint),
+            mFeatureFlags(featureFlags), mEnabledOptionalAttributes(optionalAttributes)
         {}
 
         EndpointId endpointId;

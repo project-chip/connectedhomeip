@@ -44,7 +44,8 @@ using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Structs;
 ElectricalEnergyMeasurementAttrAccess::ElectricalEnergyMeasurementAttrAccess(BitMask<Feature> aFeature,
                                                                              BitMask<OptionalAttributes> aOptionalAttrs,
                                                                              EndpointId endpointId) :
-    mEndpointId(endpointId), mCluster([&]() {
+    mEndpointId(endpointId),
+    mCluster([&]() {
         // Convert from BitMask<OptionalAttributes> to OptionalAttributesSet
         ElectricalEnergyMeasurementCluster::OptionalAttributesSet optionalAttributesSet;
         if (aOptionalAttrs.Has(OptionalAttributes::kOptionalAttributeCumulativeEnergyReset))
