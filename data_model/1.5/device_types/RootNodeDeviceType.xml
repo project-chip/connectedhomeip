@@ -125,14 +125,6 @@ Davis, CA 95616, USA
         <deprecateConform/>
       </otherwiseConform>
     </cluster>
-    <cluster id="0x002F" name="Power Source" side="server">
-      <otherwiseConform>
-        <mandatoryConform>
-          <condition name="PowerSourceCond"/>
-        </mandatoryConform>
-        <optionalConform/>
-      </otherwiseConform>
-    </cluster>
     <cluster id="0x0030" name="General Commissioning" side="server">
       <quality singleton="true"/>
       <mandatoryConform/>
