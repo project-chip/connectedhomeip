@@ -1926,7 +1926,7 @@ bool GroupDataProviderImpl::GroupSessionIteratorImpl::Next(GroupSession & output
         KeySetData keyset;
         VerifyOrReturnError(keyset.Find(mProvider.mStorage, fabric, mapping.keyset_id), false);
 
-        if (mKeyIndex >= keyset.keys_count)
+        if (mKeyIndex >= keyset.keys_count || (mKeyIndex >= KeySet::kEpochKeysMax))
         {
             // No more keys in current keyset, try next
             mMapping = mapping.next;
