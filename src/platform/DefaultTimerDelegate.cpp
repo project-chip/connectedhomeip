@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include <app/DefaultTimerDelegate.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/DefaultTimerDelegate.h>
 #include <system/SystemClock.h>
 
 using Timeout = chip::System::Clock::Timeout;

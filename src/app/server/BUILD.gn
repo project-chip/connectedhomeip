@@ -87,7 +87,6 @@ static_library("server") {
     "${chip_root}/src/access:provider-impl",
     "${chip_root}/src/app",
     "${chip_root}/src/app:attribute-persistence",
-    "${chip_root}/src/app:default-timer-delegate",
     "${chip_root}/src/app:test-event-trigger",
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/app/icd/server:observer",

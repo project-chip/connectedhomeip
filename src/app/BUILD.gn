@@ -163,21 +163,6 @@ source_set("event-reporter") {
   sources = [ "EventReporter.h" ]
 }
 
-source_set("default-timer-delegate") {
-  sources = [
-    "DefaultTimerDelegate.cpp",
-    "DefaultTimerDelegate.h",
-  ]
-
-  public_deps = [
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/support",
-    "${chip_root}/src/lib/support:timer-delegate",
-    "${chip_root}/src/platform",
-    "${chip_root}/src/system",
-  ]
-}
-
 # interaction-model is a static-library because it currently requires global functions (app/util/...) that are stubbed in different test files that depend on the app static_library
 # which in tern depens on the interaction-model.
 # Using source_set prevents the unit test to build correctly.
@@ -234,7 +219,6 @@ static_library("interaction-model") {
     ":app_config",
     ":command-handler-impl",
     ":constants",
-    ":default-timer-delegate",
     ":event-reporter",
     ":paths",
     ":subscription-info-provider",

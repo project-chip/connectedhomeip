@@ -21,13 +21,13 @@
 #include <access/examples/ExampleAccessControlDelegate.h>
 
 #include <app/AppConfig.h>
-#include <app/DefaultTimerDelegate.h>
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
 #include <app/SafeAttributePersistenceProvider.h>
 #include <app/data-model-provider/Provider.h>
 #include <app/server/Dnssd.h>
 #include <app/server/EchoHandler.h>
+#include <platform/DefaultTimerDelegate.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/Ble.h>
