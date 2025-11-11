@@ -92,7 +92,3 @@ if(CONFIG_ENABLE_PW_RPC)
 
   add_subdirectory(third_party/connectedhomeip/third_party/nanopb/repo)
 endif(CONFIG_ENABLE_PW_RPC)
-
-add_subdirectory(third_party/connectedhomeip/third_party/pigweed/repo)
-add_subdirectory(third_party/connectedhomeip/examples/platform/esp32/pw_sys_io)
-add_subdirectory(third_party/connectedhomeip/examples/platform/esp32/pw_sync)
