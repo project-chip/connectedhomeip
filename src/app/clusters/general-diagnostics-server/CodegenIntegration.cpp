@@ -97,7 +97,7 @@ void MatterGeneralDiagnosticsClusterInitCallback(EndpointId endpointId)
             .clusterId                 = GeneralDiagnostics::Id,
             .fixedClusterInstanceCount = GeneralDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size(),
             .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
-            .fetchFeatureMap           = false,
+            .fetchFeatureMap           = true,
             .fetchOptionalAttributes   = true,
         },
         integrationDelegate);
