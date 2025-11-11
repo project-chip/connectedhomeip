@@ -82,7 +82,7 @@ struct HasEncodeForWrite : std::false_type
 
 template <typename T>
 struct HasEncodeForWrite<
-    T, void_t<decltype(std::declval<T>().EncodeForWrite(std::declval<chip::TLV::TLVWriter &>(), chip::TLV::AnonymousTag()))>>
+    T, void_t<decltype(std::declval<T>().EncodeForWrite(std::declval<TLV::TLVWriter &>(), TLV::AnonymousTag()))>>
     : std::true_type
 {
 };
@@ -94,7 +94,7 @@ struct HasGenericEncode : std::false_type
 
 template <typename T>
 struct HasGenericEncode<
-    T, void_t<decltype(std::declval<T>().Encode(std::declval<chip::TLV::TLVWriter &>(), chip::TLV::AnonymousTag()))>>
+    T, void_t<decltype(std::declval<T>().Encode(std::declval<TLV::TLVWriter &>(), TLV::AnonymousTag()))>>
     : std::true_type
 {
 };
@@ -183,7 +183,7 @@ public:
     // spec compliant Will construct the command path using the first path returned by `GetPaths()` on the cluster.
     // @returns `CHIP_ERROR_INCORRECT_STATE` if `GetPaths()` doesn't return a list with one path.
     template <typename ResponseType, typename RequestType>
-    [[nodiscard]] InvokeResult<ResponseType> Invoke(chip::CommandId commandId, const RequestType & request)
+    [[nodiscard]] InvokeResult<ResponseType> Invoke(CommandId commandId, const RequestType & request)
     {
         InvokeResult<ResponseType> result;
 
@@ -245,7 +245,7 @@ public:
 
     // Write single value
     template <typename T>
-    CHIP_ERROR WriteAttribute(AttributeId attr, const T & value, chip::FabricIndex fabricIndex)
+    CHIP_ERROR WriteAttribute(AttributeId attr, const T & value, FabricIndex fabricIndex)
     {
         const auto & paths = mCluster.GetPaths();
         VerifyOrReturnError(paths.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
@@ -254,16 +254,16 @@ public:
         app::Testing::WriteOperation writeOp(path);
 
         // Create a stable object on the stack beware of a dangling ptr fabric index will change
-        chip::Access::SubjectDescriptor subjectDescriptor{ fabricIndex };
+        Access::SubjectDescriptor subjectDescriptor{ fabricIndex };
         writeOp.SetSubjectDescriptor(subjectDescriptor);
 
         uint8_t buffer[1024];
-        chip::TLV::TLVWriter writer;
+        TLV::TLVWriter writer;
         writer.Init(buffer);
 
         ReturnErrorOnFailure(EncodeValueToTLV(writer, value));
 
-        chip::TLV::TLVReader reader;
+        TLV::TLVReader reader;
         reader.Init(buffer, writer.GetLengthWritten());
         ReturnErrorOnFailure(reader.Next());
 
@@ -272,7 +272,7 @@ public:
     }
     // Write list of values
     template <typename ElementT>
-    CHIP_ERROR WriteAttribute(AttributeId attr, const chip::app::DataModel::List<ElementT> & list, chip::FabricIndex fabricIndex)
+    CHIP_ERROR WriteAttribute(AttributeId attr, const app::DataModel::List<ElementT> & list, FabricIndex fabricIndex)
     {
         const auto & paths = mCluster.GetPaths();
         VerifyOrReturnError(paths.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
@@ -280,14 +280,14 @@ public:
         app::ConcreteAttributePath path(paths[0].mEndpointId, paths[0].mClusterId, attr);
         app::Testing::WriteOperation writeOp(path);
         // Create a stable object on the stack beware of a dangling ptr fabric index will change
-        chip::Access::SubjectDescriptor subjectDescriptor{ fabricIndex };
+        Access::SubjectDescriptor subjectDescriptor{ fabricIndex };
         writeOp.SetSubjectDescriptor(subjectDescriptor);
         uint8_t buffer[1024];
-        chip::TLV::TLVWriter writer;
+        TLV::TLVWriter writer;
         writer.Init(buffer);
 
-        chip::TLV::TLVType outer;
-        ReturnErrorOnFailure(writer.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::kTLVType_Array, outer));
+        TLV::TLVType outer;
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outer));
 
         for (const auto & item : list)
         {
@@ -296,7 +296,7 @@ public:
 
         ReturnErrorOnFailure(writer.EndContainer(outer));
 
-        chip::TLV::TLVReader reader;
+        TLV::TLVReader reader;
         reader.Init(buffer, writer.GetLengthWritten());
         ReturnErrorOnFailure(reader.Next());
 
@@ -307,19 +307,19 @@ public:
 private:
     // Helper to encode any value to TLV
     template <typename T>
-    static CHIP_ERROR EncodeValueToTLV(chip::TLV::TLVWriter & writer, const T & value)
+    static CHIP_ERROR EncodeValueToTLV(TLV::TLVWriter & writer, const T & value)
     {
         if constexpr (std::is_integral_v<T> || std::is_enum_v<T>)
         {
-            return chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), value);
+            return app::DataModel::Encode(writer, TLV::AnonymousTag(), value);
         }
         else if constexpr (HasEncodeForWrite<T>::value) // <-- Path B
         {
-            return value.EncodeForWrite(writer, chip::TLV::AnonymousTag());
+            return value.EncodeForWrite(writer, TLV::AnonymousTag());
         }
         else if constexpr (HasGenericEncode<T>::value) // <-- Path A
         {
-            return value.Encode(writer, chip::TLV::AnonymousTag());
+            return value.Encode(writer, TLV::AnonymousTag());
         }
         else
         {
