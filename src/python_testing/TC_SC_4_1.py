@@ -104,118 +104,117 @@ class TC_SC_4_1(MatterBaseTest):
 
             TestStep(2, """Check if the ICD Management cluster is present""",
                         """TH reads from the DUT the ServerList attribute from the Descriptor cluster on EP0
-                            - If the ICD Management cluster ID (70,0x46) is present in the list, set supports_icd to True, otherwise set supports_icd to False
-                            - If supports_icd is true
+                            - Set supports_icd to True if present, otherwise, to False
+                            - If supports_icd is True
                                 - TH reads ActiveModeThreshold from the ICD Management cluster on EP0 and saves as active_mode_threshold_ms"""),
 
             TestStep(3, """Check if the LITS (Long Idle Time Support) feature is supported""",
                         """If supports_icd is True:
-                            - TH reads the FeatureMap attribute from the ICD Management cluster on EP0
-                                - If the LITS feature is set:
-                                    - Set supports_lit to True, otherwise, set supports_lit to False"""),
+                            - TH checks for support of the LITS feature by reading from the DUT the FeatureMap attribute from the ICD Management cluster on EP0
+                                - Set supports_lit to True if supported, otherwise, to False"""),
 
-            TestStep(4, """Check if the DUT supports TCP""",
-                        """If supported:
-                            - Set supports_tcp to True, otherwise, set supports_tcp to False"""),
+            TestStep(4, """Check if TCP is supported""",
+                        """Set supports_tcp to True if supported, otherwise, to False"""),
 
-            TestStep(5, """Check if DUT supports Open Basic Commissioning Window""",
-                        """If supported:
-                            - Set supports_obcw to True, otherwise, set supports_obcw to False"""),
+            TestStep(5, """Check the setup code type used during commissioning (QR or Manual)""",
+                        """Save as setup_code_type"""),
+
+            TestStep(6, """Check if the Open Basic Commissioning Window command is supported""",
+                        """Set supports_obcw to True if supported, otherwise, to False"""),
 
             # OPEN BASIC COMMISSIONING WINDOW
             #
-            TestStep(6, """If supports_obcw is True, DUT is put in Commissioning Mode using Open Basic Commissioning Window command""",
+            TestStep(7, """DUT is put in Commissioning Mode using the Open Basic Commissioning Window command if supported (supports_obcw)""",
                         """DUT starts advertising Commissionable Node Discovery service through DNS-SD"""),
 
-            TestStep(7, """TH gets the discriminator from the DUT and constructs the Discriminator
-                           subtype (Long or Short) based on the setup code type (QR or manual)""",
-                        """If setup code type is QR Code, construct the 'Long Discriminator Subtype'
+            TestStep(8, """TH gets the discriminator from the DUT and constructs the Discriminator subtype (Long or Short) based on the setup code type (QR or Manual)""",
+                        """If setup code type is QR, construct the 'Long Discriminator Subtype'
                             - Verify that the discriminator value is a valid 12-bit variable length decimal number in ASCII text, omitting any leading zeros
                             If setup code type is Manual, construct the 'Short Discriminator Subtype'
                             - Verify that the discriminator value is a valid 4-bit variable length decimal number in ASCII text, omitting any leading zeros
                             Save as 'discriminator_subtype'."""),
 
-            TestStep(8, """Get the Discriminator Subtype (Long or Short from the previous step) PTR record's instance name""",
-                        """TH performs a PTR record query against the 'Long Discriminator Subtype' _L
-                            - Verify that there is one, and only one, 'Long Discriminator Subtype' PTR record
-                            - Save the 'Long Discriminator Subtype' PTR record's instance name as 'discriminator_subtype_ptr_instance_name'"""),
+            TestStep(9, """Get the Discriminator Subtype (Long or Short from the previous step) PTR record's instance name""",
+                        """TH performs a PTR record query against the Discriminator Subtype (Long or Short from the previous step)
+                            - Verify that there is one, and only one, 'Discriminator Subtype' PTR record
+                            - Save the 'Discriminator Subtype' PTR record's instance name as 'discriminator_subtype_ptr_instance_name'"""),
 
-            TestStep(9, """Verify commissionable subtype advertisements""",
+            TestStep(10, """Verify commissionable subtype advertisements""",
                         """See the 'Commissionable Subtypes Verifications' table in the Notes/Testing considerations
                         section of the Test Plan for the list of verifications to be performed"""),
 
-            TestStep(10, """Verify SRV record advertisements""",
+            TestStep(11, """Verify SRV record advertisements""",
                      """See the 'SRV Record Verifications' table in the Notes/Testing considerations
                         section of the Test Plan for the list of verifications to be performed"""),
 
-            TestStep(11, """Verify TXT record advertisements""",
+            TestStep(12, """Verify TXT record advertisements""",
                      """See the 'TXT Record Verifications' table in the Notes/Testing considerations
                         section of the Test Plan for the list of verifications to be performed. Expected CM TXT key value = 1"""),
 
-            TestStep(12, """Verify AAAA records""",
+            TestStep(13, """Verify AAAA records""",
                      """See the 'AAAA Record Verifications' table in the Notes/Testing considerations
                         section of the Test Plan for the list of verifications to be performed"""),
 
-            TestStep(13, """Close commissioning window""",
+            TestStep(14, """Close commissioning window""",
                      """DUT stops advertising Commissionable Node Discovery services"""),
 
             # OPEN COMISSIONING WINDOW
             #
-            TestStep(14, """TH gets the Long Discriminator from the DUT and constructs the Long Discriminator Subtype""",
+            TestStep(15, """TH gets the Long Discriminator from the DUT and constructs the Long Discriminator Subtype""",
                      """Verify that the Long discriminator value is a valid 12-bit variable length decimal number in ASCII text,
                         omitting any leading zeros
-                        Save the 'Long Discriminator Subtype' as long_discriminator_subtype
-                        Save 'Long Discriminator' value as long_discriminator"""),
+                        Save 'Long Discriminator' value as long_discriminator
+                        Save the 'Long Discriminator Subtype' as long_discriminator_subtype"""),
 
-            TestStep(15, """DUT is put in Commissioning Mode using Open Commissioning Window command""",
+            TestStep(16, """DUT is put in Commissioning Mode using Open Commissioning Window command""",
                      """DUT starts advertising Commissionable Node Discovery service through DNS-SD"""),
 
-            TestStep(16, """Get the 'Long Discriminator Subtype' PTR record's instance name""",
-                     """TH performs a PTR record query against the 'Long Discriminator Subtype' _L
+            TestStep(17, """Get the 'Long Discriminator Subtype' PTR record's instance name""",
+                     """TH performs a PTR record query against the 'Long Discriminator Subtype'
                             - Verify that there is one, and only one, 'Long Discriminator Subtype' PTR record
                             - Save the 'Long Discriminator Subtype' PTR record's instance name as long_discriminator_subtype_ptr_instance_name"""),
 
-            TestStep(17, """Verify commissionable subtype advertisements""",
+            TestStep(18, """Verify commissionable subtype advertisements""",
                      """See the 'Commissionable Subtypes Verifications' table in the Notes/Testing considerations
                         section of the Test Plan for the list of verifications to be performed"""),
 
-            TestStep(18, """Verify SRV record advertisements""",
+            TestStep(19, """Verify SRV record advertisements""",
                      """See the 'SRV Record Verifications' table in the Notes/Testing considerations
                         section of the Test Plan for the list of verifications to be performed"""),
 
-            TestStep(19, """Verify TXT record advertisements""",
+            TestStep(20, """Verify TXT record advertisements""",
                      """See the 'TXT Record Verifications' table in the Notes/Testing considerations
                         section of the Test Plan for the list of verifications to be performed. Expected CM TXT key value = 2"""),
 
-            TestStep(20, """Verify AAAA records""",
+            TestStep(21, """Verify AAAA records""",
                      """See the 'AAAA Record Verifications' table in the Notes/Testing considerations
                         section of the Test Plan for the list of verifications to be performed"""),
 
-            TestStep(21, """Close commissioning window""",
+            TestStep(22, """Close commissioning window""",
                      """DUT stops advertising Commissionable Node Discovery services"""),
 
             # EXTENDED DISCOVERY MODE
             #
-            TestStep(22, """Check if DUT Extended Discovery mode is active""",
+            TestStep(23, """Check if DUT Extended Discovery mode is active""",
                      """Get the 'Long Discriminator Subtype' PTR record's instance name
                             - If the DUT's 'Long Discriminator Subtype' PTR record's instance name is present,
                             Extended Discovery mode is active, if so, save the 'Long Discriminator Subtype'
                             PTR record's instance name as 'long_discriminator_subtype_ptr_instance_name'"""),
 
-            TestStep(23, """Verify commissionable subtype advertisements""",
+            TestStep(24, """Verify commissionable subtype advertisements""",
                      """See the 'Commissionable Subtypes Verifications' table in the Notes/Testing considerations
                         section of the Test Plan for the list of verifications to be performed"""),
 
-            TestStep(24, """Verify SRV record advertisements""",
+            TestStep(25, """Verify SRV record advertisements""",
                      """See the 'SRV Record Verifications' table in the Notes/Testing considerations
                         section of the Test Plan for the list of verifications to be performed"""),
 
-            TestStep(25, """Verify TXT record advertisements""",
+            TestStep(26, """Verify TXT record advertisements""",
                      """See the 'TXT Record Verifications' table in the Notes/Testing considerations
                         section of the Test Plan for the list of verifications to be performed. Expected
                         CM TXT key value = 0 or omitted key"""),
 
-            TestStep(26, """Verify AAAA records""",
+            TestStep(27, """Verify AAAA records""",
                      """See the 'AAAA Record Verifications' table in the Notes/Testing considerations
                         section of the Test Plan for the list of verifications to be performed"""),
         ]
@@ -695,23 +694,12 @@ class TC_SC_4_1(MatterBaseTest):
         long_discriminator = None
         obcw_cmd = Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180)
 
-        # Determine Setup Code Type
-        if self.matter_test_config.manual_code:
-            self.setup_code_type = SetupCodeType.MANUAL_CODE
-        elif self.matter_test_config.qr_code_content:
-            self.setup_code_type = SetupCodeType.QR_CODE
-        else:
-            self.setup_code_type = SetupCodeType.NONE_SUPLIED
-
         # *** STEP 1 ***
         # DUT is Commissioned.
         self.step(1)
 
         # *** STEP 2 ***
         # Check if the ICD Management cluster is present
-        # TH reads from the DUT the ServerList attribute from the Descriptor cluster on EP0
-        #   - If the ICD Management cluster ID (70,0x46) is present in the list, set 'supports_icd' to True, otherwise set 'supports_icd' to False
-        #   - If 'supports_icd' is True, TH reads 'ActiveModeThreshold' from the ICD Management cluster on EP0 and saves as 'active_mode_threshold_ms'
         self.step(2)
         ep0_servers = await self.get_descriptor_server_list()
 
@@ -726,8 +714,6 @@ class TC_SC_4_1(MatterBaseTest):
 
         # *** STEP 3 ***
         # Check if the LITS feature is supported
-        # If 'supports_icd' is True, TH reads the 'FeatureMap' attribute from the ICD Management cluster on EP0
-        # If the LITS feature is set, set 'supports_lit' to True, otherwise, set 'supports_lit' to False
         self.step(3)
         if self.supports_icd:
             feature_map = await self.get_icd_feature_map()
@@ -741,19 +727,27 @@ class TC_SC_4_1(MatterBaseTest):
         self.supports_tcp = self.check_pics(TCP_PICS_STR)
 
         # *** STEP 5 ***
-        # Check if the DUT supports the Open Basic Commissioning Window command (BC feature)
+        # Check the setup code type used during commissioning (QR or Manual)
         self.step(5)
+        if self.matter_test_config.manual_code:
+            self.setup_code_type = SetupCodeType.MANUAL_CODE
+        elif self.matter_test_config.qr_code_content:
+            self.setup_code_type = SetupCodeType.QR_CODE
+        else:
+            self.setup_code_type = SetupCodeType.NONE_SUPLIED
+
+        # *** STEP 6 ***
+        # Check if the Open Basic Commissioning Window command is supported
+        self.step(6)
         supports_obcw = await self.feature_guard(
             endpoint=ROOT_NODE_ENDPOINT_ID,
             cluster=Clusters.AdministratorCommissioning,
             feature_int=Clusters.AdministratorCommissioning.Bitmaps.Feature.kBasic)
 
-        # *** STEP 6 ***
-        # If 'supports_obcw' is True DUT is put in Commissioning
-        # Mode using **Open Basic Commissioning Window** command
-        #   - DUT starts advertising Commissionable Node Discovery services
+        # *** STEP 7 ***
+        # DUT is put in Commissioning Mode using the Open Basic Commissioning Window command if supported (supports_obcw)
         if supports_obcw:
-            self.step(6)
+            self.step(7)
             logging.info("\n\n\t ** Open Basic Commissioning Window supported\n")
             await self.default_controller.SendCommand(
                 nodeId=self.dut_node_id,
@@ -762,54 +756,53 @@ class TC_SC_4_1(MatterBaseTest):
                 timedRequestTimeoutMs=6000
             )
 
-            # *** STEP 7 ***
+            # *** STEP 8 ***
             # TH gets the discriminator from the DUT and constructs the Discriminator
-            # subtype (Long or Short) based on the setup code type (QR or manual)
-            self.step(7)
+            # subtype (Long or Short)based on the setup code type (QR or Manual)
+            self.step(8)
             discriminator_subtype, _ = self.get_discriminator_subtype(is_obcw=True)
 
-            # *** STEP 8 ***
+            # *** STEP 9 ***
             # Get the Discriminator Subtype (Long or Short) PTR record's instance name
-            self.step(8)
+            self.step(9)
             discriminator_ptr_instance_name = await self._get_verify_discriminator_subtype_ptr_instance_name(discriminator_subtype)
 
-            # *** STEP 9 ***
+            # *** STEP 10 ***
             # Verify commissionable subtype advertisements
-            self.step(9)
+            self.step(10)
             await self._verify_commissionable_subtypes(discriminator_ptr_instance_name)
 
-            # *** STEP 10 ***
+            # *** STEP 11 ***
             # Verify SRV record advertisements
-            self.step(10)
+            self.step(11)
             srv_hostname = await self._get_verify_srv_record(discriminator_ptr_instance_name)
 
-            # *** STEP 11 ***
+            # *** STEP 12 ***
             # Verify TXT record advertisements
-            self.step(11)
+            self.step(12)
             await self._verify_txt_record_keys(discriminator_ptr_instance_name, expected_cm="1")
 
-            # *** STEP 12 ***
+            # *** STEP 13 ***
             # Verify AAAA records
-            self.step(12)
+            self.step(13)
             await self._verify_aaaa_records(srv_hostname)
 
-            # *** STEP 13 ***
+            # *** STEP 14 ***
             # Close commissioning window
-            self.step(13)
+            self.step(14)
             await self.close_commissioning_window()
         else:
             logging.info("\n\n\t ** Open Basic Commissioning Window command is unsupported, skipping advertisement verification steps.\n")
-            self.mark_step_range_skipped(6, 13)
-
-        # *** STEP 14 ***
-        # TH gets the Lomg Discriminator from the DUT and constructs the Long Discriminator Subtype
-        self.step(14)
-        long_discriminator_subtype, long_discriminator = self.get_discriminator_subtype(is_obcw=False)
+            self.mark_step_range_skipped(7, 14)
 
         # *** STEP 15 ***
-        # DUT is put in Commissioning Mode using Open Commissioning Window command
-        #   - DUT starts advertising Commissionable Node Discovery services
+        # TH gets the Lomg Discriminator from the DUT and constructs the Long Discriminator Subtype
         self.step(15)
+        long_discriminator_subtype, long_discriminator = self.get_discriminator_subtype(is_obcw=False)
+
+        # *** STEP 16 ***
+        # DUT is put in Commissioning Mode using Open Commissioning Window command
+        self.step(16)
         await self.default_controller.OpenCommissioningWindow(
             nodeId=self.dut_node_id,
             timeout=180,
@@ -818,39 +811,39 @@ class TC_SC_4_1(MatterBaseTest):
             option=1
         )
 
-        # *** STEP 16 ***
+        # *** STEP 17 ***
         # Get the 'Long Discriminator Subtype' PTR record's instance name
-        self.step(16)
+        self.step(17)
         long_discriminator_ptr_instance_name = await self._get_verify_discriminator_subtype_ptr_instance_name(long_discriminator_subtype)
 
-        # *** STEP 17 ***
+        # *** STEP 18 ***
         # Verify commissionable subtype advertisements
-        self.step(17)
+        self.step(18)
         await self._verify_commissionable_subtypes(long_discriminator_ptr_instance_name)
 
-        # *** STEP 18 ***
+        # *** STEP 19 ***
         # Verify SRV record advertisements
-        self.step(18)
+        self.step(19)
         srv_hostname = await self._get_verify_srv_record(long_discriminator_ptr_instance_name)
 
-        # *** STEP 19 ***
+        # *** STEP 20 ***
         # Verify TXT record keys advertisements
-        self.step(19)
+        self.step(20)
         await self._verify_txt_record_keys(long_discriminator_ptr_instance_name, expected_cm="2")
 
-        # *** STEP 20 ***
+        # *** STEP 21 ***
         # Verify AAAA records
-        self.step(20)
+        self.step(21)
         await self._verify_aaaa_records(srv_hostname)
 
-        # *** STEP 21 ***
+        # *** STEP 22 ***
         # Close commissioning window
-        self.step(21)
+        self.step(22)
         await self.close_commissioning_window()
 
-        # *** STEP 22 ***
+        # *** STEP 23 ***
         # Check if DUT Extended Discovery mode is active
-        self.step(22)
+        self.step(23)
         # Get the 'Long Discriminator Subtype' PTR record's instance name
         long_discriminator_ptr_instance_name = await self._get_verify_discriminator_subtype_ptr_instance_name(long_discriminator_subtype, must_be_present=False)
 
@@ -859,28 +852,28 @@ class TC_SC_4_1(MatterBaseTest):
         logging.info(f"DUT Extended Discovery mode active: {extended_discovery_mode}")
 
         if extended_discovery_mode:
-            # *** STEP 23 ***
+            # *** STEP 24 ***
             # Verify commissionable subtype advertisements
-            self.step(23)
+            self.step(24)
             await self._verify_commissionable_subtypes(long_discriminator_ptr_instance_name, extended_discovery_mode)
 
-            # *** STEP 24 ***
+            # *** STEP 25 ***
             # Verify SRV record advertisements
-            self.step(24)
+            self.step(25)
             srv_hostname = await self._get_verify_srv_record(long_discriminator_ptr_instance_name)
 
-            # *** STEP 25 ***
+            # *** STEP 26 ***
             # Verify TXT record keys advertisements
-            self.step(25)
+            self.step(26)
             await self._verify_txt_record_keys(long_discriminator_ptr_instance_name, expected_cm="0")
 
-            # *** STEP 26 ***
+            # *** STEP 27 ***
             # Verify AAAA records
-            self.step(26)
+            self.step(27)
             await self._verify_aaaa_records(srv_hostname)
         else:
             logging.info("Skipping Extended Discovery mode advertisements verification steps.")
-            self.mark_step_range_skipped(23, 26)
+            self.mark_step_range_skipped(24, 27)
 
 
 if __name__ == "__main__":
