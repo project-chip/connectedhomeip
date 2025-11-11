@@ -234,6 +234,7 @@ static_library("interaction-model") {
     ":app_config",
     ":command-handler-impl",
     ":constants",
+    ":default-timer-delegate",
     ":event-reporter",
     ":paths",
     ":subscription-info-provider",
