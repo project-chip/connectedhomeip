@@ -168,7 +168,7 @@ CHIP_ERROR ElectricalEnergyMeasurementAttrAccess::Init()
     {
 #if defined(CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS) &&                                                       \
     CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
-        ChipLogError(AppServer, "Failed to register cluster %u/" ChipLogFormatMEI ":   %" CHIP_ERROR_FORMAT, mEndpointId,
+        ChipLogError(AppServer, "Failed to register cluster %u/" ChipLogFormatMEI ": %" CHIP_ERROR_FORMAT, mEndpointId,
                      ChipLogValueMEI(ElectricalEnergyMeasurement::Id), err.Format());
 #endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
     }
