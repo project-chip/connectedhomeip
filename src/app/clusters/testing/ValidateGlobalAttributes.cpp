@@ -23,8 +23,9 @@ bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster,
     VerifyOrDie(cluster.GetPaths().size() == 1);
     auto path = cluster.GetPaths()[0];
     ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> attributesBuilder;
-    if (cluster.Attributes(path, attributesBuilder) != CHIP_NO_ERROR)
+    if (CHIP_ERROR err = cluster.Attributes(path, attributesBuilder); err != CHIP_NO_ERROR)
     {
+        ChipLogError(Test, "Failed to get attributes list from cluster. Error: %" CHIP_ERROR_FORMAT, err.Format());
         return false;
     }
 
@@ -47,8 +48,9 @@ bool IsAcceptedCommandsListEqualTo(app::ServerClusterInterface & cluster,
     VerifyOrDie(cluster.GetPaths().size() == 1);
     auto path = cluster.GetPaths()[0];
     ReadOnlyBufferBuilder<app::DataModel::AcceptedCommandEntry> commandsBuilder;
-    if (cluster.AcceptedCommands(path, commandsBuilder) != CHIP_NO_ERROR)
+    if (CHIP_ERROR err = cluster.AcceptedCommands(path, commandsBuilder); err != CHIP_NO_ERROR)
     {
+        ChipLogError(Test, "Failed to get accepted commands list from cluster. Error: %" CHIP_ERROR_FORMAT, err.Format());
         return false;
     }
 
@@ -63,16 +65,26 @@ bool IsAcceptedCommandsListEqualTo(app::ServerClusterInterface & cluster,
     return EqualAcceptedCommandSets(commandsBuilder.TakeBuffer(), expectedBuilder.TakeBuffer());
 }
 
-bool IsGeneratedCommandsListEqualTo(app::ServerClusterInterface & cluster, Span<CommandId> expected)
+bool IsGeneratedCommandsListEqualTo(app::ServerClusterInterface & cluster, std::initializer_list<const CommandId> expected)
 {
     VerifyOrDie(cluster.GetPaths().size() == 1);
     auto path = cluster.GetPaths()[0];
     ReadOnlyBufferBuilder<CommandId> commandsBuilder;
-    if (cluster.GeneratedCommands(path, commandsBuilder) != CHIP_NO_ERROR)
+    if (CHIP_ERROR err = cluster.GeneratedCommands(path, commandsBuilder); err != CHIP_NO_ERROR)
     {
+        ChipLogError(Test, "Failed to get generated commands list from cluster. Error: %" CHIP_ERROR_FORMAT, err.Format());
         return false;
     }
-    return EqualGeneratedCommandSets(commandsBuilder.TakeBuffer(), expected);
+
+    ReadOnlyBufferBuilder<CommandId> expectedBuilder;
+
+    SuccessOrDie(expectedBuilder.EnsureAppendCapacity(expected.size()));
+    for (const auto & entry : expected)
+    {
+        SuccessOrDie(expectedBuilder.Append(entry));
+    }
+
+    return EqualGeneratedCommandSets(commandsBuilder.TakeBuffer(), expectedBuilder.TakeBuffer());
 }
 
 } // namespace chip::Testing
