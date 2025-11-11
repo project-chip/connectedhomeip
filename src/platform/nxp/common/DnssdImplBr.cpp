@@ -1044,9 +1044,9 @@ static void HandleResolveCleanup(mDnsQueryCtx & resolveContext, ResolveStep step
         break;
     }
 
-    // In this case the resolve operation could not be completed successfully so we need to call 
-    // DispatchResolveError to handle the Matter callback with an error case. No IP address is reported and 
-    // the address resolve operation doesn’t need to be stopped again as was not started in the first place 
+    // In this case the resolve operation could not be completed successfully so we need to call
+    // DispatchResolveError to handle the Matter callback with an error case. No IP address is reported and
+    // the address resolve operation doesn’t need to be stopped again as was not started in the first place
     // or it's already handled by HandleResolveCleanup.
     DeviceLayer::PlatformMgr().ScheduleWork(DispatchResolveError, reinterpret_cast<intptr_t>(&resolveContext));
 }
