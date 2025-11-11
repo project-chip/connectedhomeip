@@ -27,6 +27,6 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/replacement-product-list-manager.h"
     "${CLUSTER_DIR}/resource-monitoring-cluster-objects.cpp"
     "${CLUSTER_DIR}/resource-monitoring-cluster-objects.h"
-    "${CLUSTER_DIR}/resource-monitoring-cluster.cpp"
-    "${CLUSTER_DIR}/resource-monitoring-cluster.h"
+    "${CLUSTER_DIR}/resource-monitoring-server.cpp"
+    "${CLUSTER_DIR}/resource-monitoring-server.h"
 )

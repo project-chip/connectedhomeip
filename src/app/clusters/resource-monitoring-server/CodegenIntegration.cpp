@@ -24,7 +24,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
-#include <app/clusters/resource-monitoring-server/resource-monitoring-cluster.h>
+#include <app/clusters/resource-monitoring-server/resource-monitoring-server.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/static-cluster-config/ActivatedCarbonFilterMonitoring.h>
 #include <app/static-cluster-config/HepaFilterMonitoring.h>

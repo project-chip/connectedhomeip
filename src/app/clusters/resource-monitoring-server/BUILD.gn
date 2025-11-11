@@ -18,8 +18,8 @@ source_set("resource-monitoring-server") {
   sources = [
     "resource-monitoring-cluster-objects.cpp",
     "resource-monitoring-cluster-objects.h",
-    "resource-monitoring-cluster.cpp",
-    "resource-monitoring-cluster.h",
+    "resource-monitoring-server.cpp",
+    "resource-monitoring-server.h",
   ]
 
   deps = [

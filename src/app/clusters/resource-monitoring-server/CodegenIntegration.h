@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "resource-monitoring-cluster.h"
+#include "resource-monitoring-server.h"
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 
 namespace chip {
