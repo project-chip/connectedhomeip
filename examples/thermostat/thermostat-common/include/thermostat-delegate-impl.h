@@ -50,6 +50,8 @@ static constexpr uint8_t kMaxNumberOfPresetsSupported = kMaxNumberOfPresetTypes 
 
 static constexpr uint8_t kMaxNumberOfSchedulesSupported = kMaxNumberOfScheduleTypes * kMaxNumberOfSchedulesOfEachType - 1;
 
+static constexpr uint8_t kMaxNumberOfScheduleTransitionsPerDay = 4;
+
 class ThermostatDelegate : public Delegate
 {
 public:
@@ -98,6 +100,8 @@ public:
     CHIP_ERROR ReEvaluateCurrentSuggestion() override;
 
     CHIP_ERROR GetScheduleTypeAtIndex(size_t index, Structs::ScheduleTypeStruct::Type & scheduleType) override;
+
+    DataModel::Nullable<uint8_t> GetNumberOfScheduleTransitionsPerDay() override;
 
 private:
     static ThermostatDelegate sInstance;
@@ -170,6 +174,8 @@ private:
      * @brief Initializes the schedules types array with example schedule types.
      */
     void InitializeScheduleTypes();
+
+    DataModel::Nullable<uint8_t> mMaxNumberOfScheduleTransitionsPerDay;
 };
 
 } // namespace Thermostat

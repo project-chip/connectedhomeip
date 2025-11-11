@@ -234,6 +234,13 @@ public:
      */
     virtual CHIP_ERROR GetScheduleTypeAtIndex(size_t index, Structs::ScheduleTypeStruct::Type & scheduleType) = 0;
 
+    /**
+     * @brief Get the maximum number of schedule transitions allowed per day.
+     * 
+     * @return The number of schedule transitions per day or null if the number is unlimited.
+     */
+    virtual DataModel::Nullable<uint8_t> GetNumberOfScheduleTransitionsPerDay() = 0;
+
     void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
 
     // This should be removed once #39949 is fixed.
