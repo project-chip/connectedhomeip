@@ -237,11 +237,10 @@ struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementC
         iterator->Release(); // ensure this frees memory or returns to pool
     }
 };
+const FabricIndex fabricIndex = app::Testing::kTestFabrixIndex;
 // Cluster should accept writing multiple group keys with the same KeySetID but different Group IDs
 TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttributeSameKeySetDifferentGroup)
 {
-    const FabricIndex fabricIndex = app::Testing::kTestFabrixIndex;
-
     auto keys = TestHelpers::CreateGroupKeyMapList(2, fabricIndex, TestHelpers::kTestGroupId, TestHelpers::kTestKeySetId, 1, 0);
     PrepopulateGroupKeyMap(keys, fabricIndex);
     VerifyGroupKeysMatch(fabricIndex, keys);
@@ -250,7 +249,6 @@ TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttributeSa
 // Cluster should reject a write containing duplicate keys for the same group/keyset combination.
 TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttributeDuplicateKey)
 {
-    const FabricIndex fabricIndex = app::Testing::kTestFabrixIndex;
     auto keys = TestHelpers::CreateGroupKeyMapList(2, fabricIndex, TestHelpers::kTestGroupId, TestHelpers::kTestKeySetId, 0, 0);
 
     auto listToWrite = app::DataModel::List<const GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(keys.data(), keys.size());
@@ -267,7 +265,6 @@ TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttributeDu
 
 TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttribute)
 {
-    const FabricIndex fabricIndex = app::Testing::kTestFabrixIndex;
     auto keys                     = TestHelpers::CreateGroupKeyMapList(2, fabricIndex);
 
     PrepopulateGroupKeyMap(keys, fabricIndex);
