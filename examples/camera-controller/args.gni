@@ -24,7 +24,7 @@ chip_project_config_include_dirs =
     [ "${chip_root}/examples/camera-controller/include" ]
 chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
 
-matter_enable_tracing_support = true
+matter_enable_tracing_support = false
 
 matter_log_json_payload_hex = true
 matter_log_json_payload_decode_full = true

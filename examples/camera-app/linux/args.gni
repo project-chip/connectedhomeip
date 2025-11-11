@@ -27,7 +27,7 @@ chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
 
 chip_with_nlfaultinjection = true
 
-matter_enable_tracing_support = true
+matter_enable_tracing_support = false
 matter_enable_camera_server = true
 
 # Disable IPv4 to force IPv6 usage for TCP connections
