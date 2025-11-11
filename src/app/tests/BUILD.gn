@@ -36,6 +36,7 @@ static_library("helpers") {
   deps = [
     "${chip_root}/src/access",
     "${chip_root}/src/app",
+    "${chip_root}/src/app:default-timer-delegate",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/transport/raw/tests:helpers",
   ]
@@ -337,6 +338,7 @@ chip_test_suite("tests") {
       (chip_device_platform == "linux" || chip_device_platform == "darwin")) {
     test_sources += [ "TestCommissioningWindowManager.cpp" ]
     public_deps += [
+      "${chip_root}/src/app:default-timer-delegate",
       "${chip_root}/src/app/server",
       "${chip_root}/src/messaging/tests/echo:common",
     ]

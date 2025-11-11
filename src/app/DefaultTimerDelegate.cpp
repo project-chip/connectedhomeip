@@ -16,7 +16,7 @@
  */
 
 #include <app/DefaultTimerDelegate.h>
-#include <app/InteractionModelEngine.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <system/SystemClock.h>
 
 using Timeout = chip::System::Clock::Timeout;
@@ -31,19 +31,15 @@ static void TimerCallbackInterface(System::Layer * aLayer, void * aAppState)
 }
 CHIP_ERROR DefaultTimerDelegate::StartTimer(TimerContext * context, Timeout aTimeout)
 {
-    // TODO(#41825): Remove the coupling of InteractionModelEngine
-    return InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
-        aTimeout, TimerCallbackInterface, context);
+    return DeviceLayer::SystemLayer().StartTimer(aTimeout, TimerCallbackInterface, context);
 }
 void DefaultTimerDelegate::CancelTimer(TimerContext * context)
 {
-    InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
-        TimerCallbackInterface, context);
+    DeviceLayer::SystemLayer().CancelTimer(TimerCallbackInterface, context);
 }
 bool DefaultTimerDelegate::IsTimerActive(TimerContext * context)
 {
-    return InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->IsTimerActive(
-        TimerCallbackInterface, context);
+    return DeviceLayer::SystemLayer().IsTimerActive(TimerCallbackInterface, context);
 }
 
 System::Clock::Timestamp DefaultTimerDelegate::GetCurrentMonotonicTimestamp()

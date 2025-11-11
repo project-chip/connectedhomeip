@@ -90,7 +90,10 @@ static_library("controller") {
     ]
 
     # ExampleOperationalCredentialsIssuer uses TestGroupData
-    deps += [ "${chip_root}/src/lib/support:testing" ]
+    deps += [
+      "${chip_root}/src/app:default-timer-delegate",
+      "${chip_root}/src/lib/support:testing",
+    ]
 
     if (chip_enable_read_client) {
       sources += [
