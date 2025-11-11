@@ -140,7 +140,7 @@ class TC_SC_4_1(MatterBaseTest):
                             - Save the 'Discriminator Subtype' PTR record's instance name as 'discriminator_subtype_ptr_instance_name'"""),
 
             TestStep(10, """Verify commissionable subtype advertisements""",
-                        """See the 'Commissionable Subtypes Verifications' table in the Notes/Testing considerations
+                     """See the 'Commissionable Subtypes Verifications' table in the Notes/Testing considerations
                         section of the Test Plan for the list of verifications to be performed"""),
 
             TestStep(11, """Verify SRV record advertisements""",
