@@ -359,14 +359,14 @@ def cleanup_old_spec_dms(output_dir):
             return
         with open(filename, 'rt+') as file:
             tree = etree.parse(file)
-            root = tree.getroot()            
-            
+            root = tree.getroot()
+
             if root.find("attributes/attribute[@name='EndpointUniqueID']") is None:
                 parent_el = root.find('attributes')
                 if parent_el is None:
                     logging.error("Unable to locate attributes in Descriptor-Cluster")
                     return
-                
+
                 new_xml = etree.fromstring(missing_1_1_DescriptorCluster_EndpointUID)
                 parent_el.append(new_xml)
                 changed = True
@@ -376,7 +376,7 @@ def cleanup_old_spec_dms(output_dir):
                 if parent_el is None:
                     logging.error("Unable to locate attributes in Descriptor-Cluster")
                     return
-                
+
                 new_xml = etree.fromstring(missing_1_1_DescriptorCluster_taglist)
                 parent_el.append(new_xml)
                 changed = True
