@@ -480,7 +480,7 @@ CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNewValue, 
         ChipLogDetail(NotSpecified, "Predicted flag set to %s", entryNewValue.predicted.Value() ? "true" : "false");
     }
 
-    if (!ctx->TariffComponentKeyIDsFeatureMap.insert({ entryNewValue.tariffComponentID, entryFeatures.Raw() }))
+    if (!ctx->TariffComponentKeyIDsFeatureMap.insert(entryNewValue.tariffComponentID, entryFeatures.Raw()))
     {
         ChipLogError(AppServer, "Duplicate tariffComponentID found");
         return CHIP_ERROR_DUPLICATE_KEY_ID;

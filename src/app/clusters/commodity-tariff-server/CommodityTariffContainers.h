@@ -33,83 +33,63 @@ namespace app {
 namespace CommodityTariffContainers {
 
 template <typename T, size_t kMaxSize>
-class CTC_UnorderedSet
+class CTC_UnorderedSet : public pw::Vector<T, kMaxSize>
 {
 public:
+    using Base = pw::Vector<T, kMaxSize>;
     using ValueType     = T;
-    using Iterator      = typename pw::Vector<T, kMaxSize>::iterator;
-    using ConstIterator = typename pw::Vector<T, kMaxSize>::const_iterator;
+    using Iterator      = typename Base::iterator;
+    using ConstIterator = typename Base::const_iterator;
 
     CTC_UnorderedSet() = default;
-
-    // Capacity
-    constexpr size_t capacity() const { return kMaxSize; }
-    size_t size() const { return data_.size(); }
-    bool empty() const { return data_.empty(); }
-    bool full() const { return data_.size() >= kMaxSize; }
 
     // Modifiers
     bool insert(const T & value)
     {
-        if (contains(value) || full())
+        if (contains(value) || this->full())
         {
             return false;
         }
 
-        data_.push_back(value);
+        this->push_back(value);
         return true;
     }
 
     bool insert(T && value)
     {
-        if (contains(value) || full())
+        if (contains(value) || this->full())
         {
             return false;
         }
 
-        data_.push_back(std::move(value));
+        this->push_back(std::move(value));
         return true;
     }
 
     void remove(const T & value)
     {
         auto it = find(value);
-        if (it == end())
+        if (it == this->end())
         {
             return;
         }
 
         // Swap with last element and pop (O(1) removal)
-        if (it != data_.end() - 1)
+        if (it != this->end() - 1)
         {
-            *it = std::move(data_.back());
+            *it = std::move(this->back());
         }
-        data_.pop_back();
+        this->pop_back();
     }
 
-    void clear() { data_.clear(); }
+    void clear() { this->clear(); }
 
     // Lookup
-    bool contains(const T & value) const { return find(value) != end(); }
+    bool contains(const T & value) const { return find(value) != this->end(); }
 
-    Iterator find(const T & value) { return pw::containers::Find(data_, value); }
+    Iterator find(const T & value) { return pw::containers::Find(*this, value); }
 
-    ConstIterator find(const T & value) const { return pw::containers::Find(data_, value); }
-
-    // Iterators
-    Iterator begin() { return data_.begin(); }
-    Iterator end() { return data_.end(); }
-    ConstIterator begin() const { return data_.begin(); }
-    ConstIterator end() const { return data_.end(); }
-    ConstIterator cbegin() const { return data_.cbegin(); }
-    ConstIterator cend() const { return data_.cend(); }
-
-    // Access
-    T & operator[](size_t index) { return data_[index]; }
-    const T & operator[](size_t index) const { return data_[index]; }
-
-    T * data() { return data_.data(); }
-    const T * data() const { return data_.data(); }
+    ConstIterator find(const T & value) const { return pw::containers::Find(*this, value); }
 
     // Merge operations
     template <size_t OtherMaxSize>
@@ -129,135 +109,64 @@ public:
             insert(*it);
         }
     }
-
-private:
-    pw::Vector<T, kMaxSize> data_;
 };
 
 template <typename Key, typename Value, size_t kMaxSize>
-class CTC_UnorderedMap
+class CTC_UnorderedMap : public CTC_UnorderedSet<std::pair<Key, Value>, kMaxSize>
 {
 public:
+    using Base = CTC_UnorderedSet<std::pair<Key, Value>, kMaxSize>;
     using PairType      = std::pair<Key, Value>;
-    using Iterator      = typename pw::Vector<PairType, kMaxSize>::iterator;
-    using ConstIterator = typename pw::Vector<PairType, kMaxSize>::const_iterator;
+    using Iterator      = typename Base::iterator;
+    using ConstIterator = typename Base::const_iterator;
 
     CTC_UnorderedMap() = default;
-
-    // Capacity
-    constexpr size_t capacity() const { return kMaxSize; }
-    size_t size() const { return data_.size(); }
-    bool empty() const { return data_.empty(); }
-    bool full() const { return data_.size() >= kMaxSize; }
 
     // Modifiers
     bool insert(const Key & key, const Value & value) { return insert(std::make_pair(key, value)); }
 
-    bool insert(const PairType & pair)
-    {
-        if (contains(pair.first) || full())
-        {
-            return false;
-        }
-        data_.push_back(pair);
-        return true;
-    }
-
-    bool insert(PairType && pair)
-    {
-        if (contains(pair.first) || full())
-        {
-            return false;
-        }
-        data_.push_back(std::move(pair));
-        return true;
-    }
-
-    void remove(const Key & key)
-    {
-        auto it = find(key);
-        if (it == end())
-        {
-            return;
-        }
-
-        // Swap with last element and pop
-        if (it != data_.end() - 1)
-        {
-            *it = std::move(data_.back());
-        }
-        data_.pop_back();
-    }
-
-    CHIP_ERROR update(const Key & key, const Value & value)
-    {
-        auto it = find(key);
-        if (it == end())
-        {
-            return CHIP_ERROR_KEY_NOT_FOUND;
-        }
-        it->second = value;
-        return CHIP_NO_ERROR;
-    }
-
-    void clear() { data_.clear(); }
-
     // Lookup
-    bool contains(const Key & key) const { return find(key) != end(); }
-
-    Value * get_value(const Key & key)
-    {
-        auto it = find(key);
-        return it != end() ? &it->second : nullptr;
-    }
-
-    const Value * get_value(const Key & key) const
-    {
-        auto it = find(key);
-        return it != end() ? &it->second : nullptr;
-    }
+    bool contains(const Key & key) const { return find(key) != this->end(); }
 
     Iterator find(const Key & key)
     {
-        return pw::containers::FindIf(data_, [&key](const PairType & pair) { return pair.first == key; });
+        return pw::containers::FindIf(*this, [&key](const PairType & pair) { return pair.first == key; });
     }
 
     ConstIterator find(const Key & key) const
     {
-        return pw::containers::FindIf(data_, [&key](const PairType & pair) { return pair.first == key; });
+        return pw::containers::FindIf(*this, [&key](const PairType & pair) { return pair.first == key; });
     }
 
     // Access
     Value & operator[](const Key & key)
     {
         auto it = find(key);
-        if (it != data_.end())
+        if (it != this->end())
         {
             return it->second;
         }
 
         // Key not found, must insert.
-        if (full())
+        if (this->full())
         {
             ChipLogError(AppServer, "Can't place new entry - the buffer is full");
             // This is a programming error. Using operator[] on a full map for a new key.
-            assert(!full());
+            assert(!this->full());
         }
 
-        data_.push_back({ key, Value{} });
-        return data_.back().second;
+        insert({ key, Value{} });
+        return this->back().second;
     }
-
-    // Iterators
-    Iterator begin() { return data_.begin(); }
-    Iterator end() { return data_.end(); }
-    ConstIterator begin() const { return data_.begin(); }
-    ConstIterator end() const { return data_.end(); }
-    ConstIterator cbegin() const { return data_.cbegin(); }
-    ConstIterator cend() const { return data_.cend(); }
-
 private:
-    pw::Vector<PairType, kMaxSize> data_;
+    bool insert(PairType && pair)
+    {
+        if (contains(pair.first) || this->full())
+        {
+            return false;
+        }
+        return insert(std::move(pair));
+    }
 };
 
 } // namespace CommodityTariffContainers
