@@ -650,8 +650,8 @@ TEST_F(TestCodeDrivenDataModelProvider, ReadAttribute)
 
     auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
     mEndpointStorage.push_back(std::move(endpoint));
-    mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
+    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(
+        *mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1, .compositionPattern = EndpointCompositionPattern(0) }));
     EXPECT_SUCCESS(mProvider.AddEndpoint(*mOwnedRegistrations.back()));
 
     uint32_t expectedValue = testCluster.mAttributeValue;
@@ -668,8 +668,8 @@ TEST_F(TestCodeDrivenDataModelProvider, WriteAttribute)
 
     auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
     mEndpointStorage.push_back(std::move(endpoint));
-    mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
+    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(
+        *mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1, .compositionPattern = EndpointCompositionPattern(0) }));
     EXPECT_SUCCESS(mProvider.AddEndpoint(*mOwnedRegistrations.back()));
 
     auto path             = ConcreteDataAttributePath(1, 10, 1);
@@ -690,8 +690,8 @@ TEST_F(TestCodeDrivenDataModelProvider, InvokeCommand)
 
     auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
     mEndpointStorage.push_back(std::move(endpoint));
-    mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
+    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(
+        *mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1, .compositionPattern = EndpointCompositionPattern(0) }));
     EXPECT_SUCCESS(mProvider.AddEndpoint(*mOwnedRegistrations.back()));
 
     System::PacketBufferHandle buffer = System::PacketBufferHandle::New(128);
@@ -715,8 +715,8 @@ TEST_F(TestCodeDrivenDataModelProvider, IterateOverAttributes)
 
     auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
     mEndpointStorage.push_back(std::move(endpoint));
-    mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
+    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(
+        *mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1, .compositionPattern = EndpointCompositionPattern(0) }));
     EXPECT_SUCCESS(mProvider.AddEndpoint(*mOwnedRegistrations.back()));
 
     ReadOnlyBufferBuilder<DataModel::AttributeEntry> builder;
@@ -734,8 +734,8 @@ TEST_F(TestCodeDrivenDataModelProvider, IterateOverAcceptedCommands)
 
     auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
     mEndpointStorage.push_back(std::move(endpoint));
-    mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
+    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(
+        *mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1, .compositionPattern = EndpointCompositionPattern(0) }));
     EXPECT_SUCCESS(mProvider.AddEndpoint(*mOwnedRegistrations.back()));
 
     ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> builder;
@@ -753,8 +753,8 @@ TEST_F(TestCodeDrivenDataModelProvider, IterateOverGeneratedCommands)
 
     auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
     mEndpointStorage.push_back(std::move(endpoint));
-    mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
+    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(
+        *mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1, .compositionPattern = EndpointCompositionPattern(0) }));
     EXPECT_SUCCESS(mProvider.AddEndpoint(*mOwnedRegistrations.back()));
 
     ReadOnlyBufferBuilder<CommandId> builder;
@@ -772,8 +772,8 @@ TEST_F(TestCodeDrivenDataModelProvider, GetEventInfo)
 
     auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
     mEndpointStorage.push_back(std::move(endpoint));
-    mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
+    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(
+        *mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1, .compositionPattern = EndpointCompositionPattern(0) }));
     EXPECT_SUCCESS(mProvider.AddEndpoint(*mOwnedRegistrations.back()));
 
     DataModel::EventEntry eventInfo;
@@ -790,8 +790,8 @@ TEST_F(TestCodeDrivenDataModelProvider, ListAttributeWriteNotification)
 
     auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
     mEndpointStorage.push_back(std::move(endpoint));
-    mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
+    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(
+        *mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1, .compositionPattern = EndpointCompositionPattern(0) }));
     EXPECT_SUCCESS(mProvider.AddEndpoint(*mOwnedRegistrations.back()));
 
     ConcreteAttributePath path(1, 10, 1);
@@ -821,8 +821,8 @@ TEST_F(TestCodeDrivenDataModelProvider, Temporary_ReportAttributeChanged)
 
     auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
     mEndpointStorage.push_back(std::move(endpoint));
-    mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
+    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(
+        *mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1, .compositionPattern = EndpointCompositionPattern(0) }));
     EXPECT_SUCCESS(mProvider.AddEndpoint(*mOwnedRegistrations.back()));
 
     AttributePathParams path(1, 10, 1);
@@ -855,8 +855,8 @@ TEST_F(TestCodeDrivenDataModelProvider, ReadAttributeOnInvalidPath)
 {
     auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
     mEndpointStorage.push_back(std::move(endpoint));
-    mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
+    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(
+        *mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1, .compositionPattern = EndpointCompositionPattern(0) }));
     EXPECT_SUCCESS(mProvider.AddEndpoint(*mOwnedRegistrations.back()));
 
     uint32_t readValue;
@@ -868,8 +868,8 @@ TEST_F(TestCodeDrivenDataModelProvider, WriteAttributeOnInvalidPath)
 {
     auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
     mEndpointStorage.push_back(std::move(endpoint));
-    mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
+    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(
+        *mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1, .compositionPattern = EndpointCompositionPattern(0) }));
     EXPECT_SUCCESS(mProvider.AddEndpoint(*mOwnedRegistrations.back()));
 
     uint32_t valueToWrite = 123;
@@ -886,8 +886,8 @@ TEST_F(TestCodeDrivenDataModelProvider, InvokeCommandOnInvalidEndpoint)
 {
     auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
     mEndpointStorage.push_back(std::move(endpoint));
-    mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
+    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(
+        *mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1, .compositionPattern = EndpointCompositionPattern(0) }));
     EXPECT_SUCCESS(mProvider.AddEndpoint(*mOwnedRegistrations.back()));
 
     System::PacketBufferHandle buffer = System::PacketBufferHandle::New(128);
@@ -907,8 +907,8 @@ TEST_F(TestCodeDrivenDataModelProvider, InvokeCommandOnInvalidCluster)
 {
     auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
     mEndpointStorage.push_back(std::move(endpoint));
-    mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
+    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(
+        *mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1, .compositionPattern = EndpointCompositionPattern(0) }));
     EXPECT_SUCCESS(mProvider.AddEndpoint(*mOwnedRegistrations.back()));
 
     System::PacketBufferHandle buffer = System::PacketBufferHandle::New(128);
@@ -932,14 +932,14 @@ TEST_F(TestCodeDrivenDataModelProvider, SingleServerClusterInterfaceWithMultiple
 
     auto endpoint1 = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
     mEndpointStorage.push_back(std::move(endpoint1));
-    mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1 }));
+    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(
+        *mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1, .compositionPattern = EndpointCompositionPattern(0) }));
     ASSERT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
 
     auto endpoint2 = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
     mEndpointStorage.push_back(std::move(endpoint2));
-    mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 2 }));
+    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(
+        *mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 2, .compositionPattern = EndpointCompositionPattern(0) }));
     ASSERT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
 
     {
@@ -968,8 +968,8 @@ TEST_F(TestCodeDrivenDataModelProvider, AddEndpointWithKInvalidId)
 {
     auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build());
 
-    mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*endpoint, DataModel::EndpointEntry{ kInvalidEndpointId }));
+    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(
+        *endpoint, DataModel::EndpointEntry{ .id = kInvalidEndpointId, .compositionPattern = EndpointCompositionPattern(0) }));
     EndpointInterfaceRegistration * registration = mOwnedRegistrations.back().get();
 
     EXPECT_EQ(mProvider.AddEndpoint(*registration), CHIP_ERROR_INVALID_ARGUMENT);
@@ -978,13 +978,13 @@ TEST_F(TestCodeDrivenDataModelProvider, AddEndpointWithKInvalidId)
 TEST_F(TestCodeDrivenDataModelProvider, AddDuplicateEndpointId)
 {
     mEndpointStorage.push_back(std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build()));
-    mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ 1 }));
+    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(
+        *mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1, .compositionPattern = EndpointCompositionPattern(0) }));
     EndpointInterfaceRegistration * registration1 = mOwnedRegistrations.back().get();
 
     mEndpointStorage.push_back(std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build()));
-    mOwnedRegistrations.push_back(
-        std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), DataModel::EndpointEntry{ 1 }));
+    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(
+        *mEndpointStorage.back(), DataModel::EndpointEntry{ .id = 1, .compositionPattern = EndpointCompositionPattern(0) }));
     EndpointInterfaceRegistration * registration2 = mOwnedRegistrations.back().get();
 
     EXPECT_EQ(mProvider.AddEndpoint(*registration1), CHIP_NO_ERROR);
