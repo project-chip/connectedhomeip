@@ -103,7 +103,7 @@ class TC_CC_10_1(MatterBaseTest):
             TestStep("5a", "TH sends _EnhancedMoveToHueAndSaturation command_ to DUT with _EnhancedHue_=20000, _Saturation_=50 and _TransitionTime_=0 (immediately)."),
             TestStep("5b", "TH reads _EnhancedCurrentHue and CurrentSaturation attributes_ from DUT."),
             TestStep("5c", "TH sends a _StoreScene_ command to DUT with the _GroupID_ field set to _G~1~_ and the _SceneID_ field set to 0x01."),
-            TestStep("45d", "TH sends a _ViewScene_ command to DUT with the _GroupID_ field set to _G~1~_ and the _SceneID_ field set to 0x01."),
+            TestStep("5d", "TH sends a _ViewScene_ command to DUT with the _GroupID_ field set to _G~1~_ and the _SceneID_ field set to 0x01."),
             TestStep(
                 "6a", "TH sends a _AddScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x02, the TransitionTime field set to 0 and the ExtensionFieldSetStructs set to: '[{ ClusterID: 0x0300, AttributeValueList: [{ AttributeID: 0x4001, ValueUnsigned8: 0x00 }, { AttributeID: 0x0001, ValueUnsigned8: 0xE0 }]}]'"),
             TestStep("6b", "TH sends a _RecallScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x02 and the _TransitionTime_ omitted."),
