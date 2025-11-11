@@ -21,6 +21,7 @@
  */
 
 #include <AppConfig.h>
+#include <AppTask.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
@@ -53,6 +54,23 @@ void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attrib
 void MatterClosureControlClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
 {
     ChipLogProgress(Zcl, "Closure Control cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(attributePath.mAttributeId));
+#ifdef DISPLAY_ENABLED
+    using namespace chip::app::Clusters::ClosureControl::Attributes;
+
+    switch (attributePath.mAttributeId)
+    {
+    case MainState::Id:
+    case OverallCurrentState::Id: {
+        AppEvent event;
+        event.Type    = AppEvent::kEventType_UpdateUI;
+        event.Handler = AppTask::UpdateClosureUIHandler;
+        AppTask::GetAppTask().PostEvent(&event);
+        break;
+    }
+    default:
+        break;
+    }
+#endif // DISPLAY_ENABLED
 }
 
 void MatterClosureDimensionClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
