@@ -53,7 +53,7 @@ runs:
         echo "+ python details:"
         echo "  which python: $(command -v python || true)"
         echo "  python --version: $(python --version 2>&1 || true)"
-        PYTHON_HASH="$(python --version | shasum -a 256 | cut -d' ' -f1)"
+        PYTHON_HASH="$(echo $(python --version 2>/dev/null || echo "nopython") | shasum -a 256 | cut -d' ' -f1)"
         FINAL_HASH="$(echo "$PWD:$FILES_HASH:$OS_HASH:$PYTHON_HASH" | shasum -a 256 | cut -d' ' -f1)"
         echo "Hash components:"
         echo "  FILES_HASH=$FILES_HASH"
@@ -90,7 +90,7 @@ runs:
 
     - name: Save bootstrap cache
       uses: ./.github/actions/dynamic
-      # Don't save cache if the build is a pull request, to prevent creation of multiple pr-ref caches with the same key. 
+      # Don't save cache if the build is a pull request, to prevent creation of multiple pr-ref caches with the same key.
       # PR builds still will be able to restore from cache created by master build.
       if: ${{ fromJSON(steps.restore.outputs.outputs).cache-hit != 'true' && github.event_name != 'pull_request' }}
       continue-on-error: true
