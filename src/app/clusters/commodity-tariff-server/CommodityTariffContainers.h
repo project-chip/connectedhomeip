@@ -36,7 +36,7 @@ template <typename T, size_t kMaxSize>
 class CTC_UnorderedSet : public pw::Vector<T, kMaxSize>
 {
 public:
-    using Base =        pw::Vector<T, kMaxSize>;
+    using Base          = pw::Vector<T, kMaxSize>;
     using ValueType     = T;
     using Iterator      = typename Base::iterator;
     using ConstIterator = typename Base::const_iterator;
