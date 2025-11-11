@@ -15,7 +15,7 @@
  *
  */
 
-#include "boolean-state-configuration-cluster.h"
+#include <app/clusters/boolean-state-configuration-server/boolean-state-configuration-cluster.h>
 
 #include <algorithm>
 #include <app/SafeAttributePersistenceProvider.h>
