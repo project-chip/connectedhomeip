@@ -243,7 +243,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
                         # Write the attribute
                         resp = await self.default_controller.WriteAttribute(
-                            nodeid=self.dut_node_id,
+                            nodeId=self.dut_node_id,
                             attributes=[(endpoint_id, attribute(new_val))]
                         )
 
@@ -264,7 +264,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
                             # Restore list values if we wrote an empty list successfully
                             if isinstance(current_val, list) and len(new_val) == 0:
                                 await self.default_controller.WriteAttribute(
-                                    nodeid=self.dut_node_id,
+                                    nodeId=self.dut_node_id,
                                     attributes=[(endpoint_id, attribute(current_val))]
                                 )
                                 logging.debug(f"{test_step}: Restored original value for {attribute.__name__}")
@@ -612,7 +612,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         # parameter unless the message recipient Node advertises an alternate value for the parameter
         # via Operational Discovery."
         # The negotiated values can be retrieved using:
-        #   session_params = TH.GetRemoteSessionParameters(nodeid)
+        #   session_params = TH.GetRemoteSessionParameters(nodeId)
         #   actual_idle_interval = session_params.sessionIdleInterval (in ms)
         #   actual_active_interval = session_params.sessionActiveInterval (in ms)
         #
@@ -829,7 +829,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         # Subscribe to all attributes in BasicInformation cluster on endpoint 0
         # This wildcard path subscribes to ALL attributes in the cluster
         sub_step8 = await TH.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=[(self.root_node_endpoint, Clusters.BasicInformation)],
             reportInterval=(self.min_interval_floor_sec, self.max_interval_ceiling_sec),
             keepSubscriptions=False,
@@ -863,7 +863,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
         # Subscribe to NodeLabel attribute from BasicInformation cluster on ALL endpoints
         sub_step9 = await TH.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=[AttributePath(
                 ClusterId=Clusters.BasicInformation.id,
                 AttributeId=Clusters.BasicInformation.Attributes.NodeLabel.attribute_id
@@ -940,7 +940,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
             subscription_paths.append(AttributePath(ClusterId=cluster_id))
 
         sub_step10 = await TH.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=subscription_paths,
             reportInterval=(self.min_interval_floor_sec, self.max_interval_ceiling_sec),
             keepSubscriptions=False,
@@ -996,7 +996,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
                 ))
 
         sub_step11 = await TH.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=subscription_paths_step11,
             reportInterval=(self.min_interval_floor_sec, self.max_interval_ceiling_sec),
             keepSubscriptions=False,
@@ -1030,7 +1030,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
         # Subscribe to all attributes of BasicInformation cluster on ALL endpoints
         sub_step12 = await TH.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=[AttributePath(ClusterId=Clusters.BasicInformation.id)],
             reportInterval=(self.min_interval_floor_sec, self.max_interval_ceiling_sec),
             keepSubscriptions=False,
