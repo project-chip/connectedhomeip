@@ -366,7 +366,6 @@ template("efr32_sdk") {
         "${wifi_sdk_root}/components/common/inc",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/config",
         "${wifi_sdk_root}/components/device/silabs/si91x/wireless/inc",
-        "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc",
 
         # wifi component
         "${wifi_sdk_root}/components/protocol/wifi/inc",
@@ -388,10 +387,6 @@ template("efr32_sdk") {
       ]
     }
 
-    if (use_SiWx917) {
-      _include_dirs += [ "${chip_root}/src/platform/silabs/SiWx/ble" ]
-    }
-
     if (use_wf200 || use_SiWx917) {
       _include_dirs += [ "${chip_root}/src/platform/silabs/wifi" ]
     }
@@ -401,11 +396,6 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/radio/rail_lib/hal",
         "${efr32_sdk_root}/platform/radio/rail_lib/hal/efr32",
       ]
-    }
-
-    if (chip_enable_ble_siwx) {
-      _include_dirs +=
-          [ "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc" ]
     }
 
     if (use_system_view) {
@@ -895,17 +885,7 @@ template("efr32_sdk") {
       ]
     }
 
-    if (chip_enable_ble_siwx) {
-      sources += [
-        "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_ble_gap_apis.c",
-        "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_ble_gatt_apis.c",
-        "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_bt_ble.c",
-        "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_bt_common_apis.c",
-        "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_common_apis.c",
-        "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_utils.c",
-        "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/sl_si91x_ble.c",
-      ]
-    } else {
+    if (!chip_enable_ble_siwx) {
       sources += [
         "${efr32_sdk_root}/protocol/bluetooth/bgstack/ll/src/sl_btctrl_init.c",
         "${efr32_sdk_root}/protocol/bluetooth/bgstack/ll/src/sl_btctrl_init_tasklets.c",

@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Project CHIP Authors
+# Copyright (c) 2025 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,13 +19,23 @@ import("${chip_root}/third_party/silabs/silabs_board.gni")
 config("siwx-ble-config") {
   defines = []
   include_dirs = []
-  include_dirs = [ "${silabs_platform_dir}/SiWx/ble" ]
+
+  include_dirs = [ "${silabs_platform_dir}/SiWx/ble",
+  "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc",
+   ]
 }
 
 source_set("siwx-ble") {
   sources = [
     "BLEManagerImpl.cpp",
     "sl_si91x_ble_init.cpp",
+    "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_ble_gap_apis.c",
+    "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_ble_gatt_apis.c",
+    "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_bt_ble.c",
+    "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_bt_common_apis.c",
+    "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_common_apis.c",
+    "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_utils.c",
+    "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/sl_si91x_ble.c",
   ]
 
   public_configs = [ ":siwx-ble-config" ]

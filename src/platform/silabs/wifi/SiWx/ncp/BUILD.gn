@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Project CHIP Authors
+# Copyright (c) 2025 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,6 +29,8 @@ config("siwx-ncp-config") {
     "${chip_root}/third_party/silabs/simplicity_sdk/platform/emdrv/dmadrv/inc",
     "${chip_root}/third_party/silabs/simplicity_sdk/platform/emdrv/spidrv/inc",
     "${chip_root}/examples/platform/silabs",
+    "${chip_root}/src/platform/silabs/SiWx/ble",
+    "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc",
   ]
 }
 
@@ -39,9 +41,7 @@ source_set("siwx-ncp") {
     "${chip_root}/src/platform/silabs/wifi/SiWx/ncp/sl_board_configuration.h",
     "${chip_root}/src/platform/silabs/wifi/SiWx/ncp/sl_si91x_ncp_utility.c",
     "${chip_root}/src/platform/silabs/wifi/ncp/spi_multiplex.h",
-  ]
 
-  sources += [
     # si91x_support component
     # sl_si91x_wireless component
     "${wifi_sdk_root}/components/common/src/sl_utility.c",

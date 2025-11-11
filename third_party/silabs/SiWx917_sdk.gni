@@ -63,7 +63,6 @@ template("siwx917_sdk") {
       "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/autogen",
       "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/config",
 
-      "${chip_root}/src/platform/silabs/SiWx/ble",
       "${chip_root}/src/platform/silabs/wifi",
 
       # ble component
@@ -658,14 +657,6 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/service/network_manager/src/sl_net_basic_profiles.c",
       "${wifi_sdk_root}/components/service/network_manager/src/sl_net_credentials.c",
 
-      # ble component
-      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_ble_gap_apis.c",
-      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_ble_gatt_apis.c",
-      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_bt_ble.c",
-      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_bt_common_apis.c",
-      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_common_apis.c",
-      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_utils.c",
-      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/sl_si91x_ble.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/crypto/trng/src/sl_si91x_trng.c",
 
       # si91x_basic_buffers component

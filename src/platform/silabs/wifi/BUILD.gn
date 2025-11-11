@@ -50,6 +50,8 @@ config("wifi-platform-config") {
   defines = []
   include_dirs = []
 
+
+
   if (sl_enable_wifi_debug) {
     defines += [ "WIFI_DEBUG_ENABLED=1" ]
   } else {
@@ -87,6 +89,11 @@ config("wifi-platform-config") {
   if (!disable_lcd) {
     defines += [ "DISPLAY_ENABLED" ]
   }
+  if (use_SiWx917 || wifi_soc) {
+     include_dirs +=[ "${chip_root}/src/platform/silabs/SiWx/ble",
+     "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc",
+     ]
+  }
 }
 
 source_set("state-provider") {
@@ -121,6 +128,14 @@ source_set("wifi-platform") {
     ]
   } else if (use_wf200) {
     sources += wf200_plat_src
+    sources += [
+      "${silabs_platform_dir}/wifi/lwip-support/dhcp_client.cpp",
+      "${silabs_platform_dir}/wifi/lwip-support/dhcp_client.h",
+      "${silabs_platform_dir}/wifi/lwip-support/ethernetif.cpp",
+      "${silabs_platform_dir}/wifi/lwip-support/ethernetif.h",
+      "${silabs_platform_dir}/wifi/lwip-support/lwip_netif.cpp",
+      "${silabs_platform_dir}/wifi/lwip-support/lwip_netif.h",
+    ]
   }
 
   if (wifi_soc) {
@@ -134,16 +149,6 @@ source_set("wifi-platform") {
     public_deps += [ "${lwip_root}:lwip" ]
   }
 
-  if (use_wf200) {
-    sources += [
-      "${silabs_platform_dir}/wifi/lwip-support/dhcp_client.cpp",
-      "${silabs_platform_dir}/wifi/lwip-support/dhcp_client.h",
-      "${silabs_platform_dir}/wifi/lwip-support/ethernetif.cpp",
-      "${silabs_platform_dir}/wifi/lwip-support/ethernetif.h",
-      "${silabs_platform_dir}/wifi/lwip-support/lwip_netif.cpp",
-      "${silabs_platform_dir}/wifi/lwip-support/lwip_netif.h",
-    ]
-  }
   if (chip_enable_icd_server) {
     public_deps += [
       "${chip_root}/src/app/icd/server:configuration-data",
