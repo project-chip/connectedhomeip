@@ -53,6 +53,32 @@ struct Instance
 
     CHIP_ERROR Init() { return mCluster.Cluster().Init(); };
 
+    // Attribute setters
+    Protocols::InteractionModel::Status UpdateCondition(uint8_t newCondition)
+    {
+        return mCluster.Cluster().UpdateCondition(newCondition);
+    }
+    Protocols::InteractionModel::Status
+    UpdateChangeIndication(chip::app::Clusters::ResourceMonitoring::ChangeIndicationEnum newChangeIndication)
+    {
+        return mCluster.Cluster().UpdateChangeIndication(newChangeIndication);
+    }
+    Protocols::InteractionModel::Status UpdateInPlaceIndicator(bool newInPlaceIndicator)
+    {
+        return mCluster.Cluster().UpdateInPlaceIndicator(newInPlaceIndicator);
+    }
+    Protocols::InteractionModel::Status UpdateLastChangedTime(DataModel::Nullable<uint32_t> newLastChangedTime)
+    {
+        return mCluster.Cluster().UpdateLastChangedTime(newLastChangedTime);
+    }
+
+    // Attribute getters
+    uint8_t GetCondition() const { return mCluster.Cluster().GetCondition(); }
+    ChangeIndicationEnum GetChangeIndication() const { return mCluster.Cluster().GetChangeIndication(); }
+    DegradationDirectionEnum GetDegradationDirection() const { return mCluster.Cluster().GetDegradationDirection(); }
+    bool GetInPlaceIndicator() const { return mCluster.Cluster().GetInPlaceIndicator(); }
+    DataModel::Nullable<uint32_t> GetLastChangedTime() const { return mCluster.Cluster().GetLastChangedTime(); }
+
     chip::app::RegisteredServerCluster<chip::app::Clusters::ResourceMonitoring::ResourceMonitoringCluster> mCluster;
 };
 

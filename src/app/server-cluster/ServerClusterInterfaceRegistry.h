@@ -59,6 +59,7 @@ struct RegisteredServerCluster
 
     [[nodiscard]] constexpr ServerClusterRegistration & Registration() { return registration; }
     [[nodiscard]] constexpr SERVER_CLUSTER & Cluster() { return cluster; }
+    [[nodiscard]] constexpr const SERVER_CLUSTER & Cluster() const { return cluster; }
 
 private:
     SERVER_CLUSTER cluster;
