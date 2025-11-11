@@ -702,7 +702,6 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::ConfigureThreadS
         VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
 
         otErr = otThreadSetEnabled(otInst, true);
-        ChipLogProgress(DeviceLayer, "MMMMMMMMMMMMMMMMMMMMMMMater otThreadSetEnabled:%s", otThreadErrorToString(otErr));
         VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
 
         ChipLogProgress(DeviceLayer, "OpenThread ifconfig up and thread start");

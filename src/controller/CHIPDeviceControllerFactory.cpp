@@ -30,11 +30,11 @@
 #include <app/util/DataModelHandler.h>
 #include <lib/core/ErrorStr.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
-#include <platform/DefaultTimerDelegate.h>
 
 #if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
+#include <platform/DefaultTimerDelegate.h>
 #endif
 
 #include <app/server/Dnssd.h>
