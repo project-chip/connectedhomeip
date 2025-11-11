@@ -40,7 +40,7 @@ void ChunkedWriteCallback::OnResponse(const WriteClient * apWriteClient, const C
         }
 
         // This is a response to another attribute write. Report the final result of last attribute write.
-        callback->OnResponse(apWriteClient, static_cast<ConcreteDataAttributePath>(mProcessingAttributePath.Value()), mAttributeStatus);
+        callback->OnResponse(apWriteClient, mProcessingAttributePath.Value(), mAttributeStatus);
     }
 
     // This is the first report for a new attribute.  We assume it will never be a list item operation.
@@ -66,7 +66,7 @@ void ChunkedWriteCallback::OnDone(WriteClient * apWriteClient)
         // We have a cached status that has yet to be reported to the application so report it now.
         // If we failed to receive the response, or we received a malformed response, OnResponse won't be called,
         // mProcessingAttributePath will be Missing() in this case.
-        callback->OnResponse(apWriteClient, static_cast<ConcreteDataAttributePath>(mProcessingAttributePath.Value()), mAttributeStatus);
+        callback->OnResponse(apWriteClient, mProcessingAttributePath.Value(), mAttributeStatus);
     }
 
     mProcessingAttributePath = NullOptional;
