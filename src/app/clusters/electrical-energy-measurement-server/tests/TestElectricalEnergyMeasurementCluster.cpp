@@ -35,6 +35,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ElectricalEnergyMeasurement;
 using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Attributes;
+using namespace chip::Test;
 
 namespace {
 
@@ -465,8 +466,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, EventGeneratedOnSnapshots)
     // Test cumulative energy snapshot event generation
     {
         EventNumber initialCount = logOnlyEvents.CurrentEventNumber();
-
-        auto eventNumber = cluster.CumulativeEnergySnapshot(optionalImported, optionalExported);
+        auto eventNumber         = cluster.CumulativeEnergySnapshot(optionalImported, optionalExported);
 
         ASSERT_TRUE(eventNumber.has_value());
         EXPECT_EQ(eventNumber.value(), logOnlyEvents.CurrentEventNumber());

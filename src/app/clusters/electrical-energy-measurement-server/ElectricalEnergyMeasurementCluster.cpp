@@ -334,8 +334,6 @@ ElectricalEnergyMeasurementCluster::CumulativeEnergySnapshot(const Optional<Ener
 {
     VerifyOrReturnValue(Features().Has(Feature::kCumulativeEnergy), std::nullopt);
     Events::CumulativeEnergyMeasured::Type event;
-    event.energyImported = energyImported;
-    event.energyExported = energyExported;
 
     if (Features().Has(Feature::kImportedEnergy))
     {
@@ -359,8 +357,6 @@ ElectricalEnergyMeasurementCluster::PeriodicEnergySnapshot(const Optional<Energy
 {
     VerifyOrReturnValue(Features().Has(Feature::kPeriodicEnergy), std::nullopt);
     Events::PeriodicEnergyMeasured::Type event;
-    event.energyImported = energyImported;
-    event.energyExported = energyExported;
 
     if (Features().Has(Feature::kImportedEnergy))
     {
