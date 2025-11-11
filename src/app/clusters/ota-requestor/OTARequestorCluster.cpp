@@ -34,22 +34,42 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
 
 }  // namespace
 
-OTARequestorCluster::OTARequestorCluster(EndpointId endpointId, OTARequestorInterface & otaRequestor)
+OTARequestorCluster::OTARequestorCluster(EndpointId endpointId, OTARequestorInterface * otaRequestor)
     : DefaultServerCluster(ConcreteClusterPath(endpointId, OtaSoftwareUpdateRequestor::Id)),
       mEventHandlerRegistration(*this, endpointId),
       mOtaRequestor(otaRequestor)
 {
 }
 
+void OTARequestorCluster::SetOtaRequestorInterface(OTARequestorInterface * otaRequestor)
+{
+    if (mOtaRequestor)
+    {
+        mOtaRequestor->UnregisterEventHandler(mPath.mEndpointId);
+    }
+    mOtaRequestor = otaRequestor;
+    if (mOtaRequestor)
+    {
+        mOtaRequestor->RegisterEventHandler(mEventHandlerRegistration);
+    }
+}
+
 CHIP_ERROR OTARequestorCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-    return mOtaRequestor.RegisterEventHandler(mEventHandlerRegistration);
+    if (mOtaRequestor)
+    {
+      return mOtaRequestor->RegisterEventHandler(mEventHandlerRegistration);
+    }
+    return CHIP_NO_ERROR;
 }
 
 void OTARequestorCluster::Shutdown()
 {
-    mOtaRequestor.UnregisterEventHandler(mPath.mEndpointId);
+    if (mOtaRequestor)
+    {
+        mOtaRequestor->UnregisterEventHandler(mPath.mEndpointId);
+    }
     DefaultServerCluster::Shutdown();
 }
 
@@ -60,8 +80,12 @@ DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(
     switch (request.path.mAttributeId)
     {
     case OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id: {
+        if (!mOtaRequestor)
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
         return encoder.EncodeList([this](const auto & listEncoder) -> CHIP_ERROR {
-            ProviderLocationList::Iterator providerIterator = mOtaRequestor.GetDefaultOTAProviderListIterator();
+            ProviderLocationList::Iterator providerIterator = mOtaRequestor->GetDefaultOTAProviderListIterator();
             CHIP_ERROR error = CHIP_NO_ERROR;
             while (error == CHIP_NO_ERROR && providerIterator.Next()) {
                 error = listEncoder.Encode(providerIterator.GetValue());
@@ -70,11 +94,23 @@ DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(
         });
     }
     case OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id:
-        return encoder.Encode(mOtaRequestor.GetUpdatePossible());
+        if (!mOtaRequestor)
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+        return encoder.Encode(mOtaRequestor->GetUpdatePossible());
     case OtaSoftwareUpdateRequestor::Attributes::UpdateState::Id:
-        return encoder.Encode(mOtaRequestor.GetCurrentUpdateState());
+        if (!mOtaRequestor)
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+        return encoder.Encode(mOtaRequestor->GetCurrentUpdateState());
     case OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id:
-        return encoder.Encode(mOtaRequestor.GetCurrentUpdateStateProgress());
+        if (!mOtaRequestor)
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+        return encoder.Encode(mOtaRequestor->GetCurrentUpdateStateProgress());
     case Globals::Attributes::FeatureMap::Id:
         return encoder.Encode<uint32_t>(0);
     case Globals::Attributes::ClusterRevision::Id:
@@ -107,7 +143,7 @@ std::optional<DataModel::ActionReturnStatus> OTARequestorCluster::InvokeCommand(
                          static_cast<unsigned>(kMaxMetadataLen));
             return Protocols::InteractionModel::Status::InvalidCommand;
         }
-        mOtaRequestor.HandleAnnounceOTAProvider(handler, request.path, data);
+        mOtaRequestor->HandleAnnounceOTAProvider(handler, request.path, data);
         return std::nullopt;
     }
     default:

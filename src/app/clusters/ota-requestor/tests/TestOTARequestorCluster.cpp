@@ -145,7 +145,7 @@ TEST_F(TestOTARequestorCluster, TestCreate)
 {
     chip::Test::TestServerClusterContext context;
     MockOtaRequestor otaRequestor;
-    OTARequestorCluster cluster(kTestEndpointId, otaRequestor);
+    OTARequestorCluster cluster(kTestEndpointId, &otaRequestor);
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 }
 
@@ -153,7 +153,7 @@ TEST_F(TestOTARequestorCluster, AttributeListTest)
 {
     chip::Test::TestServerClusterContext context;
     MockOtaRequestor otaRequestor;
-    OTARequestorCluster cluster(kTestEndpointId, otaRequestor);
+    OTARequestorCluster cluster(kTestEndpointId, &otaRequestor);
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
@@ -177,7 +177,7 @@ TEST_F(TestOTARequestorCluster, AcceptedCommandsTest)
 {
     chip::Test::TestServerClusterContext context;
     MockOtaRequestor otaRequestor;
-    OTARequestorCluster cluster(kTestEndpointId, otaRequestor);
+    OTARequestorCluster cluster(kTestEndpointId, &otaRequestor);
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedCommands;
@@ -197,7 +197,7 @@ TEST_F(TestOTARequestorCluster, GeneratedCommandsTest)
 {
     chip::Test::TestServerClusterContext context;
     MockOtaRequestor otaRequestor;
-    OTARequestorCluster cluster(kTestEndpointId, otaRequestor);
+    OTARequestorCluster cluster(kTestEndpointId, &otaRequestor);
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     ReadOnlyBufferBuilder<CommandId> generatedCommands;
@@ -210,7 +210,7 @@ TEST_F(TestOTARequestorCluster, EventInfoTest)
 {
     chip::Test::TestServerClusterContext context;
     MockOtaRequestor otaRequestor;
-    OTARequestorCluster cluster(kTestEndpointId, otaRequestor);
+    OTARequestorCluster cluster(kTestEndpointId, &otaRequestor);
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     DataModel::EventEntry eventInfo;
@@ -241,7 +241,7 @@ TEST_F(TestOTARequestorCluster, AnnounceOtaProviderCommandTest)
 {
     chip::Test::TestServerClusterContext context;
     MockOtaRequestor otaRequestor;
-    OTARequestorCluster cluster(kTestEndpointId, otaRequestor);
+    OTARequestorCluster cluster(kTestEndpointId, &otaRequestor);
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     chip::Test::ClusterTester tester(cluster);
@@ -268,7 +268,7 @@ TEST_F(TestOTARequestorCluster, AnnounceOtaProviderCommandInvalidMetadataTest)
 {
     chip::Test::TestServerClusterContext context;
     MockOtaRequestor otaRequestor;
-    OTARequestorCluster cluster(kTestEndpointId, otaRequestor);
+    OTARequestorCluster cluster(kTestEndpointId, &otaRequestor);
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     chip::Test::ClusterTester tester(cluster);
@@ -290,7 +290,7 @@ TEST_F(TestOTARequestorCluster, ReadAttributesTest)
 {
     chip::Test::TestServerClusterContext context;
     MockOtaRequestor otaRequestor;
-    OTARequestorCluster cluster(kTestEndpointId, otaRequestor);
+    OTARequestorCluster cluster(kTestEndpointId, &otaRequestor);
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     chip::Test::ClusterTester tester(cluster);
@@ -362,7 +362,7 @@ TEST_F(TestOTARequestorCluster, StateTransitionEvent)
 {
     chip::Test::TestServerClusterContext context;
     MockOtaRequestor otaRequestor;
-    OTARequestorCluster cluster(kTestEndpointId, otaRequestor);
+    OTARequestorCluster cluster(kTestEndpointId, &otaRequestor);
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     auto & eventsGenerator = context.EventsGenerator();
@@ -388,7 +388,7 @@ TEST_F(TestOTARequestorCluster, NoStateTransitionEventWithIdenticalStates)
 {
     chip::Test::TestServerClusterContext context;
     MockOtaRequestor otaRequestor;
-    OTARequestorCluster cluster(kTestEndpointId, otaRequestor);
+    OTARequestorCluster cluster(kTestEndpointId, &otaRequestor);
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     auto & eventsGenerator = context.EventsGenerator();
@@ -405,7 +405,7 @@ TEST_F(TestOTARequestorCluster, VersionAppliedEvent)
 {
     chip::Test::TestServerClusterContext context;
     MockOtaRequestor otaRequestor;
-    OTARequestorCluster cluster(kTestEndpointId, otaRequestor);
+    OTARequestorCluster cluster(kTestEndpointId, &otaRequestor);
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     auto & eventsGenerator = context.EventsGenerator();
@@ -426,7 +426,7 @@ TEST_F(TestOTARequestorCluster, DownloadErrorEvents)
 {
     chip::Test::TestServerClusterContext context;
     MockOtaRequestor otaRequestor;
-    OTARequestorCluster cluster(kTestEndpointId, otaRequestor);
+    OTARequestorCluster cluster(kTestEndpointId, &otaRequestor);
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     auto & eventsGenerator = context.EventsGenerator();
@@ -461,7 +461,7 @@ TEST_F(TestOTARequestorCluster, RegistersAsEventHandler)
 {
     chip::Test::TestServerClusterContext context;
     MockOtaRequestor otaRequestor;
-    OTARequestorCluster cluster(kTestEndpointId, otaRequestor);
+    OTARequestorCluster cluster(kTestEndpointId, &otaRequestor);
 
     EXPECT_EQ(otaRequestor.GetEventHandler(kTestEndpointId), nullptr);
 
@@ -470,6 +470,95 @@ TEST_F(TestOTARequestorCluster, RegistersAsEventHandler)
 
     cluster.Shutdown();
     EXPECT_EQ(otaRequestor.GetEventHandler(kTestEndpointId), nullptr);
+}
+
+TEST_F(TestOTARequestorCluster, ReadsWhileNoRequestorInterfaceReturnErrors)
+{
+    chip::Test::TestServerClusterContext context;
+    OTARequestorCluster cluster(kTestEndpointId, nullptr);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    chip::Test::ClusterTester tester(cluster);
+
+    // Read and verify that DefaultOTAProviders returns an error.
+    using DecodableProviderLocation = OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType;
+    DataModel::DecodableList<DecodableProviderLocation> defaultOtaProviders;
+    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id,
+                                   defaultOtaProviders),
+              CHIP_ERROR_INTERNAL);
+
+    // Read and verify that UpdatePossible returns an error.
+    bool updatePossible;
+    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id, updatePossible),
+              CHIP_ERROR_INTERNAL);
+
+    // Read and verify that UpdateState returns an error.
+    OtaSoftwareUpdateRequestor::UpdateStateEnum updateState;
+    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdateState::Id, updateState),
+              CHIP_ERROR_INTERNAL);
+
+    // Read and verify that UpdateStateProgress returns an error.
+    DataModel::Nullable<uint8_t> updateStateProgress;
+    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id,
+                                   updateStateProgress),
+              CHIP_ERROR_INTERNAL);
+
+    // FeatureMap shouldn't be affected.
+    uint32_t featureMap;
+    EXPECT_EQ(tester.ReadAttribute(Globals::Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
+    EXPECT_EQ(featureMap, 0u);
+
+    // ClusterRevision shouldn't be affected.
+    uint16_t clusterRevision;
+    EXPECT_EQ(tester.ReadAttribute(Globals::Attributes::ClusterRevision::Id, clusterRevision), CHIP_NO_ERROR);
+    EXPECT_EQ(clusterRevision, 1u);
+
+    // Non-existent attribute should be handled the same..
+    uint32_t nonExistentAttribute;
+    EXPECT_NE(tester.ReadAttribute(0xFFFF, nonExistentAttribute), CHIP_NO_ERROR);
+}
+
+TEST_F(TestOTARequestorCluster, SettingOtaRequestorInterfaceEnablesReads)
+{
+    chip::Test::TestServerClusterContext context;
+    OTARequestorCluster cluster(kTestEndpointId, nullptr);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    chip::Test::ClusterTester tester(cluster);
+
+    bool updatePossible;
+    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id, updatePossible),
+              CHIP_ERROR_INTERNAL);
+
+    MockOtaRequestor otaRequestor;
+    otaRequestor.SetUpdatePossible(true);
+    cluster.SetOtaRequestorInterface(&otaRequestor);
+
+    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id, updatePossible),
+              CHIP_NO_ERROR);
+    EXPECT_TRUE(updatePossible);
+}
+
+TEST_F(TestOTARequestorCluster, SettingOtaRequestorInterfaceRegistersEventHandler)
+{
+    chip::Test::TestServerClusterContext context;
+    OTARequestorCluster cluster(kTestEndpointId, nullptr);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    MockOtaRequestor otaRequestor;
+    EXPECT_EQ(otaRequestor.GetEventHandler(kTestEndpointId), nullptr);
+
+    cluster.SetOtaRequestorInterface(&otaRequestor);
+    EXPECT_EQ(otaRequestor.GetEventHandler(kTestEndpointId), &cluster);
+
+    MockOtaRequestor secondOtaRequestor;
+    cluster.SetOtaRequestorInterface(&secondOtaRequestor);
+    EXPECT_EQ(otaRequestor.GetEventHandler(kTestEndpointId), nullptr);
+    EXPECT_EQ(secondOtaRequestor.GetEventHandler(kTestEndpointId), &cluster);
+
+    cluster.Shutdown();
+    EXPECT_EQ(otaRequestor.GetEventHandler(kTestEndpointId), nullptr);
+    EXPECT_EQ(secondOtaRequestor.GetEventHandler(kTestEndpointId), nullptr);
 }
 
 }  // namespace
