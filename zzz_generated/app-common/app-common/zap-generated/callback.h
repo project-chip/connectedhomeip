@@ -7085,24 +7085,6 @@ bool emberAfBridgedDeviceBasicInformationClusterKeepActiveCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::BridgedDeviceBasicInformation::Commands::KeepActive::DecodableType & commandData);
 /**
- * @brief ICD Management Cluster RegisterClient Command callback (from client)
- */
-bool emberAfIcdManagementClusterRegisterClientCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::IcdManagement::Commands::RegisterClient::DecodableType & commandData);
-/**
- * @brief ICD Management Cluster UnregisterClient Command callback (from client)
- */
-bool emberAfIcdManagementClusterUnregisterClientCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::IcdManagement::Commands::UnregisterClient::DecodableType & commandData);
-/**
- * @brief ICD Management Cluster StayActiveRequest Command callback (from client)
- */
-bool emberAfIcdManagementClusterStayActiveRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::IcdManagement::Commands::StayActiveRequest::DecodableType & commandData);
-/**
  * @brief Timer Cluster SetTimer Command callback (from client)
  */
 bool emberAfTimerClusterSetTimerCallback(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,

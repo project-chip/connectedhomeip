@@ -532,7 +532,7 @@ private:
                 return;
             }
 
-            mServer->GetTransportManager().MulticastGroupJoinLeave(
+            TEMPORARY_RETURN_IGNORED mServer->GetTransportManager().MulticastGroupJoinLeave(
                 Transport::PeerAddress::Multicast(fabric->GetFabricId(), old_group.group_id), false);
         };
 
