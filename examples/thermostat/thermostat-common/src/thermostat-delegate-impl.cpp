@@ -512,8 +512,5 @@ CHIP_ERROR ThermostatDelegate::GetScheduleTypeAtIndex(size_t index, Structs::Sch
 
 DataModel::Nullable<uint8_t> ThermostatDelegate::GetNumberOfScheduleTransitionsPerDay()
 {
-    if (mMaxNumberOfScheduleTransitionsPerDay.IsNull())
-        return DataModel::NullNullable;
-
-    return DataModel::MakeNullable(mMaxNumberOfScheduleTransitionsPerDay.Value());
+    return mMaxNumberOfScheduleTransitionsPerDay;
 }
