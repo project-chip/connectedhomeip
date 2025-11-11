@@ -38,18 +38,18 @@ struct GeneralDiagnosticsFunctionsConfig
 class GeneralDiagnosticsCluster : public DefaultServerCluster
 {
 public:
-    using OptionalAttributeSet =
-        chip::app::OptionalAttributeSet<GeneralDiagnostics::Attributes::TotalOperationalHours::Id, //
-                                        GeneralDiagnostics::Attributes::BootReason::Id,            //
-                                        GeneralDiagnostics::Attributes::ActiveHardwareFaults::Id,  //
-                                        GeneralDiagnostics::Attributes::ActiveRadioFaults::Id,     //
-                                        GeneralDiagnostics::Attributes::ActiveNetworkFaults::Id,   //
-                                        GeneralDiagnostics::Attributes::DeviceLoadStatus::Id       //
-                                        >;
+    using OptionalAttributeSet = chip::app::OptionalAttributeSet<GeneralDiagnostics::Attributes::TotalOperationalHours::Id, //
+                                                                 GeneralDiagnostics::Attributes::BootReason::Id,            //
+                                                                 GeneralDiagnostics::Attributes::ActiveHardwareFaults::Id,  //
+                                                                 GeneralDiagnostics::Attributes::ActiveRadioFaults::Id,     //
+                                                                 GeneralDiagnostics::Attributes::ActiveNetworkFaults::Id,   //
+                                                                 GeneralDiagnostics::Attributes::DeviceLoadStatus::Id       //
+                                                                 >;
 
     GeneralDiagnosticsCluster(OptionalAttributeSet optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature> featureFlags) :
         DefaultServerCluster({ kRootEndpointId, GeneralDiagnostics::Id }),
-        mOptionalAttributeSet(optionalAttributeSet.ForceSet<GeneralDiagnostics::Attributes::UpTime::Id>()), mFeatureFlags(featureFlags)
+        mOptionalAttributeSet(optionalAttributeSet.ForceSet<GeneralDiagnostics::Attributes::UpTime::Id>()),
+        mFeatureFlags(featureFlags)
     {}
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;

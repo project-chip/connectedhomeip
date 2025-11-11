@@ -75,7 +75,8 @@ TEST_F(TestGeneralDiagnosticsCluster, CompileTest)
         .enablePayloadSnaphot = true,
     };
 
-    GeneralDiagnosticsClusterFullConfigurable clusterWithTimeAndPayload(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0), functionsConfig);
+    GeneralDiagnosticsClusterFullConfigurable clusterWithTimeAndPayload(optionalAttributeSet,
+                                                                        BitFlags<GeneralDiagnostics::Feature>(0), functionsConfig);
     ASSERT_EQ(clusterWithTimeAndPayload.GetClusterFlags({ kRootEndpointId, GeneralDiagnostics::Id }),
               BitFlags<ClusterQualityFlags>());
 }
@@ -90,7 +91,7 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
         const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
         ScopedDiagnosticsProvider<NullProvider> nullProvider;
 
-        //Create cluster without enabling any feature flags
+        // Create cluster without enabling any feature flags
         GeneralDiagnosticsCluster cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0));
 
         // Check required accepted commands are present
@@ -180,7 +181,7 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
 
         ScopedDiagnosticsProvider<AllProvider> nullProvider;
 
-        //Create cluster with LOAD feature flag enabled
+        // Create cluster with LOAD feature flag enabled
         BitFlags<GeneralDiagnostics::Feature> features{ GeneralDiagnostics::Feature::kDeviceLoad };
         GeneralDiagnosticsCluster cluster(optionalAttributeSet, features);
 
