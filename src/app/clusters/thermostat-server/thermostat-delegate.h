@@ -236,7 +236,7 @@ public:
 
     /**
      * @brief Get the maximum number of schedule transitions allowed per day.
-     * 
+     *
      * @return The number of schedule transitions per day or null if the number is unlimited.
      */
     virtual DataModel::Nullable<uint8_t> GetNumberOfScheduleTransitionsPerDay() = 0;
