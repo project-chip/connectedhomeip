@@ -231,9 +231,9 @@ class TC_CC_10_1(MatterBaseTest):
                     continue
 
                 for AV in EFS.attributeValueList:
-                    if AV.attributeID == 0x0001 and self.pics_guard(self.check_pics("CC.S.F00")):
-                        asserts.assert_less_equal(AV.valueUnsigned8, 58, "View Scene failed on Satuation above limit")
-                        asserts.assert_greater_equal(AV.valueUnsigned8, 42, "View Scene failed on Satuation below limit")
+                    if AV.attributeID == 0x0001:
+                        asserts.assert_less_equal(AV.valueUnsigned8, 58, "View Scene failed on Saturation above limit")
+                        asserts.assert_greater_equal(AV.valueUnsigned8, 42, "View Scene failed on Saturation below limit")
 
         self.step("3a")
         if self.pics_guard(self.check_pics("CC.S.F03")):
@@ -271,11 +271,11 @@ class TC_CC_10_1(MatterBaseTest):
                     continue
 
                 for AV in EFS.attributeValueList:
-                    if AV.attributeID == 0x0003 and self.pics_guard(self.check_pics("CC.S.F03")):
+                    if AV.attributeID == 0x0003:
                         asserts.assert_less_equal(AV.valueUnsigned16, 35000, "View Scene failed on CurrentX above limit")
                         asserts.assert_greater_equal(AV.valueUnsigned16, 31000, "View Scene failed on CurrentX below limit")
 
-                    if AV.attributeID == 0x0004 and self.pics_guard(self.check_pics("CC.S.F03")):
+                    if AV.attributeID == 0x0004:
                         asserts.assert_less_equal(AV.valueUnsigned16, 21000, "View Scene failed on CurrentY above limit")
                         asserts.assert_greater_equal(AV.valueUnsigned16, 17000, "View Scene failed on CurrentY below limit")
 
@@ -313,7 +313,7 @@ class TC_CC_10_1(MatterBaseTest):
                     continue
 
                 for AV in EFS.attributeValueList:
-                    if AV.attributeID == 0x0007 and self.pics_guard(self.check_pics("CC.S.F04")):
+                    if AV.attributeID == 0x0007:
                         asserts.assert_less_equal(AV.valueUnsigned16, ColorTempPhysicalMaxMiredsValue,
                                                   "View Scene failed on ColorTemperatureMireds above limit")
                         asserts.assert_greater_equal(AV.valueUnsigned16, ColorTempPhysicalMinMiredsValue,
@@ -355,7 +355,7 @@ class TC_CC_10_1(MatterBaseTest):
                     continue
 
                 for AV in EFS.attributeValueList:
-                    if AV.attributeID == 0x4000 and self.pics_guard(self.check_pics("CC.S.F01")):
+                    if AV.attributeID == 0x4000:
                         asserts.assert_less_equal(AV.valueUnsigned16, 21800, "View Scene failed on EnhancedHue above limit")
                         asserts.assert_greater_equal(AV.valueUnsigned16, 18200, "View Scene failed on EnhancedHue below limit")
 
