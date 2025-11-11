@@ -9248,7 +9248,7 @@ endpoint 0 {
     ram      attribute maxHeatSetpointLimit default = 0x0BB8;
     ram      attribute minCoolSetpointLimit default = 0x0640;
     ram      attribute maxCoolSetpointLimit default = 0x0C80;
-    ram      attribute minSetpointDeadBand default = 0x19;
+    ram      attribute minSetpointDeadBand default = 0x14;
     callback attribute remoteSensing default = 0x0;
     ram      attribute controlSequenceOfOperation default = 0x04;
     ram      attribute systemMode default = 0x01;

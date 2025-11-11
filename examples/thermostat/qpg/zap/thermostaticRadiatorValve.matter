@@ -3061,7 +3061,7 @@ endpoint 1 {
     ram      attribute maxHeatSetpointLimit default = 3000;
     ram      attribute minCoolSetpointLimit default = 1600;
     ram      attribute maxCoolSetpointLimit default = 3200;
-    ram      attribute minSetpointDeadBand default = 0x19;
+    ram      attribute minSetpointDeadBand default = 0x14;
     ram      attribute controlSequenceOfOperation default = 0x04;
     persist  attribute systemMode default = 0x01;
     callback attribute presetTypes;
