@@ -130,12 +130,19 @@ bool NotifyPeriodicEnergyMeasured(EndpointId endpointId, const Optional<EnergyMe
     VerifyOrReturnValue(cluster != nullptr, false);
     VerifyOrReturnValue(cluster->Features().Has(Feature::kPeriodicEnergy), false);
 
-    cluster->SetPeriodicEnergyImported(energyImported);
-    cluster->SetPeriodicEnergyExported(energyExported);
-
     Events::PeriodicEnergyMeasured::Type event;
-    event.energyImported = energyImported;
-    event.energyExported = energyExported;
+
+    if (cluster->Features().Has(Feature::kImportedEnergy))
+    {
+        cluster->SetPeriodicEnergyImported(energyImported);
+        event.energyImported = energyImported;
+    }
+
+    if (cluster->Features().Has(Feature::kExportedEnergy))
+    {
+        cluster->SetPeriodicEnergyExported(energyExported);
+        event.energyExported = energyExported;
+    }
 
     EventNumber eventNumber;
     CHIP_ERROR error = app::LogEvent(event, endpointId, eventNumber);

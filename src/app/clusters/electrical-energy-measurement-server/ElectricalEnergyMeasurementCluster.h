@@ -98,6 +98,12 @@ public:
                                                 AttributeValueEncoder & encoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
+    std::optional<EventNumber> CumulativeEnergySnapshot(const Optional<EnergyMeasurementStruct> & energyImported,
+                                                        const Optional<EnergyMeasurementStruct> & energyExported);
+
+    std::optional<EventNumber> PeriodicEnergySnapshot(const Optional<EnergyMeasurementStruct> & energyImported,
+                                                      const Optional<EnergyMeasurementStruct> & energyExported);
+
 private:
     const BitFlags<ElectricalEnergyMeasurement::Feature> mFeatureFlags;
     OptionalAttributesSet mEnabledOptionalAttributes;
