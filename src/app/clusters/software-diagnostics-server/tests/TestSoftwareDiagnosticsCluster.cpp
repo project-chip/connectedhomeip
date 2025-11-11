@@ -126,7 +126,8 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)
         EXPECT_EQ(featureMap, BitFlags<SoftwareDiagnostics::Feature>{ SoftwareDiagnostics::Feature::kWatermarks }.Raw());
 
         // attribute list (only heap high watermark supported)
-        EXPECT_TRUE(Testing::IsAttributesListEqualTo(cluster, { SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::kMetadataEntry }));
+        EXPECT_TRUE(Testing::IsAttributesListEqualTo(
+            cluster, { SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::kMetadataEntry }));
 
         // Call the command, and verify it calls through to the provider
         EXPECT_FALSE(watermarksProvider.GetProvider().resetCalled);
@@ -186,12 +187,13 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)
         EXPECT_TRUE(Testing::IsGeneratedCommandsListEqualTo(cluster, {}));
 
         // attribute list
-        ASSERT_TRUE(Testing::IsAttributesListEqualTo(cluster, {
-                      SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::kMetadataEntry,
-                      SoftwareDiagnostics::Attributes::CurrentHeapFree::kMetadataEntry,
-                      SoftwareDiagnostics::Attributes::CurrentHeapUsed::kMetadataEntry,
-                      SoftwareDiagnostics::Attributes::ThreadMetrics::kMetadataEntry,
-                  }));
+        ASSERT_TRUE(Testing::IsAttributesListEqualTo(cluster,
+                                                     {
+                                                         SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::kMetadataEntry,
+                                                         SoftwareDiagnostics::Attributes::CurrentHeapFree::kMetadataEntry,
+                                                         SoftwareDiagnostics::Attributes::CurrentHeapUsed::kMetadataEntry,
+                                                         SoftwareDiagnostics::Attributes::ThreadMetrics::kMetadataEntry,
+                                                     }));
 
         // Test all attributes
         // cluster revision
