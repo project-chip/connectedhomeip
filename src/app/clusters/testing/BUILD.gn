@@ -23,6 +23,7 @@ source_set("testing") {
     "ClusterTester.h",
     "MockCommandHandler.cpp",
     "MockCommandHandler.h",
+    "ValidateGlobalAttributes.cpp",
     "ValidateGlobalAttributes.h",
   ]
 
