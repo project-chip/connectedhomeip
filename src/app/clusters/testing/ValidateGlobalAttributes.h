@@ -1,56 +1,87 @@
+/*
+ *    Copyright (c) 2025 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#pragma once
 #include "AttributeTesting.h"
+
+#include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/ServerClusterInterface.h>
+#include <lib/core/CHIPError.h>
 #include <lib/support/ReadOnlyBuffer.h>
 
 namespace chip {
-
 namespace Testing {
 
-// Compare the attributes of the cluster against the expected set.
-// Will use the first path returned by `GetPaths()` on the cluster.
-// Dies if `GetPaths()` doesn't return a list with one path.
-bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster, Span<app::DataModel::AttributeEntry> expected)
-{
-    VerifyOrDie(cluster.GetPaths().size() == 1);
-    auto path = cluster.GetPaths()[0];
-    ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> attributesBuilder;
-    if (cluster.Attributes(path, attributesBuilder) != CHIP_NO_ERROR)
-    {
-        return false;
-    }
-    return EqualAttributeSets(attributesBuilder.TakeBuffer(), expected);
-}
+/// Compares the attributes of a cluster against an expected set.
+///
+/// This function retrieves the attributes for the first path returned by `cluster.GetPaths()`
+/// and compares them against the `expected` list. Global attributes are automatically
+/// added to the `expected` list, as they must always be present.
+///
+/// Parameters:
+///     cluster - The cluster interface to test.
+///     expected - An initializer list of expected attribute entries (may be empty for only globals)
+///
+/// @note This function will assert (die) if `cluster.GetPaths()` does not return exactly one path.
+///
+/// Example Usage:
+/// ```
+/// ClusterImpl cluster(kTestEndpointId, ....);
+/// ASSERT_TRUE(IsAttributesListEqualTo(cluster, { Attributes::SomeAttribute::kMetadataEntry }));
+/// ```
+bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster,
+                             std::initializer_list<const app::DataModel::AttributeEntry> expected);
 
-// Compare the accepted commands of the cluster against the expected set.
-// Will use the first path returned by `GetPaths()` on the cluster.
-// Dies if `GetPaths()` doesn't return a list with one path.
-bool IsAcceptedCommandsListEqualTo(app::ServerClusterInterface & cluster, Span<app::DataModel::AcceptedCommandEntry> expected)
-{
-    VerifyOrDie(cluster.GetPaths().size() == 1);
-    auto path = cluster.GetPaths()[0];
-    ReadOnlyBufferBuilder<app::DataModel::AcceptedCommandEntry> commandsBuilder;
-    if (cluster.AcceptedCommands(path, commandsBuilder) != CHIP_NO_ERROR)
-    {
-        return false;
-    }
-    return EqualAcceptedCommandSets(commandsBuilder.TakeBuffer(), expected);
-}
+/// Compares the accepted commands of a cluster against an expected set.
+///
+/// This function retrieves the accepted commands for the first path returned by `cluster.GetPaths()`
+/// and compares them against the `expected` list of items.
+///
+/// Parameters:
+///     cluster - The cluster interface to test.
+///     expected - An initializer list of expected accepted command entries. May be empty.
+///
+/// @note This function will assert (die) if `cluster.GetPaths()` does not return exactly one path.
+///
+/// Example Usage:
+///
+/// ```
+/// ClusterImpl cluster(kTestEndpointId, ...);
+/// ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster, { Commands::SomeCommand::kMetadataEntry }));
+/// ```
+bool IsAcceptedCommandsListEqualTo(app::ServerClusterInterface & cluster,
+                                   std::initializer_list<const app::DataModel::AcceptedCommandEntry> expected);
 
-// Compare the generated commands of the cluster against the expected set.
-// Will use the first path returned by `GetPaths()` on the cluster.
-// Dies if `GetPaths()` doesn't return a list with one path.
-bool IsGeneratedCommandsListEqualTo(app::ServerClusterInterface & cluster, Span<CommandId> expected)
-{
-    VerifyOrDie(cluster.GetPaths().size() == 1);
-    auto path = cluster.GetPaths()[0];
-    ReadOnlyBufferBuilder<CommandId> commandsBuilder;
-    if (cluster.GeneratedCommands(path, commandsBuilder) != CHIP_NO_ERROR)
-    {
-        return false;
-    }
-    return EqualGeneratedCommandSets(commandsBuilder.TakeBuffer(), expected);
-}
+/// Compares the generated commands of a cluster against an expected set.
+///
+/// This function retrieves the generated commands for the first path returned by `cluster.GetPaths()`
+/// and compares them against the `expected` list of items.
+///
+/// Parameters:
+///     cluster - The cluster interface to test.
+///     expected - An initializer list of expected generated command entries. May be empty.
+///
+/// @note This function will assert (die) if `cluster.GetPaths()` does not return exactly one path.
+///
+/// Example Usage:
+/// ```
+/// ClusterImpl cluster(kTestEndpointId, ...);
+/// ASSERT_TRUE(IsGeneratedCommandsListEqualTo(cluster, { Commands::SomeCommandResponse::kMetadataEntry }));
+/// ```
+bool IsGeneratedCommandsListEqualTo(app::ServerClusterInterface & cluster, std::initializer_list<const CommandId> expected);
 
 } // namespace Testing
-
 } // namespace chip

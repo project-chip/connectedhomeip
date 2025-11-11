@@ -43,7 +43,7 @@ CHIP_ERROR EvseTargetsDelegate::Init(PersistentStorageDelegate * targetStore)
     mpTargetStore = targetStore;
 
     // Set FabricDelegate
-    chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
+    TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
 
     return CHIP_NO_ERROR;
 }
@@ -444,7 +444,7 @@ EvseTargetsDelegate::SaveTargets(DataModel::List<const Structs::ChargingTargetSc
     uint64_t len = static_cast<uint64_t>(writer.GetLengthWritten());
     ChipLogProgress(AppServer, "SaveTargets: length written 0x" ChipLogFormatX64, ChipLogValueX64(len));
 
-    writer.Finalize(backingBuffer);
+    TEMPORARY_RETURN_IGNORED writer.Finalize(backingBuffer);
 
     ReturnErrorOnFailure(mpTargetStore->SyncSetKeyValue(spEvseTargetsKeyName, backingBuffer.Get(), static_cast<uint16_t>(len)));
 
@@ -454,7 +454,7 @@ EvseTargetsDelegate::SaveTargets(DataModel::List<const Structs::ChargingTargetSc
 CHIP_ERROR EvseTargetsDelegate::ClearTargets()
 {
     /* We simply delete the data from the persistent store */
-    mpTargetStore->SyncDeleteKeyValue(spEvseTargetsKeyName);
+    TEMPORARY_RETURN_IGNORED mpTargetStore->SyncDeleteKeyValue(spEvseTargetsKeyName);
 
     // Now reload from persistent storage so that mChargingTargetSchedulesList gets updated (it will be empty)
     CHIP_ERROR err = LoadTargets();
