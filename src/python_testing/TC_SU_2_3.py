@@ -520,9 +520,15 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
         self.current_provider_app_proc.terminate()
 
         self.step(2)
+        # TODO: Verification of the BDX transfer is pending implementation.
         self.step(3)
         # NOTE: Step skipped not implemented in spec.
         self.step(4)
+        # NOTE: In SU TC_2.2 Step #1, It is simulate Step 4 by cancelling the OTA Provider update instead of
+        # forcing a transfer failure. This causes the OTA Requestor to immediately return to Idle.
+        # As a result, the DUT can initiate a new QueryImage transfer without waiting for
+        # the full BDX Idle timeout, effectively covering the intent of Step 4.
+        # See PR: #685 for the provider cancelation implementation.
         self.step(5)
         # NOTE: Step skipped not implemented in spec.
 
