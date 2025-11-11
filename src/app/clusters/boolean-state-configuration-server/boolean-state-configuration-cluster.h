@@ -24,30 +24,28 @@
 
 namespace chip::app::Clusters {
 
-class BooleanStateConfigurationCluster : public DefaultServerCluster
-{
+class BooleanStateConfigurationCluster : public DefaultServerCluster {
 public:
     static constexpr uint8_t kMinSupportedSensitivityLevels = 2;
     static constexpr uint8_t kMaxSupportedSensitivityLevels = 10;
 
-    using OptionalAttributesSet = OptionalAttributeSet<                     //
+    using OptionalAttributesSet = OptionalAttributeSet< //
         BooleanStateConfiguration::Attributes::DefaultSensitivityLevel::Id, // optional if sensitivity level feature is enabled
-        BooleanStateConfiguration::Attributes::AlarmsEnabled::Id,           // optional if VIS or Aud enabled
-        BooleanStateConfiguration::Attributes::SensorFault::Id              // fully optional
+        BooleanStateConfiguration::Attributes::AlarmsEnabled::Id, // optional if VIS or Aud enabled
+        BooleanStateConfiguration::Attributes::SensorFault::Id // fully optional
         >;
 
-    using AlarmModeBitMask   = chip::BitMask<BooleanStateConfiguration::AlarmModeBitmap>;
+    using AlarmModeBitMask = chip::BitMask<BooleanStateConfiguration::AlarmModeBitmap>;
     using SensorFaultBitMask = chip::BitMask<BooleanStateConfiguration::SensorFaultBitmap>;
 
-    struct StartupConfiguration
-    {
+    struct StartupConfiguration {
         const uint8_t supportedSensitivityLevels;
         const uint8_t defaultSensitivityLevel;
         const AlarmModeBitMask alarmsSupported;
     };
 
     BooleanStateConfigurationCluster(EndpointId endpointId, BitMask<BooleanStateConfiguration::Feature> features,
-                                     OptionalAttributesSet optionalAttributes, const StartupConfiguration & config);
+        OptionalAttributesSet optionalAttributes, const StartupConfiguration & config);
 
     const BitMask<BooleanStateConfiguration::Feature> & GetFeatures() const { return mFeatures; }
 
@@ -64,30 +62,43 @@ public:
     // ServerClusterInterface/DefaultServerCluster implementation
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                AttributeValueEncoder & encoder) override;
+        AttributeValueEncoder & encoder) override;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                 AttributeValueDecoder & decoder) override;
+        AttributeValueDecoder & decoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
-                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
-                                                               chip::TLV::TLVReader & input_arguments,
-                                                               CommandHandler * handler) override;
+        chip::TLV::TLVReader & input_arguments,
+        CommandHandler * handler) override;
 
 private:
+    // A superset of optional attributes, based on both real optional
+    // attributes and the feature map setting.
+    using FullOptionalAttributesSet = OptionalAttributeSet< //
+        BooleanStateConfiguration::Attributes::CurrentSensitivityLevel::Id, //
+        BooleanStateConfiguration::Attributes::SupportedSensitivityLevels::Id, // optional if sensitivity level feature is enabled
+        BooleanStateConfiguration::Attributes::DefaultSensitivityLevel::Id, //
+        BooleanStateConfiguration::Attributes::AlarmsActive::Id, //
+        BooleanStateConfiguration::Attributes::AlarmsSupported::Id, //
+        BooleanStateConfiguration::Attributes::AlarmsEnabled::Id, //
+        BooleanStateConfiguration::Attributes::AlarmsSuppressed::Id, //
+        BooleanStateConfiguration::Attributes::SensorFault::Id //
+        >;
+
     const BitMask<BooleanStateConfiguration::Feature> mFeatures;
-    const OptionalAttributesSet mOptionalAttributes;
+    const FullOptionalAttributesSet mOptionalAttributes;
     BooleanStateConfiguration::Delegate * mDelegate = nullptr;
 
     // attributes that are maintained by this cluster
     uint8_t mCurrentSensitivityLevel = 0;
     const uint8_t mSupportedSensitivityLevels;
     const uint8_t mDefaultSensitivityLevel;
-    AlarmModeBitMask mAlarmsActive{ 0 };
-    AlarmModeBitMask mAlarmsSuppressed{ 0 };
-    AlarmModeBitMask mAlarmsEnabled{ 0 };
+    AlarmModeBitMask mAlarmsActive { 0 };
+    AlarmModeBitMask mAlarmsSuppressed { 0 };
+    AlarmModeBitMask mAlarmsEnabled { 0 };
     const AlarmModeBitMask mAlarmsSupported;
-    SensorFaultBitMask mSensorFault{ 0 };
+    SensorFaultBitMask mSensorFault { 0 };
 
     void EmitAlarmsStateChangedEvent();
 };

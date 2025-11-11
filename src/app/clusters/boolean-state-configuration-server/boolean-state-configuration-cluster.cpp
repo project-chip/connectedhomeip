@@ -42,8 +42,44 @@ BooleanStateConfigurationCluster::BooleanStateConfigurationCluster(EndpointId en
                                                                    BitMask<BooleanStateConfiguration::Feature> features,
                                                                    OptionalAttributesSet optionalAttributes,
                                                                    const StartupConfiguration & config) :
-    DefaultServerCluster({ endpointId, BooleanStateConfiguration::Id }),
-    mFeatures(features), mOptionalAttributes(optionalAttributes),
+    DefaultServerCluster({ endpointId, BooleanStateConfiguration::Id }), mFeatures(features),
+    mOptionalAttributes([&features, &optionalAttributes]() -> FullOptionalAttributesSet {
+        // constructs the attribute set, that once constructed stay const
+        AttributeSet enabledOptionalAttributes;
+
+        if (features.Has(Feature::kSensitivityLevel))
+        {
+            enabledOptionalAttributes.ForceSet<CurrentSensitivityLevel::Id>();
+            enabledOptionalAttributes.ForceSet<SupportedSensitivityLevels::Id>();
+            if (optionalAttributes.IsSet(DefaultSensitivityLevel::Id))
+            {
+                enabledOptionalAttributes.ForceSet<DefaultSensitivityLevel::Id>();
+            }
+        }
+
+        if (features.Has(Feature::kVisual) || features.Has(Feature::kAudible))
+        {
+            enabledOptionalAttributes.ForceSet<AlarmsActive::Id>();
+            enabledOptionalAttributes.ForceSet<AlarmsSupported::Id>();
+
+            if (optionalAttributes.IsSet(AlarmsEnabled::Id))
+            {
+                enabledOptionalAttributes.ForceSet<AlarmsEnabled::Id>();
+            }
+        }
+
+        if (features.Has(Feature::kAlarmSuppress))
+        {
+            enabledOptionalAttributes.ForceSet<AlarmsSuppressed::Id>();
+        }
+
+        if (optionalAttributes.IsSet(SensorFault::Id))
+        {
+            enabledOptionalAttributes.ForceSet<SensorFault::Id>();
+        }
+
+        return enabledOptionalAttributes;
+    }()),
     mSupportedSensitivityLevels(
         std::clamp(config.supportedSensitivityLevels, kMinSupportedSensitivityLevels, kMaxSupportedSensitivityLevels)),
     mDefaultSensitivityLevel(std::min(config.defaultSensitivityLevel, static_cast<uint8_t>(mSupportedSensitivityLevels - 1))),
@@ -207,42 +243,8 @@ CHIP_ERROR BooleanStateConfigurationCluster::Attributes(const ConcreteClusterPat
         SensorFault::kMetadataEntry,                //
     };
 
-    AttributeSet enabledOptionalAttributes;
-
-    if (mFeatures.Has(Feature::kSensitivityLevel))
-    {
-        enabledOptionalAttributes.ForceSet<CurrentSensitivityLevel::Id>();
-        enabledOptionalAttributes.ForceSet<SupportedSensitivityLevels::Id>();
-        if (mOptionalAttributes.IsSet(DefaultSensitivityLevel::Id))
-        {
-            enabledOptionalAttributes.ForceSet<DefaultSensitivityLevel::Id>();
-        }
-    }
-
-    if (mFeatures.Has(Feature::kVisual) || mFeatures.Has(Feature::kAudible))
-    {
-        enabledOptionalAttributes.ForceSet<AlarmsActive::Id>();
-        enabledOptionalAttributes.ForceSet<AlarmsSupported::Id>();
-
-        if (mOptionalAttributes.IsSet(AlarmsEnabled::Id))
-        {
-            enabledOptionalAttributes.ForceSet<AlarmsEnabled::Id>();
-        }
-    }
-
-    if (mFeatures.Has(Feature::kAlarmSuppress))
-    {
-        enabledOptionalAttributes.ForceSet<AlarmsSuppressed::Id>();
-    }
-
-    if (mOptionalAttributes.IsSet(SensorFault::Id))
-    {
-        enabledOptionalAttributes.ForceSet<SensorFault::Id>();
-    }
-
     AttributeListBuilder listBuilder(builder);
-    return listBuilder.Append(Span(kMandatoryMetadata), Span<const AttributeEntry>{ optionalAttributesMeta },
-                              enabledOptionalAttributes);
+    return listBuilder.Append(Span(kMandatoryMetadata), Span<const AttributeEntry>{ optionalAttributesMeta }, mOptionalAttributes);
 }
 
 void BooleanStateConfigurationCluster::EmitAlarmsStateChangedEvent()
