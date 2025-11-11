@@ -28,6 +28,8 @@
 #       --secured-device-port 5540
 #       --autoApplyImage
 #       --KVS /tmp/chip_kvs_requestor
+#       --requestorCanConsent true
+#       --userConsentState granted
 #       --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -339,6 +341,13 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
 
     @async_test_body
     async def test_TC_SU_2_3(self):
+
+        # NOTE: The DUT (Requestor) is launched with the following flags in CI arguments:
+        # Launch the requestor with flags:
+        #       --requestorCanConsent true
+        #       --userConsentState granted
+        # These flags indicate to the Provider that the Requestor is capable of handling user consent.
+        # The test simulates that consent has already been granted so the OTA flow can proceed automatically.
 
         self.LOG_FILE_PATH = "provider.log"
         self.KVS_PATH = "/tmp/chip_kvs_provider"
