@@ -44,6 +44,7 @@ executable("chip-im-initiator") {
   deps = [
     ":common",
     "${chip_root}/src/app",
+    "${chip_root}/src/app:default-timer-delegate",
     "${chip_root}/src/app/util/mock:mock_codegen_data_model",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
@@ -68,6 +69,7 @@ executable("chip-im-responder") {
   deps = [
     ":common",
     "${chip_root}/src/app",
+    "${chip_root}/src/app:default-timer-delegate",
     "${chip_root}/src/app/util/mock:mock_codegen_data_model",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",

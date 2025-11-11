@@ -881,26 +881,22 @@ CHIP_ERROR Engine::ScheduleRun()
 {
     if (IsRunScheduled())
     {
-        ChipLogError(DataManagement, "*****IsRunScheduled no");
         return CHIP_NO_ERROR;
     }
 
     Messaging::ExchangeManager * exchangeManager = mpImEngine->GetExchangeManager();
     if (exchangeManager == nullptr)
     {
-        ChipLogError(DataManagement, "*****exchangeManager no");
         return CHIP_ERROR_INCORRECT_STATE;
     }
     SessionManager * sessionManager = exchangeManager->GetSessionManager();
     if (sessionManager == nullptr)
     {
-        ChipLogError(DataManagement, "*****sessionManager no");
         return CHIP_ERROR_INCORRECT_STATE;
     }
     System::Layer * systemLayer = sessionManager->SystemLayer();
     if (systemLayer == nullptr)
     {
-        ChipLogError(DataManagement, "*****systemLayer no");
         return CHIP_ERROR_INCORRECT_STATE;
     }
     ReturnErrorOnFailure(systemLayer->ScheduleWork(Run, this));
