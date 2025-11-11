@@ -81,7 +81,7 @@ bool IsAcceptedCommandsListEqualTo(app::ServerClusterInterface & cluster,
 /// ClusterImpl cluster(kTestEndpointId, ...);
 /// ASSERT_TRUE(IsGeneratedCommandsListEqualTo(cluster, { Commands::SomeCommandResponse::kMetadataEntry }));
 /// ```
-bool IsGeneratedCommandsListEqualTo(app::ServerClusterInterface & cluster, Span<CommandId> expected);
+bool IsGeneratedCommandsListEqualTo(app::ServerClusterInterface & cluster, std::initializer_list<const CommandId> expected);
 
 } // namespace Testing
 } // namespace chip

@@ -65,7 +65,7 @@ bool IsAcceptedCommandsListEqualTo(app::ServerClusterInterface & cluster,
     return EqualAcceptedCommandSets(commandsBuilder.TakeBuffer(), expectedBuilder.TakeBuffer());
 }
 
-bool IsGeneratedCommandsListEqualTo(app::ServerClusterInterface & cluster, Span<CommandId> expected)
+bool IsGeneratedCommandsListEqualTo(app::ServerClusterInterface & cluster, std::initializer_list<const CommandId> expected)
 {
     VerifyOrDie(cluster.GetPaths().size() == 1);
     auto path = cluster.GetPaths()[0];
@@ -75,7 +75,16 @@ bool IsGeneratedCommandsListEqualTo(app::ServerClusterInterface & cluster, Span<
         ChipLogError(Test, "Failed to get generated commands list from cluster. Error: %" CHIP_ERROR_FORMAT, err.Format());
         return false;
     }
-    return EqualGeneratedCommandSets(commandsBuilder.TakeBuffer(), expected);
+
+    ReadOnlyBufferBuilder<CommandId> expectedBuilder;
+
+    SuccessOrDie(expectedBuilder.EnsureAppendCapacity(expected.size()));
+    for (const auto & entry : expected)
+    {
+        SuccessOrDie(expectedBuilder.Append(entry));
+    }
+
+    return EqualGeneratedCommandSets(commandsBuilder.TakeBuffer(), expectedBuilder.TakeBuffer());
 }
 
 } // namespace chip::Testing
