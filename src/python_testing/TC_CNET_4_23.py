@@ -30,12 +30,12 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 # Timeout constants
-TIMED_REQUEST_TIMEOUT_MS = 5000      # Matter command timeout (5s)
-CONNECT_NETWORK_TIMEOUT_MS = 30000   # ConnectNetwork timeout (30s)
-MDNS_DISCOVERY_TIMEOUT = 10          # mDNS discovery timeout per attempt (10s)
-SCAN_RETRY_DELAY = 3                  # Delay between scan retries (3s)
-MAX_ATTEMPTS = 3                      # Maximum discovery attempts (total: 30s + delays)
-TIMEOUT = 180                         # Overall test timeout (3 min)
+TIMED_REQUEST_TIMEOUT_MS = 5000         # Matter command timeout (5s)
+CONNECT_NETWORK_TIMEOUT_MS = 30000      # ConnectNetwork timeout (30s)
+MDNS_DISCOVERY_TIMEOUT = 10             # mDNS discovery timeout per attempt (10s)
+SCAN_RETRY_DELAY = 3                    # Delay between scan retries (3s)
+MAX_ATTEMPTS = 3                        # Maximum discovery attempts
+TIMEOUT = 180                           # Overall test timeout (3 min)
 
 # Global variable to store target device ID for mDNS discovery
 _target_device_id = None
@@ -113,7 +113,7 @@ class MatterServiceListener(ServiceListener):
 async def find_matter_devices_mdns():
     """
     Finds Matter devices via mDNS using zeroconf, optionally filtering by target device ID.
-    Raises an exception if no device is found after max_attempts.
+    Raises an exception if no device is found after MAX_ATTEMPTS.
     Returns the list of discovered services.
     """
     service_types = ["_matter._tcp.local.", "_matterc._udp.local."]
@@ -162,15 +162,14 @@ class TC_CNET_4_23(MatterBaseTest):
     def steps_TC_CNET_4_23(self):
         return [
             TestStep(1, "TH begins commissioning the DUT over the initial commissioning radio (PASE):\n"
-                        "* Establish PASE session\n"
-                        "* Arm fail-safe timer (900 seconds)\n"
-                        "* Configure regulatory and time information\n",
+                        "Skip CommissioningComplete to manually configure WiFi with incorrect then correct credentials\n"
+                        "TH reads FeatureMap attribute from the DUT and verifies if DUT supports WiFi on endpoint 0",
                         is_commissioning=False),
-            TestStep(2, "TH sends AddOrUpdateWiFiNetwork with INCORRECT credentials and Breadcrumb field set to 1",
+            TestStep(2, "TH sends AddOrUpdateWiFiNetwork with INCORRECT credentials and Breadcrumb field set to 1\n"
+                        "Save network index as 'userwifi_netidx' for later verification",
                         "Verify that DUT sends the NetworkConfigResponse command to the TH with the following response fields:\n"
                         "1. NetworkingStatus is kSuccess (0)\n"
-                        "2. DebugText is of type string with max length 512 or empty\n"
-                        "Save network index as 'userwifi_netidx' for later verification"),
+                        "2. DebugText is of type string with max length 512 or empty\n"),
             TestStep(3, "TH sends ConnectNetwork command and Breadcrumb field set to 2",
                         "Verify that DUT sends ConnectNetworkResponse command to the TH with the following response fields:\n"
                         "1. NetworkingStatus is NOT kSuccess (0)\n"
@@ -181,14 +180,14 @@ class TC_CNET_4_23(MatterBaseTest):
                         "Verify that DUT sends NetworkConfigResponse to command with the following fields:\n"
                         "1. NetworkingStatus is Success\n"
                         "2. NetworkIndex matches previously saved 'userwifi_netidx'"),
-            TestStep(6, "TH sends ScanNetworks command",
+            TestStep(6, "TH sends ScanNetworks command with Breadcrumb field set to 4",
                         "Verify that DUT sends the ScanNetworksResponse command to the TH with the following response fields:\n"
                         "1. wiFiScanResults contains the target network SSID"),
-            TestStep(7, "TH sends AddOrUpdateWiFiNetwork with CORRECT credentials and Breadcrumb field set to 4",
+            TestStep(7, "TH sends AddOrUpdateWiFiNetwork with CORRECT credentials and Breadcrumb field set to 5",
                         "Verify that DUT sends the NetworkConfigResponse command to the TH with the following response fields:\n"
                         "1. NetworkingStatus is success which is '0'\n"
                         "2. DebugText is of type string with max length 512 or empty"),
-            TestStep(8, "TH sends ConnectNetwork command and Breadcrumb field set to 5",
+            TestStep(8, "TH sends ConnectNetwork command and Breadcrumb field set to 6",
                         "Verify that DUT sends ConnectNetworkResponse command to the TH with the following response fields:\n"
                         "1. NetworkingStatus is kSuccess (0)\n"
                         "2. DebugText is of type string with max length 512 or empty"),
@@ -213,9 +212,14 @@ class TC_CNET_4_23(MatterBaseTest):
         # Network Commissioning cluster is always on root endpoint (0) during commissioning
         endpoint = ROOT_ENDPOINT_ID
 
+        # Save correct credentials (used by commissioning framework and for final connection)
         correct_ssid = self.matter_test_config.wifi_ssid.encode('utf-8')
+        correct_password = self.matter_test_config.wifi_passphrase.encode('utf-8')
+
+        # Create wrong credentials for test commands
+        wrong_ssid = b"WrongSSID_12345"
+        self.matter_test_config.wifi_passphrase = "WrongPassword123"
         wrong_password = self.matter_test_config.wifi_passphrase.encode('utf-8')
-        correct_password = self.matter_test_config.global_test_params["wifi_passphrase"].encode('utf-8')
 
         # TH begins commissioning the DUT over the initial commissioning radio (PASE):
         self.step(1)
@@ -226,15 +230,13 @@ class TC_CNET_4_23(MatterBaseTest):
         self.matter_test_config.tc_version_to_simulate = None
         self.matter_test_config.tc_user_response_to_simulate = None
 
-        # * Establish PASE session
-        # * Arm fail-safe timer (900 seconds)
-        # * Configure regulatory and time information
         await self.commission_devices()
 
         # Set target device ID for mDNS discovery
         set_target_device_id(self.dut_node_id)
         logger.info(f"Set target device ID for mDNS filtering: {self.dut_node_id}")
 
+        # TH reads FeatureMap attribute from the DUT and verifies if DUT supports WiFi on endpoint 0
         feature_map = await self.read_single_attribute(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
@@ -247,7 +249,7 @@ class TC_CNET_4_23(MatterBaseTest):
             self.skip_all_remaining_steps(2)
             return
 
-        # AddOrUpdateWiFiNetwork with INCORRECT credentials and Breadcrumb field set to 1
+        # TH sends AddOrUpdateWiFiNetwork with INCORRECT credentials and Breadcrumb field set to 1
         self.step(2)
 
         logger.info(
@@ -308,6 +310,7 @@ class TC_CNET_4_23(MatterBaseTest):
             endpoint=endpoint,
             attribute=cnet.Attributes.LastNetworkingStatus,
         )
+        logger.info(f"LastNetworkingStatus: {response}")
 
         # Verify LastNetworkingStatus indicates a failure
         # Can be kAuthFailure (wrong password), kNetworkNotFound (network not in range),
@@ -349,12 +352,14 @@ class TC_CNET_4_23(MatterBaseTest):
         ssids_found = []
         target_ssid_found = False
 
-        for attempt in range(MAX_ATTEMPTS):
-            logger.info(f"ScanNetworks attempt {attempt + 1}/{MAX_ATTEMPTS}")
+        for attempt in range(1, MAX_ATTEMPTS + 1):
+            logger.info(f"ScanNetworks attempt {attempt}/{MAX_ATTEMPTS}")
 
             response = await self.send_single_cmd(
                 endpoint=endpoint,
-                cmd=cnet.Commands.ScanNetworks()
+                cmd=cnet.Commands.ScanNetworks(
+                    breadcrumb=4
+                )
             )
 
             # Verify that DUT sends the ScanNetworksResponse command to the TH with the following response fields:
@@ -381,7 +386,7 @@ class TC_CNET_4_23(MatterBaseTest):
                 logger.warning(f"No networks found in scan (attempt {attempt + 1})")
 
             # If not found and not last attempt, wait before retry
-            if not target_ssid_found and attempt < MAX_ATTEMPTS - 1:
+            if not target_ssid_found and attempt < MAX_ATTEMPTS:
                 logger.info(f"Waiting {SCAN_RETRY_DELAY} seconds before retry...")
                 await asyncio.sleep(SCAN_RETRY_DELAY)
 
@@ -393,7 +398,7 @@ class TC_CNET_4_23(MatterBaseTest):
         else:
             logger.info(f"Successfully found target SSID in scan results")
 
-        # TH sends AddOrUpdateWiFiNetwork with CORRECT credentials and Breadcrumb field set to 4
+        # TH sends AddOrUpdateWiFiNetwork with CORRECT credentials and Breadcrumb field set to 5
         self.step(7)
 
         logger.info(
@@ -403,7 +408,7 @@ class TC_CNET_4_23(MatterBaseTest):
             cmd=cnet.Commands.AddOrUpdateWiFiNetwork(
                 ssid=correct_ssid,
                 credentials=correct_password,
-                breadcrumb=4
+                breadcrumb=5
             ),
             timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
         )
@@ -419,7 +424,7 @@ class TC_CNET_4_23(MatterBaseTest):
             asserts.assert_less_equal(len(response.debugText), 512,
                                       f"Expected length of debugText to be less than or equal to 512, but got: {len(response.debugText)}")
 
-        # TH sends ConnectNetwork command and Breadcrumb field set to 5
+        # TH sends ConnectNetwork command and Breadcrumb field set to 6
         self.step(8)
 
         # Re-arm fail-safe before connecting to WiFi
@@ -437,7 +442,7 @@ class TC_CNET_4_23(MatterBaseTest):
             endpoint=endpoint,
             cmd=cnet.Commands.ConnectNetwork(
                 networkID=correct_ssid,
-                breadcrumb=5
+                breadcrumb=6
             ),
             timedRequestTimeoutMs=CONNECT_NETWORK_TIMEOUT_MS
         )
@@ -486,6 +491,8 @@ class TC_CNET_4_23(MatterBaseTest):
 
         # TH sends CommissioningComplete to finalize commissioning
         self.step(11)
+
+        await asyncio.sleep(5)  # Short delay before mDNS discovery
 
         # Discover device on WiFi network via mDNS to establish CASE session
         logger.info("Discovering device on WiFi network via mDNS...")
