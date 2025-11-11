@@ -30,6 +30,7 @@ steps:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
           - >-
+              pip install esp-idf-kconfig==2.5.0 &&
               perl -i -pe 's/^gdbgui==/# gdbgui==/' /opt/espressif/esp-idf/requirements.txt &&
               ./scripts/build/build_examples.py --enable-flashbundle --target
               esp32-devkitc-light-rpc --target

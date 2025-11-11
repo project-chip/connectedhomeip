@@ -56,7 +56,7 @@ void SetTestEventTrigger_CurrentConditionsUpdate()
         ChipLogError(Support, "ElectricalGridConditionsInstance not available.");
         return;
     }
-    inst->SetCurrentConditions(newConditions);
+    TEMPORARY_RETURN_IGNORED inst->SetCurrentConditions(newConditions);
 }
 
 void SetTestEventTrigger_ForecastConditionsUpdate()
@@ -110,7 +110,7 @@ void SetTestEventTrigger_ForecastConditionsUpdate()
     DataModel::List<Structs::ElectricalGridConditionsStruct::Type> forecastList(
         Span<Structs::ElectricalGridConditionsStruct::Type>(sForecastEntries, kForecastSize));
 
-    inst->SetForecastConditions(forecastList); // Should now be safe: all memory lives long enough
+    TEMPORARY_RETURN_IGNORED inst->SetForecastConditions(forecastList); // Should now be safe: all memory lives long enough
 }
 
 bool HandleElectricalGridConditionsTestEventTrigger(uint64_t eventTrigger)

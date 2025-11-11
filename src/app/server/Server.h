@@ -68,7 +68,7 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 #include <transport/raw/WiFiPAF.h>
 #endif
-#include <app/TimerDelegates.h>
+#include <app/DefaultTimerDelegate.h>
 #include <app/reporting/ReportSchedulerImpl.h>
 #include <transport/raw/UDP.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
@@ -532,7 +532,7 @@ private:
                 return;
             }
 
-            mServer->GetTransportManager().MulticastGroupJoinLeave(
+            TEMPORARY_RETURN_IGNORED mServer->GetTransportManager().MulticastGroupJoinLeave(
                 Transport::PeerAddress::Multicast(fabric->GetFabricId(), old_group.group_id), false);
         };
 

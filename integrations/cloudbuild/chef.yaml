@@ -28,6 +28,7 @@ steps:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
           - >-
+              pip install esp-idf-kconfig==2.5.0 &&
               perl -i -pe 's/^gdbgui==/# gdbgui==/' /opt/espressif/esp-idf/requirements.txt &&
               ./examples/chef/chef.py --build_all --build_exclude "noip|icd"
       id: CompileAll

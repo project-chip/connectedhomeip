@@ -24,9 +24,9 @@
 
 #include <controller/CHIPDeviceControllerFactory.h>
 
+#include <app/DefaultTimerDelegate.h>
 #include <app/InteractionModelEngine.h>
 #include <app/OperationalSessionSetup.h>
-#include <app/TimerDelegates.h>
 #include <app/reporting/ReportSchedulerImpl.h>
 #include <app/util/DataModelHandler.h>
 #include <lib/core/ErrorStr.h>
@@ -333,7 +333,8 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         .groupDataProvider         = stateParams.groupDataProvider,
         // Don't provide an MRP local config, so each CASE initiation will use
         // the then-current value.
-        .mrpLocalConfig = NullOptional,
+        .mrpLocalConfig            = NullOptional,
+        .minimumLITBackoffInterval = params.minimumLITBackoffInterval,
     };
 
     CASESessionManagerConfig sessionManagerConfig = {
