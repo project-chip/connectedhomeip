@@ -991,7 +991,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 r, _, _ = select.select([fd], [], [], timeout)
                 if not r:
                     raise TimeoutError(f"No data within {timeout}")
-                
+
                 chunk_bytes = os.read(fd, chunk)
                 if not chunk_bytes:
                     break
@@ -999,11 +999,11 @@ class MatterBaseTest(base_test.BaseTestClass):
 
                 if len(buf) > max_bytes:
                     raise ValueError("Command too large")
-                
+
                 if b"\n" in buf:
                     line, _, _ = buf.partition(b"\n")
                     return json.loads(line.decode("utf-8"))
-            
+
             if buf:
                 return json.loads(buf.decode("utf-8"))
             raise EOFError("Empty command response")
