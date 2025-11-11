@@ -30,15 +30,6 @@ namespace ElectricalEnergyMeasurement {
 
 constexpr EndpointId kDefaultEndpointId = 1;
 
-struct MeasurementData
-{
-    Structs::MeasurementAccuracyStruct::Type measurementAccuracy;
-    Optional<Structs::EnergyMeasurementStruct::Type> cumulativeImported;
-    Optional<Structs::EnergyMeasurementStruct::Type> cumulativeExported;
-    Optional<Structs::EnergyMeasurementStruct::Type> periodicImported;
-    Optional<Structs::EnergyMeasurementStruct::Type> periodicExported;
-    Optional<Structs::CumulativeEnergyResetStruct::Type> cumulativeReset;
-};
 enum class OptionalAttributes : uint32_t
 {
     kOptionalAttributeCumulativeEnergyReset = 0x1,
@@ -73,7 +64,7 @@ CHIP_ERROR SetMeasurementAccuracy(EndpointId endpointId, const Structs::Measurem
 
 CHIP_ERROR SetCumulativeReset(EndpointId endpointId, const Optional<Structs::CumulativeEnergyResetStruct::Type> & cumulativeReset);
 
-MeasurementData * MeasurementDataForEndpoint(EndpointId endpointId);
+ElectricalEnergyMeasurement::MeasurementData * MeasurementDataForEndpoint(EndpointId endpointId);
 
 ElectricalEnergyMeasurementCluster * FindElectricalEnergyMeasurementClusterOnEndpoint(chip::EndpointId endpoint);
 

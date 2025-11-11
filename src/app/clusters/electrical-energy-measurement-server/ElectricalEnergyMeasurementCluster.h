@@ -27,6 +27,19 @@
 namespace chip {
 namespace app {
 namespace Clusters {
+namespace ElectricalEnergyMeasurement {
+
+// Data structure to hold measurement data for backwards compatibility
+struct MeasurementData
+{
+    Structs::MeasurementAccuracyStruct::Type measurementAccuracy;
+    Optional<Structs::EnergyMeasurementStruct::Type> cumulativeImported;
+    Optional<Structs::EnergyMeasurementStruct::Type> cumulativeExported;
+    Optional<Structs::EnergyMeasurementStruct::Type> periodicImported;
+    Optional<Structs::EnergyMeasurementStruct::Type> periodicExported;
+    Optional<Structs::CumulativeEnergyResetStruct::Type> cumulativeReset;
+};
+}; // namespace ElectricalEnergyMeasurement
 
 class ElectricalEnergyMeasurementCluster : public DefaultServerCluster
 {
@@ -62,6 +75,9 @@ public:
     const OptionalAttributesSet & OptionalAttributes() const { return mEnabledOptionalAttributes; }
     const BitFlags<ElectricalEnergyMeasurement::Feature> & Features() const { return mFeatureFlags; }
 
+    // Direct access to measurement data - for backwards compatibility
+    const ElectricalEnergyMeasurement::MeasurementData * GetMeasurementData() const { return &mMeasurementData; }
+
     // Getters - return copies with error checking
     CHIP_ERROR GetMeasurementAccuracy(MeasurementAccuracyStruct & outValue) const;
     CHIP_ERROR GetCumulativeEnergyImported(Optional<EnergyMeasurementStruct> & outValue) const;
@@ -85,12 +101,7 @@ public:
 private:
     const BitFlags<ElectricalEnergyMeasurement::Feature> mFeatureFlags;
     OptionalAttributesSet mEnabledOptionalAttributes;
-    MeasurementAccuracyStruct mMeasurementAccuracy;
-    Optional<EnergyMeasurementStruct> mCumulativeImported;
-    Optional<EnergyMeasurementStruct> mCumulativeExported;
-    Optional<EnergyMeasurementStruct> mPeriodicImported;
-    Optional<EnergyMeasurementStruct> mPeriodicExported;
-    Optional<CumulativeEnergyResetStruct> mCumulativeReset;
+    ElectricalEnergyMeasurement::MeasurementData mMeasurementData;
 };
 
 } // namespace Clusters
