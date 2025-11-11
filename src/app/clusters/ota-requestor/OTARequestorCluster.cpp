@@ -41,34 +41,21 @@ OTARequestorCluster::OTARequestorCluster(EndpointId endpointId, OTARequestorInte
 {
 }
 
-void OTARequestorCluster::SetOtaRequestorInterface(OTARequestorInterface * otaRequestor)
-{
-    if (mOtaRequestor)
-    {
-        mOtaRequestor->UnregisterEventHandler(mPath.mEndpointId);
-    }
-    mOtaRequestor = otaRequestor;
-    if (mOtaRequestor)
-    {
-        mOtaRequestor->RegisterEventHandler(mEventHandlerRegistration);
-    }
-}
-
 CHIP_ERROR OTARequestorCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-    if (mOtaRequestor)
+    if (OtaRequestorInstance())
     {
-      return mOtaRequestor->RegisterEventHandler(mEventHandlerRegistration);
+      return OtaRequestorInstance()->RegisterEventHandler(mEventHandlerRegistration);
     }
     return CHIP_NO_ERROR;
 }
 
 void OTARequestorCluster::Shutdown()
 {
-    if (mOtaRequestor)
+    if (OtaRequestorInstance())
     {
-        mOtaRequestor->UnregisterEventHandler(mPath.mEndpointId);
+        OtaRequestorInstance()->UnregisterEventHandler(mPath.mEndpointId);
     }
     DefaultServerCluster::Shutdown();
 }
@@ -80,12 +67,12 @@ DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(
     switch (request.path.mAttributeId)
     {
     case OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id: {
-        if (!mOtaRequestor)
+        if (!OtaRequestorInstance())
         {
             return CHIP_ERROR_INTERNAL;
         }
         return encoder.EncodeList([this](const auto & listEncoder) -> CHIP_ERROR {
-            ProviderLocationList::Iterator providerIterator = mOtaRequestor->GetDefaultOTAProviderListIterator();
+            ProviderLocationList::Iterator providerIterator = OtaRequestorInstance()->GetDefaultOTAProviderListIterator();
             CHIP_ERROR error = CHIP_NO_ERROR;
             while (error == CHIP_NO_ERROR && providerIterator.Next()) {
                 error = listEncoder.Encode(providerIterator.GetValue());
@@ -94,23 +81,23 @@ DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(
         });
     }
     case OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id:
-        if (!mOtaRequestor)
+        if (!OtaRequestorInstance())
         {
             return CHIP_ERROR_INTERNAL;
         }
-        return encoder.Encode(mOtaRequestor->GetUpdatePossible());
+        return encoder.Encode(OtaRequestorInstance()->GetUpdatePossible());
     case OtaSoftwareUpdateRequestor::Attributes::UpdateState::Id:
-        if (!mOtaRequestor)
+        if (!OtaRequestorInstance())
         {
             return CHIP_ERROR_INTERNAL;
         }
-        return encoder.Encode(mOtaRequestor->GetCurrentUpdateState());
+        return encoder.Encode(OtaRequestorInstance()->GetCurrentUpdateState());
     case OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id:
-        if (!mOtaRequestor)
+        if (!OtaRequestorInstance())
         {
             return CHIP_ERROR_INTERNAL;
         }
-        return encoder.Encode(mOtaRequestor->GetCurrentUpdateStateProgress());
+        return encoder.Encode(OtaRequestorInstance()->GetCurrentUpdateStateProgress());
     case Globals::Attributes::FeatureMap::Id:
         return encoder.Encode<uint32_t>(0);
     case Globals::Attributes::ClusterRevision::Id:
@@ -133,6 +120,10 @@ std::optional<DataModel::ActionReturnStatus> OTARequestorCluster::InvokeCommand(
     switch (request.path.mCommandId)
     {
     case OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id: {
+        if (!OtaRequestorInstance())
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
         OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType data;
         ReturnErrorOnFailure(data.Decode(input_arguments));
 
@@ -143,7 +134,7 @@ std::optional<DataModel::ActionReturnStatus> OTARequestorCluster::InvokeCommand(
                          static_cast<unsigned>(kMaxMetadataLen));
             return Protocols::InteractionModel::Status::InvalidCommand;
         }
-        mOtaRequestor->HandleAnnounceOTAProvider(handler, request.path, data);
+        OtaRequestorInstance()->HandleAnnounceOTAProvider(handler, request.path, data);
         return std::nullopt;
     }
     default:

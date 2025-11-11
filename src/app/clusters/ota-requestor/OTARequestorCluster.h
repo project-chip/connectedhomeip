@@ -30,8 +30,6 @@ class OTARequestorCluster : public DefaultServerCluster, public OTARequestorEven
 public:
     OTARequestorCluster(EndpointId endpointId, OTARequestorInterface * otaRequestor);
 
-    void SetOtaRequestorInterface(OTARequestorInterface * otaRequestor);
-
     CHIP_ERROR Startup(ServerClusterContext & context) override;
 
     void Shutdown() override;
@@ -59,6 +57,13 @@ public:
     void OnDownloadError(uint32_t softwareVersion, uint64_t bytesDownloaded,
                          DataModel::Nullable<uint8_t> progressPercent,
                          DataModel::Nullable<int64_t> platformCode) override;
+
+protected:
+    // TODO: Describe what this does.
+    virtual OTARequestorInterface * OtaRequestorInstance()
+    {
+        return mOtaRequestor;
+    }
 
 private:
     OTARequestorEventHandlerRegistration mEventHandlerRegistration;

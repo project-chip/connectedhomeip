@@ -47,7 +47,7 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        gServers[clusterInstanceIndex].Create(endpointId, *GetRequestorInstance());
+        gServers[clusterInstanceIndex].Create(endpointId, GetRequestorInstance());
         return gServers[clusterInstanceIndex].Registration();
     }
 
