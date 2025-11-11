@@ -78,9 +78,9 @@ TEST_F(TestGroupKeyManagementCluster, CommandsTest)
               GroupKeyManagement::Commands::KeySetReadAllIndices::kMetadataEntry.GetInvokePrivilege());
 
     // Check required generated commands are present
-    ReadOnlyBufferBuilder<chip::CommandId> generatedCommandsBuilder;
+    ReadOnlyBufferBuilder<CommandId> generatedCommandsBuilder;
     ASSERT_EQ(cluster.GeneratedCommands(groupKeyManagementPath, generatedCommandsBuilder), CHIP_NO_ERROR);
-    ReadOnlyBuffer<chip::CommandId> generatedCommands = generatedCommandsBuilder.TakeBuffer();
+    ReadOnlyBuffer<CommandId> generatedCommands = generatedCommandsBuilder.TakeBuffer();
 
     ASSERT_EQ(generatedCommands.size(), GroupKeyManagement::Commands::kGeneratedCommandsCount);
     ASSERT_EQ(generatedCommands[0], GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::Id);
