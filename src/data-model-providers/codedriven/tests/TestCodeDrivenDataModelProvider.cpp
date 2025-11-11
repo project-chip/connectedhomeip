@@ -39,6 +39,7 @@
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::DataModel;
 using namespace chip::app::Testing;
 
 class TestProviderChangeListener : public DataModel::ProviderChangeListener
