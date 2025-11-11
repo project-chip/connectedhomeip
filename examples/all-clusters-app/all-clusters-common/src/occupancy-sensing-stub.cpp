@@ -62,11 +62,11 @@ void emberAfOccupancySensingClusterInitCallback(EndpointId endpointId)
 
         if (gOccupancySensingClusterInstances[epIndex])
         {
-            gOccupancySensingClusterInstances[epIndex]->Init();
+            TEMPORARY_RETURN_IGNORED gOccupancySensingClusterInstances[epIndex]->Init();
 
-            SetHoldTimeLimits(endpointId, holdTimeLimits);
+            TEMPORARY_RETURN_IGNORED SetHoldTimeLimits(endpointId, holdTimeLimits);
 
-            SetHoldTime(endpointId, holdTime);
+            TEMPORARY_RETURN_IGNORED SetHoldTime(endpointId, holdTime);
         }
     }
     else

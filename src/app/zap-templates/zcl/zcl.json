@@ -246,7 +246,7 @@
             "TariffUnit",
             "MaximumMeteredQuantities"
         ],
-        "Descriptor": ["ClusterRevision", "FeatureMap"],
+        "Descriptor": ["ClusterRevision", "FeatureMap", "EndpointUniqueID"],
         "Device Energy Management": [
             "ESAType",
             "ESACanGenerate",
@@ -340,6 +340,7 @@
             "FeatureMap"
         ],
         "ICD Management": [
+            "ClusterRevision",
             "IdleModeDuration",
             "ActiveModeDuration",
             "ActiveModeThreshold",
@@ -412,6 +413,7 @@
             "global_struct",
             "nullable_global_struct"
         ],
+        "User Label": ["LabelList", "ClusterRevision", "FeatureMap"],
         "Thread Border Router Management": [
             "BorderRouterName",
             "BorderAgentID",

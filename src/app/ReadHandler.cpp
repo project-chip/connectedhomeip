@@ -42,7 +42,10 @@ using Status = Protocols::InteractionModel::Status;
 uint16_t ReadHandler::GetPublisherSelectedIntervalLimit()
 {
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    return std::chrono::duration_cast<System::Clock::Seconds16>(ICDConfigurationData::GetInstance().GetIdleModeDuration()).count();
+    // We don't need to check for precision loss since the max value of the IdleModeDuration can fit inside a uint16_t
+    const auto idleModeDuration =
+        std::chrono::duration_cast<System::Clock::Seconds16>(ICDConfigurationData::GetInstance().GetIdleModeDuration()).count();
+    return std::max(idleModeDuration, kSubscriptionMaxIntervalPublisherLimit);
 #else
     return kSubscriptionMaxIntervalPublisherLimit;
 #endif
@@ -133,7 +136,8 @@ void ReadHandler::OnSubscriptionResumed(const SessionHandle & sessionHandle,
     SingleLinkedListNode<AttributePathParams> * attributePath = mpAttributePathList;
     while (attributePath)
     {
-        mManagementCallback.GetInteractionModelEngine()->GetReportingEngine().SetDirty(attributePath->mValue);
+        TEMPORARY_RETURN_IGNORED mManagementCallback.GetInteractionModelEngine()->GetReportingEngine().SetDirty(
+            attributePath->mValue);
         attributePath = attributePath->mpNext;
     }
 }
@@ -168,7 +172,8 @@ void ReadHandler::Close(CloseOptions options)
         auto * subscriptionResumptionStorage = mManagementCallback.GetInteractionModelEngine()->GetSubscriptionResumptionStorage();
         if (subscriptionResumptionStorage)
         {
-            subscriptionResumptionStorage->Delete(GetInitiatorNodeId(), GetAccessingFabricIndex(), mSubscriptionId);
+            TEMPORARY_RETURN_IGNORED subscriptionResumptionStorage->Delete(GetInitiatorNodeId(), GetAccessingFabricIndex(),
+                                                                           mSubscriptionId);
         }
     }
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
@@ -207,7 +212,7 @@ void ReadHandler::OnInitialRequest(System::PacketBufferHandle && aPayload)
         {
             status = StatusIB(err).mStatus;
         }
-        StatusResponse::Send(status, mExchangeCtx.Get(), /* aExpectResponse = */ false);
+        TEMPORARY_RETURN_IGNORED StatusResponse::Send(status, mExchangeCtx.Get(), /* aExpectResponse = */ false);
         // At this point we can't have a persisted subscription, since that
         // happens only when ProcessSubscribeRequest returns success. And our
         // subscription id is almost certainly not actually useful at this
@@ -246,7 +251,6 @@ CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchange
                 err = SendSubscribeResponse();
 
                 SetStateFlag(ReadHandlerFlags::ActiveSubscription);
-
                 auto * appCallback = mManagementCallback.GetAppCallback();
                 if (appCallback)
                 {
@@ -386,7 +390,7 @@ CHIP_ERROR ReadHandler::OnMessageReceived(Messaging::ExchangeContext * apExchang
 
     if (sendStatusResponse)
     {
-        StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
+        TEMPORARY_RETURN_IGNORED StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
     }
 
     if (err != CHIP_NO_ERROR)
@@ -407,6 +411,31 @@ void ReadHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeConte
 {
     ChipLogError(DataManagement, "Time out! failed to receive status response from Exchange: " ChipLogFormatExchange,
                  ChipLogValueExchange(apExchangeContext));
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
+    switch (mState)
+    {
+    case HandlerState::AwaitingReportResponse:
+        if (IsType(InteractionType::Subscribe) && !IsPriming())
+        {
+            // Trigger check-in message when a non-priming subscription report times out.
+            ChipLogError(DataManagement, "Trigger check-in message when non-priming subscription report times out");
+            if (mSessionHandle)
+            {
+                ICDNotifier::GetInstance().NotifySendCheckIn(GetSubjectDescriptor());
+            }
+            else
+            {
+                ChipLogError(DataManagement, "Failed to get subject descriptor for sending check-in message on report timeout");
+            }
+        }
+        break;
+    case HandlerState::CanStartReporting:
+    case HandlerState::Idle:
+    default:
+        break;
+    }
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_SERVER
+
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     Close(CloseOptions::kKeepPersistedSubscription);
 #else
@@ -629,7 +658,7 @@ void ReadHandler::MoveToState(const HandlerState aTargetState)
     {
         if (ShouldReportUnscheduled())
         {
-            mManagementCallback.GetInteractionModelEngine()->GetReportingEngine().ScheduleRun();
+            TEMPORARY_RETURN_IGNORED mManagementCallback.GetInteractionModelEngine()->GetReportingEngine().ScheduleRun();
         }
         else
         {
@@ -754,8 +783,7 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     // If the next interval is greater than the MaxIntervalCeiling, use the MaxIntervalCeiling.
     // Otherwise, use IdleModeDuration as MaxInterval
 
-    // GetPublisherSelectedIntervalLimit() returns the IdleModeDuration if the device is an ICD
-    uint32_t decidedMaxInterval = GetPublisherSelectedIntervalLimit();
+    uint32_t decidedMaxInterval = ICDConfigurationData::GetInstance().GetIdleModeDuration().count();
 
     // Check if the PublisherSelectedIntervalLimit is 0. If so, set decidedMaxInterval to MaxIntervalCeiling
     if (decidedMaxInterval == 0)

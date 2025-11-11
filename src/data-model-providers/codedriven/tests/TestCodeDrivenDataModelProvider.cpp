@@ -39,7 +39,6 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Testing;
-using SemanticTag = chip::app::Clusters::Globals::Structs::SemanticTagStruct::Type;
 
 class TestProviderChangeListener : public DataModel::ProviderChangeListener
 {
@@ -267,17 +266,6 @@ constexpr DataModel::EndpointEntry endpointEntry4 = { .id                 = 4,
                                                       .parentId           = kInvalidEndpointId,
                                                       .compositionPattern = DataModel::EndpointCompositionPattern::kFullFamily };
 
-SemanticTag semanticTag1 = { .mfgCode     = VendorId::Google,
-                             .namespaceID = 1,
-                             .tag         = 1,
-                             .label       = chip::Optional<chip::app::DataModel::Nullable<chip::CharSpan>>(
-                                 { chip::app::DataModel::MakeNullable(chip::CharSpan("label1", 6)) }) };
-SemanticTag semanticTag2 = { .mfgCode     = VendorId::Google,
-                             .namespaceID = 2,
-                             .tag         = 2,
-                             .label       = chip::Optional<chip::app::DataModel::Nullable<chip::CharSpan>>(
-                                 { chip::app::DataModel::MakeNullable(chip::CharSpan("label1", 6)) }) };
-
 constexpr chip::EndpointId clientClusterId1 = 1;
 constexpr chip::EndpointId clientClusterId2 = 2;
 
@@ -404,30 +392,6 @@ TEST_F(TestCodeDrivenDataModelProvider, IterateOverClientClusters)
     EXPECT_EQ(clientClusters[1], clientClusterId2);
 }
 
-TEST_F(TestCodeDrivenDataModelProvider, IterateOverTags)
-{
-    static const SemanticTag sSemanticTagsArray[] = { semanticTag1, semanticTag2 };
-
-    auto endpoint = std::make_unique<SpanEndpoint>(
-        SpanEndpoint::Builder().SetSemanticTags(Span<const SemanticTag>(sSemanticTagsArray)).Build());
-
-    mEndpointStorage.push_back(std::move(endpoint));
-    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), endpointEntry1));
-    ASSERT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
-
-    ReadOnlyBufferBuilder<SemanticTag> builder;
-    ASSERT_EQ(mProvider.SemanticTags(endpointEntry1.id, builder), CHIP_NO_ERROR);
-
-    auto tags = builder.TakeBuffer();
-    ASSERT_EQ(tags.size(), 2u);
-    EXPECT_EQ(tags[0].mfgCode, semanticTag1.mfgCode);
-    EXPECT_EQ(tags[0].namespaceID, semanticTag1.namespaceID);
-    EXPECT_EQ(tags[0].tag, semanticTag1.tag);
-    EXPECT_EQ(tags[1].mfgCode, semanticTag2.mfgCode);
-    EXPECT_EQ(tags[1].namespaceID, semanticTag2.namespaceID);
-    EXPECT_EQ(tags[1].tag, semanticTag2.tag);
-}
-
 TEST_F(TestCodeDrivenDataModelProvider, IterateOverDeviceTypes)
 {
     static DataModel::DeviceTypeEntry sDeviceTypesData[kTestMaxDeviceTypes];
@@ -491,14 +455,11 @@ TEST_F(TestCodeDrivenDataModelProvider, EndpointWithStaticData)
     ASSERT_EQ(localProvider.Startup(mContext), CHIP_NO_ERROR);
 
     static const ClusterId clientClustersArray[]               = { 0xD001, 0xD002 };
-    static const SemanticTag semanticTagsArray[]               = { { .mfgCode = VendorId::Google, .namespaceID = 10, .tag = 100 },
-                                                                   { .mfgCode = VendorId::Google, .namespaceID = 11, .tag = 101 } };
     static const DataModel::DeviceTypeEntry deviceTypesArray[] = { { .deviceTypeId = 0x7001, .deviceTypeRevision = 1 },
                                                                    { .deviceTypeId = 0x7002, .deviceTypeRevision = 2 } };
 
     SpanEndpoint ep = SpanEndpoint::Builder()
                           .SetClientClusters(chip::Span<const ClusterId>(clientClustersArray))
-                          .SetSemanticTags(chip::Span<const SemanticTag>(semanticTagsArray))
                           .SetDeviceTypes(chip::Span<const DataModel::DeviceTypeEntry>(deviceTypesArray))
                           .Build();
 
@@ -518,7 +479,6 @@ TEST_F(TestCodeDrivenDataModelProvider, EndpointWithEmptyStaticData)
 {
     auto endpoint = std::make_unique<SpanEndpoint>(SpanEndpoint::Builder()
                                                        .SetClientClusters(Span<const ClusterId>())
-                                                       .SetSemanticTags(Span<const SemanticTag>())
                                                        .SetDeviceTypes(Span<const DataModel::DeviceTypeEntry>())
                                                        .Build());
     mEndpointStorage.push_back(std::move(endpoint));

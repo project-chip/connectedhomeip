@@ -371,7 +371,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             containerOptions = {
                 "containerType": pvcluster.Enums.ContainerFormatEnum.kCmaf,
                 "CMAFContainerOptions": {"CMAFInterface": pvcluster.Enums.CMAFInterfaceEnum.kInterface1, "chunkDuration": 4, "segmentDuration": 3,
-                                         "sessionGroup": 3, "trackName": ""},
+                                         "sessionGroup": 3, "trackName": "media"},
             }
             status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": streamUsage,
@@ -511,7 +511,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         containerOptions = {
             "containerType": pvcluster.Enums.ContainerFormatEnum.kCmaf,
             "CMAFContainerOptions": {"CMAFInterface": pvcluster.Enums.CMAFInterfaceEnum.kInterface1, "chunkDuration": 4, "segmentDuration": 6000,
-                                     "sessionGroup": 3, "trackName": "media"},
+                                     "sessionGroup": 3, "trackName": " "},
         }
         status = await self.allocate_one_pushav_transport(endpoint, expected_cluster_status=pvcluster.Enums.StatusCodeEnum.kInvalidOptions,
                                                           stream_Usage=Clusters.Globals.Enums.StreamUsageEnum.kRecording, tlsEndPoint=tlsEndpointId,

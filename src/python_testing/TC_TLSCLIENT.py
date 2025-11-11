@@ -17,6 +17,7 @@
 
 import random
 import string
+from datetime import timedelta
 
 import test_plan_support
 # === BEGIN CI TEST ARGUMENTS ===
@@ -53,6 +54,11 @@ class TC_TLSCLIENT(MatterBaseTest):
         def __init__(self, cr1_cmd: TLSUtils, cr2_cmd: TLSUtils):
             self.cr1_cmd = cr1_cmd
             self.cr2_cmd = cr2_cmd
+
+    # This test creates the maximum number of endpoints, which can take some time
+    @property
+    def default_timeout(self) -> int:
+        return timedelta(minutes=5).total_seconds()
 
     async def common_setup(self):
         self.step(1)
@@ -391,7 +397,7 @@ class TC_TLSCLIENT(MatterBaseTest):
         self.step(18)
         endpoints2 = await cr2_cmd.read_tls_client_attribute(attributes.ProvisionedEndpoints)
         asserts.assert_equal(len(endpoints2), max_provisioned)
-        found_endpoints = dict()
+        found_endpoints = {}
         for ep in endpoints2:
             found_endpoints[ep.endpointID] = ep
         for i in range(1, max_provisioned+1):
@@ -420,7 +426,7 @@ class TC_TLSCLIENT(MatterBaseTest):
         self.step(23)
         endpoints2 = await cr2_cmd.read_tls_client_attribute(attributes.ProvisionedEndpoints)
         asserts.assert_equal(len(endpoints2), max_provisioned)
-        found_endpoints = dict()
+        found_endpoints = {}
         for ep in endpoints2:
             found_endpoints[ep.endpointID] = ep
         for i in range(2, max_provisioned+2):

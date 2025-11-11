@@ -110,7 +110,7 @@ class TC_WebRTCP_2_7(MatterBaseTest, WEBRTCPTestBase):
         if self.is_pics_sdk_ci_only:
             self.write_to_app_pipe({"Name": "SetHardPrivacyModeOn", "Value": True})
         else:
-            input("Please turn ON the physical privacy switch on the device, then press Enter to continue...")
+            self.wait_for_user_input("Please turn ON the physical privacy switch on the device, then press Enter to continue...")
 
         # Verify the attribute was set successfully
         hard_privacy_mode = await self.read_single_attribute_check_success(
@@ -141,7 +141,7 @@ class TC_WebRTCP_2_7(MatterBaseTest, WEBRTCPTestBase):
         if self.is_pics_sdk_ci_only:
             self.write_to_app_pipe({"Name": "SetHardPrivacyModeOn", "Value": False})
         else:
-            input("Please turn OFF the physical privacy switch on the device, then press Enter to continue...")
+            self.wait_for_user_input("Please turn OFF the physical privacy switch on the device, then press Enter to continue...")
 
         # Verify the attribute was set successfully
         hard_privacy_mode = await self.read_single_attribute_check_success(

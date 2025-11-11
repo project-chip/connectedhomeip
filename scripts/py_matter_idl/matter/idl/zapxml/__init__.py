@@ -133,7 +133,7 @@ def ParseXmls(sources: List[ParseSource], include_meta_data=True) -> Idl:
 __LOG_LEVELS__ = {
     'debug': logging.DEBUG,
     'info': logging.INFO,
-    'warn': logging.WARN,
+    'warn': logging.WARNING,
     'fatal': logging.FATAL,
 }
 

@@ -620,7 +620,12 @@ cluster Binding = 30 {
       and enforce Access Control for the Node's endpoints and their associated
       cluster instances. */
 cluster AccessControl = 31 {
-  revision 2;
+  revision 3;
+
+  enum AccessControlAuxiliaryTypeEnum : enum8 {
+    kSystem = 0;
+    kGroupcast = 1;
+  }
 
   enum AccessControlEntryAuthModeEnum : enum8 {
     kPASE = 1 [spec_name = "PASE"];
@@ -652,6 +657,7 @@ cluster AccessControl = 31 {
   bitmap Feature : bitmap32 {
     kExtension = 0x1;
     kManagedDevice = 0x2;
+    kAuxiliary = 0x4;
   }
 
   struct AccessRestrictionStruct {
@@ -683,6 +689,7 @@ cluster AccessControl = 31 {
     fabric_sensitive AccessControlEntryAuthModeEnum authMode = 2;
     nullable fabric_sensitive int64u subjects[] = 3;
     nullable fabric_sensitive AccessControlTargetStruct targets[] = 4;
+    optional fabric_sensitive AccessControlAuxiliaryTypeEnum auxiliaryType = 5;
     fabric_idx fabricIndex = 254;
   }
 
@@ -714,6 +721,11 @@ cluster AccessControl = 31 {
     fabric_idx fabricIndex = 254;
   }
 
+  fabric_sensitive info event access(read: administer) AuxiliaryAccessUpdated = 3 {
+    nullable node_id adminNodeID = 0;
+    fabric_idx fabricIndex = 254;
+  }
+
   attribute access(read: administer, write: administer) AccessControlEntryStruct acl[] = 0;
   attribute access(read: administer, write: administer) optional AccessControlExtensionStruct extension[] = 1;
   readonly attribute int16u subjectsPerAccessControlEntry = 2;
@@ -721,6 +733,7 @@ cluster AccessControl = 31 {
   readonly attribute int16u accessControlEntriesPerFabric = 4;
   readonly attribute optional CommissioningAccessRestrictionEntryStruct commissioningARL[] = 5;
   readonly attribute optional AccessRestrictionEntryStruct arl[] = 6;
+  readonly attribute access(read: administer) optional AccessControlEntryStruct auxiliaryACL[] = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -3379,7 +3392,7 @@ cluster AudioOutput = 1291 {
 
 /** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
 cluster ApplicationLauncher = 1292 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum StatusEnum : enum8 {
     kSuccess = 0;
@@ -3394,7 +3407,7 @@ cluster ApplicationLauncher = 1292 {
     kApplicationPlatform = 0x1;
   }
 
-  shared struct ApplicationStruct {
+  struct ApplicationStruct {
     int16u catalogVendorID = 0;
     char_string applicationID = 1;
   }
@@ -3430,17 +3443,17 @@ cluster ApplicationLauncher = 1292 {
     optional octet_string data = 1;
   }
 
-  /** Upon receipt, this SHALL launch the specified app with optional data. The TV Device SHALL launch and bring to foreground the identified application in the command if the application is not already launched and in foreground. The TV Device SHALL update state attribute on the Application Basic cluster of the Endpoint corresponding to the launched application. This command returns a Launch Response. */
+  /** Upon receipt of this command, the server SHALL launch the application with optional data. */
   command LaunchApp(LaunchAppRequest): LauncherResponse = 0;
-  /** Upon receipt on a Video Player endpoint this SHALL stop the specified application if it is running. */
+  /** Upon receipt of this command, the server SHALL stop the application if it is running. */
   command StopApp(StopAppRequest): LauncherResponse = 1;
-  /** Upon receipt on a Video Player endpoint this SHALL hide the specified application if it is running and visible. */
+  /** Upon receipt of this command, the server SHALL hide the application. */
   command HideApp(HideAppRequest): LauncherResponse = 2;
 }
 
 /** This cluster provides information about an application running on a TV or media player device which is represented as an endpoint. */
 cluster ApplicationBasic = 1293 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum ApplicationStatusEnum : enum8 {
     kStopped = 0;
@@ -3449,7 +3462,7 @@ cluster ApplicationBasic = 1293 {
     kActiveVisibleNotFocus = 3;
   }
 
-  shared struct ApplicationStruct {
+  struct ApplicationStruct {
     int16u catalogVendorID = 0;
     char_string applicationID = 1;
   }
@@ -3512,7 +3525,30 @@ cluster AccountLogin = 1294 {
 
 /** This cluster is used for managing the content control (including "parental control") settings on a media device such as a TV, or Set-top Box. */
 provisional cluster ContentControl = 1295 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
+
+  enum StatusCodeEnum : enum8 {
+    kInvalidPINCode = 2;
+    kInvalidRating = 3;
+    kInvalidChannel = 4;
+    kChannelAlreadyExist = 5;
+    kChannelNotExist = 6;
+    kUnidentifiableApplication = 7;
+    kApplicationAlreadyExist = 8;
+    kApplicationNotExist = 9;
+    kTimeWindowAlreadyExist = 10;
+    kTimeWindowNotExist = 11;
+  }
+
+  bitmap DayOfWeekBitmap : bitmap8 {
+    kSunday = 0x1;
+    kMonday = 0x2;
+    kTuesday = 0x4;
+    kWednesday = 0x8;
+    kThursday = 0x10;
+    kFriday = 0x20;
+    kSaturday = 0x40;
+  }
 
   bitmap Feature : bitmap32 {
     kScreenTime = 0x1;
@@ -3520,24 +3556,58 @@ provisional cluster ContentControl = 1295 {
     kBlockUnrated = 0x4;
     kOnDemandContentRating = 0x8;
     kScheduledContentRating = 0x10;
+    kBlockChannels = 0x20;
+    kBlockApplications = 0x40;
+    kBlockContentTimeWindow = 0x80;
+  }
+
+  struct TimePeriodStruct {
+    int8u startHour = 0;
+    int8u startMinute = 1;
+    int8u endHour = 2;
+    int8u endMinute = 3;
+  }
+
+  struct TimeWindowStruct {
+    nullable int16u timeWindowIndex = 0;
+    DayOfWeekBitmap dayOfWeek = 1;
+    TimePeriodStruct timePeriod[] = 2;
+  }
+
+  struct AppInfoStruct {
+    int16u catalogVendorID = 0;
+    char_string applicationID = 1;
+  }
+
+  struct BlockChannelStruct {
+    nullable int16u blockChannelIndex = 0;
+    int16u majorNumber = 1;
+    int16u minorNumber = 2;
+    optional char_string identifier = 3;
   }
 
   struct RatingNameStruct {
-    char_string ratingName = 0;
-    optional char_string ratingNameDesc = 1;
+    char_string<8> ratingName = 0;
+    optional char_string<64> ratingNameDesc = 1;
   }
 
-  info event RemainingScreenTimeExpired = 0 {
+  provisional info event RemainingScreenTimeExpired = 0 {
   }
 
-  readonly attribute boolean enabled = 0;
-  readonly attribute optional RatingNameStruct onDemandRatings[] = 1;
-  readonly attribute optional char_string<8> onDemandRatingThreshold = 2;
-  readonly attribute optional RatingNameStruct scheduledContentRatings[] = 3;
-  readonly attribute optional char_string<8> scheduledContentRatingThreshold = 4;
-  readonly attribute optional elapsed_s screenDailyTime = 5;
-  readonly attribute optional elapsed_s remainingScreenTime = 6;
-  readonly attribute optional boolean blockUnrated = 7;
+  provisional info event EnteringBlockContentTimeWindow = 1 {
+  }
+
+  provisional readonly attribute boolean enabled = 0;
+  provisional readonly attribute optional RatingNameStruct onDemandRatings[] = 1;
+  provisional readonly attribute optional char_string<8> onDemandRatingThreshold = 2;
+  provisional readonly attribute optional RatingNameStruct scheduledContentRatings[] = 3;
+  provisional readonly attribute optional char_string<8> scheduledContentRatingThreshold = 4;
+  provisional readonly attribute optional elapsed_s screenDailyTime = 5;
+  provisional readonly attribute optional elapsed_s remainingScreenTime = 6;
+  provisional readonly attribute optional boolean blockUnrated = 7;
+  provisional readonly attribute optional BlockChannelStruct blockChannelList[] = 8;
+  provisional readonly attribute optional AppInfoStruct blockApplicationList[] = 9;
+  provisional readonly attribute optional TimeWindowStruct blockContentTimeWindow[] = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -3545,17 +3615,17 @@ provisional cluster ContentControl = 1295 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct UpdatePINRequest {
-    optional char_string oldPIN = 0;
-    char_string newPIN = 1;
+    char_string<6> oldPIN = 0;
+    char_string<6> newPIN = 1;
   }
 
   response struct ResetPINResponse = 2 {
-    char_string PINCode = 0;
+    char_string<6> PINCode = 0;
   }
 
   request struct AddBonusTimeRequest {
-    optional char_string PINCode = 0;
-    optional elapsed_s bonusTime = 1;
+    optional char_string<6> PINCode = 0;
+    elapsed_s bonusTime = 1;
   }
 
   request struct SetScreenDailyTimeRequest {
@@ -3563,33 +3633,69 @@ provisional cluster ContentControl = 1295 {
   }
 
   request struct SetOnDemandRatingThresholdRequest {
-    char_string rating = 0;
+    char_string<8> rating = 0;
   }
 
   request struct SetScheduledContentRatingThresholdRequest {
-    char_string rating = 0;
+    char_string<8> rating = 0;
   }
 
-  /** The purpose of this command is to update the PIN used for protecting configuration of the content control settings. Upon success, the old PIN SHALL no longer work. The PIN is used to ensure that only the Node (or User) with the PIN code can make changes to the Content Control settings, for example, turn off Content Controls or modify the ScreenDailyTime. The PIN is composed of a numeric string of up to 6 human readable characters (displayable) . Upon receipt of this command, the media device SHALL check if the OldPIN field of this command is the same as the current PIN. If the PINs are the same, then the PIN code SHALL be set to NewPIN. Otherwise a response with InvalidPINCode error status SHALL be returned. The media device MAY provide a default PIN to the User via an out of band mechanism. For security reasons, it is recommended that a client encourage the user to update the PIN from its default value when performing configuration of the Content Control settings exposed by this cluster. The ResetPIN command can also be used to obtain the default PIN. */
-  command UpdatePIN(UpdatePINRequest): DefaultSuccess = 0;
-  /** The purpose of this command is to reset the PIN. If this command is executed successfully, a ResetPINResponse command with a new PIN SHALL be returned. */
-  command ResetPIN(): ResetPINResponse = 1;
-  /** The purpose of this command is to turn on the Content Control feature on a media device. On receipt of the Enable command, the media device SHALL set the Enabled attribute to TRUE. */
-  command Enable(): DefaultSuccess = 3;
-  /** The purpose of this command is to turn off the Content Control feature on a media device. On receipt of the Disable command, the media device SHALL set the Enabled attribute to FALSE. */
-  command Disable(): DefaultSuccess = 4;
-  /** The purpose of this command is to add the extra screen time for the user. If a client with Operate privilege invokes this command, the media device SHALL check whether the PINCode passed in the command matches the current PINCode value. If these match, then the RemainingScreenTime attribute SHALL be increased by the specified BonusTime value. If the PINs do not match, then a response with InvalidPINCode error status SHALL be returned, and no changes SHALL be made to RemainingScreenTime. If a client with Manage privilege or greater invokes this command, the media device SHALL ignore the PINCode field and directly increase the RemainingScreenTime attribute by the specified BonusTime value. A server that does not support the PM feature SHALL respond with InvalidPINCode to clients that only have Operate privilege unless: It has been provided with the PIN value to expect via an out of band mechanism, and The client has provided a PINCode that matches the expected PIN value. */
+  request struct AddBlockChannelsRequest {
+    BlockChannelStruct channels[] = 0;
+  }
+
+  request struct RemoveBlockChannelsRequest {
+    int16u channelIndexes[] = 0;
+  }
+
+  request struct AddBlockApplicationsRequest {
+    AppInfoStruct applications[] = 0;
+  }
+
+  request struct RemoveBlockApplicationsRequest {
+    AppInfoStruct applications[] = 0;
+  }
+
+  request struct SetBlockContentTimeWindowRequest {
+    TimeWindowStruct timeWindow = 0;
+  }
+
+  request struct RemoveBlockContentTimeWindowRequest {
+    int16u timeWindowIndexes[] = 0;
+  }
+
+  /** The purpose of this command is to update the PIN used for protecting configuration of the content control settings. */
+  timed command access(invoke: manage) UpdatePIN(UpdatePINRequest): DefaultSuccess = 0;
+  /** The purpose of this command is to reset the PIN. */
+  timed command access(invoke: administer) ResetPIN(): ResetPINResponse = 1;
+  /** The purpose of this command is to turn on the Content Control feature on a media device. */
+  timed command access(invoke: manage) Enable(): DefaultSuccess = 3;
+  /** The purpose of this command is to turn off the Content Control feature on a media device. */
+  timed command access(invoke: manage) Disable(): DefaultSuccess = 4;
+  /** The purpose of this command is to add the extra screen time for the user. */
   command AddBonusTime(AddBonusTimeRequest): DefaultSuccess = 5;
-  /** The purpose of this command is to set the ScreenDailyTime attribute. On receipt of the SetScreenDailyTime command, the media device SHALL set the ScreenDailyTime attribute to the ScreenTime value. */
-  command SetScreenDailyTime(SetScreenDailyTimeRequest): DefaultSuccess = 6;
-  /** The purpose of this command is to specify whether programs with no Content rating must be blocked by this media device. On receipt of the BlockUnratedContent command, the media device SHALL set the BlockUnrated attribute to TRUE. */
-  command BlockUnratedContent(): DefaultSuccess = 7;
-  /** The purpose of this command is to specify whether programs with no Content rating must be blocked by this media device. On receipt of the UnblockUnratedContent command, the media device SHALL set the BlockUnrated attribute to FALSE. */
-  command UnblockUnratedContent(): DefaultSuccess = 8;
-  /** The purpose of this command is to set the OnDemandRatingThreshold attribute. On receipt of the SetOnDemandRatingThreshold command, the media device SHALL check if the Rating field is one of values present in the OnDemandRatings attribute. If not, then a response with InvalidRating error status SHALL be returned. */
-  command SetOnDemandRatingThreshold(SetOnDemandRatingThresholdRequest): DefaultSuccess = 9;
-  /** The purpose of this command is to set ScheduledContentRatingThreshold attribute. On receipt of the SetScheduledContentRatingThreshold command, the media device SHALL check if the Rating field is one of values present in the ScheduledContentRatings attribute. If not, then a response with InvalidRating error status SHALL be returned. */
-  command SetScheduledContentRatingThreshold(SetScheduledContentRatingThresholdRequest): DefaultSuccess = 10;
+  /** The purpose of this command is to set the ScreenDailyTime attribute. */
+  command access(invoke: manage) SetScreenDailyTime(SetScreenDailyTimeRequest): DefaultSuccess = 6;
+  /** The purpose of this command is to specify whether programs with no Content rating must be blocked by this media device. */
+  command access(invoke: manage) BlockUnratedContent(): DefaultSuccess = 7;
+  /** The purpose of this command is to specify whether programs with no Content rating must be blocked by this media device. */
+  command access(invoke: manage) UnblockUnratedContent(): DefaultSuccess = 8;
+  /** The purpose of this command is to set the OnDemandRatingThreshold attribute. */
+  command access(invoke: manage) SetOnDemandRatingThreshold(SetOnDemandRatingThresholdRequest): DefaultSuccess = 9;
+  /** The purpose of this command is to set ScheduledContentRatingThreshold attribute. */
+  command access(invoke: manage) SetScheduledContentRatingThreshold(SetScheduledContentRatingThresholdRequest): DefaultSuccess = 10;
+  /** The purpose of this command is to set BlockChannelList attribute. */
+  command access(invoke: manage) AddBlockChannels(AddBlockChannelsRequest): DefaultSuccess = 11;
+  /** The purpose of this command is to remove channels from the BlockChannelList attribute. */
+  command access(invoke: manage) RemoveBlockChannels(RemoveBlockChannelsRequest): DefaultSuccess = 12;
+  /** The purpose of this command is to set applications to the BlockApplicationList attribute. */
+  command access(invoke: manage) AddBlockApplications(AddBlockApplicationsRequest): DefaultSuccess = 13;
+  /** The purpose of this command is to remove applications from the BlockApplicationList attribute. */
+  command access(invoke: manage) RemoveBlockApplications(RemoveBlockApplicationsRequest): DefaultSuccess = 14;
+  /** The purpose of this command is to set the BlockContentTimeWindow attribute. */
+  command access(invoke: manage) SetBlockContentTimeWindow(SetBlockContentTimeWindowRequest): DefaultSuccess = 15;
+  /** The purpose of this command is to remove the selected time windows from the BlockContentTimeWindow attribute. */
+  command access(invoke: manage) RemoveBlockContentTimeWindow(RemoveBlockContentTimeWindowRequest): DefaultSuccess = 16;
 }
 
 /** This cluster provides an interface for sending targeted commands to an Observer of a Content App on a Video Player device such as a Streaming Media Player, Smart TV or Smart Screen. The cluster server for Content App Observer is implemented by an endpoint that communicates with a Content App, such as a Casting Video Client. The cluster client for Content App Observer is implemented by a Content App endpoint. A Content App is informed of the NodeId of an Observer when a binding is set on the Content App. The Content App can then send the ContentAppMessage to the Observer (server cluster), and the Observer responds with a ContentAppMessageResponse. */
@@ -3957,8 +4063,8 @@ endpoint 0 {
 
   server cluster UserLabel {
     callback attribute labelList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
   }
 
   server cluster RelativeHumidityMeasurement {
