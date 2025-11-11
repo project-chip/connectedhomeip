@@ -81,8 +81,8 @@ struct HasEncodeForWrite : std::false_type
 };
 
 template <typename T>
-struct HasEncodeForWrite<
-    T, void_t<decltype(std::declval<T>().EncodeForWrite(std::declval<TLV::TLVWriter &>(), TLV::AnonymousTag()))>>
+struct HasEncodeForWrite<T,
+                         void_t<decltype(std::declval<T>().EncodeForWrite(std::declval<TLV::TLVWriter &>(), TLV::AnonymousTag()))>>
     : std::true_type
 {
 };
@@ -93,8 +93,7 @@ struct HasGenericEncode : std::false_type
 };
 
 template <typename T>
-struct HasGenericEncode<
-    T, void_t<decltype(std::declval<T>().Encode(std::declval<TLV::TLVWriter &>(), TLV::AnonymousTag()))>>
+struct HasGenericEncode<T, void_t<decltype(std::declval<T>().Encode(std::declval<TLV::TLVWriter &>(), TLV::AnonymousTag()))>>
     : std::true_type
 {
 };
