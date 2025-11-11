@@ -1177,7 +1177,7 @@ CHIP_ERROR GenerateCertificateSigningRequest(const P256Keypair * keypair, Mutabl
          *        attributes    [0] Attributes{{ CRIAttributes }}
          *     }
          */
-        GenerateCertificationRequestInformation(writer, keypair->Pubkey());
+        ReturnErrorOnFailure(GenerateCertificationRequestInformation(writer, keypair->Pubkey()));
 
         // algorithm  AlgorithmIdentifier
         ASN1_START_SEQUENCE
