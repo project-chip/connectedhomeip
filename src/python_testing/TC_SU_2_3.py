@@ -291,7 +291,6 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
             attributes=[(0, Clusters.AccessControl.Attributes.Acl(acl))]
         )
         asserts.assert_equal(result[0].Status, Status.Success, "ACL write failed")
-        return True
 
     def desc_TC_SU_2_3(self) -> str:
         return "[TC-SU-2.3] Transfer of Software Update Images between DUT and TH/OTA-P"
@@ -336,7 +335,10 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
 
     @async_test_body
     async def teardown_test(self):
-        self.current_provider_app_proc.terminate()
+        if hasattr(self, "current_provider_app_proc") and self.current_provider_app_proc is not None:
+            logger.info("Terminating existing OTA Provider")
+            self.current_provider_app_proc.terminate()
+            self.current_provider_app_proc = None
         super().teardown_test()
 
     @async_test_body
@@ -379,14 +381,15 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
         logger.info(f'{step_number}: Prerequisite #1.0 - Requestor (DUT), NodeID: {requestor_node_id}, FabricId: {fabric_id}')
         logger.info(f'{step_number}: Prerequisite #1.0 - Launched Provider')
 
-        provider_extra_args_updateAvailable = [
+        # userConsentNeeded flag
+        provider_extra_args_updateconsent = [
             "-c"
         ]
 
         await self.setup_provider(
             provider_app_path=self.provider_app_path,
             ota_image_path=self.ota_image_v2,
-            extra_args=provider_extra_args_updateAvailable
+            extra_args=provider_extra_args_updateconsent
         )
 
         # Prerequisite #2.0 - Commission Provider (Only one time)
@@ -524,11 +527,9 @@ class TC_SU_2_3(SoftwareUpdateBaseTest):
         self.step(3)
         # NOTE: Step skipped not implemented in spec.
         self.step(4)
-        # NOTE: In SU TC_2.2 Step #1, It is simulate Step 4 by cancelling the OTA Provider update instead of
-        # forcing a transfer failure. This causes the OTA Requestor to immediately return to Idle.
-        # As a result, the DUT can initiate a new QueryImage transfer without waiting for
-        # the full BDX Idle timeout, effectively covering the intent of Step 4.
-        # See PR: #685 for the provider cancelation implementation.
+        # NOTE: Step 4 behavior is already covered by TC_SU_2_2 Step #1 (idle transition after cancel)
+        # and TC_SU_2_7 Step #4 (forced cancel and 5-min timeout validation).
+        # Reference PR: #685 for the provider cancelation implementation.
         self.step(5)
         # NOTE: Step skipped not implemented in spec.
 
