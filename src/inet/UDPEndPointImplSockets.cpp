@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    Copyright (c) 2018 Google LLC.
  *    Copyright (c) 2013-2018 Nest Labs, Inc.
  *
@@ -436,12 +436,6 @@ void UDPEndPointImplSockets::CloseImpl()
     }
 }
 
-void UDPEndPointImplSockets::Free()
-{
-    Close();
-    Release();
-}
-
 CHIP_ERROR UDPEndPointImplSockets::GetSocket(IPAddressType addressType)
 {
     if (mSocket == kInvalidSocketFd)
@@ -578,6 +572,8 @@ void UDPEndPointImplSockets::HandlePendingIO(System::SocketEvents events)
         return;
     }
 
+    // Prevent the endpoint from being freed while in the middle of a callback.
+    UDPEndPointHandle ref(this);
     CHIP_ERROR lStatus = CHIP_NO_ERROR;
     IPPacketInfo lPacketInfo;
     System::PacketBufferHandle lBuffer;

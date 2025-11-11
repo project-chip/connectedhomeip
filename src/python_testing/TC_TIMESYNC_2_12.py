@@ -46,7 +46,7 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
+from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
 from matter.testing.timeoperations import get_wait_seconds_from_set_time, utc_time_in_matter_epoch
 from matter.tlv import uint
 
@@ -82,7 +82,7 @@ class TC_TIMESYNC_2_12(MatterBaseTest):
         timeout = get_wait_seconds_from_set_time(th_utc, wait_s)
         try:
             ret = cb.get_event_from_queue(block=True, timeout=timeout)
-            asserts.assert_true(type_matches(received_value=ret.Data,
+            asserts.assert_true(matchers.is_type(received_value=ret.Data,
                                 desired_type=Clusters.TimeSynchronization.Events.TimeZoneStatus), "Incorrect type received for event")
             asserts.assert_equal(ret.Data.offset, expected_offset, "Unexpected offset returned")
             asserts.assert_equal(ret.Data.name, expected_name, "Unexpected name returned")
@@ -119,7 +119,7 @@ class TC_TIMESYNC_2_12(MatterBaseTest):
         event = time_cluster.Events.TimeZoneStatus
         cb = EventSubscriptionHandler(expected_cluster_id=event.cluster_id, expected_event_id=event.event_id)
         urgent = 1
-        subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=[(self.endpoint, event, urgent)], reportInterval=[1, 3])
+        subscription = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=[(self.endpoint, event, urgent)], reportInterval=[1, 3])
         subscription.SetEventUpdateCallback(callback=cb)
 
         self.print_step(4, "TH reads the TimeZoneListMaxSize")

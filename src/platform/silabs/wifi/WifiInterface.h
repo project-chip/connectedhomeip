@@ -353,6 +353,11 @@ public:
         return static_cast<uint32_t>(1UL << chip::to_underlying(chip::app::Clusters::NetworkCommissioning::WiFiBandEnum::k2g4));
     }
 
+    /**
+     * @brief Function resets reconnection attempt interval back to the minimum value
+     */
+    void ResetConnectionRetryInterval();
+
 protected:
     /**
      * @brief Function notifies the PlatformManager that an IPv6 event occured on the WiFi interface.

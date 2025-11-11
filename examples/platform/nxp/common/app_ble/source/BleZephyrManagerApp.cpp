@@ -98,3 +98,8 @@ void BLEApplicationManager::Init(void)
     chip::DeviceLayer::Internal::BLEMgrImpl().SetCustomAdvertising(Span<bt_data>(advertisingData));
     chip::DeviceLayer::Internal::BLEMgrImpl().SetCustomScanResponse(Span<bt_data>(scanResponseData));
 }
+
+void BLEApplicationManager::FactoryReset(void)
+{
+    /*Empty implementation. Intentionally left blank */
+}

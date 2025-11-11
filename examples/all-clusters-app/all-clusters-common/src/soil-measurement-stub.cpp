@@ -66,7 +66,11 @@ void emberAfSoilMeasurementClusterInitCallback(EndpointId endpoint)
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "SoilMeasurement cluster error registration");
+        return;
     }
+
+    // Set initial measured value to min since all clusters does not perform any actual measurements
+    TEMPORARY_RETURN_IGNORED gServer.Cluster().SetSoilMoistureMeasuredValue(kDefaultSoilMoistureMeasurementLimits.minMeasuredValue);
 }
 
 void emberAfSoilMeasurementClusterShutdownCallback(EndpointId endpoint)

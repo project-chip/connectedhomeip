@@ -42,9 +42,9 @@ DataModel::ActionReturnStatus SoilMeasurementCluster::ReadAttribute(const DataMo
     case ClusterRevision::Id:
         return encoder.Encode(SoilMeasurement::kRevision);
     case FeatureMap::Id:
-        return encoder.Encode(static_cast<uint32_t>(0));
+        return encoder.Encode<uint32_t>(0);
     default:
-        return Protocols::InteractionModel::Status::UnreportableAttribute;
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
 }
 

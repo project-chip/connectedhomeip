@@ -95,6 +95,9 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_ELECTRICAL_GRID_CONDITIONS_TRIGGER
 #include <app/clusters/electrical-grid-conditions-server/ElectricalGridConditionsTestEventTriggerHandler.h>
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_TARIFF_TRIGGER
+#include <app/clusters/commodity-tariff-server/CommodityTariffTestEventTriggerHandler.h>
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER
 #include <app/clusters/energy-evse-server/EnergyEvseTestEventTriggerHandler.h>
 #endif
@@ -786,7 +789,7 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
         uint16_t version  = LinuxDeviceOptions::GetInstance().tcVersion.Value();
         uint16_t required = LinuxDeviceOptions::GetInstance().tcRequired.Value();
         Optional<app::TermsAndConditions> requiredAcknowledgements(app::TermsAndConditions(required, version));
-        app::TermsAndConditionsManager::GetInstance()->Init(initParams.persistentStorageDelegate, requiredAcknowledgements);
+        app::TermsAndConditionsManager::GetInstance().Init(initParams.persistentStorageDelegate, requiredAcknowledgements);
     }
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 
@@ -868,6 +871,10 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     static ElectricalGridConditionsTestEventTriggerHandler sElectricalGridConditionsTestEventTriggerHandler;
     sTestEventTriggerDelegate.AddHandler(&sElectricalGridConditionsTestEventTriggerHandler);
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_TARIFF_TRIGGER
+    static CommodityTariffTestEventTriggerHandler sCommodityTariffTestEventTriggerHandler;
+    sTestEventTriggerDelegate.AddHandler(&sCommodityTariffTestEventTriggerHandler);
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER
     static EnergyEvseTestEventTriggerHandler sEnergyEvseTestEventTriggerHandler;
     sTestEventTriggerDelegate.AddHandler(&sEnergyEvseTestEventTriggerHandler);
@@ -905,6 +912,11 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     initParams.accessRestrictionProvider = exampleAccessRestrictionProvider.get();
 #endif
 
+    if (LinuxDeviceOptions::GetInstance().payload.commissioningFlow == CommissioningFlow::kUserActionRequired)
+    {
+        initParams.advertiseCommissionableIfNoFabrics = false;
+    }
+
     // Init ZCL Data Model and CHIP App Server
     CHIP_ERROR err = Server::GetInstance().Init(initParams);
     if (err != CHIP_NO_ERROR)
@@ -930,6 +942,9 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     if (Server::GetInstance().GetFabricTable().FabricCount() != 0)
     {
         ChipLogProgress(AppServer, "Fabric already commissioned. Canceling publishing");
+        // TODO #40789: Should we just NOT call WiFiPAFShutdown at startup and instead make sure that WiFiPAF is not published at
+        // all? or Change the handling within WiFiPAFShutdown?
+        // TODO #40814: Check the Return Value of the call to WiFiPAFShutdown
         DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(LinuxDeviceOptions::GetInstance().mPublishId,
                                                        chip::WiFiPAF::WiFiPafRole::kWiFiPafRole_Publisher);
     }

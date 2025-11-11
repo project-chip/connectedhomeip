@@ -70,8 +70,8 @@ from matter.tlv import uint
 StepNumber = Union[int, str]  # Test step numbers can be integers or strings
 OptionalTimeout = Optional[int]  # Optional timeout values
 
-logger = logging.getLogger("matter.python_testing")
-logger.setLevel(logging.INFO)
+LOGGER = logging.getLogger(__name__)
+LOGGER.setLevel(logging.INFO)
 
 DiscoveryFilterType = ChipDeviceCtrl.DiscoveryFilterType
 
@@ -133,6 +133,7 @@ class AttributeMatcher:
         return AttributeMatcherFromCallable(description, matcher)
 
 
+@dataclass
 class SetupParameters:
     passcode: int
     vendor_id: int = 0xFFF1
@@ -215,12 +216,12 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         """
         if len(self.problems) > 0:
-            logging.info("###########################################################")
-            logging.info("Problems found:")
-            logging.info("===============")
+            LOGGER.info("###########################################################")
+            LOGGER.info("Problems found:")
+            LOGGER.info("===============")
             for problem in self.problems:
-                logging.info(str(problem))
-            logging.info("###########################################################")
+                LOGGER.info(str(problem))
+            LOGGER.info("###########################################################")
         super().teardown_class()
 
     def setup_test(self):
@@ -330,7 +331,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             test_steps = self.get_defined_test_steps(self.current_test_info.name)
             test_step = str(test_steps[self.current_step_index-1]
                             ) if test_steps is not None else 'UNKNOWN - no test steps provided in test script'
-            logging.error(textwrap.dedent(f"""
+            LOGGER.error(textwrap.dedent(f"""
 
                                           ******************************************************************
                                           *
@@ -511,6 +512,11 @@ class MatterBaseTest(base_test.BaseTestClass):
         except AttributeError:
             return None
 
+    def get_restart_flag_file(self) -> Optional[str]:
+        if self.matter_test_config.restart_flag_file is None:
+            return None
+        return str(self.matter_test_config.restart_flag_file)
+
     def get_test_pics(self, test: str) -> list[str]:
         ''' Retrieves a list of top-level PICS that should be checked before running this test
 
@@ -608,7 +614,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             stepnum: The step number or identifier.
             title: The descriptive title of the step.
         """
-        logging.info(f'***** Test Step {stepnum} : {title}')
+        LOGGER.info(f'***** Test Step {stepnum} : {title}')
 
     def skip_step(self, step):
         """Execute and immediately mark a step as skipped.
@@ -634,7 +640,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             # TODO: I very much do not want to have people passing in strings here. Do we really need the expression
             #       as a string? Does it get used by the TH?
             self.runner_hook.step_skipped(name=str(num), expression="")
-        logging.info(f'**** Skipping: {num}')
+        LOGGER.info(f'**** Skipping: {num}')
         self.step_skipped = True
 
     def mark_all_remaining_steps_skipped(self, starting_step_number: typing.Union[int, str]) -> None:
@@ -839,7 +845,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         if node_id is None:
             node_id = self.dut_node_id
         try:
-            commissioning_params = await dev_ctrl.OpenCommissioningWindow(nodeid=node_id, timeout=timeout, iteration=1000,
+            commissioning_params = await dev_ctrl.OpenCommissioningWindow(nodeId=node_id, timeout=timeout, iteration=1000,
                                                                           discriminator=rnd_discriminator, option=dev_ctrl.CommissioningWindowPasscode.kTokenWithRandomPin)
             params = CustomCommissioningParameters(commissioning_params, rnd_discriminator)
             return params
@@ -890,20 +896,20 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def read_single_attribute_check_success(
             self, cluster: ClusterObjects.Cluster, attribute: Type[ClusterObjects.ClusterAttributeDescriptor],
-            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None, fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "") -> object:
+            dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None, fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "", payloadCapability: int = ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD) -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
             node_id = self.dut_node_id
         if endpoint is None:
             endpoint = self.get_endpoint()
-        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)
+        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered, payloadCapability=payloadCapability)
         attr_ret = result[endpoint][cluster][attribute]
         read_err_msg = f"Error reading {str(cluster)}:{str(attribute)} = {attr_ret}"
         desired_type = attribute.attribute_type.Type
         type_err_msg = f'Returned attribute {attribute} is wrong type expected {desired_type}, got {type(attr_ret)}'
         read_ok = attr_ret is not None and not isinstance(attr_ret, Clusters.Attribute.ValueDecodeFailure)
-        type_ok = type_matches(attr_ret, desired_type)
+        type_ok = matchers.is_type(attr_ret, desired_type)
         if assert_on_error:
             asserts.assert_true(read_ok, read_err_msg)
             asserts.assert_true(type_ok, type_err_msg)
@@ -987,7 +993,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         """
         # If is not empty from the args, verify if the fifo file exists.
         if app_pipe is not None and not os.path.exists(app_pipe):
-            logging.error("Named pipe %r does NOT exist" % app_pipe)
+            LOGGER.error("Named pipe %r does NOT exist" % app_pipe)
             raise FileNotFoundError("CANNOT FIND %r" % app_pipe)
 
         if app_pipe is None:
@@ -1005,17 +1011,17 @@ class MatterBaseTest(base_test.BaseTestClass):
         # Checks for concatenate app_pipe and app_pid
         if dut_ip is None:
             with open(app_pipe, "w") as app_pipe_fp:
-                logger.info(f"Sending out-of-band command: {command} to file: {app_pipe}")
+                LOGGER.info(f"Sending out-of-band command: {command} to file: {app_pipe}")
                 app_pipe_fp.write(json.dumps(command_dict) + "\n")
             # TODO(#31239): remove the need for sleep
             # This was tested with matter.js as being reliable enough
             time.sleep(0.05)
         else:
-            logging.info(f"Using DUT IP address: {dut_ip}")
+            LOGGER.info(f"Using DUT IP address: {dut_ip}")
 
             dut_uname = os.getenv('LINUX_DUT_USER')
             asserts.assert_true(dut_uname is not None, "The LINUX_DUT_USER environment variable must be set")
-            logging.info(f"Using DUT user name: {dut_uname}")
+            LOGGER.info(f"Using DUT user name: {dut_uname}")
             command_fixed = shlex.quote(json.dumps(command_dict))
             cmd = "echo \"%s\" | ssh %s@%s \'cat > %s\'" % (command_fixed, dut_uname, dut_ip, app_pipe)
             os.system(cmd)
@@ -1045,7 +1051,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         if endpoint is None:
             endpoint = self.get_endpoint()
 
-        result = await dev_ctrl.SendCommand(nodeid=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs,
+        result = await dev_ctrl.SendCommand(nodeId=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs,
                                             payloadCapability=payloadCapability)
         return result
 
@@ -1061,7 +1067,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         #    --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
         if enableKey is None:
             if 'enableKey' not in self.matter_test_config.global_test_params:
-                enableKey = bytes([b for b in range(16)])
+                enableKey = bytes(list(range(16)))
             else:
                 enableKey = self.matter_test_config.global_test_params['enableKey']
 
@@ -1099,9 +1105,9 @@ class MatterBaseTest(base_test.BaseTestClass):
         target_endpoint = 0
 
         if self.matter_test_config.legacy:
-            logger.info("Legacy test event trigger activated")
+            LOGGER.info("Legacy test event trigger activated")
         else:
-            logger.info("Legacy test event trigger deactivated")
+            LOGGER.info("Legacy test event trigger deactivated")
             target_endpoint = self.get_endpoint()
 
         if not (0 <= target_endpoint <= 0xFFFF):
@@ -1180,12 +1186,12 @@ class MatterBaseTest(base_test.BaseTestClass):
                                          placeholder=prompt_msg_placeholder,
                                          default_value=default_value)
 
-        logging.info(f"========= USER PROMPT for Endpoint {endpoint_id} =========")
-        logging.info(f">>> {prompt_msg.rstrip()} (press enter to confirm)")
+        LOGGER.info(f"========= USER PROMPT for Endpoint {endpoint_id} =========")
+        LOGGER.info(f">>> {prompt_msg.rstrip()} (press enter to confirm)")
         try:
             return input()
         except EOFError:
-            logging.info("========= EOF on STDIN =========")
+            LOGGER.info("========= EOF on STDIN =========")
             return None
 
     def user_verify_snap_shot(self,
@@ -1214,15 +1220,34 @@ class MatterBaseTest(base_test.BaseTestClass):
                 img_hex_str=hex_string
             )
 
-            logging.info("========= USER PROMPT for Image Validation =========")
+            LOGGER.info("========= USER PROMPT for Image Validation =========")
 
             try:
                 result = input()
                 if result != '1':  # User did not select 'PASS'
                     raise TestError("Image validation failed")
             except EOFError:
-                logging.info("========= EOF on STDIN =========")
+                LOGGER.info("========= EOF on STDIN =========")
                 return None
+
+    def _user_verify_prompt(self, prompt_msg: str, hook_method_name: str, validation_name: str, error_message: str) -> bool:
+        """Helper to show a prompt and wait for user validation in TH."""
+        # Only run when TC is being executed in TH
+        if self.runner_hook and hasattr(self.runner_hook, hook_method_name):
+            hook_method = getattr(self.runner_hook, hook_method_name)
+            hook_method(msg=prompt_msg)
+
+            LOGGER.info(f"========= USER PROMPT for {validation_name} =========")
+
+            try:
+                result = input()
+                if result != '1':  # User did not select 'PASS'
+                    raise TestError(error_message)
+            except EOFError:
+                LOGGER.info("========= EOF on STDIN =========")
+            return False
+        else:
+            return True  # Indicating skipped
 
     def user_verify_video_stream(self,
                                  prompt_msg: str) -> None:
@@ -1239,19 +1264,56 @@ class MatterBaseTest(base_test.BaseTestClass):
         Raises:
             TestError: Indicating video validation step failed.
         """
-        # Only run when TC is being executed in TH
-        if self.runner_hook and hasattr(self.runner_hook, 'show_video_prompt'):
-            self.runner_hook.show_video_prompt(msg=prompt_msg)
+        self._user_verify_prompt(
+            prompt_msg=prompt_msg,
+            hook_method_name='show_video_prompt',
+            validation_name='Video Stream Validation',
+            error_message='Video stream validation failed'
+        )
 
-            logging.info("========= USER PROMPT for Video Stream Validation =========")
+    def user_verify_two_way_talk(self,
+                                 prompt_msg: str) -> None:
+        """Show Two Way Talk Verification Prompt and wait for user validation.
+           This method will be executed only when TC is running in TH.
 
-            try:
-                result = input()
-                if result != '1':  # User did not select 'PASS'
-                    raise TestError("Video stream validation failed")
-            except EOFError:
-                logging.info("========= EOF on STDIN =========")
-                return None
+        Args:
+            prompt_msg (str): Message for TH UI prompt and input function.
+            Indicates what is expected from the user.
+
+        Returns:
+            Returns nothing indicating success so the test can go on.
+
+        Raises:
+            TestError: Indicating Two Way Talk validation step failed.
+        """
+        self._user_verify_prompt(
+            prompt_msg=prompt_msg,
+            hook_method_name='show_two_way_talk_prompt',
+            validation_name='Two Way Talk Validation',
+            error_message='Two way talk validation failed'
+        )
+
+    def user_verify_push_av_stream(self, prompt_msg: str) -> bool:
+        """Show Push AV Stream Verification Prompt and wait for user validation.
+           This method will be executed only when TC is running in TH.
+
+        Args:
+            prompt_msg (str): Message for TH UI prompt and input function.
+            Indicates what is expected from the user.
+
+        Returns:
+            True if validation was skipped, False otherwise.
+
+        Raises:
+            TestError: Indicating Push AV Stream validation step failed.
+        """
+        skipped = self._user_verify_prompt(
+            prompt_msg=prompt_msg,
+            hook_method_name='show_push_av_stream_prompt',
+            validation_name='Push AV Stream Validation',
+            error_message='Push AV Stream validation failed'
+        )
+        return skipped
 
 
 def _async_runner(body, self: MatterBaseTest, *args, **kwargs):
@@ -1303,7 +1365,6 @@ async def _get_all_matching_endpoints(self: MatterBaseTest, accept_function: End
 
 
 # TODO(#37537): Remove these temporary aliases after transition period
-type_matches = matchers.is_type
 utc_time_in_matter_epoch = timeoperations.utc_time_in_matter_epoch
 utc_datetime_from_matter_epoch_us = timeoperations.utc_datetime_from_matter_epoch_us
 utc_datetime_from_posix_time_ms = timeoperations.utc_datetime_from_posix_time_ms

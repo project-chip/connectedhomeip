@@ -58,9 +58,9 @@ void EndpointListLoader::Initialize(chip::Messaging::ExchangeManager * exchangeM
                     ", targetCastingPlayerFabricIndex: %d",
                     ChipLogValueX64(targetCastingPlayerNodeId), targetCastingPlayerFabricIndex);
 
-    for (const auto & binding : chip::BindingTable::GetInstance())
+    for (const auto & binding : chip::app::Clusters::Binding::Table::GetInstance())
     {
-        if (binding.type == MATTER_UNICAST_BINDING && targetCastingPlayerNodeId == binding.nodeId &&
+        if (binding.type == chip::app::Clusters::Binding::MATTER_UNICAST_BINDING && targetCastingPlayerNodeId == binding.nodeId &&
             targetCastingPlayerFabricIndex == binding.fabricIndex)
         {
             // check to see if we discovered a new endpoint in the bindings
@@ -97,14 +97,14 @@ CHIP_ERROR EndpointListLoader::Load()
 
     int endpointIndex      = -1;
     bool isLoadingRequired = false;
-    for (const auto & binding : chip::BindingTable::GetInstance())
+    for (const auto & binding : chip::app::Clusters::Binding::Table::GetInstance())
     {
         ChipLogProgress(AppServer,
                         "EndpointListLoader::Load() Binding type=%d fab=%d nodeId=0x" ChipLogFormatX64
                         " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
                         binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
                         binding.remote, ChipLogValueMEI(binding.clusterId.value_or(0)));
-        if (binding.type == MATTER_UNICAST_BINDING && targetCastingPlayerNodeId == binding.nodeId &&
+        if (binding.type == chip::app::Clusters::Binding::MATTER_UNICAST_BINDING && targetCastingPlayerNodeId == binding.nodeId &&
             targetCastingPlayerFabricIndex == binding.fabricIndex)
         {
             // if we discovered a new Endpoint from the bindings, read its EndpointAttributes

@@ -149,7 +149,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     VerifyOrExit(initParams.dataModelProvider != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // TODO(16969): Remove Platform::MemoryInit() call from Server class, it belongs to outer code
-    Platform::MemoryInit();
+    TEMPORARY_RETURN_IGNORED Platform::MemoryInit();
 
     // Initialize PersistentStorageDelegate-based storage
     mDeviceStorage                 = initParams.persistentStorageDelegate;
@@ -244,9 +244,15 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
                                ,
                            tcpListenParams
+#if INET_CONFIG_ENABLE_IPV4
+                           ,
+                           TcpListenParameters(DeviceLayer::TCPEndPointManager())
+                               .SetAddressType(IPAddressType::kIPv4)
+                               .SetListenPort(mOperationalServicePort)
+#endif
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-                           ,
+                               ,
                            Transport::WiFiPAFListenParameters(static_cast<Transport::WiFiPAFBase *>(
                                DeviceLayer::ConnectivityMgr().GetWiFiPAF()->mWiFiPAFTransport))
 #endif
@@ -272,7 +278,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
     err = mFabricDelegate.Init(this);
     SuccessOrExit(err);
-    mFabrics.AddFabricDelegate(&mFabricDelegate);
+    TEMPORARY_RETURN_IGNORED mFabrics.AddFabricDelegate(&mFabricDelegate);
 
     err = mExchangeMgr.Init(&mSessions);
     SuccessOrExit(err);
@@ -288,7 +294,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     app::DnssdServer::Instance().SetFabricTable(&mFabrics);
     app::DnssdServer::Instance().SetCommissioningModeProvider(&mCommissioningWindowManager);
 
-    Dnssd::Resolver::Instance().Init(DeviceLayer::UDPEndPointManager());
+    TEMPORARY_RETURN_IGNORED Dnssd::Resolver::Instance().Init(DeviceLayer::UDPEndPointManager());
 
 #if CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
     // Initialize event logging subsystem
@@ -359,20 +365,17 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #if CONFIG_NETWORK_LAYER_BLE
         // The device is already commissioned, proactively disable BLE advertisement.
         ChipLogProgress(AppServer, "Fabric already commissioned. Disabling BLE advertisement");
-        DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+        TEMPORARY_RETURN_IGNORED DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
 #endif
     }
-    else
+    else if (initParams.advertiseCommissionableIfNoFabrics)
     {
-#if CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART
         SuccessOrExit(err = mCommissioningWindowManager.OpenBasicCommissioningWindow(initParams.discoveryTimeout));
-#endif
     }
 
     // TODO @bzbarsky-apple @cecille Move to examples
-    // ESP32 and Mbed OS examples have a custom logic for enabling DNS-SD
-#if !CHIP_DEVICE_LAYER_TARGET_ESP32 && !CHIP_DEVICE_LAYER_TARGET_MBED &&                                                           \
-    (!CHIP_DEVICE_LAYER_TARGET_AMEBA || !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE)
+    // ESP32 examples have a custom logic for enabling DNS-SD
+#if !CHIP_DEVICE_LAYER_TARGET_ESP32 && (!CHIP_DEVICE_LAYER_TARGET_AMEBA || !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE)
     // StartServer only enables commissioning mode if device has not been commissioned
     app::DnssdServer::Instance().StartServer();
 #endif
@@ -431,7 +434,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     // Register Test Event Trigger Handler
     if (mTestEventTriggerDelegate != nullptr)
     {
-        mTestEventTriggerDelegate->AddHandler(&mICDManager);
+        TEMPORARY_RETURN_IGNORED mTestEventTriggerDelegate->AddHandler(&mICDManager);
     }
 
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -468,7 +471,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
             // Because Matter runs a single event loop for all scheduled work, it will occur after the above has
             // taken place. If a reset occurs before we have cleaned everything up, the next boot will still
             // see the commit marker.
-            PlatformMgr().ScheduleWork(
+            TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(
                 [](intptr_t arg) {
                     Server * server = reinterpret_cast<Server *>(arg);
                     VerifyOrReturn(server != nullptr);
@@ -497,7 +500,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mUdcTransportMgr->SetSessionManager(gUDCClient);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
-    PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
     PlatformMgr().HandleServerStarted();
 
     mIsDnssdReady = Dnssd::Resolver::Instance().IsInitialized();
@@ -626,7 +629,7 @@ bool Server::ShouldCheckInMsgsBeSentAtBootFunction(FabricIndex aFabricIndex, Nod
 
 void Server::GenerateShutDownEvent()
 {
-    PlatformMgr().ScheduleWork([](intptr_t) { PlatformMgr().HandleServerShuttingDown(); });
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork([](intptr_t) { PlatformMgr().HandleServerShuttingDown(); });
 }
 
 void Server::PostFactoryResetEvent()
@@ -644,7 +647,7 @@ void Server::ScheduleFactoryReset()
 {
     PostFactoryResetEvent();
 
-    PlatformMgr().ScheduleWork([](intptr_t) {
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork([](intptr_t) {
         // Delete all fabrics and emit Leave event.
         GetInstance().GetFabricTable().DeleteAllFabrics();
         PlatformMgr().HandleServerShuttingDown();

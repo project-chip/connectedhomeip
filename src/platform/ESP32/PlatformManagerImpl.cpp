@@ -46,10 +46,6 @@
 namespace chip {
 namespace DeviceLayer {
 
-namespace Internal {
-extern CHIP_ERROR InitLwIPCoreLock();
-}
-
 PlatformManagerImpl PlatformManagerImpl::sInstance;
 
 static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
@@ -63,8 +59,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 {
     // Arrange for CHIP-encapsulated ESP32 errors to be translated to text
     Internal::ESP32Utils::RegisterESP32ErrorFormatter();
-    // Make sure the LwIP core lock has been initialized
-    ReturnErrorOnFailure(Internal::InitLwIPCoreLock());
 
     // Initialize TCP/IP network interface, which internally initializes LwIP stack. We have to
     // call this before the usage of PacketBufferHandle::New() because in case of LwIP-based pool

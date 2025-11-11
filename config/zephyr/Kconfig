@@ -22,7 +22,7 @@ menuconfig CHIP
 	imply REQUIRES_FULL_LIBC
 	imply NEWLIB_LIBC_NANO
 	imply CBPRINTF_LIBC_SUBSTS
-	imply POSIX_API if !ARCH_POSIX && !CHIP_NRF_PLATFORM
+	imply POSIX_API if !ARCH_POSIX && !CHIP_NRF_PLATFORM && !CHIP_TELINK_PLATFORM
 	imply EVENTFD if !ARCH_POSIX
 	imply REBOOT
 	imply ENTROPY_GENERATOR
@@ -281,6 +281,13 @@ config CHIP_CRYPTO_PSA
 	  Enables the implementation of the Matter cryptographic operations that is
 	  based on the PSA crypto API (instead of the default implementation, which
 	  is based on the legacy mbedTLS APIs).
+
+config CHIP_CRYPTO_PSA_AEAD_SINGLE_PART
+    bool "Use PSA AEAD single-part API"
+    depends on CHIP_CRYPTO_PSA
+    help
+      When enabled, the single-part AEAD API is used with a large buffer
+      allocated on the stack. Otherwise, the multipart API path is used.
 
 config CHIP_PERSISTENT_SUBSCRIPTIONS
 	bool "Persistent subscriptions"

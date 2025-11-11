@@ -41,6 +41,9 @@ class TC_CNET_4_16(MatterBaseTest):
     def desc_TC_CNET_4_16(self):
         return '[TC-CNET-4.16] [Thread] NetworkIDNotFound returned in LastNetworkingStatus field validation [DUT-Server]'
 
+    def pics_TC_CNET_4_16(self):
+        return ['CNET.S.F01']
+
     @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kThreadNetworkInterface))
     async def test_TC_CNET_4_16(self):
 
@@ -74,7 +77,7 @@ class TC_CNET_4_16(MatterBaseTest):
         self.step(1)
 
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900)
-        res = await self.send_single_cmd(cmd=cmd)
+        res = await self.send_single_cmd(endpoint=0, cmd=cmd)
         # Verify that DUT sends ArmFailSafeResponse command to the TH
         asserts.assert_equal(
             res.errorCode,

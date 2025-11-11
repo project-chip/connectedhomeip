@@ -49,7 +49,6 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
 
-    CHIP_ERROR InitLwIPCoreLock(void);
     static void HandleESPSystemEvent(void * arg, esp_event_base_t eventBase, int32_t eventId, void * eventData);
     System::Clock::Timestamp GetStartTime() { return mStartTime; }
 

@@ -38,6 +38,8 @@ from matter.testing.global_attribute_ids import GlobalAttributeIds
 if TYPE_CHECKING:
     from matter.testing.matter_testing import MatterBaseTest
 
+LOGGER = logging.getLogger(__name__)
+
 EndpointCheckFunction = Callable[[
     Clusters.Attribute.AsyncReadTransaction.ReadResponse, int], bool]
 
@@ -304,14 +306,14 @@ def run_on_singleton_matching_endpoint(accept_function: EndpointCheckFunction):
             asserts.assert_less_equal(
                 len(matching), 1, "More than one matching endpoint found for singleton test.")
             if not matching:
-                logging.info(
+                LOGGER.info(
                     "Test is not applicable to any endpoint - skipping test")
                 asserts.skip('No endpoint matches test requirements')
                 return
             try:
                 old_endpoint = self.matter_test_config.endpoint
                 self.matter_test_config.endpoint = matching[0]
-                logging.info(
+                LOGGER.info(
                     f'Running test on endpoint {self.matter_test_config.endpoint}')
                 timeout = getattr(self.matter_test_config,
                                   'timeout', None) or self.default_timeout
@@ -356,11 +358,11 @@ def run_if_endpoint_matches(accept_function: EndpointCheckFunction):
             should_run_test = test_instance.event_loop.run_until_complete(
                 runner_with_timeout)
             if not should_run_test:
-                logging.info(
+                LOGGER.info(
                     "Test is not applicable to this endpoint - skipping test")
                 asserts.skip('Endpoint does not match test requirements')
                 return
-            logging.info(
+            LOGGER.info(
                 f'Running test on endpoint {test_instance.matter_test_config.endpoint}')
             timeout = getattr(test_instance.matter_test_config,
                               'timeout', None) or test_instance.default_timeout

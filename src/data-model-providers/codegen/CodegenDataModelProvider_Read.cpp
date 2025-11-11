@@ -100,23 +100,28 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::ReadAttribute(const Data
                   ChipLogValueMEI(request.path.mClusterId), request.path.mEndpointId, ChipLogValueMEI(request.path.mAttributeId),
                   request.path.mExpanded);
 
+    // Codegen logic specific: we accept AAI reads BEFORE server cluster interface, so that we are backwards compatible
+    // in case some application installed AAI before Server Cluster Interfaces were supported
+    const EmberAfAttributeMetadata * attributeMetadata =
+        emberAfLocateAttributeMetadata(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId);
+
+    // we only allow AAI on ember-registered clusters
+    if (attributeMetadata != nullptr)
+    {
+        std::optional<CHIP_ERROR> aai_result = TryReadViaAccessInterface(
+            request, AttributeAccessInterfaceRegistry::Instance().Get(request.path.mEndpointId, request.path.mClusterId), encoder);
+        VerifyOrReturnError(!aai_result.has_value(), *aai_result);
+    }
+
     if (auto * cluster = mRegistry.Get(request.path); cluster != nullptr)
     {
         return cluster->ReadAttribute(request, encoder);
     }
 
-    const EmberAfAttributeMetadata * attributeMetadata =
-        emberAfLocateAttributeMetadata(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId);
-
     // ReadAttribute requirement is that request.path is a VALID path inside the provider
     // metadata tree. Clients are supposed to validate this (and data version and other flags)
     // This SHOULD NEVER HAPPEN hence the general return code (seemed preferable to VerifyOrDie)
     VerifyOrReturnError(attributeMetadata != nullptr, Status::Failure);
-
-    // Read via AAI
-    std::optional<CHIP_ERROR> aai_result = TryReadViaAccessInterface(
-        request, AttributeAccessInterfaceRegistry::Instance().Get(request.path.mEndpointId, request.path.mClusterId), encoder);
-    VerifyOrReturnError(!aai_result.has_value(), *aai_result);
 
     // At this point, we have to use ember directly to read the data.
     EmberAfAttributeSearchRecord record;

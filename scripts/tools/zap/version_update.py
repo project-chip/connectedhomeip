@@ -30,7 +30,7 @@ import coloredlogs
 __LOG_LEVELS__ = {
     'debug': logging.DEBUG,
     'info': logging.INFO,
-    'warn': logging.WARN,
+    'warn': logging.WARNING,
     'fatal': logging.FATAL,
 }
 
@@ -38,7 +38,7 @@ __LOG_LEVELS__ = {
 #
 # At this time we hard-code nightly however we may need to figure out a more
 # generic version string once we stop using nightly builds
-ZAP_VERSION_RE = re.compile(r'v(\d\d\d\d)\.(\d\d)\.(\d\d)(-nightly)?(?=\W|$)')
+ZAP_VERSION_RE = re.compile(r'v?(\d\d\d\d)\.(\d\d)\.(\d\d)(-nightly)?(?=\W|$)')
 
 # A list of files where ZAP is maintained. You can get a similar list using:
 #
@@ -109,7 +109,7 @@ def version_update(log_level, update, new_version):
         #
         # This makes every group element (date section) to a base 10 integer,
         # so for 'v2023.01.11-nightly' this gets (2023, 1, 11)
-        zap_min_version = tuple(map(lambda x: int(x, 10), parsed.groups()[:3]))
+        zap_min_version = tuple((int(x, 10) for x in parsed.groups()[:3]))
 
     files_to_update = []
     if UpdateChoice.USAGE in update:
@@ -133,6 +133,7 @@ def version_update(log_level, update, new_version):
 
         # If we update, perform the update
         if new_version:
+            logging.info('Updating content of %s to version %s', name, version)
             search_pos = 0
             need_replace = False
             m = ZAP_VERSION_RE.search(file_data, search_pos)
@@ -145,9 +146,10 @@ def version_update(log_level, update, new_version):
                 file_data = file_data[:m.start()] + \
                     new_version + file_data[m.end():]
                 need_replace = True
-                # We search a bit past the match to not re-match the same thing again
+
+                # We search a bit past the match to not re-match the same thing again.
                 # This is because our version lengths may vary.
-                search_pos = m.start() + 1
+                search_pos = m.start() + len(version)
                 m = ZAP_VERSION_RE.search(file_data, search_pos)
 
             if need_replace:

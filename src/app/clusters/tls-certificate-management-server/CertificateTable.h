@@ -140,13 +140,13 @@ public:
 
       * @param nonce[in] the nonce to be used for creating nonceSignature
       * @param buffer[in] a temporary buffer for temporary serialization, if necessary
-      * @param nocsrElementsBuffer[out] a temporary buffer large enough to write nocsr_elements_message to
-      * @param id[out] the generated ID for the client certificate
+      * @param id[in/out] the pre-existing generated ID for the client certificate if present (in), or a generated ID as an output
+      if not
       * @param csr[out] a DER-encoded certificate signing request using the newly-created key pair
       * @param nonceSignature[out] a nonce signature
       */
     virtual CHIP_ERROR PrepareClientCertificate(FabricIndex fabric, const ByteSpan & nonce, ClientBuffer & buffer,
-                                                MutableByteSpan & nocsrElementsBuffer, TLSCCDID & id, MutableByteSpan & csr,
+                                                Optional<TLSCCDID> & id, MutableByteSpan & csr,
                                                 MutableByteSpan & nonceSignature) = 0;
 
     /**
@@ -180,6 +180,13 @@ public:
     virtual CHIP_ERROR RemoveClientCertificate(FabricIndex fabric, TLSCCDID id)          = 0;
     virtual CHIP_ERROR GetClientCertificateCount(FabricIndex fabric, uint8_t & outCount) = 0;
 
+    /**
+     * @brief Removes all data and certificates associated with the specified fabric.
+     *
+     * @param[in] fabric The fabric to remove.
+     */
+    virtual CHIP_ERROR RemoveFabric(FabricIndex fabric) = 0;
+
 protected:
     static inline PersistentStore<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES> & GetBuffer(BufferedRootCert & bufferedCert)
     {
@@ -189,6 +196,38 @@ protected:
     {
         return bufferedCert.mBuffer;
     }
+};
+
+/** @brief
+ *  Defines methods for implementing application-specific logic for checking if a certificate
+ *  has no blocking dependencies and can be removed.
+ */
+class CertificateDependencyChecker
+{
+public:
+    CertificateDependencyChecker() = default;
+
+    virtual ~CertificateDependencyChecker() = default;
+
+    /**
+     * @brief Checks whether the root certificate with the given (matterEndpoint, fabric, id) has no dependencies
+     *
+     * @param[in] matterEndpoint The matter endpoint to query against
+     * @param[in] fabric The fabric the certificate is associated with
+     * @param[in] id The id of the root certificate to remove.
+     * @return CHIP_NO_ERROR if the certificate can be removed.
+     */
+    virtual CHIP_ERROR RootCertCanBeRemoved(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id) = 0;
+
+    /**
+     * @brief Checks whether the client certificate with the given (matterEndpoint, fabric, id) has no dependencies
+     *
+     * @param[in] matterEndpoint The matter endpoint to query against
+     * @param[in] fabric The fabric the certificate is associated with
+     * @param[in] id The id of the client certificate to remove.
+     * @return CHIP_NO_ERROR if the certificate can be removed.
+     */
+    virtual CHIP_ERROR ClientCertCanBeRemoved(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCCDID id) = 0;
 };
 
 } // namespace Tls

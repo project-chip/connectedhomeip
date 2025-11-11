@@ -42,6 +42,8 @@ from matter.clusters.Attribute import EventReadResult, SubscriptionTransaction, 
 from matter.interaction_model import Status
 from matter.testing.matter_testing import AttributeMatcher, AttributeValue
 
+LOGGER = logging.getLogger(__name__)
+
 
 class EventSubscriptionHandler:
     """
@@ -94,7 +96,7 @@ class EventSubscriptionHandler:
         if self._expected_event_id is not None and header.EventId != self._expected_event_id:
             return
 
-        logging.info(f"[EventSubscriptionHandler] Received event: {header}")
+        LOGGER.info(f"[EventSubscriptionHandler] Received event: {header}")
         self._q.put(event_result)
 
     async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 30) -> Any:
@@ -110,7 +112,7 @@ class EventSubscriptionHandler:
     def wait_for_event_report(self, expected_event: ClusterObjects.ClusterEvent, timeout_sec: float = 10.0) -> Any:
         """This function allows a test script to block waiting for the specific event to be the next event
            to arrive within a timeout (specified in seconds). It returns the event data so that the values can be checked."""
-        logging.info(f"Waiting for {expected_event} for {timeout_sec:.1f} seconds")
+        LOGGER.info(f"Waiting for {expected_event} for {timeout_sec:.1f} seconds")
         try:
             res = self._q.get(block=True, timeout=timeout_sec)
         except queue.Empty:
@@ -118,7 +120,7 @@ class EventSubscriptionHandler:
 
         asserts.assert_equal(res.Header.ClusterId, expected_event.cluster_id, "Expected cluster ID not found in event report")
         asserts.assert_equal(res.Header.EventId, expected_event.event_id, "Expected event ID not found in event report")
-        logging.info(f"Successfully waited for {expected_event}")
+        LOGGER.info(f"Successfully waited for {expected_event}")
         return res.Data
 
     def wait_for_event_expect_no_report(self, timeout_sec: float = 10.0):
@@ -130,6 +132,33 @@ class EventSubscriptionHandler:
             return
 
         asserts.fail(f"Event reported when not expected {res}")
+
+    def wait_for_event_type_report(self, event_type: ClusterObjects.ClusterEvent, timeout_sec: float) -> Optional[Any]:
+        """
+        Waits for a specific event type from the event subscription handler within the timeout period.
+
+        Parameters:
+            event_type (ClusterObjects.ClusterEvent): The expected event type to wait for.
+            timeout_sec (float): The maximum time to wait for the event, in seconds.
+
+        Returns:
+            The event data (from EventReadResult.Data) when the expected event is received, or fails on timeout.
+        """
+        event_queue = self.event_queue
+        start_time = time.time()
+        while True:
+            remaining = timeout_sec - (time.time() - start_time)
+            if remaining <= 0:
+                asserts.fail(f"Timeout waiting for event {event_type}.")
+            try:
+                event = event_queue.get(block=True, timeout=remaining)
+            except queue.Empty:
+                asserts.fail(f"Timeout waiting for event {event_type}.")
+            if event.Header.EventId == event_type.event_id:
+                LOGGER.info(f"Event {event_type.__name__} received: {event}")
+                return event.Data
+            else:
+                LOGGER.info(f"Received other event: {event.Header.EventId}, ignoring and waiting for {event_type.__name__}.")
 
     def get_last_event(self) -> Optional[Any]:
         """Flush entire queue, returning last (newest) event only."""
@@ -209,7 +238,7 @@ class AttributeSubscriptionHandler:
         if self._expected_attribute is not None:
             attributes = [(endpoint, self._expected_attribute)]
         self._subscription = await dev_ctrl.ReadAttribute(
-            nodeid=node_id,
+            nodeId=node_id,
             attributes=attributes,
             reportInterval=(int(min_interval_sec), int(max_interval_sec)),
             fabricFiltered=fabric_filtered,
@@ -252,7 +281,7 @@ class AttributeSubscriptionHandler:
             data = transaction.GetAttribute(path)
             value = AttributeValue(endpoint_id=path.Path.EndpointId, attribute=path.AttributeType,
                                    value=data, timestamp_utc=datetime.now(timezone.utc))
-            logging.info(f"[AttributeSubscriptionHandler] Received attribute report: {path.AttributeType} = {data}")
+            LOGGER.info(f"[AttributeSubscriptionHandler] Received attribute report: {path.AttributeType} = {data}")
             self._q.put(value)
             if self._lock:
                 with self._lock:
@@ -269,7 +298,7 @@ class AttributeSubscriptionHandler:
         try:
             item = self._q.get(block=True, timeout=10)
             attribute_value = item.value
-            logging.info(
+            LOGGER.info(
                 f"[AttributeSubscriptionHandler] Got attribute subscription report. Attribute {item.attribute}. Updated value: {attribute_value}. SubscriptionId: {item.value}")
         except queue.Empty:
             asserts.fail(
@@ -292,9 +321,9 @@ class AttributeSubscriptionHandler:
         last_report_matches: dict[int, bool] = {idx: False for idx, _ in enumerate(expected_final_values)}
 
         for element in expected_final_values:
-            logging.info(
+            LOGGER.info(
                 f"--> Expecting report for value {element.value} for attribute {element.attribute} on endpoint {element.endpoint_id}")
-        logging.info(f"Waiting for {timeout_sec:.1f} seconds for all reports.")
+        LOGGER.info(f"Waiting for {timeout_sec:.1f} seconds for all reports.")
 
         while time_remaining > 0:
             # Snapshot copy at the beginning of the loop. This is thread-safe based on the design.
@@ -311,7 +340,7 @@ class AttributeSubscriptionHandler:
 
             # Determine if all were met
             if all(last_report_matches.values()):
-                logging.info("Found all expected reports were true.")
+                LOGGER.info("Found all expected reports were true.")
                 return
 
             elapsed = time.time() - start_time
@@ -319,10 +348,10 @@ class AttributeSubscriptionHandler:
             time.sleep(0.1)
 
         # If we reach here, there was no early return and we failed to find all the values.
-        logging.error("Reached time-out without finding all expected report values.")
-        logging.info("Values found:")
+        LOGGER.error("Reached time-out without finding all expected report values.")
+        LOGGER.info("Values found:")
         for expected_idx, expected_element in enumerate(expected_final_values):
-            logging.info(f"  -> {expected_element} found: {last_report_matches.get(expected_idx)}")
+            LOGGER.info(f"  -> {expected_element} found: {last_report_matches.get(expected_idx)}")
         asserts.fail("Did not find all expected last report values before time-out")
 
     def await_all_expected_report_matches(self, expected_matchers: Iterable[AttributeMatcher], timeout_sec: float = 1.0):
@@ -342,9 +371,9 @@ class AttributeSubscriptionHandler:
         report_matches: dict[int, bool] = {idx: False for idx, _ in enumerate(expected_matchers)}
 
         for matcher in expected_matchers:
-            logging.info(
+            LOGGER.info(
                 f"--> Matcher waiting: {matcher.description}")
-        logging.info(f"Waiting for {timeout_sec:.1f} seconds for all reports.")
+        LOGGER.info(f"Waiting for {timeout_sec:.1f} seconds for all reports.")
 
         while time_remaining > 0:
             # Snapshot copy at the beginning of the loop. This is thread-safe based on the design.
@@ -355,12 +384,12 @@ class AttributeSubscriptionHandler:
                 for attribute, reports in all_reports.items():
                     for report in reports:
                         if matcher.matches(report) and not report_matches[expected_idx]:
-                            logging.info(f"  --> Found a match for: {matcher.description}")
+                            LOGGER.info(f"  --> Found a match for: {matcher.description}")
                             report_matches[expected_idx] = True
 
             # Determine if all were met
             if all(report_matches.values()):
-                logging.info("Found all expected matchers did match.")
+                LOGGER.info("Found all expected matchers did match.")
                 return
 
             elapsed = time.time() - start_time
@@ -368,9 +397,9 @@ class AttributeSubscriptionHandler:
             time.sleep(0.1)
 
         # If we reach here, there was no early return and we failed to find all the values.
-        logging.error("Reached time-out without finding all expected report values.")
+        LOGGER.error("Reached time-out without finding all expected report values.")
         for expected_idx, expected_matcher in enumerate(expected_matchers):
-            logging.info(f"  -> {expected_matcher.description}: {report_matches.get(expected_idx)}")
+            LOGGER.info(f"  -> {expected_matcher.description}: {report_matches.get(expected_idx)}")
         asserts.fail("Did not find all expected reports before time-out")
 
     def await_sequence_of_reports(self, attribute: TypedAttributePath, sequence: list[Any], timeout_sec: float) -> None:
@@ -398,8 +427,8 @@ class AttributeSubscriptionHandler:
 
         while time_remaining > 0:
             expected_value = sequence[sequence_idx]
-            logging.info(f"Expecting value {expected_value} for attribute {attribute} on endpoint {self._endpoint_id}")
-            logging.info(f"Waiting for {timeout_sec:.1f} seconds for all reports.")
+            LOGGER.info(f"Expecting value {expected_value} for attribute {attribute} on endpoint {self._endpoint_id}")
+            LOGGER.info(f"Waiting for {timeout_sec:.1f} seconds for all reports.")
             try:
                 item: AttributeValue = self._q.get(block=True, timeout=time_remaining)
 
@@ -408,7 +437,7 @@ class AttributeSubscriptionHandler:
                     actual_values.append(item.value)
 
                     if item.value == expected_value:
-                        logging.info(f"Got expected attribute change {sequence_idx+1}/{len(sequence)} for attribute {attribute}")
+                        LOGGER.info(f"Got expected attribute change {sequence_idx+1}/{len(sequence)} for attribute {attribute}")
                         sequence_idx += 1
                     else:
                         asserts.assert_equal(item.value, expected_value,
@@ -416,7 +445,7 @@ class AttributeSubscriptionHandler:
 
                     # We are done waiting when we have accumulated all results.
                     if sequence_idx == len(sequence):
-                        logging.info("Got all attribute changes, done waiting.")
+                        LOGGER.info("Got all attribute changes, done waiting.")
                         return
             except queue.Empty:
                 # No error, we update timeouts and keep going

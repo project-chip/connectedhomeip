@@ -671,9 +671,20 @@ void ExchangeContext::ExchangeSessionHolder::GrabExpiredSession(const SessionHan
 }
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-void ExchangeContext::OnSessionConnectionClosed(CHIP_ERROR conErr)
+void ExchangeContext::OnSessionConnectionClosed(const Transport::ActiveTCPConnectionState & conn, CHIP_ERROR connErr)
 {
-    // TODO: Handle connection closure at the ExchangeContext level.
+    if (mDelegate != nullptr)
+    {
+        return mDelegate->HandleConnectionClosed(conn, connErr);
+    }
+}
+
+void ExchangeContext::OnConnectionAttemptComplete(Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR connErr)
+{
+    if (mDelegate != nullptr)
+    {
+        return mDelegate->HandleConnectionAttemptComplete(conn, connErr);
+    }
 }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 

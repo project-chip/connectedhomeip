@@ -56,6 +56,10 @@ declare_args() {
   chip_im_static_global_interaction_model_engine =
       current_os != "linux" && current_os != "mac" && current_os != "ios" &&
       current_os != "android"
+
+  # Set for integration into build systems: defines visibility
+  # for files that chip_data_model requires.
+  chip_app_data_model_target = "${chip_root}/examples/*"
 }
 
 buildconfig_header("app_buildconfig") {
@@ -171,6 +175,8 @@ static_library("interaction-model") {
     "CASESessionManager.h",
     "CommandSender.cpp",
     "CommandSender.h",
+    "DefaultTimerDelegate.cpp",
+    "DefaultTimerDelegate.h",
     "DeviceProxy.cpp",
     "DeviceProxy.h",
     "InteractionModelDelegatePointers.cpp",
@@ -228,6 +234,7 @@ static_library("interaction-model") {
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/lib/support:static-support",
+    "${chip_root}/src/lib/support:timer-delegate",
     "${chip_root}/src/protocols/interaction_model",
     "${chip_root}/src/protocols/secure_channel",
     "${chip_root}/src/system",
@@ -275,6 +282,7 @@ static_library("interaction-model") {
       "${chip_root}/src/app:required-privileges",
       "${chip_root}/src/app/clusters/ota-provider",
       "${chip_root}/src/app/common:attribute-type",
+      "${chip_root}/src/app/data-model-provider",
     ]
 
     public_configs += [ ":config-controller-dynamic-server" ]
@@ -350,14 +358,25 @@ source_set("required-privileges") {
   # is part of application code, the visibility is broad. However generally DO NOT USE THIS
   # unless you are creating a new CodegenDataModelProvider based item
   visibility = [
-    "//:*",  # Top-level apps (e.g. //:bouffalolab-lighting does this)
-    "${chip_root}/examples/*",
-    "${chip_root}/src/app/util/*",
+    # Test data models: mock models for testing
+    # TODO: Some of these are questionable as they would not work as part of a monolith
+    #       (single app) test build: in particular the energy management bits seem wrong
+    "${chip_root}/examples/common/server-cluster-shim:mock_data_model_with_shim",
+    "${chip_root}/examples/energy-management-app/energy-management-common",
+    "${chip_root}/src/app/util/mock/*",
+    "${chip_root}/src/data-model-providers/codegen/tests/*",
+
+    # Controller data models:
+    #   linked by controllers only, never by applications
     "${chip_root}/src/controller/data_model",
     "${chip_root}/src/controller/java:jni",
     "${chip_root}/src/controller/python:ChipDeviceCtrl",
-    "${chip_root}/src/data-model-providers/codegen/*",
   ]
+
+  # Application integration: `chip_data_model` target should be set here
+  if (chip_app_data_model_target != "") {
+    visibility += [ chip_app_data_model_target ]
+  }
 
   # We still have some strong coupling in this case
   # Eventually dynamic server should be replaced with code-driven and not try
@@ -522,8 +541,6 @@ static_library("app") {
     "FailSafeContext.cpp",
     "FailSafeContext.h",
     "ReadHandler.cpp",
-    "TimerDelegates.cpp",
-    "TimerDelegates.h",
     "WriteHandler.cpp",
 
     # TODO: the following items cannot be included due to interaction-model circularity

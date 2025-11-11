@@ -1,47 +1,44 @@
 import argparse
+import asyncio
 import datetime
+import ipaddress
 import json
 import logging
-import multiprocessing
 import os.path
 import pathlib
 import random
+import re
+import signal
 import socket
 import ssl
 import string
 import subprocess
 import sys
 import tempfile
+from enum import Enum
 from pathlib import Path
-from typing import Literal, Optional, Union
+from typing import Awaitable, Callable, Literal, Optional
 
-import uvicorn
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.asymmetric.types import CertificateIssuerPrivateKeyTypes, CertificatePublicKeyTypes
 from cryptography.x509.oid import NameOID
 from fastapi import APIRouter, FastAPI, HTTPException, Request, Response
-from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
-# Monkey patch uvicorn to make the underlying transport available to us.
-# That will let us access the ssl context and get the client certificate information.
-from uvicorn.protocols.http.h11_impl import H11Protocol
 from zeroconf import ServiceInfo, Zeroconf
 
-http_tools_protocol_old__should_upgrade = H11Protocol._should_upgrade
-
-
-def http_tools_protocol_new__should_upgrade(self):
-    http_tools_protocol_old__should_upgrade(self)
-    self.scope["transport"] = self.transport
-
-
-H11Protocol._should_upgrade = http_tools_protocol_new__should_upgrade
-
-# End monkey patch
+module_dir_path = os.path.dirname(os.path.realpath(__file__))
+templates_path = os.path.join(module_dir_path, "templates")
+static_path = os.path.join(module_dir_path, "static")
+'''
+The initialisation segments must have .init extension as per CMAF-Ingest requirements.
+https://dashif.org/Ingest/#interface-2-naming
+'''
+VALID_EXTENSIONS = ["mpd", "m3u8", "m4s", "init"]
 
 
 class WorkingDirectory:
@@ -238,9 +235,9 @@ class CAHierarchy:
         self,
         name: str,
         cert: x509.Certificate,
-        key: Union[CertificateIssuerPrivateKeyTypes, None],
+        key: Optional[CertificateIssuerPrivateKeyTypes],
         bundle_root: bool,
-    ) -> tuple[str, str]:
+    ) -> tuple[Optional[Path], Path]:
         """
         Private method that help with saving certificate and key to the hierarchy folder.
         This tool isn't meant to be used in production, but instead to help with development
@@ -250,7 +247,7 @@ class CAHierarchy:
         cert_path = self.directory / f"{name}.pem"
         key_path = self.directory / f"{name}.key" if key else None
 
-        if key:
+        if key and key_path:
             with open(key_path, "wb") as f:
                 f.write(
                     key.private_bytes(
@@ -273,17 +270,21 @@ class CAHierarchy:
         self,
         dns: str,
         public_key: CertificatePublicKeyTypes,
-        duration: datetime.timedelta
+        duration: datetime.timedelta,
+        ip_address: Optional[str] = None
     ) -> x509.Certificate:
         """
         Generate and sign a certificate.
         """
+        # Use ip_address for Common Name if provided, otherwise use dns
+        common_name = ip_address if ip_address else dns
+
         # Sign certificate
         subject = x509.Name(
             [
                 x509.NameAttribute(NameOID.ORGANIZATION_NAME, "CSA"),
                 x509.NameAttribute(NameOID.ORGANIZATIONAL_UNIT_NAME, "TC_PAVS"),
-                x509.NameAttribute(NameOID.COMMON_NAME, dns),
+                x509.NameAttribute(NameOID.COMMON_NAME, common_name),
             ]
         )
 
@@ -332,8 +333,11 @@ class CAHierarchy:
         )
 
         if self.kind == 'server':
+            san_names = [x509.DNSName(dns)]
+            if ip_address:
+                san_names.append(x509.IPAddress(ipaddress.ip_address(ip_address)))
             builder.add_extension(
-                x509.SubjectAlternativeName([x509.DNSName(dns)]),
+                x509.SubjectAlternativeName(san_names),
                 critical=False,
             )
 
@@ -367,7 +371,7 @@ class CAHierarchy:
 
         return (key_path, cert_bundle_path, False)
 
-    def gen_keypair(self, dns: str, override=False, duration: datetime.timedelta = datetime.timedelta(hours=1)) -> tuple[Path, Path, bool]:
+    def gen_keypair(self, dns: str, override=False, duration: datetime.timedelta = datetime.timedelta(hours=1), ip_address: Optional[str] = None) -> tuple[Path, Path, bool]:
         """
         Generate a private key as well as the associated certificate signed by this CA
         hierarchy. Returns the path to the key, cert, and whether it was reused or not.
@@ -385,7 +389,7 @@ class CAHierarchy:
         key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
 
         # Sign certificate
-        cert = self._sign_cert(dns, key.public_key(), duration)
+        cert = self._sign_cert(dns, key.public_key(), duration, ip_address=ip_address)
 
         # Save that information to disk
         (key_path, cert_bundle_path) = self._save_cert(dns, cert, key, bundle_root=True)
@@ -400,14 +404,29 @@ class SignClientCertificate(BaseModel):
     csr: str
 
 
+class TrackNameRequest(BaseModel):
+    """Request model to update track name for a stream"""
+    trackName: str
+
+
+class SupportedIngestInterface(str, Enum):
+    cmaf = "cmaf-ingest"
+    dash = "dash"
+    hls = "hls"
+
+
 class PushAvServer:
 
-    templates = Jinja2Templates(directory="templates")
+    templates = Jinja2Templates(directory=templates_path)
 
-    def __init__(self, wd: WorkingDirectory, device_hierarchy: CAHierarchy):
+    def __init__(self, wd: WorkingDirectory, device_hierarchy: CAHierarchy, strict_mode: bool):
         self.wd = wd
         self.device_hierarchy = device_hierarchy
+        self.strict_mode = strict_mode
         self.router = APIRouter()
+
+        # In-memory map to track stream files: {stream_id: {"valid_files": [], "invalid_files": []}}
+        self.stream_files_map = {}
 
         # UI
         self.router.add_api_route("/", self.index, methods=["GET"], response_class=RedirectResponse)
@@ -421,13 +440,28 @@ class PushAvServer:
         self.router.add_api_route("/streams", self.create_stream, methods=["POST"], status_code=201)
         self.router.add_api_route("/streams", self.list_streams, methods=["GET"])
         self.router.add_api_route("/streams/probe/{stream_id}/{file_path:path}", self.ffprobe_check, methods=["GET"])
-        self.router.add_api_route("/streams/{stream_id}", self.manifest_upload, methods=["PUT"])
-        self.router.add_api_route("/streams/{stream_id}/{file_path:path}", self.segment_upload, methods=["PUT"], status_code=202)
+
+        self.router.add_api_route("/streams/{stream_id}/{file_path:path}.{ext}", self.handle_upload, methods=["PUT"])
+
         self.router.add_api_route("/streams/{stream_id}/{file_path:path}", self.segment_download, methods=["GET"])
+        self.router.add_api_route("/streams/{stream_id}/trackName", self.update_track_name, methods=["POST"], status_code=202)
         self.router.add_api_route("/certs", self.list_certs, methods=["GET"], status_code=200)
         self.router.add_api_route("/certs/{hierarchy}/{name}", self.certificate_details, methods=["GET"], status_code=200)
         self.router.add_api_route("/certs/{name}/keypair", self.create_client_keypair, methods=["POST"])
         self.router.add_api_route("/certs/{name}/sign", self.sign_client_certificate, methods=["POST"])
+
+    # Utilities
+
+    def _read_stream_details(self, stream_id: int):
+        p = self.wd.path("streams", str(stream_id), "details.json")
+
+        try:
+            with open(p, 'r') as file:
+                return json.load(file)
+        except FileNotFoundError:
+            raise HTTPException(404, detail="Stream doesn't exists")
+        except Exception as e:
+            raise HTTPException(500, f"An unexpected error occurred: {e}")
 
     # UI website
 
@@ -451,6 +485,9 @@ class PushAvServer:
             p = self.wd.path("streams", str(stream_id), file_path)
             with open(p, "r") as f:
                 context['cert'] = json.load(f)
+        elif file_path == 'details.json':
+            context['type'] = 'details'
+            context['details'] = self._read_stream_details(stream_id)
         else:
             context['type'] = 'media'
             context['probe'] = self.ffprobe_check(stream_id, file_path)
@@ -471,48 +508,46 @@ class PushAvServer:
 
     # APIs
 
-    def create_stream(self):
+    def create_stream(self, interface: Optional[SupportedIngestInterface] = None):
         # Find the last registered stream
         dirs = [d for d in pathlib.Path(self.wd.path("streams")).iterdir() if d.is_dir()]
         last_stream = int(dirs[-1].name) if len(dirs) > 0 else 0
         stream_id = last_stream + 1
 
-        self.wd.mkdir("streams", str(stream_id))
+        # TODO Add option to specify Interface-1, Interface-2 DASH, or I2-HLS to improve the strict mode
+        p = self.wd.mkdir("streams", str(stream_id))
+        stream = {"stream_id": stream_id, "strict_mode": self.strict_mode, "interface": interface}
 
-        return {"stream_id": stream_id}
+        with open(p / "details.json", 'w', encoding='utf-8') as f:
+            json.dump(stream, f, ensure_ascii=False, indent=4)
+
+        # Initialize entry in stream files map
+        self.stream_files_map[str(stream_id)] = {"valid_files": [], "invalid_files": []}
+
+        return stream
 
     def list_streams(self):
-        dirs = [d for d in pathlib.Path(self.wd.path("streams")).iterdir() if d.is_dir()]
+        # Return streams directly from the in-memory map
+        streams = []
 
-        def stream_files(dir: Path):
-            return [f.relative_to(dir) for f in dir.glob("**/*") if f.is_file()]
-
-        streams = [{"id": d.name, "files": stream_files(d)} for d in dirs]
+        for stream_id, stream_data in self.stream_files_map.items():
+            streams.append({
+                "id": int(stream_id),
+                "valid_files": stream_data["valid_files"],
+                "invalid_files": stream_data["invalid_files"]
+            })
 
         return {"streams": streams}
 
-    async def manifest_upload(self, stream_id: int, req: Request):
-        """The DASH manifest is uploaded onto the base path without any file path"""
+    async def _handle_upload(self, dst: Path, req: Request):
+        """ Handle an upload, sending content to disk at 'dst'.
 
-        # Here we assume that no camera will upload an index.mpd file on their own.
-        # That is something that may not be true, in which case we would have to add
-        # another layer of abstraction on the file system where we can store the mpd
-        # file and the camera direct uploads.
-        return await self.segment_upload("index.mpd", stream_id, req)
-
-    async def segment_upload(self, file_path: str, stream_id: int, req: Request):
-        """Extract the parsed version of a client certificate.
-        See https://docs.python.org/3/library/ssl.html#ssl.SSLSocket.getpeercert
+        Extract the parsed version of a client certificate via a patched TLS
+        extension. See https://docs.python.org/3/library/ssl.html#ssl.SSLSocket.getpeercert
         for the exact content.
         """
-        cert_details = req.scope["transport"].get_extra_info("ssl_object").getpeercert()
 
-        logging.debug(f"segment_upload. stream_id={stream_id} file_path:{file_path}")
-
-        if not self.wd.path("streams", str(stream_id)).exists():
-            raise HTTPException(404, detail="Stream doesn't exists")
-
-        dst = self.wd.mkdir("streams", str(stream_id), file_path, is_file=True)
+        cert_details = req.scope["extensions"]["ssl"]["client_certificate"]
 
         with open(dst.with_suffix(dst.suffix + ".crt"), "w") as f:
             f.write(json.dumps(cert_details))
@@ -522,6 +557,63 @@ class PushAvServer:
                 f.write(chunk)
 
         return Response(status_code=202)
+
+    async def handle_upload(self, stream_id: int, file_path: str, ext: str, req: Request):
+        """
+            Handle any upload if strict-mode isn't enabled.
+            Otherwise, check if the segment path format complies with Matter Specification path.
+        """
+        stream = self._read_stream_details(stream_id)
+        is_valid = True
+        validation_error_reason = ""
+
+        if stream.get('strict_mode', False):
+            if ext not in VALID_EXTENSIONS:
+                is_valid = False
+                validation_error_reason = f"Invalid extension: {ext}, valid extensions are {', '.join(VALID_EXTENSIONS)}"
+            elif ext in ["mpd", "m3u8"]:
+                iface = stream.get('interface', None)
+                if (iface == SupportedIngestInterface.dash and ext != "mpd" or
+                        iface == SupportedIngestInterface.hls and ext != "m3u8"):
+                    is_valid = False
+                    validation_error_reason = "Unsupported manifest object extension"
+            elif ext == "m4s":
+                # Checks if CMAF extended path matches the pattern session_<SessionNumber>/<TrackName>/segment_<SegmentNumber>
+                # https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/PushAVStreamTransport.adoc#12-operation
+                segment_pattern = re.compile(r"^session_\d+/(?P<trackName>[^/]+)/segment_\d+$")
+                match = segment_pattern.match(file_path)
+                if not match:
+                    is_valid = False
+                    validation_error_reason = "Path does not adhere to Matter's extended path format: session_<SessionNumber>/<TrackName>/segment_<SegmentNumber>"
+                else:
+                    # Validate if the trackName is same as the one assigned during transport allocation.
+                    # https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/PushAVStreamTransport.adoc#685-trackname-field
+                    track_name_in_path = match.group("trackName")
+                    track_name = stream.get('trackName', None)
+                    if track_name and track_name != track_name_in_path:
+                        is_valid = False
+                        validation_error_reason = ("Track name mismatch: "
+                                                   f"{track_name_in_path} != {track_name}, "
+                                                   "must match TrackName provided in ContainerOptions")
+
+        dst = self.wd.mkdir("streams", str(stream_id), f"{file_path}.{ext}", is_file=True)
+        extended_path = f"{file_path}.{ext}"
+
+        # Add file to the appropriate list in the stream files map
+        logging.debug(f"Upload received: {extended_path}")
+        stream_id_str = str(stream_id)
+        if stream_id_str in self.stream_files_map:
+            if is_valid and extended_path not in self.stream_files_map[stream_id_str]["valid_files"]:
+                self.stream_files_map[stream_id_str]["valid_files"].append(extended_path)
+            if not is_valid:
+                logging.error(f"{extended_path}: {validation_error_reason}")
+                if extended_path not in self.stream_files_map[stream_id_str]["invalid_files"]:
+                    self.stream_files_map[stream_id_str]["invalid_files"].append({
+                        "file_path": extended_path,
+                        "validation_error_reason": validation_error_reason
+                    })
+
+        return await self._handle_upload(dst, req)
 
     def ffprobe_check(self, stream_id: int, file_path: str):
 
@@ -590,6 +682,21 @@ class PushAvServer:
 
         return {key, cert, created}
 
+    async def update_track_name(self, stream_id: int, track_request: TrackNameRequest):
+        """
+        Updates the trackName for a given stream_id.
+        """
+        stream_details = self._read_stream_details(stream_id)
+
+        stream_details["trackName"] = track_request.trackName
+
+        details_path = self.wd.path("streams", str(stream_id), "details.json")
+        try:
+            with open(details_path, 'w', encoding='utf-8') as f:
+                json.dump(stream_details, f, ensure_ascii=False, indent=4)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to write stream details: {e}")
+
     def sign_client_certificate(
         self, name: str, req: SignClientCertificate, override: bool = True
     ):
@@ -601,17 +708,17 @@ class PushAvServer:
 class PushAvContext:
     """Hold the context for a full Push AV Server including temporary disk, CA hierarchies and web server"""
 
-    def __init__(self, host: Optional[str], port: Optional[int], working_directory: Optional[str], dns: Optional[str]):
+    def __init__(self, host: Optional[str], port: Optional[int], working_directory: Optional[str], dns: Optional[str], server_ip: Optional[str], strict_mode: bool):
         self.directory = WorkingDirectory(working_directory)
         self.host = host
         self.port = port
-        self.dns = "localhost" if dns is None else f"{dns}._http._tcp_.local."
-        self.proc: multiprocessing.Process | None = None
+        self.dns = "localhost" if dns is None else f"{dns}._http._tcp.local."
+        self.strict_mode = strict_mode
 
         # Create CA hierarchies (for webserver and devices)
         self.device_hierarchy = CAHierarchy(self.directory.mkdir("certs", "device"), "device", "client")
         self.server_hierarchy = CAHierarchy(self.directory.mkdir("certs", "server"), "server", "server")
-        (self.server_key_file, self.server_cert_file, _) = self.server_hierarchy.gen_keypair(self.dns, override=True)
+        (self.server_key_file, self.server_cert_file, _) = self.server_hierarchy.gen_keypair(self.dns, override=True, ip_address=server_ip)
 
         # mDNS configuration. Registration only happen if the dns isn't localhost.
         self.zeroconf = Zeroconf()
@@ -628,46 +735,53 @@ class PushAvContext:
         # Streams holder
         self.directory.mkdir("streams")
 
+        logger = logging.getLogger("hypercorn.error")
         self.app = FastAPI()
-        self.app.mount("/static", StaticFiles(directory="static"), name="static")
-        pas = PushAvServer(self.directory, self.device_hierarchy)
+        self.app.mount("/static", StaticFiles(directory=static_path), name="static")
+        pas = PushAvServer(self.directory, self.device_hierarchy, strict_mode)
         self.app.include_router(pas.router)
 
-    def start_in_background(self):
-        if self.proc:
-            logging.warning("Attempting to start a server when one is already running, no new server is being started.")
-            return
+        @self.app.exception_handler(HTTPException)
+        async def http_exception_handler(request: Request, exc: HTTPException):
+            logger.error(
+                f"HTTPExecption: {exc.status_code} {exc.detail}"
+            )
+            return JSONResponse(
+                status_code=exc.status_code,
+                content={"detail": exc.detail}
+            )
 
+    async def start(self, shutdown_trigger: Optional[Callable[..., Awaitable]] = None):
+        """
+        Start the PUSH AV server. Note that method do not check if a server is already running.
+        """
         # Advertise over mDNS
         if self.svc_info:
             logging.info("Advertising the service as %s", self.svc_info)
             self.zeroconf.register_service(self.svc_info)
 
-        def background_job():
-            # Start the web server
-            try:
-                uvicorn.run(
-                    self.app,
-                    host=self.host,
-                    port=self.port,
-                    ssl_keyfile=self.server_key_file,
-                    ssl_certfile=self.server_cert_file,
-                    ssl_cert_reqs=ssl.CERT_OPTIONAL,
-                    ssl_ca_certs=self.device_hierarchy.root_cert_path,
-                )
-            finally:
-                if self.svc_info:
-                    self.zeroconf.unregister_service(self.svc_info)
+        # Start the web server
+        from hypercorn.asyncio import serve
+        from hypercorn.config import Config
+        bind = (self.host or "127.0.0.1") + ":" + (str(self.port or 8000))
+        config = Config.from_mapping(
+            bind=bind,
+            quic_bind=bind,
+            alpn_protocols=["h2"],
+            keyfile=self.server_key_file,
+            certfile=self.server_cert_file,
+            ca_certs=self.device_hierarchy.root_cert_path,
+            verify_mode=ssl.CERT_OPTIONAL
+        )
 
-        # Spawning the function results in python not being able to pickle the full context
-        # (most notably cryptography's rust bindings). So instead we force use forks as the
-        # way to create processes.
-        multiprocessing.set_start_method('fork')
-        self.proc = multiprocessing.Process(target=background_job, daemon=True)
-        self.proc.start()
+        try:
+            await serve(self.app, config, shutdown_trigger=shutdown_trigger)
 
-    def terminate(self):
-        self.proc.terminate()
+        finally:
+            if self.svc_info:
+                self.zeroconf.unregister_service(self.svc_info)
+
+    def cleanup(self):
         self.directory.cleanup()
 
 
@@ -677,6 +791,7 @@ if __name__ == "__main__":
         level=logging.DEBUG,
         datefmt="%H:%M:%S",
     )
+    logging.getLogger("hpack").setLevel(logging.WARNING)
 
     parser = argparse.ArgumentParser(
         prog="push_av_tool.py",
@@ -693,11 +808,22 @@ if __name__ == "__main__":
     parser.add_argument(
         "--dns", help="A mDNS record to adversise, or none if left empty."
     )
+    parser.add_argument("--server-ip", help="The IP address of the server to include in the SSL certificate.")
+    parser.add_argument("--strict-mode", action='store_true',
+                        help="When enabled, upload must happen on the path described by the Matter specification")
 
     args = parser.parse_args()
 
-    ctx = PushAvContext(args.host, args.port, args.working_directory, args.dns)
-    ctx.start_in_background()
-    print(ctx.proc)
-    ctx.proc.join()
-    ctx.terminate()
+    ctx = PushAvContext(args.host, args.port, args.working_directory, args.dns, args.server_ip, args.strict_mode)
+
+    shutdown_event = asyncio.Event()
+
+    def _signal_handler():
+        print("SIGINT received. Shutting down web server.")
+        shutdown_event.set()
+
+    loop = asyncio.get_event_loop()
+    loop.add_signal_handler(signal.SIGINT, _signal_handler)
+    loop.run_until_complete(ctx.start(shutdown_trigger=shutdown_event.wait))
+
+    ctx.cleanup()

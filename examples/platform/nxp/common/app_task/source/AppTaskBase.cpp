@@ -30,6 +30,7 @@
 #include <data-model-providers/codegen/Instance.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 
+#include <app/DefaultTimerDelegate.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 
 #include <platform/CommissionableDataProvider.h>
@@ -57,6 +58,10 @@
 #include <inet/EndPointStateOpenThread.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#include "BLEApplicationManager.h"
 #endif
 
 #if CONFIG_CHIP_APP_WIFI_CONNECT_AT_BOOT
@@ -442,6 +447,11 @@ void chip::NXP::App::AppTaskBase::SwitchCommissioningStateHandler(void)
 
 void chip::NXP::App::AppTaskBase::FactoryResetHandler(void)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+    /* Trigger factory reset for BLEApplicationManager */
+    chip::NXP::App::BleAppMgr().FactoryReset();
+#endif
+
     /* Emit the ShutDown event before factory reset */
     chip::Server::GetInstance().GenerateShutDownEvent();
     chip::Server::GetInstance().ScheduleFactoryReset();

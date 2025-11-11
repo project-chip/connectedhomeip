@@ -6,7 +6,10 @@
 #include <app/clusters/push-av-stream-transport-server/constants.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-delegate.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-storage.h>
+#include <app/clusters/tls-certificate-management-server/tls-certificate-management-server.h>
+#include <app/clusters/tls-client-management-server/tls-client-management-server.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <functional>
 #include <protocols/interaction_model/StatusCode.h>
 #include <vector>
 
@@ -20,16 +23,43 @@ public:
     PushAvStreamTransportServerLogic(EndpointId aEndpoint, BitFlags<PushAvStreamTransport::Feature> aFeatures);
     ~PushAvStreamTransportServerLogic();
 
-    void SetDelegate(EndpointId aEndpoint, PushAvStreamTransportDelegate * delegate)
+    void SetDelegate(PushAvStreamTransportDelegate * delegate)
     {
         mDelegate = delegate;
         if (mDelegate == nullptr)
         {
-            ChipLogError(Zcl, "Push AV Stream Transport [ep=%d]: Trying to set delegate to null", aEndpoint);
+            ChipLogError(Zcl, "Push AV Stream Transport : Trying to set delegate to null");
             return;
         }
-        mDelegate->SetEndpointId(aEndpoint);
     }
+
+    void SetTLSClientManagementDelegate(TlsClientManagementDelegate * delegate)
+    {
+        mTLSClientManagementDelegate = delegate;
+        if (mTLSClientManagementDelegate == nullptr)
+        {
+            ChipLogError(Zcl, "Push AV Stream Transport : Trying to set TLS Client Management delegate to null");
+            return;
+        }
+    }
+
+    void SetTlsCertificateManagementDelegate(TlsCertificateManagementDelegate * delegate)
+    {
+        mTlsCertificateManagementDelegate = delegate;
+        if (mTlsCertificateManagementDelegate == nullptr)
+        {
+            ChipLogError(Zcl, "Push AV Stream Transport: Trying to set TLS Certificate Management delegate to null");
+            return;
+        }
+    }
+
+    Protocols::InteractionModel::Status
+    NotifyTransportStarted(uint16_t connectionID, PushAvStreamTransport::TransportTriggerTypeEnum triggerType,
+                           Optional<PushAvStreamTransport::TriggerActivationReasonEnum> activationReason =
+                               Optional<PushAvStreamTransport::TriggerActivationReasonEnum>());
+
+    Protocols::InteractionModel::Status NotifyTransportStopped(uint16_t connectionID,
+                                                               PushAvStreamTransport::TransportTriggerTypeEnum triggerType);
 
     enum class UpsertResultEnum : uint8_t
     {
@@ -90,12 +120,12 @@ public:
     Protocols::InteractionModel::Status
     GeneratePushTransportBeginEvent(const uint16_t connectionID, const PushAvStreamTransport::TransportTriggerTypeEnum triggerType,
                                     const Optional<PushAvStreamTransport::TriggerActivationReasonEnum> activationReason);
-    Protocols::InteractionModel::Status
-    GeneratePushTransportEndEvent(const uint16_t connectionID, const PushAvStreamTransport::TransportTriggerTypeEnum triggerType,
-                                  const Optional<PushAvStreamTransport::TriggerActivationReasonEnum> activationReason);
+    Protocols::InteractionModel::Status GeneratePushTransportEndEvent(const uint16_t connectionID);
 
 private:
-    PushAvStreamTransportDelegate * mDelegate = nullptr;
+    PushAvStreamTransportDelegate * mDelegate                            = nullptr;
+    TlsClientManagementDelegate * mTLSClientManagementDelegate           = nullptr;
+    TlsCertificateManagementDelegate * mTlsCertificateManagementDelegate = nullptr;
 
     /// Convenience method that returns if the internal delegate is null and will log
     /// an error if the check returns true
@@ -124,13 +154,24 @@ private:
 
     void RemoveTimerAppState(const uint16_t connectionID);
 
+    Protocols::InteractionModel::Status CheckPrivacyModes(Globals::StreamUsageEnum streamUsage);
+
     /**
      * @brief Schedule deallocate with a given timeout
      *
-     * @param endpointId    endpoint where DoorLockServer is running
-     * @param timeoutSec    timeout in seconds
+     * @param connectionID    ID of the connection to deallocate
+     * @param timeoutSec      timeout in seconds
+     * @return               CHIP_ERROR code indicating the result of the operation
      */
     CHIP_ERROR ScheduleTransportDeallocate(uint16_t connectionID, uint32_t timeoutSec);
+
+    /**
+     * @brief Validates the provided URL.
+     *
+     * @param url The URL to validate
+     * @return true if URL is valid, false otherwise
+     */
+    bool ValidateUrl(const std::string & url);
 };
 
 } // namespace Clusters

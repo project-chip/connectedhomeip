@@ -59,14 +59,17 @@ config PTHREAD_IPC
     bool
     default n
 
+config POSIX_API
+    default y if ZEPHYR_VERSION_3_3
+
 config POSIX_MAX_FDS
     int
     default 16
 
 # Application stack size
 config MAIN_STACK_SIZE
+    default 4864 if SOC_RISCV_TELINK_W91
     default 3240 if PM || SOC_RISCV_TELINK_TL321X
-    default 4608 if SOC_RISCV_TELINK_W91 && !ZEPHYR_VERSION_3_3
     default 4096
 
 config INIT_STACKS
@@ -75,23 +78,20 @@ config INIT_STACKS
 config IDLE_STACK_SIZE
     default 512 if PM || SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_W91
 
-
 config ISR_STACK_SIZE
-    default 592 if PM || SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_W91
+    default 800 if PM || SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_W91
 
 config SYSTEM_WORKQUEUE_STACK_SIZE
-    default 616 if PM
+    default 664 if PM && !SOC_RISCV_TELINK_W91
 
 config HEAP_MEM_POOL_SIZE
     default 256 if ZEPHYR_VERSION_3_3
     default 1280
 
 config COMMON_LIBC_MALLOC_ARENA_SIZE
-    default 20716 if SOC_SERIES_RISCV_TELINK_B9X_RETENTION || (SOC_RISCV_TELINK_TL321X && ZEPHYR_VERSION_3_3) || (SOC_RISCV_TELINK_TL721X && SOC_SERIES_RISCV_TELINK_TLX_RETENTION)
-    default 16954 if (SOC_RISCV_TELINK_TL321X && !ZEPHYR_VERSION_3_3)
-    default 18000 if SOC_RISCV_TELINK_TL721X
+    default 19000 if SOC_RISCV_TELINK_TL321X && !ZEPHYR_VERSION_3_3
     default 29448 if SOC_RISCV_TELINK_W91
-    default 12288
+    default 20716
 
 config NET_IPV6_MLD
     default n if PM
@@ -172,11 +172,16 @@ config BT_HCI_TX_STACK_SIZE
 config BT_DEVICE_NAME_GATT_WRITABLE
     default n
 
+config BT_HOST_CRYPTO
+    default y if ZEPHYR_VERSION_3_3
+    default n
+
 if SOC_RISCV_TELINK_B9X || SOC_RISCV_TELINK_TLX
 
 config TL_BLE_CTRL_THREAD_STACK_SIZE
     default 648 if ZEPHYR_VERSION_3_3
-    default 696
+    default 768 if SOC_RISCV_TELINK_TL721X
+    default 712
 
 config TL_BLE_CTRL_MASTER_MAX_NUM
     default 0
@@ -194,7 +199,6 @@ choice TL_BLE_CTRL_MAC_TYPE
 endchoice
 
 endif # SOC_RISCV_TELINK_B9X || SOC_RISCV_TELINK_TLX
-
 
 endif # BT
 
@@ -233,6 +237,10 @@ endif
 config DYNAMIC_INTERRUPTS
     default y
 
+config RISCV_MTVEC_VECTORED_MODE
+	bool
+    default n
+
 config CHIP_OTA_REQUESTOR
     default y
 
@@ -261,7 +269,7 @@ config NVS_LOOKUP_CACHE
 
 config NVS_LOOKUP_CACHE_SIZE
     default 400  if SOC_RISCV_TELINK_TL321X
-    default 2048 if !PM
+    default 2048 if !PM || SOC_RISCV_TELINK_W91
 
 # Set multiplicator of Name Value Storage (NVS) as 1 to reach NVS sector size 4KB
 # nvs_sector_size = flash_page_size * mult = 4KB * 1 = 4KB
@@ -316,7 +324,7 @@ config OPENTHREAD_THREAD_STACK_SIZE
     default 2400 if PM || SOC_RISCV_TELINK_TL321X
 
 config OPENTHREAD_RADIO_WORKQUEUE_STACK_SIZE
-    default 432 if PM
+    default 440 if PM
     default 608
 
 config OPENTHREAD_SLAAC
@@ -336,9 +344,11 @@ config OPENTHREAD_IP6_MAX_EXT_MCAST_ADDRS
 endif # NET_L2_OPENTHREAD
 
 config NET_TX_STACK_SIZE
+    default 1200 if SOC_RISCV_TELINK_W91
     default 600 if PM || SOC_RISCV_TELINK_TL321X
 
 config NET_RX_STACK_SIZE
+    default 2048 if SOC_RISCV_TELINK_W91
     default 664 if PM || SOC_RISCV_TELINK_TL321X
 
 # Disable certain parts of Zephyr IPv6 stack
@@ -430,21 +440,10 @@ config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
       within range [-JITTER; +JITTER].
 
 config NET_MGMT_EVENT_STACK_SIZE
-    default 1280 if SOC_RISCV_TELINK_W91
-    default 1128 if ZEPHYR_VERSION_3_3
-    default 1250
-
-if !ZEPHYR_VERSION_3_3
-config IPC_SERVICE_BACKEND_ICMSG_WQ_STACK_SIZE
-    int "Size of RX work queue stack"
-    default 2384 if TELINK_W91_IPC_DISPATCHER
-endif
+    default 2048
 
 config TELINK_W91_WIFI_EVENT_THREAD_STACK_SIZE
-	default 1136
-
-config IPC_SERVICE_ICMSG_WORK_QUEUE_STACK_SIZE
-	default 544
+    default 1136
 
 endif # CHIP_WIFI
 
@@ -502,11 +501,6 @@ config MBEDTLS_X509_CSR_WRITE_C
 config PSA_WANT_KEY_TYPE_ECC_PUBLIC_KEY
     bool "PSA_WANT_KEY_TYPE_ECC_PUBLIC_KEY"
     default y
-
-# Disable PSA usage
-config MBEDTLS_USE_PSA_CRYPTO
-    bool "MBEDTLS_USE_PSA_CRYPTO"
-    default n
 
 config MBEDTLS_PSA_STATIC_KEY_SLOTS
     bool "MBEDTLS_PSA_STATIC_KEY_SLOTS"

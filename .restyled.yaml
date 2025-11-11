@@ -224,21 +224,12 @@ restylers:
           - "**/*.sh"
           - "**/*.bash"
     - name: autopep8
-      image: restyled/restyler-autopep8:v2.0.0
-      command:
-          - autopep8
-          - "--in-place"
-      arguments: []
-      include:
-          - "**/*.py"
-      interpreters:
-          - python
+      image: public.ecr.aws/restyled-io/restyler-autopep8:v2.3
     - name: isort
-      image: restyled/restyler-isort:v5.11.2
+      image: public.ecr.aws/restyled-io/restyler-isort:v7.0
+    - name: ruff
+      image: public.ecr.aws/restyled-io/restyler-ruff:v0.14
       command:
-          - isort
-      arguments: []
-      include:
-          - "**/*.py"
-      interpreters:
-          - python
+          - ruff
+          - check
+          - --fix-only

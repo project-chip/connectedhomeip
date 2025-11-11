@@ -44,7 +44,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import asyncio
 import logging
 import random
 from time import sleep
@@ -73,7 +72,8 @@ class TC_CADMIN(CADMINBaseTest):
             setupPayloadInfo = self.get_setup_payload_info()
             if not setupPayloadInfo:
                 asserts.assert_true(
-                    False, 'passcode and discriminator must be provided values in order for this test to work due to using BCM, please rerun test with providing --passcode <value> and --discriminator <value>')
+                    False,
+                    'passcode and discriminator must be provided values in order for this test to work due to using BCM, please rerun test with providing --passcode <value> and --discriminator <value>')
 
         # Establishing TH1
         self.th1 = self.default_controller
@@ -87,7 +87,7 @@ class TC_CADMIN(CADMINBaseTest):
         self.step("3a")
         if commission_type == "ECM":
             params = await self.th1.OpenCommissioningWindow(
-                nodeid=self.dut_node_id,
+                nodeId=self.dut_node_id,
                 timeout=self.max_window_duration,
                 iteration=1000,
                 discriminator=1234,
@@ -96,7 +96,7 @@ class TC_CADMIN(CADMINBaseTest):
 
         elif commission_type == "BCM":
             obcCmd = Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180)
-            await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=obcCmd, timedRequestTimeoutMs=6000)
+            await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=obcCmd, timedRequestTimeoutMs=6000)
 
         else:
             asserts.fail(f"Unknown commissioning type: {commission_type}")
@@ -107,13 +107,13 @@ class TC_CADMIN(CADMINBaseTest):
                 expected_cm_value=2,
                 expected_discriminator=1234
             )
-            logging.info(f"Successfully found service with CM={service.txt_record.get('CM')}, D={service.txt_record.get('D')}")
+            logging.info(f"Successfully found service with CM={service.txt.get('CM')}, D={service.txt.get('D')}")
         elif commission_type == "BCM":
             service = await self.wait_for_correct_cm_value(
                 expected_cm_value=1,
                 expected_discriminator=setupPayloadInfo[0].filter_value
             )
-            logging.info(f"Successfully found service with CM={service.txt_record.get('CM')}, D={service.txt_record.get('D')}")
+            logging.info(f"Successfully found service with CM={service.txt.get('CM')}, D={service.txt.get('D')}")
 
         self.step("3c")
         BI_cluster = Clusters.BasicInformation
@@ -179,41 +179,37 @@ class TC_CADMIN(CADMINBaseTest):
             await self.read_nl_attr(dut_node_id=self.dut_node_id, th=self.th2, attr_val=self.nl_attribute)
 
             self.step(9)
-            # TH_CR2 opens a commissioning window on DUT_CE for 180 seconds using ECM
-            await self.th2.OpenCommissioningWindow(nodeid=self.dut_node_id, timeout=180, iteration=1000, discriminator=0, option=1)
+            # TH_CR2 opens a commissioning window on DUT_CE for 180 seconds using ECM and monitors until it closes
+            params, window_status_accumulator = await self.open_commissioning_window_with_subscription_monitoring(
+                th=self.th2,
+                timeout=180,
+                node_id=self.dut_node_id,
+                discriminator=0,
+                iteration=1000
+            )
+
+            results = await self.monitor_commissioning_window_closure_with_subscription(
+                th=self.th2,
+                node_id=self.dut_node_id,
+                expected_duration_seconds=180,
+                window_status_accumulator=window_status_accumulator
+            )
+            asserts.assert_true(results.window_closed, "Window should have closed")
+            asserts.assert_true(results.timing_valid, "Window should have closed within timing constraints")
 
             self.step(10)
-            sleep(181)
-
-            self.step(11)
-            # TH_CR2 reads the window status to verify the DUT_CE window is closed
-            # TODO: Issue noticed when initially attempting to check window status, issue is detailed here: https://github.com/project-chip/connectedhomeip/issues/35983
-            # Workaround in place until above issue resolved
-            try:
-                window_status = await self.th2.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.AdministratorCommissioning.Attributes.WindowStatus)])
-            except asyncio.CancelledError:
-                window_status = await self.th2.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.AdministratorCommissioning.Attributes.WindowStatus)])
-
-            window_status = window_status[0]
-            outer_key = list(window_status.keys())[0]
-            inner_key = list(window_status[outer_key].keys())[1]
-            if window_status[outer_key][inner_key] != Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen:
-                asserts.fail("Commissioning window is expected to be closed, but was found to be open")
-
-            self.step(12)
             # TH_CR2 opens a commissioning window on DUT_CE using ECM
             self.discriminator = random.randint(0, 4095)
-            # params2 = await self.openCommissioningWindow(dev_ctrl=self.th2, node_id=self.dut_node_id)
-            params2 = await self.th2.OpenCommissioningWindow(nodeid=self.dut_node_id, timeout=self.max_window_duration, iteration=1000, discriminator=1234, option=1)
+            params2 = await self.th2.OpenCommissioningWindow(nodeId=self.dut_node_id, timeout=self.max_window_duration, iteration=1000, discriminator=self.discriminator, option=1)
 
-            self.step(13)
-            # TH_CR1 starts a commissioning process with DUT_CE before the timeout from step 12
+            self.step(11)
+            # TH_CR1 starts a commissioning process with DUT_CE before the timeout from step 10
             try:
                 await self.th1.CommissionOnNetwork(
                     nodeId=self.dut_node_id, setupPinCode=params2.setupPinCode,
-                    filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=1234)
+                    filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
             except ChipStackError as e:  # chipstack-ok: This disables ChipStackError linter check. Error occurs if a NOC for the fabric already exists, which may depend on device state. Can not use assert_raises because it not always fails
-                asserts.assert_equal(e.err,  0x0000007E,
+                asserts.assert_equal(e.err, 0x0000007E,
                                      "Expected to return Trying to add NOC for fabric that already exists")
             """
             expected error:
@@ -221,25 +217,27 @@ class TC_CADMIN(CADMINBaseTest):
                 [2024-10-08 11:57:43.144365][TEST][STDOUT][MatterTest] 10-08 11:57:42.777 INFO Add NOC failed with error src/controller/CHIPDeviceController.cpp:1712: CHIP Error 0x0000007E: Trying to add a NOC for a fabric that already exists
             """
 
-            self.step(14)
+            self.step(12)
             revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
-            await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
+            await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
             # The failsafe cleanup is scheduled after the command completes, so give it a bit of time to do that
             sleep(1)
 
         if commission_type == "ECM":
-            self.step(15)
+            self.step(13)
 
         elif commission_type == "BCM":
             self.step(7)
 
-        # TH_CR2 reads the CurrentFabricIndex attribute from the Operational Credentials cluster and saves as th2_idx, TH_CR1 sends the RemoveFabric command to the DUT with the FabricIndex set to th2_idx
-        th2_idx = await self.th2.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)])
+        # TH_CR2 reads the CurrentFabricIndex attribute from the Operational
+        # Credentials cluster and saves as th2_idx, TH_CR1 sends the RemoveFabric
+        # command to the DUT with the FabricIndex set to th2_idx
+        th2_idx = await self.th2.ReadAttribute(nodeId=self.dut_node_id, attributes=[(0, Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)])
         outer_key = list(th2_idx.keys())[0]
         inner_key = list(th2_idx[outer_key].keys())[0]
         attribute_key = list(th2_idx[outer_key][inner_key].keys())[1]
         removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(th2_idx[outer_key][inner_key][attribute_key])
-        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
+        await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
 
     def pics_TC_CADMIN_1_3(self) -> list[str]:
         return ["CADMIN.S"]
@@ -263,17 +261,15 @@ class TC_CADMIN(CADMINBaseTest):
                      "Verify DUT_CE responds to both write/read with a success"),
             TestStep(8, "TH_CR2 reads, writes and then reads the Basic Information Cluster’s NodeLabel mandatory attribute of DUT_CE",
                      "Verify the initial read reflect the value written in the above step. Verify DUT_CE responds to both write/read with a success"),
-            TestStep(9, "TH_CR2 opens a commissioning window on DUT_CE for 180 seconds using ECM"),
-            TestStep(10, "Wait for the commissioning window in step 9 to timeout"),
-            TestStep(11, "TH_CR2 reads the window status to verify the DUT_CE window is closed",
-                     "DUT_CE windows status shows the window is closed"),
-            TestStep(12, "TH_CR2 opens a commissioning window on DUT_CE using ECM",
+            TestStep(9, "TH_CR2 opens a commissioning window on DUT_CE for 180 seconds using ECM and monitors until the window closes to verify window timing",
+                     "Verify that the window closed within the expected duration of 180 seconds + 1.8 seconds of clock skew"),
+            TestStep(10, "TH_CR2 opens a commissioning window on DUT_CE using ECM",
                      "DUT_CE opens its Commissioning window to allow a new commissioning"),
-            TestStep(13, "TH_CR1 starts a commissioning process with DUT_CE before the timeout from step 12",
+            TestStep(11, "TH_CR1 starts a commissioning process with DUT_CE before the timeout from step 10",
                      "Since DUT_CE was already commissioned by TH_CR1 in step 1, AddNOC fails with NOCResponse with StatusCode field set to FabricConflict (9)"),
-            TestStep(14, "TH_CR1 sends an RevokeCommissioning command to the DUT to cleanup step 13",
+            TestStep(12, "TH_CR1 sends an RevokeCommissioning command to the DUT to cleanup step 11",
                      "Successfully revoked commissioning"),
-            TestStep(15, "TH_CR2 reads the CurrentFabricIndex attribute from the Operational Credentials cluster and saves as th2_idx, TH_CR1 sends the RemoveFabric command to the DUT with the FabricIndex set to th2_idx",
+            TestStep(13, "TH_CR2 reads the CurrentFabricIndex attribute from the Operational Credentials cluster and saves as th2_idx, TH_CR1 sends the RemoveFabric command to the DUT with the FabricIndex set to th2_idx",
                      "TH_CR1 removes TH_CR2 fabric using th2_idx")
         ]
 
@@ -303,7 +299,8 @@ class TC_CADMIN(CADMINBaseTest):
     async def test_TC_CADMIN_1_3(self):
         await self.combined_commission_val_steps(commission_type="ECM")
 
-    @run_if_endpoint_matches(has_feature(cluster=Clusters.AdministratorCommissioning, feature=Clusters.AdministratorCommissioning.Bitmaps.Feature.kBasic))
+    @run_if_endpoint_matches(has_feature(cluster=Clusters.AdministratorCommissioning,
+                             feature=Clusters.AdministratorCommissioning.Bitmaps.Feature.kBasic))
     async def test_TC_CADMIN_1_4(self):
         await self.combined_commission_val_steps(commission_type="BCM")
 

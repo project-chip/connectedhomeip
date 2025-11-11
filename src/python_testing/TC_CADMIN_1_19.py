@@ -43,6 +43,11 @@ from matter.testing.matter_testing import AttributeValue, TestStep, async_test_b
 
 
 class TC_CADMIN_1_19(CADMINBaseTest):
+    # This test can take a long time to run especially in highly congested lab networks since it creates a lot of fabrics and commissions those to the DUT so we need to increase the timeout to run this test.
+    @property
+    def default_timeout(self) -> int:
+        return 600
+
     def steps_TC_CADMIN_1_19(self) -> list[TestStep]:
         return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
@@ -112,9 +117,11 @@ class TC_CADMIN_1_19(CADMINBaseTest):
             params = await self.open_commissioning_window(dev_ctrl=self.th1, timeout=self.max_window_duration, node_id=self.dut_node_id)
 
             self.step("5b")
-            fids_ca = self.certificate_authority_manager.NewCertificateAuthority(caIndex=fid)
-            fids_fa = fids_ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=fid + 1)
-            fids = fids_fa.NewController(nodeId=fid + 1)
+            # Use a unique fabric ID that won't conflict with existing fabrics
+            new_fabric_idx = fid + initial_number_of_fabrics + 1
+            fids_ca = self.certificate_authority_manager.NewCertificateAuthority()
+            fids_fa = fids_ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=new_fabric_idx)
+            fids = fids_fa.NewController(nodeId=new_fabric_idx)
 
             await fids.CommissionOnNetwork(
                 nodeId=self.dut_node_id, setupPinCode=params.commissioningParameters.setupPinCode,
@@ -155,7 +162,7 @@ class TC_CADMIN_1_19(CADMINBaseTest):
         self.step(9)
         for fab_idx in fabric_idxs:
             removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(fab_idx)
-            await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
+            await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
 
         self.step(10)
         # TH reads the CommissionedFabrics attributes from the Node Operational Credentials cluster.

@@ -390,6 +390,7 @@ TEST_F(TestUdcMessages, TestUDCIdentificationDeclaration)
     const char * deviceName   = "device1";
     uint16_t pairingHint      = 33;
     const char * pairingInst  = "Read 6 digit code from screen";
+    uint8_t passcodeLength    = 6;
 
     TargetAppInfo appInfo;
 
@@ -426,6 +427,7 @@ TEST_F(TestUdcMessages, TestUDCIdentificationDeclaration)
     id.SetCdUponPasscodeDialog(true);
     id.SetCommissionerPasscode(true);
     id.SetCommissionerPasscodeReady(true);
+    id.SetPasscodeLength(passcodeLength);
 
     EXPECT_TRUE(id.HasDiscoveryInfo());
     EXPECT_STREQ(id.GetInstanceName(), instanceName);
@@ -446,6 +448,7 @@ TEST_F(TestUdcMessages, TestUDCIdentificationDeclaration)
     EXPECT_EQ(id.GetCdUponPasscodeDialog(), true);
     EXPECT_EQ(id.GetCommissionerPasscode(), true);
     EXPECT_EQ(id.GetCommissionerPasscodeReady(), true);
+    EXPECT_EQ(id.GetPasscodeLength(), passcodeLength);
 
     // TODO: add an ip
 
@@ -475,6 +478,7 @@ TEST_F(TestUdcMessages, TestUDCIdentificationDeclaration)
     EXPECT_EQ(id.GetCdUponPasscodeDialog(), idOut.GetCdUponPasscodeDialog());
     EXPECT_EQ(id.GetCommissionerPasscode(), idOut.GetCommissionerPasscode());
     EXPECT_EQ(id.GetCommissionerPasscodeReady(), idOut.GetCommissionerPasscodeReady());
+    EXPECT_EQ(id.GetPasscodeLength(), idOut.GetPasscodeLength());
 
     // TODO: remove following "force-fail" debug line
     // NL_TEST_ASSERT(inSuite, rotatingIdLen != id.GetRotatingIdLength());
@@ -493,6 +497,7 @@ TEST_F(TestUdcMessages, TestUDCCommissionerDeclaration)
     id.SetPasscodeDialogDisplayed(true);
     id.SetCommissionerPasscode(true);
     id.SetQRCodeDisplayed(true);
+    id.SetPasscodeLength(8);
 
     EXPECT_EQ(errorCode, id.GetErrorCode());
     EXPECT_EQ(id.GetNeedsPasscode(), true);
@@ -500,6 +505,7 @@ TEST_F(TestUdcMessages, TestUDCCommissionerDeclaration)
     EXPECT_EQ(id.GetPasscodeDialogDisplayed(), true);
     EXPECT_EQ(id.GetCommissionerPasscode(), true);
     EXPECT_EQ(id.GetQRCodeDisplayed(), true);
+    EXPECT_EQ(id.GetPasscodeLength(), 8);
 
     uint8_t idBuffer[500];
     id.WritePayload(idBuffer, sizeof(idBuffer));
@@ -513,4 +519,5 @@ TEST_F(TestUdcMessages, TestUDCCommissionerDeclaration)
     EXPECT_EQ(id.GetPasscodeDialogDisplayed(), idOut.GetPasscodeDialogDisplayed());
     EXPECT_EQ(id.GetCommissionerPasscode(), idOut.GetCommissionerPasscode());
     EXPECT_EQ(id.GetQRCodeDisplayed(), idOut.GetQRCodeDisplayed());
+    EXPECT_EQ(id.GetPasscodeLength(), idOut.GetPasscodeLength());
 }

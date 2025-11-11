@@ -76,11 +76,11 @@ inline constexpr DataModel::AcceptedCommandEntry
                    BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
                    Access::Privilege::kAdminister);
 } // namespace RemoveRootCertificate
-namespace TLSClientCSR {
+namespace ClientCSR {
 inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(TLSClientCSR::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
+    kMetadataEntry(ClientCSR::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped),
                    Access::Privilege::kAdminister);
-} // namespace TLSClientCSR
+} // namespace ClientCSR
 namespace ProvisionClientCertificate {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(ProvisionClientCertificate::Id,

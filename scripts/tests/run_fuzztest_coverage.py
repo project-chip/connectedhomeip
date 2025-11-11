@@ -137,7 +137,7 @@ def run_fuzz_test(context):
 
     try:
         if context.run_mode == FuzzTestMode.UNIT_TEST_MODE:
-            subprocess.run([context.fuzz_test_binary_path, ], env=env, check=True)
+            subprocess.run([context.fuzz_test_binary_path], env=env, check=True)
             logging.info("Fuzz Test Suite executed in Unit Test Mode.\n")
         elif context.run_mode == FuzzTestMode.CONTINUOUS_FUZZ_MODE:
             cmd_args = [context.fuzz_test_binary_path, f"--fuzz={context.selected_fuzz_test_case}"]

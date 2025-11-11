@@ -14,19 +14,31 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-group("general-commissioning-server") {
+import("${chip_root}/src/app/common_flags.gni")
+
+source_set("bread-crumb-tracker") {
+  sources = [ "BreadCrumbTracker.h" ]
+
+  public_configs = [ "${chip_root}/src:includes" ]
 }
 
-# TODO: we have a dependency on GeneralCommissioning: setting a breadcrumb
-# via `GeneralCommissioning::SetBreadcrumb`. This should be decoupled when
-# GeneralCommissioning is turned into code-driven
-#
-# See https://github.com/project-chip/connectedhomeip/issues/39412
-#
-# This source set enablese other tests to share the coupling for test
-# purposes only (and breadcrumb setting in this case is a noop)
-source_set("test-only-temporary-coupling") {
-  sources = [ "TemporaryTestCoupling.cpp" ]
-  deps =
-      [ "${chip_root}/zzz_generated/app-common/clusters/GeneralCommissioning" ]
+source_set("general-commissioning-server") {
+  sources = [
+    "general-commissioning-cluster.cpp",
+    "general-commissioning-cluster.h",
+  ]
+
+  public_deps = [
+    ":bread-crumb-tracker",
+    "${chip_root}/src/app:app_config",
+    "${chip_root}/src/app/data-model-provider",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/tracing",
+    "${chip_root}/zzz_generated/app-common/clusters/GeneralCommissioning",
+  ]
+
+  if (chip_terms_and_conditions_required) {
+    public_deps += [ "${chip_root}/src/app/server:terms_and_conditions" ]
+  }
 }

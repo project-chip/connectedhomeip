@@ -48,20 +48,53 @@ config CHIP_APP_BLE_MANAGER
 if CHIP_APP_BLE_MANAGER
     choice CHIP_APP_BLE_MANAGER_SELECTION
         prompt "Select Application BLE Manager"
-
-        config CHIP_APP_BLE_MANAGER_CUSTOM
-            bool "App Custom BLE Manager"
+        
+        config CHIP_APP_BLE_MANAGER_CUSTOM_BLE_ZEPHYR
+            bool "App Custom BLE Manager Zephyr"
             depends on CHIP_CUSTOM_BLE_ADV_DATA && CHIP_DEVICE_USE_ZEPHYR_BLE
             help
-                Enable application custom BLE manager.
+                Enable application custom Zephyr BLE manager.
+
+        config CHIP_APP_BLE_MANAGER_CUSTOM_NXP_BLE_HOST
+            bool "App Custom BLE Manager MCXW7x"
+            depends on CHIP_NXP_MULTIPLE_BLE_CONNECTIONS && !CHIP_DEVICE_USE_ZEPHYR_BLE
+            help
+                Enable application custom MCXW7x BLE manager.
 
         config CHIP_APP_BLE_MANAGER_EMPTY
             bool "App BLE Manager Empty"
             help
                 Enable application BLE manager empty implementation.
 
+        config CHIP_APP_BLE_MANAGER_CUSTOM_EXTERNAL
+            bool "App Custom BLE Manager External"
+            default n
+            help
+                Enable application custom externally linked (e.g from mcuxsdk-examples-matter) BLE manager.
+
     endchoice # CHIP_APP_BLE_MANAGER
+
 endif # CHIP_APP_BLE_MANAGER
+
+config CHIP_APP_CUSTOMIZE_EXTRA_GATT_INFO
+    bool "Enable customization of GATT service on MCXW platform"
+    default y if CHIP_NXP_MULTIPLE_BLE_CONNECTIONS
+    help
+        Enable customization of GATT service on MCXW platform
+
+if CHIP_APP_CUSTOMIZE_EXTRA_GATT_INFO
+config CHIP_APP_EXTRA_GATT_DB_HEADER
+    string "Extra application Gatt db header"
+    default "<$(CHIP_ROOT)/examples/platform/nxp/mcxw71/app_ble/include/extra_gatt_db.h>" if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+    help
+        Set path to extra application Gatt db header.
+
+config CHIP_APP_EXTRA_GATT_UUID_HEADER
+    string "Extra application Gatt UUID header"
+    default "<$(CHIP_ROOT)/examples/platform/nxp/mcxw71/app_ble/include/extra_gatt_uuid128.h>" if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+    help
+        Set path to extra application Gatt UUID header.
+endif
 
 config DIAG_LOGS_DEMO
 	bool "Diagnostic log demo"

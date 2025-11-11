@@ -43,6 +43,9 @@ class TC_CNET_4_1(MatterBaseTest):
     def desc_TC_CNET_4_1(self) -> str:
         return "[TC-CNET-4.1] [Wi-Fi] Verification for attributes check [DUT-Server]"
 
+    def pics_TC_CNET_4_1(self):
+        return ['CNET.S.F00']
+
     def steps_TC_CNET_4_1(self) -> list[TestStep]:
         steps = [
             TestStep(0, test_plan_support.commission_if_required(), "", is_commissioning=True),
@@ -120,8 +123,8 @@ class TC_CNET_4_1(MatterBaseTest):
         network_ids_list = []
         # Search for connected networks and ids in all endpoints. Gather by endpoints. Join all the networks in a single list.
         for ep in networks_dict:
-            network_count[ep] = sum(map(lambda x: x.connected, networks_dict[ep]))
-            network_ids[ep] = list(map(lambda x: x.networkID, networks_dict[ep]))
+            network_count[ep] = sum((x.connected for x in networks_dict[ep]))
+            network_ids[ep] = [x.networkID for x in networks_dict[ep]]
             network_ids_list.extend(network_ids[ep])
         logger.info(f"All networkd ids found: {network_ids_list}")
         # Check network attribute if is connected in the current cluster
@@ -165,7 +168,7 @@ class TC_CNET_4_1(MatterBaseTest):
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.LastNetworkID)
         logger.info(f"Last connected network: {last_network_id}")
-        matching_networks_count = sum(map(lambda x: x == last_network_id, network_ids_list))
+        matching_networks_count = sum((x == last_network_id for x in network_ids_list))
         asserts.assert_equal(matching_networks_count, 1,
                              "Verify that LastNetworkID attribute matches the NetworkID count of the entries")
         asserts.assert_in(last_network_id, network_ids_list,

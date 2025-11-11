@@ -46,13 +46,13 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
-class TC_WebRTCProvider_2_3(MatterBaseTest, WEBRTCPTestBase):
+class TC_WebRTCP_2_3(MatterBaseTest, WEBRTCPTestBase):
 
-    def desc_TC_WebRTCProvider_2_3(self) -> str:
+    def desc_TC_WebRTCP_2_3(self) -> str:
         """Returns a description of this test"""
         return "[TC-{picsCode}-2.3] Validate setting an SDP Offer to start a new session with {DUT_Server}"
 
-    def steps_TC_WebRTCProvider_2_3(self) -> list[TestStep]:
+    def steps_TC_WebRTCP_2_3(self) -> list[TestStep]:
         """
         Define the step-by-step sequence for the test.
         """
@@ -63,14 +63,29 @@ class TC_WebRTCProvider_2_3(MatterBaseTest, WEBRTCPTestBase):
             TestStep(4, "Allocate Audio and Video Streams"),
             TestStep(5, "Send ProvideOffer with VideoStreamID that doesn't match AllocatedVideoStreams => expect DYNAMIC_CONSTRAINT_ERROR"),
             TestStep(6, "Send ProvideOffer with AudioStreamID that doesn't match AllocatedAudioStreams => expect DYNAMIC_CONSTRAINT_ERROR"),
-            TestStep(7, "Write SoftLivestreamPrivacyModeEnabled=true, send ProvideOffer => expect INVALID_IN_STATE"),
-            TestStep(8, "Write SoftLivestreamPrivacyModeEnabled=false, send valid ProvideOffer => expect ProvideOfferResponse"),
+            TestStep(7, "Write SoftLivestreamPrivacyModeEnabled=true, send ProvideOffer with StreamUsage = LiveView => expect INVALID_IN_STATE"),
+            TestStep(8, "Write SoftLivestreamPrivacyModeEnabled=false, send valid ProvideOffer with StreamUsage = LiveView => expect ProvideOfferResponse"),
             TestStep(9, "Read CurrentSessions attribute => expect 1"),
         ]
         return steps
 
+    def pics_TC_WebRTCP_2_3(self) -> list[str]:
+        """
+        Return the list of PICS applicable to this test case.
+        """
+        pics = [
+            "WEBRTCP.S",           # WebRTC Transport Provider Server
+            "WEBRTCP.S.A0000",     # CurrentSessions attribute
+            "WEBRTCP.S.C02.Rsp",   # ProvideOffer command
+            "WEBRTCP.S.C03.Tx",    # ProvideOfferResponse command
+            "AVSM.S",              # CameraAVStreamManagement Server
+            "AVSM.S.F00",          # Audio Data Output feature
+            "AVSM.S.F01",          # Video Data Output feature
+        ]
+        return pics
+
     @async_test_body
-    async def test_TC_WebRTCProvider_2_3(self):
+    async def test_TC_WebRTCP_2_3(self):
         """
         Executes the test steps for the WebRTC Provider cluster scenario.
         """
@@ -182,7 +197,8 @@ class TC_WebRTCProvider_2_3(MatterBaseTest, WEBRTCPTestBase):
                 webRTCSessionID=NullValue,
                 sdp=test_sdp,
                 streamUsage=3,
-                originatingEndpointID=endpoint
+                originatingEndpointID=endpoint,
+                videoStreamID=videoStreamID
             )
             try:
                 await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
@@ -205,7 +221,7 @@ class TC_WebRTCProvider_2_3(MatterBaseTest, WEBRTCPTestBase):
         cmd = cluster.Commands.ProvideOffer(
             webRTCSessionID=NullValue,
             sdp=test_sdp,
-            streamUsage=3,
+            streamUsage=3,  # LiveView
             originatingEndpointID=endpoint,
             videoStreamID=videoStreamID,
             audioStreamID=audioStreamID

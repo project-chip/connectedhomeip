@@ -65,6 +65,7 @@ shared_library("ChipDeviceCtrl") {
       "ChipDeviceController-ScriptPairingDeviceDiscoveryDelegate.h",
       "ChipDeviceController-StorageDelegate.cpp",
       "ChipDeviceController-StorageDelegate.h",
+      "JsonTlv.cpp",
       "OpCredsBinding.cpp",
       "matter/bdx/bdx-transfer.cpp",
       "matter/bdx/bdx-transfer.h",
@@ -103,6 +104,7 @@ shared_library("ChipDeviceCtrl") {
         "matter/webrtc/WebRTCTransportCluster.cpp",
       ]
     }
+    defines += [ "CHIP_CONFIG_MAX_ACTIVE_TCP_CONNECTIONS=20" ]
     defines += [ "CHIP_CONFIG_MAX_GROUPS_PER_FABRIC=50" ]
     defines += [ "CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC=50" ]
 
@@ -143,6 +145,7 @@ shared_library("ChipDeviceCtrl") {
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/dnssd",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support/jsontlv",
     "${chip_root}/src/platform",
     "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload",
@@ -210,6 +213,7 @@ matter_python_wheel_action("matter-core") {
         "matter/ChipCommissionableNodeCtrl.py",
         "matter/ChipStack.py",
         "matter/FabricAdmin.py",
+        "matter/MatterTlvJson.py",
         "matter/__init__.py",
         "matter/bdx/Bdx.py",
         "matter/bdx/BdxProtocol.py",
@@ -263,12 +267,15 @@ matter_python_wheel_action("matter-core") {
       if (chip_support_webrtc_python_bindings) {
         sources += [
           "matter/webrtc/__init__.py",
+          "matter/webrtc/async_websocket_client.py",
+          "matter/webrtc/browser_peer_connection.py",
+          "matter/webrtc/browser_webrtc_client.py",
           "matter/webrtc/command.py",
+          "matter/webrtc/libdatachannel_peer_connection.py",
+          "matter/webrtc/libdatachannel_webrtc_client.py",
           "matter/webrtc/library_handle.py",
-          "matter/webrtc/peer_connection.py",
           "matter/webrtc/types.py",
           "matter/webrtc/utils.py",
-          "matter/webrtc/webrtc_client.py",
           "matter/webrtc/webrtc_manager.py",
         ]
       }
@@ -330,13 +337,14 @@ matter_python_wheel_action("matter-core") {
   py_package_reqs = [
     "coloredlogs",
     "construct",
-    "dacite",
-    "rich",
-    "pyyaml",
-    "ipdb",
-    "deprecation",
     "cryptography",
+    "dacite",
+    "deprecation",
     "ecdsa",
+    "ipdb",
+    "matter-clusters",
+    "pyyaml",
+    "rich",
   ]
 
   if (current_cpu == "x64") {
@@ -370,7 +378,7 @@ matter_python_wheel_action("matter-core") {
 
   public_deps = [ ":ChipDeviceCtrl" ]
 
-  output_name = "${py_package_name}-${chip_python_version}-cp37-abi3-${py_platform_tag}.whl"
+  output_name = "${py_package_name}-${chip_python_version}-cp311-abi3-${py_platform_tag}.whl"
 }
 
 matter_python_wheel_action("matter-clusters") {
@@ -404,8 +412,8 @@ matter_python_wheel_action("matter-clusters") {
   ]
 
   py_package_reqs = [
-    "dacite",
     "aenum",
+    "dacite",
   ]
 
   py_package_name = "${chip_python_package_prefix}-clusters"
@@ -414,8 +422,8 @@ matter_python_wheel_action("matter-clusters") {
   output_name = "${py_package_name}-${chip_python_version}-py3-none-${py_platform_tag}.whl"
 }
 
-matter_python_wheel_action("chip-repl") {
-  py_scripts = [ "chip-repl.py" ]
+matter_python_wheel_action("matter-repl") {
+  py_scripts = [ "matter-repl.py" ]
 
   py_manifest_files = [
     {
@@ -423,7 +431,7 @@ matter_python_wheel_action("chip-repl") {
       sources = [
         "matter/ChipBluezMgr.py",
         "matter/ChipCoreBluetoothMgr.py",
-        "matter/ChipReplStartup.py",
+        "matter/ReplStartup.py",
       ]
       sources += py_scripts
     },
@@ -453,6 +461,7 @@ matter_python_wheel_action("chip-repl") {
     "pyobjc-framework-corebluetooth ; sys_platform==\"darwin\"",
     "dbus-python==1.2.18 ; sys_platform==\"linux\"",
     "pygobject==3.50.0 ; sys_platform==\"linux\"",
+    "matter-core",
   ]
 
   py_package_name = "${chip_python_package_prefix}-repl"

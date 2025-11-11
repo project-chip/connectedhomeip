@@ -96,7 +96,7 @@ def convert_yaml_octet_string_to_bytes(s: str) -> bytes:
     #   * Any character greater than 0xFF has the upper bytes chopped off.
     as_bytes = [ord(c) for c in s]
 
-    if any([value > 0x200 for value in as_bytes]):
+    if any(value > 0x200 for value in as_bytes):
         raise ValueError('Unsupported char in octet string %r' % as_bytes)
     accumulated_hex = ''.join([f"{(v & 0xFF):02x}" for v in as_bytes])
     return binascii.unhexlify(accumulated_hex)

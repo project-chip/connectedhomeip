@@ -35,7 +35,6 @@
 #       --endpoint 0
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --enable-key 000102030405060708090a0b0c0d0e0f
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -75,7 +74,7 @@ class TC_DGSW_2_2(MatterBaseTest):
         return "[TC-DGSW-2.2] Event Functionality with Server as DUT"
 
     def pics_TC_DGSW_2_2(self) -> list[str]:
-        return ["DGSW.S"]
+        return ["DGSW.S.E00"]
 
     def steps_TC_DGSW_2_2(self) -> list[TestStep]:
         steps = [

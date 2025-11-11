@@ -74,13 +74,13 @@ ecdsa==0.19.0
     # via
     #   -r requirements.esp32.txt
     #   esptool
-esp-coredump==1.7.0
+esp-coredump==1.14.0
     # via esp-idf-monitor
-esp-idf-kconfig==1.2.0
+esp-idf-kconfig==1.5.0
     # via -r requirements.esp32.txt
-esp-idf-monitor==1.1.1
+esp-idf-monitor==1.8.0
     # via -r requirements.esp32.txt
-esptool==4.6.2
+esptool==4.10.0
     # via esp-coredump
 executing==1.2.0
     # via stack-data
@@ -96,7 +96,7 @@ ghapi==1.0.3
     # via -r requirements.memory.txt
 humanfriendly==10.0
     # via coloredlogs
-idf-component-manager==1.5.2
+idf-component-manager==2.4.1
     # via -r requirements.esp32.txt
 idna==3.4
     # via requests
@@ -257,7 +257,7 @@ types-protobuf==5.29.1.20250208
     # via
     #   -r requirements.all.txt
     #   mypy-protobuf
-typing-extensions==4.6.1
+typing-extensions==4.8.0
     # via mypy
 urllib3==1.26.14
     # via requests

@@ -1824,6 +1824,9 @@ OPCREDS.S.C08.Tx=1
 OPCREDS.S.C09.Rsp=1
 OPCREDS.S.C0a.Rsp=1
 OPCREDS.S.C0b.Rsp=1
+OPCREDS.S.C0c.Tx=1
+OPCREDS.S.C0d.Tx=1
+OPCREDS.S.C0e.Rsp=1
 
 # Client Attributes
 OPCREDS.C=1
@@ -3024,6 +3027,17 @@ THNETDIR.S=1
 WIFINM.S=1
 
 # Camera AV Stream Management Cluster
+# Server
+AVSM.S=1
+
+# Features
+AVSM.S.F00=1    # Audio Data Output feature
+AVSM.S.F01=1    # Video Data Output feature
+AVSM.S.F02=1    # Audio Data Input feature
+AVSM.S.F03=1    # Video Data Input feature
+AVSM.S.F04=1    # Speaker feature
+
+# Attributes
 AVSM.S.A0000=1
 AVSM.S.A0001=1
 AVSM.S.A0002=1
@@ -3066,6 +3080,48 @@ AVSM.S.A0026=1
 AVSM.S.A0027=1
 AVSM.S.A0028=1
 
+# Commodity Tariff
+#Server
+SETRF.S=1
+
+#Features
+SETRF.S.F00=1
+SETRF.S.F01=1
+SETRF.S.F02=1
+SETRF.S.F03=1
+SETRF.S.F04=1
+SETRF.S.F05=1
+
+#Attributes
+SETRF.S.A0000=1
+SETRF.S.A0001=1
+SETRF.S.A0002=1
+SETRF.S.A0003=1
+SETRF.S.A0004=1
+SETRF.S.A0005=1
+SETRF.S.A0006=1
+SETRF.S.A0007=1
+SETRF.S.A0008=1
+SETRF.S.A0009=1
+SETRF.S.A000A=1
+SETRF.S.A000B=1
+SETRF.S.A000C=1
+SETRF.S.A000D=1
+SETRF.S.A000E=1
+SETRF.S.A000F=1
+SETRF.S.A0010=1
+SETRF.S.A0011=1
+SETRF.S.A0012=1
+
+#Commands
+#Received
+SETRF.S.C00.Rsp=1
+SETRF.S.C01.Rsp=1
+
+#Generated
+SETRF.S.C00.Tx=1
+SETRF.S.C01.Tx=1
+
 # Commodity Metering
 #Server
 COMMTR.S=1
@@ -3088,3 +3144,38 @@ MTRID.S.A0001=1
 MTRID.S.A0002=1
 MTRID.S.A0003=1
 MTRID.S.A0004=1
+
+# WebRTC Transport Provider Cluster
+# Server
+WEBRTCP.S=1
+
+# Features
+WEBRTCP.S.F00=1    # Metadata transmission feature
+WEBRTCP.S.F01=1    # SFrame End-to-End Encryption feature
+
+# Attributes  
+WEBRTCP.S.A0000=1  # CurrentSessions attribute
+
+# Commands Received
+WEBRTCP.S.C00.Rsp=1  # SolicitOffer
+WEBRTCP.S.C02.Rsp=1  # ProvideOffer
+WEBRTCP.S.C04.Rsp=1  # ProvideAnswer
+WEBRTCP.S.C05.Rsp=1  # ProvideICECandidates
+WEBRTCP.S.C06.Rsp=1  # EndSession
+
+# Commands Generated
+WEBRTCP.S.C01.Tx=1   # SolicitOfferResponse
+WEBRTCP.S.C03.Tx=1   # ProvideOfferResponse
+
+# WebRTC Transport Requestor Cluster
+# Server
+WEBRTCR.S=1
+
+# Attributes  
+WEBRTCR.S.A0000=1    # CurrentSessions attribute
+
+# Commands Received
+WEBRTCR.S.C00.Rsp=1  # Offer
+WEBRTCR.S.C01.Rsp=1  # Answer  
+WEBRTCR.S.C02.Rsp=1  # ICECandidates
+WEBRTCR.S.C03.Rsp=1  # End

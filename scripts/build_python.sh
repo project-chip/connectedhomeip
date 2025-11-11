@@ -35,15 +35,16 @@ echo_bold_white() {
 }
 
 CHIP_ROOT=$(_normpath "$(dirname "$0")/..")
-OUTPUT_ROOT="$CHIP_ROOT/out/python_lib"
 
 declare enable_ble=true
+declare enable_nfc=false
 declare enable_ipv4=true
 declare wifi_paf_config=""
 declare chip_detail_logging=false
 declare chip_mdns=minimal
 declare chip_case_retry_delta
 declare install_virtual_env
+declare output_root="$CHIP_ROOT/out/python_lib"
 declare clean_virtual_env=yes
 declare install_pytest_deps=yes
 declare install_jupyterlab=no
@@ -70,9 +71,11 @@ Input Options:
                                                             By default it is $chip_detail_logging.
   -m, --chip_mdns           ChipMDNSValue                   Specify ChipMDNSValue as platform or minimal.
                                                             By default it is $chip_mdns.
+  -n, --enable_nfc          <true/false>                    Enable NFC in the controller (default=$enable_nfc)
   -w, --enable_webrtc       <true/false>                    Enable WebRTC support in the controller (default=$enable_webrtc)
   -t --time_between_case_retries MRPActiveRetryInterval     Specify MRPActiveRetryInterval value
                                                             Default is 300 ms
+  -O, --output_root         <path>                          Path for the generated bindings (default=$output_root)
   -i, --install_virtual_env <path>                          Create a virtual environment with the wheels installed
                                                             <path> represents where the virtual environment is to be created.
   -c, --clean_virtual_env  <yes|no>                         When installing a virtual environment, create/clean it first.
@@ -103,6 +106,14 @@ while (($#)); do
             enable_ble=$2
             if [[ "$enable_ble" != "true" && "$enable_ble" != "false" ]]; then
                 echo "Error: --enable_ble/-b should have a true/false value, not '$enable_ble'" >&2
+                exit 1
+            fi
+            shift
+            ;;
+        --enable_nfc | -n)
+            enable_nfc=$2
+            if [[ "$enable_nfc" != "true" && "$enable_nfc" != "false" ]]; then
+                echo "Error: --enable_nfc/-n should have a true/false value, not '$enable_nfc'" >&2
                 exit 1
             fi
             shift
@@ -146,6 +157,10 @@ while (($#)); do
             ;;
         --time_between_case_retries | -t)
             chip_case_retry_delta=$2
+            shift
+            ;;
+        --output_root | -O)
+            output_root=$2
             shift
             ;;
         --install_virtual_env | -i)
@@ -214,6 +229,7 @@ echo "  chip_mdns=\"$chip_mdns\""
 echo "  chip_case_retry_delta=\"$chip_case_retry_delta\""
 echo "  pregen_dir=\"$pregen_dir\""
 echo "  enable_ble=\"$enable_ble\""
+echo "  enable_nfc=\"$enable_nfc\""
 if [[ -n $wifi_paf_config ]]; then
     echo "  $wifi_paf_config"
 fi
@@ -270,6 +286,7 @@ gn_args=(
     "chip_project_config_include_dirs=[\"//config/python\"]"
     "chip_config_network_layer_ble=$enable_ble"
     "chip_enable_ble=$enable_ble"
+    "chip_enable_nfc_based_commissioning=$enable_nfc"
     "chip_inet_config_enable_ipv4=$enable_ipv4"
     "chip_crypto=\"$chip_crypto\""
     "chip_build_controller_dynamic_server=$chip_build_controller_dynamic_server"
@@ -295,7 +312,7 @@ fi
 # Append extra arguments provided by the user.
 gn_args+=("${extra_gn_args[@]}")
 
-gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="${gn_args[*]}"
+gn --root="$CHIP_ROOT" gen "$output_root" --args="${gn_args[*]}"
 
 # Set up ccache environment for compilation
 if [[ "$enable_ccache" == "yes" ]]; then
@@ -309,20 +326,20 @@ if [[ "$enable_ccache" == "yes" ]]; then
 fi
 
 # Compile Python wheels
-ninja -C "$OUTPUT_ROOT" python_wheels
+ninja -C "$output_root" python_wheels
 
 # Add wheels from matter_python_wheel_action templates.
-WHEEL=("$OUTPUT_ROOT"/controller/python/matter*.whl)
+WHEEL=("$output_root"/controller/python/matter*.whl)
 
 # Add the matter_testing_infrastructure wheel
-WHEEL+=("$OUTPUT_ROOT"/obj/src/python_testing/matter_testing_infrastructure/matter-testing._build_wheel/matter_testing*.whl)
+WHEEL+=("$output_root"/obj/src/python_testing/matter_testing_infrastructure/matter-testing._build_wheel/matter_testing*.whl)
 
 if [ "$install_pytest_deps" = "yes" ]; then
     # Add wheels with YAML testing support.
     WHEEL+=(
         # Add matter-idl as well as matter-yamltests depends on it.
-        "$OUTPUT_ROOT"/python/obj/scripts/py_matter_idl/matter-idl._build_wheel/matter_idl-*.whl
-        "$OUTPUT_ROOT"/python/obj/scripts/py_matter_yamltests/matter-yamltests._build_wheel/matter_yamltests-*.whl
+        "$output_root"/python/obj/scripts/py_matter_idl/matter-idl._build_wheel/matter_idl-*.whl
+        "$output_root"/python/obj/scripts/py_matter_yamltests/matter-yamltests._build_wheel/matter_yamltests-*.whl
     )
 fi
 
@@ -333,7 +350,7 @@ fi
 if [[ "$enable_pw_rpc" == "true" ]]; then
     echo "Installing Pw RPC Python wheels"
     PWRPC_ROOT="$CHIP_ROOT/examples/common/pigweed/rpc_console"
-    PWRPC_OUTPUT_ROOT="$OUTPUT_ROOT/pwrpc"
+    PWRPC_OUTPUT_ROOT="$output_root/pwrpc"
     gn --root="$PWRPC_ROOT" gen "$PWRPC_OUTPUT_ROOT"
     # Compile Python wheels
     ninja -C "$PWRPC_OUTPUT_ROOT" chip_rpc_wheel

@@ -23,8 +23,8 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing.matter_asserts import assert_non_empty_string, is_valid_bool_value
-from matter.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches,
-                                           type_matches)
+from matter.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_feature, matchers,
+                                           run_if_endpoint_matches)
 
 
 class TC_CNET_4_9(MatterBaseTest):
@@ -120,7 +120,7 @@ class TC_CNET_4_9(MatterBaseTest):
         result = await self.send_single_cmd(cmd=cmd)
 
         # Verify that DUT sends ArmFailSafeResponse command to the TH
-        asserts.assert_true(type_matches(result, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
+        asserts.assert_true(matchers.is_type(result, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
                             "Unexpected value returned from ArmFailSafe")
 
         # TH reads the Networks attribute list from the DUT on all endpoints (all network commissioning clusters)
@@ -133,7 +133,7 @@ class TC_CNET_4_9(MatterBaseTest):
 
         # Verify that there is a single connected network across ALL network commissioning clusters
         for ep in networks_dict:
-            connected_network_count[ep] = sum(map(lambda x: x.connected, networks_dict[ep]))
+            connected_network_count[ep] = sum((x.connected for x in networks_dict[ep]))
             logging.info(f"Connected networks count by endpoint: {connected_network_count}")
             asserts.assert_equal(sum(connected_network_count.values()), 1,
                                  "Verify that only one entry has connected status as TRUE across ALL endpoints")
@@ -182,7 +182,7 @@ class TC_CNET_4_9(MatterBaseTest):
 
         # Verify that DUT sends NetworkConfigResponse to command with the following fields:
         # NetworkingStatus is success
-        asserts.assert_true(type_matches(result, Clusters.NetworkCommissioning.Commands.NetworkConfigResponse),
+        asserts.assert_true(matchers.is_type(result, Clusters.NetworkCommissioning.Commands.NetworkConfigResponse),
                             "Unexpected value returned from RemoveNetwork")
         asserts.assert_equal(result.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
                              "Network status was not successful")
@@ -257,7 +257,7 @@ class TC_CNET_4_9(MatterBaseTest):
         result = await self.send_single_cmd(cmd=cmd)
 
         # Verify that DUT sends ArmFailSafeResponse command to the TH
-        asserts.assert_true(type_matches(result, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
+        asserts.assert_true(matchers.is_type(result, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
                             "Unexpected value returned from ArmFailSafe")
 
         # TTH reads Networks attribute from the DUT on the current endpoint
@@ -283,7 +283,7 @@ class TC_CNET_4_9(MatterBaseTest):
         result = await self.send_single_cmd(cmd=cmd)
 
         # Verify that DUT sends ArmFailSafeResponse command to the TH
-        asserts.assert_true(type_matches(result, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
+        asserts.assert_true(matchers.is_type(result, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
                             "Unexpected value returned from ArmFailSafe")
 
         # TH sends RemoveNetwork Command to the DUT with NetworkID field set to the value provided in the `--wifi-ssid` parameter and Breadcrumb field set to 1
@@ -292,7 +292,7 @@ class TC_CNET_4_9(MatterBaseTest):
         result = await self.send_single_cmd(cmd=cmd)
 
         # Verify that DUT sends NetworkConfigResponse to command with the following fields: NetworkingStatus is success
-        asserts.assert_true(type_matches(result, Clusters.NetworkCommissioning.Commands.NetworkConfigResponse),
+        asserts.assert_true(matchers.is_type(result, Clusters.NetworkCommissioning.Commands.NetworkConfigResponse),
                             "Unexpected value returned from RemoveNetwork")
         asserts.assert_equal(result.networkingStatus, Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum.kSuccess,
                              "Network status was not successful")
@@ -313,7 +313,7 @@ class TC_CNET_4_9(MatterBaseTest):
         result = await self.send_single_cmd(cmd=cmd)
 
         # Verify that DUT sends ArmFailSafeResponse command to the TH
-        asserts.assert_true(type_matches(result, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
+        asserts.assert_true(matchers.is_type(result, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
                             "Unexpected value returned from ArmFailSafe")
 
         # TH reads Networks attribute from the DUT on the current endpoint
@@ -338,7 +338,7 @@ class TC_CNET_4_9(MatterBaseTest):
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900)
         result = await self.send_single_cmd(cmd=cmd)
 
-        asserts.assert_true(type_matches(result, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
+        asserts.assert_true(matchers.is_type(result, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
                             "Unexpected value returned from ArmFailSafe")
 
         # TH sends the AddOrUpdateWiFiNetwork command to the DUT

@@ -15,9 +15,9 @@
  *    limitations under the License.
  */
 
-#import "MTRDeviceController.h"
-
 #import <Foundation/Foundation.h>
+
+#import "MTRSessionParameters.h"
 
 #include <app/OperationalSessionSetup.h>
 #include <controller/CHIPDeviceController.h>
@@ -55,13 +55,10 @@ public:
     }
 
     /**
-     * connect must be called on the Matter queue, and will invoke the
+     * Connect must be called on the Matter queue, and will invoke the
      * completionHandler on the Matter queue as well.
      */
-    CHIP_ERROR connect(chip::Controller::DeviceController * controller, chip::NodeId deviceID)
-    {
-        return controller->GetConnectedDevice(deviceID, &mOnConnected, &mOnConnectFailed);
-    }
+    void Connect(chip::Controller::DeviceController * controller, chip::NodeId deviceID, MTRSessionParameters parameters);
 
 private:
     MTRInternalDeviceConnectionCallback mCompletionHandler;

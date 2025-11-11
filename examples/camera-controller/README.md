@@ -43,6 +43,7 @@ sudo apt install \
   gstreamer1.0-plugins-bad \
   gstreamer1.0-libav \
   libgstreamer1.0-dev \
+  libavformat60 \
   libgstreamer-plugins-base1.0-dev
 ```
 
@@ -94,7 +95,7 @@ environment to ensure all dependencies are correct.
 1. Pull the Cross-Compilation Docker Image
 
 ```
-docker pull ghcr.io/project-chip/chip-build-crosscompile:162
+docker pull ghcr.io/project-chip/chip-build-crosscompile:174
 ```
 
 2. Run the Docker Container This command starts an interactive shell inside the
@@ -102,7 +103,7 @@ docker pull ghcr.io/project-chip/chip-build-crosscompile:162
    container's /var/connectedhomeip directory.
 
 ```
-docker run -it -v ~/connectedhomeip:/var/connectedhomeip ghcr.io/project-chip/chip-build-crosscompile:162 /bin/bash
+docker run -it -v ~/connectedhomeip:/var/connectedhomeip ghcr.io/project-chip/chip-build-crosscompile:174 /bin/bash
 ```
 
 3. Build Inside the Container From within the Docker container's shell, execute
@@ -149,8 +150,23 @@ Clean up any existing configurations (first-time pairing only):
 sudo rm -rf /tmp/chip_*
 ```
 
+#### Video Format (`YUYV` Only)
+
+This demo supports only the uncompressed `YUYV` pixel format for capture.
+
+Identify the correct video device first (examples: `video0`, `video1`). You can
+list devices and verify the format support with:
+
 ```
-./out/linux-x64-camera/chip-camera-app
+v4l2-ctl --list-devices
+v4l2-ctl -d /dev/video0 --list-formats-ext | grep -A4 YUYV || true
+```
+
+Launch the camera app explicitly selecting the device (replace `video0` if
+needed):
+
+```
+./out/linux-x64-camera/chip-camera-app --camera-video-device video0
 ```
 
 Terminal 2: Launch and Use the Camera Controller (Client)
@@ -174,12 +190,12 @@ Wait for the command to complete and confirm that commissioning was successful.
 
 3. To start a live video stream from your camera, use the `liveview start`
    command followed by the nodeID you set during pairing. For example, if your
-   nodeID is 1, you can request a stream with a minimum resolution of 800x600
+   nodeID is 1, you can request a stream with a minimum resolution of 640x480
    pixels and a minimum frame rate of 30 frames per second using the command
    below.
 
 ```
-liveview start 1 --min-res-width 800 --min-res-height 600 --min-framerate 30
+liveview start 1 --min-res-width 640 --min-res-height 480 --min-framerate 30
 ```
 
 To see what video formats and resolutions your camera supports, first list the

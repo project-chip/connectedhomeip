@@ -63,7 +63,6 @@ void OnTriggerEffectComplete(chip::System::Layer * systemLayer, void * appState)
     // Use invalid value for identifiers to enable TriggerEffect command
     // to stop Identify command for each effect
     gIdentify.mCurrentEffectIdentifier = Clusters::Identify::EffectIdentifierEnum::kUnknownEnumValue;
-    gIdentify.mTargetEffectIdentifier  = Clusters::Identify::EffectIdentifierEnum::kUnknownEnumValue;
     gIdentify.mEffectVariant           = Clusters::Identify::EffectVariantEnum::kDefault;
 
 #if CONFIG_ENABLE_FEEDBACK

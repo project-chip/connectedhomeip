@@ -35,10 +35,6 @@
 namespace chip {
 namespace DeviceLayer {
 
-namespace Internal {
-extern CHIP_ERROR InitLwIPCoreLock(void);
-}
-
 PlatformManagerImpl PlatformManagerImpl::sInstance;
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
@@ -46,10 +42,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 #if CONFIG_ENABLE_ASR_LEGA_RTOS
     CHIP_ERROR err = CHIP_NO_ERROR;
     OSStatus result;
-
-    /* Initialize LwIP lock. */
-    err = Internal::InitLwIPCoreLock();
-    SuccessOrExit(err);
 
     if (mEventQueue == NULL)
     {
@@ -74,10 +66,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     ReturnErrorOnFailure(GenericPlatformManagerImpl<ImplClass>::_InitChipStack());
 #else
     CHIP_ERROR err;
-
-    // Make sure the LwIP core lock has been initialized
-    err = Internal::InitLwIPCoreLock();
-    SuccessOrExit(err);
 
     mStartTime = System::SystemClock().GetMonotonicTimestamp();
 
@@ -255,11 +243,6 @@ void PlatformManagerImpl::EventLoopTaskMain(uint32_t arg)
     ChipLogDetail(DeviceLayer, "CHIP task running");
     PlatformMgrImpl().RunEventLoopInternal();
     lega_rtos_delete_thread(NULL);
-}
-#else
-CHIP_ERROR PlatformManagerImpl::InitLwIPCoreLock(void)
-{
-    return Internal::InitLwIPCoreLock();
 }
 #endif
 

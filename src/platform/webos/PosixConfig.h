@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-class ChipLinuxStorage;
+class ChipWebOSStorage;
 
 /**
  * Provides functions and definitions for accessing device configuration information on the Posix.
@@ -63,19 +63,16 @@ public:
     static const Key kConfigKey_HardwareVersion;
     static const Key kConfigKey_ManufacturingDate;
     static const Key kConfigKey_SetupPinCode;
-    static const Key kConfigKey_FabricId;
     static const Key kConfigKey_ServiceConfig;
     static const Key kConfigKey_PairedAccountId;
     static const Key kConfigKey_ServiceId;
-    static const Key kConfigKey_FabricSecret;
-    static const Key kConfigKey_GroupKeyIndex;
     static const Key kConfigKey_LastUsedEpochKeyId;
     static const Key kConfigKey_FailSafeArmed;
     static const Key kConfigKey_SetupDiscriminator;
     static const Key kConfigKey_RegulatoryLocation;
     static const Key kConfigKey_CountryCode;
-    static const Key kConfigKey_Breadcrumb;
     static const Key kConfigKey_LocationCapability;
+    static const Key kConfigKey_ConfigurationVersion;
     static const Key kConfigKey_Spake2pIterationCount;
     static const Key kConfigKey_Spake2pSalt;
     static const Key kConfigKey_Spake2pVerifier;
@@ -86,8 +83,6 @@ public:
     static const Key kCounterKey_UpTime;
     static const Key kCounterKey_TotalOperationalHours;
     static const Key kCounterKey_BootReason;
-
-    static const char kGroupKeyNamePrefix[];
 
     static CHIP_ERROR Init();
 
@@ -116,7 +111,7 @@ public:
     static CHIP_ERROR ClearNamespace(const char * ns);
 
 private:
-    static ChipLinuxStorage * GetStorageForNamespace(Key key);
+    static ChipWebOSStorage * GetStorageForNamespace(Key key);
 };
 
 struct PosixConfig::Key

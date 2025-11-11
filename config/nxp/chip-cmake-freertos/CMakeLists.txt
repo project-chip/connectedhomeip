@@ -52,6 +52,7 @@ matter_add_gn_arg_bool("nxp_use_factory_data" ${CONFIG_CHIP_FACTORY_DATA})
 matter_add_gn_arg_bool("nxp_enable_secure_whole_factory_data" ${CONFIG_CHIP_ENABLE_SECURE_WHOLE_FACTORY_DATA})
 matter_add_gn_arg_bool("nxp_enable_secure_EL2GO_factory_data" ${CONFIG_CHIP_ENABLE_EL2GO_FACTORY_DATA})
 matter_add_gn_arg_bool("nxp_enable_matter_cli" CONFIG_CHIP_LIB_SHELL)
+matter_add_gn_arg_bool("nxp_multiple_ble_connections" CONFIG_CHIP_NXP_MULTIPLE_BLE_CONNECTIONS)
 matter_add_gn_arg_bool("nxp_enable_pairing_autostart" CONFIG_CHIP_ENABLE_PAIRING_AUTOSTART)
 matter_add_gn_arg_bool("nxp_use_low_power" CONFIG_NXP_USE_LOW_POWER)
 matter_add_gn_arg_bool("nxp_use_plain_dac_key" CONFIG_NXP_USE_PLAIN_DAC_KEY)
@@ -115,6 +116,11 @@ matter_common_gn_args(
     PROJECT_CONFIG_INC_DIR ${CONFIG_CHIP_PROJECT_CONFIG_INCLUDE_DIRS}
     DEVICE_INFO_EXAMPLE_PROVIDER CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
 )
+
+if(NOT "${CONFIG_NXP_CUSTOM_UNIT_TESTS_DIR}" STREQUAL "")
+    # Only for NXP internal usage
+    matter_add_gn_arg_string("nxp_custom_unit_tests_dir" "${CONFIG_NXP_CUSTOM_UNIT_TESTS_DIR}")
+endif()
 
 matter_generate_args_tmp_file()
 

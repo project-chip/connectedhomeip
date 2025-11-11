@@ -36,7 +36,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:162
+            image: ghcr.io/project-chip/chip-build:174
 
         steps:
             - name: Checkout
@@ -85,7 +85,6 @@ jobs:
                      --skip-dir platform/FreeRTOS \
                      --skip-dir platform/Infineon \
                      --skip-dir platform/Linux \
-                     --skip-dir platform/mbed \
                      --skip-dir platform/mt793x \
                      --skip-dir platform/nxp \
                      --skip-dir platform/OpenThread \
@@ -112,8 +111,6 @@ jobs:
                      --known-failure app/util/attribute-storage.h \
                      --known-failure app/util/attribute-table-detail.h \
                      --known-failure app/util/attribute-table.h \
-                     --known-failure app/util/binding-table.cpp \
-                     --known-failure app/util/binding-table.h \
                      --known-failure app/util/config.h \
                      --known-failure app/util/DataModelHandler.cpp \
                      --known-failure app/util/DataModelHandler.h \
@@ -253,7 +250,10 @@ jobs:
             # to avoid our grep regexp matching itself.
             #
             # Known client-side clusters are allowed to use this only.
-            - name: emberAfClusterInit/Shutdown callbacks are for client side use, not server side. Use ClusterServerInit/Shutdown for server clusters
+            - name:
+                  emberAfClusterInit/Shutdown callbacks are for client side use,
+                  not server side. Use ClusterServerInit/Shutdown for server
+                  clusters
               if: always()
               run: |
                   git grep -I -n "void emberAf.*Cluster\(Init\|Shutdown\)Callback("  -- \
@@ -330,6 +330,18 @@ jobs:
                   --skip-subtree src/controller/tests \
                   --skip-from-file scripts/ember_exclusions.txt
 
+            # This check ensures that `SafeAttributePersistenceProvider` nor `AttributePersistenceProvider`
+            # are being used. Exclusions should be removed as soon as a refactor of the file affected is done.
+            - name:
+                  Check for use of 'SafeAttributePersistenceProvider' and
+                  'AttributePersistenceProvider' symbols
+              if: always()
+              run: |
+                  scripts/find_attribute_persistence_provider_usage.sh \
+                  --skip-subtree .github/ \
+                  --skip-subtree scripts/ \
+                  --skip-from-file scripts/attribute_persistence_provider_exclusions.txt
+
             # git grep exits with 0 if it finds a match, but we want
             # to fail (exit nonzero) on match.  And we want to exclude this file,
             # to avoid our grep regexp matching itself, as well as excluding the files
@@ -339,7 +351,7 @@ jobs:
                   type-safe getters
               if: always()
               run: |
-                  git grep -I -n 'emberAfReadAttribute' -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)src/app/util/attribute-table.h' ':(exclude)zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp' ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors.cpp.zapt' ':(exclude)src/app/util/attribute-table.cpp' ':(exclude)src/app/dynamic_server/DynamicDispatcher.cpp' ':(exclude)src/data-model-providers/codegen/ClusterIntegration.cpp' && exit 1 || exit 0
+                  git grep -I -n 'emberAfReadAttribute' -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)src/app/util/attribute-table.h' ':(exclude)zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp' ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors.cpp.zapt' ':(exclude)src/app/util/attribute-table.cpp' ':(exclude)src/app/dynamic_server/DynamicDispatcher.cpp' ':(exclude)src/data-model-providers/codegen/ClusterIntegration.cpp' ':(exclude)src/darwin/Framework/CHIP/ServerEndpoint/MTRIMDispatch.mm' && exit 1 || exit 0
 
             # git grep exits with 0 if it finds a match, but we want
             # to fail (exit nonzero) on match.  And we want to exclude this file,
@@ -413,3 +425,18 @@ jobs:
                   # Ignore uses of `System::Clock::Literals`, because that's the only way to have things using _ms32 or whatnot
                   # in a header file.
                   git grep -I -n -e '^using namespace' --and --not -e 'System::Clock::Literals' -- './**/*.h' ':(exclude)src/platform/*/BLEManager*.h' ':(exclude)./examples' ':(exclude)./third_party' && exit 1 || exit 0
+
+            # git grep exits with 0 if it finds a match, but we want
+            # to fail (exit nonzero) on match.
+            - name:
+                  Check for a direct use of the "logging" module for logging.
+                  Instead one should use a local logger with a name based on
+                  the module name.
+              if: always()
+              run: |
+                  git grep -I -n -E -e 'logging[.](log|debug|info|warn|warning|error|critical|exception)[(]' -- \
+                    'scripts/py_matter_idl' \
+                    'scripts/py_matter_yamltests' \
+                    'src/controller/python' \
+                    'src/python_testing/matter_testing_infrastructure' \
+                    && exit 1 || exit 0

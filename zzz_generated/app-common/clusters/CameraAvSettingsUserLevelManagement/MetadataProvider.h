@@ -41,6 +41,8 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::CameraAvSett
             return PanMin::kMetadataEntry;
         case PanMax::Id:
             return PanMax::kMetadataEntry;
+        case MovementState::Id:
+            return MovementState::kMetadataEntry;
         default:
             return std::nullopt;
         }

@@ -1,0 +1,41 @@
+name: 'Delete Cache'
+description: 'Deletes a GitHub Actions cache by key using the GitHub API'
+inputs:
+  cache-key:
+    required: true
+    description: 'The cache key to delete'
+  github-token:
+    required: true
+    description: 'GitHub token for API authentication'
+runs:
+  using: "composite"
+  steps:
+    - name: Delete cache
+      uses: actions/github-script@v7
+      env:
+        CACHE_KEY: ${{ inputs.cache-key }}
+      with:
+        github-token: ${{ inputs.github-token }}
+        script: |
+          const owner = context.repo.owner;
+          const repo = context.repo.repo;
+          const key = process.env.CACHE_KEY;
+          const ref = context.ref;
+          
+          core.info(`Attempting to delete cache: ${key}`);
+          
+          try {
+            await github.rest.actions.deleteActionsCacheByKey({
+              owner: owner,
+              repo: repo,
+              key: key,
+              ref: ref
+            });
+            core.info(`Successfully deleted cache`);
+          } catch (e) {
+            if (e.status === 404) {
+              core.info(`Cache not found (first run or already deleted)`);
+            } else {
+              core.warning(`Failed to delete cache: ${e.message}`);
+            }
+          }

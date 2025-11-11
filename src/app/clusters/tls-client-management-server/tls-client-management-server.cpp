@@ -40,9 +40,9 @@ using namespace chip::app::Clusters::Tls;
 using namespace chip::app::Clusters::TlsClientManagement;
 using namespace chip::app::Clusters::TlsClientManagement::Structs;
 using namespace chip::app::Clusters::TlsClientManagement::Attributes;
-using chip::Protocols::InteractionModel::Status;
+using namespace Protocols::InteractionModel;
 
-static constexpr uint16_t kSpecMaxHostname = 253;
+static constexpr uint16_t kMaxTlsEndpointId = 65534;
 
 TlsClientManagementServer::TlsClientManagementServer(EndpointId endpointId, TlsClientManagementDelegate & delegate,
                                                      CertificateTable & certificateTable, uint8_t maxProvisioned) :
@@ -68,16 +68,22 @@ TlsClientManagementServer::~TlsClientManagementServer()
 CHIP_ERROR TlsClientManagementServer::Init()
 {
     mCertificateTable.Init(Server::GetInstance().GetPersistentStorage());
+    mDelegate.Init(Server::GetInstance().GetPersistentStorage());
 
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INTERNAL);
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
 
-    return CHIP_NO_ERROR;
+    return Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
 }
 
 CHIP_ERROR TlsClientManagementServer::Finish()
 {
     mCertificateTable.Finish();
+
+    Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
+    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
+
     return CHIP_NO_ERROR;
 }
 
@@ -116,21 +122,8 @@ CHIP_ERROR
 TlsClientManagementServer::EncodeProvisionedEndpoints(EndpointId matterEndpoint, FabricIndex fabric,
                                                       const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
-    for (uint8_t i = 0; true; i++)
-    {
-        TlsClientManagementDelegate::EndpointStructType endpoint;
-
-        auto err = mDelegate.GetProvisionedEndpointByIndex(matterEndpoint, fabric, i, endpoint);
-        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-        {
-            return CHIP_NO_ERROR;
-        }
-
-        ReturnErrorOnFailure(err);
-
-        ReturnErrorOnFailure(encoder.Encode(endpoint));
-    }
-    return CHIP_NO_ERROR;
+    return mDelegate.ForEachEndpoint(matterEndpoint, fabric,
+                                     [&](auto & endpoint) -> CHIP_ERROR { return encoder.Encode(endpoint); });
 }
 
 void TlsClientManagementServer::InvokeCommand(HandlerContext & ctx)
@@ -159,14 +152,26 @@ void TlsClientManagementServer::HandleProvisionEndpoint(HandlerContext & ctx,
 
     VerifyOrReturn(req.hostname.size() >= 4 && req.hostname.size() <= kSpecMaxHostname,
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
+    VerifyOrReturn(req.caid <= kMaxRootCertId, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
+
+    auto fabric = ctx.mCommandHandler.GetAccessingFabricIndex();
+
+    ReturnOnFailure(mCertificateTable.HasRootCertificateEntry(fabric, req.caid),
+                    ctx.mCommandHandler.AddStatus(
+                        ctx.mRequestPath, ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kRootCertificateNotFound)));
+    VerifyOrReturn(req.ccdid.IsNull() || mCertificateTable.HasClientCertificateEntry(fabric, req.ccdid.Value()) == CHIP_NO_ERROR,
+                   ctx.mCommandHandler.AddStatus(
+                       ctx.mRequestPath, ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kClientCertificateNotFound)));
 
     Commands::ProvisionEndpointResponse::Type response;
-    auto status = mDelegate.ProvisionEndpoint(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(), req,
-                                              response.endpointID);
+    auto status = mDelegate.ProvisionEndpoint(ctx.mRequestPath.mEndpointId, fabric, req, response.endpointID);
 
     if (status.IsSuccess())
     {
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+
+        MatterReportingAttributeChangeCallback(ctx.mRequestPath.mEndpointId, TlsClientManagement::Id,
+                                               TlsClientManagement::Attributes::ProvisionedEndpoints::Id);
     }
     else
     {
@@ -178,18 +183,24 @@ void TlsClientManagementServer::HandleFindEndpoint(HandlerContext & ctx, const C
 {
     ChipLogDetail(Zcl, "TlsClientManagement: FindEndpoint");
 
-    Commands::FindEndpointResponse::Type response;
-    TlsClientManagementDelegate::EndpointStructType endpoint;
-    Status status     = mDelegate.FindProvisionedEndpointByID(ctx.mRequestPath.mEndpointId,
-                                                              ctx.mCommandHandler.GetAccessingFabricIndex(), req.endpointID, endpoint);
-    response.endpoint = endpoint;
-    if (status == Protocols::InteractionModel::Status::Success)
+    VerifyOrReturn(req.endpointID <= kMaxTlsEndpointId, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
+
+    CHIP_ERROR result =
+        mDelegate.FindProvisionedEndpointByID(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(),
+                                              req.endpointID, [&](auto & endpoint) -> CHIP_ERROR {
+                                                  Commands::FindEndpointResponse::Type response;
+                                                  response.endpoint = endpoint;
+                                                  ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+                                                  return CHIP_NO_ERROR;
+                                              });
+
+    if (result == CHIP_ERROR_NOT_FOUND)
     {
-        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
     }
-    else
+    else if (result != CHIP_NO_ERROR)
     {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
     }
 }
 
@@ -197,9 +208,23 @@ void TlsClientManagementServer::HandleRemoveEndpoint(HandlerContext & ctx, const
 {
     ChipLogDetail(Zcl, "TlsClientManagement: RemoveEndpoint");
 
+    VerifyOrReturn(req.endpointID <= kMaxTlsEndpointId, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
+
     auto status = mDelegate.RemoveProvisionedEndpointByID(ctx.mRequestPath.mEndpointId,
                                                           ctx.mCommandHandler.GetAccessingFabricIndex(), req.endpointID);
+
+    if (status == Status::Success)
+    {
+        MatterReportingAttributeChangeCallback(ctx.mRequestPath.mEndpointId, TlsClientManagement::Id,
+                                               TlsClientManagement::Attributes::ProvisionedEndpoints::Id);
+    }
+
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+}
+
+void TlsClientManagementServer::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
+{
+    mDelegate.RemoveFabric(fabricIndex);
 }
 
 /** @brief TlsClientManagement Cluster Server Init

@@ -54,6 +54,47 @@ static_library("nxp_crypto_lib") {
     deps = [ "${chip_root}/${nxp_crypto_mw_root}:se05x" ]
   }
 
+  defines = []
+
+  # In case nxp_external_sdk is defined assuming that se05x option would be set by KCONFIG.
+  if (!nxp_external_sdk) {
+    if (chip_se05x_spake_verifier) {
+      defines += [ "ENABLE_SE05X_SPAKE_VERIFIER=1" ]
+    }
+
+    if (chip_se05x_spake_prover) {
+      defines += [ "ENABLE_SE05X_SPAKE_PROVER=1" ]
+    }
+
+    if (chip_se05x_rnd_gen) {
+      defines += [ "ENABLE_SE05X_RND_GEN=1" ]
+    }
+
+    if (chip_se05x_gen_ec_key) {
+      defines += [ "ENABLE_SE05X_GENERATE_EC_KEY=1" ]
+    }
+
+    if (chip_se05x_ecdsa_verify) {
+      defines += [ "ENABLE_SE05X_ECDSA_VERIFY=1" ]
+    }
+
+    if (chip_se05x_pbkdf2_sha256) {
+      defines += [ "ENABLE_SE05X_PBKDF2_SHA256=1" ]
+    }
+
+    if (chip_se05x_hkdf_sha256) {
+      defines += [ "ENABLE_SE05X_HKDF_SHA256=1" ]
+    }
+
+    if (chip_se05x_hmac_sha256) {
+      defines += [ "ENABLE_SE05X_HMAC_SHA256=1" ]
+    }
+
+    if (chip_se05x_device_attestation) {
+      defines += [ "ENABLE_SE05X_DEVICE_ATTESTATION=1" ]
+    }
+  }
+
   external_mbedtls = current_os == "zephyr" || nxp_external_sdk
 
   public_deps = [ "${chip_root}/src/crypto" ]

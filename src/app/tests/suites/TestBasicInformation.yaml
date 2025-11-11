@@ -171,16 +171,38 @@ tests:
     - label: "Read the Specification Version value"
       command: "readAttribute"
       attribute: "SpecificationVersion"
+      minRevision: 3
       response:
-          # For now all-clusters-app has a version 1.4.2.
-          value: 0x01040200
+          # For now all-clusters-app has a version 1.5
+          value: 0x01050000
 
     - label: "Read the Max Paths Per Invoke value"
       command: "readAttribute"
       attribute: "MaxPathsPerInvoke"
+      minRevision: 3
       response:
           constraints:
               minValue: 1
+
+    - label:
+          "Force-fail if minRevision is not handled properly (should be skipped
+          by minRevision). Used to test YAML minRevision support."
+      command: "readAttribute"
+      attribute: "MaxPathsPerInvoke"
+      minRevision: 1000
+      response:
+          constraints:
+              maxValue: 0
+
+    - label:
+          "Force-fail if maxRevision is not handled properly (should be skipped
+          by maxRevision). Used to test YAML maxRevision support."
+      command: "readAttribute"
+      attribute: "MaxPathsPerInvoke"
+      maxRevision: 0
+      response:
+          constraints:
+              maxValue: 0
 
     - label: "Write global ClusterRevision attribute"
       command: "writeAttribute"

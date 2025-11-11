@@ -37,6 +37,9 @@ public:
     // Initialize all the camera device clusters.
     void InitCameraDeviceClusters();
 
+    // Shutdown all the camera device clusters
+    void ShutdownCameraDeviceClusters();
+
 private:
     chip::EndpointId mEndpoint;
     CameraDeviceInterface * mCameraDevice;

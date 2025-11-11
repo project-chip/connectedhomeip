@@ -64,7 +64,7 @@ class FabricAdmin:
         self._activeControllers: List[ChipDeviceCtrl.ChipDeviceController] = []
 
     def NewController(self, nodeId: Optional[int] = None, paaTrustStorePath: str = "",
-                      useTestCommissioner: bool = False, catTags: List[int] = [], keypair: p256keypair.P256Keypair = None,
+                      useTestCommissioner: bool = False, catTags: List[int] = [], keypair: Optional[p256keypair.P256Keypair] = None,
                       dacRevocationSetPath: str = ""):
         ''' Create a new matter.ChipDeviceCtrl.ChipDeviceController instance on this fabric.
 

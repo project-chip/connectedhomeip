@@ -26,7 +26,7 @@ from .derivation import AddBaseInfoPostProcessor
 from .parsing import (ApplyConstraint, AttributesToAttribute, AttributesToBitFieldConstantEntry, AttributesToCommand,
                       AttributesToEvent, AttributesToField, NormalizeDataType, NormalizeName, ParseInt, StringToAccessPrivilege)
 
-LOGGER = logging.getLogger('data-model-xml-parser')
+LOGGER = logging.getLogger(__name__)
 
 
 def is_unused_name(attrs: AttributesImpl):
@@ -267,8 +267,8 @@ class EnumHandler(BaseHandler):
         elif name == "item":
             for key in ["name", "value"]:
                 if key not in attrs:
-                    logging.error("Enumeration %s entry is missing a '%s' entry (at %r)",
-                                  self._enum.name, key, self.context.GetCurrentLocationMeta())
+                    LOGGER.error("Enumeration %s entry is missing a '%s' entry (at %r)",
+                                 self._enum.name, key, self.context.GetCurrentLocationMeta())
                     # bad entry, nothing I can do about it.
                     return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
 
@@ -406,8 +406,8 @@ class CommandHandler(BaseHandler):
         elif ("direction" in attrs) and attrs["direction"] == "responseFromServer":
             is_command = False  # response
         else:
-            LOGGER.warning("Could not clearly determine command direction: %s" %
-                           [item for item in attrs.items()])
+            LOGGER.warning("Could not clearly determine command direction: %s",
+                           list(attrs.items()))
             # Do a best-guess. However we should NOT need to guess once
             # we have a good data set
             is_command = not attrs["name"].endswith("Response")

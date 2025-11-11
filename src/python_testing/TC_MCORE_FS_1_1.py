@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 #
 #    Copyright (c) 2024 Project CHIP Authors
 #    All rights reserved.
@@ -128,9 +129,9 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
 
     def steps_TC_MCORE_FS_1_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Enable Fabric Synchronization on DUT_FSA using the manufacturer specified mechanism.", is_commissioning=True),
+            TestStep("precondition", "Commissioning already done.", is_commissioning=True),
+            TestStep(1, "Enable Fabric Synchronization on DUT_FSA using the manufacturer specified mechanism."),
             TestStep(2, "Commission DUT_FSA onto TH_FSA fabric."),
-            TestStep(3, "Reverse Commission TH_FSAs onto DUT_FSA fabric."),
             TestStep("3a", "TH_FSA sends RequestCommissioningApproval"),
             TestStep("3b", "TH_FSA sends CommissionNode"),
             TestStep("3c", "DUT_FSA commissions TH_FSA"),
@@ -144,6 +145,10 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_MCORE_FS_1_1(self):
+
+        # Commissioning
+        self.step("precondition")
+
         dut_commissioning_control_endpoint = 0
 
         # Get the list of endpoints on the DUT_FSA_BRIDGE before adding the TH_SERVER_NO_UID.
@@ -174,13 +179,12 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
 
         self.step(1)
         self.step(2)
-        self.step(3)
         th_fsa_server_fabrics = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, fabric_filtered=False)
         th_fsa_server_vid = await self.read_single_attribute_check_success(cluster=Clusters.BasicInformation, attribute=Clusters.BasicInformation.Attributes.VendorID, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0)
         th_fsa_server_pid = await self.read_single_attribute_check_success(cluster=Clusters.BasicInformation, attribute=Clusters.BasicInformation.Attributes.ProductID, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0)
 
         event_path = [(dut_commissioning_control_endpoint, Clusters.CommissionerControl.Events.CommissioningRequestResult, 1)]
-        events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
+        events = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path)
 
         self.step("3a")
         good_request_id = 0x1234567812345678
@@ -192,10 +196,10 @@ class TC_MCORE_FS_1_1(MatterBaseTest):
             self.wait_for_user_input("Approve Commissioning approval request on DUT using manufacturer specified mechanism")
 
         if not events:
-            new_event = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
+            new_event = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path)
         else:
             event_nums = [e.Header.EventNumber for e in events]
-            new_event = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path, eventNumberFilter=max(event_nums)+1)
+            new_event = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path, eventNumberFilter=max(event_nums)+1)
 
         asserts.assert_equal(len(new_event), 1, "Unexpected event list len")
         asserts.assert_equal(new_event[0].Data.statusCode, 0, "Unexpected status code")

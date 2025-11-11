@@ -14,31 +14,20 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-from ctypes import CFUNCTYPE, POINTER, c_char_p, c_int, c_uint8, c_uint16, c_void_p
+from ctypes import CFUNCTYPE, POINTER, Structure, c_char_p, c_int, c_uint8, c_uint16, c_void_p
 from dataclasses import dataclass, field
 from enum import Enum, auto
-
-WebRTCClientHandle = c_void_p
-LocalDescriptionCallbackType = CFUNCTYPE(None, c_char_p, c_char_p, c_void_p)
-IceCandidateCallbackType = CFUNCTYPE(None, c_char_p, c_char_p, c_void_p)
-GatheringCompleteCallbackType = CFUNCTYPE(None)
-StateChangeCallback = CFUNCTYPE(None, c_int)
-
-# Callback types for WebRTCRequestor server
-OnOfferCallbackFunct = CFUNCTYPE(c_int, c_uint16, c_char_p)
-OnAnswerCallbackFunct = CFUNCTYPE(c_int, c_uint16, c_char_p)
-OnICECandidatesCallbackFunct = CFUNCTYPE(c_int, c_uint16, POINTER(c_char_p), c_int)
-OnEndCallbackFunct = CFUNCTYPE(c_int, c_uint16, c_uint8)
+from typing import Any, Optional
 
 
-class PeerConnectionState(Enum):
-    NEW = 0
-    CONNECTING = 1
-    CONNECTED = 2
-    DISCONNECTED = 3
-    FAILED = 4
-    CLOSED = 5
-    INVALID = 6
+class PeerConnectionState(str, Enum):
+    NEW = "new"
+    CONNECTING = "connecting"
+    CONNECTED = "connected"
+    DISCONNECTED = "disconnected"
+    FAILED = "failed"
+    CLOSED = "closed"
+    INVALID = "invalid"
 
     @classmethod
     def _missing_(cls, value):
@@ -50,15 +39,42 @@ class Events(Enum):
     ANSWER = auto()
     ICE_CANDIDATE = auto()
     PEER_CONNECTION_STATE = auto()
+    END = auto()
+
+
+class IceCandidateStruct(Structure):
+    _fields_ = [("candidate", c_char_p), ("sdpMid", c_char_p), ("sdpMLineIndex", c_int)]
 
 
 @dataclass
-class IceCandiate:
+class IceCandidate:
     candidate: str
-    mid: str
+    sdpMid: Optional[str] = None
+    sdpMLineIndex: Optional[int] = None
 
 
 @dataclass
 class IceCandidateList:
-    candidates: list[IceCandiate] = field(default_factory=list)
+    candidates: list[IceCandidate] = field(default_factory=list)
     gathering_complete: bool = False
+
+
+@dataclass
+class WebSocketMessage:
+    type: str
+    sessionId: int
+    data: Any = None
+    error: Optional[str] = None
+
+
+WebRTCClientHandle = c_void_p
+LocalDescriptionCallbackType = CFUNCTYPE(None, c_char_p, c_char_p, c_void_p)
+IceCandidateCallbackType = CFUNCTYPE(None, c_char_p, c_char_p, c_void_p)
+GatheringCompleteCallbackType = CFUNCTYPE(None)
+StateChangeCallback = CFUNCTYPE(None, c_char_p)
+
+# Callback types for WebRTCRequestor server
+OnOfferCallbackFunct = CFUNCTYPE(c_int, c_uint16, c_char_p)
+OnAnswerCallbackFunct = CFUNCTYPE(c_int, c_uint16, c_char_p)
+OnICECandidatesCallbackFunct = CFUNCTYPE(c_int, c_uint16, POINTER(IceCandidateStruct), c_int)
+OnEndCallbackFunct = CFUNCTYPE(c_int, c_uint16, c_uint8)

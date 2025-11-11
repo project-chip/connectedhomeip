@@ -29,6 +29,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/server/Server.h>
 #include <app/util/endpoint-config-api.h>
+#include <clusters/Thermostat/Metadata.h>
 #include <lib/core/CHIPEncoding.h>
 
 using namespace chip;
@@ -632,7 +633,22 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
     }
     break;
     case ScheduleTypes::Id: {
-        return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR { return CHIP_NO_ERROR; });
+        auto delegate = GetDelegate(aPath.mEndpointId);
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
+
+        return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
+            for (uint8_t i = 0; true; i++)
+            {
+                ScheduleTypeStruct::Type scheduleType;
+                auto err = delegate->GetScheduleTypeAtIndex(i, scheduleType);
+                if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+                {
+                    return CHIP_NO_ERROR;
+                }
+                ReturnErrorOnFailure(err);
+                ReturnErrorOnFailure(encoder.Encode(scheduleType));
+            }
+        });
     }
     break;
     case Schedules::Id: {
@@ -682,6 +698,8 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
         ReturnErrorOnFailure(aEncoder.Encode(delegate->GetThermostatSuggestionNotFollowingReason()));
     }
     break;
+    case ClusterRevision::Id:
+        return aEncoder.Encode(Thermostat::kRevision);
     default: // return CHIP_NO_ERROR and just read from the attribute store in default
         break;
     }
@@ -1067,7 +1085,7 @@ Status MatterThermostatClusterServerPreAttributeChangedCallback(const app::Concr
         requested = *value;
         if (!AutoSupported)
             return Status::UnsupportedAttribute;
-        if (requested < 0 || requested > 25)
+        if (requested < 0 || requested > 127)
             return Status::InvalidValue;
         return Status::Success;
     }

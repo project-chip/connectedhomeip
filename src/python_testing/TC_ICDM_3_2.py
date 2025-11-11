@@ -363,7 +363,7 @@ class TC_ICDM_3_2(MatterBaseTest):
             newAcls.append(newAclEntry)
 
             try:
-                await self.default_controller.WriteAttribute(nodeid=self.dut_node_id, attributes=[(0, ac.Attributes.Acl(newAcls))])
+                await self.default_controller.WriteAttribute(nodeId=self.dut_node_id, attributes=[(0, ac.Attributes.Acl(newAcls))])
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, "Unexpected error returned")
@@ -407,7 +407,7 @@ class TC_ICDM_3_2(MatterBaseTest):
         finally:
             # Reset ACLs
             try:
-                await self.default_controller.WriteAttribute(nodeid=self.dut_node_id, attributes=[(0, ac.Attributes.Acl(previousAcl))])
+                await self.default_controller.WriteAttribute(nodeId=self.dut_node_id, attributes=[(0, ac.Attributes.Acl(previousAcl))])
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, "Unexpected error returned")
