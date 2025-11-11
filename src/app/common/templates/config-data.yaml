@@ -54,6 +54,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Group Key Management
     - Groupcast
     - HEPA Filter Monitoring
+    - ICD Management
     - Identify
     - Joint Fabric Administrator
     - Laundry Washer Mode
@@ -158,6 +159,7 @@ CodeDrivenClusters:
     - General Diagnostics
     - Group Key Management
     - Groupcast
+    - ICD Management
     - Identify
     - Localization Configuration
     - OTA Software Update Provider

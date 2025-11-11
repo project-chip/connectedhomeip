@@ -19,6 +19,8 @@
 #include <app/server/Server.h>
 #include <clusters/UserLabel/Metadata.h>
 
+#include <array>
+
 namespace chip::app::Clusters {
 
 using namespace UserLabel;
@@ -66,24 +68,8 @@ CHIP_ERROR ReadLabelList(EndpointId endpoint, AttributeValueEncoder & encoder)
 /// Matches constraints on a LabelStruct.
 bool IsValidLabelEntry(const Structs::LabelStruct::Type & entry)
 {
-    constexpr size_t kMaxLabelSize = 16;
-    constexpr size_t kMaxValueSize = 16;
-
     // NOTE: spec default for label and value is empty, so empty is accepted here
-    return (entry.label.size() <= kMaxLabelSize) && (entry.value.size() <= kMaxValueSize);
-}
-
-bool IsValidLabelEntryList(const LabelList::TypeInfo::DecodableType & list)
-{
-    auto iter = list.begin();
-    while (iter.Next())
-    {
-        if (!IsValidLabelEntry(iter.GetValue()))
-        {
-            return false;
-        }
-    }
-    return true;
+    return (entry.label.size() <= UserLabelCluster::kMaxLabelSize) && (entry.value.size() <= UserLabelCluster::kMaxValueSize);
 }
 
 CHIP_ERROR WriteLabelList(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder)
@@ -96,20 +82,22 @@ CHIP_ERROR WriteLabelList(const ConcreteDataAttributePath & path, AttributeValue
 
     if (!path.IsListItemOperation())
     {
-        DeviceLayer::AttributeList<Structs::LabelStruct::Type, DeviceLayer::kMaxUserLabelListLength> labelList;
+        size_t numLabels = 0;
+        std::array<Structs::LabelStruct::Type, DeviceLayer::kMaxUserLabelListLength> labels;
         LabelList::TypeInfo::DecodableType decodablelist;
 
         ReturnErrorOnFailure(decoder.Decode(decodablelist));
-        VerifyOrReturnError(IsValidLabelEntryList(decodablelist), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-
         auto iter = decodablelist.begin();
         while (iter.Next())
         {
-            ReturnErrorOnFailure(labelList.add(iter.GetValue()));
+            auto & label = iter.GetValue();
+            VerifyOrReturnError(IsValidLabelEntry(label), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+            VerifyOrReturnError(numLabels < labels.size(), CHIP_ERROR_NO_MEMORY);
+            labels[numLabels++] = label;
         }
         ReturnErrorOnFailure(iter.GetStatus());
 
-        return provider->SetUserLabelList(endpoint, labelList);
+        return provider->SetUserLabelList(endpoint, Span(labels.data(), numLabels));
     }
 
     if (path.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)

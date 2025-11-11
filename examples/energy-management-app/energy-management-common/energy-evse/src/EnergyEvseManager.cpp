@@ -49,7 +49,7 @@ CHIP_ERROR EnergyEvseManager::LoadPersistentAttributes()
     if (err == CHIP_NO_ERROR)
     {
         ChipLogDetail(AppServer, "EVSE: successfully loaded ChargingEnabledUntil from NVM");
-        mDelegate->SetChargingEnabledUntil(tempChargingEnabledUntil);
+        TEMPORARY_RETURN_IGNORED mDelegate->SetChargingEnabledUntil(tempChargingEnabledUntil);
     }
     else
     {
@@ -63,7 +63,7 @@ CHIP_ERROR EnergyEvseManager::LoadPersistentAttributes()
     if (err == CHIP_NO_ERROR)
     {
         ChipLogDetail(AppServer, "EVSE: successfully loaded DischargingEnabledUntil from NVM");
-        mDelegate->SetDischargingEnabledUntil(tempDischargingEnabledUntil);
+        TEMPORARY_RETURN_IGNORED mDelegate->SetDischargingEnabledUntil(tempDischargingEnabledUntil);
     }
     else
     {
@@ -77,7 +77,7 @@ CHIP_ERROR EnergyEvseManager::LoadPersistentAttributes()
     if (err == CHIP_NO_ERROR)
     {
         ChipLogDetail(AppServer, "EVSE: successfully loaded UserMaximumChargeCurrent from NVM");
-        mDelegate->SetUserMaximumChargeCurrent(tempUserMaximumChargeCurrent);
+        TEMPORARY_RETURN_IGNORED mDelegate->SetUserMaximumChargeCurrent(tempUserMaximumChargeCurrent);
     }
     else
     {
@@ -91,7 +91,7 @@ CHIP_ERROR EnergyEvseManager::LoadPersistentAttributes()
     if (err == CHIP_NO_ERROR)
     {
         ChipLogDetail(AppServer, "EVSE: successfully loaded RandomizationDelayWindow from NVM");
-        mDelegate->SetRandomizationDelayWindow(tempRandomizationDelayWindow);
+        TEMPORARY_RETURN_IGNORED mDelegate->SetRandomizationDelayWindow(tempRandomizationDelayWindow);
     }
     else
     {
@@ -105,7 +105,7 @@ CHIP_ERROR EnergyEvseManager::LoadPersistentAttributes()
     if (err == CHIP_NO_ERROR)
     {
         ChipLogDetail(AppServer, "EVSE: successfully loaded ApproximateEVEfficiency from NVM");
-        mDelegate->SetApproximateEVEfficiency(tempApproxEVEfficiency);
+        TEMPORARY_RETURN_IGNORED mDelegate->SetApproximateEVEfficiency(tempApproxEVEfficiency);
     }
     else
     {

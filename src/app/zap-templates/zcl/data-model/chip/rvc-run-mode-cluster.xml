@@ -59,7 +59,7 @@ limitations under the License.
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <description>Attributes and commands for selecting a mode from a list of supported options.</description>
-    <globalAttribute side="either" code="0xFFFD" value="3"/>
+    <globalAttribute side="either" code="0xFFFD" value="4"/>
 
     <features>
       <!-- TODO: ZAP still generates feature bits for things with disallowConform!
@@ -67,7 +67,7 @@ limitations under the License.
       <!--<feature bit="0" code="DEPONOFF" name="OnOff" summary="Dependency with the OnOff cluster is disallowed for this cluster">
         <disallowConform/>
       </feature>-->
-      <feature bit="16" code="DIRECTMODECH" name="DirectModeChange" summary="Cluster supports changing run modes from non-Idle states">
+      <feature bit="20" code="DIRECTMODECH" name="DirectModeChange" summary="Cluster supports changing run modes from non-Idle states">
         <optionalConform/>
       </feature>
     </features>
