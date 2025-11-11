@@ -69,9 +69,9 @@ public:
             .enablePayloadSnaphot = false,
 #endif
         };
-        gServer.Create(optionalAttributeSet, functionsConfig);
+        gServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap), functionsConfig);
 #else
-        gServer.Create(optionalAttributeSet);
+        gServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap));
 #endif
         return gServer.Registration();
     }

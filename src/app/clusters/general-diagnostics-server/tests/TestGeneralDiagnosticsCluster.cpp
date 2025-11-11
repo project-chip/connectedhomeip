@@ -67,7 +67,7 @@ TEST_F(TestGeneralDiagnosticsCluster, CompileTest)
 {
     const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
 
-    GeneralDiagnosticsCluster cluster(optionalAttributeSet);
+    GeneralDiagnosticsCluster cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0));
     ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, GeneralDiagnostics::Id }), BitFlags<ClusterQualityFlags>());
 
     const GeneralDiagnosticsFunctionsConfig functionsConfig{
@@ -75,7 +75,7 @@ TEST_F(TestGeneralDiagnosticsCluster, CompileTest)
         .enablePayloadSnaphot = true,
     };
 
-    GeneralDiagnosticsClusterFullConfigurable clusterWithTimeAndPayload(optionalAttributeSet, functionsConfig);
+    GeneralDiagnosticsClusterFullConfigurable clusterWithTimeAndPayload(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0), functionsConfig);
     ASSERT_EQ(clusterWithTimeAndPayload.GetClusterFlags({ kRootEndpointId, GeneralDiagnostics::Id }),
               BitFlags<ClusterQualityFlags>());
 }
@@ -89,7 +89,9 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
         };
         const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
         ScopedDiagnosticsProvider<NullProvider> nullProvider;
-        GeneralDiagnosticsCluster cluster(optionalAttributeSet);
+
+        //Create cluster without enabling any feature flags
+        GeneralDiagnosticsCluster cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0));
 
         // Check required accepted commands are present
         ConcreteClusterPath generalDiagnosticsPath = ConcreteClusterPath(kRootEndpointId, GeneralDiagnostics::Id);
@@ -177,7 +179,10 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
                 .Set<ActiveNetworkFaults::Id>();
 
         ScopedDiagnosticsProvider<AllProvider> nullProvider;
-        GeneralDiagnosticsCluster cluster(optionalAttributeSet);
+
+        //Create cluster with LOAD feature flag enabled
+        BitFlags<GeneralDiagnostics::Feature> features{ GeneralDiagnostics::Feature::kDeviceLoad };
+        GeneralDiagnosticsCluster cluster(optionalAttributeSet, features);
 
         // Check mandatory commands are present
         ConcreteClusterPath generalDiagnosticsPath = ConcreteClusterPath(kRootEndpointId, GeneralDiagnostics::Id);
@@ -219,6 +224,7 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
                       GeneralDiagnostics::Attributes::ActiveHardwareFaults::kMetadataEntry,
                       GeneralDiagnostics::Attributes::ActiveRadioFaults::kMetadataEntry,
                       GeneralDiagnostics::Attributes::ActiveNetworkFaults::kMetadataEntry,
+                      GeneralDiagnostics::Attributes::DeviceLoadStatus::kMetadataEntry,
                   }),
                   CHIP_NO_ERROR);
 
