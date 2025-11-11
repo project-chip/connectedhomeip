@@ -25,7 +25,6 @@
 
 #include <FakeReadings.h>
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
-#include <app/clusters/electrical-energy-measurement-server/ElectricalEnergyMeasurementCluster.h>
 #include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h>
 #include <app/clusters/electrical-energy-measurement-server/electrical-energy-measurement-server.h>
 #include <app/clusters/energy-evse-server/EnergyEvseTestEventTriggerHandler.h>

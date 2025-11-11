@@ -24,6 +24,7 @@
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/TestEventGenerator.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/ElectricalEnergyMeasurement/Attributes.h>
 #include <clusters/ElectricalEnergyMeasurement/Events.h>
