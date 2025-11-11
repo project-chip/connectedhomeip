@@ -21,6 +21,7 @@
 #include <access/examples/ExampleAccessControlDelegate.h>
 
 #include <app/AppConfig.h>
+#include <app/DefaultTimerDelegate.h>
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
 #include <app/SafeAttributePersistenceProvider.h>
