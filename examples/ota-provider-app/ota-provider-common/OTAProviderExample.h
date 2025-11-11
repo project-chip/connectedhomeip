@@ -91,16 +91,16 @@ public:
 
     void SetMaxBDXBlockSize(uint16_t blockSize) { mMaxBDXBlockSize = blockSize; }
 
-    uint32_t GetVendorId() { return mVendorId; }
-    uint32_t GetProductId() { return mProductId; }
-    short unsigned int GetHardwareVersion() { return mHardwareVersion; }
-    uint32_t GetSoftwareVersion() { return mRequestorSoftwareVersion; }
-    std::vector<chip::app::Clusters::OtaSoftwareUpdateProvider::DownloadProtocolEnum> GetProtocolsSupported()
+    uint32_t GetVendorId() const { return mVendorId; }
+    uint32_t GetProductId() const { return mProductId; }
+    uint16_t GetHardwareVersion() const { return mHardwareVersion; }
+    uint32_t GetSoftwareVersion() const { return mRequestorSoftwareVersion; }
+    const std::vector<chip::app::Clusters::OtaSoftwareUpdateProvider::DownloadProtocolEnum>& GetProtocolsSupported() const
     {
         return mProtocolsSupported;
     }
-    bool GetRequestorCanConsent() { return mRequestorCanConsent; }
-    std::string GetLocation() { return mLocation; }
+    bool GetRequestorCanConsent() const { return mRequestorCanConsent; }
+    const std::string& GetLocation() const { return mLocation; }
 
 private:
     bool SelectOTACandidate(const uint16_t requestorVendorID, const uint16_t requestorProductID,
@@ -141,7 +141,7 @@ private:
     uint16_t mMaxBDXBlockSize;
     uint32_t mVendorId;
     uint32_t mProductId;
-    short unsigned int mHardwareVersion;
+    uint16_t mHardwareVersion;
     uint32_t mRequestorSoftwareVersion;
     std::vector<chip::app::Clusters::OtaSoftwareUpdateProvider::DownloadProtocolEnum> mProtocolsSupported;
     bool mRequestorCanConsent;

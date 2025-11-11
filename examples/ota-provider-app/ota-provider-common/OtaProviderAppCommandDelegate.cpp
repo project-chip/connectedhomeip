@@ -1,5 +1,5 @@
 /*
- *json
+ *
  *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
@@ -54,7 +54,7 @@ OtaProviderAppCommandHandler * OtaProviderAppCommandHandler::FromJSON(const char
 static std::string ToString(const Json::Value & v)
 {
     Json::StreamWriterBuilder w;
-    w["identation"] = "";
+    w["indentation"] = "";
     return Json::writeString(w, v);
 }
 
