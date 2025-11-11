@@ -3346,7 +3346,7 @@ cluster LaundryWasherControls = 83 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster RvcRunMode = 84 {
-  revision 3;
+  revision 4;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -3376,7 +3376,7 @@ cluster RvcRunMode = 84 {
   }
 
   bitmap Feature : bitmap32 {
-    kDirectModeChange = 0x10000;
+    kDirectModeChange = 0x100000;
   }
 
   shared struct ModeTagStruct {
@@ -3414,7 +3414,7 @@ cluster RvcRunMode = 84 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster RvcCleanMode = 85 {
-  revision 3;
+  revision 5;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -3438,7 +3438,7 @@ cluster RvcCleanMode = 85 {
   }
 
   bitmap Feature : bitmap32 {
-    kDirectModeChange = 0x10000;
+    kDirectModeChange = 0x100000;
   }
 
   shared struct ModeTagStruct {
@@ -4116,7 +4116,7 @@ provisional cluster ScenesManagement = 98 {
 
 /** Attributes and commands for monitoring HEPA filters in a device */
 cluster HepaFilterMonitoring = 113 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   shared enum ChangeIndicationEnum : enum8 {
     kOK = 0 [spec_name = "OK"];
@@ -4160,13 +4160,13 @@ cluster HepaFilterMonitoring = 113 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  /** Reset the condition of the replaceable to the non degraded state */
+  /** Upon receipt, the device SHALL reset the Condition and ChangeIndicator attributes, indicating full resource availability and readiness for use, as initially configured. */
   command ResetCondition(): DefaultSuccess = 0;
 }
 
 /** Attributes and commands for monitoring activated carbon filters in a device */
 cluster ActivatedCarbonFilterMonitoring = 114 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   shared enum ChangeIndicationEnum : enum8 {
     kOK = 0 [spec_name = "OK"];
@@ -4210,7 +4210,7 @@ cluster ActivatedCarbonFilterMonitoring = 114 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  /** Reset the condition of the replaceable to the non degraded state */
+  /** Upon receipt, the device SHALL reset the Condition and ChangeIndicator attributes, indicating full resource availability and readiness for use, as initially configured. */
   command ResetCondition(): DefaultSuccess = 0;
 }
 

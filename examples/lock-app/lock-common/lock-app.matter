@@ -3266,7 +3266,7 @@ endpoint 0 {
     callback attribute activeModeDuration;
     callback attribute activeModeThreshold;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    callback attribute clusterRevision;
   }
 }
 endpoint 1 {

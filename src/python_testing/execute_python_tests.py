@@ -77,7 +77,7 @@ def main(search_directory, env_file, keep_going):
     metadata = yaml.full_load(
         open(os.path.join(chip_root, "src/python_testing/test_metadata.yaml"))
     )
-    excluded_patterns = set([item["name"] for item in metadata["not_automated"]])
+    excluded_patterns = {item["name"] for item in metadata["not_automated"]}
 
     # Get all .py files in the directory
     all_python_files = glob.glob(os.path.join(search_directory, "*.py"))

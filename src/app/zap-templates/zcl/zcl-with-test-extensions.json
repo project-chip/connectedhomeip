@@ -342,6 +342,7 @@
             "FeatureMap"
         ],
         "ICD Management": [
+            "ClusterRevision",
             "IdleModeDuration",
             "ActiveModeDuration",
             "ActiveModeThreshold",

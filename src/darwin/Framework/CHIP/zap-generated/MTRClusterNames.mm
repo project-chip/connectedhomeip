@@ -204,6 +204,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeActivatedCarbonFilterMonitoringID:
         result = @"ActivatedCarbonFilterMonitoring";
         break;
+    case MTRClusterIDTypeWaterTankLevelMonitoringID:
+        result = @"WaterTankLevelMonitoring";
+        break;
     case MTRClusterIDTypeBooleanStateConfigurationID:
         result = @"BooleanStateConfiguration";
         break;
@@ -3906,6 +3909,62 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         default:
             // Not a known ActivatedCarbonFilterMonitoring attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeWaterTankLevelMonitoringID:
+
+        switch (attributeID) {
+
+            // Cluster WaterTankLevelMonitoring attributes
+        case MTRAttributeIDTypeClusterWaterTankLevelMonitoringAttributeConditionID:
+            result = @"Condition";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterTankLevelMonitoringAttributeDegradationDirectionID:
+            result = @"DegradationDirection";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterTankLevelMonitoringAttributeChangeIndicationID:
+            result = @"ChangeIndication";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterTankLevelMonitoringAttributeInPlaceIndicatorID:
+            result = @"InPlaceIndicator";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterTankLevelMonitoringAttributeLastChangedTimeID:
+            result = @"LastChangedTime";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterTankLevelMonitoringAttributeReplacementProductListID:
+            result = @"ReplacementProductList";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterTankLevelMonitoringAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterTankLevelMonitoringAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterTankLevelMonitoringAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterTankLevelMonitoringAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterWaterTankLevelMonitoringAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known WaterTankLevelMonitoring attribute.
             result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
             break;
         }
@@ -10633,6 +10692,20 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
+    case MTRClusterIDTypeWaterTankLevelMonitoringID:
+
+        switch (commandID) {
+
+        case MTRCommandIDTypeClusterWaterTankLevelMonitoringCommandResetConditionID:
+            result = @"ResetCondition";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeBooleanStateConfigurationID:
 
         switch (commandID) {
@@ -13253,6 +13326,16 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         }
         break;
 
+    case MTRClusterIDTypeWaterTankLevelMonitoringID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeBooleanStateConfigurationID:
 
         switch (commandID) {
@@ -15181,6 +15264,16 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
         break;
 
     case MTRClusterIDTypeActivatedCarbonFilterMonitoringID:
+
+        switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeWaterTankLevelMonitoringID:
 
         switch (eventID) {
 
