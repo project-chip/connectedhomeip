@@ -308,11 +308,8 @@ CATValues PersistentStorage::GetCommissionerCATs()
     err           = SyncGetKeyValue(kCommissionerCATsKey, serializedCATs, size);
     if (err == CHIP_NO_ERROR && size == chip::CATValues::kSerializedLength)
     {
-        err = cats.Deserialize(serializedCATs);
-        if (err == CHIP_NO_ERROR)
-        {
-            return cats;
-        }
+        cats.Deserialize(serializedCATs);
+        return cats;
     }
     return chip::kUndefinedCATs;
 }
@@ -320,7 +317,7 @@ CATValues PersistentStorage::GetCommissionerCATs()
 CHIP_ERROR PersistentStorage::SetCommissionerCATs(const CATValues & cats)
 {
     chip::CATValues::Serialized serializedCATs;
-    ReturnErrorOnFailure(cats.Serialize(serializedCATs));
+    cats.Serialize(serializedCATs);
 
     return SyncSetKeyValue(kCommissionerCATsKey, serializedCATs, sizeof(serializedCATs));
 }

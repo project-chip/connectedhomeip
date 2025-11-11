@@ -555,6 +555,7 @@ void UserDirectedCommissioningServer::OnCommissionableNodeFound(const Dnssd::Dis
 
 void UserDirectedCommissioningServer::PrintUDCClients()
 {
+#if CHIP_PROGRESS_LOGGING
     for (uint8_t i = 0; i < kMaxUDCClients; i++)
     {
         UDCClientState * state = GetUDCClients().GetUDCClientState(i);
@@ -581,6 +582,7 @@ void UserDirectedCommissioningServer::PrintUDCClients()
                             state->GetProductId(), state->GetLongDiscriminator(), rotatingIdStringPtr);
         }
     }
+#endif
 }
 
 } // namespace UserDirectedCommissioning
