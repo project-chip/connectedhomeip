@@ -165,8 +165,9 @@ void GenericPlatformManagerImpl<ImplClass>::_Shutdown()
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     ChipLogProgress(DeviceLayer, "WiFi-PAF Layer shutdown");
-    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Shutdown(
-        [](uint32_t id, WiFiPAF::WiFiPafRole role) { DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(id, role); });
+    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Shutdown([](uint32_t id, WiFiPAF::WiFiPafRole role) {
+        TEMPORARY_RETURN_IGNORED DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(id, role);
+    });
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING

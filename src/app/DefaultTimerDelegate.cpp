@@ -15,12 +15,11 @@
  *    limitations under the License.
  */
 
+#include <app/DefaultTimerDelegate.h>
 #include <app/InteractionModelEngine.h>
-#include <app/TimerDelegates.h>
 #include <system/SystemClock.h>
 
-using TimerContext = chip::app::reporting::TimerContext;
-using Timeout      = chip::System::Clock::Timeout;
+using Timeout = chip::System::Clock::Timeout;
 
 namespace chip {
 namespace app {
@@ -32,6 +31,7 @@ static void TimerCallbackInterface(System::Layer * aLayer, void * aAppState)
 }
 CHIP_ERROR DefaultTimerDelegate::StartTimer(TimerContext * context, Timeout aTimeout)
 {
+    // TODO(#41825): Remove the coupling of InteractionModelEngine
     return InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
         aTimeout, TimerCallbackInterface, context);
 }
