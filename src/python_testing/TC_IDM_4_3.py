@@ -59,7 +59,7 @@ This test case will verify the report data messages sent from the DUT after acti
 
 Full test plan link for details:
 https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/interactiondatamodel.adoc#443-tc-idm-43-report-data-messages-post-subscription-activation-from-dut-test-cases-dut_server
- 
+
 '''
 
 
@@ -163,7 +163,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         This function now properly VERIFIES that change reports are received for each changed attribute.
 
         Args:
-            subscription: Active subscription object  
+            subscription: Active subscription object
             priming_data: Priming report data from GetAttributes()
             test_step: Step name for logging
             clusters_to_skip: List of cluster IDs to skip (e.g., problematic clusters)
@@ -419,7 +419,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
             expected_attribute=node_label_attr
         )
 
-        sub_step2 = await attr_handler_step2.start(
+        await attr_handler_step2.start(
             dev_ctrl=TH,
             node_id=self.dut_node_id,
             endpoint=self.root_node_endpoint,
@@ -685,7 +685,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
             expected_cluster=Clusters.BasicInformation,
             expected_attribute=node_label_attr
         )
-        sub_step5_first = await attr_handler_step5_first.start(
+        await attr_handler_step5_first.start(
             dev_ctrl=TH,
             node_id=self.dut_node_id,
             endpoint=self.root_node_endpoint,
@@ -698,7 +698,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
             expected_cluster=Clusters.GeneralCommissioning,
             expected_attribute=breadcrumb_attr
         )
-        sub_step5_second = await attr_handler_step5_second.start(
+        _ = await attr_handler_step5_second.start(
             dev_ctrl=TH,
             node_id=self.dut_node_id,
             endpoint=self.root_node_endpoint,
@@ -737,7 +737,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
             expected_cluster=Clusters.BasicInformation,
             expected_attribute=node_label_attr
         )
-        sub_step6_first = await attr_handler_step6_first.start(
+        _ = await attr_handler_step6_first.start(
             dev_ctrl=TH,
             node_id=self.dut_node_id,
             endpoint=self.root_node_endpoint,
@@ -750,7 +750,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
             expected_cluster=Clusters.GeneralCommissioning,
             expected_attribute=breadcrumb_attr
         )
-        sub_step6_second = await attr_handler_step6_second.start(
+        await attr_handler_step6_second.start(
             dev_ctrl=TH,
             node_id=self.dut_node_id,
             endpoint=self.root_node_endpoint,
@@ -788,7 +788,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
             expected_cluster=Clusters.BasicInformation,
             expected_attribute=node_label_attr
         )
-        sub_step7_attr = await attr_handler_step7.start(
+        await attr_handler_step7.start(
             dev_ctrl=TH,
             node_id=self.dut_node_id,
             endpoint=self.root_node_endpoint,
@@ -800,7 +800,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         event_handler_step7 = EventSubscriptionHandler(
             expected_cluster=Clusters.AccessControl
         )
-        sub_step7_event = await event_handler_step7.start(
+        await event_handler_step7.start(
             dev_ctrl=TH,
             node_id=self.dut_node_id,
             endpoint=self.root_node_endpoint,
