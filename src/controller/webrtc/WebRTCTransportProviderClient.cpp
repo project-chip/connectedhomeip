@@ -199,7 +199,7 @@ CHIP_ERROR WebRTCTransportProviderClient::ProvideOffer(const uint8_t * payload, 
     CHIP_ERROR error = data.Next();
 
     Clusters::WebRTCTransportProvider::Commands::ProvideOffer::DecodableType value;
-    error = (error != CHIP_NO_ERROR) ? value.Decode(data, mPeerId.GetFabricIndex()) : error;
+    error = (error == CHIP_NO_ERROR) ? value.Decode(data, mPeerId.GetFabricIndex()) : error;
     ReturnErrorAndLogOnFailure(error, Camera, "Failed to decode command payload value");
 
     if (mState != State::Idle)
@@ -255,7 +255,7 @@ CHIP_ERROR WebRTCTransportProviderClient::SolicitOffer(const uint8_t * payload, 
     CHIP_ERROR error = data.Next();
 
     Clusters::WebRTCTransportProvider::Commands::SolicitOffer::DecodableType value;
-    error = (error != CHIP_NO_ERROR) ? value.Decode(data, mPeerId.GetFabricIndex()) : error;
+    error = (error == CHIP_NO_ERROR) ? value.Decode(data, mPeerId.GetFabricIndex()) : error;
     ReturnErrorAndLogOnFailure(error, Camera, "Failed to decode command payload value");
 
     // Store the command type
