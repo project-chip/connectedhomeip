@@ -91,7 +91,7 @@ def make_asciidoc(target: str, include_in_progress: str, spec_dir: str, dry_run:
     help='Path to the location of the scraper tool')
 @click.option(
     '--spec-root',
-    required=True,
+    required=False,  # Required when --skip-scrape is not set. Checked in main().
     type=str,
     help='Path to the spec root')
 @click.option(
@@ -112,7 +112,13 @@ def make_asciidoc(target: str, include_in_progress: str, spec_dir: str, dry_run:
     is_flag=True,
     default=False,
 )
-def main(scraper, spec_root, output_dir, dry_run, include_in_progress, skip_scrape):
+@click.option(
+    '--no-namespace',
+    help='Excludes namespace files. Must be used for data model version 1.1 and below',
+    is_flag=True,
+    default=False,
+)
+def main(scraper, spec_root, output_dir, dry_run, include_in_progress, skip_scrape, no_namespace):
     '''
     This script is used to generate the data model XML files found in the SDK
     data_model directory.
@@ -148,7 +154,10 @@ def main(scraper, spec_root, output_dir, dry_run, include_in_progress, skip_scra
         if not scraper:
             logging.error('Missing --scraper option. It is required when --skip-scrape is not used.')
             return
-        scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress)
+        if not spec_root:
+            logging.error('Missing --spec-root option. It is required when --skip-scrape is not used.')
+            return
+        scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress, no_namespace)
         if not dry_run:
             dump_versions(scraper, spec_root, output_dir)
     if not dry_run:
@@ -159,14 +168,15 @@ def main(scraper, spec_root, output_dir, dry_run, include_in_progress, skip_scra
         generate_data_model_xmls_gni.generate_gni_file()
 
 
-def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress):
+def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress, no_namespace):
     logging.info('Generating main spec to get file include list - this may take a few minutes')
     main_out = make_asciidoc('pdf', include_in_progress, spec_root, dry_run)
     logging.info('Generating cluster spec to get file include list - this may take a few minutes')
     cluster_out = make_asciidoc('pdf-appclusters-book', include_in_progress, spec_root, dry_run)
     logging.info('Generating device type library to get file include list - this may take a few minutes')
     device_type_files = make_asciidoc('pdf-devicelibrary-book', include_in_progress, spec_root, dry_run)
-    namespace_files = make_asciidoc('pdf-standardnamespaces-book', include_in_progress, spec_root, dry_run)
+    if not no_namespace:
+        namespace_files = make_asciidoc('pdf-standardnamespaces-book', include_in_progress, spec_root, dry_run)
 
     cluster_files = main_out + cluster_out
     cmd = [scraper, 'dm', '--dmRoot', output_dir, '--specRoot', spec_root, '--force']
@@ -184,7 +194,8 @@ def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress):
     # Remove all the files that weren't compiled into the spec
     clusters_output_dir = os.path.join(output_dir, 'clusters')
     device_types_output_dir = os.path.abspath(os.path.join(output_dir, 'device_types'))
-    namespaces_output_dir = os.path.abspath(os.path.join(output_dir, 'namespaces'))
+    if not no_namespace:
+        namespaces_output_dir = os.path.abspath(os.path.join(output_dir, 'namespaces'))
     for filename in os.listdir(clusters_output_dir):
         # There are a couple of clusters that appear in the same adoc file and they have prefixes.
         # Look for these specifically.
@@ -205,11 +216,12 @@ def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress):
             logging.info(f'Removing {adoc} as it was not in the generated spec document')
             os.remove(os.path.join(device_types_output_dir, filename))
 
-    for filename in os.listdir(namespaces_output_dir):
-        adoc = os.path.basename(filename).replace('.xml', '.adoc')
-        if adoc not in namespace_files:
-            logging.info(f'Removing {adoc} as it was not in the generated spec document')
-            os.remove(os.path.join(namespaces_output_dir, filename))
+    if not no_namespace:
+        for filename in os.listdir(namespaces_output_dir):
+            adoc = os.path.basename(filename).replace('.xml', '.adoc')
+            if adoc not in namespace_files:
+                logging.info(f'Removing {adoc} as it was not in the generated spec document')
+                os.remove(os.path.join(namespaces_output_dir, filename))
 
 
 def cleanup_old_spec_dms(output_dir):
@@ -298,6 +310,104 @@ def cleanup_old_spec_dms(output_dir):
         if changed:
             tree.write(filename, pretty_print=True, xml_declaration=True, encoding='utf-8')
 
+    def _fix_pre_1_1():
+        missing_1_1_BaseDeviceType_features = '''
+        <features>
+            <feature code="TAGLIST">
+            <mandatoryConform>
+                <condition name="Duplicate"/>
+            </mandatoryConform>
+            </feature>
+        </features>
+        '''
+        missing_1_1_DescriptorCluster_features = '''
+        <features>
+            <feature bit="0" code="TAGLIST" name="TagList" summary="The TagList attribute is present">
+            <describedConform/>
+            </feature>
+        </features>
+        '''
+        missing_1_1_DescriptorCluster_taglist = '''
+        <attribute id="0x0004" name="TagList" type="list" default="MS">
+            <entry type="SemanticTagStruct"/>
+            <access read="true" readPrivilege="view"/>
+            <quality persistence="fixed"/>
+            <mandatoryConform>
+                <feature name="TAGLIST"/>
+            </mandatoryConform>
+            <constraint>
+                <countBetween>
+                <from value="1"/>
+                <to value="6"/>
+                </countBetween>
+            </constraint>
+        </attribute>
+        '''
+        missing_1_1_DescriptorCluster_EndpointUID = '''
+        <attribute id="0x0005" name="EndpointUniqueID" type="string">
+            <access read="true" readPrivilege="view"/>
+            <quality persistence="fixed"/>
+            <optionalConform/>
+            <constraint>
+                <maxLength value="32"/>
+            </constraint>
+        </attribute>
+        '''
+        changed = False
+        filename = os.path.join(output_dir, 'clusters', 'Descriptor-Cluster.xml')
+        if not os.path.exists(filename):
+            return
+        with open(filename, 'rt+') as file:
+            tree = etree.parse(file)
+            root = tree.getroot()            
+            
+            if root.find("attributes/attribute[@name='EndpointUniqueID']") is None:
+                parent_el = root.find('attributes')
+                if parent_el is None:
+                    logging.error("Unable to locate attributes in Descriptor-Cluster")
+                    return
+                
+                new_xml = etree.fromstring(missing_1_1_DescriptorCluster_EndpointUID)
+                parent_el.append(new_xml)
+                changed = True
+
+            if root.find("attributes/attribute[@name='TagList']") is None:
+                parent_el = root.find('attributes')
+                if parent_el is None:
+                    logging.error("Unable to locate attributes in Descriptor-Cluster")
+                    return
+                
+                new_xml = etree.fromstring(missing_1_1_DescriptorCluster_taglist)
+                parent_el.append(new_xml)
+                changed = True
+
+            if root.find("features") is None:
+                parent_el = root
+                new_xml = etree.fromstring(missing_1_1_DescriptorCluster_features)
+                parent_el.append(new_xml)
+                changed = True
+
+        if changed:
+            tree.write(filename, pretty_print=True, xml_declaration=True, encoding='utf-8')
+
+        changed = False
+        filename = os.path.join(output_dir, 'device_types', 'BaseDeviceType.xml')
+        if not os.path.exists(filename):
+            return
+        with open(filename, 'rt+') as file:
+            tree = etree.parse(file)
+            root = tree.getroot()
+            if root.find('clusters/cluster[@name="Descriptor"]/features') is None:
+                parent_el = root.find('clusters/cluster[@name="Descriptor"]')
+                if parent_el is None:
+                    logging.error("Unable to locate clusters/cluster[@name='Descriptor'] tag in BaseDeviceType")
+                    return
+                new_xml = etree.fromstring(missing_1_1_BaseDeviceType_features)
+                parent_el.append(new_xml)
+                changed = True
+        if changed:
+            tree.write(filename, pretty_print=True, xml_declaration=True, encoding='utf-8')
+
     def _fix_sit_lit_type():
         # In some spec revisions, the SIT and LIT conditions are listed as features.
         # This is probably fixable in alchemy, but let's just fix here until that
@@ -319,6 +429,7 @@ def cleanup_old_spec_dms(output_dir):
 
     _fix_door_lock_device_type_features()
     _fix_pre_1_3_base_device_type()
+    _fix_pre_1_1()
     _fix_sit_lit_type()
 
 
