@@ -71,7 +71,7 @@ Status ServerInstance::HandleGetDatasetRequest(CommandHandlerInterface::HandlerC
     if (err == CHIP_ERROR_NOT_FOUND)
     {
         // The spec mandates that we return an empty dataset, NOT a NotFound status.
-        dataset.Init(ByteSpan());
+        TEMPORARY_RETURN_IGNORED dataset.Init(ByteSpan());
         return Status::Success;
     }
     return StatusIB(err).mStatus;
@@ -344,7 +344,7 @@ void ServerInstance::OnFailSafeTimerExpired()
 {
     if (mDelegate)
     {
-        mDelegate->RevertActiveDataset();
+        TEMPORARY_RETURN_IGNORED mDelegate->RevertActiveDataset();
     }
     auto commandHandleRef = std::move(mAsyncCommandHandle);
     auto commandHandle    = commandHandleRef.Get();
@@ -364,7 +364,7 @@ void ServerInstance::OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent *
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
     {
-        _this->mDelegate->CommitActiveDataset();
+        TEMPORARY_RETURN_IGNORED _this->mDelegate->CommitActiveDataset();
     }
 }
 
