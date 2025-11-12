@@ -23,9 +23,18 @@
 
 #pragma once
 
-#include <platform/Zephyr/BLEAdvertisingArbiter.h>
+#include <lib/core/OTAImageHeader.h>
+#include <zephyr/drivers/flash.h>
+#include <zephyr/storage/flash_map.h>
 
-#include <array>
+enum VerificationFailReason : unsigned char
+{
+    NO_FAIL          = 0,
+    WRONG_PRODUCT_ID = 1,
+    WRONG_VENDOR_ID  = 2,
+};
+
+using verificationFailCallback = void (*)(VerificationFailReason);
 
 /**
  * @brief DFU over SMP helper class
@@ -48,21 +57,30 @@ public:
     void Init();
 
     /**
-     * @brief Start BLE SMP server
+     * @brief Set callback function for verification failing event
      *
-     * Register SMP BLE service that supports image management commands and
-     * request BLE advertising. The BLE advertising may begin immediately, or be
-     * deferred if another component with higher priority uses BLE.
+     * Set a callback function that will be called if the image footer verification fails.
+     * Callback function have to receive argument that will describe
+     * what was the reason of the failure.
      */
-    void StartServer();
+    void SetFailCallback(verificationFailCallback cb);
+
+    /**
+     * @brief Start processing the footer of the image in slot 1.
+     *
+     * Starts footer check of the newly received image in the slot 1.
+     */
+    CHIP_ERROR ProcessImageFooter();
 
 private:
-    bool mIsStarted                                                       = false;
-    chip::DeviceLayer::BLEAdvertisingArbiter::Request mAdvertisingRequest = {};
-    std::array<bt_data, 2> mAdvertisingItems;
+    verificationFailCallback failCallback;
 
     friend DFUOverSMP & GetDFUOverSMP();
     static DFUOverSMP sDFUOverSMP;
+
+    CHIP_ERROR GetDFUImageFooter(chip::OTAImageHeader & footer, const struct flash_area * fa);
+    CHIP_ERROR GetDFUImageFooterOffset(unsigned int & footer_offset, const struct flash_area * fa);
+    CHIP_ERROR CheckDFUImageFooter(chip::OTAImageHeader * imageHeader);
 };
 
 inline DFUOverSMP & GetDFUOverSMP()

@@ -247,6 +247,13 @@ CHIP_ERROR AppTaskCommon::StartApp(void)
         DispatchEvent(&event);
     }
 }
+#ifdef CONFIG_MCUMGR_TRANSPORT_BT
+/* Demonstration of the fail handling */
+void HandleDFUFail(VerificationFailReason reason)
+{
+    LOG_INF("DFU image verification failed with reason: %d", reason);
+}
+#endif
 void AppTaskCommon::PrintFirmwareInfo(void)
 {
     LOG_INF("SW Version: %u, %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION, CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
@@ -333,6 +340,7 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
 #endif
 #ifdef CONFIG_MCUMGR_TRANSPORT_BT
     GetDFUOverSMP().Init();
+    GetDFUOverSMP().SetFailCallback(HandleDFUFail);
 #endif
 
     // We need to disable OpenThread to prevent writing to the NVS storage when factory reset occurs
