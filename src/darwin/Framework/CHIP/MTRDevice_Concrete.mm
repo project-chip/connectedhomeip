@@ -733,7 +733,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     os_unfair_lock_assert_owner(&self->_lock);
 
     // Check user default to disable time sync detection
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:kDisableTimeSyncDetectionKey]) {
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:kDisableTimeSyncLossDetectionKey]) {
         return NO;
     }
 
