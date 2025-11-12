@@ -19,8 +19,13 @@ import("${chip_root}/third_party/silabs/silabs_board.gni")
 config("siwx-ble-config") {
   defines = []
   include_dirs = []
-
-  include_dirs = [
+  
+  defines += [
+    "SLI_SI91X_ENABLE_BLE=1",
+    "SL_SI91X_ENABLE_LITTLE_ENDIAN=1",
+  ]
+    
+  include_dirs += [
     "${silabs_platform_dir}/SiWx/ble",
     "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc",
   ]

@@ -515,13 +515,6 @@ template("efr32_sdk") {
       defines += [ "SL_MATTER_PROVISION_FLASH=0" ]
     }
 
-    if (chip_enable_ble_siwx) {
-      defines += [
-        "SLI_SI91X_ENABLE_BLE=1",
-        "SL_SI91X_ENABLE_LITTLE_ENDIAN=1",
-      ]
-    }
-
     if (defined(invoker.chip_enable_openthread) &&
         invoker.chip_enable_openthread) {
       defines += [
@@ -1089,6 +1082,10 @@ template("efr32_sdk") {
       sources += invoker.sources
     }
 
-    public_configs = [ ":${sdk_target_name}_config" ]
+    public_configs = [ ":${sdk_target_name}_config"]
+    
+    if (chip_enable_ble_siwx){
+      public_configs += [ "${chip_root}/src/platform/silabs/SiWx/ble:siwx-ble-config" ]
+    }
   }
 }

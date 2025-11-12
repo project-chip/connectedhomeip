@@ -205,8 +205,6 @@ template("siwx917_sdk") {
       "__HEAP_SIZE=0",
       "PLATFORM_HEADER=\"platform-header.h\"",
       "USE_NVM3=1",
-      "SLI_SI91X_ENABLE_BLE=1",
-      "SL_SI91X_ENABLE_LITTLE_ENDIAN=1",
       "__error_t_defined",
       "RSI_SAMPLE_HAL",
       "DEBUG_UART=1",
@@ -871,5 +869,8 @@ template("siwx917_sdk") {
     }
 
     public_configs = [ ":${sdk_target_name}_config" ]
+    if (chip_enable_ble_siwx){
+      public_configs += [ "${chip_root}/src/platform/silabs/SiWx/ble:siwx-ble-config" ]
+    }
   }
 }
