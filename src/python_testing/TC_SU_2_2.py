@@ -63,11 +63,11 @@ logger = logging.getLogger(__name__)
 
 class TC_SU_2_2(SoftwareUpdateBaseTest):
 
-    async def add_single_ota_provider(self, controller, requestor_node_id: int, provider_node_id: int):
+    async def add_single_ota_provider_if_missing(self, controller, requestor_node_id: int, provider_node_id: int):
         """
-        Adds a single OTA provider to the Requestor's DefaultOTAProviders attribute
+        Adds a single OTA provider to the Requestor DefaultOTAProviders attribute
         only if no provider is currently registered. If a provider already exists,
-        the function does nothing.
+        the function oreserve the current DefaultOTAProviders.
 
         Args:
             controller: The device controller.
@@ -77,6 +77,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         Returns:
             None
         """
+
         # Read existing DefaultOTAProviders on the Requestor
         current_providers = await self.read_single_attribute_check_success(
             dev_ctrl=controller,
@@ -87,28 +88,11 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
         # If there is already a provider, skip adding
         if current_providers:
-            logger.info(f'Skipping add: Requestor already has a provider registered ({current_providers})')
+            logger.info(f"Skipping add: Requestor already has providers {current_providers}")
             return
 
-        # Create a ProviderLocation for the new provider
-        provider_location = Clusters.OtaSoftwareUpdateRequestor.Structs.ProviderLocation(
-            providerNodeID=provider_node_id,
-            endpoint=0,
-            fabricIndex=controller.fabricId
-        )
-        logger.info(f'Prerequisite #4.0 - ProviderLocation to add: {provider_location}')
-
-        # Combine with existing providers (preserving previous ones)
-        updated_providers = current_providers + [provider_location]
-
-        # Write the updated DefaultOTAProviders list back to the Requestor
-        attr = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(value=updated_providers)
-        resp = await controller.WriteAttribute(
-            attributes=[(0, attr)],
-            nodeId=requestor_node_id
-        )
-        logger.info(f'Prerequisite #4.0 - Write DefaultOTAProviders response: {resp}')
-        asserts.assert_equal(resp[0].Status, Status.Success, "Failed to write DefaultOTAProviders attribute")
+        await self.set_default_ota_providers_list(controller, provider_node_id, requestor_node_id)
+        logger.info("Prerequisite #4.0 - Write DefaultOTAProviders completed.")
 
     async def clear_ota_providers(self, controller, requestor_node_id: int):
         """
@@ -503,7 +487,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
         # Prerequisite #3.0 - Add OTA Provider to the Requestor (Only if none exists, and only one time)
         logger.info(f'{step_number}: Prerequisite #4.0 - Add Provider to Requestor(DUT) DefaultOTAProviders')
-        await self.add_single_ota_provider(controller, requestor_node_id, provider_node_id)
+        await self.add_single_ota_provider_if_missing(controller, requestor_node_id, provider_node_id)
 
         # ------------------------------------------------------------------------------------
         # [STEP_1]: Step #1.1 - Matcher for OTA records logs
