@@ -355,7 +355,7 @@ TEST_F(TestEventLogging, TestHandlingInvalidEvents)
     logMgmt.RemoveEventsWithInvalidPath();
 
     // Before RemoveEventsWithInvalidPath(), there are 2 kTestEndpointId1 and 1 kTestEndpointId2 events on the buffer
-    // of Info priority and 2 kTestEndpointId2 event and 1 kTestEndpointId1 events on the buffer of Debug priority.
+    // of Info priority and 2 kTestEndpointId2 events and 1 kTestEndpointId1 event on the buffer of Debug priority.
     // After removing invalid events, there are 2 events on the buffer of Debug priority and one on events on the
     // buffer of Info priority.
     CheckLogState(logMgmt, 3, chip::app::PriorityLevel::Info);
