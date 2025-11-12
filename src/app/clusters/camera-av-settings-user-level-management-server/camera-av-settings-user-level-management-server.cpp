@@ -54,7 +54,7 @@ CameraAvSettingsUserLevelMgmtServer::CameraAvSettingsUserLevelMgmtServer(Endpoin
 CameraAvSettingsUserLevelMgmtServer::~CameraAvSettingsUserLevelMgmtServer()
 {
     // Unregister command handler and attribute access interfaces
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
     mDelegate.SetServer(nullptr);
 }
@@ -356,7 +356,7 @@ void CameraAvSettingsUserLevelMgmtServer::SetPan(Optional<int16_t> aPan)
         if (aPan.HasValue())
         {
             mMptzPosition.pan = aPan;
-            StoreMPTZPosition(mMptzPosition);
+            TEMPORARY_RETURN_IGNORED StoreMPTZPosition(mMptzPosition);
             MarkDirty(Attributes::MPTZPosition::Id);
         }
     }
@@ -369,7 +369,7 @@ void CameraAvSettingsUserLevelMgmtServer::SetTilt(Optional<int16_t> aTilt)
         if (aTilt.HasValue())
         {
             mMptzPosition.tilt = aTilt;
-            StoreMPTZPosition(mMptzPosition);
+            TEMPORARY_RETURN_IGNORED StoreMPTZPosition(mMptzPosition);
             MarkDirty(Attributes::MPTZPosition::Id);
         }
     }
@@ -382,7 +382,7 @@ void CameraAvSettingsUserLevelMgmtServer::SetZoom(Optional<uint8_t> aZoom)
         if (aZoom.HasValue())
         {
             mMptzPosition.zoom = aZoom;
-            StoreMPTZPosition(mMptzPosition);
+            TEMPORARY_RETURN_IGNORED StoreMPTZPosition(mMptzPosition);
             MarkDirty(Attributes::MPTZPosition::Id);
         }
     }
@@ -571,7 +571,7 @@ void CameraAvSettingsUserLevelMgmtServer::LoadPersistentAttributes()
     }
 
     // Signal delegate that all persistent configuration attributes have been loaded.
-    mDelegate.PersistentAttributesLoadedCallback();
+    TEMPORARY_RETURN_IGNORED mDelegate.PersistentAttributesLoadedCallback();
 }
 
 /**

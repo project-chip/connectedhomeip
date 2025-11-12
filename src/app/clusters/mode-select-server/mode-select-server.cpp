@@ -88,15 +88,13 @@ CHIP_ERROR ModeSelectAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
         if (gSupportedModeManager == nullptr)
         {
             ChipLogError(Zcl, "ModeSelect: SupportedModesManager is NULL");
-            aEncoder.EncodeEmptyList();
-            return CHIP_NO_ERROR;
+            return aEncoder.EncodeEmptyList();
         }
         const ModeSelect::SupportedModesManager::ModeOptionsProvider modeOptionsProvider =
             gSupportedModeManager->getModeOptionsProvider(aPath.mEndpointId);
         if (modeOptionsProvider.begin() == nullptr)
         {
-            aEncoder.EncodeEmptyList();
-            return CHIP_NO_ERROR;
+            return aEncoder.EncodeEmptyList();
         }
         CHIP_ERROR err;
         err = aEncoder.EncodeList([modeOptionsProvider](const auto & encoder) -> CHIP_ERROR {
@@ -241,13 +239,13 @@ public:
         CHIP_ERROR err = pair_iterator.GetStatus();
         if (CHIP_NO_ERROR != err)
         {
-            mSceneEndpointStatePairs.RemovePair(endpoint);
+            TEMPORARY_RETURN_IGNORED mSceneEndpointStatePairs.RemovePair(endpoint);
             return err;
         }
 
         VerifyOrReturnError(mTransitionTimeInterface.sceneEventControl(endpoint) != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(timeMs), timerCallback,
-                                              mTransitionTimeInterface.sceneEventControl(endpoint));
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(timeMs), timerCallback,
+                                                                       mTransitionTimeInterface.sceneEventControl(endpoint));
 
         return CHIP_NO_ERROR;
     }
@@ -276,7 +274,7 @@ static void sceneModeSelectCallback(EndpointId endpoint)
     ModeSelectEndPointPair savedState;
     ReturnOnFailure(sModeSelectSceneHandler.mSceneEndpointStatePairs.GetPair(endpoint, savedState));
     ChangeToMode(endpoint, savedState.mValue);
-    sModeSelectSceneHandler.mSceneEndpointStatePairs.RemovePair(endpoint);
+    TEMPORARY_RETURN_IGNORED sModeSelectSceneHandler.mSceneEndpointStatePairs.RemovePair(endpoint);
 }
 
 #endif // defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS

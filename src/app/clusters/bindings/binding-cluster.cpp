@@ -181,7 +181,7 @@ DataModel::ActionReturnStatus BindingCluster::WriteAttribute(const DataModel::Wr
                 {
                     if (bindingTableIter->type == Binding::MATTER_UNICAST_BINDING)
                     {
-                        Binding::Manager::GetInstance().UnicastBindingRemoved(bindingTableIter.GetIndex());
+                        TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().UnicastBindingRemoved(bindingTableIter.GetIndex());
                     }
                     ReturnErrorOnFailure(Binding::Table::GetInstance().RemoveAt(bindingTableIter));
                 }

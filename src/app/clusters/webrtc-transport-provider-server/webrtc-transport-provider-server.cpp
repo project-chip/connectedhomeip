@@ -218,7 +218,7 @@ WebRTCTransportProviderServer::WebRTCTransportProviderServer(Delegate & delegate
 
 WebRTCTransportProviderServer::~WebRTCTransportProviderServer()
 {
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 

@@ -55,7 +55,7 @@ void MatterDiagnosticLogsClusterShutdownCallback(EndpointId endpointId)
 {
     // We implement the cluster as a singleton on the root endpoint.
     VerifyOrReturn(endpointId == kRootEndpointId);
-    CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.get());
+    TEMPORARY_RETURN_IGNORED CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.get());
 }
 
 void MatterDiagnosticLogsPluginServerInitCallback() {}
