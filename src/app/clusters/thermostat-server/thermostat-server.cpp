@@ -655,7 +655,7 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
         auto delegate = GetDelegate(aPath.mEndpointId);
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
-        ReturnErrorOnFailure(aEncoder.Encode(delegate->GetNumberOfScheduleTransitionPerDay()));
+        return aEncoder.Encode(delegate->GetNumberOfScheduleTransitionPerDay());
     }
     break;
     case Schedules::Id: {
