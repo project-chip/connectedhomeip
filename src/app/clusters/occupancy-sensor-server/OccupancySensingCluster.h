@@ -75,10 +75,10 @@ public:
         EndpointId mEndpointId;
         BitMask<OccupancySensing::Feature> mFeatureMap = 0;
         bool mHasHoldTime                                = false;
-        uint16_t mHoldTime                               = 1;
+        uint16_t mHoldTime                               = 10;
         OccupancySensing::Structs::HoldTimeLimitsStruct::Type mHoldTimeLimits = { .holdTimeMin     = 1,
-                                                                                  .holdTimeMax     = 10,
-                                                                                  .holdTimeDefault = 1 };
+                                                                                  .holdTimeMax     = 300,
+                                                                                  .holdTimeDefault = 10 };
         TimerDelegate * mTimerDelegate                   = nullptr;
         OccupancySensingDelegate * mDelegate             = nullptr;
     };

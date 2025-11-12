@@ -50,17 +50,9 @@ BitMask<OccupancySensing::OccupancySensorTypeBitmap> FeaturesToOccupancySensorTy
 {
     BitMask<OccupancySensing::OccupancySensorTypeBitmap> occupancySensorTypeBitmap{};
 
-    if (!features.HasAny(OccupancySensing::Feature::kPassiveInfrared, OccupancySensing::Feature::kUltrasonic, OccupancySensing::Feature::kPhysicalContact))
-    {
-        // If no features are set, default to PIR
-        occupancySensorTypeBitmap.Set(OccupancySensing::OccupancySensorTypeBitmap::kPir);
-    }
-    else
-    {
-        occupancySensorTypeBitmap.Set(OccupancySensing::OccupancySensorTypeBitmap::kPir, features.Has(OccupancySensing::Feature::kPassiveInfrared));
-        occupancySensorTypeBitmap.Set(OccupancySensing::OccupancySensorTypeBitmap::kUltrasonic, features.Has(OccupancySensing::Feature::kUltrasonic));
-        occupancySensorTypeBitmap.Set(OccupancySensing::OccupancySensorTypeBitmap::kPhysicalContact, features.Has(OccupancySensing::Feature::kPhysicalContact));
-    }
+    occupancySensorTypeBitmap.Set(OccupancySensing::OccupancySensorTypeBitmap::kPir, features.Has(OccupancySensing::Feature::kPassiveInfrared));
+    occupancySensorTypeBitmap.Set(OccupancySensing::OccupancySensorTypeBitmap::kUltrasonic, features.Has(OccupancySensing::Feature::kUltrasonic));
+    occupancySensorTypeBitmap.Set(OccupancySensing::OccupancySensorTypeBitmap::kPhysicalContact, features.Has(OccupancySensing::Feature::kPhysicalContact));
 
     return occupancySensorTypeBitmap;
 }
@@ -205,9 +197,10 @@ CHIP_ERROR OccupancySensingCluster::Attributes(const ConcreteClusterPath & clust
     const AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
         { mHasHoldTime, Attributes::HoldTime::kMetadataEntry },
         { mHasHoldTime, Attributes::HoldTimeLimits::kMetadataEntry },
-        { mHasHoldTime, Attributes::PIROccupiedToUnoccupiedDelay::kMetadataEntry },
-        { mHasHoldTime, Attributes::UltrasonicOccupiedToUnoccupiedDelay::kMetadataEntry },
-        { mHasHoldTime, Attributes::PhysicalContactOccupiedToUnoccupiedDelay::kMetadataEntry },
+        { mHasHoldTime && mFeatureMap.Has(Feature::kPassiveInfrared), Attributes::PIROccupiedToUnoccupiedDelay::kMetadataEntry },
+        { mHasHoldTime && mFeatureMap.Has(Feature::kUltrasonic), Attributes::UltrasonicOccupiedToUnoccupiedDelay::kMetadataEntry },
+        { mHasHoldTime && mFeatureMap.Has(Feature::kPhysicalContact),
+          Attributes::PhysicalContactOccupiedToUnoccupiedDelay::kMetadataEntry },
     };
 
     return listBuilder.Append(Span(OccupancySensing::Attributes::kMandatoryMetadata), Span(optionalAttributes));
