@@ -63,7 +63,7 @@ CHIP_ERROR ServerClusterInterfaceRegistry::Register(ServerClusterRegistration & 
     if (mContext.has_value())
     {
         // To preserve similarity with SetContext, do not fail the register even Startup fails.
-        // This will cause Shutdown to be called for both success and failed startups.
+        // This will cause Shutdown to be called for both successful and failed startups.
         LogErrorOnFailure(entry.serverClusterInterface->Startup(*mContext));
     }
 
