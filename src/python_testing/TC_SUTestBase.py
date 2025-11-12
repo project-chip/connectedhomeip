@@ -300,3 +300,24 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             nodeId=provider_node_id,
             attributes=[(0, acl_attribute)]
         )
+
+    async def clear_ota_providers(self, controller: ChipDeviceCtrl, requestor_node_id: int):
+        """
+        Clears the DefaultOTAProviders attribute on the Requestor, leaving it empty.
+
+        Args:
+            controller (ChipDeviceCtrl): The controller to use for writing attributes.
+            requestor_node_id (int): Node ID of the Requestor device.
+
+        Returns:
+            None
+        """
+        # Set DefaultOTAProviders to empty list
+        attr_clear = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(value=[])
+        resp = await controller.WriteAttribute(
+            attributes=[(0, attr_clear)],
+            nodeId=requestor_node_id
+        )
+        logger.info('Cleanup - DefaultOTAProviders cleared')
+
+        asserts.assert_equal(resp[0].Status, Status.Success, "Failed to clear DefaultOTAProviders")

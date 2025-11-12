@@ -94,27 +94,6 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         await self.set_default_ota_providers_list(controller, provider_node_id, requestor_node_id)
         logger.info("Prerequisite #4.0 - Write DefaultOTAProviders completed.")
 
-    async def clear_ota_providers(self, controller, requestor_node_id: int):
-        """
-        Clears the DefaultOTAProviders attribute on the Requestor, leaving it empty.
-
-        Args:
-            controller: The controller to use for writing attributes.
-            requestor_node_id (int): Node ID of the Requestor device.
-
-        Returns:
-            None
-        """
-        # Set DefaultOTAProviders to empty list
-        attr_clear = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(value=[])
-        resp = await controller.WriteAttribute(
-            attributes=[(0, attr_clear)],
-            nodeId=requestor_node_id
-        )
-        logger.info('Cleanup - DefaultOTAProviders cleared')
-
-        assert resp[0].Status == Status.Success, "Failed to clear DefaultOTAProviders"
-
     async def setup_provider(self, provider_app_path: str, ota_image_path: str, extra_args: list[str]):
         """
         Launch an OTA Provider process with the specified image and extra arguments.
