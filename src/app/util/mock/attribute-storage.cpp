@@ -486,7 +486,10 @@ CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const Co
         ReturnErrorOnFailure(attributeReport.GetError());
         AttributePathIB::Builder & attributePath = attributeStatus.CreatePath();
         ReturnErrorOnFailure(attributeStatus.GetError());
-        attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
+        TEMPORARY_RETURN_IGNORED attributePath.Endpoint(aPath.mEndpointId)
+            .Cluster(aPath.mClusterId)
+            .Attribute(aPath.mAttributeId)
+            .EndOfAttributePathIB();
         ReturnErrorOnFailure(attributePath.GetError());
         StatusIB::Builder & errorStatus = attributeStatus.CreateErrorStatus();
         ReturnErrorOnFailure(attributeStatus.GetError());
@@ -527,7 +530,10 @@ CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const Co
     attributeData.DataVersion(dataVersion);
     AttributePathIB::Builder & attributePath = attributeData.CreatePath();
     ReturnErrorOnFailure(attributeData.GetError());
-    attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
+    TEMPORARY_RETURN_IGNORED attributePath.Endpoint(aPath.mEndpointId)
+        .Cluster(aPath.mClusterId)
+        .Attribute(aPath.mAttributeId)
+        .EndOfAttributePathIB();
     ReturnErrorOnFailure(attributePath.GetError());
 
     TLV::TLVWriter * writer = attributeData.GetWriter();

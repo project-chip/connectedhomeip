@@ -14,6 +14,7 @@
  *    limitations under the License.
  */
 
+#pragma once
 #include <app/data-model-provider/MetadataTypes.h>
 #include <lib/support/Span.h>
 

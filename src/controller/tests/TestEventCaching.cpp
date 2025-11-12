@@ -38,6 +38,7 @@
 #include <lib/support/TimeUtils.h>
 #include <lib/support/UnitTestUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <protocols/interaction_model/Constants.h>
 
 using namespace chip;
@@ -159,7 +160,7 @@ TEST_F(TestEventCaching, TestBasicCaching)
 
     // Register our fake dynamic endpoint.
     DataVersion dataVersionStorage[MATTER_ARRAY_SIZE(testEndpointClusters)];
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
+    EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage)));
 
     chip::EventNumber firstEventNumber;
     chip::EventNumber lastEventNumber;
@@ -187,7 +188,7 @@ TEST_F(TestEventCaching, TestBasicCaching)
         DrainAndServiceIO();
 
         uint8_t generationCount = 0;
-        readCallback.mClusterCacheAdapter.ForEachEventData(
+        CHIP_ERROR iterResult   = readCallback.mClusterCacheAdapter.ForEachEventData(
             [&readCallback, &generationCount, firstEventNumber, lastEventNumber](const app::EventHeader & header) {
                 EXPECT_EQ(header.mPath.mClusterId, Clusters::UnitTesting::Id);
                 EXPECT_EQ(header.mPath.mEventId, Clusters::UnitTesting::Events::TestEvent::Id);
@@ -202,18 +203,19 @@ TEST_F(TestEventCaching, TestBasicCaching)
                 generationCount++;
                 return CHIP_NO_ERROR;
             });
+        EXPECT_SUCCESS(iterResult);
 
         EXPECT_EQ(generationCount, lastEventNumber - firstEventNumber + 1);
 
         Optional<EventNumber> highestEventNumber;
-        readCallback.mClusterCacheAdapter.GetHighestReceivedEventNumber(highestEventNumber);
+        EXPECT_SUCCESS(readCallback.mClusterCacheAdapter.GetHighestReceivedEventNumber(highestEventNumber));
         EXPECT_TRUE(highestEventNumber.HasValue() && highestEventNumber.Value() == lastEventNumber);
 
         //
         // Re-run the iterator but pass in a path filter: EP*/TestCluster/EID*
         //
         generationCount = 0;
-        readCallback.mClusterCacheAdapter.ForEachEventData(
+        iterResult      = readCallback.mClusterCacheAdapter.ForEachEventData(
             [&readCallback, &generationCount, firstEventNumber, lastEventNumber](const app::EventHeader & header) {
                 EXPECT_EQ(header.mPath.mClusterId, Clusters::UnitTesting::Id);
                 EXPECT_EQ(header.mPath.mEventId, Clusters::UnitTesting::Events::TestEvent::Id);
@@ -229,6 +231,7 @@ TEST_F(TestEventCaching, TestBasicCaching)
                 return CHIP_NO_ERROR;
             },
             app::EventPathParams(kInvalidEndpointId, Clusters::UnitTesting::Id, kInvalidEventId));
+        EXPECT_SUCCESS(iterResult);
 
         EXPECT_EQ(generationCount, lastEventNumber - firstEventNumber + 1);
 
@@ -236,7 +239,7 @@ TEST_F(TestEventCaching, TestBasicCaching)
         // Re-run the iterator but pass in a path filter: EP*/TestCluster/TestEvent
         //
         generationCount = 0;
-        readCallback.mClusterCacheAdapter.ForEachEventData(
+        iterResult      = readCallback.mClusterCacheAdapter.ForEachEventData(
             [&readCallback, &generationCount, firstEventNumber, lastEventNumber](const app::EventHeader & header) {
                 EXPECT_EQ(header.mPath.mClusterId, Clusters::UnitTesting::Id);
                 EXPECT_EQ(header.mPath.mEventId, Clusters::UnitTesting::Events::TestEvent::Id);
@@ -252,6 +255,7 @@ TEST_F(TestEventCaching, TestBasicCaching)
                 return CHIP_NO_ERROR;
             },
             app::EventPathParams(kInvalidEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Events::TestEvent::Id));
+        EXPECT_SUCCESS(iterResult);
 
         EXPECT_EQ(generationCount, lastEventNumber - firstEventNumber + 1);
 
@@ -260,7 +264,7 @@ TEST_F(TestEventCaching, TestBasicCaching)
         // (EventNumber = firstEventNumber + 1). We should only receive 4 events.
         //
         generationCount = 1;
-        readCallback.mClusterCacheAdapter.ForEachEventData(
+        iterResult      = readCallback.mClusterCacheAdapter.ForEachEventData(
             [&readCallback, &generationCount, firstEventNumber, lastEventNumber](const app::EventHeader & header) {
                 EXPECT_EQ(header.mPath.mClusterId, Clusters::UnitTesting::Id);
                 EXPECT_EQ(header.mPath.mEventId, Clusters::UnitTesting::Events::TestEvent::Id);
@@ -276,6 +280,7 @@ TEST_F(TestEventCaching, TestBasicCaching)
                 return CHIP_NO_ERROR;
             },
             app::EventPathParams(), firstEventNumber + 1);
+        EXPECT_SUCCESS(iterResult);
 
         EXPECT_EQ(generationCount, lastEventNumber - firstEventNumber + 1);
 
@@ -285,7 +290,7 @@ TEST_F(TestEventCaching, TestBasicCaching)
         // events.
         //
         generationCount = 1;
-        readCallback.mClusterCacheAdapter.ForEachEventData(
+        iterResult      = readCallback.mClusterCacheAdapter.ForEachEventData(
             [&readCallback, &generationCount, firstEventNumber, lastEventNumber](const app::EventHeader & header) {
                 EXPECT_EQ(header.mPath.mClusterId, Clusters::UnitTesting::Id);
                 EXPECT_EQ(header.mPath.mEventId, Clusters::UnitTesting::Events::TestEvent::Id);
@@ -301,6 +306,7 @@ TEST_F(TestEventCaching, TestBasicCaching)
                 return CHIP_NO_ERROR;
             },
             app::EventPathParams(kInvalidEndpointId, Clusters::UnitTesting::Id, kInvalidEventId), firstEventNumber + 1);
+        EXPECT_SUCCESS(iterResult);
 
         EXPECT_EQ(generationCount, lastEventNumber - firstEventNumber + 1);
     }
@@ -324,7 +330,7 @@ TEST_F(TestEventCaching, TestBasicCaching)
         // This also ensures that we don't receive duplicate events in the `ForEachEventData` call below.
         //
         uint8_t generationCount = 0;
-        readCallback.mClusterCacheAdapter.ForEachEventData(
+        CHIP_ERROR iterResult   = readCallback.mClusterCacheAdapter.ForEachEventData(
             [&readCallback, &generationCount, oldFirstEventNumber, lastEventNumber](const app::EventHeader & header) {
                 EXPECT_EQ(header.mPath.mClusterId, Clusters::UnitTesting::Id);
                 EXPECT_EQ(header.mPath.mEventId, Clusters::UnitTesting::Events::TestEvent::Id);
@@ -340,22 +346,23 @@ TEST_F(TestEventCaching, TestBasicCaching)
 
                 return CHIP_NO_ERROR;
             });
+        EXPECT_SUCCESS(iterResult);
 
         EXPECT_EQ(generationCount, lastEventNumber - oldFirstEventNumber + 1);
 
         Optional<EventNumber> highestEventNumber;
-        readCallback.mClusterCacheAdapter.GetHighestReceivedEventNumber(highestEventNumber);
+        EXPECT_SUCCESS(readCallback.mClusterCacheAdapter.GetHighestReceivedEventNumber(highestEventNumber));
         EXPECT_TRUE(highestEventNumber.HasValue() && highestEventNumber.Value() == 9);
 
         readCallback.mClusterCacheAdapter.ClearEventCache();
         generationCount = 0;
-        readCallback.mClusterCacheAdapter.ForEachEventData([&generationCount](const app::EventHeader & header) {
+        EXPECT_SUCCESS(readCallback.mClusterCacheAdapter.ForEachEventData([&generationCount](const app::EventHeader & header) {
             generationCount++;
             return CHIP_NO_ERROR;
-        });
+        }));
 
         EXPECT_EQ(generationCount, 0u);
-        readCallback.mClusterCacheAdapter.GetHighestReceivedEventNumber(highestEventNumber);
+        EXPECT_SUCCESS(readCallback.mClusterCacheAdapter.GetHighestReceivedEventNumber(highestEventNumber));
         EXPECT_TRUE(highestEventNumber.HasValue() && highestEventNumber.Value() == 9);
     }
 
@@ -383,7 +390,7 @@ TEST_F(TestEventCaching, TestBasicCaching)
         EXPECT_EQ(readCallback.mEventsSeen, lastEventNumber - kLastSeenEventNumber);
 
         uint8_t generationCount = kLastSeenEventNumber + 1;
-        readCallback.mClusterCacheAdapter.ForEachEventData(
+        CHIP_ERROR iterResult   = readCallback.mClusterCacheAdapter.ForEachEventData(
             [&readCallback, &generationCount, lastEventNumber, kLastSeenEventNumber](const app::EventHeader & header) {
                 EXPECT_EQ(header.mPath.mClusterId, Clusters::UnitTesting::Id);
                 EXPECT_EQ(header.mPath.mEventId, Clusters::UnitTesting::Events::TestEvent::Id);
@@ -399,10 +406,11 @@ TEST_F(TestEventCaching, TestBasicCaching)
 
                 return CHIP_NO_ERROR;
             });
+        EXPECT_SUCCESS(iterResult);
 
         EXPECT_EQ(generationCount, lastEventNumber - oldFirstEventNumber + 1);
         Optional<EventNumber> highestEventNumber;
-        readCallback.mClusterCacheAdapter.GetHighestReceivedEventNumber(highestEventNumber);
+        EXPECT_SUCCESS(readCallback.mClusterCacheAdapter.GetHighestReceivedEventNumber(highestEventNumber));
         EXPECT_TRUE(highestEventNumber.HasValue() && highestEventNumber.Value() == lastEventNumber);
     }
 
@@ -425,24 +433,26 @@ TEST_F(TestEventCaching, TestBasicCaching)
         //
 
         uint8_t generationCount = 5;
-        readCallback.mClusterCacheAdapter.ForEachEventData([&readCallback, &generationCount](const app::EventHeader & header) {
-            EXPECT_EQ(header.mPath.mClusterId, Clusters::UnitTesting::Id);
-            EXPECT_EQ(header.mPath.mEventId, Clusters::UnitTesting::Events::TestEvent::Id);
-            EXPECT_EQ(header.mPath.mEndpointId, kTestEndpointId);
+        CHIP_ERROR iterResult =
+            readCallback.mClusterCacheAdapter.ForEachEventData([&readCallback, &generationCount](const app::EventHeader & header) {
+                EXPECT_EQ(header.mPath.mClusterId, Clusters::UnitTesting::Id);
+                EXPECT_EQ(header.mPath.mEventId, Clusters::UnitTesting::Events::TestEvent::Id);
+                EXPECT_EQ(header.mPath.mEndpointId, kTestEndpointId);
 
-            Clusters::UnitTesting::Events::TestEvent::DecodableType eventData;
-            EXPECT_EQ(readCallback.mClusterCacheAdapter.Get(header.mEventNumber, eventData), CHIP_NO_ERROR);
+                Clusters::UnitTesting::Events::TestEvent::DecodableType eventData;
+                EXPECT_EQ(readCallback.mClusterCacheAdapter.Get(header.mEventNumber, eventData), CHIP_NO_ERROR);
 
-            EXPECT_EQ(eventData.arg1, generationCount);
-            generationCount++;
+                EXPECT_EQ(eventData.arg1, generationCount);
+                generationCount++;
 
-            return CHIP_NO_ERROR;
-        });
+                return CHIP_NO_ERROR;
+            });
+        EXPECT_SUCCESS(iterResult);
 
         EXPECT_EQ(generationCount, 10u);
 
         Optional<EventNumber> highestEventNumber;
-        readCallback.mClusterCacheAdapter.GetHighestReceivedEventNumber(highestEventNumber);
+        EXPECT_SUCCESS(readCallback.mClusterCacheAdapter.GetHighestReceivedEventNumber(highestEventNumber));
         EXPECT_TRUE(highestEventNumber.HasValue() && highestEventNumber.Value() == 9);
     }
 

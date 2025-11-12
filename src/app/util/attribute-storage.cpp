@@ -1429,7 +1429,8 @@ void emAfSaveAttributeToStorageIfNeeded(uint8_t * data, EndpointId endpoint, Clu
     auto * attrStorage = GetAttributePersistenceProvider();
     if (attrStorage)
     {
-        attrStorage->WriteValue(ConcreteAttributePath(endpoint, clusterId, metadata->attributeId), ByteSpan(data, dataSize));
+        TEMPORARY_RETURN_IGNORED attrStorage->WriteValue(ConcreteAttributePath(endpoint, clusterId, metadata->attributeId),
+                                                         ByteSpan(data, dataSize));
     }
     else
     {

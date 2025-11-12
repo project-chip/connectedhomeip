@@ -88,7 +88,7 @@ CHIP_ERROR WakeEvent::Open(LayerSockets & systemLayer)
 
 void WakeEvent::Close(LayerSockets & systemLayer)
 {
-    systemLayer.StopWatchingSocket(&mReadWatch);
+    TEMPORARY_RETURN_IGNORED systemLayer.StopWatchingSocket(&mReadWatch);
     VerifyOrDie(::close(mReadFD) == 0);
     VerifyOrDie(::close(mWriteFD) == 0);
     mReadFD  = -1;
