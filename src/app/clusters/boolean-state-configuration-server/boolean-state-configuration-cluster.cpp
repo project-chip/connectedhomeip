@@ -44,7 +44,7 @@ BooleanStateConfigurationCluster::BooleanStateConfigurationCluster(EndpointId en
                                                                    const StartupConfiguration & config) :
     DefaultServerCluster({ endpointId, BooleanStateConfiguration::Id }),
     mFeatures(features), mOptionalAttributes([&features, &optionalAttributes]() -> FullOptionalAttributesSet {
-        // constructs the attribute set, that once constructed stay const
+        // constructs the attribute set, that once constructed stays const
         AttributeSet enabledOptionalAttributes;
 
         if (features.Has(Feature::kSensitivityLevel))
