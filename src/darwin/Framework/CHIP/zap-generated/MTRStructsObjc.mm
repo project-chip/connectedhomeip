@@ -1786,6 +1786,45 @@ NS_ASSUME_NONNULL_BEGIN
 @dynamic rssi;
 @end
 
+@implementation MTRGeneralDiagnosticsClusterDeviceLoadStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _currentSubscriptions = @(0);
+
+        _currentSubscriptionsForFabric = @(0);
+
+        _totalSubscriptionsEstablished = @(0);
+
+        _totalInteractionModelMessagesSent = @(0);
+
+        _totalInteractionModelMessagesReceived = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRGeneralDiagnosticsClusterDeviceLoadStruct alloc] init];
+
+    other.currentSubscriptions = self.currentSubscriptions;
+    other.currentSubscriptionsForFabric = self.currentSubscriptionsForFabric;
+    other.totalSubscriptionsEstablished = self.totalSubscriptionsEstablished;
+    other.totalInteractionModelMessagesSent = self.totalInteractionModelMessagesSent;
+    other.totalInteractionModelMessagesReceived = self.totalInteractionModelMessagesReceived;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: currentSubscriptions:%@; currentSubscriptionsForFabric:%@; totalSubscriptionsEstablished:%@; totalInteractionModelMessagesSent:%@; totalInteractionModelMessagesReceived:%@; >", NSStringFromClass([self class]), _currentSubscriptions, _currentSubscriptionsForFabric, _totalSubscriptionsEstablished, _totalInteractionModelMessagesSent, _totalInteractionModelMessagesReceived];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRGeneralDiagnosticsClusterNetworkInterface
 - (instancetype)init
 {

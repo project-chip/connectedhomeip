@@ -782,6 +782,16 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
 Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
 } // namespace TestEventTriggersEnabled
 
+namespace DeviceLoadStatus {
+Protocols::InteractionModel::Status
+Get(EndpointId endpoint, chip::app::Clusters::GeneralDiagnostics::Structs::DeviceLoadStruct::Type * value); // DeviceLoadStruct
+Protocols::InteractionModel::Status Set(EndpointId endpoint,
+                                        chip::app::Clusters::GeneralDiagnostics::Structs::DeviceLoadStruct::Type value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint,
+                                        chip::app::Clusters::GeneralDiagnostics::Structs::DeviceLoadStruct::Type value,
+                                        MarkAttributeDirty markDirty);
+} // namespace DeviceLoadStatus
+
 } // namespace Attributes
 } // namespace GeneralDiagnostics
 

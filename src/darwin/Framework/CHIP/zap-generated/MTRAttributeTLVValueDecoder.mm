@@ -2904,6 +2904,22 @@ static id _Nullable DecodeAttributeValueForGeneralDiagnosticsCluster(AttributeId
         value = [NSNumber numberWithBool:cppValue];
         return value;
     }
+    case Attributes::DeviceLoadStatus::Id: {
+        using TypeInfo = Attributes::DeviceLoadStatus::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        MTRGeneralDiagnosticsClusterDeviceLoadStruct * _Nonnull value;
+        value = [MTRGeneralDiagnosticsClusterDeviceLoadStruct new];
+        value.currentSubscriptions = [NSNumber numberWithUnsignedShort:cppValue.currentSubscriptions];
+        value.currentSubscriptionsForFabric = [NSNumber numberWithUnsignedShort:cppValue.currentSubscriptionsForFabric];
+        value.totalSubscriptionsEstablished = [NSNumber numberWithUnsignedInt:cppValue.totalSubscriptionsEstablished];
+        value.totalInteractionModelMessagesSent = [NSNumber numberWithUnsignedInt:cppValue.totalInteractionModelMessagesSent];
+        value.totalInteractionModelMessagesReceived = [NSNumber numberWithUnsignedInt:cppValue.totalInteractionModelMessagesReceived];
+        return value;
+    }
     default: {
         // Not a known GeneralDiagnostics attribute.
         break;
