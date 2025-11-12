@@ -20,7 +20,10 @@
 
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <app/server-cluster/AttributeListBuilder.h>
+#include <clusters/OtaSoftwareUpdateRequestor/AttributeIds.h>
 #include <clusters/OtaSoftwareUpdateRequestor/ClusterId.h>
+#include <clusters/OtaSoftwareUpdateRequestor/Commands.h>
+#include <clusters/OtaSoftwareUpdateRequestor/Events.h>
 #include <clusters/OtaSoftwareUpdateRequestor/Metadata.h>
 
 namespace chip::app::Clusters {
