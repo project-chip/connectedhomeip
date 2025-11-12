@@ -83,7 +83,7 @@ void ICDManagementFabricDelegate::OnFabricRemoved(const FabricTable & fabricTabl
 {
     uint16_t supported_clients = mICDConfigurationData->GetClientsSupportedPerFabric();
     ICDMonitoringTable table(*mStorage, fabricIndex, supported_clients, mSymmetricKeystore);
-    table.RemoveAll();
+    TEMPORARY_RETURN_IGNORED table.RemoveAll();
     ICDNotifier::GetInstance().NotifyICDManagementEvent(ICDListener::ICDManagementEvents::kTableUpdated);
 }
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
@@ -495,7 +495,7 @@ Status ICDManagementClusterWithCIP::RegisterClient(CommandHandler * commandObj, 
 
     if (entry.keyHandleValid)
     {
-        entry.DeleteKey();
+        TEMPORARY_RETURN_IGNORED entry.DeleteKey();
     }
 
     err = entry.SetKey(key);
@@ -506,7 +506,7 @@ Status ICDManagementClusterWithCIP::RegisterClient(CommandHandler * commandObj, 
     // Delete key upon failure to prevent key storage leakage.
     if (err != CHIP_NO_ERROR)
     {
-        entry.DeleteKey();
+        TEMPORARY_RETURN_IGNORED entry.DeleteKey();
     }
 
     VerifyOrReturnError(CHIP_ERROR_INVALID_ARGUMENT != err, Status::ConstraintError);

@@ -248,7 +248,7 @@ CHIP_ERROR Instance::EncodeAccuracy(const AttributeValueEncoder::ListEncodeHelpe
 
 exit:
     // Tell the delegate the read is complete
-    mDelegate.EndAccuracyRead();
+    TEMPORARY_RETURN_IGNORED mDelegate.EndAccuracyRead();
     return err;
 }
 
@@ -278,7 +278,7 @@ CHIP_ERROR Instance::EncodeRanges(const AttributeValueEncoder::ListEncodeHelper 
 
 exit:
     // Tell the delegate the read is complete
-    err = mDelegate.EndRangesRead();
+    TEMPORARY_RETURN_IGNORED mDelegate.EndRangesRead();
     return err;
 }
 
