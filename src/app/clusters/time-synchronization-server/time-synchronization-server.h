@@ -1,7 +1,5 @@
 /*
- *
  *    Copyright (c) 2023-2025 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,18 +16,4 @@
 
 #pragma once
 
-#include <app/clusters/time-synchronization-server/time-synchronization-delegate.h>
-
-namespace chip::app::Clusters::TimeSynchronization {
-
-class DefaultTimeSyncDelegate : public Delegate
-{
-
-public:
-    DefaultTimeSyncDelegate() : Delegate() {};
-    bool IsNTPAddressValid(CharSpan ntp) override;
-    bool IsNTPAddressDomain(CharSpan ntp) override;
-    CHIP_ERROR UpdateTimeFromPlatformSource(chip::Callback::Callback<OnTimeSyncCompletion> * callback) override;
-};
-
-} // namespace chip::app::Clusters::TimeSynchronization
+#include <app/clusters/time-synchronization-server/CodegenIntegration.h>

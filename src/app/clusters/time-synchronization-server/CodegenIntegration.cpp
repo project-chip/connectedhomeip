@@ -142,20 +142,12 @@ TimeSynchronizationCluster * GetClusterInstance()
 
 void SetDefaultDelegate(TimeSynchronization::Delegate * delegate)
 {
-    auto timeSynchronization = GetClusterInstance();
-    VerifyOrDie(timeSynchronization != nullptr);
-
-    // The delegate can only be set if GetClusterInstance() returns a valid instance
-    return timeSynchronization->SetDelegate(delegate);
+    TimeSynchronization::SetDelegate(delegate);
 }
 
 TimeSynchronization::Delegate * GetDefaultDelegate()
 {
-    auto timeSynchronization = GetClusterInstance();
-    VerifyOrDie(timeSynchronization != nullptr);
-
-    // The delegate can only be get if GetClusterInstance() returns a valid instance
-    return timeSynchronization->GetDelegate();
+    return TimeSynchronization::GetDelegate();
 }
 
 } // namespace chip::app::Clusters::TimeSynchronization

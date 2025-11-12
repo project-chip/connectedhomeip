@@ -22,8 +22,6 @@
 
 #include <system/SystemClock.h>
 
-#include <variant>
-
 #if TIME_SYNC_ENABLE_TSC_FEATURE
 #include <app/InteractionModelEngine.h>
 #endif
@@ -38,6 +36,33 @@ using chip::TimeSyncDataProvider;
 using chip::Protocols::InteractionModel::Status;
 
 namespace chip::app::Clusters {
+
+namespace TimeSynchronization {
+
+// Delegate implementation
+
+Delegate * gDelegate = nullptr;
+
+Delegate * GetDelegate()
+{
+    if (gDelegate == nullptr)
+    {
+        static DefaultTimeSyncDelegate delegate;
+        gDelegate = &delegate;
+    }
+
+    return gDelegate;
+}
+
+void SetDelegate(Delegate * delegate)
+{
+    if (delegate != nullptr)
+    {
+        gDelegate = delegate;
+    }
+}
+
+} // namespace TimeSynchronization
 
 namespace {
 
@@ -164,15 +189,12 @@ void EmitMissingTrustedTimeSourceEvent(DataModel::EventsGenerator * eventsGenera
 
 } // namespace
 
-static TimeSynchronization::DefaultTimeSyncDelegate gDelegate;
-
 TimeSynchronizationCluster::TimeSynchronizationCluster(EndpointId endpoint, const BitFlags<TimeSynchronization::Feature> features,
                                                        const OptionalAttributeSet & optionalAttributeSet,
                                                        const StartupConfiguration & config) :
-    DefaultServerCluster({ endpoint, TimeSynchronization::Id }),
-    mFeatures(features), mOptionalAttributeSet(optionalAttributeSet), mSupportsDNSResolve(config.supportsDNSResolve),
-    mNTPServerAvailable(config.ntpServerAvailable), mTimeZoneDatabase(config.timeZoneDatabase), mTimeSource(config.timeSource),
-    mDelegate(&gDelegate),
+    DefaultServerCluster({ endpoint, TimeSynchronization::Id }), mFeatures(features), mOptionalAttributeSet(optionalAttributeSet),
+    mSupportsDNSResolve(config.supportsDNSResolve), mNTPServerAvailable(config.ntpServerAvailable),
+    mTimeZoneDatabase(config.timeZoneDatabase), mTimeSource(config.timeSource),
 #if TIME_SYNC_ENABLE_TSC_FEATURE
     mOnDeviceConnectedCallback(OnDeviceConnectedWrapper, this),
     mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureWrapper, this),

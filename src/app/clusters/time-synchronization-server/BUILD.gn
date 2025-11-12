@@ -20,8 +20,6 @@ source_set("time-sync-data-provider") {
     "TimeSyncDataProvider.h",
   ]
 
-  # Provide headers to dependents; adjust deps if the provider needs other
-  # internal symbols.
   public_deps = [
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/lib/core",

@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -65,6 +65,10 @@ enum class TimeSyncEventFlag : uint8_t
     kMissingTTSource = 16,
 };
 
+// Delegate functions
+Delegate * GetDelegate();
+void SetDelegate(Delegate * delegate);
+
 } // namespace TimeSynchronization
 
 class TimeSynchronizationCluster : public DefaultServerCluster,
@@ -125,15 +129,6 @@ public:
 
     const TimeSynchronization::GranularityEnum & GetGranularity() const { return mGranularity; }
 
-    TimeSynchronization::Delegate * GetDelegate() const { return mDelegate; }
-    void SetDelegate(TimeSynchronization::Delegate * delegate)
-    {
-        if (delegate != nullptr)
-        {
-            mDelegate = delegate;
-        }
-    }
-
 private:
     CHIP_ERROR SetTrustedTimeSource(const DataModel::Nullable<TimeSynchronization::Structs::TrustedTimeSourceStruct::Type> & tts);
     inline CHIP_ERROR SetDefaultNTP(const DataModel::Nullable<CharSpan> & dntp);
@@ -178,7 +173,6 @@ private:
     TimeSynchronization::Attributes::NTPServerAvailable::TypeInfo::Type mNTPServerAvailable;
     TimeSynchronization::TimeZoneDatabaseEnum mTimeZoneDatabase;
     TimeSynchronization::TimeSourceEnum mTimeSource;
-    TimeSynchronization::Delegate * mDelegate = nullptr;
 
     TimeSyncDataProvider mTimeSyncDataProvider;
     TimeSynchronization::TimeSyncEventFlag mEventFlag = TimeSynchronization::TimeSyncEventFlag::kNone;
