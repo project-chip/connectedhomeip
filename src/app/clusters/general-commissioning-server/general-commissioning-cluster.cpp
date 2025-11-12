@@ -384,9 +384,8 @@ void GeneralCommissioningCluster::SetBreadCrumb(uint64_t value)
 CHIP_ERROR GeneralCommissioningCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-    mClusterContext.platformManager.AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
-    mClusterContext.fabricTable.AddFabricDelegate(this);
-    return CHIP_NO_ERROR;
+    ReturnErrorOnFailure(mClusterContext.platformManager.AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
+    return mClusterContext.fabricTable.AddFabricDelegate(this);
 }
 
 void GeneralCommissioningCluster::Shutdown()

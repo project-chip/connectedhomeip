@@ -44,6 +44,7 @@
 #include <Options.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
+#include <app/DefaultTimerDelegate.h>
 #include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/identify-server/identify-server.h>
@@ -192,7 +193,7 @@ void ApplicationInit()
     if ((!path.empty()) and (sChipNamedPipeCommands.Start(path, &sAllClustersCommandDelegate) != CHIP_NO_ERROR))
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
-        sChipNamedPipeCommands.Stop();
+        TEMPORARY_RETURN_IGNORED sChipNamedPipeCommands.Stop();
     }
 
 #ifdef MATTER_DM_PLUGIN_DISHWASHER_ALARM_SERVER
@@ -221,11 +222,16 @@ void ApplicationInit()
     VerifyOrDie(CodegenDataModelProvider::Instance().Registry().Register(gIdentifyCluster3.Registration()) == CHIP_NO_ERROR);
     VerifyOrDie(CodegenDataModelProvider::Instance().Registry().Register(gIdentifyCluster4.Registration()) == CHIP_NO_ERROR);
 
-    SetTagList(/* endpoint= */ 0, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp0TagList));
-    SetTagList(/* endpoint= */ 1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp1TagList));
-    SetTagList(/* endpoint= */ 2, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp2TagList));
-    SetTagList(/* endpoint= */ 3, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp3TagList));
-    SetTagList(/* endpoint= */ 4, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp4TagList));
+    TEMPORARY_RETURN_IGNORED SetTagList(/* endpoint= */ 0,
+                                        Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp0TagList));
+    TEMPORARY_RETURN_IGNORED SetTagList(/* endpoint= */ 1,
+                                        Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp1TagList));
+    TEMPORARY_RETURN_IGNORED SetTagList(/* endpoint= */ 2,
+                                        Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp2TagList));
+    TEMPORARY_RETURN_IGNORED SetTagList(/* endpoint= */ 3,
+                                        Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp3TagList));
+    TEMPORARY_RETURN_IGNORED SetTagList(/* endpoint= */ 4,
+                                        Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp4TagList));
 }
 
 void ApplicationShutdown()

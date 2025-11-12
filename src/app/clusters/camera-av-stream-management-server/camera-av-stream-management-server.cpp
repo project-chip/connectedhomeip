@@ -81,7 +81,7 @@ CameraAVStreamMgmtServer::~CameraAVStreamMgmtServer()
     mDelegate.SetCameraAVStreamMgmtServer(nullptr);
 
     // Unregister command handler and attribute access interfaces
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
@@ -168,7 +168,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::Init()
                          mEndpointId));
     }
 
-    LoadPersistentAttributes();
+    TEMPORARY_RETURN_IGNORED LoadPersistentAttributes();
 
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INTERNAL);
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
@@ -1001,15 +1001,22 @@ void CameraAVStreamMgmtServer::ModifyVideoStream(const uint16_t streamID, const 
     {
         if (stream.videoStreamID == streamID)
         {
+            bool wasModified = false;
             if (waterMarkEnabled.HasValue())
             {
+                wasModified = !stream.watermarkEnabled.HasValue() || stream.watermarkEnabled.Value() != waterMarkEnabled.Value();
                 stream.watermarkEnabled = waterMarkEnabled;
             }
             if (osdEnabled.HasValue())
             {
+                wasModified       = wasModified || !stream.OSDEnabled.HasValue() || stream.OSDEnabled.Value() != osdEnabled.Value();
                 stream.OSDEnabled = osdEnabled;
             }
-            ChipLogError(Camera, "Modified video stream with ID: %d", streamID);
+            if (wasModified)
+            {
+                TEMPORARY_RETURN_IGNORED PersistAndNotify<Attributes::AllocatedVideoStreams::Id>();
+                ChipLogProgress(Camera, "Modified video stream with ID: %d", streamID);
+            }
             return;
         }
     }
@@ -1022,15 +1029,22 @@ void CameraAVStreamMgmtServer::ModifySnapshotStream(const uint16_t streamID, con
     {
         if (stream.snapshotStreamID == streamID)
         {
+            bool wasModified = false;
             if (waterMarkEnabled.HasValue())
             {
+                wasModified = !stream.watermarkEnabled.HasValue() || stream.watermarkEnabled.Value() != waterMarkEnabled.Value();
                 stream.watermarkEnabled = waterMarkEnabled;
             }
             if (osdEnabled.HasValue())
             {
+                wasModified       = wasModified || !stream.OSDEnabled.HasValue() || stream.OSDEnabled.Value() != osdEnabled.Value();
                 stream.OSDEnabled = osdEnabled;
             }
-            ChipLogError(Camera, "Modified snapshot stream with ID: %d", streamID);
+            if (wasModified)
+            {
+                TEMPORARY_RETURN_IGNORED PersistAndNotify<Attributes::AllocatedSnapshotStreams::Id>();
+                ChipLogProgress(Camera, "Modified snapshot stream with ID: %d", streamID);
+            }
             return;
         }
     }
@@ -1120,7 +1134,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::SetViewport(const Globals::Structs::Viewpor
     }
     mViewport = aViewport;
 
-    StoreViewport(mViewport);
+    TEMPORARY_RETURN_IGNORED StoreViewport(mViewport);
     mDelegate.OnAttributeChanged(Attributes::Viewport::Id);
     auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::Viewport::Id);
     MatterReportingAttributeChangeCallback(path);
@@ -1569,7 +1583,7 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
     }
 
     // Signal delegate that all persistent configuration attributes have been loaded.
-    mDelegate.PersistentAttributesLoadedCallback();
+    TEMPORARY_RETURN_IGNORED mDelegate.PersistentAttributesLoadedCallback();
 }
 
 CHIP_ERROR CameraAVStreamMgmtServer::StoreViewport(const Globals::Structs::ViewportStruct::Type & viewport)
@@ -2021,7 +2035,7 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
         {
             // Add the allocated videostream object in the AllocatedVideoStreams list.
             videoStreamArgs.videoStreamID = videoStreamID;
-            AddVideoStream(videoStreamArgs);
+            TEMPORARY_RETURN_IGNORED AddVideoStream(videoStreamArgs);
 
             // Call delegate with the allocated stream parameters and new allocation action
             mDelegate.OnVideoStreamAllocated(videoStreamArgs, StreamAllocationAction::kNewAllocation);
@@ -2032,7 +2046,7 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
 
             VideoStreamStruct & videoStreamToUpdate = *it;
             // Reusing the existing stream. Update range parameters and check if they were modified
-            UpdateVideoStreamRangeParams(videoStreamToUpdate, videoStreamArgs, wasModified);
+            TEMPORARY_RETURN_IGNORED UpdateVideoStreamRangeParams(videoStreamToUpdate, videoStreamArgs, wasModified);
 
             // Call delegate with the final updated stream parameters and appropriate action
             mDelegate.OnVideoStreamAllocated(videoStreamToUpdate,
@@ -2111,7 +2125,7 @@ void CameraAVStreamMgmtServer::HandleVideoStreamDeallocate(HandlerContext & ctx,
 
     if (status == Status::Success)
     {
-        RemoveVideoStream(videoStreamID);
+        TEMPORARY_RETURN_IGNORED RemoveVideoStream(videoStreamID);
     }
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
@@ -2193,7 +2207,7 @@ void CameraAVStreamMgmtServer::HandleAudioStreamAllocate(HandlerContext & ctx,
     {
         // Add the allocated audiostream object in the AllocatedAudioStreams list.
         audioStreamArgs.audioStreamID = audioStreamID;
-        AddAudioStream(audioStreamArgs);
+        TEMPORARY_RETURN_IGNORED AddAudioStream(audioStreamArgs);
     }
 
     response.audioStreamID = audioStreamID;
@@ -2215,7 +2229,7 @@ void CameraAVStreamMgmtServer::HandleAudioStreamDeallocate(HandlerContext & ctx,
 
     if (status == Status::Success)
     {
-        RemoveAudioStream(audioStreamID);
+        TEMPORARY_RETURN_IGNORED RemoveAudioStream(audioStreamID);
     }
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
@@ -2330,13 +2344,13 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamAllocate(HandlerContext & ctx
         allocatedSnapshotStream.watermarkEnabled = snapshotStreamArgs.watermarkEnabled;
         allocatedSnapshotStream.OSDEnabled       = snapshotStreamArgs.OSDEnabled;
 
-        AddSnapshotStream(allocatedSnapshotStream);
+        TEMPORARY_RETURN_IGNORED AddSnapshotStream(allocatedSnapshotStream);
     }
     else
     {
         SnapshotStreamStruct & snapshotStreamToUpdate = *it;
         // Reusing the existing stream. Update range parameters
-        UpdateSnapshotStreamRangeParams(snapshotStreamToUpdate, snapshotStreamArgs);
+        TEMPORARY_RETURN_IGNORED UpdateSnapshotStreamRangeParams(snapshotStreamToUpdate, snapshotStreamArgs);
     }
 
     response.snapshotStreamID = snapshotStreamID;
@@ -2407,7 +2421,7 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamDeallocate(HandlerContext & c
 
     if (status == Status::Success)
     {
-        RemoveSnapshotStream(snapshotStreamID);
+        TEMPORARY_RETURN_IGNORED RemoveSnapshotStream(snapshotStreamID);
     }
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
