@@ -50,7 +50,19 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
 
     ReturnErrorOnFailure(provider.AddCluster(mBasicInformationCluster.Registration()));
 
-    mGeneralCommissioningCluster.Create();
+    mGeneralCommissioningCluster.Create(
+        GeneralCommissioningCluster::Context{
+            .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
+            .configurationManager       = DeviceLayer::ConfigurationMgr(),                       //
+            .deviceControlServer        = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
+            .fabricTable                = Server::GetInstance().GetFabricTable(),                //
+            .failsafeContext            = Server::GetInstance().GetFailSafeContext(),            //
+            .platformManager            = DeviceLayer::PlatformMgr(),                            //
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+            .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+        },
+        GeneralCommissioningCluster::OptionalAttributes());
     ReturnErrorOnFailure(provider.AddCluster(mGeneralCommissioningCluster.Registration()));
 
     mAdministratorCommissioningCluster.Create(endpointId, BitFlags<AdministratorCommissioning::Feature>{});
