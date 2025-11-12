@@ -185,6 +185,7 @@ MTR_DIRECT_MEMBERS
 
 static NSString * const kDefaultSubscriptionPoolSizeOverrideKey = @"subscriptionPoolSizeOverride";
 static NSString * const kTestStorageUserDefaultEnabledKey = @"enableTestStorage";
+static NSString * const kDisableTimeSyncDetectionKey = @"disableTimeSyncDetection";
 
 // Concrete to XPC internal state property dictionary keys
 static NSString * const kMTRDeviceInternalPropertyKeyVendorID = @"MTRDeviceInternalStateKeyVendorID";
