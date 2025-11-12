@@ -239,7 +239,7 @@ public:
      *
      * @return The number of schedule transitions per day or null if the number is unlimited.
      */
-    virtual DataModel::Nullable<uint8_t> GetNumberOfScheduleTransitionsPerDay() = 0;
+    virtual DataModel::Nullable<uint8_t> GetNumberOfScheduleTransitionPerDay() = 0;
 
     void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
 

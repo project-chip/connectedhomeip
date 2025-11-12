@@ -40,7 +40,7 @@ ThermostatDelegate::ThermostatDelegate()
     mIndexOfCurrentSuggestion                   = mMaxThermostatSuggestions;
     mNextFreeIndexInThermostatSuggestionsList   = 0;
     mMaxNumberOfSchedulesAllowedPerScheduleType = kMaxNumberOfSchedulesSupported;
-    mMaxNumberOfScheduleTransitionsPerDay       = kMaxNumberOfScheduleTransitionsPerDay;
+    mMaxNumberOfScheduleTransitionPerDay       = kMaxNumberOfScheduleTransitionPerDay;
 
     // Start the unique ID from 0 and it increases montonically.
     mUniqueID = 0;
@@ -510,7 +510,7 @@ CHIP_ERROR ThermostatDelegate::GetScheduleTypeAtIndex(size_t index, Structs::Sch
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
 
-DataModel::Nullable<uint8_t> ThermostatDelegate::GetNumberOfScheduleTransitionsPerDay()
+DataModel::Nullable<uint8_t> ThermostatDelegate::GetNumberOfScheduleTransitionPerDay()
 {
-    return mMaxNumberOfScheduleTransitionsPerDay;
+    return mMaxNumberOfScheduleTransitionPerDay;
 }
