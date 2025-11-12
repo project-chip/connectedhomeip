@@ -665,6 +665,31 @@ TEST_F(TestOTARequestorCluster, WriteDefaultProvidersList)
     EXPECT_EQ(changeListener.DirtyList()[0].mAttributeId, DefaultOtaProviders::Id);
 }
 
+TEST_F(TestOTARequestorCluster, WriteDefaultProvidersListWithNoInterfaceReturnsErrors)
+{
+    chip::Test::TestServerClusterContext context;
+    OTARequestorCluster cluster(kTestEndpointId, nullptr);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    chip::Test::ClusterTester tester(cluster);
+
+    auto & changeListener = context.ChangeListener();
+    changeListener.DirtyList().clear();
+
+    // Write the default OTA providers list.
+    namespace DefaultOtaProviders = OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders;
+    OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type provider;
+    provider.providerNodeID = 1234u;
+    provider.endpoint = 8;
+    // This comes from the subject descriptor set in WriteOperation's constructor, as ClusterTester creates
+    // a WriteOperation and doesn't set the subject descriptor
+    provider.fabricIndex = chip::app::Testing::kDenySubjectDescriptor.fabricIndex;
+    DataModel::List<OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type> payload(&provider, 1u);
+    std::optional<DataModel::ActionReturnStatus> result = tester.WriteAttribute(DefaultOtaProviders::Id, payload);
+    ASSERT_TRUE(result.has_value());
+    EXPECT_TRUE(result->IsError());
+    EXPECT_EQ(changeListener.DirtyList().size(), 0u);
+}
+
 TEST_F(TestOTARequestorCluster, WritingReadOnlyAttributesReturnsUnsupportedWrite)
 {
     // TODO
