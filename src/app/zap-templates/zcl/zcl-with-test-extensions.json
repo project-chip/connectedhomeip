@@ -3,11 +3,7 @@
     "category": "matter",
     "version": 1,
     "requiredFeatureLevel": 102,
-    "xmlRoot": [
-        ".",
-        "./data-model/chip",
-        "./data-model/test"
-    ],
+    "xmlRoot": [".", "./data-model/chip", "./data-model/test"],
     "_comment": "Ensure access-control-definitions.xml is first in xmlFile array",
     "xmlFile": [
         "access-control-definitions.xml",
@@ -156,15 +152,9 @@
     "manufacturersXml": "./data-model/manufacturers.xml",
     "options": {
         "text": {
-            "defaultResponsePolicy": [
-                "Always",
-                "Conditional",
-                "Never"
-            ]
+            "defaultResponsePolicy": ["Always", "Conditional", "Never"]
         },
-        "bool": [
-            "commandDiscovery"
-        ]
+        "bool": ["commandDiscovery"]
     },
     "defaults": {
         "text": {
@@ -554,7 +544,7 @@
             "FeatureMap"
         ],
         "RVC Clean Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
-        "RVC Run Mode": ["SupportedModes", "CurrentMode","FeatureMap"],
+        "RVC Run Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Operational State": [
             "OperationalState",
             "OperationalError",
