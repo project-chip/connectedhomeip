@@ -360,7 +360,7 @@ TEST_F(TestServerClusterInterfaceRegistry, StartupShutdownWithoutContext)
     {
         ServerClusterInterfaceRegistry registry;
 
-        // all register is ok
+        // all registrations are ok
         EXPECT_EQ(registry.Register(cluster1.Registration()), CHIP_NO_ERROR);
         EXPECT_EQ(registry.Register(cluster2.Registration()), CHIP_NO_ERROR);
 
