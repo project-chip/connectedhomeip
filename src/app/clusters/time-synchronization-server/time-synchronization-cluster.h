@@ -65,10 +65,6 @@ enum class TimeSyncEventFlag : uint8_t
     kMissingTTSource = 16,
 };
 
-// Delegate functions
-Delegate * GetDelegate();
-void SetDelegate(Delegate * delegate);
-
 } // namespace TimeSynchronization
 
 class TimeSynchronizationCluster : public DefaultServerCluster,
@@ -89,6 +85,7 @@ public:
         TimeSynchronization::Attributes::NTPServerAvailable::TypeInfo::Type ntpServerAvailable{ false };
         TimeSynchronization::TimeZoneDatabaseEnum timeZoneDatabase{ TimeSynchronization::TimeZoneDatabaseEnum::kNone };
         TimeSynchronization::TimeSourceEnum timeSource{ TimeSynchronization::TimeSourceEnum::kNone };
+        TimeSynchronization::Delegate * delegate{ nullptr };
     };
 
     TimeSynchronizationCluster(EndpointId endpoint, const BitFlags<TimeSynchronization::Feature> features,
@@ -128,6 +125,15 @@ public:
     CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
 
     const TimeSynchronization::GranularityEnum & GetGranularity() const { return mGranularity; }
+
+    TimeSynchronization::Delegate * GetDelegate() const { return mDelegate; }
+    void SetDelegate(TimeSynchronization::Delegate * delegate)
+    {
+        if (delegate != nullptr)
+        {
+            mDelegate = delegate;
+        }
+    }
 
 private:
     CHIP_ERROR SetTrustedTimeSource(const DataModel::Nullable<TimeSynchronization::Structs::TrustedTimeSourceStruct::Type> & tts);
@@ -173,6 +179,7 @@ private:
     TimeSynchronization::Attributes::NTPServerAvailable::TypeInfo::Type mNTPServerAvailable;
     TimeSynchronization::TimeZoneDatabaseEnum mTimeZoneDatabase;
     TimeSynchronization::TimeSourceEnum mTimeSource;
+    TimeSynchronization::Delegate * mDelegate = nullptr;
 
     TimeSyncDataProvider mTimeSyncDataProvider;
     TimeSynchronization::TimeSyncEventFlag mEventFlag = TimeSynchronization::TimeSyncEventFlag::kNone;

@@ -42,6 +42,8 @@ static_assert((kTimeSynchronizationFixedClusterCount == 0) ||
 
 LazyRegisteredServerCluster<TimeSynchronizationCluster> gServer;
 
+TimeSynchronization::Delegate * gDelegate = nullptr;
+
 class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
 public:
@@ -76,12 +78,11 @@ public:
         }
 
         gServer.Create(endpointId, featureMap, optionalAttributeSet,
-                       TimeSynchronizationCluster::StartupConfiguration{
-                           .supportsDNSResolve = supportsDNSResolve,
-                           .ntpServerAvailable = ntpServerAvailable,
-                           .timeZoneDatabase   = timeZoneDatabase,
-                           .timeSource         = timeSource,
-                       });
+                       TimeSynchronizationCluster::StartupConfiguration{ .supportsDNSResolve = supportsDNSResolve,
+                                                                         .ntpServerAvailable = ntpServerAvailable,
+                                                                         .timeZoneDatabase   = timeZoneDatabase,
+                                                                         .timeSource         = timeSource,
+                                                                         .delegate           = gDelegate });
         return gServer.Registration();
     }
 
@@ -140,14 +141,34 @@ TimeSynchronizationCluster * GetClusterInstance()
     return &gServer.Cluster();
 }
 
-void SetDefaultDelegate(TimeSynchronization::Delegate * delegate)
+void SetDefaultDelegate(Delegate * delegate)
 {
-    TimeSynchronization::SetDelegate(delegate);
+    VerifyOrReturn(delegate != nullptr);
+    gDelegate                = delegate;
+    auto timeSynchronization = GetClusterInstance();
+    if (timeSynchronization != nullptr)
+    {
+        timeSynchronization->SetDelegate(gDelegate);
+    }
 }
 
-TimeSynchronization::Delegate * GetDefaultDelegate()
+Delegate * GetDefaultDelegate()
 {
-    return TimeSynchronization::GetDelegate();
+    auto timeSynchronization = GetClusterInstance();
+    if (gDelegate == nullptr)
+    {
+        static DefaultTimeSyncDelegate delegate;
+        gDelegate = &delegate;
+        if (timeSynchronization != nullptr)
+        {
+            timeSynchronization->SetDelegate(gDelegate);
+        }
+    }
+    if (timeSynchronization != nullptr)
+    {
+        return timeSynchronization->GetDelegate();
+    }
+    return gDelegate;
 }
 
 } // namespace chip::app::Clusters::TimeSynchronization
