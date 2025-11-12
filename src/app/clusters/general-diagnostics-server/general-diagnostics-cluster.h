@@ -47,8 +47,7 @@ public:
                                                                  >;
 
     GeneralDiagnosticsCluster(OptionalAttributeSet optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature> featureFlags) :
-        DefaultServerCluster({ kRootEndpointId, GeneralDiagnostics::Id }),
-        mOptionalAttributeSet(optionalAttributeSet),
+        DefaultServerCluster({ kRootEndpointId, GeneralDiagnostics::Id }), mOptionalAttributeSet(optionalAttributeSet),
         mFeatureFlags(featureFlags)
     {}
 
