@@ -869,7 +869,7 @@ template("siwx917_sdk") {
     }
 
     public_configs = [ ":${sdk_target_name}_config" ]
-    
+
     if (chip_enable_ble_siwx) {
       public_configs +=
           [ "${chip_root}/src/platform/silabs/SiWx/ble:siwx-ble-config" ]

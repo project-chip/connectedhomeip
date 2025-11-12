@@ -122,6 +122,7 @@ if (is_si917_board) {
   }
   silabs_family = "SiWx917-common"
   wifi_soc = true
+
   # Enabling BLE on 917 NCP by default
   chip_enable_ble_siwx = true
 
