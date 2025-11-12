@@ -462,7 +462,7 @@ CHIP_ERROR EventManagement::LogEvent(EventLoggingDelegate * apDelegate, const Ev
 {
     assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(mState != EventManagementStates::Shutdown, CHIP_ERROR_INCORRECT_STATE);
-    // If the event path is invalid, we should not record it in the event log buffer.
+    // If the event path is invalid, we should not log it in the event log buffer.
     DataModel::EventEntry eventInfo;
     ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->EventInfo(aEventOptions.mPath, eventInfo));
     return LogEventPrivate(apDelegate, aEventOptions, aEventNumber);
