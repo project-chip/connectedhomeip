@@ -15,6 +15,7 @@
  */
 
 #include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
+#include <app/persistence/AttributePersistence.h>
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/testing/AttributeTesting.h>
@@ -800,7 +801,7 @@ TEST_F(TestOccupancySensingCluster, TestHoldTimeIncreaseWithActiveTimer)
 {
     chip::Test::TestServerClusterContext context;
     constexpr uint16_t kInitialHoldTime = 20;
-    constexpr OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin = 1, .holdTimeMax = 100, .holdTimeDefault = 1 };
+    constexpr OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin = 1, .holdTimeMax = 100, .holdTimeDefault = kInitialHoldTime };
     OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }
                                          .WithHoldTime(kInitialHoldTime, holdTimeLimitsConfig, mMockTimerDelegate)
                                          .WithDelegate(&gTestOccupancySensingDelegate) };
@@ -831,6 +832,161 @@ TEST_F(TestOccupancySensingCluster, TestHoldTimeIncreaseWithActiveTimer)
     mMockTimerDelegate.AdvanceClock(System::Clock::Seconds16(1));
     EXPECT_FALSE(cluster.IsOccupied());
     EXPECT_FALSE(mMockTimerDelegate.IsTimerActive(&cluster));
+}
+
+TEST_F(TestOccupancySensingCluster, TestSetHoldTimeLimitsSanitizesInput)
+{
+    chip::Test::TestServerClusterContext context;
+    OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithHoldTime(10, kDefaultHoldTimeLimits,
+                                                                                                     mMockTimerDelegate) };
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    chip::Test::ClusterTester tester(cluster);
+
+    const OccupancySensing::Structs::HoldTimeLimitsStruct::Type invalidHoldTimeLimits = {
+        .holdTimeMin     = 20,
+        .holdTimeMax     = 10,
+        .holdTimeDefault = 5,
+    };
+
+    cluster.SetHoldTimeLimits(invalidHoldTimeLimits);
+
+    OccupancySensing::Structs::HoldTimeLimitsStruct::Type readHoldTimeLimits;
+    EXPECT_EQ(tester.ReadAttribute(Attributes::HoldTimeLimits::Id, readHoldTimeLimits), CHIP_NO_ERROR);
+
+    // These assertions will fail with the current code, proving the bug.
+    // We expect the values to be sanitized.
+    EXPECT_EQ(readHoldTimeLimits.holdTimeMin, 20);
+    EXPECT_EQ(readHoldTimeLimits.holdTimeMax, 20); // Should be coerced to holdTimeMin
+    EXPECT_EQ(readHoldTimeLimits.holdTimeDefault, 20); // Should be clamped to the new min/max
+}
+
+TEST_F(TestOccupancySensingCluster, TestConstructorClampsInitialHoldTime)
+{
+    // holdTime is below the min, it should be clamped to min.
+    {
+        chip::Test::TestServerClusterContext context;
+        OccupancySensing::Structs::HoldTimeLimitsStruct::Type limits = { .holdTimeMin = 10, .holdTimeMax = 20, .holdTimeDefault = 15 };
+        OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithHoldTime(5, limits, mMockTimerDelegate) };
+        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+        EXPECT_EQ(cluster.GetHoldTime(), 10);
+    }
+
+    // holdTime is above the max, it should be clamped to max.
+    {
+        chip::Test::TestServerClusterContext context;
+        OccupancySensing::Structs::HoldTimeLimitsStruct::Type limits = { .holdTimeMin = 10, .holdTimeMax = 20, .holdTimeDefault = 15 };
+        OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithHoldTime(25, limits, mMockTimerDelegate) };
+        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+        EXPECT_EQ(cluster.GetHoldTime(), 20);
+    }
+}
+
+TEST_F(TestOccupancySensingCluster, TestStartupWithInvalidPersistedHoldTime)
+{
+    chip::Test::TestServerClusterContext context;
+    constexpr uint16_t kDefaultHoldTime = 15;
+    OccupancySensing::Structs::HoldTimeLimitsStruct::Type limits = { .holdTimeMin = 10, .holdTimeMax = 20, .holdTimeDefault = kDefaultHoldTime };
+
+    // 1. Manually write an invalid hold time to storage.
+    const uint16_t invalidHoldTime = 5; // Below the minimum of 10
+    EXPECT_EQ(context.AttributePersistenceProvider().WriteValue({ kTestEndpointId, OccupancySensing::Id, Attributes::HoldTime::Id },
+                                                                 { reinterpret_cast<const uint8_t *>(&invalidHoldTime), sizeof(invalidHoldTime) }),
+              CHIP_NO_ERROR);
+
+    // 2. Create a new cluster instance. On startup, it should load the invalid value,
+    //    detect that it's out of bounds, and coerce it to the default.
+    OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithHoldTime(kDefaultHoldTime, limits, mMockTimerDelegate) };
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    // 3. Verify that the hold time is now the default, not the invalid value.
+    EXPECT_EQ(cluster.GetHoldTime(), kDefaultHoldTime);
+
+    // 4. Verify that the corrected value has been written back to persistence.
+    uint16_t storedHoldTime;
+    AttributePersistence persistence(context.AttributePersistenceProvider());
+    EXPECT_TRUE(persistence.LoadNativeEndianValue({ kTestEndpointId, OccupancySensing::Id, Attributes::HoldTime::Id }, storedHoldTime, kDefaultHoldTime));
+    EXPECT_EQ(storedHoldTime, kDefaultHoldTime);
+}
+
+TEST_F(TestOccupancySensingCluster, TestEnableHoldTimeDynamically)
+{
+    chip::Test::TestServerClusterContext context;
+    OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId } };
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    chip::Test::ClusterTester tester(cluster);
+
+    // 1. Before enabling, reading hold time attributes should fail.
+    uint16_t holdTime;
+    EXPECT_EQ(tester.ReadAttribute(Attributes::HoldTime::Id, holdTime), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+
+    // 2. Enable hold time.
+    constexpr uint16_t kHoldTime = 15;
+    OccupancySensing::Structs::HoldTimeLimitsStruct::Type limits = { .holdTimeMin = 10, .holdTimeMax = 20, .holdTimeDefault = kHoldTime };
+    cluster.EnableHoldTime(kHoldTime, limits, mMockTimerDelegate);
+
+    // 3. After enabling, reading hold time attributes should succeed.
+    EXPECT_EQ(tester.ReadAttribute(Attributes::HoldTime::Id, holdTime), CHIP_NO_ERROR);
+    EXPECT_EQ(holdTime, kHoldTime);
+    EXPECT_EQ(cluster.GetHoldTime(), kHoldTime);
+
+    OccupancySensing::Structs::HoldTimeLimitsStruct::Type readLimits;
+    EXPECT_EQ(tester.ReadAttribute(Attributes::HoldTimeLimits::Id, readLimits), CHIP_NO_ERROR);
+    EXPECT_EQ(readLimits.holdTimeMin, limits.holdTimeMin);
+    EXPECT_EQ(readLimits.holdTimeMax, limits.holdTimeMax);
+    EXPECT_EQ(readLimits.holdTimeDefault, limits.holdTimeDefault);
+}
+
+TEST_F(TestOccupancySensingCluster, TestEnableHoldTimeSanitizesInput)
+{
+    chip::Test::TestServerClusterContext context;
+    OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId } };
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    chip::Test::ClusterTester tester(cluster);
+
+    // 1. Enable hold time with invalid limits and an out-of-bounds hold time.
+    const OccupancySensing::Structs::HoldTimeLimitsStruct::Type invalidLimits = {
+        .holdTimeMin     = 20, // Valid min
+        .holdTimeMax     = 10, // Invalid max < min
+        .holdTimeDefault = 5,  // Invalid default < min
+    };
+    const uint16_t invalidHoldTime = 30; // Invalid hold time > max
+    cluster.EnableHoldTime(invalidHoldTime, invalidLimits, mMockTimerDelegate);
+
+    // 2. Verify that the limits were sanitized.
+    OccupancySensing::Structs::HoldTimeLimitsStruct::Type readLimits;
+    EXPECT_EQ(tester.ReadAttribute(Attributes::HoldTimeLimits::Id, readLimits), CHIP_NO_ERROR);
+    EXPECT_EQ(readLimits.holdTimeMin, 20);
+    EXPECT_EQ(readLimits.holdTimeMax, 20); // Coerced to min
+    EXPECT_EQ(readLimits.holdTimeDefault, 20); // Clamped to new min/max
+
+    // 3. Verify that the hold time was clamped to the new sanitized limits.
+    uint16_t holdTime;
+    EXPECT_EQ(tester.ReadAttribute(Attributes::HoldTime::Id, holdTime), CHIP_NO_ERROR);
+    EXPECT_EQ(holdTime, 20); // Clamped to new max
+    EXPECT_EQ(cluster.GetHoldTime(), 20);
+}
+
+TEST_F(TestOccupancySensingCluster, TestHoldTimeMaxIsAtLeast10)
+{
+    chip::Test::TestServerClusterContext context;
+    OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithHoldTime(5, kDefaultHoldTimeLimits, mMockTimerDelegate) };
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    chip::Test::ClusterTester tester(cluster);
+
+    // 1. Set limits where max is < 10 but > min.
+    const OccupancySensing::Structs::HoldTimeLimitsStruct::Type newLimits = {
+        .holdTimeMin     = 1,
+        .holdTimeMax     = 5,
+        .holdTimeDefault = 5,
+    };
+    cluster.SetHoldTimeLimits(newLimits);
+
+    // 2. Read back the limits and verify max is coerced to 10.
+    OccupancySensing::Structs::HoldTimeLimitsStruct::Type readLimits;
+    EXPECT_EQ(tester.ReadAttribute(Attributes::HoldTimeLimits::Id, readLimits), CHIP_NO_ERROR);
+    EXPECT_EQ(readLimits.holdTimeMin, 1);
+    EXPECT_EQ(readLimits.holdTimeMax, 10); // This should fail. Current logic will result in 5.
+    EXPECT_EQ(readLimits.holdTimeDefault, 5);
 }
 
 } // namespace

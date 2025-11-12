@@ -23,7 +23,6 @@
 #include <app/InteractionModelEngine.h>
 #include <app/persistence/AttributePersistence.h>
 #include <clusters/OccupancySensing/Attributes.h>
-#include <clusters/OccupancySensing/Commands.h>
 #include <clusters/OccupancySensing/Metadata.h>
 #include <lib/support/CodeUtils.h>
 
@@ -99,15 +98,10 @@ OccupancySensing::OccupancySensorTypeEnum FeaturesToOccupancySensorType(BitFlags
 
 OccupancySensingCluster::OccupancySensingCluster(const Config & config) :
     DefaultServerCluster({ config.mEndpointId, OccupancySensing::Id }), mTimerDelegate(config.mTimerDelegate),
-    mDelegate(config.mDelegate), mFeatureMap(config.mFeatureMap), mHasHoldTime(config.mHasHoldTime), mHoldTime(config.mHoldTime),
-    mHoldTimeLimits(config.mHoldTimeLimits)
+    mDelegate(config.mDelegate), mFeatureMap(config.mFeatureMap), mHasHoldTime(config.mHasHoldTime)
 {
-    if (mHasHoldTime)
-    {
-        mHoldTimeLimits.holdTimeMin     = std::max(static_cast<uint16_t>(1), mHoldTimeLimits.holdTimeMin);
-        mHoldTimeLimits.holdTimeMax     = std::max(mHoldTimeLimits.holdTimeMin, mHoldTimeLimits.holdTimeMax);
-        mHoldTimeLimits.holdTimeDefault = std::clamp(mHoldTimeLimits.holdTimeDefault, mHoldTimeLimits.holdTimeMin, mHoldTimeLimits.holdTimeMax);
-    }
+    SetHoldTimeLimits(config.mHoldTimeLimits);
+    mHoldTime = std::clamp(config.mHoldTime, mHoldTimeLimits.holdTimeMin, mHoldTimeLimits.holdTimeMax);
 }
 
 OccupancySensingCluster::~OccupancySensingCluster()
@@ -129,19 +123,19 @@ CHIP_ERROR OccupancySensingCluster::Startup(ServerClusterContext & context)
 
         if (persistence.LoadNativeEndianValue({ mPath.mEndpointId, OccupancySensing::Id, Attributes::HoldTime::Id }, storedHoldTime, mHoldTime))
         {
-            // A value was found in persistence, so we'll use it.
-            // We ignore the return status as we don't want to fail startup if the value is invalid.
-            // The value will be coerced in SetHoldTime if it's out of bounds.
-            (void) SetHoldTime(storedHoldTime);
+            // A value was found in persistence. If it's valid, use it.
+            // If it's not valid, SetHoldTime will return an error. In that case, we'll fall
+            // back to the default and write it back to persistence.
+            if (SetHoldTime(storedHoldTime).IsSuccess())
+            {
+                return CHIP_NO_ERROR;
+            }
         }
-        else
-        {
-            // No value in persistence, so store the default value.
-            ReturnErrorOnFailure(
-                context.attributeStorage.WriteValue({ mPath.mEndpointId, OccupancySensing::Id, Attributes::HoldTime::Id }, { reinterpret_cast<const uint8_t *>(&mHoldTime), sizeof(mHoldTime) }));
-        }
-    }
 
+        // No value in persistence (or it was invalid), so store the default value.
+        ReturnErrorOnFailure(
+            context.attributeStorage.WriteValue({ mPath.mEndpointId, OccupancySensing::Id, Attributes::HoldTime::Id }, { reinterpret_cast<const uint8_t *>(&mHoldTime), sizeof(mHoldTime) }));
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -219,10 +213,18 @@ CHIP_ERROR OccupancySensingCluster::Attributes(const ConcreteClusterPath & clust
     return listBuilder.Append(Span(OccupancySensing::Attributes::kMandatoryMetadata), Span(optionalAttributes));
 }
 
+void OccupancySensingCluster::EnableHoldTime(uint16_t aHoldTime, const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & aHoldTimeLimits,
+                    TimerDelegate & aTimerDelegate)
+{
+    mHasHoldTime    = true;
+    mTimerDelegate  = &aTimerDelegate;
+    SetHoldTimeLimits(aHoldTimeLimits);
+    mHoldTime = std::clamp(aHoldTime, mHoldTimeLimits.holdTimeMin, mHoldTimeLimits.holdTimeMax);
+}
+
 DataModel::ActionReturnStatus OccupancySensingCluster::SetHoldTime(uint16_t holdTime)
 {
     VerifyOrReturnError(mHasHoldTime, Protocols::InteractionModel::Status::UnsupportedAttribute);
-
     VerifyOrReturnError(holdTime >= mHoldTimeLimits.holdTimeMin, Protocols::InteractionModel::Status::ConstraintError);
     VerifyOrReturnError(holdTime <= mHoldTimeLimits.holdTimeMax, Protocols::InteractionModel::Status::ConstraintError);
 
@@ -333,10 +335,18 @@ bool OccupancySensingCluster::IsOccupied() const
 
 void OccupancySensingCluster::SetHoldTimeLimits(const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & holdTimeLimits)
 {
-    if (mHoldTimeLimits.holdTimeMin != holdTimeLimits.holdTimeMin || mHoldTimeLimits.holdTimeMax != holdTimeLimits.holdTimeMax ||
-        mHoldTimeLimits.holdTimeDefault != holdTimeLimits.holdTimeDefault)
+    auto newHoldTimeLimits = holdTimeLimits;
+
+    // Here we sanitize the input limits to ensure they are valid, in case the caller
+    // provided invalid values.
+    newHoldTimeLimits.holdTimeMin     = std::max(static_cast<uint16_t>(1), newHoldTimeLimits.holdTimeMin);
+    newHoldTimeLimits.holdTimeMax     = std::max({ static_cast<uint16_t>(10), newHoldTimeLimits.holdTimeMin, newHoldTimeLimits.holdTimeMax });
+    newHoldTimeLimits.holdTimeDefault = std::clamp(newHoldTimeLimits.holdTimeDefault, newHoldTimeLimits.holdTimeMin, newHoldTimeLimits.holdTimeMax);
+
+    if (mHoldTimeLimits.holdTimeMin != newHoldTimeLimits.holdTimeMin || mHoldTimeLimits.holdTimeMax != newHoldTimeLimits.holdTimeMax ||
+        mHoldTimeLimits.holdTimeDefault != newHoldTimeLimits.holdTimeDefault)
     {
-        mHoldTimeLimits = holdTimeLimits;
+        mHoldTimeLimits = newHoldTimeLimits;
         NotifyAttributeChanged(Attributes::HoldTimeLimits::Id);
     }
 }

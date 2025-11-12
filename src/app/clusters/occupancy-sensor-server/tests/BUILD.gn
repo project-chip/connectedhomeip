@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-# http://www.apache.org/licenses/LICENSE-2.0
+#      http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,10 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/pigweed.gni")
-
 import("${chip_root}/build/chip/chip_test_suite.gni")
 
 chip_test_suite("tests") {
@@ -23,15 +20,12 @@ chip_test_suite("tests") {
 
   test_sources = [ "TestOccupancySensingCluster.cpp" ]
 
-  sources = []
-
-  cflags = [ "-Wconversion" ]
-
   public_deps = [
     "${chip_root}/src/app/clusters/occupancy-sensor-server",
     "${chip_root}/src/app/clusters/testing",
     "${chip_root}/src/app/data-model-provider/tests:encode-decode",
     "${chip_root}/src/app/server-cluster/testing:testing",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:timer-delegate-mock",
   ]
 }
