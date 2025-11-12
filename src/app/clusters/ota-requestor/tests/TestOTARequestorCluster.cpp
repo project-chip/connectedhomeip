@@ -159,6 +159,9 @@ TEST_F(TestOTARequestorCluster, TestCreate)
     MockOtaRequestor otaRequestor;
     OTARequestorCluster cluster(kTestEndpointId, &otaRequestor);
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    OTARequestorCluster clusterWithoutOtaRequestor(kTestEndpointId + 1, nullptr);
+    EXPECT_EQ(clusterWithoutOtaRequestor.Startup(context.Get()), CHIP_NO_ERROR);
 }
 
 TEST_F(TestOTARequestorCluster, AttributeListTest)
