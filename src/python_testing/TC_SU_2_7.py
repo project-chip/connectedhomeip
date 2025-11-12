@@ -25,9 +25,7 @@
 #     app-args: >
 #       --discriminator 123
 #       --passcode 2123
-#       --secured-device-port 5540
 #       --KVS /tmp/chip_kvs_requestor
-#       --autoApplyImage
 #       --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -35,7 +33,6 @@
 #       --discriminator 123
 #       --passcode 2123
 #       --endpoint 0
-#       --nodeId 123
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --string-arg provider_app_path:${OTA_PROVIDER_APP}
@@ -49,7 +46,6 @@
 #     app-args: >
 #       --discriminator 123
 #       --passcode 2123
-#       --secured-device-port 5540
 #       --KVS /tmp/chip_kvs_requestor
 #       --requestorCanConsent true
 #       --userConsentState deferred
@@ -60,7 +56,6 @@
 #       --discriminator 123
 #       --passcode 2123
 #       --endpoint 0
-#       --nodeId 123
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --string-arg provider_app_path:${OTA_PROVIDER_APP}
@@ -102,7 +97,6 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         "discriminator": 321,
         "setup_pincode": 2321
     }
-    requestor_setup_pincode = 2123
     requestor_node_id = None
 
     def all_steps(self) -> list[TestStep]:
@@ -137,7 +131,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         super().setup_test()
         self.ota_prov = Clusters.OtaSoftwareUpdateProvider
         self.ota_req = Clusters.OtaSoftwareUpdateRequestor
-        self.requestor_node_id = self.dut_node_id  # 123 with discriminator 123
+        self.requestor_node_id = self.dut_node_id
 
     @async_test_body
     async def teardown_test(self):
