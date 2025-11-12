@@ -71,6 +71,7 @@ source_set("data-model-provider") {
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/core:types",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:timer-delegate",
     "${chip_root}/src/messaging",
     "${chip_root}/src/platform",
     "${chip_root}/src/system",

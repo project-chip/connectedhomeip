@@ -47,13 +47,11 @@ void JitterDeferredProviderChangeListener::MarkDirty(const AttributePathParams &
         }
     }
     mAttributePaths[mCurrentIndex++] = path;
-    if (!mTimerActive)
+    if (!mTimer.IsTimerActive(this))
     {
         uint32_t jitterMs =
             (mDeferAttributePathJitterTimeoutMs == 0) ? 0 : Crypto::GetRandU32() % mDeferAttributePathJitterTimeoutMs;
-        DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(mDeferAttributePathBaseTimeoutMs + jitterMs),
-                                              TimerCallback, this);
-        mTimerActive = true;
+        mTimer.StartTimer(this, System::Clock::Milliseconds32(mDeferAttributePathBaseTimeoutMs + jitterMs));
     }
 }
 
@@ -69,11 +67,9 @@ void JitterDeferredProviderChangeListener::FlushDirtyPaths()
     mCurrentIndex = 0;
 }
 
-void JitterDeferredProviderChangeListener::TimerCallback(System::Layer * systemLayer, void * me)
+void JitterDeferredProviderChangeListener::TimerFired()
 {
-    auto * self = static_cast<JitterDeferredProviderChangeListener *>(me);
-    self->FlushDirtyPaths();
-    self->mTimerActive = false;
+    FlushDirtyPaths();
 }
 
 } // namespace DataModel

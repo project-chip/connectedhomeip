@@ -43,6 +43,7 @@
 #include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <platform/DefaultTimerDelegate.h>
 #include <platform/nrfconnect/FactoryResetTestEventTriggerHandler.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <system/SystemClock.h>
@@ -276,8 +277,9 @@ CHIP_ERROR AppTask::Init()
     static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
     static OTATestEventTriggerHandler sOtaTestEventTriggerHandler{};
     static DeviceLayer::FactoryResetTestEventTriggerHandler sFactoryResetEventTriggerHandler{};
+    static DefaultTimerDelegate sTimerDelegate;
     static chip::app::DataModel::JitterDeferredProviderChangeListener sJitterDeferredProviderChangeListener(
-        &chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine());
+        &chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine(), sTimerDelegate);
 
     VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
     VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sOtaTestEventTriggerHandler) == CHIP_NO_ERROR);

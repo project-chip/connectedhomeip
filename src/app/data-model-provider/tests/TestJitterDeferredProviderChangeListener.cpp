@@ -18,6 +18,7 @@
 
 #include <app/data-model-provider/JitterDeferredProviderChangeListener.h>
 #include <app/data-model-provider/ProviderChangeListener.h>
+#include <lib/support/TimerDelegateMock.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <pw_unit_test/framework.h>
 #include <system/SystemClock.h>
@@ -50,7 +51,6 @@ class MockProviderChangeListener : public ProviderChangeListener
 public:
     void MarkDirty(const AttributePathParams & path) override
     {
-        mLastCallTimestampMs = System::SystemClock().GetMonotonicMilliseconds64();
         mPaths.push_back(path);
         if (mPaths.size() == kTestPathsSize || path == kOverflowPath)
         {
@@ -58,13 +58,8 @@ public:
         }
     }
 
-    void Reset()
-    {
-        mLastCallTimestampMs = System::Clock::kZero;
-        mPaths.clear();
-    }
+    void Reset() { mPaths.clear(); }
 
-    System::Clock::Timestamp mLastCallTimestampMs = System::Clock::kZero;
     std::vector<AttributePathParams> mPaths;
 };
 
@@ -81,13 +76,13 @@ public:
         chip::Platform::MemoryShutdown();
         chip::DeviceLayer::PlatformMgr().Shutdown();
     }
+    TimerDelegateMock mMockTimerDelegate;
 };
 
 TEST_F(TestJitterDeferredProviderChangeListener, TestJitteryDelay)
 {
     MockProviderChangeListener underlyingListener;
-    JitterDeferredProviderChangeListener jitteryListener(&underlyingListener, kBaseTimeoutMs, kJitterTimeoutMs);
-    System::Clock::Timestamp startTime = System::SystemClock().GetMonotonicMilliseconds64();
+    JitterDeferredProviderChangeListener jitteryListener(&underlyingListener, mMockTimerDelegate, kBaseTimeoutMs, kJitterTimeoutMs);
 
     for (size_t i = 0; i < kTestPathsSize; i++)
     {
@@ -96,9 +91,8 @@ TEST_F(TestJitterDeferredProviderChangeListener, TestJitteryDelay)
 
     // The underlying listener should not have been called yet.
     EXPECT_EQ(underlyingListener.mPaths.size(), 0u);
-    EXPECT_EQ(underlyingListener.mLastCallTimestampMs, System::Clock::kZero);
 
-    chip::DeviceLayer::PlatformMgr().RunEventLoop();
+    mMockTimerDelegate.AdvanceClock(System::Clock::Milliseconds32(kBaseTimeoutMs + kJitterTimeoutMs));
 
     // Now the underlying listener should have been called.
     EXPECT_EQ(underlyingListener.mPaths.size(), kTestPathsSize);
@@ -106,22 +100,12 @@ TEST_F(TestJitterDeferredProviderChangeListener, TestJitteryDelay)
     {
         EXPECT_EQ(underlyingListener.mPaths[i], kTestPaths[i]);
     }
-    uint64_t timeDiff = (underlyingListener.mLastCallTimestampMs - startTime).count();
-    EXPECT_GE(timeDiff, kBaseTimeoutMs);
-
-    // We add a 20ms buffer to the maximum jitter delay to account for two issues:
-    // 1. A small timing gap between the test stamping 'StartTime' and the
-    //    JitterDeferredProviderChangeListener calling its internal 'StartTimer'.
-    // 2. The platform-dependent precision of 'StartTimer', which is tied
-    //    to the system's clock tick.
-    EXPECT_LE(timeDiff, kBaseTimeoutMs + kJitterTimeoutMs + kSystemClockDelaytMs);
 }
 
 TEST_F(TestJitterDeferredProviderChangeListener, TestBufferFullFlush)
 {
     MockProviderChangeListener underlyingListener;
-    JitterDeferredProviderChangeListener jitteryListener(&underlyingListener, kBaseTimeoutMs, kJitterTimeoutMs);
-    System::Clock::Timestamp startTime = System::SystemClock().GetMonotonicMilliseconds64();
+    JitterDeferredProviderChangeListener jitteryListener(&underlyingListener, mMockTimerDelegate, kBaseTimeoutMs, kJitterTimeoutMs);
 
     for (size_t i = 0; i < kTestPathsSize; i++)
     {
@@ -130,7 +114,6 @@ TEST_F(TestJitterDeferredProviderChangeListener, TestBufferFullFlush)
 
     // The underlying listener should not have been called yet.
     EXPECT_EQ(underlyingListener.mPaths.size(), 0u);
-    EXPECT_EQ(underlyingListener.mLastCallTimestampMs, System::Clock::kZero);
 
     // This call should overflow the buffer and trigger an immediate flush.
     jitteryListener.MarkDirty(kOverflowPath);
@@ -140,18 +123,9 @@ TEST_F(TestJitterDeferredProviderChangeListener, TestBufferFullFlush)
         EXPECT_EQ(underlyingListener.mPaths[i], kTestPaths[i]);
     }
     EXPECT_EQ(underlyingListener.mPaths.size(), JitterDeferredProviderChangeListener::kMaxAttributePathsBufferSize);
-    EXPECT_NE(underlyingListener.mLastCallTimestampMs, System::Clock::kZero);
 
-    chip::DeviceLayer::PlatformMgr().RunEventLoop();
+    mMockTimerDelegate.AdvanceClock(System::Clock::Milliseconds32(kBaseTimeoutMs + kJitterTimeoutMs));
 
-    uint64_t timeDiff = (underlyingListener.mLastCallTimestampMs - startTime).count();
-    EXPECT_GE(timeDiff, kBaseTimeoutMs);
-    // We add a 20ms buffer to the maximum jitter delay to account for two issues:
-    // 1. A small timing gap between the test stamping 'StartTime' and the
-    //    JitterDeferredProviderChangeListener calling its internal 'StartTimer'.
-    // 2. The platform-dependent precision of 'StartTimer', which is tied
-    //    to the system's clock tick.
-    EXPECT_LE(timeDiff, kBaseTimeoutMs + kJitterTimeoutMs + kSystemClockDelaytMs);
     EXPECT_EQ(underlyingListener.mPaths.size(), JitterDeferredProviderChangeListener::kMaxAttributePathsBufferSize + 1);
     EXPECT_EQ(underlyingListener.mPaths.back(), kOverflowPath);
 }

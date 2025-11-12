@@ -18,6 +18,7 @@
 
 #include <app/AttributePathParams.h>
 #include <app/data-model-provider/ProviderChangeListener.h>
+#include <lib/support/TimerDelegate.h>
 #include <system/SystemLayer.h>
 
 #include <array>
@@ -34,36 +35,40 @@ namespace DataModel {
  * approach has proven effective in mitigating network congestion and reducing packet retransmissions, particularly on constrained
  * networks like Thread.
  */
-class JitterDeferredProviderChangeListener : public ProviderChangeListener
+class JitterDeferredProviderChangeListener : public ProviderChangeListener, public TimerContext
 {
 public:
     static constexpr uint32_t kMaxAttributePathsBufferSize       = 10;
     static constexpr uint32_t kDeferAttributePathBaseTimeoutMs   = 1000;
     static constexpr uint32_t kDeferAttributePathJitterTimeoutMs = 1000;
 
-    JitterDeferredProviderChangeListener(ProviderChangeListener * aUnderlyingListener, uint32_t aDeferAttributePathBaseTimeoutMs,
-                                         uint32_t aDeferAttributePathJitterTimeoutMs) :
-        mUnderlyingListener(aUnderlyingListener), mDeferAttributePathBaseTimeoutMs(aDeferAttributePathBaseTimeoutMs),
+    JitterDeferredProviderChangeListener(ProviderChangeListener * aUnderlyingListener, TimerDelegate & aTimer,
+                                         uint32_t aDeferAttributePathBaseTimeoutMs, uint32_t aDeferAttributePathJitterTimeoutMs) :
+        mUnderlyingListener(aUnderlyingListener), mTimer(aTimer),
+        mDeferAttributePathBaseTimeoutMs(aDeferAttributePathBaseTimeoutMs),
         mDeferAttributePathJitterTimeoutMs(aDeferAttributePathJitterTimeoutMs)
     {}
 
-    JitterDeferredProviderChangeListener(ProviderChangeListener * aUnderlyingListener) :
-        JitterDeferredProviderChangeListener(aUnderlyingListener, kDeferAttributePathBaseTimeoutMs,
+    JitterDeferredProviderChangeListener(ProviderChangeListener * aUnderlyingListener, TimerDelegate & aTimer) :
+        JitterDeferredProviderChangeListener(aUnderlyingListener, aTimer, kDeferAttributePathBaseTimeoutMs,
                                              kDeferAttributePathJitterTimeoutMs)
     {}
 
     void MarkDirty(const AttributePathParams & path) override;
+    /**
+     * @brief Called when the identify timer fires.
+     */
+    void TimerFired() override;
 
 private:
     void FlushDirtyPaths();
-    static void TimerCallback(System::Layer * systemLayer, void * me);
 
     ProviderChangeListener * mUnderlyingListener;
+    TimerDelegate & mTimer;
     uint32_t mDeferAttributePathBaseTimeoutMs;
     uint32_t mDeferAttributePathJitterTimeoutMs;
     std::array<AttributePathParams, kMaxAttributePathsBufferSize> mAttributePaths;
     uint32_t mCurrentIndex = 0;
-    bool mTimerActive      = false;
 };
 
 } // namespace DataModel
