@@ -47,9 +47,6 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        ChipLogDetail(AppServer,
-                      "OccupancySensing::CreateRegistration: endpoint=%u, instance=%u, optionalAttributeBits=0x%x, featureMap=0x%x",
-                      endpointId, clusterInstanceIndex, optionalAttributeBits, featureMap);
         OccupancySensingCluster::Config config(endpointId);
         config.WithFeatures(static_cast<Feature>(featureMap));
 
