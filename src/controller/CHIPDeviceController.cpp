@@ -422,7 +422,7 @@ void DeviceController::Shutdown()
 
         if (mDeleteFromFabricTableOnShutdown)
         {
-            mSystemState->Fabrics()->Delete(mFabricIndex);
+            TEMPORARY_RETURN_IGNORED mSystemState->Fabrics()->Delete(mFabricIndex);
         }
         else if (mRemoveFromFabricTableOnShutdown)
         {
@@ -577,8 +577,9 @@ void DeviceCommissioner::Shutdown()
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Shutdown(
-        [](uint32_t id, WiFiPAF::WiFiPafRole role) { DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(id, role); });
+    WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Shutdown([](uint32_t id, WiFiPAF::WiFiPafRole role) {
+        TEMPORARY_RETURN_IGNORED DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(id, role);
+    });
 #endif
 
     // Release everything from the commissionee device pool here.
@@ -639,7 +640,7 @@ void DeviceCommissioner::ReleaseCommissioneeDevice(CommissioneeDeviceProxy * dev
     if (readerTransport)
     {
         ChipLogProgress(Controller, "Stopping discovery of all NFC tags");
-        readerTransport->StopDiscoveringTags();
+        TEMPORARY_RETURN_IGNORED readerTransport->StopDiscoveringTags();
     }
 #endif
 
@@ -814,10 +815,8 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
             // The RendezvousParameters argument needs to be recovered if the search succeed, so save them
             // for later.
             mRendezvousParametersForDeviceDiscoveredOverBle = params;
-            SuccessOrExit(err = mSystemState->BleLayer()->NewBleConnectionByObject(params.GetDiscoveredObject(), this,
-                                                                                   OnDiscoveredDeviceOverBleSuccess,
-                                                                                   OnDiscoveredDeviceOverBleError));
-            ExitNow(CHIP_NO_ERROR);
+            ExitNow(err = mSystemState->BleLayer()->NewBleConnectionByObject(
+                        params.GetDiscoveredObject(), this, OnDiscoveredDeviceOverBleSuccess, OnDiscoveredDeviceOverBleError));
         }
         else if (params.HasDiscriminator())
         {
@@ -825,10 +824,9 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
             // for later.
             mRendezvousParametersForDeviceDiscoveredOverBle = params;
 
-            SuccessOrExit(err = mSystemState->BleLayer()->NewBleConnectionByDiscriminator(params.GetSetupDiscriminator().value(),
-                                                                                          this, OnDiscoveredDeviceOverBleSuccess,
-                                                                                          OnDiscoveredDeviceOverBleError));
-            ExitNow(CHIP_NO_ERROR);
+            ExitNow(err = mSystemState->BleLayer()->NewBleConnectionByDiscriminator(params.GetSetupDiscriminator().value(), this,
+                                                                                    OnDiscoveredDeviceOverBleSuccess,
+                                                                                    OnDiscoveredDeviceOverBleError));
         }
         else
         {
@@ -854,9 +852,8 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
                                                     .discriminator = discriminator };
             ReturnErrorOnFailure(
                 DeviceLayer::ConnectivityMgr().GetWiFiPAF()->AddPafSession(WiFiPAF::PafInfoAccess::kAccNodeInfo, sessionInfo));
-            DeviceLayer::ConnectivityMgr().WiFiPAFSubscribe(discriminator, reinterpret_cast<void *>(this),
-                                                            OnWiFiPAFSubscribeComplete, OnWiFiPAFSubscribeError);
-            ExitNow(CHIP_NO_ERROR);
+            ExitNow(err = DeviceLayer::ConnectivityMgr().WiFiPAFSubscribe(discriminator, reinterpret_cast<void *>(this),
+                                                                          OnWiFiPAFSubscribeComplete, OnWiFiPAFSubscribeError));
         }
     }
 #endif
@@ -1004,7 +1001,7 @@ CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId)
     if (device->IsSecureConnected())
     {
         MATTER_LOG_METRIC_BEGIN(kMetricDeviceCommissionerCommission);
-        mDefaultCommissioner->StartCommissioning(this, device);
+        ReturnErrorOnFailure(mDefaultCommissioner->StartCommissioning(this, device));
     }
     else
     {
@@ -1223,7 +1220,7 @@ void DeviceCommissioner::OnSessionEstablished(const SessionHandle & session)
     CHIP_ERROR err = device->SetConnected(session);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed in setting up secure channel: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogFailure(err, Controller, "Failed in setting up secure channel");
         OnSessionEstablishmentError(err);
         return;
     }
@@ -1244,7 +1241,7 @@ void DeviceCommissioner::OnSessionEstablished(const SessionHandle & session)
     {
         mRunCommissioningAfterConnection = false;
         MATTER_LOG_METRIC_BEGIN(kMetricDeviceCommissionerCommission);
-        mDefaultCommissioner->StartCommissioning(this, device);
+        ReturnAndLogOnFailure(mDefaultCommissioner->StartCommissioning(this, device), Controller, "Failed to start commissioning");
     }
 }
 
@@ -1915,7 +1912,7 @@ CHIP_ERROR DeviceCommissioner::SetUdcListenPort(uint16_t listenPort)
 void DeviceCommissioner::FindCommissionableNode(char * instanceName)
 {
     Dnssd::DiscoveryFilter filter(Dnssd::DiscoveryFilterType::kInstanceName, instanceName);
-    DiscoverCommissionableNodes(filter);
+    TEMPORARY_RETURN_IGNORED DiscoverCommissionableNodes(filter);
 }
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY

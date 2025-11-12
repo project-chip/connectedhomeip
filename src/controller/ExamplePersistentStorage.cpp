@@ -83,7 +83,7 @@ CHIP_ERROR PersistentStorage::Init(const char * name, const char * directory)
     ifs.open(mStorageFilePath, std::ifstream::in);
     if (!ifs.good())
     {
-        CommitConfig();
+        SuccessOrExit(err = CommitConfig());
         ifs.open(mStorageFilePath, std::ifstream::in);
     }
     VerifyOrExit(ifs.is_open(), err = CHIP_ERROR_OPEN_FAILED);
