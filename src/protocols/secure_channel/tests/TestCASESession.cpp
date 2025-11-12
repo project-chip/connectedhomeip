@@ -2262,34 +2262,29 @@ static CHIP_ERROR EncodeSigma3TBEDataHelper(MutableByteSpan & buf)
     return CHIP_NO_ERROR;
 }
 
-template <typename params>
-void TestSigma3TBEParsing(chip::Platform::ScopedMemoryBuffer<uint8_t> & mem, size_t bufferSize)
-{
-    MutableByteSpan buf((mem).Get(), (bufferSize));
-    EXPECT_SUCCESS(EncodeSigma3TBEDataHelper<params>(buf));
-
-    TLV::ContiguousBufferTLVReader reader;
-    reader.Init(buf);
-    CASESessionAccess::HandleSigma3Data handleSigma3Data;
-
-    if (params::kExpectSuccess)
-    {
-        EXPECT_SUCCESS(CASESessionAccess::ParseSigma3TBEData(reader, handleSigma3Data));
-
-        uint8_t expectedNOC[params::kInitiatorNOCLen]    = { params::kTestValueInitiatorNOC };
-        uint8_t expectedICAC[params::kInitiatorICACLen]  = { params::kTestValueInitiatorICAC };
-        uint8_t expectedSignature[params::kSignatureLen] = { params::kTestValueSignature };
-
-        EXPECT_TRUE(handleSigma3Data.initiatorNOC.data_equal(ByteSpan(expectedNOC)));
-        EXPECT_TRUE(handleSigma3Data.initiatorICAC.data_equal(ByteSpan(expectedICAC)));
-        EXPECT_TRUE(ByteSpan(handleSigma3Data.tbsData3Signature.Bytes(), handleSigma3Data.tbsData3Signature.Length())
-                        .data_equal(ByteSpan(expectedSignature)));
-    }
-    else
-    {
-        EXPECT_NE(CASESessionAccess::ParseSigma3TBEData(reader, handleSigma3Data), CHIP_NO_ERROR);
-    }
-}
+#define TestSigma3TBEParsing(mem, bufferSize, params)                                                                              \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        MutableByteSpan buf((mem).Get(), (bufferSize));                                                                            \
+        EXPECT_EQ(EncodeSigma3TBEDataHelper<params>(buf), CHIP_NO_ERROR);                                                          \
+                                                                                                                                   \
+        TLV::ContiguousBufferTLVReader reader;                                                                                     \
+        reader.Init(buf);                                                                                                          \
+        CASESessionAccess::HandleSigma3Data handleSigma3Data;                                                                      \
+                                                                                                                                   \
+        EXPECT_EQ(CASESessionAccess::ParseSigma3TBEData(reader, handleSigma3Data) == CHIP_NO_ERROR, params::kExpectSuccess);       \
+        if (params::kExpectSuccess)                                                                                                \
+        {                                                                                                                          \
+            uint8_t expectedNOC[params::kInitiatorNOCLen]    = { params::kTestValueInitiatorNOC };                                 \
+            uint8_t expectedICAC[params::kInitiatorICACLen]  = { params::kTestValueInitiatorICAC };                                \
+            uint8_t expectedSignature[params::kSignatureLen] = { params::kTestValueSignature };                                    \
+                                                                                                                                   \
+            EXPECT_TRUE(handleSigma3Data.initiatorNOC.data_equal(ByteSpan(expectedNOC)));                                          \
+            EXPECT_TRUE(handleSigma3Data.initiatorICAC.data_equal(ByteSpan(expectedICAC)));                                        \
+            EXPECT_TRUE(ByteSpan(handleSigma3Data.tbsData3Signature.Bytes(), handleSigma3Data.tbsData3Signature.Length())          \
+                            .data_equal(ByteSpan(expectedSignature)));                                                             \
+        }                                                                                                                          \
+    } while (0)
 
 struct BadSigma3TBEParamsBase : public Sigma3TBEDataParams
 {
@@ -2343,15 +2338,15 @@ TEST_F(TestCASESession, ParseSigma3TBEData)
     chip::Platform::ScopedMemoryBuffer<uint8_t> mem;
     EXPECT_TRUE(mem.Calloc(bufferSize));
 
-    TestSigma3TBEParsing<Sigma3TBEDataParams>(mem, bufferSize);
-    TestSigma3TBEParsing<Sigma3TBENoStructEnd>(mem, bufferSize);
-    TestSigma3TBEParsing<Sigma3TBEWrongTags>(mem, bufferSize);
-    TestSigma3TBEParsing<Sigma3TBETooLongNOC>(mem, bufferSize);
-    TestSigma3TBEParsing<Sigma3TBETooLongICAC>(mem, bufferSize);
-    TestSigma3TBEParsing<Sigma3TBETooLongSignature>(mem, bufferSize);
-    TestSigma3TBEParsing<Sigma3TBETooShortSignature>(mem, bufferSize);
-    TestSigma3TBEParsing<Sigma3TBEFutureProofTlvElement>(mem, bufferSize);
-    TestSigma3TBEParsing<Sigma3TBEFutureProofTlvElementNoStructEnd>(mem, bufferSize);
+    TestSigma3TBEParsing(mem, bufferSize, Sigma3TBEDataParams);
+    TestSigma3TBEParsing(mem, bufferSize, Sigma3TBENoStructEnd);
+    TestSigma3TBEParsing(mem, bufferSize, Sigma3TBEWrongTags);
+    TestSigma3TBEParsing(mem, bufferSize, Sigma3TBETooLongNOC);
+    TestSigma3TBEParsing(mem, bufferSize, Sigma3TBETooLongICAC);
+    TestSigma3TBEParsing(mem, bufferSize, Sigma3TBETooLongSignature);
+    TestSigma3TBEParsing(mem, bufferSize, Sigma3TBETooShortSignature);
+    TestSigma3TBEParsing(mem, bufferSize, Sigma3TBEFutureProofTlvElement);
+    TestSigma3TBEParsing(mem, bufferSize, Sigma3TBEFutureProofTlvElementNoStructEnd);
 }
 
 } // namespace chip
