@@ -115,38 +115,6 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
         assert resp[0].Status == Status.Success, "Failed to clear DefaultOTAProviders"
 
-    async def send_announce_ota_provider(self, controller, requestor_node_id, provider_node_id, vendor_id=0xFFF1, reason=None, endpoint=0):
-        """
-        Send the AnnounceOTAProvider command from the Requestor to the Provider.
-
-        Args:
-            controller: Controller object to send the command.
-            requestor_node_id: Node ID of the OTA Requestor (DUT).
-            provider_node_id: Node ID of the OTA Provider.
-            vendor_id: Vendor ID associated with the Provider (default: 0xFFF1).
-            reason: AnnouncementReasonEnum for the announcement (default: kUpdateAvailable).
-            endpoint: Endpoint on which to send the command (default: 0).
-
-        Returns:
-            resp: Response object from the AnnounceOTAProvider command.
-        """
-        reason = reason or Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum.kUrgentUpdateAvailable
-        cmd = Clusters.OtaSoftwareUpdateRequestor.Commands.AnnounceOTAProvider(
-            providerNodeID=provider_node_id,
-            vendorID=vendor_id,
-            announcementReason=reason,
-            metadataForNode=None,
-            endpoint=endpoint
-        )
-        logger.info(f'Sending AnnounceOTAProvider to providerNodeID={provider_node_id}: {cmd}')
-        resp = await self.send_single_cmd(
-            dev_ctrl=controller,
-            node_id=requestor_node_id,
-            cmd=cmd
-        )
-        logger.info(f'AnnounceOTAProvider response: {resp}')
-        return resp
-
     async def setup_provider(self, provider_app_path: str, ota_image_path: str, extra_args: list[str]):
         """
         Launch an OTA Provider process with the specified image and extra arguments.
@@ -514,7 +482,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # [STEP_1]: Step #1.0 - Controller sends AnnounceOTAProvider command
         # ------------------------------------------------------------------------------------
         logger.info(f'{step_number}: Step #1.0 - Controller sends AnnounceOTAProvider command')
-        resp_announce = await self.send_announce_ota_provider(controller, requestor_node_id, provider_node_id=provider_node_id)
+        resp_announce = await self.announce_ota_provider(controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
+
         logger.info(f'{step_number}: Step #1.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
 
         # ------------------------------------------------------------------------------------
@@ -657,7 +626,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # [STEP_2]: Step #2.0 - Controller sends AnnounceOTAProvider command
         # ------------------------------------------------------------------------------------
         logger.info(f'{step_number_s2}: Step #2.0 - Controller sends AnnounceOTAProvider command')
-        resp_announce = await self.send_announce_ota_provider(controller, requestor_node_id, provider_node_id=provider_node_id)
+        resp_announce = await self.announce_ota_provider(controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
         logger.info(f'{step_number_s2}: Step #2.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
 
         # ------------------------------------------------------------------------------------
@@ -773,7 +742,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # [STEP_3]: Step #3.0 - Controller sends AnnounceOTAProvider command
         # ------------------------------------------------------------------------------------
         logger.info(f'{step_number_s3}: Step #3.0 - Controller sends AnnounceOTAProvider command')
-        resp_announce = await self.send_announce_ota_provider(controller, requestor_node_id, provider_node_id=provider_node_id)
+        resp_announce = await self.announce_ota_provider(controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
         logger.info(f'{step_number_s3}: Step #3.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
 
         # ------------------------------------------------------------------------------------
@@ -900,7 +869,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         logger.info(f'{step_number_s4}: Step #4.0 - FailSafe armed for 900s: {resp}')
 
         logger.info(f'{step_number_s4}: Step #4.0 - Controller sends AnnounceOTAProvider command')
-        resp_announce = await self.send_announce_ota_provider(controller, requestor_node_id, provider_node_id=provider_node_id)
+        resp_announce = await self.announce_ota_provider(controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
         logger.info(f'{step_number_s4}: Step #4.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
 
         # ------------------------------------------------------------------------------------
@@ -1023,7 +992,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # ------------------------------------------------------------------------------------
 
         logger.info(f'{step_number_s6}: Step #6.0 - Controller sends AnnounceOTAProvider command')
-        resp_announce = await self.send_announce_ota_provider(controller, requestor_node_id, provider_node_id=provider_node_id)
+        resp_announce = await self.announce_ota_provider(controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
         logger.info(f'{step_number_s6}: Step #6.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
 
         # ------------------------------------------------------------------------------------
@@ -1148,7 +1117,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # [STEP_7]: Step #7.0 - Controller sends AnnounceOTAProvider command
         # ------------------------------------------------------------------------------------
         logger.info(f'{step_number_s7}: Step #7.0 - Controller sends AnnounceOTAProvider command')
-        resp_announce = await self.send_announce_ota_provider(controller, requestor_node_id, provider_node_id=provider_node_id)
+        resp_announce = await self.announce_ota_provider(controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
         logger.info(f'{step_number_s7}: Step #7.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
 
         # ------------------------------------------------------------------------------------
