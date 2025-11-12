@@ -1064,7 +1064,7 @@ void TimeSynchronizationCluster::OnFabricRemoved(const FabricTable & fabricTable
     if (!mTrustedTimeSource.IsNull() && mTrustedTimeSource.Value().fabricIndex == fabricIndex)
     {
         DataModel::Nullable<Structs::TrustedTimeSourceStruct::Type> tts;
-        SetTrustedTimeSource(tts);
+        TEMPORARY_RETURN_IGNORED SetTrustedTimeSource(tts);
         EmitMissingTrustedTimeSourceEvent(GetEventsGenerator());
     }
 }
@@ -1196,7 +1196,7 @@ TimeSynchronizationCluster::HandleSetTrustedTimeSource(CommandHandler * commandO
         EmitMissingTrustedTimeSourceEvent(GetEventsGenerator());
     }
 
-    SetTrustedTimeSource(tts);
+    TEMPORARY_RETURN_IGNORED SetTrustedTimeSource(tts);
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -1244,7 +1244,7 @@ TimeSynchronizationCluster::HandleSetTimeZone(CommandHandler * commandObj, const
     if (response.DSTOffsetRequired)
     {
         TimeState dstState = UpdateDSTOffsetState();
-        ClearDSTOffset();
+        TEMPORARY_RETURN_IGNORED ClearDSTOffset();
         if (dstState == TimeState::kActive || dstState == TimeState::kChanged)
         {
             EmitDSTStatusEvent(false, GetEventsGenerator());

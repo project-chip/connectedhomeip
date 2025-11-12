@@ -591,7 +591,8 @@ void TCPBase::HandleTCPEndPointConnectComplete(const Inet::TCPEndPointHandle & e
     });
 
     // Set the TCPKeepalive configurations on the established connection
-    endPoint->EnableKeepAlive(activeConnection->mTCPKeepAliveIntervalSecs, activeConnection->mTCPMaxNumKeepAliveProbes);
+    TEMPORARY_RETURN_IGNORED endPoint->EnableKeepAlive(activeConnection->mTCPKeepAliveIntervalSecs,
+                                                       activeConnection->mTCPMaxNumKeepAliveProbes);
 
     ChipLogProgress(Inet, "Connection established successfully with %s.", addrStr);
 
@@ -655,13 +656,16 @@ CHIP_ERROR TCPBase::DoHandleIncomingConnection(const Inet::TCPEndPointHandle & l
     endPoint->OnConnectionClosed = HandleTCPEndPointConnectionClosed;
 
     // By default, disable TCP Nagle buffering by setting TCP_NODELAY socket option to true
-    endPoint->EnableNoDelay();
+    // If it fails, we can still use the connection
+    RETURN_SAFELY_IGNORED endPoint->EnableNoDelay();
 
     mUsedEndPointCount++;
     activeConnection->mConnectionState = TCPState::kConnected;
 
     // Set the TCPKeepalive configurations on the received connection
-    endPoint->EnableKeepAlive(activeConnection->mTCPKeepAliveIntervalSecs, activeConnection->mTCPMaxNumKeepAliveProbes);
+    // If it fails, we can still use the connection until it dies
+    RETURN_SAFELY_IGNORED endPoint->EnableKeepAlive(activeConnection->mTCPKeepAliveIntervalSecs,
+                                                    activeConnection->mTCPMaxNumKeepAliveProbes);
 
     char addrStr[Transport::PeerAddress::kMaxToStringSize];
     peerAddress.ToString(addrStr);
