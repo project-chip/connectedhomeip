@@ -146,6 +146,7 @@ config("config-controller-dynamic-server") {
 
 source_set("constants") {
   sources = [
+    "PluginDependencyFlags.h",
     "InteractionModelTimeout.h",
     "SpecificationDefinedRevisions.h",
   ]
