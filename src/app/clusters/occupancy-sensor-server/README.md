@@ -1,24 +1,44 @@
 # Occupancy Sensing Cluster
 
-The Occupancy Sensing cluster is used to measure and report the occupancy state in an area. For example, it can be used with a Passive Infrared (PIR) sensor or an ultrasonic sensor to determine whether a room is occupied or unoccupied.
+The Occupancy Sensing cluster is used to measure and report the occupancy state
+in an area. For example, it can be used with a Passive Infrared (PIR) sensor or
+an ultrasonic sensor to determine whether a room is occupied or unoccupied.
 
 ## Overview
 
-This directory contains a modern, code-driven C++ implementation of the Matter Occupancy Sensing cluster server. This implementation (`OccupancySensingCluster.h` and `OccupancySensingCluster.cpp`) is designed for flexibility, avoiding the tight coupling present in older ZAP/Ember-based implementations.
+This directory contains a modern, code-driven C++ implementation of the Matter
+Occupancy Sensing cluster server. This implementation
+(`OccupancySensingCluster.h` and `OccupancySensingCluster.cpp`) is designed for
+flexibility, avoiding the tight coupling present in older ZAP/Ember-based
+implementations.
 
-A key feature of this implementation is that it is completely decoupled from the underlying sensor hardware. The previous `occupancy-hal.h` has been removed, and the application is now responsible for initializing its own sensor hardware and notifying the cluster of occupancy changes by calling the `SetOccupancy()` method.
+A key feature of this implementation is that it is completely decoupled from the
+underlying sensor hardware. The previous `occupancy-hal.h` has been removed, and
+the application is now responsible for initializing its own sensor hardware and
+notifying the cluster of occupancy changes by calling the `SetOccupancy()`
+method.
 
-The cluster implementation now internally handles all timer logic related to the `HoldTime`, `PIROccupiedToUnoccupiedDelay`, `UltrasonicOccupiedToUnoccupiedDelay`, and `PhysicalContactOccupiedToUnoccupiedDelay` attributes, simplifying the application's responsibility.
+The cluster implementation now internally handles all timer logic related to the
+`HoldTime`, `PIROccupiedToUnoccupiedDelay`,
+`UltrasonicOccupiedToUnoccupiedDelay`, and
+`PhysicalContactOccupiedToUnoccupiedDelay` attributes, simplifying the
+application's responsibility.
 
-It uses an optional delegate pattern (`chip::app::Clusters::OccupancySensingDelegate`) to notify the application about changes to the occupancy state or the hold time configuration.
+It uses an optional delegate pattern
+(`chip::app::Clusters::OccupancySensingDelegate`) to notify the application
+about changes to the occupancy state or the hold time configuration.
 
 ## Modern Code-Driven Usage (Recommended)
 
-For new applications using the `CodeDrivenDataModelProvider`, we strongly recommend instantiating and registering the cluster directly. This approach provides the most flexibility and control.
+For new applications using the `CodeDrivenDataModelProvider`, we strongly
+recommend instantiating and registering the cluster directly. This approach
+provides the most flexibility and control.
 
 ### 1. Implement the Delegate (Optional)
 
-If your application needs to be notified of changes, create a class that inherits from `chip::app::Clusters::OccupancySensingDelegate` and implement its virtual methods.
+If your application needs to be notified of changes, create a class that
+inherits from `chip::app::Clusters::OccupancySensingDelegate` and implement its
+virtual methods.
 
 ```cpp
 #include "app/clusters/occupancy-sensor-server/OccupancySensingCluster.h"
@@ -40,9 +60,13 @@ public:
 
 ### 2. Instantiate Delegates and Cluster
 
-Instantiate your optional delegate, a timer delegate (if using the Hold Time feature), and the `OccupancySensingCluster` itself for each required endpoint. Using `RegisteredServerCluster` simplifies registration.
+Instantiate your optional delegate, a timer delegate (if using the Hold Time
+feature), and the `OccupancySensingCluster` itself for each required endpoint.
+Using `RegisteredServerCluster` simplifies registration.
 
-The `HoldTime` feature and its related attributes are optional. To enable them, call the `.WithHoldTime()` method on the `Config` object. If it is not called, these attributes will be disabled.
+The `HoldTime` feature and its related attributes are optional. To enable them,
+call the `.WithHoldTime()` method on the `Config` object. If it is not called,
+these attributes will be disabled.
 
 ```cpp
 #include "app/DefaultTimerDelegate.h"
@@ -67,7 +91,9 @@ chip::app::RegisteredServerCluster<chip::app::Clusters::OccupancySensingCluster>
 
 ### 3. Register the Cluster
 
-In your application's initialization sequence, register the cluster instance with either the `CodegenDataModelProvider` (legacy) or the `CodeDrivenDataModelProvider`.
+In your application's initialization sequence, register the cluster instance
+with either the `CodegenDataModelProvider` (legacy) or the
+`CodeDrivenDataModelProvider`.
 
 ```cpp
 #include "data-model-providers/codegen/CodegenDataModelProvider.h"
@@ -82,7 +108,8 @@ void ApplicationInit()
 
 ### 4. Notify the Cluster of Occupancy Changes
 
-Your application is responsible for monitoring the physical sensor. When the sensor state changes, call the `SetOccupancy()` method on the cluster instance.
+Your application is responsible for monitoring the physical sensor. When the
+sensor state changes, call the `SetOccupancy()` method on the cluster instance.
 
 ```cpp
 void MySensorHardwareCallback(bool isOccupied)
@@ -98,11 +125,18 @@ void MySensorHardwareCallback(bool isOccupied)
 
 ## Legacy Ember-Style Usage
 
-For backwards compatibility with applications that rely on older ZAP-generated patterns (like the `all-clusters-app`), a compatibility layer is provided in `CodegenIntegration.h` and `CodegenIntegration.cpp`.
+For backwards compatibility with applications that rely on older ZAP-generated
+patterns (like the `all-clusters-app`), a compatibility layer is provided in
+`CodegenIntegration.h` and `CodegenIntegration.cpp`.
 
-In this model, you configure the Occupancy Sensing cluster in your `.zap` file. The ZAP tool generates `MatterOccupancySensingClusterInitCallback`, which is implemented by our `CodegenIntegration` layer to automatically instantiate and configure the cluster based on your ZAP configuration.
+In this model, you configure the Occupancy Sensing cluster in your `.zap` file.
+The ZAP tool generates `MatterOccupancySensingClusterInitCallback`, which is
+implemented by our `CodegenIntegration` layer to automatically instantiate and
+configure the cluster based on your ZAP configuration.
 
-To use the cluster in this mode, your application can get a pointer to the cluster instance and call its methods directly using `OccupancySensing::FindClusterOnEndpoint(endpointId)`.
+To use the cluster in this mode, your application can get a pointer to the
+cluster instance and call its methods directly using
+`OccupancySensing::FindClusterOnEndpoint(endpointId)`.
 
 ```cpp
 // In your application logic file
