@@ -30,13 +30,24 @@
 #include <clusters/OtaSoftwareUpdateRequestor/ClusterId.h>
 #include <clusters/OtaSoftwareUpdateRequestor/Commands.h>
 #include <clusters/OtaSoftwareUpdateRequestor/Enums.h>
-#include <clusters/OtaSoftwareUpdateRequestor/EventIds.h>
+#include <clusters/OtaSoftwareUpdateRequestor/Events.h>
 #include <clusters/OtaSoftwareUpdateRequestor/Metadata.h>
 #include <clusters/OtaSoftwareUpdateRequestor/Structs.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+
+namespace chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs {
+namespace ProviderLocation {
+
+constexpr bool operator==(const Type& lhs, const Type& rhs) {
+  return lhs.providerNodeID == rhs.providerNodeID &&
+         lhs.endpoint == rhs.endpoint && lhs.fabricIndex == rhs.fabricIndex;
+}
+
+}  // namespace ProviderLocation
+}  // namespace chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs
 
 namespace {
 
@@ -614,6 +625,46 @@ TEST_F(TestOTARequestorCluster, CommandsWithNoRequestorInterfaceReturnErrors)
         tester.InvokeCommand(OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id, payload, nullptr);
     ASSERT_TRUE(result.has_value());
     EXPECT_TRUE(result->IsError());
+}
+
+TEST_F(TestOTARequestorCluster, WriteDefaultProvidersList)
+{
+    chip::Test::TestServerClusterContext context;
+    MockOtaRequestor otaRequestor;
+    OTARequestorCluster cluster(kTestEndpointId, &otaRequestor);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    chip::Test::ClusterTester tester(cluster);
+
+    auto & changeListener = context.ChangeListener();
+    changeListener.DirtyList().clear();
+
+    // Write the default OTA providers list.
+    namespace DefaultOtaProviders = OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders;
+    OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type provider;
+    provider.providerNodeID = 1234u;
+    provider.endpoint = 8;
+    provider.fabricIndex = 2;
+    DataModel::List<OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type> payload(&provider, 1u);
+    std::optional<DataModel::ActionReturnStatus> result = tester.WriteAttribute(DefaultOtaProviders::Id, payload);
+
+    // Verify the data was written correctly.
+    auto iterator = otaRequestor.GetDefaultOTAProviderListIterator();
+    ASSERT_TRUE(iterator.Next());
+    EXPECT_EQ(iterator.GetValue(), provider);
+    EXPECT_FALSE(iterator.Next());
+
+    // Verify the attribute was reported as changed.
+    ASSERT_EQ(changeListener.DirtyList().size(), 1u);
+    EXPECT_EQ(changeListener.DirtyList()[0].mEndpointId, kTestEndpointId);
+    EXPECT_EQ(changeListener.DirtyList()[0].mClusterId, OtaSoftwareUpdateRequestor::Id);
+    EXPECT_EQ(changeListener.DirtyList()[0].mAttributeId, DefaultOtaProviders::Id);
+
+    // TODO: Write the same list and verify the attribute wasn't reported as changed.
+}
+
+TEST_F(TestOTARequestorCluster, WritingReadOnlyAttributesReturnsUnsupportedWrite)
+{
+    // TODO
 }
 
 }  // namespace

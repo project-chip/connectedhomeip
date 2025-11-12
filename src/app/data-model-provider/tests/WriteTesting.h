@@ -98,7 +98,14 @@ public:
         //   - END_STRUCT
         TLV::TLVType outerContainerType;
         VerifyOrDie(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType) == CHIP_NO_ERROR);
-        VerifyOrDie(chip::app::DataModel::Encode(writer, TLV::ContextTag(1), value) == CHIP_NO_ERROR);
+        if constexpr (chip::app::DataModel::IsFabricScoped<T>::value)
+        {
+            VerifyOrDie(chip::app::DataModel::EncodeForWrite(writer, TLV::ContextTag(1), value) == CHIP_NO_ERROR);
+        }
+        else
+        {
+            VerifyOrDie(chip::app::DataModel::Encode(writer, TLV::ContextTag(1), value) == CHIP_NO_ERROR);
+        }
         VerifyOrDie(writer.EndContainer(outerContainerType) == CHIP_NO_ERROR);
         VerifyOrDie(writer.Finalize() == CHIP_NO_ERROR);
 
