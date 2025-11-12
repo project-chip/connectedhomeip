@@ -20,9 +20,10 @@
  * Any implementation of the OTA Requestor must implement this interface.
  */
 
-#include <app-common/zap-generated/cluster-objects.h>
-
 #include <app/clusters/ota-requestor/OTARequestorEventHandlerRegistry.h>
+#include <clusters/OtaSoftwareUpdateRequestor/Commands.h>
+#include <clusters/OtaSoftwareUpdateRequestor/Enums.h>
+#include <clusters/OtaSoftwareUpdateRequestor/Structs.h>
 #include <lib/core/ClusterEnums.h>
 
 #pragma once
