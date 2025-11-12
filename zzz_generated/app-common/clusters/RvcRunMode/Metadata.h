@@ -17,7 +17,7 @@ namespace app {
 namespace Clusters {
 namespace RvcRunMode {
 
-inline constexpr uint32_t kRevision = 3;
+inline constexpr uint32_t kRevision = 4;
 
 namespace Attributes {
 
