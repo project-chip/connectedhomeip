@@ -40,6 +40,10 @@ TIMEOUT = 180                           # Overall test timeout (3 min)
 # Global variable to store target device ID for mDNS discovery
 _target_device_id = None
 
+# Cluster references
+cnet = Clusters.NetworkCommissioning
+cgen = Clusters.GeneralCommissioning
+
 
 def get_target_device_id():
     """Get the cached target device ID for mDNS discovery."""
@@ -154,6 +158,55 @@ async def find_matter_devices_mdns():
 
 class TC_CNET_4_23(MatterBaseTest):
 
+    async def _validate_network_config_response(self, response, expected_status=None):
+        expected_status = expected_status or cnet.Enums.NetworkCommissioningStatusEnum.kSuccess
+        asserts.assert_true(isinstance(response, cnet.Commands.NetworkConfigResponse),
+                            "Unexpected response type from NetworkConfig command")
+        asserts.assert_equal(response.networkingStatus, expected_status,
+                             f"Expected NetworkingStatus {expected_status}, got {response.networkingStatus}")
+        if response.debugText:
+            asserts.assert_less_equal(len(response.debugText), 512,
+                                      f"debugText too long: {len(response.debugText)} bytes")
+
+    async def _validate_connect_network_response(self, response, expect_success=True):
+        asserts.assert_true(isinstance(response, cnet.Commands.ConnectNetworkResponse),
+                            "Unexpected response type from ConnectNetwork command")
+        if expect_success:
+            asserts.assert_equal(response.networkingStatus,
+                                 cnet.Enums.NetworkCommissioningStatusEnum.kSuccess,
+                                 f"Expected success, got {response.networkingStatus}")
+        else:
+            asserts.assert_not_equal(response.networkingStatus,
+                                     cnet.Enums.NetworkCommissioningStatusEnum.kSuccess,
+                                     "Expected failure, got success")
+        if response.debugText:
+            asserts.assert_less_equal(len(response.debugText), 512,
+                                      f"debugText too long: {len(response.debugText)} bytes")
+
+    async def _read_networks(self, endpoint):
+        return await self.read_single_attribute(
+            dev_ctrl=self.default_controller,
+            node_id=self.dut_node_id,
+            endpoint=endpoint,
+            attribute=cnet.Attributes.Networks,
+        )
+
+    async def _read_last_networking_status(self, endpoint, expected_status=None, valid_statuses=None):
+        status = await self.read_single_attribute(
+            dev_ctrl=self.default_controller,
+            node_id=self.dut_node_id,
+            endpoint=endpoint,
+            attribute=cnet.Attributes.LastNetworkingStatus,
+        )
+        logger.info(f"LastNetworkingStatus = {status}")
+        if expected_status is not None:
+            asserts.assert_equal(status, expected_status,
+                                 f"Expected {expected_status}, got {status}")
+        elif valid_statuses is not None:
+            asserts.assert_in(status, valid_statuses,
+                              f"Expected one of {valid_statuses}, got {status}")
+        return status
+
     # Overrides default_timeout
     @property
     def default_timeout(self) -> int:
@@ -167,7 +220,6 @@ class TC_CNET_4_23(MatterBaseTest):
                         is_commissioning=False),
             TestStep(1, "TH reads Networks attribute and removes all configured networks",
                         "Verify that DUT successfully removes all networks configured during commissioning"),
-            # New steps: Test WRONG SSID scenario
             TestStep(2, "TH sends AddOrUpdateWiFiNetwork with WRONG SSID and correct password, Breadcrumb = 1",
                         "Verify that DUT sends NetworkConfigResponse:\n"
                         "1. NetworkingStatus is kSuccess (0)\n"
@@ -185,7 +237,6 @@ class TC_CNET_4_23(MatterBaseTest):
                         "1. NetworkingStatus is kSuccess (0)"),
             TestStep(7, "TH reads Networks attribute",
                         "Verify Networks list is empty after removal"),
-            # Existing steps (renumbered from 2-10 to 8-16)
             TestStep(8, "TH sends AddOrUpdateWiFiNetwork with INCORRECT PASSWORD and Breadcrumb field set to 4",
                         "Verify that DUT sends the NetworkConfigResponse command to the TH with the following response fields:\n"
                         "1. NetworkingStatus is kSuccess (0)\n"
@@ -221,9 +272,6 @@ class TC_CNET_4_23(MatterBaseTest):
 
     @async_test_body
     async def test_TC_CNET_4_23(self):
-
-        cgen = Clusters.GeneralCommissioning
-        cnet = Clusters.NetworkCommissioning
 
         # Network Commissioning cluster is always on root endpoint (0) during commissioning
         endpoint = ROOT_ENDPOINT_ID
@@ -277,12 +325,7 @@ class TC_CNET_4_23(MatterBaseTest):
         self.step(1)
 
         logger.info(" --- Step 1: Reading and removing all configured networks from commissioning...")
-        networks = await self.read_single_attribute(
-            dev_ctrl=self.default_controller,
-            node_id=self.dut_node_id,
-            endpoint=endpoint,
-            attribute=cnet.Attributes.Networks,
-        )
+        networks = await self._read_networks(endpoint)
 
         logger.info(f"Found {len(networks)} network(s) configured during commissioning")
         for network in networks:
@@ -295,19 +338,11 @@ class TC_CNET_4_23(MatterBaseTest):
                     breadcrumb=0
                 )
             )
-            asserts.assert_true(isinstance(remove_response, cnet.Commands.NetworkConfigResponse),
-                                "Unexpected response from RemoveNetwork")
-            asserts.assert_equal(remove_response.networkingStatus, cnet.Enums.NetworkCommissioningStatusEnum.kSuccess,
-                                 f"Failed to remove network: {remove_response.networkingStatus}")
+            await self._validate_network_config_response(remove_response)
             logger.info(f" --- Network removed successfully: {network_id.decode('utf-8', errors='replace')}")
 
         # Verify networks list is now empty
-        networks_after = await self.read_single_attribute(
-            dev_ctrl=self.default_controller,
-            node_id=self.dut_node_id,
-            endpoint=endpoint,
-            attribute=cnet.Attributes.Networks,
-        )
+        networks_after = await self._read_networks(endpoint)
         asserts.assert_equal(len(networks_after), 0,
                              f"Expected empty network list after cleanup, but found {len(networks_after)} network(s)")
         logger.info(" --- All networks successfully removed. Ready for manual WiFi configuration tests.")
@@ -324,14 +359,7 @@ class TC_CNET_4_23(MatterBaseTest):
                 breadcrumb=1
             )
         )
-
-        asserts.assert_true(isinstance(response, cnet.Commands.NetworkConfigResponse),
-                            "Unexpected value returned from AddOrUpdateWiFiNetwork")
-        asserts.assert_equal(response.networkingStatus, cnet.Enums.NetworkCommissioningStatusEnum.kSuccess,
-                             f"Expected 0 (kSuccess), but got: {response.networkingStatus}")
-        if response.debugText:
-            asserts.assert_less_equal(len(response.debugText), 512,
-                                      f"Expected debugText length <= 512, got: {len(response.debugText)}")
+        await self._validate_network_config_response(response)
 
         # Step 3: TH sends ConnectNetwork command with wrong SSID
         self.step(3)
@@ -345,14 +373,7 @@ class TC_CNET_4_23(MatterBaseTest):
             ),
             timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
         )
-
-        asserts.assert_true(isinstance(response, cnet.Commands.ConnectNetworkResponse),
-                            "Unexpected value returned from ConnectNetwork")
-        asserts.assert_not_equal(response.networkingStatus, cnet.Enums.NetworkCommissioningStatusEnum.kSuccess,
-                                 "Expected ConnectNetwork to fail with wrong SSID")
-        if response.debugText:
-            asserts.assert_less_equal(len(response.debugText), 512,
-                                      f"Expected debugText length <= 512, got: {len(response.debugText)}")
+        await self._validate_connect_network_response(response, expect_success=False)
         logger.info(f"ConnectNetwork failed as expected for wrong SSID: {wrong_ssid.decode('utf-8')}")
 
         # Wait for DUT to complete connection attempt and update LastNetworkingStatus
@@ -362,25 +383,15 @@ class TC_CNET_4_23(MatterBaseTest):
         # Step 4: TH reads LastNetworkingStatus (should be kNetworkNotFound)
         self.step(4)
 
-        networking_status = await self.read_single_attribute(
-            dev_ctrl=self.default_controller,
-            node_id=self.dut_node_id,
-            endpoint=endpoint,
-            attribute=cnet.Attributes.LastNetworkingStatus,
+        await self._read_last_networking_status(
+            endpoint,
+            expected_status=cnet.Enums.NetworkCommissioningStatusEnum.kNetworkNotFound
         )
-        logger.info(f" --- Step 4: LastNetworkingStatus: {networking_status}")
-        asserts.assert_equal(networking_status, cnet.Enums.NetworkCommissioningStatusEnum.kNetworkNotFound,
-                             f"Expected kNetworkNotFound (5), but got: {networking_status}")
 
         # Step 5: TH reads Networks attribute (verify wrong SSID is stored)
         self.step(5)
 
-        networks = await self.read_single_attribute(
-            dev_ctrl=self.default_controller,
-            node_id=self.dut_node_id,
-            endpoint=endpoint,
-            attribute=cnet.Attributes.Networks,
-        )
+        networks = await self._read_networks(endpoint)
         logger.info(f" --- Step 5: Networks attribute has {len(networks)} network(s)")
         network_ids = [net.networkID for net in networks]
         asserts.assert_in(wrong_ssid, network_ids,
@@ -398,21 +409,12 @@ class TC_CNET_4_23(MatterBaseTest):
             ),
             timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
         )
-
-        asserts.assert_true(isinstance(response, cnet.Commands.NetworkConfigResponse),
-                            "Unexpected value returned from RemoveNetwork")
-        asserts.assert_equal(response.networkingStatus, cnet.Enums.NetworkCommissioningStatusEnum.kSuccess,
-                             f"Expected kSuccess (0) from RemoveNetwork, got: {response.networkingStatus}")
+        await self._validate_network_config_response(response)
 
         # Step 7: TH reads Networks attribute (verify list is empty)
         self.step(7)
 
-        networks = await self.read_single_attribute(
-            dev_ctrl=self.default_controller,
-            node_id=self.dut_node_id,
-            endpoint=endpoint,
-            attribute=cnet.Attributes.Networks,
-        )
+        networks = await self._read_networks(endpoint)
         logger.info(f" --- Step 7: Networks attribute has {len(networks)} network(s) after removal")
         asserts.assert_equal(len(networks), 0,
                              f"Expected Networks list to be empty, but has {len(networks)} network(s)")
@@ -430,17 +432,7 @@ class TC_CNET_4_23(MatterBaseTest):
                 breadcrumb=4
             )
         )
-
-        # Verify that DUT sends the NetworkConfigResponse command to the TH with the following response fields:
-        asserts.assert_true(isinstance(response, cnet.Commands.NetworkConfigResponse),
-                            "Unexpected value returned from AddOrUpdateWiFiNetwork")
-        # 1. NetworkingStatus is kSuccess (0)
-        asserts.assert_equal(response.networkingStatus, cnet.Enums.NetworkCommissioningStatusEnum.kSuccess,
-                             f"Expected 0 (kSuccess), but got: {response.networkingStatus}")
-        # 2. DebugText is of type string with max length 512 or empty
-        if response.debugText:
-            asserts.assert_less_equal(len(response.debugText), 512,
-                                      f"Expected length of debugText to be less than or equal to 512, but got: {len(response.debugText)}")
+        await self._validate_network_config_response(response)
 
         # TH sends ConnectNetwork command and Breadcrumb field set to 2
         self.step(9)
@@ -454,17 +446,7 @@ class TC_CNET_4_23(MatterBaseTest):
             ),
             timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
         )
-
-        # Verify that DUT sends ConnectNetworkResponse command to the TH with the following response fields:
-        asserts.assert_true(isinstance(response, cnet.Commands.ConnectNetworkResponse),
-                            "Unexpected value returned from ConnectNetwork")
-        # 1. NetworkingStatus is NOT kSuccess which is '0'
-        asserts.assert_not_equal(response.networkingStatus, cnet.Enums.NetworkCommissioningStatusEnum.kSuccess,
-                                 "Expected ConnectNetwork to fail with incorrect credentials")
-        # 2. DebugText is of type string with max length 512 or empty
-        if response.debugText:
-            asserts.assert_less_equal(len(response.debugText), 512,
-                                      f"Expected length of debugText to be less than or equal to 512, but got: {len(response.debugText)}")
+        await self._validate_connect_network_response(response, expect_success=False)
         logger.info(f"ConnectNetwork failed as expected for SSID: {correct_ssid.decode('utf-8')} with incorrect credentials")
 
         # Wait for DUT to complete connection attempt and update LastNetworkingStatus
@@ -474,14 +456,6 @@ class TC_CNET_4_23(MatterBaseTest):
         # TH reads LastNetworkingStatus and LastConnectErrorValue
         self.step(10)
 
-        response = await self.read_single_attribute(
-            dev_ctrl=self.default_controller,
-            node_id=self.dut_node_id,
-            endpoint=endpoint,
-            attribute=cnet.Attributes.LastNetworkingStatus,
-        )
-        logger.info(f" --- Step 10: LastNetworkingStatus: {response}")
-
         # Verify LastNetworkingStatus indicates a failure
         # Can be kAuthFailure (wrong password), kNetworkNotFound (network not in range),
         # or kOtherConnectionFailure (general connection failure)
@@ -490,8 +464,10 @@ class TC_CNET_4_23(MatterBaseTest):
             cnet.Enums.NetworkCommissioningStatusEnum.kNetworkNotFound,
             cnet.Enums.NetworkCommissioningStatusEnum.kOtherConnectionFailure
         ]
-        asserts.assert_in(response, valid_failure_statuses,
-                          f"Expected LastNetworkingStatus to indicate failure, got {response}")
+        await self._read_last_networking_status(
+            endpoint,
+            valid_statuses=valid_failure_statuses
+        )
 
         # TH sends ScanNetworks command
         self.step(11)
@@ -545,7 +521,7 @@ class TC_CNET_4_23(MatterBaseTest):
         self.step(12)
 
         logger.info(
-            f"Using correct SSID: {correct_ssid.decode('utf-8')} with correct Password: {correct_password.decode('utf-8')}")
+            f"Using correct SSID: {correct_ssid.decode('utf-8')} with correct Password")
         response = await self.send_single_cmd(
             endpoint=endpoint,
             cmd=cnet.Commands.AddOrUpdateWiFiNetwork(
@@ -555,17 +531,7 @@ class TC_CNET_4_23(MatterBaseTest):
             ),
             timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
         )
-
-        # Verify that DUT sends the NetworkConfigResponse command to the TH with the following response fields:
-        asserts.assert_true(isinstance(response, cnet.Commands.NetworkConfigResponse),
-                            "Unexpected value returned from AddOrUpdateWiFiNetwork")
-        # 1. NetworkingStatus is kSuccess which is '0'
-        asserts.assert_equal(response.networkingStatus, cnet.Enums.NetworkCommissioningStatusEnum.kSuccess,
-                             f"Expected 0 (kSuccess), but got: {response.networkingStatus}")
-        # 2. DebugText is of type string with max length 512 or empty
-        if response.debugText:
-            asserts.assert_less_equal(len(response.debugText), 512,
-                                      f"Expected length of debugText to be less than or equal to 512, but got: {len(response.debugText)}")
+        await self._validate_network_config_response(response)
 
         # TH sends ConnectNetwork command and Breadcrumb field set to 6
         self.step(13)
@@ -579,42 +545,21 @@ class TC_CNET_4_23(MatterBaseTest):
             ),
             timedRequestTimeoutMs=CONNECT_NETWORK_TIMEOUT_MS
         )
-
-        # Verify that DUT sends ConnectNetworkResponse command to the TH with the following response fields:
-        asserts.assert_true(isinstance(response, cnet.Commands.ConnectNetworkResponse),
-                            "Unexpected value returned from ConnectNetwork")
-        # 1. NetworkingStatus is kSuccess (0)
-        asserts.assert_equal(response.networkingStatus, cnet.Enums.NetworkCommissioningStatusEnum.kSuccess,
-                             "Expected ConnectNetwork to succeed with correct credentials")
-        # 2. DebugText is of type string with max length 512 or empty
-        if response.debugText:
-            asserts.assert_less_equal(len(response.debugText), 512,
-                                      f"Expected length of debugText to be less than or equal to 512, but got: {len(response.debugText)}")
+        await self._validate_connect_network_response(response, expect_success=True)
         logger.info(f"ConnectNetwork succeeded for SSID: {correct_ssid.decode('utf-8')} with correct credentials")
 
         # TH reads LastNetworkingStatus and LastConnectErrorValue
         self.step(14)
 
-        response = await self.read_single_attribute(
-            dev_ctrl=self.default_controller,
-            node_id=self.dut_node_id,
-            endpoint=endpoint,
-            attribute=cnet.Attributes.LastNetworkingStatus,
+        await self._read_last_networking_status(
+            endpoint,
+            expected_status=cnet.Enums.NetworkCommissioningStatusEnum.kSuccess
         )
-
-        # Verify LastNetworkingStatus to be 'kSuccess'
-        asserts.assert_equal(response, cnet.Enums.NetworkCommissioningStatusEnum.kSuccess,
-                             "Expected LastNetworkingStatus to be 'kSuccess'")
 
         # TH reads Networks attribute
         self.step(15)
 
-        response = await self.read_single_attribute(
-            dev_ctrl=self.default_controller,
-            node_id=self.dut_node_id,
-            endpoint=endpoint,
-            attribute=cnet.Attributes.Networks,
-        )
+        response = await self._read_networks(endpoint)
 
         # Verify device is connected to correct network
         connected_networks = [network.networkID for network in response if network.connected]
