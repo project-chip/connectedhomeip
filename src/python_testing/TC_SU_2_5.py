@@ -25,7 +25,6 @@
 #     app-args: >
 #       --discriminator 123
 #       --passcode 2123
-#       --secured-device-port 5540
 #       --KVS /tmp/chip_kvs_requestor
 #       --autoApplyImage
 #       --trace-to json:${TRACE_APP}.json
@@ -35,13 +34,12 @@
 #       --discriminator 123
 #       --passcode 2123
 #       --endpoint 0
-#       --nodeId 123
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --string-arg provider_app_path:${OTA_PROVIDER_APP}
 #       --string-arg ota_image:${SU_OTA_REQUESTOR_V2}
 #       --int-arg ota_image_expected_version:2
-#       --int-arg ota_provider_port:5543
+#       --int-arg ota_provider_port:5541
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -75,10 +73,10 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         "discriminator": 321,
         "setup_pincode": 2321
     }
-    requestor_setup_pincode = 2123
 
     @async_test_body
     async def teardown_test(self):
+        self.clear_ota_providers(self.controller, self.requestor_node_id)
         self.terminate_provider()
         super().teardown_test()
 

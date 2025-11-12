@@ -109,6 +109,8 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             logger.info("Terminating existing OTA Provider")
             self.current_provider_app_proc.terminate()
             self.current_provider_app_proc = None
+        else:
+            logger.info("Provider process  not found. Unable to terminate.")
 
     async def announce_ota_provider(self,
                                     controller: ChipDeviceCtrl,
@@ -344,3 +346,22 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             except Exception as e:
                 logging.error(f"Failed to restart Requestor: {e}")
                 asserts.fail(f"Requestor restart failed: {e}")
+
+    async def clear_ota_providers(self, controller: ChipDeviceCtrl, requestor_node_id: int):
+        """
+        Clears the DefaultOTAProviders attribute on the Requestor, leaving it empty.
+        Args:
+            controller (ChipDeviceCtrl): The controller to use for writing attributes.
+            requestor_node_id (int): Node ID of the Requestor device.
+        Returns:
+            None
+        """
+        # Set DefaultOTAProviders to empty list
+        attr_clear = Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders(value=[])
+        resp = await controller.WriteAttribute(
+            attributes=[(0, attr_clear)],
+            nodeId=requestor_node_id
+        )
+        logger.info('Cleanup - DefaultOTAProviders cleared')
+
+        asserts.assert_equal(resp[0].Status, Status.Success, "Failed to clear DefaultOTAProviders")
