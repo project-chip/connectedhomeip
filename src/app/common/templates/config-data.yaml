@@ -159,8 +159,8 @@ CodeDrivenClusters:
     - ICD Management
     - Identify
     - Localization Configuration
-    - Occupancy Sensing
     - OTA Software Update Provider
+    - Occupancy Sensing
     - Operational Credentials
     - Push AV Stream Transport
     - Software Diagnostics
