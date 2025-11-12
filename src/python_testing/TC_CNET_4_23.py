@@ -161,37 +161,57 @@ class TC_CNET_4_23(MatterBaseTest):
 
     def steps_TC_CNET_4_23(self):
         return [
-            TestStep(1, "TH begins commissioning the DUT over the initial commissioning radio (PASE):\n"
+            TestStep(0, "TH begins commissioning the DUT over the initial commissioning radio (PASE):\n"
                         "Skip CommissioningComplete to manually configure WiFi with incorrect then correct credentials\n"
                         "TH reads FeatureMap attribute from the DUT and verifies if DUT supports WiFi on endpoint 0",
                         is_commissioning=False),
-            TestStep(2, "TH sends AddOrUpdateWiFiNetwork with INCORRECT credentials and Breadcrumb field set to 1\n"
-                        "Save network index as 'userwifi_netidx' for later verification",
-                        "Verify that DUT sends the NetworkConfigResponse command to the TH with the following response fields:\n"
+            TestStep(1, "TH reads Networks attribute and removes all configured networks",
+                        "Verify that DUT successfully removes all networks configured during commissioning"),
+            # New steps: Test WRONG SSID scenario
+            TestStep(2, "TH sends AddOrUpdateWiFiNetwork with WRONG SSID and correct password, Breadcrumb = 1",
+                        "Verify that DUT sends NetworkConfigResponse:\n"
                         "1. NetworkingStatus is kSuccess (0)\n"
-                        "2. DebugText is of type string with max length 512 or empty\n"),
-            TestStep(3, "TH sends ConnectNetwork command and Breadcrumb field set to 2",
-                        "Verify that DUT sends ConnectNetworkResponse command to the TH with the following response fields:\n"
+                        "2. DebugText is of type string with max length 512 or empty"),
+            TestStep(3, "TH sends ConnectNetwork command with wrong SSID, Breadcrumb = 2",
+                        "Verify that DUT sends ConnectNetworkResponse:\n"
                         "1. NetworkingStatus is NOT kSuccess (0)\n"
                         "2. DebugText is of type string with max length 512 or empty"),
             TestStep(4, "TH reads LastNetworkingStatus and LastConnectErrorValue",
-                        "Verify LastNetworkingStatus to be 'kAuthFailure'"),
-            TestStep(5, "TH sends ScanNetworks command with Breadcrumb field set to 4",
-                        "Verify that DUT sends the ScanNetworksResponse command to the TH with the following response fields:\n"
-                        "1. wiFiScanResults contains the target network SSID"),
-            TestStep(6, "TH sends AddOrUpdateWiFiNetwork with CORRECT credentials and Breadcrumb field set to 5",
+                        "Verify LastNetworkingStatus is kNetworkNotFound (5)"),
+            TestStep(5, "TH reads Networks attribute",
+                        "Verify wrong SSID is in the network list"),
+            TestStep(6, "TH sends RemoveNetwork command with wrong SSID, Breadcrumb = 3",
+                        "Verify that DUT sends NetworkConfigResponse:\n"
+                        "1. NetworkingStatus is kSuccess (0)"),
+            TestStep(7, "TH reads Networks attribute",
+                        "Verify Networks list is empty after removal"),
+            # Existing steps (renumbered from 2-10 to 8-16)
+            TestStep(8, "TH sends AddOrUpdateWiFiNetwork with INCORRECT PASSWORD and Breadcrumb field set to 4",
                         "Verify that DUT sends the NetworkConfigResponse command to the TH with the following response fields:\n"
-                        "1. NetworkingStatus is kSuccess which is '0'\n"
-                        "2. DebugText is of type string with max length 512 or empty"),
-            TestStep(7, "TH sends ConnectNetwork command and Breadcrumb field set to 6",
+                        "1. NetworkingStatus is kSuccess (0)\n"
+                        "2. DebugText is of type string with max length 512 or empty\n"),
+            TestStep(9, "TH sends ConnectNetwork command and Breadcrumb field set to 5",
                         "Verify that DUT sends ConnectNetworkResponse command to the TH with the following response fields:\n"
-                        "1. NetworkingStatus is kSuccess which is '0'\n"
+                        "1. NetworkingStatus is NOT kSuccess (0)\n"
                         "2. DebugText is of type string with max length 512 or empty"),
-            TestStep(8, "TH reads LastNetworkingStatus and LastConnectErrorValue",
-                        "Verify LastNetworkingStatus to be 'kSuccess'"),
-            TestStep(9, "TH reads Networks attribute",
+            TestStep(10, "TH reads LastNetworkingStatus and LastConnectErrorValue",
+                     "Verify LastNetworkingStatus to be 'kAuthFailure'"),
+            TestStep(11, "TH sends ScanNetworks command with Breadcrumb field set to 6",
+                     "Verify that DUT sends the ScanNetworksResponse command to the TH with the following response fields:\n"
+                     "1. wiFiScanResults contains the target network SSID"),
+            TestStep(12, "TH sends AddOrUpdateWiFiNetwork with CORRECT credentials and Breadcrumb field set to 7",
+                     "Verify that DUT sends the NetworkConfigResponse command to the TH with the following response fields:\n"
+                     "1. NetworkingStatus is kSuccess which is '0'\n"
+                     "2. DebugText is of type string with max length 512 or empty"),
+            TestStep(13, "TH sends ConnectNetwork command and Breadcrumb field set to 8",
+                     "Verify that DUT sends ConnectNetworkResponse command to the TH with the following response fields:\n"
+                     "1. NetworkingStatus is kSuccess which is '0'\n"
+                     "2. DebugText is of type string with max length 512 or empty"),
+            TestStep(14, "TH reads LastNetworkingStatus and LastConnectErrorValue",
+                     "Verify LastNetworkingStatus to be 'kSuccess'"),
+            TestStep(15, "TH reads Networks attribute",
                      "Verify device is connected to correct network"),
-            TestStep(10, "TH sends CommissioningComplete to finalize commissioning",
+            TestStep(16, "TH sends CommissioningComplete to finalize commissioning",
                          "Verify that DUT sends CommissioningCompleteResponse with the following fields:\n"
                          "1. ErrorCode field set to OK (0)"),
         ]
@@ -217,8 +237,8 @@ class TC_CNET_4_23(MatterBaseTest):
         self.matter_test_config.wifi_passphrase = "WrongPassword123"
         wrong_password = self.matter_test_config.wifi_passphrase.encode('utf-8')
 
-        # TH begins commissioning the DUT over the initial commissioning radio (PASE):
-        self.step(1)
+        # Step 0: TH begins commissioning the DUT over the initial commissioning radio (PASE):
+        self.step(0)
 
         # Skip CommissioningComplete to manually configure WiFi with incorrect then correct credentials
         self.default_controller.SetSkipCommissioningComplete(True)
@@ -227,6 +247,14 @@ class TC_CNET_4_23(MatterBaseTest):
         self.matter_test_config.tc_user_response_to_simulate = None
 
         await self.commission_devices()
+
+        # Extend fail-safe to 300 seconds to allow time for credential testing
+        await self.send_single_cmd(
+            dev_ctrl=self.default_controller,
+            node_id=self.dut_node_id,
+            cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=300, breadcrumb=0)
+        )
+        logger.info("Extended fail-safe timer to 300 seconds")
 
         # Set target device ID for mDNS discovery
         set_target_device_id(self.dut_node_id)
@@ -242,20 +270,164 @@ class TC_CNET_4_23(MatterBaseTest):
 
         if not (feature_map & cnet.Bitmaps.Feature.kWiFiNetworkInterface):
             logger.info("Device does not support WiFi on endpoint 0, skipping remaining steps")
-            self.skip_all_remaining_steps(2)
+            self.skip_all_remaining_steps(1)
             return
 
-        # TH sends AddOrUpdateWiFiNetwork with INCORRECT credentials and Breadcrumb field set to 1
+        # Step 1: TH reads Networks attribute and removes all configured networks
+        self.step(1)
+
+        logger.info(" --- Step 1: Reading and removing all configured networks from commissioning...")
+        networks = await self.read_single_attribute(
+            dev_ctrl=self.default_controller,
+            node_id=self.dut_node_id,
+            endpoint=endpoint,
+            attribute=cnet.Attributes.Networks,
+        )
+
+        logger.info(f"Found {len(networks)} network(s) configured during commissioning")
+        for network in networks:
+            network_id = network.networkID
+            logger.info(f" --- Removing network: {network_id.decode('utf-8', errors='replace')}")
+            remove_response = await self.send_single_cmd(
+                endpoint=endpoint,
+                cmd=cnet.Commands.RemoveNetwork(
+                    networkID=network_id,
+                    breadcrumb=0
+                )
+            )
+            asserts.assert_true(isinstance(remove_response, cnet.Commands.NetworkConfigResponse),
+                                "Unexpected response from RemoveNetwork")
+            asserts.assert_equal(remove_response.networkingStatus, cnet.Enums.NetworkCommissioningStatusEnum.kSuccess,
+                                 f"Failed to remove network: {remove_response.networkingStatus}")
+            logger.info(f" --- Network removed successfully: {network_id.decode('utf-8', errors='replace')}")
+
+        # Verify networks list is now empty
+        networks_after = await self.read_single_attribute(
+            dev_ctrl=self.default_controller,
+            node_id=self.dut_node_id,
+            endpoint=endpoint,
+            attribute=cnet.Attributes.Networks,
+        )
+        asserts.assert_equal(len(networks_after), 0,
+                             f"Expected empty network list after cleanup, but found {len(networks_after)} network(s)")
+        logger.info(" --- All networks successfully removed. Ready for manual WiFi configuration tests.")
+
+        # Step 2: TH sends AddOrUpdateWiFiNetwork with WRONG SSID and correct password
         self.step(2)
 
+        logger.info(f" --- Step 2: Using WRONG SSID: {wrong_ssid.decode('utf-8')} with correct password")
+        response = await self.send_single_cmd(
+            endpoint=endpoint,
+            cmd=cnet.Commands.AddOrUpdateWiFiNetwork(
+                ssid=wrong_ssid,
+                credentials=correct_password,
+                breadcrumb=1
+            )
+        )
+
+        asserts.assert_true(isinstance(response, cnet.Commands.NetworkConfigResponse),
+                            "Unexpected value returned from AddOrUpdateWiFiNetwork")
+        asserts.assert_equal(response.networkingStatus, cnet.Enums.NetworkCommissioningStatusEnum.kSuccess,
+                             f"Expected 0 (kSuccess), but got: {response.networkingStatus}")
+        if response.debugText:
+            asserts.assert_less_equal(len(response.debugText), 512,
+                                      f"Expected debugText length <= 512, got: {len(response.debugText)}")
+
+        # Step 3: TH sends ConnectNetwork command with wrong SSID
+        self.step(3)
+
+        logger.info(" --- Step 3: Sending ConnectNetwork with wrong SSID...")
+        response = await self.send_single_cmd(
+            endpoint=endpoint,
+            cmd=cnet.Commands.ConnectNetwork(
+                networkID=wrong_ssid,
+                breadcrumb=2
+            ),
+            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
+        )
+
+        asserts.assert_true(isinstance(response, cnet.Commands.ConnectNetworkResponse),
+                            "Unexpected value returned from ConnectNetwork")
+        asserts.assert_not_equal(response.networkingStatus, cnet.Enums.NetworkCommissioningStatusEnum.kSuccess,
+                                 "Expected ConnectNetwork to fail with wrong SSID")
+        if response.debugText:
+            asserts.assert_less_equal(len(response.debugText), 512,
+                                      f"Expected debugText length <= 512, got: {len(response.debugText)}")
+        logger.info(f"ConnectNetwork failed as expected for wrong SSID: {wrong_ssid.decode('utf-8')}")
+
+        # Wait for DUT to complete connection attempt and update LastNetworkingStatus
+        logger.info(" --- Waiting 3 seconds for DUT to update network status...")
+        await asyncio.sleep(3)
+
+        # Step 4: TH reads LastNetworkingStatus (should be kNetworkNotFound)
+        self.step(4)
+
+        networking_status = await self.read_single_attribute(
+            dev_ctrl=self.default_controller,
+            node_id=self.dut_node_id,
+            endpoint=endpoint,
+            attribute=cnet.Attributes.LastNetworkingStatus,
+        )
+        logger.info(f" --- Step 4: LastNetworkingStatus: {networking_status}")
+        asserts.assert_equal(networking_status, cnet.Enums.NetworkCommissioningStatusEnum.kNetworkNotFound,
+                             f"Expected kNetworkNotFound (5), but got: {networking_status}")
+
+        # Step 5: TH reads Networks attribute (verify wrong SSID is stored)
+        self.step(5)
+
+        networks = await self.read_single_attribute(
+            dev_ctrl=self.default_controller,
+            node_id=self.dut_node_id,
+            endpoint=endpoint,
+            attribute=cnet.Attributes.Networks,
+        )
+        logger.info(f" --- Step 5: Networks attribute has {len(networks)} network(s)")
+        network_ids = [net.networkID for net in networks]
+        asserts.assert_in(wrong_ssid, network_ids,
+                          f"Expected wrong SSID {wrong_ssid.decode('utf-8')} to be in Networks list")
+
+        # Step 6: TH sends RemoveNetwork to clean up wrong SSID
+        self.step(6)
+
+        logger.info(f" --- Step 6: Removing wrong SSID: {wrong_ssid.decode('utf-8')}")
+        response = await self.send_single_cmd(
+            endpoint=endpoint,
+            cmd=cnet.Commands.RemoveNetwork(
+                networkID=wrong_ssid,
+                breadcrumb=3
+            ),
+            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
+        )
+
+        asserts.assert_true(isinstance(response, cnet.Commands.NetworkConfigResponse),
+                            "Unexpected value returned from RemoveNetwork")
+        asserts.assert_equal(response.networkingStatus, cnet.Enums.NetworkCommissioningStatusEnum.kSuccess,
+                             f"Expected kSuccess (0) from RemoveNetwork, got: {response.networkingStatus}")
+
+        # Step 7: TH reads Networks attribute (verify list is empty)
+        self.step(7)
+
+        networks = await self.read_single_attribute(
+            dev_ctrl=self.default_controller,
+            node_id=self.dut_node_id,
+            endpoint=endpoint,
+            attribute=cnet.Attributes.Networks,
+        )
+        logger.info(f" --- Step 7: Networks attribute has {len(networks)} network(s) after removal")
+        asserts.assert_equal(len(networks), 0,
+                             f"Expected Networks list to be empty, but has {len(networks)} network(s)")
+
+        # TH sends AddOrUpdateWiFiNetwork with INCORRECT credentials and Breadcrumb field set to 1
+        self.step(8)
+
         logger.info(
-            f" --- Step 2: Using correct SSID: {correct_ssid.decode('utf-8')} with incorrect Password: {wrong_password.decode('utf-8')}")
+            f" --- Step 8: Using correct SSID: {correct_ssid.decode('utf-8')} with incorrect Password: {wrong_password.decode('utf-8')}")
         response = await self.send_single_cmd(
             endpoint=endpoint,
             cmd=cnet.Commands.AddOrUpdateWiFiNetwork(
                 ssid=correct_ssid,
                 credentials=wrong_password,
-                breadcrumb=1
+                breadcrumb=4
             )
         )
 
@@ -270,18 +442,15 @@ class TC_CNET_4_23(MatterBaseTest):
             asserts.assert_less_equal(len(response.debugText), 512,
                                       f"Expected length of debugText to be less than or equal to 512, but got: {len(response.debugText)}")
 
-        # Save network index as 'userwifi_netidx' for later verification
-        userwifi_netidx = response.networkIndex
-
         # TH sends ConnectNetwork command and Breadcrumb field set to 2
-        self.step(3)
+        self.step(9)
 
-        logger.info(" --- Step 3: Sending ConnectNetwork with incorrect credentials...")
+        logger.info(" --- Step 9: Sending ConnectNetwork with incorrect credentials...")
         response = await self.send_single_cmd(
             endpoint=endpoint,
             cmd=cnet.Commands.ConnectNetwork(
                 networkID=correct_ssid,
-                breadcrumb=2
+                breadcrumb=5
             ),
             timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
         )
@@ -298,8 +467,12 @@ class TC_CNET_4_23(MatterBaseTest):
                                       f"Expected length of debugText to be less than or equal to 512, but got: {len(response.debugText)}")
         logger.info(f"ConnectNetwork failed as expected for SSID: {correct_ssid.decode('utf-8')} with incorrect credentials")
 
+        # Wait for DUT to complete connection attempt and update LastNetworkingStatus
+        logger.info(" --- Waiting 3 seconds for DUT to update network status...")
+        await asyncio.sleep(3)
+
         # TH reads LastNetworkingStatus and LastConnectErrorValue
-        self.step(4)
+        self.step(10)
 
         response = await self.read_single_attribute(
             dev_ctrl=self.default_controller,
@@ -307,7 +480,7 @@ class TC_CNET_4_23(MatterBaseTest):
             endpoint=endpoint,
             attribute=cnet.Attributes.LastNetworkingStatus,
         )
-        logger.info(f" --- Step 4: LastNetworkingStatus: {response}")
+        logger.info(f" --- Step 10: LastNetworkingStatus: {response}")
 
         # Verify LastNetworkingStatus indicates a failure
         # Can be kAuthFailure (wrong password), kNetworkNotFound (network not in range),
@@ -321,7 +494,7 @@ class TC_CNET_4_23(MatterBaseTest):
                           f"Expected LastNetworkingStatus to indicate failure, got {response}")
 
         # TH sends ScanNetworks command
-        self.step(5)
+        self.step(11)
 
         # Retry scan up to MAX_ATTEMPTS times if no networks found or target SSID not found
         ssids_found = []
@@ -333,7 +506,7 @@ class TC_CNET_4_23(MatterBaseTest):
             response = await self.send_single_cmd(
                 endpoint=endpoint,
                 cmd=cnet.Commands.ScanNetworks(
-                    breadcrumb=4
+                    breadcrumb=6
                 )
             )
 
@@ -369,7 +542,7 @@ class TC_CNET_4_23(MatterBaseTest):
                             f"ScanNetworks did not find target SSID '{correct_ssid.decode('utf-8')}' after {MAX_ATTEMPTS} attempts")
 
         # TH sends AddOrUpdateWiFiNetwork with CORRECT credentials and Breadcrumb field set to 5
-        self.step(6)
+        self.step(12)
 
         logger.info(
             f"Using correct SSID: {correct_ssid.decode('utf-8')} with correct Password: {correct_password.decode('utf-8')}")
@@ -378,7 +551,7 @@ class TC_CNET_4_23(MatterBaseTest):
             cmd=cnet.Commands.AddOrUpdateWiFiNetwork(
                 ssid=correct_ssid,
                 credentials=correct_password,
-                breadcrumb=5
+                breadcrumb=7
             ),
             timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
         )
@@ -395,24 +568,14 @@ class TC_CNET_4_23(MatterBaseTest):
                                       f"Expected length of debugText to be less than or equal to 512, but got: {len(response.debugText)}")
 
         # TH sends ConnectNetwork command and Breadcrumb field set to 6
-        self.step(7)
-
-        # Re-arm fail-safe before connecting to WiFi
-        logger.info("Re-arming fail-safe timer for 900 seconds before WiFi connection...")
-        await self.send_single_cmd(
-            endpoint=endpoint,
-            cmd=cgen.Commands.ArmFailSafe(
-                expiryLengthSeconds=300,
-                breadcrumb=0
-            )
-        )
+        self.step(13)
 
         logger.info("Sending ConnectNetwork with correct credentials...")
         response = await self.send_single_cmd(
             endpoint=endpoint,
             cmd=cnet.Commands.ConnectNetwork(
                 networkID=correct_ssid,
-                breadcrumb=6
+                breadcrumb=8
             ),
             timedRequestTimeoutMs=CONNECT_NETWORK_TIMEOUT_MS
         )
@@ -430,7 +593,7 @@ class TC_CNET_4_23(MatterBaseTest):
         logger.info(f"ConnectNetwork succeeded for SSID: {correct_ssid.decode('utf-8')} with correct credentials")
 
         # TH reads LastNetworkingStatus and LastConnectErrorValue
-        self.step(8)
+        self.step(14)
 
         response = await self.read_single_attribute(
             dev_ctrl=self.default_controller,
@@ -444,7 +607,7 @@ class TC_CNET_4_23(MatterBaseTest):
                              "Expected LastNetworkingStatus to be 'kSuccess'")
 
         # TH reads Networks attribute
-        self.step(9)
+        self.step(15)
 
         response = await self.read_single_attribute(
             dev_ctrl=self.default_controller,
@@ -460,7 +623,7 @@ class TC_CNET_4_23(MatterBaseTest):
         logger.info(f"Device is connected to SSID: {correct_ssid.decode('utf-8')}")
 
         # TH sends CommissioningComplete to finalize commissioning
-        self.step(10)
+        self.step(16)
 
         await asyncio.sleep(5)  # Short delay before mDNS discovery
 
