@@ -2266,7 +2266,7 @@ template <typename params>
 void TestSigma3TBEParsing(chip::Platform::ScopedMemoryBuffer<uint8_t> & mem, size_t bufferSize)
 {
     MutableByteSpan buf((mem).Get(), (bufferSize));
-    EXPECT_EQ(EncodeSigma3TBEDataHelper<params>(buf), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(EncodeSigma3TBEDataHelper<params>(buf));
 
     TLV::ContiguousBufferTLVReader reader;
     reader.Init(buf);
