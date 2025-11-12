@@ -130,6 +130,9 @@ declare_args() {
   # and the supplicant can support.
   chip_device_config_enable_wifipaf =
       chip_enable_wifi && chip_device_platform == "linux"
+
+  chip_device_config_enable_wifipaf_ctrl_iface = false
+  chip_device_config_enable_wifipaf_hostapd = false
 }
 
 declare_args() {

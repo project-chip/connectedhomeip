@@ -74,6 +74,7 @@ static_library("Linux") {
     "PosixConfig.h",
     "SystemPlatformConfig.h",
     "SystemTimeSupport.cpp",
+    "WpaDbusDefs.h",
   ]
 
   deps = [
@@ -181,5 +182,43 @@ static_library("Linux") {
 
   if (chip_device_config_enable_wifipaf) {
     public_deps += [ "${chip_root}/src/wifipaf" ]
+    sources += [
+      "WiFiPAFDriver.cpp",
+      "WiFiPAFDriver.h",
+    ]
+    if (chip_device_config_enable_wifipaf_ctrl_iface) {
+      include_dirs = [ "${chip_root}/third_party/hostap/repo/src/common" ]
+      sources += [
+        "WiFiPAFDriverCtrlIface.cpp",
+        "WiFiPAFDriverCtrlIface.h",
+      ]
+      deps += [ ":wpa_ctrl" ]
+    } else {
+      sources += [
+        "WiFiPAFDriverDbus.cpp",
+        "WiFiPAFDriverDbus.h",
+      ]
+    }
+  }
+}
+
+if (chip_device_config_enable_wifipaf_ctrl_iface) {
+  source_set("wpa_ctrl") {
+    cflags_c = [
+      "-std=c99",
+      "-Wno-error=vla",
+    ]
+    include_dirs = [
+      "${chip_root}/third_party/hostap/repo/src/common",
+      "${chip_root}/third_party/hostap/repo/src/utils",
+    ]
+    sources = [
+      "${chip_root}/third_party/hostap/repo/src/common/wpa_ctrl.c",
+      "${chip_root}/third_party/hostap/repo/src/utils/os_unix.c",
+    ]
+    defines = [
+      "CONFIG_CTRL_IFACE",
+      "CONFIG_CTRL_IFACE_UNIX",
+    ]
   }
 }
