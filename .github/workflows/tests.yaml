@@ -593,7 +593,14 @@ jobs:
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
             CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
 
-        runs-on: ubuntu-latest
+        # Run on namespace.so instead of `ubuntu-latest`: This seems to provide 20-40% speed improvement
+        # even if using just 4CPUx8GB RAM. We do this because most processing is I/O bound. The
+        # 8 CPU provide would perform compilation even faster, however it has a double minute multiplier
+        # which we would waste during the I/O bound testing.
+        #
+        # In the future, if we either have sufficient resources or if the processing moves to be CPU
+        # bound (parallel testing) this can be updated to the 8x16 profile.
+        runs-on: namespace-profile-4x8
 
         container:
             image: ghcr.io/project-chip/chip-build:174
@@ -825,7 +832,7 @@ jobs:
             - name: Build Software Update ota images with new version.
               env:
                   CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
-              run: >- 
+              run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_ota_images.sh --out-prefix out/su_ota_images_min --max-range 2
                   && mv out/su_ota_images_min-v*/*.ota objdir-clone
                   && rm -rf out/su_ota_images_min-v*"
@@ -879,7 +886,7 @@ jobs:
 
             - name: Verify Testing Support
               run: |
-                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_ota_images_versions.py -i objdir-clone/chip-ota-requestor-app_v2.min.ota -v 2' 
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_ota_images_versions.py -i objdir-clone/chip-ota-requestor-app_v2.min.ota -v 2'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_IDM_10_4.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_ICDM_2_1_full_pics.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_ICDM_2_1_min_pics.py'
