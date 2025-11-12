@@ -24,6 +24,7 @@ import("${matter_support_root}/provision/args.gni")
 silabs_platform_dir = "${chip_root}/src/platform/silabs"
 
 assert(chip_device_platform == "SiWx917")
+assert(chip_enable_ble_siwx,"chip_enable_ble_siwx must be enabled for SiWx917")
 
 if (chip_crypto == "platform") {
   import("//build_overrides/mbedtls.gni")
@@ -75,8 +76,9 @@ static_library("SiWx") {
   public_deps = [
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/platform:platform_base",
-    "${silabs_platform_dir}/SiWx/ble:siwx-ble",
     "${silabs_platform_dir}/platformAbstraction:wisemcu",
+    # chip_enable_ble_siwx
+    "${silabs_platform_dir}/SiWx/ble:siwx-ble",
   ]
   deps = [
     "${chip_root}/src/app/common:ids",

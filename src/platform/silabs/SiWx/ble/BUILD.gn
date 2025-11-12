@@ -19,7 +19,6 @@ import("${chip_root}/third_party/silabs/silabs_board.gni")
 config("siwx-ble-config") {
   defines = []
   include_dirs = []
-
   defines += [
     "SLI_SI91X_ENABLE_BLE=1",
     "SL_SI91X_ENABLE_LITTLE_ENDIAN=1",
