@@ -595,7 +595,7 @@ jobs:
 
         # Run on namespace.so instead of `ubuntu-latest`: This seems to provide 20-40% speed improvement
         # even if using just 4CPUx8GB RAM. We do this because most processing is I/O bound. The
-        # 8 CPU provide would perform compilation even faster, however it has a double minute multiplier
+        # 8 CPU provided would perform compilation even faster, however it has a double minute multiplier
         # which we would waste during the I/O bound testing.
         #
         # In the future, if we either have sufficient resources or if the processing moves to be CPU
