@@ -95,9 +95,6 @@ public:
 
     void TimerFired() override;
 
-    void EnableHoldTime(uint16_t aHoldTime, const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & aHoldTimeLimits,
-                        TimerDelegate & aTimerDelegate);
-
     DataModel::ActionReturnStatus SetHoldTime(uint16_t holdTime);
     void SetHoldTimeLimits(const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & holdTimeLimits);
     void SetOccupancy(bool occupied);

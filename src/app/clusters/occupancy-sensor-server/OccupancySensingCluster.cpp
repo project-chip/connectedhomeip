@@ -212,16 +212,6 @@ CHIP_ERROR OccupancySensingCluster::Attributes(const ConcreteClusterPath & clust
     return listBuilder.Append(Span(OccupancySensing::Attributes::kMandatoryMetadata), Span(optionalAttributes));
 }
 
-void OccupancySensingCluster::EnableHoldTime(uint16_t aHoldTime,
-                                             const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & aHoldTimeLimits,
-                                             TimerDelegate & aTimerDelegate)
-{
-    mHasHoldTime   = true;
-    mTimerDelegate = &aTimerDelegate;
-    SetHoldTimeLimits(aHoldTimeLimits);
-    mHoldTime = std::clamp(aHoldTime, mHoldTimeLimits.holdTimeMin, mHoldTimeLimits.holdTimeMax);
-}
-
 DataModel::ActionReturnStatus OccupancySensingCluster::SetHoldTime(uint16_t holdTime)
 {
     VerifyOrReturnError(mHasHoldTime, Protocols::InteractionModel::Status::UnsupportedAttribute);
