@@ -80,9 +80,9 @@ static_library("efr32") {
   if (sl_matter_enable_siwx_ble) {
     public_deps += [ "${silabs_platform_dir}/SiWx/ble:siwx-ble" ]
     sources += [
-    "${silabs_platform_dir}/SiWx/ble/BLEManagerImpl.cpp",
-    "${silabs_platform_dir}/SiWx/ble//sl_si91x_ble_init.cpp",
-    "${silabs_platform_dir}/SiWx/ble//sl_si91x_ble_init.h",
+      "${silabs_platform_dir}/SiWx/ble//sl_si91x_ble_init.cpp",
+      "${silabs_platform_dir}/SiWx/ble//sl_si91x_ble_init.h",
+      "${silabs_platform_dir}/SiWx/ble/BLEManagerImpl.cpp",
     ]
   } else {
     sources += [ "BLEManagerImpl.cpp" ]

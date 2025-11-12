@@ -24,7 +24,8 @@ import("${matter_support_root}/provision/args.gni")
 silabs_platform_dir = "${chip_root}/src/platform/silabs"
 
 assert(chip_device_platform == "SiWx917")
-assert(sl_matter_enable_siwx_ble, "sl_matter_enable_siwx_ble must be enabled for SiWx917")
+assert(sl_matter_enable_siwx_ble,
+       "sl_matter_enable_siwx_ble must be enabled for SiWx917")
 
 if (chip_crypto == "platform") {
   import("//build_overrides/mbedtls.gni")
