@@ -378,7 +378,7 @@ TEST_F(TestServerClusterInterfaceRegistry, StartupShutdownWithoutContext)
         EXPECT_EQ(cluster3.Cluster().GetStartupCallCount(), 0u);
         EXPECT_EQ(registry.Register(cluster3.Registration()), CHIP_NO_ERROR);
 
-        // all startups were called, even though error
+        // all startups were called, even though there was an error
         EXPECT_EQ(cluster1.Cluster().GetStartupCallCount(), 1u);
         EXPECT_EQ(cluster2.Cluster().GetStartupCallCount(), 1u);
         EXPECT_EQ(cluster3.Cluster().GetStartupCallCount(), 1u);
