@@ -42,9 +42,8 @@ constexpr std::array<AttributePathParams, kTestPathsSize> kTestPaths = {
 };
 constexpr AttributePathParams kOverflowPath(1, 2, 3);
 
-constexpr uint32_t kBaseTimeoutMs       = 1000;
-constexpr uint32_t kJitterTimeoutMs     = 1000;
-constexpr uint32_t kSystemClockDelaytMs = 20;
+constexpr uint32_t kBaseTimeoutMs   = 1000;
+constexpr uint32_t kJitterTimeoutMs = 1000;
 
 class MockProviderChangeListener : public ProviderChangeListener
 {
