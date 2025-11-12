@@ -35,10 +35,10 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --endpoint 0
-#       --int-arg target_version:{}
-#       --int-arg
-#       --string-arg
-#       --string-arg
+#       --int-arg target_version:2
+#       --int-arg ota_provider_port:5540
+#       --string-arg provider_app_path:${OTA_PROVIDER_APP}
+#       --string-arg ota_image:${SU_OTA_REQUESTOR_V2}
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -109,8 +109,8 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
 
         self.provider_port = self.user_params.get('ota_provider_port')
 
-        self.app_path = self.user_params.get('app_path')
-        image = self.user_params.get('image')
+        self.app_path = self.user_params.get('provider_app_path')
+        image = self.user_params.get('ota_image')
         self.provider_ota_file = OtaImagePath(path=image)
 
         # States
