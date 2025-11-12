@@ -59,6 +59,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/general-commissioning-server/tests",
       "${chip_root}/src/app/clusters/general-diagnostics-server/tests",
       "${chip_root}/src/app/clusters/group-key-mgmt-server/tests",
+      "${chip_root}/src/app/clusters/icd-management-server/tests",
       "${chip_root}/src/app/clusters/network-commissioning/tests",
       "${chip_root}/src/app/clusters/ota-provider/tests",
       "${chip_root}/src/app/clusters/software-diagnostics-server/tests",
@@ -83,7 +84,6 @@ if (chip_build_tests) {
       "${chip_root}/src/crypto/tests",
       "${chip_root}/src/data-model-providers/codedriven/endpoint/tests",
       "${chip_root}/src/inet/tests",
-      "${chip_root}/src/include/platform/tests",
       "${chip_root}/src/lib/address_resolve/tests",
       "${chip_root}/src/app/server-cluster/tests",
       "${chip_root}/src/lib/asn1/tests",
@@ -199,7 +199,12 @@ if (chip_build_tests) {
     }
 
     if (chip_device_config_enable_joint_fabric) {
-      tests += [ "${chip_root}/src/app/server/tests" ]
+      tests += [
+        "${chip_root}/src/app/server/tests",
+        "${chip_root}/src/controller/tests/jcm",
+        "${chip_root}/src/credentials/tests/jcm",
+        "${chip_root}/src/app/clusters/joint-fabric-administrator-server/tests",
+      ]
     }
   }
 

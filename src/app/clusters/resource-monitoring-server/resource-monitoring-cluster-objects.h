@@ -97,13 +97,13 @@ public:
                              chip::CharSpan aProductIdentifierValue)
     {
         SetProductIdentifierType(aProductIdentifierType);
-        SetProductIdentifierValue(aProductIdentifierValue);
+        TEMPORARY_RETURN_IGNORED SetProductIdentifierValue(aProductIdentifierValue);
     }
 
     ReplacementProductStruct & operator=(const ReplacementProductStruct & aReplacementProductStruct)
     {
         SetProductIdentifierType(aReplacementProductStruct.GetProductIdentifierType());
-        SetProductIdentifierValue(aReplacementProductStruct.GetProductIdentifierValue());
+        TEMPORARY_RETURN_IGNORED SetProductIdentifierValue(aReplacementProductStruct.GetProductIdentifierValue());
         return *this;
     }
 
