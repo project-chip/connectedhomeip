@@ -23,7 +23,7 @@
  */
 
 /* this file behaves like a config.h, comes first */
-#include <platform/internal/CHIPDeviceLayerInternal.h> // nogncheck
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 #include "sl_si91x_ble_init.h"
@@ -31,9 +31,8 @@
 #include <crypto/RandUtils.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/CommissionableDataProvider.h> // nogncheck
-#include <platform/DeviceInstanceInfoProvider.h> // nogncheck
-#include <platform/internal/BLEManager.h>        // nogncheck
+#include <platform/CommissionableDataProvider.h>
+#include <platform/internal/BLEManager.h>
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 #include <setup_payload/AdditionalDataPayloadGenerator.h>

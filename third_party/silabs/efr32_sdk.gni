@@ -269,7 +269,7 @@ template("efr32_sdk") {
 
       libs += [ "${matter_support_root}/sdk-copies/protocol/openthread/libs/libsl_openthread_cm33_gcc.a" ]
 
-      if (!chip_enable_ble_siwx) {
+      if (!sl_matter_enable_siwx_ble) {
         libs += [
           "${matter_support_root}/sdk-copies/protocol/bluetooth/bgcommon/lib/build/gcc/cortex-m33/bgcommon/release/libbgcommon.a",
           "${matter_support_root}/sdk-copies/protocol/bluetooth/bgstack/ll/build/gcc/xg24/release/liblinklayer.a",
@@ -301,7 +301,7 @@ template("efr32_sdk") {
 
       libs += [ "${matter_support_root}/sdk-copies/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg24_gcc_release.a" ]
 
-      if (!chip_enable_ble_siwx) {
+      if (!sl_matter_enable_siwx_ble) {
         libs += [ "${matter_support_root}/sdk-copies/protocol/bluetooth/bgstack/ll/build/gcc/xg24/release/liblinklayer.a" ]
       }
 
@@ -878,7 +878,7 @@ template("efr32_sdk") {
       ]
     }
 
-    if (!chip_enable_ble_siwx) {
+    if (!sl_matter_enable_siwx_ble) {
       sources += [
         "${efr32_sdk_root}/protocol/bluetooth/bgstack/ll/src/sl_btctrl_init.c",
         "${efr32_sdk_root}/protocol/bluetooth/bgstack/ll/src/sl_btctrl_init_tasklets.c",
@@ -1084,7 +1084,7 @@ template("efr32_sdk") {
 
     public_configs = [ ":${sdk_target_name}_config" ]
 
-    if (chip_enable_ble_siwx) {
+    if (sl_matter_enable_siwx_ble) {
       public_configs +=
           [ "${chip_root}/src/platform/silabs/SiWx/ble:siwx-ble-config" ]
     }

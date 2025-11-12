@@ -119,7 +119,7 @@ To build the lighting app as an Wi-Fi MG24 + SiWx NCP, the default build command
 for the BRD4187C is
 
 ```shell
-./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/lighting-app_siwx917 BRD4187C use_external_flash=false chip_enable_ble_siwx=true --wifi SiWx917
+./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/lighting-app_siwx917 BRD4187C use_external_flash=false sl_matter_enable_siwx_ble=true --wifi SiWx917
 ```
 
 > **Note**: The build argument `--wifi SiWx917` is necessary to build BRD4187C

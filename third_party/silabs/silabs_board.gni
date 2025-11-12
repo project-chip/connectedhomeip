@@ -70,7 +70,7 @@ declare_args() {
   show_qr_code = !disable_lcd
 
   # Enabling BLE on 917 SoC by default
-  chip_enable_ble_siwx = use_SiWx917
+  sl_matter_enable_siwx_ble = use_SiWx917
 }
 
 # TODO - This needs to be removed once multiplexing issues resolved
@@ -124,7 +124,7 @@ if (is_si917_board) {
   wifi_soc = true
 
   # Enabling BLE on 917 NCP by default
-  chip_enable_ble_siwx = true
+  sl_matter_enable_siwx_ble = true
 
   if (silabs_board == "BRD2708A" || silabs_board == "BRD2911A") {
     is_si917y_mcu = true

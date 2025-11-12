@@ -23,8 +23,8 @@
 
 #include "ble_config.h"
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/CHIPDeviceLayer.h>       // nogncheck
-#include <platform/silabs/BLEManagerImpl.h> // nogncheck
+#include <platform/CHIPDeviceLayer.h>
+#include <platform/silabs/BLEManagerImpl.h>
 #include <sl_si91x_ble_init.h>
 
 using namespace chip::DeviceLayer::Internal;
