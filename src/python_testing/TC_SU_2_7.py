@@ -27,6 +27,7 @@
 #       --passcode 2123
 #       --KVS /tmp/chip_kvs_requestor
 #       --trace-to json:${TRACE_APP}.json
+#       --autoApplyImage
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -135,6 +136,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
 
     @async_test_body
     async def teardown_test(self):
+        self.clear_ota_providers(self.controller, self.requestor_node_id)
         self.terminate_provider()
         super().teardown_test()
 
