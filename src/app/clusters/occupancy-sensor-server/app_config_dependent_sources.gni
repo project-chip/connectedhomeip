@@ -13,9 +13,6 @@
 # limitations under the License.
 
 app_config_dependent_sources = [
-  "occupancy-hal.h",
-  "occupancy-sensor-server.cpp",
-  "occupancy-sensor-server.h",
   "CodegenIntegration.h",
   "CodegenIntegration.cpp",
 ]

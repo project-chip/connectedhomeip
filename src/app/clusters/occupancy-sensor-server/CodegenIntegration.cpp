@@ -47,10 +47,16 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
+        ChipLogDetail(AppServer, "OccupancySensing::CreateRegistration: endpoint=%u, instance=%u, optionalAttributeBits=0x%x, featureMap=0x%x", endpointId, clusterInstanceIndex, optionalAttributeBits, featureMap);
         OccupancySensingCluster::Config config(endpointId);
         config.WithFeatures(static_cast<Feature>(featureMap));
 
-        if (optionalAttributeBits & (1 << Attributes::HoldTime::Id))
+        bool hasSensorFeature = (featureMap & (to_underlying(Feature::kPassiveInfrared) | to_underlying(Feature::kUltrasonic) |
+                                                to_underlying(Feature::kPhysicalContact)));
+
+        // If HoldTime is optional OR if any sensor feature is present, enable the HoldTime logic.
+        // The delay attributes are required if the corresponding sensor feature is present.
+        if ((optionalAttributeBits & (1 << Attributes::HoldTime::Id)) || hasSensorFeature)
         {
             // Initializes hold time with default limits and default timer delegate. Application can use SetHoldTimeLimits() and SetHoldTime() later to customize.
             constexpr chip::app::Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::Type kDefaultHoldTimeLimits = { .holdTimeMin = 1, .holdTimeMax = 60, .holdTimeDefault = 10 };
@@ -121,3 +127,7 @@ OccupancySensingCluster * FindClusterOnEndpoint(EndpointId endpointId)
 }
 
 } // namespace chip::app::Clusters::OccupancySensing
+
+// Legacy PluginServer callback stubs
+void MatterOccupancySensingPluginServerInitCallback() {}
+void MatterOccupancySensingPluginServerShutdownCallback() {}

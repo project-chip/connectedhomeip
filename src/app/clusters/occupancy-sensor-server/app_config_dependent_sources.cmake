@@ -16,7 +16,6 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/occupancy-hal.h"
-    "${CLUSTER_DIR}/occupancy-sensor-server.cpp"
-    "${CLUSTER_DIR}/occupancy-sensor-server.h"
+    "${CLUSTER_DIR}/CodegenIntegration.h"
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
 )

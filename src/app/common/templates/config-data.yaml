@@ -96,7 +96,6 @@ ClustersWithInitFunctions:
     - Groups
     - Level Control
     - Mode Select
-    - Occupancy Sensing
     - On/Off
     - Pump Configuration and Control
     - Sample MEI
@@ -160,6 +159,7 @@ CodeDrivenClusters:
     - ICD Management
     - Identify
     - Localization Configuration
+    - Occupancy Sensing
     - OTA Software Update Provider
     - Operational Credentials
     - Push AV Stream Transport
