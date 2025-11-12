@@ -40,7 +40,7 @@ ThermostatDelegate::ThermostatDelegate()
     mIndexOfCurrentSuggestion                   = mMaxThermostatSuggestions;
     mNextFreeIndexInThermostatSuggestionsList   = 0;
     mMaxNumberOfSchedulesAllowedPerScheduleType = kMaxNumberOfSchedulesSupported;
-    mMaxNumberOfScheduleTransitionPerDay       = kMaxNumberOfScheduleTransitionPerDay;
+    mMaxNumberOfScheduleTransitionPerDay        = kMaxNumberOfScheduleTransitionPerDay;
 
     // Start the unique ID from 0 and it increases montonically.
     mUniqueID = 0;
