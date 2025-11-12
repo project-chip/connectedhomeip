@@ -24,6 +24,9 @@ import typing
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum, auto
+from collections.abc import Iterable
+
+from .runner import LogPipe
 
 TEST_NODE_ID = '0x12344321'
 TEST_DISCRIMINATOR = '3840'
@@ -101,10 +104,10 @@ class App:
         # Watch for both mDNS advertisement start as well as event loop start.
         # These two messages can appear in any order depending on the implementation.
         # Waiting for both makes the startup detection more robust.
-        self.__waitFor("mDNS service published:", "Starting event loop")
+        self.__waitFor(("mDNS service published:", "Starting event loop"))
 
-    def waitForMessage(self, message, timeoutInSeconds=10):
-        self.__waitFor(message, timeoutInSeconds=timeoutInSeconds)
+    def waitForMessage(self, message: str, timeoutInSeconds: int = 10):
+        self.__waitFor((message), timeoutInSeconds=timeoutInSeconds)
         return True
 
     def kill(self):
@@ -145,42 +148,43 @@ class App:
                     self.kvsPathSet.add(value)
         return self.runner.RunSubprocess(app_cmd, name='APP ', wait=False)
 
-    def __waitFor(self, *symptoms, **kwargs):
+    def __waitFor(self, patterns: Iterable[str], process=None, outpipe: LogPipe | None = None, timeoutInSeconds: int = 10):
         """
-        Wait for all provided symptom strings to appear in the capture log.
+        Wait for all provided pattern strings to appear in the process output pipe (capture log).
         """
-        server_process = kwargs.get('server_process', self.process)
-        outpipe = kwargs.get('outpipe', self.outpipe)
-        timeoutInSeconds = kwargs.get('timeoutInSeconds', 10)
+        if process is None:
+            process = self.process
+        if outpipe is None:
+            outpipe = self.outpipe
 
-        logging.debug('Waiting for symptoms %r', symptoms)
+        logging.debug('Waiting for all patterns %r', patterns)
 
         start_time = time.monotonic()
-        symptom_dict = {}
 
-        def searchSymptoms():
-            for s in symptoms:
-                found, index = outpipe.CapturedLogContains(s, self.lastLogIndex)
-                symptom_dict[s] = found, index
+        def allPatternsFound() -> int | None:
+            lastLogIndex = self.lastLogIndex
+            for p in patterns:
+                found, index = outpipe.CapturedLogContains(p, self.lastLogIndex)
+                if not found:
+                    return None
+                lastLogIndex = max(lastLogIndex, index)
 
-            ready = all([s[0] for s in symptom_dict.values()])
-            if ready:
-                self.lastLogIndex = max([s[1] for s in symptom_dict.values()]) + 1
-            return ready
+            return lastLogIndex + 1
 
-        ready = searchSymptoms()
-        while not ready:
-            if server_process.poll() is not None:
-                died_str = f'Server died while waiting for {symptoms!r}, returncode {server_process.returncode}'
+        lastLogIndex = allPatternsFound()
+        while lastLogIndex is None:
+            if process.poll() is not None:
+                died_str = f'Server died while waiting for {patterns!r}, returncode {process.returncode}'
                 logging.error(died_str)
                 raise Exception(died_str)
             if time.monotonic() - start_time > timeoutInSeconds:
-                raise Exception(f'Timeout while waiting for {symptoms!r}')
+                raise Exception(f'Timeout while waiting for {patterns!r}')
             time.sleep(0.1)
 
-            ready = searchSymptoms()
+            lastLogIndex = allPatternsFound()
 
-        logging.debug('Success waiting for: %r', symptoms)
+        self.lastLogIndex = lastLogIndex + 1
+        logging.debug('Success waiting for: %r', patterns)
 
     def __updateSetUpCode(self):
         qrLine = self.outpipe.FindLastMatchingLine('.*SetupQRCode: *\\[(.*)]')
