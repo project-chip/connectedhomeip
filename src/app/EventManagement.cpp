@@ -831,10 +831,9 @@ CHIP_ERROR EventManagement::RemoveEventsWithInvalidPath()
         }
         ReturnErrorOnFailure(ctx.writer.Finalize());
         currentBuffer->mProcessEvictedElement = nullptr;
-        // Evict all the events in current buffer
-        while (err == CHIP_NO_ERROR)
+        while (currentBuffer->EvictHead() == CHIP_NO_ERROR)
         {
-            err = currentBuffer->EvictHead();
+            // Evict all the events in current buffer
         }
         // Copy the obtained buffer to current buffer
         CircularTLVWriter circularWriter;
