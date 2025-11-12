@@ -1,0 +1,56 @@
+# Copyright (c) 2025 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("${chip_root}/src/app/common_flags.gni")
+
+config("includes") {
+  include_dirs = [
+    ".",
+    "include",
+  ]
+}
+
+executable("all-devices-app") {
+  sources = [ "main.cpp" ]
+
+  deps = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/device-factory",
+    "${chip_root}/examples/all-devices-app/all-devices-common/devices/root-node",
+    "${chip_root}/examples/all-devices-app/linux/app_options:app-options",
+    "${chip_root}/examples/common/tracing:commandline",
+    "${chip_root}/examples/platform/linux:app-main-loop",
+    "${chip_root}/examples/platform/linux:linux-commissionable-data-provider",
+    "${chip_root}/examples/providers:all_devices_device_info_provider",
+    "${chip_root}/src/app/persistence",
+    "${chip_root}/src/app/persistence:default",
+    "${chip_root}/src/data-model-providers/codedriven",
+    "${chip_root}/src/lib",
+  ]
+
+  include_dirs = [
+    "include",
+    "${chip_root}/examples/common",
+  ]
+
+  output_dir = root_out_dir
+}
+
+group("linux") {
+  deps = [ ":all-devices-app" ]
+}
+
+group("default") {
+  deps = [ ":linux" ]
+}

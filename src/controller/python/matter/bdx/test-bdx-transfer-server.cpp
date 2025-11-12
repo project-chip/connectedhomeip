@@ -37,7 +37,8 @@ CHIP_ERROR TestBdxTransferServer::Init(System::Layer * systemLayer, Messaging::E
     mExchangeManager = exchangeManager;
     // This removes the BdxTransferServer registered as part of CHIPDeviceControllerFactory.
     // Store the handler that was previously registered for SendInit so we can restore it on shutdown.
-    mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(MessageType::SendInit, &mPrevSendInitHandler);
+    ReturnErrorOnFailure(
+        mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(MessageType::SendInit, &mPrevSendInitHandler));
     return mExchangeManager->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id, this);
 }
 

@@ -30,7 +30,7 @@ using ReadHandlerNode = ReportScheduler::ReadHandlerNode;
 /// the engine already verifies that read handlers are reportable before sending a report
 void ReportSchedulerImpl::ReportTimerCallback()
 {
-    InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
+    TEMPORARY_RETURN_IGNORED InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
 }
 
 ReportSchedulerImpl::ReportSchedulerImpl(TimerDelegate * aTimerDelegate) : ReportScheduler(aTimerDelegate)
@@ -81,8 +81,8 @@ void ReportSchedulerImpl::OnBecameReportable(ReadHandler * aReadHandler)
     Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
 
     Milliseconds32 newTimeout;
-    CalculateNextReportTimeout(newTimeout, node, now);
-    ScheduleReport(newTimeout, node, now);
+    TEMPORARY_RETURN_IGNORED CalculateNextReportTimeout(newTimeout, node, now);
+    TEMPORARY_RETURN_IGNORED ScheduleReport(newTimeout, node, now);
 }
 
 void ReportSchedulerImpl::OnSubscriptionReportSent(ReadHandler * aReadHandler)
@@ -99,8 +99,8 @@ void ReportSchedulerImpl::OnSubscriptionReportSent(ReadHandler * aReadHandler)
     Milliseconds32 newTimeout;
     // Reset the EngineRunScheduled flag so that the next report is scheduled correctly
     node->SetEngineRunScheduled(false);
-    CalculateNextReportTimeout(newTimeout, node, now);
-    ScheduleReport(newTimeout, node, now);
+    TEMPORARY_RETURN_IGNORED CalculateNextReportTimeout(newTimeout, node, now);
+    TEMPORARY_RETURN_IGNORED ScheduleReport(newTimeout, node, now);
 }
 
 void ReportSchedulerImpl::OnReadHandlerDestroyed(ReadHandler * aReadHandler)
