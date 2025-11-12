@@ -259,12 +259,12 @@ TEST_F(TestAclEvent, TestReadRoundtripWithEventStatusIBInEventReport)
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
     // Shouldn't have anything in the retransmit table when starting the test.
     EXPECT_FALSE(rm->TestGetCountRetransTable());
-
-    GenerateEvents();
-
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
 
     engine->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
+
+    GenerateEvents();
+
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
 
     // A custom AccessControl::Delegate has been installed that grants privilege to any cluster except the test cluster.

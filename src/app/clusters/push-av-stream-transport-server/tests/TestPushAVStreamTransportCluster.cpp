@@ -27,6 +27,7 @@
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
 #include <app/clusters/testing/MockCommandHandler.h>
 #include <app/clusters/tls-client-management-server/tls-client-management-server.h>
+#include <app/server-cluster/testing/EmptyProvider.h>
 #include <app/tests/AppTestContext.h>
 #include <lib/core/Optional.h>
 #include <lib/core/StringBuilderAdapters.h>
@@ -73,10 +74,20 @@ private:
     Messaging::ExchangeContext * mExchangeContext = nullptr;
 };
 
+class TestDataModelProvider : public Test::EmptyProvider
+{
+public:
+    CHIP_ERROR EventInfo(const app::ConcreteEventPath & path, app::DataModel::EventEntry & eventInfo) override
+    {
+        return CHIP_NO_ERROR;
+    }
+};
+
 static uint8_t gDebugEventBuffer[120];
 static uint8_t gInfoEventBuffer[120];
 static uint8_t gCritEventBuffer[120];
 static chip::app::CircularEventBuffer gCircularEventBuffer[3];
+static TestDataModelProvider gDataModelProvider;
 
 class MockEventLogging : public chip::Test::AppContext
 {
@@ -92,6 +103,7 @@ public:
         AppContext::SetUp();
 
         ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
+        chip::app::InteractionModelEngine::GetInstance()->SetDataModelProvider(&gDataModelProvider);
 
         chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), std::size(logStorageResources),
                                                           gCircularEventBuffer, logStorageResources, &mEventCounter);

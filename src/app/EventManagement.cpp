@@ -64,7 +64,7 @@ CHIP_ERROR FetchBufferExcludeInvalidEvents(const TLVReader & aReader, size_t aDe
             {
                 TLVReader encodedEvent;
                 encodedEvent.Init(aReader);
-                ctx->writer.CopyElement(encodedEvent);
+                ReturnErrorOnFailure(ctx->writer.CopyElement(encodedEvent));
             }
             else
             {
@@ -813,6 +813,7 @@ CHIP_ERROR EventManagement::RemoveEventsWithInvalidPath()
         InvalidEventsRemoveContext ctx;
         circularReader.Init(*currentBuffer);
         reader.Init(circularReader);
+        // The data length of current buffer will not be larger than the buffer length.
         ctx.scopedBuffer.Calloc(currentBuffer->DataLength());
         VerifyOrReturnError(ctx.scopedBuffer.Get(), CHIP_ERROR_NO_MEMORY);
         ctx.writer.Init(ctx.scopedBuffer.Get(), currentBuffer->DataLength());
@@ -830,19 +831,27 @@ CHIP_ERROR EventManagement::RemoveEventsWithInvalidPath()
             continue;
         }
         ReturnErrorOnFailure(ctx.writer.Finalize());
+        // Intentionally set mProcessEvictedElement to nullptr to prevent callbacks during eviction.
+        // This ensures that no handlers are invoked while clearing events. The original value is not restored,
+        // as callbacks are not required after this operation.
         currentBuffer->mProcessEvictedElement = nullptr;
-        while (currentBuffer->EvictHead() == CHIP_NO_ERROR)
+        // Evict all the events in current buffer
+        while (currentBuffer->DataLength() > 0)
         {
-            // Evict all the events in current buffer
+            ReturnErrorOnFailure(currentBuffer->EvictHead());
         }
         // Copy the obtained buffer to current buffer
         CircularTLVWriter circularWriter;
         TLVReader copyReader;
         circularWriter.Init(*currentBuffer);
         copyReader.Init(ctx.scopedBuffer.Get(), ctx.writer.GetLengthWritten());
-        while (copyReader.Next() == CHIP_NO_ERROR)
+        while ((err = copyReader.Next()) == CHIP_NO_ERROR)
         {
             ReturnErrorOnFailure(circularWriter.CopyElement(copyReader));
+        }
+        if (err != CHIP_END_OF_TLV)
+        {
+            return err;
         }
         ReturnErrorOnFailure(circularWriter.Finalize());
     }

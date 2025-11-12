@@ -375,6 +375,13 @@ public:
 
     /**
      * @brief Iterate all events and remove the events whose associated EventPath is invalid.
+     *
+     * This API should be called when the endpoint/cluster structure changes, such that
+     * previously logged events may reference now-invalid paths. It ensures that the event
+     * log does not contain events with paths that are no longer valid in the current data model.
+     *
+     * @retval #CHIP_NO_ERROR on success
+     * @retval other CHIP_ERROR codes on failure
      */
     CHIP_ERROR RemoveEventsWithInvalidPath();
 

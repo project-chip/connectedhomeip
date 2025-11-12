@@ -151,7 +151,7 @@ CHIP_ERROR InitializeEventLogging(chip::Messaging::ExchangeManager * apMgr)
 
 } // namespace
 
-// Mock function for linking
+// Mock function for linking - provides stub implementation required by CodegenDataModelProviderInstance.
 void InitDataModelHandler() {}
 
 int main(int argc, char * argv[])
