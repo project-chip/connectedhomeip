@@ -25,8 +25,6 @@
 #     app-args: >
 #       --discriminator 1234
 #       --passcode 20202021
-#       --secured-device-port 5540
-#       --autoApplyImage
 #       --KVS /tmp/chip_kvs_requestor
 #       --trace-to json:${TRACE_APP}.json
 #     script-args: >
@@ -34,7 +32,6 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --nodeId 2
 #       --admin-vendor-id 65521
 #       --int-arg product-id:32769
 #       --trace-to json:${TRACE_TEST_JSON}.json
