@@ -108,9 +108,17 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         p_pass = 20202021
 
         self.provider_port = self.user_params.get('ota_provider_port')
+        if not self.provider_port:
+            asserts.fail("Missing OTA provider port. Speficy using --int-arg ota_provider_port:<OTA_PROVIDER_PORT>")
 
         self.app_path = self.user_params.get('provider_app_path')
+        if not self.app_path:
+            asserts.fail("Missing OTA provider app path. Speficy using --string-arg provider_app_path:<PROVIDER_APP_PATH>")
+
         image = self.user_params.get('ota_image')
+        if not image:
+            asserts.fail("Missing OTA image. Specify using --string-arg ota_image:<OTA_IMAGE>")
+
         self.provider_ota_file = OtaImagePath(path=image)
 
         # States
@@ -118,15 +126,17 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         querying = Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
         downloading = Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading
 
-        target_version = self.user_params.get('target_version')
+        self.target_version = self.user_params.get('target_version')
+        if not self.target_version:
+            asserts.fail("Missing target version. Speficy using --int-arg target_version:<TARGET_VERSION>")
 
         self.fifo_in = self.user_params.get('app_pipe', None)
-        if self.fifo_in is None:
-            AssertionError("Fifo input missing")
+        if not self.fifo_in:
+            asserts.fail("Fifo input missing. Speficy using --string-arg app_pipe:<FIFO_APP_PIPE_INPUT>")
 
         self.fifo_out = self.user_params.get('app_pipe_out', None)
-        if self.fifo_out is None:
-            AssertionError("Fifo output missing")
+        if not self.fifo_out:
+            asserts.fail("Fifo output missing. Speficy using --string-arg app_pipe_out:<FIFO_APP_PIPE_OUTPUT>")
 
         endpoint = self.get_endpoint(default=0)
         dut_node_id = self.dut_node_id
@@ -395,7 +405,7 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
             Clusters.Objects.OtaSoftwareUpdateRequestor.Events.StateTransition, 5000)
 
         self.verify_state_transition_event(event_report=event_querying_to_downloading,
-                                           expected_previous_state=querying, expected_new_state=downloading, expected_target_version=target_version)
+                                           expected_previous_state=querying, expected_new_state=downloading, expected_target_version=self.target_version)
 
         event_cb.reset()
         await event_cb.cancel()
