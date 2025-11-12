@@ -35,7 +35,7 @@ using namespace chip::app::Clusters::OccupancySensing::Attributes;
 namespace {
 
 constexpr size_t kOccupancySensingFixedClusterCount = OccupancySensing::StaticApplicationConfig::kFixedClusterConfig.size();
-constexpr size_t kOccupancySensingMaxClusterCount   = kOccupancySensingFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+constexpr size_t kOccupancySensingMaxClusterCount = kOccupancySensingFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 LazyRegisteredServerCluster<OccupancySensingCluster> gServers[kOccupancySensingMaxClusterCount];
 
@@ -47,19 +47,25 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        ChipLogDetail(AppServer, "OccupancySensing::CreateRegistration: endpoint=%u, instance=%u, optionalAttributeBits=0x%x, featureMap=0x%x", endpointId, clusterInstanceIndex, optionalAttributeBits, featureMap);
+        ChipLogDetail(AppServer,
+                      "OccupancySensing::CreateRegistration: endpoint=%u, instance=%u, optionalAttributeBits=0x%x, featureMap=0x%x",
+                      endpointId, clusterInstanceIndex, optionalAttributeBits, featureMap);
         OccupancySensingCluster::Config config(endpointId);
         config.WithFeatures(static_cast<Feature>(featureMap));
 
-        bool hasSensorFeature = (featureMap & (to_underlying(Feature::kPassiveInfrared) | to_underlying(Feature::kUltrasonic) |
-                                                to_underlying(Feature::kPhysicalContact)));
+        bool hasSensorFeature = (featureMap &
+                                 (to_underlying(Feature::kPassiveInfrared) | to_underlying(Feature::kUltrasonic) |
+                                  to_underlying(Feature::kPhysicalContact)));
 
         // If HoldTime is optional OR if any sensor feature is present, enable the HoldTime logic.
         // The delay attributes are required if the corresponding sensor feature is present.
         if ((optionalAttributeBits & (1 << Attributes::HoldTime::Id)) || hasSensorFeature)
         {
-            // Initializes hold time with default limits and default timer delegate. Application can use SetHoldTimeLimits() and SetHoldTime() later to customize.
-            constexpr chip::app::Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::Type kDefaultHoldTimeLimits = { .holdTimeMin = 1, .holdTimeMax = 60, .holdTimeDefault = 10 };
+            // Initializes hold time with default limits and default timer delegate. Application can use SetHoldTimeLimits() and
+            // SetHoldTime() later to customize.
+            constexpr chip::app::Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::Type kDefaultHoldTimeLimits = {
+                .holdTimeMin = 1, .holdTimeMax = 60, .holdTimeDefault = 10
+            };
             config.WithHoldTime(kDefaultHoldTimeLimits.holdTimeDefault, kDefaultHoldTimeLimits, gDefaultTimerDelegate);
         }
 

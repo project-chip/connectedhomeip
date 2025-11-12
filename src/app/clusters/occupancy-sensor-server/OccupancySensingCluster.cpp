@@ -17,11 +17,10 @@
 #include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
 #include <clusters/OccupancySensing/Events.h>
 
-
 #include <algorithm>
-#include <app/server-cluster/AttributeListBuilder.h>
 #include <app/InteractionModelEngine.h>
 #include <app/persistence/AttributePersistence.h>
+#include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/OccupancySensing/Attributes.h>
 #include <clusters/OccupancySensing/Metadata.h>
 #include <lib/support/CodeUtils.h>
@@ -46,13 +45,17 @@ namespace {
 //  | 0   | 1  | 1          | PhysicalContact + Ultrasonic          | Ultrasonic
 //  | 1   | 1  | 1          | PhysicalContact + PIR + Ultrasonic    | PIRAndUltrasonic
 
-BitMask<OccupancySensing::OccupancySensorTypeBitmap> FeaturesToOccupancySensorTypeBitmap(BitFlags<OccupancySensing::Feature> features)
+BitMask<OccupancySensing::OccupancySensorTypeBitmap>
+FeaturesToOccupancySensorTypeBitmap(BitFlags<OccupancySensing::Feature> features)
 {
     BitMask<OccupancySensing::OccupancySensorTypeBitmap> occupancySensorTypeBitmap{};
 
-    occupancySensorTypeBitmap.Set(OccupancySensing::OccupancySensorTypeBitmap::kPir, features.Has(OccupancySensing::Feature::kPassiveInfrared));
-    occupancySensorTypeBitmap.Set(OccupancySensing::OccupancySensorTypeBitmap::kUltrasonic, features.Has(OccupancySensing::Feature::kUltrasonic));
-    occupancySensorTypeBitmap.Set(OccupancySensing::OccupancySensorTypeBitmap::kPhysicalContact, features.Has(OccupancySensing::Feature::kPhysicalContact));
+    occupancySensorTypeBitmap.Set(OccupancySensing::OccupancySensorTypeBitmap::kPir,
+                                  features.Has(OccupancySensing::Feature::kPassiveInfrared));
+    occupancySensorTypeBitmap.Set(OccupancySensing::OccupancySensorTypeBitmap::kUltrasonic,
+                                  features.Has(OccupancySensing::Feature::kUltrasonic));
+    occupancySensorTypeBitmap.Set(OccupancySensing::OccupancySensorTypeBitmap::kPhysicalContact,
+                                  features.Has(OccupancySensing::Feature::kPhysicalContact));
 
     return occupancySensorTypeBitmap;
 }
@@ -63,18 +66,18 @@ OccupancySensing::OccupancySensorTypeEnum FeaturesToOccupancySensorType(BitFlags
     // the PIR/US/PHY columns not in MSB-descending order. This is OK as we apply the correct
     // bit weighing to make the table equal below.
     unsigned maskFromFeatures = (features.Has(Feature::kPhysicalContact) ? (1 << 2) : 0) |
-    (features.Has(Feature::kUltrasonic) ? (1 << 1) : 0) |
-    (features.Has(Feature::kPassiveInfrared) ? (1 << 0) : 0);
+        (features.Has(Feature::kUltrasonic) ? (1 << 1) : 0) | (features.Has(Feature::kPassiveInfrared) ? (1 << 0) : 0);
 
-    const OccupancySensorTypeEnum mappingTable[8] = {  //  | PIR | US | PHY | Type value
-      OccupancySensorTypeEnum::kPir,                   //  | 0   | 0  | 0   | PIR
-      OccupancySensorTypeEnum::kPir,                   //  | 1   | 0  | 0   | PIR
-      OccupancySensorTypeEnum::kUltrasonic,            //  | 0   | 1  | 0   | Ultrasonic
-      OccupancySensorTypeEnum::kPIRAndUltrasonic,      //  | 1   | 1  | 0   | PIRAndUltrasonic
-      OccupancySensorTypeEnum::kPhysicalContact,       //  | 0   | 0  | 1   | PhysicalContact
-      OccupancySensorTypeEnum::kPir,                   //  | 1   | 0  | 1   | PIR
-      OccupancySensorTypeEnum::kUltrasonic,            //  | 0   | 1  | 1   | Ultrasonic
-      OccupancySensorTypeEnum::kPIRAndUltrasonic,      //  | 1   | 1  | 1   | PIRAndUltrasonic
+    const OccupancySensorTypeEnum mappingTable[8] = {
+        //  | PIR | US | PHY | Type value
+        OccupancySensorTypeEnum::kPir,              //  | 0   | 0  | 0   | PIR
+        OccupancySensorTypeEnum::kPir,              //  | 1   | 0  | 0   | PIR
+        OccupancySensorTypeEnum::kUltrasonic,       //  | 0   | 1  | 0   | Ultrasonic
+        OccupancySensorTypeEnum::kPIRAndUltrasonic, //  | 1   | 1  | 0   | PIRAndUltrasonic
+        OccupancySensorTypeEnum::kPhysicalContact,  //  | 0   | 0  | 1   | PhysicalContact
+        OccupancySensorTypeEnum::kPir,              //  | 1   | 0  | 1   | PIR
+        OccupancySensorTypeEnum::kUltrasonic,       //  | 0   | 1  | 1   | Ultrasonic
+        OccupancySensorTypeEnum::kPIRAndUltrasonic, //  | 1   | 1  | 1   | PIRAndUltrasonic
     };
 
     // This check is to ensure that no changes to the mapping table in the future can overrun.
@@ -113,7 +116,8 @@ CHIP_ERROR OccupancySensingCluster::Startup(ServerClusterContext & context)
         AttributePersistence persistence(context.attributeStorage);
         uint16_t storedHoldTime;
 
-        if (persistence.LoadNativeEndianValue({ mPath.mEndpointId, OccupancySensing::Id, Attributes::HoldTime::Id }, storedHoldTime, mHoldTime))
+        if (persistence.LoadNativeEndianValue({ mPath.mEndpointId, OccupancySensing::Id, Attributes::HoldTime::Id }, storedHoldTime,
+                                              mHoldTime))
         {
             // A value was found in persistence. If it's valid, use it.
             // If it's not valid, SetHoldTime will return an error. In that case, we'll fall
@@ -126,7 +130,8 @@ CHIP_ERROR OccupancySensingCluster::Startup(ServerClusterContext & context)
 
         // No value in persistence (or it was invalid), so store the default value.
         ReturnErrorOnFailure(
-            context.attributeStorage.WriteValue({ mPath.mEndpointId, OccupancySensing::Id, Attributes::HoldTime::Id }, { reinterpret_cast<const uint8_t *>(&mHoldTime), sizeof(mHoldTime) }));
+            context.attributeStorage.WriteValue({ mPath.mEndpointId, OccupancySensing::Id, Attributes::HoldTime::Id },
+                                                { reinterpret_cast<const uint8_t *>(&mHoldTime), sizeof(mHoldTime) }));
     }
     return CHIP_NO_ERROR;
 }
@@ -143,7 +148,7 @@ DataModel::ActionReturnStatus OccupancySensingCluster::ReadAttribute(const DataM
     case Attributes::Occupancy::Id:
         return encoder.Encode(mOccupancy);
     case Attributes::OccupancySensorType::Id:
-    return encoder.Encode(FeaturesToOccupancySensorType(mFeatureMap));
+        return encoder.Encode(FeaturesToOccupancySensorType(mFeatureMap));
     case Attributes::OccupancySensorTypeBitmap::Id:
         return encoder.Encode(FeaturesToOccupancySensorTypeBitmap(mFeatureMap));
     case Attributes::HoldTime::Id:
@@ -166,7 +171,8 @@ DataModel::ActionReturnStatus OccupancySensingCluster::ReadAttribute(const DataM
     }
 }
 
-DataModel::ActionReturnStatus OccupancySensingCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & aDecoder)
+DataModel::ActionReturnStatus OccupancySensingCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                                      AttributeValueDecoder & aDecoder)
 {
     VerifyOrDie(request.path.mClusterId == OccupancySensing::Id);
 
@@ -190,7 +196,7 @@ DataModel::ActionReturnStatus OccupancySensingCluster::WriteAttribute(const Data
 }
 
 CHIP_ERROR OccupancySensingCluster::Attributes(const ConcreteClusterPath & clusterPath,
-                                             ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+                                               ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder listBuilder(builder);
 
@@ -206,11 +212,12 @@ CHIP_ERROR OccupancySensingCluster::Attributes(const ConcreteClusterPath & clust
     return listBuilder.Append(Span(OccupancySensing::Attributes::kMandatoryMetadata), Span(optionalAttributes));
 }
 
-void OccupancySensingCluster::EnableHoldTime(uint16_t aHoldTime, const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & aHoldTimeLimits,
-                    TimerDelegate & aTimerDelegate)
+void OccupancySensingCluster::EnableHoldTime(uint16_t aHoldTime,
+                                             const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & aHoldTimeLimits,
+                                             TimerDelegate & aTimerDelegate)
 {
-    mHasHoldTime    = true;
-    mTimerDelegate  = &aTimerDelegate;
+    mHasHoldTime   = true;
+    mTimerDelegate = &aTimerDelegate;
     SetHoldTimeLimits(aHoldTimeLimits);
     mHoldTime = std::clamp(aHoldTime, mHoldTimeLimits.holdTimeMin, mHoldTimeLimits.holdTimeMax);
 }
@@ -259,8 +266,9 @@ DataModel::ActionReturnStatus OccupancySensingCluster::SetHoldTime(uint16_t hold
 
     if (mContext != nullptr)
     {
-        CHIP_ERROR err = mContext->attributeStorage.WriteValue({ mPath.mEndpointId, OccupancySensing::Id, Attributes::HoldTime::Id },
-                                                               { reinterpret_cast<const uint8_t *>(&mHoldTime), sizeof(mHoldTime) });
+        CHIP_ERROR err =
+            mContext->attributeStorage.WriteValue({ mPath.mEndpointId, OccupancySensing::Id, Attributes::HoldTime::Id },
+                                                  { reinterpret_cast<const uint8_t *>(&mHoldTime), sizeof(mHoldTime) });
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "Failed to store holdTime in persistence: %" CHIP_ERROR_FORMAT, err.Format());
@@ -332,11 +340,14 @@ void OccupancySensingCluster::SetHoldTimeLimits(const OccupancySensing::Structs:
 
     // Here we sanitize the input limits to ensure they are valid, in case the caller
     // provided invalid values.
-    newHoldTimeLimits.holdTimeMin     = std::max(static_cast<uint16_t>(1), newHoldTimeLimits.holdTimeMin);
-    newHoldTimeLimits.holdTimeMax     = std::max({ static_cast<uint16_t>(10), newHoldTimeLimits.holdTimeMin, newHoldTimeLimits.holdTimeMax });
-    newHoldTimeLimits.holdTimeDefault = std::clamp(newHoldTimeLimits.holdTimeDefault, newHoldTimeLimits.holdTimeMin, newHoldTimeLimits.holdTimeMax);
+    newHoldTimeLimits.holdTimeMin = std::max(static_cast<uint16_t>(1), newHoldTimeLimits.holdTimeMin);
+    newHoldTimeLimits.holdTimeMax =
+        std::max({ static_cast<uint16_t>(10), newHoldTimeLimits.holdTimeMin, newHoldTimeLimits.holdTimeMax });
+    newHoldTimeLimits.holdTimeDefault =
+        std::clamp(newHoldTimeLimits.holdTimeDefault, newHoldTimeLimits.holdTimeMin, newHoldTimeLimits.holdTimeMax);
 
-    if (mHoldTimeLimits.holdTimeMin != newHoldTimeLimits.holdTimeMin || mHoldTimeLimits.holdTimeMax != newHoldTimeLimits.holdTimeMax ||
+    if (mHoldTimeLimits.holdTimeMin != newHoldTimeLimits.holdTimeMin ||
+        mHoldTimeLimits.holdTimeMax != newHoldTimeLimits.holdTimeMax ||
         mHoldTimeLimits.holdTimeDefault != newHoldTimeLimits.holdTimeDefault)
     {
         mHoldTimeLimits = newHoldTimeLimits;

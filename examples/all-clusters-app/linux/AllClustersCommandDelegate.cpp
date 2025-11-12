@@ -966,7 +966,8 @@ void AllClustersAppCommandHandler::HandleSetOccupancyChange(EndpointId endpointI
     }
 
     cluster->SetOccupancy(newOccupancyValue == 1);
-    ChipLogDetail(NotSpecified, "Set Occupancy attribute to %u on Endpoint %u", newOccupancyValue, static_cast<unsigned>(endpointId));
+    ChipLogDetail(NotSpecified, "Set Occupancy attribute to %u on Endpoint %u", newOccupancyValue,
+                  static_cast<unsigned>(endpointId));
 }
 
 void AllClustersCommandDelegate::OnEventCommandReceived(const char * json)
