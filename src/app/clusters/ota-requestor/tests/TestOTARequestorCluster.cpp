@@ -41,7 +41,8 @@ using namespace chip::app::Clusters;
 namespace chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs {
 namespace ProviderLocation {
 
-constexpr bool operator==(const Type& lhs, const Type& rhs) {
+constexpr bool operator==(const Type& lhs, const Type& rhs)
+{
   return lhs.providerNodeID == rhs.providerNodeID &&
          lhs.endpoint == rhs.endpoint && lhs.fabricIndex == rhs.fabricIndex;
 }
@@ -643,9 +644,13 @@ TEST_F(TestOTARequestorCluster, WriteDefaultProvidersList)
     OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type provider;
     provider.providerNodeID = 1234u;
     provider.endpoint = 8;
-    provider.fabricIndex = 2;
+    // This comes from the subject descriptor set in WriteOperation's constructor, as ClusterTester creates
+    // a WriteOperation and doesn't set the subject descriptor
+    provider.fabricIndex = chip::app::Testing::kDenySubjectDescriptor.fabricIndex;
     DataModel::List<OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type> payload(&provider, 1u);
     std::optional<DataModel::ActionReturnStatus> result = tester.WriteAttribute(DefaultOtaProviders::Id, payload);
+    ASSERT_TRUE(result.has_value());
+    ASSERT_TRUE(result->IsSuccess());
 
     // Verify the data was written correctly.
     auto iterator = otaRequestor.GetDefaultOTAProviderListIterator();
@@ -658,8 +663,6 @@ TEST_F(TestOTARequestorCluster, WriteDefaultProvidersList)
     EXPECT_EQ(changeListener.DirtyList()[0].mEndpointId, kTestEndpointId);
     EXPECT_EQ(changeListener.DirtyList()[0].mClusterId, OtaSoftwareUpdateRequestor::Id);
     EXPECT_EQ(changeListener.DirtyList()[0].mAttributeId, DefaultOtaProviders::Id);
-
-    // TODO: Write the same list and verify the attribute wasn't reported as changed.
 }
 
 TEST_F(TestOTARequestorCluster, WritingReadOnlyAttributesReturnsUnsupportedWrite)

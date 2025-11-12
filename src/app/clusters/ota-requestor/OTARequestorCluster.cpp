@@ -110,6 +110,27 @@ DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(
     }
 }
 
+DataModel::ActionReturnStatus OTARequestorCluster::WriteAttribute(
+    const DataModel::WriteAttributeRequest & request,
+    AttributeValueDecoder & decoder)
+{
+    switch (request.path.mAttributeId)
+    {
+    case OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id:
+        return NotifyAttributeChangedIfSuccess(
+            OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id,
+            WriteDefaultOtaProviders(request.path, decoder));
+    case OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id:
+    case OtaSoftwareUpdateRequestor::Attributes::UpdateState::Id:
+    case OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id:
+    case Globals::Attributes::FeatureMap::Id:
+    case Globals::Attributes::ClusterRevision::Id:
+        return Protocols::InteractionModel::Status::UnsupportedWrite;
+    default:
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
+    }
+}
+
 CHIP_ERROR OTARequestorCluster::Attributes(const ConcreteClusterPath & path,
                                            ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
@@ -179,6 +200,49 @@ void OTARequestorCluster::OnDownloadError(uint32_t softwareVersion, uint64_t byt
     OtaSoftwareUpdateRequestor::Events::DownloadError::Type event =
         { softwareVersion, bytesDownloaded, progressPercent, platformCode };
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+}
+
+CHIP_ERROR OTARequestorCluster::WriteDefaultOtaProviders(const ConcreteDataAttributePath & aPath,
+                                                         AttributeValueDecoder & aDecoder)
+{
+    chip::OTARequestorInterface * requestor = OtaRequestorInstance();
+    if (requestor == nullptr)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    if (!aPath.IsListOperation() || aPath.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
+    {
+        DataModel::DecodableList<OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> list;
+        ReturnErrorOnFailure(aDecoder.Decode(list));
+
+        ReturnErrorOnFailure(requestor->ClearDefaultOtaProviderList(aDecoder.AccessingFabricIndex()));
+
+        auto iter = list.begin();
+        while (iter.Next())
+        {
+            ReturnErrorOnFailure(requestor->AddDefaultOtaProvider(iter.GetValue()));
+        }
+
+        return iter.GetStatus();
+    }
+
+    switch (aPath.mListOp)
+    {
+    case ConcreteDataAttributePath::ListOperation::ReplaceItem:
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    case ConcreteDataAttributePath::ListOperation::DeleteItem:
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    case ConcreteDataAttributePath::ListOperation::AppendItem: {
+        OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType item;
+        ReturnErrorOnFailure(aDecoder.Decode(item));
+        return requestor->AddDefaultOtaProvider(item);
+    }
+    default:
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 }  // namespace chip::app::Clusters

@@ -37,6 +37,9 @@ public:
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
 
+    DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                 AttributeValueDecoder & decoder) override;
+
     CHIP_ERROR Attributes(const ConcreteClusterPath & path,
                           ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
@@ -66,6 +69,9 @@ protected:
     }
 
 private:
+    CHIP_ERROR WriteDefaultOtaProviders(const ConcreteDataAttributePath & aPath,
+                                        AttributeValueDecoder & aDecoder);
+
     OTARequestorEventHandlerRegistration mEventHandlerRegistration;
     OTARequestorInterface * mOtaRequestor = nullptr;
 };
