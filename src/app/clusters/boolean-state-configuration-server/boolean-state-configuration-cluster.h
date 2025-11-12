@@ -58,7 +58,7 @@ public:
     Protocols::InteractionModel::Status SuppressAlarms(AlarmModeBitMask alarms);
     CHIP_ERROR SetCurrentSensitivityLevel(uint8_t level);
     void ClearAllAlarms();
-    void EmitSensorFault(SensorFaultBitMask fault);
+    void GenerateSensorFault(SensorFaultBitMask fault);
     Protocols::InteractionModel::Status SetAllEnabledAlarmsActive();
 
     // ServerClusterInterface/DefaultServerCluster implementation
@@ -102,7 +102,7 @@ private:
     const AlarmModeBitMask mAlarmsSupported;
     SensorFaultBitMask mSensorFault{ 0 };
 
-    void EmitAlarmsStateChangedEvent();
+    void GenerateAlarmsStateChangedEvent();
 };
 
 } // namespace chip::app::Clusters

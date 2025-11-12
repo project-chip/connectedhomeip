@@ -95,11 +95,11 @@ inline CHIP_ERROR SetCurrentSensitivityLevel(EndpointId ep, uint8_t level)
     return cluster->SetCurrentSensitivityLevel(level);
 }
 
-inline CHIP_ERROR EmitSensorFault(EndpointId ep, BitMask<BooleanStateConfiguration::SensorFaultBitmap> fault)
+inline CHIP_ERROR GenerateSensorFault(EndpointId ep, BitMask<BooleanStateConfiguration::SensorFaultBitmap> fault)
 {
     auto cluster = FindClusterOnEndpoint(ep);
     VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_NO_ENDPOINT);
-    cluster->EmitSensorFault(fault);
+    cluster->GenerateSensorFault(fault);
     return CHIP_NO_ERROR;
 }
 

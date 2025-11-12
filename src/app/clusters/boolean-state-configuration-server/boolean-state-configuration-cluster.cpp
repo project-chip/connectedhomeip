@@ -159,23 +159,23 @@ BooleanStateConfigurationCluster::InvokeCommand(const DataModel::InvokeRequest &
         const BitMask<BooleanStateConfiguration::AlarmModeBitmap> alarmsToDisable{ static_cast<uint8_t>(~alarms.Raw() &
                                                                                                         kAllKnownAlarmModes) };
 
-        bool emit = false;
+        bool generateEvent = false;
         if (mAlarmsActive.HasAny(alarmsToDisable))
         {
             mAlarmsActive.Clear(alarmsToDisable);
             NotifyAttributeChanged(AlarmsActive::Id);
-            emit = true;
+            generateEvent = true;
         }
         if (mAlarmsSuppressed.HasAny(alarmsToDisable))
         {
             mAlarmsSuppressed.Clear(alarmsToDisable);
             NotifyAttributeChanged(AlarmsSuppressed::Id);
-            emit = true;
+            generateEvent = true;
         }
 
-        if (emit)
+        if (generateEvent)
         {
-            EmitAlarmsStateChangedEvent();
+            GenerateAlarmsStateChangedEvent();
         }
         return Status::Success;
     }
@@ -247,7 +247,7 @@ CHIP_ERROR BooleanStateConfigurationCluster::Attributes(const ConcreteClusterPat
     return listBuilder.Append(Span(kMandatoryMetadata), Span<const AttributeEntry>{ optionalAttributesMeta }, mOptionalAttributes);
 }
 
-void BooleanStateConfigurationCluster::EmitAlarmsStateChangedEvent()
+void BooleanStateConfigurationCluster::GenerateAlarmsStateChangedEvent()
 {
     VerifyOrReturn(mContext != nullptr);
     VerifyOrReturn(mFeatures.HasAny(Feature::kAudible, Feature::kVisual));
@@ -262,7 +262,7 @@ void BooleanStateConfigurationCluster::EmitAlarmsStateChangedEvent()
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
-void BooleanStateConfigurationCluster::EmitSensorFault(SensorFaultBitMask fault)
+void BooleanStateConfigurationCluster::GenerateSensorFault(SensorFaultBitMask fault)
 {
     VerifyOrReturn(mContext != nullptr);
 
@@ -295,7 +295,7 @@ Status BooleanStateConfigurationCluster::SetAlarmsActive(AlarmModeBitMask alarms
 
     mAlarmsActive = alarms;
     NotifyAttributeChanged(AlarmsActive::Id);
-    EmitAlarmsStateChangedEvent();
+    GenerateAlarmsStateChangedEvent();
 
     return Status::Success;
 }
@@ -307,7 +307,7 @@ Status BooleanStateConfigurationCluster::SetAllEnabledAlarmsActive()
 
     mAlarmsActive = mAlarmsEnabled;
     NotifyAttributeChanged(AlarmsActive::Id);
-    EmitAlarmsStateChangedEvent();
+    GenerateAlarmsStateChangedEvent();
     return Status::Success;
 }
 
@@ -326,7 +326,7 @@ void BooleanStateConfigurationCluster::ClearAllAlarms()
         NotifyAttributeChanged(AlarmsSuppressed::Id);
     }
 
-    EmitAlarmsStateChangedEvent();
+    GenerateAlarmsStateChangedEvent();
 }
 
 Status BooleanStateConfigurationCluster::SuppressAlarms(AlarmModeBitMask alarms)
@@ -351,7 +351,7 @@ Status BooleanStateConfigurationCluster::SuppressAlarms(AlarmModeBitMask alarms)
 
     mAlarmsSuppressed.Set(alarms);
     NotifyAttributeChanged(AlarmsSuppressed::Id);
-    EmitAlarmsStateChangedEvent();
+    GenerateAlarmsStateChangedEvent();
     return Status::Success;
 }
 
