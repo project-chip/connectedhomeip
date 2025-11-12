@@ -75,7 +75,7 @@ chip::Optional<SessionHandle> CommissioneeDeviceProxy::DetachSecureSession()
     return session;
 }
 
-CHIP_ERROR CommissioneeDeviceProxy::UpdateDeviceData(const Transport::PeerAddress & addr,
+void CommissioneeDeviceProxy::UpdateDeviceData(const Transport::PeerAddress & addr,
                                                      const ReliableMessageProtocolConfig & config)
 {
     mDeviceAddress = addr;
@@ -90,13 +90,11 @@ CHIP_ERROR CommissioneeDeviceProxy::UpdateDeviceData(const Transport::PeerAddres
         // secureSession.  For one thing, we could have gotten an different
         // UpdateAddress already and that caused connections to be torn down and
         // whatnot.
-        return CHIP_NO_ERROR;
+        return;
     }
 
     Transport::SecureSession * secureSession = mSecureSession.Get().Value()->AsSecureSession();
     secureSession->SetPeerAddress(addr);
-
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CommissioneeDeviceProxy::SetConnected(const SessionHandle & session)

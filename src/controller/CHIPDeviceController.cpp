@@ -801,7 +801,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
 
     mDeviceInPASEEstablishment = device;
     device->Init(GetControllerDeviceInitParams(), remoteDeviceId, peerAddress);
-    SuccessOrExit(err = device->UpdateDeviceData(params.GetPeerAddress(), params.GetMRPConfig()));
+    device->UpdateDeviceData(params.GetPeerAddress(), params.GetMRPConfig());
 
 #if CONFIG_NETWORK_LAYER_BLE
     if (params.GetPeerAddress().GetTransportType() == Transport::Type::kBle)

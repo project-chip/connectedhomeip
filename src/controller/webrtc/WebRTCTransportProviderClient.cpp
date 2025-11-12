@@ -195,7 +195,6 @@ CHIP_ERROR WebRTCTransportProviderClient::ProvideOffer(const uint8_t * payload, 
     ChipLogProgress(Camera, "Sending ProvideOffer to node " ChipLogFormatX64, ChipLogValueX64(mPeerId.GetNodeId()));
     TLV::TLVReader data;
     data.Init(payload, length);
-    // If Next() fails, we will skip calling value.Decode below and propagate the failure
     CHIP_ERROR error = data.Next();
 
     Clusters::WebRTCTransportProvider::Commands::ProvideOffer::DecodableType value;
