@@ -692,7 +692,39 @@ TEST_F(TestOTARequestorCluster, WriteDefaultProvidersListWithNoInterfaceReturnsE
 
 TEST_F(TestOTARequestorCluster, WritingReadOnlyAttributesReturnsUnsupportedWrite)
 {
-    // TODO
+    chip::Test::TestServerClusterContext context;
+    MockOtaRequestor otaRequestor;
+    OTARequestorCluster cluster(kTestEndpointId, &otaRequestor);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    chip::Test::ClusterTester tester(cluster);
+
+    auto & changeListener = context.ChangeListener();
+    changeListener.DirtyList().clear();
+
+    std::optional<DataModel::ActionReturnStatus> result =
+        tester.WriteAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id, false);
+    ASSERT_TRUE(result.has_value());
+    EXPECT_EQ(*result, Protocols::InteractionModel::Status::UnsupportedAttribute);
+
+    result = tester.WriteAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdateState::Id,
+                                   OtaSoftwareUpdateRequestor::UpdateStateEnum::kDelayedOnApply);
+    ASSERT_TRUE(result.has_value());
+    EXPECT_EQ(*result, Protocols::InteractionModel::Status::UnsupportedAttribute);
+
+    result = tester.WriteAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id,
+                                   DataModel::MakeNullable(50));
+    ASSERT_TRUE(result.has_value());
+    EXPECT_EQ(*result, Protocols::InteractionModel::Status::UnsupportedAttribute);
+
+    result = tester.WriteAttribute(Globals::Attributes::FeatureMap::Id, static_cast<uint32_t>(10));
+    ASSERT_TRUE(result.has_value());
+    EXPECT_EQ(*result, Protocols::InteractionModel::Status::UnsupportedAttribute);
+
+    result = tester.WriteAttribute(Globals::Attributes::ClusterRevision::Id, static_cast<uint16_t>(5));
+    ASSERT_TRUE(result.has_value());
+    EXPECT_EQ(*result, Protocols::InteractionModel::Status::UnsupportedAttribute);
+
+    EXPECT_EQ(changeListener.DirtyList().size(), 0u);
 }
 
 }  // namespace

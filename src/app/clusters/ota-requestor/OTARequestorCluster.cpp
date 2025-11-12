@@ -120,12 +120,6 @@ DataModel::ActionReturnStatus OTARequestorCluster::WriteAttribute(
         return NotifyAttributeChangedIfSuccess(
             OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id,
             WriteDefaultOtaProviders(request.path, decoder));
-    case OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id:
-    case OtaSoftwareUpdateRequestor::Attributes::UpdateState::Id:
-    case OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id:
-    case Globals::Attributes::FeatureMap::Id:
-    case Globals::Attributes::ClusterRevision::Id:
-        return Protocols::InteractionModel::Status::UnsupportedWrite;
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
