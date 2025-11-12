@@ -31,6 +31,7 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ReliableMessageContext.h>
 #include <messaging/ReliableMessageMgr.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
@@ -364,7 +365,7 @@ TEST_F(TestReliableMessageProtocol, CheckAddClearRetrans)
 
     ReliableMessageMgr::RetransTableEntry * entry;
 
-    rm->AddToRetransTable(rc, &entry);
+    EXPECT_SUCCESS(rm->AddToRetransTable(rc, &entry));
     EXPECT_EQ(rm->TestGetCountRetransTable(), 1);
     rm->ClearRetransTable(*entry);
     EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
@@ -1044,7 +1045,7 @@ TEST_F(TestReliableMessageProtocol, CheckReceiveAfterStandaloneAck)
     EXPECT_TRUE(receiverRc->IsAckPending());
 
     // Send the standalone ack.
-    receiverRc->SendStandaloneAckMessage();
+    EXPECT_SUCCESS(receiverRc->SendStandaloneAckMessage());
     DrainAndServiceIO();
 
     // Ensure the ack was sent.

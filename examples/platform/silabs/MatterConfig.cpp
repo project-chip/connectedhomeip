@@ -69,10 +69,10 @@
 static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeystore;
 #endif
 
-#include <app/DefaultTimerDelegate.h>
 #include <app/InteractionModelEngine.h>
 #include <data-model-providers/codegen/Instance.h>
 #include <headers/ProvisionManager.h>
+#include <platform/DefaultTimerDelegate.h>
 
 #ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 #include "SilabsTestEventTriggerDelegate.h" // nogncheck
