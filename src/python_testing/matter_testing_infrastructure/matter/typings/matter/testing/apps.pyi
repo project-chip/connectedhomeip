@@ -26,7 +26,7 @@ class AppServerSubprocess(Subprocess):
     log_file = ""
     err_log_file = ""
     def __init__(self, app: str, storage_dir: str, discriminator: int,
-                 passcode: int, port: int = 5540, app_pipe: Optional[str] = None, app_pipe_out: Optional[str] = None, extra_args: List[str] = ...) -> None: ...
+                 passcode: int, port: int = 5540, extra_args: List[str] = ...) -> None: ...
 
 
 class IcdAppServerSubprocess(AppServerSubprocess):
@@ -49,7 +49,7 @@ class OTAProviderSubprocess(AppServerSubprocess):
     def __init__(self, app: str, storage_dir: str, discriminator: int,
                  passcode: int, ota_source: Union[OtaImagePath, ImageListPath],
                  port: int = 5541, extra_args: list[str] = [], kvs_path: Optional[str] = None,
-                 log_file: Union[str, BinaryIO] = stdout.buffer, err_log_file: Union[str, BinaryIO] = stderr.buffer, app_pipe: Optional[str] = None, app_pipe_out: Optional[str] = None): ...
+                 log_file: Union[str, BinaryIO] = stdout.buffer, err_log_file: Union[str, BinaryIO] = stderr.buffer): ...
 
     def kill(self) -> None: ...
 

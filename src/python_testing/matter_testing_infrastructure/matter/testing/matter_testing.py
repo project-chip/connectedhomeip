@@ -984,31 +984,43 @@ class MatterBaseTest(base_test.BaseTestClass):
         if not isinstance(app_pipe_out, str):
             raise TypeError("The named pipe must be provided as a string value")
 
-        fd = os.open(app_pipe_out, os.O_RDONLY | os.O_NONBLOCK)
-        try:
-            buf = bytearray()
-            while True:
-                r, _, _ = select.select([fd], [], [], timeout)
-                if not r:
-                    raise TimeoutError(f"No data within {timeout}")
+        dut_ip = os.getenv('LINUX_DUT_IP')
+        # Checks for concatenate app_pipe and app_pid
+        if dut_ip is None:
+            fd = os.open(app_pipe_out, os.O_RDONLY | os.O_NONBLOCK)
+            try:
+                buf = bytearray()
+                while True:
+                    r, _, _ = select.select([fd], [], [], timeout)
+                    if not r:
+                        raise TimeoutError(f"No data within {timeout}")
 
-                chunk_bytes = os.read(fd, chunk)
-                if not chunk_bytes:
-                    break
-                buf += chunk_bytes
+                    chunk_bytes = os.read(fd, chunk)
+                    if not chunk_bytes:
+                        break
+                    buf += chunk_bytes
 
-                if len(buf) > max_bytes:
-                    raise ValueError("Command too large")
+                    if len(buf) > max_bytes:
+                        raise ValueError("Command too large")
 
-                if b"\n" in buf:
-                    line, _, _ = buf.partition(b"\n")
-                    return json.loads(line.decode("utf-8"))
+                    if b"\n" in buf:
+                        line, _, _ = buf.partition(b"\n")
+                        return json.loads(line.decode("utf-8"))
 
-            if buf:
-                return json.loads(buf.decode("utf-8"))
-            raise EOFError("Empty command response")
-        finally:
-            os.close(fd)
+                if buf:
+                    return json.loads(buf.decode("utf-8"))
+                raise EOFError("Empty command response")
+            finally:
+                os.close(fd)
+
+        else:
+            LOGGER.info(f"Using DUT IP address: {dut_ip}")
+
+            dut_uname = os.getenv('LINUX_DUT_USER')
+            asserts.assert_true(dut_uname is not None, "The LINUX_DUT_USER environment variable must be set")
+            LOGGER.info(f"Using DUT user name: {dut_uname}")
+            cmd = "ssh %s@%s \'cat %s\'" % (dut_uname, dut_ip, app_pipe_out)
+            os.system(cmd)
 
     def write_to_app_pipe(self, command_dict: dict, app_pipe: Optional[str] = None):
         """
