@@ -370,7 +370,7 @@ TEST_F(TestServerClusterInterfaceRegistry, StartupShutdownWithoutContext)
 
         TestServerClusterContext context;
 
-        // the clusters are explicitly set to fail startup, so create SetContext returns an error.
+        // the clusters are explicitly set to fail startup, so SetContext returns an error.
         // TODO: is this sane? Register() with a startup failure does NOT return a failure.
         EXPECT_EQ(registry.SetContext(context.Create()), CHIP_ERROR_HAD_FAILURES);
 
