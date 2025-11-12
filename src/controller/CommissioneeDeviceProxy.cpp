@@ -75,8 +75,7 @@ chip::Optional<SessionHandle> CommissioneeDeviceProxy::DetachSecureSession()
     return session;
 }
 
-void CommissioneeDeviceProxy::UpdateDeviceData(const Transport::PeerAddress & addr,
-                                                     const ReliableMessageProtocolConfig & config)
+void CommissioneeDeviceProxy::UpdateDeviceData(const Transport::PeerAddress & addr, const ReliableMessageProtocolConfig & config)
 {
     mDeviceAddress = addr;
 
