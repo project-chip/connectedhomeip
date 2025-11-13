@@ -702,7 +702,7 @@ TEST_F(TestOccupancySensingCluster, TestOccupancyChangedEvent)
     cluster.SetOccupancy(true);
     auto eventInfo = context.EventsGenerator().GetNextEvent();
     ASSERT_NE(eventInfo, std::nullopt);
-    if(eventInfo.has_value()) // Redundant check to avoid clang tidy "error: unchecked access to optional value"
+    if (eventInfo.has_value()) // Redundant check to avoid clang tidy "error: unchecked access to optional value"
     {
         EXPECT_EQ(eventInfo->GetEventData(decodedEvent), CHIP_NO_ERROR);
         EXPECT_EQ(decodedEvent.occupancy, OccupancySensing::OccupancyBitmap::kOccupied);
@@ -712,7 +712,7 @@ TEST_F(TestOccupancySensingCluster, TestOccupancyChangedEvent)
     cluster.SetOccupancy(false);
     eventInfo = context.EventsGenerator().GetNextEvent();
     ASSERT_NE(eventInfo, std::nullopt);
-    if(eventInfo.has_value()) // Redundant check to avoid clang tidy "error: unchecked access to optional value"
+    if (eventInfo.has_value()) // Redundant check to avoid clang tidy "error: unchecked access to optional value"
     {
         EXPECT_EQ(eventInfo->GetEventData(decodedEvent), CHIP_NO_ERROR);
         EXPECT_EQ(decodedEvent.occupancy, kOccupancyUnoccupied);
