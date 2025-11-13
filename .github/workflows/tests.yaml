@@ -879,7 +879,7 @@ jobs:
             CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
 
         # Tests are I/O bound, so run on a smaller machine
-        runs-on: ubuntu-latest
+        runs-on: namespace-profile-1x4
 
         container:
             image: ghcr.io/project-chip/chip-build:174
