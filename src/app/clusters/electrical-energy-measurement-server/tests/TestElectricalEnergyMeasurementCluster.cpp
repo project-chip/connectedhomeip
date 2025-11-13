@@ -404,21 +404,23 @@ TEST_F(TestElectricalEnergyMeasurementCluster, EventGeneratedOnSnapshots)
 
     // Test cumulative energy snapshot event generation
     {
-        EventNumber initialCount = logOnlyEvents.CurrentEventNumber();
-        auto eventNumber         = cluster.CumulativeEnergySnapshot(optionalImported, optionalExported);
+        auto eventNumber = cluster.CumulativeEnergySnapshot(optionalImported, optionalExported);
 
         ASSERT_TRUE(eventNumber.has_value());
-        EXPECT_EQ(eventNumber.value(), logOnlyEvents.CurrentEventNumber());
-        EXPECT_EQ(logOnlyEvents.CurrentEventNumber(), initialCount + 1);
+
+        // Get the event from the queue
+        auto event = logOnlyEvents.GetNextEvent();
+        ASSERT_TRUE(event.has_value());
+        EXPECT_EQ(eventNumber.value(), event->eventNumber);
 
         // Verify event path
         using CumulativeEventType = chip::app::Clusters::ElectricalEnergyMeasurement::Events::CumulativeEnergyMeasured::Type;
-        EXPECT_EQ(logOnlyEvents.LastOptions().mPath,
+        EXPECT_EQ(event->eventOptions.mPath,
                   ConcreteEventPath(kTestEndpointId, CumulativeEventType::GetClusterId(), CumulativeEventType::GetEventId()));
 
         // Decode and verify event payload
         chip::app::Clusters::ElectricalEnergyMeasurement::Events::CumulativeEnergyMeasured::DecodableType decodedEvent;
-        ASSERT_EQ(logOnlyEvents.DecodeLastEvent(decodedEvent), CHIP_NO_ERROR);
+        ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR);
 
         ASSERT_TRUE(decodedEvent.energyImported.HasValue());
         EXPECT_EQ(decodedEvent.energyImported.Value().energy, 10000);
@@ -429,22 +431,23 @@ TEST_F(TestElectricalEnergyMeasurementCluster, EventGeneratedOnSnapshots)
 
     // Test periodic energy snapshot event generation
     {
-        EventNumber initialCount = logOnlyEvents.CurrentEventNumber();
-
         auto eventNumber = cluster.PeriodicEnergySnapshot(optionalImported, optionalExported);
 
         ASSERT_TRUE(eventNumber.has_value());
-        EXPECT_EQ(eventNumber.value(), logOnlyEvents.CurrentEventNumber());
-        EXPECT_EQ(logOnlyEvents.CurrentEventNumber(), initialCount + 1);
+
+        // Get the event from the queue
+        auto event = logOnlyEvents.GetNextEvent();
+        ASSERT_TRUE(event.has_value());
+        EXPECT_EQ(eventNumber.value(), event->eventNumber);
 
         // Verify event path
         using PeriodicEventType = chip::app::Clusters::ElectricalEnergyMeasurement::Events::PeriodicEnergyMeasured::Type;
-        EXPECT_EQ(logOnlyEvents.LastOptions().mPath,
+        EXPECT_EQ(event->eventOptions.mPath,
                   ConcreteEventPath(kTestEndpointId, PeriodicEventType::GetClusterId(), PeriodicEventType::GetEventId()));
 
         // Decode and verify event payload
         chip::app::Clusters::ElectricalEnergyMeasurement::Events::PeriodicEnergyMeasured::DecodableType decodedEvent;
-        ASSERT_EQ(logOnlyEvents.DecodeLastEvent(decodedEvent), CHIP_NO_ERROR);
+        ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR);
 
         ASSERT_TRUE(decodedEvent.energyImported.HasValue());
         EXPECT_EQ(decodedEvent.energyImported.Value().energy, 10000);
