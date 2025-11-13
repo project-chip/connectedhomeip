@@ -94,22 +94,6 @@ public:
     // with that name, with different semantics.
     void Deinit();
 
-    // BaseDriver::NetworkStatusChangeCallback
-    void OnNetworkingStatusChange(DeviceLayer::NetworkCommissioning::Status aCommissioningError, Optional<ByteSpan> aNetworkId,
-                                  Optional<int32_t> aConnectStatus) override;
-
-    // WirelessDriver::ConnectCallback
-    void OnResult(DeviceLayer::NetworkCommissioning::Status commissioningError, CharSpan errorText,
-                  int32_t interfaceStatus) override;
-
-    // WiFiDriver::ScanCallback
-    void OnFinished(DeviceLayer::NetworkCommissioning::Status err, CharSpan debugText,
-                    DeviceLayer::NetworkCommissioning::WiFiScanResponseIterator * networks) override;
-
-    // ThreadDriver::ScanCallback
-    void OnFinished(DeviceLayer::NetworkCommissioning::Status err, CharSpan debugText,
-                    DeviceLayer::NetworkCommissioning::ThreadScanResponseIterator * networks) override;
-
     // Actual handlers of the commands
     std::optional<DataModel::ActionReturnStatus>
     HandleScanNetworks(CommandHandler & handler, const ConcreteCommandPath & commandPath,
@@ -264,6 +248,22 @@ private:
 
     // Sets the breadcrumb attribute in GeneralCommissioning cluster, no-op when breadcrumbValue is NullOptional.
     void UpdateBreadcrumb(const Optional<uint64_t> & breadcrumbValue);
+
+    // BaseDriver::NetworkStatusChangeCallback
+    void OnNetworkingStatusChange(DeviceLayer::NetworkCommissioning::Status aCommissioningError, Optional<ByteSpan> aNetworkId,
+                                  Optional<int32_t> aConnectStatus) override;
+
+    // WirelessDriver::ConnectCallback
+    void OnResult(DeviceLayer::NetworkCommissioning::Status commissioningError, CharSpan errorText,
+                  int32_t interfaceStatus) override;
+
+    // WiFiDriver::ScanCallback
+    void OnFinished(DeviceLayer::NetworkCommissioning::Status err, CharSpan debugText,
+                    DeviceLayer::NetworkCommissioning::WiFiScanResponseIterator * networks) override;
+
+    // ThreadDriver::ScanCallback
+    void OnFinished(DeviceLayer::NetworkCommissioning::Status err, CharSpan debugText,
+                    DeviceLayer::NetworkCommissioning::ThreadScanResponseIterator * networks) override;
 };
 
 } // namespace Clusters
