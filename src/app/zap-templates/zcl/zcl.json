@@ -363,7 +363,6 @@
             "TotalOperationalHours",
             "BootReason",
             "DeviceLoadStatus",
-            "FeatureMap",
             "ClusterRevision"
         ],
         "Group Key Management": [
