@@ -843,7 +843,7 @@ jobs:
             - name: Upload artifacts for running
               uses: namespace-actions/upload-artifact@v1
               with:
-                name: repl-build-data-${{ github.sha }}
+                name: repl-build-data
                 path: |
                   ./out/venv/
                   ./objdir-clone/
@@ -920,7 +920,7 @@ jobs:
             - name: Download artifacts for running
               uses: namespace-actions/download-artifact@v1
               with:
-                name: repl-build-data-${{ github.sha }}
+                name: repl-build-data
 
             - name: Generate an argument environment file
               run: |
