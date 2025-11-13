@@ -291,7 +291,8 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     std::string contentType = "application/*"; // Default fallback
 
     // Extract file extension from full path using std::filesystem
-    std::filesystem::path extension = data.first.extension();
+    std::filesystem::path filePath(data.first);
+    std::filesystem::path extension = filePath.extension();
     if (extension == ".mpd")
     {
         contentType = "application/dash+xml"; // Manifest file
@@ -318,7 +319,6 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     std::string rootCertPEM;
     std::string clientCertPEM;
     std::string derKeyToPemstr;
-    bool isMPDFile;
     std::error_code ec;
     size_t sessionPos;
     CURLcode res;
