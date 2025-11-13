@@ -756,8 +756,7 @@ public:
             if (aValue.IsNull())
             {
                 mUpdateState.store(UpdateState::kInitialized);
-                MarkAsAssigned();
-                return CHIP_NO_ERROR;
+                return MarkAsAssigned();
             }
         }
 
@@ -842,12 +841,8 @@ public:
             }
         }
 
-        if (err == CHIP_NO_ERROR)
-        {
-            MarkAsAssigned();
-        }
-
-        return err;
+        ReturnErrorOnFailure(err);
+        return MarkAsAssigned();
     }
 
     /**

@@ -269,7 +269,7 @@ public:
             (void) fabricTable;
             if (mGroupDataProvider != nullptr)
             {
-                mGroupDataProvider->RemoveFabric(fabricIndex);
+                TEMPORARY_RETURN_IGNORED mGroupDataProvider->RemoveFabric(fabricIndex);
             }
             ClearCASEResumptionStateOnFabricChange(fabricIndex);
         };
