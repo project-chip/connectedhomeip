@@ -63,6 +63,8 @@ public:
                                                           *  Cleared during factory reset. */
     static constexpr uint8_t kFileId_KVSValue = 0x05;    /**< Category containing KVS values set at runtime.
                                                           *   Cleared during factory reset. */
+    static constexpr uint8_t kFileId_App = 0x06;         /**< Category containing custom application values set at runtime.
+                                                          *   Cleared during factory reset. */
 
     using Key = uint16_t;
 
@@ -98,6 +100,9 @@ public:
     static constexpr Key kCounterKey_TotalOperationalHours = K32WConfigKey(kFileId_ChipCounter, 0x02);
     static constexpr Key kCounterKey_BootReason            = K32WConfigKey(kFileId_ChipCounter, 0x03);
 
+    // Application Custom Keys
+    static constexpr Key kConfigKey_AppOTADone = config_key(kFileId_App, 0x00);
+
     // Set key id limits for each group.
     static constexpr Key kMinConfigKey_ChipFactory = K32WConfigKey(kFileId_ChipFactory, 0x00);
     static constexpr Key kMaxConfigKey_ChipFactory = K32WConfigKey(kFileId_ChipFactory, 0xFF);
@@ -109,6 +114,8 @@ public:
     static constexpr Key kMaxConfigKey_KVSKey      = K32WConfigKey(kFileId_KVSKey, 0xFF);
     static constexpr Key kMinConfigKey_KVSValue    = K32WConfigKey(kFileId_KVSValue, 0x00);
     static constexpr Key kMaxConfigKey_KVSValue    = K32WConfigKey(kFileId_KVSValue, 0xFF);
+    static constexpr Key kMinConfigKey_App         = K32WConfigKey(kFileId_App, 0x00);
+    static constexpr Key kMaxConfigKey_App         = K32WConfigKey(kFileId_App, 0xFF);
 
     static CHIP_ERROR Init(void);
 
