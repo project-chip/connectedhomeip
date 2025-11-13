@@ -19,3 +19,11 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/CodegenIntegration.h"
     "${CLUSTER_DIR}/CodegenIntegration.cpp"
 )
+
+# These are the things that BUILD.gn dependencies would pull
+TARGET_SOURCES(
+  ${APP_TARGET}
+  PRIVATE
+    "${CLUSTER_DIR}/OccupancySensingCluster.cpp"
+    "${CLUSTER_DIR}/OccupancySensingCluster.h"
+)
