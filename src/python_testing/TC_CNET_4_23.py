@@ -35,7 +35,7 @@ CONNECT_NETWORK_TIMEOUT_MS = 30000      # ConnectNetwork timeout (30s)
 MDNS_DISCOVERY_TIMEOUT = 10             # mDNS discovery timeout per attempt (10s)
 NETWORK_STATUS_UPDATE_DELAY = 3         # Delay for DUT to update LastNetworkingStatus (3s)
 MDNS_DISCOVERY_PREP_DELAY = 5           # Delay before starting mDNS discovery (5s)
-SESSION_EXPIRY_DELAY = 2                # Delay for session expiry (2s)
+SESSION_EXPIRY_DELAY = 5                # Delay for session expiry (5s)
 SCAN_RETRY_DELAY = 3                    # Delay between scan retries (3s)
 MAX_ATTEMPTS = 3                        # Maximum discovery attempts
 TIMEOUT = 180                           # Overall test timeout (3 min)
@@ -103,7 +103,7 @@ class MatterServiceListener(ServiceListener):
         pass
 
 
-async def find_matter_devices_mdns(target_device_id=None):
+async def find_matter_devices_mdns(target_device_id: int = None) -> list:
     """
     Finds Matter devices via mDNS using zeroconf, optionally filtering by target device ID.
     Raises an exception if no device is found after MAX_ATTEMPTS.
@@ -112,9 +112,10 @@ async def find_matter_devices_mdns(target_device_id=None):
     service_types = ["_matter._tcp.local.", "_matterc._udp.local."]
 
     logger.info(
-        f"find_matter_devices_mdns: Searching for Matter devices{' with target device ID: ' + str(target_device_id) if target_device_id else ''}")
+        f" --- find_matter_devices_mdns: Searching for Matter devices{' with target device ID: ' + str(target_device_id) if target_device_id else ''}")
 
     for attempt in range(1, MAX_ATTEMPTS + 1):
+        zc = None
         try:
             zc = Zeroconf()
             listener = MatterServiceListener(target_device_id)
@@ -125,17 +126,19 @@ async def find_matter_devices_mdns(target_device_id=None):
             # Cleanup
             for browser in browsers:
                 browser.cancel()
-            zc.close()
+            await asyncio.sleep(0.1)  # Give browsers time to cleanup
 
             if listener.discovered_services:
                 return listener.discovered_services
 
         except Exception as e:
-            logger.error(f"find_matter_devices_mdns: Discovery attempt {attempt} failed: {e}")
-            try:
-                zc.close()
-            except Exception:
-                pass
+            logger.error(f" --- find_matter_devices_mdns: Discovery attempt {attempt} failed: {e}")
+        finally:
+            if zc is not None:
+                try:
+                    zc.close()
+                except Exception:
+                    pass
 
         if attempt < MAX_ATTEMPTS:
             await asyncio.sleep(SCAN_RETRY_DELAY)
@@ -146,7 +149,11 @@ async def find_matter_devices_mdns(target_device_id=None):
 
 class TC_CNET_4_23(MatterBaseTest):
 
-    async def _validate_network_config_response(self, response, expected_status=None):
+    async def _validate_network_config_response(
+        self,
+        response: cnet.Commands.NetworkConfigResponse,
+        expected_status: cnet.Enums.NetworkCommissioningStatusEnum = None
+    ) -> None:
         expected_status = expected_status or cnet.Enums.NetworkCommissioningStatusEnum.kSuccess
         asserts.assert_true(isinstance(response, cnet.Commands.NetworkConfigResponse),
                             "Unexpected response type from NetworkConfig command")
@@ -156,7 +163,11 @@ class TC_CNET_4_23(MatterBaseTest):
             asserts.assert_less_equal(len(response.debugText), 512,
                                       f"debugText too long: {len(response.debugText)} bytes")
 
-    async def _validate_connect_network_response(self, response, expect_success=True):
+    async def _validate_connect_network_response(
+        self,
+        response: cnet.Commands.ConnectNetworkResponse,
+        expect_success: bool = True
+    ) -> None:
         asserts.assert_true(isinstance(response, cnet.Commands.ConnectNetworkResponse),
                             "Unexpected response type from ConnectNetwork command")
         if expect_success:
@@ -171,7 +182,7 @@ class TC_CNET_4_23(MatterBaseTest):
             asserts.assert_less_equal(len(response.debugText), 512,
                                       f"debugText too long: {len(response.debugText)} bytes")
 
-    async def _read_networks(self, endpoint):
+    async def _read_networks(self, endpoint: int) -> list:
         return await self.read_single_attribute(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
@@ -179,14 +190,19 @@ class TC_CNET_4_23(MatterBaseTest):
             attribute=cnet.Attributes.Networks,
         )
 
-    async def _read_last_networking_status(self, endpoint, expected_status=None, valid_statuses=None):
+    async def _read_last_networking_status(
+        self,
+        endpoint: int,
+        expected_status: cnet.Enums.NetworkCommissioningStatusEnum = None,
+        valid_statuses: list = None
+    ) -> cnet.Enums.NetworkCommissioningStatusEnum:
         status = await self.read_single_attribute(
             dev_ctrl=self.default_controller,
             node_id=self.dut_node_id,
             endpoint=endpoint,
             attribute=cnet.Attributes.LastNetworkingStatus,
         )
-        logger.info(f"LastNetworkingStatus = {status}")
+        logger.info(f" --- LastNetworkingStatus = {status}")
         if expected_status is not None:
             asserts.assert_equal(status, expected_status,
                                  f"Expected {expected_status}, got {status}")
@@ -287,10 +303,11 @@ class TC_CNET_4_23(MatterBaseTest):
         self.matter_test_config.tc_version_to_simulate = None
         self.matter_test_config.tc_user_response_to_simulate = None
 
-        await self.commission_devices()
-
-        # Restore correct password immediately after commissioning
-        self.matter_test_config.wifi_passphrase = correct_password.decode('utf-8')
+        try:
+            await self.commission_devices()
+        finally:
+            # Restore correct password immediately after commissioning (even if commissioning fails)
+            self.matter_test_config.wifi_passphrase = correct_password.decode('utf-8')
 
         # Extend fail-safe to 300 seconds to allow time for credential testing
         await self.send_single_cmd(
@@ -298,7 +315,7 @@ class TC_CNET_4_23(MatterBaseTest):
             node_id=self.dut_node_id,
             cmd=cgen.Commands.ArmFailSafe(expiryLengthSeconds=300, breadcrumb=0)
         )
-        logger.info("Extended fail-safe timer to 300 seconds")
+        logger.info(" --- Extended fail-safe timer to 300 seconds")
 
         # TH reads FeatureMap attribute from the DUT and verifies if DUT supports WiFi on endpoint 0
         feature_map = await self.read_single_attribute(
@@ -309,7 +326,7 @@ class TC_CNET_4_23(MatterBaseTest):
         )
 
         if not (feature_map & cnet.Bitmaps.Feature.kWiFiNetworkInterface):
-            logger.info("Device does not support WiFi on endpoint 0, skipping remaining steps")
+            logger.info(" --- Device does not support WiFi on endpoint 0, skipping remaining steps")
             self.skip_all_remaining_steps(1)
             return
 
@@ -317,7 +334,7 @@ class TC_CNET_4_23(MatterBaseTest):
         self.step(1)
 
         networks = await self._read_networks(endpoint)
-        logger.info(f"Found {len(networks)} network(s) configured during commissioning")
+        logger.info(f" --- Found {len(networks)} network(s) configured during commissioning")
         for network in networks:
             network_id = network.networkID
             logger.info(f" --- Removing network: {network_id.decode('utf-8', errors='replace')}")
@@ -363,10 +380,10 @@ class TC_CNET_4_23(MatterBaseTest):
                 networkID=incorrect_ssid,
                 breadcrumb=2
             ),
-            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
+            timedRequestTimeoutMs=CONNECT_NETWORK_TIMEOUT_MS
         )
         await self._validate_connect_network_response(response, expect_success=False)
-        logger.info(f"ConnectNetwork failed as expected for incorrect SSID: {incorrect_ssid.decode('utf-8')}")
+        logger.info(f" --- ConnectNetwork failed as expected for incorrect SSID: {incorrect_ssid.decode('utf-8')}")
 
         # Wait for DUT to complete connection attempt and update LastNetworkingStatus
         logger.info(f" --- Waiting {NETWORK_STATUS_UPDATE_DELAY} seconds for DUT to update network status...")
@@ -437,10 +454,11 @@ class TC_CNET_4_23(MatterBaseTest):
                 networkID=correct_ssid,
                 breadcrumb=5
             ),
-            timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
+            timedRequestTimeoutMs=CONNECT_NETWORK_TIMEOUT_MS
         )
         await self._validate_connect_network_response(response, expect_success=False)
-        logger.info(f"ConnectNetwork failed as expected for SSID: {correct_ssid.decode('utf-8')} with incorrect credentials")
+        logger.info(
+            f" --- ConnectNetwork failed as expected for SSID: {correct_ssid.decode('utf-8')} with incorrect credentials")
 
         # Wait for DUT to complete connection attempt and update LastNetworkingStatus
         logger.info(f" --- Waiting {NETWORK_STATUS_UPDATE_DELAY} seconds for DUT to update network status...")
@@ -470,7 +488,7 @@ class TC_CNET_4_23(MatterBaseTest):
         target_ssid_found = False
 
         for attempt in range(1, MAX_ATTEMPTS + 1):
-            logger.info(f"ScanNetworks attempt {attempt}/{MAX_ATTEMPTS}")
+            logger.info(f" --- ScanNetworks attempt {attempt}/{MAX_ATTEMPTS}")
 
             response = await self.send_single_cmd(
                 endpoint=endpoint,
@@ -485,26 +503,27 @@ class TC_CNET_4_23(MatterBaseTest):
 
             # 1. wiFiScanResults contains the target network SSID
             ssids_found = [network.ssid for network in response.wiFiScanResults]
-            logger.info(f"Scan results: Found {len(ssids_found)} networks")
+            logger.info(f" --- Scan results: Found {len(ssids_found)} networks")
 
             if len(ssids_found) > 0:
                 for i, ssid in enumerate(ssids_found):
-                    logger.info(f"Network {i}: {ssid} (type: {type(ssid)})")
+                    logger.info(f" --- Network {i}: {ssid} (type: {type(ssid)})")
 
                 # Check if target SSID is in the results
                 if correct_ssid in ssids_found:
                     target_ssid_found = True
-                    logger.info(f"ScanNetworks found target SSID: {correct_ssid.decode('utf-8')} on attempt {attempt}")
+                    logger.info(
+                        f" --- ScanNetworks found target SSID: {correct_ssid.decode('utf-8')} on attempt {attempt}")
                     break
                 else:
                     logger.warning(
-                        f"Target SSID '{correct_ssid.decode('utf-8')}' not found in scan results (attempt {attempt})")
+                        f" --- Target SSID '{correct_ssid.decode('utf-8')}' not found in scan results (attempt {attempt})")
             else:
-                logger.warning(f"No networks found in scan (attempt {attempt})")
+                logger.warning(f" --- No networks found in scan (attempt {attempt})")
 
             # If not found and not last attempt, wait before retry
             if not target_ssid_found and attempt < MAX_ATTEMPTS:
-                logger.info(f"Waiting {SCAN_RETRY_DELAY} seconds before retry...")
+                logger.info(f" --- Waiting {SCAN_RETRY_DELAY} seconds before retry...")
                 await asyncio.sleep(SCAN_RETRY_DELAY)
 
         asserts.assert_true(target_ssid_found,
@@ -529,7 +548,7 @@ class TC_CNET_4_23(MatterBaseTest):
         # Step 13: TH sends ConnectNetwork command and Breadcrumb = 8
         self.step(13)
 
-        logger.info("Sending ConnectNetwork with correct credentials...")
+        logger.info(" --- Sending ConnectNetwork with correct credentials...")
         response = await self.send_single_cmd(
             endpoint=endpoint,
             cmd=cnet.Commands.ConnectNetwork(
@@ -539,7 +558,8 @@ class TC_CNET_4_23(MatterBaseTest):
             timedRequestTimeoutMs=CONNECT_NETWORK_TIMEOUT_MS
         )
         await self._validate_connect_network_response(response, expect_success=True)
-        logger.info(f"ConnectNetwork succeeded for SSID: {correct_ssid.decode('utf-8')} with correct credentials")
+        logger.info(
+            f" --- ConnectNetwork succeeded for SSID: {correct_ssid.decode('utf-8')} with correct credentials")
 
         # Step 14: TH reads LastNetworkingStatus (should be kSuccess)
         self.step(14)
@@ -558,7 +578,7 @@ class TC_CNET_4_23(MatterBaseTest):
         connected_networks = [network.networkID for network in response if network.connected]
         asserts.assert_true(correct_ssid in connected_networks,
                             f"Expected device to be connected to SSID '{correct_ssid.decode('utf-8')}'")
-        logger.info(f"Device is connected to SSID: {correct_ssid.decode('utf-8')}")
+        logger.info(f" --- Device is connected to SSID: {correct_ssid.decode('utf-8')}")
 
         # Step 16: TH sends CommissioningComplete to finalize commissioning
         self.step(16)
@@ -566,15 +586,17 @@ class TC_CNET_4_23(MatterBaseTest):
         await asyncio.sleep(MDNS_DISCOVERY_PREP_DELAY)
 
         # Discover device on WiFi network via mDNS to establish CASE session
-        logger.info("Discovering device on WiFi network via mDNS...")
+        logger.info(" --- Discovering device on WiFi network via mDNS...")
         discovered_devices = await find_matter_devices_mdns(self.dut_node_id)
-        logger.info(f"Found {len(discovered_devices)} device(s) via mDNS")
+        logger.info(f" --- Found {len(discovered_devices)} device(s) via mDNS")
+        asserts.assert_greater(len(discovered_devices), 0,
+                               "No devices found via mDNS after WiFi connection")
         if discovered_devices:
             for device in discovered_devices:
-                logger.info(f"  Device: {device['name']} at {device['addresses']}")
+                logger.info(f" ---   Device: {device['name']} at {device['addresses']}")
 
         # Close PASE session to force CASE session establishment over WiFi
-        logger.info("Closing BLE connection and expiring PASE session...")
+        logger.info(" --- Closing BLE connection and expiring PASE session...")
         self.default_controller.CloseBLEConnection()
         self.default_controller.ExpireSessions(self.dut_node_id)
 
@@ -592,7 +614,7 @@ class TC_CNET_4_23(MatterBaseTest):
         # 1. ErrorCode field set to OK (0)
         asserts.assert_equal(response.errorCode, cgen.Enums.CommissioningErrorEnum.kOk,
                              f"Expected CommissioningCompleteResponse errorCode to be OK (0), but got {response.errorCode}")
-        logger.info("CommissioningComplete command sent successfully, commissioning finalized.")
+        logger.info(" --- CommissioningComplete command sent successfully, commissioning finalized.")
 
 
 if __name__ == "__main__":
