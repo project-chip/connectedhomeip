@@ -37,10 +37,12 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
 
 }  // namespace
 
-OTARequestorCluster::OTARequestorCluster(EndpointId endpointId, OTARequestorInterface * otaRequestor)
+OTARequestorCluster::OTARequestorCluster(EndpointId endpointId, OTARequestorInterface * otaRequestor,
+                                         bool updatePossible)
     : DefaultServerCluster(ConcreteClusterPath(endpointId, OtaSoftwareUpdateRequestor::Id)),
       mEventHandlerRegistration(*this, endpointId),
-      mOtaRequestor(otaRequestor)
+      mOtaRequestor(otaRequestor),
+      mUpdatePossible(updatePossible)
 {
 }
 
@@ -84,11 +86,7 @@ DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(
         });
     }
     case OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id:
-        if (!OtaRequestorInstance())
-        {
-            return CHIP_ERROR_INTERNAL;
-        }
-        return encoder.Encode(OtaRequestorInstance()->GetUpdatePossible());
+        return encoder.Encode(mUpdatePossible);
     case OtaSoftwareUpdateRequestor::Attributes::UpdateState::Id:
         if (!OtaRequestorInstance())
         {

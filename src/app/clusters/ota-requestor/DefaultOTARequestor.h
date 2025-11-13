@@ -105,12 +105,6 @@ public:
     // Retrieve an iterator to the cached default OTA provider list
     ProviderLocationList::Iterator GetDefaultOTAProviderListIterator(void) override { return mDefaultOtaProviderList.Begin(); }
 
-    // Set the attribute that indicates whether updates are possible
-    virtual void SetUpdatePossible(bool updatePossible) override { mUpdatePossible = updatePossible; }
-
-    // Retrieve the attribute that indicates whether updates are possible
-    virtual bool GetUpdatePossible() override { return mUpdatePossible; }
-
     // Register a handler for generated cluster events
     CHIP_ERROR RegisterEventHandler(app::OTARequestorEventHandlerRegistration & eventHandler) override
     {
@@ -380,7 +374,6 @@ private:
     // in the OTARequestorDriver on reboot.
     Optional<ProviderLocationType> mProviderLocation;
     SessionHolder mSessionHolder;
-    bool mUpdatePossible = true;
     app::OTARequestorEventHandlerRegistry mEventHandlers;
 };
 

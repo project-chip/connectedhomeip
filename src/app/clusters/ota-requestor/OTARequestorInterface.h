@@ -221,12 +221,6 @@ public:
     // Retrieve an iterator to the cached default OTA provider list
     virtual ProviderLocationList::Iterator GetDefaultOTAProviderListIterator(void) = 0;
 
-    // Set the attribute that indicates whether updates are possible
-    virtual void SetUpdatePossible(bool updatePossible) = 0;
-
-    // Retrieve the attribute that indicates whether updates are possible
-    virtual bool GetUpdatePossible() = 0;
-
     // Register a handler for generated cluster events
     virtual CHIP_ERROR RegisterEventHandler(app::OTARequestorEventHandlerRegistration & eventHandler) = 0;
 
