@@ -630,7 +630,7 @@ jobs:
                 cache-suffix: ${{ env.CCACHE_KEY_SUFFIX }}
 
             - name: Build python env
-              run: scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv $([ "${DISABLE_CCACHE}" != "true" ] && echo --enable-ccache)'
+              run: scripts/run_in_build_env.sh './scripts/build_python.sh --jupyter-lab --install_virtual_env out/venv $([ "${DISABLE_CCACHE}" != "true" ] && echo --enable-ccache)'
 
             - name: Build apps for REPL tests with unified build
               env:
@@ -998,15 +998,8 @@ jobs:
 
             - name: Execute Jupyter Notebooks
               run: |
-                  scripts/run_in_build_env.sh './scripts/build_python.sh --jupyter-lab --install_virtual_env out/venv'
-                  ./scripts/run_in_build_env.sh \
-                   "./scripts/build/build_examples.py \
-                      --target linux-x64-all-clusters-${BUILD_VARIANT}-clang-test \
-                      build \
-                      --copy-artifacts-to objdir-clone \
-                   "
                   # TODO: ipynb HARD CODES paths to all-clusters app. create a symlink to them
-                  ln -s linux-x64-all-clusters-${BUILD_VARIANT}-clang-test out/linux-x64-all-clusters
+                  ln -s ../objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-clang-test out/linux-x64-all-clusters
 
                   scripts/run_in_python_env.sh out/venv \
                   "jupyter execute docs/development_controllers/matter-repl/Matter_REPL_Intro.ipynb \
