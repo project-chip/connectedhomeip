@@ -566,7 +566,7 @@ CHIP_ERROR WifiInterfaceImpl::InitWiFiStack(void)
 
     // Create Semaphore for scan in-progress protection
     sScanInProgressSemaphore = osSemaphoreNew(1, 1, nullptr);
-    VerifyOrReturnError(sScanCompleteSemaphore != nullptr, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(sScanInProgressSemaphore != nullptr, CHIP_ERROR_NO_MEMORY);
 
     // Create the message queue
     sWifiEventQueue = osMessageQueueNew(kWfxQueueSize, sizeof(WifiPlatformEvent), nullptr);
