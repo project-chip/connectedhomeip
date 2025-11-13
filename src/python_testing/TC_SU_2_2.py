@@ -351,7 +351,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
     @async_test_body
     async def teardown_test(self):
-        self.current_provider_app_proc.terminate()
+        self.clear_ota_providers(self.controller, self.requestor_node_id)
+        self.terminate_provider()
         super().teardown_test()
 
     @async_test_body
