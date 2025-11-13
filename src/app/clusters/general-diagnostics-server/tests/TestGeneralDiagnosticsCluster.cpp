@@ -78,14 +78,14 @@ CHIP_ERROR InvokeTimeSnapshotAndGetResponse(ClusterTester & tester,
     {
         return CHIP_ERROR_INTERNAL;
     }
-    if (!result.status->IsSuccess())
-    {
-        return CHIP_ERROR_INTERNAL;
-    }
+
+    ReturnErrorOnFailure(result.status->GetUnderlyingError());
+
     if (!result.response.has_value())
     {
-        return CHIP_ERROR_INTERNAL;
+        return CHIP_ERROR_INCORRECT_STATE;
     }
+
     response = result.response.value();
     return CHIP_NO_ERROR;
 }
