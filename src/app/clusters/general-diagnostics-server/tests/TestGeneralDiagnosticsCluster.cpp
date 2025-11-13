@@ -67,27 +67,25 @@ class NullProvider : public DeviceLayer::DiagnosticDataProvider
 {
 };
 
+// Helper method to invoke TimeSnapshot command and decode response
+void InvokeTimeSnapshotAndGetResponse(GeneralDiagnosticsCluster & cluster,
+                                      GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType & response)
+{
+    ClusterTester tester(cluster);
+
+    GeneralDiagnostics::Commands::TimeSnapshot::Type request{};
+    auto result = tester.Invoke(GeneralDiagnostics::Commands::TimeSnapshot::Id, request);
+
+    ASSERT_TRUE(result.status.has_value());
+    ASSERT_TRUE(result.status->IsSuccess()); // NOLINT(bugprone-unchecked-optional-access)
+    ASSERT_TRUE(result.response.has_value());
+    response = result.response.value(); // NOLINT(bugprone-unchecked-optional-access)
+}
+
 struct TestGeneralDiagnosticsCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { Platform::MemoryShutdown(); }
-
-    // Helper method to invoke TimeSnapshot command and decode response
-    void InvokeTimeSnapshotAndGetResponse(GeneralDiagnosticsCluster & cluster,
-                                          GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType & response)
-    {
-        ClusterTester tester(cluster);
-        CHIP_ERROR startupError = cluster.Startup(tester.GetServerClusterContext());
-        ASSERT_TRUE(startupError == CHIP_NO_ERROR || startupError == CHIP_ERROR_ALREADY_INITIALIZED);
-
-        GeneralDiagnostics::Commands::TimeSnapshot::Type request{};
-        auto result = tester.Invoke(GeneralDiagnostics::Commands::TimeSnapshot::Id, request);
-
-        ASSERT_TRUE(result.status.has_value());
-        ASSERT_TRUE(result.status->IsSuccess()); // NOLINT(bugprone-unchecked-optional-access)
-        ASSERT_TRUE(result.response.has_value());
-        response = result.response.value(); // NOLINT(bugprone-unchecked-optional-access)
-    }
 };
 
 TEST_F(TestGeneralDiagnosticsCluster, CompileTest)
@@ -242,6 +240,9 @@ TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotCommandTest)
     ScopedDiagnosticsProvider<NullProvider> nullProvider;
     GeneralDiagnosticsCluster cluster(optionalAttributeSet);
 
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
     // Invoke TimeSnapshot command and get response
     GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType response;
     InvokeTimeSnapshotAndGetResponse(cluster, response);
@@ -261,6 +262,9 @@ TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotCommandWithPosixTimeTest)
     };
     GeneralDiagnosticsClusterFullConfigurable cluster(optionalAttributeSet, functionsConfig);
 
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
     // Invoke TimeSnapshot command and get response
     GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType response;
     InvokeTimeSnapshotAndGetResponse(cluster, response);
@@ -278,6 +282,9 @@ TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotResponseValues)
     const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
     ScopedDiagnosticsProvider<NullProvider> nullProvider;
     GeneralDiagnosticsCluster cluster(optionalAttributeSet);
+
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // First invocation. Capture initial timestamp
     GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType firstResponse;
