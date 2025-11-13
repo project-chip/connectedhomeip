@@ -232,12 +232,14 @@ sl_status_t BackgroundScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t 
 
         // Copy the scanned SSID to the current scan ssid buffer that will be forwarded to the callback
         chip::MutableByteSpan currentScanSsid(currentScanResult.ssid, WFX_MAX_SSID_LENGTH);
-        ReturnOnFailure(chip::CopySpanToMutableSpan(scannedSsidSpan, currentScanSsid));
+        VerifyOrReturnError(chip::CopySpanToMutableSpan(scannedSsidSpan, currentScanSsid) == CHIP_NO_ERROR,
+                            SL_STATUS_SI91X_MEMORY_IS_NOT_SUFFICIENT);
         currentScanResult.ssid_length = currentScanSsid.size();
 
         chip::ByteSpan inBssid(result->scan_info[i].bssid, kWifiMacAddressLength);
         chip::MutableByteSpan outBssid(currentScanResult.bssid, kWifiMacAddressLength);
-        ReturnOnFailure(chip::CopySpanToMutableSpan(inBssid, outBssid));
+        VerifyOrReturnError(chip::CopySpanToMutableSpan(inBssid, outBssid) == CHIP_NO_ERROR,
+                            SL_STATUS_SI91X_MEMORY_IS_NOT_SUFFICIENT);
 
         // TODO: We should revisit this to make sure we are setting the correct values
         currentScanResult.security = static_cast<wfx_sec_t>(result->scan_info[i].security_mode);
@@ -907,7 +909,7 @@ CHIP_ERROR WifiInterfaceImpl::StartNetworkScan(chip::ByteSpan ssid, ::ScanCallba
     {
         // Copy the requested SSID to the sl_wifi_ssid_t structure
         chip::MutableByteSpan requestedSsidSpan(requested_ssid.value, sizeof(requested_ssid.value));
-        ReturnOnFailure(chip::CopySpanToMutableSpan(ssid, requestedSsidSpan));
+        ReturnErrorOnFailure(chip::CopySpanToMutableSpan(ssid, requestedSsidSpan));
         // Copy the length of the requested SSID to the sl_wifi_ssid_t structure
         requested_ssid.length = static_cast<uint8_t>(ssid.size());
         requested_ssid_ptr    = &requested_ssid;
