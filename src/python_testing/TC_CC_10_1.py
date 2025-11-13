@@ -121,7 +121,7 @@ class TC_CC_10_1(MatterBaseTest):
             TestStep("9b", "TH sends a _RecallScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x05 and the _TransitionTime_ omitted."),
             TestStep("9c", "TH reads _EnhancedCurrentHue and CurrentSaturation attributes_ from DUT."),
             TestStep(
-                "10a", "TH sends a _AddScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x06, the TransitionTime field set to 0 and the ExtensionFieldSetStructs set to: '[{ ClusterID: 0x0300, AttributeValueList: [{ AttributeID: 0x4002, ValueUnsigned16: 1 }, { AttributeID: 0x4002, ValueUnsigned16: 1 }, { AttributeID: 0x4004, ValueUnsigned16: 5 }]}]'"),
+                "10a", "TH sends a _AddScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x06, the TransitionTime field set to 0 and the ExtensionFieldSetStructs set to: '[{ ClusterID: 0x0300, AttributeValueList: [{ AttributeID: 0x4002, ValueUnsigned8: 1 }, { AttributeID: 0x4003, ValueUnsigned8: 1 }, { AttributeID: 0x4004, ValueUnsigned16: 5 }]}]'"),
             TestStep("10b", "TH sends a _RecallScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x06 and the _TransitionTime_ omitted."),
             TestStep("10c", "TH read _ColorLoopActive attribute_ from DUT."),
             TestStep("10d", "TH read _ColorLoopDirection attribute_ from DUT."),
