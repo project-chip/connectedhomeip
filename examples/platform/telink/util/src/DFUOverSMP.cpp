@@ -176,34 +176,54 @@ CHIP_ERROR DFUOverSMP::GetDFUImageFooter(OTAImageHeader & footer, const struct f
 
 CHIP_ERROR DFUOverSMP::CheckDFUImageFooter(OTAImageHeader * imageHeader)
 {
-    uint16_t vendorId  = 0;
-    uint16_t productId = 0;
+    uint16_t vendorId        = 0;
+    uint16_t productId       = 0;
+    uint32_t softwareVersion = 0;
+    char newSoftwareVersionString[VERSION_STRING_MAX_LENGTH];
+    char activeSoftwareVersionString[VERSION_STRING_MAX_LENGTH];
 
     if (GetDeviceInstanceInfoProvider()->GetVendorId(vendorId) != CHIP_NO_ERROR)
     {
-        LOG_INF("[DFU] Failed to retrieve local Vendor ID for OTA validation");
+        LOG_ERR("[DFU] Failed to retrieve local Vendor ID for DFU validation");
         return CHIP_ERROR_INCORRECT_STATE;
     }
     if (GetDeviceInstanceInfoProvider()->GetProductId(productId) != CHIP_NO_ERROR)
     {
-        LOG_INF("[DFU] Failed to retrieve local Product ID for OTA validation");
+        LOG_ERR("[DFU] Failed to retrieve local Product ID for DFU validation");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+    if (ConfigurationMgr().GetSoftwareVersion(softwareVersion) != CHIP_NO_ERROR)
+    {
+        LOG_ERR("[DFU] Failed to retrieve local Software version for DFU validation");
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
+    uint8_t checkResult = 0;
     if (imageHeader->mVendorId != vendorId)
     {
-        LOG_INF("[DFU] The argument is invalid, mVendorId: 0x%x - \
+        LOG_ERR("[DFU] The argument is invalid, mVendorId: 0x%x - \
             \t vendorId : 0x%x",
                 imageHeader->mVendorId, vendorId);
-        failCallback(VerificationFailReason::WRONG_VENDOR_ID);
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        checkResult |= VerificationFailReason::WRONG_VENDOR_ID;
     }
-    else if (imageHeader->mProductId != productId)
+    if (imageHeader->mProductId != productId)
     {
-        LOG_INF("[DFU] The argument is invalid, mProductId: 0x%x - \
+        LOG_ERR("[DFU] The argument is invalid, mProductId: 0x%x - \
                         \t productId : 0x%x",
                 imageHeader->mProductId, productId);
-        failCallback(VerificationFailReason::WRONG_PRODUCT_ID);
+        checkResult |= VerificationFailReason::WRONG_PRODUCT_ID;
+    }
+    if (imageHeader->mSoftwareVersion <= softwareVersion)
+    {
+        ConfigurationMgr().GetSoftwareVersionString(activeSoftwareVersionString, VERSION_STRING_MAX_LENGTH);
+        memcpy(newSoftwareVersionString, imageHeader->mSoftwareVersionString.data(), imageHeader->mSoftwareVersionString.size());
+        LOG_ERR("[DFU] Incorrect version of the update image!\nActive firmware version:\t %s\nUpdate version:\t %s",
+                newSoftwareVersionString, activeSoftwareVersionString);
+        checkResult |= VerificationFailReason::WRONG_VERSION;
+    }
+    if (checkResult != VerificationFailReason::NO_FAIL)
+    {
+        failCallback(static_cast<VerificationFailReason>(checkResult));
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     else

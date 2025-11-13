@@ -30,8 +30,9 @@
 enum VerificationFailReason : unsigned char
 {
     NO_FAIL          = 0,
-    WRONG_PRODUCT_ID = 1,
-    WRONG_VENDOR_ID  = 2,
+    WRONG_PRODUCT_ID = 1 << 1,
+    WRONG_VENDOR_ID  = 1 << 2,
+    WRONG_VERSION    = 1 << 3,
 };
 
 using verificationFailCallback = void (*)(VerificationFailReason);
@@ -73,6 +74,8 @@ public:
     CHIP_ERROR ProcessImageFooter();
 
 private:
+    static constexpr uint16_t VERSION_STRING_MAX_LENGTH = 64;
+
     verificationFailCallback failCallback;
 
     friend DFUOverSMP & GetDFUOverSMP();
