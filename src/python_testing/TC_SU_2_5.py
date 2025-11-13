@@ -83,10 +83,19 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
     @async_test_body
     async def setup_test(self):
         # Set up Provider configuration and values for step1
-        self.ota_image = self.user_params.get('ota_image', None)
+        self.ota_image = self.user_params.get('ota_image')
         self.expected_software_version = self.user_params.get('ota_image_expected_version')
-        self.provider_app_path = self.user_params.get('provider_app_path', None)
+        self.provider_app_path = self.user_params.get('provider_app_path')
         self.ota_provider_port = self.user_params.get('ota_provider_port', 5541)
+
+        if not self.expected_software_version:
+            asserts.fail("Missing OTA image software version. Speficy using --int-arg ota_image_expected_version:<ota_image_expected_version>")
+
+        if not self.provider_app_path:
+            asserts.fail("Missing provider app path . Speficy using --string-arg provider_app_path:<provider_app_path>")
+
+        if not self.ota_image:
+            asserts.fail("Missing ota image path . Speficy using --string-arg ota_image:<ota_image>")
 
         self.requestor_node_id = self.dut_node_id  # 123 with discriminator 123
         self.controller = self.default_controller
