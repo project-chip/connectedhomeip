@@ -840,13 +840,18 @@ jobs:
                     && patch -d \$(python3 -m pip show hypercorn | grep 'Location: ' | sed 's/Location: //') -p0 < src/tools/push_av_server/hypercorn.patch \
                   "
 
+            # We archive ourselves since upload-artifact seems to lose permission bits
+            # We also remove some debug info to make artifacts smaller (otherwise they are 2GB for binaries)
+            - name: Archive artifacts
+              run: |
+                strip out/objdir-clone/*
+                tar cfvJ repl-build-data.tar.xz out/venv objdir-clone
+
             - name: Upload artifacts for running
               uses: namespace-actions/upload-artifact@v1
               with:
                 name: repl-build-data
-                path: |
-                  ./out/venv/
-                  ./objdir-clone/
+                path: repl-build-data.tar.xz
                 retention-days: 2
                 if-no-files-found: error
                 overwrite: true
@@ -921,6 +926,10 @@ jobs:
               uses: namespace-actions/download-artifact@v1
               with:
                 name: repl-build-data
+
+            - name: Unpack artifacts
+              run: |
+                tar xfvJ repl-build-data.tar.xz
 
             - name: Generate an argument environment file
               run: |
@@ -1005,30 +1014,12 @@ jobs:
                   docs/development_controllers/matter-repl/Matter_Access_Control.ipynb \
                   docs/development_controllers/matter-repl/Matter_Multi_Fabric_Commissioning.ipynb \
                   "
-
-            - name: Uploading core files
-              uses: actions/upload-artifact@v5
-              if: ${{ failure() && !env.ACT }}
-              with:
-                  name: crash-core-linux-python-repl
-                  path: /tmp/cores/
-                  # Cores are big; don't hold on to them too long.
-                  retention-days: 5
-            - name: Uploading objdir for debugging
-              uses: actions/upload-artifact@v5
-              if: ${{ failure() && !env.ACT }}
-              with:
-                  name: crash-objdir-linux-python-repl
-                  path: objdir-clone/
-                  # objdirs are big; don't hold on to them too long.
-                  retention-days: 5
             # Temporary to debug stuff
             - name: Breakpoint if tests failed
               if: failure()
               uses: namespacelabs/breakpoint-action@v0
               with:
                  duration: 15m
-                 authorized-users: andy31415
 
     repl_tests_darwin:
         name: REPL Tests - Darwin (Build Only)
