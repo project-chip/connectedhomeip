@@ -68,11 +68,9 @@ class NullProvider : public DeviceLayer::DiagnosticDataProvider
 };
 
 // Helper method to invoke TimeSnapshot command and decode response
-void InvokeTimeSnapshotAndGetResponse(GeneralDiagnosticsCluster & cluster,
+void InvokeTimeSnapshotAndGetResponse(ClusterTester & tester,
                                       GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType & response)
 {
-    ClusterTester tester(cluster);
-
     GeneralDiagnostics::Commands::TimeSnapshot::Type request{};
     auto result = tester.Invoke(GeneralDiagnostics::Commands::TimeSnapshot::Id, request);
 
@@ -245,7 +243,7 @@ TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotCommandTest)
 
     // Invoke TimeSnapshot command and get response
     GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType response;
-    InvokeTimeSnapshotAndGetResponse(cluster, response);
+    InvokeTimeSnapshotAndGetResponse(tester, response);
 
     // Basic configuration excludes POSIX time
     EXPECT_TRUE(response.posixTimeMs.IsNull());
@@ -267,7 +265,7 @@ TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotCommandWithPosixTimeTest)
 
     // Invoke TimeSnapshot command and get response
     GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType response;
-    InvokeTimeSnapshotAndGetResponse(cluster, response);
+    InvokeTimeSnapshotAndGetResponse(tester, response);
 
     // POSIX time is included when available (system dependent)
     if (!response.posixTimeMs.IsNull())
@@ -288,11 +286,11 @@ TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotResponseValues)
 
     // First invocation. Capture initial timestamp
     GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType firstResponse;
-    InvokeTimeSnapshotAndGetResponse(cluster, firstResponse);
+    InvokeTimeSnapshotAndGetResponse(tester, firstResponse);
 
     // Second invocation. Capture subsequent timestamp
     GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType secondResponse;
-    InvokeTimeSnapshotAndGetResponse(cluster, secondResponse);
+    InvokeTimeSnapshotAndGetResponse(tester, secondResponse);
 
     // Verify second response is also valid and greater than or equal to first
     EXPECT_GE(secondResponse.systemTimeMs, firstResponse.systemTimeMs);
