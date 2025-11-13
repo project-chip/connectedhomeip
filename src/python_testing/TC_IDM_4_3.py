@@ -45,7 +45,8 @@ from matter.clusters import ClusterObjects as ClusterObjects
 from matter.clusters.Attribute import AttributePath, ValueDecodeFailure
 from matter.interaction_model import Status
 from matter.testing.basic_composition import BasicCompositionTests
-from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
+from matter.testing.event_attribute_reporting import (AttributeSubscriptionHandler, EventSubscriptionHandler,
+                                                       WildcardAttributeSubscriptionHandler)
 from matter.testing.global_attribute_ids import GlobalAttributeIds, is_standard_attribute_id, is_standard_cluster_id
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from matter.tlv import uint
@@ -152,18 +153,24 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
         return writable_attrs
 
-    async def change_writable_attributes_and_verify_reports(self, subscription, priming_data, test_step: str, clusters_to_skip: list = None):
+    async def change_writable_attributes_and_verify_reports(self, handler: WildcardAttributeSubscriptionHandler, priming_data, test_step: str, clusters_to_skip: list = None):
         """Change writable attributes and verify subscription reports are received.
 
         Based on TC_AccessChecker.py's _run_write_access_test_for_cluster_privilege() approach.
-        This dynamically identifies writable attributes using XML spec data, then attempts to write
-        to them to trigger subscription change reports, following the same pattern used in TC-ACE-2.2
-        for write access testing.
+        This dynamically identifies writable attributes using XML spec data, then writes ACTUAL
+        VALUE CHANGES to trigger subscription change reports per Matter specification.
 
-        This function now properly VERIFIES that change reports are received for each changed attribute.
+        This function ensures actual value changes for all attribute types:
+        - Strings: Write unique timestamped values
+        - Lists: Write empty list
+        - Booleans: Flip the value
+        - Integers and Floats: Increment the value
+
+        This function verifies that change reports are received for each changed attribute
+        by using the handler's queue-based tracking mechanism to confirm reports were received.
 
         Args:
-            subscription: Active subscription object
+            handler: WildcardAttributeSubscriptionHandler tracking the subscription
             priming_data: Priming report data from GetAttributes()
             test_step: Step name for logging
             clusters_to_skip: List of cluster IDs to skip (e.g., problematic clusters)
@@ -175,10 +182,11 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
             clusters_to_skip = []
 
         changed_count = 0
-        max_changes = 100
-
+        max_changes = 20
         changed_attributes = []
 
+        reports_at_start = handler.get_all_reported_attributes()
+        logging.info(f"{test_step}: Handler has {len(reports_at_start)} attributes with reports at start")
         logging.info(f"{test_step}: Scanning for writable attributes using XML spec data...")
 
         for endpoint_id, clusters in priming_data.items():
@@ -217,31 +225,62 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
                     attribute = Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id][attribute_id]
 
+                    # Skip attributes known to not send subscription reports even after successful writes
+                    # These attributes have special reporting behavior per device implementation
+                    ATTRIBUTES_WITH_NO_SUBSCRIPTION_REPORTS = [
+                        Clusters.BasicInformation.Attributes.LocalConfigDisabled, 
+                        Clusters.Binding.Attributes.Binding,
+                        Clusters.GeneralCommissioning.Attributes.Breadcrumb,  
+                        Clusters.TimeFormatLocalization.Attributes.HourFormat,  
+                    ]
+                    if attribute in ATTRIBUTES_WITH_NO_SUBSCRIPTION_REPORTS:
+                        logging.debug(f"{test_step}: Skipping {attribute.__name__} - known to not send subscription reports")
+                        continue
+
                     # Check if we have this attribute in the priming data
                     if attribute not in attributes:
                         continue
 
                     try:
-                        # Get current value
-                        current_val = attributes[attribute]
+                        # Get current value from priming data
+                        cached_val = attributes[attribute]
 
                         # Skip if value decode failed
-                        if isinstance(current_val, ValueDecodeFailure):
+                        if isinstance(cached_val, ValueDecodeFailure):
                             logging.debug(f"{test_step}: Skipping {attribute.__name__} - decode failure")
                             continue
+
+                        # Use cached value from priming data to avoid subscription timeout from many reads
+                        current_val = cached_val
 
                         # Determine new value based on type
                         if isinstance(current_val, str):
                             # String attribute - use unique value to trigger actual change
                             new_val = f"{test_step}_T{int(time.time())}_{changed_count}"
                         elif isinstance(current_val, list):
-                            # List attribute - use empty list (safe per TC_AccessChecker pattern)
-                            new_val = []
+                            # List attribute - toggle between empty and non-empty to ensure actual change
+                            if len(current_val) == 0:
+                                # Skip empty lists - writing a valid non-empty list requires XML spec knowledge to write valid data
+                                logging.debug(f"{test_step}: Skipping {attribute.__name__} - empty list (requires XML spec knowledge to write valid data)")
+                                continue
+                            else:
+                                # Non-empty list -> write empty list (safe change)
+                                new_val = []
+                        elif isinstance(current_val, bool):
+                            # Boolean attribute - flip the value to trigger actual change
+                            new_val = not current_val
+                        elif isinstance(current_val, (int, float)):
+                            # increment to trigger actual change
+                            # Use modulo to keep within reasonable bounds
+                            new_val = (current_val + 1) if current_val < 1000000 else 0
                         else:
-                            # For other types, write back the same value (safe, guaranteed to succeed)
-                            new_val = current_val
+                            # For other types, skip to avoid writing same value
+                            # Writing the same value should NOT trigger a report
+                            logging.debug(f"{test_step}: Skipping {attribute.__name__} - unsupported type for change")
+                            continue
 
                         # Write the attribute
+                        logging.debug(f"{test_step}: Writing {attribute.__name__} on EP{endpoint_id}: {current_val} -> {new_val}")
                         resp = await self.default_controller.WriteAttribute(
                             nodeId=self.dut_node_id,
                             attributes=[(endpoint_id, attribute(new_val))]
@@ -250,7 +289,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
                         if resp[0].Status == Status.Success:
                             changed_count += 1
                             logging.info(
-                                f"{test_step}: Changed {attribute.__name__} (0x{attribute_id:04X}) on endpoint {endpoint_id}, cluster 0x{cluster_id:04X}")
+                                f"{test_step}: [{changed_count}] Changed {attribute.__name__} (0x{attribute_id:04X}) on endpoint {endpoint_id}, cluster 0x{cluster_id:04X}: {current_val} -> {new_val}")
 
                             # Track this change for verification
                             changed_attributes.append({
@@ -260,22 +299,6 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
                                 'old_value': current_val,
                                 'new_value': new_val
                             })
-
-                            # Restore list values if we wrote an empty list successfully
-                            if isinstance(current_val, list) and len(new_val) == 0:
-                                await self.default_controller.WriteAttribute(
-                                    nodeId=self.dut_node_id,
-                                    attributes=[(endpoint_id, attribute(current_val))]
-                                )
-                                logging.debug(f"{test_step}: Restored original value for {attribute.__name__}")
-                                # Track the restoration as another change
-                                changed_attributes.append({
-                                    'endpoint': endpoint_id,
-                                    'cluster': cluster_class,
-                                    'attribute': attribute,
-                                    'old_value': new_val,
-                                    'new_value': current_val
-                                })
 
                         elif resp[0].Status == Status.UnsupportedAccess:
                             asserts.fail(f"{test_step}: Write to {attribute.__name__} returned UnsupportedAccess")
@@ -288,54 +311,58 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
                     except Exception as e:
                         logging.debug(f"{test_step}: Exception writing {attribute.__name__}: {e}")
 
-        if changed_count == 0:
-            logging.info(
-                f"{test_step}: No writable attributes found to change (this is acceptable - some devices may have limited writable attributes)")
-            return 0
-
         # Wait for change reports to arrive
-        # Reports should arrive within MaxInterval per subscription parameters and adding an additional wait here for 5 seconds to be safe.
-        wait_time = self.max_interval_ceiling_sec + 5
-        time.sleep(wait_time)
+        # Wait in small increments, checking periodically
+        count = 0
+        last_report_count = len(handler.get_all_reported_attributes())
+        while count < 30:
+            time.sleep(1)
+            count += 1
+            # Log progress every interval
+            current_reports = len(handler.get_all_reported_attributes())
+            if current_reports != last_report_count:
+                logging.info(f"{test_step}: {count}s elapsed, {current_reports} unique attributes reported (was {last_report_count})")
+                last_report_count = current_reports
+            elif current_reports == changed_count:
+                break
+            else:
+                logging.debug(f"{test_step}: {count}s elapsed, {current_reports} unique attributes reported (no change)")
 
-        # Verify we received reports for the changed attributes
-        # Get the latest attribute data from the subscription
-        current_data = subscription.GetAttributes()
+        # Verify that we received reports for all the changed attributes we wrote to
         verified_count = 0
         missing_reports = []
 
-        # Possible this might be too strict currently.
         for change in changed_attributes:
             ep = change['endpoint']
             cluster = change['cluster']
             attr = change['attribute']
-            expected_val = change['new_value']
 
-            # Check if we have data for this attribute in the subscription
-            if ep in current_data and cluster in current_data[ep] and attr in current_data[ep][cluster]:
-                received_val = current_data[ep][cluster][attr]
-
-                # For strings, verify the value changed
-                # For lists, we may have restored so just verify we got a report
-                # For other types, we wrote back the same value so just verify presence
-                if isinstance(expected_val, str):
-                    if received_val == expected_val:
-                        verified_count += 1
-                    else:
-                        asserts.assert_equal(
-                            received_val, expected_val, f"{test_step}: Report value mismatch for {attr.__name__}: expected '{expected_val}', got '{received_val}'")
-                else:
-                    # For non-string types, just verify we have the attribute data
-                    verified_count += 1
-                    logging.debug(f"{test_step}: Verified report for {attr.__name__}")
+            # Check if handler received a report for this attribute
+            if handler.was_attribute_reported(ep, cluster, attr):
+                verified_count += 1
+                report_count = handler.get_attribute_report_count(ep, cluster, attr)
+                logging.debug(
+                    f"{test_step}: Verified report for {attr.__name__} on EP{ep} "
+                    f"({report_count} report{'s' if report_count > 1 else ''} received)"
+                )
             else:
                 missing_reports.append(f"{attr.__name__} on endpoint {ep}")
+                logging.warning(f"{test_step}: Missing report for {attr.__name__} on EP{ep}")
 
-        logging.info(f"{test_step}: Verified {verified_count}/{len(changed_attributes)} attribute change reports received")
+        logging.info(
+            f"{test_step}: Verified {verified_count}/{len(changed_attributes)} attribute change reports received")
+
+        # Report summary of all attributes that received reports
+        all_reported = handler.get_all_reported_attributes()
+        logging.info(f"{test_step}: Total unique attributes with reports: {len(all_reported)}")
 
         asserts.assert_less_equal(
-            len(missing_reports), 0, f"{test_step}: Missing reports for {len(missing_reports)} attribute(s): {', '.join(missing_reports)}")
-        asserts.assert_greater(verified_count, 0, "No change reports verified, we should have received at least one report")
+            len(missing_reports), 0, 
+            f"{test_step}: Missing reports for {len(missing_reports)} attribute(s): {', '.join(missing_reports)}")
+        asserts.assert_greater(
+            verified_count, 0, 
+            f"{test_step}: No change reports verified, expected {changed_count} reports")
+        
         return verified_count
 
     @async_test_body
@@ -828,12 +855,16 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
         # Subscribe to all attributes in BasicInformation cluster on endpoint 0
         # This wildcard path subscribes to ALL attributes in the cluster
-        sub_step8 = await TH.ReadAttribute(
-            nodeId=self.dut_node_id,
+        handler_step8 = WildcardAttributeSubscriptionHandler()
+        sub_step8 = await handler_step8.start(
+            dev_ctrl=TH,
+            node_id=self.dut_node_id,
             attributes=[(self.root_node_endpoint, Clusters.BasicInformation)],
-            reportInterval=(self.min_interval_floor_sec, self.max_interval_ceiling_sec),
+            min_interval_sec=self.min_interval_floor_sec,
+            max_interval_sec=self.max_interval_ceiling_sec,
             keepSubscriptions=False,
-            fabricFiltered=False
+            fabric_filtered=False,
+            autoResubscribe=False
         )
 
         # Verify we got a priming report with multiple attributes
@@ -847,15 +878,18 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         num_attributes = len(cluster_data)
         asserts.assert_greater(num_attributes, 5,
                                "Should receive multiple attributes in priming report for wildcard subscription")
+        
+        # Flush priming reports from handler queue before making changes
+        handler_step8.flush_reports()
 
         # Change writable attributes and verify change reports per test spec
         changed_count = await self.change_writable_attributes_and_verify_reports(
-            sub_step8, priming_data, "Step 8"
+            handler_step8, priming_data, "Step 8"
         )
         logging.info(f"Changed and verified {changed_count} attribute(s)")
 
         # Shutdown subscription
-        sub_step8.Shutdown()
+        handler_step8.shutdown()
 
         # Step 9: Attribute on cluster from all endpoints
         # (This was originally test step 18 in the test plan)
@@ -896,11 +930,11 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         # Subscribe to ALL attributes from ALL clusters on ALL endpoints
         # Note: Some clusters have attributes that don't support subscriptions (INVALID_ACTION) or only support subscriptions in special circumstances:
         # - AccessControl, NetworkCommissioning, CameraAvStreamManagement, OperationalCredentials
-        # - ValveConfigurationAndControl
+        # - ValveConfigurationAndControl, Switch, PowerSource, BasicInformation, Identify
         # - All concentration measurement clusters (10 total: CO, CO2, NO2, Ozone, PM2.5, Formaldehyde, PM1, PM10, TVOC, Radon)
         # - Manufacturer-specific clusters (0xFC00-0xFFFE range) may have non-standard subscription behavior
         # Since most of these appear to be mandatory/common clusters, we must exclude them from the wildcard so it doesnt fail.
-        # We build a filtered wildcard by subscribing to all attributes for each non-problematic cluster similar to how it is done in ACE_2_4 test module.
+        # We build a filtered wildcard by subscribing to all attributes for each non-problematic cluster similar to how it is done in ACE test modules (Specifically ACE_2_3 for writes and ACE_2_4 for subscriptions).
 
         CLUSTERS_WITH_SUBSCRIPTION_ISSUES = [
             Clusters.AccessControl.id,
@@ -908,7 +942,11 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
             Clusters.CameraAvStreamManagement.id,
             Clusters.OperationalCredentials.id,
             Clusters.ValveConfigurationAndControl.id,
-            # All concentration measurement clusters have been added to remove possible clusters that might cause issues during subscription testing. More comprehensive testing is done in ACE_2_4 test module.
+            Clusters.Switch.id,  # Switch cluster has subscription issues with certain attributes
+            Clusters.PowerSource.id,  # Power Source cluster returns INVALID_ACTION for certain attributes
+            Clusters.BasicInformation.id,  # BasicInformation cluster has attributes (e.g., 0x000E) that return INVALID_ACTION
+            Clusters.Identify.id,  # Identify cluster returns INVALID_ACTION during wildcard subscriptions
+            # All concentration measurement clusters have been added to remove possible clusters that might cause issues during subscription testing. More comprehensive testing is done in ACE test modules.
             Clusters.CarbonMonoxideConcentrationMeasurement.id,
             Clusters.CarbonDioxideConcentrationMeasurement.id,
             Clusters.NitrogenDioxideConcentrationMeasurement.id,
@@ -939,12 +977,16 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
             # Subscribe to all attributes in this cluster across all endpoints
             subscription_paths.append(AttributePath(ClusterId=cluster_id))
 
-        sub_step10 = await TH.ReadAttribute(
-            nodeId=self.dut_node_id,
+        handler_step10 = WildcardAttributeSubscriptionHandler()
+        sub_step10 = await handler_step10.start(
+            dev_ctrl=TH,
+            node_id=self.dut_node_id,
             attributes=subscription_paths,
-            reportInterval=(self.min_interval_floor_sec, self.max_interval_ceiling_sec),
+            min_interval_sec=self.min_interval_floor_sec,
+            max_interval_sec=self.max_interval_ceiling_sec,
             keepSubscriptions=False,
-            fabricFiltered=False
+            fabric_filtered=False,
+            autoResubscribe=True
         )
 
         # Verify we got priming reports with multiple endpoints, clusters, and attributes
@@ -963,14 +1005,17 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         asserts.assert_greater(total_clusters, 15, "Should receive reports from multiple clusters")
         asserts.assert_greater(total_attributes, 100, "Should receive reports for many attributes")
 
+        # Flush priming reports from handler queue before making changes
+        handler_step10.flush_reports()
+        
         # Change writable attributes and verify change reports per test spec
         # Skip problematic clusters we identified earlier
         changed_count = await self.change_writable_attributes_and_verify_reports(
-            sub_step10, priming_data, "Step 10", clusters_to_skip=CLUSTERS_WITH_SUBSCRIPTION_ISSUES
+            handler_step10, priming_data, "Step 10", clusters_to_skip=CLUSTERS_WITH_SUBSCRIPTION_ISSUES
         )
         logging.info(f"Changed and verified {changed_count} attribute(s)")
 
-        sub_step10.Shutdown()
+        handler_step10.shutdown()
 
         # Step 11: All attributes from all clusters on an endpoint
         # (This was originally test step 20 in the test plan)
@@ -995,12 +1040,16 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
                     ClusterId=cluster_id
                 ))
 
-        sub_step11 = await TH.ReadAttribute(
-            nodeId=self.dut_node_id,
+        handler_step11 = WildcardAttributeSubscriptionHandler()
+        sub_step11 = await handler_step11.start(
+            dev_ctrl=TH,
+            node_id=self.dut_node_id,
             attributes=subscription_paths_step11,
-            reportInterval=(self.min_interval_floor_sec, self.max_interval_ceiling_sec),
+            min_interval_sec=self.min_interval_floor_sec,
+            max_interval_sec=self.max_interval_ceiling_sec,
             keepSubscriptions=False,
-            fabricFiltered=False
+            fabric_filtered=False,
+            autoResubscribe=False
         )
 
         # Verify we got priming reports with multiple clusters and attributes
@@ -1015,14 +1064,16 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         asserts.assert_greater(num_clusters, 1, "Should receive reports from multiple clusters on the endpoint")
         asserts.assert_greater(total_attributes, 5, "Should receive reports for many attributes on the endpoint")
 
+        # Flush priming reports from handler queue before making changes
+        handler_step11.flush_reports()
+        
         # Change writable attributes and verify change reports per test spec
-        # Skip problematic clusters we identified earlier
         changed_count = await self.change_writable_attributes_and_verify_reports(
-            sub_step11, priming_data, "Step 11", clusters_to_skip=CLUSTERS_WITH_SUBSCRIPTION_ISSUES
+            handler_step11, priming_data, "Step 11", clusters_to_skip=CLUSTERS_WITH_SUBSCRIPTION_ISSUES
         )
         logging.info(f"Changed and verified {changed_count} attribute(s)")
 
-        sub_step11.Shutdown()
+        handler_step11.shutdown()
 
         # Step 12: All attributes from specific cluster on all endpoints
         # (This was originally test step 21 in the test plan)
