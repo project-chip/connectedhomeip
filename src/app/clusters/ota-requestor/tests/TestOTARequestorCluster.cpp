@@ -292,6 +292,7 @@ TEST_F(TestOTARequestorCluster, AnnounceOtaProviderCommandInvalidMetadataTest)
     payload.vendorID = static_cast<VendorId>(4321);
     payload.announcementReason = OtaSoftwareUpdateRequestor::AnnouncementReasonEnum::kUpdateAvailable;
     payload.endpoint = 5;
+    // The maximum allowed metadata length is 512 bytes, so send 513.
     uint8_t bytes[513] = {'\0'};
     payload.metadataForNode = MakeOptional(ByteSpan(bytes));
 
@@ -351,6 +352,7 @@ TEST_F(TestOTARequestorCluster, ReadAttributesTest)
               CHIP_NO_ERROR);
     EXPECT_TRUE(updateStateProgress.IsNull());
 
+    // Verify a non-null value as well.
     otaRequestor.SetUpdateStateProgress(85);
     EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id,
                                    updateStateProgress),
@@ -607,7 +609,7 @@ TEST_F(TestOTARequestorCluster, ReadsWithNoRequestorInterfaceReturnErrors)
     EXPECT_EQ(tester.ReadAttribute(Globals::Attributes::ClusterRevision::Id, clusterRevision), CHIP_NO_ERROR);
     EXPECT_EQ(clusterRevision, 1u);
 
-    // Non-existent attribute should be handled the same..
+    // Non-existent attribute should be handled the same.
     uint32_t nonExistentAttribute;
     EXPECT_NE(tester.ReadAttribute(0xFFFF, nonExistentAttribute), CHIP_NO_ERROR);
 }
@@ -648,7 +650,7 @@ TEST_F(TestOTARequestorCluster, WriteDefaultProvidersList)
     provider.providerNodeID = 1234u;
     provider.endpoint = 8;
     // This comes from the subject descriptor set in WriteOperation's constructor, as ClusterTester creates
-    // a WriteOperation and doesn't set the subject descriptor
+    // a WriteOperation and doesn't set the subject descriptor.
     provider.fabricIndex = chip::app::Testing::kDenySubjectDescriptor.fabricIndex;
     DataModel::List<OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type> payload(&provider, 1u);
     std::optional<DataModel::ActionReturnStatus> result = tester.WriteAttribute(DefaultOtaProviders::Id, payload);

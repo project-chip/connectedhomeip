@@ -62,7 +62,7 @@ public:
                          DataModel::Nullable<int64_t> platformCode) override;
 
 protected:
-    // Returns the OTA requestor instance to use. Defaults to the instance passed into the constructor.
+    // Returns the OTA requestor instance to use internally. Defaults to the instance passed into the constructor.
     virtual OTARequestorInterface * OtaRequestorInstance()
     {
         return mOtaRequestor;

@@ -49,7 +49,7 @@ CHIP_ERROR OTARequestorCluster::Startup(ServerClusterContext & context)
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
     if (OtaRequestorInstance())
     {
-      return OtaRequestorInstance()->RegisterEventHandler(mEventHandlerRegistration);
+        return OtaRequestorInstance()->RegisterEventHandler(mEventHandlerRegistration);
     }
     return CHIP_NO_ERROR;
 }
