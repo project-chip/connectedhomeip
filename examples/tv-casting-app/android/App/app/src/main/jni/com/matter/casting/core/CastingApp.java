@@ -22,6 +22,7 @@ import android.util.Log;
 import chip.appserver.ChipAppServer;
 import chip.platform.AndroidBleManager;
 import chip.platform.AndroidChipPlatform;
+import chip.platform.AndroidNfcCommissioningManager;
 import chip.platform.ChipMdnsCallbackImpl;
 import chip.platform.DiagnosticDataProviderImpl;
 import chip.platform.NsdManagerServiceBrowser;
@@ -76,6 +77,7 @@ public final class CastingApp {
     chipPlatform =
         new AndroidChipPlatform(
             new AndroidBleManager(),
+            new AndroidNfcCommissioningManager(),
             new PreferencesKeyValueStoreManager(appParameters.getApplicationContext()),
             appParameters.getConfigurationManagerProvider().get(),
             new NsdManagerServiceResolver(
@@ -167,6 +169,7 @@ public final class CastingApp {
       Log.e(TAG, "CastingApp.stop failed to stop Matter server");
       return MatterError.CHIP_ERROR_INCORRECT_STATE;
     }
+    finishStopping();
     mState =
         CastingAppState.NOT_RUNNING; // CastingApp stopped successfully, set state to NOT_RUNNING
 
@@ -192,6 +195,9 @@ public final class CastingApp {
 
   /** Performs post Matter server startup registrations */
   private native MatterError finishStartup();
+
+  /** Performs cleanup after stopping Matter server */
+  private native void finishStopping();
 
   static {
     System.loadLibrary("TvCastingApp");

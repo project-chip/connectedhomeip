@@ -169,6 +169,8 @@ uint32_t IdentificationDeclaration::WritePayload(uint8_t * payloadBuffer, size_t
                  LogErrorOnFailure(err));
     VerifyOrExit(CHIP_NO_ERROR == (err = writer.PutBoolean(chip::TLV::ContextTag(kCancelPasscodeTag), mCancelPasscode)),
                  LogErrorOnFailure(err));
+    VerifyOrExit(CHIP_NO_ERROR == (err = writer.Put(chip::TLV::ContextTag(kPasscodeLengthTag), GetPasscodeLength())),
+                 LogErrorOnFailure(err));
 
     VerifyOrExit(CHIP_NO_ERROR == (err = writer.EndContainer(outerContainerType)), LogErrorOnFailure(err));
     VerifyOrExit(CHIP_NO_ERROR == (err = writer.Finalize()), LogErrorOnFailure(err));
@@ -226,6 +228,9 @@ CHIP_ERROR CommissionerDeclaration::ReadPayload(uint8_t * udcPayload, size_t pay
         case kCancelPasscodeTag:
             err = reader.Get(mCancelPasscode);
             break;
+        case kPasscodeLengthTag:
+            err = reader.Get(mPasscodeLength);
+            break;
         }
     }
 
@@ -266,10 +271,10 @@ void UserDirectedCommissioningClient::OnMessageReceived(const Transport::PeerAdd
 
     uint8_t udcPayload[IdentificationDeclaration::kUdcTLVDataMaxBytes];
     size_t udcPayloadLength = std::min<size_t>(msg->DataLength(), sizeof(udcPayload));
-    msg->Read(udcPayload, udcPayloadLength);
+    TEMPORARY_RETURN_IGNORED msg->Read(udcPayload, udcPayloadLength);
 
     CommissionerDeclaration cd;
-    cd.ReadPayload(udcPayload, sizeof(udcPayload));
+    TEMPORARY_RETURN_IGNORED cd.ReadPayload(udcPayload, sizeof(udcPayload));
     cd.DebugLog();
 
     // Call the registered mCommissionerDeclarationHandler, if any.

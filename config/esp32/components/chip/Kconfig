@@ -138,12 +138,6 @@ menu "CHIP Core"
             help
                 Option to enable/disable CHIP log level filtering APIs.
 
-        config ENABLE_CHIP_DATA_MODEL
-            bool "Enable CHIP data model"
-            default y
-            help
-                Option to enable/disable CHIP data model.
-
         config CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
             bool "Use heap memory to allocate object pools"
             default n
@@ -191,6 +185,27 @@ menu "CHIP Core"
                 Enable dynamic server to handle a different interaction model dispatch.
                 Can be implied when users do not want to use the same server clusters.
 
+        choice CHIP_MEM_ALLOC_MODE
+            prompt "Memory allocation strategy"
+            default CHIP_MEM_ALLOC_MODE_DEFAULT
+            help
+                Strategy for Matter memory management
+                - Internal DRAM memory only
+                - External SPIRAM memory only
+                - Either internal or external memory based on default malloc() behavior in ESP-IDF
+
+            config CHIP_MEM_ALLOC_MODE_INTERNAL
+                bool "Internal memory"
+
+            config CHIP_MEM_ALLOC_MODE_EXTERNAL
+                bool "External SPIRAM"
+                depends on SPIRAM_USE_CAPS_ALLOC || SPIRAM_USE_MALLOC
+
+            config CHIP_MEM_ALLOC_MODE_DEFAULT
+                bool "Default alloc mode"
+
+        endchoice # CHIP_MEM_ALLOC_MODE
+
     endmenu # "General Options"
 
     menu "Networking Options"
@@ -216,10 +231,12 @@ menu "CHIP Core"
 
         config ENABLE_ROUTE_HOOK
             bool "Enable route hook"
-            depends on LWIP_HOOK_IP6_ROUTE_DEFAULT && LWIP_HOOK_ND6_GET_GW_DEFAULT
+            depends on LWIP_HOOK_IP6_ROUTE_DEFAULT && LWIP_HOOK_ND6_GET_GW_DEFAULT && !LWIP_IPV6_ND6_ROUTE_INFO_OPTION_SUPPORT
             default y
             help
                 Enable this option to use LwIP default IPv6 route hook for Route Information Option(RIO) feature.
+                This option is unavailable if LWIP_IPV6_ND6_ROUTE_INFO_OPTION_SUPPORT is enabled.
+                In that case, RIO is handled directly by LwIP.
 
         config ENABLE_ENDPOINT_QUEUE_FILTER
             bool "Enable UDP Endpoint queue filter for mDNS Broadcast packets"
@@ -228,14 +245,15 @@ menu "CHIP Core"
             help
                 Enable this option to start a UDP Endpoint queue filter for mDNS Broadcast packets
 
-        config ENABLE_LWIP_THREAD_SAFETY
-            bool "Enable LwIP Thread safety options"
+        config USE_TCPIP_CORE_LOCK_FOR_THREAD_SAFETY
+            bool "Use TCPIP core locking for LwIP thread safety"
             default y
             select LWIP_TCPIP_CORE_LOCKING
             select LWIP_CHECK_THREAD_SAFETY
             help
                 CHIP SDK performs LwIP core locking before calling an LwIP API.
                 To make the calls thread safe we have to enable LWIP_TCPIP_CORE_LOCKING.
+                Otherwise CHIP SDK will post LwIP APIs to TCPIP task to ensure thread safety.
                 Here, we are also enabling LWIP_CHECK_THREAD_SAFETY which will assert when
                 LwIP code gets called from any other context or without holding the LwIP lock.
 
@@ -690,7 +708,7 @@ menu "CHIP Device Layer"
                 should not start advertising automatically after power-up.
 
         config USE_BLE_ONLY_FOR_COMMISSIONING
-            depends on BT_ENABLED
+            depends on ENABLE_CHIPOBLE
             bool "Use BLE only for commissioning"
             default y
             help
@@ -854,18 +872,38 @@ menu "CHIP Device Layer"
            help
                This option enables the system statistics to be sent to the insights cloud.
 
-      config MAX_PERMIT_LIST_SIZE
-           int "Set permit list size for Insights traces"
-           range 5 30
-           depends on ESP_INSIGHTS_ENABLED
-           default 20
-           help
-               Maximum number of group entries that can be included in the permit list for reporting
-               the traces to insights.
-
+        config MAX_PERMIT_LIST_SIZE
+            int "Set permit list size for Insights traces"
+            range 5 30
+            depends on ESP_INSIGHTS_ENABLED
+            default 20
+            help
+                Set the maximum number of group entries that can be included in the permit list for reporting
+                traces to Insights. This ensures proper management of trace reporting capacity.
     endmenu
 
+    menu "Diagnostics Options"
+        config ENABLE_ESP_DIAGNOSTICS
+            bool "Enable ESP Platform Diagnostics for Matter"
+            default n
+            help
+                Enables the ESP Diagnostics platform to collect, store, and retrieve diagnostic data for the Matter protocol.
+                This feature helps monitor system health and performance by providing insights through diagnostics logs.
 
+        config ENABLE_ESP_DIAGNOSTIC_TRACES
+            bool "Enable Traces"
+            default y
+            depends on ENABLE_ESP_DIAGNOSTICS
+            help
+                Enable Traces for the ESP Platform Diagnostics for Matter.
+
+        config ENABLE_ESP_DIAGNOSTIC_METRICS
+            bool "Enable Metrics"
+            default y
+            depends on ENABLE_ESP_DIAGNOSTICS
+            help
+                Enable Metrics for the ESP Platform Diagnostics for Matter.
+    endmenu
 
     menu "Testing Options"
 
@@ -1123,7 +1161,7 @@ menu "CHIP Device Layer"
             int "MRP local active retry interval for Thread network in milliseconds"
             depends on ENABLE_MATTER_OVER_THREAD
             range 0 3600000
-            default 800
+            default 2000
             help
                 Base retry interval of the present Thread node when it is in the active state.
 
@@ -1139,7 +1177,7 @@ menu "CHIP Device Layer"
             int "MRP local idle retry interval for Thread network in milliseconds"
             depends on ENABLE_MATTER_OVER_THREAD
             range 0 3600000
-            default 800
+            default 2000
             help
                 Base retry interval of the present Thread node when it is in the idle state.
 
@@ -1155,7 +1193,7 @@ menu "CHIP Device Layer"
             int "MRP retransmission delta timeout for Thread network in milliseconds"
             depends on ENABLE_MATTER_OVER_THREAD
             range 0 3600000
-            default 500
+            default 1500
             help
                 A constant value added to the calculated retransmission timeout.
 
@@ -1188,7 +1226,7 @@ menu "CHIP Device Layer"
     menu "Network Commissioning Driver Endpoint Id"
         config THREAD_NETWORK_COMMISSIONING_DRIVER
             bool "Use the generic Thread network commissioning driver"
-            depends on ENABLE_MATTER_OVER_THREAD && ENABLE_CHIP_DATA_MODEL
+            depends on ENABLE_MATTER_OVER_THREAD
             default y
             help
                 Option to enable/disable the use of generic Thread network commissioning driver.
@@ -1203,7 +1241,7 @@ menu "CHIP Device Layer"
 
         config WIFI_NETWORK_COMMISSIONING_DRIVER
             bool "Use ESP Wi-Fi network commissioning driver"
-            depends on (ENABLE_WIFI_STATION || ENABLE_WIFI_AP) && ENABLE_CHIP_DATA_MODEL
+            depends on (ENABLE_WIFI_STATION || ENABLE_WIFI_AP)
             default y
             help
                 Option to enable/disable the use of ESP Wi-Fi network commissioning driver.
@@ -1218,7 +1256,7 @@ menu "CHIP Device Layer"
 
         config ETHERNET_NETWORK_COMMISSIONING_DRIVER
             bool "Use ESP Ethernet network commissioning driver"
-            depends on ENABLE_ETHERNET_TELEMETRY && ENABLE_CHIP_DATA_MODEL
+            depends on ENABLE_ETHERNET_TELEMETRY
             default y
             help
                 Option to enable/disable the use of ESP Ethernet network commissioning driver.
@@ -1233,4 +1271,12 @@ menu "CHIP Device Layer"
 
     endmenu
 
+    menu "Cluster Configuration Options"
+        config ENABLE_ACCESS_RESTRICTIONS
+            bool "Enable Access Restrictions of Access Control Cluster"
+            default n
+            help
+                Enable this option to enable Access Restrictions on the device.
+
+    endmenu
 endmenu

@@ -96,7 +96,7 @@ public:
     size_t GetRotatingIdLength() const { return mRotatingIdLen; }
     void SetRotatingId(const uint8_t * rotatingId, size_t rotatingIdLen)
     {
-        size_t maxSize = ArraySize(mRotatingId);
+        size_t maxSize = MATTER_ARRAY_SIZE(mRotatingId);
         mRotatingIdLen = (maxSize < rotatingIdLen) ? maxSize : rotatingIdLen;
         memcpy(mRotatingId, rotatingId, mRotatingIdLen);
     }
@@ -147,6 +147,9 @@ public:
     void SetCancelPasscode(bool newValue) { mCancelPasscode = newValue; };
     bool GetCancelPasscode() const { return mCancelPasscode; };
 
+    void SetPasscodeLength(uint8_t newValue) { mPasscodeLength = newValue; };
+    uint8_t GetPasscodeLength() const { return mPasscodeLength; };
+
     /**
      *  Writes the IdentificationDeclaration message to the given buffer.
      *
@@ -185,10 +188,12 @@ public:
         client->SetCommissionerPasscode(GetCommissionerPasscode());
         client->SetCommissionerPasscodeReady(GetCommissionerPasscodeReady());
         client->SetCancelPasscode(GetCancelPasscode());
+        client->SetPasscodeLength(GetPasscodeLength());
     }
 
     void DebugLog()
     {
+#if CHIP_DETAIL_LOGGING
         ChipLogDetail(AppServer, "---- Identification Declaration Start ----");
 
         ChipLogDetail(AppServer, "\tinstance: %s", mInstanceName);
@@ -211,8 +216,13 @@ public:
         if (mRotatingIdLen > 0)
         {
             char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
-            Encoding::BytesToUppercaseHexString(mRotatingId, mRotatingIdLen, rotatingIdString, sizeof(rotatingIdString));
-            ChipLogDetail(AppServer, "\trotating id: %s", rotatingIdString);
+            const char * rotatingIdStringPtr                              = rotatingIdString;
+            if (Encoding::BytesToUppercaseHexString(mRotatingId, mRotatingIdLen, rotatingIdString, sizeof(rotatingIdString)) !=
+                CHIP_NO_ERROR)
+            {
+                rotatingIdStringPtr = "<invalid id>";
+            }
+            ChipLogDetail(AppServer, "\trotating id: %s", rotatingIdStringPtr);
         }
         for (uint8_t i = 0; i < mNumTargetAppInfos; i++)
         {
@@ -247,7 +257,12 @@ public:
         {
             ChipLogDetail(AppServer, "\tcancel passcode: true");
         }
+        if (mPasscodeLength != 0)
+        {
+            ChipLogDetail(AppServer, "\tpasscode length: %d", static_cast<uint16_t>(mPasscodeLength));
+        }
         ChipLogDetail(AppServer, "---- Identification Declaration End ----");
+#endif
     }
 
 private:
@@ -271,6 +286,7 @@ private:
         kCommissionerPasscodeTag,
         kCommissionerPasscodeReadyTag,
         kCancelPasscodeTag,
+        kPasscodeLengthTag,
 
         kMaxNum = UINT8_MAX
     };
@@ -296,6 +312,7 @@ private:
     bool mCommissionerPasscode      = false;
     bool mCommissionerPasscodeReady = false;
     bool mCancelPasscode            = false;
+    uint8_t mPasscodeLength         = 0;
 };
 
 /**
@@ -351,6 +368,9 @@ public:
     void SetCancelPasscode(bool newValue) { mCancelPasscode = newValue; };
     bool GetCancelPasscode() const { return mCancelPasscode; };
 
+    void SetPasscodeLength(uint8_t newValue) { mPasscodeLength = newValue; };
+    uint8_t GetPasscodeLength() const { return mPasscodeLength; };
+
     /**
      *  Writes the CommissionerDeclaration message to the given buffer.
      *
@@ -396,6 +416,10 @@ public:
         {
             ChipLogDetail(AppServer, "\tPasscode cancelled: true");
         }
+        if (mPasscodeLength != 0)
+        {
+            ChipLogDetail(AppServer, "\tpasscode length: %d", static_cast<uint16_t>(mPasscodeLength));
+        }
         ChipLogDetail(AppServer, "---- Commissioner Declaration End ----");
     }
 
@@ -410,6 +434,7 @@ private:
         kCommissionerPasscodeTag,
         kQRCodeDisplayedTag,
         kCancelPasscodeTag,
+        kPasscodeLengthTag,
 
         kMaxNum = UINT8_MAX
     };
@@ -421,6 +446,7 @@ private:
     bool mCommissionerPasscode    = false;
     bool mQRCodeDisplayed         = false;
     bool mCancelPasscode          = false;
+    uint8_t mPasscodeLength       = 0;
 };
 
 class DLL_EXPORT InstanceNameResolver

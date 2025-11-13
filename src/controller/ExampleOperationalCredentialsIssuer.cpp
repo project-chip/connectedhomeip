@@ -175,15 +175,16 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
 
         PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIssuerKeypairStorage, key,
                           err = storage.SyncGetKeyValue(key, serializedKey.Bytes(), keySize));
-        serializedKey.SetLength(keySize);
+        ReturnErrorOnFailure(serializedKey.SetLength(keySize));
     }
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(Controller, "Couldn't get %s from storage: %s", kOperationalCredentialsIssuerKeypairStorage, ErrorStr(err));
+        ChipLogProgress(Controller, "Couldn't get %s from storage: %" CHIP_ERROR_FORMAT,
+                        kOperationalCredentialsIssuerKeypairStorage, err.Format());
         // Storage doesn't have an existing keypair. Let's create one and add it to the storage.
-        ReturnErrorOnFailure(mIssuer.Initialize(Crypto::ECPKeyTarget::ECDSA));
-        ReturnErrorOnFailure(mIssuer.Serialize(serializedKey));
+        ReturnErrorOnFailure(mRootIssuer.Initialize(Crypto::ECPKeyTarget::ECDSA));
+        ReturnErrorOnFailure(mRootIssuer.Serialize(serializedKey));
 
         PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIssuerKeypairStorage, key,
                           ReturnErrorOnFailure(
@@ -192,7 +193,7 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
     else
     {
         // Use the keypair from the storage
-        ReturnErrorOnFailure(mIssuer.Deserialize(serializedKey));
+        ReturnErrorOnFailure(mRootIssuer.Deserialize(serializedKey));
     }
 
     {
@@ -201,13 +202,13 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
 
         PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIntermediateIssuerKeypairStorage, key,
                           err = storage.SyncGetKeyValue(key, serializedKey.Bytes(), keySize));
-        serializedKey.SetLength(keySize);
+        ReturnErrorOnFailure(serializedKey.SetLength(keySize));
     }
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(Controller, "Couldn't get %s from storage: %s", kOperationalCredentialsIntermediateIssuerKeypairStorage,
-                        ErrorStr(err));
+        ChipLogProgress(Controller, "Couldn't get %s from storage: %" CHIP_ERROR_FORMAT,
+                        kOperationalCredentialsIntermediateIssuerKeypairStorage, err.Format());
         // Storage doesn't have an existing keypair. Let's create one and add it to the storage.
         ReturnErrorOnFailure(mIntermediateIssuer.Initialize(Crypto::ECPKeyTarget::ECDSA));
         ReturnErrorOnFailure(mIntermediateIssuer.Serialize(serializedKey));
@@ -251,16 +252,16 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
         rcac.reduce_size(rcacBufLen);
         ReturnErrorOnFailure(ExtractSubjectDNFromX509Cert(rcac, rcac_dn));
         ReturnErrorOnFailure(rcac_dn.GetCertChipId(rcacId));
-        VerifyOrReturnError(rcacId == mIssuerId, CHIP_ERROR_INTERNAL);
+        VerifyOrReturnError(rcacId == mRootIssuerId, CHIP_ERROR_INTERNAL);
     }
     // If root certificate not found in the storage, generate new root certificate.
     else
     {
-        ReturnErrorOnFailure(rcac_dn.AddAttribute_MatterRCACId(mIssuerId));
+        ReturnErrorOnFailure(rcac_dn.AddAttribute_MatterRCACId(mRootIssuerId));
 
         ChipLogProgress(Controller, "Generating RCAC");
         ReturnErrorOnFailure(IssueX509Cert(mNow, mValidity, rcac_dn, rcac_dn, CertType::kRcac, mUseMaximallySizedCerts,
-                                           mIssuer.Pubkey(), mIssuer, rcac));
+                                           mRootIssuer.Pubkey(), mRootIssuer, rcac));
         VerifyOrReturnError(CanCastTo<uint16_t>(rcac.size()), CHIP_ERROR_INTERNAL);
 
         // Re-extract DN based on final generated cert
@@ -296,7 +297,7 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
 
         ChipLogProgress(Controller, "Generating ICAC");
         ReturnErrorOnFailure(IssueX509Cert(mNow, mValidity, rcac_dn, icac_dn, CertType::kIcac, mUseMaximallySizedCerts,
-                                           mIntermediateIssuer.Pubkey(), mIssuer, icac));
+                                           mIntermediateIssuer.Pubkey(), mRootIssuer, icac));
         VerifyOrReturnError(CanCastTo<uint16_t>(icac.size()), CHIP_ERROR_INTERNAL);
 
         // Re-extract DN based on final generated cert
@@ -313,8 +314,22 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
     ReturnErrorOnFailure(noc_dn.AddCATs(cats));
 
     ChipLogProgress(Controller, "Generating NOC");
-    return IssueX509Cert(mNow, mValidity, icac_dn, noc_dn, CertType::kNoc, mUseMaximallySizedCerts, pubkey, mIntermediateIssuer,
-                         noc);
+    if (mAlwaysOmitIcac)
+    {
+        icac.reduce_size(0);
+        err = IssueX509Cert(mNow, mValidity, rcac_dn, noc_dn, CertType::kNoc, mUseMaximallySizedCerts, pubkey, mRootIssuer, noc);
+    }
+    else
+    {
+        err = IssueX509Cert(mNow, mValidity, icac_dn, noc_dn, CertType::kNoc, mUseMaximallySizedCerts, pubkey, mIntermediateIssuer,
+                            noc);
+    }
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to Generate NOC: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    return err;
 }
 
 CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce,
@@ -355,7 +370,7 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan 
     ReturnErrorOnFailure(reader.Next(kTLVType_ByteString, TLV::ContextTag(1)));
 
     ByteSpan csr(reader.GetReadPoint(), reader.GetLength());
-    reader.ExitContainer(containerType);
+    ReturnErrorOnFailure(reader.ExitContainer(containerType));
 
     P256PublicKey pubkey;
     ReturnErrorOnFailure(VerifyCertificateSigningRequest(csr.data(), csr.size(), pubkey));

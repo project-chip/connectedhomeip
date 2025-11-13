@@ -26,15 +26,15 @@ jobs:
 
     steps:
        - name: Checkout
-         uses: actions/checkout@v4
+         uses: actions/checkout@v5
        - name: Setup python
-         uses: actions/setup-python@v5
+         uses: actions/setup-python@v6
          with:
-           python-version: 3.11
+           python-version: 3.12
        - name: Install dependencies
          run: |
-           python -m pip install --upgrade pip
-           pip install click coloredlogs lark
+           python3 -m venv venv
+           venv/bin/pip3 install -e scripts/py_matter_idl
        - name: Create old/new copies
          run: |
            mkdir -p out
@@ -45,5 +45,4 @@ jobs:
            patch -p1 <out/patch.diff
        - name: Check backwards compatibility
          run: |
-           scripts/backwards_compatibility_checker.py out/old_version.matter out/new_version.matter
-
+           venv/bin/matter-idl-check-backward-compatibility out/old_version.matter out/new_version.matter

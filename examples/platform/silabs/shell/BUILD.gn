@@ -19,7 +19,7 @@ import("${chip_root}/third_party/silabs/silabs_board.gni")
 
 # This is necessary since the BUILD.gn for both platforms are still split
 shell_dependency_path = "${chip_root}/examples/platform/silabs/efr32"
-if (use_SiWx917) {
+if (wifi_soc) {
   shell_dependency_path = "${chip_root}/examples/platform/silabs/SiWx917"
 }
 
@@ -35,5 +35,8 @@ source_set("icd") {
 
   public_configs = [ ":icd-shell-config" ]
 
-  deps = [ "${shell_dependency_path}:matter-shell" ]
+  deps = [
+    "${chip_root}/src/app/icd/server:notifier",
+    "${shell_dependency_path}:matter-shell",
+  ]
 }

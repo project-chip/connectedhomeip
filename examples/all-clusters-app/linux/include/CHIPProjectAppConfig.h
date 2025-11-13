@@ -51,3 +51,9 @@
 // Claim a device type while advertising that matches the device type on our
 // endpoint 1.  0x0101 is the "Dimmable Light" device type.
 #define CHIP_DEVICE_CONFIG_DEVICE_TYPE 0x0101
+
+// Needed for CI tests
+#define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 1
+
+// Max Binding entries per fabric for CI tests
+#define CHIP_CONFIG_MAX_BINDING_ENTRIES_PER_FABRIC 1

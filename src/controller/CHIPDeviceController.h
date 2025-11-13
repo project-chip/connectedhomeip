@@ -181,7 +181,7 @@ public:
     DeviceController();
     ~DeviceController() override {}
 
-    CHIP_ERROR Init(ControllerInitParams params);
+    virtual CHIP_ERROR Init(ControllerInitParams params);
 
     /**
      * @brief
@@ -478,7 +478,7 @@ class DLL_EXPORT DeviceCommissioner : public DeviceController,
 {
 public:
     DeviceCommissioner();
-    ~DeviceCommissioner() override;
+    ~DeviceCommissioner() override {}
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     /**
@@ -486,6 +486,8 @@ public:
      */
     CHIP_ERROR SetUdcListenPort(uint16_t listenPort);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+
+    using DeviceController::Init;
 
     /**
      * Commissioner-specific initialization, includes parameters such as the pairing delegate.
@@ -602,7 +604,7 @@ public:
      * @param[in] remoteDeviceId        The remote device Id.
      * @param[in] params                The commissioning parameters
      */
-    CHIP_ERROR Commission(NodeId remoteDeviceId, CommissioningParameters & params);
+    virtual CHIP_ERROR Commission(NodeId remoteDeviceId, CommissioningParameters & params);
     CHIP_ERROR Commission(NodeId remoteDeviceId);
 
     /**
@@ -616,6 +618,17 @@ public:
      */
     CHIP_ERROR
     ContinueCommissioningAfterDeviceAttestation(DeviceProxy * device, Credentials::AttestationVerificationResult attestationResult);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    /**
+     * @brief
+     *   This method instructs the commissioner to proceed to the commissioning complete stage for a device
+     *   that had previously being commissioned until request to connect to network.
+     *
+     * @param[in] remoteDeviceId        The remote device Id.
+     */
+    CHIP_ERROR ContinueCommissioningAfterConnectNetworkRequest(NodeId remoteDeviceId);
+#endif
 
     CHIP_ERROR GetDeviceBeingCommissioned(NodeId deviceId, CommissioneeDeviceProxy ** device);
 
@@ -730,6 +743,7 @@ public:
      */
     void CloseBleConnection();
 #endif
+
     /**
      * @brief
      *   Discover all devices advertising as commissionable.
@@ -814,9 +828,11 @@ public:
 
     Credentials::DeviceAttestationVerifier * GetDeviceAttestationVerifier() const { return mDeviceAttestationVerifier; }
 
-    Optional<CommissioningParameters> GetCommissioningParameters()
+    const CommissioningParameters & GetCommissioningParameters() { return mDefaultCommissioner->GetCommissioningParameters(); }
+
+    CHIP_ERROR UpdateCommissioningParameters(const CommissioningParameters & newParameters)
     {
-        return mDefaultCommissioner == nullptr ? NullOptional : MakeOptional(mDefaultCommissioner->GetCommissioningParameters());
+        return mDefaultCommissioner->SetCommissioningParameters(newParameters);
     }
 
     // Reset the arm failsafe timer during commissioning.  If this returns
@@ -831,6 +847,34 @@ public:
         return ExtendArmFailSafeInternal(proxy, step, armFailSafeTimeout, commandTimeout, onSuccess, onFailure,
                                          /* fireAndForget = */ true);
     }
+
+    // Check if the commissioning mode is valid for the current commissioning parameters.
+    virtual bool HasValidCommissioningMode(const Dnssd::CommissionNodeData & nodeData);
+
+protected:
+    // Cleans up and resets failsafe as appropriate depending on the error and the failed stage.
+    // For success, sends completion report with the CommissioningDelegate and sends callbacks to the PairingDelegate
+    // For failures after AddNOC succeeds, sends completion report with the CommissioningDelegate and sends callbacks to the
+    // PairingDelegate. In this case, it does not disarm the failsafe or close the pase connection. For failures up through AddNOC,
+    // sends a command to immediately expire the failsafe, then sends completion report with the CommissioningDelegate and callbacks
+    // to the PairingDelegate upon arm failsafe command completion.
+    virtual void CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus);
+
+    /* This function start the JCM verification steps
+     */
+    virtual CHIP_ERROR StartJCMTrustVerification(DeviceProxy * proxy) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
+    virtual CHIP_ERROR ParseExtraCommissioningInfo(ReadCommissioningInfo & info, const CommissioningParameters & params)
+    {
+        return CHIP_NO_ERROR;
+    }
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
+
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
+    Platform::UniquePtr<app::ClusterStateCache> mAttributeCache;
+    Platform::UniquePtr<app::ReadClient> mReadClient;
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
 private:
     DevicePairingDelegate * mPairingDelegate = nullptr;
@@ -847,6 +891,16 @@ private:
     Internal::WriteCancelFn mWriteCancelFn;
 
     ObjectPool<CommissioneeDeviceProxy, kNumMaxActiveDevices> mCommissioneeDevicePool;
+
+    // While we have an ongoing PASE attempt (i.e. after calling Pair() on the
+    // PASESession), track which RendezvousParameters we used for that attempt.
+    // This allows us to notify delegates about which thing it was we actually
+    // established PASE with, especially in the context of concatenated QR
+    // codes.
+    //
+    // This member only has a value while we are in the middle of session
+    // establishment.
+    std::optional<RendezvousParameters> mRendezvousParametersForPASEEstablishment;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     Protocols::UserDirectedCommissioning::UserDirectedCommissioningServer * mUdcServer = nullptr;
@@ -1040,7 +1094,6 @@ private:
     bool ExtendArmFailSafeInternal(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,
                                    Optional<System::Clock::Timeout> commandTimeout, OnExtendFailsafeSuccess onSuccess,
                                    OnExtendFailsafeFailure onFailure, bool fireAndForget);
-
     template <typename RequestObjectT>
     CHIP_ERROR SendCommissioningCommand(DeviceProxy * device, const RequestObjectT & request,
                                         CommandResponseSuccessCallback<typename RequestObjectT::ResponseType> successCb,
@@ -1057,10 +1110,11 @@ private:
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
     void ContinueReadingCommissioningInfo(const CommissioningParameters & params);
-    void FinishReadingCommissioningInfo();
+    void FinishReadingCommissioningInfo(const CommissioningParameters & params);
     CHIP_ERROR ParseGeneralCommissioningInfo(ReadCommissioningInfo & info);
     CHIP_ERROR ParseBasicInformation(ReadCommissioningInfo & info);
     CHIP_ERROR ParseNetworkCommissioningInfo(ReadCommissioningInfo & info);
+    CHIP_ERROR ParseNetworkCommissioningTimeouts(NetworkClusterInfo & networkInfo, const char * networkType);
     CHIP_ERROR ParseFabrics(ReadCommissioningInfo & info);
     CHIP_ERROR ParseICDInfo(ReadCommissioningInfo & info);
     CHIP_ERROR ParseTimeSyncInfo(ReadCommissioningInfo & info);
@@ -1072,14 +1126,6 @@ private:
     // Sends commissioning complete callbacks to the delegate depending on the status. Sends
     // OnCommissioningComplete and either OnCommissioningSuccess or OnCommissioningFailure depending on the given completion status.
     void SendCommissioningCompleteCallbacks(NodeId nodeId, const CompletionStatus & completionStatus);
-
-    // Cleans up and resets failsafe as appropriate depending on the error and the failed stage.
-    // For success, sends completion report with the CommissioningDelegate and sends callbacks to the PairingDelegate
-    // For failures after AddNOC succeeds, sends completion report with the CommissioningDelegate and sends callbacks to the
-    // PairingDelegate. In this case, it does not disarm the failsafe or close the pase connection. For failures up through AddNOC,
-    // sends a command to immediately expire the failsafe, then sends completion report with the CommissioningDelegate and callbacks
-    // to the PairingDelegate upon arm failsafe command completion.
-    void CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus);
 
     // Extend the fail-safe before trying to do network-enable (since after that
     // point, for non-concurrent-commissioning devices, we may not have a way to
@@ -1101,18 +1147,18 @@ private:
     SetUpCodePairer mSetUpCodePairer;
     AutoCommissioner mAutoCommissioner;
     CommissioningDelegate * mDefaultCommissioner =
-        nullptr; // Commissioning delegate to call when PairDevice / Commission functions are used
+        &mAutoCommissioner; // Commissioning delegate to call when PairDevice / Commission functions are used
     CommissioningDelegate * mCommissioningDelegate =
         nullptr; // Commissioning delegate that issued the PerformCommissioningStep command
     CompletionStatus mCommissioningCompletionStatus;
-
-#if CHIP_CONFIG_ENABLE_READ_CLIENT
-    Platform::UniquePtr<app::ClusterStateCache> mAttributeCache;
-    Platform::UniquePtr<app::ReadClient> mReadClient;
-#endif
     Credentials::AttestationVerificationResult mAttestationResult;
     Platform::UniquePtr<Credentials::DeviceAttestationVerifier::AttestationDeviceInfo> mAttestationDeviceInfo;
     Credentials::DeviceAttestationVerifier * mDeviceAttestationVerifier = nullptr;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    Optional<Crypto::P256PublicKey> mTrustedIcacPublicKeyB;
+    EndpointId mPeerAdminJFAdminClusterEndpointId = kInvalidEndpointId;
+#endif
 };
 
 } // namespace Controller

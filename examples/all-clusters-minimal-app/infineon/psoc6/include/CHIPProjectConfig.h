@@ -104,3 +104,5 @@
  * A size, in bytes, of the individual debug event logging buffer.
  */
 #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)
+
+#define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 1

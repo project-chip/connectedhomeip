@@ -18,12 +18,11 @@
 
 #include <AppMain.h>
 
-#include "BridgedAdministratorCommissioning.h"
-#include "BridgedDevice.h"
-#include "BridgedDeviceBasicInformationImpl.h"
-#include "BridgedDeviceManager.h"
-#include "CommissionableInit.h"
 #include "CommissionerControlDelegate.h"
+#include <fabric-bridge-common/BridgedAdministratorCommissioning.h>
+#include <fabric-bridge-common/BridgedDevice.h>
+#include <fabric-bridge-common/BridgedDeviceBasicInformationImpl.h>
+#include <fabric-bridge-common/BridgedDeviceManager.h>
 
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
@@ -105,7 +104,7 @@ void AttemptRpcClientConnect(System::Layer * systemLayer, void * appState)
     else
     {
         ChipLogError(NotSpecified, "Failed to connect to Fabric-Admin, retry in %d seconds....", kRetryIntervalS);
-        systemLayer->StartTimer(System::Clock::Seconds16(kRetryIntervalS), AttemptRpcClientConnect, nullptr);
+        SuccessOrDie(systemLayer->StartTimer(System::Clock::Seconds16(kRetryIntervalS), AttemptRpcClientConnect, nullptr));
     }
 }
 #endif // defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
@@ -122,8 +121,16 @@ public:
         CommandHandlerInterface(Optional<EndpointId>::Missing(), AdministratorCommissioning::Id)
     {}
 
+    CHIP_ERROR Init();
+
     void InvokeCommand(HandlerContext & handlerContext) override;
 };
+
+CHIP_ERROR AdministratorCommissioningCommandHandler::Init()
+{
+    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
+    return CHIP_NO_ERROR;
+}
 
 void AdministratorCommissioningCommandHandler::InvokeCommand(HandlerContext & handlerContext)
 {
@@ -135,7 +142,6 @@ void AdministratorCommissioningCommandHandler::InvokeCommand(HandlerContext & ha
     if (handlerContext.mRequestPath.mCommandId != AdministratorCommissioning::Commands::OpenCommissioningWindow::Id ||
         endpointId == kRootEndpointId)
     {
-        // Proceed with default handling in Administrator Commissioning Server
         return;
     }
 
@@ -240,7 +246,6 @@ void BridgedDeviceInformationCommandHandler::InvokeCommand(HandlerContext & hand
     handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, status);
 }
 
-BridgedAdministratorCommissioning gBridgedAdministratorCommissioning;
 BridgedDeviceBasicInformationImpl gBridgedDeviceBasicInformationAttributes;
 AdministratorCommissioningCommandHandler gAdministratorCommissioningCommandHandler;
 BridgedDeviceInformationCommandHandler gBridgedDeviceInformationCommandHandler;
@@ -252,9 +257,11 @@ void ApplicationInit()
     ChipLogDetail(NotSpecified, "Fabric-Bridge: ApplicationInit()");
 
     MatterEcosystemInformationPluginServerInitCallback();
-    CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&bridge::gAdministratorCommissioningCommandHandler);
-    CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&bridge::gBridgedDeviceInformationCommandHandler);
-    AttributeAccessInterfaceRegistry::Instance().Register(&bridge::gBridgedDeviceBasicInformationAttributes);
+    VerifyOrDieWithMsg(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(
+                           &bridge::gBridgedDeviceInformationCommandHandler) == CHIP_NO_ERROR,
+                       NotSpecified, "Failed to register bridged device command handler");
+    VerifyOrDieWithMsg(AttributeAccessInterfaceRegistry::Instance().Register(&bridge::gBridgedDeviceBasicInformationAttributes),
+                       NotSpecified, "Failed to register bridged device attribute access");
 
 #if defined(PW_RPC_FABRIC_BRIDGE_SERVICE) && PW_RPC_FABRIC_BRIDGE_SERVICE
     bridge::SetRpcRemoteServerPort(gFabricAdminServerPort);
@@ -263,7 +270,8 @@ void ApplicationInit()
 #endif
 
     bridge::BridgedDeviceManager::Instance().Init();
-    VerifyOrDie(bridge::gBridgedAdministratorCommissioning.Init() == CHIP_NO_ERROR);
+    VerifyOrDieWithMsg(bridge::gAdministratorCommissioningCommandHandler.Init() == CHIP_NO_ERROR, NotSpecified,
+                       "Failed to initialize Commissioner command handler");
 
     VerifyOrDieWithMsg(bridge::CommissionerControlInit() == CHIP_NO_ERROR, NotSpecified,
                        "Failed to initialize Commissioner Control Server");

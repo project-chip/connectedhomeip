@@ -29,12 +29,14 @@ import sys
 import threading
 import time
 import typing
+import uuid
 
 import click
 import coloredlogs
-from chip.testing.metadata import Metadata, MetadataReader
-from chip.testing.tasks import Subprocess
 from colorama import Fore, Style
+
+from matter.testing.metadata import Metadata, MetadataReader
+from matter.testing.tasks import Subprocess
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -89,6 +91,54 @@ def forward_fifo(path: str, f_out: typing.BinaryIO, stop_event: threading.Event)
         os.unlink(path)
 
 
+class AppProcessManager:
+    def __init__(self, app: str, app_args: str, app_ready_pattern: typing.Optional[str], stream_output: typing.BinaryIO, app_stdin_pipe: typing.Optional[str] = None):
+        self.app = app
+        self.app_args = app_args
+        self.app_ready_pattern = app_ready_pattern
+        self.stream_output = stream_output
+        self.app_stdin_pipe = app_stdin_pipe
+        self.app_process = None
+        self.stdin_thread = None
+        self.stdin_stop_event = threading.Event()
+
+    def start(self):
+        logging.info(f"Starting app with args: {self.app_args}")
+        if self.app_ready_pattern and isinstance(self.app_ready_pattern, str):
+            ready_pattern = re.compile(self.app_ready_pattern.encode())
+        else:
+            ready_pattern = self.app_ready_pattern
+        self.app_process = Subprocess(self.app, *shlex.split(self.app_args),
+                                      output_cb=process_chip_app_output,
+                                      f_stdout=self.stream_output,
+                                      f_stderr=self.stream_output)
+        self.app_process.start(expected_output=ready_pattern, timeout=30)
+        if self.app_stdin_pipe:
+            logging.info("Forwarding stdin from '%s' to app", self.app_stdin_pipe)
+            self.stdin_stop_event.clear()
+            self.stdin_thread = threading.Thread(
+                target=forward_fifo, args=(self.app_stdin_pipe, self.app_process.p.stdin, self.stdin_stop_event))
+            self.stdin_thread.start()
+        else:
+            self.app_process.p.stdin.close()
+
+    def stop(self):
+        if self.stdin_thread:
+            self.stdin_stop_event.set()
+            self.stdin_thread.join()
+            self.stdin_thread = None
+        if self.app_process:
+            self.app_process.terminate()
+            self.app_process = None
+
+    def restart(self):
+        self.stop()
+        self.start()
+
+    def get_process(self):
+        return self.app_process
+
+
 @click.command()
 @click.option("--app", type=click.Path(exists=True), default=None,
               help='Path to local application to use, omit to use external apps.')
@@ -111,15 +161,16 @@ def forward_fifo(path: str, f_out: typing.BinaryIO, stop_event: threading.Event)
                                                                              'mobile-device-test.py'), help='Test script to use.')
 @click.option("--script-args", type=str, default='',
               help='Script arguments, can use placeholders like {SCRIPT_BASE_NAME}.')
-@click.option("--script-gdb", is_flag=True,
+@click.option("--script-gdb/--no-script-gdb", default=None,
               help='Run script through gdb')
 @click.option("--quiet/--no-quiet", default=None,
               help="Do not print output from passing tests. Use this flag in CI to keep GitHub log size manageable.")
 @click.option("--load-from-env", default=None, help="YAML file that contains values for environment variables.")
 @click.option("--run", type=str, multiple=True, help="Run only the specified test run(s).")
+@click.option("--app-filter", type=str, default=None, help="Run only for the specified app(s). Comma separated.")
 def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
          app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
-         script_gdb: bool, quiet: bool, load_from_env, run):
+         script_gdb: bool, quiet: bool, load_from_env, run, app_filter):
     if load_from_env:
         reader = MetadataReader(load_from_env)
         runs = reader.parse_script(script)
@@ -146,20 +197,27 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
         # Filter runs based on the command line arguments
         runs = [r for r in runs if r.run in run]
 
+    if app_filter:
+        allowed_apps = [s.strip() for s in app_filter.split(',')]
+        # app name in metadata is like "${APP_NAME}"
+        allowed_apps_with_format = [f"${{{app}}}" for app in allowed_apps]
+        runs = [r for r in runs if r.app in allowed_apps_with_format]
+
     # Override runs Metadata with the command line options
     for run in runs:
         if factory_reset is not None:
             run.factory_reset = factory_reset
         if factory_reset_app_only is not None:
             run.factory_reset_app_only = factory_reset_app_only
+        if script_gdb is not None:
+            run.script_gdb = script_gdb
         if quiet is not None:
             run.quiet = quiet
 
     for run in runs:
         logging.info("Executing %s %s", run.py_script_path.split('/')[-1], run.run)
-        main_impl(run.app, run.factory_reset, run.factory_reset_app_only, run.app_args or "",
-                  run.app_ready_pattern, run.app_stdin_pipe, run.py_script_path,
-                  run.script_args or "", run.script_gdb, run.quiet)
+        main_impl(run.app, run.factory_reset, run.factory_reset_app_only, run.app_args or "", run.app_ready_pattern,
+                  run.app_stdin_pipe, run.py_script_path, run.script_args or "", run.script_gdb, run.quiet)
 
 
 def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
@@ -168,6 +226,10 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
 
     app_args = app_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
     script_args = script_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
+
+    # Generate unique test run ID to avoid conflicts in concurrent test runs
+    test_run_id = str(uuid.uuid4())[:8]  # Use first 8 characters for shorter paths
+    restart_flag_file = f"/tmp/chip_test_restart_app_{test_run_id}"
 
     if factory_reset or factory_reset_app_only:
         # Remove native app config
@@ -185,42 +247,42 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
             logging.info("Removing storage path: %s" % match.group("path"))
             pathlib.Path(match.group("path")).unlink(missing_ok=True)
 
-    app_process = None
-    app_stdin_forwarding_thread = None
-    app_stdin_forwarding_stop_event = threading.Event()
+    app_manager_ref = None
+    app_manager_lock = threading.Lock()
+    restart_monitor_thread = None
     app_exit_code = 0
-    app_pid = 0
-
     stream_output = sys.stdout.buffer
     if quiet:
         stream_output = io.BytesIO()
-
     if app:
         if not os.path.exists(app):
             if app is None:
                 raise FileNotFoundError(f"{app} not found")
-        if app_ready_pattern:
-            app_ready_pattern = re.compile(app_ready_pattern.encode())
-        app_process = Subprocess(app, *shlex.split(app_args),
-                                 output_cb=process_chip_app_output,
-                                 f_stdout=stream_output,
-                                 f_stderr=stream_output)
-        app_process.start(expected_output=app_ready_pattern, timeout=30)
-        if app_stdin_pipe:
-            logging.info("Forwarding stdin from '%s' to app", app_stdin_pipe)
-            app_stdin_forwarding_thread = threading.Thread(
-                target=forward_fifo, args=(app_stdin_pipe, app_process.p.stdin, app_stdin_forwarding_stop_event))
-            app_stdin_forwarding_thread.start()
-        else:
-            app_process.p.stdin.close()
-        app_pid = app_process.p.pid
+        app_manager = AppProcessManager(app, app_args, app_ready_pattern, stream_output, app_stdin_pipe)
+        app_manager.start()
+        app_manager_ref = [app_manager]
+        restart_monitor_thread = threading.Thread(
+            target=monitor_app_restart_requests,
+            args=(
+                app_manager_ref,
+                app_manager_lock,
+                app,
+                app_args,
+                app_ready_pattern,
+                stream_output,
+                app_stdin_pipe,
+                restart_flag_file),
+            daemon=True)
+        restart_monitor_thread.start()
+
+    # TODO: Remove this below workaround once we understand if mobile-device-test needs to be run through Cirque and through this script for CI test pipeline, task PR: https://github.com/project-chip/matter-test-scripts/issues/681
+    if "mobile-device-test.py" not in script:
+        script_args += f" --restart-flag-file {restart_flag_file}"
 
     script_command = [
         script,
         "--fail-on-skipped",
-        "--paa-trust-store-path", os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
-        "--log-format", '%(message)s',
-        "--app-pid", str(app_pid),
+        "--paa-trust-store-path", os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS)
     ] + shlex.split(script_args)
 
     if script_gdb:
@@ -232,7 +294,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         script_command = ("gdb -batch -return-child-result -q -ex run -ex "
                           "thread|apply|all|bt --args python3".split() + script_command)
     else:
-        script_command = "/usr/bin/env python3".split() + script_command
+        script_command = "/usr/bin/env python3 -X faulthandler".split() + script_command
 
     final_script_command = [i.replace('|', ' ') for i in script_command]
 
@@ -242,30 +304,90 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
                                      f_stderr=stream_output)
     test_script_process.start()
     test_script_process.p.stdin.close()
-    test_script_exit_code = test_script_process.wait()
 
-    if test_script_exit_code != 0:
-        logging.error("Test script exited with returncode %d" % test_script_exit_code)
+    try:
+        test_script_exit_code = test_script_process.wait()
 
-    if app_process:
-        logging.info("Stopping app with SIGTERM")
-        if app_stdin_forwarding_thread:
-            app_stdin_forwarding_stop_event.set()
-            app_stdin_forwarding_thread.join()
-        app_process.terminate()
-        app_exit_code = app_process.returncode
+        if test_script_exit_code != 0:
+            logging.error("Test script exited with returncode %d" % test_script_exit_code)
 
-    # We expect both app and test script should exit with 0
-    exit_code = test_script_exit_code or app_exit_code
+        # Stop the restart monitor thread if it exists
+        if restart_monitor_thread and restart_monitor_thread.is_alive():
+            logging.info("Stopping app restart monitor thread")
+            restart_monitor_thread.join(2.0)
 
-    if quiet:
-        if exit_code:
-            sys.stdout.write(stream_output.getvalue().decode('utf-8'))
-        else:
-            logging.info("Test completed successfully")
+        # Get the current app manager if it exists
+        current_app_manager = None
+        if app_manager_ref:
+            with app_manager_lock:
+                current_app_manager = app_manager_ref[0]
 
-    if exit_code != 0:
-        sys.exit(exit_code)
+        if current_app_manager:
+            logging.info("Stopping app with SIGTERM")
+            current_app_manager.stop()
+            if current_app_manager.get_process():
+                app_exit_code = current_app_manager.get_process().returncode
+
+        # We expect both app and test script should exit with 0
+        exit_code = test_script_exit_code or app_exit_code
+
+        if quiet:
+            if exit_code:
+                sys.stdout.write(stream_output.getvalue().decode('utf-8', errors='replace'))
+            else:
+                logging.info("Test completed successfully")
+
+        if exit_code != 0:
+            logging.error("SUBPROCESS failure: ")
+            logging.error("  TEST SCRIPT: %d (%r)", test_script_exit_code, final_script_command)
+            logging.error("  APP:         %d (%r)", app_exit_code, [app] + shlex.split(app_args))
+            sys.exit(exit_code)
+
+    finally:
+        # Stop the restart monitor thread if it exists
+        if restart_monitor_thread and restart_monitor_thread.is_alive():
+            logging.info("Stopping app restart monitor thread")
+            restart_monitor_thread.join(2.0)
+
+        # Clean up any leftover flag files if they exist - ensure this always executes
+        logging.info("Cleaning up flag files")
+        if os.path.exists(restart_flag_file):
+            try:
+                os.unlink(restart_flag_file)
+                logging.info(f"Cleaned up flag file: {restart_flag_file}")
+            except Exception as e:
+                logging.warning(f"Failed to clean up flag file {restart_flag_file}: {e}")
+
+
+def monitor_app_restart_requests(
+        app_manager_ref,
+        app_manager_lock,
+        app,
+        app_args,
+        app_ready_pattern,
+        stream_output,
+        app_stdin_pipe,
+        restart_flag_file):
+    while True:
+        try:
+            if os.path.exists(restart_flag_file):
+                logging.info("App restart requested by test script")
+                # Remove the flag file immediately to prevent multiple restarts
+                os.unlink(restart_flag_file)
+
+                new_app_manager = AppProcessManager(app, app_args, app_ready_pattern, stream_output, app_stdin_pipe)
+                new_app_manager.start()
+                with app_manager_lock:
+                    app_manager_ref[0].stop()
+                    app_manager_ref[0] = new_app_manager
+
+                # After restart is complete, we can exit the monitor thread
+                logging.info("App restart completed, monitor thread exiting")
+                break
+            else:
+                time.sleep(0.5)
+        except Exception as e:
+            logging.error(f"Error in app restart monitor: {e}")
 
 
 if __name__ == '__main__':

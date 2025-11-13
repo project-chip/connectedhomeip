@@ -28,12 +28,12 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <assert.h>
 #include <lib/support/BitMask.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
@@ -70,7 +70,7 @@
 #endif
 
 #define APP_FUNCTION_BUTTON 0
-#define APP_EVSE_SWITCH 1
+#define APP_CONTROL_BUTTON 1
 
 namespace {
 
@@ -133,7 +133,7 @@ AppTask AppTask::sAppTask;
 
 EndpointId GetEnergyDeviceEndpointId()
 {
-#if defined(SL_CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE)
+#if SL_CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
     return kWaterHeaterEndpoint;
 #else
     return kEvseEndpoint;
@@ -177,26 +177,10 @@ void ApplicationShutdown()
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 }
 
-CHIP_ERROR AppTask::Init()
+CHIP_ERROR AppTask::AppInit()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
-
-#ifdef DISPLAY_ENABLED
-#if SL_MATTER_CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
-    GetLCD().Init((uint8_t *) "energy-management-App (EVSE)");
-#elif SL_CONFIG_ENABLE_EXAMPLE_WATER_HEATER_DEVICE
-    GetLCD().Init((uint8_t *) "energy-management-App (WaterHeater)");
-#endif
-#endif
-
-    err = BaseApplication::Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        SILABS_LOG("BaseApplication::Init() failed");
-        appError(err);
-    }
-
     ApplicationInit();
 
 #ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
@@ -315,7 +299,7 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
     button_event.Type               = AppEvent::kEventType_Button;
     button_event.ButtonEvent.Action = btnAction;
 
-    if (button == APP_EVSE_SWITCH && btnAction == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed))
+    if (button == APP_CONTROL_BUTTON && btnAction == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed))
     {
         button_event.Handler = EnergyManagementActionEventHandler;
         AppTask::GetAppTask().PostEvent(&button_event);

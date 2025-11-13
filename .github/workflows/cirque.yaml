@@ -54,7 +54,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Checkout submodules
               uses: ./.github/actions/checkout-submodules
               with:
@@ -75,7 +75,7 @@ jobs:
             - name: Get Cirque Bootstrap cache key
               id: cirque-bootstrap-cache-key
               run: echo "val=$(scripts/tests/cirque_tests.sh cachekeyhash)" >> $GITHUB_OUTPUT
-            - uses: Wandalen/wretry.action@v1.4.10
+            - uses: Wandalen/wretry.action@v3.8.0
               name: Cirque Bootstrap cache
               if: ${{ !env.ACT }}
               continue-on-error: true
@@ -130,7 +130,7 @@ jobs:
                    
 
             - name: Uploading Binaries
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v5
               if: ${{ always() && !env.ACT }}
               with:
                   name: cirque_log-${{steps.outsuffix.outputs.value}}-logs

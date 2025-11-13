@@ -40,13 +40,15 @@ import time
 import typing
 from datetime import datetime, timedelta, timezone
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError
-from chip.testing.matter_testing import (MatterBaseTest, SimpleEventCallback, async_test_body, default_matter_test_main,
-                                         get_wait_seconds_from_set_time, type_matches, utc_time_in_matter_epoch)
-from chip.tlv import uint
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.interaction_model import InteractionModelError
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
+from matter.testing.timeoperations import get_wait_seconds_from_set_time, utc_time_in_matter_epoch
+from matter.tlv import uint
 
 
 class TC_TIMESYNC_2_11(MatterBaseTest):
@@ -60,11 +62,27 @@ class TC_TIMESYNC_2_11(MatterBaseTest):
     async def send_set_utc_cmd(self, utc: uint) -> None:
         await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetUTCTime(UTCTime=utc, granularity=Clusters.Objects.TimeSynchronization.Enums.GranularityEnum.kMillisecondsGranularity))
 
-    def wait_for_dst_status(self, th_utc, wait_s, expect_active):
+    def wait_for_dst_status(self, th_utc, wait_s, expect_active, cb):
+        """
+        Waits for the DSTStatus event to be received and validates its contents.
+
+        This function waits for the DSTStatus event to be received via the given callback.
+        It verifies that the event type is correct and that the field DSTOffsetAcive matches the expected value.
+
+        Parameters:
+            th_utc (int): The UTC time in seconds used for timeout.
+            wait_s (int): Additional wait time in secods.
+            expect_active (bool): Expected value of the DSTOffsetActive field in the event.
+            cb: The callback object from which the event will be pulled.
+
+        Raises:
+            AssertionError: If no event is received in time, the type is incorrect or the value does not match.
+        """
+
         timeout = get_wait_seconds_from_set_time(th_utc, wait_s)
         try:
-            ret = self.q.get(block=True, timeout=timeout)
-            asserts.assert_true(type_matches(received_value=ret.Data,
+            ret = cb.get_event_from_queue(block=True, timeout=timeout)
+            asserts.assert_true(matchers.is_type(received_value=ret.Data,
                                 desired_type=Clusters.TimeSynchronization.Events.DSTStatus), "Unexpected event type returned")
             asserts.assert_equal(ret.Data.DSTOffsetActive, expect_active, "Unexpected value for DSTOffsetActive")
         except queue.Empty:
@@ -99,10 +117,9 @@ class TC_TIMESYNC_2_11(MatterBaseTest):
 
         self.print_step(3, "Subscribe to DSTStatus event")
         event = time_cluster.Events.DSTStatus
-        self.q = queue.Queue()
-        cb = SimpleEventCallback("DSTStatus", event.cluster_id, event.event_id, self.q)
+        cb = EventSubscriptionHandler(expected_cluster_id=event.cluster_id, expected_event_id=event.event_id)
         urgent = 1
-        subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=[(self.endpoint, event, urgent)], reportInterval=[1, 3])
+        subscription = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=[(self.endpoint, event, urgent)], reportInterval=[1, 3])
         subscription.SetEventUpdateCallback(callback=cb)
 
         self.print_step(4, "TH reads the DSTOffsetListMaxSize")
@@ -129,7 +146,7 @@ class TC_TIMESYNC_2_11(MatterBaseTest):
         await self.read_single_attribute_check_success(cluster=Clusters.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.LocalTime)
 
         self.print_step(8, "TH waits for DSTStatus event until th_utc + 5s")
-        self.wait_for_dst_status(th_utc, 5, True)
+        self.wait_for_dst_status(th_utc, 5, True, cb)
 
         self.print_step(9, "If dst_list_size > 1, TH waits until th_utc + 15s")
         if dst_list_size > 1:
@@ -141,7 +158,7 @@ class TC_TIMESYNC_2_11(MatterBaseTest):
 
         self.print_step(11, "If dst_list_size > 1, TH waits for DSTStatus event until th_utc + 20s")
         if dst_list_size > 1:
-            self.wait_for_dst_status(th_utc, 20, False)
+            self.wait_for_dst_status(th_utc, 20, False, cb)
 
         self.print_step(12, "If dst_list_size > 1, TH waits until th_utc + 30s")
         if dst_list_size > 1:
@@ -153,7 +170,7 @@ class TC_TIMESYNC_2_11(MatterBaseTest):
 
         self.print_step(14, "If dst_list_size > 1, TH waits for a DSTStatus event until th_utc + 35s")
         if dst_list_size > 1:
-            self.wait_for_dst_status(th_utc, 35, True)
+            self.wait_for_dst_status(th_utc, 35, True, cb)
 
         self.print_step(15, "Set time zone back to 0")
         tz = [tz_struct(offset=0, validAt=0)]

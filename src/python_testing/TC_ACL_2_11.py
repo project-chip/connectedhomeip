@@ -39,41 +39,19 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-import queue
 
-import chip.clusters as Clusters
-import matter_testing_infrastructure.chip.testing.global_attribute_ids as global_attribute_ids
-from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, ValueDecodeFailure
-from chip.clusters.ClusterObjects import ALL_ACCEPTED_COMMANDS, ALL_ATTRIBUTES, ALL_CLUSTERS, ClusterEvent
-from chip.clusters.Objects import AccessControl
-from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.basic_composition import arls_populated
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
-
-class EventChangeCallback:
-    def __init__(self, expected_event: ClusterEvent, output: queue.Queue):
-        self._output = output
-        self._expected_cluster_id = expected_event.cluster_id
-        self._expected_event_id = expected_event.event_id
-
-    def __call__(self, res: EventReadResult, transaction: SubscriptionTransaction):
-        if res.Status == Status.Success and res.Header.ClusterId == self._expected_cluster_id and res.Header.EventId == self._expected_event_id:
-            logging.info(
-                f'Got subscription report for event {self._expected_event_id} on cluster {self._expected_cluster_id}: {res.Data}')
-            self._output.put(res)
-
-
-def WaitForEventReport(q: queue.Queue, expected_event: ClusterEvent):
-    try:
-        res = q.get(block=True, timeout=10)
-    except queue.Empty:
-        asserts.fail("Failed to receive a report for the event {}".format(expected_event))
-
-    asserts.assert_equal(res.Header.ClusterId, expected_event.cluster_id, "Expected cluster ID not found in event report")
-    asserts.assert_equal(res.Header.EventId, expected_event.event_id, "Expected event ID not found in event report")
+import matter.clusters as Clusters
+import matter.testing.global_attribute_ids as global_attribute_ids
+from matter.clusters.Attribute import ValueDecodeFailure
+from matter.clusters.ClusterObjects import ALL_ACCEPTED_COMMANDS, ALL_ATTRIBUTES, ALL_CLUSTERS
+from matter.clusters.Objects import AccessControl
+from matter.clusters.Types import NullValue
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.basic_composition import arls_populated
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_ACL_2_11(MatterBaseTest):
@@ -181,8 +159,8 @@ class TC_ACL_2_11(MatterBaseTest):
                                                  f"Failed to verify ACCESS_RESTRICTED when sending command {ID1} to Cluster {C1} Endpoint {E1}")
 
         # Belongs to step 6, but needs to be subscribed before executing step 5: begin
-        arru_queue = queue.Queue()
-        arru_cb = EventChangeCallback(Clusters.AccessControl.Events.FabricRestrictionReviewUpdate, arru_queue)
+        event = Clusters.AccessControl.Events.FabricRestrictionReviewUpdate
+        arru_cb = EventSubscriptionHandler(expected_cluster_id=event.cluster_id, expected_event_id=event.event_id)
 
         urgent = 1
         subscription_arru = await dev_ctrl.ReadEvent(dut_node_id, events=[(0, Clusters.AccessControl.Events.FabricRestrictionReviewUpdate, urgent)], reportInterval=(0, 30), keepSubscriptions=True, autoResubscribe=False)
@@ -219,7 +197,7 @@ class TC_ACL_2_11(MatterBaseTest):
 
         self.step(7)
         logging.info("Please follow instructions provided by the product maker to remove all ARL entries")
-        WaitForEventReport(arru_queue, Clusters.AccessControl.Events.FabricRestrictionReviewUpdate)
+        arru_cb.wait_for_event_report(Clusters.AccessControl.Events.FabricRestrictionReviewUpdate)
 
         self.step(8)
         cluster = Clusters.AccessControl

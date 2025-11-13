@@ -40,9 +40,9 @@ tests:
           networking technologies that are supported by both the TH and the DUT
           If TH is unaware of the DUT’s Discovery Capability Bitmask, it MAY
           initiate Device Discovery in any order on all the networking
-          technologies it supports out of Wi-Fi Soft-AP, Wi-Fi PAF, BLE, and on
-          IP network discovery, or initiate Device Discovery on a specific
-          networking technology."
+          technologies it supports out of Wi-Fi PAF, BLE, and on IP network
+          discovery, or initiate Device Discovery on a specific networking
+          technology."
       verification: |
           TH selects the DUT's capability bitmask and start the commissiong process accordingly
           No applicable TH or DUT logs.
@@ -52,11 +52,10 @@ tests:
           "Step 2: If (MCORE.DD.CHIP_DEV) then If !(MCORE.DD.CHIP_DEV) then If
           (MCORE.DD.DEV_LOCK) then If (MCORE.DD.DEV_BARRIER) then"
       PICS:
-          MCORE.DD.CHIP_DEV || !(MCORE.DD.CHIP_DEV) || MCORE.DD.DEV_LOCK ||
-          MCORE.DD.DEV_BARRIER
+
       verification: |
-          If (MCORE.DD.CHIP_DEV) IP/BLE discovery tool should discover the DUT else it should not
-          If !(MCORE.DD.CHIP_DEV) instruct DUT to start Advertising and scan again for commissionale devices using the IP/BLE discovery tool
+          If !(MCORE.DD.CHIP_DEV) IP/BLE discovery tool should not discover the DUT
+          If device is not discovered, instruct DUT to start Advertising and scan again for commissionable devices using the IP/BLE discovery tool
 
           Verify in TH (CHIP-TOOL)
           For devices already on the network:
@@ -185,9 +184,11 @@ tests:
           2.4GHz band."
       PICS: MCORE.COM.WIFI && MCORE.DD.DISCOVERY_PAF
       verification: |
-          [Configuration command to be filled by NXP]
+          WIFI - PAF feature is out of scope for V1.4
 
-          Configure the AP to the PAF working channel and connect TH to AP
+           [Configuration command to be filled by NXP]
+
+           Configure the AP to the PAF working channel and connect TH to AP
       disabled: true
 
     - label:
@@ -196,6 +197,8 @@ tests:
           in 5GHz band if it is in ETSI regulatory domains."
       PICS: MCORE.COM.WIFI && !MCORE.COM.BLE && MCORE.DD.DISCOVERY_PAF
       verification: |
+          WIFI - PAF feature is out of scope for V1.4
+
           [Configuration command to be filled by NXP]
 
           Configure the AP to the PAF working channel and connect TH to AP
@@ -204,31 +207,37 @@ tests:
     - label: "Step 9: DUT begins sending Wi-Fi PAF Publish messages."
       PICS: MCORE.COM.WIFI && MCORE.DD.DISCOVERY_PAF
       verification: |
-          [Verification command to be filled by NXP]
+          WIFI - PAF feature is out of scope for V1.4
 
-          * 2.4g:
-          $sudo ./chip-all-clusters-app --wifi --wifipaf freq_list=2437
-          * 5g, FCC:
-          $sudo ./chip-all-clusters-app --wifi --wifipaf freq_list=5220
-          * 5g ETSI:
-          $sudo ./chip-all-clusters-app --wifi --wifipaf freq_list=5745
+           [Verification command to be filled by NXP]
+
+           * 2.4g:
+           $sudo ./chip-all-clusters-app --wifi --wifipaf freq_list=2437
+           * 5g, FCC:
+           $sudo ./chip-all-clusters-app --wifi --wifipaf freq_list=5220
+           * 5g ETSI:
+           $sudo ./chip-all-clusters-app --wifi --wifipaf freq_list=5745
       disabled: true
 
     - label: "Step 10: TH scans and finds the DUT SSID"
       PICS: MCORE.COM.WIFI && MCORE.DD.DISCOVERY_SOFTAP
       verification: |
-          Out of Scope
-          SoftAP commissioning not currently supported on TH=chip-tool
+          Out of Scope : SoftAP commissioning is currently not supported.
       disabled: true
 
     - label:
-          "Step 11: TTH scans and finds the DUT SSID TH sends to DUT a 1st power
+          "Step 11: TH scans and finds the DUT SSID TH sends to DUT a 1st power
           cycle command (or reset manually) TH sends to DUT a 2nd power cycle
           command (or reset manually)"
       PICS: MCORE.COM.WIFI && MCORE.DD.DISCOVERY_SOFTAP
       verification: |
-          Out of Scope
-          SoftAP commissioning not currently supported on TH=chip-tool
+          Out of Scope : SoftAP commissioning is currently not supported.
+      disabled: true
+
+    - label: "Step 12: TH scans and finds the DUT SSID"
+      PICS: MCORE.COM.WIFI && MCORE.DD.IE
+      verification: |
+          Out of Scope : SoftAP commissioning is currently not supported.
       disabled: true
 
     - label:
@@ -236,7 +245,6 @@ tests:
           vendor-unique means or by commissioning the DUT onto the Matter
           network and opening a commissioning window. The DUT is sending
           mandatory Commissionable Node Discovery service records over DNS-SD."
-      PICS: MCORE.COM.WIFI && MCORE.DD.DISCOVERY_SOFTAP
       verification: |
           ./chip-all-clusters-app
           ...

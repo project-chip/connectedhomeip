@@ -89,8 +89,8 @@ CommandHandler::Handle gAsyncCommandHandle;
 } // namespace DataModelTests
 
 static CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, bool aIsFabricFiltered,
-                                        const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
-                                        AttributeEncodeState * apEncoderState)
+                                        bool allowInfiniteReads, const ConcreteReadAttributePath & aPath,
+                                        AttributeReportIBs::Builder & aAttributeReports, AttributeEncodeState * apEncoderState)
 {
     if (aPath.mEndpointId >= chip::Test::kMockEndpointMin)
     {
@@ -146,6 +146,7 @@ static CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubje
 
             return valueEncoder.Encode(++gInt16uTotalReadCount);
         }
+
         if (aPath.mClusterId == kPerpetualClusterId ||
             (aPath.mClusterId == app::Clusters::UnitTesting::Id && aPath.mAttributeId == kPerpetualAttributeid))
         {
@@ -153,9 +154,9 @@ static CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubje
             AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor, aPath, kDataVersion, aIsFabricFiltered,
                                                state);
 
-            CHIP_ERROR err = valueEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-                encoder.Encode(static_cast<uint8_t>(1));
-                return CHIP_ERROR_NO_MEMORY;
+            CHIP_ERROR err = valueEncoder.EncodeList([allowInfiniteReads](const auto & encoder) -> CHIP_ERROR {
+                TEMPORARY_RETURN_IGNORED encoder.Encode(static_cast<uint8_t>(1));
+                return allowInfiniteReads ? CHIP_ERROR_NO_MEMORY : CHIP_NO_ERROR;
             });
 
             if (err != CHIP_NO_ERROR)
@@ -199,7 +200,10 @@ static CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubje
         attributeData.DataVersion(kDataVersion);
         ReturnErrorOnFailure(attributeData.GetError());
         AttributePathIB::Builder & attributePath = attributeData.CreatePath();
-        attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
+        TEMPORARY_RETURN_IGNORED attributePath.Endpoint(aPath.mEndpointId)
+            .Cluster(aPath.mClusterId)
+            .Attribute(aPath.mAttributeId)
+            .EndOfAttributePathIB();
         ReturnErrorOnFailure(attributePath.GetError());
 
         ReturnErrorOnFailure(DataModel::Encode(*(attributeData.GetWriter()), TLV::ContextTag(AttributeDataIB::Tag::kData), value));
@@ -213,13 +217,16 @@ static CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubje
         ReturnErrorOnFailure(aAttributeReports.GetError());
         AttributeStatusIB::Builder & attributeStatus = attributeReport.CreateAttributeStatus();
         AttributePathIB::Builder & attributePath     = attributeStatus.CreatePath();
-        attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
+        TEMPORARY_RETURN_IGNORED attributePath.Endpoint(aPath.mEndpointId)
+            .Cluster(aPath.mClusterId)
+            .Attribute(aPath.mAttributeId)
+            .EndOfAttributePathIB();
         ReturnErrorOnFailure(attributePath.GetError());
 
         StatusIB::Builder & errorStatus = attributeStatus.CreateErrorStatus();
         ReturnErrorOnFailure(attributeStatus.GetError());
         errorStatus.EncodeStatusIB(StatusIB(Protocols::InteractionModel::Status::Busy));
-        attributeStatus.EndOfAttributeStatusIB();
+        TEMPORARY_RETURN_IGNORED attributeStatus.EndOfAttributeStatusIB();
         ReturnErrorOnFailure(attributeStatus.GetError());
         ReturnErrorOnFailure(attributeReport.EndOfAttributeReportIB());
     }
@@ -331,8 +338,9 @@ ActionReturnStatus CustomDataModel::ReadAttribute(const ReadAttributeRequest & r
         subjectDescriptor = *request.subjectDescriptor;
     }
 
-    CHIP_ERROR err = ReadSingleClusterData(subjectDescriptor, request.readFlags.Has(ReadFlags::kFabricFiltered), request.path,
-                                           TestOnlyAttributeValueEncoderAccessor(encoder).Builder(), &mutableState);
+    CHIP_ERROR err =
+        ReadSingleClusterData(subjectDescriptor, request.readFlags.Has(ReadFlags::kFabricFiltered), mAllowInfiniteReads,
+                              request.path, TestOnlyAttributeValueEncoderAccessor(encoder).Builder(), &mutableState);
 
     // state must survive CHIP_ERRORs as it is used for chunking
     TestOnlyAttributeValueEncoderAccessor(encoder).SetState(mutableState);
@@ -470,113 +478,11 @@ ActionReturnStatus CustomDataModel::WriteAttribute(const WriteAttributeRequest &
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-std::optional<ActionReturnStatus> CustomDataModel::Invoke(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
-                                                          CommandHandler * handler)
+std::optional<ActionReturnStatus> CustomDataModel::InvokeCommand(const InvokeRequest & request,
+                                                                 chip::TLV::TLVReader & input_arguments, CommandHandler * handler)
 {
     DispatchSingleClusterCommand(request.path, input_arguments, handler);
     return std::nullopt; // handler status is set by the dispatch
-}
-
-DataModel::EndpointEntry CustomDataModel::FirstEndpoint()
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstEndpoint();
-}
-
-DataModel::EndpointEntry CustomDataModel::NextEndpoint(EndpointId before)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->NextEndpoint(before);
-}
-
-std::optional<DataModel::EndpointInfo> CustomDataModel::GetEndpointInfo(EndpointId endpoint)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetEndpointInfo(endpoint);
-}
-
-std::optional<DataModel::DeviceTypeEntry> CustomDataModel::FirstDeviceType(EndpointId endpoint)
-{
-    return std::nullopt;
-}
-
-std::optional<DataModel::DeviceTypeEntry> CustomDataModel::NextDeviceType(EndpointId endpoint,
-                                                                          const DataModel::DeviceTypeEntry & previous)
-{
-    return std::nullopt;
-}
-
-std::optional<DataModel::Provider::SemanticTag> CustomDataModel::GetFirstSemanticTag(EndpointId endpoint)
-{
-    return std::nullopt;
-}
-
-std::optional<DataModel::Provider::SemanticTag> CustomDataModel::GetNextSemanticTag(EndpointId endpoint,
-                                                                                    const SemanticTag & previous)
-{
-    return std::nullopt;
-}
-
-ClusterEntry CustomDataModel::FirstServerCluster(EndpointId endpoint)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstServerCluster(endpoint);
-}
-
-ClusterEntry CustomDataModel::NextServerCluster(const ConcreteClusterPath & before)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->NextServerCluster(before);
-}
-
-std::optional<ClusterInfo> CustomDataModel::GetServerClusterInfo(const ConcreteClusterPath & path)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetServerClusterInfo(path);
-}
-
-ConcreteClusterPath CustomDataModel::FirstClientCluster(EndpointId endpoint)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstClientCluster(endpoint);
-}
-
-ConcreteClusterPath CustomDataModel::NextClientCluster(const ConcreteClusterPath & before)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->NextClientCluster(before);
-}
-
-AttributeEntry CustomDataModel::FirstAttribute(const ConcreteClusterPath & cluster)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstAttribute(cluster);
-}
-
-AttributeEntry CustomDataModel::NextAttribute(const ConcreteAttributePath & before)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->NextAttribute(before);
-}
-
-std::optional<AttributeInfo> CustomDataModel::GetAttributeInfo(const ConcreteAttributePath & path)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetAttributeInfo(path);
-}
-
-CommandEntry CustomDataModel::FirstAcceptedCommand(const ConcreteClusterPath & cluster)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstAcceptedCommand(cluster);
-}
-
-CommandEntry CustomDataModel::NextAcceptedCommand(const ConcreteCommandPath & before)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->NextAcceptedCommand(before);
-}
-
-std::optional<CommandInfo> CustomDataModel::GetAcceptedCommandInfo(const ConcreteCommandPath & path)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->GetAcceptedCommandInfo(path);
-}
-
-ConcreteCommandPath CustomDataModel::FirstGeneratedCommand(const ConcreteClusterPath & cluster)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->FirstGeneratedCommand(cluster);
-}
-
-ConcreteCommandPath CustomDataModel::NextGeneratedCommand(const ConcreteCommandPath & before)
-{
-    return CodegenDataModelProviderInstance(nullptr /* delegate */)->NextGeneratedCommand(before);
 }
 
 } // namespace app

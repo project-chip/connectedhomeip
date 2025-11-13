@@ -28,8 +28,7 @@ constexpr uint8_t kRefEndpointId = 1;
 
 using namespace chip;
 using namespace chip::app;
-using namespace Clusters::RefrigeratorAlarm;
-using namespace Clusters::TemperatureControl;
+using namespace chip::app::Clusters;
 using Shell::Engine;
 using Shell::shell_command_t;
 using Shell::streamer_get;
@@ -89,6 +88,33 @@ CHIP_ERROR AlarmHelpHandler(int argc, char ** argv)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR EventRefrigeratorAlarmCommandHandler(int argc, char ** argv)
+{
+    if (argc == 0)
+    {
+        return AlarmHelpHandler(argc, argv);
+    }
+    sShellRefrigeratorEventAlarmDoorSubCommands.ExecCommand(argc, argv);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR RefrigeratorAlarmSuppressHandler(int argc, char ** argv)
+{
+    if (argc != 0)
+    {
+        ChipLogError(Shell, "Invalid arguments");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    RefrigeratorAlarmEventData * data = Platform::New<RefrigeratorAlarmEventData>();
+    data->eventState                  = RefrigeratorAlarm::Events::Notify::Fields::kMask;
+    data->doorState                   = static_cast<AlarmBitmap>(0);
+
+    DeviceLayer::PlatformMgr().ScheduleWork(EventWorkerFunction, reinterpret_cast<intptr_t>(data));
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR RefrigeratorDoorEventHandler(int argc, char ** argv)
 {
 
@@ -113,7 +139,7 @@ CHIP_ERROR RefrigeratorDoorEventHandler(int argc, char ** argv)
     int value = std::stoi(argv[0]); // Safe to use now, as we validated the input earlier
 
     RefrigeratorAlarmEventData * data = Platform::New<RefrigeratorAlarmEventData>();
-    data->eventId                     = Events::Notify::Id;
+    data->eventState                  = RefrigeratorAlarm::Events::Notify::Fields::kState;
     data->doorState                   = static_cast<AlarmBitmap>(value);
 
     DeviceLayer::PlatformMgr().ScheduleWork(EventWorkerFunction, reinterpret_cast<intptr_t>(data));
@@ -130,7 +156,8 @@ CHIP_ERROR RegisterRefrigeratorEvents()
 {
     static const shell_command_t sRefrigeratorSubCommands[] = {
         { &RefrigeratorHelpHandler, "help", "Usage: refrigeratoralarm <subcommand>" },
-        { &EventRefrigeratorCommandHandler, "event", " Usage: refrigeratoralarm event <subcommand>" }
+        { &EventRefrigeratorCommandHandler, "event", " Usage: refrigeratoralarm event <subcommand>" },
+        { &EventRefrigeratorAlarmCommandHandler, "alarm", "Usage: refrigeratoralarm alarm <subcommand>" }
     };
 
     static const shell_command_t sRefrigeratorEventSubCommands[] = {
@@ -139,16 +166,18 @@ CHIP_ERROR RegisterRefrigeratorEvents()
     };
 
     static const shell_command_t sRefrigeratorEventAlarmDoorSubCommands[] = {
-        { &AlarmHelpHandler, "help", "Usage : Refrigerator event to change door state" }
+        { &AlarmHelpHandler, "help", "Usage : refrigeratoralarm alarm <subcommand>" },
+        { &RefrigeratorAlarmSuppressHandler, "suppress", "Suppress the refrigerator alarm" }
     };
 
     static const shell_command_t sRefrigeratorCommand = { &RefrigeratorCommandHandler, "refrigeratoralarm",
                                                           "refrigerator alarm commands. Usage: refrigeratoralarm <subcommand>" };
 
     sShellRefrigeratorEventAlarmDoorSubCommands.RegisterCommands(sRefrigeratorEventAlarmDoorSubCommands,
-                                                                 ArraySize(sRefrigeratorEventAlarmDoorSubCommands));
-    sShellRefrigeratorEventSubCommands.RegisterCommands(sRefrigeratorEventSubCommands, ArraySize(sRefrigeratorEventSubCommands));
-    sShellRefrigeratorSubCommands.RegisterCommands(sRefrigeratorSubCommands, ArraySize(sRefrigeratorSubCommands));
+                                                                 MATTER_ARRAY_SIZE(sRefrigeratorEventAlarmDoorSubCommands));
+    sShellRefrigeratorEventSubCommands.RegisterCommands(sRefrigeratorEventSubCommands,
+                                                        MATTER_ARRAY_SIZE(sRefrigeratorEventSubCommands));
+    sShellRefrigeratorSubCommands.RegisterCommands(sRefrigeratorSubCommands, MATTER_ARRAY_SIZE(sRefrigeratorSubCommands));
 
     Engine::Root().RegisterCommands(&sRefrigeratorCommand, 1);
 
@@ -160,9 +189,15 @@ void EventWorkerFunction(intptr_t context)
     VerifyOrReturn(reinterpret_cast<void *>(context) != nullptr, ChipLogError(Shell, "EventWorkerFunction - Invalid work data"));
     EventData * data = reinterpret_cast<EventData *>(context);
 
-    switch (data->eventId)
+    switch (data->eventState)
     {
-    case Events::Notify::Id: {
+    case RefrigeratorAlarm::Events::Notify::Fields::kMask: {
+        RefrigeratorAlarmEventData * alarmData = reinterpret_cast<RefrigeratorAlarmEventData *>(context);
+        RefrigeratorAlarmServer::Instance().SetMaskValue(kRefEndpointId, alarmData->doorState);
+        break;
+    }
+
+    case RefrigeratorAlarm::Events::Notify::Fields::kState: {
         RefrigeratorAlarmEventData * alarmData = reinterpret_cast<RefrigeratorAlarmEventData *>(context);
         RefrigeratorAlarmServer::Instance().SetStateValue(kRefEndpointId, alarmData->doorState);
         break;

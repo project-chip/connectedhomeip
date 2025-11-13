@@ -40,13 +40,23 @@
 #include <zephyr/bluetooth/addr.h>
 #include <zephyr/bluetooth/gatt.h>
 #include <zephyr/drivers/flash.h>
+#if defined(CONFIG_ZEPHYR_VERSION_3_3)
 #include <zephyr/random/rand32.h>
+#else
+#include <zephyr/random/random.h>
+#endif
 #include <zephyr/storage/flash_map.h>
 #include <zephyr/sys/byteorder.h>
 #include <zephyr/sys/util.h>
 
 extern "C" {
+#if defined(CONFIG_BT_B9X)
+extern __attribute__((noinline)) int b9x_bt_blc_mac_init(uint8_t * bt_mac);
+#elif defined(CONFIG_BT_TLX)
+extern __attribute__((noinline)) int tlx_bt_blc_mac_init(uint8_t * bt_mac);
+#elif defined(CONFIG_BT_W91)
 extern __attribute__((noinline)) void telink_bt_blc_mac_init(uint8_t * bt_mac);
+#endif
 }
 
 #if defined(CONFIG_PM) && !defined(CONFIG_CHIP_ENABLE_PM_DURING_BLE)
@@ -117,7 +127,13 @@ CHIP_ERROR InitBLEMACAddress()
     int error = 0;
     bt_addr_le_t addr;
 
+#if defined(CONFIG_BT_B9X)
+    b9x_bt_blc_mac_init(addr.a.val);
+#elif defined(CONFIG_BT_TLX)
+    tlx_bt_blc_mac_init(addr.a.val);
+#elif defined(CONFIG_BT_W91)
     telink_bt_blc_mac_init(addr.a.val);
+#endif
 
     if (BT_ADDR_IS_STATIC(&addr.a)) // in case of Random static address, create a new id
     {
@@ -144,6 +160,7 @@ BLEManagerImpl BLEManagerImpl::sInstance;
 CHIP_ERROR BLEManagerImpl::_Init(void)
 {
     mBLERadioInitialized  = false;
+    mReadyToAttachThread  = false;
     mconId                = NULL;
     mInternalScanCallback = new InternalScanCallback(this);
 
@@ -491,9 +508,12 @@ CHIP_ERROR BLEManagerImpl::HandleGAPConnect(const ChipDeviceEvent * event)
 CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(const ChipDeviceEvent * event)
 {
     const BleConnEventType * connEvent = &event->Platform.BleConnEvent;
+    const uint8_t hciResult            = connEvent->HciResult;
 
-    ChipLogProgress(DeviceLayer, "BLE GAP connection terminated (reason 0x%02x)", connEvent->HciResult);
+    ChipLogProgress(DeviceLayer, "BLE GAP connection terminated (reason 0x%02x)", hciResult);
 
+    mNeedToResetFailSafeTimer = !ConfigurationMgr().IsFullyProvisioned() &&
+        (hciResult == BT_HCI_ERR_REMOTE_USER_TERM_CONN || hciResult == BT_HCI_ERR_CONN_TIMEOUT);
     mGAPConns--;
 
     // If indications were enabled for this connection, record that they are now disabled and
@@ -501,7 +521,7 @@ CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(const ChipDeviceEvent * event)
     if (UnsetSubscribed(connEvent->BtConn))
     {
         CHIP_ERROR disconReason;
-        switch (connEvent->HciResult)
+        switch (hciResult)
         {
         case BT_HCI_ERR_REMOTE_USER_TERM_CONN:
             // Do not treat proper connection termination as an error and exit.
@@ -663,13 +683,13 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         err = HandleTXCharComplete(event);
         break;
 
+    case DeviceEventType::kCHIPoBLEConnectionClosed:
+        err = HandleBleConnectionClosed(event);
+        break;
+
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     case DeviceEventType::kThreadStateChange:
         err = HandleThreadStateChange(event);
-        break;
-
-    case DeviceEventType::kCHIPoBLEConnectionClosed:
-        err = HandleBleConnectionClosed(event);
         break;
 
     case DeviceEventType::kOperationalNetworkEnabled:
@@ -900,18 +920,60 @@ ssize_t BLEManagerImpl::HandleC3Read(struct bt_conn * conId, const struct bt_gat
 }
 #endif
 
+CHIP_ERROR BLEManagerImpl::HandleBleConnectionClosed(const ChipDeviceEvent * event)
+{
+    // Deinit BLE
+    bt_disable();
+    mBLERadioInitialized = false;
+
+#if defined(CONFIG_PM) && !defined(CONFIG_CHIP_ENABLE_PM_DURING_BLE)
+    pm_policy_state_lock_put(PM_STATE_SUSPEND_TO_IDLE, PM_ALL_SUBSTATES);
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    if (ThreadStackMgrImpl().IsReadyToAttach())
+    {
+        SwitchToIeee802154();
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+
+    return CHIP_NO_ERROR;
+}
+
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 CHIP_ERROR BLEManagerImpl::HandleOperationalNetworkEnabled(const ChipDeviceEvent * event)
 {
     ChipLogDetail(DeviceLayer, "HandleOperationalNetworkEnabled");
 
-    int error = bt_conn_disconnect(BLEMgrImpl().mconId, BT_HCI_ERR_LOCALHOST_TERM_CONN);
-    if (error)
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    /* On first commissioning BLE disconnects before switching to Thread operational network.
+       All subsequent Thread operational network changes are handled in a bit different way */
+    if (!mReadyToAttachThread)
     {
-        ChipLogError(DeviceLayer, "Close BLEConn err: %d", error);
+        error = MapErrorZephyr(bt_conn_disconnect(BLEMgrImpl().mconId, BT_HCI_ERR_LOCALHOST_TERM_CONN));
+        if (error != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Close BLEConn err: %" CHIP_ERROR_FORMAT, error.Format());
+        }
+        mReadyToAttachThread = true;
+    }
+    else
+    {
+        ThreadStackMgrImpl().SetThreadEnabled(false);
+        SwitchToIeee802154();
+
+        ChipDeviceEvent attachEvent;
+        attachEvent.Type                            = DeviceEventType::kThreadConnectivityChange;
+        attachEvent.ThreadConnectivityChange.Result = kConnectivity_Established;
+
+        error = PlatformMgr().PostEvent(&attachEvent);
+        VerifyOrExit(error == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "PostEvent err: %" CHIP_ERROR_FORMAT, error.Format()));
+
+        ThreadStackMgrImpl().CommitConfiguration();
     }
 
-    return MapErrorZephyr(error);
+exit:
+    return error;
 }
 
 CHIP_ERROR BLEManagerImpl::HandleThreadStateChange(const ChipDeviceEvent * event)
@@ -934,27 +996,9 @@ exit:
     return error;
 }
 
-CHIP_ERROR BLEManagerImpl::HandleBleConnectionClosed(const ChipDeviceEvent * event)
-{
-    if (ThreadStackMgrImpl().IsReadyToAttach())
-    {
-        SwitchToIeee802154();
-    }
-
-    return CHIP_NO_ERROR;
-}
-
 void BLEManagerImpl::SwitchToIeee802154(void)
 {
     ChipLogProgress(DeviceLayer, "Switch context from BLE to Thread");
-
-    // Deinit BLE
-    bt_disable();
-    mBLERadioInitialized = false;
-
-#if defined(CONFIG_PM) && !defined(CONFIG_CHIP_ENABLE_PM_DURING_BLE)
-    pm_policy_state_lock_put(PM_STATE_SUSPEND_TO_IDLE, PM_ALL_SUBSTATES);
-#endif
 
     // Init Thread
     ThreadStackMgrImpl().SetRadioBlocked(false);
@@ -965,5 +1009,13 @@ void BLEManagerImpl::SwitchToIeee802154(void)
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
+
+#if !defined(CONFIG_ZEPHYR_VERSION_3_3)
+// Implementation for Zephyr Bluetooth host.
+int bt_rand(void * buf, size_t len)
+{
+    return sys_csrand_get(buf, len);
+}
+#endif
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

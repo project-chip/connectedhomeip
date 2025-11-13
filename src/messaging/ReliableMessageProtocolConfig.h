@@ -191,8 +191,9 @@ inline constexpr System::Clock::Milliseconds32 kDefaultActiveTime = System::Cloc
  */
 struct ReliableMessageProtocolConfig
 {
-    ReliableMessageProtocolConfig(System::Clock::Milliseconds32 idleInterval, System::Clock::Milliseconds32 activeInterval,
-                                  System::Clock::Milliseconds16 activeThreshold = kDefaultActiveTime) :
+    constexpr ReliableMessageProtocolConfig(System::Clock::Milliseconds32 idleInterval,
+                                            System::Clock::Milliseconds32 activeInterval,
+                                            System::Clock::Milliseconds16 activeThreshold = kDefaultActiveTime) :
         mIdleRetransTimeout(idleInterval),
         mActiveRetransTimeout(activeInterval), mActiveThresholdTime(activeThreshold)
     {}
@@ -257,11 +258,12 @@ Optional<ReliableMessageProtocolConfig> GetLocalMRPConfig();
  * @param[in] idleInterval      The idle interval to use for the backoff calculation.
  * @param[in] lastActivityTime  The last time some activity has been recorded.
  * @param[in] activityThreshold The activity threshold for a node to be considered active.
- *
+ * @param[in] isFirstMessageOnExchange Indicates whether this is for the initial message on an exchange.
  * @return The maximum transmission time
  */
 System::Clock::Timeout GetRetransmissionTimeout(System::Clock::Timeout activeInterval, System::Clock::Timeout idleInterval,
-                                                System::Clock::Timeout lastActivityTime, System::Clock::Timeout activityThreshold);
+                                                System::Clock::Timeout lastActivityTime, System::Clock::Timeout activityThreshold,
+                                                bool isFirstMessageOnExchange);
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
 

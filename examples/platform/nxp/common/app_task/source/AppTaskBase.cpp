@@ -26,11 +26,12 @@
 #include <app/server/Dnssd.h>
 #include <lib/dnssd/Advertiser.h>
 
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/Instance.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #include <app/clusters/network-commissioning/network-commissioning.h>
+#include <platform/DefaultTimerDelegate.h>
 
 #include <platform/CommissionableDataProvider.h>
 
@@ -56,6 +57,11 @@
 #if CONFIG_NET_L2_OPENTHREAD
 #include <inet/EndPointStateOpenThread.h>
 #include <lib/support/ThreadOperationalDataset.h>
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#include "BLEApplicationManager.h"
 #endif
 
 #if CONFIG_CHIP_APP_WIFI_CONNECT_AT_BOOT
@@ -109,6 +115,10 @@
 #define CONFIG_THREAD_DEVICE_TYPE kThreadDeviceType_Router
 #endif
 
+#if CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED
+#include <app/reporting/SynchronizedReportSchedulerImpl.h>
+#endif
+
 using namespace chip;
 using namespace chip::TLV;
 using namespace ::chip::Credentials;
@@ -120,6 +130,11 @@ using namespace ::chip::app::Clusters;
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #endif
 
+#if CONFIG_NET_L2_OPENTHREAD
+app::Clusters::NetworkCommissioning::InstanceAndDriver<DeviceLayer::NetworkCommissioning::GenericThreadDriver>
+    sThreadNetworkDriver(CHIP_DEVICE_CONFIG_THREAD_NETWORK_ENDPOINT_ID /*endpointId*/);
+#endif
+
 #if CONFIG_CHIP_WIFI || CHIP_DEVICE_CONFIG_ENABLE_WPA
 app::Clusters::NetworkCommissioning::Instance sNetworkCommissioningInstance(0,
                                                                             chip::NXP::App::GetAppTask().GetWifiDriverInstance());
@@ -129,8 +144,7 @@ app::Clusters::NetworkCommissioning::Instance
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_TBR
-static constexpr EndpointId kThreadBRMgmtEndpoint = 2;
-static CharSpan sBrName("NXP-BR", strlen("NXP-BR"));
+extern char baseServiceInstanceName[];
 #endif
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER || (CONFIG_CHIP_TEST_EVENT && CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
@@ -162,6 +176,13 @@ void UnlockOpenThreadTask(void)
 void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
 {
     GetAppTask().PreInitMatterServerInstance();
+
+#if CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED
+    // Report scheduler and timer delegate instance
+    static chip::app::DefaultTimerDelegate sTimerDelegate;
+    static chip::app::reporting::SynchronizedReportSchedulerImpl sReportScheduler(&sTimerDelegate);
+    initParams.reportScheduler = &sReportScheduler;
+#endif
 
 #if CONFIG_CHIP_TEST_EVENT && CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     static OTATestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
@@ -220,10 +241,6 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
 
 #if CONFIG_CHIP_APP_WIFI_CONNECT_AT_BOOT
     VerifyOrDie(WifiConnectAtboot(chip::NXP::App::GetAppTask().GetWifiDriverInstance()) == CHIP_NO_ERROR);
-#endif
-
-#if CHIP_DEVICE_CONFIG_ENABLE_TBR
-    GetAppTask().EnableTbrManagementCluster();
 #endif
 }
 
@@ -289,6 +306,7 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
         ChipLogError(DeviceLayer, "Error during ThreadStackMgr().InitThreadStack()");
         return err;
     }
+    sThreadNetworkDriver.Init();
 
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::CONFIG_THREAD_DEVICE_TYPE);
     if (err != CHIP_NO_ERROR)
@@ -429,6 +447,11 @@ void chip::NXP::App::AppTaskBase::SwitchCommissioningStateHandler(void)
 
 void chip::NXP::App::AppTaskBase::FactoryResetHandler(void)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+    /* Trigger factory reset for BLEApplicationManager */
+    chip::NXP::App::BleAppMgr().FactoryReset();
+#endif
+
     /* Emit the ShutDown event before factory reset */
     chip::Server::GetInstance().GenerateShutDownEvent();
     chip::Server::GetInstance().ScheduleFactoryReset();
@@ -485,15 +508,20 @@ void chip::NXP::App::AppTaskBase::PrintCurrentVersion()
 #if CHIP_DEVICE_CONFIG_ENABLE_TBR
 void chip::NXP::App::AppTaskBase::EnableTbrManagementCluster()
 {
-    auto * persistentStorage = &Server::GetInstance().GetPersistentStorage();
+    if (mTbrmClusterEnabled == false)
+    {
+        mTbrmClusterEnabled      = true;
+        auto * persistentStorage = &Server::GetInstance().GetPersistentStorage();
 
-    static ThreadBorderRouterManagement::GenericOpenThreadBorderRouterDelegate sThreadBRDelegate(persistentStorage);
-    static ThreadBorderRouterManagement::ServerInstance sThreadBRMgmtInstance(kThreadBRMgmtEndpoint, &sThreadBRDelegate,
-                                                                              Server::GetInstance().GetFailSafeContext());
+        static ThreadBorderRouterManagement::GenericOpenThreadBorderRouterDelegate sThreadBRDelegate(persistentStorage);
+        static ThreadBorderRouterManagement::ServerInstance sThreadBRMgmtInstance(kThreadBRMgmtEndpoint, &sThreadBRDelegate,
+                                                                                  Server::GetInstance().GetFailSafeContext());
 
-    // Initialize TBR name
-    sThreadBRDelegate.SetThreadBorderRouterName(sBrName);
-    // Initialize TBR cluster
-    sThreadBRMgmtInstance.Init();
+        // Initialize TBR name
+        CharSpan brName(baseServiceInstanceName, strlen(baseServiceInstanceName));
+        sThreadBRDelegate.SetThreadBorderRouterName(brName);
+        // Initialize TBR cluster
+        sThreadBRMgmtInstance.Init();
+    }
 }
 #endif

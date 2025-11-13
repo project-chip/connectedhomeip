@@ -46,6 +46,7 @@
 #include <lib/support/TimeUtils.h>
 #include <lib/support/UnitTestUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -321,14 +322,14 @@ public:
         path.mEndpointId  = kTestEndpointId5;
         path.mClusterId   = Clusters::UnitTesting::Id;
         path.mAttributeId = attr;
-        app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
+        EXPECT_SUCCESS(app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path));
     }
 
     // These setters
     void SetVal(uint8_t attribute, uint8_t newVal)
     {
         uint8_t index = static_cast<uint8_t>(attribute - 1);
-        if (index < ArraySize(val) && val[index] != newVal)
+        if (index < MATTER_ARRAY_SIZE(val) && val[index] != newVal)
         {
             val[index] = newVal;
             SetDirty(attribute);
@@ -343,7 +344,7 @@ public:
 CHIP_ERROR TestMutableAttrAccess::Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder)
 {
     uint8_t index = static_cast<uint8_t>(aPath.mAttributeId - 1);
-    VerifyOrReturnError(aPath.mEndpointId == kTestEndpointId5 && index < ArraySize(val), CHIP_ERROR_NOT_FOUND);
+    VerifyOrReturnError(aPath.mEndpointId == kTestEndpointId5 && index < MATTER_ARRAY_SIZE(val), CHIP_ERROR_NOT_FOUND);
     return aEncoder.Encode(val[index]);
 }
 
@@ -486,8 +487,8 @@ TEST_F(TestReadChunking, TestChunking)
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
-    DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
+    DataVersion dataVersionStorage[MATTER_ARRAY_SIZE(testEndpointClusters)];
+    EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage)));
 
     app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::UnitTesting::Id);
     app::ReadPrepareParams readParams(sessionHandle);
@@ -521,7 +522,7 @@ TEST_F(TestReadChunking, TestChunking)
         //
         // Always returns the same number of attributes read (5 + revision + GlobalAttributesNotInMetadata).
         //
-        EXPECT_EQ(readCallback.mAttributeCount, 6 + ArraySize(GlobalAttributesNotInMetadata));
+        EXPECT_EQ(readCallback.mAttributeCount, 6 + MATTER_ARRAY_SIZE(GlobalAttributesNotInMetadata));
         readCallback.mAttributeCount = 0;
 
         EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
@@ -549,8 +550,8 @@ TEST_F(TestReadChunking, TestListChunking)
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
-    DataVersion dataVersionStorage[ArraySize(testEndpoint3Clusters)];
-    emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, Span<DataVersion>(dataVersionStorage));
+    DataVersion dataVersionStorage[MATTER_ARRAY_SIZE(testEndpoint3Clusters)];
+    EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, Span<DataVersion>(dataVersionStorage)));
 
     app::AttributePathParams attributePath(kTestEndpointId3, app::Clusters::UnitTesting::Id, kTestListAttribute);
     app::ReadPrepareParams readParams(sessionHandle);
@@ -562,7 +563,7 @@ TEST_F(TestReadChunking, TestListChunking)
     AttributePathParams pathList[] = { attributePath, attributePath };
 
     readParams.mpAttributePathParamsList    = pathList;
-    readParams.mAttributePathParamsListSize = ArraySize(pathList);
+    readParams.mAttributePathParamsListSize = MATTER_ARRAY_SIZE(pathList);
 
     constexpr size_t maxPacketSize = kMaxSecureSduLengthBytes;
     bool gotSuccessfulEncode       = false;
@@ -653,8 +654,8 @@ TEST_F(TestReadChunking, TestBadChunking)
     app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetWriterReserved(0);
 
     // Register our fake dynamic endpoint.
-    DataVersion dataVersionStorage[ArraySize(testEndpoint3Clusters)];
-    emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, Span<DataVersion>(dataVersionStorage));
+    DataVersion dataVersionStorage[MATTER_ARRAY_SIZE(testEndpoint3Clusters)];
+    EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, Span<DataVersion>(dataVersionStorage)));
 
     app::AttributePathParams attributePath(kTestEndpointId3, app::Clusters::UnitTesting::Id, kTestBadAttribute);
     app::ReadPrepareParams readParams(sessionHandle);
@@ -703,7 +704,7 @@ TEST_F(TestReadChunking, TestDynamicEndpoint)
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
-    DataVersion dataVersionStorage[ArraySize(testEndpoint4Clusters)];
+    DataVersion dataVersionStorage[MATTER_ARRAY_SIZE(testEndpoint4Clusters)];
 
     app::AttributePathParams attributePath;
     app::ReadPrepareParams readParams(sessionHandle);
@@ -719,7 +720,7 @@ TEST_F(TestReadChunking, TestDynamicEndpoint)
         app::ReadClient readClient(engine, &GetExchangeManager(), readCallback.mBufferedCallback,
                                    app::ReadClient::InteractionType::Subscribe);
         // Enable the new endpoint
-        emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
+        EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage)));
 
         EXPECT_EQ(readClient.SendRequest(readParams), CHIP_NO_ERROR);
 
@@ -728,13 +729,14 @@ TEST_F(TestReadChunking, TestDynamicEndpoint)
         EXPECT_TRUE(readCallback.mOnSubscriptionEstablished);
         readCallback.mAttributeCount = 0;
 
-        emberAfSetDynamicEndpoint(0, kTestEndpointId4, &testEndpoint4, Span<DataVersion>(dataVersionStorage));
+        EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId4, &testEndpoint4, Span<DataVersion>(dataVersionStorage)));
 
         DrainAndServiceIO();
 
         // Ensure we have received the report, we do not care about the initial report here.
         // GlobalAttributesNotInMetadata attributes are not included in testClusterAttrsOnEndpoint4.
-        EXPECT_EQ(readCallback.mAttributeCount, ArraySize(testClusterAttrsOnEndpoint4) + ArraySize(GlobalAttributesNotInMetadata));
+        EXPECT_EQ(readCallback.mAttributeCount,
+                  MATTER_ARRAY_SIZE(testClusterAttrsOnEndpoint4) + MATTER_ARRAY_SIZE(GlobalAttributesNotInMetadata));
 
         // We have received all report data.
         EXPECT_TRUE(readCallback.mOnReportEnd);
@@ -759,7 +761,8 @@ TEST_F(TestReadChunking, TestDynamicEndpoint)
 
         // Ensure we have received the report, we do not care about the initial report here.
         // GlobalAttributesNotInMetadata attributes are not included in testClusterAttrsOnEndpoint4.
-        EXPECT_EQ(readCallback.mAttributeCount, ArraySize(testClusterAttrsOnEndpoint4) + ArraySize(GlobalAttributesNotInMetadata));
+        EXPECT_EQ(readCallback.mAttributeCount,
+                  MATTER_ARRAY_SIZE(testClusterAttrsOnEndpoint4) + MATTER_ARRAY_SIZE(GlobalAttributesNotInMetadata));
 
         // We have received all report data.
         EXPECT_TRUE(readCallback.mOnReportEnd);
@@ -802,7 +805,7 @@ auto TouchAttrOp(AttributeIdWithEndpointId attr)
         path.mClusterId   = Clusters::UnitTesting::Id;
         path.mAttributeId = attr.second;
         gIterationCount++;
-        app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
+        EXPECT_SUCCESS(app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path));
     };
 }
 
@@ -899,14 +902,14 @@ TEST_F(TestReadChunking, TestSetDirtyBetweenChunks)
     app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetWriterReserved(0);
     app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetMaxAttributesPerChunk(2);
 
-    DataVersion dataVersionStorage1[ArraySize(testEndpointClusters)];
-    DataVersion dataVersionStorage5[ArraySize(testEndpoint5Clusters)];
+    DataVersion dataVersionStorage1[MATTER_ARRAY_SIZE(testEndpointClusters)];
+    DataVersion dataVersionStorage5[MATTER_ARRAY_SIZE(testEndpoint5Clusters)];
 
     gMutableAttrAccess.Reset();
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage1));
-    emberAfSetDynamicEndpoint(1, kTestEndpointId5, &testEndpoint5, Span<DataVersion>(dataVersionStorage5));
+    EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage1)));
+    EXPECT_SUCCESS(emberAfSetDynamicEndpoint(1, kTestEndpointId5, &testEndpoint5, Span<DataVersion>(dataVersionStorage5)));
 
     {
         app::AttributePathParams attributePath;

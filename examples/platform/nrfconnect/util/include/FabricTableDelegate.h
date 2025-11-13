@@ -47,7 +47,19 @@ public:
 private:
     void OnFabricRemoved(const chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex)
     {
-        k_timer_start(&sFabricRemovedTimer, K_MSEC(CONFIG_CHIP_LAST_FABRIC_REMOVED_ACTION_DELAY), K_NO_WAIT);
+#ifndef CONFIG_CHIP_LAST_FABRIC_REMOVED_NONE
+        auto & server = chip::Server::GetInstance();
+
+        if (server.GetFabricTable().FabricCount() == 0)
+        {
+            if (chip::DeviceLayer::ConnectivityMgr().IsBLEAdvertisingEnabled())
+            {
+                server.GetCommissioningWindowManager().CloseCommissioningWindow();
+            }
+
+            k_timer_start(&sFabricRemovedTimer, K_MSEC(CONFIG_CHIP_LAST_FABRIC_REMOVED_ACTION_DELAY), K_NO_WAIT);
+        }
+#endif // CONFIG_CHIP_LAST_FABRIC_REMOVED_NONE
     }
 
     static void OnFabricRemovedTimerCallback(k_timer * timer)
@@ -59,7 +71,10 @@ private:
 #ifdef CONFIG_CHIP_LAST_FABRIC_REMOVED_ERASE_AND_REBOOT
                 chip::Server::GetInstance().ScheduleFactoryReset();
 #elif defined(CONFIG_CHIP_LAST_FABRIC_REMOVED_ERASE_ONLY) || defined(CONFIG_CHIP_LAST_FABRIC_REMOVED_ERASE_AND_PAIRING_START)
-                // Erase Matter data
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+                chip::DeviceLayer::ThreadStackMgr().ClearAllSrpHostAndServices();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+       // Erase Matter data
                 chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().DoFactoryReset();
                 // Erase Network credentials and disconnect
                 chip::DeviceLayer::ConnectivityMgr().ErasePersistentInfo();

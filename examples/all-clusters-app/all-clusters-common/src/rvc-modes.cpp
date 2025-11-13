@@ -40,7 +40,7 @@ CHIP_ERROR RvcRunModeDelegate::Init()
 
 void RvcRunModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
-    uint8_t currentMode = mInstance->GetCurrentMode();
+    uint8_t currentMode = GetInstance()->GetCurrentMode();
 
     if (!gRvcRunModeInstance->HasFeature(static_cast<ModeBase::Feature>(RvcRunMode::Feature::kDirectModeChange)))
     {
@@ -56,11 +56,13 @@ void RvcRunModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands:
     auto rvcOpStateInstance = RvcOperationalState::GetRvcOperationalStateInstance();
     if (NewMode == RvcRunMode::ModeIdle)
     {
-        rvcOpStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
+        TEMPORARY_RETURN_IGNORED rvcOpStateInstance->SetOperationalState(
+            to_underlying(OperationalState::OperationalStateEnum::kStopped));
     }
     else
     {
-        rvcOpStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
+        TEMPORARY_RETURN_IGNORED rvcOpStateInstance->SetOperationalState(
+            to_underlying(OperationalState::OperationalStateEnum::kRunning));
     }
 
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);
@@ -68,7 +70,7 @@ void RvcRunModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands:
 
 CHIP_ERROR RvcRunModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -77,7 +79,7 @@ CHIP_ERROR RvcRunModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::Muta
 
 CHIP_ERROR RvcRunModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -87,7 +89,7 @@ CHIP_ERROR RvcRunModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t & 
 
 CHIP_ERROR RvcRunModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -129,7 +131,16 @@ void emberAfRvcRunModeClusterInitCallback(chip::EndpointId endpointId)
     gRvcRunModeDelegate = new RvcRunMode::RvcRunModeDelegate;
     gRvcRunModeInstance = new ModeBase::Instance(gRvcRunModeDelegate, 0x1, RvcRunMode::Id,
                                                  chip::to_underlying(RvcRunMode::Feature::kDirectModeChange));
-    gRvcRunModeInstance->Init();
+    TEMPORARY_RETURN_IGNORED gRvcRunModeInstance->Init();
+}
+
+void emberAfRvcRunModeClusterShutdownCallback(chip::EndpointId endpointId)
+{
+    if (gRvcRunModeInstance)
+    {
+        gRvcRunModeInstance->Shutdown();
+    }
+    RvcRunMode::Shutdown();
 }
 
 // RVC Clean
@@ -161,7 +172,7 @@ void RvcCleanModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Command
 
 CHIP_ERROR RvcCleanModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -170,7 +181,7 @@ CHIP_ERROR RvcCleanModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::Mu
 
 CHIP_ERROR RvcCleanModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -180,7 +191,7 @@ CHIP_ERROR RvcCleanModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t 
 
 CHIP_ERROR RvcCleanModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -222,5 +233,14 @@ void emberAfRvcCleanModeClusterInitCallback(chip::EndpointId endpointId)
     gRvcCleanModeDelegate = new RvcCleanMode::RvcCleanModeDelegate;
     gRvcCleanModeInstance = new ModeBase::Instance(gRvcCleanModeDelegate, 0x1, RvcCleanMode::Id,
                                                    chip::to_underlying(RvcCleanMode::Feature::kDirectModeChange));
-    gRvcCleanModeInstance->Init();
+    TEMPORARY_RETURN_IGNORED gRvcCleanModeInstance->Init();
+}
+
+void emberAfRvcCleanModeClusterShutdownCallback(chip::EndpointId endpointId)
+{
+    if (gRvcCleanModeInstance)
+    {
+        gRvcCleanModeInstance->Shutdown();
+    }
+    RvcCleanMode::Shutdown();
 }

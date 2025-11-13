@@ -45,7 +45,7 @@ constexpr EmberAfAttributeMetadata DefaultAttributeMetadata(chip::AttributeId id
         .attributeId   = id,
         .size          = 4,
         .attributeType = ZCL_INT32U_ATTRIBUTE_TYPE,
-        .mask          = ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_NULLABLE,
+        .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE | MATTER_ATTRIBUTE_FLAG_READABLE | MATTER_ATTRIBUTE_FLAG_NULLABLE,
     };
 }
 
@@ -56,7 +56,8 @@ struct MockAttributeConfig
     MockAttributeConfig(AttributeId aId) : id(aId), attributeMetaData(internal::DefaultAttributeMetadata(aId)) {}
     MockAttributeConfig(AttributeId aId, EmberAfAttributeMetadata metadata) : id(aId), attributeMetaData(metadata) {}
     MockAttributeConfig(AttributeId aId, EmberAfAttributeType type,
-                        EmberAfAttributeMask mask = ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_NULLABLE) :
+                        EmberAfAttributeMask mask = MATTER_ATTRIBUTE_FLAG_WRITABLE | MATTER_ATTRIBUTE_FLAG_READABLE |
+                            MATTER_ATTRIBUTE_FLAG_NULLABLE) :
         id(aId),
         attributeMetaData(internal::DefaultAttributeMetadata(aId))
     {
@@ -112,7 +113,8 @@ struct MockEndpointConfig
     MockEndpointConfig(EndpointId aId, std::initializer_list<MockClusterConfig> aClusters = {},
                        std::initializer_list<EmberAfDeviceType> aDeviceTypes                                    = {},
                        std::initializer_list<app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> aTags = {},
-                       app::EndpointComposition composition = app::EndpointComposition::kFullFamily);
+                       app::EndpointComposition composition = app::EndpointComposition::kFullFamily,
+                       chip::CharSpan aEndpointUniqueID     = chip::CharSpan());
 
     // Endpoint-config is self-referential: mEmberEndpoint.clusters references  mEmberClusters.data()
     MockEndpointConfig(const MockEndpointConfig & other);
@@ -133,6 +135,8 @@ struct MockEndpointConfig
     const EndpointId id;
     const app::EndpointComposition composition;
     const std::vector<MockClusterConfig> clusters;
+    char endpointUniqueIdBuffer[app::Clusters::Descriptor::Attributes::EndpointUniqueID::TypeInfo::MaxLength()] = { 0 };
+    uint8_t endpointUniqueIdSize;
 
 private:
     std::vector<EmberAfCluster> mEmberClusters;

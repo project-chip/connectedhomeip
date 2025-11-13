@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 103,
+  "featureLevel": 107,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -41,14 +41,16 @@
         "code": 22,
         "profileId": 259,
         "label": "MA-rootdevice",
-        "name": "MA-rootdevice"
+        "name": "MA-rootdevice",
+        "deviceTypeOrder": 0
       },
       "deviceTypes": [
         {
           "code": 22,
           "profileId": 259,
           "label": "MA-rootdevice",
-          "name": "MA-rootdevice"
+          "name": "MA-rootdevice",
+          "deviceTypeOrder": 0
         }
       ],
       "deviceVersions": [
@@ -1695,6 +1697,15 @@
           ]
         },
         {
+          "name": "Commodity Price",
+          "code": 149,
+          "mfgCode": null,
+          "define": "COMMODITY_PRICE_CLUSTER",
+          "side": "client",
+          "enabled": 1,
+          "apiMaturity": "provisional"
+        },
+        {
           "name": "Device Energy Management",
           "code": 152,
           "mfgCode": null,
@@ -1815,6 +1826,15 @@
               "isEnabled": 1
             }
           ]
+        },
+        {
+          "name": "Electrical Grid Conditions",
+          "code": 160,
+          "mfgCode": null,
+          "define": "ELECTRICAL_GRID_CONDITIONS_CLUSTER",
+          "side": "client",
+          "enabled": 1,
+          "apiMaturity": "provisional"
         },
         {
           "name": "Door Lock",
@@ -2458,13 +2478,21 @@
           "enabled": 1
         },
         {
+          "name": "Soil Measurement",
+          "code": 1072,
+          "mfgCode": null,
+          "define": "SOIL_MEASUREMENT_CLUSTER",
+          "side": "client",
+          "enabled": 1,
+          "apiMaturity": "provisional"
+        },
+        {
           "name": "Thread Border Router Management",
           "code": 1106,
           "mfgCode": null,
           "define": "THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
-          "apiMaturity": "provisional",
           "commands": [
             {
               "name": "GetActiveDatasetRequest",
@@ -2499,7 +2527,6 @@
           "define": "THREAD_NETWORK_DIRECTORY_CLUSTER",
           "side": "client",
           "enabled": 1,
-          "apiMaturity": "provisional",
           "commands": [
             {
               "name": "AddNetwork",
@@ -2973,6 +3000,321 @@
               "isEnabled": 1
             }
           ]
+        },
+        {
+          "name": "Commodity Tariff",
+          "code": 1792,
+          "mfgCode": null,
+          "define": "COMMODITY_TARIFF_CLUSTER",
+          "side": "client",
+          "enabled": 1,
+          "apiMaturity": "provisional",
+          "commands": [
+            {
+              "name": "GetTariffComponentResponse",
+              "code": 0,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "GetTariffComponent",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "GetDayEntryResponse",
+              "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "GetDayEntry",
+              "code": 1,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            }
+          ]
+        },
+        {
+          "name": "Joint Fabric Datastore",
+          "code": 1874,
+          "mfgCode": null,
+          "define": "JOINT_FABRIC_DATASTORE_CLUSTER",
+          "side": "client",
+          "enabled": 1,
+          "apiMaturity": "provisional",
+          "commands": [
+            {
+              "name": "AddKeySet",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "UpdateKeySet",
+              "code": 1,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "RemoveKeySet",
+              "code": 2,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "AddGroup",
+              "code": 3,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "UpdateGroup",
+              "code": 4,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "RemoveGroup",
+              "code": 5,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "AddAdmin",
+              "code": 6,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "UpdateAdmin",
+              "code": 7,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "RemoveAdmin",
+              "code": 8,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "AddPendingNode",
+              "code": 9,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "RefreshNode",
+              "code": 10,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "UpdateNode",
+              "code": 11,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "RemoveNode",
+              "code": 12,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "UpdateEndpointForNode",
+              "code": 13,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "AddGroupIDToEndpointForNode",
+              "code": 14,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "RemoveGroupIDFromEndpointForNode",
+              "code": 15,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "AddBindingToEndpointForNode",
+              "code": 16,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "RemoveBindingFromEndpointForNode",
+              "code": 17,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "AddACLToNode",
+              "code": 18,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "RemoveACLFromNode",
+              "code": 19,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            }
+          ]
+        },
+        {
+          "name": "Joint Fabric Administrator",
+          "code": 1875,
+          "mfgCode": null,
+          "define": "JOINT_FABRIC_ADMINISTRATOR_CLUSTER",
+          "side": "client",
+          "enabled": 1,
+          "apiMaturity": "provisional",
+          "commands": [
+            {
+              "name": "ICACCSRRequest",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "ICACCSRResponse",
+              "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "AddICAC",
+              "code": 2,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "ICACResponse",
+              "code": 3,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "OpenJointCommissioningWindow",
+              "code": 4,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "TransferAnchorRequest",
+              "code": 5,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "TransferAnchorResponse",
+              "code": 6,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "TransferAnchorComplete",
+              "code": 7,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "AnnounceJointFabricAdministrator",
+              "code": 8,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            }
+          ]
+        },
+        {
+          "name": "Meter Identification",
+          "code": 2822,
+          "mfgCode": null,
+          "define": "METER_IDENTIFICATION_CLUSTER",
+          "side": "client",
+          "enabled": 1,
+          "apiMaturity": "provisional"
+        },
+        {
+          "name": "Commodity Metering",
+          "code": 2823,
+          "mfgCode": null,
+          "define": "COMMODITY_METERING_CLUSTER",
+          "side": "client",
+          "enabled": 1,
+          "apiMaturity": "provisional"
         },
         {
           "name": "Unit Testing",

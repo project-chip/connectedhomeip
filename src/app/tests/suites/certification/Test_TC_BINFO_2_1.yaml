@@ -89,7 +89,7 @@ tests:
       command: "readAttribute"
       attribute: "DataModelRevision"
       response:
-          value: 18
+          value: 19
           saveAs: DataModelRevisionValue
           constraints:
               type: int16u
@@ -715,16 +715,16 @@ tests:
       response:
           value: ProductAppearancevalue
 
+    # This list should be expanded as we expand the TH to support more specification revisions
     - label:
-          "Step 62: SpecificationVersion value should in the inclusive range of
-          (0x01040000 to 0x0104FF00) and the lower 8 bits are set to zero."
+          "Step 62: SpecificationVersion value should be set to a valid Major,
+          Minor, and Dot version with the lower 8 bits set to zero."
       command: "readAttribute"
       attribute: "SpecificationVersion"
       response:
           saveAs: SpecificationVersionValue
           constraints:
-              minValue: 0x01040000
-              maxValue: 0x0104FF00
+              anyOf: [0x01040000, 0x01040100, 0x01040200, 0x01050000]
               hasMasksClear: [0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80]
 
     - label:
@@ -770,3 +770,29 @@ tests:
       attribute: "MaxPathsPerInvoke"
       response:
           value: MaxPathsPerInvokeValue
+
+    - label: "Step 68: TH reads ConfigurationVersion from the DUT."
+      PICS: BINFO.S.A0018
+      command: "readAttribute"
+      attribute: "ConfigurationVersion"
+      response:
+          saveAs: ConfigurationVersionValue
+          constraints:
+              type: int32u
+              minValue: 1
+
+    - label: "Step 69: TH writes ConfigurationVersion as '0x1124' "
+      PICS: BINFO.S.A0018
+      command: "writeAttribute"
+      attribute: "ConfigurationVersion"
+      arguments:
+          value: 4388
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 70: TH reads ConfigurationVersion from the DUT."
+      PICS: BINFO.S.A0018
+      command: "readAttribute"
+      attribute: "ConfigurationVersion"
+      response:
+          value: ConfigurationVersionValue

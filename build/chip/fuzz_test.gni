@@ -117,6 +117,13 @@ template("chip_pw_fuzz_target") {
       #   "MAKE_BUILD_TYPE=RelWithDebug",
       #  ]
 
+      if (!defined(configs)) {
+        configs = []
+      }
+      if (use_coverage) {
+        configs += [ "${build_root}/config/compiler:coverage" ]
+      }
+
       sources = invoker.test_source
       output_dir = _test_output_dir
 

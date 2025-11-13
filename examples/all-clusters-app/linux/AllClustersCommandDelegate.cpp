@@ -20,15 +20,16 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/EventLogging.h>
-#include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
+#include <app/clusters/general-diagnostics-server/CodegenIntegration.h>
 #include <app/clusters/occupancy-sensor-server/occupancy-sensor-server.h>
+#include <app/clusters/refrigerator-alarm-server/refrigerator-alarm-server.h>
 #include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
-#include <app/clusters/software-diagnostics-server/software-diagnostics-server.h>
+#include <app/clusters/software-diagnostics-server/software-fault-listener.h>
 #include <app/clusters/switch-server/switch-server.h>
 #include <app/server/Server.h>
-#include <app/util/att-storage.h>
 #include <app/util/attribute-storage.h>
 #include <platform/PlatformManager.h>
+#include <soil-measurement-stub.h>
 
 #include "ButtonEventsSimulator.h"
 #include <air-quality-instance.h>
@@ -286,6 +287,47 @@ void HandleSimulateLatchPosition(Json::Value & jsonValue)
 }
 
 /**
+ * Named pipe handler for simulating a Door Opening.
+ *
+ * Usage example:
+ *   echo '{"Name":"SetRefrigeratorDoorStatus", "EndpointId": 1, "DoorOpen": 1}' > /tmp/chip_all_clusters_fifo_1146610
+ *
+ * JSON Arguments:
+ *   - "Name": Must be "SetRefrigeratorDoorStatus"
+ *   - "EndpointId": ID of endpoint
+ *   - "DoorOpen": Status of the Door, open or closed.
+ *
+ * @param jsonValue - JSON payload from named pipe
+ */
+void SetRefrigeratorDoorStatusHandler(Json::Value & jsonValue)
+{
+    bool hasEndpointId = HasNumericField(jsonValue, "EndpointId");
+    bool hasDoorStatus = HasNumericField(jsonValue, "DoorOpen");
+
+    if (!hasEndpointId || !hasDoorStatus)
+    {
+        std::string inputJson = jsonValue.toStyledString();
+        ChipLogError(NotSpecified, "Missing or invalid value for one of EndpointId, DoorOpen in %s", inputJson.c_str());
+        return;
+    }
+    // values to update the door status
+    EndpointId endpointId = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
+    bool doorStatus       = static_cast<bool>(jsonValue["DoorOpen"].asBool());
+    ChipLogDetail(NotSpecified, "SetRefrigeratorDoorStatusHandler State -> %d.", doorStatus);
+    if (!doorStatus)
+    {
+        RefrigeratorAlarmServer::Instance().SetMaskValue(endpointId, doorStatus);
+        ChipLogDetail(NotSpecified, "Refrigeratoralarm status updated to :%d", doorStatus);
+    }
+    else
+    {
+        ChipLogDetail(NotSpecified, "Refrigeratoralarm status updated to :%d", doorStatus);
+        RefrigeratorAlarmServer::Instance().SetMaskValue(endpointId, doorStatus);
+        RefrigeratorAlarmServer::Instance().SetStateValue(endpointId, doorStatus);
+    }
+}
+
+/**
  * Named pipe handler for simulating switch is idle
  *
  * Usage example:
@@ -510,9 +552,51 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
             ChipLogError(NotSpecified, "Invalid Occupancy state to set.");
         }
     }
+    else if (name == "SetRefrigeratorDoorStatus")
+    {
+        SetRefrigeratorDoorStatusHandler(self->mJsonValue);
+    }
+    else if (name == "SimulateConfigurationVersionChange")
+    {
+        uint32_t configurationVersion = 0;
+        TEMPORARY_RETURN_IGNORED ConfigurationMgr().GetConfigurationVersion(configurationVersion);
+        configurationVersion++;
+
+        if (ConfigurationMgr().StoreConfigurationVersion(configurationVersion + 1) != CHIP_NO_ERROR)
+        {
+            ChipLogError(NotSpecified, "Failed to store configuration version:%d", configurationVersion);
+        }
+    }
+    else if (name == "SetSimulatedSoilMoisture")
+    {
+        EndpointId endpoint          = static_cast<EndpointId>(self->mJsonValue["EndpointId"].asUInt());
+        Json::Value jsonSoilMoisture = self->mJsonValue["SoilMoistureValue"];
+        DataModel::Nullable<Percent> soilMoistureMeasuredValue;
+
+        if (endpoint != 1)
+        {
+            ChipLogError(NotSpecified, "Invalid EndpointId to set Soil Moisture value.");
+            return;
+        }
+
+        if (jsonSoilMoisture.isNull())
+        {
+            soilMoistureMeasuredValue.SetNull();
+        }
+        else
+        {
+            soilMoistureMeasuredValue.SetNonNull(static_cast<uint8_t>(self->mJsonValue["SoilMoistureValue"].asUInt()));
+        }
+
+        self->OnSoilMoistureChange(endpoint, soilMoistureMeasuredValue);
+    }
+    else if (name == "UserIntentCommissioningStart")
+    {
+        TEMPORARY_RETURN_IGNORED Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+    }
     else
     {
-        ChipLogError(NotSpecified, "Unhandled command '%s': this hould never happen", name.c_str());
+        ChipLogError(NotSpecified, "Unhandled command '%s': this should never happen", name.c_str());
         VerifyOrDie(false && "Named pipe command not supported, see log above.");
     }
 
@@ -532,7 +616,8 @@ void AllClustersAppCommandHandler::OnRebootSignalHandler(BootReasonType bootReas
     if (ConfigurationMgr().StoreBootReason(static_cast<uint32_t>(bootReason)) == CHIP_NO_ERROR)
     {
         Server::GetInstance().GenerateShutDownEvent();
-        PlatformMgr().ScheduleWork([](intptr_t) { PlatformMgr().StopEventLoopTask(); });
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(
+            [](intptr_t) { TEMPORARY_RETURN_IGNORED PlatformMgr().StopEventLoopTask(); });
     }
     else
     {
@@ -560,7 +645,7 @@ void AllClustersAppCommandHandler::OnGeneralFaultEventHandler(uint32_t eventId)
         ReturnOnFailure(current.add(to_underlying(HardwareFaultEnum::kSensor)));
         ReturnOnFailure(current.add(to_underlying(HardwareFaultEnum::kPowerSource)));
         ReturnOnFailure(current.add(to_underlying(HardwareFaultEnum::kUserInterfaceFault)));
-        Clusters::GeneralDiagnosticsServer::Instance().OnHardwareFaultsDetect(previous, current);
+        Clusters::GeneralDiagnostics::GlobalNotifyHardwareFaultsDetect(previous, current);
     }
     else if (eventId == Clusters::GeneralDiagnostics::Events::RadioFaultChange::Id)
     {
@@ -575,7 +660,7 @@ void AllClustersAppCommandHandler::OnGeneralFaultEventHandler(uint32_t eventId)
         ReturnOnFailure(current.add(to_underlying(GeneralDiagnostics::RadioFaultEnum::kCellularFault)));
         ReturnOnFailure(current.add(to_underlying(GeneralDiagnostics::RadioFaultEnum::kThreadFault)));
         ReturnOnFailure(current.add(to_underlying(GeneralDiagnostics::RadioFaultEnum::kNFCFault)));
-        Clusters::GeneralDiagnosticsServer::Instance().OnRadioFaultsDetect(previous, current);
+        Clusters::GeneralDiagnostics::GlobalNotifyRadioFaultsDetect(previous, current);
     }
     else if (eventId == Clusters::GeneralDiagnostics::Events::NetworkFaultChange::Id)
     {
@@ -589,7 +674,7 @@ void AllClustersAppCommandHandler::OnGeneralFaultEventHandler(uint32_t eventId)
         ReturnOnFailure(current.add(to_underlying(Clusters::GeneralDiagnostics::NetworkFaultEnum::kHardwareFailure)));
         ReturnOnFailure(current.add(to_underlying(Clusters::GeneralDiagnostics::NetworkFaultEnum::kNetworkJammed)));
         ReturnOnFailure(current.add(to_underlying(Clusters::GeneralDiagnostics::NetworkFaultEnum::kConnectionFailed)));
-        Clusters::GeneralDiagnosticsServer::Instance().OnNetworkFaultsDetect(previous, current);
+        Clusters::GeneralDiagnostics::GlobalNotifyNetworkFaultsDetect(previous, current);
     }
     else
     {
@@ -621,7 +706,7 @@ void AllClustersAppCommandHandler::OnSoftwareFaultEventHandler(uint32_t eventId)
         softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(timeChar), strlen(timeChar)));
     }
 
-    Clusters::SoftwareDiagnosticsServer::Instance().OnSoftwareFaultDetect(softwareFault);
+    Clusters::SoftwareDiagnostics::SoftwareFaultListener::GlobalNotifySoftwareFaultDetect(softwareFault);
 }
 
 void AllClustersAppCommandHandler::OnSwitchLatchedHandler(uint8_t newPosition)
@@ -831,15 +916,18 @@ void AllClustersAppCommandHandler::OnOvenOperationalStateChange(std::string devi
     OperationalState::Instance * operationalStateInstance = OvenCavityOperationalState::GetOperationalStateInstance();
     if (operation == "Start" || operation == "Resume")
     {
-        operationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
+        TEMPORARY_RETURN_IGNORED operationalStateInstance->SetOperationalState(
+            to_underlying(OperationalState::OperationalStateEnum::kRunning));
     }
     else if (operation == "Pause")
     {
-        operationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused));
+        TEMPORARY_RETURN_IGNORED operationalStateInstance->SetOperationalState(
+            to_underlying(OperationalState::OperationalStateEnum::kPaused));
     }
     else if (operation == "Stop")
     {
-        operationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
+        TEMPORARY_RETURN_IGNORED operationalStateInstance->SetOperationalState(
+            to_underlying(OperationalState::OperationalStateEnum::kStopped));
     }
     else if (operation == "OnFault")
     {
@@ -870,6 +958,20 @@ void AllClustersAppCommandHandler::OnAirQualityChange(uint32_t aNewValue)
     {
         ChipLogDetail(NotSpecified, "Invalid value: %u", aNewValue);
     }
+}
+
+void AllClustersAppCommandHandler::OnSoilMoistureChange(EndpointId endpointId, DataModel::Nullable<Percent> soilMoisture)
+{
+    if (soilMoisture.IsNull())
+    {
+        ChipLogDetail(NotSpecified, "Set SoilMoisture value to null");
+    }
+    else
+    {
+        ChipLogDetail(NotSpecified, "Set SoilMoisture value to %u", soilMoisture.Value());
+    }
+
+    TEMPORARY_RETURN_IGNORED SoilMeasurement::SetSoilMoistureMeasuredValue(soilMoisture);
 }
 
 void AllClustersAppCommandHandler::HandleSetOccupancyChange(EndpointId endpointId, uint8_t newOccupancyValue)
@@ -946,5 +1048,6 @@ void AllClustersCommandDelegate::OnEventCommandReceived(const char * json)
         return;
     }
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(AllClustersAppCommandHandler::HandleCommand, reinterpret_cast<intptr_t>(handler));
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(AllClustersAppCommandHandler::HandleCommand,
+                                                                           reinterpret_cast<intptr_t>(handler));
 }

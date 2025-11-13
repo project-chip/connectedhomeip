@@ -53,11 +53,15 @@ Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClus
     mResetConditionCommandSupported(aResetConditionCommandSupported)
 {
     mDelegate->SetInstance(this);
-};
+}
 
 Instance::~Instance()
 {
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    if (mDelegate)
+    {
+        mDelegate->SetInstance(nullptr);
+    }
+    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
@@ -130,7 +134,7 @@ chip::Protocols::InteractionModel::Status Instance::UpdateLastChangedTime(DataMo
     mLastChangedTime        = aNewLastChangedTime;
     if (mLastChangedTime != oldLastchangedTime)
     {
-        chip::app::GetSafeAttributePersistenceProvider()->WriteScalarValue(
+        TEMPORARY_RETURN_IGNORED chip::app::GetSafeAttributePersistenceProvider()->WriteScalarValue(
             ConcreteAttributePath(mEndpointId, mClusterId, Attributes::LastChangedTime::Id), mLastChangedTime);
         MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::LastChangedTime::Id);
     }
@@ -187,13 +191,14 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
 }
 
 // List the commands supported by this instance.
-CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
-                                               CommandHandlerInterface::CommandIdCallback callback, void * context)
+CHIP_ERROR Instance::RetrieveAcceptedCommands(const ConcreteClusterPath & cluster,
+                                              ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    ChipLogDetail(Zcl, "resourcemonitoring: EnumerateAcceptedCommands");
+    ChipLogDetail(Zcl, "resourcemonitoring: RetrieveAcceptedCommands");
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
     if (mResetConditionCommandSupported)
     {
-        callback(ResourceMonitoring::Commands::ResetCondition::Id, context);
+        ReturnErrorOnFailure(builder.Append(ResourceMonitoring::Commands::ResetCondition::kMetadataEntry));
     }
 
     return CHIP_NO_ERROR;
@@ -207,7 +212,7 @@ CHIP_ERROR Instance::ReadReplaceableProductList(AttributeValueEncoder & aEncoder
         ReplacementProductListManager * productListManagerInstance = GetReplacementProductListManagerInstance();
         if (nullptr == productListManagerInstance)
         {
-            aEncoder.EncodeEmptyList();
+            TEMPORARY_RETURN_IGNORED aEncoder.EncodeEmptyList();
             return CHIP_NO_ERROR;
         }
 
@@ -273,7 +278,7 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeVal
     case Attributes::LastChangedTime::Id: {
         DataModel::Nullable<uint32_t> newLastChangedTime;
         ReturnErrorOnFailure(aDecoder.Decode(newLastChangedTime));
-        UpdateLastChangedTime(newLastChangedTime);
+        TEMPORARY_RETURN_IGNORED UpdateLastChangedTime(newLastChangedTime);
         break;
     }
     }

@@ -1,0 +1,106 @@
+// DO NOT EDIT - Generated file
+//
+// Application configuration for {{ cluster_name }} based on EMBER configuration
+{%- if input_name %}
+// from {{input_name}}
+{%- endif %}
+#pragma once
+
+#include <app/util/cluster-config.h>
+#include <clusters/{{cluster_name}}/AttributeIds.h>
+#include <clusters/{{cluster_name}}/CommandIds.h>
+#include <clusters/{{cluster_name}}/Enums.h>
+
+#include <array>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace {{ cluster_name }} {
+namespace StaticApplicationConfig {
+namespace detail {
+{%- for endpoint_config in config.endpoint_configs %}
+{%- if endpoint_config.instance.attributes %}
+inline constexpr AttributeId kEndpoint{{endpoint_config.endpoint_number}}EnabledAttributes[] = {
+  {%- for attr in endpoint_config.instance.attributes | sort(attribute="name") %}
+    Attributes::{{attr.name | upfirst}}::Id,
+  {%- endfor %}
+};
+{%- endif %}
+
+{%- if endpoint_config.instance.commands %}
+
+inline constexpr CommandId kEndpoint{{endpoint_config.endpoint_number}}EnabledCommands[] = {
+  {%- for cmd in endpoint_config.instance.commands  | sort(attribute="name") %}
+    Commands::{{cmd.name | upfirst}}::Id,
+  {%- endfor %}
+};
+{% endif %}
+{%- endfor %}
+} // namespace detail
+
+{% if config.feature_bitmap_type -%}
+using FeatureBitmapType = Feature;
+{%- else -%}
+using FeatureBitmapType = Clusters::StaticApplicationConfig::NoFeatureFlagsDefined;
+{%- endif %}
+
+inline constexpr std::array<Clusters::StaticApplicationConfig::ClusterConfiguration<FeatureBitmapType>, {{config.endpoint_configs | length}}> kFixedClusterConfig = { {
+{%- for endpoint_config in config.endpoint_configs %}
+    {
+        .endpointNumber = {{ endpoint_config.endpoint_number }},
+        .featureMap = BitFlags<FeatureBitmapType> {
+          {%- for feature in endpoint_config.features %}
+            FeatureBitmapType::{{ feature.name }}
+            {%- if not loop.last -%}, {% endif -%}
+            // feature bit {{ "0x%0X" | format(feature.value) }}
+          {%- endfor %}
+        },
+        .enabledAttributes = Span<const AttributeId>(
+        {%- if endpoint_config.instance.attributes -%}
+          detail::kEndpoint{{endpoint_config.endpoint_number}}EnabledAttributes
+        {%- endif -%}
+        ),
+        .enabledCommands = Span<const CommandId>(
+        {%- if endpoint_config.instance.commands -%}
+          detail::kEndpoint{{endpoint_config.endpoint_number}}EnabledCommands
+        {%- endif -%}
+        ),
+    },
+{%- endfor %}
+} };
+
+// If a specific attribute is supported at all across all endpoint static instantiations
+inline constexpr bool IsAttributeEnabledOnSomeEndpoint(AttributeId attributeId) {
+  switch (attributeId) {
+  {%- for attr in all_enabled_attributes%}
+    case Attributes::{{attr | upfirst}}::Id:
+    {%- if loop.last %}
+      return true;
+    {%- endif %}
+  {%- endfor %}
+    default:
+      return false;
+  }
+}
+
+// If a specific command is supported at all across all endpoint static instantiations
+inline constexpr bool IsCommandEnabledOnSomeEndpoint(CommandId commandId) {
+  switch (commandId) {
+  {%- for cmd in all_enabled_commands%}
+    case Commands::{{cmd | upfirst}}::Id:
+    {%- if loop.last %}
+      return true;
+    {%- endif %}
+  {%- endfor %}
+    default:
+      return false;
+  }
+}
+
+} // namespace StaticApplicationConfig
+} // namespace {{ cluster_name }}
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+

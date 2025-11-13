@@ -38,9 +38,10 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_OCC_2_3(MatterBaseTest):
@@ -97,7 +98,8 @@ class TC_OCC_2_3(MatterBaseTest):
         attribute_list = await self.read_occ_attribute_expect_success(attribute=attributes.AttributeList)
         if attributes.HoldTime.attribute_id not in attribute_list:
             logging.info("No HoldTime attribute supports. Terminate this test case")
-            self.skip_all_remaining_steps(4)
+            self.mark_all_remaining_steps_skipped(4)
+            return
         holdtime_dut = await self.read_occ_attribute_expect_success(attribute=attributes.HoldTime)
 
         self.step(4)
@@ -132,7 +134,7 @@ class TC_OCC_2_3(MatterBaseTest):
             holdtime_dut = await self.read_occ_attribute_expect_success(attribute=attributes.HoldTime)
             asserts.assert_equal(occupancy_pir_otou_delay_dut, holdtime_dut,
                                  "PIROccupiedToUnoccupiedDelay has a different value from HoldTime in reverse testing.")
-            # self.skip_all_remaining_steps("7a")
+            # self.mark_all_remaining_steps_skipped("7a")
         else:
             self.skip_step("6a")
             self.skip_step("6b")

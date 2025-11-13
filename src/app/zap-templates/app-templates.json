@@ -41,6 +41,16 @@
             "path": "templates/app/access.zapt",
             "name": "Matter access definitions",
             "output": "access.h"
+        },
+        {
+            "path": "templates/app/codedriven-callback.h.zapt",
+            "name": "Matter code driven cluster init and shutdown callbacks header",
+            "output": "CodeDrivenCallback.h"
+        },
+        {
+            "path": "templates/app/codedriven-init-shutdown.cpp.zapt",
+            "name": "Matter code driven cluster init and shutdown calls",
+            "output": "CodeDrivenInitShutdown.cpp"
         }
     ]
 }

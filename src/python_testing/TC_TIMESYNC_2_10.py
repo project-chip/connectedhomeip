@@ -35,23 +35,19 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import queue
 import time
 import typing
 from datetime import datetime, timedelta, timezone
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError
-from chip.testing.matter_testing import (MatterBaseTest, SimpleEventCallback, async_test_body, default_matter_test_main,
-                                         utc_time_in_matter_epoch)
-from chip.tlv import uint
 from mobly import asserts
 
-
-def get_wait_seconds_from_set_time(set_time_matter_us: int, wait_seconds: int):
-    seconds_passed = int((utc_time_in_matter_epoch() - set_time_matter_us)/1000000)
-    return wait_seconds - seconds_passed
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.interaction_model import InteractionModelError
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from matter.testing.timeoperations import get_wait_seconds_from_set_time, utc_time_in_matter_epoch
+from matter.tlv import uint
 
 
 class TC_TIMESYNC_2_10(MatterBaseTest):
@@ -97,10 +93,9 @@ class TC_TIMESYNC_2_10(MatterBaseTest):
 
         self.print_step(4, "Subscribe to DSTTableEmpy event")
         event = time_cluster.Events.DSTTableEmpty
-        q = queue.Queue()
-        cb = SimpleEventCallback("DSTTableEmpty", event.cluster_id, event.event_id, q)
+        cb = EventSubscriptionHandler(expected_cluster_id=event.cluster_id, expected_event_id=event.event_id)
         urgent = 1
-        subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=[(self.endpoint, event, urgent)], reportInterval=[1, 3])
+        subscription = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=[(self.endpoint, event, urgent)], reportInterval=[1, 3])
         subscription.SetEventUpdateCallback(callback=cb)
 
         self.print_step(5, "Send SetTimeZone command")
@@ -109,10 +104,7 @@ class TC_TIMESYNC_2_10(MatterBaseTest):
         asserts.assert_true(ret.DSTOffsetRequired, "DSTOffsetRequired not set to true")
 
         self.print_step(6, "Wait for DSTTableEmpty event")
-        try:
-            q.get(block=True, timeout=5)
-        except queue.Empty:
-            asserts.fail("Did not receive DSTTableEmpy event")
+        cb.wait_for_event_report(event, 5)
 
         self.print_step(7, "Set DSTOffset to expire in 10 seconds")
         th_utc = utc_time_in_matter_epoch(datetime.now(tz=timezone.utc))
@@ -129,11 +121,7 @@ class TC_TIMESYNC_2_10(MatterBaseTest):
 
         self.print_step(10, "Wait for DSTTableEmpty event")
         timeout = get_wait_seconds_from_set_time(th_utc, 20)
-        try:
-            q.get(block=True, timeout=timeout)
-        except queue.Empty:
-            asserts.fail("Did not receive DSTTableEmpy event")
-            pass
+        cb.wait_for_event_report(event, timeout)
 
         self.print_step(11, "Set time zone back to 0")
         tz = [tz_struct(offset=0, validAt=0)]

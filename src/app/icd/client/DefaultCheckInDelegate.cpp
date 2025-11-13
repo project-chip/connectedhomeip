@@ -35,7 +35,7 @@ CHIP_ERROR DefaultCheckInDelegate::Init(ICDClientStorage * storage, InteractionM
 void DefaultCheckInDelegate::OnCheckInComplete(const ICDClientInfo & clientInfo)
 {
     ChipLogProgress(
-        ICD, "Check In Message processing complete: start_counter=%" PRIu32 " offset=%" PRIu32 " nodeid=" ChipLogFormatScopedNodeId,
+        ICD, "Check In Message processing complete: start_counter=%" PRIu32 " offset=%" PRIu32 " nodeId=" ChipLogFormatScopedNodeId,
         clientInfo.start_icd_counter, clientInfo.offset, ChipLogValueScopedNodeId(clientInfo.peer_node));
 }
 
@@ -66,19 +66,25 @@ RefreshKeySender * DefaultCheckInDelegate::OnKeyRefreshNeeded(ICDClientInfo & cl
 
 void DefaultCheckInDelegate::OnKeyRefreshDone(RefreshKeySender * refreshKeySender, CHIP_ERROR error)
 {
+    if (refreshKeySender == nullptr)
+    {
+        ChipLogError(ICD, "RefreshKeySender is null");
+        return;
+    }
+    auto icdClientInfo = refreshKeySender->GetICDClientInfo();
+    Platform::Delete(refreshKeySender);
+    refreshKeySender = nullptr;
     if (error == CHIP_NO_ERROR)
     {
-        ChipLogProgress(ICD, "Re-registration with new key completed successfully");
+        ChipLogProgress(ICD, "Re-registration with new key completed successfully for peer node " ChipLogFormatScopedNodeId,
+                        ChipLogValueScopedNodeId(icdClientInfo.peer_node));
     }
     else
     {
-        ChipLogError(ICD, "Re-registration with new key failed with error : %" CHIP_ERROR_FORMAT, error.Format());
+        ChipLogError(
+            ICD, "Re-registration with new key failed with error %" CHIP_ERROR_FORMAT " for peer node " ChipLogFormatScopedNodeId,
+            error.Format(), ChipLogValueScopedNodeId(icdClientInfo.peer_node));
         // The callee can take corrective action  based on the error received.
-    }
-    if (refreshKeySender != nullptr)
-    {
-        Platform::Delete(refreshKeySender);
-        refreshKeySender = nullptr;
     }
 }
 } // namespace app

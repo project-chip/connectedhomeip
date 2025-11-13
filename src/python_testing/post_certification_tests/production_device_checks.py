@@ -36,6 +36,7 @@
 # pip install opencv-python requests click_option_group
 # python src/python_testing/post_certification_tests/production_device_checks.py
 
+import asyncio
 import base64
 import hashlib
 import importlib
@@ -50,24 +51,27 @@ from dataclasses import dataclass
 from enum import Enum, auto
 from pathlib import Path
 
-import chip.clusters as Clusters
 import cv2
 import requests
 from mobly import asserts
+
+import matter.clusters as Clusters
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..', '..'))
 
 try:
-    from chip.testing.basic_composition import BasicCompositionTests
-    from chip.testing.matter_testing import (MatterBaseTest, MatterStackState, MatterTestConfig, TestStep, async_test_body,
-                                             run_tests_no_exit)
+    from matter.testing.basic_composition import BasicCompositionTests
+    from matter.testing.matter_stack_state import MatterStackState
+    from matter.testing.matter_test_config import MatterTestConfig
+    from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, run_tests_no_exit
 except ImportError:
     sys.path.append(os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..')))
-    from chip.testing.basic_composition import BasicCompositionTests
-    from chip.testing.matter_testing import (MatterBaseTest, MatterStackState, MatterTestConfig, TestStep, async_test_body,
-                                             run_tests_no_exit)
+    from matter.testing.basic_composition import BasicCompositionTests
+    from matter.testing.matter_stack_state import MatterStackState
+    from matter.testing.matter_test_config import MatterTestConfig
+    from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, run_tests_no_exit
 
 try:
     import fetch_paa_certs_from_dcl
@@ -75,6 +79,8 @@ except ImportError:
     sys.path.append(os.path.abspath(
         os.path.join(DEFAULT_CHIP_ROOT, 'credentials')))
     import fetch_paa_certs_from_dcl
+
+sys.path.append(os.path.abspath(os.path.join(DEFAULT_CHIP_ROOT, 'src', 'python_testing')))
 
 
 @dataclass
@@ -95,7 +101,7 @@ class Hooks():
     def stop(self, duration: int):
         pass
 
-    def test_start(self, filename: str, name: str, count: int):
+    def test_start(self, filename: str, name: str, count: int, steps: list[str] = []):
         self.current_test = name
         pass
 
@@ -126,16 +132,30 @@ class Hooks():
 class TestEventTriggersCheck(MatterBaseTest, BasicCompositionTests):
     @async_test_body
     async def test_TestEventTriggersCheck(self):
-        self.connect_over_pase(self.default_controller)
+        setupCode = self.matter_test_config.qr_code_content or self.matter_test_config.manual_code
+        await self.default_controller.FindOrEstablishPASESession(setupCode[0], self.dut_node_id)
         gd = Clusters.GeneralDiagnostics
         ret = await self.read_single_attribute_check_success(cluster=gd, attribute=gd.Attributes.TestEventTriggersEnabled)
         asserts.assert_equal(ret, 0, "TestEventTriggers are still on")
 
 
 class DclCheck(MatterBaseTest, BasicCompositionTests):
+    def get_versions_and_assert_all_keys_exist(self):
+        entry = requests.get(f"{self.url}/dcl/model/versions/{self.vid}/{self.pid}").json()
+        key_model_versions = 'modelVersions'
+        asserts.assert_true(key_model_versions in entry.keys(),
+                            f"Unable to find {key_model_versions} in software versions schema for {self.vid_pid_str}")
+        logging.info(f'Found version info for vid=0x{self.vid_pid_str} in the DCL:')
+        logging.info(f'{entry[key_model_versions]}')
+        key_software_versions = 'softwareVersions'
+        asserts.assert_true(key_software_versions in entry[key_model_versions].keys(
+        ), f"Unable to find {key_software_versions} in software versions schema for {self.vid_pid_str}")
+        return entry[key_model_versions][key_software_versions]
+
     @async_test_body
     async def setup_class(self):
-        self.connect_over_pase(self.default_controller)
+        setupCode = self.matter_test_config.qr_code_content or self.matter_test_config.manual_code
+        await self.default_controller.FindOrEstablishPASESession(setupCode[0], self.dut_node_id)
         bi = Clusters.BasicInformation
         self.vid = await self.read_single_attribute_check_success(cluster=bi, attribute=bi.Attributes.VendorID)
         self.pid = await self.read_single_attribute_check_success(cluster=bi, attribute=bi.Attributes.ProductID)
@@ -169,32 +189,61 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
         logging.info(f'{entry[key]}')
 
     def steps_Compliance(self):
-        return [TestStep(1, "Check if device VID/PID/SoftwareVersion are listed in the DCL compliance info schema", "Listing found")]
+        return [TestStep(1, "Query the information about all software versions for this PID/VID", "DCL entry exists"),
+                TestStep(2, "Query the compliance information for the specified software versions",
+                            "Check at least one compliance entry exists for the specified software versions. "
+                            "For each compliance entry the corresponding certified model entry exists")]
 
     def test_Compliance(self):
         self.step(1)
-        key = 'complianceInfo'
-        entry = requests.get(
-            f"{self.url}/dcl/compliance/compliance-info/{self.vid}/{self.pid}/{self.software_version}/matter").json()
-        asserts.assert_true(key in entry.keys(),
-                            f"Unable to find compliance entry for {self.vid_pid_sv_str}")
-        logging.info(
-            f'Found compliance info for {self.vid_pid_sv_str} in the DCL:')
-        logging.info(f'{entry[key]}')
+        software_versions = self.get_versions_and_assert_all_keys_exist()
+
+        self.step(2)
+        found_versions = []
+        for software_version in software_versions:
+            vid_pid_sv_str = f'{self.vid_pid_str} software version = {software_version}'
+            key = 'complianceInfo'
+            sub_key = 'softwareVersion'
+            cert_model_key = 'certifiedModel'
+            entry = requests.get(
+                f"{self.url}/dcl/compliance/compliance-info/{self.vid}/{self.pid}/{software_version}/matter").json()
+            if key in entry.keys() and entry[key][sub_key] == software_version:
+                found_versions.append(software_version)
+                logging.info(
+                    f'Found compliance info for {vid_pid_sv_str} in the DCL:')
+                logging.info(f'{entry[key]}')
+                certified_model_entry = requests.get(
+                    f"{self.url}/dcl/compliance/certified-models/{self.vid}/{self.pid}/{software_version}/matter").json()
+                asserts.assert_true(cert_model_key in certified_model_entry.keys(),
+                                    f"Unable to find certified model entry for {vid_pid_sv_str}")
+        asserts.assert_true(found_versions,
+                            f"Unable to find at least one compliance entry for the versions {software_versions}")
 
     def steps_CertifiedModel(self):
-        return [TestStep(1, "Check if device VID/PID/SoftwareVersion are listed in the DCL certified model schema", "Listing found")]
+        return [TestStep(1, "Query the information about all software versions for this PID/VID", "DCL entry exists"),
+                TestStep(2, "Query the certified version information for the specified software versions",
+                            "Check at least one certified model entry exists for the specified software versions")]
 
     def test_CertifiedModel(self):
         self.step(1)
-        key = 'certifiedModel'
-        entry = requests.get(
-            f"{self.url}/dcl/compliance/certified-models/{self.vid}/{self.pid}/{self.software_version}/matter").json()
-        asserts.assert_true(key in entry.keys(),
-                            f"Unable to find certified model entry for {self.vid_pid_sv_str}")
-        logging.info(
-            f'Found certified model for {self.vid_pid_sv_str} in the DCL:')
-        logging.info(f'{entry[key]}')
+        software_versions = self.get_versions_and_assert_all_keys_exist()
+
+        self.step(2)
+        is_found = False
+        for software_version in software_versions:
+            vid_pid_sv_str = f'{self.vid_pid_str} software version = {software_version}'
+            key = 'certifiedModel'
+            sub_key = 'softwareVersion'
+            entry = requests.get(
+                f"{self.url}/dcl/compliance/certified-models/{self.vid}/{self.pid}/{software_version}/matter").json()
+            if key in entry.keys() and entry[key][sub_key] == software_version:
+                is_found = True
+                logging.info(
+                    f'Found certified model for {vid_pid_sv_str} in the DCL:')
+                logging.info(f'{entry[key]}')
+                break
+        asserts.assert_true(is_found,
+                            f"Unable to find at least one certified model entry for the versions {software_versions}")
 
     def steps_AllSoftwareVersions(self):
         return [TestStep(1, "Query the version information for this software version", "DCL entry exists"),
@@ -202,19 +251,11 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
 
     def test_AllSoftwareVersions(self):
         self.step(1)
-        versions_entry = requests.get(f"{self.url}/dcl/model/versions/{self.vid}/{self.pid}").json()
-        key_model_versions = 'modelVersions'
-        asserts.assert_true(key_model_versions in versions_entry.keys(),
-                            f"Unable to find {key_model_versions} in software versions schema for {self.vid_pid_str}")
-        logging.info(f'Found version info for vid=0x{self.vid_pid_str} in the DCL:')
-        logging.info(f'{versions_entry[key_model_versions]}')
-        key_software_versions = 'softwareVersions'
-        asserts.assert_true(key_software_versions in versions_entry[key_model_versions].keys(
-        ), f"Unable to find {key_software_versions} in software versions schema for {self.vid_pid_str}")
+        software_versions = self.get_versions_and_assert_all_keys_exist()
 
         problems = []
         self.step(2)
-        for software_version in versions_entry[key_model_versions][key_software_versions]:
+        for software_version in software_versions:
             entry_wrapper = requests.get(f"{self.url}/dcl/model/versions/{self.vid}/{self.pid}/{software_version}").json()
             key_model_version = 'modelVersion'
             if key_model_version not in entry_wrapper:
@@ -313,9 +354,9 @@ def get_qr() -> str:
 
 
 class SetupCodeType(Enum):
-    UNKNOWN = auto(),
-    QR = auto(),
-    MANUAL = auto(),
+    UNKNOWN = auto()
+    QR = auto()
+    MANUAL = auto()
 
 
 def get_setup_code() -> (str, bool):
@@ -350,7 +391,7 @@ class TestConfig(object):
         self.admin_storage = f'admin_storage_{tmp_uuid}.json'
         global_test_params = {'use_pase_only': True, 'post_cert_test': True}
         self.config = MatterTestConfig(endpoint=0, dut_node_ids=[
-                                       1], global_test_params=global_test_params, storage_path=self.admin_storage)
+            1], global_test_params=global_test_params, storage_path=self.admin_storage)
         if code_type == SetupCodeType.QR:
             self.config.qr_code_content = [code]
         else:
@@ -390,9 +431,9 @@ def run_test(test_class: MatterBaseTest, tests: typing.List[str], test_config: T
     stack = test_config.get_stack()
     controller = test_config.get_controller()
     matter_config = test_config.get_config(tests)
-    ok = run_tests_no_exit(test_class, matter_config, hooks, controller, stack)
-    if not ok:
-        print(f"Test failure. Failed on step: {hooks.get_failures()}")
+    with asyncio.Runner() as runner:
+        if not run_tests_no_exit(test_class, matter_config, runner.get_loop(), hooks, controller, stack):
+            print(f"Test failure. Failed on step: {hooks.get_failures()}")
     return hooks.get_failures()
 
 

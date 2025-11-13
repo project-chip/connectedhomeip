@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    Copyright (c) 2018 Google LLC
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *
@@ -41,6 +41,9 @@ struct otInstance;
 
 namespace chip {
 namespace Inet {
+
+class UDPEndPoint;
+using UDPEndPointHandle = EndPointHandle<UDPEndPoint>;
 
 /**
  * @brief   Objects of this class represent UDP transport endpoints.
@@ -238,23 +241,19 @@ public:
     void Close();
 
     /**
-     * Close the endpoint and recycle its memory.
-     *
-     *  Invokes the \c Close method, then invokes the <tt>EndPointBasis::Release</tt> method to return the object to its
-     *  memory pool.
-     *
-     *  On LwIP systems, this method must not be called with the LwIP stack lock already acquired.
-     */
-    virtual void Free() = 0;
-
-    /**
      * Set Network Native Parameters (optional)
      *
      * Some networking stack requires additionnal parameters
      */
     virtual inline void SetNativeParams(void * params) { (void) params; }
 
+    inline bool operator==(const UDPEndPointHandle & other) const { return other == *this; }
+    inline bool operator!=(const UDPEndPointHandle & other) const { return other != *this; }
+
 protected:
+    friend class EndPointDeletor<UDPEndPoint>;
+    friend class EndPointHandle<UDPEndPoint>;
+
     UDPEndPoint(EndPointManager<UDPEndPoint> & endPointManager) :
         EndPointBasis(endPointManager), mState(State::kReady), OnMessageReceived(nullptr), OnReceiveError(nullptr)
     {}
@@ -296,6 +295,16 @@ protected:
     virtual CHIP_ERROR ListenImpl()                                                                                           = 0;
     virtual CHIP_ERROR SendMsgImpl(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle && msg)                     = 0;
     virtual void CloseImpl()                                                                                                  = 0;
+
+    /**
+     * Close the endpoint and recycle its memory.
+     *
+     *  Invokes the \c Close method, then invokes the <tt>EndPointBasis::Delete</tt> method to return the object to its
+     *  memory pool.
+     *
+     *  On LwIP systems, this method must not be called with the LwIP stack lock already acquired.
+     */
+    virtual void Free();
 };
 
 template <>

@@ -195,22 +195,29 @@ TEST_F_FROM_FIXTURE(TestReportingEngine, TestBuildAndSendSingleReportData)
     EXPECT_EQ(readRequestBuilder.GetError(), CHIP_NO_ERROR);
     AttributePathIB::Builder & attributePathBuilder1 = attributePathListBuilder.CreatePath();
     EXPECT_EQ(attributePathListBuilder.GetError(), CHIP_NO_ERROR);
-    attributePathBuilder1.Node(1).Endpoint(kTestEndpointId).Cluster(kTestClusterId).Attribute(kTestFieldId1).EndOfAttributePathIB();
+    EXPECT_SUCCESS(attributePathBuilder1.Node(1)
+                       .Endpoint(kTestEndpointId)
+                       .Cluster(kTestClusterId)
+                       .Attribute(kTestFieldId1)
+                       .EndOfAttributePathIB());
     EXPECT_EQ(attributePathBuilder1.GetError(), CHIP_NO_ERROR);
 
     AttributePathIB::Builder & attributePathBuilder2 = attributePathListBuilder.CreatePath();
     EXPECT_EQ(attributePathListBuilder.GetError(), CHIP_NO_ERROR);
-    attributePathBuilder2.Node(1).Endpoint(kTestEndpointId).Cluster(kTestClusterId).Attribute(kTestFieldId2).EndOfAttributePathIB();
+    EXPECT_SUCCESS(attributePathBuilder2.Node(1)
+                       .Endpoint(kTestEndpointId)
+                       .Cluster(kTestClusterId)
+                       .Attribute(kTestFieldId2)
+                       .EndOfAttributePathIB());
     EXPECT_EQ(attributePathBuilder2.GetError(), CHIP_NO_ERROR);
-    attributePathListBuilder.EndOfAttributePathIBs();
+    EXPECT_SUCCESS(attributePathListBuilder.EndOfAttributePathIBs());
 
     EXPECT_EQ(readRequestBuilder.GetError(), CHIP_NO_ERROR);
-    readRequestBuilder.IsFabricFiltered(false).EndOfReadRequestMessage();
+    EXPECT_SUCCESS(readRequestBuilder.IsFabricFiltered(false).EndOfReadRequestMessage());
     EXPECT_EQ(readRequestBuilder.GetError(), CHIP_NO_ERROR);
     EXPECT_EQ(writer.Finalize(&readRequestbuf), CHIP_NO_ERROR);
     app::ReadHandler readHandler(dummy, exchangeCtx, chip::app::ReadHandler::InteractionType::Read,
-                                 app::reporting::GetDefaultReportScheduler(),
-                                 CodegenDataModelProviderInstance(nullptr /* delegate */));
+                                 app::reporting::GetDefaultReportScheduler());
     readHandler.OnInitialRequest(std::move(readRequestbuf));
 
     EXPECT_EQ(InteractionModelEngine::GetInstance()->GetReportingEngine().BuildAndSendSingleReportData(&readHandler),

@@ -26,6 +26,7 @@
 #include <app/EventLogging.h>
 #include <app/clusters/thread-network-diagnostics-server/thread-network-diagnostics-provider.h>
 #include <app/util/attribute-storage.h>
+#include <clusters/ThreadNetworkDiagnostics/Metadata.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/core/Optional.h>
 #include <lib/core/TLVTypes.h>
@@ -45,18 +46,18 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
-class ThreadDiagosticsAttrAccess : public AttributeAccessInterface
+class ThreadDiagnosticsAttrAccess : public AttributeAccessInterface
 {
 public:
     // Register for the ThreadNetworkDiagnostics cluster on all endpoints.
-    ThreadDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), ThreadNetworkDiagnostics::Id) {}
+    ThreadDiagnosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), ThreadNetworkDiagnostics::Id) {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 };
 
-ThreadDiagosticsAttrAccess gAttrAccess;
+ThreadDiagnosticsAttrAccess gAttrAccess;
 
-CHIP_ERROR ThreadDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR ThreadDiagnosticsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     if (aPath.mClusterId != ThreadNetworkDiagnostics::Id)
     {
@@ -66,6 +67,9 @@ CHIP_ERROR ThreadDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & aP
 
     switch (aPath.mAttributeId)
     {
+    case Attributes::ClusterRevision::Id:
+        return aEncoder.Encode(ThreadNetworkDiagnostics::kRevision);
+
     case ThreadNetworkDiagnostics::Attributes::NeighborTable::Id:
     case ThreadNetworkDiagnostics::Attributes::RouteTable::Id:
     case ThreadNetworkDiagnostics::Attributes::SecurityPolicy::Id:
@@ -129,6 +133,8 @@ CHIP_ERROR ThreadDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & aP
     case ThreadNetworkDiagnostics::Attributes::PendingTimestamp::Id:
     case ThreadNetworkDiagnostics::Attributes::Delay::Id:
     case ThreadNetworkDiagnostics::Attributes::ChannelPage0Mask::Id:
+    case ThreadNetworkDiagnostics::Attributes::ExtAddress::Id:
+    case ThreadNetworkDiagnostics::Attributes::Rloc16::Id:
         return WriteThreadNetworkDiagnosticAttributeToTlv(aPath.mAttributeId, aEncoder);
     default:
         break;
@@ -146,7 +152,7 @@ class ThreadDiagnosticsDelegate : public DeviceLayer::ThreadDiagnosticsDelegate
 
         Events::ConnectionStatus::Type event{ newConnectionStatus };
 
-        // ThreadNetworkDiagnostics cluster should exist only for endpoint 0.
+        // TODO: ThreadNetworkDiagnostics cluster can exist on other endpoints (SNI or NIM/TBR device types)
         if (emberAfContainsServer(kRootEndpointId, ThreadNetworkDiagnostics::Id))
         {
             // If Thread Network Diagnostics cluster is implemented on this endpoint
@@ -175,7 +181,7 @@ class ThreadDiagnosticsDelegate : public DeviceLayer::ThreadDiagnosticsDelegate
 
         Events::NetworkFaultChange::Type event{ currentList, previousList };
 
-        // ThreadNetworkDiagnostics cluster should exist only for endpoint 0.
+        // TODO: ThreadNetworkDiagnostics cluster can exist on other endpoints (SNI or NIM/TBR device types)
         if (emberAfContainsServer(kRootEndpointId, ThreadNetworkDiagnostics::Id))
         {
             // If Thread Network Diagnostics cluster is implemented on this endpoint
@@ -206,4 +212,10 @@ void MatterThreadNetworkDiagnosticsPluginServerInitCallback()
 {
     AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
     GetDiagnosticDataProvider().SetThreadDiagnosticsDelegate(&gDiagnosticDelegate);
+}
+
+void MatterThreadNetworkDiagnosticsPluginServerShutdownCallback()
+{
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
+    GetDiagnosticDataProvider().SetThreadDiagnosticsDelegate(nullptr);
 }

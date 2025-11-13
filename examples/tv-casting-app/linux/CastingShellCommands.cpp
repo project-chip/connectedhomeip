@@ -85,7 +85,7 @@ static CHIP_ERROR PrintAllCommands()
 
 void PrintBindings()
 {
-    for (const auto & binding : BindingTable::GetInstance())
+    for (const auto & binding : chip::app::Clusters::Binding::Table::GetInstance())
     {
         ChipLogProgress(NotSpecified,
                         "Binding type=%d fab=%d nodeId=0x" ChipLogFormatX64
@@ -236,6 +236,7 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
         DeviceLayer::SetCommissionableDataProvider(&gCommissionableDataProvider);
 
         CastingServer::GetInstance()->SetCommissionerPasscodeReady();
+        return CHIP_NO_ERROR;
     }
     if (strcmp(argv[0], "testudc") == 0)
     {
@@ -248,6 +249,7 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
         // ex. sendudc <address> <port> t t 111 5 'hello world'
 
         Protocols::UserDirectedCommissioning::IdentificationDeclaration id;
+        id.SetPasscodeLength(8);
         if (argc > 3)
         {
             id.SetNoPasscode(strcmp(argv[3], "t") == 0);

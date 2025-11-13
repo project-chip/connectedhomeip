@@ -35,15 +35,19 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <assert.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
+
+// TODO: Ideally we should not depend on the codegen integration
+// It would be best if we could use generic cluster API instead
+#include <app/clusters/boolean-state-server/CodegenIntegration.h>
 
 /**********************************************************
  * Defines and Constants
@@ -68,22 +72,10 @@ using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
 
-CHIP_ERROR AppTask::Init()
+CHIP_ERROR AppTask::AppInit()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(AppTask::ButtonEventHandler);
-
-#ifdef DISPLAY_ENABLED
-    GetLCD().Init((uint8_t *) "LIT ICD");
-#endif
-
-    err = BaseApplication::Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        SILABS_LOG("BaseApplication::Init() failed");
-        appError(err);
-    }
-
     return err;
 }
 
@@ -127,25 +119,14 @@ void AppTask::ApplicationEventHandler(AppEvent * aEvent)
     VerifyOrReturn(aEvent->Type == AppEvent::kEventType_Button);
     VerifyOrReturn(aEvent->ButtonEvent.Action == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed));
 
-    // Simple Application logic that toggles the BoleanState StateValue attribute.
+    // Simple Application logic that toggles the BooleanState StateValue attribute.
     // DO NOT COPY for product logic. LIT ICD app is a test app with very simple application logic to enable testing.
     // The goal of the app is just to enable testing of LIT ICD features without impacting product sample apps.
     PlatformMgr().ScheduleWork([](intptr_t) {
-        bool state = true;
-
-        Protocols::InteractionModel::Status status = chip::app::Clusters::BooleanState::Attributes::StateValue::Get(1, &state);
-        if (status != Protocols::InteractionModel::Status::Success)
-        {
-            // Failed to read StateValue. Default to true (open state)
-            state = true;
-            ChipLogError(NotSpecified, "ERR: reading boolean status value %x", to_underlying(status));
-        }
-
-        status = chip::app::Clusters::BooleanState::Attributes::StateValue::Set(1, !state);
-        if (status != Protocols::InteractionModel::Status::Success)
-        {
-            ChipLogError(NotSpecified, "ERR: updating boolean status value %x", to_underlying(status));
-        }
+        auto booleanState = chip::app::Clusters::BooleanState::FindClusterOnEndpoint(1);
+        VerifyOrReturn(booleanState != nullptr);
+        auto state = booleanState->GetStateValue();
+        booleanState->SetStateValue(!state);
     });
 }
 

@@ -20,9 +20,9 @@
 #include <app/icd/server/ICDServerConfig.h>
 
 namespace {
-#ifdef ENABLE_CHIP_SHELL
+#if defined(ENABLE_CHIP_SHELL) && CHIP_CONFIG_ENABLE_ICD_SERVER && defined(RTE_UULP_GPIO_1_PIN)
 bool ps_requirement_added = false;
-#endif // ENABLE_CHIP_SHELL
+#endif // defined(ENABLE_CHIP_SHELL) && CHIP_CONFIG_ENABLE_ICD_SERVER && defined(RTE_UULP_GPIO_1_PIN)
 } // namespace
 
 #ifdef __cplusplus
@@ -30,8 +30,10 @@ extern "C" {
 #endif
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #if SLI_SI91X_MCU_INTERFACE
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 #include "sl_si91x_button.h"
 #include "sl_si91x_button_pin_config.h"
+#endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
 #include "sl_si91x_driver_gpio.h"
 #include "sl_si91x_power_manager.h"
 
@@ -56,6 +58,16 @@ void gpio_uulp_pin_interrupt_callback(uint32_t pin_intr)
         VerifyOrReturn(status == SL_STATUS_OK, ChipLogError(DeviceLayer, "failed to mask interrupt: %ld", status));
     }
 }
+
+/**
+ * @brief Processing function when a button is triggered
+ *
+ * TODO: Move this to SPAM
+ *
+ * @param btn which button was pressed
+ * @param btnAction the action that triggered the buttone vent
+ */
+void sl_button_on_change(uint8_t btn, uint8_t btnAction);
 
 #endif // SLI_SI91X_MCU_INTERFACE
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -90,6 +102,7 @@ inline void sl_si91x_btn_event_handler()
 void sl_si91x_uart_power_requirement_handler()
 {
 #ifdef ENABLE_CHIP_SHELL
+#ifdef RTE_UULP_GPIO_1_PIN
     // Checking the UULP PIN 1 status to reinit the UART and not allow the device to go to sleep
     if (sl_si91x_gpio_get_uulp_npss_pin(RTE_UULP_GPIO_1_PIN))
     {
@@ -107,6 +120,7 @@ void sl_si91x_uart_power_requirement_handler()
             ps_requirement_added = false;
         }
     }
+#endif // RTE_UULP_GPIO_1_PIN
 #endif // ENABLE_CHIP_SHELL
 }
 

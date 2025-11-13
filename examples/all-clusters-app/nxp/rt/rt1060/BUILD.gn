@@ -76,6 +76,20 @@ rt_sdk("sdk") {
     sources += [ "${example_platform_dir}/board/${evkname}/pin_mux.c" ]
   }
 
+  if (iw416_transceiver || w8801_transceiver || iwx12_transceiver) {
+    if (evkname == "evkmimxrt1060") {
+      include_dirs += [ "${example_platform_dir}/board/evkbmimxrt1060/" ]
+      sources +=
+          [ "${example_platform_dir}/board/evkbmimxrt1060/sdmmc_config.c" ]
+      sources +=
+          [ "${example_platform_dir}/board/evkbmimxrt1060/wifi_bt_config.c" ]
+    } else {
+      include_dirs += [ "${example_platform_dir}/board/${evkname}/" ]
+      sources += [ "${example_platform_dir}/board/${evkname}/sdmmc_config.c" ]
+      sources += [ "${example_platform_dir}/board/${evkname}/wifi_bt_config.c" ]
+    }
+  }
+
   sources += [ "${example_platform_dir}/board/hardware_init.c" ]
   sources += [ "${example_platform_dir}/board/clock_config.c" ]
   sources += [ "${example_platform_dir}/board/board.c" ]
@@ -126,7 +140,6 @@ rt_executable("all_cluster_app") {
 
   sources = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
-    "${chip_root}/examples/providers/DeviceInfoProviderImpl.cpp",
     "../../common/main/AppTask.cpp",
     "../../common/main/DeviceCallbacks.cpp",
     "../../common/main/ZclCallbacks.cpp",
@@ -154,12 +167,15 @@ rt_executable("all_cluster_app") {
     "${common_example_dir}/device_callbacks/source/CommonDeviceCallbacks.cpp",
     "${common_example_dir}/device_manager/source/CHIPDeviceManager.cpp",
     "${common_example_dir}/icd/source/ICDUtil.cpp",
-    "${common_example_dir}/matter_button/source/ButtonDefault.cpp",
-    "${common_example_dir}/matter_button/source/ButtonManager.cpp",
-    "${common_example_dir}/matter_button/source/ButtonRegistrationDefault.cpp",
+    "${common_example_dir}/matter_button/source/ButtonRegistrationEmpty.cpp",
   ]
 
-  deps = [ "${chip_root}/examples/${app_common_folder}" ]
+  deps = [
+    "${chip_root}/examples/${app_common_folder}",
+    "${chip_root}/examples/providers:device_info_provider_please_do_not_reuse_as_is",
+    "${chip_root}/src/app/clusters/network-commissioning:network-commissioning",
+    "${chip_root}/src/setup_payload:onboarding-codes-utils",
+  ]
 
   sources += [
     "${chip_root}/examples/${app_common_folder}/src/bridged-actions-stub.cpp",
@@ -256,7 +272,7 @@ rt_executable("all_cluster_app") {
   ]
 
   if (evkname == "evkcmimxrt1060") {
-    ldflags += [ "-Wl,--defsym=gEVKCFlashSize_d=0x1000000" ]
+    ldflags += [ "-Wl,--defsym=gFlashSize_d=0x1000000" ]
   }
 
   if (enable_ota_provider) {

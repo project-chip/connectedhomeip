@@ -21,22 +21,23 @@ import("${chip_root}/src/platform/device.gni")
 import("${silabs_sdk_build_root}/efr32_sdk.gni")
 import("${silabs_sdk_build_root}/silabs_board.gni")
 
+import("${matter_support_root}/provision/args.gni")  # Seperate import since the
+                                                     # matter_support_root is
+                                                     # defined in the
+                                                     # ef32_sdk.gni
 declare_args() {
   enable_heap_monitoring = false
 
   # OTA timeout in seconds
   ota_periodic_query_timeout_sec = 86400
-
-  # The EnableKey in hex string format used by TestEventTrigger command in
-  # GeneralDiagnostics cluster. The length of the string should be 16 bytes.
-  sl_test_event_trigger_enable_key = "00112233445566778899AABBCCDDEEFF"
 }
+
+chip_detail_logging = sl_verbose_mode
 
 import("${silabs_common_plat_dir}/args.gni")
 
 # Sanity check
 assert(!(chip_enable_wifi && chip_enable_openthread))
-assert(!(use_rs9116 && chip_enable_openthread))
 assert(!(use_SiWx917 && chip_enable_openthread))
 assert(!(use_wf200 && chip_enable_openthread))
 
@@ -54,29 +55,7 @@ config("chip_examples_project_config") {
     "-Wl,--wrap=_realloc_r",
     "-Wl,--wrap=_free_r",
     "-Wl,--wrap=_calloc_r",
-  ]
-}
-
-config("test-event-trigger-config") {
-  defines = [ "SL_MATTER_TEST_EVENT_TRIGGER_ENABLED" ]
-
-  if (is_debug) {
-    defines += [ "SL_MATTER_TEST_EVENT_TRIGGER_ENABLE_KEY=\"${sl_test_event_trigger_enable_key}\"" ]
-  }
-}
-
-source_set("test-event-trigger") {
-  sources = [
-    "${silabs_common_plat_dir}/SilabsTestEventTriggerDelegate.cpp",
-    "${silabs_common_plat_dir}/SilabsTestEventTriggerDelegate.h",
-  ]
-
-  deps = [ "${chip_root}/src/platform/silabs/provision:provision-headers" ]
-  public_configs = [ ":test-event-trigger-config" ]
-  public_deps = [
-    "${chip_root}/src/app:test-event-trigger",
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/support",
+    "-Wl,--wrap=main",
   ]
 }
 
@@ -133,15 +112,18 @@ config("efr32-common-config") {
     defines += [ "HEAP_MONITORING" ]
   }
 
-  if (chip_enable_multi_ota_requestor) {
-    defines += [ "CHIP_DEVICE_CONFIG_ENABLE_MULTI_OTA_REQUESTOR=1" ]
-  }
-
-  ldflags = [ "-Wl,--no-warn-rwx-segment" ]
+  ldflags = [
+    "-Wl,--no-warn-rwx-segment",
+    "-fno-lto",
+  ]
 }
 
 source_set("efr32-common") {
-  deps = [ "${silabs_common_plat_dir}/provision:storage" ]
+  deps = [
+    "${chip_root}/src/app/clusters/network-commissioning:network-commissioning",
+    "${chip_root}/src/app/clusters/software-diagnostics-server:software-fault-listener",
+    "${silabs_common_plat_dir}/provision:storage",
+  ]
   defines = []
   public_deps = []
   public_configs = [
@@ -150,17 +132,14 @@ source_set("efr32-common") {
     ":chip_examples_project_config",
   ]
 
-  # DIC
-  if (enable_dic) {
-    public_deps +=
-        [ "${silabs_common_plat_dir}/DIC/matter_abs_interface:silabs-dic" ]
+  # MATTER_AWS
+  if (enable_matter_aws) {
+    public_deps += [ "${silabs_common_plat_dir}/matter_aws/matter_aws_interface:silabs-matter-aws" ]
   }
 
   # AWS SDK OTA
   if (aws_sdk_ota) {
-    public_deps += [
-      "${silabs_common_plat_dir}/DIC/matter_abs_interface:silabs-aws-sdk-ota",
-    ]
+    public_deps += [ "${silabs_common_plat_dir}/matter_aws/matter_aws_interface:silabs-matter-aws-sdk-ota" ]
   }
 
   include_dirs = [ "." ]
@@ -205,6 +184,11 @@ source_set("efr32-common") {
     ]
   }
 
+  if (sl_enable_rgb_led) {
+    sources += [ "${silabs_common_plat_dir}/led/RGBLEDWidget.cpp" ]
+    include_dirs = [ "${silabs_common_plat_dir}/rgb_led" ]
+  }
+
   if (chip_build_libshell) {
     deps += [ ":matter-shell" ]
 
@@ -214,7 +198,7 @@ source_set("efr32-common") {
   }
 
   public_deps += [
-    "${chip_root}/examples/providers:device_info_provider",
+    "${chip_root}/examples/providers:device_info_provider_please_do_not_reuse_as_is",
     "${chip_root}/src/app/server",
     "${chip_root}/src/data-model-providers/codegen:instance-header",
     "${chip_root}/src/lib",
@@ -222,7 +206,7 @@ source_set("efr32-common") {
   ]
 
   if (sl_enable_test_event_trigger) {
-    public_deps += [ ":test-event-trigger" ]
+    public_deps += [ "${silabs_common_plat_dir}/test-event-trigger:sources" ]
   }
 
   if (sl_enable_si70xx_sensor) {

@@ -3,100 +3,168 @@ EnumsNotUsedAsTypeInXML:
     # to this list you prevent incorrectly assuming from code that you are
     # able to use kUnknownEnumValue safely. This happens for derived clusters
     # such as ModeBase where there are CommonTag, DerivedClusterTags, MfgTags.
+    # keep-sorted start
+    - "DeviceEnergyManagementMode::ModeTag"
     - "DishwasherMode::ModeTag"
+    - "EnergyEvseMode::ModeTag"
     - "LaundryWasherMode::ModeTag"
     - "RefrigeratorAndTemperatureControlledCabinetMode::ModeTag"
-    - "RvcRunMode::ModeTag"
-    - "RvcRunMode::StatusCode"
     - "RvcCleanMode::ModeTag"
     - "RvcCleanMode::StatusCode"
-    - "RvcOperationalState::OperationalStateEnum"
     - "RvcOperationalState::ErrorStateEnum"
-    - "EnergyEvseMode::ModeTag"
+    - "RvcOperationalState::OperationalStateEnum"
+    - "RvcRunMode::ModeTag"
+    - "RvcRunMode::StatusCode"
     - "WaterHeaterMode::ModeTag"
-    - "DeviceEnergyManagementMode::ModeTag"
+    # keep-sorted end
 
 CommandHandlerInterfaceOnlyClusters:
     # List of clusters that are implemented entirely with
     # CommandHandlerInterface and hence do not need generated command dispatch.
     # This uses asUpperCamelCase versions of the cluster name.
-    - Network Commissioning
-    - Scenes Management
-    - RVC Run Mode
-    - RVC Clean Mode
-    - Service Area
-    - Dishwasher Mode
-    - Laundry Washer Mode
-    - Oven Mode
-    - Oven Cavity Operational State
-    - Refrigerator And Temperature Controlled Cabinet Mode
-    - Operational State
+    # keep-sorted start
+    - Access Control
+    - Actions
     - Activated Carbon Filter Monitoring
-    - HEPA Filter Monitoring
-    - RVC Operational State
-    - Sample MEI
-    - Microwave Oven Control
+    - Administrator Commissioning
+    - Basic Information
+    - Boolean State
+    - Camera AV Settings User Level Management
+    - Camera AV Stream Management
     - Chime
+    - Closure Control
+    - Closure Dimension
     - Commissioner Control
-    - Energy EVSE
-    - Energy EVSE Mode
+    - Commodity Price
+    - Commodity Tariff
+    - Descriptor
     - Device Energy Management
     - Device Energy Management Mode
-    - Electrical Power Measurement
+    - Diagnostic Logs
+    - Dishwasher Mode
     - Electrical Energy Measurement
-    - Wi-Fi Network Management
+    - Electrical Power Measurement
+    - Energy EVSE
+    - Energy EVSE Mode
+    - Ethernet Network Diagnostics
+    - Fixed Label
+    - General Commissioning
+    - General Diagnostics
+    - Group Key Management
+    - Groupcast
+    - HEPA Filter Monitoring
+    - ICD Management
+    - Identify
+    - Joint Fabric Administrator
+    - Laundry Washer Mode
+    - Microwave Oven Control
+    - Network Commissioning
+    - OTA Software Update Provider
+    - Operational Credentials
+    - Operational State
+    - Oven Cavity Operational State
+    - Oven Mode
+    - Push AV Stream Transport
+    - RVC Clean Mode
+    - RVC Operational State
+    - RVC Run Mode
+    - Refrigerator And Temperature Controlled Cabinet Mode
+    - Sample MEI
+    - Scenes Management
+    - Service Area
+    - Software Diagnostics
+    - Soil Measurement
+    - TLS Certificate Management
+    - TLS Client Management
     - Thread Border Router Management
     - Thread Network Directory
+    - User Label
     - Water Heater Management
     - Water Heater Mode
-    - General Commissioning
-    - Software Diagnostics
+    - WebRTC Transport Provider
+    - WebRTC Transport Requestor
+    - Wi-Fi Network Diagnostics
+    - Wi-Fi Network Management
+    - Zone Management
+    # keep-sorted end
 
 # We need a more configurable way of deciding which clusters have which init functions....
 # See https://github.com/project-chip/connectedhomeip/issues/4369
 ClustersWithInitFunctions:
+    # keep-sorted start
     - Color Control
     - Groups
-    - Identify
     - Level Control
-    - Localization Configuration
+    - Mode Select
     - Occupancy Sensing
     - On/Off
     - Pump Configuration and Control
-    - Time Format Localization
-    - Thermostat
-    - Mode Select
     - Sample MEI
     - Scenes Management
+    - Thermostat
+    # keep-sorted end
 
 ClustersWithAttributeChangedFunctions:
-    - Bridged Device Basic
+    # keep-sorted start
+    - Bridged Device Basic Information
     - Door Lock
-    - Identify
-    - Pump Configuration and Control
-    - Window Covering
     - Fan Control
+    - Pump Configuration and Control
     - Thermostat
+    - Window Covering
+    # keep-sorted end
 
 ClustersWithShutdownFunctions:
+    # keep-sorted start
     - Barrier Control
-    - On/Off
+    - Color Control
     - Door Lock
     - Level Control
-    - Color Control
+    - On/Off
     - Sample MEI
     - Scenes Management
     - Thermostat
+    # keep-sorted end
 
 ClustersWithPreAttributeChangeFunctions:
+    # keep-sorted start
     - Door Lock
-    - Pump Configuration and Control
-    - Thermostat User Interface Configuration
-    - Time Format Localization
-    - Localization Configuration
-    - Mode Select
-    - Fan Control
-    - Thermostat
     - Energy Preference
-    - Laundry Washer Controls
+    - Fan Control
     - Laundry Dryer Controls
+    - Laundry Washer Controls
+    - Mode Select
+    - Pump Configuration and Control
+    - Thermostat
+    - Thermostat User Interface Configuration
+    # keep-sorted end
+
+# Code Driven clusters are clusters that implement the ServerClusterInterface.
+# The clusters in this list require Init() and/or Shutdown() callbacks, defined
+# in the cluster's respective CodgenIntegration.cpp file.
+CodeDrivenClusters:
+    # keep-sorted start
+    - Access Control
+    - Administrator Commissioning
+    - Basic Information
+    - Binding
+    - Boolean State
+    - Descriptor
+    - Diagnostic Logs
+    - Ethernet Network Diagnostics
+    - Fixed Label
+    - General Commissioning
+    - General Diagnostics
+    - Group Key Management
+    - Groupcast
+    - ICD Management
+    - Identify
+    - Localization Configuration
+    - OTA Software Update Provider
+    - Operational Credentials
+    - Push AV Stream Transport
+    - Software Diagnostics
+    - Time Format Localization
+    - User Label
+    - Wi-Fi Network Diagnostics
+    # keep-sorted end

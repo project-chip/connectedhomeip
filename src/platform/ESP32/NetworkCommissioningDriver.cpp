@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include <app/InteractionModelEngine.h> // nogncheck
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -239,7 +238,7 @@ CHIP_ERROR ESPWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen,
         CHIP_ERROR error = chip::DeviceLayer::Internal::ESP32Utils::ClearWiFiStationProvision();
         if (error != CHIP_NO_ERROR)
         {
-            ChipLogError(DeviceLayer, "ClearWiFiStationProvision failed: %s", chip::ErrorStr(error));
+            ChipLogError(DeviceLayer, "ClearWiFiStationProvision failed: %" CHIP_ERROR_FORMAT, error.Format());
             return chip::DeviceLayer::Internal::ESP32Utils::MapError(err);
         }
     }
@@ -301,7 +300,7 @@ void ESPWiFiDriver::OnConnectWiFiNetworkFailed(chip::System::Layer * aLayer, voi
     CHIP_ERROR error = chip::DeviceLayer::Internal::ESP32Utils::ClearWiFiStationProvision();
     if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "ClearWiFiStationProvision failed: %s", chip::ErrorStr(error));
+        ChipLogError(DeviceLayer, "ClearWiFiStationProvision failed: %" CHIP_ERROR_FORMAT, error.Format());
     }
     ESPWiFiDriver::GetInstance().OnConnectWiFiNetworkFailed();
 }
@@ -316,8 +315,7 @@ void ESPWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callbac
     VerifyOrExit(NetworkMatch(mStagingNetwork, networkId), networkingStatus = Status::kNetworkIDNotFound);
     VerifyOrExit(BackupConfiguration() == CHIP_NO_ERROR, networkingStatus = Status::kUnknownError);
     VerifyOrExit(mpConnectCallback == nullptr, networkingStatus = Status::kUnknownError);
-    ChipLogProgress(NetworkProvisioning, "ESP NetworkCommissioningDelegate: SSID: %.*s", static_cast<int>(networkId.size()),
-                    networkId.data());
+    ChipLogProgress(NetworkProvisioning, "ESP NetworkCommissioningDelegate: SSID: %s", NullTerminated(networkId).c_str());
     if (CHIP_NO_ERROR == GetConfiguredNetwork(configuredNetwork))
     {
         if (NetworkMatch(mStagingNetwork, ByteSpan(configuredNetwork.networkID, configuredNetwork.networkIDLen)))
@@ -343,7 +341,7 @@ exit:
     }
     if (networkingStatus != Status::kSuccess)
     {
-        ChipLogError(NetworkProvisioning, "Failed to connect to WiFi network:%s", chip::ErrorStr(err));
+        ChipLogError(NetworkProvisioning, "Failed to connect to WiFi network: %" CHIP_ERROR_FORMAT, err.Format());
         mpConnectCallback = nullptr;
         callback->OnResult(networkingStatus, CharSpan(), 0);
     }
@@ -459,9 +457,6 @@ void ESPWiFiDriver::OnScanWiFiNetworkDone()
 
 void ESPWiFiDriver::OnNetworkStatusChange()
 {
-    // This function reports the status to the data model provider, so skip it if the provider is not ready.
-    VerifyOrReturn(app::InteractionModelEngine::GetInstance() &&
-                   app::InteractionModelEngine::GetInstance()->GetDataModelProvider());
     Network configuredNetwork;
     bool staEnabled = false, staConnected = false;
     VerifyOrReturn(ESP32Utils::IsStationEnabled(staEnabled) == CHIP_NO_ERROR);

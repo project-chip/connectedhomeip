@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022,2024 Project CHIP Authors
+ *    Copyright (c) 2022-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -34,6 +34,8 @@
 
 #if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
 #include <platform/nrfconnect/Reboot.h>
+#elif CHIP_DEVICE_LAYER_TARGET_TELINK
+#include <platform/telink/Reboot.h>
 #elif defined(CONFIG_MCUBOOT_IMG_MANAGER)
 #include <zephyr/dfu/mcuboot.h>
 #endif
@@ -123,7 +125,7 @@ BootReasonType DetermineBootReason()
 
     if (reason & RESET_SOFTWARE)
     {
-#if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
+#if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT || CHIP_DEVICE_LAYER_TARGET_TELINK
         if (GetSoftwareRebootReason() == SoftwareRebootReason::kSoftwareUpdate)
         {
             return BootReasonType::kSoftwareUpdateCompleted;
@@ -270,19 +272,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetUpTime(uint64_t & upTime)
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
 {
-    uint64_t upTimeS;
-
-    ReturnErrorOnFailure(GetUpTime(upTimeS));
-
-    uint64_t totalHours      = 0;
-    const uint32_t upTimeH   = upTimeS / 3600 < UINT32_MAX ? static_cast<uint32_t>(upTimeS / 3600) : UINT32_MAX;
-    const uint64_t deltaTime = upTimeH - PlatformMgrImpl().GetSavedOperationalHoursSinceBoot();
-
-    ReturnErrorOnFailure(ConfigurationMgr().GetTotalOperationalHours(reinterpret_cast<uint32_t &>(totalHours)));
-
-    totalOperationalHours = static_cast<uint32_t>(totalHours + deltaTime < UINT32_MAX ? totalHours + deltaTime : UINT32_MAX);
-
-    return CHIP_NO_ERROR;
+    // Update the total operational hours and get the most recent value.
+    return PlatformMgrImpl().UpdateOperationalHours(&totalOperationalHours);
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason)
@@ -304,8 +295,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
         NetworkInterface * ifp = new NetworkInterface();
 
         interfaceIterator.GetInterfaceName(ifp->Name, Inet::InterfaceId::kMaxIfNameLength);
-        ifp->name          = CharSpan::fromCharString(ifp->Name);
-        ifp->isOperational = true;
+        ifp->name = CharSpan::fromCharString(ifp->Name);
         Inet::InterfaceType interfaceType;
         if (interfaceIterator.GetInterfaceType(interfaceType) == CHIP_NO_ERROR)
         {
@@ -339,9 +329,19 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
         CHIP_ERROR error;
         uint8_t addressSize;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        if (interfaceType == Inet::InterfaceType::Thread)
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+        if (interfaceType == Inet::InterfaceType::WiFi)
         {
+            ifp->isOperational = ConnectivityMgr().IsWiFiStationConnected();
+            error              = interfaceIterator.GetHardwareAddress(ifp->MacAddress, addressSize, sizeof(ifp->MacAddress));
+        }
+        else
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+            if (interfaceType == Inet::InterfaceType::Thread)
+        {
+            ifp->isOperational = ConnectivityMgr().IsThreadAttached();
+
             static_assert(OT_EXT_ADDRESS_SIZE <= sizeof(ifp->MacAddress), "Unexpected extended address size");
             error       = ThreadStackMgr().GetPrimary802154MACAddress(ifp->MacAddress);
             addressSize = OT_EXT_ADDRESS_SIZE;
@@ -349,7 +349,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
         else
 #endif
         {
-            error = interfaceIterator.GetHardwareAddress(ifp->MacAddress, addressSize, sizeof(ifp->MacAddress));
+            ifp->isOperational = true;
+            error              = interfaceIterator.GetHardwareAddress(ifp->MacAddress, addressSize, sizeof(ifp->MacAddress));
         }
 
         if (error != CHIP_NO_ERROR)
@@ -380,6 +381,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
         }
 
         ifp->IPv6Addresses = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv6AddressSpans, ipv6AddressesCount);
+        ifp->Next          = head;
         head               = ifp;
     }
 

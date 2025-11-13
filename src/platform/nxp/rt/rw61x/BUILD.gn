@@ -1,5 +1,5 @@
 # Copyright (c) 2021 Project CHIP Authors
-# Copyright 2023-2024 NXP
+# Copyright 2023-2025 NXP
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,6 +18,10 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/nxp_sdk.gni")
 import("//build_overrides/openthread.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/platform/nxp/common/ota/ota.gni")
+
+# Include to define nxp_crypto_impl
+import("${chip_root}/src/platform/nxp/crypto/nxp_crypto.gni")
 
 # If external SDK is used, do not import ${nxp_sdk_name}.gni
 if (!nxp_external_sdk) {
@@ -27,6 +31,17 @@ if (!nxp_external_sdk) {
 import("${nxp_sdk_build_root}/nxp_sdk.gni")
 
 assert(chip_device_platform == "nxp")
+
+declare_args() {
+  # Enable secondary network interface
+  chip_enable_secondary_nwk_if = false
+
+  # Enable OTA encryption
+  chip_with_ota_encryption = false
+
+  # AES key encryption for OTA encryption (16 bytes)
+  chip_with_ota_key = "1234567890ABCDEFA1B2C3D4E5F6F1B4"
+}
 
 source_set("nxp_factory_data") {
 }
@@ -56,21 +71,11 @@ config("nxp_platform_config") {
       assert(nxp_enable_secure_whole_factory_data &&
                  !nxp_enable_secure_EL2GO_factory_data,
              "please select only one protection solution")
-      defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/rt/rw61x/FactoryDataProviderEncImpl.h\"" ]
     } else if (nxp_enable_secure_EL2GO_factory_data) {
       assert(!nxp_enable_secure_whole_factory_data &&
                  nxp_enable_secure_EL2GO_factory_data,
              "please select only one protection solution")
-      defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/rt/rw61x/FactoryDataProviderEl2GoImpl.h\"" ]
-    } else {
-      defines += [ "EXTERNAL_FACTORY_DATA_PROVIDER_IMPL_HEADER=\"platform/nxp/rt/rw61x/FactoryDataProviderImpl.h\"" ]
     }
-  }
-
-  # When OTBR is enabled Thread network commissioning cluster is enabled using chip_enable_secondary_nwk_if
-  if (chip_enable_wifi && chip_enable_openthread &&
-      !chip_enable_secondary_nwk_if) {
-    defines += [ "_NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_" ]
   }
 }
 
@@ -80,7 +85,6 @@ static_library("nxp_platform") {
     "-Wno-conversion",
     "-Wno-sign-compare",
   ]
-  deps = []
   defines = []
   sources = [
     "../../../FreeRTOS/SystemTimeSupport.cpp",
@@ -101,6 +105,20 @@ static_library("nxp_platform") {
     "CHIPDevicePlatformConfig.h",
     "PlatformManagerImpl.cpp",
   ]
+  deps = [
+    "${chip_root}/src/app:app_config",
+    "${chip_root}/src/app/common:ids",
+  ]
+
+  if (nxp_crypto_impl == "") {
+    # Default Operational key secure storage
+    sources += [
+      "../../common/crypto/PersistentStorageOpKeystoreBase.cpp",
+      "../../common/crypto/PersistentStorageOpKeystoreBase.h",
+      "../../common/crypto/S50/PersistentStorageOpKeystoreS50.cpp",
+      "../../common/crypto/S50/PersistentStorageOpKeystoreS50.h",
+    ]
+  }
 
   if (nxp_nvm_component == "nvm_fwk" || nxp_nvm_component == "littlefs") {
     sources += [
@@ -149,12 +167,19 @@ static_library("nxp_platform") {
   }
 
   if (chip_enable_ota_requestor) {
-    sources += [
-      "../../common/OTAImageProcessorImpl.cpp",
-      "../../common/OTAImageProcessorImpl.h",
-    ]
-    include_dirs =
-        [ "${chip_root}/examples/platform/nxp/common/mcuboot_app_support/" ]
+    defines += [ "CONFIG_CHIP_OTA_POSTED_OPERATIONS_IN_IDLE=1" ]
+    sources += ota_sources
+    if (nxp_enable_ota_factory_data_processor) {
+      defines += [ "CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR=1" ]
+    }
+    if (chip_with_ota_encryption) {
+      defines += [
+        "OTA_ENCRYPTION_ENABLE=1",
+        "OTA_ENCRYPTION_KEY=\"${chip_with_ota_key}\"",
+      ]
+    } else {
+      defines += [ "OTA_ENCRYPTION_ENABLE=0" ]
+    }
   }
 
   if (chip_enable_openthread) {
@@ -168,12 +193,12 @@ static_library("nxp_platform") {
       "../../common/ThreadStackManagerImpl.h",
     ]
 
-    deps += [ "${chip_root}/src/app/common:ids" ]
+    deps += [ "${chip_root}/third_party/openthread:openthread" ]
 
-    if (!nxp_build_matter_standalone_lib) {
-      deps += [ "${chip_root}/third_party/openthread:openthread" ]
-      public_deps +=
-          [ "${chip_root}/third_party/openthread:openthread-platform" ]
+    public_deps += [ "${chip_root}/third_party/openthread:openthread-platform" ]
+
+    if (nxp_enable_matter_cli) {
+      public_deps += [ "${chip_root}/third_party/openthread:openthread_cli" ]
     }
 
     if (chip_mdns == "platform") {
@@ -196,11 +221,25 @@ static_library("nxp_platform") {
     }
   }
 
+  if (chip_enable_ethernet) {
+    include_dirs = [ "../../common/Ethernet/" ]
+    sources += [ "../../common/Ethernet/NxpEthDriver.cpp" ]
+  }
+
   if (nxp_use_factory_data) {
     sources += [
-      "../../common/factory_data/FactoryDataProvider.cpp",
-      "../../common/factory_data/FactoryDataProvider.h",
+      "../../common/factory_data/legacy/FactoryDataProvider.cpp",
+      "../../common/factory_data/legacy/FactoryDataProvider.h",
     ]
+    if (nxp_enable_ota_factory_data_processor) {
+      sources += [
+        "../../common/factory_data/legacy/FactoryDataDriver.cpp",
+        "../../common/factory_data/legacy/FactoryDataDriver.h",
+        "FactoryDataDriverImpl.cpp",
+        "FactoryDataDriverImpl.h",
+      ]
+    }
+
     if (nxp_enable_secure_whole_factory_data) {
       sources += [
         "FactoryDataProviderEncImpl.cpp",
@@ -228,6 +267,12 @@ static_library("nxp_platform") {
     "${chip_root}/src/crypto",
     "${chip_root}/src/platform:syscalls_stub",
   ]
+
+  if (nxp_crypto_impl == "se05x") {
+    deps += [
+      "${chip_root}/src/platform/nxp/crypto/${nxp_crypto_impl}:nxp_crypto_lib",
+    ]
+  }
 
   public_configs = [ ":nxp_platform_config" ]
 }

@@ -30,11 +30,14 @@
 
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
+#include <lib/support/Base64.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafePointerCast.h>
 #include <lib/support/Span.h>
+#include <lib/support/StringBuilder.h>
 
 #include <stddef.h>
 #include <string.h>
@@ -115,6 +118,41 @@ inline constexpr char kVIDPrefixForCNEncoding[]    = "Mvid:";
 inline constexpr char kPIDPrefixForCNEncoding[]    = "Mpid:";
 inline constexpr size_t kVIDandPIDHexLength        = sizeof(uint16_t) * 2;
 inline constexpr size_t kMax_CommonNameAttr_Length = 64;
+
+enum class FabricBindingVersion : uint8_t
+{
+    kVersion1 = 0x01 // Initial version using version 1.0 of the Matter Cryptographic Primitives.
+};
+
+// VidVerificationStatementVersion is on purpose different and non-overlapping with FabricBindingVersion.
+enum class VidVerificationStatementVersion : uint8_t
+{
+    kVersion1 = 0x21 // Initial version using version 1.0 of the Matter Cryptographic Primitives.
+};
+
+inline constexpr uint8_t kFabricBindingVersionV1 = 1u;
+
+inline constexpr size_t kVendorIdVerificationClientChallengeSize = 32u;
+
+// VIDVerificationStatement := statement_version || vid_verification_signer_skid || vid_verification_statement_signature
+inline constexpr size_t kVendorIdVerificationStatementV1Size =
+    sizeof(uint8_t) + kSubjectKeyIdentifierLength + kP256_ECDSA_Signature_Length_Raw;
+static_assert(
+    kVendorIdVerificationStatementV1Size == 85,
+    "Expected size of VendorIdVerificationStatement version 1 was computed incorrectly due to changes of fundamental constants");
+
+// vendor_fabric_binding_message := fabric_binding_version (1 byte) || root_public_key || fabric_id || vendor_id
+inline constexpr size_t kVendorFabricBindingMessageV1Size =
+    sizeof(uint8_t) + CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES + sizeof(uint64_t) + sizeof(uint16_t);
+static_assert(
+    kVendorFabricBindingMessageV1Size == 76,
+    "Expected size of VendorFabricBindingMessage version 1 was computed incorrectly due to changes of fundamental constants");
+
+// vendor_id_verification_tbs := fabric_binding_version || client_challenge || attestation_challenge || fabric_index ||
+// vendor_fabric_binding_message || <vid_verification_statement>
+inline constexpr size_t kVendorIdVerificationTbsV1MaxSize = sizeof(uint8_t) + kVendorIdVerificationClientChallengeSize +
+    CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES + sizeof(uint8_t) + kVendorFabricBindingMessageV1Size +
+    kVendorIdVerificationStatementV1Size;
 
 /*
  * Overhead to encode a raw ECDSA signature in X9.62 format in ASN.1 DER
@@ -275,7 +313,7 @@ public:
             return *this;
 
         ClearSecretData(mBytes);
-        SetLength(other.Length());
+        TEMPORARY_RETURN_IGNORED SetLength(other.Length());
         ::memcpy(Bytes(), other.ConstBytes(), other.Length());
         return *this;
     }
@@ -581,15 +619,42 @@ public:
      **/
     CHIP_ERROR ECDH_derive_secret(const P256PublicKey & remote_public_key, P256ECDHDerivedSecret & out_secret) const override;
 
+    /**
+     * @brief Loads a P256 keypair from raw private and public key byte spans.
+     *
+     * !!!!!! IMPORTANT !!!!!!!
+     * Raw private keys SHOULD NOT be loaded directly without extreme care about ensuring they do not get retained in
+     * memory (e.g. stack or heap) and have the shortest possible lifecycle. Please consider replacing basic example
+     * usage of private key loading with delegation of signing to another part of the system that preferably has key
+     * material isolation or protection.
+     *
+     * Combines the public and private key data into a serialized keypair format,
+     * then deserializes it into this keypair object.
+     *
+     * @param private_key ByteSpan containing the raw private key bytes.
+     * @param public_key ByteSpan containing the raw public key bytes.
+     * @return CHIP_ERROR indicating success or failure of the operation.
+     */
+    CHIP_ERROR HazardousOperationLoadKeypairFromRaw(ByteSpan private_key, ByteSpan public_key);
+
     /** @brief Return public key for the keypair.
      **/
     const P256PublicKey & Pubkey() const override { return mPublicKey; }
+
+#if CHIP_WITH_NLFAULTINJECTION
+    P256PublicKey & TestOnlyMutablePubkey() { return mPublicKey; }
+#endif
 
     /** Release resources associated with this key pair */
     void Clear();
 
 protected:
+#if CHIP_WITH_NLFAULTINJECTION
+    mutable P256PublicKey mPublicKey;
+#else
     P256PublicKey mPublicKey;
+#endif
+    // P256PublicKey mPublicKey;
     mutable P256KeypairContext mKeypair;
     bool mInitialized = false;
 };
@@ -1650,6 +1715,39 @@ enum class AttestationCertType
 CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, AttestationCertType certType);
 
 /**
+ * @brief Generate a VendorFabricBindingMessage as used by the Fabric Table Vendor ID Verification Procedure.
+ *
+ * @param[in] fabricBindingVersion - Version of binding payload to generate. outputSpan size requirements are based on this.
+ * @param[in] rootPublicKey - Root public key for the fabric in question
+ * @param[in] fabricId - Fabric ID for the fabric in question
+ * @param[in] vendorId - Vendor ID for the fabric in question
+ * @param[inout] outputSpan - Span that will receive the binding message. Must be large enough for the
+ *                            payload (otherwise CHIP_ERROR_BUFFER_TOO_SMALL) and will be resized to fit.
+ * @return CHIP_NO_ERROR on success, otherwise another CHIP_ERROR value representative of the failure.
+ */
+CHIP_ERROR GenerateVendorFabricBindingMessage(FabricBindingVersion fabricBindingVersion, const P256PublicKey & rootPublicKey,
+                                              FabricId fabricId, uint16_t vendorId, MutableByteSpan & outputSpan);
+
+/**
+ * @brief Generate the message to be signed for the Fabric Table Vendor ID Verification Procedure.
+ *
+ * The Fabric Binding Version value will be recovered from the vendorFabricBindingMessage.
+ *
+ * @param fabricIndex - Fabric Index for the fabric in question
+ * @param clientChallenge - Client challenge to use
+ * @param attestationChallenge - Attestation challenge to use
+ * @param vendorFabricBindingMessage - The VendorFabricBindingMessage previously computed for the fabric
+ * @param vidVerificationStatement - The VID Verification Statement to include in signature (may be empty)
+ * @param outputSpan - Span that will receive the to-be-signed message. Must be large enough for the
+ *                     payload (otherwise CHIP_ERROR_BUFFER_TOO_SMALL) and will be resized to fit.
+ * @return CHIP_NO_ERROR on success, otherwise another CHIP_ERROR value representative of the failure.
+ */
+CHIP_ERROR GenerateVendorIdVerificationToBeSigned(FabricIndex fabricIndex, const ByteSpan & clientChallenge,
+                                                  const ByteSpan & attestationChallenge,
+                                                  const ByteSpan & vendorFabricBindingMessage,
+                                                  const ByteSpan & vidVerificationStatement, MutableByteSpan & outputSpan);
+
+/**
  * @brief Validate notBefore timestamp of a certificate (candidateCertificate) against validity period of the
  *        issuer certificate (issuerCertificate).
  *
@@ -1725,6 +1823,112 @@ CHIP_ERROR ExtractSubjectFromX509Cert(const ByteSpan & certificate, MutableByteS
  * @brief Extracts Issuer Distinguished Name from X509 Certificate. The value is copied into buffer in a raw ASN.1 X.509 format.
  **/
 CHIP_ERROR ExtractIssuerFromX509Cert(const ByteSpan & certificate, MutableByteSpan & issuer);
+
+class PemEncoder
+{
+public:
+    /**
+     * @brief Construct a PEM encoder for element type `encodedElement` whose DER data is in `derBytes` span.
+     *
+     * LIFETIME: both encodedElement and derBytes lifetime must be >= PemEncoder lifetime.
+     *           PemEncoder references these while processing `NextLine()` calls.
+     *
+     * @param encodedElement - Element type string to include in header/footer (e.g. "CERTIFICATE"). Caller must provide correct
+     * uppercase.
+     * @param derBytes - Byte span containing data to encode. May be empty.
+     */
+    explicit PemEncoder(const char * encodedElement, ByteSpan derBytes) : mEncodedElement(encodedElement), mDerBytes(derBytes) {}
+
+    // No copies.
+    PemEncoder(const PemEncoder &)             = delete;
+    PemEncoder & operator=(const PemEncoder &) = delete;
+
+    /**
+     * @brief Returns the pointer to the next null-terminated line of the encoding, or nullptr if done.
+     *
+     * The returned pointer has the lifetime of this class and during that lifetime will always point
+     * to valid memory.
+     *
+     * When header/footer are written, the heading type (`encodedElement` value) such as
+     * `CERTIFICATE` is clamped so that the entire header line with `-----BEGIN ${encodedElement}-----`
+     * and footer line with `-----END ${encodedElement}-----` are not wider than 64 bytes. This
+     * will not happen in practice with the types of things this is meant to encode.
+     *
+     * Usage should be in a loop, for example:
+     *
+     *   std::vector<std::string> pemLines;
+     *
+     *   PemEncoder encoder("CERTIFICATE", TestCerts::sTestCert_PAA_FFF1_Cert);
+     *
+     *   const char* line = encoder.NextLine();
+     *   while (line)
+     *   {
+     *       pemLines.push_back(std::string{ line });
+     *       line = encoder.NextLine();
+     *   }
+     *
+     * @return a pointer to the internal line buffer for next line or nullptr when done.
+     */
+    const char * NextLine();
+
+private:
+    static constexpr size_t kNumBytesPerLine = 48u;
+    static constexpr size_t kLineBufferSize  = 64u + 1u; // PEM expects 64 characters wide and a null terminator at least.
+    static_assert(kLineBufferSize == (BASE64_ENCODED_LEN(kNumBytesPerLine) + 1), "Internal incoherence of library configuration!");
+
+    enum State : int
+    {
+        kPrintHeader = 0,
+        kPrintBody   = 1,
+        kPrintFooter = 2,
+        kDone        = 3,
+    };
+
+    const char * mEncodedElement; // "CERTIFICATE", "EC PUBLIC KEY", etc. Must be capitalized by caller.
+    ByteSpan mDerBytes;
+    State mState           = State::kPrintHeader;
+    size_t mProcessedBytes = 0;
+    StringBuilder<kLineBufferSize> mStringBuilder{};
+};
+
+// Utility class to take subject Key IDs (AKID/SKID) and convert them to DCL format ("A5:FF:00.....:DE:AD").
+class KeyIdStringifier
+{
+public:
+    KeyIdStringifier() = default;
+
+    /**
+     * @brief Returns the null-terminated string buffer owned by the class containing converted KeyID.
+     *
+     * LIFETIME NOTE: The last returned value from KeyIdToHex is valid until the next call.
+     *
+     * This is optimized for standard 20-byte AKID/SKID but works for any length, truncating very long ones.
+     *
+     * @param keyIdBuffer - buffer of bytes of the key ID.
+     * @return pointer to class-owned storage of a null-terminated string in DCL format.
+     */
+    const char * KeyIdToHex(ByteSpan keyIdBuffer)
+    {
+        mStringBuilder.Reset();
+        if (keyIdBuffer.empty())
+        {
+            mStringBuilder.Add("<EMPTY KEY ID>");
+            return mStringBuilder.c_str();
+        }
+
+        mStringBuilder.AddFormat("%02X", keyIdBuffer[0]);
+        for (size_t i = 1; i < keyIdBuffer.size(); ++i)
+        {
+            mStringBuilder.Add(":");
+            mStringBuilder.AddFormat("%02X", keyIdBuffer[i]);
+        }
+
+        return mStringBuilder.AddMarkerIfOverflow().c_str();
+    }
+
+private:
+    StringBuilder<(Crypto::kAuthorityKeyIdentifierLength * 3) + 1> mStringBuilder;
+};
 
 /**
  * @brief Checks for resigned version of the certificate in the list and returns it.

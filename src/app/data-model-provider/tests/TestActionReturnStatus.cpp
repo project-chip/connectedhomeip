@@ -15,13 +15,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#include "lib/core/CHIPError.h"
-#include "protocols/interaction_model/StatusCode.h"
-#include "pw_unit_test/framework_backend.h"
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/StringBuilderAdapters.h>
+#include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 #include <pw_unit_test/framework.h>
 

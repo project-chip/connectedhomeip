@@ -45,7 +45,7 @@ extern ThermostatAttrAccess gThermostatAttrAccess;
 void TimerExpiredCallback(System::Layer * systemLayer, void * callbackContext)
 {
     EndpointId endpoint = static_cast<EndpointId>(reinterpret_cast<uintptr_t>(callbackContext));
-    gThermostatAttrAccess.ResetAtomicWrite(endpoint);
+    TEMPORARY_RETURN_IGNORED gThermostatAttrAccess.ResetAtomicWrite(endpoint);
 }
 
 namespace {
@@ -58,8 +58,8 @@ namespace {
  */
 void ScheduleTimer(EndpointId endpoint, System::Clock::Milliseconds16 timeout)
 {
-    DeviceLayer::SystemLayer().StartTimer(timeout, TimerExpiredCallback,
-                                          reinterpret_cast<void *>(static_cast<uintptr_t>(endpoint)));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(timeout, TimerExpiredCallback,
+                                                                   reinterpret_cast<void *>(static_cast<uintptr_t>(endpoint)));
 }
 
 /**
@@ -213,7 +213,7 @@ bool ThermostatAttrAccess::InAtomicWrite(EndpointId endpoint, Optional<Attribute
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
 
-    if (ep >= ArraySize(mAtomicWriteSessions))
+    if (ep >= MATTER_ARRAY_SIZE(mAtomicWriteSessions))
     {
         return false;
     }
@@ -264,7 +264,7 @@ bool ThermostatAttrAccess::InAtomicWrite(
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
 
-    if (ep >= ArraySize(mAtomicWriteSessions))
+    if (ep >= MATTER_ARRAY_SIZE(mAtomicWriteSessions))
     {
         return false;
     }
@@ -306,7 +306,7 @@ bool ThermostatAttrAccess::SetAtomicWrite(
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
 
-    if (ep >= ArraySize(mAtomicWriteSessions))
+    if (ep >= MATTER_ARRAY_SIZE(mAtomicWriteSessions))
     {
         return false;
     }
@@ -341,7 +341,7 @@ void ThermostatAttrAccess::ResetAtomicWrite(EndpointId endpoint)
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
 
-    if (ep >= ArraySize(mAtomicWriteSessions))
+    if (ep >= MATTER_ARRAY_SIZE(mAtomicWriteSessions))
     {
         return;
     }
@@ -358,7 +358,7 @@ ScopedNodeId ThermostatAttrAccess::GetAtomicWriteOriginatorScopedNodeId(const En
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, Thermostat::Id, MATTER_DM_THERMOSTAT_CLUSTER_SERVER_ENDPOINT_COUNT);
 
-    if (ep < ArraySize(mAtomicWriteSessions))
+    if (ep < MATTER_ARRAY_SIZE(mAtomicWriteSessions))
     {
         originatorNodeId = mAtomicWriteSessions[ep].nodeId;
     }

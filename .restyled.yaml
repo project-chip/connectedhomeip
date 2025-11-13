@@ -66,9 +66,9 @@ exclude:
     - "third_party/nanopb/repo/**/*"
     - "examples/android/CHIPTool/gradlew" # gradle wrapper generated file
     - "third_party/android_deps/gradlew" # gradle wrapper generated file
-    - "src/controller/python/chip/clusters/Objects.py" # generated file, no point to restyle
-    - "src/controller/python/chip/clusters/CHIPClusters.py" # generated file, no point to restyle
-    - "scripts/py_matter_idl/matter_idl/tests/outputs/**/*" # Matches generated output 1:1
+    - "src/controller/python/matter/clusters/Objects.py" # generated file, no point to restyle
+    - "src/controller/python/matter/clusters/CHIPClusters.py" # generated file, no point to restyle
+    - "scripts/py_matter_idl/matter/idl/tests/outputs/**/*" # Matches generated output 1:1
     - "scripts/tools/zap/tests/outputs/**/*" # Matches generated output 1:1
     - "examples/chef/sample_app_util/test_files/*.yaml"
     - "examples/chef/zzz_generated/**/*"
@@ -224,23 +224,12 @@ restylers:
           - "**/*.sh"
           - "**/*.bash"
     - name: autopep8
-      image: restyled/restyler-autopep8:v2.0.0
-      command:
-          - autopep8
-          - "--in-place"
-          - "--max-line-length"
-          - "132"
-      arguments: []
-      include:
-          - "**/*.py"
-      interpreters:
-          - python
+      image: public.ecr.aws/restyled-io/restyler-autopep8:v2.3
     - name: isort
-      image: restyled/restyler-isort:v5.11.2
+      image: public.ecr.aws/restyled-io/restyler-isort:v7.0
+    - name: ruff
+      image: public.ecr.aws/restyled-io/restyler-ruff:v0.14
       command:
-          - isort
-      arguments: []
-      include:
-          - "**/*.py"
-      interpreters:
-          - python
+          - ruff
+          - check
+          - --fix-only

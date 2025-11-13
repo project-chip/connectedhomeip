@@ -170,7 +170,7 @@ void AsyncBatchCommandWork(AsyncBatchCommandsWorkData * asyncWorkData)
     memset(buffer, asyncWorkData->fillCharacter, asyncWorkData->sizeOfResponseBuffer);
     Commands::TestBatchHelperResponse::Type response;
     response.buffer = ByteSpan(buffer, asyncWorkData->sizeOfResponseBuffer);
-    commandHandle->AddResponse(asyncWorkData->commandPath, response);
+    TEMPORARY_RETURN_IGNORED commandHandle->AddResponse(asyncWorkData->commandPath, response);
     Platform::Delete(asyncWorkData);
 }
 
@@ -181,8 +181,8 @@ static void timerCallback(System::Layer *, void * callbackContext)
 
 static void scheduleTimerCallbackMs(AsyncBatchCommandsWorkData * asyncWorkData, uint32_t delayMs)
 {
-    DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayMs), timerCallback,
-                                          reinterpret_cast<void *>(asyncWorkData));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayMs), timerCallback,
+                                                                   reinterpret_cast<void *>(asyncWorkData));
 }
 
 CHIP_ERROR TestAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
@@ -583,7 +583,7 @@ CHIP_ERROR TestAttrAccess::WriteListNullablesAndOptionalsStructAttribute(const C
         if (!value.nullableList.IsNull())
         {
             ReturnErrorOnFailure(value.nullableList.Value().ComputeSize(&count));
-            VerifyOrReturnError(count <= ArraySize(gSimpleEnums), CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrReturnError(count <= MATTER_ARRAY_SIZE(gSimpleEnums), CHIP_ERROR_INVALID_ARGUMENT);
             auto iter2       = value.nullableList.Value().begin();
             gSimpleEnumCount = 0;
             while (iter2.Next())
@@ -1180,10 +1180,22 @@ bool emberAfUnitTestingClusterGlobalEchoRequestCallback(CommandHandler * command
     return true;
 }
 
+bool emberAfUnitTestingClusterTestCheckCommandFlagsCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                            const Commands::TestCheckCommandFlags::DecodableType & commandData)
+{
+    commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
+    return true;
+}
+
 // -----------------------------------------------------------------------------
 // Plugin initialization
 
 void MatterUnitTestingPluginServerInitCallback()
 {
     AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
+}
+
+void MatterUnitTestingPluginServerShutdownCallback()
+{
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
 }

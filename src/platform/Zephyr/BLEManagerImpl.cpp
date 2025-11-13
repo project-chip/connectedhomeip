@@ -44,10 +44,15 @@
 #include <zephyr/random/random.h>
 #include <zephyr/sys/byteorder.h>
 #include <zephyr/sys/util.h>
+#include <zephyr/version.h>
 
 #ifdef CONFIG_BT_BONDABLE
 #include <zephyr/settings/settings.h>
 #endif // CONFIG_BT_BONDABLE
+
+#if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
+#include <ncs_version.h>
+#endif
 
 #include <array>
 
@@ -75,7 +80,18 @@ const bt_uuid_128 UUID128_CHIPoBLEChar_C3 =
 
 bt_uuid_16 UUID16_CHIPoBLEService = BT_UUID_INIT_16(0xFFF6);
 
+#if KERNEL_VERSION_MAJOR >= 4 && KERNEL_VERSION_MINOR >= 2
+bt_gatt_ccc_managed_user_data CHIPoBLEChar_TX_CCC =
+    BT_GATT_CCC_MANAGED_USER_DATA_INIT(nullptr, BLEManagerImpl::HandleTXCCCWrite, nullptr);
+// nRF Connect SDK 3.1.0 supports Zephyr 4.1.99 version, so unfortunately it needs a separate check
+#elif CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
+#if NCS_VERSION_MAJOR >= 3 && NCS_VERSION_MINOR >= 1
+bt_gatt_ccc_managed_user_data CHIPoBLEChar_TX_CCC =
+    BT_GATT_CCC_MANAGED_USER_DATA_INIT(nullptr, BLEManagerImpl::HandleTXCCCWrite, nullptr);
+#endif
+#else
 _bt_gatt_ccc CHIPoBLEChar_TX_CCC = BT_GATT_CCC_INITIALIZER(nullptr, BLEManagerImpl::HandleTXCCCWrite, nullptr);
+#endif
 
 // clang-format off
 
@@ -122,13 +138,14 @@ int InitRandomStaticAddress(bool idPresent, int & id)
     // generating the address
     addr.type = BT_ADDR_LE_RANDOM;
     error     = sys_csrand_get(addr.a.val, sizeof(addr.a.val));
-    BT_ADDR_SET_STATIC(&addr.a);
 
     if (error)
     {
         ChipLogError(DeviceLayer, "Failed to create BLE address: %d", error);
         return error;
     }
+
+    BT_ADDR_SET_STATIC(&addr.a);
 
     if (!idPresent)
     {

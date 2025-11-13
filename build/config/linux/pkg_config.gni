@@ -67,6 +67,10 @@ declare_args() {
   host_pkg_config = ""
 
   system_libdir = "lib"
+
+  if (current_os == "tizen" && current_cpu == "arm64") {
+    system_libdir = "lib64"
+  }
 }
 
 pkg_config_script = "${build_root}/config/linux/pkg-config.py"

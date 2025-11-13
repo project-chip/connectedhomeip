@@ -13,16 +13,19 @@ concurrency:
 
 
 jobs:
+
+  # This test is currently disabled due to Issue #41932
   detekt:
     name: Static code analysis
+    if: false
     runs-on: ubuntu-latest
 
     steps:
       - name: "checkout"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: "detekt"
-        uses: natiginfo/action-detekt-all@1.23.6
+        uses: natiginfo/action-detekt-all@1.23.7
         # Detekt seems not to like circular symlinks, so we set up
         # explicit paths below
         #
@@ -39,9 +42,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: 'adopt'
           java-version: '17'

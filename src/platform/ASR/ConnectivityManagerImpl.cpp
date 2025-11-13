@@ -305,7 +305,7 @@ void ConnectivityManagerImpl::DriveStationState()
             err = Internal::ASRUtils::asr_wifi_disconnect();
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(DeviceLayer, "asr_wifi_disconnect() failed: %s", chip::ErrorStr(err));
+                ChipLogError(DeviceLayer, "asr_wifi_disconnect() failed: %" CHIP_ERROR_FORMAT, err.Format());
             }
             SuccessOrExit(err);
 
@@ -351,7 +351,7 @@ void ConnectivityManagerImpl::DriveStationState()
                     err = Internal::ASRUtils::asr_wifi_connect();
                     if (err != CHIP_NO_ERROR)
                     {
-                        ChipLogError(DeviceLayer, "asr_wifi_connect() failed: %s", chip::ErrorStr(err));
+                        ChipLogError(DeviceLayer, "asr_wifi_connect() failed: %" CHIP_ERROR_FORMAT, err.Format());
                     }
                     SuccessOrExit(err);
                     ChangeWiFiStationState(kWiFiStationState_Connecting);

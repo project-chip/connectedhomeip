@@ -17,6 +17,7 @@
  */
 
 #include "BDXDiagnosticLogsServerDelegate.h"
+#include <lib/support/StringBuilder.h>
 
 #include <string>
 #include <unistd.h>
@@ -95,8 +96,8 @@ void LogFileDesignator(const char * prefix, const chip::CharSpan & fileDesignato
 {
 #if CHIP_PROGRESS_LOGGING
     auto size = static_cast<uint16_t>(fileDesignator.size());
-    auto data = fileDesignator.data();
-    ChipLogProgress(chipTool, "%s (%u): %.*s", prefix, size, size, data);
+
+    ChipLogProgress(chipTool, "%s (%u): %s", prefix, size, chip::NullTerminated(fileDesignator).c_str());
 #endif // CHIP_PROGRESS_LOGGING
 
     if (CHIP_NO_ERROR != error)
@@ -153,7 +154,7 @@ CHIP_ERROR BDXDiagnosticLogsServerDelegate::OnTransferBegin(chip::bdx::BDXTransf
     ReturnErrorOnFailure(GetFilePath(fileDesignator, outputFilePathSpan));
 
     // Ensure null-termination of the filename, since we will be passing it around as a char *.
-    VerifyOrReturnError(outputFilePathSpan.size() < ArraySize(outputFilePath), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(outputFilePathSpan.size() < MATTER_ARRAY_SIZE(outputFilePath), CHIP_ERROR_INTERNAL);
     outputFilePath[outputFilePathSpan.size()] = '\0';
 
     ReturnErrorOnFailure(CheckFileDoesNotExist(outputFilePath));

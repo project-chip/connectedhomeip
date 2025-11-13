@@ -22,7 +22,9 @@ LABEL org.opencontainers.image.source https://github.com/project-chip/connectedh
 ARG USERNAME=vscode
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
-ENV LANG en_US.utf8
+ARG WORKSPACE_ROOT=/workspaces/connectedhomeip
+ARG LOCAL_WORKSPACE_ROOT
+ENV LANG=en_US.utf8
 
 
 # These are installed for terminal/dev convenience. If more tooling for build is required, please
@@ -54,25 +56,20 @@ RUN curl https://raw.githubusercontent.com/restyled-io/restyler/master/bin/resty
     && chmod +x /usr/local/bin/restyle-path \
     && :
 
-RUN mkdir -p /opt/sdk/sdks/ \
+RUN mkdir -p /opt/android/sdk \
     && chown -R $USERNAME:$USERNAME \
-    /opt/sdk/sdks/ `# NXP uses a patch_sdk script to change SDK files` \
     $ANDROID_HOME \
     $IDF_TOOLS_PATH \
-    && find $AMEBA_PATH -name "inc_lp" -print0 | xargs -0 chown -R $USERNAME:$USERNAME \
-    && find $AMEBA_PATH -name "inc_hp" -print0 | xargs -0 chown -R $USERNAME:$USERNAME \
-    && find $AMEBA_PATH -name "project_lp" -print0 | xargs -0 chown -R $USERNAME:$USERNAME \
-    && find $AMEBA_PATH -name "project_hp" -print0 | xargs -0 chown -R $USERNAME:$USERNAME \
-    && chmod -R +x \
-    $ANDROID_HOME/tools/bin `# sdkmanager for accepting licenses`\
+    && find $AMEBA_PATH \
+    -name "inc_lp" -print0      -or \
+    -name "inc_hp" -print0      -or \
+    -name "project_lp" -print0  -or \
+    -name "project_hp" -print0 \
+    | xargs -0 -I {} sh -c 'chown -R $USERNAME:$USERNAME {}; chmod -R +w {}' \
+    && find $ANDROID_HOME/cmdline-tools/ -type d -name bin | xargs chmod -R +x `# sdkmanager for accepting licenses` \
     && chmod -R +w \
     $IDF_TOOLS_PATH \
-    && find $AMEBA_PATH -name "inc_lp" -print0 | xargs -0 chmod -R +w \
-    && find $AMEBA_PATH -name "inc_hp" -print0 | xargs -0 chmod -R +w \
-    && find $AMEBA_PATH -name "project_lp" -print0 | xargs -0 chmod -R +w \
-    && find $AMEBA_PATH -name "project_hp" -print0 | xargs -0 chmod -R +w \
-    # Safe directory is preffered over chown.
-    && git config --global --add safe.directory "*" \
+    && git config --global --add safe.directory "*" `# Safe directory is preferred over chown.` \
     && :
 
 # Fix Tizen SDK paths for new user
@@ -81,10 +78,16 @@ RUN sed -i '/^TIZEN_SDK_DATA_PATH/d' $TIZEN_SDK_ROOT/sdk.info \
     && ln -sf /home/$USERNAME/.tizen-cli-config $TIZEN_SDK_ROOT/tools/.tizen-cli-config \
     && : # last line
 
-ENV TIZEN_ROOTFS /tizen_rootfs
+RUN if [ -n "${LOCAL_WORKSPACE_ROOT}" ]; then \
+    true \
+    && mkdir -p "$(dirname "${LOCAL_WORKSPACE_ROOT}")" \
+    && ln -sf "${WORKSPACE_ROOT}" "${LOCAL_WORKSPACE_ROOT}" \
+    ; fi
+
+ENV TIZEN_ROOTFS=/tizen_rootfs
 
 # Fast Model GDB plugins path for debugging support
-ENV FAST_MODEL_PLUGINS_PATH /opt/FastModelsPortfolio_11.16/plugins/Linux64_GCC-9.3
+ENV FAST_MODEL_PLUGINS_PATH=/opt/FastModelsPortfolio_11.16/plugins/Linux64_GCC-9.3
 
 # Set up ccache as a pigweed command launcher when using the scripts/build/build_examples.py
 # script. Also, set up icecc as the command prefix for ccache. Such setup allows to benefit
@@ -92,6 +95,6 @@ ENV FAST_MODEL_PLUGINS_PATH /opt/FastModelsPortfolio_11.16/plugins/Linux64_GCC-9
 #
 # NOTE: In order to use distributed compilation with icecc, one should run
 #       "scripts/icecc.sh start" before starting the build.
-ENV CHIP_PW_COMMAND_LAUNCHER ccache
-ENV CCACHE_PREFIX icecc
-ENV PATH /usr/lib/ccache:$PATH
+ENV CHIP_PW_COMMAND_LAUNCHER=ccache
+ENV CCACHE_PREFIX=icecc
+ENV PATH=/usr/lib/ccache:$PATH

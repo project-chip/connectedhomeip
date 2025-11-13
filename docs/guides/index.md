@@ -19,3 +19,5 @@ and features.
 
 -   [Access Control](./access-control-guide.md)
 -   [Matter IDL tooling and validation](./matter_idl_tooling.md)
+-   [Writing clusters](./writing_clusters.md)
+-   [Migrating to code-driven clusters](./migrating_ember_cluster_to_code_driven.md)

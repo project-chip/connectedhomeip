@@ -26,6 +26,7 @@
 #include <lib/core/TLV.h>
 #include <lib/support/Span.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 #include <lib/core/StringBuilderAdapters.h>
 #include <pw_unit_test/framework.h>
@@ -146,9 +147,9 @@ SceneTableEntry scene14(sceneId11, sceneData14);
 SceneTableEntry scene15(sceneId12, sceneData15);
 
 // Clusters EFS data
-static app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type OOextensionFieldSet;
-static app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type LCextensionFieldSet;
-static app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type CCextensionFieldSet;
+static app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::Type OOextensionFieldSet;
+static app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::Type LCextensionFieldSet;
+static app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::Type CCextensionFieldSet;
 
 static app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type OOPairs[1];
 static app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type LCPairs[2];
@@ -176,7 +177,7 @@ static EmberAfAttributeMetadata mockMetadataBool = {
     .attributeId   = 0,
     .size          = 1,
     .attributeType = ZCL_BOOLEAN_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE,
+    .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataUint8 = {
@@ -184,7 +185,7 @@ static EmberAfAttributeMetadata mockMetadataUint8 = {
     .attributeId   = 0,
     .size          = 1,
     .attributeType = ZCL_INT8U_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_NULLABLE,
+    .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE | MATTER_ATTRIBUTE_FLAG_NULLABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataUint8Max = {
@@ -192,7 +193,7 @@ static EmberAfAttributeMetadata mockMetadataUint8Max = {
     .attributeId   = 0,
     .size          = 1,
     .attributeType = ZCL_INT8U_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_NULLABLE | ATTRIBUTE_MASK_MIN_MAX,
+    .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE | MATTER_ATTRIBUTE_FLAG_NULLABLE | MATTER_ATTRIBUTE_FLAG_MIN_MAX,
 };
 
 static EmberAfAttributeMetadata mockMetadataUint16 = {
@@ -200,7 +201,7 @@ static EmberAfAttributeMetadata mockMetadataUint16 = {
     .attributeId   = 0,
     .size          = 2,
     .attributeType = ZCL_INT16U_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE,
+    .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataUint24 = {
@@ -208,7 +209,7 @@ static EmberAfAttributeMetadata mockMetadataUint24 = {
     .attributeId   = 0,
     .size          = 3,
     .attributeType = ZCL_INT24U_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE,
+    .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataUint32 = {
@@ -216,7 +217,7 @@ static EmberAfAttributeMetadata mockMetadataUint32 = {
     .attributeId   = 0,
     .size          = 4,
     .attributeType = ZCL_INT32U_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE,
+    .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataUint40 = {
@@ -224,7 +225,7 @@ static EmberAfAttributeMetadata mockMetadataUint40 = {
     .attributeId   = 0,
     .size          = 5,
     .attributeType = ZCL_INT40U_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE,
+    .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataUint48 = {
@@ -232,7 +233,7 @@ static EmberAfAttributeMetadata mockMetadataUint48 = {
     .attributeId   = 0,
     .size          = 6,
     .attributeType = ZCL_INT48U_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE,
+    .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataUint56 = {
@@ -240,7 +241,7 @@ static EmberAfAttributeMetadata mockMetadataUint56 = {
     .attributeId   = 0,
     .size          = 7,
     .attributeType = ZCL_INT56U_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE,
+    .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataUint64 = {
@@ -248,7 +249,7 @@ static EmberAfAttributeMetadata mockMetadataUint64 = {
     .attributeId   = 0,
     .size          = 8,
     .attributeType = ZCL_INT64U_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE,
+    .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataInt8 = {
@@ -256,7 +257,7 @@ static EmberAfAttributeMetadata mockMetadataInt8 = {
     .attributeId   = 0,
     .size          = 1,
     .attributeType = ZCL_INT8S_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_MIN_MAX,
+    .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE | MATTER_ATTRIBUTE_FLAG_MIN_MAX,
 };
 
 static EmberAfAttributeMetadata mockMetadataInt16 = {
@@ -264,7 +265,7 @@ static EmberAfAttributeMetadata mockMetadataInt16 = {
     .attributeId   = 0,
     .size          = 2,
     .attributeType = ZCL_INT16S_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE | ATTRIBUTE_MASK_MIN_MAX,
+    .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE | MATTER_ATTRIBUTE_FLAG_MIN_MAX,
 };
 
 static EmberAfAttributeMetadata mockMetadataInt24 = {
@@ -272,7 +273,7 @@ static EmberAfAttributeMetadata mockMetadataInt24 = {
     .attributeId   = 0,
     .size          = 3,
     .attributeType = ZCL_INT24S_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE,
+    .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataInt32 = {
@@ -280,7 +281,7 @@ static EmberAfAttributeMetadata mockMetadataInt32 = {
     .attributeId   = 0,
     .size          = 4,
     .attributeType = ZCL_INT32S_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE,
+    .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataInt40 = {
@@ -288,7 +289,7 @@ static EmberAfAttributeMetadata mockMetadataInt40 = {
     .attributeId   = 0,
     .size          = 5,
     .attributeType = ZCL_INT40S_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE,
+    .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataInt48 = {
@@ -296,7 +297,7 @@ static EmberAfAttributeMetadata mockMetadataInt48 = {
     .attributeId   = 0,
     .size          = 6,
     .attributeType = ZCL_INT48S_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE,
+    .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataInt56 = {
@@ -304,7 +305,7 @@ static EmberAfAttributeMetadata mockMetadataInt56 = {
     .attributeId   = 0,
     .size          = 7,
     .attributeType = ZCL_INT56S_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE,
+    .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE,
 };
 
 static EmberAfAttributeMetadata mockMetadataInt64 = {
@@ -312,7 +313,7 @@ static EmberAfAttributeMetadata mockMetadataInt64 = {
     .attributeId   = 0,
     .size          = 8,
     .attributeType = ZCL_INT64S_ATTRIBUTE_TYPE,
-    .mask          = ATTRIBUTE_MASK_WRITABLE,
+    .mask          = MATTER_ATTRIBUTE_FLAG_WRITABLE,
 };
 
 // clang-format off
@@ -684,7 +685,7 @@ public:
         // Initialize Scene Table
         SceneTable * sceneTable = scenes::GetSceneTableImpl();
         ASSERT_NE(sceneTable, nullptr);
-        ASSERT_EQ(sceneTable->Init(mpTestStorage), CHIP_NO_ERROR);
+        ASSERT_EQ(sceneTable->Init(*mpTestStorage), CHIP_NO_ERROR);
         SetMockNodeConfig(SceneMockNodeConfig);
     }
 
@@ -696,6 +697,8 @@ public:
         sceneTable->Finish();
         delete mpTestStorage;
         delete mpSceneHandler;
+        mpTestStorage  = nullptr;
+        mpSceneHandler = nullptr;
         chip::Platform::MemoryShutdown();
     }
 
@@ -710,9 +713,9 @@ TestSceneHandler * TestSceneTable::mpSceneHandler                   = nullptr;
 
 void ResetSceneTable(SceneTable * sceneTable)
 {
-    sceneTable->RemoveFabric(kFabric1);
-    sceneTable->RemoveFabric(kFabric2);
-    sceneTable->RemoveFabric(kFabric3);
+    EXPECT_SUCCESS(sceneTable->RemoveFabric(kFabric1));
+    EXPECT_SUCCESS(sceneTable->RemoveFabric(kFabric2));
+    EXPECT_SUCCESS(sceneTable->RemoveFabric(kFabric3));
 }
 
 TEST_F(TestSceneTable, TestHandlerRegistration)
@@ -771,8 +774,8 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
 {
     SceneTable * sceneTable = scenes::GetSceneTableImpl(kTestEndpoint1, defaultTestTableSize);
     ASSERT_NE(nullptr, sceneTable);
-    app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type extensionFieldSetOut;
-    app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::DecodableType extensionFieldSetIn;
+    app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::Type extensionFieldSetOut;
+    app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::DecodableType extensionFieldSetIn;
 
     TLV::TLVReader reader;
     TLV::TLVWriter writer;
@@ -910,8 +913,8 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
     memset(buffer, 0, buff_span.size());
 
     // To test failure on serialize and deserialize when too many pairs are in the field sets
-    app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type extensionFieldFailTestOut;
-    app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::DecodableType extensionFieldFailTestIn;
+    app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::Type extensionFieldFailTestOut;
+    app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::DecodableType extensionFieldFailTestIn;
     app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type TooManyPairs[16];
 
     for (uint8_t i = 0; i < 16; i++)
@@ -948,8 +951,8 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
     OOPairs[0].valueUnsigned8.SetValue(0xFF);
 
     // EFS to test caping of value once a variable above the mock attribute size is serialized
-    app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type extensionFieldValueCapOut;
-    app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::DecodableType extensionFieldValueCapIn;
+    app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::Type extensionFieldValueCapOut;
+    app::Clusters::ScenesManagement::Structs::ExtensionFieldSetStruct::DecodableType extensionFieldValueCapIn;
 
     extensionFieldValueCapOut.clusterID          = kOnOffClusterId;
     extensionFieldValueCapOut.attributeValueList = OOPairs;
@@ -1400,8 +1403,7 @@ TEST_F(TestSceneTable, TestStoreScenes)
     EXPECT_EQ(kScene7, sceneList[0]);
 
     uint8_t sceneCount = 0;
-    sceneTable->GetEndpointSceneCount(sceneCount);
-    sceneTable->GetFabricSceneCount(kFabric1, sceneCount);
+    EXPECT_SUCCESS(sceneTable->GetFabricSceneCount(kFabric1, sceneCount));
 }
 
 TEST_F(TestSceneTable, TestOverwriteScenes)
@@ -1410,8 +1412,8 @@ TEST_F(TestSceneTable, TestOverwriteScenes)
     ASSERT_NE(nullptr, sceneTable);
 
     uint8_t sceneCount = 0;
-    sceneTable->GetEndpointSceneCount(sceneCount);
-    sceneTable->GetFabricSceneCount(kFabric1, sceneCount);
+    EXPECT_SUCCESS(sceneTable->GetEndpointSceneCount(sceneCount));
+    EXPECT_SUCCESS(sceneTable->GetFabricSceneCount(kFabric1, sceneCount));
     SceneTableEntry scene;
     // Overwriting the first entry
     EXPECT_EQ(CHIP_NO_ERROR, sceneTable->SetSceneTableEntry(kFabric1, scene10));
@@ -1431,40 +1433,6 @@ TEST_F(TestSceneTable, TestOverwriteScenes)
     EXPECT_EQ(scene, scene12);
 }
 
-TEST_F(TestSceneTable, TestIterateScenes)
-{
-    SceneTable * sceneTable = scenes::GetSceneTableImpl(kTestEndpoint1, defaultTestTableSize);
-    ASSERT_NE(nullptr, sceneTable);
-
-    SceneTableEntry scene;
-    auto * iterator = sceneTable->IterateSceneEntries(kFabric1);
-
-    ASSERT_NE(iterator, nullptr);
-
-    if (iterator)
-    {
-        EXPECT_EQ(iterator->Count(), 7u);
-        EXPECT_TRUE(iterator->Next(scene));
-        EXPECT_EQ(scene, scene10);
-        EXPECT_TRUE(iterator->Next(scene));
-        EXPECT_EQ(scene, scene2);
-        EXPECT_TRUE(iterator->Next(scene));
-        EXPECT_EQ(scene, scene3);
-        EXPECT_TRUE(iterator->Next(scene));
-        EXPECT_EQ(scene, scene4);
-        EXPECT_TRUE(iterator->Next(scene));
-        EXPECT_EQ(scene, scene11);
-        EXPECT_TRUE(iterator->Next(scene));
-        EXPECT_EQ(scene, scene6);
-        EXPECT_TRUE(iterator->Next(scene));
-        EXPECT_EQ(scene, scene12);
-
-        EXPECT_FALSE(iterator->Next(scene));
-
-        iterator->Release();
-    }
-}
-
 TEST_F(TestSceneTable, TestRemoveScenes)
 {
     SceneTableImpl * sceneTable = scenes::GetSceneTableImpl(kTestEndpoint1, defaultTestTableSize);
@@ -1477,80 +1445,54 @@ TEST_F(TestSceneTable, TestRemoveScenes)
 
     // Remove middle
     EXPECT_EQ(CHIP_NO_ERROR, sceneTable->RemoveSceneTableEntry(kFabric1, scene5.mStorageId));
-    auto * iterator = sceneTable->IterateSceneEntries(kFabric1);
-    EXPECT_EQ(iterator->Count(), 6u);
-    EXPECT_TRUE(iterator->Next(scene));
-    EXPECT_EQ(scene, scene10);
-    iterator->Release();
+    uint8_t entryCount;
+    EXPECT_EQ(CHIP_NO_ERROR, sceneTable->GetFabricSceneCount(kFabric1, entryCount));
+    EXPECT_EQ(entryCount, 6u);
 
     // Add scene in middle, a spot should have been freed
     EXPECT_EQ(CHIP_NO_ERROR, sceneTable->SetSceneTableEntry(kFabric1, scene9));
-    iterator = sceneTable->IterateSceneEntries(kFabric1);
-    EXPECT_EQ(iterator->Count(), 7u);
+    EXPECT_EQ(CHIP_NO_ERROR, sceneTable->GetFabricSceneCount(kFabric1, entryCount));
+    EXPECT_EQ(entryCount, 7u);
     EXPECT_EQ(CHIP_NO_ERROR, sceneTable->GetSceneTableEntry(kFabric1, sceneId9, scene));
     EXPECT_EQ(scene, scene9);
-    iterator->Release();
 
     // Remove the recently added scene 9
     EXPECT_EQ(CHIP_NO_ERROR, sceneTable->RemoveSceneTableEntry(kFabric1, scene9.mStorageId));
-    iterator = sceneTable->IterateSceneEntries(kFabric1);
-    EXPECT_EQ(iterator->Count(), 6u);
-    EXPECT_TRUE(iterator->Next(scene));
-    EXPECT_EQ(scene, scene10);
-    iterator->Release();
+    EXPECT_EQ(CHIP_NO_ERROR, sceneTable->GetFabricSceneCount(kFabric1, entryCount));
+    EXPECT_EQ(entryCount, 6u);
 
     // Remove first
     EXPECT_EQ(CHIP_NO_ERROR, sceneTable->RemoveSceneTableEntryAtPosition(kTestEndpoint1, kFabric1, 0));
-    iterator = sceneTable->IterateSceneEntries(kFabric1);
-    EXPECT_EQ(iterator->Count(), 5u);
-    EXPECT_TRUE(iterator->Next(scene));
-    EXPECT_EQ(scene, scene2);
-    iterator->Release();
+    EXPECT_EQ(CHIP_NO_ERROR, sceneTable->GetFabricSceneCount(kFabric1, entryCount));
+    EXPECT_EQ(entryCount, 5u);
 
     // Remove Next
     EXPECT_EQ(CHIP_NO_ERROR, sceneTable->RemoveSceneTableEntry(kFabric1, scene3.mStorageId));
-    iterator = sceneTable->IterateSceneEntries(kFabric1);
-    EXPECT_EQ(iterator->Count(), 4u);
-    EXPECT_TRUE(iterator->Next(scene));
-    EXPECT_EQ(scene, scene2);
-    EXPECT_TRUE(iterator->Next(scene));
-    EXPECT_EQ(scene, scene4);
-    iterator->Release();
+    EXPECT_EQ(CHIP_NO_ERROR, sceneTable->GetFabricSceneCount(kFabric1, entryCount));
+    EXPECT_EQ(entryCount, 4u);
 
     EXPECT_EQ(CHIP_NO_ERROR, sceneTable->RemoveSceneTableEntry(kFabric1, scene2.mStorageId));
-    iterator = sceneTable->IterateSceneEntries(kFabric1);
-    EXPECT_EQ(iterator->Count(), 3u);
-    EXPECT_TRUE(iterator->Next(scene));
-    EXPECT_EQ(scene, scene4);
-    iterator->Release();
+    EXPECT_EQ(CHIP_NO_ERROR, sceneTable->GetFabricSceneCount(kFabric1, entryCount));
+    EXPECT_EQ(entryCount, 3u);
 
     EXPECT_EQ(CHIP_NO_ERROR, sceneTable->RemoveSceneTableEntry(kFabric1, scene4.mStorageId));
-    iterator = sceneTable->IterateSceneEntries(kFabric1);
-    EXPECT_EQ(iterator->Count(), 2u);
-    EXPECT_TRUE(iterator->Next(scene));
-    EXPECT_EQ(scene, scene6);
-    iterator->Release();
+    EXPECT_EQ(CHIP_NO_ERROR, sceneTable->GetFabricSceneCount(kFabric1, entryCount));
+    EXPECT_EQ(entryCount, 2u);
 
     EXPECT_EQ(CHIP_NO_ERROR, sceneTable->RemoveSceneTableEntry(kFabric1, scene6.mStorageId));
-    iterator = sceneTable->IterateSceneEntries(kFabric1);
-    EXPECT_EQ(iterator->Count(), 1u);
-    EXPECT_TRUE(iterator->Next(scene));
-    EXPECT_EQ(scene, scene12);
-    iterator->Release();
+    EXPECT_EQ(CHIP_NO_ERROR, sceneTable->GetFabricSceneCount(kFabric1, entryCount));
+    EXPECT_EQ(entryCount, 1u);
 
     // Remove last
     EXPECT_EQ(CHIP_NO_ERROR, sceneTable->RemoveSceneTableEntry(kFabric1, scene7.mStorageId));
-    iterator = sceneTable->IterateSceneEntries(kFabric1);
-    EXPECT_EQ(iterator->Count(), 0u);
-    EXPECT_FALSE(iterator->Next(scene));
-    iterator->Release();
+    EXPECT_EQ(CHIP_NO_ERROR, sceneTable->GetFabricSceneCount(kFabric1, entryCount));
+    EXPECT_EQ(entryCount, 0u);
 
     // Remove at empty position, shouldn't trigger error
     EXPECT_EQ(CHIP_NO_ERROR, sceneTable->RemoveSceneTableEntryAtPosition(kTestEndpoint1, kFabric1, defaultTestFabricCapacity - 1));
 
-    iterator = sceneTable->IterateSceneEntries(kFabric1);
-    EXPECT_EQ(iterator->Count(), 0u);
-    iterator->Release();
+    EXPECT_EQ(CHIP_NO_ERROR, sceneTable->GetFabricSceneCount(kFabric1, entryCount));
+    EXPECT_EQ(entryCount, 0u);
 
     // Test Remove all scenes in Group
     EXPECT_EQ(CHIP_NO_ERROR, sceneTable->SetSceneTableEntry(kFabric1, scene1));
@@ -1559,23 +1501,20 @@ TEST_F(TestSceneTable, TestRemoveScenes)
     EXPECT_EQ(CHIP_NO_ERROR, sceneTable->SetSceneTableEntry(kFabric1, scene4));
     EXPECT_EQ(CHIP_NO_ERROR, sceneTable->SetSceneTableEntry(kFabric1, scene5));
     EXPECT_EQ(CHIP_NO_ERROR, sceneTable->SetSceneTableEntry(kFabric1, scene6));
-    iterator = sceneTable->IterateSceneEntries(kFabric1);
-    EXPECT_EQ(iterator->Count(), 6u);
-    iterator->Release();
+    EXPECT_EQ(CHIP_NO_ERROR, sceneTable->GetFabricSceneCount(kFabric1, entryCount));
+    EXPECT_EQ(entryCount, 6u);
 
     EXPECT_EQ(CHIP_NO_ERROR, sceneTable->DeleteAllScenesInGroup(kFabric1, kGroup1));
-    iterator = sceneTable->IterateSceneEntries(kFabric1);
-    EXPECT_EQ(iterator->Count(), 2u);
-    EXPECT_TRUE(iterator->Next(scene));
-    EXPECT_EQ(scene, scene5);
-    EXPECT_TRUE(iterator->Next(scene));
-    EXPECT_EQ(scene, scene6);
-    iterator->Release();
+    SceneId sceneList[defaultTestFabricCapacity];
+    Span<SceneId> sceneListSpan = Span<SceneId>(sceneList);
+    EXPECT_EQ(CHIP_NO_ERROR, sceneTable->GetAllSceneIdsInGroup(kFabric1, kGroup1, sceneListSpan));
+    EXPECT_EQ(0u, sceneListSpan.size());
+    EXPECT_EQ(CHIP_NO_ERROR, sceneTable->GetFabricSceneCount(kFabric1, entryCount));
+    EXPECT_EQ(entryCount, 2u);
 
     EXPECT_EQ(CHIP_NO_ERROR, sceneTable->DeleteAllScenesInGroup(kFabric1, kGroup2));
-    iterator = sceneTable->IterateSceneEntries(kFabric1);
-    EXPECT_EQ(iterator->Count(), 0u);
-    iterator->Release();
+    EXPECT_EQ(CHIP_NO_ERROR, sceneTable->GetFabricSceneCount(kFabric1, entryCount));
+    EXPECT_EQ(entryCount, 0u);
 }
 
 TEST_F(TestSceneTable, TestFabricScenes)
@@ -2063,7 +2002,7 @@ TEST_F(TestSceneTable, TestEndpointScenes)
     // Test removal of fabric clears scene fabric on all endpoints
     sceneTable = scenes::GetSceneTableImpl(kTestEndpoint1, defaultTestTableSize);
     ASSERT_NE(nullptr, sceneTable);
-    sceneTable->RemoveFabric(kFabric1);
+    EXPECT_SUCCESS(sceneTable->RemoveFabric(kFabric1));
     EXPECT_EQ(CHIP_ERROR_NOT_FOUND, sceneTable->GetSceneTableEntry(kFabric1, sceneId1, scene));
     EXPECT_EQ(CHIP_ERROR_NOT_FOUND, sceneTable->GetSceneTableEntry(kFabric1, sceneId2, scene));
     EXPECT_EQ(CHIP_ERROR_NOT_FOUND, sceneTable->GetSceneTableEntry(kFabric1, sceneId3, scene));
@@ -2092,7 +2031,7 @@ TEST_F(TestSceneTable, TestEndpointScenes)
     EXPECT_EQ(CHIP_ERROR_NOT_FOUND, sceneTable->GetSceneTableEntry(kFabric1, sceneId6, scene));
     EXPECT_EQ(CHIP_ERROR_NOT_FOUND, sceneTable->GetSceneTableEntry(kFabric1, sceneId7, scene));
 
-    sceneTable->RemoveFabric(kFabric2);
+    EXPECT_SUCCESS(sceneTable->RemoveFabric(kFabric2));
 
     // Validate endpoints are empty
     sceneTable = scenes::GetSceneTableImpl(kTestEndpoint1, defaultTestTableSize);
@@ -2181,6 +2120,7 @@ TEST_F(TestSceneTable, TestOTAChanges)
 {
     SceneTable * sceneTable = scenes::GetSceneTableImpl(kTestEndpoint1, defaultTestTableSize);
     ASSERT_NE(nullptr, sceneTable);
+    ASSERT_NE(nullptr, mpTestStorage);
 
     // Reset test
     ResetSceneTable(sceneTable);
@@ -2201,9 +2141,9 @@ TEST_F(TestSceneTable, TestOTAChanges)
     EXPECT_EQ(CHIP_NO_ERROR, sceneTable->GetRemainingCapacity(kFabric1, fabric_capacity));
     EXPECT_EQ(0, fabric_capacity);
     uint8_t scene_table_fabric1_capacity = fabric_capacity;
-    auto * iterator                      = sceneTable->IterateSceneEntries(kFabric1);
-    EXPECT_EQ(defaultTestFabricCapacity, iterator->Count());
-    iterator->Release();
+    uint8_t entryCount                   = 0;
+    EXPECT_EQ(CHIP_NO_ERROR, sceneTable->GetFabricSceneCount(kFabric1, entryCount));
+    EXPECT_EQ(defaultTestFabricCapacity, entryCount);
 
     // Fill fabric 2 to capacity
     EXPECT_EQ(CHIP_NO_ERROR, sceneTable->SetSceneTableEntry(kFabric2, scene1));
@@ -2216,9 +2156,8 @@ TEST_F(TestSceneTable, TestOTAChanges)
     EXPECT_EQ(CHIP_NO_ERROR, sceneTable->GetRemainingCapacity(kFabric1, fabric_capacity));
     EXPECT_EQ(0, fabric_capacity);
     uint8_t scene_table_fabric2_capacity = fabric_capacity;
-    iterator                             = sceneTable->IterateSceneEntries(kFabric2);
-    EXPECT_EQ(defaultTestFabricCapacity, iterator->Count());
-    iterator->Release();
+    EXPECT_EQ(CHIP_NO_ERROR, sceneTable->GetFabricSceneCount(kFabric2, entryCount));
+    EXPECT_EQ(defaultTestFabricCapacity, entryCount);
     // SceneTable should be full at this point
     uint8_t scene_count;
     EXPECT_EQ(CHIP_NO_ERROR, sceneTable->GetEndpointSceneCount(scene_count));
@@ -2227,7 +2166,7 @@ TEST_F(TestSceneTable, TestOTAChanges)
 
     // Create a scene table with a greater capacity than the original one (Max allowed capacity from gen_config.h)
     TestSceneTableImpl ExpandedSceneTable(scenes::kMaxScenesPerFabric, scenes::kMaxScenesPerEndpoint);
-    EXPECT_EQ(CHIP_NO_ERROR, ExpandedSceneTable.Init(mpTestStorage));
+    EXPECT_EQ(CHIP_NO_ERROR, ExpandedSceneTable.Init(*mpTestStorage));
     ExpandedSceneTable.SetEndpoint(kTestEndpoint1);
 
     EXPECT_EQ(CHIP_NO_ERROR, ExpandedSceneTable.GetRemainingCapacity(kFabric1, fabric_capacity));
@@ -2265,11 +2204,11 @@ TEST_F(TestSceneTable, TestOTAChanges)
 
     // Test failure to init a SceneTable with sizes above the defined max scenes per fabric or globaly
     TestSceneTableImpl SceneTableTooManyPerFabric(scenes::kMaxScenesPerFabric + 1, scenes::kMaxScenesPerEndpoint);
-    EXPECT_EQ(CHIP_ERROR_INVALID_INTEGER_VALUE, SceneTableTooManyPerFabric.Init(mpTestStorage));
+    EXPECT_EQ(CHIP_ERROR_INVALID_INTEGER_VALUE, SceneTableTooManyPerFabric.Init(*mpTestStorage));
     SceneTableTooManyPerFabric.Finish();
 
     TestSceneTableImpl SceneTableTooManyGlobal(scenes::kMaxScenesPerFabric, scenes::kMaxScenesPerEndpoint + 1);
-    EXPECT_EQ(CHIP_ERROR_INVALID_INTEGER_VALUE, SceneTableTooManyGlobal.Init(mpTestStorage));
+    EXPECT_EQ(CHIP_ERROR_INVALID_INTEGER_VALUE, SceneTableTooManyGlobal.Init(*mpTestStorage));
     SceneTableTooManyGlobal.Finish();
 
     // Create a new table with a lower limit of scenes per fabric
@@ -2277,7 +2216,7 @@ TEST_F(TestSceneTable, TestOTAChanges)
     uint8_t newTableSize       = defaultTestTableSize - 2;
     uint8_t capacityDifference = static_cast<uint8_t>(scenes::kMaxScenesPerFabric - newCapacity);
     TestSceneTableImpl ReducedSceneTable(newCapacity, newTableSize);
-    EXPECT_EQ(CHIP_NO_ERROR, ReducedSceneTable.Init(mpTestStorage));
+    EXPECT_EQ(CHIP_NO_ERROR, ReducedSceneTable.Init(*mpTestStorage));
     ReducedSceneTable.SetEndpoint(kTestEndpoint1);
 
     // Global count should not have been modified
@@ -2293,9 +2232,8 @@ TEST_F(TestSceneTable, TestOTAChanges)
     EXPECT_EQ(scene, scene1);
 
     // The number count of scenes in Fabric 1 should have been adjusted here
-    iterator = ReducedSceneTable.IterateSceneEntries(kFabric1);
-    EXPECT_EQ(newCapacity, iterator->Count());
-    iterator->Release();
+    EXPECT_EQ(CHIP_NO_ERROR, sceneTable->GetFabricSceneCount(kFabric1, entryCount));
+    EXPECT_EQ(newCapacity, entryCount);
     // Capacity should still be 0 in fabric 1
     EXPECT_EQ(CHIP_NO_ERROR, ReducedSceneTable.GetRemainingCapacity(kFabric1, fabric_capacity));
     EXPECT_EQ(0, fabric_capacity);
@@ -2307,9 +2245,8 @@ TEST_F(TestSceneTable, TestOTAChanges)
     // Remove a Scene from the Fabric 1
     EXPECT_EQ(CHIP_NO_ERROR, ReducedSceneTable.RemoveSceneTableEntry(kFabric1, scene1.mStorageId));
     // Check count updated for fabric
-    iterator = ReducedSceneTable.IterateSceneEntries(kFabric1);
-    EXPECT_EQ(static_cast<uint8_t>(newCapacity - 1), iterator->Count());
-    iterator->Release();
+    EXPECT_EQ(CHIP_NO_ERROR, sceneTable->GetFabricSceneCount(kFabric1, entryCount));
+    EXPECT_EQ(static_cast<uint8_t>(newCapacity - 1), entryCount);
     // Check fabric still doesn't have capacity because fabric 2 still have a higher number of scene than allowed
     EXPECT_EQ(CHIP_NO_ERROR, ReducedSceneTable.GetRemainingCapacity(kFabric1, fabric_capacity));
     EXPECT_EQ(0, fabric_capacity);
@@ -2318,9 +2255,8 @@ TEST_F(TestSceneTable, TestOTAChanges)
     EXPECT_EQ(CHIP_NO_ERROR, ReducedSceneTable.RemoveSceneTableEntry(kFabric1, scene3.mStorageId));
     EXPECT_EQ(CHIP_NO_ERROR, ReducedSceneTable.RemoveSceneTableEntry(kFabric1, scene4.mStorageId));
     // Check count updated for fabric
-    iterator = ReducedSceneTable.IterateSceneEntries(kFabric1);
-    EXPECT_EQ(2u, iterator->Count());
-    iterator->Release();
+    EXPECT_EQ(CHIP_NO_ERROR, sceneTable->GetFabricSceneCount(kFabric1, entryCount));
+    EXPECT_EQ(2u, entryCount);
 
     // Confirm global count has been updated
     EXPECT_EQ(CHIP_NO_ERROR, ReducedSceneTable.GetEndpointSceneCount(scene_count));
@@ -2334,9 +2270,8 @@ TEST_F(TestSceneTable, TestOTAChanges)
     EXPECT_EQ(scene, scene1);
 
     // The number count of scenes in Fabric 2 should have been adjusted here
-    iterator = ReducedSceneTable.IterateSceneEntries(kFabric2);
-    EXPECT_EQ(defaultTestFabricCapacity - 1u, iterator->Count());
-    iterator->Release();
+    EXPECT_EQ(CHIP_NO_ERROR, sceneTable->GetFabricSceneCount(kFabric2, entryCount));
+    EXPECT_EQ(defaultTestFabricCapacity - 1u, entryCount);
     // Global count should also have been adjusted
     EXPECT_EQ(CHIP_NO_ERROR, ReducedSceneTable.GetEndpointSceneCount(scene_count));
     // had 22 scenes, truncated 5 from both (10) and deleted 4 from fabric 1: 8 scenes left

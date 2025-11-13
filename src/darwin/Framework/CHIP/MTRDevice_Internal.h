@@ -22,6 +22,7 @@
 
 #import "MTRAsyncWorkQueue.h"
 #import "MTRDefines_Internal.h"
+#import "MTRDelegateManager.h"
 #import "MTRDeviceStorageBehaviorConfiguration_Internal.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -58,12 +59,7 @@ typedef NS_ENUM(NSUInteger, MTRInternalDeviceState) {
  * paths for attribute reports.
  */
 MTR_DIRECT_MEMBERS
-@interface MTRDeviceDelegateInfo : NSObject {
-@private
-    void * _delegatePointerValue;
-    __weak id _delegate;
-    dispatch_queue_t _queue;
-}
+@interface MTRDeviceDelegateInfo : MTRDelegateInfo <id <MTRDeviceDelegate>>
 
 // Array of interested cluster paths, attribute paths, or endpointID, for attribute report filtering.
 @property (readonly, nullable) NSArray * interestedPathsForAttributes;
@@ -71,21 +67,7 @@ MTR_DIRECT_MEMBERS
 // Array of interested cluster paths, attribute paths, or endpointID, for event report filtering.
 @property (readonly, nullable) NSArray * interestedPathsForEvents;
 
-// Expose delegate
-@property (readonly) id delegate;
-
-// Pointer value for logging purpose only
-@property (readonly) void * delegatePointerValue;
-
 - (instancetype)initWithDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes interestedPathsForEvents:(NSArray * _Nullable)interestedPathsForEvents;
-
-// Returns YES if delegate and queue are both non-null, and the block is scheduled to run.
-- (BOOL)callDelegateWithBlock:(void (^)(id<MTRDeviceDelegate>))block;
-
-#ifdef DEBUG
-// Only used for unit test purposes - normal delegate should not expect or handle being called back synchronously.
-- (BOOL)callDelegateSynchronouslyWithBlock:(void (^)(id<MTRDeviceDelegate>))block;
-#endif
 @end
 
 #pragma mark - MTRDevice internal extensions
@@ -95,7 +77,7 @@ MTR_DIRECT_MEMBERS
 @protected
     // Lock that protects overall device state, including delegate storage.
     os_unfair_lock _lock;
-    NSMutableSet<MTRDeviceDelegateInfo *> * _delegates;
+    MTRDelegateManager<id<MTRDeviceDelegate>, MTRDeviceDelegateInfo *> * _delegateManager;
 
     // Our node ID, with the ivar declared explicitly so it's accessible to
     // subclasses.
@@ -146,10 +128,15 @@ MTR_DIRECT_MEMBERS
 // Returns YES if any non-null delegates were found
 - (BOOL)_iterateDelegatesWithBlock:(void(NS_NOESCAPE ^ _Nullable)(MTRDeviceDelegateInfo * delegateInfo))block;
 
+// For subclasses to call while holding lock
 - (BOOL)_delegateExists;
 
+// For device controller or other objects to call
+- (BOOL)delegateExists;
+
 // Must be called by subclasses or MTRDevice implementation only.
-- (void)_delegateAdded;
+- (void)_delegateAdded:(id<MTRDeviceDelegate>)delegate;
+- (void)_delegateRemoved:(id<MTRDeviceDelegate>)delegate;
 
 #ifdef DEBUG
 // Only used for unit test purposes - normal delegate should not expect or handle being called back synchronously
@@ -178,6 +165,15 @@ MTR_DIRECT_MEMBERS
 
 - (void)_forgetAttributeWaiter:(MTRAttributeValueWaiter *)attributeValueWaiter;
 
+/**
+ * Returns true if a diagnostic log transfer is ongoing.
+ */
+@property (readonly) BOOL diagnosticLogTransferInProgress;
+
+@end
+
+@interface MTRDevice (MatterPrivateForInternalDragonsDoNotFeed)
+- (void)_deviceMayBeReachable;
 @end
 
 #pragma mark - MTRDevice internal state monitoring
@@ -189,9 +185,7 @@ MTR_DIRECT_MEMBERS
 
 static NSString * const kDefaultSubscriptionPoolSizeOverrideKey = @"subscriptionPoolSizeOverride";
 static NSString * const kTestStorageUserDefaultEnabledKey = @"enableTestStorage";
-
-// Declared inside platform, but noting here for reference
-// static NSString * const kSRPTimeoutInMsecsUserDefaultKey = @"SRPTimeoutInMSecsOverride";
+static NSString * const kDisableTimeSyncLossDetectionKey = @"disableTimeSyncLossDetection";
 
 // Concrete to XPC internal state property dictionary keys
 static NSString * const kMTRDeviceInternalPropertyKeyVendorID = @"MTRDeviceInternalStateKeyVendorID";
@@ -203,6 +197,7 @@ static NSString * const kMTRDeviceInternalPropertyMostRecentReportTime = @"MTRDe
 static NSString * const kMTRDeviceInternalPropertyLastSubscriptionFailureTime = @"MTRDeviceInternalPropertyLastSubscriptionFailureTime";
 static NSString * const kMTRDeviceInternalPropertyDeviceState = @"MTRDeviceInternalPropertyDeviceState";
 static NSString * const kMTRDeviceInternalPropertyDeviceCachePrimed = @"MTRDeviceInternalPropertyDeviceCachePrimed";
+static NSString * const kMTRDeviceInternalPropertyDiagnosticLogTransferInProgress = @"MTRDeviceInternalPropertyDiagnosticLogTransferInProgress";
 static NSString * const kMTRDeviceInternalPropertyEstimatedStartTime = @"MTRDeviceInternalPropertyEstimatedStartTime";
 static NSString * const kMTRDeviceInternalPropertyEstimatedSubscriptionLatency = @"MTRDeviceInternalPropertyEstimatedSubscriptionLatency";
 

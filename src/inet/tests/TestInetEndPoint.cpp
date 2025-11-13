@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    Copyright (c) 2018 Google LLC.
  *    Copyright (c) 2016-2018 Nest Labs, Inc.
  *    All rights reserved.
@@ -33,7 +33,9 @@
 
 #include <CHIPVersion.h>
 #include <inet/IPPrefix.h>
+#include <inet/InetConfig.h>
 #include <inet/InetError.h>
+#include <inet/UDPEndPoint.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
@@ -91,10 +93,10 @@ public:
 TEST_F(TestInetEndPoint, TestInetPre)
 {
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
-    UDPEndPoint * testUDPEP = nullptr;
+    UDPEndPointHandle testUDPEP;
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    TCPEndPoint * testTCPEP = nullptr;
+    TCPEndPointHandle testTCPEP;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -106,12 +108,12 @@ TEST_F(TestInetEndPoint, TestInetPre)
     }
 
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
-    err = gUDP.NewEndPoint(&testUDPEP);
+    err = gUDP.NewEndPoint(testUDPEP);
     EXPECT_EQ(err, CHIP_ERROR_INCORRECT_STATE);
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    err = gTCP.NewEndPoint(&testTCPEP);
+    err = gTCP.NewEndPoint(testTCPEP);
     EXPECT_EQ(err, CHIP_ERROR_INCORRECT_STATE);
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
@@ -136,7 +138,7 @@ TEST_F(TestInetEndPoint, TestInetInterface)
 {
     InterfaceIterator intIterator;
     InterfaceAddressIterator addrIterator;
-    char intName[chip::Inet::InterfaceId::kMaxIfNameLength];
+    char intName[InterfaceId::kMaxIfNameLength];
     InterfaceId intId;
     IPAddress addr;
     InterfaceType intType;
@@ -183,7 +185,8 @@ TEST_F(TestInetEndPoint, TestInetInterface)
                intName, intIterator.IsUp() ? "UP" : "DOWN", intIterator.SupportsMulticast() ? "supports" : "no",
                intIterator.HasBroadcastAddress() ? "has" : "no");
 
-        intId.GetLinkLocalAddr(&addr);
+        err = intId.GetLinkLocalAddr(&addr);
+        EXPECT_TRUE(err == CHIP_NO_ERROR || err == INET_ERROR_ADDRESS_NOT_FOUND);
         InterfaceId::MatchLocalIPv6Subnet(addr);
 
         // Not all platforms support getting interface type and hardware address
@@ -256,29 +259,34 @@ TEST_F(TestInetEndPoint, TestInetEndPointInternal)
     InterfaceId intId;
 
     // EndPoint
-    UDPEndPoint * testUDPEP = nullptr;
+    UDPEndPointHandle testUDPEP;
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    TCPEndPoint * testTCPEP1 = nullptr;
+    TCPEndPointHandle testTCPEP1;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
     PacketBufferHandle buf = PacketBufferHandle::New(PacketBuffer::kMaxSize);
 
     // init all the EndPoints
     SYSTEM_STATS_RESET(System::Stats::kInetLayer_NumUDPEps);
-    err = gUDP.NewEndPoint(&testUDPEP);
+    err = gUDP.NewEndPoint(testUDPEP);
     ASSERT_EQ(err, CHIP_NO_ERROR);
     EXPECT_TRUE(SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, 1));
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     SYSTEM_STATS_RESET(System::Stats::kInetLayer_NumTCPEps);
-    err = gTCP.NewEndPoint(&testTCPEP1);
+    err = gTCP.NewEndPoint(testTCPEP1);
     ASSERT_EQ(err, CHIP_NO_ERROR);
     EXPECT_TRUE(SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumTCPEps, 1));
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     err = InterfaceId::Null().GetLinkLocalAddr(&addr);
 
-    // We should skip the following checks if the interface does not have the Link local address
-    ASSERT_NE(err, INET_ERROR_ADDRESS_NOT_FOUND);
+    // We should skip the following checks if the interface does not have the Link local address.
+    // This can happen if you don't have network interfaces connected to any link (like happened
+    // to the author of this comment at YYZ before CSA 2025 Chicago Member Meeting).
+    if (err == INET_ERROR_ADDRESS_NOT_FOUND)
+    {
+        return;
+    }
 
     EXPECT_EQ(err, CHIP_NO_ERROR);
     intId = InterfaceId::FromIPAddress(addr);
@@ -311,11 +319,11 @@ TEST_F(TestInetEndPoint, TestInetEndPointInternal)
     EXPECT_EQ(err, CHIP_ERROR_INCORRECT_STATE);
     err = testUDPEP->BindInterface(IPAddressType::kIPv6, intId);
     EXPECT_EQ(err, CHIP_ERROR_INCORRECT_STATE);
-    testUDPEP->Free();
+    testUDPEP.Release();
     EXPECT_TRUE(SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, 0));
     EXPECT_TRUE(SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumUDPEps, 1));
 
-    err = gUDP.NewEndPoint(&testUDPEP);
+    err = gUDP.NewEndPoint(testUDPEP);
     ASSERT_EQ(err, CHIP_NO_ERROR);
     EXPECT_TRUE(SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, 1));
 #if INET_CONFIG_ENABLE_IPV4
@@ -324,7 +332,7 @@ TEST_F(TestInetEndPoint, TestInetEndPointInternal)
     buf = PacketBufferHandle::New(PacketBuffer::kMaxSize);
     err = testUDPEP->SendTo(addr_v4, 3000, std::move(buf));
 #endif // INET_CONFIG_ENABLE_IPV4
-    testUDPEP->Free();
+    testUDPEP.Release();
     EXPECT_TRUE(SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, 0));
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -364,7 +372,7 @@ TEST_F(TestInetEndPoint, TestInetEndPointInternal)
     EXPECT_EQ(err, CHIP_ERROR_INCORRECT_STATE);
 #endif // INET_CONFIG_ENABLE_IPV4
 
-    testTCPEP1->Free();
+    testTCPEP1.Release();
     EXPECT_TRUE(SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumTCPEps, 0));
     EXPECT_TRUE(SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumTCPEps, 1));
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -374,19 +382,35 @@ TEST_F(TestInetEndPoint, TestInetEndPointInternal)
 // Test the Inet resource limitations.
 TEST_F(TestInetEndPoint, TestInetEndPointLimit)
 {
-    UDPEndPoint * testUDPEP[INET_CONFIG_NUM_UDP_ENDPOINTS + 1] = { nullptr };
+    UDPEndPointHandle testUDPEP[INET_CONFIG_NUM_UDP_ENDPOINTS + 1];
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    TCPEndPoint * testTCPEP[INET_CONFIG_NUM_TCP_ENDPOINTS + 1] = { nullptr };
+    TCPEndPointHandle testTCPEP[INET_CONFIG_NUM_TCP_ENDPOINTS + 1];
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    // we assume NO open endpoints
+    gUDP.ForEachEndPoint([](const UDPEndPointHandle & ep) {
+        EXPECT_TRUE(ep.IsNull()); // Expect no endpoints
+        return Loop::Continue;
+    });
 
     int udpCount = 0;
     SYSTEM_STATS_RESET(System::Stats::kInetLayer_NumUDPEps);
     for (int i = INET_CONFIG_NUM_UDP_ENDPOINTS; i >= 0; --i)
     {
-        err = gUDP.NewEndPoint(&testUDPEP[i]);
-        EXPECT_EQ(err, (i ? CHIP_NO_ERROR : CHIP_ERROR_ENDPOINT_POOL_FULL));
+        err = gUDP.NewEndPoint(testUDPEP[i]);
+
+        CHIP_ERROR expected_error = (i ? CHIP_NO_ERROR : CHIP_ERROR_ENDPOINT_POOL_FULL);
+        if (err != expected_error)
+        {
+            // have a log to debug things
+            ChipLogError(Test, "UDP: Failure on index %d: (out of %d)", i, INET_CONFIG_NUM_UDP_ENDPOINTS);
+
+            // this will fail after the above log
+            EXPECT_EQ(err, expected_error);
+        }
+
         if (err == CHIP_NO_ERROR)
         {
             ++udpCount;
@@ -397,12 +421,26 @@ TEST_F(TestInetEndPoint, TestInetEndPointLimit)
     EXPECT_TRUE(SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumUDPEps, udpHighWaterMark));
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    // we assume NO open endpoints
+    gTCP.ForEachEndPoint([](const TCPEndPointHandle & ep) {
+        EXPECT_TRUE(ep.IsNull()); // Expect no endpoints
+        return Loop::Continue;
+    });
+
     int tcpCount = 0;
     SYSTEM_STATS_RESET(System::Stats::kInetLayer_NumTCPEps);
     for (int i = INET_CONFIG_NUM_TCP_ENDPOINTS; i >= 0; --i)
     {
-        err = gTCP.NewEndPoint(&testTCPEP[i]);
-        EXPECT_EQ(err, (i ? CHIP_NO_ERROR : CHIP_ERROR_ENDPOINT_POOL_FULL));
+        err                       = gTCP.NewEndPoint(testTCPEP[i]);
+        CHIP_ERROR expected_error = (i ? CHIP_NO_ERROR : CHIP_ERROR_ENDPOINT_POOL_FULL);
+        if (err != expected_error)
+        {
+            // have a log to debug things
+            ChipLogError(Test, "TCP: Failure on index %d: (out of %d)", i, INET_CONFIG_NUM_TCP_ENDPOINTS);
+
+            // this will fail after the above log
+            EXPECT_EQ(err, expected_error);
+        }
         if (err == CHIP_NO_ERROR)
         {
             ++tcpCount;
@@ -430,9 +468,9 @@ TEST_F(TestInetEndPoint, TestInetEndPointLimit)
     // Release UDP endpoints
     for (int i = 0; i <= INET_CONFIG_NUM_UDP_ENDPOINTS; i++)
     {
-        if (testUDPEP[i] != nullptr)
+        if (testUDPEP[i])
         {
-            testUDPEP[i]->Free();
+            testUDPEP[i].Release();
             --udpCount;
             EXPECT_TRUE(SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, udpCount));
         }
@@ -442,9 +480,9 @@ TEST_F(TestInetEndPoint, TestInetEndPointLimit)
     // Release TCP endpoints
     for (int i = 0; i <= INET_CONFIG_NUM_TCP_ENDPOINTS; i++)
     {
-        if (testTCPEP[i] != nullptr)
+        if (testTCPEP[i])
         {
-            testTCPEP[i]->Free();
+            testTCPEP[i].Release();
             --tcpCount;
             EXPECT_TRUE(SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumTCPEps, tcpCount));
         }

@@ -27,7 +27,6 @@ get_filename_component(CHEF ${CHIP_ROOT}/examples/chef REALPATH)
 set(CHIP_SHELL_DIR "${CHIP_ROOT}/examples/shell")
 
 set(PRIV_INCLUDE_DIRS_LIST
-                      "${CHIP_ROOT}/zzz_generated/"
                       "${CHIP_ROOT}/zzz_generated/app-common"
                       "${CHIP_ROOT}/examples/platform/esp32/"
                       "${CHIP_ROOT}/third_party/nlio/repo/include"
@@ -48,12 +47,17 @@ set(SRC_DIRS_LIST
                       "${CHEF}/common/clusters/low-power/"
                       "${CHEF}/common/clusters/media-input/"
                       "${CHEF}/common/clusters/media-playback/"
+                      "${CHEF}/common/clusters/oven-cavity-operational-state/"
+                      "${CHEF}/common/clusters/oven-mode/"
+                      "${CHEF}/common/clusters/microwave-oven-mode/"
+                      "${CHEF}/common/clusters/microwave-oven-control/"
                       "${CHEF}/common/clusters/refrigerator-and-temperature-controlled-cabinet-mode/"
                       "${CHEF}/common/clusters/resource-monitoring/"
                       "${CHEF}/common/clusters/switch/"
                       "${CHEF}/common/clusters/target-navigator/"
                       "${CHEF}/common/clusters/temperature-control/"
                       "${CHEF}/common/clusters/wake-on-lan/"
+                      "${CHEF}/common/clusters/window-covering/"
                       "${CHIP_ROOT}/zzz_generated/app-common/app-common/zap-generated/attributes"
 )
 
@@ -92,12 +96,30 @@ set(SRC_DIRS_LIST
                       ${SRC_DIRS_LIST}
                       "${CHIP_SHELL_DIR}/shell_common/"
 )
+# Exclude chef-rpc-actions-worker.cpp from compilation when RPC is disabled
+# Path to the chef-rpc-actions-worker.cpp file, which is part of ${CHEF}/common directory included in SRC_DIRS_LIST
+set(STUBS_CPP_ABSOLUTE_PATH "${CHEF}/common/chef-rpc-actions-worker.cpp")
+# Calculate the path relative to the current component directory (main/)
+file(RELATIVE_PATH STUBS_CPP_RELATIVE_TO_MAIN "${CMAKE_CURRENT_LIST_DIR}" "${STUBS_CPP_ABSOLUTE_PATH}")
+# Add it to the list of excluded sources for this component
+set(COMPONENT_EXCLUDE_SRCS "${STUBS_CPP_RELATIVE_TO_MAIN}")
+
 endif (CONFIG_ENABLE_PW_RPC)
 
+# Check if we have to exclude any sources from compilation
+if(COMPONENT_EXCLUDE_SRCS)
+idf_component_register(
+                      EXCLUDE_SRCS ${COMPONENT_EXCLUDE_SRCS}
+                      PRIV_INCLUDE_DIRS
+                      "${CHIP_SHELL_DIR}/shell_common/include"
+                      "${PRIV_INCLUDE_DIRS_LIST}"
+                      SRC_DIRS ${SRC_DIRS_LIST})
+else()
 idf_component_register(PRIV_INCLUDE_DIRS
                       "${CHIP_SHELL_DIR}/shell_common/include"
                       "${PRIV_INCLUDE_DIRS_LIST}"
                       SRC_DIRS ${SRC_DIRS_LIST})
+endif()
 
 # Forces the linker to include common/stubs.cpp
 target_link_libraries(${COMPONENT_LIB} INTERFACE "-u chef_include_stubs_impl")
@@ -107,7 +129,6 @@ chip_configure_data_model(${COMPONENT_LIB}
     ZAP_FILE ${CHEF}/devices/${SAMPLE_NAME}.zap
 )
 
-set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 17)
 target_compile_options(${COMPONENT_LIB} PRIVATE "-DCHIP_HAVE_CONFIG_H")
 target_compile_options(${COMPONENT_LIB} PUBLIC
            "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
@@ -119,6 +140,19 @@ set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
 include(${PIGWEED_ROOT}/pw_build/pigweed.cmake)
 include(${PIGWEED_ROOT}/pw_protobuf_compiler/proto.cmake)
 set(dir_pw_third_party_nanopb "${CHIP_ROOT}/third_party/nanopb/repo" CACHE STRING "" FORCE)
+
+pw_proto_library(actions_service
+  SOURCES
+    ${CHIP_ROOT}/examples/common/pigweed/protos/actions_service.proto
+  INPUTS
+    ${CHIP_ROOT}/examples/common/pigweed/protos/actions_service.options
+  PREFIX
+  actions_service
+  STRIP_PREFIX
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+  DEPS
+    pw_protobuf.common_proto
+)
 
 pw_proto_library(attributes_service
   SOURCES
@@ -193,6 +227,7 @@ pw_proto_library(wifi_service
 )
 
 target_link_libraries(${COMPONENT_LIB} PUBLIC
+  actions_service.nanopb_rpc
   attributes_service.nanopb_rpc
   boolean_state_service.nanopb_rpc
   button_service.nanopb_rpc
@@ -218,6 +253,7 @@ target_link_options(${COMPONENT_LIB}
 )
 
 target_compile_options(${COMPONENT_LIB} PRIVATE
+                       "-DPW_RPC_ACTIONS_SERVICE=1"
                        "-DPW_RPC_ATTRIBUTE_SERVICE=1"
                        "-DPW_RPC_BOOLEAN_STATE_SERVICE=1"
                        "-DPW_RPC_BUTTON_SERVICE=1"

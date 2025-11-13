@@ -68,7 +68,7 @@ struct ICDMonitoringEntry : public PersistentData<kICDMonitoringBufferSize>
         this->symmetricKeystore = keyStore;
     }
 
-    CHIP_ERROR UpdateKey(StorageKeyName & key) override;
+    CHIP_ERROR UpdateKey(StorageKeyName & key) const override;
     CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override;
     CHIP_ERROR Deserialize(TLV::TLVReader & reader) override;
     void Clear() override;

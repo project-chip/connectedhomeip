@@ -1,5 +1,4 @@
 <?xml version="1.0"?>
-
 <!--
 Copyright (c) 2021 Project CHIP Authors
 
@@ -23,10 +22,10 @@ limitations under the License.
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0xFFF10001</deviceId>
         <clusters lockOthers="true">
-            <include cluster="Proxy Configuration" client="false" server="true" clientLocked="true" serverLocked="true"/>
-            <include cluster="Proxy Discovery" client="false" server="true" clientLocked="true" serverLocked="true"/>
-            <include cluster="Proxy Valid" client="false" server="true" clientLocked="true" serverLocked="true"/>
-            <include cluster="Pulse Width Modulation" client="false" server="true" clientLocked="true" serverLocked="true"/>
+            <include cluster="Proxy Configuration" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Proxy Discovery" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Proxy Valid" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Pulse Width Modulation" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>
     <deviceType>
@@ -35,6 +34,7 @@ limitations under the License.
         <typeName>Root Node</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0016</deviceId>
+        <revision editable="false">3</revision>
         <class>Node</class>
         <scope>Node</scope>
         <clusters lockOthers="true">
@@ -69,13 +69,8 @@ limitations under the License.
             <include cluster="Network Commissioning" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Administrator Commissioning" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Operational Credentials" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Localization Configuration" client="false" server="true" clientLocked="true" serverLocked="false">
-                <requireAttribute>ACTIVE_LOCALE</requireAttribute>
-                <requireAttribute>SUPPORTED_LOCALES</requireAttribute>
-            </include>
-            <include cluster="Time Format Localization" client="false" server="false" clientLocked="true" serverLocked="false">
-                <requireAttribute>HOUR_FORMAT</requireAttribute>
-            </include>
+            <include cluster="Localization Configuration" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Time Format Localization" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Unit Localization" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="General Diagnostics" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>UP_TIME</requireAttribute>
@@ -88,12 +83,12 @@ limitations under the License.
             <include cluster="ICD Management" client="false" server="false" clientLocked="true" serverLocked="false">
                 <features>
                     <feature code="LITS" name="LongIdleTimeSupport">
-                    <otherwiseConform>
-                        <provisionalConform/>
-                        <mandatoryConform>
-                        <feature name="LIT"/>
-                        </mandatoryConform>
-                    </otherwiseConform>
+                        <otherwiseConform>
+                            <provisionalConform></provisionalConform>
+                            <mandatoryConform>
+                                <feature name="LIT"></feature>
+                            </mandatoryConform>
+                        </otherwiseConform>
                     </feature>
                 </features>
             </include>
@@ -105,6 +100,7 @@ limitations under the License.
         <typeName>Power Source</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0011</deviceId>
+        <revision editable="false">1</revision>
         <class>Utility</class>
         <scope>Node</scope>
         <clusters lockOthers="true">
@@ -123,6 +119,7 @@ limitations under the License.
         <typeName>Electrical Sensor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0510</deviceId>
+        <revision editable="false">1</revision>
         <class>Utility</class>
         <scope>Node</scope>
         <clusters lockOthers="true">
@@ -138,6 +135,7 @@ limitations under the License.
         <typeName>OTA Requestor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0012</deviceId>
+        <revision editable="false">1</revision>
         <class>Utility</class>
         <scope>Node</scope>
         <clusters lockOthers="true">
@@ -157,6 +155,7 @@ limitations under the License.
         <typeName>OTA Provider</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0014</deviceId>
+        <revision editable="false">1</revision>
         <class>Utility</class>
         <scope>Node</scope>
         <clusters lockOthers="true">
@@ -176,6 +175,7 @@ limitations under the License.
         <typeName>Aggregator</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x000e</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -194,6 +194,7 @@ limitations under the License.
         <typeName>Bridged Node</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0013</deviceId>
+        <revision editable="false">3</revision>
         <class>Utility</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -216,6 +217,7 @@ limitations under the License.
         <typeName>On/Off Light</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0100</deviceId>
+        <revision editable="false">3</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -265,7 +267,7 @@ limitations under the License.
             <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
                 <features>
                     <feature code="LT" name="Lighting">
-                    <mandatoryConform/>
+                        <mandatoryConform></mandatoryConform>
                     </feature>
                 </features>
                 <requireAttribute>ON_OFF</requireAttribute>
@@ -283,10 +285,10 @@ limitations under the License.
             <include cluster="Level Control" client="false" server="false" clientLocked="true" serverLocked="false">
                 <features>
                     <feature code="OO" name="OnOff">
-                    <mandatoryConform/>
+                        <mandatoryConform></mandatoryConform>
                     </feature>
                     <feature code="LT" name="Lighting">
-                    <mandatoryConform/>
+                        <mandatoryConform></mandatoryConform>
                     </feature>
                 </features>
                 <requireAttribute>CURRENT_LEVEL</requireAttribute>
@@ -303,7 +305,7 @@ limitations under the License.
                 <requireCommand>StepWithOnOff</requireCommand>
                 <requireCommand>StopWithOnOff</requireCommand>
             </include>
-            <include cluster="Occupancy Sensing" client="false" server="false" clientLocked="false" serverLocked="true" />
+            <include cluster="Occupancy Sensing" client="false" server="false" clientLocked="false" serverLocked="true"></include>
         </clusters>
     </deviceType>
     <deviceType>
@@ -312,6 +314,7 @@ limitations under the License.
         <typeName>Dimmable Light</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0101</deviceId>
+        <revision editable="false">3</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <superset>On/Off Light</superset>
@@ -365,7 +368,7 @@ limitations under the License.
             <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
                 <features>
                     <feature code="LT" name="Lighting">
-                    <mandatoryConform/>
+                        <mandatoryConform></mandatoryConform>
                     </feature>
                 </features>
                 <requireAttribute>ON_OFF</requireAttribute>
@@ -383,10 +386,10 @@ limitations under the License.
             <include cluster="Level Control" client="false" server="true" clientLocked="true" serverLocked="true">
                 <features>
                     <feature code="LT" name="Lighting">
-                    <mandatoryConform/>
+                        <mandatoryConform></mandatoryConform>
                     </feature>
                     <feature code="OO" name="OnOff">
-                    <mandatoryConform/>
+                        <mandatoryConform></mandatoryConform>
                     </feature>
                 </features>
                 <requireAttribute>CURRENT_LEVEL</requireAttribute>
@@ -403,7 +406,7 @@ limitations under the License.
                 <requireCommand>StepWithOnOff</requireCommand>
                 <requireCommand>StopWithOnOff</requireCommand>
             </include>
-            <include cluster="Occupancy Sensing" client="false" server="false" clientLocked="false" serverLocked="true" />
+            <include cluster="Occupancy Sensing" client="false" server="false" clientLocked="false" serverLocked="true"></include>
         </clusters>
     </deviceType>
     <deviceType>
@@ -412,6 +415,7 @@ limitations under the License.
         <typeName>Color Temperature Light</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x010C</deviceId>
+        <revision editable="false">4</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <superset>Dimmable Light</superset>
@@ -462,7 +466,7 @@ limitations under the License.
             <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
                 <features>
                     <feature code="LT" name="Lighting">
-                    <mandatoryConform/>
+                        <mandatoryConform></mandatoryConform>
                     </feature>
                 </features>
                 <requireAttribute>ON_OFF</requireAttribute>
@@ -480,10 +484,10 @@ limitations under the License.
             <include cluster="Level Control" client="false" server="true" clientLocked="true" serverLocked="true">
                 <features>
                     <feature code="OO" name="OnOff">
-                    <mandatoryConform/>
+                        <mandatoryConform></mandatoryConform>
                     </feature>
                     <feature code="LT" name="Lighting">
-                    <mandatoryConform/>
+                        <mandatoryConform></mandatoryConform>
                     </feature>
                 </features>
                 <requireAttribute>CURRENT_LEVEL</requireAttribute>
@@ -503,7 +507,7 @@ limitations under the License.
             <include cluster="Color Control" client="false" server="true" clientLocked="true" serverLocked="true">
                 <features>
                     <feature code="CT" name="ColorTemperature">
-                    <mandatoryConform/>
+                        <mandatoryConform></mandatoryConform>
                     </feature>
                 </features>
                 <requireAttribute>COLOR_CONTROL_REMAINING_TIME</requireAttribute>
@@ -530,6 +534,7 @@ limitations under the License.
         <typeName>Extended Color Light</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x010D</deviceId>
+        <revision editable="false">4</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <superset>Color Temperature Light</superset>
@@ -574,11 +579,13 @@ limitations under the License.
                 <requireCommand>RecallScene</requireCommand>
                 <requireCommand>GetSceneMembership</requireCommand>
                 <requireCommand>GetSceneMembershipResponse</requireCommand>
+                <requireCommand>CopyScene</requireCommand>
+                <requireCommand>CopySceneResponse</requireCommand>
             </include>
             <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
                 <features>
                     <feature code="LT" name="Lighting">
-                    <mandatoryConform/>
+                        <mandatoryConform></mandatoryConform>
                     </feature>
                 </features>
                 <requireAttribute>ON_OFF</requireAttribute>
@@ -596,10 +603,10 @@ limitations under the License.
             <include cluster="Level Control" client="false" server="true" clientLocked="true" serverLocked="true">
                 <features>
                     <feature code="OO" name="OnOff">
-                    <mandatoryConform/>
+                        <mandatoryConform></mandatoryConform>
                     </feature>
                     <feature code="LT" name="Lighting">
-                    <mandatoryConform/>
+                        <mandatoryConform></mandatoryConform>
                     </feature>
                 </features>
                 <requireAttribute>CURRENT_LEVEL</requireAttribute>
@@ -619,19 +626,19 @@ limitations under the License.
             <include cluster="Color Control" client="false" server="true" clientLocked="true" serverLocked="true">
                 <features>
                     <feature code="HS" name="HueSaturation">
-                    <optionalConform/>
+                        <optionalConform></optionalConform>
                     </feature>
                     <feature code="EHUE" name="EnhancedHue">
-                    <optionalConform/>
+                        <optionalConform></optionalConform>
                     </feature>
                     <feature code="CL" name="ColorLoop">
-                    <optionalConform/>
+                        <optionalConform></optionalConform>
                     </feature>
                     <feature code="XY" name="XY">
-                    <mandatoryConform/>
+                        <mandatoryConform></mandatoryConform>
                     </feature>
                     <feature code="CT" name="ColorTemperature">
-                    <mandatoryConform/>
+                        <mandatoryConform></mandatoryConform>
                     </feature>
                 </features>
                 <requireAttribute>COLOR_CONTROL_REMAINING_TIME</requireAttribute>
@@ -663,6 +670,7 @@ limitations under the License.
         <typeName>On/Off Plug-in Unit</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x010A</deviceId>
+        <revision editable="false">3</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -706,11 +714,13 @@ limitations under the License.
                 <requireCommand>RecallScene</requireCommand>
                 <requireCommand>GetSceneMembership</requireCommand>
                 <requireCommand>GetSceneMembershipResponse</requireCommand>
+                <requireCommand>CopyScene</requireCommand>
+                <requireCommand>CopySceneResponse</requireCommand>
             </include>
             <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
                 <features>
                     <feature code="LT" name="Lighting">
-                    <mandatoryConform/>
+                        <mandatoryConform></mandatoryConform>
                     </feature>
                 </features>
                 <requireAttribute>ON_OFF</requireAttribute>
@@ -728,10 +738,10 @@ limitations under the License.
             <include cluster="Level Control" client="false" server="false" clientLocked="true" serverLocked="false">
                 <features>
                     <feature code="OO" name="OnOff">
-                    <mandatoryConform/>
+                        <mandatoryConform></mandatoryConform>
                     </feature>
                     <feature code="LT" name="Lighting">
-                    <mandatoryConform/>
+                        <mandatoryConform></mandatoryConform>
                     </feature>
                 </features>
                 <requireAttribute>CURRENT_LEVEL</requireAttribute>
@@ -756,6 +766,7 @@ limitations under the License.
         <typeName>Dimmable Plug-in Unit</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x010B</deviceId>
+        <revision editable="false">4</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -799,11 +810,13 @@ limitations under the License.
                 <requireCommand>RecallScene</requireCommand>
                 <requireCommand>GetSceneMembership</requireCommand>
                 <requireCommand>GetSceneMembershipResponse</requireCommand>
+                <requireCommand>CopyScene</requireCommand>
+                <requireCommand>CopySceneResponse</requireCommand>
             </include>
             <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
                 <features>
                     <feature code="LT" name="Lighting">
-                    <mandatoryConform/>
+                        <mandatoryConform></mandatoryConform>
                     </feature>
                 </features>
                 <requireAttribute>ON_OFF</requireAttribute>
@@ -821,10 +834,10 @@ limitations under the License.
             <include cluster="Level Control" client="false" server="true" clientLocked="true" serverLocked="true">
                 <features>
                     <feature code="OO" name="OnOff">
-                    <mandatoryConform/>
+                        <mandatoryConform></mandatoryConform>
                     </feature>
                     <feature code="LT" name="Lighting">
-                    <mandatoryConform/>
+                        <mandatoryConform></mandatoryConform>
                     </feature>
                 </features>
                 <requireAttribute>CURRENT_LEVEL</requireAttribute>
@@ -844,11 +857,443 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
+        <name>MA-mounted-onoff-control</name>
+        <domain>CHIP</domain>
+        <typeName>Mounted On/Off Control</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x010F</deviceId>
+        <revision editable="false">1</revision>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <superset>On/Off Plug-in Unit</superset>
+        <clusters>
+            <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireCommand>TriggerEffect</requireCommand>
+            </include>
+            <include cluster="Level Control" client="false" server="false" clientLocked="true" serverLocked="false">
+                <features>
+                    <feature code="LT" name="Lighting"></feature>
+                    <feature code="OO" name="OnOff"></feature>
+                </features>
+            </include>
+            <include cluster="Occupancy Sensing" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
+                <features>
+                    <feature code="LT" name="Lighting"></feature>
+                </features>
+            </include>
+            <include cluster="Scenes Management" client="false" server="false" clientLocked="true" serverLocked="false">
+                <requireCommand>CopyScene</requireCommand>
+            </include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-mounted-dimmable-load-control</name>
+        <domain>CHIP</domain>
+        <typeName>Mounted Dimmable Load Control</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0110</deviceId>
+        <revision editable="false">1</revision>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <superset>Dimmable Plug-in Unit</superset>
+        <clusters>
+            <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireCommand>TriggerEffect</requireCommand>
+            </include>
+            <include cluster="Level Control" client="false" server="true" clientLocked="true" serverLocked="true">
+                <features>
+                    <feature code="LT" name="Lighting"></feature>
+                    <feature code="OO" name="OnOff"></feature>
+                </features>
+            </include>
+            <include cluster="Occupancy Sensing" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
+                <features>
+                    <feature code="LT" name="Lighting"></feature>
+                </features>
+            </include>
+            <include cluster="Scenes Management" client="false" server="true" clientLocked="true" serverLocked="false">
+                <requireCommand>CopyScene</requireCommand>
+            </include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-intercom</name>
+        <domain>CHIP</domain>
+        <typeName>Intercom</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0140</deviceId>
+        <revision editable="false">1</revision>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Camera AV Settings User Level Management" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Camera AV Stream Management" client="false" server="true" clientLocked="true" serverLocked="true">
+                <features>
+                    <feature code="ADO" name="Audio"></feature>
+                    <feature code="SNP" name="Snapshot">
+                        <disallowConform></disallowConform>
+                    </feature>
+                    <feature code="VDO" name="Video">
+                        <optionalConform></optionalConform>
+                    </feature>
+                </features>
+            </include>
+            <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Power Source" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="TLS Certificate Management" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Time Synchronization" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="WebRTC Transport Provider" client="true" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="WebRTC Transport Requestor" client="true" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-audio-doorbell</name>
+        <domain>CHIP</domain>
+        <typeName>Audio Doorbell</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0141</deviceId>
+        <revision editable="false">1</revision>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Camera AV Stream Management" client="false" server="true" clientLocked="true" serverLocked="true">
+                <features>
+                    <feature code="ADO" name="Audio"></feature>
+                    <feature code="SNP" name="Snapshot">
+                        <disallowConform></disallowConform>
+                    </feature>
+                    <feature code="VDO" name="Video">
+                        <disallowConform></disallowConform>
+                    </feature>
+                </features>
+            </include>
+            <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Power Source" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Push AV Stream Transport" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="TLS Certificate Management" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="TLS Client Management" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Time Synchronization" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="WebRTC Transport Provider" client="false" server="true" clientLocked="false" serverLocked="true"></include>
+            <include cluster="WebRTC Transport Requestor" client="true" server="false" clientLocked="true" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-camera</name>
+        <domain>CHIP</domain>
+        <typeName>Camera</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0142</deviceId>
+        <revision editable="false">1</revision>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <endpointComposition>
+            <compositionType>tree</compositionType>
+            <endpoint conformance="O">
+                <deviceType id="0x0107" name="Occupancy Sensor">
+                    <clusters>
+                        <include cluster="Boolean State Configuration" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+                        <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+                        <include cluster="Occupancy Sensing" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+                    </clusters>
+                </deviceType>
+            </endpoint>
+        </endpointComposition>
+        <clusters>
+            <include cluster="Camera AV Settings User Level Management" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Camera AV Stream Management" client="false" server="true" clientLocked="true" serverLocked="true">
+                <features>
+                    <feature code="ADO" name="Audio"></feature>
+                    <feature code="SNP" name="Snapshot"></feature>
+                    <feature code="VDO" name="Video"></feature>
+                </features>
+            </include>
+            <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Occupancy Sensing" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Power Source" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Push AV Stream Transport" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="TLS Certificate Management" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="TLS Client Management" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Time Synchronization" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="WebRTC Transport Provider" client="false" server="true" clientLocked="false" serverLocked="true"></include>
+            <include cluster="WebRTC Transport Requestor" client="true" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Zone Management" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-video-doorbell</name>
+        <domain>CHIP</domain>
+        <typeName>Video Doorbell</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0143</deviceId>
+        <revision editable="false">1</revision>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <endpointComposition>
+            <compositionType>tree</compositionType>
+            <endpoint conformance="M" constraint="min 1">
+                <deviceType id="0x000F" name="Generic Switch">
+                    <clusters>
+                        <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+                        <include cluster="Switch" client="false" server="true" clientLocked="true" serverLocked="true">
+                            <features>
+                                <feature code="MS" name="MomentarySwitch"></feature>
+                            </features>
+                        </include>
+                    </clusters>
+                </deviceType>
+            </endpoint>
+            <endpoint conformance="M" constraint="1">
+                <deviceType id="0x0142" name="Camera">
+                    <clusters>
+                        <include cluster="Camera AV Settings User Level Management" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+                        <include cluster="Camera AV Stream Management" client="false" server="true" clientLocked="true" serverLocked="true">
+                            <features>
+                                <feature code="ADO" name="Audio"></feature>
+                                <feature code="SNP" name="Snapshot"></feature>
+                                <feature code="VDO" name="Video"></feature>
+                            </features>
+                        </include>
+                        <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+                        <include cluster="Occupancy Sensing" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+                        <include cluster="Power Source" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+                        <include cluster="Push AV Stream Transport" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+                        <include cluster="TLS Certificate Management" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+                        <include cluster="TLS Client Management" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+                        <include cluster="Time Synchronization" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+                        <include cluster="WebRTC Transport Provider" client="false" server="true" clientLocked="false" serverLocked="true"></include>
+                        <include cluster="WebRTC Transport Requestor" client="true" server="false" clientLocked="true" serverLocked="false"></include>
+                        <include cluster="Zone Management" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+                    </clusters>
+                </deviceType>
+            </endpoint>
+        </endpointComposition>
+    </deviceType>
+    <deviceType>
+        <name>MA-floodlight-camera</name>
+        <domain>CHIP</domain>
+        <typeName>Floodlight Camera</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0144</deviceId>
+        <revision editable="false">1</revision>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <endpointComposition>
+            <compositionType>tree</compositionType>
+            <endpoint conformance="M" constraint="min 1">
+                <deviceType id="0x0100" name="On/Off Light">
+                    <clusters>
+                        <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+                        <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                            <requireCommand>TriggerEffect</requireCommand>
+                        </include>
+                        <include cluster="Level Control" client="false" server="false" clientLocked="true" serverLocked="false">
+                            <requireAttribute>CURRENT_LEVEL</requireAttribute>
+                            <requireAttribute>MAX_LEVEL</requireAttribute>
+                            <requireAttribute>MIN_LEVEL</requireAttribute>
+                            <features>
+                                <feature code="LT" name="Lighting"></feature>
+                                <feature code="OO" name="OnOff"></feature>
+                            </features>
+                        </include>
+                        <include cluster="Occupancy Sensing" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+                        <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
+                            <features>
+                                <feature code="LT" name="Lighting"></feature>
+                            </features>
+                        </include>
+                        <include cluster="Scenes Management" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+                    </clusters>
+                </deviceType>
+            </endpoint>
+            <endpoint conformance="M" constraint="1">
+                <deviceType id="0x0142" name="Camera">
+                    <clusters>
+                        <include cluster="Camera AV Settings User Level Management" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+                        <include cluster="Camera AV Stream Management" client="false" server="true" clientLocked="true" serverLocked="true">
+                            <features>
+                                <feature code="ADO" name="Audio"></feature>
+                                <feature code="SNP" name="Snapshot"></feature>
+                                <feature code="VDO" name="Video"></feature>
+                            </features>
+                        </include>
+                        <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+                        <include cluster="Occupancy Sensing" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+                        <include cluster="Power Source" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+                        <include cluster="Push AV Stream Transport" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+                        <include cluster="TLS Certificate Management" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+                        <include cluster="TLS Client Management" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+                        <include cluster="Time Synchronization" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+                        <include cluster="WebRTC Transport Provider" client="false" server="true" clientLocked="false" serverLocked="true"></include>
+                        <include cluster="WebRTC Transport Requestor" client="true" server="false" clientLocked="true" serverLocked="false"></include>
+                        <include cluster="Zone Management" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+                    </clusters>
+                </deviceType>
+            </endpoint>
+        </endpointComposition>
+    </deviceType>
+    <deviceType>
+        <name>MA-snapshot-camera</name>
+        <domain>CHIP</domain>
+        <typeName>Snapshot Camera</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0145</deviceId>
+        <revision editable="false">1</revision>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <endpointComposition>
+            <compositionType>tree</compositionType>
+            <endpoint conformance="O">
+                <deviceType id="0x0107" name="Occupancy Sensor">
+                    <clusters>
+                        <include cluster="Boolean State Configuration" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+                        <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+                        <include cluster="Occupancy Sensing" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+                    </clusters>
+                </deviceType>
+            </endpoint>
+        </endpointComposition>
+        <clusters>
+            <include cluster="Camera AV Settings User Level Management" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Camera AV Stream Management" client="false" server="true" clientLocked="true" serverLocked="true">
+                <features>
+                    <feature code="ADO" name="Audio">
+                        <disallowConform></disallowConform>
+                    </feature>
+                    <feature code="SNP" name="Snapshot"></feature>
+                    <feature code="VDO" name="Video">
+                        <disallowConform></disallowConform>
+                    </feature>
+                </features>
+            </include>
+            <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Occupancy Sensing" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Power Source" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Time Synchronization" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Zone Management" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-chime</name>
+        <domain>CHIP</domain>
+        <typeName>Chime</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0146</deviceId>
+        <revision editable="false">1</revision>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Chime" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-camera-controller</name>
+        <domain>CHIP</domain>
+        <typeName>Camera Controller</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0147</deviceId>
+        <revision editable="false">1</revision>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Camera AV Settings User Level Management" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Camera AV Stream Management" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Identify" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Occupancy Sensing" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Power Source" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Push AV Stream Transport" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="TLS Certificate Management" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="TLS Client Management" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Time Synchronization" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="WebRTC Transport Provider" client="true" server="false" clientLocked="true" serverLocked="true"></include>
+            <include cluster="WebRTC Transport Requestor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Zone Management" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-doorbell</name>
+        <domain>CHIP</domain>
+        <typeName>Doorbell</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0148</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Binding" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Chime" client="true" server="false" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Switch" client="false" server="true" clientLocked="true" serverLocked="true">
+                <features>
+                    <feature code="MS" name="MomentarySwitch"></feature>
+                </features>
+            </include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-closure</name>
+        <domain>CHIP</domain>
+        <typeName>Closure</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0230</deviceId>
+        <revision editable="false">1</revision>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Closure Control" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <features>
+                    <feature code="TAGLIST" name="TagList"></feature>
+                </features>
+            </include>
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-closure-panel</name>
+        <domain>CHIP</domain>
+        <typeName>Closure Panel</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0231</deviceId>
+        <revision editable="false">1</revision>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Closure Dimension" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <features>
+                    <feature code="TAGLIST" name="TagList"></feature>
+                </features>
+            </include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-closure-controller</name>
+        <domain>CHIP</domain>
+        <typeName>Closure Controller</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x023E</deviceId>
+        <revision editable="false">1</revision>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Binding" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Closure Control" client="true" server="false" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Closure Dimension" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Groups" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Identify" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
         <name>MA-pump</name>
         <domain>CHIP</domain>
         <typeName>Pump</typeName>
         <profileId editable="false">0x0999</profileId>
         <deviceId editable="false">0x0303</deviceId>
+        <revision editable="false">3</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -917,10 +1362,10 @@ limitations under the License.
                 <requireAttribute>OperationMode</requireAttribute>
             </include>
             <include cluster="Level Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Pressure Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Flow Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Occupancy Sensing" client="false" server="false" clientLocked="false" serverLocked="true" />
+            <include cluster="Temperature Measurement" client="false" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Pressure Measurement" client="false" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Flow Measurement" client="false" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Occupancy Sensing" client="false" server="false" clientLocked="false" serverLocked="true"></include>
         </clusters>
     </deviceType>
     <deviceType>
@@ -929,6 +1374,7 @@ limitations under the License.
         <typeName>On/Off Light Switch</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0103</deviceId>
+        <revision editable="false">3</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -989,6 +1435,7 @@ limitations under the License.
         <typeName>Dimmer Switch</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0104</deviceId>
+        <revision editable="false">3</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <superset>On/Off Light Switch</superset>
@@ -1051,6 +1498,7 @@ limitations under the License.
         <typeName>Color Dimmer Switch</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0105</deviceId>
+        <revision editable="false">3</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <superset>Dimmer Switch</superset>
@@ -1105,11 +1553,75 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
-        <name>MA-controlbridge</name>
+        <name>MA-electrical-utility-meter</name>
+        <domain>CHIP</domain>
+        <typeName>Electrical Utility Meter</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0511</deviceId>
+        <revision editable="false">1</revision>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Meter Identification" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Time Synchronization" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-meter-reference-point</name>
+        <domain>CHIP</domain>
+        <typeName>Meter Reference Point</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0512</deviceId>
+        <revision editable="false">1</revision>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Time Synchronization" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-electrical-energy-tariff</name>
+        <domain>CHIP</domain>
+        <typeName>Electrical Energy Tariff</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0513</deviceId>
+        <revision editable="false">1</revision>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Commodity Price" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Commodity Tariff" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>TAG_LIST</requireAttribute>
+                <features>
+                    <feature code="TAGLIST" name="TagList"></feature>
+                </features>
+            </include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-electrical-meter</name>
+        <domain>CHIP</domain>
+        <typeName>Electrical Meter</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0514</deviceId>
+        <revision editable="false">1</revision>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters>
+            <include cluster="Commodity Metering" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-control-bridge</name>
         <domain>CHIP</domain>
         <typeName>Control Bridge</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0840</deviceId>
+        <revision editable="false">3</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -1129,10 +1641,8 @@ limitations under the License.
             <include cluster="Binding" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>BINDING</requireAttribute>
             </include>
-            <include cluster="Groups" client="true" server="false" clientLocked="true" serverLocked="true">
-            </include>
-            <include cluster="Scenes Management" client="true" server="false" clientLocked="true" serverLocked="true">
-            </include>
+            <include cluster="Groups" client="true" server="false" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Scenes Management" client="true" server="false" clientLocked="true" serverLocked="true"></include>
             <include cluster="On/Off" client="true" server="false" clientLocked="true" serverLocked="true"></include>
             <include cluster="Level Control" client="true" server="false" clientLocked="true" serverLocked="true"></include>
             <include cluster="Color Control" client="true" server="false" clientLocked="true" serverLocked="true"></include>
@@ -1146,6 +1656,7 @@ limitations under the License.
         <typeName>Pump Controller</typeName>
         <profileId editable="false">0x0999</profileId>
         <deviceId editable="false">0x0304</deviceId>
+        <revision editable="false">4</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -1198,10 +1709,8 @@ limitations under the License.
                 <requireCommand>GetSceneMembership</requireCommand>
                 <requireCommand>GetSceneMembershipResponse</requireCommand>
             </include>
-            <include cluster="On/Off" client="true" server="false" clientLocked="true" serverLocked="true">
-            </include>
-            <include cluster="Pump Configuration and Control" client="true" server="false" clientLocked="true" serverLocked="true">
-            </include>
+            <include cluster="On/Off" client="true" server="false" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Pump Configuration and Control" client="true" server="false" clientLocked="true" serverLocked="true"></include>
             <include cluster="Level Control" client="false" server="false" clientLocked="false" serverLocked="true"></include>
             <include cluster="Temperature Measurement" client="false" server="false" clientLocked="false" serverLocked="true"></include>
             <include cluster="Pressure Measurement" client="false" server="false" clientLocked="false" serverLocked="true"></include>
@@ -1214,6 +1723,7 @@ limitations under the License.
         <typeName>Generic Switch</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x000f</deviceId>
+        <revision editable="false">3</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -1241,6 +1751,7 @@ limitations under the License.
         <typeName>Contact Sensor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0015</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -1268,6 +1779,7 @@ limitations under the License.
         <typeName>Light Sensor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0106</deviceId>
+        <revision editable="false">3</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -1301,6 +1813,7 @@ limitations under the License.
         <typeName>Occupancy Sensor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0107</deviceId>
+        <revision editable="false">4</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -1333,6 +1846,7 @@ limitations under the License.
         <typeName>Temperature Sensor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0302</deviceId>
+        <revision editable="false">3</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -1358,6 +1872,7 @@ limitations under the License.
         <typeName>Pressure Sensor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0305</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -1383,6 +1898,7 @@ limitations under the License.
         <typeName>Flow Sensor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0306</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -1408,6 +1924,7 @@ limitations under the License.
         <typeName>Humidity Sensor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0307</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -1433,6 +1950,7 @@ limitations under the License.
         <typeName>On/Off Sensor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0850</deviceId>
+        <revision editable="false">3</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -1465,6 +1983,7 @@ limitations under the License.
         <typeName>Door Lock</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x000A</deviceId>
+        <revision editable="false">3</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -1484,23 +2003,23 @@ limitations under the License.
             <include cluster="Door Lock" client="false" server="true" clientLocked="true" serverLocked="true">
                 <features>
                     <feature code="USR" name="User">
-                    <mandatoryConform>
-                        <andTerm>
-                        <condition name="Matter"/>
-                        <orTerm>
-                            <feature name="PIN"/>
-                            <feature name="RID"/>
-                            <feature name="FPG"/>
-                            <feature name="FACE"/>
-                        </orTerm>
-                        </andTerm>
-                    </mandatoryConform>
+                        <mandatoryConform>
+                            <andTerm>
+                                <condition name="Matter"></condition>
+                                <orTerm>
+                                    <feature name="PIN"></feature>
+                                    <feature name="RID"></feature>
+                                    <feature name="FPG"></feature>
+                                    <feature name="FACE"></feature>
+                                </orTerm>
+                            </andTerm>
+                        </mandatoryConform>
                     </feature>
                     <feature code="" name="RFIDCredential">
-                    <otherwiseConform>
-                        <provisionalConform/>
-                        <optionalConform/>
-                    </otherwiseConform>
+                        <otherwiseConform>
+                            <provisionalConform></provisionalConform>
+                            <optionalConform></optionalConform>
+                        </otherwiseConform>
                     </feature>
                 </features>
             </include>
@@ -1513,6 +2032,7 @@ limitations under the License.
         <typeName>Door Lock Controller</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x000B</deviceId>
+        <revision editable="false">3</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -1535,6 +2055,7 @@ limitations under the License.
         <typeName>Window Covering</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0202</deviceId>
+        <revision editable="false">4</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -1586,9 +2107,9 @@ limitations under the License.
             <include cluster="Window Covering" client="false" server="true" clientLocked="true" serverLocked="true">
                 <features>
                     <feature code="ABS" name="AbsolutePosition">
-                    <mandatoryConform>
-                        <condition name="Zigbee"/>
-                    </mandatoryConform>
+                        <mandatoryConform>
+                            <condition name="Zigbee"></condition>
+                        </mandatoryConform>
                     </feature>
                 </features>
             </include>
@@ -1600,6 +2121,7 @@ limitations under the License.
         <typeName>Window Covering Controller</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0203</deviceId>
+        <revision editable="false">4</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -1623,76 +2145,12 @@ limitations under the License.
             <include cluster="Window Covering" client="true" server="false" clientLocked="true" serverLocked="true">
                 <features>
                     <feature code="ABS" name="AbsolutePosition">
-                    <mandatoryConform>
-                        <condition name="Zigbee"/>
-                    </mandatoryConform>
+                        <mandatoryConform>
+                            <condition name="Zigbee"></condition>
+                        </mandatoryConform>
                     </feature>
                 </features>
             </include>
-        </clusters>
-    </deviceType>
-    <deviceType>
-        <name>MA-heatcool</name>
-        <domain>CHIP</domain>
-        <typeName>Heating/Cooling Unit</typeName>
-        <profileId editable="false">0x0103</profileId>
-        <deviceId editable="false">0x0300</deviceId>
-        <class>Simple</class>
-        <scope>Endpoint</scope>
-        <clusters lockOthers="true">
-            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
-                <requireAttribute>IDENTIFY_TIME</requireAttribute>
-                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
-                <requireCommand>Identify</requireCommand>
-                <requireCommand>IdentifyQuery</requireCommand>
-                <requireCommand>TriggerEffect</requireCommand>
-            </include>
-            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
-                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
-                <requireAttribute>SERVER_LIST</requireAttribute>
-                <requireAttribute>CLIENT_LIST</requireAttribute>
-                <requireAttribute>PARTS_LIST</requireAttribute>
-            </include>
-            <include cluster="Binding" client="false" server="true" clientLocked="true" serverLocked="true">
-                <requireAttribute>BINDING</requireAttribute>
-            </include>
-            <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true">
-                <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
-                <requireCommand>AddGroup</requireCommand>
-                <requireCommand>AddGroupResponse</requireCommand>
-                <requireCommand>ViewGroup</requireCommand>
-                <requireCommand>ViewGroupResponse</requireCommand>
-                <requireCommand>GetGroupMembership</requireCommand>
-                <requireCommand>GetGroupMembershipResponse</requireCommand>
-                <requireCommand>RemoveGroup</requireCommand>
-                <requireCommand>RemoveGroupResponse</requireCommand>
-                <requireCommand>RemoveAllGroups</requireCommand>
-                <requireCommand>AddGroupIfIdentifying</requireCommand>
-            </include>
-            <include cluster="Scenes Management" client="false" server="false" clientLocked="true" serverLocked="false">
-                <requireAttribute>SCENE_COUNT</requireAttribute>
-                <requireAttribute>CURRENT_SCENE</requireAttribute>
-                <requireAttribute>CURRENT_GROUP</requireAttribute>
-                <requireAttribute>SCENE_VALID</requireAttribute>
-                <requireAttribute>SCENE_NAME_SUPPORT</requireAttribute>
-                <requireCommand>AddScene</requireCommand>
-                <requireCommand>AddSceneResponse</requireCommand>
-                <requireCommand>ViewScene</requireCommand>
-                <requireCommand>ViewSceneResponse</requireCommand>
-                <requireCommand>RemoveScene</requireCommand>
-                <requireCommand>RemoveSceneResponse</requireCommand>
-                <requireCommand>RemoveAllScenes</requireCommand>
-                <requireCommand>RemoveAllScenesResponse</requireCommand>
-                <requireCommand>StoreScene</requireCommand>
-                <requireCommand>StoreSceneResponse</requireCommand>
-                <requireCommand>RecallScene</requireCommand>
-                <requireCommand>GetSceneMembership</requireCommand>
-                <requireCommand>GetSceneMembershipResponse</requireCommand>
-            </include>
-            <include cluster="Thermostat" client="true" server="false" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Fan Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Level Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>
     <deviceType>
@@ -1701,6 +2159,7 @@ limitations under the License.
         <typeName>Thermostat</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0301</deviceId>
+        <revision editable="false">4</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -1768,6 +2227,7 @@ limitations under the License.
         <typeName>Fan</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x002B</deviceId>
+        <revision editable="false">3</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -1805,6 +2265,7 @@ limitations under the License.
         <typeName>Casting Video Player</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0023</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -1819,7 +2280,7 @@ limitations under the License.
             <include cluster="Application Launcher" client="false" server="true" clientLocked="false" serverLocked="false">
                 <features>
                     <feature code="AP" name="ApplicationPlatform">
-                    <mandatoryConform/>
+                        <mandatoryConform></mandatoryConform>
                     </feature>
                 </features>
             </include>
@@ -1840,6 +2301,7 @@ limitations under the License.
         <typeName>Basic Video Player</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0028</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -1866,6 +2328,7 @@ limitations under the License.
         <typeName>Casting Video Client</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0029</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -1900,6 +2363,7 @@ limitations under the License.
         <typeName>Video Remote Control</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x002A</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -1933,6 +2397,7 @@ limitations under the License.
         <typeName>Speaker</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0022</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -1959,6 +2424,7 @@ limitations under the License.
         <typeName>Content App</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0024</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -1980,7 +2446,7 @@ limitations under the License.
             <include cluster="Application Launcher" client="false" server="true" clientLocked="false" serverLocked="true">
                 <features>
                     <feature code="AP" name="ApplicationPlatform">
-                    <disallowConform/>
+                        <disallowConform></disallowConform>
                     </feature>
                 </features>
             </include>
@@ -1997,6 +2463,7 @@ limitations under the License.
         <typeName>Mode Select</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0027</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2022,6 +2489,7 @@ limitations under the License.
         <typeName>Room Air Conditioner</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0072</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2033,7 +2501,7 @@ limitations under the License.
             <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
                 <features>
                     <feature code="DF" name="DeadFrontBehavior">
-                    <mandatoryConform/>
+                        <mandatoryConform></mandatoryConform>
                     </feature>
                 </features>
                 <requireAttribute>ON_OFF</requireAttribute>
@@ -2057,6 +2525,7 @@ limitations under the License.
         <typeName>Smoke CO Alarm</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0076</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2080,6 +2549,7 @@ limitations under the License.
         <typeName>Air Purifier</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x002D</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2101,6 +2571,7 @@ limitations under the License.
         <typeName>Air Quality Sensor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x002C</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2131,6 +2602,7 @@ limitations under the License.
         <typeName>Dishwasher</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0075</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2138,7 +2610,7 @@ limitations under the License.
             <include cluster="On/Off" client="false" server="false" clientLocked="true" serverLocked="false">
                 <features>
                     <feature code="DF" name="DeadFrontBehavior">
-                    <mandatoryConform/>
+                        <mandatoryConform></mandatoryConform>
                     </feature>
                 </features>
             </include>
@@ -2147,7 +2619,7 @@ limitations under the License.
             <include cluster="Dishwasher Mode" client="false" server="false" clientLocked="true" serverLocked="false">
                 <features>
                     <feature code="OO" name="OnOff">
-                    <disallowConform/>
+                        <disallowConform></disallowConform>
                     </feature>
                 </features>
             </include>
@@ -2161,8 +2633,18 @@ limitations under the License.
         <typeName>Oven</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x007B</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
+        <endpointComposition>
+            <compositionType>tree</compositionType>
+            <endpoint conformance="M" constraint="min 1">
+                <deviceType>0x0071</deviceType>
+            </endpoint>
+            <endpoint conformance="O" constraint="max 1">
+                <deviceType>0x0078</deviceType>
+            </endpoint>
+        </endpointComposition>
         <clusters lockOthers="true">
             <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
@@ -2174,6 +2656,7 @@ limitations under the License.
         <typeName>Microwave Oven</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0079</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2182,15 +2665,15 @@ limitations under the License.
             <include cluster="Fan Control" client="false" server="false" clientLocked="true" serverLocked="false">
                 <features>
                     <feature code="WND" name="Wind">
-                    <disallowConform/>
+                        <disallowConform></disallowConform>
                     </feature>
                     <feature code="DIR" name="AirflowDirection">
-                    <disallowConform/>
+                        <disallowConform></disallowConform>
                     </feature>
                 </features>
             </include>
-            <include cluster="Microwave Oven Mode"  client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Microwave Oven Control"  client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Microwave Oven Mode" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Microwave Oven Control" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Operational State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>
@@ -2200,12 +2683,13 @@ limitations under the License.
         <typeName>Refrigerator</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0070</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <endpointComposition>
             <compositionType>tree</compositionType>
             <endpoint conformance="M" constraint="min 1">
-                    <deviceType>0x0071</deviceType>
+                <deviceType>0x0071</deviceType>
             </endpoint>
         </endpointComposition>
         <clusters lockOthers="true">
@@ -2214,7 +2698,7 @@ limitations under the License.
             <include cluster="Refrigerator And Temperature Controlled Cabinet Mode" client="false" server="false" clientLocked="true" serverLocked="false">
                 <features>
                     <feature code="OO" name="OnOff">
-                    <disallowConform/>
+                        <disallowConform></disallowConform>
                     </feature>
                 </features>
             </include>
@@ -2227,6 +2711,7 @@ limitations under the License.
         <typeName>Laundry Washer</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0073</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2235,14 +2720,14 @@ limitations under the License.
             <include cluster="On/Off" client="false" server="false" clientLocked="true" serverLocked="false">
                 <features>
                     <feature code="DF" name="DeadFrontBehavior">
-                    <mandatoryConform/>
+                        <mandatoryConform></mandatoryConform>
                     </feature>
                 </features>
             </include>
             <include cluster="Laundry Washer Mode" client="false" server="false" clientLocked="true" serverLocked="false">
                 <features>
                     <feature code="OO" name="OnOff">
-                    <disallowConform/>
+                        <disallowConform></disallowConform>
                     </feature>
                 </features>
             </include>
@@ -2257,6 +2742,7 @@ limitations under the License.
         <typeName>Laundry Dryer</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x007C</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2265,14 +2751,14 @@ limitations under the License.
             <include cluster="On/Off" client="false" server="false" clientLocked="true" serverLocked="false">
                 <features>
                     <feature code="DF" name="DeadFrontBehavior">
-                    <mandatoryConform/>
+                        <mandatoryConform></mandatoryConform>
                     </feature>
                 </features>
             </include>
             <include cluster="Laundry Washer Mode" client="false" server="false" clientLocked="true" serverLocked="false">
                 <features>
                     <feature code="" name="OnOff">
-                    <disallowConform/>
+                        <disallowConform></disallowConform>
                     </feature>
                 </features>
             </include>
@@ -2287,6 +2773,7 @@ limitations under the License.
         <typeName>Extractor Hood</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x007A</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2297,13 +2784,13 @@ limitations under the License.
             <include cluster="Fan Control" client="false" server="true" clientLocked="true" serverLocked="true">
                 <features>
                     <feature code="RCK" name="Rocking">
-                    <disallowConform/>
+                        <disallowConform></disallowConform>
                     </feature>
                     <feature code="WND" name="Wind">
-                    <disallowConform/>
+                        <disallowConform></disallowConform>
                     </feature>
                     <feature code="DIR" name="AirflowDirection">
-                    <disallowConform/>
+                        <disallowConform></disallowConform>
                     </feature>
                 </features>
             </include>
@@ -2315,11 +2802,11 @@ limitations under the License.
         <typeName>Robotic Vacuum Cleaner</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0074</deviceId>
+        <revision editable="false">4</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
-            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
-            </include>
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="RVC Run Mode" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="RVC Clean Mode" client="false" server="false" clientLocked="true" serverLocked="false"></include>
@@ -2333,6 +2820,7 @@ limitations under the License.
         <typeName>Temperature Controlled Cabinet</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0071</deviceId>
+        <revision editable="false">5</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2342,14 +2830,14 @@ limitations under the License.
             <include cluster="Refrigerator And Temperature Controlled Cabinet Mode" client="false" server="false" clientLocked="true" serverLocked="false">
                 <features>
                     <feature code="OO" name="OnOff">
-                    <disallowConform/>
+                        <disallowConform></disallowConform>
                     </feature>
                 </features>
             </include>
             <include cluster="Oven Mode" client="false" server="false" clientLocked="true" serverLocked="false">
                 <features>
                     <feature code="OO" name="OnOff">
-                    <disallowConform/>
+                        <disallowConform></disallowConform>
                     </feature>
                 </features>
             </include>
@@ -2362,6 +2850,7 @@ limitations under the License.
         <typeName>Water Freeze Detector</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0041</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2377,6 +2866,7 @@ limitations under the License.
         <typeName>Water Valve</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0042</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2391,6 +2881,7 @@ limitations under the License.
         <typeName>Water Leak Detector</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0043</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2406,6 +2897,7 @@ limitations under the License.
         <typeName>Rain Sensor</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0044</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2421,13 +2913,14 @@ limitations under the License.
         <typeName>Network Infrastructure Manager</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0090</deviceId>
+        <revision editable="false">2</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
-            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"/>
-            <include cluster="Thread Network Directory" client="false" server="true" clientLocked="true" serverLocked="true"/>
-            <include cluster="Wi-Fi Network Management" client="false" server="true" clientLocked="true" serverLocked="true"/>
-            <include cluster="Thread Border Router Management" client="false" server="true" clientLocked="true" serverLocked="true"/>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Thread Network Directory" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Wi-Fi Network Management" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Thread Border Router Management" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>
     <deviceType>
@@ -2436,10 +2929,11 @@ limitations under the License.
         <typeName>Thread Border Router</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0091</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
-            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"/>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Thread Network Diagnostics" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Thread Border Router Management" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
@@ -2607,6 +3101,7 @@ limitations under the License.
         <typeName>Secondary Network Interface</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0019</deviceId>
+        <revision editable="false">1</revision>
         <class>Utility</class>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
@@ -2623,20 +3118,34 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
+        <name>MA-joint-fabric-administrator</name>
+        <domain>CHIP</domain>
+        <typeName>Joint Fabric Administrator</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0130</deviceId>
+        <revision editable="false">1</revision>
+        <class>Utility</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Joint Fabric Datastore" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Joint Fabric Administrator" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
         <name>Cooktop</name>
         <domain>CHIP</domain>
         <typeName>Cooktop</typeName>
         <class>Simple</class>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0078</deviceId>
+        <revision editable="false">1</revision>
         <clusters lockOthers="true">
-            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
-            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
                 <features>
                     <feature code="OFFONLY" name="OffOnly">
-                    <mandatoryConform/>
+                        <mandatoryConform></mandatoryConform>
                     </feature>
                 </features>
             </include>
@@ -2649,11 +3158,12 @@ limitations under the License.
         <class>Simple</class>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0077</deviceId>
+        <revision editable="false">2</revision>
         <clusters lockOthers="true">
             <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="false">
                 <features>
                     <feature code="OFFONLY" name="OffOnly">
-                    <mandatoryConform/>
+                        <mandatoryConform></mandatoryConform>
                     </feature>
                 </features>
             </include>
@@ -2669,6 +3179,7 @@ limitations under the License.
         <class>Simple</class>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x050C</deviceId>
+        <revision editable="false">2</revision>
         <clusters lockOthers="true">
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
@@ -2684,6 +3195,7 @@ limitations under the License.
         <class>Utility</class>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x050D</deviceId>
+        <revision editable="false">2</revision>
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
             <include cluster="Device Energy Management" client="false" server="true" clientLocked="true" serverLocked="true"></include>
@@ -2696,6 +3208,7 @@ limitations under the License.
         <typeName>Water Heater</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x050F</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters>
@@ -2739,6 +3252,7 @@ limitations under the License.
         <typeName>Heat Pump</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0309</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters>
@@ -2767,6 +3281,7 @@ limitations under the License.
         <typeName>Solar Power</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0017</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters>
@@ -2789,6 +3304,7 @@ limitations under the License.
         <typeName>Battery Storage</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0018</deviceId>
+        <revision editable="false">1</revision>
         <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters>
@@ -2803,6 +3319,40 @@ limitations under the License.
                 <requireAttribute>IDENTIFY_TYPE</requireAttribute>
                 <requireCommand>Identify</requireCommand>
             </include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-thermostatcontroller</name>
+        <domain>CHIP</domain>
+        <typeName>Thermostat Controller</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x030A</deviceId>
+        <revision editable="false">1</revision>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Binding" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Thermostat" client="true" server="false" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Identify" client="true" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Groups" client="true" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Scenes Management" client="true" server="false" clientLocked="false" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-soilsensor</name>
+        <domain>CHIP</domain>
+        <typeName>Soil Sensor</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0045</deviceId>
+        <revision editable="false">1</revision>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Soil Measurement" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>
 </configurator>

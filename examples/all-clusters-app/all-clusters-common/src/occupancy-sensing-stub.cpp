@@ -62,15 +62,30 @@ void emberAfOccupancySensingClusterInitCallback(EndpointId endpointId)
 
         if (gOccupancySensingClusterInstances[epIndex])
         {
-            gOccupancySensingClusterInstances[epIndex]->Init();
+            TEMPORARY_RETURN_IGNORED gOccupancySensingClusterInstances[epIndex]->Init();
 
-            SetHoldTimeLimits(endpointId, holdTimeLimits);
+            TEMPORARY_RETURN_IGNORED SetHoldTimeLimits(endpointId, holdTimeLimits);
 
-            SetHoldTime(endpointId, holdTime);
+            TEMPORARY_RETURN_IGNORED SetHoldTime(endpointId, holdTime);
         }
     }
     else
     {
         ChipLogError(AppServer, "Error: invalid/unexpected OccupancySensing Cluster endpoint index.");
+    }
+}
+
+void emberAfOccupancySensingClusterShutdownCallback(EndpointId endpointId)
+{
+    uint16_t epIndex = emberAfGetClusterServerEndpointIndex(endpointId, chip::app::Clusters::OccupancySensing::Id,
+                                                            MATTER_DM_OCCUPANCY_SENSING_CLUSTER_SERVER_ENDPOINT_COUNT);
+
+    if (epIndex < kOccupancySensingClusterTableSize)
+    {
+        if (gOccupancySensingClusterInstances[epIndex])
+        {
+            gOccupancySensingClusterInstances[epIndex]->Shutdown();
+        }
+        gOccupancySensingClusterInstances[epIndex] = nullptr;
     }
 }

@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/chip.gni")
+import("${chip_root}/src/platform/silabs/tests/args.gni")
+
 declare_args() {
   # Silabs wireless starter kit plug-in boards featuring specific mcu family and mcu model.
   # Find more information at https://www.silabs.com/development-tools/wireless.
@@ -40,50 +43,92 @@ declare_args() {
 
   # WIFI rcp boards options for wifi apps.
   use_wf200 = false
-  use_rs9116 = false
   use_SiWx917 = false
 
   wifi_soc = false
 
+  wifi_ncp_module = false
+
   #Disable MQTT by default
-  enable_dic = false
+  enable_matter_aws = false
 
   # Disable AWS SDK OTA by default
   aws_sdk_ota = false
-
-  # Self-provision enabled
-  use_provision_channel = false
 
   # Temperature Sensor support
   sl_enable_si70xx_sensor = false
 
   # RGB LED support
   sl_enable_rgb_led = false
+
+  #Si917Y boards
+  is_si917y_mcu = false
 }
 
 declare_args() {
   # Enables LCD Qr Code on supported devices
   show_qr_code = !disable_lcd
 
-  # Enabling BLE on 9116/917 NCP by default
-  chip_enable_ble_rs911x = use_rs9116 || use_SiWx917
+  # Enabling BLE on 917 NCP by default
+  chip_enable_ble_rs911x = use_SiWx917
+}
+
+# TODO - This needs to be removed once multiplexing issues resolved
+if (use_SiWx917) {
+  disable_lcd = true
+  show_qr_code = false
+  use_external_flash = false
 }
 
 if (silabs_board == "") {
   silabs_board = getenv("SILABS_BOARD")
 }
 
+# Workaround to enable unit-tests when depending on files that import this gni
+if (silabs_board == "" && sl_build_unit_tests) {
+  if (!chip_build_all_platform_tests) {
+    # We can't print to the console when running our tests in the CSA CI otherwise CI fails.
+    print("Building the unit test configuration since silabs_board is not set.")
+    print("If you are building the efr32 test_driver, a board is required.")
+  }
+  silabs_board = "unit-test"
+  silabs_family = "unit-test"
+  silabs_mcu = "unit-test"
+}
+
 assert(silabs_board != "", "silabs_board must be specified")
 
 # Si917 WIFI board ----------
-if (silabs_board == "BRD4338A" || silabs_board == "BRD2605A" ||
-    silabs_board == "BRD4343A") {
+si917_wifi_boards = [
+  "BRD4338A",
+  "BRD2605A",
+  "BRD4343A",
+  "BRD4342A",
+  "BRD2708A",
+  "BRD2911A",
+]
+
+# Check if silabs_board is a Si917 board
+is_si917_board = false
+foreach(board, si917_wifi_boards) {
+  if (silabs_board == board) {
+    is_si917_board = true
+  }
+}
+
+if (is_si917_board) {
   if (silabs_board == "BRD2605A") {
     sl_enable_rgb_led = true
   }
   silabs_family = "SiWx917-common"
-  silabs_mcu = "SiWG917M111MGTBA"
   wifi_soc = true
+
+  if (silabs_board == "BRD2708A" || silabs_board == "BRD2911A") {
+    is_si917y_mcu = true
+    silabs_mcu = "SIWG917Y111MGABA"
+  } else {
+    silabs_mcu = "SiWG917M111MGTBA"
+  }
 
   assert(!sl_enable_si70xx_sensor,
          "${silabs_board} does not support the si90xx sensor!")
@@ -186,6 +231,8 @@ if (silabs_board == "BRD4338A" || silabs_board == "BRD2605A" ||
   print("Using custom board configuration")
   print("silabs_family:", silabs_family)
   print("silabs_mcu:", silabs_mcu)
+} else if (silabs_board == "unit-test") {
+  # Do nothing
 } else {
   assert(
       false,

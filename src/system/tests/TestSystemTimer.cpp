@@ -32,6 +32,8 @@
 #include <lib/core/ErrorStr.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
+#include <system/RAIIMockClock.h>
 #include <system/SystemConfig.h>
 #include <system/SystemError.h>
 #include <system/SystemLayerImpl.h>
@@ -53,8 +55,19 @@ public:
     static void ServiceEvents(Layer & aLayer) {}
 };
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+template <class LayerImpl>
+class LayerEvents<LayerImpl, typename std::enable_if<std::is_base_of<LayerDispatch, LayerImpl>::value>::type>
+{
+public:
+    static bool HasServiceEvents() { return true; }
+    static void ServiceEvents(Layer & aLayer)
+    {
+        LayerDispatch & layer = static_cast<LayerDispatch &>(aLayer);
+        layer.HandleDispatchQueueEvents(chip::System::Clock::kZero);
+    }
+};
+#elif CHIP_SYSTEM_CONFIG_USE_SOCKETS
 template <class LayerImpl>
 class LayerEvents<LayerImpl, typename std::enable_if<std::is_base_of<LayerSocketsLoop, LayerImpl>::value>::type>
 {
@@ -68,10 +81,9 @@ public:
         layer.HandleEvents();
     }
 };
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 
 template <class LayerImpl>
 class LayerEvents<LayerImpl, typename std::enable_if<std::is_base_of<LayerImplFreeRTOS, LayerImpl>::value>::type>
@@ -88,7 +100,7 @@ public:
     }
 };
 
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 
 // Test input vector format.
 static const uint32_t MAX_NUM_TIMERS = 1000;
@@ -110,7 +122,7 @@ public:
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP && (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0) &&
        // !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
 
-        mLayer.Init();
+        EXPECT_SUCCESS(mLayer.Init());
     }
 
     static void TearDownTestSuite()
@@ -177,8 +189,8 @@ TEST_F(TestSystemTimer, CheckOverflow)
 
     sOverflowTestDone = false;
 
-    lSys.StartTimer(timeout_overflow_0ms, HandleTimerFailed, this);
-    lSys.StartTimer(timeout_10ms, HandleTimer10Success, this);
+    EXPECT_SUCCESS(lSys.StartTimer(timeout_overflow_0ms, HandleTimerFailed, this));
+    EXPECT_SUCCESS(lSys.StartTimer(timeout_10ms, HandleTimer10Success, this));
 
     while (!sOverflowTestDone)
     {
@@ -200,7 +212,7 @@ void HandleGreedyTimer(Layer * aLayer, void * aState)
         return;
     }
 
-    aLayer->StartTimer(chip::System::Clock::kZero, HandleGreedyTimer, aState);
+    EXPECT_SUCCESS(aLayer->StartTimer(chip::System::Clock::kZero, HandleGreedyTimer, aState));
     sNumTimersHandled++;
 }
 
@@ -211,7 +223,7 @@ TEST_F(TestSystemTimer, CheckStarvation)
 
     Layer & lSys = mLayer;
 
-    lSys.StartTimer(chip::System::Clock::kZero, HandleGreedyTimer, this);
+    EXPECT_SUCCESS(lSys.StartTimer(chip::System::Clock::kZero, HandleGreedyTimer, this));
 
     LayerEvents<LayerImpl>::ServiceEvents(lSys);
 }
@@ -243,15 +255,13 @@ TEST_F(TestSystemTimer, CheckOrder)
     TestState testState;
     EXPECT_EQ(testState.record[0], 0);
 
-    Clock::ClockBase * const savedClock = &SystemClock();
-    Clock::Internal::MockClock mockClock;
-    Clock::Internal::SetSystemClockForTesting(&mockClock);
+    Clock::Internal::RAIIMockClock mockClock;
 
     using namespace Clock::Literals;
-    systemLayer.StartTimer(300_ms, TestState::D, &testState);
-    systemLayer.StartTimer(100_ms, TestState::B, &testState);
-    systemLayer.StartTimer(200_ms, TestState::C, &testState);
-    systemLayer.StartTimer(0_ms, TestState::A, &testState);
+    EXPECT_SUCCESS(systemLayer.StartTimer(300_ms, TestState::D, &testState));
+    EXPECT_SUCCESS(systemLayer.StartTimer(100_ms, TestState::B, &testState));
+    EXPECT_SUCCESS(systemLayer.StartTimer(200_ms, TestState::C, &testState));
+    EXPECT_SUCCESS(systemLayer.StartTimer(0_ms, TestState::A, &testState));
 
     LayerEvents<LayerImpl>::ServiceEvents(systemLayer);
     EXPECT_EQ(strcmp(testState.record, "A"), 0);
@@ -263,8 +273,6 @@ TEST_F(TestSystemTimer, CheckOrder)
     mockClock.AdvanceMonotonic(200_ms);
     LayerEvents<LayerImpl>::ServiceEvents(systemLayer);
     EXPECT_EQ(strcmp(testState.record, "ABCD"), 0);
-
-    Clock::Internal::SetSystemClockForTesting(savedClock);
 }
 
 TEST_F(TestSystemTimer, CheckCancellation)
@@ -310,22 +318,18 @@ TEST_F(TestSystemTimer, CheckCancellation)
     TestState testState(systemLayer);
     EXPECT_EQ(testState.record[0], 0);
 
-    Clock::ClockBase * const savedClock = &SystemClock();
-    Clock::Internal::MockClock mockClock;
-    Clock::Internal::SetSystemClockForTesting(&mockClock);
+    Clock::Internal::RAIIMockClock mockClock;
 
     using namespace Clock::Literals;
-    systemLayer.StartTimer(0_ms, TestState::A, &testState);
-    systemLayer.StartTimer(0_ms, TestState::B, &testState);
-    systemLayer.StartTimer(20_ms, TestState::C, &testState);
-    systemLayer.StartTimer(30_ms, TestState::D, &testState);
-    systemLayer.StartTimer(50_ms, TestState::E, &testState);
+    EXPECT_SUCCESS(systemLayer.StartTimer(0_ms, TestState::A, &testState));
+    EXPECT_SUCCESS(systemLayer.StartTimer(0_ms, TestState::B, &testState));
+    EXPECT_SUCCESS(systemLayer.StartTimer(20_ms, TestState::C, &testState));
+    EXPECT_SUCCESS(systemLayer.StartTimer(30_ms, TestState::D, &testState));
+    EXPECT_SUCCESS(systemLayer.StartTimer(50_ms, TestState::E, &testState));
 
     mockClock.AdvanceMonotonic(100_ms);
     LayerEvents<LayerImpl>::ServiceEvents(systemLayer);
     EXPECT_EQ(strcmp(testState.record, "AC"), 0);
-
-    Clock::Internal::SetSystemClockForTesting(savedClock);
 }
 
 namespace {
@@ -403,9 +407,8 @@ TEST_F(TestSystemTimer, CancelTimerTest)
 
     Layer & systemLayer = mLayer;
 
-    Clock::ClockBase * const savedClock = &SystemClock();
-    Clock::Internal::MockClock mockClock;
-    Clock::Internal::SetSystemClockForTesting(&mockClock);
+    Clock::Internal::RAIIMockClock mockClock;
+
     using namespace Clock::Literals;
 
     for (unsigned i = 0; i < kCancelTimerCount; i++)
@@ -422,8 +425,6 @@ TEST_F(TestSystemTimer, CancelTimerTest)
 
     ValidateExecutedTimerCounts();
     EXPECT_EQ(ExecutedTimerCount(), kCancelTimerCount);
-
-    Clock::Internal::SetSystemClockForTesting(savedClock);
 }
 
 } // namespace CancelTimerTest
@@ -591,17 +592,15 @@ TEST_F(TestSystemTimer, ExtendTimerToTest)
     TestState testState;
     EXPECT_EQ(testState.record[0], 0);
 
-    Clock::ClockBase * const savedClock = &SystemClock();
-    Clock::Internal::MockClock mockClock;
-    Clock::Internal::SetSystemClockForTesting(&mockClock);
+    Clock::Internal::RAIIMockClock mockClock;
 
     using namespace Clock::Literals;
-    systemLayer.StartTimer(150_ms, TestState::B, &testState);
-    systemLayer.StartTimer(200_ms, TestState::C, &testState);
-    systemLayer.StartTimer(150_ms, TestState::D, &testState);
+    EXPECT_SUCCESS(systemLayer.StartTimer(150_ms, TestState::B, &testState));
+    EXPECT_SUCCESS(systemLayer.StartTimer(200_ms, TestState::C, &testState));
+    EXPECT_SUCCESS(systemLayer.StartTimer(150_ms, TestState::D, &testState));
 
     // Timer wasn't started before. ExtendTimerTo will start it.
-    systemLayer.ExtendTimerTo(100_ms, TestState::A, &testState);
+    EXPECT_SUCCESS(systemLayer.ExtendTimerTo(100_ms, TestState::A, &testState));
     mockClock.AdvanceMonotonic(100_ms);
     LayerEvents<LayerImpl>::ServiceEvents(systemLayer);
     EXPECT_EQ(strcmp(testState.record, "A"), 0);
@@ -609,9 +608,9 @@ TEST_F(TestSystemTimer, ExtendTimerToTest)
     // Timer B as 50ms remaining. ExtendTimerTo 25 should have no effect
     // Timer C as 100ms remaining. ExtendTimerTo 75ms should have no effect
     // Timer D as 50ms remaining. Timer should be extend to a duration of 75ms
-    systemLayer.ExtendTimerTo(25_ms, TestState::B, &testState);
-    systemLayer.ExtendTimerTo(75_ms, TestState::D, &testState);
-    systemLayer.ExtendTimerTo(75_ms, TestState::D, &testState);
+    EXPECT_SUCCESS(systemLayer.ExtendTimerTo(25_ms, TestState::B, &testState));
+    EXPECT_SUCCESS(systemLayer.ExtendTimerTo(75_ms, TestState::D, &testState));
+    EXPECT_SUCCESS(systemLayer.ExtendTimerTo(75_ms, TestState::D, &testState));
 
     mockClock.AdvanceMonotonic(25_ms);
     LayerEvents<LayerImpl>::ServiceEvents(systemLayer);
@@ -622,12 +621,10 @@ TEST_F(TestSystemTimer, ExtendTimerToTest)
     EXPECT_EQ(strcmp(testState.record, "AB"), 0);
 
     // Timer D as 25ms remaining. Timer should be extend to a duration of 75ms
-    systemLayer.ExtendTimerTo(75_ms, TestState::D, &testState);
+    EXPECT_SUCCESS(systemLayer.ExtendTimerTo(75_ms, TestState::D, &testState));
     mockClock.AdvanceMonotonic(100_ms);
     LayerEvents<LayerImpl>::ServiceEvents(systemLayer);
     EXPECT_EQ(strcmp(testState.record, "ABCD"), 0);
-
-    Clock::Internal::SetSystemClockForTesting(savedClock);
 
     // Extending a timer by 0 ms permitted
     EXPECT_EQ(systemLayer.ExtendTimerTo(0_ms, TestState::A, &testState), CHIP_ERROR_INVALID_ARGUMENT);
@@ -659,14 +656,12 @@ TEST_F(TestSystemTimer, IsTimerActiveTest)
     TestState testState;
     EXPECT_EQ(testState.record[0], 0);
 
-    Clock::ClockBase * const savedClock = &SystemClock();
-    Clock::Internal::MockClock mockClock;
-    Clock::Internal::SetSystemClockForTesting(&mockClock);
+    Clock::Internal::RAIIMockClock mockClock;
 
     using namespace Clock::Literals;
-    systemLayer.StartTimer(100_ms, TestState::A, &testState);
-    systemLayer.StartTimer(200_ms, TestState::B, &testState);
-    systemLayer.StartTimer(300_ms, TestState::C, &testState);
+    EXPECT_SUCCESS(systemLayer.StartTimer(100_ms, TestState::A, &testState));
+    EXPECT_SUCCESS(systemLayer.StartTimer(200_ms, TestState::B, &testState));
+    EXPECT_SUCCESS(systemLayer.StartTimer(300_ms, TestState::C, &testState));
 
     EXPECT_TRUE(systemLayer.IsTimerActive(TestState::A, &testState));
     EXPECT_TRUE(systemLayer.IsTimerActive(TestState::B, &testState));
@@ -686,8 +681,6 @@ TEST_F(TestSystemTimer, IsTimerActiveTest)
     mockClock.AdvanceMonotonic(100_ms);
     LayerEvents<LayerImpl>::ServiceEvents(systemLayer);
     EXPECT_FALSE(systemLayer.IsTimerActive(TestState::C, &testState));
-
-    Clock::Internal::SetSystemClockForTesting(savedClock);
 }
 
 } // namespace System

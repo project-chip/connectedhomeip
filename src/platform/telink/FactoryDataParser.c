@@ -43,7 +43,11 @@ static inline bool uint16_decode(zcbor_state_t * states, uint16_t * value)
 bool ParseFactoryData(uint8_t * buffer, uint16_t bufferSize, struct FactoryData * factoryData)
 {
     memset(factoryData, 0, sizeof(*factoryData));
+#if defined(CONFIG_ZEPHYR_VERSION_3_3)
     ZCBOR_STATE_D(states, MAX_FACTORY_DATA_NESTING_LEVEL, buffer, bufferSize, 1);
+#else
+    ZCBOR_STATE_D(states, MAX_FACTORY_DATA_NESTING_LEVEL, buffer, bufferSize, 1, 0);
+#endif
 
     bool res = zcbor_map_start_decode(states);
     struct zcbor_string currentString;

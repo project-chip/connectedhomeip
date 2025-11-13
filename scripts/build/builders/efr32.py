@@ -32,6 +32,7 @@ class Efr32App(Enum):
     PUMP = auto()
     UNIT_TEST = auto()
     AIR_QUALITY_SENSOR = auto()
+    CLOSURE = auto()
 
     def ExampleName(self):
         if self == Efr32App.LIGHT:
@@ -48,6 +49,8 @@ class Efr32App(Enum):
             return 'pump-app'
         elif self == Efr32App.AIR_QUALITY_SENSOR:
             return 'air-quality-sensor-app'
+        elif self == Efr32App.CLOSURE:
+            return 'closure-app'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -68,6 +71,8 @@ class Efr32App(Enum):
             return 'matter-silabs-device_tests'
         elif self == Efr32App.AIR_QUALITY_SENSOR:
             return 'matter-silabs-air-quality-sensor-example'
+        elif self == Efr32App.CLOSURE:
+            return 'matter-silabs-closure-example'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -88,6 +93,8 @@ class Efr32App(Enum):
             return os.path.join('tests', 'efr32_device_tests.flashbundle.txt')
         elif self == Efr32App.AIR_QUALITY_SENSOR:
             return 'air_quality_sensor_app.flashbundle.txt'
+        elif self == Efr32App.CLOSURE:
+            return 'closure_app.flashbundle.txt'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -113,6 +120,9 @@ class Efr32Board(Enum):
     BRD2703A = 12
     BRD2605A = 13
     BRD4343A = 14
+    BRD4342A = 15
+    BRD2708A = 16
+    BRD2911A = 17
 
     def GnArgName(self):
         if self == Efr32Board.BRD2704B:
@@ -143,6 +153,12 @@ class Efr32Board(Enum):
             return 'BRD2605A'
         elif self == Efr32Board.BRD4343A:
             return 'BRD4343A'
+        elif self == Efr32Board.BRD4342A:
+            return 'BRD4342A'
+        elif self == Efr32Board.BRD2708A:
+            return 'BRD2708A'
+        elif self == Efr32Board.BRD2911A:
+            return 'BRD2911A'
         else:
             raise Exception('Unknown board #: %r' % self)
 
@@ -165,7 +181,6 @@ class Efr32Builder(GnBuilder):
                  enable_icd: bool = False,
                  enable_low_power: bool = False,
                  enable_wifi: bool = False,
-                 enable_rs9116: bool = False,
                  enable_wf200: bool = False,
                  enable_917_ncp: bool = False,
                  enable_wifi_ipv4: bool = False,
@@ -220,14 +235,12 @@ class Efr32Builder(GnBuilder):
                 # Wifi SoC platform
                 self.extra_gn_options.append('chip_device_platform=\"SiWx917\"')
             else:
-                if enable_rs9116:
-                    self.extra_gn_options.append('use_rs9116=true chip_device_platform =\"efr32\"')
-                elif enable_wf200:
+                if enable_wf200:
                     self.extra_gn_options.append('use_wf200=true chip_device_platform =\"efr32\"')
                 elif enable_917_ncp:
                     self.extra_gn_options.append('use_SiWx917=true chip_device_platform =\"efr32\"')
                 else:
-                    raise Exception('Wifi usage: ...-wifi-[rs9116|wf200|siwx917]-...')
+                    raise Exception('Wifi usage: ...-wifi-[wf200|siwx917]-...')
 
         if enable_wifi_ipv4:
             self.extra_gn_options.append('chip_enable_wifi_ipv4=true')
@@ -262,10 +275,6 @@ class Efr32Builder(GnBuilder):
 
         if "GSDK_ROOT" in os.environ and not enable_wifi:
             self.extra_gn_options.append(f"openthread_root=\"{sdk_path}/util/third_party/openthread\"")
-
-        if "WISECONNECT_SDK_ROOT" in os.environ:
-            wiseconnect_sdk_path = shlex.quote(os.environ['WISECONNECT_SDK_ROOT'])
-            self.extra_gn_options.append(f"wiseconnect_sdk_root=\"{wiseconnect_sdk_path}\"")
 
         if "WIFI_SDK_ROOT" in os.environ:
             wifi_sdk_path = shlex.quote(os.environ['WIFI_SDK_ROOT'])

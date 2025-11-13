@@ -86,7 +86,7 @@ public:
         return SendMessageImpl<0>(address, std::move(msgBuf));
     }
 
-    CHIP_ERROR MulticastGroupJoinLeave(const Transport::PeerAddress & address, bool join) override
+    CHIP_ERROR MulticastGroupJoinLeave(const PeerAddress & address, bool join) override
     {
         return MulticastGroupJoinLeaveImpl<0>(address, join);
     }
@@ -94,18 +94,12 @@ public:
     bool CanSendToPeer(const PeerAddress & address) override { return CanSendToPeerImpl<0>(address); }
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    CHIP_ERROR TCPConnect(const PeerAddress & address, Transport::AppTCPConnectionCallbackCtxt * appState,
-                          Transport::ActiveTCPConnectionState ** peerConnState) override
+    CHIP_ERROR TCPConnect(const PeerAddress & address, AppTCPConnectionCallbackCtxt * appState,
+                          ActiveTCPConnectionHandle & peerConnState) override
     {
         return TCPConnectImpl<0>(address, appState, peerConnState);
     }
 
-    void TCPDisconnect(const PeerAddress & address) override { return TCPDisconnectImpl<0>(address); }
-
-    void TCPDisconnect(Transport::ActiveTCPConnectionState * conn, bool shouldAbort = 0) override
-    {
-        return TCPDisconnectImpl<0>(conn, shouldAbort);
-    }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     void Close() override { return CloseImpl<0>(); }
@@ -160,8 +154,8 @@ private:
      * @param address what address to connect to.
      */
     template <size_t N, typename std::enable_if<(N < sizeof...(TransportTypes))>::type * = nullptr>
-    CHIP_ERROR TCPConnectImpl(const PeerAddress & address, Transport::AppTCPConnectionCallbackCtxt * appState,
-                              Transport::ActiveTCPConnectionState ** peerConnState)
+    CHIP_ERROR TCPConnectImpl(const PeerAddress & address, AppTCPConnectionCallbackCtxt * appState,
+                              ActiveTCPConnectionHandle & peerConnState)
     {
         Base * base = &std::get<N>(mTransports);
         if (base->CanSendToPeer(address))
@@ -175,8 +169,8 @@ private:
      * TCPConnectImpl template for out of range N.
      */
     template <size_t N, typename std::enable_if<(N >= sizeof...(TransportTypes))>::type * = nullptr>
-    CHIP_ERROR TCPConnectImpl(const PeerAddress & address, Transport::AppTCPConnectionCallbackCtxt * appState,
-                              Transport::ActiveTCPConnectionState ** peerConnState)
+    CHIP_ERROR TCPConnectImpl(const PeerAddress & address, AppTCPConnectionCallbackCtxt * appState,
+                              ActiveTCPConnectionHandle & peerConnState)
     {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
@@ -210,7 +204,7 @@ private:
      * @param conn pointer to the connection to the peer.
      */
     template <size_t N, typename std::enable_if<(N < sizeof...(TransportTypes))>::type * = nullptr>
-    void TCPDisconnectImpl(Transport::ActiveTCPConnectionState * conn, bool shouldAbort = 0)
+    void TCPDisconnectImpl(ActiveTCPConnectionHandle & conn, bool shouldAbort = 0)
     {
         std::get<N>(mTransports).TCPDisconnect(conn, shouldAbort);
         TCPDisconnectImpl<N + 1>(conn, shouldAbort);
@@ -220,7 +214,7 @@ private:
      * TCPDisconnectImpl template for out of range N.
      */
     template <size_t N, typename std::enable_if<(N >= sizeof...(TransportTypes))>::type * = nullptr>
-    void TCPDisconnectImpl(Transport::ActiveTCPConnectionState * conn, bool shouldAbort = 0)
+    void TCPDisconnectImpl(ActiveTCPConnectionHandle & conn, bool shouldAbort = 0)
     {}
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
@@ -284,7 +278,7 @@ private:
      * @param join a boolean indicating if the transport should join or leave the group
      */
     template <size_t N, typename std::enable_if<(N < sizeof...(TransportTypes))>::type * = nullptr>
-    CHIP_ERROR MulticastGroupJoinLeaveImpl(const Transport::PeerAddress & address, bool join)
+    CHIP_ERROR MulticastGroupJoinLeaveImpl(const PeerAddress & address, bool join)
     {
         Base * base = &std::get<N>(mTransports);
         if (base->CanListenMulticast())
@@ -298,7 +292,7 @@ private:
      * GroupJoinLeave when N is out of range. Always returns an error code.
      */
     template <size_t N, typename std::enable_if<(N >= sizeof...(TransportTypes))>::type * = nullptr>
-    CHIP_ERROR MulticastGroupJoinLeaveImpl(const Transport::PeerAddress & address, bool join)
+    CHIP_ERROR MulticastGroupJoinLeaveImpl(const PeerAddress & address, bool join)
     {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }

@@ -31,9 +31,10 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_ACL_2_2(MatterBaseTest):
@@ -53,7 +54,7 @@ class TC_ACL_2_2(MatterBaseTest):
     async def test_TC_ACL_2_2(self):
         self.step(1)
         self.step(2)
-        data = await self.default_controller.ReadAttribute(nodeid=self.dut_node_id, attributes=[(Clusters.Descriptor.Attributes.ServerList)])
+        data = await self.default_controller.ReadAttribute(nodeId=self.dut_node_id, attributes=[(Clusters.Descriptor.Attributes.ServerList)])
         asserts.assert_true(Clusters.AccessControl.id in data[0][Clusters.Descriptor]
                             [Clusters.Descriptor.Attributes.ServerList], "ACL cluster not on EP0")
         self.step(3)

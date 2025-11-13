@@ -25,6 +25,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/tests/AppTestContext.h>
 #include <app/util/attribute-storage.h>
+#include <clusters/UnitTesting/Metadata.h>
 #include <controller/InvokeInteraction.h>
 #include <controller/ReadInteraction.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
@@ -34,6 +35,7 @@
 #include <lib/core/ErrorStr.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <protocols/interaction_model/Constants.h>
 
 using namespace chip;
@@ -59,17 +61,18 @@ class TestClusterCommandHandler : public chip::app::CommandHandlerInterface
 public:
     TestClusterCommandHandler() : chip::app::CommandHandlerInterface(Optional<EndpointId>::Missing(), Clusters::UnitTesting::Id)
     {
-        CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this);
+        EXPECT_SUCCESS(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
     }
 
-    ~TestClusterCommandHandler() { CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this); }
+    ~TestClusterCommandHandler() { EXPECT_SUCCESS(CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this)); }
 
     void OverrideAcceptedCommands() { mOverrideAcceptedCommands = true; }
     void ClaimNoCommands() { mClaimNoCommands = true; }
 
 private:
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext & handlerContext) final;
-    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) final;
+    CHIP_ERROR RetrieveAcceptedCommands(const ConcreteClusterPath & cluster,
+                                        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) final;
 
     bool mOverrideAcceptedCommands = false;
     bool mClaimNoCommands          = false;
@@ -99,13 +102,11 @@ void TestClusterCommandHandler::InvokeCommand(chip::app::CommandHandlerInterface
 
                 ctx.mCommandHandler.AddResponse(ctx.mRequestPath, dataResponse);
             }
-
-            return CHIP_NO_ERROR;
         });
 }
 
-CHIP_ERROR TestClusterCommandHandler::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster,
-                                                                CommandHandlerInterface::CommandIdCallback callback, void * context)
+CHIP_ERROR TestClusterCommandHandler::RetrieveAcceptedCommands(const ConcreteClusterPath & cluster,
+                                                               ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     if (!mOverrideAcceptedCommands)
     {
@@ -118,7 +119,8 @@ CHIP_ERROR TestClusterCommandHandler::EnumerateAcceptedCommands(const ConcreteCl
     }
 
     // We just have one command id.
-    callback(Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Id, context);
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
+    ReturnErrorOnFailure(builder.Append(Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::kMetadataEntry));
     return CHIP_NO_ERROR;
 }
 
@@ -207,15 +209,16 @@ TEST_F(TestServerCommandDispatch, TestNoHandler)
 
     responseDirective = kSendDataResponse;
 
-    chip::Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
-                                           onFailureCb);
+    EXPECT_SUCCESS(chip::Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request,
+                                                          onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
-static const int kDescriptorAttributeArraySize = 254;
+// Use 8 so that we don't exceed the size of ATTRIBUTE_LARGEST defined by ZAP
+static const int kDescriptorAttributeArraySize = 8;
 
 // Declare Descriptor cluster attributes
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(descriptorAttrs)
@@ -279,8 +282,8 @@ void TestServerCommandDispatch::TestDataResponseHelper(const EmberAfEndpointType
     //
     // All our endpoints have the same number of clusters, so just pick one.
     //
-    DataVersion dataVersionStorage[ArraySize(testEndpointClusters1)];
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, aEndpoint, Span<DataVersion>(dataVersionStorage));
+    DataVersion dataVersionStorage[MATTER_ARRAY_SIZE(testEndpointClusters1)];
+    EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId, aEndpoint, Span<DataVersion>(dataVersionStorage)));
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
@@ -311,8 +314,8 @@ void TestServerCommandDispatch::TestDataResponseHelper(const EmberAfEndpointType
 
     responseDirective = kSendDataResponse;
 
-    chip::Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
-                                           onFailureCb);
+    EXPECT_SUCCESS(chip::Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request,
+                                                          onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 
@@ -349,8 +352,8 @@ void TestServerCommandDispatch::TestDataResponseHelper(const EmberAfEndpointType
         ChipLogError(NotSpecified, "TEST FAILURE: %" CHIP_ERROR_FORMAT, aError.Format());
     };
 
-    chip::Controller::ReadAttribute<Clusters::UnitTesting::Attributes::AcceptedCommandList::TypeInfo>(
-        &GetExchangeManager(), sessionHandle, kTestEndpointId, readSuccessCb, readFailureCb);
+    EXPECT_SUCCESS(chip::Controller::ReadAttribute<Clusters::UnitTesting::Attributes::AcceptedCommandList::TypeInfo>(
+        &GetExchangeManager(), sessionHandle, kTestEndpointId, readSuccessCb, readFailureCb));
 
     DrainAndServiceIO();
 

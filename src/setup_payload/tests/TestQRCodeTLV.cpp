@@ -22,6 +22,7 @@
 
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/ScopedBuffer.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 using namespace chip;
 
@@ -61,7 +62,7 @@ TEST_F(TestQRCodeTLV, TestOptionalDataAddRemove)
     optionalData = payload.getAllOptionalVendorData();
     EXPECT_EQ(optionalData.size(), 1u);
 
-    payload.removeOptionalVendorData(kOptionalDefaultIntTag);
+    EXPECT_SUCCESS(payload.removeOptionalVendorData(kOptionalDefaultIntTag));
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     optionalData = payload.getAllOptionalVendorData();
@@ -199,17 +200,17 @@ TEST_F(TestQRCodeTLV, TestOptionalDataReadSerial)
 {
     SetupPayload inPayload = GetDefaultPayload();
 
-    inPayload.addSerialNumber(kSerialNumberDefaultStringValue);
+    EXPECT_SUCCESS(inPayload.addSerialNumber(kSerialNumberDefaultStringValue));
     EXPECT_TRUE(CheckWriteRead(inPayload));
 
-    inPayload.addSerialNumber(kSerialNumberDefaultUInt32Value);
+    EXPECT_SUCCESS(inPayload.addSerialNumber(kSerialNumberDefaultUInt32Value));
     EXPECT_TRUE(CheckWriteRead(inPayload));
 }
 
 TEST_F(TestQRCodeTLV, TestOptionalDataReadVendorInt)
 {
     SetupPayload inPayload = GetDefaultPayload();
-    inPayload.addOptionalVendorData(kOptionalDefaultIntTag, kOptionalDefaultIntValue);
+    EXPECT_SUCCESS(inPayload.addOptionalVendorData(kOptionalDefaultIntTag, kOptionalDefaultIntValue));
 
     EXPECT_TRUE(CheckWriteRead(inPayload));
 }
@@ -217,7 +218,7 @@ TEST_F(TestQRCodeTLV, TestOptionalDataReadVendorInt)
 TEST_F(TestQRCodeTLV, TestOptionalDataReadVendorString)
 {
     SetupPayload inPayload = GetDefaultPayload();
-    inPayload.addOptionalVendorData(kOptionalDefaultStringTag, kOptionalDefaultStringValue);
+    EXPECT_SUCCESS(inPayload.addOptionalVendorData(kOptionalDefaultStringTag, kOptionalDefaultStringValue));
 
     EXPECT_TRUE(CheckWriteRead(inPayload));
 }

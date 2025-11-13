@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,13 +29,14 @@
 #include <lib/support/ScopedBuffer.h>
 #include <platform/PersistedStorage.h>
 
+#include <map>
 #include <string>
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-class ChipLinuxStorageIni
+class ChipWebOSStorageIni
 {
 public:
     CHIP_ERROR Init();
@@ -54,6 +55,7 @@ protected:
     CHIP_ERROR RemoveAll();
 
 private:
+    CHIP_ERROR GetDefaultSection(std::map<std::string, std::string> & section);
     CHIP_ERROR GetBinaryBlobDataAndLengths(const char * key, chip::Platform::ScopedMemoryBuffer<char> & encodedData,
                                            size_t & encodedDataLen, size_t & decodedDataLen);
     inipp::Ini<char> mConfigStore;

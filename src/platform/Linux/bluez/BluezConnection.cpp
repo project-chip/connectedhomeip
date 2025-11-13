@@ -29,7 +29,7 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/GLibTypeDeleter.h>
-#include <platform/Linux/dbus/bluez/DbusBluez.h>
+#include <platform/Linux/dbus/bluez/DBusBluez.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/BLEManager.h>
 #include <system/SystemPacketBuffer.h>
@@ -171,29 +171,24 @@ const char * BluezConnection::GetPeerAddress() const
 
 gboolean BluezConnection::WriteHandlerCallback(GIOChannel * aChannel, GIOCondition aCond, BluezConnection * apConn)
 {
+    VerifyOrReturnValue(!(aCond & G_IO_HUP), G_SOURCE_REMOVE,
+                        ChipLogError(DeviceLayer, "INFO: socket disconnected in %s", __func__));
+    VerifyOrReturnValue(aCond == G_IO_IN, G_SOURCE_REMOVE,
+                        ChipLogError(DeviceLayer, "FAIL: socket error in %s: cond=0x%x", __func__, aCond));
+
     uint8_t buf[512 /* characteristic max size per BLE specification */];
-    bool isSuccess = false;
-    GVariant * newVal;
     ssize_t len;
 
-    VerifyOrExit(!(aCond & G_IO_HUP), ChipLogError(DeviceLayer, "INFO: socket disconnected in %s", __func__));
-    VerifyOrExit(!(aCond & (G_IO_ERR | G_IO_NVAL)), ChipLogError(DeviceLayer, "INFO: socket error in %s", __func__));
-    VerifyOrExit(aCond == G_IO_IN, ChipLogError(DeviceLayer, "FAIL: error in %s", __func__));
-
-    ChipLogDetail(DeviceLayer, "C1 %s MTU: %d", __func__, apConn->GetMTU());
-
     len = read(g_io_channel_unix_get_fd(aChannel), buf, sizeof(buf));
-    VerifyOrExit(len > 0, ChipLogError(DeviceLayer, "FAIL: short read in %s (%zd)", __func__, len));
+    VerifyOrReturnValue(len > 0, G_SOURCE_REMOVE, ChipLogError(DeviceLayer, "FAIL: short read in %s: %zd", __func__, len));
 
+    ChipLogDetail(DeviceLayer, "C1 %s received %zd bytes", __func__, len);
     // Casting len to size_t is safe, since we ensured that it's not negative.
-    newVal = g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, buf, static_cast<size_t>(len), sizeof(uint8_t));
-
-    bluez_gatt_characteristic1_set_value(apConn->mC1.get(), newVal);
+    bluez_gatt_characteristic1_set_value(
+        apConn->mC1.get(), g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, buf, static_cast<size_t>(len), sizeof(uint8_t)));
     BLEManagerImpl::HandleRXCharWrite(apConn, buf, static_cast<size_t>(len));
-    isSuccess = true;
 
-exit:
-    return isSuccess ? G_SOURCE_CONTINUE : G_SOURCE_REMOVE;
+    return G_SOURCE_CONTINUE;
 }
 
 void BluezConnection::SetupWriteHandler(int aSocketFd)
@@ -203,7 +198,7 @@ void BluezConnection::SetupWriteHandler(int aSocketFd)
     g_io_channel_set_close_on_unref(channel, TRUE);
     g_io_channel_set_buffered(channel, FALSE);
 
-    auto watchSource = g_io_create_watch(channel, static_cast<GIOCondition>(G_IO_HUP | G_IO_IN | G_IO_ERR | G_IO_NVAL));
+    auto watchSource = g_io_create_watch(channel, static_cast<GIOCondition>(G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL));
     g_source_set_callback(watchSource, G_SOURCE_FUNC(WriteHandlerCallback), this, nullptr);
 
     mC1Channel.mChannel.reset(channel);
@@ -212,9 +207,34 @@ void BluezConnection::SetupWriteHandler(int aSocketFd)
     PlatformMgrImpl().GLibMatterContextAttachSource(watchSource);
 }
 
-gboolean BluezConnection::NotifyHandlerCallback(GIOChannel *, GIOCondition, BluezConnection *)
+gboolean BluezConnection::NotifyHandlerCallback(GIOChannel * aChannel, GIOCondition aCond, BluezConnection * apConn)
 {
-    return G_SOURCE_REMOVE;
+    VerifyOrReturnValue(!(aCond & G_IO_HUP), G_SOURCE_REMOVE,
+                        ChipLogError(DeviceLayer, "INFO: socket disconnected in %s", __func__));
+    VerifyOrReturnValue(aCond == G_IO_IN, G_SOURCE_REMOVE,
+                        ChipLogError(DeviceLayer, "FAIL: socket error in %s: cond=0x%x", __func__, aCond));
+
+    uint8_t value = 0;
+    ssize_t len;
+
+    // NOTE: For BlueZ version <= 5.73 the confirmation was delivered via the D-Bus "Confirm"
+    //       method call. However, for BlueZ >= 5.80 the confirmation is sent via the socket
+    //       opened in the "AcquireNotify" method. For versions in between, the confirmation
+    //       might not work correctly at all!
+    len = read(g_io_channel_unix_get_fd(aChannel), &value, sizeof(value));
+    VerifyOrReturnValue(len > 0, G_SOURCE_REMOVE, ChipLogError(DeviceLayer, "FAIL: short read in %s: %zd", __func__, len));
+
+    if (value != 1)
+    {
+        ChipLogError(DeviceLayer, "FAIL: Invalid indication confirmation: value=%u", value);
+    }
+    else
+    {
+        ChipLogDetail(DeviceLayer, "Indication confirmation: conn=%p", apConn);
+        BLEManagerImpl::HandleTXComplete(apConn);
+    }
+
+    return G_SOURCE_CONTINUE;
 }
 
 void BluezConnection::SetupNotifyHandler(int aSocketFd, bool aAdditionalAdvertising)
@@ -224,7 +244,7 @@ void BluezConnection::SetupNotifyHandler(int aSocketFd, bool aAdditionalAdvertis
     g_io_channel_set_close_on_unref(channel, TRUE);
     g_io_channel_set_buffered(channel, FALSE);
 
-    auto watchSource = g_io_create_watch(channel, static_cast<GIOCondition>(G_IO_HUP | G_IO_ERR | G_IO_NVAL));
+    auto watchSource = g_io_create_watch(channel, static_cast<GIOCondition>(G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL));
     g_source_set_callback(watchSource, G_SOURCE_FUNC(NotifyHandlerCallback), this, nullptr);
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING

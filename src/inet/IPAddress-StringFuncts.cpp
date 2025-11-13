@@ -41,7 +41,7 @@ namespace Inet {
 
 char * IPAddress::ToString(char * buf, uint32_t bufSize) const
 {
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 #if INET_CONFIG_ENABLE_IPV4
     if (IsIPv4())
     {
@@ -76,7 +76,7 @@ char * IPAddress::ToString(char * buf, uint32_t bufSize) const
         // This cast is safe because |s| points into |buf| which is not const.
         buf = const_cast<char *>(s);
     }
-#elif CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#elif CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     otIp6Address addr = ToIPv6();
     otIp6AddressToString(&addr, buf, static_cast<uint16_t>(bufSize));
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -89,7 +89,7 @@ bool IPAddress::FromString(const char * str, IPAddress & output)
 #if INET_CONFIG_ENABLE_IPV4
     if (strchr(str, ':') == nullptr)
     {
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
         ip4_addr_t ipv4Addr;
         if (!ip4addr_aton(str, &ipv4Addr))
             return false;
@@ -103,7 +103,7 @@ bool IPAddress::FromString(const char * str, IPAddress & output)
     else
 #endif // INET_CONFIG_ENABLE_IPV4
     {
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
         ip6_addr_t ipv6Addr;
         if (!ip6addr_aton(str, &ipv6Addr))
             return false;
@@ -111,7 +111,7 @@ bool IPAddress::FromString(const char * str, IPAddress & output)
         struct in6_addr ipv6Addr;
         if (inet_pton(AF_INET6, str, &ipv6Addr) < 1)
             return false;
-#elif CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#elif CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
         otIp6Address ipv6Addr;
         if (OT_ERROR_NONE != otIp6AddressFromString(str, &ipv6Addr))
             return false;

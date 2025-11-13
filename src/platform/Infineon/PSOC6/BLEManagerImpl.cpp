@@ -416,7 +416,7 @@ void BLEManagerImpl::DriveBLEState(void)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
         mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
     }
 }
@@ -924,7 +924,7 @@ void BLEManagerImpl::SetAdvertisingData(void)
     wiced_bt_ble_set_raw_scan_response_data(num_elem, adv_elem);
 
 exit:
-    ChipLogProgress(DeviceLayer, "BLEManagerImpl::SetAdvertisingData err:%s", ErrorStr(err));
+    ChipLogProgress(DeviceLayer, "BLEManagerImpl::SetAdvertisingData err: %" CHIP_ERROR_FORMAT, err.Format());
 }
 
 BLEManagerImpl::CHIPoBLEConState * BLEManagerImpl::AllocConnectionState(uint16_t conId)

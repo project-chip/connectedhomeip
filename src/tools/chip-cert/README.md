@@ -1,12 +1,12 @@
-# CHIP Certificate Tool
+# Matter/CHIP Certificate Tool
 
 ## Table of Contents
 
--   [CHIP Certificate Tool](#chip-certificate-tool)
+-   [Matter/CHIP Certificate Tool](#matterchip-certificate-tool)
     -   [Table of Contents](#table-of-contents)
     -   [Introduction](#introduction)
     -   [Directory Structure](#directory-structure)
-        -   [<code>/src/tools/chip-cert</code>](#srctoolschip-cert)
+        -   [/src/tools/chip-cert](#srctoolschip-cert)
     -   [Usage Examples](#usage-examples)
         -   [Building](#building)
     -   [Operational Certificates Usage Examples](#operational-certificates-usage-examples)
@@ -29,9 +29,9 @@
 
 ## Introduction
 
-CHIP Certificate Tool (chip-cert) provides command line interface (CLI) utility
-used for generating and manipulating CHIP certificates and CHIP private keys
-material.
+Matter/CHIP Certificate Tool (chip-cert) provides command line interface (CLI)
+utility used for generating and manipulating Matter operational and attestation
+certificates and private key material (for testing).
 
 ## Directory Structure
 
@@ -220,8 +220,9 @@ COMMAND OPTIONS
            c - CA certificate
            n - node certificate
            f - firmware signing certificate
+           v - vendor ID verification signer certificate
 
-   -i, --subject-chip-id <hex-digits>
+   -i, --subject-chip-id <hex-digits>, --subject-matter-id <hex-digits>
 
        Subject DN CHIP Id attribute in hexadecimal format with upto 8 octets with or without '0x' prefix.
           - for Root certificate it is ChipRootId

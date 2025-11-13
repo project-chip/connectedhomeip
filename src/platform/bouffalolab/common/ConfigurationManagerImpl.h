@@ -38,6 +38,10 @@ public:
     CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours);
     bool IsFullyProvisioned();
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    void ClearThreadStack();
+#endif
+
 private:
     // ===== Members that implement the ConfigurationManager private interface.
 
@@ -66,7 +70,7 @@ private:
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
-    CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf) override;
+    CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan & buf) override;
 #endif
 
     static void DoFactoryReset(intptr_t arg);

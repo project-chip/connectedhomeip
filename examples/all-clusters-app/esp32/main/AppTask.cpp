@@ -21,6 +21,7 @@
 #include "DeviceWithDisplay.h"
 #include "Globals.h"
 #include "LEDWidget.h"
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #if CONFIG_HAVE_DISPLAY
 #include "ScreenManager.h"
 #endif
@@ -28,7 +29,7 @@
 #include "esp_idf_version.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
-#include <app/server/OnboardingCodesUtil.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
 #include "esp_spi_flash.h"
@@ -173,6 +174,16 @@ CHIP_ERROR AppTask::Init()
 #if CONFIG_HAVE_DISPLAY
     InitDeviceDisplay();
 #endif
+
+    // Initialize and register clusters
+    VerifyOrDie(chip::app::CodegenDataModelProvider::Instance().Registry().Register(gIdentifyCluster1.Registration()) ==
+                CHIP_NO_ERROR);
+    VerifyOrDie(chip::app::CodegenDataModelProvider::Instance().Registry().Register(gIdentifyCluster2.Registration()) ==
+                CHIP_NO_ERROR);
+    VerifyOrDie(chip::app::CodegenDataModelProvider::Instance().Registry().Register(gIdentifyCluster3.Registration()) ==
+                CHIP_NO_ERROR);
+    VerifyOrDie(chip::app::CodegenDataModelProvider::Instance().Registry().Register(gIdentifyCluster4.Registration()) ==
+                CHIP_NO_ERROR);
 
     return CHIP_NO_ERROR;
 }

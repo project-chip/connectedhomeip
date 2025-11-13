@@ -55,7 +55,7 @@
 #include <ble/Ble.h>
 #include <lib/core/CHIPError.h>
 #include <platform/GLibTypeDeleter.h>
-#include <platform/Linux/dbus/bluez/DbusBluez.h>
+#include <platform/Linux/dbus/bluez/DBusBluez.h>
 
 #include "BluezConnection.h"
 #include "BluezObjectManager.h"
@@ -77,6 +77,7 @@ public:
     CHIP_ERROR RegisterGattApplication();
     GDBusObjectManagerServer * GetGattApplicationObjectManager() const { return mRoot.get(); }
 
+    size_t GetNumConnections() const { return mConnMap.size(); }
     CHIP_ERROR ConnectDevice(BluezDevice1 & aDevice);
     void CancelConnect();
 
@@ -118,8 +119,8 @@ private:
     bool mIsInitialized = false;
 
     // Paths for objects published by this service
-    char * mpRootPath    = nullptr;
-    char * mpServicePath = nullptr;
+    GAutoPtr<char> mRootPath;
+    GAutoPtr<char> mServicePath;
 
     // Objects (interfaces) published by this service
     GAutoPtr<GDBusObjectManagerServer> mRoot;
@@ -133,7 +134,7 @@ private:
 
     std::unordered_map<std::string, BluezConnection *> mConnMap;
     GAutoPtr<GCancellable> mConnectCancellable;
-    char * mpPeerDevicePath = nullptr;
+    GAutoPtr<char> mPeerDevicePath;
 
     // Allow BluezConnection to access our private members
     friend class BluezConnection;

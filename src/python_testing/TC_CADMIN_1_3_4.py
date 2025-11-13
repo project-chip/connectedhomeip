@@ -1,0 +1,309 @@
+#
+#    Copyright (c) 2024 Project CHIP Authors
+#    All rights reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 0
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run2:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --tests test_TC_CADMIN_1_4
+#       --storage-path admin_storage.json
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 0
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: false
+#     quiet: true
+# === END CI TEST ARGUMENTS ===
+
+import logging
+import random
+from time import sleep
+
+from mobly import asserts
+from support_modules.cadmin_support import CADMINBaseTest
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.exceptions import ChipStackError
+from matter.testing.matter_testing import TestStep, default_matter_test_main, has_cluster, has_feature, run_if_endpoint_matches
+from matter.tlv import TLVReader
+
+opcreds = Clusters.OperationalCredentials
+nonce = random.randbytes(32)
+
+
+class TC_CADMIN(CADMINBaseTest):
+    async def combined_commission_val_steps(self, commission_type: str):
+        """
+        Combined test function for commissioning tests.
+        :param commission_type: Type of commissioning ("BCM" or "ECM").
+        """
+        self.step(1)
+        if commission_type == "BCM":
+            setupPayloadInfo = self.get_setup_payload_info()
+            if not setupPayloadInfo:
+                asserts.assert_true(
+                    False,
+                    'passcode and discriminator must be provided values in order for this test to work due to using BCM, please rerun test with providing --passcode <value> and --discriminator <value>')
+
+        # Establishing TH1
+        self.th1 = self.default_controller
+
+        self.step(2)
+        GC_cluster = Clusters.GeneralCommissioning
+        attribute = GC_cluster.Attributes.BasicCommissioningInfo
+        duration = await self.read_single_attribute_check_success(endpoint=0, cluster=GC_cluster, attribute=attribute)
+        self.max_window_duration = duration.maxCumulativeFailsafeSeconds
+
+        self.step("3a")
+        if commission_type == "ECM":
+            params = await self.th1.OpenCommissioningWindow(
+                nodeId=self.dut_node_id,
+                timeout=self.max_window_duration,
+                iteration=1000,
+                discriminator=1234,
+                option=1
+            )
+
+        elif commission_type == "BCM":
+            obcCmd = Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180)
+            await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=obcCmd, timedRequestTimeoutMs=6000)
+
+        else:
+            asserts.fail(f"Unknown commissioning type: {commission_type}")
+
+        self.step("3b")
+        if commission_type == "ECM":
+            service = await self.wait_for_correct_cm_value(
+                expected_cm_value=2,
+                expected_discriminator=1234
+            )
+            logging.info(f"Successfully found service with CM={service.txt.get('CM')}, D={service.txt.get('D')}")
+        elif commission_type == "BCM":
+            service = await self.wait_for_correct_cm_value(
+                expected_cm_value=1,
+                expected_discriminator=setupPayloadInfo[0].filter_value
+            )
+            logging.info(f"Successfully found service with CM={service.txt.get('CM')}, D={service.txt.get('D')}")
+
+        self.step("3c")
+        BI_cluster = Clusters.BasicInformation
+        self.nl_attribute = BI_cluster.Attributes.NodeLabel
+        await self.write_nl_attr(dut_node_id=self.dut_node_id, th=self.th1, attr_val=self.nl_attribute)
+        await self.read_nl_attr(dut_node_id=self.dut_node_id, th=self.th1, attr_val=self.nl_attribute)
+
+        self.step(4)
+        # Establishing TH2
+        th2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
+        th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.th1.fabricId + 1)
+        self.th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
+
+        if commission_type == "ECM":
+            await self.th2.CommissionOnNetwork(
+                nodeId=self.dut_node_id,
+                setupPinCode=params.setupPinCode,
+                filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+                filter=1234
+            )
+        else:
+            setupPayloadInfo = self.get_setup_payload_info()
+            if not setupPayloadInfo:
+                asserts.fail("Setup payload info is required for basic commissioning.")
+            await self.th2.CommissionOnNetwork(
+                nodeId=self.dut_node_id,
+                setupPinCode=setupPayloadInfo[0].passcode,
+                filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+                filter=setupPayloadInfo[0].filter_value
+            )
+        rcac = self.th2.get_rcac()
+        th2_rcac_decoded = TLVReader(rcac).get()["Any"][9]
+
+        self.step(5)
+        # TH_CR1 reads the Fabrics attribute
+        th1_fabric_info = await self.get_fabrics(th=self.th1)
+        th1_cam_rcac = TLVReader(
+            self.certificate_authority_manager.activeCaList[0]._persistentStorage.GetSdkKey("f/1/r")).get()["Any"][9]
+        if th1_fabric_info[0].rootPublicKey != th1_cam_rcac:
+            asserts.fail("Public keys from fabric and certs for TH1 are not the same.")
+        if th1_fabric_info[0].nodeID != self.dut_node_id:
+            asserts.fail("DUT node ID from fabric does not equal DUT node ID for TH1 during commissioning.")
+
+        self.step(6)
+        # TH_CR2 reads the Fabrics attribute
+        th2_fabric_info = await self.get_fabrics(th=self.th2)
+        if th2_fabric_info[0].rootPublicKey != th2_rcac_decoded:
+            asserts.fail("Public keys from fabric and certs for TH2 are not the same.")
+        if th2_fabric_info[0].nodeID != self.dut_node_id:
+            asserts.fail("DUT node ID from fabric does not equal DUT node ID for TH2 during commissioning.")
+
+        if commission_type == "ECM":
+            self.step(7)
+            # TH_CR1 writes and reads the Basic Information Cluster’s NodeLabel mandatory attribute of DUT_CE
+            await self.write_nl_attr(dut_node_id=self.dut_node_id, th=self.th1, attr_val=self.nl_attribute)
+            await self.read_nl_attr(dut_node_id=self.dut_node_id, th=self.th1, attr_val=self.nl_attribute)
+
+            self.step(8)
+            # TH_CR2 writes and reads the Basic Information Cluster’s NodeLabel mandatory attribute of DUT_CE
+            val = await self.read_nl_attr(dut_node_id=self.dut_node_id, th=self.th2, attr_val=self.nl_attribute)
+            self.print_step("basic information cluster node label attr value", val)
+            await self.write_nl_attr(dut_node_id=self.dut_node_id, th=self.th2, attr_val=self.nl_attribute)
+            await self.read_nl_attr(dut_node_id=self.dut_node_id, th=self.th2, attr_val=self.nl_attribute)
+
+            self.step(9)
+            # TH_CR2 opens a commissioning window on DUT_CE for 180 seconds using ECM and monitors until it closes
+            params, window_status_accumulator = await self.open_commissioning_window_with_subscription_monitoring(
+                th=self.th2,
+                timeout=180,
+                node_id=self.dut_node_id,
+                discriminator=0,
+                iteration=1000
+            )
+
+            results = await self.monitor_commissioning_window_closure_with_subscription(
+                th=self.th2,
+                node_id=self.dut_node_id,
+                expected_duration_seconds=180,
+                window_status_accumulator=window_status_accumulator
+            )
+            asserts.assert_true(results.window_closed, "Window should have closed")
+            asserts.assert_true(results.timing_valid, "Window should have closed within timing constraints")
+
+            self.step(10)
+            # TH_CR2 opens a commissioning window on DUT_CE using ECM
+            self.discriminator = random.randint(0, 4095)
+            params2 = await self.th2.OpenCommissioningWindow(nodeId=self.dut_node_id, timeout=self.max_window_duration, iteration=1000, discriminator=self.discriminator, option=1)
+
+            self.step(11)
+            # TH_CR1 starts a commissioning process with DUT_CE before the timeout from step 10
+            try:
+                await self.th1.CommissionOnNetwork(
+                    nodeId=self.dut_node_id, setupPinCode=params2.setupPinCode,
+                    filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
+            except ChipStackError as e:  # chipstack-ok: This disables ChipStackError linter check. Error occurs if a NOC for the fabric already exists, which may depend on device state. Can not use assert_raises because it not always fails
+                asserts.assert_equal(e.err, 0x0000007E,
+                                     "Expected to return Trying to add NOC for fabric that already exists")
+            """
+            expected error:
+                [2024-10-08 11:57:43.144125][TEST][STDOUT][MatterTest] 10-08 11:57:42.777 INFO Device returned status 9 on receiving the NOC
+                [2024-10-08 11:57:43.144365][TEST][STDOUT][MatterTest] 10-08 11:57:42.777 INFO Add NOC failed with error src/controller/CHIPDeviceController.cpp:1712: CHIP Error 0x0000007E: Trying to add a NOC for a fabric that already exists
+            """
+
+            self.step(12)
+            revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
+            await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
+            # The failsafe cleanup is scheduled after the command completes, so give it a bit of time to do that
+            sleep(1)
+
+        if commission_type == "ECM":
+            self.step(13)
+
+        elif commission_type == "BCM":
+            self.step(7)
+
+        # TH_CR2 reads the CurrentFabricIndex attribute from the Operational
+        # Credentials cluster and saves as th2_idx, TH_CR1 sends the RemoveFabric
+        # command to the DUT with the FabricIndex set to th2_idx
+        th2_idx = await self.th2.ReadAttribute(nodeId=self.dut_node_id, attributes=[(0, Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)])
+        outer_key = list(th2_idx.keys())[0]
+        inner_key = list(th2_idx[outer_key].keys())[0]
+        attribute_key = list(th2_idx[outer_key][inner_key].keys())[1]
+        removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(th2_idx[outer_key][inner_key][attribute_key])
+        await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
+
+    def pics_TC_CADMIN_1_3(self) -> list[str]:
+        return ["CADMIN.S"]
+
+    def steps_TC_CADMIN_1_3(self) -> list[TestStep]:
+        return [
+            TestStep(1, "TH_CR1 starts a commissioning process with DUT_CE", is_commissioning=True),
+            TestStep(2, "TH_CR1 reads the BasicCommissioningInfo attribute from the General Commissioning cluster and saves the MaxCumulativeFailsafeSeconds field as max_window_duration."),
+            TestStep("3a", "TH_CR1 opens a commissioning window on DUT_CE using a commissioning timeout of max_window_duration using ECM",
+                     "DUT_CE opens its Commissioning window to allow a second commissioning."),
+            TestStep("3b", "DNS-SD records shows DUT_CE advertising", "Verify that the DNS-SD advertisement shows CM=2"),
+            TestStep("3c", "TH_CR1 writes and reads the Basic Information Cluster’s NodeLabel mandatory attribute of DUT_CE",
+                     "Verify DUT_CE responds to both write/read with a success"),
+            TestStep(4, "TH creates a controller (TH_CR2) on a new fabric and commissions DUT_CE using that controller. TH_CR2 should commission the device using a different NodeID than TH_CR1.",
+                     "Commissioning is successful"),
+            TestStep(5, "TH_CR1 reads the Fabrics attribute from the Node Operational Credentials cluster using a fabric-filtered read",
+                     "Verify that the RootPublicKey matches the root public key for TH_CR1 and the NodeID matches the node ID used when TH_CR1 commissioned the device."),
+            TestStep(6, "TH_CR2 reads the Fabrics attribute from the Node Operational Credentials cluster using a fabric-filtered read",
+                     "Verify that the RootPublicKey matches the root public key for TH_CR2 and the NodeID matches the node ID used when TH_CR2 commissioned the device."),
+            TestStep(7, "TH_CR1 writes and reads the Basic Information Cluster’s NodeLabel mandatory attribute of DUT_CE",
+                     "Verify DUT_CE responds to both write/read with a success"),
+            TestStep(8, "TH_CR2 reads, writes and then reads the Basic Information Cluster’s NodeLabel mandatory attribute of DUT_CE",
+                     "Verify the initial read reflect the value written in the above step. Verify DUT_CE responds to both write/read with a success"),
+            TestStep(9, "TH_CR2 opens a commissioning window on DUT_CE for 180 seconds using ECM and monitors until the window closes to verify window timing",
+                     "Verify that the window closed within the expected duration of 180 seconds + 1.8 seconds of clock skew"),
+            TestStep(10, "TH_CR2 opens a commissioning window on DUT_CE using ECM",
+                     "DUT_CE opens its Commissioning window to allow a new commissioning"),
+            TestStep(11, "TH_CR1 starts a commissioning process with DUT_CE before the timeout from step 10",
+                     "Since DUT_CE was already commissioned by TH_CR1 in step 1, AddNOC fails with NOCResponse with StatusCode field set to FabricConflict (9)"),
+            TestStep(12, "TH_CR1 sends an RevokeCommissioning command to the DUT to cleanup step 11",
+                     "Successfully revoked commissioning"),
+            TestStep(13, "TH_CR2 reads the CurrentFabricIndex attribute from the Operational Credentials cluster and saves as th2_idx, TH_CR1 sends the RemoveFabric command to the DUT with the FabricIndex set to th2_idx",
+                     "TH_CR1 removes TH_CR2 fabric using th2_idx")
+        ]
+
+    def pics_TC_CADMIN_1_4(self) -> list[str]:
+        return ["CADMIN.S.F00"]
+
+    def steps_TC_CADMIN_1_4(self) -> list[TestStep]:
+        return [
+            TestStep(1, "TH_CR1 starts a commissioning process with DUT_CE", is_commissioning=True),
+            TestStep(2, "TH_CR1 reads the BasicCommissioningInfo attribute from the General Commissioning cluster and saves the MaxCumulativeFailsafeSeconds field as max_window_duration."),
+            TestStep("3a", "TH_CR1 opens a commissioning window on DUT_CE using a commissioning timeout of max_window_duration using BCM",
+                     "DUT_CE opens its Commissioning window to allow a second commissioning."),
+            TestStep("3b", "DNS-SD records shows DUT_CE advertising", "Verify that the DNS-SD advertisement shows CM=1"),
+            TestStep("3c", "TH_CR1 writes and reads the Basic Information Cluster’s NodeLabel mandatory attribute of DUT_CE",
+                     "Verify DUT_CE responds to both write/read with a success"),
+            TestStep(4, "TH creates a controller (TH_CR2) on a new fabric and commissions DUT_CE using that controller. TH_CR2 should commission the device using a different NodeID than TH_CR1.",
+                     "Commissioning is successful"),
+            TestStep(5, "TH_CR1 reads the Fabrics attribute from the Node Operational Credentials cluster using a fabric-filtered read",
+                     "Verify that the RootPublicKey matches the root public key for TH_CR1 and the NodeID matches the node ID used when TH_CR1 commissioned the device."),
+            TestStep(6, "TH_CR2 reads the Fabrics attribute from the Node Operational Credentials cluster using a fabric-filtered read",
+                     "Verify that the RootPublicKey matches the root public key for TH_CR2 and the NodeID matches the node ID used when TH_CR2 commissioned the device."),
+            TestStep(7, "TH_CR2 reads the CurrentFabricIndex attribute from the Operational Credentials cluster and saves as th2_idx, TH_CR1 sends the RemoveFabric command to the DUT with the FabricIndex set to th2_idx",
+                     "TH_CR1 removes TH_CR2 fabric using th2_idx")
+        ]
+
+    @run_if_endpoint_matches(has_cluster(Clusters.AdministratorCommissioning))
+    async def test_TC_CADMIN_1_3(self):
+        await self.combined_commission_val_steps(commission_type="ECM")
+
+    @run_if_endpoint_matches(has_feature(cluster=Clusters.AdministratorCommissioning,
+                             feature=Clusters.AdministratorCommissioning.Bitmaps.Feature.kBasic))
+    async def test_TC_CADMIN_1_4(self):
+        await self.combined_commission_val_steps(commission_type="BCM")
+
+
+if __name__ == "__main__":
+    default_matter_test_main()

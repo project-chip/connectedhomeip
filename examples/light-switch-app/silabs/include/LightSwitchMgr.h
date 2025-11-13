@@ -19,10 +19,19 @@
 
 #pragma once
 
+#include "AppEvent.h"
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/clusters/bindings/BindingManager.h>
 #include <app/util/basic-types.h>
+#include <cmsis_os2.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <string>
 
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters::LevelControl;
 class LightSwitchMgr
 {
 public:
@@ -39,17 +48,44 @@ public:
         chip::EventId event;
     };
 
+    static constexpr Clusters::LevelControl::Commands::Step::Type stepCommand = {
+        .stepSize = 1, .transitionTime = 0, .optionsMask = 0, .optionsOverride = 0
+    };
+
     CHIP_ERROR Init(chip::EndpointId lightSwitchEndpoint, chip::EndpointId genericSwitchEndpoint);
+
+    static LightSwitchMgr & GetInstance() { return sSwitch; }
 
     void GenericSwitchOnInitialPress();
     void GenericSwitchOnShortRelease();
 
     void TriggerLightSwitchAction(LightSwitchAction action, bool isGroupCommand = false);
+    void TriggerLevelControlAction(StepModeEnum stepMode, bool isGroupCommand = false);
 
-    static LightSwitchMgr & GetInstance() { return sSwitch; }
+    StepModeEnum getStepMode();
+    void changeStepMode();
+
+    /**
+     * @brief Button event processing function
+     *        Function triggers a switch action sent to the CHIP task
+     *
+     * @param aEvent button event being processed
+     */
+    static void SwitchActionEventHandler(uint16_t eventType);
 
 private:
     static LightSwitchMgr sSwitch;
+
+    // Default Step direction for Level control
+    StepModeEnum stepDirection = StepModeEnum::kUp;
+
+    LightSwitchMgr() = default;
+
+    /**
+     * @brief This function will be called when PB0 is
+     *        long-pressed to trigger the factory-reset
+     */
+    void HandleLongPress();
 
     static void GenericSwitchWorkerFunction(intptr_t context);
 

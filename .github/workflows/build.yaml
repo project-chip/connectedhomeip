@@ -43,7 +43,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:94
+            image: ghcr.io/project-chip/chip-build:174
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -60,7 +60,7 @@ jobs:
                   CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
               run: echo "$CONCURRENCY_CONTEXT"
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Try to ensure the directories for core dumping exist and we
                   can write them.
               run: |
@@ -72,41 +72,55 @@ jobs:
                 platform: linux
             - name: Initialize CodeQL
               if: ${{ inputs.run-codeql  }}
-              uses: github/codeql-action/init@v3
+              uses: github/codeql-action/init@v4
               with:
                   languages: "cpp"
+                  queries: security-extended, security-and-quality
             - name: Setup Build
               run: scripts/build/gn_gen.sh --args="chip_config_memory_debug_checks=true chip_config_memory_debug_dmalloc=false"
             - name: Run Build
               run: scripts/run_in_build_env.sh "ninja -C ./out"
             - name: Run Tests
               run: scripts/tests/gn_tests.sh
-            # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
-            # TODO https://github.com/project-chip/connectedhomeip/issues/1512
-            # - name: Run Code Coverage
-            #   if: ${{ contains('main', env.BUILD_TYPE) }}
-            #   run: scripts/tools/codecoverage.sh
-            # - name: Upload Code Coverage
-            #   if: ${{ contains('main', env.BUILD_TYPE) }}
-            #   run: bash <(curl -s https://codecov.io/bash)
+            - name: Clean out build output
+              run: rm -rf ./out
+
+            # Do not run below steps with CodeQL since we are getting "Out of runner space issues" with CodeQL and their added coverage is limited
             - name: Set up Build Without Detail Logging
+              if: inputs.run-codeql != true
               run: scripts/build/gn_gen.sh --args="chip_detail_logging=false"
             - name: Run Build Without Detail Logging
+              if: inputs.run-codeql != true
               run: scripts/run_in_build_env.sh "ninja -C ./out"
+            - name: Cleanout build output
+              if: inputs.run-codeql != true
+              run: rm -rf ./out
             - name: Set up Build Without Progress Logging
+              if: inputs.run-codeql != true
               run: scripts/build/gn_gen.sh --args="chip_detail_logging=false chip_progress_logging=false"
             - name: Run Build Without Progress Logging
+              if: inputs.run-codeql != true
               run: scripts/run_in_build_env.sh "ninja -C ./out"
+            - name: Clean out build output
+              if: inputs.run-codeql != true
+              run: rm -rf ./out
             - name: Set up Build Without Error Logging
+              if: inputs.run-codeql != true
               run: scripts/build/gn_gen.sh --args="chip_detail_logging=false chip_progress_logging=false chip_error_logging=false"
             - name: Run Build Without Error Logging
+              if: inputs.run-codeql != true
               run: scripts/run_in_build_env.sh "ninja -C ./out"
+            - name: Clean out build output
+              if: inputs.run-codeql != true
+              run: rm -rf ./out
             - name: Set up Build Without Logging
+              if: inputs.run-codeql != true
               run: scripts/build/gn_gen.sh --args="chip_logging=false"
             - name: Run Build Without Logging
+              if: inputs.run-codeql != true
               run: scripts/run_in_build_env.sh "ninja -C ./out"
             - name: Uploading core files
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v5
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-core-linux-gcc-debug
@@ -124,7 +138,7 @@ jobs:
             # If re-enabling, some subset of this should be picked
             #
             # - name: Uploading objdir for debugging
-            #   uses: actions/upload-artifact@v4
+            #   uses: actions/upload-artifact@v5
             #   if: ${{ failure() && !env.ACT }}
             #   with:
             #       name: crash-objdir-linux-gcc-debug
@@ -136,10 +150,10 @@ jobs:
         name: Build on Linux (fake, gcc_release, clang, simulated)
 
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
+        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
 
         container:
-            image: ghcr.io/project-chip/chip-build:94
+            image: ghcr.io/project-chip/chip-build:174
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -156,7 +170,7 @@ jobs:
                   CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
               run: echo "$CONCURRENCY_CONTEXT"
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
               with:
                   fetch-depth: 2
                   persist-credentials: true
@@ -169,11 +183,13 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: linux
-            - name: Initialize CodeQL
-              if: ${{ inputs.run-codeql  }}
-              uses: github/codeql-action/init@v3
-              with:
-                  languages: "cpp"
+            # CodeQL + this job is consistently failing (in the step "Run Tests with sanitizers")
+            # deactivate until a better workaround is found
+            # - name: Initialize CodeQL
+            #   if: ${{ inputs.run-codeql  }}
+            #   uses: github/codeql-action/init@v4
+            #   with:
+            #       languages: "cpp"
             - name: Setup and Build Simulated Device
               run: |
                   BUILD_TYPE=simulated
@@ -218,12 +234,12 @@ jobs:
                   ./scripts/run_in_build_env.sh "./scripts/run_codegen_targets.sh out/sanitizers"
             - name: Find changed files
               id: changed-files
-              uses: tj-actions/changed-files@v45
+              uses: tj-actions/changed-files@v47
             - name: Clang-tidy validation
               # NOTE: clang-tidy crashes on CodegenDataModel_Write due to Nullable/std::optional check.
               #       See https://github.com/llvm/llvm-project/issues/97426
               env:
-                  ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+                  ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.changed_files }}
               run: |
                   touch out/changed_files.txt
                   for file in ${ALL_CHANGED_FILES}; do
@@ -273,14 +289,16 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target linux-fake-tests build"
-            - name: Perform CodeQL Analysis
-              if: ${{ inputs.run-codeql  }}
-              uses: ./.github/actions/perform-codeql-analysis
-              with:
-                language: cpp
+            # CodeQL + this job is consistently failing (in the step "Run Tests with sanitizers")
+            # deactivate until a better solution is found
+            # - name: Perform CodeQL Analysis
+            #   if: ${{ inputs.run-codeql  }}
+            #   uses: ./.github/actions/perform-codeql-analysis
+            #   with:
+            #     language: cpp
 
             - name: Uploading core files
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v5
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-core-linux
@@ -293,7 +311,7 @@ jobs:
             # If re-enabling, some subset of this should be picked
             #
             # - name: Uploading objdir for debugging
-            #   uses: actions/upload-artifact@v4
+            #   uses: actions/upload-artifact@v5
             #   if: ${{ failure() && !env.ACT }}
             #   with:
             #       name: crash-objdir-linux
@@ -305,10 +323,10 @@ jobs:
         name: Build on Linux (python_lib)
 
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
+        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
 
         container:
-            image: ghcr.io/project-chip/chip-build:94
+            image: ghcr.io/project-chip/chip-build:174
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -325,7 +343,7 @@ jobs:
                   CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
               run: echo "$CONCURRENCY_CONTEXT"
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -342,15 +360,13 @@ jobs:
                   scripts/run_in_build_env.sh 'virtualenv pyenv'
                   source pyenv/bin/activate
                   python -m ensurepip --upgrade
-                  python -m pip install ./out/controller/python/chip_core-0.0-cp37-abi3-linux_x86_64.whl
-                  python -m pip install ./out/controller/python/chip_clusters-0.0-py3-none-any.whl
-                  python -m pip install ./out/controller/python/chip_repl-0.0-py3-none-any.whl
+                  python -m pip install out/controller/python/matter*.whl
 
             - name: Run Python tests
               shell: bash
               run: |
                   source pyenv/bin/activate
-                  cd src/controller/python/test/unit_tests/
+                  cd src/controller/python/tests
                   python3 -m unittest -v
             - name: Clean previous outputs
               run: rm -rf out pyenv
@@ -363,15 +379,17 @@ jobs:
                   python -m ensurepip --upgrade
                   python -m pip install -r scripts/setup/requirements.setuppayload.txt
                   python3 src/setup_payload/tests/run_python_setup_payload_test.py out/chip-tool
+            - name: Run revocation set generation tests
+              run: scripts/run_in_build_env.sh 'python3 -m unittest -v credentials/generate_revocation_set.py'
 
     build_linux_python_lighting_device:
         name: Build on Linux (python lighting-app)
 
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
+        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
 
         container:
-            image: ghcr.io/project-chip/chip-build:94
+            image: ghcr.io/project-chip/chip-build:174
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -388,7 +406,7 @@ jobs:
                   CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
               run: echo "$CONCURRENCY_CONTEXT"
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -400,12 +418,12 @@ jobs:
 
     build_darwin:
         name: Build on Darwin (clang, simulated)
-        runs-on: macos-13
-        if: github.actor != 'restyled-io[bot]'
+        runs-on: macos-14
+        if: github.actor != 'restyled-io[bot]'  && inputs.run-codeql != true
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
               with:
                   fetch-depth: 2
                   persist-credentials: true
@@ -416,11 +434,12 @@ jobs:
             - name: Try to ensure the directory for diagnostic log collection exists
               run: |
                   mkdir -p ~/Library/Logs/DiagnosticReports || true
-            - name: Initialize CodeQL
-              if: ${{ inputs.run-codeql  }}
-              uses: github/codeql-action/init@v3
-              with:
-                  languages: "cpp"
+            #  Build on Darwin + CodeQL often takes 6 hours (which is more than the maximum allowed by GitHub Runners), Deactivate it until we can investigate this
+            # - name: Initialize CodeQL
+            #   if: ${{ inputs.run-codeql  }}
+            #   uses: github/codeql-action/init@v4
+            #   with:
+            #       languages: "cpp"
 
             - name: Setup and Build Simulated Device
               run: |
@@ -447,7 +466,7 @@ jobs:
                   ./scripts/run_in_build_env.sh "./scripts/run_codegen_targets.sh out/default"
             - name: Find changed files
               id: changed-files
-              uses: tj-actions/changed-files@v45
+              uses: tj-actions/changed-files@v47
             - name: Clang-tidy validation
               # NOTE: clang-tidy crashes on CodegenDataModel_Write due to Nullable/std::optional check.
               #       See https://github.com/llvm/llvm-project/issues/97426
@@ -463,22 +482,23 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                     "./scripts/run-clang-tidy-on-compile-commands.py \
                        --compile-database out/default/compile_commands.json \
-                       --file-exclude-regex '/(repo|zzz_generated|lwip/standalone)/|CodegenDataModel_Write|QuieterReporting' \
+                       --file-exclude-regex '/(repo|zzz_generated|lwip/standalone)/|CodegenDataModel_Write|QuieterReporting|TestPascalString' \
                        --file-list-file out/changed_files.txt \
                        check \
                     "
             - name: Uploading diagnostic logs
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v5
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-log-darwin
                   path: ~/Library/Logs/DiagnosticReports/
 
-            - name: Perform CodeQL Analysis
-              if: ${{ inputs.run-codeql  }}
-              uses: ./.github/actions/perform-codeql-analysis
-              with:
-                language: cpp
+            #  Build on Darwin + CodeQL often takes 6 hours (which is more than the maximum allowed by GitHub Runners), Deactivate it until we can investigate this
+            # - name: Perform CodeQL Analysis
+            #   if: ${{ inputs.run-codeql  }}
+            #   uses: ./.github/actions/perform-codeql-analysis
+            #   with:
+            #     language: cpp
 
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512
@@ -486,24 +506,35 @@ jobs:
     build_linux_gcc_coverage:
         name: Build on Linux (coverage)
 
+        env:
+            TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
+
+        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:94
-            volumes:
-                - "/:/runner-root-volume"
-                - "/tmp/log_output:/tmp/test_logs"
+            image: ghcr.io/project-chip/chip-build:174
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
-                net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
+                net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: linux
+                bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
 
             - name: Run Build Coverage
-              run: ./scripts/build_coverage.sh
+              run: ./scripts/build_coverage.sh --yaml --xml
+            # This is a workaround to unblock CI: failure is due to missing gpg which got triggered when codecov-action@v5 made a new release
+            # TODO: install gpg in chip-build image directly
+            - name: Install gpg
+              run: |
+                apt-get update
+                apt-get install -y --no-install-recommends gnupg
+            - name: Upload coverage reports to Codecov with GitHub Action
+              uses: codecov/codecov-action@v5
+              env:
+                CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

@@ -39,11 +39,11 @@ NS_ASSUME_NONNULL_BEGIN
 {{#*inline "interfaceDecl"}}
 {{#zcl_event_fields}}
 {{#if (isSupported ../cluster event=../event eventField=(asStructPropertyName name))}}
-{{> struct_field_decl cluster=../cluster type=type label=name}} {{availability ../cluster event=../event eventField=(asStructPropertyName name) deprecationMessage=(concat "Please use MTR" (asUpperCamelCase ../../name preserveAcronyms=true) "Cluster" (asUpperCamelCase ../name preserveAcronyms=true) "Event")}};
+{{> struct_field_decl cluster=../cluster originalCluster=../originalCluster type=type label=name}} {{availability ../cluster event=../event eventField=(asStructPropertyName name) deprecationMessage=(concat "Please use MTR" (asUpperCamelCase ../../name preserveAcronyms=true) "Cluster" (asUpperCamelCase ../name preserveAcronyms=true) "Event")}};
 {{/if}}
 {{#if (hasOldName ../cluster event=../event eventField=(asStructPropertyName name))}}
 {{#if (isSupported ../cluster event=../event eventField=(oldName ../cluster event=../event eventField=(asStructPropertyName name)))}}
-{{> struct_field_decl cluster=../cluster type=type label=(oldName ../cluster event=../event eventField=(asStructPropertyName name))}} {{availability ../cluster event=../event eventField=(oldName ../cluster event=../event eventField=(asStructPropertyName name)) deprecationMessage=(concat "Please use " (asStructPropertyName name))}};
+{{> struct_field_decl cluster=../cluster originalCluster=../originalCluster type=type label=(oldName ../cluster event=../event eventField=(asStructPropertyName name))}} {{availability ../cluster event=../event eventField=(oldName ../cluster event=../event eventField=(asStructPropertyName name)) deprecationMessage=(concat "Please use " (asStructPropertyName name))}};
 {{/if}}
 {{/if}}
 {{/zcl_event_fields}}
@@ -51,7 +51,7 @@ NS_ASSUME_NONNULL_BEGIN
 {{#if (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) event=(asUpperCamelCase name preserveAcronyms=true))}}
 {{availability (asUpperCamelCase parent.name preserveAcronyms=true) event=(asUpperCamelCase name preserveAcronyms=true)}}
 @interface MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Event : NSObject <NSCopying>
-{{> interfaceDecl cluster=(asUpperCamelCase parent.name preserveAcronyms=true) event=(asUpperCamelCase name preserveAcronyms=true)}}
+{{> interfaceDecl cluster=(asUpperCamelCase parent.name preserveAcronyms=true) originalCluster=parent.name event=(asUpperCamelCase name preserveAcronyms=true)}}
 @end
 
 {{/if}}
@@ -60,7 +60,7 @@ NS_ASSUME_NONNULL_BEGIN
 {{#if (isSupported (compatClusterNameRemapping parent.name) event=eventName)}}
 {{availability (compatClusterNameRemapping parent.name) event=eventName deprecationMessage=(concat "Please use MTR" (asUpperCamelCase parent.name preserveAcronyms=true) "Cluster" (asUpperCamelCase name preserveAcronyms=true) "Event")}}
 @interface MTR{{compatClusterNameRemapping parent.name}}Cluster{{eventName}}Event : MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Event
-{{> interfaceDecl cluster=(compatClusterNameRemapping parent.name) event=eventName}}
+{{> interfaceDecl cluster=(compatClusterNameRemapping parent.name) originalCluster=parent.name event=eventName}}
 @end
 
 {{/if}}

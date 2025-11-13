@@ -31,7 +31,7 @@
 #endif
 
 extern "C" {
-#if CHIP_DEVICE_LAYER_TARGET_BL702L
+#if CHIP_DEVICE_LAYER_TARGET_BL702L || CHIP_DEVICE_LAYER_TARGET_BL616
 #include <btble_lib_api.h>
 #else
 #include <ble_lib_api.h>
@@ -121,7 +121,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     memset(mSubscribedConns, 0, sizeof(mSubscribedConns));
 
     ReturnErrorOnFailure(InitRandomStaticAddress());
-#if CHIP_DEVICE_LAYER_TARGET_BL702L
+#if CHIP_DEVICE_LAYER_TARGET_BL702L || CHIP_DEVICE_LAYER_TARGET_BL616
     btble_controller_init(configMAX_PRIORITIES - 1);
 #else
     ble_controller_init(configMAX_PRIORITIES - 1);
@@ -208,7 +208,7 @@ void BLEManagerImpl::DriveBLEState()
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
         mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
     }
 }
@@ -841,6 +841,10 @@ ssize_t BLEManagerImpl::HandleC3Read(struct bt_conn * conId, const struct bt_gat
 }
 #endif
 
+extern "C" int ble_connection_number(void)
+{
+    return BLEMgr().NumConnections();
+}
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip

@@ -41,12 +41,12 @@ jobs:
     if: github.actor != 'restyled-io[bot]'
 
     container:
-      image: ghcr.io/project-chip/chip-build-efr32:94
+      image: ghcr.io/project-chip/chip-build-efr32:174
       volumes:
         - "/tmp/bloat_reports:/tmp/bloat_reports"
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Checkout submodules & Bootstrap
         uses: ./.github/actions/checkout-submodules-and-bootstrap
         with:
@@ -58,19 +58,20 @@ jobs:
         with:
           gh-context: ${{ toJson(github) }}
 
-      - name: Test SLC gen
-        timeout-minutes: 30
-        run: |
-          scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs ./out/light-app BRD4187C --slc_generate --docker
-          rm -rf ./out/
+      # TODO: re-enable it once the SLC generation is fixed (JAVA version update in docker image)
+      # - name: Test SLC gen
+      #   timeout-minutes: 30
+      #   run: |
+      #     scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs ./out/light-app BRD4187C --slc_generate --docker
+      #     rm -rf ./out/
       - name: Build some BRD4187C variants (1)
+      # TODO #39216 : Deactivated Unit Testing (efr32-brd4187c-unit-test ) due to Pigweed incompatibility issues
         run: |
           ./scripts/run_in_build_env.sh \
              "./scripts/build/build_examples.py \
                 --enable-flashbundle \
                 --target efr32-brd4187c-thermostat-use-ot-lib \
                 --target efr32-brd4187c-switch-shell-use-ot-coap-lib \
-                --target efr32-brd4187c-unit-test \
                 build \
                 --copy-artifacts-to out/artifacts \
              "
@@ -84,6 +85,7 @@ jobs:
                 --target efr32-brd4187c-lock-rpc \
                 --target efr32-brd4187c-air-quality-sensor-app-shell-heap-monitoring \
                 --target efr32-brd4187c-window-covering-additional-data-advertising \
+                --target efr32-brd4187c-closure \
                 build \
                 --copy-artifacts-to out/artifacts \
              "
@@ -106,6 +108,7 @@ jobs:
                 --enable-flashbundle \
                 --target efr32-brd2605a-light-skip-rps-generation \
                 --target efr32-brd4338a-lock-skip-rps-generation \
+                --target efr32-brd4338a-closure-skip-rps-generation \
                 build \
                 --copy-artifacts-to out/artifacts \
              "
@@ -123,7 +126,6 @@ jobs:
             "./scripts/build/build_examples.py \
                 --enable-flashbundle \
                 --target efr32-brd4187c-lock-wifi-siwx917 \
-                --target efr32-brd4187c-light-wifi-rs9116 \
                 --target efr32-brd4187c-lock-wifi-wf200 \
                 build \
                 --copy-artifacts-to out/artifacts \

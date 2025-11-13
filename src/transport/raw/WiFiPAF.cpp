@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,69 +30,98 @@
 #include <transport/raw/WiFiPAF.h>
 
 using namespace chip::System;
+using namespace chip::WiFiPAF;
 
 namespace chip {
 namespace Transport {
-
-WiFiPAFBase::~WiFiPAFBase()
-{
-    ClearState();
-}
-
-void WiFiPAFBase::ClearState()
-{
-    mState = State::kNotReady;
-}
-
 CHIP_ERROR WiFiPAFBase::Init(const WiFiPAFListenParameters & param)
 {
     ChipLogDetail(Inet, "WiFiPAFBase::Init - setting/overriding transport");
-    VerifyOrReturnError(mState == State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
-    DeviceLayer::ConnectivityMgr().SetWiFiPAF(this);
-    mState = State::kInitialized;
-
-    if (!DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted())
-    {
-        ChipLogError(Inet, "Wi-Fi Management has not started, do it now.");
-        static constexpr useconds_t kWiFiStartCheckTimeUsec = WIFI_START_CHECK_TIME_USEC;
-        static constexpr uint8_t kWiFiStartCheckAttempts    = WIFI_START_CHECK_ATTEMPTS;
-        DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
-        {
-            for (int cnt = 0; cnt < kWiFiStartCheckAttempts; cnt++)
-            {
-                if (DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted())
-                {
-                    break;
-                }
-                usleep(kWiFiStartCheckTimeUsec);
-            }
-        }
-        if (!DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted())
-        {
-            ChipLogError(Inet, "Wi-Fi Management taking too long to start - device configuration will be reset.");
-            return CHIP_ERROR_INTERNAL;
-        }
-        ChipLogProgress(NotSpecified, "Wi-Fi Management is started");
-    }
+    mWiFiPAFLayer = DeviceLayer::ConnectivityMgr().GetWiFiPAF();
+    SetWiFiPAFLayerTransportToSelf();
+    mWiFiPAFLayer->SetWiFiPAFState(State::kInitialized);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WiFiPAFBase::SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf)
+CHIP_ERROR WiFiPAFBase::SendMessage(const Transport::PeerAddress & address, PacketBufferHandle && msgBuf)
 {
     VerifyOrReturnError(address.GetTransportType() == Type::kWiFiPAF, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(mState != State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
-    DeviceLayer::ConnectivityMgr().WiFiPAFSend(std::move(msgBuf));
+    VerifyOrReturnError(mWiFiPAFLayer->GetWiFiPAFState() != State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
+
+    WiFiPAFSession sessionInfo = { .nodeId = address.GetRemoteId() };
+    WiFiPAFSession * pTxInfo   = mWiFiPAFLayer->GetPAFInfo(chip::WiFiPAF::PafInfoAccess::kAccNodeId, sessionInfo);
+    if (pTxInfo == nullptr)
+    {
+        /*
+            The session does not exist
+        */
+        ChipLogError(Inet, "WiFi-PAF: No valid session whose nodeId: %lu", address.GetRemoteId());
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+    return mWiFiPAFLayer->SendMessage(*pTxInfo, std::move(msgBuf));
+}
+
+bool WiFiPAFBase::CanSendToPeer(const Transport::PeerAddress & address)
+{
+    if (mWiFiPAFLayer != nullptr)
+    {
+        return (mWiFiPAFLayer->GetWiFiPAFState() != State::kNotReady) && (address.GetTransportType() == Type::kWiFiPAF);
+    }
+    return false;
+}
+
+CHIP_ERROR WiFiPAFBase::WiFiPAFMessageReceived(WiFiPAFSession & RxInfo, PacketBufferHandle && buffer)
+{
+    auto pPafInfo = mWiFiPAFLayer->GetPAFInfo(chip::WiFiPAF::PafInfoAccess::kAccSessionId, RxInfo);
+    if (pPafInfo == nullptr)
+    {
+        /*
+            The session does not exist
+        */
+        ChipLogError(Inet, "WiFi-PAF: No valid session whose Id: %u", RxInfo.id);
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    if ((pPafInfo->id != RxInfo.id) || (pPafInfo->peer_id != RxInfo.peer_id) ||
+        (memcmp(pPafInfo->peer_addr, RxInfo.peer_addr, sizeof(uint8_t) * 6) != 0))
+    {
+        /*
+            The packet is from the wrong sender
+        */
+        ChipLogError(Inet, "WiFi-PAF: packet from unexpected node:");
+        ChipLogError(Inet, "session: [id: %u, peer_id: %u, [%02x:%02x:%02x:%02x:%02x:%02x]", pPafInfo->id, pPafInfo->peer_id,
+                     pPafInfo->peer_addr[0], pPafInfo->peer_addr[1], pPafInfo->peer_addr[2], pPafInfo->peer_addr[3],
+                     pPafInfo->peer_addr[4], pPafInfo->peer_addr[5]);
+        ChipLogError(Inet, "pkt: [id: %u, peer_id: %u, [%02x:%02x:%02x:%02x:%02x:%02x]", RxInfo.id, RxInfo.peer_id,
+                     RxInfo.peer_addr[0], RxInfo.peer_addr[1], RxInfo.peer_addr[2], RxInfo.peer_addr[3], RxInfo.peer_addr[4],
+                     RxInfo.peer_addr[5]);
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+    HandleMessageReceived(Transport::PeerAddress(Transport::Type::kWiFiPAF, pPafInfo->nodeId), std::move(buffer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR WiFiPAFBase::WiFiPAFMessageSend(WiFiPAFSession & TxInfo, PacketBufferHandle && msgBuf)
+{
+    VerifyOrReturnError(mWiFiPAFLayer->GetWiFiPAFState() != State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
+    return DeviceLayer::ConnectivityMgr().WiFiPAFSend(TxInfo, std::move(msgBuf));
+}
+
+CHIP_ERROR WiFiPAFBase::WiFiPAFCloseSession(WiFiPAFSession & SessionInfo)
+{
+    VerifyOrReturnError(mWiFiPAFLayer->GetWiFiPAFState() != State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(SessionInfo.id, SessionInfo.role);
+    mWiFiPAFLayer->SetWiFiPAFState(State::kInitialized);
 
     return CHIP_NO_ERROR;
 }
 
-void WiFiPAFBase::OnWiFiPAFMessageReceived(System::PacketBufferHandle && buffer)
+bool WiFiPAFBase::WiFiPAFResourceAvailable(void)
 {
-    HandleMessageReceived(Transport::PeerAddress(Transport::Type::kWiFiPAF), std::move(buffer));
-    return;
+    return DeviceLayer::ConnectivityMgr().WiFiPAFResourceAvailable();
 }
 
-CHIP_ERROR WiFiPAFBase::SendAfterConnect(System::PacketBufferHandle && msg)
+CHIP_ERROR WiFiPAFBase::SendAfterConnect(PacketBufferHandle && msg)
 {
     CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
 

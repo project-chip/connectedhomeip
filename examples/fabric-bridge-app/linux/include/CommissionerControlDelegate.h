@@ -31,7 +31,7 @@ inline constexpr EndpointId kAggregatorEndpointId = 1;
 class CommissionerControlDelegate : public Delegate
 {
 public:
-    CommissionerControlDelegate() : mCommissionerControlServer(this, kAggregatorEndpointId, CommissionerControl::Id) {}
+    CommissionerControlDelegate() : mCommissionerControlServer(this, kAggregatorEndpointId) {}
 
     CHIP_ERROR HandleCommissioningApprovalRequest(const CommissioningApprovalRequest & request) override;
     // TODO(#35627) clientNodeId should move towards ScopedNodeId.

@@ -321,6 +321,17 @@ TEST(TestBytesToHex, TestHexToBytesAndUint)
     EXPECT_EQ(test16Out, test16OutExpected);
 }
 
+TEST(TestBytesToHex, TestHexToBytesInPlace)
+{
+    // Test that HexToBytes can decode in-place (dest_bytes == src_hex)
+    uint8_t buffer[]         = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+    const uint8_t expected[] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF };
+
+    size_t bytesWritten = HexToBytes(reinterpret_cast<char *>(buffer), sizeof(buffer), buffer, sizeof(buffer));
+    EXPECT_EQ(bytesWritten, sizeof(expected));
+    EXPECT_EQ(memcmp(buffer, expected, sizeof(expected)), 0);
+}
+
 #if CHIP_PROGRESS_LOGGING
 
 ENFORCE_FORMAT(3, 0) void AccumulateLogLineCallback(const char * module, uint8_t category, const char * msg, va_list args)
@@ -390,14 +401,14 @@ TEST(TestBytesToHex, TestLogBufferAsHex)
 
     const TestCase kTestCases[] = {
         // Basic cases
-        { "", ByteSpan(buffer), kExpectedText1, ArraySize(kExpectedText1) },
-        { nullptr, ByteSpan(buffer), kExpectedText1, ArraySize(kExpectedText1) },
-        { "label", ByteSpan(buffer), kExpectedText2, ArraySize(kExpectedText2) },
+        { "", ByteSpan(buffer), kExpectedText1, MATTER_ARRAY_SIZE(kExpectedText1) },
+        { nullptr, ByteSpan(buffer), kExpectedText1, MATTER_ARRAY_SIZE(kExpectedText1) },
+        { "label", ByteSpan(buffer), kExpectedText2, MATTER_ARRAY_SIZE(kExpectedText2) },
 
         // Empty buffer leads to a single label
-        { "label", ByteSpan(), kExpectedText3, ArraySize(kExpectedText3) },
+        { "label", ByteSpan(), kExpectedText3, MATTER_ARRAY_SIZE(kExpectedText3) },
         // Less than full single line works
-        { "label", ByteSpan(&buffer[0], 3), kExpectedText4, ArraySize(kExpectedText4) },
+        { "label", ByteSpan(&buffer[0], 3), kExpectedText4, MATTER_ARRAY_SIZE(kExpectedText4) },
     };
 
     for (auto testCase : kTestCases)

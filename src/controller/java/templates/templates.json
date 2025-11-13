@@ -25,10 +25,6 @@
             "path": "../../../app/zap-templates/partials/cluster_header.zapt"
         },
         {
-            "name": "encode_value",
-            "path": "partials/encode_value.zapt"
-        },
-        {
             "name": "decode_value",
             "path": "partials/decode_value.zapt"
         }

@@ -16,23 +16,24 @@
 #    limitations under the License.
 #
 
-import os
 import sys
+from pathlib import Path
 
-import chip.clusters as Clusters
-from chip.clusters import Attribute
-from chip.testing.pics import parse_pics_xml
-from MockTestRunner import MockTestRunner
+import matter.clusters as Clusters
+from matter.clusters import Attribute
+from matter.testing.pics import parse_pics_xml
+from matter.testing.runner import MockTestRunner
 
 # Reachable attribute is off in the pics file
 # MaxPathsPerInvoke is not include in the pics file
 # Vendor ID is included on ON in the PICS file
 
 
-def create_read(include_reachable: bool = False, include_max_paths: bool = False, include_vendor_id: bool = True) -> Attribute.AsyncReadTransaction.ReadResponse:
+def create_read(include_reachable: bool = False, include_max_paths: bool = False, include_vendor_id: bool = True, device_type: int = 0x01) -> Attribute.AsyncReadTransaction.ReadResponse:
     # Attribute read here is set to match the example_pics_xml_basic_info.xml in this directory
     bi = Clusters.BasicInformation.Attributes
     lvl = Clusters.LevelControl.Attributes
+    desc = Clusters.Descriptor.Attributes
     attrs_bi = {bi.DataModelRevision: 1,
                 bi.VendorName: 'testVendor',
                 bi.ProductName: 'testProduct',
@@ -49,6 +50,7 @@ def create_read(include_reachable: bool = False, include_max_paths: bool = False
                 bi.ProductLabel: 'myProduct',
                 bi.SerialNumber: 'ABCD1234',
                 bi.LocalConfigDisabled: False,
+                bi.SpecificationVersion: 0x01040000,
                 bi.UniqueID: 'Hashy-McHashface'}
     if include_reachable:
         attrs_bi[bi.Reachable] = True
@@ -68,27 +70,41 @@ def create_read(include_reachable: bool = False, include_max_paths: bool = False
     attrs_lvl[lvl.GeneratedCommandList] = []
     attrs_lvl[lvl.FeatureMap] = 0
 
+    attrs_desc = {}
+    attrs_desc[desc.DeviceTypeList] = [Clusters.Descriptor.Structs.DeviceTypeStruct(deviceType=device_type, revision=1)]
+    attrs_desc[desc.AttributeList] = [a.attribute_id for a in attrs_desc.keys()]
+    attrs_desc[desc.AcceptedCommandList] = []
+    attrs_desc[desc.GeneratedCommandList] = []
+    attrs_desc[desc.FeatureMap] = 0
+
     resp = Attribute.AsyncReadTransaction.ReadResponse({}, [], {})
-    resp.attributes = {0: {Clusters.BasicInformation: attrs_bi, Clusters.LevelControl: attrs_lvl}}
+    resp.attributes = {0: {Clusters.Descriptor: attrs_desc, Clusters.BasicInformation: attrs_bi, Clusters.LevelControl: attrs_lvl}}
 
     tlv_attrs_bi = {a.attribute_id: value for a, value in attrs_bi.items()}
     tlv_attrs_lvl = {a.attribute_id: value for a, value in attrs_lvl.items()}
-    resp.tlvAttributes = {0: {Clusters.BasicInformation.id: tlv_attrs_bi, Clusters.LevelControl.id: tlv_attrs_lvl}}
+    tlv_attrs_desc = {a.attribute_id: value for a, value in attrs_desc.items()}
+    tlv_attrs_desc[desc.DeviceTypeList.attribute_id] = [d.ToTLV() for d in attrs_desc[desc.DeviceTypeList]]
+    resp.tlvAttributes = {0: {Clusters.Descriptor.id: tlv_attrs_desc,
+                              Clusters.BasicInformation.id: tlv_attrs_bi, Clusters.LevelControl.id: tlv_attrs_lvl}}
 
+    print(resp)
     return resp
 
 
 def main():
     # TODO: add the same test for commands and features
-    script_dir = os.path.dirname(os.path.realpath(__file__))
-    with open(f'{script_dir}/example_pics_xml_basic_info.xml') as f:
+
+    ROOT_NODE_DEVICE_TYPE = 0x16
+
+    script_dir = Path(__file__).resolve().parent
+    with open(script_dir / 'example_pics_xml_basic_info.xml') as f:
         pics = parse_pics_xml(f.read())
-    test_runner = MockTestRunner('TC_pics_checker.py', 'TC_PICS_Checker', 'test_TC_IDM_10_4', 0, pics)
+    test_runner = MockTestRunner(script_dir / '../TC_pics_checker.py',
+                                 'TC_PICS_Checker', 'test_TC_IDM_10_4', 0, pics)
     failures = []
 
     # Success, include vendor ID, which IS in the pics file, and neither of the incorrect ones
     resp = create_read()
-    print(resp)
     if not test_runner.run_test_with_mock_read(resp):
         failures.append("Test case failure: Vendor ID included - expected pass")
 
@@ -107,10 +123,59 @@ def main():
     if test_runner.run_test_with_mock_read(resp):
         failures.append("Test case failure: MaxPathsPerInvoke included but not in PICS- expected failure")
 
+    # If we make the device type a root node, this test should fail because MCORE.ROLE.COMMISSIONEE needs to be set
+    resp = create_read(device_type=ROOT_NODE_DEVICE_TYPE)
+    if test_runner.run_test_with_mock_read(resp):
+        failures.append("Test case failure: MCORE.ROLE.COMMISSIONEE is not included for a root node device - expected failure")
+
+    # If we add the MCORE.ROLE.COMMISSIONEE PICS, this should pass again.
+    pics['MCORE.ROLE.COMMISSIONEE'] = True
+    test_runner.config.pics = pics
+    resp = create_read(device_type=ROOT_NODE_DEVICE_TYPE)
+    if not test_runner.run_test_with_mock_read(resp):
+        failures.append("Test case failure: MCORE.ROLE.COMMISSIONEE is included for a root node device - expected success")
+
+    # If we add a QR code PICS with no manual, it should fail
+    pics['MCORE.DD.QR'] = True
+    test_runner.config.pics = pics
+    resp = create_read(device_type=ROOT_NODE_DEVICE_TYPE)
+    if test_runner.run_test_with_mock_read(resp):
+        failures.append("Test case failure: QR code with no manual code - expected failure")
+
+    # If we add the manual code, it should pass again
+    pics['MCORE.DD.MANUAL_PC'] = True
+    test_runner.config.pics = pics
+    resp = create_read(device_type=ROOT_NODE_DEVICE_TYPE)
+    if not test_runner.run_test_with_mock_read(resp):
+        failures.append("Test case failure: QR code with manual code - expected success")
+
+    # NFC only with no manual should fail
+    pics['MCORE.DD.QR'] = False
+    pics['MCORE.DD.MANUAL_PC'] = False
+    pics['MCORE.DD.NFC'] = True
+    test_runner.config.pics = pics
+    resp = create_read(device_type=ROOT_NODE_DEVICE_TYPE)
+    if test_runner.run_test_with_mock_read(resp):
+        failures.append("Test case failure: NFC code with no manual code - expected failure")
+
+    # If we add the manual code again, it should pass
+    pics['MCORE.DD.MANUAL_PC'] = True
+    test_runner.config.pics = pics
+    resp = create_read(device_type=ROOT_NODE_DEVICE_TYPE)
+    if not test_runner.run_test_with_mock_read(resp):
+        failures.append("Test case failure: NFC code with manual code - expected success")
+
+    # All three should also be fine.
+    pics['MCORE.DD.QR'] = True
+    test_runner.config.pics = pics
+    resp = create_read(device_type=ROOT_NODE_DEVICE_TYPE)
+    if not test_runner.run_test_with_mock_read(resp):
+        failures.append("Test case failure: NFC and QR code with manual code - expected success")
+
     pics['PICS_SDK_CI_ONLY'] = True
     test_runner.config.pics = pics
     # This is a success case for the attributes (as seen above), but the test should fail because the CI PICS is added
-    resp = create_read()
+    resp = create_read(device_type=ROOT_NODE_DEVICE_TYPE)
     if test_runner.run_test_with_mock_read(resp):
         failures.append("Test case failure: SDK CI PICS is included - expected failure")
 

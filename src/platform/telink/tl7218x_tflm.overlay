@@ -1,0 +1,9 @@
+&cpu0 {
+	clock-frequency = <240000000>;
+};
+
+&pwm0 {
+	status = "okay";
+	clock-frequency = <500000>;
+	pinctrl-ch0 = <&pwm_ch0_pb7_default>;
+};

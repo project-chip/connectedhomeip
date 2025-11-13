@@ -1,0 +1,38 @@
+# Copyright (c) 2025 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/src/inet/inet.gni")
+
+# These files are physically located under src/platform/Darwin/inet/,
+# but are considered part of the inet logical layer.
+
+darwin_sources = [ "${chip_root}/src/platform/Darwin/inet/NetworkMonitor.h" ]
+
+if (chip_inet_config_enable_udp_endpoint) {
+  darwin_sources += [
+    "${chip_root}/src/platform/Darwin/inet/UDPEndPointImplNetworkFramework.h",
+    "${chip_root}/src/platform/Darwin/inet/UDPEndPointImplNetworkFramework.mm",
+    "${chip_root}/src/platform/Darwin/inet/UDPEndPointImplNetworkFrameworkConnection.h",
+    "${chip_root}/src/platform/Darwin/inet/UDPEndPointImplNetworkFrameworkConnection.mm",
+    "${chip_root}/src/platform/Darwin/inet/UDPEndPointImplNetworkFrameworkDebug.h",
+    "${chip_root}/src/platform/Darwin/inet/UDPEndPointImplNetworkFrameworkDebug.mm",
+    "${chip_root}/src/platform/Darwin/inet/UDPEndPointImplNetworkFrameworkListener.h",
+    "${chip_root}/src/platform/Darwin/inet/UDPEndPointImplNetworkFrameworkListener.mm",
+    "${chip_root}/src/platform/Darwin/inet/UDPEndPointImplNetworkFrameworkListenerGroup.h",
+    "${chip_root}/src/platform/Darwin/inet/UDPEndPointImplNetworkFrameworkListenerGroup.mm",
+  ]
+}

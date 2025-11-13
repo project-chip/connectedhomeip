@@ -72,7 +72,8 @@ void CheckInHandler::Shutdown()
     mpCheckInDelegate  = nullptr;
     if (mpExchangeManager)
     {
-        mpExchangeManager->UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::ICD_CheckIn);
+        TEMPORARY_RETURN_IGNORED mpExchangeManager->UnregisterUnsolicitedMessageHandlerForType(
+            Protocols::SecureChannel::MsgType::ICD_CheckIn);
         mpExchangeManager = nullptr;
     }
 }
@@ -135,10 +136,10 @@ CHIP_ERROR CheckInHandler::OnMessageReceived(Messaging::ExchangeContext * ec, co
     }
     else
     {
-        mpICDClientStorage->StoreEntry(clientInfo);
+        TEMPORARY_RETURN_IGNORED mpICDClientStorage->StoreEntry(clientInfo);
         mpCheckInDelegate->OnCheckInComplete(clientInfo);
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
-        mpImEngine->OnActiveModeNotification(clientInfo.peer_node);
+        mpImEngine->OnActiveModeNotification(clientInfo.peer_node, clientInfo.monitored_subject);
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
     }
 

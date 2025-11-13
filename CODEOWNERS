@@ -5,6 +5,9 @@ chip-build-asr/                  @tx2rx
 /src/platform/Ameba/             @pankore
 ameba/                           @pankore
 chip-build-ameba/                @pankore
+/src/platform/realtek/           @pankore
+realtek/                         @pankore
+chip-build-realtek/              @pankore
 
 /src/platform/Beken/             @zhengyaohan
 
@@ -67,5 +70,6 @@ stm32/                           @STYoannZamaron
 
 telink/                          @s07641069
 chip-build-telink/               @s07641069
+chip-build-telink-zephyr_3_3/    @s07641069
 
 webos/                           @joonhaengHeo

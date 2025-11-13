@@ -228,7 +228,7 @@ public:
         CHIP_ERROR err = pair_iterator.GetStatus();
         if (CHIP_NO_ERROR != err)
         {
-            mSceneEndpointStatePairs.RemovePair(endpoint);
+            TEMPORARY_RETURN_IGNORED mSceneEndpointStatePairs.RemovePair(endpoint);
             return err;
         }
 
@@ -520,12 +520,6 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
             status = setOnOffValue(endpoint, onOffValueForStartUp, true);
         }
 
-#if defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
-        // Registers Scene handlers for the On/Off cluster on the server
-        app::Clusters::ScenesManagement::ScenesServer::Instance().RegisterSceneHandler(endpoint,
-                                                                                       OnOffServer::Instance().GetSceneHandler());
-#endif // defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
-
 #ifdef MATTER_DM_PLUGIN_MODE_SELECT
         // If OnMode is not a null value, then change the current mode to it.
         if (onOffValueForStartUp && emberAfContainsServer(endpoint, ModeSelect::Id) &&
@@ -541,6 +535,12 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
 #endif
     }
 #endif // IGNORE_ON_OFF_CLUSTER_START_UP_ON_OFF
+
+#if defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+    // Registers Scene handlers for the On/Off cluster on the server
+    app::Clusters::ScenesManagement::ScenesServer::Instance().RegisterSceneHandler(endpoint,
+                                                                                   OnOffServer::Instance().GetSceneHandler());
+#endif // defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 
     emberAfPluginOnOffClusterServerPostInitCallback(endpoint);
 }
@@ -667,8 +667,9 @@ bool OnOffServer::offWithEffectCommand(app::CommandHandler * commandObj, const a
         if (globalSceneControl)
         {
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-            ScenesManagement::ScenesServer::Instance().StoreCurrentScene(fabric, endpoint, ZCL_SCENES_GLOBAL_SCENE_GROUP_ID,
-                                                                         ZCL_SCENES_GLOBAL_SCENE_SCENE_ID);
+            ScenesManagement::ScenesServer::Instance().StoreCurrentScene(fabric, endpoint,
+                                                                         ScenesManagement::ScenesServer::kGlobalSceneGroupId,
+                                                                         ScenesManagement::ScenesServer::kGlobalSceneId);
 #endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
             OnOff::Attributes::GlobalSceneControl::Set(endpoint, false);
         }
@@ -723,8 +724,8 @@ bool OnOffServer::OnWithRecallGlobalSceneCommand(app::CommandHandler * commandOb
     }
 
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-    ScenesManagement::ScenesServer::Instance().RecallScene(fabric, endpoint, ZCL_SCENES_GLOBAL_SCENE_GROUP_ID,
-                                                           ZCL_SCENES_GLOBAL_SCENE_SCENE_ID);
+    ScenesManagement::ScenesServer::Instance().RecallScene(fabric, endpoint, ScenesManagement::ScenesServer::kGlobalSceneGroupId,
+                                                           ScenesManagement::ScenesServer::kGlobalSceneId);
 #endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 
     OnOff::Attributes::GlobalSceneControl::Set(endpoint, true);
@@ -1037,3 +1038,5 @@ void onOffWaitTimeOffEventHandler(chip::EndpointId endpoint)
 void emberAfPluginOnOffClusterServerPostInitCallback(EndpointId endpoint) {}
 
 void MatterOnOffPluginServerInitCallback() {}
+
+void MatterOnOffPluginServerShutdownCallback() {}

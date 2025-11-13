@@ -157,6 +157,7 @@ constexpr uint8_t kUpdateTokenLen = 32;
 
 - (void)handleBDXTransferSessionEndForNodeID:(NSNumber * _Nonnull)nodeID
                                   controller:(MTRDeviceController * _Nonnull)controller
+                                     metrics:(MTRMetrics * _Nonnull)metrics
                                        error:(NSError * _Nullable)error
 {
     NSLog(@"BDX TransferSession end with error: %@", error);

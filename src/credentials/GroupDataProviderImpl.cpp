@@ -36,7 +36,7 @@ using GroupSession  = GroupDataProvider::GroupSession;
 
 struct FabricList : public CommonPersistentData::FabricList
 {
-    CHIP_ERROR UpdateKey(StorageKeyName & key) override
+    CHIP_ERROR UpdateKey(StorageKeyName & key) const override
     {
         key = DefaultStorageKeyAllocator::GroupFabricList();
         return CHIP_NO_ERROR;
@@ -81,7 +81,7 @@ struct FabricData : public PersistentData<kPersistentBufferMax>
     FabricData() = default;
     FabricData(chip::FabricIndex fabric) : fabric_index(fabric) {}
 
-    CHIP_ERROR UpdateKey(StorageKeyName & key) override
+    CHIP_ERROR UpdateKey(StorageKeyName & key) const override
     {
         VerifyOrReturnError(kUndefinedFabricIndex != fabric_index, CHIP_ERROR_INVALID_FABRIC_INDEX);
         key = DefaultStorageKeyAllocator::FabricGroups(fabric_index);
@@ -279,7 +279,7 @@ struct GroupData : public GroupDataProvider::GroupInfo, PersistentData<kPersiste
     GroupData(chip::FabricIndex fabric) : fabric_index(fabric) {}
     GroupData(chip::FabricIndex fabric, chip::GroupId group) : GroupInfo(group, nullptr), fabric_index(fabric) {}
 
-    CHIP_ERROR UpdateKey(StorageKeyName & key) override
+    CHIP_ERROR UpdateKey(StorageKeyName & key) const override
     {
         VerifyOrReturnError(kUndefinedFabricIndex != fabric_index, CHIP_ERROR_INVALID_FABRIC_INDEX);
         key = DefaultStorageKeyAllocator::FabricGroup(fabric_index, group_id);
@@ -403,7 +403,7 @@ struct KeyMapData : public GroupDataProvider::GroupKey, LinkedData
         GroupKey(group, keyset), LinkedData(link_id), fabric_index(fabric)
     {}
 
-    CHIP_ERROR UpdateKey(StorageKeyName & key) override
+    CHIP_ERROR UpdateKey(StorageKeyName & key) const override
     {
         VerifyOrReturnError(kUndefinedFabricIndex != fabric_index, CHIP_ERROR_INVALID_FABRIC_INDEX);
         key = DefaultStorageKeyAllocator::FabricGroupKey(fabric_index, id);
@@ -554,7 +554,7 @@ struct EndpointData : GroupDataProvider::GroupEndpoint, PersistentData<kPersiste
         fabric_index(fabric)
     {}
 
-    CHIP_ERROR UpdateKey(StorageKeyName & key) override
+    CHIP_ERROR UpdateKey(StorageKeyName & key) const override
     {
         VerifyOrReturnError(kUndefinedFabricIndex != fabric_index, CHIP_ERROR_INVALID_FABRIC_INDEX);
         key = DefaultStorageKeyAllocator::FabricGroupEndpoint(fabric_index, group_id, endpoint_id);
@@ -647,7 +647,7 @@ struct KeySetData : PersistentData<kPersistentBufferMax>
         fabric_index(fabric), keyset_id(id), policy(policy_id), keys_count(num_keys)
     {}
 
-    CHIP_ERROR UpdateKey(StorageKeyName & key) override
+    CHIP_ERROR UpdateKey(StorageKeyName & key) const override
     {
         VerifyOrReturnError(kUndefinedFabricIndex != fabric_index, CHIP_ERROR_INVALID_FABRIC_INDEX);
         VerifyOrReturnError(kInvalidKeysetId != keyset_id, CHIP_ERROR_INVALID_KEY_ID);
@@ -993,7 +993,7 @@ CHIP_ERROR GroupDataProviderImpl::RemoveGroupInfoAt(chip::FabricIndex fabric_ind
         {
             break;
         }
-        endpoint.Delete(mStorage);
+        TEMPORARY_RETURN_IGNORED endpoint.Delete(mStorage);
         endpoint.endpoint_id = endpoint.next;
     }
 
@@ -1105,7 +1105,7 @@ CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index,
     VerifyOrReturnError(endpoint.Find(mStorage, fabric, group, endpoint_id), CHIP_ERROR_NOT_FOUND);
 
     // Existing endpoint
-    endpoint.Delete(mStorage);
+    TEMPORARY_RETURN_IGNORED endpoint.Delete(mStorage);
 
     if (endpoint.first)
     {
@@ -1331,7 +1331,7 @@ CHIP_ERROR GroupDataProviderImpl::RemoveEndpoints(chip::FabricIndex fabric_index
     while (endpoint_index < group.endpoint_count)
     {
         ReturnErrorOnFailure(endpoint.Load(mStorage));
-        endpoint.Delete(mStorage);
+        TEMPORARY_RETURN_IGNORED endpoint.Delete(mStorage);
         endpoint.endpoint_id = endpoint.next;
         endpoint_index++;
     }
@@ -1459,7 +1459,7 @@ CHIP_ERROR GroupDataProviderImpl::RemoveGroupKeys(chip::FabricIndex fabric_index
         {
             break;
         }
-        map.Delete(mStorage);
+        TEMPORARY_RETURN_IGNORED map.Delete(mStorage);
         map.id = map.next;
     }
 
@@ -1627,7 +1627,7 @@ CHIP_ERROR GroupDataProviderImpl::RemoveKeySet(chip::FabricIndex fabric_index, u
     uint16_t original_count = fabric.map_count;
     for (uint16_t i = 0; i < original_count; ++i)
     {
-        fabric.Load(mStorage);
+        TEMPORARY_RETURN_IGNORED fabric.Load(mStorage);
         size_t idx = map.Find(mStorage, fabric, target_id);
         if (idx == std::numeric_limits<size_t>::max())
         {
@@ -1636,7 +1636,7 @@ CHIP_ERROR GroupDataProviderImpl::RemoveKeySet(chip::FabricIndex fabric_index, u
         // NOTE: It's unclear what should happen here if we have removed the key set
         // and possibly some mappings before failing. For now, ignoring errors, but
         // open to suggestsions for the correct behavior.
-        RemoveGroupKeyAt(fabric_index, idx);
+        TEMPORARY_RETURN_IGNORED RemoveGroupKeyAt(fabric_index, idx);
     }
     return CHIP_NO_ERROR;
 }
@@ -1706,14 +1706,14 @@ CHIP_ERROR GroupDataProviderImpl::RemoveFabric(chip::FabricIndex fabric_index)
 
     for (size_t i = 0; i < fabric.map_count; i++)
     {
-        RemoveGroupKeyAt(fabric_index, fabric.map_count - i - 1);
+        TEMPORARY_RETURN_IGNORED RemoveGroupKeyAt(fabric_index, fabric.map_count - i - 1);
     }
 
     // Remove group info
 
     for (size_t i = 0; i < fabric.group_count; i++)
     {
-        RemoveGroupInfoAt(fabric_index, fabric.group_count - i - 1);
+        TEMPORARY_RETURN_IGNORED RemoveGroupInfoAt(fabric_index, fabric.group_count - i - 1);
     }
 
     // Remove Keysets
@@ -1728,7 +1728,7 @@ CHIP_ERROR GroupDataProviderImpl::RemoveFabric(chip::FabricIndex fabric_index)
         {
             break;
         }
-        RemoveKeySet(fabric_index, keyset.keyset_id);
+        TEMPORARY_RETURN_IGNORED RemoveKeySet(fabric_index, keyset.keyset_id);
         keyset.keyset_id = keyset.next;
         keyset_count++;
     }
@@ -1787,7 +1787,7 @@ CHIP_ERROR GroupDataProviderImpl::GetIpkKeySet(FabricIndex fabric_index, KeySet 
     out_keyset.num_keys_used = keyset.keys_count;
     out_keyset.policy        = keyset.policy;
 
-    for (size_t key_idx = 0; key_idx < ArraySize(out_keyset.epoch_keys); ++key_idx)
+    for (size_t key_idx = 0; key_idx < MATTER_ARRAY_SIZE(out_keyset.epoch_keys); ++key_idx)
     {
         out_keyset.epoch_keys[key_idx].Clear();
         if (key_idx < keyset.keys_count)
@@ -1926,7 +1926,7 @@ bool GroupDataProviderImpl::GroupSessionIteratorImpl::Next(GroupSession & output
         KeySetData keyset;
         VerifyOrReturnError(keyset.Find(mProvider.mStorage, fabric, mapping.keyset_id), false);
 
-        if (mKeyIndex >= keyset.keys_count)
+        if (mKeyIndex >= keyset.keys_count || (mKeyIndex >= KeySet::kEpochKeysMax))
         {
             // No more keys in current keyset, try next
             mMapping = mapping.next;
@@ -1938,7 +1938,7 @@ bool GroupDataProviderImpl::GroupSessionIteratorImpl::Next(GroupSession & output
         Crypto::GroupOperationalCredentials & creds = keyset.operational_keys[mKeyIndex++];
         if (creds.hash == mSessionId)
         {
-            mGroupKeyContext.Initialize(creds.encryption_key, mSessionId, creds.privacy_key);
+            TEMPORARY_RETURN_IGNORED mGroupKeyContext.Initialize(creds.encryption_key, mSessionId, creds.privacy_key);
             output.fabric_index    = fabric.fabric_index;
             output.group_id        = mapping.group_id;
             output.security_policy = keyset.policy;

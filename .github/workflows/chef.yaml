@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2021-2025 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Build Chef CI examples on all platforms
+name: Chef CI
 
 on:
     push:
@@ -30,18 +30,19 @@ env:
     CHIP_NO_LOG_TIMESTAMPS: true
 
 jobs:
-    chef_linux:
-        name: Chef - Linux CI Examples
+    chef_linux_all_devices:
+        name: Chef - Linux CI Examples (All chef devices)
+        timeout-minutes: 120
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:94
+            image: ghcr.io/project-chip/chip-build:174
             options: --user root
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -49,7 +50,45 @@ jobs:
             - name: CI Examples Linux
               shell: bash
               run: |
-                  ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci -t linux"
+                  ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci_linux"
+
+    chef_device_functional_test:
+        name: Chef - Device functional tests (Linux)
+        if: github.actor != 'restyled-io[bot]'
+        timeout-minutes: 90
+        runs-on: ubuntu-latest
+        container:
+            image: ghcr.io/project-chip/chip-build:174
+            options: >-
+                --privileged
+                --sysctl net.ipv6.conf.all.disable_ipv6=0
+                --sysctl net.ipv4.conf.all.forwarding=0
+                --sysctl net.ipv6.conf.all.forwarding=0
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v5
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                  platform: linux
+            - name: Try to ensure the directories for core dumping exist and we
+                  can write them.
+              run: |
+                  mkdir /tmp/cores || true
+                  sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
+                  mkdir objdir-clone || true
+
+            - name: Set up a IPV6 known envionment
+              uses: ./.github/actions/add-ipv6
+
+            - name: Build python env
+              run: scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/python_env -pw true'
+
+            - name: Dimmablelight tests
+              run: |
+                  ./examples/chef/chef.py -br -d rootnode_dimmablelight_bCwGYSDpoe -t linux
+                  scripts/run_in_python_env.sh out/python_env './scripts/tests/run_python_test.py --app examples/chef/linux/out/rootnode_dimmablelight_bCwGYSDpoe --factory-reset --script ./examples/chef/tests/dimmablelight_test.py --script-args "--commissioning-method on-network --discriminator 3840 --passcode 20202021" --app-stdin-pipe /tmp/chef_stdin.txt'
 
     chef_esp32:
         name: Chef - ESP32 CI Examples
@@ -57,16 +96,17 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32:94
+            image: ghcr.io/project-chip/chip-build-esp32:174
             options: --user root
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Checkout submodules
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: esp32
+
             - name: CI Examples ESP32
               shell: bash
               run: |
@@ -78,12 +118,12 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nrf-platform:94
+            image: ghcr.io/project-chip/chip-build-nrf-platform:174
             options: --user root
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -99,19 +139,19 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink:94
+            image: ghcr.io/project-chip/chip-build-telink:174
             options: --user root
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: telink
             # - name: Update Zephyr to specific revision (for developers purpose)
             #   shell: bash
-            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py ffdbfe7560c0b628e03ab487ab110eeed9bdc8c7"
+            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 86fb5f1142c99e04abc923f4c0aa5fafb2ea9ace"
             - name: CI Examples Telink
               shell: bash
               run: |

@@ -21,8 +21,6 @@
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
 #include <lib/support/CodeUtils.h>
 
-#include <EnergyTimeUtils.h>
-
 #include "FakeReadings.h"
 
 using namespace chip;
@@ -36,7 +34,6 @@ constexpr uint16_t MAX_POWER_ADJUSTMENTS = 5;
 
 chip::app::Clusters::DeviceEnergyManagement::Structs::SlotStruct::Type sSlots[MAX_SLOTS];
 chip::app::Clusters::DeviceEnergyManagement::Structs::ForecastStruct::Type sForecastStruct;
-chip::app::DataModel::Nullable<chip::app::Clusters::DeviceEnergyManagement::Structs::ForecastStruct::Type> sForecast;
 
 chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustStruct::Type sPowerAdjustments[MAX_POWER_ADJUSTMENTS];
 chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::Type sPowerAdjustCapabilityStruct;
@@ -47,9 +44,9 @@ chip::app::DataModel::Nullable<chip::app::Clusters::DeviceEnergyManagement::Stru
 
 CHIP_ERROR ConfigureForecast(uint16_t numSlots)
 {
-    uint32_t chipEpoch = 0;
+    uint32_t matterEpoch = 0;
 
-    CHIP_ERROR err = GetEpochTS(chipEpoch);
+    CHIP_ERROR err = System::Clock::GetClock_MatterEpochS(matterEpoch);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Support, "ConfigureForecast could not get time");
@@ -58,17 +55,17 @@ CHIP_ERROR ConfigureForecast(uint16_t numSlots)
 
     // planned start time, in UTC, for the entire Forecast. Allow to be a little
     // time in the future as forecastStruct.startTime is used in some tests.
-    sForecastStruct.startTime = chipEpoch + 60;
+    sForecastStruct.startTime = matterEpoch + 60;
 
     // earliest start time, in UTC, that the entire Forecast can be shifted to. null value indicates that it can be started
     // immediately.
-    sForecastStruct.earliestStartTime = MakeOptional(DataModel::MakeNullable(chipEpoch));
+    sForecastStruct.earliestStartTime = MakeOptional(DataModel::MakeNullable(matterEpoch));
 
     // planned end time, in UTC, for the entire Forecast.
-    sForecastStruct.endTime = chipEpoch * 3;
+    sForecastStruct.endTime = matterEpoch * 3;
 
     // latest end time, in UTC, for the entire Forecast
-    sForecastStruct.latestEndTime = MakeOptional(chipEpoch * 3);
+    sForecastStruct.latestEndTime = MakeOptional(matterEpoch * 3);
 
     sForecastStruct.isPausable = true;
 
@@ -128,9 +125,7 @@ CHIP_ERROR ConfigureForecast(uint16_t numSlots)
 
     sForecastStruct.slots = DataModel::List<const DeviceEnergyManagement::Structs::SlotStruct::Type>(sSlots, numSlots);
 
-    GetDEMDelegate()->SetForecast(DataModel::MakeNullable(sForecastStruct));
-
-    return CHIP_NO_ERROR;
+    return GetDEMDelegate()->SetForecast(DataModel::MakeNullable(sForecastStruct));
 }
 
 void SetTestEventTrigger_PowerAdjustment()
@@ -149,7 +144,7 @@ void SetTestEventTrigger_PowerAdjustment()
     CHIP_ERROR err = GetDEMDelegate()->SetPowerAdjustmentCapability(sPowerAdjustmentCapability);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Support, "SetTestEventTrigger_PowerAdjustment failed %s", chip::ErrorStr(err));
+        ChipLogError(Support, "SetTestEventTrigger_PowerAdjustment failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
@@ -171,38 +166,39 @@ void SetTestEventTrigger_ClearForecast()
     CHIP_ERROR err = GetDEMDelegate()->SetPowerAdjustmentCapability(powerAdjustmentCapabilityStruct);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Support, "SetTestEventTrigger_PowerAdjustment failed %s", chip::ErrorStr(err));
+        ChipLogError(Support, "SetTestEventTrigger_PowerAdjustment failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
 void SetTestEventTrigger_StartTimeAdjustment()
 {
-    ConfigureForecast(2);
+    TEMPORARY_RETURN_IGNORED ConfigureForecast(2);
 
     // Get the current forecast ad update the earliestStartTime and latestEndTime
     sForecastStruct = GetDEMDelegate()->GetForecast().Value();
 
-    uint32_t chipEpoch = 0;
+    uint32_t matterEpoch = 0;
 
-    CHIP_ERROR err = GetEpochTS(chipEpoch);
+    CHIP_ERROR err = System::Clock::GetClock_MatterEpochS(matterEpoch);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Support, "ConfigureForecast_EarliestStartLatestEndTimes could not get time");
     }
 
     // planned start time, in UTC, for the entire Forecast.
-    sForecastStruct.startTime = chipEpoch;
+    sForecastStruct.startTime = matterEpoch;
 
     // Set the earliest start time, in UTC, to that before the startTime
-    sForecastStruct.earliestStartTime = Optional<DataModel::Nullable<uint32_t>>{ DataModel::Nullable<uint32_t>{ chipEpoch - 60 } };
+    sForecastStruct.earliestStartTime =
+        Optional<DataModel::Nullable<uint32_t>>{ DataModel::Nullable<uint32_t>{ matterEpoch - 60 } };
 
     // Planned end time, in UTC, for the entire Forecast.
-    sForecastStruct.endTime = chipEpoch * 3;
+    sForecastStruct.endTime = matterEpoch * 3;
 
     // Latest end time, in UTC, for the entire Forecast which is > sForecastStruct.endTime
-    sForecastStruct.latestEndTime = Optional<uint32_t>(chipEpoch * 3 + 60);
+    sForecastStruct.latestEndTime = Optional<uint32_t>(matterEpoch * 3 + 60);
 
-    GetDEMDelegate()->SetForecast(DataModel::MakeNullable(sForecastStruct));
+    TEMPORARY_RETURN_IGNORED GetDEMDelegate()->SetForecast(DataModel::MakeNullable(sForecastStruct));
 }
 
 void SetTestEventTrigger_StartTimeAdjustmentClear()
@@ -216,17 +212,17 @@ void SetTestEventTrigger_StartTimeAdjustmentClear()
     sForecastStruct.earliestStartTime = NullOptional;
     sForecastStruct.latestEndTime     = NullOptional;
 
-    GetDEMDelegate()->SetForecast(DataModel::MakeNullable(sForecastStruct));
+    TEMPORARY_RETURN_IGNORED GetDEMDelegate()->SetForecast(DataModel::MakeNullable(sForecastStruct));
 }
 
 void SetTestEventTrigger_UserOptOutOptimization(OptOutStateEnum optOutState)
 {
-    GetDEMDelegate()->SetOptOutState(optOutState);
+    TEMPORARY_RETURN_IGNORED GetDEMDelegate()->SetOptOutState(optOutState);
 }
 
 void SetTestEventTrigger_Pausable()
 {
-    ConfigureForecast(2);
+    TEMPORARY_RETURN_IGNORED ConfigureForecast(2);
 }
 
 void SetTestEventTrigger_PausableNextSlot()
@@ -235,12 +231,12 @@ void SetTestEventTrigger_PausableNextSlot()
     sForecastStruct = GetDEMDelegate()->GetForecast().Value();
     sForecastStruct.activeSlotNumber.SetNonNull(1);
 
-    GetDEMDelegate()->SetForecast(DataModel::MakeNullable(sForecastStruct));
+    TEMPORARY_RETURN_IGNORED GetDEMDelegate()->SetForecast(DataModel::MakeNullable(sForecastStruct));
 }
 
 void SetTestEventTrigger_Forecast()
 {
-    ConfigureForecast(2);
+    TEMPORARY_RETURN_IGNORED ConfigureForecast(2);
 }
 
 void SetTestEventTrigger_ForecastClear()
@@ -253,12 +249,12 @@ void SetTestEventTrigger_ForecastClear()
     sForecastStruct.activeSlotNumber.SetNull();
     sForecastStruct.slots = DataModel::List<const DeviceEnergyManagement::Structs::SlotStruct::Type>();
 
-    GetDEMDelegate()->SetForecast(DataModel::MakeNullable(sForecastStruct));
+    TEMPORARY_RETURN_IGNORED GetDEMDelegate()->SetForecast(DataModel::MakeNullable(sForecastStruct));
 }
 
 void SetTestEventTrigger_ForecastAdjustment()
 {
-    ConfigureForecast(2);
+    TEMPORARY_RETURN_IGNORED ConfigureForecast(2);
 
     // The following values need to match the equivalent values in src/python_testing/TC_DEM_2_5.py
     sForecastStruct = GetDEMDelegate()->GetForecast().Value();
@@ -269,7 +265,7 @@ void SetTestEventTrigger_ForecastAdjustment()
 
     sForecastStruct.slots = DataModel::List<const DeviceEnergyManagement::Structs::SlotStruct::Type>(sSlots, 2);
 
-    GetDEMDelegate()->SetForecast(DataModel::MakeNullable(sForecastStruct));
+    TEMPORARY_RETURN_IGNORED GetDEMDelegate()->SetForecast(DataModel::MakeNullable(sForecastStruct));
 }
 
 void SetTestEventTrigger_ForecastAdjustmentNextSlot()
@@ -277,12 +273,12 @@ void SetTestEventTrigger_ForecastAdjustmentNextSlot()
     sForecastStruct = GetDEMDelegate()->GetForecast().Value();
     sForecastStruct.activeSlotNumber.SetNonNull(sForecastStruct.activeSlotNumber.Value() + 1);
 
-    GetDEMDelegate()->SetForecast(DataModel::MakeNullable(sForecastStruct));
+    TEMPORARY_RETURN_IGNORED GetDEMDelegate()->SetForecast(DataModel::MakeNullable(sForecastStruct));
 }
 
 void SetTestEventTrigger_ConstraintBasedAdjustment()
 {
-    ConfigureForecast(4);
+    TEMPORARY_RETURN_IGNORED ConfigureForecast(4);
 }
 
 bool HandleDeviceEnergyManagementTestEventTrigger(uint64_t eventTrigger)

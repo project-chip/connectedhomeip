@@ -58,7 +58,7 @@ struct NetworkInterface : public app::Clusters::GeneralDiagnostics::Structs::Net
     uint8_t Ipv6AddressesBuffer[kMaxIPv6AddrCount][kMaxIPv6AddrSize];
     chip::ByteSpan Ipv4AddressSpans[kMaxIPv4AddrCount];
     chip::ByteSpan Ipv6AddressSpans[kMaxIPv6AddrCount];
-    NetworkInterface * Next; /* Pointer to the next structure.  */
+    NetworkInterface * Next = nullptr; /* Pointer to the next structure.  */
 };
 
 class DiagnosticDataProviderImpl;
@@ -191,7 +191,7 @@ public:
     virtual CHIP_ERROR GetAverageWearCount(uint32_t & averageWearCount);
 
     /*
-     * Get the linked list of network interfaces of the current plaform. After usage, each caller of GetNetworkInterfaces
+     * Get the linked list of network interfaces of the current platform. After usage, each caller of GetNetworkInterfaces
      * needs to release the network interface list it gets via ReleaseNetworkInterfaces.
      *
      */
@@ -202,7 +202,7 @@ public:
      * Software Diagnostics methods.
      */
 
-    /// Feature support - this returns support gor GetCurrentHeapHighWatermark and ResetWatermarks()
+    /// Feature support - this returns support for GetCurrentHeapHighWatermark and ResetWatermarks()
     virtual bool SupportsWatermarks() { return false; }
 
     virtual CHIP_ERROR GetCurrentHeapFree(uint64_t & currentHeapFree);
@@ -211,7 +211,7 @@ public:
     virtual CHIP_ERROR ResetWatermarks();
 
     /*
-     * Get the linked list of thread metrics of the current plaform. After usage, each caller of GetThreadMetrics
+     * Get the linked list of thread metrics of the current platform. After usage, each caller of GetThreadMetrics
      * needs to release the thread metrics list it gets via ReleaseThreadMetrics.
      *
      */

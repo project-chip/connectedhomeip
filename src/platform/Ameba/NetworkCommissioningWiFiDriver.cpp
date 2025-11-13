@@ -172,6 +172,34 @@ void AmebaWiFiDriver::OnConnectWiFiNetwork()
     }
 }
 
+void AmebaWiFiDriver::OnConnectWiFiNetworkFailed(uint16_t reason)
+{
+    if (mpConnectCallback)
+    {
+        Status status;
+        switch (reason)
+        {
+        case RTW_NONE_NETWORK:
+            status = Status::kNetworkNotFound;
+            break;
+        case RTW_CONNECT_FAIL:
+#if defined(CONFIG_PLATFORM_8710C)
+        case RTW_4WAY_HANDSHAKE_TIMEOUT:
+#endif
+        case RTW_WRONG_PASSWORD:
+            status = Status::kAuthFailure;
+            break;
+        case RTW_DHCP_FAIL:
+        case RTW_UNKNOWN:
+        default:
+            status = Status::kUnknownError;
+            break;
+        }
+        mpConnectCallback->OnResult(status, CharSpan(), 0);
+        mpConnectCallback = nullptr;
+    }
+}
+
 void AmebaWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
@@ -189,9 +217,10 @@ exit:
     {
         networkingStatus = Status::kUnknownError;
     }
+
     if (networkingStatus != Status::kSuccess)
     {
-        ChipLogError(NetworkProvisioning, "Failed to connect to WiFi network:%s", chip::ErrorStr(err));
+        ChipLogError(NetworkProvisioning, "Failed to connect to WiFi network: %" CHIP_ERROR_FORMAT, err.Format());
         mpConnectCallback = nullptr;
         callback->OnResult(networkingStatus, CharSpan(), 0);
     }
@@ -201,11 +230,11 @@ CHIP_ERROR AmebaWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
 {
     if (!ssid.empty()) // ssid is given, only scan this network
     {
-        matter_scan_networks_with_ssid(ssid.data(), ssid.size());
+        matter_wifi_scan_networks_with_ssid(ssid.data(), ssid.size());
     }
     else // scan all networks
     {
-        matter_scan_networks();
+        matter_wifi_scan_networks();
     }
     return CHIP_NO_ERROR;
 }

@@ -31,11 +31,13 @@ chip_test_suite("tests") {
   output_name = "libSupportTests"
 
   test_sources = [
+    "TestAutoRelease.cpp",
     "TestBitMask.cpp",
     "TestBufferReader.cpp",
     "TestBufferWriter.cpp",
     "TestBytesCircularBuffer.cpp",
     "TestBytesToHex.cpp",
+    "TestCHIPArgParser.cpp",
     "TestCHIPCounter.cpp",
     "TestCHIPMem.cpp",
     "TestCHIPMemString.cpp",
@@ -50,6 +52,8 @@ chip_test_suite("tests") {
     "TestPersistedCounter.cpp",
     "TestPool.cpp",
     "TestPrivateHeap.cpp",
+    "TestReadOnlyBuffer.cpp",
+    "TestReferenceCountedPtr.cpp",
     "TestSafeInt.cpp",
     "TestSafeString.cpp",
     "TestScoped.cpp",
@@ -70,9 +74,6 @@ chip_test_suite("tests") {
     "TestVariant.cpp",
     "TestZclString.cpp",
   ]
-  if (current_os != "mbed") {
-    test_sources += [ "TestCHIPArgParser.cpp" ]
-  }
 
   sources = []
 
@@ -87,6 +88,7 @@ chip_test_suite("tests") {
   ]
 
   public_deps = [
+    "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/credentials",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:string-builder-adapters",

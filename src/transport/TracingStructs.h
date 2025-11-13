@@ -41,6 +41,7 @@ struct MessageSendInfo
     const PayloadHeader * payloadHeader;
     const PacketHeader * packetHeader;
     const chip::ByteSpan payload;
+    const size_t messageTotalSize;
 };
 
 enum class IncomingMessageType
@@ -59,6 +60,7 @@ struct MessageReceivedInfo
     const Transport::Session * session;
     const Transport::PeerAddress * peerAddress;
     const chip::ByteSpan payload;
+    const size_t messageTotalSize;
 };
 
 } // namespace Tracing

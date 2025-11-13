@@ -23,10 +23,11 @@
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::Clusters;
 
 static bool sEnabled = false;
 
-static void ProcessSwitchUnicastBindingCommand(CommandId commandId, const EmberBindingTableEntry & binding,
+static void ProcessSwitchUnicastBindingCommand(CommandId commandId, const Binding::TableEntry & binding,
                                                Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle,
                                                BindingCommandData * data)
 {
@@ -95,7 +96,7 @@ static void ProcessSwitchUnicastBindingCommand(CommandId commandId, const EmberB
     }
 }
 
-static void ProcessSwitchGroupBindingCommand(CommandId commandId, const EmberBindingTableEntry & binding, BindingCommandData * data)
+static void ProcessSwitchGroupBindingCommand(CommandId commandId, const Binding::TableEntry & binding, BindingCommandData * data)
 {
     Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
 
@@ -156,12 +157,12 @@ static void ProcessSwitchGroupBindingCommand(CommandId commandId, const EmberBin
     }
 }
 
-static void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, OperationalDeviceProxy * peer_device, void * context)
+static void LightSwitchChangedHandler(const Binding::TableEntry & binding, OperationalDeviceProxy * peer_device, void * context)
 {
     VerifyOrReturn(context != nullptr, ChipLogError(NotSpecified, "nullptr pointer passed"));
     BindingCommandData * data = static_cast<BindingCommandData *>(context);
 
-    if (binding.type == MATTER_MULTICAST_BINDING && data->isGroup)
+    if (binding.type == Binding::MATTER_MULTICAST_BINDING && data->isGroup)
     {
         switch (data->clusterId)
         {
@@ -172,7 +173,7 @@ static void LightSwitchChangedHandler(const EmberBindingTableEntry & binding, Op
             break;
         }
     }
-    else if (binding.type == MATTER_UNICAST_BINDING && !data->isGroup)
+    else if (binding.type == Binding::MATTER_UNICAST_BINDING && !data->isGroup)
     {
         switch (data->clusterId)
         {
@@ -202,17 +203,17 @@ static void LightSwitchContextReleaseHandler(void * context)
 
 void InitBindingManager(intptr_t context)
 {
-    auto & server                          = chip::Server::GetInstance();
-    BindingManagerInitParams bindingParams = { &server.GetFabricTable(), server.GetCASESessionManager(),
-                                               &server.GetPersistentStorage() };
-    CHIP_ERROR error                       = BindingManager::GetInstance().Init(bindingParams);
+    auto & server                            = chip::Server::GetInstance();
+    Binding::ManagerInitParams bindingParams = { &server.GetFabricTable(), server.GetCASESessionManager(),
+                                                 &server.GetPersistentStorage() };
+    CHIP_ERROR error                         = Binding::Manager::GetInstance().Init(bindingParams);
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "BindingManager initialization failed: %" CHIP_ERROR_FORMAT, error.Format());
         return;
     }
-    BindingManager::GetInstance().RegisterBoundDeviceChangedHandler(LightSwitchChangedHandler);
-    BindingManager::GetInstance().RegisterBoundDeviceContextReleaseHandler(LightSwitchContextReleaseHandler);
+    Binding::Manager::GetInstance().RegisterBoundDeviceChangedHandler(LightSwitchChangedHandler);
+    Binding::Manager::GetInstance().RegisterBoundDeviceContextReleaseHandler(LightSwitchContextReleaseHandler);
     sEnabled = true;
 }
 
@@ -228,5 +229,5 @@ void SwitchWorkerFunction(intptr_t context)
         Platform::Delete(data);
     }
 
-    BindingManager::GetInstance().NotifyBoundClusterChanged(data->localEndpointId, data->clusterId, static_cast<void *>(data));
+    Binding::Manager::GetInstance().NotifyBoundClusterChanged(data->localEndpointId, data->clusterId, static_cast<void *>(data));
 }

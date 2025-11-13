@@ -58,6 +58,9 @@ declare_args() {
 
   # Enable or disable support for C++ exceptions.
   enable_exceptions = false
+
+  # Disable this to allow for overriding built-in defines, such as __FILE__.
+  warn_builtin_macro_redefined = true
 }
 
 if (current_cpu == "arm" || current_cpu == "arm64") {
@@ -240,6 +243,9 @@ config("disabled_warnings") {
       "-Wno-maybe-uninitialized",
     ]
   }
+  if (!warn_builtin_macro_redefined) {
+    cflags += [ "-Wno-builtin-macro-redefined" ]
+  }
 }
 
 config("warnings_common") {
@@ -288,7 +294,7 @@ config("strict_warnings") {
   # we can.  Ideally this would be checking chip_device_platform or so
   # to be more fine-grained than current_os, but it's not clear that
   # we can access that here.
-  if (current_os != "freertos" && current_os != "mbed" &&
+  if (current_os != "freertos" &&
       # cmsis-rtos is OpenIOT
       current_os != "cmsis-rtos" &&
       # cyw30739 is one of the Infineon builds
@@ -411,6 +417,26 @@ config("runtime_default") {
   if (sysroot != "") {
     cflags += [ "--sysroot=${sysroot}" ]
     ldflags += [ "--sysroot=${sysroot}" ]
+
+    if (is_clang && current_os == "linux" &&
+        (current_cpu == "arm" || current_cpu == "arm64")) {
+      # The sysroot for linux-arm* targets contains an incompatible libunwind that
+      # conflicts with the one from the LLVM toolchain.
+      #
+      # To solve this, we provide the direct path to the correct libunwind.a
+      # from the pigweed toolchain. This forces the linker to use this exact
+      # file, completely bypassing any library search paths for libunwind.
+
+      if (current_cpu == "arm64") {
+        ldflags += [ rebase_path(
+                "$pw_env_setup_CIPD_PIGWEED/lib/aarch64-unknown-linux-gnu/libunwind.a",
+                root_build_dir) ]
+      } else {  # arm
+        ldflags += [ rebase_path(
+                "$pw_env_setup_CIPD_PIGWEED/lib/armv7-unknown-linux-gnueabihf/libunwind.a",
+                root_build_dir) ]
+      }
+    }
   }
 
   cflags += runtime_library_cflags
@@ -530,8 +556,28 @@ config("fuzzing_default") {
 }
 
 config("coverage") {
-  cflags = [ "--coverage" ]
+  if (is_clang) {
+    cflags = [
+      # CLANG builds use the clang-specific coverage, so that versions of lcov/gcov
+      # do not have to match and `llvm-cov export -format=lcov` can be used
+      #
+      # Documentation: https://clang.llvm.org/docs/SourceBasedCodeCoverage.html
+      "-fprofile-instr-generate",
+      "-fcoverage-mapping",
+    ]
+  } else {
+    cflags = [ "--coverage" ]
+  }
   ldflags = cflags
+
+  if (is_clang) {
+    # Looking to add buildid which _could_ be used for coverage
+    # file format using `%b` (see
+    # https://clang.llvm.org/docs/SourceBasedCodeCoverage.html#running-the-instrumented-program)
+    # however at the time of writing this, linux clang used during bootstrap
+    # does not seem to support this.
+    ldflags += [ "-Wl,--build-id" ]
+  }
 }
 
 config("coverage_default") {
@@ -643,5 +689,18 @@ config("specs_default") {
     libs = [ "nosys" ]
 
     ldflags = cflags
+  }
+}
+
+config("link_as_needed") {
+  # ld64.lld on clang used by Apple does not have a --as-needed option
+  if (current_os != "mac" && current_os != "ios") {
+    ldflags = [ "-Wl,--as-needed" ]
+  }
+}
+
+config("arc_default") {
+  if (current_os == "mac" || current_os == "ios") {
+    cflags = [ "-fobjc-arc" ]
   }
 }

@@ -20,13 +20,12 @@ import logging
 import multiprocessing
 import os
 import os.path
+import shlex
 import shutil
 import subprocess
 import sys
 import tempfile
 import time
-import traceback
-import urllib.request
 from dataclasses import dataclass
 from enum import Flag, auto
 from pathlib import Path
@@ -209,7 +208,7 @@ class ZAPGenerateTarget:
         """Runs a ZAP generate command on the configured zap/template/outputs.
         """
         cmd = self.build_cmd()
-        logging.info("Generating target: %s" % " ".join(cmd))
+        logging.info("Generating target: %s" % shlex.join(cmd))
 
         generate_start = time.time()
         subprocess.check_call(cmd)
@@ -278,42 +277,10 @@ class JinjaCodegenTarget():
         self.command = ["./scripts/codegen.py", "--output-dir", output_directory,
                         "--generator", generator, idl_path]
 
-    def formatKotlinFiles(self, paths):
-        try:
-            logging.info("Prettifying %d kotlin files:", len(paths))
-            for name in paths:
-                logging.info("    %s" % name)
-
-            VERSION = "0.51"
-            JAR_NAME = f"ktfmt-{VERSION}-jar-with-dependencies.jar"
-            jar_url = f"https://repo1.maven.org/maven2/com/facebook/ktfmt/{VERSION}/{JAR_NAME}"
-
-            with tempfile.TemporaryDirectory(prefix='ktfmt') as tmpdir:
-                path, http_message = urllib.request.urlretrieve(jar_url, Path(tmpdir).joinpath(JAR_NAME).as_posix())
-                subprocess.check_call(['java', '-jar', path, '--google-style'] + paths)
-        except Exception:
-            traceback.print_exc()
-
-    def codeFormat(self):
-        outputs = subprocess.check_output(["./scripts/codegen.py", "--name-only", "--generator",
-                                           self.generator, "--log-level", "fatal", self.idl_path]).decode("utf8").split("\n")
-        outputs = [os.path.join(self.output_directory, name) for name in outputs if name]
-
-        # Split output files by extension,
-        name_dict = {}
-        for name in outputs:
-            _, extension = os.path.splitext(name)
-            name_dict[extension] = name_dict.get(extension, []) + [name]
-
-        if '.kt' in name_dict:
-            self.formatKotlinFiles(name_dict['.kt'])
-
     def generate(self) -> TargetRunStats:
         generate_start = time.time()
 
         subprocess.check_call(self.command)
-
-        self.codeFormat()
 
         generate_end = time.time()
 
@@ -361,8 +328,7 @@ def setupArgumentsParser():
         args.type = TargetType.ALL  # default instead of a list
     else:
         # convert the list into a single flag value
-        types = [t for t in map(lambda x: __TARGET_TYPES__[
-                                x.lower()], args.type)]
+        types = [__TARGET_TYPES__[x.lower()] for x in args.type]
         args.type = types[0]
         for t in types:
             args.type = args.type | t
@@ -415,6 +381,11 @@ def getCodegenTemplates():
         generator="summary-markdown",
         idl_path="src/controller/data_model/controller-clusters.matter",
         output_directory="docs/ids_and_codes"))
+
+    targets.append(JinjaCodegenTarget(
+        generator="cpp-sdk",
+        idl_path="src/controller/data_model/controller-clusters.matter",
+        output_directory="zzz_generated/app-common/clusters"))
 
     return targets
 

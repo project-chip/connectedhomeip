@@ -47,7 +47,7 @@ jobs:
                     - "-minimal"
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Build & Push images using project bash script
               if: ${{ inputs.push_images == true }}
               run: |
@@ -58,11 +58,21 @@ jobs:
               run: |
                   cd integrations/docker/images/base/chip-build${{ matrix.img }}
                   ./build.sh --latest
+
+    # NOTE: docker images builds are disabled for all beyond base image because
+    #       underlying image builds fail either due to size restrictions (we only
+    #       have a few GB in github: 14GB for everything) or dependencies which
+    #       result in a "cannot find package" error.
+    #
+    # Until the above is fixed, we do not try to build things so we do not train
+    # developers to ignore CI failures.
+    #
+    # See https://github.com/project-chip/connectedhomeip/issues/30750
     build_images_stage_1:
         needs: [build_images_base]
         name: Build Docker CHIP Build images - stage 1
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
+        if: github.actor != 'restyled-io[bot]' && false
         strategy:
             fail-fast: false
             matrix:
@@ -70,7 +80,7 @@ jobs:
                     - "-crosscompile"
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Build & Push images using project bash script
               if: ${{ inputs.push_images == true }}
               run: |
@@ -85,7 +95,7 @@ jobs:
         needs: [build_images_base, build_images_stage_1]
         name: Build Docker CHIP Build images - stage 2
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
+        if: github.actor != 'restyled-io[bot]' && false
         strategy:
             fail-fast: false
             matrix:
@@ -104,13 +114,14 @@ jobs:
                     - "-nxp"
                     - "-nxp-zephyr"
                     - "-nrf-platform"
+                    - "-realtek-zephyr"
                     - "-telink"
+                    - "-telink-zephyr_3_3"
                     - "-ti"
                     - "-tizen"
-                    - "-openiotsdk"
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Build & Push images using project bash script
               if: ${{ inputs.push_images == true }}
               run: |
@@ -126,7 +137,7 @@ jobs:
         needs: [build_images_base, build_images_stage_1, build_images_stage_2]
         name: Build Docker CHIP Build images - stage 3
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
+        if: github.actor != 'restyled-io[bot]' && false
         strategy:
             fail-fast: false
             matrix:
@@ -136,7 +147,7 @@ jobs:
                     - "-tizen-qemu"
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Build & Push images using project bash script
               if: ${{ inputs.push_images == true }}
               run: |
@@ -159,7 +170,7 @@ jobs:
                     - "-vscode"
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Build & Push images using project bash script
               if: ${{ inputs.push_images == true }}
               run: |

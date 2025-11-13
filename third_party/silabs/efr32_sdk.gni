@@ -19,14 +19,13 @@ import("//build_overrides/mbedtls.gni")
 
 import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/lib/lib.gni")
+import("${chip_root}/src/platform/silabs/multi-ota/args.gni")
 import("silabs_board.gni")
 
 declare_args() {
   # Location of the efr32 SDK.
   efr32_sdk_root = "${chip_root}/third_party/silabs/simplicity_sdk"
-  sdk_support_root = "${chip_root}/third_party/silabs/matter_support"
-  wiseconnect_sdk_root =
-      "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
+  matter_support_root = "${chip_root}/third_party/silabs/matter_support"
   wifi_sdk_root = "${chip_root}/third_party/silabs/wifi_sdk"
 
   # Build openthread with prebuilt silabs lib
@@ -36,11 +35,15 @@ declare_args() {
   use_thread_coap_lib = false
 
   # enable by default for thread/non-wifi-ncp builds
-  enable_openthread_cli = !(use_rs9116 || use_wf200 || use_SiWx917)
-  kvs_max_entries = 255
-  sl_nvm3_max_object_size = 4092
+  enable_openthread_cli = !(use_wf200 || use_SiWx917)
+
+  # Max KVS entry counts. Its the current maximal value we support.
+  kvs_max_entries = 511
+  sl_nvm3_max_object_size = 1024
   sl_nvm3_nvm_size = 40960
-  sl_nvm3_cache_size = 200
+
+  # NVM3 cache size. A cache size >= total object count is recommended.
+  sl_nvm3_cache_size = 600
 
   # Use Silabs factory data provider example.
   # Users can implement their own.
@@ -81,16 +84,15 @@ declare_args() {
   # Use SLC generated files
   slc_reuse_files = false
 
-  # Multi-chip OTA
-  chip_enable_multi_ota_requestor = false
-  chip_enable_multi_ota_encryption = false
-  chip_enable_ota_custom_tlv_testing = false
-
   # Factory Provision storage
   use_provision_flash_storage = wifi_soc
 
   # Enable TestEventTrigger in GeneralDiagnostics cluster
   sl_enable_test_event_trigger = false
+
+  sl_verbose_mode = false
+
+  sl_em4_sleep = false
 }
 
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
@@ -103,10 +105,6 @@ is_series_2 = silabs_family == "mgm24" || silabs_family == "efr32mg24" ||
 
 assert(efr32_sdk_root != "", "efr32_sdk_root must be specified")
 
-if (use_rs9116) {
-  assert(wiseconnect_sdk_root != "", "wiseconnect_sdk_root must be specified")
-}
-
 if (use_SiWx917) {
   assert(wifi_sdk_root != "", "wifi_sdk_root must be specified")
 }
@@ -117,8 +115,7 @@ declare_args() {
       "${efr32_sdk_root}/protocol/openthread/platform-abstraction"
 
   # board related pre-generated files path (default)
-  sl_pre_gen_path =
-      "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/"
+  sl_pre_gen_path = "${matter_support_root}/board-support/efr32/${silabs_family}/${silabs_board}/"
 
   # board related generated files path (used if slc_generate or slc_reuse_files is set)
   slc_gen_path = "${chip_root}/third_party/silabs/slc_gen/${silabs_board}/"
@@ -131,7 +128,10 @@ declare_args() {
 if (slc_generate || slc_reuse_files) {
   silabs_gen_folder = slc_gen_path
 } else {
-  print("Using pre-generate files")
+  if (!chip_build_all_platform_tests) {
+    # We can't print to the console when running our tests in the CSA CI otherwise CI fails.
+    print("Using pre-generate files")
+  }
   silabs_gen_folder = sl_pre_gen_path
 }
 
@@ -173,14 +173,17 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/bootloader",
       "${efr32_sdk_root}/platform/bootloader/config",
       "${efr32_sdk_root}/platform/bootloader/config/btl_interface",
+      "${efr32_sdk_root}/platform/bootloader/core/flash",
       "${efr32_sdk_root}/platform/bootloader/api",
       "${efr32_sdk_root}/platform/CMSIS/Core/Include",
       "${efr32_sdk_root}/platform/CMSIS/RTOS2/Include",
       "${efr32_sdk_root}/platform/common/inc",
       "${efr32_sdk_root}/platform/driver/debug/inc",
+      "${efr32_sdk_root}/platform/driver/gpio/inc",
       "${efr32_sdk_root}/platform/emdrv/common/inc",
       "${efr32_sdk_root}/platform/emdrv/gpiointerrupt/inc",
       "${efr32_sdk_root}/platform/emdrv/dmadrv/inc",
+      "${efr32_sdk_root}/platform/emdrv/nvm3/config",
       "${efr32_sdk_root}/platform/emdrv/nvm3/inc",
       "${efr32_sdk_root}/platform/emlib/inc",
       "${efr32_sdk_root}/platform/halconfig/inc/hal-config",
@@ -192,13 +195,15 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions",
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_pti",
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_power_manager_init",
+      "${efr32_sdk_root}/platform/security/sl_component/se_manager/inc",
+      "${efr32_sdk_root}/platform/security/sl_component/se_manager/src/",
       "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/config/",
       "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/config/preset",
       "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/inc",
       "${efr32_sdk_root}/platform/security/sl_component/sl_protocol_crypto/src",
       "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/inc",
-      "${efr32_sdk_root}/platform/security/sl_component/se_manager/inc",
-      "${efr32_sdk_root}/platform/security/sl_component/se_manager/src/",
+      "${efr32_sdk_root}/platform/security/sl_component/sli_crypto/inc",
+      "${efr32_sdk_root}/platform/security/sl_component/sli_psec_osal/inc",
       "${efr32_sdk_root}/platform/service/clock_manager/inc",
       "${efr32_sdk_root}/platform/service/device_init/inc",
       "${efr32_sdk_root}/platform/service/device_manager/inc",
@@ -206,6 +211,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/service/hfxo_manager/src",
       "${efr32_sdk_root}/platform/service/interrupt_manager/inc/",
       "${efr32_sdk_root}/platform/service/interrupt_manager/inc/arm/",
+      "${efr32_sdk_root}/platform/service/interrupt_manager/src",
       "${efr32_sdk_root}/platform/service/iostream/inc",
       "${efr32_sdk_root}/platform/service/memory_manager/inc",
       "${efr32_sdk_root}/platform/service/memory_manager/src",
@@ -213,9 +219,11 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/service/memory_manager/profiler/config",
       "${efr32_sdk_root}/platform/service/mpu/inc",
       "${efr32_sdk_root}/platform/service/power_manager/inc/",
-      "${efr32_sdk_root}/platform/service/power_manager/src/",
+      "${efr32_sdk_root}/platform/service/power_manager/src/common/",
+      "${efr32_sdk_root}/platform/service/power_manager/src/sleep_loop/",
+      "${efr32_sdk_root}/platform/service/sl_main/inc",
+      "${efr32_sdk_root}/platform/service/sl_main/src",
       "${efr32_sdk_root}/platform/service/sleeptimer/inc",
-      "${efr32_sdk_root}/platform/service/system/inc",
       "${efr32_sdk_root}/platform/service/udelay/inc",
       "${efr32_sdk_root}/platform/service/legacy_hal/inc",
       "${efr32_sdk_root}/platform/middleware/glib",
@@ -239,9 +247,10 @@ template("efr32_sdk") {
       "${sl_ot_platform_abstraction}/rtos",
       "${efr32_sdk_root}/protocol/openthread/include",
       "${efr32_sdk_root}/util/third_party/openthread/include",
+      "${efr32_sdk_root}/util/third_party/openthread/src/include",
       "${efr32_sdk_root}/util/third_party/openthread/src/core",
       "${efr32_sdk_root}/util/third_party/openthread/examples/platforms/",
-      "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/config",
+      "${matter_support_root}/board-support/efr32/${silabs_family}/${silabs_board}/config",
 
       # Headers needed for Init no function will be called if OT is not used
       "${sl_ot_efr32_root}",
@@ -258,16 +267,25 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure",
       ]
 
-      libs += [
-        "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM33_gcc.a",
-        "${sdk_support_root}/protocol/openthread/libs/libsl_openthread_efr32mg2x_gcc.a",
-      ]
+      libs += [ "${matter_support_root}/sdk-copies/protocol/openthread/libs/libsl_openthread_cm33_gcc.a" ]
 
       if (!chip_enable_ble_rs911x) {
         libs += [
-          "${sdk_support_root}/protocol/bluetooth/bgcommon/lib/build/gcc/cortex-m33/bgcommon/release/libbgcommon.a",
-          "${sdk_support_root}/protocol/bluetooth/build/gcc/cortex-m33/bt_host/release/libbt_host.a",
-          "${sdk_support_root}/protocol/bluetooth/build/gcc/cortex-m33/bt_host/hal/release/libbt_hal_series2.a",
+          "${matter_support_root}/sdk-copies/protocol/bluetooth/bgcommon/lib/build/gcc/cortex-m33/bgcommon/release/libbgcommon.a",
+          "${matter_support_root}/sdk-copies/protocol/bluetooth/bgstack/ll/build/gcc/xg24/release/liblinklayer.a",
+          "${matter_support_root}/sdk-copies/protocol/bluetooth/build/gcc/cortex-m33/ble_host/ble_bgapi/release/libble_bgapi_gatt_server.a",
+          "${matter_support_root}/sdk-copies/protocol/bluetooth/build/gcc/cortex-m33/bgapi_protocol/api3/release/libbgapi_core.a",
+          "${matter_support_root}/sdk-copies/protocol/bluetooth/build/gcc/cortex-m33/ble_host/accept_list/release/libble_host_accept_list_stub.a",
+          "${matter_support_root}/sdk-copies/protocol/bluetooth/build/gcc/cortex-m33/ble_host/bgstack/release/libble_host.a",
+          "${matter_support_root}/sdk-copies/protocol/bluetooth/build/gcc/cortex-m33/ble_host/bgstack/release/libbondingdb_stub.a",
+          "${matter_support_root}/sdk-copies/protocol/bluetooth/build/gcc/cortex-m33/ble_host/ble_bgapi/release/libble_bgapi.a",
+          "${matter_support_root}/sdk-copies/protocol/bluetooth/build/gcc/cortex-m33/ble_host/ble_bgapi/release/libble_bgapi_stub_gatt_client.a",
+          "${matter_support_root}/sdk-copies/protocol/bluetooth/build/gcc/cortex-m33/ble_host/ble_system/release/libble_system.a",
+          "${matter_support_root}/sdk-copies/protocol/bluetooth/build/gcc/cortex-m33/ble_host/connection_subrating/release/libble_host_connection_subrating_stub.a",
+          "${matter_support_root}/sdk-copies/protocol/bluetooth/build/gcc/cortex-m33/ble_host/core/release/libble_host_core.a",
+          "${matter_support_root}/sdk-copies/protocol/bluetooth/build/gcc/cortex-m33/ble_host/hal/release/libble_host_hal_series2.a",
+          "${matter_support_root}/sdk-copies/protocol/bluetooth/build/gcc/cortex-m33/ble_host/hci/release/libble_host_hci.a",
+          "${matter_support_root}/sdk-copies/protocol/bluetooth/build/gcc/cortex-m33/ble_host/system/release/libble_host_system.a",
         ]
       }
     }
@@ -281,10 +299,10 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/emdrv/spidrv/config",
       ]
 
-      libs += [ "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg24_gcc_release.a" ]
+      libs += [ "${matter_support_root}/sdk-copies/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg24_gcc_release.a" ]
 
       if (!chip_enable_ble_rs911x) {
-        libs += [ "${sdk_support_root}/protocol/bluetooth/bgstack/ll/lib/libbluetooth_controller_efr32xg24_gcc_release.a" ]
+        libs += [ "${matter_support_root}/sdk-copies/protocol/bluetooth/bgstack/ll/build/gcc/xg24/release/liblinklayer.a" ]
       }
 
       defines += [ "EFR32MG24" ]
@@ -296,18 +314,18 @@ template("efr32_sdk") {
       ]
 
       libs += [
-        "${sdk_support_root}/protocol/bluetooth/bgstack/ll/lib/libbluetooth_controller_efr32xg24_gcc_release.a",
-        "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_module_efr32xg24_gcc_release.a",
+        "${matter_support_root}/sdk-copies/protocol/bluetooth/bgstack/ll/build/gcc/xg24/release/liblinklayer.a",
+        "${matter_support_root}/sdk-copies/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_module_efr32xg24_gcc_release.a",
       ]
 
       if (silabs_mcu == "MGM240PB32VNA") {
-        libs += [ "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_config_mgm240pb32vna_gcc.a" ]
+        libs += [ "${matter_support_root}/sdk-copies/platform/radio/rail_lib/autogen/librail_release/librail_config_mgm240pb32vna_gcc.a" ]
       } else if (silabs_mcu == "MGM240PB22VNA") {
-        libs += [ "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_config_mgm240pb22vna_gcc.a" ]
+        libs += [ "${matter_support_root}/sdk-copies/platform/radio/rail_lib/autogen/librail_release/librail_config_mgm240pb22vna_gcc.a" ]
       } else if (silabs_mcu == "MGM240L022RNF") {
-        libs += [ "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_config_mgm240l022rnf_gcc.a" ]
+        libs += [ "${matter_support_root}/sdk-copies/platform/radio/rail_lib/autogen/librail_release/librail_config_mgm240l022rnf_gcc.a" ]
       } else if (silabs_mcu == "MGM240SD22VNA") {
-        libs += [ "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_config_mgm240sd22vna_gcc.a" ]
+        libs += [ "${matter_support_root}/sdk-copies/platform/radio/rail_lib/autogen/librail_release/librail_config_mgm240sd22vna_gcc.a" ]
         defines += [ "SLI_RADIOAES_REQUIRES_MASKING=1" ]
       }
 
@@ -320,8 +338,8 @@ template("efr32_sdk") {
       ]
 
       libs += [
-        "${sdk_support_root}/protocol/bluetooth/bgstack/ll/lib/libbluetooth_controller_efr32xg26_gcc_release.a",
-        "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg26_gcc_release.a",
+        "${matter_support_root}/sdk-copies/protocol/bluetooth/bgstack/ll/build/gcc/xg26/release/liblinklayer.a",
+        "${matter_support_root}/sdk-copies/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg26_gcc_release.a",
       ]
 
       defines += [ "EFR32MG26" ]
@@ -352,6 +370,7 @@ template("efr32_sdk") {
 
         # wifi component
         "${wifi_sdk_root}/components/protocol/wifi/inc",
+        "${wifi_sdk_root}/components/sli_wifi_command_engine/inc",
 
         # si91x_support component
         "${wifi_sdk_root}/components/si91x_support/inc",
@@ -365,19 +384,15 @@ template("efr32_sdk") {
         "${wifi_sdk_root}/components/service/network_manager/inc",
 
         "${wifi_sdk_root}/components/protocol/wifi/si91x",
+        "${wifi_sdk_root}/components/device/silabs/si91x/wireless/firmware_upgrade",
       ]
     }
 
-    if (use_rs9116) {
-      # TODO: we should create a seperate directory for headers that are necessary for the underlying sdks
-      _include_dirs += [ "${chip_root}/src/platform/silabs/wifi/rs911x/ncp" ]
-    }
-
-    if (use_rs9116 || use_SiWx917) {
+    if (use_SiWx917) {
       _include_dirs += [ "${chip_root}/src/platform/silabs/rs911x" ]
     }
 
-    if (use_wf200 || use_rs9116 || use_SiWx917) {
+    if (use_wf200 || use_SiWx917) {
       _include_dirs += [ "${chip_root}/src/platform/silabs/wifi" ]
     }
 
@@ -389,13 +404,8 @@ template("efr32_sdk") {
     }
 
     if (chip_enable_ble_rs911x) {
-      if (use_rs9116) {
-        _include_dirs += [ "${wiseconnect_sdk_root}/sapi/include" ]
-      } else {
-        _include_dirs += [
-          "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc",
-        ]
-      }
+      _include_dirs +=
+          [ "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc" ]
     }
 
     if (use_system_view) {
@@ -421,7 +431,7 @@ template("efr32_sdk") {
       _include_dirs += [ "${efr32_sdk_root}/platform/driver/button/inc" ]
     }
 
-    if (invoker.enable_dic) {
+    if (invoker.enable_matter_aws) {
       _include_dirs += [ "${chip_root}/third_party/silabs/mqtt/stack" ]
     }
 
@@ -478,6 +488,11 @@ template("efr32_sdk") {
       "SL_OPENTHREAD_STACK_FEATURES_CONFIG_FILE=\"sl_openthread_features_config.h\"",
       "SL_CSL_TIMEOUT=${sl_ot_csl_timeout_sec}",
       "CIRCULAR_QUEUE_USE_LOCAL_CONFIG_HEADER=1",
+      "SL_RAIL_3_API=1",
+      "SL_CODE_COMPONENT_OPENTHREAD=openthread",
+      "SL_CODE_COMPONENT_INTERRUPT_MANAGER=interrupt_manager",
+      "SL_APP_PROPERTIES",
+      "SL_MATTER_EM4_SLEEP=${sl_em4_sleep}",
     ]
 
     if (silabs_log_enabled && chip_logging) {
@@ -541,44 +556,30 @@ template("efr32_sdk") {
       ]
     }
 
-    if (chip_enable_multi_ota_encryption && chip_enable_multi_ota_requestor) {
-      defines += [ "OTA_ENCRYPTION_ENABLE=1" ]
-    }
-
-    if (chip_enable_ota_custom_tlv_testing && chip_enable_multi_ota_requestor) {
-      defines += [ "OTA_TEST_CUSTOM_TLVS=1" ]
-    }
-
     if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
-      if (enable_dic) {
+      if (enable_matter_aws) {
         assert(chip_enable_wifi_ipv4, "enable chip_enable_wifi_ipv4")
-        defines += [ "DIC_ENABLE=1" ]
+        defines += [ "SL_MATTER_ENABLE_AWS=1" ]
       }
       if (aws_sdk_ota) {
-        defines += [ "ENABLE_AWS_OTA_FEAT=1" ]
+        defines += [ "SL_MATTER_ENABLE_AWS_OTA_FEAT=1" ]
       }
       if (chip_enable_wifi_ipv4) {
         defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4=1" ]
       }
-      if (use_rs9116 || use_SiWx917) {
+      if (use_SiWx917) {
         defines += [
           "SL_HEAP_SIZE=32768",
           "SL_WIFI=1",
-          "SL_WFX_USE_SPI",
-          "EFX32_RS911X=1",
           "RS911X_WIFI",
           "RSI_WLAN_ENABLE",
           "RSI_SPI_INTERFACE",
-          "RSI_WITH_OS",
-        ]
-      }
-      if (use_SiWx917) {
-        defines += [
           "EXP_BOARD=1",
           "CHIP_917",
           "SLI_SI917=1",
           "CHIP_9117",
           "SL_WIFI_COMPONENT_INCLUDED",
+          "SLI_SI91X_LWIP_HOSTED_NETWORK_STACK",
         ]
       } else if (use_wf200) {
         defines += [
@@ -590,31 +591,15 @@ template("efr32_sdk") {
         ]
       }
 
-      if (use_wf200 || use_rs9116 || use_SiWx917) {
+      if (wifi_ncp_module) {
+        defines += [
+          "USE_BYPASS_CLOCK=1",
+          "SL_SI91X_ACX_MODULE=1",
+        ]
+      }
+
+      if (use_wf200 || use_SiWx917) {
         import("${chip_root}/src/platform/silabs/wifi/args.gni")
-
-        defines += [ "LWIP_NETIF_API=1" ]
-        if (chip_enable_wifi_ipv4) {
-          defines += [
-            "LWIP_IPV4=1",
-
-            # adds following options to provide
-            # them to .cpp source files
-            # flags ported from lwipopts file
-            # TODO: move lwipopts to one location
-            "LWIP_ARP=1",
-            "LWIP_ICMP=1",
-            "LWIP_IGMP=1",
-            "LWIP_DHCP=1",
-          ]
-        } else {
-          defines += [ "LWIP_IPV4=0" ]
-        }
-        if (lwip_ipv6) {
-          defines += [ "LWIP_IPV6=1" ]
-        } else {
-          defines += [ "LWIP_IPV6=0" ]
-        }
       }
     }
 
@@ -672,6 +657,10 @@ template("efr32_sdk") {
       ]
     }
 
+    if (sl_verbose_mode) {
+      defines += [ "VERBOSE_MODE=1" ]
+    }
+
     if (sl_use_subscription_syncing) {
       defines += [ "CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED=1" ]
     }
@@ -719,17 +708,26 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/CMSIS/RTOS2/Source/os_systick.c",
       "${efr32_sdk_root}/platform/bootloader/api/btl_interface.c",
       "${efr32_sdk_root}/platform/bootloader/api/btl_interface_storage.c",
+      "${efr32_sdk_root}/platform/bootloader/app_properties/app_properties.c",
+      "${efr32_sdk_root}/platform/bootloader/core/flash/btl_internal_flash.c",
       "${efr32_sdk_root}/platform/bootloader/security/sha/crypto_sha.c",
       "${efr32_sdk_root}/platform/common/src/sl_core_cortexm.c",
       "${efr32_sdk_root}/platform/common/src/sl_slist.c",
+      "${efr32_sdk_root}/platform/common/src/sl_string.c",
       "${efr32_sdk_root}/platform/common/src/sli_cmsis_os2_ext_task_register.c",
+      "${efr32_sdk_root}/platform/driver/gpio/src/sl_gpio.c",
       "${efr32_sdk_root}/platform/emdrv/dmadrv/src/dmadrv.c",
       "${efr32_sdk_root}/platform/emdrv/gpiointerrupt/src/gpiointerrupt.c",
-      "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_default.c",
+      "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3.c",
+      "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_cache.c",
+      "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_default_common_linker.c",
       "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_hal_flash.c",
       "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_lock.c",
+      "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_object.c",
+      "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_page.c",
+      "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_utils.c",
+      "${efr32_sdk_root}/platform/emlib/src/em_burtc.c",
       "${efr32_sdk_root}/platform/emlib/src/em_cmu.c",
-      "${efr32_sdk_root}/platform/emlib/src/em_core.c",
       "${efr32_sdk_root}/platform/emlib/src/em_crypto.c",
       "${efr32_sdk_root}/platform/emlib/src/em_emu.c",
       "${efr32_sdk_root}/platform/emlib/src/em_gpio.c",
@@ -737,11 +735,11 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/emlib/src/em_msc.c",
       "${efr32_sdk_root}/platform/emlib/src/em_prs.c",
       "${efr32_sdk_root}/platform/emlib/src/em_rmu.c",
-      "${efr32_sdk_root}/platform/emlib/src/em_rtcc.c",
-      "${efr32_sdk_root}/platform/emlib/src/em_se.c",
       "${efr32_sdk_root}/platform/emlib/src/em_system.c",
       "${efr32_sdk_root}/platform/emlib/src/em_timer.c",
+      "${efr32_sdk_root}/platform/peripheral/src/sl_hal_gpio.c",
       "${efr32_sdk_root}/platform/peripheral/src/sl_hal_sysrtc.c",
+      "${efr32_sdk_root}/platform/peripheral/src/sl_hal_system.c",
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/pa_conversions_efr32.c",
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_power_manager_init/sl_rail_util_power_manager_init.c",
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_pti/sl_rail_util_pti.c",
@@ -761,6 +759,8 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_se_driver_builtin_keys.c",
       "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_se_driver_signature.c",
       "${efr32_sdk_root}/platform/security/sl_component/sl_psa_driver/src/sli_se_version_dependencies.c",
+      "${efr32_sdk_root}/platform/security/sl_component/sli_crypto/src/sl_crypto_s2.c",
+      "${efr32_sdk_root}/platform/security/sl_component/sli_psec_osal/src/sli_psec_osal_cmsis_rtos2.c",
       "${efr32_sdk_root}/platform/service/clock_manager/src/sl_clock_manager.c",
       "${efr32_sdk_root}/platform/service/clock_manager/src/sl_clock_manager_init.c",
       "${efr32_sdk_root}/platform/service/device_manager/src/sl_device_clock.c",
@@ -777,13 +777,17 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/service/memory_manager/src/sl_memory_manager_region.c",
       "${efr32_sdk_root}/platform/service/memory_manager/src/sl_memory_manager_retarget.c",
       "${efr32_sdk_root}/platform/service/memory_manager/src/sli_memory_manager_common.c",
-      "${efr32_sdk_root}/platform/service/mpu/src/sl_mpu.c",
-      "${efr32_sdk_root}/platform/service/power_manager/src/sl_power_manager.c",
-      "${efr32_sdk_root}/platform/service/power_manager/src/sl_power_manager_debug.c",
+      "${efr32_sdk_root}/platform/service/power_manager/src/common/sl_power_manager_common.c",
+      "${efr32_sdk_root}/platform/service/power_manager/src/common/sl_power_manager_em4.c",
+      "${efr32_sdk_root}/platform/service/power_manager/src/common/sl_power_manager_execution_modes.c",
+      "${efr32_sdk_root}/platform/service/power_manager/src/sleep_loop/sl_power_manager.c",
+      "${efr32_sdk_root}/platform/service/power_manager/src/sleep_loop/sl_power_manager_debug.c",
+      "${efr32_sdk_root}/platform/service/sl_main/src/rtos/main_retarget.c",
+      "${efr32_sdk_root}/platform/service/sl_main/src/sl_main_init.c",
+      "${efr32_sdk_root}/platform/service/sl_main/src/sl_main_init_memory.c",
+      "${efr32_sdk_root}/platform/service/sl_main/src/sl_main_kernel.c",
       "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer.c",
       "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer_hal_rtcc.c",
-      "${efr32_sdk_root}/platform/service/system/src/sl_system_init.c",
-      "${efr32_sdk_root}/platform/service/system/src/sl_system_kernel.c",
       "${efr32_sdk_root}/platform/service/udelay/src/sl_udelay.c",
       "${efr32_sdk_root}/platform/service/udelay/src/sl_udelay_armv6m_gcc.S",
       "${efr32_sdk_root}/util/plugin/security_manager/security_manager.c",
@@ -793,7 +797,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/freertos/kernel/event_groups.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/list.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/MemMang/heap_3.c",
-      "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/SiliconLabs/tick_power_manager.c",
+      "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/SiliconLabs/cortexm/tick_power_manager.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/queue.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/stream_buffer.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/tasks.c",
@@ -820,6 +824,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/mbedtls/library/oid.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/pem.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/pk.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/pk_ecc.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/pk_wrap.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/pkcs5.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/pkparse.c",
@@ -861,8 +866,16 @@ template("efr32_sdk") {
       "${silabs_gen_folder}/autogen/sl_board_default_init.c",
       "${silabs_gen_folder}/autogen/sl_event_handler.c",
       "${silabs_gen_folder}/autogen/sl_iostream_handles.c",
+      "${silabs_gen_folder}/main.c",
     ]
-    if (enable_dic) {
+
+    if (chip_enable_multi_ota_requestor) {
+      if (use_SiWx917) {
+        sources += [ "${wifi_sdk_root}/components/device/silabs/si91x/wireless/firmware_upgrade/firmware_upgradation.c" ]
+      }
+    }
+
+    if (enable_matter_aws) {
       sources += [
         "${chip_root}/third_party/silabs/mqtt/stack/mqtt.c",
         "${efr32_sdk_root}/util/third_party/mbedtls/library/ctr_drbg.c",
@@ -891,26 +904,19 @@ template("efr32_sdk") {
     }
 
     if (chip_enable_ble_rs911x) {
-      if (use_rs9116) {
-        sources += [
-          "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_ble_gap_apis.c",
-          "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_ble_gatt_apis.c",
-          "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_bt_common_apis.c",
-          "${wiseconnect_sdk_root}/sapi/driver/rsi_bt_ble.c",
-        ]
-      } else {
-        sources += [
-          "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_ble_gap_apis.c",
-          "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_ble_gatt_apis.c",
-          "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_bt_ble.c",
-          "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_bt_common_apis.c",
-          "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_common_apis.c",
-          "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_utils.c",
-          "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/sl_si91x_ble.c",
-        ]
-      }
+      sources += [
+        "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_ble_gap_apis.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_ble_gatt_apis.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_bt_ble.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_bt_common_apis.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_common_apis.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_utils.c",
+        "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/sl_si91x_ble.c",
+      ]
     } else {
       sources += [
+        "${efr32_sdk_root}/protocol/bluetooth/bgstack/ll/src/sl_btctrl_init.c",
+        "${efr32_sdk_root}/protocol/bluetooth/bgstack/ll/src/sl_btctrl_init_tasklets.c",
         "${efr32_sdk_root}/protocol/bluetooth/src/sl_bt_rtos_adaptation.c",
         "${efr32_sdk_root}/protocol/bluetooth/src/sl_bt_stack_init.c",
         "${efr32_sdk_root}/protocol/bluetooth/src/sli_bt_advertiser_config.c",
@@ -959,6 +965,7 @@ template("efr32_sdk") {
       sources += [
         "${efr32_sdk_root}/hardware/driver/configuration_over_swo/src/sl_cos.c",
         "${efr32_sdk_root}/platform/driver/debug/src/sl_debug_swo.c",
+        "${efr32_sdk_root}/util/third_party/mbedtls/library/block_cipher.c",
         "${efr32_sdk_root}/util/third_party/mbedtls/library/hmac_drbg.c",
         "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_crypto_ecp.c",
       ]
@@ -998,6 +1005,13 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/middleware/glib/glib/glib_polygon.c",
         "${efr32_sdk_root}/platform/middleware/glib/glib/glib_rectangle.c",
         "${efr32_sdk_root}/platform/middleware/glib/glib/glib_string.c",
+      ]
+    }
+
+    if (use_thread_coap_lib) {
+      sources += [
+        "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_crypto_driver_wrappers.h",
+        "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_crypto_pake.c",
       ]
     }
 
@@ -1070,8 +1084,10 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/service/clock_manager/src/sl_clock_manager_init_hal_s2.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_dcdc_s2.c",
         "${efr32_sdk_root}/platform/service/hfxo_manager/src/sl_hfxo_manager_hal_s2.c",
-        "${efr32_sdk_root}/platform/service/power_manager/src/sl_power_manager_hal_s2.c",
+        "${efr32_sdk_root}/platform/service/mpu/src/sl_mpu_s2.c",
+        "${efr32_sdk_root}/platform/service/power_manager/src/sleep_loop/sl_power_manager_hal_s2.c",
         "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer_hal_sysrtc.c",
+        "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/mpu_wrappers_v2_asm.c",
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/port.c",
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/portasm.c",
       ]
@@ -1083,7 +1099,7 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/common/src/sl_status.c",
         "${efr32_sdk_root}/platform/driver/i2cspm/src/sl_i2cspm.c",
         "${efr32_sdk_root}/platform/emlib/src/em_i2c.c",
-        "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/sl_i2cspm_init.c",
+        "${matter_support_root}/board-support/efr32/${silabs_family}/${silabs_board}/autogen/sl_i2cspm_init.c",
       ]
     }
 

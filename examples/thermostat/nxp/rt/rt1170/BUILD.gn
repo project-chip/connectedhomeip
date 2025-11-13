@@ -70,6 +70,7 @@ rt_sdk("sdk") {
   sources += [ "${example_platform_dir}/board/board.c" ]
   sources += [ "${example_platform_dir}/board/peripherals.c" ]
   sources += [ "${example_platform_dir}/board/sdmmc_config.c" ]
+  sources += [ "${example_platform_dir}/board/wifi_bt_config.c" ]
 
   # Indicate the path to CHIPProjectConfig.h
   include_dirs += [ "include/config" ]
@@ -142,7 +143,8 @@ rt_executable("thermostat") {
       # to customize BLE advertising data
       defines += [ "CONFIG_CHIP_CUSTOM_BLE_ADV_DATA=1" ]
       include_dirs += [ "${chip_root}/src/platform/nxp/common/ble_zephyr" ]
-      sources += [ "../../common/main/BleZephyrManagerApp.cpp" ]
+      sources +=
+          [ "${common_example_dir}/app_ble/source/BleZephyrManagerApp.cpp" ]
     } else {
       # Empty implementation, default matter advertising data
       sources += [
@@ -183,7 +185,11 @@ rt_executable("thermostat") {
     "${common_example_dir}/matter_button/source/ButtonRegistrationEmpty.cpp",
   ]
 
-  deps = [ "${chip_root}/examples/${app_common_folder}" ]
+  deps = [
+    "${chip_root}/examples/${app_common_folder}",
+    "${chip_root}/src/app/clusters/network-commissioning:network-commissioning",
+    "${chip_root}/src/setup_payload:onboarding-codes-utils",
+  ]
 
   if (nxp_enable_matter_cli) {
     defines += [ "ENABLE_CHIP_SHELL" ]

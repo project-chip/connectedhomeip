@@ -33,6 +33,7 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/Span.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 #include <dirent.h>
 #include <stdio.h>
@@ -58,7 +59,9 @@ struct TestCommissionerDUTVectors : public ::testing::Test
 
 TEST_F(TestCommissionerDUTVectors, TestCommissionerDUTVectors)
 {
-    DeviceAttestationVerifier * example_dac_verifier = GetDefaultDACVerifier(GetTestAttestationTrustStore());
+    chip::Credentials::DeviceAttestationRevocationDelegate * kDeviceAttestationRevocationNotChecked = nullptr;
+    DeviceAttestationVerifier * example_dac_verifier =
+        GetDefaultDACVerifier(GetTestAttestationTrustStore(), kDeviceAttestationRevocationNotChecked);
     ASSERT_NE(example_dac_verifier, nullptr);
 
     std::string dirPath("../../../../../credentials/development/commissioner_dut/");
@@ -91,7 +94,7 @@ TEST_F(TestCommissionerDUTVectors, TestCommissionerDUTVectors)
 
         uint8_t attestationChallengeBuf[Crypto::kAES_CCM128_Key_Length];
         MutableByteSpan attestationChallengeSpan(attestationChallengeBuf);
-        Crypto::DRBG_get_bytes(attestationChallengeBuf, sizeof(attestationChallengeBuf));
+        EXPECT_SUCCESS(Crypto::DRBG_get_bytes(attestationChallengeBuf, sizeof(attestationChallengeBuf)));
 
         Crypto::P256ECDSASignature signature;
         MutableByteSpan attestationSignatureSpan{ signature.Bytes(), signature.Capacity() };
@@ -107,7 +110,7 @@ TEST_F(TestCommissionerDUTVectors, TestCommissionerDUTVectors)
 
         uint8_t attestationNonceBuf[kAttestationNonceLength];
         MutableByteSpan attestationNonceSpan(attestationNonceBuf);
-        Crypto::DRBG_get_bytes(attestationNonceBuf, sizeof(attestationNonceBuf));
+        EXPECT_SUCCESS(Crypto::DRBG_get_bytes(attestationNonceBuf, sizeof(attestationNonceBuf)));
 
         VendorId vid = TestVendor1;
         uint16_t pid = dacProvider.GetPid();

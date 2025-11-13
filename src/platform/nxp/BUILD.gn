@@ -26,7 +26,7 @@ source_set("logging") {
     "${chip_root}/src/platform/logging:headers",
   ]
 
-  if (nxp_platform == "k32w0" || nxp_platform == "mcxw71_k32w1") {
+  if (nxp_platform == "mcxw71") {
     sources = [ "${chip_root}/src/platform/nxp/${nxp_platform}/Logging.cpp" ]
   } else {
     sources = [ "${chip_root}/src/platform/nxp/common/Logging.cpp" ]

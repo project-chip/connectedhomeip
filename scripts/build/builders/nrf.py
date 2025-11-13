@@ -16,7 +16,6 @@ import logging
 import os
 import shlex
 from enum import Enum, auto
-from typing import Optional
 
 from .builder import Builder, BuilderOutput
 
@@ -118,17 +117,17 @@ class NrfBoard(Enum):
     NRF52840DK = auto()
     NRF52840DONGLE = auto()
     NRF5340DK = auto()
-    NATIVE_POSIX_64 = auto()
+    NATIVE_SIM = auto()
 
     def GnArgName(self):
         if self == NrfBoard.NRF52840DK:
-            return 'nrf52840dk_nrf52840'
+            return 'nrf52840dk/nrf52840'
         elif self == NrfBoard.NRF52840DONGLE:
-            return 'nrf52840dongle_nrf52840'
+            return 'nrf52840dongle/nrf52840'
         elif self == NrfBoard.NRF5340DK:
-            return 'nrf5340dk_nrf5340_cpuapp'
-        elif self == NrfBoard.NATIVE_POSIX_64:
-            return 'native_posix_64'
+            return 'nrf5340dk/nrf5340cpuapp'
+        elif self == NrfBoard.NATIVE_SIM:
+            return 'native_sim'
         else:
             raise Exception('Unknown board type: %r' % self)
 
@@ -147,23 +146,44 @@ class NrfConnectBuilder(Builder):
         self.board = board
         self.enable_rpcs = enable_rpcs
 
+    def _check_ncs_version(self):
+        # validate the the ZEPHYR_BASE is up to date (generally the case in docker images)
+        try:
+            self._Execute(
+                ['python3', 'scripts/setup/nrfconnect/update_ncs.py', '--check'])
+        except Exception:
+            logging.exception('Failed to validate ZEPHYR_BASE status')
+            logging.error(
+                'To update $ZEPHYR_BASE run: python3 scripts/setup/nrfconnect/update_ncs.py --update --shallow')
+
+            raise Exception('ZEPHYR_BASE validation failed')
+
+    def _prepare_environment(self):
+        # Source the zephyr-env.sh script to set up the environment
+        # The zephyr-env.sh script changes the python environment, so we need to
+        # source the activate.sh script after zephyr-env.sh to ensure that the
+        # all python packages and dependencies are available.
+        return 'source "$ZEPHYR_BASE/zephyr-env.sh";\nsource scripts/activate.sh;\n'
+
+    def _get_build_flags(self):
+        flags = []
+        if self.enable_rpcs:
+            flags.append("-DOVERLAY_CONFIG=rpc.overlay")
+
+        if self.options.pregen_dir:
+            flags.append(f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")
+
+        build_flags = " -- " + " ".join(flags) if len(flags) > 0 else ""
+
+        return build_flags
+
     def generate(self):
         if not os.path.exists(self.output_dir):
-            zephyr_sdk_dir = None
-
             if not self._runner.dry_run:
-                if 'ZEPHYR_BASE' not in os.environ:
-                    raise Exception("NRF builds require ZEPHYR_BASE to be set")
-
-                # Users are expected to set ZEPHYR_SDK_INSTALL_DIR but additionally cover the Docker
-                # case by inferring ZEPHYR_SDK_INSTALL_DIR from NRF5_TOOLS_ROOT.
-                if not os.environ.get('ZEPHYR_SDK_INSTALL_DIR') and not os.environ.get('NRF5_TOOLS_ROOT'):
-                    raise Exception("NRF buils require ZEPHYR_SDK_INSTALL_DIR to be set")
+                self._check_ncs_version()
 
                 zephyr_base = os.environ['ZEPHYR_BASE']
                 nrfconnect_sdk = os.path.dirname(zephyr_base)
-                zephyr_sdk_dir = os.environ.get('ZEPHYR_SDK_INSTALL_DIR') or os.path.join(
-                    os.environ['NRF5_TOOLS_ROOT'], 'zephyr-sdk-0.16.1')
 
                 # NRF builds will both try to change .west/config in nrfconnect and
                 # overall perform a git fetch on that location
@@ -171,37 +191,14 @@ class NrfConnectBuilder(Builder):
                     raise Exception(
                         "Directory %s not writable. NRFConnect builds require updates to this directory." % nrfconnect_sdk)
 
-                # validate the the ZEPHYR_BASE is up to date (generally the case in docker images)
-                try:
-                    self._Execute(
-                        ['python3', 'scripts/setup/nrfconnect/update_ncs.py', '--check'])
-                except Exception:
-                    logging.exception('Failed to validate ZEPHYR_BASE status')
-                    logging.error(
-                        'To update $ZEPHYR_BASE run: python3 scripts/setup/nrfconnect/update_ncs.py --update --shallow')
+            cmd = self._prepare_environment()
 
-                    raise Exception('ZEPHYR_BASE validation failed')
-
-            flags = []
-            if self.enable_rpcs:
-                flags.append("-DOVERLAY_CONFIG=rpc.overlay")
-
-            if self.options.pregen_dir:
-                flags.append(f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")
-
-            build_flags = " -- " + " ".join(flags) if len(flags) > 0 else ""
-
-            cmd = 'source "$ZEPHYR_BASE/zephyr-env.sh";\nexport ZEPHYR_TOOLCHAIN_VARIANT=zephyr;'
-
-            if zephyr_sdk_dir:
-                cmd += f'\nexport ZEPHYR_SDK_INSTALL_DIR={zephyr_sdk_dir};'
-
-            cmd += '\nwest build --cmake-only -d {outdir} -b {board} --sysbuild {sourcedir}{build_flags}\n'.format(
+            cmd += 'west build --cmake-only -d {outdir} -b {board} --sysbuild {sourcedir}{build_flags}\n'.format(
                 outdir=shlex.quote(self.output_dir),
                 board=self.board.GnArgName(),
                 sourcedir=shlex.quote(os.path.join(
                     self.root, self.app.AppPath(), 'nrfconnect')),
-                build_flags=build_flags
+                build_flags=self._get_build_flags()
             )
             self._Execute(['bash', '-c', cmd.strip()],
                           title='Generating ' + self.identifier)
@@ -209,18 +206,19 @@ class NrfConnectBuilder(Builder):
     def _build(self):
         logging.info('Compiling NrfConnect at %s', self.output_dir)
 
-        cmd = ['ninja', '-C', self.output_dir]
+        cmd = self._prepare_environment()
+        cmd += f'ninja -C {self.output_dir}'
 
         if self.ninja_jobs is not None:
-            cmd.append('-j' + str(self.ninja_jobs))
+            cmd += '-j' + str(self.ninja_jobs)
 
-        self._Execute(cmd, title='Building ' + self.identifier)
+        self._Execute(['bash', '-c', cmd.strip()], title='Building ' + self.identifier)
 
         if self.app == NrfApp.UNIT_TESTS:
             # Note: running zephyr/zephyr.elf has the same result except it creates
             # a flash.bin in the current directory. ctest has more options and does not
             # pollute the source directory
-            self._Execute(['ctest', '--build-nocmake', '-V', '--output-on-failure', '--test-dir', self.output_dir],
+            self._Execute(['ctest', '--build-nocmake', '-V', '--output-on-failure', '--test-dir', os.path.join(self.output_dir, 'nrfconnect'), '--no-tests=error'],
                           title='Run Tests ' + self.identifier)
 
     def _bundle(self):

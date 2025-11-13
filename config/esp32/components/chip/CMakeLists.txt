@@ -35,9 +35,9 @@ set(CHIP_REQUIRE_COMPONENTS esp_eth freertos lwip bt mbedtls fatfs app_update co
 
 if (NOT CMAKE_BUILD_EARLY_EXPANSION)
     if (CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_DISABLE)
-        set(is_debug TRUE)
-    else()
         set(is_debug FALSE)
+    else()
+        set(is_debug TRUE)
     endif()
 endif()
 
@@ -149,6 +149,14 @@ if(CONFIG_ENABLE_ICD_SERVER)
     endif()
 endif()
 
+if(CONFIG_CHIP_MEM_ALLOC_MODE_INTERNAL)
+    chip_gn_arg_append("chip_memory_alloc_mode"               "\"internal\"")
+elseif(CONFIG_CHIP_MEM_ALLOC_MODE_EXTERNAL)
+    chip_gn_arg_append("chip_memory_alloc_mode"               "\"external\"")
+elseif(CONFIG_CHIP_MEM_ALLOC_MODE_DEFAULT)
+    chip_gn_arg_append("chip_memory_alloc_mode"               "\"default\"")
+endif()
+
 if(CONFIG_ENABLE_PW_RPC)
     string(APPEND chip_gn_args "import(\"//build_overrides/pigweed.gni\")\n")
     chip_gn_arg_append("remove_default_configs"             "[\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_build:toolchain_cpp_standard\"]")
@@ -163,10 +171,6 @@ endif()
 
 if (CONFIG_BUILD_CHIP_TESTS)
     chip_gn_arg_bool("chip_build_tests"     "true")
-endif()
-
-if (CONFIG_IM_PRETTY_PRINT)
-    chip_gn_arg_bool("enable_im_pretty_print"	"true")
 endif()
 
 if (NOT CONFIG_USE_MINIMAL_MDNS)
@@ -240,6 +244,10 @@ if (CONFIG_ENABLE_OTA_REQUESTOR)
     chip_gn_arg_append("chip_enable_ota_requestor"                 "true")
 endif()
 
+if (CONFIG_ENABLE_ACCESS_RESTRICTIONS)
+    chip_gn_arg_append("chip_enable_access_restrictions"                 "true")
+endif()
+
 if (CONFIG_ENABLE_ROTATING_DEVICE_ID)
     chip_gn_arg_append("chip_enable_additional_data_advertising"   "true")
     chip_gn_arg_append("chip_enable_rotating_device_id"            "true")
@@ -294,6 +302,11 @@ if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
   chip_gn_arg_append("matter_trace_config" "\"${CHIP_ROOT}/src/tracing/esp32_trace:esp32_trace_tracing\"")
 endif()
 
+if (CONFIG_ENABLE_ESP_DIAGNOSTICS)
+    chip_gn_arg_bool("matter_enable_tracing_support"  "true")
+    chip_gn_arg_append("matter_trace_config" "\"${CHIP_ROOT}/src/tracing/esp32_diagnostics:esp32_diagnostic_tracing\"")
+endif()
+
 if (CONFIG_ENABLE_ESP_INSIGHTS_SYSTEM_STATS)
      chip_gn_arg_append("matter_enable_esp_insights_system_stats"            "true")
 endif()
@@ -304,6 +317,10 @@ endif()
 
 if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
    target_include_directories(${COMPONENT_LIB} INTERFACE "${CHIP_ROOT}/src/tracing/esp32_trace/include")
+endif()
+
+if (CONFIG_ENABLE_ESP_DIAGNOSTICS)
+    target_include_directories(${COMPONENT_LIB} INTERFACE "${CHIP_ROOT}/src/tracing/esp32_diagnostics/include")
 endif()
 
 if (CONFIG_CHIP_DEVICE_ENABLE_DYNAMIC_SERVER)
@@ -337,8 +354,8 @@ endif()
 
 set(args_gn "${CMAKE_CURRENT_BINARY_DIR}/args.gn")
 add_custom_command(OUTPUT "${args_gn}"
-                   COMMAND ${python} 
-                           ${CMAKE_CURRENT_LIST_DIR}/create_args_gn.py 
+                   COMMAND ${python}
+                           ${CMAKE_CURRENT_LIST_DIR}/create_args_gn.py
                            "${CMAKE_BINARY_DIR}"
                            "${idf_path}"
                            "${CMAKE_CURRENT_LIST_DIR}/chip.c"
@@ -370,6 +387,11 @@ endif()
 if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
   list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libEsp32TracingBackend.a")
 endif()
+
+if (CONFIG_ENABLE_ESP_DIAGNOSTICS)
+  list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libEsp32DiagnosticsBackend.a")
+endif()
+
 
 # When using the pregenerated files, there is a edge case where an error appears for
 # undeclared argument chip_code_pre_generated_directory. To get around with it we are
@@ -432,6 +454,14 @@ if (CONFIG_OPENTHREAD_BORDER_ROUTER)
     list(APPEND matter_requires espressif__esp_rcp_update)
 endif()
 
+if (CONFIG_SEC_CERT_DAC_PROVIDER)
+    list(APPEND matter_requires espressif__esp_secure_cert_mgr)
+endif()
+
+if (CONFIG_ENABLE_ENCRYPTED_OTA)
+    list(APPEND matter_requires espressif__esp_encrypted_img)
+endif()
+
 add_prebuilt_library(matterlib "${CMAKE_CURRENT_BINARY_DIR}/lib/libCHIP.a"
                      REQUIRES ${matter_requires})
 
@@ -452,10 +482,19 @@ endif()
 
 # Build Matter OTA image
 if (CONFIG_CHIP_OTA_IMAGE_BUILD)
-    chip_ota_image(chip-ota-image
-        INPUT_FILES ${BUILD_DIR}/${CMAKE_PROJECT_NAME}.bin
-        OUTPUT_FILE ${BUILD_DIR}/${CMAKE_PROJECT_NAME}-ota.bin
-    )
-    # Adding dependecy as app target so that this runs after images are ready
-    add_dependencies(chip-ota-image app)
+    if (CONFIG_OPENTHREAD_BORDER_ROUTER AND CONFIG_AUTO_UPDATE_RCP)
+        chip_ota_image(chip-ota-image
+            INPUT_FILES ${BUILD_DIR}/ota_with_rcp_image
+            OUTPUT_FILE ${BUILD_DIR}/ota_with_rcp_image-ota.bin
+        )
+        # Adding dependecy as app target so that this runs after images are ready
+        add_dependencies(chip-ota-image gen_ota_image)
+    else()
+        chip_ota_image(chip-ota-image
+            INPUT_FILES ${BUILD_DIR}/${CMAKE_PROJECT_NAME}.bin
+            OUTPUT_FILE ${BUILD_DIR}/${CMAKE_PROJECT_NAME}-ota.bin
+        )
+        # Adding dependecy as app target so that this runs after images are ready
+        add_dependencies(chip-ota-image app)
+    endif()
 endif()

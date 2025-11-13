@@ -15,14 +15,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- *    @file
- *      This file defines read handler for a CHIP Interaction Data model
- *
- */
-
 #include <app/AppConfig.h>
+#include <app/AttributePathExpandIterator.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/EventPathIB.h>
 #include <app/MessageDef/StatusResponseMessage.h>
@@ -31,6 +25,7 @@
 #include <app/data-model-provider/Provider.h>
 #include <app/icd/server/ICDServerConfig.h>
 #include <lib/core/TLVUtilities.h>
+#include <lib/support/CodeUtils.h>
 #include <messaging/ExchangeContext.h>
 
 #include <app/ReadHandler.h>
@@ -47,16 +42,19 @@ using Status = Protocols::InteractionModel::Status;
 uint16_t ReadHandler::GetPublisherSelectedIntervalLimit()
 {
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    return std::chrono::duration_cast<System::Clock::Seconds16>(ICDConfigurationData::GetInstance().GetIdleModeDuration()).count();
+    // We don't need to check for precision loss since the max value of the IdleModeDuration can fit inside a uint16_t
+    const auto idleModeDuration =
+        std::chrono::duration_cast<System::Clock::Seconds16>(ICDConfigurationData::GetInstance().GetIdleModeDuration()).count();
+    return std::max(idleModeDuration, kSubscriptionMaxIntervalPublisherLimit);
 #else
     return kSubscriptionMaxIntervalPublisherLimit;
 #endif
 }
 
 ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext,
-                         InteractionType aInteractionType, Observer * observer, DataModel::Provider * apDataModel) :
-    mAttributePathExpandIterator(apDataModel, nullptr),
-    mExchangeCtx(*this), mManagementCallback(apCallback)
+                         InteractionType aInteractionType, Observer * observer) :
+    mExchangeCtx(*this),
+    mManagementCallback(apCallback)
 {
     VerifyOrDie(apExchangeContext != nullptr);
 
@@ -80,8 +78,8 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeCon
 }
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-ReadHandler::ReadHandler(ManagementCallback & apCallback, Observer * observer, DataModel::Provider * apDataModel) :
-    mAttributePathExpandIterator(apDataModel, nullptr), mExchangeCtx(*this), mManagementCallback(apCallback)
+ReadHandler::ReadHandler(ManagementCallback & apCallback, Observer * observer) :
+    mExchangeCtx(*this), mManagementCallback(apCallback)
 {
     mInteractionType = InteractionType::Subscribe;
     mFlags.ClearAll();
@@ -138,7 +136,8 @@ void ReadHandler::OnSubscriptionResumed(const SessionHandle & sessionHandle,
     SingleLinkedListNode<AttributePathParams> * attributePath = mpAttributePathList;
     while (attributePath)
     {
-        mManagementCallback.GetInteractionModelEngine()->GetReportingEngine().SetDirty(attributePath->mValue);
+        TEMPORARY_RETURN_IGNORED mManagementCallback.GetInteractionModelEngine()->GetReportingEngine().SetDirty(
+            attributePath->mValue);
         attributePath = attributePath->mpNext;
     }
 }
@@ -173,7 +172,8 @@ void ReadHandler::Close(CloseOptions options)
         auto * subscriptionResumptionStorage = mManagementCallback.GetInteractionModelEngine()->GetSubscriptionResumptionStorage();
         if (subscriptionResumptionStorage)
         {
-            subscriptionResumptionStorage->Delete(GetInitiatorNodeId(), GetAccessingFabricIndex(), mSubscriptionId);
+            TEMPORARY_RETURN_IGNORED subscriptionResumptionStorage->Delete(GetInitiatorNodeId(), GetAccessingFabricIndex(),
+                                                                           mSubscriptionId);
         }
     }
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
@@ -212,7 +212,7 @@ void ReadHandler::OnInitialRequest(System::PacketBufferHandle && aPayload)
         {
             status = StatusIB(err).mStatus;
         }
-        StatusResponse::Send(status, mExchangeCtx.Get(), /* aExpectResponse = */ false);
+        TEMPORARY_RETURN_IGNORED StatusResponse::Send(status, mExchangeCtx.Get(), /* aExpectResponse = */ false);
         // At this point we can't have a persisted subscription, since that
         // happens only when ProcessSubscribeRequest returns success. And our
         // subscription id is almost certainly not actually useful at this
@@ -251,7 +251,6 @@ CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchange
                 err = SendSubscribeResponse();
 
                 SetStateFlag(ReadHandlerFlags::ActiveSubscription);
-
                 auto * appCallback = mManagementCallback.GetAppCallback();
                 if (appCallback)
                 {
@@ -391,7 +390,7 @@ CHIP_ERROR ReadHandler::OnMessageReceived(Messaging::ExchangeContext * apExchang
 
     if (sendStatusResponse)
     {
-        StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
+        TEMPORARY_RETURN_IGNORED StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
     }
 
     if (err != CHIP_NO_ERROR)
@@ -412,6 +411,31 @@ void ReadHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeConte
 {
     ChipLogError(DataManagement, "Time out! failed to receive status response from Exchange: " ChipLogFormatExchange,
                  ChipLogValueExchange(apExchangeContext));
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
+    switch (mState)
+    {
+    case HandlerState::AwaitingReportResponse:
+        if (IsType(InteractionType::Subscribe) && !IsPriming())
+        {
+            // Trigger check-in message when a non-priming subscription report times out.
+            ChipLogError(DataManagement, "Trigger check-in message when non-priming subscription report times out");
+            if (mSessionHandle)
+            {
+                ICDNotifier::GetInstance().NotifySendCheckIn(GetSubjectDescriptor());
+            }
+            else
+            {
+                ChipLogError(DataManagement, "Failed to get subject descriptor for sending check-in message on report timeout");
+            }
+        }
+        break;
+    case HandlerState::CanStartReporting:
+    case HandlerState::Idle:
+    default:
+        break;
+    }
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_SERVER
+
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     Close(CloseOptions::kKeepPersistedSubscription);
 #else
@@ -511,8 +535,8 @@ CHIP_ERROR ReadHandler::ProcessAttributePaths(AttributePathIBs::Parser & aAttrib
     if (CHIP_END_OF_TLV == err)
     {
         mManagementCallback.GetInteractionModelEngine()->RemoveDuplicateConcreteAttributePath(mpAttributePathList);
-        mAttributePathExpandIterator.ResetTo(mpAttributePathList);
-        err = CHIP_NO_ERROR;
+        mAttributePathExpandPosition = AttributePathExpandIterator::Position::StartIterating(mpAttributePathList);
+        err                          = CHIP_NO_ERROR;
     }
     return err;
 }
@@ -634,7 +658,7 @@ void ReadHandler::MoveToState(const HandlerState aTargetState)
     {
         if (ShouldReportUnscheduled())
         {
-            mManagementCallback.GetInteractionModelEngine()->GetReportingEngine().ScheduleRun();
+            TEMPORARY_RETURN_IGNORED mManagementCallback.GetInteractionModelEngine()->GetReportingEngine().ScheduleRun();
         }
         else
         {
@@ -759,8 +783,7 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     // If the next interval is greater than the MaxIntervalCeiling, use the MaxIntervalCeiling.
     // Otherwise, use IdleModeDuration as MaxInterval
 
-    // GetPublisherSelectedIntervalLimit() returns the IdleModeDuration if the device is an ICD
-    uint32_t decidedMaxInterval = GetPublisherSelectedIntervalLimit();
+    uint32_t decidedMaxInterval = ICDConfigurationData::GetInstance().GetIdleModeDuration().count();
 
     // Check if the PublisherSelectedIntervalLimit is 0. If so, set decidedMaxInterval to MaxIntervalCeiling
     if (decidedMaxInterval == 0)
@@ -854,15 +877,17 @@ void ReadHandler::PersistSubscription()
 
 void ReadHandler::ResetPathIterator()
 {
-    mAttributePathExpandIterator.ResetTo(mpAttributePathList);
+    mAttributePathExpandPosition = AttributePathExpandIterator::Position::StartIterating(mpAttributePathList);
     mAttributeEncoderState.Reset();
 }
 
-void ReadHandler::AttributePathIsDirty(const AttributePathParams & aAttributeChanged)
+void ReadHandler::AttributePathIsDirty(DataModel::Provider * apDataModel, const AttributePathParams & aAttributeChanged)
 {
-    ConcreteAttributePath path;
-
     mDirtyGeneration = mManagementCallback.GetInteractionModelEngine()->GetReportingEngine().GetDirtySetGeneration();
+
+    // We want to get the value, but not advance the iterator position.
+    AttributePathExpandIterator::Position tempPosition = mAttributePathExpandPosition;
+    ConcreteAttributePath path;
 
     // We won't reset the path iterator for every AttributePathIsDirty call to reduce the number of full data reports.
     // The iterator will be reset after finishing each report session.
@@ -873,7 +898,7 @@ void ReadHandler::AttributePathIsDirty(const AttributePathParams & aAttributeCha
     // TODO (#16699): Currently we can only guarantee the reports generated from a single path in the request are consistent. The
     // data might be inconsistent if the user send a request with two paths from the same cluster. We need to clearify the behavior
     // or make it consistent.
-    if (mAttributePathExpandIterator.Get(path) &&
+    if (AttributePathExpandIterator(apDataModel, tempPosition).Next(path) &&
         (aAttributeChanged.HasWildcardEndpointId() || aAttributeChanged.mEndpointId == path.mEndpointId) &&
         (aAttributeChanged.HasWildcardClusterId() || aAttributeChanged.mClusterId == path.mClusterId))
     {
@@ -883,7 +908,8 @@ void ReadHandler::AttributePathIsDirty(const AttributePathParams & aAttributeCha
         // If we're currently in the middle of generating reports for a given cluster and that in turn is marked dirty, let's reset
         // our iterator to point back to the beginning of that cluster. This ensures that the receiver will get a coherent view of
         // the state of the cluster as present on the server
-        mAttributePathExpandIterator.ResetCurrentCluster();
+        mAttributePathExpandPosition.IterateFromTheStartOfTheCurrentClusterIfAttributeWildcard();
+
         mAttributeEncoderState.Reset();
     }
 

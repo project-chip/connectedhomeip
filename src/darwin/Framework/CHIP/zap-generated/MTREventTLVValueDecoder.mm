@@ -39,6 +39,7 @@ static id _Nullable DecodeEventPayloadForIdentifyCluster(EventId aEventId, TLV::
     using namespace Clusters::Identify;
     switch (aEventId) {
     default: {
+        // Not a known Identify event.
         break;
     }
     }
@@ -51,6 +52,7 @@ static id _Nullable DecodeEventPayloadForGroupsCluster(EventId aEventId, TLV::TL
     using namespace Clusters::Groups;
     switch (aEventId) {
     default: {
+        // Not a known Groups event.
         break;
     }
     }
@@ -63,6 +65,7 @@ static id _Nullable DecodeEventPayloadForOnOffCluster(EventId aEventId, TLV::TLV
     using namespace Clusters::OnOff;
     switch (aEventId) {
     default: {
+        // Not a known OnOff event.
         break;
     }
     }
@@ -75,6 +78,7 @@ static id _Nullable DecodeEventPayloadForLevelControlCluster(EventId aEventId, T
     using namespace Clusters::LevelControl;
     switch (aEventId) {
     default: {
+        // Not a known LevelControl event.
         break;
     }
     }
@@ -87,6 +91,7 @@ static id _Nullable DecodeEventPayloadForPulseWidthModulationCluster(EventId aEv
     using namespace Clusters::PulseWidthModulation;
     switch (aEventId) {
     default: {
+        // Not a known PulseWidthModulation event.
         break;
     }
     }
@@ -99,6 +104,7 @@ static id _Nullable DecodeEventPayloadForDescriptorCluster(EventId aEventId, TLV
     using namespace Clusters::Descriptor;
     switch (aEventId) {
     default: {
+        // Not a known Descriptor event.
         break;
     }
     }
@@ -111,6 +117,7 @@ static id _Nullable DecodeEventPayloadForBindingCluster(EventId aEventId, TLV::T
     using namespace Clusters::Binding;
     switch (aEventId) {
     default: {
+        // Not a known Binding event.
         break;
     }
     }
@@ -216,6 +223,11 @@ static id _Nullable DecodeEventPayloadForAccessControlCluster(EventId aEventId, 
                         }
                         memberValue.targets = array_3;
                     }
+                }
+                if (cppValue.latestValue.Value().auxiliaryType.HasValue()) {
+                    memberValue.auxiliaryType = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.latestValue.Value().auxiliaryType.Value())];
+                } else {
+                    memberValue.auxiliaryType = nil;
                 }
                 memberValue.fabricIndex = [NSNumber numberWithUnsignedChar:cppValue.latestValue.Value().fabricIndex];
             }
@@ -330,7 +342,34 @@ static id _Nullable DecodeEventPayloadForAccessControlCluster(EventId aEventId, 
 
         return value;
     }
+    case Events::AuxiliaryAccessUpdated::Id: {
+        Events::AuxiliaryAccessUpdated::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRAccessControlClusterAuxiliaryAccessUpdatedEvent new];
+
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.adminNodeID.IsNull()) {
+                memberValue = nil;
+            } else {
+                memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.adminNodeID.Value()];
+            }
+            value.adminNodeID = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:cppValue.fabricIndex];
+            value.fabricIndex = memberValue;
+        } while (0);
+
+        return value;
+    }
     default: {
+        // Not a known AccessControl event.
         break;
     }
     }
@@ -402,6 +441,7 @@ static id _Nullable DecodeEventPayloadForActionsCluster(EventId aEventId, TLV::T
         return value;
     }
     default: {
+        // Not a known Actions event.
         break;
     }
     }
@@ -476,6 +516,7 @@ static id _Nullable DecodeEventPayloadForBasicInformationCluster(EventId aEventI
         return value;
     }
     default: {
+        // Not a known BasicInformation event.
         break;
     }
     }
@@ -488,6 +529,7 @@ static id _Nullable DecodeEventPayloadForOTASoftwareUpdateProviderCluster(EventI
     using namespace Clusters::OtaSoftwareUpdateProvider;
     switch (aEventId) {
     default: {
+        // Not a known OTASoftwareUpdateProvider event.
         break;
     }
     }
@@ -598,6 +640,7 @@ static id _Nullable DecodeEventPayloadForOTASoftwareUpdateRequestorCluster(Event
         return value;
     }
     default: {
+        // Not a known OTASoftwareUpdateRequestor event.
         break;
     }
     }
@@ -610,6 +653,7 @@ static id _Nullable DecodeEventPayloadForLocalizationConfigurationCluster(EventI
     using namespace Clusters::LocalizationConfiguration;
     switch (aEventId) {
     default: {
+        // Not a known LocalizationConfiguration event.
         break;
     }
     }
@@ -622,6 +666,7 @@ static id _Nullable DecodeEventPayloadForTimeFormatLocalizationCluster(EventId a
     using namespace Clusters::TimeFormatLocalization;
     switch (aEventId) {
     default: {
+        // Not a known TimeFormatLocalization event.
         break;
     }
     }
@@ -634,6 +679,7 @@ static id _Nullable DecodeEventPayloadForUnitLocalizationCluster(EventId aEventI
     using namespace Clusters::UnitLocalization;
     switch (aEventId) {
     default: {
+        // Not a known UnitLocalization event.
         break;
     }
     }
@@ -646,6 +692,7 @@ static id _Nullable DecodeEventPayloadForPowerSourceConfigurationCluster(EventId
     using namespace Clusters::PowerSourceConfiguration;
     switch (aEventId) {
     default: {
+        // Not a known PowerSourceConfiguration event.
         break;
     }
     }
@@ -814,6 +861,7 @@ static id _Nullable DecodeEventPayloadForPowerSourceCluster(EventId aEventId, TL
         return value;
     }
     default: {
+        // Not a known PowerSource event.
         break;
     }
     }
@@ -826,6 +874,7 @@ static id _Nullable DecodeEventPayloadForGeneralCommissioningCluster(EventId aEv
     using namespace Clusters::GeneralCommissioning;
     switch (aEventId) {
     default: {
+        // Not a known GeneralCommissioning event.
         break;
     }
     }
@@ -838,6 +887,7 @@ static id _Nullable DecodeEventPayloadForNetworkCommissioningCluster(EventId aEv
     using namespace Clusters::NetworkCommissioning;
     switch (aEventId) {
     default: {
+        // Not a known NetworkCommissioning event.
         break;
     }
     }
@@ -850,6 +900,7 @@ static id _Nullable DecodeEventPayloadForDiagnosticLogsCluster(EventId aEventId,
     using namespace Clusters::DiagnosticLogs;
     switch (aEventId) {
     default: {
+        // Not a known DiagnosticLogs event.
         break;
     }
     }
@@ -1035,6 +1086,7 @@ static id _Nullable DecodeEventPayloadForGeneralDiagnosticsCluster(EventId aEven
         return value;
     }
     default: {
+        // Not a known GeneralDiagnostics event.
         break;
     }
     }
@@ -1087,6 +1139,7 @@ static id _Nullable DecodeEventPayloadForSoftwareDiagnosticsCluster(EventId aEve
         return value;
     }
     default: {
+        // Not a known SoftwareDiagnostics event.
         break;
     }
     }
@@ -1168,6 +1221,7 @@ static id _Nullable DecodeEventPayloadForThreadNetworkDiagnosticsCluster(EventId
         return value;
     }
     default: {
+        // Not a known ThreadNetworkDiagnostics event.
         break;
     }
     }
@@ -1236,6 +1290,7 @@ static id _Nullable DecodeEventPayloadForWiFiNetworkDiagnosticsCluster(EventId a
         return value;
     }
     default: {
+        // Not a known WiFiNetworkDiagnostics event.
         break;
     }
     }
@@ -1248,6 +1303,7 @@ static id _Nullable DecodeEventPayloadForEthernetNetworkDiagnosticsCluster(Event
     using namespace Clusters::EthernetNetworkDiagnostics;
     switch (aEventId) {
     default: {
+        // Not a known EthernetNetworkDiagnostics event.
         break;
     }
     }
@@ -1341,6 +1397,7 @@ static id _Nullable DecodeEventPayloadForTimeSynchronizationCluster(EventId aEve
         return value;
     }
     default: {
+        // Not a known TimeSynchronization event.
         break;
     }
     }
@@ -1426,6 +1483,7 @@ static id _Nullable DecodeEventPayloadForBridgedDeviceBasicInformationCluster(Ev
         return value;
     }
     default: {
+        // Not a known BridgedDeviceBasicInformation event.
         break;
     }
     }
@@ -1567,6 +1625,7 @@ static id _Nullable DecodeEventPayloadForSwitchCluster(EventId aEventId, TLV::TL
         return value;
     }
     default: {
+        // Not a known Switch event.
         break;
     }
     }
@@ -1579,6 +1638,7 @@ static id _Nullable DecodeEventPayloadForAdministratorCommissioningCluster(Event
     using namespace Clusters::AdministratorCommissioning;
     switch (aEventId) {
     default: {
+        // Not a known AdministratorCommissioning event.
         break;
     }
     }
@@ -1591,6 +1651,7 @@ static id _Nullable DecodeEventPayloadForOperationalCredentialsCluster(EventId a
     using namespace Clusters::OperationalCredentials;
     switch (aEventId) {
     default: {
+        // Not a known OperationalCredentials event.
         break;
     }
     }
@@ -1603,6 +1664,7 @@ static id _Nullable DecodeEventPayloadForGroupKeyManagementCluster(EventId aEven
     using namespace Clusters::GroupKeyManagement;
     switch (aEventId) {
     default: {
+        // Not a known GroupKeyManagement event.
         break;
     }
     }
@@ -1615,6 +1677,7 @@ static id _Nullable DecodeEventPayloadForFixedLabelCluster(EventId aEventId, TLV
     using namespace Clusters::FixedLabel;
     switch (aEventId) {
     default: {
+        // Not a known FixedLabel event.
         break;
     }
     }
@@ -1627,6 +1690,7 @@ static id _Nullable DecodeEventPayloadForUserLabelCluster(EventId aEventId, TLV:
     using namespace Clusters::UserLabel;
     switch (aEventId) {
     default: {
+        // Not a known UserLabel event.
         break;
     }
     }
@@ -1656,6 +1720,7 @@ static id _Nullable DecodeEventPayloadForBooleanStateCluster(EventId aEventId, T
         return value;
     }
     default: {
+        // Not a known BooleanState event.
         break;
     }
     }
@@ -1668,6 +1733,7 @@ static id _Nullable DecodeEventPayloadForICDManagementCluster(EventId aEventId, 
     using namespace Clusters::IcdManagement;
     switch (aEventId) {
     default: {
+        // Not a known ICDManagement event.
         break;
     }
     }
@@ -1680,6 +1746,7 @@ static id _Nullable DecodeEventPayloadForTimerCluster(EventId aEventId, TLV::TLV
     using namespace Clusters::Timer;
     switch (aEventId) {
     default: {
+        // Not a known Timer event.
         break;
     }
     }
@@ -1773,6 +1840,7 @@ static id _Nullable DecodeEventPayloadForOvenCavityOperationalStateCluster(Event
         return value;
     }
     default: {
+        // Not a known OvenCavityOperationalState event.
         break;
     }
     }
@@ -1785,6 +1853,7 @@ static id _Nullable DecodeEventPayloadForOvenModeCluster(EventId aEventId, TLV::
     using namespace Clusters::OvenMode;
     switch (aEventId) {
     default: {
+        // Not a known OvenMode event.
         break;
     }
     }
@@ -1797,6 +1866,7 @@ static id _Nullable DecodeEventPayloadForLaundryDryerControlsCluster(EventId aEv
     using namespace Clusters::LaundryDryerControls;
     switch (aEventId) {
     default: {
+        // Not a known LaundryDryerControls event.
         break;
     }
     }
@@ -1809,6 +1879,7 @@ static id _Nullable DecodeEventPayloadForModeSelectCluster(EventId aEventId, TLV
     using namespace Clusters::ModeSelect;
     switch (aEventId) {
     default: {
+        // Not a known ModeSelect event.
         break;
     }
     }
@@ -1821,6 +1892,7 @@ static id _Nullable DecodeEventPayloadForLaundryWasherModeCluster(EventId aEvent
     using namespace Clusters::LaundryWasherMode;
     switch (aEventId) {
     default: {
+        // Not a known LaundryWasherMode event.
         break;
     }
     }
@@ -1833,6 +1905,7 @@ static id _Nullable DecodeEventPayloadForRefrigeratorAndTemperatureControlledCab
     using namespace Clusters::RefrigeratorAndTemperatureControlledCabinetMode;
     switch (aEventId) {
     default: {
+        // Not a known RefrigeratorAndTemperatureControlledCabinetMode event.
         break;
     }
     }
@@ -1845,6 +1918,7 @@ static id _Nullable DecodeEventPayloadForLaundryWasherControlsCluster(EventId aE
     using namespace Clusters::LaundryWasherControls;
     switch (aEventId) {
     default: {
+        // Not a known LaundryWasherControls event.
         break;
     }
     }
@@ -1857,6 +1931,7 @@ static id _Nullable DecodeEventPayloadForRVCRunModeCluster(EventId aEventId, TLV
     using namespace Clusters::RvcRunMode;
     switch (aEventId) {
     default: {
+        // Not a known RVCRunMode event.
         break;
     }
     }
@@ -1869,6 +1944,7 @@ static id _Nullable DecodeEventPayloadForRVCCleanModeCluster(EventId aEventId, T
     using namespace Clusters::RvcCleanMode;
     switch (aEventId) {
     default: {
+        // Not a known RVCCleanMode event.
         break;
     }
     }
@@ -1881,6 +1957,7 @@ static id _Nullable DecodeEventPayloadForTemperatureControlCluster(EventId aEven
     using namespace Clusters::TemperatureControl;
     switch (aEventId) {
     default: {
+        // Not a known TemperatureControl event.
         break;
     }
     }
@@ -1925,6 +2002,7 @@ static id _Nullable DecodeEventPayloadForRefrigeratorAlarmCluster(EventId aEvent
         return value;
     }
     default: {
+        // Not a known RefrigeratorAlarm event.
         break;
     }
     }
@@ -1937,6 +2015,7 @@ static id _Nullable DecodeEventPayloadForDishwasherModeCluster(EventId aEventId,
     using namespace Clusters::DishwasherMode;
     switch (aEventId) {
     default: {
+        // Not a known DishwasherMode event.
         break;
     }
     }
@@ -1949,6 +2028,7 @@ static id _Nullable DecodeEventPayloadForAirQualityCluster(EventId aEventId, TLV
     using namespace Clusters::AirQuality;
     switch (aEventId) {
     default: {
+        // Not a known AirQuality event.
         break;
     }
     }
@@ -2112,6 +2192,7 @@ static id _Nullable DecodeEventPayloadForSmokeCOAlarmCluster(EventId aEventId, T
         return value;
     }
     default: {
+        // Not a known SmokeCOAlarm event.
         break;
     }
     }
@@ -2156,6 +2237,7 @@ static id _Nullable DecodeEventPayloadForDishwasherAlarmCluster(EventId aEventId
         return value;
     }
     default: {
+        // Not a known DishwasherAlarm event.
         break;
     }
     }
@@ -2168,6 +2250,7 @@ static id _Nullable DecodeEventPayloadForMicrowaveOvenModeCluster(EventId aEvent
     using namespace Clusters::MicrowaveOvenMode;
     switch (aEventId) {
     default: {
+        // Not a known MicrowaveOvenMode event.
         break;
     }
     }
@@ -2180,6 +2263,7 @@ static id _Nullable DecodeEventPayloadForMicrowaveOvenControlCluster(EventId aEv
     using namespace Clusters::MicrowaveOvenControl;
     switch (aEventId) {
     default: {
+        // Not a known MicrowaveOvenControl event.
         break;
     }
     }
@@ -2273,6 +2357,7 @@ static id _Nullable DecodeEventPayloadForOperationalStateCluster(EventId aEventI
         return value;
     }
     default: {
+        // Not a known OperationalState event.
         break;
     }
     }
@@ -2366,6 +2451,7 @@ static id _Nullable DecodeEventPayloadForRVCOperationalStateCluster(EventId aEve
         return value;
     }
     default: {
+        // Not a known RVCOperationalState event.
         break;
     }
     }
@@ -2378,6 +2464,20 @@ static id _Nullable DecodeEventPayloadForScenesManagementCluster(EventId aEventI
     using namespace Clusters::ScenesManagement;
     switch (aEventId) {
     default: {
+        // Not a known ScenesManagement event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForGroupcastCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::Groupcast;
+    switch (aEventId) {
+    default: {
+        // Not a known Groupcast event.
         break;
     }
     }
@@ -2390,6 +2490,7 @@ static id _Nullable DecodeEventPayloadForHEPAFilterMonitoringCluster(EventId aEv
     using namespace Clusters::HepaFilterMonitoring;
     switch (aEventId) {
     default: {
+        // Not a known HEPAFilterMonitoring event.
         break;
     }
     }
@@ -2402,6 +2503,20 @@ static id _Nullable DecodeEventPayloadForActivatedCarbonFilterMonitoringCluster(
     using namespace Clusters::ActivatedCarbonFilterMonitoring;
     switch (aEventId) {
     default: {
+        // Not a known ActivatedCarbonFilterMonitoring event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForWaterTankLevelMonitoringCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::WaterTankLevelMonitoring;
+    switch (aEventId) {
+    default: {
+        // Not a known WaterTankLevelMonitoring event.
         break;
     }
     }
@@ -2457,6 +2572,7 @@ static id _Nullable DecodeEventPayloadForBooleanStateConfigurationCluster(EventI
         return value;
     }
     default: {
+        // Not a known BooleanStateConfiguration event.
         break;
     }
     }
@@ -2512,6 +2628,7 @@ static id _Nullable DecodeEventPayloadForValveConfigurationAndControlCluster(Eve
         return value;
     }
     default: {
+        // Not a known ValveConfigurationAndControl event.
         break;
     }
     }
@@ -2599,6 +2716,7 @@ static id _Nullable DecodeEventPayloadForElectricalPowerMeasurementCluster(Event
         return value;
     }
     default: {
+        // Not a known ElectricalPowerMeasurement event.
         break;
     }
     }
@@ -2644,6 +2762,16 @@ static id _Nullable DecodeEventPayloadForElectricalEnergyMeasurementCluster(Even
                 } else {
                     memberValue.endSystime = nil;
                 }
+                if (cppValue.energyImported.Value().apparentEnergy.HasValue()) {
+                    memberValue.apparentEnergy = [NSNumber numberWithLongLong:cppValue.energyImported.Value().apparentEnergy.Value()];
+                } else {
+                    memberValue.apparentEnergy = nil;
+                }
+                if (cppValue.energyImported.Value().reactiveEnergy.HasValue()) {
+                    memberValue.reactiveEnergy = [NSNumber numberWithLongLong:cppValue.energyImported.Value().reactiveEnergy.Value()];
+                } else {
+                    memberValue.reactiveEnergy = nil;
+                }
             } else {
                 memberValue = nil;
             }
@@ -2673,6 +2801,16 @@ static id _Nullable DecodeEventPayloadForElectricalEnergyMeasurementCluster(Even
                     memberValue.endSystime = [NSNumber numberWithUnsignedLongLong:cppValue.energyExported.Value().endSystime.Value()];
                 } else {
                     memberValue.endSystime = nil;
+                }
+                if (cppValue.energyExported.Value().apparentEnergy.HasValue()) {
+                    memberValue.apparentEnergy = [NSNumber numberWithLongLong:cppValue.energyExported.Value().apparentEnergy.Value()];
+                } else {
+                    memberValue.apparentEnergy = nil;
+                }
+                if (cppValue.energyExported.Value().reactiveEnergy.HasValue()) {
+                    memberValue.reactiveEnergy = [NSNumber numberWithLongLong:cppValue.energyExported.Value().reactiveEnergy.Value()];
+                } else {
+                    memberValue.reactiveEnergy = nil;
                 }
             } else {
                 memberValue = nil;
@@ -2716,6 +2854,16 @@ static id _Nullable DecodeEventPayloadForElectricalEnergyMeasurementCluster(Even
                 } else {
                     memberValue.endSystime = nil;
                 }
+                if (cppValue.energyImported.Value().apparentEnergy.HasValue()) {
+                    memberValue.apparentEnergy = [NSNumber numberWithLongLong:cppValue.energyImported.Value().apparentEnergy.Value()];
+                } else {
+                    memberValue.apparentEnergy = nil;
+                }
+                if (cppValue.energyImported.Value().reactiveEnergy.HasValue()) {
+                    memberValue.reactiveEnergy = [NSNumber numberWithLongLong:cppValue.energyImported.Value().reactiveEnergy.Value()];
+                } else {
+                    memberValue.reactiveEnergy = nil;
+                }
             } else {
                 memberValue = nil;
             }
@@ -2746,6 +2894,16 @@ static id _Nullable DecodeEventPayloadForElectricalEnergyMeasurementCluster(Even
                 } else {
                     memberValue.endSystime = nil;
                 }
+                if (cppValue.energyExported.Value().apparentEnergy.HasValue()) {
+                    memberValue.apparentEnergy = [NSNumber numberWithLongLong:cppValue.energyExported.Value().apparentEnergy.Value()];
+                } else {
+                    memberValue.apparentEnergy = nil;
+                }
+                if (cppValue.energyExported.Value().reactiveEnergy.HasValue()) {
+                    memberValue.reactiveEnergy = [NSNumber numberWithLongLong:cppValue.energyExported.Value().reactiveEnergy.Value()];
+                } else {
+                    memberValue.reactiveEnergy = nil;
+                }
             } else {
                 memberValue = nil;
             }
@@ -2755,6 +2913,7 @@ static id _Nullable DecodeEventPayloadForElectricalEnergyMeasurementCluster(Even
         return value;
     }
     default: {
+        // Not a known ElectricalEnergyMeasurement event.
         break;
     }
     }
@@ -2821,6 +2980,7 @@ static id _Nullable DecodeEventPayloadForWaterHeaterManagementCluster(EventId aE
         return value;
     }
     default: {
+        // Not a known WaterHeaterManagement event.
         break;
     }
     }
@@ -2828,157 +2988,96 @@ static id _Nullable DecodeEventPayloadForWaterHeaterManagementCluster(EventId aE
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForDemandResponseLoadControlCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForCommodityPriceCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
-    using namespace Clusters::DemandResponseLoadControl;
+    using namespace Clusters::CommodityPrice;
     switch (aEventId) {
-    case Events::LoadControlEventStatusChange::Id: {
-        Events::LoadControlEventStatusChange::DecodableType cppValue;
+    case Events::PriceChange::Id: {
+        Events::PriceChange::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
 
-        __auto_type * value = [MTRDemandResponseLoadControlClusterLoadControlEventStatusChangeEvent new];
+        __auto_type * value = [MTRCommodityPriceClusterPriceChangeEvent new];
 
         do {
-            NSData * _Nonnull memberValue;
-            memberValue = AsData(cppValue.eventID);
-            value.eventID = memberValue;
-        } while (0);
-        do {
-            NSNumber * _Nullable memberValue;
-            if (cppValue.transitionIndex.IsNull()) {
+            MTRCommodityPriceClusterCommodityPriceStruct * _Nullable memberValue;
+            if (cppValue.currentPrice.IsNull()) {
                 memberValue = nil;
             } else {
-                memberValue = [NSNumber numberWithUnsignedChar:cppValue.transitionIndex.Value()];
-            }
-            value.transitionIndex = memberValue;
-        } while (0);
-        do {
-            NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.status)];
-            value.status = memberValue;
-        } while (0);
-        do {
-            NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.criticality)];
-            value.criticality = memberValue;
-        } while (0);
-        do {
-            NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedShort:cppValue.control.Raw()];
-            value.control = memberValue;
-        } while (0);
-        do {
-            MTRDemandResponseLoadControlClusterTemperatureControlStruct * _Nullable memberValue;
-            if (cppValue.temperatureControl.HasValue()) {
-                if (cppValue.temperatureControl.Value().IsNull()) {
-                    memberValue = nil;
+                memberValue = [MTRCommodityPriceClusterCommodityPriceStruct new];
+                memberValue.periodStart = [NSNumber numberWithUnsignedInt:cppValue.currentPrice.Value().periodStart];
+                if (cppValue.currentPrice.Value().periodEnd.IsNull()) {
+                    memberValue.periodEnd = nil;
                 } else {
-                    memberValue = [MTRDemandResponseLoadControlClusterTemperatureControlStruct new];
-                    if (cppValue.temperatureControl.Value().Value().coolingTempOffset.HasValue()) {
-                        if (cppValue.temperatureControl.Value().Value().coolingTempOffset.Value().IsNull()) {
-                            memberValue.coolingTempOffset = nil;
-                        } else {
-                            memberValue.coolingTempOffset = [NSNumber numberWithUnsignedShort:cppValue.temperatureControl.Value().Value().coolingTempOffset.Value().Value()];
-                        }
-                    } else {
-                        memberValue.coolingTempOffset = nil;
+                    memberValue.periodEnd = [NSNumber numberWithUnsignedInt:cppValue.currentPrice.Value().periodEnd.Value()];
+                }
+                if (cppValue.currentPrice.Value().price.HasValue()) {
+                    memberValue.price = [NSNumber numberWithLongLong:cppValue.currentPrice.Value().price.Value()];
+                } else {
+                    memberValue.price = nil;
+                }
+                if (cppValue.currentPrice.Value().priceLevel.HasValue()) {
+                    memberValue.priceLevel = [NSNumber numberWithShort:cppValue.currentPrice.Value().priceLevel.Value()];
+                } else {
+                    memberValue.priceLevel = nil;
+                }
+                if (cppValue.currentPrice.Value().description.HasValue()) {
+                    memberValue.descriptionString = AsString(cppValue.currentPrice.Value().description.Value());
+                    if (memberValue.descriptionString == nil) {
+                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                        *aError = err;
+                        return nil;
                     }
-                    if (cppValue.temperatureControl.Value().Value().heatingtTempOffset.HasValue()) {
-                        if (cppValue.temperatureControl.Value().Value().heatingtTempOffset.Value().IsNull()) {
-                            memberValue.heatingtTempOffset = nil;
-                        } else {
-                            memberValue.heatingtTempOffset = [NSNumber numberWithUnsignedShort:cppValue.temperatureControl.Value().Value().heatingtTempOffset.Value().Value()];
+                } else {
+                    memberValue.descriptionString = nil;
+                }
+                if (cppValue.currentPrice.Value().components.HasValue()) {
+                    { // Scope for our temporary variables
+                        auto * array_3 = [NSMutableArray new];
+                        auto iter_3 = cppValue.currentPrice.Value().components.Value().begin();
+                        while (iter_3.Next()) {
+                            auto & entry_3 = iter_3.GetValue();
+                            MTRCommodityPriceClusterCommodityPriceComponentStruct * newElement_3;
+                            newElement_3 = [MTRCommodityPriceClusterCommodityPriceComponentStruct new];
+                            newElement_3.price = [NSNumber numberWithLongLong:entry_3.price];
+                            newElement_3.source = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_3.source)];
+                            if (entry_3.description.HasValue()) {
+                                newElement_3.descriptionString = AsString(entry_3.description.Value());
+                                if (newElement_3.descriptionString == nil) {
+                                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                                    *aError = err;
+                                    return nil;
+                                }
+                            } else {
+                                newElement_3.descriptionString = nil;
+                            }
+                            if (entry_3.tariffComponentID.HasValue()) {
+                                newElement_3.tariffComponentID = [NSNumber numberWithUnsignedInt:entry_3.tariffComponentID.Value()];
+                            } else {
+                                newElement_3.tariffComponentID = nil;
+                            }
+                            [array_3 addObject:newElement_3];
                         }
-                    } else {
-                        memberValue.heatingtTempOffset = nil;
-                    }
-                    if (cppValue.temperatureControl.Value().Value().coolingTempSetpoint.HasValue()) {
-                        if (cppValue.temperatureControl.Value().Value().coolingTempSetpoint.Value().IsNull()) {
-                            memberValue.coolingTempSetpoint = nil;
-                        } else {
-                            memberValue.coolingTempSetpoint = [NSNumber numberWithShort:cppValue.temperatureControl.Value().Value().coolingTempSetpoint.Value().Value()];
+                        CHIP_ERROR err = iter_3.GetStatus();
+                        if (err != CHIP_NO_ERROR) {
+                            *aError = err;
+                            return nil;
                         }
-                    } else {
-                        memberValue.coolingTempSetpoint = nil;
+                        memberValue.components = array_3;
                     }
-                    if (cppValue.temperatureControl.Value().Value().heatingTempSetpoint.HasValue()) {
-                        if (cppValue.temperatureControl.Value().Value().heatingTempSetpoint.Value().IsNull()) {
-                            memberValue.heatingTempSetpoint = nil;
-                        } else {
-                            memberValue.heatingTempSetpoint = [NSNumber numberWithShort:cppValue.temperatureControl.Value().Value().heatingTempSetpoint.Value().Value()];
-                        }
-                    } else {
-                        memberValue.heatingTempSetpoint = nil;
-                    }
-                }
-            } else {
-                memberValue = nil;
-            }
-            value.temperatureControl = memberValue;
-        } while (0);
-        do {
-            MTRDemandResponseLoadControlClusterAverageLoadControlStruct * _Nullable memberValue;
-            if (cppValue.averageLoadControl.HasValue()) {
-                if (cppValue.averageLoadControl.Value().IsNull()) {
-                    memberValue = nil;
                 } else {
-                    memberValue = [MTRDemandResponseLoadControlClusterAverageLoadControlStruct new];
-                    memberValue.loadAdjustment = [NSNumber numberWithChar:cppValue.averageLoadControl.Value().Value().loadAdjustment];
+                    memberValue.components = nil;
                 }
-            } else {
-                memberValue = nil;
             }
-            value.averageLoadControl = memberValue;
-        } while (0);
-        do {
-            MTRDemandResponseLoadControlClusterDutyCycleControlStruct * _Nullable memberValue;
-            if (cppValue.dutyCycleControl.HasValue()) {
-                if (cppValue.dutyCycleControl.Value().IsNull()) {
-                    memberValue = nil;
-                } else {
-                    memberValue = [MTRDemandResponseLoadControlClusterDutyCycleControlStruct new];
-                    memberValue.dutyCycle = [NSNumber numberWithUnsignedChar:cppValue.dutyCycleControl.Value().Value().dutyCycle];
-                }
-            } else {
-                memberValue = nil;
-            }
-            value.dutyCycleControl = memberValue;
-        } while (0);
-        do {
-            MTRDemandResponseLoadControlClusterPowerSavingsControlStruct * _Nullable memberValue;
-            if (cppValue.powerSavingsControl.HasValue()) {
-                if (cppValue.powerSavingsControl.Value().IsNull()) {
-                    memberValue = nil;
-                } else {
-                    memberValue = [MTRDemandResponseLoadControlClusterPowerSavingsControlStruct new];
-                    memberValue.powerSavings = [NSNumber numberWithUnsignedChar:cppValue.powerSavingsControl.Value().Value().powerSavings];
-                }
-            } else {
-                memberValue = nil;
-            }
-            value.powerSavingsControl = memberValue;
-        } while (0);
-        do {
-            MTRDemandResponseLoadControlClusterHeatingSourceControlStruct * _Nullable memberValue;
-            if (cppValue.heatingSourceControl.HasValue()) {
-                if (cppValue.heatingSourceControl.Value().IsNull()) {
-                    memberValue = nil;
-                } else {
-                    memberValue = [MTRDemandResponseLoadControlClusterHeatingSourceControlStruct new];
-                    memberValue.heatingSource = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.heatingSourceControl.Value().Value().heatingSource)];
-                }
-            } else {
-                memberValue = nil;
-            }
-            value.heatingSourceControl = memberValue;
+            value.currentPrice = memberValue;
         } while (0);
 
         return value;
     }
     default: {
+        // Not a known CommodityPrice event.
         break;
     }
     }
@@ -3082,6 +3181,7 @@ static id _Nullable DecodeEventPayloadForMessagesCluster(EventId aEventId, TLV::
         return value;
     }
     default: {
+        // Not a known Messages event.
         break;
     }
     }
@@ -3160,6 +3260,7 @@ static id _Nullable DecodeEventPayloadForDeviceEnergyManagementCluster(EventId a
         return value;
     }
     default: {
+        // Not a known DeviceEnergyManagement event.
         break;
     }
     }
@@ -3360,6 +3461,7 @@ static id _Nullable DecodeEventPayloadForEnergyEVSECluster(EventId aEventId, TLV
         return value;
     }
     default: {
+        // Not a known EnergyEVSE event.
         break;
     }
     }
@@ -3372,6 +3474,7 @@ static id _Nullable DecodeEventPayloadForEnergyPreferenceCluster(EventId aEventI
     using namespace Clusters::EnergyPreference;
     switch (aEventId) {
     default: {
+        // Not a known EnergyPreference event.
         break;
     }
     }
@@ -3384,6 +3487,7 @@ static id _Nullable DecodeEventPayloadForPowerTopologyCluster(EventId aEventId, 
     using namespace Clusters::PowerTopology;
     switch (aEventId) {
     default: {
+        // Not a known PowerTopology event.
         break;
     }
     }
@@ -3396,6 +3500,7 @@ static id _Nullable DecodeEventPayloadForEnergyEVSEModeCluster(EventId aEventId,
     using namespace Clusters::EnergyEvseMode;
     switch (aEventId) {
     default: {
+        // Not a known EnergyEVSEMode event.
         break;
     }
     }
@@ -3408,6 +3513,7 @@ static id _Nullable DecodeEventPayloadForWaterHeaterModeCluster(EventId aEventId
     using namespace Clusters::WaterHeaterMode;
     switch (aEventId) {
     default: {
+        // Not a known WaterHeaterMode event.
         break;
     }
     }
@@ -3420,6 +3526,51 @@ static id _Nullable DecodeEventPayloadForDeviceEnergyManagementModeCluster(Event
     using namespace Clusters::DeviceEnergyManagementMode;
     switch (aEventId) {
     default: {
+        // Not a known DeviceEnergyManagementMode event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForElectricalGridConditionsCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::ElectricalGridConditions;
+    switch (aEventId) {
+    case Events::CurrentConditionsChanged::Id: {
+        Events::CurrentConditionsChanged::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRElectricalGridConditionsClusterCurrentConditionsChangedEvent new];
+
+        do {
+            MTRElectricalGridConditionsClusterElectricalGridConditionsStruct * _Nullable memberValue;
+            if (cppValue.currentConditions.IsNull()) {
+                memberValue = nil;
+            } else {
+                memberValue = [MTRElectricalGridConditionsClusterElectricalGridConditionsStruct new];
+                memberValue.periodStart = [NSNumber numberWithUnsignedInt:cppValue.currentConditions.Value().periodStart];
+                if (cppValue.currentConditions.Value().periodEnd.IsNull()) {
+                    memberValue.periodEnd = nil;
+                } else {
+                    memberValue.periodEnd = [NSNumber numberWithUnsignedInt:cppValue.currentConditions.Value().periodEnd.Value()];
+                }
+                memberValue.gridCarbonIntensity = [NSNumber numberWithShort:cppValue.currentConditions.Value().gridCarbonIntensity];
+                memberValue.gridCarbonLevel = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.currentConditions.Value().gridCarbonLevel)];
+                memberValue.localCarbonIntensity = [NSNumber numberWithShort:cppValue.currentConditions.Value().localCarbonIntensity];
+                memberValue.localCarbonLevel = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.currentConditions.Value().localCarbonLevel)];
+            }
+            value.currentConditions = memberValue;
+        } while (0);
+
+        return value;
+    }
+    default: {
+        // Not a known ElectricalGridConditions event.
         break;
     }
     }
@@ -3692,6 +3843,7 @@ static id _Nullable DecodeEventPayloadForDoorLockCluster(EventId aEventId, TLV::
         return value;
     }
     default: {
+        // Not a known DoorLock event.
         break;
     }
     }
@@ -3704,6 +3856,110 @@ static id _Nullable DecodeEventPayloadForWindowCoveringCluster(EventId aEventId,
     using namespace Clusters::WindowCovering;
     switch (aEventId) {
     default: {
+        // Not a known WindowCovering event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForClosureControlCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::ClosureControl;
+    switch (aEventId) {
+    case Events::OperationalError::Id: {
+        Events::OperationalError::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRClosureControlClusterOperationalErrorEvent new];
+
+        do {
+            NSArray * _Nonnull memberValue;
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.errorState.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    NSNumber * newElement_0;
+                    newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
+                    [array_0 addObject:newElement_0];
+                }
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                memberValue = array_0;
+            }
+            value.errorState = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::MovementCompleted::Id: {
+        Events::MovementCompleted::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRClosureControlClusterMovementCompletedEvent new];
+
+        return value;
+    }
+    case Events::EngageStateChanged::Id: {
+        Events::EngageStateChanged::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRClosureControlClusterEngageStateChangedEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithBool:cppValue.engageValue];
+            value.engageValue = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::SecureStateChanged::Id: {
+        Events::SecureStateChanged::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRClosureControlClusterSecureStateChangedEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithBool:cppValue.secureValue];
+            value.secureValue = memberValue;
+        } while (0);
+
+        return value;
+    }
+    default: {
+        // Not a known ClosureControl event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForClosureDimensionCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::ClosureDimension;
+    switch (aEventId) {
+    default: {
+        // Not a known ClosureDimension event.
         break;
     }
     }
@@ -3716,6 +3972,7 @@ static id _Nullable DecodeEventPayloadForServiceAreaCluster(EventId aEventId, TL
     using namespace Clusters::ServiceArea;
     switch (aEventId) {
     default: {
+        // Not a known ServiceArea event.
         break;
     }
     }
@@ -3915,6 +4172,7 @@ static id _Nullable DecodeEventPayloadForPumpConfigurationAndControlCluster(Even
         return value;
     }
     default: {
+        // Not a known PumpConfigurationAndControl event.
         break;
     }
     }
@@ -3926,7 +4184,241 @@ static id _Nullable DecodeEventPayloadForThermostatCluster(EventId aEventId, TLV
 {
     using namespace Clusters::Thermostat;
     switch (aEventId) {
+    case Events::SystemModeChange::Id: {
+        Events::SystemModeChange::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRThermostatClusterSystemModeChangeEvent new];
+
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.previousSystemMode.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.previousSystemMode.Value())];
+            } else {
+                memberValue = nil;
+            }
+            value.previousSystemMode = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.currentSystemMode)];
+            value.currentSystemMode = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::LocalTemperatureChange::Id: {
+        Events::LocalTemperatureChange::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRThermostatClusterLocalTemperatureChangeEvent new];
+
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.currentLocalTemperature.IsNull()) {
+                memberValue = nil;
+            } else {
+                memberValue = [NSNumber numberWithShort:cppValue.currentLocalTemperature.Value()];
+            }
+            value.currentLocalTemperature = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::OccupancyChange::Id: {
+        Events::OccupancyChange::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRThermostatClusterOccupancyChangeEvent new];
+
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.previousOccupancy.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedChar:cppValue.previousOccupancy.Value().Raw()];
+            } else {
+                memberValue = nil;
+            }
+            value.previousOccupancy = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:cppValue.currentOccupancy.Raw()];
+            value.currentOccupancy = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::SetpointChange::Id: {
+        Events::SetpointChange::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRThermostatClusterSetpointChangeEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.systemMode)];
+            value.systemMode = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.occupancy.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedChar:cppValue.occupancy.Value().Raw()];
+            } else {
+                memberValue = nil;
+            }
+            value.occupancy = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.previousSetpoint.HasValue()) {
+                memberValue = [NSNumber numberWithShort:cppValue.previousSetpoint.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.previousSetpoint = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithShort:cppValue.currentSetpoint];
+            value.currentSetpoint = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::RunningStateChange::Id: {
+        Events::RunningStateChange::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRThermostatClusterRunningStateChangeEvent new];
+
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.previousRunningState.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedShort:cppValue.previousRunningState.Value().Raw()];
+            } else {
+                memberValue = nil;
+            }
+            value.previousRunningState = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedShort:cppValue.currentRunningState.Raw()];
+            value.currentRunningState = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::RunningModeChange::Id: {
+        Events::RunningModeChange::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRThermostatClusterRunningModeChangeEvent new];
+
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.previousRunningMode.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.previousRunningMode.Value())];
+            } else {
+                memberValue = nil;
+            }
+            value.previousRunningMode = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.currentRunningMode)];
+            value.currentRunningMode = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::ActiveScheduleChange::Id: {
+        Events::ActiveScheduleChange::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRThermostatClusterActiveScheduleChangeEvent new];
+
+        do {
+            NSData * _Nullable memberValue;
+            if (cppValue.previousScheduleHandle.HasValue()) {
+                if (cppValue.previousScheduleHandle.Value().IsNull()) {
+                    memberValue = nil;
+                } else {
+                    memberValue = AsData(cppValue.previousScheduleHandle.Value().Value());
+                }
+            } else {
+                memberValue = nil;
+            }
+            value.previousScheduleHandle = memberValue;
+        } while (0);
+        do {
+            NSData * _Nullable memberValue;
+            if (cppValue.currentScheduleHandle.IsNull()) {
+                memberValue = nil;
+            } else {
+                memberValue = AsData(cppValue.currentScheduleHandle.Value());
+            }
+            value.currentScheduleHandle = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::ActivePresetChange::Id: {
+        Events::ActivePresetChange::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRThermostatClusterActivePresetChangeEvent new];
+
+        do {
+            NSData * _Nullable memberValue;
+            if (cppValue.previousPresetHandle.HasValue()) {
+                if (cppValue.previousPresetHandle.Value().IsNull()) {
+                    memberValue = nil;
+                } else {
+                    memberValue = AsData(cppValue.previousPresetHandle.Value().Value());
+                }
+            } else {
+                memberValue = nil;
+            }
+            value.previousPresetHandle = memberValue;
+        } while (0);
+        do {
+            NSData * _Nullable memberValue;
+            if (cppValue.currentPresetHandle.IsNull()) {
+                memberValue = nil;
+            } else {
+                memberValue = AsData(cppValue.currentPresetHandle.Value());
+            }
+            value.currentPresetHandle = memberValue;
+        } while (0);
+
+        return value;
+    }
     default: {
+        // Not a known Thermostat event.
         break;
     }
     }
@@ -3939,6 +4431,7 @@ static id _Nullable DecodeEventPayloadForFanControlCluster(EventId aEventId, TLV
     using namespace Clusters::FanControl;
     switch (aEventId) {
     default: {
+        // Not a known FanControl event.
         break;
     }
     }
@@ -3951,6 +4444,7 @@ static id _Nullable DecodeEventPayloadForThermostatUserInterfaceConfigurationClu
     using namespace Clusters::ThermostatUserInterfaceConfiguration;
     switch (aEventId) {
     default: {
+        // Not a known ThermostatUserInterfaceConfiguration event.
         break;
     }
     }
@@ -3963,6 +4457,7 @@ static id _Nullable DecodeEventPayloadForColorControlCluster(EventId aEventId, T
     using namespace Clusters::ColorControl;
     switch (aEventId) {
     default: {
+        // Not a known ColorControl event.
         break;
     }
     }
@@ -3975,6 +4470,7 @@ static id _Nullable DecodeEventPayloadForBallastConfigurationCluster(EventId aEv
     using namespace Clusters::BallastConfiguration;
     switch (aEventId) {
     default: {
+        // Not a known BallastConfiguration event.
         break;
     }
     }
@@ -3987,6 +4483,7 @@ static id _Nullable DecodeEventPayloadForIlluminanceMeasurementCluster(EventId a
     using namespace Clusters::IlluminanceMeasurement;
     switch (aEventId) {
     default: {
+        // Not a known IlluminanceMeasurement event.
         break;
     }
     }
@@ -3999,6 +4496,7 @@ static id _Nullable DecodeEventPayloadForTemperatureMeasurementCluster(EventId a
     using namespace Clusters::TemperatureMeasurement;
     switch (aEventId) {
     default: {
+        // Not a known TemperatureMeasurement event.
         break;
     }
     }
@@ -4011,6 +4509,7 @@ static id _Nullable DecodeEventPayloadForPressureMeasurementCluster(EventId aEve
     using namespace Clusters::PressureMeasurement;
     switch (aEventId) {
     default: {
+        // Not a known PressureMeasurement event.
         break;
     }
     }
@@ -4023,6 +4522,7 @@ static id _Nullable DecodeEventPayloadForFlowMeasurementCluster(EventId aEventId
     using namespace Clusters::FlowMeasurement;
     switch (aEventId) {
     default: {
+        // Not a known FlowMeasurement event.
         break;
     }
     }
@@ -4035,6 +4535,7 @@ static id _Nullable DecodeEventPayloadForRelativeHumidityMeasurementCluster(Even
     using namespace Clusters::RelativeHumidityMeasurement;
     switch (aEventId) {
     default: {
+        // Not a known RelativeHumidityMeasurement event.
         break;
     }
     }
@@ -4064,6 +4565,7 @@ static id _Nullable DecodeEventPayloadForOccupancySensingCluster(EventId aEventI
         return value;
     }
     default: {
+        // Not a known OccupancySensing event.
         break;
     }
     }
@@ -4076,6 +4578,7 @@ static id _Nullable DecodeEventPayloadForCarbonMonoxideConcentrationMeasurementC
     using namespace Clusters::CarbonMonoxideConcentrationMeasurement;
     switch (aEventId) {
     default: {
+        // Not a known CarbonMonoxideConcentrationMeasurement event.
         break;
     }
     }
@@ -4088,6 +4591,7 @@ static id _Nullable DecodeEventPayloadForCarbonDioxideConcentrationMeasurementCl
     using namespace Clusters::CarbonDioxideConcentrationMeasurement;
     switch (aEventId) {
     default: {
+        // Not a known CarbonDioxideConcentrationMeasurement event.
         break;
     }
     }
@@ -4100,6 +4604,7 @@ static id _Nullable DecodeEventPayloadForNitrogenDioxideConcentrationMeasurement
     using namespace Clusters::NitrogenDioxideConcentrationMeasurement;
     switch (aEventId) {
     default: {
+        // Not a known NitrogenDioxideConcentrationMeasurement event.
         break;
     }
     }
@@ -4112,6 +4617,7 @@ static id _Nullable DecodeEventPayloadForOzoneConcentrationMeasurementCluster(Ev
     using namespace Clusters::OzoneConcentrationMeasurement;
     switch (aEventId) {
     default: {
+        // Not a known OzoneConcentrationMeasurement event.
         break;
     }
     }
@@ -4124,6 +4630,7 @@ static id _Nullable DecodeEventPayloadForPM25ConcentrationMeasurementCluster(Eve
     using namespace Clusters::Pm25ConcentrationMeasurement;
     switch (aEventId) {
     default: {
+        // Not a known PM25ConcentrationMeasurement event.
         break;
     }
     }
@@ -4136,6 +4643,7 @@ static id _Nullable DecodeEventPayloadForFormaldehydeConcentrationMeasurementClu
     using namespace Clusters::FormaldehydeConcentrationMeasurement;
     switch (aEventId) {
     default: {
+        // Not a known FormaldehydeConcentrationMeasurement event.
         break;
     }
     }
@@ -4148,6 +4656,7 @@ static id _Nullable DecodeEventPayloadForPM1ConcentrationMeasurementCluster(Even
     using namespace Clusters::Pm1ConcentrationMeasurement;
     switch (aEventId) {
     default: {
+        // Not a known PM1ConcentrationMeasurement event.
         break;
     }
     }
@@ -4160,6 +4669,7 @@ static id _Nullable DecodeEventPayloadForPM10ConcentrationMeasurementCluster(Eve
     using namespace Clusters::Pm10ConcentrationMeasurement;
     switch (aEventId) {
     default: {
+        // Not a known PM10ConcentrationMeasurement event.
         break;
     }
     }
@@ -4172,6 +4682,7 @@ static id _Nullable DecodeEventPayloadForTotalVolatileOrganicCompoundsConcentrat
     using namespace Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement;
     switch (aEventId) {
     default: {
+        // Not a known TotalVolatileOrganicCompoundsConcentrationMeasurement event.
         break;
     }
     }
@@ -4184,6 +4695,20 @@ static id _Nullable DecodeEventPayloadForRadonConcentrationMeasurementCluster(Ev
     using namespace Clusters::RadonConcentrationMeasurement;
     switch (aEventId) {
     default: {
+        // Not a known RadonConcentrationMeasurement event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForSoilMeasurementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::SoilMeasurement;
+    switch (aEventId) {
+    default: {
+        // Not a known SoilMeasurement event.
         break;
     }
     }
@@ -4196,6 +4721,7 @@ static id _Nullable DecodeEventPayloadForWiFiNetworkManagementCluster(EventId aE
     using namespace Clusters::WiFiNetworkManagement;
     switch (aEventId) {
     default: {
+        // Not a known WiFiNetworkManagement event.
         break;
     }
     }
@@ -4208,6 +4734,7 @@ static id _Nullable DecodeEventPayloadForThreadBorderRouterManagementCluster(Eve
     using namespace Clusters::ThreadBorderRouterManagement;
     switch (aEventId) {
     default: {
+        // Not a known ThreadBorderRouterManagement event.
         break;
     }
     }
@@ -4220,6 +4747,7 @@ static id _Nullable DecodeEventPayloadForThreadNetworkDirectoryCluster(EventId a
     using namespace Clusters::ThreadNetworkDirectory;
     switch (aEventId) {
     default: {
+        // Not a known ThreadNetworkDirectory event.
         break;
     }
     }
@@ -4232,6 +4760,7 @@ static id _Nullable DecodeEventPayloadForWakeOnLANCluster(EventId aEventId, TLV:
     using namespace Clusters::WakeOnLan;
     switch (aEventId) {
     default: {
+        // Not a known WakeOnLAN event.
         break;
     }
     }
@@ -4244,6 +4773,7 @@ static id _Nullable DecodeEventPayloadForChannelCluster(EventId aEventId, TLV::T
     using namespace Clusters::Channel;
     switch (aEventId) {
     default: {
+        // Not a known Channel event.
         break;
     }
     }
@@ -4305,6 +4835,7 @@ static id _Nullable DecodeEventPayloadForTargetNavigatorCluster(EventId aEventId
         return value;
     }
     default: {
+        // Not a known TargetNavigator event.
         break;
     }
     }
@@ -4384,6 +4915,7 @@ static id _Nullable DecodeEventPayloadForMediaPlaybackCluster(EventId aEventId, 
         return value;
     }
     default: {
+        // Not a known MediaPlayback event.
         break;
     }
     }
@@ -4396,6 +4928,7 @@ static id _Nullable DecodeEventPayloadForMediaInputCluster(EventId aEventId, TLV
     using namespace Clusters::MediaInput;
     switch (aEventId) {
     default: {
+        // Not a known MediaInput event.
         break;
     }
     }
@@ -4408,6 +4941,7 @@ static id _Nullable DecodeEventPayloadForLowPowerCluster(EventId aEventId, TLV::
     using namespace Clusters::LowPower;
     switch (aEventId) {
     default: {
+        // Not a known LowPower event.
         break;
     }
     }
@@ -4420,6 +4954,7 @@ static id _Nullable DecodeEventPayloadForKeypadInputCluster(EventId aEventId, TL
     using namespace Clusters::KeypadInput;
     switch (aEventId) {
     default: {
+        // Not a known KeypadInput event.
         break;
     }
     }
@@ -4432,6 +4967,7 @@ static id _Nullable DecodeEventPayloadForContentLauncherCluster(EventId aEventId
     using namespace Clusters::ContentLauncher;
     switch (aEventId) {
     default: {
+        // Not a known ContentLauncher event.
         break;
     }
     }
@@ -4444,6 +4980,7 @@ static id _Nullable DecodeEventPayloadForAudioOutputCluster(EventId aEventId, TL
     using namespace Clusters::AudioOutput;
     switch (aEventId) {
     default: {
+        // Not a known AudioOutput event.
         break;
     }
     }
@@ -4456,6 +4993,7 @@ static id _Nullable DecodeEventPayloadForApplicationLauncherCluster(EventId aEve
     using namespace Clusters::ApplicationLauncher;
     switch (aEventId) {
     default: {
+        // Not a known ApplicationLauncher event.
         break;
     }
     }
@@ -4468,6 +5006,7 @@ static id _Nullable DecodeEventPayloadForApplicationBasicCluster(EventId aEventI
     using namespace Clusters::ApplicationBasic;
     switch (aEventId) {
     default: {
+        // Not a known ApplicationBasic event.
         break;
     }
     }
@@ -4497,10 +5036,16 @@ static id _Nullable DecodeEventPayloadForAccountLoginCluster(EventId aEventId, T
             }
             value.node = memberValue;
         } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:cppValue.fabricIndex];
+            value.fabricIndex = memberValue;
+        } while (0);
 
         return value;
     }
     default: {
+        // Not a known AccountLogin event.
         break;
     }
     }
@@ -4523,7 +5068,19 @@ static id _Nullable DecodeEventPayloadForContentControlCluster(EventId aEventId,
 
         return value;
     }
+    case Events::EnteringBlockContentTimeWindow::Id: {
+        Events::EnteringBlockContentTimeWindow::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRContentControlClusterEnteringBlockContentTimeWindowEvent new];
+
+        return value;
+    }
     default: {
+        // Not a known ContentControl event.
         break;
     }
     }
@@ -4536,6 +5093,7 @@ static id _Nullable DecodeEventPayloadForContentAppObserverCluster(EventId aEven
     using namespace Clusters::ContentAppObserver;
     switch (aEventId) {
     default: {
+        // Not a known ContentAppObserver event.
         break;
     }
     }
@@ -4557,24 +5115,9 @@ static id _Nullable DecodeEventPayloadForZoneManagementCluster(EventId aEventId,
         __auto_type * value = [MTRZoneManagementClusterZoneTriggeredEvent new];
 
         do {
-            NSArray * _Nonnull memberValue;
-            { // Scope for our temporary variables
-                auto * array_0 = [NSMutableArray new];
-                auto iter_0 = cppValue.zones.begin();
-                while (iter_0.Next()) {
-                    auto & entry_0 = iter_0.GetValue();
-                    NSNumber * newElement_0;
-                    newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
-                    [array_0 addObject:newElement_0];
-                }
-                CHIP_ERROR err = iter_0.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    *aError = err;
-                    return nil;
-                }
-                memberValue = array_0;
-            }
-            value.zones = memberValue;
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedShort:cppValue.zone];
+            value.zone = memberValue;
         } while (0);
         do {
             NSNumber * _Nonnull memberValue;
@@ -4594,24 +5137,9 @@ static id _Nullable DecodeEventPayloadForZoneManagementCluster(EventId aEventId,
         __auto_type * value = [MTRZoneManagementClusterZoneStoppedEvent new];
 
         do {
-            NSArray * _Nonnull memberValue;
-            { // Scope for our temporary variables
-                auto * array_0 = [NSMutableArray new];
-                auto iter_0 = cppValue.zones.begin();
-                while (iter_0.Next()) {
-                    auto & entry_0 = iter_0.GetValue();
-                    NSNumber * newElement_0;
-                    newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
-                    [array_0 addObject:newElement_0];
-                }
-                CHIP_ERROR err = iter_0.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    *aError = err;
-                    return nil;
-                }
-                memberValue = array_0;
-            }
-            value.zones = memberValue;
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedShort:cppValue.zone];
+            value.zone = memberValue;
         } while (0);
         do {
             NSNumber * _Nonnull memberValue;
@@ -4622,6 +5150,7 @@ static id _Nullable DecodeEventPayloadForZoneManagementCluster(EventId aEventId,
         return value;
     }
     default: {
+        // Not a known ZoneManagement event.
         break;
     }
     }
@@ -4633,264 +5162,21 @@ static id _Nullable DecodeEventPayloadForCameraAVStreamManagementCluster(EventId
 {
     using namespace Clusters::CameraAvStreamManagement;
     switch (aEventId) {
-    case Events::VideoStreamChanged::Id: {
-        Events::VideoStreamChanged::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-
-        __auto_type * value = [MTRCameraAVStreamManagementClusterVideoStreamChangedEvent new];
-
-        do {
-            NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedShort:cppValue.videoStreamID];
-            value.videoStreamID = memberValue;
-        } while (0);
-        do {
-            NSNumber * _Nullable memberValue;
-            if (cppValue.streamType.HasValue()) {
-                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.streamType.Value())];
-            } else {
-                memberValue = nil;
-            }
-            value.streamType = memberValue;
-        } while (0);
-        do {
-            NSNumber * _Nullable memberValue;
-            if (cppValue.videoCodec.HasValue()) {
-                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.videoCodec.Value())];
-            } else {
-                memberValue = nil;
-            }
-            value.videoCodec = memberValue;
-        } while (0);
-        do {
-            NSNumber * _Nullable memberValue;
-            if (cppValue.minFrameRate.HasValue()) {
-                memberValue = [NSNumber numberWithUnsignedShort:cppValue.minFrameRate.Value()];
-            } else {
-                memberValue = nil;
-            }
-            value.minFrameRate = memberValue;
-        } while (0);
-        do {
-            NSNumber * _Nullable memberValue;
-            if (cppValue.maxFrameRate.HasValue()) {
-                memberValue = [NSNumber numberWithUnsignedShort:cppValue.maxFrameRate.Value()];
-            } else {
-                memberValue = nil;
-            }
-            value.maxFrameRate = memberValue;
-        } while (0);
-        do {
-            MTRCameraAVStreamManagementClusterVideoResolutionStruct * _Nullable memberValue;
-            if (cppValue.minResolution.HasValue()) {
-                memberValue = [MTRCameraAVStreamManagementClusterVideoResolutionStruct new];
-                memberValue.width = [NSNumber numberWithUnsignedShort:cppValue.minResolution.Value().width];
-                memberValue.height = [NSNumber numberWithUnsignedShort:cppValue.minResolution.Value().height];
-            } else {
-                memberValue = nil;
-            }
-            value.minResolution = memberValue;
-        } while (0);
-        do {
-            MTRCameraAVStreamManagementClusterVideoResolutionStruct * _Nullable memberValue;
-            if (cppValue.maxResolution.HasValue()) {
-                memberValue = [MTRCameraAVStreamManagementClusterVideoResolutionStruct new];
-                memberValue.width = [NSNumber numberWithUnsignedShort:cppValue.maxResolution.Value().width];
-                memberValue.height = [NSNumber numberWithUnsignedShort:cppValue.maxResolution.Value().height];
-            } else {
-                memberValue = nil;
-            }
-            value.maxResolution = memberValue;
-        } while (0);
-        do {
-            NSNumber * _Nullable memberValue;
-            if (cppValue.minBitRate.HasValue()) {
-                memberValue = [NSNumber numberWithUnsignedInt:cppValue.minBitRate.Value()];
-            } else {
-                memberValue = nil;
-            }
-            value.minBitRate = memberValue;
-        } while (0);
-        do {
-            NSNumber * _Nullable memberValue;
-            if (cppValue.maxBitRate.HasValue()) {
-                memberValue = [NSNumber numberWithUnsignedInt:cppValue.maxBitRate.Value()];
-            } else {
-                memberValue = nil;
-            }
-            value.maxBitRate = memberValue;
-        } while (0);
-        do {
-            NSNumber * _Nullable memberValue;
-            if (cppValue.minFragmentLen.HasValue()) {
-                memberValue = [NSNumber numberWithUnsignedShort:cppValue.minFragmentLen.Value()];
-            } else {
-                memberValue = nil;
-            }
-            value.minFragmentLen = memberValue;
-        } while (0);
-        do {
-            NSNumber * _Nullable memberValue;
-            if (cppValue.maxFragmentLen.HasValue()) {
-                memberValue = [NSNumber numberWithUnsignedShort:cppValue.maxFragmentLen.Value()];
-            } else {
-                memberValue = nil;
-            }
-            value.maxFragmentLen = memberValue;
-        } while (0);
-
-        return value;
-    }
-    case Events::AudioStreamChanged::Id: {
-        Events::AudioStreamChanged::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-
-        __auto_type * value = [MTRCameraAVStreamManagementClusterAudioStreamChangedEvent new];
-
-        do {
-            NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedShort:cppValue.audioStreamID];
-            value.audioStreamID = memberValue;
-        } while (0);
-        do {
-            NSNumber * _Nullable memberValue;
-            if (cppValue.streamType.HasValue()) {
-                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.streamType.Value())];
-            } else {
-                memberValue = nil;
-            }
-            value.streamType = memberValue;
-        } while (0);
-        do {
-            NSNumber * _Nullable memberValue;
-            if (cppValue.audioCodec.HasValue()) {
-                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.audioCodec.Value())];
-            } else {
-                memberValue = nil;
-            }
-            value.audioCodec = memberValue;
-        } while (0);
-        do {
-            NSNumber * _Nullable memberValue;
-            if (cppValue.channelCount.HasValue()) {
-                memberValue = [NSNumber numberWithUnsignedChar:cppValue.channelCount.Value()];
-            } else {
-                memberValue = nil;
-            }
-            value.channelCount = memberValue;
-        } while (0);
-        do {
-            NSNumber * _Nullable memberValue;
-            if (cppValue.sampleRate.HasValue()) {
-                memberValue = [NSNumber numberWithUnsignedInt:cppValue.sampleRate.Value()];
-            } else {
-                memberValue = nil;
-            }
-            value.sampleRate = memberValue;
-        } while (0);
-        do {
-            NSNumber * _Nullable memberValue;
-            if (cppValue.bitRate.HasValue()) {
-                memberValue = [NSNumber numberWithUnsignedInt:cppValue.bitRate.Value()];
-            } else {
-                memberValue = nil;
-            }
-            value.bitRate = memberValue;
-        } while (0);
-        do {
-            NSNumber * _Nullable memberValue;
-            if (cppValue.bitDepth.HasValue()) {
-                memberValue = [NSNumber numberWithUnsignedChar:cppValue.bitDepth.Value()];
-            } else {
-                memberValue = nil;
-            }
-            value.bitDepth = memberValue;
-        } while (0);
-
-        return value;
-    }
-    case Events::SnapshotStreamChanged::Id: {
-        Events::SnapshotStreamChanged::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-
-        __auto_type * value = [MTRCameraAVStreamManagementClusterSnapshotStreamChangedEvent new];
-
-        do {
-            NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedShort:cppValue.snapshotStreamID];
-            value.snapshotStreamID = memberValue;
-        } while (0);
-        do {
-            NSNumber * _Nullable memberValue;
-            if (cppValue.imageCodec.HasValue()) {
-                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.imageCodec.Value())];
-            } else {
-                memberValue = nil;
-            }
-            value.imageCodec = memberValue;
-        } while (0);
-        do {
-            NSNumber * _Nullable memberValue;
-            if (cppValue.frameRate.HasValue()) {
-                memberValue = [NSNumber numberWithUnsignedShort:cppValue.frameRate.Value()];
-            } else {
-                memberValue = nil;
-            }
-            value.frameRate = memberValue;
-        } while (0);
-        do {
-            NSNumber * _Nullable memberValue;
-            if (cppValue.bitRate.HasValue()) {
-                memberValue = [NSNumber numberWithUnsignedInt:cppValue.bitRate.Value()];
-            } else {
-                memberValue = nil;
-            }
-            value.bitRate = memberValue;
-        } while (0);
-        do {
-            MTRCameraAVStreamManagementClusterVideoResolutionStruct * _Nullable memberValue;
-            if (cppValue.minResolution.HasValue()) {
-                memberValue = [MTRCameraAVStreamManagementClusterVideoResolutionStruct new];
-                memberValue.width = [NSNumber numberWithUnsignedShort:cppValue.minResolution.Value().width];
-                memberValue.height = [NSNumber numberWithUnsignedShort:cppValue.minResolution.Value().height];
-            } else {
-                memberValue = nil;
-            }
-            value.minResolution = memberValue;
-        } while (0);
-        do {
-            MTRCameraAVStreamManagementClusterVideoResolutionStruct * _Nullable memberValue;
-            if (cppValue.maxResolution.HasValue()) {
-                memberValue = [MTRCameraAVStreamManagementClusterVideoResolutionStruct new];
-                memberValue.width = [NSNumber numberWithUnsignedShort:cppValue.maxResolution.Value().width];
-                memberValue.height = [NSNumber numberWithUnsignedShort:cppValue.maxResolution.Value().height];
-            } else {
-                memberValue = nil;
-            }
-            value.maxResolution = memberValue;
-        } while (0);
-        do {
-            NSNumber * _Nullable memberValue;
-            if (cppValue.quality.HasValue()) {
-                memberValue = [NSNumber numberWithUnsignedChar:cppValue.quality.Value()];
-            } else {
-                memberValue = nil;
-            }
-            value.quality = memberValue;
-        } while (0);
-
-        return value;
-    }
     default: {
+        // Not a known CameraAVStreamManagement event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForCameraAVSettingsUserLevelManagementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::CameraAvSettingsUserLevelManagement;
+    switch (aEventId) {
+    default: {
+        // Not a known CameraAVSettingsUserLevelManagement event.
         break;
     }
     }
@@ -4903,6 +5189,7 @@ static id _Nullable DecodeEventPayloadForWebRTCTransportProviderCluster(EventId 
     using namespace Clusters::WebRTCTransportProvider;
     switch (aEventId) {
     default: {
+        // Not a known WebRTCTransportProvider event.
         break;
     }
     }
@@ -4915,6 +5202,68 @@ static id _Nullable DecodeEventPayloadForWebRTCTransportRequestorCluster(EventId
     using namespace Clusters::WebRTCTransportRequestor;
     switch (aEventId) {
     default: {
+        // Not a known WebRTCTransportRequestor event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForPushAVStreamTransportCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::PushAvStreamTransport;
+    switch (aEventId) {
+    case Events::PushTransportBegin::Id: {
+        Events::PushTransportBegin::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRPushAVStreamTransportClusterPushTransportBeginEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedShort:cppValue.connectionID];
+            value.connectionID = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.triggerType)];
+            value.triggerType = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.activationReason.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.activationReason.Value())];
+            } else {
+                memberValue = nil;
+            }
+            value.activationReason = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::PushTransportEnd::Id: {
+        Events::PushTransportEnd::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRPushAVStreamTransportClusterPushTransportEndEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedShort:cppValue.connectionID];
+            value.connectionID = memberValue;
+        } while (0);
+
+        return value;
+    }
+    default: {
+        // Not a known PushAVStreamTransport event.
         break;
     }
     }
@@ -4927,6 +5276,20 @@ static id _Nullable DecodeEventPayloadForChimeCluster(EventId aEventId, TLV::TLV
     using namespace Clusters::Chime;
     switch (aEventId) {
     default: {
+        // Not a known Chime event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForCommodityTariffCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::CommodityTariff;
+    switch (aEventId) {
+    default: {
+        // Not a known CommodityTariff event.
         break;
     }
     }
@@ -4939,6 +5302,7 @@ static id _Nullable DecodeEventPayloadForEcosystemInformationCluster(EventId aEv
     using namespace Clusters::EcosystemInformation;
     switch (aEventId) {
     default: {
+        // Not a known EcosystemInformation event.
         break;
     }
     }
@@ -4983,6 +5347,85 @@ static id _Nullable DecodeEventPayloadForCommissionerControlCluster(EventId aEve
         return value;
     }
     default: {
+        // Not a known CommissionerControl event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForJointFabricDatastoreCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::JointFabricDatastore;
+    switch (aEventId) {
+    default: {
+        // Not a known JointFabricDatastore event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForJointFabricAdministratorCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::JointFabricAdministrator;
+    switch (aEventId) {
+    default: {
+        // Not a known JointFabricAdministrator event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForTLSCertificateManagementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::TlsCertificateManagement;
+    switch (aEventId) {
+    default: {
+        // Not a known TLSCertificateManagement event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForTLSClientManagementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::TlsClientManagement;
+    switch (aEventId) {
+    default: {
+        // Not a known TLSClientManagement event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForMeterIdentificationCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::MeterIdentification;
+    switch (aEventId) {
+    default: {
+        // Not a known MeterIdentification event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForCommodityMeteringCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::CommodityMetering;
+    switch (aEventId) {
+    default: {
+        // Not a known CommodityMetering event.
         break;
     }
     }
@@ -5137,6 +5580,7 @@ static id _Nullable DecodeEventPayloadForUnitTestingCluster(EventId aEventId, TL
         return value;
     }
     default: {
+        // Not a known UnitTesting event.
         break;
     }
     }
@@ -5171,6 +5615,7 @@ static id _Nullable DecodeEventPayloadForSampleMEICluster(EventId aEventId, TLV:
         return value;
     }
     default: {
+        // Not a known SampleMEI event.
         break;
     }
     }
@@ -5350,11 +5795,17 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     case Clusters::ScenesManagement::Id: {
         return DecodeEventPayloadForScenesManagementCluster(aPath.mEventId, aReader, aError);
     }
+    case Clusters::Groupcast::Id: {
+        return DecodeEventPayloadForGroupcastCluster(aPath.mEventId, aReader, aError);
+    }
     case Clusters::HepaFilterMonitoring::Id: {
         return DecodeEventPayloadForHEPAFilterMonitoringCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::ActivatedCarbonFilterMonitoring::Id: {
         return DecodeEventPayloadForActivatedCarbonFilterMonitoringCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::WaterTankLevelMonitoring::Id: {
+        return DecodeEventPayloadForWaterTankLevelMonitoringCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::BooleanStateConfiguration::Id: {
         return DecodeEventPayloadForBooleanStateConfigurationCluster(aPath.mEventId, aReader, aError);
@@ -5371,8 +5822,8 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     case Clusters::WaterHeaterManagement::Id: {
         return DecodeEventPayloadForWaterHeaterManagementCluster(aPath.mEventId, aReader, aError);
     }
-    case Clusters::DemandResponseLoadControl::Id: {
-        return DecodeEventPayloadForDemandResponseLoadControlCluster(aPath.mEventId, aReader, aError);
+    case Clusters::CommodityPrice::Id: {
+        return DecodeEventPayloadForCommodityPriceCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::Messages::Id: {
         return DecodeEventPayloadForMessagesCluster(aPath.mEventId, aReader, aError);
@@ -5398,11 +5849,20 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     case Clusters::DeviceEnergyManagementMode::Id: {
         return DecodeEventPayloadForDeviceEnergyManagementModeCluster(aPath.mEventId, aReader, aError);
     }
+    case Clusters::ElectricalGridConditions::Id: {
+        return DecodeEventPayloadForElectricalGridConditionsCluster(aPath.mEventId, aReader, aError);
+    }
     case Clusters::DoorLock::Id: {
         return DecodeEventPayloadForDoorLockCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::WindowCovering::Id: {
         return DecodeEventPayloadForWindowCoveringCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::ClosureControl::Id: {
+        return DecodeEventPayloadForClosureControlCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::ClosureDimension::Id: {
+        return DecodeEventPayloadForClosureDimensionCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::ServiceArea::Id: {
         return DecodeEventPayloadForServiceAreaCluster(aPath.mEventId, aReader, aError);
@@ -5473,6 +5933,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     case Clusters::RadonConcentrationMeasurement::Id: {
         return DecodeEventPayloadForRadonConcentrationMeasurementCluster(aPath.mEventId, aReader, aError);
     }
+    case Clusters::SoilMeasurement::Id: {
+        return DecodeEventPayloadForSoilMeasurementCluster(aPath.mEventId, aReader, aError);
+    }
     case Clusters::WiFiNetworkManagement::Id: {
         return DecodeEventPayloadForWiFiNetworkManagementCluster(aPath.mEventId, aReader, aError);
     }
@@ -5530,20 +5993,47 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     case Clusters::CameraAvStreamManagement::Id: {
         return DecodeEventPayloadForCameraAVStreamManagementCluster(aPath.mEventId, aReader, aError);
     }
+    case Clusters::CameraAvSettingsUserLevelManagement::Id: {
+        return DecodeEventPayloadForCameraAVSettingsUserLevelManagementCluster(aPath.mEventId, aReader, aError);
+    }
     case Clusters::WebRTCTransportProvider::Id: {
         return DecodeEventPayloadForWebRTCTransportProviderCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::WebRTCTransportRequestor::Id: {
         return DecodeEventPayloadForWebRTCTransportRequestorCluster(aPath.mEventId, aReader, aError);
     }
+    case Clusters::PushAvStreamTransport::Id: {
+        return DecodeEventPayloadForPushAVStreamTransportCluster(aPath.mEventId, aReader, aError);
+    }
     case Clusters::Chime::Id: {
         return DecodeEventPayloadForChimeCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::CommodityTariff::Id: {
+        return DecodeEventPayloadForCommodityTariffCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::EcosystemInformation::Id: {
         return DecodeEventPayloadForEcosystemInformationCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::CommissionerControl::Id: {
         return DecodeEventPayloadForCommissionerControlCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::JointFabricDatastore::Id: {
+        return DecodeEventPayloadForJointFabricDatastoreCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::JointFabricAdministrator::Id: {
+        return DecodeEventPayloadForJointFabricAdministratorCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::TlsCertificateManagement::Id: {
+        return DecodeEventPayloadForTLSCertificateManagementCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::TlsClientManagement::Id: {
+        return DecodeEventPayloadForTLSClientManagementCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::MeterIdentification::Id: {
+        return DecodeEventPayloadForMeterIdentificationCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::CommodityMetering::Id: {
+        return DecodeEventPayloadForCommodityMeteringCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::UnitTesting::Id: {
         return DecodeEventPayloadForUnitTestingCluster(aPath.mEventId, aReader, aError);

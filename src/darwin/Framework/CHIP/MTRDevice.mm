@@ -42,10 +42,7 @@
 @implementation MTRDeviceDelegateInfo
 - (instancetype)initWithDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue interestedPathsForAttributes:(NSArray * _Nullable)interestedPathsForAttributes interestedPathsForEvents:(NSArray * _Nullable)interestedPathsForEvents
 {
-    if (self = [super init]) {
-        _delegate = delegate;
-        _delegatePointerValue = (__bridge void *) delegate;
-        _queue = queue;
+    if (self = [super initWithDelegate:delegate queue:queue]) {
         _interestedPathsForAttributes = [interestedPathsForAttributes copy];
         _interestedPathsForEvents = [interestedPathsForEvents copy];
     }
@@ -54,30 +51,9 @@
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<MTRDeviceDelegateInfo: %p delegate value %p interested attribute paths count %lu event paths count %lu>", self, _delegatePointerValue, static_cast<unsigned long>(_interestedPathsForAttributes.count), static_cast<unsigned long>(_interestedPathsForEvents.count)];
+    return [NSString stringWithFormat:@"<MTRDeviceDelegateInfo: %p delegate value %p interested attribute paths count %lu event paths count %lu>", self, self.delegatePointerValue, static_cast<unsigned long>(_interestedPathsForAttributes.count), static_cast<unsigned long>(_interestedPathsForEvents.count)];
 }
 
-- (BOOL)callDelegateWithBlock:(void (^)(id<MTRDeviceDelegate>))block
-{
-    id<MTRDeviceDelegate> strongDelegate = _delegate;
-    VerifyOrReturnValue(strongDelegate, NO);
-    dispatch_async(_queue, ^{
-        block(strongDelegate);
-    });
-    return YES;
-}
-
-#ifdef DEBUG
-- (BOOL)callDelegateSynchronouslyWithBlock:(void (^)(id<MTRDeviceDelegate>))block
-{
-    id<MTRDeviceDelegate> strongDelegate = _delegate;
-    VerifyOrReturnValue(strongDelegate, NO);
-
-    block(strongDelegate);
-
-    return YES;
-}
-#endif
 @end
 
 #pragma mark - MTRDevice
@@ -110,7 +86,7 @@ MTR_DIRECT_MEMBERS
 {
     if (self = [super init]) {
         _lock = OS_UNFAIR_LOCK_INIT;
-        _delegates = [NSMutableSet set];
+        _delegateManager = [[MTRDelegateManager alloc] initWithOwner:self];
         _deviceController = controller;
         _nodeID = nodeID;
         _state = MTRDeviceStateUnknown;
@@ -132,6 +108,8 @@ MTR_DIRECT_MEMBERS
 {
     // TODO: retain cycle and clean up https://github.com/project-chip/connectedhomeip/issues/34267
     MTR_LOG("MTRDevice dealloc: %p", self);
+
+    [_deviceController deviceDeallocated];
 
     // Locking because _cancelAllAttributeValueWaiters has os_unfair_lock_assert_owner(&_lock)
     std::lock_guard lock(_lock);
@@ -178,33 +156,17 @@ MTR_DIRECT_MEMBERS
 {
     std::lock_guard lock(_lock);
 
-    // Replace delegate info with the same delegate object, and opportunistically remove defunct delegate references
-    NSMutableSet<MTRDeviceDelegateInfo *> * delegatesToRemove = [NSMutableSet set];
-    for (MTRDeviceDelegateInfo * delegateInfo in _delegates) {
-        id<MTRDeviceDelegate> strongDelegate = delegateInfo.delegate;
-        if (!strongDelegate) {
-            [delegatesToRemove addObject:delegateInfo];
-            MTR_LOG("%@ removing delegate info for nil delegate %p", self, delegateInfo.delegatePointerValue);
-        } else if (strongDelegate == delegate) {
-            [delegatesToRemove addObject:delegateInfo];
-            MTR_LOG("%@ replacing delegate info for %p", self, delegate);
-        }
-    }
-    if (delegatesToRemove.count) {
-        NSUInteger oldDelegatesCount = _delegates.count;
-        [_delegates minusSet:delegatesToRemove];
-        MTR_LOG("%@ addDelegate: removed %lu", self, static_cast<unsigned long>(_delegates.count - oldDelegatesCount));
-    }
-
     MTRDeviceDelegateInfo * newDelegateInfo = [[MTRDeviceDelegateInfo alloc] initWithDelegate:delegate queue:queue interestedPathsForAttributes:interestedPathsForAttributes interestedPathsForEvents:interestedPathsForEvents];
-    [_delegates addObject:newDelegateInfo];
-    MTR_LOG("%@ added delegate info %@", self, newDelegateInfo);
+    [_delegateManager addDelegateInfo:newDelegateInfo];
 
     // Call hook to allow subclasses to act on delegate addition.
-    [self _delegateAdded];
+    // TODO: We're calling this hook even if we just updated our existing
+    // delegate info, not actually added a new delegate.  That might be OK, but
+    // worth checking.
+    [self _delegateAdded:delegate];
 }
 
-- (void)_delegateAdded
+- (void)_delegateAdded:(id<MTRDeviceDelegate>)delegate
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
@@ -213,34 +175,33 @@ MTR_DIRECT_MEMBERS
 
 - (void)removeDelegate:(id<MTRDeviceDelegate>)delegate
 {
-    MTR_LOG("%@ removeDelegate %@", self, delegate);
-
     std::lock_guard lock(_lock);
 
-    NSMutableSet<MTRDeviceDelegateInfo *> * delegatesToRemove = [NSMutableSet set];
-    [self _iterateDelegatesWithBlock:^(MTRDeviceDelegateInfo * delegateInfo) {
-        id<MTRDeviceDelegate> strongDelegate = delegateInfo.delegate;
-        if (!strongDelegate) {
-            [delegatesToRemove addObject:delegateInfo];
-            MTR_LOG("%@ removing delegate info for nil delegate %p", self, delegateInfo.delegatePointerValue);
-        } else if (strongDelegate == delegate) {
-            [delegatesToRemove addObject:delegateInfo];
-            MTR_LOG("%@ removing delegate info %@ for %p", self, delegateInfo, delegate);
-        }
-    }];
-    if (delegatesToRemove.count) {
-        NSUInteger oldDelegatesCount = _delegates.count;
-        [_delegates minusSet:delegatesToRemove];
-        MTR_LOG("%@ removeDelegate: removed %lu", self, static_cast<unsigned long>(_delegates.count - oldDelegatesCount));
-    }
+    [_delegateManager removeDelegate:delegate];
+
+    // Call hook to allow subclasses to act on delegate removal.
+    [self _delegateRemoved:delegate];
+}
+
+- (void)_delegateRemoved:(id<MTRDeviceDelegate>)delegate
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    // Nothing to do for now. At the moment this is a hook for subclasses.
 }
 
 - (void)invalidate
 {
     std::lock_guard lock(_lock);
 
-    [_delegates removeAllObjects];
+    [_delegateManager removeAllDelegates];
     [self _cancelAllAttributeValueWaiters];
+}
+
+- (BOOL)delegateExists
+{
+    std::lock_guard lock(_lock);
+    return [self _delegateExists];
 }
 
 - (BOOL)_delegateExists
@@ -253,50 +214,14 @@ MTR_DIRECT_MEMBERS
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
-    if (!_delegates.count) {
-        MTR_LOG_DEBUG("%@ no delegates to iterate", self);
-        return NO;
-    }
-
-    // Opportunistically remove defunct delegate references on every iteration
-    NSMutableSet * delegatesToRemove = nil;
-    for (MTRDeviceDelegateInfo * delegateInfo in _delegates) {
-        id<MTRDeviceDelegate> strongDelegate = delegateInfo.delegate;
-        if (strongDelegate) {
-            if (block) {
-                @autoreleasepool {
-                    block(delegateInfo);
-                }
-            }
-            (void) strongDelegate; // ensure it stays alive
-        } else {
-            if (!delegatesToRemove) {
-                delegatesToRemove = [NSMutableSet set];
-            }
-            [delegatesToRemove addObject:delegateInfo];
-        }
-    }
-
-    if (delegatesToRemove.count) {
-        [_delegates minusSet:delegatesToRemove];
-        MTR_LOG("%@ _iterateDelegatesWithBlock: removed %lu remaining %lu", self, static_cast<unsigned long>(delegatesToRemove.count), (unsigned long) static_cast<unsigned long>(_delegates.count));
-    }
-
-    return (_delegates.count > 0);
+    return [_delegateManager iterateDelegatesWithBlock:block] > 0;
 }
 
 - (BOOL)_callDelegatesWithBlock:(void (^)(id<MTRDeviceDelegate> delegate))block
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
-    __block NSUInteger delegatesCalled = 0;
-    [self _iterateDelegatesWithBlock:^(MTRDeviceDelegateInfo * delegateInfo) {
-        if ([delegateInfo callDelegateWithBlock:block]) {
-            delegatesCalled++;
-        }
-    }];
-
-    return (delegatesCalled > 0);
+    return [_delegateManager callDelegatesWithBlock:block];
 }
 
 - (BOOL)_lockAndCallDelegatesWithBlock:(void (^)(id<MTRDeviceDelegate> delegate))block
@@ -311,12 +236,7 @@ MTR_DIRECT_MEMBERS
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
-    for (MTRDeviceDelegateInfo * delegateInfo in _delegates) {
-        if ([delegateInfo callDelegateSynchronouslyWithBlock:block]) {
-            MTR_LOG("%@ _callFirstDelegateSynchronouslyWithBlock: successfully called %@", self, delegateInfo);
-            return;
-        }
-    }
+    [_delegateManager callFirstDelegateSynchronouslyWithBlock:block];
 }
 #endif
 
@@ -325,14 +245,7 @@ MTR_DIRECT_MEMBERS
 {
     std::lock_guard lock(self->_lock);
 
-    NSUInteger nonnullDelegateCount = 0;
-    for (MTRDeviceDelegateInfo * delegateInfo in _delegates) {
-        if (delegateInfo.delegate) {
-            nonnullDelegateCount++;
-        }
-    }
-
-    return nonnullDelegateCount;
+    return [_delegateManager unitTestNonnullDelegateCount];
 }
 #endif
 
@@ -523,6 +436,16 @@ MTR_DIRECT_MEMBERS
                             completion:responseHandler];
 }
 
+- (void)invokeCommands:(NSArray<NSArray<MTRCommandWithRequiredResponse *> *> *)commands
+                 queue:(dispatch_queue_t)queue
+            completion:(MTRDeviceResponseHandler)completion
+{
+    MTR_ABSTRACT_METHOD();
+    dispatch_async(queue, ^{
+        completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
+    });
+}
+
 - (void)openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode
                                    discriminator:(NSNumber *)discriminator
                                         duration:(NSNumber *)duration
@@ -572,6 +495,12 @@ MTR_DIRECT_MEMBERS
 }
 
 - (BOOL)deviceCachePrimed
+{
+    MTR_ABSTRACT_METHOD();
+    return NO;
+}
+
+- (BOOL)diagnosticLogTransferInProgress
 {
     MTR_ABSTRACT_METHOD();
     return NO;

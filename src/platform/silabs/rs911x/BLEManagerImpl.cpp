@@ -40,9 +40,6 @@
 #endif
 
 extern "C" {
-#if !(SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
-#include <rsi_driver.h>
-#endif
 #include <rsi_utils.h>
 }
 
@@ -51,8 +48,6 @@ extern "C" {
 #define BLE_SLAVE_LATENCY_MS 0
 #define BLE_TIMEOUT_MS 400
 #define BLE_SEND_INDICATION_TIMER_PERIOD_MS (5000)
-
-osSemaphoreId_t sl_rs_ble_init_sem;
 
 using namespace ::chip;
 using namespace ::chip::Ble;
@@ -165,6 +160,28 @@ void rsi_ble_add_matter_service(void)
                                                    RSI_BLE_ATT_PROPERTY_READ | RSI_BLE_ATT_PROPERTY_NOTIFY |
                                                    RSI_BLE_ATT_PROPERTY_INDICATE, // Set read, write, write without response
                                                data, sizeof(data), ATT_REC_MAINTAIN_IN_HOST);
+#ifdef CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    // C3 characteristic is of 128 bit UUID format structure - where val128 is of uuid128_t which is composed of uint32_t data1,
+    // uint16_t data2, uint16_t data3, uint8_t data4[8];
+    constexpr uuid_t custom_characteristic_C3 = { .size     = RSI_BLE_CHAR_C3_UUID_SIZE,
+                                                  .reserved = { RSI_BLE_CHAR_C3_RESERVED },
+                                                  .val      = { .val128 = { .data1 = RSI_BLE_CHAR_C3_UUID_1,
+                                                                            .data2 = RSI_BLE_CHAR_C3_UUID_2,
+                                                                            .data3 = RSI_BLE_CHAR_C3_UUID_3,
+                                                                            .data4 = { RSI_BLE_CHAR_C3_UUID_4 } } } };
+
+    // Adding custom characteristic declaration to the custom service
+    SilabsBleWrapper::rsi_ble_add_char_serv_att(
+        new_serv_resp.serv_handler, new_serv_resp.start_handle + RSI_BLE_CHAR_C3_ATTR_HANDLE_LOC,
+        RSI_BLE_ATT_PROPERTY_READ, // Set read
+        new_serv_resp.start_handle + RSI_BLE_CHAR_C3_MEASUREMENT_HANDLE_LOC, custom_characteristic_C3);
+
+    // Adding characteristic value attribute to the service
+    SilabsBleWrapper::rsi_ble_add_char_val_att(
+        new_serv_resp.serv_handler, new_serv_resp.start_handle + RSI_BLE_CHAR_C3_MEASUREMENT_HANDLE_LOC, custom_characteristic_C3,
+        RSI_BLE_ATT_PROPERTY_READ, // Set read
+        data, sizeof(data), ATT_REC_IN_HOST);
+#endif // CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 }
 
 } // namespace
@@ -234,9 +251,6 @@ void BLEManagerImpl::sl_ble_event_handling_task(void * args)
     sl_status_t status;
     SilabsBleWrapper::BleEvent_t bleEvent;
 
-    //! This semaphore is waiting for wifi module initialization.
-    osSemaphoreAcquire(sl_rs_ble_init_sem, osWaitForever);
-
     // This function initialize BLE and start BLE advertisement.
     sInstance.sl_ble_init();
 
@@ -287,8 +301,6 @@ void BLEManagerImpl::sl_ble_init()
 CHIP_ERROR BLEManagerImpl::_Init()
 {
     CHIP_ERROR err;
-
-    sl_rs_ble_init_sem = osSemaphoreNew(1, 0, NULL);
 
     sBleThread = osThreadNew(sInstance.sl_ble_event_handling_task, NULL, &kBleTaskAttr);
 
@@ -479,7 +491,7 @@ CHIP_ERROR BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "sl_bt_connection_close() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "sl_bt_connection_close() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     return err;
@@ -545,7 +557,7 @@ void BLEManagerImpl::DriveBLEState(void)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Check if BLE stack is initialized ( TODO )
-    VerifyOrExit(mFlags.Has(Flags::kEFRBLEStackInitialized), /* */);
+    VerifyOrExit(mFlags.Has(Flags::kSiLabsBLEStackInitialize), /* */);
 
     // Start advertising if needed...
     if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && mFlags.Has(Flags::kAdvertisingEnabled) &&
@@ -572,7 +584,7 @@ void BLEManagerImpl::DriveBLEState(void)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
         mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
     }
 }
@@ -728,7 +740,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 
 exit:
     // TODO: Add MapBLEError to return the correct error code
-    ChipLogError(DeviceLayer, "StartAdvertising() End error: %s", ErrorStr(err));
+    ChipLogError(DeviceLayer, "StartAdvertising() End error: %" CHIP_ERROR_FORMAT, err.Format());
     return err;
 }
 
@@ -811,7 +823,7 @@ void BLEManagerImpl::UpdateMtu(const SilabsBleWrapper::sl_wfx_msg_t & evt)
 
 void BLEManagerImpl::HandleBootEvent(void)
 {
-    mFlags.Set(Flags::kEFRBLEStackInitialized);
+    mFlags.Set(Flags::kSiLabsBLEStackInitialize);
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
 
@@ -910,7 +922,7 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(const SilabsBleWrapper::sl_wfx_msg_t 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "HandleTXCharCCCDWrite() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "HandleTXCharCCCDWrite() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
@@ -940,7 +952,7 @@ void BLEManagerImpl::HandleRXCharWrite(const SilabsBleWrapper::sl_wfx_msg_t & ev
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "HandleRXCharWrite() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "HandleRXCharWrite() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
@@ -1028,23 +1040,27 @@ CHIP_ERROR BLEManagerImpl::EncodeAdditionalDataTlv()
     MutableByteSpan rotatingDeviceIdUniqueIdSpan(rotatingDeviceIdUniqueId);
 
     err = DeviceLayer::GetDeviceInstanceInfoProvider()->GetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueIdSpan);
-    SuccessOrExit(err);
+
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(DeviceLayer, "Failed to GetRotatingDeviceIdUniqueId"));
+
     err = ConfigurationMgr().GetLifetimeCounter(additionalDataPayloadParams.rotatingDeviceIdLifetimeCounter);
-    SuccessOrExit(err);
+
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(DeviceLayer, "Failed to GetLifetimeCounter"));
+
     additionalDataPayloadParams.rotatingDeviceIdUniqueId = rotatingDeviceIdUniqueIdSpan;
     additionalDataFields.Set(AdditionalDataFields::RotatingDeviceId);
 #endif /* CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID) */
 
-    err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(additionalDataPayloadParams, c3AdditionalDataBufferHandle,
-                                                                         additionalDataFields);
+    err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(
+        additionalDataPayloadParams, sInstance.c3AdditionalDataBufferHandle, additionalDataFields);
 
-exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Failed to generate TLV encoded Additional Data (%s)", __func__);
+        ChipLogError(DeviceLayer, "Failed to generate TLV encoded Additional Data: %" CHIP_ERROR_FORMAT, err.Format());
     }
-
     return err;
+
+    return CHIP_NO_ERROR;
 }
 
 void BLEManagerImpl::HandleC3ReadRequest(const SilabsBleWrapper::sl_wfx_msg_t & evt)

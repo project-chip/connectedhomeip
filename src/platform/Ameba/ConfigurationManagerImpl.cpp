@@ -279,7 +279,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     err = AmebaConfig::ClearNamespace();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "ClearNamespace() failed: %s", chip::ErrorStr(err));
+        ChipLogError(DeviceLayer, "ClearNamespace() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     // Restart the system.

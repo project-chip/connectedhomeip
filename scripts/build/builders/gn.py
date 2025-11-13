@@ -52,7 +52,7 @@ class GnBuilder(Builder):
         """Extra steps to run after 'build'"""
         pass
 
-    def generate(self):
+    def generate(self, dedup=False):
         cmd = [
             'gn', 'gen', '--check', '--fail-on-unused-args',
             '--add-export-compile-commands=*',
@@ -89,12 +89,14 @@ class GnBuilder(Builder):
                 )
             ]
 
-        self._Execute(cmd, title=title)
+        self._Execute(cmd, title=title, dedup=dedup)
 
     def _build(self):
         self.PreBuildCommand()
 
         cmd = ['ninja', '-C', self.output_dir]
+        if self.verbose:
+            cmd.append('-v')
         if self.ninja_jobs is not None:
             cmd.append('-j' + str(self.ninja_jobs))
         if self.build_command:

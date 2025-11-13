@@ -36,6 +36,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/UnitTestUtils.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/TestOnlyCommissionableDataProvider.h>
@@ -90,10 +91,10 @@ TEST_F(TestPlatformMgr, BasicEventLoopTask)
         // Verify that the event loop will not exit until we tell it to by
         // scheduling few lambdas (for the test to pass, the event loop will
         // have to process more than one event).
-        DeviceLayer::SystemLayer().ScheduleLambda([&]() {
+        EXPECT_SUCCESS(DeviceLayer::SystemLayer().ScheduleLambda([&]() {
             counterRun++;
             counterSync--;
-        });
+        }));
 
         // Sleep for a short time to allow the event loop to process the
         // scheduled event and go to idle state. Without this sleep, the
@@ -103,10 +104,10 @@ TEST_F(TestPlatformMgr, BasicEventLoopTask)
         // using a "do { ... } while (shouldRun)" construct.
         chip::test_utils::SleepMillis(10);
 
-        DeviceLayer::SystemLayer().ScheduleLambda([&]() {
+        EXPECT_SUCCESS(DeviceLayer::SystemLayer().ScheduleLambda([&]() {
             counterRun++;
             counterSync--;
-        });
+        }));
 
         // Wait for the event loop to process the scheduled events.
         // Note, that we can not use any synchronization primitives like
@@ -146,7 +147,7 @@ TEST_F(TestPlatformMgr, BasicRunEventLoop)
 
     EXPECT_EQ(PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
 
-    PlatformMgr().ScheduleWork(StopTheLoop);
+    EXPECT_SUCCESS(PlatformMgr().ScheduleWork(StopTheLoop));
 
     EXPECT_FALSE(stopRan);
     PlatformMgr().RunEventLoop();
@@ -171,8 +172,8 @@ TEST_F(TestPlatformMgr, RunEventLoopTwoTasks)
 
     EXPECT_EQ(PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
 
-    PlatformMgr().ScheduleWork(SleepSome);
-    PlatformMgr().ScheduleWork(StopTheLoop);
+    EXPECT_SUCCESS(PlatformMgr().ScheduleWork(SleepSome));
+    EXPECT_SUCCESS(PlatformMgr().ScheduleWork(StopTheLoop));
 
     EXPECT_FALSE(stopRan);
     EXPECT_FALSE(sleepRan);
@@ -190,11 +191,11 @@ TEST_F(TestPlatformMgr, RunEventLoopStopBeforeSleep)
 
     EXPECT_EQ(PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
 
-    PlatformMgr().ScheduleWork([](intptr_t arg) {
+    EXPECT_SUCCESS(PlatformMgr().ScheduleWork([](intptr_t arg) {
         // Ensure that we don't proceed after stopping until the sleep is done too.
         StopTheLoop(arg);
         SleepSome(arg);
-    });
+    }));
 
     EXPECT_FALSE(stopRan);
     EXPECT_FALSE(sleepRan);
@@ -207,9 +208,15 @@ TEST_F(TestPlatformMgr, RunEventLoopStopBeforeSleep)
 
 TEST_F(TestPlatformMgr, TryLockChipStack)
 {
+    EXPECT_EQ(PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
+
     bool locked = PlatformMgr().TryLockChipStack();
+    EXPECT_EQ(locked, !CHIP_SYSTEM_CONFIG_NO_LOCKING);
+
     if (locked)
         PlatformMgr().UnlockChipStack();
+
+    PlatformMgr().Shutdown();
 }
 
 static int sEventRecieved = 0;
@@ -229,10 +236,12 @@ TEST_F(TestPlatformMgr, AddEventHandler)
 class MockSystemLayer : public System::LayerImpl
 {
 public:
+    // NOLINTNEXTLINE(bugprone-derived-method-shadowing-base-method)
     CHIP_ERROR StartTimer(System::Clock::Timeout aDelay, System::TimerCompleteCallback aComplete, void * aAppState) override
     {
         return CHIP_APPLICATION_ERROR(1);
     }
+    // NOLINTNEXTLINE(bugprone-derived-method-shadowing-base-method)
     CHIP_ERROR ScheduleWork(System::TimerCompleteCallback aComplete, void * aAppState) override
     {
         return CHIP_APPLICATION_ERROR(2);

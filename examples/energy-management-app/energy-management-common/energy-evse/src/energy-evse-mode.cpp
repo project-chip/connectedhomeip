@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <EnergyManagementAppCommonMain.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <energy-evse-modes.h>
 
@@ -41,7 +42,7 @@ void EnergyEvseModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Comma
 
 CHIP_ERROR EnergyEvseModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -50,7 +51,7 @@ CHIP_ERROR EnergyEvseModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::
 
 CHIP_ERROR EnergyEvseModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -60,7 +61,7 @@ CHIP_ERROR EnergyEvseModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_
 
 CHIP_ERROR EnergyEvseModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags)
 {
-    if (modeIndex >= ArraySize(kModeOptions))
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -89,8 +90,27 @@ void EnergyEvseMode::Shutdown()
 
 void emberAfEnergyEvseModeClusterInitCallback(chip::EndpointId endpointId)
 {
+    if (endpointId != GetEnergyDeviceEndpointId())
+    {
+        return;
+    }
+
     VerifyOrDie(!gEnergyEvseModeDelegate && !gEnergyEvseModeInstance);
     gEnergyEvseModeDelegate = std::make_unique<EnergyEvseMode::EnergyEvseModeDelegate>();
     gEnergyEvseModeInstance = std::make_unique<ModeBase::Instance>(gEnergyEvseModeDelegate.get(), 0x1, EnergyEvseMode::Id, 0);
-    gEnergyEvseModeInstance->Init();
+    TEMPORARY_RETURN_IGNORED gEnergyEvseModeInstance->Init();
+}
+
+void emberAfEnergyEvseModeClusterShutdownCallback(chip::EndpointId endpointId)
+{
+    if (endpointId != GetEnergyDeviceEndpointId())
+    {
+        return;
+    }
+
+    if (gEnergyEvseModeInstance)
+    {
+        gEnergyEvseModeInstance->Shutdown();
+    }
+    EnergyEvseMode::Shutdown();
 }

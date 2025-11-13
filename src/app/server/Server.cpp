@@ -27,6 +27,7 @@
 #include <app/data-model-provider/Provider.h>
 #include <app/server/Dnssd.h>
 #include <app/server/EchoHandler.h>
+#include <platform/DefaultTimerDelegate.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/Ble.h>
@@ -57,6 +58,9 @@
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SessionManager.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+#include <transport/raw/NFC.h>
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 #include <transport/raw/WiFiPAF.h>
@@ -79,6 +83,9 @@ using chip::Transport::PeerAddress;
 using chip::Transport::UdpListenParameters;
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 using chip::Transport::TcpListenParameters;
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+using chip::Transport::NfcListenParameters;
 #endif
 
 namespace {
@@ -116,6 +123,12 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mUserDirectedCommissioningPort = initParams.userDirectedCommissioningPort;
     mInterfaceId                   = initParams.interfaceId;
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    auto tcpListenParams = TcpListenParameters(DeviceLayer::TCPEndPointManager())
+                               .SetAddressType(IPAddressType::kIPv6)
+                               .SetListenPort(mOperationalServicePort);
+#endif
+
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(initParams.persistentStorageDelegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -137,7 +150,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     VerifyOrExit(initParams.dataModelProvider != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // TODO(16969): Remove Platform::MemoryInit() call from Server class, it belongs to outer code
-    Platform::MemoryInit();
+    TEMPORARY_RETURN_IGNORED Platform::MemoryInit();
 
     // Initialize PersistentStorageDelegate-based storage
     mDeviceStorage                 = initParams.persistentStorageDelegate;
@@ -210,13 +223,17 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     }
 
     // Init transport before operations with secure session mgr.
+    //
+    // The logic below expects that the IPv6 transport is at index 0. Keep that logic in sync with
+    // this code.
     err = mTransports.Init(UdpListenParameters(DeviceLayer::UDPEndPointManager())
                                .SetAddressType(IPAddressType::kIPv6)
                                .SetListenPort(mOperationalServicePort)
                                .SetNativeParams(initParams.endpointNativeParams)
-
 #if INET_CONFIG_ENABLE_IPV4
                                ,
+                           // The logic below expects that the IPv4 transport, if enabled, is at
+                           // index 1. Keep that logic in sync with this code.
                            UdpListenParameters(DeviceLayer::UDPEndPointManager())
                                .SetAddressType(IPAddressType::kIPv4)
                                .SetListenPort(mOperationalServicePort)
@@ -227,13 +244,22 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #endif
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
                                ,
+                           tcpListenParams
+#if INET_CONFIG_ENABLE_IPV4
+                           ,
                            TcpListenParameters(DeviceLayer::TCPEndPointManager())
-                               .SetAddressType(IPAddressType::kIPv6)
+                               .SetAddressType(IPAddressType::kIPv4)
                                .SetListenPort(mOperationalServicePort)
+#endif
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
                                ,
-                           Transport::WiFiPAFListenParameters(DeviceLayer::ConnectivityMgr().GetWiFiPAF())
+                           Transport::WiFiPAFListenParameters(static_cast<Transport::WiFiPAFBase *>(
+                               DeviceLayer::ConnectivityMgr().GetWiFiPAF()->mWiFiPAFTransport))
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+                               ,
+                           NfcListenParameters(nullptr)
 #endif
     );
 
@@ -253,7 +279,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
     err = mFabricDelegate.Init(this);
     SuccessOrExit(err);
-    mFabrics.AddFabricDelegate(&mFabricDelegate);
+    TEMPORARY_RETURN_IGNORED mFabrics.AddFabricDelegate(&mFabricDelegate);
 
     err = mExchangeMgr.Init(&mSessions);
     SuccessOrExit(err);
@@ -269,7 +295,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     app::DnssdServer::Instance().SetFabricTable(&mFabrics);
     app::DnssdServer::Instance().SetCommissioningModeProvider(&mCommissioningWindowManager);
 
-    Dnssd::Resolver::Instance().Init(DeviceLayer::UDPEndPointManager());
+    TEMPORARY_RETURN_IGNORED Dnssd::Resolver::Instance().Init(DeviceLayer::UDPEndPointManager());
 
 #if CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
     // Initialize event logging subsystem
@@ -284,9 +310,12 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
             { &sCritEventBuffer[0], sizeof(sCritEventBuffer), app::PriorityLevel::Critical }
         };
 
-        app::EventManagement::GetInstance().Init(&mExchangeMgr, CHIP_NUM_EVENT_LOGGING_BUFFERS, &sLoggingBuffer[0],
-                                                 &logStorageResources[0], &sGlobalEventIdCounter,
-                                                 std::chrono::duration_cast<System::Clock::Milliseconds64>(mInitTimestamp));
+        err = app::EventManagement::GetInstance().Init(&mExchangeMgr, CHIP_NUM_EVENT_LOGGING_BUFFERS, &sLoggingBuffer[0],
+                                                       &logStorageResources[0], &sGlobalEventIdCounter,
+                                                       std::chrono::duration_cast<System::Clock::Milliseconds64>(mInitTimestamp),
+                                                       &app::InteractionModelEngine::GetInstance()->GetReportingEngine());
+
+        SuccessOrExit(err);
     }
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
@@ -312,13 +341,10 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     SuccessOrExit(err);
 #endif
 
-    //
-    // We need to advertise the port that we're listening to for unsolicited messages over UDP. However, we have both a IPv4
-    // and IPv6 endpoint to pick from. Given that the listen port passed in may be set to 0 (which then has the kernel select
-    // a valid port at bind time), that will result in two possible ports being provided back from the resultant endpoint
-    // initializations. Since IPv6 is POR for Matter, let's go ahead and pick that port.
-    //
-    app::DnssdServer::Instance().SetSecuredPort(mTransports.GetTransport().GetImplAtIndex<0>().GetBoundPort());
+    app::DnssdServer::Instance().SetSecuredIPv6Port(mTransports.GetTransport().GetImplAtIndex<0>().GetBoundPort());
+#if INET_CONFIG_ENABLE_IPV4
+    app::DnssdServer::Instance().SetSecuredIPv4Port(mTransports.GetTransport().GetImplAtIndex<1>().GetBoundPort());
+#endif // INET_CONFIG_ENABLE_IPV4
 
     app::DnssdServer::Instance().SetUnsecuredPort(mUserDirectedCommissioningPort);
     app::DnssdServer::Instance().SetInterfaceId(mInterfaceId);
@@ -330,25 +356,27 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     app::DnssdServer::Instance().SetICDManager(&mICDManager);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    // Enable the TCP Server based on the TCPListenParameters setting.
+    app::DnssdServer::Instance().SetTCPServerEnabled(tcpListenParams.IsServerListenEnabled());
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+
     if (GetFabricTable().FabricCount() != 0)
     {
 #if CONFIG_NETWORK_LAYER_BLE
         // The device is already commissioned, proactively disable BLE advertisement.
         ChipLogProgress(AppServer, "Fabric already commissioned. Disabling BLE advertisement");
-        DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+        TEMPORARY_RETURN_IGNORED DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
 #endif
     }
-    else
+    else if (initParams.advertiseCommissionableIfNoFabrics)
     {
-#if CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART
-        SuccessOrExit(err = mCommissioningWindowManager.OpenBasicCommissioningWindow());
-#endif
+        SuccessOrExit(err = mCommissioningWindowManager.OpenBasicCommissioningWindow(initParams.discoveryTimeout));
     }
 
     // TODO @bzbarsky-apple @cecille Move to examples
-    // ESP32 and Mbed OS examples have a custom logic for enabling DNS-SD
-#if !CHIP_DEVICE_LAYER_TARGET_ESP32 && !CHIP_DEVICE_LAYER_TARGET_MBED &&                                                           \
-    (!CHIP_DEVICE_LAYER_TARGET_AMEBA || !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE)
+    // ESP32 examples have a custom logic for enabling DNS-SD
+#if !CHIP_DEVICE_LAYER_TARGET_ESP32 && (!CHIP_DEVICE_LAYER_TARGET_AMEBA || !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE)
     // StartServer only enables commissioning mode if device has not been commissioned
     app::DnssdServer::Instance().StartServer();
 #endif
@@ -407,7 +435,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     // Register Test Event Trigger Handler
     if (mTestEventTriggerDelegate != nullptr)
     {
-        mTestEventTriggerDelegate->AddHandler(&mICDManager);
+        TEMPORARY_RETURN_IGNORED mTestEventTriggerDelegate->AddHandler(&mICDManager);
     }
 
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -417,9 +445,9 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     //
     // Thread LWIP devices using dedicated Inet endpoint implementations are excluded because they call this function from:
     // src/platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.cpp
-#if !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     RejoinExistingMulticastGroups();
-#endif // !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#endif // !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 
     // Handle deferred clean-up of a previously armed fail-safe that occurred during FabricTable commit.
     // This is done at the very end since at the earlier time above when FabricTable::Init() is called,
@@ -444,7 +472,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
             // Because Matter runs a single event loop for all scheduled work, it will occur after the above has
             // taken place. If a reset occurs before we have cleaned everything up, the next boot will still
             // see the commit marker.
-            PlatformMgr().ScheduleWork(
+            TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(
                 [](intptr_t arg) {
                     Server * server = reinterpret_cast<Server *>(arg);
                     VerifyOrReturn(server != nullptr);
@@ -473,7 +501,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mUdcTransportMgr->SetSessionManager(gUDCClient);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
-    PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
     PlatformMgr().HandleServerStarted();
 
     mIsDnssdReady = Dnssd::Resolver::Instance().IsInitialized();
@@ -521,7 +549,7 @@ void Server::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent & event)
         ResumeSubscriptions();
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
         break;
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     case DeviceEventType::kThreadConnectivityChange:
         if (event.ThreadConnectivityChange.Result == kConnectivity_Established)
         {
@@ -530,7 +558,7 @@ void Server::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent & event)
             RejoinExistingMulticastGroups();
         }
         break;
-#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#endif // CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     default:
         break;
     }
@@ -602,12 +630,25 @@ bool Server::ShouldCheckInMsgsBeSentAtBootFunction(FabricIndex aFabricIndex, Nod
 
 void Server::GenerateShutDownEvent()
 {
-    PlatformMgr().ScheduleWork([](intptr_t) { PlatformMgr().HandleServerShuttingDown(); });
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork([](intptr_t) { PlatformMgr().HandleServerShuttingDown(); });
+}
+
+void Server::PostFactoryResetEvent()
+{
+    DeviceLayer::ChipDeviceEvent event{ .Type = DeviceLayer::DeviceEventType::kFactoryReset };
+
+    CHIP_ERROR error = DeviceLayer::PlatformMgr().PostEvent(&event);
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Posting kFactoryReset event failed with %" CHIP_ERROR_FORMAT, error.Format());
+    }
 }
 
 void Server::ScheduleFactoryReset()
 {
-    PlatformMgr().ScheduleWork([](intptr_t) {
+    PostFactoryResetEvent();
+
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork([](intptr_t) {
         // Delete all fabrics and emit Leave event.
         GetInstance().GetFabricTable().DeleteAllFabrics();
         PlatformMgr().HandleServerShuttingDown();

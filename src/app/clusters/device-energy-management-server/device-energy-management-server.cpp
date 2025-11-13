@@ -22,6 +22,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/util/attribute-storage.h>
+#include <clusters/DeviceEnergyManagement/Metadata.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -46,7 +47,7 @@ CHIP_ERROR Instance::Init()
 
 void Instance::Shutdown()
 {
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
@@ -104,49 +105,46 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
 }
 
 // CommandHandlerInterface
-CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
+CHIP_ERROR Instance::RetrieveAcceptedCommands(const ConcreteClusterPath & cluster,
+                                              ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Commands;
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(kAcceptedCommandsCount));
 
     if (HasFeature(Feature::kPowerAdjustment))
     {
-        for (auto && cmd : {
-                 PowerAdjustRequest::Id,
-                 CancelPowerAdjustRequest::Id,
-             })
-        {
-            VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
-        }
+        ReturnErrorOnFailure(builder.AppendElements({
+            PowerAdjustRequest::kMetadataEntry,
+            CancelPowerAdjustRequest::kMetadataEntry,
+        }));
     }
 
     if (HasFeature(Feature::kStartTimeAdjustment))
     {
-        VerifyOrExit(callback(StartTimeAdjustRequest::Id, context) == Loop::Continue, /**/);
+        ReturnErrorOnFailure(builder.Append(StartTimeAdjustRequest::kMetadataEntry));
     }
 
     if (HasFeature(Feature::kPausable))
     {
-        VerifyOrExit(callback(PauseRequest::Id, context) == Loop::Continue, /**/);
-        VerifyOrExit(callback(ResumeRequest::Id, context) == Loop::Continue, /**/);
+        ReturnErrorOnFailure(builder.AppendElements({ PauseRequest::kMetadataEntry, ResumeRequest::kMetadataEntry }));
     }
 
     if (HasFeature(Feature::kForecastAdjustment))
     {
-        VerifyOrExit(callback(ModifyForecastRequest::Id, context) == Loop::Continue, /**/);
+        ReturnErrorOnFailure(builder.Append(ModifyForecastRequest::kMetadataEntry));
     }
 
     if (HasFeature(Feature::kConstraintBasedAdjustment))
     {
-        VerifyOrExit(callback(RequestConstraintBasedForecast::Id, context) == Loop::Continue, /**/);
+        ReturnErrorOnFailure(builder.Append(RequestConstraintBasedForecast::kMetadataEntry));
     }
 
     if (HasFeature(Feature::kStartTimeAdjustment) || HasFeature(Feature::kForecastAdjustment) ||
         HasFeature(Feature::kConstraintBasedAdjustment))
     {
-        VerifyOrExit(callback(CancelRequest::Id, context) == Loop::Continue, /**/);
+        ReturnErrorOnFailure(builder.Append(CancelRequest::kMetadataEntry));
     }
 
-exit:
     return CHIP_NO_ERROR;
 }
 
@@ -451,8 +449,8 @@ void Instance::HandleStartTimeAdjustRequest(HandlerContext & ctx,
 
     if (earliestStartTimeNullable.IsNull())
     {
-        System::Clock::Milliseconds64 cTMs;
-        CHIP_ERROR err = System::SystemClock().GetClock_RealTimeMS(cTMs);
+        uint32_t matterEpoch = 0;
+        CHIP_ERROR err       = System::Clock::GetClock_MatterEpochS(matterEpoch);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "DEM: Unable to get current time - err:%" CHIP_ERROR_FORMAT, err.Format());
@@ -460,17 +458,8 @@ void Instance::HandleStartTimeAdjustRequest(HandlerContext & ctx,
             return;
         }
 
-        auto unixEpoch     = std::chrono::duration_cast<System::Clock::Seconds32>(cTMs).count();
-        uint32_t chipEpoch = 0;
-        if (!UnixEpochToChipEpochTime(unixEpoch, chipEpoch))
-        {
-            ChipLogError(Zcl, "DEM: unable to convert Unix Epoch time to Matter Epoch Time");
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
-            return;
-        }
-
         /* Null means - We can start immediately */
-        earliestStartTimeEpoch = chipEpoch; /* NOW */
+        earliestStartTimeEpoch = matterEpoch; /* NOW */
     }
     else
     {
@@ -756,11 +745,11 @@ void Instance::HandleRequestConstraintBasedForecast(HandlerContext & ctx,
     }
 
     uint32_t currentUtcTime = 0;
-    status                  = GetMatterEpochTimeFromUnixTime(currentUtcTime);
-    if (status != Status::Success)
+    CHIP_ERROR err          = System::Clock::GetClock_MatterEpochS(currentUtcTime);
+    if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "DEM: Failed to get UTC time");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
         return;
     }
 
@@ -896,31 +885,10 @@ void Instance::HandleCancelRequest(HandlerContext & ctx, const Commands::CancelR
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
-Status Instance::GetMatterEpochTimeFromUnixTime(uint32_t & currentUtcTime) const
-{
-    currentUtcTime = 0;
-    System::Clock::Milliseconds64 cTMs;
-
-    CHIP_ERROR err = System::SystemClock().GetClock_RealTimeMS(cTMs);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "DEM: Unable to get current time - err:%" CHIP_ERROR_FORMAT, err.Format());
-        return Status::Failure;
-    }
-
-    auto unixEpoch = std::chrono::duration_cast<System::Clock::Seconds32>(cTMs).count();
-    if (!UnixEpochToChipEpochTime(unixEpoch, currentUtcTime))
-    {
-        ChipLogError(Zcl, "DEM: unable to convert Unix Epoch time to Matter Epoch Time");
-        return Status::Failure;
-    }
-
-    return Status::Success;
-}
-
 } // namespace DeviceEnergyManagement
 } // namespace Clusters
 } // namespace app
 } // namespace chip
 
 void MatterDeviceEnergyManagementPluginServerInitCallback() {}
+void MatterDeviceEnergyManagementPluginServerShutdownCallback() {}

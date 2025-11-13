@@ -25,10 +25,6 @@ extern "C" {
 #include "ELSFactoryData.h"
 #include "mflash_drv.h"
 
-#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
-#include "els_pkc_mbedtls.h"
-#endif /* defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT) */
-
 #include "fsl_adapter_flash.h"
 
 /* mbedtls */
@@ -53,6 +49,10 @@ extern "C" {
 #define FACTORY_DATA_PROVIDER_PRINTF(...)
 #endif
 
+#if CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
+#error("OTA FACTORY DATA PROCESSOR NOT SUPPORTED WITH THIS FACTORY DATA PRVD IMPL")
+#endif
+
 /* Grab symbol for the base address from the linker file. */
 extern uint32_t __FACTORY_DATA_START_OFFSET[];
 extern uint32_t __FACTORY_DATA_SIZE[];
@@ -71,7 +71,6 @@ CHIP_ERROR FactoryDataProviderImpl::SearchForId(uint8_t searchedType, uint8_t * 
     CHIP_ERROR err               = CHIP_ERROR_NOT_FOUND;
     uint8_t type                 = 0;
     uint32_t index               = 0;
-    uint8_t * addrContent        = NULL;
     uint8_t * factoryDataAddress = &factoryDataRamBuffer[0];
     uint32_t factoryDataSize     = sizeof(factoryDataRamBuffer);
     uint16_t currentLen          = 0;
@@ -161,7 +160,6 @@ CHIP_ERROR FactoryDataProviderImpl::ReadAndCheckFactoryDataInFlash(void)
     status_t status;
     uint32_t factoryDataAddress = (uint32_t) __FACTORY_DATA_START_OFFSET;
     uint32_t factoryDataSize    = (uint32_t) __FACTORY_DATA_SIZE;
-    uint32_t hashId;
     uint8_t calculatedHash[SHA256_OUTPUT_SIZE];
     CHIP_ERROR res;
 
@@ -211,7 +209,6 @@ CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & digestToSign
     uint8_t hash[MCUXCLHASH_OUTPUT_SIZE_SHA_256]     = { 0 };
     mcuxClEls_KeyIndex_t key_index                   = MCUXCLELS_KEY_SLOTS;
     mcuxClEls_EccByte_t ecc_signature[MCUXCLELS_ECC_SIGNATURE_SIZE];
-    uint8_t digest[kSHA256_Hash_Length];
     uint16_t BlobSize  = 0;
     uint16_t KeyIdSize = 0;
     uint32_t Addr;
@@ -223,16 +220,11 @@ CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & digestToSign
         SearchForId(FactoryDataId::kEl2GoDacKeyId, (uint8_t *) &el2go_dac_key_id, sizeof(el2go_dac_key_id), KeyIdSize));
 
     /* Calculate message HASH to sign */
-    memset(&digest[0], 0, sizeof(digest));
-    res = Hash_SHA256(digestToSign.data(), digestToSign.size(), &digest[0]);
+    res = Hash_SHA256(digestToSign.data(), digestToSign.size(), &hash[0]);
     if (res != CHIP_NO_ERROR)
     {
         return res;
     }
-
-#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
-    (void) mcux_els_mutex_lock();
-#endif
 
     /* Read DAC key from EL2GO data*/
     status =
@@ -254,29 +246,23 @@ CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & digestToSign
     status = els_delete_key(key_index);
     STATUS_SUCCESS_OR_EXIT_MSG("Deletion of el2goimport_auth failed", status);
 
-#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
-    (void) mcux_els_mutex_unlock();
-#endif
     return CHIP_NO_ERROR;
 exit:
-#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
-    (void) mcux_els_mutex_unlock();
-#endif
     return CHIP_ERROR_INTERNAL;
 }
 
 CHIP_ERROR FactoryDataProviderImpl::Init(void)
 {
-    uint16_t len;
-    uint8_t type;
-    uint16_t keySize = 0;
-    status_t status  = STATUS_SUCCESS;
-
     ReturnLogErrorOnFailure(ReadAndCheckFactoryDataInFlash());
 
     els_enable();
 
     return CHIP_NO_ERROR;
+}
+
+FactoryDataProvider & FactoryDataPrvdImpl()
+{
+    return FactoryDataProviderImpl::sInstance;
 }
 
 } // namespace DeviceLayer

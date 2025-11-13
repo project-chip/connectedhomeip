@@ -78,8 +78,7 @@ CHIP_ERROR TemperatureControlAttrAccess::Read(const ConcreteReadAttributePath & 
         TemperatureControl::SupportedTemperatureLevelsIteratorDelegate * instance = TemperatureControl::GetInstance();
         if (instance == nullptr)
         {
-            aEncoder.EncodeEmptyList();
-            return CHIP_NO_ERROR;
+            return aEncoder.EncodeEmptyList();
         }
         instance->Reset(aPath.mEndpointId);
         err = aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
@@ -156,6 +155,9 @@ bool emberAfTemperatureControlClusterSetTemperatureCallback(app::CommandHandler 
                     goto exit;
                 }
 
+                // Step is min 1 in spec, to avoid divide by zero.
+                step = (step < 1) ? 1 : step;
+
                 if ((targetTemperature.Value() - minTemperature) % step != 0)
                 {
                     status = Status::ConstraintError;
@@ -229,4 +231,9 @@ void emberAfTemperatureControlClusterServerInitCallback(EndpointId endpoint) {}
 void MatterTemperatureControlPluginServerInitCallback()
 {
     AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
+}
+
+void MatterTemperatureControlPluginServerShutdownCallback()
+{
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
 }

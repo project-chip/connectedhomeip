@@ -69,6 +69,16 @@ enum class EnergyEvseTrigger : uint64_t
     kEVSEDiagnosticsComplete = 0x0099000000000020,
     // EV Charge TimeOfUse Mode clear | Simulate clearing the EVSE Mode TimeOfUse tag
     kEVTimeOfUseModeClear = 0x0099000000000021,
+    // EVSE Set SoC Low | Simulate a vehicle reporting 20% State of Charge, 70kWh battery capacity
+    kEVSESetSoCLow = 0x0099000000000030,
+    // EVSE Set SoC High | Simulate a vehicle reporting 95% State of Charge, 70kWh battery capacity
+    kEVSESetSoCHigh = 0x0099000000000031,
+    // EVSE Set SoC Clear | Simulate no vehicle State of Charge information
+    kEVSESetSoCClear = 0x0099000000000032,
+    // EVSE Set VehicleID | Simulate a vehicle ID being sent
+    kEVSESetVehicleID = 0x0099000000000040,
+    // EVSE Trigger RFID | Simulate an RFID tag being activated
+    kEVSETriggerRFID = 0x0099000000000050,
 };
 
 class EnergyEvseTestEventTriggerHandler : public TestEventTriggerHandler
@@ -82,6 +92,7 @@ public:
      */
     CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override
     {
+        eventTrigger = clearEndpointInEventTrigger(eventTrigger);
         if (HandleEnergyEvseTestEventTrigger(eventTrigger))
         {
             return CHIP_NO_ERROR;

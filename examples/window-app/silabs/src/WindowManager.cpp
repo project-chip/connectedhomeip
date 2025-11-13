@@ -27,17 +27,17 @@
 #include <WindowManager.h>
 
 #include <app/clusters/window-covering-server/window-covering-server.h>
-#include <app/server/OnboardingCodesUtil.h>
 #include <cmsis_os2.h>
 #include <lib/core/CHIPError.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #ifdef SL_WIFI
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <platform/silabs/NetworkCommissioningWiFiDriver.h>
-#include <platform/silabs/wifi/WifiInterfaceAbstraction.h>
+#include <platform/silabs/wifi/WifiInterface.h>
 #endif
 
 #ifdef DISPLAY_ENABLED
@@ -54,11 +54,11 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Silabs;
 #define APP_ACTION_LED 1
 
-#ifdef DIC_ENABLE
+#ifdef SL_MATTER_ENABLE_AWS
 #define DECIMAL 10
 #define MSG_SIZE 6
-#include "dic.h"
-#endif // DIC_ENABLE
+#include "MatterAws.h"
+#endif // SL_MATTER_ENABLE_AWS
 
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
@@ -171,7 +171,9 @@ void WindowManager::DispatchEventAttributeChange(chip::EndpointId endpoint, chip
     case Attributes::CurrentPositionLiftPercent100ths::Id:
     case Attributes::CurrentPositionTiltPercent100ths::Id:
         UpdateLED();
+#ifdef DISPLAY_ENABLED
         UpdateLCD();
+#endif // DISPLAY_ENABLED
         break;
     default:
         break;
@@ -476,22 +478,22 @@ void WindowManager::Cover::PositionSet(chip::EndpointId endpointId, chip::Percen
     if (action == ControlAction::Tilt)
     {
         TiltPositionSet(endpointId, nullablePosition);
-#ifdef DIC_ENABLE
+#ifdef SL_MATTER_ENABLE_AWS
         uint16_t value = position;
         char buffer[MSG_SIZE];
         itoa(value, buffer, DECIMAL);
-        dic_sendmsg("tilt/position set", (const char *) (buffer));
-#endif // DIC_ENABLE
+        MatterAwsSendMsg("tilt/position set", (const char *) (buffer));
+#endif // SL_MATTER_ENABLE_AWS
     }
     else
     {
         LiftPositionSet(endpointId, nullablePosition);
-#ifdef DIC_ENABLE
+#ifdef SL_MATTER_ENABLE_AWS
         uint16_t value = position;
         char buffer[MSG_SIZE];
         itoa(value, buffer, DECIMAL);
-        dic_sendmsg("lift/position set", (const char *) (buffer));
-#endif // DIC_ENABLE
+        MatterAwsSendMsg("lift/position set", (const char *) (buffer));
+#endif // SL_MATTER_ENABLE_AWS
     }
 }
 
@@ -554,7 +556,7 @@ void WindowManager::OnIconTimeout(WindowManager::Timer & timer)
 #ifdef DISPLAY_ENABLED
     sWindow.mIcon = LcdIcon::None;
     sWindow.UpdateLCD();
-#endif
+#endif // DISPLAY_ENABLED
 }
 
 CHIP_ERROR WindowManager::Init()
@@ -632,10 +634,15 @@ void WindowManager::UpdateLED()
     }
 }
 
+#ifdef DISPLAY_ENABLED
+void WindowManager::DrawUI(GLIB_Context_t * glibContext)
+{
+    sWindow.UpdateLCD();
+}
+
 void WindowManager::UpdateLCD()
 {
     // Update LCD
-#ifdef DISPLAY_ENABLED
     if (BaseApplication::GetProvisionStatus())
     {
         Cover & cover = GetCover();
@@ -654,8 +661,8 @@ void WindowManager::UpdateLCD()
             LcdPainter::Paint(AppTask::GetAppTask().GetLCD(), type, lift.Value(), tilt.Value(), mIcon);
         }
     }
-#endif // DISPLAY_ENABLED
 }
+#endif // DISPLAY_ENABLED
 
 // Silabs button callback from button event ISR
 void WindowManager::ButtonEventHandler(uint8_t button, uint8_t btnAction)
@@ -792,7 +799,7 @@ void WindowManager::GeneralEventHandler(AppEvent * aEvent)
         window->mIcon = window->mTiltMode ? LcdIcon::Tilt : LcdIcon::Lift;
         window->UpdateLCD();
         break;
-#endif
+#endif // DISPLAY_ENABLED
 
     default:
         break;

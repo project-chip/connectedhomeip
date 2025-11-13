@@ -47,7 +47,6 @@ extern "C" {
 #define SHA256_OUTPUT_SIZE 32
 #define HASH_ID 0xCE47BA5E
 #define HASH_LEN 4
-#define CBC_INITIAL_VECTOR_SIZE 16
 
 /* Grab symbol for the base address from the linker file. */
 extern uint32_t __FACTORY_DATA_START_OFFSET[];
@@ -142,21 +141,12 @@ CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & digestToSign
     ReturnErrorOnFailure(SearchForId(FactoryDataId::kDacPrivateKeyId, NULL, 0, keySize, &keyAddr));
     MutableByteSpan dacPrivateKeySpan((uint8_t *) keyAddr, keySize);
 
-    ReturnErrorOnFailure(LoadKeypairFromRaw(ByteSpan(dacPrivateKeySpan.data(), dacPrivateKeySpan.size()),
-                                            ByteSpan(dacPublicKey.Bytes(), dacPublicKey.Length()), keypair));
+    ReturnErrorOnFailure(keypair.HazardousOperationLoadKeypairFromRaw(ByteSpan(dacPrivateKeySpan.data(), dacPrivateKeySpan.size()),
+                                                                      ByteSpan(dacPublicKey.Bytes(), dacPublicKey.Length())));
 
     ReturnErrorOnFailure(keypair.ECDSA_sign_msg(digestToSign.data(), digestToSign.size(), signature));
 
     return CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, outSignBuffer);
-}
-
-CHIP_ERROR FactoryDataProviderImpl::LoadKeypairFromRaw(ByteSpan privateKey, ByteSpan publicKey, Crypto::P256Keypair & keypair)
-{
-    Crypto::P256SerializedKeypair serialized_keypair;
-    ReturnErrorOnFailure(serialized_keypair.SetLength(privateKey.size() + publicKey.size()));
-    memcpy(serialized_keypair.Bytes(), publicKey.data(), publicKey.size());
-    memcpy(serialized_keypair.Bytes() + publicKey.size(), privateKey.data(), privateKey.size());
-    return keypair.Deserialize(serialized_keypair);
 }
 
 CHIP_ERROR FactoryDataProviderImpl::Init(void)
@@ -171,6 +161,8 @@ CHIP_ERROR FactoryDataProviderImpl::Init(void)
     size_t outputHashSize = sizeof(calculatedHash);
     uint16_t i;
     CHIP_ERROR res;
+
+    VerifyOrReturnError(pAESKeySize == aes_128, CHIP_ERROR_INVALID_ARGUMENT);
 
     /* Init mflash */
     status = mflash_drv_init();
@@ -243,26 +235,18 @@ CHIP_ERROR FactoryDataProviderImpl::Init(void)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FactoryDataProviderImpl::SetAes128Key(const uint8_t * keyAes128)
+CHIP_ERROR FactoryDataProviderImpl::SetKeyType(KeyType type)
 {
-    CHIP_ERROR error = CHIP_ERROR_INVALID_ARGUMENT;
-    if (keyAes128 != nullptr)
+    if (type == kHwKey)
     {
-        pAesKey = keyAes128;
-        error   = CHIP_NO_ERROR;
+        // by default if hw key is selected, kDCP_OTPMKKeyLow is choosen
+        selectedKey = kDCP_OTPMKKeyLow;
     }
-    return error;
-}
-
-CHIP_ERROR FactoryDataProviderImpl::SetKeySelected(KeySelect key)
-{
-    CHIP_ERROR error = CHIP_ERROR_INVALID_ARGUMENT;
-    if (key <= kDCP_OCOTPKeyHigh)
+    else
     {
-        selectedKey = key;
-        error       = CHIP_NO_ERROR;
+        selectedKey = kDCP_UseSoftKey;
     }
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 void FactoryDataProviderImpl::SetDCP_OTPKeySelect(void)
@@ -288,28 +272,6 @@ void FactoryDataProviderImpl::SetDCP_OTPKeySelect(void)
     default:
         break;
     }
-}
-
-CHIP_ERROR FactoryDataProviderImpl::SetCbcInitialVector(const uint8_t * iv, uint16_t ivSize)
-{
-    CHIP_ERROR error = CHIP_ERROR_INVALID_ARGUMENT;
-    if (ivSize == CBC_INITIAL_VECTOR_SIZE)
-    {
-        cbcInitialVector = iv;
-        error            = CHIP_NO_ERROR;
-    }
-    return error;
-}
-
-CHIP_ERROR FactoryDataProviderImpl::SetEncryptionMode(EncryptionMode mode)
-{
-    CHIP_ERROR error = CHIP_ERROR_INVALID_ARGUMENT;
-    if (mode <= encrypt_cbc)
-    {
-        encryptMode = mode;
-        error       = CHIP_NO_ERROR;
-    }
-    return error;
 }
 
 CHIP_ERROR FactoryDataProviderImpl::ReadEncryptedData(uint8_t * desBuff, uint8_t * sourceAddr, uint16_t sizeToRead)
@@ -375,6 +337,11 @@ CHIP_ERROR FactoryDataProviderImpl::Hash256(const uint8_t * input, size_t inputS
         return CHIP_ERROR_INTERNAL;
 
     return CHIP_NO_ERROR;
+}
+
+FactoryDataProvider & FactoryDataPrvdImpl()
+{
+    return FactoryDataProviderImpl::sInstance;
 }
 
 } // namespace DeviceLayer

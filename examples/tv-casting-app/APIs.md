@@ -15,7 +15,7 @@ Matter Casting consists of three parts:
     [example Matter content-app](https://github.com/project-chip/connectedhomeip/tree/master/examples/tv-app/android/App/content-app)
     for Android builds on top of the Matter SDK to demonstrate how a TV Content
     app works.
--   **The TV platform app**: The TV platform app implements the Casting Video  
+-   **The TV platform app**: The TV platform app implements the Casting Video
     Player device type and provides common capabilities around media playback on
     the TV such as play/pause, keypad navigation, input and output control,
     content search, and an implementation of an app platform as described in the
@@ -71,13 +71,20 @@ In order to illustrate these steps, refer to the figure below
 The Casting Client is expected to consume the Matter TV Casting library built
 for its respective platform which implements the APIs described in this
 document. Refer to the tv-casting-app READMEs for [Linux](linux/README.md),
-Android and [iOS](darwin/TvCasting/README.md) to understand how to build and
-consume each platform's specific libraries. The libraries MUST be built with the
+[Android](https://github.com/project-chip/connectedhomeip/blob/master/examples/tv-casting-app/android/README.md)
+and [iOS](darwin/TvCasting/README.md) to understand how to build and consume
+each platform's specific libraries. The libraries MUST be built with the
 client's specific values for `CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID` and
 `CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID` updated in the
 [CHIPProjectAppConfig.h](tv-casting-common/include/CHIPProjectAppConfig.h) file.
 Other values like the `CHIP_DEVICE_CONFIG_DEVICE_NAME` may be updated as well to
 correspond to the client being built.
+
+`CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID` and `CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID`
+can be obtained during the CSA certification of your mobile app. The Matter SDK
+has pre-configured sample/test values for them in the
+[CHIPDeviceConfig.h](https://github.com/project-chip/connectedhomeip/blob/master/src/include/platform/CHIPDeviceConfig.h)
+file.
 
 ### Initialize the Casting Client
 
@@ -425,9 +432,13 @@ int main(int argc, char * argv[]) {
     VerifyOrReturnValue(
         err == CHIP_NO_ERROR, 0,
         ChipLogError(AppServer, "Initialization of CommissionableDataProvider failed %" CHIP_ERROR_FORMAT, err.Format()));
+
+    // TODO: provide your version of revocation delegate and a trust store properly filled with DCL.
+    chip::Credentials::DeviceAttestationRevocationDelegate *kDeviceAttestationRevocationNotChecked = nullptr;
     err = appParameters.Create(&rotatingDeviceIdUniqueIdProvider, &gCommissionableDataProvider,
                                chip::Credentials::Examples::GetExampleDACProvider(),
-                               GetDefaultDACVerifier(chip::Credentials::GetTestAttestationTrustStore()), &serverInitParamsProvider);
+                               GetDefaultDACVerifier(chip::Credentials::GetTestAttestationTrustStore(), kDeviceAttestationRevocationNotChecked),
+                               &serverInitParamsProvider);
     VerifyOrReturnValue(err == CHIP_NO_ERROR, 0,
                         ChipLogError(AppServer, "Creation of AppParameters failed %" CHIP_ERROR_FORMAT, err.Format()));
 
@@ -1290,8 +1301,8 @@ void InvokeContentLauncherLaunchURL(matter::casting::memory::Strong<matter::cast
     launchURLCommand->Invoke(
         request, nullptr,
         [](void * context, const chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type::ResponseType & response) {
-            ChipLogProgress(AppServer, "LaunchURL Success with response.data: %.*s", static_cast<int>(response.data.Value().size()),
-                            response.data.Value().data());
+            ChipLogProgress(AppServer, "LaunchURL Success with response.data: %s",
+                            chip::NullTerminated(response.data.Value()).c_str());
         },
         [](void * context, CHIP_ERROR error) {
             ChipLogError(AppServer, "LaunchURL Failure with err %" CHIP_ERROR_FORMAT, error.Format());

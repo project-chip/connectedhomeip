@@ -63,13 +63,14 @@ import random
 import tempfile
 import time
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
-                                         run_if_endpoint_matches)
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.apps import AppServerSubprocess
+from matter.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
+                                           run_if_endpoint_matches)
 
 
 class TC_CCTRL_2_3(MatterBaseTest):
@@ -173,7 +174,7 @@ class TC_CCTRL_2_3(MatterBaseTest):
 
         self.step(6)
         event_path = [(self.matter_test_config.endpoint, Clusters.CommissionerControl.Events.CommissioningRequestResult, 1)]
-        events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
+        events = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path)
         asserts.assert_equal(len(events), 1, "Unexpected event list len")
         asserts.assert_equal(events[0].Data.statusCode, 0, "Unexpected status code")
         asserts.assert_equal(events[0].Data.clientNodeID,

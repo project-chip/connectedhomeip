@@ -99,7 +99,7 @@ CHIP_ERROR SimpleSessionResumptionStorage::LoadIndex(SessionIndex & index)
     CHIP_ERROR err;
     while ((err = reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag())) == CHIP_NO_ERROR)
     {
-        if (count >= ArraySize(index.mNodes))
+        if (count >= MATTER_ARRAY_SIZE(index.mNodes))
         {
             return CHIP_ERROR_NO_MEMORY;
         }
@@ -241,9 +241,8 @@ CHIP_ERROR SimpleSessionResumptionStorage::LoadState(const ScopedNodeId & node, 
     ByteSpan sharedSecretSpan;
     ReturnErrorOnFailure(reader.Next(kSharedSecretTag));
     ReturnErrorOnFailure(reader.Get(sharedSecretSpan));
-    VerifyOrReturnError(sharedSecretSpan.size() <= sharedSecret.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    ReturnValueOnFailure(sharedSecret.SetLength(sharedSecretSpan.size()), CHIP_ERROR_BUFFER_TOO_SMALL);
     ::memcpy(sharedSecret.Bytes(), sharedSecretSpan.data(), sharedSecretSpan.size());
-    sharedSecret.SetLength(sharedSecretSpan.size());
 
     ByteSpan catSpan;
     ReturnErrorOnFailure(reader.Next(kCATTag));
@@ -254,15 +253,12 @@ CHIP_ERROR SimpleSessionResumptionStorage::LoadState(const ScopedNodeId & node, 
     peerCATs.Deserialize(cat);
 
     ReturnErrorOnFailure(reader.ExitContainer(containerType));
-    ReturnErrorOnFailure(reader.VerifyEndOfContainer());
-
-    return CHIP_NO_ERROR;
+    return reader.VerifyEndOfContainer();
 }
 
 CHIP_ERROR SimpleSessionResumptionStorage::DeleteState(const ScopedNodeId & node)
 {
-    ReturnErrorOnFailure(mStorage->SyncDeleteKeyValue(GetStorageKey(node).KeyName()));
-    return CHIP_NO_ERROR;
+    return mStorage->SyncDeleteKeyValue(GetStorageKey(node).KeyName());
 }
 
 } // namespace chip

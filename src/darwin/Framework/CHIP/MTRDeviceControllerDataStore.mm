@@ -19,11 +19,15 @@
 // Importing MTRBaseDevice.h for the MTRAttributePath class. Needs to change when https://github.com/project-chip/connectedhomeip/issues/31247 is fixed.
 #import "MTRBaseDevice.h"
 #import "MTRLogging_Internal.h"
+#import "MTRUnfairLock.h"
 
 #include <lib/core/CASEAuthTag.h>
 #include <lib/core/NodeId.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
+
+// Log error each time sync storage takes longer than this threshold
+#define SYNC_OPERATION_DURATION_LOG_THRESHOLD_SECONDS (2.0)
 
 // FIXME: Are these good key strings? https://github.com/project-chip/connectedhomeip/issues/28973
 static NSString * sResumptionNodeListKey = @"caseResumptionNodeList";
@@ -111,6 +115,11 @@ static bool IsValidCATNumber(id _Nullable value)
     __weak MTRDeviceController * _controller;
     // Array of nodes with resumption info, oldest-stored first.
     NSMutableArray<NSNumber *> * _nodesWithResumptionInfo;
+    // Array of nodes with attribute info.
+    NSMutableArray<NSNumber *> * _nodesWithAttributeInfo;
+    // Lock protecting access to the _nodesWithAttributeInfo and
+    // _nodesWithResumptionInfo arrays.
+    os_unfair_lock _nodeArrayLock;
 }
 
 - (nullable instancetype)initWithController:(MTRDeviceController *)controller
@@ -124,8 +133,11 @@ static bool IsValidCATNumber(id _Nullable value)
     _controller = controller;
     _storageDelegate = storageDelegate;
     _storageDelegateQueue = storageDelegateQueue;
+    _nodeArrayLock = OS_UNFAIR_LOCK_INIT;
 
     __block id resumptionNodeList;
+    __block NSArray<NSNumber *> * nodesWithAttributeInfo;
+    NSDate * startTime = [NSDate now];
     dispatch_sync(_storageDelegateQueue, ^{
         @autoreleasepool {
             // NOTE: controller, not our weak ref, since we know it's still
@@ -134,8 +146,14 @@ static bool IsValidCATNumber(id _Nullable value)
                                                   valueForKey:sResumptionNodeListKey
                                                 securityLevel:MTRStorageSecurityLevelSecure
                                                   sharingType:MTRStorageSharingTypeNotShared];
+
+            nodesWithAttributeInfo = [self _fetchNodeIndex];
         }
     });
+    NSTimeInterval syncDuration = -[startTime timeIntervalSinceNow];
+    if (syncDuration > SYNC_OPERATION_DURATION_LOG_THRESHOLD_SECONDS) {
+        MTR_LOG_ERROR("MTRDeviceControllerDataStore init took %0.6lf seconds to read from storage", syncDuration);
+    }
     if (resumptionNodeList != nil) {
         if (![resumptionNodeList isKindOfClass:[NSArray class]]) {
             MTR_LOG_ERROR("List of CASE resumption node IDs is not an array");
@@ -152,6 +170,12 @@ static bool IsValidCATNumber(id _Nullable value)
         _nodesWithResumptionInfo = [[NSMutableArray alloc] init];
     }
 
+    if (nodesWithAttributeInfo != nil) {
+        _nodesWithAttributeInfo = [nodesWithAttributeInfo mutableCopy];
+    } else {
+        _nodesWithAttributeInfo = [[NSMutableArray alloc] init];
+    }
+
     return self;
 }
 
@@ -161,11 +185,16 @@ static bool IsValidCATNumber(id _Nullable value)
     MTRDeviceController * controller = _controller;
     VerifyOrReturn(controller != nil); // No way to call delegate without controller.
 
+    NSDate * startTime = [NSDate now];
     dispatch_sync(_storageDelegateQueue, ^{
         if ([self->_storageDelegate respondsToSelector:@selector(valuesForController:securityLevel:sharingType:)]) {
             dataStoreSecureLocalValues = [self->_storageDelegate valuesForController:controller securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
         }
     });
+    NSTimeInterval syncDuration = -[startTime timeIntervalSinceNow];
+    if (syncDuration > SYNC_OPERATION_DURATION_LOG_THRESHOLD_SECONDS) {
+        MTR_LOG_ERROR("MTRDeviceControllerDataStore fetchAttributeDataForAllDevices took %0.6lf seconds to read from storage", syncDuration);
+    }
 
     if (dataStoreSecureLocalValues.count) {
         clusterDataHandler([self _getClusterDataFromSecureLocalValues:dataStoreSecureLocalValues]);
@@ -188,6 +217,7 @@ static bool IsValidCATNumber(id _Nullable value)
     VerifyOrReturn(controller != nil); // No way to call delegate without controller.
 
     auto * oldInfo = [self findResumptionInfoByNodeID:resumptionInfo.nodeID];
+    NSDate * startTime = [NSDate now];
     dispatch_sync(_storageDelegateQueue, ^{
         if (oldInfo != nil) {
             // Remove old resumption id key.  No need to do that for the
@@ -196,6 +226,8 @@ static bool IsValidCATNumber(id _Nullable value)
                        removeValueForKey:ResumptionByResumptionIDKey(oldInfo.resumptionID)
                            securityLevel:MTRStorageSecurityLevelSecure
                              sharingType:MTRStorageSharingTypeNotShared];
+
+            std::lock_guard lock(self->_nodeArrayLock);
             [_nodesWithResumptionInfo removeObject:resumptionInfo.nodeID];
         }
 
@@ -211,13 +243,22 @@ static bool IsValidCATNumber(id _Nullable value)
                          sharingType:MTRStorageSharingTypeNotShared];
 
         // Update our resumption info node list.
-        [_nodesWithResumptionInfo addObject:resumptionInfo.nodeID];
+        NSArray<NSNumber *> * valueToStore;
+        {
+            std::lock_guard lock(self->_nodeArrayLock);
+            [_nodesWithResumptionInfo addObject:resumptionInfo.nodeID];
+            valueToStore = [_nodesWithResumptionInfo copy];
+        }
         [_storageDelegate controller:controller
-                          storeValue:[_nodesWithResumptionInfo copy]
+                          storeValue:valueToStore
                               forKey:sResumptionNodeListKey
                        securityLevel:MTRStorageSecurityLevelSecure
                          sharingType:MTRStorageSharingTypeNotShared];
     });
+    NSTimeInterval syncDuration = -[startTime timeIntervalSinceNow];
+    if (syncDuration > SYNC_OPERATION_DURATION_LOG_THRESHOLD_SECONDS) {
+        MTR_LOG_ERROR("MTRDeviceControllerDataStore storeResumptionInfo took %0.6lf seconds to store to storage", syncDuration);
+    }
 }
 
 - (void)clearAllResumptionInfo
@@ -226,24 +267,47 @@ static bool IsValidCATNumber(id _Nullable value)
     VerifyOrReturn(controller != nil); // No way to call delegate without controller.
 
     // Can we do less dispatch?  We would need to have a version of
-    // _findResumptionInfoWithKey that assumes we are already on the right queue.
+    // _findResumptionInfoWithKey that assumes we are already on the right
+    // queue.
+    std::lock_guard lock(_nodeArrayLock);
     for (NSNumber * nodeID in _nodesWithResumptionInfo) {
-        auto * oldInfo = [self findResumptionInfoByNodeID:nodeID];
-        if (oldInfo != nil) {
-            dispatch_sync(_storageDelegateQueue, ^{
-                [_storageDelegate controller:controller
-                           removeValueForKey:ResumptionByResumptionIDKey(oldInfo.resumptionID)
-                               securityLevel:MTRStorageSecurityLevelSecure
-                                 sharingType:MTRStorageSharingTypeNotShared];
-                [_storageDelegate controller:controller
-                           removeValueForKey:ResumptionByNodeIDKey(oldInfo.nodeID)
-                               securityLevel:MTRStorageSecurityLevelSecure
-                                 sharingType:MTRStorageSharingTypeNotShared];
-            });
-        }
+        [self _clearResumptionInfoForNodeID:nodeID controller:controller];
     }
 
     [_nodesWithResumptionInfo removeAllObjects];
+}
+
+- (void)clearResumptionInfoForNodeID:(NSNumber *)nodeID
+{
+    MTRDeviceController * controller = _controller;
+    VerifyOrReturn(controller != nil); // No way to call delegate without controller.
+
+    [self _clearResumptionInfoForNodeID:nodeID controller:controller];
+
+    std::lock_guard lock(_nodeArrayLock);
+    [_nodesWithResumptionInfo removeObject:nodeID];
+}
+
+- (void)_clearResumptionInfoForNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
+{
+    auto * oldInfo = [self findResumptionInfoByNodeID:nodeID];
+    if (oldInfo != nil) {
+        NSDate * startTime = [NSDate now];
+        dispatch_sync(_storageDelegateQueue, ^{
+            [_storageDelegate controller:controller
+                       removeValueForKey:ResumptionByResumptionIDKey(oldInfo.resumptionID)
+                           securityLevel:MTRStorageSecurityLevelSecure
+                             sharingType:MTRStorageSharingTypeNotShared];
+            [_storageDelegate controller:controller
+                       removeValueForKey:ResumptionByNodeIDKey(oldInfo.nodeID)
+                           securityLevel:MTRStorageSecurityLevelSecure
+                             sharingType:MTRStorageSharingTypeNotShared];
+        });
+        NSTimeInterval syncDuration = -[startTime timeIntervalSinceNow];
+        if (syncDuration > SYNC_OPERATION_DURATION_LOG_THRESHOLD_SECONDS) {
+            MTR_LOG_ERROR("MTRDeviceControllerDataStore _clearResumptionInfoForNodeID took %0.6lf seconds to remove from storage", syncDuration);
+        }
+    }
 }
 
 - (CHIP_ERROR)storeLastLocallyUsedNOC:(MTRCertificateTLVBytes)noc
@@ -252,6 +316,7 @@ static bool IsValidCATNumber(id _Nullable value)
     VerifyOrReturnError(controller != nil, CHIP_ERROR_PERSISTED_STORAGE_FAILED); // No way to call delegate without controller.
 
     __block BOOL ok;
+    NSDate * startTime = [NSDate now];
     dispatch_sync(_storageDelegateQueue, ^{
         ok = [_storageDelegate controller:controller
                                storeValue:noc
@@ -259,6 +324,10 @@ static bool IsValidCATNumber(id _Nullable value)
                             securityLevel:MTRStorageSecurityLevelSecure
                               sharingType:MTRStorageSharingTypeNotShared];
     });
+    NSTimeInterval syncDuration = -[startTime timeIntervalSinceNow];
+    if (syncDuration > SYNC_OPERATION_DURATION_LOG_THRESHOLD_SECONDS) {
+        MTR_LOG_ERROR("MTRDeviceControllerDataStore storeLastLocallyUsedNOC took %0.6lf seconds to store to storage", syncDuration);
+    }
     return ok ? CHIP_NO_ERROR : CHIP_ERROR_PERSISTED_STORAGE_FAILED;
 }
 
@@ -268,6 +337,7 @@ static bool IsValidCATNumber(id _Nullable value)
     VerifyOrReturnValue(controller != nil, nil); // No way to call delegate without controller.
 
     __block id data;
+    NSDate * startTime = [NSDate now];
     dispatch_sync(_storageDelegateQueue, ^{
         @autoreleasepool {
             data = [_storageDelegate controller:controller
@@ -276,6 +346,10 @@ static bool IsValidCATNumber(id _Nullable value)
                                     sharingType:MTRStorageSharingTypeNotShared];
         }
     });
+    NSTimeInterval syncDuration = -[startTime timeIntervalSinceNow];
+    if (syncDuration > SYNC_OPERATION_DURATION_LOG_THRESHOLD_SECONDS) {
+        MTR_LOG_ERROR("MTRDeviceControllerDataStore fetchLastLocallyUsedNOC took %0.6lf seconds to read from storage", syncDuration);
+    }
 
     if (data == nil) {
         return nil;
@@ -299,6 +373,7 @@ static bool IsValidCATNumber(id _Nullable value)
     }
 
     __block id resumptionInfo;
+    NSDate * startTime = [NSDate now];
     dispatch_sync(_storageDelegateQueue, ^{
         @autoreleasepool {
             resumptionInfo = [_storageDelegate controller:controller
@@ -307,6 +382,10 @@ static bool IsValidCATNumber(id _Nullable value)
                                               sharingType:MTRStorageSharingTypeNotShared];
         }
     });
+    NSTimeInterval syncDuration = -[startTime timeIntervalSinceNow];
+    if (syncDuration > SYNC_OPERATION_DURATION_LOG_THRESHOLD_SECONDS) {
+        MTR_LOG_ERROR("MTRDeviceControllerDataStore _findResumptionInfoWithKey took %0.6lf seconds to read from storage", syncDuration);
+    }
 
     if (resumptionInfo == nil) {
         return nil;
@@ -574,6 +653,20 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
         [self _pruneEmptyStoredClusterDataBranches];
     });
 }
+
+- (void)unitTestRereadNodeIndex
+{
+    dispatch_sync(_storageDelegateQueue, ^{
+        auto * newIndex = [self _fetchNodeIndex];
+
+        std::lock_guard lock(self->_nodeArrayLock);
+        if (newIndex != nil) {
+            self->_nodesWithAttributeInfo = [newIndex mutableCopy];
+        } else {
+            self->_nodesWithAttributeInfo = [[NSMutableArray alloc] init];
+        }
+    });
+}
 #endif
 
 - (void)_pruneEmptyStoredClusterDataBranches
@@ -582,9 +675,8 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
 
     NSUInteger storeFailures = 0;
 
-    // Fetch node index
-    NSArray<NSNumber *> * nodeIndex = [self _fetchNodeIndex];
-    NSMutableArray<NSNumber *> * nodeIndexCopy = [nodeIndex mutableCopy];
+    std::lock_guard lock(self->_nodeArrayLock);
+    NSArray<NSNumber *> * nodeIndex = [_nodesWithAttributeInfo copy];
 
     for (NSNumber * nodeID in nodeIndex) {
         // Fetch endpoint index
@@ -624,7 +716,7 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
             if (endpointIndexCopy.count) {
                 success = [self _storeEndpointIndex:endpointIndexCopy forNodeID:nodeID];
             } else {
-                [nodeIndexCopy removeObject:nodeID];
+                [_nodesWithAttributeInfo removeObject:nodeID];
                 success = [self _deleteEndpointIndexForNodeID:nodeID];
             }
             if (!success) {
@@ -634,16 +726,16 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
         }
     }
 
-    if (nodeIndex.count != nodeIndexCopy.count) {
+    if (nodeIndex.count != _nodesWithAttributeInfo.count) {
         BOOL success;
-        if (nodeIndexCopy.count) {
-            success = [self _storeNodeIndex:nodeIndexCopy];
+        if (_nodesWithAttributeInfo.count) {
+            success = [self _storeNodeIndex:_nodesWithAttributeInfo];
         } else {
             success = [self _deleteNodeIndex];
         }
         if (!success) {
             storeFailures++;
-            MTR_LOG_ERROR("Store failed in _pruneEmptyStoredClusterDataBranches for nodeIndex (%lu)", static_cast<unsigned long>(nodeIndexCopy.count));
+            MTR_LOG_ERROR("Store failed in _pruneEmptyStoredClusterDataBranches for nodeIndex (%lu)", static_cast<unsigned long>(_nodesWithAttributeInfo.count));
         }
     }
 
@@ -699,18 +791,19 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
 {
     dispatch_async(_storageDelegateQueue, ^{
         [self _clearStoredClusterDataForNodeID:nodeID];
-        NSArray<NSNumber *> * nodeIndex = [self _fetchNodeIndex];
-        NSMutableArray<NSNumber *> * nodeIndexCopy = [nodeIndex mutableCopy];
-        [nodeIndexCopy removeObject:nodeID];
-        if (nodeIndex.count != nodeIndexCopy.count) {
+
+        std::lock_guard lock(self->_nodeArrayLock);
+        auto oldCount = self->_nodesWithAttributeInfo.count;
+        [self->_nodesWithAttributeInfo removeObject:nodeID];
+        if (self->_nodesWithAttributeInfo.count != oldCount) {
             BOOL success;
-            if (nodeIndexCopy.count) {
-                success = [self _storeNodeIndex:nodeIndexCopy];
+            if (self->_nodesWithAttributeInfo.count) {
+                success = [self _storeNodeIndex:self->_nodesWithAttributeInfo];
             } else {
                 success = [self _deleteNodeIndex];
             }
             if (!success) {
-                MTR_LOG_ERROR("Store failed in clearStoredAttributesForNodeID for nodeIndex (%lu)", static_cast<unsigned long>(nodeIndexCopy.count));
+                MTR_LOG_ERROR("Store failed in clearStoredAttributesForNodeID for nodeIndex (%lu)", static_cast<unsigned long>(self->_nodesWithAttributeInfo.count));
             }
         }
     });
@@ -790,12 +883,12 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
 {
     dispatch_async(_storageDelegateQueue, ^{
         // Fetch node index
-        NSArray<NSNumber *> * nodeIndex = [self _fetchNodeIndex];
-
-        for (NSNumber * nodeID in nodeIndex) {
+        std::lock_guard lock(self->_nodeArrayLock);
+        for (NSNumber * nodeID in self->_nodesWithAttributeInfo) {
             [self _clearStoredClusterDataForNodeID:nodeID];
         }
 
+        [self->_nodesWithAttributeInfo removeAllObjects];
         BOOL success = [self _deleteNodeIndex];
         if (!success) {
             MTR_LOG_ERROR("Delete failed for nodeIndex");
@@ -811,15 +904,15 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
     }
 
     __block NSMutableDictionary<MTRClusterPath *, MTRDeviceClusterData *> * clusterDataToReturn = nil;
+    NSDate * startTime = [NSDate now];
     dispatch_sync(_storageDelegateQueue, ^{
-        // Fetch node index
-        NSArray<NSNumber *> * nodeIndex = [self _fetchNodeIndex];
+        std::lock_guard lock(self->_nodeArrayLock);
 
 #if ATTRIBUTE_CACHE_VERBOSE_LOGGING
-        MTR_LOG("Fetch got %lu values for nodeIndex", static_cast<unsigned long>(nodeIndex.count));
+        MTR_LOG("Fetch got %lu values for nodeIndex", static_cast<unsigned long>(self->_nodesWithAttributeInfo.count));
 #endif
 
-        if (![nodeIndex containsObject:nodeID]) {
+        if (![self->_nodesWithAttributeInfo containsObject:nodeID]) {
             // Sanity check and delete if nodeID exists in index
             NSArray<NSNumber *> * endpointIndex = [self _fetchEndpointIndexForNodeID:nodeID];
             if (endpointIndex) {
@@ -870,6 +963,10 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
             }
         }
     });
+    NSTimeInterval syncDuration = -[startTime timeIntervalSinceNow];
+    if (syncDuration > SYNC_OPERATION_DURATION_LOG_THRESHOLD_SECONDS) {
+        MTR_LOG_ERROR("MTRDeviceControllerDataStore getStoredClusterDataForNodeID took %0.6lf seconds to read from storage", syncDuration);
+    }
 
     return clusterDataToReturn;
 }
@@ -880,9 +977,14 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
     // when the consumer knows that we're supposed to have data for this cluster
     // path.
     __block MTRDeviceClusterData * clusterDataToReturn = nil;
+    NSDate * startTime = [NSDate now];
     dispatch_sync(_storageDelegateQueue, ^{
         clusterDataToReturn = [self _fetchClusterDataForNodeID:nodeID endpointID:endpointID clusterID:clusterID];
     });
+    NSTimeInterval syncDuration = -[startTime timeIntervalSinceNow];
+    if (syncDuration > SYNC_OPERATION_DURATION_LOG_THRESHOLD_SECONDS) {
+        MTR_LOG_ERROR("MTRDeviceControllerDataStore getStoredClusterDataForNodeID took %0.6lf seconds to read from storage", syncDuration);
+    }
     return clusterDataToReturn;
 }
 
@@ -1072,14 +1174,13 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
         }
 
         // Check if node index needs updating / creation
-        NSArray<NSNumber *> * nodeIndex = [self _fetchNodeIndex];
         NSArray<NSNumber *> * nodeIndexToStore = nil;
-        if (!nodeIndex) {
-            // Ensure node index exists
-            MTR_LOG("No entry found for for nodeIndex - creating for node 0x%016llX", nodeID.unsignedLongLongValue);
-            nodeIndexToStore = [NSArray arrayWithObject:nodeID];
-        } else if (![nodeIndex containsObject:nodeID]) {
-            nodeIndexToStore = [nodeIndex arrayByAddingObject:nodeID];
+        {
+            std::lock_guard lock(self->_nodeArrayLock);
+            if (![self->_nodesWithAttributeInfo containsObject:nodeID]) {
+                [self->_nodesWithAttributeInfo addObject:nodeID];
+                nodeIndexToStore = [self->_nodesWithAttributeInfo copy];
+            }
         }
 
         if (nodeIndexToStore) {
@@ -1120,6 +1221,7 @@ static NSString * sDeviceDataKeyPrefix = @"deviceData";
 - (nullable NSDictionary<NSString *, id> *)getStoredDeviceDataForNodeID:(NSNumber *)nodeID
 {
     __block NSDictionary<NSString *, id> * deviceData = nil;
+    NSDate * startTime = [NSDate now];
     dispatch_sync(_storageDelegateQueue, ^{
         MTRDeviceController * controller = self->_controller;
         VerifyOrReturn(controller != nil); // No way to call delegate without controller.
@@ -1151,6 +1253,10 @@ static NSString * sDeviceDataKeyPrefix = @"deviceData";
         // to do that.
         deviceData = dictionary;
     });
+    NSTimeInterval syncDuration = -[startTime timeIntervalSinceNow];
+    if (syncDuration > SYNC_OPERATION_DURATION_LOG_THRESHOLD_SECONDS) {
+        MTR_LOG_ERROR("MTRDeviceControllerDataStore getStoredDeviceDataForNodeID took %0.6lf seconds to read from storage", syncDuration);
+    }
     return deviceData;
 }
 
@@ -1169,6 +1275,20 @@ static NSString * sDeviceDataKeyPrefix = @"deviceData";
     });
 }
 
+- (void)clearDeviceDataForNodeID:(NSNumber *)nodeID
+{
+    dispatch_async(_storageDelegateQueue, ^{
+        MTRDeviceController * controller = self->_controller;
+        VerifyOrReturn(controller != nil); // No way to call delegate without controller.
+
+        // Ignore store failures, since they are not actionable for us here.
+        [self->_storageDelegate controller:controller
+                         removeValueForKey:[self _deviceDataKeyForNodeID:nodeID]
+                             securityLevel:MTRStorageSecurityLevelSecure
+                               sharingType:MTRStorageSharingTypeNotShared];
+    });
+}
+
 - (void)synchronouslyPerformBlock:(void (^_Nullable)(void))block
 {
     dispatch_sync(_storageDelegateQueue, ^{
@@ -1176,6 +1296,27 @@ static NSString * sDeviceDataKeyPrefix = @"deviceData";
             block();
         }
     });
+}
+
+- (NSArray<NSNumber *> *)nodesWithStoredData
+{
+    // We have three types of stored data:
+    //
+    // 1) Attribute data
+    // 2) Session resumption data
+    // 3) Device data.
+    //
+    // Items 1 and 2 come with node indices.  Item 3 does not, but in practice
+    // we should have device data if and only if we have attribute data for that
+    // node ID, barring odd error conditions.
+    //
+    // TODO: Consider changing how we store device data so we can easily recover
+    // the relevant set of node IDs.
+    NSMutableSet<NSNumber *> * nodeSet = [NSMutableSet set];
+    std::lock_guard lock(_nodeArrayLock);
+    [nodeSet addObjectsFromArray:_nodesWithResumptionInfo];
+    [nodeSet addObjectsFromArray:_nodesWithAttributeInfo];
+    return [nodeSet allObjects];
 }
 
 @end

@@ -15,38 +15,36 @@
  *    limitations under the License.
  */
 
+#include <chip_porting.h>
 #include <platform_stdlib.h>
 
-#include "AmebaObserver.h"
-#include "CHIPDeviceManager.h"
-#include "DeviceCallbacks.h"
-#include "Server.h"
-#include <DeviceInfoProviderImpl.h>
-
-#include "chip_porting.h"
-#include <platform/CHIPDeviceLayer.h>
-#include <support/CHIPMem.h>
+#include <AmebaObserver.h>
+#include <CHIPDeviceManager.h>
+#include <DeviceCallbacks.h>
 
 #include <air-purifier-manager.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
-#include <app/server/OnboardingCodesUtil.h>
+#include <app/server/Server.h>
+#if CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION
+#include <app/server/TermsAndConditionsManager.h>
+#endif
 #include <app/util/endpoint-config-api.h>
 #include <data-model-providers/codegen/Instance.h>
 #include <lib/core/ErrorStr.h>
 #include <platform/Ameba/AmebaConfig.h>
+#include <platform/Ameba/DeviceInfoProviderImpl.h>
 #include <platform/Ameba/NetworkCommissioningDriver.h>
-#include <platform/CHIPDeviceLayer.h>
-#include <setup_payload/ManualSetupPayloadGenerator.h>
-#include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #if CONFIG_ENABLE_AMEBA_CRYPTO
 #include <platform/Ameba/crypto/AmebaPersistentStorageOperationalKeystore.h>
 #endif
-
-#include <lwip_netconf.h>
-
+#include <platform/CHIPDeviceLayer.h>
+#include <setup_payload/ManualSetupPayloadGenerator.h>
+#include <setup_payload/OnboardingCodesUtil.h>
+#include <setup_payload/QRCodeSetupPayloadGenerator.h>
+#include <support/CHIPMem.h>
 #if CONFIG_ENABLE_PW_RPC
-#include "Rpc.h"
+#include <Rpc.h>
 #endif
 
 #define AIR_PURIFIER_ENDPOINT 1
@@ -60,6 +58,9 @@ using namespace ::chip::app;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::System;
+
+static DeviceCallbacks EchoCallbacks;
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 namespace { // Network Commissioning
 constexpr EndpointId kNetworkCommissioningEndpointMain      = 0;
@@ -77,9 +78,6 @@ void NetWorkCommissioningInstInit()
     // We only have network commissioning on endpoint 0.
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 }
-
-static DeviceCallbacks EchoCallbacks;
-chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 void OnIdentifyStart(Identify *)
 {
@@ -136,12 +134,14 @@ static void InitServer(intptr_t context)
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
+
 #if CONFIG_ENABLE_AMEBA_CRYPTO
     ChipLogProgress(DeviceLayer, "platform crypto enabled!");
     static chip::AmebaPersistentStorageOperationalKeystore sAmebaPersistentStorageOpKeystore;
     VerifyOrDie((sAmebaPersistentStorageOpKeystore.Init(initParams.persistentStorageDelegate)) == CHIP_NO_ERROR);
     initParams.operationalKeystore = &sAmebaPersistentStorageOpKeystore;
 #endif
+
     static AmebaObserver sAmebaObserver;
     initParams.appDelegate = &sAmebaObserver;
     chip::Server::GetInstance().Init(initParams);
@@ -149,6 +149,13 @@ static void InitServer(intptr_t context)
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     NetWorkCommissioningInstInit();
+
+#if CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION
+    const Optional<app::TermsAndConditions> termsAndConditions = Optional<app::TermsAndConditions>(
+        app::TermsAndConditions(CHIP_AMEBA_TC_REQUIRED_ACKNOWLEDGEMENTS, CHIP_AMEBA_TC_MIN_REQUIRED_VERSION));
+    PersistentStorageDelegate & persistentStorageDelegate = Server::GetInstance().GetPersistentStorage();
+    chip::app::TermsAndConditionsManager::GetInstance().Init(&persistentStorageDelegate, termsAndConditions);
+#endif
 
     if (RTW_SUCCESS != wifi_is_connected_to_ap())
     {

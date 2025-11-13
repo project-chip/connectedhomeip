@@ -42,9 +42,10 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_OCC_2_1(MatterBaseTest):
@@ -157,7 +158,7 @@ class TC_OCC_2_1(MatterBaseTest):
                                          "HoldTime attribute is less than HoldTimeMin.")
         else:
             logging.info("HoldTime not supported. The rest of legacy attribute test can be skipped")
-            self.skip_all_remaining_steps(7)
+            self.mark_all_remaining_steps_skipped(7)
             return
 
         self.step(7)

@@ -66,14 +66,15 @@ import struct
 import tempfile
 import time
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import (MatterBaseTest, SetupParameters, TestStep, async_test_body, default_matter_test_main,
-                                         type_matches)
 from ecdsa.curves import NIST256p
 from mobly import asserts
 from TC_SC_3_6 import AttributeChangeAccumulator
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.testing.apps import AppServerSubprocess
+from matter.testing.commissioning import SetupParameters
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
 
 # Length of `w0s` and `w1s` elements
 WS_LENGTH = NIST256p.baselen + 8
@@ -152,14 +153,16 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
             f">>> pairing onnetwork 111 {setup_params.passcode}")
 
     def steps_TC_MCORE_FS_1_2(self) -> list[TestStep]:
-        steps = [TestStep(1, "TH subscribes to PartsList attribute of the Descriptor cluster of DUT_FSA endpoint 0."),
-                 TestStep(2, "Follow manufacturer provided instructions to have DUT_FSA commission TH_SERVER"),
-                 TestStep(3, "TH waits up to 30 seconds for subscription report from the PartsList attribute of the Descriptor to contain new endpoint"),
-                 TestStep(4, "TH uses DUT to open commissioning window to TH_SERVER"),
-                 TestStep(5, "TH commissions TH_SERVER"),
-                 TestStep(6, "TH reads all attributes in Basic Information cluster from TH_SERVER directly"),
-                 TestStep(7, "TH reads all attributes in the Bridged Device Basic Information cluster on new endpoint identified in step 3 from the DUT_FSA")]
-        return steps
+        return [
+            TestStep("precondition", "Commission DUT if not done", is_commissioning=True),
+            TestStep(1, "TH subscribes to PartsList attribute of the Descriptor cluster of DUT_FSA endpoint 0."),
+            TestStep(2, "Follow manufacturer provided instructions to have DUT_FSA commission TH_SERVER"),
+            TestStep(3, "TH waits up to 30 seconds for subscription report from the PartsList attribute of the Descriptor to contain new endpoint"),
+            TestStep(4, "TH uses DUT to open commissioning window to TH_SERVER"),
+            TestStep(5, "TH commissions TH_SERVER"),
+            TestStep(6, "TH reads all attributes in Basic Information cluster from TH_SERVER directly"),
+            TestStep(7, "TH reads all attributes in the Bridged Device Basic Information cluster on new endpoint identified in step 3 from the DUT_FSA"),
+        ]
 
     # This test has some manual steps, so we need a longer timeout. Test typically runs under 1 mins so 3 mins should
     # be enough time for test to run
@@ -169,6 +172,9 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
 
     @async_test_body
     async def test_TC_MCORE_FS_1_2(self):
+
+        # Commissioning - done
+        self.step("precondition")
 
         min_report_interval_sec = self.user_params.get("min_report_interval_sec", 0)
         max_report_interval_sec = self.user_params.get("max_report_interval_sec", 30)
@@ -180,7 +186,7 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
             (root_endpoint, Clusters.Descriptor.Attributes.PartsList)
         ]
         self._partslist_subscription = await self.default_controller.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=subscription_contents,
             reportInterval=(min_report_interval_sec, max_report_interval_sec),
             keepSubscriptions=True
@@ -193,7 +199,7 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
         cached_attributes = self._partslist_subscription.GetAttributes()
         step_1_dut_parts_list = cached_attributes[root_endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
 
-        asserts.assert_true(type_matches(step_1_dut_parts_list, list), "PartsList is expected to be a list")
+        asserts.assert_true(matchers.is_type(step_1_dut_parts_list, list), "PartsList is expected to be a list")
 
         self.step(2)
         if not self.is_pics_sdk_ci_only:

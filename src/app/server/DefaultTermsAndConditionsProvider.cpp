@@ -211,7 +211,9 @@ CHIP_ERROR chip::app::DefaultTermsAndConditionsProvider::GetAcknowledgementsRequ
 
     TermsAndConditions requiredTermsAndConditions = requiredTermsAndConditionsMaybe.Value();
     TermsAndConditions acceptedTermsAndConditions = acceptedTermsAndConditionsMaybe.Value();
-    outAcknowledgementsRequired                   = requiredTermsAndConditions.Validate(acceptedTermsAndConditions);
+
+    bool requiredTermsAndConditionsAreAccepted = requiredTermsAndConditions.Validate(acceptedTermsAndConditions);
+    outAcknowledgementsRequired                = !requiredTermsAndConditionsAreAccepted;
     return CHIP_NO_ERROR;
 }
 

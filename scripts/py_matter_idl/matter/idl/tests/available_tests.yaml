@@ -1,0 +1,170 @@
+# These are the available tests for generators
+#
+# General format is:
+# <generator>
+#    <input_file>
+#      <output_file> : <golden_path>
+#
+# Where
+#   - generator is the type of generator to use
+#   - input_file is the input IDL
+#   - output_file/golden_path are the expected output file names
+#     and the expected content for those output files.
+java-class:
+    inputs/several_clusters.matter:
+        java/chip/devicecontroller/cluster/structs/SecondClusterFabricDescriptorStruct.kt: outputs/several_clusters/java/SecondClusterFabricDescriptorStruct.kt
+        java/chip/devicecontroller/ChipClusters.java: outputs/several_clusters/java/ChipClusters.java
+        java/chip/devicecontroller/ChipEventStructs.java: outputs/several_clusters/java/ChipEventStructs.java
+        java/chip/devicecontroller/ChipStructs.java: outputs/several_clusters/java/ChipStructs.java
+        java/chip/devicecontroller/ClusterInfoMapping.java: outputs/several_clusters/java/ClusterInfoMapping.java
+        java/chip/devicecontroller/ClusterWriteMapping.java: outputs/several_clusters/java/ClusterWriteMapping.java
+        java/chip/devicecontroller/ClusterReadMapping.java: outputs/several_clusters/java/ClusterReadMapping.java
+        java/chip/devicecontroller/ClusterIDMapping.java: outputs/several_clusters/java/ClusterIDMapping.java
+        java/chip/devicecontroller/cluster/files.gni: outputs/several_clusters/java/files.gni
+
+cpp-app:
+    inputs/several_clusters.matter:
+        app/PluginApplicationCallbacks.h: outputs/several_clusters/cpp-app/PluginApplicationCallbacks.h
+        app/callback-stub.cpp: outputs/several_clusters/cpp-app/callback-stub.cpp
+        app/cluster-callbacks.cpp: outputs/several_clusters/cpp-app/cluster-callbacks.cpp
+        app/static-cluster-config/Third.h: outputs/several_clusters/cpp-app/static-cluster-config/Third.h
+
+    inputs/large_all_clusters_app.matter:
+        app/PluginApplicationCallbacks.h: outputs/large_all_clusters_app/cpp-app/PluginApplicationCallbacks.h
+        app/callback-stub.cpp: outputs/large_all_clusters_app/cpp-app/callback-stub.cpp
+        app/cluster-callbacks.cpp: outputs/large_all_clusters_app/cpp-app/cluster-callbacks.cpp
+        app/static-cluster-config/AccessControl.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/AccessControl.h
+        app/static-cluster-config/Actions.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/Actions.h
+        app/static-cluster-config/ActivatedCarbonFilterMonitoring.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/ActivatedCarbonFilterMonitoring.h
+        app/static-cluster-config/AdministratorCommissioning.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/AdministratorCommissioning.h
+        app/static-cluster-config/AirQuality.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/AirQuality.h
+        app/static-cluster-config/BallastConfiguration.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/BallastConfiguration.h
+        app/static-cluster-config/BasicInformation.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/BasicInformation.h
+        app/static-cluster-config/Binding.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/Binding.h
+        app/static-cluster-config/BooleanStateConfiguration.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/BooleanStateConfiguration.h
+        app/static-cluster-config/BooleanState.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/BooleanState.h
+        app/static-cluster-config/CameraAvStreamManagement.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/CameraAvStreamManagement.h
+        app/static-cluster-config/CarbonDioxideConcentrationMeasurement.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/CarbonDioxideConcentrationMeasurement.h
+        app/static-cluster-config/CarbonMonoxideConcentrationMeasurement.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/CarbonMonoxideConcentrationMeasurement.h
+        app/static-cluster-config/Chime.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/Chime.h
+        app/static-cluster-config/ColorControl.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/ColorControl.h
+        app/static-cluster-config/Descriptor.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/Descriptor.h
+        app/static-cluster-config/DeviceEnergyManagement.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/DeviceEnergyManagement.h
+        app/static-cluster-config/DeviceEnergyManagementMode.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/DeviceEnergyManagementMode.h
+        app/static-cluster-config/DiagnosticLogs.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/DiagnosticLogs.h
+        app/static-cluster-config/DishwasherAlarm.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/DishwasherAlarm.h
+        app/static-cluster-config/DishwasherMode.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/DishwasherMode.h
+        app/static-cluster-config/ElectricalEnergyMeasurement.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/ElectricalEnergyMeasurement.h
+        app/static-cluster-config/ElectricalPowerMeasurement.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/ElectricalPowerMeasurement.h
+        app/static-cluster-config/EnergyEvse.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/EnergyEvse.h
+        app/static-cluster-config/EnergyEvseMode.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/EnergyEvseMode.h
+        app/static-cluster-config/EnergyPreference.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/EnergyPreference.h
+        app/static-cluster-config/EthernetNetworkDiagnostics.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/EthernetNetworkDiagnostics.h
+        app/static-cluster-config/FanControl.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/FanControl.h
+        app/static-cluster-config/FaultInjection.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/FaultInjection.h
+        app/static-cluster-config/FixedLabel.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/FixedLabel.h
+        app/static-cluster-config/FlowMeasurement.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/FlowMeasurement.h
+        app/static-cluster-config/FormaldehydeConcentrationMeasurement.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/FormaldehydeConcentrationMeasurement.h
+        app/static-cluster-config/GeneralCommissioning.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/GeneralCommissioning.h
+        app/static-cluster-config/GeneralDiagnostics.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/GeneralDiagnostics.h
+        app/static-cluster-config/GroupKeyManagement.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/GroupKeyManagement.h
+        app/static-cluster-config/Groups.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/Groups.h
+        app/static-cluster-config/HepaFilterMonitoring.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/HepaFilterMonitoring.h
+        app/static-cluster-config/Identify.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/Identify.h
+        app/static-cluster-config/IlluminanceMeasurement.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/IlluminanceMeasurement.h
+        app/static-cluster-config/LaundryDryerControls.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/LaundryDryerControls.h
+        app/static-cluster-config/LaundryWasherControls.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/LaundryWasherControls.h
+        app/static-cluster-config/LaundryWasherMode.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/LaundryWasherMode.h
+        app/static-cluster-config/LevelControl.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/LevelControl.h
+        app/static-cluster-config/LocalizationConfiguration.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/LocalizationConfiguration.h
+        app/static-cluster-config/LowPower.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/LowPower.h
+        app/static-cluster-config/MicrowaveOvenMode.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/MicrowaveOvenMode.h
+        app/static-cluster-config/ModeSelect.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/ModeSelect.h
+        app/static-cluster-config/NetworkCommissioning.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/NetworkCommissioning.h
+        app/static-cluster-config/NitrogenDioxideConcentrationMeasurement.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/NitrogenDioxideConcentrationMeasurement.h
+        app/static-cluster-config/OccupancySensing.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/OccupancySensing.h
+        app/static-cluster-config/OnOff.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/OnOff.h
+        app/static-cluster-config/OperationalCredentials.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/OperationalCredentials.h
+        app/static-cluster-config/OperationalState.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/OperationalState.h
+        app/static-cluster-config/OtaSoftwareUpdateRequestor.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/OtaSoftwareUpdateRequestor.h
+        app/static-cluster-config/OvenCavityOperationalState.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/OvenCavityOperationalState.h
+        app/static-cluster-config/OvenMode.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/OvenMode.h
+        app/static-cluster-config/OzoneConcentrationMeasurement.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/OzoneConcentrationMeasurement.h
+        app/static-cluster-config/Pm10ConcentrationMeasurement.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/Pm10ConcentrationMeasurement.h
+        app/static-cluster-config/Pm1ConcentrationMeasurement.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/Pm1ConcentrationMeasurement.h
+        app/static-cluster-config/Pm25ConcentrationMeasurement.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/Pm25ConcentrationMeasurement.h
+        app/static-cluster-config/PowerSourceConfiguration.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/PowerSourceConfiguration.h
+        app/static-cluster-config/PowerSource.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/PowerSource.h
+        app/static-cluster-config/PowerTopology.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/PowerTopology.h
+        app/static-cluster-config/PressureMeasurement.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/PressureMeasurement.h
+        app/static-cluster-config/PumpConfigurationAndControl.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/PumpConfigurationAndControl.h
+        app/static-cluster-config/RadonConcentrationMeasurement.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/RadonConcentrationMeasurement.h
+        app/static-cluster-config/RefrigeratorAlarm.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/RefrigeratorAlarm.h
+        app/static-cluster-config/RefrigeratorAndTemperatureControlledCabinetMode.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/RefrigeratorAndTemperatureControlledCabinetMode.h
+        app/static-cluster-config/RelativeHumidityMeasurement.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/RelativeHumidityMeasurement.h
+        app/static-cluster-config/RvcCleanMode.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/RvcCleanMode.h
+        app/static-cluster-config/RvcOperationalState.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/RvcOperationalState.h
+        app/static-cluster-config/RvcRunMode.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/RvcRunMode.h
+        app/static-cluster-config/ScenesManagement.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/ScenesManagement.h
+        app/static-cluster-config/SmokeCoAlarm.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/SmokeCoAlarm.h
+        app/static-cluster-config/SoftwareDiagnostics.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/SoftwareDiagnostics.h
+        app/static-cluster-config/Switch.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/Switch.h
+        app/static-cluster-config/TemperatureControl.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/TemperatureControl.h
+        app/static-cluster-config/TemperatureMeasurement.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/TemperatureMeasurement.h
+        app/static-cluster-config/Thermostat.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/Thermostat.h
+        app/static-cluster-config/ThermostatUserInterfaceConfiguration.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/ThermostatUserInterfaceConfiguration.h
+        app/static-cluster-config/ThreadNetworkDiagnostics.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/ThreadNetworkDiagnostics.h
+        app/static-cluster-config/TimeFormatLocalization.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/TimeFormatLocalization.h
+        app/static-cluster-config/TimeSynchronization.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/TimeSynchronization.h
+        app/static-cluster-config/TotalVolatileOrganicCompoundsConcentrationMeasurement.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/TotalVolatileOrganicCompoundsConcentrationMeasurement.h
+        app/static-cluster-config/UnitLocalization.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/UnitLocalization.h
+        app/static-cluster-config/UnitTesting.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/UnitTesting.h
+        app/static-cluster-config/UserLabel.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/UserLabel.h
+        app/static-cluster-config/ValveConfigurationAndControl.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/ValveConfigurationAndControl.h
+        app/static-cluster-config/WakeOnLan.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/WakeOnLan.h
+        app/static-cluster-config/WaterHeaterManagement.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/WaterHeaterManagement.h
+        app/static-cluster-config/WaterHeaterMode.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/WaterHeaterMode.h
+        app/static-cluster-config/WiFiNetworkDiagnostics.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/WiFiNetworkDiagnostics.h
+        app/static-cluster-config/WindowCovering.h: outputs/large_all_clusters_app/cpp-app/static-cluster-config/WindowCovering.h
+
+    inputs/large_lighting_app.matter:
+        app/PluginApplicationCallbacks.h: outputs/large_lighting_app/cpp-app/PluginApplicationCallbacks.h
+        app/callback-stub.cpp: outputs/large_lighting_app/cpp-app/callback-stub.cpp
+        app/cluster-callbacks.cpp: outputs/large_lighting_app/cpp-app/cluster-callbacks.cpp
+        app/static-cluster-config/AccessControl.h: outputs/large_lighting_app/cpp-app/static-cluster-config/AccessControl.h
+        app/static-cluster-config/AdministratorCommissioning.h: outputs/large_lighting_app/cpp-app/static-cluster-config/AdministratorCommissioning.h
+        app/static-cluster-config/BasicInformation.h: outputs/large_lighting_app/cpp-app/static-cluster-config/BasicInformation.h
+        app/static-cluster-config/ColorControl.h: outputs/large_lighting_app/cpp-app/static-cluster-config/ColorControl.h
+        app/static-cluster-config/Descriptor.h: outputs/large_lighting_app/cpp-app/static-cluster-config/Descriptor.h
+        app/static-cluster-config/DiagnosticLogs.h: outputs/large_lighting_app/cpp-app/static-cluster-config/DiagnosticLogs.h
+        app/static-cluster-config/EthernetNetworkDiagnostics.h: outputs/large_lighting_app/cpp-app/static-cluster-config/EthernetNetworkDiagnostics.h
+        app/static-cluster-config/FixedLabel.h: outputs/large_lighting_app/cpp-app/static-cluster-config/FixedLabel.h
+        app/static-cluster-config/GeneralCommissioning.h: outputs/large_lighting_app/cpp-app/static-cluster-config/GeneralCommissioning.h
+        app/static-cluster-config/GeneralDiagnostics.h: outputs/large_lighting_app/cpp-app/static-cluster-config/GeneralDiagnostics.h
+        app/static-cluster-config/GroupKeyManagement.h: outputs/large_lighting_app/cpp-app/static-cluster-config/GroupKeyManagement.h
+        app/static-cluster-config/Groups.h: outputs/large_lighting_app/cpp-app/static-cluster-config/Groups.h
+        app/static-cluster-config/Identify.h: outputs/large_lighting_app/cpp-app/static-cluster-config/Identify.h
+        app/static-cluster-config/LevelControl.h: outputs/large_lighting_app/cpp-app/static-cluster-config/LevelControl.h
+        app/static-cluster-config/LocalizationConfiguration.h: outputs/large_lighting_app/cpp-app/static-cluster-config/LocalizationConfiguration.h
+        app/static-cluster-config/NetworkCommissioning.h: outputs/large_lighting_app/cpp-app/static-cluster-config/NetworkCommissioning.h
+        app/static-cluster-config/OnOff.h: outputs/large_lighting_app/cpp-app/static-cluster-config/OnOff.h
+        app/static-cluster-config/OperationalCredentials.h: outputs/large_lighting_app/cpp-app/static-cluster-config/OperationalCredentials.h
+        app/static-cluster-config/OtaSoftwareUpdateRequestor.h: outputs/large_lighting_app/cpp-app/static-cluster-config/OtaSoftwareUpdateRequestor.h
+        app/static-cluster-config/SoftwareDiagnostics.h: outputs/large_lighting_app/cpp-app/static-cluster-config/SoftwareDiagnostics.h
+        app/static-cluster-config/ThreadNetworkDiagnostics.h: outputs/large_lighting_app/cpp-app/static-cluster-config/ThreadNetworkDiagnostics.h
+        app/static-cluster-config/UserLabel.h: outputs/large_lighting_app/cpp-app/static-cluster-config/UserLabel.h
+        app/static-cluster-config/WiFiNetworkDiagnostics.h: outputs/large_lighting_app/cpp-app/static-cluster-config/WiFiNetworkDiagnostics.h
+
+cpp-tlvmeta:
+    inputs/cluster_with_commands.matter:
+        tlv/meta/clusters_meta.cpp: outputs/cluster_with_commands/cpp-tlvmeta/clusters_meta.cpp
+        tlv/meta/clusters_meta.h: outputs/cluster_with_commands/cpp-tlvmeta/clusters_meta.h
+    inputs/cluster_struct_attribute.matter:
+        tlv/meta/clusters_meta.cpp: outputs/cluster_struct_attribute/cpp-tlvmeta/clusters_meta.cpp
+        tlv/meta/clusters_meta.h: outputs/cluster_struct_attribute/cpp-tlvmeta/clusters_meta.h
+
+custom-example-proto:
+    inputs/several_clusters.matter:
+        proto/first_cluster.proto: outputs/proto/first_cluster.proto
+        proto/second_cluster.proto: outputs/proto/second_cluster.proto
+        proto/third_cluster.proto: outputs/proto/third_cluster.proto

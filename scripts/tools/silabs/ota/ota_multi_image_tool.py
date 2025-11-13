@@ -47,11 +47,12 @@ sys.path.insert(0, os.path.join(
     os.path.dirname(__file__), '../../../../src/app/'))
 
 import ota_image_tool  # noqa: E402 isort:skip
-from chip.tlv import TLVWriter  # noqa: E402 isort:skip
+from matter.tlv import TLVWriter  # noqa: E402 isort:skip
 from custom import CertDeclaration, DacCert, DacPKey, PaiCert  # noqa: E402 isort:skip
 from default import InputArgument  # noqa: E402 isort:skip
 
 OTA_APP_TLV_TEMP = os.path.join(os.path.dirname(__file__), "ota_temp_app_tlv.bin")
+OTA_WIFI_TA_TLV_TEMP = os.path.join(os.path.dirname(__file__), "ota_temp_wifi_ta_tlv.bin")
 OTA_BOOTLOADER_TLV_TEMP = os.path.join(os.path.dirname(__file__), "ota_temp_ssbl_tlv.bin")
 OTA_FACTORY_TLV_TEMP = os.path.join(os.path.dirname(__file__), "ota_temp_factory_tlv.bin")
 
@@ -62,6 +63,7 @@ class TAG:
     APPLICATION = 1
     BOOTLOADER = 2
     FACTORY_DATA = 3
+    WIFI_TA = 4
 
 
 def set_logger():
@@ -91,7 +93,7 @@ def generate_factory_data(args: object):
     Generate custom OTA payload from InputArgument derived objects. The payload is
     written in a temporary file that will be appended to args.input_files.
     """
-    fields = dict()
+    fields = {}
 
     if args.dac_key is not None:
         args.dac_key.generate_private_key(args.dac_key_password)
@@ -161,6 +163,32 @@ def generate_app(args: object):
         return [OTA_APP_TLV_TEMP]
     else:
         return [OTA_APP_TLV_TEMP, args.app_input_file]
+
+
+def generate_wifi_ta_image(args: object):
+    """
+    Generate WiFi TA image payload with descriptor. If a certain option is not specified, use the default values.
+    """
+    logging.info("WiFi TA descriptor information:")
+
+    descriptor = generate_descriptor(args.wifi_ta_version, args.wifi_ta_version_str, args.wifi_ta_build_date)
+    logging.info(f"WiFi TA encryption enable: {args.enc_enable}")
+    if args.enc_enable:
+        inputFile = open(args.wifi_ta_input_file, "rb")
+        enc_file = crypto_utils.encryptData(inputFile.read(), args.input_ota_key, INITIALIZATION_VECTOR)
+        enc_file1 = bytes([ord(x) for x in enc_file])
+        file_size = len(enc_file1)
+        payload = generate_header(TAG.WIFI_TA, len(descriptor) + file_size) + descriptor + enc_file1
+    else:
+        file_size = os.path.getsize(args.wifi_ta_input_file)
+        logging.info(f"file size: {file_size}")
+        payload = generate_header(TAG.WIFI_TA, len(descriptor) + file_size) + descriptor
+
+    write_to_temp(OTA_WIFI_TA_TLV_TEMP, payload)
+    if args.enc_enable:
+        return [OTA_WIFI_TA_TLV_TEMP]
+    else:
+        return [OTA_WIFI_TA_TLV_TEMP, args.wifi_ta_input_file]
 
 
 def generate_bootloader(args: object):
@@ -242,7 +270,7 @@ def show_payload(args: object):
 def create_image(args: object):
     ota_image_tool.validate_header_attributes(args)
 
-    input_files = list()
+    input_files = []
 
     if args.json:
         with open(args.json, 'r') as fd:
@@ -258,6 +286,9 @@ def create_image(args: object):
 
     if args.app_input_file:
         input_files += generate_app(args)
+
+    if args.wifi_ta_input_file:
+        input_files += generate_wifi_ta_image(args)
 
     if len(input_files) == 0:
         print("Please specify an input option.")
@@ -319,6 +350,15 @@ def main():
     create_parser.add_argument('--app-build-date', type=str,
                                help='Application build date (string)')
 
+    create_parser.add_argument('-tai', "--wifi_ta_input_file",
+                               help='Path to OTA image for 917 wifi TA')
+    create_parser.add_argument('--wifi-ta-version', type=any_base_int,
+                               help='WiFi TA Software version (numeric)')
+    create_parser.add_argument('--wifi-ta-version-str', type=str,
+                               help='WiFi TA Software version (string)')
+    create_parser.add_argument('--wifi-ta-build-date', type=str,
+                               help='WiFi TA build date (string)')
+
     create_parser.add_argument('-bl', '--bl-input-file',
                                help='Path to input bootloader image payload file')
     create_parser.add_argument('--bl-version', type=any_base_int,
@@ -349,7 +389,7 @@ def main():
     create_parser.add_argument('--input_ota_key', type=str, default="1234567890ABCDEFA1B2C3D4E5F6F1B4",
                                help='Input OTA Encryption KEY (string:16Bytes)')
 
-    create_parser.add_argument('-i', '--input_files', default=list(),
+    create_parser.add_argument('-i', '--input_files', default=[],
                                help='Path to input image payload file')
     create_parser.add_argument('output_file', help='Path to output image file')
 

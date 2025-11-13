@@ -174,7 +174,8 @@ int main(int argc, char * argv[])
     {
         // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
         const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
-        SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
+        chip::Credentials::DeviceAttestationRevocationDelegate * kDeviceAttestationRevocationNotChecked = nullptr;
+        SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore, kDeviceAttestationRevocationNotChecked));
     }
 
     SuccessOrExit(err = CastingServer::GetInstance()->PreInit());
@@ -216,7 +217,7 @@ int main(int argc, char * argv[])
     {
         struct sigaction sa = {};
         sa.sa_handler       = StopSignalHandler;
-        sa.sa_flags         = SA_RESETHAND;
+        sa.sa_flags         = static_cast<int>(SA_RESETHAND);
         sigaction(SIGINT, &sa, nullptr);
         sigaction(SIGTERM, &sa, nullptr);
     }

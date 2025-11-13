@@ -35,6 +35,7 @@
 #include <inttypes.h>
 #include <limits.h>
 #include <memory>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -76,7 +77,7 @@ using chip::ASN1::OID;
 #endif
 
 #define COPYRIGHT_STRING                                                                                                           \
-    "Copyright (c) 2021-2022 Project CHIP Authors. "                                                                               \
+    "Copyright (c) 2021-2025 Project CHIP Authors. "                                                                               \
     "Copyright (c) 2019 Google LLC. "                                                                                              \
     "Copyright (c) 2013-2017 Nest Labs, Inc. "                                                                                     \
     "All rights reserved.\n"
@@ -429,6 +430,7 @@ extern bool Cmd_ValidateAttCert(int argc, char * argv[]);
 extern bool Cmd_ValidateCert(int argc, char * argv[]);
 extern bool Cmd_PrintCert(int argc, char * argv[]);
 extern bool Cmd_PrintCD(int argc, char * argv[]);
+extern bool Cmd_PrintTLV(int argc, char * argv[]);
 extern bool Cmd_GenAttCert(int argc, char * argv[]);
 
 extern bool ReadCert(const char * fileNameOrStr, std::unique_ptr<X509, void (*)(X509 *)> & cert);
@@ -464,7 +466,8 @@ extern bool X509ToChipCert(X509 * cert, chip::MutableByteSpan & chipCert);
 extern bool InitOpenSSL();
 extern bool Base64Encode(const uint8_t * inData, uint32_t inDataLen, uint8_t * outBuf, uint32_t outBufSize, uint32_t & outDataLen);
 extern bool Base64Decode(const uint8_t * inData, uint32_t inDataLen, uint8_t * outBuf, uint32_t outBufSize, uint32_t & outDataLen);
-extern bool IsBase64String(const char * str, uint32_t strLen);
+extern bool IsBase64String(const char * str, size_t strLen);
+extern bool IsHexString(const uint8_t * s, size_t strLen);
 extern bool ContainsPEMMarker(const char * marker, const uint8_t * data, uint32_t dataLen);
 extern bool ParseDateTime(const char * str, struct tm & date);
 extern bool ReadFileIntoMem(const char * fileName, uint8_t * data, uint32_t & dataLen);
@@ -476,6 +479,7 @@ extern int gNIDChipNodeId;
 extern int gNIDChipFirmwareSigningId;
 extern int gNIDChipICAId;
 extern int gNIDChipRootId;
+extern int gNIDChipVidVerificationSignerId;
 extern int gNIDChipFabricId;
 extern int gNIDChipCASEAuthenticatedTag;
 extern int gNIDChipCurveP256;

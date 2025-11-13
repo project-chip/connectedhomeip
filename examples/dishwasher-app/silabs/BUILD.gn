@@ -109,14 +109,6 @@ if (wifi_soc) {
       include_dirs += [ "${examples_plat_dir}/wf200" ]
     }
 
-    if (chip_enable_ble_rs911x) {
-      # TODO efr32_sdk should not need a header from this location
-      include_dirs += [
-        "${examples_plat_dir}/rs911x",
-        "${examples_plat_dir}/rs911x/hal",
-      ]
-    }
-
     defines = []
     if (chip_enable_pw_rpc) {
       defines += [
@@ -141,7 +133,6 @@ silabs_executable("dishwasher_app") {
   }
 
   sources = [
-    "${example_enegy_management_dir}/energy-management-common/common/src/EnergyTimeUtils.cpp",
     "${example_enegy_management_dir}/energy-management-common/device-energy-management/src/DEMTestEventTriggers.cpp",
     "${example_enegy_management_dir}/energy-management-common/device-energy-management/src/DeviceEnergyManagementDelegateImpl.cpp",
     "${example_enegy_management_dir}/energy-management-common/device-energy-management/src/DeviceEnergyManagementManager.cpp",
@@ -152,13 +143,13 @@ silabs_executable("dishwasher_app") {
     "${example_enegy_management_dir}/energy-management-common/energy-reporting/src/PowerTopologyDelegate.cpp",
     "${examples_common_plat_dir}/main.cpp",
     "src/AppTask.cpp",
+    "src/DataModelCallbacks.cpp",
     "src/DataModelHelper.cpp",
     "src/DeviceEnergyManager.cpp",
     "src/DishwasherManager.cpp",
     "src/ElectricalEnergyMeasurementInstance.cpp",
     "src/ElectricalSensorManager.cpp",
     "src/PowerTopologyDelegateImpl.cpp",
-    "src/ZclCallbacks.cpp",
     "src/operational-state-delegate-impl.cpp",
   ]
 

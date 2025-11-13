@@ -1,10 +1,14 @@
 # Python requirements for scripts in this location
 alive_progress
+bluezoo>=1.0.2; sys_platform == "linux"
 click
 colorama
 coloredlogs
 diskcache
-mypy==1.10.1
-pyyaml
+mypy==1.16.0
+sdbus; sys_platform == "linux"
+types-PyYAML
 tabulate
-websockets
+
+-e ${PW_PROJECT_ROOT}/scripts/py_matter_idl
+-e ${PW_PROJECT_ROOT}/scripts/py_matter_yamltests

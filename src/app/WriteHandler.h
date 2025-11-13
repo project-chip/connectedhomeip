@@ -24,6 +24,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelDelegatePointers.h>
 #include <app/MessageDef/WriteResponseMessage.h>
+#include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/Provider.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLVDebug.h>
@@ -184,6 +185,20 @@ private:
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
+
+    /// Validate that a write is acceptable on the given path.
+    ///
+    /// Validates that ACL, writability and Timed interaction settings are ok.
+    ///
+    /// Returns a success status if all is ok, failure otherwise.
+    DataModel::ActionReturnStatus CheckWriteAllowed(const Access::SubjectDescriptor & aSubject,
+                                                    const ConcreteDataAttributePath & aPath);
+
+    /// Validate that a write on the given path has aRequiredPrivilege.
+    ///
+    /// Returns a success status if the ACL check is successful, otherwise the relevant status will be returned.
+    Status CheckWriteAccess(const Access::SubjectDescriptor & aSubject, const ConcreteAttributePath & aPath,
+                            const Access::Privilege aRequiredPrivilege);
 
     // Write the given data to the given path
     CHIP_ERROR WriteClusterData(const Access::SubjectDescriptor & aSubject, const ConcreteDataAttributePath & aPath,

@@ -28,7 +28,7 @@ chip_openthread_ftd = true
 chip_stack_lock_tracking = "fatal"
 
 chip_system_config_provide_statistics = false
-chip_system_config_use_open_thread_inet_endpoints = true
+chip_system_config_use_openthread_inet_endpoints = true
 
 chip_with_lwip = false
 nxp_enable_ot_cli = false

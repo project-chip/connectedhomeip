@@ -18,11 +18,19 @@ rsource "../../zephyr/Kconfig"
 
 if CHIP
 
+config CHIP_TELINK_PLATFORM
+	bool
+	default y
+	help
+	  States that the configuration uses Matter Telink platform,
+	  what can be used to conditionally deviate from Zephyr generic configuration
+	  for Telink platform related purposes.
+
 # See config/zephyr/Kconfig for full definition
 config CHIP_DEVICE_VENDOR_NAME
 	default "Telink Semiconductor"
 
-config CHIP_NFC_COMMISSIONING
+config CHIP_NFC_ONBOARDING_PAYLOAD
 	bool "Share onboarding payload in NFC tag"
 	default n
 	imply I2C
@@ -46,7 +54,7 @@ config BOOTLOADER_MCUBOOT
 	select IMG_MANAGER
 	select STREAM_FLASH
 	select STREAM_FLASH_ERASE
-	select TELINK_W91_N22_MATTER_OTA_LAYOUT if BOARD_TLSR9118BDK40D
+	select TELINK_W91_N22_MATTER_OTA_LAYOUT if BOARD_TLSR9118BDK40D || BOARD_TLSR9118BDK40D_V1
 
 config CHIP_OTA_REQUESTOR_BUFFER_SIZE
 	int "OTA Requestor image buffer size"
@@ -94,7 +102,7 @@ config TELINK_OTA_PARTITION_ADDR
 
 config CHIP_ROTATING_DEVICE_ID
 	bool "Generate rotating device ID"
-	default y
+	default n
 	help
 	  Enables the rotating device identifier that provides a non-trackable
 	  identifier. The identifier is unique per device and rotates at pre-defined
@@ -182,7 +190,7 @@ config CHIP_DEVICE_GENERATE_ROTATING_DEVICE_UID
 endif #CHIP_FACTORY_DATA_BUILD
 
 # See config/zephyr/Kconfig for full definition
-config CHIP_FACTORY_RESET_ERASE_NVS
+config CHIP_FACTORY_RESET_ERASE_SETTINGS
 	bool
 	default n
 
@@ -221,19 +229,12 @@ config CHIP_ENABLE_APPLICATION_STATUS_LED
 
 config CHIP_ENABLE_PM_DURING_BLE
 	bool "Enable PM during BLE operation"
+	default n if SOC_RISCV_TELINK_W91
 	default PM
 	help
 	  Enable PM during BLE operation.
 
-config CHIP_OPENTHREAD_TX_POWER
-	int "OpenThread Transmission power"
-	range -30 9
-	default 0
-	help
-	  OpenThread Transmission power in dBm.
-
 config SHELL_BACKEND_SERIAL_RX_RING_BUFFER_SIZE
-	int
 	default 255 if SHELL_BACKEND_SERIAL
 
 config CHIP_ENABLE_POWER_ON_FACTORY_RESET
@@ -247,10 +248,14 @@ config CHIP_ENABLE_POWER_ON_FACTORY_RESET
 config CHIP_TASK_STACK_SIZE
 	int
 	default 6192 if SOC_RISCV_TELINK_TL321X
-	default 5352 if PM
-	default 8192
+	default 5480 if PM && !SOC_RISCV_TELINK_W91
+	default 8448
 
 config CHIP_USE_MARS_SENSOR
 	bool "Use Mars board sensor"
-	depends on SOC_SERIES_RISCV_TELINK_B9X && (BOARD_TLSR9518ADK80D || BOARD_TLSR9518ADK80D_RETENTION)
+	depends on SOC_RISCV_TELINK_B9X && (BOARD_TLSR9518ADK80D || BOARD_TLSR9518ADK80D_RETENTION)
+	default n
+
+config TFLM_FEATURE
+	bool "Enable the TFLM micro speech feature"
 	default n

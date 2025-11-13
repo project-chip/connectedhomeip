@@ -17,22 +17,18 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file implements a test for  CHIP core library reference counted object.
- *
- */
-
 #include <array>
 #include <cinttypes>
 #include <cstdint>
 #include <cstring>
+#include <string>
 
 #include <pw_unit_test/framework.h>
 
 #include <lib/core/Optional.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/Span.h>
+#include <type_traits>
 
 using namespace chip;
 
@@ -75,6 +71,10 @@ public:
 
 int Count::created;
 int Count::destroyed;
+
+// Optional is trivially destructible if the underlying type is trivially destructible
+static_assert(std::is_trivially_destructible_v<chip::Optional<unsigned>>);
+static_assert(!std::is_trivially_destructible_v<chip::Optional<std::string>>);
 
 TEST(TestOptional, TestBasic)
 {

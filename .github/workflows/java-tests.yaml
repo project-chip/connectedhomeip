@@ -37,19 +37,20 @@ jobs:
         name: Linux
 
         env:
+            PW_PROJECT_ROOT: ${{ github.workspace }}
             TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build-java:94
+            image: ghcr.io/project-chip/chip-build-java:174
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -75,7 +76,7 @@ jobs:
               # TODO: this direct path loading is not maintainable. Our build system should define and
               #       support test classes.
               run: |
-                 $JAVA_PATH/bin/java \
+                 $JAVA_HOME/bin/java \
                    -cp 'third_party/java_deps/artifacts/*:out/linux-x64-tests/lib/src/controller/java/*' \
                    org.junit.runner.JUnitCore       \
                    matter.tlv.TlvWriterTest           \
@@ -94,6 +95,7 @@ jobs:
                       --target linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test \
                       --target linux-x64-java-matter-controller \
                       --target linux-x64-lit-icd-ipv6only \
+                      --target linux-x64-ota-requestor \
                       build \
                    "
             - name: Build Kotlin Matter Controller
@@ -126,7 +128,7 @@ jobs:
                      --app-args "--discriminator 3840 --interface-id -1" \
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "pairing" \
-                     --tool-args "onnetwork-long --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
+                     --tool-args "onnetwork-long --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 --timeout 5000" \
                      --factoryreset \
                   '
             - name: Run IM Invoke Test
@@ -139,7 +141,7 @@ jobs:
                      --app-args "--discriminator 3840 --interface-id -1" \
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "im" \
-                     --tool-args "onnetwork-long-im-invoke --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
+                     --tool-args "onnetwork-long-im-invoke --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 --timeout 5000" \
                      --factoryreset \
                   '
             - name: Run IM Extendable Invoke Test
@@ -152,7 +154,7 @@ jobs:
                      --app-args "--discriminator 3840 --interface-id -1" \
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "im" \
-                     --tool-args "onnetwork-long-im-extendable-invoke --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
+                     --tool-args "onnetwork-long-im-extendable-invoke --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 --timeout 5000" \
                      --factoryreset \
                   '
             - name: Run IM Read Test
@@ -165,7 +167,7 @@ jobs:
                      --app-args "--discriminator 3840 --interface-id -1" \
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "im" \
-                     --tool-args "onnetwork-long-im-read --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 3000" \
+                     --tool-args "onnetwork-long-im-read --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 --timeout 8000" \
                      --factoryreset \
                   '
             - name: Run IM Write Test
@@ -178,7 +180,7 @@ jobs:
                      --app-args "--discriminator 3840 --interface-id -1" \
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "im" \
-                     --tool-args "onnetwork-long-im-write --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
+                     --tool-args "onnetwork-long-im-write --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 --timeout 5000" \
                      --factoryreset \
                   '
             - name: Run IM Subscribe Test
@@ -191,7 +193,7 @@ jobs:
                      --app-args "--discriminator 3840 --interface-id -1" \
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "im" \
-                     --tool-args "onnetwork-long-im-subscribe --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 3000" \
+                     --tool-args "onnetwork-long-im-subscribe --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 --timeout 5000" \
                      --factoryreset \
                   '
             - name: Run Pairing AlreadyDiscovered Test
@@ -204,7 +206,7 @@ jobs:
                      --app-args "--discriminator 3840 --interface-id -1" \
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "pairing" \
-                     --tool-args "already-discovered --nodeid 1 --setup-pin-code 20202021 --address ::1 --port 5540 -t 1000" \
+                     --tool-args "already-discovered --nodeid 1 --setup-pin-code 20202021 --address ::1 --port 5540 -t 5000" \
                      --factoryreset \
                   '
             - name: Run Pairing Address-PaseOnly Test
@@ -217,7 +219,7 @@ jobs:
                      --app-args "--discriminator 3840 --interface-id -1" \
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "pairing" \
-                     --tool-args "address-paseonly --nodeid 1 --setup-pin-code 20202021 --address ::1 --port 5540 -t 1000" \
+                     --tool-args "address-paseonly --nodeid 1 --setup-pin-code 20202021 --address ::1 --port 5540 -t 5000" \
                      --factoryreset \
                   '
             - name: Run Pairing SetupQRCode Test
@@ -230,7 +232,7 @@ jobs:
                      --app-args "--discriminator 3840 --interface-id -1" \
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "pairing" \
-                     --tool-args "code --nodeid 1 --setup-payload MT:-24J0AFN00KA0648G00 --discover-once 1 --use-only-onnetwork-discovery 0 -t 1000" \
+                     --tool-args "code --nodeid 1 --setup-payload MT:-24J0AFN00KA0648G00 --discover-once 1 --use-only-onnetwork-discovery 0 -t 5000" \
                      --factoryreset \
                   '
             - name: Run Pairing ManualCode Test
@@ -243,7 +245,7 @@ jobs:
                      --app-args "--discriminator 3840 --interface-id -1" \
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "pairing" \
-                     --tool-args "code --nodeid 1 --setup-payload 34970112332 --discover-once 1 --use-only-onnetwork-discovery 0 -t 1000" \
+                     --tool-args "code --nodeid 1 --setup-payload 34970112332 --discover-once 1 --use-only-onnetwork-discovery 0 -t 5000" \
                      --factoryreset \
                   '
             - name: Run Pairing ICD Onnetwork Test
@@ -256,7 +258,20 @@ jobs:
                      --app-args "--discriminator 3840 --interface-id -1" \
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "pairing" \
-                     --tool-args "onnetwork-long --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
+                     --tool-args "onnetwork-long --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 --timeout 5000" \
+                     --factoryreset \
+                  '
+            - name: Run Pairing ICD Onnetwork and OTA test
+              # Generally completes in seconds
+              timeout-minutes: 2
+              run: |
+                  scripts/run_in_python_env.sh out/venv \
+                  './scripts/tests/run_java_test.py \
+                     --app out/linux-x64-ota-requestor/chip-ota-requestor-app \
+                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --tool-path out/linux-x64-java-matter-controller \
+                     --tool-cluster "ota" \
+                     --tool-args "onnetwork-long-ota-over-bdx  --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 --timeout 5000" \
                      --factoryreset \
                   '
             - name: Run Pairing Onnetwork and get diagnostic log Test
@@ -267,7 +282,7 @@ jobs:
                      --app-args "--discriminator 3840 --interface-id -1 --crash_log ./crashLog.log --end_user_support_log ./enduser.log --network_diagnostics_log ./network.log" \
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "bdx" \
-                     --tool-args "onnetwork-long-downloadLog --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 3000 --logType CrashLogs --fileName ./crashLog.log" \
+                     --tool-args "onnetwork-long-downloadLog --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 --timeout 3000 --logType CrashLogs --fileName ./crashLog.log" \
                      --factoryreset \
                   '
             - name: Run Pairing Onnetwork Test
@@ -280,7 +295,7 @@ jobs:
                      --app-args "--discriminator 3840 --interface-id -1" \
                      --tool-path out/linux-x64-kotlin-matter-controller \
                      --tool-cluster "pairing" \
-                     --tool-args "onnetwork-long --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
+                     --tool-args "onnetwork-long --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 --timeout 5000" \
                      --factoryreset \
                   '
             - name: Run Kotlin IM Invoke Test
@@ -293,7 +308,7 @@ jobs:
                      --app-args "--discriminator 3840 --interface-id -1" \
                      --tool-path out/linux-x64-kotlin-matter-controller \
                      --tool-cluster "im" \
-                     --tool-args "onnetwork-long-im-invoke --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
+                     --tool-args "onnetwork-long-im-invoke --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 --timeout 5000" \
                      --factoryreset \
                   '
             - name: Run Kotlin IM Read Test
@@ -306,7 +321,7 @@ jobs:
                      --app-args "--discriminator 3840 --interface-id -1" \
                      --tool-path out/linux-x64-kotlin-matter-controller \
                      --tool-cluster "im" \
-                     --tool-args "onnetwork-long-im-read --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 3000" \
+                     --tool-args "onnetwork-long-im-read --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 --timeout 5000" \
                      --factoryreset \
                   '
             - name: Run Kotlin IM Write Test
@@ -319,7 +334,7 @@ jobs:
                      --app-args "--discriminator 3840 --interface-id -1" \
                      --tool-path out/linux-x64-kotlin-matter-controller \
                      --tool-cluster "im" \
-                     --tool-args "onnetwork-long-im-write --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
+                     --tool-args "onnetwork-long-im-write --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 --timeout 5000" \
                      --factoryreset \
                   '
             - name: Run Kotlin IM Subscribe Test
@@ -332,11 +347,11 @@ jobs:
                      --app-args "--discriminator 3840 --interface-id -1" \
                      --tool-path out/linux-x64-kotlin-matter-controller \
                      --tool-cluster "im" \
-                     --tool-args "onnetwork-long-im-subscribe --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 3000" \
+                     --tool-args "onnetwork-long-im-subscribe --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 --timeout 8000" \
                      --factoryreset \
                   '
             - name: Uploading core files
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v5
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-core-linux-java-controller
@@ -344,7 +359,7 @@ jobs:
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
             - name: Uploading objdir for debugging
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v5
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-objdir-linux-java-controller

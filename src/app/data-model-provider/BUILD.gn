@@ -14,27 +14,55 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
 
+source_set("metadata") {
+  sources = [
+    "ClusterMetadataProvider.h",
+    "MetadataTypes.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/access:types",
+    "${chip_root}/src/lib/core:types",
+    "${chip_root}/src/lib/support",
+  ]
+}
+
+source_set("core") {
+  public = [ "OperationTypes.h" ]
+
+  public_deps = [
+    "${chip_root}/src/access:types",
+    "${chip_root}/src/app:paths",
+    "${chip_root}/src/app/data-model",
+  ]
+}
+
 source_set("data-model-provider") {
   sources = [
     "ActionContext.h",
     "ActionReturnStatus.cpp",
     "ActionReturnStatus.h",
+    "ClusterMetadataProvider.h",
     "Context.h",
+    "EventsGenerator.cpp",
     "EventsGenerator.h",
-    "MetadataTypes.cpp",
-    "MetadataTypes.h",
-    "OperationTypes.h",
+    "MetadataLookup.cpp",
+    "MetadataLookup.h",
     "Provider.h",
     "ProviderChangeListener.h",
+    "ProviderMetadataTree.cpp",
+    "ProviderMetadataTree.h",
   ]
 
   public_deps = [
-    "${chip_root}/src/access:types",
+    ":core",
+    ":metadata",
     "${chip_root}/src/app:attribute-access",
-    "${chip_root}/src/app:command-handler-interface",
+    "${chip_root}/src/app:command-handler",
     "${chip_root}/src/app:events",
     "${chip_root}/src/app:paths",
     "${chip_root}/src/app/MessageDef",
+    "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/data-model",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:error",

@@ -20,6 +20,7 @@
 
 #include <pw_unit_test/framework.h>
 
+#include <crypto/PSAKeyAllocator.h>
 #include <crypto/PSAOperationalKeystore.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
 #include <lib/core/StringBuilderAdapters.h>
@@ -267,6 +268,109 @@ TEST_F(TestPSAOpKeyStore, TestMigrationKeys)
 
     // Finalize
     persistentOpKeyStore.Finish();
+}
+
+TEST_F(TestPSAOpKeyStore, TestKeyAllocation)
+{
+    const psa_key_id_t kBaseTestKeyId    = 256;
+    const psa_key_id_t kICDBaseTestKeyId = 1024;
+
+    class TestKeyAllocator : public PSAKeyAllocator
+    {
+    public:
+        psa_key_id_t GetDacKeyId() override
+        {
+            // Return a constant number 256 in this test case
+            return 256;
+        }
+        psa_key_id_t GetOpKeyId(FabricIndex fabricIndex) override
+        {
+            // Return a number 256 + fabricIndex in this test case to have a different value than in DefaultPSAKeyAllocator
+            return 256 + fabricIndex;
+        }
+        psa_key_id_t AllocateICDKeyId() override
+        {
+            psa_key_id_t newKeyId = PSA_KEY_ID_NULL;
+            if (CHIP_NO_ERROR != Crypto::FindFreeKeySlotInRange(newKeyId, kICDBaseTestKeyId, kMaxICDClientKeys))
+            {
+                newKeyId = PSA_KEY_ID_NULL;
+            }
+            return newKeyId;
+        }
+        void UpdateKeyAttributes(psa_key_attributes_t & attrs) override
+        {
+            psa_set_key_type(&attrs, PSA_KEY_TYPE_AES);
+            psa_set_key_bits(&attrs, kP256_PrivateKey_Length);
+            psa_set_key_algorithm(&attrs, PSA_ALG_AEAD_WITH_AT_LEAST_THIS_LENGTH_TAG(PSA_ALG_CCM, 8));
+            psa_set_key_usage_flags(&attrs, PSA_KEY_USAGE_COPY);
+            psa_set_key_lifetime(&attrs, PSA_KEY_LIFETIME_VOLATILE);
+        }
+    };
+
+    // Create a key with the following attributes:
+    psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
+    psa_set_key_type(&attributes, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
+    psa_set_key_bits(&attributes, kP256_PrivateKey_Length * 8);
+    psa_set_key_algorithm(&attributes, PSA_ALG_ECDSA(PSA_ALG_SHA_256));
+    psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_SIGN_MESSAGE);
+    psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_PERSISTENT);
+    psa_set_key_id(&attributes, GetPSAKeyAllocator().GetOpKeyId(1));
+
+    // Check if the default key allocator returns the expected values
+    EXPECT_EQ(GetPSAKeyAllocator().GetDacKeyId(), to_underlying(KeyIdBase::DACPrivKey));
+    EXPECT_EQ(GetPSAKeyAllocator().GetOpKeyId(1), to_underlying(KeyIdBase::Operational) + 1);
+    EXPECT_EQ(GetPSAKeyAllocator().GetOpKeyId(255), to_underlying(KeyIdBase::Operational) + 255);
+    EXPECT_NE(GetPSAKeyAllocator().AllocateICDKeyId(), PSA_KEY_ID_NULL);
+
+    // Check whether attributes are not changed after using the default Allocator
+    GetPSAKeyAllocator().UpdateKeyAttributes(attributes);
+
+    EXPECT_EQ(psa_get_key_type(&attributes), PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
+    EXPECT_EQ(psa_get_key_bits(&attributes), kP256_PrivateKey_Length * 8);
+    EXPECT_EQ(psa_get_key_algorithm(&attributes), PSA_ALG_ECDSA(PSA_ALG_SHA_256));
+    EXPECT_EQ(psa_get_key_usage_flags(&attributes), PSA_KEY_USAGE_SIGN_MESSAGE);
+    EXPECT_EQ(psa_get_key_lifetime(&attributes), PSA_KEY_LIFETIME_PERSISTENT);
+
+    // Set the new testing Key Allocator and check if it returns the expected values, different than the default ones.
+    static TestKeyAllocator testKeyAllocator;
+    SetPSAKeyAllocator(&testKeyAllocator);
+
+    EXPECT_EQ(GetPSAKeyAllocator().GetDacKeyId(), kBaseTestKeyId);
+    EXPECT_EQ(GetPSAKeyAllocator().GetOpKeyId(1), kBaseTestKeyId + 1);
+    EXPECT_EQ(GetPSAKeyAllocator().GetOpKeyId(255), kBaseTestKeyId + 255);
+    EXPECT_EQ(GetPSAKeyAllocator().AllocateICDKeyId(), kICDBaseTestKeyId);
+    EXPECT_NE(GetPSAKeyAllocator().AllocateICDKeyId(), PSA_KEY_ID_NULL);
+
+    // Test changing the key attributes
+
+    // Use the KeyAllocator to update the key attributes
+    GetPSAKeyAllocator().UpdateKeyAttributes(attributes);
+
+    // Check if the attributes were changed
+    EXPECT_EQ(psa_get_key_type(&attributes), PSA_KEY_TYPE_AES);
+    EXPECT_EQ(psa_get_key_bits(&attributes), kP256_PrivateKey_Length);
+    EXPECT_EQ(psa_get_key_algorithm(&attributes), PSA_ALG_AEAD_WITH_AT_LEAST_THIS_LENGTH_TAG(PSA_ALG_CCM, 8));
+    EXPECT_EQ(psa_get_key_usage_flags(&attributes), PSA_KEY_USAGE_COPY);
+    EXPECT_EQ(psa_get_key_lifetime(&attributes), PSA_KEY_LIFETIME_VOLATILE);
+
+    // Go back to the default Key Allocator and check if the values are still good
+    SetPSAKeyAllocator(nullptr);
+
+    // Check if the default key allocator returns the expected values
+    EXPECT_EQ(GetPSAKeyAllocator().GetDacKeyId(), to_underlying(KeyIdBase::DACPrivKey));
+    EXPECT_EQ(GetPSAKeyAllocator().GetOpKeyId(1), to_underlying(KeyIdBase::Operational) + 1);
+    EXPECT_EQ(GetPSAKeyAllocator().GetOpKeyId(255), to_underlying(KeyIdBase::Operational) + 255);
+    EXPECT_NE(GetPSAKeyAllocator().AllocateICDKeyId(), PSA_KEY_ID_NULL);
+
+    // Check whether attributes are not changed after using the default Allocator
+    GetPSAKeyAllocator().UpdateKeyAttributes(attributes);
+
+    // Attributes should be still the same as previously
+    EXPECT_EQ(psa_get_key_type(&attributes), PSA_KEY_TYPE_AES);
+    EXPECT_EQ(psa_get_key_bits(&attributes), kP256_PrivateKey_Length);
+    EXPECT_EQ(psa_get_key_algorithm(&attributes), PSA_ALG_AEAD_WITH_AT_LEAST_THIS_LENGTH_TAG(PSA_ALG_CCM, 8));
+    EXPECT_EQ(psa_get_key_usage_flags(&attributes), PSA_KEY_USAGE_COPY);
+    EXPECT_EQ(psa_get_key_lifetime(&attributes), PSA_KEY_LIFETIME_VOLATILE);
 }
 
 } // namespace

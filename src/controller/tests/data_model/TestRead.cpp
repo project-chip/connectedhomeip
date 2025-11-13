@@ -34,6 +34,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/tests/MessagingContext.h>
 #include <protocols/interaction_model/Constants.h>
 #include <system/SystemClock.h>
@@ -67,6 +68,10 @@ const MockNodeConfig & TestMockNodeConfig()
                 Clusters::UnitTesting::Attributes::Int16u::Id,
                 Clusters::UnitTesting::Attributes::ListFabricScoped::Id,
                 Clusters::UnitTesting::Attributes::ListStructOctetString::Id,
+                kPerpetualAttributeid,
+            }),
+            MockClusterConfig(kPerpetualClusterId, {
+                ClusterRevision::Id, FeatureMap::Id, 1
             }),
         }),
         MockEndpointConfig(kMockEndpoint1, {
@@ -109,7 +114,7 @@ const MockNodeConfig & TestMockNodeConfig()
     return config;
 }
 
-class TestRead : public chip::Test::AppContext, public app::ReadHandler::ApplicationCallback
+class TestRead : public AppContext, public ReadHandler::ApplicationCallback
 {
 protected:
     static uint16_t mMaxInterval;
@@ -117,24 +122,24 @@ protected:
     // Performs setup for each individual test in the test suite
     void SetUp() override
     {
-        chip::Test::AppContext::SetUp();
+        AppContext::SetUp();
         // Register app callback, so we can test it as well to ensure we get the right
         // number of SubscriptionEstablishment/Termination callbacks.
         InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(this);
         mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&CustomDataModel::Instance());
-        chip::Test::SetMockNodeConfig(TestMockNodeConfig());
+        SetMockNodeConfig(TestMockNodeConfig());
     }
 
     // Performs teardown for each individual test in the test suite
     void TearDown() override
     {
-        chip::Test::ResetMockNodeConfig();
+        ResetMockNodeConfig();
         InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
         InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
-        chip::Test::AppContext::TearDown();
+        AppContext::TearDown();
     }
 
-    CHIP_ERROR OnSubscriptionRequested(app::ReadHandler & aReadHandler, Transport::SecureSession & aSecureSession) override
+    CHIP_ERROR OnSubscriptionRequested(ReadHandler & aReadHandler, Transport::SecureSession & aSecureSession) override
     {
         VerifyOrReturnError(!mEmitSubscriptionError, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -145,9 +150,9 @@ protected:
         return CHIP_NO_ERROR;
     }
 
-    void OnSubscriptionEstablished(app::ReadHandler & aReadHandler) override { mNumActiveSubscriptions++; }
+    void OnSubscriptionEstablished(ReadHandler & aReadHandler) override { mNumActiveSubscriptions++; }
 
-    void OnSubscriptionTerminated(app::ReadHandler & aReadHandler) override { mNumActiveSubscriptions--; }
+    void OnSubscriptionTerminated(ReadHandler & aReadHandler) override { mNumActiveSubscriptions--; }
 
     // Issue the given number of reads in parallel and wait for them all to
     // succeed.
@@ -165,23 +170,20 @@ protected:
     // max-interval to time out.
     static System::Clock::Timeout ComputeSubscriptionTimeout(System::Clock::Seconds16 aMaxInterval);
 
-    bool mEmitSubscriptionError                   = false;
-    int32_t mNumActiveSubscriptions               = 0;
-    bool mAlterSubscriptionIntervals              = false;
-    chip::app::DataModel::Provider * mOldProvider = nullptr;
+    bool mEmitSubscriptionError        = false;
+    int32_t mNumActiveSubscriptions    = 0;
+    bool mAlterSubscriptionIntervals   = false;
+    DataModel::Provider * mOldProvider = nullptr;
 };
 
 uint16_t TestRead::mMaxInterval = 66;
 
-class MockInteractionModelApp : public chip::app::ClusterStateCache::Callback
+class MockInteractionModelApp : public ClusterStateCache::Callback
 {
 public:
-    void OnEventData(const chip::app::EventHeader & aEventHeader, chip::TLV::TLVReader * apData,
-                     const chip::app::StatusIB * apStatus) override
-    {}
+    void OnEventData(const EventHeader & aEventHeader, chip::TLV::TLVReader * apData, const StatusIB * apStatus) override {}
 
-    void OnAttributeData(const chip::app::ConcreteDataAttributePath & aPath, chip::TLV::TLVReader * apData,
-                         const chip::app::StatusIB & status) override
+    void OnAttributeData(const ConcreteDataAttributePath & aPath, chip::TLV::TLVReader * apData, const StatusIB & status) override
     {
         if (status.mStatus == chip::Protocols::InteractionModel::Status::Success)
         {
@@ -197,9 +199,9 @@ public:
         mReadError = true;
     }
 
-    void OnDone(app::ReadClient *) override {}
+    void OnDone(ReadClient *) override {}
 
-    void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
+    void OnDeallocatePaths(ReadPrepareParams && aReadPrepareParams) override
     {
         if (aReadPrepareParams.mpAttributePathParamsList != nullptr)
         {
@@ -231,7 +233,7 @@ TEST_F(TestRead, TestReadAttributeResponse)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [&onSuccessCbInvoked](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+    auto onSuccessCb = [&onSuccessCbInvoked](const ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
         uint8_t i = 0;
         EXPECT_TRUE(attributePath.mDataVersion.HasValue() && attributePath.mDataVersion.Value() == kDataVersion);
         auto iter = dataResponse.begin();
@@ -248,18 +250,18 @@ TEST_F(TestRead, TestReadAttributeResponse)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+    auto onFailureCb = [&onFailureCbInvoked](const ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
         onFailureCbInvoked = true;
     };
 
-    Controller::ReadAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
-        &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb);
+    EXPECT_SUCCESS(Controller::ReadAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
+        &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 
     EXPECT_TRUE(onSuccessCbInvoked && !onFailureCbInvoked);
-    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients(), 0u);
-    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 0u);
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadClients(), 0u);
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 0u);
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
@@ -271,64 +273,61 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithVersionOnlyCache)
     ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     MockInteractionModelApp delegate;
-    chip::app::ClusterStateCache cache(delegate, Optional<EventNumber>::Missing(), false /*cachedData*/);
+    ClusterStateCache cache(delegate, Optional<EventNumber>::Missing(), false /*cachedData*/);
 
-    chip::app::ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
+    ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
 
     // read of E2C2A* and E3C2A2. Expect cache E2C2 version
     {
-        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(),
-                                   cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
-        chip::app::AttributePathParams attributePathParams2[2];
-        attributePathParams2[0].mEndpointId  = chip::Test::kMockEndpoint2;
-        attributePathParams2[0].mClusterId   = chip::Test::MockClusterId(3);
+        ReadClient readClient(InteractionModelEngine::GetInstance(), &GetExchangeManager(), cache.GetBufferedCallback(),
+                              ReadClient::InteractionType::Read);
+        AttributePathParams attributePathParams2[2];
+        attributePathParams2[0].mEndpointId  = kMockEndpoint2;
+        attributePathParams2[0].mClusterId   = MockClusterId(3);
         attributePathParams2[0].mAttributeId = kInvalidAttributeId;
 
-        attributePathParams2[1].mEndpointId            = chip::Test::kMockEndpoint3;
-        attributePathParams2[1].mClusterId             = chip::Test::MockClusterId(2);
-        attributePathParams2[1].mAttributeId           = chip::Test::MockAttributeId(2);
+        attributePathParams2[1].mEndpointId            = kMockEndpoint3;
+        attributePathParams2[1].mClusterId             = MockClusterId(2);
+        attributePathParams2[1].mAttributeId           = MockAttributeId(2);
         readPrepareParams.mpAttributePathParamsList    = attributePathParams2;
         readPrepareParams.mAttributePathParamsListSize = 2;
         err                                            = readClient.SendRequest(readPrepareParams);
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         DrainAndServiceIO();
-        // There are supported 2 global and 3 non-global attributes in E2C2A* and  1 E3C2A2
-        EXPECT_EQ(delegate.mNumAttributeResponse, 6);
+        // There are supported 5 global and 3 non-global attributes in E2C2A* and  1 E3C2A2
+        EXPECT_EQ(delegate.mNumAttributeResponse, 9);
         EXPECT_FALSE(delegate.mReadError);
         Optional<DataVersion> version1;
-        app::ConcreteClusterPath clusterPath1(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3));
+        ConcreteClusterPath clusterPath1(kMockEndpoint2, MockClusterId(3));
         EXPECT_EQ(cache.GetVersion(clusterPath1, version1), CHIP_NO_ERROR);
         EXPECT_TRUE(version1.HasValue() && (version1.Value() == 0));
         Optional<DataVersion> version2;
-        app::ConcreteClusterPath clusterPath2(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2));
+        ConcreteClusterPath clusterPath2(kMockEndpoint3, MockClusterId(2));
         EXPECT_EQ(cache.GetVersion(clusterPath2, version2), CHIP_NO_ERROR);
         EXPECT_FALSE(version2.HasValue());
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
-                                                     chip::Test::MockAttributeId(2));
+            ConcreteAttributePath attributePath(kMockEndpoint2, MockClusterId(3), MockAttributeId(2));
             TLV::TLVReader reader;
             EXPECT_NE(cache.Get(attributePath, reader), CHIP_NO_ERROR);
         }
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
-                                                     chip::Test::MockAttributeId(3));
+            ConcreteAttributePath attributePath(kMockEndpoint2, MockClusterId(3), MockAttributeId(3));
             TLV::TLVReader reader;
             EXPECT_NE(cache.Get(attributePath, reader), CHIP_NO_ERROR);
         }
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2),
-                                                     chip::Test::MockAttributeId(2));
+            ConcreteAttributePath attributePath(kMockEndpoint3, MockClusterId(2), MockAttributeId(2));
             TLV::TLVReader reader;
             EXPECT_NE(cache.Get(attributePath, reader), CHIP_NO_ERROR);
         }
         delegate.mNumAttributeResponse = 0;
     }
 
-    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients(), 0u);
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadClients(), 0u);
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
@@ -338,17 +337,17 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
     ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
 
     MockInteractionModelApp delegate;
-    chip::app::ClusterStateCache cache(delegate);
+    ClusterStateCache cache(delegate);
 
-    chip::app::EventPathParams eventPathParams[100];
+    EventPathParams eventPathParams[100];
     for (auto & eventPathParam : eventPathParams)
     {
-        eventPathParam.mEndpointId = chip::Test::kMockEndpoint3;
-        eventPathParam.mClusterId  = chip::Test::MockClusterId(2);
+        eventPathParam.mEndpointId = kMockEndpoint3;
+        eventPathParam.mClusterId  = MockClusterId(2);
         eventPathParam.mEventId    = 0;
     }
 
-    chip::app::ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
+    ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
     readPrepareParams.mMinIntervalFloorSeconds   = 0;
     readPrepareParams.mMaxIntervalCeilingSeconds = 4;
 
@@ -359,19 +358,19 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
     {
         testId++;
         ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
-        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(),
-                                   cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
-        chip::app::AttributePathParams attributePathParams1[3];
-        attributePathParams1[0].mEndpointId  = chip::Test::kMockEndpoint2;
-        attributePathParams1[0].mClusterId   = chip::Test::MockClusterId(3);
-        attributePathParams1[0].mAttributeId = chip::Test::MockAttributeId(1);
+        ReadClient readClient(InteractionModelEngine::GetInstance(), &GetExchangeManager(), cache.GetBufferedCallback(),
+                              ReadClient::InteractionType::Read);
+        AttributePathParams attributePathParams1[3];
+        attributePathParams1[0].mEndpointId  = kMockEndpoint2;
+        attributePathParams1[0].mClusterId   = MockClusterId(3);
+        attributePathParams1[0].mAttributeId = MockAttributeId(1);
 
         attributePathParams1[1].mEndpointId  = kInvalidEndpointId;
-        attributePathParams1[1].mClusterId   = chip::Test::MockClusterId(3);
-        attributePathParams1[1].mAttributeId = chip::Test::MockAttributeId(1);
+        attributePathParams1[1].mClusterId   = MockClusterId(3);
+        attributePathParams1[1].mAttributeId = MockAttributeId(1);
 
-        attributePathParams1[2].mEndpointId  = chip::Test::kMockEndpoint2;
-        attributePathParams1[2].mClusterId   = chip::Test::MockClusterId(3);
+        attributePathParams1[2].mEndpointId  = kMockEndpoint2;
+        attributePathParams1[2].mClusterId   = MockClusterId(3);
         attributePathParams1[2].mAttributeId = kInvalidAttributeId;
 
         readPrepareParams.mpAttributePathParamsList    = attributePathParams1;
@@ -380,10 +379,10 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         DrainAndServiceIO();
-        EXPECT_EQ(delegate.mNumAttributeResponse, 6);
+        EXPECT_EQ(delegate.mNumAttributeResponse, 9);
         EXPECT_FALSE(delegate.mReadError);
         Optional<DataVersion> version1;
-        app::ConcreteClusterPath clusterPath1(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3));
+        ConcreteClusterPath clusterPath1(kMockEndpoint2, MockClusterId(3));
         EXPECT_EQ(cache.GetVersion(clusterPath1, version1), CHIP_NO_ERROR);
         EXPECT_FALSE(version1.HasValue());
         delegate.mNumAttributeResponse = 0;
@@ -394,20 +393,20 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
     {
         testId++;
         ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
-        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(),
-                                   cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
-        chip::app::AttributePathParams attributePathParams1[3];
-        attributePathParams1[0].mEndpointId  = chip::Test::kMockEndpoint2;
-        attributePathParams1[0].mClusterId   = chip::Test::MockClusterId(3);
-        attributePathParams1[0].mAttributeId = chip::Test::MockAttributeId(1);
+        ReadClient readClient(InteractionModelEngine::GetInstance(), &GetExchangeManager(), cache.GetBufferedCallback(),
+                              ReadClient::InteractionType::Read);
+        AttributePathParams attributePathParams1[3];
+        attributePathParams1[0].mEndpointId  = kMockEndpoint2;
+        attributePathParams1[0].mClusterId   = MockClusterId(3);
+        attributePathParams1[0].mAttributeId = MockAttributeId(1);
 
-        attributePathParams1[1].mEndpointId  = chip::Test::kMockEndpoint2;
-        attributePathParams1[1].mClusterId   = chip::Test::MockClusterId(3);
-        attributePathParams1[1].mAttributeId = chip::Test::MockAttributeId(2);
+        attributePathParams1[1].mEndpointId  = kMockEndpoint2;
+        attributePathParams1[1].mClusterId   = MockClusterId(3);
+        attributePathParams1[1].mAttributeId = MockAttributeId(2);
 
-        attributePathParams1[2].mEndpointId  = chip::Test::kMockEndpoint3;
-        attributePathParams1[2].mClusterId   = chip::Test::MockClusterId(2);
-        attributePathParams1[2].mAttributeId = chip::Test::MockAttributeId(2);
+        attributePathParams1[2].mEndpointId  = kMockEndpoint3;
+        attributePathParams1[2].mClusterId   = MockClusterId(2);
+        attributePathParams1[2].mAttributeId = MockAttributeId(2);
 
         readPrepareParams.mpAttributePathParamsList    = attributePathParams1;
         readPrepareParams.mAttributePathParamsListSize = 3;
@@ -418,41 +417,38 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
         EXPECT_EQ(delegate.mNumAttributeResponse, 3);
         EXPECT_FALSE(delegate.mReadError);
         Optional<DataVersion> version1;
-        app::ConcreteClusterPath clusterPath1(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3));
+        ConcreteClusterPath clusterPath1(kMockEndpoint2, MockClusterId(3));
         EXPECT_EQ(cache.GetVersion(clusterPath1, version1), CHIP_NO_ERROR);
         EXPECT_FALSE(version1.HasValue());
         Optional<DataVersion> version2;
-        app::ConcreteClusterPath clusterPath2(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2));
+        ConcreteClusterPath clusterPath2(kMockEndpoint3, MockClusterId(2));
         EXPECT_EQ(cache.GetVersion(clusterPath2, version2), CHIP_NO_ERROR);
         EXPECT_FALSE(version2.HasValue());
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
-                                                     chip::Test::MockAttributeId(1));
+            ConcreteAttributePath attributePath(kMockEndpoint2, MockClusterId(3), MockAttributeId(1));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
-            reader.Get(receivedAttribute1);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute1));
             EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
-                                                     chip::Test::MockAttributeId(2));
+            ConcreteAttributePath attributePath(kMockEndpoint2, MockClusterId(3), MockAttributeId(2));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2),
-                                                     chip::Test::MockAttributeId(2));
+            ConcreteAttributePath attributePath(kMockEndpoint3, MockClusterId(2), MockAttributeId(2));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
@@ -465,20 +461,20 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
     {
         testId++;
         ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
-        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(),
-                                   cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
-        chip::app::AttributePathParams attributePathParams1[3];
+        ReadClient readClient(InteractionModelEngine::GetInstance(), &GetExchangeManager(), cache.GetBufferedCallback(),
+                              ReadClient::InteractionType::Read);
+        AttributePathParams attributePathParams1[3];
         attributePathParams1[0].mEndpointId  = kInvalidEndpointId;
-        attributePathParams1[0].mClusterId   = chip::Test::MockClusterId(2);
-        attributePathParams1[0].mAttributeId = chip::Test::MockAttributeId(2);
+        attributePathParams1[0].mClusterId   = MockClusterId(2);
+        attributePathParams1[0].mAttributeId = MockAttributeId(2);
 
-        attributePathParams1[1].mEndpointId  = chip::Test::kMockEndpoint2;
-        attributePathParams1[1].mClusterId   = chip::Test::MockClusterId(2);
-        attributePathParams1[1].mAttributeId = chip::Test::MockAttributeId(2);
+        attributePathParams1[1].mEndpointId  = kMockEndpoint2;
+        attributePathParams1[1].mClusterId   = MockClusterId(2);
+        attributePathParams1[1].mAttributeId = MockAttributeId(2);
 
-        attributePathParams1[2].mEndpointId  = chip::Test::kMockEndpoint3;
-        attributePathParams1[2].mClusterId   = chip::Test::MockClusterId(2);
-        attributePathParams1[2].mAttributeId = chip::Test::MockAttributeId(2);
+        attributePathParams1[2].mEndpointId  = kMockEndpoint3;
+        attributePathParams1[2].mClusterId   = MockClusterId(2);
+        attributePathParams1[2].mAttributeId = MockAttributeId(2);
 
         readPrepareParams.mpAttributePathParamsList    = attributePathParams1;
         readPrepareParams.mAttributePathParamsListSize = 3;
@@ -489,38 +485,35 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
         EXPECT_EQ(delegate.mNumAttributeResponse, 2);
         EXPECT_FALSE(delegate.mReadError);
         Optional<DataVersion> version1;
-        app::ConcreteClusterPath clusterPath1(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3));
+        ConcreteClusterPath clusterPath1(kMockEndpoint2, MockClusterId(3));
         EXPECT_EQ(cache.GetVersion(clusterPath1, version1), CHIP_NO_ERROR);
         EXPECT_FALSE(version1.HasValue());
         Optional<DataVersion> version2;
-        app::ConcreteClusterPath clusterPath2(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2));
+        ConcreteClusterPath clusterPath2(kMockEndpoint3, MockClusterId(2));
         EXPECT_EQ(cache.GetVersion(clusterPath2, version2), CHIP_NO_ERROR);
         EXPECT_FALSE(version2.HasValue());
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint1, chip::Test::MockClusterId(2),
-                                                     chip::Test::MockAttributeId(2));
+            ConcreteAttributePath attributePath(kMockEndpoint1, MockClusterId(2), MockAttributeId(2));
             TLV::TLVReader reader;
             EXPECT_NE(cache.Get(attributePath, reader), CHIP_NO_ERROR);
         }
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(2),
-                                                     chip::Test::MockAttributeId(2));
+            ConcreteAttributePath attributePath(kMockEndpoint2, MockClusterId(2), MockAttributeId(2));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2),
-                                                     chip::Test::MockAttributeId(2));
+            ConcreteAttributePath attributePath(kMockEndpoint3, MockClusterId(2), MockAttributeId(2));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
         delegate.mNumAttributeResponse = 0;
@@ -531,71 +524,67 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
     {
         testId++;
         ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
-        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(),
-                                   cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
-        chip::app::AttributePathParams attributePathParams2[2];
-        attributePathParams2[0].mEndpointId  = chip::Test::kMockEndpoint2;
-        attributePathParams2[0].mClusterId   = chip::Test::MockClusterId(3);
+        ReadClient readClient(InteractionModelEngine::GetInstance(), &GetExchangeManager(), cache.GetBufferedCallback(),
+                              ReadClient::InteractionType::Read);
+        AttributePathParams attributePathParams2[2];
+        attributePathParams2[0].mEndpointId  = kMockEndpoint2;
+        attributePathParams2[0].mClusterId   = MockClusterId(3);
         attributePathParams2[0].mAttributeId = kInvalidAttributeId;
 
-        attributePathParams2[1].mEndpointId            = chip::Test::kMockEndpoint3;
-        attributePathParams2[1].mClusterId             = chip::Test::MockClusterId(2);
-        attributePathParams2[1].mAttributeId           = chip::Test::MockAttributeId(2);
+        attributePathParams2[1].mEndpointId            = kMockEndpoint3;
+        attributePathParams2[1].mClusterId             = MockClusterId(2);
+        attributePathParams2[1].mAttributeId           = MockAttributeId(2);
         readPrepareParams.mpAttributePathParamsList    = attributePathParams2;
         readPrepareParams.mAttributePathParamsListSize = 2;
         err                                            = readClient.SendRequest(readPrepareParams);
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         DrainAndServiceIO();
-        // There are supported 2 global and 3 non-global attributes in E2C2A* and  1 E3C2A2
-        EXPECT_EQ(delegate.mNumAttributeResponse, 6);
+        // There are supported 5 global and 3 non-global attributes in E2C2A* and  1 E3C2A2
+        EXPECT_EQ(delegate.mNumAttributeResponse, 9);
         EXPECT_FALSE(delegate.mReadError);
         Optional<DataVersion> version1;
-        app::ConcreteClusterPath clusterPath1(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3));
+        ConcreteClusterPath clusterPath1(kMockEndpoint2, MockClusterId(3));
         EXPECT_EQ(cache.GetVersion(clusterPath1, version1), CHIP_NO_ERROR);
         EXPECT_TRUE(version1.HasValue() && (version1.Value() == 0));
         Optional<DataVersion> version2;
-        app::ConcreteClusterPath clusterPath2(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2));
+        ConcreteClusterPath clusterPath2(kMockEndpoint3, MockClusterId(2));
         EXPECT_EQ(cache.GetVersion(clusterPath2, version2), CHIP_NO_ERROR);
         EXPECT_FALSE(version2.HasValue());
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
-                                                     chip::Test::MockAttributeId(1));
+            ConcreteAttributePath attributePath(kMockEndpoint2, MockClusterId(3), MockAttributeId(1));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
-            reader.Get(receivedAttribute1);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute1));
             EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
-                                                     chip::Test::MockAttributeId(2));
+            ConcreteAttributePath attributePath(kMockEndpoint2, MockClusterId(3), MockAttributeId(2));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
-                                                     chip::Test::MockAttributeId(3));
+            ConcreteAttributePath attributePath(kMockEndpoint2, MockClusterId(3), MockAttributeId(3));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             uint64_t receivedAttribute3;
-            reader.Get(receivedAttribute3);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute3));
             EXPECT_EQ(receivedAttribute3, mockAttribute3);
         }
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2),
-                                                     chip::Test::MockAttributeId(2));
+            ConcreteAttributePath attributePath(kMockEndpoint3, MockClusterId(2), MockAttributeId(2));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
         delegate.mNumAttributeResponse = 0;
@@ -606,20 +595,20 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
     {
         testId++;
         ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
-        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(),
-                                   cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
-        chip::app::AttributePathParams attributePathParams1[3];
-        attributePathParams1[0].mEndpointId  = chip::Test::kMockEndpoint2;
-        attributePathParams1[0].mClusterId   = chip::Test::MockClusterId(3);
-        attributePathParams1[0].mAttributeId = chip::Test::MockAttributeId(1);
+        ReadClient readClient(InteractionModelEngine::GetInstance(), &GetExchangeManager(), cache.GetBufferedCallback(),
+                              ReadClient::InteractionType::Read);
+        AttributePathParams attributePathParams1[3];
+        attributePathParams1[0].mEndpointId  = kMockEndpoint2;
+        attributePathParams1[0].mClusterId   = MockClusterId(3);
+        attributePathParams1[0].mAttributeId = MockAttributeId(1);
 
-        attributePathParams1[1].mEndpointId  = chip::Test::kMockEndpoint2;
-        attributePathParams1[1].mClusterId   = chip::Test::MockClusterId(3);
-        attributePathParams1[1].mAttributeId = chip::Test::MockAttributeId(2);
+        attributePathParams1[1].mEndpointId  = kMockEndpoint2;
+        attributePathParams1[1].mClusterId   = MockClusterId(3);
+        attributePathParams1[1].mAttributeId = MockAttributeId(2);
 
-        attributePathParams1[2].mEndpointId  = chip::Test::kMockEndpoint3;
-        attributePathParams1[2].mClusterId   = chip::Test::MockClusterId(2);
-        attributePathParams1[2].mAttributeId = chip::Test::MockAttributeId(2);
+        attributePathParams1[2].mEndpointId  = kMockEndpoint3;
+        attributePathParams1[2].mClusterId   = MockClusterId(2);
+        attributePathParams1[2].mAttributeId = MockAttributeId(2);
 
         readPrepareParams.mpAttributePathParamsList    = attributePathParams1;
         readPrepareParams.mAttributePathParamsListSize = 3;
@@ -630,41 +619,38 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
         EXPECT_EQ(delegate.mNumAttributeResponse, 1);
         EXPECT_FALSE(delegate.mReadError);
         Optional<DataVersion> version1;
-        app::ConcreteClusterPath clusterPath1(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3));
+        ConcreteClusterPath clusterPath1(kMockEndpoint2, MockClusterId(3));
         EXPECT_EQ(cache.GetVersion(clusterPath1, version1), CHIP_NO_ERROR);
         EXPECT_TRUE(version1.HasValue() && (version1.Value() == 0));
         Optional<DataVersion> version2;
-        app::ConcreteClusterPath clusterPath2(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2));
+        ConcreteClusterPath clusterPath2(kMockEndpoint3, MockClusterId(2));
         EXPECT_EQ(cache.GetVersion(clusterPath2, version2), CHIP_NO_ERROR);
         EXPECT_FALSE(version2.HasValue());
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
-                                                     chip::Test::MockAttributeId(1));
+            ConcreteAttributePath attributePath(kMockEndpoint2, MockClusterId(3), MockAttributeId(1));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
-            reader.Get(receivedAttribute1);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute1));
             EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
-                                                     chip::Test::MockAttributeId(2));
+            ConcreteAttributePath attributePath(kMockEndpoint2, MockClusterId(3), MockAttributeId(2));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2),
-                                                     chip::Test::MockAttributeId(2));
+            ConcreteAttributePath attributePath(kMockEndpoint3, MockClusterId(2), MockAttributeId(2));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
         delegate.mNumAttributeResponse = 0;
@@ -675,16 +661,16 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
     {
         testId++;
         ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
-        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(),
-                                   cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
-        chip::app::AttributePathParams attributePathParams2[2];
-        attributePathParams2[0].mEndpointId  = chip::Test::kMockEndpoint2;
-        attributePathParams2[0].mClusterId   = chip::Test::MockClusterId(3);
+        ReadClient readClient(InteractionModelEngine::GetInstance(), &GetExchangeManager(), cache.GetBufferedCallback(),
+                              ReadClient::InteractionType::Read);
+        AttributePathParams attributePathParams2[2];
+        attributePathParams2[0].mEndpointId  = kMockEndpoint2;
+        attributePathParams2[0].mClusterId   = MockClusterId(3);
         attributePathParams2[0].mAttributeId = kInvalidAttributeId;
 
-        attributePathParams2[1].mEndpointId            = chip::Test::kMockEndpoint3;
-        attributePathParams2[1].mClusterId             = chip::Test::MockClusterId(2);
-        attributePathParams2[1].mAttributeId           = chip::Test::MockAttributeId(2);
+        attributePathParams2[1].mEndpointId            = kMockEndpoint3;
+        attributePathParams2[1].mClusterId             = MockClusterId(2);
+        attributePathParams2[1].mAttributeId           = MockAttributeId(2);
         readPrepareParams.mpAttributePathParamsList    = attributePathParams2;
         readPrepareParams.mAttributePathParamsListSize = 2;
         err                                            = readClient.SendRequest(readPrepareParams);
@@ -694,57 +680,53 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
         EXPECT_EQ(delegate.mNumAttributeResponse, 1);
         EXPECT_FALSE(delegate.mReadError);
         Optional<DataVersion> version1;
-        app::ConcreteClusterPath clusterPath1(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3));
+        ConcreteClusterPath clusterPath1(kMockEndpoint2, MockClusterId(3));
         EXPECT_EQ(cache.GetVersion(clusterPath1, version1), CHIP_NO_ERROR);
         EXPECT_TRUE(version1.HasValue() && (version1.Value() == 0));
         Optional<DataVersion> version2;
-        app::ConcreteClusterPath clusterPath2(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2));
+        ConcreteClusterPath clusterPath2(kMockEndpoint3, MockClusterId(2));
         EXPECT_EQ(cache.GetVersion(clusterPath2, version2), CHIP_NO_ERROR);
         EXPECT_FALSE(version2.HasValue());
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
-                                                     chip::Test::MockAttributeId(1));
+            ConcreteAttributePath attributePath(kMockEndpoint2, MockClusterId(3), MockAttributeId(1));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
-            reader.Get(receivedAttribute1);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute1));
             EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
-                                                     chip::Test::MockAttributeId(2));
+            ConcreteAttributePath attributePath(kMockEndpoint2, MockClusterId(3), MockAttributeId(2));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
-                                                     chip::Test::MockAttributeId(3));
+            ConcreteAttributePath attributePath(kMockEndpoint2, MockClusterId(3), MockAttributeId(3));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             uint64_t receivedAttribute3;
-            reader.Get(receivedAttribute3);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute3));
             EXPECT_EQ(receivedAttribute3, mockAttribute3);
         }
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2),
-                                                     chip::Test::MockAttributeId(2));
+            ConcreteAttributePath attributePath(kMockEndpoint3, MockClusterId(2), MockAttributeId(2));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
         delegate.mNumAttributeResponse = 0;
     }
 
-    chip::Test::BumpVersion();
+    BumpVersion();
 
     // Read of E2C3A1, E2C3A2 and E3C2A2. It would use the stored data versions in the cache since our subsequent read's C1A*
     // path intersects with previous cached data version, server's version is changed. Expect E2C3A1, E2C3A2 and E3C2A2 attribute in
@@ -752,20 +734,20 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
     {
         testId++;
         ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
-        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(),
-                                   cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
-        chip::app::AttributePathParams attributePathParams1[3];
-        attributePathParams1[0].mEndpointId  = chip::Test::kMockEndpoint2;
-        attributePathParams1[0].mClusterId   = chip::Test::MockClusterId(3);
-        attributePathParams1[0].mAttributeId = chip::Test::MockAttributeId(1);
+        ReadClient readClient(InteractionModelEngine::GetInstance(), &GetExchangeManager(), cache.GetBufferedCallback(),
+                              ReadClient::InteractionType::Read);
+        AttributePathParams attributePathParams1[3];
+        attributePathParams1[0].mEndpointId  = kMockEndpoint2;
+        attributePathParams1[0].mClusterId   = MockClusterId(3);
+        attributePathParams1[0].mAttributeId = MockAttributeId(1);
 
-        attributePathParams1[1].mEndpointId  = chip::Test::kMockEndpoint2;
-        attributePathParams1[1].mClusterId   = chip::Test::MockClusterId(3);
-        attributePathParams1[1].mAttributeId = chip::Test::MockAttributeId(2);
+        attributePathParams1[1].mEndpointId  = kMockEndpoint2;
+        attributePathParams1[1].mClusterId   = MockClusterId(3);
+        attributePathParams1[1].mAttributeId = MockAttributeId(2);
 
-        attributePathParams1[2].mEndpointId  = chip::Test::kMockEndpoint3;
-        attributePathParams1[2].mClusterId   = chip::Test::MockClusterId(2);
-        attributePathParams1[2].mAttributeId = chip::Test::MockAttributeId(2);
+        attributePathParams1[2].mEndpointId  = kMockEndpoint3;
+        attributePathParams1[2].mClusterId   = MockClusterId(2);
+        attributePathParams1[2].mAttributeId = MockAttributeId(2);
 
         readPrepareParams.mpAttributePathParamsList    = attributePathParams1;
         readPrepareParams.mAttributePathParamsListSize = 3;
@@ -776,41 +758,38 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
         EXPECT_EQ(delegate.mNumAttributeResponse, 3);
         EXPECT_FALSE(delegate.mReadError);
         Optional<DataVersion> version1;
-        app::ConcreteClusterPath clusterPath1(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3));
+        ConcreteClusterPath clusterPath1(kMockEndpoint2, MockClusterId(3));
         EXPECT_EQ(cache.GetVersion(clusterPath1, version1), CHIP_NO_ERROR);
         EXPECT_FALSE(version1.HasValue());
         Optional<DataVersion> version2;
-        app::ConcreteClusterPath clusterPath2(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2));
+        ConcreteClusterPath clusterPath2(kMockEndpoint3, MockClusterId(2));
         EXPECT_EQ(cache.GetVersion(clusterPath2, version2), CHIP_NO_ERROR);
         EXPECT_FALSE(version2.HasValue());
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
-                                                     chip::Test::MockAttributeId(1));
+            ConcreteAttributePath attributePath(kMockEndpoint2, MockClusterId(3), MockAttributeId(1));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
-            reader.Get(receivedAttribute1);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute1));
             EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
-                                                     chip::Test::MockAttributeId(2));
+            ConcreteAttributePath attributePath(kMockEndpoint2, MockClusterId(3), MockAttributeId(2));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2),
-                                                     chip::Test::MockAttributeId(2));
+            ConcreteAttributePath attributePath(kMockEndpoint3, MockClusterId(2), MockAttributeId(2));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
         delegate.mNumAttributeResponse = 0;
@@ -821,20 +800,20 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
     {
         testId++;
         ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
-        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(),
-                                   cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
-        chip::app::AttributePathParams attributePathParams1[3];
-        attributePathParams1[0].mEndpointId  = chip::Test::kMockEndpoint2;
-        attributePathParams1[0].mClusterId   = chip::Test::MockClusterId(3);
-        attributePathParams1[0].mAttributeId = chip::Test::MockAttributeId(1);
+        ReadClient readClient(InteractionModelEngine::GetInstance(), &GetExchangeManager(), cache.GetBufferedCallback(),
+                              ReadClient::InteractionType::Read);
+        AttributePathParams attributePathParams1[3];
+        attributePathParams1[0].mEndpointId  = kMockEndpoint2;
+        attributePathParams1[0].mClusterId   = MockClusterId(3);
+        attributePathParams1[0].mAttributeId = MockAttributeId(1);
 
-        attributePathParams1[1].mEndpointId  = chip::Test::kMockEndpoint2;
-        attributePathParams1[1].mClusterId   = chip::Test::MockClusterId(3);
-        attributePathParams1[1].mAttributeId = chip::Test::MockAttributeId(2);
+        attributePathParams1[1].mEndpointId  = kMockEndpoint2;
+        attributePathParams1[1].mClusterId   = MockClusterId(3);
+        attributePathParams1[1].mAttributeId = MockAttributeId(2);
 
-        attributePathParams1[2].mEndpointId  = chip::Test::kMockEndpoint3;
-        attributePathParams1[2].mClusterId   = chip::Test::MockClusterId(2);
-        attributePathParams1[2].mAttributeId = chip::Test::MockAttributeId(2);
+        attributePathParams1[2].mEndpointId  = kMockEndpoint3;
+        attributePathParams1[2].mClusterId   = MockClusterId(2);
+        attributePathParams1[2].mAttributeId = MockAttributeId(2);
 
         readPrepareParams.mpAttributePathParamsList    = attributePathParams1;
         readPrepareParams.mAttributePathParamsListSize = 3;
@@ -845,41 +824,38 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
         EXPECT_EQ(delegate.mNumAttributeResponse, 3);
         EXPECT_FALSE(delegate.mReadError);
         Optional<DataVersion> version1;
-        app::ConcreteClusterPath clusterPath1(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3));
+        ConcreteClusterPath clusterPath1(kMockEndpoint2, MockClusterId(3));
         EXPECT_EQ(cache.GetVersion(clusterPath1, version1), CHIP_NO_ERROR);
         EXPECT_FALSE(version1.HasValue());
         Optional<DataVersion> version2;
-        app::ConcreteClusterPath clusterPath2(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2));
+        ConcreteClusterPath clusterPath2(kMockEndpoint3, MockClusterId(2));
         EXPECT_EQ(cache.GetVersion(clusterPath2, version2), CHIP_NO_ERROR);
         EXPECT_FALSE(version2.HasValue());
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
-                                                     chip::Test::MockAttributeId(1));
+            ConcreteAttributePath attributePath(kMockEndpoint2, MockClusterId(3), MockAttributeId(1));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
-            reader.Get(receivedAttribute1);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute1));
             EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
-                                                     chip::Test::MockAttributeId(2));
+            ConcreteAttributePath attributePath(kMockEndpoint2, MockClusterId(3), MockAttributeId(2));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2),
-                                                     chip::Test::MockAttributeId(2));
+            ConcreteAttributePath attributePath(kMockEndpoint3, MockClusterId(2), MockAttributeId(2));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
         delegate.mNumAttributeResponse = 0;
@@ -890,70 +866,66 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
     {
         testId++;
         ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
-        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(),
-                                   cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
-        chip::app::AttributePathParams attributePathParams2[2];
-        attributePathParams2[0].mEndpointId  = chip::Test::kMockEndpoint2;
-        attributePathParams2[0].mClusterId   = chip::Test::MockClusterId(3);
+        ReadClient readClient(InteractionModelEngine::GetInstance(), &GetExchangeManager(), cache.GetBufferedCallback(),
+                              ReadClient::InteractionType::Read);
+        AttributePathParams attributePathParams2[2];
+        attributePathParams2[0].mEndpointId  = kMockEndpoint2;
+        attributePathParams2[0].mClusterId   = MockClusterId(3);
         attributePathParams2[0].mAttributeId = kInvalidAttributeId;
 
-        attributePathParams2[1].mEndpointId            = chip::Test::kMockEndpoint3;
-        attributePathParams2[1].mClusterId             = chip::Test::MockClusterId(2);
-        attributePathParams2[1].mAttributeId           = chip::Test::MockAttributeId(2);
+        attributePathParams2[1].mEndpointId            = kMockEndpoint3;
+        attributePathParams2[1].mClusterId             = MockClusterId(2);
+        attributePathParams2[1].mAttributeId           = MockAttributeId(2);
         readPrepareParams.mpAttributePathParamsList    = attributePathParams2;
         readPrepareParams.mAttributePathParamsListSize = 2;
         err                                            = readClient.SendRequest(readPrepareParams);
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         DrainAndServiceIO();
-        EXPECT_EQ(delegate.mNumAttributeResponse, 6);
+        EXPECT_EQ(delegate.mNumAttributeResponse, 9);
         EXPECT_FALSE(delegate.mReadError);
         Optional<DataVersion> version1;
-        app::ConcreteClusterPath clusterPath1(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3));
+        ConcreteClusterPath clusterPath1(kMockEndpoint2, MockClusterId(3));
         EXPECT_EQ(cache.GetVersion(clusterPath1, version1), CHIP_NO_ERROR);
         EXPECT_TRUE(version1.HasValue() && (version1.Value() == 1));
         Optional<DataVersion> version2;
-        app::ConcreteClusterPath clusterPath2(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2));
+        ConcreteClusterPath clusterPath2(kMockEndpoint3, MockClusterId(2));
         EXPECT_EQ(cache.GetVersion(clusterPath2, version2), CHIP_NO_ERROR);
         EXPECT_FALSE(version2.HasValue());
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
-                                                     chip::Test::MockAttributeId(1));
+            ConcreteAttributePath attributePath(kMockEndpoint2, MockClusterId(3), MockAttributeId(1));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
-            reader.Get(receivedAttribute1);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute1));
             EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
-                                                     chip::Test::MockAttributeId(2));
+            ConcreteAttributePath attributePath(kMockEndpoint2, MockClusterId(3), MockAttributeId(2));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
-                                                     chip::Test::MockAttributeId(3));
+            ConcreteAttributePath attributePath(kMockEndpoint2, MockClusterId(3), MockAttributeId(3));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             uint64_t receivedAttribute3;
-            reader.Get(receivedAttribute3);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute3));
             EXPECT_EQ(receivedAttribute3, mockAttribute3);
         }
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2),
-                                                     chip::Test::MockAttributeId(2));
+            ConcreteAttributePath attributePath(kMockEndpoint3, MockClusterId(2), MockAttributeId(2));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
         delegate.mNumAttributeResponse = 0;
@@ -965,78 +937,74 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
     {
         testId++;
         ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
-        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(),
-                                   cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
-        chip::app::AttributePathParams attributePathParams2[2];
-        attributePathParams2[0].mEndpointId  = chip::Test::kMockEndpoint2;
-        attributePathParams2[0].mClusterId   = chip::Test::MockClusterId(3);
+        ReadClient readClient(InteractionModelEngine::GetInstance(), &GetExchangeManager(), cache.GetBufferedCallback(),
+                              ReadClient::InteractionType::Read);
+        AttributePathParams attributePathParams2[2];
+        attributePathParams2[0].mEndpointId  = kMockEndpoint2;
+        attributePathParams2[0].mClusterId   = MockClusterId(3);
         attributePathParams2[0].mAttributeId = kInvalidAttributeId;
 
-        attributePathParams2[1].mEndpointId            = chip::Test::kMockEndpoint3;
-        attributePathParams2[1].mClusterId             = chip::Test::MockClusterId(2);
-        attributePathParams2[1].mAttributeId           = chip::Test::MockAttributeId(2);
+        attributePathParams2[1].mEndpointId            = kMockEndpoint3;
+        attributePathParams2[1].mClusterId             = MockClusterId(2);
+        attributePathParams2[1].mAttributeId           = MockAttributeId(2);
         readPrepareParams.mpAttributePathParamsList    = attributePathParams2;
         readPrepareParams.mAttributePathParamsListSize = 2;
 
         readPrepareParams.mpEventPathParamsList = eventPathParams;
         // This size needs to be big enough that we can't fit our
         // DataVersionFilterIBs in the same packet.  Max size is
-        // ArraySize(eventPathParams);
-        static_assert(75 <= ArraySize(eventPathParams));
+        // MATTER_ARRAY_SIZE(eventPathParams);
+        static_assert(75 <= MATTER_ARRAY_SIZE(eventPathParams));
         readPrepareParams.mEventPathParamsListSize = 75;
 
         err = readClient.SendRequest(readPrepareParams);
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         DrainAndServiceIO();
-        EXPECT_EQ(delegate.mNumAttributeResponse, 6);
+        EXPECT_EQ(delegate.mNumAttributeResponse, 9);
         EXPECT_FALSE(delegate.mReadError);
         Optional<DataVersion> version1;
-        app::ConcreteClusterPath clusterPath1(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3));
+        ConcreteClusterPath clusterPath1(kMockEndpoint2, MockClusterId(3));
         EXPECT_EQ(cache.GetVersion(clusterPath1, version1), CHIP_NO_ERROR);
         EXPECT_TRUE(version1.HasValue() && (version1.Value() == 1));
         Optional<DataVersion> version2;
-        app::ConcreteClusterPath clusterPath2(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2));
+        ConcreteClusterPath clusterPath2(kMockEndpoint3, MockClusterId(2));
         EXPECT_EQ(cache.GetVersion(clusterPath2, version2), CHIP_NO_ERROR);
         EXPECT_FALSE(version2.HasValue());
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
-                                                     chip::Test::MockAttributeId(1));
+            ConcreteAttributePath attributePath(kMockEndpoint2, MockClusterId(3), MockAttributeId(1));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
-            reader.Get(receivedAttribute1);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute1));
             EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
-                                                     chip::Test::MockAttributeId(2));
+            ConcreteAttributePath attributePath(kMockEndpoint2, MockClusterId(3), MockAttributeId(2));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
-                                                     chip::Test::MockAttributeId(3));
+            ConcreteAttributePath attributePath(kMockEndpoint2, MockClusterId(3), MockAttributeId(3));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             uint64_t receivedAttribute3;
-            reader.Get(receivedAttribute3);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute3));
             EXPECT_EQ(receivedAttribute3, mockAttribute3);
         }
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2),
-                                                     chip::Test::MockAttributeId(2));
+            ConcreteAttributePath attributePath(kMockEndpoint3, MockClusterId(2), MockAttributeId(2));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
         delegate.mNumAttributeResponse             = 0;
@@ -1044,27 +1012,27 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
         readPrepareParams.mEventPathParamsListSize = 0;
     }
 
-    chip::Test::BumpVersion();
+    BumpVersion();
 
     // Read of E1C2A* and E2C3A* and E2C2A*, it would use C1 cached version to construct DataVersionFilter, but version has
     // changed in server. Expect E1C2A* and C2C3A* and E2C2A* attributes in report, and cache their versions
     {
         testId++;
         ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
-        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(),
-                                   cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
+        ReadClient readClient(InteractionModelEngine::GetInstance(), &GetExchangeManager(), cache.GetBufferedCallback(),
+                              ReadClient::InteractionType::Read);
 
-        chip::app::AttributePathParams attributePathParams3[3];
-        attributePathParams3[0].mEndpointId  = chip::Test::kMockEndpoint1;
-        attributePathParams3[0].mClusterId   = chip::Test::MockClusterId(2);
+        AttributePathParams attributePathParams3[3];
+        attributePathParams3[0].mEndpointId  = kMockEndpoint1;
+        attributePathParams3[0].mClusterId   = MockClusterId(2);
         attributePathParams3[0].mAttributeId = kInvalidAttributeId;
 
-        attributePathParams3[1].mEndpointId  = chip::Test::kMockEndpoint2;
-        attributePathParams3[1].mClusterId   = chip::Test::MockClusterId(3);
+        attributePathParams3[1].mEndpointId  = kMockEndpoint2;
+        attributePathParams3[1].mClusterId   = MockClusterId(3);
         attributePathParams3[1].mAttributeId = kInvalidAttributeId;
 
-        attributePathParams3[2].mEndpointId            = chip::Test::kMockEndpoint2;
-        attributePathParams3[2].mClusterId             = chip::Test::MockClusterId(2);
+        attributePathParams3[2].mEndpointId            = kMockEndpoint2;
+        attributePathParams3[2].mClusterId             = MockClusterId(2);
         attributePathParams3[2].mAttributeId           = kInvalidAttributeId;
         readPrepareParams.mpAttributePathParamsList    = attributePathParams3;
         readPrepareParams.mAttributePathParamsListSize = 3;
@@ -1074,77 +1042,72 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
 
         DrainAndServiceIO();
         // E1C2A* has 3 attributes and E2C3A* has 5 attributes and E2C2A* has 4 attributes
-        EXPECT_EQ(delegate.mNumAttributeResponse, 12);
+        // + 3 global attributes not in metadata (3*3 = 9) for attributes/acceptedcommands/generatedcommands
+        EXPECT_EQ(delegate.mNumAttributeResponse, 21);
         EXPECT_FALSE(delegate.mReadError);
         Optional<DataVersion> version1;
-        app::ConcreteClusterPath clusterPath1(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3));
+        ConcreteClusterPath clusterPath1(kMockEndpoint2, MockClusterId(3));
         EXPECT_EQ(cache.GetVersion(clusterPath1, version1), CHIP_NO_ERROR);
         EXPECT_TRUE(version1.HasValue() && (version1.Value() == 2));
         Optional<DataVersion> version2;
-        app::ConcreteClusterPath clusterPath2(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(2));
+        ConcreteClusterPath clusterPath2(kMockEndpoint2, MockClusterId(2));
         EXPECT_EQ(cache.GetVersion(clusterPath2, version2), CHIP_NO_ERROR);
         EXPECT_TRUE(version2.HasValue() && (version2.Value() == 2));
         Optional<DataVersion> version3;
-        app::ConcreteClusterPath clusterPath3(chip::Test::kMockEndpoint1, chip::Test::MockClusterId(2));
+        ConcreteClusterPath clusterPath3(kMockEndpoint1, MockClusterId(2));
         EXPECT_EQ(cache.GetVersion(clusterPath3, version3), CHIP_NO_ERROR);
         EXPECT_TRUE(version3.HasValue() && (version3.Value() == 2));
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint1, chip::Test::MockClusterId(2),
-                                                     chip::Test::MockAttributeId(1));
+            ConcreteAttributePath attributePath(kMockEndpoint1, MockClusterId(2), MockAttributeId(1));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
-            reader.Get(receivedAttribute1);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute1));
             EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
-                                                     chip::Test::MockAttributeId(1));
+            ConcreteAttributePath attributePath(kMockEndpoint2, MockClusterId(3), MockAttributeId(1));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
-            reader.Get(receivedAttribute1);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute1));
             EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
-                                                     chip::Test::MockAttributeId(2));
+            ConcreteAttributePath attributePath(kMockEndpoint2, MockClusterId(3), MockAttributeId(2));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
-                                                     chip::Test::MockAttributeId(3));
+            ConcreteAttributePath attributePath(kMockEndpoint2, MockClusterId(3), MockAttributeId(3));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             uint64_t receivedAttribute3;
-            reader.Get(receivedAttribute3);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute3));
             EXPECT_EQ(receivedAttribute3, mockAttribute3);
         }
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(2),
-                                                     chip::Test::MockAttributeId(1));
+            ConcreteAttributePath attributePath(kMockEndpoint2, MockClusterId(2), MockAttributeId(1));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
-            reader.Get(receivedAttribute1);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute1));
             EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(2),
-                                                     chip::Test::MockAttributeId(2));
+            ConcreteAttributePath attributePath(kMockEndpoint2, MockClusterId(2), MockAttributeId(2));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
@@ -1158,105 +1121,99 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
     {
         testId++;
         ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
-        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(),
-                                   cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
+        ReadClient readClient(InteractionModelEngine::GetInstance(), &GetExchangeManager(), cache.GetBufferedCallback(),
+                              ReadClient::InteractionType::Read);
 
-        chip::app::AttributePathParams attributePathParams3[3];
-        attributePathParams3[0].mEndpointId  = chip::Test::kMockEndpoint1;
-        attributePathParams3[0].mClusterId   = chip::Test::MockClusterId(2);
+        AttributePathParams attributePathParams3[3];
+        attributePathParams3[0].mEndpointId  = kMockEndpoint1;
+        attributePathParams3[0].mClusterId   = MockClusterId(2);
         attributePathParams3[0].mAttributeId = kInvalidAttributeId;
 
-        attributePathParams3[1].mEndpointId  = chip::Test::kMockEndpoint2;
-        attributePathParams3[1].mClusterId   = chip::Test::MockClusterId(3);
+        attributePathParams3[1].mEndpointId  = kMockEndpoint2;
+        attributePathParams3[1].mClusterId   = MockClusterId(3);
         attributePathParams3[1].mAttributeId = kInvalidAttributeId;
 
-        attributePathParams3[2].mEndpointId            = chip::Test::kMockEndpoint2;
-        attributePathParams3[2].mClusterId             = chip::Test::MockClusterId(2);
+        attributePathParams3[2].mEndpointId            = kMockEndpoint2;
+        attributePathParams3[2].mClusterId             = MockClusterId(2);
         attributePathParams3[2].mAttributeId           = kInvalidAttributeId;
         readPrepareParams.mpAttributePathParamsList    = attributePathParams3;
         readPrepareParams.mAttributePathParamsListSize = 3;
         readPrepareParams.mpEventPathParamsList        = eventPathParams;
 
         // This size needs to be big enough that we can only fit our first
-        // DataVersionFilterIB. Max size is ArraySize(eventPathParams);
-        static_assert(73 <= ArraySize(eventPathParams));
+        // DataVersionFilterIB. Max size is MATTER_ARRAY_SIZE(eventPathParams);
+        static_assert(73 <= MATTER_ARRAY_SIZE(eventPathParams));
         readPrepareParams.mEventPathParamsListSize = 73;
         err                                        = readClient.SendRequest(readPrepareParams);
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         DrainAndServiceIO();
-        EXPECT_EQ(delegate.mNumAttributeResponse, 7);
+        EXPECT_EQ(delegate.mNumAttributeResponse, 13);
         EXPECT_FALSE(delegate.mReadError);
         Optional<DataVersion> version1;
-        app::ConcreteClusterPath clusterPath1(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3));
+        ConcreteClusterPath clusterPath1(kMockEndpoint2, MockClusterId(3));
         EXPECT_EQ(cache.GetVersion(clusterPath1, version1), CHIP_NO_ERROR);
         EXPECT_TRUE(version1.HasValue() && (version1.Value() == 2));
         Optional<DataVersion> version2;
-        app::ConcreteClusterPath clusterPath2(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(2));
+        ConcreteClusterPath clusterPath2(kMockEndpoint2, MockClusterId(2));
         EXPECT_EQ(cache.GetVersion(clusterPath2, version2), CHIP_NO_ERROR);
         EXPECT_TRUE(version2.HasValue() && (version2.Value() == 2));
         Optional<DataVersion> version3;
-        app::ConcreteClusterPath clusterPath3(chip::Test::kMockEndpoint1, chip::Test::MockClusterId(2));
+        ConcreteClusterPath clusterPath3(kMockEndpoint1, MockClusterId(2));
         EXPECT_EQ(cache.GetVersion(clusterPath3, version3), CHIP_NO_ERROR);
         EXPECT_TRUE(version3.HasValue() && (version3.Value() == 2));
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint1, chip::Test::MockClusterId(2),
-                                                     chip::Test::MockAttributeId(1));
+            ConcreteAttributePath attributePath(kMockEndpoint1, MockClusterId(2), MockAttributeId(1));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
-            reader.Get(receivedAttribute1);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute1));
             EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
-                                                     chip::Test::MockAttributeId(1));
+            ConcreteAttributePath attributePath(kMockEndpoint2, MockClusterId(3), MockAttributeId(1));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
-            reader.Get(receivedAttribute1);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute1));
             EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
-                                                     chip::Test::MockAttributeId(2));
+            ConcreteAttributePath attributePath(kMockEndpoint2, MockClusterId(3), MockAttributeId(2));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
-                                                     chip::Test::MockAttributeId(3));
+            ConcreteAttributePath attributePath(kMockEndpoint2, MockClusterId(3), MockAttributeId(3));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             uint64_t receivedAttribute3;
-            reader.Get(receivedAttribute3);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute3));
             EXPECT_EQ(receivedAttribute3, mockAttribute3);
         }
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(2),
-                                                     chip::Test::MockAttributeId(1));
+            ConcreteAttributePath attributePath(kMockEndpoint2, MockClusterId(2), MockAttributeId(1));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
-            reader.Get(receivedAttribute1);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute1));
             EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(2),
-                                                     chip::Test::MockAttributeId(2));
+            ConcreteAttributePath attributePath(kMockEndpoint2, MockClusterId(2), MockAttributeId(2));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
         delegate.mNumAttributeResponse             = 0;
@@ -1269,11 +1226,11 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
     {
         testId++;
         ChipLogProgress(DataManagement, "\t -- Running Read with ClusterStateCache Test ID %d", testId);
-        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(),
-                                   cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
-        chip::app::AttributePathParams attributePathParams1[1];
-        attributePathParams1[0].mEndpointId = chip::Test::kMockEndpoint3;
-        attributePathParams1[0].mClusterId  = chip::Test::MockClusterId(2);
+        ReadClient readClient(InteractionModelEngine::GetInstance(), &GetExchangeManager(), cache.GetBufferedCallback(),
+                              ReadClient::InteractionType::Read);
+        AttributePathParams attributePathParams1[1];
+        attributePathParams1[0].mEndpointId = kMockEndpoint3;
+        attributePathParams1[0].mClusterId  = MockClusterId(2);
 
         readPrepareParams.mpAttributePathParamsList    = attributePathParams1;
         readPrepareParams.mAttributePathParamsListSize = 1;
@@ -1281,57 +1238,53 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         DrainAndServiceIO();
-        EXPECT_EQ(delegate.mNumAttributeResponse, 6);
+        EXPECT_EQ(delegate.mNumAttributeResponse, 9);
         EXPECT_FALSE(delegate.mReadError);
         Optional<DataVersion> version1;
-        app::ConcreteClusterPath clusterPath(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2));
+        ConcreteClusterPath clusterPath(kMockEndpoint3, MockClusterId(2));
 
         EXPECT_EQ(cache.GetVersion(clusterPath, version1), CHIP_NO_ERROR);
         EXPECT_TRUE(version1.HasValue());
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2),
-                                                     chip::Test::MockAttributeId(1));
+            ConcreteAttributePath attributePath(kMockEndpoint3, MockClusterId(2), MockAttributeId(1));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
-            reader.Get(receivedAttribute1);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute1));
             EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2),
-                                                     chip::Test::MockAttributeId(2));
+            ConcreteAttributePath attributePath(kMockEndpoint3, MockClusterId(2), MockAttributeId(2));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2),
-                                                     chip::Test::MockAttributeId(3));
+            ConcreteAttributePath attributePath(kMockEndpoint3, MockClusterId(2), MockAttributeId(3));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             uint64_t receivedAttribute3;
-            reader.Get(receivedAttribute3);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute3));
             EXPECT_EQ(receivedAttribute3, mockAttribute3);
         }
 
         {
-            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2),
-                                                     chip::Test::MockAttributeId(4));
+            ConcreteAttributePath attributePath(kMockEndpoint3, MockClusterId(2), MockAttributeId(4));
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             uint8_t receivedAttribute4[256];
-            reader.GetBytes(receivedAttribute4, 256);
+            EXPECT_EQ(reader.GetBytes(receivedAttribute4, 256), CHIP_ERROR_WRONG_TLV_TYPE);
             EXPECT_TRUE(memcmp(receivedAttribute4, mockAttribute4, 256));
         }
         delegate.mNumAttributeResponse = 0;
     }
 
-    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients(), 0u);
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadClients(), 0u);
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
@@ -1342,29 +1295,27 @@ TEST_F(TestRead, TestReadEventResponse)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [&onSuccessCbInvoked](const app::EventHeader & eventHeader, const auto & EventResponse) {
+    auto onSuccessCb = [&onSuccessCbInvoked](const EventHeader & eventHeader, const auto & EventResponse) {
         // TODO: Need to add check when IM event server integration completes
         onSuccessCbInvoked = true;
     };
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&onFailureCbInvoked](const app::EventHeader * eventHeader, CHIP_ERROR aError) {
-        onFailureCbInvoked = true;
-    };
+    auto onFailureCb = [&onFailureCbInvoked](const EventHeader * eventHeader, CHIP_ERROR aError) { onFailureCbInvoked = true; };
 
-    auto onDoneCb = [&onDoneCbInvoked](app::ReadClient * apReadClient) { onDoneCbInvoked = true; };
+    auto onDoneCb = [&onDoneCbInvoked](ReadClient * apReadClient) { onDoneCbInvoked = true; };
 
-    Controller::ReadEvent<Clusters::UnitTesting::Events::TestEvent::DecodableType>(
-        &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, onDoneCb);
+    EXPECT_SUCCESS(Controller::ReadEvent<Clusters::UnitTesting::Events::TestEvent::DecodableType>(
+        &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, onDoneCb));
 
     DrainAndServiceIO();
 
     EXPECT_FALSE(onFailureCbInvoked);
     EXPECT_TRUE(onDoneCbInvoked);
 
-    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients(), 0u);
-    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 0u);
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadClients(), 0u);
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 0u);
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
@@ -1377,25 +1328,25 @@ TEST_F(TestRead, TestReadAttributeError)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [&onSuccessCbInvoked](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+    auto onSuccessCb = [&onSuccessCbInvoked](const ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
         onSuccessCbInvoked = true;
     };
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
-        EXPECT_TRUE(aError.IsIMStatus() && app::StatusIB(aError).mStatus == Protocols::InteractionModel::Status::Busy);
+    auto onFailureCb = [&onFailureCbInvoked](const ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+        EXPECT_TRUE(aError.IsIMStatus() && StatusIB(aError).mStatus == Protocols::InteractionModel::Status::Busy);
         onFailureCbInvoked = true;
     };
 
-    Controller::ReadAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
-        &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb);
+    EXPECT_SUCCESS(Controller::ReadAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
+        &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 
     EXPECT_TRUE(!onSuccessCbInvoked && onFailureCbInvoked);
-    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients(), 0u);
-    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 0u);
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadClients(), 0u);
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 0u);
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
@@ -1408,19 +1359,19 @@ TEST_F(TestRead, TestReadAttributeTimeout)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [&onSuccessCbInvoked](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+    auto onSuccessCb = [&onSuccessCbInvoked](const ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
         onSuccessCbInvoked = true;
     };
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+    auto onFailureCb = [&onFailureCbInvoked](const ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
         EXPECT_EQ(aError, CHIP_ERROR_TIMEOUT);
         onFailureCbInvoked = true;
     };
 
-    Controller::ReadAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
-        &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb);
+    EXPECT_SUCCESS(Controller::ReadAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
+        &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb));
 
     ExpireSessionAliceToBob();
 
@@ -1436,26 +1387,26 @@ TEST_F(TestRead, TestReadAttributeTimeout)
 
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 
-    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 0u);
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 0u);
 
     //
     // Let's put back the sessions so that the next tests (which assume a valid initialized set of sessions)
     // can function correctly.
     //
-    CreateSessionAliceToBob();
-    CreateSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
-class TestResubscriptionCallback : public app::ReadClient::Callback
+class TestResubscriptionCallback : public ReadClient::Callback
 {
 public:
     TestResubscriptionCallback() {}
 
-    void SetReadClient(app::ReadClient * apReadClient) { mpReadClient = apReadClient; }
+    void SetReadClient(ReadClient * apReadClient) { mpReadClient = apReadClient; }
 
-    void OnDone(app::ReadClient *) override { mOnDone++; }
+    void OnDone(ReadClient *) override { mOnDone++; }
 
     void OnError(CHIP_ERROR aError) override
     {
@@ -1465,7 +1416,7 @@ public:
 
     void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override { mOnSubscriptionEstablishedCount++; }
 
-    CHIP_ERROR OnResubscriptionNeeded(app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override
+    CHIP_ERROR OnResubscriptionNeeded(ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override
     {
         mOnResubscriptionsAttempted++;
         mLastError = aTerminationCause;
@@ -1493,7 +1444,7 @@ public:
     int32_t mOnError                        = 0;
     CHIP_ERROR mLastError                   = CHIP_NO_ERROR;
     bool mScheduleLITResubscribeImmediately = false;
-    app::ReadClient * mpReadClient          = nullptr;
+    ReadClient * mpReadClient               = nullptr;
 };
 
 //
@@ -1508,24 +1459,24 @@ TEST_F(TestRead, TestResubscribeAttributeTimeout)
 {
     auto sessionHandle = GetSessionBobToAlice();
 
-    SetMRPMode(chip::Test::MessagingContext::MRPMode::kResponsive);
+    SetMRPMode(MessagingContext::MRPMode::kResponsive);
 
     {
         TestResubscriptionCallback callback;
-        app::ReadClient readClient(app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), callback,
-                                   app::ReadClient::InteractionType::Subscribe);
+        ReadClient readClient(InteractionModelEngine::GetInstance(), &GetExchangeManager(), callback,
+                              ReadClient::InteractionType::Subscribe);
 
         callback.SetReadClient(&readClient);
 
-        app::ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
+        ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
 
         // Read full wildcard paths, repeat twice to ensure chunking.
-        app::AttributePathParams attributePathParams[1];
+        AttributePathParams attributePathParams[1];
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
-        readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
+        readPrepareParams.mAttributePathParamsListSize = MATTER_ARRAY_SIZE(attributePathParams);
         attributePathParams[0].mEndpointId             = kTestEndpointId;
-        attributePathParams[0].mClusterId              = app::Clusters::UnitTesting::Id;
-        attributePathParams[0].mAttributeId            = app::Clusters::UnitTesting::Attributes::Boolean::Id;
+        attributePathParams[0].mClusterId              = Clusters::UnitTesting::Id;
+        attributePathParams[0].mAttributeId            = Clusters::UnitTesting::Attributes::Boolean::Id;
 
         constexpr uint16_t maxIntervalCeilingSeconds = 1;
 
@@ -1543,7 +1494,7 @@ TEST_F(TestRead, TestResubscribeAttributeTimeout)
         EXPECT_EQ(callback.mOnError, 0);
         EXPECT_EQ(callback.mOnResubscriptionsAttempted, 0);
 
-        chip::app::ReadHandler * readHandler = app::InteractionModelEngine::GetInstance()->ActiveHandlerAt(0);
+        ReadHandler * readHandler = InteractionModelEngine::GetInstance()->ActiveHandlerAt(0);
 
         uint16_t minInterval;
         uint16_t maxInterval;
@@ -1553,7 +1504,7 @@ TEST_F(TestRead, TestResubscribeAttributeTimeout)
         // Disable packet transmission, and drive IO till we have reported a re-subscription attempt.
         //
         //
-        GetLoopback().mNumMessagesToDrop = chip::Test::LoopbackTransport::kUnlimitedMessageCount;
+        GetLoopback().mNumMessagesToDrop = LoopbackTransport::kUnlimitedMessageCount;
         GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)),
                                     [&]() { return callback.mOnResubscriptionsAttempted > 0; });
 
@@ -1577,9 +1528,172 @@ TEST_F(TestRead, TestResubscribeAttributeTimeout)
         EXPECT_EQ(callback.mOnDone, 0);
     }
 
-    SetMRPMode(chip::Test::MessagingContext::MRPMode::kDefault);
+    SetMRPMode(MessagingContext::MRPMode::kDefault);
 
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+//
+// This validates the re-subscription logic within ReadClient that has registered an icd token with the LIT device.
+// This achieves it by overriding the timeout for the liveness timer within ReadClient to be a smaller value than
+// the nominal max interval of the subscription. This causes the subscription to fail on the client side, triggering
+// re-subscription when device is operating as LIT and client has not registered its token in device.
+//
+TEST_F(TestRead, TestResubscribeAttributeTimeoutLITWithoutRegisteringToken)
+{
+    auto sessionHandle = GetSessionBobToAlice();
+
+    SetMRPMode(MessagingContext::MRPMode::kResponsive);
+
+    {
+        TestResubscriptionCallback callback;
+        ReadClient readClient(InteractionModelEngine::GetInstance(), &GetExchangeManager(), callback,
+                              ReadClient::InteractionType::Subscribe);
+
+        callback.SetReadClient(&readClient);
+
+        ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
+
+        // Read full wildcard paths, repeat twice to ensure chunking.
+        AttributePathParams attributePathParams[1];
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+        readPrepareParams.mAttributePathParamsListSize = MATTER_ARRAY_SIZE(attributePathParams);
+        readPrepareParams.mIsPeerLIT                   = true;
+        readPrepareParams.mRegisteredCheckInToken      = false;
+        attributePathParams[0].mEndpointId             = kTestEndpointId;
+        attributePathParams[0].mClusterId              = Clusters::UnitTesting::Id;
+        attributePathParams[0].mAttributeId            = Clusters::UnitTesting::Attributes::Boolean::Id;
+
+        constexpr uint16_t maxIntervalCeilingSeconds = 1;
+
+        readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
+
+        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        //
+        // Drive servicing IO till we have established a subscription.
+        //
+        GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                    [&]() { return callback.mOnSubscriptionEstablishedCount >= 1; });
+        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
+        EXPECT_EQ(callback.mOnError, 0);
+        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 0);
+
+        ReadHandler * readHandler = InteractionModelEngine::GetInstance()->ActiveHandlerAt(0);
+
+        uint16_t minInterval;
+        uint16_t maxInterval;
+        readHandler->GetReportingIntervals(minInterval, maxInterval);
+
+        //
+        // Disable packet transmission, and drive IO till we have reported a re-subscription attempt.
+        //
+        //
+        GetLoopback().mNumMessagesToDrop = LoopbackTransport::kUnlimitedMessageCount;
+        GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)),
+                                    [&]() { return callback.mOnResubscriptionsAttempted > 0; });
+
+        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 1);
+        EXPECT_EQ(callback.mLastError, CHIP_ERROR_TIMEOUT);
+
+        GetLoopback().mNumMessagesToDrop = 0;
+        callback.ClearCounters();
+
+        //
+        // Drive servicing IO till we have established a subscription.
+        //
+        GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                    [&]() { return callback.mOnSubscriptionEstablishedCount == 1; });
+        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
+
+        //
+        // With re-sub enabled, we shouldn't have encountered any errors
+        //
+        EXPECT_EQ(callback.mOnError, 0);
+        EXPECT_EQ(callback.mOnDone, 0);
+    }
+
+    SetMRPMode(MessagingContext::MRPMode::kDefault);
+
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F(TestRead, TestShutdownAllSubscriptionHandlers)
+{
+    auto sessionHandle = GetSessionBobToAlice();
+
+    SetMRPMode(MessagingContext::MRPMode::kResponsive);
+
+    {
+        TestResubscriptionCallback callback;
+        ReadClient readClient(InteractionModelEngine::GetInstance(), &GetExchangeManager(), callback,
+                              ReadClient::InteractionType::Subscribe);
+
+        callback.SetReadClient(&readClient);
+
+        ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
+
+        // Read full wildcard paths, repeat twice to ensure chunking.
+        AttributePathParams attributePathParams[1];
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+        readPrepareParams.mAttributePathParamsListSize = MATTER_ARRAY_SIZE(attributePathParams);
+        attributePathParams[0].mEndpointId             = kTestEndpointId;
+        attributePathParams[0].mClusterId              = Clusters::UnitTesting::Id;
+        attributePathParams[0].mAttributeId            = Clusters::UnitTesting::Attributes::Boolean::Id;
+
+        constexpr uint16_t maxIntervalCeilingSeconds = 1;
+
+        readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
+
+        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        //
+        // Drive servicing IO till we have established a subscription.
+        //
+        GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                    [&]() { return callback.mOnSubscriptionEstablishedCount >= 1; });
+        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
+        EXPECT_EQ(callback.mOnError, 0);
+        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 0);
+
+        ReadHandler * readHandler = InteractionModelEngine::GetInstance()->ActiveHandlerAt(0);
+
+        uint16_t minInterval;
+        uint16_t maxInterval;
+        readHandler->GetReportingIntervals(minInterval, maxInterval);
+
+        InteractionModelEngine::GetInstance()->ShutdownAllSubscriptionHandlers();
+
+        GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)),
+                                    [&]() { return callback.mOnResubscriptionsAttempted > 0; });
+
+        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 1);
+        EXPECT_EQ(callback.mLastError, CHIP_ERROR_TIMEOUT);
+
+        GetLoopback().mNumMessagesToDrop = 0;
+        callback.ClearCounters();
+
+        //
+        // Drive servicing IO till we have established a subscription.
+        //
+        GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                    [&]() { return callback.mOnSubscriptionEstablishedCount == 1; });
+        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
+
+        //
+        // With re-sub enabled, we shouldn't have encountered any errors
+        //
+        EXPECT_EQ(callback.mOnError, 0);
+        EXPECT_EQ(callback.mOnDone, 0);
+    }
+
+    SetMRPMode(MessagingContext::MRPMode::kDefault);
+
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
@@ -1591,23 +1705,23 @@ TEST_F(TestRead, TestSubscribeAttributeTimeout)
 {
     auto sessionHandle = GetSessionBobToAlice();
 
-    SetMRPMode(chip::Test::MessagingContext::MRPMode::kResponsive);
+    SetMRPMode(MessagingContext::MRPMode::kResponsive);
 
     {
         TestResubscriptionCallback callback;
-        app::ReadClient readClient(app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), callback,
-                                   app::ReadClient::InteractionType::Subscribe);
+        ReadClient readClient(InteractionModelEngine::GetInstance(), &GetExchangeManager(), callback,
+                              ReadClient::InteractionType::Subscribe);
 
         callback.SetReadClient(&readClient);
 
-        app::ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
+        ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
 
-        app::AttributePathParams attributePathParams[1];
+        AttributePathParams attributePathParams[1];
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
-        readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
+        readPrepareParams.mAttributePathParamsListSize = MATTER_ARRAY_SIZE(attributePathParams);
         attributePathParams[0].mEndpointId             = kTestEndpointId;
-        attributePathParams[0].mClusterId              = app::Clusters::UnitTesting::Id;
-        attributePathParams[0].mAttributeId            = app::Clusters::UnitTesting::Attributes::Boolean::Id;
+        attributePathParams[0].mClusterId              = Clusters::UnitTesting::Id;
+        attributePathParams[0].mAttributeId            = Clusters::UnitTesting::Attributes::Boolean::Id;
 
         //
         // Request a max interval that's very small to reduce time to discovering a liveness failure.
@@ -1628,9 +1742,9 @@ TEST_F(TestRead, TestSubscribeAttributeTimeout)
         //
         // Request we drop all further messages.
         //
-        GetLoopback().mNumMessagesToDrop = chip::Test::LoopbackTransport::kUnlimitedMessageCount;
+        GetLoopback().mNumMessagesToDrop = LoopbackTransport::kUnlimitedMessageCount;
 
-        chip::app::ReadHandler * readHandler = app::InteractionModelEngine::GetInstance()->ActiveHandlerAt(0);
+        ReadHandler * readHandler = InteractionModelEngine::GetInstance()->ActiveHandlerAt(0);
 
         uint16_t minInterval;
         uint16_t maxInterval;
@@ -1650,9 +1764,9 @@ TEST_F(TestRead, TestSubscribeAttributeTimeout)
         EXPECT_EQ(callback.mOnResubscriptionsAttempted, 0);
     }
 
-    SetMRPMode(chip::Test::MessagingContext::MRPMode::kDefault);
+    SetMRPMode(MessagingContext::MRPMode::kDefault);
 
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
     GetLoopback().mNumMessagesToDrop = 0;
 }
@@ -1667,30 +1781,30 @@ TEST_F(TestRead, TestReadHandler_MultipleSubscriptions)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+    auto onSuccessCb = [&numSuccessCalls](const ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
         numSuccessCalls++;
     };
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+    auto onFailureCb = [](const ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
         //
         // We shouldn't be encountering any failures in this test.
         //
         EXPECT_TRUE(false);
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const ReadClient & readClient,
                                                                           chip::SubscriptionId aSubscriptionId) {
         numSubscriptionEstablishedCalls++;
     };
 
     //
-    // Try to issue parallel subscriptions that will exceed the value for app::InteractionModelEngine::kReadHandlerPoolSize.
+    // Try to issue parallel subscriptions that will exceed the value for InteractionModelEngine::kReadHandlerPoolSize.
     // If heap allocation is correctly setup, this should result in it successfully servicing more than the number
     // present in that define.
     //
-    for (size_t i = 0; i < (app::InteractionModelEngine::kReadHandlerPoolSize + 1); i++)
+    for (size_t i = 0; i < (InteractionModelEngine::kReadHandlerPoolSize + 1); i++)
     {
         EXPECT_EQ(Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
                       &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 20,
@@ -1701,20 +1815,20 @@ TEST_F(TestRead, TestReadHandler_MultipleSubscriptions)
     // There are too many messages and the test (gcc_debug, which includes many sanity checks) will be quite slow. Note: report
     // engine is using ScheduleWork which cannot be handled by DrainAndServiceIO correctly.
     GetIOContext().DriveIOUntil(System::Clock::Seconds16(60), [&]() {
-        return numSuccessCalls == (app::InteractionModelEngine::kReadHandlerPoolSize + 1) &&
-            numSubscriptionEstablishedCalls == (app::InteractionModelEngine::kReadHandlerPoolSize + 1);
+        return numSuccessCalls == (InteractionModelEngine::kReadHandlerPoolSize + 1) &&
+            numSubscriptionEstablishedCalls == (InteractionModelEngine::kReadHandlerPoolSize + 1);
     });
 
-    EXPECT_EQ(numSuccessCalls, (app::InteractionModelEngine::kReadHandlerPoolSize + 1));
-    EXPECT_EQ(numSubscriptionEstablishedCalls, (app::InteractionModelEngine::kReadHandlerPoolSize + 1));
-    EXPECT_EQ(mNumActiveSubscriptions, static_cast<int32_t>(app::InteractionModelEngine::kReadHandlerPoolSize + 1));
+    EXPECT_EQ(numSuccessCalls, (InteractionModelEngine::kReadHandlerPoolSize + 1));
+    EXPECT_EQ(numSubscriptionEstablishedCalls, (InteractionModelEngine::kReadHandlerPoolSize + 1));
+    EXPECT_EQ(mNumActiveSubscriptions, static_cast<int32_t>(InteractionModelEngine::kReadHandlerPoolSize + 1));
 
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
 
     EXPECT_EQ(mNumActiveSubscriptions, 0);
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 
-    SetMRPMode(chip::Test::MessagingContext::MRPMode::kDefault);
+    SetMRPMode(MessagingContext::MRPMode::kDefault);
 }
 
 TEST_F(TestRead, TestReadHandler_SubscriptionAppRejection)
@@ -1728,17 +1842,17 @@ TEST_F(TestRead, TestReadHandler_SubscriptionAppRejection)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+    auto onSuccessCb = [&numSuccessCalls](const ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
         numSuccessCalls++;
     };
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+    auto onFailureCb = [&numFailureCalls](const ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
         numFailureCalls++;
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const ReadClient & readClient,
                                                                           chip::SubscriptionId aSubscriptionId) {
         numSubscriptionEstablishedCalls++;
     };
@@ -1765,7 +1879,7 @@ TEST_F(TestRead, TestReadHandler_SubscriptionAppRejection)
     EXPECT_EQ(numSubscriptionEstablishedCalls, 0u);
     EXPECT_EQ(mNumActiveSubscriptions, 0);
 
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
 
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 
@@ -1787,17 +1901,17 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest1)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+    auto onSuccessCb = [&numSuccessCalls](const ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
         numSuccessCalls++;
     };
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+    auto onFailureCb = [&numFailureCalls](const ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
         numFailureCalls++;
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const ReadClient & readClient,
                                                                           chip::SubscriptionId aSubscriptionId) {
         uint16_t minInterval = 0, maxInterval = 0;
 
@@ -1827,7 +1941,7 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest1)
     EXPECT_EQ(numSubscriptionEstablishedCalls, 1u);
     EXPECT_EQ(mNumActiveSubscriptions, 1);
 
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
 
     EXPECT_EQ(mNumActiveSubscriptions, 0);
 
@@ -1848,17 +1962,17 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest2)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+    auto onSuccessCb = [&numSuccessCalls](const ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
         numSuccessCalls++;
     };
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+    auto onFailureCb = [&numFailureCalls](const ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
         numFailureCalls++;
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const ReadClient & readClient,
                                                                           chip::SubscriptionId aSubscriptionId) {
         uint16_t minInterval = 0, maxInterval = 0;
 
@@ -1888,7 +2002,7 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest2)
     EXPECT_EQ(numSubscriptionEstablishedCalls, 1u);
     EXPECT_EQ(mNumActiveSubscriptions, 1);
 
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
 
     EXPECT_EQ(mNumActiveSubscriptions, 0);
 
@@ -1909,17 +2023,17 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest3)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+    auto onSuccessCb = [&numSuccessCalls](const ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
         numSuccessCalls++;
     };
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+    auto onFailureCb = [&numFailureCalls](const ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
         numFailureCalls++;
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const ReadClient & readClient,
                                                                           chip::SubscriptionId aSubscriptionId) {
         uint16_t minInterval = 0, maxInterval = 0;
 
@@ -1954,7 +2068,7 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest3)
     EXPECT_EQ(numSubscriptionEstablishedCalls, 1u);
     EXPECT_EQ(mNumActiveSubscriptions, 1);
 
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
 
     EXPECT_EQ(mNumActiveSubscriptions, 0);
 
@@ -1977,17 +2091,17 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest4)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+    auto onSuccessCb = [&numSuccessCalls](const ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
         numSuccessCalls++;
     };
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+    auto onFailureCb = [&numFailureCalls](const ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
         numFailureCalls++;
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const ReadClient & readClient,
                                                                           chip::SubscriptionId aSubscriptionId) {
         numSubscriptionEstablishedCalls++;
     };
@@ -2012,7 +2126,7 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest4)
     EXPECT_EQ(numSubscriptionEstablishedCalls, 0u);
     EXPECT_EQ(mNumActiveSubscriptions, 0);
 
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
 
     EXPECT_EQ(mNumActiveSubscriptions, 0);
 
@@ -2035,17 +2149,17 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest5)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+    auto onSuccessCb = [&numSuccessCalls](const ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
         numSuccessCalls++;
     };
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+    auto onFailureCb = [&numFailureCalls](const ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
         numFailureCalls++;
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const ReadClient & readClient,
                                                                           chip::SubscriptionId aSubscriptionId) {
         uint16_t minInterval = 0, maxInterval = 0;
 
@@ -2075,7 +2189,7 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest5)
     EXPECT_EQ(numSubscriptionEstablishedCalls, 1u);
     EXPECT_EQ(mNumActiveSubscriptions, 1);
 
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
 
     EXPECT_EQ(mNumActiveSubscriptions, 0);
 
@@ -2096,17 +2210,17 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest6)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+    auto onSuccessCb = [&numSuccessCalls](const ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
         numSuccessCalls++;
     };
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+    auto onFailureCb = [&numFailureCalls](const ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
         numFailureCalls++;
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const ReadClient & readClient,
                                                                           chip::SubscriptionId aSubscriptionId) {
         uint16_t minInterval = 0, maxInterval = 0;
 
@@ -2141,7 +2255,7 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest6)
     EXPECT_EQ(numSubscriptionEstablishedCalls, 1u);
     EXPECT_EQ(mNumActiveSubscriptions, 1);
 
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
 
     EXPECT_EQ(mNumActiveSubscriptions, 0);
 
@@ -2162,17 +2276,17 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest7)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+    auto onSuccessCb = [&numSuccessCalls](const ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
         numSuccessCalls++;
     };
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+    auto onFailureCb = [&numFailureCalls](const ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
         numFailureCalls++;
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const ReadClient & readClient,
                                                                           chip::SubscriptionId aSubscriptionId) {
         uint16_t minInterval = 0, maxInterval = 0;
 
@@ -2207,7 +2321,7 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest7)
     EXPECT_EQ(numSubscriptionEstablishedCalls, 1u);
     EXPECT_EQ(mNumActiveSubscriptions, 1);
 
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
 
     EXPECT_EQ(mNumActiveSubscriptions, 0);
 
@@ -2230,17 +2344,17 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest8)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+    auto onSuccessCb = [&numSuccessCalls](const ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
         numSuccessCalls++;
     };
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+    auto onFailureCb = [&numFailureCalls](const ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
         numFailureCalls++;
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const ReadClient & readClient,
                                                                           chip::SubscriptionId aSubscriptionId) {
         numSubscriptionEstablishedCalls++;
     };
@@ -2265,7 +2379,7 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest8)
     EXPECT_EQ(numSubscriptionEstablishedCalls, 0u);
     EXPECT_EQ(mNumActiveSubscriptions, 0);
 
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
 
     EXPECT_EQ(mNumActiveSubscriptions, 0);
 
@@ -2285,17 +2399,17 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest9)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+    auto onSuccessCb = [&numSuccessCalls](const ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
         numSuccessCalls++;
     };
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+    auto onFailureCb = [&numFailureCalls](const ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
         numFailureCalls++;
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const ReadClient & readClient,
                                                                           chip::SubscriptionId aSubscriptionId) {
         numSubscriptionEstablishedCalls++;
     };
@@ -2313,7 +2427,7 @@ TEST_F(TestRead, TestReadHandler_SubscriptionReportingIntervalsTest9)
     EXPECT_EQ(numSubscriptionEstablishedCalls, 0u);
     EXPECT_EQ(mNumActiveSubscriptions, 0);
 
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
 
     EXPECT_EQ(mNumActiveSubscriptions, 0);
 
@@ -2328,32 +2442,32 @@ TEST_F(TestRead, TestSubscribe_OnActiveModeNotification)
 {
     auto sessionHandle = GetSessionBobToAlice();
 
-    SetMRPMode(chip::Test::MessagingContext::MRPMode::kResponsive);
+    SetMRPMode(MessagingContext::MRPMode::kResponsive);
 
     {
         TestResubscriptionCallback callback;
-        app::ReadClient readClient(app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), callback,
-                                   app::ReadClient::InteractionType::Subscribe);
+        ReadClient readClient(InteractionModelEngine::GetInstance(), &GetExchangeManager(), callback,
+                              ReadClient::InteractionType::Subscribe);
 
         callback.mScheduleLITResubscribeImmediately = false;
         callback.SetReadClient(&readClient);
 
-        app::ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
+        ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
 
         // Read full wildcard paths, repeat twice to ensure chunking.
-        app::AttributePathParams attributePathParams[1];
+        AttributePathParams attributePathParams[1];
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
-        readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
+        readPrepareParams.mAttributePathParamsListSize = MATTER_ARRAY_SIZE(attributePathParams);
         attributePathParams[0].mEndpointId             = kTestEndpointId;
-        attributePathParams[0].mClusterId              = app::Clusters::UnitTesting::Id;
-        attributePathParams[0].mAttributeId            = app::Clusters::UnitTesting::Attributes::Boolean::Id;
+        attributePathParams[0].mClusterId              = Clusters::UnitTesting::Id;
+        attributePathParams[0].mAttributeId            = Clusters::UnitTesting::Attributes::Boolean::Id;
 
         constexpr uint16_t maxIntervalCeilingSeconds = 1;
 
         readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
         readPrepareParams.mIsPeerLIT                 = true;
-
-        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
+        readPrepareParams.mRegisteredCheckInToken    = true;
+        auto err                                     = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         //
@@ -2364,7 +2478,7 @@ TEST_F(TestRead, TestSubscribe_OnActiveModeNotification)
         EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
         EXPECT_EQ(callback.mOnError, 0);
         EXPECT_EQ(callback.mOnResubscriptionsAttempted, 0);
-        chip::app::ReadHandler * readHandler = app::InteractionModelEngine::GetInstance()->ActiveHandlerAt(0);
+        ReadHandler * readHandler = InteractionModelEngine::GetInstance()->ActiveHandlerAt(0);
 
         uint16_t minInterval;
         uint16_t maxInterval;
@@ -2376,15 +2490,15 @@ TEST_F(TestRead, TestSubscribe_OnActiveModeNotification)
         // WakeUp() is called.
         //
         //
-        GetLoopback().mNumMessagesToDrop = chip::Test::LoopbackTransport::kUnlimitedMessageCount;
+        GetLoopback().mNumMessagesToDrop = LoopbackTransport::kUnlimitedMessageCount;
         GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)), [&]() { return false; });
         EXPECT_EQ(callback.mOnResubscriptionsAttempted, 1);
         EXPECT_EQ(callback.mLastError, CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT);
 
         GetLoopback().mNumMessagesToDrop = 0;
         callback.ClearCounters();
-        app::InteractionModelEngine::GetInstance()->OnActiveModeNotification(
-            ScopedNodeId(readClient.GetPeerNodeId(), readClient.GetFabricIndex()));
+        InteractionModelEngine::GetInstance()->OnActiveModeNotification(
+            ScopedNodeId(readClient.GetPeerNodeId(), readClient.GetFabricIndex()), static_cast<uint64_t>(0x12344321));
         EXPECT_EQ(callback.mOnResubscriptionsAttempted, 1);
         EXPECT_EQ(callback.mLastError, CHIP_ERROR_TIMEOUT);
 
@@ -2402,9 +2516,204 @@ TEST_F(TestRead, TestSubscribe_OnActiveModeNotification)
         EXPECT_EQ(callback.mOnDone, 0);
     }
 
-    SetMRPMode(chip::Test::MessagingContext::MRPMode::kDefault);
+    SetMRPMode(MessagingContext::MRPMode::kDefault);
 
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+/**
+ * When all tracked subscriptions go away in server, check-in message is received and OnActiveModeNotification is called in client
+ * side, the tracked subscription would be torn down and a new one would be rescheduled in client side.
+ */
+TEST_F(TestRead, TestSubscribe_SubGoAwayInserverOnActiveModeNotification)
+{
+    auto sessionHandle = GetSessionBobToAlice();
+
+    SetMRPMode(MessagingContext::MRPMode::kResponsive);
+
+    {
+        TestResubscriptionCallback callback;
+        ReadClient readClient(InteractionModelEngine::GetInstance(), &GetExchangeManager(), callback,
+                              ReadClient::InteractionType::Subscribe);
+
+        callback.mScheduleLITResubscribeImmediately = false;
+        callback.SetReadClient(&readClient);
+
+        ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
+
+        // Read full wildcard paths, repeat twice to ensure chunking.
+        AttributePathParams attributePathParams[1];
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+        readPrepareParams.mAttributePathParamsListSize = MATTER_ARRAY_SIZE(attributePathParams);
+        attributePathParams[0].mEndpointId             = kTestEndpointId;
+        attributePathParams[0].mClusterId              = Clusters::UnitTesting::Id;
+        attributePathParams[0].mAttributeId            = Clusters::UnitTesting::Attributes::Boolean::Id;
+
+        constexpr uint16_t maxIntervalCeilingSeconds = 1;
+
+        readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
+        readPrepareParams.mIsPeerLIT                 = true;
+        readPrepareParams.mRegisteredCheckInToken    = true;
+        auto err                                     = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        //
+        // Drive servicing IO till we have established a subscription.
+        //
+        GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                    [&]() { return callback.mOnSubscriptionEstablishedCount >= 1; });
+        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
+        EXPECT_EQ(callback.mOnError, 0);
+        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 0);
+
+        GetLoopback().mNumMessagesToDrop = 0;
+        callback.ClearCounters();
+        InteractionModelEngine::GetInstance()->OnActiveModeNotification(
+            ScopedNodeId(readClient.GetPeerNodeId(), readClient.GetFabricIndex()), static_cast<uint64_t>(0x12344321));
+        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 1);
+        EXPECT_EQ(callback.mLastError, CHIP_ERROR_TIMEOUT);
+
+        //
+        // Drive servicing IO till we have established a subscription.
+        //
+        GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                    [&]() { return callback.mOnSubscriptionEstablishedCount == 1; });
+        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
+
+        //
+        // With re-sub enabled, we shouldn't have encountered any errors
+        //
+        EXPECT_EQ(callback.mOnError, 0);
+        EXPECT_EQ(callback.mOnDone, 0);
+    }
+
+    SetMRPMode(MessagingContext::MRPMode::kDefault);
+
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+/**
+ * When all tracked subscriptions go away in server, check-in message is received and OnActiveModeNotification is called in client
+ * side, the untracked subscription would be kept.
+ */
+TEST_F(TestRead, TestSubscribe_MismatchedSubGoAwayInserverOnActiveModeNotification)
+{
+    auto sessionHandle = GetSessionBobToAlice();
+
+    SetMRPMode(MessagingContext::MRPMode::kResponsive);
+
+    {
+        TestResubscriptionCallback callback;
+        ReadClient readClient(InteractionModelEngine::GetInstance(), &GetExchangeManager(), callback,
+                              ReadClient::InteractionType::Subscribe);
+
+        callback.mScheduleLITResubscribeImmediately = false;
+        callback.SetReadClient(&readClient);
+
+        ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
+
+        // Read full wildcard paths, repeat twice to ensure chunking.
+        AttributePathParams attributePathParams[1];
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+        readPrepareParams.mAttributePathParamsListSize = MATTER_ARRAY_SIZE(attributePathParams);
+        attributePathParams[0].mEndpointId             = kTestEndpointId;
+        attributePathParams[0].mClusterId              = Clusters::UnitTesting::Id;
+        attributePathParams[0].mAttributeId            = Clusters::UnitTesting::Attributes::Boolean::Id;
+        constexpr uint16_t maxIntervalCeilingSeconds   = 1;
+
+        readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
+        readPrepareParams.mIsPeerLIT                 = true;
+        readPrepareParams.mRegisteredCheckInToken    = true;
+        auto err                                     = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        //
+        // Drive servicing IO till we have established a subscription.
+        //
+        GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                    [&]() { return callback.mOnSubscriptionEstablishedCount >= 1; });
+        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
+        EXPECT_EQ(callback.mOnError, 0);
+        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 0);
+
+        GetLoopback().mNumMessagesToDrop = 0;
+        callback.ClearCounters();
+        InteractionModelEngine::GetInstance()->OnActiveModeNotification(
+            ScopedNodeId(readClient.GetPeerNodeId(), readClient.GetFabricIndex()), static_cast<uint64_t>(0));
+        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 0);
+        EXPECT_EQ(callback.mLastError, CHIP_NO_ERROR);
+        EXPECT_EQ(callback.mOnError, 0);
+        EXPECT_EQ(callback.mOnDone, 0);
+    }
+
+    SetMRPMode(MessagingContext::MRPMode::kDefault);
+
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F(TestRead, TestSubscribeFailed_OnActiveModeNotification)
+{
+    auto sessionHandle = GetSessionBobToAlice();
+
+    SetMRPMode(MessagingContext::MRPMode::kResponsive);
+
+    {
+        TestResubscriptionCallback callback;
+        ReadClient readClient(InteractionModelEngine::GetInstance(), &GetExchangeManager(), callback,
+                              ReadClient::InteractionType::Subscribe);
+
+        callback.mScheduleLITResubscribeImmediately = false;
+        callback.SetReadClient(&readClient);
+
+        ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
+
+        AttributePathParams attributePathParams[1];
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+        readPrepareParams.mAttributePathParamsListSize = MATTER_ARRAY_SIZE(attributePathParams);
+        attributePathParams[0].mEndpointId             = kTestEndpointId;
+        attributePathParams[0].mClusterId              = Clusters::UnitTesting::Id;
+        attributePathParams[0].mAttributeId            = Clusters::UnitTesting::Attributes::Boolean::Id;
+
+        constexpr uint16_t maxIntervalCeilingSeconds = 1;
+
+        readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
+        readPrepareParams.mIsPeerLIT                 = true;
+        readPrepareParams.mRegisteredCheckInToken    = true;
+        auto err                                     = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        GetLoopback().mNumMessagesToDrop = LoopbackTransport::kUnlimitedMessageCount;
+        GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(6000),
+                                    [&]() { return callback.mOnResubscriptionsAttempted == 1; });
+        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 0);
+
+        GetLoopback().mNumMessagesToDrop = 0;
+        callback.ClearCounters();
+        InteractionModelEngine::GetInstance()->OnActiveModeNotification(
+            ScopedNodeId(readClient.GetPeerNodeId(), readClient.GetFabricIndex()), static_cast<uint64_t>(0x12344321));
+        //
+        // Drive servicing IO till we have established a subscription.
+        //
+        GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                    [&]() { return callback.mOnSubscriptionEstablishedCount == 1; });
+        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
+
+        //
+        // With re-sub enabled, we shouldn't have encountered any errors
+        //
+        EXPECT_EQ(callback.mOnError, 0);
+        EXPECT_EQ(callback.mOnDone, 0);
+
+        GetLoopback().mNumMessagesToDrop = 0;
+        callback.ClearCounters();
+    }
+
+    SetMRPMode(MessagingContext::MRPMode::kDefault);
+
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
@@ -2416,34 +2725,34 @@ TEST_F(TestRead, TestSubscribe_DynamicLITSubscription)
 {
     auto sessionHandle = GetSessionBobToAlice();
 
-    SetMRPMode(chip::Test::MessagingContext::MRPMode::kResponsive);
+    SetMRPMode(MessagingContext::MRPMode::kResponsive);
     ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
     ScopedChange isLitIcd(gIsLitIcd, false);
 
     {
         TestResubscriptionCallback callback;
-        app::ReadClient readClient(app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), callback,
-                                   app::ReadClient::InteractionType::Subscribe);
+        ReadClient readClient(InteractionModelEngine::GetInstance(), &GetExchangeManager(), callback,
+                              ReadClient::InteractionType::Subscribe);
 
         callback.mScheduleLITResubscribeImmediately = false;
         callback.SetReadClient(&readClient);
 
-        app::ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
+        ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
 
         // Read full wildcard paths, repeat twice to ensure chunking.
-        app::AttributePathParams attributePathParams[1];
+        AttributePathParams attributePathParams[1];
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
-        readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
+        readPrepareParams.mAttributePathParamsListSize = MATTER_ARRAY_SIZE(attributePathParams);
         attributePathParams[0].mEndpointId             = kRootEndpointId;
-        attributePathParams[0].mClusterId              = app::Clusters::IcdManagement::Id;
-        attributePathParams[0].mAttributeId            = app::Clusters::IcdManagement::Attributes::OperatingMode::Id;
+        attributePathParams[0].mClusterId              = Clusters::IcdManagement::Id;
+        attributePathParams[0].mAttributeId            = Clusters::IcdManagement::Attributes::OperatingMode::Id;
 
         constexpr uint16_t maxIntervalCeilingSeconds = 1;
 
         readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
         readPrepareParams.mIsPeerLIT                 = true;
-
-        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
+        readPrepareParams.mRegisteredCheckInToken    = true;
+        auto err                                     = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         //
@@ -2454,7 +2763,7 @@ TEST_F(TestRead, TestSubscribe_DynamicLITSubscription)
         EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
         EXPECT_EQ(callback.mOnError, 0);
         EXPECT_EQ(callback.mOnResubscriptionsAttempted, 0);
-        chip::app::ReadHandler * readHandler = app::InteractionModelEngine::GetInstance()->ActiveHandlerAt(0);
+        ReadHandler * readHandler = InteractionModelEngine::GetInstance()->ActiveHandlerAt(0);
 
         uint16_t minInterval;
         uint16_t maxInterval;
@@ -2469,7 +2778,7 @@ TEST_F(TestRead, TestSubscribe_DynamicLITSubscription)
         //
         // Even if we set the peer type to LIT before, the report indicates that the peer is a SIT now, it will just bahve as
         // normal, non-LIT subscriptions.
-        GetLoopback().mNumMessagesToDrop = chip::Test::LoopbackTransport::kUnlimitedMessageCount;
+        GetLoopback().mNumMessagesToDrop = LoopbackTransport::kUnlimitedMessageCount;
         GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)),
                                     [&]() { return callback.mOnResubscriptionsAttempted != 0; });
         EXPECT_EQ(callback.mOnResubscriptionsAttempted, 1);
@@ -2495,18 +2804,18 @@ TEST_F(TestRead, TestSubscribe_DynamicLITSubscription)
 
         isLitIcd = true;
         {
-            app::AttributePathParams path;
+            AttributePathParams path;
             path.mEndpointId  = kRootEndpointId;
             path.mClusterId   = Clusters::IcdManagement::Id;
             path.mAttributeId = Clusters::IcdManagement::Attributes::OperatingMode::Id;
-            app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
+            EXPECT_SUCCESS(InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path));
         }
         callback.ClearCounters();
         GetIOContext().DriveIOUntil(System::Clock::Seconds16(60),
-                                    [&]() { return app::InteractionModelEngine::GetInstance()->GetNumDirtySubscriptions() == 0; });
+                                    [&]() { return InteractionModelEngine::GetInstance()->GetNumDirtySubscriptions() == 0; });
 
         // When we received the update that OperatingMode becomes LIT, we automatically set the inner peer type to LIT ICD.
-        GetLoopback().mNumMessagesToDrop = chip::Test::LoopbackTransport::kUnlimitedMessageCount;
+        GetLoopback().mNumMessagesToDrop = LoopbackTransport::kUnlimitedMessageCount;
         GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)), [&]() { return false; });
         EXPECT_EQ(callback.mOnResubscriptionsAttempted, 1);
         EXPECT_EQ(callback.mLastError, CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT);
@@ -2515,9 +2824,9 @@ TEST_F(TestRead, TestSubscribe_DynamicLITSubscription)
         callback.ClearCounters();
     }
 
-    SetMRPMode(chip::Test::MessagingContext::MRPMode::kDefault);
+    SetMRPMode(MessagingContext::MRPMode::kDefault);
 
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
@@ -2529,32 +2838,32 @@ TEST_F(TestRead, TestSubscribe_ImmediatelyResubscriptionForLIT)
 {
     auto sessionHandle = GetSessionBobToAlice();
 
-    SetMRPMode(chip::Test::MessagingContext::MRPMode::kResponsive);
+    SetMRPMode(MessagingContext::MRPMode::kResponsive);
 
     {
         TestResubscriptionCallback callback;
-        app::ReadClient readClient(app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), callback,
-                                   app::ReadClient::InteractionType::Subscribe);
+        ReadClient readClient(InteractionModelEngine::GetInstance(), &GetExchangeManager(), callback,
+                              ReadClient::InteractionType::Subscribe);
 
         callback.mScheduleLITResubscribeImmediately = true;
         callback.SetReadClient(&readClient);
 
-        app::ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
+        ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
 
         // Read full wildcard paths, repeat twice to ensure chunking.
-        app::AttributePathParams attributePathParams[1];
+        AttributePathParams attributePathParams[1];
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
-        readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
+        readPrepareParams.mAttributePathParamsListSize = MATTER_ARRAY_SIZE(attributePathParams);
         attributePathParams[0].mEndpointId             = kTestEndpointId;
-        attributePathParams[0].mClusterId              = app::Clusters::UnitTesting::Id;
-        attributePathParams[0].mAttributeId            = app::Clusters::UnitTesting::Attributes::Boolean::Id;
+        attributePathParams[0].mClusterId              = Clusters::UnitTesting::Id;
+        attributePathParams[0].mAttributeId            = Clusters::UnitTesting::Attributes::Boolean::Id;
 
         constexpr uint16_t maxIntervalCeilingSeconds = 1;
 
         readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
         readPrepareParams.mIsPeerLIT                 = true;
-
-        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
+        readPrepareParams.mRegisteredCheckInToken    = true;
+        auto err                                     = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         //
@@ -2565,7 +2874,7 @@ TEST_F(TestRead, TestSubscribe_ImmediatelyResubscriptionForLIT)
         EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
         EXPECT_EQ(callback.mOnError, 0);
         EXPECT_EQ(callback.mOnResubscriptionsAttempted, 0);
-        chip::app::ReadHandler * readHandler = app::InteractionModelEngine::GetInstance()->ActiveHandlerAt(0);
+        ReadHandler * readHandler = InteractionModelEngine::GetInstance()->ActiveHandlerAt(0);
 
         uint16_t minInterval;
         uint16_t maxInterval;
@@ -2577,7 +2886,7 @@ TEST_F(TestRead, TestSubscribe_ImmediatelyResubscriptionForLIT)
         // WakeUp() is called.
         //
         //
-        GetLoopback().mNumMessagesToDrop = chip::Test::LoopbackTransport::kUnlimitedMessageCount;
+        GetLoopback().mNumMessagesToDrop = LoopbackTransport::kUnlimitedMessageCount;
         GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)),
                                     [&]() { return callback.mLastError == CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT; });
         EXPECT_EQ(callback.mOnResubscriptionsAttempted, 1);
@@ -2600,27 +2909,27 @@ TEST_F(TestRead, TestSubscribe_ImmediatelyResubscriptionForLIT)
         EXPECT_EQ(callback.mOnDone, 0);
     }
 
-    SetMRPMode(chip::Test::MessagingContext::MRPMode::kDefault);
+    SetMRPMode(MessagingContext::MRPMode::kDefault);
 
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
 TEST_F(TestRead, TestReadHandler_MultipleReads)
 {
-    static_assert(CHIP_IM_MAX_REPORTS_IN_FLIGHT <= app::InteractionModelEngine::kReadHandlerPoolSize,
+    static_assert(CHIP_IM_MAX_REPORTS_IN_FLIGHT <= InteractionModelEngine::kReadHandlerPoolSize,
                   "How can we have more reports in flight than read handlers?");
 
     MultipleReadHelper(CHIP_IM_MAX_REPORTS_IN_FLIGHT);
 
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
 }
 
 TEST_F(TestRead, TestReadHandler_OneSubscribeMultipleReads)
 {
-    static_assert(CHIP_IM_MAX_REPORTS_IN_FLIGHT <= app::InteractionModelEngine::kReadHandlerPoolSize,
+    static_assert(CHIP_IM_MAX_REPORTS_IN_FLIGHT <= InteractionModelEngine::kReadHandlerPoolSize,
                   "How can we have more reports in flight than read handlers?");
     static_assert(CHIP_IM_MAX_REPORTS_IN_FLIGHT > 1, "We won't do any reads");
 
@@ -2628,12 +2937,12 @@ TEST_F(TestRead, TestReadHandler_OneSubscribeMultipleReads)
 
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
 }
 
 TEST_F(TestRead, TestReadHandler_TwoSubscribesMultipleReads)
 {
-    static_assert(CHIP_IM_MAX_REPORTS_IN_FLIGHT <= app::InteractionModelEngine::kReadHandlerPoolSize,
+    static_assert(CHIP_IM_MAX_REPORTS_IN_FLIGHT <= InteractionModelEngine::kReadHandlerPoolSize,
                   "How can we have more reports in flight than read handlers?");
     static_assert(CHIP_IM_MAX_REPORTS_IN_FLIGHT > 2, "We won't do any reads");
 
@@ -2641,7 +2950,7 @@ TEST_F(TestRead, TestReadHandler_TwoSubscribesMultipleReads)
 
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
 }
 
 void TestRead::SubscribeThenReadHelper(size_t aSubscribeCount, size_t aReadCount)
@@ -2657,13 +2966,13 @@ void TestRead::SubscribeThenReadHelper(size_t aSubscribeCount, size_t aReadCount
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+    auto onSuccessCb = [&numSuccessCalls](const ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
         numSuccessCalls++;
     };
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+    auto onFailureCb = [](const ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
         //
         // We shouldn't be encountering any failures in this test.
         //
@@ -2671,8 +2980,7 @@ void TestRead::SubscribeThenReadHelper(size_t aSubscribeCount, size_t aReadCount
     };
 
     auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls, this, aSubscribeCount, aReadCount, &numReadSuccessCalls,
-                                        &numReadFailureCalls](const app::ReadClient & readClient,
-                                                              chip::SubscriptionId aSubscriptionId) {
+                                        &numReadFailureCalls](const ReadClient & readClient, chip::SubscriptionId aSubscriptionId) {
         numSubscriptionEstablishedCalls++;
         if (numSubscriptionEstablishedCalls == aSubscribeCount)
         {
@@ -2709,7 +3017,7 @@ void TestRead::MultipleReadHelperInternal(size_t aReadCount, uint32_t & aNumSucc
 
     uint16_t firstExpectedResponse = gInt16uTotalReadCount + 1;
 
-    auto onFailureCb = [&aNumFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+    auto onFailureCb = [&aNumFailureCalls](const ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
         aNumFailureCalls++;
 
         EXPECT_EQ(attributePath, nullptr);
@@ -2717,7 +3025,7 @@ void TestRead::MultipleReadHelperInternal(size_t aReadCount, uint32_t & aNumSucc
 
     for (size_t i = 0; i < aReadCount; ++i)
     {
-        auto onSuccessCb = [&aNumSuccessCalls, firstExpectedResponse, i](const app::ConcreteDataAttributePath & attributePath,
+        auto onSuccessCb = [&aNumSuccessCalls, firstExpectedResponse, i](const ConcreteDataAttributePath & attributePath,
                                                                          const auto & dataResponse) {
             EXPECT_EQ(dataResponse, firstExpectedResponse + i);
             aNumSuccessCalls++;
@@ -2752,32 +3060,32 @@ TEST_F(TestRead, TestReadHandler_MultipleSubscriptionsWithDataVersionFilter)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+    auto onSuccessCb = [&numSuccessCalls](const ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
         EXPECT_TRUE(attributePath.mDataVersion.HasValue() && attributePath.mDataVersion.Value() == kDataVersion);
         numSuccessCalls++;
     };
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+    auto onFailureCb = [](const ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
         //
         // We shouldn't be encountering any failures in this test.
         //
         EXPECT_TRUE(false);
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const ReadClient & readClient,
                                                                           chip::SubscriptionId aSubscriptionId) {
         numSubscriptionEstablishedCalls++;
     };
 
     //
-    // Try to issue parallel subscriptions that will exceed the value for app::InteractionModelEngine::kReadHandlerPoolSize.
+    // Try to issue parallel subscriptions that will exceed the value for InteractionModelEngine::kReadHandlerPoolSize.
     // If heap allocation is correctly setup, this should result in it successfully servicing more than the number
     // present in that define.
     //
     chip::Optional<chip::DataVersion> dataVersion(1);
-    for (size_t i = 0; i < (app::InteractionModelEngine::kReadHandlerPoolSize + 1); i++)
+    for (size_t i = 0; i < (InteractionModelEngine::kReadHandlerPoolSize + 1); i++)
     {
         EXPECT_EQ(Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
                       &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
@@ -2788,17 +3096,17 @@ TEST_F(TestRead, TestReadHandler_MultipleSubscriptionsWithDataVersionFilter)
     // There are too many messages and the test (gcc_debug, which includes many sanity checks) will be quite slow. Note: report
     // engine is using ScheduleWork which cannot be handled by DrainAndServiceIO correctly.
     GetIOContext().DriveIOUntil(System::Clock::Seconds16(30), [&]() {
-        return numSubscriptionEstablishedCalls == (app::InteractionModelEngine::kReadHandlerPoolSize + 1) &&
-            numSuccessCalls == (app::InteractionModelEngine::kReadHandlerPoolSize + 1);
+        return numSubscriptionEstablishedCalls == (InteractionModelEngine::kReadHandlerPoolSize + 1) &&
+            numSuccessCalls == (InteractionModelEngine::kReadHandlerPoolSize + 1);
     });
 
     ChipLogError(Zcl, "Success call cnt: %" PRIu32 " (expect %" PRIu32 ") subscription cnt: %" PRIu32 " (expect %" PRIu32 ")",
-                 numSuccessCalls, uint32_t(app::InteractionModelEngine::kReadHandlerPoolSize + 1), numSubscriptionEstablishedCalls,
-                 uint32_t(app::InteractionModelEngine::kReadHandlerPoolSize + 1));
+                 numSuccessCalls, uint32_t(InteractionModelEngine::kReadHandlerPoolSize + 1), numSubscriptionEstablishedCalls,
+                 uint32_t(InteractionModelEngine::kReadHandlerPoolSize + 1));
 
-    EXPECT_EQ(numSuccessCalls, (app::InteractionModelEngine::kReadHandlerPoolSize + 1));
-    EXPECT_EQ(numSubscriptionEstablishedCalls, (app::InteractionModelEngine::kReadHandlerPoolSize + 1));
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    EXPECT_EQ(numSuccessCalls, (InteractionModelEngine::kReadHandlerPoolSize + 1));
+    EXPECT_EQ(numSubscriptionEstablishedCalls, (InteractionModelEngine::kReadHandlerPoolSize + 1));
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
 
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
@@ -2806,7 +3114,7 @@ TEST_F(TestRead, TestReadHandler_MultipleSubscriptionsWithDataVersionFilter)
 TEST_F(TestRead, TestReadHandler_DataVersionFiltersTruncated)
 {
     static TestRead * pContext = this;
-    struct : public chip::Test::LoopbackTransportDelegate
+    struct : public LoopbackTransportDelegate
     {
         size_t requestSize = 0;
         void WillSendMessage(const Transport::PeerAddress & peer, const System::PacketBufferHandle & message) override
@@ -2856,7 +3164,7 @@ TEST_F(TestRead, TestReadHandler_DataVersionFiltersTruncated)
 
         } readCallback;
 
-        ReadClient readClient(app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), readCallback,
+        ReadClient readClient(InteractionModelEngine::GetInstance(), &GetExchangeManager(), readCallback,
                               ReadClient::InteractionType::Read);
 
         EXPECT_EQ(readClient.SendRequest(read), CHIP_NO_ERROR);
@@ -2894,21 +3202,21 @@ TEST_F(TestRead, TestReadHandlerResourceExhaustion_MultipleReads)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+    auto onSuccessCb = [&numSuccessCalls](const ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
         numSuccessCalls++;
     };
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&numFailureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+    auto onFailureCb = [&numFailureCalls](const ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
         numFailureCalls++;
 
         EXPECT_EQ(aError, CHIP_IM_GLOBAL_STATUS(Busy));
         EXPECT_EQ(attributePath, nullptr);
     };
 
-    app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForReads(0);
-    app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(true);
+    InteractionModelEngine::GetInstance()->SetHandlerCapacityForReads(0);
+    InteractionModelEngine::GetInstance()->SetForceHandlerQuota(true);
 
     EXPECT_EQ(Controller::ReadAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
                   &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb),
@@ -2916,9 +3224,9 @@ TEST_F(TestRead, TestReadHandlerResourceExhaustion_MultipleReads)
 
     DrainAndServiceIO();
 
-    app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForReads(-1);
-    app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(false);
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    InteractionModelEngine::GetInstance()->SetHandlerCapacityForReads(-1);
+    InteractionModelEngine::GetInstance()->SetForceHandlerQuota(false);
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
 
     EXPECT_EQ(numSuccessCalls, 0u);
     EXPECT_EQ(numFailureCalls, 1u);
@@ -2945,7 +3253,7 @@ TEST_F(TestRead, TestReadFabricScopedWithoutFabricFilter)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [&onSuccessCbInvoked](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+    auto onSuccessCb = [&onSuccessCbInvoked](const ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
         size_t len = 0;
 
         EXPECT_EQ(dataResponse.ComputeSize(&len), CHIP_NO_ERROR);
@@ -2956,18 +3264,18 @@ TEST_F(TestRead, TestReadFabricScopedWithoutFabricFilter)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+    auto onFailureCb = [&onFailureCbInvoked](const ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
         onFailureCbInvoked = true;
     };
 
-    Controller::ReadAttribute<Clusters::UnitTesting::Attributes::ListFabricScoped::TypeInfo>(
-        &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, false /* fabric filtered */);
+    EXPECT_SUCCESS(Controller::ReadAttribute<Clusters::UnitTesting::Attributes::ListFabricScoped::TypeInfo>(
+        &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, false /* fabric filtered */));
 
     DrainAndServiceIO();
 
     EXPECT_TRUE(onSuccessCbInvoked && !onFailureCbInvoked);
-    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients(), 0u);
-    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 0u);
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadClients(), 0u);
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 0u);
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
@@ -2990,7 +3298,7 @@ TEST_F(TestRead, TestReadFabricScopedWithFabricFilter)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [&onSuccessCbInvoked](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+    auto onSuccessCb = [&onSuccessCbInvoked](const ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
         size_t len = 0;
 
         EXPECT_EQ(dataResponse.ComputeSize(&len), CHIP_NO_ERROR);
@@ -3010,28 +3318,27 @@ TEST_F(TestRead, TestReadFabricScopedWithFabricFilter)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
+    auto onFailureCb = [&onFailureCbInvoked](const ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {
         onFailureCbInvoked = true;
     };
 
-    Controller::ReadAttribute<Clusters::UnitTesting::Attributes::ListFabricScoped::TypeInfo>(
-        &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, true /* fabric filtered */);
+    EXPECT_SUCCESS(Controller::ReadAttribute<Clusters::UnitTesting::Attributes::ListFabricScoped::TypeInfo>(
+        &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, true /* fabric filtered */));
 
     DrainAndServiceIO();
 
     EXPECT_TRUE(onSuccessCbInvoked && !onFailureCbInvoked);
-    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients(), 0u);
-    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 0u);
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadClients(), 0u);
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 0u);
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
 namespace SubscriptionPathQuotaHelpers {
-class TestReadCallback : public app::ReadClient::Callback
+class TestReadCallback : public ReadClient::Callback
 {
 public:
     TestReadCallback() {}
-    void OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
-                         const app::StatusIB & aStatus) override
+    void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override
     {
         if (apData != nullptr)
         {
@@ -3039,7 +3346,7 @@ public:
         }
     }
 
-    void OnDone(app::ReadClient *) override { mOnDone++; }
+    void OnDone(ReadClient *) override { mOnDone++; }
 
     void OnReportEnd() override { mOnReportEnd++; }
 
@@ -3069,41 +3376,40 @@ public:
     CHIP_ERROR mLastError                    = CHIP_NO_ERROR;
 };
 
-class TestPerpetualListReadCallback : public app::ReadClient::Callback
+class TestPerpetualListReadCallback : public ReadClient::Callback
 {
 public:
     TestPerpetualListReadCallback() {}
-    void OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
-                         const app::StatusIB & aStatus) override
+    void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override
     {
         if (apData != nullptr)
         {
             reportsReceived++;
-            app::AttributePathParams path;
+            AttributePathParams path;
             path.mEndpointId  = aPath.mEndpointId;
             path.mClusterId   = aPath.mClusterId;
             path.mAttributeId = aPath.mAttributeId;
-            app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
+            EXPECT_SUCCESS(InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path));
         }
     }
 
-    void OnDone(chip::app::ReadClient *) override {}
+    void OnDone(ReadClient *) override {}
 
     void ClearCounter() { reportsReceived = 0; }
 
     int32_t reportsReceived = 0;
 };
 
-void EstablishReadOrSubscriptions(const SessionHandle & sessionHandle, size_t numSubs, size_t pathPerSub,
-                                  app::AttributePathParams path, app::ReadClient::InteractionType type,
-                                  app::ReadClient::Callback * callback, std::vector<std::unique_ptr<app::ReadClient>> & readClients)
+void EstablishReadOrSubscriptions(const SessionHandle & sessionHandle, size_t numSubs, size_t pathPerSub, AttributePathParams path,
+                                  ReadClient::InteractionType type, ReadClient::Callback * callback,
+                                  std::vector<std::unique_ptr<ReadClient>> & readClients)
 {
-    std::vector<app::AttributePathParams> attributePaths(pathPerSub, path);
+    std::vector<AttributePathParams> attributePaths(pathPerSub, path);
 
-    app::ReadPrepareParams readParams(sessionHandle);
+    ReadPrepareParams readParams(sessionHandle);
     readParams.mpAttributePathParamsList    = attributePaths.data();
     readParams.mAttributePathParamsListSize = pathPerSub;
-    if (type == app::ReadClient::InteractionType::Subscribe)
+    if (type == ReadClient::InteractionType::Subscribe)
     {
         readParams.mMaxIntervalCeilingSeconds = 1;
         readParams.mKeepSubscriptions         = true;
@@ -3111,9 +3417,8 @@ void EstablishReadOrSubscriptions(const SessionHandle & sessionHandle, size_t nu
 
     for (uint32_t i = 0; i < numSubs; i++)
     {
-        std::unique_ptr<app::ReadClient> readClient =
-            std::make_unique<app::ReadClient>(app::InteractionModelEngine::GetInstance(),
-                                              app::InteractionModelEngine::GetInstance()->GetExchangeManager(), *callback, type);
+        std::unique_ptr<ReadClient> readClient = std::make_unique<ReadClient>(
+            InteractionModelEngine::GetInstance(), InteractionModelEngine::GetInstance()->GetExchangeManager(), *callback, type);
         EXPECT_EQ(readClient->SendRequest(readParams), CHIP_NO_ERROR);
         readClients.push_back(std::move(readClient));
     }
@@ -3125,21 +3430,21 @@ TEST_F(TestRead, TestSubscribeAttributeDeniedNotExistPath)
 {
     auto sessionHandle = GetSessionBobToAlice();
 
-    SetMRPMode(chip::Test::MessagingContext::MRPMode::kResponsive);
+    SetMRPMode(MessagingContext::MRPMode::kResponsive);
 
     {
         SubscriptionPathQuotaHelpers::TestReadCallback callback;
-        app::ReadClient readClient(app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), callback,
-                                   app::ReadClient::InteractionType::Subscribe);
+        ReadClient readClient(InteractionModelEngine::GetInstance(), &GetExchangeManager(), callback,
+                              ReadClient::InteractionType::Subscribe);
 
-        app::ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
+        ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
 
-        app::AttributePathParams attributePathParams[1];
+        AttributePathParams attributePathParams[1];
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
-        readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
+        readPrepareParams.mAttributePathParamsListSize = MATTER_ARRAY_SIZE(attributePathParams);
         attributePathParams[0].mEndpointId             = kRootEndpointId; // this cluster does NOT exist on the root endpoint
-        attributePathParams[0].mClusterId              = app::Clusters::UnitTesting::Id;
-        attributePathParams[0].mAttributeId            = app::Clusters::UnitTesting::Attributes::ListStructOctetString::Id;
+        attributePathParams[0].mClusterId              = Clusters::UnitTesting::Id;
+        attributePathParams[0].mAttributeId            = Clusters::UnitTesting::Attributes::ListStructOctetString::Id;
 
         //
         // Request a max interval that's very small to reduce time to discovering a liveness failure.
@@ -3156,43 +3461,44 @@ TEST_F(TestRead, TestSubscribeAttributeDeniedNotExistPath)
         EXPECT_EQ(callback.mOnDone, 1u);
     }
 
-    SetMRPMode(chip::Test::MessagingContext::MRPMode::kDefault);
+    SetMRPMode(MessagingContext::MRPMode::kDefault);
 
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
 TEST_F(TestRead, TestReadHandler_KillOverQuotaSubscriptions)
 {
     // Note: We cannot use DrainAndServiceIO() since the perpetual read will make DrainAndServiceIO never return.
+    CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
+
     using namespace SubscriptionPathQuotaHelpers;
     auto sessionHandle = GetSessionBobToAlice();
 
-    const auto kExpectedParallelSubs =
-        app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric * GetFabricTable().FabricCount();
-    const auto kExpectedParallelPaths = kExpectedParallelSubs * app::InteractionModelEngine::kMinSupportedPathsPerSubscription;
+    const auto kExpectedParallelSubs = InteractionModelEngine::kMinSupportedSubscriptionsPerFabric * GetFabricTable().FabricCount();
+    const auto kExpectedParallelPaths = kExpectedParallelSubs * InteractionModelEngine::kMinSupportedPathsPerSubscription;
 
     // Here, we set up two background perpetual read requests to simulate parallel Read + Subscriptions.
     // We don't care about the data read, we only care about the existence of such read transactions.
     TestReadCallback readCallback;
     TestReadCallback readCallbackFabric2;
     TestPerpetualListReadCallback perpetualReadCallback;
-    std::vector<std::unique_ptr<app::ReadClient>> readClients;
+    std::vector<std::unique_ptr<ReadClient>> readClients;
 
     EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1, 1,
-                                 app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, kPerpetualAttributeid),
-                                 app::ReadClient::InteractionType::Read, &perpetualReadCallback, readClients);
+                                 AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, kPerpetualAttributeid),
+                                 ReadClient::InteractionType::Read, &perpetualReadCallback, readClients);
     EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1,
-                                 app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, kPerpetualAttributeid),
-                                 app::ReadClient::InteractionType::Read, &perpetualReadCallback, readClients);
+                                 AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, kPerpetualAttributeid),
+                                 ReadClient::InteractionType::Read, &perpetualReadCallback, readClients);
     GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() {
-        return app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(app::ReadHandler::InteractionType::Read) == 2;
+        return InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read) == 2;
     });
     // Ensure our read transactions are established.
-    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(app::ReadHandler::InteractionType::Read), 2u);
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read), 2u);
 
     // Intentially establish subscriptions using exceeded resources.
-    app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(false);
+    InteractionModelEngine::GetInstance()->SetForceHandlerQuota(false);
     //
     // We establish 1 subscription that exceeds the minimum supported paths (but is still established since the
     // target has sufficient resources), and kExpectedParallelSubs subscriptions that conform to the minimum
@@ -3201,46 +3507,46 @@ TEST_F(TestRead, TestReadHandler_KillOverQuotaSubscriptions)
     //
     // Subscription A
     EstablishReadOrSubscriptions(
-        GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerSubscription + 1,
-        app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
-        app::ReadClient::InteractionType::Subscribe, &readCallback, readClients);
+        GetSessionBobToAlice(), 1, InteractionModelEngine::kMinSupportedPathsPerSubscription + 1,
+        AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
+        ReadClient::InteractionType::Subscribe, &readCallback, readClients);
     // Subscription B
     EstablishReadOrSubscriptions(
-        GetSessionBobToAlice(), kExpectedParallelSubs, app::InteractionModelEngine::kMinSupportedPathsPerSubscription,
-        app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
-        app::ReadClient::InteractionType::Subscribe, &readCallback, readClients);
+        GetSessionBobToAlice(), kExpectedParallelSubs, InteractionModelEngine::kMinSupportedPathsPerSubscription,
+        AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
+        ReadClient::InteractionType::Subscribe, &readCallback, readClients);
 
     // There are too many messages and the test (gcc_debug, which includes many sanity checks) will be quite slow. Note: report
     // engine is using ScheduleWork which cannot be handled by DrainAndServiceIO correctly.
     GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() {
         return readCallback.mOnSubscriptionEstablishedCount == kExpectedParallelSubs + 1 &&
             readCallback.mAttributeCount ==
-            kExpectedParallelSubs * app::InteractionModelEngine::kMinSupportedPathsPerSubscription +
-                app::InteractionModelEngine::kMinSupportedPathsPerSubscription + 1;
+            kExpectedParallelSubs * InteractionModelEngine::kMinSupportedPathsPerSubscription +
+                InteractionModelEngine::kMinSupportedPathsPerSubscription + 1;
     });
 
     EXPECT_EQ(readCallback.mAttributeCount,
-              kExpectedParallelSubs * app::InteractionModelEngine::kMinSupportedPathsPerSubscription +
-                  app::InteractionModelEngine::kMinSupportedPathsPerSubscription + 1);
+              kExpectedParallelSubs * InteractionModelEngine::kMinSupportedPathsPerSubscription +
+                  InteractionModelEngine::kMinSupportedPathsPerSubscription + 1);
     EXPECT_EQ(readCallback.mOnSubscriptionEstablishedCount, kExpectedParallelSubs + 1);
 
     // We have set up the environment for testing the evicting logic.
     // We now have a full stable of subscriptions setup AND we've artificially limited the capacity, creation of further
     // subscriptions will require the eviction of existing subscriptions, OR potential rejection of the subscription if it exceeds
     // minimas.
-    app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(true);
-    app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForSubscriptions(static_cast<int32_t>(kExpectedParallelSubs));
-    app::InteractionModelEngine::GetInstance()->SetPathPoolCapacityForSubscriptions(static_cast<int32_t>(kExpectedParallelPaths));
+    InteractionModelEngine::GetInstance()->SetForceHandlerQuota(true);
+    InteractionModelEngine::GetInstance()->SetHandlerCapacityForSubscriptions(static_cast<int32_t>(kExpectedParallelSubs));
+    InteractionModelEngine::GetInstance()->SetPathPoolCapacityForSubscriptions(static_cast<int32_t>(kExpectedParallelPaths));
 
     // Part 1: Test per subscription minimas.
     // Rejection of the subscription that exceeds minimas.
     {
         TestReadCallback callback;
-        std::vector<std::unique_ptr<app::ReadClient>> outReadClient;
+        std::vector<std::unique_ptr<ReadClient>> outReadClient;
         EstablishReadOrSubscriptions(
-            GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerSubscription + 1,
-            app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
-            app::ReadClient::InteractionType::Subscribe, &callback, outReadClient);
+            GetSessionBobToAlice(), 1, InteractionModelEngine::kMinSupportedPathsPerSubscription + 1,
+            AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
+            ReadClient::InteractionType::Subscribe, &callback, outReadClient);
 
         GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return callback.mOnError == 1; });
 
@@ -3253,39 +3559,39 @@ TEST_F(TestRead, TestReadHandler_KillOverQuotaSubscriptions)
     // was previously established with more paths than the limit per fabric)
     {
         EstablishReadOrSubscriptions(
-            GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerSubscription,
-            app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
-            app::ReadClient::InteractionType::Subscribe, &readCallback, readClients);
+            GetSessionBobToAlice(), 1, InteractionModelEngine::kMinSupportedPathsPerSubscription,
+            AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
+            ReadClient::InteractionType::Subscribe, &readCallback, readClients);
 
         readCallback.ClearCounters();
         // Run until the new subscription got setup fully as viewed by the client.
         GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() {
             return readCallback.mOnSubscriptionEstablishedCount == 1 &&
-                readCallback.mAttributeCount == app::InteractionModelEngine::kMinSupportedPathsPerSubscription;
+                readCallback.mAttributeCount == InteractionModelEngine::kMinSupportedPathsPerSubscription;
         });
 
         // This read handler should evict some existing subscriptions for enough space.
         // Validate that the new subscription got setup fully as viewed by the client. And we will validate we handled this
         // subscription by evicting the correct subscriptions later.
         EXPECT_EQ(readCallback.mOnSubscriptionEstablishedCount, 1u);
-        EXPECT_EQ(readCallback.mAttributeCount, app::InteractionModelEngine::kMinSupportedPathsPerSubscription);
+        EXPECT_EQ(readCallback.mAttributeCount, InteractionModelEngine::kMinSupportedPathsPerSubscription);
     }
 
     // Validate we evicted the right subscription for handling the new subscription above.
     // We should used **exactly** all resources for subscriptions if we have evicted the correct subscription, and we validate the
     // number of used paths by mark all subscriptions as dirty, and count the number of received reports.
     {
-        app::AttributePathParams path;
+        AttributePathParams path;
         path.mEndpointId  = kTestEndpointId;
         path.mClusterId   = Clusters::UnitTesting::Id;
         path.mAttributeId = Clusters::UnitTesting::Attributes::Int16u::Id;
-        app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
+        EXPECT_SUCCESS(InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path));
     }
     readCallback.ClearCounters();
 
     // Run until all subscriptions are clean.
     GetIOContext().DriveIOUntil(System::Clock::Seconds16(60),
-                                [&]() { return app::InteractionModelEngine::GetInstance()->GetNumDirtySubscriptions() == 0; });
+                                [&]() { return InteractionModelEngine::GetInstance()->GetNumDirtySubscriptions() == 0; });
 
     // Before the above subscription, we have one subscription with kMinSupportedPathsPerSubscription + 1 paths, we should evict
     // that subscription before evicting any other subscriptions, which will result we used exactly kExpectedParallelPaths and have
@@ -3294,82 +3600,81 @@ TEST_F(TestRead, TestReadHandler_KillOverQuotaSubscriptions)
     // will have exactly kExpectedParallelPaths only when that subscription have been evicted. We use this indirect method to verify
     // the subscriptions since the read client won't shutdown until the timeout fired.
     EXPECT_EQ(readCallback.mAttributeCount, kExpectedParallelPaths);
-    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(app::ReadHandler::InteractionType::Subscribe),
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe),
               static_cast<uint32_t>(kExpectedParallelSubs));
 
     // Part 2: Testing per fabric minimas.
     // Validate we have more than kMinSupportedSubscriptionsPerFabric subscriptions for testing per fabric minimas.
-    EXPECT_GT(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(app::ReadHandler::InteractionType::Subscribe,
-                                                                                   GetAliceFabricIndex()),
-              app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric);
+    EXPECT_GT(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe,
+                                                                              GetAliceFabricIndex()),
+              InteractionModelEngine::kMinSupportedSubscriptionsPerFabric);
 
     // The following check will trigger the logic in im to kill the read handlers that use more paths than the limit per fabric.
     {
         EstablishReadOrSubscriptions(
-            GetSessionAliceToBob(), app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric,
-            app::InteractionModelEngine::kMinSupportedPathsPerSubscription,
-            app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
-            app::ReadClient::InteractionType::Subscribe, &readCallbackFabric2, readClients);
+            GetSessionAliceToBob(), InteractionModelEngine::kMinSupportedSubscriptionsPerFabric,
+            InteractionModelEngine::kMinSupportedPathsPerSubscription,
+            AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
+            ReadClient::InteractionType::Subscribe, &readCallbackFabric2, readClients);
 
         // Run until we have established the subscriptions.
         GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() {
             return readCallbackFabric2.mOnSubscriptionEstablishedCount ==
-                app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric &&
+                InteractionModelEngine::kMinSupportedSubscriptionsPerFabric &&
                 readCallbackFabric2.mAttributeCount ==
-                app::InteractionModelEngine::kMinSupportedPathsPerSubscription *
-                    app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric;
+                InteractionModelEngine::kMinSupportedPathsPerSubscription *
+                    InteractionModelEngine::kMinSupportedSubscriptionsPerFabric;
         });
 
         // Verify the subscriptions are established successfully. We will check if we evicted the expected subscriptions later.
-        EXPECT_EQ(readCallbackFabric2.mOnSubscriptionEstablishedCount,
-                  app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric);
+        EXPECT_EQ(readCallbackFabric2.mOnSubscriptionEstablishedCount, InteractionModelEngine::kMinSupportedSubscriptionsPerFabric);
         EXPECT_EQ(readCallbackFabric2.mAttributeCount,
-                  app::InteractionModelEngine::kMinSupportedPathsPerSubscription *
-                      app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric);
+                  InteractionModelEngine::kMinSupportedPathsPerSubscription *
+                      InteractionModelEngine::kMinSupportedSubscriptionsPerFabric);
     }
 
     // Validate the subscriptions are handled by evicting one or more subscriptions from Fabric A.
     {
-        app::AttributePathParams path;
+        AttributePathParams path;
         path.mEndpointId  = kTestEndpointId;
         path.mClusterId   = Clusters::UnitTesting::Id;
         path.mAttributeId = Clusters::UnitTesting::Attributes::Int16u::Id;
-        app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
+        EXPECT_SUCCESS(InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path));
     }
     readCallback.ClearCounters();
     readCallbackFabric2.ClearCounters();
 
     // Run until all subscriptions are clean.
     GetIOContext().DriveIOUntil(System::Clock::Seconds16(60),
-                                [&]() { return app::InteractionModelEngine::GetInstance()->GetNumDirtySubscriptions() == 0; });
+                                [&]() { return InteractionModelEngine::GetInstance()->GetNumDirtySubscriptions() == 0; });
 
     // Some subscriptions on fabric 1 should be evicted since fabric 1 is using more resources than the limits.
     EXPECT_EQ(readCallback.mAttributeCount,
-              app::InteractionModelEngine::kMinSupportedPathsPerSubscription *
-                  app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric);
+              InteractionModelEngine::kMinSupportedPathsPerSubscription *
+                  InteractionModelEngine::kMinSupportedSubscriptionsPerFabric);
     EXPECT_EQ(readCallbackFabric2.mAttributeCount,
-              app::InteractionModelEngine::kMinSupportedPathsPerSubscription *
-                  app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric);
-    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(app::ReadHandler::InteractionType::Subscribe,
-                                                                                   GetAliceFabricIndex()),
-              app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric);
-    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(app::ReadHandler::InteractionType::Subscribe,
-                                                                                   GetBobFabricIndex()),
-              app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric);
+              InteractionModelEngine::kMinSupportedPathsPerSubscription *
+                  InteractionModelEngine::kMinSupportedSubscriptionsPerFabric);
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe,
+                                                                              GetAliceFabricIndex()),
+              InteractionModelEngine::kMinSupportedSubscriptionsPerFabric);
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe,
+                                                                              GetBobFabricIndex()),
+              InteractionModelEngine::kMinSupportedSubscriptionsPerFabric);
 
     // Ensure our read transactions are still alive.
-    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(app::ReadHandler::InteractionType::Read), 2u);
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read), 2u);
 
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
     DrainAndServiceIO();
 
     // Shutdown all clients
     readClients.clear();
 
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
-    app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(false);
-    app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForSubscriptions(-1);
-    app::InteractionModelEngine::GetInstance()->SetPathPoolCapacityForSubscriptions(-1);
+    InteractionModelEngine::GetInstance()->SetForceHandlerQuota(false);
+    InteractionModelEngine::GetInstance()->SetHandlerCapacityForSubscriptions(-1);
+    InteractionModelEngine::GetInstance()->SetPathPoolCapacityForSubscriptions(-1);
 }
 
 TEST_F(TestRead, TestReadHandler_KillOldestSubscriptions)
@@ -3377,37 +3682,36 @@ TEST_F(TestRead, TestReadHandler_KillOldestSubscriptions)
     using namespace SubscriptionPathQuotaHelpers;
     auto sessionHandle = GetSessionBobToAlice();
 
-    const auto kExpectedParallelSubs =
-        app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric * GetFabricTable().FabricCount();
-    const auto kExpectedParallelPaths = kExpectedParallelSubs * app::InteractionModelEngine::kMinSupportedPathsPerSubscription;
+    const auto kExpectedParallelSubs = InteractionModelEngine::kMinSupportedSubscriptionsPerFabric * GetFabricTable().FabricCount();
+    const auto kExpectedParallelPaths = kExpectedParallelSubs * InteractionModelEngine::kMinSupportedPathsPerSubscription;
 
     TestReadCallback readCallback;
-    std::vector<std::unique_ptr<app::ReadClient>> readClients;
+    std::vector<std::unique_ptr<ReadClient>> readClients;
 
-    app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(true);
-    app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForSubscriptions(static_cast<int32_t>(kExpectedParallelSubs));
-    app::InteractionModelEngine::GetInstance()->SetPathPoolCapacityForSubscriptions(static_cast<int32_t>(kExpectedParallelPaths));
+    InteractionModelEngine::GetInstance()->SetForceHandlerQuota(true);
+    InteractionModelEngine::GetInstance()->SetHandlerCapacityForSubscriptions(static_cast<int32_t>(kExpectedParallelSubs));
+    InteractionModelEngine::GetInstance()->SetPathPoolCapacityForSubscriptions(static_cast<int32_t>(kExpectedParallelPaths));
 
     // This should just use all availbale resources.
     EstablishReadOrSubscriptions(
-        GetSessionBobToAlice(), kExpectedParallelSubs, app::InteractionModelEngine::kMinSupportedPathsPerSubscription,
-        app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
-        app::ReadClient::InteractionType::Subscribe, &readCallback, readClients);
+        GetSessionBobToAlice(), kExpectedParallelSubs, InteractionModelEngine::kMinSupportedPathsPerSubscription,
+        AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
+        ReadClient::InteractionType::Subscribe, &readCallback, readClients);
 
     DrainAndServiceIO();
 
-    EXPECT_EQ(readCallback.mAttributeCount, kExpectedParallelSubs * app::InteractionModelEngine::kMinSupportedPathsPerSubscription);
+    EXPECT_EQ(readCallback.mAttributeCount, kExpectedParallelSubs * InteractionModelEngine::kMinSupportedPathsPerSubscription);
     EXPECT_EQ(readCallback.mOnSubscriptionEstablishedCount, kExpectedParallelSubs);
-    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), kExpectedParallelSubs);
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), kExpectedParallelSubs);
 
     // The following check will trigger the logic in im to kill the read handlers that uses more paths than the limit per fabric.
     {
         TestReadCallback callback;
-        std::vector<std::unique_ptr<app::ReadClient>> outReadClient;
+        std::vector<std::unique_ptr<ReadClient>> outReadClient;
         EstablishReadOrSubscriptions(
-            GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerSubscription + 1,
-            app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
-            app::ReadClient::InteractionType::Subscribe, &callback, outReadClient);
+            GetSessionBobToAlice(), 1, InteractionModelEngine::kMinSupportedPathsPerSubscription + 1,
+            AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
+            ReadClient::InteractionType::Subscribe, &callback, outReadClient);
 
         DrainAndServiceIO();
 
@@ -3419,42 +3723,41 @@ TEST_F(TestRead, TestReadHandler_KillOldestSubscriptions)
     // The following check will trigger the logic in im to kill the read handlers that uses more paths than the limit per fabric.
     {
         EstablishReadOrSubscriptions(
-            GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerSubscription,
-            app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
-            app::ReadClient::InteractionType::Subscribe, &readCallback, readClients);
+            GetSessionBobToAlice(), 1, InteractionModelEngine::kMinSupportedPathsPerSubscription,
+            AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
+            ReadClient::InteractionType::Subscribe, &readCallback, readClients);
         readCallback.ClearCounters();
 
         DrainAndServiceIO();
 
         // This read handler should evict some existing subscriptions for enough space
         EXPECT_EQ(readCallback.mOnSubscriptionEstablishedCount, 1u);
-        EXPECT_EQ(readCallback.mAttributeCount, app::InteractionModelEngine::kMinSupportedPathsPerSubscription);
-        EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(),
-                  static_cast<size_t>(kExpectedParallelSubs));
+        EXPECT_EQ(readCallback.mAttributeCount, InteractionModelEngine::kMinSupportedPathsPerSubscription);
+        EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), static_cast<size_t>(kExpectedParallelSubs));
     }
 
     {
-        app::AttributePathParams path;
+        AttributePathParams path;
         path.mEndpointId  = kTestEndpointId;
         path.mClusterId   = Clusters::UnitTesting::Id;
         path.mAttributeId = Clusters::UnitTesting::Attributes::Int16u::Id;
-        app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
+        EXPECT_SUCCESS(InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path));
     }
     readCallback.ClearCounters();
     DrainAndServiceIO();
 
     EXPECT_LE(readCallback.mAttributeCount, kExpectedParallelPaths);
 
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
     DrainAndServiceIO();
 
     // Shutdown all clients
     readClients.clear();
 
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
-    app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(false);
-    app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForSubscriptions(-1);
-    app::InteractionModelEngine::GetInstance()->SetPathPoolCapacityForSubscriptions(-1);
+    InteractionModelEngine::GetInstance()->SetForceHandlerQuota(false);
+    InteractionModelEngine::GetInstance()->SetHandlerCapacityForSubscriptions(-1);
+    InteractionModelEngine::GetInstance()->SetPathPoolCapacityForSubscriptions(-1);
 }
 
 struct TestReadHandler_ParallelReads_TestCase_Parameters
@@ -3468,24 +3771,24 @@ static void TestReadHandler_ParallelReads_TestCase(TestRead * apContext,
                                                    const TestReadHandler_ParallelReads_TestCase_Parameters & params,
                                                    std::function<void()> body)
 {
-    app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(true);
-    app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForReads(params.ReadHandlerCapacity);
-    app::InteractionModelEngine::GetInstance()->SetConfigMaxFabrics(params.MaxFabrics);
-    app::InteractionModelEngine::GetInstance()->SetPathPoolCapacityForReads(params.PathPoolCapacity);
+    InteractionModelEngine::GetInstance()->SetForceHandlerQuota(true);
+    InteractionModelEngine::GetInstance()->SetHandlerCapacityForReads(params.ReadHandlerCapacity);
+    InteractionModelEngine::GetInstance()->SetConfigMaxFabrics(params.MaxFabrics);
+    InteractionModelEngine::GetInstance()->SetPathPoolCapacityForReads(params.PathPoolCapacity);
 
     body();
 
     // Clean up
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
     apContext->DrainAndServiceIO();
 
     // Sanity check
     EXPECT_EQ(apContext->GetExchangeManager().GetNumActiveExchanges(), 0u);
 
-    app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(false);
-    app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForReads(-1);
-    app::InteractionModelEngine::GetInstance()->SetConfigMaxFabrics(-1);
-    app::InteractionModelEngine::GetInstance()->SetPathPoolCapacityForReads(-1);
+    InteractionModelEngine::GetInstance()->SetForceHandlerQuota(false);
+    InteractionModelEngine::GetInstance()->SetHandlerCapacityForReads(-1);
+    InteractionModelEngine::GetInstance()->SetConfigMaxFabrics(-1);
+    InteractionModelEngine::GetInstance()->SetPathPoolCapacityForReads(-1);
 }
 
 TEST_F(TestRead, TestReadHandler_ParallelReads)
@@ -3507,21 +3810,23 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
     TestCase(
         Params{
             .ReadHandlerCapacity = 3,
-            .PathPoolCapacity    = 2 * app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+            .PathPoolCapacity    = 2 * InteractionModelEngine::kMinSupportedPathsPerReadRequest,
             .MaxFabrics          = 2,
         },
         [&]() {
             TestReadCallback readCallback;
             TestPerpetualListReadCallback backgroundReadCallback1;
             TestPerpetualListReadCallback backgroundReadCallback2;
-            std::vector<std::unique_ptr<app::ReadClient>> readClients;
+            std::vector<std::unique_ptr<ReadClient>> readClients;
 
-            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                                         app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                                         app::ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
-            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                                         app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                                         app::ReadClient::InteractionType::Read, &backgroundReadCallback2, readClients);
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
+
+            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+                                         AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
+            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+                                         AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &backgroundReadCallback2, readClients);
 
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() {
                 return backgroundReadCallback1.reportsReceived > 0 && backgroundReadCallback2.reportsReceived > 0;
@@ -3532,9 +3837,9 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             backgroundReadCallback2.ClearCounter();
 
             EstablishReadOrSubscriptions(
-                GetSessionAliceToBob(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
-                app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
-                app::ReadClient::InteractionType::Read, &readCallback, readClients);
+                GetSessionAliceToBob(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
+                AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
+                ReadClient::InteractionType::Read, &readCallback, readClients);
 
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
 
@@ -3550,21 +3855,21 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
     TestCase(
         Params{
             .ReadHandlerCapacity = 2,
-            .PathPoolCapacity    = 2 * app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+            .PathPoolCapacity    = 2 * InteractionModelEngine::kMinSupportedPathsPerReadRequest,
             .MaxFabrics          = 2,
         },
         [&]() {
             TestReadCallback readCallback;
             TestPerpetualListReadCallback backgroundReadCallback1;
             TestPerpetualListReadCallback backgroundReadCallback2;
-            std::vector<std::unique_ptr<app::ReadClient>> readClients;
+            std::vector<std::unique_ptr<ReadClient>> readClients;
 
-            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1,
-                                         app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                                         app::ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
-            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1,
-                                         app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                                         app::ReadClient::InteractionType::Read, &backgroundReadCallback2, readClients);
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
+
+            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1, AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
+            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1, AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &backgroundReadCallback2, readClients);
 
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() {
                 return backgroundReadCallback1.reportsReceived > 0 && backgroundReadCallback2.reportsReceived > 0;
@@ -3575,9 +3880,9 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             backgroundReadCallback2.ClearCounter();
 
             EstablishReadOrSubscriptions(
-                GetSessionAliceToBob(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
-                app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
-                app::ReadClient::InteractionType::Read, &readCallback, readClients);
+                GetSessionAliceToBob(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
+                AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
+                ReadClient::InteractionType::Read, &readCallback, readClients);
 
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
 
@@ -3592,21 +3897,23 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
     TestCase(
         Params{
             .ReadHandlerCapacity = 3,
-            .PathPoolCapacity    = 3 * app::InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
+            .PathPoolCapacity    = 3 * InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
             .MaxFabrics          = 2,
         },
         [&]() {
             TestReadCallback readCallback;
             TestPerpetualListReadCallback backgroundReadCallback1;
             TestPerpetualListReadCallback backgroundReadCallback2;
-            std::vector<std::unique_ptr<app::ReadClient>> readClients;
+            std::vector<std::unique_ptr<ReadClient>> readClients;
 
-            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                                         app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                                         app::ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
-            EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                                         app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                                         app::ReadClient::InteractionType::Read, &backgroundReadCallback2, readClients);
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
+
+            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+                                         AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
+            EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+                                         AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &backgroundReadCallback2, readClients);
 
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() {
                 return backgroundReadCallback1.reportsReceived > 0 && backgroundReadCallback2.reportsReceived > 0;
@@ -3614,14 +3921,14 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             EXPECT_TRUE(backgroundReadCallback1.reportsReceived > 0 && backgroundReadCallback2.reportsReceived > 0);
 
             EstablishReadOrSubscriptions(
-                GetSessionAliceToBob(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
-                app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
-                app::ReadClient::InteractionType::Read, &readCallback, readClients);
+                GetSessionAliceToBob(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
+                AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
+                ReadClient::InteractionType::Read, &readCallback, readClients);
 
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
 
             // The new read request should be accepted
-            EXPECT_EQ(readCallback.mAttributeCount, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1);
+            EXPECT_EQ(readCallback.mAttributeCount, InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1);
             EXPECT_EQ(readCallback.mOnError, 0u);
 
             // The two subscriptions should still alive
@@ -3637,21 +3944,23 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
     TestCase(
         Params{
             .ReadHandlerCapacity = 3,
-            .PathPoolCapacity    = 3 * app::InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
+            .PathPoolCapacity    = 3 * InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
             .MaxFabrics          = 2,
         },
         [&]() {
             TestReadCallback readCallback;
             TestPerpetualListReadCallback backgroundReadCallback1;
             TestPerpetualListReadCallback backgroundReadCallback2;
-            std::vector<std::unique_ptr<app::ReadClient>> readClients;
+            std::vector<std::unique_ptr<ReadClient>> readClients;
 
-            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                                         app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                                         app::ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
-            EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                                         app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                                         app::ReadClient::InteractionType::Read, &backgroundReadCallback2, readClients);
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
+
+            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+                                         AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
+            EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+                                         AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &backgroundReadCallback2, readClients);
 
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() {
                 return backgroundReadCallback1.reportsReceived > 0 && backgroundReadCallback2.reportsReceived > 0;
@@ -3663,8 +3972,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
 
             EstablishReadOrSubscriptions(
                 GetSessionAliceToBob(), 1, 1,
-                app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
-                app::ReadClient::InteractionType::Read, &readCallback, readClients);
+                AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
+                ReadClient::InteractionType::Read, &readCallback, readClients);
 
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
 
@@ -3686,43 +3995,43 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
     TestCase(
         Params{
             .ReadHandlerCapacity = 2,
-            .PathPoolCapacity    = 2 * app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+            .PathPoolCapacity    = 2 * InteractionModelEngine::kMinSupportedPathsPerReadRequest,
             .MaxFabrics          = 2,
         },
         [&]() {
             TestReadCallback readCallback;
             TestPerpetualListReadCallback readCallbackForOversizedRead;
             TestPerpetualListReadCallback backgroundReadCallback;
-            std::vector<std::unique_ptr<app::ReadClient>> readClients;
+            std::vector<std::unique_ptr<ReadClient>> readClients;
 
-            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1,
-                                         app::InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
-                                         app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                                         app::ReadClient::InteractionType::Read, &readCallbackForOversizedRead, readClients);
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
+
+            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
+                                         AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &readCallbackForOversizedRead, readClients);
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5),
                                         [&]() { return readCallbackForOversizedRead.reportsReceived > 0; });
 
-            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1,
-                                         app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                                         app::ReadClient::InteractionType::Read, &backgroundReadCallback, readClients);
+            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1, AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &backgroundReadCallback, readClients);
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return backgroundReadCallback.reportsReceived > 0; });
 
             EXPECT_TRUE(readCallbackForOversizedRead.reportsReceived > 0 && backgroundReadCallback.reportsReceived > 0);
 
             EstablishReadOrSubscriptions(
-                GetSessionAliceToBob(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
-                app::ReadClient::InteractionType::Read, &readCallback, readClients);
+                GetSessionAliceToBob(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+                AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
+                ReadClient::InteractionType::Read, &readCallback, readClients);
 
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
 
             // The new read request should be accepted.
             EXPECT_EQ(readCallback.mOnError, 0u);
             EXPECT_EQ(readCallback.mOnDone, 1u);
-            EXPECT_EQ(readCallback.mAttributeCount, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest);
+            EXPECT_EQ(readCallback.mAttributeCount, InteractionModelEngine::kMinSupportedPathsPerReadRequest);
 
             // The oversized read handler should be evicted -> We should have one active read handler.
-            EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 1u);
+            EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 1u);
 
             backgroundReadCallback.ClearCounter();
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return backgroundReadCallback.reportsReceived > 0; });
@@ -3740,43 +4049,43 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
     TestCase(
         Params{
             .ReadHandlerCapacity = 2,
-            .PathPoolCapacity    = 2 * app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+            .PathPoolCapacity    = 2 * InteractionModelEngine::kMinSupportedPathsPerReadRequest,
             .MaxFabrics          = 2,
         },
         [&]() {
             TestReadCallback readCallback;
             TestPerpetualListReadCallback readCallbackForOversizedRead;
             TestPerpetualListReadCallback backgroundReadCallback;
-            std::vector<std::unique_ptr<app::ReadClient>> readClients;
+            std::vector<std::unique_ptr<ReadClient>> readClients;
 
-            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1,
-                                         app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                                         app::ReadClient::InteractionType::Read, &backgroundReadCallback, readClients);
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
+
+            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1, AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &backgroundReadCallback, readClients);
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return backgroundReadCallback.reportsReceived > 0; });
 
-            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1,
-                                         app::InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
-                                         app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                                         app::ReadClient::InteractionType::Read, &readCallbackForOversizedRead, readClients);
+            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
+                                         AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &readCallbackForOversizedRead, readClients);
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5),
                                         [&]() { return readCallbackForOversizedRead.reportsReceived > 0; });
 
             EXPECT_TRUE(readCallbackForOversizedRead.reportsReceived > 0 && backgroundReadCallback.reportsReceived > 0);
 
             EstablishReadOrSubscriptions(
-                GetSessionAliceToBob(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
-                app::ReadClient::InteractionType::Read, &readCallback, readClients);
+                GetSessionAliceToBob(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+                AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
+                ReadClient::InteractionType::Read, &readCallback, readClients);
 
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
 
             // The new read request should be accepted.
             EXPECT_EQ(readCallback.mOnError, 0u);
             EXPECT_EQ(readCallback.mOnDone, 1u);
-            EXPECT_EQ(readCallback.mAttributeCount, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest);
+            EXPECT_EQ(readCallback.mAttributeCount, InteractionModelEngine::kMinSupportedPathsPerReadRequest);
 
             // The oversized read handler should be evicted -> We should have one active read handler.
-            EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 1u);
+            EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 1u);
 
             backgroundReadCallback.ClearCounter();
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return backgroundReadCallback.reportsReceived > 0; });
@@ -3796,22 +4105,22 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
     TestCase(
         Params{
             .ReadHandlerCapacity = 2,
-            .PathPoolCapacity    = 2 * app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+            .PathPoolCapacity    = 2 * InteractionModelEngine::kMinSupportedPathsPerReadRequest,
             .MaxFabrics          = 2,
         },
         [&]() {
             TestReadCallback readCallback;
             TestPerpetualListReadCallback readCallbackForOversizedRead;
             TestPerpetualListReadCallback backgroundReadCallback;
-            std::vector<std::unique_ptr<app::ReadClient>> readClients;
+            std::vector<std::unique_ptr<ReadClient>> readClients;
 
-            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1,
-                                         app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                                         app::ReadClient::InteractionType::Read, &backgroundReadCallback, readClients);
-            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1,
-                                         app::InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
-                                         app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                                         app::ReadClient::InteractionType::Read, &readCallbackForOversizedRead, readClients);
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
+
+            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1, AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &backgroundReadCallback, readClients);
+            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
+                                         AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &readCallbackForOversizedRead, readClients);
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() {
                 return backgroundReadCallback.reportsReceived > 0 && readCallbackForOversizedRead.reportsReceived > 0;
             });
@@ -3819,9 +4128,9 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             EXPECT_TRUE(readCallbackForOversizedRead.reportsReceived > 0 && backgroundReadCallback.reportsReceived > 0);
 
             EstablishReadOrSubscriptions(
-                GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
-                app::ReadClient::InteractionType::Read, &readCallback, readClients);
+                GetSessionBobToAlice(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+                AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
+                ReadClient::InteractionType::Read, &readCallback, readClients);
 
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
 
@@ -3844,23 +4153,23 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
     TestCase(
         Params{
             .ReadHandlerCapacity = 2,
-            .PathPoolCapacity    = 2 * app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+            .PathPoolCapacity    = 2 * InteractionModelEngine::kMinSupportedPathsPerReadRequest,
             .MaxFabrics          = 2,
         },
         [&]() {
             TestReadCallback readCallback;
             TestPerpetualListReadCallback backgroundReadCallback1;
             TestPerpetualListReadCallback backgroundReadCallback2;
-            std::vector<std::unique_ptr<app::ReadClient>> readClients;
+            std::vector<std::unique_ptr<ReadClient>> readClients;
 
-            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1,
-                                         app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                                         app::ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
+
+            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1, AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return backgroundReadCallback1.reportsReceived > 0; });
 
-            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1,
-                                         app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                                         app::ReadClient::InteractionType::Read, &backgroundReadCallback2, readClients);
+            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1, AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &backgroundReadCallback2, readClients);
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return backgroundReadCallback2.reportsReceived > 0; });
             EXPECT_TRUE(backgroundReadCallback1.reportsReceived > 0 && backgroundReadCallback2.reportsReceived > 0);
 
@@ -3868,21 +4177,21 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             backgroundReadCallback2.ClearCounter();
 
             EstablishReadOrSubscriptions(
-                GetSessionAliceToBob(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
-                app::ReadClient::InteractionType::Read, &readCallback, readClients);
+                GetSessionAliceToBob(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+                AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
+                ReadClient::InteractionType::Read, &readCallback, readClients);
 
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
 
             // The new read request should be rejected.
             EXPECT_EQ(readCallback.mOnError, 0u);
             EXPECT_EQ(readCallback.mOnDone, 1u);
-            EXPECT_EQ(readCallback.mAttributeCount, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest);
+            EXPECT_EQ(readCallback.mAttributeCount, InteractionModelEngine::kMinSupportedPathsPerReadRequest);
 
             // One of the read requests from Bob to Alice should be evicted.
             // We should have only one 1 active read handler, since the transaction from Alice to Bob has finished already, and one
             // of two Bob to Alice transactions has been evicted.
-            EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 1u);
+            EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 1u);
 
             // Note: Younger read handler will be evicted.
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return backgroundReadCallback1.reportsReceived > 0; });
@@ -3894,24 +4203,24 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
     TestCase(
         Params{
             .ReadHandlerCapacity = 2,
-            .PathPoolCapacity    = 2 * app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+            .PathPoolCapacity    = 2 * InteractionModelEngine::kMinSupportedPathsPerReadRequest,
             .MaxFabrics          = 2,
         },
         [&]() {
             TestReadCallback readCallback;
             TestPerpetualListReadCallback backgroundReadCallback1;
             TestPerpetualListReadCallback backgroundReadCallback2;
-            std::vector<std::unique_ptr<app::ReadClient>> readClients;
+            std::vector<std::unique_ptr<ReadClient>> readClients;
 
-            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1,
-                                         app::InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
-                                         app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                                         app::ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
+
+            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
+                                         AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return backgroundReadCallback1.reportsReceived > 0; });
 
-            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1,
-                                         app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                                         app::ReadClient::InteractionType::Read, &backgroundReadCallback2, readClients);
+            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1, AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &backgroundReadCallback2, readClients);
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return backgroundReadCallback2.reportsReceived > 0; });
             EXPECT_TRUE(backgroundReadCallback1.reportsReceived > 0 && backgroundReadCallback2.reportsReceived > 0);
 
@@ -3919,21 +4228,21 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             backgroundReadCallback2.ClearCounter();
 
             EstablishReadOrSubscriptions(
-                GetSessionAliceToBob(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
-                app::ReadClient::InteractionType::Read, &readCallback, readClients);
+                GetSessionAliceToBob(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+                AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
+                ReadClient::InteractionType::Read, &readCallback, readClients);
 
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
 
             // The new read request should be rejected.
             EXPECT_EQ(readCallback.mOnError, 0u);
             EXPECT_EQ(readCallback.mOnDone, 1u);
-            EXPECT_EQ(readCallback.mAttributeCount, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest);
+            EXPECT_EQ(readCallback.mAttributeCount, InteractionModelEngine::kMinSupportedPathsPerReadRequest);
 
             // One of the read requests from Bob to Alice should be evicted.
             // We should have only one 1 active read handler, since the transaction from Alice to Bob has finished already, and one
             // of two Bob to Alice transactions has been evicted.
-            EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 1u);
+            EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 1u);
 
             // Note: Larger read handler will be evicted before evicting the younger one.
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return backgroundReadCallback2.reportsReceived > 0; });
@@ -3947,7 +4256,7 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
     TestCase(
         Params{
             .ReadHandlerCapacity = 3,
-            .PathPoolCapacity    = 3 * app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+            .PathPoolCapacity    = 3 * InteractionModelEngine::kMinSupportedPathsPerReadRequest,
             .MaxFabrics          = 3,
         },
         [&]() {
@@ -3955,17 +4264,16 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback1;
             TestPerpetualListReadCallback backgroundReadCallback2;
             TestPerpetualListReadCallback backgroundReadCallback3;
-            std::vector<std::unique_ptr<app::ReadClient>> readClients;
+            std::vector<std::unique_ptr<ReadClient>> readClients;
 
-            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1,
-                                         app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                                         app::ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
-            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1,
-                                         app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                                         app::ReadClient::InteractionType::Read, &backgroundReadCallback2, readClients);
-            EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1, 1,
-                                         app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                                         app::ReadClient::InteractionType::Read, &backgroundReadCallback3, readClients);
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
+
+            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1, AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
+            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1, AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &backgroundReadCallback2, readClients);
+            EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1, 1, AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &backgroundReadCallback3, readClients);
 
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() {
                 return backgroundReadCallback1.reportsReceived > 0 && backgroundReadCallback2.reportsReceived > 0 &&
@@ -3975,22 +4283,22 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
                         backgroundReadCallback3.reportsReceived > 0);
 
             EstablishReadOrSubscriptions(
-                GetSessionCharlieToDavid(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
-                app::ReadClient::InteractionType::Read, &readCallback, readClients);
+                GetSessionCharlieToDavid(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+                AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
+                ReadClient::InteractionType::Read, &readCallback, readClients);
 
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
 
             // The new read request should be accepted.
             EXPECT_EQ(readCallback.mOnError, 0u);
             EXPECT_EQ(readCallback.mOnDone, 1u);
-            EXPECT_EQ(readCallback.mAttributeCount, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest);
+            EXPECT_EQ(readCallback.mAttributeCount, InteractionModelEngine::kMinSupportedPathsPerReadRequest);
             // Should evict one read request from Bob fabric for enough resources.
-            EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(app::ReadHandler::InteractionType::Read,
-                                                                                           GetAliceFabricIndex()),
+            EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read,
+                                                                                      GetAliceFabricIndex()),
                       1u);
-            EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(app::ReadHandler::InteractionType::Read,
-                                                                                           GetBobFabricIndex()),
+            EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read,
+                                                                                      GetBobFabricIndex()),
                       1u);
         });
 
@@ -4001,7 +4309,7 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
     TestCase(
         Params{
             .ReadHandlerCapacity = 3,
-            .PathPoolCapacity    = 3 * app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+            .PathPoolCapacity    = 3 * InteractionModelEngine::kMinSupportedPathsPerReadRequest,
             .MaxFabrics          = 3,
         },
         [&]() {
@@ -4009,17 +4317,16 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback1;
             TestPerpetualListReadCallback backgroundReadCallback2;
             TestPerpetualListReadCallback backgroundReadCallback3;
-            std::vector<std::unique_ptr<app::ReadClient>> readClients;
+            std::vector<std::unique_ptr<ReadClient>> readClients;
 
-            EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1, 1,
-                                         app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                                         app::ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
-            EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1, 1,
-                                         app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                                         app::ReadClient::InteractionType::Read, &backgroundReadCallback2, readClients);
-            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1,
-                                         app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                                         app::ReadClient::InteractionType::Read, &backgroundReadCallback3, readClients);
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
+
+            EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1, 1, AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
+            EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1, 1, AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &backgroundReadCallback2, readClients);
+            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1, AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &backgroundReadCallback3, readClients);
 
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() {
                 return backgroundReadCallback1.reportsReceived > 0 && backgroundReadCallback2.reportsReceived > 0 &&
@@ -4029,22 +4336,22 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
                         backgroundReadCallback3.reportsReceived > 0);
 
             EstablishReadOrSubscriptions(
-                GetSessionCharlieToDavid(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
-                app::ReadClient::InteractionType::Read, &readCallback, readClients);
+                GetSessionCharlieToDavid(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+                AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
+                ReadClient::InteractionType::Read, &readCallback, readClients);
 
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
 
             // The new read request should be accepted.
             EXPECT_EQ(readCallback.mOnError, 0u);
             EXPECT_EQ(readCallback.mOnDone, 1u);
-            EXPECT_EQ(readCallback.mAttributeCount, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest);
+            EXPECT_EQ(readCallback.mAttributeCount, InteractionModelEngine::kMinSupportedPathsPerReadRequest);
             // Should evict one read request from Bob fabric for enough resources.
-            EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(app::ReadHandler::InteractionType::Read,
-                                                                                           GetAliceFabricIndex()),
+            EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read,
+                                                                                      GetAliceFabricIndex()),
                       1u);
-            EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(app::ReadHandler::InteractionType::Read,
-                                                                                           GetBobFabricIndex()),
+            EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read,
+                                                                                      GetBobFabricIndex()),
                       1u);
         });
 
@@ -4053,7 +4360,7 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
     TestCase(
         Params{
             .ReadHandlerCapacity = 3,
-            .PathPoolCapacity    = 3 * app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+            .PathPoolCapacity    = 3 * InteractionModelEngine::kMinSupportedPathsPerReadRequest,
             .MaxFabrics          = 2,
         },
         [&]() {
@@ -4061,17 +4368,19 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback1;
             TestPerpetualListReadCallback backgroundReadCallback2;
             TestPerpetualListReadCallback backgroundReadCallback3;
-            std::vector<std::unique_ptr<app::ReadClient>> readClients;
+            std::vector<std::unique_ptr<ReadClient>> readClients;
 
-            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                                         app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                                         app::ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
-            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                                         app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                                         app::ReadClient::InteractionType::Read, &backgroundReadCallback2, readClients);
-            EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                                         app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                                         app::ReadClient::InteractionType::Read, &backgroundReadCallback3, readClients);
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
+
+            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+                                         AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
+            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+                                         AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &backgroundReadCallback2, readClients);
+            EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+                                         AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &backgroundReadCallback3, readClients);
 
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() {
                 return backgroundReadCallback1.reportsReceived > 0 && backgroundReadCallback2.reportsReceived > 0 &&
@@ -4081,9 +4390,9 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
                         backgroundReadCallback3.reportsReceived > 0);
 
             EstablishReadOrSubscriptions(
-                GetSessionCharlieToDavid(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
-                app::ReadClient::InteractionType::Read, &readCallback, readClients);
+                GetSessionCharlieToDavid(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+                AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
+                ReadClient::InteractionType::Read, &readCallback, readClients);
 
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
 
@@ -4091,11 +4400,11 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             EXPECT_EQ(readCallback.mOnError, 1u);
             EXPECT_EQ(readCallback.mLastError, CHIP_IM_GLOBAL_STATUS(Busy));
             // Should evict one read request from Bob fabric for enough resources.
-            EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(app::ReadHandler::InteractionType::Read,
-                                                                                           GetAliceFabricIndex()),
+            EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read,
+                                                                                      GetAliceFabricIndex()),
                       2u);
-            EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(app::ReadHandler::InteractionType::Read,
-                                                                                           GetBobFabricIndex()),
+            EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read,
+                                                                                      GetBobFabricIndex()),
                       1u);
         });
 
@@ -4104,21 +4413,23 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
     TestCase(
         Params{
             .ReadHandlerCapacity = 3,
-            .PathPoolCapacity    = 3 * app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+            .PathPoolCapacity    = 3 * InteractionModelEngine::kMinSupportedPathsPerReadRequest,
             .MaxFabrics          = 2,
         },
         [&]() {
             TestReadCallback readCallback;
             TestPerpetualListReadCallback backgroundReadCallback1;
             TestPerpetualListReadCallback backgroundReadCallback2;
-            std::vector<std::unique_ptr<app::ReadClient>> readClients;
+            std::vector<std::unique_ptr<ReadClient>> readClients;
 
-            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                                         app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                                         app::ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
-            EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                                         app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                                         app::ReadClient::InteractionType::Read, &backgroundReadCallback2, readClients);
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
+
+            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+                                         AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
+            EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+                                         AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &backgroundReadCallback2, readClients);
 
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() {
                 return backgroundReadCallback1.reportsReceived > 0 && backgroundReadCallback2.reportsReceived > 0;
@@ -4126,22 +4437,22 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             EXPECT_TRUE(backgroundReadCallback1.reportsReceived > 0 && backgroundReadCallback2.reportsReceived > 0);
 
             EstablishReadOrSubscriptions(
-                GetSessionCharlieToDavid(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
-                app::ReadClient::InteractionType::Read, &readCallback, readClients);
+                GetSessionCharlieToDavid(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+                AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
+                ReadClient::InteractionType::Read, &readCallback, readClients);
 
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
 
             // The new read request should be accepted.
             EXPECT_EQ(readCallback.mOnError, 0u);
             EXPECT_EQ(readCallback.mOnDone, 1u);
-            EXPECT_EQ(readCallback.mAttributeCount, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest);
+            EXPECT_EQ(readCallback.mAttributeCount, InteractionModelEngine::kMinSupportedPathsPerReadRequest);
             // No read transactions should be evicted.
-            EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(app::ReadHandler::InteractionType::Read,
-                                                                                           GetAliceFabricIndex()),
+            EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read,
+                                                                                      GetAliceFabricIndex()),
                       1u);
-            EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(app::ReadHandler::InteractionType::Read,
-                                                                                           GetBobFabricIndex()),
+            EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read,
+                                                                                      GetBobFabricIndex()),
                       1u);
         });
 
@@ -4150,41 +4461,41 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
     TestCase(
         Params{
             .ReadHandlerCapacity = 2,
-            .PathPoolCapacity    = 2 * app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+            .PathPoolCapacity    = 2 * InteractionModelEngine::kMinSupportedPathsPerReadRequest,
             .MaxFabrics          = 2,
         },
         [&]() {
             TestReadCallback readCallback;
             TestPerpetualListReadCallback backgroundReadCallback1;
             TestPerpetualListReadCallback backgroundReadCallback2;
-            std::vector<std::unique_ptr<app::ReadClient>> readClients;
+            std::vector<std::unique_ptr<ReadClient>> readClients;
+
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
 
             EstablishReadOrSubscriptions(GetSessionCharlieToDavid(), 1, 1,
-                                         app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                                         app::ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
-            EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1, 1,
-                                         app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                                         app::ReadClient::InteractionType::Read, &backgroundReadCallback2, readClients);
+                                         AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
+            EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1, 1, AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &backgroundReadCallback2, readClients);
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() {
                 return backgroundReadCallback1.reportsReceived > 0 && backgroundReadCallback2.reportsReceived > 0;
             });
             EXPECT_TRUE(backgroundReadCallback1.reportsReceived > 0 && backgroundReadCallback2.reportsReceived > 0);
 
             EstablishReadOrSubscriptions(
-                GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
-                app::ReadClient::InteractionType::Read, &readCallback, readClients);
+                GetSessionBobToAlice(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+                AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
+                ReadClient::InteractionType::Read, &readCallback, readClients);
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
 
             // The new read request should be accepted.
             EXPECT_EQ(readCallback.mOnError, 0u);
             EXPECT_EQ(readCallback.mOnDone, 1u);
-            EXPECT_EQ(readCallback.mAttributeCount, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest);
+            EXPECT_EQ(readCallback.mAttributeCount, InteractionModelEngine::kMinSupportedPathsPerReadRequest);
             // Should evict the read request on PASE session for enough resources.
-            EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(app::ReadHandler::InteractionType::Read),
-                      1u);
-            EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(app::ReadHandler::InteractionType::Read,
-                                                                                           kUndefinedFabricIndex),
+            EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read), 1u);
+            EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read,
+                                                                                      kUndefinedFabricIndex),
                       0u);
         });
 
@@ -4194,22 +4505,23 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
     TestCase(
         Params{
             .ReadHandlerCapacity = 2,
-            .PathPoolCapacity    = 2 * app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+            .PathPoolCapacity    = 2 * InteractionModelEngine::kMinSupportedPathsPerReadRequest,
             .MaxFabrics          = 2,
         },
         [&]() {
             TestReadCallback readCallback;
             TestPerpetualListReadCallback backgroundReadCallback1;
             TestPerpetualListReadCallback backgroundReadCallback2;
-            std::vector<std::unique_ptr<app::ReadClient>> readClients;
+            std::vector<std::unique_ptr<ReadClient>> readClients;
+
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
 
             EstablishReadOrSubscriptions(GetSessionCharlieToDavid(), 1, 1,
-                                         app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                                         app::ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
-            EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1,
-                                         app::InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
-                                         app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                                         app::ReadClient::InteractionType::Read, &backgroundReadCallback2, readClients);
+                                         AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
+            EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
+                                         AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &backgroundReadCallback2, readClients);
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() {
                 return backgroundReadCallback1.reportsReceived > 0 && backgroundReadCallback2.reportsReceived > 0;
             });
@@ -4217,8 +4529,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
 
             EstablishReadOrSubscriptions(
                 GetSessionBobToAlice(), 1, 1,
-                app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
-                app::ReadClient::InteractionType::Read, &readCallback, readClients);
+                AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
+                ReadClient::InteractionType::Read, &readCallback, readClients);
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
 
             // The new read request should be accepted.
@@ -4226,10 +4538,9 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             EXPECT_EQ(readCallback.mOnDone, 1u);
             EXPECT_EQ(readCallback.mAttributeCount, 1u);
             // Should evict the read request on PASE session for enough resources.
-            EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(app::ReadHandler::InteractionType::Read),
-                      1u);
-            EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(app::ReadHandler::InteractionType::Read,
-                                                                                           kUndefinedFabricIndex),
+            EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read), 1u);
+            EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read,
+                                                                                      kUndefinedFabricIndex),
                       0u);
         });
 
@@ -4238,7 +4549,7 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
     TestCase(
         Params{
             .ReadHandlerCapacity = 3,
-            .PathPoolCapacity    = 3 * app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+            .PathPoolCapacity    = 3 * InteractionModelEngine::kMinSupportedPathsPerReadRequest,
             .MaxFabrics          = 3,
         },
         [&]() {
@@ -4246,17 +4557,17 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallbackForPASESession;
             TestPerpetualListReadCallback backgroundReadCallback1;
             TestPerpetualListReadCallback backgroundReadCallback2;
-            std::vector<std::unique_ptr<app::ReadClient>> readClients;
+            std::vector<std::unique_ptr<ReadClient>> readClients;
 
-            EstablishReadOrSubscriptions(
-                GetSessionCharlieToDavid(), 1, 1, app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                app::ReadClient::InteractionType::Read, &backgroundReadCallbackForPASESession, readClients);
-            EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1, 1,
-                                         app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                                         app::ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
-            EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1, 1,
-                                         app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                                         app::ReadClient::InteractionType::Read, &backgroundReadCallback2, readClients);
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
+
+            EstablishReadOrSubscriptions(GetSessionCharlieToDavid(), 1, 1,
+                                         AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &backgroundReadCallbackForPASESession, readClients);
+            EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1, 1, AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
+            EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1, 1, AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &backgroundReadCallback2, readClients);
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() {
                 return backgroundReadCallbackForPASESession.reportsReceived > 0 && backgroundReadCallback1.reportsReceived > 0 &&
                     backgroundReadCallback2.reportsReceived > 0;
@@ -4266,8 +4577,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
 
             EstablishReadOrSubscriptions(
                 GetSessionBobToAlice(), 1, 1,
-                app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
-                app::ReadClient::InteractionType::Read, &readCallback, readClients);
+                AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
+                ReadClient::InteractionType::Read, &readCallback, readClients);
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
 
             // The new read request should be accepted.
@@ -4277,10 +4588,9 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
 
             // The read handler on PASE session should not be evicted since the resources used by all PASE sessions are not
             // exceeding the resources guaranteed to a normal fabric.
-            EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(app::ReadHandler::InteractionType::Read),
-                      2u);
-            EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(app::ReadHandler::InteractionType::Read,
-                                                                                           kUndefinedFabricIndex),
+            EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read), 2u);
+            EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read,
+                                                                                      kUndefinedFabricIndex),
                       1u);
         });
 
@@ -4290,7 +4600,7 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
     TestCase(
         Params{
             .ReadHandlerCapacity = 6,
-            .PathPoolCapacity    = 6 * app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+            .PathPoolCapacity    = 6 * InteractionModelEngine::kMinSupportedPathsPerReadRequest,
             .MaxFabrics          = 3,
         },
         [&]() {
@@ -4298,43 +4608,42 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallbackForPASESession;
             TestPerpetualListReadCallback backgroundReadCallback1;
             TestPerpetualListReadCallback backgroundReadCallback2;
-            std::vector<std::unique_ptr<app::ReadClient>> readClients;
+            std::vector<std::unique_ptr<ReadClient>> readClients;
 
-            EstablishReadOrSubscriptions(
-                GetSessionCharlieToDavid(), 3, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest - 1,
-                app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1), app::ReadClient::InteractionType::Read,
-                &backgroundReadCallbackForPASESession, readClients);
-            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 3,
-                                         app::InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
-                                         app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                                         app::ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
+
+            EstablishReadOrSubscriptions(GetSessionCharlieToDavid(), 3,
+                                         InteractionModelEngine::kMinSupportedPathsPerReadRequest - 1,
+                                         AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &backgroundReadCallbackForPASESession, readClients);
+            EstablishReadOrSubscriptions(GetSessionBobToAlice(), 3, InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
+                                         AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() {
-                return app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(
-                           app::ReadHandler::InteractionType::Read) == 6;
+                return InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read) == 6;
             });
-            EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(app::ReadHandler::InteractionType::Read,
-                                                                                           kUndefinedFabricIndex),
+            EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read,
+                                                                                      kUndefinedFabricIndex),
                       3u);
 
             // We have to evict one read transaction on PASE session and one read transaction on Alice's fabric.
             EstablishReadOrSubscriptions(
-                GetSessionAliceToBob(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
-                app::ReadClient::InteractionType::Read, &readCallback, readClients);
+                GetSessionAliceToBob(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+                AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
+                ReadClient::InteractionType::Read, &readCallback, readClients);
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
 
             // The new read request should be accepted.
             EXPECT_EQ(readCallback.mOnError, 0u);
             EXPECT_EQ(readCallback.mOnDone, 1u);
-            EXPECT_EQ(readCallback.mAttributeCount, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest);
+            EXPECT_EQ(readCallback.mAttributeCount, InteractionModelEngine::kMinSupportedPathsPerReadRequest);
 
             // No more than one read handler on PASE session should be evicted exceeding the resources guaranteed to a normal
             // fabric. Note: We are using ">=" here since it is also acceptable if we choose to evict one read transaction from
             // Alice fabric.
-            EXPECT_GE(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(app::ReadHandler::InteractionType::Read),
-                      4u);
-            EXPECT_GE(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(app::ReadHandler::InteractionType::Read,
-                                                                                           kUndefinedFabricIndex),
+            EXPECT_GE(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read), 4u);
+            EXPECT_GE(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read,
+                                                                                      kUndefinedFabricIndex),
                       2u);
         });
 
@@ -4343,7 +4652,7 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
     TestCase(
         Params{
             .ReadHandlerCapacity = 4,
-            .PathPoolCapacity    = 4 * app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+            .PathPoolCapacity    = 4 * InteractionModelEngine::kMinSupportedPathsPerReadRequest,
             .MaxFabrics          = 2,
         },
         [&]() {
@@ -4351,60 +4660,59 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallbackForPASESession;
             TestPerpetualListReadCallback backgroundReadCallback1;
             TestPerpetualListReadCallback backgroundReadCallback2;
-            std::vector<std::unique_ptr<app::ReadClient>> readClients;
+            std::vector<std::unique_ptr<ReadClient>> readClients;
 
-            EstablishReadOrSubscriptions(
-                GetSessionCharlieToDavid(), 2, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest - 1,
-                app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1), app::ReadClient::InteractionType::Read,
-                &backgroundReadCallbackForPASESession, readClients);
-            EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1,
-                                         app::InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
-                                         app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                                         app::ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
-            EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1,
-                                         app::InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
-                                         app::AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
-                                         app::ReadClient::InteractionType::Read, &backgroundReadCallback2, readClients);
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
+
+            EstablishReadOrSubscriptions(GetSessionCharlieToDavid(), 2,
+                                         InteractionModelEngine::kMinSupportedPathsPerReadRequest - 1,
+                                         AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &backgroundReadCallbackForPASESession, readClients);
+            EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
+                                         AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
+            EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
+                                         AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
+                                         ReadClient::InteractionType::Read, &backgroundReadCallback2, readClients);
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() {
                 return backgroundReadCallbackForPASESession.reportsReceived > 0 && backgroundReadCallback1.reportsReceived > 0 &&
                     backgroundReadCallback2.reportsReceived > 0 &&
-                    app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(app::ReadHandler::InteractionType::Read,
-                                                                                         kUndefinedFabricIndex) == 2;
+                    InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read,
+                                                                                    kUndefinedFabricIndex) == 2;
             });
             EXPECT_TRUE(backgroundReadCallbackForPASESession.reportsReceived > 0 && backgroundReadCallback1.reportsReceived > 0 &&
                         backgroundReadCallback2.reportsReceived > 0 &&
-                        app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(
-                            app::ReadHandler::InteractionType::Read, kUndefinedFabricIndex) == 2);
+                        InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read,
+                                                                                        kUndefinedFabricIndex) == 2);
 
             // To handle this read request, we must evict both read transactions from the PASE session.
             EstablishReadOrSubscriptions(
-                GetSessionBobToAlice(), 1, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest,
-                app::AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
-                app::ReadClient::InteractionType::Read, &readCallback, readClients);
+                GetSessionBobToAlice(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest,
+                AttributePathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id),
+                ReadClient::InteractionType::Read, &readCallback, readClients);
             GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() { return readCallback.mOnDone != 0; });
 
             // The new read request should be accepted.
             EXPECT_EQ(readCallback.mOnError, 0u);
             EXPECT_EQ(readCallback.mOnDone, 1u);
-            EXPECT_EQ(readCallback.mAttributeCount, app::InteractionModelEngine::kMinSupportedPathsPerReadRequest);
+            EXPECT_EQ(readCallback.mAttributeCount, InteractionModelEngine::kMinSupportedPathsPerReadRequest);
 
             // The read handler on PASE session should be evicted, and the read transactions on a normal fabric should be untouched
             // although it is oversized.
-            EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(app::ReadHandler::InteractionType::Read),
-                      2u);
-            EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(app::ReadHandler::InteractionType::Read,
-                                                                                           kUndefinedFabricIndex),
+            EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read), 2u);
+            EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(ReadHandler::InteractionType::Read,
+                                                                                      kUndefinedFabricIndex),
                       0u);
         });
 
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
     DrainAndServiceIO();
 
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
-    app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(false);
-    app::InteractionModelEngine::GetInstance()->SetConfigMaxFabrics(-1);
-    app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForReads(-1);
-    app::InteractionModelEngine::GetInstance()->SetPathPoolCapacityForReads(-1);
+    InteractionModelEngine::GetInstance()->SetForceHandlerQuota(false);
+    InteractionModelEngine::GetInstance()->SetConfigMaxFabrics(-1);
+    InteractionModelEngine::GetInstance()->SetHandlerCapacityForReads(-1);
+    InteractionModelEngine::GetInstance()->SetPathPoolCapacityForReads(-1);
 }
 
 // Needs to be larger than our plausible path pool.
@@ -4412,8 +4720,6 @@ constexpr size_t sTooLargePathCount = 200;
 
 TEST_F(TestRead, TestReadHandler_TooManyPaths)
 {
-    using namespace chip::app;
-
     chip::Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
     // Shouldn't have anything in the retransmit table when starting the test.
     EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
@@ -4423,9 +4729,9 @@ TEST_F(TestRead, TestReadHandler_TooManyPaths)
 
     ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
     // Needs to be larger than our plausible path pool.
-    chip::app::AttributePathParams attributePathParams[sTooLargePathCount];
+    AttributePathParams attributePathParams[sTooLargePathCount];
     readPrepareParams.mpAttributePathParamsList    = attributePathParams;
-    readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
+    readPrepareParams.mAttributePathParamsListSize = MATTER_ARRAY_SIZE(attributePathParams);
 
     {
         MockInteractionModelApp delegate;
@@ -4453,8 +4759,6 @@ TEST_F(TestRead, TestReadHandler_TooManyPaths)
 
 TEST_F(TestRead, TestReadHandler_TwoParallelReadsSecondTooManyPaths)
 {
-    using namespace chip::app;
-
     chip::Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
     // Shouldn't have anything in the retransmit table when starting the test.
     EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
@@ -4477,18 +4781,18 @@ TEST_F(TestRead, TestReadHandler_TwoParallelReadsSecondTooManyPaths)
 
         ReadPrepareParams readPrepareParams1(GetSessionBobToAlice());
         // Read full wildcard paths, repeat twice to ensure chunking.
-        chip::app::AttributePathParams attributePathParams1[2];
+        AttributePathParams attributePathParams1[2];
         readPrepareParams1.mpAttributePathParamsList    = attributePathParams1;
-        readPrepareParams1.mAttributePathParamsListSize = ArraySize(attributePathParams1);
+        readPrepareParams1.mAttributePathParamsListSize = MATTER_ARRAY_SIZE(attributePathParams1);
 
         CHIP_ERROR err = readClient1.SendRequest(readPrepareParams1);
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         ReadPrepareParams readPrepareParams2(GetSessionBobToAlice());
         // Read full wildcard paths, repeat twice to ensure chunking.
-        chip::app::AttributePathParams attributePathParams2[sTooLargePathCount];
+        AttributePathParams attributePathParams2[sTooLargePathCount];
         readPrepareParams2.mpAttributePathParamsList    = attributePathParams2;
-        readPrepareParams2.mAttributePathParamsListSize = ArraySize(attributePathParams2);
+        readPrepareParams2.mAttributePathParamsListSize = MATTER_ARRAY_SIZE(attributePathParams2);
 
         err = readClient2.SendRequest(readPrepareParams2);
         EXPECT_EQ(err, CHIP_NO_ERROR);
@@ -4510,6 +4814,63 @@ TEST_F(TestRead, TestReadHandler_TwoParallelReadsSecondTooManyPaths)
     engine->SetForceHandlerQuota(false);
 }
 
+TEST_F(TestRead, TestReadHandler_MultipleSubscriptions_OnFabricRemoved)
+{
+    auto sessionHandle                       = GetSessionBobToAlice();
+    uint32_t numSuccessCalls                 = 0;
+    uint32_t numSubscriptionEstablishedCalls = 0;
+
+    ScopedChange directive(gReadResponseDirective, ReadResponseDirective::kSendDataResponse);
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&numSuccessCalls](const ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+        numSuccessCalls++;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [](const ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) {};
+
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const ReadClient & readClient,
+                                                                          chip::SubscriptionId aSubscriptionId) {
+        numSubscriptionEstablishedCalls++;
+    };
+
+    //
+    // Try to issue parallel subscriptions that will exceed the value for InteractionModelEngine::kReadHandlerPoolSize.
+    // If heap allocation is correctly setup, this should result in it successfully servicing more than the number
+    // present in that define.
+    //
+    for (size_t i = 0; i < (InteractionModelEngine::kReadHandlerPoolSize + 1); i++)
+    {
+        EXPECT_EQ(Controller::SubscribeAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
+                      &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 20,
+                      onSubscriptionEstablishedCb, nullptr, false, true),
+                  CHIP_NO_ERROR);
+    }
+
+    // There are too many messages and the test (gcc_debug, which includes many sanity checks) will be quite slow. Note: report
+    // engine is using ScheduleWork which cannot be handled by DrainAndServiceIO correctly.
+    GetIOContext().DriveIOUntil(System::Clock::Seconds16(60), [&]() {
+        return numSuccessCalls == (InteractionModelEngine::kReadHandlerPoolSize + 1) &&
+            numSubscriptionEstablishedCalls == (InteractionModelEngine::kReadHandlerPoolSize + 1);
+    });
+
+    EXPECT_EQ(numSuccessCalls, (InteractionModelEngine::kReadHandlerPoolSize + 1));
+    EXPECT_EQ(numSubscriptionEstablishedCalls, (InteractionModelEngine::kReadHandlerPoolSize + 1));
+    EXPECT_EQ(mNumActiveSubscriptions, static_cast<int32_t>(InteractionModelEngine::kReadHandlerPoolSize + 1));
+
+    GetFabricTable().DeleteAllFabrics();
+
+    EXPECT_EQ(mNumActiveSubscriptions, 0);
+    size_t numActiveReadClients = InteractionModelEngine::GetInstance()->GetNumActiveReadClients();
+    EXPECT_EQ(numActiveReadClients, 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    SetMRPMode(MessagingContext::MRPMode::kDefault);
+}
+
 TEST_F(TestRead, TestReadAttribute_ManyDataValues)
 {
     auto sessionHandle  = GetSessionBobToAlice();
@@ -4520,7 +4881,7 @@ TEST_F(TestRead, TestReadAttribute_ManyDataValues)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [&successCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+    auto onSuccessCb = [&successCalls](const ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
         EXPECT_TRUE(attributePath.mDataVersion.HasValue() && attributePath.mDataVersion.Value() == kDataVersion);
 
         EXPECT_TRUE(dataResponse);
@@ -4529,17 +4890,17 @@ TEST_F(TestRead, TestReadAttribute_ManyDataValues)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&failureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) { ++failureCalls; };
+    auto onFailureCb = [&failureCalls](const ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) { ++failureCalls; };
 
-    Controller::ReadAttribute<Clusters::UnitTesting::Attributes::Boolean::TypeInfo>(&GetExchangeManager(), sessionHandle,
-                                                                                    kTestEndpointId, onSuccessCb, onFailureCb);
+    EXPECT_SUCCESS(Controller::ReadAttribute<Clusters::UnitTesting::Attributes::Boolean::TypeInfo>(
+        &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 
     EXPECT_EQ(successCalls, 1u);
     EXPECT_EQ(failureCalls, 0u);
-    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients(), 0u);
-    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 0u);
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadClients(), 0u);
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 0u);
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
@@ -4553,7 +4914,7 @@ TEST_F(TestRead, TestReadAttribute_ManyDataValuesWrongPath)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [&successCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+    auto onSuccessCb = [&successCalls](const ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
         EXPECT_TRUE(attributePath.mDataVersion.HasValue() && attributePath.mDataVersion.Value() == kDataVersion);
 
         EXPECT_TRUE(dataResponse);
@@ -4562,17 +4923,17 @@ TEST_F(TestRead, TestReadAttribute_ManyDataValuesWrongPath)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&failureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) { ++failureCalls; };
+    auto onFailureCb = [&failureCalls](const ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) { ++failureCalls; };
 
-    Controller::ReadAttribute<Clusters::UnitTesting::Attributes::Boolean::TypeInfo>(&GetExchangeManager(), sessionHandle,
-                                                                                    kTestEndpointId, onSuccessCb, onFailureCb);
+    EXPECT_SUCCESS(Controller::ReadAttribute<Clusters::UnitTesting::Attributes::Boolean::TypeInfo>(
+        &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 
     EXPECT_EQ(successCalls, 0u);
     EXPECT_EQ(failureCalls, 1u);
-    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients(), 0u);
-    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 0u);
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadClients(), 0u);
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 0u);
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
@@ -4586,7 +4947,7 @@ TEST_F(TestRead, TestReadAttribute_ManyErrors)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onSuccessCb = [&successCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+    auto onSuccessCb = [&successCalls](const ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
         EXPECT_TRUE(attributePath.mDataVersion.HasValue() && attributePath.mDataVersion.Value() == kDataVersion);
 
         EXPECT_TRUE(dataResponse);
@@ -4595,17 +4956,17 @@ TEST_F(TestRead, TestReadAttribute_ManyErrors)
 
     // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
     // not safe to do so.
-    auto onFailureCb = [&failureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) { ++failureCalls; };
+    auto onFailureCb = [&failureCalls](const ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) { ++failureCalls; };
 
-    Controller::ReadAttribute<Clusters::UnitTesting::Attributes::Boolean::TypeInfo>(&GetExchangeManager(), sessionHandle,
-                                                                                    kTestEndpointId, onSuccessCb, onFailureCb);
+    EXPECT_SUCCESS(Controller::ReadAttribute<Clusters::UnitTesting::Attributes::Boolean::TypeInfo>(
+        &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 
     EXPECT_EQ(successCalls, 0u);
     EXPECT_EQ(failureCalls, 1u);
-    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients(), 0u);
-    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 0u);
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadClients(), 0u);
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 0u);
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
@@ -4620,36 +4981,36 @@ TEST_F(TestRead, TestReadHandler_KeepSubscriptionTest)
     using namespace SubscriptionPathQuotaHelpers;
 
     TestReadCallback readCallback;
-    app::AttributePathParams pathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id);
+    AttributePathParams pathParams(kTestEndpointId, Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Int16u::Id);
 
-    app::ReadPrepareParams readParam(GetSessionAliceToBob());
+    ReadPrepareParams readParam(GetSessionAliceToBob());
     readParam.mpAttributePathParamsList    = &pathParams;
     readParam.mAttributePathParamsListSize = 1;
     readParam.mMaxIntervalCeilingSeconds   = 1;
     readParam.mKeepSubscriptions           = false;
 
-    std::unique_ptr<app::ReadClient> readClient = std::make_unique<app::ReadClient>(
-        app::InteractionModelEngine::GetInstance(), app::InteractionModelEngine::GetInstance()->GetExchangeManager(), readCallback,
-        app::ReadClient::InteractionType::Subscribe);
+    std::unique_ptr<ReadClient> readClient = std::make_unique<ReadClient>(
+        InteractionModelEngine::GetInstance(), InteractionModelEngine::GetInstance()->GetExchangeManager(), readCallback,
+        ReadClient::InteractionType::Subscribe);
     EXPECT_EQ(readClient->SendRequest(readParam), CHIP_NO_ERROR);
 
     DrainAndServiceIO();
 
-    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 1u);
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 1u);
 
     ChipLogProgress(DataManagement, "Issue another subscription that will evict the first sub...");
 
     readParam.mAttributePathParamsListSize = 0;
-    readClient                             = std::make_unique<app::ReadClient>(app::InteractionModelEngine::GetInstance(),
-                                                   app::InteractionModelEngine::GetInstance()->GetExchangeManager(), readCallback,
-                                                   app::ReadClient::InteractionType::Subscribe);
+    readClient                             = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(),
+                                              InteractionModelEngine::GetInstance()->GetExchangeManager(), readCallback,
+                                              ReadClient::InteractionType::Subscribe);
     EXPECT_EQ(readClient->SendRequest(readParam), CHIP_NO_ERROR);
 
     DrainAndServiceIO();
 
-    EXPECT_EQ(app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 0u);
+    EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers(), 0u);
     EXPECT_NE(readCallback.mOnError, 0u);
-    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
     DrainAndServiceIO();
 }
 
@@ -4658,10 +5019,10 @@ System::Clock::Timeout TestRead::ComputeSubscriptionTimeout(System::Clock::Secon
     // Add 1000ms of slack to our max interval to make sure we hit the
     // subscription liveness timer.  100ms was tried in the past and is not
     // sufficient: our process can easily lose the timeslice for 100ms.
-    const auto & ourMrpConfig = GetDefaultMRPConfig();
-    auto publisherTransmissionTimeout =
-        GetRetransmissionTimeout(ourMrpConfig.mActiveRetransTimeout, ourMrpConfig.mIdleRetransTimeout,
-                                 System::SystemClock().GetMonotonicTimestamp(), ourMrpConfig.mActiveThresholdTime);
+    const auto & ourMrpConfig         = GetDefaultMRPConfig();
+    auto publisherTransmissionTimeout = GetRetransmissionTimeout(
+        ourMrpConfig.mActiveRetransTimeout, ourMrpConfig.mIdleRetransTimeout, System::SystemClock().GetMonotonicTimestamp(),
+        ourMrpConfig.mActiveThresholdTime, true /* isFirstMessageOnExchange */);
 
     return publisherTransmissionTimeout + aMaxInterval + System::Clock::Milliseconds32(1000);
 }

@@ -56,6 +56,10 @@ declare_args() {
   chip_im_static_global_interaction_model_engine =
       current_os != "linux" && current_os != "mac" && current_os != "ios" &&
       current_os != "android"
+
+  # Set for integration into build systems: defines visibility
+  # for files that chip_data_model requires.
+  chip_app_data_model_target = "${chip_root}/examples/*"
 }
 
 buildconfig_header("app_buildconfig") {
@@ -107,17 +111,22 @@ source_set("paths") {
     "${chip_root}/src/app/util:types",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:types",
+    "${chip_root}/src/lib/support",
   ]
 }
 
 source_set("global-attributes") {
-  sources = [ "GlobalAttributes.h" ]
+  sources = [
+    "GlobalAttributes.cpp",
+    "GlobalAttributes.h",
+  ]
 
   # This also depends on zap-generated code which is currently impossible to split out
   # as a dependency
   public_deps = [
     ":app_config",
-    "${chip_root}/src/app/common:ids",
+    "${chip_root}/src/app/common:global-ids",
+    "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/lib/support",
   ]
 }
@@ -196,17 +205,12 @@ static_library("interaction-model") {
     "reporting/ReportSchedulerImpl.h",
     "reporting/SynchronizedReportSchedulerImpl.cpp",
     "reporting/SynchronizedReportSchedulerImpl.h",
-
-    # TODO: reporting header is part of interaction-model, however actual implementation depends
-    #       on generated code as subscriptions depend on attribute data versioning to determine
-    #       when "data changed" reports should be sent.
-    #
-    #       This breaks having `.h` and `.cpp` based off the same compilation unit and
-    #       should ideally be cleaned up.
+    "reporting/reporting.cpp",
     "reporting/reporting.h",
   ]
 
   deps = [
+    ":path-expansion",
     "${chip_root}/src/app:events",
     "${chip_root}/src/app:global-attributes",
   ]
@@ -218,20 +222,25 @@ static_library("interaction-model") {
     ":event-reporter",
     ":paths",
     ":subscription-info-provider",
+    "${chip_root}/src/access",
     "${chip_root}/src/app/MessageDef",
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/icd/server:icd-server-config",
-    "${chip_root}/src/app/icd/server:manager",
     "${chip_root}/src/app/icd/server:observer",
     "${chip_root}/src/app/util:af-types",
     "${chip_root}/src/app/util:callbacks",
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/lib/support:static-support",
+    "${chip_root}/src/lib/support:timer-delegate",
     "${chip_root}/src/protocols/interaction_model",
     "${chip_root}/src/protocols/secure_channel",
     "${chip_root}/src/system",
   ]
+
+  if (chip_enable_icd_server) {
+    public_deps += [ "${chip_root}/src/app/icd/server:manager" ]
+  }
 
   public_configs = [ "${chip_root}/src:includes" ]
 
@@ -250,7 +259,6 @@ static_library("interaction-model") {
 
   if (chip_build_controller_dynamic_server) {
     sources += [
-      "clusters/ota-provider/ota-provider.cpp",
       "dynamic_server/AccessControl.cpp",
       "dynamic_server/AccessControl.h",
     ]
@@ -261,7 +269,6 @@ static_library("interaction-model") {
     # We likely should formalize and change this with a proper DataModel::Provider that
     # is consistent instead
     sources += [
-      "${chip_root}/src/app/util/ember-global-attribute-access-interface.cpp",
       "${chip_root}/src/app/util/ember-io-storage.cpp",
       "dynamic_server/DynamicDispatcher.cpp",
     ]
@@ -270,7 +277,10 @@ static_library("interaction-model") {
       ":global-attributes",
       "${chip_root}/src/access",
       "${chip_root}/src/access:provider-impl",
+      "${chip_root}/src/app:required-privileges",
+      "${chip_root}/src/app/clusters/ota-provider",
       "${chip_root}/src/app/common:attribute-type",
+      "${chip_root}/src/app/data-model-provider",
     ]
 
     public_configs += [ ":config-controller-dynamic-server" ]
@@ -287,6 +297,7 @@ source_set("events") {
   deps = [
     ":paths",
     "${chip_root}/src/access:types",
+    "${chip_root}/src/app/data-model:data-model",
     "${chip_root}/src/lib/core",
   ]
 }
@@ -310,6 +321,7 @@ static_library("attribute-access") {
     "${chip_root}/src/access:types",
     "${chip_root}/src/app/MessageDef",
     "${chip_root}/src/app/data-model",
+    "${chip_root}/src/app/data-model-provider:core",
     "${chip_root}/src/app/util:af-types",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
@@ -338,6 +350,38 @@ source_set("required-privileges") {
 
     public_configs = [ ":config-controller-dynamic-server" ]
   }
+
+  # These files are for CODE GENERATION ONLY, so technically
+  # CodegenDataModelProvider should be the only one using this. Since CodegenDataModelProvider
+  # is part of application code, the visibility is broad. However generally DO NOT USE THIS
+  # unless you are creating a new CodegenDataModelProvider based item
+  visibility = [
+    # Test data models: mock models for testing
+    # TODO: Some of these are questionable as they would not work as part of a monolith
+    #       (single app) test build: in particular the energy management bits seem wrong
+    "${chip_root}/examples/common/server-cluster-shim:mock_data_model_with_shim",
+    "${chip_root}/examples/energy-management-app/energy-management-common",
+    "${chip_root}/src/app/util/mock/*",
+    "${chip_root}/src/data-model-providers/codegen/tests/*",
+
+    # Controller data models:
+    #   linked by controllers only, never by applications
+    "${chip_root}/src/controller/data_model",
+    "${chip_root}/src/controller/java:jni",
+    "${chip_root}/src/controller/python:ChipDeviceCtrl",
+  ]
+
+  # Application integration: `chip_data_model` target should be set here
+  if (chip_app_data_model_target != "") {
+    visibility += [ chip_app_data_model_target ]
+  }
+
+  # We still have some strong coupling in this case
+  # Eventually dynamic server should be replaced with code-driven and not try
+  # to fake out ember codegen
+  if (chip_build_controller_dynamic_server) {
+    visibility += [ ":interaction-model" ]
+  }
 }
 
 source_set("status-response") {
@@ -349,23 +393,42 @@ source_set("status-response") {
     ":constants",
     "${chip_root}/src/app/MessageDef",
     "${chip_root}/src/messaging",
+    "${chip_root}/src/protocols/interaction_model",
   ]
 }
 
-source_set("command-handler-interface") {
+source_set("command-handler") {
   sources = [
     "CommandHandler.cpp",
     "CommandHandler.h",
-    "CommandHandlerExchangeInterface.h",
-    "CommandHandlerInterface.h",
-    "CommandHandlerInterfaceRegistry.cpp",
-    "CommandHandlerInterfaceRegistry.h",
   ]
 
   public_deps = [
     ":paths",
     "${chip_root}/src/access:types",
     "${chip_root}/src/app/data-model",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/messaging",
+    "${chip_root}/src/protocols/interaction_model",
+  ]
+}
+
+source_set("command-handler-interface") {
+  sources = [
+    "CommandHandlerExchangeInterface.h",
+    "CommandHandlerInterface.h",
+    "CommandHandlerInterfaceRegistry.cpp",
+    "CommandHandlerInterfaceRegistry.h",
+    "CommandHandlerInterfaceShim.h",
+  ]
+
+  public_deps = [
+    ":command-handler",
+    ":paths",
+    "${chip_root}/src/access:types",
+    "${chip_root}/src/app/data-model",
+    "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
@@ -382,10 +445,10 @@ source_set("command-handler-impl") {
   public_deps = [
     ":command-handler-interface",
     ":paths",
-    ":required-privileges",
     ":status-response",
     "${chip_root}/src/access:types",
     "${chip_root}/src/app/MessageDef",
+    "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/data-model",
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/util:callbacks",
@@ -402,6 +465,21 @@ source_set("storage-wrapper") {
 
   public_deps = [
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
+}
+
+source_set("path-expansion") {
+  sources = [
+    "AttributePathExpandIterator.cpp",
+    "AttributePathExpandIterator.h",
+  ]
+
+  public_deps = [
+    ":global-attributes",
+    ":paths",
+    "${chip_root}/src/app/data-model-provider",
+    "${chip_root}/src/lib/core:types",
     "${chip_root}/src/lib/support",
   ]
 }
@@ -423,15 +501,34 @@ source_set("attribute-persistence") {
   ]
 }
 
+source_set("generic-test-event-trigger-handler") {
+  sources = [
+    "GenericEventManagementTestEventTriggerHandler.cpp",
+    "GenericEventManagementTestEventTriggerHandler.h",
+  ]
+
+  public_deps = [
+    ":test-event-trigger",
+    "${chip_root}/src/app/clusters/general-diagnostics-server:general-diagnostics-server",
+    "${chip_root}/src/platform",
+  ]
+}
+
+source_set("user-consent") {
+  sources = [ "OTAUserConsentCommon.h" ]
+  deps = [
+    "${chip_root}/src/lib/core:types",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:span",
+  ]
+}
+
 # Note to developpers, instead of continuously adding files in the app librabry, it is recommand to create smaller source_sets that app can depend on.
 # This way, we can have a better understanding of dependencies and other componenets can depend on the different source_sets without needing to depend on the entire app library.
 static_library("app") {
   output_name = "libCHIPDataModel"
 
   sources = [
-    "AttributePathExpandIterator.cpp",
-    "AttributePathExpandIterator.h",
-    "AttributePathExpandIterator.h",
     "ChunkedWriteCallback.cpp",
     "ChunkedWriteCallback.h",
     "CommandResponseHelper.h",
@@ -441,12 +538,7 @@ static_library("app") {
     "EventManagement.h",
     "FailSafeContext.cpp",
     "FailSafeContext.h",
-    "GenericEventManagementTestEventTriggerHandler.cpp",
-    "GenericEventManagementTestEventTriggerHandler.h",
-    "OTAUserConsentCommon.h",
     "ReadHandler.cpp",
-    "TimerDelegates.cpp",
-    "TimerDelegates.h",
     "WriteHandler.cpp",
 
     # TODO: the following items cannot be included due to interaction-model circularity
@@ -464,6 +556,7 @@ static_library("app") {
     ":event-reporter",
     ":global-attributes",
     ":interaction-model",
+    ":path-expansion",
     "${chip_root}/src/app/data-model",
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/icd/server:icd-server-config",

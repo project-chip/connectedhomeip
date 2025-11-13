@@ -30,6 +30,8 @@
 #include <lib/core/TLVData.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CodeUtils.h>
+#include <setup_payload/ManualSetupPayloadParser.h>
+#include <setup_payload/QRCodeSetupPayloadParser.h>
 #include <utility>
 
 namespace chip {
@@ -63,7 +65,8 @@ bool PayloadContents::isValidQRCodePayload(ValidationMode mode) const
     if (mode == ValidationMode::kProduce)
     {
         chip::RendezvousInformationFlags valid(RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kOnNetwork,
-                                               RendezvousInformationFlag::kSoftAP, RendezvousInformationFlag::kWiFiPAF);
+                                               RendezvousInformationFlag::kSoftAP, RendezvousInformationFlag::kWiFiPAF,
+                                               RendezvousInformationFlag::kNFC);
         VerifyOrReturnValue(rendezvousInformation.Value().HasOnly(valid), false);
     }
 
@@ -332,6 +335,32 @@ bool SetupPayload::operator==(const SetupPayload & input) const
     }
 
     return true;
+}
+
+CHIP_ERROR SetupPayload::FromStringRepresentation(std::string stringRepresentation, std::vector<SetupPayload> & outPayloads)
+{
+    // We're going to assume that in practice all these allocations are small
+    // enough that allocation failure will not happen.  If that ever turns out
+    // to not be the case, we may need to figure out how to handle that.
+
+    // std::string::starts_with is C++20, sadly.
+    bool isQRCode = (stringRepresentation.rfind(kQRCodePrefix, 0) == 0);
+    if (!isQRCode)
+    {
+        outPayloads.clear();
+        auto & payload = outPayloads.emplace_back();
+        ReturnErrorOnFailure(ManualSetupPayloadParser(stringRepresentation).populatePayload(payload));
+        VerifyOrReturnError(payload.isValidManualCode(), CHIP_ERROR_INVALID_ARGUMENT);
+        return CHIP_NO_ERROR;
+    }
+
+    ReturnErrorOnFailure(QRCodeSetupPayloadParser(stringRepresentation).populatePayloads(outPayloads));
+
+    for (auto & entry : outPayloads)
+    {
+        VerifyOrReturnError(entry.isValidQRCodePayload(), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    return CHIP_NO_ERROR;
 }
 
 } // namespace chip

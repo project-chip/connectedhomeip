@@ -253,7 +253,7 @@ DefaultSceneHandlerImpl::SerializeAdd(EndpointId endpoint, const ExtensionFieldS
     size_t pairTotal = 0;
     // Verify size of list
     ReturnErrorOnFailure(extensionFieldSet.attributeValueList.ComputeSize(&pairTotal));
-    VerifyOrReturnError(pairTotal <= ArraySize(aVPairs), CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(pairTotal <= MATTER_ARRAY_SIZE(aVPairs), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     uint8_t pairCount  = 0;
     auto pair_iterator = extensionFieldSet.attributeValueList.begin();
@@ -280,7 +280,7 @@ CHIP_ERROR DefaultSceneHandlerImpl::Deserialize(EndpointId endpoint, ClusterId c
     // Verify size of list
     size_t pairTotal = 0;
     ReturnErrorOnFailure(attributeValueList.ComputeSize(&pairTotal));
-    VerifyOrReturnError(pairTotal <= ArraySize(mAVPairs), CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(pairTotal <= MATTER_ARRAY_SIZE(mAVPairs), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     uint8_t pairCount  = 0;
     auto pair_iterator = attributeValueList.begin();

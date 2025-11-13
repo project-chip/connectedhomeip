@@ -92,7 +92,7 @@ On Debian-based Linux distributions such as Ubuntu, these dependencies can be
 satisfied with the following command:
 
 ```
-sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
+sudo apt-get install git gcc g++ pkg-config cmake libssl-dev libdbus-1-dev \
      libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev \
      python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev \
      default-jre
@@ -131,7 +131,7 @@ Complete the following steps:
 1. Install some Raspberry Pi specific dependencies:
 
     ```
-    sudo apt-get install pi-bluetooth avahi-utils
+    sudo apt-get install bluez pi-bluetooth avahi-utils
     ```
 
 1. Reboot your Raspberry Pi after installing `pi-bluetooth`.
@@ -161,7 +161,7 @@ during the Matter commissioning process.
     ```ini
     [Service]
     ExecStart=
-    ExecStart=/usr/lib/bluetooth/bluetoothd -E -P battery
+    ExecStart=/usr/libexec/bluetooth/bluetoothd -E -P battery
     ```
 
 1. Restart the Bluetooth service by running the following command:
@@ -213,7 +213,7 @@ up in `$PATH`.
 
 ZAP releases are copied to CIPD by an automated bot. You can check if a release
 was copied by looking at tags created for
-[ZAP CIPD Packages](https://chrome-infra-packages.appspot.com/p/fuchsia/third_party/zap)
+[ZAP CIPD Packages](https://chrome-infra-packages.appspot.com/p/fuchsia/third_party/3pp/zap)
 in various platforms.
 
 ### Custom ZAP
@@ -333,6 +333,32 @@ ninja -C out/host src/inet/tests:tests_run
 >
 > This means that the tests passed in a previous build.
 
+## Building a single unit test
+
+To run a unit test, pass the target path to ninja in the form:
+"<platform>/phony/<src_path>/<test_file>.run" OR "<platform>/tests/<test_file>"
+
+-   `<platform>` is the build configuration directory, such as `linux_x64_clang`
+    for a Linux build using Clang. You can find this by looking at the
+    subdirectories in your `out/debug` build output.
+-   `<src_path>` is the relative path from the source root to the test file,
+    excluding the platform and file extension. For example, for a test located
+    at `src/transport/tests/TestSessionManagerDispatch.cpp`, the `src_path`
+    would be `src/transport/tests`.
+-   `<test_file>` is the name of the test source file (without extension), such
+    as `TestSessionManagerDispatch`.
+
+For example:
+
+```
+# Assuming `gn gen out/debug` has been run
+ninja -C out/debug mac_arm64_gcc/tests/TestSessionManagerDispatch
+
+# OR enter build directory:
+cd out/debug
+ninja linux_x64_clang/phony/src/transport/tests/TestSessionManagerDispatch.run
+```
+
 ## Using `build_examples.py`
 
 The script `./scripts/build/build_examples.py` provides a uniform build
@@ -393,8 +419,17 @@ executed manually.
 ./scripts/build/build_examples.py --target linux-x64-tests-clang-pw-fuzztest build
 ```
 
-NOTE: `asan` is enabled by default in FuzzTest, so please do not add it in
-build_examples.py invocation.
+> [!NOTE]  
+> `asan` is enabled by default in FuzzTest, so please do not add it in
+> `build_examples.py` invocation.
+
+> [!TIP]
+>
+> -   It is possible to build `FuzzTests` with Coverage instrumentation, by
+>     appending `-coverage` to the target, e.g.
+>     `linux-x64-tests-clang-pw-fuzztest-coverage`
+> -   Details:
+>     [Coverage Report Generation](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/fuzz_testing.md#coverage-report-generation)
 
 Tests will be located in:
 `out/linux-x64-tests-clang-pw-fuzztest/chip_pw_fuzztest/tests/` where
@@ -403,9 +438,9 @@ Tests will be located in:
 -   Details on How To Run Fuzz Tests in
     [Running FuzzTests](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/fuzz_testing.md#running-fuzztests)
 
-FAQ: In the event of a build failure related to missing files or dependencies
-for pw_fuzzer, check the
-[FuzzTest FAQ](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/fuzz_testing.md#FAQ)
+-   FAQ: In the event of a build failure related to missing files or
+    dependencies for pw_fuzzer, check the
+    [FuzzTest FAQ](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/fuzz_testing.md#FAQ)
 
 ## Build custom configuration
 
@@ -589,30 +624,77 @@ SDK source code has been executed. It also provides information on how often the
 Matter SDK executes segments of the code and produces a copy of the source file,
 annotated with execution frequencies.
 
-Run the following command to initiate the script:
+### How to Run
+
+```
+./scripts/build_coverage.sh [OPTIONS]
+```
+
+By default, the script
+
+Builds the Matter SDK with coverage instrumentation (unless you specify a custom
+--output_root). Runs the unit tests to generate coverage data. Produces an HTML
+coverage report located at:
+
+```
+out/coverage/coverage/html/index.html
+```
+
+You can extend the coverage scope and test types with the following options:
+
+Option Description -c, --code=<scope> Specify the scope to collect coverage
+data. - core (default): Coverage from the core Matter SDK stack - clusters:
+Coverage from cluster implementations - all: Coverage from the entire Matter SDK
+
+--yaml Also run YAML-based tests, in addition to unit tests.
+
+--python Also run Python-based tests, in addition to unit tests.
+
+-o, --output_root=DIR If specified, skip the build phase and only run coverage
+on the provided build output directory. This directory must have been built with
+use_coverage=true and have had tests run already.
+
+--target=<testname> When running unit tests, specifies a particular test target
+to run (e.g., TestEmberAttributeBuffer.run).
+
+-h, --help Print script usage and exit.
+
+### Examples
+
+Run coverage with the default scope (core) and only unit tests:
 
 ```
 ./scripts/build_coverage.sh
 ```
 
-By default, the code coverage script is performed at the unit testing level.
-Unit tests are created by developers, thus giving them the best overview of what
-tests to include in unit testing. You can extend the coverage test by scope and
-ways of execution with the following parameters:
+Run coverage including YAML tests (plus the always-enabled unit tests):
 
 ```
-  -c, --code                Specify which scope to collect coverage data.
-                            'core': collect coverage data from core stack in Matter SDK. --default
-                            'clusters': collect coverage data from clusters implementation in Matter SDK.
-                            'all': collect coverage data from Matter SDK.
-  -t, --tests               Specify which tools to run the coverage check.
-                            'unit': Run unit test to drive the coverage check. --default
-                            'yaml': Run yaml test to drive the coverage check.
-                            'all': Run unit & yaml test to drive the coverage check.
+./scripts/build_coverage.sh --yaml
 ```
 
-Also, see the up-to-date unit testing coverage report of the Matter SDK
-(collected daily) at:
+Run coverage including Python tests (plus the always-enabled unit tests):
+
+```
+./scripts/build_coverage.sh --python
+```
+
+Run coverage including both YAML and Python tests:
+
+```
+./scripts/build_coverage.sh --yaml --python
+```
+
+Change coverage scope to all (core + clusters) and run YAML tests:
+
+```
+./scripts/build_coverage.sh --code=all --yaml
+```
+
+### Viewing Coverage Results
+
+After the script completes, open the following file in your web browser to view
+the HTML coverage report:
 [matter coverage](https://matter-build-automation.ue.r.appspot.com).
 
 ## Maintaining Matter

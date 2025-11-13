@@ -20,6 +20,7 @@
 
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/BLEManager.h>
+#include <platform/internal/NFCCommissioningManager.h>
 
 #include <cstdlib>
 #include <new>
@@ -120,11 +121,6 @@ bool ConnectivityManagerImpl::_IsWiFiStationProvisioned()
 }
 
 void ConnectivityManagerImpl::_ClearWiFiStationProvision() {}
-
-bool ConnectivityManagerImpl::_CanStartWiFiScan()
-{
-    return false;
-}
 
 CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
 {

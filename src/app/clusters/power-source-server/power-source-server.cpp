@@ -26,6 +26,7 @@
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
+#include <clusters/PowerSource/Metadata.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -71,14 +72,9 @@ PowerSourceServer gPowerSourceServer;
 
 PowerSourceAttrAccess gAttrAccess;
 
-#ifdef ZCL_USING_POWER_SOURCE_CLUSTER_SERVER
 static constexpr uint16_t kNumStaticEndpoints = MATTER_DM_POWER_SOURCE_CLUSTER_SERVER_ENDPOINT_COUNT;
 #define POWER_SERVER_NUM_SUPPORTED_ENDPOINTS                                                                                       \
     (MATTER_DM_POWER_SOURCE_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
-#else
-static constexpr uint16_t kNumStaticEndpoints    = 0;
-#define POWER_SERVER_NUM_SUPPORTED_ENDPOINTS CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
-#endif
 static constexpr size_t kNumSupportedEndpoints = POWER_SERVER_NUM_SUPPORTED_ENDPOINTS;
 
 #if POWER_SERVER_NUM_SUPPORTED_ENDPOINTS > 0
@@ -92,6 +88,11 @@ PowerSourceClusterInfo * sPowerSourceClusterInfo = nullptr;
 void MatterPowerSourcePluginServerInitCallback()
 {
     AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
+}
+
+void MatterPowerSourcePluginServerShutdownCallback()
+{
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
 }
 
 namespace chip {
@@ -127,6 +128,10 @@ CHIP_ERROR PowerSourceAttrAccess::Read(const ConcreteReadAttributePath & aPath, 
         }
         break;
     }
+    case ClusterRevision::Id: {
+        err = aEncoder.Encode(PowerSource::kRevision);
+        break;
+    }
     default:
         break;
     }
@@ -159,13 +164,11 @@ CHIP_ERROR PowerSourceServer::SetEndpointList(EndpointId powerSourceClusterEndpo
     if (endpointList.size() == 0)
     {
         sPowerSourceClusterInfo[idx] = PowerSourceClusterInfo();
+        return CHIP_NO_ERROR;
     }
-    else
-    {
-        sPowerSourceClusterInfo[idx] = PowerSourceClusterInfo(powerSourceClusterEndpoint);
-        sPowerSourceClusterInfo[idx].SetEndpointList(endpointList);
-    }
-    return CHIP_NO_ERROR;
+
+    sPowerSourceClusterInfo[idx] = PowerSourceClusterInfo(powerSourceClusterEndpoint);
+    return sPowerSourceClusterInfo[idx].SetEndpointList(endpointList);
 }
 const Span<EndpointId> * PowerSourceServer::GetEndpointList(EndpointId powerSourceClusterEndpoint) const
 {

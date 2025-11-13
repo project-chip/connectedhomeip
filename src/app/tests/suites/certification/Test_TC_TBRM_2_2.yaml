@@ -41,6 +41,7 @@ tests:
           values:
               - name: nodeId
                 value: nodeId
+
     # Step 1
     - label: "TH reads the ActiveDatasetTimestamp attribute from the DUT"
       command: readAttribute
@@ -49,17 +50,47 @@ tests:
           value: null
 
     # Step 2
+    - label: "TH send a GetActiveDatasetRequest command to the DUT"
+      command: GetActiveDatasetRequest
+      response:
+          values:
+              - name: Dataset
+                value: ""
+
+    # Step 3
     - label: "TH reads the PendingDatasetTimestamp attribute from the DUT"
       command: readAttribute
       attribute: PendingDatasetTimestamp
       response:
           value: null
 
-    # Step 3
+    # Step 4
+    - label: "TH send a GetPendingDatasetRequest command to the DUT"
+      command: GetPendingDatasetRequest
+      response:
+          values:
+              - name: Dataset
+                value: ""
+
+    # Step 5
+    # Note: Unsupported with darwin-framework-tool because it automatically performs a timed invoke
+    - label:
+          "TH sends a valid ActiveDatasetRequest command to the DUT without a
+          timed interaction"
+      command: SetActiveDatasetRequest
+      arguments:
+          values:
+              - name: ActiveDataset
+                value: PIXIT.TBRM.THREAD_ACTIVE_DATASET
+      response:
+          error: NEEDS_TIMED_INTERACTION
+
+    # Step 6
     - label:
           "TH sends a valid ActiveDatasetRequest command to the DUT without
           having armed the fail-safe"
       command: SetActiveDatasetRequest
+      timedInteractionTimeoutMs: 2000
       arguments:
           values:
               - name: ActiveDataset
@@ -67,7 +98,7 @@ tests:
       response:
           error: FAILSAFE_REQUIRED
 
-    # Step 4
+    # Step 7
     - label: "TH sends ArmFailSafe command to the DUT"
       cluster: General Commissioning
       command: ArmFailSafe
@@ -83,9 +114,10 @@ tests:
               - name: ErrorCode
                 value: CommissioningErrorEnum.OK
 
-    # Step 5
+    # Step 8
     - label: "TH sends an invalid ActiveDatasetRequest command to the DUT"
       command: SetActiveDatasetRequest
+      timedInteractionTimeoutMs: 2000
       arguments:
           values:
               - name: ActiveDataset
@@ -93,28 +125,29 @@ tests:
       response:
           error: INVALID_COMMAND
 
-    # Step 6
+    # Step 9
     - label: "TH sends a valid ActiveDatasetRequest command to the DUT"
       command: SetActiveDatasetRequest
+      timedInteractionTimeoutMs: 2000
       arguments:
           values:
               - name: ActiveDataset
                 value: PIXIT.TBRM.THREAD_ACTIVE_DATASET
 
-    # Step 7
+    # Step 10
     - label: "TH sends CommissioningComplete command to the DUT"
       cluster: General Commissioning
       command: CommissioningComplete
       endpoint: 0
 
-    # Step 8
+    # Step 11
     - label: "TH reads the InterfaceEnabled attribute from the DUT"
       command: readAttribute
       attribute: InterfaceEnabled
       response:
           value: true
 
-    # Step 9
+    # Step 12
     - label: "TH reads the ActiveDatasetTimestamp attribute from the DUT"
       command: readAttribute
       attribute: ActiveDatasetTimestamp
@@ -123,7 +156,7 @@ tests:
           constraints:
               type: int64u
 
-    # Step 10
+    # Step 13
     - label: "TH send a GetActiveDatasetRequest command to the DUT"
       command: GetActiveDatasetRequest
       response:

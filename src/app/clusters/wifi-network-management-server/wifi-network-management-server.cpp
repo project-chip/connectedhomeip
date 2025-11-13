@@ -65,7 +65,7 @@ WiFiNetworkManagementServer::WiFiNetworkManagementServer(EndpointId endpoint) :
 WiFiNetworkManagementServer::~WiFiNetworkManagementServer()
 {
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
 }
 
 CHIP_ERROR WiFiNetworkManagementServer::Init()
@@ -80,7 +80,7 @@ CHIP_ERROR WiFiNetworkManagementServer::ClearNetworkCredentials()
     VerifyOrReturnError(HaveNetworkCredentials(), CHIP_NO_ERROR);
 
     mSsidLen = 0;
-    mPassphrase.SetLength(0);
+    TEMPORARY_RETURN_IGNORED mPassphrase.SetLength(0);
     MatterReportingAttributeChangeCallback(GetEndpointId(), WiFiNetworkManagement::Id, Ssid::Id);
     return CHIP_NO_ERROR;
 }
@@ -97,7 +97,7 @@ CHIP_ERROR WiFiNetworkManagementServer::SetNetworkCredentials(ByteSpan ssid, Byt
     memcpy(mSsid, ssid.data(), ssid.size());
     mSsidLen = static_cast<decltype(mSsidLen)>(ssid.size());
 
-    VerifyOrDie(mPassphrase.SetLength(passphrase.size()) == CHIP_NO_ERROR);
+    TEMPORARY_RETURN_IGNORED mPassphrase.SetLength(passphrase.size());
     memcpy(mPassphrase.Bytes(), passphrase.data(), passphrase.size());
 
     if (ssidChanged)
@@ -166,3 +166,4 @@ void WiFiNetworkManagementServer::HandleNetworkPassphraseRequest(HandlerContext 
 } // namespace chip
 
 void MatterWiFiNetworkManagementPluginServerInitCallback() {}
+void MatterWiFiNetworkManagementPluginServerShutdownCallback() {}

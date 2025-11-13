@@ -19,7 +19,7 @@ config("include_providers_dir") {
   include_dirs = [ "." ]
 }
 
-static_library("device_info_provider") {
+static_library("device_info_provider_please_do_not_reuse_as_is") {
   output_name = "libMatterDeviceInfoProviderExample"
   output_dir = "${root_out_dir}/lib"
 
@@ -29,6 +29,41 @@ static_library("device_info_provider") {
   ]
 
   public_deps = [
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform",
+  ]
+
+  public_configs = [ ":include_providers_dir" ]
+}
+
+static_library("all_clusters_device_info_provider") {
+  output_name = "libMatterAllClustersDeviceInfoProviderExample"
+  output_dir = "${root_out_dir}/lib"
+
+  sources = [
+    "AllClustersExampleDeviceInfoProviderImpl.cpp",
+    "AllClustersExampleDeviceInfoProviderImpl.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform",
+  ]
+
+  public_configs = [ ":include_providers_dir" ]
+}
+
+static_library("all_devices_device_info_provider") {
+  output_name = "libMatterAllDevicesDeviceInfoProviderExample"
+  output_dir = "${root_out_dir}/lib"
+
+  sources = [
+    "AllDevicesExampleDeviceInfoProviderImpl.cpp",
+    "AllDevicesExampleDeviceInfoProviderImpl.h",
+  ]
+
+  public_deps = [
+    ":all_clusters_device_info_provider",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
   ]

@@ -19,11 +19,9 @@
 #include "LightingAppCommandDelegate.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
-#include <app/clusters/software-diagnostics-server/software-diagnostics-server.h>
-#include <app/clusters/switch-server/switch-server.h>
+#include <app/clusters/general-diagnostics-server/CodegenIntegration.h>
+#include <app/clusters/software-diagnostics-server/software-fault-listener.h>
 #include <app/server/Server.h>
-#include <app/util/att-storage.h>
 #include <app/util/attribute-storage.h>
 #include <platform/PlatformManager.h>
 
@@ -83,43 +81,6 @@ void LightingAppCommandHandler::HandleCommand(intptr_t context)
     else if (name == "NetworkFaultChange")
     {
         self->OnGeneralFaultEventHandler(Clusters::GeneralDiagnostics::Events::NetworkFaultChange::Id);
-    }
-    else if (name == "SwitchLatched")
-    {
-        uint8_t newPosition = static_cast<uint8_t>(self->mJsonValue["NewPosition"].asUInt());
-        self->OnSwitchLatchedHandler(newPosition);
-    }
-    else if (name == "InitialPress")
-    {
-        uint8_t newPosition = static_cast<uint8_t>(self->mJsonValue["NewPosition"].asUInt());
-        self->OnSwitchInitialPressedHandler(newPosition);
-    }
-    else if (name == "LongPress")
-    {
-        uint8_t newPosition = static_cast<uint8_t>(self->mJsonValue["NewPosition"].asUInt());
-        self->OnSwitchLongPressedHandler(newPosition);
-    }
-    else if (name == "ShortRelease")
-    {
-        uint8_t previousPosition = static_cast<uint8_t>(self->mJsonValue["PreviousPosition"].asUInt());
-        self->OnSwitchShortReleasedHandler(previousPosition);
-    }
-    else if (name == "LongRelease")
-    {
-        uint8_t previousPosition = static_cast<uint8_t>(self->mJsonValue["PreviousPosition"].asUInt());
-        self->OnSwitchLongReleasedHandler(previousPosition);
-    }
-    else if (name == "MultiPressOngoing")
-    {
-        uint8_t newPosition = static_cast<uint8_t>(self->mJsonValue["NewPosition"].asUInt());
-        uint8_t count       = static_cast<uint8_t>(self->mJsonValue["CurrentNumberOfPressesCounted"].asUInt());
-        self->OnSwitchMultiPressOngoingHandler(newPosition, count);
-    }
-    else if (name == "MultiPressComplete")
-    {
-        uint8_t previousPosition = static_cast<uint8_t>(self->mJsonValue["PreviousPosition"].asUInt());
-        uint8_t count            = static_cast<uint8_t>(self->mJsonValue["TotalNumberOfPressesCounted"].asUInt());
-        self->OnSwitchMultiPressCompleteHandler(previousPosition, count);
     }
     else if (name == "PowerOnReboot")
     {
@@ -194,7 +155,7 @@ void LightingAppCommandHandler::OnGeneralFaultEventHandler(uint32_t eventId)
         ReturnOnFailure(current.add(to_underlying(HardwareFaultEnum::kSensor)));
         ReturnOnFailure(current.add(to_underlying(HardwareFaultEnum::kPowerSource)));
         ReturnOnFailure(current.add(to_underlying(HardwareFaultEnum::kUserInterfaceFault)));
-        Clusters::GeneralDiagnosticsServer::Instance().OnHardwareFaultsDetect(previous, current);
+        Clusters::GeneralDiagnostics::GlobalNotifyHardwareFaultsDetect(previous, current);
     }
     else if (eventId == Clusters::GeneralDiagnostics::Events::RadioFaultChange::Id)
     {
@@ -209,7 +170,7 @@ void LightingAppCommandHandler::OnGeneralFaultEventHandler(uint32_t eventId)
         ReturnOnFailure(current.add(to_underlying(GeneralDiagnostics::RadioFaultEnum::kCellularFault)));
         ReturnOnFailure(current.add(to_underlying(GeneralDiagnostics::RadioFaultEnum::kThreadFault)));
         ReturnOnFailure(current.add(to_underlying(GeneralDiagnostics::RadioFaultEnum::kNFCFault)));
-        Clusters::GeneralDiagnosticsServer::Instance().OnRadioFaultsDetect(previous, current);
+        Clusters::GeneralDiagnostics::GlobalNotifyRadioFaultsDetect(previous, current);
     }
     else if (eventId == Clusters::GeneralDiagnostics::Events::NetworkFaultChange::Id)
     {
@@ -223,7 +184,7 @@ void LightingAppCommandHandler::OnGeneralFaultEventHandler(uint32_t eventId)
         ReturnOnFailure(current.add(to_underlying(Clusters::GeneralDiagnostics::NetworkFaultEnum::kHardwareFailure)));
         ReturnOnFailure(current.add(to_underlying(Clusters::GeneralDiagnostics::NetworkFaultEnum::kNetworkJammed)));
         ReturnOnFailure(current.add(to_underlying(Clusters::GeneralDiagnostics::NetworkFaultEnum::kConnectionFailed)));
-        Clusters::GeneralDiagnosticsServer::Instance().OnNetworkFaultsDetect(previous, current);
+        Clusters::GeneralDiagnostics::GlobalNotifyNetworkFaultsDetect(previous, current);
     }
     else
     {
@@ -255,99 +216,7 @@ void LightingAppCommandHandler::OnSoftwareFaultEventHandler(uint32_t eventId)
         softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(timeChar), strlen(timeChar)));
     }
 
-    Clusters::SoftwareDiagnosticsServer::Instance().OnSoftwareFaultDetect(softwareFault);
-}
-
-void LightingAppCommandHandler::OnSwitchLatchedHandler(uint8_t newPosition)
-{
-    EndpointId endpoint = 0;
-
-    Protocols::InteractionModel::Status status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
-    VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
-                   ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
-    ChipLogDetail(NotSpecified, "The latching switch is moved to a new position:%d", newPosition);
-
-    Clusters::SwitchServer::Instance().OnSwitchLatch(endpoint, newPosition);
-}
-
-void LightingAppCommandHandler::OnSwitchInitialPressedHandler(uint8_t newPosition)
-{
-    EndpointId endpoint = 0;
-
-    Protocols::InteractionModel::Status status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
-    VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
-                   ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
-    ChipLogDetail(NotSpecified, "The new position when the momentary switch starts to be pressed:%d", newPosition);
-
-    Clusters::SwitchServer::Instance().OnInitialPress(endpoint, newPosition);
-}
-
-void LightingAppCommandHandler::OnSwitchLongPressedHandler(uint8_t newPosition)
-{
-    EndpointId endpoint = 0;
-
-    Protocols::InteractionModel::Status status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
-    VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
-                   ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
-    ChipLogDetail(NotSpecified, "The new position when the momentary switch has been pressed for a long time:%d", newPosition);
-
-    Clusters::SwitchServer::Instance().OnLongPress(endpoint, newPosition);
-}
-
-void LightingAppCommandHandler::OnSwitchShortReleasedHandler(uint8_t previousPosition)
-{
-    EndpointId endpoint = 0;
-
-    Protocols::InteractionModel::Status status = Switch::Attributes::CurrentPosition::Set(endpoint, 0);
-    VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
-                   ChipLogError(NotSpecified, "Failed to reset CurrentPosition attribute"));
-    ChipLogDetail(NotSpecified, "The the previous value of the CurrentPosition when the momentary switch has been released:%d",
-                  previousPosition);
-
-    Clusters::SwitchServer::Instance().OnShortRelease(endpoint, previousPosition);
-}
-
-void LightingAppCommandHandler::OnSwitchLongReleasedHandler(uint8_t previousPosition)
-{
-    EndpointId endpoint = 0;
-
-    Protocols::InteractionModel::Status status = Switch::Attributes::CurrentPosition::Set(endpoint, 0);
-    VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
-                   ChipLogError(NotSpecified, "Failed to reset CurrentPosition attribute"));
-    ChipLogDetail(NotSpecified,
-                  "The the previous value of the CurrentPosition when the momentary switch has been released after having been "
-                  "pressed for a long time:%d",
-                  previousPosition);
-
-    Clusters::SwitchServer::Instance().OnLongRelease(endpoint, previousPosition);
-}
-
-void LightingAppCommandHandler::OnSwitchMultiPressOngoingHandler(uint8_t newPosition, uint8_t count)
-{
-    EndpointId endpoint = 0;
-
-    Protocols::InteractionModel::Status status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
-    VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
-                   ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
-    ChipLogDetail(NotSpecified, "The new position when the momentary switch has been pressed in a multi-press sequence:%d",
-                  newPosition);
-    ChipLogDetail(NotSpecified, "%d times the momentary switch has been pressed", count);
-
-    Clusters::SwitchServer::Instance().OnMultiPressOngoing(endpoint, newPosition, count);
-}
-
-void LightingAppCommandHandler::OnSwitchMultiPressCompleteHandler(uint8_t previousPosition, uint8_t count)
-{
-    EndpointId endpoint = 0;
-
-    Protocols::InteractionModel::Status status = Switch::Attributes::CurrentPosition::Set(endpoint, 0);
-    VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
-                   ChipLogError(NotSpecified, "Failed to reset CurrentPosition attribute"));
-    ChipLogDetail(NotSpecified, "The previous position when the momentary switch has been pressed in a multi-press sequence:%d",
-                  previousPosition);
-    ChipLogDetail(NotSpecified, "%d times the momentary switch has been pressed", count);
-
-    Clusters::SwitchServer::Instance().OnMultiPressComplete(endpoint, previousPosition, count);
+    Clusters::SoftwareDiagnostics::SoftwareFaultListener::GlobalNotifySoftwareFaultDetect(softwareFault);
 }
 
 void LightingAppCommandDelegate::OnEventCommandReceived(const char * json)

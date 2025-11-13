@@ -57,6 +57,10 @@ public:
     void SetAddTrustedRootCertInvoked() { mAddTrustedRootCertHasBeenInvoked = true; }
     void SetCsrRequestForUpdateNoc(bool isForUpdateNoc) { mIsCsrRequestForUpdateNoc = isForUpdateNoc; }
     void SetUpdateTermsAndConditionsHasBeenInvoked() { mUpdateTermsAndConditionsHasBeenInvoked = true; }
+    void RecordSetVidVerificationStatementHasBeenInvoked() { mSetVidVerificationStatementHasBeenInvoked = true; }
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    void SetAddICACHasBeenInvoked() { mAddICACHasBeenInvoked = true; }
+#endif
 
     /**
      * @brief
@@ -92,7 +96,11 @@ public:
     bool UpdateNocCommandHasBeenInvoked() const { return mUpdateNocCommandHasBeenInvoked; }
     bool AddTrustedRootCertHasBeenInvoked() const { return mAddTrustedRootCertHasBeenInvoked; }
     bool IsCsrRequestForUpdateNoc() const { return mIsCsrRequestForUpdateNoc; }
-    bool UpdateTermsAndConditionsHasBeenInvoked() { return mUpdateTermsAndConditionsHasBeenInvoked; }
+    bool UpdateTermsAndConditionsHasBeenInvoked() const { return mUpdateTermsAndConditionsHasBeenInvoked; }
+    bool HasSetVidVerificationStatementHasBeenInvoked() const { return mSetVidVerificationStatementHasBeenInvoked; }
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    bool AddICACCommandHasBeenInvoked() const { return mAddICACHasBeenInvoked; }
+#endif
 
     FabricIndex GetFabricIndex() const
     {
@@ -111,9 +119,13 @@ private:
     bool mUpdateNocCommandHasBeenInvoked   = false;
     bool mAddTrustedRootCertHasBeenInvoked = false;
     // The fact of whether a CSR occurred at all is stored elsewhere.
-    bool mIsCsrRequestForUpdateNoc               = false;
-    FabricIndex mFabricIndex                     = kUndefinedFabricIndex;
-    bool mUpdateTermsAndConditionsHasBeenInvoked = false;
+    bool mIsCsrRequestForUpdateNoc                  = false;
+    FabricIndex mFabricIndex                        = kUndefinedFabricIndex;
+    bool mUpdateTermsAndConditionsHasBeenInvoked    = false;
+    bool mSetVidVerificationStatementHasBeenInvoked = false;
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    bool mAddICACHasBeenInvoked = false;
+#endif
 
     /**
      * @brief
@@ -143,16 +155,19 @@ private:
     {
         SetFailSafeArmed(false);
 
-        mAddNocCommandHasBeenInvoked            = false;
-        mUpdateNocCommandHasBeenInvoked         = false;
-        mAddTrustedRootCertHasBeenInvoked       = false;
-        mFailSafeBusy                           = false;
-        mIsCsrRequestForUpdateNoc               = false;
-        mUpdateTermsAndConditionsHasBeenInvoked = false;
+        mAddNocCommandHasBeenInvoked               = false;
+        mUpdateNocCommandHasBeenInvoked            = false;
+        mAddTrustedRootCertHasBeenInvoked          = false;
+        mFailSafeBusy                              = false;
+        mIsCsrRequestForUpdateNoc                  = false;
+        mUpdateTermsAndConditionsHasBeenInvoked    = false;
+        mSetVidVerificationStatementHasBeenInvoked = false;
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+        mAddICACHasBeenInvoked = false;
+#endif
     }
 
     void FailSafeTimerExpired();
-    CHIP_ERROR CommitToStorage();
 };
 
 } // namespace app

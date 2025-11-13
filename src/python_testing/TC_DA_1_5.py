@@ -37,11 +37,6 @@
 
 import random
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, hex_from_bytes, type_matches
-from chip.tlv import TLVReader
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import ec, utils
@@ -50,6 +45,13 @@ from mobly import asserts
 from pyasn1.codec.der.decoder import decode as der_decoder
 from pyasn1.error import PyAsn1Error
 from pyasn1_modules import rfc2986, rfc3279, rfc5480
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.conversions import hex_from_bytes
+from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
+from matter.tlv import TLVReader
 
 
 class TC_DA_1_5(MatterBaseTest):
@@ -69,7 +71,7 @@ class TC_DA_1_5(MatterBaseTest):
         self.print_step(3, "Send CertificateChainRequest for DAC")
         certtype = opcreds.Enums.CertificateChainTypeEnum.kDACCertificate
         dac_resp = await self.send_single_cmd(cmd=opcreds.Commands.CertificateChainRequest(certificateType=certtype))
-        asserts.assert_true(type_matches(dac_resp, opcreds.Commands.CertificateChainResponse),
+        asserts.assert_true(matchers.is_type(dac_resp, opcreds.Commands.CertificateChainResponse),
                             "Certificate request returned incorrect type")
         der_dac = dac_resp.certificate
         # This throws an exception for a non-x509 cert
@@ -173,9 +175,10 @@ class TC_DA_1_5(MatterBaseTest):
         await self.send_single_cmd(cmd=gcomm.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=1))
 
         self.print_step(11, "Send CSRRequest wtih 31-byte nonce")
-        bad_nonce = random.randbytes(32)
+        bad_nonce = random.randbytes(31)
         try:
             await self.send_single_cmd(cmd=opcreds.Commands.CSRRequest(CSRNonce=bad_nonce, isForUpdateNOC=False))
+            asserts.fail("CSRRequest with 31-byte nonce was expected to fail but succeeded")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.InvalidCommand, "Received incorrect error from CSRRequest command with bad nonce")
 
@@ -184,7 +187,7 @@ class TC_DA_1_5(MatterBaseTest):
 
         self.print_step(13, "Open commissioning window")
         params = await self.default_controller.OpenCommissioningWindow(
-            nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=1234, option=1)
+            nodeId=self.dut_node_id, timeout=600, iteration=10000, discriminator=1234, option=1)
 
         self.print_step(14, "Commission to TH2")
         new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()

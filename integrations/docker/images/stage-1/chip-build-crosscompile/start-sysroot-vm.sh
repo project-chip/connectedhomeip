@@ -110,13 +110,25 @@ hostname: sysrootsrv
 package_update: true
 package_upgrade: true
 packages:
+  - curl
+  - ffmpeg
   - g++
   - gcc
+  - gstreamer1.0-plugins-base
+  - gstreamer1.0-tools
   - libavahi-client-dev
+  - libavcodec-dev
+  - libavformat-dev
+  - libavutil-dev
   - libcairo2-dev
+  - libcurl4-openssl-dev
   - libdbus-1-dev
   - libgirepository1.0-dev
   - libglib2.0-dev
+  - libgstreamer1.0-0
+  - libgstreamer1.0-dev
+  - libgstreamer-plugins-base1.0-dev
+  - libpcsclite-dev
   - libreadline-dev
   - libsdl2-dev
   - libssl-dev

@@ -137,7 +137,7 @@ CHIP_ERROR PSOC6Utils::StartWiFiLayer(void)
         if (result != CY_RSLT_SUCCESS)
         {
             err = CHIP_ERROR_INTERNAL;
-            ChipLogError(DeviceLayer, "StartWiFiLayer() PSOC6 Wi-Fi Started Failed: %s", chip::ErrorStr(err));
+            ChipLogError(DeviceLayer, "StartWiFiLayer() PSOC6 Wi-Fi Started Failed: %" CHIP_ERROR_FORMAT, err.Format());
             SuccessOrExit(err);
         }
         wcm_init_done = true;

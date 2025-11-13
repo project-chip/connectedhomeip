@@ -163,7 +163,7 @@ class ClangTidyEntry:
                 for line in err.decode("utf-8").split("\n"):
                     line = line.strip()
 
-                    if any(map(lambda s: s in line, skip_strings)):
+                    if any((s in line for s in skip_strings)):
                         continue
 
                     if not line:
@@ -207,16 +207,24 @@ class TidyState:
 
 
 def find_darwin_gcc_sysroot():
-    for line in subprocess.check_output(
-        "xcodebuild -sdk -version".split(), text=True
-    ).splitlines():
-        if not line.startswith("Path: "):
-            continue
-        path = line[line.find(": ") + 2:]
-        if "/MacOSX.platform/" not in path:
-            continue
-        logging.info("Found %s" % path)
-        return path
+    try:
+        for line in subprocess.check_output(
+            "xcodebuild -sdk macosx -version".split(), text=True
+        ).splitlines():
+            if not line.startswith("Path: "):
+                continue
+            path = line[line.find(": ") + 2:]
+            logging.info("Found %s" % path)
+            return path.strip()
+    except Exception:
+        # lets try with xcrun
+        try:
+            path = subprocess.check_output(
+                "xcrun --sdk macosx --show-sdk-path".split(), text=True
+            )
+            return path.strip()
+        except Exception:
+            pass
 
     # A hard-coded value that works on default installations
     logging.warning("Using default platform sdk path. This may be incorrect.")
@@ -363,7 +371,7 @@ class ClangTidyRunner:
 __LOG_LEVELS__ = {
     "debug": logging.DEBUG,
     "info": logging.INFO,
-    "warn": logging.WARN,
+    "warn": logging.WARNING,
     "fatal": logging.FATAL,
 }
 
@@ -488,7 +496,7 @@ def cmd_check(context):
         sys.exit(1)
 
 
-@main.command("fix", help="Run check followd by fix")
+@main.command("fix", help="Run check followed by fix")
 @click.pass_context
 def cmd_fix(context):
     runner = context.obj

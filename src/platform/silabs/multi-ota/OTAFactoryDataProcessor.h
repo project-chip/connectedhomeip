@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <ProvisionManager.h>
-#include <ProvisionStorage.h>
+#include <headers/ProvisionManager.h>
+#include <headers/ProvisionStorage.h>
 #include <lib/core/Optional.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
@@ -62,8 +62,6 @@ enum class FactoryTags
 class OTAFactoryDataProcessor : public OTATlvProcessor
 {
 public:
-    CHIP_ERROR Init() override;
-    CHIP_ERROR Clear() override;
     CHIP_ERROR ApplyAction() override;
     CHIP_ERROR FinalizeAction() override;
 
@@ -74,8 +72,9 @@ private:
     CHIP_ERROR UpdateValue(uint8_t tag, ByteSpan & newValue);
 
     OTAFactoryPayload mPayload;
-    OTADataAccumulator mAccumulator;
     uint8_t * mFactoryData = nullptr;
-};
 
+protected:
+    uint32_t GetAccumulatorLength() const override { return mLength; }
+};
 } // namespace chip

@@ -2,3 +2,8 @@ mobly
 pyasn1
 pyasn1_modules
 zeroconf
+ifaddr
+langcodes
+requests
+pyscard
+ndeflib

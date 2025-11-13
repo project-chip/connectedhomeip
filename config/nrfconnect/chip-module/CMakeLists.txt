@@ -41,6 +41,11 @@ include(generate_factory_data.cmake)
 if (NOT CHIP_ROOT)
     get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../.. REALPATH)
 endif()
+
+if (NOT CHIP_APP_ZAP_DIR)
+    get_filename_component(CHIP_APP_ZAP_DIR ${CHIP_ROOT}/zzz_generated/app-common REALPATH)
+endif()
+
 get_filename_component(GN_ROOT_TARGET ${CHIP_ROOT}/config/nrfconnect/chip-gn REALPATH)
 get_filename_component(COMMON_CMAKE_SOURCE_DIR ${CHIP_ROOT}/config/common/cmake REALPATH)
 
@@ -62,13 +67,20 @@ endif()
 
 if (CONFIG_NRF_SECURITY)
     zephyr_include_directories($<TARGET_PROPERTY:mbedtls_external,INTERFACE_INCLUDE_DIRECTORIES>)
-    zephyr_include_directories($<TARGET_PROPERTY:mbedcrypto_common,INTERFACE_INCLUDE_DIRECTORIES>)
+
+    if(CONFIG_BUILD_WITH_TFM)
+        zephyr_include_directories($<TARGET_PROPERTY:psa_crypto_config,INTERFACE_INCLUDE_DIRECTORIES>)
+    else()
+        zephyr_include_directories($<TARGET_PROPERTY:psa_crypto_library_config,INTERFACE_INCLUDE_DIRECTORIES>)
+        matter_add_flags(-DMBEDTLS_PSA_CRYPTO_USER_CONFIG_FILE=<nrf-psa-crypto-user-config.h>)
+    endif()
+
+    zephyr_include_directories($<TARGET_PROPERTY:psa_interface,INTERFACE_INCLUDE_DIRECTORIES>)
     if(TARGET platform_cc3xx)
         zephyr_include_directories($<TARGET_PROPERTY:platform_cc3xx,INTERFACE_INCLUDE_DIRECTORIES>)
     endif()
     matter_add_flags(-DMBEDTLS_CONFIG_FILE=<nrf-config.h>)
-    matter_add_flags(-DMBEDTLS_PSA_CRYPTO_CONFIG_FILE=<nrf-psa-crypto-want-config.h>)
-    matter_add_flags(-DMBEDTLS_PSA_CRYPTO_USER_CONFIG_FILE=<nrf-psa-crypto-config.h>)
+    matter_add_flags(-DMBEDTLS_PSA_CRYPTO_CONFIG_FILE=<nrf-psa-crypto-config.h>)
 elseif(CONFIG_MBEDTLS)
     zephyr_include_directories($<TARGET_PROPERTY:mbedTLS,INTERFACE_INCLUDE_DIRECTORIES>)
     zephyr_compile_definitions($<TARGET_PROPERTY:mbedTLS,INTERFACE_COMPILE_DEFINITIONS>)
@@ -76,6 +88,11 @@ endif()
 
 if (CONFIG_NRF_802154_RADIO_DRIVER)
     zephyr_include_directories($<TARGET_PROPERTY:nrf-802154-driver-interface,INTERFACE_INCLUDE_DIRECTORIES>)
+endif()
+
+if (CONFIG_CHIP_LOG_FILE_NAME)
+    zephyr_compile_definitions(__FILE__=__FILE_NAME__)
+    zephyr_compile_options(-Wno-builtin-macro-redefined)
 endif()
 
 zephyr_get_compile_flags(ZEPHYR_CFLAGS_C C)
@@ -88,7 +105,7 @@ matter_add_cxxflags(${ZEPHYR_GNU_CPP_STD})
 # Set up custom OpenThread configuration
 
 if (CONFIG_CHIP_OPENTHREAD_CONFIG)
-    get_filename_component(CHIP_OPENTHREAD_CONFIG 
+    get_filename_component(CHIP_OPENTHREAD_CONFIG
         ${CONFIG_CHIP_OPENTHREAD_CONFIG}
         REALPATH
         BASE_DIR ${CMAKE_SOURCE_DIR}
@@ -120,12 +137,13 @@ matter_common_gn_args(
 matter_add_gn_arg_string("zephyr_ar"                              ${CMAKE_AR})
 matter_add_gn_arg_string("zephyr_cc"                              ${CMAKE_C_COMPILER})
 matter_add_gn_arg_string("zephyr_cxx"                             ${CMAKE_CXX_COMPILER})
+matter_add_gn_arg_string("chip_app_zap_dir"                       ${CHIP_APP_ZAP_DIR})
 matter_add_gn_arg_bool  ("chip_logging"                           CONFIG_LOG)
 matter_add_gn_arg_bool  ("chip_enable_openthread"                 CONFIG_NET_L2_OPENTHREAD)
 matter_add_gn_arg_bool  ("chip_openthread_ftd"                    CONFIG_OPENTHREAD_FTD)
 matter_add_gn_arg_bool  ("chip_config_network_layer_ble"          CONFIG_BT)
 matter_add_gn_arg_bool  ("chip_inet_config_enable_ipv4"           CONFIG_CHIP_IPV4)
-matter_add_gn_arg_bool  ("chip_enable_nfc"                        CONFIG_CHIP_NFC_COMMISSIONING)
+matter_add_gn_arg_bool  ("chip_enable_nfc_onboarding_payload"     CONFIG_CHIP_NFC_ONBOARDING_PAYLOAD)
 matter_add_gn_arg_bool  ("chip_enable_ota_requestor"              CONFIG_CHIP_OTA_REQUESTOR)
 matter_add_gn_arg_bool  ("chip_persist_subscriptions"             CONFIG_CHIP_PERSISTENT_SUBSCRIPTIONS)
 matter_add_gn_arg_bool  ("chip_monolithic_tests"                  CONFIG_CHIP_BUILD_TESTS)
@@ -135,19 +153,23 @@ matter_add_gn_arg_bool  ("chip_progress_logging"                  CONFIG_MATTER_
 matter_add_gn_arg_bool  ("chip_detail_logging"                    CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 4)
 matter_add_gn_arg_bool  ("chip_automation_logging"                FALSE)
 matter_add_gn_arg_bool  ("chip_malloc_sys_heap"                   CONFIG_CHIP_MALLOC_SYS_HEAP)
-matter_add_gn_arg_bool  ("chip_enable_wifi"                       CONFIG_WIFI_NRF700X)
+matter_add_gn_arg_bool  ("chip_enable_wifi"                       CONFIG_WIFI_NRF70)
 matter_add_gn_arg_bool  ("chip_system_config_provide_statistics"  CONFIG_CHIP_STATISTICS)
 matter_add_gn_arg_bool  ("chip_enable_icd_server"                 CONFIG_CHIP_ENABLE_ICD_SUPPORT)
 matter_add_gn_arg_bool  ("chip_enable_factory_data"               CONFIG_CHIP_FACTORY_DATA)
 matter_add_gn_arg_bool  ("chip_enable_read_client"                CONFIG_CHIP_ENABLE_READ_CLIENT)
-matter_add_gn_arg_bool  ("chip_mdns_minimal"                      CONFIG_WIFI_NRF700X)
+matter_add_gn_arg_bool  ("chip_mdns_minimal"                      CONFIG_WIFI_NRF70)
 matter_add_gn_arg_bool  ("chip_mdns_platform"                     CONFIG_NET_L2_OPENTHREAD)
+
+matter_add_gn_arg_bool  ("chip_system_config_use_sockets"                   NOT CONFIG_CHIP_USE_OPENTHREAD_ENDPOINT)
+matter_add_gn_arg_bool  ("chip_system_config_use_openthread_inet_endpoints" CONFIG_CHIP_USE_OPENTHREAD_ENDPOINT)
 
 if (CONFIG_CHIP_ENABLE_ICD_SUPPORT)
     matter_add_gn_arg_bool  ("chip_enable_icd_lit"                       CONFIG_CHIP_ICD_LIT_SUPPORT)
     matter_add_gn_arg_bool  ("chip_enable_icd_checkin"                   CONFIG_CHIP_ICD_CHECK_IN_SUPPORT)
     matter_add_gn_arg_bool  ("chip_enable_icd_user_active_mode_trigger"  CONFIG_CHIP_ICD_UAT_SUPPORT)
     matter_add_gn_arg_bool  ("chip_enable_icd_dsls"                      CONFIG_CHIP_ICD_DSLS_SUPPORT)
+    matter_add_gn_arg_bool  ("chip_icd_report_on_active_mode"            CONFIG_CHIP_ICD_REPORT_ON_ACTIVE_MODE)
 endif()
 
 if (CONFIG_CHIP_FACTORY_DATA OR CONFIG_CHIP_FACTORY_DATA_CUSTOM_BACKEND)
@@ -160,7 +182,7 @@ if (CONFIG_CHIP_ROTATING_DEVICE_ID)
     matter_add_gn_arg_bool("chip_enable_additional_data_advertising" TRUE)
 endif()
 
-if(CONFIG_WIFI_NRF700X)
+if(CONFIG_WIFI_NRF70)
     matter_add_gn_arg_string("chip_mdns" "minimal")
 elseif (CONFIG_NET_L2_OPENTHREAD)
     matter_add_gn_arg_string("chip_mdns" "platform")
@@ -169,18 +191,24 @@ else()
 endif()
 
 if (CONFIG_CHIP_CRYPTO_PSA)
-    matter_add_gn_arg_string("chip_crypto"             "psa")
-    matter_add_gn_arg_bool  ("chip_crypto_psa_spake2p" CONFIG_PSA_WANT_ALG_SPAKE2P_MATTER)
+    matter_add_gn_arg_string("chip_crypto"                      "psa")
+    matter_add_gn_arg_bool  ("chip_crypto_psa_spake2p"          CONFIG_PSA_WANT_ALG_SPAKE2P_MATTER)
+    matter_add_gn_arg_bool  ("chip_crypto_psa_aead_single_part" CONFIG_CHIP_CRYPTO_PSA_AEAD_SINGLE_PART)
+    matter_add_gn_arg_bool  ("chip_use_cracen_kmu"              CONFIG_CHIP_STORE_KEYS_IN_KMU)
 endif()
 
-if (BOARD STREQUAL "native_posix")
+if (BOARD STREQUAL "native_sim")
     matter_add_gn_arg_string("target_cpu" "x86")
-elseif (BOARD STREQUAL "native_posix_64")
+elseif (BOARD STREQUAL "native_sim/native/64")
     matter_add_gn_arg_string("target_cpu" "x64")
 endif()
 
 if (NOT CONFIG_CHIP_DEBUG_SYMBOLS)
     matter_add_gn_arg_string("symbol_level" "0")
+endif()
+
+if (CONFIG_CHIP_LOG_FILE_NAME)
+    matter_add_gn_arg_bool("warn_builtin_macro_redefined" FALSE)
 endif()
 
 if (CHIP_COMPILER_LAUNCHER)
@@ -194,17 +222,36 @@ if (CONFIG_CHIP_PW_RPC)
     matter_add_gn_arg("pw_build_LINK_DEPS" [\"${PIGWEED_DIR}/pw_assert:impl\",\ \"${PIGWEED_DIR}/pw_log:impl\"])
 endif()
 
+# Inform users that they use not-optimized settings backend for the nRF54LX series.
+if(CONFIG_SOC_SERIES_NRF54LX AND CONFIG_SETTINGS_NVS)
+    message(WARNING "
+    The nRF54L series is not optimized for the NVS settings backend due to RRAM specifications.
+    Consider using the CONFIG_SETTINGS_ZMS Kconfig option, which is recommended for this type of non-volatile memory.")
+endif()
+
 matter_generate_args_tmp_file()
 
 # ==============================================================================
 # Build chip library
 # ==============================================================================
 
+# Create Data Model target
+add_library(matter-data-model STATIC)
+
 matter_build(chip
     LIB_TESTS   ${CONFIG_CHIP_BUILD_TESTS}
     DEVICE_INFO_EXAMPLE_PROVIDER ${CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER}
     GN_DEPENDENCIES kernel
+    LINK_TARGETS matter-data-model
 )
+
+# Configure Data Model target
+target_link_libraries(matter-data-model PUBLIC zephyr_interface chip)
+add_dependencies(app matter-data-model)
+
+# Add empty C source to Data Model target to avoid CMake error due to no sources added to target
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/matter-data-model.c)
+target_sources(matter-data-model PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/matter-data-model.c)
 
 set_property(GLOBAL APPEND PROPERTY ZEPHYR_INTERFACE_LIBS chip)
 # Enable visibility of POSIX.1-2008 functions, such as strnlen
@@ -232,17 +279,6 @@ if (CONFIG_CHIP_LIB_SHELL)
     # the Matter shell library is linked using the '--whole-archive' flag.
     target_link_options(chip INTERFACE
         -Wl,-u,_ZN4chip5Shell6Engine11RunMainLoopEv
-    )
-endif()
-
-# ==============================================================================
-# Define 'chip-ota-image' target for building CHIP OTA image
-# ==============================================================================
-
-if (CONFIG_CHIP_OTA_IMAGE_BUILD AND NOT SYSBUILD)
-    chip_ota_image(chip-ota-image
-        INPUT_FILES ${PROJECT_BINARY_DIR}/dfu_multi_image.bin
-        OUTPUT_FILE ${PROJECT_BINARY_DIR}/${CONFIG_CHIP_OTA_IMAGE_FILE_NAME}
     )
 endif()
 

@@ -58,6 +58,7 @@ private:
 
     friend PlatformManager & PlatformMgr();
     friend PlatformManagerImpl & PlatformMgrImpl();
+    friend class Internal::NFCCommissioningManagerImpl;
     friend class Internal::BLEManagerImpl;
 
     static PlatformManagerImpl sInstance;

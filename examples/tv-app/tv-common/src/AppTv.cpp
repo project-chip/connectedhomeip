@@ -66,7 +66,7 @@ class MyUserPrompter : public UserPrompter
 
     // tv should override this with a dialog prompt
     inline void PromptForCommissionPasscode(uint16_t vendorId, uint16_t productId, const char * commissioneeName,
-                                            uint16_t pairingHint, const char * pairingInstruction) override
+                                            uint16_t pairingHint, const char * pairingInstruction, uint8_t passcodeLength) override
     {
         return;
     }
@@ -79,7 +79,8 @@ class MyUserPrompter : public UserPrompter
 
     // tv should override this with a dialog prompt
     inline void PromptWithCommissionerPasscode(uint16_t vendorId, uint16_t productId, const char * commissioneeName,
-                                               uint32_t passcode, uint16_t pairingHint, const char * pairingInstruction) override
+                                               uint32_t passcode, uint8_t passcodeLength, uint16_t pairingHint,
+                                               const char * pairingInstruction) override
     {
         return;
     }
@@ -107,6 +108,9 @@ class MyPasscodeService : public PasscodeService
     void LookupTargetContentApp(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId,
                                 chip::Protocols::UserDirectedCommissioning::TargetAppInfo & info) override
     {
+        ChipLogProgress(DeviceLayer,
+                        "LookupTargetContentApp() client vendorID=%d productID=%d; TargetAppInfo vendorID=%d productID=%d",
+                        vendorId, productId, info.vendorId, info.productId);
         uint32_t passcode = 0;
         bool foundApp     = ContentAppPlatform::GetInstance().HasTargetContentApp(vendorId, productId, rotatingId, info, passcode);
         if (!foundApp)
@@ -128,10 +132,11 @@ class MyPasscodeService : public PasscodeService
         }
     }
 
-    uint32_t GetCommissionerPasscode(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId) override
+    PasscodeInfo GetCommissionerPasscode(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId) override
     {
         // TODO: randomly generate this value
-        return 12345678;
+        ChipLogDetail(AppServer, "GetCommissionerPasscode: returning a passcode");
+        return { 12345678, 8 };
     }
 
     void FetchCommissionPasscodeFromContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId) override
@@ -172,7 +177,7 @@ class MyPostCommissioningListener : public PostCommissioningListener
             cluster.ReadAttribute<Binding::Attributes::Binding::TypeInfo>(this, OnReadSuccessResponse, OnReadFailureResponse);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "Failed in reading binding. Error %s", ErrorStr(err));
+            ChipLogError(Controller, "Failed in reading binding: %" CHIP_ERROR_FORMAT, err.Format());
             clearContext();
         }
     }
@@ -497,7 +502,7 @@ DECLARE_DYNAMIC_ENDPOINT(contentAppEndpoint, contentAppClusters);
 
 namespace {
 
-DataVersion gDataVersions[APP_LIBRARY_SIZE][ArraySize(contentAppClusters)];
+DataVersion gDataVersions[APP_LIBRARY_SIZE][MATTER_ARRAY_SIZE(contentAppClusters)];
 
 EmberAfDeviceType gContentAppDeviceType[] = { { DEVICE_TYPE_CONTENT_APP, 1 } };
 
@@ -653,7 +658,7 @@ void ContentAppFactoryImpl::InstallContentApp(uint16_t vendorId, uint16_t produc
     }
     else if (vendorId == 65521 && productId == 32769)
     {
-        auto ptr = std::make_unique<ContentAppImpl>("Vendor2", vendorId, "exampleString", productId, "Version2", "20202021",
+        auto ptr = std::make_unique<ContentAppImpl>("Vendor2", vendorId, "exampleString", productId, "Version2", "0",
                                                     make_default_supported_clusters());
         mContentApps.emplace_back(std::move(ptr));
     }

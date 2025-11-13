@@ -145,8 +145,11 @@ namespace app {
 namespace DataModel {
 
 template <>
-CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, const CSRResponse::Type & responseData)
+CHIP_ERROR EncodeResponseCommandPayload(DataModel::FabricAwareTLVWriter & writerWithFabricIndex, TLV::Tag tag,
+                                        const CSRResponse::Type & responseData)
 {
+    TLV::TLVWriter & writer = writerWithFabricIndex;
+
     auto tag1      = TLV::ContextTag(CSRResponse::Fields::kNOCSRElements);
     auto tag2      = TLV::ContextTag(CSRResponse::Fields::kAttestationSignature);
     auto & options = LinuxDeviceOptions::GetInstance().mCSRResponseOptions;

@@ -71,6 +71,7 @@ rt_sdk("sdk") {
   sources += [ "${example_platform_dir}/board/board.c" ]
   sources += [ "${example_platform_dir}/board/peripherals.c" ]
   sources += [ "${example_platform_dir}/board/sdmmc_config.c" ]
+  sources += [ "${example_platform_dir}/board/wifi_bt_config.c" ]
 
   # Indicate the path to CHIPProjectConfig.h
   include_dirs += [ "include/config" ]
@@ -166,7 +167,11 @@ rt_executable("laundry-washer-app") {
     "${common_example_dir}/matter_button/source/ButtonRegistrationEmpty.cpp",
   ]
 
-  deps = [ "${chip_root}/examples/${app_common_folder}" ]
+  deps = [
+    "${chip_root}/examples/${app_common_folder}",
+    "${chip_root}/src/app/clusters/network-commissioning:network-commissioning",
+    "${chip_root}/src/setup_payload:onboarding-codes-utils",
+  ]
 
   sources += [
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",

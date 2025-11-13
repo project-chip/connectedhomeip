@@ -60,6 +60,35 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    - label: "Open Commissioning Window from alpha"
+      cluster: "Administrator Commissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+
+    - label: "Commission from gamma"
+      identity: "gamma"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+              - name: "payload"
+                value: payload
+
+    - label: "Wait for the commissioned device to be retrieved for gamma"
+      identity: "gamma"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
     - label: "Read maxGroupsPerFabric"
       command: "readAttribute"
       attribute: "MaxGroupsPerFabric"
@@ -507,6 +536,26 @@ tests:
                         EpochStartTime2: 2110002,
                     }
 
+    - label: "KeySet Write 4"
+      identity: "gamma"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a3,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0:
+                            "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f",
+                        EpochStartTime0: 2110000,
+                        EpochKey1: "\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f",
+                        EpochStartTime1: 2110001,
+                        EpochKey2:
+                            "\x20\x21\x22\x23\x24\x25\x26\x27\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f",
+                        EpochStartTime2: 2110002,
+                    }
+
     - label: "KeySet Read"
       command: "KeySetRead"
       arguments:
@@ -891,6 +940,359 @@ tests:
                       GroupId: 0x0105,
                       Endpoints: [1],
                       GroupName: "Group #5",
+                  },
+              ]
+
+    # Try to add enough groups on fabric gamma that the group table does not fit in a packet.
+    # TODO: We don't seem to support enough groups to actually manage to fill a packet.  To really test this part,
+    # ReadHandler::GetReportBufferMaxSize needs to be changed to return a much smaller value.
+
+    - label: "Write Group Keys on gamma"
+      identity: "gamma"
+      command: "writeAttribute"
+      attribute: "GroupKeyMap"
+      arguments:
+          value: [
+                  # Note: the FabricIndex here does not matter; it's not sent on the wire.
+                  { FabricIndex: 1, GroupId: 0x0101, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 1, GroupId: 0x0103, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 1, GroupId: 0x0104, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 1, GroupId: 0x0105, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 1, GroupId: 0x0106, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 1, GroupId: 0x0107, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 1, GroupId: 0x0108, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 1, GroupId: 0x0109, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 1, GroupId: 0x010a, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 1, GroupId: 0x010b, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 1, GroupId: 0x010c, GroupKeySetID: 0x01a3 },
+              ]
+
+    - label: "Add Group 1 on gamma"
+      identity: "gamma"
+      cluster: "Groups"
+      endpoint: 1
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0101
+              - name: "GroupName"
+                value: "Group #1"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0101
+
+    - label: "Add Group 2 on gamma"
+      identity: "gamma"
+      cluster: "Groups"
+      endpoint: 1
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0102
+              - name: "GroupName"
+                value: "Group #2"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0102
+
+    - label: "Add Group 3 on gamma"
+      identity: "gamma"
+      cluster: "Groups"
+      endpoint: 1
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0103
+              - name: "GroupName"
+                value: "Group #3"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0103
+
+    - label: "Add Group 4 on gamma"
+      identity: "gamma"
+      cluster: "Groups"
+      endpoint: 1
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0104
+              - name: "GroupName"
+                value: "Group #4"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0104
+
+    - label: "Add Group 5 on gamma"
+      identity: "gamma"
+      cluster: "Groups"
+      endpoint: 1
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0105
+              - name: "GroupName"
+                value: "Group #5"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0105
+
+    - label: "Add Group 6 on gamma"
+      identity: "gamma"
+      cluster: "Groups"
+      endpoint: 1
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0106
+              - name: "GroupName"
+                value: "Group #6"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0106
+
+    - label: "Add Group 7 on gamma"
+      identity: "gamma"
+      cluster: "Groups"
+      endpoint: 1
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0107
+              - name: "GroupName"
+                value: "Group #7"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0107
+
+    - label: "Add Group 8 on gamma"
+      identity: "gamma"
+      cluster: "Groups"
+      endpoint: 1
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0108
+              - name: "GroupName"
+                value: "Group #8"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0108
+
+    - label: "Add Group 9 on gamma"
+      identity: "gamma"
+      cluster: "Groups"
+      endpoint: 1
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0109
+              - name: "GroupName"
+                value: "Group #9"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0109
+
+    - label: "Add Group 10 on gamma"
+      identity: "gamma"
+      cluster: "Groups"
+      endpoint: 1
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x010a
+              - name: "GroupName"
+                value: "Group #10"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x010a
+
+    - label: "Add Group 11 on gamma"
+      identity: "gamma"
+      cluster: "Groups"
+      endpoint: 1
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x010b
+              - name: "GroupName"
+                value: "Group #11"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x010b
+
+    - label: "Add Group 12 on gamma"
+      identity: "gamma"
+      cluster: "Groups"
+      endpoint: 1
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x010c
+              - name: "GroupName"
+                value: "Group #12"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x010c
+
+    - label: "Read GroupTable from gamma without fabric filtering"
+      identity: "gamma"
+      command: "readAttribute"
+      attribute: "GroupTable"
+      fabricFiltered: false
+      response:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0101,
+                      Endpoints: [1],
+                      GroupName: "Group #1",
+                  },
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0102,
+                      Endpoints: [1],
+                      GroupName: "Group #2",
+                  },
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0103,
+                      Endpoints: [1],
+                      GroupName: "Group #3",
+                  },
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0104,
+                      Endpoints: [1],
+                      GroupName: "Group #4",
+                  },
+                  {
+                      FabricIndex: 2,
+                      GroupId: 0x0105,
+                      Endpoints: [1],
+                      GroupName: "Group #5",
+                  },
+                  {
+                      FabricIndex: 3,
+                      GroupId: 0x0101,
+                      Endpoints: [1],
+                      GroupName: "Group #1",
+                  },
+                  {
+                      FabricIndex: 3,
+                      GroupId: 0x0102,
+                      Endpoints: [1],
+                      GroupName: "Group #2",
+                  },
+                  {
+                      FabricIndex: 3,
+                      GroupId: 0x0103,
+                      Endpoints: [1],
+                      GroupName: "Group #3",
+                  },
+                  {
+                      FabricIndex: 3,
+                      GroupId: 0x0104,
+                      Endpoints: [1],
+                      GroupName: "Group #4",
+                  },
+                  {
+                      FabricIndex: 3,
+                      GroupId: 0x0105,
+                      Endpoints: [1],
+                      GroupName: "Group #5",
+                  },
+                  {
+                      FabricIndex: 3,
+                      GroupId: 0x0106,
+                      Endpoints: [1],
+                      GroupName: "Group #6",
+                  },
+                  {
+                      FabricIndex: 3,
+                      GroupId: 0x0107,
+                      Endpoints: [1],
+                      GroupName: "Group #7",
+                  },
+                  {
+                      FabricIndex: 3,
+                      GroupId: 0x0108,
+                      Endpoints: [1],
+                      GroupName: "Group #8",
+                  },
+                  {
+                      FabricIndex: 3,
+                      GroupId: 0x0109,
+                      Endpoints: [1],
+                      GroupName: "Group #9",
+                  },
+                  {
+                      FabricIndex: 3,
+                      GroupId: 0x010a,
+                      Endpoints: [1],
+                      GroupName: "Group #10",
+                  },
+                  {
+                      FabricIndex: 3,
+                      GroupId: 0x010b,
+                      Endpoints: [1],
+                      GroupName: "Group #11",
+                  },
+                  {
+                      FabricIndex: 3,
+                      GroupId: 0x010c,
+                      Endpoints: [1],
+                      GroupName: "Group #12",
                   },
               ]
 

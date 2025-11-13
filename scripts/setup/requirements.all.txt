@@ -4,10 +4,6 @@ virtualenv
 # core build requirements
 -r requirements.build.txt
 
-# esp-idf
--c constraints.esp32.txt
--r requirements.esp32.txt
-
 -r requirements.zephyr.txt
 -r requirements.cirque.txt
 -r requirements.memory.txt
@@ -19,13 +15,14 @@ pyobjc-core; sys_platform == 'darwin'
 pyobjc-framework-cocoa; sys_platform == 'darwin'
 pyobjc-framework-corebluetooth; sys_platform == 'darwin'
 
+# other tools
+click-option-group
+
 # python unit tests run directly without installing
 # built venv
 #
 # TODO: this should change in the Future
-diskcache
-lark
-websockets
+-r ../tests/requirements.txt
 
 # mobly tests
 portpicker
@@ -38,10 +35,10 @@ appdirs
 coloredlogs
 watchdog
 build==0.8.0
-mypy==1.10.1
+mypy==1.16.0
 mypy-protobuf==3.5.0
-protobuf==4.24.4
-types-protobuf==4.24.0.2
+protobuf==5.28.3
+types-protobuf==5.29.1.20250208
 
 cffi==1.15.0; python_version < "3.13"
 cffi==1.17.1; python_version >= "3.13"

@@ -19,11 +19,11 @@ details.
     -   [Device Tracing](#device-tracing)
     -   [Python Test Cases](#python-test-cases)
         -   [Running the test cases:](#running-the-test-cases)
-    -   [CHIP-REPL Interaction](#chip-repl-interaction)
-        -   [Building chip-repl:](#building-chip-repl)
+    -   [MATTER-REPL Interaction](#matter-repl-interaction)
+        -   [Building matter-repl:](#building-matter-repl)
         -   [Activating python virtual env](#activating-python-virtual-env)
-        -   [Interacting with CHIP-REPL and the example app](#interacting-with-chip-repl-and-the-example-app)
-        -   [Using chip-repl to Fake a charging session](#using-chip-repl-to-fake-a-charging-session)
+        -   [Interacting with matter-repl and the example app](#interacting-with-matter-repl-and-the-example-app)
+        -   [Using matter-repl to Fake a charging session](#using-matter-repl-to-fake-a-charging-session)
     -   [Water Heater App: Interaction using the chip-tool and TestEventTriggers](#water-heater-app-interaction-using-the-chip-tool-and-testeventtriggers)
 
 <hr>
@@ -66,13 +66,11 @@ details.
     Enables Thread management feature, requires ot-br-posix dbus daemon running.
     Required for Thread commissioning.
 
--   `--ble-device <interface id>`
+-   `--ble-controller <selector>`
 
-    Use specific bluetooth interface for BLE advertisement and connections.
-
-    `interface id`: the number after `hci` when listing BLE interfaces by
-    `hciconfig` command, for example, `--ble-device 1` means using `hci1`
-    interface. Default: `0`.
+    Use the specific Bluetooth controller for BLE advertisement and connections.
+    For details on controller selection refer to
+    [Linux BLE Settings](/platforms/linux/ble_settings.md).
 
 -   `--application <evse | water-heater>`
 
@@ -110,32 +108,19 @@ details.
 
     -   [Optional] Plug USB Bluetooth dongle
 
-        -   Plug USB Bluetooth dongle and find its bluetooth device number. The
-            number after `hci` is the bluetooth device number, `1` in this
-            example.
+        -   Plug USB Bluetooth dongle and find its bluetooth controller selector
+            as described in
+            [Linux BLE Settings](/platforms/linux/ble_settings.md).
 
-                  $ hciconfig
-                  hci1:	Type: Primary  Bus: USB
-                      BD Address: 00:1A:7D:AA:BB:CC  ACL MTU: 310:10  SCO MTU: 64:8
-                      UP RUNNING PSCAN ISCAN
-                      RX bytes:20942 acl:1023 sco:0 events:1140 errors:0
-                      TX bytes:16559 acl:1011 sco:0 commands:121 errors:0
+    -   Run Linux Energy Management Example App
 
-                  hci0:	Type: Primary  Bus: UART
-                      BD Address: B8:27:EB:AA:BB:CC  ACL MTU: 1021:8  SCO MTU: 64:1
-                      UP RUNNING PSCAN ISCAN
-                      RX bytes:8609495 acl:14 sco:0 events:217484 errors:0
-                      TX bytes:92185 acl:20 sco:0 commands:5259 errors:0
+              $ cd ~/connectedhomeip/examples/energy-management-app/linux
+              $ sudo out/debug/chip-energy-management-app --ble-controller [bluetooth controller number]
+              # In this example, the device we want to use is hci1
+              $ sudo out/debug/chip-energy-management-app --ble-controller 1
 
-        -   Run Linux Energy Management Example App
-
-                  $ cd ~/connectedhomeip/examples/energy-management-app/linux
-                  $ sudo out/debug/chip-energy-management-app --ble-device [bluetooth device number]
-                  # In this example, the device we want to use is hci1
-                  $ sudo out/debug/chip-energy-management-app --ble-device 1
-
-        -   Test the device using ChipDeviceController on your laptop /
-            workstation etc.
+    -   Test the device using ChipDeviceController on your laptop / workstation
+        etc.
 
 ## Device Tracing
 
@@ -151,12 +136,12 @@ Obtain tracing json file.
 
 ## Python Test Cases
 
-When you want to test this cluster you can use chip-repl or chip-tool by hand.
-CHIP-REPL is slightly easier to interact with when dealing with some of the
+When you want to test this cluster you can use matter-repl or chip-tool by hand.
+MATTER-REPL is slightly easier to interact with when dealing with some of the
 complex structures.
 
 There are several test scripts provided for EVSE (in
-[src/python_testing](src/python_testing)):
+[src/python_testing](/src/python_testing)):
 
 -   `TC_EEVSE_2_2`: This validates the primary functionality
 -   `TC_EEVSE_2_3`: This validates Get/Set/Clear target commands
@@ -237,13 +222,13 @@ step. That is also why the evse.bin is deleted before running
 chip-energy-management-app as this is where the app stores the matter persistent
 data (e.g. fabric info).
 
-## CHIP-REPL Interaction
+## MATTER-REPL Interaction
 
--   See chip-repl documentation in:
-    -   [Working with Python CHIP Controller](../../../docs/development_controllers/chip-repl/python_chip_controller_building.md)
-    -   [Matter_REPL_Intro](../../../docs/development_controllers/chip-repl/Matter_REPL_Intro.ipynb)
+-   See matter-repl documentation in:
+    -   [Working with Python CHIP Controller](../../../docs/development_controllers/matter-repl/python_chip_controller_building.md)
+    -   [Matter_REPL_Intro](https://github.com/project-chip/connectedhomeip/blob/master/docs/development_controllers/matter-repl/Matter_REPL_Intro.ipynb)
 
-### Building chip-repl:
+### Building matter-repl:
 
 ```bash
     $ ./build_python.sh -i <path_to_out_folder>
@@ -257,7 +242,7 @@ data (e.g. fabric info).
     $ source <path_to_out_folder>/bin/activate
 ```
 
-### Interacting with CHIP-REPL and the example app
+### Interacting with matter-repl and the example app
 
 -   Step 1: Launch the example app
 
@@ -265,67 +250,67 @@ data (e.g. fabric info).
     $ ./chip-energy-management-app --enable-key 000102030405060708090a0b0c0d0e0f --application evse
 ```
 
--   Step 2: Launch CHIP-REPL
+-   Step 2: Launch matter-repl
 
 ```bash
-    $ chip-repl
+    $ matter-repl
 ```
 
--   Step 3: (In chip-repl) Commissioning OnNetwork
+-   Step 3: (In matter-repl) Commissioning OnNetwork
 
 ```python
     await devCtrl.CommissionOnNetwork(1234,20202021)   # Commission with NodeID 1234
 Established secure session with Device
 Commissioning complete
-Out[2]: <chip.native.PyChipError object at 0x7f2432b16140>
+Out[2]: <matter.native.PyChipError object at 0x7f2432b16140>
 ```
 
--   Step 4: (In chip-repl) Read EVSE attributes
+-   Step 4: (In matter-repl) Read EVSE attributes
 
 ```python
     # Read from NodeID 1234, Endpoint 1, all attributes on EnergyEvse cluster
-    await devCtrl.ReadAttribute(1234,[(1, chip.clusters.EnergyEvse)])
+    await devCtrl.ReadAttribute(1234,[(1, matter.clusters.EnergyEvse)])
 ```
 
 ```
 {
 │   1: {
-│   │   <class 'chip.clusters.Objects.EnergyEvse'>: {
-│   │   │   <class 'chip.clusters.Attribute.DataVersion'>: 3790455237,
-│   │   │   <class 'chip.clusters.Objects.EnergyEvse.Attributes.ChargingEnabledUntil'>: Null,
-│   │   │   <class 'chip.clusters.Objects.EnergyEvse.Attributes.FaultState'>: <FaultStateEnum.kNoError: 0>,
-│   │   │   <class 'chip.clusters.Objects.EnergyEvse.Attributes.NextChargeStartTime'>: Null,
-│   │   │   <class 'chip.clusters.Objects.EnergyEvse.Attributes.StateOfCharge'>: Null,
-│   │   │   <class 'chip.clusters.Objects.EnergyEvse.Attributes.MaximumChargeCurrent'>: 0,
-│   │   │   <class 'chip.clusters.Objects.EnergyEvse.Attributes.ApproximateEVEfficiency'>: Null,
-│   │   │   <class 'chip.clusters.Objects.EnergyEvse.Attributes.BatteryCapacity'>: Null,
-│   │   │   <class 'chip.clusters.Objects.EnergyEvse.Attributes.AcceptedCommandList'>: [
+│   │   <class 'matter.clusters.Objects.EnergyEvse'>: {
+│   │   │   <class 'matter.clusters.Attribute.DataVersion'>: 3790455237,
+│   │   │   <class 'matter.clusters.Objects.EnergyEvse.Attributes.ChargingEnabledUntil'>: Null,
+│   │   │   <class 'matter.clusters.Objects.EnergyEvse.Attributes.FaultState'>: <FaultStateEnum.kNoError: 0>,
+│   │   │   <class 'matter.clusters.Objects.EnergyEvse.Attributes.NextChargeStartTime'>: Null,
+│   │   │   <class 'matter.clusters.Objects.EnergyEvse.Attributes.StateOfCharge'>: Null,
+│   │   │   <class 'matter.clusters.Objects.EnergyEvse.Attributes.MaximumChargeCurrent'>: 0,
+│   │   │   <class 'matter.clusters.Objects.EnergyEvse.Attributes.ApproximateEVEfficiency'>: Null,
+│   │   │   <class 'matter.clusters.Objects.EnergyEvse.Attributes.BatteryCapacity'>: Null,
+│   │   │   <class 'matter.clusters.Objects.EnergyEvse.Attributes.AcceptedCommandList'>: [
 ... │   │   ],
-│   │   │   <class 'chip.clusters.Objects.EnergyEvse.Attributes.MinimumChargeCurrent'>: 6000,
-│   │   │   <class 'chip.clusters.Objects.EnergyEvse.Attributes.NextChargeTargetSoC'>: Null,
-│   │   │   <class 'chip.clusters.Objects.EnergyEvse.Attributes.SessionDuration'>: 758415333,
-│   │   │   <class 'chip.clusters.Objects.EnergyEvse.Attributes.NumberOfWeeklyTargets'>: 0,
-│   │   │   <class 'chip.clusters.Objects.EnergyEvse.Attributes.FeatureMap'>: 1,
-│   │   │   <class 'chip.clusters.Objects.EnergyEvse.Attributes.GeneratedCommandList'>: [
+│   │   │   <class 'matter.clusters.Objects.EnergyEvse.Attributes.MinimumChargeCurrent'>: 6000,
+│   │   │   <class 'matter.clusters.Objects.EnergyEvse.Attributes.NextChargeTargetSoC'>: Null,
+│   │   │   <class 'matter.clusters.Objects.EnergyEvse.Attributes.SessionDuration'>: 758415333,
+│   │   │   <class 'matter.clusters.Objects.EnergyEvse.Attributes.NumberOfWeeklyTargets'>: 0,
+│   │   │   <class 'matter.clusters.Objects.EnergyEvse.Attributes.FeatureMap'>: 1,
+│   │   │   <class 'matter.clusters.Objects.EnergyEvse.Attributes.GeneratedCommandList'>: [
 ...
 │   │   │   ],
-│   │   │   <class 'chip.clusters.Objects.EnergyEvse.Attributes.State'>: <StateEnum.kNotPluggedIn: 0>,
-│   │   │   <class 'chip.clusters.Objects.EnergyEvse.Attributes.SessionID'>: Null,
-│   │   │   <class 'chip.clusters.Objects.EnergyEvse.Attributes.SessionEnergyCharged'>: Null,
-│   │   │   <class 'chip.clusters.Objects.EnergyEvse.Attributes.VehicleID'>: Null,
-│   │   │   <class 'chip.clusters.Objects.EnergyEvse.Attributes.NextChargeRequiredEnergy'>: Null,
-│   │   │   <class 'chip.clusters.Objects.EnergyEvse.Attributes.SessionEnergyDischarged'>: Null,
-│   │   │   <class 'chip.clusters.Objects.EnergyEvse.Attributes.AttributeList'>: [
+│   │   │   <class 'matter.clusters.Objects.EnergyEvse.Attributes.State'>: <StateEnum.kNotPluggedIn: 0>,
+│   │   │   <class 'matter.clusters.Objects.EnergyEvse.Attributes.SessionID'>: Null,
+│   │   │   <class 'matter.clusters.Objects.EnergyEvse.Attributes.SessionEnergyCharged'>: Null,
+│   │   │   <class 'matter.clusters.Objects.EnergyEvse.Attributes.VehicleID'>: Null,
+│   │   │   <class 'matter.clusters.Objects.EnergyEvse.Attributes.NextChargeRequiredEnergy'>: Null,
+│   │   │   <class 'matter.clusters.Objects.EnergyEvse.Attributes.SessionEnergyDischarged'>: Null,
+│   │   │   <class 'matter.clusters.Objects.EnergyEvse.Attributes.AttributeList'>: [
 ... │   │   ],
-│   │   │   <class 'chip.clusters.Objects.EnergyEvse.Attributes.NextChargeTargetTime'>: Null,
-│   │   │   <class 'chip.clusters.Objects.EnergyEvse.Attributes.CircuitCapacity'>: 0,
-│   │   │   <class 'chip.clusters.Objects.EnergyEvse.Attributes.DischargingEnabledUntil'>: Null,
-│   │   │   <class 'chip.clusters.Objects.EnergyEvse.Attributes.SupplyState'>: <SupplyStateEnum.kDisabled: 0>,
-│   │   │   <class 'chip.clusters.Objects.EnergyEvse.Attributes.RandomizationDelayWindow'>: 600,
-│   │   │   <class 'chip.clusters.Objects.EnergyEvse.Attributes.MaximumDischargeCurrent'>: 0,
-│   │   │   <class 'chip.clusters.Objects.EnergyEvse.Attributes.NumberOfDailyTargets'>: 1,
-│   │   │   <class 'chip.clusters.Objects.EnergyEvse.Attributes.UserMaximumChargeCurrent'>: 80000,
-│   │   │   <class 'chip.clusters.Objects.EnergyEvse.Attributes.ClusterRevision'>: 2
+│   │   │   <class 'matter.clusters.Objects.EnergyEvse.Attributes.NextChargeTargetTime'>: Null,
+│   │   │   <class 'matter.clusters.Objects.EnergyEvse.Attributes.CircuitCapacity'>: 0,
+│   │   │   <class 'matter.clusters.Objects.EnergyEvse.Attributes.DischargingEnabledUntil'>: Null,
+│   │   │   <class 'matter.clusters.Objects.EnergyEvse.Attributes.SupplyState'>: <SupplyStateEnum.kDisabled: 0>,
+│   │   │   <class 'matter.clusters.Objects.EnergyEvse.Attributes.RandomizationDelayWindow'>: 600,
+│   │   │   <class 'matter.clusters.Objects.EnergyEvse.Attributes.MaximumDischargeCurrent'>: 0,
+│   │   │   <class 'matter.clusters.Objects.EnergyEvse.Attributes.NumberOfDailyTargets'>: 1,
+│   │   │   <class 'matter.clusters.Objects.EnergyEvse.Attributes.UserMaximumChargeCurrent'>: 80000,
+│   │   │   <class 'matter.clusters.Objects.EnergyEvse.Attributes.ClusterRevision'>: 2
 │   │   }
 │   }
 }
@@ -337,7 +322,7 @@ Out[2]: <chip.native.PyChipError object at 0x7f2432b16140>
 
 ```python
    reportingTimingParams = (3, 60) # MinInterval = 3s, MaxInterval = 60s
-   subscription = await devCtrl.ReadAttribute(1234,[(1, chip.clusters.EnergyEvse)], reportInterval=reportingTimingParams)
+   subscription = await devCtrl.ReadAttribute(1234,[(1, matter.clusters.EnergyEvse)], reportInterval=reportingTimingParams)
 ```
 
 -   Step 6: Send an `EnableCharging` command which lasts for 60 seconds The
@@ -350,7 +335,7 @@ Out[2]: <chip.native.PyChipError object at 0x7f2432b16140>
    from datetime import datetime, timezone, timedelta
    epoch_end = int((datetime.now(tz=timezone.utc) + timedelta(seconds=60) - datetime(2000, 1, 1, 0, 0, 0, 0, timezone.utc)).total_seconds())
 
-   await devCtrl.SendCommand(1234, 1, chip.clusters.EnergyEvse.Commands.EnableCharging(chargingEnabledUntil=epoch_end,minimumChargeCurrent=2000,maximumChargeCurrent=25000),timedRequestTimeoutMs=3000)
+   await devCtrl.SendCommand(1234, 1, matter.clusters.EnergyEvse.Commands.EnableCharging(chargingEnabledUntil=epoch_end,minimumChargeCurrent=2000,maximumChargeCurrent=25000),timedRequestTimeoutMs=3000)
 ```
 
 The output should look like:
@@ -359,19 +344,19 @@ The output should look like:
 Attribute Changed:
 {
 │   'Endpoint': 1,
-│   'Attribute': <class 'chip.clusters.Objects.EnergyEvse.Attributes.SupplyState'>,
+│   'Attribute': <class 'matter.clusters.Objects.EnergyEvse.Attributes.SupplyState'>,
 │   'Value': <SupplyStateEnum.kChargingEnabled: 1>
 }
 Attribute Changed:
 {
 │   'Endpoint': 1,
-│   'Attribute': <class 'chip.clusters.Objects.EnergyEvse.Attributes.MinimumChargeCurrent'>,
+│   'Attribute': <class 'matter.clusters.Objects.EnergyEvse.Attributes.MinimumChargeCurrent'>,
 │   'Value': 2000
 }
 Attribute Changed:
 {
 │   'Endpoint': 1,
-│   'Attribute': <class 'chip.clusters.Objects.EnergyEvse.Attributes.ChargingEnabledUntil'>,
+│   'Attribute': <class 'matter.clusters.Objects.EnergyEvse.Attributes.ChargingEnabledUntil'>,
 │   'Value': 758416066
 }
 ```
@@ -382,25 +367,25 @@ After 60 seconds the charging should automatically become disabled:
 Attribute Changed:
 {
 │   'Endpoint': 1,
-│   'Attribute': <class 'chip.clusters.Objects.EnergyEvse.Attributes.SupplyState'>,
+│   'Attribute': <class 'matter.clusters.Objects.EnergyEvse.Attributes.SupplyState'>,
 │   'Value': <SupplyStateEnum.kDisabled: 0>
 }
 Attribute Changed:
 {
 │   'Endpoint': 1,
-│   'Attribute': <class 'chip.clusters.Objects.EnergyEvse.Attributes.DischargingEnabledUntil'>,
+│   'Attribute': <class 'matter.clusters.Objects.EnergyEvse.Attributes.DischargingEnabledUntil'>,
 │   'Value': 0
 }
 Attribute Changed:
 {
 │   'Endpoint': 1,
-│   'Attribute': <class 'chip.clusters.Objects.EnergyEvse.Attributes.MinimumChargeCurrent'>,
+│   'Attribute': <class 'matter.clusters.Objects.EnergyEvse.Attributes.MinimumChargeCurrent'>,
 │   'Value': 0
 }
 Attribute Changed:
 {
 │   'Endpoint': 1,
-│   'Attribute': <class 'chip.clusters.Objects.EnergyEvse.Attributes.ChargingEnabledUntil'>,
+│   'Attribute': <class 'matter.clusters.Objects.EnergyEvse.Attributes.ChargingEnabledUntil'>,
 │   'Value': 0
 }
 ```
@@ -408,7 +393,7 @@ Attribute Changed:
 Note that you can omit the `chargingEnabledUntil` argument and it will charge
 indefinitely.
 
-### Using chip-repl to Fake a charging session
+### Using matter-repl to Fake a charging session
 
 If you haven't implemented a real EVSE but want to simulate plugging in an EV
 then you can use a few of the test event triggers to simulate these scenarios.
@@ -422,14 +407,14 @@ The test event triggers values can be found in:
 -   0x0099000000000004 - Simulates the EVSE requesting power
 
 To send a test event trigger to the app, use the following commands (in
-chip-repl):
+matter-repl):
 
 ```python
     # send 1st event trigger to 'install' the EVSE on a 32A supply
-    await devCtrl.SendCommand(1234, 0, chip.clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=bytes([b for b in range(16)]), eventTrigger=0x0099000000000000))
+    await devCtrl.SendCommand(1234, 0, matter.clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=bytes([b for b in range(16)]), eventTrigger=0x0099000000000000))
 
     # send 2nd event trigger to plug the EV in
-    await devCtrl.SendCommand(1234, 0, chip.clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=bytes([b for b in range(16)]), eventTrigger=0x0099000000000002))
+    await devCtrl.SendCommand(1234, 0, matter.clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=bytes([b for b in range(16)]), eventTrigger=0x0099000000000002))
 
 ```
 
@@ -437,17 +422,17 @@ Now send the enable charging command (omit the `chargingEnabledUntil` arg this
 time):
 
 ```python
-    await devCtrl.SendCommand(1234, 1, chip.clusters.EnergyEvse.Commands.EnableCharging(minimumChargeCurrent=2000,maximumChargeCurrent=25000),timedRequestTimeoutMs=3000)
+    await devCtrl.SendCommand(1234, 1, matter.clusters.EnergyEvse.Commands.EnableCharging(minimumChargeCurrent=2000,maximumChargeCurrent=25000),timedRequestTimeoutMs=3000)
 ```
 
 Now send the test event trigger to simulate the EV asking for demand:
 
 ```python
     # send 2nd event trigger to plug the EV in
-    await devCtrl.SendCommand(1234, 0, chip.clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=bytes([b for b in range(16)]), eventTrigger=0x0099000000000004))
+    await devCtrl.SendCommand(1234, 0, matter.clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=bytes([b for b in range(16)]), eventTrigger=0x0099000000000004))
 
     # Read the events
-    await devCtrl.ReadEvent(1234,[(1, chip.clusters.EnergyEvse,1)])
+    await devCtrl.ReadEvent(1234,[(1, matter.clusters.EnergyEvse,1)])
 ```
 
 ```
@@ -495,7 +480,7 @@ Now send the test event trigger to simulate the EV asking for demand:
 What happens when we unplug the vehicle?
 
 ```python
-    await devCtrl.SendCommand(1234, 0, chip.clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=bytes([b for b in range(16)]), eventTrigger=0x0099000000000001))
+    await devCtrl.SendCommand(1234, 0, matter.clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=bytes([b for b in range(16)]), eventTrigger=0x0099000000000001))
 ```
 
 When we re-read the events:

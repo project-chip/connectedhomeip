@@ -83,7 +83,7 @@ void ICDManager::Init()
     }
 #endif // CHIP_CONFIG_ENABLE_ICD_LIT
 
-    VerifyOrDie(ICDNotifier::GetInstance().Subscribe(this) == CHIP_NO_ERROR);
+    SuccessOrDie(ICDNotifier::GetInstance().Subscribe(this));
 
     UpdateICDMode();
     UpdateOperationState(OperationalState::IdleMode);
@@ -116,14 +116,7 @@ void ICDManager::Shutdown()
 
 bool ICDManager::SupportsFeature(Feature feature)
 {
-    // Can't use attribute accessors/Attributes::FeatureMap::Get in unit tests
-#if !(CONFIG_BUILD_FOR_HOST_UNIT_TEST)
-    uint32_t featureMap = 0;
-    bool success        = (Attributes::FeatureMap::Get(kRootEndpointId, &featureMap) == Status::Success);
-    return success ? ((featureMap & to_underlying(feature)) != 0) : false;
-#else
-    return ((mFeatureMap & to_underlying(feature)) != 0);
-#endif // !(CONFIG_BUILD_FOR_HOST_UNIT_TEST)
+    return ICDConfigurationData::GetInstance().GetFeatureMap().Has(feature);
 }
 
 uint32_t ICDManager::StayActiveRequest(uint32_t stayActiveDuration)
@@ -143,9 +136,10 @@ uint32_t ICDManager::StayActiveRequest(uint32_t stayActiveDuration)
 }
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-void ICDManager::SendCheckInMsgs()
+void ICDManager::SendCheckInMsgs(Optional<Access::SubjectDescriptor> specificSubject)
 {
 #if !(CONFIG_BUILD_FOR_HOST_UNIT_TEST)
+    VerifyOrDie(SupportsFeature(Feature::kCheckInProtocolSupport));
     VerifyOrDie(mStorage != nullptr);
     VerifyOrDie(mFabricTable != nullptr);
 
@@ -180,7 +174,13 @@ void ICDManager::SendCheckInMsgs()
                 continue;
             }
 
-            if (!ShouldCheckInMsgsBeSentAtActiveModeFunction(entry.fabricIndex, entry.monitoredSubject))
+            if (specificSubject.HasValue() && !ShouldSendCheckInMessageForSpecificSubject(entry, specificSubject.Value()))
+            {
+                continue;
+            }
+
+            if (!specificSubject.HasValue() &&
+                !ShouldCheckInMsgsBeSentAtActiveModeFunction(entry.fabricIndex, entry.monitoredSubject))
             {
                 continue;
             }
@@ -214,6 +214,24 @@ void ICDManager::SendCheckInMsgs()
         }
     }
 #endif // !(CONFIG_BUILD_FOR_HOST_UNIT_TEST)
+}
+
+bool ICDManager::ShouldSendCheckInMessageForSpecificSubject(const ICDMonitoringEntry & entry,
+                                                            const Access::SubjectDescriptor & specificSubject)
+{
+    if (specificSubject.fabricIndex != entry.fabricIndex)
+    {
+        return false;
+    }
+
+    if (specificSubject.cats.CheckSubjectAgainstCATs(entry.monitoredSubject) || entry.monitoredSubject == specificSubject.subject)
+    {
+        ChipLogProgress(AppServer, "Proceed to send Check-In msg for specific subject: " ChipLogFormatX64,
+                        ChipLogValueX64(specificSubject.subject));
+        return true;
+    }
+
+    return false;
 }
 
 bool ICDManager::CheckInMessagesWouldBeSent(const std::function<ShouldCheckInMsgsBeSentFunction> & shouldCheckInMsgsBeSentFunction)
@@ -394,12 +412,6 @@ void ICDManager::UpdateICDMode()
     if (ICDConfigurationData::GetInstance().GetICDMode() != tempMode)
     {
         ICDConfigurationData::GetInstance().SetICDMode(tempMode);
-
-        // Can't use attribute accessors/Attributes::OperatingMode::Set in unit tests
-#if !(CONFIG_BUILD_FOR_HOST_UNIT_TEST)
-        Attributes::OperatingMode::Set(kRootEndpointId, static_cast<OperatingModeEnum>(tempMode));
-#endif
-
         postObserverEvent(ObserverEventType::ICDModeChange);
     }
 
@@ -435,7 +447,8 @@ void ICDManager::UpdateOperationState(OperationalState state)
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
         )
         {
-            DeviceLayer::SystemLayer().StartTimer(ICDConfigurationData::GetInstance().GetIdleModeDuration(), OnIdleModeDone, this);
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(
+                ICDConfigurationData::GetInstance().GetIdleModeDuration(), OnIdleModeDone, this);
         }
 
         Milliseconds32 slowPollInterval = ICDConfigurationData::GetInstance().GetSlowPollingInterval();
@@ -471,7 +484,7 @@ void ICDManager::UpdateOperationState(OperationalState state)
                 activeModeDuration = ICDConfigurationData::GetInstance().GetActiveModeThreshold();
             }
 
-            DeviceLayer::SystemLayer().StartTimer(activeModeDuration, OnActiveModeDone, this);
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(activeModeDuration, OnActiveModeDone, this);
 
             Milliseconds32 activeModeJitterInterval = Milliseconds32(ICD_ACTIVE_TIME_JITTER_MS);
             // TODO(#33074): Edge case when we transition to IdleMode with this condition being true
@@ -482,7 +495,7 @@ void ICDManager::UpdateOperationState(OperationalState state)
             // Reset this flag when we enter ActiveMode to avoid having a feedback loop that keeps us indefinitly in
             // ActiveMode.
             mTransitionToIdleCalled = false;
-            DeviceLayer::SystemLayer().StartTimer(activeModeJitterInterval, OnTransitionToIdle, this);
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(activeModeJitterInterval, OnTransitionToIdle, this);
 
             CHIP_ERROR err =
                 DeviceLayer::ConnectivityMgr().SetPollingInterval(ICDConfigurationData::GetInstance().GetFastPollingInterval());
@@ -492,10 +505,7 @@ void ICDManager::UpdateOperationState(OperationalState state)
             }
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-            if (SupportsFeature(Feature::kCheckInProtocolSupport))
-            {
-                SendCheckInMsgs();
-            }
+            SendCheckInMsgs();
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
             postObserverEvent(ObserverEventType::EnterActiveMode);
@@ -674,21 +684,30 @@ void ICDManager::OnSubscriptionReport()
     this->UpdateOperationState(OperationalState::ActiveMode);
 }
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
+void ICDManager::OnSendCheckIn(const Access::SubjectDescriptor & subject)
+{
+    ChipLogProgress(AppServer, "Received OnSendCheckIn for subject: " ChipLogFormatX64, ChipLogValueX64(subject.subject));
+    SendCheckInMsgs(MakeOptional(subject));
+}
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER && CHIP_CONFIG_ENABLE_ICD_CIP && CHIP_CONFIG_ENABLE_ICD_CHECK_IN_ON_REPORT_TIMEOUT
+
 void ICDManager::ExtendActiveMode(Milliseconds16 extendDuration)
 {
-    DeviceLayer::SystemLayer().ExtendTimerTo(extendDuration, OnActiveModeDone, this);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ExtendTimerTo(extendDuration, OnActiveModeDone, this);
 
     Milliseconds32 activeModeJitterThreshold = Milliseconds32(ICD_ACTIVE_TIME_JITTER_MS);
     activeModeJitterThreshold = (extendDuration >= activeModeJitterThreshold) ? extendDuration - activeModeJitterThreshold : kZero;
 
     if (!mTransitionToIdleCalled)
     {
-        DeviceLayer::SystemLayer().ExtendTimerTo(activeModeJitterThreshold, OnTransitionToIdle, this);
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ExtendTimerTo(activeModeJitterThreshold, OnTransitionToIdle, this);
     }
 }
 
 CHIP_ERROR ICDManager::HandleEventTrigger(uint64_t eventTrigger)
 {
+    eventTrigger                     = clearEndpointInEventTrigger(eventTrigger);
     ICDTestEventTriggerEvent trigger = static_cast<ICDTestEventTriggerEvent>(eventTrigger);
     CHIP_ERROR err                   = CHIP_NO_ERROR;
 

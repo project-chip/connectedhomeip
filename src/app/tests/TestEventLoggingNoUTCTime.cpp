@@ -21,6 +21,7 @@
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
 #include <app/tests/AppTestContext.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/core/TLV.h>
@@ -31,6 +32,7 @@
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/LinkedList.h>
 #include <lib/support/logging/Constants.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -100,8 +102,10 @@ public:
         };
 
         AppContext::SetUp();
+        chip::app::InteractionModelEngine::GetInstance()->SetDataModelProvider(
+            chip::app::CodegenDataModelProviderInstance(nullptr));
         ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
-        chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), ArraySize(logStorageResources),
+        chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), MATTER_ARRAY_SIZE(logStorageResources),
                                                           gCircularEventBuffer, logStorageResources, &mEventCounter);
     }
 
@@ -134,8 +138,7 @@ void PrintEventLog()
 {
     chip::TLV::TLVReader reader;
     chip::app::CircularEventBufferWrapper bufWrapper;
-    chip::app::EventManagement::GetInstance().GetEventReader(reader, chip::app::PriorityLevel::Critical, &bufWrapper);
-    chip::TLV::Debug::Dump(reader, SimpleDumpWriter);
+    EXPECT_SUCCESS(chip::TLV::Debug::Dump(reader, SimpleDumpWriter));
 }
 
 static void CheckLogState(chip::app::EventManagement & aLogMgmt, size_t expectedMinNumEvents, size_t expectedMaxNumEvents,
@@ -186,7 +189,7 @@ static void CheckLogReadOut(chip::app::EventManagement & alogMgmt, chip::EventNu
     EXPECT_EQ(totalNumElements, expectedNumEvents);
     EXPECT_EQ(totalNumElements, eventCount);
     reader.Init(backingStore.Get(), writer.GetLengthWritten());
-    chip::TLV::Debug::Dump(reader, SimpleDumpWriter);
+    EXPECT_SUCCESS(chip::TLV::Debug::Dump(reader, SimpleDumpWriter));
 }
 
 class TestEventGenerator : public chip::app::EventLoggingDelegate

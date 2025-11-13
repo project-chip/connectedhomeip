@@ -32,31 +32,60 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-import random
+from copy import deepcopy
 from time import sleep
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.ChipDeviceCtrl import CommissioningParameters
-from chip.exceptions import ChipStackError
-from chip.native import PyChipError
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+from support_modules.cadmin_support import CADMINBaseTest
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.exceptions import ChipStackError
+from matter.native import PyChipError
+from matter.testing.matter_testing import CustomCommissioningParameters, TestStep, async_test_body, default_matter_test_main
 
 
-class TC_CADMIN_1_9(MatterBaseTest):
-    async def OpenCommissioningWindow(self) -> CommissioningParameters:
-        try:
-            cluster = Clusters.GeneralCommissioning
-            attribute = cluster.Attributes.BasicCommissioningInfo
-            duration = await self.read_single_attribute_check_success(endpoint=0, cluster=cluster, attribute=attribute)
-            params = await self.th1.OpenCommissioningWindow(
-                nodeid=self.dut_node_id, timeout=duration.maxCumulativeFailsafeSeconds, iteration=10000, discriminator=self.discriminator, option=1)
-            return params
+class TC_CADMIN_1_9(CADMINBaseTest):
+    async def OpenCommissioningWindowForMaxTime(self) -> CustomCommissioningParameters:
+        cluster = Clusters.GeneralCommissioning
+        attribute = cluster.Attributes.BasicCommissioningInfo
+        duration = await self.read_single_attribute_check_success(endpoint=0, cluster=cluster, attribute=attribute)
+        return await self.open_commissioning_window(dev_ctrl=self.th1, node_id=self.dut_node_id, timeout=duration.maxCumulativeFailsafeSeconds)
 
-        except Exception as e:
-            logging.exception('Error running OpenCommissioningWindow %s', e)
-            asserts.assert_true(False, 'Failed to open commissioning window')
+    async def CommissionOnNetwork(self, params: CustomCommissioningParameters):
+        ctx = asserts.assert_raises(ChipStackError)
+        with ctx:
+            await self.th2.CommissionOnNetwork(
+                nodeId=self.dut_node_id,
+                setupPinCode=params.commissioningParameters.setupPinCode,
+                filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+                filter=params.randomDiscriminator
+            )
+        errcode = PyChipError.from_code(ctx.exception.err)
+        return errcode
+
+    async def CommissionAttempt(self, params: CustomCommissioningParameters, expectedErrCode: int):
+        if expectedErrCode == 3:
+            for cycle in range(20):
+                logging.info("-----------------Current Iteration {}-------------------------".format(cycle+1))
+                new_params = deepcopy(params)
+                new_params.commissioningParameters.setupPinCode = self.generate_unique_random_value(
+                    params.commissioningParameters.setupPinCode)
+                errcode = await self.CommissionOnNetwork(new_params)
+                logging.info('Commissioning complete done. Successful? {}, errorcode = {}, cycle={}'.format(
+                    errcode.is_success, errcode, (cycle+1)))
+                asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
+                asserts.assert_true(errcode.sdk_code == expectedErrCode,
+                                    'Unexpected error code returned from CommissioningComplete')
+
+        elif expectedErrCode == 50:
+            logging.info("-----------------Attempting connection expecting timeout-------------------------")
+            errcode = await self.CommissionOnNetwork(params)
+            logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
+            asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
+            # TODO: Adding try or except clause here as the errcode code be either 50 for timeout or 3 for incorrect state at this time
+            # until issue mentioned in https://github.com/project-chip/connectedhomeip/issues/34383 can be resolved
+            asserts.assert_in(errcode.sdk_code, [expectedErrCode, 3], 'Unexpected error code returned from CommissioningComplete')
 
     def steps_TC_CADMIN_1_9(self) -> list[TestStep]:
         return [
@@ -69,46 +98,6 @@ class TC_CADMIN_1_9(MatterBaseTest):
             TestStep(6, "TH1 revoking Commissioning Window"),
         ]
 
-    def generate_unique_random_value(self, value):
-        while True:
-            random_value = random.randint(10000000, 99999999)
-            if random_value != value:
-                return random_value
-
-    async def CommissionOnNetwork(
-        self, setup_code: int
-    ):
-        ctx = asserts.assert_raises(ChipStackError)
-        with ctx:
-            await self.th2.CommissionOnNetwork(
-                nodeId=self.dut_node_id, setupPinCode=setup_code,
-                filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
-        errcode = PyChipError.from_code(ctx.exception.err)
-        return errcode
-
-    async def CommissionAttempt(
-            self, setupPinCode: int, expectedErrCode: int):
-
-        if expectedErrCode == 3:
-            for cycle in range(20):
-                logging.info("-----------------Current Iteration {}-------------------------".format(cycle+1))
-                setup_code = self.generate_unique_random_value(setupPinCode)
-                errcode = await self.CommissionOnNetwork(setup_code)
-                logging.info('Commissioning complete done. Successful? {}, errorcode = {}, cycle={}'.format(
-                    errcode.is_success, errcode, (cycle+1)))
-                asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
-                asserts.assert_true(errcode.sdk_code == expectedErrCode,
-                                    'Unexpected error code returned from CommissioningComplete')
-
-        elif expectedErrCode == 50:
-            logging.info("-----------------Attempting connection expecting timeout-------------------------")
-            errcode = await self.CommissionOnNetwork(setupPinCode)
-            logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
-            asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
-            # TODO: Adding try or except clause here as the errcode code be either 50 for timeout or 3 for incorrect state at this time
-            # until issue mentioned in https://github.com/project-chip/connectedhomeip/issues/34383 can be resolved
-            asserts.assert_in(errcode.sdk_code, [expectedErrCode, 3], 'Unexpected error code returned from CommissioningComplete')
-
     def pics_TC_CADMIN_1_9(self) -> list[str]:
         return ["CADMIN.S"]
 
@@ -118,27 +107,25 @@ class TC_CADMIN_1_9(MatterBaseTest):
 
         # Establishing TH1 and TH2
         self.th1 = self.default_controller
-        self.discriminator = random.randint(0, 4095)
         th2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
         th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.th1.fabricId + 1)
         self.th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
 
         self.step(2)
-        params = await self.OpenCommissioningWindow()
-        setupPinCode = params.setupPinCode
+        params = await self.OpenCommissioningWindowForMaxTime()
 
         self.step(3)
-        await self.CommissionAttempt(setupPinCode, expectedErrCode=0x03)
+        await self.CommissionAttempt(params, expectedErrCode=0x03)
 
         self.step(4)
-        await self.CommissionAttempt(setupPinCode, expectedErrCode=0x32)
+        await self.CommissionAttempt(params, expectedErrCode=0x32)
 
         self.step(5)
-        params = await self.OpenCommissioningWindow()
+        params = await self.OpenCommissioningWindowForMaxTime()
 
         self.step(6)
         revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
-        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
+        await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
         # The failsafe cleanup is scheduled after the command completes, so give it a bit of time to do that
         sleep(1)
 

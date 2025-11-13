@@ -17,7 +17,6 @@
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 #include <optional>
-#include <variant>
 
 #include <access/AccessControl.h>
 #include <access/Privilege.h>
@@ -26,7 +25,6 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/AttributeValueEncoder.h>
-#include <app/GlobalAttributes.h>
 #include <app/RequiredPrivilege.h>
 #include <app/data-model/FabricScoped.h>
 #include <app/util/af-types.h>
@@ -34,12 +32,10 @@
 #include <app/util/attribute-storage-detail.h>
 #include <app/util/attribute-storage-null-handling.h>
 #include <app/util/attribute-storage.h>
-#include <app/util/ember-global-attribute-access-interface.h>
 #include <app/util/ember-io-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <app/util/odd-sized-integers.h>
 #include <data-model-providers/codegen/EmberAttributeDataBuffer.h>
-#include <data-model-providers/codegen/EmberMetadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
@@ -60,7 +56,7 @@ using Protocols::InteractionModel::Status;
 ///
 /// If it returns std::nullopt, then there is no AAI to handle the given path
 /// and processing should figure out the value otherwise (generally from other ember data)
-std::optional<CHIP_ERROR> TryReadViaAccessInterface(const ConcreteAttributePath & path, AttributeAccessInterface * aai,
+std::optional<CHIP_ERROR> TryReadViaAccessInterface(const DataModel::ReadAttributeRequest & request, AttributeAccessInterface * aai,
                                                     AttributeValueEncoder & encoder)
 {
     // Processing can happen only if an attribute access interface actually exists..
@@ -69,12 +65,12 @@ std::optional<CHIP_ERROR> TryReadViaAccessInterface(const ConcreteAttributePath 
         return std::nullopt;
     }
 
-    CHIP_ERROR err = aai->Read(path, encoder);
+    CHIP_ERROR err = aai->Read(request, encoder);
 
     if (err != CHIP_NO_ERROR)
     {
         // Implementation of 8.4.3.2 of the spec for path expansion
-        if (path.mExpanded && (err == CHIP_IM_GLOBAL_STATUS(UnsupportedRead)))
+        if (request.path.mExpanded && (err == CHIP_IM_GLOBAL_STATUS(UnsupportedRead)))
         {
             return CHIP_NO_ERROR;
         }
@@ -104,39 +100,28 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::ReadAttribute(const Data
                   ChipLogValueMEI(request.path.mClusterId), request.path.mEndpointId, ChipLogValueMEI(request.path.mAttributeId),
                   request.path.mExpanded);
 
-    auto metadata = Ember::FindAttributeMetadata(request.path);
+    // Codegen logic specific: we accept AAI reads BEFORE server cluster interface, so that we are backwards compatible
+    // in case some application installed AAI before Server Cluster Interfaces were supported
+    const EmberAfAttributeMetadata * attributeMetadata =
+        emberAfLocateAttributeMetadata(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId);
 
-    // Explicit failure in finding a suitable metadata
-    if (const Status * status = std::get_if<Status>(&metadata))
+    // we only allow AAI on ember-registered clusters
+    if (attributeMetadata != nullptr)
     {
-        VerifyOrDie((*status == Status::UnsupportedEndpoint) || //
-                    (*status == Status::UnsupportedCluster) ||  //
-                    (*status == Status::UnsupportedAttribute));
-        return *status;
+        std::optional<CHIP_ERROR> aai_result = TryReadViaAccessInterface(
+            request, AttributeAccessInterfaceRegistry::Instance().Get(request.path.mEndpointId, request.path.mClusterId), encoder);
+        VerifyOrReturnError(!aai_result.has_value(), *aai_result);
     }
 
-    // Read via AAI
-    std::optional<CHIP_ERROR> aai_result;
-    if (const EmberAfCluster ** cluster = std::get_if<const EmberAfCluster *>(&metadata))
+    if (auto * cluster = mRegistry.Get(request.path); cluster != nullptr)
     {
-        Compatibility::GlobalAttributeReader aai(*cluster);
-        aai_result = TryReadViaAccessInterface(request.path, &aai, encoder);
+        return cluster->ReadAttribute(request, encoder);
     }
-    else
-    {
-        aai_result = TryReadViaAccessInterface(
-            request.path, AttributeAccessInterfaceRegistry::Instance().Get(request.path.mEndpointId, request.path.mClusterId),
-            encoder);
-    }
-    VerifyOrReturnError(!aai_result.has_value(), *aai_result);
 
-    if (!std::holds_alternative<const EmberAfAttributeMetadata *>(metadata))
-    {
-        // if we only got a cluster, this was for a global attribute. We cannot read ember attributes
-        // at this point, so give up (although GlobalAttributeReader should have returned something here).
-        chipDie();
-    }
-    const EmberAfAttributeMetadata * attributeMetadata = std::get<const EmberAfAttributeMetadata *>(metadata);
+    // ReadAttribute requirement is that request.path is a VALID path inside the provider
+    // metadata tree. Clients are supposed to validate this (and data version and other flags)
+    // This SHOULD NEVER HAPPEN hence the general return code (seemed preferable to VerifyOrDie)
+    VerifyOrReturnError(attributeMetadata != nullptr, Status::Failure);
 
     // At this point, we have to use ember directly to read the data.
     EmberAfAttributeSearchRecord record;

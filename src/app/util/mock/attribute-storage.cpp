@@ -33,7 +33,7 @@
 #include <app/MessageDef/AttributeDataIB.h>
 #include <app/MessageDef/AttributeReportIB.h>
 #include <app/MessageDef/AttributeStatusIB.h>
-#include <app/util/att-storage.h>
+#include <app/data-model-provider/ProviderChangeListener.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <app/util/mock/Constants.h>
@@ -207,6 +207,14 @@ uint8_t emberAfClusterCount(chip::EndpointId endpoint, bool server)
     return (server) ? emberAfGetClusterCountForEndpoint(endpoint) : 0;
 }
 
+uint8_t emberAfClusterCountForEndpointType(const EmberAfEndpointType * type, bool server)
+{
+    const EmberAfClusterMask cluster_mask = server ? MATTER_CLUSTER_FLAG_SERVER : MATTER_CLUSTER_FLAG_CLIENT;
+
+    return static_cast<uint8_t>(std::count_if(type->cluster, type->cluster + type->clusterCount,
+                                              [=](const EmberAfCluster & cluster) { return (cluster.mask & cluster_mask) != 0; }));
+}
+
 uint16_t emberAfGetServerAttributeCount(chip::EndpointId endpointId, chip::ClusterId clusterId)
 {
     auto cluster = GetMockNodeConfig().clusterByIds(endpointId, clusterId);
@@ -236,6 +244,20 @@ chip::EndpointId emberAfEndpointFromIndex(uint16_t index)
     VerifyOrDie(index < config.endpoints.size());
     return config.endpoints[index].id;
 }
+
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+CHIP_ERROR emberAfGetEndpointUniqueIdForEndPoint(EndpointId endpoint, MutableCharSpan & epUniqueIdSpan)
+{
+
+    // Retrieve the endpoint configuration from the mock node configuration
+    auto epConfig = GetMockNodeConfig().endpointById(endpoint);
+    VerifyOrReturnError(epConfig != nullptr, CHIP_ERROR_NOT_FOUND);
+
+    // Copy the unique ID into the provided span
+    CharSpan targetSpan(epConfig->endpointUniqueIdBuffer, epConfig->endpointUniqueIdSize);
+    return CopyCharSpanToMutableCharSpan(targetSpan, epUniqueIdSpan);
+}
+#endif
 
 namespace chip {
 namespace app {
@@ -306,7 +328,7 @@ chip::Optional<chip::AttributeId> emberAfGetServerAttributeIdByIndex(chip::Endpo
 
 uint8_t emberAfClusterIndex(chip::EndpointId endpointId, chip::ClusterId clusterId, EmberAfClusterMask mask)
 {
-    VerifyOrReturnValue(mask == 0 || (mask & CLUSTER_MASK_SERVER) != 0, UINT8_MAX); // only server clusters supported
+    VerifyOrReturnValue(mask == 0 || (mask & MATTER_CLUSTER_FLAG_SERVER) != 0, UINT8_MAX); // only server clusters supported
     ptrdiff_t index;
     auto cluster = GetMockNodeConfig().clusterByIds(endpointId, clusterId, &index);
     VerifyOrReturnValue(cluster != nullptr, UINT8_MAX);
@@ -370,13 +392,13 @@ chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpointIndex(unsig
 }
 
 void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
-                             AttributesChangedListener * listener)
+                             DataModel::ProviderChangeListener * listener)
 {
     dataVersion++;
     listener->MarkDirty(AttributePathParams(endpoint, clusterId, attributeId));
 }
 
-void emberAfEndpointChanged(EndpointId endpoint, AttributesChangedListener * listener)
+void emberAfEndpointChanged(EndpointId endpoint, DataModel::ProviderChangeListener * listener)
 {
     listener->MarkDirty(AttributePathParams(endpoint));
 }
@@ -464,7 +486,10 @@ CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const Co
         ReturnErrorOnFailure(attributeReport.GetError());
         AttributePathIB::Builder & attributePath = attributeStatus.CreatePath();
         ReturnErrorOnFailure(attributeStatus.GetError());
-        attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
+        TEMPORARY_RETURN_IGNORED attributePath.Endpoint(aPath.mEndpointId)
+            .Cluster(aPath.mClusterId)
+            .Attribute(aPath.mAttributeId)
+            .EndOfAttributePathIB();
         ReturnErrorOnFailure(attributePath.GetError());
         StatusIB::Builder & errorStatus = attributeStatus.CreateErrorStatus();
         ReturnErrorOnFailure(attributeStatus.GetError());
@@ -505,7 +530,10 @@ CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const Co
     attributeData.DataVersion(dataVersion);
     AttributePathIB::Builder & attributePath = attributeData.CreatePath();
     ReturnErrorOnFailure(attributeData.GetError());
-    attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
+    TEMPORARY_RETURN_IGNORED attributePath.Endpoint(aPath.mEndpointId)
+        .Cluster(aPath.mClusterId)
+        .Attribute(aPath.mAttributeId)
+        .EndOfAttributePathIB();
     ReturnErrorOnFailure(attributePath.GetError());
 
     TLV::TLVWriter * writer = attributeData.GetWriter();
@@ -535,7 +563,9 @@ CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const Co
     ReturnErrorOnFailure(attributeData.EndOfAttributeDataIB());
     return attributeReport.EndOfAttributeReportIB();
 }
-
+// WARNING: Ensure that ResetMockNodeConfig() is called after SetMockNodeConfig().
+// When platform unit tests are merged into a single binary,
+// stale MockNodeConfig instances may leak between tests.
 void SetMockNodeConfig(const MockNodeConfig & config)
 {
     metadataStructureGeneration++;

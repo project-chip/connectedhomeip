@@ -43,8 +43,7 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t newMode, ModeBase::Commands::Ch
         if (currentMode != RvcRunMode::ModeIdle && newMode != RvcRunMode::ModeIdle)
         {
             response.status = to_underlying(ModeBase::StatusCode::kInvalidInMode);
-            response.statusText.SetValue(
-                chip::CharSpan::fromCharString("Change to the mapping or cleaning mode is only allowed from idle"));
+            response.statusText.SetValue("Change to the mapping or cleaning mode is only allowed from idle"_span);
             return;
         }
 
@@ -61,8 +60,7 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t newMode, ModeBase::Commands::Ch
         if (newMode != RvcRunMode::ModeIdle)
         {
             response.status = to_underlying(ModeBase::StatusCode::kInvalidInMode);
-            response.statusText.SetValue(
-                chip::CharSpan::fromCharString("Change to the mapping or cleaning mode is only allowed from idle"));
+            response.statusText.SetValue("Change to the mapping or cleaning mode is only allowed from idle"_span);
             return;
         }
 
@@ -78,7 +76,7 @@ void RvcDevice::HandleRvcRunChangeToMode(uint8_t newMode, ModeBase::Commands::Ch
 
     // If we fall through at any point, it's because the change is not supported in the current state.
     response.status = to_underlying(ModeBase::StatusCode::kInvalidInMode);
-    response.statusText.SetValue(chip::CharSpan::fromCharString("This change is not allowed at this time"));
+    response.statusText.SetValue("This change is not allowed at this time"_span);
 }
 
 void RvcDevice::HandleRvcCleanChangeToMode(uint8_t newMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
@@ -88,7 +86,7 @@ void RvcDevice::HandleRvcCleanChangeToMode(uint8_t newMode, ModeBase::Commands::
     if (rvcRunCurrentMode != RvcRunMode::ModeIdle)
     {
         response.status = to_underlying(ModeBase::StatusCode::kInvalidInMode);
-        response.statusText.SetValue(chip::CharSpan::fromCharString("Change of the cleaning mode is only allowed in Idle."));
+        response.statusText.SetValue("Change of the cleaning mode is only allowed in Idle."_span);
         return;
     }
 
@@ -144,12 +142,20 @@ void RvcDevice::HandleOpStateGoHomeCallback(Clusters::OperationalState::GenericO
 {
     switch (mOperationalStateInstance.GetCurrentOperationalState())
     {
-    case to_underlying(OperationalState::OperationalStateEnum::kStopped): {
-        if (mRunModeInstance.GetCurrentMode() != RvcRunMode::ModeIdle)
+    case to_underlying(OperationalState::OperationalStateEnum::kStopped):
+    case to_underlying(OperationalState::OperationalStateEnum::kPaused):
+    case to_underlying(OperationalState::OperationalStateEnum::kRunning): {
+        if (mOperationalStateInstance.GetCurrentOperationalState() ==
+                to_underlying(OperationalState::OperationalStateEnum::kStopped) &&
+            mRunModeInstance.GetCurrentMode() != RvcRunMode::ModeIdle)
         {
             err.Set(to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState));
             return;
         }
+
+        // Spec requires device to be in Idle RVC Run Mode _after_ docking happens,
+        // but to avoid need for an additional state variable, set Idle now.
+        mRunModeInstance.UpdateCurrentMode(RvcRunMode::ModeIdle);
 
         auto error = mOperationalStateInstance.SetOperationalState(
             to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger));
@@ -265,6 +271,26 @@ void RvcDevice::HandleDockedMessage()
     mDocked = true;
 
     mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kDocked));
+}
+
+void RvcDevice::HandleEmptyingDustBinMessage()
+{
+    mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kEmptyingDustBin));
+}
+
+void RvcDevice::HandleCleaningMopMessage()
+{
+    mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kCleaningMop));
+}
+
+void RvcDevice::HandleFillingWaterTankMessage()
+{
+    mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kFillingWaterTank));
+}
+
+void RvcDevice::HandleUpdatingMapsMessage()
+{
+    mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kUpdatingMaps));
 }
 
 void RvcDevice::HandleChargerFoundMessage()
@@ -394,6 +420,34 @@ void RvcDevice::HandleErrorEvent(const std::string & error)
     else if (error == "MopCleaningPadMissing")
     {
         err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kMopCleaningPadMissing);
+    }
+    else if (error == "LowBattery")
+    {
+        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kLowBattery);
+    }
+    else if (error == "CannotReachTargetArea")
+    {
+        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kCannotReachTargetArea);
+    }
+    else if (error == "DirtyWaterTankFull")
+    {
+        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kDirtyWaterTankFull);
+    }
+    else if (error == "DirtyWaterTankMissing")
+    {
+        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kDirtyWaterTankMissing);
+    }
+    else if (error == "WheelsJammed")
+    {
+        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kWheelsJammed);
+    }
+    else if (error == "BrushJammed")
+    {
+        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kBrushJammed);
+    }
+    else if (error == "NavigationSensorObscured")
+    {
+        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kNavigationSensorObscured);
     }
     else
     {

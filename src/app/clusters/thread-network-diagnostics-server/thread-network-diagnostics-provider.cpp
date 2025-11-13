@@ -51,15 +51,13 @@ namespace ThreadNetworkDiagnostics {
  *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE = Is not a Runtime readable attribute. Use standard read
  *         All other errors should be treated as a read error and reported as such.
  *
- * @note This function implementation can compile in 3 different outcomes
+ * @note This function currently builds in two different variants:
  *       (1) CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK:
- *           - Generic implementation fetching the valid thread network data from the thread stack and encoding it respectively to
- *             the attributeID received.
- *       (2) CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK:
+ *           - Generic implementation fetching the valid thread network data from the thread stack
+ *             (via ThreadStackMgrImpl().OTInstance()) and encoding it respectively to the attributeID
+ *             received. This relies on an in-process OpenThread stack.
+ *       (2) Otherwise
  *           - Encode a NULL value for nullable attributes or 0 for the others.
- *           - Devices using the ot-br-posix dbus stack have not yet provided the API to fetch the needed thread informations.
- *       (3) None of the conditions above
- *           - returns CHIP_ERROR_NOT_IMPLEMENTED.
  */
 CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder)
 {
@@ -92,6 +90,8 @@ CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, a
         case Attributes::SecurityPolicy::Id:
         case Attributes::ChannelPage0Mask::Id:
         case Attributes::OperationalDatasetComponents::Id:
+        case Attributes::ExtAddress::Id:
+        case Attributes::Rloc16::Id:
             return encoder.EncodeNull();
         }
     }
@@ -248,8 +248,6 @@ CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, a
 
 #if CHIP_DEVICE_CONFIG_THREAD_FTD
             uint8_t maxRouterId = otThreadGetMaxRouterId(otInst);
-            CHIP_ERROR chipErr  = CHIP_ERROR_INCORRECT_STATE;
-
             for (uint8_t i = 0; i <= maxRouterId; i++)
             {
                 if (otThreadGetRouterInfo(otInst, i, &routerInfo) == OT_ERROR_NONE)
@@ -268,11 +266,10 @@ CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, a
                     routeTable.linkEstablished = routerInfo.mLinkEstablished;
 
                     ReturnErrorOnFailure(aEncoder.Encode(routeTable));
-                    chipErr = CHIP_NO_ERROR;
                 }
             }
-
-            return chipErr;
+            // Returning empty list with no error in case thread network is not up
+            return CHIP_NO_ERROR;
 
 #else // OPENTHREAD_MTD
             otError otErr = otThreadGetParentInfo(otInst, &routerInfo);
@@ -675,14 +672,31 @@ CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, a
         err = encoder.EncodeEmptyList();
     }
     break;
-
+    case Attributes::ExtAddress::Id: {
+        const otExtAddress * extAddress = otLinkGetExtendedAddress(otInst);
+        if (!extAddress)
+        {
+            err = encoder.EncodeNull();
+        }
+        else
+        {
+            // This attribute's value is composed by taking the 8 octets of the extended address EUI-64 and
+            // treating them as a big-endian integer.
+            static_assert(sizeof(extAddress->m8) == sizeof(uint64_t), "Unexpected buffer size");
+            err = encoder.Encode(Encoding::BigEndian::Get64(extAddress->m8));
+        }
+    }
+    break;
+    case Attributes::Rloc16::Id:
+        err = encoder.Encode(otThreadGetRloc16(otInst));
+        break;
     default: {
         err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
     break;
     }
 
-#elif (CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
+#else
     switch (attributeId)
     {
     case Attributes::NeighborTable::Id:
@@ -707,6 +721,8 @@ CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, a
     case Attributes::ChannelPage0Mask::Id:
     case Attributes::SecurityPolicy::Id:
     case Attributes::OperationalDatasetComponents::Id:
+    case Attributes::ExtAddress::Id:
+    case Attributes::Rloc16::Id:
         err = encoder.EncodeNull();
         break;
     case Attributes::OverrunCount::Id:
@@ -842,8 +858,6 @@ CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, a
         err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
         break;
     }
-#else
-    err = CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
     return err;
 }

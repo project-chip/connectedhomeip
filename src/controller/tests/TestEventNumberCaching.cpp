@@ -18,10 +18,10 @@
 
 #include <pw_unit_test/framework.h>
 
-#include "app-common/zap-generated/ids/Clusters.h"
-#include "app/ClusterStateCache.h"
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/BufferedReadCallback.h>
+#include <app/ClusterStateCache.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
@@ -30,10 +30,12 @@
 #include <app/util/DataModelHandler.h>
 #include <app/util/attribute-storage.h>
 #include <controller/InvokeInteraction.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/TimeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -59,6 +61,7 @@ protected:
     // Performs setup for each test in the suite
     void SetUp()
     {
+        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
         const chip::app::LogStorageResources logStorageResources[] = {
             { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), chip::app::PriorityLevel::Debug },
             { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), chip::app::PriorityLevel::Info },
@@ -71,7 +74,7 @@ protected:
         // TODO: use ASSERT_EQ, once transition to pw_unit_test is complete
         VerifyOrDieWithMsg((err = mEventCounter.Init(0)) == CHIP_NO_ERROR, AppServer,
                            "Init EventCounter failed: %" CHIP_ERROR_FORMAT, err.Format());
-        chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), ArraySize(logStorageResources),
+        chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), MATTER_ARRAY_SIZE(logStorageResources),
                                                           gCircularEventBuffer, logStorageResources, &mEventCounter);
     }
 
@@ -80,6 +83,7 @@ protected:
     {
         chip::app::EventManagement::DestroyEventManagement();
         AppContext::TearDown();
+        chip::Platform::MemoryShutdown();
     }
 
 private:
@@ -144,11 +148,12 @@ TEST_F(TestEventNumberCaching, TestEventNumberCaching)
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
-    DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
+    DataVersion dataVersionStorage[MATTER_ARRAY_SIZE(testEndpointClusters)];
+    EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage)));
 
     chip::EventNumber firstEventNumber;
     chip::EventNumber lastEventNumber;
@@ -169,7 +174,7 @@ TEST_F(TestEventNumberCaching, TestEventNumberCaching)
 
     {
         Optional<EventNumber> highestEventNumber;
-        readCallback.mClusterCacheAdapter.GetHighestReceivedEventNumber(highestEventNumber);
+        EXPECT_SUCCESS(readCallback.mClusterCacheAdapter.GetHighestReceivedEventNumber(highestEventNumber));
         EXPECT_FALSE(highestEventNumber.HasValue());
         app::ReadClient readClient(engine, &GetExchangeManager(), readCallback.mClusterCacheAdapter.GetBufferedCallback(),
                                    app::ReadClient::InteractionType::Read);
@@ -180,13 +185,13 @@ TEST_F(TestEventNumberCaching, TestEventNumberCaching)
 
         EXPECT_EQ(readCallback.mEventsSeen, lastEventNumber - firstEventNumber + 1);
 
-        readCallback.mClusterCacheAdapter.ForEachEventData([](const app::EventHeader & header) {
+        EXPECT_SUCCESS(readCallback.mClusterCacheAdapter.ForEachEventData([](const app::EventHeader & header) {
             // We are not caching data.
             ADD_FAILURE(); // Can't use FAIL() because lambda has non-void return type.
             return CHIP_NO_ERROR;
-        });
+        }));
 
-        readCallback.mClusterCacheAdapter.GetHighestReceivedEventNumber(highestEventNumber);
+        EXPECT_SUCCESS(readCallback.mClusterCacheAdapter.GetHighestReceivedEventNumber(highestEventNumber));
         EXPECT_TRUE(highestEventNumber.HasValue() && highestEventNumber.Value() == lastEventNumber);
     }
 
@@ -200,7 +205,7 @@ TEST_F(TestEventNumberCaching, TestEventNumberCaching)
 
         readCallback.mClusterCacheAdapter.ClearEventCache(true);
         Optional<EventNumber> highestEventNumber;
-        readCallback.mClusterCacheAdapter.GetHighestReceivedEventNumber(highestEventNumber);
+        EXPECT_SUCCESS(readCallback.mClusterCacheAdapter.GetHighestReceivedEventNumber(highestEventNumber));
         EXPECT_FALSE(highestEventNumber.HasValue());
 
         const EventNumber kHighestEventNumberSeen = lastEventNumber - 1;
@@ -219,13 +224,13 @@ TEST_F(TestEventNumberCaching, TestEventNumberCaching)
         // We should only get events with event numbers larger than kHighestEventNumberSeen.
         EXPECT_EQ(readCallback.mEventsSeen, lastEventNumber - kHighestEventNumberSeen);
 
-        readCallback.mClusterCacheAdapter.ForEachEventData([](const app::EventHeader & header) {
+        EXPECT_SUCCESS(readCallback.mClusterCacheAdapter.ForEachEventData([](const app::EventHeader & header) {
             // We are not caching data.
             ADD_FAILURE(); // Can't use FAIL() because lambda has non-void return type.
             return CHIP_NO_ERROR;
-        });
+        }));
 
-        readCallback.mClusterCacheAdapter.GetHighestReceivedEventNumber(highestEventNumber);
+        EXPECT_SUCCESS(readCallback.mClusterCacheAdapter.GetHighestReceivedEventNumber(highestEventNumber));
         EXPECT_TRUE(highestEventNumber.HasValue() && highestEventNumber.Value() == lastEventNumber);
     }
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);

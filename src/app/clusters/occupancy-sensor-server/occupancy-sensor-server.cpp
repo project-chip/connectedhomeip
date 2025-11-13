@@ -23,6 +23,7 @@
 #include <app/data-model/Encode.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
+#include <clusters/OccupancySensing/Metadata.h>
 #include <lib/core/CHIPError.h>
 
 using chip::Protocols::InteractionModel::Status;
@@ -85,6 +86,8 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
 
         return aEncoder.Encode(*holdTimeLimitsStruct);
     }
+    case Attributes::ClusterRevision::Id:
+        return aEncoder.Encode(OccupancySensing::kRevision);
     default:
         return CHIP_NO_ERROR;
     }
@@ -136,7 +139,7 @@ Structs::HoldTimeLimitsStruct::Type * GetHoldTimeLimitsForEndpoint(EndpointId en
         return nullptr;
     }
 
-    if (index >= ArraySize(sHoldTimeLimitsStructs))
+    if (index >= MATTER_ARRAY_SIZE(sHoldTimeLimitsStructs))
     {
         ChipLogError(NotSpecified, "Internal error: invalid/unexpected hold time limits index.");
         return nullptr;
@@ -171,7 +174,7 @@ uint16_t * GetHoldTimeForEndpoint(EndpointId endpoint)
         return nullptr;
     }
 
-    if (index >= ArraySize(sHoldTimeLimitsStructs))
+    if (index >= MATTER_ARRAY_SIZE(sHoldTimeLimitsStructs))
     {
         ChipLogError(NotSpecified, "Internal error: invalid/unexpected hold time index.");
         return nullptr;
@@ -269,3 +272,4 @@ HalOccupancySensorType __attribute__((weak)) halOccupancyGetSensorType(EndpointI
 }
 
 void MatterOccupancySensingPluginServerInitCallback() {}
+void MatterOccupancySensingPluginServerShutdownCallback() {}
