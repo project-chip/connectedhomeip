@@ -29,20 +29,20 @@ using namespace chip::app::Clusters::WebRTCTransportRequestor;
 CHIP_ERROR WebRTCRequestorDelegate::HandleOffer(const WebRTCSessionStruct & session, const OfferArgs & args)
 {
     ChipLogProgress(Camera, "WebRTCRequestorDelegate::HandleOffer");
-    return WebRTCManager::Instance().HandleOffer(session.id, args);
+    return WebRTCManager::Instance().HandleOffer(session, args);
 }
 
 CHIP_ERROR WebRTCRequestorDelegate::HandleAnswer(const WebRTCSessionStruct & session, const std::string & sdpAnswer)
 {
     ChipLogProgress(Camera, "WebRTCRequestorDelegate::HandleAnswer");
-    return WebRTCManager::Instance().HandleAnswer(session.id, sdpAnswer);
+    return WebRTCManager::Instance().HandleAnswer(session, sdpAnswer);
 }
 
 CHIP_ERROR WebRTCRequestorDelegate::HandleICECandidates(const WebRTCSessionStruct & session,
                                                         const std::vector<ICECandidateStruct> & candidates)
 {
     ChipLogProgress(Camera, "WebRTCRequestorDelegate::HandleICECandidates");
-    return WebRTCManager::Instance().HandleICECandidates(session.id, candidates);
+    return WebRTCManager::Instance().HandleICECandidates(session, candidates);
 }
 
 CHIP_ERROR WebRTCRequestorDelegate::HandleEnd(const WebRTCSessionStruct & session, WebRTCEndReasonEnum reasonCode)

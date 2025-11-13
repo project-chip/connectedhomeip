@@ -30,8 +30,6 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
-constexpr uint16_t kMaxSessionId = 65534;
-
 constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
     Commands::Offer::kMetadataEntry,
     Commands::Answer::kMetadataEntry,
