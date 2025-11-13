@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,17 +18,12 @@
 
 #pragma once
 
-#include "TimeSyncDataProvider.h"
+#include <app/clusters/time-synchronization-server/TimeSyncDataProvider.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-objects.h>
-#include <lib/support/Span.h>
 #include <protocols/interaction_model/StatusCode.h>
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace TimeSynchronization {
+namespace chip::app::Clusters::TimeSynchronization {
 
 typedef void (*OnTimeSyncCompletion)(void * context, TimeSourceEnum timeSource, GranularityEnum granularity);
 typedef void (*OnFallbackNTPCompletion)(void * context, bool timeSyncSuccessful);
@@ -38,16 +33,8 @@ typedef void (*OnFallbackNTPCompletion)(void * context, bool timeSyncSuccessful)
  */
 class Delegate
 {
-    // using TimeZoneList = Span<TimeSyncDataProvider::TimeZoneStore>;
 
 public:
-    inline bool HasFeature(Feature feature)
-    {
-        uint32_t map;
-        bool success = (Attributes::FeatureMap::Get(mEndpoint, &map) == Protocols::InteractionModel::Status::Success);
-        return success ? (map & to_underlying(feature)) : false;
-    }
-
     inline EndpointId GetEndpoint() { return mEndpoint; }
     inline void SetEndpoint(EndpointId ep) { mEndpoint = ep; }
 
@@ -131,7 +118,4 @@ private:
     EndpointId mEndpoint = kRootEndpointId;
 };
 
-} // namespace TimeSynchronization
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::app::Clusters::TimeSynchronization
