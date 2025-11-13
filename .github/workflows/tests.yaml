@@ -620,15 +620,6 @@ jobs:
               with:
                   platform: linux
                   bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
-            - name: Try to ensure the directories for core dumping exist and we
-                  can write them.
-              run: |
-                  mkdir /tmp/cores || true
-                  sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
-                  mkdir objdir-clone || true
-
-            - name: Set up a IPV6 known envionment
-              uses: ./.github/actions/add-ipv6
 
             - name: Setup and Restore Cache
               id: ccache
@@ -852,7 +843,7 @@ jobs:
             - name: Upload artifacts for running
               uses: namespace-actions/upload-artifact@v1
               with:
-                name: repl-build-data-${{ github.sha }}}
+                name: repl-build-data-${{ github.sha }}
                 path: ./out/
                 retention-days: 2
                 if-no-files-found: error
@@ -914,13 +905,20 @@ jobs:
                   platform: linux
                   bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
 
+            - name: Try to ensure the directories for core dumping exist and we
+                  can write them.
+              run: |
+                  mkdir /tmp/cores || true
+                  sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
+                  mkdir objdir-clone || true
+
             - name: Set up a IPV6 known envionment
               uses: ./.github/actions/add-ipv6
 
             - name: Download artifacts for running
               uses: namespace-actions/download-artifact@v1
               with:
-                name: repl-build-data-${{ github.sha }}}
+                name: repl-build-data-${{ github.sha }}
                 path: ./out/
 
             - name: Generate an argument environment file
