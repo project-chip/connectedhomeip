@@ -351,25 +351,12 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
     @async_test_body
     async def teardown_test(self):
-        self.clear_ota_providers(self.controller, self.requestor_node_id)
+        self.clear_ota_providers(self.default_controller, self.dut_node_id)
         self.terminate_provider()
         super().teardown_test()
 
     @async_test_body
     async def test_TC_SU_2_2(self):
-        # ------------------------------------------------------------------------------------
-        # Run script
-        # ------------------------------------------------------------------------------------
-        # Run Python test with commission Provisioner/Requestor from Terminal:
-        #   python3 src/python_testing/TC_SU_2_2.py \
-        #   --commissioning-method on-network \
-        #   --discriminator 1234 \
-        #   --passcode 20202021 \
-        #   --admin-vendor-id 65521 \
-        #   --int-arg product-id:32769 \
-        #   --nodeId 2
-        # ------------------------------------------------------------------------------------
-
         self.LOG_FILE_PATH = "provider.log"
         self.KVS_PATH = "/tmp/chip_kvs_provider"
         self.provider_app_path = self.user_params.get('provider_app_path', None)
@@ -1169,13 +1156,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # [STEP_7]: Step #7.5 - Close Provider Process
         # ------------------------------------------------------------------------------------
         # Clear DefaultOTAProviders for a clean state
-        await self.clear_ota_providers(
-            controller=controller,
-            requestor_node_id=requestor_node_id
-        )
-
-        logger.info(
-            f'{step_number_s7}: Step #7.5 - Closed Provider process.')
+        logger.info(f'{step_number_s7}: Step #7.5 - Closed Provider process.')
 
         # Kill Provider process
         self.current_provider_app_proc.terminate()
