@@ -5,5 +5,3 @@ zeroconf
 ifaddr
 langcodes
 requests
-pyscard
-ndeflib

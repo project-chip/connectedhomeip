@@ -381,6 +381,11 @@ if [ -n "$install_virtual_env" ]; then
         "$ENVIRONMENT_ROOT"/bin/pip install -r "$CHIP_ROOT/src/python_testing/requirements.txt"
     fi
 
+    if [ "$enable_nfc" = "true" ]; then
+        echo_blue "Installing python nfc dependencies ..."
+        "$ENVIRONMENT_ROOT"/bin/pip install -r "$CHIP_ROOT/src/python_testing/nfc_requirements.txt"
+    fi
+
     if [ "$install_jupyterlab" = "yes" ]; then
         echo_blue "Installing JupyterLab kernels and lsp..."
         "$ENVIRONMENT_ROOT"/bin/pip install -r "$CHIP_ROOT/scripts/jupyterlab_requirements.txt"
