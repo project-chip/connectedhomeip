@@ -295,7 +295,7 @@ class TC_CNET_4_23(MatterBaseTest):
         # Temporarily use incorrect password during auto-commissioning to prevent automatic WiFi connection
         # This ensures the DUT doesn't connect to WiFi during the automated commissioning steps,
         # allowing the test to manually verify incorrect and correct credential handling
-        self.matter_test_config.wifi_passphrase = incorrect_password.decode('utf-8')
+        self.matter_test_config.wifi_passphrase = incorrect_password.decode('utf-8', errors='replace')
 
         # Skip CommissioningComplete to manually configure WiFi with incorrect then correct credentials
         self.default_controller.SetSkipCommissioningComplete(True)
@@ -307,7 +307,7 @@ class TC_CNET_4_23(MatterBaseTest):
             await self.commission_devices()
         finally:
             # Restore correct password immediately after commissioning (even if commissioning fails)
-            self.matter_test_config.wifi_passphrase = correct_password.decode('utf-8')
+            self.matter_test_config.wifi_passphrase = correct_password.decode('utf-8', errors='replace')
 
         # Extend fail-safe to 300 seconds to allow time for credential testing
         await self.send_single_cmd(
@@ -358,7 +358,7 @@ class TC_CNET_4_23(MatterBaseTest):
         self.step(2)
 
         logger.info(
-            f" --- Step 2: Using incorrect SSID: {incorrect_ssid.decode('utf-8')} with correct password")
+            f" --- Step 2: Using incorrect SSID: {incorrect_ssid.decode('utf-8', errors='replace')} with correct password")
         response = await self.send_single_cmd(
             endpoint=endpoint,
             cmd=cnet.Commands.AddOrUpdateWiFiNetwork(
@@ -383,7 +383,8 @@ class TC_CNET_4_23(MatterBaseTest):
             timedRequestTimeoutMs=CONNECT_NETWORK_TIMEOUT_MS
         )
         await self._validate_connect_network_response(response, expect_success=False)
-        logger.info(f" --- ConnectNetwork failed as expected for incorrect SSID: {incorrect_ssid.decode('utf-8')}")
+        logger.info(
+            f" --- ConnectNetwork failed as expected for incorrect SSID: {incorrect_ssid.decode('utf-8', errors='replace')}")
 
         # Wait for DUT to complete connection attempt and update LastNetworkingStatus
         logger.info(f" --- Waiting {NETWORK_STATUS_UPDATE_DELAY} seconds for DUT to update network status...")
@@ -404,12 +405,12 @@ class TC_CNET_4_23(MatterBaseTest):
         logger.info(f" --- Step 5: Networks attribute has {len(networks)} network(s)")
         network_ids = [net.networkID for net in networks]
         asserts.assert_in(incorrect_ssid, network_ids,
-                          f"Expected incorrect SSID {incorrect_ssid.decode('utf-8')} to be in Networks list")
+                          f"Expected incorrect SSID {incorrect_ssid.decode('utf-8', errors='replace')} to be in Networks list")
 
         # Step 6: TH sends RemoveNetwork command with incorrect SSID, Breadcrumb = 3
         self.step(6)
 
-        logger.info(f" --- Step 6: Removing incorrect SSID: {incorrect_ssid.decode('utf-8')}")
+        logger.info(f" --- Step 6: Removing incorrect SSID: {incorrect_ssid.decode('utf-8', errors='replace')}")
         response = await self.send_single_cmd(
             endpoint=endpoint,
             cmd=cnet.Commands.RemoveNetwork(
@@ -432,7 +433,7 @@ class TC_CNET_4_23(MatterBaseTest):
         self.step(8)
 
         logger.info(
-            f" --- Step 8: Using correct SSID: {correct_ssid.decode('utf-8')} with incorrect password")
+            f" --- Step 8: Using correct SSID: {correct_ssid.decode('utf-8', errors='replace')} with incorrect password")
         response = await self.send_single_cmd(
             endpoint=endpoint,
             cmd=cnet.Commands.AddOrUpdateWiFiNetwork(
@@ -458,7 +459,7 @@ class TC_CNET_4_23(MatterBaseTest):
         )
         await self._validate_connect_network_response(response, expect_success=False)
         logger.info(
-            f" --- ConnectNetwork failed as expected for SSID: {correct_ssid.decode('utf-8')} with incorrect credentials")
+            f" --- ConnectNetwork failed as expected for SSID: {correct_ssid.decode('utf-8', errors='replace')} with incorrect credentials")
 
         # Wait for DUT to complete connection attempt and update LastNetworkingStatus
         logger.info(f" --- Waiting {NETWORK_STATUS_UPDATE_DELAY} seconds for DUT to update network status...")
@@ -513,11 +514,11 @@ class TC_CNET_4_23(MatterBaseTest):
                 if correct_ssid in ssids_found:
                     target_ssid_found = True
                     logger.info(
-                        f" --- ScanNetworks found target SSID: {correct_ssid.decode('utf-8')} on attempt {attempt}")
+                        f" --- ScanNetworks found target SSID: {correct_ssid.decode('utf-8', errors='replace')} on attempt {attempt}")
                     break
                 else:
                     logger.warning(
-                        f" --- Target SSID '{correct_ssid.decode('utf-8')}' not found in scan results (attempt {attempt})")
+                        f" --- Target SSID '{correct_ssid.decode('utf-8', errors='replace')}' not found in scan results (attempt {attempt})")
             else:
                 logger.warning(f" --- No networks found in scan (attempt {attempt})")
 
@@ -527,13 +528,13 @@ class TC_CNET_4_23(MatterBaseTest):
                 await asyncio.sleep(SCAN_RETRY_DELAY)
 
         asserts.assert_true(target_ssid_found,
-                            f"ScanNetworks did not find target SSID '{correct_ssid.decode('utf-8')}' after {MAX_ATTEMPTS} attempts")
+                            f"ScanNetworks did not find target SSID '{correct_ssid.decode('utf-8', errors='replace')}' after {MAX_ATTEMPTS} attempts")
 
         # Step 12: TH sends AddOrUpdateWiFiNetwork with correct credentials and Breadcrumb = 7
         self.step(12)
 
         logger.info(
-            f"Using correct SSID: {correct_ssid.decode('utf-8')} with correct Password")
+            f"Using correct SSID: {correct_ssid.decode('utf-8', errors='replace')} with correct Password")
         response = await self.send_single_cmd(
             endpoint=endpoint,
             cmd=cnet.Commands.AddOrUpdateWiFiNetwork(
@@ -559,7 +560,7 @@ class TC_CNET_4_23(MatterBaseTest):
         )
         await self._validate_connect_network_response(response, expect_success=True)
         logger.info(
-            f" --- ConnectNetwork succeeded for SSID: {correct_ssid.decode('utf-8')} with correct credentials")
+            f" --- ConnectNetwork succeeded for SSID: {correct_ssid.decode('utf-8', errors='replace')} with correct credentials")
 
         # Step 14: TH reads LastNetworkingStatus (should be kSuccess)
         self.step(14)
@@ -577,8 +578,8 @@ class TC_CNET_4_23(MatterBaseTest):
         # Verify the device is connected to the correct network
         connected_networks = [network.networkID for network in response if network.connected]
         asserts.assert_true(correct_ssid in connected_networks,
-                            f"Expected device to be connected to SSID '{correct_ssid.decode('utf-8')}'")
-        logger.info(f" --- Device is connected to SSID: {correct_ssid.decode('utf-8')}")
+                            f"Expected device to be connected to SSID '{correct_ssid.decode('utf-8', errors='replace')}'")
+        logger.info(f" --- Device is connected to SSID: {correct_ssid.decode('utf-8', errors='replace')}")
 
         # Step 16: TH sends CommissioningComplete to finalize commissioning
         self.step(16)
