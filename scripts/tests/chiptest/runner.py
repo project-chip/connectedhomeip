@@ -149,8 +149,8 @@ class Executor:
 
 
 class Runner:
-    def __init__(self, executor=None, capture_delegate=None):
-        self.executor = Executor() if executor is None else executor
+    def __init__(self, executor, capture_delegate=None):
+        self.executor = executor
         self.capture_delegate = capture_delegate
 
     def RunSubprocess(self, subproc: SubprocessInfo, name: str, wait=True, dependencies=[], timeout_seconds: typing.Optional[int] = None, stdin=None):

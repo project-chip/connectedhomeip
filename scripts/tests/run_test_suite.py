@@ -27,13 +27,16 @@ import click
 import coloredlogs
 from chiptest.accessories import AppsRegister
 from chiptest.glob_matcher import GlobMatcher
-from chiptest.runner import SubprocessInfo
+from chiptest.runner import Executor, SubprocessInfo
 from chiptest.test_definition import TestRunTime, TestTag
 from chipyaml.paths_finder import PathsFinder
 
 # If running on Linux platform load the Linux specific code.
 if sys.platform == "linux":
     import chiptest.linux
+
+if sys.platform == 'darwin':
+    import chiptest.darwin
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -409,12 +412,13 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
             ble_controller_tool = 1  # Bind tool to the second BLE controller
 
         executor = chiptest.linux.LinuxNamespacedExecutor(ns)
-        runner = chiptest.runner.Runner(executor=executor)
     elif sys.platform == 'darwin':
         executor = chiptest.darwin.DarwinExecutor()
-        runner = chiptest.runner.Runner(executor=executor)
     else:
-        runner = chiptest.runner.Runner()
+        log.warning("No platform-specific executor for '%s'", sys.platform)
+        executor = Executor()
+
+    runner = chiptest.runner.Runner(executor=executor)
 
     logging.info("Each test will be executed %d times" % iterations)
 
