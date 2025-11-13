@@ -15,7 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "ElectricalEnergyMeasurementCluster.h"
+#include <app/clusters/electrical-energy-measurement-server/ElectricalEnergyMeasurementCluster.h>
 
 #include <protocols/interaction_model/StatusCode.h>
 
