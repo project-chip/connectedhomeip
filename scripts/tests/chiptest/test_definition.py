@@ -104,10 +104,10 @@ class App:
         # Watch for both mDNS advertisement start as well as event loop start.
         # These two messages can appear in any order depending on the implementation.
         # Waiting for both makes the startup detection more robust.
-        self.__waitFor(("mDNS service published:", "Starting event loop"))
+        self.__waitFor(["mDNS service published:", "Starting event loop"])
 
     def waitForMessage(self, message: str, timeoutInSeconds: int = 10):
-        self.__waitFor((message), timeoutInSeconds=timeoutInSeconds)
+        self.__waitFor([message], timeoutInSeconds=timeoutInSeconds)
         return True
 
     def kill(self):
@@ -169,7 +169,7 @@ class App:
                     return None
                 lastLogIndex = max(lastLogIndex, index)
 
-            return lastLogIndex + 1
+            return lastLogIndex
 
         lastLogIndex = allPatternsFound()
         while lastLogIndex is None:
