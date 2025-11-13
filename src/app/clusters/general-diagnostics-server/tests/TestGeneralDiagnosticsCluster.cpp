@@ -68,16 +68,26 @@ class NullProvider : public DeviceLayer::DiagnosticDataProvider
 };
 
 // Helper method to invoke TimeSnapshot command and decode response
-void InvokeTimeSnapshotAndGetResponse(ClusterTester & tester,
-                                      GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType & response)
+CHIP_ERROR InvokeTimeSnapshotAndGetResponse(ClusterTester & tester,
+                                            GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType & response)
 {
     GeneralDiagnostics::Commands::TimeSnapshot::Type request{};
     auto result = tester.Invoke(GeneralDiagnostics::Commands::TimeSnapshot::Id, request);
 
-    ASSERT_TRUE(result.status.has_value());
-    ASSERT_TRUE(result.status->IsSuccess()); // NOLINT(bugprone-unchecked-optional-access)
-    ASSERT_TRUE(result.response.has_value());
-    response = result.response.value(); // NOLINT(bugprone-unchecked-optional-access)
+    if (!result.status.has_value())
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+    if (!result.status->IsSuccess())
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+    if (!result.response.has_value())
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+    response = result.response.value();
+    return CHIP_NO_ERROR;
 }
 
 struct TestGeneralDiagnosticsCluster : public ::testing::Test
@@ -243,7 +253,7 @@ TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotCommandTest)
 
     // Invoke TimeSnapshot command and get response
     GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType response;
-    InvokeTimeSnapshotAndGetResponse(tester, response);
+    ASSERT_EQ(InvokeTimeSnapshotAndGetResponse(tester, response), CHIP_NO_ERROR);
 
     // Basic configuration excludes POSIX time
     EXPECT_TRUE(response.posixTimeMs.IsNull());
@@ -265,7 +275,7 @@ TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotCommandWithPosixTimeTest)
 
     // Invoke TimeSnapshot command and get response
     GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType response;
-    InvokeTimeSnapshotAndGetResponse(tester, response);
+    ASSERT_EQ(InvokeTimeSnapshotAndGetResponse(tester, response), CHIP_NO_ERROR);
 
     // POSIX time is included when available (system dependent)
     if (!response.posixTimeMs.IsNull())
@@ -286,11 +296,11 @@ TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotResponseValues)
 
     // First invocation. Capture initial timestamp
     GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType firstResponse;
-    InvokeTimeSnapshotAndGetResponse(tester, firstResponse);
+    ASSERT_EQ(InvokeTimeSnapshotAndGetResponse(tester, firstResponse), CHIP_NO_ERROR);
 
     // Second invocation. Capture subsequent timestamp
     GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType secondResponse;
-    InvokeTimeSnapshotAndGetResponse(tester, secondResponse);
+    ASSERT_EQ(InvokeTimeSnapshotAndGetResponse(tester, secondResponse), CHIP_NO_ERROR);
 
     // Verify second response is also valid and greater than or equal to first
     EXPECT_GE(secondResponse.systemTimeMs, firstResponse.systemTimeMs);
