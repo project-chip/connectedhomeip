@@ -845,7 +845,7 @@ jobs:
             - name: Archive artifacts
               run: |
                 find objdir-clone -executable -type f | xargs -n 1 strip
-                tar cfvJ repl-build-data.tar.xz out/venv objdir-clone
+                tar cfJ repl-build-data.tar.xz out/venv objdir-clone
 
             - name: Upload artifacts for running
               uses: namespace-actions/upload-artifact@v1
@@ -929,7 +929,7 @@ jobs:
 
             - name: Unpack artifacts
               run: |
-                tar xfvJ repl-build-data.tar.xz
+                tar xfJ repl-build-data.tar.xz
 
             - name: Generate an argument environment file
               run: |
@@ -1014,12 +1014,6 @@ jobs:
                   docs/development_controllers/matter-repl/Matter_Access_Control.ipynb \
                   docs/development_controllers/matter-repl/Matter_Multi_Fabric_Commissioning.ipynb \
                   "
-            # Temporary to debug stuff
-            - name: Breakpoint if tests failed
-              if: failure()
-              uses: namespacelabs/breakpoint-action@v0
-              with:
-                 duration: 15m
 
     repl_tests_darwin:
         name: REPL Tests - Darwin (Build Only)
