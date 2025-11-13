@@ -43,8 +43,8 @@ bool gUpdatePossibleInitialized = false;
 class OTARequestorClusterUsingSingleton : public OTARequestorCluster
 {
 public:
-    explicit OTARequestorClusterUsingSingleton(EndpointId endpointId)
-        : OTARequestorCluster(endpointId, nullptr) {}
+    explicit OTARequestorClusterUsingSingleton(EndpointId endpointId, bool updatePossible)
+        : OTARequestorCluster(endpointId, nullptr, updatePossible) {}
 
     OTARequestorInterface * OtaRequestorInstance() override
     {
@@ -52,35 +52,8 @@ public:
     }
 };
 
-LazyRegisteredServerCluster<OTARequestorClusterUsingSingleton> gServers[kOtaRequestorMaxClusterCount];
-
-class IntegrationDelegate : public CodegenClusterIntegration::Delegate
+bool LoadUpdatePossible(EndpointId endpointId)
 {
-public:
-    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
-                                                   uint32_t optionalAttributeBits, uint32_t featureMap) override
-    {
-        gServers[clusterInstanceIndex].Create(endpointId);
-        return gServers[clusterInstanceIndex].Registration();
-    }
-
-    ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
-    {
-        VerifyOrReturnValue(gServers[clusterInstanceIndex].IsConstructed(), nullptr);
-        return &gServers[clusterInstanceIndex].Cluster();
-    }
-
-    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServers[clusterInstanceIndex].Destroy(); }
-};
-
-void LoadUpdatePossible(EndpointId endpointId)
-{
-    OTARequestorInterface * requestor = GetRequestorInstance();
-    if (requestor == nullptr)
-    {
-        return;
-    }
-
     using Traits = NumericAttributeTraits<bool>;
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
@@ -96,10 +69,32 @@ void LoadUpdatePossible(EndpointId endpointId)
                      endpointId, ChipLogValueMEI(OtaSoftwareUpdateRequestor::Id),
                      static_cast<int>(status));
 #endif
-        return;
+        // Return the spec's fallback value.
+        return true;
     }
-    requestor->SetUpdatePossible(Traits::StorageToWorking(temp));
+    return Traits::StorageToWorking(temp);
 }
+
+LazyRegisteredServerCluster<OTARequestorClusterUsingSingleton> gServers[kOtaRequestorMaxClusterCount];
+
+class IntegrationDelegate : public CodegenClusterIntegration::Delegate
+{
+public:
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
+                                                   uint32_t optionalAttributeBits, uint32_t featureMap) override
+    {
+        gServers[clusterInstanceIndex].Create(endpointId, LoadUpdatePossible(endpointId));
+        return gServers[clusterInstanceIndex].Registration();
+    }
+
+    ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
+    {
+        VerifyOrReturnValue(gServers[clusterInstanceIndex].IsConstructed(), nullptr);
+        return &gServers[clusterInstanceIndex].Cluster();
+    }
+
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServers[clusterInstanceIndex].Destroy(); }
+};
 
 }  // namespace
 
