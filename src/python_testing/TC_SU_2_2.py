@@ -137,8 +137,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
         Args:
             controller: The Matter device controller instance used to read/write ACLs.
-            requestor_node: Node ID of the OTA Requestor (DUT).
-            provider_node: Node ID of the OTA Provider.
+            requestor_node_id: Node ID of the OTA Requestor (DUT).
+            provider_node_id: Node ID of the OTA Provider.
 
         Returns:
             None
@@ -205,9 +205,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         Writes the Access Control List (ACL) to the DUT device using the specified controller.
 
         Args:
-            controller: The Matter controller (e.g., th1, th4) that will perform the write operation.
+            node_id (int): The node ID of the device to which the ACL will be written.
             acl (list): List of AccessControlEntryStruct objects defining the ACL permissions to write.
-            node_id:
 
         Raises:
             AssertionError: If writing the ACL attribute fails (status is not Status.Success).
@@ -224,18 +223,17 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         Generic matcher for OTA UpdateState across multiple steps.
 
         Args:
-            step_name: str, Name of the step, used in logging.
-            start_states: list[int], States that trigger the start of the interval timer.
-            allowed_states: list[int], States allowed during the interval. Any other state is considered unexpected.
-            min_interval_sec: float, Minimum duration of the interval in seconds.
-            final_state: int, optional, If provided, matcher waits for this state after interval completes.
+            step_name (str): Name of the step, used in logging.
+            start_states (list[int]): States that trigger the start of the interval timer.
+            allowed_states (list[int]): States allowed during the interval. Any other state is considered unexpected.
+            min_interval_sec (float): Minimum duration of the interval in seconds.
+            final_state (int, optional): If provided, matcher waits for this state after interval completes.
 
         Returns:
-            matcher_obj: AttributeMatcher
-            state_sequence: list of observed states
-            unexpected_states: set of unexpected states during interval
-            t_start: timestamp when first start_state observed
-            t_end: timestamp when interval ended
+            matcher_obj (AttributeMatcher): Matcher object to be used in event subscriptions.
+            state_sequence (list): List of observed states during the interval.
+            unexpected_states (set): Set of unexpected states observed during the interval.
+            interval_duration (list): List containing the duration (in seconds) of the interval, or None if not completed.
         """
         seen_states = set()
         observed_states = set()
@@ -312,7 +310,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
     def pics_TC_SU_2_2(self):
         """Return the PICS definitions associated with this test."""
         pics = [
-            "MCORE.OTA.Requestor",      # Pics
+            "MCORE.OTA.Requestor",
         ]
         return pics
 
@@ -427,7 +425,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # ------------------------------------------------------------------------------------
         # [STEP_1]: Step #1.1 - Matcher for OTA records logs
         # Start AttributeSubscriptionHandler first to avoid missing any rapid OTA events (race condition)
-        # Atrributes: UpdateState and UpdateStateProgress (updateAvailable sequence)
+        # Attributes: UpdateState and UpdateStateProgress (updateAvailable sequence)
         # ------------------------------------------------------------------------------------
 
         subscription_attr = AttributeSubscriptionHandler(
@@ -537,7 +535,8 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             asserts.fail(msg)
 
         # Assert that progress has at least one value between 1 and 100
-        assert any(1 <= v <= 100 for v in progress_values), f"{step_number}: No valid UpdateStateProgress observed (1-100)"
+        asserts.assert_true(any(1 <= v <= 100 for v in progress_values),
+                            f"{step_number}: No valid UpdateStateProgress observed (1-100)")
         logger.info(f'{step_number}: Step #1.4 - UpdateStateProgress has valid value(s) in range 1-100')
 
         # ------------------------------------------------------------------------------------
@@ -571,7 +570,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # ------------------------------------------------------------------------------------
         # [STEP_2]: Step #2.1 - Matcher for OTA records logs
         # Start AttributeSubscriptionHandler first to avoid missing any rapid OTA events (race condition)
-        # Atrributes: UpdateState (Busy sequence)
+        # Attributes: UpdateState (Busy sequence)
         # ------------------------------------------------------------------------------------
         subscription_attr_state_busy = AttributeSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
@@ -687,7 +686,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # ------------------------------------------------------------------------------------
         # [STEP_3]: Step #3.1 - Matcher for OTA records logs
         # Start AttributeSubscriptionHandler first to avoid missing any rapid OTA events (race condition)
-        # Atrributes: UpdateState (updateNotAvailable sequence)
+        # Attributes: UpdateState (updateNotAvailable sequence)
         # ------------------------------------------------------------------------------------
         subscription_attr_state_updatenotavailable = AttributeSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
@@ -802,7 +801,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # ------------------------------------------------------------------------------------
         # [STEP_4]: Step #4.1 - Matcher for OTA records logs
         # Start AttributeSubscriptionHandler first to avoid missing any rapid OTA events (race condition)
-        # Atrributes: UpdateState (Busy, 180s DelayedActionTime)
+        # Attributes: UpdateState (Busy, 180s DelayedActionTime)
         # ------------------------------------------------------------------------------------
 
         subscription_attr_state_busy_180s = AttributeSubscriptionHandler(
@@ -840,7 +839,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         logger.info(f'{step_number_s4}: Step #4.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
 
         # ------------------------------------------------------------------------------------
-        # [STEP_4]: Step #2.4 - Track OTA attributes: UpdateState (Busy,  180s DelayedActionTime sequence)
+        # [STEP_4]: Step #4.4 - Track OTA attributes: UpdateState (Busy,  180s DelayedActionTime sequence)
         # UpdateState (Busy, 180s DelayedActionTime sequence) matcher: Allowed states during 180s interval: Idle, DelayedOnQuery, Querying.
         # Any unexpected states during the 180s interval are asserted.
         # After the interval, Downloading is verified.
