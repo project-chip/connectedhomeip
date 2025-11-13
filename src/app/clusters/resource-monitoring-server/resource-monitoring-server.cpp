@@ -79,7 +79,7 @@ DataModel::ActionReturnStatus ResourceMonitoringCluster::WriteImpl(const DataMod
     {
     case ResourceMonitoring::Attributes::LastChangedTime::Id: {
 
-        uint32_t lastChangedTime;
+        uint32_t lastChangedTime = 0; // Initialize to a known value
 
         DataModel::ActionReturnStatus status = persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, lastChangedTime);
         if (status == CHIP_NO_ERROR)
