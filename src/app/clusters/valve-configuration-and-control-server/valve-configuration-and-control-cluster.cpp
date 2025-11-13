@@ -22,7 +22,7 @@
 #ifdef ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
 // Need the `nogncheck` because it's inter-cluster dependency and this
 // breaks GN deps checks since that doesn't know how to deal with #ifdef'd includes :(.
-#include "app/clusters/time-synchronization-server/time-synchronization-cluster.h" // nogncheck
+#include "app/clusters/time-synchronization-server/time-synchronization-server.h" // nogncheck
 
 #endif // ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
 
@@ -314,9 +314,11 @@ CHIP_ERROR SetValveLevel(EndpointId ep, DataModel::Nullable<Percent> level, Data
     if (HasFeature(ep, ValveConfigurationAndControl::Feature::kTimeSync))
     {
 #ifdef ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
+        auto timeSynchronization = TimeSynchronization::GetClusterInstance();
+        VerifyOrReturnValue(timeSynchronization != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
         if (!openDuration.IsNull() &&
-            TimeSynchronization::TimeSynchronizationServer::Instance().GetGranularity() !=
-                TimeSynchronization::GranularityEnum::kNoTimeGranularity)
+            timeSynchronization->GetGranularity() != TimeSynchronization::GranularityEnum::kNoTimeGranularity)
         {
             System::Clock::Microseconds64 utcTime;
             uint64_t chipEpochTime;
