@@ -178,7 +178,6 @@ private:
     TimeSynchronization::TimeZoneDatabaseEnum mTimeZoneDatabase;
     TimeSynchronization::TimeSourceEnum mTimeSource;
     TimeSynchronization::Delegate * mDelegate = nullptr;
-    TimeSynchronization::DefaultTimeSyncDelegate mDefaultDelegate;
 
     TimeSyncDataProvider mTimeSyncDataProvider;
     TimeSynchronization::TimeSyncEventFlag mEventFlag = TimeSynchronization::TimeSyncEventFlag::kNone;
