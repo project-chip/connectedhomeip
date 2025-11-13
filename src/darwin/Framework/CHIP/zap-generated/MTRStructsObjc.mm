@@ -1089,6 +1089,14 @@ NS_ASSUME_NONNULL_BEGIN
         _caseSessionsPerFabric = @(0);
 
         _subscriptionsPerFabric = @(0);
+
+        _simultaneousInvocationsSupported = nil;
+
+        _simultaneousWritesSupported = nil;
+
+        _readPathsSupported = nil;
+
+        _subscribePathsSupported = nil;
     }
     return self;
 }
@@ -1099,13 +1107,17 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.caseSessionsPerFabric = self.caseSessionsPerFabric;
     other.subscriptionsPerFabric = self.subscriptionsPerFabric;
+    other.simultaneousInvocationsSupported = self.simultaneousInvocationsSupported;
+    other.simultaneousWritesSupported = self.simultaneousWritesSupported;
+    other.readPathsSupported = self.readPathsSupported;
+    other.subscribePathsSupported = self.subscribePathsSupported;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: caseSessionsPerFabric:%@; subscriptionsPerFabric:%@; >", NSStringFromClass([self class]), _caseSessionsPerFabric, _subscriptionsPerFabric];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: caseSessionsPerFabric:%@; subscriptionsPerFabric:%@; simultaneousInvocationsSupported:%@; simultaneousWritesSupported:%@; readPathsSupported:%@; subscribePathsSupported:%@; >", NSStringFromClass([self class]), _caseSessionsPerFabric, _subscriptionsPerFabric, _simultaneousInvocationsSupported, _simultaneousWritesSupported, _readPathsSupported, _subscribePathsSupported];
     return descriptionString;
 }
 

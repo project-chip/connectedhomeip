@@ -941,7 +941,7 @@ cluster Actions = 37 {
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
 cluster BasicInformation = 40 {
-  revision 5;
+  revision 6;
 
   enum ColorEnum : enum8 {
     kBlack = 0;
@@ -979,6 +979,10 @@ cluster BasicInformation = 40 {
   struct CapabilityMinimaStruct {
     int16u caseSessionsPerFabric = 0;
     int16u subscriptionsPerFabric = 1;
+    optional int16u simultaneousInvocationsSupported = 2;
+    optional int16u simultaneousWritesSupported = 3;
+    optional int16u readPathsSupported = 4;
+    optional int16u subscribePathsSupported = 5;
   }
 
   struct ProductAppearanceStruct {
@@ -1019,12 +1023,12 @@ cluster BasicInformation = 40 {
   readonly attribute optional char_string<32> serialNumber = 15;
   attribute access(write: manage) optional boolean localConfigDisabled = 16;
   readonly attribute optional boolean reachable = 17;
-  readonly attribute char_string<32> uniqueID = 18;
+  readonly attribute optional char_string<32> uniqueID = 18;
   readonly attribute CapabilityMinimaStruct capabilityMinima = 19;
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
-  readonly attribute int32u specificationVersion = 21;
-  readonly attribute int16u maxPathsPerInvoke = 22;
-  readonly attribute int32u configurationVersion = 24;
+  readonly attribute optional int32u specificationVersion = 21;
+  readonly attribute optional int16u maxPathsPerInvoke = 22;
+  readonly attribute optional int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
