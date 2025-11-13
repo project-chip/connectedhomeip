@@ -45,7 +45,6 @@ public:
     bool SupportsOptAttr(OptionalAttributes aOptionalAttrs);
 
 private:
-    EndpointId mEndpointId;
     RegisteredServerCluster<ElectricalEnergyMeasurementCluster> mCluster;
 };
 

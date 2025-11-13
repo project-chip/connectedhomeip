@@ -44,7 +44,6 @@ using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Structs;
 ElectricalEnergyMeasurementAttrAccess::ElectricalEnergyMeasurementAttrAccess(BitMask<Feature> aFeature,
                                                                              BitMask<OptionalAttributes> aOptionalAttrs,
                                                                              EndpointId endpointId) :
-    mEndpointId(endpointId),
     mCluster([&]() { return ElectricalEnergyMeasurementCluster::Config(endpointId, aFeature, aOptionalAttrs); }())
 {}
 
@@ -160,9 +159,10 @@ CHIP_ERROR ElectricalEnergyMeasurementAttrAccess::Init()
     if (err != CHIP_NO_ERROR)
     {
 #if defined(CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS) &&                                                       \
-    CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
-        ChipLogError(AppServer, "Failed to register cluster %u/" ChipLogFormatMEI ": %" CHIP_ERROR_FORMAT, mEndpointId,
-                     ChipLogValueMEI(ElectricalEnergyMeasurement::Id), err.Format());
+        CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS ||                                                            \
+    1
+        ChipLogError(AppServer, "Failed to register cluster %u/" ChipLogFormatMEI ": %" CHIP_ERROR_FORMAT,
+                     mCluster.Cluster().GetPaths()[1].mEndpointId, ChipLogValueMEI(ElectricalEnergyMeasurement::Id), err.Format());
 #endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
     }
     return err;
@@ -175,9 +175,10 @@ void ElectricalEnergyMeasurementAttrAccess::Shutdown()
     if (err != CHIP_NO_ERROR)
     {
 #if defined(CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS) &&                                                       \
-    CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
-        ChipLogError(AppServer, "Failed to unregister cluster %u/" ChipLogFormatMEI ": %" CHIP_ERROR_FORMAT, mEndpointId,
-                     ChipLogValueMEI(ElectricalEnergyMeasurement::Id), err.Format());
+        CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS ||                                                            \
+    1
+        ChipLogError(AppServer, "Failed to unregister cluster %u/" ChipLogFormatMEI ": %" CHIP_ERROR_FORMAT,
+                     mCluster.Cluster().GetPaths()[1].mEndpointId, ChipLogValueMEI(ElectricalEnergyMeasurement::Id), err.Format());
 #endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
     }
 }
