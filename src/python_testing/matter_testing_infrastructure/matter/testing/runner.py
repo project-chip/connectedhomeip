@@ -849,7 +849,7 @@ def parse_matter_test_args(argv: Optional[List[str]] = None):
     basic_group.add_argument('--app-pipe', type=str, default=None,
                              help="The full path of the app to send an out-of-band command from test to app")
     basic_group.add_argument('--app-pipe-out', type=str, default=None,
-                             help="The full path of the app to send an out-of-band command from app to test")
+                             help="The full path of the app to read an out-of-band command from app to test")
     basic_group.add_argument('--restart-flag-file', type=str, default=None,
                              help="The full path of the file to use to signal a restart to the app")
     basic_group.add_argument('--timeout', type=int, help="Test timeout in seconds")

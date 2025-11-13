@@ -171,8 +171,6 @@ class OTAProviderSubprocess(AppServerSubprocess):
             kvs_path(str): Str of the path for the kvs path, if not will use temp file.
             log_file(str,BinaryIO): Path to create the BinaryIO logger for stdoutput, if not use the default stdout.buffer.
             err_log_file(str,BinaryIO): Path to create the BinaryIO logger for stderr, if not use the default stderr.buffer.
-            app_pipe(str): Path to send out of band commands from test to app
-            app_pipe_out(str): Path to send out of band commands from app to test
         """
         # Create the BinaryIO fp allow to use if path is provided.
         # Or assign it to the previously opened fp.
