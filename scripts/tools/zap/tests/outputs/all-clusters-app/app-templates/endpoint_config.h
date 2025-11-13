@@ -1921,8 +1921,9 @@
           ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) },                 /* ScheduleTypes */               \
         { ZAP_SIMPLE_DEFAULT(0), 0x0000004A, 1, ZAP_TYPE(INT8U), ZAP_ATTRIBUTE_MASK(READABLE) }, /* NumberOfPresets */             \
         { ZAP_SIMPLE_DEFAULT(0), 0x0000004B, 1, ZAP_TYPE(INT8U), ZAP_ATTRIBUTE_MASK(READABLE) }, /* NumberOfSchedules */           \
-        { ZAP_SIMPLE_DEFAULT(0xFF), 0x0000004D, 1, ZAP_TYPE(INT8U),                                                                \
-          ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* NumberOfScheduleTransitionPerDay */                    \
+        { ZAP_EMPTY_DEFAULT(), 0x0000004D, 1, ZAP_TYPE(INT8U),                                                                     \
+          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) |                                                    \
+              ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* NumberOfScheduleTransitionPerDay */                                               \
         { ZAP_EMPTY_DEFAULT(), 0x0000004E, 17, ZAP_TYPE(OCTET_STRING),                                                             \
           ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* ActivePresetHandle */                                  \
         { ZAP_EMPTY_DEFAULT(), 0x0000004F, 17, ZAP_TYPE(OCTET_STRING),                                                             \
@@ -4479,7 +4480,7 @@
       .clusterId = 0x00000201, \
       .attributes = ZAP_ATTRIBUTE_INDEX(590), \
       .attributeCount = 26, \
-      .clusterSize = 70, \
+      .clusterSize = 69, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION), \
       .functions = chipFuncArrayThermostatServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 233 ), \
@@ -4952,7 +4953,7 @@
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
         { ZAP_CLUSTER_INDEX(0), 28, 189 },                                                                                         \
-        { ZAP_CLUSTER_INDEX(28), 73, 3415 },                                                                                       \
+        { ZAP_CLUSTER_INDEX(28), 73, 3414 },                                                                                       \
         { ZAP_CLUSTER_INDEX(101), 7, 101 },                                                                                        \
         { ZAP_CLUSTER_INDEX(108), 2, 0 },                                                                                          \
     }
@@ -4966,7 +4967,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 #define ATTRIBUTE_SINGLETONS_SIZE (0)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (3705)
+#define ATTRIBUTE_MAX_SIZE (3704)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (4)

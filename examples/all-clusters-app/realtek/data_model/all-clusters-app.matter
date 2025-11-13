@@ -9101,7 +9101,7 @@ endpoint 1 {
     callback attribute scheduleTypes;
     ram      attribute numberOfPresets default = 0;
     ram      attribute numberOfSchedules default = 0;
-    ram      attribute numberOfScheduleTransitionPerDay default = 0xFF;
+    callback attribute numberOfScheduleTransitionPerDay;
     ram      attribute activePresetHandle;
     ram      attribute activeScheduleHandle;
     callback attribute presets;
