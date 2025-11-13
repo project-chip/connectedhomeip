@@ -212,7 +212,7 @@ class TelinkBuilder(Builder):
             flags.append("-DCONFIG_CHIP_OTA_REQUESTOR=y")
 
         if self.enable_dfu_smp:
-            flags.append("-DCONFIG_CHIP_DFU_OVER_BT_SMP=y")
+            flags.append("-DCONFIG_CHIP_DFU_OVER_BT_SMP=y -DCONFIG_CHIP_DFU_OVER_BT_SMP_BUILD=y")
 
         if self.enable_shell:
             flags.append("-DCONFIG_CHIP_LIB_SHELL=y")
