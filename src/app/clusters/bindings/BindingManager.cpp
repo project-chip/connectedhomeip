@@ -33,7 +33,7 @@ class BindingFabricTableDelegate : public chip::FabricTable::Delegate
         {
             if (iter->fabricIndex == fabricIndex)
             {
-                bindingTable.RemoveAt(iter);
+                TEMPORARY_RETURN_IGNORED bindingTable.RemoveAt(iter);
             }
             else
             {
@@ -72,7 +72,7 @@ CHIP_ERROR Manager::Init(const ManagerInitParams & params)
     VerifyOrReturnError(params.mFabricTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(params.mStorage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mInitParams = params;
-    params.mFabricTable->AddFabricDelegate(&gFabricTableDelegate);
+    TEMPORARY_RETURN_IGNORED params.mFabricTable->AddFabricDelegate(&gFabricTableDelegate);
     Table::GetInstance().SetPersistentStorage(params.mStorage);
     CHIP_ERROR error = Table::GetInstance().LoadFromStorage();
     if (error != CHIP_NO_ERROR)

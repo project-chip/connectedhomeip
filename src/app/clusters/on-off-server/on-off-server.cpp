@@ -228,7 +228,7 @@ public:
         CHIP_ERROR err = pair_iterator.GetStatus();
         if (CHIP_NO_ERROR != err)
         {
-            mSceneEndpointStatePairs.RemovePair(endpoint);
+            TEMPORARY_RETURN_IGNORED mSceneEndpointStatePairs.RemovePair(endpoint);
             return err;
         }
 

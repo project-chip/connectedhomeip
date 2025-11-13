@@ -136,7 +136,8 @@ void ReadHandler::OnSubscriptionResumed(const SessionHandle & sessionHandle,
     SingleLinkedListNode<AttributePathParams> * attributePath = mpAttributePathList;
     while (attributePath)
     {
-        mManagementCallback.GetInteractionModelEngine()->GetReportingEngine().SetDirty(attributePath->mValue);
+        TEMPORARY_RETURN_IGNORED mManagementCallback.GetInteractionModelEngine()->GetReportingEngine().SetDirty(
+            attributePath->mValue);
         attributePath = attributePath->mpNext;
     }
 }
@@ -171,7 +172,8 @@ void ReadHandler::Close(CloseOptions options)
         auto * subscriptionResumptionStorage = mManagementCallback.GetInteractionModelEngine()->GetSubscriptionResumptionStorage();
         if (subscriptionResumptionStorage)
         {
-            subscriptionResumptionStorage->Delete(GetInitiatorNodeId(), GetAccessingFabricIndex(), mSubscriptionId);
+            TEMPORARY_RETURN_IGNORED subscriptionResumptionStorage->Delete(GetInitiatorNodeId(), GetAccessingFabricIndex(),
+                                                                           mSubscriptionId);
         }
     }
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
@@ -210,7 +212,7 @@ void ReadHandler::OnInitialRequest(System::PacketBufferHandle && aPayload)
         {
             status = StatusIB(err).mStatus;
         }
-        StatusResponse::Send(status, mExchangeCtx.Get(), /* aExpectResponse = */ false);
+        TEMPORARY_RETURN_IGNORED StatusResponse::Send(status, mExchangeCtx.Get(), /* aExpectResponse = */ false);
         // At this point we can't have a persisted subscription, since that
         // happens only when ProcessSubscribeRequest returns success. And our
         // subscription id is almost certainly not actually useful at this
@@ -388,7 +390,7 @@ CHIP_ERROR ReadHandler::OnMessageReceived(Messaging::ExchangeContext * apExchang
 
     if (sendStatusResponse)
     {
-        StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
+        TEMPORARY_RETURN_IGNORED StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
     }
 
     if (err != CHIP_NO_ERROR)
@@ -656,7 +658,7 @@ void ReadHandler::MoveToState(const HandlerState aTargetState)
     {
         if (ShouldReportUnscheduled())
         {
-            mManagementCallback.GetInteractionModelEngine()->GetReportingEngine().ScheduleRun();
+            TEMPORARY_RETURN_IGNORED mManagementCallback.GetInteractionModelEngine()->GetReportingEngine().ScheduleRun();
         }
         else
         {

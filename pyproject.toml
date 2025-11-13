@@ -1,3 +1,6 @@
+[project]
+requires-python = ">=3.11"
+
 [tool.autopep8]
 max_line_length = 132
 
@@ -7,7 +10,7 @@ known_first_party = "matter"
 
 [tool.ruff]
 line-length = 132
-target-version = "py310"
+target-version = "py311"
 exclude = [
     ".environment",
     ".git",
@@ -27,13 +30,18 @@ select = [
     "E", "W", "F",
     # Consistent commas
     "COM",
+    # Simplify the code if possible
+    "C4",
     # Ensure that scripts are executable
     "EXE",
+    # Check for common logging issues
+    "LOG",
     # Check for common optimization issues
     "SLOT",
 ]
 ignore = [
-    "COM812", # Do not enforce trailing commas in multi-line collections
+    "COM812", # Do not enforce trailing commas in multi-line collections for now
+    "LOG015", # Do not enforce non-root loggers in the entire codebase for now
     "E501", # Do not report line length issues (formatter should handle this)
     "E721", # We use it for good reasons
 ]

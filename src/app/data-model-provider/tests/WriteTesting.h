@@ -97,25 +97,24 @@ public:
         //     - 1: .....
         //   - END_STRUCT
         TLV::TLVType outerContainerType;
-        VerifyOrDie(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType) == CHIP_NO_ERROR);
+        SuccessOrDie(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType));
         if constexpr (chip::app::DataModel::IsFabricScoped<T>::value)
         {
-            VerifyOrDie(chip::app::DataModel::EncodeForWrite(writer, TLV::ContextTag(1), value) == CHIP_NO_ERROR);
+            SuccessOrDie(chip::app::DataModel::EncodeForWrite(writer, TLV::ContextTag(1), value));
         }
         else
         {
-            VerifyOrDie(chip::app::DataModel::Encode(writer, TLV::ContextTag(1), value) == CHIP_NO_ERROR);
+            SuccessOrDie(chip::app::DataModel::Encode(writer, TLV::ContextTag(1), value));
         }
-        VerifyOrDie(writer.EndContainer(outerContainerType) == CHIP_NO_ERROR);
-        VerifyOrDie(writer.Finalize() == CHIP_NO_ERROR);
+        SuccessOrDie(writer.EndContainer(outerContainerType));
+        SuccessOrDie(writer.Finalize());
 
         TLV::TLVReader reader;
         reader.Init(mTLVBuffer);
 
-        // position the reader inside the buffer, on the encoded value
-        VerifyOrDie(reader.Next() == CHIP_NO_ERROR);
-        VerifyOrDie(reader.EnterContainer(outerContainerType) == CHIP_NO_ERROR);
-        VerifyOrDie(reader.Next() == CHIP_NO_ERROR);
+        SuccessOrDie(reader.Next());
+        SuccessOrDie(reader.EnterContainer(outerContainerType));
+        SuccessOrDie(reader.Next());
 
         return reader;
     }

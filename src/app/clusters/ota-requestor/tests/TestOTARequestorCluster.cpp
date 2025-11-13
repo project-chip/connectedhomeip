@@ -167,14 +167,12 @@ TEST_F(TestOTARequestorCluster, AttributeListTest)
     OTARequestorCluster cluster(kTestEndpointId, &otaRequestor);
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-    DataModel::AttributeEntry expectedAttributes[] = {
+    EXPECT_TRUE(chip::Testing::IsAttributesListEqualTo(cluster, {
         OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::kMetadataEntry,
         OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::kMetadataEntry,
         OtaSoftwareUpdateRequestor::Attributes::UpdateState::kMetadataEntry,
         OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::kMetadataEntry,
-    };
-
-    EXPECT_TRUE(chip::Testing::IsAttributesListEqualTo(cluster, Span(expectedAttributes)));
+    }));
 }
 
 TEST_F(TestOTARequestorCluster, AcceptedCommandsTest)
@@ -184,11 +182,9 @@ TEST_F(TestOTARequestorCluster, AcceptedCommandsTest)
     OTARequestorCluster cluster(kTestEndpointId, &otaRequestor);
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-    DataModel::AcceptedCommandEntry expectedCommands[] = {
+    EXPECT_TRUE(chip::Testing::IsAcceptedCommandsListEqualTo(cluster, {
         OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::kMetadataEntry,
-    };
-
-    EXPECT_TRUE(chip::Testing::IsAcceptedCommandsListEqualTo(cluster, Span(expectedCommands)));
+    }));
 }
 
 TEST_F(TestOTARequestorCluster, GeneratedCommandsTest)
@@ -246,9 +242,8 @@ TEST_F(TestOTARequestorCluster, AnnounceOtaProviderCommandTest)
     payload.announcementReason = OtaSoftwareUpdateRequestor::AnnouncementReasonEnum::kUpdateAvailable;
     payload.endpoint = 5;
 
-    std::optional<DataModel::ActionReturnStatus> result =
-        tester.InvokeCommand(OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id, payload, nullptr);
-    EXPECT_EQ(result, std::nullopt);
+    auto result = tester.Invoke(OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id, payload);
+    EXPECT_EQ(result.status, std::nullopt);
 
     OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType forwarded_payload =
         otaRequestor.GetLastAnnounceCommandPayload();
@@ -276,10 +271,9 @@ TEST_F(TestOTARequestorCluster, AnnounceOtaProviderCommandInvalidMetadataTest)
     uint8_t bytes[513] = {'\0'};
     payload.metadataForNode = MakeOptional(ByteSpan(bytes));
 
-    std::optional<DataModel::ActionReturnStatus> result =
-        tester.InvokeCommand(OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id, payload, nullptr);
-    ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(result.value(), DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::InvalidCommand));
+    auto result = tester.Invoke(OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id, payload);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status.value(), DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::InvalidCommand));
 }
 
 TEST_F(TestOTARequestorCluster, ReadAttributesTest)
@@ -617,10 +611,9 @@ TEST_F(TestOTARequestorCluster, CommandsWithNoRequestorInterfaceReturnErrors)
     payload.announcementReason = OtaSoftwareUpdateRequestor::AnnouncementReasonEnum::kUpdateAvailable;
     payload.endpoint = 5;
 
-    std::optional<DataModel::ActionReturnStatus> result =
-        tester.InvokeCommand(OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id, payload, nullptr);
-    ASSERT_TRUE(result.has_value());
-    EXPECT_TRUE(result->IsError());
+    auto result = tester.Invoke(OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id, payload);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_TRUE(result.status->IsError());
 }
 
 TEST_F(TestOTARequestorCluster, WriteDefaultProvidersList)

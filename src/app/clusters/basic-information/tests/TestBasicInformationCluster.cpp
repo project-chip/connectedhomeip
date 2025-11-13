@@ -17,6 +17,7 @@
 
 #include <app/clusters/basic-information/BasicInformationCluster.h>
 #include <app/clusters/testing/AttributeTesting.h>
+#include <app/clusters/testing/ValidateGlobalAttributes.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/BasicInformation/Enums.h>
@@ -62,22 +63,17 @@ TEST_F(TestBasicInformationCluster, TestAttributes)
         BasicInformationCluster::Instance().OptionalAttributes() =
             BasicInformationCluster::OptionalAttributesSet().Set<UniqueID::Id>();
 
-        ReadOnlyBufferBuilder<AttributeEntry> builder;
-        ASSERT_EQ(BasicInformationCluster::Instance().Attributes({ kRootEndpointId, BasicInformation::Id }, builder),
-                  CHIP_NO_ERROR);
+        EXPECT_TRUE(Testing::IsAttributesListEqualTo(
+            BasicInformationCluster::Instance(),
+            {
 
-        ReadOnlyBufferBuilder<AttributeEntry> expectedBuilder;
-        ASSERT_EQ(expectedBuilder.AppendElements({
-                      DataModelRevision::kMetadataEntry, VendorName::kMetadataEntry, VendorID::kMetadataEntry,
-                      ProductName::kMetadataEntry, ProductID::kMetadataEntry, NodeLabel::kMetadataEntry, Location::kMetadataEntry,
-                      HardwareVersion::kMetadataEntry, HardwareVersionString::kMetadataEntry, SoftwareVersion::kMetadataEntry,
-                      SoftwareVersionString::kMetadataEntry, CapabilityMinima::kMetadataEntry, SpecificationVersion::kMetadataEntry,
-                      MaxPathsPerInvoke::kMetadataEntry, ConfigurationVersion::kMetadataEntry,
-                      UniqueID::kMetadataEntry, // required in latest spec
-                  }),
-                  CHIP_NO_ERROR);
-        ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-        ASSERT_TRUE(Testing::EqualAttributeSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+                DataModelRevision::kMetadataEntry, VendorName::kMetadataEntry, VendorID::kMetadataEntry,
+                ProductName::kMetadataEntry, ProductID::kMetadataEntry, NodeLabel::kMetadataEntry, Location::kMetadataEntry,
+                HardwareVersion::kMetadataEntry, HardwareVersionString::kMetadataEntry, SoftwareVersion::kMetadataEntry,
+                SoftwareVersionString::kMetadataEntry, CapabilityMinima::kMetadataEntry, SpecificationVersion::kMetadataEntry,
+                MaxPathsPerInvoke::kMetadataEntry, ConfigurationVersion::kMetadataEntry,
+                UniqueID::kMetadataEntry, // required in latest spec
+            }));
     }
 
     // Check that disabling unique id works
@@ -85,31 +81,24 @@ TEST_F(TestBasicInformationCluster, TestAttributes)
         // UniqueID is EXPLICITLY NOT SET
         BasicInformationCluster::Instance().OptionalAttributes() = BasicInformationCluster::OptionalAttributesSet();
 
-        ReadOnlyBufferBuilder<AttributeEntry> builder;
-        ASSERT_EQ(BasicInformationCluster::Instance().Attributes({ kRootEndpointId, BasicInformation::Id }, builder),
-                  CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<AttributeEntry> expectedBuilder;
-        ASSERT_EQ(expectedBuilder.AppendElements({
-                      DataModelRevision::kMetadataEntry,
-                      VendorName::kMetadataEntry,
-                      VendorID::kMetadataEntry,
-                      ProductName::kMetadataEntry,
-                      ProductID::kMetadataEntry,
-                      NodeLabel::kMetadataEntry,
-                      Location::kMetadataEntry,
-                      HardwareVersion::kMetadataEntry,
-                      HardwareVersionString::kMetadataEntry,
-                      SoftwareVersion::kMetadataEntry,
-                      SoftwareVersionString::kMetadataEntry,
-                      CapabilityMinima::kMetadataEntry,
-                      SpecificationVersion::kMetadataEntry,
-                      MaxPathsPerInvoke::kMetadataEntry,
-                      ConfigurationVersion::kMetadataEntry,
-                  }),
-                  CHIP_NO_ERROR);
-        ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-        ASSERT_TRUE(Testing::EqualAttributeSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+        EXPECT_TRUE(Testing::IsAttributesListEqualTo(BasicInformationCluster::Instance(),
+                                                     {
+                                                         DataModelRevision::kMetadataEntry,
+                                                         VendorName::kMetadataEntry,
+                                                         VendorID::kMetadataEntry,
+                                                         ProductName::kMetadataEntry,
+                                                         ProductID::kMetadataEntry,
+                                                         NodeLabel::kMetadataEntry,
+                                                         Location::kMetadataEntry,
+                                                         HardwareVersion::kMetadataEntry,
+                                                         HardwareVersionString::kMetadataEntry,
+                                                         SoftwareVersion::kMetadataEntry,
+                                                         SoftwareVersionString::kMetadataEntry,
+                                                         CapabilityMinima::kMetadataEntry,
+                                                         SpecificationVersion::kMetadataEntry,
+                                                         MaxPathsPerInvoke::kMetadataEntry,
+                                                         ConfigurationVersion::kMetadataEntry,
+                                                     }));
     }
 
     // All attributes
@@ -126,40 +115,34 @@ TEST_F(TestBasicInformationCluster, TestAttributes)
                 .Set<ProductAppearance::Id>()
                 .Set<UniqueID::Id>();
 
-        ReadOnlyBufferBuilder<AttributeEntry> builder;
-        ASSERT_EQ(BasicInformationCluster::Instance().Attributes({ kRootEndpointId, BasicInformation::Id }, builder),
-                  CHIP_NO_ERROR);
+        EXPECT_TRUE(Testing::IsAttributesListEqualTo(BasicInformationCluster::Instance(),
 
-        ReadOnlyBufferBuilder<AttributeEntry> expectedBuilder;
-        ASSERT_EQ(expectedBuilder.AppendElements({
-                      DataModelRevision::kMetadataEntry,
-                      VendorName::kMetadataEntry,
-                      VendorID::kMetadataEntry,
-                      ProductName::kMetadataEntry,
-                      ProductID::kMetadataEntry,
-                      NodeLabel::kMetadataEntry,
-                      Location::kMetadataEntry,
-                      HardwareVersion::kMetadataEntry,
-                      HardwareVersionString::kMetadataEntry,
-                      SoftwareVersion::kMetadataEntry,
-                      SoftwareVersionString::kMetadataEntry,
-                      CapabilityMinima::kMetadataEntry,
-                      SpecificationVersion::kMetadataEntry,
-                      MaxPathsPerInvoke::kMetadataEntry,
-                      ConfigurationVersion::kMetadataEntry,
-                      UniqueID::kMetadataEntry,
-                      ManufacturingDate::kMetadataEntry,
-                      PartNumber::kMetadataEntry,
-                      ProductURL::kMetadataEntry,
-                      ProductLabel::kMetadataEntry,
-                      SerialNumber::kMetadataEntry,
-                      LocalConfigDisabled::kMetadataEntry,
-                      Reachable::kMetadataEntry,
-                      ProductAppearance::kMetadataEntry,
-                  }),
-                  CHIP_NO_ERROR);
-        ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-        ASSERT_TRUE(Testing::EqualAttributeSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+                                                     {
+                                                         DataModelRevision::kMetadataEntry,
+                                                         VendorName::kMetadataEntry,
+                                                         VendorID::kMetadataEntry,
+                                                         ProductName::kMetadataEntry,
+                                                         ProductID::kMetadataEntry,
+                                                         NodeLabel::kMetadataEntry,
+                                                         Location::kMetadataEntry,
+                                                         HardwareVersion::kMetadataEntry,
+                                                         HardwareVersionString::kMetadataEntry,
+                                                         SoftwareVersion::kMetadataEntry,
+                                                         SoftwareVersionString::kMetadataEntry,
+                                                         CapabilityMinima::kMetadataEntry,
+                                                         SpecificationVersion::kMetadataEntry,
+                                                         MaxPathsPerInvoke::kMetadataEntry,
+                                                         ConfigurationVersion::kMetadataEntry,
+                                                         UniqueID::kMetadataEntry,
+                                                         ManufacturingDate::kMetadataEntry,
+                                                         PartNumber::kMetadataEntry,
+                                                         ProductURL::kMetadataEntry,
+                                                         ProductLabel::kMetadataEntry,
+                                                         SerialNumber::kMetadataEntry,
+                                                         LocalConfigDisabled::kMetadataEntry,
+                                                         Reachable::kMetadataEntry,
+                                                         ProductAppearance::kMetadataEntry,
+                                                     }));
     }
 }
 
