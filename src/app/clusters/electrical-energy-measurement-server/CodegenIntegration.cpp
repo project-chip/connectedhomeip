@@ -26,8 +26,50 @@
 #include <app/util/config.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/support/CodeUtils.h>
+
 #include <lib/support/logging/CHIPLogging.h>
 #include <zap-generated/gen_config.h>
+
+namespace {
+using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::ElectricalEnergyMeasurement;
+
+SingleLinkedListNode<ElectricalEnergyMeasurementCluster *> * EEMFirstInstance = nullptr;
+
+inline void RegisterLegacyEEM(SingleLinkedListNode<ElectricalEnergyMeasurementCluster *> * inst)
+{
+    inst->mpNext     = EEMFirstInstance;
+    EEMFirstInstance = inst;
+}
+
+inline void UnregisterLegacyEEM(SingleLinkedListNode<ElectricalEnergyMeasurementCluster *> * inst)
+{
+    SingleLinkedListNode<ElectricalEnergyMeasurementCluster *> * current  = EEMFirstInstance;
+    SingleLinkedListNode<ElectricalEnergyMeasurementCluster *> * previous = nullptr;
+
+    while (current != nullptr)
+    {
+        if (current == inst)
+        {
+            if (previous == nullptr)
+            {
+                // Removing first element
+                EEMFirstInstance = current->mpNext;
+            }
+            else
+            {
+                previous->mpNext = current->mpNext;
+            }
+            break;
+        }
+        previous = current;
+        current  = current->mpNext;
+    }
+}
+
+} // namespace
 
 namespace chip {
 namespace app {
@@ -45,28 +87,16 @@ ElectricalEnergyMeasurementAttrAccess::ElectricalEnergyMeasurementAttrAccess(Bit
                                                                              BitMask<OptionalAttributes> aOptionalAttrs,
                                                                              EndpointId endpointId) :
     mCluster([&]() { return ElectricalEnergyMeasurementCluster::Config(endpointId, aFeature, aOptionalAttrs); }())
-{}
-
-ElectricalEnergyMeasurementCluster * FindElectricalEnergyMeasurementClusterOnEndpoint(EndpointId endpointId)
 {
-    for (ClusterId clusterId : CodegenDataModelProvider::Instance().Registry().ClustersOnEndpoint(endpointId))
-    {
-        if (clusterId == ElectricalEnergyMeasurement::Id)
-        {
-            ConcreteClusterPath path(endpointId, clusterId);
-            ServerClusterInterface * interface = CodegenDataModelProvider::Instance().Registry().Get(path);
-            return static_cast<ElectricalEnergyMeasurementCluster *>(interface);
-        }
-    }
-    return nullptr;
+    mClusterListNode.mValue = &mCluster.Cluster();
 }
 
-ElectricalEnergyMeasurement::MeasurementData * MeasurementDataForEndpoint(EndpointId endpointId)
+const ElectricalEnergyMeasurement::MeasurementData * MeasurementDataForEndpoint(EndpointId endpointId)
 {
     ElectricalEnergyMeasurementCluster * cluster = FindElectricalEnergyMeasurementClusterOnEndpoint(endpointId);
     VerifyOrReturnValue(cluster != nullptr, nullptr);
 
-    return const_cast<MeasurementData *>(cluster->GetMeasurementData());
+    return cluster->GetMeasurementData();
 }
 
 CHIP_ERROR SetMeasurementAccuracy(EndpointId endpointId, const MeasurementAccuracyStruct::Type & accuracy)
@@ -155,6 +185,7 @@ bool NotifyPeriodicEnergyMeasured(EndpointId endpointId, const Optional<EnergyMe
 CHIP_ERROR ElectricalEnergyMeasurementAttrAccess::Init()
 {
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
+    RegisterLegacyEEM(&mClusterListNode);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -162,7 +193,7 @@ CHIP_ERROR ElectricalEnergyMeasurementAttrAccess::Init()
         CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS ||                                                            \
     1
         ChipLogError(AppServer, "Failed to register cluster %u/" ChipLogFormatMEI ": %" CHIP_ERROR_FORMAT,
-                     mCluster.Cluster().GetPaths()[1].mEndpointId, ChipLogValueMEI(ElectricalEnergyMeasurement::Id), err.Format());
+                     mCluster.Cluster().GetPaths()[0].mEndpointId, ChipLogValueMEI(ElectricalEnergyMeasurement::Id), err.Format());
 #endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
     }
     return err;
@@ -178,9 +209,11 @@ void ElectricalEnergyMeasurementAttrAccess::Shutdown()
         CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS ||                                                            \
     1
         ChipLogError(AppServer, "Failed to unregister cluster %u/" ChipLogFormatMEI ": %" CHIP_ERROR_FORMAT,
-                     mCluster.Cluster().GetPaths()[1].mEndpointId, ChipLogValueMEI(ElectricalEnergyMeasurement::Id), err.Format());
+                     mCluster.Cluster().GetPaths()[0].mEndpointId, ChipLogValueMEI(ElectricalEnergyMeasurement::Id), err.Format());
 #endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
     }
+
+    UnregisterLegacyEEM(&mClusterListNode);
 }
 
 bool ElectricalEnergyMeasurementAttrAccess::HasFeature(Feature aFeature)
@@ -198,6 +231,20 @@ bool ElectricalEnergyMeasurementAttrAccess::SupportsOptAttr(OptionalAttributes a
     default:
         return false;
     }
+}
+
+ElectricalEnergyMeasurementCluster * FindElectricalEnergyMeasurementClusterOnEndpoint(EndpointId endpointId)
+{
+    SingleLinkedListNode<ElectricalEnergyMeasurementCluster *> * current = EEMFirstInstance;
+    while (current != nullptr)
+    {
+        if (current->mValue != nullptr && current->mValue->GetPaths()[0].mEndpointId == endpointId)
+        {
+            return current->mValue;
+        }
+        current = current->mpNext;
+    }
+    return nullptr;
 }
 
 } // namespace ElectricalEnergyMeasurement

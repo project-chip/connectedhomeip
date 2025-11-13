@@ -206,7 +206,7 @@ TEST_F(TestElectricalEnergyMeasurementClusterBackwardsCompatibility, TestCodegen
 
     // Test MeasurementDataForEndpoint
     {
-        MeasurementData * data = MeasurementDataForEndpoint(kTestEndpointId);
+        const MeasurementData * data = MeasurementDataForEndpoint(kTestEndpointId);
         ASSERT_NE(data, nullptr);
 
         // Verify data structure contains expected values from previous sets

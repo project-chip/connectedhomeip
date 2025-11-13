@@ -22,6 +22,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
+#include <lib/support/LinkedList.h>
 
 namespace chip {
 namespace app {
@@ -45,6 +46,7 @@ public:
     bool SupportsOptAttr(OptionalAttributes aOptionalAttrs);
 
 private:
+    SingleLinkedListNode<ElectricalEnergyMeasurementCluster *> mClusterListNode;
     RegisteredServerCluster<ElectricalEnergyMeasurementCluster> mCluster;
 };
 
@@ -58,7 +60,7 @@ CHIP_ERROR SetMeasurementAccuracy(EndpointId endpointId, const Structs::Measurem
 
 CHIP_ERROR SetCumulativeReset(EndpointId endpointId, const Optional<Structs::CumulativeEnergyResetStruct::Type> & cumulativeReset);
 
-ElectricalEnergyMeasurement::MeasurementData * MeasurementDataForEndpoint(EndpointId endpointId);
+const ElectricalEnergyMeasurement::MeasurementData * MeasurementDataForEndpoint(EndpointId endpointId);
 
 ElectricalEnergyMeasurementCluster * FindElectricalEnergyMeasurementClusterOnEndpoint(chip::EndpointId endpoint);
 
