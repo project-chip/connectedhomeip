@@ -223,9 +223,6 @@ private:
 
     /// @name Internal Methods
     /// @{
-    bool FileExists(const std::string & path);
-
-    bool IsOutputDirectoryValid(const std::string & path);
 
     /**
      * @brief Ensures a directory exists, creating it if necessary.
@@ -233,12 +230,6 @@ private:
      * @return true if the directory exists or was created successfully, false otherwise.
      */
     bool EnsureDirectoryExists(const std::string & path);
-
-    /**
-     * @brief Removes files from previous recordings in the specified directory.
-     * @param path The directory path to clean.
-     */
-    void RemovePreviousRecordingFiles(const std::string & path);
 
     bool CheckAndUploadFile(std::string path);
 

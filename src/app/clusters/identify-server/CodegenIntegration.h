@@ -21,6 +21,7 @@
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <app/util/basic-types.h>
+#include <lib/support/TimerDelegate.h>
 
 struct Identify
 {
@@ -52,7 +53,7 @@ struct Identify
         chip::app::Clusters::Identify::EffectIdentifierEnum effectIdentifier =
             chip::app::Clusters::Identify::EffectIdentifierEnum::kBlink,
         chip::app::Clusters::Identify::EffectVariantEnum effectVariant = chip::app::Clusters::Identify::EffectVariantEnum::kDefault,
-        chip::app::reporting::ReportScheduler::TimerDelegate * timerDelegate = nullptr);
+        chip::TimerDelegate * timerDelegate                            = nullptr);
     ~Identify();
 
     onIdentifyStartCb mOnIdentifyStart = nullptr;

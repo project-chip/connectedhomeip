@@ -67,7 +67,7 @@ kRootEndpointId = 0
 client1 = Client(
     checkInNodeID=1,
     subjectId=1,
-    key=bytes([x for x in range(0x10, 0x20)]),
+    key=bytes(list(range(0x10, 0x20))),
     clientType=ClientTypeEnum.kEphemeral
 )
 

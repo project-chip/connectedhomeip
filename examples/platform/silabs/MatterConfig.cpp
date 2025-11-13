@@ -24,6 +24,17 @@
 
 #include <mbedtls/platform.h>
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#if defined(SL_MATTER_EM4_SLEEP) && (SL_MATTER_EM4_SLEEP == 1)
+#include "sl_sleeptimer.h"
+#include <app/icd/server/ICDConfigurationData.h> // nogncheck
+
+#include "em_burtc.h"
+#include "em_cmu.h"
+#include "em_emu.h"
+#endif // defined(SL_MATTER_EM4_SLEEP) && (SL_MATTER_EM4_SLEEP == 1)
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
 #ifdef SL_WIFI
 #include <platform/silabs/NetworkCommissioningWiFiDriver.h>
 #include <platform/silabs/wifi/WifiInterface.h> // nogncheck
@@ -59,9 +70,9 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #endif
 
 #include <app/InteractionModelEngine.h>
-#include <app/TimerDelegates.h>
 #include <data-model-providers/codegen/Instance.h>
 #include <headers/ProvisionManager.h>
+#include <platform/DefaultTimerDelegate.h>
 
 #ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 #include "SilabsTestEventTriggerDelegate.h" // nogncheck
@@ -339,9 +350,35 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     return CHIP_NO_ERROR;
 }
 
+#if defined(SL_MATTER_EM4_SLEEP) && (SL_MATTER_EM4_SLEEP == 1)
+void OnEM4Trigger(uint32_t duration)
+{
+    CMU_ClockSelectSet(cmuClock_EM4GRPACLK, cmuSelect_ULFRCO);
+    CMU_ClockEnable(cmuClock_BURTC, true);
+    CMU_ClockEnable(cmuClock_BURAM, true);
+
+    BURTC_Init_TypeDef burtcInit = BURTC_INIT_DEFAULT;
+    burtcInit.compare0Top        = true; // reset counter when counter reaches compare value
+    burtcInit.em4comp            = true; // BURTC compare interrupt wakes from EM4 (causes reset)
+    BURTC_Init(&burtcInit);
+
+    BURTC_CounterReset();
+    BURTC_CompareSet(0, duration);
+
+    BURTC_IntEnable(BURTC_IEN_COMP); // compare match
+    NVIC_EnableIRQ(BURTC_IRQn);
+    BURTC_Enable(true);
+    EMU_EM4Init_TypeDef em4Init = EMU_EM4INIT_DEFAULT;
+    EMU_EM4Init(&em4Init);
+    BURTC_CounterReset();
+    EMU_EnterEM4();
+}
+
+#endif // defined(SL_MATTER_EM4_SLEEP) && (SL_MATTER_EM4_SLEEP == 1)
 // ================================================================================
 // FreeRTOS Callbacks
 // ================================================================================
+
 extern "C" void vApplicationIdleHook(void)
 {
 #if (SLI_SI91X_MCU_INTERFACE && CHIP_CONFIG_ENABLE_ICD_SERVER)
@@ -351,3 +388,30 @@ extern "C" void vApplicationIdleHook(void)
     SiWxPlatformInterface::sl_si91x_uart_power_requirement_handler();
 #endif
 }
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#if defined(SL_MATTER_EM4_SLEEP) && (SL_MATTER_EM4_SLEEP == 1)
+
+#ifndef SL_MATTER_EM4_THRESHOLD_PERCENTAGE
+#define SL_MATTER_EM4_THRESHOLD_PERCENTAGE 90
+#endif
+
+static_assert(SL_MATTER_EM4_THRESHOLD_PERCENTAGE > 0 && SL_MATTER_EM4_THRESHOLD_PERCENTAGE < 100,
+              "SL_MATTER_EM4_THRESHOLD_PERCENTAGE must be between 1 and 99");
+
+extern "C" void sl_matter_em4_check(uint32_t expected_idle_time_ms)
+{
+    if (chip::ICDConfigurationData::GetInstance().GetICDMode() == chip::ICDConfigurationData::ICDMode::LIT)
+    {
+        uint32_t idleDuration_seconds = chip::ICDConfigurationData::GetInstance().GetIdleModeDuration().count();
+        uint32_t threshold_ms         = idleDuration_seconds * SL_EM4_THRESHOLD_PERCENTAGE * 10;
+        // Since the sleep timer will never match the actual idle time (hardware latency, etc), we set a threshold
+        // Multiply by 10 to converts seconds into milliseconds (e.g. 90% of 1000sec in ms is 1000*90*10 = 900000ms)
+        if (expected_idle_time_ms >= threshold_ms)
+        {
+            OnEM4Trigger(expected_idle_time_ms);
+        }
+    }
+}
+#endif // defined(SL_MATTER_EM4_SLEEP) && (SL_MATTER_EM4_SLEEP == 1)
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER

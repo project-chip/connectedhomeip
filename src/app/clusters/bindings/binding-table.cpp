@@ -58,7 +58,8 @@ CHIP_ERROR Table::Add(const TableEntry & entry)
         }
         if (error != CHIP_NO_ERROR)
         {
-            mStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::BindingTableEntry(newIndex).KeyName());
+            TEMPORARY_RETURN_IGNORED mStorage->SyncDeleteKeyValue(
+                DefaultStorageKeyAllocator::BindingTableEntry(newIndex).KeyName());
         }
     }
     if (error != CHIP_NO_ERROR)

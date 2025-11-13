@@ -22,7 +22,7 @@
 #ifdef ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
 // Need the `nogncheck` because it's inter-cluster dependency and this
 // breaks GN deps checks since that doesn't know how to deal with #ifdef'd includes :(.
-#include "app/clusters/time-synchronization-server/time-synchronization-server.h" // nogncheck
+#include "app/clusters/time-synchronization-server/time-synchronization-cluster.h" // nogncheck
 
 #endif // ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
 
@@ -249,7 +249,7 @@ void startRemainingDurationTick(EndpointId ep)
     }
     else
     {
-        ValveConfigurationAndControl::CloseValve(ep);
+        TEMPORARY_RETURN_IGNORED ValveConfigurationAndControl::CloseValve(ep);
         (void) DeviceLayer::SystemLayer().CancelTimer(onValveConfigurationAndControlTick, item);
     }
 }
@@ -300,7 +300,7 @@ CHIP_ERROR CloseValve(EndpointId ep)
     emitValveStateChangedEvent(ep, ValveConfigurationAndControl::ValveStateEnum::kTransitioning);
     if (!isDelegateNull(delegate))
     {
-        delegate->HandleCloseValve();
+        TEMPORARY_RETURN_IGNORED delegate->HandleCloseValve();
     }
 
     return CHIP_NO_ERROR;
@@ -361,7 +361,7 @@ CHIP_ERROR SetValveLevel(EndpointId ep, DataModel::Nullable<Percent> level, Data
         DataModel::Nullable<Percent> cLevel = delegate->HandleOpenValve(level);
         if (HasFeature(ep, ValveConfigurationAndControl::Feature::kLevel) && !cLevel.IsNull())
         {
-            UpdateCurrentLevel(ep, cLevel.Value());
+            TEMPORARY_RETURN_IGNORED UpdateCurrentLevel(ep, cLevel.Value());
         }
     }
     // start countdown
@@ -382,7 +382,7 @@ CHIP_ERROR UpdateCurrentLevel(EndpointId ep, Percent currentLevel)
     {
         targetLevel = DataModel::NullNullable;
         TargetLevel::Set(ep, targetLevel);
-        UpdateCurrentState(ep, currentLevel == 0 ? ValveStateEnum::kClosed : ValveStateEnum::kOpen);
+        TEMPORARY_RETURN_IGNORED UpdateCurrentState(ep, currentLevel == 0 ? ValveStateEnum::kClosed : ValveStateEnum::kOpen);
     }
     return CHIP_NO_ERROR;
 }
@@ -442,8 +442,8 @@ bool emberAfValveConfigurationAndControlClusterOpenCallback(
     // if fault is registered return FailureDueToFault
     if (Status::Success == ValveFault::Get(ep, &fault) && fault.HasAny())
     {
-        commandObj->AddClusterSpecificFailure(commandPath,
-                                              to_underlying(ValveConfigurationAndControl::StatusCodeEnum::kFailureDueToFault));
+        TEMPORARY_RETURN_IGNORED commandObj->AddClusterSpecificFailure(
+            commandPath, to_underlying(ValveConfigurationAndControl::StatusCodeEnum::kFailureDueToFault));
         return true;
     }
 
@@ -487,7 +487,7 @@ exit:
     {
         BitMask<ValveConfigurationAndControl::ValveFaultBitmap> gFault(
             ValveConfigurationAndControl::ValveFaultBitmap::kGeneralFault);
-        emitValveFaultEvent(ep, gFault);
+        TEMPORARY_RETURN_IGNORED emitValveFaultEvent(ep, gFault);
         commandObj->AddStatus(commandPath, status.Value());
     }
     else
@@ -508,8 +508,8 @@ bool emberAfValveConfigurationAndControlClusterCloseCallback(
     // if fault is registered return FailureDueToFault
     if (Status::Success == ValveFault::Get(ep, &fault) && fault.HasAny())
     {
-        commandObj->AddClusterSpecificFailure(commandPath,
-                                              to_underlying(ValveConfigurationAndControl::StatusCodeEnum::kFailureDueToFault));
+        TEMPORARY_RETURN_IGNORED commandObj->AddClusterSpecificFailure(
+            commandPath, to_underlying(ValveConfigurationAndControl::StatusCodeEnum::kFailureDueToFault));
         return true;
     }
 

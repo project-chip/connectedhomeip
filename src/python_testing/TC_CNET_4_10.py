@@ -194,7 +194,7 @@ class TC_CNET_4_10(MatterBaseTest):
         logging.info(f"Networks by endpoint: {networks_dict}")
         connected_network_count = {}
         for ep in networks_dict:
-            connected_network_count[ep] = sum(map(lambda x: x.connected, networks_dict[ep]))
+            connected_network_count[ep] = sum((x.connected for x in networks_dict[ep]))
         logging.info(f"Connected networks count by endpoint: {connected_network_count}")
         asserts.assert_equal(sum(connected_network_count.values()), 1,
                              "Verify that only one entry has connected status as TRUE across ALL endpoints")
@@ -209,9 +209,9 @@ class TC_CNET_4_10(MatterBaseTest):
 
         # Step 4: Arm failsafe and verify response
         self.step(4)
-        await self.send_single_cmd(
-            cmd=gen_comm.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=0)
-        )
+        await self.send_single_cmd(endpoint=0,
+                                   cmd=gen_comm.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=0)
+                                   )
         # Successful command execution is implied if no exception is raised.
 
         # Step 5: Read Networks and verify thread network
@@ -280,6 +280,7 @@ class TC_CNET_4_10(MatterBaseTest):
         # Step 10: Verify breadcrumb
         self.step(10)
         breadcrumb = await self.read_single_attribute_check_success(
+            endpoint=0,
             cluster=gen_comm,
             attribute=gen_comm.Attributes.Breadcrumb
         )
@@ -299,6 +300,7 @@ class TC_CNET_4_10(MatterBaseTest):
         # Step 12: Verify breadcrumb unchanged
         self.step(12)
         breadcrumb = await self.read_single_attribute_check_success(
+            endpoint=0,
             cluster=gen_comm,
             attribute=gen_comm.Attributes.Breadcrumb
         )
@@ -306,9 +308,9 @@ class TC_CNET_4_10(MatterBaseTest):
 
         # Step 13: Disable failsafe
         self.step(13)
-        await self.send_single_cmd(
-            cmd=gen_comm.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=0)
-        )
+        await self.send_single_cmd(endpoint=0,
+                                   cmd=gen_comm.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=0)
+                                   )
         # Successful command execution is implied if no exception is raised.
 
         # Step 14: Verify network restored
@@ -329,9 +331,9 @@ class TC_CNET_4_10(MatterBaseTest):
 
         # Step 15: Re-arm failsafe
         self.step(15)
-        await self.send_single_cmd(
-            cmd=gen_comm.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=0)
-        )
+        await self.send_single_cmd(endpoint=0,
+                                   cmd=gen_comm.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=0)
+                                   )
         # Successful command execution is implied if no exception is raised.
 
         # Step 16: Remove network again
@@ -348,16 +350,16 @@ class TC_CNET_4_10(MatterBaseTest):
 
         # Step 17: Complete commissioning
         self.step(17)
-        await self.send_single_cmd(
-            cmd=gen_comm.Commands.CommissioningComplete()
-        )
+        await self.send_single_cmd(endpoint=0,
+                                   cmd=gen_comm.Commands.CommissioningComplete()
+                                   )
         # Successful command execution is implied if no exception is raised.
 
         # Step 18: Verify failsafe disabled
         self.step(18)
-        await self.send_single_cmd(
-            cmd=gen_comm.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=0)
-        )
+        await self.send_single_cmd(endpoint=0,
+                                   cmd=gen_comm.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=0)
+                                   )
         # Successful command execution is implied if no exception is raised.
 
         # Step 19: Verify network remains removed
@@ -380,9 +382,9 @@ class TC_CNET_4_10(MatterBaseTest):
         operational_dataset = self.matter_test_config.thread_operational_dataset
 
         # Need to re-arm failsafe to add network
-        await self.send_single_cmd(
-            cmd=gen_comm.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=0)
-        )
+        await self.send_single_cmd(endpoint=0,
+                                   cmd=gen_comm.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=0)
+                                   )
 
         # Use AddOrUpdateThreadNetwork with the dataset
         add_resp = await self.send_single_cmd(
@@ -395,9 +397,9 @@ class TC_CNET_4_10(MatterBaseTest):
                              "Failed to add/update Thread network during cleanup")
 
         # Commit the change by completing commissioning
-        await self.send_single_cmd(
-            cmd=gen_comm.Commands.CommissioningComplete()
-        )
+        await self.send_single_cmd(endpoint=0,
+                                   cmd=gen_comm.Commands.CommissioningComplete()
+                                   )
 
         # Verify network added and is the one we intended to add
         networks_after_add = await self.read_single_attribute_check_success(

@@ -95,7 +95,7 @@ class PartitionCreator:
 
         If "key_value" of data entry is a dictionary, algorithm appends it to the created dictionary.
         """
-        output_dict = dict()
+        output_dict = {}
         for entry in data:
             if not isinstance(entry, dict):
                 log.debug("Processing entry {}".format(entry))

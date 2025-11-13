@@ -265,7 +265,7 @@ void TestWriteInteraction::AddAttributeDataIB(WriteClient & aWriteClient, Encodi
         // Put Preencoded Data into AttributeDataIB
         TLV::TLVReader reader;
         reader.Init(buffer, writer.GetLengthWritten());
-        reader.Next();
+        EXPECT_SUCCESS(reader.Next());
         EXPECT_EQ(aWriteClient.PutPreencodedAttribute(ConcreteDataAttributePath(attributePathParams.mEndpointId,
                                                                                 attributePathParams.mClusterId,
                                                                                 attributePathParams.mAttributeId),
@@ -320,12 +320,12 @@ void TestWriteInteraction::GenerateWriteRequest(bool aIsTimedWrite, System::Pack
         EXPECT_EQ(pWriter->EndContainer(dummyType), CHIP_NO_ERROR);
     }
 
-    attributeDataIBBuilder.EndOfAttributeDataIB();
+    EXPECT_SUCCESS(attributeDataIBBuilder.EndOfAttributeDataIB());
     EXPECT_EQ(attributeDataIBBuilder.GetError(), CHIP_NO_ERROR);
 
-    attributeDataIBsBuilder.EndOfAttributeDataIBs();
+    EXPECT_SUCCESS(attributeDataIBsBuilder.EndOfAttributeDataIBs());
     EXPECT_EQ(attributeDataIBsBuilder.GetError(), CHIP_NO_ERROR);
-    writeRequestBuilder.EndOfWriteRequestMessage();
+    EXPECT_SUCCESS(writeRequestBuilder.EndOfWriteRequestMessage());
     EXPECT_EQ(writeRequestBuilder.GetError(), CHIP_NO_ERROR);
 
     EXPECT_EQ(writer.Finalize(&aPayload), CHIP_NO_ERROR);
@@ -360,12 +360,12 @@ void TestWriteInteraction::GenerateWriteResponse(System::PacketBufferHandle & aP
     statusIBBuilder.EncodeStatusIB(statusIB);
     EXPECT_EQ(statusIBBuilder.GetError(), CHIP_NO_ERROR);
 
-    attributeStatusIBBuilder.EndOfAttributeStatusIB();
+    EXPECT_SUCCESS(attributeStatusIBBuilder.EndOfAttributeStatusIB());
     EXPECT_EQ(attributeStatusIBBuilder.GetError(), CHIP_NO_ERROR);
 
-    attributeStatusesBuilder.EndOfAttributeStatuses();
+    EXPECT_SUCCESS(attributeStatusesBuilder.EndOfAttributeStatuses());
     EXPECT_EQ(attributeStatusesBuilder.GetError(), CHIP_NO_ERROR);
-    writeResponseBuilder.EndOfWriteResponseMessage();
+    EXPECT_SUCCESS(writeResponseBuilder.EndOfWriteResponseMessage());
     EXPECT_EQ(writeResponseBuilder.GetError(), CHIP_NO_ERROR);
 
     EXPECT_EQ(writer.Finalize(&aPayload), CHIP_NO_ERROR);
@@ -433,8 +433,8 @@ TEST_F(TestWriteInteraction, TestWriteHandler)
 
             System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
-            writeHandler.Init(chip::app::InteractionModelEngine::GetInstance()->GetDataModelProvider(),
-                              chip::app::InteractionModelEngine::GetInstance());
+            EXPECT_SUCCESS(writeHandler.Init(chip::app::InteractionModelEngine::GetInstance()->GetDataModelProvider(),
+                                             chip::app::InteractionModelEngine::GetInstance()));
 
             GenerateWriteRequest(messageIsTimed, buf);
 
@@ -514,7 +514,7 @@ TEST_F(TestWriteInteraction, TestWriteRoundtripWithClusterObjects)
             // Put Preencoded Data into AttributeDataIB
             TLV::TLVReader dataTxTLV;
             dataTxTLV.Init(buffer, writer.GetLengthWritten());
-            dataTxTLV.Next();
+            EXPECT_SUCCESS(dataTxTLV.Next());
             ConcreteDataAttributePath path = ConcreteDataAttributePath(
                 attributePathParams.mEndpointId, attributePathParams.mClusterId, attributePathParams.mAttributeId);
             EXPECT_EQ(writeClient.PutPreencodedAttribute(path, dataTxTLV), CHIP_NO_ERROR);
@@ -532,7 +532,7 @@ TEST_F(TestWriteInteraction, TestWriteRoundtripWithClusterObjects)
             app::Clusters::UnitTesting::Structs::SimpleStruct::Type dataRx;
             TLV::TLVReader reader;
             reader.Init(chip::Test::attributeDataTLV, chip::Test::attributeDataTLVLen);
-            reader.Next();
+            EXPECT_SUCCESS(reader.Next());
             EXPECT_EQ(CHIP_NO_ERROR, DataModel::Decode(reader, dataRx));
             EXPECT_EQ(dataRx.a, dataTx.a);
             EXPECT_EQ(dataRx.b, dataTx.b);
@@ -729,7 +729,7 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteHandlerReceiveInvalidMessage)
     writer.Init(std::move(msgBuf));
 
     ReportDataMessage::Builder response;
-    response.Init(&writer);
+    EXPECT_SUCCESS(response.Init(&writer));
     EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
 
     PayloadHeader payloadHeader;
@@ -742,7 +742,8 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteHandlerReceiveInvalidMessage)
     rm->ClearRetransTable(writeHandler->mExchangeCtx.Get());
     GetLoopback().mSentMessageCount  = 0;
     GetLoopback().mNumMessagesToDrop = 0;
-    writeHandler->OnMessageReceived(writeHandler->mExchangeCtx.Get(), payloadHeader, std::move(msgBuf));
+    EXPECT_EQ(writeHandler->OnMessageReceived(writeHandler->mExchangeCtx.Get(), payloadHeader, std::move(msgBuf)),
+              CHIP_ERROR_INVALID_MESSAGE_TYPE);
     DrainAndServiceIO();
 
     EXPECT_EQ(writeCallback.mLastErrorReason.mStatus, Protocols::InteractionModel::Status::InvalidAction);
@@ -750,8 +751,8 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteHandlerReceiveInvalidMessage)
     engine->Shutdown();
     ExpireSessionAliceToBob();
     ExpireSessionBobToAlice();
-    CreateSessionAliceToBob();
-    CreateSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 // This test is to create Chunked write requests, we drop the message since the 3rd message, then remove fabrics for client and
@@ -793,14 +794,14 @@ TEST_F(TestWriteInteraction, TestWriteHandlerInvalidateFabric)
     EXPECT_EQ(GetLoopback().mSentMessageCount, 3u);
     EXPECT_EQ(GetLoopback().mDroppedMessageCount, 1u);
 
-    GetFabricTable().Delete(GetAliceFabricIndex());
+    EXPECT_SUCCESS(GetFabricTable().Delete(GetAliceFabricIndex()));
     EXPECT_EQ(InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 0u);
     engine->Shutdown();
     ExpireSessionAliceToBob();
     ExpireSessionBobToAlice();
-    CreateAliceFabric();
-    CreateSessionAliceToBob();
-    CreateSessionBobToAlice();
+    EXPECT_SUCCESS(CreateAliceFabric());
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 #endif
@@ -847,8 +848,8 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteHandlerReceiveEmptyWriteReque
     engine->Shutdown();
     ExpireSessionAliceToBob();
     ExpireSessionBobToAlice();
-    CreateSessionAliceToBob();
-    CreateSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 // Write Client sends a write request, receives an unexpected message type, sends a status response to that.
@@ -887,7 +888,7 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage1)
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(msgBuf));
     ReportDataMessage::Builder response;
-    response.Init(&writer);
+    EXPECT_SUCCESS(response.Init(&writer));
     EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
     PayloadHeader payloadHeader;
     payloadHeader.SetExchangeID(0);
@@ -918,8 +919,8 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage1)
     engine->Shutdown();
     ExpireSessionAliceToBob();
     ExpireSessionBobToAlice();
-    CreateSessionAliceToBob();
-    CreateSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 // Write Client sends a write request, receives a malformed write response message, sends a Status Report.
@@ -958,7 +959,7 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage2)
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(msgBuf));
     WriteResponseMessage::Builder response;
-    response.Init(&writer);
+    EXPECT_SUCCESS(response.Init(&writer));
     EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
     PayloadHeader payloadHeader;
     payloadHeader.SetExchangeID(0);
@@ -988,8 +989,8 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage2)
     engine->Shutdown();
     ExpireSessionAliceToBob();
     ExpireSessionBobToAlice();
-    CreateSessionAliceToBob();
-    CreateSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 // Write Client sends a write request, receives a malformed status response message.
@@ -1028,7 +1029,7 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage3)
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(msgBuf));
     StatusResponseMessage::Builder response;
-    response.Init(&writer);
+    EXPECT_SUCCESS(response.Init(&writer));
     EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
     PayloadHeader payloadHeader;
     payloadHeader.SetExchangeID(0);
@@ -1059,8 +1060,8 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage3)
     engine->Shutdown();
     ExpireSessionAliceToBob();
     ExpireSessionBobToAlice();
-    CreateSessionAliceToBob();
-    CreateSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 // Write Client sends a write request, receives a busy status response message.
@@ -1099,7 +1100,7 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage4)
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(msgBuf));
     StatusResponseMessage::Builder response;
-    response.Init(&writer);
+    EXPECT_SUCCESS(response.Init(&writer));
     response.Status(Protocols::InteractionModel::Status::Busy);
     EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
     PayloadHeader payloadHeader;
@@ -1131,8 +1132,8 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteInvalidMessage4)
     engine->Shutdown();
     ExpireSessionAliceToBob();
     ExpireSessionBobToAlice();
-    CreateSessionAliceToBob();
-    CreateSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 } // namespace app

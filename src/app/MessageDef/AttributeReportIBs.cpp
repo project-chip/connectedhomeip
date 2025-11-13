@@ -93,7 +93,7 @@ CHIP_ERROR AttributeReportIBs::Builder::EncodeAttributeStatus(const ConcreteRead
     AttributePathIB::Builder & attributePathIBBuilder = attributeStatusIBBuilder.CreatePath();
     ReturnErrorOnFailure(attributeStatusIBBuilder.GetError());
 
-    attributePathIBBuilder.Endpoint(aPath.mEndpointId)
+    TEMPORARY_RETURN_IGNORED attributePathIBBuilder.Endpoint(aPath.mEndpointId)
         .Cluster(aPath.mClusterId)
         .Attribute(aPath.mAttributeId)
         .EndOfAttributePathIB();

@@ -85,6 +85,9 @@ using namespace chip::Crypto;
 
 #define CDC_JNI_CALLBACK_LOCAL_REF_COUNT 256
 
+static void PairDevice(JNIEnv * env, AndroidDeviceControllerWrapper * wrapper, chip::NodeId deviceId,
+                       RendezvousParameters & rendezvousParams, jbyteArray csrNonce, jobject networkCredentials,
+                       jobject icdRegistrationInfo);
 static void * IOThreadMain(void * arg);
 static CHIP_ERROR StopIOThread();
 static CHIP_ERROR N2J_PaseVerifierParams(JNIEnv * env, jlong setupPincode, jbyteArray pakeVerifier, jobject & outParams);
@@ -653,12 +656,11 @@ exit:
     }
 }
 
-JNI_METHOD(void, pairDevice)
+JNI_METHOD(void, pairDeviceThroughBLE)
 (JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint connObj, jlong pinCode, jbyteArray csrNonce,
  jobject networkCredentials, jobject icdRegistrationInfo)
 {
     chip::DeviceLayer::StackLock lock;
-    CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     ChipLogProgress(Controller, "pairDevice() called with device ID, connection object, and pincode");
@@ -676,6 +678,16 @@ JNI_METHOD(void, pairDevice)
 #endif
                                                 .SetPeerAddress(Transport::PeerAddress::BLE());
 
+    PairDevice(env, wrapper, static_cast<chip::NodeId>(deviceId), rendezvousParams, csrNonce, networkCredentials,
+               icdRegistrationInfo);
+}
+
+static void PairDevice(JNIEnv * env, AndroidDeviceControllerWrapper * wrapper, chip::NodeId deviceId,
+                       RendezvousParameters & rendezvousParams, jbyteArray csrNonce, jobject networkCredentials,
+                       jobject icdRegistrationInfo)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
     CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
     wrapper->ApplyNetworkCredentials(commissioningParams, networkCredentials);
 
@@ -692,13 +704,36 @@ JNI_METHOD(void, pairDevice)
     {
         commissioningParams.SetDeviceAttestationDelegate(wrapper->GetDeviceAttestationDelegateBridge());
     }
-    err = wrapper->Controller()->PairDevice(static_cast<chip::NodeId>(deviceId), rendezvousParams, commissioningParams);
+
+    err = wrapper->Controller()->PairDevice(deviceId, rendezvousParams, commissioningParams);
 
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed to pair the device.");
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
     }
+}
+
+JNI_METHOD(void, pairDeviceThroughNfc)
+(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jlong pinCode, jbyteArray csrNonce, jobject networkCredentials,
+ jobject icdRegistrationInfo)
+{
+    chip::DeviceLayer::StackLock lock;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    ChipLogProgress(Controller, "pairDeviceThroughNfc() called with device ID and pincode");
+
+    if (!chip::CanCastTo<uint32_t>(pinCode))
+    {
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, CHIP_ERROR_INVALID_ARGUMENT);
+        return;
+    }
+
+    RendezvousParameters rendezvousParams =
+        RendezvousParameters().SetSetupPINCode(static_cast<uint32_t>(pinCode)).SetPeerAddress(Transport::PeerAddress::NFC());
+
+    PairDevice(env, wrapper, static_cast<chip::NodeId>(deviceId), rendezvousParams, csrNonce, networkCredentials,
+               icdRegistrationInfo);
 }
 
 JNI_METHOD(void, pairDeviceWithAddress)
@@ -1331,6 +1366,35 @@ JNI_METHOD(void, unpairDeviceCallback)(JNIEnv * env, jobject self, jlong handle,
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
     }
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+// Method used in case of NFC-based Commissioning without power.
+// At end of 1st commissioning phase, the user is asked to install and power ON the device.
+// Present function is used to confirm that this action has been done.
+// The 2nd commissioning phase, on the Operational network, will then start.
+JNI_METHOD(void, continueCommissioningAfterConnectNetworkRequest)(JNIEnv * env, jobject self, jlong handle, jlong remoteDeviceId)
+{
+    chip::DeviceLayer::StackLock lock;
+    AndroidDeviceControllerWrapper * wrapper = nullptr;
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+
+    VerifyOrExit(env != nullptr, err = CHIP_ERROR_BAD_REQUEST);
+
+    wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+    VerifyOrExit(wrapper != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = wrapper->Controller()->ContinueCommissioningAfterConnectNetworkRequest(static_cast<NodeId>(remoteDeviceId));
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to continue Commissioning after Connect Network Request: %" CHIP_ERROR_FORMAT,
+                     err.Format());
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
 
 JNI_METHOD(void, stopDevicePairing)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
 {
