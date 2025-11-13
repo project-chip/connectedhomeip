@@ -88,7 +88,7 @@ TEST_F(TestOccupancySensingCluster, TestReadClusterRevision)
 TEST_F(TestOccupancySensingCluster, TestReadFeatureMap)
 {
     chip::Test::TestServerClusterContext context;
-    uint32_t featureMap;
+    uint32_t featureMap = 0;
 
     {
         constexpr uint32_t featureMapPir = 0x1; // PassiveInfrared
@@ -209,7 +209,7 @@ TEST_F(TestOccupancySensingCluster, TestHoldTimePersistence)
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         chip::Test::ClusterTester tester(cluster);
 
-        uint16_t holdTime;
+        uint16_t holdTime = 0;
         EXPECT_EQ(tester.ReadAttribute(Attributes::HoldTime::Id, holdTime), CHIP_NO_ERROR);
         EXPECT_EQ(holdTime, kDefaultHoldTime);
         EXPECT_EQ(cluster.GetHoldTime(), kDefaultHoldTime);
@@ -232,7 +232,7 @@ TEST_F(TestOccupancySensingCluster, TestHoldTimePersistence)
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         chip::Test::ClusterTester tester(cluster);
 
-        uint16_t holdTime;
+        uint16_t holdTime = 0;
         EXPECT_EQ(tester.ReadAttribute(Attributes::HoldTime::Id, holdTime), CHIP_NO_ERROR);
         EXPECT_EQ(holdTime, kNewHoldTime);
         EXPECT_EQ(cluster.GetHoldTime(), kNewHoldTime);
@@ -702,15 +702,21 @@ TEST_F(TestOccupancySensingCluster, TestOccupancyChangedEvent)
     cluster.SetOccupancy(true);
     auto eventInfo = context.EventsGenerator().GetNextEvent();
     ASSERT_NE(eventInfo, std::nullopt);
-    EXPECT_EQ(eventInfo->GetEventData(decodedEvent), CHIP_NO_ERROR);
-    EXPECT_EQ(decodedEvent.occupancy, OccupancySensing::OccupancyBitmap::kOccupied);
+    if(eventInfo.has_value()) // Redundant check to avoid clang tidy "error: unchecked access to optional value"
+    {
+        EXPECT_EQ(eventInfo->GetEventData(decodedEvent), CHIP_NO_ERROR);
+        EXPECT_EQ(decodedEvent.occupancy, OccupancySensing::OccupancyBitmap::kOccupied);
+    }
 
     // Set to unoccupied and verify event
     cluster.SetOccupancy(false);
     eventInfo = context.EventsGenerator().GetNextEvent();
     ASSERT_NE(eventInfo, std::nullopt);
-    EXPECT_EQ(eventInfo->GetEventData(decodedEvent), CHIP_NO_ERROR);
-    EXPECT_EQ(decodedEvent.occupancy, kOccupancyUnoccupied);
+    if(eventInfo.has_value()) // Redundant check to avoid clang tidy "error: unchecked access to optional value"
+    {
+        EXPECT_EQ(eventInfo->GetEventData(decodedEvent), CHIP_NO_ERROR);
+        EXPECT_EQ(decodedEvent.occupancy, kOccupancyUnoccupied);
+    }
 }
 
 TEST_F(TestOccupancySensingCluster, TestSetHoldTimeLimits)
