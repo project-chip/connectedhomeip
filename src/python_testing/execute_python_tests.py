@@ -16,12 +16,13 @@
 #    limitations under the License.
 #
 
+import fnmatch
+import glob as g
 import logging
 import os
+import re
 import subprocess
 import sys
-import glob as g
-import fnmatch
 
 import click
 import coloredlogs
@@ -73,9 +74,14 @@ def load_env_from_yaml(file_path):
 @click.option(
     "--glob",
     multiple=True,
-    help="Glob the tests to pick. Use `!` to negate the glob. Glob FILTERS non-matching (i.e. you can use it to restrict more and more, but not to add)",
+    help="Glob the tests to pick. Use `!` to negate the glob. Glob FILTERS out non-matching (i.e. you can use it to restrict more and more, but not to add)",
 )
-def main(search_directory, env_file, keep_going, dry_run: bool, glob: list[str]):
+@click.option(
+    "--regex",
+    multiple=True,
+    help="Regex the tests to pick. Use `!` to negate the expression. Expressions FILTERS out non-matching (i.e. you can use it to restrict more and more, but not to add)",
+)
+def main(search_directory, env_file, keep_going, dry_run: bool, glob: list[str], regex: list[str]):
     # Determine the root directory of the CHIP project
     chip_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
@@ -91,14 +97,21 @@ def main(search_directory, env_file, keep_going, dry_run: bool, glob: list[str])
     # Get all .py files in the directory
     all_python_files = g.glob(os.path.join(search_directory, "*.py"))
 
-    if glob:
-        for pattern in glob:
-            if pattern.startswith('!'):
-                match = lambda p: not fnmatch.fnmatch(p, f"*{pattern[1:]}*")
-            else:
-                match = lambda p: fnmatch.fnmatch(p, f"*{pattern}*")
-            all_python_files = [path for path in all_python_files if match(path)]
+    for pattern in glob:
+        if pattern.startswith('!'):
+            def match(p): return not fnmatch.fnmatch(p, f"*{pattern[1:]}*")
+        else:
+            def match(p): return fnmatch.fnmatch(p, f"*{pattern}*")
+        all_python_files = [path for path in all_python_files if match(path)]
 
+    for pattern in regex:
+        if pattern.startswith('!'):
+            r = re.compile(pattern[1:])
+            def match(p): return not r.search(p)
+        else:
+            r = re.compile(pattern)
+            def match(p): return r.search(p) is not None
+        all_python_files = [path for path in all_python_files if match(path)]
 
     # Filter out the files matching the excluded patterns
     python_files = [file for file in all_python_files if os.path.basename(file) not in excluded_patterns]
