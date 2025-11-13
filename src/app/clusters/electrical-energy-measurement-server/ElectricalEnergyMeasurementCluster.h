@@ -29,6 +29,10 @@ namespace app {
 namespace Clusters {
 namespace ElectricalEnergyMeasurement {
 
+enum class OptionalAttributes : uint32_t
+{
+    kOptionalAttributeCumulativeEnergyReset = 0x1,
+};
 // Data structure to hold measurement data for backwards compatibility
 struct MeasurementData
 {
@@ -59,20 +63,36 @@ public:
 
     struct Config
     {
-        constexpr Config(EndpointId endpoint, BitMask<ElectricalEnergyMeasurement::Feature> featureFlags,
-                         OptionalAttributesSet & optionalAttributes) :
+        Config(EndpointId endpoint, BitMask<ElectricalEnergyMeasurement::Feature> featureFlags,
+               BitMask<ElectricalEnergyMeasurement::OptionalAttributes> optionalAttributes) :
             endpointId(endpoint),
-            mFeatureFlags(featureFlags), mEnabledOptionalAttributes(optionalAttributes)
-        {}
+            mFeatureFlags(featureFlags)
+        {
+            mEnabledOptionalAttributes.Set<ElectricalEnergyMeasurement::Attributes::CumulativeEnergyImported::Id>(
+                featureFlags.HasAll(ElectricalEnergyMeasurement::Feature::kCumulativeEnergy,
+                                    ElectricalEnergyMeasurement::Feature::kImportedEnergy));
+            mEnabledOptionalAttributes.Set<ElectricalEnergyMeasurement::Attributes::CumulativeEnergyExported::Id>(
+                (featureFlags.HasAll(ElectricalEnergyMeasurement::Feature::kCumulativeEnergy,
+                                     ElectricalEnergyMeasurement::Feature::kExportedEnergy)));
+            mEnabledOptionalAttributes.Set<ElectricalEnergyMeasurement::Attributes::PeriodicEnergyImported::Id>(featureFlags.HasAll(
+                ElectricalEnergyMeasurement::Feature::kPeriodicEnergy, ElectricalEnergyMeasurement::Feature::kImportedEnergy));
+            mEnabledOptionalAttributes.Set<ElectricalEnergyMeasurement::Attributes::PeriodicEnergyExported::Id>(featureFlags.HasAll(
+                ElectricalEnergyMeasurement::Feature::kPeriodicEnergy, ElectricalEnergyMeasurement::Feature::kExportedEnergy));
+            mEnabledOptionalAttributes.Set<ElectricalEnergyMeasurement::Attributes::CumulativeEnergyReset::Id>(
+                optionalAttributes.Has(ElectricalEnergyMeasurement::OptionalAttributes::kOptionalAttributeCumulativeEnergyReset) &&
+                featureFlags.Has(ElectricalEnergyMeasurement::Feature::kCumulativeEnergy));
+        }
 
         EndpointId endpointId;
         const BitFlags<ElectricalEnergyMeasurement::Feature> mFeatureFlags;
         OptionalAttributesSet mEnabledOptionalAttributes;
     };
 
-    ElectricalEnergyMeasurementCluster(const Config & config);
+    ElectricalEnergyMeasurementCluster(const Config & config) :
+        DefaultServerCluster({ config.endpointId, ElectricalEnergyMeasurement::Id }), mFeatureFlags(config.mFeatureFlags),
+        mEnabledOptionalAttributes(config.mEnabledOptionalAttributes)
+    {}
 
-    OptionalAttributesSet & OptionalAttributes() { return mEnabledOptionalAttributes; }
     const OptionalAttributesSet & OptionalAttributes() const { return mEnabledOptionalAttributes; }
     const BitFlags<ElectricalEnergyMeasurement::Feature> & Features() const { return mFeatureFlags; }
 

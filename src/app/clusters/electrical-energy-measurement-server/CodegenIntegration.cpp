@@ -45,15 +45,7 @@ ElectricalEnergyMeasurementAttrAccess::ElectricalEnergyMeasurementAttrAccess(Bit
                                                                              BitMask<OptionalAttributes> aOptionalAttrs,
                                                                              EndpointId endpointId) :
     mEndpointId(endpointId),
-    mCluster([&]() {
-        // Convert from BitMask<OptionalAttributes> to OptionalAttributesSet
-        ElectricalEnergyMeasurementCluster::OptionalAttributesSet optionalAttributesSet;
-        if (aOptionalAttrs.Has(OptionalAttributes::kOptionalAttributeCumulativeEnergyReset))
-        {
-            optionalAttributesSet.Set<CumulativeEnergyReset::Id>();
-        }
-        return ElectricalEnergyMeasurementCluster::Config(endpointId, aFeature, optionalAttributesSet);
-    }())
+    mCluster([&]() { return ElectricalEnergyMeasurementCluster::Config(endpointId, aFeature, aOptionalAttrs); }())
 {}
 
 ElectricalEnergyMeasurementCluster * FindElectricalEnergyMeasurementClusterOnEndpoint(EndpointId endpointId)
@@ -113,12 +105,12 @@ bool NotifyCumulativeEnergyMeasured(EndpointId endpointId, const Optional<Energy
     {
 #if defined(CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS) &&                                                       \
     CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
-        ChipLogError(Zcl, "[NotifyCumulativeEnergyMeasured] Unable to send event: %" CHIP_ERROR_FORMAT " [endpointId=%d]",
+        ChipLogError(Zcl, "[NotifyCumulativeEnergyMeasured] Unable to generate event: %" CHIP_ERROR_FORMAT " [endpointId=%d]",
                      error.Format(), endpointId);
 #endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
         return false;
     }
-    ChipLogProgress(Zcl, "[NotifyCumulativeEnergyMeasured] Sent event [endpointId=%d,eventNumber=%lu]", endpointId,
+    ChipLogProgress(Zcl, "[NotifyCumulativeEnergyMeasured] Generated event [endpointId=%d,eventNumber=%lu]", endpointId,
                     static_cast<unsigned long>(eventNumber));
     return true;
 }
@@ -151,12 +143,12 @@ bool NotifyPeriodicEnergyMeasured(EndpointId endpointId, const Optional<EnergyMe
     {
 #if defined(CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS) &&                                                       \
     CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
-        ChipLogError(Zcl, "[NotifyPeriodicEnergyMeasured] Unable to send event: %" CHIP_ERROR_FORMAT " [endpointId=%d]",
+        ChipLogError(Zcl, "[NotifyPeriodicEnergyMeasured] Unable to generate event: %" CHIP_ERROR_FORMAT " [endpointId=%d]",
                      error.Format(), endpointId);
 #endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
         return false;
     }
-    ChipLogProgress(Zcl, "[NotifyPeriodicEnergyMeasured] Sent event [endpointId=%d,eventNumber=%lu]", endpointId,
+    ChipLogProgress(Zcl, "[NotifyPeriodicEnergyMeasured] Generated event [endpointId=%d,eventNumber=%lu]", endpointId,
                     static_cast<unsigned long>(eventNumber));
     return true;
 }
@@ -190,21 +182,18 @@ void ElectricalEnergyMeasurementAttrAccess::Shutdown()
     }
 }
 
-bool ElectricalEnergyMeasurementAttrAccess::HasFeature(Feature aFeature) const
+bool ElectricalEnergyMeasurementAttrAccess::HasFeature(Feature aFeature)
 {
-    return const_cast<RegisteredServerCluster<ElectricalEnergyMeasurementCluster> &>(mCluster).Cluster().Features().Has(aFeature);
+    return mCluster.Cluster().Features().Has(aFeature);
 }
 
-bool ElectricalEnergyMeasurementAttrAccess::SupportsOptAttr(OptionalAttributes aOptionalAttrs) const
+bool ElectricalEnergyMeasurementAttrAccess::SupportsOptAttr(OptionalAttributes aOptionalAttrs)
 {
     // Convert from OptionalAttributes enum to AttributeId and check OptionalAttributesSet from cluster
     switch (aOptionalAttrs)
     {
     case OptionalAttributes::kOptionalAttributeCumulativeEnergyReset:
-        return const_cast<RegisteredServerCluster<ElectricalEnergyMeasurementCluster> &>(mCluster)
-            .Cluster()
-            .OptionalAttributes()
-            .IsSet(CumulativeEnergyReset::Id);
+        return mCluster.Cluster().OptionalAttributes().IsSet(CumulativeEnergyReset::Id);
     default:
         return false;
     }

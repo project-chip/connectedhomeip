@@ -30,11 +30,6 @@ namespace ElectricalEnergyMeasurement {
 
 constexpr EndpointId kDefaultEndpointId = 1;
 
-enum class OptionalAttributes : uint32_t
-{
-    kOptionalAttributeCumulativeEnergyReset = 0x1,
-};
-
 class ElectricalEnergyMeasurementAttrAccess
 {
 public:
@@ -46,8 +41,8 @@ public:
     CHIP_ERROR Init();
     void Shutdown();
 
-    bool HasFeature(Feature aFeature) const;
-    bool SupportsOptAttr(OptionalAttributes aOptionalAttrs) const;
+    bool HasFeature(Feature aFeature);
+    bool SupportsOptAttr(OptionalAttributes aOptionalAttrs);
 
 private:
     EndpointId mEndpointId;

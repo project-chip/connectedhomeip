@@ -41,36 +41,47 @@ using namespace ElectricalEnergyMeasurement::Attributes;
 using namespace ElectricalEnergyMeasurement::Structs;
 using namespace ElectricalEnergyMeasurement;
 
-ElectricalEnergyMeasurementCluster::ElectricalEnergyMeasurementCluster(const Config & config) :
-    DefaultServerCluster({ config.endpointId, ElectricalEnergyMeasurement::Id }), mFeatureFlags(config.mFeatureFlags),
-    mEnabledOptionalAttributes(config.mEnabledOptionalAttributes)
+namespace {
+
+bool ValueChanged(const MeasurementAccuracyStruct::Type & previous, const MeasurementAccuracyStruct::Type & newValue)
 {
-    // Verify that optional attributes match the enabled features
-    // CumulativeEnergyImported requires kCumulativeEnergy + kImportedEnergy
-    VerifyOrDieWithMsg(!mEnabledOptionalAttributes.IsSet(CumulativeEnergyImported::Id) ||
-                           (mFeatureFlags.Has(Feature::kCumulativeEnergy) && mFeatureFlags.Has(Feature::kImportedEnergy)),
-                       Zcl, "CumulativeEnergyImported attribute requires kCumulativeEnergy and kImportedEnergy features");
-
-    // CumulativeEnergyExported requires kCumulativeEnergy + kExportedEnergy
-    VerifyOrDieWithMsg(!mEnabledOptionalAttributes.IsSet(CumulativeEnergyExported::Id) ||
-                           (mFeatureFlags.Has(Feature::kCumulativeEnergy) && mFeatureFlags.Has(Feature::kExportedEnergy)),
-                       Zcl, "CumulativeEnergyExported attribute requires kCumulativeEnergy and kExportedEnergy features");
-
-    // PeriodicEnergyImported requires kPeriodicEnergy + kImportedEnergy
-    VerifyOrDieWithMsg(!mEnabledOptionalAttributes.IsSet(PeriodicEnergyImported::Id) ||
-                           (mFeatureFlags.Has(Feature::kPeriodicEnergy) && mFeatureFlags.Has(Feature::kImportedEnergy)),
-                       Zcl, "PeriodicEnergyImported attribute requires kPeriodicEnergy and kImportedEnergy features");
-
-    // PeriodicEnergyExported requires kPeriodicEnergy + kExportedEnergy
-    VerifyOrDieWithMsg(!mEnabledOptionalAttributes.IsSet(PeriodicEnergyExported::Id) ||
-                           (mFeatureFlags.Has(Feature::kPeriodicEnergy) && mFeatureFlags.Has(Feature::kExportedEnergy)),
-                       Zcl, "PeriodicEnergyExported attribute requires kPeriodicEnergy and kExportedEnergy features");
-
-    // CumulativeEnergyReset requires kCumulativeEnergy
-    VerifyOrDieWithMsg(!mEnabledOptionalAttributes.IsSet(CumulativeEnergyReset::Id) ||
-                           mFeatureFlags.Has(Feature::kCumulativeEnergy),
-                       Zcl, "CumulativeEnergyReset attribute requires kCumulativeEnergy feature");
+    return (previous.measurementType != newValue.measurementType) || (previous.measured != newValue.measured) ||
+        (previous.minMeasuredValue != newValue.minMeasuredValue) || (previous.maxMeasuredValue != newValue.maxMeasuredValue);
+    // Note: accuracyRanges List is not compared as we do not expect it to change in operation
 }
+
+bool ValueChanged(const EnergyMeasurementStruct::Type & previous, const EnergyMeasurementStruct::Type & newValue)
+{
+    return (previous.energy != newValue.energy) || (previous.startTimestamp != newValue.startTimestamp) ||
+        (previous.endTimestamp != newValue.endTimestamp) || (previous.startSystime != newValue.startSystime) ||
+        (previous.endSystime != newValue.endSystime) || (previous.apparentEnergy != newValue.apparentEnergy) ||
+        (previous.reactiveEnergy != newValue.reactiveEnergy);
+}
+
+bool ValueChanged(const Optional<EnergyMeasurementStruct::Type> & previous,
+                  const Optional<EnergyMeasurementStruct::Type> & newValue)
+{
+    if (previous.HasValue() != newValue.HasValue())
+        return true;
+    if (!previous.HasValue())
+        return false;
+    return ValueChanged(previous.Value(), newValue.Value());
+}
+
+bool ValueChanged(const Optional<CumulativeEnergyResetStruct::Type> & previous,
+                  const Optional<CumulativeEnergyResetStruct::Type> & newValue)
+{
+    if (previous.HasValue() != newValue.HasValue())
+        return true;
+    if (!previous.HasValue())
+        return false;
+    return (previous.Value().importedResetTimestamp != newValue.Value().importedResetTimestamp) ||
+        (previous.Value().exportedResetTimestamp != newValue.Value().exportedResetTimestamp) ||
+        (previous.Value().importedResetSystime != newValue.Value().importedResetSystime) ||
+        (previous.Value().exportedResetSystime != newValue.Value().exportedResetSystime);
+}
+
+} // anonymous namespace
 
 CHIP_ERROR ElectricalEnergyMeasurementCluster::GetMeasurementAccuracy(MeasurementAccuracyStruct & outValue) const
 {
@@ -80,8 +91,8 @@ CHIP_ERROR ElectricalEnergyMeasurementCluster::GetMeasurementAccuracy(Measuremen
 
 CHIP_ERROR ElectricalEnergyMeasurementCluster::GetCumulativeEnergyImported(Optional<EnergyMeasurementStruct> & outValue) const
 {
-    if (!mFeatureFlags.Has(ElectricalEnergyMeasurement::Feature::kCumulativeEnergy) ||
-        !mFeatureFlags.Has(ElectricalEnergyMeasurement::Feature::kImportedEnergy))
+    if (!mFeatureFlags.HasAll(ElectricalEnergyMeasurement::Feature::kCumulativeEnergy,
+                              ElectricalEnergyMeasurement::Feature::kImportedEnergy))
     {
         ChipLogError(
             Zcl, "Electrical Energy Measurement: CumulativeEnergyImported requires kCumulativeEnergy and kImportedEnergy features");
@@ -93,8 +104,8 @@ CHIP_ERROR ElectricalEnergyMeasurementCluster::GetCumulativeEnergyImported(Optio
 
 CHIP_ERROR ElectricalEnergyMeasurementCluster::GetCumulativeEnergyExported(Optional<EnergyMeasurementStruct> & outValue) const
 {
-    if (!mFeatureFlags.Has(ElectricalEnergyMeasurement::Feature::kCumulativeEnergy) ||
-        !mFeatureFlags.Has(ElectricalEnergyMeasurement::Feature::kExportedEnergy))
+    if (!mFeatureFlags.HasAll(ElectricalEnergyMeasurement::Feature::kCumulativeEnergy,
+                              ElectricalEnergyMeasurement::Feature::kExportedEnergy))
     {
         ChipLogError(
             Zcl, "Electrical Energy Measurement: CumulativeEnergyExported requires kCumulativeEnergy and kExportedEnergy features");
@@ -106,8 +117,8 @@ CHIP_ERROR ElectricalEnergyMeasurementCluster::GetCumulativeEnergyExported(Optio
 
 CHIP_ERROR ElectricalEnergyMeasurementCluster::GetPeriodicEnergyImported(Optional<EnergyMeasurementStruct> & outValue) const
 {
-    if (!mFeatureFlags.Has(ElectricalEnergyMeasurement::Feature::kPeriodicEnergy) ||
-        !mFeatureFlags.Has(ElectricalEnergyMeasurement::Feature::kImportedEnergy))
+    if (!mFeatureFlags.HasAll(ElectricalEnergyMeasurement::Feature::kPeriodicEnergy,
+                              ElectricalEnergyMeasurement::Feature::kImportedEnergy))
     {
         ChipLogError(Zcl,
                      "Electrical Energy Measurement: PeriodicEnergyImported requires kPeriodicEnergy and kImportedEnergy features");
@@ -119,8 +130,8 @@ CHIP_ERROR ElectricalEnergyMeasurementCluster::GetPeriodicEnergyImported(Optiona
 
 CHIP_ERROR ElectricalEnergyMeasurementCluster::GetPeriodicEnergyExported(Optional<EnergyMeasurementStruct> & outValue) const
 {
-    if (!mFeatureFlags.Has(ElectricalEnergyMeasurement::Feature::kPeriodicEnergy) ||
-        !mFeatureFlags.Has(ElectricalEnergyMeasurement::Feature::kExportedEnergy))
+    if (!mFeatureFlags.HasAll(ElectricalEnergyMeasurement::Feature::kPeriodicEnergy,
+                              ElectricalEnergyMeasurement::Feature::kExportedEnergy))
     {
         ChipLogError(Zcl,
                      "Electrical Energy Measurement: PeriodicEnergyExported requires kPeriodicEnergy and kExportedEnergy features");
@@ -132,7 +143,7 @@ CHIP_ERROR ElectricalEnergyMeasurementCluster::GetPeriodicEnergyExported(Optiona
 
 CHIP_ERROR ElectricalEnergyMeasurementCluster::GetCumulativeEnergyReset(Optional<CumulativeEnergyResetStruct> & outValue) const
 {
-    if (!mFeatureFlags.Has(ElectricalEnergyMeasurement::Feature::kCumulativeEnergy))
+    if (!mEnabledOptionalAttributes.IsSet(CumulativeEnergyReset::Id))
     {
         ChipLogError(Zcl, "Electrical Energy Measurement: CumulativeEnergyReset requires kCumulativeEnergy feature");
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
@@ -143,76 +154,97 @@ CHIP_ERROR ElectricalEnergyMeasurementCluster::GetCumulativeEnergyReset(Optional
 
 CHIP_ERROR ElectricalEnergyMeasurementCluster::SetMeasurementAccuracy(const MeasurementAccuracyStruct & value)
 {
-    mMeasurementData.measurementAccuracy = value;
-    NotifyAttributeChanged(Accuracy::Id);
+    if (ValueChanged(mMeasurementData.measurementAccuracy, value))
+    {
+        mMeasurementData.measurementAccuracy = value;
+        NotifyAttributeChanged(Accuracy::Id);
+    }
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ElectricalEnergyMeasurementCluster::SetCumulativeEnergyImported(const Optional<EnergyMeasurementStruct> & value)
 {
-    if (!mFeatureFlags.Has(ElectricalEnergyMeasurement::Feature::kCumulativeEnergy) ||
-        !mFeatureFlags.Has(ElectricalEnergyMeasurement::Feature::kImportedEnergy))
+    if (!mFeatureFlags.HasAll(ElectricalEnergyMeasurement::Feature::kCumulativeEnergy,
+                              ElectricalEnergyMeasurement::Feature::kImportedEnergy))
     {
         ChipLogError(
             Zcl, "Electrical Energy Measurement: CumulativeEnergyImported requires kCumulativeEnergy and kImportedEnergy features");
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
-    mMeasurementData.cumulativeImported = value;
-    NotifyAttributeChanged(CumulativeEnergyImported::Id);
+
+    if (ValueChanged(mMeasurementData.cumulativeImported, value))
+    {
+        mMeasurementData.cumulativeImported = value;
+        NotifyAttributeChanged(CumulativeEnergyImported::Id);
+    }
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ElectricalEnergyMeasurementCluster::SetCumulativeEnergyExported(const Optional<EnergyMeasurementStruct> & value)
 {
-    if (!mFeatureFlags.Has(ElectricalEnergyMeasurement::Feature::kCumulativeEnergy) ||
-        !mFeatureFlags.Has(ElectricalEnergyMeasurement::Feature::kExportedEnergy))
+    if (!mFeatureFlags.HasAll(ElectricalEnergyMeasurement::Feature::kCumulativeEnergy,
+                              ElectricalEnergyMeasurement::Feature::kExportedEnergy))
     {
         ChipLogError(
             Zcl, "Electrical Energy Measurement: CumulativeEnergyExported requires kCumulativeEnergy and kExportedEnergy features");
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
-    mMeasurementData.cumulativeExported = value;
-    NotifyAttributeChanged(CumulativeEnergyExported::Id);
+
+    if (ValueChanged(mMeasurementData.cumulativeExported, value))
+    {
+        mMeasurementData.cumulativeExported = value;
+        NotifyAttributeChanged(CumulativeEnergyExported::Id);
+    }
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ElectricalEnergyMeasurementCluster::SetPeriodicEnergyImported(const Optional<EnergyMeasurementStruct> & value)
 {
-    if (!mFeatureFlags.Has(ElectricalEnergyMeasurement::Feature::kPeriodicEnergy) ||
-        !mFeatureFlags.Has(ElectricalEnergyMeasurement::Feature::kImportedEnergy))
+    if (!mFeatureFlags.HasAll(ElectricalEnergyMeasurement::Feature::kPeriodicEnergy,
+                              ElectricalEnergyMeasurement::Feature::kImportedEnergy))
     {
         ChipLogError(Zcl,
                      "Electrical Energy Measurement: PeriodicEnergyImported requires kPeriodicEnergy and kImportedEnergy features");
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
-    mMeasurementData.periodicImported = value;
-    NotifyAttributeChanged(PeriodicEnergyImported::Id);
+    if (ValueChanged(mMeasurementData.periodicImported, value))
+    {
+        mMeasurementData.periodicImported = value;
+        NotifyAttributeChanged(PeriodicEnergyImported::Id);
+    }
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ElectricalEnergyMeasurementCluster::SetPeriodicEnergyExported(const Optional<EnergyMeasurementStruct> & value)
 {
-    if (!mFeatureFlags.Has(ElectricalEnergyMeasurement::Feature::kPeriodicEnergy) ||
-        !mFeatureFlags.Has(ElectricalEnergyMeasurement::Feature::kExportedEnergy))
+    if (!mFeatureFlags.HasAll(ElectricalEnergyMeasurement::Feature::kPeriodicEnergy,
+                              ElectricalEnergyMeasurement::Feature::kExportedEnergy))
     {
         ChipLogError(Zcl,
                      "Electrical Energy Measurement: PeriodicEnergyExported requires kPeriodicEnergy and kExportedEnergy features");
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
-    mMeasurementData.periodicExported = value;
-    NotifyAttributeChanged(PeriodicEnergyExported::Id);
+
+    if (ValueChanged(mMeasurementData.periodicExported, value))
+    {
+        mMeasurementData.periodicExported = value;
+        NotifyAttributeChanged(PeriodicEnergyExported::Id);
+    }
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ElectricalEnergyMeasurementCluster::SetCumulativeEnergyReset(const Optional<CumulativeEnergyResetStruct> & value)
 {
-    if (!mFeatureFlags.Has(ElectricalEnergyMeasurement::Feature::kCumulativeEnergy))
+    if (!mEnabledOptionalAttributes.IsSet(CumulativeEnergyReset::Id))
     {
         ChipLogError(Zcl, "Electrical Energy Measurement: CumulativeEnergyReset requires kCumulativeEnergy feature");
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
-    mMeasurementData.cumulativeReset = value;
-    NotifyAttributeChanged(CumulativeEnergyReset::Id);
+    if (ValueChanged(mMeasurementData.cumulativeReset, value))
+    {
+        mMeasurementData.cumulativeReset = value;
+        NotifyAttributeChanged(CumulativeEnergyReset::Id);
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -222,90 +254,50 @@ DataModel::ActionReturnStatus ElectricalEnergyMeasurementCluster::ReadAttribute(
     switch (request.path.mAttributeId)
     {
     case FeatureMap::Id:
-        return encoder.Encode<uint32_t>(mFeatureFlags.Raw());
+        return encoder.Encode(mFeatureFlags);
 
     case Accuracy::Id: {
-        MeasurementAccuracyStruct accuracy;
-        CHIP_ERROR err = GetMeasurementAccuracy(accuracy);
-        if (err != CHIP_NO_ERROR)
-        {
-            return Protocols::InteractionModel::Status::UnsupportedAttribute;
-        }
-        return encoder.Encode(accuracy);
+        return encoder.Encode(mMeasurementData.measurementAccuracy);
     }
 
     case CumulativeEnergyImported::Id: {
-        Optional<EnergyMeasurementStruct> value;
-        CHIP_ERROR err = GetCumulativeEnergyImported(value);
-        if (err != CHIP_NO_ERROR)
-        {
-            return Protocols::InteractionModel::Status::UnsupportedAttribute;
-        }
-        if (!value.HasValue())
+        if (!mMeasurementData.cumulativeImported.HasValue())
         {
             return encoder.EncodeNull();
         }
-        return encoder.Encode(value.Value());
+        return encoder.Encode(mMeasurementData.cumulativeImported.Value());
     }
 
     case CumulativeEnergyExported::Id: {
-        Optional<EnergyMeasurementStruct> value;
-        CHIP_ERROR err = GetCumulativeEnergyExported(value);
-        if (err != CHIP_NO_ERROR)
-        {
-            return Protocols::InteractionModel::Status::UnsupportedAttribute;
-        }
-        if (!value.HasValue())
+        if (!mMeasurementData.cumulativeExported.HasValue())
         {
             return encoder.EncodeNull();
         }
-        return encoder.Encode(value.Value());
+        return encoder.Encode(mMeasurementData.cumulativeExported.Value());
     }
 
     case PeriodicEnergyImported::Id: {
-        Optional<EnergyMeasurementStruct> value;
-        CHIP_ERROR err = GetPeriodicEnergyImported(value);
-        if (err != CHIP_NO_ERROR)
-        {
-            return Protocols::InteractionModel::Status::UnsupportedAttribute;
-        }
-        if (!value.HasValue())
+        if (!mMeasurementData.periodicImported.HasValue())
         {
             return encoder.EncodeNull();
         }
-        return encoder.Encode(value.Value());
+        return encoder.Encode(mMeasurementData.periodicImported.Value());
     }
 
     case PeriodicEnergyExported::Id: {
-        Optional<EnergyMeasurementStruct> value;
-        CHIP_ERROR err = GetPeriodicEnergyExported(value);
-        if (err != CHIP_NO_ERROR)
-        {
-            return Protocols::InteractionModel::Status::UnsupportedAttribute;
-        }
-        if (!value.HasValue())
+        if (!mMeasurementData.periodicExported.HasValue())
         {
             return encoder.EncodeNull();
         }
-        return encoder.Encode(value.Value());
+        return encoder.Encode(mMeasurementData.periodicExported.Value());
     }
 
     case CumulativeEnergyReset::Id: {
-        if (!mEnabledOptionalAttributes.IsSet(CumulativeEnergyReset::Id))
-        {
-            return Protocols::InteractionModel::Status::UnsupportedAttribute;
-        }
-        Optional<CumulativeEnergyResetStruct> value;
-        CHIP_ERROR err = GetCumulativeEnergyReset(value);
-        if (err != CHIP_NO_ERROR)
-        {
-            return Protocols::InteractionModel::Status::UnsupportedAttribute;
-        }
-        if (!value.HasValue())
+        if (!mMeasurementData.cumulativeReset.HasValue())
         {
             return encoder.EncodeNull();
         }
-        return encoder.Encode(value.Value());
+        return encoder.Encode(mMeasurementData.cumulativeReset.Value());
     }
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
