@@ -24,6 +24,7 @@ import queue
 import random
 import select
 import shlex
+import subprocess
 import textwrap
 import time
 import typing
@@ -1019,9 +1020,8 @@ class MatterBaseTest(base_test.BaseTestClass):
             dut_uname = os.getenv('LINUX_DUT_USER')
             asserts.assert_true(dut_uname is not None, "The LINUX_DUT_USER environment variable must be set")
             LOGGER.info(f"Using DUT user name: {dut_uname}")
-            cmd = "ssh %s@%s \'cat %s\'" % (dut_uname, dut_ip, app_pipe_out)
-            cmd_list = ["ssh",f"{dut_name}@{dut_ip}",f"cat {app_pipe_out}"]
-            out = check_output(cmd_list)
+            cmd_list = ["ssh", f"{dut_uname}@{dut_ip}", f"cat {app_pipe_out}"]
+            out = subprocess.check_output(cmd_list)
             return out
 
     def write_to_app_pipe(self, command_dict: dict, app_pipe: Optional[str] = None):
