@@ -67,7 +67,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         """
         Adds a single OTA provider to the Requestor DefaultOTAProviders attribute
         only if no provider is currently registered. If a provider already exists,
-        the function oreserve the current DefaultOTAProviders.
+        the function preserve the current DefaultOTAProviders.
 
         Args:
             controller: The device controller.
@@ -467,9 +467,9 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         logger.info(f'{step_number}: Step #1.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
 
         # ------------------------------------------------------------------------------------
-        # [STEP_1]: Step #1.2   - Track OTA attributes: UpdateState and UpdateStateProgress
+        # [STEP_1]: Step #1.2 - Track OTA attributes: UpdateState and UpdateStateProgress
         # [STEP_1]: Step #1.2.1 - UpdateState matcher: Track "Downloading"
-        # [STEP_1]: Step #1.2.2 - UpdateStateProgress matcher: Track non-null values "rage 1–100" and final "None"
+        # [STEP_1]: Step #1.2.2 - UpdateStateProgress matcher: Track non-null values "range 1–100" and final "None"
         # ------------------------------------------------------------------------------------
         logger.info(
             f'{step_number}: Step #1.1 - Started subscription for UpdateState and UpdateStateProgress attributes '
@@ -924,7 +924,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # [STEP_4]: Step #4.5 - Close Provider Process
         # ------------------------------------------------------------------------------------
         logger.info(
-            f'{step_number_s4}: Step #4.5 - Closed Provider_S4 process.')
+            f'{step_number_s4}: Step #4.5 - Closed Provider process.')
 
         # Kill Provider process
         self.current_provider_app_proc.terminate()
@@ -947,7 +947,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         )
 
         # ------------------------------------------------------------------------------------
-        # [STEP_6]: Step #6.1 - Matcher for OTA records logs
+        # [STEP_6]: Step #6.1 - Matcher for OTA event logs
         # Start EventSubscriptionHandler first to avoid missing any rapid OTA events (race condition)
         # Events: StateTransition (UpdateState should stay Idle if UpdateAvailable version is same or lower)
         # ------------------------------------------------------------------------------------
@@ -992,7 +992,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             Tracks state transitions events:
             First event: Idle > Querying
             Second event: Querying > Idle
-            Records each observed transition only once and validates that no image transfer occurs when version is same or lower.
+            Records all observed transitions for full visibility and validates that no image transfer occurs when version is same or lower.
             """
             nonlocal state_sequence_notavailable
             val = report.Data.newState
@@ -1047,10 +1047,10 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             f'{step_number_s6}: Step #6.4 - Full OTA StateTransition (if UpdateAvailable version is same or lower) observed: {state_sequence_notavailable}')
 
         # ------------------------------------------------------------------------------------
-        # [STEP_6]: Step #6.5 - Close Provider_S6 Process (CLEANUP!)
+        # [STEP_6]: Step #6.5 - Close Provider Process
         # ------------------------------------------------------------------------------------
         logger.info(
-            f'{step_number_s6}: Step #6.5 - Closed Provider_S6.')
+            f'{step_number_s6}: Step #6.5 - Closed Provider.')
 
         # Kill Provider process
         self.current_provider_app_proc.terminate()
@@ -1073,7 +1073,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         )
 
         # ------------------------------------------------------------------------------------
-        # [STEP_7]: Step #7.1 - Matcher for OTA records logs
+        # [STEP_7]: Step #7.1 - Matcher for OTA event logs
         # Start EventSubscriptionHandler first to avoid missing any rapid OTA events (race condition)
         # Events: StateTransition (should stay Idle due to invalid BDX ImageURI in UpdateAvailable)
         # ------------------------------------------------------------------------------------
@@ -1112,7 +1112,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             Tracks state transitions events:
             First event: Idle > Querying
             Second event: Querying > Idle
-            Records each observed transition only once and validates that no image transfer occurs due to invalid BDX ImageURI.
+            Records every observed transition and validates that no image transfer occurs due to invalid BDX ImageURI.
             """
             nonlocal state_sequence_notavailable
             val = report.Data.newState
