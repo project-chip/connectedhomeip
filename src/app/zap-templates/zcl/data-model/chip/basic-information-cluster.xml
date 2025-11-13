@@ -20,7 +20,7 @@ Source: src/service_device_management/BasicInformationCluster.adoc
 Parameters: zap attribute=improved-capabilities-tcr,cluster-rev-conformance sdk-root=../connectedhomeip/ spec-root=../connectedhomeip-spec/ ../connectedhomeip-spec/src/data_model/Interaction-Model.adoc ../connectedhomeip-spec/src/data_model/Data-Model.adoc ../connectedhomeip-spec/src/service_device_management/BasicInformationCluster.adoc 
 Git: 1.5-base-64-ge13c53cfd
 Alchemy: v1.6.1
---> 
+-->
 <configurator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../zcl.xsd">
   <domain name="CHIP"/>
   <struct name="CapabilityMinimaStruct">
