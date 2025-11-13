@@ -587,7 +587,7 @@ if (chip_device_platform != "none") {
     } else if (chip_device_platform == "efr32") {
       _platform_target = "silabs/efr32"
     } else if (chip_device_platform == "SiWx917") {
-      _platform_target = "silabs/SiWx917"
+      _platform_target = "silabs/SiWx"
     } else if (chip_device_platform == "esp32") {
       _platform_target = "ESP32"
     } else if (chip_device_platform == "linux") {
