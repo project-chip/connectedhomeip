@@ -23,7 +23,6 @@
 #include <app-common/zap-generated/ids/Commands.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/DefaultTimerDelegate.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/server-cluster/DefaultServerCluster.h>
@@ -32,6 +31,7 @@
 #include <data-model-providers/codegen/CodegenProcessingConfig.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TimerDelegate.h>
+#include <platform/DefaultTimerDelegate.h>
 #include <tracing/macros.h>
 
 namespace {
