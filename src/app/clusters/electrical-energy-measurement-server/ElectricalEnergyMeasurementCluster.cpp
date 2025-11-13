@@ -83,10 +83,9 @@ bool ValueChanged(const Optional<CumulativeEnergyResetStruct::Type> & previous,
 
 } // anonymous namespace
 
-CHIP_ERROR ElectricalEnergyMeasurementCluster::GetMeasurementAccuracy(MeasurementAccuracyStruct & outValue) const
+void ElectricalEnergyMeasurementCluster::GetMeasurementAccuracy(MeasurementAccuracyStruct & outValue) const
 {
     outValue = mMeasurementData.measurementAccuracy;
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ElectricalEnergyMeasurementCluster::GetCumulativeEnergyImported(Optional<EnergyMeasurementStruct> & outValue) const
@@ -256,49 +255,47 @@ DataModel::ActionReturnStatus ElectricalEnergyMeasurementCluster::ReadAttribute(
     case FeatureMap::Id:
         return encoder.Encode(mFeatureFlags);
 
-    case Accuracy::Id: {
-        return encoder.Encode(mMeasurementData.measurementAccuracy);
-    }
+    case ClusterRevision::Id:
+        return encoder.Encode(kRevision);
 
-    case CumulativeEnergyImported::Id: {
+    case Accuracy::Id:
+        return encoder.Encode(mMeasurementData.measurementAccuracy);
+
+    case CumulativeEnergyImported::Id:
         if (!mMeasurementData.cumulativeImported.HasValue())
         {
             return encoder.EncodeNull();
         }
         return encoder.Encode(mMeasurementData.cumulativeImported.Value());
-    }
 
-    case CumulativeEnergyExported::Id: {
+    case CumulativeEnergyExported::Id:
         if (!mMeasurementData.cumulativeExported.HasValue())
         {
             return encoder.EncodeNull();
         }
         return encoder.Encode(mMeasurementData.cumulativeExported.Value());
-    }
 
-    case PeriodicEnergyImported::Id: {
+    case PeriodicEnergyImported::Id:
         if (!mMeasurementData.periodicImported.HasValue())
         {
             return encoder.EncodeNull();
         }
         return encoder.Encode(mMeasurementData.periodicImported.Value());
-    }
 
-    case PeriodicEnergyExported::Id: {
+    case PeriodicEnergyExported::Id:
         if (!mMeasurementData.periodicExported.HasValue())
         {
             return encoder.EncodeNull();
         }
         return encoder.Encode(mMeasurementData.periodicExported.Value());
-    }
 
-    case CumulativeEnergyReset::Id: {
+    case CumulativeEnergyReset::Id:
         if (!mMeasurementData.cumulativeReset.HasValue())
         {
             return encoder.EncodeNull();
         }
         return encoder.Encode(mMeasurementData.cumulativeReset.Value());
-    }
+
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
@@ -320,11 +317,10 @@ CHIP_ERROR ElectricalEnergyMeasurementCluster::Attributes(const ConcreteClusterP
     return listBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), mEnabledOptionalAttributes);
 }
 
-std::optional<EventNumber>
-ElectricalEnergyMeasurementCluster::CumulativeEnergySnapshot(const Optional<EnergyMeasurementStruct> & energyImported,
-                                                             const Optional<EnergyMeasurementStruct> & energyExported)
+void ElectricalEnergyMeasurementCluster::CumulativeEnergySnapshot(const Optional<EnergyMeasurementStruct> & energyImported,
+                                                                  const Optional<EnergyMeasurementStruct> & energyExported)
 {
-    VerifyOrReturnValue(Features().Has(Feature::kCumulativeEnergy), std::nullopt);
+    VerifyOrReturn(Features().Has(Feature::kCumulativeEnergy));
     Events::CumulativeEnergyMeasured::Type event;
 
     if (Features().Has(Feature::kImportedEnergy))
@@ -339,15 +335,14 @@ ElectricalEnergyMeasurementCluster::CumulativeEnergySnapshot(const Optional<Ener
         event.energyExported = energyExported;
     }
 
-    VerifyOrReturnValue(mContext != nullptr, std::nullopt);
-    return mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+    VerifyOrReturn(mContext != nullptr);
+    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
-std::optional<EventNumber>
-ElectricalEnergyMeasurementCluster::PeriodicEnergySnapshot(const Optional<EnergyMeasurementStruct> & energyImported,
-                                                           const Optional<EnergyMeasurementStruct> & energyExported)
+void ElectricalEnergyMeasurementCluster::PeriodicEnergySnapshot(const Optional<EnergyMeasurementStruct> & energyImported,
+                                                                const Optional<EnergyMeasurementStruct> & energyExported)
 {
-    VerifyOrReturnValue(Features().Has(Feature::kPeriodicEnergy), std::nullopt);
+    VerifyOrReturn(Features().Has(Feature::kPeriodicEnergy));
     Events::PeriodicEnergyMeasured::Type event;
 
     if (Features().Has(Feature::kImportedEnergy))
@@ -362,8 +357,8 @@ ElectricalEnergyMeasurementCluster::PeriodicEnergySnapshot(const Optional<Energy
         event.energyExported = energyExported;
     }
 
-    VerifyOrReturnValue(mContext != nullptr, std::nullopt);
-    return mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+    VerifyOrReturn(mContext != nullptr);
+    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
 } // namespace Clusters

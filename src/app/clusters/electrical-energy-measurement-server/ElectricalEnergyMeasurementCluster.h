@@ -63,34 +63,29 @@ public:
 
     struct Config
     {
-        Config(EndpointId endpoint, BitMask<ElectricalEnergyMeasurement::Feature> featureFlags,
-               BitMask<ElectricalEnergyMeasurement::OptionalAttributes> optionalAttributes) :
-            endpointId(endpoint),
-            mFeatureFlags(featureFlags)
-        {
-            mEnabledOptionalAttributes.Set<ElectricalEnergyMeasurement::Attributes::CumulativeEnergyImported::Id>(
-                featureFlags.HasAll(ElectricalEnergyMeasurement::Feature::kCumulativeEnergy,
-                                    ElectricalEnergyMeasurement::Feature::kImportedEnergy));
-            mEnabledOptionalAttributes.Set<ElectricalEnergyMeasurement::Attributes::CumulativeEnergyExported::Id>(
-                (featureFlags.HasAll(ElectricalEnergyMeasurement::Feature::kCumulativeEnergy,
-                                     ElectricalEnergyMeasurement::Feature::kExportedEnergy)));
-            mEnabledOptionalAttributes.Set<ElectricalEnergyMeasurement::Attributes::PeriodicEnergyImported::Id>(featureFlags.HasAll(
-                ElectricalEnergyMeasurement::Feature::kPeriodicEnergy, ElectricalEnergyMeasurement::Feature::kImportedEnergy));
-            mEnabledOptionalAttributes.Set<ElectricalEnergyMeasurement::Attributes::PeriodicEnergyExported::Id>(featureFlags.HasAll(
-                ElectricalEnergyMeasurement::Feature::kPeriodicEnergy, ElectricalEnergyMeasurement::Feature::kExportedEnergy));
-            mEnabledOptionalAttributes.Set<ElectricalEnergyMeasurement::Attributes::CumulativeEnergyReset::Id>(
-                optionalAttributes.Has(ElectricalEnergyMeasurement::OptionalAttributes::kOptionalAttributeCumulativeEnergyReset) &&
-                featureFlags.Has(ElectricalEnergyMeasurement::Feature::kCumulativeEnergy));
-        }
-
         EndpointId endpointId;
-        const BitFlags<ElectricalEnergyMeasurement::Feature> mFeatureFlags;
-        OptionalAttributesSet mEnabledOptionalAttributes;
+        BitMask<ElectricalEnergyMeasurement::Feature> featureFlags;
+        BitMask<ElectricalEnergyMeasurement::OptionalAttributes> optionalAttributes;
     };
 
     ElectricalEnergyMeasurementCluster(const Config & config) :
-        DefaultServerCluster({ config.endpointId, ElectricalEnergyMeasurement::Id }), mFeatureFlags(config.mFeatureFlags),
-        mEnabledOptionalAttributes(config.mEnabledOptionalAttributes)
+        DefaultServerCluster({ config.endpointId, ElectricalEnergyMeasurement::Id }), mFeatureFlags(config.featureFlags),
+        mEnabledOptionalAttributes([&]() {
+            OptionalAttributesSet attrs;
+            attrs.Set<ElectricalEnergyMeasurement::Attributes::CumulativeEnergyImported::Id>(config.featureFlags.HasAll(
+                ElectricalEnergyMeasurement::Feature::kCumulativeEnergy, ElectricalEnergyMeasurement::Feature::kImportedEnergy));
+            attrs.Set<ElectricalEnergyMeasurement::Attributes::CumulativeEnergyExported::Id>((config.featureFlags.HasAll(
+                ElectricalEnergyMeasurement::Feature::kCumulativeEnergy, ElectricalEnergyMeasurement::Feature::kExportedEnergy)));
+            attrs.Set<ElectricalEnergyMeasurement::Attributes::PeriodicEnergyImported::Id>(config.featureFlags.HasAll(
+                ElectricalEnergyMeasurement::Feature::kPeriodicEnergy, ElectricalEnergyMeasurement::Feature::kImportedEnergy));
+            attrs.Set<ElectricalEnergyMeasurement::Attributes::PeriodicEnergyExported::Id>(config.featureFlags.HasAll(
+                ElectricalEnergyMeasurement::Feature::kPeriodicEnergy, ElectricalEnergyMeasurement::Feature::kExportedEnergy));
+            attrs.Set<ElectricalEnergyMeasurement::Attributes::CumulativeEnergyReset::Id>(
+                config.optionalAttributes.Has(
+                    ElectricalEnergyMeasurement::OptionalAttributes::kOptionalAttributeCumulativeEnergyReset) &&
+                config.featureFlags.Has(ElectricalEnergyMeasurement::Feature::kCumulativeEnergy));
+            return attrs;
+        }())
     {}
 
     const OptionalAttributesSet & OptionalAttributes() const { return mEnabledOptionalAttributes; }
@@ -100,7 +95,7 @@ public:
     const ElectricalEnergyMeasurement::MeasurementData * GetMeasurementData() const { return &mMeasurementData; }
 
     // Getters - return copies with error checking
-    CHIP_ERROR GetMeasurementAccuracy(MeasurementAccuracyStruct & outValue) const;
+    void GetMeasurementAccuracy(MeasurementAccuracyStruct & outValue) const;
     CHIP_ERROR GetCumulativeEnergyImported(Optional<EnergyMeasurementStruct> & outValue) const;
     CHIP_ERROR GetCumulativeEnergyExported(Optional<EnergyMeasurementStruct> & outValue) const;
     CHIP_ERROR GetPeriodicEnergyImported(Optional<EnergyMeasurementStruct> & outValue) const;
@@ -119,15 +114,15 @@ public:
                                                 AttributeValueEncoder & encoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
-    std::optional<EventNumber> CumulativeEnergySnapshot(const Optional<EnergyMeasurementStruct> & energyImported,
-                                                        const Optional<EnergyMeasurementStruct> & energyExported);
+    void CumulativeEnergySnapshot(const Optional<EnergyMeasurementStruct> & energyImported,
+                                  const Optional<EnergyMeasurementStruct> & energyExported);
 
-    std::optional<EventNumber> PeriodicEnergySnapshot(const Optional<EnergyMeasurementStruct> & energyImported,
-                                                      const Optional<EnergyMeasurementStruct> & energyExported);
+    void PeriodicEnergySnapshot(const Optional<EnergyMeasurementStruct> & energyImported,
+                                const Optional<EnergyMeasurementStruct> & energyExported);
 
 private:
     const BitFlags<ElectricalEnergyMeasurement::Feature> mFeatureFlags;
-    OptionalAttributesSet mEnabledOptionalAttributes;
+    const OptionalAttributesSet mEnabledOptionalAttributes;
     ElectricalEnergyMeasurement::MeasurementData mMeasurementData;
 };
 

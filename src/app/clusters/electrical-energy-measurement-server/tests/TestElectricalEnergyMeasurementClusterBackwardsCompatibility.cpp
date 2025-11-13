@@ -18,6 +18,7 @@
 #include <app/EventManagement.h>
 #include <app/clusters/electrical-energy-measurement-server/CodegenIntegration.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <clusters/ElectricalEnergyMeasurement/Events.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/support/CHIPCounter.h>
 #include <pw_unit_test/framework.h>
@@ -142,7 +143,7 @@ TEST_F(TestElectricalEnergyMeasurementClusterBackwardsCompatibility, TestCodegen
 
         // Verify the value was set
         Structs::MeasurementAccuracyStruct::Type readAccuracy;
-        EXPECT_EQ(cluster->GetMeasurementAccuracy(readAccuracy), CHIP_NO_ERROR);
+        cluster->GetMeasurementAccuracy(readAccuracy);
         EXPECT_EQ(readAccuracy.measurementType, MeasurementTypeEnum::kApparentEnergy);
         EXPECT_TRUE(readAccuracy.measured);
     }
@@ -162,6 +163,8 @@ TEST_F(TestElectricalEnergyMeasurementClusterBackwardsCompatibility, TestCodegen
 
     // Test NotifyCumulativeEnergyMeasured
     {
+        auto & logOnlyEvents = mContext.EventsGenerator();
+
         Structs::EnergyMeasurementStruct::Type energyData;
         energyData.energy = 5000;
         Optional<Structs::EnergyMeasurementStruct::Type> energyImported(energyData);
@@ -180,10 +183,29 @@ TEST_F(TestElectricalEnergyMeasurementClusterBackwardsCompatibility, TestCodegen
         EXPECT_EQ(cluster->GetCumulativeEnergyExported(readValue), CHIP_NO_ERROR);
         EXPECT_TRUE(readValue.HasValue());
         EXPECT_EQ(readValue.Value().energy, 2000);
+
+        // Verify event was generated
+        auto event = logOnlyEvents.GetNextEvent();
+        ASSERT_TRUE(event.has_value());
+
+        using CumulativeEventType = chip::app::Clusters::ElectricalEnergyMeasurement::Events::CumulativeEnergyMeasured::Type;
+        EXPECT_EQ(event->eventOptions.mPath,
+                  ConcreteEventPath(kTestEndpointId, CumulativeEventType::GetClusterId(), CumulativeEventType::GetEventId()));
+
+        chip::app::Clusters::ElectricalEnergyMeasurement::Events::CumulativeEnergyMeasured::DecodableType decodedEvent;
+        ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR);
+
+        ASSERT_TRUE(decodedEvent.energyImported.HasValue());
+        EXPECT_EQ(decodedEvent.energyImported.Value().energy, 5000);
+
+        ASSERT_TRUE(decodedEvent.energyExported.HasValue());
+        EXPECT_EQ(decodedEvent.energyExported.Value().energy, 2000);
     }
 
     // Test NotifyPeriodicEnergyMeasured
     {
+        auto & logOnlyEvents = mContext.EventsGenerator();
+
         Structs::EnergyMeasurementStruct::Type energyData;
         energyData.energy = 1500;
         Optional<Structs::EnergyMeasurementStruct::Type> energyImported(energyData);
@@ -202,6 +224,23 @@ TEST_F(TestElectricalEnergyMeasurementClusterBackwardsCompatibility, TestCodegen
         EXPECT_EQ(cluster->GetPeriodicEnergyExported(readValue), CHIP_NO_ERROR);
         EXPECT_TRUE(readValue.HasValue());
         EXPECT_EQ(readValue.Value().energy, 800);
+
+        // Verify event was generated
+        auto event = logOnlyEvents.GetNextEvent();
+        ASSERT_TRUE(event.has_value());
+
+        using PeriodicEventType = chip::app::Clusters::ElectricalEnergyMeasurement::Events::PeriodicEnergyMeasured::Type;
+        EXPECT_EQ(event->eventOptions.mPath,
+                  ConcreteEventPath(kTestEndpointId, PeriodicEventType::GetClusterId(), PeriodicEventType::GetEventId()));
+
+        chip::app::Clusters::ElectricalEnergyMeasurement::Events::PeriodicEnergyMeasured::DecodableType decodedEvent;
+        ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR);
+
+        ASSERT_TRUE(decodedEvent.energyImported.HasValue());
+        EXPECT_EQ(decodedEvent.energyImported.Value().energy, 1500);
+
+        ASSERT_TRUE(decodedEvent.energyExported.HasValue());
+        EXPECT_EQ(decodedEvent.energyExported.Value().energy, 800);
     }
 
     // Test MeasurementDataForEndpoint
@@ -226,8 +265,8 @@ TEST_F(TestElectricalEnergyMeasurementClusterBackwardsCompatibility, TestCodegen
     {
         EXPECT_EQ(FindElectricalEnergyMeasurementClusterOnEndpoint(999), nullptr);
         EXPECT_EQ(MeasurementDataForEndpoint(999), nullptr);
-        EXPECT_EQ(SetMeasurementAccuracy(999, {}), CHIP_ERROR_INVALID_ARGUMENT);
-        EXPECT_EQ(SetCumulativeReset(999, {}), CHIP_ERROR_INVALID_ARGUMENT);
+        EXPECT_EQ(SetMeasurementAccuracy(999, {}), CHIP_ERROR_NOT_FOUND);
+        EXPECT_EQ(SetCumulativeReset(999, {}), CHIP_ERROR_NOT_FOUND);
         EXPECT_FALSE(NotifyCumulativeEnergyMeasured(999, {}, {}));
         EXPECT_FALSE(NotifyPeriodicEnergyMeasured(999, {}, {}));
     }

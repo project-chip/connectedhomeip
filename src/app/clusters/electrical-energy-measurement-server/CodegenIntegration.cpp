@@ -86,7 +86,11 @@ using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Structs;
 ElectricalEnergyMeasurementAttrAccess::ElectricalEnergyMeasurementAttrAccess(BitMask<Feature> aFeature,
                                                                              BitMask<OptionalAttributes> aOptionalAttrs,
                                                                              EndpointId endpointId) :
-    mCluster([&]() { return ElectricalEnergyMeasurementCluster::Config(endpointId, aFeature, aOptionalAttrs); }())
+    mCluster(ElectricalEnergyMeasurementCluster::Config{
+        .endpointId         = endpointId,
+        .featureFlags       = aFeature,
+        .optionalAttributes = aOptionalAttrs,
+    })
 {
     mClusterListNode.mValue = &mCluster.Cluster();
 }
@@ -102,14 +106,14 @@ const ElectricalEnergyMeasurement::MeasurementData * MeasurementDataForEndpoint(
 CHIP_ERROR SetMeasurementAccuracy(EndpointId endpointId, const MeasurementAccuracyStruct::Type & accuracy)
 {
     ElectricalEnergyMeasurementCluster * cluster = FindElectricalEnergyMeasurementClusterOnEndpoint(endpointId);
-    VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_NOT_FOUND);
     return cluster->SetMeasurementAccuracy(accuracy);
 }
 
 CHIP_ERROR SetCumulativeReset(EndpointId endpointId, const Optional<CumulativeEnergyResetStruct::Type> & cumulativeReset)
 {
     ElectricalEnergyMeasurementCluster * cluster = FindElectricalEnergyMeasurementClusterOnEndpoint(endpointId);
-    VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_NOT_FOUND);
     return cluster->SetCumulativeEnergyReset(cumulativeReset);
 }
 
@@ -121,26 +125,7 @@ bool NotifyCumulativeEnergyMeasured(EndpointId endpointId, const Optional<Energy
     VerifyOrReturnValue(cluster != nullptr, false);
     VerifyOrReturnValue(cluster->Features().Has(Feature::kCumulativeEnergy), false);
 
-    cluster->SetCumulativeEnergyImported(energyImported);
-    cluster->SetCumulativeEnergyExported(energyExported);
-
-    Events::CumulativeEnergyMeasured::Type event;
-    event.energyImported = energyImported;
-    event.energyExported = energyExported;
-
-    EventNumber eventNumber;
-    CHIP_ERROR error = app::LogEvent(event, endpointId, eventNumber);
-    if (CHIP_NO_ERROR != error)
-    {
-#if defined(CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS) &&                                                       \
-    CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
-        ChipLogError(Zcl, "[NotifyCumulativeEnergyMeasured] Unable to generate event: %" CHIP_ERROR_FORMAT " [endpointId=%d]",
-                     error.Format(), endpointId);
-#endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
-        return false;
-    }
-    ChipLogProgress(Zcl, "[NotifyCumulativeEnergyMeasured] Generated event [endpointId=%d,eventNumber=%lu]", endpointId,
-                    static_cast<unsigned long>(eventNumber));
+    cluster->CumulativeEnergySnapshot(energyImported, energyExported);
     return true;
 }
 
@@ -152,33 +137,7 @@ bool NotifyPeriodicEnergyMeasured(EndpointId endpointId, const Optional<EnergyMe
     VerifyOrReturnValue(cluster != nullptr, false);
     VerifyOrReturnValue(cluster->Features().Has(Feature::kPeriodicEnergy), false);
 
-    Events::PeriodicEnergyMeasured::Type event;
-
-    if (cluster->Features().Has(Feature::kImportedEnergy))
-    {
-        cluster->SetPeriodicEnergyImported(energyImported);
-        event.energyImported = energyImported;
-    }
-
-    if (cluster->Features().Has(Feature::kExportedEnergy))
-    {
-        cluster->SetPeriodicEnergyExported(energyExported);
-        event.energyExported = energyExported;
-    }
-
-    EventNumber eventNumber;
-    CHIP_ERROR error = app::LogEvent(event, endpointId, eventNumber);
-    if (CHIP_NO_ERROR != error)
-    {
-#if defined(CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS) &&                                                       \
-    CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
-        ChipLogError(Zcl, "[NotifyPeriodicEnergyMeasured] Unable to generate event: %" CHIP_ERROR_FORMAT " [endpointId=%d]",
-                     error.Format(), endpointId);
-#endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
-        return false;
-    }
-    ChipLogProgress(Zcl, "[NotifyPeriodicEnergyMeasured] Generated event [endpointId=%d,eventNumber=%lu]", endpointId,
-                    static_cast<unsigned long>(eventNumber));
+    cluster->PeriodicEnergySnapshot(energyImported, energyExported);
     return true;
 }
 
@@ -190,8 +149,7 @@ CHIP_ERROR ElectricalEnergyMeasurementAttrAccess::Init()
     if (err != CHIP_NO_ERROR)
     {
 #if defined(CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS) &&                                                       \
-        CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS ||                                                            \
-    1
+    CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
         ChipLogError(AppServer, "Failed to register cluster %u/" ChipLogFormatMEI ": %" CHIP_ERROR_FORMAT,
                      mCluster.Cluster().GetPaths()[0].mEndpointId, ChipLogValueMEI(ElectricalEnergyMeasurement::Id), err.Format());
 #endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
@@ -206,8 +164,7 @@ void ElectricalEnergyMeasurementAttrAccess::Shutdown()
     if (err != CHIP_NO_ERROR)
     {
 #if defined(CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS) &&                                                       \
-        CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS ||                                                            \
-    1
+    CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
         ChipLogError(AppServer, "Failed to unregister cluster %u/" ChipLogFormatMEI ": %" CHIP_ERROR_FORMAT,
                      mCluster.Cluster().GetPaths()[0].mEndpointId, ChipLogValueMEI(ElectricalEnergyMeasurement::Id), err.Format());
 #endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
