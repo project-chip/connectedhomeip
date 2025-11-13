@@ -32,8 +32,6 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --admin-vendor-id 65521
-#       --int-arg product-id:32769
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --string-arg provider_app_path:${OTA_PROVIDER_APP}
@@ -62,73 +60,6 @@ logger = logging.getLogger(__name__)
 
 
 class TC_SU_2_2(SoftwareUpdateBaseTest):
-
-    async def add_single_ota_provider_if_missing(self, controller, requestor_node_id: int, provider_node_id: int):
-        """
-        Adds a single OTA provider to the Requestor DefaultOTAProviders attribute
-        only if no provider is currently registered. If a provider already exists,
-        the function preserve the current DefaultOTAProviders.
-
-        Args:
-            controller: The device controller.
-            requestor_node_id (int): Node ID of the Requestor device.
-            provider_node_id (int): Node ID of the OTA Provider to add.
-
-        Returns:
-            None
-        """
-
-        # Read existing DefaultOTAProviders on the Requestor
-        current_providers = await self.read_single_attribute_check_success(
-            dev_ctrl=controller,
-            cluster=Clusters.OtaSoftwareUpdateRequestor,
-            attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders
-        )
-        logger.info(f'Prerequisite #4.0 - Current DefaultOTAProviders on Requestor: {current_providers}')
-
-        # If there is already a provider, skip adding
-        if current_providers:
-            logger.info(f"Skipping add: Requestor already has providers {current_providers}")
-            return
-
-        await self.set_default_ota_providers_list(controller, provider_node_id, requestor_node_id)
-        logger.info("Prerequisite #4.0 - Write DefaultOTAProviders completed.")
-
-    async def setup_provider(self, provider_app_path: str, ota_image_path: str, extra_args: list[str]):
-        """
-        Launch an OTA Provider process with the specified image and extra arguments.
-
-        Args:
-            provider_app_path (str): Path to the OTA provider application executable.
-            ota_image_path (str): Path to the OTA image file.
-            extra_args (list[str]): Additional command-line arguments to pass to the provider.
-
-        Returns:
-            None
-        """
-
-        logger.info(f"""Prerequisite - Provider info:
-            provider_app_path: {provider_app_path},
-            ota_image_path: {ota_image_path},
-            discriminator: {self.provider_data["discriminator"]},
-            setupPinCode: {self.provider_data["setup_pincode"]},
-            port: {self.provider_data["port"]},
-            extra_args: {extra_args},
-            kvs_path: {self.KVS_PATH},
-            log_file: {self.LOG_FILE_PATH}""")
-
-        self.start_provider(
-            provider_app_path=provider_app_path,
-            ota_image_path=ota_image_path,
-            setup_pincode=self.provider_data["setup_pincode"],
-            discriminator=self.provider_data["discriminator"],
-            port=self.provider_data["port"],
-            extra_args=extra_args,
-            kvs_path=self.KVS_PATH,
-            log_file=self.LOG_FILE_PATH,
-            expected_output="Server initialization complete",
-            timeout=30
-        )
 
     async def extend_ota_acls(self, controller, provider_node_id, requestor_node_id):
         """
@@ -358,7 +289,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         self.LOG_FILE_PATH = "provider.log"
         self.KVS_PATH = "/tmp/chip_kvs_provider"
         self.provider_app_path = self.user_params.get('provider_app_path', None)
-        self.ota_image_v2 = self.user_params.get('ota_image')
+        self.ota_image = self.user_params.get('ota_image')
 
         self.step(0)
         # Controller has already commissioned the requestor
@@ -397,10 +328,15 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             "-q", "updateAvailable"
         ]
 
-        await self.setup_provider(
+        self.start_provider(
             provider_app_path=self.provider_app_path,
-            ota_image_path=self.ota_image_v2,
-            extra_args=provider_extra_args_updateAvailable
+            ota_image_path=self.ota_image,
+            setup_pincode=self.provider_data["setup_pincode"],
+            discriminator=self.provider_data["discriminator"],
+            port=self.provider_data["port"],
+            kvs_path=self.KVS_PATH,
+            log_file=self.LOG_FILE_PATH,
+            extra_args=provider_extra_args_updateAvailable,
         )
 
         # Prerequisite #2.0 - Commission Provider (Only one time)
@@ -420,7 +356,22 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
         # Prerequisite #3.0 - Add OTA Provider to the Requestor (Only if none exists, and only one time)
         logger.info(f'{step_number}: Prerequisite #4.0 - Add Provider to Requestor(DUT) DefaultOTAProviders')
-        await self.add_single_ota_provider_if_missing(controller, requestor_node_id, provider_node_id)
+
+        # Read existing DefaultOTAProviders on the Requestor
+        current_providers = await self.read_single_attribute_check_success(
+            dev_ctrl=controller,
+            cluster=Clusters.OtaSoftwareUpdateRequestor,
+            attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders
+        )
+        logger.info(f'Prerequisite #4.0 - Current DefaultOTAProviders on Requestor: {current_providers}')
+
+        # If there is already a provider, skip adding
+        if current_providers:
+            logger.info(f"Skipping add: Requestor already has providers {current_providers}")
+            return
+
+        await self.set_default_ota_providers_list(controller, provider_node_id, requestor_node_id)
+        logger.info("Prerequisite #4.0 - Write DefaultOTAProviders completed.")
 
         # ------------------------------------------------------------------------------------
         # [STEP_1]: Step #1.1 - Matcher for OTA records logs
@@ -561,10 +512,15 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             "-t", "60"
         ]
 
-        await self.setup_provider(
+        self.start_provider(
             provider_app_path=self.provider_app_path,
-            ota_image_path=self.ota_image_v2,
-            extra_args=provider_extra_args_busy
+            ota_image_path=self.ota_image,
+            setup_pincode=self.provider_data["setup_pincode"],
+            discriminator=self.provider_data["discriminator"],
+            port=self.provider_data["port"],
+            kvs_path=self.KVS_PATH,
+            log_file=self.LOG_FILE_PATH,
+            extra_args=provider_extra_args_busy,
         )
 
         # ------------------------------------------------------------------------------------
@@ -677,10 +633,15 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             "-t", "60"
         ]
 
-        await self.setup_provider(
+        self.start_provider(
             provider_app_path=self.provider_app_path,
-            ota_image_path=self.ota_image_v2,
-            extra_args=provider_extra_args_updateNotAvailable
+            ota_image_path=self.ota_image,
+            setup_pincode=self.provider_data["setup_pincode"],
+            discriminator=self.provider_data["discriminator"],
+            port=self.provider_data["port"],
+            kvs_path=self.KVS_PATH,
+            log_file=self.LOG_FILE_PATH,
+            extra_args=provider_extra_args_updateNotAvailable,
         )
 
         # ------------------------------------------------------------------------------------
@@ -792,10 +753,15 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             "-t", "180"
         ]
 
-        await self.setup_provider(
+        self.start_provider(
             provider_app_path=self.provider_app_path,
-            ota_image_path=self.ota_image_v2,
-            extra_args=provider_extra_args_busy_180
+            ota_image_path=self.ota_image,
+            setup_pincode=self.provider_data["setup_pincode"],
+            discriminator=self.provider_data["discriminator"],
+            port=self.provider_data["port"],
+            kvs_path=self.KVS_PATH,
+            log_file=self.LOG_FILE_PATH,
+            extra_args=provider_extra_args_busy_180,
         )
 
         # ------------------------------------------------------------------------------------
@@ -926,10 +892,15 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         step_number_s6 = "[STEP_6]"
         logger.info(f'{step_number_s6}: Prerequisite #1.0 - Requestor (DUT), NodeID: {requestor_node_id}, FabricId: {fabric_id}')
 
-        await self.setup_provider(
+        self.start_provider(
             provider_app_path=self.provider_app_path,
-            ota_image_path=self.ota_image_v2,
-            extra_args=provider_extra_args_updateAvailable
+            ota_image_path=self.ota_image,
+            setup_pincode=self.provider_data["setup_pincode"],
+            discriminator=self.provider_data["discriminator"],
+            port=self.provider_data["port"],
+            kvs_path=self.KVS_PATH,
+            log_file=self.LOG_FILE_PATH,
+            extra_args=provider_extra_args_updateAvailable,
         )
 
         # ------------------------------------------------------------------------------------
@@ -1052,10 +1023,15 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             "-i", "bdx://000000000000000X"
         ]
 
-        await self.setup_provider(
+        self.start_provider(
             provider_app_path=self.provider_app_path,
-            ota_image_path=self.ota_image_v2,
-            extra_args=provider_extra_args_invalid_bdx
+            ota_image_path=self.ota_image,
+            setup_pincode=self.provider_data["setup_pincode"],
+            discriminator=self.provider_data["discriminator"],
+            port=self.provider_data["port"],
+            kvs_path=self.KVS_PATH,
+            log_file=self.LOG_FILE_PATH,
+            extra_args=provider_extra_args_invalid_bdx,
         )
 
         # ------------------------------------------------------------------------------------
