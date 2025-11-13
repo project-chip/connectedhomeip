@@ -13,13 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+import logging
 import os
 import tempfile
 from pathlib import Path
 
 import click
 from diskcache import Cache
+
+log = logging.getLogger(__name__)
 
 _PATHS_CACHE_NAME = 'yaml_runner_cache'
 _PATHS_CACHE = Cache(os.path.join(tempfile.gettempdir(), _PATHS_CACHE_NAME))
@@ -29,24 +31,33 @@ DEFAULT_CHIP_ROOT = os.path.abspath(
 
 
 class PathsFinder:
-    def __init__(self, root_dir: str = DEFAULT_CHIP_ROOT):
-        self.__root_dir = root_dir
+    def __init__(self, search_path: str = DEFAULT_CHIP_ROOT):
+        self.__search_path = search_path
+        log.info("Searching for paths in '%s'", search_path)
 
-    def get(self, target_name: str) -> str:
+    def get(self, target_name: str) -> Path:
+        log.debug("Cache fetch for '%s'", target_name)
+
         path = _PATHS_CACHE.get(target_name)
         if path and Path(path).is_file():
-            return path
+            log.debug("Cache hit for '%s' -> '%s'", target_name, path)
+            return Path(path)
 
         if path:
+            log.warning("Cache purge for '%s': path '%s' does not exist", target_name, path)
             del _PATHS_CACHE[target_name]
 
-        for path in Path(self.__root_dir).rglob(target_name):
-            if not path.is_file() or path.name != target_name:
-                continue
+        log.debug("Cache miss for '%s'", target_name)
+        for dir in self.__search_path.split(':'):
+            for path in Path(dir).rglob(target_name):
+                if not path.is_file() or path.name != target_name:
+                    continue
 
-            _PATHS_CACHE[target_name] = str(path)
-            return str(path)
+                log.debug("Search found '%s' -> '%s'", target_name, path)
+                _PATHS_CACHE[target_name] = str(path)
+                return path
 
+        log.debug("No path found for '%s'", target_name)
         return None
 
 
@@ -98,4 +109,5 @@ def search(name: str):
 
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.DEBUG)
     finder()

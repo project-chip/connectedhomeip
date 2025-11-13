@@ -24,16 +24,17 @@ from pathlib import Path
 from typing import Iterator, Set
 
 from . import runner
-from .test_definition import ApplicationPaths, TestDefinition, TestTag, TestTarget
+from .test_definition import TestDefinition, TestTag, TestTarget, SubprocessInfoRepo
 
 log = logging.getLogger(__name__)
 
 __all__ = [
     "TestTarget",
     "TestDefinition",
-    "ApplicationPaths",
+    "SubprocessInfoRepo",
     "runner",
 ]
+
 
 _DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", ".."))

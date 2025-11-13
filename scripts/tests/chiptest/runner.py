@@ -124,11 +124,14 @@ class RunnerWaitQueue:
         return self.queue.get()
 
 
+type SubprocessKind = Literal['app', 'tool']
+
+
 @dataclass
 class SubprocessInfo:
     # Restricted as this identifies the name of the network namespace in an executor implementing
     # test case isolation.
-    kind: Literal['app', 'tool']
+    kind: SubprocessKind
     path: pathlib.Path | str
     wrapper: tuple[str, ...] = ()
     args: tuple[str, ...] = ()
@@ -157,7 +160,7 @@ class Runner:
         self.capture_delegate = capture_delegate
 
     def RunSubprocess(self, subproc: SubprocessInfo, name: str, wait=True, dependencies=[], timeout_seconds: typing.Optional[int] = None, stdin=None):
-        log.info('RunSubprocess starting application %s' % subproc)
+        log.debug('RunSubprocess starting application %s' % subproc)
         cmd = subproc.to_cmd()
 
         outpipe = LogPipe(
