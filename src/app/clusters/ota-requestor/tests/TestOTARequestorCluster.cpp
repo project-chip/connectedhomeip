@@ -21,6 +21,7 @@
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/clusters/testing/ClusterTester.h>
+#include <app/clusters/testing/ValidateGlobalAttributes.h>
 #include <app/data-model/Nullable.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
@@ -166,21 +167,14 @@ TEST_F(TestOTARequestorCluster, AttributeListTest)
     OTARequestorCluster cluster(kTestEndpointId, &otaRequestor);
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-    EXPECT_EQ(cluster.Attributes(ConcreteClusterPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id), attributes),
-              CHIP_NO_ERROR);
-
-    const DataModel::AttributeEntry expectedAttributes[] = {
+    DataModel::AttributeEntry expectedAttributes[] = {
         OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::kMetadataEntry,
         OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::kMetadataEntry,
         OtaSoftwareUpdateRequestor::Attributes::UpdateState::kMetadataEntry,
         OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::kMetadataEntry,
     };
 
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-    AttributeListBuilder listBuilder(expected);
-    EXPECT_EQ(listBuilder.Append(Span(expectedAttributes), {}), CHIP_NO_ERROR);
-    EXPECT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
+    EXPECT_TRUE(chip::Testing::IsAttributesListEqualTo(cluster, Span(expectedAttributes)));
 }
 
 TEST_F(TestOTARequestorCluster, AcceptedCommandsTest)
@@ -190,17 +184,11 @@ TEST_F(TestOTARequestorCluster, AcceptedCommandsTest)
     OTARequestorCluster cluster(kTestEndpointId, &otaRequestor);
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-    ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedCommands;
-    EXPECT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id), acceptedCommands),
-              CHIP_NO_ERROR);
-
-    const DataModel::AcceptedCommandEntry expectedCommands[] = {
+    DataModel::AcceptedCommandEntry expectedCommands[] = {
         OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::kMetadataEntry,
     };
 
-    ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> expected;
-    EXPECT_EQ(expected.ReferenceExisting(expectedCommands), CHIP_NO_ERROR);
-    EXPECT_TRUE(chip::Testing::EqualAcceptedCommandSets(acceptedCommands.TakeBuffer(), expected.TakeBuffer()));
+    EXPECT_TRUE(chip::Testing::IsAcceptedCommandsListEqualTo(cluster, Span(expectedCommands)));
 }
 
 TEST_F(TestOTARequestorCluster, GeneratedCommandsTest)
@@ -210,10 +198,7 @@ TEST_F(TestOTARequestorCluster, GeneratedCommandsTest)
     OTARequestorCluster cluster(kTestEndpointId, &otaRequestor);
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-    ReadOnlyBufferBuilder<CommandId> generatedCommands;
-    EXPECT_EQ(cluster.GeneratedCommands(ConcreteClusterPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id), generatedCommands),
-              CHIP_NO_ERROR);
-    EXPECT_EQ(generatedCommands.TakeBuffer().size(), 0u);
+    EXPECT_TRUE(chip::Testing::IsGeneratedCommandsListEqualTo(cluster, {}));
 }
 
 TEST_F(TestOTARequestorCluster, EventInfoTest)
