@@ -65,21 +65,22 @@ class TestRevokeCommissioningClearsPASE(MatterBaseTest):
         resp = await self.open_commissioning_window()
 
         self.print_step(2, "TH2 establishes a PASE session with DUT")
-        await self.TH2.FindOrEstablishPASESession(setupCode=resp.commissioningParameters.setupQRCode, nodeid=self.dut_node_id)
+        pase_node_id = self.dut_node_id + 1
+        await self.TH2.FindOrEstablishPASESession(setupCode=resp.commissioningParameters.setupQRCode, nodeid=pase_node_id)
 
         self.print_step(3, "Read VendorName from BasicInformation Cluster using TH2 over PASE, to ensure PASE session is established")
 
         VendorNameAttr = Clusters.BasicInformation.Attributes.VendorName
         ROOT_NODE_ENDPOINT_ID = 0
 
-        read_step1a = await self.TH2.ReadAttribute(
-            nodeid=self.dut_node_id,
+        read_step3 = await self.TH2.ReadAttribute(
+            nodeid=pase_node_id,
             attributes=(ROOT_NODE_ENDPOINT_ID, VendorNameAttr),
         )
 
         asserts.assert_in(
             VendorNameAttr,
-            read_step1a[ROOT_NODE_ENDPOINT_ID][Clusters.BasicInformation],
+            read_step3[ROOT_NODE_ENDPOINT_ID][Clusters.BasicInformation],
             "VendorName should be present in the read response"
         )
 
@@ -94,7 +95,7 @@ class TestRevokeCommissioningClearsPASE(MatterBaseTest):
 
         with asserts.assert_raises(ChipStackError) as e:
             await self.TH2.ReadAttribute(
-                nodeid=self.dut_node_id,
+                nodeid=pase_node_id,
                 attributes=(ROOT_NODE_ENDPOINT_ID, VendorNameAttr))
         asserts.assert_equal(e.exception.err,  _CHIP_TIMEOUT_ERROR,
                              f"Expected timeout error reading VendorName attribute over PASE, got {e.exception.err}")
