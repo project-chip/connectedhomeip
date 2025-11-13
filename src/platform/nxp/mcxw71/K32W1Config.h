@@ -101,7 +101,7 @@ public:
     static constexpr Key kCounterKey_BootReason            = K32WConfigKey(kFileId_ChipCounter, 0x03);
 
     // Application Custom Keys
-    static constexpr Key kConfigKey_AppOTADone = config_key(kFileId_App, 0x00);
+    static constexpr Key kConfigKey_AppOTADone = K32WConfigKey(kFileId_App, 0x00);
 
     // Set key id limits for each group.
     static constexpr Key kMinConfigKey_ChipFactory = K32WConfigKey(kFileId_ChipFactory, 0x00);
