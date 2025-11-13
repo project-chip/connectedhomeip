@@ -23,8 +23,6 @@
 
 #pragma once
 
-#include <functional>
-
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -114,9 +112,6 @@ public:
     // If the failsafe is not armed, this is a no-op.
     void ForceFailSafeTimerExpiry();
 
-    // Sets the callback to be called after the fail-safe is disarmed.
-    void SetFailSafeDisarmedCallback(std::function<void()> aCallback) { mFailSafeDisarmedCallback = aCallback; }
-
 private:
     bool mFailSafeArmed                    = false;
     bool mFailSafeBusy                     = false;
@@ -173,8 +168,6 @@ private:
     }
 
     void FailSafeTimerExpired();
-
-    std::function<void()> mFailSafeDisarmedCallback = nullptr;
 };
 
 } // namespace app

@@ -107,32 +107,16 @@ DataModel::ActionReturnStatus AdministratorCommissioningLogic::RevokeCommissioni
     MATTER_TRACE_SCOPE("RevokeCommissioning", "AdministratorCommissioning");
     ChipLogProgress(Zcl, "Received command to close commissioning window");
 
+    Server::GetInstance().GetFailSafeContext().ForceFailSafeTimerExpiry();
+
     if (!Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen())
     {
         ChipLogError(Zcl, "Commissioning window is currently not open");
         return ClusterStatusCode::ClusterSpecificFailure(StatusCode::kWindowNotOpen);
     }
 
-    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
-
-    // No need to call ForceFailSafeTimerExpiry() if fail-safe is not armed
-    if (!failSafeContext.IsFailSafeArmed())
-    {
-        Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
-        ChipLogProgress(Zcl, "Commissioning window closed immediately as fail-safe is not armed");
-        return Status::Success;
-    }
-
-    // Register a callback so that CloseCommissioningWindow() runs only after the fail-safe has been fully disarmed.
-    // This avoids a race where the CommissioningWindowManager’s event handler is unregistered before the pending
-    // kFailSafeTimerExpired event is processed.
-    failSafeContext.SetFailSafeDisarmedCallback([]() {
-        Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
-        ChipLogProgress(Zcl, "Commissioning window closed after fail-safe is disarmed");
-    });
-
-    failSafeContext.ForceFailSafeTimerExpiry();
-
+    Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
+    ChipLogProgress(Zcl, "Commissioning window is now closed");
     return Status::Success;
 }
 

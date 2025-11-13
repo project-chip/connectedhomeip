@@ -137,8 +137,6 @@ void CommissioningWindowManager::ResetState()
 
     DeviceLayer::SystemLayer().CancelTimer(HandleCommissioningWindowTimeout, this);
     mCommissioningTimeoutTimerArmed = false;
-
-    DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
 }
 
 void CommissioningWindowManager::Cleanup()
@@ -210,8 +208,6 @@ void CommissioningWindowManager::OnSessionEstablished(const SessionHandle & sess
         mAppDelegate->OnCommissioningSessionStarted();
     }
 
-    DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
-
     StopAdvertisement(/* aShuttingDown = */ false);
 
     auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
@@ -242,6 +238,8 @@ void CommissioningWindowManager::OnSessionEstablished(const SessionHandle & sess
         // When the now-armed fail-safe is disarmed or expires it will handle
         // clearing out mPASESession.
         mPASESession.Grab(session);
+
+        DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
     }
 }
 
@@ -588,6 +586,8 @@ void CommissioningWindowManager::OnSessionReleased()
     // session, since we arm it when the PASE session is set up, and anything
     // that disarms the fail-safe would also tear down the PASE session.
     ExpireFailSafeIfArmed();
+
+    DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
 }
 
 void CommissioningWindowManager::ExpireFailSafeIfArmed()

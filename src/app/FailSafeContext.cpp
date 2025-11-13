@@ -140,11 +140,6 @@ void FailSafeContext::DisarmFailSafe()
     ResetState();
 
     ChipLogProgress(FailSafe, "Fail-safe cleanly disarmed");
-
-    if (mFailSafeDisarmedCallback)
-    {
-        mFailSafeDisarmedCallback();
-    }
 }
 
 void FailSafeContext::ForceFailSafeTimerExpiry()

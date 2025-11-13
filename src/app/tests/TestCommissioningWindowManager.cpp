@@ -529,14 +529,16 @@ TEST_F(TestCommissioningWindowManager, TestCheckCommissioningWindowManagerEnhanc
 
 void RevokeCommissioningCommandEquivalent()
 {
-    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
+    Server::GetInstance().GetFailSafeContext().ForceFailSafeTimerExpiry();
 
-    failSafeContext.SetFailSafeDisarmedCallback([]() {
-        Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
-        ChipLogError(Zcl, "Commissioning window closed after fail-safe is disarmed");
-    });
+    if (!Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen())
+    {
+        ChipLogError(Zcl, "Commissioning window is currently not open");
+        return;
+    }
 
-    failSafeContext.ForceFailSafeTimerExpiry();
+    Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
+    ChipLogProgress(Zcl, "Commissioning window is now closed");
 }
 
 TEST_F(TestCommissioningWindowManager, SecurePairingHandshakeTestECM)
