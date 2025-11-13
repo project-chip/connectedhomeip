@@ -29,17 +29,6 @@ using namespace chip::app::Clusters::ResourceMonitoring;
 using namespace chip::app::Clusters::ResourceMonitoring::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
-namespace {
-
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
-    ResourceMonitoring::Attributes::Condition::kMetadataEntry,
-    ResourceMonitoring::Attributes::DegradationDirection::kMetadataEntry,
-    ResourceMonitoring::Attributes::ChangeIndication::kMetadataEntry,
-    ResourceMonitoring::Attributes::ReplacementProductList::kMetadataEntry,
-};
-
-} // namespace
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -144,7 +133,7 @@ CHIP_ERROR ResourceMonitoringCluster::Attributes(const ConcreteClusterPath & pat
           LastChangedTime::kMetadataEntry },
     };
 
-    return listBuilder.Append(Span(kMandatoryAttributes), Span(optionalAttributesEntries));
+    return listBuilder.Append(Span(HepaFilterMonitoring::Attributes::kMandatoryMetadata), Span(optionalAttributesEntries));
 }
 
 CHIP_ERROR ResourceMonitoringCluster::ReadReplaceableProductList(AttributeValueEncoder & aEncoder)
