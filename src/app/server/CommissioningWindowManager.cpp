@@ -240,7 +240,7 @@ void CommissioningWindowManager::OnSessionEstablished(const SessionHandle & sess
         // When the now-armed fail-safe is disarmed or expires it will handle
         // clearing out mPASESession.
         mPASESession.Grab(session);
-      
+
         TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
     }
 }
