@@ -81,6 +81,8 @@ public:
                                                                        * runtime. Retained during factory reset. */
     static constexpr uint8_t kFileId_KVS = CATEGORY_BASE + 3;         /**< Category containing KVS set at runtime.
                                                                        *  Cleared during factory reset. */
+    static constexpr uint8_t kFileId_App = CATEGORY_BASE + 4;         /**< Category containing custom application values set at runtime.
+                                                                       *  Cleared during factory reset. */
 
     using Key = uint16_t;
 
@@ -146,6 +148,9 @@ public:
     static constexpr Key kConfigKey_GroupKeyMax  = config_key(kFileId_ChipConfig, 0x1E);
     ; // Allows 16 Group Keys to be created.
 
+    // Application Custom Keys
+    static constexpr Key kConfigKey_AppOTADone = config_key(kFileId_App, 0x00);
+
     // Set key id limits for each group.
     static constexpr Key kMinConfigKey_ChipFactory = config_key(kFileId_ChipFactory, 0x00);
     static constexpr Key kMaxConfigKey_ChipFactory = config_key(kFileId_ChipFactory, 0x08);
@@ -155,6 +160,8 @@ public:
     static constexpr Key kMaxConfigKey_ChipCounter = config_key(kFileId_ChipCounter, 0x1F); // Allows 32 Counters to be created.
     static constexpr Key kMinConfigKey_KVS         = config_key(kFileId_KVS, 0x00);
     static constexpr Key kMaxConfigKey_KVS         = config_key(kFileId_KVS, 0xFF);
+    static constexpr Key kMinConfigKey_App         = config_key(kFileId_App, 0x00);
+    static constexpr Key kMaxConfigKey_App         = config_key(kFileId_App, 0xFF);
 
     static CHIP_ERROR Init(void);
 
