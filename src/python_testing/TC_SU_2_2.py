@@ -61,94 +61,6 @@ logger = logging.getLogger(__name__)
 
 class TC_SU_2_2(SoftwareUpdateBaseTest):
 
-    async def extend_ota_acls(self, controller, provider_node_id, requestor_node_id):
-        """
-        Set ACLs for OTA interaction between a Requestor and Provider.
-        Preserves existing ACLs to avoid overwriting.
-
-        Args:
-            controller: The Matter device controller instance used to read/write ACLs.
-            requestor_node_id: Node ID of the OTA Requestor (DUT).
-            provider_node_id: Node ID of the OTA Provider.
-
-        Returns:
-            None
-
-        Raises:
-            AssertionError: If reading or writing ACL attributes fails.
-        """
-
-        # Read existing ACLs on Requestor and Provider
-        provider_existing_acls = await self.read_single_attribute(
-            dev_ctrl=controller,
-            node_id=provider_node_id,
-            endpoint=0,
-            attribute=Clusters.AccessControl.Attributes.Acl,
-        )
-
-        requestor_existing_acls = await self.read_single_attribute(
-            dev_ctrl=controller,
-            node_id=requestor_node_id,
-            endpoint=0,
-            attribute=Clusters.AccessControl.Attributes.Acl,
-        )
-
-        # Generate new ACL entries for OTA interaction (via TC_SUTestBase)
-        await self.create_acl_entry(
-            dev_ctrl=controller,
-            provider_node_id=provider_node_id,
-            requestor_node_id=requestor_node_id
-        )
-
-        await self.create_acl_entry(
-            dev_ctrl=controller,
-            provider_node_id=requestor_node_id,
-            requestor_node_id=provider_node_id
-        )
-
-        # Read the current ACLs after adding new entries
-        provider_current_acls = await self.read_single_attribute(
-            dev_ctrl=controller,
-            node_id=provider_node_id,
-            endpoint=0,
-            attribute=Clusters.AccessControl.Attributes.Acl,
-        )
-
-        requestor_current_acls = await self.read_single_attribute(
-            dev_ctrl=controller,
-            node_id=requestor_node_id,
-            endpoint=0,
-            attribute=Clusters.AccessControl.Attributes.Acl,
-        )
-
-        # Combine original + new ACLs to preserve existing entries
-        combined_provider_acls = provider_existing_acls + provider_current_acls
-        combined_requestor_acls = requestor_existing_acls + requestor_current_acls
-
-        # Write back the combined ACLs
-        await self.write_acl(controller, provider_node_id, combined_provider_acls)
-        await self.write_acl(controller, requestor_node_id, combined_requestor_acls)
-
-        logger.info(f'OTA ACLs extended between provider: {provider_node_id} and requestor: {requestor_node_id}')
-
-    async def write_acl(self, controller, node_id, acl):
-        """
-        Writes the Access Control List (ACL) to the DUT device using the specified controller.
-
-        Args:
-            node_id (int): The node ID of the device to which the ACL will be written.
-            acl (list): List of AccessControlEntryStruct objects defining the ACL permissions to write.
-
-        Raises:
-            AssertionError: If writing the ACL attribute fails (status is not Status.Success).
-        """
-        result = await controller.WriteAttribute(
-            nodeId=node_id,
-            attributes=[(0, Clusters.AccessControl.Attributes.Acl(acl))]
-        )
-        asserts.assert_equal(result[0].Status, Status.Success, "ACL write failed")
-        return True
-
     def matcher_ota_updatestate(self, step_name, start_states, allowed_states, min_interval_sec, final_state=None):
         """
         Generic matcher for OTA UpdateState across multiple steps.
@@ -280,7 +192,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
     @async_test_body
     async def teardown_test(self):
-        self.clear_ota_providers(self.default_controller, self.dut_node_id)
+        await self.clear_ota_providers(self.default_controller, self.dut_node_id)
         self.terminate_provider()
         super().teardown_test()
 
@@ -933,7 +845,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         logger.info(f'{step_number_s6}: Step #6.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
 
         # ------------------------------------------------------------------------------------
-        # [STEP_6]: Step #6.2 -  Track OTA StateTransition event: should stay Idle if UpdateAvailable version is same or lower
+        # [STEP_6]: Step #6.2 - Track OTA StateTransition event: should stay Idle if UpdateAvailable version is same or lower
         # StateTransition event matcher: Idle > Querying > Idle
         # ------------------------------------------------------------------------------------
         logger.info(
