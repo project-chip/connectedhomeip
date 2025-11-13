@@ -160,7 +160,8 @@ TEST_F(TestWebRTCTransportRequestorCluster, TestCurrentSessionsAttribute)
     // Add a test session
     WebRTCSessionStruct testSession;
     testSession.id          = 1;
-    testSession.peerNodeID  = chip::kUndefinedNodeId;
+    testSession.peerNodeID  = 1;
+    testSession.fabricIndex = 1;
     testSession.streamUsage = StreamUsageEnum::kLiveView;
 
     auto result = server.UpsertSession(testSession);
@@ -194,12 +195,14 @@ TEST_F(TestWebRTCTransportRequestorCluster, TestSessionManagement)
 
     // Test adding multiple sessions
     WebRTCSessionStruct session1;
-    session1.id         = 1;
-    session1.peerNodeID = 0x1234ULL;
+    session1.id          = 1;
+    session1.peerNodeID  = 0x1234ULL;
+    session1.fabricIndex = 1;
 
     WebRTCSessionStruct session2;
-    session2.id         = 2;
-    session2.peerNodeID = 0x5678ULL;
+    session2.id          = 2;
+    session2.peerNodeID  = 0x5678ULL;
+    session2.fabricIndex = 1;
 
     server.UpsertSession(session1);
     server.UpsertSession(session2);
