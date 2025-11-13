@@ -578,8 +578,8 @@ jobs:
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
 
-    repl_tests_linux:
-        name: REPL Tests - Linux
+    repl_tests_linux_build:
+        name: REPL Tests - Linux (BUILD)
 
         if: github.actor != 'restyled-io[bot]'
 
@@ -593,17 +593,19 @@ jobs:
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
             CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
 
-        # Run on namespace.so instead of `ubuntu-latest`: This seems to provide 20-40% speed improvement
-        # even if using just 4CPUx8GB RAM. We do this because most processing is I/O bound. The
-        # 8 CPU provided would perform compilation even faster, however it has a double minute multiplier
-        # which we would waste during the I/O bound testing.
-        #
-        # In the future, if we either have sufficient resources or if the processing moves to be CPU
-        # bound (parallel testing) this can be updated to the 8x16 profile.
-        runs-on: namespace-profile-4x8
+        # Run on namespace.so instead of `ubuntu-latest`: since compilations are generally CPU
+        # bound, we run these on larger/faster machines.
+        runs-on: namespace-profile-16x32
 
         container:
             image: ghcr.io/project-chip/chip-build:174
+            volumes:
+                - /var/run/nsc/:/var/run/nsc/
+            env:
+                NSC_TOKEN_FILE: ${{ env.NSC_TOKEN_FILE }}
+                NAMESPACE_ACTIONS_RESULTS_URL: ${{ env.NAMESPACE_ACTIONS_RESULTS_URL }}
+                NAMESPACE_ACTIONS_RESULTS_SERVICE: ${{ env.NAMESPACE_ACTIONS_RESULTS_SERVICE }}
+                NAMESPACE_ACTIONS_DIRECT_ZIP_UPLOAD: ${{ env.NAMESPACE_ACTIONS_DIRECT_ZIP_UPLOAD }}
             options: >-
                 --privileged
                 --sysctl net.ipv6.conf.all.disable_ipv6=0
@@ -847,6 +849,80 @@ jobs:
                     && patch -d \$(python3 -m pip show hypercorn | grep 'Location: ' | sed 's/Location: //') -p0 < src/tools/push_av_server/hypercorn.patch \
                   "
 
+            - name: Upload artifacts for running
+              uses: namespace-actions/upload-artifact@v1
+              with:
+                name: repl-build-data-${{ github.sha }}}
+                path: ./out/
+                retention-days: 2
+                if-no-files-found: error
+                overwrite: true
+
+            - name: Delete existing ccache before save
+              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
+              uses: ./.github/actions/delete-cache
+              with:
+                  cache-key: ${{ env.CCACHE_KEY }}
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+            - name: Save ccache
+              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
+              uses: actions/cache/save@v4
+              with:
+                  path: .ccache
+                  key: ${{ env.CCACHE_KEY }}
+
+    repl_tests_linux_run:
+        name: REPL Tests - Linux (RUN)
+        needs: repl_tests_linux_build
+
+        if: github.actor != 'restyled-io[bot]'
+
+        strategy:
+            matrix:
+                build_variant: [ipv6only-no-ble-no-wifi]
+
+        env:
+            TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
+            BUILD_VARIANT: ${{matrix.build_variant}}
+            DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
+            CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
+
+        # Tests are I/O bound, so run on a smaller machine
+        runs-on: ubuntu-latest
+
+        container:
+            image: ghcr.io/project-chip/chip-build:174
+            volumes:
+                - /var/run/nsc/:/var/run/nsc/
+            env:
+                NSC_TOKEN_FILE: ${{ env.NSC_TOKEN_FILE }}
+                NAMESPACE_ACTIONS_RESULTS_URL: ${{ env.NAMESPACE_ACTIONS_RESULTS_URL }}
+                NAMESPACE_ACTIONS_RESULTS_SERVICE: ${{ env.NAMESPACE_ACTIONS_RESULTS_SERVICE }}
+                NAMESPACE_ACTIONS_DIRECT_ZIP_UPLOAD: ${{ env.NAMESPACE_ACTIONS_DIRECT_ZIP_UPLOAD }}
+            options: >-
+                --privileged
+                --sysctl net.ipv6.conf.all.disable_ipv6=0
+                --sysctl net.ipv4.conf.all.forwarding=0
+                --sysctl net.ipv6.conf.all.forwarding=0
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v5
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                  platform: linux
+                  bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+
+            - name: Set up a IPV6 known envionment
+              uses: ./.github/actions/add-ipv6
+
+            - name: Download artifacts for running
+              uses: namespace-actions/download-artifact@v1
+              with:
+                name: repl-build-data-${{ github.sha }}}
+                path: ./out/
+
             - name: Generate an argument environment file
               run: |
                   echo -n "" >/tmp/test_env.yaml
@@ -947,18 +1023,6 @@ jobs:
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
-            - name: Delete existing ccache before save
-              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
-              uses: ./.github/actions/delete-cache
-              with:
-                  cache-key: ${{ env.CCACHE_KEY }}
-                  github-token: ${{ secrets.GITHUB_TOKEN }}
-            - name: Save ccache
-              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
-              uses: actions/cache/save@v4
-              with:
-                  path: .ccache
-                  key: ${{ env.CCACHE_KEY }}
 
     repl_tests_darwin:
         name: REPL Tests - Darwin (Build Only)
