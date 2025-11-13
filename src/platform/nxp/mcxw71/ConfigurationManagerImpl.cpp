@@ -63,10 +63,23 @@ CHIP_ERROR ConfigurationManagerImpl::DetermineBootReason(uint32_t reason)
     {
         bootReason = BootReasonType::kSoftwareReset;
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-        OtaImgState_t img_state = OTA_GetImgState();
-        if (img_state == OtaImgState_RunCandidate)
+        CHIP_ERROR err  = CHIP_NO_ERROR;
+        bool otaDone = false;
+
+        err = ReadConfigValue(NXPConfig::kConfigKey_AppOTADone, otaDone);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "BootReason Read OTA key failed: %s", ErrorStr(err));
+        }
+
+        if (otaDone)
         {
             bootReason = BootReasonType::kSoftwareUpdateCompleted;
+            err = WriteConfigValue(NXPConfig::kConfigKey_AppOTADone, false);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "BootReason Write OTA key failed: %s", ErrorStr(err));
+            }
         }
 #endif
     }
@@ -84,8 +97,15 @@ CHIP_ERROR ConfigurationManagerImpl::DetermineBootReason(uint32_t reason)
 
 CHIP_ERROR ConfigurationManagerImpl::StoreSoftwareUpdateCompleted()
 {
-    /* Empty implementation*/
-    return CHIP_NO_ERROR;
+    CHIP_ERROR err  = CHIP_NO_ERROR;
+
+    err = WriteConfigValue(NXPConfig::kConfigKey_AppOTADone, true);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "BootReason Write OTA key failed: %s", ErrorStr(err));
+    }
+
+    return err;
 }
 
 CHIP_ERROR ConfigurationManagerImpl::Init()
