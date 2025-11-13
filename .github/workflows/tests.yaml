@@ -1028,6 +1028,7 @@ jobs:
               uses: namespacelabs/breakpoint-action@v0
               with:
                  duration: 15m
+                 authorized-users: andy31415
 
     repl_tests_darwin:
         name: REPL Tests - Darwin (Build Only)
