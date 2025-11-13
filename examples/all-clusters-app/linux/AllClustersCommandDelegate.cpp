@@ -961,13 +961,9 @@ void AllClustersAppCommandHandler::HandleSetOccupancyChange(EndpointId endpointI
     chip::app::Clusters::OccupancySensingCluster * cluster = OccupancySensing::FindClusterOnEndpoint(endpointId);
     if (cluster == nullptr)
     {
-        ChipLogError(NotSpecified, "OccupancySensingCluster not found on endpoint %u", static_cast<unsigned>(endpointId));
         return;
     }
-
     cluster->SetOccupancy(newOccupancyValue == 1);
-    ChipLogDetail(NotSpecified, "Set Occupancy attribute to %u on Endpoint %u", newOccupancyValue,
-                  static_cast<unsigned>(endpointId));
 }
 
 void AllClustersCommandDelegate::OnEventCommandReceived(const char * json)
