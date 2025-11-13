@@ -844,7 +844,7 @@ jobs:
             # We also remove some debug info to make artifacts smaller (otherwise they are 2GB for binaries)
             - name: Archive artifacts
               run: |
-                strip objdir-clone/*
+                find objdir-clone -executable -type f | xargs -n 1 strip
                 tar cfvJ repl-build-data.tar.xz out/venv objdir-clone
 
             - name: Upload artifacts for running
