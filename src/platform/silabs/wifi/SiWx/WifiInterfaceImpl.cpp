@@ -899,7 +899,7 @@ CHIP_ERROR WifiInterfaceImpl::StartNetworkScan(chip::ByteSpan ssid, ::ScanCallba
         return CHIP_ERROR_INTERNAL;
     }
 
-    // If an ssid was not provided, we need to call the scan API with nullptr to scan all Wi-Fi networks
+    // If an ssid was not provided, we need to call sl_wifi_start_scan with nullptr to scan all Wi-Fi networks
     sl_wifi_ssid_t requested_ssid       = { 0 };
     sl_wifi_ssid_t * requested_ssid_ptr = nullptr;
 
@@ -921,6 +921,7 @@ CHIP_ERROR WifiInterfaceImpl::StartNetworkScan(chip::ByteSpan ssid, ::ScanCallba
 
     if (SL_STATUS_IN_PROGRESS == status)
     {
+        // NOTE: Intentional to wait for timeout here as the scan completion is indicated by the callback
         osSemaphoreAcquire(sScanCompleteSemaphore, kWifiScanTimeoutTicks);
     }
 
