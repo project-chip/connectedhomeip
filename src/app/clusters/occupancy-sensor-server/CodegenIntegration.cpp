@@ -61,7 +61,7 @@ public:
             // Initializes hold time with default limits and default timer delegate. Application can use SetHoldTimeLimits() and
             // SetHoldTime() later to customize.
             constexpr chip::app::Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::Type kDefaultHoldTimeLimits = {
-                .holdTimeMin = 1, .holdTimeMax = 60, .holdTimeDefault = 10
+                .holdTimeMin = 1, .holdTimeMax = 300, .holdTimeDefault = 10
             };
             config.WithHoldTime(kDefaultHoldTimeLimits.holdTimeDefault, kDefaultHoldTimeLimits, gDefaultTimerDelegate);
         }
