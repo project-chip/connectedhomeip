@@ -4930,58 +4930,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value)
 
 } // namespace TestEventTriggersEnabled
 
-#error Attribute "DeviceLoadStatus" in cluster "General Diagnostics" is struct-typed and must be added to the attributeAccessInterfaceAttributes object in src/app/zap-templates/zcl/zcl.json and src/app/zap-templates/zcl/zcl-with-test-extensions.json
-namespace DeviceLoadStatus {
-
-Protocols::InteractionModel::Status Get(EndpointId endpoint,
-                                        chip::app::Clusters::GeneralDiagnostics::Structs::DeviceLoadStruct::Type * value)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::GeneralDiagnostics::Structs::DeviceLoadStruct::Type>;
-    Traits::StorageType temp;
-    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
-    Protocols::InteractionModel::Status status =
-        emberAfReadAttribute(endpoint, Clusters::GeneralDiagnostics::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    *value = Traits::StorageToWorking(temp);
-    return status;
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::app::Clusters::GeneralDiagnostics::Structs::DeviceLoadStruct::Type value,
-                                        MarkAttributeDirty markDirty)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::GeneralDiagnostics::Structs::DeviceLoadStruct::Type>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::GeneralDiagnostics::Id, Id),
-                                 EmberAfWriteDataInput(writable, ZCL__ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
-}
-
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        chip::app::Clusters::GeneralDiagnostics::Structs::DeviceLoadStruct::Type value)
-{
-    using Traits = NumericAttributeTraits<chip::app::Clusters::GeneralDiagnostics::Structs::DeviceLoadStruct::Type>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return Protocols::InteractionModel::Status::ConstraintError;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::GeneralDiagnostics::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
-}
-
-} // namespace DeviceLoadStatus
-
 } // namespace Attributes
 } // namespace GeneralDiagnostics
 
