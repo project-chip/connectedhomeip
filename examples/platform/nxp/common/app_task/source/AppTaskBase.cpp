@@ -30,8 +30,8 @@
 #include <data-model-providers/codegen/Instance.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 
-#include <app/DefaultTimerDelegate.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
+#include <platform/DefaultTimerDelegate.h>
 
 #include <platform/CommissionableDataProvider.h>
 

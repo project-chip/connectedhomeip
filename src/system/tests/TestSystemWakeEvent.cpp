@@ -26,6 +26,7 @@
 #include <lib/core/ErrorStr.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <system/SystemConfig.h>
 #include <system/SystemError.h>
 #include <system/SystemLayerImpl.h>
@@ -55,8 +56,8 @@ class TestSystemWakeEvent : public ::testing::Test
 public:
     void SetUp()
     {
-        mSystemLayer.Init();
-        mWakeEvent.Open(mSystemLayer);
+        EXPECT_SUCCESS(mSystemLayer.Init());
+        EXPECT_SUCCESS(mWakeEvent.Open(mSystemLayer));
     }
 
     void TearDown()
@@ -97,7 +98,7 @@ TEST_F(TestSystemWakeEvent, TestNotify)
     EXPECT_EQ(SelectWakeEvent(), 0);
 
     // Check that select() succeeds after Notify() has been called
-    mWakeEvent.Notify();
+    EXPECT_SUCCESS(mWakeEvent.Notify());
     EXPECT_EQ(SelectWakeEvent(), 1);
     EXPECT_TRUE(FD_ISSET(WakeEventTest::GetReadFD(mWakeEvent), &mReadSet));
 
@@ -109,7 +110,7 @@ TEST_F(TestSystemWakeEvent, TestNotify)
 TEST_F(TestSystemWakeEvent, TestConfirm)
 {
     // Check that select() succeeds after Notify() has been called
-    mWakeEvent.Notify();
+    EXPECT_SUCCESS(mWakeEvent.Notify());
     EXPECT_EQ(SelectWakeEvent(), 1);
     EXPECT_TRUE(FD_ISSET(WakeEventTest::GetReadFD(mWakeEvent), &mReadSet));
 
@@ -132,7 +133,7 @@ TEST_F(TestSystemWakeEvent, TestBlockingSelect)
     pthread_t tid = 0;
     EXPECT_EQ(0, pthread_create(&tid, nullptr, WaitForEvent, this));
 
-    mWakeEvent.Notify();
+    EXPECT_SUCCESS(mWakeEvent.Notify());
     void * selectResult = nullptr;
     EXPECT_EQ(0, pthread_join(tid, &selectResult));
     EXPECT_EQ(selectResult, reinterpret_cast<void *>(1));

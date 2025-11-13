@@ -23,6 +23,7 @@
 #include <data-model-providers/codegen/tests/EmberInvokeOverride.h>
 #include <data-model-providers/codegen/tests/EmberReadWriteOverride.h>
 #include <lib/support/ReadOnlyBuffer.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 #include <server-cluster-shim/ServerClusterShim.h>
 
@@ -327,7 +328,7 @@ TEST_F(TestServerClusterShim, TestWriteAttributeOnlyProvidedPathsAreValid)
     ServerClusterShim invalid_cluster(
         { { kMockEndpoint1,
             MockClusterId(1) } }); // Only adds path endpoint 1, cluster 1, even though behind the scenes ember knows more stuff.
-    invalid_cluster.Startup(testContext.Get());
+    EXPECT_SUCCESS(invalid_cluster.Startup(testContext.Get()));
 
     WriteOperation test(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZCL_CHAR_STRING_ATTRIBUTE_TYPE));
     test.SetSubjectDescriptor(kAdminSubjectDescriptor);
@@ -340,7 +341,7 @@ TEST_F(TestServerClusterShim, TestWriteAttributeOnlyProvidedPathsAreValid)
 
     // Create another cluster with the valid paths for the write command
     ServerClusterShim valid_cluster({ { kMockEndpoint1, MockClusterId(1) }, { kMockEndpoint3, MockClusterId(4) } });
-    valid_cluster.Startup(testContext.Get());
+    EXPECT_SUCCESS(valid_cluster.Startup(testContext.Get()));
 
     chip::Test::SetEmberReadOutput(Protocols::InteractionModel::Status::Success);
     // Expect success now
@@ -359,7 +360,7 @@ TEST_F(TestServerClusterShim, TestDataVersion)
     chip::Test::SetMockNodeConfig(gTestNodeConfig);
 
     ServerClusterShim cluster({ { kMockEndpoint3, MockClusterId(4) } });
-    cluster.Startup(testContext.Get());
+    EXPECT_SUCCESS(cluster.Startup(testContext.Get()));
 
     DataVersion v1 = cluster.GetDataVersion({ kMockEndpoint3, MockClusterId(4) });
 
@@ -379,7 +380,7 @@ TEST_F(TestServerClusterShim, AttributeWriteShortString)
     TestServerClusterContext testContext;
     chip::Test::SetMockNodeConfig(gTestNodeConfig);
     ServerClusterShim cluster({ { kMockEndpoint3, MockClusterId(4) } });
-    cluster.Startup(testContext.Get());
+    EXPECT_SUCCESS(cluster.Startup(testContext.Get()));
 
     WriteOperation test(kMockEndpoint3, MockClusterId(4), MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZCL_CHAR_STRING_ATTRIBUTE_TYPE));
     test.SetSubjectDescriptor(kAdminSubjectDescriptor);
@@ -401,8 +402,8 @@ TEST_F(TestServerClusterShim, EmberAttributeReadOctetString)
     chip::Test::SetMockNodeConfig(gTestNodeConfig);
     ServerClusterShim invalid_cluster({ { 1, 1 } });
     ServerClusterShim valid_cluster({ { kMockEndpoint3, MockClusterId(4) } });
-    invalid_cluster.Startup(testContext.Get());
-    valid_cluster.Startup(testContext.Get());
+    EXPECT_SUCCESS(invalid_cluster.Startup(testContext.Get()));
+    EXPECT_SUCCESS(valid_cluster.Startup(testContext.Get()));
 
     ReadOperation testRequest(kMockEndpoint3, MockClusterId(4),
                               MOCK_ATTRIBUTE_ID_FOR_NON_NULLABLE_TYPE(ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE));
@@ -445,7 +446,7 @@ TEST_F(TestServerClusterShim, IterateOverAttributes)
     TestServerClusterContext testContext;
     chip::Test::SetMockNodeConfig(gTestNodeConfig);
     ServerClusterShim cluster({ { kMockEndpoint3, MockClusterId(4) } });
-    cluster.Startup(testContext.Get());
+    EXPECT_SUCCESS(cluster.Startup(testContext.Get()));
 
     // should be able to iterate over valid paths
     ReadOnlyBufferBuilder<DataModel::AttributeEntry> builder;
@@ -497,8 +498,8 @@ TEST_F(TestServerClusterShim, EmberInvokeTest)
     ServerClusterShim cluster_with_invalid_path({ { kMockEndpoint3, MockClusterId(4) } });
     ServerClusterShim cluster_with_valid_path({ { kMockEndpoint1, MockClusterId(1) } });
 
-    cluster_with_invalid_path.Startup(testContext.Get());
-    cluster_with_valid_path.Startup(testContext.Get());
+    EXPECT_SUCCESS(cluster_with_invalid_path.Startup(testContext.Get()));
+    EXPECT_SUCCESS(cluster_with_valid_path.Startup(testContext.Get()));
 
     {
         const ConcreteCommandPath kCommandPath(kMockEndpoint1, MockClusterId(1), kMockCommandId1);
@@ -539,7 +540,7 @@ TEST_F(TestServerClusterShim, IterateOverAcceptedCommands)
     TestServerClusterContext testContext;
     chip::Test::SetMockNodeConfig(gTestNodeConfig);
     ServerClusterShim cluster({ { kMockEndpoint3, MockClusterId(4) }, { kMockEndpoint2, MockClusterId(2) } });
-    cluster.Startup(testContext.Get());
+    EXPECT_SUCCESS(cluster.Startup(testContext.Get()));
 
     ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> builder;
 
@@ -578,10 +579,10 @@ TEST_F(TestServerClusterShim, IterateOverGeneratedCommands)
     TestServerClusterContext testContext;
     chip::Test::SetMockNodeConfig(gTestNodeConfig);
     ServerClusterShim cluster({ { kMockEndpoint2, MockClusterId(2) }, { kMockEndpoint2, MockClusterId(3) } });
-    cluster.Startup(testContext.Get());
+    EXPECT_SUCCESS(cluster.Startup(testContext.Get()));
 
     ServerClusterShim cluster_without_id3({ { kMockEndpoint2, MockClusterId(2) } });
-    cluster_without_id3.Startup(testContext.Get());
+    EXPECT_SUCCESS(cluster_without_id3.Startup(testContext.Get()));
 
     ReadOnlyBufferBuilder<CommandId> builder;
 
