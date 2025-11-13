@@ -38,19 +38,32 @@ LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 namespace {
+#ifndef CONFIG_ZEPHYR_VERSION_3_3
 enum mgmt_cb_return UploadProgressHandler(uint32_t event, enum mgmt_cb_return prev_status, int32_t * rc, uint16_t * group,
                                           bool * abort_more, void * data, size_t data_size)
+#else
+int UploadProgressHandler(uint32_t event, int32_t rc, bool * abort_more, void * data, size_t data_size)
+#endif
+
 {
     const img_mgmt_upload_check & imgData = *static_cast<img_mgmt_upload_check *>(data);
 
     LOG_INF("[DFU] DFU over SMP progress: %u/%u B of image %u", static_cast<unsigned>(imgData.req->off),
             static_cast<unsigned>(imgData.action->size), static_cast<unsigned>(imgData.req->image));
 
+#ifndef CONFIG_ZEPHYR_VERSION_3_3
     return MGMT_CB_OK;
+#else
+    return MGMT_ERR_EOK;
+#endif
 }
 
+#ifndef CONFIG_ZEPHYR_VERSION_3_3
 enum mgmt_cb_return UploadConfirmHandler(uint32_t event, enum mgmt_cb_return prev_status, int32_t * rc, uint16_t * group,
                                          bool * abort_more, void * data, size_t data_size)
+#else
+int32_t UploadConfirmHandler(uint32_t event, int32_t rc, bool * abort_more, void * data, size_t data_size)
+#endif
 {
     const img_mgmt_upload_check & imgData = *static_cast<img_mgmt_upload_check *>(data);
     IgnoreUnusedVariable(imgData);
@@ -60,8 +73,11 @@ enum mgmt_cb_return UploadConfirmHandler(uint32_t event, enum mgmt_cb_return pre
     {
         LOG_ERR("[DFU] Image footer verification failed!");
     }
-
+#ifndef CONFIG_ZEPHYR_VERSION_3_3
     return MGMT_CB_OK;
+#else
+    return MGMT_ERR_EOK;
+#endif
 }
 
 mgmt_callback sUploadProgressCallback = {
