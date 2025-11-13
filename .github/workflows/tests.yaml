@@ -494,23 +494,29 @@ jobs:
                   platform: darwin
                   bootstrap-log-name: bootstrap-logs-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
 
-            - name: Build Apps
+            - name: Build Apps Using Unified Build
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target darwin-${{matrix.arch}}-lock-${BUILD_VARIANT}-unified \
+                        --target darwin-${{matrix.arch}}-ota-provider-${BUILD_VARIANT}-unified \
+                        --target darwin-${{matrix.arch}}-tv-app-${BUILD_VARIANT}-unified \
+                        --target darwin-${{matrix.arch}}-bridge-${BUILD_VARIANT}-unified \
+                        --target darwin-${{matrix.arch}}-microwave-oven-${BUILD_VARIANT}-unified \
+                        --target darwin-${{matrix.arch}}-rvc-${BUILD_VARIANT}-unified \
+                        build \
+                        --copy-artifacts-to objdir-clone \
+                     "
+            - name: Build Remaining Apps That Don't Support Unified Build
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --target darwin-${{matrix.arch}}-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT} \
                         --target darwin-${{matrix.arch}}-all-clusters-${BUILD_VARIANT} \
-                        --target darwin-${{matrix.arch}}-lock-${BUILD_VARIANT} \
                         --target darwin-${{matrix.arch}}-ota-provider-${BUILD_VARIANT} \
-                        --target darwin-${{matrix.arch}}-ota-requestor-${BUILD_VARIANT} \
                         --target darwin-${{matrix.arch}}-tv-app-${BUILD_VARIANT} \
-                        --target darwin-${{matrix.arch}}-bridge-${BUILD_VARIANT} \
                         --target darwin-${{matrix.arch}}-lit-icd-${BUILD_VARIANT} \
-                        --target darwin-${{matrix.arch}}-microwave-oven-${BUILD_VARIANT} \
                         --target darwin-${{matrix.arch}}-rvc-${BUILD_VARIANT} \
-                        --target darwin-${{matrix.arch}}-network-manager-${BUILD_VARIANT} \
-                        --target darwin-${{matrix.arch}}-energy-gateway-${BUILD_VARIANT} \
-                        --target darwin-${{matrix.arch}}-energy-management-${BUILD_VARIANT} \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
@@ -527,14 +533,14 @@ jobs:
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --all-clusters-app ./out/darwin-${{matrix.arch}}-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
-                     --lock-app ./out/darwin-${{matrix.arch}}-lock-${BUILD_VARIANT}/chip-lock-app \
-                     --ota-provider-app ./out/darwin-${{matrix.arch}}-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
+                     --lock-app ./out/darwin-${{matrix.arch}}-lock-${BUILD_VARIANT}-unified/chip-lock-app \
+                     --ota-provider-app ./out/darwin-${{matrix.arch}}-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
                      --ota-requestor-app ./out/darwin-${{matrix.arch}}-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
-                     --tv-app ./out/darwin-${{matrix.arch}}-tv-app-${BUILD_VARIANT}/chip-tv-app \
-                     --bridge-app ./out/darwin-${{matrix.arch}}-bridge-${BUILD_VARIANT}/chip-bridge-app \
+                     --tv-app ./out/darwin-${{matrix.arch}}-tv-app-${BUILD_VARIANT}-unified/chip-tv-app \
+                     --bridge-app ./out/darwin-${{matrix.arch}}-bridge-${BUILD_VARIANT}-unified/chip-bridge-app \
                      --lit-icd-app ./out/darwin-${{matrix.arch}}-lit-icd-${BUILD_VARIANT}/lit-icd-app \
-                     --microwave-oven-app ./out/darwin-${{matrix.arch}}-microwave-oven-${BUILD_VARIANT}/chip-microwave-oven-app \
-                     --rvc-app ./out/darwin-${{matrix.arch}}-rvc-${BUILD_VARIANT}/chip-rvc-app \
+                     --microwave-oven-app ./out/darwin-${{matrix.arch}}-microwave-oven-${BUILD_VARIANT}-unified/chip-microwave-oven-app \
+                     --rvc-app ./out/darwin-${{matrix.arch}}-rvc-${BUILD_VARIANT}-unified/chip-rvc-app \
                      --network-manager-app ./out/darwin-${{matrix.arch}}-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
                      --energy-gateway-app ./out/darwin-${{matrix.arch}}-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
                      --energy-management-app ./out/darwin-${{matrix.arch}}-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
