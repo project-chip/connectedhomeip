@@ -82,7 +82,7 @@ public:
                                                                          .ntpServerAvailable = ntpServerAvailable,
                                                                          .timeZoneDatabase   = timeZoneDatabase,
                                                                          .timeSource         = timeSource,
-                                                                         .delegate           = gDelegate });
+                                                                         .delegate = TimeSynchronization::GetDefaultDelegate() });
         return gServer.Registration();
     }
 
@@ -155,18 +155,14 @@ void SetDefaultDelegate(Delegate * delegate)
 Delegate * GetDefaultDelegate()
 {
     auto timeSynchronization = GetClusterInstance();
+    if (timeSynchronization != nullptr)
+    {
+        return timeSynchronization->GetDelegate();
+    }
     if (gDelegate == nullptr)
     {
         static DefaultTimeSyncDelegate delegate;
         gDelegate = &delegate;
-        if (timeSynchronization != nullptr)
-        {
-            timeSynchronization->SetDelegate(gDelegate);
-        }
-    }
-    if (timeSynchronization != nullptr)
-    {
-        return timeSynchronization->GetDelegate();
     }
     return gDelegate;
 }

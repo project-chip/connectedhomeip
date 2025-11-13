@@ -129,10 +129,8 @@ public:
     TimeSynchronization::Delegate * GetDelegate() const { return mDelegate; }
     void SetDelegate(TimeSynchronization::Delegate * delegate)
     {
-        if (delegate != nullptr)
-        {
-            mDelegate = delegate;
-        }
+        VerifyOrDie(delegate != nullptr);
+        mDelegate = delegate;
     }
 
 private:
@@ -180,6 +178,7 @@ private:
     TimeSynchronization::TimeZoneDatabaseEnum mTimeZoneDatabase;
     TimeSynchronization::TimeSourceEnum mTimeSource;
     TimeSynchronization::Delegate * mDelegate = nullptr;
+    TimeSynchronization::DefaultTimeSyncDelegate mDefaultDelegate;
 
     TimeSyncDataProvider mTimeSyncDataProvider;
     TimeSynchronization::TimeSyncEventFlag mEventFlag = TimeSynchronization::TimeSyncEventFlag::kNone;

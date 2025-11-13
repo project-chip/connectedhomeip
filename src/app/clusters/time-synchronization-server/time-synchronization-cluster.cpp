@@ -165,16 +165,20 @@ void EmitMissingTrustedTimeSourceEvent(DataModel::EventsGenerator * eventsGenera
 TimeSynchronizationCluster::TimeSynchronizationCluster(EndpointId endpoint, const BitFlags<TimeSynchronization::Feature> features,
                                                        const OptionalAttributeSet & optionalAttributeSet,
                                                        const StartupConfiguration & config) :
-    DefaultServerCluster({ endpoint, TimeSynchronization::Id }),
-    mFeatures(features), mOptionalAttributeSet(optionalAttributeSet), mSupportsDNSResolve(config.supportsDNSResolve),
-    mNTPServerAvailable(config.ntpServerAvailable), mTimeZoneDatabase(config.timeZoneDatabase), mTimeSource(config.timeSource),
-    mDelegate(config.delegate),
+    DefaultServerCluster({ endpoint, TimeSynchronization::Id }), mFeatures(features), mOptionalAttributeSet(optionalAttributeSet),
+    mSupportsDNSResolve(config.supportsDNSResolve), mNTPServerAvailable(config.ntpServerAvailable),
+    mTimeZoneDatabase(config.timeZoneDatabase), mTimeSource(config.timeSource), mDelegate(config.delegate),
 #if TIME_SYNC_ENABLE_TSC_FEATURE
     mOnDeviceConnectedCallback(OnDeviceConnectedWrapper, this),
     mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureWrapper, this),
 #endif
     mOnTimeSyncCompletion(OnTimeSyncCompletionWrapper, this), mOnFallbackNTPCompletion(OnFallbackNTPCompletionWrapper, this)
-{}
+{
+    if (mDelegate == nullptr)
+    {
+        mDelegate = &mDefaultDelegate;
+    }
+}
 
 CHIP_ERROR TimeSynchronizationCluster::Attributes(const ConcreteClusterPath & path,
                                                   ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
