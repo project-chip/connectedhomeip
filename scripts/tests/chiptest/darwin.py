@@ -1,5 +1,3 @@
-#!/usr/bin/env -S python3 -B
-
 # Copyright (c) 2025 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");

@@ -196,13 +196,3 @@ class Runner:
                 raise Exception('Command %r failed: %d' % (cmd, s.returncode))
 
         logging.debug('Command %r completed with error code 0', cmd)
-
-
-# class NamespacedRunner(Runner):
-#     def __init__(self, ns, capture_delegate=None):
-#         super().__init__(capture_delegate)
-#         self.ns = ns
-
-#     def RunSubprocess(self, subprocess: Subprocess, name: str, wait=True, dependencies=[], timeout_seconds: typing.Optional[int] = None, stdin=None):
-#         wrapped_subprocess = self.ns.wrap_in_namespace(subprocess)
-#         return super().RunSubprocess(wrapped_subprocess, name, wait, dependencies, timeout_seconds, stdin)
