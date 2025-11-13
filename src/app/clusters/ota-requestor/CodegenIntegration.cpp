@@ -34,8 +34,9 @@ using namespace chip::app::Clusters;
 
 namespace {
 
-static constexpr size_t kOtaRequestorFixedClusterCount = OtaSoftwareUpdateRequestor::StaticApplicationConfig::kFixedClusterConfig.size();
-static constexpr size_t kOtaRequestorMaxClusterCount   = kOtaRequestorFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+static constexpr size_t kOtaRequestorFixedClusterCount =
+    OtaSoftwareUpdateRequestor::StaticApplicationConfig::kFixedClusterConfig.size();
+static constexpr size_t kOtaRequestorMaxClusterCount = kOtaRequestorFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 bool gUpdatePossibleInitialized = false;
 
@@ -43,13 +44,11 @@ bool gUpdatePossibleInitialized = false;
 class OTARequestorClusterUsingSingleton : public OTARequestorCluster
 {
 public:
-    explicit OTARequestorClusterUsingSingleton(EndpointId endpointId, bool updatePossible)
-        : OTARequestorCluster(endpointId, nullptr, updatePossible) {}
+    explicit OTARequestorClusterUsingSingleton(EndpointId endpointId, bool updatePossible) :
+        OTARequestorCluster(endpointId, nullptr, updatePossible)
+    {}
 
-    OTARequestorInterface * OtaRequestorInstance() override
-    {
-        return GetRequestorInstance();
-    }
+    OTARequestorInterface * OtaRequestorInstance() override { return GetRequestorInstance(); }
 };
 
 bool LoadUpdatePossible(EndpointId endpointId)
@@ -58,16 +57,13 @@ bool LoadUpdatePossible(EndpointId endpointId)
     Traits::StorageType temp;
     uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
     Protocols::InteractionModel::Status status =
-        emberAfReadAttribute(endpointId, OtaSoftwareUpdateRequestor::Id,
-                             OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id,
+        emberAfReadAttribute(endpointId, OtaSoftwareUpdateRequestor::Id, OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id,
                              readable, sizeof(temp));
-    if (status != Protocols::InteractionModel::Status::Success ||
-        !Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    if (status != Protocols::InteractionModel::Status::Success || !Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
 #if CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
-        ChipLogError(AppServer, "Failed to load UpdatePossible for %u/" ChipLogFormatMEI " (Status %d",
-                     endpointId, ChipLogValueMEI(OtaSoftwareUpdateRequestor::Id),
-                     static_cast<int>(status));
+        ChipLogError(AppServer, "Failed to load UpdatePossible for %u/" ChipLogFormatMEI " (Status %d", endpointId,
+                     ChipLogValueMEI(OtaSoftwareUpdateRequestor::Id), static_cast<int>(status));
 #endif
         // Return the spec's fallback value.
         return true;
@@ -96,7 +92,7 @@ public:
     void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServers[clusterInstanceIndex].Destroy(); }
 };
 
-}  // namespace
+} // namespace
 
 void MatterOtaSoftwareUpdateRequestorClusterInitCallback(EndpointId endpointId)
 {

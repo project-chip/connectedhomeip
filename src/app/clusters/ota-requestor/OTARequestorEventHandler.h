@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <clusters/OtaSoftwareUpdateRequestor/Enums.h>
 #include <app/data-model/Nullable.h>
+#include <clusters/OtaSoftwareUpdateRequestor/Enums.h>
 
 namespace chip {
 namespace app {
@@ -33,11 +33,11 @@ public:
                                    chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum newState,
                                    chip::app::Clusters::OtaSoftwareUpdateRequestor::ChangeReasonEnum reason,
                                    chip::app::DataModel::Nullable<uint32_t> const & targetSoftwareVersion) = 0;
-    virtual void OnVersionApplied(uint32_t softwareVersion, uint16_t productId) = 0;
+    virtual void OnVersionApplied(uint32_t softwareVersion, uint16_t productId)                            = 0;
     virtual void OnDownloadError(uint32_t softwareVersion, uint64_t bytesDownloaded,
                                  chip::app::DataModel::Nullable<uint8_t> progressPercent,
-                                 chip::app::DataModel::Nullable<int64_t> platformCode) = 0;
+                                 chip::app::DataModel::Nullable<int64_t> platformCode)                     = 0;
 };
 
-}  // namespace app
-}  // namespace chip
+} // namespace app
+} // namespace chip

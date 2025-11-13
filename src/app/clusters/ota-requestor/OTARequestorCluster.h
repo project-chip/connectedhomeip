@@ -40,8 +40,7 @@ public:
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                  AttributeValueDecoder & decoder) override;
 
-    CHIP_ERROR Attributes(const ConcreteClusterPath & path,
-                          ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                chip::TLV::TLVReader & input_arguments,
@@ -57,24 +56,19 @@ public:
 
     void OnVersionApplied(uint32_t softwareVersion, uint16_t productId) override;
 
-    void OnDownloadError(uint32_t softwareVersion, uint64_t bytesDownloaded,
-                         DataModel::Nullable<uint8_t> progressPercent,
+    void OnDownloadError(uint32_t softwareVersion, uint64_t bytesDownloaded, DataModel::Nullable<uint8_t> progressPercent,
                          DataModel::Nullable<int64_t> platformCode) override;
 
 protected:
     // Returns the OTA requestor instance to use internally. Defaults to the instance passed into the constructor.
-    virtual OTARequestorInterface * OtaRequestorInstance()
-    {
-        return mOtaRequestor;
-    }
+    virtual OTARequestorInterface * OtaRequestorInstance() { return mOtaRequestor; }
 
 private:
-    CHIP_ERROR WriteDefaultOtaProviders(const ConcreteDataAttributePath & aPath,
-                                        AttributeValueDecoder & aDecoder);
+    CHIP_ERROR WriteDefaultOtaProviders(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
 
     OTARequestorEventHandlerRegistration mEventHandlerRegistration;
     OTARequestorInterface * mOtaRequestor = nullptr;
-    bool mUpdatePossible = true;
+    bool mUpdatePossible                  = true;
 };
 
-}  // namespace chip::app::Clusters
+} // namespace chip::app::Clusters

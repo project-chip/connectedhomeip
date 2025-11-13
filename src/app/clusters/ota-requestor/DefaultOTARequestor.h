@@ -114,7 +114,8 @@ public:
     // Unregister a previously-registered event handler
     CHIP_ERROR UnregisterEventHandler(EndpointId endpointId) override
     {
-        return mEventHandlers.Unregister(endpointId);;
+        return mEventHandlers.Unregister(endpointId);
+        ;
     }
 
     //////////// BDXDownloader::StateDelegate Implementation ///////////////
@@ -304,9 +305,7 @@ private:
     /**
      * Send a StateTransition event to all registered event handlers
      */
-    void SendStateTransitionEvent(OTAUpdateStateEnum previousState,
-                                  OTAUpdateStateEnum newState,
-                                  OTAChangeReasonEnum reason,
+    void SendStateTransitionEvent(OTAUpdateStateEnum previousState, OTAUpdateStateEnum newState, OTAChangeReasonEnum reason,
                                   app::DataModel::Nullable<uint32_t> const & targetSoftwareVersion);
 
     /**
@@ -318,8 +317,7 @@ private:
      * Send a StateTransition event to all registered event handlers
      */
     void SendDownloadErrorEvent(uint32_t softwareVersion, uint64_t bytesDownloaded,
-                                app::DataModel::Nullable<uint8_t> progressPercent,
-                                app::DataModel::Nullable<int64_t> platformCode);
+                                app::DataModel::Nullable<uint8_t> progressPercent, app::DataModel::Nullable<int64_t> platformCode);
 
     /**
      * Session connection callbacks

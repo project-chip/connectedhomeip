@@ -22,9 +22,9 @@
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/clusters/testing/ClusterTester.h>
 #include <app/clusters/testing/ValidateGlobalAttributes.h>
-#include <app/data-model/Nullable.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
+#include <app/data-model/Nullable.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
@@ -42,14 +42,13 @@ using namespace chip::app::Clusters;
 namespace chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs {
 namespace ProviderLocation {
 
-constexpr bool operator==(const Type& lhs, const Type& rhs)
+constexpr bool operator==(const Type & lhs, const Type & rhs)
 {
-  return lhs.providerNodeID == rhs.providerNodeID &&
-         lhs.endpoint == rhs.endpoint && lhs.fabricIndex == rhs.fabricIndex;
+    return lhs.providerNodeID == rhs.providerNodeID && lhs.endpoint == rhs.endpoint && lhs.fabricIndex == rhs.fabricIndex;
 }
 
-}  // namespace ProviderLocation
-}  // namespace chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs
+} // namespace ProviderLocation
+} // namespace chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs
 
 namespace {
 
@@ -61,16 +60,13 @@ public:
     ~MockOtaRequestor() = default;
 
     void Reset(void) override {}
-    void HandleAnnounceOTAProvider(
-        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-        const OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType & commandData) override
+    void
+    HandleAnnounceOTAProvider(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                              const OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType & commandData) override
     {
         mLastAnnounceCommandPayload = commandData;
     }
-    CHIP_ERROR TriggerImmediateQuery(FabricIndex fabricIndex = kUndefinedFabricIndex) override
-    {
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR TriggerImmediateQuery(FabricIndex fabricIndex = kUndefinedFabricIndex) override { return CHIP_NO_ERROR; }
     void TriggerImmediateQueryInternal() override {}
     void DownloadUpdate() override {}
     void DownloadUpdateDelayedOnUserConsent() override {}
@@ -80,27 +76,12 @@ public:
     {
         return CHIP_NO_ERROR;
     }
-    CHIP_ERROR GetUpdateStateAttribute(EndpointId endpointId, OTAUpdateStateEnum & state) override
-    {
-        return CHIP_NO_ERROR;
-    }
-    OTAUpdateStateEnum GetCurrentUpdateState() override
-    {
-        return OTAUpdateStateEnum::kIdle;
-    }
-    DataModel::Nullable<uint8_t> GetCurrentUpdateStateProgress() override
-    {
-        return mUpdateStateProgress;
-    }
-    uint32_t GetTargetVersion() override
-    {
-        return 0;
-    }
+    CHIP_ERROR GetUpdateStateAttribute(EndpointId endpointId, OTAUpdateStateEnum & state) override { return CHIP_NO_ERROR; }
+    OTAUpdateStateEnum GetCurrentUpdateState() override { return OTAUpdateStateEnum::kIdle; }
+    DataModel::Nullable<uint8_t> GetCurrentUpdateStateProgress() override { return mUpdateStateProgress; }
+    uint32_t GetTargetVersion() override { return 0; }
     void CancelImageUpdate() override {}
-    CHIP_ERROR ClearDefaultOtaProviderList(FabricIndex fabricIndex) override
-    {
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR ClearDefaultOtaProviderList(FabricIndex fabricIndex) override { return CHIP_NO_ERROR; }
     void SetCurrentProviderLocation(ProviderLocationType providerLocation) override {}
     void SetMetadataForProvider(chip::ByteSpan metadataForProvider) override {}
     void GetProviderLocation(Optional<ProviderLocationType> & providerLocation) override {}
@@ -108,33 +89,21 @@ public:
     {
         return mProviderLocations.Add(providerLocation);
     }
-    ProviderLocationList::Iterator GetDefaultOTAProviderListIterator() override
-    {
-        return mProviderLocations.Begin();
-    }
+    ProviderLocationList::Iterator GetDefaultOTAProviderListIterator() override { return mProviderLocations.Begin(); }
     CHIP_ERROR RegisterEventHandler(OTARequestorEventHandlerRegistration & eventHandler) override
     {
         return mEventHandlerRegistry.Register(eventHandler);
     }
-    CHIP_ERROR UnregisterEventHandler(EndpointId endpointId) override
-    {
-        return mEventHandlerRegistry.Unregister(endpointId);
-    }
+    CHIP_ERROR UnregisterEventHandler(EndpointId endpointId) override { return mEventHandlerRegistry.Unregister(endpointId); }
 
     OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType GetLastAnnounceCommandPayload() const
     {
         return mLastAnnounceCommandPayload;
     }
 
-    void SetUpdateStateProgress(DataModel::Nullable<uint8_t> updateStateProgress)
-    {
-        mUpdateStateProgress = updateStateProgress;
-    }
+    void SetUpdateStateProgress(DataModel::Nullable<uint8_t> updateStateProgress) { mUpdateStateProgress = updateStateProgress; }
 
-    OTARequestorEventHandler * GetEventHandler(EndpointId endpointId)
-    {
-        return mEventHandlerRegistry.Get(endpointId);
-    }
+    OTARequestorEventHandler * GetEventHandler(EndpointId endpointId) { return mEventHandlerRegistry.Get(endpointId); }
 
 private:
     OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType mLastAnnounceCommandPayload;
@@ -167,12 +136,14 @@ TEST_F(TestOTARequestorCluster, AttributeListTest)
     OTARequestorCluster cluster(kTestEndpointId, &otaRequestor);
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-    EXPECT_TRUE(chip::Testing::IsAttributesListEqualTo(cluster, {
-        OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::kMetadataEntry,
-        OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::kMetadataEntry,
-        OtaSoftwareUpdateRequestor::Attributes::UpdateState::kMetadataEntry,
-        OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::kMetadataEntry,
-    }));
+    EXPECT_TRUE(
+        chip::Testing::IsAttributesListEqualTo(cluster,
+                                               {
+                                                   OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::kMetadataEntry,
+                                                   OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::kMetadataEntry,
+                                                   OtaSoftwareUpdateRequestor::Attributes::UpdateState::kMetadataEntry,
+                                                   OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::kMetadataEntry,
+                                               }));
 }
 
 TEST_F(TestOTARequestorCluster, AcceptedCommandsTest)
@@ -182,9 +153,11 @@ TEST_F(TestOTARequestorCluster, AcceptedCommandsTest)
     OTARequestorCluster cluster(kTestEndpointId, &otaRequestor);
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-    EXPECT_TRUE(chip::Testing::IsAcceptedCommandsListEqualTo(cluster, {
-        OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::kMetadataEntry,
-    }));
+    EXPECT_TRUE(
+        chip::Testing::IsAcceptedCommandsListEqualTo(cluster,
+                                                     {
+                                                         OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::kMetadataEntry,
+                                                     }));
 }
 
 TEST_F(TestOTARequestorCluster, GeneratedCommandsTest)
@@ -206,26 +179,23 @@ TEST_F(TestOTARequestorCluster, EventInfoTest)
 
     DataModel::EventEntry eventInfo;
 
-    EXPECT_EQ(cluster.EventInfo(ConcreteEventPath(kTestEndpointId,
-                                                  OtaSoftwareUpdateRequestor::Id,
-                                                  OtaSoftwareUpdateRequestor::Events::StateTransition::Id), eventInfo),
+    EXPECT_EQ(cluster.EventInfo(ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id,
+                                                  OtaSoftwareUpdateRequestor::Events::StateTransition::Id),
+                                eventInfo),
               CHIP_NO_ERROR);
-    EXPECT_EQ(eventInfo.readPrivilege,
-              OtaSoftwareUpdateRequestor::Events::StateTransition::kMetadataEntry.readPrivilege);
+    EXPECT_EQ(eventInfo.readPrivilege, OtaSoftwareUpdateRequestor::Events::StateTransition::kMetadataEntry.readPrivilege);
 
-    EXPECT_EQ(cluster.EventInfo(ConcreteEventPath(kTestEndpointId,
-                                                  OtaSoftwareUpdateRequestor::Id,
-                                                  OtaSoftwareUpdateRequestor::Events::VersionApplied::Id), eventInfo),
+    EXPECT_EQ(cluster.EventInfo(ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id,
+                                                  OtaSoftwareUpdateRequestor::Events::VersionApplied::Id),
+                                eventInfo),
               CHIP_NO_ERROR);
-    EXPECT_EQ(eventInfo.readPrivilege,
-              OtaSoftwareUpdateRequestor::Events::VersionApplied::kMetadataEntry.readPrivilege);
+    EXPECT_EQ(eventInfo.readPrivilege, OtaSoftwareUpdateRequestor::Events::VersionApplied::kMetadataEntry.readPrivilege);
 
-    EXPECT_EQ(cluster.EventInfo(ConcreteEventPath(kTestEndpointId,
-                                                  OtaSoftwareUpdateRequestor::Id,
-                                                  OtaSoftwareUpdateRequestor::Events::DownloadError::Id), eventInfo),
+    EXPECT_EQ(cluster.EventInfo(ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id,
+                                                  OtaSoftwareUpdateRequestor::Events::DownloadError::Id),
+                                eventInfo),
               CHIP_NO_ERROR);
-    EXPECT_EQ(eventInfo.readPrivilege,
-              OtaSoftwareUpdateRequestor::Events::DownloadError::kMetadataEntry.readPrivilege);
+    EXPECT_EQ(eventInfo.readPrivilege, OtaSoftwareUpdateRequestor::Events::DownloadError::kMetadataEntry.readPrivilege);
 }
 
 TEST_F(TestOTARequestorCluster, AnnounceOtaProviderCommandTest)
@@ -237,10 +207,10 @@ TEST_F(TestOTARequestorCluster, AnnounceOtaProviderCommandTest)
 
     chip::Test::ClusterTester tester(cluster);
     OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Type payload;
-    payload.providerNodeID = 1234;
-    payload.vendorID = static_cast<VendorId>(4321);
+    payload.providerNodeID     = 1234;
+    payload.vendorID           = static_cast<VendorId>(4321);
     payload.announcementReason = OtaSoftwareUpdateRequestor::AnnouncementReasonEnum::kUpdateAvailable;
-    payload.endpoint = 5;
+    payload.endpoint           = 5;
 
     auto result = tester.Invoke(OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id, payload);
     EXPECT_EQ(result.status, std::nullopt);
@@ -249,8 +219,7 @@ TEST_F(TestOTARequestorCluster, AnnounceOtaProviderCommandTest)
         otaRequestor.GetLastAnnounceCommandPayload();
     EXPECT_EQ(forwarded_payload.providerNodeID, static_cast<NodeId>(1234));
     EXPECT_EQ(forwarded_payload.vendorID, static_cast<VendorId>(4321));
-    EXPECT_EQ(forwarded_payload.announcementReason,
-              OtaSoftwareUpdateRequestor::AnnouncementReasonEnum::kUpdateAvailable);
+    EXPECT_EQ(forwarded_payload.announcementReason, OtaSoftwareUpdateRequestor::AnnouncementReasonEnum::kUpdateAvailable);
     EXPECT_EQ(forwarded_payload.endpoint, 5);
 }
 
@@ -263,12 +232,12 @@ TEST_F(TestOTARequestorCluster, AnnounceOtaProviderCommandInvalidMetadataTest)
 
     chip::Test::ClusterTester tester(cluster);
     OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Type payload;
-    payload.providerNodeID = 1234;
-    payload.vendorID = static_cast<VendorId>(4321);
+    payload.providerNodeID     = 1234;
+    payload.vendorID           = static_cast<VendorId>(4321);
     payload.announcementReason = OtaSoftwareUpdateRequestor::AnnouncementReasonEnum::kUpdateAvailable;
-    payload.endpoint = 5;
+    payload.endpoint           = 5;
     // The maximum allowed metadata length is 512 bytes, so send 513.
-    uint8_t bytes[513] = {'\0'};
+    uint8_t bytes[513]      = { '\0' };
     payload.metadataForNode = MakeOptional(ByteSpan(bytes));
 
     auto result = tester.Invoke(OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id, payload);
@@ -293,18 +262,16 @@ TEST_F(TestOTARequestorCluster, ReadAttributesTest)
     using DecodableProviderLocation = OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType;
     OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type provider;
     provider.providerNodeID = 1234u;
-    provider.endpoint = 8;
-    provider.fabricIndex = 2;
+    provider.endpoint       = 8;
+    provider.fabricIndex    = 2;
     otaRequestor.AddDefaultOtaProvider(provider);
     DataModel::DecodableList<DecodableProviderLocation> defaultOtaProviders;
-    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id,
-                                   defaultOtaProviders),
+    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id, defaultOtaProviders),
               CHIP_NO_ERROR);
     size_t defaultOtaProvidersSize;
     defaultOtaProviders.ComputeSize(&defaultOtaProvidersSize);
     EXPECT_EQ(defaultOtaProvidersSize, 1u);
-    DataModel::DecodableList<DecodableProviderLocation>::Iterator defaultOtaProvidersIterator =
-        defaultOtaProviders.begin();
+    DataModel::DecodableList<DecodableProviderLocation>::Iterator defaultOtaProvidersIterator = defaultOtaProviders.begin();
     EXPECT_TRUE(defaultOtaProvidersIterator.Next());
     const DecodableProviderLocation & decodedProvider = defaultOtaProvidersIterator.GetValue();
     EXPECT_EQ(decodedProvider.providerNodeID, 1234u);
@@ -313,32 +280,27 @@ TEST_F(TestOTARequestorCluster, ReadAttributesTest)
 
     // Read and verify UpdatePossible.
     bool updatePossible;
-    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id, updatePossible),
-              CHIP_NO_ERROR);
+    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id, updatePossible), CHIP_NO_ERROR);
     EXPECT_TRUE(updatePossible);
 
-    EXPECT_EQ(testerUpdateImpossible.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id,
-                                                   updatePossible),
+    EXPECT_EQ(testerUpdateImpossible.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id, updatePossible),
               CHIP_NO_ERROR);
     EXPECT_FALSE(updatePossible);
 
     // Read and verify UpdateState.
     OtaSoftwareUpdateRequestor::UpdateStateEnum updateState;
-    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdateState::Id, updateState),
-              CHIP_NO_ERROR);
+    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdateState::Id, updateState), CHIP_NO_ERROR);
     EXPECT_EQ(updateState, OtaSoftwareUpdateRequestor::UpdateStateEnum::kIdle);
 
     // Read and verify UpdateStateProgress.
     DataModel::Nullable<uint8_t> updateStateProgress;
-    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id,
-                                   updateStateProgress),
+    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id, updateStateProgress),
               CHIP_NO_ERROR);
     EXPECT_TRUE(updateStateProgress.IsNull());
 
     // Verify a non-null value as well.
     otaRequestor.SetUpdateStateProgress(85);
-    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id,
-                                   updateStateProgress),
+    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id, updateStateProgress),
               CHIP_NO_ERROR);
     EXPECT_FALSE(updateStateProgress.IsNull());
     EXPECT_EQ(updateStateProgress.Value(), 85);
@@ -369,8 +331,7 @@ TEST_F(TestOTARequestorCluster, StateTransitionEvent)
 
     cluster.OnStateTransition(OtaSoftwareUpdateRequestor::UpdateStateEnum::kQuerying,
                               OtaSoftwareUpdateRequestor::UpdateStateEnum::kIdle,
-                              OtaSoftwareUpdateRequestor::ChangeReasonEnum::kFailure,
-                              1000u);
+                              OtaSoftwareUpdateRequestor::ChangeReasonEnum::kFailure, 1000u);
     auto event = eventsGenerator.GetNextEvent();
     ASSERT_TRUE(event.has_value());
     EXPECT_EQ(event->eventOptions.mPath,
@@ -394,8 +355,7 @@ TEST_F(TestOTARequestorCluster, StateTransitionEventWithNoOtaRequestor)
 
     cluster.OnStateTransition(OtaSoftwareUpdateRequestor::UpdateStateEnum::kQuerying,
                               OtaSoftwareUpdateRequestor::UpdateStateEnum::kIdle,
-                              OtaSoftwareUpdateRequestor::ChangeReasonEnum::kFailure,
-                              1000u);
+                              OtaSoftwareUpdateRequestor::ChangeReasonEnum::kFailure, 1000u);
     auto event = eventsGenerator.GetNextEvent();
     ASSERT_TRUE(event.has_value());
     EXPECT_EQ(event->eventOptions.mPath,
@@ -420,8 +380,7 @@ TEST_F(TestOTARequestorCluster, NoStateTransitionEventWithIdenticalStates)
 
     cluster.OnStateTransition(OtaSoftwareUpdateRequestor::UpdateStateEnum::kApplying,
                               OtaSoftwareUpdateRequestor::UpdateStateEnum::kApplying,
-                              OtaSoftwareUpdateRequestor::ChangeReasonEnum::kTimeOut,
-                              2000u);
+                              OtaSoftwareUpdateRequestor::ChangeReasonEnum::kTimeOut, 2000u);
     auto event = eventsGenerator.GetNextEvent();
     ASSERT_FALSE(event.has_value());
 }
@@ -438,9 +397,9 @@ TEST_F(TestOTARequestorCluster, VersionAppliedEvent)
     cluster.OnVersionApplied(3000u, 1234u);
     auto event = eventsGenerator.GetNextEvent();
     ASSERT_TRUE(event.has_value());
-    EXPECT_EQ(event->eventOptions.mPath,
-              ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id,
-                                OtaSoftwareUpdateRequestor::Events::VersionApplied::Id));
+    EXPECT_EQ(
+        event->eventOptions.mPath,
+        ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id, OtaSoftwareUpdateRequestor::Events::VersionApplied::Id));
     OtaSoftwareUpdateRequestor::Events::VersionApplied::DecodableType decodedEvent;
     ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR);
     EXPECT_EQ(decodedEvent.softwareVersion, 3000u);
@@ -458,9 +417,9 @@ TEST_F(TestOTARequestorCluster, VersionAppliedEventWithNoOtaRequestor)
     cluster.OnVersionApplied(3000u, 1234u);
     auto event = eventsGenerator.GetNextEvent();
     ASSERT_TRUE(event.has_value());
-    EXPECT_EQ(event->eventOptions.mPath,
-              ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id,
-                                OtaSoftwareUpdateRequestor::Events::VersionApplied::Id));
+    EXPECT_EQ(
+        event->eventOptions.mPath,
+        ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id, OtaSoftwareUpdateRequestor::Events::VersionApplied::Id));
     OtaSoftwareUpdateRequestor::Events::VersionApplied::DecodableType decodedEvent;
     ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR);
     EXPECT_EQ(decodedEvent.softwareVersion, 3000u);
@@ -479,9 +438,9 @@ TEST_F(TestOTARequestorCluster, DownloadErrorEvents)
     cluster.OnDownloadError(4000u, 10000u, 82u, 1234567890l);
     auto event = eventsGenerator.GetNextEvent();
     ASSERT_TRUE(event.has_value());
-    EXPECT_EQ(event->eventOptions.mPath,
-              ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id,
-                                OtaSoftwareUpdateRequestor::Events::DownloadError::Id));
+    EXPECT_EQ(
+        event->eventOptions.mPath,
+        ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id, OtaSoftwareUpdateRequestor::Events::DownloadError::Id));
     OtaSoftwareUpdateRequestor::Events::DownloadError::DecodableType decodedEvent;
     ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR);
     EXPECT_EQ(decodedEvent.softwareVersion, 4000u);
@@ -492,9 +451,9 @@ TEST_F(TestOTARequestorCluster, DownloadErrorEvents)
     cluster.OnDownloadError(5000u, 12000u, DataModel::NullNullable, DataModel::NullNullable);
     event = eventsGenerator.GetNextEvent();
     ASSERT_TRUE(event.has_value());
-    EXPECT_EQ(event->eventOptions.mPath,
-              ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id,
-                                OtaSoftwareUpdateRequestor::Events::DownloadError::Id));
+    EXPECT_EQ(
+        event->eventOptions.mPath,
+        ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id, OtaSoftwareUpdateRequestor::Events::DownloadError::Id));
     ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR);
     EXPECT_EQ(decodedEvent.softwareVersion, 5000u);
     EXPECT_EQ(decodedEvent.bytesDownloaded, 12000u);
@@ -513,9 +472,9 @@ TEST_F(TestOTARequestorCluster, DownloadErrorEventsWithNoOtaRequestor)
     cluster.OnDownloadError(4000u, 10000u, 82u, 1234567890l);
     auto event = eventsGenerator.GetNextEvent();
     ASSERT_TRUE(event.has_value());
-    EXPECT_EQ(event->eventOptions.mPath,
-              ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id,
-                                OtaSoftwareUpdateRequestor::Events::DownloadError::Id));
+    EXPECT_EQ(
+        event->eventOptions.mPath,
+        ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id, OtaSoftwareUpdateRequestor::Events::DownloadError::Id));
     OtaSoftwareUpdateRequestor::Events::DownloadError::DecodableType decodedEvent;
     ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR);
     EXPECT_EQ(decodedEvent.softwareVersion, 4000u);
@@ -526,9 +485,9 @@ TEST_F(TestOTARequestorCluster, DownloadErrorEventsWithNoOtaRequestor)
     cluster.OnDownloadError(5000u, 12000u, DataModel::NullNullable, DataModel::NullNullable);
     event = eventsGenerator.GetNextEvent();
     ASSERT_TRUE(event.has_value());
-    EXPECT_EQ(event->eventOptions.mPath,
-              ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id,
-                                OtaSoftwareUpdateRequestor::Events::DownloadError::Id));
+    EXPECT_EQ(
+        event->eventOptions.mPath,
+        ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id, OtaSoftwareUpdateRequestor::Events::DownloadError::Id));
     ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR);
     EXPECT_EQ(decodedEvent.softwareVersion, 5000u);
     EXPECT_EQ(decodedEvent.bytesDownloaded, 12000u);
@@ -562,25 +521,21 @@ TEST_F(TestOTARequestorCluster, ReadsWithNoRequestorInterfaceReturnErrors)
     // Read and verify that DefaultOTAProviders returns an error.
     using DecodableProviderLocation = OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType;
     DataModel::DecodableList<DecodableProviderLocation> defaultOtaProviders;
-    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id,
-                                   defaultOtaProviders),
+    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id, defaultOtaProviders),
               CHIP_ERROR_INTERNAL);
 
     // UpdatePossible shouldn't be affected.
     bool updatePossible;
-    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id, updatePossible),
-              CHIP_NO_ERROR);
+    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id, updatePossible), CHIP_NO_ERROR);
     EXPECT_TRUE(updatePossible);
 
     // Read and verify that UpdateState returns an error.
     OtaSoftwareUpdateRequestor::UpdateStateEnum updateState;
-    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdateState::Id, updateState),
-              CHIP_ERROR_INTERNAL);
+    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdateState::Id, updateState), CHIP_ERROR_INTERNAL);
 
     // Read and verify that UpdateStateProgress returns an error.
     DataModel::Nullable<uint8_t> updateStateProgress;
-    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id,
-                                   updateStateProgress),
+    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id, updateStateProgress),
               CHIP_ERROR_INTERNAL);
 
     // FeatureMap shouldn't be affected.
@@ -606,10 +561,10 @@ TEST_F(TestOTARequestorCluster, CommandsWithNoRequestorInterfaceReturnErrors)
 
     chip::Test::ClusterTester tester(cluster);
     OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Type payload;
-    payload.providerNodeID = 1234;
-    payload.vendorID = static_cast<VendorId>(4321);
+    payload.providerNodeID     = 1234;
+    payload.vendorID           = static_cast<VendorId>(4321);
     payload.announcementReason = OtaSoftwareUpdateRequestor::AnnouncementReasonEnum::kUpdateAvailable;
-    payload.endpoint = 5;
+    payload.endpoint           = 5;
 
     auto result = tester.Invoke(OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id, payload);
     ASSERT_TRUE(result.status.has_value());
@@ -631,7 +586,7 @@ TEST_F(TestOTARequestorCluster, WriteDefaultProvidersList)
     namespace DefaultOtaProviders = OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders;
     OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type provider;
     provider.providerNodeID = 1234u;
-    provider.endpoint = 8;
+    provider.endpoint       = 8;
     // This comes from the subject descriptor set in WriteOperation's constructor, as ClusterTester creates
     // a WriteOperation and doesn't set the subject descriptor.
     provider.fabricIndex = chip::app::Testing::kDenySubjectDescriptor.fabricIndex;
@@ -667,7 +622,7 @@ TEST_F(TestOTARequestorCluster, WriteDefaultProvidersListWithNoInterfaceReturnsE
     namespace DefaultOtaProviders = OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders;
     OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type provider;
     provider.providerNodeID = 1234u;
-    provider.endpoint = 8;
+    provider.endpoint       = 8;
     // This comes from the subject descriptor set in WriteOperation's constructor, as ClusterTester creates
     // a WriteOperation and doesn't set the subject descriptor
     provider.fabricIndex = chip::app::Testing::kDenySubjectDescriptor.fabricIndex;
@@ -699,8 +654,7 @@ TEST_F(TestOTARequestorCluster, WritingReadOnlyAttributesReturnsUnsupportedWrite
     ASSERT_TRUE(result.has_value());
     EXPECT_EQ(*result, Protocols::InteractionModel::Status::UnsupportedAttribute);
 
-    result = tester.WriteAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id,
-                                   DataModel::MakeNullable(50));
+    result = tester.WriteAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id, DataModel::MakeNullable(50));
     ASSERT_TRUE(result.has_value());
     EXPECT_EQ(*result, Protocols::InteractionModel::Status::UnsupportedAttribute);
 
@@ -715,4 +669,4 @@ TEST_F(TestOTARequestorCluster, WritingReadOnlyAttributesReturnsUnsupportedWrite
     EXPECT_EQ(changeListener.DirtyList().size(), 0u);
 }
 
-}  // namespace
+} // namespace

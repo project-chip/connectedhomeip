@@ -927,8 +927,7 @@ void DefaultOTARequestor::OnCommissioningCompleteRequestor(const DeviceLayer::Ch
     driver->OTACommissioningCallback();
 }
 
-void DefaultOTARequestor::SendStateTransitionEvent(OTAUpdateStateEnum previousState,
-                                                   OTAUpdateStateEnum newState,
+void DefaultOTARequestor::SendStateTransitionEvent(OTAUpdateStateEnum previousState, OTAUpdateStateEnum newState,
                                                    OTAChangeReasonEnum reason,
                                                    DataModel::Nullable<uint32_t> const & targetSoftwareVersion)
 {

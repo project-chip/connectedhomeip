@@ -35,16 +35,12 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
     OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::kMetadataEntry,
 };
 
-}  // namespace
+} // namespace
 
-OTARequestorCluster::OTARequestorCluster(EndpointId endpointId, OTARequestorInterface * otaRequestor,
-                                         bool updatePossible)
-    : DefaultServerCluster(ConcreteClusterPath(endpointId, OtaSoftwareUpdateRequestor::Id)),
-      mEventHandlerRegistration(*this, endpointId),
-      mOtaRequestor(otaRequestor),
-      mUpdatePossible(updatePossible)
-{
-}
+OTARequestorCluster::OTARequestorCluster(EndpointId endpointId, OTARequestorInterface * otaRequestor, bool updatePossible) :
+    DefaultServerCluster(ConcreteClusterPath(endpointId, OtaSoftwareUpdateRequestor::Id)),
+    mEventHandlerRegistration(*this, endpointId), mOtaRequestor(otaRequestor), mUpdatePossible(updatePossible)
+{}
 
 CHIP_ERROR OTARequestorCluster::Startup(ServerClusterContext & context)
 {
@@ -65,9 +61,8 @@ void OTARequestorCluster::Shutdown()
     DefaultServerCluster::Shutdown();
 }
 
-DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(
-    const DataModel::ReadAttributeRequest & request,
-    AttributeValueEncoder & encoder)
+DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                                 AttributeValueEncoder & encoder)
 {
     switch (request.path.mAttributeId)
     {
@@ -78,8 +73,9 @@ DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(
         }
         return encoder.EncodeList([this](const auto & listEncoder) -> CHIP_ERROR {
             ProviderLocationList::Iterator providerIterator = OtaRequestorInstance()->GetDefaultOTAProviderListIterator();
-            CHIP_ERROR error = CHIP_NO_ERROR;
-            while (error == CHIP_NO_ERROR && providerIterator.Next()) {
+            CHIP_ERROR error                                = CHIP_NO_ERROR;
+            while (error == CHIP_NO_ERROR && providerIterator.Next())
+            {
                 error = listEncoder.Encode(providerIterator.GetValue());
             }
             return error;
@@ -108,16 +104,14 @@ DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(
     }
 }
 
-DataModel::ActionReturnStatus OTARequestorCluster::WriteAttribute(
-    const DataModel::WriteAttributeRequest & request,
-    AttributeValueDecoder & decoder)
+DataModel::ActionReturnStatus OTARequestorCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                                  AttributeValueDecoder & decoder)
 {
     switch (request.path.mAttributeId)
     {
     case OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id:
-        return NotifyAttributeChangedIfSuccess(
-            OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id,
-            WriteDefaultOtaProviders(request.path, decoder));
+        return NotifyAttributeChangedIfSuccess(OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id,
+                                               WriteDefaultOtaProviders(request.path, decoder));
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
@@ -130,8 +124,9 @@ CHIP_ERROR OTARequestorCluster::Attributes(const ConcreteClusterPath & path,
     return listBuilder.Append(Span(OtaSoftwareUpdateRequestor::Attributes::kMandatoryMetadata), {});
 }
 
-std::optional<DataModel::ActionReturnStatus> OTARequestorCluster::InvokeCommand(
-    const DataModel::InvokeRequest & request, chip::TLV::TLVReader & input_arguments, CommandHandler * handler)
+std::optional<DataModel::ActionReturnStatus> OTARequestorCluster::InvokeCommand(const DataModel::InvokeRequest & request,
+                                                                                chip::TLV::TLVReader & input_arguments,
+                                                                                CommandHandler * handler)
 {
     switch (request.path.mCommandId)
     {
@@ -174,8 +169,7 @@ void OTARequestorCluster::OnStateTransition(OtaSoftwareUpdateRequestor::UpdateSt
         ChipLogError(Zcl, "Previous state and new state are the same (%d), no event to log", to_underlying(newState));
         return;
     }
-    OtaSoftwareUpdateRequestor::Events::StateTransition::Type event =
-        { previousState, newState, reason, targetSoftwareVersion };
+    OtaSoftwareUpdateRequestor::Events::StateTransition::Type event = { previousState, newState, reason, targetSoftwareVersion };
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
@@ -186,16 +180,14 @@ void OTARequestorCluster::OnVersionApplied(uint32_t softwareVersion, uint16_t pr
 }
 
 void OTARequestorCluster::OnDownloadError(uint32_t softwareVersion, uint64_t bytesDownloaded,
-                                          DataModel::Nullable<uint8_t> progressPercent,
-                                          DataModel::Nullable<int64_t> platformCode)
+                                          DataModel::Nullable<uint8_t> progressPercent, DataModel::Nullable<int64_t> platformCode)
 {
-    OtaSoftwareUpdateRequestor::Events::DownloadError::Type event =
-        { softwareVersion, bytesDownloaded, progressPercent, platformCode };
+    OtaSoftwareUpdateRequestor::Events::DownloadError::Type event = { softwareVersion, bytesDownloaded, progressPercent,
+                                                                      platformCode };
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
-CHIP_ERROR OTARequestorCluster::WriteDefaultOtaProviders(const ConcreteDataAttributePath & aPath,
-                                                         AttributeValueDecoder & aDecoder)
+CHIP_ERROR OTARequestorCluster::WriteDefaultOtaProviders(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
     chip::OTARequestorInterface * requestor = OtaRequestorInstance();
     if (requestor == nullptr)
@@ -237,4 +229,4 @@ CHIP_ERROR OTARequestorCluster::WriteDefaultOtaProviders(const ConcreteDataAttri
     return CHIP_NO_ERROR;
 }
 
-}  // namespace chip::app::Clusters
+} // namespace chip::app::Clusters
