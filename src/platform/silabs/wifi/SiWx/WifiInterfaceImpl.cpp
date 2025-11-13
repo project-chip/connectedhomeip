@@ -232,12 +232,12 @@ sl_status_t BackgroundScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t 
 
         // Copy the scanned SSID to the current scan ssid buffer that will be forwarded to the callback
         chip::MutableByteSpan currentScanSsid(currentScanResult.ssid, WFX_MAX_SSID_LENGTH);
-        chip::CopySpanToMutableSpan(scannedSsidSpan, currentScanSsid);
+        ReturnOnFailure(chip::CopySpanToMutableSpan(scannedSsidSpan, currentScanSsid));
         currentScanResult.ssid_length = currentScanSsid.size();
 
         chip::ByteSpan inBssid(result->scan_info[i].bssid, kWifiMacAddressLength);
         chip::MutableByteSpan outBssid(currentScanResult.bssid, kWifiMacAddressLength);
-        chip::CopySpanToMutableSpan(inBssid, outBssid);
+        ReturnOnFailure(chip::CopySpanToMutableSpan(inBssid, outBssid));
 
         // TODO: We should revisit this to make sure we are setting the correct values
         currentScanResult.security = static_cast<wfx_sec_t>(result->scan_info[i].security_mode);
