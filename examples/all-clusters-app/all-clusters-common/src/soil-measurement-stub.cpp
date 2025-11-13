@@ -70,7 +70,7 @@ void emberAfSoilMeasurementClusterInitCallback(EndpointId endpoint)
     }
 
     // Set initial measured value to min since all clusters does not perform any actual measurements
-    gServer.Cluster().SetSoilMoistureMeasuredValue(kDefaultSoilMoistureMeasurementLimits.minMeasuredValue);
+    TEMPORARY_RETURN_IGNORED gServer.Cluster().SetSoilMoistureMeasuredValue(kDefaultSoilMoistureMeasurementLimits.minMeasuredValue);
 }
 
 void emberAfSoilMeasurementClusterShutdownCallback(EndpointId endpoint)

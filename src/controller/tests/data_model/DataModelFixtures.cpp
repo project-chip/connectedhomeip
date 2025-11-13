@@ -155,7 +155,7 @@ static CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubje
                                                state);
 
             CHIP_ERROR err = valueEncoder.EncodeList([allowInfiniteReads](const auto & encoder) -> CHIP_ERROR {
-                encoder.Encode(static_cast<uint8_t>(1));
+                TEMPORARY_RETURN_IGNORED encoder.Encode(static_cast<uint8_t>(1));
                 return allowInfiniteReads ? CHIP_ERROR_NO_MEMORY : CHIP_NO_ERROR;
             });
 
@@ -200,7 +200,10 @@ static CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubje
         attributeData.DataVersion(kDataVersion);
         ReturnErrorOnFailure(attributeData.GetError());
         AttributePathIB::Builder & attributePath = attributeData.CreatePath();
-        attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
+        TEMPORARY_RETURN_IGNORED attributePath.Endpoint(aPath.mEndpointId)
+            .Cluster(aPath.mClusterId)
+            .Attribute(aPath.mAttributeId)
+            .EndOfAttributePathIB();
         ReturnErrorOnFailure(attributePath.GetError());
 
         ReturnErrorOnFailure(DataModel::Encode(*(attributeData.GetWriter()), TLV::ContextTag(AttributeDataIB::Tag::kData), value));
@@ -214,13 +217,16 @@ static CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubje
         ReturnErrorOnFailure(aAttributeReports.GetError());
         AttributeStatusIB::Builder & attributeStatus = attributeReport.CreateAttributeStatus();
         AttributePathIB::Builder & attributePath     = attributeStatus.CreatePath();
-        attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
+        TEMPORARY_RETURN_IGNORED attributePath.Endpoint(aPath.mEndpointId)
+            .Cluster(aPath.mClusterId)
+            .Attribute(aPath.mAttributeId)
+            .EndOfAttributePathIB();
         ReturnErrorOnFailure(attributePath.GetError());
 
         StatusIB::Builder & errorStatus = attributeStatus.CreateErrorStatus();
         ReturnErrorOnFailure(attributeStatus.GetError());
         errorStatus.EncodeStatusIB(StatusIB(Protocols::InteractionModel::Status::Busy));
-        attributeStatus.EndOfAttributeStatusIB();
+        TEMPORARY_RETURN_IGNORED attributeStatus.EndOfAttributeStatusIB();
         ReturnErrorOnFailure(attributeStatus.GetError());
         ReturnErrorOnFailure(attributeReport.EndOfAttributeReportIB());
     }

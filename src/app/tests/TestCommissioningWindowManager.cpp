@@ -16,7 +16,6 @@
  */
 
 #include <app/TestEventTriggerDelegate.h>
-#include <app/TimerDelegates.h>
 #include <app/reporting/ReportSchedulerImpl.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
@@ -28,11 +27,13 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/ConfigurationManager.h>
+#include <platform/DefaultTimerDelegate.h>
 #include <platform/PlatformManager.h>
 #include <platform/TestOnlyCommissionableDataProvider.h>
 #include <protocols/secure_channel/PASESession.h>
 
 #include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 #include <lib/support/UnitTestUtils.h>
@@ -131,7 +132,7 @@ void TearDownTask(intptr_t context)
 
 static void StopEventLoop(intptr_t context)
 {
-    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+    EXPECT_SUCCESS(chip::DeviceLayer::PlatformMgr().StopEventLoopTask());
 }
 
 class TestSecurePairingDelegate : public SessionEstablishmentDelegate
@@ -178,14 +179,14 @@ public:
     {
 
         // TODO: The platform memory was intentionally left not deinitialized so that minimal mdns can destruct
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(TearDownTask, 0);
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(StopEventLoop);
+        EXPECT_SUCCESS(chip::DeviceLayer::PlatformMgr().ScheduleWork(TearDownTask, 0));
+        EXPECT_SUCCESS(chip::DeviceLayer::PlatformMgr().ScheduleWork(StopEventLoop));
         chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
         chip::DeviceLayer::PlatformMgr().Shutdown();
 
         auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
-        mdnsAdvertiser.RemoveServices();
+        RETURN_SAFELY_IGNORED mdnsAdvertiser.RemoveServices();
         mdnsAdvertiser.Shutdown();
 
         LoopbackMessagingContext::TearDownTestSuite();
@@ -316,8 +317,8 @@ void CheckCommissioningWindowManagerBasicWindowOpenCloseTask(intptr_t context)
 TEST_F(TestCommissioningWindowManager, TestCheckCommissioningWindowManagerBasicWindowOpenClose)
 {
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(CheckCommissioningWindowManagerBasicWindowOpenCloseTask);
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(StopEventLoop);
+    EXPECT_SUCCESS(chip::DeviceLayer::PlatformMgr().ScheduleWork(CheckCommissioningWindowManagerBasicWindowOpenCloseTask));
+    EXPECT_SUCCESS(chip::DeviceLayer::PlatformMgr().ScheduleWork(StopEventLoop));
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 }
 
@@ -363,8 +364,9 @@ void CheckCommissioningWindowManagerBasicWindowOpenCloseFromClusterTask(intptr_t
 
 TEST_F(TestCommissioningWindowManager, TestCheckCommissioningWindowManagerBasicWindowOpenCloseFromCluster)
 {
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(CheckCommissioningWindowManagerBasicWindowOpenCloseFromClusterTask);
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(StopEventLoop);
+    EXPECT_SUCCESS(
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(CheckCommissioningWindowManagerBasicWindowOpenCloseFromClusterTask));
+    EXPECT_SUCCESS(chip::DeviceLayer::PlatformMgr().ScheduleWork(StopEventLoop));
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 }
 
@@ -401,14 +403,14 @@ void CheckCommissioningWindowManagerWindowTimeoutTask(intptr_t context)
     EXPECT_FALSE(sAdminFabricIndexDirty);
     EXPECT_FALSE(sAdminVendorIdDirty);
 
-    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(kTimeoutMs + kSleepPadding),
-                                                CheckCommissioningWindowManagerWindowClosedTask, nullptr);
+    EXPECT_SUCCESS(chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(kTimeoutMs + kSleepPadding),
+                                                               CheckCommissioningWindowManagerWindowClosedTask, nullptr));
 }
 
 TEST_F(TestCommissioningWindowManager, TestCheckCommissioningWindowManagerWindowTimeout)
 {
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(CheckCommissioningWindowManagerWindowTimeoutTask);
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(StopEventLoop);
+    EXPECT_SUCCESS(chip::DeviceLayer::PlatformMgr().ScheduleWork(CheckCommissioningWindowManagerWindowTimeoutTask));
+    EXPECT_SUCCESS(chip::DeviceLayer::PlatformMgr().ScheduleWork(StopEventLoop));
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 }
 
@@ -455,18 +457,19 @@ void CheckCommissioningWindowManagerWindowTimeoutWithSessionEstablishmentErrorsT
     EXPECT_FALSE(sAdminFabricIndexDirty);
     EXPECT_FALSE(sAdminVendorIdDirty);
 
-    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(kTimeoutMs + kSleepPadding),
-                                                CheckCommissioningWindowManagerWindowClosedTask, nullptr);
+    EXPECT_SUCCESS(chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(kTimeoutMs + kSleepPadding),
+                                                               CheckCommissioningWindowManagerWindowClosedTask, nullptr));
     // Simulate a session establishment error during that window, such that the
     // delay for the error plus the window size exceeds our "timeout + padding" above.
-    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(kTimeoutMs / 4 * 3),
-                                                SimulateFailedSessionEstablishmentTask, nullptr);
+    EXPECT_SUCCESS(chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(kTimeoutMs / 4 * 3),
+                                                               SimulateFailedSessionEstablishmentTask, nullptr));
 }
 
 TEST_F(TestCommissioningWindowManager, CheckCommissioningWindowManagerWindowTimeoutWithSessionEstablishmentErrors)
 {
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(CheckCommissioningWindowManagerWindowTimeoutWithSessionEstablishmentErrorsTask);
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(StopEventLoop);
+    EXPECT_SUCCESS(chip::DeviceLayer::PlatformMgr().ScheduleWork(
+        CheckCommissioningWindowManagerWindowTimeoutWithSessionEstablishmentErrorsTask));
+    EXPECT_SUCCESS(chip::DeviceLayer::PlatformMgr().ScheduleWork(StopEventLoop));
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 }
 
@@ -522,8 +525,8 @@ void CheckCommissioningWindowManagerEnhancedWindowTask(intptr_t context)
 
 TEST_F(TestCommissioningWindowManager, TestCheckCommissioningWindowManagerEnhancedWindow)
 {
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(CheckCommissioningWindowManagerEnhancedWindowTask);
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(StopEventLoop);
+    EXPECT_SUCCESS(chip::DeviceLayer::PlatformMgr().ScheduleWork(CheckCommissioningWindowManagerEnhancedWindowTask));
+    EXPECT_SUCCESS(chip::DeviceLayer::PlatformMgr().ScheduleWork(StopEventLoop));
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 }
 
