@@ -907,7 +907,7 @@ CHIP_ERROR WifiInterfaceImpl::StartNetworkScan(chip::ByteSpan ssid, ::ScanCallba
     {
         // Copy the requested SSID to the sl_wifi_ssid_t structure
         chip::MutableByteSpan requestedSsidSpan(requested_ssid.value, sizeof(requested_ssid.value));
-        chip::CopySpanToMutableSpan(ssid, requestedSsidSpan);
+        ReturnOnFailure(chip::CopySpanToMutableSpan(ssid, requestedSsidSpan));
         // Copy the length of the requested SSID to the sl_wifi_ssid_t structure
         requested_ssid.length = static_cast<uint8_t>(ssid.size());
         requested_ssid_ptr    = &requested_ssid;
