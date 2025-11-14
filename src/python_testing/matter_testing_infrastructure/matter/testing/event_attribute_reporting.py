@@ -489,28 +489,28 @@ class AttributeSubscriptionHandler:
 class WildcardAttributeSubscriptionHandler:
     """
     Callback class to handle wildcard attribute subscription reports.
-    
+
     Unlike AttributeSubscriptionHandler which tracks a specific attribute, this class manages
     subscriptions to multiple attributes using wildcard paths (e.g., all attributes in a cluster,
     all attributes on an endpoint, or all attributes across all endpoints/clusters).
-    
+
     It provides queue-based tracking of all attribute updates, allowing tests to verify that
     specific attributes received reports after being modified.
-    
+
     Attributes:
         _subscription: The active subscription transaction object.
         _q: Queue storing tuples of (endpoint_id, cluster_type, attribute_type, value) for received updates.
         _attribute_reports: Dictionary tracking all reports by (endpoint, cluster, attribute) tuple.
         _lock: Threading lock for thread-safe access to internal data structures.
     """
-    
+
     def __init__(self):
         """Initialize the wildcard subscription handler."""
         self._subscription = None
         self._q = queue.Queue()
         self._attribute_reports: dict[tuple, list[Any]] = {}
         self._lock = threading.Lock()
-    
+
     def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
         """
         Callback invoked when an attribute report is received via subscription.
@@ -527,10 +527,10 @@ class WildcardAttributeSubscriptionHandler:
             f"EP{path.Path.EndpointId} {path.ClusterType.__name__ if path.ClusterType else 'None'}.{path.AttributeType.__name__ if path.AttributeType else 'None'}"
         )
         data = transaction.GetAttribute(path)
-        
+
         # Create a unique key for this attribute
         report_key = (path.Path.EndpointId, path.ClusterType, path.AttributeType)
-        
+
         # Queue the report for sequential processing
         self._q.put({
             'endpoint': path.Path.EndpointId,
@@ -538,7 +538,7 @@ class WildcardAttributeSubscriptionHandler:
             'attribute': path.AttributeType,
             'value': data
         })
-        
+
         # Track in history with thread safety
         with self._lock:
             if report_key not in self._attribute_reports:
@@ -547,16 +547,16 @@ class WildcardAttributeSubscriptionHandler:
                 'value': data,
                 'timestamp': datetime.now(timezone.utc)
             })
-        
+
         LOGGER.debug(
             f"[WildcardAttributeSubscriptionHandler] Report received: "
             f"EP{path.Path.EndpointId} {path.ClusterType.__name__}.{path.AttributeType.__name__} = {data}"
         )
-    
-    async def start(self, dev_ctrl, node_id: int, attributes: list, 
-                    fabric_filtered: bool = False, 
-                    min_interval_sec: int = 0, 
-                    max_interval_sec: int = 5, 
+
+    async def start(self, dev_ctrl, node_id: int, attributes: list,
+                    fabric_filtered: bool = False,
+                    min_interval_sec: int = 0,
+                    max_interval_sec: int = 5,
                     keepSubscriptions: bool = False,
                     autoResubscribe: bool = False) -> Any:
         """
@@ -575,7 +575,7 @@ class WildcardAttributeSubscriptionHandler:
         Returns:
             The subscription transaction object.
         """
-        LOGGER.info(f"[WildcardAttributeSubscriptionHandler] Setting up subscription callback BEFORE ReadAttribute")
+        LOGGER.info("[WildcardAttributeSubscriptionHandler] Setting up subscription callback BEFORE ReadAttribute")
         self._subscription = await dev_ctrl.ReadAttribute(
             nodeId=node_id,
             attributes=attributes,
@@ -584,59 +584,59 @@ class WildcardAttributeSubscriptionHandler:
             keepSubscriptions=keepSubscriptions,
             autoResubscribe=autoResubscribe
         )
-        LOGGER.info(f"[WildcardAttributeSubscriptionHandler] ReadAttribute completed, registering callback")
+        LOGGER.info("[WildcardAttributeSubscriptionHandler] ReadAttribute completed, registering callback")
         self._subscription.SetAttributeUpdateCallback(self.__call__)
-        LOGGER.info(f"[WildcardAttributeSubscriptionHandler] Callback registered successfully")
+        LOGGER.info("[WildcardAttributeSubscriptionHandler] Callback registered successfully")
         return self._subscription
-    
+
     def was_attribute_reported(self, endpoint_id: int, cluster_type, attribute_type) -> bool:
         """
         Check if a specific attribute has received at least one report.
-        
+
         Parameters:
             endpoint_id: The endpoint ID to check.
             cluster_type: The cluster class type.
             attribute_type: The attribute class type.
-            
+
         Returns:
             True if the attribute has been reported, False otherwise.
         """
         report_key = (endpoint_id, cluster_type, attribute_type)
         with self._lock:
             return report_key in self._attribute_reports and len(self._attribute_reports[report_key]) > 0
-    
+
     def get_attribute_report_count(self, endpoint_id: int, cluster_type, attribute_type) -> int:
         """
         Get the number of reports received for a specific attribute.
-        
+
         Parameters:
             endpoint_id: The endpoint ID to check.
             cluster_type: The cluster class type.
             attribute_type: The attribute class type.
-            
+
         Returns:
             Number of reports received for this attribute.
         """
         report_key = (endpoint_id, cluster_type, attribute_type)
         with self._lock:
             return len(self._attribute_reports.get(report_key, []))
-    
+
     def get_all_reported_attributes(self) -> list[tuple]:
         """
         Get a list of all (endpoint, cluster, attribute) tuples that have received reports.
-        
+
         Returns:
             List of tuples (endpoint_id, cluster_type, attribute_type).
         """
         with self._lock:
             return list(self._attribute_reports.keys())
-    
+
     def reset(self) -> None:
         """Reset all tracking data, clearing the queue and report history."""
         with self._lock:
             self._attribute_reports.clear()
         self.flush_reports()
-    
+
     def flush_reports(self) -> None:
         """Flush the entire queue, discarding all pending reports."""
         while True:
@@ -644,17 +644,17 @@ class WildcardAttributeSubscriptionHandler:
                 self._q.get(block=False)
             except queue.Empty:
                 return
-    
+
     @property
     def attribute_queue(self) -> queue.Queue:
         """Get the internal queue of attribute reports."""
         return self._q
-    
+
     @property
     def subscription(self):
         """Get the underlying subscription transaction object."""
         return self._subscription
-    
+
     def shutdown(self) -> None:
         """Shutdown the subscription."""
         if self._subscription:

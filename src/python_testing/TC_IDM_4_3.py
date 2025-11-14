@@ -228,10 +228,10 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
                     # Skip attributes known to not send subscription reports even after successful writes
                     # These attributes have special reporting behavior per device implementation
                     ATTRIBUTES_WITH_NO_SUBSCRIPTION_REPORTS = [
-                        Clusters.BasicInformation.Attributes.LocalConfigDisabled, 
+                        Clusters.BasicInformation.Attributes.LocalConfigDisabled,
                         Clusters.Binding.Attributes.Binding,
-                        Clusters.GeneralCommissioning.Attributes.Breadcrumb,  
-                        Clusters.TimeFormatLocalization.Attributes.HourFormat,  
+                        Clusters.GeneralCommissioning.Attributes.Breadcrumb,
+                        Clusters.TimeFormatLocalization.Attributes.HourFormat,
                     ]
                     if attribute in ATTRIBUTES_WITH_NO_SUBSCRIPTION_REPORTS:
                         logging.debug(f"{test_step}: Skipping {attribute.__name__} - known to not send subscription reports")
@@ -357,12 +357,12 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         logging.info(f"{test_step}: Total unique attributes with reports: {len(all_reported)}")
 
         asserts.assert_less_equal(
-            len(missing_reports), 0, 
+            len(missing_reports), 0,
             f"{test_step}: Missing reports for {len(missing_reports)} attribute(s): {', '.join(missing_reports)}")
         asserts.assert_greater(
-            verified_count, 0, 
+            verified_count, 0,
             f"{test_step}: No change reports verified, expected {changed_count} reports")
-        
+
         return verified_count
 
     @async_test_body
@@ -878,7 +878,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         num_attributes = len(cluster_data)
         asserts.assert_greater(num_attributes, 5,
                                "Should receive multiple attributes in priming report for wildcard subscription")
-        
+
         # Flush priming reports from handler queue before making changes
         handler_step8.flush_reports()
 
@@ -1007,7 +1007,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
         # Flush priming reports from handler queue before making changes
         handler_step10.flush_reports()
-        
+
         # Change writable attributes and verify change reports per test spec
         # Skip problematic clusters we identified earlier
         changed_count = await self.change_writable_attributes_and_verify_reports(
@@ -1066,7 +1066,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
         # Flush priming reports from handler queue before making changes
         handler_step11.flush_reports()
-        
+
         # Change writable attributes and verify change reports per test spec
         changed_count = await self.change_writable_attributes_and_verify_reports(
             handler_step11, priming_data, "Step 11", clusters_to_skip=CLUSTERS_WITH_SUBSCRIPTION_ISSUES
