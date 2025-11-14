@@ -791,6 +791,8 @@ tests:
       response:
           constraints:
               type: int8u
+              minValue: 1
+              maxValue: 255
 
     - label: "Step 56: TH reads the ActivePresetHandle attribute from the DUT"
       PICS: TSTAT.S.F08
