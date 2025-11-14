@@ -37,7 +37,7 @@
 
 using namespace chip::System;
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && !CHIP_SYSTEM_CONFIG_USE_DISPATCH
+#if !CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
 namespace chip {
 namespace System {
@@ -54,19 +54,10 @@ namespace {
 class TestSystemWakeEvent : public ::testing::Test
 {
 public:
-    void SetUp()
-    {
-        EXPECT_SUCCESS(mSystemLayer.Init());
-        EXPECT_SUCCESS(mWakeEvent.Open(mSystemLayer));
-    }
+    void SetUp() { EXPECT_SUCCESS(mWakeEvent.Open()); }
 
-    void TearDown()
-    {
-        mWakeEvent.Close(mSystemLayer);
-        mSystemLayer.Shutdown();
-    }
+    void TearDown() { mWakeEvent.Close(); }
 
-    ::chip::System::LayerImpl mSystemLayer;
     WakeEvent mWakeEvent;
     fd_set mReadSet;
     fd_set mWriteSet;
@@ -142,14 +133,13 @@ TEST_F(TestSystemWakeEvent, TestBlockingSelect)
 
 TEST_F(TestSystemWakeEvent, TestClose)
 {
-    mWakeEvent.Close(mSystemLayer);
-
+    mWakeEvent.Close();
     const auto notifFD = WakeEventTest::GetReadFD(mWakeEvent);
 
     // Check that Close() has cleaned up itself and reopen is possible
-    EXPECT_EQ(mWakeEvent.Open(mSystemLayer), CHIP_NO_ERROR);
+    EXPECT_EQ(mWakeEvent.Open(), CHIP_NO_ERROR);
     EXPECT_LT(notifFD, 0);
 }
 } // namespace
 
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && !CHIP_SYSTEM_CONFIG_USE_DISPATCH
+#endif // !CHIP_SYSTEM_CONFIG_USE_DISPATCH
