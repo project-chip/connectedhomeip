@@ -256,18 +256,12 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/electrical-power-measurement-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/zone-management-cluster.xml \
                   "
-            - name: Build Apps
+            - name: Build Apps (part 1)
               id: build_with_cache
               continue-on-error: true
               env:
                   CCACHE_DIR: "${{ github.workspace }}/.ccache"
               run: |
-                  ./scripts/run_in_build_env.sh \
-                     "./scripts/build_python.sh \
-                        --install_virtual_env out/venv \
-                        --include_pytest_deps yes \
-                        $([ "${DISABLE_CCACHE}" != "true" ] && echo --enable-ccache) \
-                     "
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --target linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT} \
@@ -276,6 +270,20 @@ jobs:
                         --target linux-x64-ota-provider-${BUILD_VARIANT} \
                         --target linux-x64-ota-requestor-${BUILD_VARIANT} \
                         --target linux-x64-tv-app-${BUILD_VARIANT} \
+                        --pw-command-launcher=ccache \
+                        build \
+                        --copy-artifacts-to objdir-clone \
+                     "
+            - name: Clean out
+              run: rm -rf out/
+            - name: Build Apps (part 2)
+              id: build_with_cache
+              continue-on-error: true
+              env:
+                  CCACHE_DIR: "${{ github.workspace }}/.ccache"
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
                         --target linux-x64-bridge-${BUILD_VARIANT} \
                         --target linux-x64-lit-icd-${BUILD_VARIANT} \
                         --target linux-x64-microwave-oven-${BUILD_VARIANT} \
@@ -287,59 +295,41 @@ jobs:
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
-            - name: Retry build without cache on master
-              if: ${{ steps.build_with_cache.outcome == 'failure' && github.ref == 'refs/heads/master' }}
+            - name: Clean out
+              run: rm -rf out/
+            - name: Build Python
+              id: build_with_cache
+              continue-on-error: true
               env:
                   CCACHE_DIR: "${{ github.workspace }}/.ccache"
               run: |
-                  echo "CCACHE_DISABLE=1" >> $GITHUB_ENV
-                  echo "DISABLE_CCACHE=true" >> $GITHUB_ENV
-                  rm -rf "${{ github.workspace }}/.ccache" || true
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build_python.sh \
                         --install_virtual_env out/venv \
                         --include_pytest_deps yes \
+                        $([ "${DISABLE_CCACHE}" != "true" ] && echo --enable-ccache) \
                      "
-                  ./scripts/run_in_build_env.sh \
-                     "./scripts/build/build_examples.py \
-                        --target linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT} \
-                        --target linux-x64-all-clusters-${BUILD_VARIANT} \
-                        --target linux-x64-lock-${BUILD_VARIANT} \
-                        --target linux-x64-ota-provider-${BUILD_VARIANT} \
-                        --target linux-x64-ota-requestor-${BUILD_VARIANT} \
-                        --target linux-x64-tv-app-${BUILD_VARIANT} \
-                        --target linux-x64-bridge-${BUILD_VARIANT} \
-                        --target linux-x64-lit-icd-${BUILD_VARIANT} \
-                        --target linux-x64-microwave-oven-${BUILD_VARIIANT} \
-                        --target linux-x64-rvc-${BUILD_VARIANT} \
-                        --target linux-x64-network-manager-${BUILD_VARIANT} \
-                        --target linux-x64-energy-gateway-${BUILD_VARIIANT} \
-                        --target linux-x64-energy-management-${BUILD_VARIANT} \
-                        build \
-                        --copy-artifacts-to objdir-clone \
-                     "
-
             - name: Run Tests using the python parser sending commands to chip-tool
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
                      --runner chip_tool_python \
-                     --chip-tool ./out/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
+                     --chip-tool ./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
-                     --all-clusters-app ./out/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
-                     --lock-app ./out/linux-x64-lock-${BUILD_VARIANT}/chip-lock-app \
-                     --ota-provider-app ./out/linux-x64-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
-                     --ota-requestor-app ./out/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
-                     --tv-app ./out/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
-                     --bridge-app ./out/linux-x64-bridge-${BUILD_VARIANT}/chip-bridge-app \
-                     --lit-icd-app ./out/linux-x64-lit-icd-${BUILD_VARIANT}/lit-icd-app \
-                     --microwave-oven-app ./out/linux-x64-microwave-oven-${BUILD_VARIANT}/chip-microwave-oven-app \
-                     --rvc-app ./out/linux-x64-rvc-${BUILD_VARIANT}/chip-rvc-app \
-                     --network-manager-app ./out/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
-                     --energy-gateway-app ./out/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
-                     --energy-management-app ./out/linux-x64-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
+                     --all-clusters-app ./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --lock-app ./objdir-clone/linux-x64-lock-${BUILD_VARIANT}/chip-lock-app \
+                     --ota-provider-app ./objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
+                     --ota-requestor-app ./objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
+                     --tv-app ./objdir-clone/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
+                     --bridge-app ./objdir-clone/linux-x64-bridge-${BUILD_VARIANT}/chip-bridge-app \
+                     --lit-icd-app ./objdir-clone/linux-x64-lit-icd-${BUILD_VARIANT}/lit-icd-app \
+                     --microwave-oven-app ./objdir-clone/linux-x64-microwave-oven-${BUILD_VARIANT}/chip-microwave-oven-app \
+                     --rvc-app ./objdir-clone/linux-x64-rvc-${BUILD_VARIANT}/chip-rvc-app \
+                     --network-manager-app ./objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
+                     --energy-gateway-app ./objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
+                     --energy-management-app ./objdir-clone/linux-x64-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
                   "
 
             - name: Run purposeful failure tests using the python parser sending commands to chip-tool
@@ -348,13 +338,13 @@ jobs:
                   "./scripts/tests/run_test_suite.py \
                      --runner chip_tool_python \
                      --include-tags PURPOSEFUL_FAILURE \
-                     --chip-tool ./out/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
+                     --chip-tool ./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
                      run \
                      --iterations 1 \
                      --expected-failures 3 \
                      --keep-going \
                      --test-timeout-seconds 120 \
-                     --all-clusters-app ./out/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --all-clusters-app ./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
                   "
 
             - name: Run BLE-WiFi commissioning test
@@ -368,11 +358,11 @@ jobs:
                   "./scripts/tests/run_test_suite.py \
                      --runner chip_tool_python \
                      --target TestOperationalState \
-                     --chip-tool ./out/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
+                     --chip-tool ./objdir-clone/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
-                     --all-clusters-app ./out/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --all-clusters-app ./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
                      --ble-wifi \
                   "
 
@@ -391,18 +381,18 @@ jobs:
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
-                     --all-clusters-app ./out/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
-                     --lock-app ./out/linux-x64-lock-${BUILD_VARIANT}/chip-lock-app \
-                     --ota-provider-app ./out/linux-x64-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
-                     --ota-requestor-app ./out/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
-                     --tv-app ./out/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
-                     --bridge-app ./out/linux-x64-bridge-${BUILD_VARIANT}/chip-bridge-app \
-                     --lit-icd-app ./out/linux-x64-lit-icd-${BUILD_VARIANT}/lit-icd-app \
-                     --microwave-oven-app ./out/linux-x64-microwave-oven-${BUILD_VARIANT}/chip-microwave-oven-app \
-                     --rvc-app ./out/linux-x64-rvc-${BUILD_VARIANT}/chip-rvc-app \
-                     --network-manager-app ./out/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
-                     --energy-gateway-app ./out/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
-                     --energy-management-app ./out/linux-x64-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
+                     --all-clusters-app ./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --lock-app ./objdir-clone/linux-x64-lock-${BUILD_VARIANT}/chip-lock-app \
+                     --ota-provider-app ./objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
+                     --ota-requestor-app ./objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
+                     --tv-app ./objdir-clone/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
+                     --bridge-app ./objdir-clone/linux-x64-bridge-${BUILD_VARIANT}/chip-bridge-app \
+                     --lit-icd-app ./objdir-clone/linux-x64-lit-icd-${BUILD_VARIANT}/lit-icd-app \
+                     --microwave-oven-app ./objdir-clone/linux-x64-microwave-oven-${BUILD_VARIANT}/chip-microwave-oven-app \
+                     --rvc-app ./objdir-clone/linux-x64-rvc-${BUILD_VARIANT}/chip-rvc-app \
+                     --network-manager-app ./objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
+                     --energy-gateway-app ./objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
+                     --energy-management-app ./objdir-clone/linux-x64-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
                   "
             - name: Run Tests using matter-repl (including slow)
               if: github.event_name == 'push'
@@ -413,18 +403,18 @@ jobs:
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
-                     --all-clusters-app ./out/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
-                     --lock-app ./out/linux-x64-lock-${BUILD_VARIANT}/chip-lock-app \
-                     --ota-provider-app ./out/linux-x64-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
-                     --ota-requestor-app ./out/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
-                     --tv-app ./out/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
-                     --bridge-app ./out/linux-x64-bridge-${BUILD_VARIANT}/chip-bridge-app \
-                     --lit-icd-app ./out/linux-x64-lit-icd-${BUILD_VARIANT}/lit-icd-app \
-                     --microwave-oven-app ./out/linux-x64-microwave-oven-${BUILD_VARIANT}/chip-microwave-oven-app \
-                     --rvc-app ./out/linux-x64-rvc-${BUILD_VARIANT}/chip-rvc-app \
-                     --network-manager-app ./out/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
-                     --energy-gateway-app ./out/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
-                     --energy-management-app ./out/linux-x64-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
+                     --all-clusters-app ./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --lock-app ./objdir-clone/linux-x64-lock-${BUILD_VARIANT}/chip-lock-app \
+                     --ota-provider-app ./objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
+                     --ota-requestor-app ./objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
+                     --tv-app ./objdir-clone/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
+                     --bridge-app ./objdir-clone/linux-x64-bridge-${BUILD_VARIANT}/chip-bridge-app \
+                     --lit-icd-app ./objdir-clone/linux-x64-lit-icd-${BUILD_VARIANT}/lit-icd-app \
+                     --microwave-oven-app ./objdir-clone/linux-x64-microwave-oven-${BUILD_VARIANT}/chip-microwave-oven-app \
+                     --rvc-app ./objdir-clone/linux-x64-rvc-${BUILD_VARIANT}/chip-rvc-app \
+                     --network-manager-app ./objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
+                     --energy-gateway-app ./objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
+                     --energy-management-app ./objdir-clone/linux-x64-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
                   "
             - name: Uploading core files
               uses: actions/upload-artifact@v5
