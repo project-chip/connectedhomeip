@@ -833,7 +833,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             min_interval_sec=1,
             max_interval_sec=1
         )
-        await asyncio.sleep(1)
+        # await asyncio.sleep(1)
 
         # ------------------------------------------------------------------------------------
         # [STEP_6]: Step #6.0 - Controller sends AnnounceOTAProvider command
@@ -844,81 +844,59 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         logger.info(f'{step_number_s6}: Step #6.0 - cmd AnnounceOTAProvider response: {resp_announce}.')
 
         # ------------------------------------------------------------------------------------
-        # [STEP_6]: Step #6.2 - Track OTA StateTransition event: should stay Idle if UpdateAvailable version is same or lower
-        # StateTransition event matcher: Idle > Querying > Idle
+        # [STEP_6]: Step #6.2 matcher function to track OTA StateTransition event (should stay Idle if UpdateAvailable version is same or lower)
+        #     Tracks state transitions events:
+        #     First event: Idle > Querying
+        #     Second event: Querying > Idle
         # ------------------------------------------------------------------------------------
         logger.info(
             f'{step_number_s6}: Step #6.1 - Create a subscription for StateTransition event '
             '(should stay Idle if UpdateAvailable version is same or lower) '
             'before AnnounceOTAProvider to avoid missing OTA events')
 
-        state_sequence_notavailable = []  # Full OTA state flow
+        # # ------------------------------------------------------------------------------------
+        # # [STEP_6]: Step #6.3 - Start tasks to track OTA events:
+        # # StateTransition two events: Idle > Querying, Querying > Idle, ensuring no image transfer occurs if UpdateAvailable version is same or lower.
+        # # ------------------------------------------------------------------------------------
 
-        def matcher_idle_state_no_download(report):
-            """
-            Step #6.2 matcher function to track OTA StateTransition event (should stay Idle if UpdateAvailable version is same or lower)
-            Tracks state transitions events:
-            First event: Idle > Querying
-            Second event: Querying > Idle
-            Records all observed transitions for full visibility and validates that no image transfer occurs when version is same or lower.
-            """
-            nonlocal state_sequence_notavailable
-            val = report.Data.newState
-            prev_state = report.Data.previousState
+        # Transition 1: Idle > Querying
+        event1 = subscription_state_no_download.wait_for_event_report(
+            Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition,
+            timeout_sec=30
+        )
+        logger.info(f"{step_number_s6}: Event 1: {event1}")
 
-            if val is None:
-                return False
+        self.verify_state_transition_event(
+            event1,
+            Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
+            Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
+        )
 
-            transition = (prev_state, val)
-            state_sequence_notavailable.append(transition)
+        # Transition 2: Querying > Idle
+        event2 = subscription_state_no_download.wait_for_event_report(
+            Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition,
+            timeout_sec=30
+        )
+        logger.info(f"{step_number_s6}: Event 2: {event2}")
 
-            expected = [
-                (Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
-                 Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying),
-                (Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying,
-                 Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle),
-            ]
+        self.verify_state_transition_event(
+            event2,
+            Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying,
+            Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
+        )
 
-            # Validate the last two transitions
-            if len(state_sequence_notavailable) >= 2:
-                if state_sequence_notavailable[-2:] == expected:
-                    logger.info(
-                        f"{step_number_s6}: Step #6.2 - Validated StateTransition events: Idle > Querying (first event) > Querying > Idle (second event)")
-                    return True
-
-            return False
-
-        # ------------------------------------------------------------------------------------
-        # [STEP_6]: Step #6.3 - Start tasks to track OTA events:
-        # StateTransition two events: Idle > Querying, Querying > Idle, ensuring no image transfer occurs if UpdateAvailable version is same or lower.
-        # ------------------------------------------------------------------------------------
-        try:
-            timeout_total = 60  # 1 min
-            start_time = time.time()
-
-            while time.time() - start_time < timeout_total:
-                try:
-                    report = subscription_state_no_download.get_event_from_queue(block=True, timeout=10)
-                    matcher_idle_state_no_download(report)
-                except queue.Empty:
-                    continue
-        finally:
-            logger.info(f'{step_number_s6}: Step #6.3 - StateTransition two events: '
-                        '(1) Idle > Querying, (2) Querying > Idle, if UpdateAvailable version is same or lower, '
-                        'successfully observed.')
-            await subscription_state_no_download.cancel()
+        await subscription_state_no_download.cancel()
 
         # ------------------------------------------------------------------------------------
         # [STEP_6]: Step # 6.4 - Verify NO image transfer occurs from TH/OTA-P to DUT if UpdateAvailable version is same or lower
         # ------------------------------------------------------------------------------------
-        logger.info(
-            f'{step_number_s6}: Step #6.4 - Full OTA StateTransition (if UpdateAvailable version is same or lower) observed: {state_sequence_notavailable}')
+        logger.info(f"{step_number_s6}: No image transfer occurred (expected).")
 
         # ------------------------------------------------------------------------------------
         # [STEP_6]: Step #6.5 - Close Provider Process
         # ------------------------------------------------------------------------------------
-        logger.info(
-            f'{step_number_s6}: Step #6.5 - Closed Provider.')
+
+        logger.info(f'{step_number_s6}: Step #6.5 - Closed Provider.')
 
         # Kill Provider process
         self.current_provider_app_proc.terminate()
@@ -975,68 +953,43 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
         # ------------------------------------------------------------------------------------
         # [STEP_7]: Step #7.2 -  Track OTA StateTransition event: should stay Idle due to invalid BDX ImageURI in UpdateAvailable.
-        # StateTransition event matcher: Idle > Querying (first event) > Querying > Idle (second event)
+        # Tracks state transitions events:
+        #     First event: Idle > Querying
+        #     Second event: Querying > Idle
         # ------------------------------------------------------------------------------------
-        state_sequence_notavailable = []  # Full OTA state flow
 
-        def matcher_idle_state_no_download_invalid_uri(report):
-            """
-            Step #7.2 matcher function to track OTA StateTransition event (should stay Idle due to invalid BDX ImageURI in UpdateAvailable)
-            Tracks state transitions events:
-            First event: Idle > Querying
-            Second event: Querying > Idle
-            Records every observed transition and validates that no image transfer occurs due to invalid BDX ImageURI.
-            """
-            nonlocal state_sequence_notavailable
-            val = report.Data.newState
-            prev_state = report.Data.previousState
+        # Transition 1: Idle > Querying
+        event1 = subscription_state_invalid_uri.wait_for_event_report(
+            Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition,
+            timeout_sec=30
+        )
+        logger.info(f"{step_number_s7}: Event 1: {event1}")
 
-            if val is None:
-                return False
+        self.verify_state_transition_event(
+            event1,
+            Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
+            Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
+        )
 
-            transition = (prev_state, val)
-            state_sequence_notavailable.append(transition)
+        # Transition 2: Querying > Idle
+        event2 = subscription_state_invalid_uri.wait_for_event_report(
+            Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition,
+            timeout_sec=30
+        )
+        logger.info(f"{step_number_s7}: Event 2: {event2}")
 
-            expected = [
-                (Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle,
-                 Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying),
-                (Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying,
-                 Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle),
-            ]
+        self.verify_state_transition_event(
+            event2,
+            Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying,
+            Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
+        )
 
-            # Validate the last two transitions
-            if len(state_sequence_notavailable) >= 2:
-                if state_sequence_notavailable[-2:] == expected:
-                    logger.info(
-                        f"{step_number_s7}: Step #7.2 - Validated StateTransition events: Idle > Querying (first event) > Querying > Idle (second event)")
-                    return True
-
-            return False
-
-        # ------------------------------------------------------------------------------------
-        # [STEP_7]: Step #7.3 - Start tasks to track OTA events:
-        # StateTransition two events: Idle > Querying, Querying > Idle, ensuring no image transfer occurs due to invalid BDX ImageURI.
-        # ------------------------------------------------------------------------------------
-        try:
-            timeout_total = 60  # 1 min
-            start_time = time.time()
-
-            while time.time() - start_time < timeout_total:
-                try:
-                    report = subscription_state_invalid_uri.get_event_from_queue(block=True, timeout=10)
-                    matcher_idle_state_no_download_invalid_uri(report)
-                except queue.Empty:
-                    continue
-        finally:
-            logger.info(f'{step_number_s7}: Step #7.3 - StateTransition two events: '
-                        '(1) Idle > Querying, (2) Querying > Idle, due to invalid BDX ImageURI, '
-                        'successfully observed.')
-            await subscription_state_invalid_uri.cancel()
+        await subscription_state_invalid_uri.cancel()
 
         # ------------------------------------------------------------------------------------
         # [STEP_7]: Step # 7.4 - Verify NO image transfer occurs from TH/OTA-P to DUT due invalid BDX ImageURI in UpdateAvailable.
         # ------------------------------------------------------------------------------------
-        logger.info(f'{step_number_s7}: Step #7.4 - Full OTA StateTransition (invalid BDX ImageURI) observed: {state_sequence_notavailable}')
+        logger.info(f"{step_number_s7}: No image transfer occurred due to invalid BDX URI (expected).")
 
         # ------------------------------------------------------------------------------------
         # [STEP_7]: Step #7.5 - Close Provider Process
