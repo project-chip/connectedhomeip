@@ -19,7 +19,6 @@
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/clusters/testing/ClusterTester.h>
 #include <app/clusters/testing/ValidateGlobalAttributes.h>
-#include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/GroupKeyManagement/ClusterId.h>
@@ -35,7 +34,6 @@
 #include <lib/support/ReadOnlyBuffer.h>
 =======
 #include <lib/core/CHIPError.h>
-#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/ReadOnlyBuffer.h>
 
 >>>>>>> b956206b0a (Add command testing)
