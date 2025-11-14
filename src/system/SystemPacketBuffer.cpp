@@ -589,10 +589,17 @@ PacketBufferHandle PacketBufferHandle::New(size_t aAvailableSize, uint16_t aRese
     }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM
+    // The buffer is allocated using kMaxAllocSize instead of the input-specified allocation size.
+    // This cast is safe because kLargeBufMaxSizeWithoutReserve has been statically asserted to fit in uint16_t.
+    lPacket = static_cast<PacketBuffer *>(
+        pbuf_alloc(PBUF_RAW, static_cast<uint16_t>(PacketBuffer::kMaxAllocSize), CHIP_SYSTEM_PACKETBUFFER_LWIP_PBUF_TYPE));
+#else
     // This cast is safe because lAllocSize is no larger than
     // kMaxSizeWithoutReserve, which fits in uint16_t.
     lPacket = static_cast<PacketBuffer *>(
         pbuf_alloc(PBUF_RAW, static_cast<uint16_t>(lAllocSize), CHIP_SYSTEM_PACKETBUFFER_LWIP_PBUF_TYPE));
+#endif
 
     SYSTEM_STATS_UPDATE_LWIP_PBUF_COUNTS();
 
