@@ -205,16 +205,31 @@ TEST_F(TestOTARequestorCluster, AnnounceOtaProviderCommandTest)
     OTARequestorCluster cluster(kTestEndpointId, &otaRequestor);
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-    chip::Test::ClusterTester tester(cluster);
+    // Construct the payload.
     OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Type payload;
     payload.providerNodeID     = 1234;
     payload.vendorID           = static_cast<VendorId>(4321);
     payload.announcementReason = OtaSoftwareUpdateRequestor::AnnouncementReasonEnum::kUpdateAvailable;
     payload.endpoint           = 5;
 
-    auto result = tester.Invoke(OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id, payload);
-    EXPECT_EQ(result.status, std::nullopt);
+    app::DataModel::InvokeRequest request = { .path = { kTestEndpointId, OtaSoftwareUpdateRequestor::Id,
+                                                        OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id } };
 
+    uint8_t payloadBuffer[1024];
+    TLV::TLVWriter writer;
+    writer.Init(payloadBuffer);
+    ASSERT_EQ(payload.Encode(writer, TLV::AnonymousTag()), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+    TLV::TLVReader reader;
+    reader.Init(payloadBuffer, writer.GetLengthWritten());
+    ASSERT_EQ(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()), CHIP_NO_ERROR);
+
+    // Invoke the command.
+    auto result = cluster.InvokeCommand(request, reader, nullptr);
+    EXPECT_FALSE(result.has_value());
+
+    // Check that the payload was decoded correctly.
     OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType forwarded_payload =
         otaRequestor.GetLastAnnounceCommandPayload();
     EXPECT_EQ(forwarded_payload.providerNodeID, static_cast<NodeId>(1234));
@@ -230,7 +245,7 @@ TEST_F(TestOTARequestorCluster, AnnounceOtaProviderCommandInvalidMetadataTest)
     OTARequestorCluster cluster(kTestEndpointId, &otaRequestor);
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-    chip::Test::ClusterTester tester(cluster);
+    // Construct the payload.
     OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Type payload;
     payload.providerNodeID     = 1234;
     payload.vendorID           = static_cast<VendorId>(4321);
@@ -240,9 +255,55 @@ TEST_F(TestOTARequestorCluster, AnnounceOtaProviderCommandInvalidMetadataTest)
     uint8_t bytes[513]      = { '\0' };
     payload.metadataForNode = MakeOptional(ByteSpan(bytes));
 
-    auto result = tester.Invoke(OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id, payload);
-    ASSERT_TRUE(result.status.has_value());
-    EXPECT_EQ(result.status.value(), DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::InvalidCommand));
+    app::DataModel::InvokeRequest request = { .path = { kTestEndpointId, OtaSoftwareUpdateRequestor::Id,
+                                                        OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id } };
+
+    uint8_t payloadBuffer[1024];
+    TLV::TLVWriter writer;
+    writer.Init(payloadBuffer);
+    ASSERT_EQ(payload.Encode(writer, TLV::AnonymousTag()), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+    TLV::TLVReader reader;
+    reader.Init(payloadBuffer, writer.GetLengthWritten());
+    ASSERT_EQ(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()), CHIP_NO_ERROR);
+
+    // Invoke the command.
+    auto result = cluster.InvokeCommand(request, reader, nullptr);
+    ASSERT_TRUE(result.has_value());
+    EXPECT_EQ(result.value(), DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::InvalidCommand));
+}
+
+TEST_F(TestOTARequestorCluster, AnnounceCommandWithNoRequestorInterfaceReturnsError)
+{
+    chip::Test::TestServerClusterContext context;
+    OTARequestorCluster cluster(kTestEndpointId, nullptr);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    // Construct the payload.
+    OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Type payload;
+    payload.providerNodeID     = 1234;
+    payload.vendorID           = static_cast<VendorId>(4321);
+    payload.announcementReason = OtaSoftwareUpdateRequestor::AnnouncementReasonEnum::kUpdateAvailable;
+    payload.endpoint           = 5;
+
+    app::DataModel::InvokeRequest request = { .path = { kTestEndpointId, OtaSoftwareUpdateRequestor::Id,
+                                                        OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id } };
+
+    uint8_t payloadBuffer[1024];
+    TLV::TLVWriter writer;
+    writer.Init(payloadBuffer);
+    ASSERT_EQ(payload.Encode(writer, TLV::AnonymousTag()), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+    TLV::TLVReader reader;
+    reader.Init(payloadBuffer, writer.GetLengthWritten());
+    ASSERT_EQ(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()), CHIP_NO_ERROR);
+
+    // Invoke the command.
+    auto result = cluster.InvokeCommand(request, reader, nullptr);
+    ASSERT_TRUE(result.has_value());
+    EXPECT_TRUE(result->IsError());
 }
 
 TEST_F(TestOTARequestorCluster, ReadAttributesTest)
@@ -551,24 +612,6 @@ TEST_F(TestOTARequestorCluster, ReadsWithNoRequestorInterfaceReturnErrors)
     // Non-existent attribute should be handled the same.
     uint32_t nonExistentAttribute;
     EXPECT_NE(tester.ReadAttribute(0xFFFF, nonExistentAttribute), CHIP_NO_ERROR);
-}
-
-TEST_F(TestOTARequestorCluster, CommandsWithNoRequestorInterfaceReturnErrors)
-{
-    chip::Test::TestServerClusterContext context;
-    OTARequestorCluster cluster(kTestEndpointId, nullptr);
-    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-
-    chip::Test::ClusterTester tester(cluster);
-    OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Type payload;
-    payload.providerNodeID     = 1234;
-    payload.vendorID           = static_cast<VendorId>(4321);
-    payload.announcementReason = OtaSoftwareUpdateRequestor::AnnouncementReasonEnum::kUpdateAvailable;
-    payload.endpoint           = 5;
-
-    auto result = tester.Invoke(OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Id, payload);
-    ASSERT_TRUE(result.status.has_value());
-    EXPECT_TRUE(result.status->IsError());
 }
 
 TEST_F(TestOTARequestorCluster, WriteDefaultProvidersList)

@@ -245,10 +245,10 @@ private:
     app::ServerClusterInterface & mCluster;
 
     // Buffer size for TLV encoding/decoding of command payloads.
-    // 1024 bytes was chosen as a conservative upper bound for typical command payloads in tests.
+    // 256 bytes was chosen as a conservative upper bound for typical command payloads in tests.
     // All command payloads used in tests must fit within this buffer; tests with larger payloads will fail.
     // If protocol or test requirements change, this value may need to be increased.
-    static constexpr size_t kTlvBufferSize = 1024;
+    static constexpr size_t kTlvBufferSize = 256;
 
     app::Testing::MockCommandHandler mHandler;
     uint8_t mTlvBuffer[kTlvBufferSize];
