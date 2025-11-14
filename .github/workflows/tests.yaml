@@ -912,13 +912,6 @@ jobs:
                   platform: linux
                   bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
 
-            - name: Try to ensure the directories for core dumping exist and we
-                  can write them.
-              run: |
-                  mkdir /tmp/cores || true
-                  sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
-                  mkdir objdir-clone || true
-
             - name: Set up a IPV6 known envionment
               uses: ./.github/actions/add-ipv6
 
