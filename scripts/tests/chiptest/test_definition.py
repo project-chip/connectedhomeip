@@ -26,7 +26,6 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum, auto
 
-
 TEST_NODE_ID = '0x12344321'
 TEST_DISCRIMINATOR = '3840'
 TEST_PASSCODE = '20202021'
