@@ -136,3 +136,44 @@ TEST_F(TestAdministratorCommissioningCluster, TestCommands)
 }
 
 } // namespace
+
+TEST_F(TestAdministratorCommissioningCluster, TestReadAttributesDefaultValues)
+{
+    AdministratorCommissioningCluster cluster(kRootEndpointId, {});
+    chip::Test::ClusterTester tester(cluster);
+
+    // Test reading FeatureMap (base class)
+    {
+        Attributes::FeatureMap::TypeInfo::Type feature;
+        ASSERT_EQ(tester.ReadAttribute(Attributes::FeatureMap::Id, feature), CHIP_NO_ERROR);
+        ASSERT_EQ(feature, 0u);
+    }
+
+    // Revision
+    {
+        uint16_t revision;
+        ASSERT_EQ(tester.ReadAttribute(Attributes::ClusterRevision::Id, revision), CHIP_NO_ERROR);
+        ASSERT_EQ(revision, 1u);
+    }
+
+    // Read default value of WindowStatus
+    {
+        Attributes::WindowStatus::TypeInfo::Type winStatus;
+        ASSERT_EQ(tester.ReadAttribute(Attributes::WindowStatus::Id, winStatus), CHIP_NO_ERROR);
+        EXPECT_EQ(winStatus, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);
+    }
+
+    // AdminFabricIndex
+    {
+        Attributes::AdminFabricIndex::TypeInfo::Type adminFabric;
+        ASSERT_EQ(tester.ReadAttribute(Attributes::AdminFabricIndex::Id, adminFabric), CHIP_NO_ERROR);
+        ASSERT_TRUE(adminFabric.IsNull());
+    }
+
+    // AdminVendorId
+    {
+        Attributes::AdminVendorId::TypeInfo::Type adminVendor;
+        ASSERT_EQ(tester.ReadAttribute(Attributes::AdminVendorId::Id, adminVendor), CHIP_NO_ERROR);
+        ASSERT_TRUE(adminVendor.IsNull());
+    }
+}
