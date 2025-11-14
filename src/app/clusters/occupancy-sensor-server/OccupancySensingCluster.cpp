@@ -147,16 +147,8 @@ DataModel::ActionReturnStatus OccupancySensingCluster::ReadAttribute(const DataM
     case Attributes::PIROccupiedToUnoccupiedDelay::Id:
     case Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id:
     case Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Id:
-        if (!mHasHoldTime)
-        {
-            return Protocols::InteractionModel::Status::UnsupportedAttribute;
-        }
         return encoder.Encode(mHoldTime);
     case Attributes::HoldTimeLimits::Id:
-        if (!mHasHoldTime)
-        {
-            return Protocols::InteractionModel::Status::UnsupportedAttribute;
-        }
         return encoder.Encode(mHoldTimeLimits);
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
