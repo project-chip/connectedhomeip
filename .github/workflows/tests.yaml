@@ -967,12 +967,14 @@ jobs:
                   docs/development_controllers/matter-repl/Matter_Multi_Fabric_Commissioning.ipynb \
                   "
 
-            - name: Breakpoint if tests failed
-              if: failure()
-              uses: namespacelabs/breakpoint-action@v0
-              with:
-                duration: 30m
-                authorized-users: andy31415
+            # Example debug breakpoint:
+            #
+            # - name: Breakpoint if tests failed
+            #   if: failure()
+            #   uses: namespacelabs/breakpoint-action@v0
+            #   with:
+            #     duration: 30m
+            #     authorized-users: andy31415
 
     repl_tests_darwin:
         name: REPL Tests - Darwin (Build Only)
