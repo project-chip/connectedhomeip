@@ -528,6 +528,9 @@ public:
 
     Crypto::SessionKeystore * GetSessionKeystore() const { return mSessionKeystore; }
 
+    uint32_t GetIMMessagesSent() { return mMessageStats.InteractionModelMessagesSent; }
+    uint32_t GetIMMessagesReceived() { return mMessageStats.InteractionModelMessagesReceived; }
+
 private:
     /**
      *    The State of a secure transport object.
@@ -544,6 +547,12 @@ private:
         kPayloadIsUnencrypted,
     };
 
+    struct MessageStats {
+        public:
+            uint32_t InteractionModelMessagesReceived = 0;
+            uint32_t InteractionModelMessagesSent = 0;
+    };
+
     System::Layer * mSystemLayer               = nullptr;
     FabricTable * mFabricTable                 = nullptr;
     Crypto::SessionKeystore * mSessionKeystore = nullptr;
@@ -551,6 +560,7 @@ private:
     Transport::SecureSessionTable mSecureSessions;
     State mState; // < Initialization state of the object
     chip::Transport::GroupOutgoingCounters mGroupClientCounter;
+    MessageStats mMessageStats;
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     OnTCPConnectionReceivedCallback mConnReceivedCb = nullptr;
@@ -619,6 +629,9 @@ private:
         return payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq) ||
             payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp);
     }
+
+    void CountMessagesReceived(const SessionHandle & sessionHandle, const PayloadHeader & payloadHeader);
+    void CountMessagesSent(const SessionHandle & sessionHandle, const PayloadHeader & payloadHeader);
 };
 
 namespace MessagePacketBuffer {

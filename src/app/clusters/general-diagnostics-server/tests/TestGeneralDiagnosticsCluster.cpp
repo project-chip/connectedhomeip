@@ -222,6 +222,7 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
                                                 GeneralDiagnostics::Attributes::ActiveHardwareFaults::kMetadataEntry,
                                                 GeneralDiagnostics::Attributes::ActiveRadioFaults::kMetadataEntry,
                                                 GeneralDiagnostics::Attributes::ActiveNetworkFaults::kMetadataEntry,
+                                                GeneralDiagnostics::Attributes::DeviceLoadStatus::kMetadataEntry,
                                             }));
 
         // Check proper read/write of values and returns
