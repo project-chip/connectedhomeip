@@ -16,7 +16,9 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/group-key-mgmt-server/GroupKeyManagementCluster.h>
-#include <app/data-model-provider/MetadataTypes.h>
+#include <app/clusters/testing/AttributeTesting.h>
+#include <app/clusters/testing/ClusterTester.h>
+#include <app/clusters/testing/ValidateGlobalAttributes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
@@ -28,17 +30,9 @@
 #include <clusters/GroupKeyManagement/Metadata.h>
 #include <clusters/GroupKeyManagement/Structs.h>
 #include <credentials/GroupDataProvider.h>
-<<<<<<< HEAD
-#include <crypto/DefaultSessionKeystore.h>
 #include <lib/core/CHIPError.h>
-#include <lib/core/StringBuilderAdapters.h>
-#include <lib/support/ReadOnlyBuffer.h>
-=======
-#include <lib/core/CHIPError.h>
-#include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/ReadOnlyBuffer.h>
 
->>>>>>> b956206b0a (Add command testing)
 namespace {
 using namespace chip;
 using namespace chip::app;
