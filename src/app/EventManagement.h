@@ -26,7 +26,6 @@
  */
 #pragma once
 
-#include "ConcreteEventPath.h"
 #include "EventLoggingDelegate.h"
 #include <access/SubjectDescriptor.h>
 #include <app/EventLoggingTypes.h>
