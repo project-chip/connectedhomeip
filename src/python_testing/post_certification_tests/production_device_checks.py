@@ -232,8 +232,8 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
             asserts.fail(f'Unable to find compliance info for {self.vid_pid_sv_str} in the DCL')
         logging.info(f'Found compliance info for {self.vid_pid_sv_str} in the DCL:')
         logging.info(f'{entry[key]}')
-        if not entry[key][sub_key]:
-            logging.warning(f'Certification declaration ID is empty for {self.vid_pid_sv_str}')
+        if sub_key not in entry[key] or not entry[key][sub_key]:
+            logging.warning(f'Certification declaration ID is missing or empty for {self.vid_pid_sv_str}')
 
     def steps_CertifiedModel(self):
         return [TestStep(1, "Query the information about all software versions for this PID/VID", "DCL entry exists"),
