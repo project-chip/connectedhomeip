@@ -443,12 +443,12 @@ TEST_F(TestElectricalEnergyMeasurementCluster, SnapshotsSetValuesAndGenerateEven
 
         // Verify event path
         using CumulativeEventType = chip::app::Clusters::ElectricalEnergyMeasurement::Events::CumulativeEnergyMeasured::Type;
-        EXPECT_EQ(event->eventOptions.mPath,
+        EXPECT_EQ(event.value().eventOptions.mPath,
                   ConcreteEventPath(kTestEndpointId, CumulativeEventType::GetClusterId(), CumulativeEventType::GetEventId()));
 
         // Decode and verify event payload
         chip::app::Clusters::ElectricalEnergyMeasurement::Events::CumulativeEnergyMeasured::DecodableType decodedEvent;
-        ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR);
+        ASSERT_EQ(event.value().GetEventData(decodedEvent), CHIP_NO_ERROR);
 
         ASSERT_TRUE(decodedEvent.energyImported.HasValue());
         EXPECT_EQ(decodedEvent.energyImported.Value().energy, 10000);
@@ -477,12 +477,12 @@ TEST_F(TestElectricalEnergyMeasurementCluster, SnapshotsSetValuesAndGenerateEven
 
         // Verify event path
         using PeriodicEventType = chip::app::Clusters::ElectricalEnergyMeasurement::Events::PeriodicEnergyMeasured::Type;
-        EXPECT_EQ(event->eventOptions.mPath,
+        EXPECT_EQ(event.value().eventOptions.mPath,
                   ConcreteEventPath(kTestEndpointId, PeriodicEventType::GetClusterId(), PeriodicEventType::GetEventId()));
 
         // Decode and verify event payload
         chip::app::Clusters::ElectricalEnergyMeasurement::Events::PeriodicEnergyMeasured::DecodableType decodedEvent;
-        ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR);
+        ASSERT_EQ(event.value().GetEventData(decodedEvent), CHIP_NO_ERROR);
 
         ASSERT_TRUE(decodedEvent.energyImported.HasValue());
         EXPECT_EQ(decodedEvent.energyImported.Value().energy, 10000);
