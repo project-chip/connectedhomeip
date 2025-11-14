@@ -104,10 +104,6 @@ public:
 
     // Setters - update values and notify data model
     CHIP_ERROR SetMeasurementAccuracy(const MeasurementAccuracyStruct & value);
-    CHIP_ERROR SetCumulativeEnergyImported(const Optional<EnergyMeasurementStruct> & value);
-    CHIP_ERROR SetCumulativeEnergyExported(const Optional<EnergyMeasurementStruct> & value);
-    CHIP_ERROR SetPeriodicEnergyImported(const Optional<EnergyMeasurementStruct> & value);
-    CHIP_ERROR SetPeriodicEnergyExported(const Optional<EnergyMeasurementStruct> & value);
     CHIP_ERROR SetCumulativeEnergyReset(const Optional<CumulativeEnergyResetStruct> & value);
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -121,6 +117,13 @@ public:
                                 const Optional<EnergyMeasurementStruct> & energyExported);
 
 private:
+    // These setters are private since it is intended that the app updates those attributes through CumulativeEnergySnapshot and
+    // PeriodicEnergySnapshot.
+    CHIP_ERROR SetCumulativeEnergyImported(const Optional<EnergyMeasurementStruct> & value);
+    CHIP_ERROR SetCumulativeEnergyExported(const Optional<EnergyMeasurementStruct> & value);
+    CHIP_ERROR SetPeriodicEnergyImported(const Optional<EnergyMeasurementStruct> & value);
+    CHIP_ERROR SetPeriodicEnergyExported(const Optional<EnergyMeasurementStruct> & value);
+
     const BitFlags<ElectricalEnergyMeasurement::Feature> mFeatureFlags;
     const OptionalAttributesSet mEnabledOptionalAttributes;
     ElectricalEnergyMeasurement::MeasurementData mMeasurementData;

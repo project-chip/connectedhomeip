@@ -177,7 +177,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, GettersSettersWithFeatureValidati
 {
     chip::Test::TestServerClusterContext context;
 
-    // Test 1: Cluster with all features enabled - setters and getters should work
+    // Test 1: Cluster with all features enabled - snapshot methods and getters should work
     {
         BitMask<Feature> allFeatures(Feature::kImportedEnergy, Feature::kExportedEnergy, Feature::kCumulativeEnergy,
                                      Feature::kPeriodicEnergy);
@@ -190,16 +190,14 @@ TEST_F(TestElectricalEnergyMeasurementCluster, GettersSettersWithFeatureValidati
 
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-        // Set values via setters
+        // Set values via snapshot methods
         ElectricalEnergyMeasurementCluster::EnergyMeasurementStruct energyData;
         energyData.energy = 1000;
 
         Optional<ElectricalEnergyMeasurementCluster::EnergyMeasurementStruct> optionalEnergyData(energyData);
 
-        EXPECT_EQ(cluster.SetCumulativeEnergyImported(optionalEnergyData), CHIP_NO_ERROR);
-        EXPECT_EQ(cluster.SetCumulativeEnergyExported(optionalEnergyData), CHIP_NO_ERROR);
-        EXPECT_EQ(cluster.SetPeriodicEnergyImported(optionalEnergyData), CHIP_NO_ERROR);
-        EXPECT_EQ(cluster.SetPeriodicEnergyExported(optionalEnergyData), CHIP_NO_ERROR);
+        cluster.CumulativeEnergySnapshot(optionalEnergyData, optionalEnergyData);
+        cluster.PeriodicEnergySnapshot(optionalEnergyData, optionalEnergyData);
 
         ElectricalEnergyMeasurementCluster::CumulativeEnergyResetStruct resetData;
         Optional<ElectricalEnergyMeasurementCluster::CumulativeEnergyResetStruct> optionalResetData(resetData);
@@ -229,7 +227,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, GettersSettersWithFeatureValidati
         cluster.Shutdown();
     }
 
-    // Test 2: Cluster with no features - setters and getters should fail
+    // Test 2: Cluster with no features - getters should fail
     {
         BitMask<Feature> noFeatures;
 
@@ -241,21 +239,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, GettersSettersWithFeatureValidati
 
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-        // Try to set values - should fail with feature error
-        ElectricalEnergyMeasurementCluster::EnergyMeasurementStruct energyData;
-        energyData.energy = 1000;
-        Optional<ElectricalEnergyMeasurementCluster::EnergyMeasurementStruct> optionalEnergyData(energyData);
-
-        EXPECT_EQ(cluster.SetCumulativeEnergyImported(optionalEnergyData), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-        EXPECT_EQ(cluster.SetCumulativeEnergyExported(optionalEnergyData), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-        EXPECT_EQ(cluster.SetPeriodicEnergyImported(optionalEnergyData), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-        EXPECT_EQ(cluster.SetPeriodicEnergyExported(optionalEnergyData), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
-        ElectricalEnergyMeasurementCluster::CumulativeEnergyResetStruct resetData;
-        Optional<ElectricalEnergyMeasurementCluster::CumulativeEnergyResetStruct> optionalResetData(resetData);
-        EXPECT_EQ(cluster.SetCumulativeEnergyReset(optionalResetData), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
-        // Try to get values - should also fail with feature error
+        // Try to get values - should fail with feature error
         Optional<ElectricalEnergyMeasurementCluster::EnergyMeasurementStruct> readValue;
         EXPECT_EQ(cluster.GetCumulativeEnergyImported(readValue), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
         EXPECT_EQ(cluster.GetCumulativeEnergyExported(readValue), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
@@ -364,10 +348,8 @@ TEST_F(TestElectricalEnergyMeasurementCluster, ReadAttributeWithClusterTesterTes
     energyData.energy = 5000;
     Optional<ElectricalEnergyMeasurementCluster::EnergyMeasurementStruct> optionalEnergyData(energyData);
 
-    EXPECT_EQ(cluster.SetCumulativeEnergyImported(optionalEnergyData), CHIP_NO_ERROR);
-    EXPECT_EQ(cluster.SetCumulativeEnergyExported(optionalEnergyData), CHIP_NO_ERROR);
-    EXPECT_EQ(cluster.SetPeriodicEnergyImported(optionalEnergyData), CHIP_NO_ERROR);
-    EXPECT_EQ(cluster.SetPeriodicEnergyExported(optionalEnergyData), CHIP_NO_ERROR);
+    cluster.CumulativeEnergySnapshot(optionalEnergyData, optionalEnergyData);
+    cluster.PeriodicEnergySnapshot(optionalEnergyData, optionalEnergyData);
 
     DataModel::Nullable<Structs::EnergyMeasurementStruct::DecodableType> cumulativeImported;
     ASSERT_EQ(tester.ReadAttribute(CumulativeEnergyImported::Id, cumulativeImported), CHIP_NO_ERROR);
@@ -439,15 +421,15 @@ TEST_F(TestElectricalEnergyMeasurementCluster, SnapshotsSetValuesAndGenerateEven
 
         // Get the event from the queue
         auto event = logOnlyEvents.GetNextEvent();
-        ASSERT_TRUE(event.has_value());
 
-        // Verify event path
         using CumulativeEventType = chip::app::Clusters::ElectricalEnergyMeasurement::Events::CumulativeEnergyMeasured::Type;
+        ASSERT_TRUE(event.has_value());
         EXPECT_EQ(event.value().eventOptions.mPath,
                   ConcreteEventPath(kTestEndpointId, CumulativeEventType::GetClusterId(), CumulativeEventType::GetEventId()));
-
-        // Decode and verify event payload
         chip::app::Clusters::ElectricalEnergyMeasurement::Events::CumulativeEnergyMeasured::DecodableType decodedEvent;
+
+        // Check again for Tidy
+        ASSERT_TRUE(event.has_value());
         ASSERT_EQ(event.value().GetEventData(decodedEvent), CHIP_NO_ERROR);
 
         ASSERT_TRUE(decodedEvent.energyImported.HasValue());
@@ -473,15 +455,15 @@ TEST_F(TestElectricalEnergyMeasurementCluster, SnapshotsSetValuesAndGenerateEven
 
         // Get the event from the queue
         auto event = logOnlyEvents.GetNextEvent();
-        ASSERT_TRUE(event.has_value());
 
-        // Verify event path
         using PeriodicEventType = chip::app::Clusters::ElectricalEnergyMeasurement::Events::PeriodicEnergyMeasured::Type;
+        ASSERT_TRUE(event.has_value());
         EXPECT_EQ(event.value().eventOptions.mPath,
                   ConcreteEventPath(kTestEndpointId, PeriodicEventType::GetClusterId(), PeriodicEventType::GetEventId()));
-
-        // Decode and verify event payload
         chip::app::Clusters::ElectricalEnergyMeasurement::Events::PeriodicEnergyMeasured::DecodableType decodedEvent;
+
+        // Check again for Tidy
+        ASSERT_TRUE(event.has_value());
         ASSERT_EQ(event.value().GetEventData(decodedEvent), CHIP_NO_ERROR);
 
         ASSERT_TRUE(decodedEvent.energyImported.HasValue());

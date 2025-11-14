@@ -42,8 +42,8 @@ public:
     CHIP_ERROR Init();
     void Shutdown();
 
-    bool HasFeature(Feature aFeature);
-    bool SupportsOptAttr(OptionalAttributes aOptionalAttrs);
+    bool HasFeature(Feature aFeature) const;
+    bool SupportsOptAttr(OptionalAttributes aOptionalAttrs) const;
 
 private:
     SingleLinkedListNode<ElectricalEnergyMeasurementCluster *> mClusterListNode;

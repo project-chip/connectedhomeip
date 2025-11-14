@@ -173,12 +173,12 @@ void ElectricalEnergyMeasurementAttrAccess::Shutdown()
     UnregisterLegacyEEM(&mClusterListNode);
 }
 
-bool ElectricalEnergyMeasurementAttrAccess::HasFeature(Feature aFeature)
+bool ElectricalEnergyMeasurementAttrAccess::HasFeature(Feature aFeature) const
 {
     return mCluster.Cluster().Features().Has(aFeature);
 }
 
-bool ElectricalEnergyMeasurementAttrAccess::SupportsOptAttr(OptionalAttributes aOptionalAttrs)
+bool ElectricalEnergyMeasurementAttrAccess::SupportsOptAttr(OptionalAttributes aOptionalAttrs) const
 {
     // Convert from OptionalAttributes enum to AttributeId and check OptionalAttributesSet from cluster
     switch (aOptionalAttrs)
