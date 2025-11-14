@@ -391,8 +391,8 @@ TEST_F(TestOccupancySensingCluster, TestReadOptionalHoldTimeAttributes)
     // Case 2: WithHoldTime is called, so attributes should be readable.
     constexpr uint16_t kHoldTime                                               = 100;
     OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin     = 10,
-                                                                                    .holdTimeMax     = 200,
-                                                                                    .holdTimeDefault = kHoldTime };
+                                                                                   .holdTimeMax     = 200,
+                                                                                   .holdTimeDefault = kHoldTime };
     OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithHoldTime(
         kHoldTime, holdTimeLimitsConfig, mMockTimerDelegate) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
