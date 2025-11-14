@@ -53,7 +53,6 @@ jobs:
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
             CHIP_TOOL_VARIANT: ${{matrix.chip_tool}}
-            TSAN_OPTIONS: "halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt"
             LSAN_OPTIONS: detect_leaks=1
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
             CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
@@ -68,6 +67,10 @@ jobs:
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
         steps:
+            - name: Set up additional environment
+              run: |
+                echo "TSAN_OPTIONS=\"halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt\"" >> $GITHUB_ENV
+                echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
             - name: Checkout
               uses: actions/checkout@v5
             # To use act like:
@@ -259,8 +262,6 @@ jobs:
             - name: Build Apps
               id: build_with_cache
               continue-on-error: true
-              env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build_python.sh \
@@ -289,8 +290,6 @@ jobs:
                      "
             - name: Retry build without cache on master
               if: ${{ steps.build_with_cache.outcome == 'failure' && github.ref == 'refs/heads/master' }}
-              env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: |
                   echo "CCACHE_DISABLE=1" >> $GITHUB_ENV
                   echo "DISABLE_CCACHE=true" >> $GITHUB_ENV
@@ -613,6 +612,10 @@ jobs:
                 --sysctl net.ipv6.conf.all.forwarding=0
 
         steps:
+            - name: Set up additional environment
+              run: |
+                echo "TSAN_OPTIONS=\"halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt\"" >> $GITHUB_ENV
+                echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
             - name: Checkout
               uses: actions/checkout@v5
             - name: Checkout submodules & Bootstrap
@@ -633,8 +636,6 @@ jobs:
               run: scripts/run_in_build_env.sh './scripts/build_python.sh --jupyter-lab --install_virtual_env out/venv $([ "${DISABLE_CCACHE}" != "true" ] && echo --enable-ccache)'
 
             - name: Build apps for REPL tests with unified build
-              env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -656,8 +657,6 @@ jobs:
                   rm -rf out/unified-build
 
             - name: Build linux-x64-all-clusters
-              env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test
@@ -666,8 +665,6 @@ jobs:
                   "
 
             - name: Build linux-x64-all-devices-app
-              env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-all-devices-app-tsan-clang-test
@@ -675,8 +672,6 @@ jobs:
                   && rm -rf out/linux-x64-all-devices-app-tsan-clang-test"
 
             - name: Build linux-x64-lit-icd
-              env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-lit-icd-${BUILD_VARIANT}-tsan-clang-test
@@ -684,8 +679,6 @@ jobs:
                   && rm -rf out/linux-x64-lit-icd-${BUILD_VARIANT}-tsan-clang-test"
 
             - name: Build linux-x64-energy-gateway
-              env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-energy-gateway-${BUILD_VARIANT}-tsan-clang-test
@@ -693,8 +686,6 @@ jobs:
                   && rm -rf out/linux-x64-energy-gateway-${BUILD_VARIANT}-tsan-clang-test"
 
             - name: Build linux-x64-energy-management
-              env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-energy-management-${BUILD_VARIANT}-tsan-clang-test
@@ -702,8 +693,6 @@ jobs:
                   && rm -rf out/linux-x64-energy-management-${BUILD_VARIANT}-tsan-clang-test"
 
             - name: Build linux-x64-network-manager
-              env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-network-manager-${BUILD_VARIANT}-tsan-clang-test
@@ -711,8 +700,6 @@ jobs:
                   && rm -rf out/linux-x64-network-manager-${BUILD_VARIANT}-tsan-clang-test"
 
             - name: Build linux-x64-fabric-admin-rpc
-              env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-clang
@@ -720,8 +707,6 @@ jobs:
                   && rm -rf out/linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-clang"
 
             - name: Build linux-x64-fabric-bridge-rpc
-              env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang
@@ -729,8 +714,6 @@ jobs:
                   && rm -rf out/linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang"
 
             - name: Build linux-x64-fabric-sync
-              env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-fabric-sync-${BUILD_VARIANT}-clang
@@ -739,8 +722,6 @@ jobs:
 
             # TODO: camera app needs clang support
             - name: Build linux-x64-camera
-              env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-camera
@@ -748,8 +729,6 @@ jobs:
                   && rm -rf out/linux-x64-camera"
 
             - name: Build linux-x64-camera-controller
-              env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-camera-controller
@@ -757,8 +736,6 @@ jobs:
                   && rm -rf out/linux-x64-camera-controller"
 
             - name: Build linux-x64-light-data-model-no-unique-id
-              env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang
@@ -766,8 +743,6 @@ jobs:
                   && rm -rf out/linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang"
 
             - name: Build linux-x64-terms-and-conditions
-              env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-terms-and-conditions
@@ -775,8 +750,6 @@ jobs:
                   && rm -rf out/linux-x64-terms-and-conditions"
 
             - name: Build linux-x64-python-bindings
-              env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-python-bindings-webrtc
@@ -784,8 +757,6 @@ jobs:
                   && rm -rf out/linux-x64-python-bindings-webrtc"
 
             - name: Build linux-x64-jf-control-app
-              env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-jf-control-app
@@ -793,8 +764,6 @@ jobs:
                   && rm -rf out/linux-x64-jf-control-app"
 
             - name: Build linux-x64-jf-admin-app
-              env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-jf-admin-app
@@ -805,8 +774,6 @@ jobs:
               run: ccache -s
 
             - name: Build linux-x64-requestor-app
-              env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-ota-requestor-${BUILD_VARIANT}-tsan-clang-test
@@ -814,8 +781,6 @@ jobs:
                   && rm -rf out/linux-x64-ota-requestor-${BUILD_VARIANT}-tsan-clang-test"
 
             - name: Build linux-x64-provider-app
-              env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-ota-provider-${BUILD_VARIANT}-tsan-clang-test
@@ -823,8 +788,6 @@ jobs:
                   && rm -rf out/linux-x64-ota-provider-${BUILD_VARIANT}-tsan-clang-test"
 
             - name: Build Software Update ota images with new version.
-              env:
-                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_ota_images.sh --out-prefix out/su_ota_images_min --max-range 2
                   && mv out/su_ota_images_min-v*/*.ota objdir-clone
@@ -880,7 +843,6 @@ jobs:
                 build_variant: [ipv6only-no-ble-no-wifi]
 
         env:
-            TSAN_OPTIONS: "halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt"
             BUILD_VARIANT: ${{matrix.build_variant}}
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
             CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
@@ -904,6 +866,9 @@ jobs:
                 --sysctl net.ipv6.conf.all.forwarding=0
 
         steps:
+            - name: Set up additional environment
+              run: |
+                echo "TSAN_OPTIONS="halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
             - name: Checkout
               uses: actions/checkout@v5
             - name: Checkout submodules & Bootstrap
