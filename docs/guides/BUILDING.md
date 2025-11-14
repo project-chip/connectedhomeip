@@ -98,6 +98,14 @@ sudo apt-get install git gcc g++ pkg-config cmake libssl-dev libdbus-1-dev \
      default-jre libpcsclite-dev
 ```
 
+#### NFC builds
+
+If you plan to build with NFC support for Python tests (by passing `--enable_nfc true` to `build_python.sh`), you must also install `pcsc-lite`:
+
+```sh
+sudo apt-get install libpcsclite-dev
+```
+
 #### UI builds
 
 If building via `build_examples.py` and `-with-ui` variant, also install SDL2:
