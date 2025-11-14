@@ -230,7 +230,7 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
         sub_key = 'cDCertificateId'
         logging.info(f'Found compliance info for {self.vid_pid_sv_str} in the DCL:')
         logging.info(f'{entry[key]}')
-        if not key in entry.keys():
+        if key not in entry.keys():
             asserts.fail(f'Unable to find compliance info for {self.vid_pid_sv_str} in the DCL')
         if key in entry.keys() and not entry[key][sub_key]:
             logging.warning(f'Certification declaration ID is empty for {self.vid_pid_sv_str}')
