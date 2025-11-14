@@ -384,7 +384,7 @@ if [ -n "$install_virtual_env" ]; then
             echo_blue "Installing python nfc dependencies ..."
             OS_TYPE="$(uname -s)"
 
-            if [[ "$OS_TYPE" == "Linux" ]]; then
+            if [ "$OS_TYPE" = "Linux" ]; then
 
                 # Only run dpkg check if dpkg exists (Debian/Ubuntu)
                 if command -v dpkg >/dev/null 2>&1; then
