@@ -46,7 +46,7 @@ from matter.clusters.Attribute import AttributePath, ValueDecodeFailure
 from matter.interaction_model import Status
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.event_attribute_reporting import (AttributeSubscriptionHandler, EventSubscriptionHandler,
-                                                       WildcardAttributeSubscriptionHandler)
+                                                      WildcardAttributeSubscriptionHandler)
 from matter.testing.global_attribute_ids import GlobalAttributeIds, is_standard_attribute_id, is_standard_cluster_id
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from matter.tlv import uint
@@ -261,7 +261,8 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
                             # List attribute - toggle between empty and non-empty to ensure actual change
                             if len(current_val) == 0:
                                 # Skip empty lists - writing a valid non-empty list requires XML spec knowledge to write valid data
-                                logging.debug(f"{test_step}: Skipping {attribute.__name__} - empty list (requires XML spec knowledge to write valid data)")
+                                logging.debug(
+                                    f"{test_step}: Skipping {attribute.__name__} - empty list (requires XML spec knowledge to write valid data)")
                                 continue
                             else:
                                 # Non-empty list -> write empty list (safe change)
