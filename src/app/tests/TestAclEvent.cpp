@@ -38,6 +38,7 @@
 #include <lib/core/TLVDebug.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CHIPCounter.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
 #include <protocols/interaction_model/Constants.h>
@@ -230,7 +231,7 @@ public:
                                                           gCircularEventBuffer, logStorageResources, &mEventCounter);
 
         Access::GetAccessControl().Finish();
-        Access::GetAccessControl().Init(GetTestAccessControlDelegate(), gDeviceTypeResolver);
+        EXPECT_SUCCESS(Access::GetAccessControl().Init(GetTestAccessControlDelegate(), gDeviceTypeResolver));
 
         mAccessControlDelegate                          = static_cast<TestAccessControlDelegate *>(GetTestAccessControlDelegate());
         mAccessControlDelegate->mNumOfTimesAclIsChecked = 0;
@@ -497,8 +498,8 @@ TEST_F(TestAclEvent, TestUnsupportedEventWithValidClusterPath)
     EXPECT_FALSE(GetExchangeManager().GetNumActiveExchanges());
     engine->SetDataModelProvider(mOldProvider);
 
-    model.Registry().Unregister(&fakeClusterServer);
-    model.Shutdown();
+    EXPECT_SUCCESS(model.Registry().Unregister(&fakeClusterServer));
+    EXPECT_SUCCESS(model.Shutdown());
 }
 
 } // namespace app

@@ -33,6 +33,7 @@
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/LinkedList.h>
 #include <lib/support/logging/Constants.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -118,8 +119,9 @@ void PrintEventLog()
 {
     chip::TLV::TLVReader reader;
     chip::app::CircularEventBufferWrapper bufWrapper;
-    chip::app::EventManagement::GetInstance().GetEventReader(reader, chip::app::PriorityLevel::Critical, &bufWrapper);
-    chip::TLV::Debug::Dump(reader, SimpleDumpWriter);
+    EXPECT_SUCCESS(
+        chip::app::EventManagement::GetInstance().GetEventReader(reader, chip::app::PriorityLevel::Critical, &bufWrapper));
+    EXPECT_SUCCESS(chip::TLV::Debug::Dump(reader, SimpleDumpWriter));
 }
 
 static void CheckLogState(chip::app::EventManagement & aLogMgmt, size_t expectedNumEvents, chip::app::PriorityLevel aPriority)
@@ -180,7 +182,7 @@ static void CheckLogReadOut(chip::app::EventManagement & alogMgmt, chip::EventNu
     if (writer.GetLengthWritten())
     {
         reader.Init(backingStore.Get(), writer.GetLengthWritten());
-        chip::TLV::Debug::Dump(reader, SimpleDumpWriter);
+        EXPECT_SUCCESS(chip::TLV::Debug::Dump(reader, SimpleDumpWriter));
     }
 }
 
