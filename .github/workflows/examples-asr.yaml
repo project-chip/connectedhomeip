@@ -59,7 +59,7 @@ jobs:
                         --target asr-asr582x-ota-requestor \
                         build \
                      "
-            - name: Clean out directory (make some room for more compiles
+            - name: Clean out directory (make some room for more compiles)
               run: rm -rf out/
             - name: Build all ASR582X examples (part2)
               run: |
