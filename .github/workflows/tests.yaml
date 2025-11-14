@@ -53,7 +53,7 @@ jobs:
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
             CHIP_TOOL_VARIANT: ${{matrix.chip_tool}}
-            TSAN_OPTIONS: "halt_on_error=1 suppressions=${{github.workspace}}/scripts/tests/chiptest/tsan-linux-suppressions.txt"
+            TSAN_OPTIONS: "halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt"
             LSAN_OPTIONS: detect_leaks=1
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
             CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
@@ -260,7 +260,7 @@ jobs:
               id: build_with_cache
               continue-on-error: true
               env:
-                  CCACHE_DIR: "${{ github.workspace }}/.ccache"
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build_python.sh \
@@ -290,11 +290,11 @@ jobs:
             - name: Retry build without cache on master
               if: ${{ steps.build_with_cache.outcome == 'failure' && github.ref == 'refs/heads/master' }}
               env:
-                  CCACHE_DIR: "${{ github.workspace }}/.ccache"
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: |
                   echo "CCACHE_DISABLE=1" >> $GITHUB_ENV
                   echo "DISABLE_CCACHE=true" >> $GITHUB_ENV
-                  rm -rf "${{ github.workspace }}/.ccache" || true
+                  rm -rf "${GITHUB_WORKSPACE}/.ccache" || true
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build_python.sh \
                         --install_virtual_env out/venv \
@@ -588,7 +588,7 @@ jobs:
                 build_variant: [ipv6only-no-ble-no-wifi]
 
         env:
-            TSAN_OPTIONS: "halt_on_error=1 suppressions=${{github.workspace}}/scripts/tests/chiptest/tsan-linux-suppressions.txt"
+            TSAN_OPTIONS: "halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt"
             BUILD_VARIANT: ${{matrix.build_variant}}
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
             CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
@@ -634,7 +634,7 @@ jobs:
 
             - name: Build apps for REPL tests with unified build
               env:
-                  CCACHE_DIR: "${{ github.workspace }}/.ccache"
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -657,7 +657,7 @@ jobs:
 
             - name: Build linux-x64-all-clusters
               env:
-                  CCACHE_DIR: "${{ github.workspace }}/.ccache"
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test
@@ -667,7 +667,7 @@ jobs:
 
             - name: Build linux-x64-all-devices-app
               env:
-                  CCACHE_DIR: "${{ github.workspace }}/.ccache"
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-all-devices-app-tsan-clang-test
@@ -676,7 +676,7 @@ jobs:
 
             - name: Build linux-x64-lit-icd
               env:
-                  CCACHE_DIR: "${{ github.workspace }}/.ccache"
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-lit-icd-${BUILD_VARIANT}-tsan-clang-test
@@ -740,7 +740,7 @@ jobs:
             # TODO: camera app needs clang support
             - name: Build linux-x64-camera
               env:
-                  CCACHE_DIR: "${{ github.workspace }}/.ccache"
+                  CCACHE_DIR: "${GITHUB_WORKSPACE}/.ccache"
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --target linux-x64-camera
@@ -880,7 +880,7 @@ jobs:
                 build_variant: [ipv6only-no-ble-no-wifi]
 
         env:
-            TSAN_OPTIONS: "halt_on_error=1 suppressions=${{github.workspace}}/scripts/tests/chiptest/tsan-linux-suppressions.txt"
+            TSAN_OPTIONS: "halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt"
             BUILD_VARIANT: ${{matrix.build_variant}}
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
             CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
