@@ -15,6 +15,10 @@
  *    limitations under the License.
  */
 #include <app/clusters/basic-information/BasicInformationCluster.h>
+#include <app/clusters/operational-credentials-server/OperationalCredentialsCluster.h>
+
+#include <app/clusters/testing/AttributeTesting.h>
+#include <app/clusters/testing/ClusterTester.h>
 #include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
@@ -30,6 +34,9 @@
 #include <platform/ConfigurationManager.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <pw_unit_test/framework.h>
+
+#include <app/server/Server.h>
+#include <clusters/BasicInformation/Events.h>
 
 namespace {
 
@@ -49,10 +56,13 @@ static constexpr uint16_t kVendorId                  = static_cast<uint16_t>(Ven
 static constexpr uint16_t kProductId                 = 0x5678;
 static constexpr uint16_t kHardwareVersion           = 1;
 static constexpr uint16_t kManufacturingYear         = 2023;
+static constexpr uint32_t kTestSoftwareVersion       = 0x12345678;
 static constexpr uint8_t kManufacturingMonth         = 6;
 static constexpr uint8_t kManufacturingDay           = 15;
 static constexpr ProductFinishEnum kProductFinish    = ProductFinishEnum::kMatte;
 static constexpr ColorEnum kProductPrimaryColor      = ColorEnum::kBlack;
+
+static constexpr chip::FabricIndex kTestFabricIndex = static_cast<chip::FabricIndex>(123);
 
 // Helper function to safely copy strings and check for buffer size
 CHIP_ERROR SafeCopyString(char * buf, size_t bufSize, const char * source)
@@ -168,103 +178,13 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    // ========================================================================
-    // Stubs required to satisfy the ConfigurationManager Interface
-    // ========================================================================
-
-    CHIP_ERROR Init() override { return CHIP_NO_ERROR; }
-
-    CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan & buf) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
-    CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
-    CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
-    CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVersion) override { return CHIP_NO_ERROR; }
-    CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
-    CHIP_ERROR GetFirmwareBuildChipEpochTime(System::Clock::Seconds32 & buildTime) override
+    // The following methods does not have implementation on Linux, so we provide
+    // a stub that returns success.
+    CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVersion) override
     {
-        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-    }
-
-    CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen) override { return CHIP_NO_ERROR; }
-    CHIP_ERROR StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen) override { return CHIP_NO_ERROR; }
-    CHIP_ERROR StoreSoftwareVersion(uint32_t softwareVer) override { return CHIP_NO_ERROR; }
-    CHIP_ERROR StoreHardwareVersion(uint16_t hardwareVer) override { return CHIP_NO_ERROR; }
-    CHIP_ERROR StoreRegulatoryLocation(uint8_t location) override { return CHIP_NO_ERROR; }
-    CHIP_ERROR StoreUniqueId(const char * uniqueId, size_t uniqueIdLen) override { return CHIP_NO_ERROR; }
-    CHIP_ERROR GenerateUniqueId(char * buf, size_t bufSize) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
-
-    CHIP_ERROR GetFailSafeArmed(bool & val) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
-    CHIP_ERROR SetFailSafeArmed(bool val) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
-
-    CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) override
-    {
-        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-    }
-
-    void RunUnitTests() override {}
-    bool IsFullyProvisioned() override { return false; }
-    void LogDeviceConfig() override {}
-
-    bool IsCommissionableDeviceTypeEnabled() override { return false; }
-    CHIP_ERROR GetDeviceTypeId(uint32_t & deviceType) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
-    bool IsCommissionableDeviceNameEnabled() override { return false; }
-    CHIP_ERROR GetCommissionableDeviceName(char * buf, size_t bufSize) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
-
-    CHIP_ERROR GetInitialPairingHint(uint16_t & pairingHint) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
-    CHIP_ERROR GetInitialPairingInstruction(char * buf, size_t bufSize) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
-    CHIP_ERROR GetSecondaryPairingHint(uint16_t & pairingHint) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
-    CHIP_ERROR GetSecondaryPairingInstruction(char * buf, size_t bufSize) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
-#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
-    CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
-    CHIP_ERROR IncrementLifetimeCounter() override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
-    CHIP_ERROR SetRotatingDeviceIdUniqueId(const ByteSpan & uniqueIdSpan) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
-    CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
-#endif
-
-    CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value) override
-    {
-        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-    }
-    CHIP_ERROR WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value) override
-    {
+        softwareVersion = kTestSoftwareVersion;
         return CHIP_NO_ERROR;
     }
-
-    CHIP_ERROR GetRebootCount(uint32_t & v) override
-    {
-        v = 0;
-        return CHIP_NO_ERROR;
-    }
-    CHIP_ERROR StoreRebootCount(uint32_t) override { return CHIP_NO_ERROR; }
-    CHIP_ERROR GetTotalOperationalHours(uint32_t & v) override
-    {
-        v = 0;
-        return CHIP_NO_ERROR;
-    }
-    CHIP_ERROR StoreTotalOperationalHours(uint32_t) override { return CHIP_NO_ERROR; }
-    CHIP_ERROR GetBootReason(uint32_t & v) override
-    {
-        v = 0;
-        return CHIP_NO_ERROR;
-    }
-    CHIP_ERROR StoreBootReason(uint32_t) override { return CHIP_NO_ERROR; }
-    CHIP_ERROR GetRegulatoryLocation(uint8_t & loc) override
-    {
-        loc = 0;
-        return CHIP_NO_ERROR;
-    }
-    CHIP_ERROR GetLocationCapability(uint8_t & cap) override
-    {
-        cap = 0;
-        return CHIP_NO_ERROR;
-    }
-    CHIP_ERROR GetConfigurationVersion(uint32_t & v) override
-    {
-        v = 1;
-        return CHIP_NO_ERROR;
-    }
-    CHIP_ERROR StoreConfigurationVersion(uint32_t) override { return CHIP_NO_ERROR; }
-    bool CanFactoryReset() override { return false; }
-    void InitiateFactoryReset() override {}
 
 private:
     char mCountryCode[kCountryCodeLength + 1] = "XX";
@@ -578,4 +498,128 @@ TEST_F(TestBasicInformationReadWrite, TestWriteLocalConfigDisabled)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+// TODO: Move all the tests to one file and remove this file TestBasicInformationCluster.cpp
+TEST_F(TestBasicInformationReadWrite, StartUpEventTest)
+{
+    /**
+     * Basic Information Cluster - Event: StartUp (ID: 0x00)
+     * Priority: Critical
+     * Trigger: Generated when the Node starts up.
+     * Data: Must contain the SoftwareVersion (UINT32).
+     */
+
+    // Trigger the server startup sequence to force the cluster to emit the event
+    chip::DeviceLayer::PlatformMgr().HandleServerStarted();
+    uint32_t expectedSoftwareVersion{ kTestSoftwareVersion };
+
+    chip::app::Clusters::BasicInformation::Events::StartUp::DecodableType decodedEvent;
+
+    // Fetch the event from the event generator/log
+    auto event = testContext.EventsGenerator().GetNextEvent();
+    ASSERT_TRUE(event.has_value());
+
+    // Ensure the event priority is CRITICAL as per spec
+    ASSERT_EQ(event->eventOptions.mPriority, chip::app::PriorityLevel::Critical);
+
+    ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR); // NOLINT(bugprone-unchecked-optional-access)
+
+    // Verify the attribute itself is readable (sanity check)
+    ASSERT_EQ(tester.ReadAttribute(Attributes::SoftwareVersion::Id, expectedSoftwareVersion), CHIP_NO_ERROR);
+
+    // Verify the event payload matches the current SoftwareVersion
+    ASSERT_EQ(decodedEvent.softwareVersion, expectedSoftwareVersion);
+}
+
+TEST_F(TestBasicInformationReadWrite, ShutDownEventTest)
+{
+    /**
+     * Basic Information Cluster - Event: ShutDown (ID: 0x01)
+     * Priority: Critical
+     * Trigger: Generated when the Node shuts down.
+     * Data: No data fields defined in Spec 1.3.
+     */
+
+    // Trigger the server shutdown sequence
+    chip::DeviceLayer::PlatformMgr().HandleServerShuttingDown();
+
+    // basicInformationClusterInstance.Shutdown(); // Not needed here as PlatformMgr handles the delegate
+
+    chip::app::Clusters::BasicInformation::Events::ShutDown::DecodableType decodedEvent;
+
+    auto event = testContext.EventsGenerator().GetNextEvent();
+    ASSERT_TRUE(event.has_value());
+
+    // Ensure the event priority is CRITICAL
+    ASSERT_EQ(event->eventOptions.mPriority, chip::app::PriorityLevel::Critical);
+
+    ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR); // NOLINT(bugprone-unchecked-optional-access)
+}
+
+TEST_F(TestBasicInformationReadWrite, LeaveEventTest)
+{
+    /**
+     * Basic Information Cluster - Event: Leave (ID: 0x02)
+     * Priority: Info
+     * Trigger: Generated when the Node leaves a fabric.
+     * Data: Must contain the FabricIndex.
+     */
+
+    // Setup Operational Credentials context to simulate fabric management
+    OperationalCredentialsCluster::Context opCredsContext = { .fabricTable     = Server::GetInstance().GetFabricTable(),
+                                                              .failSafeContext = Server::GetInstance().GetFailSafeContext(),
+                                                              .sessionManager  = Server::GetInstance().GetSecureSessionManager(),
+                                                              .dnssdServer     = app::DnssdServer::Instance(),
+                                                              .commissioningWindowManager =
+                                                                  Server::GetInstance().GetCommissioningWindowManager() };
+
+    OperationalCredentialsCluster opCredsCluster(kRootEndpointId, opCredsContext);
+    ASSERT_EQ(opCredsCluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    // Act: Simulate the removal of a fabric.
+    // The Basic Information cluster listens to FabricTable delegates to trigger the 'Leave' event.
+    opCredsCluster.FabricWillBeRemoved(opCredsContext.fabricTable, kTestFabricIndex);
+
+    chip::app::Clusters::BasicInformation::Events::Leave::DecodableType decodedEvent;
+    auto event = testContext.EventsGenerator().GetNextEvent();
+    ASSERT_TRUE(event.has_value());
+
+    // Ensure the event priority is INFO
+    ASSERT_EQ(event->eventOptions.mPriority, chip::app::PriorityLevel::Info);
+    ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR); // NOLINT(bugprone-unchecked-optional-access)
+
+    // Verify the event contains the correct FabricIndex of the network left
+    ASSERT_EQ(decodedEvent.fabricIndex, kTestFabricIndex);
+}
+
+TEST_F(TestBasicInformationReadWrite, ReachableEventTest)
+{
+    /**
+     * Basic Information Cluster - Event: ReachableChanged (ID: 0x03)
+     * Priority: Info
+     * Trigger: Generated when the Node's reachability changes (e.g. sleep/wake).
+     * Data: reachableNewValue (boolean).
+     */
+
+    // Define the expected new state
+    bool newReachable = false;
+
+    // NOTE: This test manually injects the event.
+    // Ideally, a compliance test would modify the `Reachable` attribute (if writable)
+    // or trigger a platform event that causes the Basic Info cluster to emit this naturally.
+    BasicInformation::Events::ReachableChanged::Type newEvent;
+    newEvent.reachableNewValue                   = newReachable;
+    DataModel::EventsGenerator & eventsGenerator = testContext.Get().interactionContext.eventsGenerator;
+
+    // Manually generate event
+    eventsGenerator.GenerateEvent(newEvent, kRootEndpointId);
+    chip::app::Clusters::BasicInformation::Events::ReachableChanged::DecodableType decodedEvent;
+    auto event = testContext.EventsGenerator().GetNextEvent();
+    ASSERT_TRUE(event.has_value());
+
+    // Ensure the event priority is INFO
+    ASSERT_EQ(event->eventOptions.mPriority, chip::app::PriorityLevel::Info);
+
+    ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR); // NOLINT(bugprone-unchecked-optional-access)
+    ASSERT_EQ(decodedEvent.reachableNewValue, newReachable);
+}
 } // namespace
