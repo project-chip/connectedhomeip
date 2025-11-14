@@ -157,7 +157,7 @@ TEST_F(TestOccupancySensingCluster, TestWriteHoldTimeAttribute)
 
     // Verify that we can write a valid hold time
     EXPECT_EQ(tester.WriteAttribute(Attributes::HoldTime::Id, static_cast<uint16_t>(150)), CHIP_NO_ERROR);
-    uint16_t holdTime;
+    uint16_t holdTime = 0;
     EXPECT_EQ(tester.ReadAttribute(Attributes::HoldTime::Id, holdTime), CHIP_NO_ERROR);
     EXPECT_EQ(holdTime, 150);
     EXPECT_EQ(cluster.GetHoldTime(), 150);
@@ -387,7 +387,6 @@ TEST_F(TestOccupancySensingCluster, TestOccupancySensorTypeAttributesFromFeature
 TEST_F(TestOccupancySensingCluster, TestReadOptionalHoldTimeAttributes)
 {
     chip::Test::TestServerClusterContext context;
-
     // Case 2: WithHoldTime is called, so attributes should be readable.
     constexpr uint16_t kHoldTime                                               = 100;
     OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin     = 10,
@@ -398,7 +397,7 @@ TEST_F(TestOccupancySensingCluster, TestReadOptionalHoldTimeAttributes)
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
     chip::Test::ClusterTester tester(cluster);
 
-    uint16_t holdTime;
+    uint16_t holdTime = 0;
     EXPECT_EQ(tester.ReadAttribute(Attributes::HoldTime::Id, holdTime), CHIP_NO_ERROR);
     EXPECT_EQ(holdTime, kHoldTime);
 
