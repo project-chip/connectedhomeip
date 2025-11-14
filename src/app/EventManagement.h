@@ -92,7 +92,7 @@ public:
      * @brief
      *   A constructor for the CircularEventBuffer (internal API).
      */
-    CircularEventBuffer() : TLVCircularBuffer(nullptr, 0) {};
+    CircularEventBuffer() : TLVCircularBuffer(nullptr, 0){};
 
     /**
      * @brief
@@ -157,7 +157,7 @@ class CircularEventReader;
 class CircularEventBufferWrapper : public TLV::TLVCircularBuffer
 {
 public:
-    CircularEventBufferWrapper() : TLVCircularBuffer(nullptr, 0), mpCurrent(nullptr) {};
+    CircularEventBufferWrapper() : TLVCircularBuffer(nullptr, 0), mpCurrent(nullptr){};
     CircularEventBuffer * mpCurrent;
 
 private:
@@ -549,7 +549,7 @@ private:
     /**
      * @brief Internal iterator function used to fetch event into EventEnvelopeContext, then EventIterator would filter event
      * based upon EventEnvelopeContext
-    *
+     *
      */
     static CHIP_ERROR FetchEventParameters(const TLV::TLVReader & aReader, size_t aDepth, void * apContext);
 
