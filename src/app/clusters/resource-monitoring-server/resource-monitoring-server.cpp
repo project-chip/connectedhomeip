@@ -87,8 +87,7 @@ DataModel::ActionReturnStatus ResourceMonitoringCluster::ReadAttribute(const Dat
                                                                        AttributeValueEncoder & encoder)
 {
 
-    ChipLogDetail(Zcl, "ResourceMonitoringCluster::ReadAttribute: clusterId=0x%04lX, attributeId=0x%04lX", request.path.mClusterId,
-                  request.path.mAttributeId);
+    ChipLogDetail(Zcl, "ResourceMonitoringCluster::ReadAttribute");
 
     switch (request.path.mAttributeId)
     {
@@ -147,8 +146,7 @@ CHIP_ERROR ResourceMonitoringCluster::Attributes(const ConcreteClusterPath & pat
 
 CHIP_ERROR ResourceMonitoringCluster::ReadReplaceableProductList(AttributeValueEncoder & aEncoder)
 {
-    ChipLogDetail(Zcl, "ResourceMonitoringCluster::ReadReplaceableProductList: clusterId=0x%04lX, attributeId=0x%04lX",
-                  mPath.mClusterId, ResourceMonitoring::Attributes::ReplacementProductList::Id);
+    ChipLogDetail(Zcl, "ResourceMonitoringCluster::ReadReplaceableProductList");
 
     VerifyOrReturnError(mEnabledFeatures.Has(ResourceMonitoring::Feature::kReplacementProductList), CHIP_NO_ERROR);
 
