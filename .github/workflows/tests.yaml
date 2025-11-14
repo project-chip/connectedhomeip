@@ -867,7 +867,7 @@ jobs:
         steps:
             - name: Set up additional environment
               run: |
-                echo "TSAN_OPTIONS="halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
+                echo "TSAN_OPTIONS=\"halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt\"" >> $GITHUB_ENV
             - name: Checkout
               uses: actions/checkout@v5
             - name: Checkout submodules & Bootstrap
