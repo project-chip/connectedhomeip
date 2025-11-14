@@ -191,7 +191,7 @@ public:
 
         LoopbackMessagingContext::TearDownTestSuite();
 
-        // Server shudown will be called in TearDownTask
+        // Server shutdown will be called in TearDownTask
 
         // TODO: At this point UDP endpoits still seem leaked and the sanitizer
         // builds will attempt a memory free. As a result, we keep Memory initialized
@@ -217,16 +217,11 @@ public:
 
 void TestCommissioningWindowManager::ServiceEvents()
 {
-    // Takes a few rounds of this because handling IO messages may schedule work,
-    // and scheduled work may queue messages for sending...
-    for (int i = 0; i < 3; ++i)
-    {
-        DrainAndServiceIO();
+    DrainAndServiceIO();
 
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(
-            [](intptr_t) -> void { chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); }, (intptr_t) nullptr);
-        chip::DeviceLayer::PlatformMgr().RunEventLoop();
-    }
+    chip::DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) -> void { chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); },
+                                                  (intptr_t) nullptr);
+    chip::DeviceLayer::PlatformMgr().RunEventLoop();
 }
 
 void TestCommissioningWindowManager::EstablishPASEHandshake(SessionManager & sessionManager, PASESession & pairingCommissioner,
@@ -573,13 +568,13 @@ TEST_F(TestCommissioningWindowManager, SecurePairingHandshakeTestECM)
     EstablishPASEHandshake(sessionManager, pairingCommissioner, delegateCommissioner);
 
     // Ensure that a PASE Session exists for pairingCommissioner
-    auto CommissionerSession = pairingCommissioner.CopySecureSession();
-    EXPECT_TRUE(CommissionerSession.HasValue());
-    EXPECT_TRUE(CommissionerSession.Value()->AsSecureSession()->IsPASESession());
+    auto commissionerSession = pairingCommissioner.CopySecureSession();
+    EXPECT_TRUE(commissionerSession.HasValue());
+    EXPECT_TRUE(commissionerSession.Value()->AsSecureSession()->IsPASESession());
 
     // Ensure that a PASE Session exists for the CommissioningWindowManager
-    EXPECT_TRUE(commissionMgr.GetPASESession());
-    EXPECT_TRUE(commissionMgr.GetPASESession()->AsSecureSession()->IsPASESession());
+    EXPECT_TRUE(commissionMgr.GetPASESession().HasValue());
+    EXPECT_TRUE(commissionMgr.GetPASESession().Value()->AsSecureSession()->IsPASESession());
 
     // This is the equivalent of AdministratorCommissioningLogic::RevokeCommissioning() in the AdministratorCommissioning Cluster
     RevokeCommissioningCommandEquivalent();
@@ -591,11 +586,11 @@ TEST_F(TestCommissioningWindowManager, SecurePairingHandshakeTestECM)
     EXPECT_FALSE(commissionMgr.IsCommissioningWindowOpen());
 
     // This asserts that the CommissioningWindowManager has cleared the PASESession
-    EXPECT_FALSE(commissionMgr.GetPASESession());
+    EXPECT_FALSE(commissionMgr.GetPASESession().HasValue());
 
     // Asserting that PASESession is still present on the Commissioner side
-    CommissionerSession = pairingCommissioner.CopySecureSession();
-    EXPECT_TRUE(CommissionerSession.HasValue());
+    commissionerSession = pairingCommissioner.CopySecureSession();
+    EXPECT_TRUE(commissionerSession.HasValue());
 }
 
 } // namespace

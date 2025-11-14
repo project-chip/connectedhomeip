@@ -130,7 +130,7 @@ class TestRevokeCommissioningClearsPASE(MatterBaseTest):
             await self.TH2.ReadAttribute(
                 nodeId=pase_node_id,
                 attributes=(ROOT_NODE_ENDPOINT_ID, VendorNameAttr))
-        asserts.assert_equal(e.exception.err,  _CHIP_TIMEOUT_ERROR,
+        asserts.assert_equal(e.exception.err, _CHIP_TIMEOUT_ERROR,
                              f"Expected timeout error reading VendorName attribute over PASE, got {e.exception.err}")
 
 
