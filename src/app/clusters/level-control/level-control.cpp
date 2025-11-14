@@ -38,15 +38,15 @@
 #include <platform/PlatformManager.h>
 #include <tracing/macros.h>
 
-#if defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT)
+#if MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 #include <app/clusters/scenes-server/scenes-server.h>
 #endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 
-#if defined(MATTER_DM_PLUGIN_ON_OFF)
+#if MATTER_DM_PLUGIN_ON_OFF
 #include <app/clusters/on-off-server/on-off-server.h>
 #endif // MATTER_DM_PLUGIN_ON_OFF
 
-#if defined(MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP)
+#if MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 #include <app/clusters/color-control-server/color-control-server.h>
 #endif // MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
@@ -129,7 +129,7 @@ static bool shouldExecuteIfOff(EndpointId endpoint, CommandId commandId, chip::O
 static Status SetCurrentLevelQuietReport(EndpointId endpoint, EmberAfLevelControlState * state,
                                          DataModel::Nullable<uint8_t> newValue, bool isEndOfTransition);
 
-#if defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+#if MATTER_DM_PLUGIN_SCENES_MANAGEMENT && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 class DefaultLevelControlSceneHandler : public scenes::DefaultSceneHandlerImpl
 {
 public:
@@ -269,7 +269,7 @@ static DefaultLevelControlSceneHandler sLevelControlSceneHandler;
 
 #endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 
-#if !defined(IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS) && defined(MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP)
+#if !defined(IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS) && MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 static void reallyUpdateCoupledColorTemp(EndpointId endpoint);
 #define updateCoupledColorTemp(endpoint) reallyUpdateCoupledColorTemp(endpoint)
 #else
@@ -346,7 +346,7 @@ static EmberAfLevelControlState * getState(EndpointId endpoint)
     return (ep >= kLevelControlStateTableSize ? nullptr : &stateTable[ep]);
 }
 
-#if !defined(IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS) && defined(MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP)
+#if !defined(IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS) && MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 static void reallyUpdateCoupledColorTemp(EndpointId endpoint)
 {
     LevelControl::Attributes::Options::TypeInfo::Type options;
@@ -572,7 +572,7 @@ static void writeRemainingTime(EndpointId endpoint, uint16_t remainingTimeMs, bo
 
 static void setOnOffValue(EndpointId endpoint, bool onOff)
 {
-#if defined(MATTER_DM_PLUGIN_ON_OFF)
+#if MATTER_DM_PLUGIN_ON_OFF
     if (emberAfContainsServer(endpoint, OnOff::Id))
     {
         ChipLogProgress(Zcl, "Setting on/off to %s due to level change", onOff ? "ON" : "OFF");
@@ -704,7 +704,7 @@ Status MoveToLevel(EndpointId endpointId, const Commands::MoveToLevel::Decodable
 
 chip::scenes::SceneHandler * GetSceneHandler()
 {
-#if defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+#if MATTER_DM_PLUGIN_SCENES_MANAGEMENT && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
     return &sLevelControlSceneHandler;
 #else
     return nullptr;
@@ -1003,7 +1003,7 @@ static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8
     state->storedLevel              = storedLevel;
     state->callbackSchedule.runTime = System::Clock::Milliseconds32(0);
 
-#if defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT)
+#if MATTER_DM_PLUGIN_SCENES_MANAGEMENT
     // The level has changed, the scene is no longer valid.
     if (emberAfContainsServer(endpoint, ScenesManagement::Id))
     {
@@ -1014,7 +1014,7 @@ static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8
     // The setup was successful, so mark the new state as active and return.
     scheduleTimerCallbackMs(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));
 
-#if defined(MATTER_DM_PLUGIN_ON_OFF)
+#if MATTER_DM_PLUGIN_ON_OFF
     // Check that the received MoveToLevelWithOnOff produces a On action and that the onoff support the lighting featuremap
     if (commandId == Commands::MoveToLevelWithOnOff::Id && state->moveToLevel != state->minLevel &&
         OnOffServer::Instance().SupportsLightingApplications(endpoint))
@@ -1561,7 +1561,7 @@ void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
         }
     }
 
-#if defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+#if MATTER_DM_PLUGIN_SCENES_MANAGEMENT && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
     // Registers Scene handlers for the level control cluster on the server
     Clusters::ScenesManagement::ScenesServer::Instance().RegisterSceneHandler(endpoint, LevelControlServer::GetSceneHandler());
 #endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
