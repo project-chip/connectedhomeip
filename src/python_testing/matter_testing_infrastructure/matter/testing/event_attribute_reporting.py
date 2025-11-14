@@ -521,11 +521,6 @@ class WildcardAttributeSubscriptionHandler:
             path (TypedAttributePath): Contains endpoint, cluster and attribute metadata for the report.
             transaction (SubscriptionTransaction): Provides access to the actual reported value.
         """
-        LOGGER.info("we got here in __call__ ")
-        LOGGER.info(
-            f"[WildcardAttributeSubscriptionHandler] __call__ INVOKED: "
-            f"EP{path.Path.EndpointId} {path.ClusterType.__name__ if path.ClusterType else 'None'}.{path.AttributeType.__name__ if path.AttributeType else 'None'}"
-        )
         data = transaction.GetAttribute(path)
 
         # Create a unique key for this attribute
@@ -547,11 +542,6 @@ class WildcardAttributeSubscriptionHandler:
                 'value': data,
                 'timestamp': datetime.now(timezone.utc)
             })
-
-        LOGGER.debug(
-            f"[WildcardAttributeSubscriptionHandler] Report received: "
-            f"EP{path.Path.EndpointId} {path.ClusterType.__name__}.{path.AttributeType.__name__} = {data}"
-        )
 
     async def start(self, dev_ctrl, node_id: int, attributes: list,
                     fabric_filtered: bool = False,
@@ -575,7 +565,6 @@ class WildcardAttributeSubscriptionHandler:
         Returns:
             The subscription transaction object.
         """
-        LOGGER.info("[WildcardAttributeSubscriptionHandler] Setting up subscription callback BEFORE ReadAttribute")
         self._subscription = await dev_ctrl.ReadAttribute(
             nodeId=node_id,
             attributes=attributes,
@@ -584,9 +573,7 @@ class WildcardAttributeSubscriptionHandler:
             keepSubscriptions=keepSubscriptions,
             autoResubscribe=autoResubscribe
         )
-        LOGGER.info("[WildcardAttributeSubscriptionHandler] ReadAttribute completed, registering callback")
         self._subscription.SetAttributeUpdateCallback(self.__call__)
-        LOGGER.info("[WildcardAttributeSubscriptionHandler] Callback registered successfully")
         return self._subscription
 
     def was_attribute_reported(self, endpoint_id: int, cluster_type, attribute_type) -> bool:
