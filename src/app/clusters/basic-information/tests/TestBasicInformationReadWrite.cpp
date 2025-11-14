@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 #include <app/clusters/basic-information/BasicInformationCluster.h>
+#include <app/clusters/operational-credentials-server/operational-credentials-cluster.h>
+
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/clusters/testing/ClusterTester.h>
 #include <app/persistence/AttributePersistence.h>
@@ -30,6 +32,9 @@
 #include <platform/ConfigurationManager.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <pw_unit_test/framework.h>
+
+#include <app/server/Server.h>
+#include <clusters/BasicInformation/Events.h>
 
 namespace {
 
@@ -49,10 +54,13 @@ static constexpr uint16_t kVendorId                  = static_cast<uint16_t>(Ven
 static constexpr uint16_t kProductId                 = 0x5678;
 static constexpr uint16_t kHardwareVersion           = 1;
 static constexpr uint16_t kManufacturingYear         = 2023;
+static constexpr uint32_t kTestSoftwareVersion       = 0x12345678;
 static constexpr uint8_t kManufacturingMonth         = 6;
 static constexpr uint8_t kManufacturingDay           = 15;
 static constexpr ProductFinishEnum kProductFinish    = ProductFinishEnum::kMatte;
 static constexpr ColorEnum kProductPrimaryColor      = ColorEnum::kBlack;
+
+static constexpr chip::FabricIndex kTestFabricIndex = static_cast<chip::FabricIndex>(123);
 
 // Helper function to safely copy strings and check for buffer size
 CHIP_ERROR SafeCopyString(char * buf, size_t bufSize, const char * source)
@@ -150,7 +158,11 @@ public:
 
     // The following methods does not have implementation on Linux, so we provide
     // a stub that returns success.
-    CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVersion) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVersion) override
+    {
+        softwareVersion = kTestSoftwareVersion;
+        return CHIP_NO_ERROR;
+    }
 
 private:
     char mCountryCode[kCountryCodeLength + 1] = "XX";
@@ -402,4 +414,63 @@ TEST_F(TestBasicInformationReadWrite, TestWriteLocalConfigDisabled)
     }
 }
 
+// TODO: Move all the tests to one file and remove this file TestBasicInformationCluster.cpp
+TEST_F(TestBasicInformationReadWrite, StartUpEventTest)
+{
+    chip::DeviceLayer::PlatformMgr().HandleServerStarted();
+    uint32_t expectedSoftwareVersion{ kTestSoftwareVersion };
+
+    chip::app::Clusters::BasicInformation::Events::StartUp::DecodableType decodedEvent;
+    auto event = testContext.EventsGenerator().GetNextEvent();
+    ASSERT_TRUE(event.has_value());
+    ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR); // NOLINT(bugprone-unchecked-optional-access)
+
+    ASSERT_EQ(tester.ReadAttribute(Attributes::SoftwareVersion::Id, expectedSoftwareVersion), CHIP_NO_ERROR);
+
+    ASSERT_EQ(decodedEvent.softwareVersion, expectedSoftwareVersion);
+}
+
+TEST_F(TestBasicInformationReadWrite, ShutDownEventTest)
+{
+    chip::DeviceLayer::PlatformMgr().HandleServerShuttingDown();
+    // basicInformationClusterInstance.Shutdown();
+    chip::app::Clusters::BasicInformation::Events::ShutDown::DecodableType decodedEvent;
+    auto event = testContext.EventsGenerator().GetNextEvent();
+    ASSERT_TRUE(event.has_value());
+    ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR); // NOLINT(bugprone-unchecked-optional-access)
+}
+
+TEST_F(TestBasicInformationReadWrite, LeaveEventTest)
+{
+    OperationalCredentialsCluster::Context opCredsContext = { .fabricTable     = Server::GetInstance().GetFabricTable(),
+                                                              .failSafeContext = Server::GetInstance().GetFailSafeContext(),
+                                                              .sessionManager  = Server::GetInstance().GetSecureSessionManager(),
+                                                              .dnssdServer     = app::DnssdServer::Instance(),
+                                                              .commissioningWindowManager =
+                                                                  Server::GetInstance().GetCommissioningWindowManager() };
+    OperationalCredentialsCluster opCredsCluster(kRootEndpointId, opCredsContext);
+    opCredsCluster.Startup(context);
+    opCredsCluster.FabricWillBeRemoved(opCredsContext.fabricTable, kTestFabricIndex);
+
+    chip::app::Clusters::BasicInformation::Events::Leave::DecodableType decodedEvent;
+    auto event = testContext.EventsGenerator().GetNextEvent();
+    ASSERT_TRUE(event.has_value());
+    ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR); // NOLINT(bugprone-unchecked-optional-access)
+    ASSERT_EQ(decodedEvent.fabricIndex, kTestFabricIndex);
+}
+
+TEST_F(TestBasicInformationReadWrite, ReachableEventTest)
+{
+    // Notify reachable change, and verify it is received
+    bool newReachable = false;
+    BasicInformation::Events::ReachableChanged::Type newEvent;
+    newEvent.reachableNewValue                   = newReachable;
+    DataModel::EventsGenerator & eventsGenerator = context.interactionContext.eventsGenerator;
+    eventsGenerator.GenerateEvent(newEvent, kRootEndpointId);
+    chip::app::Clusters::BasicInformation::Events::ReachableChanged::DecodableType decodedEvent;
+    auto event = testContext.EventsGenerator().GetNextEvent();
+    ASSERT_TRUE(event.has_value());
+    ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR); // NOLINT(bugprone-unchecked-optional-access)
+    ASSERT_EQ(decodedEvent.reachableNewValue, newReachable);
+}
 } // namespace
