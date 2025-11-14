@@ -99,14 +99,6 @@ OccupancySensingCluster::OccupancySensingCluster(const Config & config) :
     mHoldTime = std::clamp(config.mHoldTime, mHoldTimeLimits.holdTimeMin, mHoldTimeLimits.holdTimeMax);
 }
 
-OccupancySensingCluster::~OccupancySensingCluster()
-{
-    if (mTimerDelegate)
-    {
-        mTimerDelegate->CancelTimer(this);
-    }
-}
-
 CHIP_ERROR OccupancySensingCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));

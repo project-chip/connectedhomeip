@@ -84,7 +84,7 @@ public:
     };
 
     OccupancySensingCluster(const Config & config);
-    ~OccupancySensingCluster();
+    ~OccupancySensingCluster() = default;
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,

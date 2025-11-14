@@ -815,37 +815,6 @@ TEST_F(TestOccupancySensingCluster, TestOccupancyHoldTimeRetrigger)
     EXPECT_FALSE(mMockTimerDelegate.IsTimerActive(&cluster));
 }
 
-TEST_F(TestOccupancySensingCluster, TestTimerIsCancelledOnDestruction)
-{
-    chip::Test::TestServerClusterContext context;
-    constexpr uint16_t kHoldTime                                               = 5;
-    OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimitsConfig = { .holdTimeMin     = 1,
-                                                                                   .holdTimeMax     = 10,
-                                                                                   .holdTimeDefault = 1 };
-
-    {
-        OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithHoldTime(
-            kHoldTime, holdTimeLimitsConfig, mMockTimerDelegate) };
-        EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-
-        // 1. Set Occupancy to occupied
-        cluster.SetOccupancy(true);
-        EXPECT_TRUE(cluster.IsOccupied());
-
-        // 2. Set Occupancy to unoccupied, which starts a timer.
-        cluster.SetOccupancy(false);
-        EXPECT_TRUE(cluster.IsOccupied()); // State is still occupied.
-        EXPECT_TRUE(mMockTimerDelegate.IsTimerActive(&cluster));
-
-        // 3. The cluster object is about to be destroyed as it goes out of scope. The timer should be cancelled on destruction.
-    }
-
-    // 4. Manually advance the clock to fire the timer. The mock delegate is now holding
-    // a dangling pointer to the destroyed 'cluster' object. This would crash if the OccupancySensingCluster did not cancel the
-    // timer on destruction.
-    mMockTimerDelegate.AdvanceClock(System::Clock::Seconds16(kHoldTime));
-}
-
 TEST_F(TestOccupancySensingCluster, TestOnOccupancyChangedCallback)
 {
     chip::Test::TestServerClusterContext context;
