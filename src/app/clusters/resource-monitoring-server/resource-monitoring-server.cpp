@@ -86,6 +86,10 @@ DataModel::ActionReturnStatus ResourceMonitoringCluster::WriteImpl(const DataMod
 DataModel::ActionReturnStatus ResourceMonitoringCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                        AttributeValueEncoder & encoder)
 {
+
+    ChipLogDetail(Zcl, "ResourceMonitoringCluster::ReadAttribute: clusterId=0x%04X, attributeId=0x%04X", request.path.mClusterId,
+                  request.path.mAttributeId);
+
     switch (request.path.mAttributeId)
     {
     case ResourceMonitoring::Attributes::Condition::Id:
@@ -106,9 +110,14 @@ DataModel::ActionReturnStatus ResourceMonitoringCluster::ReadAttribute(const Dat
     case ResourceMonitoring::Attributes::LastChangedTime::Id:
         return encoder.Encode(mLastChangedTime);
 
-    case ResourceMonitoring::Attributes::ReplacementProductList::Id:
-        return DataModel::ActionReturnStatus{ ReadReplaceableProductList(encoder) };
-
+    case ResourceMonitoring::Attributes::ReplacementProductList::Id: {
+        CHIP_ERROR err = ReadReplaceableProductList(encoder);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Error reading ReplacementProductList attribute: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+        return DataModel::ActionReturnStatus{ err };
+    }
     case ResourceMonitoring::Attributes::ClusterRevision::Id:
         return encoder.Encode(HepaFilterMonitoring::kRevision);
 
@@ -138,6 +147,9 @@ CHIP_ERROR ResourceMonitoringCluster::Attributes(const ConcreteClusterPath & pat
 
 CHIP_ERROR ResourceMonitoringCluster::ReadReplaceableProductList(AttributeValueEncoder & aEncoder)
 {
+    ChipLogDetail(Zcl, "ResourceMonitoringCluster::ReadReplaceableProductList: clusterId=0x%04X, attributeId=0x%04X",
+                  mPath.mClusterId, ResourceMonitoring::Attributes::ReplacementProductList::Id);
+
     VerifyOrReturnError(mEnabledFeatures.Has(ResourceMonitoring::Feature::kReplacementProductList), CHIP_NO_ERROR);
 
     ReplacementProductListManager * productListManagerInstance = GetReplacementProductListManagerInstance();
@@ -260,7 +272,7 @@ ResourceMonitoringCluster::UpdateLastChangedTime(DataModel::Nullable<uint32_t> a
 
 void ResourceMonitoringCluster::LoadPersistentAttributes()
 {
-    CHIP_ERROR err;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     if (mPath.mClusterId == HepaFilterMonitoring::Id)
     {
