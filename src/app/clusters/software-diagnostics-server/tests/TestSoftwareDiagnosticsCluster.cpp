@@ -164,7 +164,7 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)
                 metrics[0].id   = 1;
                 metrics[1].Next = nullptr;
                 metrics[1].id   = 2;
-                metrics[1].stackFreeMinimum.SetValue(512u);
+                metrics[1].stackFreeMinimum.SetValue(567u);
                 *threadMetricsList = metrics;
                 return CHIP_NO_ERROR;
             }
@@ -241,7 +241,7 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)
             EXPECT_FALSE(tm2.name.HasValue());
             EXPECT_FALSE(tm2.stackFreeCurrent.HasValue());
             ASSERT_TRUE(tm2.stackFreeMinimum.HasValue());
-            EXPECT_EQ(tm2.stackFreeMinimum.Value(), 512u);
+            EXPECT_EQ(tm2.stackFreeMinimum.Value(), 567u);
             EXPECT_FALSE(tm2.stackSize.HasValue());
 
             EXPECT_FALSE(it.Next());
