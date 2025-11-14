@@ -43,7 +43,6 @@
 
 import asyncio
 import logging
-import queue
 import time
 
 from mobly import asserts
