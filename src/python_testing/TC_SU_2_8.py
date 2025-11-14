@@ -25,7 +25,6 @@
 #     app-args: >
 #       --discriminator 1234
 #       --passcode 20202021
-#       --secured-device-port 5541
 #       --KVS /tmp/chip_kvs_requestor
 #       --autoApplyImage
 #       --trace-to json:${TRACE_APP}.json
@@ -35,8 +34,8 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --endpoint 0
-#       --int-arg target_version:2
-#       --int-arg ota_provider_port:5540
+#       --int-arg ota_image_expected_version:2
+#       --int-arg ota_provider_port:5541
 #       --string-arg provider_app_path:${OTA_PROVIDER_APP}
 #       --string-arg ota_image:${SU_OTA_REQUESTOR_V2}
 #       --trace-to json:${TRACE_TEST_JSON}.json
@@ -54,7 +53,6 @@ from TC_SUTestBase import SoftwareUpdateBaseTest
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.interaction_model import Status
-from matter.testing.apps import OtaImagePath, OTAProviderSubprocess
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
@@ -94,6 +92,11 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         return steps
 
     @async_test_body
+    async def teardown_test(self):
+        self.terminate_provider()
+        super().teardown_test()
+
+    @async_test_body
     async def test_TC_SU_2_8(self):
 
         # Variables for TH1-OTA Provider
@@ -107,26 +110,16 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
 
         p_pass = 20202021
 
-        self.provider_port = self.user_params.get('ota_provider_port')
-        if not self.provider_port:
-            asserts.fail("Missing OTA provider port. Speficy using --int-arg ota_provider_port:<OTA_PROVIDER_PORT>")
-
-        self.app_path = self.user_params.get('provider_app_path')
-        if not self.app_path:
-            asserts.fail("Missing OTA provider app path. Speficy using --string-arg provider_app_path:<PROVIDER_APP_PATH>")
-
-        image = self.user_params.get('ota_image')
-        if not image:
-            asserts.fail("Missing OTA image. Specify using --string-arg ota_image:<OTA_IMAGE>")
-
-        self.provider_ota_file = OtaImagePath(path=image)
-
         # States
         idle = Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
         querying = Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
         downloading = Clusters.Objects.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading
 
-        self.target_version = self.user_params.get('target_version')
+        self.app_path = self.user_params.get('provider_app_path', None)
+        self.image = self.user_params.get('ota_image')
+        self.provider_port = self.user_params.get('ota_provider_port', 5541)
+
+        self.target_version = self.user_params.get('ota_image_expected_version')
         if not self.target_version:
             asserts.fail("Missing target version. Speficy using --int-arg target_version:<TARGET_VERSION>")
 
@@ -159,20 +152,18 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         # Start OTA Provider
         logging.info("Starting OTA Provider 1")
 
-        provider_1 = OTAProviderSubprocess(
-            app=self.app_path,
-            storage_dir='/tmp',
-            port=self.provider_port,
+        extra_arguments = ['--app-pipe', self.fifo_in, '--app-pipe-out', self.fifo_out]
+        self.start_provider(
+            provider_app_path=self.app_path,
+            ota_image_path=self.image,
+            setup_pincode=p_pass,
             discriminator=p1_disc,
-            passcode=p_pass,
-            ota_source=self.provider_ota_file,
-            kvs_path='/tmp/chip_kvs_provider',
+            port=self.provider_port,
+            kvs_path='/tmp/chip_kvs_provider_1',
             log_file='/tmp/provider_1.log',
-            err_log_file='/tmp/provider_1.log',
-            extra_args=["--app-pipe", self.fifo_in, "--app-pipe-out", self.fifo_out]
+            expected_output=None,
+            extra_args=extra_arguments
         )
-
-        provider_1.start()
 
         # Commissioning Provider-TH1
         logging.info("Commissioning OTA Provider to TH1")
@@ -283,10 +274,7 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
 
         # Stop provider
         await asyncio.sleep(2)
-        try:
-            provider_1.terminate()
-        except Exception as e:
-            logging.warning(f"Provider termination raised: {e}")
+        self.terminate_provider()
 
         th1.ExpireSessions(nodeId=p1_node)
         await asyncio.sleep(2)
@@ -297,22 +285,17 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         # Configure DefaultOTAProviders with invalid node ID. DUT tries to send a QueryImage command to TH1/OTA-P. DUT sends QueryImage command to TH2/OTA-P
         self.step(2)
 
-        # provider_ota_file = OtaImagePath(path="firmware_v2.ota")
-
         logging.info("Starting OTA Provider 2")
-        provider_2 = OTAProviderSubprocess(
-            app=self.app_path,
-            storage_dir='/tmp',
-            port=self.provider_port,
+        self.start_provider(
+            provider_app_path=self.app_path,
+            ota_image_path=self.image,
+            setup_pincode=p_pass,
             discriminator=p2_disc,
-            passcode=p_pass,
-            ota_source=self.provider_ota_file,
+            port=self.provider_port,
             kvs_path='/tmp/chip_kvs_provider_2',
             log_file='/tmp/provider_2.log',
-            err_log_file='/tmp/provider_2.log'
+            expected_output=None
         )
-
-        provider_2.start()
 
         # Create TH2
         logging.info("Setting up TH2.")
@@ -416,12 +399,6 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
             [(endpoint, Clusters.Objects.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders([]))]
         )
         asserts.assert_equal(resp[0].Status, Status.Success, "Clean DefaultOTAProviders failed.")
-
-        await asyncio.sleep(2)
-        try:
-            provider_2.terminate()
-        except Exception as e:
-            logging.warning(f"Provider termination raised: {e}")
 
         th2.ExpireSessions(nodeId=p2_node)
 

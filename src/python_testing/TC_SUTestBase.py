@@ -103,6 +103,14 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         self.current_provider_app_proc = proc
         logger.info(f"Provider started with PID:  {self.current_provider_app_proc.get_pid()}")
 
+    def terminate_provider(self):
+        if hasattr(self, "current_provider_app_proc") and self.current_provider_app_proc is not None:
+            logger.info("Terminating existing OTA Provider")
+            self.current_provider_app_proc.terminate()
+            self.current_provider_app_proc = None
+        else:
+            logger.info("Provider process not found. Unable to terminate.")
+
     async def announce_ota_provider(self,
                                     controller: ChipDeviceCtrl,
                                     provider_node_id: int,
