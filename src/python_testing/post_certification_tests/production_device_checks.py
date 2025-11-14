@@ -219,6 +219,20 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
         asserts.assert_true(found_versions,
                             f"Unable to find at least one compliance entry for the versions {software_versions}")
 
+    def steps_CertificationDeclaration(self):
+        return [TestStep(1, "Query the certification declaration for this VID/PID/SoftwareVersion", "Warn if certification declaration ID is empty"),]
+
+    def test_CertificationDeclaration(self):
+        self.step(1)
+        entry = requests.get(
+            f"{self.url}/dcl/compliance/compliance-info/{self.vid}/{self.pid}/{self.software_version}/matter").json()
+        key = 'complianceInfo'
+        sub_key = 'cDCertificateId'
+        logging.info(f'Found compliance info for {self.vid_pid_sv_str} in the DCL:')
+        logging.info(f'{entry[key]}')
+        if not entry[key][sub_key]:
+            logging.warning(f'Certification declaration ID is empty for {self.vid_pid_sv_str}')
+
     def steps_CertifiedModel(self):
         return [TestStep(1, "Query the information about all software versions for this PID/VID", "DCL entry exists"),
                 TestStep(2, "Query the certified version information for the specified software versions",
