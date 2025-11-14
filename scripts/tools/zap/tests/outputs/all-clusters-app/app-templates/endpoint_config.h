@@ -4969,11 +4969,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 #define ATTRIBUTE_SINGLETONS_SIZE (0)
 
 // Total size of attribute storage
-<<<<<<< HEAD
 #define ATTRIBUTE_MAX_SIZE (3703)
-=======
-#define ATTRIBUTE_MAX_SIZE (3701)
->>>>>>> b157434d07 (regen tool changes.)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (4)
