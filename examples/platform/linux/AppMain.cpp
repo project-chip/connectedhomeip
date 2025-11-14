@@ -1010,14 +1010,14 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     // NOLINTEND(bugprone-signal-handler)
 #endif
 #else
-    struct sigaction sa                        = {};
-    sa.sa_handler                              = StopSignalHandler;
-    sa.sa_flags                                = SA_RESETHAND;
+    struct sigaction sa = {};
+    sa.sa_handler       = StopSignalHandler;
+    sa.sa_flags         = SA_RESETHAND;
     sigaction(SIGINT, &sa, nullptr);
     sigaction(SIGTERM, &sa, nullptr);
 #endif
 
-    // This message is used as a symptom for when the application process has started.
+    // This message is used as a marker for when the application process has started.
     // See: scripts/tests/chiptest/test_definition.py
     ChipLogProgress(DeviceLayer, "Starting event loop");
     if (impl != nullptr)

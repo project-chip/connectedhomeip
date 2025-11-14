@@ -148,15 +148,10 @@ class App:
                     self.kvsPathSet.add(value)
         return self.runner.RunSubprocess(app_cmd, name='APP ', wait=False)
 
-    def __waitFor(self, patterns: Iterable[str], process=None, outpipe: LogPipe | None = None, timeoutInSeconds: int = 10):
+    def __waitFor(self, patterns: Iterable[str], timeoutInSeconds: int = 10):
         """
         Wait for all provided pattern strings to appear in the process output pipe (capture log).
         """
-        if process is None:
-            process = self.process
-        if outpipe is None:
-            outpipe = self.outpipe
-
         logging.debug('Waiting for all patterns %r', patterns)
 
         start_time = time.monotonic()
@@ -164,7 +159,7 @@ class App:
         def allPatternsFound() -> int | None:
             lastLogIndex = self.lastLogIndex
             for p in patterns:
-                found, index = outpipe.CapturedLogContains(p, self.lastLogIndex)
+                found, index = self.outpipe.CapturedLogContains(p, self.lastLogIndex)
                 if not found:
                     return None
                 lastLogIndex = max(lastLogIndex, index)
@@ -173,8 +168,8 @@ class App:
 
         lastLogIndex = allPatternsFound()
         while lastLogIndex is None:
-            if process.poll() is not None:
-                died_str = f'Server died while waiting for {patterns!r}, returncode {process.returncode}'
+            if self.process.poll() is not None:
+                died_str = f'Server died while waiting for {patterns!r}, returncode {self.process.returncode}'
                 logging.error(died_str)
                 raise Exception(died_str)
             if time.monotonic() - start_time > timeoutInSeconds:
