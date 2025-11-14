@@ -805,6 +805,8 @@ jobs:
             # We archive ourselves since upload-artifact seems to lose permission bits
             # We also remove some debug info to make artifacts smaller (otherwise they are 2GB for binaries)
             - name: Archive artifacts
+              env:
+                XZ_OPT: -T 0 -1
               run: |
                 find objdir-clone -executable -type f | xargs -n 1 strip
                 tar cfJ repl-build-data.tar.xz out/venv objdir-clone
@@ -964,6 +966,13 @@ jobs:
                   docs/development_controllers/matter-repl/Matter_Access_Control.ipynb \
                   docs/development_controllers/matter-repl/Matter_Multi_Fabric_Commissioning.ipynb \
                   "
+
+            - name: Breakpoint if tests failed
+              if: failure()
+              uses: namespacelabs/breakpoint-action@v0
+              with:
+                duration: 30m
+                authorized-users: andy31415
 
     repl_tests_darwin:
         name: REPL Tests - Darwin (Build Only)
