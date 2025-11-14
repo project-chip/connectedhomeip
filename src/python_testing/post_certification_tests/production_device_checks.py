@@ -220,7 +220,7 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
                             f"Unable to find at least one compliance entry for the versions {software_versions}")
 
     def steps_CertificationDeclaration(self):
-        return [TestStep(1, "Query the certification declaration for this VID/PID/SoftwareVersion", "Warn if certification declaration ID is empty"),]
+        return [TestStep(1, "Query the certification declaration for this VID/PID/SoftwareVersion", "Warn if certification declaration ID is empty")]
 
     def test_CertificationDeclaration(self):
         self.step(1)
