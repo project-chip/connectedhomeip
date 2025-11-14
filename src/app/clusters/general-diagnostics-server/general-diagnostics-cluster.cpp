@@ -466,7 +466,7 @@ GeneralDiagnosticsClusterFullConfigurable::InvokeCommand(const DataModel::Invoke
         return HandleTimeSnapshot(*handler, request.path, request_data);
     }
     case GeneralDiagnostics::Commands::PayloadTestRequest::Id: {
-        if (mFunctionConfig.enablePayloadSnaphot)
+        if (mFunctionConfig.enablePayloadSnapshot)
         {
             GeneralDiagnostics::Commands::PayloadTestRequest::DecodableType request_data;
             ReturnErrorOnFailure(request_data.Decode(input_arguments));

@@ -15,18 +15,21 @@
  */
 #include <pw_unit_test/framework.h>
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-cluster.h>
 #include <app/clusters/testing/AttributeTesting.h>
+#include <app/clusters/testing/ClusterTester.h>
+#include <app/clusters/testing/ValidateGlobalAttributes.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/GeneralDiagnostics/Enums.h>
 #include <clusters/GeneralDiagnostics/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/ReadOnlyBuffer.h>
+#include <messaging/ExchangeContext.h>
 #include <platform/DiagnosticDataProvider.h>
-
-#include <cmath>
 
 namespace {
 
@@ -35,6 +38,8 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::GeneralDiagnostics::Attributes;
 using namespace chip::app::DataModel;
+using namespace chip::Test;
+using namespace chip::Testing;
 
 template <class T>
 class ScopedDiagnosticsProvider
@@ -57,10 +62,38 @@ private:
     T mProvider;
 };
 
+// Mock DiagnosticDataProvider for testing
+class NullProvider : public DeviceLayer::DiagnosticDataProvider
+{
+};
+
+// Helper method to invoke TimeSnapshot command and decode response
+CHIP_ERROR InvokeTimeSnapshotAndGetResponse(ClusterTester & tester,
+                                            GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType & response)
+{
+    GeneralDiagnostics::Commands::TimeSnapshot::Type request{};
+    auto result = tester.Invoke(GeneralDiagnostics::Commands::TimeSnapshot::Id, request);
+
+    if (!result.status.has_value())
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    ReturnErrorOnFailure(result.status->GetUnderlyingError());
+
+    if (!result.response.has_value())
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    response = result.response.value();
+    return CHIP_NO_ERROR;
+}
+
 struct TestGeneralDiagnosticsCluster : public ::testing::Test
 {
-    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+    static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { Platform::MemoryShutdown(); }
 };
 
 TEST_F(TestGeneralDiagnosticsCluster, CompileTest)
@@ -71,8 +104,8 @@ TEST_F(TestGeneralDiagnosticsCluster, CompileTest)
     ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, GeneralDiagnostics::Id }), BitFlags<ClusterQualityFlags>());
 
     const GeneralDiagnosticsFunctionsConfig functionsConfig{
-        .enablePosixTime      = true,
-        .enablePayloadSnaphot = true,
+        .enablePosixTime       = true,
+        .enablePayloadSnapshot = true,
     };
 
     GeneralDiagnosticsClusterFullConfigurable clusterWithTimeAndPayload(optionalAttributeSet,
@@ -85,9 +118,6 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
 {
     {
         // everything returns empty here ..
-        class NullProvider : public DeviceLayer::DiagnosticDataProvider
-        {
-        };
         const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
         ScopedDiagnosticsProvider<NullProvider> nullProvider;
 
@@ -95,44 +125,26 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
         GeneralDiagnosticsCluster cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0));
 
         // Check required accepted commands are present
-        ConcreteClusterPath generalDiagnosticsPath = ConcreteClusterPath(kRootEndpointId, GeneralDiagnostics::Id);
-
-        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> acceptedCommandsBuilder;
-        ASSERT_EQ(cluster.AcceptedCommands(generalDiagnosticsPath, acceptedCommandsBuilder), CHIP_NO_ERROR);
-        ReadOnlyBuffer<DataModel::AcceptedCommandEntry> acceptedCommands = acceptedCommandsBuilder.TakeBuffer();
-        ASSERT_EQ(acceptedCommands.size(), 2u);
-
-        ASSERT_EQ(acceptedCommands[0].commandId, GeneralDiagnostics::Commands::TestEventTrigger::Id);
-        ASSERT_EQ(acceptedCommands[0].GetInvokePrivilege(),
-                  GeneralDiagnostics::Commands::TestEventTrigger::kMetadataEntry.GetInvokePrivilege());
-
-        ASSERT_EQ(acceptedCommands[1].commandId, GeneralDiagnostics::Commands::TimeSnapshot::Id);
-        ASSERT_EQ(acceptedCommands[1].GetInvokePrivilege(),
-                  GeneralDiagnostics::Commands::TimeSnapshot::kMetadataEntry.GetInvokePrivilege());
+        ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
+                                                  {
+                                                      GeneralDiagnostics::Commands::TestEventTrigger::kMetadataEntry,
+                                                      GeneralDiagnostics::Commands::TimeSnapshot::kMetadataEntry,
+                                                  }));
 
         // Check required generated commands are present
-        ReadOnlyBufferBuilder<chip::CommandId> generatedCommandsBuilder;
-        ASSERT_EQ(cluster.GeneratedCommands(generalDiagnosticsPath, generatedCommandsBuilder), CHIP_NO_ERROR);
-        ReadOnlyBuffer<chip::CommandId> generatedCommands = generatedCommandsBuilder.TakeBuffer();
-
-        ASSERT_EQ(generatedCommands.size(), 1u);
-        ASSERT_EQ(generatedCommands[0], GeneralDiagnostics::Commands::TimeSnapshotResponse::Id);
+        ASSERT_TRUE(IsGeneratedCommandsListEqualTo(cluster,
+                                                   {
+                                                       GeneralDiagnostics::Commands::TimeSnapshotResponse::Id,
+                                                   }));
 
         // Everything is unimplemented, so attributes are just the global and mandatory ones.
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
-        ASSERT_EQ(cluster.Attributes(generalDiagnosticsPath, attributesBuilder), CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedBuilder;
-        ASSERT_EQ(expectedBuilder.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-        ASSERT_EQ(expectedBuilder.AppendElements({
-                      GeneralDiagnostics::Attributes::NetworkInterfaces::kMetadataEntry,
-                      GeneralDiagnostics::Attributes::RebootCount::kMetadataEntry,
-                      GeneralDiagnostics::Attributes::UpTime::kMetadataEntry,
-                      GeneralDiagnostics::Attributes::TestEventTriggersEnabled::kMetadataEntry,
-                  }),
-                  CHIP_NO_ERROR);
-
-        ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+        ASSERT_TRUE(IsAttributesListEqualTo(cluster,
+                                            {
+                                                GeneralDiagnostics::Attributes::NetworkInterfaces::kMetadataEntry,
+                                                GeneralDiagnostics::Attributes::RebootCount::kMetadataEntry,
+                                                GeneralDiagnostics::Attributes::UpTime::kMetadataEntry,
+                                                GeneralDiagnostics::Attributes::TestEventTriggersEnabled::kMetadataEntry,
+                                            }));
     }
 
     {
@@ -149,22 +161,22 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
                 totalOperationalHours = 456;
                 return CHIP_NO_ERROR;
             }
-            CHIP_ERROR GetBootReason(chip::app::Clusters::GeneralDiagnostics::BootReasonEnum & bootReason) override
+            CHIP_ERROR GetBootReason(app::Clusters::GeneralDiagnostics::BootReasonEnum & bootReason) override
             {
                 bootReason = GeneralDiagnostics::BootReasonEnum::kSoftwareReset;
                 return CHIP_NO_ERROR;
             }
             CHIP_ERROR
-            GetActiveHardwareFaults(chip::DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & hardwareFaults) override
+            GetActiveHardwareFaults(DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & hardwareFaults) override
             {
                 return CHIP_NO_ERROR;
             }
-            CHIP_ERROR GetActiveRadioFaults(chip::DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & radioFaults) override
+            CHIP_ERROR GetActiveRadioFaults(DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & radioFaults) override
             {
                 return CHIP_NO_ERROR;
             }
             CHIP_ERROR
-            GetActiveNetworkFaults(chip::DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & networkFaults) override
+            GetActiveNetworkFaults(DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & networkFaults) override
             {
                 return CHIP_NO_ERROR;
             }
@@ -186,50 +198,32 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
         GeneralDiagnosticsCluster cluster(optionalAttributeSet, features);
 
         // Check mandatory commands are present
-        ConcreteClusterPath generalDiagnosticsPath = ConcreteClusterPath(kRootEndpointId, GeneralDiagnostics::Id);
-
-        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
-        ASSERT_EQ(cluster.AcceptedCommands(generalDiagnosticsPath, commandsBuilder), CHIP_NO_ERROR);
-        ReadOnlyBuffer<DataModel::AcceptedCommandEntry> commands = commandsBuilder.TakeBuffer();
-        ASSERT_EQ(commands.size(), 2u);
-
-        ASSERT_EQ(commands[0].commandId, GeneralDiagnostics::Commands::TestEventTrigger::Id);
-        ASSERT_EQ(commands[0].GetInvokePrivilege(),
-                  GeneralDiagnostics::Commands::TestEventTrigger::kMetadataEntry.GetInvokePrivilege());
-
-        ASSERT_EQ(commands[1].commandId, GeneralDiagnostics::Commands::TimeSnapshot::Id);
-        ASSERT_EQ(commands[1].GetInvokePrivilege(),
-                  GeneralDiagnostics::Commands::TimeSnapshot::kMetadataEntry.GetInvokePrivilege());
+        ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
+                                                  {
+                                                      GeneralDiagnostics::Commands::TestEventTrigger::kMetadataEntry,
+                                                      GeneralDiagnostics::Commands::TimeSnapshot::kMetadataEntry,
+                                                  }));
 
         // Check required generated commands are present
-        ReadOnlyBufferBuilder<chip::CommandId> generatedCommandsBuilder;
-        ASSERT_EQ(cluster.GeneratedCommands(generalDiagnosticsPath, generatedCommandsBuilder), CHIP_NO_ERROR);
-        ReadOnlyBuffer<chip::CommandId> generatedCommands = generatedCommandsBuilder.TakeBuffer();
-
-        ASSERT_EQ(generatedCommands.size(), 1u);
-        ASSERT_EQ(generatedCommands[0], GeneralDiagnostics::Commands::TimeSnapshotResponse::Id);
+        ASSERT_TRUE(IsGeneratedCommandsListEqualTo(cluster,
+                                                   {
+                                                       GeneralDiagnostics::Commands::TimeSnapshotResponse::Id,
+                                                   }));
 
         // Everything is implemented, so attributes are the global ones and ALL optional ones as well.
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
-        ASSERT_EQ(cluster.Attributes(generalDiagnosticsPath, attributesBuilder), CHIP_NO_ERROR);
-
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedBuilder;
-        ASSERT_EQ(expectedBuilder.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-        ASSERT_EQ(expectedBuilder.AppendElements({
-                      GeneralDiagnostics::Attributes::NetworkInterfaces::kMetadataEntry,
-                      GeneralDiagnostics::Attributes::RebootCount::kMetadataEntry,
-                      GeneralDiagnostics::Attributes::UpTime::kMetadataEntry,
-                      GeneralDiagnostics::Attributes::TestEventTriggersEnabled::kMetadataEntry,
-                      GeneralDiagnostics::Attributes::TotalOperationalHours::kMetadataEntry,
-                      GeneralDiagnostics::Attributes::BootReason::kMetadataEntry,
-                      GeneralDiagnostics::Attributes::ActiveHardwareFaults::kMetadataEntry,
-                      GeneralDiagnostics::Attributes::ActiveRadioFaults::kMetadataEntry,
-                      GeneralDiagnostics::Attributes::ActiveNetworkFaults::kMetadataEntry,
-                      GeneralDiagnostics::Attributes::DeviceLoadStatus::kMetadataEntry,
-                  }),
-                  CHIP_NO_ERROR);
-
-        ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+        ASSERT_TRUE(IsAttributesListEqualTo(cluster,
+                                            {
+                                                GeneralDiagnostics::Attributes::NetworkInterfaces::kMetadataEntry,
+                                                GeneralDiagnostics::Attributes::RebootCount::kMetadataEntry,
+                                                GeneralDiagnostics::Attributes::UpTime::kMetadataEntry,
+                                                GeneralDiagnostics::Attributes::TestEventTriggersEnabled::kMetadataEntry,
+                                                GeneralDiagnostics::Attributes::TotalOperationalHours::kMetadataEntry,
+                                                GeneralDiagnostics::Attributes::BootReason::kMetadataEntry,
+                                                GeneralDiagnostics::Attributes::ActiveHardwareFaults::kMetadataEntry,
+                                                GeneralDiagnostics::Attributes::ActiveRadioFaults::kMetadataEntry,
+                                                GeneralDiagnostics::Attributes::ActiveNetworkFaults::kMetadataEntry,
+                                                GeneralDiagnostics::Attributes::DeviceLoadStatus::kMetadataEntry,
+                                            }));
 
         // Check proper read/write of values and returns
         uint16_t rebootCount                               = 0;
@@ -252,6 +246,71 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
         EXPECT_EQ(cluster.GetActiveRadioFaults(radioFaults), CHIP_NO_ERROR);
         EXPECT_EQ(cluster.GetActiveNetworkFaults(networkFaults), CHIP_NO_ERROR);
     }
+}
+
+TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotCommandTest)
+{
+    // Create a cluster with no optional attributes enabled
+    const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
+    ScopedDiagnosticsProvider<NullProvider> nullProvider;
+    GeneralDiagnosticsCluster cluster(optionalAttributeSet);
+
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    // Invoke TimeSnapshot command and get response
+    GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType response;
+    ASSERT_EQ(InvokeTimeSnapshotAndGetResponse(tester, response), CHIP_NO_ERROR);
+
+    // Basic configuration excludes POSIX time
+    EXPECT_TRUE(response.posixTimeMs.IsNull());
+}
+
+TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotCommandWithPosixTimeTest)
+{
+    // Configure cluster with POSIX time support enabled and no optional attributes enabled
+    const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
+    ScopedDiagnosticsProvider<NullProvider> nullProvider;
+    const GeneralDiagnosticsFunctionsConfig functionsConfig{
+        .enablePosixTime       = true,
+        .enablePayloadSnapshot = false,
+    };
+    GeneralDiagnosticsClusterFullConfigurable cluster(optionalAttributeSet, functionsConfig);
+
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    // Invoke TimeSnapshot command and get response
+    GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType response;
+    ASSERT_EQ(InvokeTimeSnapshotAndGetResponse(tester, response), CHIP_NO_ERROR);
+
+    // POSIX time is included when available (system dependent)
+    if (!response.posixTimeMs.IsNull())
+    {
+        EXPECT_GT(response.posixTimeMs.Value(), 0u);
+    }
+}
+
+TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotResponseValues)
+{
+    // Create a cluster with no optional attributes enabled
+    const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
+    ScopedDiagnosticsProvider<NullProvider> nullProvider;
+    GeneralDiagnosticsCluster cluster(optionalAttributeSet);
+
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    // First invocation. Capture initial timestamp
+    GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType firstResponse;
+    ASSERT_EQ(InvokeTimeSnapshotAndGetResponse(tester, firstResponse), CHIP_NO_ERROR);
+
+    // Second invocation. Capture subsequent timestamp
+    GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType secondResponse;
+    ASSERT_EQ(InvokeTimeSnapshotAndGetResponse(tester, secondResponse), CHIP_NO_ERROR);
+
+    // Verify second response is also valid and greater than or equal to first
+    EXPECT_GE(secondResponse.systemTimeMs, firstResponse.systemTimeMs);
 }
 
 } // namespace

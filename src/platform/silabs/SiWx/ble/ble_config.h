@@ -1,5 +1,5 @@
 /*******************************************************************************
- * @file  rsi_ble_config.h
+ * @file  ble_config.h
  * @brief
  *******************************************************************************
  * # License
@@ -14,6 +14,7 @@
  * sections of the MSLA applicable to Source Code.
  *
  ******************************************************************************/
+
 #pragma once
 
 #ifdef __cplusplus
@@ -103,7 +104,6 @@ extern "C" {
 #define RSI_BLE_NUM_CONN_EVENTS 20
 #define RSI_BLE_MAX_NBR_PERIPHERALS 3
 #endif
-
 #define RSI_BLE_MAX_NBR_CENTRALS (1)
 #define RSI_BLE_MAX_NBR_ATT_SERV (10)
 

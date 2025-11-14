@@ -32,7 +32,7 @@ namespace Clusters {
 struct GeneralDiagnosticsFunctionsConfig
 {
     bool enablePosixTime : 1;
-    bool enablePayloadSnaphot : 1;
+    bool enablePayloadSnapshot : 1;
 };
 
 class GeneralDiagnosticsCluster : public DefaultServerCluster
