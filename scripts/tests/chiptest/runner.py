@@ -22,6 +22,9 @@ import subprocess
 import threading
 import typing
 from dataclasses import dataclass
+from typing import Literal
+
+log = logging.getLogger(__name__)
 
 
 class LogPipe(threading.Thread):
@@ -78,7 +81,7 @@ class LogPipe(threading.Thread):
                     break
             except OSError:
                 break
-            logging.log(self.level, line.strip('\n'))
+            log.log(self.level, line.strip('\n'))
             self.captured_logs.append(line)
             if self.capture_delegate:
                 self.capture_delegate.Log(self.name, line)
@@ -121,16 +124,15 @@ class RunnerWaitQueue:
 
 @dataclass
 class SubprocessInfo:
-    kind: str
+    # Restricted as this identifies the name of the network namespace in an executor implementing
+    # test case isolation.
+    kind: Literal['app', 'tool']
     path: pathlib.Path | str
     wrapper: tuple[str, ...] = ()
     args: tuple[str, ...] = ()
 
     def __post_init__(self):
         self.path = pathlib.Path(self.path)
-
-    def __repr__(self) -> str:
-        return 'SubprocessInfo(kind={}, path={}, wrapper={}, args={})'.format(self.kind, self.path, self.wrapper, self.args)
 
     def with_args(self, *args: str):
         return SubprocessInfo(kind=self.kind, path=self.path, wrapper=self.wrapper, args=self.args + tuple(args))
@@ -143,9 +145,8 @@ class SubprocessInfo:
 
 
 class Executor:
-    def run(self, subproc: SubprocessInfo, stdin, stdout, stderr):
-        s = subprocess.Popen(subproc.to_cmd(), stdin=stdin, stdout=stdout, stderr=stderr)
-        return s
+    def run(self, subproc: SubprocessInfo, stdin=None, stdout=None, stderr=None):
+        return subprocess.Popen(subproc.to_cmd(), stdin=stdin, stdout=stdout, stderr=stderr)
 
 
 class Runner:
@@ -154,7 +155,7 @@ class Runner:
         self.capture_delegate = capture_delegate
 
     def RunSubprocess(self, subproc: SubprocessInfo, name: str, wait=True, dependencies=[], timeout_seconds: typing.Optional[int] = None, stdin=None):
-        logging.info('RunSubprocess starting application %s' % subproc)
+        log.info('RunSubprocess starting application %s' % subproc)
         cmd = subproc.to_cmd()
 
         outpipe = LogPipe(
@@ -195,4 +196,4 @@ class Runner:
             else:
                 raise Exception('Command %r failed: %d' % (cmd, s.returncode))
 
-        logging.debug('Command %r completed with error code 0', cmd)
+        log.debug('Command %r completed with error code 0', cmd)

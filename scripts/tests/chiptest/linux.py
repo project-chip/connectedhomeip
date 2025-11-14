@@ -31,13 +31,15 @@ import sdbus
 
 from .runner import Executor, SubprocessInfo
 
+log = logging.getLogger(__name__)
+
 test_environ = os.environ.copy()
 
 
 def EnsureNetworkNamespaceAvailability():
     if os.getuid() == 0:
-        logging.debug("Current user is root")
-        logging.warning("Running as root and this will change global namespaces.")
+        log.debug("Current user is root")
+        log.warning("Running as root and this will change global namespaces.")
         return
 
     os.execvpe(
@@ -47,18 +49,18 @@ def EnsureNetworkNamespaceAvailability():
 
 
 def EnsurePrivateState():
-    logging.info("Ensuring /run is privately accessible")
+    log.info("Ensuring /run is privately accessible")
 
-    logging.debug("Making / private")
+    log.debug("Making / private")
     if subprocess.run(["mount", "--make-private", "/"]).returncode != 0:
-        logging.error("Failed to make / private")
-        logging.error("Are you using --privileged if running in docker?")
+        log.error("Failed to make / private")
+        log.error("Are you using --privileged if running in docker?")
         sys.exit(1)
 
-    logging.debug("Remounting /run")
+    log.debug("Remounting /run")
     if subprocess.run(["mount", "-t", "tmpfs", "tmpfs", "/run"]).returncode != 0:
-        logging.error("Failed to mount /run as a temporary filesystem")
-        logging.error("Are you using --privileged if running in docker?")
+        log.error("Failed to mount /run as a temporary filesystem")
+        log.error("Are you using --privileged if running in docker?")
         sys.exit(1)
 
 
@@ -149,68 +151,67 @@ class IsolatedNetworkNamespace:
         self.app_link_name = app_link_name
         self.tool_link_name = tool_link_name
 
-        self.setup()
+        self._setup()
         if setup_app_link_up:
-            self.setup_app_link_up(wait_for_dad=False)
+            self._setup_app_link_up(wait_for_dad=False)
         if setup_tool_link_up:
-            self.setup_tool_link_up(wait_for_dad=False)
+            self._setup_tool_link_up(wait_for_dad=False)
         self._wait_for_duplicate_address_detection()
+
+    def netns_for_subprocess(self, subproc: SubprocessInfo):
+        return "{}-{}".format(subproc.kind, self.index)
 
     def _wait_for_duplicate_address_detection(self):
         # IPv6 does Duplicate Address Detection even though
         # we know ULAs provided are isolated. Wait for 'tentative'
         # address to be gone.
-        logging.info('Waiting for IPv6 DaD to complete (no tentative addresses)')
+        log.info('Waiting for IPv6 DaD to complete (no tentative addresses)')
         for _ in range(100):  # wait at most 10 seconds
             if 'tentative' not in subprocess.check_output(['ip', 'addr'], text=True):
-                logging.info('No more tentative addresses')
+                log.info('No more tentative addresses')
                 break
             time.sleep(0.1)
         else:
-            logging.warning("Some addresses look to still be tentative")
+            log.warning("Some addresses look to still be tentative")
 
-    def setup(self):
+    def _setup(self):
         for command in self.COMMANDS_SETUP:
-            self.run(command)
+            self._run(command)
 
-    def setup_app_link_up(self, wait_for_dad=True):
+    def _setup_app_link_up(self, wait_for_dad=True):
         for command in self.COMMANDS_APP_LINK_UP:
-            self.run(command)
+            self._run(command)
         if wait_for_dad:
             self._wait_for_duplicate_address_detection()
 
-    def setup_tool_link_up(self, wait_for_dad=True):
+    def _setup_tool_link_up(self, wait_for_dad=True):
         for command in self.COMMANDS_TOOL_LINK_UP:
-            self.run(command)
+            self._run(command)
         if wait_for_dad:
             self._wait_for_duplicate_address_detection()
 
-    def run(self, command: str):
+    def _run(self, command: str):
         command = command.format(app_link_name=self.app_link_name,
                                  tool_link_name=self.tool_link_name,
                                  index=self.index)
-        logging.debug("Executing: %s", command)
+        log.debug("Executing: %s", command)
         if subprocess.run(command.split()).returncode != 0:
-            logging.error("Failed to execute '%s'" % command)
-            logging.error("Are you using --privileged if running in docker?")
+            log.error("Failed to execute '%s'" % command)
+            log.error("Are you using --privileged if running in docker?")
             sys.exit(1)
 
     def terminate(self):
         for command in self.COMMANDS_TERMINATE:
-            self.run(command)
-
-    def wrap_in_namespace(self, subproc: SubprocessInfo):
-        return subproc.wrap_with("ip", "netns", "exec", "{}-{}".format(subproc.kind, self.index))
+            self._run(command)
 
 
 class LinuxNamespacedExecutor(Executor):
-    def __init__(self, ns):
+    def __init__(self, ns: IsolatedNetworkNamespace):
         self.ns = ns
 
-    def run(self, subproc: SubprocessInfo, stdin, stdout, stderr):
-        wrapped = self.ns.wrap_in_namespace(subproc)
-        s = subprocess.Popen(wrapped.to_cmd(), stdin=stdin, stdout=stdout, stderr=stderr)
-        return s
+    def run(self, subproc: SubprocessInfo, stdin=None, stdout=None, stderr=None):
+        wrapped = subproc.wrap_with("ip", "netns", "exec", self.ns.netns_for_subprocess(subproc))
+        return subprocess.Popen(wrapped.to_cmd(), stdin=stdin, stdout=stdout, stderr=stderr)
 
 
 class DBusTestSystemBus(subprocess.Popen):
@@ -242,7 +243,7 @@ class BluetoothMock(subprocess.Popen):
         for line in self.stderr:
             if "adapter[1][00:00:00:22:22:22]" in line:
                 self.event.set()
-            logging.debug("%s", line.strip())
+            log.debug("%s", line.strip())
 
     def __init__(self):
         adapters = [f"--adapter={mac}" for mac in self.ADAPTERS]
