@@ -142,9 +142,6 @@ protected:
     int mSelectResult;
 
     ObjectLifeCycle mLayerState;
-#if !CHIP_SYSTEM_CONFIG_USE_LIBEV
-    WakeEvent mWakeEvent;
-#endif
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     std::atomic<pthread_t> mHandleSelectThread;
@@ -152,6 +149,8 @@ protected:
 
 #if CHIP_SYSTEM_CONFIG_USE_LIBEV
     struct ev_loop * mLibEvLoopP;
+#else
+    WakeEvent mWakeEvent;
 #endif
 };
 
