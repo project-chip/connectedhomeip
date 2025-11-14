@@ -61,12 +61,12 @@ public:
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER)
             .enablePosixTime = true,
 #else
-            .enablePosixTime      = false,
+            .enablePosixTime       = false,
 #endif
 #if defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
-            .enablePayloadSnaphot = true,
+            .enablePayloadSnapshot = true,
 #else
-            .enablePayloadSnaphot = false,
+            .enablePayloadSnapshot = false,
 #endif
         };
         gServer.Create(optionalAttributeSet, functionsConfig);
