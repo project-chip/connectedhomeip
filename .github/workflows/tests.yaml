@@ -837,7 +837,7 @@ jobs:
 
         strategy:
             matrix:
-                filter: ["", "TC_[ABCDE]", "TC_[ABCDE]" ]
+                filter: ["", "TC_[ABCDE]", "!TC_[ABCDE]" ]
 
         env:
             BUILD_VARIANT: ipv6only-no-ble-no-wifi
