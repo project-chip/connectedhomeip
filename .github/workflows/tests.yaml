@@ -53,7 +53,7 @@ jobs:
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
             CHIP_TOOL_VARIANT: ${{matrix.chip_tool}}
-            TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
+            TSAN_OPTIONS: "halt_on_error=1 suppressions=${{github.workspace}}/scripts/tests/chiptest/tsan-linux-suppressions.txt"
             LSAN_OPTIONS: detect_leaks=1
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
             CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
@@ -588,7 +588,7 @@ jobs:
                 build_variant: [ipv6only-no-ble-no-wifi]
 
         env:
-            TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
+            TSAN_OPTIONS: "halt_on_error=1 suppressions=${{github.workspace}}/scripts/tests/chiptest/tsan-linux-suppressions.txt"
             BUILD_VARIANT: ${{matrix.build_variant}}
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
             CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
@@ -880,7 +880,7 @@ jobs:
                 build_variant: [ipv6only-no-ble-no-wifi]
 
         env:
-            TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
+            TSAN_OPTIONS: "halt_on_error=1 suppressions=${{github.workspace}}/scripts/tests/chiptest/tsan-linux-suppressions.txt"
             BUILD_VARIANT: ${{matrix.build_variant}}
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
             CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
