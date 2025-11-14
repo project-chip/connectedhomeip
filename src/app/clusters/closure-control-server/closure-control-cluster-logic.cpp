@@ -152,11 +152,15 @@ CHIP_ERROR ClusterLogic::SetCountdownTime(const DataModel::Nullable<ElapsedS> & 
     auto now       = System::SystemClock().GetMonotonicTimestamp();
     bool markDirty = false;
 
-    // TODO: Delegate specific handling logic will be added if needed after after spec issue resolution.
-    //       https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/11603
+    // When fromDelegate=true (delegate updates), we rely on the QuieterReportingAttribute policies
+    // to determine if reporting is needed (increment, change to/from zero, null changes).
+    // When fromDelegate=false (MainState change), we force reporting since the tracked operation changed.
 
-    auto predicate = [](const decltype(mState.mCountdownTime)::SufficientChangePredicateCandidate &) -> bool { return true; };
-    markDirty      = (mState.mCountdownTime.SetValue(countdownTime, now, predicate) == AttributeDirtyState::kMustReport);
+    auto predicate = [fromDelegate](const decltype(mState.mCountdownTime)::SufficientChangePredicateCandidate &) -> bool {
+        // Force reporting when the tracked operation changes due to MainState change
+        return !fromDelegate;
+    };
+    markDirty = (mState.mCountdownTime.SetValue(countdownTime, now, predicate) == AttributeDirtyState::kMustReport);
 
     if (markDirty)
     {
