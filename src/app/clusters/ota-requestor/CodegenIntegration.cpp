@@ -38,38 +38,14 @@ static constexpr size_t kOtaRequestorFixedClusterCount =
     OtaSoftwareUpdateRequestor::StaticApplicationConfig::kFixedClusterConfig.size();
 static constexpr size_t kOtaRequestorMaxClusterCount = kOtaRequestorFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
-bool gUpdatePossibleInitialized = false;
-
 // Uses the global singleton OTARequestorInterface as its data source.
 class OTARequestorClusterUsingSingleton : public OTARequestorCluster
 {
 public:
-    explicit OTARequestorClusterUsingSingleton(EndpointId endpointId, bool updatePossible) :
-        OTARequestorCluster(endpointId, nullptr, updatePossible)
-    {}
+    explicit OTARequestorClusterUsingSingleton(EndpointId endpointId) : OTARequestorCluster(endpointId, nullptr) {}
 
     OTARequestorInterface * OtaRequestorInstance() override { return GetRequestorInstance(); }
 };
-
-bool LoadUpdatePossible(EndpointId endpointId)
-{
-    using Traits = NumericAttributeTraits<bool>;
-    Traits::StorageType temp;
-    uint8_t * readable = Traits::ToAttributeStoreRepresentation(temp);
-    Protocols::InteractionModel::Status status =
-        emberAfReadAttribute(endpointId, OtaSoftwareUpdateRequestor::Id, OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id,
-                             readable, sizeof(temp));
-    if (status != Protocols::InteractionModel::Status::Success || !Traits::CanRepresentValue(/* isNullable = */ false, temp))
-    {
-#if CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
-        ChipLogError(AppServer, "Failed to load UpdatePossible for %u/" ChipLogFormatMEI " (Status %d", endpointId,
-                     ChipLogValueMEI(OtaSoftwareUpdateRequestor::Id), static_cast<int>(status));
-#endif
-        // Return the spec's fallback value.
-        return true;
-    }
-    return Traits::StorageToWorking(temp);
-}
 
 LazyRegisteredServerCluster<OTARequestorClusterUsingSingleton> gServers[kOtaRequestorMaxClusterCount];
 
@@ -79,7 +55,7 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        gServers[clusterInstanceIndex].Create(endpointId, LoadUpdatePossible(endpointId));
+        gServers[clusterInstanceIndex].Create(endpointId);
         return gServers[clusterInstanceIndex].Registration();
     }
 
@@ -96,12 +72,6 @@ public:
 
 void MatterOtaSoftwareUpdateRequestorClusterInitCallback(EndpointId endpointId)
 {
-    if (!gUpdatePossibleInitialized)
-    {
-        LoadUpdatePossible(endpointId);
-        gUpdatePossibleInitialized = true;
-    }
-
     IntegrationDelegate integrationDelegate;
 
     CodegenClusterIntegration::RegisterServer(

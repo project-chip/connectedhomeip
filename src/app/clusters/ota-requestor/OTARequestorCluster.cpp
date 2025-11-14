@@ -37,9 +37,9 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
 
 } // namespace
 
-OTARequestorCluster::OTARequestorCluster(EndpointId endpointId, OTARequestorInterface * otaRequestor, bool updatePossible) :
+OTARequestorCluster::OTARequestorCluster(EndpointId endpointId, OTARequestorInterface * otaRequestor) :
     DefaultServerCluster(ConcreteClusterPath(endpointId, OtaSoftwareUpdateRequestor::Id)),
-    mEventHandlerRegistration(*this, endpointId), mOtaRequestor(otaRequestor), mUpdatePossible(updatePossible)
+    mEventHandlerRegistration(*this, endpointId), mOtaRequestor(otaRequestor)
 {}
 
 CHIP_ERROR OTARequestorCluster::Startup(ServerClusterContext & context)

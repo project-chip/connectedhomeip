@@ -198,6 +198,19 @@ TEST_F(TestOTARequestorCluster, EventInfoTest)
     EXPECT_EQ(eventInfo.readPrivilege, OtaSoftwareUpdateRequestor::Events::DownloadError::kMetadataEntry.readPrivilege);
 }
 
+TEST_F(TestOTARequestorCluster, UpdatePossibleIsModifiable)
+{
+    chip::Test::TestServerClusterContext context;
+    MockOtaRequestor otaRequestor;
+    OTARequestorCluster cluster(kTestEndpointId, &otaRequestor);
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(cluster.GetUpdatePossible());
+
+    cluster.SetUpdatePossible(false);
+    EXPECT_FALSE(cluster.GetUpdatePossible());
+}
+
 TEST_F(TestOTARequestorCluster, AnnounceOtaProviderCommandTest)
 {
     chip::Test::TestServerClusterContext context;
@@ -313,11 +326,7 @@ TEST_F(TestOTARequestorCluster, ReadAttributesTest)
     OTARequestorCluster cluster(kTestEndpointId, &otaRequestor);
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-    OTARequestorCluster clusterUpdateImpossible(kTestEndpointId + 1, &otaRequestor, false);
-    EXPECT_EQ(clusterUpdateImpossible.Startup(context.Get()), CHIP_NO_ERROR);
-
     chip::Test::ClusterTester tester(cluster);
-    chip::Test::ClusterTester testerUpdateImpossible(clusterUpdateImpossible);
 
     // Read and verify DefaultOTAProviders.
     using DecodableProviderLocation = OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType;
@@ -344,8 +353,8 @@ TEST_F(TestOTARequestorCluster, ReadAttributesTest)
     EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id, updatePossible), CHIP_NO_ERROR);
     EXPECT_TRUE(updatePossible);
 
-    EXPECT_EQ(testerUpdateImpossible.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id, updatePossible),
-              CHIP_NO_ERROR);
+    cluster.SetUpdatePossible(false);
+    EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id, updatePossible), CHIP_NO_ERROR);
     EXPECT_FALSE(updatePossible);
 
     // Read and verify UpdateState.

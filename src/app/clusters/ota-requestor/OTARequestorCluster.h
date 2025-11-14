@@ -28,7 +28,10 @@ namespace chip::app::Clusters {
 class OTARequestorCluster : public DefaultServerCluster, public OTARequestorEventHandler
 {
 public:
-    OTARequestorCluster(EndpointId endpointId, OTARequestorInterface * otaRequestor, bool updatePossible = true);
+    OTARequestorCluster(EndpointId endpointId, OTARequestorInterface * otaRequestor);
+
+    void SetUpdatePossible(bool updatePossible) { mUpdatePossible = updatePossible; }
+    bool GetUpdatePossible() const { return mUpdatePossible; }
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
 
