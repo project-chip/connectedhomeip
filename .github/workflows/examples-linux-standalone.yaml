@@ -102,8 +102,6 @@ jobs:
                      "./scripts/build/build_examples.py \
                         --target linux-x64-light-rpc-with-ui \
                         build" && rm -rf out
-            - name: Clean out build output
-              run: rm -rf ./out
             - name: Build example Standalone Bridge
               run: |
                   ./scripts/run_in_build_env.sh \
