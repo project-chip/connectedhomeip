@@ -240,8 +240,6 @@ static_library("system") {
     "TLVPacketBufferBackingStore.cpp",
     "TLVPacketBufferBackingStore.h",
     "TimeSource.h",
-    "WakeEvent.cpp",
-    "WakeEvent.h",
   ]
 
   if (chip_system_layer_impl_config_file == "") {
@@ -266,6 +264,13 @@ static_library("system") {
         "SystemLayerImpl${chip_system_config_event_loop}.h",
       ]
     }
+  }
+
+  if (chip_system_config_event_loop == "Select") {
+    sources += [
+      "WakeEvent.cpp",
+      "WakeEvent.h",
+    ]
   }
 
   cflags = [ "-Wconversion" ]
