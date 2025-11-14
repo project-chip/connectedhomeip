@@ -28,10 +28,17 @@
 #include <clusters/GroupKeyManagement/Metadata.h>
 #include <clusters/GroupKeyManagement/Structs.h>
 #include <credentials/GroupDataProvider.h>
+<<<<<<< HEAD
 #include <crypto/DefaultSessionKeystore.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/ReadOnlyBuffer.h>
+=======
+#include <lib/core/CHIPError.h>
+#include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/ReadOnlyBuffer.h>
+
+>>>>>>> b956206b0a (Add command testing)
 namespace {
 using namespace chip;
 using namespace chip::app;
