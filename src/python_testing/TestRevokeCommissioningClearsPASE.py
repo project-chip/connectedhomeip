@@ -97,7 +97,7 @@ class TestRevokeCommissioningClearsPASE(MatterBaseTest):
             await self.TH2.ReadAttribute(
                 nodeId=pase_node_id,
                 attributes=(ROOT_NODE_ENDPOINT_ID, VendorNameAttr))
-        asserts.assert_equal(e.exception.err,  _CHIP_TIMEOUT_ERROR,
+        asserts.assert_equal(e.exception.err, _CHIP_TIMEOUT_ERROR,
                              f"Expected timeout error reading VendorName attribute over PASE, got {e.exception.err}")
 
         # ---------------------------- Repeat test, but sending RevokeCommissioning over PASE this time --------------------------------
@@ -125,8 +125,6 @@ class TestRevokeCommissioningClearsPASE(MatterBaseTest):
 
         self.print_step(
             10, "Ensure that the PASE Session got cleared, by attempting to read VendorName using TH2 (over PASE) and Ensuring that the Command times out")
-
-        _CHIP_TIMEOUT_ERROR = 50
 
         with asserts.assert_raises(ChipStackError) as e:
             await self.TH2.ReadAttribute(
