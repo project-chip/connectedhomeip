@@ -40,10 +40,10 @@ struct OTARequestorEventHandlerRegistration
     EndpointId endpointId;
     OTARequestorEventHandlerRegistration * next;
 
-    OTARequestorEventHandlerRegistration(OTARequestorEventHandler & handler, EndpointId endpointId,
+    OTARequestorEventHandlerRegistration(OTARequestorEventHandler & handler, EndpointId endpoint,
                                          OTARequestorEventHandlerRegistration * next_item = nullptr) :
         eventHandler(&handler),
-        endpointId(endpointId), next(next_item)
+        endpointId(endpoint), next(next_item)
     {}
     OTARequestorEventHandlerRegistration(OTARequestorEventHandlerRegistration && other) = default;
 

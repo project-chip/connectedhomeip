@@ -342,7 +342,7 @@ TEST_F(TestOTARequestorCluster, StateTransitionEvent)
     EXPECT_EQ(decodedEvent.previousState, OtaSoftwareUpdateRequestor::UpdateStateEnum::kQuerying);
     EXPECT_EQ(decodedEvent.newState, OtaSoftwareUpdateRequestor::UpdateStateEnum::kIdle);
     EXPECT_EQ(decodedEvent.reason, OtaSoftwareUpdateRequestor::ChangeReasonEnum::kFailure);
-    EXPECT_EQ(decodedEvent.targetSoftwareVersion, DataModel::MakeNullable(1000u));
+    EXPECT_EQ(decodedEvent.targetSoftwareVersion, DataModel::MakeNullable<uint32_t>(1000));
 }
 
 TEST_F(TestOTARequestorCluster, StateTransitionEventWithNoOtaRequestor)
@@ -366,7 +366,7 @@ TEST_F(TestOTARequestorCluster, StateTransitionEventWithNoOtaRequestor)
     EXPECT_EQ(decodedEvent.previousState, OtaSoftwareUpdateRequestor::UpdateStateEnum::kQuerying);
     EXPECT_EQ(decodedEvent.newState, OtaSoftwareUpdateRequestor::UpdateStateEnum::kIdle);
     EXPECT_EQ(decodedEvent.reason, OtaSoftwareUpdateRequestor::ChangeReasonEnum::kFailure);
-    EXPECT_EQ(decodedEvent.targetSoftwareVersion, DataModel::MakeNullable(1000u));
+    EXPECT_EQ(decodedEvent.targetSoftwareVersion, DataModel::MakeNullable<uint32_t>(1000));
 }
 
 TEST_F(TestOTARequestorCluster, NoStateTransitionEventWithIdenticalStates)
@@ -445,8 +445,8 @@ TEST_F(TestOTARequestorCluster, DownloadErrorEvents)
     ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR);
     EXPECT_EQ(decodedEvent.softwareVersion, 4000u);
     EXPECT_EQ(decodedEvent.bytesDownloaded, 10000u);
-    EXPECT_EQ(decodedEvent.progressPercent, DataModel::MakeNullable(static_cast<uint8_t>(82u)));
-    EXPECT_EQ(decodedEvent.platformCode, DataModel::MakeNullable(1234567890l));
+    EXPECT_EQ(decodedEvent.progressPercent, DataModel::MakeNullable<uint8_t>(82));
+    EXPECT_EQ(decodedEvent.platformCode, DataModel::MakeNullable<int64_t>(1234567890));
 
     cluster.OnDownloadError(5000u, 12000u, DataModel::NullNullable, DataModel::NullNullable);
     event = eventsGenerator.GetNextEvent();
@@ -479,8 +479,8 @@ TEST_F(TestOTARequestorCluster, DownloadErrorEventsWithNoOtaRequestor)
     ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR);
     EXPECT_EQ(decodedEvent.softwareVersion, 4000u);
     EXPECT_EQ(decodedEvent.bytesDownloaded, 10000u);
-    EXPECT_EQ(decodedEvent.progressPercent, DataModel::MakeNullable(static_cast<uint8_t>(82u)));
-    EXPECT_EQ(decodedEvent.platformCode, DataModel::MakeNullable(1234567890l));
+    EXPECT_EQ(decodedEvent.progressPercent, DataModel::MakeNullable<uint8_t>(82));
+    EXPECT_EQ(decodedEvent.platformCode, DataModel::MakeNullable<int64_t>(1234567890));
 
     cluster.OnDownloadError(5000u, 12000u, DataModel::NullNullable, DataModel::NullNullable);
     event = eventsGenerator.GetNextEvent();
@@ -654,7 +654,8 @@ TEST_F(TestOTARequestorCluster, WritingReadOnlyAttributesReturnsUnsupportedWrite
     ASSERT_TRUE(result.has_value());
     EXPECT_EQ(*result, Protocols::InteractionModel::Status::UnsupportedAttribute);
 
-    result = tester.WriteAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id, DataModel::MakeNullable(50));
+    result = tester.WriteAttribute(OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id,
+                                   DataModel::MakeNullable<uint8_t>(50));
     ASSERT_TRUE(result.has_value());
     EXPECT_EQ(*result, Protocols::InteractionModel::Status::UnsupportedAttribute);
 
