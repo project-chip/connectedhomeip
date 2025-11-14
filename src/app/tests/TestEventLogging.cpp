@@ -356,10 +356,9 @@ TEST_F(TestEventLogging, TestHandlingInvalidEvents)
     gTestDataModelProvider.SetInvalidEndpoint(kTestEndpointId1);
     logMgmt.RemoveEventsWithInvalidPath();
 
-    // Before RemoveEventsWithInvalidPath(), there are 2 events for kTestEndpointId1 and 1 event for kTestEndpointId2 on the Debug buffer,
-    // and 3 events for kTestEndpointId2 on the Info buffer.
-    // After removing invalid events (kTestEndpointId1), only events for kTestEndpointId2 remain:
-    // 1 event on the Debug buffer and 3 events on the Info buffer.
+    // Before RemoveEventsWithInvalidPath(), there are 2 events for kTestEndpointId1 and 1 event for kTestEndpointId2 on the Debug
+    // buffer, and 3 events for kTestEndpointId2 on the Info buffer. After removing invalid events (kTestEndpointId1), only events
+    // for kTestEndpointId2 remain: 1 event on the Debug buffer and 3 events on the Info buffer.
     CheckLogState(logMgmt, 3, chip::app::PriorityLevel::Info);
     CheckLogState(logMgmt, 2, chip::app::PriorityLevel::Debug);
     CheckLogReadOut(logMgmt, 0, 0, &paths[0]);
