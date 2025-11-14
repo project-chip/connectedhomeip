@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 #include <app/clusters/basic-information/BasicInformationCluster.h>
+#include <app/clusters/operational-credentials-server/OperationalCredentialsCluster.h>
+
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/clusters/testing/ClusterTester.h>
 #include <app/persistence/AttributePersistence.h>
@@ -30,6 +32,9 @@
 #include <platform/ConfigurationManager.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <pw_unit_test/framework.h>
+
+#include <app/server/Server.h>
+#include <clusters/BasicInformation/Events.h>
 
 namespace {
 
@@ -49,10 +54,13 @@ static constexpr uint16_t kVendorId                  = static_cast<uint16_t>(Ven
 static constexpr uint16_t kProductId                 = 0x5678;
 static constexpr uint16_t kHardwareVersion           = 1;
 static constexpr uint16_t kManufacturingYear         = 2023;
+static constexpr uint32_t kTestSoftwareVersion       = 0x12345678;
 static constexpr uint8_t kManufacturingMonth         = 6;
 static constexpr uint8_t kManufacturingDay           = 15;
 static constexpr ProductFinishEnum kProductFinish    = ProductFinishEnum::kMatte;
 static constexpr ColorEnum kProductPrimaryColor      = ColorEnum::kBlack;
+
+static constexpr chip::FabricIndex kTestFabricIndex = static_cast<chip::FabricIndex>(123);
 
 // Helper function to safely copy strings and check for buffer size
 CHIP_ERROR SafeCopyString(char * buf, size_t bufSize, const char * source)
@@ -150,7 +158,11 @@ public:
 
     // The following methods does not have implementation on Linux, so we provide
     // a stub that returns success.
-    CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVersion) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVersion) override
+    {
+        softwareVersion = kTestSoftwareVersion;
+        return CHIP_NO_ERROR;
+    }
 
 private:
     char mCountryCode[kCountryCodeLength + 1] = "XX";
@@ -402,4 +414,128 @@ TEST_F(TestBasicInformationReadWrite, TestWriteLocalConfigDisabled)
     }
 }
 
+// TODO: Move all the tests to one file and remove this file TestBasicInformationCluster.cpp
+TEST_F(TestBasicInformationReadWrite, StartUpEventTest)
+{
+    /**
+     * Basic Information Cluster - Event: StartUp (ID: 0x00)
+     * Priority: Critical
+     * Trigger: Generated when the Node starts up.
+     * Data: Must contain the SoftwareVersion (UINT32).
+     */
+
+    // Trigger the server startup sequence to force the cluster to emit the event
+    chip::DeviceLayer::PlatformMgr().HandleServerStarted();
+    uint32_t expectedSoftwareVersion{ kTestSoftwareVersion };
+
+    chip::app::Clusters::BasicInformation::Events::StartUp::DecodableType decodedEvent;
+
+    // Fetch the event from the event generator/log
+    auto event = testContext.EventsGenerator().GetNextEvent();
+    ASSERT_TRUE(event.has_value());
+
+    // Ensure the event priority is CRITICAL as per spec
+    ASSERT_EQ(event->eventOptions.mPriority, chip::app::PriorityLevel::Critical);
+
+    ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR); // NOLINT(bugprone-unchecked-optional-access)
+
+    // Verify the attribute itself is readable (sanity check)
+    ASSERT_EQ(tester.ReadAttribute(Attributes::SoftwareVersion::Id, expectedSoftwareVersion), CHIP_NO_ERROR);
+
+    // Verify the event payload matches the current SoftwareVersion
+    ASSERT_EQ(decodedEvent.softwareVersion, expectedSoftwareVersion);
+}
+
+TEST_F(TestBasicInformationReadWrite, ShutDownEventTest)
+{
+    /**
+     * Basic Information Cluster - Event: ShutDown (ID: 0x01)
+     * Priority: Critical
+     * Trigger: Generated when the Node shuts down.
+     * Data: No data fields defined in Spec 1.3.
+     */
+
+    // Trigger the server shutdown sequence
+    chip::DeviceLayer::PlatformMgr().HandleServerShuttingDown();
+
+    // basicInformationClusterInstance.Shutdown(); // Not needed here as PlatformMgr handles the delegate
+
+    chip::app::Clusters::BasicInformation::Events::ShutDown::DecodableType decodedEvent;
+
+    auto event = testContext.EventsGenerator().GetNextEvent();
+    ASSERT_TRUE(event.has_value());
+
+    // Ensure the event priority is CRITICAL
+    ASSERT_EQ(event->eventOptions.mPriority, chip::app::PriorityLevel::Critical);
+
+    ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR); // NOLINT(bugprone-unchecked-optional-access)
+}
+
+TEST_F(TestBasicInformationReadWrite, LeaveEventTest)
+{
+    /**
+     * Basic Information Cluster - Event: Leave (ID: 0x02)
+     * Priority: Info
+     * Trigger: Generated when the Node leaves a fabric.
+     * Data: Must contain the FabricIndex.
+     */
+
+    // Setup Operational Credentials context to simulate fabric management
+    OperationalCredentialsCluster::Context opCredsContext = { .fabricTable     = Server::GetInstance().GetFabricTable(),
+                                                              .failSafeContext = Server::GetInstance().GetFailSafeContext(),
+                                                              .sessionManager  = Server::GetInstance().GetSecureSessionManager(),
+                                                              .dnssdServer     = app::DnssdServer::Instance(),
+                                                              .commissioningWindowManager =
+                                                                  Server::GetInstance().GetCommissioningWindowManager() };
+
+    OperationalCredentialsCluster opCredsCluster(kRootEndpointId, opCredsContext);
+    ASSERT_EQ(opCredsCluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    // Act: Simulate the removal of a fabric.
+    // The Basic Information cluster listens to FabricTable delegates to trigger the 'Leave' event.
+    opCredsCluster.FabricWillBeRemoved(opCredsContext.fabricTable, kTestFabricIndex);
+
+    chip::app::Clusters::BasicInformation::Events::Leave::DecodableType decodedEvent;
+    auto event = testContext.EventsGenerator().GetNextEvent();
+    ASSERT_TRUE(event.has_value());
+
+    // Ensure the event priority is INFO
+    ASSERT_EQ(event->eventOptions.mPriority, chip::app::PriorityLevel::Info);
+    ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR); // NOLINT(bugprone-unchecked-optional-access)
+
+    // Verify the event contains the correct FabricIndex of the network left
+    ASSERT_EQ(decodedEvent.fabricIndex, kTestFabricIndex);
+}
+
+TEST_F(TestBasicInformationReadWrite, ReachableEventTest)
+{
+    /**
+     * Basic Information Cluster - Event: ReachableChanged (ID: 0x03)
+     * Priority: Info
+     * Trigger: Generated when the Node's reachability changes (e.g. sleep/wake).
+     * Data: reachableNewValue (boolean).
+     */
+
+    // Define the expected new state
+    bool newReachable = false;
+
+    // NOTE: This test manually injects the event.
+    // Ideally, a compliance test would modify the `Reachable` attribute (if writable)
+    // or trigger a platform event that causes the Basic Info cluster to emit this naturally.
+    BasicInformation::Events::ReachableChanged::Type newEvent;
+    newEvent.reachableNewValue                   = newReachable;
+    DataModel::EventsGenerator & eventsGenerator = testContext.Get().interactionContext.eventsGenerator;
+
+    // Manually generate event
+    eventsGenerator.GenerateEvent(newEvent, kRootEndpointId);
+    chip::app::Clusters::BasicInformation::Events::ReachableChanged::DecodableType decodedEvent;
+    auto event = testContext.EventsGenerator().GetNextEvent();
+    ASSERT_TRUE(event.has_value());
+
+    // Ensure the event priority is INFO
+    ASSERT_EQ(event->eventOptions.mPriority, chip::app::PriorityLevel::Info);
+
+    ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR); // NOLINT(bugprone-unchecked-optional-access)
+    ASSERT_EQ(decodedEvent.reachableNewValue, newReachable);
+}
 } // namespace
