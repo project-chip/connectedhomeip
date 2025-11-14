@@ -261,7 +261,7 @@ TEST_F(TestSoftwareDiagnosticsCluster, TestEventGeneration)
     const char faultData[] = "faultdata";
     Events::SoftwareFault::Type fault{
         .id             = 1234,
-        .name           = Optional{ CharSpan::fromCharString("test") },
+        .name           = Optional{ "test"_span },
         .faultRecording = Optional{ ByteSpan(Uint8::from_const_char(faultData), strlen(faultData)) },
     };
 
