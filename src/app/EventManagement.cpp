@@ -20,62 +20,16 @@
 #include <access/RequestPath.h>
 #include <access/SubjectDescriptor.h>
 #include <app/EventManagement.h>
-#include <app/InteractionModelEngine.h>
+#include <app/MessageDef/EventReportIB.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <system/TLVPacketBufferBackingStore.h>
 
 #include <cassert>
 #include <cinttypes>
 
 using namespace chip::TLV;
-using namespace chip::app;
-
-namespace {
-
-struct InvalidEventsRemoveContext
-{
-    chip::Platform::ScopedMemoryBuffer<uint8_t> scopedBuffer;
-    TLVWriter writer;
-    size_t removedEventCount;
-};
-
-CHIP_ERROR FetchBufferExcludeInvalidEvents(const TLVReader & aReader, size_t aDepth, void * apContext)
-{
-    InvalidEventsRemoveContext * ctx = static_cast<InvalidEventsRemoveContext *>(apContext);
-    TLVReader event;
-    TLVType tlvType;
-    TLVType tlvType1;
-    event.Init(aReader);
-    VerifyOrReturnError(event.EnterContainer(tlvType) == CHIP_NO_ERROR, CHIP_NO_ERROR);
-    VerifyOrReturnError(event.Next(ContextTag(EventReportIB::Tag::kEventData)) == CHIP_NO_ERROR, CHIP_NO_ERROR);
-    VerifyOrReturnError(event.EnterContainer(tlvType1) == CHIP_NO_ERROR, CHIP_NO_ERROR);
-
-    while (CHIP_NO_ERROR == event.Next())
-    {
-        if (event.GetTag() == ContextTag(EventDataIB::Tag::kPath))
-        {
-            EventPathIB::Parser path;
-            ConcreteEventPath eventPath;
-            DataModel::EventEntry eventInfo;
-            ReturnErrorOnFailure(path.Init(event));
-            ReturnErrorOnFailure(path.GetEventPath(&eventPath));
-            if (InteractionModelEngine::GetInstance()->GetDataModelProvider()->EventInfo(eventPath, eventInfo) == CHIP_NO_ERROR)
-            {
-                TLVReader encodedEvent;
-                encodedEvent.Init(aReader);
-                ReturnErrorOnFailure(ctx->writer.CopyElement(encodedEvent));
-            }
-            else
-            {
-                ctx->removedEventCount++;
-            }
-        }
-    }
-    return CHIP_NO_ERROR;
-}
-
-} // namespace
 
 namespace chip {
 namespace app {
@@ -131,10 +85,12 @@ CHIP_ERROR EventManagement::Init(Messaging::ExchangeManager * apExchangeManager,
                                  CircularEventBuffer * apCircularEventBuffer,
                                  const LogStorageResources * const apLogStorageResources,
                                  MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter,
-                                 System::Clock::Milliseconds64 aMonotonicStartupTime, EventReporter * apEventReporter)
+                                 System::Clock::Milliseconds64 aMonotonicStartupTime, EventReporter * apEventReporter,
+                                 DataModel::Provider * apDataModelProvider)
 {
     VerifyOrReturnError(apEventReporter != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(aNumBuffers != 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(apDataModelProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mState == EventManagementStates::Shutdown, CHIP_ERROR_INCORRECT_STATE);
 
     CircularEventBuffer * current = nullptr;
@@ -166,7 +122,8 @@ CHIP_ERROR EventManagement::Init(Messaging::ExchangeManager * apExchangeManager,
 
     mMonotonicStartupTime = aMonotonicStartupTime;
 
-    mpEventReporter = apEventReporter;
+    mpEventReporter     = apEventReporter;
+    mpDataModelProvider = apDataModelProvider;
 
     return CHIP_NO_ERROR;
 }
@@ -387,12 +344,12 @@ void EventManagement::CreateEventManagement(Messaging::ExchangeManager * apExcha
                                             CircularEventBuffer * apCircularEventBuffer,
                                             const LogStorageResources * const apLogStorageResources,
                                             MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter,
+                                            EventReporter * apEventReporter, DataModel::Provider * apDataModelProvider,
                                             System::Clock::Milliseconds64 aMonotonicStartupTime)
 {
 
     TEMPORARY_RETURN_IGNORED sInstance.Init(apExchangeManager, aNumBuffers, apCircularEventBuffer, apLogStorageResources,
-                                            apEventNumberCounter, aMonotonicStartupTime,
-                                            &InteractionModelEngine::GetInstance()->GetReportingEngine());
+                                            apEventNumberCounter, aMonotonicStartupTime, apEventReporter, apDataModelProvider);
 }
 
 /**
@@ -462,9 +419,10 @@ CHIP_ERROR EventManagement::LogEvent(EventLoggingDelegate * apDelegate, const Ev
 {
     assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(mState != EventManagementStates::Shutdown, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mpDataModelProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
     // If the event path is invalid, we should not log it in the event log buffer.
     DataModel::EventEntry eventInfo;
-    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->EventInfo(aEventOptions.mPath, eventInfo));
+    ReturnErrorOnFailure(mpDataModelProvider->EventInfo(aEventOptions.mPath, eventInfo));
     return LogEventPrivate(apDelegate, aEventOptions, aEventNumber);
 }
 
@@ -607,7 +565,7 @@ bool EventManagement::IncludeEventInReport(EventLoadOutContext * eventLoadOutCon
     }
 
     DataModel::EventEntry eventInfo;
-    if (InteractionModelEngine::GetInstance()->GetDataModelProvider()->EventInfo(path, eventInfo) != CHIP_NO_ERROR)
+    if (GetInstance().mpDataModelProvider->EventInfo(path, eventInfo) != CHIP_NO_ERROR)
     {
         // If we cannot get event info here, that means the data model doesn't support the
         // event (eg. the endpoint is removed).  Return false, because we can't even perform ACL checks here,
@@ -798,6 +756,48 @@ CHIP_ERROR EventManagement::FabricRemoved(FabricIndex aFabricIndex)
     return err;
 }
 
+struct EventsFilterContext
+{
+    TLVWriter & writer;
+    EventManagement::EventFilterFunction filter;
+};
+
+CHIP_ERROR EventManagement::FilterEventsCB(const TLVReader & aReader, size_t aDepth, void * apContext)
+{
+    EventsFilterContext * ctx = static_cast<EventsFilterContext *>(apContext);
+    TLVReader event;
+    TLVType tlvType;
+    TLVType tlvType1;
+    event.Init(aReader);
+    VerifyOrReturnError(event.EnterContainer(tlvType) == CHIP_NO_ERROR, CHIP_NO_ERROR);
+    VerifyOrReturnError(event.Next(ContextTag(EventReportIB::Tag::kEventData)) == CHIP_NO_ERROR, CHIP_NO_ERROR);
+    VerifyOrReturnError(event.EnterContainer(tlvType1) == CHIP_NO_ERROR, CHIP_NO_ERROR);
+
+    while (CHIP_NO_ERROR == event.Next())
+    {
+        if (event.GetTag() == ContextTag(EventDataIB::Tag::kPath))
+        {
+            EventPathIB::Parser path;
+            ConcreteEventPath eventPath;
+            ReturnErrorOnFailure(path.Init(event));
+            ReturnErrorOnFailure(path.GetEventPath(&eventPath));
+            if (ctx->filter && ctx->filter(eventPath))
+            {
+                TLVReader encodedEvent;
+                encodedEvent.Init(aReader);
+                ReturnErrorOnFailure(ctx->writer.CopyElement(encodedEvent));
+            }
+        }
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EventManagement::FilterEvents(TLVWriter & outputEvents, const TLVReader & inputEvents, EventFilterFunction filter)
+{
+    EventsFilterContext ctx{ outputEvents, filter };
+    return TLV::Utilities::Iterate(inputEvents, FilterEventsCB, &ctx, false).NoErrorIf(CHIP_END_OF_TLV);
+}
+
 CHIP_ERROR EventManagement::RemoveEventsWithInvalidPath()
 {
     assertChipStackLockedByCurrentThread();
@@ -810,41 +810,35 @@ CHIP_ERROR EventManagement::RemoveEventsWithInvalidPath()
         }
         TLVReader reader;
         CircularTLVReader circularReader;
-        InvalidEventsRemoveContext ctx;
         circularReader.Init(*currentBuffer);
         reader.Init(circularReader);
         // The data length of current buffer will not be larger than the buffer length.
-        ctx.scopedBuffer.Calloc(currentBuffer->DataLength());
-        VerifyOrReturnError(ctx.scopedBuffer.Get(), CHIP_ERROR_NO_MEMORY);
-        ctx.writer.Init(ctx.scopedBuffer.Get(), currentBuffer->DataLength());
-        ctx.removedEventCount = 0;
-        // Get a buffer which excludes the events with the invalid path from current buffer.
-        CHIP_ERROR err = TLV::Utilities::Iterate(reader, FetchBufferExcludeInvalidEvents, &ctx, false);
-        if (err == CHIP_END_OF_TLV)
-        {
-            err = CHIP_NO_ERROR;
-        }
-        ReturnErrorOnFailure(err);
-        if (ctx.removedEventCount == 0)
-        {
-            // No event gets removed, switch to the next buffer
-            continue;
-        }
-        ReturnErrorOnFailure(ctx.writer.Finalize());
+        Platform::ScopedMemoryBuffer<uint8_t> scopedBuffer;
+        scopedBuffer.Calloc(currentBuffer->DataLength());
+        VerifyOrReturnError(scopedBuffer.Get(), CHIP_ERROR_NO_MEMORY);
+        TLVWriter writer;
+        writer.Init(scopedBuffer.Get(), currentBuffer->DataLength());
+        ReturnErrorOnFailure(FilterEvents(writer, reader, CheckEventPath));
+        ReturnErrorOnFailure(writer.Finalize());
         // Intentionally set mProcessEvictedElement to nullptr to prevent callbacks during eviction.
-        // This ensures that no handlers are invoked while clearing events. The original value is not restored,
-        // as callbacks are not required after this operation.
+        // For the Events with invalid path, the callback is not required as their data will not be checked during eviction.
+        // For the Events with valid path, it will be added after being removed from the buffer, so they don't need the callback
+        // either.
+        CircularEventBuffer::ProcessEvictedElementFunct restoreEvictFunct = currentBuffer->mProcessEvictedElement;
+        // Restore the Evict function to prevent potential issues
         currentBuffer->mProcessEvictedElement = nullptr;
         // Evict all the events in current buffer
         while (currentBuffer->DataLength() > 0)
         {
             ReturnErrorOnFailure(currentBuffer->EvictHead());
         }
+        currentBuffer->mProcessEvictedElement = restoreEvictFunct;
         // Copy the obtained buffer to current buffer
         CircularTLVWriter circularWriter;
         TLVReader copyReader;
         circularWriter.Init(*currentBuffer);
-        copyReader.Init(ctx.scopedBuffer.Get(), ctx.writer.GetLengthWritten());
+        copyReader.Init(scopedBuffer.Get(), writer.GetLengthWritten());
+        CHIP_ERROR err = CHIP_NO_ERROR;
         while ((err = copyReader.Next()) == CHIP_NO_ERROR)
         {
             ReturnErrorOnFailure(circularWriter.CopyElement(copyReader));

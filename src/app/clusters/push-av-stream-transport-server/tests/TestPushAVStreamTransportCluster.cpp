@@ -104,10 +104,10 @@ public:
         AppContext::SetUp();
 
         ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
-        chip::app::InteractionModelEngine::GetInstance()->SetDataModelProvider(&gDataModelProvider);
 
-        chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), std::size(logStorageResources),
-                                                          gCircularEventBuffer, logStorageResources, &mEventCounter);
+        chip::app::EventManagement::CreateEventManagement(
+            &GetExchangeManager(), std::size(logStorageResources), gCircularEventBuffer, logStorageResources, &mEventCounter,
+            &chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine(), &gDataModelProvider);
     }
 
     void TearDown() override

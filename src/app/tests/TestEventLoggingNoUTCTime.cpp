@@ -102,11 +102,11 @@ public:
         };
 
         AppContext::SetUp();
-        chip::app::InteractionModelEngine::GetInstance()->SetDataModelProvider(
-            chip::app::CodegenDataModelProviderInstance(nullptr));
         ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
         chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), MATTER_ARRAY_SIZE(logStorageResources),
-                                                          gCircularEventBuffer, logStorageResources, &mEventCounter);
+                                                          gCircularEventBuffer, logStorageResources, &mEventCounter,
+                                                          &chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine(),
+                                                          chip::app::CodegenDataModelProviderInstance(nullptr));
     }
 
     // Performs teardown for each individual test in the test suite

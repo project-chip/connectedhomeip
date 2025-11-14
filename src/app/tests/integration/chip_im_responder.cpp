@@ -145,7 +145,9 @@ CHIP_ERROR InitializeEventLogging(chip::Messaging::ExchangeManager * apMgr)
     chip::app::InteractionModelEngine::GetInstance()->SetDataModelProvider(
         chip::app::CodegenDataModelProviderInstance(&gTestPersistentStorageDelegate));
     chip::app::EventManagement::CreateEventManagement(apMgr, MATTER_ARRAY_SIZE(logStorageResources), gCircularEventBuffer,
-                                                      logStorageResources, &gEventCounter);
+                                                      logStorageResources, &gEventCounter,
+                                                      &chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine(),
+                                                      chip::app::CodegenDataModelProviderInstance(&gTestPersistentStorageDelegate));
     return CHIP_NO_ERROR;
 }
 
