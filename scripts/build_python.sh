@@ -398,7 +398,7 @@ if [ -n "$install_virtual_env" ]; then
                     echo "Ensure PCSC development libraries are installed for your distro."
                 fi
             fi
-            
+
             "$ENVIRONMENT_ROOT"/bin/pip install -r "$CHIP_ROOT/src/python_testing/requirements.nfc.txt"
         fi
 
