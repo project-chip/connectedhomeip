@@ -819,7 +819,9 @@ jobs:
 
         strategy:
             matrix:
-                filter: ["", "TC_[ABCDE]", "!TC_[ABCDE]" ]
+                # This list is empirically created to have a reasonable time split. The "" that runs the "other"
+                # tests is reasonably fast, the others take about 20-30 minutes each at the time this was split.
+                filter: ["", "TC_[A-C]", "TC_D-O", "!TC_[A-O]" ]
 
         env:
             BUILD_VARIANT: ipv6only-no-ble-no-wifi
