@@ -80,6 +80,7 @@ class TestDataModelProvider : public Test::EmptyProvider
 public:
     CHIP_ERROR EventInfo(const app::ConcreteEventPath & path, app::DataModel::EventEntry & eventInfo) override
     {
+        eventInfo.readPrivilege = Access::Privilege::kView;
         return CHIP_NO_ERROR;
     }
 };
