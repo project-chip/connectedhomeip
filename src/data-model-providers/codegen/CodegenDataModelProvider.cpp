@@ -538,7 +538,7 @@ CHIP_ERROR CodegenDataModelProvider::EndpointUniqueID(EndpointId endpointId, Mut
 {
     char buffer[Clusters::Descriptor::Attributes::EndpointUniqueID::TypeInfo::MaxLength()] = { 0 };
     MutableCharSpan epUniqueIdSpan(buffer);
-    emberAfGetEndpointUniqueIdForEndPoint(endpointId, epUniqueIdSpan);
+    ReturnErrorOnFailure(emberAfGetEndpointUniqueIdForEndPoint(endpointId, epUniqueIdSpan));
 
     memcpy(epUniqueId.data(), epUniqueIdSpan.data(), epUniqueIdSpan.size());
     return CHIP_NO_ERROR;

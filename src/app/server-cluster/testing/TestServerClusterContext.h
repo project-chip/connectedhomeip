@@ -60,7 +60,7 @@ public:
             .interactionContext = mTestContext,
         }
     {
-        mDefaultAttributePersistenceProvider.Init(&mTestStorage);
+        SuccessOrDie(mDefaultAttributePersistenceProvider.Init(&mTestStorage));
     }
 
     /// Get a stable pointer to the underlying context

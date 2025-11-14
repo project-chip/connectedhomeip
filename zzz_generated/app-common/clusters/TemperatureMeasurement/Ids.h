@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster TemperatureMeasurement (cluster code: 1026/0x04402)
+// Identifier constant values for cluster TemperatureMeasurement (cluster code: 1026/0x0402)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

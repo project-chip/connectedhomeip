@@ -74,7 +74,7 @@ if (wifi_soc) {
     ]
 
     include_dirs = [
-      "${chip_root}/src/platform/silabs/SiWx917",
+      "${chip_root}/src/platform/silabs/SiWx",
       "${silabs_project_dir}/include",
       "${examples_plat_dir}",
       "${chip_root}/src/lib",
@@ -138,6 +138,10 @@ silabs_executable("closure_app") {
     "src/ClosureManager.cpp",
     "src/DataModelCallbacks.cpp",
   ]
+
+  if (!disable_lcd) {
+    sources += [ "src/ClosureUI.cpp" ]
+  }
 
   deps = [ ":sdk" ]
 

@@ -163,18 +163,18 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
                 chip_tool = SubprocessInfo(kind='tool', path=chip_tool_path)
 
     if include_tags:
-        include_tags = set([TestTag.__members__[t] for t in include_tags])
+        include_tags = {TestTag.__members__[t] for t in include_tags}
 
     if exclude_tags:
-        exclude_tags = set([TestTag.__members__[t] for t in exclude_tags])
+        exclude_tags = {TestTag.__members__[t] for t in exclude_tags}
 
     # Figures out selected test that match the given name(s)
     if runtime == TestRunTime.MATTER_REPL_PYTHON:
-        all_tests = [test for test in chiptest.AllReplYamlTests()]
+        all_tests = list(chiptest.AllReplYamlTests())
     elif runtime == TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON:
-        all_tests = [test for test in chiptest.AllDarwinFrameworkToolYamlTests()]
+        all_tests = list(chiptest.AllDarwinFrameworkToolYamlTests())
     else:
-        all_tests = [test for test in chiptest.AllChipToolYamlTests()]
+        all_tests = list(chiptest.AllChipToolYamlTests())
 
     tests = all_tests
 
