@@ -55,6 +55,16 @@ public:
         const char * context;
     };
 
+    MockCommandHandler() = default;
+
+    // Prevent accidental copies — PacketBufferHandle inside ResponseRecord is move-only.
+    MockCommandHandler(const MockCommandHandler &)             = delete;
+    MockCommandHandler & operator=(const MockCommandHandler &) = delete;
+
+    // Allow moves (optional). If you don't need move semantics you can omit these.
+    MockCommandHandler(MockCommandHandler &&)             = default;
+    MockCommandHandler & operator=(MockCommandHandler &&) = default;
+
     ~MockCommandHandler() override = default;
 
     CHIP_ERROR FallibleAddStatus(const app::ConcreteCommandPath & aRequestCommandPath,

@@ -73,6 +73,7 @@ namespace Testing {
 class ClusterTester
 {
 public:
+    // Constructor using internal default handler
     ClusterTester(app::ServerClusterInterface & cluster) : mCluster(cluster) {}
 
     app::ServerClusterContext & GetServerClusterContext() { return mTestServerClusterContext.Get(); }
