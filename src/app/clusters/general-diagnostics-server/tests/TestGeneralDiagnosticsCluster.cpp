@@ -253,7 +253,7 @@ TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotCommandTest)
     // Create a cluster with no optional attributes enabled
     const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
     ScopedDiagnosticsProvider<NullProvider> nullProvider;
-    GeneralDiagnosticsCluster cluster(optionalAttributeSet);
+    GeneralDiagnosticsCluster cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0));
 
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -275,7 +275,7 @@ TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotCommandWithPosixTimeTest)
         .enablePosixTime       = true,
         .enablePayloadSnapshot = false,
     };
-    GeneralDiagnosticsClusterFullConfigurable cluster(optionalAttributeSet, functionsConfig);
+    GeneralDiagnosticsClusterFullConfigurable cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0), functionsConfig);
 
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -296,7 +296,7 @@ TEST_F(TestGeneralDiagnosticsCluster, TimeSnapshotResponseValues)
     // Create a cluster with no optional attributes enabled
     const GeneralDiagnosticsCluster::OptionalAttributeSet optionalAttributeSet;
     ScopedDiagnosticsProvider<NullProvider> nullProvider;
-    GeneralDiagnosticsCluster cluster(optionalAttributeSet);
+    GeneralDiagnosticsCluster cluster(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(0));
 
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
