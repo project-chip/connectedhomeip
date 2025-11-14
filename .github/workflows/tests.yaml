@@ -257,8 +257,6 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/zone-management-cluster.xml \
                   "
             - name: Build Apps (part 1)
-              id: build_with_cache
-              continue-on-error: true
               env:
                   CCACHE_DIR: "${{ github.workspace }}/.ccache"
               run: |
@@ -277,8 +275,6 @@ jobs:
             - name: Clean out
               run: rm -rf out/
             - name: Build Apps (part 2)
-              id: build_with_cache
-              continue-on-error: true
               env:
                   CCACHE_DIR: "${{ github.workspace }}/.ccache"
               run: |
@@ -298,8 +294,6 @@ jobs:
             - name: Clean out
               run: rm -rf out/
             - name: Build Python
-              id: build_with_cache
-              continue-on-error: true
               env:
                   CCACHE_DIR: "${{ github.workspace }}/.ccache"
               run: |
