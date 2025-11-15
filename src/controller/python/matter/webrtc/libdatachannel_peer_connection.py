@@ -217,7 +217,7 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
         return await self._remote_events[Events.ANSWER].get(timeout_s)
 
     async def get_remote_ice_candidates(self, timeout_s: Optional[int] = None) -> tuple[int, list[str]]:
-        """Waits for a list of remote ICE Canddidates to be received through a matter command.
+        """Waits for a list of remote ICE Candidates to be received through a matter command.
 
         Args:
             timeout_s (Optional[int]): The maximum time in seconds to wait for a list of remote candidates.
