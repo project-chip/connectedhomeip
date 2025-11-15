@@ -175,6 +175,31 @@ public:
 
         result.status = mCluster.InvokeCommand(invokeRequest, reader, &mHandler);
 
+        // If InvokeCommand returned nullopt, it means the command implementation handled the response.
+        // We need to check the mock handler for a data response or a status response.
+        if (!result.status.has_value())
+        {
+            if (mHandler.HasResponse())
+            {
+                // A data response was added, so the command is successful.
+                result.status = app::DataModel::ActionReturnStatus(CHIP_NO_ERROR);
+            }
+            else if (mHandler.HasStatus())
+            {
+                // A status response was added. Use the last one.
+                result.status = app::DataModel::ActionReturnStatus(mHandler.GetLastStatus().status);
+            }
+            else
+            {
+                // Neither response nor status was provided; this is unexpected.
+                // This would happen either in error (as mentioned here) or if the command is supposed
+                // to be handled asynchronously. ClusterTester does not support such asynchronous processing.
+                result.status = app::DataModel::ActionReturnStatus(CHIP_ERROR_INCORRECT_STATE);
+                ChipLogError(
+                    Test, "InvokeCommand returned nullopt, but neither HasResponse nor HasStatus is true. Setting error status.");
+            }
+        }
+
         // If command was successful and there's a response, decode it (skip for NullObjectType)
         if constexpr (!std::is_same_v<ResponseType, app::DataModel::NullObjectType>)
         {

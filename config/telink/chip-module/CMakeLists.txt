@@ -212,6 +212,19 @@ if (CONFIG_CHIP_OTA_IMAGE_BUILD)
 endif()
 
 # ==============================================================================
+# Define 'dfu-smp-image' target for building DFU over BT SMP image
+# ==============================================================================
+
+if (CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD)
+    file(WRITE "${PROJECT_BINARY_DIR}/empty.txt" "")
+    chip_ota_image(dfu-smp-image
+        INPUT_FILES ${PROJECT_BINARY_DIR}/empty.txt
+        OUTPUT_FILE ${PROJECT_BINARY_DIR}/dfu.data
+    )
+    add_dependencies(process_binaries dfu-smp-image)
+endif()
+
+# ==============================================================================
 # Define 'factory_data' target for generating a factory data partition
 # ==============================================================================
 
