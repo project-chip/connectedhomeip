@@ -69,6 +69,34 @@ namespace Test {
 //     ASSERT_GT(it.GetValue().label.size(), 0u);
 // }
 //
+
+// Detection traits for Encode() and EncodeForWrite()
+template <typename...>
+using void_t = void;
+
+template <typename T, typename = void>
+struct HasEncodeForWrite : std::false_type
+{
+};
+
+template <typename T>
+struct HasEncodeForWrite<T,
+                         void_t<decltype(std::declval<T>().EncodeForWrite(std::declval<TLV::TLVWriter &>(), TLV::AnonymousTag()))>>
+    : std::true_type
+{
+};
+
+template <typename T, typename = void>
+struct HasGenericEncode : std::false_type
+{
+};
+
+template <typename T>
+struct HasGenericEncode<T, void_t<decltype(std::declval<T>().Encode(std::declval<TLV::TLVWriter &>(), TLV::AnonymousTag()))>>
+    : std::true_type
+{
+};
+
 class ClusterTester
 {
 public:
