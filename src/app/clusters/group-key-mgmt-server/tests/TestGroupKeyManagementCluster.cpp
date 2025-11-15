@@ -265,7 +265,7 @@ TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttributeDu
 
 TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttribute)
 {
-    auto keys                     = TestHelpers::CreateGroupKeyMapList(2, fabricIndex);
+    auto keys = TestHelpers::CreateGroupKeyMapList(2, fabricIndex);
 
     PrepopulateGroupKeyMap(keys, fabricIndex);
     VerifyGroupKeysMatch(fabricIndex, keys);
