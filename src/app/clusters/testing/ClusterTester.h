@@ -69,35 +69,6 @@ namespace Test {
 //     ASSERT_GT(it.GetValue().label.size(), 0u);
 // }
 //
-
-// Detection traits for Encode() and EncodeForWrite()
-template <typename...>
-using void_t = void;
-
-// Detection traits for Encode() and EncodeForWrite()
-template <typename T, typename = void>
-struct HasEncodeForWrite : std::false_type
-{
-};
-
-template <typename T>
-struct HasEncodeForWrite<T,
-                         void_t<decltype(std::declval<T>().EncodeForWrite(std::declval<TLV::TLVWriter &>(), TLV::AnonymousTag()))>>
-    : std::true_type
-{
-};
-
-template <typename T, typename = void>
-struct HasGenericEncode : std::false_type
-{
-};
-
-template <typename T>
-struct HasGenericEncode<T, void_t<decltype(std::declval<T>().Encode(std::declval<TLV::TLVWriter &>(), TLV::AnonymousTag()))>>
-    : std::true_type
-{
-};
-
 class ClusterTester
 {
 public:
@@ -176,13 +147,12 @@ public:
     };
 
     // Invoke a command and return the decoded result.
-    // The `RequestType`, `ResponseType` type-parameters must be of the correct type for the command being invoked.
-    // Use `app::Clusters::<ClusterName>::Commands::<CommandName>::Type` for the `RequestType` type-parameter to be spec compliant
-    // Use `app::Clusters::<ClusterName>::Commands::<CommandName>::Type::ResponseType` for the `ResponseType` type-parameter to be
-    // spec compliant Will construct the command path using the first path returned by `GetPaths()` on the cluster.
+    // The `request` parameter must be of the correct type for the command being invoked.
+    // Use `app::Clusters::<ClusterName>::Commands::<CommandName>::Type` for the `request` parameter to be spec compliant
+    // Will construct the command path using the first path returned by `GetPaths()` on the cluster.
     // @returns `CHIP_ERROR_INCORRECT_STATE` if `GetPaths()` doesn't return a list with one path.
-    template <typename ResponseType, typename RequestType>
-    [[nodiscard]] InvokeResult<ResponseType> Invoke(CommandId commandId, const RequestType & request)
+    template <typename RequestType, typename ResponseType = typename RequestType::ResponseType>
+    [[nodiscard]] InvokeResult<ResponseType> Invoke(chip::CommandId commandId, const RequestType & request)
     {
         InvokeResult<ResponseType> result;
 
@@ -207,6 +177,31 @@ public:
 
         result.status = mCluster.InvokeCommand(invokeRequest, reader, &mHandler);
 
+        // If InvokeCommand returned nullopt, it means the command implementation handled the response.
+        // We need to check the mock handler for a data response or a status response.
+        if (!result.status.has_value())
+        {
+            if (mHandler.HasResponse())
+            {
+                // A data response was added, so the command is successful.
+                result.status = app::DataModel::ActionReturnStatus(CHIP_NO_ERROR);
+            }
+            else if (mHandler.HasStatus())
+            {
+                // A status response was added. Use the last one.
+                result.status = app::DataModel::ActionReturnStatus(mHandler.GetLastStatus().status);
+            }
+            else
+            {
+                // Neither response nor status was provided; this is unexpected.
+                // This would happen either in error (as mentioned here) or if the command is supposed
+                // to be handled asynchronously. ClusterTester does not support such asynchronous processing.
+                result.status = app::DataModel::ActionReturnStatus(CHIP_ERROR_INCORRECT_STATE);
+                ChipLogError(
+                    Test, "InvokeCommand returned nullopt, but neither HasResponse nor HasStatus is true. Setting error status.");
+            }
+        }
+
         // If command was successful and there's a response, decode it (skip for NullObjectType)
         if constexpr (!std::is_same_v<ResponseType, app::DataModel::NullObjectType>)
         {
@@ -228,6 +223,12 @@ public:
         }
 
         return result;
+    }
+
+    // Returns the next generated event from the event generator in the test server cluster context
+    std::optional<LogOnlyEvents::EventInformation> GetNextGeneratedEvent()
+    {
+        return mTestServerClusterContext.EventsGenerator().GetNextEvent();
     }
 
     /*
@@ -304,7 +305,7 @@ public:
     }
 
 private:
-    // Helper to encode any value to TLV
+ // Helper to encode any value to TLV
     template <typename T>
     static CHIP_ERROR EncodeValueToTLV(TLV::TLVWriter & writer, const T & value)
     {
@@ -326,7 +327,6 @@ private:
             return CHIP_ERROR_NOT_IMPLEMENTED;
         }
     }
-
     bool VerifyClusterPathsValid()
     {
         auto paths = mCluster.GetPaths();
