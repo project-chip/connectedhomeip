@@ -331,7 +331,7 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
         """Callback function called when a remote SDP answer is received through a matter command."""
         self._remote_events[Events.ANSWER].put((sessionId, answer_sdp))
 
-    def on_remote_ice_candidates(self, sessionId: int, candidates: list[str]) -> None:
+    def on_remote_ice_candidates(self, sessionId: int, candidates: list[IceCandidate]) -> None:
         """Callback function called when a remote ICE candidates are received through a matter command.
 
         Implements trickle ICE by immediately applying received candidates to the peer connection.
