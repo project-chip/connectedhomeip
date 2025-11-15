@@ -331,7 +331,7 @@ class BrowserPeerConnection(BrowserWebRTCClient):
         """
         # Immediately apply candidates for trickle ICE support
         LOGGER.debug(f"Applying {len(candidates)} candidates for trickle ICE support: {candidates}")
-        self.set_remote_ice_candidates(candidates)
+        await self.set_remote_ice_candidates(candidates)
 
         # Also put in event queue for any waiting consumers
         self._remote_events[Events.ICE_CANDIDATE].put((sessionId, candidates))
