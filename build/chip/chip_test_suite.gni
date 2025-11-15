@@ -116,7 +116,7 @@ template("chip_test_suite") {
         }
 
         if (use_coverage && is_clang) {
-          # Generates clang coverage to "<TestName>.profraw" instead of "deafault.profraw"
+          # Generates clang coverage to "<TestName>.profraw" instead of "default.profraw"
           _clang_coverage_setup = "${root_build_dir}/clang_static_coverage_config/${_test_name}ClangCoverageConfig.cpp"
           pw_python_action("${_test_name}-clang-coverage") {
             script = "${chip_root}/scripts/build/clang_coverage_wrapper.py"
