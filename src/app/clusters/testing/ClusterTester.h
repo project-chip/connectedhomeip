@@ -305,7 +305,7 @@ public:
     }
 
 private:
- // Helper to encode any value to TLV
+    // Helper to encode any value to TLV
     template <typename T>
     static CHIP_ERROR EncodeValueToTLV(TLV::TLVWriter & writer, const T & value)
     {
