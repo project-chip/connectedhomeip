@@ -61,7 +61,6 @@ public:
     MockCommandHandler(const MockCommandHandler &)             = delete;
     MockCommandHandler & operator=(const MockCommandHandler &) = delete;
 
-    // Allow moves (optional). If you don't need move semantics you can omit these.
     MockCommandHandler(MockCommandHandler &&)             = default;
     MockCommandHandler & operator=(MockCommandHandler &&) = default;
 
