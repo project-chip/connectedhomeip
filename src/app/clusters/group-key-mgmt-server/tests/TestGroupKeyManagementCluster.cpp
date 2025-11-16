@@ -145,6 +145,7 @@ struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementC
 
         mRealProvider.SetStorageDelegate(storage);
         mRealProvider.SetSessionKeystore(&mMockKeystore);
+
         ASSERT_EQ(mRealProvider.Init(), CHIP_NO_ERROR);
         ASSERT_EQ(mCluster.Startup(mTestContext.Get()), CHIP_NO_ERROR);
 
