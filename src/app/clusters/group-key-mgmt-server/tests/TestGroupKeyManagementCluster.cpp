@@ -139,6 +139,8 @@ struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementC
 
     TestGroupKeyManagementClusterWithStorage() : tester(mCluster) {}
 
+    chip::app::Testing::MockCommandHandler mHandler;
+
     void SetUp() override
     {
         if (Server::GetInstance().GetFabricTable().FabricCount() > 0)
@@ -146,6 +148,7 @@ struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementC
             Server::GetInstance().GetFabricTable().DeleteAllFabrics();
         }
 
+        tester.SetCommandHandler(&mHandler);
         auto * storage = &mTestContext.StorageDelegate();
 
         mRealProvider.SetStorageDelegate(storage);
