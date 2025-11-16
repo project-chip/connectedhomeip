@@ -18,6 +18,7 @@
 #include <app/clusters/group-key-mgmt-server/GroupKeyManagementCluster.h>
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/clusters/testing/ClusterTester.h>
+#include <app/clusters/testing/ValidateGlobalAttributes.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
@@ -90,17 +91,9 @@ TEST_F(TestGroupKeyManagementCluster, CommandsTest)
 TEST_F(TestGroupKeyManagementCluster, AttributesTest)
 {
     GroupKeyManagementCluster cluster;
-    ConcreteClusterPath groupKeyManagementPath = ConcreteClusterPath(kRootEndpointId, GroupKeyManagement::Id);
-
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
-    ASSERT_EQ(cluster.Attributes(groupKeyManagementPath, attributesBuilder), CHIP_NO_ERROR);
-
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedBuilder;
-    ASSERT_EQ(expectedBuilder.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-
     // There are only mandatory attributes in this cluster, so it should match the ones in Metadata exactly
-    ASSERT_EQ(expectedBuilder.AppendElements(GroupKeyManagement::Attributes::kMandatoryMetadata), CHIP_NO_ERROR);
-    ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+    ASSERT_TRUE(chip::Testing::IsAttributesListEqualTo(cluster, GroupKeyManagement::Attributes::kMandatoryMetadata.data(),
+                                                       GroupKeyManagement::Attributes::kMandatoryMetadata.size()));
 }
 
 class MockSessionKeystore : public Crypto::SessionKeystore

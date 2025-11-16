@@ -45,6 +45,14 @@ namespace Testing {
 bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster,
                              std::initializer_list<const app::DataModel::AttributeEntry> expected);
 
+/// Overload of IsAttributesListEqualTo that accepts a pointer and count for cleaner tests
+///
+/// Parameters:
+///     cluster - The cluster interface to test.
+///     entries - Pointer to the first attribute entry
+///     count - Number of attribute entries
+bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster, const app::DataModel::AttributeEntry * entries, size_t count);
+
 /// Compares the accepted commands of a cluster against an expected set.
 ///
 /// This function retrieves the accepted commands for the first path returned by `cluster.GetPaths()`

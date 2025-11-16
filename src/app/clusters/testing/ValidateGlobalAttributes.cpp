@@ -42,6 +42,26 @@ bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster,
     return EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer());
 }
 
+bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster, const app::DataModel::AttributeEntry * entries, size_t count)
+{
+    ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> expectedBuilder;
+    SuccessOrDie(expectedBuilder.EnsureAppendCapacity(count));
+    for (size_t i = 0; i < count; ++i)
+    {
+        SuccessOrDie(expectedBuilder.Append(entries[i]));
+    }
+    SuccessOrDie(expectedBuilder.AppendElements(app::DefaultServerCluster::GlobalAttributes()));
+
+    ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> actualBuilder;
+    if (CHIP_ERROR err = cluster.Attributes(cluster.GetPaths()[0], actualBuilder); err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Test, "Failed to get attributes list from cluster. Error: %" CHIP_ERROR_FORMAT, err.Format());
+        return false;
+    }
+
+    return EqualAttributeSets(actualBuilder.TakeBuffer(), expectedBuilder.TakeBuffer());
+}
+
 bool IsAcceptedCommandsListEqualTo(app::ServerClusterInterface & cluster,
                                    std::initializer_list<const app::DataModel::AcceptedCommandEntry> expected)
 {
