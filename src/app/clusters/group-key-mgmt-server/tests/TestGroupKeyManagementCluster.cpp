@@ -141,6 +141,11 @@ struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementC
 
     void SetUp() override
     {
+        if (Server::GetInstance().GetFabricTable().FabricCount() > 0)
+        {
+            Server::GetInstance().GetFabricTable().DeleteAllFabrics();
+        }
+
         auto * storage = &mTestContext.StorageDelegate();
 
         mRealProvider.SetStorageDelegate(storage);
