@@ -137,8 +137,10 @@ public:
         return app::DataModel::Decode(attributeData[0].dataReader, out);
     }
 
-    // multi-fabric writes will not work
-    // does not handle structs or ZAP-generated types with Encode / EncodeForWrite(), or DataModel::List.
+    // Uses ::DecodableType (or ::DecodableList) for attribute writes.
+    // For simple types, ::Type may work since it aliases to ::DecodableType, but not for complex structs.
+    // Complex structs define a custom ::DecodableType with Decode() logic to map TLV fields back to members.
+
     // Write attribute from `value` parameter.
     // The `value` parameter must be of the correct type for the attribute being written.
     // Use `app::Clusters::<ClusterName>::Attributes::<AttributeName>::TypeInfo::Type` for the `value` parameter to be spec
@@ -259,19 +261,20 @@ public:
         return mTestServerClusterContext.EventsGenerator().GetNextEvent();
     }
 
-    /*
-     * CHIP Test Cluster Write Helpers
-     *
-     *  - Scalars/enums: written directly using DecoderFor().
-     *  - Structs/ZAP structs: encoded into a TLV buffer via Encode() or EncodeForWrite().
-     *  - Lists: encoded as TLV arrays. Each element is encoded individually:
-     *      * Struct elements must provide EncodeForWrite().
-     *      * Simple elements (integral, enum) are handled by generic templated encoding.
-     *  - Supports multiple fabrics through WriteOperation subject descriptors.
-     *  - Uses cluster.GetPaths() to automatically deduce the endpoint + cluster for convenience.
-     */
+    /// CHIP Test Cluster Write Helpers
+    //  - Multi-fabric writes are supported through WriteOperation subject descriptors.
+    // - Cluster paths are automatically deduced using cluster.GetPaths().
 
-    // Write single value
+    //  - Scalars/enums:
+    //    * Written directly using DecoderFor().
+    //    * `value` must match the attribute's ::DecodableType.
+    //    * Example: WriteAttribute(attrId, 42, fabricIndex);
+
+    //  - Structs/ZAP structs: use WriteAttribute(attrId, structValue, fabricIndex)
+    //     * Encoded into a TLV buffer via Encode() or EncodeForWrite().
+    //     * `value` must match ::DecodableType.
+    //     * Example: MyStruct s{42, true}; WriteAttribute(attrId, s, fabricIndex);
+
     template <typename T>
     CHIP_ERROR WriteAttribute(AttributeId attr, const T & value, FabricIndex fabricIndex)
     {
@@ -298,7 +301,13 @@ public:
         app::AttributeValueDecoder decoder(reader, *writeOp.GetRequest().subjectDescriptor);
         return mCluster.WriteAttribute(writeOp.GetRequest(), decoder).GetUnderlyingError();
     }
-    // Write list of values
+
+    // - Lists: use WriteAttribute(attrId, listValue, fabricIndex)
+    //     * Encoded as TLV arrays. Each element is encoded individually.
+    //         - Struct elements must provide EncodeForWrite().
+    //         - Simple elements (integral, enum) handled by generic templated encoding.
+    //     * `value` must match ::DecodableList.
+    //     * Example: app::DataModel::List<int> l = {1,2,3}; WriteAttribute(attrId, l, fabricIndex);
     template <typename ElementT>
     CHIP_ERROR WriteAttribute(AttributeId attr, const app::DataModel::List<ElementT> & list, FabricIndex fabricIndex)
     {

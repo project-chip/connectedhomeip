@@ -171,9 +171,6 @@ CreateGroupKeyMapList(size_t count, FabricIndex fabricIndex, GroupId startGroupI
 
 struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementCluster
 {
-    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
-
     chip::Test::TestServerClusterContext mTestContext;
     Credentials::GroupDataProviderImpl mRealProvider;
     MockSessionKeystore mMockKeystore;
@@ -188,15 +185,14 @@ struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementC
     void SetUp() override
     {
         auto * storage = &mTestContext.StorageDelegate();
-        ASSERT_NE(storage, nullptr);
 
         mRealProvider.SetStorageDelegate(storage);
         mRealProvider.SetSessionKeystore(&mMockKeystore);
+
         ASSERT_EQ(mRealProvider.Init(), CHIP_NO_ERROR);
+        ASSERT_EQ(mCluster.Startup(mContext), CHIP_NO_ERROR);
 
         Credentials::SetGroupDataProvider(&mRealProvider);
-
-        ASSERT_EQ(mCluster.Startup(mContext), CHIP_NO_ERROR);
     }
 
     void TearDown() override
@@ -205,7 +201,8 @@ struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementC
         Credentials::SetGroupDataProvider(nullptr);
         mRealProvider.Finish();
     }
-
+    // Writes a list of group keys to the GroupKeyMap attribute for a given fabric.
+    // Used to set up test scenarios with pre-existing keys.
     void PrepopulateGroupKeyMap(const std::vector<GroupKeyManagement::Structs::GroupKeyMapStruct::Type> & keys,
                                 FabricIndex fabricIndex)
     {
@@ -216,6 +213,8 @@ struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementC
         ASSERT_EQ(err, CHIP_NO_ERROR);
     }
 
+    // Checks that the stored group keys for a fabric match the expected list.
+    // Validates group IDs and keyset IDs to ensure attribute writes succeeded.
     void VerifyGroupKeysMatch(const FabricIndex fabricIndex,
                               const std::vector<GroupKeyManagement::Structs::GroupKeyMapStruct::Type> & expectedKeys)
     {
