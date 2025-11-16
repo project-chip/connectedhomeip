@@ -326,12 +326,15 @@ class BrowserPeerConnection(BrowserWebRTCClient):
     def on_remote_ice_candidates(self, sessionId: int, candidates: list[IceCandidate]) -> None:
         """Callback function called when a remote ICE candidates are received through a matter command.
 
-        Implements trickle ICE by immediately applying received candidates to the peer connection.
+        Implements trickle ICE by scheduling candidates to be applied to the peer connection.
         Also stores them in the event queue for tests that may need to wait for and verify them.
         """
-        # Immediately apply candidates for trickle ICE support
-        LOGGER.debug(f"Applying {len(candidates)} candidates for trickle ICE support: {candidates}")
-        await self.set_remote_ice_candidates(candidates)
+        # Schedule candidates to be applied for trickle ICE support
+        LOGGER.debug(f"Scheduling {len(candidates)} candidates for trickle ICE support: {candidates}")
+        asyncio.run_coroutine_threadsafe(
+            self.set_remote_ice_candidates(candidates),
+            self.event_loop
+        )
 
         # Also put in event queue for any waiting consumers
         self._remote_events[Events.ICE_CANDIDATE].put((sessionId, candidates))
