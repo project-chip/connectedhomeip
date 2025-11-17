@@ -37,6 +37,7 @@ class WebRTCManager
 {
 public:
     using ICECandidateStruct         = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
+    using WebRTCSessionStruct        = chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type;
     using StreamUsageEnum            = chip::app::Clusters::Globals::StreamUsageEnum;
     using SessionEstablishedCallback = std::function<void(uint16_t streamId)>;
 
@@ -55,11 +56,11 @@ public:
      */
     void SetSessionEstablishedCallback(SessionEstablishedCallback callback) { mSessionEstablishedCallback = callback; }
 
-    CHIP_ERROR HandleOffer(uint16_t sessionId, const WebRTCRequestorDelegate::OfferArgs & args);
+    CHIP_ERROR HandleOffer(const WebRTCSessionStruct & session, const WebRTCRequestorDelegate::OfferArgs & args);
 
-    CHIP_ERROR HandleAnswer(uint16_t sessionId, const std::string & sdp);
+    CHIP_ERROR HandleAnswer(const WebRTCSessionStruct & session, const std::string & sdp);
 
-    CHIP_ERROR HandleICECandidates(uint16_t sessionId, const std::vector<ICECandidateStruct> & candidates);
+    CHIP_ERROR HandleICECandidates(const WebRTCSessionStruct & session, const std::vector<ICECandidateStruct> & candidates);
 
     CHIP_ERROR Connnect(chip::Controller::DeviceCommissioner & commissioner, chip::NodeId nodeId, chip::EndpointId endpointId);
 

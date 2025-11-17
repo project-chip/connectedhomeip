@@ -1004,12 +1004,12 @@ void CameraAVStreamMgmtServer::ModifyVideoStream(const uint16_t streamID, const 
             bool wasModified = false;
             if (waterMarkEnabled.HasValue())
             {
-                wasModified = !stream.watermarkEnabled.HasValue() || stream.watermarkEnabled.Value() != waterMarkEnabled.Value();
+                wasModified             = (waterMarkEnabled != stream.watermarkEnabled);
                 stream.watermarkEnabled = waterMarkEnabled;
             }
             if (osdEnabled.HasValue())
             {
-                wasModified       = wasModified || !stream.OSDEnabled.HasValue() || stream.OSDEnabled.Value() != osdEnabled.Value();
+                wasModified       = wasModified || (osdEnabled != stream.OSDEnabled);
                 stream.OSDEnabled = osdEnabled;
             }
             if (wasModified)
@@ -1032,12 +1032,12 @@ void CameraAVStreamMgmtServer::ModifySnapshotStream(const uint16_t streamID, con
             bool wasModified = false;
             if (waterMarkEnabled.HasValue())
             {
-                wasModified = !stream.watermarkEnabled.HasValue() || stream.watermarkEnabled.Value() != waterMarkEnabled.Value();
+                wasModified             = (waterMarkEnabled != stream.watermarkEnabled);
                 stream.watermarkEnabled = waterMarkEnabled;
             }
             if (osdEnabled.HasValue())
             {
-                wasModified       = wasModified || !stream.OSDEnabled.HasValue() || stream.OSDEnabled.Value() != osdEnabled.Value();
+                wasModified       = wasModified || (osdEnabled != stream.OSDEnabled);
                 stream.OSDEnabled = osdEnabled;
             }
             if (wasModified)
