@@ -228,8 +228,10 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
                     # Skip attributes known to have write constraints
                     ATTRIBUTES_WITH_WRITE_CONSTRAINTS = [
-                        Clusters.AccessControl.Attributes.Acl, # If ACL attribute is written to a blank list in below logic, then unable to recover needed permissions to read it afterwards, as known from working on the ACL tests.
-                        Clusters.NetworkCommissioning.Attributes.InterfaceEnabled, # InterfaceEnabled only writeable attribute and returns error status 1. Writing to it would cause the DUT to disconnect if successful, spec 11.9.6.5 shows this could attribute could be protected and will return a INVALID_ACTION error if attempted to be written too.
+                        # If ACL attribute is written to a blank list in below logic, then unable to recover needed permissions to read it afterwards, as known from working on the ACL tests.
+                        Clusters.AccessControl.Attributes.Acl,
+                        # InterfaceEnabled only writeable attribute and returns error status 1. Writing to it would cause the DUT to disconnect if successful, spec 11.9.6.5 shows this could attribute could be protected and will return a INVALID_ACTION error if attempted to be written too.
+                        Clusters.NetworkCommissioning.Attributes.InterfaceEnabled,
                     ]
                     if attribute in ATTRIBUTES_WITH_WRITE_CONSTRAINTS:
                         logging.debug(f"{test_step}: Skipping {attribute.__name__} - known to have write constraints")
@@ -829,7 +831,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
             keepSubscriptions=False
         )
 
-        # Subscribe to events - using AccessControl cluster events 
+        # Subscribe to events - using AccessControl cluster events
         event_handler_step7 = EventSubscriptionHandler(
             expected_cluster=Clusters.AccessControl
         )
@@ -936,7 +938,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         # (This was originally test step 19 in the test plan)
         self.step(10)
         # Subscribe to ALL attributes from ALL clusters on ALL endpoints
-        # Device testing shows limit of 25 cluster paths per subscription, 
+        # Device testing shows limit of 25 cluster paths per subscription,
         # using 25 clusters to keep from runnining into intermittent issue CHIP Error 0x0000000B: No memory
         # This is due to resource constraints during priming report generation
         # Spec only requires minimum of 3 paths per subscription (Section 2.11.2.2)
