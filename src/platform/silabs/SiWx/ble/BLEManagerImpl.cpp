@@ -35,8 +35,8 @@
 #include <platform/internal/BLEManager.h>
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-#include <setup_payload/AdditionalDataPayloadGenerator.h>
 #include <platform/DeviceInstanceInfoProvider.h>
+#include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
 
 extern "C" {
@@ -1061,9 +1061,10 @@ CHIP_ERROR BLEManagerImpl::EncodeAdditionalDataTlv()
 void BLEManagerImpl::HandleC3ReadRequest(const SilabsBleWrapper::sl_wfx_msg_t & evt)
 {
     uint8_t read_resp = evt.rsi_ble_read_req->type == 0 ? GATT_READ_RESP : GATT_BLOB_READ_RESP;
-    sl_status_t ret = rsi_ble_gatt_read_response(evt.rsi_ble_read_req->dev_addr, read_resp, evt.rsi_ble_read_req->handle,
-                                         evt.rsi_ble_read_req->offset, sInstance.c3AdditionalDataBufferHandle->DataLength() - evt.rsi_ble_read_req->offset,
-                                         sInstance.c3AdditionalDataBufferHandle->Start() + evt.rsi_ble_read_req->offset);
+    sl_status_t ret   = rsi_ble_gatt_read_response(
+        evt.rsi_ble_read_req->dev_addr, read_resp, evt.rsi_ble_read_req->handle, evt.rsi_ble_read_req->offset,
+        sInstance.c3AdditionalDataBufferHandle->DataLength() - evt.rsi_ble_read_req->offset,
+        sInstance.c3AdditionalDataBufferHandle->Start() + evt.rsi_ble_read_req->offset);
 
     if (ret != SL_STATUS_OK)
     {

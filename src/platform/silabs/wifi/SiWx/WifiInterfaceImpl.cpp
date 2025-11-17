@@ -259,9 +259,10 @@ sl_status_t BackgroundScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t 
         chip::CopySpanToMutableSpan(inBssid, outBssid);
 
         // Convert sl_wifi_security_t to wfx_sec_t
-        currentScanResult.security = ConvertSlWifiSecurityToWfx(static_cast<sl_wifi_security_t>(result->scan_info[i].security_mode));
-        currentScanResult.rssi     = (-1) * result->scan_info[i].rssi_val; // The returned value is positive - we need to flip it
-        currentScanResult.chan     = result->scan_info[i].rf_channel;
+        currentScanResult.security =
+            ConvertSlWifiSecurityToWfx(static_cast<sl_wifi_security_t>(result->scan_info[i].security_mode));
+        currentScanResult.rssi = (-1) * result->scan_info[i].rssi_val; // The returned value is positive - we need to flip it
+        currentScanResult.chan = result->scan_info[i].rf_channel;
         // TODO: change this when SDK provides values
         currentScanResult.wiFiBand = WiFiBandEnum::k2g4;
 
