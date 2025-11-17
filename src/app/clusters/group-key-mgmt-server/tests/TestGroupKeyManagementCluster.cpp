@@ -28,10 +28,10 @@
 #include <clusters/GroupKeyManagement/Metadata.h>
 #include <clusters/GroupKeyManagement/Structs.h>
 #include <credentials/GroupDataProvider.h>
+#include <crypto/DefaultSessionKeystore.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/ReadOnlyBuffer.h>
-
 namespace {
 using namespace chip;
 using namespace chip::app;
@@ -96,43 +96,6 @@ TEST_F(TestGroupKeyManagementCluster, AttributesTest)
                                                        GroupKeyManagement::Attributes::kMandatoryMetadata.size()));
 }
 
-class MockSessionKeystore : public Crypto::SessionKeystore
-{
-public:
-    using P256ECDHDerivedSecret        = Crypto::P256ECDHDerivedSecret;
-    using Symmetric128BitsKeyByteArray = Crypto::Symmetric128BitsKeyByteArray;
-    using Aes128KeyHandle              = Crypto::Aes128KeyHandle;
-    using Hmac128KeyHandle             = Crypto::Hmac128KeyHandle;
-    using HkdfKeyHandle                = Crypto::HkdfKeyHandle;
-    using Symmetric128BitsKeyHandle    = Crypto::Symmetric128BitsKeyHandle;
-    using AttestationChallenge         = Crypto::AttestationChallenge;
-
-    CHIP_ERROR CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Aes128KeyHandle & key) override { return CHIP_NO_ERROR; }
-    CHIP_ERROR CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Hmac128KeyHandle & key) override
-    {
-        return CHIP_NO_ERROR;
-    }
-    CHIP_ERROR CreateKey(const ByteSpan & keyMaterial, HkdfKeyHandle & key) override { return CHIP_NO_ERROR; }
-    void DestroyKey(Symmetric128BitsKeyHandle & key) override {}
-    void DestroyKey(HkdfKeyHandle & key) override {}
-
-    CHIP_ERROR DeriveKey(const P256ECDHDerivedSecret & secret, const ByteSpan & salt, const ByteSpan & info,
-                         Aes128KeyHandle & key) override
-    {
-        return CHIP_NO_ERROR;
-    }
-    CHIP_ERROR DeriveSessionKeys(const ByteSpan & secret, const ByteSpan & salt, const ByteSpan & info, Aes128KeyHandle & i2rKey,
-                                 Aes128KeyHandle & r2iKey, AttestationChallenge & attestationChallenge) override
-    {
-        return CHIP_NO_ERROR;
-    }
-    CHIP_ERROR DeriveSessionKeys(const HkdfKeyHandle & secretKey, const ByteSpan & salt, const ByteSpan & info,
-                                 Aes128KeyHandle & i2rKey, Aes128KeyHandle & r2iKey,
-                                 AttestationChallenge & attestationChallenge) override
-    {
-        return CHIP_NO_ERROR;
-    }
-};
 namespace TestHelpers {
 
 constexpr GroupId kTestGroupId   = 0x1001;
@@ -161,42 +124,22 @@ CreateGroupKeyMapList(size_t count, FabricIndex fabricIndex, GroupId startGroupI
 }
 
 } // namespace TestHelpers
-
-inline Crypto::SessionKeystore * CreateKeystoreForPlatform()
-{
-#if CHIP_CRYPTO_KEYSTORE_RAW
-    // Use MakeUnique to safely allocate memory
-    return chip::Platform::MakeUnique<Crypto::RawKeySessionKeystore>().release();
-#elif CHIP_CRYPTO_KEYSTORE_PSA
-    // Use MakeUnique to safely allocate memory
-    return chip::Platform::MakeUnique<Crypto::PSASessionKeystore>().release();
-#else
-// This will cause a compile error if neither is set, which is good.
-#error "No keystore defined for platform. (CHIP_CRYPTO_KEYSTORE_...)"
-    return nullptr;
-#endif
-}
-
 struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementCluster
 {
     chip::Test::TestServerClusterContext mTestContext;
     Credentials::GroupDataProviderImpl mRealProvider;
-    MockSessionKeystore mMockKeystore;
+    Crypto::DefaultSessionKeystore mMockKeystore;
     GroupKeyManagementCluster mCluster;
     chip::Test::ClusterTester tester;
-
-    std::unique_ptr<Crypto::SessionKeystore> mKeystore;
 
     TestGroupKeyManagementClusterWithStorage() : tester(mCluster) {}
 
     void SetUp() override
     {
         auto * storage = &mTestContext.StorageDelegate();
-        mKeystore.reset(CreateKeystoreForPlatform());
-        ASSERT_NE(mKeystore.get(), nullptr);
 
         mRealProvider.SetStorageDelegate(storage);
-        mRealProvider.SetSessionKeystore(mKeystore.get());
+        mRealProvider.SetSessionKeystore(&mMockKeystore);
         ASSERT_EQ(mRealProvider.Init(), CHIP_NO_ERROR);
         ASSERT_EQ(mCluster.Startup(mTestContext.Get()), CHIP_NO_ERROR);
 
@@ -208,7 +151,6 @@ struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementC
         mCluster.Shutdown();
         Credentials::SetGroupDataProvider(nullptr);
         mRealProvider.Finish();
-        mKeystore.reset();
     }
     // Writes a list of group keys to the GroupKeyMap attribute for a given fabric.
     // Used to set up test scenarios with pre-existing keys.
