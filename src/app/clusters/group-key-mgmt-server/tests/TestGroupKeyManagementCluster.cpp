@@ -162,28 +162,43 @@ CreateGroupKeyMapList(size_t count, FabricIndex fabricIndex, GroupId startGroupI
 
 } // namespace TestHelpers
 
+inline Crypto::SessionKeystore * CreateKeystoreForPlatform()
+{
+#if CHIP_CRYPTO_KEYSTORE_RAW
+    // Use MakeUnique to safely allocate memory
+    return chip::Platform::MakeUnique<Crypto::RawKeySessionKeystore>().release();
+#elif CHIP_CRYPTO_KEYSTORE_PSA
+    // Use MakeUnique to safely allocate memory
+    return chip::Platform::MakeUnique<Crypto::PSASessionKeystore>().release();
+#else
+// This will cause a compile error if neither is set, which is good.
+#error "No keystore defined for platform. (CHIP_CRYPTO_KEYSTORE_...)"
+    return nullptr;
+#endif
+}
+
 struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementCluster
 {
     chip::Test::TestServerClusterContext mTestContext;
     Credentials::GroupDataProviderImpl mRealProvider;
     MockSessionKeystore mMockKeystore;
     GroupKeyManagementCluster mCluster;
-    // This context object is non-assignable
-    decltype(mTestContext.Create()) mContext;
     chip::Test::ClusterTester tester;
 
-    // We initialize mContext here
-    TestGroupKeyManagementClusterWithStorage() : mContext(mTestContext.Create()), tester(mCluster) {}
+    std::unique_ptr<Crypto::SessionKeystore> mKeystore;
+
+    TestGroupKeyManagementClusterWithStorage() : tester(mCluster) {}
 
     void SetUp() override
     {
         auto * storage = &mTestContext.StorageDelegate();
+        mKeystore.reset(CreateKeystoreForPlatform());
+        ASSERT_NE(mKeystore.get(), nullptr);
 
         mRealProvider.SetStorageDelegate(storage);
-        mRealProvider.SetSessionKeystore(&mMockKeystore);
-
+        mRealProvider.SetSessionKeystore(mKeystore.get());
         ASSERT_EQ(mRealProvider.Init(), CHIP_NO_ERROR);
-        ASSERT_EQ(mCluster.Startup(mContext), CHIP_NO_ERROR);
+        ASSERT_EQ(mCluster.Startup(mTestContext.Get()), CHIP_NO_ERROR);
 
         Credentials::SetGroupDataProvider(&mRealProvider);
     }
@@ -193,6 +208,7 @@ struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementC
         mCluster.Shutdown();
         Credentials::SetGroupDataProvider(nullptr);
         mRealProvider.Finish();
+        mKeystore.reset();
     }
     // Writes a list of group keys to the GroupKeyMap attribute for a given fabric.
     // Used to set up test scenarios with pre-existing keys.
