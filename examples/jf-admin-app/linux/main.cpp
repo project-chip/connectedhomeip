@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include "JFADatastoreSync.h"
 #include "JFAManager.h"
 #include "rpc/RpcServer.h"
 #include <AppMain.h>
@@ -99,7 +100,9 @@ void ApplicationInit()
     }
 
     JFAMgr().Init(Server::GetInstance());
+    JFADSync().Init(Server::GetInstance());
     Server::GetInstance().GetJointFabricAdministrator().SetDelegate(&JFAMgr());
+    Server::GetInstance().GetJointFabricDatastore().SetDelegate(&JFADSync());
 
     PlatformMgrImpl().AddEventHandler(EventHandler, 0);
 }
