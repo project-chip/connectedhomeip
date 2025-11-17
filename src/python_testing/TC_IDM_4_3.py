@@ -270,7 +270,6 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
                         elif isinstance(cached_val, (int, float)):
                             # increment to trigger actual change
                             # Try incrementing first, but respect reasonable upper bounds
-                            # Example: Writing to the DefaultOpenLevel attribute of the ValveConfigurationAndControl cluster, default value appears to be 100, have to decrement to 99 to trigger a change and not hit ConstraintError
                             if cached_val < 100:
                                 # For values 0-99, safe to increment (handles percentages, small enums)
                                 new_val = cached_val + 1
@@ -279,7 +278,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
                                 # Example: DefaultOpenLevel is 0-100, so we can decrement to 99 to trigger a change, if we incremented to 101 then it hits a constraint error..
                                 new_val = cached_val - 1
                             else:
-                                # For very large values, use a safe middle value
+                                # For very large values, use a safe 0 value
                                 new_val = 0
                         else:
                             # For other types, skip to avoid writing same value
@@ -830,7 +829,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
             keepSubscriptions=False
         )
 
-        # Subscribe to events - using AccessControl cluster events as an example
+        # Subscribe to events - using AccessControl cluster events 
         event_handler_step7 = EventSubscriptionHandler(
             expected_cluster=Clusters.AccessControl
         )
@@ -937,7 +936,8 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         # (This was originally test step 19 in the test plan)
         self.step(10)
         # Subscribe to ALL attributes from ALL clusters on ALL endpoints
-        # Device testing shows limit of 25 cluster paths per subscription, using 25 clusters to keep from runnining into intermittent issue CHIP Error 0x0000000B: No memory 
+        # Device testing shows limit of 25 cluster paths per subscription, 
+        # using 25 clusters to keep from runnining into intermittent issue CHIP Error 0x0000000B: No memory
         # This is due to resource constraints during priming report generation
         # Spec only requires minimum of 3 paths per subscription (Section 2.11.2.2)
         MAX_CLUSTER_PATHS_PER_SUBSCRIPTION = 25
@@ -946,12 +946,11 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         for endpoint_id, endpoint_data in self.endpoints_tlv.items():
             all_cluster_ids.update(endpoint_data.keys())
 
-        # Build wildcard paths for all clusters EXCEPT the problematic ones
+        # Build wildcard paths for all clusters, removing any non-standard function clusters
         subscription_paths = []
         for cluster_id in all_cluster_ids:
-            # These may have non-standard subscription behavior
             if (not is_standard_cluster_id(cluster_id)):
-                continue            
+                continue
 
             if len(subscription_paths) >= MAX_CLUSTER_PATHS_PER_SUBSCRIPTION:
                 continue
@@ -965,7 +964,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
             node_id=self.dut_node_id,
             attributes=subscription_paths,
             min_interval_sec=self.min_interval_floor_sec,
-            max_interval_sec=120,  # Long timeout to prevent subscription timeout during sequential writes
+            max_interval_sec=120,  # Long timeout to prevent subscription timeout during writes
             keepSubscriptions=False,
             fabric_filtered=False,
             autoResubscribe=False
@@ -986,12 +985,11 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         asserts.assert_greater(num_endpoints, 0, "Should receive reports from at least one endpoint")
         asserts.assert_greater(total_clusters, 4, "Should receive reports from multiple clusters")
         asserts.assert_greater(total_attributes, 20, "Should receive reports for many attributes")
-        
+
         # Flush priming reports from handler queue before making changes
         handler_step10.flush_reports()
 
         # Change writable attributes and verify change reports per test spec
-        # Skip problematic clusters we identified earlier
         changed_count = await self.change_writable_attributes_and_verify_reports(
             handler_step10, priming_data, "Step 10"
         )
@@ -1008,7 +1006,6 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         subscription_paths_step11 = []
         if self.root_node_endpoint in self.endpoints_tlv:
             for cluster_id in self.endpoints_tlv[self.root_node_endpoint].keys():
-                # Skip manufacturer-specific clusters (0xFC00-0xFFFE range)
                 if (not is_standard_cluster_id(cluster_id)):
                     continue
 
