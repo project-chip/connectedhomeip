@@ -484,7 +484,8 @@ def main() -> int:
             try:
                 sleepy_device_name = f"sleepy_{device_name}"
                 for ext in [".zap", ".matter"]:
-                    src_item = os.path.join(_DEVICE_FOLDER, f"{device_name}{ext}")
+                    src_item = os.path.join(
+                        _DEVICE_FOLDER, f"{device_name}{ext}")
                     dest_item = os.path.join(
                         _DEVICE_FOLDER, f"{sleepy_device_name}{ext}")
                     shutil.copy(src_item, dest_item)
@@ -839,7 +840,8 @@ def main() -> int:
                 f"-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING='\"{sw_ver_string}\"'")
             if re.search(_SLEEPY_DEVICE_PATTERN, options.sample_device_type_name):
                 nrf_build_cmds.append("-DCONFIG_OPENTHREAD_MTD_SED=y")
-                nrf_build_cmds.append(f"-DCONFIG_OPENTHREAD_POLL_PERIOD={_SLEEPY_DEVICE_POLL_PERIOD_MS}")
+                nrf_build_cmds.append(
+                    f"-DCONFIG_OPENTHREAD_POLL_PERIOD={_SLEEPY_DEVICE_POLL_PERIOD_MS}")
 
             flush_print("NRF Build command args: ", " ".join(nrf_build_cmds))
             shell.run_cmd(" ".join(nrf_build_cmds))
