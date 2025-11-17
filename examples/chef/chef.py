@@ -482,10 +482,13 @@ def main() -> int:
             try:
                 sleepy_device_name = f"sleepy_{device_name}"
                 src_item = os.path.join(_DEVICE_FOLDER, f"{device_name}.zap")
-                dest_item = os.path.join(_DEVICE_FOLDER, f"{sleepy_device_name}.zap")
+                dest_item = os.path.join(
+                    _DEVICE_FOLDER, f"{sleepy_device_name}.zap")
                 shutil.copy(src_item, dest_item)
-                src_item = os.path.join(_DEVICE_FOLDER, f"{device_name}.matter")
-                dest_item = os.path.join(_DEVICE_FOLDER, f"{sleepy_device_name}.matter")
+                src_item = os.path.join(
+                    _DEVICE_FOLDER, f"{device_name}.matter")
+                dest_item = os.path.join(
+                    _DEVICE_FOLDER, f"{sleepy_device_name}.matter")
                 shutil.copy(src_item, dest_item)
                 sleepy_device_names.append(sleepy_device_name)
             except FileNotFoundError as copy_fail_error:
