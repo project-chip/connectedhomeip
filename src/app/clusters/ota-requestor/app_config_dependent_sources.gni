@@ -12,20 +12,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 app_config_dependent_sources = [
-  "BDXDownloader.cpp",
-  "BDXDownloader.h",
   "CodegenIntegration.cpp",
-  "DefaultOTARequestor.cpp",
-  "DefaultOTARequestor.h",
-  "DefaultOTARequestorDriver.cpp",
-  "DefaultOTARequestorDriver.h",
-  "DefaultOTARequestorStorage.cpp",
-  "DefaultOTARequestorStorage.h",
-  "DefaultOTARequestorUserConsent.h",
-  "ExtendedOTARequestorDriver.cpp",
-  "ExtendedOTARequestorDriver.h",
-  "OTARequestorDriver.h",
-  "OTARequestorStorage.h",
-  "OTATestEventTriggerHandler.cpp",
-  "OTATestEventTriggerHandler.h",
 ]
