@@ -216,7 +216,7 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
         LOGGER.debug("Waiting for remote answer")
         return await self._remote_events[Events.ANSWER].get(timeout_s)
 
-    async def get_remote_ice_candidates(self, timeout_s: Optional[int] = None) -> tuple[int, list[str]]:
+    async def get_remote_ice_candidates(self, timeout_s: Optional[int] = None) -> tuple[int, list[IceCandidate]]:
         """Waits for a list of remote ICE Candidates to be received through a matter command.
 
         Args:
@@ -224,7 +224,7 @@ class LibdatachannelPeerConnection(LibdatachannelWebRTCClient):
             If None, the function will wait indefinitely.
 
         Returns:
-            tuple[int, list[str]]: A tuple containing the session ID and list of ice candidate strings.
+            tuple[int, list[IceCandidate]]: A tuple containing the session ID and list of ice candidate strings.
 
         Raises:
             asyncio.TimeoutError: If no remote offer is received within the specified timeout period.
