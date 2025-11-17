@@ -48,8 +48,19 @@ _EXCLUDE_DEVICE_FROM_LINUX_CI = [
     "rootnode_onofflight_samplemei",  # not actively developed,
     "rootnode_watervalve_6bb39f1f67",  # not actively developed,
 ]
+
+# For these devices additional NRF variants with sleepy flags will be built.
+# Sleepy variants will be prefixed with "sleepy_" in the device name.
+_DEVICES_WITH_SLEEPY_VARIANT_REQUIRED = [
+    "rootnode_contactsensor_lFAGG1bfRO",
+]
+
 # Pattern to filter (based on device-name) devices that need ICD support.
 _ICD_DEVICE_PATTERN = "^icd_"
+
+# Pattern to filter (based on device-name) devices that will be built with
+# sleepy flags. Applies to NRF only.
+_SLEEPY_DEVICE_PATTERN = "^sleepy_"
 
 gen_dir = ""  # Filled in after sample app type is read from args.
 
@@ -464,8 +475,27 @@ def main() -> int:
         archive_prefix = "/workspace/artifacts/"
         archive_suffix = ".tar.gz"
         failed_builds = []
-        for device_name in _DEVICE_LIST:
+        # Sleepy variants have no ZAP differences from their non-sleepy counterparts,
+        # so we can just copy the ZAP files.
+        sleepy_device_names = []
+        for device_name in _DEVICES_WITH_SLEEPY_VARIANT_REQUIRED:
+            try:
+                sleepy_device_name = f"sleepy_{device_name}"
+                src_item = os.path.join(_DEVICE_FOLDER, f"{device_name}.zap")
+                dest_item = os.path.join(_DEVICE_FOLDER, f"{sleepy_device_name}.zap")
+                shutil.copy(src_item, dest_item)
+                src_item = os.path.join(_DEVICE_FOLDER, f"{device_name}.matter")
+                dest_item = os.path.join(_DEVICE_FOLDER, f"{sleepy_device_name}.matter")
+                shutil.copy(src_item, dest_item)
+                sleepy_device_names.append(sleepy_device_name)
+            except FileNotFoundError as copy_fail_error:
+                flush_print(
+                    'Failed to copy ZAP and matter files for sleepy variant of ' + device_name + f': {str(copy_fail_error)}')
+                continue
+        for device_name in _DEVICE_LIST + sleepy_device_names:
             for platform, label_args in cicd_config["cd_platforms"].items():
+                if re.search(_SLEEPY_DEVICE_PATTERN, device_name) and platform != "nrfconnect":
+                    continue
                 for label, args in label_args.items():
                     archive_name = f"{label}-{device_name}"
                     if options.build_exclude and re.search(options.build_exclude, archive_name):
@@ -805,6 +835,9 @@ def main() -> int:
                     "-DCONFIG_CHIP_ENABLE_ICD_SUPPORT=n")
             nrf_build_cmds.append(
                 f"-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING='\"{sw_ver_string}\"'")
+            if re.search(_SLEEPY_DEVICE_PATTERN, options.sample_device_type_name):
+                nrf_build_cmds.append("-DCONFIG_OPENTHREAD_MTD_SED=y")
+                nrf_build_cmds.append("-DCONFIG_OPENTHREAD_POLL_PERIOD=2500")
 
             shell.run_cmd(" ".join(nrf_build_cmds))
 
