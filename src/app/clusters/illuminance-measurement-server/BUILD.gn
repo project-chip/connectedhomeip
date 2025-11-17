@@ -14,7 +14,7 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-source_set("boolean-state-server") {
+source_set("illuminance-measurement-server") {
   sources = [
     "illuminance-measurement.cpp",
     "illuminance-measurement.h",
@@ -24,6 +24,6 @@ source_set("boolean-state-server") {
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/server-cluster",
-    "${chip_root}/zzz_generated/app-common/clusters/BooleanState",
+    "${chip_root}/zzz_generated/app-common/clusters/IlluminanceMeasurement",
   ]
 }

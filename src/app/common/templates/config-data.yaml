@@ -55,6 +55,7 @@ CommandHandlerInterfaceOnlyClusters:
     - HEPA Filter Monitoring
     - ICD Management
     - Identify
+    - Illuminance Measurement
     - Joint Fabric Administrator
     - Laundry Washer Mode
     - Microwave Oven Control
@@ -160,6 +161,7 @@ CodeDrivenClusters:
     - Groupcast
     - ICD Management
     - Identify
+    - Illuminance Measurement
     - Localization Configuration
     - OTA Software Update Provider
     - Operational Credentials
