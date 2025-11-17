@@ -475,11 +475,6 @@ def main() -> int:
         archive_prefix = "/workspace/artifacts/"
         archive_suffix = ".tar.gz"
         failed_builds = []
-        # TODO: Remove this once tested.
-        _dev_list = [
-            "rootnode_dimmablelight_bCwGYSDpoe",
-            "rootnode_contactsensor_lFAGG1bfRO",
-        ]
         # Sleepy variants have no ZAP differences from their non-sleepy counterparts,
         # so we can just copy the ZAP files.
         sleepy_device_names = []
@@ -497,7 +492,7 @@ def main() -> int:
                 flush_print(
                     'Failed to copy ZAP and matter files for sleepy variant of ' + device_name + f': {str(copy_fail_error)}')
                 continue
-        for device_name in _dev_list + sleepy_device_names:
+        for device_name in _DEVICE_LIST + sleepy_device_names:
             for platform, label_args in cicd_config["cd_platforms"].items():
                 if re.search(_SLEEPY_DEVICE_PATTERN, device_name) and platform != "nrfconnect":
                     continue
