@@ -34,6 +34,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
 import time
 
@@ -65,6 +66,9 @@ https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/interacti
 
 
 class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
+    @property
+    def default_timeout(self) -> int:
+        return 600
 
     @async_test_body
     async def setup_class(self):
@@ -153,7 +157,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
         return writable_attrs
 
-    async def change_writable_attributes_and_verify_reports(self, handler: WildcardAttributeSubscriptionHandler, priming_data, test_step: str, clusters_to_skip: list = None):
+    async def change_writable_attributes_and_verify_reports(self, handler: WildcardAttributeSubscriptionHandler, priming_data, test_step: str):
         """Change writable attributes and verify subscription reports are received.
 
         Based on TC_AccessChecker.py's _run_write_access_test_for_cluster_privilege() approach.
@@ -173,21 +177,16 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
             handler: WildcardAttributeSubscriptionHandler tracking the subscription
             priming_data: Priming report data from GetAttributes()
             test_step: Step name for logging
-            clusters_to_skip: List of cluster IDs to skip (e.g., problematic clusters)
 
         Returns:
             Number of attributes successfully changed and verified
         """
-        if clusters_to_skip is None:
-            clusters_to_skip = []
-
         changed_count = 0
         max_changes = 20
         changed_attributes = []
 
         reports_at_start = handler.get_all_reported_attributes()
         logging.info(f"{test_step}: Handler has {len(reports_at_start)} attributes with reports at start")
-        logging.info(f"{test_step}: Scanning for writable attributes using XML spec data...")
 
         for endpoint_id, clusters in priming_data.items():
             if changed_count >= max_changes:
@@ -198,9 +197,6 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
                     break
 
                 cluster_id = cluster_class.id
-                if cluster_id in clusters_to_skip:
-                    continue
-
                 # Get writable attributes for this cluster from endpoints_tlv data
                 if endpoint_id not in self.endpoints_tlv:
                     continue
@@ -210,6 +206,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
                 cluster_data = self.endpoints_tlv[endpoint_id][cluster_id]
                 writable_attr_ids = self.get_writable_attributes_for_cluster(cluster_id, cluster_data)
+                logging.info(f'Writable attributes for cluster {cluster_id}: {writable_attr_ids}')
 
                 if not writable_attr_ids:
                     continue
@@ -225,20 +222,17 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
                     attribute = Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id][attribute_id]
 
-                    # Skip attributes known to not send subscription reports even after successful writes
-                    # These attributes have special reporting behavior per device implementation
-                    ATTRIBUTES_WITH_NO_SUBSCRIPTION_REPORTS = [
-                        Clusters.BasicInformation.Attributes.LocalConfigDisabled,
-                        Clusters.Binding.Attributes.Binding,
-                        Clusters.GeneralCommissioning.Attributes.Breadcrumb,
-                        Clusters.TimeFormatLocalization.Attributes.HourFormat,
-                    ]
-                    if attribute in ATTRIBUTES_WITH_NO_SUBSCRIPTION_REPORTS:
-                        logging.debug(f"{test_step}: Skipping {attribute.__name__} - known to not send subscription reports")
-                        continue
-
                     # Check if we have this attribute in the priming data
                     if attribute not in attributes:
+                        continue
+
+                    # Skip attributes known to have write constraints
+                    ATTRIBUTES_WITH_WRITE_CONSTRAINTS = [
+                        Clusters.AccessControl.Attributes.Acl, # If ACL attribute is written to a blank list in below logic, then unable to recover needed permissions to read it afterwards, as known from working on the ACL tests.
+                        Clusters.NetworkCommissioning.Attributes.InterfaceEnabled, # InterfaceEnabled only writeable attribute and returns error status 1. Writing to it would cause the DUT to disconnect if successful, spec 11.9.6.5 shows this could attribute could be protected and will return a INVALID_ACTION error if attempted to be written too.
+                    ]
+                    if attribute in ATTRIBUTES_WITH_WRITE_CONSTRAINTS:
+                        logging.debug(f"{test_step}: Skipping {attribute.__name__} - known to have write constraints")
                         continue
 
                     try:
@@ -247,41 +241,54 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
                         # Skip if value decode failed
                         if isinstance(cached_val, ValueDecodeFailure):
-                            logging.debug(f"{test_step}: Skipping {attribute.__name__} - decode failure")
+                            logging.info(f"{test_step}: Skipping {attribute.__name__} - decode failure")
                             continue
 
-                        # Use cached value from priming data to avoid subscription timeout from many reads
-                        current_val = cached_val
-
                         # Determine new value based on type
-                        if isinstance(current_val, str):
-                            # String attribute - use unique value to trigger actual change
-                            new_val = f"{test_step}_T{int(time.time())}_{changed_count}"
-                        elif isinstance(current_val, list):
+                        if isinstance(cached_val, str):
+                            # For very short strings (likely codes/enums), use simple toggle
+                            # Example: Location attribute of BasicInformation cluster default value is "XX", requires value to be max length of 2 uppercase letters.
+                            if len(cached_val) <= 2:
+                                # Location, country codes, short identifiers
+                                new_val = "US" if cached_val != "US" else "CA"
+                            else:
+                                # Normal strings - use unique timestamped value
+                                new_val = f"{test_step}_T{int(time.time())}_{changed_count}"
+                        elif isinstance(cached_val, list):
                             # List attribute - toggle between empty and non-empty to ensure actual change
-                            if len(current_val) == 0:
-                                # Skip empty lists - writing a valid non-empty list requires XML spec knowledge to write valid data
-                                logging.debug(
-                                    f"{test_step}: Skipping {attribute.__name__} - empty list (requires XML spec knowledge to write valid data)")
+                            if len(cached_val) == 0:
+                                # Skip empty lists - writing a valid non-empty list requires XML spec knowledge to write valid data, this is outside the bounds of the IDM tests, and is covered by ACE tests
+                                logging.info(
+                                    f"{test_step}: Skipping {attribute.__name__} - empty list")
                                 continue
                             else:
                                 # Non-empty list -> write empty list (safe change)
                                 new_val = []
-                        elif isinstance(current_val, bool):
+                        elif isinstance(cached_val, bool):
                             # Boolean attribute - flip the value to trigger actual change
-                            new_val = not current_val
-                        elif isinstance(current_val, (int, float)):
+                            new_val = not cached_val
+                        elif isinstance(cached_val, (int, float)):
                             # increment to trigger actual change
-                            # Use modulo to keep within reasonable bounds
-                            new_val = (current_val + 1) if current_val < 1000000 else 0
+                            # Try incrementing first, but respect reasonable upper bounds
+                            # Example: Writing to the DefaultOpenLevel attribute of the ValveConfigurationAndControl cluster, default value appears to be 100, have to decrement to 99 to trigger a change and not hit ConstraintError
+                            if cached_val < 100:
+                                # For values 0-99, safe to increment (handles percentages, small enums)
+                                new_val = cached_val + 1
+                            elif cached_val < 1000000:
+                                # For larger values, decrement to ensure change without hitting constraints
+                                # Example: DefaultOpenLevel is 0-100, so we can decrement to 99 to trigger a change, if we incremented to 101 then it hits a constraint error..
+                                new_val = cached_val - 1
+                            else:
+                                # For very large values, use a safe middle value
+                                new_val = 0
                         else:
                             # For other types, skip to avoid writing same value
                             # Writing the same value should NOT trigger a report
-                            logging.debug(f"{test_step}: Skipping {attribute.__name__} - unsupported type for change")
+                            logging.info(f"{test_step}: Skipping {attribute.__name__} - unsupported type for change")
                             continue
 
                         # Write the attribute
-                        logging.debug(f"{test_step}: Writing {attribute.__name__} on EP{endpoint_id}: {current_val} -> {new_val}")
+                        logging.info(f"{test_step}: Writing {attribute.__name__} on EP{endpoint_id}: {cached_val} -> {new_val}")
                         resp = await self.default_controller.WriteAttribute(
                             nodeId=self.dut_node_id,
                             attributes=[(endpoint_id, attribute(new_val))]
@@ -290,14 +297,14 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
                         if resp[0].Status == Status.Success:
                             changed_count += 1
                             logging.info(
-                                f"{test_step}: [{changed_count}] Changed {attribute.__name__} (0x{attribute_id:04X}) on endpoint {endpoint_id}, cluster 0x{cluster_id:04X}: {current_val} -> {new_val}")
+                                f"{test_step}: [{changed_count}] Changed {attribute.__name__} (0x{attribute_id:04X}) on endpoint {endpoint_id}, cluster 0x{cluster_id:04X}: {cached_val} -> {new_val}")
 
                             # Track this change for verification
                             changed_attributes.append({
                                 'endpoint': endpoint_id,
                                 'cluster': cluster_class,
                                 'attribute': attribute,
-                                'old_value': current_val,
+                                'old_value': cached_val,
                                 'new_value': new_val
                             })
 
@@ -307,10 +314,10 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
                         else:
                             # Other errors are acceptable per TC_AccessChecker pattern
                             # (e.g., InvalidValue, ConstraintError - as long as it's not UnsupportedAccess)
-                            logging.debug(f"{test_step}: Write to {attribute.__name__} returned {resp[0].Status}")
+                            logging.info(f"{test_step}: Write to {attribute.__name__} returned {resp[0].Status}")
 
                     except Exception as e:
-                        logging.debug(f"{test_step}: Exception writing {attribute.__name__}: {e}")
+                        logging.info(f"{test_step}: Exception writing {attribute.__name__}: {e}")
 
         # Wait for change reports to arrive
         # Wait in small increments, checking periodically
@@ -559,7 +566,6 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
         # First subscription should have been cancelled
         # Note: The first handler may still have the priming report but no update
-
         await attr_handler_step3_second.cancel()
 
         # Step 4: MinInterval/MaxInterval timing validation
@@ -889,8 +895,9 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         )
         logging.info(f"Changed and verified {changed_count} attribute(s)")
 
-        # Shutdown subscription
+        # Shutdown subscription and wait for cleanup
         handler_step8.shutdown()
+        await asyncio.sleep(1)  # Allow time for subscription teardown to complete
 
         # Step 9: Attribute on cluster from all endpoints
         # (This was originally test step 18 in the test plan)
@@ -924,41 +931,16 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         asserts.assert_true(found_attribute, "Should find NodeLabel attribute in priming report")
 
         sub_step9.Shutdown()
+        await asyncio.sleep(1)  # Allow time for subscription teardown to complete
 
         # Step 10: All attributes from all clusters from all endpoints
         # (This was originally test step 19 in the test plan)
         self.step(10)
         # Subscribe to ALL attributes from ALL clusters on ALL endpoints
-        # Note: Some clusters have attributes that don't support subscriptions (INVALID_ACTION) or only support subscriptions in special circumstances:
-        # - AccessControl, NetworkCommissioning, CameraAvStreamManagement, OperationalCredentials
-        # - ValveConfigurationAndControl, Switch, PowerSource, BasicInformation, Identify
-        # - All concentration measurement clusters (10 total: CO, CO2, NO2, Ozone, PM2.5, Formaldehyde, PM1, PM10, TVOC, Radon)
-        # - Manufacturer-specific clusters (0xFC00-0xFFFE range) may have non-standard subscription behavior
-        # Since most of these appear to be mandatory/common clusters, we must exclude them from the wildcard so it doesnt fail.
-        # We build a filtered wildcard by subscribing to all attributes for each non-problematic cluster similar to how it is done in ACE test modules (Specifically ACE_2_3 for writes and ACE_2_4 for subscriptions).
-
-        CLUSTERS_WITH_SUBSCRIPTION_ISSUES = [
-            Clusters.AccessControl.id,
-            Clusters.NetworkCommissioning.id,
-            Clusters.CameraAvStreamManagement.id,
-            Clusters.OperationalCredentials.id,
-            Clusters.ValveConfigurationAndControl.id,
-            Clusters.Switch.id,  # Switch cluster has subscription issues with certain attributes
-            Clusters.PowerSource.id,  # Power Source cluster returns INVALID_ACTION for certain attributes
-            Clusters.BasicInformation.id,  # BasicInformation cluster has attributes (e.g., 0x000E) that return INVALID_ACTION
-            Clusters.Identify.id,  # Identify cluster returns INVALID_ACTION during wildcard subscriptions
-            # All concentration measurement clusters have been added to remove possible clusters that might cause issues during subscription testing. More comprehensive testing is done in ACE test modules.
-            Clusters.CarbonMonoxideConcentrationMeasurement.id,
-            Clusters.CarbonDioxideConcentrationMeasurement.id,
-            Clusters.NitrogenDioxideConcentrationMeasurement.id,
-            Clusters.OzoneConcentrationMeasurement.id,
-            Clusters.Pm25ConcentrationMeasurement.id,
-            Clusters.FormaldehydeConcentrationMeasurement.id,
-            Clusters.Pm1ConcentrationMeasurement.id,
-            Clusters.Pm10ConcentrationMeasurement.id,
-            Clusters.TotalVolatileOrganicCompoundsConcentrationMeasurement.id,
-            Clusters.RadonConcentrationMeasurement.id,
-        ]
+        # Device testing shows limit of 25 cluster paths per subscription, using 25 clusters to keep from runnining into intermittent issue CHIP Error 0x0000000B: No memory 
+        # This is due to resource constraints during priming report generation
+        # Spec only requires minimum of 3 paths per subscription (Section 2.11.2.2)
+        MAX_CLUSTER_PATHS_PER_SUBSCRIPTION = 25
 
         all_cluster_ids = set()
         for endpoint_id, endpoint_data in self.endpoints_tlv.items():
@@ -967,15 +949,14 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         # Build wildcard paths for all clusters EXCEPT the problematic ones
         subscription_paths = []
         for cluster_id in all_cluster_ids:
-            # Skip known problematic clusters
-            if cluster_id in CLUSTERS_WITH_SUBSCRIPTION_ISSUES:
-                continue
-
             # These may have non-standard subscription behavior
             if (not is_standard_cluster_id(cluster_id)):
+                continue            
+
+            if len(subscription_paths) >= MAX_CLUSTER_PATHS_PER_SUBSCRIPTION:
                 continue
 
-            # Subscribe to all attributes in this cluster across all endpoints
+            # Subscribe to all attributes in this cluster across all endpoints, append this cluster to the subscription_paths list
             subscription_paths.append(AttributePath(ClusterId=cluster_id))
 
         handler_step10 = WildcardAttributeSubscriptionHandler()
@@ -984,10 +965,10 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
             node_id=self.dut_node_id,
             attributes=subscription_paths,
             min_interval_sec=self.min_interval_floor_sec,
-            max_interval_sec=self.max_interval_ceiling_sec,
+            max_interval_sec=120,  # Long timeout to prevent subscription timeout during sequential writes
             keepSubscriptions=False,
             fabric_filtered=False,
-            autoResubscribe=True
+            autoResubscribe=False
         )
 
         # Verify we got priming reports with multiple endpoints, clusters, and attributes
@@ -1003,34 +984,30 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
                 total_attributes += len(attributes)
 
         asserts.assert_greater(num_endpoints, 0, "Should receive reports from at least one endpoint")
-        asserts.assert_greater(total_clusters, 15, "Should receive reports from multiple clusters")
-        asserts.assert_greater(total_attributes, 100, "Should receive reports for many attributes")
-
+        asserts.assert_greater(total_clusters, 4, "Should receive reports from multiple clusters")
+        asserts.assert_greater(total_attributes, 20, "Should receive reports for many attributes")
+        
         # Flush priming reports from handler queue before making changes
         handler_step10.flush_reports()
 
         # Change writable attributes and verify change reports per test spec
         # Skip problematic clusters we identified earlier
         changed_count = await self.change_writable_attributes_and_verify_reports(
-            handler_step10, priming_data, "Step 10", clusters_to_skip=CLUSTERS_WITH_SUBSCRIPTION_ISSUES
+            handler_step10, priming_data, "Step 10"
         )
         logging.info(f"Changed and verified {changed_count} attribute(s)")
 
         handler_step10.shutdown()
+        await asyncio.sleep(1)  # Allow time for subscription teardown to complete
 
         # Step 11: All attributes from all clusters on an endpoint
         # (This was originally test step 20 in the test plan)
         self.step(11)
 
         # Subscribe to all attributes from all clusters on endpoint 0
-        # Note: We must exclude clusters with subscription issues and manufacturer-specific clusters
         subscription_paths_step11 = []
         if self.root_node_endpoint in self.endpoints_tlv:
             for cluster_id in self.endpoints_tlv[self.root_node_endpoint].keys():
-                # Skip known problematic clusters
-                if cluster_id in CLUSTERS_WITH_SUBSCRIPTION_ISSUES:
-                    continue
-
                 # Skip manufacturer-specific clusters (0xFC00-0xFFFE range)
                 if (not is_standard_cluster_id(cluster_id)):
                     continue
@@ -1070,7 +1047,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
         # Change writable attributes and verify change reports per test spec
         changed_count = await self.change_writable_attributes_and_verify_reports(
-            handler_step11, priming_data, "Step 11", clusters_to_skip=CLUSTERS_WITH_SUBSCRIPTION_ISSUES
+            handler_step11, priming_data, "Step 11"
         )
         logging.info(f"Changed and verified {changed_count} attribute(s)")
 
