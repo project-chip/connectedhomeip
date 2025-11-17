@@ -175,8 +175,6 @@ static_library("interaction-model") {
     "CASESessionManager.h",
     "CommandSender.cpp",
     "CommandSender.h",
-    "DefaultTimerDelegate.cpp",
-    "DefaultTimerDelegate.h",
     "DeviceProxy.cpp",
     "DeviceProxy.h",
     "InteractionModelDelegatePointers.cpp",

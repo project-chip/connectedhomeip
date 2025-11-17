@@ -107,15 +107,6 @@ jobs:
               with:
                 platform: esp32
 
-            # We cannot add esp-idf-kconfig==2.5.0 to rquirements.txt because it
-            # will break the nuttx workflow which requires the older version of
-            # the kconfiglib and esp-idf-kconfig==2.5.0 installs newer version
-            # so, install it in in the virtual environment here
-            - name: Install esp-idf-kconfig
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                    "pip install esp-idf-kconfig==2.5.0"
-
             - name: CI Examples ESP32
               shell: bash
               run: |

@@ -61,7 +61,7 @@ if (wifi_soc) {
     ]
 
     include_dirs = [
-      "${chip_root}/src/platform/silabs/SiWx917",
+      "${chip_root}/src/platform/silabs/SiWx",
       "${silabs_project_dir}/include",
       "${examples_plat_dir}",
       "${chip_root}/src/lib",
