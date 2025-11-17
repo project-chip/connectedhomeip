@@ -317,7 +317,7 @@ class WpaSupplicantMock(threading.Thread):
                 # Mock AP association process.
                 await self.State.set_async("associating")
                 await self.State.set_async("associated")
-                self.mock.networking.setup_app_link_up()
+                self.mock.networking._setup_app_link_up()
                 await self.State.set_async("completed")
             await self.CurrentNetwork.set_async(path)
             asyncio.create_task(associate())
