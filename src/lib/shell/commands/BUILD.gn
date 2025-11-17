@@ -67,7 +67,7 @@ source_set("commands") {
   }
 
   if (chip_device_platform != "none") {
-    deps = [ "${chip_root}/src/setup_payload:onboarding-codes-utils" ]
+    deps += [ "${chip_root}/src/setup_payload:onboarding-codes-utils" ]
   }
 
   cflags = [ "-Wconversion" ]

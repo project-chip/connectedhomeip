@@ -107,6 +107,11 @@ ti_simplelink_executable("lock_app") {
     "${chip_root}/src/platform/logging:default",
     "${chip_root}/third_party/openthread:openthread",
   ]
+
+  if (chip_enable_ota_requestor) {
+    deps += [ "${chip_root}/src/app/clusters/ota-requestor" ]
+  }
+
   defines = []
   if (custom_factory_data) {
     defines += [ "TI_FACTORY_DATA" ]
