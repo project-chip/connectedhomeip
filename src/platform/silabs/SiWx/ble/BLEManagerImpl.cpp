@@ -36,6 +36,7 @@
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
+#include <platform/DeviceInstanceInfoProvider.h>
 #endif
 
 extern "C" {
@@ -179,7 +180,7 @@ void rsi_ble_add_matter_service(void)
     SilabsBleWrapper::rsi_ble_add_char_val_att(
         new_serv_resp.serv_handler, new_serv_resp.start_handle + RSI_BLE_CHAR_C3_MEASUREMENT_HANDLE_LOC, custom_characteristic_C3,
         RSI_BLE_ATT_PROPERTY_READ, // Set read
-        data, sizeof(data), ATT_REC_IN_HOST);
+        data, sizeof(data), ATT_REC_MAINTAIN_IN_HOST);
 #endif // CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 }
 
@@ -214,10 +215,7 @@ void BLEManagerImpl::ProcessEvent(SilabsBleWrapper::BleEvent_t inEvent)
     break;
     case SilabsBleWrapper::BleEventType::RSI_BLE_EVENT_GATT_RD: {
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-        if (inEvent.eventData.rsi_ble_read_req->type == 0)
-        {
-            BLEMgrImpl().HandleC3ReadRequest(inEvent.eventData);
-        }
+        BLEMgrImpl().HandleC3ReadRequest(inEvent.eventData);
 #endif // CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     }
     break;
@@ -1058,15 +1056,15 @@ CHIP_ERROR BLEManagerImpl::EncodeAdditionalDataTlv()
         ChipLogError(DeviceLayer, "Failed to generate TLV encoded Additional Data: %" CHIP_ERROR_FORMAT, err.Format());
     }
     return err;
-
-    return CHIP_NO_ERROR;
 }
 
 void BLEManagerImpl::HandleC3ReadRequest(const SilabsBleWrapper::sl_wfx_msg_t & evt)
 {
-    sl_status_t ret = rsi_ble_gatt_read_response(evt.rsi_ble_read_req->dev_addr, GATT_READ_RESP, evt.rsi_ble_read_req->handle,
-                                                 GATT_READ_ZERO_OFFSET, sInstance.c3AdditionalDataBufferHandle->DataLength(),
-                                                 sInstance.c3AdditionalDataBufferHandle->Start());
+    uint8_t read_resp = evt.rsi_ble_read_req->type == 0 ? GATT_READ_RESP : GATT_BLOB_READ_RESP;
+    sl_status_t ret = rsi_ble_gatt_read_response(evt.rsi_ble_read_req->dev_addr, read_resp, evt.rsi_ble_read_req->handle,
+                                         evt.rsi_ble_read_req->offset, sInstance.c3AdditionalDataBufferHandle->DataLength() - evt.rsi_ble_read_req->offset,
+                                         sInstance.c3AdditionalDataBufferHandle->Start() + evt.rsi_ble_read_req->offset);
+
     if (ret != SL_STATUS_OK)
     {
         ChipLogDetail(DeviceLayer, "Failed to send read response, err:%ld", ret);
