@@ -27,7 +27,6 @@ from matter.commissioning import ROOT_ENDPOINT_ID
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
 
 # Timeout constants
 TIMED_REQUEST_TIMEOUT_MS = 5000         # Matter command timeout (5s)
@@ -545,6 +544,10 @@ class TC_CNET_4_23(MatterBaseTest):
             timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS
         )
         await self._validate_network_config_response(response)
+
+        # Wait for DUT to stabilize WiFi configuration before attempting connection
+        logger.info(f" --- Waiting {NETWORK_STATUS_UPDATE_DELAY} seconds for DUT to stabilize WiFi configuration...")
+        await asyncio.sleep(NETWORK_STATUS_UPDATE_DELAY)
 
         # Step 13: TH sends ConnectNetwork command and Breadcrumb = 8
         self.step(13)
