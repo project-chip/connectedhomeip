@@ -448,7 +448,7 @@ CHIP_ERROR Instance::Init()
 
 void Instance::Shutdown()
 {
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
@@ -1059,7 +1059,7 @@ CHIP_ERROR Instance::UpdateDayInformation(uint32_t matterEpochNow_s)
     }
 
     ChipLogDetail(AppServer, "UpdateCurrentAttrs: current day date: %u", currentDay.Value().date);
-    SetCurrentDay(currentDay);
+    ReturnErrorOnFailure(SetCurrentDay(currentDay));
 
     nextDay.SetNonNull(
         Utils::FindDay(mServerTariffAttrsCtx, (matterEpochNow_s + (kSecondsPerDay - matterEpochNow_s % kSecondsPerDay)) + 1));
@@ -1067,7 +1067,7 @@ CHIP_ERROR Instance::UpdateDayInformation(uint32_t matterEpochNow_s)
     if (Utils::DayIsValid(&nextDay.Value()))
     {
         ChipLogDetail(AppServer, "UpdateCurrentAttrs: next day date: %u", nextDay.Value().date);
-        SetNextDay(nextDay);
+        ReturnErrorOnFailure(SetNextDay(nextDay));
     }
 
     return CHIP_NO_ERROR;
@@ -1101,8 +1101,8 @@ CHIP_ERROR Instance::UpdateDayEntryInformation(uint32_t matterEpochNow_s)
         ChipLogDetail(AppServer, "UpdateCurrentAttrs: current day entry: %u", tmpDayEntry.Value().dayEntryID);
     }
 
-    SetCurrentDayEntry(tmpDayEntry);
-    SetCurrentDayEntryDate(tmpDate);
+    ReturnErrorOnFailure(SetCurrentDayEntry(tmpDayEntry));
+    ReturnErrorOnFailure(SetCurrentDayEntryDate(tmpDate));
 
     // Handle next day entry
     tmpDayEntry.SetNull();
@@ -1117,10 +1117,8 @@ CHIP_ERROR Instance::UpdateDayEntryInformation(uint32_t matterEpochNow_s)
         tmpDate.SetNonNull(mCurrentDayEntryDate.Value() + currentEntryMinutesRemain * 60);
     }
 
-    SetNextDayEntry(tmpDayEntry);
-    SetNextDayEntryDate(tmpDate);
-
-    return CHIP_NO_ERROR;
+    ReturnErrorOnFailure(SetNextDayEntry(tmpDayEntry));
+    return SetNextDayEntryDate(tmpDate);
 }
 
 void Instance::DeinitCurrentAttrs()

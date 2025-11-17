@@ -24,7 +24,6 @@
 
 #include <controller/CHIPDeviceControllerFactory.h>
 
-#include <app/DefaultTimerDelegate.h>
 #include <app/InteractionModelEngine.h>
 #include <app/OperationalSessionSetup.h>
 #include <app/reporting/ReportSchedulerImpl.h>
@@ -35,6 +34,7 @@
 #if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
+#include <platform/DefaultTimerDelegate.h>
 #endif
 
 #include <app/server/Dnssd.h>
