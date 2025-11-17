@@ -132,7 +132,7 @@ try:
             "License :: OSI Approved :: Apache Software License",
             "Programming Language :: Python :: 3"
         ],
-        python_requires=">=3.7",
+        python_requires=">=3.11",
         packages=packages,
         package_dir={
             # By default, look in the tmp directory for packages/modules to be included.
@@ -150,7 +150,7 @@ try:
                 'universal': False,
                 # Place the generated .whl in the dist directory.
                 'dist_dir': distDir,
-                'py_limited_api': 'cp37',
+                'py_limited_api': 'cp311',
                 'plat_name': args.plat_name,
             },
             'egg_info': {

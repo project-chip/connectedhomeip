@@ -437,6 +437,15 @@ PyChipError pychip_WriteClient_TestOnlyWriteAttributesWithMismatchedTimedRequest
     size_t attributeDataLength)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+        
+    TLV::TLVReader reader;
+    reader.Init(tlvBuffer, static_cast<uint32_t>(length));
+    TEMPORARY_RETURN_IGNORED reader.Next();
+    Optional<DataVersion> dataVersion;
+    if (path.hasDataVersion == 1)
+    {
+        dataVersion.SetValue(path.dataVersion);
+    }
 
     uint16_t timedWriteTimeoutMs  = static_cast<uint16_t>(timedWriteTimeoutMsSizeT);
     uint16_t interactionTimeoutMs = static_cast<uint16_t>(interactionTimeoutMsSizeT);
@@ -502,7 +511,7 @@ PyChipError pychip_WriteClient_WriteGroupAttributes(size_t groupIdSizeT, chip::C
 
         TLV::TLVReader reader;
         reader.Init(tlvBuffer, static_cast<uint32_t>(length));
-        reader.Next();
+        TEMPORARY_RETURN_IGNORED reader.Next();
         Optional<DataVersion> dataVersion;
         if (path.hasDataVersion == 1)
         {
@@ -543,7 +552,8 @@ void pychip_ReadClient_ShutdownSubscription(ReadClient * apReadClient)
     FabricIndex fabricIndex = apReadClient->GetFabricIndex();
     NodeId nodeId           = apReadClient->GetPeerNodeId();
 
-    InteractionModelEngine::GetInstance()->ShutdownSubscription(ScopedNodeId(nodeId, fabricIndex), subscriptionId.Value());
+    TEMPORARY_RETURN_IGNORED InteractionModelEngine::GetInstance()->ShutdownSubscription(ScopedNodeId(nodeId, fabricIndex),
+                                                                                         subscriptionId.Value());
 }
 
 void pychip_ReadClient_OverrideLivenessTimeout(ReadClient * pReadClient, uint32_t livenessTimeoutMs)

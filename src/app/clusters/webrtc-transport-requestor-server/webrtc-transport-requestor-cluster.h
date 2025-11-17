@@ -61,48 +61,49 @@ public:
      * @brief
      *   Handles the Offer command received by the server.
      *
-     * @param[in] args
-     *   Structure containing all input arguments for the command.
+     * @param[in] session  The WebRTC session for this offer.
+     * @param[in] args     Structure containing all input arguments for the command.
      *
      * @return CHIP_ERROR
      *   - Returns error if the session is invalid or the candidates cannot be processed
      */
-    virtual CHIP_ERROR HandleOffer(uint16_t sessionId, const OfferArgs & args) = 0;
+    virtual CHIP_ERROR HandleOffer(const WebRTCSessionStruct & session, const OfferArgs & args) = 0;
     /**
      * @brief
      *   Handles the Answer command received by the server.
      *
-     * @param[in]  sessionId Current session ID.
-     * @param[in]  sdpAnswer  SDP answer received.
+     * @param[in] session    The WebRTC session for this answer.
+     * @param[in] sdpAnswer  SDP answer received.
      *
      * @return CHIP_ERROR
      *   - Returns error if the session is invalid or the candidates cannot be processed
      */
-    virtual CHIP_ERROR HandleAnswer(uint16_t sessionId, const std::string & sdpAnswer) = 0;
+    virtual CHIP_ERROR HandleAnswer(const WebRTCSessionStruct & session, const std::string & sdpAnswer) = 0;
     /**
      * @brief
      *   Called when the server receives the ICECandidates command.
      *
-     * @param[in] sessionId  Current session ID.
-     * @param[in] candidates List of ICE candidate structs.
+     * @param[in] session     The WebRTC session for these candidates.
+     * @param[in] candidates  List of ICE candidate structs.
      * Note: The callee cannot reference the `candidates` vector after this call
      * returns, and must copy the contents over for later use, if required.
      *
      * @return CHIP_ERROR
      *   - Returns error if the session is invalid or the candidates cannot be processed
      */
-    virtual CHIP_ERROR HandleICECandidates(uint16_t sessionId, const std::vector<ICECandidateStruct> & candidates) = 0;
+    virtual CHIP_ERROR HandleICECandidates(const WebRTCSessionStruct & session,
+                                           const std::vector<ICECandidateStruct> & candidates) = 0;
     /**
      * @brief
      *   Called when the server receives the End command.
      *
-     * @param[in] sessionId  Current session ID to end.
-     * @param[in] reasonCode Reason to end the session.
+     * @param[in] session     The WebRTC session to end.
+     * @param[in] reasonCode  Reason to end the session.
      *
      * @return CHIP_ERROR
      *   - Returns error if the session is invalid or the candidates cannot be processed
      */
-    virtual CHIP_ERROR HandleEnd(uint16_t sessionId, WebRTCEndReasonEnum reasonCode) = 0;
+    virtual CHIP_ERROR HandleEnd(const WebRTCSessionStruct & session, WebRTCEndReasonEnum reasonCode) = 0;
 };
 
 class WebRTCTransportRequestorServer : public DefaultServerCluster
@@ -152,21 +153,21 @@ public:
 
     /**
      * @brief
-     *   Removes a session identified by its session ID from the internal list of current sessions.
+     *   Removes a session identified by its session ID, peer node ID, and fabric index from the internal list of current sessions.
      *
      * @param sessionId  The session ID of the session to remove.
-     *                   If the ID is not found, the call is a no‑op.
+     * @param peerNodeId The peer node ID of the session to remove.
+     * @param fabricIndex The fabric index of the session to remove.
+     *                   If the session is not found, the call is a no‑op.
      */
-    void RemoveSession(uint16_t sessionId);
+    void RemoveSession(uint16_t sessionId, NodeId peerNodeId, FabricIndex fabricIndex);
 
 private:
     Delegate & mDelegate;
     std::vector<WebRTCSessionStruct> mCurrentSessions;
 
     // Helper functions
-    WebRTCSessionStruct * FindSession(uint16_t sessionId);
-    uint16_t GenerateSessionId();
-    bool IsPeerNodeSessionValid(uint16_t sessionId, const CommandHandler & commandHandler);
+    WebRTCSessionStruct * FindSession(uint16_t sessionId, NodeId peerNodeId, FabricIndex fabricIndex);
 
     // Command handlers
     DataModel::ActionReturnStatus HandleOffer(const CommandHandler & commandHandler, const Commands::Offer::DecodableType & req);

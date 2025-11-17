@@ -80,9 +80,6 @@ Davis, CA 95616, USA
         <feature name="SET"/>
       </optionalConform>
     </feature>
-    <feature bit="4" code="CIRC" name="ElectricalCircuit" summary="This endpoint provides information about downstream nodes on its circuit">
-      <optionalConform/>
-    </feature>
   </features>
   <dataTypes>
     <struct name="CircuitNodeStruct">
@@ -122,17 +119,6 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint>
         <maxCount value="20"/>
-      </constraint>
-    </attribute>
-    <attribute id="0x0002" name="ElectricalCircuitNodes" type="list">
-      <entry type="CircuitNodeStruct"/>
-      <access read="true" write="true" readPrivilege="view" writePrivilege="operate" fabricScoped="true"/>
-      <quality persistence="nonVolatile"/>
-      <mandatoryConform>
-        <feature name="CIRC"/>
-      </mandatoryConform>
-      <constraint>
-        <maxCount value="50"/>
       </constraint>
     </attribute>
   </attributes>
