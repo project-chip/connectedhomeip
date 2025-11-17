@@ -28,6 +28,7 @@
 #if CHIP_CONFIG_ENABLE_ICD_CIP
 #include <app/icd/server/ICDNotifier.h> // nogncheck
 #endif
+#include <app/reporting/reporting.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 
@@ -185,12 +186,6 @@ private:
 /*
  * ICD Management Implementation
  */
-#if CHIP_CONFIG_ENABLE_ICD_CIP
-PersistentStorageDelegate * ICDManagementServer::mStorage           = nullptr;
-Crypto::SymmetricKeystore * ICDManagementServer::mSymmetricKeystore = nullptr;
-#endif // CHIP_CONFIG_ENABLE_ICD_CIP
-
-ICDConfigurationData * ICDManagementServer::mICDConfigurationData = nullptr;
 
 namespace {
 IcdManagementAttributeAccess gAttribute;
@@ -281,6 +276,14 @@ CHIP_ERROR CheckAdmin(CommandHandler * commandObj, const ConcreteCommandPath & c
 
 } // namespace
 
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+
+namespace chip::app::Clusters {
+
+ICDManagementServer ICDManagementServer::instance;
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+
 Status ICDManagementServer::RegisterClient(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                            const Commands::RegisterClient::DecodableType & commandData, uint32_t & icdCounter)
 {
@@ -356,7 +359,7 @@ Status ICDManagementServer::RegisterClient(CommandHandler * commandObj, const Co
         // Notify subscribers that the first entry for the fabric was successfully added
         TriggerICDMTableUpdatedEvent();
     }
-
+    MatterReportingAttributeChangeCallback(kRootEndpointId, IcdManagement::Id, IcdManagement::Attributes::RegisteredClients::Id);
     icdCounter = mICDConfigurationData->GetICDCounter().GetValue();
     return Status::Success;
 }
@@ -395,6 +398,7 @@ Status ICDManagementServer::UnregisterClient(CommandHandler * commandObj, const 
         TriggerICDMTableUpdatedEvent();
     }
 
+    MatterReportingAttributeChangeCallback(kRootEndpointId, IcdManagement::Id, IcdManagement::Attributes::RegisteredClients::Id);
     return Status::Success;
 }
 
@@ -415,6 +419,14 @@ void ICDManagementServer::Init(PersistentStorageDelegate & storage, Crypto::Symm
     mICDConfigurationData = &icdConfigurationData;
 }
 
+void ICDManagementServer::OnICDModeChange()
+{
+    // Notify attribute change for OperatingMode attribute
+    MatterReportingAttributeChangeCallback(kRootEndpointId, IcdManagement::Id, IcdManagement::Attributes::OperatingMode::Id);
+}
+
+} // namespace chip::app::Clusters
+
 /**********************************************************
  * Callbacks Implementation
  *********************************************************/
@@ -429,8 +441,7 @@ bool emberAfIcdManagementClusterRegisterClientCallback(CommandHandler * commandO
 {
     uint32_t icdCounter = 0;
 
-    ICDManagementServer server;
-    Status status = server.RegisterClient(commandObj, commandPath, commandData, icdCounter);
+    Status status = ICDManagementServer::GetInstance().RegisterClient(commandObj, commandPath, commandData, icdCounter);
 
     if (Status::Success == status)
     {
@@ -452,8 +463,7 @@ bool emberAfIcdManagementClusterRegisterClientCallback(CommandHandler * commandO
 bool emberAfIcdManagementClusterUnregisterClientCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                          const Commands::UnregisterClient::DecodableType & commandData)
 {
-    ICDManagementServer server;
-    Status status = server.UnregisterClient(commandObj, commandPath, commandData);
+    Status status = ICDManagementServer::GetInstance().UnregisterClient(commandObj, commandPath, commandData);
 
     commandObj->AddStatus(commandPath, status);
     return true;
@@ -496,7 +506,15 @@ void MatterIcdManagementPluginServerInitCallback()
     AttributeAccessInterfaceRegistry::Instance().Register(&gAttribute);
 
     // Configure ICD Management
-    ICDManagementServer::Init(storage, symmetricKeystore, icdConfigurationData);
+    ICDManagementServer::GetInstance().Init(storage, symmetricKeystore, icdConfigurationData);
+
+// TODO(#32321): Remove #if after issue is resolved
+// Note: We only need this #if statement for platform examples that enable the ICD management server without building the sample
+// as an ICD. Since this is not spec compliant, we should remove this #if statement once we stop compiling the ICD management
+// server in those examples.
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    Server::GetInstance().GetICDManager().RegisterObserver(&ICDManagementServer::GetInstance());
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 }
 
 void MatterIcdManagementPluginServerShutdownCallback()
@@ -507,4 +525,12 @@ void MatterIcdManagementPluginServerShutdownCallback()
     FabricTable & fabricTable = Server::GetInstance().GetFabricTable();
     fabricTable.RemoveFabricDelegate(&gFabricDelegate);
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
+
+// TODO(#32321): Remove #if after issue is resolved
+// Note: We only need this #if statement for platform examples that enable the ICD management server without building the sample
+// as an ICD. Since this is not spec compliant, we should remove this #if statement once we stop compiling the ICD management
+// server in those examples.
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    Server::GetInstance().GetICDManager().ReleaseObserver(&ICDManagementServer::GetInstance());
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 }
