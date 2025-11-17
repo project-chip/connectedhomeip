@@ -90,6 +90,9 @@ leak:_instantiateTLVs
 # macOS 15
 leak:dyld::ThreadLocalVariables::instantiateVariable
 
+# TLS in ErrorStr (using thread local storage for error formatting)
+leak:chip::ErrorStr
+
 # ignore (maybe false-positive?) leaks in macOS key value store init
 leak:KeyValueStoreManagerImpl::Init
 
