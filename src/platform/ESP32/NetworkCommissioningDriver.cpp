@@ -260,8 +260,11 @@ CHIP_ERROR ESPWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen,
         return chip::DeviceLayer::Internal::ESP32Utils::MapError(err);
     }
 
-    ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));
-    return ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Enabled);
+    // Already called above
+    // ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));
+    ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Enabled));
+    vTaskDelay(pdMS_TO_TICKS(100)); // Delay to allow WiFi interface to come up
+    return CHIP_NO_ERROR;
 }
 
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
