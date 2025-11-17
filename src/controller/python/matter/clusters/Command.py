@@ -19,7 +19,6 @@ import builtins
 import ctypes
 import inspect
 import logging
-import sys
 from asyncio.futures import Future
 from ctypes import CFUNCTYPE, POINTER, c_bool, c_char_p, c_size_t, c_uint8, c_uint16, c_uint32, c_void_p, cast, py_object
 from dataclasses import dataclass
@@ -29,8 +28,8 @@ from ..interaction_model import InteractionModelError, PyInvokeRequestData
 from ..interaction_model import Status as InteractionModelStatus
 from ..interaction_model import TestOnlyPyBatchCommandsOverrides, TestOnlyPyOnDoneInfo
 from ..native import GetLibraryHandle, NativeLibraryHandleMethodArguments, PyChipError
-from . import Objects as GeneratedObjects  # noqa: F401
-from .ClusterObjects import ClusterCommand
+from . import Objects as GeneratedObjects
+from .ClusterObjects import Cluster, ClusterCommand
 
 logger = logging.getLogger('matter.cluster.Command')
 logger.setLevel(logging.ERROR)
@@ -70,17 +69,12 @@ def FindCommandClusterObject(isClientSideCommand: bool, path: CommandPath):
 
         Returns the type of the cluster object if one is found. Otherwise, returns None.
     '''
-    for clusterName, obj in inspect.getmembers(sys.modules['matter.clusters.Objects']):
-        if ('matter.clusters.Objects' in str(obj)) and inspect.isclass(obj):
-            for objName, subclass in inspect.getmembers(obj):
-                if inspect.isclass(subclass) and (('Commands') in str(subclass)):
-                    for commandName, command in inspect.getmembers(subclass):
-                        if inspect.isclass(command):
-                            for name, field in inspect.getmembers(command):
-                                if ('__dataclass_fields__' in name):
-                                    if (field['cluster_id'].default == path.ClusterId) and (field['command_id'].default ==
-                                                                                            path.CommandId) and (field['is_client'].default == isClientSideCommand):
-                                        return eval('GeneratedObjects.' + clusterName + '.Commands.' + commandName)
+    for clusterName in GeneratedObjects.__all__:
+        obj = getattr(GeneratedObjects, clusterName)
+        if issubclass(obj, Cluster) and obj.id == path.ClusterId:
+            for _, cmd in inspect.getmembers(getattr(obj, "Commands", None), inspect.isclass):
+                if issubclass(cmd, ClusterCommand) and cmd.command_id == path.CommandId and cmd.is_client == isClientSideCommand:
+                    return cmd
     return None
 
 

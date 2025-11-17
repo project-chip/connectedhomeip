@@ -400,7 +400,7 @@ public:
     }
 };
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 /*
     Get the freq_list from args.
     Format:
@@ -586,7 +586,7 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
         }
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     if (LinuxDeviceOptions::GetInstance().mWiFi && LinuxDeviceOptions::GetInstance().mWiFiPAF)
     {
         ChipLogProgress(WiFiPAF, "WiFi-PAF: initialzing");
