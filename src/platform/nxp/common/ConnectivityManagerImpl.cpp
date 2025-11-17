@@ -270,7 +270,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState()
             event.InternetConnectivityChange.ipAddress = IPAddress(*addr4);
         }
         err = PlatformMgr().PostEvent(&event);
-        VerifyOrDie(err == CHIP_NO_ERROR);
+        SuccessOrDie(err);
 
         ChipLogProgress(DeviceLayer, "%s Internet connectivity %s", "IPv4", (haveIPv4Conn) ? "ESTABLISHED" : "LOST");
     }
@@ -291,7 +291,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState()
 #endif
         }
         err = PlatformMgr().PostEvent(&event);
-        VerifyOrDie(err == CHIP_NO_ERROR);
+        SuccessOrDie(err);
 
         ChipLogProgress(DeviceLayer, "%s Internet connectivity %s", "IPv6", (haveIPv6Conn) ? "ESTABLISHED" : "LOST");
     }

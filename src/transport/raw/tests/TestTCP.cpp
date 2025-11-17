@@ -37,6 +37,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/UnitTestUtils.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <system/SystemLayer.h>
 #include <transport/TransportMgr.h>
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -190,7 +191,7 @@ public:
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         mTransportMgrBase.SetSessionManager(this);
-        mTransportMgrBase.Init(&tcp);
+        EXPECT_SUCCESS(mTransportMgrBase.Init(&tcp));
 
         mReceiveHandlerCallCount        = 0;
         mHandleConnectionCompleteCalled = false;
