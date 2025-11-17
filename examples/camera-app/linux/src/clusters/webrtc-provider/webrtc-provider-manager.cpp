@@ -133,7 +133,8 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & ar
             [this](const std::string & sdp, SDPType type, const uint16_t sessionId) {
                 this->OnLocalDescription(sdp, type, sessionId);
             },
-            [this](bool connected, const uint16_t sessionId) { this->OnConnectionStateChanged(connected, sessionId); });
+            [this](bool connected, const uint16_t sessionId) { this->OnConnectionStateChanged(connected, sessionId); },
+            [this](const uint16_t sessionId) { this->OnTrickleICECandidate(sessionId); });
     }
 
     transport->SetRequestArgs(requestArgs);
@@ -325,7 +326,8 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
             [this](const std::string & sdp, SDPType type, const uint16_t sessionId) {
                 this->OnLocalDescription(sdp, type, sessionId);
             },
-            [this](bool connected, const uint16_t sessionId) { this->OnConnectionStateChanged(connected, sessionId); });
+            [this](bool connected, const uint16_t sessionId) { this->OnConnectionStateChanged(connected, sessionId); },
+            [this](const uint16_t sessionId) { this->OnTrickleICECandidate(sessionId); });
     }
 
     // Check resource availability before proceeding
@@ -1017,6 +1019,13 @@ void WebRTCProviderManager::OnConnectionStateChanged(bool connected, const uint1
     }
 }
 
+void WebRTCProviderManager::OnTrickleICECandidate(const uint16_t sessionId)
+{
+    ChipLogProgress(Camera, "Trickle ICE candidate received for session %u", sessionId);
+    // Reuse the existing ICE candidates send mechanism
+    ScheduleICECandidatesSend(sessionId);
+}
+
 CHIP_ERROR WebRTCProviderManager::SendAnswerCommand(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle,
                                                     uint16_t sessionId)
 {
@@ -1067,7 +1076,9 @@ CHIP_ERROR WebRTCProviderManager::SendICECandidatesCommand(Messaging::ExchangeMa
         return CHIP_ERROR_INTERNAL;
     }
 
-    const std::vector<ICECandidateInfo> & localCandidates = transport->GetCandidates();
+    // Drain candidates to get all accumulated candidates and clear the list
+    // This prevents resending the same candidates during trickle ICE
+    const std::vector<ICECandidateInfo> localCandidates = transport->DrainCandidates();
 
     // Build the command
     WebRTCTransportRequestor::Commands::ICECandidates::Type command;

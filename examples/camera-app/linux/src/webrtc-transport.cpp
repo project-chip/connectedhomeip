@@ -51,10 +51,12 @@ WebrtcTransport::~WebrtcTransport()
 }
 
 void WebrtcTransport::SetCallbacks(OnTransportLocalDescriptionCallback onLocalDescription,
-                                   OnTransportConnectionStateCallback onConnectionState)
+                                   OnTransportConnectionStateCallback onConnectionState,
+                                   OnTransportICECandidateCallback onICECandidate)
 {
     mOnLocalDescription = onLocalDescription;
     mOnConnectionState  = onConnectionState;
+    mOnICECandidate     = onICECandidate;
 }
 
 void WebrtcTransport::SetRequestArgs(const RequestArgs & args)
@@ -265,6 +267,13 @@ void WebrtcTransport::OnICECandidate(const ICECandidateInfo & candidateInfo)
     ChipLogProgress(Camera, "Local Candidate:");
     ChipLogProgress(Camera, "%s", candidateInfo.candidate.c_str());
     ChipLogProgress(Camera, "  mid: %s, mlineIndex: %d", candidateInfo.mid.c_str(), candidateInfo.mlineIndex);
+
+    // If we're back in Idle state, send this candidate immediately (trickle ICE)
+    if (mState == State::Idle && mOnICECandidate)
+    {
+        ChipLogProgress(Camera, "Sending trickle ICE candidate immediately for sessionID: %u", mRequestArgs.sessionId);
+        mOnICECandidate(mRequestArgs.sessionId);
+    }
 }
 
 void WebrtcTransport::OnConnectionStateChanged(bool connected)

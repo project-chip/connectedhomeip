@@ -27,6 +27,7 @@
 
 using OnTransportLocalDescriptionCallback = std::function<void(const std::string & sdp, SDPType type, const int16_t sessionId)>;
 using OnTransportConnectionStateCallback  = std::function<void(bool connected, const int16_t sessionId)>;
+using OnTransportICECandidateCallback     = std::function<void(const int16_t sessionId)>;
 
 // Derived class for WebRTC transport
 class WebrtcTransport : public Transport
@@ -65,7 +66,8 @@ public:
 
     ~WebrtcTransport();
 
-    void SetCallbacks(OnTransportLocalDescriptionCallback onLocalDescription, OnTransportConnectionStateCallback onConnectionState);
+    void SetCallbacks(OnTransportLocalDescriptionCallback onLocalDescription, OnTransportConnectionStateCallback onConnectionState,
+                      OnTransportICECandidateCallback onICECandidate);
 
     void MoveToState(const State targetState);
     const char * GetStateStr() const;
@@ -107,6 +109,15 @@ public:
 
     const std::vector<ICECandidateInfo> & GetCandidates() { return mLocalCandidates; }
 
+    // Drain candidates - returns all accumulated candidates and clears the internal list
+    // This prevents resending the same candidates multiple times during trickle ICE
+    const std::vector<ICECandidateInfo> DrainCandidates()
+    {
+        std::vector<ICECandidateInfo> candidates = std::move(mLocalCandidates);
+        mLocalCandidates.clear();
+        return candidates;
+    }
+
     void SetCandidates(std::vector<ICECandidateInfo> candidates) { mLocalCandidates = candidates; }
 
     void AddRemoteCandidate(const std::string & candidate, const std::string & mid);
@@ -143,4 +154,5 @@ private:
     RequestArgs mRequestArgs;
     OnTransportLocalDescriptionCallback mOnLocalDescription = nullptr;
     OnTransportConnectionStateCallback mOnConnectionState   = nullptr;
+    OnTransportICECandidateCallback mOnICECandidate         = nullptr;
 };
