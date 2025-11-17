@@ -69,6 +69,7 @@ static_library("stm32") {
     ]
 
     deps += [
+      "${chip_root}/src/app/clusters/ota-requestor:interface",
       "${chip_root}/src/app/common:ids",
       "${chip_root}/src/platform/logging:stdio",
     ]

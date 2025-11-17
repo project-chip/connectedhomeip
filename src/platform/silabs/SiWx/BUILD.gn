@@ -98,6 +98,7 @@ static_library("SiWx") {
       "${silabs_platform_dir}/OTAImageProcessorImpl.h",
       "OTAImageProcessorImpl.cpp",
     ]
+    deps += [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
   }
 
   # Add platform crypto implementation

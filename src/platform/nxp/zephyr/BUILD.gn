@@ -113,6 +113,7 @@ static_library("nxp_zephyr") {
       "ota/OTAImageProcessorImpl.cpp",
       "ota/OTAImageProcessorImpl.h",
     ]
+    deps += [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
   }
   if (chip_enable_wifi || chip_enable_ethernet) {
     sources += [

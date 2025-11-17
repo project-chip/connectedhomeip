@@ -43,6 +43,7 @@ static_library("BL616") {
 
   if (chip_enable_ota_requestor) {
     sources += [ "../common/OTAImageProcessorImpl_bflb.cpp" ]
+    deps += [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
   }
 
   if (chip_enable_ble) {
