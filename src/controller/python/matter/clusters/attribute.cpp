@@ -383,7 +383,7 @@ PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * 
 
         TLV::TLVReader reader;
         reader.Init(tlvBuffer, static_cast<uint32_t>(length));
-        reader.Next();
+        TEMPORARY_RETURN_IGNORED reader.Next();
         Optional<DataVersion> dataVersion;
         if (path.hasDataVersion == 1)
         {
@@ -442,7 +442,7 @@ PyChipError pychip_WriteClient_WriteGroupAttributes(size_t groupIdSizeT, chip::C
 
         TLV::TLVReader reader;
         reader.Init(tlvBuffer, static_cast<uint32_t>(length));
-        reader.Next();
+        TEMPORARY_RETURN_IGNORED reader.Next();
         Optional<DataVersion> dataVersion;
         if (path.hasDataVersion == 1)
         {
@@ -483,7 +483,8 @@ void pychip_ReadClient_ShutdownSubscription(ReadClient * apReadClient)
     FabricIndex fabricIndex = apReadClient->GetFabricIndex();
     NodeId nodeId           = apReadClient->GetPeerNodeId();
 
-    InteractionModelEngine::GetInstance()->ShutdownSubscription(ScopedNodeId(nodeId, fabricIndex), subscriptionId.Value());
+    TEMPORARY_RETURN_IGNORED InteractionModelEngine::GetInstance()->ShutdownSubscription(ScopedNodeId(nodeId, fabricIndex),
+                                                                                         subscriptionId.Value());
 }
 
 void pychip_ReadClient_OverrideLivenessTimeout(ReadClient * pReadClient, uint32_t livenessTimeoutMs)
