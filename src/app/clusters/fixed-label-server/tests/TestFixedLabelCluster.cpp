@@ -40,14 +40,13 @@ struct TestFixedLabelCluster : public ::testing::Test
 
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
-    void SetUp() override { ASSERT_EQ(fixedLabel.Startup(context), CHIP_NO_ERROR); }
+    void SetUp() override { ASSERT_EQ(fixedLabel.Startup(testContext.Get()), CHIP_NO_ERROR); }
 
     void TearDown() override { fixedLabel.Shutdown(); }
 
-    TestFixedLabelCluster() : context(testContext.Create()), fixedLabel(kRootEndpointId) {}
+    TestFixedLabelCluster() : fixedLabel(kRootEndpointId) {}
 
     chip::Test::TestServerClusterContext testContext;
-    ServerClusterContext context;
     FixedLabelCluster fixedLabel;
 };
 
