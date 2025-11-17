@@ -61,9 +61,9 @@ void WebRTCProviderManager::SetMediaController(MediaController * mediaController
     mMediaController = mediaController;
 }
 
-void WebRTCProviderManager::SetWebRTCTransportProvider(std::unique_ptr<WebRTCTransportProviderServer> aWebRTCTransportProvider)
+void WebRTCProviderManager::SetWebRTCTransportProvider(WebRTCTransportProviderServer * webRTCTransportProvider)
 {
-    mWebRTCTransportProvider = std::move(aWebRTCTransportProvider);
+    mWebRTCTransportProvider = webRTCTransportProvider;
 }
 
 CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs & args, WebRTCSessionStruct & outSession,

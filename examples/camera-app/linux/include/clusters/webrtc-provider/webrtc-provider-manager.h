@@ -22,7 +22,7 @@
 #include "webrtc-abstract.h"
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/CASESessionManager.h>
-#include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
+#include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-cluster.h>
 #include <media-controller.h>
 #include <webrtc-transport.h>
 
@@ -39,7 +39,7 @@ using ICECandidateStruct       = chip::app::Clusters::Globals::Structs::ICECandi
 using StreamUsageEnum          = chip::app::Clusters::Globals::StreamUsageEnum;
 using WebRTCEndReasonEnum      = chip::app::Clusters::Globals::WebRTCEndReasonEnum;
 
-class WebRTCProviderManager : public Delegate, public WebRTCTransportProviderController
+class WebRTCProviderManager : public Delegate
 {
 public:
     WebRTCProviderManager() :
@@ -54,7 +54,7 @@ public:
 
     void SetMediaController(MediaController * mediaController);
 
-    void SetWebRTCTransportProvider(std::unique_ptr<WebRTCTransportProviderServer> webRTCTransportProvider) override;
+    void SetWebRTCTransportProvider(WebRTCTransportProviderServer * webRTCTransportProvider);
 
     CHIP_ERROR HandleSolicitOffer(const OfferRequestArgs & args, WebRTCSessionStruct & outSession,
                                   bool & outDeferredOffer) override;
@@ -149,7 +149,7 @@ private:
 
     MediaController * mMediaController = nullptr;
 
-    std::unique_ptr<WebRTCTransportProviderServer> mWebRTCTransportProvider = nullptr;
+    WebRTCTransportProviderServer * mWebRTCTransportProvider = nullptr;
 
     // Handle to the Camera Device interface. For accessing other
     // clusters, if required.

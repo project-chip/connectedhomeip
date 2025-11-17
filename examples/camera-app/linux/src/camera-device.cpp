@@ -1834,9 +1834,9 @@ WebRTCTransportProvider::Delegate & CameraDevice::GetWebRTCProviderDelegate()
     return mWebRTCProviderManager;
 }
 
-WebRTCTransportProvider::WebRTCTransportProviderController & CameraDevice::GetWebRTCProviderController()
+void CameraDevice::SetWebRTCTransportProvider(WebRTCTransportProvider::WebRTCTransportProviderServer * provider)
 {
-    return mWebRTCProviderManager;
+    mWebRTCProviderManager.SetWebRTCTransportProvider(provider);
 }
 
 PushAvStreamTransportDelegate & CameraDevice::GetPushAVTransportDelegate()

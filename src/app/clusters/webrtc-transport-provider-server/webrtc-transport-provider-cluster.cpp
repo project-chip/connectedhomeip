@@ -15,37 +15,39 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "webrtc-transport-provider-server.h"
-
-#include <protocols/interaction_model/StatusCode.h>
+#include "webrtc-transport-provider-cluster.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/CommandHandler.h>
-#include <app/CommandHandlerInterfaceRegistry.h>
-#include <app/EventLogging.h>
-#include <app/reporting/reporting.h>
+#include <app/server-cluster/AttributeListBuilder.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 #include <iterator>
 #include <memory>
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::WebRTCTransportProvider;
+using namespace chip::app::Clusters::WebRTCTransportProvider::Attributes;
+using namespace chip::Protocols::InteractionModel;
 using chip::Protocols::InteractionModel::Status;
-
-using ICEServerDecodableStruct = chip::app::Clusters::Globals::Structs::ICEServerStruct::DecodableType;
-using WebRTCSessionStruct      = chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type;
-using ICECandidateStruct       = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
-using StreamUsageEnum          = chip::app::Clusters::Globals::StreamUsageEnum;
-using WebRTCEndReasonEnum      = chip::app::Clusters::Globals::WebRTCEndReasonEnum;
 
 namespace {
 
 static constexpr uint16_t kMaxSessionId = 65534;
+
+constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
+    Commands::SolicitOffer::kMetadataEntry,         Commands::ProvideOffer::kMetadataEntry, Commands::ProvideAnswer::kMetadataEntry,
+    Commands::ProvideICECandidates::kMetadataEntry, Commands::EndSession::kMetadataEntry,
+};
+
+constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
+    CurrentSessions::kMetadataEntry,
+};
 
 NodeId GetNodeIdFromCtx(const CommandHandler & commandHandler)
 {
@@ -211,83 +213,84 @@ namespace app {
 namespace Clusters {
 namespace WebRTCTransportProvider {
 
-WebRTCTransportProviderServer::WebRTCTransportProviderServer(Delegate & delegate, EndpointId endpointId) :
-    AttributeAccessInterface(MakeOptional(endpointId), WebRTCTransportProvider::Id),
-    CommandHandlerInterface(MakeOptional(endpointId), WebRTCTransportProvider::Id), mDelegate(delegate)
+WebRTCTransportProviderServer::WebRTCTransportProviderServer(EndpointId endpointId, Delegate & delegate) :
+    DefaultServerCluster({ endpointId, Id }), mDelegate(delegate)
 {}
 
-WebRTCTransportProviderServer::~WebRTCTransportProviderServer()
+DataModel::ActionReturnStatus WebRTCTransportProviderServer::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                                           AttributeValueEncoder & encoder)
 {
-    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
-    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
-}
-
-CHIP_ERROR WebRTCTransportProviderServer::Init()
-{
-    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
-    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
-
-    return CHIP_NO_ERROR;
-}
-
-// AttributeAccessInterface
-CHIP_ERROR WebRTCTransportProviderServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
-{
-    // The only attribute from the spec is "CurrentSessions" (attribute ID 0x0000),
-    // which is a list[WebRTCSessionStruct].
-    if (aPath.mClusterId == Id && aPath.mAttributeId == Attributes::CurrentSessions::Id)
+    switch (request.path.mAttributeId)
     {
-        // We encode mCurrentSessions as a list of WebRTCSessionStruct
-        return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
+    case CurrentSessions::Id:
+        return encoder.EncodeList([this](const auto & listEncoder) -> CHIP_ERROR {
             for (auto & session : mCurrentSessions)
             {
-                ReturnErrorOnFailure(encoder.Encode(session));
+                ReturnErrorOnFailure(listEncoder.Encode(session));
             }
             return CHIP_NO_ERROR;
         });
+    case ClusterRevision::Id:
+        return encoder.Encode(kRevision);
+    case FeatureMap::Id:
+        // TODO: Allow delegate to specify supported features
+        // Currently hardcoded to 0 (no features supported)
+        // METADATA feature (bit 0) should be configurable based on delegate capabilities
+        return encoder.Encode<uint32_t>(0);
+    default:
+        return Status::UnsupportedAttribute;
     }
-
-    // If not our attribute, let default logic handle
-    return CHIP_NO_ERROR;
 }
 
-// CommandHandlerInterface
-void WebRTCTransportProviderServer::InvokeCommand(HandlerContext & ctx)
+std::optional<DataModel::ActionReturnStatus> WebRTCTransportProviderServer::InvokeCommand(const DataModel::InvokeRequest & request,
+                                                                                          TLV::TLVReader & input_arguments,
+                                                                                          CommandHandler * handler)
 {
-    ChipLogDetail(Zcl, "WebRTCTransportProvider: InvokeCommand called with CommandId=0x%08" PRIx32, ctx.mRequestPath.mCommandId);
+    FabricIndex accessingFabricIndex = handler->GetAccessingFabricIndex();
 
-    switch (ctx.mRequestPath.mCommandId)
+    switch (request.path.mCommandId)
     {
-    case Commands::SolicitOffer::Id:
-        CommandHandlerInterface::HandleCommand<Commands::SolicitOffer::DecodableType>(
-            ctx, [this](HandlerContext & subCtx, const auto & req) { HandleSolicitOffer(subCtx, req); });
-        break;
-
-    case Commands::ProvideOffer::Id:
-        CommandHandlerInterface::HandleCommand<Commands::ProvideOffer::DecodableType>(
-            ctx, [this](HandlerContext & subCtx, const auto & req) { HandleProvideOffer(subCtx, req); });
-        break;
-
-    case Commands::ProvideAnswer::Id:
-        CommandHandlerInterface::HandleCommand<Commands::ProvideAnswer::DecodableType>(
-            ctx, [this](HandlerContext & subCtx, const auto & req) { HandleProvideAnswer(subCtx, req); });
-        break;
-
-    case Commands::ProvideICECandidates::Id:
-        CommandHandlerInterface::HandleCommand<Commands::ProvideICECandidates::DecodableType>(
-            ctx, [this](HandlerContext & subCtx, const auto & req) { HandleProvideICECandidates(subCtx, req); });
-        break;
-
-    case Commands::EndSession::Id:
-        CommandHandlerInterface::HandleCommand<Commands::EndSession::DecodableType>(
-            ctx, [this](HandlerContext & subCtx, const auto & req) { HandleEndSession(subCtx, req); });
-        break;
-
-    default:
-        // Mark unrecognized command as UnsupportedCommand
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::UnsupportedCommand);
-        break;
+    case Commands::SolicitOffer::Id: {
+        Commands::SolicitOffer::DecodableType req;
+        ReturnErrorOnFailure(req.Decode(input_arguments, accessingFabricIndex));
+        return HandleSolicitOffer(*handler, req);
     }
+    case Commands::ProvideOffer::Id: {
+        Commands::ProvideOffer::DecodableType req;
+        ReturnErrorOnFailure(req.Decode(input_arguments, accessingFabricIndex));
+        return HandleProvideOffer(*handler, req);
+    }
+    case Commands::ProvideAnswer::Id: {
+        Commands::ProvideAnswer::DecodableType req;
+        ReturnErrorOnFailure(req.Decode(input_arguments, accessingFabricIndex));
+        return HandleProvideAnswer(*handler, req);
+    }
+    case Commands::ProvideICECandidates::Id: {
+        Commands::ProvideICECandidates::DecodableType req;
+        ReturnErrorOnFailure(req.Decode(input_arguments, accessingFabricIndex));
+        return HandleProvideICECandidates(*handler, req);
+    }
+    case Commands::EndSession::Id: {
+        Commands::EndSession::DecodableType req;
+        ReturnErrorOnFailure(req.Decode(input_arguments, accessingFabricIndex));
+        return HandleEndSession(*handler, req);
+    }
+    default:
+        return Status::UnsupportedCommand;
+    }
+}
+
+CHIP_ERROR WebRTCTransportProviderServer::AcceptedCommands(const ConcreteClusterPath & path,
+                                                           ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+{
+    return builder.ReferenceExisting(kAcceptedCommands);
+}
+
+CHIP_ERROR WebRTCTransportProviderServer::Attributes(const ConcreteClusterPath & path,
+                                                     ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+{
+    AttributeListBuilder listBuilder(builder);
+    return listBuilder.Append(Span(kMandatoryAttributes), Span<AttributeListBuilder::OptionalAttributeEntry>());
 }
 
 // Helper functions
@@ -323,8 +326,7 @@ WebRTCTransportProviderServer::UpsertResultEnum WebRTCTransportProviderServer::U
         result = UpsertResultEnum::kInserted;
     }
 
-    MatterReportingAttributeChangeCallback(AttributeAccessInterface::GetEndpointId().Value(), WebRTCTransportProvider::Id,
-                                           WebRTCTransportProvider::Attributes::CurrentSessions::Id);
+    NotifyAttributeChanged(Attributes::CurrentSessions::Id);
 
     return result;
 }
@@ -343,13 +345,12 @@ void WebRTCTransportProviderServer::RemoveSession(uint16_t sessionId)
     // If a session was removed, the size will be smaller.
     if (mCurrentSessions.size() < originalSize)
     {
-        // Notify the stack that the CurrentSessions attribute has changed.
-        MatterReportingAttributeChangeCallback(AttributeAccessInterface::GetEndpointId().Value(), WebRTCTransportProvider::Id,
-                                               WebRTCTransportProvider::Attributes::CurrentSessions::Id);
+        NotifyAttributeChanged(Attributes::CurrentSessions::Id);
     }
 }
 
-WebRTCSessionStruct * WebRTCTransportProviderServer::CheckForMatchingSession(HandlerContext & ctx, uint16_t sessionId)
+WebRTCSessionStruct * WebRTCTransportProviderServer::CheckForMatchingSession(const CommandHandler & commandHandler,
+                                                                             uint16_t sessionId)
 {
     WebRTCSessionStruct * session = FindSession(sessionId);
     if (session == nullptr)
@@ -357,8 +358,8 @@ WebRTCSessionStruct * WebRTCTransportProviderServer::CheckForMatchingSession(Han
         return nullptr;
     }
 
-    NodeId peerNodeId           = GetNodeIdFromCtx(ctx.mCommandHandler);
-    FabricIndex peerFabricIndex = ctx.mCommandHandler.GetAccessingFabricIndex();
+    NodeId peerNodeId           = GetNodeIdFromCtx(commandHandler);
+    FabricIndex peerFabricIndex = commandHandler.GetAccessingFabricIndex();
 
     // Ensure the session’s peer matches the current command invoker
     if (peerNodeId != session->peerNodeID || peerFabricIndex != session->GetFabricIndex())
@@ -496,7 +497,9 @@ Status WebRTCTransportProviderServer::CheckTurnsOrStunsRequiresUTCTime(
 }
 
 // Command Handlers
-void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, const Commands::SolicitOffer::DecodableType & req)
+std::optional<DataModel::ActionReturnStatus>
+WebRTCTransportProviderServer::HandleSolicitOffer(CommandHandler & commandHandler,
+                                                  const Commands::SolicitOffer::DecodableType & req)
 {
     auto videoStreamID = req.videoStreamID;
     auto audioStreamID = req.audioStreamID;
@@ -507,16 +510,14 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
     if (req.streamUsage == StreamUsageEnum::kUnknownEnumValue)
     {
         ChipLogError(Zcl, "HandleSolicitOffer: Invalid streamUsage value %u.", to_underlying(req.streamUsage));
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-        return;
+        return Status::ConstraintError;
     }
 
     // At least one of Video Stream ID and Audio Stream ID has to be present
     if (!req.videoStreamID.HasValue() && !req.audioStreamID.HasValue())
     {
         ChipLogError(Zcl, "HandleSolicitOffer: one of VideoStreamID or AudioStreamID must be present");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-        return;
+        return Status::InvalidCommand;
     }
 
     if (req.SFrameConfig.HasValue())
@@ -524,8 +525,7 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
         if (!SFrameFollowsSpecConstraints(req.SFrameConfig.Value()))
         {
             ChipLogError(Zcl, "HandleSolicitOffer: SFrame spec constraint validation failed");
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-            return;
+            return Status::ConstraintError;
         }
     }
 
@@ -537,8 +537,7 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
         Status validationStatus = ICEServersFollowsSpecConstraints(req.ICEServers.Value(), "HandleSolicitOffer");
         if (validationStatus != Status::Success)
         {
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, validationStatus);
-            return;
+            return validationStatus;
         }
     }
 
@@ -548,8 +547,7 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
         if (req.ICETransportPolicy.Value().size() > 16)
         {
             ChipLogError(Zcl, "HandleSolicitOffer: ICETransportPolicy exceeds maximum length of 16");
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-            return;
+            return Status::ConstraintError;
         }
     }
 
@@ -558,16 +556,14 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
     Status status = CheckPrivacyModes("HandleSolicitOffer", req.streamUsage);
     if (status != Status::Success)
     {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-        return;
+        return status;
     }
 
     // Validate that the StreamUsage is in the StreamUsagePriorities list
     if (mDelegate.IsStreamUsageSupported(req.streamUsage) != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "HandleSolicitOffer: StreamUsage %u is not in StreamUsagePriorities", to_underlying(req.streamUsage));
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
-        return;
+        return Status::DynamicConstraintError;
     }
 
     // Validate VideoStreamID against AllocatedVideoStreams.
@@ -581,8 +577,7 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
             if (!mDelegate.HasAllocatedVideoStreams())
             {
                 ChipLogError(Zcl, "HandleSolicitOffer: video requested when there are no AllocatedVideoStreams");
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState);
-                return;
+                return Status::InvalidInState;
             }
         }
         else
@@ -592,8 +587,7 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
             {
                 ChipLogError(Zcl, "HandleSolicitOffer: VideoStreamID %u does not match AllocatedVideoStreams",
                              req.videoStreamID.Value().Value());
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
-                return;
+                return Status::DynamicConstraintError;
             }
         }
     }
@@ -609,8 +603,7 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
             if (!mDelegate.HasAllocatedAudioStreams())
             {
                 ChipLogError(Zcl, "HandleSolicitOffer: audio requested when there are no AllocatedAudioStreams");
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState);
-                return;
+                return Status::InvalidInState;
             }
         }
         else
@@ -620,8 +613,7 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
             {
                 ChipLogError(Zcl, "HandleSolicitOffer: AudioStreamID %u does not match AllocatedAudioStreams",
                              req.audioStreamID.Value().Value());
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
-                return;
+                return Status::DynamicConstraintError;
             }
         }
     }
@@ -633,8 +625,7 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "HandleSolicitOffer: SFrame configuration validation failed: %" CHIP_ERROR_FORMAT, err.Format());
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
-            return;
+            return Status::DynamicConstraintError;
         }
     }
 
@@ -643,8 +634,7 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
     status = CheckTurnsOrStunsRequiresUTCTime("HandleSolicitOffer", req.ICEServers);
     if (status != Status::Success)
     {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-        return;
+        return status;
     }
 
     // Check resource management and stream priorities. If the IDs are null the delegate will populate with
@@ -653,8 +643,7 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "HandleSolicitOffer: Cannot provide the stream usage requested");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
-        return;
+        return Status::DynamicConstraintError;
     }
 
     // Prepare the arguments for the delegate.
@@ -664,15 +653,15 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "HandleSolicitOffer: Cannot generate session ID: %" CHIP_ERROR_FORMAT, err.Format());
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::ClusterStatusCode(err));
-        return;
+        return err;
     }
+
     args.sessionId             = sessionId;
     args.streamUsage           = req.streamUsage;
-    args.videoStreamId         = videoStreamID;
-    args.audioStreamId         = audioStreamID;
-    args.peerNodeId            = GetNodeIdFromCtx(ctx.mCommandHandler);
-    args.fabricIndex           = ctx.mCommandHandler.GetAccessingFabricIndex();
+    args.videoStreamId         = req.videoStreamID;
+    args.audioStreamId         = req.audioStreamID;
+    args.peerNodeId            = GetNodeIdFromCtx(commandHandler);
+    args.fabricIndex           = commandHandler.GetAccessingFabricIndex();
     args.originatingEndpointId = req.originatingEndpointID;
 
     if (req.SFrameConfig.HasValue())
@@ -716,8 +705,7 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
         Protocols::InteractionModel::ClusterStatusCode(mDelegate.HandleSolicitOffer(args, outSession, deferredOffer));
     if (!delegateStatus.IsSuccess())
     {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, delegateStatus);
-        return;
+        return delegateStatus;
     }
 
     // Store or update the session.
@@ -747,17 +735,22 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
         resp.audioStreamID.SetValue(outSession.audioStreamID);
     }
 
-    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, resp);
+    ConcreteCommandPath requestPath(mPath.mEndpointId, Id, Commands::SolicitOffer::Id);
+    commandHandler.AddResponse(requestPath, resp);
+
+    return std::nullopt;
 }
 
-void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, const Commands::ProvideOffer::DecodableType & req)
+std::optional<DataModel::ActionReturnStatus>
+WebRTCTransportProviderServer::HandleProvideOffer(CommandHandler & commandHandler,
+                                                  const Commands::ProvideOffer::DecodableType & req)
 {
     auto webRTCSessionID = req.webRTCSessionID;
     auto videoStreamID   = req.videoStreamID;
     auto audioStreamID   = req.audioStreamID;
 
-    NodeId peerNodeId           = GetNodeIdFromCtx(ctx.mCommandHandler);
-    FabricIndex peerFabricIndex = ctx.mCommandHandler.GetAccessingFabricIndex();
+    NodeId peerNodeId           = GetNodeIdFromCtx(commandHandler);
+    FabricIndex peerFabricIndex = commandHandler.GetAccessingFabricIndex();
 
     WebRTCSessionStruct outSession;
 
@@ -770,16 +763,14 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
     if (req.streamUsage == StreamUsageEnum::kUnknownEnumValue)
     {
         ChipLogError(Zcl, "HandleProvideOffer: Invalid streamUsage value %u.", to_underlying(req.streamUsage));
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-        return;
+        return Status::ConstraintError;
     }
 
     // At least one of Video Stream ID and Audio Stream ID must be present
     if (!req.videoStreamID.HasValue() && !req.audioStreamID.HasValue())
     {
         ChipLogError(Zcl, "HandleProvideOffer: one of VideoStreamID or AudioStreamID must be present");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-        return;
+        return Status::InvalidCommand;
     }
 
     if (req.SFrameConfig.HasValue())
@@ -787,8 +778,7 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
         if (!SFrameFollowsSpecConstraints(req.SFrameConfig.Value()))
         {
             ChipLogError(Zcl, "HandleProvideOffer: SFrame spec constraint validation failed");
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-            return;
+            return Status::ConstraintError;
         }
     }
 
@@ -800,8 +790,7 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
         Status validationStatus = ICEServersFollowsSpecConstraints(req.ICEServers.Value(), "HandleProvideOffer");
         if (validationStatus != Status::Success)
         {
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, validationStatus);
-            return;
+            return validationStatus;
         }
     }
 
@@ -811,8 +800,7 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
         if (req.ICETransportPolicy.Value().size() > 16)
         {
             ChipLogError(Zcl, "HandleProvideOffer: ICETransportPolicy exceeds maximum length of 16");
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-            return;
+            return Status::ConstraintError;
         }
     }
 
@@ -826,11 +814,10 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
     if (!webRTCSessionID.IsNull())
     {
         uint16_t sessionId                    = webRTCSessionID.Value();
-        WebRTCSessionStruct * existingSession = CheckForMatchingSession(ctx, sessionId);
+        WebRTCSessionStruct * existingSession = CheckForMatchingSession(commandHandler, sessionId);
         if (existingSession == nullptr)
         {
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
-            return;
+            return Status::NotFound;
         }
 
         // Use the existing session for further processing (re-offer case).
@@ -847,16 +834,14 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
         Status status = CheckPrivacyModes("HandleProvideOffer", req.streamUsage);
         if (status != Status::Success)
         {
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-            return;
+            return status;
         }
 
         // Validate that the StreamUsage is in the StreamUsagePriorities list
         if (mDelegate.IsStreamUsageSupported(req.streamUsage) != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "HandleProvideOffer: StreamUsage %u is not in StreamUsagePriorities", to_underlying(req.streamUsage));
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
-            return;
+            return Status::DynamicConstraintError;
         }
 
         // If VideoStreamID is present and is not null and does not match a value in AllocatedVideoStreams:
@@ -867,8 +852,7 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
             {
                 ChipLogError(Zcl, "HandleProvideOffer: VideoStreamID %u does not match AllocatedVideoStreams",
                              videoStreamID.Value().Value());
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
-                return;
+                return Status::DynamicConstraintError;
             }
         }
 
@@ -880,8 +864,7 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
             if (!mDelegate.HasAllocatedVideoStreams())
             {
                 ChipLogError(Zcl, "HandleProvideOffer: AllocatedVideoStreams is empty");
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState);
-                return;
+                return Status::InvalidInState;
             }
             // Automatic selection will be handled by the delegate in HandleProvideOffer.
         }
@@ -894,8 +877,7 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
             {
                 ChipLogError(Zcl, "HandleProvideOffer: AudioStreamID %u does not match AllocatedAudioStreams",
                              audioStreamID.Value().Value());
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
-                return;
+                return Status::DynamicConstraintError;
             }
         }
 
@@ -907,8 +889,7 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
             if (!mDelegate.HasAllocatedAudioStreams())
             {
                 ChipLogError(Zcl, "HandleProvideOffer: AllocatedAudioStreams is empty");
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState);
-                return;
+                return Status::InvalidInState;
             }
             // Automatic selection will be handled by the delegate in HandleProvideOffer.
         }
@@ -919,8 +900,7 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "HandleProvideOffer: Cannot provide stream usage requested");
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ResourceExhausted);
-            return;
+            return Status::ResourceExhausted;
         }
 
         // If SFrameConfig is present:
@@ -935,8 +915,7 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(Zcl, "HandleProvideOffer: SFrame configuration validation failed: %" CHIP_ERROR_FORMAT, err.Format());
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
-                return;
+                return Status::DynamicConstraintError;
             }
         }
 
@@ -946,8 +925,7 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
         status = CheckTurnsOrStunsRequiresUTCTime("HandleProvideOffer", req.ICEServers);
         if (status != Status::Success)
         {
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-            return;
+            return status;
         }
 
         // Generate new session id
@@ -956,8 +934,7 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "HandleProvideOffer: Cannot generate session ID: %" CHIP_ERROR_FORMAT, err.Format());
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::ClusterStatusCode(err));
-            return;
+            return err;
         }
         args.sessionId = sessionId;
     }
@@ -1000,8 +977,7 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
     auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(mDelegate.HandleProvideOffer(args, outSession));
     if (!delegateStatus.IsSuccess())
     {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, delegateStatus);
-        return;
+        return delegateStatus;
     }
 
     // Update/Insert the WebRTCSessionStruct in CurrentSessions.
@@ -1023,29 +999,32 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
         resp.audioStreamID.SetValue(outSession.audioStreamID);
     }
 
-    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, resp);
+    ConcreteCommandPath requestPath(mPath.mEndpointId, Id, Commands::ProvideOffer::Id);
+    commandHandler.AddResponse(requestPath, resp);
+
+    return std::nullopt;
 }
 
-void WebRTCTransportProviderServer::HandleProvideAnswer(HandlerContext & ctx, const Commands::ProvideAnswer::DecodableType & req)
+std::optional<DataModel::ActionReturnStatus>
+WebRTCTransportProviderServer::HandleProvideAnswer(CommandHandler & commandHandler,
+                                                   const Commands::ProvideAnswer::DecodableType & req)
 {
-    // Extract command fields from the request.
     uint16_t sessionId = req.webRTCSessionID;
     auto sdpSpan       = req.sdp;
 
-    WebRTCSessionStruct * existingSession = CheckForMatchingSession(ctx, sessionId);
+    WebRTCSessionStruct * existingSession = CheckForMatchingSession(commandHandler, sessionId);
     if (existingSession == nullptr)
     {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
-        return;
+        return Status::NotFound;
     }
 
     std::string sdpAnswer(sdpSpan.data(), sdpSpan.size());
-    ctx.mCommandHandler.AddStatus(
-        ctx.mRequestPath, Protocols::InteractionModel::ClusterStatusCode(mDelegate.HandleProvideAnswer(sessionId, sdpAnswer)));
+    return mDelegate.HandleProvideAnswer(sessionId, sdpAnswer);
 }
 
-void WebRTCTransportProviderServer::HandleProvideICECandidates(HandlerContext & ctx,
-                                                               const Commands::ProvideICECandidates::DecodableType & req)
+std::optional<DataModel::ActionReturnStatus>
+WebRTCTransportProviderServer::HandleProvideICECandidates(CommandHandler & commandHandler,
+                                                          const Commands::ProvideICECandidates::DecodableType & req)
 {
     // Extract command fields from the request.
     uint16_t sessionId = req.webRTCSessionID;
@@ -1061,8 +1040,7 @@ void WebRTCTransportProviderServer::HandleProvideICECandidates(HandlerContext & 
         if (!candidate.SDPMid.IsNull() && candidate.SDPMid.Value().empty())
         {
             ChipLogError(Zcl, "HandleProvideICECandidates: SDPMid must have minimum length of 1 when present");
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-            return;
+            return Status::ConstraintError;
         }
 
         candidates.push_back(candidate);
@@ -1073,24 +1051,21 @@ void WebRTCTransportProviderServer::HandleProvideICECandidates(HandlerContext & 
     if (listErr != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "HandleProvideICECandidates: ICECandidates list error: %" CHIP_ERROR_FORMAT, listErr.Format());
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-        return;
+        return Status::InvalidCommand;
     }
 
-    WebRTCSessionStruct * existingSession = CheckForMatchingSession(ctx, sessionId);
+    WebRTCSessionStruct * existingSession = CheckForMatchingSession(commandHandler, sessionId);
     if (existingSession == nullptr)
     {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
-        return;
+        return Status::NotFound;
     }
 
     // Delegate the handling of ICE candidates.
-    ctx.mCommandHandler.AddStatus(
-        ctx.mRequestPath,
-        Protocols::InteractionModel::ClusterStatusCode(mDelegate.HandleProvideICECandidates(sessionId, candidates)));
+    return mDelegate.HandleProvideICECandidates(sessionId, candidates);
 }
 
-void WebRTCTransportProviderServer::HandleEndSession(HandlerContext & ctx, const Commands::EndSession::DecodableType & req)
+std::optional<DataModel::ActionReturnStatus>
+WebRTCTransportProviderServer::HandleEndSession(CommandHandler & commandHandler, const Commands::EndSession::DecodableType & req)
 {
     // Extract command fields from the request.
     uint16_t sessionId = req.webRTCSessionID;
@@ -1100,24 +1075,22 @@ void WebRTCTransportProviderServer::HandleEndSession(HandlerContext & ctx, const
     if (reason == WebRTCEndReasonEnum::kUnknownEnumValue)
     {
         ChipLogError(Zcl, "HandleEndSession: Invalid reason value %u.", to_underlying(reason));
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-        return;
+        return Status::ConstraintError;
     }
 
-    WebRTCSessionStruct * existingSession = CheckForMatchingSession(ctx, sessionId);
+    WebRTCSessionStruct * existingSession = CheckForMatchingSession(commandHandler, sessionId);
     if (existingSession == nullptr)
     {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
-        return;
+        return Status::NotFound;
     }
 
     // Delegate handles decrementing reference counts on video/audio streams if applicable.
     CHIP_ERROR err = mDelegate.HandleEndSession(sessionId, reason, existingSession->videoStreamID, existingSession->audioStreamID);
 
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::ClusterStatusCode(err));
-
     // Remove the session entry from CurrentSessions.
     RemoveSession(sessionId);
+
+    return err;
 }
 
 } // namespace WebRTCTransportProvider

@@ -11,5 +11,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-group("webrtc-transport-provider-server") {
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+source_set("webrtc-transport-provider-server") {
+  sources = [
+    "webrtc-transport-provider-cluster.cpp",
+    "webrtc-transport-provider-cluster.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app:attribute-access",
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/lib/core:error",
+    "${chip_root}/zzz_generated/app-common/clusters/WebRTCTransportProvider",
+  ]
 }
