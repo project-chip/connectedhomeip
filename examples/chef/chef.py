@@ -64,6 +64,12 @@ _SLEEPY_DEVICE_PATTERN = "^sleepy_"
 
 gen_dir = ""  # Filled in after sample app type is read from args.
 
+# TODO: Remove this once tested.
+_DEVICE_LIST = [
+    "rootnode_dimmablelight_bCwGYSDpoe",
+    "rootnode_contactsensor_lFAGG1bfRO",
+]
+
 
 def splash() -> None:
     splashText = textwrap.dedent(
