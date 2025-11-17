@@ -55,6 +55,8 @@ _DEVICES_WITH_SLEEPY_VARIANT_REQUIRED = [
     "rootnode_contactsensor_lFAGG1bfRO",
 ]
 
+_SLEEPY_DEVICE_POLL_PERIOD_MS = 2500
+
 # Pattern to filter (based on device-name) devices that need ICD support.
 _ICD_DEVICE_PATTERN = "^icd_"
 
@@ -840,8 +842,9 @@ def main() -> int:
                 f"-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING='\"{sw_ver_string}\"'")
             if re.search(_SLEEPY_DEVICE_PATTERN, options.sample_device_type_name):
                 nrf_build_cmds.append("-DCONFIG_OPENTHREAD_MTD_SED=y")
-                nrf_build_cmds.append("-DCONFIG_OPENTHREAD_POLL_PERIOD=2500")
+                nrf_build_cmds.append(f"-DCONFIG_OPENTHREAD_POLL_PERIOD={_SLEEPY_DEVICE_POLL_PERIOD_MS}")
 
+            flush_print("NRF Build command args: ", " ".join(nrf_build_cmds))
             shell.run_cmd(" ".join(nrf_build_cmds))
 
         elif options.build_target == "silabs-thread":
