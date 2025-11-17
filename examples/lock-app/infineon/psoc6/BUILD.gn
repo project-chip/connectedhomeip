@@ -121,7 +121,6 @@ psoc6_executable("lock_app") {
     "${chip_root}/src/setup_payload",
   ]
 
-
   include_dirs += [
     "include",
     "${examples_plat_dir}",
