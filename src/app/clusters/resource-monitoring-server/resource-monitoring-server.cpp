@@ -87,8 +87,6 @@ DataModel::ActionReturnStatus ResourceMonitoringCluster::ReadAttribute(const Dat
                                                                        AttributeValueEncoder & encoder)
 {
 
-    ChipLogDetail(Zcl, "ResourceMonitoringCluster::ReadAttribute");
-
     switch (request.path.mAttributeId)
     {
     case ResourceMonitoring::Attributes::Condition::Id:
@@ -110,12 +108,7 @@ DataModel::ActionReturnStatus ResourceMonitoringCluster::ReadAttribute(const Dat
         return encoder.Encode(mLastChangedTime);
 
     case ResourceMonitoring::Attributes::ReplacementProductList::Id: {
-        CHIP_ERROR err = ReadReplaceableProductList(encoder);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Zcl, "Error reading ReplacementProductList attribute: %" CHIP_ERROR_FORMAT, err.Format());
-        }
-        return DataModel::ActionReturnStatus{ err };
+        return DataModel::ActionReturnStatus{ ReadReplaceableProductList(encoder) };
     }
     case ResourceMonitoring::Attributes::ClusterRevision::Id:
         return encoder.Encode(HepaFilterMonitoring::kRevision);
@@ -130,7 +123,8 @@ CHIP_ERROR ResourceMonitoringCluster::Attributes(const ConcreteClusterPath & pat
 {
     AttributeListBuilder listBuilder(builder);
 
-    const bool haveCondition = mEnabledFeatures.Has(Feature::kCondition);
+    const bool haveCondition              = mEnabledFeatures.Has(Feature::kCondition);
+    const bool haveReplacementProductList = mEnabledFeatures.Has(Feature::kReplacementProductList);
 
     AttributeListBuilder::OptionalAttributeEntry optionalAttributesEntries[] = {
         { haveCondition, Condition::kMetadataEntry },
@@ -139,6 +133,7 @@ CHIP_ERROR ResourceMonitoringCluster::Attributes(const ConcreteClusterPath & pat
           InPlaceIndicator::kMetadataEntry },
         { mOptionalAttributeSet.HasValue() && mOptionalAttributeSet.Value().IsSet(LastChangedTime::Id),
           LastChangedTime::kMetadataEntry },
+        { haveReplacementProductList, ReplacementProductList::kMetadataEntry },
     };
 
     return listBuilder.Append(Span(HepaFilterMonitoring::Attributes::kMandatoryMetadata), Span(optionalAttributesEntries));
@@ -146,7 +141,6 @@ CHIP_ERROR ResourceMonitoringCluster::Attributes(const ConcreteClusterPath & pat
 
 CHIP_ERROR ResourceMonitoringCluster::ReadReplaceableProductList(AttributeValueEncoder & aEncoder)
 {
-    ChipLogDetail(Zcl, "ResourceMonitoringCluster::ReadReplaceableProductList");
 
     VerifyOrReturnError(mEnabledFeatures.Has(ResourceMonitoring::Feature::kReplacementProductList), CHIP_NO_ERROR);
 
