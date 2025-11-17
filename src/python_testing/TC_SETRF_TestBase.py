@@ -1070,7 +1070,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             List[int]: List of all DayEntryIDs from the list of TariffPeriodStruct where particular TariffComponentID is present.
         """
 
-        return sorted(set([dayEntryID for tariff_period in self.tariffPeriodsValue if tariff_componentID in tariff_period.tariffComponentIDs for dayEntryID in tariff_period.dayEntryIDs]))
+        return sorted({dayEntryID for tariff_period in self.tariffPeriodsValue if tariff_componentID in tariff_period.tariffComponentIDs for dayEntryID in tariff_period.dayEntryIDs})
 
     async def get_tariff_period_label_for_particular_tariff_component(self, tariff_componentID: int) -> List[int]:
         """Gets Label field from the TariffPeriodStruct where particular TariffComponentID is present.
@@ -1153,13 +1153,13 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             saved_value: Value that has been saved before TestEventTrigger sending;
 
         Returns:
-            bool: - True if report is presented; 
+            bool: - True if report is presented;
                   - False if there are no reports at all;
         """
 
         try:
             asserts.assert_not_equal(reports[attribute][0].value, saved_value,
-                                     f"""Reported '{attribute_name}' value should be different from saved value. 
+                                     f"""Reported '{attribute_name}' value should be different from saved value.
                                      Subscriptions should only report when values have changed.""")
             return True
         except (KeyError, IndexError) as err:

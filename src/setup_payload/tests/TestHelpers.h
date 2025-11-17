@@ -64,7 +64,7 @@ inline SetupPayload GetDefaultPayload()
 inline SetupPayload GetDefaultPayloadWithSerialNumber()
 {
     SetupPayload payload = GetDefaultPayload();
-    payload.addSerialNumber(kSerialNumberDefaultStringValue);
+    TEMPORARY_RETURN_IGNORED payload.addSerialNumber(kSerialNumberDefaultStringValue);
 
     return payload;
 }
@@ -73,8 +73,8 @@ inline SetupPayload GetDefaultPayloadWithOptionalDefaults()
 {
     SetupPayload payload = GetDefaultPayloadWithSerialNumber();
 
-    payload.addOptionalVendorData(kOptionalDefaultStringTag, kOptionalDefaultStringValue);
-    payload.addOptionalVendorData(kOptionalDefaultIntTag, kOptionalDefaultIntValue);
+    TEMPORARY_RETURN_IGNORED payload.addOptionalVendorData(kOptionalDefaultStringTag, kOptionalDefaultStringValue);
+    TEMPORARY_RETURN_IGNORED payload.addOptionalVendorData(kOptionalDefaultIntTag, kOptionalDefaultIntValue);
 
     return payload;
 }
@@ -86,7 +86,7 @@ inline std::string toBinaryRepresentation(std::string base38Result)
 
     // Decode the base38 encoded string
     std::vector<uint8_t> buffer;
-    base38Decode(base38Result, buffer);
+    TEMPORARY_RETURN_IGNORED base38Decode(base38Result, buffer);
 
     // Convert it to binary
     std::string binaryResult;
@@ -131,7 +131,7 @@ inline bool CompareBinary(SetupPayload & payload, std::string & expectedBinary)
 
     std::string result;
     uint8_t optionalInfo[kDefaultBufferSizeInBytes] = {};
-    generator.payloadBase38Representation(result, optionalInfo, sizeof(optionalInfo));
+    TEMPORARY_RETURN_IGNORED generator.payloadBase38Representation(result, optionalInfo, sizeof(optionalInfo));
 
     std::string resultBinary = toBinaryRepresentation(result);
     return (expectedBinary == resultBinary);
@@ -154,7 +154,7 @@ inline bool CheckWriteRead(SetupPayload & inPayload, bool allowInvalidPayload = 
     }
 
     outPayload = {};
-    QRCodeSetupPayloadParser(result).populatePayload(outPayload);
+    TEMPORARY_RETURN_IGNORED QRCodeSetupPayloadParser(result).populatePayload(outPayload);
 
     return inPayload == outPayload;
 }

@@ -170,7 +170,7 @@ void AsyncBatchCommandWork(AsyncBatchCommandsWorkData * asyncWorkData)
     memset(buffer, asyncWorkData->fillCharacter, asyncWorkData->sizeOfResponseBuffer);
     Commands::TestBatchHelperResponse::Type response;
     response.buffer = ByteSpan(buffer, asyncWorkData->sizeOfResponseBuffer);
-    commandHandle->AddResponse(asyncWorkData->commandPath, response);
+    TEMPORARY_RETURN_IGNORED commandHandle->AddResponse(asyncWorkData->commandPath, response);
     Platform::Delete(asyncWorkData);
 }
 
@@ -181,8 +181,8 @@ static void timerCallback(System::Layer *, void * callbackContext)
 
 static void scheduleTimerCallbackMs(AsyncBatchCommandsWorkData * asyncWorkData, uint32_t delayMs)
 {
-    DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayMs), timerCallback,
-                                          reinterpret_cast<void *>(asyncWorkData));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayMs), timerCallback,
+                                                                   reinterpret_cast<void *>(asyncWorkData));
 }
 
 CHIP_ERROR TestAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)

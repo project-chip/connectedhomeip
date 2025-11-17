@@ -19,6 +19,7 @@
 #include <app/clusters/groupcast/GroupcastCluster.h>
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/clusters/testing/ClusterTester.h>
+#include <app/clusters/testing/MockCommandHandler.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
@@ -38,75 +39,6 @@ using namespace chip::app::Clusters::Groupcast;
 
 using chip::app::DataModel::AcceptedCommandEntry;
 using chip::app::DataModel::AttributeEntry;
-
-class MockCommandHandler : public app::CommandHandler
-{
-public:
-    ~MockCommandHandler() override {}
-
-    struct ResponseRecord
-    {
-        app::ConcreteCommandPath path;
-        CommandId commandId;
-        System::PacketBufferHandle encodedData;
-    };
-
-    CHIP_ERROR FallibleAddStatus(const app::ConcreteCommandPath & aRequestCommandPath,
-                                 const Protocols::InteractionModel::ClusterStatusCode & aStatus,
-                                 const char * context = nullptr) override
-    {
-        return CHIP_NO_ERROR;
-    }
-
-    void AddStatus(const app::ConcreteCommandPath & aRequestCommandPath,
-                   const Protocols::InteractionModel::ClusterStatusCode & aStatus, const char * context = nullptr) override
-    {
-        CHIP_ERROR err = FallibleAddStatus(aRequestCommandPath, aStatus, context);
-        VerifyOrDie(err == CHIP_NO_ERROR);
-    }
-
-    FabricIndex GetAccessingFabricIndex() const override { return mFabricIndex; }
-
-    CHIP_ERROR AddResponseData(const app::ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
-                               const app::DataModel::EncodableToTLV & aEncodable) override
-    {
-        System::PacketBufferHandle handle = MessagePacketBuffer::New(1024);
-        VerifyOrReturnError(!handle.IsNull(), CHIP_ERROR_NO_MEMORY);
-        TLV::TLVWriter baseWriter;
-        baseWriter.Init(handle->Start(), handle->MaxDataLength());
-        app::DataModel::FabricAwareTLVWriter writer(baseWriter, mFabricIndex);
-        TLV::TLVType ct;
-        ReturnErrorOnFailure(
-            static_cast<TLV::TLVWriter &>(writer).StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, ct));
-        ReturnErrorOnFailure(aEncodable.EncodeTo(writer, TLV::ContextTag(app::CommandDataIB::Tag::kFields)));
-        ReturnErrorOnFailure(static_cast<TLV::TLVWriter &>(writer).EndContainer(ct));
-        handle->SetDataLength(static_cast<TLV::TLVWriter &>(writer).GetLengthWritten());
-        mResponse.path        = aRequestCommandPath;
-        mResponse.commandId   = aResponseCommandId;
-        mResponse.encodedData = std::move(handle);
-        return CHIP_NO_ERROR;
-    }
-
-    void AddResponse(const app::ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommandId,
-                     const app::DataModel::EncodableToTLV & aEncodable) override
-    {
-        (void) AddResponseData(aRequestCommandPath, aResponseCommandId, aEncodable);
-    }
-
-    bool IsTimedInvoke() const override { return false; }
-    void FlushAcksRightAwayOnSlowCommand() override {}
-    Access::SubjectDescriptor GetSubjectDescriptor() const override { return Access::SubjectDescriptor{}; }
-    Messaging::ExchangeContext * GetExchangeContext() const override { return nullptr; }
-
-    const ResponseRecord & GetResponse() const { return mResponse; }
-
-    // Optional for test configuration
-    void SetFabricIndex(FabricIndex index) { mFabricIndex = index; }
-
-private:
-    ResponseRecord mResponse;
-    FabricIndex mFabricIndex = 0;
-};
 
 // initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestGroupcastCluster : public ::testing::Test
@@ -183,12 +115,12 @@ TEST_F(TestGroupcastCluster, TestJoinGroupCommand)
     cmdData.gracePeriod     = MakeOptional(0U);
     cmdData.useAuxiliaryACL = MakeOptional(true);
 
-    MockCommandHandler cmdHandler;
+    chip::app::Testing::MockCommandHandler cmdHandler;
     chip::Test::ClusterTester tester(cluster);
-    auto result = tester.InvokeCommand(Commands::JoinGroup::Id, cmdData, &cmdHandler);
-    ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(result.value().GetStatusCode().GetStatus(),    // NOLINT(bugprone-unchecked-optional-access)
-              Protocols::InteractionModel::Status::Failure); // Currently expect Failure as JoinGroup command returns
-                                                             // CHIP_ERROR_NOT_IMPLEMENTED
+    auto result = tester.Invoke(Commands::JoinGroup::Id, cmdData);
+    ASSERT_TRUE(result.status.has_value());
+    EXPECT_EQ(result.status.value().GetStatusCode().GetStatus(), // NOLINT(bugprone-unchecked-optional-access)
+              Protocols::InteractionModel::Status::Failure);     // Currently expect Failure as JoinGroup command returns
+                                                                 // CHIP_ERROR_NOT_IMPLEMENTED
 }
 } // namespace
