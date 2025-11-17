@@ -23,8 +23,6 @@ source_set("ota-requestor") {
     "DefaultOTARequestor.h",
     "DefaultOTARequestorDriver.cpp",
     "DefaultOTARequestorDriver.h",
-    "DefaultOTARequestorStorage.cpp",
-    "DefaultOTARequestorStorage.h",
     "DefaultOTARequestorUserConsent.h",
     "ExtendedOTARequestorDriver.cpp",
     "ExtendedOTARequestorDriver.h",
@@ -40,10 +38,23 @@ source_set("ota-requestor") {
   # TODO: DefaultOTARequestor depends on controller, however the cluster server itself does not.
   # Maybe DefaultOTARequestor and related code should have its own source set.
   public_deps = [
+    ":default-storage",
     ":interface",
     "${chip_root}/src/app:user-consent",
     "${chip_root}/src/app/clusters/basic-information",
     "${chip_root}/src/controller:interactions",
+  ]
+}
+
+source_set("default-storage") {
+  sources = [
+    "DefaultOTARequestorStorage.cpp",
+    "DefaultOTARequestorStorage.h",
+  ]
+
+  public_deps = [
+    ":interface",
+    "${chip_root}/src/app/common:cluster-objects",
   ]
 }
 

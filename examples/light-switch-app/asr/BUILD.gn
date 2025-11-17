@@ -70,6 +70,7 @@ asr_executable("light_switch_app") {
   defines = []
   output_name = "chip-asr-light-switch-example.out"
 
+  deps = []
   public_deps = [
     ":light_switch_app_sdk_sources",
     "${chip_root}/examples/common/QRCode",
@@ -102,6 +103,7 @@ asr_executable("light_switch_app") {
 
   if (chip_enable_ota_requestor) {
     sources += [ "${examples_plat_dir}/init_OTARequestor.cpp" ]
+    deps += [ "${chip_root}/src/app/clusters/ota-requestor" ]
   }
 
   defines = [ "ASR_NETWORK_LAYER_BLE=${chip_config_network_layer_ble}" ]

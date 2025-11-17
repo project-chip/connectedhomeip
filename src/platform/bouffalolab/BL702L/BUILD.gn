@@ -42,14 +42,6 @@ static_library("BL702L") {
     "../common/SystemTimeSupport.cpp",
   ]
 
-  if (chip_enable_ota_requestor) {
-    sources += [
-      "../common/OTAImageProcessorImpl.cpp",
-      "../common/OTAImageProcessorImpl.h",
-    ]
-    deps += [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
-  }
-
   if (chip_enable_ble) {
     sources += [
       "../common/BLEManagerImpl.cpp",
@@ -77,6 +69,14 @@ static_library("BL702L") {
     "${chip_root}/src/credentials:credentials_header",
     "${chip_root}/src/platform/logging:headers",
   ]
+
+  if (chip_enable_ota_requestor) {
+    sources += [
+      "../common/OTAImageProcessorImpl.cpp",
+      "../common/OTAImageProcessorImpl.h",
+    ]
+    deps += [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
+  }
 
   if (chip_enable_openthread) {
     # needed for MTD/FTD

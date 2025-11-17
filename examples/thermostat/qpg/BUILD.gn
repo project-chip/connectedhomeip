@@ -77,6 +77,7 @@ qpg_executable("thermostat") {
     "${chip_root}/examples/providers:device_info_provider_please_do_not_reuse_as_is",
     "${chip_root}/examples/thermostat/qpg/zap/",
     "${chip_root}/src/app/clusters/network-commissioning:network-commissioning",
+    "${chip_root}/src/app/clusters/ota-requestor",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload",

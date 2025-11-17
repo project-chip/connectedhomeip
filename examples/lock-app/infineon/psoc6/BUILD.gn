@@ -120,6 +120,10 @@ psoc6_executable("lock_app") {
     "${chip_root}/src/setup_payload",
   ]
 
+  if (chip_enable_ota_requestor) {
+    public_deps += [ "${chip_root}/src/app/clusters/ota-requestor" ]
+  }
+
   include_dirs += [
     "include",
     "${examples_plat_dir}",

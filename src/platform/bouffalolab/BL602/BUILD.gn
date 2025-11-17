@@ -42,14 +42,6 @@ static_library("BL602") {
     "../common/SystemTimeSupport.cpp",
   ]
 
-  if (chip_enable_ota_requestor) {
-    sources += [
-      "../common/OTAImageProcessorImpl.cpp",
-      "../common/OTAImageProcessorImpl.h",
-    ]
-    deps += [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
-  }
-
   if (chip_enable_ble) {
     sources += [
       "../common/BLEManagerImpl.cpp",
@@ -78,6 +70,14 @@ static_library("BL602") {
     "${chip_root}/src/lib/dnssd:platform_header",
     "${chip_root}/src/platform/logging:headers",
   ]
+
+  if (chip_enable_ota_requestor) {
+    sources += [
+      "../common/OTAImageProcessorImpl.cpp",
+      "../common/OTAImageProcessorImpl.h",
+    ]
+    deps += [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
+  }
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 }

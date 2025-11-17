@@ -81,10 +81,6 @@ asr_executable("refrigerator_app") {
     "src/main.cpp",
   ]
 
-  if (chip_enable_ota_requestor) {
-    sources += [ "${examples_plat_dir}/init_OTARequestor.cpp" ]
-  }
-
   deps = [
     ":refrigerator_app_sdk_sources",
     "${chip_root}/examples/common/QRCode",
@@ -94,6 +90,11 @@ asr_executable("refrigerator_app") {
     "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload",
   ]
+
+  if (chip_enable_ota_requestor) {
+    sources += [ "${examples_plat_dir}/init_OTARequestor.cpp" ]
+    deps += [ "${chip_root}/src/app/clusters/ota-requestor" ]
+  }
 
   include_dirs += [
     "include",
