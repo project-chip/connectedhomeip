@@ -18,14 +18,10 @@ LIST(
   "${CLUSTER_DIR}/CodegenIntegration.cpp"
 
   # This is equivalent to BUILD.gn's ota-requestor source set.
-  "${CLUSTER_DIR}/BDXDownloader.cpp"
-  "${CLUSTER_DIR}/BDXDownloader.h"
   "${CLUSTER_DIR}/DefaultOTARequestor.cpp"
   "${CLUSTER_DIR}/DefaultOTARequestor.h"
   "${CLUSTER_DIR}/DefaultOTARequestorDriver.cpp"
   "${CLUSTER_DIR}/DefaultOTARequestorDriver.h"
-  "${CLUSTER_DIR}/DefaultOTARequestorStorage.cpp"
-  "${CLUSTER_DIR}/DefaultOTARequestorStorage.h"
   "${CLUSTER_DIR}/DefaultOTARequestorUserConsent.h"
   "${CLUSTER_DIR}/ExtendedOTARequestorDriver.cpp"
   "${CLUSTER_DIR}/ExtendedOTARequestorDriver.h"
@@ -36,6 +32,14 @@ LIST(
   "${CLUSTER_DIR}/OTARequestorEventHandlerRegistry.h"
   "${CLUSTER_DIR}/OTATestEventTriggerHandler.cpp"
   "${CLUSTER_DIR}/OTATestEventTriggerHandler.h"
+
+  # This is equivalent to BUILD.gn's default-storage source set.
+  "${CLUSTER_DIR}/DefaultOTARequestorStorage.cpp"
+  "${CLUSTER_DIR}/DefaultOTARequestorStorage.h"
+
+  # This is equivalent to BUILD.gn's bdx-downloader source set.
+  "${CLUSTER_DIR}/BDXDownloader.cpp"
+  "${CLUSTER_DIR}/BDXDownloader.h"
 
   # This is equivalent to BUILD.gn's interface source set.
   "${CLUSTER_DIR}/OTADownloader.h"
