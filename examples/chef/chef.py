@@ -483,19 +483,16 @@ def main() -> int:
         for device_name in _DEVICES_WITH_SLEEPY_VARIANT_REQUIRED:
             try:
                 sleepy_device_name = f"sleepy_{device_name}"
-                src_item = os.path.join(_DEVICE_FOLDER, f"{device_name}.zap")
-                dest_item = os.path.join(
-                    _DEVICE_FOLDER, f"{sleepy_device_name}.zap")
-                shutil.copy(src_item, dest_item)
-                src_item = os.path.join(
-                    _DEVICE_FOLDER, f"{device_name}.matter")
-                dest_item = os.path.join(
-                    _DEVICE_FOLDER, f"{sleepy_device_name}.matter")
-                shutil.copy(src_item, dest_item)
+                for ext in [".zap", ".matter"]:
+                    src_item = os.path.join(_DEVICE_FOLDER, f"{device_name}{ext}")
+                    dest_item = os.path.join(
+                        _DEVICE_FOLDER, f"{sleepy_device_name}{ext}")
+                    shutil.copy(src_item, dest_item)
                 sleepy_device_names.append(sleepy_device_name)
             except FileNotFoundError as copy_fail_error:
                 flush_print(
-                    'Failed to copy ZAP and matter files for sleepy variant of ' + device_name + f': {str(copy_fail_error)}')
+                    f'Failed to copy ZAP and matter files for sleepy variant of {device_name}: {str(copy_fail_error)}'
+                )
                 continue
         for device_name in _DEVICE_LIST + sleepy_device_names:
             for platform, label_args in cicd_config["cd_platforms"].items():
