@@ -247,7 +247,7 @@
             "TariffUnit",
             "MaximumMeteredQuantities"
         ],
-        "Descriptor": ["ClusterRevision", "FeatureMap"],
+        "Descriptor": ["ClusterRevision", "FeatureMap", "EndpointUniqueID"],
         "Device Energy Management": [
             "ESAType",
             "ESACanGenerate",
@@ -314,6 +314,9 @@
             "ClusterRevision"
         ],
         "General Commissioning": [
+            "FeatureMap",
+            "ClusterRevision",
+            "Breadcrumb",
             "RegulatoryConfig",
             "LocationCapability",
             "BasicCommissioningInfo",
@@ -338,6 +341,7 @@
             "FeatureMap"
         ],
         "ICD Management": [
+            "ClusterRevision",
             "IdleModeDuration",
             "ActiveModeDuration",
             "ActiveModeThreshold",
@@ -347,6 +351,12 @@
             "MaximumCheckInBackOff",
             "OperatingMode",
             "FeatureMap"
+        ],
+        "Identify": [
+            "ClusterRevision",
+            "FeatureMap",
+            "IdentifyTime",
+            "IdentifyType"
         ],
         "Joint Fabric Datastore": ["Status"],
         "Meter Identification": [
@@ -378,12 +388,15 @@
             "PIROccupiedToUnoccupiedDelay",
             "UltrasonicOccupiedToUnoccupiedDelay",
             "PhysicalContactOccupiedToUnoccupiedDelay",
-            "FeatureMap"
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "Operational Credentials": [
             "SupportedFabrics",
             "CommissionedFabrics",
-            "CurrentFabricIndex"
+            "CurrentFabricIndex",
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "Software Diagnostics": [
             "ClusterRevision",
@@ -472,7 +485,8 @@
             "ChannelPage0Mask",
             "OperationalDatasetComponents",
             "ExtAddress",
-            "Rloc16"
+            "Rloc16",
+            "ClusterRevision"
         ],
         "Wi-Fi Network Diagnostics": [
             "BSSID",
@@ -506,7 +520,8 @@
             "LocalTime",
             "Granularity",
             "TimeZoneListMaxSize",
-            "DSTOffsetListMaxSize"
+            "DSTOffsetListMaxSize",
+            "ClusterRevision"
         ],
         "Temperature Control": ["SupportedTemperatureLevels"],
         "Dishwasher Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
@@ -535,19 +550,22 @@
             "OperationalState",
             "OperationalError",
             "CurrentPhase",
-            "CountdownTime"
+            "CountdownTime",
+            "ClusterRevision"
         ],
         "RVC Operational State": [
             "OperationalState",
             "OperationalError",
             "CurrentPhase",
-            "CountdownTime"
+            "CountdownTime",
+            "ClusterRevision"
         ],
         "Oven Cavity Operational State": [
             "OperationalState",
             "OperationalError",
             "CurrentPhase",
-            "CountdownTime"
+            "CountdownTime",
+            "ClusterRevision"
         ],
         "Activated Carbon Filter Monitoring": [
             "Condition",
@@ -746,6 +764,7 @@
             "FeatureMap"
         ],
         "Power Topology": ["FeatureMap"],
+        "Power Source": ["ClusterRevision"],
         "Valve Configuration and Control": ["RemainingDuration"],
         "Boolean State Configuration": ["CurrentSensitivityLevel"],
         "Water Heater Management": [
@@ -812,6 +831,8 @@
             "FeatureMap"
         ],
         "Unit Localization": ["TemperatureUnit"],
+        "User Label": ["LabelList", "ClusterRevision", "FeatureMap"],
+        "Localization Configuration": ["ClusterRevision", "SupportedLocales"],
         "TLS Certificate Management": [
             "ClusterRevision",
             "MaxRootCertificates",
@@ -821,9 +842,11 @@
         "Thermostat": [
             "MaxThermostatSuggestions",
             "CurrentThermostatSuggestion",
-            "ThermostatSuggestionNotFollowingReason"
+            "ThermostatSuggestionNotFollowingReason",
+            "ClusterRevision"
         ],
         "Time Format Localization": ["ClusterRevision"],
+        "Window Covering": ["ClusterRevision"],
         "Zone Management": [
             "MaxUserDefinedZones",
             "MaxZones",
@@ -845,5 +868,6 @@
     },
     "uiOptions": {
         "showProfileId": false
-    }
+    },
+    "upgradeRules": "./upgrade-rules-matter.json"
 }

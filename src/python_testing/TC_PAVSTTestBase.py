@@ -29,6 +29,8 @@ logger = logging.getLogger(__name__)
 
 
 class PAVSTTestBase:
+    DEFAULT_AV_TRANSPORT_EXPIRY_TIME_SEC = 30  # 30 seconds
+
     async def read_pavst_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.PushAvStreamTransport
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
@@ -187,8 +189,8 @@ class PAVSTTestBase:
 
     async def allocate_one_pushav_transport(self, endpoint, triggerType=Clusters.PushAvStreamTransport.Enums.TransportTriggerTypeEnum.kContinuous,
                                             trigger_Options=None, ingestMethod=Clusters.PushAvStreamTransport.Enums.IngestMethodsEnum.kCMAFIngest,
-                                            url="https://localhost:1234/streams/1", stream_Usage=None, container_Options=None,
-                                            videoStream_ID=None, audioStream_ID=None, expected_cluster_status=None, tlsEndPoint=1, expiryTime=10):
+                                            url="https://localhost:1234/streams/1/", stream_Usage=None, container_Options=None,
+                                            videoStream_ID=None, audioStream_ID=None, expected_cluster_status=None, tlsEndPoint=1, expiryTime=DEFAULT_AV_TRANSPORT_EXPIRY_TIME_SEC):
         endpoint = self.get_endpoint(default=1)
         cluster = Clusters.PushAvStreamTransport
 
@@ -232,8 +234,8 @@ class PAVSTTestBase:
 
         containerOptions = {
             "containerType": cluster.Enums.ContainerFormatEnum.kCmaf,
-            "CMAFContainerOptions": {"CMAFInterface": cluster.Enums.CMAFInterfaceEnum.kInterface1, "chunkDuration": 4, "segmentDuration": 500,
-                                     "sessionGroup": 3, "trackName": " "},
+            "CMAFContainerOptions": {"CMAFInterface": cluster.Enums.CMAFInterfaceEnum.kInterface1, "chunkDuration": 4, "segmentDuration": 4000,
+                                     "sessionGroup": 3, "trackName": "media"},
         }
 
         if (container_Options is not None):
@@ -250,7 +252,7 @@ class PAVSTTestBase:
                         "streamUsage": streamUsage,
                         "videoStreamID": videoStreamID,
                         "audioStreamID": audioStreamID,
-                        "endpointID": tlsEndPoint,
+                        "TLSEndpointID": tlsEndPoint,
                         "url": url,
                         "triggerOptions": triggerOptions,
                         "ingestMethod": ingestMethod,
@@ -268,6 +270,8 @@ class PAVSTTestBase:
                     e.clusterStatus == expected_cluster_status, "Unexpected error returned"
                 )
                 return e.clusterStatus
+            if (e.status == Status.ResourceExhausted):
+                asserts.fail("RESOURCE_EXHAUSTED")
             return e.status
         pass
 
@@ -305,9 +309,12 @@ class PAVSTTestBase:
             await self.send_single_cmd(cmd=cmd, endpoint=endpoint, dev_ctrl=dev_ctrl)
             return Status.Success
         except InteractionModelError as e:
-            asserts.assert_true(
-                e.status == Status.NotFound, "Unexpected error returned"
-            )
+            if (e.status == Status.Busy):
+                asserts.fail("Transport is busy, currently uploading data")
+            else:
+                asserts.assert_true(
+                    e.status == Status.NotFound, "Unexpected error returned"
+                )
             return e.status
         pass
 
@@ -320,13 +327,16 @@ class PAVSTTestBase:
             await self.send_single_cmd(cmd=cmd, endpoint=endpoint, dev_ctrl=dev_ctrl)
             return Status.Success
         except InteractionModelError as e:
-            asserts.assert_true(
-                e.status == Status.NotFound, "Unexpected error returned"
-            )
+            if (e.status == Status.Busy):
+                asserts.fail("Transport is busy, currently uploading data")
+            else:
+                asserts.assert_true(
+                    e.status == Status.NotFound, "Unexpected error returned"
+                )
             return e.status
         pass
 
-    async def psvt_set_transport_status(self, cmd, devCtrl=None):
+    async def psvt_set_transport_status(self, cmd, expected_status=None, devCtrl=None):
         endpoint = self.get_endpoint(default=1)
         dev_ctrl = self.default_controller
         if (devCtrl is not None):
@@ -335,9 +345,10 @@ class PAVSTTestBase:
             await self.send_single_cmd(cmd=cmd, endpoint=endpoint, dev_ctrl=dev_ctrl)
             return Status.Success
         except InteractionModelError as e:
-            asserts.assert_true(
-                e.status == Status.NotFound, "Unexpected error returned"
-            )
+            if (expected_status is not None):
+                asserts.assert_true(e.status, expected_status, "Unexpected error returned")
+            else:
+                asserts.assert_true(e.status == Status.NotFound, "Unexpected error returned")
             return e.status
         pass
 
@@ -359,7 +370,7 @@ class PAVSTTestBase:
             return e.status
         pass
 
-    async def psvt_manually_trigger_transport(self, cmd, expected_cluster_status=None, devCtrl=None):
+    async def psvt_manually_trigger_transport(self, cmd, expected_cluster_status=None, expected_status=None, devCtrl=None):
         endpoint = self.get_endpoint(default=1)
         dev_ctrl = self.default_controller
         if (devCtrl is not None):
@@ -373,18 +384,26 @@ class PAVSTTestBase:
                     e.clusterStatus == expected_cluster_status, "Unexpected error returned"
                 )
                 return e.clusterStatus
+            elif (e.status == Status.Busy):
+                asserts.fail("Transport is busy, currently uploading data")
             else:
-                asserts.assert_true(
-                    e.status == Status.NotFound, "Unexpected error returned"
-                )
-                return e.status
+                if (expected_status is not None):
+                    asserts.assert_true(
+                        e.status == expected_status, "Unexpected error returned"
+                    )
+                    return e.status
+                else:
+                    asserts.assert_true(
+                        e.status == Status.NotFound, "Unexpected error returned"
+                    )
+                    return e.status
         pass
 
     async def psvt_create_test_harness_controller(self):
         self.th1 = self.default_controller
         self.discriminator = random.randint(0, 4095)
         params = await self.th1.OpenCommissioningWindow(
-            nodeid=self.dut_node_id, timeout=900, iteration=10000, discriminator=self.discriminator, option=1)
+            nodeId=self.dut_node_id, timeout=900, iteration=10000, discriminator=self.discriminator, option=1)
 
         th2_certificate_authority = (
             self.certificate_authority_manager.NewCertificateAuthority()
@@ -413,7 +432,7 @@ class PAVSTTestBase:
     async def psvt_remove_current_fabric(self, devCtrl):
         fabric_idx_cr2_2 = await self.read_currentfabricindex(th=devCtrl)
         removeFabricCmd2 = Clusters.OperationalCredentials.Commands.RemoveFabric(fabric_idx_cr2_2)
-        resp = await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd2)
+        resp = await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=removeFabricCmd2)
         return resp
         asserts.assert_equal(
             resp.statusCode, Clusters.OperationalCredentials.Enums.NodeOperationalCertStatusEnum.kOk, "Expected removal of TH2's fabric to succeed")

@@ -37,7 +37,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32:167
+            image: ghcr.io/project-chip/chip-build-esp32:174
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -72,6 +72,9 @@ jobs:
                      out/esp32-c3devkit-all-clusters/chip-all-clusters-app.elf \
                      /tmp/bloat_reports/
 
+            - name: Remove built artifacts for all-clusters
+              run: rm -rf out/esp32-c3devkit-all-clusters
+
             - name: Prepare code pregen and ensure compile time pregen not possible
               run: |
                   ./scripts/run_in_build_env.sh "./scripts/codepregen.py ./zzz_pregenerated"
@@ -96,6 +99,9 @@ jobs:
                   rm -rf ./zzz_pregenerated
                   mv scripts/codegen.py.renamed scripts/codegen.py
                   mv scripts/tools/zap/generate.py.renamed scripts/tools/zap/generate.py
+
+            - name: Remove built artifacts for all-clusters-minimal
+              run: rm -rf out/esp32-m5stack-all-clusters-minimal
 
             - name: Check for changed paths
               uses: dorny/paths-filter@v3
@@ -132,6 +138,9 @@ jobs:
                         --copy-artifacts-to out/artifacts \
                      "
 
+            - name: Remove built artifacts for all-clusters-rpc-ipv6only
+              run: rm -rf out/esp32-devkitc-all-clusters-rpc-ipv6only
+
             - name: Build example Lighting App (Target:ESP32C6)
               run: scripts/examples/esp_example.sh lighting-app sdkconfig.wifi_thread.defaults esp32c6
 
@@ -159,7 +168,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]' &&  github.repository_owner == 'espressif'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32:167
+            image: ghcr.io/project-chip/chip-build-esp32:174
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 

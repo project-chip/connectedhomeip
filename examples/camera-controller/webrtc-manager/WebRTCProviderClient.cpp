@@ -162,7 +162,7 @@ CHIP_ERROR WebRTCProviderClient::ProvideAnswer(uint16_t webRTCSessionId, const s
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WebRTCProviderClient::ProvideICECandidates(uint16_t webRTCSessionId, const std::vector<std::string> & iceCandidates)
+CHIP_ERROR WebRTCProviderClient::ProvideICECandidates(uint16_t webRTCSessionId, const std::vector<ICECandidateInfo> & iceCandidates)
 {
     ChipLogProgress(Camera, "Sending ProvideICECandidates to node " ChipLogFormatX64, ChipLogValueX64(mPeerId.GetNodeId()));
 
@@ -175,14 +175,38 @@ CHIP_ERROR WebRTCProviderClient::ProvideICECandidates(uint16_t webRTCSessionId, 
     // Store the command type
     mCommandType = CommandType::kProvideICECandidates;
 
-    // Store ICE Candidates.
+    // Store ICE Candidates for lifetime management
     mClientICECandidates = iceCandidates;
+    mICECandidateStructList.clear();
 
-    for (const auto & candidate : mClientICECandidates)
+    for (const auto & candidateInfo : mClientICECandidates)
     {
-        ICECandidateStruct iceCandidate = { CharSpan::fromCharString(candidate.c_str()) };
+        ICECandidateStruct iceCandidate;
+        iceCandidate.candidate = CharSpan(candidateInfo.candidate.data(), candidateInfo.candidate.size());
+
+        // Set SDPMid if available
+        if (!candidateInfo.mid.empty())
+        {
+            iceCandidate.SDPMid.SetNonNull(CharSpan(candidateInfo.mid.data(), candidateInfo.mid.size()));
+        }
+        else
+        {
+            iceCandidate.SDPMid.SetNull();
+        }
+
+        // Set SDPMLineIndex if valid
+        if (candidateInfo.mlineIndex >= 0)
+        {
+            iceCandidate.SDPMLineIndex.SetNonNull(static_cast<uint16_t>(candidateInfo.mlineIndex));
+        }
+        else
+        {
+            iceCandidate.SDPMLineIndex.SetNull();
+        }
+
         mICECandidateStructList.push_back(iceCandidate);
     }
+
     // Stash data in class members so the CommandSender can safely reference them async
     mProvideICECandidatesData.webRTCSessionID = webRTCSessionId;
     mProvideICECandidatesData.ICECandidates =
@@ -378,7 +402,7 @@ void WebRTCProviderClient::OnSessionEstablishTimeout(chip::System::Layer * syste
 
     if (self->mCurrentSessionId != 0)
     {
-        self->mRequestorServer->RemoveSession(self->mCurrentSessionId);
+        self->mRequestorServer->RemoveSession(self->mCurrentSessionId, self->mPeerId.GetNodeId(), self->mPeerId.GetFabricIndex());
         self->mCurrentSessionId = 0;
     }
 

@@ -41,6 +41,16 @@ extern "C" {
 #include <libavutil/timestamp.h>
 }
 
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace PushAvStreamTransport {
+class PushAvStreamTransportManager; // Forward declaration
+} // namespace PushAvStreamTransport
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
 /**
  * @struct BufferData
  * @brief Contains buffer information for custom IO operations
@@ -68,16 +78,18 @@ public:
     {
         bool mHasVideo;                                       ///< Video recording enabled flag
         bool mHasAudio;                                       ///< Audio recording enabled flag
-        int mClipId;                                          ///< Current clip identifier
-        uint32_t mMaxClipDuration;                            ///< Maximum clip duration in seconds
-        uint16_t mInitialDuration;                            ///< Initial clip duration in seconds
-        uint16_t mAugmentationDuration;                       ///< Duration increment on motion detect
-        uint16_t mChunkDuration;                              ///< Chunk duration  milliseconds
-        uint16_t mSegmentDuration;                            ///< Segment duration in milliseconds
-        uint16_t mBlindDuration;                              ///< Duration without recording after motion stop
-        uint16_t mPreRollLength;                              ///< Pre-roll length in seconds
-        std::string mRecorderId;                              ///< Unique recorder identifier
+        uint64_t mSessionNumber;                              ///< Session number for unique clip identification
+        uint8_t mSessionGroup;                                ///< Session group for grouping multiple transports
+        uint32_t mMaxClipDurationS;                           ///< Maximum clip duration in seconds
+        uint16_t mInitialDurationS;                           ///< Initial clip duration in seconds
+        uint16_t mAugmentationDurationS;                      ///< Duration increment on motion detect
+        uint16_t mChunkDurationMs;                            ///< Chunk duration  milliseconds
+        uint16_t mSegmentDurationMs;                          ///< Segment duration in milliseconds
+        uint16_t mBlindDurationS;                             ///< Duration without recording after motion stop
+        uint16_t mPreRollLengthMs;                            ///< Pre-roll length in milliseconds
+        uint16_t mElapsedTimeS;                               ///< Elapsed time since recording start in seconds
         std::string mOutputPath;                              ///< Base output directory path
+        std::string mTrackName;                               ///< Track name for segmented files
         AVRational mInputTimeBase;                            ///< Input time base
         std::string mUrl;                                     ///< URL for uploading clips;
         int mTriggerType;                                     ///< Recording trigger type
@@ -139,7 +151,7 @@ public:
      * @param size Data size in bytes
      * @param isVideo True for video data, false for audio
      */
-    void PushPacket(const char * data, size_t size, bool isVideo);
+    void PushPacket(const uint8_t * data, size_t size, bool isVideo);
 
     void SetOnStopCallback(std::function<void()> cb) { mOnStopCallback = std::move(cb); }
 
@@ -161,6 +173,11 @@ public:
     ClipInfoStruct mClipInfo;                         ///< Clip configuration parameters
     void SetRecorderStatus(bool status);              ///< Sets the recorder status
     bool GetRecorderStatus();                         ///< Gets the recorder status
+    void SetFabricIndex(chip::FabricIndex fabricIndex) { mFabricIndex = fabricIndex; }
+    void SetPushAvStreamTransportManager(chip::app::Clusters::PushAvStreamTransport::PushAvStreamTransportManager * manager)
+    {
+        mPushAvStreamTransportManager = manager;
+    }
 
 private:
     long unsigned int kMaxQueueSize = 500; ///< Maximum queue size for media packets
@@ -186,8 +203,7 @@ private:
     std::queue<AVPacket *> mAudioQueue;
     std::queue<AVPacket *> mVideoQueue;
 
-    int mAudioFragment           = 1;
-    int mVideoFragment           = 1;
+    int mUploadSegmentID;
     int64_t mCurrentClipStartPts = AV_NOPTS_VALUE;
     int64_t mFoundFirstIFramePts = -1;
     int64_t currentPts           = AV_NOPTS_VALUE;
@@ -198,16 +214,27 @@ private:
     PushAVUploader * mUploader;
 
     // Cluster server reference for direct API calls
-    chip::app::Clusters::PushAvStreamTransportServer * mPushAvStreamTransportServer = nullptr;
-    uint16_t mConnectionID                                                          = 0;
+    uint16_t mConnectionID                                                                                   = 0;
+    chip::FabricIndex mFabricIndex                                                                           = 0;
+    chip::app::Clusters::PushAvStreamTransportServer * mPushAvStreamTransportServer                          = nullptr;
+    chip::app::Clusters::PushAvStreamTransport::PushAvStreamTransportManager * mPushAvStreamTransportManager = nullptr;
     chip::app::Clusters::PushAvStreamTransport::TransportTriggerTypeEnum mTriggerType;
     chip ::Optional<chip::app::Clusters::PushAvStreamTransport::TriggerActivationReasonEnum> mReasonType;
 
     /// @name Internal Methods
     /// @{
-    bool FileExists(const std::string & path);
+
+    /**
+     * @brief Ensures a directory exists, creating it if necessary.
+     * @param path The directory path to check/create.
+     * @return true if the directory exists or was created successfully, false otherwise.
+     */
+    bool EnsureDirectoryExists(const std::string & path);
+
     bool CheckAndUploadFile(std::string path);
+
     bool IsH264IFrame(const uint8_t * data, unsigned int length);
+
     AVPacket * CreatePacket(const uint8_t * data, int size, bool isVideo);
 
     /**

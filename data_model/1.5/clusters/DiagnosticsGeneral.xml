@@ -60,7 +60,7 @@ Davis, CA 95616, USA
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0033" name="General Diagnostics Cluster" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
-    <revision revision="2" summary="UpTime attribute now mandatory, and added TimeSnapshot command, added DMTEST feature."/>
+    <revision revision="2" summary="UpTime attribute now mandatory, and added TimeSnapshot command, added DMTEST feature"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0033" name="General Diagnostics"/>

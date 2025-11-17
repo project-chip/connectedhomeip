@@ -81,4 +81,35 @@ Davis, CA 95616, USA
       </features>
     </cluster>
   </clusters>
+  <composedDeviceTypes>
+    <deviceType deviceTypeId="0x0510" deviceTypeName="Electrical Sensor">
+      <clusterRequirements>
+        <cluster id="0x0090" name="Electrical Power Measurement">
+          <mandatoryConform/>
+        </cluster>
+        <cluster id="0x0091" name="Electrical Energy Measurement">
+          <mandatoryConform/>
+        </cluster>
+      </clusterRequirements>
+    </deviceType>
+  </composedDeviceTypes>
+  <composedDeviceTypes>
+    <cluster id="0x0003" name="Identify" side="server">
+      <optionalConform/>
+    </cluster>
+    <cluster id="0x0094" name="Water Heater Management" side="server">
+      <mandatoryConform/>
+    </cluster>
+    <cluster id="0x009E" name="Water Heater Mode" side="server">
+      <mandatoryConform/>
+    </cluster>
+    <cluster id="0x0201" name="Thermostat" side="server">
+      <mandatoryConform/>
+      <features>
+        <feature code="HEAT">
+          <mandatoryConform/>
+        </feature>
+      </features>
+    </cluster>
+  </composedDeviceTypes>
 </deviceType>

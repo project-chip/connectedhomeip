@@ -171,9 +171,7 @@ class ClusterTablesGenerator:
             )
             for e in self.cluster.events if e.fields
         ])
-        cluster_entries.extend(
-            [entry for entry in self.CommandEntries()]
-        )
+        cluster_entries.extend(list(self.CommandEntries()))
 
         yield Table(
             full_name=self.cluster.name,
@@ -241,9 +239,7 @@ class ClusterTablesGenerator:
 def CreateTables(idl: Idl) -> List[Table]:
     result = []
     for cluster in idl.clusters:
-        result.extend(
-            [table for table in ClusterTablesGenerator(cluster).GenerateTables()])
-
+        result.extend(list(ClusterTablesGenerator(cluster).GenerateTables()))
     return result
 
 

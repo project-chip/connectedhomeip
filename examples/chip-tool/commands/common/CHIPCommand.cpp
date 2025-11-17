@@ -158,6 +158,11 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
         port = static_cast<uint16_t>(port + CurrentCommissionerId());
     }
     factoryInitParams.listenPort = port;
+    if (mInterfaceId.HasValue())
+    {
+        factoryInitParams.interfaceId =
+            chip::Inet::InterfaceId(static_cast<chip::Inet::InterfaceId::PlatformType>(mInterfaceId.Value()));
+    }
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryInitParams));
 
     auto systemState = chip::Controller::DeviceControllerFactory::GetInstance().GetSystemState();
@@ -472,7 +477,7 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
     VerifyOrReturnError(chip::CanCastTo<uint16_t>(CHIP_UDC_PORT + fabricId), CHIP_ERROR_INVALID_ARGUMENT);
     uint16_t udcListenPort = static_cast<uint16_t>(CHIP_UDC_PORT + fabricId);
-    commissioner->SetUdcListenPort(udcListenPort);
+    ReturnErrorOnFailure(commissioner->SetUdcListenPort(udcListenPort));
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
     chip::Controller::SetupParams commissionerParams;
 
@@ -540,7 +545,7 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, 
             chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, fabricIndex, defaultIpk, compressed_fabric_id_span));
     }
 
-    CHIPCommand::sICDClientStorage.UpdateFabricList(commissioner->GetFabricIndex());
+    ReturnErrorOnFailure(CHIPCommand::sICDClientStorage.UpdateFabricList(commissioner->GetFabricIndex()));
 
     mCommissioners[identity] = std::move(commissioner);
 

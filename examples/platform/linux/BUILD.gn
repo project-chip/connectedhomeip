@@ -99,8 +99,65 @@ source_set("commodity-metering-test-event-trigger") {
   sources = [ "${chip_root}/src/app/clusters/commodity-metering-server/CommodityMeteringTestEventTriggerHandler.h" ]
 }
 
+source_set("linux-commissionable-data-provider") {
+  sources = [
+    "LinuxCommissionableDataProvider.cpp",
+    "LinuxCommissionableDataProvider.h",
+  ]
+  public_deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform",
+  ]
+
+  public_configs = [ ":app-main-config" ]
+}
+
 source_set("commodity-tariff-test-event-trigger") {
   sources = [ "${chip_root}/src/app/clusters/commodity-tariff-server/CommodityTariffTestEventTriggerHandler.h" ]
+}
+
+source_set("app-main-loop") {
+  sources = [ "AppMainLoop.h" ]
+
+  public_configs = [ ":app-main-config" ]
+}
+
+source_set("app-options") {
+  defines = [
+    "ENABLE_TRACING=${matter_enable_tracing_support}",
+    "ENABLE_CAMERA_SERVER=${matter_enable_camera_server}",
+    "CHIP_ATTESTATION_TRUSTY_OS=${chip_with_trusty_os}",
+  ]
+
+  sources = [
+    "Options.cpp",
+    "Options.h",
+    "testing/CustomCSRResponse.cpp",
+    "testing/CustomCSRResponse.h",
+    "testing/CustomCSRResponseOperationalKeyStore.cpp",
+    "testing/CustomCSRResponseOperationalKeyStore.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app/tests/suites/credentials:dac_provider",
+    "${chip_root}/src/lib",
+  ]
+
+  if (matter_enable_tracing_support) {
+    public_deps += [
+      "${chip_root}/examples/common/tracing:commandline",
+      "${chip_root}/src/tracing",
+    ]
+  }
+  if (current_os != "nuttx") {
+    public_deps += [ jsoncpp_root ]
+  }
+  if (chip_enable_pw_rpc) {
+    defines += [ "PW_RPC_ENABLED" ]
+  }
+
+  public_configs = [ ":app-main-config" ]
 }
 
 source_set("app-main") {
@@ -115,19 +172,13 @@ source_set("app-main") {
     "AppMain.h",
     "CommissionableInit.cpp",
     "CommissionableInit.h",
-    "LinuxCommissionableDataProvider.cpp",
-    "LinuxCommissionableDataProvider.h",
     "NamedPipeCommands.cpp",
     "NamedPipeCommands.h",
-    "Options.cpp",
-    "Options.h",
-    "testing/CustomCSRResponse.cpp",
-    "testing/CustomCSRResponse.h",
-    "testing/CustomCSRResponseOperationalKeyStore.cpp",
-    "testing/CustomCSRResponseOperationalKeyStore.h",
   ]
 
   public_deps = [
+    ":app-main-loop",
+    ":app-options",
     ":boolean-state-configuration-test-event-trigger",
     ":commissioner-main",
     ":commodity-metering-test-event-trigger",
@@ -137,6 +188,7 @@ source_set("app-main") {
     ":electrical-grid-conditions-test-event-trigger",
     ":energy-evse-test-event-trigger",
     ":energy-reporting-test-event-trigger",
+    ":linux-commissionable-data-provider",
     ":meter-identification-test-event-trigger",
     ":smco-test-event-trigger",
     ":software-diagnostics-test-event-trigger",
@@ -151,13 +203,8 @@ source_set("app-main") {
     "${chip_root}/examples/providers:all_clusters_device_info_provider",
     "${chip_root}/examples/providers:device_info_provider_please_do_not_reuse_as_is",
     "${chip_root}/src/app/server",
-    "${chip_root}/src/app/tests/suites/credentials:dac_provider",
     "${chip_root}/src/setup_payload:onboarding-codes-utils",
   ]
-
-  if (current_os != "nuttx") {
-    public_deps += [ jsoncpp_root ]
-  }
 
   if (chip_enable_pw_rpc) {
     defines += [ "PW_RPC_ENABLED" ]

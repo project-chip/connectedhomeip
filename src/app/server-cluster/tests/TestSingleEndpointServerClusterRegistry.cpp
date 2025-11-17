@@ -26,6 +26,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 #include <algorithm>
 #include <cstdlib>
@@ -49,8 +50,10 @@ constexpr chip::ClusterId kCluster3 = 3;
 class FakeServerClusterInterface : public DefaultServerCluster
 {
 public:
-    FakeServerClusterInterface(const ConcreteClusterPath & path) : DefaultServerCluster(path) {}
-    FakeServerClusterInterface(EndpointId endpoint, ClusterId cluster) : DefaultServerCluster({ endpoint, cluster }) {}
+    constexpr FakeServerClusterInterface(ConcreteClusterPath && path) : DefaultServerCluster(std::move(path)) {}
+    constexpr FakeServerClusterInterface(EndpointId endpoint, ClusterId cluster) :
+        DefaultServerCluster(ConcreteClusterPath::ConstExpr(endpoint, cluster))
+    {}
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override
@@ -576,7 +579,7 @@ TEST_F(TestSingleEndpointServerClusterRegistry, AllClustersIteration)
     EXPECT_NE(std::find(found_clusters.begin(), found_clusters.end(), &cluster2), found_clusters.end());
     EXPECT_NE(std::find(found_clusters.begin(), found_clusters.end(), &cluster3), found_clusters.end());
 
-    registry.Unregister(&cluster2);
+    EXPECT_SUCCESS(registry.Unregister(&cluster2));
 
     found_clusters.clear();
     for (auto * cluster : registry.AllServerClusterInstances())

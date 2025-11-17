@@ -2175,6 +2175,11 @@ PICS:
       id: OPCREDS.S.C0b.Rsp
 
     - label:
+          "Does the Device(Server) implement receiving the
+          SignVIDVerificationResponse command?"
+      id: OPCREDS.S.C0e.Rsp
+
+    - label:
           "Does the Device(Server) implement receiving the ScanNetworks command?"
       id: CNET.S.C00.Rsp
 
@@ -2223,6 +2228,16 @@ PICS:
     - label:
           "Does the Device(Server) invoking/generating the NOCResponse command?"
       id: OPCREDS.S.C08.Tx
+
+    - label:
+          "Does the Device(Server) invoking/generating the
+          SetVIDVerificationStatement command?"
+      id: OPCREDS.S.C0c.Tx
+
+    - label:
+          "Does the Device(Server) invoking/generating the
+          SignVIDVerificationRequest command?"
+      id: OPCREDS.S.C0d.Tx
 
     - label:
           "Does the Device(Server) invoking/generating the ScanNetworksResponse
@@ -10323,6 +10338,28 @@ PICS:
     #
     # Camera AV Stream Management Cluster
     #
+    - label:
+          "Does the device implement the Camera AV Stream Management Cluster as
+          a server?"
+      id: AVSM.S
+
+    # Features
+    - label: "Does the device support Audio Data Output feature?"
+      id: AVSM.S.F00
+
+    - label: "Does the device support Video Data Output feature?"
+      id: AVSM.S.F01
+
+    - label: "Does the device support Audio Data Input feature?"
+      id: AVSM.S.F02
+
+    - label: "Does the device support Video Data Input feature?"
+      id: AVSM.S.F03
+
+    - label: "Does the device support Speaker feature?"
+      id: AVSM.S.F04
+
+    # Server attributes
     - label: " Does the device implement the MaxConcurrentEncoders attribute?"
       id: AVSM.S.A0000
     - label: " Does the device implement the MaxEncodedPixelRate attribute?"
@@ -10573,3 +10610,69 @@ PICS:
 
     - label: "Does the device implement the PowerThreshold attribute?"
       id: MTRID.S.A0004
+
+    #
+    # WebRTC Transport Provider Cluster
+    #
+    - label:
+          "Does the device implement the WebRTC Transport Provider Cluster as a
+          server?"
+      id: WEBRTCP.S
+
+    # Features
+    - label: "Does the device support Metadata transmission feature?"
+      id: WEBRTCP.S.F00
+
+    - label: "Does the device support SFrame End-to-End Encryption feature?"
+      id: WEBRTCP.S.F01
+
+    # Server attributes
+    - label: "Does the device implement the CurrentSessions attribute?"
+      id: WEBRTCP.S.A0000
+
+    # Commands received
+    - label: "Does the device implement the SolicitOffer command?"
+      id: WEBRTCP.S.C00.Rsp
+
+    - label: "Does the device implement the ProvideOffer command?"
+      id: WEBRTCP.S.C02.Rsp
+
+    - label: "Does the device implement the ProvideAnswer command?"
+      id: WEBRTCP.S.C04.Rsp
+
+    - label: "Does the device implement the ProvideICECandidates command?"
+      id: WEBRTCP.S.C05.Rsp
+
+    - label: "Does the device implement the EndSession command?"
+      id: WEBRTCP.S.C06.Rsp
+
+    # Commands generated
+    - label: "Does the device implement the SolicitOfferResponse command?"
+      id: WEBRTCP.S.C01.Tx
+
+    - label: "Does the device implement the ProvideOfferResponse command?"
+      id: WEBRTCP.S.C03.Tx
+
+    #
+    # WebRTC Requestor Cluster
+    #
+    - label:
+          "Does the device implement the WebRTC Requestor Cluster as a server?"
+      id: WEBRTCR.S
+
+    # Server attributes
+    - label: "Does the device implement the CurrentSessions attribute?"
+      id: WEBRTCR.S.A0000
+
+    # Commands received
+    - label: "Does the device implement the Offer command?"
+      id: WEBRTCR.S.C00.Rsp
+
+    - label: "Does the device implement the Answer command?"
+      id: WEBRTCR.S.C01.Rsp
+
+    - label: "Does the device implement the ICECandidates command?"
+      id: WEBRTCR.S.C02.Rsp
+
+    - label: "Does the device implement the End command?"
+      id: WEBRTCR.S.C03.Rsp

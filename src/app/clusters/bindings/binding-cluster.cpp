@@ -74,34 +74,33 @@ CHIP_ERROR CheckValidBindingList(const EndpointId localEndpoint, const Decodable
 
     // Check binding table size
     uint8_t oldListSize = 0;
-    for (const auto & entry : BindingTable::GetInstance())
+    for (const auto & entry : Binding::Table::GetInstance())
     {
         if (entry.local == localEndpoint && entry.fabricIndex == accessingFabricIndex)
         {
             oldListSize++;
         }
     }
-    VerifyOrReturnError(BindingTable::GetInstance().Size() - oldListSize + listSize <= BindingTable::kMaxBindingEntries,
+    VerifyOrReturnError(Binding::Table::GetInstance().Size() - oldListSize + listSize <= Binding::Table::kMaxBindingEntries,
                         CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CreateBindingEntry(const TargetStructType & entry, EndpointId localEndpoint)
 {
-    EmberBindingTableEntry bindingEntry;
+    Binding::TableEntry bindingEntry;
 
     if (entry.group.HasValue())
     {
-        bindingEntry =
-            EmberBindingTableEntry::ForGroup(entry.fabricIndex, entry.group.Value(), localEndpoint, entry.cluster.std_optional());
+        bindingEntry = Binding::TableEntry(entry.fabricIndex, entry.group.Value(), localEndpoint, entry.cluster.std_optional());
     }
     else
     {
-        bindingEntry = EmberBindingTableEntry::ForNode(entry.fabricIndex, entry.node.Value(), localEndpoint, entry.endpoint.Value(),
-                                                       entry.cluster.std_optional());
+        bindingEntry = Binding::TableEntry(entry.fabricIndex, entry.node.Value(), localEndpoint, entry.endpoint.Value(),
+                                           entry.cluster.std_optional());
     }
 
-    return chip::app::AddBindingEntry(bindingEntry);
+    return AddBindingEntry(bindingEntry);
 }
 
 } // namespace
@@ -117,13 +116,13 @@ DataModel::ActionReturnStatus BindingCluster::ReadAttribute(const DataModel::Rea
     {
     case Binding::Attributes::Binding::Id: {
         return encoder.EncodeList([&](const auto & subEncoder) {
-            for (auto & entry : BindingTable::GetInstance())
+            for (auto & entry : Binding::Table::GetInstance())
             {
                 if (entry.local != request.path.mEndpointId)
                 {
                     continue;
                 }
-                if (entry.type == MATTER_UNICAST_BINDING)
+                if (entry.type == Binding::MATTER_UNICAST_BINDING)
                 {
                     Binding::Structs::TargetStruct::Type value = {
                         .node        = MakeOptional(entry.nodeId),
@@ -134,7 +133,7 @@ DataModel::ActionReturnStatus BindingCluster::ReadAttribute(const DataModel::Rea
                     };
                     ReturnErrorOnFailure(subEncoder.Encode(value));
                 }
-                else if (entry.type == MATTER_MULTICAST_BINDING)
+                else if (entry.type == Binding::MATTER_MULTICAST_BINDING)
                 {
                     Binding::Structs::TargetStruct::Type value = {
                         .node        = NullOptional,
@@ -165,25 +164,26 @@ DataModel::ActionReturnStatus BindingCluster::WriteAttribute(const DataModel::Wr
     switch (request.path.mAttributeId)
     {
     case Binding::Attributes::Binding::Id: {
-        mAccessingFabricIndex = request.GetAccessingFabricIndex();
         if (!request.path.IsListOperation() || request.path.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
         {
             DecodableBindingListType newBindingList;
 
             ReturnErrorOnFailure(decoder.Decode(newBindingList));
-            ReturnErrorOnFailure(CheckValidBindingList(request.path.mEndpointId, newBindingList, mAccessingFabricIndex));
+            ReturnErrorOnFailure(
+                CheckValidBindingList(request.path.mEndpointId, newBindingList, request.GetAccessingFabricIndex()));
 
             // Clear all entries for the current accessing fabric and endpoint
-            auto bindingTableIter = BindingTable::GetInstance().begin();
-            while (bindingTableIter != BindingTable::GetInstance().end())
+            auto bindingTableIter = Binding::Table::GetInstance().begin();
+            while (bindingTableIter != Binding::Table::GetInstance().end())
             {
-                if (bindingTableIter->local == request.path.mEndpointId && bindingTableIter->fabricIndex == mAccessingFabricIndex)
+                if (bindingTableIter->local == request.path.mEndpointId &&
+                    bindingTableIter->fabricIndex == request.GetAccessingFabricIndex())
                 {
-                    if (bindingTableIter->type == MATTER_UNICAST_BINDING)
+                    if (bindingTableIter->type == Binding::MATTER_UNICAST_BINDING)
                     {
-                        BindingManager::GetInstance().UnicastBindingRemoved(bindingTableIter.GetIndex());
+                        TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().UnicastBindingRemoved(bindingTableIter.GetIndex());
                     }
-                    ReturnErrorOnFailure(BindingTable::GetInstance().RemoveAt(bindingTableIter));
+                    ReturnErrorOnFailure(Binding::Table::GetInstance().RemoveAt(bindingTableIter));
                 }
                 else
                 {
@@ -204,7 +204,7 @@ DataModel::ActionReturnStatus BindingCluster::WriteAttribute(const DataModel::Wr
             if (!request.path.IsListOperation())
             {
                 // Notify binding table has changed
-                LogErrorOnFailure(NotifyBindingsChanged());
+                LogErrorOnFailure(NotifyBindingsChanged(request.GetAccessingFabricIndex()));
             }
             return err;
         }
@@ -227,11 +227,12 @@ DataModel::ActionReturnStatus BindingCluster::WriteAttribute(const DataModel::Wr
     return Protocols::InteractionModel::Status::UnsupportedWrite;
 }
 
-void BindingCluster::ListAttributeWriteNotification(const ConcreteAttributePath & path, DataModel::ListWriteOperation opType)
+void BindingCluster::ListAttributeWriteNotification(const ConcreteAttributePath & path, DataModel::ListWriteOperation opType,
+                                                    FabricIndex accessingFabric)
 {
     if (opType == DataModel::ListWriteOperation::kListWriteSuccess)
     {
-        LogErrorOnFailure(NotifyBindingsChanged());
+        LogErrorOnFailure(NotifyBindingsChanged(accessingFabric));
     }
 }
 
@@ -241,10 +242,10 @@ CHIP_ERROR BindingCluster::Attributes(const ConcreteClusterPath & path, ReadOnly
     return listBuilder.Append(Span(Binding::Attributes::kMandatoryMetadata), {});
 }
 
-CHIP_ERROR BindingCluster::NotifyBindingsChanged()
+CHIP_ERROR BindingCluster::NotifyBindingsChanged(FabricIndex accessingFabricIndex)
 {
     DeviceLayer::ChipDeviceEvent event{ .Type            = DeviceLayer::DeviceEventType::kBindingsChangedViaCluster,
-                                        .BindingsChanged = { .fabricIndex = mAccessingFabricIndex } };
+                                        .BindingsChanged = { .fabricIndex = accessingFabricIndex } };
     return chip::DeviceLayer::PlatformMgr().PostEvent(&event);
 }
 

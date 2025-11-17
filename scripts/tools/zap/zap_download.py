@@ -41,7 +41,7 @@ except ImportError:
 __LOG_LEVELS__ = {
     'debug': logging.DEBUG,
     'info': logging.INFO,
-    'warn': logging.WARN,
+    'warn': logging.WARNING,
     'fatal': logging.FATAL,
 }
 
@@ -97,33 +97,42 @@ def _SetupSourceZap(install_directory: str, zap_version: str):
     _ExecuteProcess("npm ci".split(), install_directory)
 
 
-def _SetupReleaseZap(install_directory: str, zap_version: str):
+def _GetDefaultPlatform():
+    match sys.platform:
+        case 'linux':
+            return 'linux'
+        case 'darwin':
+            return 'mac'
+        case 'win32':
+            return 'win'
+        case _:
+            raise Exception('Unknown platform - do not know what zip file to download.')
+
+
+def _GetDefaultArch():
+    arch = None
+
+    match sys.platform:
+        case 'win32':
+            # os.uname is not implemented on Windows, so use an alternative instead.
+            import platform
+            arch = platform.uname().machine
+        case _:
+            arch = os.uname().machine
+
+    if arch == 'x86_64' or arch == 'AMD64':
+        return 'x64'
+
+    # this should be `arm64` ...
+    return arch
+
+
+def DownloadReleasedZap(install_directory: str, zap_version: str, zap_platform: str, zap_arch: str):
     """
     Downloads the given [zap_version] into "[install_directory]/zap-[zap_version]/".
 
     Will download the given release from github releases.
     """
-
-    if sys.platform == 'linux':
-        zap_platform = 'linux'
-        arch = os.uname().machine
-    elif sys.platform == 'darwin':
-        zap_platform = 'mac'
-        arch = os.uname().machine
-    elif sys.platform == 'win32':
-        zap_platform = 'win'
-        # os.uname is not implemented on Windows, so use an alternative instead.
-        import platform
-        arch = platform.uname().machine
-    else:
-        raise Exception('Unknown platform - do not know what zip file to download.')
-
-    if arch == 'arm64':
-        zap_arch = 'arm64'
-    elif arch == 'x86_64' or arch == 'AMD64':
-        zap_arch = 'x64'
-    else:
-        raise Exception(f'Unknown architecture "${arch}" - do not know what zip file to download.')
 
     url = f"https://github.com/project-chip/zap/releases/download/{zap_version}/zap-{zap_platform}-{zap_arch}.zip"
 
@@ -149,7 +158,7 @@ def _SetupReleaseZap(install_directory: str, zap_version: str):
     logging.info("Done extracting.")
 
 
-def _GetZapVersionToUse(project_root):
+def _GetZapVersionToUse(project_root) -> str:
     """
     Heuristic to figure out what zap version should be used.
 
@@ -173,8 +182,9 @@ def _GetZapVersionToUse(project_root):
     zap_json = json.load(open(zap_path))
     for package in zap_json.get("packages", []):
         for tag in package.get("tags", []):
-            if tag.startswith("version:2@"):
-                zap_version = tag.removeprefix("version:2@")
+            if tag.startswith("version:"):
+                zap_version = tag.removeprefix("version:")
+
                 suffix_index = zap_version.rfind(".")
                 if suffix_index != -1:
                     zap_version = zap_version[:suffix_index]
@@ -212,7 +222,9 @@ def _GetZapVersionToUse(project_root):
     type=click.Choice(DownloadType.__members__, case_sensitive=False),
     callback=lambda c, p, v: getattr(DownloadType, v),
     help='What type of zap download to perform')
-def main(log_level: str, sdk_root: str, extract_root: str, zap_version: Optional[str], zap: DownloadType):
+@click.option('--platform', default=_GetDefaultPlatform(), show_default=True, help='ZAP Platform to download')
+@click.option('--arch', default=_GetDefaultArch(), show_default=True, help='ZAP Architecture to download')
+def main(log_level: str, sdk_root: str, extract_root: str, zap_version: Optional[str], zap: DownloadType, platform: str, arch: str):
     if _has_coloredlogs:
         coloredlogs.install(level=log_level, fmt='%(asctime)s %(name)s %(levelname)-7s %(message)s')
     else:
@@ -245,7 +257,7 @@ def main(log_level: str, sdk_root: str, extract_root: str, zap_version: Optional
         # Make sure the results can be used in scripts
         print(f"{export_cmd} ZAP_DEVELOPMENT_PATH={shlex.quote(install_directory)}")
     else:
-        _SetupReleaseZap(install_directory, zap_version)
+        DownloadReleasedZap(install_directory, zap_version, platform, arch)
 
         # Make sure the results can be used in scripts
         print(f"{export_cmd} ZAP_INSTALL_PATH={shlex.quote(install_directory)}")

@@ -74,7 +74,7 @@ class TC_DGSW_2_2(MatterBaseTest):
         return "[TC-DGSW-2.2] Event Functionality with Server as DUT"
 
     def pics_TC_DGSW_2_2(self) -> list[str]:
-        return ["DGSW.S"]
+        return ["DGSW.S.E00"]
 
     def steps_TC_DGSW_2_2(self) -> list[TestStep]:
         steps = [

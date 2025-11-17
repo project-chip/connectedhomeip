@@ -62,9 +62,7 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0B07" name="Commodity Metering">
-      <provisionalConform/>
-    </clusterId>
+    <clusterId id="0x0B07" name="Commodity Metering"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="COMMTR" scope="Endpoint"/>
   <dataTypes>
@@ -107,6 +105,9 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform/>
+      <constraint>
+        <min value="1"/>
+      </constraint>
     </attribute>
   </attributes>
 </cluster>

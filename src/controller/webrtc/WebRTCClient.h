@@ -24,6 +24,18 @@
 namespace chip {
 namespace webrtc {
 
+constexpr int kVideoH264PayloadType     = 96; // 96 is just the first value in the dynamic RTP payload‑type range (96‑127).
+constexpr int kVideoBitRate             = 3000;
+const std::string kVideoMid             = "video";
+constexpr const char * kStreamDestIp    = "127.0.0.1";
+constexpr uint16_t kVideoStreamDestPort = 5000;
+
+// Constants for Audio
+constexpr int kAudioBitRate             = 64000;
+constexpr int kOpusPayloadType          = 111;
+constexpr uint16_t kAudioStreamDestPort = 5001;
+const std::string kAudioMid             = "audio";
+
 class WebRTCClient
 {
 public:
@@ -62,12 +74,15 @@ private:
     // Local vector to store the ICE Candidate strings coming from the WebRTC stack
     std::vector<std::string> mLocalCandidates;
 
-    std::shared_ptr<rtc::Track> mTrack;
+    std::shared_ptr<rtc::Track> mVideoTrack;
     std::shared_ptr<rtc::Track> mAudioTrack;
 
     // UDP socket for stream forwarding
-    int mRTPSocket      = -1;
+    int mVideoRTPSocket = -1;
     int mAudioRTPSocket = -1;
+
+    void addVideoTrack(std::string mid = kVideoMid, int payloadType = kVideoH264PayloadType);
+    void addAudioTrack(std::string mid = kAudioMid, int payloadType = kOpusPayloadType);
 
     // Close and reset the UDP socket
     void CloseRTPSocket();

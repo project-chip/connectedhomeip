@@ -39,11 +39,10 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_attribute, run_if_endpoint_matches
 
 
 class TC_ACL_2_5(MatterBaseTest):
-
     async def write_attribute_with_encoding_option(self, controller, node_id, path, forceLegacyListEncoding):
         if forceLegacyListEncoding:
             return await controller.TestOnlyWriteAttributeWithLegacyList(node_id, path)
@@ -53,11 +52,13 @@ class TC_ACL_2_5(MatterBaseTest):
     async def internal_test_TC_ACL_2_5(self, force_legacy_encoding: bool):
         self.step(1)
         self.th1 = self.default_controller
+        self.endpoint = self.get_endpoint()
 
         self.step(2)
         oc_cluster = Clusters.OperationalCredentials
         cfi_attribute = oc_cluster.Attributes.CurrentFabricIndex
         f1 = await self.read_single_attribute_check_success(endpoint=0, cluster=oc_cluster, attribute=cfi_attribute)
+        extension_attr = Clusters.AccessControl.Attributes.Extension
 
         self.step(3)
         # Read initial AccessControlClusterExtension
@@ -89,7 +90,6 @@ class TC_ACL_2_5(MatterBaseTest):
 
         # Write the extension to the device - properly wrap the extensions list
         logging.info(f"Writing extension with data {D_OK_EMPTY.hex()}")
-        extension_attr = Clusters.AccessControl.Attributes.Extension
         extensions_list = [extension]
         result = await self.write_attribute_with_encoding_option(
             self.default_controller,
@@ -119,11 +119,6 @@ class TC_ACL_2_5(MatterBaseTest):
         # There should be exactly one event
         asserts.assert_equal(len(direct_events), 1, "Expected exactly one event from direct read")
         direct_event = direct_events[0]
-
-        # Log the event structures to help debug
-        logging.info(f"direct event: {direct_event}")
-        logging.info(f"Direct event structure: {dir(direct_event)}")
-        logging.info(f"Subscription event structure: {dir(subscription_event)}")
 
         # Verify both methods return the same event data
         logging.info(f"Comparing subscription event: {subscription_event} with direct event: {direct_event}")
@@ -409,8 +404,11 @@ class TC_ACL_2_5(MatterBaseTest):
 
     async def get_latest_event_number(self, acec_event: Clusters.AccessControl.Events.AccessControlExtensionChanged) -> int:
         event_path = [(self.matter_test_config.endpoint, acec_event, 1)]
-        events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
+        events = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path)
         return max([e.Header.EventNumber for e in events])
+
+    def pics_TC_ACL_2_5(self) -> list[str]:
+        return ['ACL.S.A0001']
 
     def desc_TC_ACL_2_5(self) -> str:
         return "[TC-ACL-2.5]  AccessControlExtensionChanged event"
@@ -445,7 +443,7 @@ class TC_ACL_2_5(MatterBaseTest):
         ]
         return steps
 
-    @ async_test_body
+    @run_if_endpoint_matches(has_attribute(Clusters.AccessControl.Attributes.Extension))
     async def test_TC_ACL_2_5(self):
         await self.internal_test_TC_ACL_2_5(force_legacy_encoding=False)
         self.current_step_index = 0

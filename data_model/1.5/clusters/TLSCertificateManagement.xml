@@ -62,9 +62,7 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0801" name="TLS Certificate Management">
-      <provisionalConform/>
-    </clusterId>
+    <clusterId id="0x0801" name="TLS Certificate Management"/>
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="TLSCERT" scope="Node"/>
   <dataTypes>
@@ -99,6 +97,7 @@ Davis, CA 95616, USA
         </constraint>
       </field>
       <field id="1" name="ClientCertificate" type="octstr">
+        <quality nullable="true"/>
         <optionalConform/>
         <constraint>
           <maxLength value="3000"/>
@@ -256,7 +255,7 @@ Davis, CA 95616, USA
         </constraint>
       </field>
     </command>
-    <command id="0x07" name="TLSClientCSR" direction="commandToServer" response="TLSClientCSRResponse">
+    <command id="0x07" name="ClientCSR" direction="commandToServer" response="ClientCSRResponse">
       <quality largeMessage="true"/>
       <access invokePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
@@ -266,8 +265,18 @@ Davis, CA 95616, USA
           <allowed value="32"/>
         </constraint>
       </field>
+      <field id="1" name="CCDID" type="TLSCCDID">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <between>
+            <from value="0"/>
+            <to value="65534"/>
+          </between>
+        </constraint>
+      </field>
     </command>
-    <command id="0x08" name="TLSClientCSRResponse" direction="responseFromServer">
+    <command id="0x08" name="ClientCSRResponse" direction="responseFromServer">
       <quality largeMessage="true"/>
       <mandatoryConform/>
       <field id="0" name="CCDID" type="TLSCCDID">
@@ -319,7 +328,10 @@ Davis, CA 95616, USA
         </entry>
         <mandatoryConform/>
         <constraint>
-          <maxCount value="10"/>
+          <countBetween>
+            <from value="0"/>
+            <to value="10"/>
+          </countBetween>
         </constraint>
       </field>
     </command>

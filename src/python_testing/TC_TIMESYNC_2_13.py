@@ -81,7 +81,7 @@ class TC_TIMESYNC_2_13(MatterBaseTest):
 
         self.print_step(1, "TH1 opens a commissioning window")
         params = await self.default_controller.OpenCommissioningWindow(
-            nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=1234, option=1)
+            nodeId=self.dut_node_id, timeout=600, iteration=10000, discriminator=1234, option=1)
 
         self.print_step(2, "Commission to TH2")
         new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
@@ -104,7 +104,7 @@ class TC_TIMESYNC_2_13(MatterBaseTest):
         event = Clusters.TimeSynchronization.Events.MissingTrustedTimeSource
         cb = EventSubscriptionHandler(expected_cluster_id=event.cluster_id, expected_event_id=event.event_id)
         urgent = 1
-        subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=[(self.endpoint, event, urgent)], reportInterval=[1, 3])
+        subscription = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=[(self.endpoint, event, urgent)], reportInterval=[1, 3])
         subscription.SetEventUpdateCallback(callback=cb)
 
         self.print_step(6, "TH1 removes the TH2 fabric")

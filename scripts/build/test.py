@@ -49,7 +49,6 @@ def build_actual_output(root: str, out: str, args: List[str]) -> List[str]:
         'TI_SYSCONFIG_ROOT': 'TEST_TI_SYSCONFIG_ROOT',
         'JAVA_HOME': 'TEST_JAVA_HOME',
         'GSDK_ROOT': 'TEST_GSDK_ROOT',
-        'WISECONNECT_SDK_ROOT': 'TEST_WISECONNECT_SDK_ROOT',
         'WIFI_SDK_ROOT': 'TEST_WIFI_SDK_ROOT',
     })
 

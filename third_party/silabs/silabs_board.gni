@@ -43,13 +43,14 @@ declare_args() {
 
   # WIFI rcp boards options for wifi apps.
   use_wf200 = false
-  use_rs9116 = false
   use_SiWx917 = false
 
   wifi_soc = false
 
+  wifi_ncp_module = false
+
   #Disable MQTT by default
-  enable_dic = false
+  enable_matter_aws = false
 
   # Disable AWS SDK OTA by default
   aws_sdk_ota = false
@@ -68,12 +69,12 @@ declare_args() {
   # Enables LCD Qr Code on supported devices
   show_qr_code = !disable_lcd
 
-  # Enabling BLE on 9116/917 NCP by default
-  chip_enable_ble_rs911x = use_rs9116 || use_SiWx917
+  # Enabling BLE on 917 SoC by default
+  sl_matter_enable_siwx_ble = use_SiWx917
 }
 
 # TODO - This needs to be removed once multiplexing issues resolved
-if (use_SiWx917 || use_rs9116) {
+if (use_SiWx917) {
   disable_lcd = true
   show_qr_code = false
   use_external_flash = false
@@ -121,6 +122,9 @@ if (is_si917_board) {
   }
   silabs_family = "SiWx917-common"
   wifi_soc = true
+
+  # Enabling BLE on 917 NCP by default
+  sl_matter_enable_siwx_ble = true
 
   if (silabs_board == "BRD2708A" || silabs_board == "BRD2911A") {
     is_si917y_mcu = true

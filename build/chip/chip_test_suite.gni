@@ -89,13 +89,13 @@ template("chip_test_suite") {
 
     deps = [ dir_pw_unit_test ]
 
-    if (current_os != "zephyr" && current_os != "mbed" &&
-        chip_device_platform != "efr32") {
+    if (current_os != "zephyr" && chip_device_platform != "efr32") {
       # Depend on stdio logging, and have it take precedence over the default platform backend
       public_deps += [ "${chip_root}/src/platform/logging:stdio" ]
     } else {
       public_deps += [ "${chip_root}/src/platform/logging:default" ]
     }
+    public_deps += [ "${chip_root}/src/lib/support/tests:pw-test-macros" ]
 
     if (chip_device_platform == "esp32") {
       complete_static_lib = true

@@ -34,14 +34,14 @@ LIGHTING_ENDPOINT_ID = 1
 GROUP_ID = 0
 
 
-async def waitForActiveAndTriggerCheckIn(test, nodeid):
-    coro = test.TestWaitForActive(nodeid=nodeid, stayActiveDurationMs=10)
+async def waitForActiveAndTriggerCheckIn(test, nodeId: int):
+    coro = test.TestWaitForActive(nodeId=nodeId, stayActiveDurationMs=10)
     return await coro
 
 
-async def invalidateHalfCounterValuesAndWaitForCheckIn(test, nodeid, testEventKey):
-    await test.TestTriggerTestEventHandler(nodeid, bytes.fromhex(testEventKey), 0x0046_0000_0000_0003)
-    return await waitForActiveAndTriggerCheckIn(test, nodeid)
+async def invalidateHalfCounterValuesAndWaitForCheckIn(test, nodeId: int, testEventKey):
+    await test.TestTriggerTestEventHandler(nodeId, bytes.fromhex(testEventKey), 0x0046_0000_0000_0003)
+    return await waitForActiveAndTriggerCheckIn(test, nodeId)
 
 
 async def main():
@@ -57,32 +57,13 @@ async def main():
         metavar="<timeout-second>",
     )
     optParser.add_option(
-        "-a",
-        "--address",
-        action="store",
-        dest="deviceAddress",
-        default='',
-        type='str',
-        help="Address of the device",
-        metavar="<device-addr>",
-    )
-    optParser.add_option(
-        "--setup-payload",
-        action="store",
-        dest="setupPayload",
-        default='',
-        type='str',
-        help="Setup Payload (manual pairing code or QR code content)",
-        metavar="<setup-payload>"
-    )
-    optParser.add_option(
         "--nodeid",
         action="store",
         dest="nodeid",
         default=1,
         type=int,
         help="The Node ID issued to the device",
-        metavar="<nodeid>"
+        metavar="<node-id>"
     )
     optParser.add_option(
         "--discriminator",
@@ -91,7 +72,13 @@ async def main():
         default=TEST_DISCRIMINATOR,
         type=int,
         help="Discriminator of the device",
-        metavar="<nodeid>"
+    )
+    optParser.add_option(
+        "--passcode",
+        action="store",
+        dest="passcode",
+        type=int,
+        help="setup passcdoe",
     )
     optParser.add_option(
         "-p",
@@ -128,23 +115,23 @@ async def main():
     timeoutTicker.start()
 
     test = BaseTestHelper(
-        nodeid=112233, paaTrustStorePath=options.paaTrustStorePath, testCommissioner=True)
+        nodeId=112233, paaTrustStorePath=options.paaTrustStorePath, testCommissioner=True)
 
     devCtrl = test.devCtrl
     devCtrl.EnableICDRegistration(devCtrl.GenerateICDRegistrationParameters())
     logger.info("Testing commissioning")
-    FailIfNot(await test.TestCommissioning(ip=options.deviceAddress,
-                                           setuppin=20202021,
-                                           nodeid=options.nodeid),
+    FailIfNot(await test.TestOnNetworkCommissioning(discriminator=options.discriminator,
+                                                    setuppin=options.passcode,
+                                                    nodeId=options.nodeid),
               "Failed to finish key exchange")
     logger.info("Commissioning completed")
 
     logger.info("Testing wait for active")
-    FailIfNot(await waitForActiveAndTriggerCheckIn(test, nodeid=options.nodeid), "Failed to test wait for active")
+    FailIfNot(await waitForActiveAndTriggerCheckIn(test, nodeId=options.nodeid), "Failed to test wait for active")
     logger.info("Successfully handled wait-for-active")
 
     logger.info("Testing InvalidateHalfCounterValues for refresh key")
-    FailIfNot(await invalidateHalfCounterValuesAndWaitForCheckIn(test, nodeid=options.nodeid, testEventKey=options.testEventKey), "Failed to test wait for active")
+    FailIfNot(await invalidateHalfCounterValuesAndWaitForCheckIn(test, nodeId=options.nodeid, testEventKey=options.testEventKey), "Failed to test wait for active")
     logger.info("Successfully handled key refresh")
 
     timeoutTicker.stop()

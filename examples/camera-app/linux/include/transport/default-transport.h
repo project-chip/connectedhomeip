@@ -22,9 +22,9 @@
 class DefaultTransport : public Transport
 {
 public:
-    void SendVideo(const char * data, size_t size, int64_t timestamp, uint16_t videoStreamID) {}
-    void SendAudio(const char * data, size_t size, int64_t timestamp, uint16_t audioStreamID) {}
-    void SendAudioVideo(const char * data, size_t size, uint16_t videoSTreamID, uint16_t audioStreamID) {}
+    void SendVideo(const chip::ByteSpan & data, int64_t timestamp, uint16_t videoStreamID) {}
+    void SendAudio(const chip::ByteSpan & data, int64_t timestamp, uint16_t audioStreamID) {}
+    void SendAudioVideo(const chip::ByteSpan & data, uint16_t videoStreamID, uint16_t audioStreamID) {}
     bool CanSendVideo() { return true; }
     bool CanSendAudio() { return true; }
     virtual ~Transport() = default;

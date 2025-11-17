@@ -172,17 +172,17 @@ class SpecDefinitions:
     def get_command_names(self, cluster_name: str) -> List[str]:
         targets = self.__get_targets_by_cluster_name(
             cluster_name, _ItemType.Request)
-        return [] if targets is None else [name for name in targets]
+        return [] if targets is None else list(targets)
 
     def get_event_names(self, cluster_name: str) -> List[str]:
         targets = self.__get_targets_by_cluster_name(
             cluster_name, _ItemType.Event)
-        return [] if targets is None else [name for name in targets]
+        return [] if targets is None else list(targets)
 
     def get_attribute_names(self, cluster_name: str) -> List[str]:
         targets = self.__get_targets_by_cluster_name(
             cluster_name, _ItemType.Attribute)
-        return [] if targets is None else [name for name in targets]
+        return [] if targets is None else list(targets)
 
     def is_fabric_scoped(self, target) -> bool:
         if isinstance(target, Event):
@@ -280,7 +280,13 @@ class SpecDefinitions:
             return global_target
         if global_target is None:
             return target
-        return target | global_target
+
+        # If there is a cluster-specific type with the same name as a global
+        # one, it should take precedence over the global type.  That means
+        # "target" should be on the right of the "|" operator here: when
+        # combining dictionaries with "|", if both have a value for a key the
+        # value from the right-hand dictionary is used.
+        return global_target | target
 
 
 def SpecDefinitionsFromPaths(paths: str, pseudo_clusters: Optional[PseudoClusters] = PseudoClusters([])):

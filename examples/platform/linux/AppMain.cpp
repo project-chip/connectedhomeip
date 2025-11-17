@@ -789,7 +789,7 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
         uint16_t version  = LinuxDeviceOptions::GetInstance().tcVersion.Value();
         uint16_t required = LinuxDeviceOptions::GetInstance().tcRequired.Value();
         Optional<app::TermsAndConditions> requiredAcknowledgements(app::TermsAndConditions(required, version));
-        app::TermsAndConditionsManager::GetInstance()->Init(initParams.persistentStorageDelegate, requiredAcknowledgements);
+        app::TermsAndConditionsManager::GetInstance().Init(initParams.persistentStorageDelegate, requiredAcknowledgements);
     }
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 
@@ -911,6 +911,11 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     initParams.accessRestrictionProvider = exampleAccessRestrictionProvider.get();
 #endif
+
+    if (LinuxDeviceOptions::GetInstance().payload.commissioningFlow == CommissioningFlow::kUserActionRequired)
+    {
+        initParams.advertiseCommissionableIfNoFabrics = false;
+    }
 
     // Init ZCL Data Model and CHIP App Server
     CHIP_ERROR err = Server::GetInstance().Init(initParams);

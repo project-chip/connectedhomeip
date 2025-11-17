@@ -16,10 +16,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <optional>
 #if defined(ENABLE_CHIP_SHELL)
 
-#include "ShellCommands.h"
 #include "BindingHandler.h"
+#include "ShellCommands.h"
 
 #include <app/clusters/bindings/BindingManager.h>
 #include <lib/shell/Engine.h>
@@ -28,6 +29,7 @@
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::Clusters;
 
 namespace LightSwitchCommands {
 
@@ -140,13 +142,8 @@ CHIP_ERROR BindingGroupBindCommandHandler(int argc, char ** argv)
 {
     VerifyOrReturnError(argc == 2, CHIP_ERROR_INVALID_ARGUMENT);
 
-    EmberBindingTableEntry * entry = Platform::New<EmberBindingTableEntry>();
-    entry->type                    = MATTER_MULTICAST_BINDING;
-    entry->fabricIndex             = atoi(argv[0]);
-    entry->groupId                 = atoi(argv[1]);
-    entry->local                   = 1; // Hardcoded to endpoint 1 for now
-    entry->clusterId.emplace(6);        // Hardcoded to OnOff cluster for now
-
+    Binding::TableEntry * entry =
+        Platform::New<Binding::TableEntry>(atoi(argv[0]), atoi(argv[1]), 1, std::make_optional<ClusterId>(6));
     DeviceLayer::PlatformMgr().ScheduleWork(BindingWorkerFunction, reinterpret_cast<intptr_t>(entry));
     return CHIP_NO_ERROR;
 }
@@ -155,14 +152,8 @@ CHIP_ERROR BindingUnicastBindCommandHandler(int argc, char ** argv)
 {
     VerifyOrReturnError(argc == 3, CHIP_ERROR_INVALID_ARGUMENT);
 
-    EmberBindingTableEntry * entry = Platform::New<EmberBindingTableEntry>();
-    entry->type                    = MATTER_UNICAST_BINDING;
-    entry->fabricIndex             = atoi(argv[0]);
-    entry->nodeId                  = atoi(argv[1]);
-    entry->local                   = 1; // Hardcoded to endpoint 1 for now
-    entry->remote                  = atoi(argv[2]);
-    entry->clusterId.emplace(6); // Hardcode to OnOff cluster for now
-
+    Binding::TableEntry * entry =
+        Platform::New<Binding::TableEntry>(atoi(argv[0]), atoi(argv[1]), 1, atoi(argv[2]), std::make_optional<ClusterId>(6));
     DeviceLayer::PlatformMgr().ScheduleWork(BindingWorkerFunction, reinterpret_cast<intptr_t>(entry));
     return CHIP_NO_ERROR;
 }

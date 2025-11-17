@@ -62,7 +62,10 @@ CHIP_ERROR KeyValueStoreManagerImpl::Init(void)
     }
     ReturnErrorOnFailure(error);
 
-    constexpr osThreadAttr_t attr = { .name = "KvsKeyMapCleanupTask", .stack_size = 512 /* bytes */, .priority = osPriorityLow7 };
+    // On series 3, nvm3 security can use up to ~1100 bytes of stack during read/write operations.
+    // Provide enough stack for all platforms. The KvsKeyMapCleanupTask is deleted once the cleanup is completed and the allocated
+    // stack is freed.
+    constexpr osThreadAttr_t attr = { .name = "KvsKeyMapCleanupTask", .stack_size = 1536 /* bytes */, .priority = osPriorityLow7 };
     if (osThreadNew(KvsKeyMapCleanup, nullptr, &attr) == nullptr)
     {
         // We don't need to crash and force a reboot. we will retry at the next reboot

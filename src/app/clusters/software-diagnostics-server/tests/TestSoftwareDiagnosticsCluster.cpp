@@ -17,9 +17,11 @@
 
 #include <app/clusters/software-diagnostics-server/software-diagnostics-cluster.h>
 #include <app/clusters/software-diagnostics-server/software-diagnostics-logic.h>
+#include <app/clusters/software-diagnostics-server/software-fault-listener.h>
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/SoftwareDiagnostics/Enums.h>
 #include <clusters/SoftwareDiagnostics/Metadata.h>
 #include <lib/core/CHIPError.h>
@@ -53,6 +55,8 @@ public:
     ScopedDiagnosticsProvider(ScopedDiagnosticsProvider &&)                  = delete;
     ScopedDiagnosticsProvider & operator=(ScopedDiagnosticsProvider &&)      = delete;
 
+    T & GetProvider() { return mProvider; }
+
 private:
     DeviceLayer::DiagnosticDataProvider * mOldProvider;
     T mProvider;
@@ -73,7 +77,7 @@ TEST_F(TestSoftwareDiagnosticsCluster, CompileTest)
     ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, SoftwareDiagnostics::Id }), BitFlags<ClusterQualityFlags>());
 }
 
-TEST_F(TestSoftwareDiagnosticsCluster, AttributesTest)
+TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)
 {
     {
         // everything returns empty here ..
@@ -103,6 +107,14 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesTest)
         {
         public:
             bool SupportsWatermarks() override { return true; }
+
+            CHIP_ERROR ResetWatermarks() override
+            {
+                resetCalled = true;
+                return CHIP_NO_ERROR;
+            }
+
+            bool resetCalled = false;
         };
 
         ScopedDiagnosticsProvider<WatermarksProvider> watermarksProvider;
@@ -130,6 +142,11 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesTest)
                   CHIP_NO_ERROR);
 
         ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+
+        // Call the command, and verify it calls through to the provider
+        ASSERT_FALSE(watermarksProvider.GetProvider().resetCalled);
+        ASSERT_EQ(diag.ResetWatermarks(), CHIP_NO_ERROR);
+        ASSERT_TRUE(watermarksProvider.GetProvider().resetCalled);
     }
 
     {
@@ -202,6 +219,39 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesTest)
         EXPECT_EQ(diag.GetCurrentHighWatermark(value), CHIP_NO_ERROR);
         EXPECT_EQ(value, 456u);
     }
+
+    // Here should be test for ThreadMetrics attribute, but this will be harder to do without a testing
+    // infrastructure for clusters.
+}
+
+TEST_F(TestSoftwareDiagnosticsCluster, SoftwareFaultListenerTest)
+{
+    SoftwareDiagnosticsServerCluster cluster({});
+    chip::Test::TestServerClusterContext context;
+
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    // Notify a fault, and verify it is received
+    chip::app::Clusters::SoftwareDiagnostics::Events::SoftwareFault::Type fault;
+    fault.id = 1234;
+    fault.name.SetValue(CharSpan::fromCharString("test"));
+    const char faultData[] = "faultdata";
+    fault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(faultData), strlen(faultData)));
+
+    SoftwareDiagnostics::SoftwareFaultListener::GlobalNotifySoftwareFaultDetect(fault);
+
+    chip::app::Clusters::SoftwareDiagnostics::Events::SoftwareFault::DecodableType decodedFault;
+    auto event = context.EventsGenerator().GetNextEvent();
+    ASSERT_TRUE(event.has_value());
+    ASSERT_EQ(event->GetEventData(decodedFault), CHIP_NO_ERROR); // NOLINT(bugprone-unchecked-optional-access)
+
+    ASSERT_EQ(decodedFault.id, fault.id);
+    ASSERT_TRUE(decodedFault.name.HasValue());
+    ASSERT_TRUE(decodedFault.name.Value().data_equal(fault.name.Value()));
+    ASSERT_TRUE(decodedFault.faultRecording.HasValue());
+    ASSERT_TRUE(decodedFault.faultRecording.Value().data_equal(fault.faultRecording.Value()));
+
+    cluster.Shutdown();
 }
 
 } // namespace

@@ -69,23 +69,28 @@ TlsCertificateManagementServer::~TlsCertificateManagementServer()
     mDelegate.SetTlsCertificateManagementServer(nullptr);
 
     // unregister
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
 CHIP_ERROR TlsCertificateManagementServer::Init()
 {
-    mCertificateTable.Init(Server::GetInstance().GetPersistentStorage());
+    ReturnErrorOnFailure(mCertificateTable.Init(Server::GetInstance().GetPersistentStorage()));
 
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INTERNAL);
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
 
-    return CHIP_NO_ERROR;
+    return Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
 }
 
 CHIP_ERROR TlsCertificateManagementServer::Finish()
 {
     mCertificateTable.Finish();
+
+    TEMPORARY_RETURN_IGNORED Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
+    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
+
     return CHIP_NO_ERROR;
 }
 
@@ -252,7 +257,11 @@ void TlsCertificateManagementServer::HandleProvisionRootCertificate(HandlerConte
     }
 
     VerifyOrDieWithMsg(response.caid <= kMaxRootCertId, NotSpecified, "Spec requires CAID to be < kMaxRootCertId");
+
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+
+    MatterReportingAttributeChangeCallback(ctx.mRequestPath.mEndpointId, TlsCertificateManagement::Id,
+                                           TlsCertificateManagement::Attributes::ProvisionedRootCertificates::Id);
 }
 
 void TlsCertificateManagementServer::HandleFindRootCertificate(HandlerContext & ctx, const FindRootCertificate::DecodableType & req)
@@ -333,6 +342,13 @@ void TlsCertificateManagementServer::HandleRemoveRootCertificate(HandlerContext 
                     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState));
 
     auto result = mDelegate.RemoveRootCert(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(), req.caid);
+
+    if (result == Status::Success)
+    {
+        MatterReportingAttributeChangeCallback(ctx.mRequestPath.mEndpointId, TlsCertificateManagement::Id,
+                                               TlsCertificateManagement::Attributes::ProvisionedRootCertificates::Id);
+    }
+
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, result);
 }
 
@@ -388,6 +404,7 @@ void TlsCertificateManagementServer::HandleProvisionClientCertificate(HandlerCon
         ReturnOnFailure(Crypto::IsCertificateValidAtCurrentTime(cert),
                         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError));
     }
+    ReturnOnFailure(srcIter.GetStatus(), ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidAction));
 
     auto fabric = ctx.mCommandHandler.GetAccessingFabricIndex();
     DataModel::Nullable<Tls::TLSCCDID> foundId;
@@ -406,6 +423,13 @@ void TlsCertificateManagementServer::HandleProvisionClientCertificate(HandlerCon
                     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound));
 
     auto status = mDelegate.ProvisionClientCert(ctx.mRequestPath.mEndpointId, fabric, req);
+
+    if (status == Status::Success)
+    {
+        MatterReportingAttributeChangeCallback(ctx.mRequestPath.mEndpointId, TlsCertificateManagement::Id,
+                                               TlsCertificateManagement::Attributes::ProvisionedClientCertificates::Id);
+    }
+
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
@@ -492,7 +516,20 @@ void TlsCertificateManagementServer::HandleRemoveClientCertificate(HandlerContex
 
     auto result =
         mDelegate.RemoveClientCert(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(), req.ccdid);
+
+    if (result == Status::Success)
+    {
+        MatterReportingAttributeChangeCallback(ctx.mRequestPath.mEndpointId, TlsCertificateManagement::Id,
+                                               TlsCertificateManagement::Attributes::ProvisionedClientCertificates::Id);
+    }
+
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, result);
+}
+
+void TlsCertificateManagementServer::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
+{
+    ReturnAndLogOnFailure(mCertificateTable.RemoveFabric(fabricIndex), Zcl, "Failed to remove TLS certificate data for fabric 0x%x",
+                          fabricIndex);
 }
 
 /** @brief TlsCertificateManagement Cluster Server Init
