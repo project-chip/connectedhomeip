@@ -28,19 +28,17 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-# === END CI TEST ARGUMENTS ===""
+# === END CI TEST ARGUMENTS ===
 
 import logging
 
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.clusters.Types import NullValue
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
@@ -60,10 +58,10 @@ class TC_DISHALM_2_1(MatterBaseTest):
     def steps_TC_DISHALM_2_1(self) -> list[TestStep]:
         steps = [
             TestStep(0, "Commission DUT to TH", is_commissioning=True),
-            TestStep(1, "TH reads from the DUT the Mask attribute"),
-            TestStep(2, "TH reads from the DUT the Latch attribute"),
-            TestStep(3, "TH reads from the DUT the State attribute"),
-            TestStep(4, "TH reads from the DUT the Supported attribute")
+            TestStep(1, "TH reads from the DUT the Mask attribute", "Verify that the DUT response contains a 32-bit value"),
+            TestStep(2, "TH reads from the DUT the Latch attribute", "Verify that the DUT response contains a 32-bit value"),
+            TestStep(3, "TH reads from the DUT the State attribute", "Verify that the DUT response contains a 32-bit value"),
+            TestStep(4, "TH reads from the DUT the Supported attribute", "Verify that the DUT response contains a 32-bit value")
         ]
         return steps
 
