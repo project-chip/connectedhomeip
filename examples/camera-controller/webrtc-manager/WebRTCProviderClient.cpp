@@ -402,7 +402,7 @@ void WebRTCProviderClient::OnSessionEstablishTimeout(chip::System::Layer * syste
 
     if (self->mCurrentSessionId != 0)
     {
-        self->mRequestorServer->RemoveSession(self->mCurrentSessionId);
+        self->mRequestorServer->RemoveSession(self->mCurrentSessionId, self->mPeerId.GetNodeId(), self->mPeerId.GetFabricIndex());
         self->mCurrentSessionId = 0;
     }
 
