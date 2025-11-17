@@ -437,15 +437,6 @@ PyChipError pychip_WriteClient_TestOnlyWriteAttributesWithMismatchedTimedRequest
     size_t attributeDataLength)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-        
-    TLV::TLVReader reader;
-    reader.Init(tlvBuffer, static_cast<uint32_t>(length));
-    TEMPORARY_RETURN_IGNORED reader.Next();
-    Optional<DataVersion> dataVersion;
-    if (path.hasDataVersion == 1)
-    {
-        dataVersion.SetValue(path.dataVersion);
-    }
 
     uint16_t timedWriteTimeoutMs  = static_cast<uint16_t>(timedWriteTimeoutMsSizeT);
     uint16_t interactionTimeoutMs = static_cast<uint16_t>(interactionTimeoutMsSizeT);
