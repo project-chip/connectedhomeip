@@ -12,35 +12,41 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This is the equivalent to app_config_dependent_sources.gni
-TARGET_SOURCES(
-  ${APP_TARGET}
-  PRIVATE
-    "${CLUSTER_DIR}/BDXDownloader.cpp"
-    "${CLUSTER_DIR}/BDXDownloader.h"
-    "${CLUSTER_DIR}/CodegenIntegration.cpp"
-    "${CLUSTER_DIR}/DefaultOTARequestor.cpp"
-    "${CLUSTER_DIR}/DefaultOTARequestor.h"
-    "${CLUSTER_DIR}/DefaultOTARequestorDriver.cpp"
-    "${CLUSTER_DIR}/DefaultOTARequestorDriver.h"
-    "${CLUSTER_DIR}/DefaultOTARequestorStorage.cpp"
-    "${CLUSTER_DIR}/DefaultOTARequestorStorage.h"
-    "${CLUSTER_DIR}/DefaultOTARequestorUserConsent.h"
-    "${CLUSTER_DIR}/ExtendedOTARequestorDriver.cpp"
-    "${CLUSTER_DIR}/ExtendedOTARequestorDriver.h"
-    "${CLUSTER_DIR}/OTARequestorDriver.h"
-    "${CLUSTER_DIR}/OTARequestorStorage.h"
-    "${CLUSTER_DIR}/OTATestEventTriggerHandler.cpp"
-    "${CLUSTER_DIR}/OTATestEventTriggerHandler.h"
+LIST(
+  APPEND ota_requestor_sources
+  # This is the equivalent to app_config_dependent_sources.gni
+  "${CLUSTER_DIR}/CodegenIntegration.cpp"
+
+  # This is equivalent to BUILD.gn's ota-requestor source set.
+  "${CLUSTER_DIR}/BDXDownloader.cpp"
+  "${CLUSTER_DIR}/BDXDownloader.h"
+  "${CLUSTER_DIR}/DefaultOTARequestor.cpp"
+  "${CLUSTER_DIR}/DefaultOTARequestor.h"
+  "${CLUSTER_DIR}/DefaultOTARequestorDriver.cpp"
+  "${CLUSTER_DIR}/DefaultOTARequestorDriver.h"
+  "${CLUSTER_DIR}/DefaultOTARequestorStorage.cpp"
+  "${CLUSTER_DIR}/DefaultOTARequestorStorage.h"
+  "${CLUSTER_DIR}/DefaultOTARequestorUserConsent.h"
+  "${CLUSTER_DIR}/ExtendedOTARequestorDriver.cpp"
+  "${CLUSTER_DIR}/ExtendedOTARequestorDriver.h"
+  "${CLUSTER_DIR}/OTARequestorCluster.cpp"
+  "${CLUSTER_DIR}/OTARequestorCluster.h"
+  "${CLUSTER_DIR}/OTARequestorEventHandler.h"
+  "${CLUSTER_DIR}/OTARequestorEventHandlerRegistry.cpp"
+  "${CLUSTER_DIR}/OTARequestorEventHandlerRegistry.h"
+  "${CLUSTER_DIR}/OTATestEventTriggerHandler.cpp"
+  "${CLUSTER_DIR}/OTATestEventTriggerHandler.h"
+
+  # This is equivalent to BUILD.gn's interface source set.
+  "${CLUSTER_DIR}/OTADownloader.h"
+  "${CLUSTER_DIR}/OTARequestorDriver.h"
+  "${CLUSTER_DIR}/OTARequestorInterface.h"
+  "${CLUSTER_DIR}/OTARequestorStorage.h"
+  "${CLUSTER_DIR}/OTARequestorUserConsentDelegate.h"
 )
 
-# This is equivalent to BUILD.gn's ota-requestor source set.
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/OTARequestorCluster.cpp"
-    "${CLUSTER_DIR}/OTARequestorCluster.h"
-    "${CLUSTER_DIR}/OTARequestorEventHandler.h"
-    "${CLUSTER_DIR}/OTARequestorEventHandlerRegistry.cpp"
-    "${CLUSTER_DIR}/OTARequestorEventHandlerRegistry.h"
+    ${ota_requestor_sources}
 )

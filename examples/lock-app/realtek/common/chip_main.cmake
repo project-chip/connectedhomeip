@@ -140,11 +140,7 @@ if (matter_enable_ota_requestor)
 list(
     APPEND ${list_chip_main_sources}
     #OTARequestor
-    ${chip_dir}/src/app/clusters/ota-requestor/BDXDownloader.cpp
-    ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestor.cpp
-    ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorDriver.cpp
-    ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp
-    ${chip_dir}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
+    ${ota_requestor_sources}
     ${chip_dir}/examples/platform/realtek/ota/OTAInitializer.cpp
 )
 endif (matter_enable_ota_requestor)
