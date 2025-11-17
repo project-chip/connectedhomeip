@@ -101,8 +101,8 @@ sudo apt-get install git gcc g++ pkg-config cmake libssl-dev libdbus-1-dev \
 #### NFC builds
 
 If you plan to build with NFC support for Python tests (by passing
-`--enable_nfc true` to `build_python.sh`), you must install
-`libpcsclite-dev` before running the build script:
+`--enable_nfc true` to `build_python.sh`), you must install `libpcsclite-dev`
+before running the build script:
 
 ```sh
 sudo apt-get install libpcsclite-dev
