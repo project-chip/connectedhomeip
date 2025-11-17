@@ -226,7 +226,7 @@ class BrowserPeerConnection(BrowserWebRTCClient):
             If None, the function will wait indefinitely.
 
         Returns:
-            tuple[int, list[str]]: A tuple containing the session ID and list of ice candidate strings.
+            tuple[int, list[IceCandidate]]: A tuple containing the session ID and list of IceCandidate objects.
 
         Raises:
             asyncio.TimeoutError: If no remote offer is received within the specified timeout period.
