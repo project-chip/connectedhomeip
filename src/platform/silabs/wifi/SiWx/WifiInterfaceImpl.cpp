@@ -212,13 +212,13 @@ sl_status_t BackgroundScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t 
     VerifyOrReturnError(result != nullptr, SL_STATUS_NULL_POINTER);
     VerifyOrReturnError(wfx_rsi.scan_cb != nullptr, SL_STATUS_INVALID_HANDLE);
 
-    sl_wifi_ssid_t * requested_ssid_ptr = nullptr;
+    sl_wifi_ssid_t * requestedSsidPtr = nullptr;
     chip::ByteSpan requestedSsidSpan;
     // arg is the requested SSID pointer passed during sl_wifi_set_scan_callback
     if (arg != nullptr)
     {
-        requested_ssid_ptr = reinterpret_cast<sl_wifi_ssid_t *>(arg);
-        requestedSsidSpan  = chip::ByteSpan(requested_ssid_ptr->value, requested_ssid_ptr->length);
+        requestedSsidPtr  = reinterpret_cast<sl_wifi_ssid_t *>(arg);
+        requestedSsidSpan = chip::ByteSpan(requestedSsidPtr->value, requestedSsidPtr->length);
     }
 
     uint32_t nbreResults = result->scan_count;
@@ -902,24 +902,24 @@ CHIP_ERROR WifiInterfaceImpl::StartNetworkScan(chip::ByteSpan ssid, ::ScanCallba
     }
 
     // If an ssid was not provided, we need to call sl_wifi_start_scan with nullptr to scan all Wi-Fi networks
-    sl_wifi_ssid_t requested_ssid       = { 0 };
-    sl_wifi_ssid_t * requested_ssid_ptr = nullptr;
+    sl_wifi_ssid_t requestedSsid      = { 0 };
+    sl_wifi_ssid_t * requestedSsidPtr = nullptr;
 
     if (!ssid.empty())
     {
         // Copy the requested SSID to the sl_wifi_ssid_t structure
-        chip::MutableByteSpan requestedSsidSpan(requested_ssid.value, sizeof(requested_ssid.value));
+        chip::MutableByteSpan requestedSsidSpan(requestedSsid.value, sizeof(requestedSsid.value));
         ReturnErrorOnFailure(chip::CopySpanToMutableSpan(ssid, requestedSsidSpan));
         // Copy the length of the requested SSID to the sl_wifi_ssid_t structure
-        requested_ssid.length = static_cast<uint8_t>(ssid.size());
-        requested_ssid_ptr    = &requested_ssid;
+        requestedSsid.length = static_cast<uint8_t>(ssid.size());
+        requestedSsidPtr     = &requestedSsid;
     }
 
     osSemaphoreAcquire(sScanInProgressSemaphore, osWaitForever);
 
-    // NOTE: sending requested_ssid_ptr as background scan does not filter for SSID
-    sl_wifi_set_scan_callback(BackgroundScanCallback, requested_ssid_ptr);
-    status = sl_wifi_start_scan(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, requested_ssid_ptr, &wifi_scan_configuration);
+    // NOTE: sending requestedSsidPtr as background scan does not filter for SSID
+    sl_wifi_set_scan_callback(BackgroundScanCallback, requestedSsidPtr);
+    status = sl_wifi_start_scan(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, requestedSsidPtr, &wifi_scan_configuration);
 
     if (SL_STATUS_IN_PROGRESS == status)
     {
