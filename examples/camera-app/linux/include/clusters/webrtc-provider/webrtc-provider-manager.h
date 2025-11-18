@@ -135,6 +135,9 @@ private:
     static void OnDeviceConnectionFailure(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error);
 
     // WebRTC Callbacks
+    void OnLocalDescription(const std::string & sdp, SDPType type, const uint16_t sessionId);
+    void OnConnectionStateChanged(bool connected, const uint16_t sessionId);
+
     /**
      * Called when a new ICE candidate is available for trickle ICE.
      * This callback is triggered during an active WebRTC session to notify that

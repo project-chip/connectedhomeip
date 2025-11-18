@@ -23,6 +23,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/ScopedNodeId.h>
 
+#include <mutex>
 #include <string>
 
 using OnTransportLocalDescriptionCallback = std::function<void(const std::string & sdp, SDPType type, const int16_t sessionId)>;
@@ -107,13 +108,19 @@ public:
 
     void SetSdpAnswer(std::string localSdp) { mLocalSdp = localSdp; }
 
-    const std::vector<ICECandidateInfo> & GetCandidates() { return mLocalCandidates; }
+    std::vector<ICECandidateInfo> GetCandidates()
+    {
+        std::lock_guard<std::mutex> lock(mCandidatesMutex);
+        return mLocalCandidates;
+    }
 
     // Drain candidates - returns all accumulated candidates and clears the internal list
     // This prevents resending the same candidates multiple times during trickle ICE
-    std::vector<ICECandidateInfo> DrainCandidates() { return std::move(mLocalCandidates); }
-
-    void SetCandidates(std::vector<ICECandidateInfo> candidates) { mLocalCandidates = candidates; }
+    std::vector<ICECandidateInfo> DrainCandidates()
+    {
+        std::lock_guard<std::mutex> lock(mCandidatesMutex);
+        return std::move(mLocalCandidates);
+    }
 
     void AddRemoteCandidate(const std::string & candidate, const std::string & mid);
 
@@ -145,6 +152,7 @@ private:
     std::string mLocalSdp;
     SDPType mLocalSdpType;
     std::vector<ICECandidateInfo> mLocalCandidates;
+    std::mutex mCandidatesMutex;
 
     RequestArgs mRequestArgs;
     OnTransportLocalDescriptionCallback mOnLocalDescription = nullptr;
