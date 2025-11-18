@@ -64,6 +64,7 @@ __LOG_LEVELS__ = {
     "debug": logging.DEBUG,
     "info": logging.INFO,
     "warn": logging.WARNING,
+    "error": logging.ERROR,
     "fatal": logging.FATAL,
 }
 
