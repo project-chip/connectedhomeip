@@ -58,7 +58,7 @@ extern "C" {
 
 #if (EXP_BOARD)
 #include "rsi_bt_common_apis.h"
-#include <platform/silabs/wifi/SiWx/ncp/sl_board_configuration.h>
+#include "sl_board_configuration.h"
 #endif
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -875,9 +875,8 @@ CHIP_ERROR WifiInterfaceImpl::ConfigurePowerSave(PowerSaveInterface::PowerSaveCo
     VerifyOrReturnError(error == RSI_SUCCESS, CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "rsi_bt_power_save_profile failed: %ld", error));
 
-    sl_wifi_performance_profile_v2_t wifi_profile = { .profile = ConvertPowerSaveConfiguration(configuration),
-                                                      // TODO: Performance profile fails if not aligned with DTIM
-                                                      .dtim_aligned_type = SL_SI91X_ALIGN_WITH_DTIM_BEACON,
+    sl_wifi_performance_profile_v2_t wifi_profile = { .profile           = ConvertPowerSaveConfiguration(configuration),
+                                                      .dtim_aligned_type = SL_SI91X_ALIGN_WITH_BEACON,
                                                       .listen_interval   = listenInterval };
 
     sl_status_t status = sl_wifi_set_performance_profile_v2(&wifi_profile);
