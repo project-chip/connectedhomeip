@@ -18,8 +18,8 @@
 
 #include "window.h"
 
-#include <app/data-model/Nullable.h>
 #include <app-common/zap-generated/cluster-enums.h>
+#include <app/data-model/Nullable.h>
 
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
