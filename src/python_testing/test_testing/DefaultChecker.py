@@ -130,7 +130,7 @@ class DefaultChecker():
         if cluster in self.endpoints[0].keys():
             label_list = self.endpoints[0][cluster][attr]
 
-            if any([label for label in label_list if label in DEFAULT_FIXED_LABEL_VALUES]):
+            if any(label for label in label_list if label in DEFAULT_FIXED_LABEL_VALUES):
                 return _problem(AttributePathLocation(0, cluster.id, attr.attribute_id), f"Fixed label list contains default labels:\ndefaults {DEFAULT_FIXED_LABEL_VALUES}\nlist={label_list}")
         else:
             self.mark_current_step_skipped()

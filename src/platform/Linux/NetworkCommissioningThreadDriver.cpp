@@ -46,7 +46,7 @@ CHIP_ERROR LinuxThreadDriver::Init(BaseDriver::NetworkStatusChangeCallback * net
     VerifyOrReturnError(ConnectivityMgrImpl().IsThreadAttached(), CHIP_NO_ERROR);
     VerifyOrReturnError(ThreadStackMgrImpl().GetThreadProvision(mStagingNetwork) == CHIP_NO_ERROR, CHIP_NO_ERROR);
 
-    mSavedNetwork.Init(mStagingNetwork.AsByteSpan());
+    ReturnErrorOnFailure(mSavedNetwork.Init(mStagingNetwork.AsByteSpan()));
 
     ThreadStackMgrImpl().SetNetworkStatusChangeCallback(networkStatusChangeCallback);
 
@@ -79,7 +79,7 @@ Status LinuxThreadDriver::AddOrUpdateNetwork(ByteSpan operationalDataset, Mutabl
     Thread::OperationalDataset newDataset;
     outDebugText.reduce_size(0);
     outNetworkIndex = 0;
-    newDataset.Init(operationalDataset);
+    TEMPORARY_RETURN_IGNORED newDataset.Init(operationalDataset);
     VerifyOrReturnError(newDataset.IsCommissioned(), Status::kOutOfRange);
 
     VerifyOrReturnError(!mStagingNetwork.IsCommissioned() || memcmp(extpanid, newExtpanid, kSizeExtendedPanId) == 0,
@@ -212,7 +212,7 @@ ThreadCapabilities LinuxThreadDriver::GetSupportedThreadFeatures()
 uint16_t LinuxThreadDriver::GetThreadVersion()
 {
     uint16_t version = 0;
-    ThreadStackMgrImpl().GetThreadVersion(version);
+    TEMPORARY_RETURN_IGNORED ThreadStackMgrImpl().GetThreadVersion(version);
     return version;
 }
 

@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -121,7 +122,7 @@ class TC_IDM_2_2(BasicCompositionTests):
                 "PartsList attribute should always be present")
 
             # Server list matches returned clusters
-            returned_clusters = sorted(list(read_response.tlvAttributes[endpoint].keys()))
+            returned_clusters = sorted(read_response.tlvAttributes[endpoint].keys())
             server_list = sorted(read_response.tlvAttributes[endpoint][Clusters.Descriptor.id][
                 Clusters.Descriptor.Attributes.ServerList.attribute_id])
             asserts.assert_equal(returned_clusters, server_list,
@@ -134,9 +135,9 @@ class TC_IDM_2_2(BasicCompositionTests):
                 if global_attribute_ids.cluster_id_type(cluster) != global_attribute_ids.ClusterIdType.kStandard:
                     continue
 
-                returned_attrs = sorted([x for x in read_response.tlvAttributes[endpoint][cluster].keys()])
-                attr_list = sorted([x for x in read_response.tlvAttributes[endpoint][cluster][
-                    ClusterObjects.ALL_CLUSTERS[cluster].Attributes.AttributeList.attribute_id]])
+                returned_attrs = sorted(read_response.tlvAttributes[endpoint][cluster].keys())
+                attr_list = sorted(read_response.tlvAttributes[endpoint][cluster][
+                    ClusterObjects.ALL_CLUSTERS[cluster].Attributes.AttributeList.attribute_id])
                 asserts.assert_equal(returned_attrs, attr_list,
                                      f"Mismatch for {cluster} at endpoint {endpoint}")
 
@@ -180,9 +181,9 @@ class TC_IDM_2_2(BasicCompositionTests):
                         # Extra assertion to ensure cluster_id exists before accessing (defense in depth)
                         asserts.assert_in(cluster_id, read_response.tlvAttributes[ep],
                                           f"Cluster {cluster_id} not found in endpoint {ep}")
-                        returned_attrs = sorted([x for x in read_response.tlvAttributes[ep][cluster_id].keys()])
-                        attr_list = sorted([x for x in read_response.tlvAttributes[ep][cluster_id][
-                            ClusterObjects.ALL_CLUSTERS[cluster_id].Attributes.AttributeList.attribute_id]])
+                        returned_attrs = sorted(read_response.tlvAttributes[ep][cluster_id].keys())
+                        attr_list = sorted(read_response.tlvAttributes[ep][cluster_id][
+                            ClusterObjects.ALL_CLUSTERS[cluster_id].Attributes.AttributeList.attribute_id])
                         asserts.assert_equal(
                             returned_attrs,
                             attr_list,
@@ -222,7 +223,7 @@ class TC_IDM_2_2(BasicCompositionTests):
             if global_attribute_ids.cluster_id_type(cluster.id) == global_attribute_ids.ClusterIdType.kStandard:
                 returned_attrs = sorted([x.attribute_id for x in read_request[endpoint][cluster].keys()
                                          if x != Clusters.Attribute.DataVersion])
-                attr_list = sorted([x for x in read_request[endpoint][cluster][cluster.Attributes.AttributeList]])
+                attr_list = sorted(read_request[endpoint][cluster][cluster.Attributes.AttributeList])
                 asserts.assert_equal(
                     returned_attrs,
                     attr_list,
@@ -475,7 +476,7 @@ class TC_IDM_2_2(BasicCompositionTests):
             TH2.Shutdown()
 
     async def _read_all_events_attributes(self):
-        return await self.default_controller.Read(nodeid=self.dut_node_id, attributes=[()], events=[()])
+        return await self.default_controller.Read(nodeId=self.dut_node_id, attributes=[()], events=[()])
 
     async def _read_data_version_filter_multiple_clusters(self, endpoint, cluster, attribute, other_cluster, other_attribute):
         read_a = await self.default_controller.ReadAttribute(
@@ -539,7 +540,7 @@ class TC_IDM_2_2(BasicCompositionTests):
 
         # Server list validation
         for endpoint in read_request.tlvAttributes:
-            returned_clusters = sorted(list(read_request.tlvAttributes[endpoint].keys()))
+            returned_clusters = sorted(read_request.tlvAttributes[endpoint].keys())
             server_list = sorted(read_request.tlvAttributes[endpoint][Clusters.Descriptor.id]
                                  [Clusters.Descriptor.Attributes.ServerList.attribute_id])
             asserts.assert_equal(returned_clusters, server_list)

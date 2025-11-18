@@ -64,7 +64,7 @@ ZoneMgmtServer::~ZoneMgmtServer()
     mDelegate.SetZoneMgmtServer(nullptr);
 
     // Unregister command handler and attribute access interfaces
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
@@ -134,7 +134,7 @@ void ZoneMgmtServer::LoadPersistentAttributes()
     }
 
     // Signal delegate that all persistent configuration attributes have been loaded.
-    mDelegate.PersistentAttributesLoadedCallback();
+    TEMPORARY_RETURN_IGNORED mDelegate.PersistentAttributesLoadedCallback();
 }
 
 CHIP_ERROR ZoneMgmtServer::ReadAndEncodeZones(const AttributeValueEncoder::ListEncodeHelper & encoder)
@@ -520,7 +520,7 @@ void ZoneMgmtServer::HandleCreateTwoDCartesianZone(HandlerContext & ctx,
     ZoneInformationStorage zoneInfo;
     zoneInfo.Set(zoneID, ZoneTypeEnum::kTwoDCARTZone, ZoneSourceEnum::kUser, MakeOptional(twoDCartZoneStorage));
 
-    AddZone(zoneInfo);
+    TEMPORARY_RETURN_IGNORED AddZone(zoneInfo);
     mUserDefinedZonesCount++;
 
     response.zoneID = zoneID;
@@ -613,7 +613,7 @@ void ZoneMgmtServer::HandleUpdateTwoDCartesianZone(HandlerContext & ctx,
     ZoneInformationStorage zoneInfo;
     zoneInfo.Set(zoneID, ZoneTypeEnum::kTwoDCARTZone, ZoneSourceEnum::kUser, MakeOptional(twoDCartZoneStorage));
 
-    UpdateZone(zoneID, zoneInfo);
+    TEMPORARY_RETURN_IGNORED UpdateZone(zoneID, zoneInfo);
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Success);
 }
@@ -651,7 +651,7 @@ void ZoneMgmtServer::HandleRemoveZone(HandlerContext & ctx, const Commands::Remo
 
     if (status == Status::Success)
     {
-        RemoveZone(zoneID);
+        TEMPORARY_RETURN_IGNORED RemoveZone(zoneID);
         mUserDefinedZonesCount--;
     }
 
