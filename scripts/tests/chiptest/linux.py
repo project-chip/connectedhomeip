@@ -229,7 +229,7 @@ class BluetoothMock(subprocess.Popen):
         for line in self.stderr:
             if "adapter[1][00:00:00:22:22:22]" in line:
                 self.event.set()
-            log.debug("%s", line.strip())
+            log.debug(line.strip())
 
     def __init__(self):
         adapters = [f"--adapter={mac}" for mac in self.ADAPTERS]

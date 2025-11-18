@@ -26,7 +26,7 @@ from .derivation import AddBaseInfoPostProcessor
 from .parsing import (AttributesToAttribute, AttributesToBitFieldConstantEntry, AttributesToCommand, AttributesToEvent,
                       AttributesToField, NormalizeDataType, NormalizeName, ParseInt, ParseOptionalInt, StringToAccessPrivilege)
 
-LOGGER = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 def is_unused_name(attrs: AttributesImpl):
@@ -58,8 +58,7 @@ class FeaturesHandler(BaseHandler):
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "feature":
             if is_unused_name(attrs):
-                LOGGER.warning(
-                    f"Ignoring feature constant data for {attrs['name']}")
+                log.warning("Ignoring feature constant data for '%s'", attrs['name'])
                 return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
 
             self._bitmap.entries.append(
@@ -220,19 +219,16 @@ class FieldHandler(BaseHandler):
                 self._field.qualities = self._field.qualities | FieldQuality.NULLABLE
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         elif name == "enum":
-            LOGGER.warning(
-                f"Anonymous enumeration not supported when handling field {self._field.name}")
+            log.warning("Anonymous enumeration not supported when handling field '%s'", self._field.name)
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "bitmap":
-            LOGGER.warning(
-                f"Anonymous bitmap not supported when handling field {self._field.name}")
+            log.warning("Anonymous bitmap not supported when handling field '%s'", self._field.name)
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "entry":
             # Lists have "type=list" and then the type is inside entry
 
             if self._field.data_type.name != "list":
-                LOGGER.warning(
-                    f"Entry type provided for non-list element {self._field.name}")
+                log.warning("Entry type provided for non-list element '%s'", self._field.name)
 
             assert "type" in attrs
 
@@ -329,8 +325,8 @@ class EnumHandler(BaseHandler):
         elif name == "item":
             for key in ["name", "value"]:
                 if key not in attrs:
-                    LOGGER.error("Enumeration %s entry is missing a '%s' entry (at %r)",
-                                 self._enum.name, key, self.context.GetCurrentLocationMeta())
+                    log.error("Enumeration '%s' entry is missing a '%s' entry (at %r)",
+                              self._enum.name, key, self.context.GetCurrentLocationMeta())
                     # bad entry, nothing I can do about it.
                     return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
 
@@ -388,12 +384,12 @@ class AttributeHandler(BaseHandler):
 
     def GetNextProcessor(self, name: str, attrs: AttributesImpl):
         if name == "enum":
-            LOGGER.warning(
-                f"Anonymous enumeration not supported when handling attribute {self._cluster.name}::{self._attribute.definition.name}")
+            log.warning("Anonymous enumeration not supported when handling attribute '%s::%s'",
+                        self._cluster.name, self._attribute.definition.name)
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "bitmap":
-            LOGGER.warning(
-                f"Anonymous bitmap not supported when handling attribute {self._cluster.name}::{self._attribute.definition.name}")
+            log.warning("Anonymous bitmap not supported when handling attribute '%s::%s'",
+                        self._cluster.name, self._attribute.definition.name)
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "access":
             if "readPrivilege" in attrs:
@@ -444,7 +440,7 @@ class AttributesHandler(BaseHandler):
     def GetNextProcessor(self, name: str, attrs: AttributesImpl):
         if name == "attribute":
             if is_unused_name(attrs):
-                LOGGER.warning(f"Ignoring attribute data for {attrs['name']}")
+                log.warning("Ignoring attribute data for '%s'", attrs['name'])
                 return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
             return AttributeHandler(self.context, self._cluster, attrs)
         else:
@@ -481,8 +477,8 @@ class CommandHandler(BaseHandler):
         elif ("direction" in attrs) and attrs["direction"] == "responseFromServer":
             is_command = False  # response
         else:
-            LOGGER.warning("Could not clearly determine command direction: %s",
-                           list(attrs.items()))
+            log.warning("Could not clearly determine command direction: %s",
+                        list(attrs.items()))
             # Do a best-guess. However we should NOT need to guess once
             # we have a good data set
             is_command = not attrs["name"].endswith("Response")
@@ -524,8 +520,7 @@ class CommandHandler(BaseHandler):
                     self._command.invokeacl = StringToAccessPrivilege(
                         attrs["invokePrivilege"])
                 else:
-                    LOGGER.warning(
-                        f"Ignoring invoke privilege for {self._struct.name}")
+                    log.warning("Ignoring invoke privilege for '%s'", self._struct.name)
 
             if self._command:
                 if "timed" in attrs and attrs["timed"] != "false":
@@ -551,12 +546,11 @@ class CommandsHandler(BaseHandler):
     def GetNextProcessor(self, name: str, attrs: AttributesImpl):
         if name == "command":
             if is_unused_name(attrs):
-                LOGGER.warning(f"Ignoring command data for {attrs['name']}")
+                log.warning("Ignoring command data for '%s'", attrs['name'])
                 return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
 
             if 'id' not in attrs:
-                LOGGER.error(
-                    f"Could not process command {attrs['name']}: no id")
+                log.error("Could not process command '%s': no id", attrs['name'])
                 # TODO: skip over these without failing the processing
                 #
                 # https://github.com/csa-data-model/projects/issues/364
@@ -591,8 +585,7 @@ class RevisionHistoryHandler(BaseHandler):
     def GetNextProcessor(self, name: str, attrs: AttributesImpl):
         if name == "revision":
             if 'revision' not in attrs:
-                LOGGER.error(
-                    f"Could not find a revision for {attrs}: no revision data")
+                log.error("Could not find a revision for %s: no revision data", attrs)
                 return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
             else:
                 rev = int(attrs['revision'])

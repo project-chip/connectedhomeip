@@ -18,7 +18,7 @@ from typing import List, Optional
 
 from matter.idl.matter_idl_types import Cluster, Idl, ParseMetaData
 
-LOGGER = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class IdlPostProcessor:
@@ -125,7 +125,7 @@ class Context:
             if where:
                 msg = msg + " at " + where
 
-            LOGGER.warning(msg)
+            log.warning(msg)
             self._not_handled.add(path)
 
     def AddIdlPostProcessor(self, processor: IdlPostProcessor, has_priority: bool = False):

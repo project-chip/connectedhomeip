@@ -317,7 +317,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
             energy_gateway_app, energy_management_app, closure_app, matter_repl_yaml_tester,
             chip_tool_with_python, pics_file, keep_going, test_timeout_seconds, expected_failures, ble_wifi):
     if expected_failures != 0 and not keep_going:
-        log.exception("--expected-failures '%s' used without '--keep-going'", expected_failures)
+        log.error("--expected-failures '%s' used without '--keep-going'", expected_failures)
         sys.exit(2)
 
     runner = chiptest.runner.Runner()
@@ -470,7 +470,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
                     sys.exit(2)
 
         if observed_failures != expected_failures:
-            log.exception("Iteration %d: expected failure count %d, but got %d", i, expected_failures, observed_failures)
+            log.error("Iteration %d: expected failure count %d, but got %d", i, expected_failures, observed_failures)
             cleanup()
             sys.exit(2)
 

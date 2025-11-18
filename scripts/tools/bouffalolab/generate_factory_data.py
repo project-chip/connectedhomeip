@@ -18,7 +18,7 @@
 import argparse
 import base64
 import binascii
-import logging as log
+import logging
 import os
 import random
 import secrets
@@ -35,6 +35,8 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.serialization import load_der_private_key
 from cryptography.x509.oid import ObjectIdentifier
+
+log = logging.getLogger(__name__)
 
 MATTER_ROOT = os.path.dirname(os.path.realpath(__file__))[:-len("/scripts/tools/bouffalolab")]
 
@@ -188,7 +190,7 @@ def gen_test_certs(chip_cert: str,
                        "--pai", pai_cert,
                        "--paa", paa_cert,
                        ]
-                log.info("Verify Certificate Chain: {}".format(shlex.join(cmd)))
+                log.info("Verify Certificate Chain: %s", shlex.join(cmd))
                 subprocess.run(cmd)
 
     def gen_dac_certificate(chip_cert, device_name, dac_vid, dac_pid, pai_cert, pai_key, dac_cert, dac_key, pai_issue_date, pai_expire_date, discriminator):
@@ -217,7 +219,7 @@ def gen_test_certs(chip_cert: str,
                    "--valid-from", valid_from,
                    "--lifetime", str(lifetime),
                    ]
-            log.info("Generate DAC: {}".format(shlex.join(cmd)))
+            log.info("Generate DAC: %s", shlex.join(cmd))
             subprocess.run(cmd)
 
     def convert_pem_to_der(chip_cert, action, pem):
@@ -260,7 +262,7 @@ def gen_test_certs(chip_cert: str,
         if paa_cert:
             cmd += ["--authorized-paa-cert", paa_cert]
 
-        log.info("Generate CD: {}".format(shlex.join(cmd)))
+        log.info("Generate CD: %s", shlex.join(cmd))
         subprocess.run(cmd)
 
     pai_vendor_id, pai_product_id, pai_issue_date, pai_expire_date = parse_cert_file(pai_cert)
@@ -449,11 +451,11 @@ def main():
 
         if not isinstance(args.output, str) or not os.path.exists(args.output):
             raise Exception("output path is not specified or not existed.")
-        log.info("output path: {}".format(args.output))
+        log.info("output path: '%s'", args.output)
 
         if not isinstance(args.chip_cert, str) or not os.path.exists(args.chip_cert):
             raise Exception("chip-cert should be built before and is specified.")
-        log.info("chip-cert path: {}".format(args.chip_cert))
+        log.info("chip-cert path: '%s'", args.chip_cert)
 
     def to_bytes(input):
         if isinstance(input, str):
@@ -505,7 +507,7 @@ def main():
 
     args = parser.parse_args()
 
-    log.basicConfig(format='[%(levelname)s] %(message)s', level=log.INFO)
+    logging.basicConfig(format='[%(levelname)s] %(message)s', level=logging.INFO)
 
     check_arg(args)
 
@@ -557,20 +559,19 @@ def main():
 
     log.info("")
     log.info("Output as below: ")
-    log.info("Passcode: {}".format(passcode))
-    log.info("Discriminator ID: {}".format(discriminator))
-    log.info("Rotating Unique ID: {}".format(unique_id.hex()))
-    log.info("Rotating Unique ID base64 code: {}".format(base64.b64encode(unique_id).decode()))
-    log.info("SPAKE2+ iteration: {}".format(spake2p_it))
-    log.info("SPAKE2+ slat: {}".format(spake2p_salt.hex()))
-    log.info("SPAKE2+ slat base code: {}".format(base64.b64encode(spake2p_salt).decode()))
-    log.info("Manual code: {}".format(manualcode))
-    log.info("QR code: {}".format(qrcode))
+    log.info("Passcode: '%s'", passcode)
+    log.info("Discriminator ID: '%s'", discriminator)
+    log.info("Rotating Unique ID: '%s'", unique_id.hex())
+    log.info("Rotating Unique ID base64 code: '%s'", base64.b64encode(unique_id).decode())
+    log.info("SPAKE2+ iteration: '%s'", spake2p_it)
+    log.info("SPAKE2+ slat: '%s'", spake2p_salt.hex())
+    log.info("SPAKE2+ slat base code: '%s'", base64.b64encode(spake2p_salt).decode())
+    log.info("Manual code: '%s'", manualcode)
+    log.info("QR code: '%s'", qrcode)
 
     log.info("")
-    log.info("MFD partition file: {}".format(mfd_output))
-    log.info("QR code PNG file: {}".format(onboard_png))
+    log.info("MFD partition file: '%s'", mfd_output)
+    log.info("QR code PNG file: '%s'", onboard_png)
 
-
-if __name__ == "__main__":
-    main()
+    if __name__ == "__main__":
+        main()
