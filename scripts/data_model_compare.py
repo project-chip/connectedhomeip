@@ -123,7 +123,7 @@ def _compare_maturity(matter_items, data_model_items, path: list[str] = []):
             continue
 
         if matter_item.api_maturity != data_model_item.api_maturity:
-            logging.error("%s - different maturity: %s != %s", "::".join(current_path), data_model_item.api_maturity, matter_item.api_maturity)
+            logging.error("Different maturity: %s != %s: %s", data_model_item.api_maturity, matter_item.api_maturity, "::".join(current_path))
             had_diffs = True
 
         # TODO: recurse!
