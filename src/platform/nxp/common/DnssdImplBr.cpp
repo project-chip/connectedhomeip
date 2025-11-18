@@ -247,7 +247,9 @@ CHIP_ERROR NxpChipDnssdRemoveServices()
 
         if ((0 == strcmp(mServiceList[mServiceListFreeIndex]->mHostName, hostName)) &&
             ((0 == strcmp(mServiceList[mServiceListFreeIndex]->mServiceType, "_matter._tcp")) ||
-             (0 == strcmp(mServiceList[mServiceListFreeIndex]->mServiceType, "_matterc._udp"))))
+             (0 == strcmp(mServiceList[mServiceListFreeIndex]->mServiceType, "_matterc._udp"))) &&
+            (mServiceList[mServiceListFreeIndex]->mTtl > 0))
+        // if mTtl = 0 , the service is already in the removal process but not yet removed
         {
             mServiceListFreeIndex++;
         }
