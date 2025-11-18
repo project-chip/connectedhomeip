@@ -79,7 +79,7 @@ class LogPipe(threading.Thread):
                     break
             except OSError:
                 break
-            log.log(self.level, line.strip('\n'))
+            log.log(self.level, line.strip())
             self.captured_logs.append(line)
             if self.capture_delegate:
                 self.capture_delegate.Log(self.name, line)
@@ -168,4 +168,4 @@ class Runner:
             else:
                 raise Exception('Command %r failed: %d' % (cmd, s.returncode))
 
-        log.debug('Command %r completed with error code 0', cmd)
+        log.debug("Command %r completed with error code 0", cmd)

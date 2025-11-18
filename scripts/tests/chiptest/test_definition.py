@@ -135,11 +135,11 @@ class App:
         app_cmd = self.command + ['--interface-id', str(-1)]
 
         if not self.options:
-            log.debug('Executing application under test with default args')
+            log.debug("Executing application under test with default args")
         else:
-            log.debug('Executing application under test with the following args:')
+            log.debug("Executing application under test with the following args:")
             for key, value in self.options.items():
-                log.debug('   %s: %s', key, value)
+                log.debug("   %s: %s", key, value)
                 app_cmd = app_cmd + [key, value]
                 if key == '--KVS':
                     self.kvsPathSet.add(value)
@@ -156,7 +156,7 @@ class App:
 
         while not ready:
             if server_process.poll() is not None:
-                died_str = ('Server died while waiting for %s, returncode %d' %
+                died_str = ("Server died while waiting for %s, returncode %d" %
                             (waitForString, server_process.returncode))
                 log.error(died_str)
                 raise Exception(died_str)
@@ -185,10 +185,10 @@ class App:
             try:
                 exit_code = self.process.wait(10)
                 if exit_code:
-                    log.error('Subprocess failed with exit code: %d', exit_code)
+                    log.error("Subprocess failed with exit code: %d", exit_code)
                     return False
             except subprocess.TimeoutExpired:
-                log.debug('Subprocess did not terminate on SIGTERM, killing it now')
+                log.debug("Subprocess did not terminate on SIGTERM, killing it now")
                 self.process.kill()
                 # The exit code when using Python subprocess will be the signal used to kill it.
                 # Ideally, we would recover the original exit code, but the process was already
@@ -302,10 +302,10 @@ class ExecutionCapture:
             ))
 
     def LogContents(self):
-        log.error('================ CAPTURED LOG START ==================')
+        log.error("================ CAPTURED LOG START ==================")
         with self.lock:
             for entry in self.captures:
-                log.error('%02d:%02d:%02d.%03d - %-10s: %s',
+                log.error("%02d:%02d:%02d.%03d - %-10s: %s",
                           entry.when.hour,
                           entry.when.minute,
                           entry.when.second,
@@ -313,7 +313,7 @@ class ExecutionCapture:
                           entry.source,
                           entry.line
                           )
-        log.error('================ CAPTURED LOG END ====================')
+        log.error("================ CAPTURED LOG END ====================")
 
 
 class TestTag(Enum):

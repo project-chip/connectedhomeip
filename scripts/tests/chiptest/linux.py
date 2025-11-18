@@ -161,10 +161,10 @@ class IsolatedNetworkNamespace:
         # IPv6 does Duplicate Address Detection even though
         # we know ULAs provided are isolated. Wait for 'tentative'
         # address to be gone.
-        log.info('Waiting for IPv6 DaD to complete (no tentative addresses)')
+        log.info("Waiting for IPv6 DaD to complete (no tentative addresses)")
         for _ in range(100):  # wait at most 10 seconds
             if 'tentative' not in subprocess.check_output(['ip', 'addr'], text=True):
-                log.info('No more tentative addresses')
+                log.info("No more tentative addresses")
                 break
             time.sleep(0.1)
         else:
