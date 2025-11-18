@@ -1883,22 +1883,6 @@ cluster UserLabel = 65 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** This cluster provides an interface to a boolean state called StateValue. */
-cluster BooleanState = 69 {
-  revision 1;
-
-  info event StateChange = 0 {
-    boolean stateValue = 0;
-  }
-
-  readonly attribute boolean stateValue = 0;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
 /** Allows servers to ensure that listed clients are notified when a server is available for communication. */
 cluster IcdManagement = 70 {
   revision 3;
@@ -2367,16 +2351,4 @@ endpoint 1 {
     callback attribute featureMap;
     callback attribute clusterRevision;
   }
-
-  server cluster BooleanState {
-    emits event StateChange;
-    callback attribute stateValue;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    callback attribute featureMap;
-    callback attribute clusterRevision;
-  }
 }
-
-
