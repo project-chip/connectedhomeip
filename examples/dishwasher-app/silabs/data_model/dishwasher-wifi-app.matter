@@ -2145,19 +2145,19 @@ provisional cluster DeviceEnergyManagement = 152 {
     elapsed_s duration = 2;
   }
 
-  provisional info event PowerAdjustStart = 0 {
+  info event PowerAdjustStart = 0 {
   }
 
-  provisional info event PowerAdjustEnd = 1 {
+  info event PowerAdjustEnd = 1 {
     CauseEnum cause = 0;
     elapsed_s duration = 1;
     energy_mwh energyUse = 2;
   }
 
-  provisional info event Paused = 2 {
+  info event Paused = 2 {
   }
 
-  provisional info event Resumed = 3 {
+  info event Resumed = 3 {
     CauseEnum cause = 0;
   }
 

@@ -42,12 +42,15 @@ from datetime import datetime, timedelta, timezone
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 cluster = Clusters.Thermostat
+time_sync_cluster = Clusters.TimeSynchronization
 
 
 class TC_TSTAT_4_3(MatterBaseTest):
@@ -94,7 +97,9 @@ class TC_TSTAT_4_3(MatterBaseTest):
         steps = [
             TestStep("1", "Commissioning, already done",
                      is_commissioning=True),
-            TestStep("2", "TH reads the Presets attribute and saves it in a SupportedPresets variable.",
+            TestStep("2a", "TH reads the FeatureMap attribute.",
+                     "Verify that the TSUGGEST bit is set in the FeatureMap value."),
+            TestStep("2b", "TH reads the Presets attribute and saves it in a SupportedPresets variable.",
                      "Verify that the read returned a list of presets with count >=2."),
             TestStep("3", "TH reads the ActivePresetHandle attribute. TH picks a preset handle from an entry in the SupportedPresets that does not match the ActivePresetHandle and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp and the ExpirationInMinutes is set to 1 minute.",
                      "Verify that the AddThermostatSuggestion command returns INVALID_IN_STATE."),
@@ -139,7 +144,16 @@ class TC_TSTAT_4_3(MatterBaseTest):
         self.step("1")
         # Commission DUT - already done
 
-        self.step("2")
+        self.step("2a")
+        if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
+            # TH reads the FeatureMap attribute.
+            feature_map = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.FeatureMap)
+            logger.info(f"FeatureMap: {feature_map}")
+
+            # Verify that the TSUGGEST bit is set in the FeatureMap value.
+            asserts.assert_true(feature_map & 0b10000000000, "TSUGGEST bit is not set in the FeatureMap")
+
+        self.step("2b")
         if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
             # TH reads the Presets attribute and saves it in a SupportedPresets variable.
             supported_presets = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Presets)
@@ -148,23 +162,23 @@ class TC_TSTAT_4_3(MatterBaseTest):
             # Verify that the read returned a list of presets with count >=2.
             asserts.assert_greater_equal(len(supported_presets), 2)
 
-        # TODO Remove skipTimeSync once TimeSync details are ironed out in the test plan
-        skipTimeSync = True
-        if not skipTimeSync:
-            self.step("3")
-            if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
+        self.step("3")
+        if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
+            # TH reads the UTCTime attribute.
+            currentUTC = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=time_sync_cluster, attribute=cluster.Attributes.UTCTime)
+
+            if currentUTC is NullValue:
                 # TH reads the ActivePresetHandle attribute.
                 activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
                 logger.info(f"Active Preset Handlers: {activePresetHandle}")
-
+    
                 # TH picks a preset handle from an entry in the SupportedPresets that does not match the ActivePresetHandle and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp and the ExpirationInMinutes is set to 1 minute.
                 possiblePresetHandles = [
                     preset.presetHandle for preset in supported_presets if preset.presetHandle != activePresetHandle]
                 if len(possiblePresetHandles) > 0:
                     preset_handle = possiblePresetHandles[0]
                     # Verify that the AddThermostatSuggestion command returns INVALID_IN_STATE.
-                    currentUTC = int(int((datetime.now(timezone.utc) - datetime(2000,
-                                     1, 1, 0, 0, 0, 0, timezone.utc)).total_seconds()))
+                      
                     await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
                                                                       preset_handle=preset_handle,
                                                                       effective_time=currentUTC,
@@ -173,17 +187,12 @@ class TC_TSTAT_4_3(MatterBaseTest):
                 else:
                     logger.info("Couldn't run test step 3 since all preset handles are also the ActivePresetHandle on this Thermostat")
 
-            self.step("4")
-            if not skipTimeSync:
+                self.step("4")
                 # TH sends Time Synchronization command to DUT using a time source.
                 tts = Clusters.TimeSynchronization.Structs.FabricScopedTrustedTimeSourceStruct(nodeID=self.dut_node_id, endpoint=0)
                 await self.send_single_cmd(cmd=Clusters.TimeSynchronization.Commands.SetTrustedTimeSource(trustedTimeSource=tts), endpoint=endpoint)
                 # Verify that TH and DUT are now time synchronized.
                 # TODO Unsure how to validate this one. Read DUT through TimeSynchronization cluster and compare to datetime current time?
-        else:
-            logger.info("TimeSync steps need to be ironed out, skipping for now.")
-            self.skip_step("3")
-            self.skip_step("4")
 
         self.step("5")
         if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
