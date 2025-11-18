@@ -31,13 +31,15 @@ import sdbus
 
 from .test_definition import ApplicationPaths
 
+log = logging.getLogger(__name__)
+
 test_environ = os.environ.copy()
 
 
 def EnsureNetworkNamespaceAvailability():
     if os.getuid() == 0:
-        logging.debug("Current user is root")
-        logging.warning("Running as root and this will change global namespaces.")
+        log.debug("Current user is root")
+        log.warning("Running as root and this will change global namespaces.")
         return
 
     os.execvpe(
@@ -47,18 +49,18 @@ def EnsureNetworkNamespaceAvailability():
 
 
 def EnsurePrivateState():
-    logging.info("Ensuring /run is privately accessible")
+    log.info("Ensuring /run is privately accessible")
 
-    logging.debug("Making / private")
+    log.debug("Making / private")
     if subprocess.run(["mount", "--make-private", "/"]).returncode != 0:
-        logging.error("Failed to make / private")
-        logging.error("Are you using --privileged if running in docker?")
+        log.error("Failed to make / private")
+        log.error("Are you using --privileged if running in docker?")
         sys.exit(1)
 
-    logging.debug("Remounting /run")
+    log.debug("Remounting /run")
     if subprocess.run(["mount", "-t", "tmpfs", "tmpfs", "/run"]).returncode != 0:
-        logging.error("Failed to mount /run as a temporary filesystem")
-        logging.error("Are you using --privileged if running in docker?")
+        log.error("Failed to mount /run as a temporary filesystem")
+        log.error("Are you using --privileged if running in docker?")
         sys.exit(1)
 
 
@@ -159,14 +161,14 @@ class IsolatedNetworkNamespace:
         # IPv6 does Duplicate Address Detection even though
         # we know ULAs provided are isolated. Wait for 'tentative'
         # address to be gone.
-        logging.info('Waiting for IPv6 DaD to complete (no tentative addresses)')
+        log.info('Waiting for IPv6 DaD to complete (no tentative addresses)')
         for _ in range(100):  # wait at most 10 seconds
             if 'tentative' not in subprocess.check_output(['ip', 'addr'], text=True):
-                logging.info('No more tentative addresses')
+                log.info('No more tentative addresses')
                 break
             time.sleep(0.1)
         else:
-            logging.warning("Some addresses look to still be tentative")
+            log.warning("Some addresses look to still be tentative")
 
     def setup(self):
         for command in self.COMMANDS_SETUP:
@@ -187,10 +189,10 @@ class IsolatedNetworkNamespace:
     def run(self, command: str):
         command = command.format(app_link_name=self.app_link_name,
                                  tool_link_name=self.tool_link_name)
-        logging.debug("Executing: %s", command)
+        log.debug("Executing: '%s'", command)
         if subprocess.run(command.split()).returncode != 0:
-            logging.error("Failed to execute '%s'" % command)
-            logging.error("Are you using --privileged if running in docker?")
+            log.error("Failed to execute '%s'", command)
+            log.error("Are you using --privileged if running in docker?")
             sys.exit(1)
 
     def terminate(self):
@@ -227,7 +229,7 @@ class BluetoothMock(subprocess.Popen):
         for line in self.stderr:
             if "adapter[1][00:00:00:22:22:22]" in line:
                 self.event.set()
-            logging.debug("%s", line.strip())
+            log.debug("%s", line.strip())
 
     def __init__(self):
         adapters = [f"--adapter={mac}" for mac in self.ADAPTERS]
