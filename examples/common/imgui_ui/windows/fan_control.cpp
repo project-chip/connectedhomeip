@@ -25,18 +25,25 @@
 #include <math.h>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <utility>
 #include <vector>
-
 
 namespace example {
 namespace Ui {
 namespace Windows {
 
 template <typename T>
-static const std::string GetBitmapValueString(chip::BitMask<T> bitmask,
+static const std::string GetBitmapValueString(const T maxValue, chip::BitMask<T> bitmask,
                                               const std::vector<std::pair<T, std::string_view>> & valuesToNames)
+
 {
+    // Check if any new value was added and communicate to user that the code needs updating.
+    if ((static_cast<std::underlying_type_t<T>>(maxValue) << 1) <= static_cast<std::underlying_type_t<T>>(bitmask.Raw()))
+    {
+        return "UI code needs uptating to support new value";
+    }
+
     std::string result;
     for (const auto & entry : valuesToNames)
     {
@@ -44,7 +51,7 @@ static const std::string GetBitmapValueString(chip::BitMask<T> bitmask,
         {
             if (!result.empty())
             {
-                result += "|";
+                result += " | ";
             }
             result += entry.second;
         }
@@ -55,11 +62,7 @@ static const std::string GetBitmapValueString(chip::BitMask<T> bitmask,
 
 static const std::string GetRockBitmapValueString(chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> bitmask)
 {
-    if (bitmask > chip::app::Clusters::FanControl::RockBitmap::kRockRound) {
-        return "Unsupported rocking bitmask";
-    }
-
-    return GetBitmapValueString(bitmask,
+    return GetBitmapValueString(chip::app::Clusters::FanControl::RockBitmap::kRockRound, bitmask,
                                 { { chip::app::Clusters::FanControl::RockBitmap::kRockLeftRight, "Left-right" },
                                   { chip::app::Clusters::FanControl::RockBitmap::kRockUpDown, "Up-down" },
                                   { chip::app::Clusters::FanControl::RockBitmap::kRockRound, "Round" } });
@@ -67,11 +70,7 @@ static const std::string GetRockBitmapValueString(chip::BitMask<chip::app::Clust
 
 static const std::string GetWindBitmapValueString(chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> bitmask)
 {
-    if (bitmask > chip::app::Clusters::FanControl::WindBitmap::kNaturalWind) {
-        return "Unsupported wind for bitmask";
-    }
-
-    return GetBitmapValueString(bitmask,
+    return GetBitmapValueString(chip::app::Clusters::FanControl::WindBitmap::kNaturalWind, bitmask,
                                 { { chip::app::Clusters::FanControl::WindBitmap::kSleepWind, "Sleep" },
                                   { chip::app::Clusters::FanControl::WindBitmap::kNaturalWind, "Natural" } });
 }
@@ -106,21 +105,17 @@ void FanControl::UpdateState()
                         &chip::app::Clusters::FanControl::Attributes::SpeedSetting::Set,
                         &chip::app::Clusters::FanControl::Attributes::SpeedSetting::Get);
 
-    UpdateStateEnum(mEndpointId, mTargetRockSupport, mRockSupport,
-                        &chip::app::Clusters::FanControl::Attributes::RockSupport::Set,
-                        &chip::app::Clusters::FanControl::Attributes::RockSupport::Get);
+    UpdateStateEnum(mEndpointId, mTargetRockSupport, mRockSupport, &chip::app::Clusters::FanControl::Attributes::RockSupport::Set,
+                    &chip::app::Clusters::FanControl::Attributes::RockSupport::Get);
 
-    UpdateStateEnum(mEndpointId, mTargetRockSetting, mRockSetting,
-                        &chip::app::Clusters::FanControl::Attributes::RockSetting::Set,
-                        &chip::app::Clusters::FanControl::Attributes::RockSetting::Get);
+    UpdateStateEnum(mEndpointId, mTargetRockSetting, mRockSetting, &chip::app::Clusters::FanControl::Attributes::RockSetting::Set,
+                    &chip::app::Clusters::FanControl::Attributes::RockSetting::Get);
 
-    UpdateStateEnum(mEndpointId, mTargetWindSupport, mWindSupport,
-                        &chip::app::Clusters::FanControl::Attributes::WindSupport::Set,
-                        &chip::app::Clusters::FanControl::Attributes::WindSupport::Get);
+    UpdateStateEnum(mEndpointId, mTargetWindSupport, mWindSupport, &chip::app::Clusters::FanControl::Attributes::WindSupport::Set,
+                    &chip::app::Clusters::FanControl::Attributes::WindSupport::Get);
 
-    UpdateStateEnum(mEndpointId, mTargetWindSetting, mWindSetting,
-                        &chip::app::Clusters::FanControl::Attributes::WindSetting::Set,
-                        &chip::app::Clusters::FanControl::Attributes::WindSetting::Get);
+    UpdateStateEnum(mEndpointId, mTargetWindSetting, mWindSetting, &chip::app::Clusters::FanControl::Attributes::WindSetting::Set,
+                    &chip::app::Clusters::FanControl::Attributes::WindSetting::Get);
 }
 
 void FanControl::Render()
@@ -128,10 +123,10 @@ void FanControl::Render()
     ImGui::Begin(mTitle.c_str());
     ImGui::Text("On Endpoint %d", mEndpointId);
 
-    int uiFanMode          = static_cast<int>(mFanMode);
-    int uiPercentSetting   = static_cast<int>(mPercentSetting);
-    int uiSpeedSetting     = static_cast<int>(mSpeedSetting);
-    int uiAirflowDirection = static_cast<int>(mAirflowDirection);
+    int uiFanMode                                                            = static_cast<int>(mFanMode);
+    int uiPercentSetting                                                     = static_cast<int>(mPercentSetting);
+    int uiSpeedSetting                                                       = static_cast<int>(mSpeedSetting);
+    int uiAirflowDirection                                                   = static_cast<int>(mAirflowDirection);
     int uiFanModeSequence                                                    = static_cast<int>(mFanModeSequence);
     int uiPercent                                                            = mPercent;
     int uiSpeedCurrent                                                       = mSpeedCurrent;
