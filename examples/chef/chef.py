@@ -843,7 +843,7 @@ def main() -> int:
                 nrf_build_cmds.append(
                     f"-DCONFIG_OPENTHREAD_POLL_PERIOD={_SLEEPY_DEVICE_POLL_PERIOD_MS}")
 
-            flush_print(f"NRF Build command args: f{' '.join(nrf_build_cmds)}")
+            flush_print(f"NRF Build command args: {' '.join(nrf_build_cmds)}")
             shell.run_cmd(" ".join(nrf_build_cmds))
 
         elif options.build_target == "silabs-thread":
