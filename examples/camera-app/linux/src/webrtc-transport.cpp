@@ -263,7 +263,10 @@ bool WebrtcTransport::ClosePeerConnection()
 void WebrtcTransport::OnICECandidate(const ICECandidateInfo & candidateInfo)
 {
     ChipLogProgress(Camera, "ICE Candidate received for sessionID: %u", mRequestArgs.sessionId);
-    mLocalCandidates.push_back(candidateInfo);
+    {
+        std::lock_guard<std::mutex> lock(mCandidatesMutex);
+        mLocalCandidates.push_back(candidateInfo);
+    }
     ChipLogProgress(Camera, "Local Candidate:");
     ChipLogProgress(Camera, "%s", candidateInfo.candidate.c_str());
     ChipLogProgress(Camera, "  mid: %s, mlineIndex: %d", candidateInfo.mid.c_str(), candidateInfo.mlineIndex);
