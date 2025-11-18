@@ -407,7 +407,8 @@ class AttributeHandler(BaseHandler):
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         elif name in {"optionalConform", "otherwiseConform"}:
             self._attribute.definition.qualities |= FieldQuality.OPTIONAL
-            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+            # we have more conformance logic, maybe even provisional conform, so recurse
+            return self
         elif name == "mandatoryConform":
             return MandatoryConformFieldHandler(self.context, self._attribute.definition)
         elif name == "provisionalConform":
