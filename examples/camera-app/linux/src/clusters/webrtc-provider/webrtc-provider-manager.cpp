@@ -1078,7 +1078,7 @@ CHIP_ERROR WebRTCProviderManager::SendICECandidatesCommand(Messaging::ExchangeMa
 
     // Drain candidates to get all accumulated candidates and clear the list
     // This prevents resending the same candidates during trickle ICE
-    const std::vector<ICECandidateInfo> localCandidates = transport->DrainCandidates();
+    std::vector<ICECandidateInfo> localCandidates = transport->DrainCandidates();
 
     // Build the command
     WebRTCTransportRequestor::Commands::ICECandidates::Type command;
