@@ -133,6 +133,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         self.ota_prov = Clusters.OtaSoftwareUpdateProvider
         self.ota_req = Clusters.OtaSoftwareUpdateRequestor
         self.requestor_node_id = self.dut_node_id
+        self.controller = self.default_controller
 
     @async_test_body
     async def teardown_test(self):
