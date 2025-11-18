@@ -182,19 +182,14 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
             Number of attributes successfully changed and verified
         """
         changed_count = 0
-        max_changes = 20
         changed_attributes = []
 
         reports_at_start = handler.get_all_reported_attributes()
         logging.info(f"{test_step}: Handler has {len(reports_at_start)} attributes with reports at start")
 
         for endpoint_id, clusters in priming_data.items():
-            if changed_count >= max_changes:
-                break
 
             for cluster_class, attributes in clusters.items():
-                if changed_count >= max_changes:
-                    break
 
                 cluster_id = cluster_class.id
                 # Get writable attributes for this cluster from endpoints_tlv data
@@ -213,9 +208,6 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
 
                 # Try to write to each writable attribute
                 for attribute_id in writable_attr_ids:
-                    if changed_count >= max_changes:
-                        break
-
                     # Get the attribute object
                     if attribute_id not in Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id]:
                         continue
@@ -938,12 +930,6 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         # (This was originally test step 19 in the test plan)
         self.step(10)
         # Subscribe to ALL attributes from ALL clusters on ALL endpoints
-        # Device testing shows limit of 25 cluster paths per subscription,
-        # using 25 clusters to keep from runnining into intermittent issue CHIP Error 0x0000000B: No memory
-        # This is due to resource constraints during priming report generation
-        # Spec only requires minimum of 3 paths per subscription (Section 2.11.2.2)
-        MAX_CLUSTER_PATHS_PER_SUBSCRIPTION = 25
-
         all_cluster_ids = set()
         for endpoint_id, endpoint_data in self.endpoints_tlv.items():
             all_cluster_ids.update(endpoint_data.keys())
@@ -952,9 +938,6 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         subscription_paths = []
         for cluster_id in all_cluster_ids:
             if (not is_standard_cluster_id(cluster_id)):
-                continue
-
-            if len(subscription_paths) >= MAX_CLUSTER_PATHS_PER_SUBSCRIPTION:
                 continue
 
             # Subscribe to all attributes in this cluster across all endpoints, append this cluster to the subscription_paths list
