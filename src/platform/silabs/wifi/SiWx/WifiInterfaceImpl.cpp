@@ -58,7 +58,7 @@ extern "C" {
 
 #if (EXP_BOARD)
 #include "rsi_bt_common_apis.h"
-#include <platform/silabs/wifi/SiWx/ncp/sl_board_configuration.h>
+#include "sl_board_configuration.h"
 #endif
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
