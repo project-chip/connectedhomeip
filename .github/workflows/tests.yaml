@@ -488,6 +488,8 @@ jobs:
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
+            - name: Clean out
+              run: rm -rf out/
             - name: Build Remaining Apps That Don't Support Unified Build
               run: |
                   ./scripts/run_in_build_env.sh \
@@ -501,7 +503,8 @@ jobs:
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
-
+            - name: Clean out
+              run: rm -rf out/
             - name: Run Tests using the python parser sending commands to chip-tool
               # tests that failed macOS 15/26 last check: TestGroupMessaging,Test_TC_ACE_1_6,Test_TC_G_*,Test_TC_GRPKEY_*,Test_TC_S_*
               run: |
