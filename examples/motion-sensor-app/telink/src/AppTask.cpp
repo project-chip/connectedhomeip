@@ -20,11 +20,6 @@
 #include "LEDManager.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-
-// TODO: Ideally we should not depend on the codegen integration
-// It would be best if we could use generic cluster API instead
-#include <app/clusters/boolean-state-server/CodegenIntegration.h>
-
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 
@@ -32,40 +27,31 @@ LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 AppTask AppTask::sAppTask;
 
-CHIP_ERROR AppTask::Init(void)
+// sequence of lux values for button toggling
+static const uint16_t kLuxSteps[] = { 100, 300, 600, 1000, 1500, 2000 };
+static constexpr size_t kLuxCount = sizeof(kLuxSteps) / sizeof(uint16_t);
+
+CHIP_ERROR AppTask::Init()
 {
     SetExampleButtonCallbacks(MotionActionEventHandler);
     InitCommonParts();
 
-    LedManager::getInstance().setLed(LedManager::EAppLed_App0, MotionSensorMgr().IsMotionClosed());
+    LedManager::getInstance().setLed(LedManager::EAppLed_App0, MotionSensorMgr().IsMotionDetected());
+
+    MotionSensorMgr().SetCallback(OnMotionStateChanged);
 
     UpdateDeviceState();
-
-    MotionSensorMgr().SetCallback(OnStateChanged);
-
     return CHIP_NO_ERROR;
 }
 
-void AppTask::OnStateChanged(MotionSensorManager::State aState)
+void AppTask::OnMotionStateChanged(MotionSensorManager::State aState)
 {
-    // If the Motion state was changed, update LED state and cluster state (only if button was pressed).
-    //  - turn on the Motion LED if Motion sensor is in closed state.
-    //  - turn off the lock LED if Motion sensor is in opened state.
-    if (MotionSensorManager::State::kMotionClosed == aState)
-    {
-        LOG_INF("Motion state changed to CLOSED");
-        LedManager::getInstance().setLed(LedManager::EAppLed_App0, true);
-    }
-    else if (MotionSensorManager::State::kMotionOpened == aState)
-    {
-        LOG_INF("Motion state changed to OPEN");
-        LedManager::getInstance().setLed(LedManager::EAppLed_App0, false);
-    }
+    bool detected = (aState == MotionSensorManager::State::kMotionDetected);
+
+    LedManager::getInstance().setLed(LedManager::EAppLed_App0, detected);
 
     if (sAppTask.IsSyncClusterToButtonAction())
-    {
         sAppTask.UpdateClusterState();
-    }
 }
 
 void AppTask::PostMotionActionRequest(MotionSensorManager::Action aAction)
@@ -78,69 +64,78 @@ void AppTask::PostMotionActionRequest(MotionSensorManager::Action aAction)
     sAppTask.PostEvent(&event);
 }
 
-void AppTask::UpdateClusterStateInternal(intptr_t arg)
-{
-    uint8_t newValue = MotionSensorMgr().IsMotionClosed();
-
-    ChipLogProgress(NotSpecified, "StateValue::Set : %d", newValue);
-
-    auto booleanState = chip::app::Clusters::BooleanState::FindClusterOnEndpoint(1);
-    VerifyOrReturn(booleanState != nullptr);
-    booleanState->SetStateValue(newValue);
-}
-
 void AppTask::MotionActionEventHandler(AppEvent * aEvent)
 {
-    MotionSensorManager::Action action  = MotionSensorManager::Action::kInvalid;
-    CHIP_ERROR err                      = CHIP_NO_ERROR;
+    MotionSensorManager::Action action;
 
-    ChipLogProgress(NotSpecified, "MotionActionEventHandler");
-
-    if (aEvent->Type == AppEvent::kEventType_DeviceAction)
+    if (aEvent->Type == AppEvent::kEventType_Button)
     {
-        action = static_cast<MotionSensorManager::Action>(aEvent->DeviceEvent.Action);
-    }
-    else if (aEvent->Type == AppEvent::kEventType_Button)
-    {
-        if (MotionSensorMgr().IsMotionClosed())
-        {
-            action = MotionSensorManager::Action::kSignalLost;
-        }
+        // toggle occupancy
+        if (MotionSensorMgr().IsMotionDetected())
+            action = MotionSensorManager::Action::kSetUndetected;
         else
-        {
-            action = MotionSensorManager::Action::kSignalDetected;
-        }
+            action = MotionSensorManager::Action::kSetDetected;
+
+        // toggle lux
+        static size_t idx = 0;
+        idx               = (idx + 1) % kLuxCount;
+        sAppTask.mLux     = kLuxSteps[idx];
 
         sAppTask.SetSyncClusterToButtonAction(true);
     }
     else
     {
-        err    = APP_ERROR_UNHANDLED_EVENT;
-        action = MotionSensorManager::Action::kInvalid;
+        action = static_cast<MotionSensorManager::Action>(aEvent->DeviceEvent.Action);
     }
 
-    if (err == CHIP_NO_ERROR)
-    {
-        MotionSensorMgr().InitiateAction(action);
-    }
+    MotionSensorMgr().InitiateAction(action);
+    sAppTask.SetIlluminance(sAppTask.mLux);
 }
 
-void AppTask::UpdateClusterState(void)
+void AppTask::SetIlluminance(uint16_t lux)
+{
+    chip::app::Clusters::IlluminanceMeasurement::Attributes::MeasuredValue::Set(2, lux);
+    ChipLogProgress(NotSpecified, "Illuminance SET: %u", lux);
+}
+
+void AppTask::UpdateClusterStateInternal(intptr_t)
+{
+    using Bitmap = chip::app::Clusters::OccupancySensing::OccupancyBitmap;
+
+    chip::BitMask<Bitmap> mask;
+    if (MotionSensorMgr().IsMotionDetected())
+        mask.Set(Bitmap::kOccupied);
+    else
+        mask.ClearAll();
+
+    chip::app::Clusters::OccupancySensing::Attributes::Occupancy::Set(1, mask);
+
+    chip::app::Clusters::IlluminanceMeasurement::Attributes::MeasuredValue::Set(2, sAppTask.mLux);
+}
+
+void AppTask::UpdateClusterState()
 {
     PlatformMgr().ScheduleWork(UpdateClusterStateInternal, 0);
 }
 
-void AppTask::UpdateDeviceState(void)
+void AppTask::UpdateDeviceStateInternal(intptr_t)
 {
-    PlatformMgr().ScheduleWork(UpdateDeviceStateInternal, 0);
+    chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancyBitmap> mask;
+    chip::app::Clusters::OccupancySensing::Attributes::Occupancy::Get(1, &mask);
+
+    bool occupied = mask.Raw() & 0x01;
+    LedManager::getInstance().setLed(LedManager::EAppLed_App0, occupied);
+
+    chip::app::DataModel::Nullable<uint16_t> lux;
+    chip::app::Clusters::IlluminanceMeasurement::Attributes::MeasuredValue::Get(2, lux);
+
+    if (!lux.IsNull())
+        ChipLogProgress(NotSpecified, "Lux: %u", lux.Value());
 }
 
-void AppTask::UpdateDeviceStateInternal(intptr_t arg)
+void AppTask::UpdateDeviceState()
 {
-    auto booleanState = chip::app::Clusters::BooleanState::FindClusterOnEndpoint(1);
-    VerifyOrReturn(booleanState != nullptr);
-    auto stateValueAttrValue = booleanState->GetStateValue();
-    LedManager::getInstance().setLed(LedManager::EAppLed_App0, stateValueAttrValue);
+    PlatformMgr().ScheduleWork(UpdateDeviceStateInternal, 0);
 }
 
 void AppTask::LinkLeds(LedManager & ledManager)
@@ -150,5 +145,5 @@ void AppTask::LinkLeds(LedManager & ledManager)
     ledManager.linkLed(LedManager::EAppLed_App0, 1);
 #else
     ledManager.linkLed(LedManager::EAppLed_App0, 0);
-#endif // CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
+#endif
 }

@@ -28,31 +28,24 @@ using namespace chip::app::Clusters;
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
-void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
-                                       uint8_t * value)
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t, uint16_t, uint8_t * value)
 {
-    ClusterId clusterId     = attributePath.mClusterId;
-    AttributeId attributeId = attributePath.mAttributeId;
-    ChipLogProgress(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
-
-    if (clusterId == BooleanState::Id && attributeId == BooleanState::Attributes::StateValue::Id)
+    if (attributePath.mClusterId == OccupancySensing::Id &&
+        attributePath.mAttributeId == OccupancySensing::Attributes::Occupancy::Id)
     {
-        ChipLogProgress(Zcl, "Cluster BooleanState: attribute StateValue set to %u", *value);
-        AppTask & task = GetAppTask();
-        if (task.IsSyncClusterToButtonAction())
+        ChipLogProgress(Zcl, "Occupancy changed externally: %u", *value);
+
+        if (!GetAppTask().IsSyncClusterToButtonAction())
         {
-            task.SetSyncClusterToButtonAction(false);
+            GetAppTask().PostMotionActionRequest((*value & 0x01) ? MotionSensorManager::Action::kSetDetected
+                                                                 : MotionSensorManager::Action::kSetUndetected);
         }
-        else
-        {
-            task.PosMotionActionRequest(*value ? MotionSensorManager::Action::kSignalDetected
-                                               : MotionSensorManager::Action::kSignalLost);
-        }
+        GetAppTask().SetSyncClusterToButtonAction(false);
     }
 }
 
-void emberAfBooleanStateClusterInitCallback(EndpointId endpoint)
+void emberAfOccupancySensingClusterInitCallback(chip::EndpointId)
 {
-    ChipLogProgress(Zcl, "emberAfBooleanStateClusterInitCallback");
+    ChipLogProgress(Zcl, "Occupancy cluster init");
     GetAppTask().UpdateClusterState();
 }

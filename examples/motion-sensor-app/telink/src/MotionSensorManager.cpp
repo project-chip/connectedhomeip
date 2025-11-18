@@ -17,38 +17,28 @@
  */
 
 #include "MotionSensorManager.h"
-
-#include "AppConfig.h"
 #include "AppTask.h"
 
-#include <lib/support/CodeUtils.h>
-
-#include <zephyr/drivers/pwm.h>
-#include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
-
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 MotionSensorManager MotionSensorManager::sMotionSensor;
 
 int MotionSensorManager::Init()
 {
-    int err = 0;
-
-    mState                = State::kMotionOpened;
-    mCallbackStateChanged = nullptr;
-
-    return err;
+    mState    = State::kMotionUndetected;
+    mCallback = nullptr;
+    return 0;
 }
 
-void MotionSensorManager::SetCallback(CallbackStateChanged aCallbackStateChanged)
+bool MotionSensorManager::IsMotionDetected() const
 {
-    mCallbackStateChanged = aCallbackStateChanged;
+    return mState == State::kMotionDetected;
 }
 
-bool MotionSensorManager::IsMotionClosed()
+void MotionSensorManager::SetCallback(CallbackStateChanged cb)
 {
-    return mState == State::kMotionClosed;
+    mCallback = cb;
 }
 
 void MotionSensorManager::InitiateAction(Action aAction)
@@ -57,31 +47,26 @@ void MotionSensorManager::InitiateAction(Action aAction)
     event.Type               = AppEvent::kEventType_DeviceAction;
     event.DeviceEvent.Action = static_cast<uint8_t>(aAction);
     event.Handler            = HandleAction;
+
     GetAppTask().PostEvent(&event);
 }
 
 void MotionSensorManager::HandleAction(AppEvent * aEvent)
 {
     Action action = static_cast<Action>(aEvent->DeviceEvent.Action);
-    // Change current state based on action:
-    // - if state is closed and action is signal lost, change state to opened
-    // - if state is opened and action is signal detected, change state to closed
-    // - else, the state/action combination does not change the state.
-    if (sMotionSensor.mState == State::kMotionClosed && action == Action::kSignalLost)
-    {
-        sMotionSensor.mState = State::kMotionOpened;
-    }
-    else if (sMotionSensor.mState == State::kMotionOpened && action == Action::kSignalDetected)
-    {
-        sMotionSensor.mState = State::kMotionClosed;
-    }
 
-    if (sMotionSensor.mCallbackStateChanged != nullptr)
-    {
-        sMotionSensor.mCallbackStateChanged(sMotionSensor.mState);
-    }
+    State newState = sMotionSensor.mState;
+
+    if (action == Action::kSetDetected)
+        newState = State::kMotionDetected;
+    else if (action == Action::kSetUndetected)
+        newState = State::kMotionUndetected;
+
+    if (newState != sMotionSensor.mState)
+        sMotionSensor.mState = newState;
+
+    if (sMotionSensor.mCallback)
+        sMotionSensor.mCallback(sMotionSensor.mState);
     else
-    {
-        LOG_ERR("Callback for state change was not set. Please set an appropriate callback.");
-    }
+        LOG_WRN("MotionSensor callback not set");
 }

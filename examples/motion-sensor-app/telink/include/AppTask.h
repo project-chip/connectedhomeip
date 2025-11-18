@@ -21,27 +21,27 @@
 #include "AppTaskCommon.h"
 #include "MotionSensorManager.h"
 
-// Application-defined error codes in the CHIP_ERROR space.
-#define APP_ERROR_UNHANDLED_EVENT CHIP_APPLICATION_ERROR(0x03)
-
 class AppTask : public AppTaskCommon
 {
 public:
     void PostMotionActionRequest(MotionSensorManager::Action aAction);
-    void UpdateClusterState(void);
-    void UpdateDeviceState(void);
 
-    bool IsSyncClusterToButtonAction(void);
+    void UpdateClusterState();
+    void UpdateDeviceState();
+
+    bool IsSyncClusterToButtonAction();
     void SetSyncClusterToButtonAction(bool value);
 
+    void SetIlluminance(uint16_t lux);
+
 private:
-    friend AppTask & GetAppTask(void);
+    friend AppTask & GetAppTask();
     friend class AppTaskCommon;
 
-    CHIP_ERROR Init(void);
+    CHIP_ERROR Init();
     void LinkLeds(LedManager & ledManager);
 
-    static void OnStateChanged(MotionSensorManager::State aState);
+    static void OnMotionStateChanged(MotionSensorManager::State aState);
 
     static void UpdateClusterStateInternal(intptr_t arg);
     static void UpdateDeviceStateInternal(intptr_t arg);
@@ -49,11 +49,12 @@ private:
     static void MotionActionEventHandler(AppEvent * aEvent);
 
     bool mSyncClusterToButtonAction = false;
+    uint16_t mLux                   = 100; // initial brightness
 
     static AppTask sAppTask;
 };
 
-inline AppTask & GetAppTask(void)
+inline AppTask & GetAppTask()
 {
     return AppTask::sAppTask;
 }

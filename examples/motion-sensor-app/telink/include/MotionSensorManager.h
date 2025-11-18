@@ -18,45 +18,42 @@
 
 #pragma once
 
+#include "AppEventCommon.h"
 #include <stdbool.h>
 #include <stdint.h>
-
-#include "AppEventCommon.h"
 
 class MotionSensorManager
 {
 public:
-    enum class Action : uint8_t
-    {
-        kSignalDetected = 0,
-        kSignalLost,
-        kInvalid
-    };
-
     enum class State : uint8_t
     {
-        kMotionClosed = 0,
-        kMotionOpened,
-        kInvalid
+        kMotionUndetected = 0,
+        kMotionDetected
+    };
+
+    enum class Action : uint8_t
+    {
+        kSetUndetected = 0,
+        kSetDetected
     };
 
     int Init();
-    bool IsMotionClosed();
+    bool IsMotionDetected() const;
+
     void InitiateAction(Action aAction);
 
-    typedef void (*CallbackStateChanged)(State aState);
-    void SetCallback(CallbackStateChanged aCallbackStateChanged);
+    using CallbackStateChanged = void (*)(State aState);
+    void SetCallback(CallbackStateChanged cb);
 
     static void HandleAction(AppEvent * aEvent);
+    static MotionSensorManager sMotionSensor;
 
 private:
-    friend MotionSensorManager & MotionSensorMgr(void);
-    State mState;
-    CallbackStateChanged mCallbackStateChanged;
-    static MotionSensorManager sMotionSensor;
+    State mState                   = State::kMotionUndetected;
+    CallbackStateChanged mCallback = nullptr;
 };
 
-inline MotionSensorManager & MotionSensorMgr(void)
+inline MotionSensorManager & MotionSensorMgr()
 {
     return MotionSensorManager::sMotionSensor;
 }
