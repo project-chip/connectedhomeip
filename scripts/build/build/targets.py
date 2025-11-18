@@ -797,6 +797,7 @@ def BuildTelinkTarget():
         TargetPart('temperature-measurement',
                    app=TelinkApp.TEMPERATURE_MEASUREMENT),
         TargetPart('thermostat', app=TelinkApp.THERMOSTAT),
+        TargetPart('motion-sensor', app=TelinkApp.MOTION_SENSOR),
         TargetPart('window-covering', app=TelinkApp.WINDOW_COVERING),
     ])
 
