@@ -716,7 +716,6 @@ void Instance::HandleModifyForecastRequest(HandlerContext & ctx, const Commands:
     if (status != Status::Success)
     {
         ChipLogError(Zcl, "DEM: ModifyForecastRequest FAILURE");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
         return;
     }
 }
