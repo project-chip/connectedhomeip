@@ -62,17 +62,15 @@ logger = logging.getLogger(__name__)
 
 class TC_SU_2_5(SoftwareUpdateBaseTest):
     "This test case verifies that the DUT behaves according to the spec when it is applying the software update."
-    kvs_path = '/tmp/chip_kvs_provider'
-    provider_log = '/tmp/provider_log_2_5.log'
+    kvs_path = None
+    provider_log = None
     current_requestor_app_pid = None
     ota_prov = Clusters.OtaSoftwareUpdateProvider
     ota_req = Clusters.OtaSoftwareUpdateRequestor
     controller = None
-    provider_data = {
-        "node_id": 321,
-        "discriminator": 321,
-        "setup_pincode": 2321
-    }
+    provider_node_id = 321
+    provider_discriminator = 321
+    provider_setup_pincode = 2321
 
     @async_test_body
     async def teardown_test(self):
@@ -87,6 +85,8 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         self.expected_software_version = self.user_params.get('ota_image_expected_version')
         self.provider_app_path = self.user_params.get('provider_app_path')
         self.ota_provider_port = self.user_params.get('ota_provider_port', 5541)
+        self.kvs_path = self.user_params.get('provider_kvs_path', '/tmp/chip_kvs_provider')
+        self.provider_log = self.user_params.get('provider_log_path', '/tmp/provider_log_2_5.log')
 
         if not self.expected_software_version:
             asserts.fail("Missing OTA image software version. Speficy using --int-arg ota_image_expected_version:<ota_image_expected_version>")
@@ -105,8 +105,8 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         self.start_provider(
             provider_app_path=self.provider_app_path,
             ota_image_path=self.ota_image,
-            setup_pincode=self.provider_data['setup_pincode'],
-            discriminator=self.provider_data['discriminator'],
+            setup_pincode=self.provider_setup_pincode,
+            discriminator=self.provider_discriminator,
             port=self.ota_provider_port,
             kvs_path=self.kvs_path,
             log_file=self.provider_log,
@@ -114,16 +114,16 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         )
         logger.info("About to start commissioning")
         await self.controller.CommissionOnNetwork(
-            nodeId=self.provider_data['node_id'],
-            setupPinCode=self.provider_data['setup_pincode'],
+            nodeId=self.provider_node_id,
+            setupPinCode=self.provider_setup_pincode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
-            filter=self.provider_data['discriminator']
+            filter=self.provider_discriminator
         )
         logger.info("Create ACL Entries")
         await self.create_acl_entry(dev_ctrl=self.controller,
-                                    provider_node_id=self.provider_data['node_id'], requestor_node_id=self.requestor_node_id)
+                                    provider_node_id=self.provider_node_id, requestor_node_id=self.requestor_node_id)
         logger.info("Write OTA Providers")
-        await self.set_default_ota_providers_list(controller=self.controller, provider_node_id=self.provider_data['node_id'], requestor_node_id=self.requestor_node_id, endpoint=0)
+        await self.set_default_ota_providers_list(controller=self.controller, provider_node_id=self.provider_node_id, requestor_node_id=self.requestor_node_id, endpoint=0)
         super().setup_test()
 
     def desc_TC_SU_2_5(self) -> str:
@@ -170,7 +170,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         basicinformation_handler = EventSubscriptionHandler(
             expected_cluster=Clusters.BasicInformation, expected_event_id=Clusters.BasicInformation.Events.ShutDown.event_id)
         await basicinformation_handler.start(self.controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=60*2)
-        await self.announce_ota_provider(self.controller, self.provider_data['node_id'], self.requestor_node_id)
+        await self.announce_ota_provider(self.controller, self.provider_node_id, self.requestor_node_id)
 
         update_state_match = AttributeMatcher.from_callable(
             "Update state is Downloading",
@@ -218,8 +218,8 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         self.start_provider(
             provider_app_path=self.provider_app_path,
             ota_image_path=self.ota_image,
-            setup_pincode=self.provider_data['setup_pincode'],
-            discriminator=self.provider_data['discriminator'],
+            setup_pincode=self.provider_setup_pincode,
+            discriminator=self.provider_discriminator,
             port=self.ota_provider_port,
             kvs_path=self.kvs_path,
             log_file=self.provider_log,
@@ -243,7 +243,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         await update_state_attr_handler.start(dev_ctrl=self.controller, node_id=self.requestor_node_id, endpoint=0,
                                               fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
 
-        await self.announce_ota_provider(self.controller, self.provider_data['node_id'], self.requestor_node_id)
+        await self.announce_ota_provider(self.controller, self.provider_node_id, self.requestor_node_id)
 
         update_state_match = AttributeMatcher.from_callable(
             "Update state is Downloading",
@@ -287,8 +287,8 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         self.start_provider(
             provider_app_path=self.provider_app_path,
             ota_image_path=self.ota_image,
-            setup_pincode=self.provider_data['setup_pincode'],
-            discriminator=self.provider_data['discriminator'],
+            setup_pincode=self.provider_setup_pincode,
+            discriminator=self.provider_discriminator,
             port=self.ota_provider_port,
             kvs_path=self.kvs_path,
             log_file=self.provider_log,
@@ -313,7 +313,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
                                                   fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
         await update_state_attr_handler.start(dev_ctrl=self.controller, node_id=self.requestor_node_id, endpoint=0,
                                               fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
-        await self.announce_ota_provider(self.controller, self.provider_data['node_id'], self.requestor_node_id)
+        await self.announce_ota_provider(self.controller, self.provider_node_id, self.requestor_node_id)
 
         update_state_match = AttributeMatcher.from_callable(
             "Update state is Downloading",
@@ -365,8 +365,8 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         self.start_provider(
             provider_app_path=self.provider_app_path,
             ota_image_path=self.ota_image,
-            setup_pincode=self.provider_data['setup_pincode'],
-            discriminator=self.provider_data['discriminator'],
+            setup_pincode=self.provider_setup_pincode,
+            discriminator=self.provider_discriminator,
             port=self.ota_provider_port,
             kvs_path=self.kvs_path,
             log_file=self.provider_log,
@@ -391,7 +391,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
                                               fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
         await software_version_attr_handler.start(dev_ctrl=self.controller, node_id=self.requestor_node_id, endpoint=0,
                                                   fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
-        await self.announce_ota_provider(self.controller, self.provider_data['node_id'], self.requestor_node_id)
+        await self.announce_ota_provider(self.controller, self.provider_node_id, self.requestor_node_id)
 
         update_state_states_seen = set()
         update_state_states_stack = []
@@ -443,8 +443,8 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         self.start_provider(
             provider_app_path=self.provider_app_path,
             ota_image_path=self.ota_image,
-            setup_pincode=self.provider_data['setup_pincode'],
-            discriminator=self.provider_data['discriminator'],
+            setup_pincode=self.provider_setup_pincode,
+            discriminator=self.provider_discriminator,
             port=self.ota_provider_port,
             kvs_path=self.kvs_path,
             log_file=self.provider_log,
@@ -461,7 +461,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         )
         await update_state_attr_handler.start(dev_ctrl=self.controller, node_id=self.requestor_node_id, endpoint=0,
                                               fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
-        await self.announce_ota_provider(self.controller, self.provider_data['node_id'], self.requestor_node_id)
+        await self.announce_ota_provider(self.controller, self.provider_node_id, self.requestor_node_id)
 
         # Wait Until Downlading
         update_state_match = AttributeMatcher.from_callable(
