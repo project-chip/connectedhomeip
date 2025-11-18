@@ -320,8 +320,8 @@ jobs:
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --all-clusters-app ./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
-                     --lock-app ./objdir-clone/linux-x64-lock-${BUILD_VARIANT}/chip-lock-app \
-                     --ota-provider-app ./objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
+                     --lock-app ./objdir-clone/linux-x64-lock-${BUILD_VARIANT}-unified/chip-lock-app \
+                     --ota-provider-app ./objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
                      --ota-requestor-app ./objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
                      --tv-app ./objdir-clone/linux-x64-tv-app-${BUILD_VARIANT}-unified/chip-tv-app \
                      --bridge-app ./objdir-clone/linux-x64-bridge-${BUILD_VARIANT}-unified/chip-bridge-app \
