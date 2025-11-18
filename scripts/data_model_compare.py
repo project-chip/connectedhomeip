@@ -42,15 +42,16 @@ import click
 # Reference it directly from the source tree.
 from python_path import PythonPath
 
-with PythonPath('py_matter_idl', relative_to=__file__):
-    from matter.idl.data_model_xml import ParseXmls, ParseSource
+with PythonPath("py_matter_idl", relative_to=__file__):
+    from matter.idl.data_model_xml import ParseSource, ParseXmls
     from matter.idl.generators.idl import IdlGenerator
     from matter.idl.generators.storage import InMemoryStorage
     from matter.idl.matter_idl_parser import CreateParser
-    from matter.idl.matter_idl_types import Idl, Cluster
+    from matter.idl.matter_idl_types import Cluster, Idl
 
 try:
     import coloredlogs
+
     _has_coloredlogs = True
 except ImportError:
     _has_coloredlogs = False
@@ -60,15 +61,16 @@ LOGGER = logging.getLogger(__name__)
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
 __LOG_LEVELS__ = {
-    'debug': logging.DEBUG,
-    'info': logging.INFO,
-    'warn': logging.WARNING,
-    'fatal': logging.FATAL,
+    "debug": logging.DEBUG,
+    "info": logging.INFO,
+    "warn": logging.WARNING,
+    "fatal": logging.FATAL,
 }
+
 
 def _normalize_order(idl: Idl):
     """Re-sorts contents of things inside a cluster so that
-       output is easily diffed by humans.
+    output is easily diffed by humans.
     """
 
     # This method exists because `zapt` generation of IDL files
@@ -93,6 +95,7 @@ def _normalize_order(idl: Idl):
         cluster.structs.sort(key=lambda s: s.name)
         cluster.commands.sort(key=lambda c: c.code)
 
+
 def _get_name(item) -> str:
     if hasattr(item, "name"):
         return getattr(item, "name")
@@ -100,6 +103,7 @@ def _get_name(item) -> str:
         return getattr(item, "definition").name
     else:
         raise Exception("Cannot find name of `%r`" % item)
+
 
 def _compare_maturity(matter_items, data_model_items, path: list[str] = []):
     # we assume each of the items have some form of "name"
@@ -123,10 +127,18 @@ def _compare_maturity(matter_items, data_model_items, path: list[str] = []):
             continue
 
         if matter_item.api_maturity != data_model_item.api_maturity:
-            logging.error("Different maturity: %s != %s: %s", data_model_item.api_maturity, matter_item.api_maturity, "::".join(current_path))
+            logging.error(
+                "Different maturity: %s != %s: %s", data_model_item.api_maturity, matter_item.api_maturity, "::".join(current_path)
+            )
             had_diffs = True
 
-        # TODO: recurse!
+        for a in dir(matter_item):
+            if not hasattr(data_model_item, a):
+                continue
+            if type(getattr(matter_item, a)) != list:
+                continue
+
+            _compare_maturity(getattr(matter_item, a), getattr(data_model_item, a), current_path)
 
 
 def _match_names(dest: list[Cluster], src: list[Cluster]):
@@ -142,11 +154,12 @@ def _match_names(dest: list[Cluster], src: list[Cluster]):
 
 @click.group()
 @click.option(
-    '--log-level',
-    default='INFO',
+    "--log-level",
+    default="INFO",
     show_default=True,
     type=click.Choice(list(__LOG_LEVELS__.keys()), case_sensitive=False),
-    help='Determines the verbosity of script output.')
+    help="Determines the verbosity of script output.",
+)
 def main(log_level):
     """
     A program supporting parsing of CSA data model XML files and generating them
@@ -167,31 +180,25 @@ def main(log_level):
         data_model/master/clusters/Switch.xml
     """
     if _has_coloredlogs:
-        coloredlogs.install(level=__LOG_LEVELS__[
-                            log_level], fmt='%(asctime)s %(levelname)-7s %(message)s')
+        coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt="%(asctime)s %(levelname)-7s %(message)s")
     else:
         logging.basicConfig(
-            level=__LOG_LEVELS__[log_level],
-            format='%(asctime)s %(levelname)-7s %(message)s',
-            datefmt='%Y-%m-%d %H:%M:%S'
+            level=__LOG_LEVELS__[log_level], format="%(asctime)s %(levelname)-7s %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
         )
 
-@main.command('filter')
+
+@main.command("filter")
 @click.option(
     "--matter",
     default=None,
     required=True,
     type=click.Path(exists=True),
-    help="An input .matter IDL to select a subset of clusters to include."
+    help="An input .matter IDL to select a subset of clusters to include.",
 )
 @click.option(
-    "--output",
-    default=None,
-    required=True,
-    type=click.Path(),
-    help="Where to output the generated XML from the input data mode."
+    "--output", default=None, required=True, type=click.Path(), help="Where to output the generated XML from the input data mode."
 )
-@click.argument('filenames', nargs=-1)
+@click.argument("filenames", nargs=-1)
 def filter_matter(matter, output, filenames):
     """
     Filter clusters from a ".matter" file to contain only clusters defined
@@ -202,15 +209,13 @@ def filter_matter(matter, output, filenames):
     data_model_xmls = ParseXmls(sources)
 
     LOGGER.info("Parsing matter file ...")
-    matter_idl = CreateParser(skip_meta=True).parse(
-        open(matter).read(), file_name=matter)
+    matter_idl = CreateParser(skip_meta=True).parse(open(matter).read(), file_name=matter)
     LOGGER.info("Parsing done, filtering ...")
 
     # ensure that input file is filtered to only interesting
     # clusters
     loaded_clusters = {c.code for c in data_model_xmls.clusters}
-    matter_idl.clusters = [
-        c for c in matter_idl.clusters if c.code in loaded_clusters]
+    matter_idl.clusters = [c for c in matter_idl.clusters if c.code in loaded_clusters]
     _normalize_order(matter_idl)
 
     LOGGER.info("Filter done ...")
@@ -223,22 +228,18 @@ def filter_matter(matter, output, filenames):
     storage = InMemoryStorage()
     IdlGenerator(storage=storage, idl=matter_idl).render(dry_run=False)
     LOGGER.info("Generation done ...")
-    if output == '-':
+    if output == "-":
         print(storage.content)
     else:
-        with open(output, 'wt', encoding="utf8") as o:
+        with open(output, "wt", encoding="utf8") as o:
             o.write(storage.content)
 
 
-@main.command('parse')
+@main.command("parse")
 @click.option(
-    "-o",
-    "--output",
-    default=None,
-    type=click.Path(),
-    help="Where to output the parsed IDL. Use `-` for output to stdout"
+    "-o", "--output", default=None, type=click.Path(), help="Where to output the parsed IDL. Use `-` for output to stdout"
 )
-@click.argument('filenames', nargs=-1)
+@click.argument("filenames", nargs=-1)
 def parse(output, filenames):
     """
     Parse data_model XML files and output the resulting .matter file.
@@ -255,22 +256,22 @@ def parse(output, filenames):
     IdlGenerator(storage=storage, idl=data).render(dry_run=False)
 
     if output:
-        if output == '-':
+        if output == "-":
             print(storage.content)
         else:
-            with open(output, 'wt', encoding="utf8") as o:
+            with open(output, "wt", encoding="utf8") as o:
                 o.write(storage.content)
 
 
-@main.command('conformance-diff')
+@main.command("conformance-diff")
 @click.option(
     "--matter",
     default=None,
     required=True,
     type=click.Path(exists=True),
-    help="An input .matter IDL to use for the conformance diff."
+    help="An input .matter IDL to use for the conformance diff.",
 )
-@click.argument('filenames', nargs=-1)
+@click.argument("filenames", nargs=-1)
 def filter_matter(matter, filenames):
     """
     Compare provisional/non-provisional conformance between a given matter file
@@ -281,16 +282,13 @@ def filter_matter(matter, filenames):
     data_model_xmls = ParseXmls(sources)
 
     LOGGER.info("Parsing matter file ...")
-    matter_idl = CreateParser(skip_meta=True).parse(
-        open(matter).read(), file_name=matter)
+    matter_idl = CreateParser(skip_meta=True).parse(open(matter).read(), file_name=matter)
     LOGGER.info("Parsing done, performing diff ...")
-
 
     # ensure that input file is filtered to only interesting
     # clusters
     loaded_clusters = {c.code for c in data_model_xmls.clusters}
-    matter_idl.clusters = [
-        c for c in matter_idl.clusters if c.code in loaded_clusters]
+    matter_idl.clusters = [c for c in matter_idl.clusters if c.code in loaded_clusters]
     _match_names(data_model_xmls.clusters, matter_idl.clusters)
     _normalize_order(matter_idl)
 
@@ -300,16 +298,11 @@ def filter_matter(matter, filenames):
         sys.exit(1)
 
 
-
-@main.command('parse')
+@main.command("parse")
 @click.option(
-    "-o",
-    "--output",
-    default=None,
-    type=click.Path(),
-    help="Where to output the parsed IDL. Use `-` for output to stdout"
+    "-o", "--output", default=None, type=click.Path(), help="Where to output the parsed IDL. Use `-` for output to stdout"
 )
-@click.argument('filenames', nargs=-1)
+@click.argument("filenames", nargs=-1)
 def parse(output, filenames):
     """
     Parse data_model XML files and output the resulting .matter file.
@@ -326,11 +319,12 @@ def parse(output, filenames):
     IdlGenerator(storage=storage, idl=data).render(dry_run=False)
 
     if output:
-        if output == '-':
+        if output == "-":
             print(storage.content)
         else:
-            with open(output, 'wt', encoding="utf8") as o:
+            with open(output, "wt", encoding="utf8") as o:
                 o.write(storage.content)
 
+
 if __name__ == "__main__":
-    main(auto_envvar_prefix='CHIP')
+    main(auto_envvar_prefix="CHIP")
