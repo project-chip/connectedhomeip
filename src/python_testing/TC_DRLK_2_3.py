@@ -69,6 +69,10 @@ class TC_DRLK_2_3(MatterBaseTest, DRLK_COMMON):
     def default_endpoint(self) -> int:
         return 1
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_DRLK_2_3(self):
         await self.run_drlk_test_2_3()
