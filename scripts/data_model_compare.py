@@ -65,40 +65,14 @@ __LOG_LEVELS__ = {
     'fatal': logging.FATAL,
 }
 
-@click.command()
+@click.group()
 @click.option(
     '--log-level',
     default='INFO',
     show_default=True,
     type=click.Choice(list(__LOG_LEVELS__.keys()), case_sensitive=False),
     help='Determines the verbosity of script output.')
-@click.option(
-    '--no-print',
-    show_default=True,
-    default=False,
-    is_flag=True,
-    help='Do not pring output data (parsed data)')
-@click.option(
-    "-o",
-    "--output",
-    default=None,
-    type=click.Path(),
-    help="Where to output the parsed IDL."
-)
-@click.option(
-    "--compare",
-    default=None,
-    type=click.Path(exists=True),
-    help="An input .matter IDL to compare with."
-)
-@click.option(
-    "--compare-output",
-    default=None,
-    type=click.Path(),
-    help="Where to output the compare IDL"
-)
-@click.argument('filenames', nargs=-1)
-def main(log_level, no_print, output, compare, compare_output, filenames):
+def main(log_level):
     """
     A program supporting parsing of CSA data model XML files and generating them
     as human readable IDL output.
@@ -107,11 +81,15 @@ def main(log_level, no_print, output, compare, compare_output, filenames):
     such as using:
 
     \b
-       matter-data-model-xml-parser                                      \\
-          --compare src/controller/data_model/controller-clusters.matter \\
-          --compare-output out/orig.matter                               \\
-          --output out/from_xml.matter                                   \\
+       uv run scripts/data_model_compare.py parse  \\
+          --output -                               \\
           data_model/clusters/Switch.xml
+
+    \b
+        uv run scripts/data_model_compare.py filter                    \\
+        --matter src/controller/data_model/controller-clusters.matter  \\
+        --output -                                                     \\
+        data_model/clusters/Switch.xml
     """
     if _has_coloredlogs:
         coloredlogs.install(level=__LOG_LEVELS__[
@@ -123,44 +101,81 @@ def main(log_level, no_print, output, compare, compare_output, filenames):
             datefmt='%Y-%m-%d %H:%M:%S'
         )
 
-    if (compare is None) != (compare_output is None):
-        LOGGER.error(
-            "Either both or none of --compare AND --compare-output must be set")
-        sys.exit(1)
-
+@main.command('filter')
+@click.option(
+    "--matter",
+    default=None,
+    required=True,
+    type=click.Path(exists=True),
+    help="An input .matter IDL to select a subset of clusters to include."
+)
+@click.option(
+    "--output",
+    default=None,
+    required=True,
+    type=click.Path(),
+    help="Where to output the generated XML from the input data mode."
+)
+@click.argument('filenames', nargs=-1)
+def filter_matter(matter, output, filenames):
+    """
+    Filter clusters from a ".matter" file to contain only clusters defined
+    in the given data_model XML files
+    """
     LOGGER.info("Starting to parse ...")
+    sources = [ParseSource(source=name) for name in filenames]
+    data_model_xmls = ParseXmls(sources)
+    LOGGER.info("Parse completed")
 
+    matter_idl = CreateParser(skip_meta=True).parse(
+        open(matter).read(), file_name=matter)
+
+    # ensure that input file is filtered to only interesting
+    # clusters
+    loaded_clusters = {c.code for c in data_model_xmls.clusters}
+    matter_idl.clusters = [
+        c for c in matter_idl.clusters if c.code in loaded_clusters]
+    normalize_order(matter_idl)
+
+    storage = InMemoryStorage()
+    IdlGenerator(storage=storage, idl=matter_idl).render(dry_run=False)
+    if output == '-':
+        print(storage.content)
+    else:
+        with open(output, 'wt', encoding="utf8") as o:
+            o.write(storage.content)
+
+
+@main.command('parse')
+@click.option(
+    "-o",
+    "--output",
+    default=None,
+    type=click.Path(),
+    help="Where to output the parsed IDL. Use `-` for output to stdout"
+)
+@click.argument('filenames', nargs=-1)
+def parse(output, filenames):
+    """
+    Parse data_model XML files and output the resulting .matter file.
+    """
+    LOGGER.info("Starting to parse ...")
     sources = [ParseSource(source=name) for name in filenames]
     data = ParseXmls(sources)
     LOGGER.info("Parse completed")
 
-    if compare:
-        other_idl = CreateParser(skip_meta=True).parse(
-            open(compare).read(), file_name=compare)
-
-        # ensure that input file is filtered to only interesting
-        # clusters
-        loaded_clusters = {c.code for c in data.clusters}
-        other_idl.clusters = [
-            c for c in other_idl.clusters if c.code in loaded_clusters]
-
-        # Ensure consistent ordering for compares
-        normalize_order(data)
-        normalize_order(other_idl)
-
-        storage = InMemoryStorage()
-        IdlGenerator(storage=storage, idl=other_idl).render(dry_run=False)
-        with open(compare_output, 'wt', encoding="utf8") as o:
-            o.write(storage.content)
+    # make sure compares are working well - same ordering
+    normalize_order(data)
 
     storage = InMemoryStorage()
     IdlGenerator(storage=storage, idl=data).render(dry_run=False)
 
     if output:
-        with open(output, 'wt', encoding="utf8") as o:
-            o.write(storage.content)
-    elif not no_print:
-        print(storage.content)
+        if output == '-':
+            print(storage.content)
+        else:
+            with open(output, 'wt', encoding="utf8") as o:
+                o.write(storage.content)
 
 
 if __name__ == "__main__":
