@@ -801,7 +801,7 @@ def BuildTelinkTarget():
     ])
 
     target.AppendModifier('ota', enable_ota=True)
-    target.AppendModifier('dfu', enable_dfu=True)
+    target.AppendModifier('dfu-smp', enable_dfu_smp=True)
     target.AppendModifier('shell', enable_shell=True)
     target.AppendModifier('rpc', enable_rpcs=True)
     target.AppendModifier('factory-data', enable_factory_data=True)

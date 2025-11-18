@@ -50,7 +50,7 @@ group("default") {
     } else if (chip_device_platform == "efr32") {
       deps += [ "${chip_root}/src/platform/silabs/efr32:logging" ]
     } else if (chip_device_platform == "SiWx917") {
-      deps += [ "${chip_root}/src/platform/silabs/SiWx917:logging" ]
+      deps += [ "${chip_root}/src/platform/silabs/SiWx:logging" ]
     } else if (chip_device_platform == "linux") {
       deps += [ ":stdio" ]
     } else if (chip_device_platform == "tizen") {

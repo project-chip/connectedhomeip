@@ -73,21 +73,21 @@ void WebRTCTransportRequestorManager::InitCallbacks(OnOfferCallback onOnOfferCal
     gOnEndCallback           = onEndCallback;
 }
 
-CHIP_ERROR WebRTCTransportRequestorManager::HandleOffer(uint16_t sessionId, const OfferArgs & args)
+CHIP_ERROR WebRTCTransportRequestorManager::HandleOffer(const WebRTCSessionStruct & session, const OfferArgs & args)
 {
     std::string offer = args.sdp;
-    int err           = gOnOfferCallback(sessionId, offer.c_str());
+    int err           = gOnOfferCallback(session.id, offer.c_str());
     return err == 0 ? CHIP_NO_ERROR : CHIP_ERROR_INCORRECT_STATE;
 }
 
-CHIP_ERROR WebRTCTransportRequestorManager::HandleAnswer(uint16_t sessionId, const std::string & sdpAnswer)
+CHIP_ERROR WebRTCTransportRequestorManager::HandleAnswer(const WebRTCSessionStruct & session, const std::string & sdpAnswer)
 {
     std::string answer = sdpAnswer;
-    int err            = gOnAnswerCallback(sessionId, answer.c_str());
+    int err            = gOnAnswerCallback(session.id, answer.c_str());
     return err == 0 ? CHIP_NO_ERROR : CHIP_ERROR_INCORRECT_STATE;
 }
 
-CHIP_ERROR WebRTCTransportRequestorManager::HandleICECandidates(uint16_t sessionId,
+CHIP_ERROR WebRTCTransportRequestorManager::HandleICECandidates(const WebRTCSessionStruct & session,
                                                                 const std::vector<ICECandidateStruct> & candidates)
 {
     std::vector<OwnedIceCandidate> remoteCandidates;
@@ -120,13 +120,14 @@ CHIP_ERROR WebRTCTransportRequestorManager::HandleICECandidates(uint16_t session
         cStrings.push_back(candidate.view);
     }
 
-    int err = gOnICECandidatesCallback(sessionId, cStrings.data(), static_cast<int>(cStrings.size()));
+    int err = gOnICECandidatesCallback(session.id, cStrings.data(), static_cast<int>(cStrings.size()));
     return err == 0 ? CHIP_NO_ERROR : CHIP_ERROR_INCORRECT_STATE;
 }
 
-CHIP_ERROR WebRTCTransportRequestorManager::HandleEnd(uint16_t sessionId, WebRTCTransportRequestor::WebRTCEndReasonEnum reasonCode)
+CHIP_ERROR WebRTCTransportRequestorManager::HandleEnd(const WebRTCSessionStruct & session,
+                                                      WebRTCTransportRequestor::WebRTCEndReasonEnum reasonCode)
 {
-    int err = gOnEndCallback(sessionId, static_cast<uint8_t>(reasonCode));
+    int err = gOnEndCallback(session.id, static_cast<uint8_t>(reasonCode));
     return err == 0 ? CHIP_NO_ERROR : CHIP_ERROR_INCORRECT_STATE;
 }
 

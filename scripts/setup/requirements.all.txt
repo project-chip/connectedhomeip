@@ -4,10 +4,6 @@ virtualenv
 # core build requirements
 -r requirements.build.txt
 
-# esp-idf
--c constraints.esp32.txt
--r requirements.esp32.txt
-
 -r requirements.zephyr.txt
 -r requirements.cirque.txt
 -r requirements.memory.txt
