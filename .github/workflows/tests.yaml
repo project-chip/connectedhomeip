@@ -814,10 +814,13 @@ jobs:
     repl_tests_linux_run:
         name: REPL Tests - Linux (RUN)
         needs: repl_tests_linux_build
+        timeout-minutes: 45
 
         if: github.actor != 'restyled-io[bot]'
 
         strategy:
+            # Since some of these tests can be flaky, do not fail all matrix parts when a single one fails
+            fail-fast: false
             matrix:
                 # This list is empirically created to have a reasonable time split. The "" that runs the "other"
                 # tests is reasonably fast, the others take about 20-30 minutes each at the time this was split.
