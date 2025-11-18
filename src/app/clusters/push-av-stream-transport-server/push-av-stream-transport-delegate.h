@@ -84,7 +84,7 @@ public:
      *         Failure if modification fails
      *
      * @note The buffers storing URL, Trigger Options, Motion Zones, Container Options are owned by
-     * the PushAvStreamTransport Server. The allocated buffers are cleared and reassigned to modified
+     * the Push AV Stream Transport server. The allocated buffers are cleared and reassigned to modified
      * transportOptions on success of ModifyPushTransport and deallocated on success of DeallocatePushTransport.
      */
     virtual Protocols::InteractionModel::Status
