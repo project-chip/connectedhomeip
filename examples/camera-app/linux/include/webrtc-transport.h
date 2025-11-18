@@ -111,11 +111,9 @@ public:
 
     // Drain candidates - returns all accumulated candidates and clears the internal list
     // This prevents resending the same candidates multiple times during trickle ICE
-    const std::vector<ICECandidateInfo> DrainCandidates()
+    std::vector<ICECandidateInfo> DrainCandidates()
     {
-        std::vector<ICECandidateInfo> candidates = std::move(mLocalCandidates);
-        mLocalCandidates.clear();
-        return candidates;
+        return std::move(mLocalCandidates);
     }
 
     void SetCandidates(std::vector<ICECandidateInfo> candidates) { mLocalCandidates = candidates; }
