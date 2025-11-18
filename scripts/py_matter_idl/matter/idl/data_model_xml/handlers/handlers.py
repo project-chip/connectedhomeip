@@ -23,7 +23,7 @@ from matter.idl.matter_idl_types import (ApiMaturity, Attribute, AttributeQualit
 from .base import BaseHandler, HandledDepth
 from .context import Context
 from .derivation import AddBaseInfoPostProcessor
-from .parsing import (ApplyConstraint, AttributesToAttribute, AttributesToBitFieldConstantEntry, AttributesToCommand,
+from .parsing import (ParseOptionalInt, AttributesToAttribute, AttributesToBitFieldConstantEntry, AttributesToCommand,
                       AttributesToEvent, AttributesToField, NormalizeDataType, NormalizeName, ParseInt, StringToAccessPrivilege)
 
 LOGGER = logging.getLogger(__name__)
@@ -136,6 +136,47 @@ class MandatoryConformFieldHandler(BaseHandler):
             self._field.qualities |= FieldQuality.OPTIONAL
 
 
+class ConstraintHandler(BaseHandler):
+    def __init__(self, context: Context, field: Field):
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
+        self._field = field
+
+    def GetNextProcessor(self, name: str, attrs: AttributesImpl):
+        if name == "allowed":
+            pass  # unsure what to do allowed
+        elif name == "desc":
+            pass  # free-form description
+        elif name in {"countBetween", "maxCount", "minCount", "maxCodePoints"}:
+            pass  # cannot implement count
+        elif name == "min":
+            # field.data_type.min_value = ParseOptionalInt(attrs["value"])
+            pass
+        elif name == "max":
+            # Data with formulas like `value="1500 - StartTime"` cannot be handled
+            # field.data_type.max_value = ParseOptionalInt(attrs["value"])
+            pass
+        elif name == "between":
+            # TODO: examples existing in the parsed data which are NOT
+            #       handled:
+            #         - from="-2.5°C" to="2.5°C"
+            #         - from="0%" to="100%"
+            # field.data_type.min_value = ParseOptionalInt(attrs["from"])
+            # field.data_type.max_value = ParseOptionalInt(attrs["to"])
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        elif name == "maxLength":
+            self._field.data_type.max_length = ParseOptionalInt(attrs["value"])
+        elif name == "minLength":
+            self._field.data_type.min_length = ParseOptionalInt(attrs["value"])
+        elif name == "lengthBetween":
+            # TODO: this is NOT ok (see data_model/master/clusters/NetworkCommissioningCluster.xml)
+            self._field.data_type.min_length = ParseOptionalInt(attrs["from"])
+            self._field.data_type.max_length = ParseOptionalInt(attrs["to"])
+        else:
+            LOGGER.error(f"UNKNOWN constraint type {name}")
+        return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
+
+
+
 class FieldHandler(BaseHandler):
     def __init__(self, context: Context, field: Field):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
@@ -143,8 +184,7 @@ class FieldHandler(BaseHandler):
 
     def GetNextProcessor(self, name: str, attrs: AttributesImpl):
         if name == "constraint":
-            ApplyConstraint(attrs, self._field)
-            return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
+            return ConstraintHandler(self.context, self._field)
         elif name == "mandatoryConform":
             return MandatoryConformFieldHandler(self.context, self._field)
         elif name == "optionalConform":
@@ -355,8 +395,7 @@ class AttributeHandler(BaseHandler):
             self._deprecated = True
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "constraint":
-            ApplyConstraint(attrs, self._attribute.definition)
-            return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
+            return ConstraintHandler(self.context, self._attribute.definition)
         else:
             return BaseHandler(self.context)
 

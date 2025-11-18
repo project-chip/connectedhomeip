@@ -128,28 +128,3 @@ def ParseXmls(sources: List[ParseSource], include_meta_data=True) -> Idl:
             raise
 
     return handler.Finish()
-
-
-def normalize_order(idl: Idl):
-    """Re-sorts contents of things inside a cluster so that
-       output is easily diffed by humans.
-    """
-
-    # This method exists because `zapt` generation of IDL files
-    # are generally based on SQL select query ordering, likely
-    # with some sort fields to achieve determinism
-    #
-    # However overall, especially if manual editing, it seems
-    # easier to just fix a sort order instead of trying to
-    # match another tool ordering that resides in another
-    # code location.
-
-    idl.clusters.sort(key=lambda c: c.name)
-
-    for cluster in idl.clusters:
-        cluster.enums.sort(key=lambda e: e.name)
-        cluster.bitmaps.sort(key=lambda b: b.name)
-        cluster.events.sort(key=lambda e: e.code)
-        cluster.attributes.sort(key=lambda a: a.definition.code)
-        cluster.structs.sort(key=lambda s: s.name)
-        cluster.commands.sort(key=lambda c: c.code)

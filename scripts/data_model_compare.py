@@ -47,6 +47,7 @@ with PythonPath('py_matter_idl', relative_to=__file__):
     from matter.idl.generators.storage import InMemoryStorage
     from matter.idl.matter_idl_parser import CreateParser
     from matter.idl.data_model_xml import ParseXmls, ParseSource
+    from matter.idl.matter_idl_types import Idl
 
 try:
     import coloredlogs
@@ -64,6 +65,30 @@ __LOG_LEVELS__ = {
     'warn': logging.WARNING,
     'fatal': logging.FATAL,
 }
+
+def _normalize_order(idl: Idl):
+    """Re-sorts contents of things inside a cluster so that
+       output is easily diffed by humans.
+    """
+
+    # This method exists because `zapt` generation of IDL files
+    # are generally based on SQL select query ordering, likely
+    # with some sort fields to achieve determinism
+    #
+    # However overall, especially if manual editing, it seems
+    # easier to just fix a sort order instead of trying to
+    # match another tool ordering that resides in another
+    # code location.
+
+    idl.clusters.sort(key=lambda c: c.name)
+
+    for cluster in idl.clusters:
+        cluster.enums.sort(key=lambda e: e.name)
+        cluster.bitmaps.sort(key=lambda b: b.name)
+        cluster.events.sort(key=lambda e: e.code)
+        cluster.attributes.sort(key=lambda a: a.definition.code)
+        cluster.structs.sort(key=lambda s: s.name)
+        cluster.commands.sort(key=lambda c: c.code)
 
 @click.group()
 @click.option(
@@ -83,13 +108,13 @@ def main(log_level):
     \b
        uv run scripts/data_model_compare.py parse  \\
           --output -                               \\
-          data_model/clusters/Switch.xml
+          data_model/master/clusters/Switch.xml
 
     \b
         uv run scripts/data_model_compare.py filter                    \\
         --matter src/controller/data_model/controller-clusters.matter  \\
         --output -                                                     \\
-        data_model/clusters/Switch.xml
+        data_model/master/clusters/Switch.xml
     """
     if _has_coloredlogs:
         coloredlogs.install(level=__LOG_LEVELS__[
@@ -135,7 +160,7 @@ def filter_matter(matter, output, filenames):
     loaded_clusters = {c.code for c in data_model_xmls.clusters}
     matter_idl.clusters = [
         c for c in matter_idl.clusters if c.code in loaded_clusters]
-    normalize_order(matter_idl)
+    _normalize_order(matter_idl)
 
     storage = InMemoryStorage()
     IdlGenerator(storage=storage, idl=matter_idl).render(dry_run=False)
@@ -165,7 +190,7 @@ def parse(output, filenames):
     LOGGER.info("Parse completed")
 
     # make sure compares are working well - same ordering
-    normalize_order(data)
+    _normalize_order(data)
 
     storage = InMemoryStorage()
     IdlGenerator(storage=storage, idl=data).render(dry_run=False)
