@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022-2024 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "ContactSensorManager.h"
+#include "MotionSensorManager.h"
 
 #include "AppConfig.h"
 #include "AppTask.h"
@@ -29,29 +29,29 @@
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
-ContactSensorManager ContactSensorManager::sContactSensor;
+MotionSensorManager MotionSensorManager::sMotionSensor;
 
-int ContactSensorManager::Init()
+int MotionSensorManager::Init()
 {
     int err = 0;
 
-    mState                = State::kContactOpened;
+    mState                = State::kMotionOpened;
     mCallbackStateChanged = nullptr;
 
     return err;
 }
 
-void ContactSensorManager::SetCallback(CallbackStateChanged aCallbackStateChanged)
+void MotionSensorManager::SetCallback(CallbackStateChanged aCallbackStateChanged)
 {
     mCallbackStateChanged = aCallbackStateChanged;
 }
 
-bool ContactSensorManager::IsContactClosed()
+bool MotionSensorManager::IsMotionClosed()
 {
-    return mState == State::kContactClosed;
+    return mState == State::kMotionClosed;
 }
 
-void ContactSensorManager::InitiateAction(Action aAction)
+void MotionSensorManager::InitiateAction(Action aAction)
 {
     AppEvent event;
     event.Type               = AppEvent::kEventType_DeviceAction;
@@ -60,25 +60,25 @@ void ContactSensorManager::InitiateAction(Action aAction)
     GetAppTask().PostEvent(&event);
 }
 
-void ContactSensorManager::HandleAction(AppEvent * aEvent)
+void MotionSensorManager::HandleAction(AppEvent * aEvent)
 {
     Action action = static_cast<Action>(aEvent->DeviceEvent.Action);
     // Change current state based on action:
     // - if state is closed and action is signal lost, change state to opened
     // - if state is opened and action is signal detected, change state to closed
     // - else, the state/action combination does not change the state.
-    if (sContactSensor.mState == State::kContactClosed && action == Action::kSignalLost)
+    if (sMotionSensor.mState == State::kMotionClosed && action == Action::kSignalLost)
     {
-        sContactSensor.mState = State::kContactOpened;
+        sMotionSensor.mState = State::kMotionOpened;
     }
-    else if (sContactSensor.mState == State::kContactOpened && action == Action::kSignalDetected)
+    else if (sMotionSensor.mState == State::kMotionOpened && action == Action::kSignalDetected)
     {
-        sContactSensor.mState = State::kContactClosed;
+        sMotionSensor.mState = State::kMotionClosed;
     }
 
-    if (sContactSensor.mCallbackStateChanged != nullptr)
+    if (sMotionSensor.mCallbackStateChanged != nullptr)
     {
-        sContactSensor.mCallbackStateChanged(sContactSensor.mState);
+        sMotionSensor.mCallbackStateChanged(sMotionSensor.mState);
     }
     else
     {

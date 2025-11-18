@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022-2023 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,7 @@
 #pragma once
 
 #include "AppTaskCommon.h"
-#include "ContactSensorManager.h"
+#include "MotionSensorManager.h"
 
 // Application-defined error codes in the CHIP_ERROR space.
 #define APP_ERROR_UNHANDLED_EVENT CHIP_APPLICATION_ERROR(0x03)
@@ -27,7 +27,7 @@
 class AppTask : public AppTaskCommon
 {
 public:
-    void PostContactActionRequest(ContactSensorManager::Action aAction);
+    void PostMotionActionRequest(MotionSensorManager::Action aAction);
     void UpdateClusterState(void);
     void UpdateDeviceState(void);
 
@@ -41,12 +41,12 @@ private:
     CHIP_ERROR Init(void);
     void LinkLeds(LedManager & ledManager);
 
-    static void OnStateChanged(ContactSensorManager::State aState);
+    static void OnStateChanged(MotionSensorManager::State aState);
 
     static void UpdateClusterStateInternal(intptr_t arg);
     static void UpdateDeviceStateInternal(intptr_t arg);
 
-    static void ContactActionEventHandler(AppEvent * aEvent);
+    static void MotionActionEventHandler(AppEvent * aEvent);
 
     bool mSyncClusterToButtonAction = false;
 

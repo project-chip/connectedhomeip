@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -45,8 +45,8 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         }
         else
         {
-            task.PostContactActionRequest(*value ? ContactSensorManager::Action::kSignalDetected
-                                                 : ContactSensorManager::Action::kSignalLost);
+            task.PosMotionActionRequest(*value ? MotionSensorManager::Action::kSignalDetected
+                                               : MotionSensorManager::Action::kSignalLost);
         }
     }
 }

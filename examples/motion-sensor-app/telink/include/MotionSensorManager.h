@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +23,7 @@
 
 #include "AppEventCommon.h"
 
-class ContactSensorManager
+class MotionSensorManager
 {
 public:
     enum class Action : uint8_t
@@ -35,13 +35,13 @@ public:
 
     enum class State : uint8_t
     {
-        kContactClosed = 0,
-        kContactOpened,
+        kMotionClosed = 0,
+        kMotionOpened,
         kInvalid
     };
 
     int Init();
-    bool IsContactClosed();
+    bool IsMotionClosed();
     void InitiateAction(Action aAction);
 
     typedef void (*CallbackStateChanged)(State aState);
@@ -50,13 +50,13 @@ public:
     static void HandleAction(AppEvent * aEvent);
 
 private:
-    friend ContactSensorManager & ContactSensorMgr(void);
+    friend MotionSensorManager & MotionSensorMgr(void);
     State mState;
     CallbackStateChanged mCallbackStateChanged;
-    static ContactSensorManager sContactSensor;
+    static MotionSensorManager sMotionSensor;
 };
 
-inline ContactSensorManager & ContactSensorMgr(void)
+inline MotionSensorManager & MotionSensorMgr(void)
 {
-    return ContactSensorManager::sContactSensor;
+    return MotionSensorManager::sMotionSensor;
 }

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022-2024 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,31 +34,31 @@ AppTask AppTask::sAppTask;
 
 CHIP_ERROR AppTask::Init(void)
 {
-    SetExampleButtonCallbacks(ContactActionEventHandler);
+    SetExampleButtonCallbacks(MotionActionEventHandler);
     InitCommonParts();
 
-    LedManager::getInstance().setLed(LedManager::EAppLed_App0, ContactSensorMgr().IsContactClosed());
+    LedManager::getInstance().setLed(LedManager::EAppLed_App0, MotionSensorMgr().IsMotionClosed());
 
     UpdateDeviceState();
 
-    ContactSensorMgr().SetCallback(OnStateChanged);
+    MotionSensorMgr().SetCallback(OnStateChanged);
 
     return CHIP_NO_ERROR;
 }
 
-void AppTask::OnStateChanged(ContactSensorManager::State aState)
+void AppTask::OnStateChanged(MotionSensorManager::State aState)
 {
-    // If the contact state was changed, update LED state and cluster state (only if button was pressed).
-    //  - turn on the contact LED if contact sensor is in closed state.
-    //  - turn off the lock LED if contact sensor is in opened state.
-    if (ContactSensorManager::State::kContactClosed == aState)
+    // If the Motion state was changed, update LED state and cluster state (only if button was pressed).
+    //  - turn on the Motion LED if Motion sensor is in closed state.
+    //  - turn off the lock LED if Motion sensor is in opened state.
+    if (MotionSensorManager::State::kMotionClosed == aState)
     {
-        LOG_INF("Contact state changed to CLOSED");
+        LOG_INF("Motion state changed to CLOSED");
         LedManager::getInstance().setLed(LedManager::EAppLed_App0, true);
     }
-    else if (ContactSensorManager::State::kContactOpened == aState)
+    else if (MotionSensorManager::State::kMotionOpened == aState)
     {
-        LOG_INF("Contact state changed to OPEN");
+        LOG_INF("Motion state changed to OPEN");
         LedManager::getInstance().setLed(LedManager::EAppLed_App0, false);
     }
 
@@ -68,19 +68,19 @@ void AppTask::OnStateChanged(ContactSensorManager::State aState)
     }
 }
 
-void AppTask::PostContactActionRequest(ContactSensorManager::Action aAction)
+void AppTask::PostMotionActionRequest(MotionSensorManager::Action aAction)
 {
     AppEvent event;
     event.Type               = AppEvent::kEventType_DeviceAction;
     event.DeviceEvent.Action = static_cast<uint8_t>(aAction);
-    event.Handler            = ContactActionEventHandler;
+    event.Handler            = MotionActionEventHandler;
 
     sAppTask.PostEvent(&event);
 }
 
 void AppTask::UpdateClusterStateInternal(intptr_t arg)
 {
-    uint8_t newValue = ContactSensorMgr().IsContactClosed();
+    uint8_t newValue = MotionSensorMgr().IsMotionClosed();
 
     ChipLogProgress(NotSpecified, "StateValue::Set : %d", newValue);
 
@@ -89,26 +89,26 @@ void AppTask::UpdateClusterStateInternal(intptr_t arg)
     booleanState->SetStateValue(newValue);
 }
 
-void AppTask::ContactActionEventHandler(AppEvent * aEvent)
+void AppTask::MotionActionEventHandler(AppEvent * aEvent)
 {
-    ContactSensorManager::Action action = ContactSensorManager::Action::kInvalid;
+    MotionSensorManager::Action action  = MotionSensorManager::Action::kInvalid;
     CHIP_ERROR err                      = CHIP_NO_ERROR;
 
-    ChipLogProgress(NotSpecified, "ContactActionEventHandler");
+    ChipLogProgress(NotSpecified, "MotionActionEventHandler");
 
     if (aEvent->Type == AppEvent::kEventType_DeviceAction)
     {
-        action = static_cast<ContactSensorManager::Action>(aEvent->DeviceEvent.Action);
+        action = static_cast<MotionSensorManager::Action>(aEvent->DeviceEvent.Action);
     }
     else if (aEvent->Type == AppEvent::kEventType_Button)
     {
-        if (ContactSensorMgr().IsContactClosed())
+        if (MotionSensorMgr().IsMotionClosed())
         {
-            action = ContactSensorManager::Action::kSignalLost;
+            action = MotionSensorManager::Action::kSignalLost;
         }
         else
         {
-            action = ContactSensorManager::Action::kSignalDetected;
+            action = MotionSensorManager::Action::kSignalDetected;
         }
 
         sAppTask.SetSyncClusterToButtonAction(true);
@@ -116,12 +116,12 @@ void AppTask::ContactActionEventHandler(AppEvent * aEvent)
     else
     {
         err    = APP_ERROR_UNHANDLED_EVENT;
-        action = ContactSensorManager::Action::kInvalid;
+        action = MotionSensorManager::Action::kInvalid;
     }
 
     if (err == CHIP_NO_ERROR)
     {
-        ContactSensorMgr().InitiateAction(action);
+        MotionSensorMgr().InitiateAction(action);
     }
 }
 

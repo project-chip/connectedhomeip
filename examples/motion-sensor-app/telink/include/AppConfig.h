@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,6 @@
 
 #pragma once
 
-// ---- All Clusters Application example config ----
+// ---- Motion sensor example config ----
 #define APP_SET_DEVICE_INFO_PROVIDER 1
 #define APP_SET_NETWORK_COMM_ENDPOINT_SEC 0

@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2023 Project CHIP Authors
+#    Copyright (c) 2025 Project CHIP Authors
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-mainmenu "Matter Telink Contact Sensor Example Application"
+mainmenu "Matter Telink Motion Sensor Example Application"
 
 rsource "../../../config/telink/chip-module/Kconfig.defaults"
 source "Kconfig.zephyr"

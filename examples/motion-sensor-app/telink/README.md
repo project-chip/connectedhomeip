@@ -1,4 +1,4 @@
-# Matter Telink Contact Sensor Example Application
+# Matter Telink Motion Sensor Example Application
 
 You can use this example as a reference for creating your own application.
 
@@ -91,7 +91,7 @@ The following buttons are available on **tlsr9518adk80d** board:
 | Name     | Function               | Description                                                                                                                                       |
 | :------- | :--------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Button 1 | Factory reset          | Perform factory reset to forget currently commissioned Thread network and return to a decommissioned state (to activate, push the button 3 times) |
-| Button 2 | Toggle Contact State   | Manually triggers the Contact Sensor State                                                                                                        |
+| Button 2 | Toggle Motion State   | Manually triggers the Motion Sensor State                                                                                                        |
 | Button 3 | NA                     | NA                                                                                                                                                |
 | Button 4 | Open commission window | The button is opening commissioning window to perform commissioning over BLE                                                                      |
 
@@ -123,9 +123,9 @@ be used to specify the the effect. It is able to be in following effects:
 | Blinks (950 ms on/50 ms off)    | Finish ( `Clusters::Identify::EffectIdentifierEnum::kFinishEffect`)          |
 | LED off                         | Stop (`Clusters::Identify::EffectIdentifierEnum::kStopEffect`)               |
 
-#### Indicate current state of Contact Sensor
+#### Indicate current state of Motion Sensor
 
-**White** LED shows current state of Contact Sensor
+**White** LED shows current state of Motion Sensor
 
 ### CHIP tool commands
 

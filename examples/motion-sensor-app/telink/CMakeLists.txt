@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2022-2024 Project CHIP Authors
+#    Copyright (c) 2025 Project CHIP Authors
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -24,19 +24,19 @@ include(${TELINK_COMMON}/common.cmake)
 include(${CHIP_ROOT}/config/telink/app/enable-gnu-std.cmake)
 include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
 
-project(chip-telink-contact-sensor-example)
+project(chip-telink-motion-sensor-example)
 
 target_include_directories(app PRIVATE
                            include
                            ${GEN_DIR}/app-common
-                           ${GEN_DIR}/contact-sensor-app
+                           ${GEN_DIR}/motion-sensor-app
                            ${TELINK_COMMON}/common/include
                            ${TELINK_COMMON}/util/include
                            ${TELINK_COMMON}/zephyr_ext)
 
 target_sources(app PRIVATE
                src/AppTask.cpp
-               src/ContactSensorManager.cpp
+               src/MotionSensorManager.cpp
                src/ZclCallbacks.cpp
                ${TELINK_COMMON}/common/src/mainCommon.cpp
                ${TELINK_COMMON}/common/src/AppTaskCommon.cpp
@@ -51,7 +51,7 @@ target_sources(app PRIVATE
                ${TELINK_COMMON}/zephyr_ext/zephyr_ws2812.c)
 
 chip_configure_data_model(app
-    ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../contact-sensor-common/contact-sensor-app.zap
+    ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../motion-sensor-common/motion-sensor-app.zap
 )
 
 if(CONFIG_BOOTLOADER_MCUBOOT)
