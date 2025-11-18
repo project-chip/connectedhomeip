@@ -33,6 +33,7 @@
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/DefaultAclStorage.h>
+#include <app/server/PlatformDnssdServer.h>
 #include <credentials/CertificateValidityPolicy.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
@@ -44,6 +45,7 @@
 #include <crypto/PersistentStorageOperationalKeystore.h>
 #include <inet/InetConfig.h>
 #include <lib/core/CHIPConfig.h>
+#include <lib/dnssd/DnssdServer.h>
 #include <lib/support/SafeInt.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/DefaultTimerDelegate.h>
@@ -436,6 +438,8 @@ public:
 
     app::reporting::ReportScheduler * GetReportScheduler() { return mReportScheduler; }
 
+    chip::app::PlatformDnssdServer & GetDefaultDnssdServer() { return mDefaultDnssdServer; }
+
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     app::JointFabricDatastore & GetJointFabricDatastore() { return mJointFabricDatastore; }
     app::JointFabricAdministrator & GetJointFabricAdministrator() { return mJointFabricAdministrator; }
@@ -729,6 +733,9 @@ private:
     Crypto::OperationalKeystore * mOperationalKeystore;
     Credentials::OperationalCertificateStore * mOpCertStore;
     app::FailSafeContext mFailSafeContext;
+
+    // For dependency injection of DNSSD server implementation
+    app::PlatformDnssdServer mDefaultDnssdServer;
 
     bool mIsDnssdReady = false;
     uint16_t mOperationalServicePort;

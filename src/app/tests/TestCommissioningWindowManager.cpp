@@ -18,6 +18,7 @@
 #include <app/TestEventTriggerDelegate.h>
 #include <app/reporting/ReportSchedulerImpl.h>
 #include <app/server/CommissioningWindowManager.h>
+#include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <crypto/RandUtils.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
@@ -111,9 +112,57 @@ static void StopEventLoop(intptr_t context)
     EXPECT_SUCCESS(chip::DeviceLayer::PlatformMgr().StopEventLoopTask());
 }
 
+class MockDnssdServer : public chip::Dnssd::DnssdServer
+{
+public:
+    MockDnssdServer() :
+        mAdvertiseOperationalCallCount(0), mLastAdvertiseOperationalResult(CHIP_NO_ERROR), mAdvertisingEnabled(false),
+        mIsStopped(false)
+    {}
+    CHIP_ERROR AdvertiseOperational() override
+    {
+        mAdvertiseOperationalCallCount++;
+        if (mIsStopped)
+        {
+            mLastAdvertiseOperationalResult = CHIP_ERROR_INCORRECT_STATE;
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+        mAdvertisingEnabled             = true;
+        mLastAdvertiseOperationalResult = CHIP_NO_ERROR;
+        return CHIP_NO_ERROR;
+    }
+
+    void StartServer() override { mIsStopped = false; }
+
+    void StopServer() override
+    {
+        mAdvertisingEnabled             = false;
+        mIsStopped                      = true;
+        mAdvertiseOperationalCallCount  = 0;
+        mLastAdvertiseOperationalResult = CHIP_NO_ERROR;
+    }
+
+    bool IsAdvertisingEnabled() { return !mIsStopped && mAdvertisingEnabled; }
+
+    void Reset()
+    {
+        mAdvertisingEnabled            = false;
+        mAdvertiseOperationalCallCount = 0;
+    }
+
+    int mAdvertiseOperationalCallCount;
+    CHIP_ERROR mLastAdvertiseOperationalResult;
+
+private:
+    bool mAdvertisingEnabled;
+    bool mIsStopped;
+};
+
 class TestCommissioningWindowManager : public ::testing::Test
 {
 public:
+    static MockDnssdServer mMockDnssd;
+
     static void SetUpTestSuite()
     {
         ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
@@ -135,8 +184,8 @@ public:
         initParams.operationalServicePort = 0;
 
         ASSERT_EQ(chip::Server::GetInstance().Init(initParams), CHIP_NO_ERROR);
-
         Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
+        Server::GetInstance().GetCommissioningWindowManager().SetDnssdServer(&mMockDnssd);
     }
     static void TearDownTestSuite()
     {
@@ -152,6 +201,7 @@ public:
         RETURN_SAFELY_IGNORED mdnsAdvertiser.RemoveServices();
         mdnsAdvertiser.Shutdown();
 
+        Server::GetInstance().GetCommissioningWindowManager().SetDnssdServer(&(Server::GetInstance().GetDefaultDnssdServer()));
         // Server shudown will be called in TearDownTask
 
         // TODO: At this point UDP endpoits still seem leaked and the sanitizer
@@ -164,6 +214,8 @@ public:
         // chip::Platform::MemoryShutdown();
     }
 };
+
+MockDnssdServer TestCommissioningWindowManager::mMockDnssd;
 
 void CheckCommissioningWindowManagerBasicWindowOpenCloseTask(intptr_t context)
 {
@@ -408,5 +460,108 @@ TEST_F(TestCommissioningWindowManager, TestCheckCommissioningWindowManagerEnhanc
     EXPECT_SUCCESS(chip::DeviceLayer::PlatformMgr().ScheduleWork(StopEventLoop));
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 }
+
+chip::DeviceLayer::ChipDeviceEvent CreateEvent(uint16_t eventType)
+{
+    chip::DeviceLayer::ChipDeviceEvent event;
+    event.Type = eventType;
+    return event;
+}
+
+// Verify that the commissioning window is closed when commissioning has completed.
+TEST_F(TestCommissioningWindowManager, TestOnPlatformEventCommissioningComplete)
+{
+    CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
+
+    EXPECT_EQ(commissionMgr.OpenBasicCommissioningWindow(commissionMgr.MaxCommissioningTimeout(),
+                                                         CommissioningWindowAdvertisement::kAllSupported),
+              CHIP_NO_ERROR);
+    EXPECT_TRUE(commissionMgr.IsCommissioningWindowOpen());
+
+    auto event = CreateEvent(chip::DeviceLayer::DeviceEventType::kCommissioningComplete);
+
+    commissionMgr.OnPlatformEvent(&event);
+    // When the commissioning has completed (kCommissioningComplete event) OnPlatformEvent cleans up, closes active sessions and the
+    // commissioning window is closed The device should no longer be discoverable or accept new commissioners.
+    EXPECT_FALSE(commissionMgr.IsCommissioningWindowOpen());
+    EXPECT_EQ(commissionMgr.GetCommissioningMode(), chip::Dnssd::CommissioningMode::kDisabled);
+
+// When BLE is enabled
+#if CONFIG_NETWORK_LAYER_BLE && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    EXPECT_FALSE(Server::GetInstance().GetBleLayerObject()->IsBleClosing());
+#endif
+}
+
+// Verify that on normal failsafe timer expiry the commissioning window remains open.
+// The explicit CloseCommissioningWindow() call is for cleanup and also checks that the commissioning mode changes to kDisabled.
+TEST_F(TestCommissioningWindowManager, TestOnPlatformEventFailSafeTimerExpired)
+{
+    CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
+
+    EXPECT_EQ(commissionMgr.OpenBasicCommissioningWindow(commissionMgr.MaxCommissioningTimeout(),
+                                                         CommissioningWindowAdvertisement::kDnssdOnly),
+              CHIP_NO_ERROR);
+
+    auto event = CreateEvent(chip::DeviceLayer::DeviceEventType::kFailSafeTimerExpired);
+
+    commissionMgr.OnPlatformEvent(&event);
+    EXPECT_TRUE(commissionMgr.IsCommissioningWindowOpen());
+    EXPECT_EQ(commissionMgr.GetCommissioningMode(), chip::Dnssd::CommissioningMode::kEnabledBasic);
+    commissionMgr.CloseCommissioningWindow();
+    EXPECT_EQ(commissionMgr.GetCommissioningMode(), chip::Dnssd::CommissioningMode::kDisabled);
+}
+
+// Verify that operational advertising is started when the operational network is enabled.
+TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnabled)
+{
+    CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
+    auto event                                 = CreateEvent(chip::DeviceLayer::DeviceEventType::kOperationalNetworkEnabled);
+
+    commissionMgr.OnPlatformEvent(&event);
+    EXPECT_EQ(mMockDnssd.mAdvertiseOperationalCallCount, 1);
+    EXPECT_EQ(mMockDnssd.mLastAdvertiseOperationalResult, CHIP_NO_ERROR);
+    EXPECT_TRUE(mMockDnssd.IsAdvertisingEnabled());
+}
+
+// Verify that operational advertising failure is handled gracefully.
+TEST_F(TestCommissioningWindowManager, TestOnPlatformEventOperationalNetworkEnabledFail)
+{
+    CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
+
+    mMockDnssd.Reset();
+
+    // Stopping DNS-SD server to trigger AdvertiseOperational() failure.
+    Server::GetInstance().GetCommissioningWindowManager().GetDnssdServer()->StopServer();
+
+    auto event = CreateEvent(chip::DeviceLayer::DeviceEventType::kOperationalNetworkEnabled);
+
+    commissionMgr.OnPlatformEvent(&event);
+    // This should attempt to start operational advertising, which will fail.
+    EXPECT_EQ(mMockDnssd.mAdvertiseOperationalCallCount, 1);
+    EXPECT_EQ(mMockDnssd.mLastAdvertiseOperationalResult, CHIP_ERROR_INCORRECT_STATE);
+    Server::GetInstance().GetCommissioningWindowManager().GetDnssdServer()->StartServer();
+}
+
+// Verify that BLE advertising is stopped when all BLE connections are closed.
+// BLE advertisement is not supported on Darwin in Matter
+// so this test is skipped on Darwin since it requires the device to act as an advertiser.
+#if CONFIG_NETWORK_LAYER_BLE && !CHIP_DEVICE_LAYER_TARGET_DARWIN
+TEST_F(TestCommissioningWindowManager, TestOnPlatformEventCloseAllBleConnections)
+{
+    CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
+
+    EXPECT_EQ(commissionMgr.OpenBasicCommissioningWindow(commissionMgr.MaxCommissioningTimeout(),
+                                                         CommissioningWindowAdvertisement::kAllSupported),
+              CHIP_NO_ERROR);
+
+    // Ensure that BLE advertising is active before the event generation.
+    EXPECT_TRUE(chip::DeviceLayer::ConnectivityMgr().IsBLEAdvertisingEnabled());
+    auto event = CreateEvent(chip::DeviceLayer::DeviceEventType::kCloseAllBleConnections);
+
+    commissionMgr.OnPlatformEvent(&event);
+    commissionMgr.CloseCommissioningWindow();
+    EXPECT_FALSE(chip::DeviceLayer::ConnectivityMgr().IsBLEAdvertisingEnabled());
+}
+#endif
 
 } // namespace

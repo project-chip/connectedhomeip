@@ -290,6 +290,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     SuccessOrExit(err);
 
     SuccessOrExit(err = mCommissioningWindowManager.Init(this));
+    mCommissioningWindowManager.SetDnssdServer(&mDefaultDnssdServer);
     mCommissioningWindowManager.SetAppDelegate(initParams.appDelegate);
 
     app::DnssdServer::Instance().SetFabricTable(&mFabrics);
