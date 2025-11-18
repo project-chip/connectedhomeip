@@ -259,14 +259,27 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/electrical-power-measurement-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/zone-management-cluster.xml \
                   "
-            - name: Build Apps (part 1)
+            - name: Build Apps with Unified Build
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target linux-x64-bridge-${BUILD_VARIANT}-unified \
+                        --target linux-x64-lock-${BUILD_VARIANT}-unified \
+                        --target linux-x64-microwave-oven-${BUILD_VARIANT}-unified \
+                        --target linux-x64-rvc-${BUILD_VARIANT}-unified \
+                        --target linux-x64-ota-provider-${BUILD_VARIANT}-unified \
+                        --pw-command-launcher=ccache \
+                        build \
+                        --copy-artifacts-to objdir-clone \
+                     "
+            - name: Clean out
+              run: rm -rf out/
+            - name: Build Remaining Apps (part 1)
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --target linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT} \
                         --target linux-x64-all-clusters-${BUILD_VARIANT} \
-                        --target linux-x64-lock-${BUILD_VARIANT} \
-                        --target linux-x64-ota-provider-${BUILD_VARIANT} \
                         --target linux-x64-ota-requestor-${BUILD_VARIANT} \
                         --target linux-x64-tv-app-${BUILD_VARIANT} \
                         --pw-command-launcher=ccache \
@@ -275,14 +288,11 @@ jobs:
                      "
             - name: Clean out
               run: rm -rf out/
-            - name: Build Apps (part 2)
+            - name: Build Remaining Apps (part 2)
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
-                        --target linux-x64-bridge-${BUILD_VARIANT} \
                         --target linux-x64-lit-icd-${BUILD_VARIANT} \
-                        --target linux-x64-microwave-oven-${BUILD_VARIANT} \
-                        --target linux-x64-rvc-${BUILD_VARIANT} \
                         --target linux-x64-network-manager-${BUILD_VARIANT} \
                         --target linux-x64-energy-gateway-${BUILD_VARIANT} \
                         --target linux-x64-energy-management-${BUILD_VARIANT} \
@@ -310,14 +320,14 @@ jobs:
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --all-clusters-app ./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
-                     --lock-app ./objdir-clone/linux-x64-lock-${BUILD_VARIANT}/chip-lock-app \
-                     --ota-provider-app ./objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
+                     --lock-app ./objdir-clone/linux-x64-lock-${BUILD_VARIANT}-unified/chip-lock-app \
+                     --ota-provider-app ./objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
                      --ota-requestor-app ./objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
                      --tv-app ./objdir-clone/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
-                     --bridge-app ./objdir-clone/linux-x64-bridge-${BUILD_VARIANT}/chip-bridge-app \
+                     --bridge-app ./objdir-clone/linux-x64-bridge-${BUILD_VARIANT}-unified/chip-bridge-app \
                      --lit-icd-app ./objdir-clone/linux-x64-lit-icd-${BUILD_VARIANT}/lit-icd-app \
-                     --microwave-oven-app ./objdir-clone/linux-x64-microwave-oven-${BUILD_VARIANT}/chip-microwave-oven-app \
-                     --rvc-app ./objdir-clone/linux-x64-rvc-${BUILD_VARIANT}/chip-rvc-app \
+                     --microwave-oven-app ./objdir-clone/linux-x64-microwave-oven-${BUILD_VARIANT}-unified/chip-microwave-oven-app \
+                     --rvc-app ./objdir-clone/linux-x64-rvc-${BUILD_VARIANT}-unified/chip-rvc-app \
                      --network-manager-app ./objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
                      --energy-gateway-app ./objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
                      --energy-management-app ./objdir-clone/linux-x64-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
@@ -373,14 +383,14 @@ jobs:
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --all-clusters-app ./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
-                     --lock-app ./objdir-clone/linux-x64-lock-${BUILD_VARIANT}/chip-lock-app \
-                     --ota-provider-app ./objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
+                     --lock-app ./objdir-clone/linux-x64-lock-${BUILD_VARIANT}-unified/chip-lock-app \
+                     --ota-provider-app ./objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
                      --ota-requestor-app ./objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
                      --tv-app ./objdir-clone/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
-                     --bridge-app ./objdir-clone/linux-x64-bridge-${BUILD_VARIANT}/chip-bridge-app \
+                     --bridge-app ./objdir-clone/linux-x64-bridge-${BUILD_VARIANT}-unified/chip-bridge-app \
                      --lit-icd-app ./objdir-clone/linux-x64-lit-icd-${BUILD_VARIANT}/lit-icd-app \
-                     --microwave-oven-app ./objdir-clone/linux-x64-microwave-oven-${BUILD_VARIANT}/chip-microwave-oven-app \
-                     --rvc-app ./objdir-clone/linux-x64-rvc-${BUILD_VARIANT}/chip-rvc-app \
+                     --microwave-oven-app ./objdir-clone/linux-x64-microwave-oven-${BUILD_VARIANT}-unified/chip-microwave-oven-app \
+                     --rvc-app ./objdir-clone/linux-x64-rvc-${BUILD_VARIANT}-unified/chip-rvc-app \
                      --network-manager-app ./objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
                      --energy-gateway-app ./objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
                      --energy-management-app ./objdir-clone/linux-x64-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
@@ -395,14 +405,14 @@ jobs:
                      --iterations 1 \
                      --test-timeout-seconds 120 \
                      --all-clusters-app ./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
-                     --lock-app ./objdir-clone/linux-x64-lock-${BUILD_VARIANT}/chip-lock-app \
-                     --ota-provider-app ./objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
+                     --lock-app ./objdir-clone/linux-x64-lock-${BUILD_VARIANT}-unified/chip-lock-app \
+                     --ota-provider-app ./objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
                      --ota-requestor-app ./objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
                      --tv-app ./objdir-clone/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
-                     --bridge-app ./objdir-clone/linux-x64-bridge-${BUILD_VARIANT}/chip-bridge-app \
+                     --bridge-app ./objdir-clone/linux-x64-bridge-${BUILD_VARIANT}-unified/chip-bridge-app \
                      --lit-icd-app ./objdir-clone/linux-x64-lit-icd-${BUILD_VARIANT}/lit-icd-app \
-                     --microwave-oven-app ./objdir-clone/linux-x64-microwave-oven-${BUILD_VARIANT}/chip-microwave-oven-app \
-                     --rvc-app ./objdir-clone/linux-x64-rvc-${BUILD_VARIANT}/chip-rvc-app \
+                     --microwave-oven-app ./objdir-clone/linux-x64-microwave-oven-${BUILD_VARIANT}-unified/chip-microwave-oven-app \
+                     --rvc-app ./objdir-clone/linux-x64-rvc-${BUILD_VARIANT-unified}/chip-rvc-app \
                      --network-manager-app ./objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
                      --energy-gateway-app ./objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
                      --energy-management-app ./objdir-clone/linux-x64-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
@@ -823,10 +833,13 @@ jobs:
     repl_tests_linux_run:
         name: REPL Tests - Linux (RUN)
         needs: repl_tests_linux_build
+        timeout-minutes: 45
 
         if: github.actor != 'restyled-io[bot]'
 
         strategy:
+            # Since some of these tests can be flaky, do not fail all matrix parts when a single one fails
+            fail-fast: false
             matrix:
                 # This list is empirically created to have a reasonable time split. The "" that runs the "other"
                 # tests is reasonably fast, the others take about 20-30 minutes each at the time this was split.
