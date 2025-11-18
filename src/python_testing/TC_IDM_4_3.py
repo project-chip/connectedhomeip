@@ -924,7 +924,6 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         asserts.assert_true(found_attribute, "Should find NodeLabel attribute in priming report")
 
         sub_step9.Shutdown()
-        await asyncio.sleep(1)  # Allow time for subscription teardown to complete
 
         # Step 10: All attributes from all clusters from all endpoints
         # (This was originally test step 19 in the test plan)
@@ -948,8 +947,8 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
             dev_ctrl=TH,
             node_id=self.dut_node_id,
             attributes=subscription_paths,
-            min_interval_sec=self.min_interval_floor_sec,
-            max_interval_sec=120,  # Long timeout to prevent subscription timeout during writes
+            min_interval_sec=0,
+            max_interval_sec=120,
             keepSubscriptions=False,
             fabric_filtered=False,
             autoResubscribe=False
@@ -968,8 +967,8 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
                 total_attributes += len(attributes)
 
         asserts.assert_greater(num_endpoints, 0, "Should receive reports from at least one endpoint")
-        asserts.assert_greater(total_clusters, 4, "Should receive reports from multiple clusters")
-        asserts.assert_greater(total_attributes, 20, "Should receive reports for many attributes")
+        asserts.assert_greater(total_clusters, 40, "Should receive reports from multiple clusters")
+        asserts.assert_greater(total_attributes, 100, "Should receive reports for many attributes")
 
         # Flush priming reports from handler queue before making changes
         handler_step10.flush_reports()
@@ -1034,6 +1033,7 @@ class TC_IDM_4_3(MatterBaseTest, BasicCompositionTests):
         logging.info(f"Changed and verified {changed_count} attribute(s)")
 
         handler_step11.shutdown()
+        await asyncio.sleep(1)  # Allow time for subscription teardown to complete
 
         # Step 12: All attributes from specific cluster on all endpoints
         # (This was originally test step 21 in the test plan)
