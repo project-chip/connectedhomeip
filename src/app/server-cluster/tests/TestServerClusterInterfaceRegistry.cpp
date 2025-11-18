@@ -239,7 +239,7 @@ TEST_F(TestServerClusterInterfaceRegistry, Context)
 
         // set up the registry
         TestServerClusterContext context;
-        EXPECT_EQ(registry.SetContext(context.Create()), CHIP_NO_ERROR);
+        EXPECT_EQ(registry.SetContext(ServerClusterContext{ context.Get() }), CHIP_NO_ERROR);
 
         EXPECT_TRUE(cluster1.HasContext());
         EXPECT_FALSE(cluster2.HasContext());
@@ -255,7 +255,7 @@ TEST_F(TestServerClusterInterfaceRegistry, Context)
         EXPECT_FALSE(cluster2.HasContext());
         EXPECT_FALSE(cluster3.HasContext());
 
-        EXPECT_EQ(registry.SetContext(context.Create()), CHIP_NO_ERROR);
+        EXPECT_EQ(registry.SetContext(ServerClusterContext{ context.Get() }), CHIP_NO_ERROR);
         EXPECT_TRUE(cluster1.HasContext());
         EXPECT_TRUE(cluster2.HasContext());
         EXPECT_FALSE(cluster3.HasContext());
@@ -270,7 +270,7 @@ TEST_F(TestServerClusterInterfaceRegistry, Context)
         EXPECT_TRUE(cluster3.HasContext());
 
         // re-setting context works
-        EXPECT_EQ(registry.SetContext(context.Create()), CHIP_NO_ERROR);
+        EXPECT_EQ(registry.SetContext(ServerClusterContext{ context.Get() }), CHIP_NO_ERROR);
         EXPECT_TRUE(cluster1.HasContext());
         EXPECT_FALSE(cluster2.HasContext());
         EXPECT_TRUE(cluster3.HasContext());
@@ -278,7 +278,7 @@ TEST_F(TestServerClusterInterfaceRegistry, Context)
         // also not valid, but different
         TestServerClusterContext otherContext;
 
-        EXPECT_EQ(registry.SetContext(otherContext.Create()), CHIP_NO_ERROR);
+        EXPECT_EQ(registry.SetContext(ServerClusterContext{ otherContext.Get() }), CHIP_NO_ERROR);
         EXPECT_TRUE(cluster1.HasContext());
         EXPECT_FALSE(cluster2.HasContext());
         EXPECT_TRUE(cluster3.HasContext());
@@ -373,7 +373,7 @@ TEST_F(TestServerClusterInterfaceRegistry, StartupShutdownWithoutContext)
 
         // the clusters are explicitly set to fail startup, so SetContext returns an error.
         // TODO: is this sane? Register() with a startup failure does NOT return a failure.
-        EXPECT_EQ(registry.SetContext(context.Create()), CHIP_ERROR_HAD_FAILURES);
+        EXPECT_EQ(registry.SetContext(ServerClusterContext{ context.Get() }), CHIP_ERROR_HAD_FAILURES);
 
         // Startup called after registration, with failure that is NOT reported (only logged)
         EXPECT_EQ(cluster3.Cluster().GetStartupCallCount(), 0u);
