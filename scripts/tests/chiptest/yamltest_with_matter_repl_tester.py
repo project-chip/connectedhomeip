@@ -41,6 +41,8 @@ from matter.yaml.runner import ReplTestRunner
 from matter.yamltests.definitions import SpecDefinitionsFromPaths
 from matter.yamltests.parser import PostProcessCheckStatus, TestParser, TestParserConfig, build_revision_var_name
 
+log = logging.getLogger(__name__)
+
 _DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 _CLUSTER_XML_DIRECTORY_PATH = os.path.abspath(
@@ -64,9 +66,8 @@ async def execute_test(yaml, runner):
             except (ValueError, IndexError, KeyError):
                 current_val = "unknown"
 
-            logging.warning(f"Step {test_step.label} skipped due to ClusterRevision range not matching (val={current_val}, "
-                            f"min={test_step.min_revision}, "
-                            f"max={test_step.max_revision})")
+            log.warning("Step '%s' skipped due to ClusterRevision range not matching (val=%s, min=%s, max=%s)",
+                        test_step.label, current_val, test_step.min_revision, test_step.max_revision)
             continue
 
         test_action = runner.encode(test_step)
@@ -79,12 +80,12 @@ async def execute_test(yaml, runner):
         post_processing_result = test_step.post_process_response(
             decoded_response)
         if not post_processing_result.is_success():
-            logging.warning(f"Test step failure in {test_step.label}")
+            log.warning("Test step failure in '%s'", test_step.label)
             for entry in post_processing_result.entries:
                 if entry.state == PostProcessCheckStatus.SUCCESS:
                     continue
-                logging.warning("%s: %s", entry.state, entry.message)
-            raise Exception(f'Test step failed {test_step.label}')
+                log.warning("%s: %s", entry.state, entry.message)
+            raise Exception(f"Test step failed '{test_step.label}'")
 
 
 def asyncio_executor(f):
