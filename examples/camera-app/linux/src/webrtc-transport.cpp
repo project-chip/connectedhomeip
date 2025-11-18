@@ -268,7 +268,7 @@ void WebrtcTransport::OnICECandidate(const ICECandidateInfo & candidateInfo)
     ChipLogProgress(Camera, "%s", candidateInfo.candidate.c_str());
     ChipLogProgress(Camera, "  mid: %s, mlineIndex: %d", candidateInfo.mid.c_str(), candidateInfo.mlineIndex);
 
-    // If we're back in Idle state, send this candidate immediately (trickle ICE)
+    // If we're in Idle state (no pending commands), send this candidate immediately (trickle ICE)
     if (mState == State::Idle && mOnICECandidate)
     {
         ChipLogProgress(Camera, "Sending trickle ICE candidate immediately for sessionID: %u", mRequestArgs.sessionId);
