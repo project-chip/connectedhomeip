@@ -28,6 +28,7 @@
 #include <lib/core/TLVDebug.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CHIPCounter.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
 #include <protocols/interaction_model/Constants.h>
@@ -174,7 +175,7 @@ public:
         ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
         sActionsDelegateImpl = new TestActionsDelegateImpl;
         sActionsServer       = new ActionsServer(1, *sActionsDelegateImpl);
-        sActionsServer->Init();
+        EXPECT_SUCCESS(sActionsServer->Init());
     }
     static void TearDownTestSuite()
     {
@@ -296,7 +297,7 @@ TEST_F(TestActionsCluster, TestActionListAttributeAccess)
     tlvWriter.Init(buf);
 
     AttributeReportIBs::Builder builder;
-    builder.Init(&tlvWriter);
+    EXPECT_SUCCESS(builder.Init(&tlvWriter));
 
     ConcreteAttributePath path(1, Clusters::Actions::Id, Clusters::Actions::Attributes::ActionList::Id);
     ConcreteReadAttributePath readPath(path);
@@ -314,27 +315,26 @@ TEST_F(TestActionsCluster, TestActionListAttributeAccess)
     TLV::TLVReader attrReportReader;
     TLV::TLVReader attrDataReader;
 
-    reader.Next();
-    reader.OpenContainer(attrReportsReader);
+    EXPECT_SUCCESS(reader.Next());
+    EXPECT_SUCCESS(reader.OpenContainer(attrReportsReader));
 
-    attrReportsReader.Next();
-    attrReportsReader.OpenContainer(attrReportReader);
+    EXPECT_SUCCESS(attrReportsReader.Next());
+    EXPECT_SUCCESS(attrReportsReader.OpenContainer(attrReportReader));
 
-    attrReportReader.Next();
-    attrReportReader.OpenContainer(attrDataReader);
+    EXPECT_SUCCESS(attrReportReader.Next());
+    EXPECT_SUCCESS(attrReportReader.OpenContainer(attrDataReader));
 
     // We're now in the attribute data IB, skip to the desired tag, we want TagNum = 2
-    attrDataReader.Next();
+    EXPECT_SUCCESS(attrDataReader.Next());
     for (int i = 0; i < 3 && !(IsContextTag(attrDataReader.GetTag()) && TagNumFromTag(attrDataReader.GetTag()) == 2); ++i)
     {
-        attrDataReader.Next();
+        EXPECT_SUCCESS(attrDataReader.Next());
     }
     EXPECT_TRUE(IsContextTag(attrDataReader.GetTag()));
     EXPECT_EQ(TagNumFromTag(attrDataReader.GetTag()), 2u);
 
     Clusters::Actions::Attributes::ActionList::TypeInfo::DecodableType list;
-    CHIP_ERROR err = list.Decode(attrDataReader);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_SUCCESS(list.Decode(attrDataReader));
 
     auto iter = list.begin();
     EXPECT_TRUE(iter.Next());
@@ -383,7 +383,7 @@ TEST_F(TestActionsCluster, TestEndpointListAttributeAccess)
     tlvWriter.Init(buf);
 
     AttributeReportIBs::Builder builder;
-    builder.Init(&tlvWriter);
+    EXPECT_SUCCESS(builder.Init(&tlvWriter));
 
     ConcreteAttributePath path(1, Clusters::Actions::Id, Clusters::Actions::Attributes::EndpointLists::Id);
     ConcreteReadAttributePath readPath(path);
@@ -392,7 +392,7 @@ TEST_F(TestActionsCluster, TestEndpointListAttributeAccess)
     AttributeValueEncoder encoder(builder, subjectDescriptor, path, dataVersion);
 
     // Read the endpoint lists using the Actions cluster's Read function
-    EXPECT_EQ(sActionsServer->Read(path, encoder), CHIP_NO_ERROR);
+    EXPECT_SUCCESS(sActionsServer->Read(path, encoder));
 
     TLV::TLVReader reader;
     reader.Init(buf);
@@ -401,27 +401,25 @@ TEST_F(TestActionsCluster, TestEndpointListAttributeAccess)
     TLV::TLVReader attrReportReader;
     TLV::TLVReader attrDataReader;
 
-    reader.Next();
-    reader.OpenContainer(attrReportsReader);
+    EXPECT_SUCCESS(reader.Next());
+    EXPECT_SUCCESS(reader.OpenContainer(attrReportsReader));
 
-    attrReportsReader.Next();
-    attrReportsReader.OpenContainer(attrReportReader);
+    EXPECT_SUCCESS(attrReportsReader.Next());
+    EXPECT_SUCCESS(attrReportsReader.OpenContainer(attrReportReader));
 
-    attrReportReader.Next();
-    attrReportReader.OpenContainer(attrDataReader);
+    EXPECT_SUCCESS(attrReportReader.Next());
+    EXPECT_SUCCESS(attrReportReader.OpenContainer(attrDataReader));
 
-    // We're now in the attribute data IB, skip to the desired tag, we want TagNum = 2
-    attrDataReader.Next();
+    EXPECT_SUCCESS(attrDataReader.Next());
     for (int i = 0; i < 3 && !(IsContextTag(attrDataReader.GetTag()) && TagNumFromTag(attrDataReader.GetTag()) == 2); ++i)
     {
-        attrDataReader.Next();
+        EXPECT_SUCCESS(attrDataReader.Next());
     }
     EXPECT_TRUE(IsContextTag(attrDataReader.GetTag()));
     EXPECT_EQ(TagNumFromTag(attrDataReader.GetTag()), 2u);
 
     Clusters::Actions::Attributes::EndpointLists::TypeInfo::DecodableType list;
-    CHIP_ERROR err = list.Decode(attrDataReader);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_SUCCESS(list.Decode(attrDataReader));
 
     auto iter = list.begin();
     EXPECT_TRUE(iter.Next());

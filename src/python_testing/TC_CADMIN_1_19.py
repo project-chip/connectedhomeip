@@ -162,7 +162,7 @@ class TC_CADMIN_1_19(CADMINBaseTest):
         self.step(9)
         for fab_idx in fabric_idxs:
             removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(fab_idx)
-            await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
+            await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
 
         self.step(10)
         # TH reads the CommissionedFabrics attributes from the Node Operational Credentials cluster.

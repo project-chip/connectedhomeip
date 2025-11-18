@@ -45,10 +45,10 @@ std::set<CHIPCommand *> CHIPCommand::sDeferredCleanups;
 using DeviceControllerFactory      = chip::Controller::DeviceControllerFactory;
 using JCMAutoCommissioner          = chip::Controller::JCM::AutoCommissioner;
 using JCMDeviceCommissioner        = chip::Controller::JCM::DeviceCommissioner;
-using JCMTrustVerificationDelegate = chip::Controller::JCM::TrustVerificationDelegate;
-using JCMTrustVerificationStage    = chip::Controller::JCM::TrustVerificationStage;
-using JCMTrustVerificationError    = chip::Controller::JCM::TrustVerificationError;
-using JCMTrustVerificationInfo     = chip::Controller::JCM::TrustVerificationInfo;
+using JCMTrustVerificationDelegate = chip::Credentials::JCM::TrustVerificationDelegate;
+using JCMTrustVerificationStage    = chip::Credentials::JCM::TrustVerificationStage;
+using JCMTrustVerificationError    = chip::Credentials::JCM::TrustVerificationError;
+using JCMTrustVerificationInfo     = chip::Credentials::JCM::TrustVerificationInfo;
 
 constexpr chip::FabricId kIdentityNullFabricId  = chip::kUndefinedFabricId;
 constexpr chip::FabricId kIdentityAlphaFabricId = 1;

@@ -145,7 +145,7 @@ class TC_LTIME_3_1(MatterBaseTest):
             return
 
         self.step(10)
-        calendar_type_values = set([i for i in range(0, 12)])
+        calendar_type_values = set(range(0, 12))
         calendar_type_values.add(255)
         cluster_supported_calendar_types = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.SupportedCalendarTypes)
         asserts.assert_true(set(cluster_supported_calendar_types).issubset(

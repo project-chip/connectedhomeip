@@ -17,6 +17,7 @@
 
 #include <app/AttributePathParams.h>
 #include <app/AttributeValueDecoder.h>
+#include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/network-commissioning/NetworkCommissioningCluster.h>
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/data-model-provider/MetadataTypes.h>
@@ -48,6 +49,11 @@ using chip::app::DataModel::AttributeEntry;
 using chip::app::Testing::kAdminSubjectDescriptor;
 using chip::app::Testing::WriteOperation;
 
+class NoopBreadcrumbTracker : public BreadCrumbTracker
+{
+public:
+    void SetBreadCrumb(uint64_t v) override {}
+};
 // initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestNetworkCommissioningCluster : public ::testing::Test
 {
@@ -57,9 +63,11 @@ struct TestNetworkCommissioningCluster : public ::testing::Test
 
 TEST_F(TestNetworkCommissioningCluster, TestAttributes)
 {
+    NoopBreadcrumbTracker tracker;
     {
         Testing::FakeWiFiDriver fakeWifiDriver;
-        NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver);
+
+        NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, tracker);
 
         ReadOnlyBufferBuilder<AttributeEntry> builder;
         ASSERT_EQ(cluster.Attributes({ kRootEndpointId, NetworkCommissioning::Id }, builder), CHIP_NO_ERROR);
@@ -97,7 +105,8 @@ TEST_F(TestNetworkCommissioningCluster, TestAttributes)
 TEST_F(TestNetworkCommissioningCluster, TestNotifyOnEnableInterface)
 {
     Testing::FakeWiFiDriver fakeWifiDriver;
-    NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver);
+    NoopBreadcrumbTracker tracker;
+    NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, tracker);
 
     chip::Test::TestServerClusterContext context;
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);

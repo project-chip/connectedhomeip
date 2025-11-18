@@ -30,6 +30,8 @@ from chiptest.glob_matcher import GlobMatcher
 from chiptest.test_definition import TestRunTime, TestTag
 from chipyaml.paths_finder import PathsFinder
 
+log = logging.getLogger(__name__)
+
 # If running on Linux platform load the Linux specific code.
 if sys.platform == "linux":
     import chiptest.linux
@@ -46,12 +48,7 @@ class ManualHandling(enum.Enum):
 
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
-__LOG_LEVELS__ = {
-    'debug': logging.DEBUG,
-    'info': logging.INFO,
-    'warn': logging.WARN,
-    'fatal': logging.FATAL,
-}
+__LOG_LEVELS__ = logging.getLevelNamesMapping()
 
 
 @dataclass
@@ -156,18 +153,18 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
             chip_tool = paths_finder.get('darwin-framework-tool')
 
     if include_tags:
-        include_tags = set([TestTag.__members__[t] for t in include_tags])
+        include_tags = {TestTag.__members__[t] for t in include_tags}
 
     if exclude_tags:
-        exclude_tags = set([TestTag.__members__[t] for t in exclude_tags])
+        exclude_tags = {TestTag.__members__[t] for t in exclude_tags}
 
     # Figures out selected test that match the given name(s)
     if runtime == TestRunTime.MATTER_REPL_PYTHON:
-        all_tests = [test for test in chiptest.AllReplYamlTests()]
+        all_tests = list(chiptest.AllReplYamlTests())
     elif runtime == TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON:
-        all_tests = [test for test in chiptest.AllDarwinFrameworkToolYamlTests()]
+        all_tests = list(chiptest.AllDarwinFrameworkToolYamlTests())
     else:
-        all_tests = [test for test in chiptest.AllChipToolYamlTests()]
+        all_tests = list(chiptest.AllChipToolYamlTests())
 
     tests = all_tests
 
@@ -191,7 +188,7 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
             targeted = [test for test in all_tests if test.name.lower()
                         == name.lower()]
             if len(targeted) == 0:
-                logging.error("Unknown target: %s" % name)
+                log.error("Unknown target: '%s'", name)
             tests.extend(targeted)
 
     if target_glob:
@@ -199,9 +196,9 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
         tests = [test for test in tests if matcher.matches(test.name.lower())]
 
     if len(tests) == 0:
-        logging.error("No targets match, exiting.")
-        logging.error("Valid targets are (case-insensitive): %s" %
-                      (", ".join(test.name for test in all_tests)))
+        log.error("No targets match, exiting.")
+        log.error("Valid targets are (case-insensitive): '%s'",
+                  ", ".join(test.name for test in all_tests))
         exit(1)
 
     if target_skip_glob:
@@ -320,7 +317,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
             energy_gateway_app, energy_management_app, closure_app, matter_repl_yaml_tester,
             chip_tool_with_python, pics_file, keep_going, test_timeout_seconds, expected_failures, ble_wifi):
     if expected_failures != 0 and not keep_going:
-        logging.exception(f"'--expected-failures {expected_failures}' used without '--keep-going'")
+        log.exception("--expected-failures '%s' used without '--keep-going'", expected_failures)
         sys.exit(2)
 
     runner = chiptest.runner.Runner()
@@ -421,7 +418,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
             ble_controller_tool = 1  # Bind tool to the second BLE controller
         paths = chiptest.linux.PathsWithNetworkNamespaces(paths)
 
-    logging.info("Each test will be executed %d times" % iterations)
+    log.info("Each test will be executed %d times", iterations)
 
     apps_register = AppsRegister()
     apps_register.init()
@@ -436,25 +433,25 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
             ns.terminate()
 
     for i in range(iterations):
-        logging.info("Starting iteration %d" % (i+1))
+        log.info("Starting iteration %d", i+1)
         observed_failures = 0
         for test in context.obj.tests:
             if context.obj.include_tags:
                 if not (test.tags & context.obj.include_tags):
-                    logging.debug("Test %s not included" % test.name)
+                    log.debug("Test '%s' not included", test.name)
                     continue
 
             if context.obj.exclude_tags:
                 if test.tags & context.obj.exclude_tags:
-                    logging.debug("Test %s excluded" % test.name)
+                    log.debug("Test '%s' excluded", test.name)
                     continue
 
             test_start = time.monotonic()
             try:
                 if context.obj.dry_run:
-                    logging.info("Would run test: %s" % test.name)
+                    log.info("Would run test: '%s'", test.name)
                 else:
-                    logging.info('%-20s - Starting test' % (test.name))
+                    log.info("%-20s - Starting test", test.name)
                 test.Run(
                     runner, apps_register, paths, pics_file, test_timeout_seconds, context.obj.dry_run,
                     test_runtime=context.obj.runtime,
@@ -463,19 +460,17 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
                 )
                 if not context.obj.dry_run:
                     test_end = time.monotonic()
-                    logging.info('%-30s - Completed in %0.2f seconds' %
-                                 (test.name, (test_end - test_start)))
+                    log.info("%-30s - Completed in %0.2f seconds", test.name, test_end - test_start)
             except Exception:
                 test_end = time.monotonic()
-                logging.exception('%-30s - FAILED in %0.2f seconds' %
-                                  (test.name, (test_end - test_start)))
+                log.exception("%-30s - FAILED in %0.2f seconds", test.name, test_end - test_start)
                 observed_failures += 1
                 if not keep_going:
                     cleanup()
                     sys.exit(2)
 
         if observed_failures != expected_failures:
-            logging.exception(f'Iteration {i}: expected failure count {expected_failures}, but got {observed_failures}')
+            log.exception("Iteration %d: expected failure count %d, but got %d", i, expected_failures, observed_failures)
             cleanup()
             sys.exit(2)
 

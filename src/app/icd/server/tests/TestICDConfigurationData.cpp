@@ -23,6 +23,7 @@
 #include <app/icd/server/tests/ICDConfigurationDataTestAccess.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/TimeUtils.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/tests/MessagingContext.h>
 #include <system/SystemLayerImpl.h>
 
@@ -138,7 +139,7 @@ TEST_F(TestICDConfigurationData, TestGetAndSetSlowPollingInterval)
 
     // Reduce slow polling interval to 5s, shorter than SITPollingInterval
     System::Clock::Milliseconds32 shortSlowPollInterval(5000);
-    privateConfigData.SetSlowPollingInterval(shortSlowPollInterval);
+    EXPECT_SUCCESS(privateConfigData.SetSlowPollingInterval(shortSlowPollInterval));
     EXPECT_EQ(privateConfigData.SetSlowPollingInterval(shortSlowPollInterval), CHIP_NO_ERROR);
     EXPECT_EQ(configData.GetSlowPollingInterval(), shortSlowPollInterval);
 

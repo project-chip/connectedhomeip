@@ -86,7 +86,7 @@ class MatterCertParser:
     def get_subject_names(self) -> dict[int, object]:
         if self.SUBJECT_TAG not in self.parsed_tlv:
             raise ValueError(f"Did not find Subject tag in Matter TLV certificate: {self.parsed_tlv}")
-        return {tag: value for tag, value in self.parsed_tlv[self.SUBJECT_TAG]}
+        return dict(self.parsed_tlv[self.SUBJECT_TAG])
 
     def get_public_key_bytes(self) -> bytes:
         if self.SUBJECT_PUBLIC_KEY_TAG not in self.parsed_tlv:
