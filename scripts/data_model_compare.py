@@ -42,7 +42,7 @@ with PythonPath("py_matter_idl", relative_to=__file__):
     from matter.idl.generators.idl import IdlGenerator
     from matter.idl.generators.storage import InMemoryStorage
     from matter.idl.matter_idl_parser import CreateParser
-    from matter.idl.matter_idl_types import Cluster, Idl
+    from matter.idl.matter_idl_types import Cluster, Idl, ApiMaturity
 
 try:
     import coloredlogs
@@ -128,13 +128,15 @@ def _compare_maturity(matter_items, data_model_items, path: list[str] = []):
             )
             had_diffs = True
 
-        for a in dir(matter_item):
-            if not hasattr(data_model_item, a):
-                continue
-            if type(getattr(matter_item, a)) != list:
-                continue
+        # Once something is provisional, do not recurse
+        if matter_item.api_maturity != ApiMaturity.PROVISIONAL:
+            for a in dir(matter_item):
+                if not hasattr(data_model_item, a):
+                    continue
+                if type(getattr(matter_item, a)) != list:
+                    continue
 
-            _compare_maturity(getattr(matter_item, a), getattr(data_model_item, a), current_path)
+                _compare_maturity(getattr(matter_item, a), getattr(data_model_item, a), current_path)
 
 
 def _match_names(dest: list[Cluster], src: list[Cluster]):
