@@ -570,12 +570,8 @@ jobs:
 
         if: github.actor != 'restyled-io[bot]'
 
-        strategy:
-            matrix:
-                build_variant: [ipv6only-no-ble-no-wifi]
-
         env:
-            BUILD_VARIANT: ${{matrix.build_variant}}
+            BUILD_VARIANT: ipv6only-no-ble-no-wifi
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
             CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
 
@@ -829,10 +825,12 @@ jobs:
 
         strategy:
             matrix:
-                build_variant: [ipv6only-no-ble-no-wifi]
+                # This list is empirically created to have a reasonable time split. The "" that runs the "other"
+                # tests is reasonably fast, the others take about 20-30 minutes each at the time this was split.
+                filter: ["", "TC_[A-C]", "TC_[D-O]", "!TC_[A-O]" ]
 
         env:
-            BUILD_VARIANT: ${{matrix.build_variant}}
+            BUILD_VARIANT: ipv6only-no-ble-no-wifi
             DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
             CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
 
@@ -860,12 +858,7 @@ jobs:
                 echo "TSAN_OPTIONS=halt_on_error=1 suppressions=${GITHUB_WORKSPACE}/scripts/tests/chiptest/tsan-linux-suppressions.txt" >> $GITHUB_ENV
             - name: Checkout
               uses: actions/checkout@v5
-            - name: Checkout submodules & Bootstrap
-              uses: ./.github/actions/checkout-submodules-and-bootstrap
-              with:
-                  platform: linux
-                  bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
-
+            # NOTE: no bootstrap since we only use compile outputs from previous steps (including python venv in out/venv)
             - name: Set up a IPV6 known envionment
               uses: ./.github/actions/add-ipv6
 
@@ -916,6 +909,7 @@ jobs:
                   echo "TRACE_TEST_PERFETTO: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
 
             - name: Verify Testing Support
+              if: ${{matrix.filter == ''}}
               run: |
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_ota_images_versions.py -i objdir-clone/chip-ota-requestor-app_v2.min.ota -v 2'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_IDM_10_4.py'
@@ -936,14 +930,20 @@ jobs:
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestSpecParsingSelection.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestSpecParsingSupport.py'
                   scripts/run_in_python_env.sh out/venv 'PYTHONPATH=src/python_testing:$PYTHONPATH python3 -m unittest discover -s src/python_testing/mdns_discovery/tests -p "test_*.py"'
-            - name: Run Tests
+            - name: Run Tests (individual)
+              if: ${{matrix.filter == ''}}
               run: |
                   mkdir -p out/trace_data
                   scripts/run_in_python_env.sh out/venv 'scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/controller/python/tests/scripts/mobile-device-test.py'
-                  scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py --env-file /tmp/test_env.yaml --search-directory src/python_testing'
                   scripts/run_in_python_env.sh out/venv "scripts/tests/TestTimeSyncTrustedTimeSourceRunner.py --all-clusters objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test/chip-all-clusters-app"
 
+            - name: Run Tests ${{matrix.filter}}
+              if: ${{matrix.filter != ''}}
+              run: |
+                  scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex "${{matrix.filter}}"'
+
             - name: Execute Jupyter Notebooks
+              if: ${{matrix.filter == ''}}
               run: |
                   # TODO: ipynb HARD CODES paths to all-clusters app. create a symlink to them
                   ln -s ../objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test out/linux-x64-all-clusters
