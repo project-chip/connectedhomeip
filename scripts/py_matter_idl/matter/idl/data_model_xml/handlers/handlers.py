@@ -613,6 +613,28 @@ class DataTypesHandler(BaseHandler):
         else:
             return BaseHandler(self.context)
 
+class ClusterIdHandler(BaseHandler):
+    def __init__(self, context: Context, cluster: Cluster):
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
+        self._cluster = cluster
+
+    def GetNextProcessor(self, name: str, attrs: AttributesImpl):
+        if name == "provisionalConform":
+            self._cluster.api_maturity = ApiMaturity.PROVISIONAL
+            return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
+        else:
+            return BaseHandler(self.context)
+
+class ClusterIdsHandler(BaseHandler):
+    def __init__(self, context: Context, cluster: Cluster):
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
+        self._cluster = cluster
+
+    def GetNextProcessor(self, name: str, attrs: AttributesImpl):
+        if name == "clusterId":
+            return ClusterIdHandler(self.context, self._cluster)
+        else:
+            return BaseHandler(self.context)
 
 class ClusterHandlerPostProcessing(enum.Enum):
     FINALIZE_AND_ADD_TO_IDL = enum.auto()
@@ -673,6 +695,8 @@ class ClusterHandler(BaseHandler):
     def GetNextProcessor(self, name: str, attrs: AttributesImpl):
         if name == "revisionHistory":
             return RevisionHistoryHandler(self.context, self._cluster)
+        elif name == "clusterIds":
+            return ClusterIdsHandler(self.context, self._cluster)
         elif name == "section":
             # Documentation data, skipped
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
