@@ -515,7 +515,7 @@ jobs:
                      --test-timeout-seconds 120 \
                      --all-clusters-app ./out/darwin-${{matrix.arch}}-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
                      --lock-app ./objdir-clone/darwin-${{matrix.arch}}-lock-${BUILD_VARIANT}-unified/chip-lock-app \
-                     --ota-provider-app ./objdir-clone/darwin-${{matrix.arch}}-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
+                     --ota-provider-app ./objdir-clone/darwin-${{matrix.arch}}-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
                      --ota-requestor-app ./out/darwin-${{matrix.arch}}-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
                      --tv-app ./objdir-clone/darwin-${{matrix.arch}}-tv-app-${BUILD_VARIANT}-unified/chip-tv-app \
                      --bridge-app ./objdir-clone/darwin-${{matrix.arch}}-bridge-${BUILD_VARIANT}-unified/chip-bridge-app \
