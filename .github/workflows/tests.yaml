@@ -267,6 +267,7 @@ jobs:
                         --target linux-x64-lock-${BUILD_VARIANT}-unified \
                         --target linux-x64-microwave-oven-${BUILD_VARIANT}-unified \
                         --target linux-x64-rvc-${BUILD_VARIANT}-unified \
+                        --target linux-x64-ota-provider-${BUILD_VARIANT}-unified \
                         --pw-command-launcher=ccache \
                         build \
                         --copy-artifacts-to objdir-clone \
@@ -279,7 +280,6 @@ jobs:
                      "./scripts/build/build_examples.py \
                         --target linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT} \
                         --target linux-x64-all-clusters-${BUILD_VARIANT} \
-                        --target linux-x64-ota-provider-${BUILD_VARIANT} \
                         --target linux-x64-ota-requestor-${BUILD_VARIANT} \
                         --target linux-x64-tv-app-${BUILD_VARIANT} \
                         --pw-command-launcher=ccache \
@@ -321,7 +321,7 @@ jobs:
                      --test-timeout-seconds 120 \
                      --all-clusters-app ./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
                      --lock-app ./objdir-clone/linux-x64-lock-${BUILD_VARIANT}-unified/chip-lock-app \
-                     --ota-provider-app ./objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
+                     --ota-provider-app ./objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
                      --ota-requestor-app ./objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
                      --tv-app ./objdir-clone/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
                      --bridge-app ./objdir-clone/linux-x64-bridge-${BUILD_VARIANT}-unified/chip-bridge-app \
@@ -384,7 +384,7 @@ jobs:
                      --test-timeout-seconds 120 \
                      --all-clusters-app ./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
                      --lock-app ./objdir-clone/linux-x64-lock-${BUILD_VARIANT}-unified/chip-lock-app \
-                     --ota-provider-app ./objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
+                     --ota-provider-app ./objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
                      --ota-requestor-app ./objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
                      --tv-app ./objdir-clone/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
                      --bridge-app ./objdir-clone/linux-x64-bridge-${BUILD_VARIANT}-unified/chip-bridge-app \
@@ -406,7 +406,7 @@ jobs:
                      --test-timeout-seconds 120 \
                      --all-clusters-app ./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
                      --lock-app ./objdir-clone/linux-x64-lock-${BUILD_VARIANT}-unified/chip-lock-app \
-                     --ota-provider-app ./objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
+                     --ota-provider-app ./objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
                      --ota-requestor-app ./objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
                      --tv-app ./objdir-clone/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
                      --bridge-app ./objdir-clone/linux-x64-bridge-${BUILD_VARIANT}-unified/chip-bridge-app \
