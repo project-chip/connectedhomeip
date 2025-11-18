@@ -23,8 +23,8 @@ from matter.idl.matter_idl_types import (ApiMaturity, Attribute, AttributeQualit
 from .base import BaseHandler, HandledDepth
 from .context import Context
 from .derivation import AddBaseInfoPostProcessor
-from .parsing import (ParseOptionalInt, AttributesToAttribute, AttributesToBitFieldConstantEntry, AttributesToCommand,
-                      AttributesToEvent, AttributesToField, NormalizeDataType, NormalizeName, ParseInt, StringToAccessPrivilege)
+from .parsing import (AttributesToAttribute, AttributesToBitFieldConstantEntry, AttributesToCommand, AttributesToEvent,
+                      AttributesToField, NormalizeDataType, NormalizeName, ParseInt, ParseOptionalInt, StringToAccessPrivilege)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -135,6 +135,7 @@ class MandatoryConformFieldHandler(BaseHandler):
         if self._hadConditions:
             self._field.qualities |= FieldQuality.OPTIONAL
 
+
 class LengthBetweenHandler(BaseHandler):
     def __init__(self, context: Context, field: Field):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
@@ -148,7 +149,6 @@ class LengthBetweenHandler(BaseHandler):
         else:
             LOGGER.error(f"UNKNOWN constraint type {name}")
         return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
-
 
 
 class ConstraintHandler(BaseHandler):
@@ -195,7 +195,6 @@ class ConstraintHandler(BaseHandler):
         else:
             LOGGER.error(f"UNKNOWN constraint type {name}")
         return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
-
 
 
 class FieldHandler(BaseHandler):

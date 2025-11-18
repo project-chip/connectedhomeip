@@ -31,13 +31,8 @@
 
 import logging
 import sys
-import typing
-import xml.sax.handler
-from dataclasses import dataclass
-from typing import List, Optional, Union
 
 import click
-
 # py_matter_idl may not be installed in the pigweed venv.
 # Reference it directly from the source tree.
 from python_path import PythonPath
@@ -179,6 +174,13 @@ def main(log_level):
         --matter src/controller/data_model/controller-clusters.matter  \\
         --output -                                                     \\
         data_model/master/clusters/Switch.xml
+
+    \b
+        uv run scripts/data_model_compare.py                           \\
+        --log-level error                                              \\
+        conformance-diff                                               \\
+        --matter src/controller/data_model/controller-clusters.matter  \\
+        data_model/1.5/clusters/*.xml
     """
     if _has_coloredlogs:
         coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt="%(asctime)s %(levelname)-7s %(message)s")

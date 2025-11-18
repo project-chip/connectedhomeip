@@ -90,7 +90,7 @@ class Context:
         """Creates a new cluster entry for the given name in the list of known
            base clusters.
         """
-        if  name in self.abstract_base_clusters:
+        if name in self.abstract_base_clusters:
             # This does NOT seem unique ... this seems like a bug
             # See this currently with Label-Cluster.xml and Label-Cluster-LabelCluster.xml ...
             LOGGER.warning("Duplicate defined base cluster: %s", name)
