@@ -43,10 +43,10 @@ import click
 from python_path import PythonPath
 
 with PythonPath('py_matter_idl', relative_to=__file__):
+    from matter.idl.data_model_xml import ParseXmls, ParseSource
     from matter.idl.generators.idl import IdlGenerator
     from matter.idl.generators.storage import InMemoryStorage
     from matter.idl.matter_idl_parser import CreateParser
-    from matter.idl.data_model_xml import ParseXmls, ParseSource
     from matter.idl.matter_idl_types import Idl
 
 try:
@@ -81,6 +81,9 @@ def _normalize_order(idl: Idl):
     # code location.
 
     idl.clusters.sort(key=lambda c: c.name)
+    idl.global_bitmaps.sort(key=lambda c: c.name)
+    idl.global_enums.sort(key=lambda c: c.name)
+    idl.global_structs.sort(key=lambda c: c.name)
 
     for cluster in idl.clusters:
         cluster.enums.sort(key=lambda e: e.name)
@@ -150,10 +153,11 @@ def filter_matter(matter, output, filenames):
     LOGGER.info("Starting to parse ...")
     sources = [ParseSource(source=name) for name in filenames]
     data_model_xmls = ParseXmls(sources)
-    LOGGER.info("Parse completed")
 
+    LOGGER.info("Parsing matter file ...")
     matter_idl = CreateParser(skip_meta=True).parse(
         open(matter).read(), file_name=matter)
+    LOGGER.info("Parsing done, filtering ...")
 
     # ensure that input file is filtered to only interesting
     # clusters
@@ -162,8 +166,16 @@ def filter_matter(matter, output, filenames):
         c for c in matter_idl.clusters if c.code in loaded_clusters]
     _normalize_order(matter_idl)
 
+    LOGGER.info("Filter done ...")
+
+    # data_model file parsing does not include global items, so clear them out
+    matter_idl.global_bitmaps = []
+    matter_idl.global_enums = []
+    matter_idl.global_structs = []
+
     storage = InMemoryStorage()
     IdlGenerator(storage=storage, idl=matter_idl).render(dry_run=False)
+    LOGGER.info("Generation done ...")
     if output == '-':
         print(storage.content)
     else:
