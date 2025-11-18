@@ -1010,7 +1010,6 @@ def _OnWriteDoneCallback(closure):
     closure.handleDone()
 
 
-
 def _prepare_write_attributes_data(attributes: List[AttributeWriteRequest], must_use_timed_write_check: bool = True, timedRequestTimeoutMs: Union[None, int] = None) -> Tuple[ctypes.Array[PyWriteAttributeData], int]:
     """Helper function to prepare PyWriteAttributeData array from AttributeWriteRequest list."""
     numberOfAttributes = len(attributes)
