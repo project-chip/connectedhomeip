@@ -400,6 +400,13 @@ config CHIP_ICD_UAT_SUPPORT
 	  Enables the User Active Mode Trigger (UAT) support in Matter. It allows the User to use application specific
 	  means (e.g. button press) to trigger an ICD device to enter the active mode and become responsive.
 
+config CHIP_ICD_DSLS_SUPPORT
+	bool "Intermittently Connected Device Dynamic SIT LIT support"
+	depends on CHIP_ICD_LIT_SUPPORT
+	help
+	  Enables the Dynamic SIT LIT support in Matter. It allows the application to dynamically switch between
+	  SIT and LIT modes, as long as the requirements for these modes are met (e.g. device has at least one active ICD client).
+
 config CHIP_ICD_CLIENTS_PER_FABRIC
 	int "Intermittently Connected Device number of clients per fabric"
 	default 2

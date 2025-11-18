@@ -17,6 +17,7 @@
 #pragma once
 
 #include <app/AppConfig.h>
+#include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/GeneralCommissioning/AttributeIds.h>
@@ -28,7 +29,7 @@
 
 namespace chip::app::Clusters {
 
-class GeneralCommissioningCluster : public DefaultServerCluster, chip::FabricTable::Delegate
+class GeneralCommissioningCluster : public DefaultServerCluster, chip::FabricTable::Delegate, public BreadCrumbTracker
 {
 public:
     using OptionalAttributes = OptionalAttributeSet<GeneralCommissioning::Attributes::IsCommissioningWithoutPower::Id>;
@@ -37,7 +38,7 @@ public:
 
     OptionalAttributes & GetOptionalAttributes() { return mOptionalAttributes; }
 
-    void SetBreadCrumb(uint64_t value);
+    void SetBreadCrumb(uint64_t value) final;
 
     // Server cluster implementation
     CHIP_ERROR Startup(ServerClusterContext & context) override;
@@ -55,10 +56,7 @@ public:
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
     // Fabric delegate
-    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
-
-    // GeneralCommissioning is a singleton cluster that exists only on the root endpoint.
-    static GeneralCommissioningCluster & Instance();
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) final;
 
     // Feature map constant based on compile-time defines. This ensures feature map
     // is in sync with the actual supported features determined at build time.

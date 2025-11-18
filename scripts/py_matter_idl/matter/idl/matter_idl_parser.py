@@ -691,7 +691,7 @@ class ParserWithLines:
                         f"Different cluster definition for {c.name}/{c.code}")
             else:
                 clusters[c.code] = c
-        idl.clusters = [c for c in clusters.values()]
+        idl.clusters = list(clusters.values())
 
         for comment in self.transformer.doc_comments:
             comment.apply_to_idl(idl, file)
@@ -725,7 +725,7 @@ def CreateParser(skip_meta: bool = False, merge_globals=True):
 __LOG_LEVELS__ = {
     'debug': logging.DEBUG,
     'info': logging.INFO,
-    'warn': logging.WARN,
+    'warn': logging.WARNING,
     'fatal': logging.FATAL,
 }
 

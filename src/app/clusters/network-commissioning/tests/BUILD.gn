@@ -23,7 +23,6 @@ chip_test_suite("tests") {
 
   test_sources = [
     "TestNetworkCommissioningCluster.cpp",
-    "TestNetworkCommissioningLogic.cpp",
     "TestThreadResponse.cpp",
     "TestWifiResponse.cpp",
   ]

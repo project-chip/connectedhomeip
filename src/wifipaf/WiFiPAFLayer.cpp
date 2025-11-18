@@ -328,9 +328,7 @@ CHIP_ERROR WiFiPAFLayer::NewEndPoint(WiFiPAFEndPoint ** retEndPoint, WiFiPAFSess
         ChipLogError(WiFiPAF, "endpoint pool FULL");
         return CHIP_ERROR_ENDPOINT_POOL_FULL;
     }
-    (*retEndPoint)->Init(this, SessionInfo);
-
-    return CHIP_NO_ERROR;
+    return (*retEndPoint)->Init(this, SessionInfo);
 }
 
 CHIP_ERROR WiFiPAFLayer::HandleTransportConnectionInitiated(WiFiPAF::WiFiPAFSession & SessionInfo,

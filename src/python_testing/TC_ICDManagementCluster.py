@@ -48,7 +48,7 @@ from matter.testing.matter_testing import MatterBaseTest, async_test_body, defau
 
 # Assumes `--enable-key 000102030405060708090a0b0c0d0e0f` on Linux app command line, or a DUT
 # that has that Enable Key
-kTestEventTriggerKey = bytes([b for b in range(16)])
+kTestEventTriggerKey = bytes(list(range(16)))
 kRootEndpointId = 0
 kMaxUint32Value = 0xFFFFFFFF
 kHalfMaxUint32Value = 0xFFFFFFFF >> 1

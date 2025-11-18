@@ -35,6 +35,7 @@
 #include <credentials/OperationalCertificateStore.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <inet/InetInterface.h>
+#include <lib/support/TimerDelegate.h>
 #include <protocols/secure_channel/SessionResumptionStorage.h>
 
 #include <optional>
@@ -137,7 +138,7 @@ struct FactoryInitParams
     PersistentStorageDelegate * fabricIndependentStorage               = nullptr;
     Credentials::CertificateValidityPolicy * certificateValidityPolicy = nullptr;
     Credentials::GroupDataProvider * groupDataProvider                 = nullptr;
-    app::reporting::ReportScheduler::TimerDelegate * timerDelegate     = nullptr;
+    TimerDelegate * timerDelegate                                      = nullptr;
     Crypto::SessionKeystore * sessionKeystore                          = nullptr;
     Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager      = nullptr;
     Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager      = nullptr;
@@ -268,7 +269,7 @@ public:
             (void) fabricTable;
             if (mGroupDataProvider != nullptr)
             {
-                mGroupDataProvider->RemoveFabric(fabricIndex);
+                TEMPORARY_RETURN_IGNORED mGroupDataProvider->RemoveFabric(fabricIndex);
             }
             ClearCASEResumptionStateOnFabricChange(fabricIndex);
         };

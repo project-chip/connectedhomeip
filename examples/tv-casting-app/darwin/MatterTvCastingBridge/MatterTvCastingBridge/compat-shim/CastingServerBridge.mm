@@ -339,6 +339,18 @@ static const uint32_t kTargetPlayerDeviceType = 0x23;
     });
 }
 
+- (void)removeFabric:(dispatch_queue_t _Nonnull)clientQueue requestSentHandler:(nullable void (^)())requestSentHandler
+{
+    ChipLogProgress(AppServer, "CastingServerBridge().removeFabric() called");
+    MCCastingPlayer * castingPlayer = [MCCastingPlayer getTargetCastingPlayer];
+    if (castingPlayer != nil) {
+        [castingPlayer removeFabric];
+    }
+    dispatch_async(clientQueue, ^{
+        requestSentHandler();
+    });
+}
+
 - (void)purgeCache:(dispatch_queue_t _Nonnull)clientQueue responseHandler:(void (^)(MatterError * _Nonnull))responseHandler
 {
     ChipLogProgress(AppServer, "CastingServerBridge().purgeCache() called");

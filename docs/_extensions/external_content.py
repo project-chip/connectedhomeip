@@ -169,13 +169,13 @@ def sync_contents(app: Sphinx) -> None:
 
     srcdir = Path(app.srcdir).resolve()
     to_copy = []
-    to_delete = set(f for f in srcdir.glob("**/*") if not f.is_dir())
-    to_keep = set(
+    to_delete = {f for f in srcdir.glob("**/*") if not f.is_dir()}
+    to_keep = {
         f
         for k in app.config.external_content_keep
         for f in srcdir.glob(k)
         if not f.is_dir()
-    )
+    }
 
     for content in app.config.external_content_contents:
         prefix_src, glob = content
