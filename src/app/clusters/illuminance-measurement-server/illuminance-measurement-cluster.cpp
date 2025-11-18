@@ -30,7 +30,7 @@ using namespace chip::app::Clusters::IlluminanceMeasurement;
 using namespace chip::app::Clusters::IlluminanceMeasurement::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
-namespace chip::app::Clusters::IlluminanceMeasurement {
+namespace chip::app::Clusters {
 
 IlluminanceMeasurementCluster::IlluminanceMeasurementCluster(EndpointId endpointId,
                                                              const OptionalAttributeSet & optionalAttributeSet,
@@ -86,4 +86,4 @@ CHIP_ERROR IlluminanceMeasurementCluster::Attributes(const ConcreteClusterPath &
     return attributeListBuilder.Append(Span(kMandatoryMetadata), Span(optionalAttributes), optionalAttributeSet);
 }
 
-} // namespace chip::app::Clusters::IlluminanceMeasurement
+} // namespace chip::app::Clusters

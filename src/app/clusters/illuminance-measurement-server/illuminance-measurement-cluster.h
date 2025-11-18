@@ -20,7 +20,7 @@
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <platform/DeviceInfoProvider.h>
 
-namespace chip::app::Clusters::IlluminanceMeasurement {
+namespace chip::app::Clusters {
 
 class IlluminanceMeasurementCluster : public DefaultServerCluster
 {
@@ -63,4 +63,4 @@ protected:
     const OptionalAttributeSet mOptionalAttributeSet;
 };
 
-} // namespace chip::app::Clusters::IlluminanceMeasurement
+} // namespace chip::app::Clusters
