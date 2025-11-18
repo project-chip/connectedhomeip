@@ -262,20 +262,21 @@ def AttributesToAttribute(attrs: AttributesImpl) -> Attribute:
 def AttributesToEvent(attrs: AttributesImpl) -> Event:
     assert "name" in attrs
     assert "id" in attrs
-    assert "priority" in attrs
-
-    if attrs["priority"] == "critical":
-        priority = EventPriority.CRITICAL
-    elif attrs["priority"] == "info":
-        priority = EventPriority.INFO
-    elif attrs["priority"] == "debug":
-        priority = EventPriority.DEBUG
-    elif attrs["priority"] == "desc":
-        LOGGER.warning("Found an event with 'desc' priority: %s",
-                       list(attrs.items()))
-        priority = EventPriority.CRITICAL
+    if "priority" in attrs:
+        if attrs["priority"] == "critical":
+            priority = EventPriority.CRITICAL
+        elif attrs["priority"] == "info":
+            priority = EventPriority.INFO
+        elif attrs["priority"] == "debug":
+            priority = EventPriority.DEBUG
+        elif attrs["priority"] == "desc":
+            LOGGER.warning("Found an event with 'desc' priority: %s",
+                        list(attrs.items()))
+            priority = EventPriority.CRITICAL
+        else:
+            raise Exception("UNKNOWN event priority: %r" % attrs["priority"])
     else:
-        raise Exception("UNKNOWN event priority: %r" % attrs["priority"])
+        priority = EventPriority.INFO
 
     return Event(
         name=NormalizeName(attrs["name"]),

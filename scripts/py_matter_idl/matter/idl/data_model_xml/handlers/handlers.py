@@ -135,6 +135,21 @@ class MandatoryConformFieldHandler(BaseHandler):
         if self._hadConditions:
             self._field.qualities |= FieldQuality.OPTIONAL
 
+class LengthBetweenHandler(BaseHandler):
+    def __init__(self, context: Context, field: Field):
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
+        self._field = field
+
+    def GetNextProcessor(self, name: str, attrs: AttributesImpl):
+        if name == "from":
+            self._field.data_type.min_length = ParseOptionalInt(attrs["value"])
+        elif name == "to":
+            self._field.data_type.max_length = ParseOptionalInt(attrs["value"])
+        else:
+            LOGGER.error(f"UNKNOWN constraint type {name}")
+        return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
+
+
 
 class ConstraintHandler(BaseHandler):
     def __init__(self, context: Context, field: Field):
@@ -164,13 +179,19 @@ class ConstraintHandler(BaseHandler):
             # field.data_type.max_value = ParseOptionalInt(attrs["to"])
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "maxLength":
-            self._field.data_type.max_length = ParseOptionalInt(attrs["value"])
+            # some items may have a "constant" like:
+            #   <maxLength>
+            #     <constant name="RESP_MAX" value="900"/>
+            #   </maxLength>
+            # we skip that for now...
+            if "value" in attrs:
+                self._field.data_type.max_length = ParseOptionalInt(attrs["value"])
+            else:
+                LOGGER.warning("could not parse maxLength for %s (is it a constant sub-item?)", self._field.name)
         elif name == "minLength":
             self._field.data_type.min_length = ParseOptionalInt(attrs["value"])
         elif name == "lengthBetween":
-            # TODO: this is NOT ok (see data_model/master/clusters/NetworkCommissioningCluster.xml)
-            self._field.data_type.min_length = ParseOptionalInt(attrs["from"])
-            self._field.data_type.max_length = ParseOptionalInt(attrs["to"])
+            return LengthBetweenHandler(self.context, self._field)
         else:
             LOGGER.error(f"UNKNOWN constraint type {name}")
         return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
@@ -189,6 +210,8 @@ class FieldHandler(BaseHandler):
             return MandatoryConformFieldHandler(self.context, self._field)
         elif name == "optionalConform":
             self._field.qualities |= FieldQuality.OPTIONAL
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        elif name in {'disallowConform', 'describedConform'}:
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "access":
             # per-field access is not something we model

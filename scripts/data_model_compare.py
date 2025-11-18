@@ -47,7 +47,7 @@ with PythonPath('py_matter_idl', relative_to=__file__):
     from matter.idl.generators.idl import IdlGenerator
     from matter.idl.generators.storage import InMemoryStorage
     from matter.idl.matter_idl_parser import CreateParser
-    from matter.idl.matter_idl_types import Idl
+    from matter.idl.matter_idl_types import Idl, Cluster
 
 try:
     import coloredlogs
@@ -92,6 +92,53 @@ def _normalize_order(idl: Idl):
         cluster.attributes.sort(key=lambda a: a.definition.code)
         cluster.structs.sort(key=lambda s: s.name)
         cluster.commands.sort(key=lambda c: c.code)
+
+def _get_name(item) -> str:
+    if hasattr(item, "name"):
+        return getattr(item, "name")
+    elif hasattr(item, "definition"):
+        return getattr(item, "definition").name
+    else:
+        raise Exception("Cannot find name of `%r`" % item)
+
+def _compare_maturity(matter_items, data_model_items, path: list[str] = []):
+    # we assume each of the items have some form of "name"
+    matter_by_name = {_get_name(item): item for item in matter_items}
+    data_model_by_name = {_get_name(item): item for item in data_model_items}
+
+    had_diffs = False
+
+    all_names = set(matter_by_name.keys()) | set(data_model_by_name.keys())
+    for name in all_names:
+        matter_item = matter_by_name.get(name)
+        data_model_item = data_model_by_name.get(name)
+
+        current_path = path + [name]
+
+        if matter_item is None:
+            logging.warning("%s - does not exist in .matter file", "::".join(current_path))
+            continue
+        if data_model_item is None:
+            logging.warning("%s - does not exist in the data_model file", "::".join(current_path))
+            continue
+
+        if matter_item.api_maturity != data_model_item.api_maturity:
+            logging.error("%s - different maturity: %s != %s", "::".join(current_path), data_model_item.api_maturity, matter_item.api_maturity)
+            had_diffs = True
+
+        # TODO: recurse!
+
+
+def _match_names(dest: list[Cluster], src: list[Cluster]):
+    """
+    Make sure cluster names in `dest` matches the ones in `src` (compare by code)
+    """
+    name_by_code = {c.code: c.name for c in src}
+
+    for cluster in dest:
+        if cluster.code in name_by_code:
+            cluster.name = name_by_code[cluster.code]
+
 
 @click.group()
 @click.option(
@@ -214,6 +261,76 @@ def parse(output, filenames):
             with open(output, 'wt', encoding="utf8") as o:
                 o.write(storage.content)
 
+
+@main.command('conformance-diff')
+@click.option(
+    "--matter",
+    default=None,
+    required=True,
+    type=click.Path(exists=True),
+    help="An input .matter IDL to use for the conformance diff."
+)
+@click.argument('filenames', nargs=-1)
+def filter_matter(matter, filenames):
+    """
+    Compare provisional/non-provisional conformance between a given matter file
+    and the given data_model XML files.
+    """
+    LOGGER.info("Starting to parse ...")
+    sources = [ParseSource(source=name) for name in filenames]
+    data_model_xmls = ParseXmls(sources)
+
+    LOGGER.info("Parsing matter file ...")
+    matter_idl = CreateParser(skip_meta=True).parse(
+        open(matter).read(), file_name=matter)
+    LOGGER.info("Parsing done, performing diff ...")
+
+
+    # ensure that input file is filtered to only interesting
+    # clusters
+    loaded_clusters = {c.code for c in data_model_xmls.clusters}
+    matter_idl.clusters = [
+        c for c in matter_idl.clusters if c.code in loaded_clusters]
+    _match_names(data_model_xmls.clusters, matter_idl.clusters)
+    _normalize_order(matter_idl)
+
+    # iterate through all items and report if conformance seems off at some level
+    # Everything gets merged by "name". Only Attribute has `definition
+    if not _compare_maturity(matter_idl.clusters, data_model_xmls.clusters):
+        sys.exit(1)
+
+
+
+@main.command('parse')
+@click.option(
+    "-o",
+    "--output",
+    default=None,
+    type=click.Path(),
+    help="Where to output the parsed IDL. Use `-` for output to stdout"
+)
+@click.argument('filenames', nargs=-1)
+def parse(output, filenames):
+    """
+    Parse data_model XML files and output the resulting .matter file.
+    """
+    LOGGER.info("Starting to parse ...")
+    sources = [ParseSource(source=name) for name in filenames]
+    data = ParseXmls(sources)
+    LOGGER.info("Parse completed")
+
+    # make sure compares are working well - same ordering
+    _normalize_order(data)
+
+    storage = InMemoryStorage()
+    IdlGenerator(storage=storage, idl=data).render(dry_run=False)
+
+    if output:
+        if output == '-':
+            print(storage.content)
+        else:
+            with open(output, 'wt', encoding="utf8") as o:
+                o.write(storage.content)
 
 if __name__ == "__main__":
     main(auto_envvar_prefix='CHIP')
