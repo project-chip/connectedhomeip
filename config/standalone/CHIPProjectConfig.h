@@ -96,4 +96,9 @@
 #define CONFIG_BUILD_FOR_HOST_UNIT_TEST 1
 #endif
 
+// For --secured-device-port command line option support
+#ifndef CHIP_DEVICE_ENABLE_PORT_PARAMS
+#define CHIP_DEVICE_ENABLE_PORT_PARAMS 1
+#endif
+
 #endif /* CHIPPROJECTCONFIG_H */
