@@ -60,7 +60,6 @@ void MatterFixedLabelClusterInitCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
-    // register a singleton server (root endpoint only)
     CodegenClusterIntegration::RegisterServer(
         {
             .endpointId                = endpointId,
@@ -77,7 +76,6 @@ void MatterFixedLabelClusterShutdownCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
-    // register a singleton server (root endpoint only)
     CodegenClusterIntegration::UnregisterServer(
         {
             .endpointId                = endpointId,

@@ -520,7 +520,7 @@ WifiInterface & WifiInterface::GetInstance()
 void WifiInterfaceImpl::MatterWifiTask(void * arg)
 {
     (void) arg;
-    WifiInterfaceImpl::WifiPlatformEvent event;
+    WifiPlatformEvent event;
     sl_status_t status = SL_STATUS_OK;
 
     status = SiWxPlatformInit();
@@ -569,7 +569,7 @@ CHIP_ERROR WifiInterfaceImpl::InitWiFiStack(void)
     VerifyOrReturnError(sScanCompleteSemaphore != nullptr, CHIP_ERROR_NO_MEMORY);
 
     // Create the message queue
-    sWifiEventQueue = osMessageQueueNew(kWfxQueueSize, sizeof(WifiInterfaceImpl::WifiPlatformEvent), nullptr);
+    sWifiEventQueue = osMessageQueueNew(kWfxQueueSize, sizeof(WifiPlatformEvent), nullptr);
     VerifyOrReturnError(sWifiEventQueue != nullptr, CHIP_ERROR_NO_MEMORY);
 #ifndef SL_MBEDTLS_USE_TINYCRYPT
     // PSA Crypto initialization
@@ -875,9 +875,8 @@ CHIP_ERROR WifiInterfaceImpl::ConfigurePowerSave(PowerSaveInterface::PowerSaveCo
     VerifyOrReturnError(error == RSI_SUCCESS, CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "rsi_bt_power_save_profile failed: %ld", error));
 
-    sl_wifi_performance_profile_v2_t wifi_profile = { .profile = ConvertPowerSaveConfiguration(configuration),
-                                                      // TODO: Performance profile fails if not aligned with DTIM
-                                                      .dtim_aligned_type = SL_SI91X_ALIGN_WITH_DTIM_BEACON,
+    sl_wifi_performance_profile_v2_t wifi_profile = { .profile           = ConvertPowerSaveConfiguration(configuration),
+                                                      .dtim_aligned_type = SL_SI91X_ALIGN_WITH_BEACON,
                                                       .listen_interval   = listenInterval };
 
     sl_status_t status = sl_wifi_set_performance_profile_v2(&wifi_profile);

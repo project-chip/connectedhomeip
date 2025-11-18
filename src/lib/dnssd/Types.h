@@ -266,7 +266,8 @@ struct CommissionNodeData : public CommonResolutionData
         if (rotatingIdLen > 0)
         {
             char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
-            Encoding::BytesToUppercaseHexString(rotatingId, rotatingIdLen, rotatingIdString, sizeof(rotatingIdString));
+            TEMPORARY_RETURN_IGNORED Encoding::BytesToUppercaseHexString(rotatingId, rotatingIdLen, rotatingIdString,
+                                                                         sizeof(rotatingIdString));
             ChipLogDetail(Discovery, "\tRotating ID: %s", rotatingIdString);
         }
         if (strlen(deviceName) != 0)

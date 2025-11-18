@@ -43,7 +43,8 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters import ClusterObjects as ClusterObjects
-from matter.interaction_model import Status
+# from matter.exceptions import ChipStackError
+from matter.interaction_model import InteractionModelError, Status
 from matter.testing import global_attribute_ids
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
@@ -61,7 +62,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
     ) -> tuple[Optional[int], Optional[type[ClusterObjects.ClusterAttributeDescriptor]]]:
         """
         Find an attribute that requires timed write on the actual device
-        Uses the wildcard read data that's already in endpoints_data 
+        Uses the wildcard read data that's already in endpoints_data
         """
         logging.info(f"Searching for timed write attributes across {len(endpoints_data)} endpoints")
 
@@ -71,8 +72,9 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
 
                 cluster_type_enum = global_attribute_ids.cluster_id_type(cluster_id)
                 # If debugging, please uncomment the following line to add Unit Testing clusters to the search and comment out the line below it.
-                # if cluster_type_enum != global_attribute_ids.ClusterIdType.kStandard and cluster_type_enum != global_attribute_ids.ClusterIdType.kTest:
-                if cluster_type_enum != global_attribute_ids.ClusterIdType.kStandard:
+
+                if cluster_type_enum != global_attribute_ids.ClusterIdType.kStandard and cluster_type_enum != global_attribute_ids.ClusterIdType.kTest:
+                    # if cluster_type_enum != global_attribute_ids.ClusterIdType.kStandard:
                     continue
 
                 for attr_type in cluster_data:
@@ -330,32 +332,24 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
             # TODO: https://github.com/project-chip/matter-test-scripts/issues/693
             logging.info("NodeLabel not found - this may be a non-commissionable device")
 
-        self.skip_step(7)
-        # Skipping Step 7 (Timed Write / Timed Request).
-        # This validation is covered in the main IDM_3_2 PR:
-        #   https://github.com/project-chip/connectedhomeip/pull/41066
-        # SuppressResponse client behavior is currently broken; tracking here:
-        #   https://github.com/project-chip/connectedhomeip/issues/41227
-        # TODO(j-ororke): Re-enable and restore the timed write code here once the SuppressResponse functionality is fixed and approved before merge.
-        """
         endpoint_id, timed_attr = await self.find_timed_write_attribute(self.endpoints)
         if timed_attr:
             self.step(7)
             '''
-            TH sends the WriteRequestMessage to the DUT to modify the value of a specific attribute data that needs 
+            TH sends the WriteRequestMessage to the DUT to modify the value of a specific attribute data that needs
             timed write transaction to write and this action is not part of a timed write transaction.
-            
+
             This step tests the following 3 timed write error scenarios:
             1. NEEDS_TIMED_INTERACTION: Writing timed-write-required attribute without timed transaction
             2. TIMED_REQUEST_MISMATCH: Writing with TimedRequest flag but no actual timed transaction
                                         (Timed Request ACTION = No, TimedRequest FLAG = True)
             3. TIMED_REQUEST_MISMATCH: Writing with timed action performed but TimedRequest flag set to false
                                         (Timed Request ACTION = Yes, TimedRequest FLAG = False)
-            
+
             Understanding the distinction:
             - TIMED REQUEST ACTION: The TimedRequest protocol message sent BEFORE the WriteRequest
             - TIMEDREQUEST FLAG: A boolean field IN the WriteRequest message itself
-            
+
             Normal timed write: Action=Yes, Flag=True (both must match)
             '''
 
@@ -379,8 +373,10 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
             # Thanks to Cecille for the guidance on the test step logic and plumbing for this to function below.
             logging.info("Writing with TimedRequest flag but no timed transaction should return TIMED_REQUEST_MISMATCH")
             try:
-                await self.default_controller.TestOnlyWriteAttributeTimedRequestFlagWithNoTimedAction(
+                await self.default_controller.TestOnlyWriteAttributeWithMismatchedTimedRequestField(
                     self.dut_node_id,
+                    timedRequestTimeoutMs=0,  # No timed action
+                    timedRequestFieldValue=True,  # But field=true
                     attributes=[(endpoint_id, timed_attr(False))]
                 )
                 asserts.fail("The write request should be rejected due to InteractionModelError: TimedRequestMismatch (0xc9).")
@@ -391,9 +387,10 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
             # TIMED_REQUEST_MISMATCH - Writing with timed action performed but TimedRequest flag set to false
             logging.info("Writing with timed action but TimedRequest flag=false should return TIMED_REQUEST_MISMATCH")
             try:
-                await self.default_controller.TestOnlyWriteAttributeTimedActionNoTimedRequestFlag(
+                await self.default_controller.TestOnlyWriteAttributeWithMismatchedTimedRequestField(
                     self.dut_node_id,
-                    timedRequestTimeoutMs=1000,
+                    timedRequestTimeoutMs=1000,  # Timed action performed
+                    timedRequestFieldValue=False,  # But field=false
                     attributes=[(endpoint_id, timed_attr(False))]
                 )
                 asserts.fail("The write request should be rejected due to InteractionModelError: TimedRequestMismatch (0xc9).")
@@ -403,7 +400,6 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
 
         else:
             self.skip_step(7)
-        """
 
 
 if __name__ == "__main__":

@@ -65,7 +65,7 @@ void ApplicationInit()
 {
     const app::TermsAndConditions termsAndConditions = app::TermsAndConditions(sTcRequiredAcknowledgements, sTcMinRequiredVersion);
     PersistentStorageDelegate & persistentStorageDelegate = Server::GetInstance().GetPersistentStorage();
-    app::TermsAndConditionsManager::GetInstance()->Init(&persistentStorageDelegate, MakeOptional(termsAndConditions));
+    app::TermsAndConditionsManager::GetInstance().Init(&persistentStorageDelegate, MakeOptional(termsAndConditions));
 }
 
 void ApplicationShutdown() {}

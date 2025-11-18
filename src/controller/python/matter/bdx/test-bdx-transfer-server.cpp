@@ -36,7 +36,9 @@ CHIP_ERROR TestBdxTransferServer::Init(System::Layer * systemLayer, Messaging::E
     mSystemLayer     = systemLayer;
     mExchangeManager = exchangeManager;
     // This removes the BdxTransferServer registered as part of CHIPDeviceControllerFactory.
-    mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(MessageType::SendInit);
+    // Store the handler that was previously registered for SendInit so we can restore it on shutdown.
+    ReturnErrorOnFailure(
+        mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(MessageType::SendInit, &mPrevSendInitHandler));
     return mExchangeManager->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id, this);
 }
 
@@ -44,6 +46,14 @@ void TestBdxTransferServer::Shutdown()
 {
     VerifyOrReturn(mExchangeManager != nullptr);
     LogErrorOnFailure(mExchangeManager->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id));
+
+    // Re-register the BdxTransferServer that was registered as part of CHIPDeviceControllerFactory.
+    // Otherwise when BdxTransferServer::Shutdown() attempts to unregister this, it causes an error.
+    if (mPrevSendInitHandler != nullptr)
+    {
+        LogErrorOnFailure(mExchangeManager->RegisterUnsolicitedMessageHandlerForType(MessageType::SendInit, mPrevSendInitHandler));
+    }
+
     mExchangeManager = nullptr;
 }
 
