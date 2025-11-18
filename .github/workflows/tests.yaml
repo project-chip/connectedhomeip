@@ -507,9 +507,10 @@ jobs:
                         --target darwin-${{matrix.arch}}-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT} \
                         --target darwin-${{matrix.arch}}-all-clusters-${BUILD_VARIANT} \
                         --target darwin-${{matrix.arch}}-ota-requestor-${BUILD_VARIANT} \
-                        --target darwin-${{matrix.arch}}-tv-app-${BUILD_VARIANT} \
                         --target darwin-${{matrix.arch}}-lit-icd-${BUILD_VARIANT} \
-                        --target darwin-${{matrix.arch}}-rvc-${BUILD_VARIANT} \
+                        --target darwin-${{matrix.arch}}-network-manager-${BUILD_VARIANT} \
+                        --target darwin-${{matrix.arch}}-energy-gateway-${BUILD_VARIANT} \
+                        --target darwin-${{matrix.arch}}-energy-management-${BUILD_VARIANT} \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
