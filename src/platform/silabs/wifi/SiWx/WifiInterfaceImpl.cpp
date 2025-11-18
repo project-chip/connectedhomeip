@@ -107,7 +107,7 @@ constexpr uint32_t kTimeToFullBeaconReception = 5000; // 5 seconds
 wfx_wifi_scan_ext_t temp_reset;
 
 osSemaphoreId_t sScanCompleteSemaphore;
-osSemaphoreId_t sScanInProgressSemaphore;
+osMutexId_t sScanInProgressSemaphore;
 
 osMessageQueueId_t sWifiEventQueue = nullptr;
 
@@ -379,7 +379,7 @@ sl_status_t InitiateScan()
 
     sl_wifi_set_scan_callback(ScanCallback, NULL);
 
-    osSemaphoreAcquire(sScanInProgressSemaphore, osWaitForever);
+    osMutexAcquire(sScanInProgressSemaphore, osWaitForever);
 
     // This is an odd success code?
     status = sl_wifi_start_scan(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, &ssid, &wifi_scan_configuration);
@@ -389,7 +389,7 @@ sl_status_t InitiateScan()
         status = SL_STATUS_OK;
     }
 
-    osSemaphoreRelease(sScanInProgressSemaphore);
+    osMutexRelease(sScanInProgressSemaphore);
     VerifyOrReturnError(status == SL_STATUS_OK, status, ChipLogProgress(DeviceLayer, "sl_wifi_start_scan failed: 0x%lx", status));
 
     return status;
@@ -571,7 +571,7 @@ CHIP_ERROR WifiInterfaceImpl::InitWiFiStack(void)
     VerifyOrReturnError(sScanCompleteSemaphore != nullptr, CHIP_ERROR_NO_MEMORY);
 
     // Create Semaphore for scan in-progress protection
-    sScanInProgressSemaphore = osSemaphoreNew(1, 1, nullptr);
+    sScanInProgressSemaphore = osMutexNew(nullptr);
     VerifyOrReturnError(sScanInProgressSemaphore != nullptr, CHIP_ERROR_NO_MEMORY);
 
     // Create the message queue
@@ -915,7 +915,7 @@ CHIP_ERROR WifiInterfaceImpl::StartNetworkScan(chip::ByteSpan ssid, ::ScanCallba
         requestedSsidPtr     = &requestedSsid;
     }
 
-    osSemaphoreAcquire(sScanInProgressSemaphore, osWaitForever);
+    osMutexAcquire(sScanInProgressSemaphore, osWaitForever);
 
     // NOTE: sending requestedSsidPtr as background scan does not filter for SSID
     sl_wifi_set_scan_callback(BackgroundScanCallback, requestedSsidPtr);
@@ -927,7 +927,7 @@ CHIP_ERROR WifiInterfaceImpl::StartNetworkScan(chip::ByteSpan ssid, ::ScanCallba
         osSemaphoreAcquire(sScanCompleteSemaphore, kWifiScanTimeoutTicks);
     }
 
-    osSemaphoreRelease(sScanInProgressSemaphore);
+    osMutexRelease(sScanInProgressSemaphore);
 
     // Check for errors other than in-progress, since the sl_wifi_start_scan can return in-progress as a success code
     if (status != SL_STATUS_OK && status != SL_STATUS_IN_PROGRESS)
