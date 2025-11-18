@@ -70,6 +70,11 @@ jobs:
         run: |
           scripts/run_in_python_env.sh out/venv 'python3 scripts/dm_xml_ci_change_enforcement.py data_model/1.4.2'
 
+      - name: Check for changes to the 1.5 data_model directory without a SHA update
+        if: (!contains(github.event.pull_request.labels.*.name, 'data-model-file-structural-change-dm-tt-use-only'))
+        run: |
+          scripts/run_in_python_env.sh out/venv 'python3 scripts/dm_xml_ci_change_enforcement.py data_model/1.5'
+
   check-data_model-build-file:
     name: Check that all data_model files are listed in the data_model_xmls.gni build file
     runs-on: ubuntu-latest
