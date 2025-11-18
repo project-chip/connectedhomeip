@@ -139,13 +139,10 @@ struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementC
 
     TestGroupKeyManagementClusterWithStorage() : tester(mCluster) {}
 
-    chip::app::Testing::MockCommandHandler mHandler;
     void SetUp() override
     {
-        tester.SetCommandHandler(&mHandler);
-        auto * storage = &mTestContext.StorageDelegate();
 
-        mRealProvider.SetStorageDelegate(storage);
+        mRealProvider.SetStorageDelegate(&mTestContext.StorageDelegate());
         mRealProvider.SetSessionKeystore(&mMockKeystore);
 
         ASSERT_EQ(mRealProvider.Init(), CHIP_NO_ERROR);
