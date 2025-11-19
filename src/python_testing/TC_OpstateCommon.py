@@ -1228,7 +1228,7 @@ class TC_OPSTATE_BASE():
         expected_value = (0.5 * initial_countdown_time)
         asserts.assert_almost_equal(expected_value, event_data.pausedTime,
                                     delta=approx_delta_seconds,
-                                    f"Paused time ({event_data.pausedTime}) shall be about {expected_value:.1f} +/- {approx_delta_seconds}")
+                                    msg=f"Paused time ({event_data.pausedTime}) shall be about {expected_value:.1f} +/- {approx_delta_seconds}")
 
     ############################
     #   TEST CASE 2.6 - Optional Reports with DUT as Server
