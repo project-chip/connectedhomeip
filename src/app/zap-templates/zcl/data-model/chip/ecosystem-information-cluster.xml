@@ -40,7 +40,7 @@ limitations under the License.
     <item fieldId="2" name="LocationDescriptorLastEdit" type="epoch_us" isFabricSensitive="true" default="0"/>
   </struct>
 
-  <cluster apiMaturity="provisional">
+  <cluster>
     <domain>General</domain>
     <name>Ecosystem Information</name>
     <code>0x0750</code>

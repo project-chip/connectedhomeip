@@ -51,7 +51,7 @@ limitations under the License.
         <field name="WPA3-Matter-PDC" mask="0x20"/>
     </bitmap>
 
-    <bitmap name="ThreadCapabilitiesBitmap" type="bitmap16" apiMaturity="provisional">
+    <bitmap name="ThreadCapabilitiesBitmap" type="bitmap16">
       <cluster code="0x0031"/>
       <field name="IsBorderRouterCapable" mask="0x1"/>
       <field name="IsRouterCapable" mask="0x2"/>
@@ -156,17 +156,17 @@ limitations under the License.
             <access op="read" privilege="administer"/>
             <mandatoryConform/>
         </attribute>
-        <attribute side="server" code="0x0008" name="SupportedWiFiBands" define="SUPPORTED_WIFI_BANDS" type="array" entryType="WiFiBandEnum" optional="true" apiMaturity="provisional">
+        <attribute side="server" code="0x0008" name="SupportedWiFiBands" define="SUPPORTED_WIFI_BANDS" type="array" entryType="WiFiBandEnum" optional="true">
           <mandatoryConform>
             <feature name="WI"/>
           </mandatoryConform>
         </attribute>
-        <attribute side="server" code="0x0009" name="SupportedThreadFeatures" define="SUPPORTED_THREAD_FEATURES" type="ThreadCapabilitiesBitmap" optional="true" apiMaturity="provisional">
+        <attribute side="server" code="0x0009" name="SupportedThreadFeatures" define="SUPPORTED_THREAD_FEATURES" type="ThreadCapabilitiesBitmap" optional="true">
           <mandatoryConform>
             <feature name="TH"/>
           </mandatoryConform>
         </attribute>
-        <attribute side="server" code="0x000A" name="ThreadVersion" define="THREAD_VERSION" type="int16u" optional="true" apiMaturity="provisional">
+        <attribute side="server" code="0x000A" name="ThreadVersion" define="THREAD_VERSION" type="int16u" optional="true">
           <mandatoryConform>
             <feature name="TH"/>
           </mandatoryConform>

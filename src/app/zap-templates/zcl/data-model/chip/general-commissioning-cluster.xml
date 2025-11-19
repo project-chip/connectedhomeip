@@ -29,9 +29,9 @@ Git: 0.7-summer-2025-ncr-444-g89b9baa9b-dirty
     <item name="InvalidAuthentication" value="0x2"/>
     <item name="NoFailSafe" value="0x3"/>
     <item name="BusyWithOtherAdmin" value="0x4"/>
-    <item name="RequiredTCNotAccepted" value="0x5" apiMaturity="provisional"/>
-    <item name="TCAcknowledgementsNotReceived" value="0x6" apiMaturity="provisional"/>
-    <item name="TCMinVersionNotMet" value="0x7" apiMaturity="provisional"/>
+    <item name="RequiredTCNotAccepted" value="0x5"/>
+    <item name="TCAcknowledgementsNotReceived" value="0x6"/>
+    <item name="TCMinVersionNotMet" value="0x7"/>
   </enum>
 
   <enum name="NetworkRecoveryReasonEnum" type="enum8">
@@ -64,10 +64,8 @@ Git: 0.7-summer-2025-ncr-444-g89b9baa9b-dirty
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <features>
-      <feature bit="0" code="TC" name="TermsAndConditions" summary="Supports Terms &amp; Conditions acknowledgement" apiMaturity="provisional">
-        <provisionalConform/>
-      </feature>
-      <feature bit="1" code="NR" name="NetworkRecovery" summary="Supports Network Recovery" apiMaturity="provisional">
+      <feature bit="0" code="TC" name="TermsAndConditions" summary="Supports Terms &amp; Conditions acknowledgement"/>
+      <feature bit="1" code="NR" name="NetworkRecovery" summary="Supports Network Recovery">
         <provisionalConform/>
       </feature>
     </features>
@@ -78,7 +76,7 @@ Git: 0.7-summer-2025-ncr-444-g89b9baa9b-dirty
     <attribute side="server" code="0x02" name="RegulatoryConfig" define="REGULATORY_CONFIG" type="RegulatoryLocationTypeEnum" min="0x00" max="0x02" default="0x02"/>
     <attribute side="server" code="0x03" name="LocationCapability" define="LOCATION_CAPABILITY" type="RegulatoryLocationTypeEnum" min="0x00" max="0x02" default="0x02"/>
     <attribute side="server" code="0x04" name="SupportsConcurrentConnection" define="SUPPORTS_CONCURRENT_CONNECTION" type="boolean" default="1"/>
-    <attribute side="server" code="0x05" name="TCAcceptedVersion" define="TC_ACCEPTED_VERSION" type="int16u" apiMaturity="provisional">
+    <attribute side="server" code="0x05" name="TCAcceptedVersion" define="TC_ACCEPTED_VERSION" type="int16u">
       <access op="read" privilege="administer"/>
       <otherwiseConform>
         <provisionalConform/>
@@ -87,46 +85,33 @@ Git: 0.7-summer-2025-ncr-444-g89b9baa9b-dirty
         </mandatoryConform>
       </otherwiseConform>
     </attribute>
-    <attribute side="server" code="0x06" name="TCMinRequiredVersion" define="TC_MIN_REQUIRED_VERSION" type="int16u" apiMaturity="provisional">
+    <attribute side="server" code="0x06" name="TCMinRequiredVersion" define="TC_MIN_REQUIRED_VERSION" type="int16u">
       <access op="read" privilege="administer"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="TC"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="TC"/>
+      </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x07" name="TCAcknowledgements" define="TC_ACKNOWLEDGEMENTS" type="bitmap16" apiMaturity="provisional">
+    <attribute side="server" code="0x07" name="TCAcknowledgements" define="TC_ACKNOWLEDGEMENTS" type="bitmap16">
       <access op="read" privilege="administer"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="TC"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="TC"/>
+      </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x08" name="TCAcknowledgementsRequired" define="TC_ACKNOWLEDGEMENTS_REQUIRED" type="boolean" apiMaturity="provisional" default="1">
+    <attribute side="server" code="0x08" name="TCAcknowledgementsRequired" define="TC_ACKNOWLEDGEMENTS_REQUIRED" type="boolean" default="1">
       <access op="read" privilege="administer"/>
-      <otherwiseConform>
-        <provisionalConform/>
         <mandatoryConform>
           <feature name="TC"/>
         </mandatoryConform>
-      </otherwiseConform>
     </attribute>
-    <attribute side="server" code="0x09" name="TCUpdateDeadline" define="TC_UPDATE_DEADLINE" type="int32u" isNullable="true" apiMaturity="provisional">
+    <attribute side="server" code="0x09" name="TCUpdateDeadline" define="TC_UPDATE_DEADLINE" type="int32u" isNullable="true">
       <access op="read" privilege="administer"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="TC"/>
-        </mandatoryConform>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="TC"/>
+      </mandatoryConform>
     </attribute>
     <attribute code="0x000A" side="server" name="RecoveryIdentifier" define="RECOVERY_IDENTIFIER" type="octet_string" length="8" minLength="8" default="0" apiMaturity="provisional">
       <access op="read" privilege="manage"/>
       <otherwiseConform>
-        <provisionalConform/>
         <mandatoryConform>
           <feature name="NR"/>
         </mandatoryConform>
