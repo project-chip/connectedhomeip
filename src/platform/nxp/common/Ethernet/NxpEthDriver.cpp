@@ -87,9 +87,6 @@ void NxpEthDriver::OnNetworkStatusChange()
             Status::kUnknownError, MakeOptional(ByteSpan(ethIterator->interfaceName, ethIterator->interfaceNameLen)),
             NullOptional);
         } 
-    }
-    if (networkIterator != nullptr)
-    {
         networkIterator->Release();
     }
 }
