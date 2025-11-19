@@ -436,6 +436,7 @@ PyChipError pychip_WriteClient_TestOnlyWriteAttributesWithMismatchedTimedRequest
     size_t interactionTimeoutMsSizeT, size_t busyWaitMsSizeT, python::PyWriteAttributeData * writeAttributesData,
     size_t attributeDataLength)
 {
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     uint16_t timedWriteTimeoutMs  = static_cast<uint16_t>(timedWriteTimeoutMsSizeT);
@@ -472,6 +473,9 @@ PyChipError pychip_WriteClient_TestOnlyWriteAttributesWithMismatchedTimedRequest
 
 exit:
     return ToPyChipError(err);
+#else
+    return ToPyChipError(CHIP_ERROR_NOT_IMPLEMENTED);
+#endif
 }
 
 PyChipError pychip_WriteClient_WriteGroupAttributes(size_t groupIdSizeT, chip::Controller::DeviceCommissioner * devCtrl,
