@@ -142,6 +142,11 @@ public:
     /// Calls 'FindRegistration' on the delegate and returns the address of the cluster for the provided endpoint id or nullptr if
     /// not found.
     static ServerClusterInterface * FindClusterOnEndpoint(const FindClusterOnEndpointOptions & options, Delegate & delegate);
+
+    /// Fetch the featuremap from ember for the given endpoint/cluster
+    ///
+    /// on error 0 is returned
+    static uint32_t LoadFeatureMap(EndpointId endpointId, ClusterId clusterId);
 };
 
 } // namespace chip::app

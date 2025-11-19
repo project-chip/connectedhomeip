@@ -89,6 +89,11 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case app::Clusters::BooleanStateConfiguration::Id:
         MatterBooleanStateConfigurationClusterInitCallback(endpoint);
+    case app::Clusters::HepaFilterMonitoring::Id:
+        MatterHepaFilterMonitoringClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::ActivatedCarbonFilterMonitoring::Id:
+        MatterActivatedCarbonFilterMonitoringClusterInitCallback(endpoint);
         break;
     }
 }
@@ -159,6 +164,11 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     case app::Clusters::BooleanStateConfiguration::Id:
         MatterBooleanStateConfigurationClusterShutdownCallback(endpoint);
+    case app::Clusters::HepaFilterMonitoring::Id:
+        MatterHepaFilterMonitoringClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::ActivatedCarbonFilterMonitoring::Id:
+        MatterActivatedCarbonFilterMonitoringClusterShutdownCallback(endpoint);
         break;
     }
 }

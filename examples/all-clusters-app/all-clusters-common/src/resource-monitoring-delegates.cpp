@@ -17,8 +17,6 @@
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
-#include <app/clusters/resource-monitoring-server/resource-monitoring-server.h>
 #include <resource-monitoring-delegates.h>
 
 using namespace chip;
@@ -119,7 +117,7 @@ void emberAfActivatedCarbonFilterMonitoringClusterInitCallback(chip::EndpointId 
     gActivatedCarbonFilterInstance = new ResourceMonitoring::Instance(
         gActivatedCarbonFilterDelegate, endpoint, ActivatedCarbonFilterMonitoring::Id,
         static_cast<uint32_t>(gActivatedCarbonFeatureMap.to_ulong()), ResourceMonitoring::DegradationDirectionEnum::kDown, true);
-    TEMPORARY_RETURN_IGNORED gActivatedCarbonFilterInstance->Init();
+    gActivatedCarbonFilterInstance->Init();
 }
 
 void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
@@ -130,7 +128,7 @@ void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
     gHepaFilterInstance = new ResourceMonitoring::Instance(gHepaFilterDelegate, endpoint, HepaFilterMonitoring::Id,
                                                            static_cast<uint32_t>(gHepaFilterFeatureMap.to_ulong()),
                                                            ResourceMonitoring::DegradationDirectionEnum::kDown, true);
-    TEMPORARY_RETURN_IGNORED gHepaFilterInstance->Init();
+    gHepaFilterInstance->Init();
 }
 
 void emberAfActivatedCarbonFilterMonitoringClusterShutdownCallback(chip::EndpointId endpoint)
