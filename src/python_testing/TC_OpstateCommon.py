@@ -1215,15 +1215,14 @@ class TC_OPSTATE_BASE():
         if event_data.totalOperationalTime is not NullValue:
             expected_value = (1.5 * initial_countdown_time)
 
-            # Need some fuzzyness. Test plan says:
+            # Need some fuzziness. Test plan says:
             #   TotalOperationalTime is approximately 1.5 times the initial-countdown-time or null
             # however "approximately" does not seem clearly defined
-            #
             asserts.assert_almost_equal(expected_value, event_data.totalOperationalTime,
                                         delta=approx_delta_seconds,
                                         msg=f"The total operation time shall be about {expected_value:.1f} +/- {approx_delta_seconds}")
 
-        # Need some fuzzyness. Test plan says:
+        # Need some fuzziness. Test plan says:
         #   PausedTime is 0.5 times the initial-countdown-time
         # however given time/sleeps, this is highly unlikely to be always accurate, especially in CI
         expected_value = (0.5 * initial_countdown_time)
