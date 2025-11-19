@@ -137,10 +137,10 @@ def _compare_maturity(matter_items, data_model_items, path: list[str] = []):
                 if type(getattr(matter_item, a)) != list:
                     continue
 
-                _compare_maturity(getattr(matter_item, a), getattr(data_model_item, a), current_path)
+                if not _compare_maturity(getattr(matter_item, a), getattr(data_model_item, a), current_path):
+                    had_diffs = True
 
-        if had_diffs:
-            sys.exit(1)
+    return had_diffs
 
 
 def _match_names(dest: list[Cluster], src: list[Cluster]):
