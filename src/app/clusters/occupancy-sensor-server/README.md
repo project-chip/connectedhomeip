@@ -110,6 +110,8 @@ void ApplicationInit()
 
 Your application is responsible for monitoring the physical sensor. When the
 sensor state changes, call the `SetOccupancy()` method on the cluster instance.
+This must be called within the Matter context. Use `ScheduleWork` if calling
+from a separate application thread.
 
 ```cpp
 void MySensorHardwareCallback(bool isOccupied)
@@ -155,3 +157,9 @@ void MySensorHardwareCallback(bool isOccupied)
     }
 }
 ```
+
+Unlike the legacy implementation, the current implementation handles all timer related functionality related to the `holdTime` attribute. So the application should no longer maintain any `holdTime` timer.
+
+The global attribute setter/getters are no longer available. This is now exclusively done using the public methods from the `OccupancySensingCluster` class.
+
+Post attribute change callback are now exclusively handled by implementing an `OccupancySensingDelegate`.
