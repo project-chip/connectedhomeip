@@ -358,6 +358,19 @@ class EventsHandler(BaseHandler):
         else:
             return BaseHandler(self.context)
 
+class NestedConformHandler(BaseHandler):
+    def __init__(self, context: Context, attribute: Attribute):
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
+        self._attribute = attribute
+
+    def GetNextProcessor(self, name: str, attrs: AttributesImpl):
+        if name == "provisionalConform":
+            self._attribute.api_maturity = ApiMaturity.PROVISIONAL
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        else:
+            return BaseHandler(self.context)
+
+
 
 class AttributeHandler(BaseHandler):
     def __init__(self, context: Context, cluster: Cluster, attrs: AttributesImpl):
@@ -408,7 +421,7 @@ class AttributeHandler(BaseHandler):
         elif name in {"optionalConform", "otherwiseConform"}:
             self._attribute.definition.qualities |= FieldQuality.OPTIONAL
             # we have more conformance logic, maybe even provisional conform, so recurse
-            return self
+            return NestedConformHandler(self.context, self._attribute)
         elif name == "mandatoryConform":
             return MandatoryConformFieldHandler(self.context, self._attribute.definition)
         elif name == "provisionalConform":
