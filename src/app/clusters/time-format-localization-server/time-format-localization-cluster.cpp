@@ -142,7 +142,7 @@ CHIP_ERROR TimeFormatLocalizationCluster::Startup(ServerClusterContext & context
 DataModel::ActionReturnStatus TimeFormatLocalizationCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                                             AttributeValueDecoder & decoder)
 {
-    return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, WriteImpl(request, decoder));
+    return NotifyIfAttributeChanged(request.path.mAttributeId, WriteImpl(request, decoder));
 }
 
 DataModel::ActionReturnStatus TimeFormatLocalizationCluster::WriteImpl(const DataModel::WriteAttributeRequest & request,

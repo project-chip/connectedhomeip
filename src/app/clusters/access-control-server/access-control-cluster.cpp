@@ -518,7 +518,7 @@ DataModel::ActionReturnStatus AccessControlCluster::ReadAttribute(const DataMode
 DataModel::ActionReturnStatus AccessControlCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                                    AttributeValueDecoder & decoder)
 {
-    return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, ChipErrorToImErrorMap(WriteImpl(request, decoder, mContext)));
+    return NotifyIfAttributeChanged(request.path.mAttributeId, ChipErrorToImErrorMap(WriteImpl(request, decoder, mContext)));
 }
 
 CHIP_ERROR AccessControlCluster::Attributes(const ConcreteClusterPath & path,

@@ -599,7 +599,7 @@ CHIP_ERROR TimeSynchronizationCluster::SetTrustedTimeSource(const DataModel::Nul
         return err;
     };
 
-    return NotifyAttributeChangedIfSuccess(TrustedTimeSource::Id, setAttribute(tts)).GetUnderlyingError();
+    return NotifyIfAttributeChanged(TrustedTimeSource::Id, setAttribute(tts)).GetUnderlyingError();
 }
 
 inline CHIP_ERROR TimeSynchronizationCluster::SetDefaultNTP(const DataModel::Nullable<CharSpan> & dntp)
@@ -612,7 +612,7 @@ inline CHIP_ERROR TimeSynchronizationCluster::SetDefaultNTP(const DataModel::Nul
         return mTimeSyncDataProvider.ClearDefaultNtp();
     };
 
-    return NotifyAttributeChangedIfSuccess(DefaultNTP::Id, setAttribute(dntp)).GetUnderlyingError();
+    return NotifyIfAttributeChanged(DefaultNTP::Id, setAttribute(dntp)).GetUnderlyingError();
 }
 
 void TimeSynchronizationCluster::InitTimeZone()
@@ -736,7 +736,7 @@ CHIP_ERROR TimeSynchronizationCluster::SetTimeZone(const DataModel::DecodableLis
         return mTimeSyncDataProvider.StoreTimeZone(GetTimeZone());
     };
 
-    return NotifyAttributeChangedIfSuccess(TimeZone::Id, setAttribute(tzL)).GetUnderlyingError();
+    return NotifyIfAttributeChanged(TimeZone::Id, setAttribute(tzL)).GetUnderlyingError();
 }
 
 CHIP_ERROR TimeSynchronizationCluster::LoadTimeZone()
@@ -822,7 +822,7 @@ CHIP_ERROR TimeSynchronizationCluster::SetDSTOffset(const DataModel::DecodableLi
         return mTimeSyncDataProvider.StoreDSTOffset(GetDSTOffset());
     };
 
-    return NotifyAttributeChangedIfSuccess(DSTOffset::Id, setAttribute(dstL)).GetUnderlyingError();
+    return NotifyIfAttributeChanged(DSTOffset::Id, setAttribute(dstL)).GetUnderlyingError();
 }
 
 CHIP_ERROR TimeSynchronizationCluster::LoadDSTOffset()
@@ -886,7 +886,7 @@ CHIP_ERROR TimeSynchronizationCluster::SetUTCTime(uint64_t utcTime, GranularityE
         return CHIP_NO_ERROR;
     };
 
-    return NotifyAttributeChangedIfSuccess(UTCTime::Id, setAttribute(utcTime, granularity, source)).GetUnderlyingError();
+    return NotifyIfAttributeChanged(UTCTime::Id, setAttribute(utcTime, granularity, source)).GetUnderlyingError();
 }
 
 CHIP_ERROR TimeSynchronizationCluster::GetLocalTime(DataModel::Nullable<uint64_t> & localTime)

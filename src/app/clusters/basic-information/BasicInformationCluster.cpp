@@ -354,7 +354,7 @@ DataModel::ActionReturnStatus BasicInformationCluster::ReadAttribute(const DataM
 DataModel::ActionReturnStatus BasicInformationCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                                       AttributeValueDecoder & decoder)
 {
-    return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, WriteImpl(request, decoder));
+    return NotifyIfAttributeChanged(request.path.mAttributeId, WriteImpl(request, decoder));
 }
 
 DataModel::ActionReturnStatus BasicInformationCluster::WriteImpl(const DataModel::WriteAttributeRequest & request,

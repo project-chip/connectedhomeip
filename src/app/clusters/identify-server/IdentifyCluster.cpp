@@ -74,8 +74,8 @@ DataModel::ActionReturnStatus IdentifyCluster::WriteAttribute(const DataModel::W
     case Attributes::IdentifyTime::Id: {
         uint16_t newIdentifyTime;
         ReturnErrorOnFailure(decoder.Decode(newIdentifyTime));
-        return NotifyAttributeChangedIfSuccess(request.path.mAttributeId,
-                                               SetIdentifyTime(IdentifyTimeChangeSource::kClient, newIdentifyTime));
+        return NotifyIfAttributeChanged(request.path.mAttributeId,
+                                        SetIdentifyTime(IdentifyTimeChangeSource::kClient, newIdentifyTime));
     }
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
@@ -92,7 +92,7 @@ void IdentifyCluster::TimerFired()
 {
     if (mIdentifyTime > 0)
     {
-        NotifyAttributeChangedIfSuccess(
+        NotifyIfAttributeChanged(
             Attributes::IdentifyTime::Id,
             SetIdentifyTime(IdentifyTimeChangeSource::kTimer, static_cast<uint16_t>(mIdentifyTime - 1)));
     }
@@ -153,8 +153,8 @@ IdentifyCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TL
         Identify::Commands::Identify::DecodableType data;
         ReturnErrorOnFailure(data.Decode(input_arguments));
         MATTER_TRACE_SCOPE("IdentifyCommand", "Identify");
-        return NotifyAttributeChangedIfSuccess(Attributes::IdentifyTime::Id,
-                                               SetIdentifyTime(IdentifyTimeChangeSource::kClient, data.identifyTime));
+        return NotifyIfAttributeChanged(Attributes::IdentifyTime::Id,
+                                        SetIdentifyTime(IdentifyTimeChangeSource::kClient, data.identifyTime));
     }
     case Identify::Commands::TriggerEffect::Id: {
         Identify::Commands::TriggerEffect::DecodableType data;
@@ -182,18 +182,18 @@ IdentifyCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TL
         // Currently identifying: handle stop/finish effects, otherwise cancel Identify process and trigger new effect.
         if (mEffectIdentifier == Identify::EffectIdentifierEnum::kFinishEffect)
         {
-            return NotifyAttributeChangedIfSuccess(Attributes::IdentifyTime::Id,
-                                                   SetIdentifyTime(IdentifyTimeChangeSource::kClient, 1));
+            return NotifyIfAttributeChanged(Attributes::IdentifyTime::Id,
+                                            SetIdentifyTime(IdentifyTimeChangeSource::kClient, 1));
         }
 
         if (mEffectIdentifier == Identify::EffectIdentifierEnum::kStopEffect)
         {
-            return NotifyAttributeChangedIfSuccess(Attributes::IdentifyTime::Id,
-                                                   SetIdentifyTime(IdentifyTimeChangeSource::kClient, 0));
+            return NotifyIfAttributeChanged(Attributes::IdentifyTime::Id,
+                                            SetIdentifyTime(IdentifyTimeChangeSource::kClient, 0));
         }
 
         // Other effects: cancel and trigger new effect.
-        auto err = NotifyAttributeChangedIfSuccess(
+        auto err = NotifyIfAttributeChanged(
             Attributes::IdentifyTime::Id, SetIdentifyTime(IdentifyTimeChangeSource::kClient, 0)); // This will call onIdentifyStop.
         mIdentifyDelegate->OnTriggerEffect(*this);
         return err;

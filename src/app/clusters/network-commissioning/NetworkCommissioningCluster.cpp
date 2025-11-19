@@ -1081,7 +1081,7 @@ DataModel::ActionReturnStatus NetworkCommissioningCluster::WriteAttribute(const 
     {
         bool value;
         ReturnErrorOnFailure(decoder.Decode(value));
-        return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, SetInterfaceEnabled(value));
+        return NotifyIfAttributeChanged(request.path.mAttributeId, SetInterfaceEnabled(value));
     }
 
     return Protocols::InteractionModel::Status::InvalidAction;

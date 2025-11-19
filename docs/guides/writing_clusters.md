@@ -215,7 +215,7 @@ attribute's value changes.
     `interactionContext->dataModelChangeListener->MarkDirty(path)`. A
     `NotifyAttributeChanged` helper exists for paths managed by this cluster.
 
-    -   For write implementations, you can use `NotifyAttributeChangedIfSuccess`
+    -   For write implementations, you can use `NotifyIfAttributeChanged`
         together with a separate `WriteImpl` such that any successful attribute
         write will notify.
 
@@ -226,11 +226,11 @@ attribute's value changes.
                                                                           AttributeValueDecoder & decoder)
         {
                 // Delegate everything to WriteImpl. If write succeeds, notify that the attribute changed.
-                return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, WriteImpl(request, decoder));
+                return NotifyIfAttributeChanged(request.path.mAttributeId, WriteImpl(request, decoder));
         }
         ```
 
-    -   For the `NotifyAttributeChangedIfSuccess` ensure that WriteImpl is
+    -   For the `NotifyIfAttributeChanged` ensure that WriteImpl is
         returning
         [ActionReturnStatus::FixedStatus::kWriteSuccessNoOp](https://github.com/project-chip/connectedhomeip/blob/master/src/app/data-model-provider/ActionReturnStatus.h)
         when no notification should be sent (e.g. write was a `noop` because

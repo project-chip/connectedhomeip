@@ -263,7 +263,7 @@ DataModel::ActionReturnStatus GeneralCommissioningCluster::WriteAttribute(const 
         uint64_t value;
         ReturnErrorOnFailure(decoder.Decode(value));
         // SetBreadCrumb handles notification internally via NotifyAttributeChanged(),
-        // so we don't need to call NotifyAttributeChangedIfSuccess here.
+        // so we don't need to call NotifyIfAttributeChanged here.
         SetBreadCrumb(value);
         return CHIP_NO_ERROR;
     }

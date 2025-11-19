@@ -64,9 +64,9 @@ public:
 
     void TestIncreaseDataVersion() { IncreaseDataVersion(); }
     void TestNotifyAttributeChanged(AttributeId attributeId) { NotifyAttributeChanged(attributeId); }
-    ActionReturnStatus TestNotifyAttributeChangedIfSuccess(AttributeId attributeId, ActionReturnStatus status)
+    ActionReturnStatus TestNotifyIfAttributeChanged(AttributeId attributeId, ActionReturnStatus status)
     {
-        return NotifyAttributeChangedIfSuccess(attributeId, status);
+        return NotifyIfAttributeChanged(attributeId, status);
     }
 };
 
@@ -198,7 +198,7 @@ TEST(TestDefaultServerCluster, NotifyAttributeChanged)
     ASSERT_EQ(context.ChangeListener().DirtyList()[0], AttributePathParams(kEndpointId, kClusterId, 234));
 }
 
-TEST(TestDefaultServerCluster, NotifyAttributeChangedIfSuccess)
+TEST(TestDefaultServerCluster, NotifyIfAttributeChanged)
 {
     constexpr ClusterId kEndpointId = 321;
     constexpr ClusterId kClusterId  = 1122;
@@ -207,12 +207,12 @@ TEST(TestDefaultServerCluster, NotifyAttributeChangedIfSuccess)
     // When no ServerClusterContext is set, only the data version should change.
     DataVersion oldVersion = cluster.GetDataVersion({ kEndpointId, kClusterId });
 
-    ASSERT_EQ(cluster.TestNotifyAttributeChangedIfSuccess(123, Status::Success), Status::Success);
+    ASSERT_EQ(cluster.TestNotifyIfAttributeChanged(123, Status::Success), Status::Success);
     DataVersion newVersion = cluster.GetDataVersion({ kEndpointId, kClusterId });
     ASSERT_NE(newVersion, oldVersion);
 
     oldVersion = newVersion;
-    ASSERT_EQ(cluster.TestNotifyAttributeChangedIfSuccess(123, Status::Failure), Status::Failure);
+    ASSERT_EQ(cluster.TestNotifyIfAttributeChanged(123, Status::Failure), Status::Failure);
     newVersion = cluster.GetDataVersion({ kEndpointId, kClusterId });
     ASSERT_EQ(newVersion, oldVersion);
 
@@ -221,7 +221,7 @@ TEST(TestDefaultServerCluster, NotifyAttributeChangedIfSuccess)
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     oldVersion = cluster.GetDataVersion({ kEndpointId, kClusterId });
-    ASSERT_EQ(cluster.TestNotifyAttributeChangedIfSuccess(234, Status::Success), Status::Success);
+    ASSERT_EQ(cluster.TestNotifyIfAttributeChanged(234, Status::Success), Status::Success);
     ASSERT_NE(cluster.GetDataVersion({ kEndpointId, kClusterId }), oldVersion);
 
     ASSERT_EQ(context.ChangeListener().DirtyList().size(), 1u);
@@ -230,7 +230,7 @@ TEST(TestDefaultServerCluster, NotifyAttributeChangedIfSuccess)
     // now test a failure - nothing should be marked dirty
     oldVersion = cluster.GetDataVersion({ kEndpointId, kClusterId });
     context.ChangeListener().DirtyList().clear();
-    ASSERT_EQ(cluster.TestNotifyAttributeChangedIfSuccess(345, Status::Failure), Status::Failure);
+    ASSERT_EQ(cluster.TestNotifyIfAttributeChanged(345, Status::Failure), Status::Failure);
     ASSERT_EQ(cluster.GetDataVersion({ kEndpointId, kClusterId }), oldVersion);
     ASSERT_TRUE(context.ChangeListener().DirtyList().empty());
 }
