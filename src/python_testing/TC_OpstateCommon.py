@@ -1226,9 +1226,9 @@ class TC_OPSTATE_BASE():
         #   PausedTime is 0.5 times the initial-countdown-time
         # however given time/sleeps, this is highly unlikely to be always accurate, especially in CI
         expected_value = (0.5 * initial_countdown_time)
-        asserts.assert_almost_less_equal(expected_value, event_data.pausedTime,
-                                         delta=approx_delta_seconds,
-                                         f"Paused time ({event_data.pausedTime}) shall be about {expected_value:.1f} +/- {approx_delta_seconds}")
+        asserts.assert_almost_equal(expected_value, event_data.pausedTime,
+                                    delta=approx_delta_seconds,
+                                    f"Paused time ({event_data.pausedTime}) shall be about {expected_value:.1f} +/- {approx_delta_seconds}")
 
     ############################
     #   TEST CASE 2.6 - Optional Reports with DUT as Server
