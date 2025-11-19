@@ -144,17 +144,24 @@ TEST_F(TestAccessControlCluster, ReadAttributesTest)
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Test mandatory attributes (always available)
+    // According to Matter spec, minimum values are:
+    // - SubjectsPerAccessControlEntry: >= 4
+    // - TargetsPerAccessControlEntry: >= 3
+    // - AccessControlEntriesPerFabric: >= 4
     uint16_t subjectsPerEntry = 0;
     auto status = tester.ReadAttribute(AccessControl::Attributes::SubjectsPerAccessControlEntry::Id, subjectsPerEntry);
     ASSERT_TRUE(status.IsSuccess());
+    ASSERT_GE(subjectsPerEntry, 4u);
 
     uint16_t targetsPerEntry = 0;
     status                   = tester.ReadAttribute(AccessControl::Attributes::TargetsPerAccessControlEntry::Id, targetsPerEntry);
     ASSERT_TRUE(status.IsSuccess());
+    ASSERT_GE(targetsPerEntry, 3u);
 
     uint16_t entriesPerFabric = 0;
     status = tester.ReadAttribute(AccessControl::Attributes::AccessControlEntriesPerFabric::Id, entriesPerFabric);
     ASSERT_TRUE(status.IsSuccess());
+    ASSERT_GE(entriesPerFabric, 4u);
 
 #if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
     // Read Extension attribute (optional)
