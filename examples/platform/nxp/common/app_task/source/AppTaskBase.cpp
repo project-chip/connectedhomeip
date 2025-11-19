@@ -31,6 +31,7 @@
 #include <setup_payload/OnboardingCodesUtil.h>
 
 #include <app/clusters/network-commissioning/network-commissioning.h>
+#include <platform/DefaultTimerDelegate.h>
 
 #include <platform/CommissionableDataProvider.h>
 

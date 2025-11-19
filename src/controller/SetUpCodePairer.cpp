@@ -264,8 +264,7 @@ CHIP_ERROR SetUpCodePairer::StopDiscoveryOverDNSSD()
 
     mWaitingForDiscovery[kIPTransport] = false;
 
-    mCommissioner->StopCommissionableDiscovery();
-    return CHIP_NO_ERROR;
+    return mCommissioner->StopCommissionableDiscovery();
 }
 
 CHIP_ERROR SetUpCodePairer::StartDiscoveryOverWiFiPAF()
@@ -310,9 +309,10 @@ CHIP_ERROR SetUpCodePairer::StopDiscoveryOverWiFiPAF()
 {
     mWaitingForDiscovery[kWiFiPAFTransport] = false;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    DeviceLayer::ConnectivityMgr().WiFiPAFCancelIncompleteSubscribe();
-#endif
+    return DeviceLayer::ConnectivityMgr().WiFiPAFCancelIncompleteSubscribe();
+#else
     return CHIP_NO_ERROR;
+#endif
 }
 
 CHIP_ERROR SetUpCodePairer::StartDiscoveryOverNFC()
@@ -653,7 +653,7 @@ void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::CommonRe
     {
         // If the discovery type does not want the PASE auto retry mechanism, we will just store
         // a single IP. So the discovery process is stopped as it won't be of any help anymore.
-        StopDiscoveryOverDNSSD();
+        TEMPORARY_RETURN_IGNORED StopDiscoveryOverDNSSD();
         mDiscoveredParameters.emplace_back(resolutionData, matchedLongDiscriminator, 0);
     }
     else

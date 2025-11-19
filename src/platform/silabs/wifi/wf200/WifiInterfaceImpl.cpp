@@ -698,13 +698,11 @@ CHIP_ERROR WifiInterfaceImpl::GetAccessPointInfo(wfx_wifi_scan_result_t & info)
 {
     uint32_t signal_strength = 0;
 
-    // TODO: The ap_info.ssid isn't populated anywhere. The returned value is always 0.
     chip::ByteSpan apSsidSpan(ap_info.ssid, ap_info.ssid_length);
     chip::MutableByteSpan apSsidMutableSpan(info.ssid, WFX_MAX_SSID_LENGTH);
     chip::CopySpanToMutableSpan(apSsidSpan, apSsidMutableSpan);
     info.ssid_length = apSsidMutableSpan.size();
 
-    // TODO: The ap_info.bssid isn't populated anywhere. The returned value is always 0.
     chip::ByteSpan apBssidSpan(ap_info.bssid, kWifiMacAddressLength);
     chip::MutableByteSpan apBssidMutableSpan(info.bssid, kWifiMacAddressLength);
     chip::CopySpanToMutableSpan(apBssidSpan, apBssidMutableSpan);
@@ -869,15 +867,31 @@ void WifiInterfaceImpl::CancelScanNetworks()
 
 void WifiInterfaceImpl::ConnectionEventCallback(sl_wfx_connect_ind_body_t connect_indication_body)
 {
-    uint8_t * mac   = connect_indication_body.mac;
     uint32_t status = connect_indication_body.status;
-    ap_info.chan    = connect_indication_body.channel;
-    memcpy(&ap_info.security, &wifi_provision.security, sizeof(wifi_provision.security));
     switch (status)
     {
     case WFM_STATUS_SUCCESS: {
         ChipLogProgress(DeviceLayer, "STA-Connected");
-        memcpy(ap_mac.data(), mac, kWifiMacAddressLength);
+
+        ap_info.chan = connect_indication_body.channel;
+        chip::ByteSpan securitySpan(reinterpret_cast<const uint8_t *>(&wifi_provision.security), sizeof(wifi_provision.security));
+        chip::MutableByteSpan apSecurityMutableSpan(reinterpret_cast<uint8_t *>(&ap_info.security), sizeof(ap_info.security));
+        chip::CopySpanToMutableSpan(securitySpan, apSecurityMutableSpan);
+
+        // Store SSID
+        chip::ByteSpan apSsidSpan(wifi_provision.ssid, wifi_provision.ssidLength);
+        chip::MutableByteSpan apSsidMutableSpan(ap_info.ssid, WFX_MAX_SSID_LENGTH);
+        chip::CopySpanToMutableSpan(apSsidSpan, apSsidMutableSpan);
+        ap_info.ssid_length = wifi_provision.ssidLength;
+
+        // Store BSSID
+        chip::ByteSpan macSpan(connect_indication_body.mac, kWifiMacAddressLength);
+        chip::MutableByteSpan apBssidMutableSpan(ap_info.bssid, kWifiMacAddressLength);
+        chip::CopySpanToMutableSpan(macSpan, apBssidMutableSpan);
+
+        // TODO: Refactor WifiInterface to use single representation of MAC address
+        chip::MutableByteSpan apMacMutableSpan(ap_mac.data(), kWifiMacAddressLength);
+        chip::CopySpanToMutableSpan(macSpan, apMacMutableSpan);
 
         wifi_extra.Set(WifiInterface::WifiState::kStationConnected);
         xEventGroupSetBits(sl_wfx_event_group, SL_WFX_CONNECT);

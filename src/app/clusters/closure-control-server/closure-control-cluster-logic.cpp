@@ -152,11 +152,15 @@ CHIP_ERROR ClusterLogic::SetCountdownTime(const DataModel::Nullable<ElapsedS> & 
     auto now       = System::SystemClock().GetMonotonicTimestamp();
     bool markDirty = false;
 
-    // TODO: Delegate specific handling logic will be added if needed after after spec issue resolution.
-    //       https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/11603
+    // When fromDelegate=true (delegate updates), we rely on the QuieterReportingAttribute policies
+    // to determine if reporting is needed (increment, change to/from zero, null changes).
+    // When fromDelegate=false (MainState change), we force reporting since the tracked operation changed.
 
-    auto predicate = [](const decltype(mState.mCountdownTime)::SufficientChangePredicateCandidate &) -> bool { return true; };
-    markDirty      = (mState.mCountdownTime.SetValue(countdownTime, now, predicate) == AttributeDirtyState::kMustReport);
+    auto predicate = [fromDelegate](const decltype(mState.mCountdownTime)::SufficientChangePredicateCandidate &) -> bool {
+        // Force reporting when the tracked operation changes due to MainState change
+        return !fromDelegate;
+    };
+    markDirty = (mState.mCountdownTime.SetValue(countdownTime, now, predicate) == AttributeDirtyState::kMustReport);
 
     if (markDirty)
     {
@@ -177,12 +181,12 @@ CHIP_ERROR ClusterLogic::SetMainState(MainStateEnum mainState)
     // EngageStateChanged event SHALL be generated when the MainStateEnum attribute changes state to and from disengaged state
     if (mState.mMainState == MainStateEnum::kDisengaged)
     {
-        GenerateEngageStateChangedEvent(true);
+        TEMPORARY_RETURN_IGNORED GenerateEngageStateChangedEvent(true);
     }
 
     if (mainState == MainStateEnum::kDisengaged)
     {
-        GenerateEngageStateChangedEvent(false);
+        TEMPORARY_RETURN_IGNORED GenerateEngageStateChangedEvent(false);
     }
 
     mState.mMainState = mainState;
@@ -192,20 +196,20 @@ CHIP_ERROR ClusterLogic::SetMainState(MainStateEnum mainState)
     {
         if (mainState == MainStateEnum::kCalibrating)
         {
-            SetCountdownTimeFromCluster(mDelegate.GetCalibrationCountdownTime());
+            TEMPORARY_RETURN_IGNORED SetCountdownTimeFromCluster(mDelegate.GetCalibrationCountdownTime());
         }
         else if (mainState == MainStateEnum::kMoving)
         {
-            SetCountdownTimeFromCluster(mDelegate.GetMovingCountdownTime());
+            TEMPORARY_RETURN_IGNORED SetCountdownTimeFromCluster(mDelegate.GetMovingCountdownTime());
         }
         else if (mainState == MainStateEnum::kWaitingForMotion)
         {
-            SetCountdownTimeFromCluster(mDelegate.GetWaitingForMotionCountdownTime());
+            TEMPORARY_RETURN_IGNORED SetCountdownTimeFromCluster(mDelegate.GetWaitingForMotionCountdownTime());
         }
         else
         {
             // Reset the countdown time to 0 when the main state is not in motion or calibration.
-            SetCountdownTimeFromCluster(DataModel::Nullable<ElapsedS>(0));
+            TEMPORARY_RETURN_IGNORED SetCountdownTimeFromCluster(DataModel::Nullable<ElapsedS>(0));
         }
     }
 
@@ -293,7 +297,7 @@ CHIP_ERROR ClusterLogic::SetOverallCurrentState(const DataModel::Nullable<Generi
             {
                 // As secureState field is not set in present current state and incoming current state has value, we generate the
                 // event
-                GenerateSecureStateChangedEvent(incomingOverallCurrentState.secureState.Value());
+                TEMPORARY_RETURN_IGNORED GenerateSecureStateChangedEvent(incomingOverallCurrentState.secureState.Value());
             }
             else
             {
@@ -301,7 +305,7 @@ CHIP_ERROR ClusterLogic::SetOverallCurrentState(const DataModel::Nullable<Generi
                 // value has changed.
                 if (mState.mOverallCurrentState.Value().secureState.Value() != incomingOverallCurrentState.secureState.Value())
                 {
-                    GenerateSecureStateChangedEvent(incomingOverallCurrentState.secureState.Value());
+                    TEMPORARY_RETURN_IGNORED GenerateSecureStateChangedEvent(incomingOverallCurrentState.secureState.Value());
                 }
             }
         }

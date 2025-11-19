@@ -35,7 +35,6 @@
 import logging
 import random
 from time import sleep
-from typing import Optional
 
 from mobly import asserts
 from support_modules.cadmin_support import CADMINBaseTest
@@ -52,32 +51,15 @@ class TC_CADMIN_1_11(CADMINBaseTest):
     async def OpenCommissioningWindow(self, th, expectedErrCode) -> CommissioningParameters:
         if expectedErrCode is None:
             params = await th.OpenCommissioningWindow(
-                nodeid=self.dut_node_id, timeout=self.timeout, iteration=10000, discriminator=self.discriminator, option=1)
+                nodeId=self.dut_node_id, timeout=self.timeout, iteration=10000, discriminator=self.discriminator, option=1)
             return params
 
         else:
             ctx = asserts.assert_raises(ChipStackError)
             with ctx:
                 await th.OpenCommissioningWindow(
-                    nodeid=self.dut_node_id, timeout=self.timeout, iteration=10000, discriminator=self.discriminator, option=1)
+                    nodeId=self.dut_node_id, timeout=self.timeout, iteration=10000, discriminator=self.discriminator, option=1)
             errcode = PyChipError.from_code(ctx.exception.err)
-            logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
-            asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
-            asserts.assert_true(errcode.sdk_code == expectedErrCode,
-                                'Unexpected error code returned from CommissioningComplete')
-
-    async def OpenBasicCommissioningWindow(self, th: ChipDeviceCtrl, expectedErrCode: Optional[Clusters.AdministratorCommissioning.Enums.StatusCode] = None) -> CommissioningParameters:
-        if not expectedErrCode:
-            params = await th.OpenBasicCommissioningWindow(
-                nodeid=self.dut_node_id, timeout=self.timeout)
-            return params
-
-        else:
-            ctx = asserts.assert_raises(ChipStackError)
-            with ctx:
-                await th.OpenBasicCommissioningWindow(
-                    nodeid=self.dut_node_id, timeout=self.timeout)
-            errcode = ctx.exception.chip_error
             logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
             asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
             asserts.assert_true(errcode.sdk_code == expectedErrCode,
@@ -160,7 +142,7 @@ class TC_CADMIN_1_11(CADMINBaseTest):
 
         self.step(8)
         revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
-        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
+        await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
         # The failsafe cleanup is scheduled after the command completes, so give it a bit of time to do that
         sleep(1)
 
@@ -176,25 +158,25 @@ class TC_CADMIN_1_11(CADMINBaseTest):
             self.count = 0
             self.step("9a")
             obcCmd = Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180)
-            await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=obcCmd, timedRequestTimeoutMs=6000)
+            await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=obcCmd, timedRequestTimeoutMs=6000)
 
             self.step("9b")
             try:
-                await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=obcCmd, timedRequestTimeoutMs=6000)
+                await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=obcCmd, timedRequestTimeoutMs=6000)
             except Exception as e:
                 asserts.assert_true(e.clusterStatus == busy_enum,
                                     'Unexpected error code returned from CommissioningComplete')
 
             self.step("9c")
             try:
-                await self.th2.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=obcCmd, timedRequestTimeoutMs=6000)
+                await self.th2.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=obcCmd, timedRequestTimeoutMs=6000)
             except Exception as e:
                 asserts.assert_true(e.clusterStatus == busy_enum,
                                     'Unexpected error code returned from CommissioningComplete')
 
             self.step("9d")
             revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
-            await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
+            await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
             # The failsafe cleanup is scheduled after the command completes, so give it a bit of time to do that
             sleep(1)
 
@@ -210,7 +192,7 @@ class TC_CADMIN_1_11(CADMINBaseTest):
 
         self.step(11)
         removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(th2_idx)
-        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
+        await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
 
 
 if __name__ == "__main__":
