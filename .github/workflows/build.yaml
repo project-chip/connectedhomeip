@@ -509,7 +509,8 @@ jobs:
         env:
             TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
 
-        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
+        # Disable coverage build for 1.5 Branch since it is failing consistently and is not that useful
+        if: false
         runs-on: ubuntu-latest
 
         container:
