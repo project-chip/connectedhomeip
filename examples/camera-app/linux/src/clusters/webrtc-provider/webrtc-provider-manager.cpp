@@ -411,6 +411,12 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideAnswer(uint16_t sessionId, const 
 
     transport->GetPeerConnection()->SetRemoteDescription(sdpAnswer, SDPType::Answer);
 
+    if (transport->HasCandidates())
+    {
+        transport->MoveToState(WebrtcTransport::State::SendingICECandidates);
+        ScheduleICECandidatesSend(sessionId);
+    }
+
     return CHIP_NO_ERROR;
 }
 
@@ -445,6 +451,12 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideICECandidates(uint16_t sessionId,
         std::string mid =
             candidate.SDPMid.IsNull() ? "" : std::string(candidate.SDPMid.Value().begin(), candidate.SDPMid.Value().end());
         transport->AddRemoteCandidate(std::string(candidate.candidate.begin(), candidate.candidate.end()), mid);
+    }
+
+    if (transport->HasCandidates())
+    {
+        transport->MoveToState(WebrtcTransport::State::SendingICECandidates);
+        ScheduleICECandidatesSend(sessionId);
     }
 
     return CHIP_NO_ERROR;

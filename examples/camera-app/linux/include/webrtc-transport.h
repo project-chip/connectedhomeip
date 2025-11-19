@@ -108,10 +108,10 @@ public:
 
     void SetSdpAnswer(std::string localSdp) { mLocalSdp = localSdp; }
 
-    const std::vector<ICECandidateInfo> & GetCandidates()
+    bool HasCandidates()
     {
         std::lock_guard<std::mutex> lock(mCandidatesMutex);
-        return mLocalCandidates;
+        return !mLocalCandidates.empty();
     }
 
     // Drain candidates - returns all accumulated candidates and clears the internal list
