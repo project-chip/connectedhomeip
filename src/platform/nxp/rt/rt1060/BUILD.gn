@@ -138,6 +138,7 @@ static_library("nxp_platform") {
   if (chip_enable_ota_requestor) {
     defines += [ "CONFIG_CHIP_OTA_POSTED_OPERATIONS_IN_IDLE=1" ]
     sources += ota_sources
+    deps += [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
     if (chip_with_ota_encryption) {
       defines += [
         "OTA_ENCRYPTION_ENABLE=1",

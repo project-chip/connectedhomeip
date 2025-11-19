@@ -59,7 +59,7 @@ struct MockOtaRequestor : public OTARequestorInterface
 public:
     ~MockOtaRequestor() = default;
 
-    void Reset(void) override {}
+    void Reset() override {}
     void
     HandleAnnounceOTAProvider(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                               const OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType & commandData) override
@@ -284,7 +284,8 @@ TEST_F(TestOTARequestorCluster, AnnounceOtaProviderCommandInvalidMetadataTest)
     // Invoke the command.
     auto result = cluster.InvokeCommand(request, reader, nullptr);
     ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(result.value(), DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::InvalidCommand));
+    EXPECT_EQ(result.value(), // NOLINT(bugprone-unchecked-optional-access)
+              DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::InvalidCommand));
 }
 
 TEST_F(TestOTARequestorCluster, AnnounceCommandWithNoRequestorInterfaceReturnsError)
@@ -316,7 +317,7 @@ TEST_F(TestOTARequestorCluster, AnnounceCommandWithNoRequestorInterfaceReturnsEr
     // Invoke the command.
     auto result = cluster.InvokeCommand(request, reader, nullptr);
     ASSERT_TRUE(result.has_value());
-    EXPECT_TRUE(result->IsError());
+    EXPECT_TRUE(result->IsError()); // NOLINT(bugprone-unchecked-optional-access)
 }
 
 TEST_F(TestOTARequestorCluster, ReadAttributesTest)
@@ -404,11 +405,11 @@ TEST_F(TestOTARequestorCluster, StateTransitionEvent)
                               OtaSoftwareUpdateRequestor::ChangeReasonEnum::kFailure, 1000u);
     auto event = eventsGenerator.GetNextEvent();
     ASSERT_TRUE(event.has_value());
-    EXPECT_EQ(event->eventOptions.mPath,
+    EXPECT_EQ(event->eventOptions.mPath, // NOLINT(bugprone-unchecked-optional-access)
               ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id,
                                 OtaSoftwareUpdateRequestor::Events::StateTransition::Id));
     OtaSoftwareUpdateRequestor::Events::StateTransition::DecodableType decodedEvent;
-    ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR);
+    ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR); // NOLINT(bugprone-unchecked-optional-access)
     EXPECT_EQ(decodedEvent.previousState, OtaSoftwareUpdateRequestor::UpdateStateEnum::kQuerying);
     EXPECT_EQ(decodedEvent.newState, OtaSoftwareUpdateRequestor::UpdateStateEnum::kIdle);
     EXPECT_EQ(decodedEvent.reason, OtaSoftwareUpdateRequestor::ChangeReasonEnum::kFailure);
@@ -428,11 +429,11 @@ TEST_F(TestOTARequestorCluster, StateTransitionEventWithNoOtaRequestor)
                               OtaSoftwareUpdateRequestor::ChangeReasonEnum::kFailure, 1000u);
     auto event = eventsGenerator.GetNextEvent();
     ASSERT_TRUE(event.has_value());
-    EXPECT_EQ(event->eventOptions.mPath,
+    EXPECT_EQ(event->eventOptions.mPath, // NOLINT(bugprone-unchecked-optional-access)
               ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id,
                                 OtaSoftwareUpdateRequestor::Events::StateTransition::Id));
     OtaSoftwareUpdateRequestor::Events::StateTransition::DecodableType decodedEvent;
-    ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR);
+    ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR); // NOLINT(bugprone-unchecked-optional-access)
     EXPECT_EQ(decodedEvent.previousState, OtaSoftwareUpdateRequestor::UpdateStateEnum::kQuerying);
     EXPECT_EQ(decodedEvent.newState, OtaSoftwareUpdateRequestor::UpdateStateEnum::kIdle);
     EXPECT_EQ(decodedEvent.reason, OtaSoftwareUpdateRequestor::ChangeReasonEnum::kFailure);
@@ -468,10 +469,10 @@ TEST_F(TestOTARequestorCluster, VersionAppliedEvent)
     auto event = eventsGenerator.GetNextEvent();
     ASSERT_TRUE(event.has_value());
     EXPECT_EQ(
-        event->eventOptions.mPath,
+        event->eventOptions.mPath, // NOLINT(bugprone-unchecked-optional-access)
         ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id, OtaSoftwareUpdateRequestor::Events::VersionApplied::Id));
     OtaSoftwareUpdateRequestor::Events::VersionApplied::DecodableType decodedEvent;
-    ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR);
+    ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR); // NOLINT(bugprone-unchecked-optional-access)
     EXPECT_EQ(decodedEvent.softwareVersion, 3000u);
     EXPECT_EQ(decodedEvent.productID, 1234u);
 }
@@ -488,10 +489,10 @@ TEST_F(TestOTARequestorCluster, VersionAppliedEventWithNoOtaRequestor)
     auto event = eventsGenerator.GetNextEvent();
     ASSERT_TRUE(event.has_value());
     EXPECT_EQ(
-        event->eventOptions.mPath,
+        event->eventOptions.mPath, // NOLINT(bugprone-unchecked-optional-access)
         ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id, OtaSoftwareUpdateRequestor::Events::VersionApplied::Id));
     OtaSoftwareUpdateRequestor::Events::VersionApplied::DecodableType decodedEvent;
-    ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR);
+    ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR); // NOLINT(bugprone-unchecked-optional-access)
     EXPECT_EQ(decodedEvent.softwareVersion, 3000u);
     EXPECT_EQ(decodedEvent.productID, 1234u);
 }
@@ -509,10 +510,10 @@ TEST_F(TestOTARequestorCluster, DownloadErrorEvents)
     auto event = eventsGenerator.GetNextEvent();
     ASSERT_TRUE(event.has_value());
     EXPECT_EQ(
-        event->eventOptions.mPath,
+        event->eventOptions.mPath, // NOLINT(bugprone-unchecked-optional-access)
         ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id, OtaSoftwareUpdateRequestor::Events::DownloadError::Id));
     OtaSoftwareUpdateRequestor::Events::DownloadError::DecodableType decodedEvent;
-    ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR);
+    ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR); // NOLINT(bugprone-unchecked-optional-access)
     EXPECT_EQ(decodedEvent.softwareVersion, 4000u);
     EXPECT_EQ(decodedEvent.bytesDownloaded, 10000u);
     EXPECT_EQ(decodedEvent.progressPercent, DataModel::MakeNullable<uint8_t>(82));
@@ -522,9 +523,9 @@ TEST_F(TestOTARequestorCluster, DownloadErrorEvents)
     event = eventsGenerator.GetNextEvent();
     ASSERT_TRUE(event.has_value());
     EXPECT_EQ(
-        event->eventOptions.mPath,
+        event->eventOptions.mPath, // NOLINT(bugprone-unchecked-optional-access)
         ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id, OtaSoftwareUpdateRequestor::Events::DownloadError::Id));
-    ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR);
+    ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR); // NOLINT(bugprone-unchecked-optional-access)
     EXPECT_EQ(decodedEvent.softwareVersion, 5000u);
     EXPECT_EQ(decodedEvent.bytesDownloaded, 12000u);
     EXPECT_TRUE(decodedEvent.progressPercent.IsNull());
@@ -543,10 +544,10 @@ TEST_F(TestOTARequestorCluster, DownloadErrorEventsWithNoOtaRequestor)
     auto event = eventsGenerator.GetNextEvent();
     ASSERT_TRUE(event.has_value());
     EXPECT_EQ(
-        event->eventOptions.mPath,
+        event->eventOptions.mPath, // NOLINT(bugprone-unchecked-optional-access)
         ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id, OtaSoftwareUpdateRequestor::Events::DownloadError::Id));
     OtaSoftwareUpdateRequestor::Events::DownloadError::DecodableType decodedEvent;
-    ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR);
+    ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR); // NOLINT(bugprone-unchecked-optional-access)
     EXPECT_EQ(decodedEvent.softwareVersion, 4000u);
     EXPECT_EQ(decodedEvent.bytesDownloaded, 10000u);
     EXPECT_EQ(decodedEvent.progressPercent, DataModel::MakeNullable<uint8_t>(82));
@@ -556,9 +557,9 @@ TEST_F(TestOTARequestorCluster, DownloadErrorEventsWithNoOtaRequestor)
     event = eventsGenerator.GetNextEvent();
     ASSERT_TRUE(event.has_value());
     EXPECT_EQ(
-        event->eventOptions.mPath,
+        event->eventOptions.mPath, // NOLINT(bugprone-unchecked-optional-access)
         ConcreteEventPath(kTestEndpointId, OtaSoftwareUpdateRequestor::Id, OtaSoftwareUpdateRequestor::Events::DownloadError::Id));
-    ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR);
+    ASSERT_EQ(event->GetEventData(decodedEvent), CHIP_NO_ERROR); // NOLINT(bugprone-unchecked-optional-access)
     EXPECT_EQ(decodedEvent.softwareVersion, 5000u);
     EXPECT_EQ(decodedEvent.bytesDownloaded, 12000u);
     EXPECT_TRUE(decodedEvent.progressPercent.IsNull());
@@ -681,7 +682,7 @@ TEST_F(TestOTARequestorCluster, WriteDefaultProvidersListWithNoInterfaceReturnsE
     DataModel::List<OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type> payload(&provider, 1u);
     std::optional<DataModel::ActionReturnStatus> result = tester.WriteAttribute(DefaultOtaProviders::Id, payload);
     ASSERT_TRUE(result.has_value());
-    EXPECT_TRUE(result->IsError());
+    EXPECT_TRUE(result->IsError()); // NOLINT(bugprone-unchecked-optional-access)
     EXPECT_EQ(changeListener.DirtyList().size(), 0u);
 }
 
