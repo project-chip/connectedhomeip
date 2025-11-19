@@ -546,21 +546,13 @@ void ConnectivityManagerImpl::DriveStationState()
         // scanning, then...
         if (mWiFiStationMode == kWiFiStationMode_Enabled && IsWiFiStationProvisioned())
         {
-            if (mWiFiStationState == kWiFiStationState_Connecting)
-            {
-                // A connection attempt is already in progress, so there's nothing more to do here.
-                ChipLogProgress(DeviceLayer, "WiFi station interface connection attempt in progress...");
-                return;
-            }
-
             // Initiate a connection to the AP if we haven't done so before, or if enough
             // time has passed since the last attempt.
             if (mLastStationConnectFailTime == System::Clock::kZero ||
                 now >= mLastStationConnectFailTime + mWiFiStationReconnectInterval)
             {
                 ChipLogProgress(DeviceLayer, "Attempting to connect WiFi station interface");
-                mLastStationConnectFailTime = now;
-                esp_err_t err               = esp_wifi_connect();
+                esp_err_t err = esp_wifi_connect();
                 if (err != ESP_OK)
                 {
                     ChipLogError(DeviceLayer, "esp_wifi_connect() failed: %s", esp_err_to_name(err));
