@@ -1,4 +1,4 @@
-# NXP `MCXW71` OTA guide
+# NXP MCXW OTA guide
 
 ### Convert `srec` into `sb3` file
 
