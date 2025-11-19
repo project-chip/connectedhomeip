@@ -42,7 +42,7 @@ with PythonPath("py_matter_idl", relative_to=__file__):
     from matter.idl.generators.idl import IdlGenerator
     from matter.idl.generators.storage import InMemoryStorage
     from matter.idl.matter_idl_parser import CreateParser
-    from matter.idl.matter_idl_types import Cluster, Idl, ApiMaturity
+    from matter.idl.matter_idl_types import ApiMaturity, Cluster, Idl
 
 try:
     import coloredlogs

@@ -613,6 +613,7 @@ class DataTypesHandler(BaseHandler):
         else:
             return BaseHandler(self.context)
 
+
 class ClusterIdHandler(BaseHandler):
     def __init__(self, context: Context, cluster: Cluster):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
@@ -625,6 +626,7 @@ class ClusterIdHandler(BaseHandler):
         else:
             return BaseHandler(self.context)
 
+
 class ClusterIdsHandler(BaseHandler):
     def __init__(self, context: Context, cluster: Cluster):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
@@ -635,6 +637,7 @@ class ClusterIdsHandler(BaseHandler):
             return ClusterIdHandler(self.context, self._cluster)
         else:
             return BaseHandler(self.context)
+
 
 class ClusterHandlerPostProcessing(enum.Enum):
     FINALIZE_AND_ADD_TO_IDL = enum.auto()
