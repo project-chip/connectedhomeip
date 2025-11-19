@@ -70,7 +70,7 @@ def _normalize_order(idl: Idl):
     output is easily diffed by humans.
     """
 
-    # This method exists because `zapt` generation of IDL files
+    # This method exists because `zap` generation of IDL files
     # are generally based on SQL select query ordering, likely
     # with some sort fields to achieve determinism
     #
