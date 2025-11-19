@@ -104,9 +104,7 @@ CHIP_ERROR CommandSender::AllocateBuffer()
             reservedSize = static_cast<uint32_t>(commandPacket->AvailableDataLength() - bufferSizeToAllocate);
         }
 
-        bool chainedBuffer = commandPacket->HasChainedBuffer();
-        mCommandMessageWriter.Init(std::move(commandPacket), chainedBuffer);
-
+        mCommandMessageWriter.Init(std::move(commandPacket));
         ReturnErrorOnFailure(mInvokeRequestBuilder.InitWithEndBufferReserved(&mCommandMessageWriter));
         // Reserving space for MIC at the end.
         ReturnErrorOnFailure(

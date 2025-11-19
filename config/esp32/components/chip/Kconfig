@@ -32,7 +32,7 @@ menu "CHIP Core"
             default 8
             help
                 The maximum number of simultaneously active CHIP exchange contexts.
-                                           
+
                 An exchange context object is used to track the state of an ongoing CHIP message
                 exchange (conversation) with a peer, e.g. a cloud service, a mobile application, or
                 another device.
@@ -1214,9 +1214,16 @@ menu "CHIP Device Layer"
 
     endmenu
 
-    menu "Matter TCP payload options"
+    menu "Matter TCP transport options"
+        config ENABLE_TCP_TRANSPORT
+            bool "Enable TCP transport"
+            default n
+            help
+                Enable TCP transport.
+
         config MAX_LARGE_BUFFER_SIZE_BYTES
             int "Max buffer size for TCP payloads"
+            depends on ENABLE_TCP_TRANSPORT
             default 1530
             help
                 Max TCP payload buffer size.
