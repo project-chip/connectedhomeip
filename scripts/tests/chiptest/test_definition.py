@@ -142,7 +142,7 @@ class App:
             log.debug("Executing application under test with the following args:")
             for key, value in self.options.items():
                 log.debug("   %s: %s", key, value)
-                app_cmd = app_cmd + [key, value]
+                subproc = subproc.with_args(key, value)
                 if key == '--KVS':
                     self.kvsPathSet.add(value)
         return self.runner.RunSubprocess(subproc, name='APP ', wait=False)
