@@ -253,7 +253,7 @@ void NetworkCommissioningCluster::SetLastNetworkingStatusValue(
 {
     if (mLastNetworkingStatusValue.Update(networkingStatusValue))
     {
-        NotifyAttributeChanged(Attributes::LastNetworkingStatus::TypeInfo::GetAttributeId());
+        NotifyAttributeChanged(Attributes::LastNetworkingStatus::Id);
     }
 }
 

@@ -34,7 +34,6 @@ public:
         kStationDisconnect  = 1,
         kAPStart            = 2,
         kAPStop             = 3,
-        kScan               = 4, /* This combines the scan start and scan result events  */
         kStationStartJoin   = 5,
         kConnectionComplete = 6, /* This combines the DHCP and Notify */
         kStationDhcpDone    = 7,

@@ -15,6 +15,7 @@
 
 import logging
 import os
+import shlex
 import shutil
 import subprocess
 import tempfile
@@ -25,6 +26,8 @@ from collections.abc import Iterable
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum, auto
+
+log = logging.getLogger(__name__)
 
 TEST_NODE_ID = '0x12344321'
 TEST_DISCRIMINATOR = '3840'
@@ -136,11 +139,11 @@ class App:
         app_cmd = self.command + ['--interface-id', str(-1)]
 
         if not self.options:
-            logging.debug('Executing application under test with default args')
+            log.debug("Executing application under test with default args")
         else:
-            logging.debug('Executing application under test with the following args:')
+            log.debug("Executing application under test with the following args:")
             for key, value in self.options.items():
-                logging.debug('   %s: %s' % (key, value))
+                log.debug("   %s: %s", key, value)
                 app_cmd = app_cmd + [key, value]
                 if key == '--KVS':
                     self.kvsPathSet.add(value)
@@ -194,10 +197,10 @@ class App:
             try:
                 exit_code = self.process.wait(10)
                 if exit_code:
-                    logging.error('Subprocess failed with exit code: %d' % exit_code)
+                    log.error("Subprocess failed with exit code: %d", exit_code)
                     return False
             except subprocess.TimeoutExpired:
-                logging.debug('Subprocess did not terminate on SIGTERM, killing it now')
+                log.debug("Subprocess did not terminate on SIGTERM, killing it now")
                 self.process.kill()
                 # The exit code when using Python subprocess will be the signal used to kill it.
                 # Ideally, we would recover the original exit code, but the process was already
@@ -312,18 +315,18 @@ class ExecutionCapture:
             ))
 
     def LogContents(self):
-        logging.error('================ CAPTURED LOG START ==================')
+        log.error("================ CAPTURED LOG START ==================")
         with self.lock:
             for entry in self.captures:
-                logging.error('%02d:%02d:%02d.%03d - %-10s: %s',
-                              entry.when.hour,
-                              entry.when.minute,
-                              entry.when.second,
-                              entry.when.microsecond/1000,
-                              entry.source,
-                              entry.line
-                              )
-        logging.error('================ CAPTURED LOG END ====================')
+                log.error("%02d:%02d:%02d.%03d - %-10s: %s",
+                          entry.when.hour,
+                          entry.when.minute,
+                          entry.when.second,
+                          entry.when.microsecond/1000,
+                          entry.source,
+                          entry.line
+                          )
+        log.error("================ CAPTURED LOG END ====================")
 
 
 class TestTag(Enum):
@@ -472,7 +475,7 @@ class TestDefinition:
                               + ['--yaml-path', self.run_name]
                               + ["--pics-file", pics_file])
                 if dry_run:
-                    logging.info(" ".join(python_cmd))
+                    log.info(shlex.join(python_cmd))
                 else:
                     runner.RunSubprocess(python_cmd, name='MATTER_REPL_YAML_TESTER',
                                          dependencies=[apps_register], timeout_seconds=timeout_seconds)
@@ -496,11 +499,8 @@ class TestDefinition:
                 test_cmd += server_args
 
                 if dry_run:
-                    # Some of our command arguments have spaces in them, so if we are
-                    # trying to log commands people can run we should quote those.
-                    def quoter(arg): return f"'{arg}'" if ' ' in arg else arg
-                    logging.info(" ".join(map(quoter, pairing_cmd)))
-                    logging.info(" ".join(map(quoter, test_cmd)))
+                    log.info(shlex.join(pairing_cmd))
+                    log.info(shlex.join(test_cmd))
                 else:
                     runner.RunSubprocess(pairing_cmd,
                                          name='PAIR', dependencies=[apps_register])
@@ -510,7 +510,7 @@ class TestDefinition:
                         timeout_seconds=timeout_seconds)
 
         except Exception:
-            logging.error("!!!!!!!!!!!!!!!!!!!! ERROR !!!!!!!!!!!!!!!!!!!!!!")
+            log.error("!!!!!!!!!!!!!!!!!!!! ERROR !!!!!!!!!!!!!!!!!!!!!!")
             runner.capture_delegate.LogContents()
             loggedCapturedLogs = True
             raise
@@ -523,6 +523,6 @@ class TestDefinition:
             # If loggedCapturedLogs then we are already throwing, so no need to
             # try to trigger test failure due to our abnormal termination.
             if not ok and not loggedCapturedLogs:
-                logging.error("!!!!!!!!!!!!!!!!!!!! ERROR !!!!!!!!!!!!!!!!!!!!!!")
+                log.error("!!!!!!!!!!!!!!!!!!!! ERROR !!!!!!!!!!!!!!!!!!!!!!")
                 runner.capture_delegate.LogContents()
                 raise Exception('Subprocess terminated abnormally')

@@ -352,25 +352,12 @@ config CHIP_ICD_IDLE_MODE_DURATION
 	  It determines the maximum amount of time the device can stay in the idle mode, which means the
 	  device may be unreachable and not able to receive messages.
 
-config CHIP_ICD_IDLE_MODE_INTERVAL_MS
-	int "Intermittently Connected Device idle mode interval (ms)"
-	default 2000
-	help
-	  Provides the ICD idle mode interval in milliseconds.
-
-
 config CHIP_ICD_ACTIVE_MODE_DURATION
 	int "Intermittently Connected Device active mode duration (ms)"
 	default 10000
 	help
 	  Provides the Intermittently Connected Device active mode duration in milliseconds.
 	  It determines the minimum amount of time the device shall stay in the active mode.
-
-config CHIP_ICD_ACTIVE_MODE_INTERVAL_MS
-	int "Intermittently Connected Device active mode interval (ms)"
-	default 500
-	help
-	  Provides the ICD active mode interval in milliseconds.
 
 config CHIP_ICD_ACTIVE_MODE_THRESHOLD
 	int "Intermittently Connected Device active mode threshold (ms)"
