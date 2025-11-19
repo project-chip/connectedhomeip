@@ -132,7 +132,7 @@ CHIP_ERROR DefaultServerCluster::GeneratedCommands(const ConcreteClusterPath & p
 }
 
 DataModel::ActionReturnStatus DefaultServerCluster::NotifyIfAttributeChanged(AttributeId attributeId,
-                                                                                    DataModel::ActionReturnStatus status)
+                                                                             DataModel::ActionReturnStatus status)
 {
     if (status.IsSuccess() && !status.IsNoOpSuccess())
     {

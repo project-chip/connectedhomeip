@@ -120,8 +120,8 @@ project's Slack channel.
     -   [ ] For persisted attributes, use the `AttributePersistence` helper to
             load in `Startup` and save on writes.
     -   [ ] **Crucially,** after a successful write, call a notification
-            function (e.g., `NotifyIfAttributeChanged`) to ensure
-            subscriptions work correctly.
+            function (e.g., `NotifyIfAttributeChanged`) to ensure subscriptions
+            work correctly.
 
 -   [ ] **2.3: Implement Command Logic:**
 

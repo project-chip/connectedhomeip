@@ -92,9 +92,8 @@ void IdentifyCluster::TimerFired()
 {
     if (mIdentifyTime > 0)
     {
-        NotifyIfAttributeChanged(
-            Attributes::IdentifyTime::Id,
-            SetIdentifyTime(IdentifyTimeChangeSource::kTimer, static_cast<uint16_t>(mIdentifyTime - 1)));
+        NotifyIfAttributeChanged(Attributes::IdentifyTime::Id,
+                                 SetIdentifyTime(IdentifyTimeChangeSource::kTimer, static_cast<uint16_t>(mIdentifyTime - 1)));
     }
 }
 
@@ -182,14 +181,12 @@ IdentifyCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TL
         // Currently identifying: handle stop/finish effects, otherwise cancel Identify process and trigger new effect.
         if (mEffectIdentifier == Identify::EffectIdentifierEnum::kFinishEffect)
         {
-            return NotifyIfAttributeChanged(Attributes::IdentifyTime::Id,
-                                            SetIdentifyTime(IdentifyTimeChangeSource::kClient, 1));
+            return NotifyIfAttributeChanged(Attributes::IdentifyTime::Id, SetIdentifyTime(IdentifyTimeChangeSource::kClient, 1));
         }
 
         if (mEffectIdentifier == Identify::EffectIdentifierEnum::kStopEffect)
         {
-            return NotifyIfAttributeChanged(Attributes::IdentifyTime::Id,
-                                            SetIdentifyTime(IdentifyTimeChangeSource::kClient, 0));
+            return NotifyIfAttributeChanged(Attributes::IdentifyTime::Id, SetIdentifyTime(IdentifyTimeChangeSource::kClient, 0));
         }
 
         // Other effects: cancel and trigger new effect.
