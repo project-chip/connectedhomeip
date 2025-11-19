@@ -128,10 +128,10 @@ void FanControl::Render()
     int uiSpeedSetting                                                       = static_cast<int>(mSpeedSetting);
     int uiAirflowDirection                                                   = static_cast<int>(mAirflowDirection);
     int uiFanModeSequence                                                    = static_cast<int>(mFanModeSequence);
-    int uiPercent                                                            = mPercent;
-    int uiSpeedCurrent                                                       = mSpeedCurrent;
-    int uiSpeedMax                                                           = mSpeedMax;
-    int uiFeatureMap                                                         = mFeatureMap;
+    int uiPercent                                                            = static_cast<int>(mPercent);
+    int uiSpeedCurrent                                                       = static_cast<int>(mSpeedCurrent);
+    int uiSpeedMax                                                           = static_cast<int>(mSpeedMax);
+    int uiFeatureMap                                                         = static_cast<int>(mFeatureMap);
     chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> uiRockSetting = mRockSetting;
     chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> uiRockSupport = mRockSupport;
     chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> uiWindSetting = mWindSetting;
@@ -159,7 +159,7 @@ void FanControl::Render()
     ImGui::LabelText("Percent", "%d", uiPercent);
     if (static_cast<int>(mPercent) != uiPercent)
     {
-        mTargetPercent = uiPercent;
+        mTargetPercent = static_cast<chip::Percent>(uiPercent);
     }
 
     ImGui::SliderInt("Speed setting", &uiSpeedSetting, 0, 10);
@@ -171,13 +171,13 @@ void FanControl::Render()
     ImGui::LabelText("Speed current", "%d", uiSpeedCurrent);
     if (static_cast<int>(mSpeedCurrent) != uiSpeedCurrent)
     {
-        mTargetSpeedCurrent = uiSpeedCurrent;
+        mTargetSpeedCurrent = static_cast<uint8_t>(uiSpeedCurrent);
     }
 
     ImGui::LabelText("Speed Max", "%d", uiSpeedMax);
     if (static_cast<int>(mSpeedMax) != uiSpeedMax)
     {
-        mTargetSpeedMax = uiSpeedMax;
+        mTargetSpeedMax = static_cast<uint8_t>(uiSpeedMax);
     }
 
     ImGui::SliderInt("Airflow direction", &uiAirflowDirection, 1, 0,
@@ -210,7 +210,7 @@ void FanControl::Render()
     ImGui::LabelText("Feature map", "%d", uiFeatureMap);
     if (static_cast<int>(mFeatureMap) != uiFeatureMap)
     {
-        mTargetFeatureMap = uiFeatureMap;
+        mTargetFeatureMap = static_cast<uint32_t>(uiFeatureMap);
     }
 
     const auto flags = ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_SizingStretchProp;
