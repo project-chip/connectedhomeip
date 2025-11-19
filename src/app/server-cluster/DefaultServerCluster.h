@@ -115,9 +115,11 @@ protected:
     /// notify that the attribute has changed.
     void NotifyAttributeChanged(AttributeId attributeId);
 
-    /// Marks that a specific attribute has changed value, if `status` is success.
+    /// Marks that a specific attribute has changed value, if `status` is success and NOT a NoOp.
     ///
-    /// Will return `status`
+    /// This is a helper to wrap write operations that return an action status.
+    ///
+    /// Will return `status` unchanged.
     DataModel::ActionReturnStatus NotifyIfAttributeChanged(AttributeId attributeId, DataModel::ActionReturnStatus status);
 
 private:
