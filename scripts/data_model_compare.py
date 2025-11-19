@@ -205,7 +205,7 @@ def main(log_level):
     help="An input .matter IDL to select a subset of clusters to include.",
 )
 @click.option(
-    "--output", default=None, required=True, type=click.Path(), help="Where to output the generated XML from the input data mode."
+    "--output", default=None, required=True, type=click.Path(), help="Where to output the filtered .matter file."
 )
 @click.argument("filenames", nargs=-1)
 def filter_matter(matter, output, filenames):
