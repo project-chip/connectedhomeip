@@ -261,11 +261,9 @@ void NXPWiFiDriver::OnNetworkStatusChange()
     else
     {
         mpStatusChangeCallback->OnNetworkingStatusChange(
-        Status::kUnknownError, MakeOptional(ByteSpan(configuredNetwork.networkID, configuredNetwork.networkIDLen)),
-        NullOptional);
-
+            Status::kUnknownError, MakeOptional(ByteSpan(configuredNetwork.networkID, configuredNetwork.networkIDLen)),
+            NullOptional);
     }
-
 }
 
 void NXPWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback)
@@ -518,7 +516,7 @@ bool NXPWiFiDriver::WiFiNetworkIterator::Next(Network & item)
     mExhausted        = true;
 
     Network connectedNetwork;
-    CHIP_ERROR err =  mDriver->GetConnectedNetwork(connectedNetwork);
+    CHIP_ERROR err = mDriver->GetConnectedNetwork(connectedNetwork);
 
     if (err == CHIP_NO_ERROR)
     {

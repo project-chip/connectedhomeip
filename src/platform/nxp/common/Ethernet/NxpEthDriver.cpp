@@ -72,20 +72,22 @@ void NxpEthDriver::OnNetworkStatusChange()
 {
     ChipLogProgress(NetworkProvisioning, "NxpEthDriver::OnNetworkStatusChange\r\n");
     VerifyOrReturn(mpStatusChangeCallback != nullptr);
-    NetworkIterator* networkIterator = GetNetworks();
+    NetworkIterator * networkIterator = GetNetworks();
 
-    if (networkIterator != nullptr) {
-        EthernetNetworkIterator* ethIterator = static_cast<EthernetNetworkIterator*>(networkIterator);
+    if (networkIterator != nullptr)
+    {
+        EthernetNetworkIterator * ethIterator = static_cast<EthernetNetworkIterator *>(networkIterator);
 
         if (ethIterator->interfaceNameLen)
         {
             mpStatusChangeCallback->OnNetworkingStatusChange(
                 Status::kSuccess, MakeOptional(ByteSpan(ethIterator->interfaceName, ethIterator->interfaceNameLen)), NullOptional);
         }
-        else{
+        else
+        {
             mpStatusChangeCallback->OnNetworkingStatusChange(
-            Status::kUnknownError, MakeOptional(ByteSpan(ethIterator->interfaceName, ethIterator->interfaceNameLen)),
-            NullOptional);
+                Status::kUnknownError, MakeOptional(ByteSpan(ethIterator->interfaceName, ethIterator->interfaceNameLen)),
+                NullOptional);
         }
         networkIterator->Release();
     }
@@ -94,7 +96,7 @@ void NxpEthDriver::OnNetworkStatusChange()
 CHIP_ERROR NxpEthDriver::Init(NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
     err_t err;
-    mpStatusChangeCallback = networkStatusChangeCallback;
+    mpStatusChangeCallback          = networkStatusChangeCallback;
     ethernetif_config_t enet_config = {
         .phyHandle   = &phyHandle,
         .phyAddr     = EXAMPLE_PHY_ADDRESS,
