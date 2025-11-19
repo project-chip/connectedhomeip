@@ -132,12 +132,12 @@ def _compare_maturity(matter_items, data_model_items, path: list[str] = []):
         # Once something is provisional, do not recurse
         if matter_item.api_maturity != ApiMaturity.PROVISIONAL:
             for a in dataclasses.fields(matter_item):
-                if not hasattr(data_model_item, a):
+                if not hasattr(data_model_item, a.name):
                     continue
-                if type(getattr(matter_item, a)) != list:
+                if type(getattr(matter_item, a.name)) != list:
                     continue
 
-                if not _compare_maturity(getattr(matter_item, a), getattr(data_model_item, a), current_path):
+                if not _compare_maturity(getattr(matter_item, a.name), getattr(data_model_item, a.name), current_path):
                     had_diffs = True
 
     return had_diffs
