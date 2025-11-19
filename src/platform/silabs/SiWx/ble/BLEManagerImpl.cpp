@@ -1061,16 +1061,15 @@ CHIP_ERROR BLEManagerImpl::EncodeAdditionalDataTlv()
 void BLEManagerImpl::HandleC3ReadRequest(const SilabsBleWrapper::sl_wfx_msg_t & evt)
 {
     uint8_t read_resp = evt.rsi_ble_read_req->type == 0 ? GATT_READ_RESP : GATT_BLOB_READ_RESP;
-    size_t dataLen = sInstance.c3AdditionalDataBufferHandle->DataLength();
-    size_t offset = evt.rsi_ble_read_req->offset;
+    size_t dataLen    = sInstance.c3AdditionalDataBufferHandle->DataLength();
+    size_t offset     = evt.rsi_ble_read_req->offset;
     if (offset >= dataLen)
     {
         ChipLogError(DeviceLayer, "Read request offset (%zu) out of bounds (dataLen=%zu)", offset, dataLen);
         return;
     }
-    sl_status_t ret = rsi_ble_gatt_read_response(evt.rsi_ble_read_req->dev_addr, read_resp, evt.rsi_ble_read_req->handle,
-                                         offset, dataLen - offset,
-                                         sInstance.c3AdditionalDataBufferHandle->Start() + offset);
+    sl_status_t ret = rsi_ble_gatt_read_response(evt.rsi_ble_read_req->dev_addr, read_resp, evt.rsi_ble_read_req->handle, offset,
+                                                 dataLen - offset, sInstance.c3AdditionalDataBufferHandle->Start() + offset);
     if (ret != SL_STATUS_OK)
     {
         ChipLogDetail(DeviceLayer, "Failed to send read response, err:%ld", ret);
