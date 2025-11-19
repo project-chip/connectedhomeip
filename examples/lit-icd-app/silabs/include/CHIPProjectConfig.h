@@ -90,6 +90,6 @@
 /**
  * @brief CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE
  *
- * Increase default(2) by 1 to account for the AppTask registering
+ * Increase default(3) by 1 to account for the AppTask registering
  */
-#define CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE 3
+#define CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE 4
