@@ -433,6 +433,31 @@ TEST_F(TestIdentifyCluster, TriggerEffectStopEffectTest)
     EXPECT_EQ(identifyTime, 0u);
 }
 
+TEST_F(TestIdentifyCluster, StopIdentifyingTest)
+{
+    chip::Test::TestServerClusterContext context;
+    IdentifyCluster cluster(IdentifyCluster::Config(kTestEndpointId, mMockTimerDelegate).WithDelegate(&gTestIdentifyDelegate));
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    // Start identifying.
+    EXPECT_EQ(WriteAttribute(cluster, IdentifyTime::Id, static_cast<uint16_t>(10)), CHIP_NO_ERROR);
+
+    // Verify identifying started
+    uint16_t identifyTime;
+    EXPECT_EQ(ReadNumericAttribute(cluster, IdentifyTime::Id, identifyTime), CHIP_NO_ERROR);
+    EXPECT_EQ(identifyTime, 10u);
+
+    // Stop identifying.
+    cluster.StopIdentifying();
+
+    // Verify identifying stopped
+    EXPECT_EQ(ReadNumericAttribute(cluster, IdentifyTime::Id, identifyTime), CHIP_NO_ERROR);
+    EXPECT_EQ(identifyTime, 0u);
+
+    // Verify stop callback was called
+    EXPECT_TRUE(onIdentifyStopCalled);
+}
+
 TEST_F(TestIdentifyCluster, IdentifyTimeAttributeReportingTest)
 {
     chip::Test::TestServerClusterContext context;
