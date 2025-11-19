@@ -18,7 +18,6 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/data-model/Nullable.h>
-#include <lib/core/Optional.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 namespace example {
