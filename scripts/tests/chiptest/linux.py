@@ -33,6 +33,8 @@ from .runner import Executor, SubprocessInfo
 
 log = logging.getLogger(__name__)
 
+log = logging.getLogger(__name__)
+
 test_environ = os.environ.copy()
 
 
@@ -165,11 +167,10 @@ class IsolatedNetworkNamespace:
         # IPv6 does Duplicate Address Detection even though
         # we know ULAs provided are isolated. Wait for 'tentative'
         # address to be gone.
-        log.info('Waiting for IPv6 DaD to complete (no tentative addresses)')
+        log.info("Waiting for IPv6 DaD to complete (no tentative addresses)")
         for _ in range(100):  # wait at most 10 seconds
             if 'tentative' not in subprocess.check_output(['ip', 'addr'], text=True):
-                log.info('No more tentative addresses')
-                break
+                log.info("No more tentative addresses")
             time.sleep(0.1)
         else:
             log.warning("Some addresses look to still be tentative")
@@ -192,11 +193,10 @@ class IsolatedNetworkNamespace:
 
     def _run(self, command: str):
         command = command.format(app_link_name=self.app_link_name,
-                                 tool_link_name=self.tool_link_name,
-                                 index=self.index)
-        log.debug("Executing: %s", command)
+                                 tool_link_name=self.tool_link_name)
+        log.debug("Executing: '%s'", command)
         if subprocess.run(command.split()).returncode != 0:
-            log.error("Failed to execute '%s'" % command)
+            log.error("Failed to execute '%s'", command)
             log.error("Are you using --privileged if running in docker?")
             sys.exit(1)
 

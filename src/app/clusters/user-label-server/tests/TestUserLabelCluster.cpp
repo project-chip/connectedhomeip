@@ -70,7 +70,7 @@ struct TestUserLabelCluster : public ::testing::Test
     void SetUp() override
     {
         DeviceLayer::SetDeviceInfoProvider(&mDeviceInfoProvider);
-        ASSERT_EQ(userLabel.Startup(context), CHIP_NO_ERROR);
+        ASSERT_EQ(userLabel.Startup(testContext.Get()), CHIP_NO_ERROR);
     }
 
     void TearDown() override
@@ -79,10 +79,9 @@ struct TestUserLabelCluster : public ::testing::Test
         DeviceLayer::SetDeviceInfoProvider(nullptr);
     }
 
-    TestUserLabelCluster() : context(testContext.Create()), userLabel(kRootEndpointId) {}
+    TestUserLabelCluster() : userLabel(kRootEndpointId) {}
 
     chip::Test::TestServerClusterContext testContext;
-    ServerClusterContext context;
     UserLabelCluster userLabel;
     MockDeviceInfoProvider mDeviceInfoProvider;
 };

@@ -198,7 +198,7 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
             targeted = [test for test in all_tests if test.name.lower()
                         == name.lower()]
             if len(targeted) == 0:
-                log.error("Unknown target: %s" % name)
+                log.error("Unknown target: '%s'", name)
             tests.extend(targeted)
 
     if target_glob:
@@ -207,8 +207,8 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
 
     if len(tests) == 0:
         log.error("No targets match, exiting.")
-        log.error("Valid targets are (case-insensitive): %s" %
-                  (", ".join(test.name for test in all_tests)))
+        log.error("Valid targets are (case-insensitive): '%s'",
+                  ", ".join(test.name for test in all_tests))
         exit(1)
 
     if target_skip_glob:
@@ -327,7 +327,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
             energy_gateway_app, energy_management_app, closure_app, matter_repl_yaml_tester,
             chip_tool_with_python, pics_file, keep_going, test_timeout_seconds, expected_failures, ble_wifi):
     if expected_failures != 0 and not keep_going:
-        log.exception(f"'--expected-failures {expected_failures}' used without '--keep-going'")
+        log.exception("--expected-failures '%s' used without '--keep-going'", expected_failures)
         sys.exit(2)
 
     paths_finder = PathsFinder()
@@ -417,7 +417,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
 
     runner = chiptest.runner.Runner(executor=executor)
 
-    log.info("Each test will be executed %d times" % iterations)
+    log.info("Each test will be executed %d times", iterations)
 
     apps_register = AppsRegister()
     apps_register.init()
@@ -432,25 +432,25 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
             ns.terminate()
 
     for i in range(iterations):
-        log.info("Starting iteration %d" % (i+1))
+        log.info("Starting iteration %d", i+1)
         observed_failures = 0
         for test in context.obj.tests:
             if context.obj.include_tags:
                 if not (test.tags & context.obj.include_tags):
-                    log.debug("Test %s not included" % test.name)
+                    log.debug("Test '%s' not included", test.name)
                     continue
 
             if context.obj.exclude_tags:
                 if test.tags & context.obj.exclude_tags:
-                    log.debug("Test %s excluded" % test.name)
+                    log.debug("Test '%s' excluded", test.name)
                     continue
 
             test_start = time.monotonic()
             try:
                 if context.obj.dry_run:
-                    log.info("Would run test: %s" % test.name)
+                    log.info("Would run test: '%s'", test.name)
                 else:
-                    log.info('%-20s - Starting test' % (test.name))
+                    log.info("%-20s - Starting test", test.name)
                 test.Run(
                     runner, apps_register, paths, pics_file, test_timeout_seconds, context.obj.dry_run,
                     test_runtime=context.obj.runtime,
@@ -459,19 +459,17 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
                 )
                 if not context.obj.dry_run:
                     test_end = time.monotonic()
-                    log.info('%-30s - Completed in %0.2f seconds' %
-                             (test.name, (test_end - test_start)))
+                    log.info("%-30s - Completed in %0.2f seconds", test.name, test_end - test_start)
             except Exception:
                 test_end = time.monotonic()
-                log.exception('%-30s - FAILED in %0.2f seconds' %
-                              (test.name, (test_end - test_start)))
+                log.exception("%-30s - FAILED in %0.2f seconds", test.name, test_end - test_start)
                 observed_failures += 1
                 if not keep_going:
                     cleanup()
                     sys.exit(2)
 
         if observed_failures != expected_failures:
-            log.exception(f'Iteration {i}: expected failure count {expected_failures}, but got {observed_failures}')
+            log.exception("Iteration %d: expected failure count %d, but got %d", i, expected_failures, observed_failures)
             cleanup()
             sys.exit(2)
 
