@@ -114,32 +114,6 @@ osMessageQueueId_t sWifiEventQueue = nullptr;
 sl_net_wifi_lwip_context_t wifi_client_context;
 sl_wifi_security_t security = SL_WIFI_SECURITY_UNKNOWN;
 
-// Convert sl_wifi_security_t to wfx_sec_t
-static wfx_sec_t ConvertSlWifiSecurityToWfx(sl_wifi_security_t sec)
-{
-    switch (sec)
-    {
-    case SL_WIFI_OPEN:
-        return WFX_SEC_NONE;
-    case SL_WIFI_WEP:
-        return WFX_SEC_WEP;
-    case SL_WIFI_WPA:
-    case SL_WIFI_WPA_ENTERPRISE: // map enterprise to WPA as closest
-        return WFX_SEC_WPA;
-    case SL_WIFI_WPA2:
-    case SL_WIFI_WPA2_ENTERPRISE: // map enterprise to WPA2 as closest
-    case SL_WIFI_WPA_WPA2_MIXED:
-        return WFX_SEC_WPA2;
-    case SL_WIFI_WPA3_TRANSITION:
-    case SL_WIFI_WPA3_TRANSITION_ENTERPRISE: // map enterprise to WPA3 transition
-    case SL_WIFI_WPA3:
-    case SL_WIFI_WPA3_ENTERPRISE:
-        return WFX_SEC_WPA3; // map enterprise to WPA3
-    default:
-        return WFX_SEC_UNSPECIFIED;
-    }
-}
-
 const sl_wifi_device_configuration_t config = {
     .boot_option = LOAD_NWP_FW,
     .mac_address = NULL,
@@ -224,6 +198,32 @@ constexpr uint8_t kWfxQueueSize = 10;
 
 // TODO: Figure out why we actually need this, we are already handling failure and retries somewhere else.
 constexpr uint16_t kWifiScanTimeoutTicks = 10000;
+
+// Convert sl_wifi_security_t to wfx_sec_t
+static wfx_sec_t ConvertSlWifiSecurityToWfx(sl_wifi_security_t security)
+{
+    switch (security)
+    {
+    case SL_WIFI_OPEN:
+        return WFX_SEC_NONE;
+    case SL_WIFI_WEP:
+        return WFX_SEC_WEP;
+    case SL_WIFI_WPA:
+    case SL_WIFI_WPA_ENTERPRISE: // map enterprise to WPA as closest
+        return WFX_SEC_WPA;
+    case SL_WIFI_WPA2:
+    case SL_WIFI_WPA2_ENTERPRISE: // map enterprise to WPA2 as closest
+    case SL_WIFI_WPA_WPA2_MIXED:
+        return WFX_SEC_WPA2;
+    case SL_WIFI_WPA3_TRANSITION:
+    case SL_WIFI_WPA3_TRANSITION_ENTERPRISE: // map enterprise to WPA3 transition
+    case SL_WIFI_WPA3:
+    case SL_WIFI_WPA3_ENTERPRISE:
+        return WFX_SEC_WPA3; // map enterprise to WPA3
+    default:
+        return WFX_SEC_UNSPECIFIED;
+    }
+}
 
 /**
  * @brief Network Scan callback when the device receive a scan operation from the controller.
