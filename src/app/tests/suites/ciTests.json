@@ -249,9 +249,7 @@
         "TestOperationalState",
         "TestRVCOperationalState",
         "TestDishwasherAlarm",
-        "Test_AddNewFabricFromExistingFabric",
-        "TestElectricalEnergyMeasurementCluster",
-        "TestElectricalEnergyMeasurementClusterBackwardsCompatibility"
+        "Test_AddNewFabricFromExistingFabric"
     ],
     "MultiAdmin": ["TestMultiAdmin"],
     "SoftwareDiagnostics": [],

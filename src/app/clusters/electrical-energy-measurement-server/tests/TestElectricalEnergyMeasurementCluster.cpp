@@ -20,6 +20,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/testing/ClusterTester.h>
+#include <app/clusters/testing/ValidateGlobalAttributes.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/server-cluster/AttributeListBuilder.h>
@@ -36,6 +37,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ElectricalEnergyMeasurement;
 using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Attributes;
 using namespace chip::Test;
+using namespace chip::Testing;
 
 namespace {
 
@@ -65,22 +67,7 @@ TEST_F(TestElectricalEnergyMeasurementCluster, AttributeListTest)
 
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-        EXPECT_EQ(cluster.Attributes(ConcreteClusterPath(kTestEndpointId, ElectricalEnergyMeasurement::Id), attributes),
-                  CHIP_NO_ERROR);
-
-        // Verify Accuracy attribute is present
-        auto attributeBuffer = attributes.TakeBuffer();
-        bool foundAccuracy   = false;
-        for (const auto & attr : attributeBuffer)
-        {
-            if (attr.attributeId == Attributes::Accuracy::Id)
-            {
-                foundAccuracy = true;
-                break;
-            }
-        }
-        EXPECT_TRUE(foundAccuracy);
+        EXPECT_TRUE(IsAttributesListEqualTo(cluster, { Attributes::Accuracy::kMetadataEntry }));
 
         cluster.Shutdown();
     }
@@ -99,41 +86,15 @@ TEST_F(TestElectricalEnergyMeasurementCluster, AttributeListTest)
 
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-        EXPECT_EQ(cluster.Attributes(ConcreteClusterPath(kTestEndpointId, ElectricalEnergyMeasurement::Id), attributes),
-                  CHIP_NO_ERROR);
-
-        // Verify all expected attributes are present
-        auto attributeBuffer         = attributes.TakeBuffer();
-        bool foundAccuracy           = false;
-        bool foundCumulativeImported = false;
-        bool foundCumulativeExported = false;
-        bool foundPeriodicImported   = false;
-        bool foundPeriodicExported   = false;
-        bool foundCumulativeReset    = false;
-
-        for (const auto & attr : attributeBuffer)
-        {
-            if (attr.attributeId == Attributes::Accuracy::Id)
-                foundAccuracy = true;
-            else if (attr.attributeId == Attributes::CumulativeEnergyImported::Id)
-                foundCumulativeImported = true;
-            else if (attr.attributeId == Attributes::CumulativeEnergyExported::Id)
-                foundCumulativeExported = true;
-            else if (attr.attributeId == Attributes::PeriodicEnergyImported::Id)
-                foundPeriodicImported = true;
-            else if (attr.attributeId == Attributes::PeriodicEnergyExported::Id)
-                foundPeriodicExported = true;
-            else if (attr.attributeId == Attributes::CumulativeEnergyReset::Id)
-                foundCumulativeReset = true;
-        }
-
-        EXPECT_TRUE(foundAccuracy);
-        EXPECT_TRUE(foundCumulativeImported);
-        EXPECT_TRUE(foundCumulativeExported);
-        EXPECT_TRUE(foundPeriodicImported);
-        EXPECT_TRUE(foundPeriodicExported);
-        EXPECT_TRUE(foundCumulativeReset);
+        EXPECT_TRUE(IsAttributesListEqualTo(cluster,
+                                            {
+                                                Attributes::Accuracy::kMetadataEntry,
+                                                Attributes::CumulativeEnergyImported::kMetadataEntry,
+                                                Attributes::CumulativeEnergyExported::kMetadataEntry,
+                                                Attributes::PeriodicEnergyImported::kMetadataEntry,
+                                                Attributes::PeriodicEnergyExported::kMetadataEntry,
+                                                Attributes::CumulativeEnergyReset::kMetadataEntry,
+                                            }));
 
         cluster.Shutdown();
     }
@@ -152,22 +113,8 @@ TEST_F(TestElectricalEnergyMeasurementCluster, AttributeListTest)
 
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
-        EXPECT_EQ(cluster.Attributes(ConcreteClusterPath(kTestEndpointId, ElectricalEnergyMeasurement::Id), attributes),
-                  CHIP_NO_ERROR);
-
         // Verify CumulativeEnergyReset is NOT present because kCumulativeEnergy feature is not enabled
-        auto attributeBuffer      = attributes.TakeBuffer();
-        bool foundCumulativeReset = false;
-        for (const auto & attr : attributeBuffer)
-        {
-            if (attr.attributeId == Attributes::CumulativeEnergyReset::Id)
-            {
-                foundCumulativeReset = true;
-                break;
-            }
-        }
-        EXPECT_FALSE(foundCumulativeReset);
+        EXPECT_TRUE(IsAttributesListEqualTo(cluster, { Attributes::Accuracy::kMetadataEntry }));
 
         cluster.Shutdown();
     }
