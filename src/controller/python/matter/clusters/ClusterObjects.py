@@ -250,6 +250,10 @@ class ClusterCommand(ClusterObject):
         raise NotImplementedError()
 
     @ChipUtility.classproperty
+    def is_client(self) -> bool:
+        raise NotImplementedError()
+
+    @ChipUtility.classproperty
     def must_use_timed_invoke(cls) -> bool:
         return False
 
