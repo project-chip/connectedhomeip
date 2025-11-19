@@ -1032,8 +1032,15 @@ void WebRTCProviderManager::OnTrickleICECandidate(const uint16_t sessionId)
     WebrtcTransport * transport = GetTransport(sessionId);
     if (transport != nullptr)
     {
-        transport->MoveToState(WebrtcTransport::State::SendingICECandidates);
-        ScheduleICECandidatesSend(sessionId);
+        if (transport->HasCandidates())
+        {
+            transport->MoveToState(WebrtcTransport::State::SendingICECandidates);
+            ScheduleICECandidatesSend(sessionId);
+        }
+        else
+        {
+            ChipLogProgress(Camera, "No ICE candidates to send for session %u; not changing state", sessionId);
+        }
     }
     else
     {
