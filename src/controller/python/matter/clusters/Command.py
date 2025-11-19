@@ -169,25 +169,22 @@ class AsyncBatchCommandsTransaction:
     def handleResponse(self, path: CommandPath, index: int, status: Status, response: bytes):
         self._event_loop.call_soon_threadsafe(self._handleResponse, path, index, status, response)
 
-    def _handleError(self, imError: Status, chipError: PyChipError, exception: Exception):
+    def _handleError(self, imError: Status, chipError: PyChipError, exception: Exception | None):
         if self._future.done():
             logger.exception(f"Received another error. Only expecting one error. imError:{imError}, chipError {chipError}")
             return
-        if exception:
-            self._future.set_exception(exception)
-        elif chipError != 0:
-            self._future.set_exception(chipError.to_exception())
-        else:
+        if chipError != 0:
+            exception = chipError.to_exception()
+        if exception is None:
             try:
                 # If you got an exception from this call other than AttributeError please
                 # add it to the except block below. We changed Exception->AttributeError as
                 # that is what we thought we are trying to catch here.
-                self._future.set_exception(
-                    InteractionModelError(InteractionModelStatus(imError.IMStatus), imError.ClusterStatus))
+                exception = InteractionModelError(InteractionModelStatus(imError.IMStatus), imError.ClusterStatus)
             except AttributeError:
-                logger.exception("Failed to map interaction model status received: %s. Remapping to Failure." % imError)
-                self._future.set_exception(InteractionModelError(
-                    InteractionModelStatus.Failure, imError.ClusterStatus))
+                logger.exception("Failed to map interaction model status received: %s. Remapping to Failure.", imError)
+                exception = InteractionModelError(InteractionModelStatus.Failure, imError.ClusterStatus)
+        self._future.set_exception(exception)
 
     def handleError(self, status: Status, chipError: PyChipError):
         self._event_loop.call_soon_threadsafe(self._handleError, status, chipError, None)
