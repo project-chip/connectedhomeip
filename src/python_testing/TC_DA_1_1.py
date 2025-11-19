@@ -72,6 +72,51 @@ class TC_DA_1_1(MatterBaseTest):
     async def test_TC_DA_1_1(self):
 
         self.step("precondition")
+        self.th1 = self.default_controller
+        th1_fabric_id = self.th1.fabricId
+        opcreds = Clusters.OperationalCredentials
+        
+        TH1_nodeid = self.matter_test_config.controller_node_id
+        logging.info(f"\n\n\n\n\n\t\t\t TH1_nodeid: {TH1_nodeid}\n\n\n\n\n\n")
+        
+        
+        
+        # new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
+        # new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.matter_test_config.fabric_id + 1)
+
+        # TH2_nodeid = self.matter_test_config.controller_node_id + 2
+
+        # self.th2 = new_fabric_admin.NewController(nodeId=TH2_nodeid,
+        #                                           paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path))
+
+
+
+
+        noc_th1 = await self.read_single_attribute_check_success(
+            dev_ctrl=self.th1,
+            # node_id=TH1_nodeid,
+            # endpoint=0,
+            cluster=opcreds,
+            attribute=opcreds.Attributes.NOCs,
+            fabric_filtered=False)
+
+        # logging.info(f"\n\n\n\n\n\t\t\t noc_th1: {noc_th1}, len: {len(noc_th1)}, noc: {noc_th1[0]}\n\n\n\n\n\n")
+        
+        
+        
+        asserts.assert_true(len(noc_th1) == 1, "NOCs attribute must contain single entry in the list")
+        
+        fabrics_th1 = await self.read_single_attribute_check_success(
+            dev_ctrl=self.th1,
+            cluster=opcreds,
+            attribute=opcreds.Attributes.Fabrics,
+            fabric_filtered=False)
+
+        asserts.assert_true(len(fabrics_th1) == 1, "Fabrics attribute must contain single entry in the list")
+        asserts.assert_equal(fabrics_th1[0].fabricID, th1_fabric_id, "TH1 FabricID and Fabrics attribute FabricID must match")
+        
+        logging.info(f"\n\n\n\n\n\t\t\t fabrics_th1: {fabrics_th1}, len: {len(fabrics_th1)}, noc: {fabrics_th1[0]}\n\n\n\n\n\n")
+        
 
 
 if __name__ == "__main__":
