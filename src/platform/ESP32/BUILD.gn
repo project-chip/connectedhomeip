@@ -97,7 +97,6 @@ static_library("ESP32") {
       "OTAImageProcessorImpl.cpp",
       "OTAImageProcessorImpl.h",
     ]
-    deps += [ "${chip_root}/src/app/clusters/ota-requestor:bdx-downloader" ]
   }
 
   if (chip_enable_ble) {

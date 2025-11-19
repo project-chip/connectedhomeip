@@ -19,7 +19,10 @@ list(
     ${chip_dir}/examples/ota-requestor-app/ameba/main/CHIPDeviceManager.cpp
     ${chip_dir}/examples/ota-requestor-app/ameba/main/DeviceCallbacks.cpp
 
-    ${ota_requestor_sources}
+    ${chip_dir}/src/app/clusters/ota-requestor/BDXDownloader.cpp
+    ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestor.cpp
+    ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorDriver.cpp
+    ${chip_dir}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp
     ${chip_dir}/examples/platform/ameba/ota/OTAInitializer.cpp
 
     ${chip_dir}/examples/platform/ameba/route_hook/ameba_route_hook.c

@@ -47,8 +47,14 @@ static_library("helpers") {
 }
 
 source_set("ota-requestor-test-srcs") {
+  sources = [
+    "${chip_root}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp",
+    "${chip_root}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.h",
+    "${chip_root}/src/app/clusters/ota-requestor/OTARequestorStorage.h",
+  ]
+
   public_deps = [
-    "${chip_root}/src/app/clusters/ota-requestor:default-storage",
+    "${chip_root}/src/app/clusters/ota-requestor:interface",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/lib/core",
   ]

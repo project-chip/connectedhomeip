@@ -17,57 +17,20 @@ import("//build_overrides/chip.gni")
 # the right dependencies
 source_set("ota-requestor") {
   sources = [
-    "DefaultOTARequestor.cpp",
-    "DefaultOTARequestor.h",
-    "DefaultOTARequestorDriver.cpp",
-    "DefaultOTARequestorDriver.h",
-    "DefaultOTARequestorUserConsent.h",
-    "ExtendedOTARequestorDriver.cpp",
-    "ExtendedOTARequestorDriver.h",
     "OTARequestorCluster.cpp",
     "OTARequestorCluster.h",
     "OTARequestorEventHandler.h",
     "OTARequestorEventHandlerRegistry.cpp",
     "OTARequestorEventHandlerRegistry.h",
-    "OTATestEventTriggerHandler.cpp",
-    "OTATestEventTriggerHandler.h",
   ]
 
   # TODO: DefaultOTARequestor depends on controller, however the cluster server itself does not.
   # Maybe DefaultOTARequestor and related code should have its own source set.
   public_deps = [
-    ":bdx-downloader",
-    ":default-storage",
     ":interface",
     "${chip_root}/src/app:user-consent",
     "${chip_root}/src/app/clusters/basic-information",
     "${chip_root}/src/controller:interactions",
-  ]
-}
-
-source_set("default-storage") {
-  sources = [
-    "DefaultOTARequestorStorage.cpp",
-    "DefaultOTARequestorStorage.h",
-  ]
-
-  public_deps = [
-    ":interface",
-    "${chip_root}/src/app/common:cluster-objects",
-  ]
-}
-
-source_set("bdx-downloader") {
-  sources = [
-    "BDXDownloader.cpp",
-    "BDXDownloader.h",
-  ]
-
-  public_deps = [
-    ":interface",
-    "${chip_root}/src/app/common:cluster-objects",
-    "${chip_root}/src/controller:interactions",
-    "${chip_root}/src/protocols/bdx",
   ]
 }
 
