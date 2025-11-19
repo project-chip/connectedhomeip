@@ -73,10 +73,10 @@ void NxpEthDriver::OnNetworkStatusChange()
     ChipLogProgress(NetworkProvisioning, "NxpEthDriver::OnNetworkStatusChange\r\n");
     VerifyOrReturn(mpStatusChangeCallback != nullptr);
     NetworkIterator* networkIterator = GetNetworks();
-    
+
     if (networkIterator != nullptr) {
         EthernetNetworkIterator* ethIterator = static_cast<EthernetNetworkIterator*>(networkIterator);
-        
+
         if (ethIterator->interfaceNameLen)
         {
             mpStatusChangeCallback->OnNetworkingStatusChange(
@@ -86,7 +86,7 @@ void NxpEthDriver::OnNetworkStatusChange()
             mpStatusChangeCallback->OnNetworkingStatusChange(
             Status::kUnknownError, MakeOptional(ByteSpan(ethIterator->interfaceName, ethIterator->interfaceNameLen)),
             NullOptional);
-        } 
+        }
         networkIterator->Release();
     }
 }

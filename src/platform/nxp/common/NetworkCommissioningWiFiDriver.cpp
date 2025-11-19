@@ -265,7 +265,7 @@ void NXPWiFiDriver::OnNetworkStatusChange()
         NullOptional);
 
     }
-    
+
 }
 
 void NXPWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback)
