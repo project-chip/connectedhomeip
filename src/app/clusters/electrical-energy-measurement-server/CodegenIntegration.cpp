@@ -25,6 +25,7 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <data-model-providers/codegen/CodegenProcessingConfig.h>
 #include <lib/support/CodeUtils.h>
 
 #include <lib/support/logging/CHIPLogging.h>
