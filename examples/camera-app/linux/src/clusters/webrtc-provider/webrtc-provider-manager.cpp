@@ -411,9 +411,6 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideAnswer(uint16_t sessionId, const 
 
     transport->GetPeerConnection()->SetRemoteDescription(sdpAnswer, SDPType::Answer);
 
-    transport->MoveToState(WebrtcTransport::State::SendingICECandidates);
-    ScheduleICECandidatesSend(sessionId);
-
     return CHIP_NO_ERROR;
 }
 
@@ -449,10 +446,6 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideICECandidates(uint16_t sessionId,
             candidate.SDPMid.IsNull() ? "" : std::string(candidate.SDPMid.Value().begin(), candidate.SDPMid.Value().end());
         transport->AddRemoteCandidate(std::string(candidate.candidate.begin(), candidate.candidate.end()), mid);
     }
-
-    // Schedule sending Ice Candidates when remote candidates are received. This keeps the exchange simple
-    transport->MoveToState(WebrtcTransport::State::SendingICECandidates);
-    ScheduleICECandidatesSend(sessionId);
 
     return CHIP_NO_ERROR;
 }
@@ -1022,8 +1015,18 @@ void WebRTCProviderManager::OnConnectionStateChanged(bool connected, const uint1
 void WebRTCProviderManager::OnTrickleICECandidate(const uint16_t sessionId)
 {
     ChipLogProgress(Camera, "Trickle ICE candidate received for session %u", sessionId);
-    // Reuse the existing ICE candidates send mechanism
-    ScheduleICECandidatesSend(sessionId);
+
+    // Check if the provided sessionId matches your current sessions
+    WebrtcTransport * transport = GetTransport(sessionId);
+    if (transport != nullptr)
+    {
+        transport->MoveToState(WebrtcTransport::State::SendingICECandidates);
+        ScheduleICECandidatesSend(sessionId);
+    }
+    else
+    {
+        ChipLogError(Camera, "Session ID %u does not match the current sessions", sessionId);
+    }
 }
 
 CHIP_ERROR WebRTCProviderManager::SendAnswerCommand(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle,
