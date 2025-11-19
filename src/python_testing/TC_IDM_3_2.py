@@ -47,10 +47,10 @@ from matter.clusters import ClusterObjects as ClusterObjects
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing import global_attribute_ids
 from matter.testing.basic_composition import BasicCompositionTests
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
 
 
-class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
+class TC_IDM_3_2(BasicCompositionTests):
     """Test case for IDM-3.2: Write Response Action from DUT to TH. [{DUT_Server}]"""
 
     def __init__(self, *args, **kwargs):
