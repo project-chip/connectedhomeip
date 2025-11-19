@@ -31,7 +31,7 @@ from matter.tlv import uint
 
 
 def run_against_all_spec_revisions(body):
-    def runner(self: "MatterBaseTest", *args, **kwargs):
+    def runner(self: "DeviceConformanceTests", *args, **kwargs):
         for revision in PrebuiltDataModelDirectory:
             self._create_xmls(revision)
             body(self, *args, **kwargs)
