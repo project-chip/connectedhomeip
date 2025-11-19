@@ -380,10 +380,7 @@ def monitor_app_restart_requests(
                 with app_manager_lock:
                     new_app_manager.start()
                     app_manager_ref[0] = new_app_manager
-
-                # After restart is complete, we can exit the monitor thread
-                logging.info("App restart completed, monitor thread exiting")
-                break
+                logging.info("App restart completed")
             else:
                 time.sleep(0.5)
         except Exception as e:

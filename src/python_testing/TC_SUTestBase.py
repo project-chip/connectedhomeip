@@ -110,7 +110,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             self.current_provider_app_proc.terminate()
             self.current_provider_app_proc = None
         else:
-            logger.info("Provider process not found. Unable to terminate.")
+            logger.warning("Provider process not found. Unable to terminate.")
 
     async def announce_ota_provider(self,
                                     controller: ChipDeviceCtrl,
