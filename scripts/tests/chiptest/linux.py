@@ -170,7 +170,7 @@ class IsolatedNetworkNamespace:
         log.info("Waiting for IPv6 DaD to complete (no tentative addresses)")
         for _ in range(100):  # wait at most 10 seconds
             if 'tentative' not in subprocess.check_output(['ip', 'addr'], text=True):
-                log.info("No more tentative addresses")
+                log.debug("No more tentative addresses")
             time.sleep(0.1)
         else:
             log.warning("Some addresses look to still be tentative")
@@ -193,7 +193,8 @@ class IsolatedNetworkNamespace:
 
     def _run(self, command: str):
         command = command.format(app_link_name=self.app_link_name,
-                                 tool_link_name=self.tool_link_name)
+                                 tool_link_name=self.tool_link_name,
+                                 index=self.index)
         log.debug("Executing: '%s'", command)
         if subprocess.run(command.split()).returncode != 0:
             log.error("Failed to execute '%s'", command)
