@@ -9,6 +9,7 @@ from subprocess import PIPE
 import click
 from chiptest.accessories import AppsRegister
 from chiptest.runner import Runner, SubprocessInfo
+from chiptest.darwin import DarwinExecutor
 from chiptest.test_definition import App, ExecutionCapture
 from chipyaml.paths_finder import PathsFinder
 
@@ -118,7 +119,7 @@ def cmd_run(context, darwin_framework_tool, ota_requestor_app, ota_data_file, ot
         ota_requestor_app = SubprocessInfo(kind='app', path=ota_requestor_app,
                                            args=('--otaDownloadPath', ota_destination_file))
 
-    runner = Runner()
+    runner = Runner(executor=DarwinExecutor())
     runner.capture_delegate = ExecutionCapture()
 
     apps_register = AppsRegister()
