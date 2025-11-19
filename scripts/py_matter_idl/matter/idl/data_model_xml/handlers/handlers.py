@@ -358,6 +358,7 @@ class EventsHandler(BaseHandler):
         else:
             return BaseHandler(self.context)
 
+
 class NestedConformHandler(BaseHandler):
     def __init__(self, context: Context, attribute: Attribute):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
@@ -369,7 +370,6 @@ class NestedConformHandler(BaseHandler):
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         else:
             return BaseHandler(self.context)
-
 
 
 class AttributeHandler(BaseHandler):
