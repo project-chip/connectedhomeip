@@ -19,7 +19,7 @@
 #   uv run scripts/data_model_compare.py --help
 #
 # /// script
-# requires-python = ">=3.13"
+# requires-python = ">=3.11"
 # dependencies = [
 #     "click",
 #     "coloredlogs",
@@ -29,6 +29,7 @@
 # ]
 # ///
 
+import dataclasses
 import logging
 import sys
 
@@ -130,13 +131,16 @@ def _compare_maturity(matter_items, data_model_items, path: list[str] = []):
 
         # Once something is provisional, do not recurse
         if matter_item.api_maturity != ApiMaturity.PROVISIONAL:
-            for a in dir(matter_item):
+            for a in dataclasses.fields(matter_item):
                 if not hasattr(data_model_item, a):
                     continue
                 if type(getattr(matter_item, a)) != list:
                     continue
 
                 _compare_maturity(getattr(matter_item, a), getattr(data_model_item, a), current_path)
+
+        if had_diffs:
+            sys.exit(1)
 
 
 def _match_names(dest: list[Cluster], src: list[Cluster]):
@@ -214,7 +218,8 @@ def filter_matter(matter, output, filenames):
     data_model_xmls = ParseXmls(sources)
 
     LOGGER.info("Parsing matter file ...")
-    matter_idl = CreateParser(skip_meta=True).parse(open(matter).read(), file_name=matter)
+    with open(matter) as f:
+        matter_idl = CreateParser(skip_meta=True).parse(f.read(), file_name=matter)
     LOGGER.info("Parsing done, filtering ...")
 
     # ensure that input file is filtered to only interesting
@@ -240,34 +245,6 @@ def filter_matter(matter, output, filenames):
             o.write(storage.content)
 
 
-@main.command("parse")
-@click.option(
-    "-o", "--output", default=None, type=click.Path(), help="Where to output the parsed IDL. Use `-` for output to stdout"
-)
-@click.argument("filenames", nargs=-1)
-def parse(output, filenames):
-    """
-    Parse data_model XML files and output the resulting .matter file.
-    """
-    LOGGER.info("Starting to parse ...")
-    sources = [ParseSource(source=name) for name in filenames]
-    data = ParseXmls(sources)
-    LOGGER.info("Parse completed")
-
-    # make sure compares are working well - same ordering
-    _normalize_order(data)
-
-    storage = InMemoryStorage()
-    IdlGenerator(storage=storage, idl=data).render(dry_run=False)
-
-    if output:
-        if output == "-":
-            print(storage.content)
-        else:
-            with open(output, "wt", encoding="utf8") as o:
-                o.write(storage.content)
-
-
 @main.command("conformance-diff")
 @click.option(
     "--matter",
@@ -277,7 +254,7 @@ def parse(output, filenames):
     help="An input .matter IDL to use for the conformance diff.",
 )
 @click.argument("filenames", nargs=-1)
-def filter_matter(matter, filenames):
+def conformance_diff(matter, filenames):
     """
     Compare provisional/non-provisional conformance between a given matter file
     and the given data_model XML files.
@@ -287,7 +264,8 @@ def filter_matter(matter, filenames):
     data_model_xmls = ParseXmls(sources)
 
     LOGGER.info("Parsing matter file ...")
-    matter_idl = CreateParser(skip_meta=True).parse(open(matter).read(), file_name=matter)
+    with open(matter) as f:
+        matter_idl = CreateParser(skip_meta=True).parse(f.read(), file_name=matter)
     LOGGER.info("Parsing done, performing diff ...")
 
     # ensure that input file is filtered to only interesting
