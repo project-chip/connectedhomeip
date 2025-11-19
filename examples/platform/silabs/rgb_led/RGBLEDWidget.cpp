@@ -64,18 +64,19 @@ void RGBLEDWidget::GetColor(uint16_t & r, uint16_t & g, uint16_t & b)
  */
 void RGBLEDWidget::SetColorFromHSV(uint8_t hue, uint8_t saturation)
 {
-    ChipLogDetails(Zcl, "SetColorFromHSV : H:%u|S:%u|V:%u", hue, saturation, GetLevel());
-
-    float h = (hue * 360.0f) / 254.0f, s = (saturation / 254.0f), v = 1.0;
+    ChipLogDetail(Zcl, "SetColorFromHSV : H:%u|S:%u|V:%u", hue, saturation, GetLevel());
+    // Per spec max value for each attribute is 254
+    float h = (hue * 360.0f) / 254.0f, s = (saturation / 254.0f), v = (GetLevel() / 254.0f);
     float hh, p, q, t, ff, r, g, b;
     long i;
 
-    ChipLogDetails(Zcl, "HUE Values: H=%u S=%u V=%u", static_cast<uint8_t>(h), static_cast<uint8_t>(s * 100.0),
-                   static_cast<uint8_t>(v * 100.0));
+    ChipLogDetail(Zcl, "HUE Values: H=%u S=%u V=%u", static_cast<uint8_t>(h), static_cast<uint8_t>(s * 100.0),
+                  static_cast<uint8_t>(v * 100.0));
 
     if (s <= 0.0)
     { // Achromatic (grey)
         SetColor(static_cast<uint8_t>(v * 255), static_cast<uint8_t>(v * 255), static_cast<uint8_t>(v * 255));
+        return;
     }
 
     hh = h;
