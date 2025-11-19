@@ -47,16 +47,21 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: asr
-            - name: Build all ASR582X examples
+            - name: Build all ASR582X examples (part1)
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
-                        --target asr-asr582x-all-clusters \
-                        --target asr-asr582x-all-clusters-minimal \
-                        --target asr-asr582x-lighting-ota \
                         --target asr-asr582x-light-switch-shell \
                         --target asr-asr582x-lock-no_logging \
                         --target asr-asr582x-ota-requestor \
+                        build \
+                     "
+            - name: Clean out directory (make some room for more compiles)
+              run: rm -rf out/
+            - name: Build all ASR582X examples (part2)
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
                         --target asr-asr582x-bridge-factory \
                         --target asr-asr582x-temperature-measurement-rotating_id \
                         --target asr-asr582x-thermostat-rio \
