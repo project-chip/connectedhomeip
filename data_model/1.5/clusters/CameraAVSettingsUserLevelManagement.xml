@@ -62,9 +62,7 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial release"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0552" name="Camera AV Settings User Level Management">
-      <provisionalConform/>
-    </clusterId>
+    <clusterId id="0x0552" name="Camera AV Settings User Level Management"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="AVSUM" scope="Endpoint"/>
   <features>

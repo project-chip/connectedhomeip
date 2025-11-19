@@ -382,7 +382,7 @@ matter_python_wheel_action("matter-core") {
 
   public_deps = [ ":ChipDeviceCtrl" ]
 
-  output_name = "${py_package_name}-${chip_python_version}-cp37-abi3-${py_platform_tag}.whl"
+  output_name = "${py_package_name}-${chip_python_version}-cp311-abi3-${py_platform_tag}.whl"
 }
 
 pw_python_package("matter-core-module") {

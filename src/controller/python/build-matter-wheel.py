@@ -143,17 +143,14 @@ try:
                 libName
             ]
         } if libName else {},
-        scripts=[name for name in map(
-            lambda script: os.path.join(tmpDir, script.installName),
-            installScripts
-        )],
+        scripts=[os.path.join(tmpDir, script.installName) for script in installScripts],
         install_requires=requiredPackages,
         options={
             'bdist_wheel': {
                 'universal': False,
                 # Place the generated .whl in the dist directory.
                 'dist_dir': distDir,
-                'py_limited_api': 'cp37',
+                'py_limited_api': 'cp311',
                 'plat_name': args.plat_name,
             },
             'egg_info': {

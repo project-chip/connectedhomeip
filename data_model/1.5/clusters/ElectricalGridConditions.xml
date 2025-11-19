@@ -62,9 +62,7 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial Matter revision"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x00A0" name="Electrical Grid Conditions">
-      <provisionalConform/>
-    </clusterId>
+    <clusterId id="0x00A0" name="Electrical Grid Conditions"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="EGC" scope="Endpoint"/>
   <features>
