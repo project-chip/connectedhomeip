@@ -28,6 +28,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/ReadOnlyBuffer.h>
+#include <lib/support/ScopedBuffer.h>
 #include <platform/NetworkCommissioning.h>
 
 namespace {
@@ -184,6 +185,46 @@ TEST_F(TestAccessControlCluster, ReadAttributesTest)
     ASSERT_TRUE(status.IsSuccess());
     ASSERT_EQ(CountListElements(arl), 0u);
 #endif // CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
+}
+
+TEST_F(TestAccessControlCluster, WriteAttributesTest)
+{
+    // Test that writable attributes can be written
+    AccessControlCluster cluster;
+    chip::Test::ClusterTester tester(cluster);
+
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    // Test writing Acl attribute (writable, mandatory)
+    // Write an empty ACL list
+    AccessControl::Attributes::Acl::TypeInfo::Type emptyAcl;
+    auto status = tester.WriteAttribute(AccessControl::Attributes::Acl::Id, emptyAcl);
+    ASSERT_TRUE(status.IsSuccess());
+
+    // Verify the write by reading it back
+    AccessControl::Attributes::Acl::TypeInfo::DecodableType readAcl;
+    status = tester.ReadAttribute(AccessControl::Attributes::Acl::Id, readAcl);
+    ASSERT_TRUE(status.IsSuccess());
+    ASSERT_EQ(CountListElements(readAcl), 0u);
+
+#if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
+    // Test writing Extension attribute (writable, optional)
+    AccessControl::Attributes::Extension::TypeInfo::Type emptyExtension;
+    status = tester.WriteAttribute(AccessControl::Attributes::Extension::Id, emptyExtension);
+    ASSERT_TRUE(status.IsSuccess());
+
+    // Verify the write by reading it back
+    AccessControl::Attributes::Extension::TypeInfo::DecodableType readExtension;
+    status = tester.ReadAttribute(AccessControl::Attributes::Extension::Id, readExtension);
+    ASSERT_TRUE(status.IsSuccess());
+    ASSERT_EQ(CountListElements(readExtension), 0u);
+#endif // CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
+
+    // Test writing to a non-writable attribute should fail
+    // SubjectsPerAccessControlEntry is read-only
+    uint16_t invalidValue = 10;
+    status                = tester.WriteAttribute(AccessControl::Attributes::SubjectsPerAccessControlEntry::Id, invalidValue);
+    ASSERT_FALSE(status.IsSuccess());
 }
 
 } // namespace

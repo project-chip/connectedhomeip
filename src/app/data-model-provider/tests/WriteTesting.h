@@ -20,8 +20,11 @@
 #include <app/data-model-provider/OperationTypes.h>
 #include <app/data-model-provider/tests/TestConstants.h>
 #include <app/data-model/Encode.h>
+#include <app/data-model/FabricScoped.h>
+#include <app/data-model/List.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/TLVReader.h>
+#include <type_traits>
 
 namespace chip {
 namespace app {
@@ -86,6 +89,36 @@ public:
 
     const DataModel::WriteAttributeRequest & GetRequest() const { return mRequest; }
 
+    // Helper to encode a value, using EncodeForWrite for fabric-scoped types
+    template <typename T>
+    CHIP_ERROR EncodeValue(TLV::TLVWriter & writer, TLV::Tag tag, const T & value)
+    {
+        if constexpr (chip::app::DataModel::IsFabricScoped<T>::value)
+        {
+            return chip::app::DataModel::EncodeForWrite(writer, tag, value);
+        }
+        else
+        {
+            return chip::app::DataModel::Encode(writer, tag, value);
+        }
+    }
+
+    // Specialization for List types - check if list elements are fabric-scoped
+    template <typename T>
+    CHIP_ERROR EncodeValue(TLV::TLVWriter & writer, TLV::Tag tag, const chip::app::DataModel::List<T> & value)
+    {
+        // Check if the element type (removing const) is fabric-scoped
+        using ElementType = std::remove_const_t<T>;
+        if constexpr (chip::app::DataModel::IsFabricScoped<ElementType>::value)
+        {
+            return chip::app::DataModel::EncodeForWrite(writer, tag, value);
+        }
+        else
+        {
+            return chip::app::DataModel::Encode(writer, tag, value);
+        }
+    }
+
     template <typename T>
     TLV::TLVReader ReadEncodedValue(const T & value)
     {
@@ -98,7 +131,7 @@ public:
         //   - END_STRUCT
         TLV::TLVType outerContainerType;
         SuccessOrDie(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType));
-        SuccessOrDie(chip::app::DataModel::Encode(writer, TLV::ContextTag(1), value));
+        SuccessOrDie(EncodeValue(writer, TLV::ContextTag(1), value));
         SuccessOrDie(writer.EndContainer(outerContainerType));
         SuccessOrDie(writer.Finalize());
 
