@@ -108,7 +108,7 @@ public:
 
     void SetSdpAnswer(std::string localSdp) { mLocalSdp = localSdp; }
 
-    std::vector<ICECandidateInfo> GetCandidates()
+    const std::vector<ICECandidateInfo> & GetCandidates()
     {
         std::lock_guard<std::mutex> lock(mCandidatesMutex);
         return mLocalCandidates;
@@ -119,7 +119,9 @@ public:
     std::vector<ICECandidateInfo> DrainCandidates()
     {
         std::lock_guard<std::mutex> lock(mCandidatesMutex);
-        return std::move(mLocalCandidates);
+        auto candidates = std::move(mLocalCandidates);
+        mLocalCandidates.clear();
+        return candidates;
     }
 
     void AddRemoteCandidate(const std::string & candidate, const std::string & mid);
