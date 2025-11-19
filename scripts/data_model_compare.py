@@ -134,7 +134,7 @@ def _compare_maturity(matter_items, data_model_items, path: list[str] = []):
             for a in dataclasses.fields(matter_item):
                 if not hasattr(data_model_item, a.name):
                     continue
-                if type(getattr(matter_item, a.name)) != list:
+                if not isinstance(getattr(matter_item, a.name), list):
                     continue
 
                 if not _compare_maturity(getattr(matter_item, a.name), getattr(data_model_item, a.name), current_path):
