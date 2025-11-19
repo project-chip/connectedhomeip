@@ -232,8 +232,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         Dump device attribute data when problems are found for debugging purposes.
 
         This method attempts to generate a device attribute dump if the test has
-        collected endpoint data. It's designed to be safe and not interfere with
-        the original test failure reporting.
+        collected endpoint data.
         """
         try:
             # Check if we have endpoints_tlv data (from BasicCompositionTests or similar)
