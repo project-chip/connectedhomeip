@@ -122,8 +122,11 @@ CHIP_ERROR OccupancySensingCluster::Startup(ServerClusterContext & context)
         }
 
         // No value in persistence (or it was invalid), so store the default value.
+        const uint8_t buffer[] = { static_cast<uint8_t>(mHoldTime), static_cast<uint8_t>(mHoldTime >> 8) };
+        // Ensure the size of mHoldTime is coherent in case of future changes to the width of mHoldTime.
+        static_assert(sizeof(mHoldTime) == sizeof(buffer), "HoldTime size mismatch from previous specification.");
         RETURN_SAFELY_IGNORED context.attributeStorage.WriteValue({ mPath.mEndpointId, OccupancySensing::Id, Attributes::HoldTime::Id },
-                                                { reinterpret_cast<const uint8_t *>(&mHoldTime), sizeof(mHoldTime) });
+                                                                  ByteSpan(buffer));
     }
     return CHIP_NO_ERROR;
 }
