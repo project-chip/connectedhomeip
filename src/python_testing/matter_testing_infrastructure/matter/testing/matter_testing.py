@@ -973,7 +973,26 @@ class MatterBaseTest(base_test.BaseTestClass):
         return write_result[0].Status
 
     def read_from_app_pipe(self, app_pipe_out: Optional[str] = None, timeout=2.0, max_bytes=66536, chunk=4096, is_subprocess: Optional[bool] = False):
+        """
+        Read an out-of-band command from a Matter app.
+        Args:
+            app_pipe_out (Optional[str], optional): Name of the cluster pipe file  (i.e. /tmp/chip_all_clusters_fifo_55441_out or /tmp/chip_rvc_fifo_11111_out). Raises
+            FileNotFoundError if pipe file is not found. If None takes the value from the CI argument --app-pipe-out,  arg --app-pipe-out has his own file exists check.
+            is_subprocess (Optional[bool]): is an optional argument, if it is True then it means that the test runs a subprocess (i.e. provider) and LINUX_DUT_IP environment variable is not needed
 
+        This method uses the following environment variables:
+
+         - LINUX_DUT_IP
+            * if not provided, the Matter app is assumed to run on the same machine as the test,
+              such as during CI, and the commands are sent to it using a local named pipe
+            * if provided, the commands for writing to the named pipe are forwarded to the DUT
+        - LINUX_DUT_USER
+            * if LINUX_DUT_IP is provided, use this for the DUT user name
+            * If a remote password is needed, set up ssh keys to ensure that this script can log in to the DUT without a password:
+                 + Step 1: If you do not have a key, create one using ssh-keygen
+                 + Step 2: Authorize this key on the remote host: run ssh-copy-id user@ip once, using your password
+                 + Step 3: From now on ssh user@ip will no longer ask for your password
+        """
         # If is not empty from the args, verify if the fifo file exists.
         if app_pipe_out is not None and not os.path.exists(app_pipe_out):
             LOGGER.error("Named pipe %r does NOT exist" % app_pipe_out)
@@ -1035,7 +1054,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             command_dict (dict): dictionary with the command and data.
             app_pipe (Optional[str], optional): Name of the cluster pipe file  (i.e. /tmp/chip_all_clusters_fifo_55441 or /tmp/chip_rvc_fifo_11111). Raises
             FileNotFoundError if pipe file is not found. If None takes the value from the CI argument --app-pipe,  arg --app-pipe has his own file exists check.
-            subprocess (Optional[bool]): is an optional argument, if it is True then it means that the test runs a subprocess (i.e. provider) and LINUX_DUT_IP environment variable is not needed
+            is_subprocess (Optional[bool]): is an optional argument, if it is True then it means that the test runs a subprocess (i.e. provider) and LINUX_DUT_IP environment variable is not needed
 
         This method uses the following environment variables:
 
