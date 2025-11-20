@@ -972,7 +972,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                                  f"Expected write success for write to attribute {attribute_value} on endpoint {endpoint_id}")
         return write_result[0].Status
 
-    def read_from_app_pipe(self, app_pipe_out: Optional[str] = None, timeout=2.0, max_bytes=66536, chunk=4096):
+    def read_from_app_pipe(self, app_pipe_out: Optional[str] = None, timeout=2.0, max_bytes=66536, chunk=4096, subprocess: Optional[bool] = False):
 
         # If is not empty from the args, verify if the fifo file exists.
         if app_pipe_out is not None and not os.path.exists(app_pipe_out):
@@ -985,7 +985,11 @@ class MatterBaseTest(base_test.BaseTestClass):
         if not isinstance(app_pipe_out, str):
             raise TypeError("The named pipe must be provided as a string value")
 
-        dut_ip = os.getenv('LINUX_DUT_IP')
+        dut_ip = None
+
+        if subprocess == False:
+            dut_ip = os.getenv('LINUX_DUT_IP')
+
         # Checks for concatenate app_pipe and app_pid
         if dut_ip is None:
             fd = os.open(app_pipe_out, os.O_RDONLY | os.O_NONBLOCK)
@@ -1024,13 +1028,14 @@ class MatterBaseTest(base_test.BaseTestClass):
             out = subprocess.check_output(cmd_list)
             return out
 
-    def write_to_app_pipe(self, command_dict: dict, app_pipe: Optional[str] = None):
+    def write_to_app_pipe(self, command_dict: dict, app_pipe: Optional[str] = None, subprocess: Optional[bool] = False):
         """
         Send an out-of-band command to a Matter app.
         Args:
             command_dict (dict): dictionary with the command and data.
             app_pipe (Optional[str], optional): Name of the cluster pipe file  (i.e. /tmp/chip_all_clusters_fifo_55441 or /tmp/chip_rvc_fifo_11111). Raises
             FileNotFoundError if pipe file is not found. If None takes the value from the CI argument --app-pipe,  arg --app-pipe has his own file exists check.
+            subprocess (Optional[bool]): is an optional argument, if it is True then it means that the test runs a subprocess (i.e. provider) and LINUX_DUT_IP environment variable is not needed
 
         This method uses the following environment variables:
 
@@ -1060,7 +1065,10 @@ class MatterBaseTest(base_test.BaseTestClass):
             raise TypeError("The command must be passed as a dictionary value")
 
         command = json.dumps(command_dict)
-        dut_ip = os.getenv('LINUX_DUT_IP')
+        dut_ip = None
+
+        if subprocess == False:
+            dut_ip = os.getenv('LINUX_DUT_IP')
 
         # Checks for concatenate app_pipe and app_pid
         if dut_ip is None:
