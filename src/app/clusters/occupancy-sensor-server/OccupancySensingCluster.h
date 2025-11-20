@@ -103,7 +103,6 @@ public:
     void TimerFired() override;
 
     DataModel::ActionReturnStatus SetHoldTime(uint16_t holdTime);
-    void SetHoldTimeLimits(const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & holdTimeLimits);
     void SetOccupancy(bool occupied);
     bool IsOccupied() const;
 
