@@ -13,12 +13,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "app/DefaultSafeAttributePersistenceProvider.h"
+#include "app/SafeAttributePersistenceProvider.h"
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/boolean-state-configuration-server/boolean-state-configuration-cluster.h>
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/clusters/testing/ClusterTester.h>
 #include <app/clusters/testing/ValidateGlobalAttributes.h>
+#include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/BooleanStateConfiguration/Enums.h>
 #include <clusters/BooleanStateConfiguration/Metadata.h>
 #include <lib/core/CHIPError.h>
@@ -31,9 +34,11 @@ using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::BooleanStateConfiguration;
 
+using chip::app::Clusters::BooleanStateConfiguration::Feature;
 using chip::app::DataModel::AcceptedCommandEntry;
 using chip::app::DataModel::AttributeEntry;
 using chip::Test::ClusterTester;
+using chip::Test::TestServerClusterContext;
 using chip::Testing::IsAcceptedCommandsListEqualTo;
 using chip::Testing::IsAttributesListEqualTo;
 
@@ -46,10 +51,64 @@ struct TestBooleanStateConfigurationCluster : public ::testing::Test
 
 constexpr EndpointId kTestEndpointId = 1;
 
-BooleanStateConfigurationCluster::StartupConfiguration DefaultConfig()
+class StartupConfigurationBuilder
 {
-    return { .supportedSensitivityLevels = 7, .defaultSensitivityLevel = 3, .alarmsSupported = 0 };
+public:
+    StartupConfigurationBuilder() = default;
+    operator BooleanStateConfigurationCluster::StartupConfiguration() { return build(); }
+
+    BooleanStateConfigurationCluster::StartupConfiguration build()
+    {
+        return { .supportedSensitivityLevels = mSupportedSensitivityLevels,
+                 .defaultSensitivityLevel    = mDefaultSensitivityLevel,
+                 .alarmsSupported            = mAlarmsSupported };
+    }
+
+    uint8_t DefaultSensitivityLevel() const { return mDefaultSensitivityLevel; }
+    uint8_t SupportedSensitivityLevels() const { return mSupportedSensitivityLevels; }
+
+    StartupConfigurationBuilder & WithSupportedSensitivityLevels(uint8_t level)
+    {
+        mSupportedSensitivityLevels = level;
+        return *this;
+    }
+    StartupConfigurationBuilder & WithDefaultSensitivityLevel(uint8_t level)
+    {
+        mDefaultSensitivityLevel = level;
+        return *this;
+    }
+
+    StartupConfigurationBuilder & WithAlarmsSupported(BooleanStateConfiguration::AlarmModeBitmap alarm)
+    {
+        mAlarmsSupported.Set(alarm);
+        return *this;
+    }
+
+private:
+    uint8_t mSupportedSensitivityLevels = 7;
+    uint8_t mDefaultSensitivityLevel    = 3;
+    BooleanStateConfigurationCluster::AlarmModeBitMask mAlarmsSupported;
+};
+
+StartupConfigurationBuilder DefaultConfig()
+{
+    return {};
 }
+
+class ScopedSafeAttributePersistence
+{
+public:
+    ScopedSafeAttributePersistence(TestServerClusterContext & context) : mOldPersistence(app::GetSafeAttributePersistenceProvider())
+    {
+        VerifyOrDie(mPersistence.Init(&context.StorageDelegate()) == CHIP_NO_ERROR);
+        app::SetSafeAttributePersistenceProvider(&mPersistence);
+    }
+    ~ScopedSafeAttributePersistence() { app::SetSafeAttributePersistenceProvider(mOldPersistence); }
+
+private:
+    app::SafeAttributePersistenceProvider * mOldPersistence;
+    app::DefaultSafeAttributePersistenceProvider mPersistence;
+};
 
 TEST_F(TestBooleanStateConfigurationCluster, TestAttributeList)
 {
@@ -176,6 +235,152 @@ TEST_F(TestBooleanStateConfigurationCluster, TestAcceptedCommandList)
                                                       Commands::EnableDisableAlarm::kMetadataEntry,
                                                       Commands::SuppressAlarm::kMetadataEntry,
                                                   }));
+    }
+}
+
+TEST_F(TestBooleanStateConfigurationCluster, TestSensitivityClamping)
+{
+    TestServerClusterContext context;
+    ScopedSafeAttributePersistence persistence(context);
+
+    // supportedSensitivityLevels is clamped to [2, 100]
+    {
+        // Test value below min
+        auto config = DefaultConfig().WithSupportedSensitivityLevels(1);
+        BooleanStateConfigurationCluster cluster(kTestEndpointId, Feature::kSensitivityLevel, {}, config);
+        ClusterTester tester(cluster);
+
+        uint8_t supportedLevels;
+        EXPECT_EQ(tester.ReadAttribute(Attributes::SupportedSensitivityLevels::Id, supportedLevels),
+                  Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(supportedLevels, 2);
+    }
+    {
+        // Test value above max
+        auto config = DefaultConfig().WithDefaultSensitivityLevel(101);
+        BooleanStateConfigurationCluster cluster(kTestEndpointId, Feature::kSensitivityLevel, {}, config);
+        ClusterTester tester(cluster);
+
+        uint8_t supportedLevels;
+        EXPECT_EQ(tester.ReadAttribute(Attributes::SupportedSensitivityLevels::Id, supportedLevels),
+                  Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(supportedLevels, config.SupportedSensitivityLevels());
+    }
+
+    // defaultSensitivityLevel is clamped to supported-1
+    {
+        auto config = DefaultConfig().WithDefaultSensitivityLevel(5).WithSupportedSensitivityLevels(5);
+        BooleanStateConfigurationCluster cluster(
+            kTestEndpointId, Feature::kSensitivityLevel,
+            BooleanStateConfigurationCluster::OptionalAttributesSet().Set<Attributes::DefaultSensitivityLevel::Id>(), config);
+        ClusterTester tester(cluster);
+
+        uint8_t defaultLevel;
+        EXPECT_EQ(tester.ReadAttribute(Attributes::DefaultSensitivityLevel::Id, defaultLevel),
+                  Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(defaultLevel, 4);
+    }
+
+    // Writing CurrentSensitivityLevel is clamped
+    {
+        auto config = DefaultConfig().WithSupportedSensitivityLevels(10);
+        BooleanStateConfigurationCluster cluster(kTestEndpointId, Feature::kSensitivityLevel, {}, config);
+        ClusterTester tester(cluster);
+        cluster.Startup(context.Get());
+
+        uint8_t currentLevel;
+
+        // Write a valid level
+        EXPECT_EQ(tester.WriteAttribute(Attributes::CurrentSensitivityLevel::Id, static_cast<uint8_t>(5)),
+                  Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(tester.ReadAttribute(Attributes::CurrentSensitivityLevel::Id, currentLevel),
+                  Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(currentLevel, 5);
+
+        // Write an invalid level
+        EXPECT_EQ(tester.WriteAttribute(Attributes::CurrentSensitivityLevel::Id, static_cast<uint8_t>(10)),
+                  Protocols::InteractionModel::Status::ConstraintError);
+
+        // Value should not have changed
+        EXPECT_EQ(tester.ReadAttribute(Attributes::CurrentSensitivityLevel::Id, currentLevel),
+                  Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(currentLevel, 5);
+        cluster.Shutdown();
+    }
+}
+
+TEST_F(TestBooleanStateConfigurationCluster, TestPersistenceAndStartup)
+{
+    TestServerClusterContext context;
+    ScopedSafeAttributePersistence persistence(context);
+
+    // 1. Create a cluster, write a value.
+    {
+        auto config = DefaultConfig().WithSupportedSensitivityLevels(9);
+
+        BooleanStateConfigurationCluster cluster(kTestEndpointId, Feature::kSensitivityLevel, {}, config);
+        cluster.Startup(context.Get());
+        ClusterTester tester(cluster);
+
+        // check default value first
+        uint8_t sensitivity;
+        EXPECT_EQ(tester.ReadAttribute(Attributes::CurrentSensitivityLevel::Id, sensitivity),
+                  Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(sensitivity, config.DefaultSensitivityLevel());
+
+        // Write a new value. This will be persisted.
+        uint8_t levelToWrite = 6;
+        EXPECT_EQ(tester.WriteAttribute(Attributes::CurrentSensitivityLevel::Id, levelToWrite),
+                  Protocols::InteractionModel::Status::Success);
+        cluster.Shutdown();
+    }
+
+    // 2. Create a new cluster instance with the same context, and check if the value was restored.
+    {
+        auto config = DefaultConfig().WithSupportedSensitivityLevels(9);
+
+        BooleanStateConfigurationCluster cluster(kTestEndpointId, Feature::kSensitivityLevel, {}, config);
+        cluster.Startup(context.Get());
+        ClusterTester tester(cluster);
+        uint8_t sensitivity;
+        EXPECT_EQ(tester.ReadAttribute(Attributes::CurrentSensitivityLevel::Id, sensitivity),
+                  Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(sensitivity, 6); // Check if value is persisted.
+        cluster.Shutdown();
+    }
+
+    // 3. Create another new cluster with a smaller supported range and check clamping on startup.
+    {
+        auto smallerConfig = DefaultConfig().WithSupportedSensitivityLevels(5).WithDefaultSensitivityLevel(3);
+        // The stored value 6 is now out of bounds.
+        // Default sensitivity for this config is 3.
+
+        BooleanStateConfigurationCluster cluster(kTestEndpointId, Feature::kSensitivityLevel, {}, smallerConfig);
+        cluster.Startup(context.Get()); // Should read 18 and clamp it to 14.
+
+        ClusterTester tester(cluster);
+        uint8_t sensitivity;
+        EXPECT_EQ(tester.ReadAttribute(Attributes::CurrentSensitivityLevel::Id, sensitivity),
+                  Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(sensitivity, 4); // 5-1. Clamped from persisted value.
+
+        cluster.Shutdown();
+    }
+
+    // 4. Test that if persistence fails, default is used. Let's clear the storage.
+    context.StorageDelegate().ClearStorage();
+    {
+        auto config = DefaultConfig().WithSupportedSensitivityLevels(20).WithDefaultSensitivityLevel(5);
+
+        BooleanStateConfigurationCluster cluster(kTestEndpointId, Feature::kSensitivityLevel, {}, config);
+        cluster.Startup(context.Get());
+        ClusterTester tester(cluster);
+
+        uint8_t sensitivity;
+        EXPECT_EQ(tester.ReadAttribute(Attributes::CurrentSensitivityLevel::Id, sensitivity),
+                  Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(sensitivity, 5); // Should be default, as storage is empty.
+        cluster.Shutdown();
     }
 }
 
