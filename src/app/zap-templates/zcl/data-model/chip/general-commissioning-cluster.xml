@@ -65,7 +65,7 @@ Git: 0.7-summer-2025-ncr-444-g89b9baa9b-dirty
     <server init="false" tick="false">true</server>
     <features>
       <feature bit="0" code="TC" name="TermsAndConditions" summary="Supports Terms &amp; Conditions acknowledgement"/>
-      <feature bit="1" code="NR" name="NetworkRecovery" summary="Supports Network Recovery">
+      <feature bit="1" code="NR" name="NetworkRecovery" summary="Supports Network Recovery" apiMaturity="provisional">
         <provisionalConform/>
       </feature>
     </features>
