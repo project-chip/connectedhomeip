@@ -22,4 +22,5 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/boolean-state-configuration-cluster.cpp"
     "${CLUSTER_DIR}/boolean-state-configuration-server.h"
     "${CLUSTER_DIR}/CodegenIntegration.cpp"
+    "${CLUSTER_DIR}/CodegenIntegration.h"
 )

@@ -18,7 +18,6 @@
 
 #include <app/clusters/general-commissioning-server/general-commissioning-cluster.h>
 #include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/testing/ValidateGlobalAttributes.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
@@ -41,7 +40,6 @@ using chip::app::AttributeListBuilder;
 using chip::app::DataModel::AcceptedCommandEntry;
 using chip::app::DataModel::AttributeEntry;
 using chip::Testing::IsAcceptedCommandsListEqualTo;
-using chip::Testing::IsAttributesListEqualTo;
 
 // initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestGeneralCommissioningCluster : public ::testing::Test

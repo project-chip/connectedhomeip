@@ -15,5 +15,6 @@ app_config_dependent_sources = [
   "BooleanStateConfigurationTestEventTriggerHandler.cpp",
   "BooleanStateConfigurationTestEventTriggerHandler.h",
   "CodegenIntegration.cpp",
+  "CodegenIntegration.h",
   "boolean-state-configuration-server.h",
 ]
