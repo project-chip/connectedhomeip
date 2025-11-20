@@ -13,6 +13,6 @@
 # limitations under the License.
 app_config_dependent_sources = [
   "DeviceEnergyManagementTestEventTriggerHandler.h",
-  "device-energy-management-server.cpp",
+  "DeviceEnergyManagementCluster.cpp",
   "device-energy-management-server.h",
 ]
