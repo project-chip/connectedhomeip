@@ -57,6 +57,7 @@ Test Plan
 https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/deviceattestation.adoc#211-tc-da-11-the-noc-shall-be-wiped-on-factory-reset-dut---commissionee
 '''
 
+
 class TC_DA_1_1(MatterBaseTest):
 
     def desc_TC_DA_1_1(self) -> str:
