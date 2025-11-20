@@ -37,14 +37,14 @@ void RGBLEDWidget::SetColor(uint8_t red, uint8_t green, uint8_t blue)
     if (GetPlatform().GetRGBLedState(GetLED()))
     {
         ChipLogProgress(Zcl, "SetColor : %u|%u|%u", red, green, blue);
-        GetPlatform().SetLedColor(GetLED(), red, green, blue);
+        TEMPORARY_RETURN_IGNORED GetPlatform().SetLedColor(GetLED(), red, green, blue);
     }
 }
 
 void RGBLEDWidget::GetColor(uint16_t & r, uint16_t & g, uint16_t & b)
 {
     uint16_t rawR, rawG, rawB;
-    GetPlatform().GetLedColor(GetLED(), rawR, rawG, rawB);
+    TEMPORARY_RETURN_IGNORED GetPlatform().GetLedColor(GetLED(), rawR, rawG, rawB);
 
     // Scale down PWM values by TICK_DELAY to bring them back to the expected range
     // Clamp to 8-bit range (0-255)
