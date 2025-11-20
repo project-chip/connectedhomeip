@@ -20,7 +20,7 @@
  #include <lib/core/Optional.h>
  #include <app-common/zap-generated/cluster-objects.h>
  #include <protocols/interaction_model/StatusCode.h>
- 
+
 namespace chip {
 namespace app {
 namespace Clusters {
