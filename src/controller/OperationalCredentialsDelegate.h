@@ -87,6 +87,10 @@ public:
      * should be used, or overridden to return a specific nonce that will be
      * used instead of the one from CommissioningParameters, if AutoCommissioner
      * is used.
+     *
+     * The default implementation of this method generates a random nonce,
+     * which will take precedence over the one from CommissioningParameters
+     * if AutoCommissioner is used.
      */
     virtual CHIP_ERROR ObtainCsrNonce(MutableByteSpan & csrNonce)
     {
