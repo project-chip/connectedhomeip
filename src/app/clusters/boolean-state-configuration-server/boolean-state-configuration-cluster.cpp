@@ -346,7 +346,7 @@ Status BooleanStateConfigurationCluster::SuppressAlarms(AlarmModeBitMask alarms)
     {
         // TODO: To preserve original logic, we ignore error code from the
         //       delegate, however this feels off.
-        (void) mDelegate->HandleSuppressAlarm(alarms);
+        TEMPORARY_RETURN_IGNORED mDelegate->HandleSuppressAlarm(alarms);
     }
 
     mAlarmsSuppressed.Set(alarms);
