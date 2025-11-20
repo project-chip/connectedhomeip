@@ -24,7 +24,6 @@ import queue
 import random
 import select
 import shlex
-import subprocess
 import textwrap
 import time
 import typing

@@ -410,7 +410,8 @@ void ApplicationInit()
     std::string path     = std::string(LinuxDeviceOptions::GetInstance().app_pipe);
     std::string path_out = std::string(LinuxDeviceOptions::GetInstance().app_pipe_out);
 
-    if ((!path.empty()) and (!path_out.empty()) and (sChipNamedPipeCommands.Start(path, path_out, &sOtaProviderAppCommandDelegate) != CHIP_NO_ERROR))
+    if ((!path.empty()) and (!path_out.empty()) and
+        (sChipNamedPipeCommands.Start(path, path_out, &sOtaProviderAppCommandDelegate) != CHIP_NO_ERROR))
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommand");
         sChipNamedPipeCommands.Stop();
