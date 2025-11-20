@@ -28,7 +28,7 @@
 namespace chip {
 
 // Full file path to where the new image will be executed from post-download
-static char kImageExecPath[] = "/tmp/ota.update";
+constexpr char kImageExecPath[] = "/tmp/ota.update";
 
 class OTAImageProcessorImpl : public OTAImageProcessorInterface
 {
