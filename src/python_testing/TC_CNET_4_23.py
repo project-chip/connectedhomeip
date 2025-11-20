@@ -58,9 +58,12 @@ class MatterServiceListener(ServiceListener):
         try:
             service_info = zc.get_service_info(type_, name)
             if service_info:
-                addresses = [
-                    socket.inet_ntoa(addr) for addr in service_info.addresses if len(addr) == 4
-                ]
+                addresses = []
+                for addr in service_info.addresses:
+                    if len(addr) == 4:  # IPv4
+                        addresses.append(socket.inet_ntoa(addr))
+                    elif len(addr) == 16:  # IPv6
+                        addresses.append(socket.inet_ntop(socket.AF_INET6, addr))
                 service_data = {
                     'name': name.replace(f'.{type_}', ''),
                     'type': type_,
@@ -136,8 +139,8 @@ async def find_matter_devices_mdns(target_device_id: int = None) -> list:
             if zc is not None:
                 try:
                     zc.close()
-                except Exception:
-                    pass
+                except Exception as e:
+                    logger.warning(f"Failed to close zeroconf instance: {e}")
 
         if attempt < MAX_ATTEMPTS:
             await asyncio.sleep(SCAN_RETRY_DELAY)
@@ -272,7 +275,7 @@ class TC_CNET_4_23(MatterBaseTest):
         ]
 
     def desc_TC_CNET_4_23(self):
-        return "[TC-CNET-4.23] [Wi-Fi] Verification for Commissioning [DUT-Server]"
+        return "[TC-CNET-4.23] [Wi-Fi] Network Commissioning Success After Connection Failures [DUT-Server]"
 
     @async_test_body
     async def test_TC_CNET_4_23(self):
@@ -588,9 +591,6 @@ class TC_CNET_4_23(MatterBaseTest):
         logger.info(f" --- Found {len(discovered_devices)} device(s) via mDNS")
         asserts.assert_greater(len(discovered_devices), 0,
                                "No devices found via mDNS after WiFi connection")
-        if discovered_devices:
-            for device in discovered_devices:
-                logger.info(f" ---   Device: {device['name']} at {device['addresses']}")
 
         # Close PASE session to force CASE session establishment over WiFi
         logger.info(" --- Closing BLE connection and expiring PASE session...")
