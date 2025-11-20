@@ -192,7 +192,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     VerifyOrReturnError(err == 0, MapErrorZephyr(err));
 #endif // CONFIG_BT_BONDABLE
 
-    BLEAdvertisingArbiter::Init(static_cast<uint8_t>(id));
+    TEMPORARY_RETURN_IGNORED BLEAdvertisingArbiter::Init(static_cast<uint8_t>(id));
 
     memset(&mConnCallbacks, 0, sizeof(mConnCallbacks));
     mConnCallbacks.connected    = HandleConnect;
@@ -203,7 +203,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     // Initialize the CHIP BleLayer.
     ReturnErrorOnFailure(BleLayer::Init(this, this, &DeviceLayer::SystemLayer()));
 
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
     return CHIP_NO_ERROR;
 }
@@ -351,7 +351,7 @@ inline CHIP_ERROR BLEManagerImpl::PrepareAdvertisingRequest()
         else
         {
             ChipLogError(DeviceLayer, "Failed to start CHIPoBLE advertising: %d", rc);
-            BLEManagerImpl().StopAdvertising();
+            TEMPORARY_RETURN_IGNORED BLEManagerImpl().StopAdvertising();
         }
     };
 
@@ -429,7 +429,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising()
         if (mFlags.Has(Flags::kFastAdvertisingEnabled))
         {
             // Start timer to change advertising interval from fast to slow.
-            DeviceLayer::SystemLayer().StartTimer(
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(
                 System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME),
                 HandleSlowBLEAdvertisementInterval, this);
 
@@ -489,7 +489,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
     // Ensure that each enabling/disabling of the general advertising clears
     // the extended mode, to make sure we always start fresh in the regular mode
     mFlags.Set(Flags::kExtendedAdvertisingEnabled, false);
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
     return CHIP_NO_ERROR;
 }
@@ -514,7 +514,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     mFlags.Set(Flags::kAdvertisingRefreshNeeded);
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
     return CHIP_NO_ERROR;
 }
 
@@ -546,7 +546,7 @@ CHIP_ERROR BLEManagerImpl::HandleGAPConnect(const ChipDeviceEvent * event)
     }
 
     mFlags.Set(Flags::kAdvertisingRefreshNeeded);
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
     bt_conn_unref(connEvent->BtConn);
 
@@ -597,7 +597,7 @@ exit:
     // Force a reconfiguration of advertising in case we switched to non-connectable mode when
     // the BLE connection was established.
     mFlags.Set(Flags::kAdvertisingRefreshNeeded);
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
     return CHIP_NO_ERROR;
 }
@@ -699,13 +699,13 @@ exit:
 
 void BLEManagerImpl::HandleSlowBLEAdvertisementInterval(System::Layer * layer, void * param)
 {
-    BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
+    TEMPORARY_RETURN_IGNORED BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
     ChipLogProgress(DeviceLayer, "CHIPoBLE advertising mode changed to slow");
 }
 
 void BLEManagerImpl::HandleExtendedBLEAdvertisementInterval(System::Layer * layer, void * param)
 {
-    BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kExtendedAdvertising);
+    TEMPORARY_RETURN_IGNORED BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kExtendedAdvertising);
     ChipLogProgress(DeviceLayer, "CHIPoBLE advertising mode changed to extended");
 }
 
@@ -743,7 +743,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     {
         ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
         mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 }
 
@@ -813,7 +813,7 @@ CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const C
 
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
-    CloseConnection(conId);
+    TEMPORARY_RETURN_IGNORED CloseConnection(conId);
 }
 
 bool BLEManagerImpl::IsSubscribed(bt_conn * conn)
