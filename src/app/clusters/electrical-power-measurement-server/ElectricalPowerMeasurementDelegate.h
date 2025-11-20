@@ -19,7 +19,6 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <lib/core/Optional.h>
- 
 namespace chip {
 namespace app {
 namespace Clusters {
