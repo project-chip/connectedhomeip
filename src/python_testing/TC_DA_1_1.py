@@ -48,6 +48,14 @@ from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_b
 
 logger = logging.getLogger(__name__)
 
+'''
+Purpose
+This test case validates the following condition:
+- NOCs attribute gets deleted on the DUT after factory reset.
+
+Test Plan
+https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/deviceattestation.adoc#211-tc-da-11-the-noc-shall-be-wiped-on-factory-reset-dut---commissionee
+'''
 
 class TC_DA_1_1(MatterBaseTest):
 
@@ -75,21 +83,21 @@ class TC_DA_1_1(MatterBaseTest):
         new_controller = new_fabric_admin.NewController(paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path))
         return new_controller
 
-    async def read_nocs(self, dev_ctrl: ChipDeviceCtrl):
+    async def read_nocs(self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController):
         return await self.read_single_attribute_check_success(
             dev_ctrl=dev_ctrl,
             cluster=Clusters.OperationalCredentials,
             attribute=Clusters.OperationalCredentials.Attributes.NOCs,
             fabric_filtered=False)
 
-    async def read_fabrics(self, dev_ctrl: ChipDeviceCtrl):
+    async def read_fabrics(self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController):
         return await self.read_single_attribute_check_success(
             dev_ctrl=dev_ctrl,
             cluster=Clusters.OperationalCredentials,
             attribute=Clusters.OperationalCredentials.Attributes.Fabrics,
             fabric_filtered=False)
 
-    def factory_reset_dut(self, dev_ctrl):
+    def factory_reset_dut(self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController):
         restart_flag_file = self.get_restart_flag_file()
 
         if not restart_flag_file:
@@ -121,12 +129,26 @@ class TC_DA_1_1(MatterBaseTest):
                 logging.error(f"Failed to restart app: {e}")
                 asserts.fail(f"App restart failed: {e}")
 
+    async def commission_dut(self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController):
+        params = await dev_ctrl.OpenCommissioningWindow(
+            nodeId=self.dut_node_id,
+            timeout=900,
+            iteration=10000,
+            discriminator=self.discriminator,
+            option=1)
+
+        await dev_ctrl.CommissionOnNetwork(
+            nodeId=self.dut_node_id,
+            setupPinCode=params.setupPinCode,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+            filter=self.discriminator)
+
     @async_test_body
     async def test_TC_DA_1_1(self):
 
         self.step("precondition")
 
-        discriminator = random.randint(0, 4095)
+        self.discriminator = random.randint(0, 4095)
         th1 = self.default_controller
         th2 = self.get_new_controller()
 
@@ -139,18 +161,7 @@ class TC_DA_1_1(MatterBaseTest):
 
         self.factory_reset_dut(th1)
 
-        params = await self.th1.OpenCommissioningWindow(
-            nodeId=self.dut_node_id,
-            timeout=900,
-            iteration=10000,
-            discriminator=discriminator,
-            option=1)
-
-        await self.th2.CommissionOnNetwork(
-            nodeId=self.dut_node_id,
-            setupPinCode=params.setupPinCode,
-            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
-            filter=self.discriminator)
+        await self.commission_dut(th2)
 
         nocs_th1 = await self.read_nocs(th2)
 
