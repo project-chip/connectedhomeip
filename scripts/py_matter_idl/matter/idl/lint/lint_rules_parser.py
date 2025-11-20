@@ -90,7 +90,7 @@ def _isRequired(attr: xml.etree.ElementTree.Element) -> bool:
     mandatory_element = attr.find('mandatoryConform')
 
     if mandatory_element is None:
-        return True
+        return False
 
     return mandatory_element.find('feature') is None
 
