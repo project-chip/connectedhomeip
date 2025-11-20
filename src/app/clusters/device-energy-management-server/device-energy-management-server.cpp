@@ -22,6 +22,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/util/attribute-storage.h>
+#include <clusters/DeviceEnergyManagement/Metadata.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -46,7 +47,7 @@ CHIP_ERROR Instance::Init()
 
 void Instance::Shutdown()
 {
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
@@ -104,49 +105,46 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
 }
 
 // CommandHandlerInterface
-CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
+CHIP_ERROR Instance::RetrieveAcceptedCommands(const ConcreteClusterPath & cluster,
+                                              ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     using namespace Commands;
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(kAcceptedCommandsCount));
 
     if (HasFeature(Feature::kPowerAdjustment))
     {
-        for (auto && cmd : {
-                 PowerAdjustRequest::Id,
-                 CancelPowerAdjustRequest::Id,
-             })
-        {
-            VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
-        }
+        ReturnErrorOnFailure(builder.AppendElements({
+            PowerAdjustRequest::kMetadataEntry,
+            CancelPowerAdjustRequest::kMetadataEntry,
+        }));
     }
 
     if (HasFeature(Feature::kStartTimeAdjustment))
     {
-        VerifyOrExit(callback(StartTimeAdjustRequest::Id, context) == Loop::Continue, /**/);
+        ReturnErrorOnFailure(builder.Append(StartTimeAdjustRequest::kMetadataEntry));
     }
 
     if (HasFeature(Feature::kPausable))
     {
-        VerifyOrExit(callback(PauseRequest::Id, context) == Loop::Continue, /**/);
-        VerifyOrExit(callback(ResumeRequest::Id, context) == Loop::Continue, /**/);
+        ReturnErrorOnFailure(builder.AppendElements({ PauseRequest::kMetadataEntry, ResumeRequest::kMetadataEntry }));
     }
 
     if (HasFeature(Feature::kForecastAdjustment))
     {
-        VerifyOrExit(callback(ModifyForecastRequest::Id, context) == Loop::Continue, /**/);
+        ReturnErrorOnFailure(builder.Append(ModifyForecastRequest::kMetadataEntry));
     }
 
     if (HasFeature(Feature::kConstraintBasedAdjustment))
     {
-        VerifyOrExit(callback(RequestConstraintBasedForecast::Id, context) == Loop::Continue, /**/);
+        ReturnErrorOnFailure(builder.Append(RequestConstraintBasedForecast::kMetadataEntry));
     }
 
     if (HasFeature(Feature::kStartTimeAdjustment) || HasFeature(Feature::kForecastAdjustment) ||
         HasFeature(Feature::kConstraintBasedAdjustment))
     {
-        VerifyOrExit(callback(CancelRequest::Id, context) == Loop::Continue, /**/);
+        ReturnErrorOnFailure(builder.Append(CancelRequest::kMetadataEntry));
     }
 
-exit:
     return CHIP_NO_ERROR;
 }
 
@@ -598,7 +596,6 @@ void Instance::HandlePauseRequest(HandlerContext & ctx, const Commands::PauseReq
     if (status != Status::Success)
     {
         ChipLogError(Zcl, "DEM: PauseRequest(%ld) FAILURE", static_cast<long unsigned int>(duration));
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
         return;
     }
 }
@@ -718,7 +715,6 @@ void Instance::HandleModifyForecastRequest(HandlerContext & ctx, const Commands:
     if (status != Status::Success)
     {
         ChipLogError(Zcl, "DEM: ModifyForecastRequest FAILURE");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
         return;
     }
 }

@@ -37,13 +37,14 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.clusters import Globals
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
-                                         default_matter_test_main)
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters import Globals
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
+                                           default_matter_test_main)
 
 
 def current_latch_matcher(latch: bool) -> AttributeMatcher:
@@ -131,7 +132,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
 
     def pics_TC_CLDIM_4_1(self) -> list[str]:
         pics = [
-            "CLDIM.S",
+            "CLDIM.S", "CLDIM.S.F00"
         ]
         return pics
 

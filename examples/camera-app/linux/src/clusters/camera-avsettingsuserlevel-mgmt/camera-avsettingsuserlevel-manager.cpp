@@ -20,6 +20,7 @@
 #include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
 #include <camera-avsettingsuserlevel-manager.h>
 #include <cmath>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -27,6 +28,8 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement;
 
 using chip::Protocols::InteractionModel::Status;
+
+static void onTimerExpiry(System::Layer * systemLayer, void * data);
 
 void CameraAVSettingsUserLevelManager::SetCameraDeviceHAL(CameraDeviceInterface * aCameraDeviceHAL)
 {
@@ -56,75 +59,57 @@ void CameraAVSettingsUserLevelManager::DefaultViewportUpdated(Globals::Structs::
     this->GetServer()->UpdateMoveCapableVideoStreams(aViewport);
 }
 
-Status CameraAVSettingsUserLevelManager::MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom)
+Status CameraAVSettingsUserLevelManager::MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
+                                                         PhysicalPTZCallback * callback)
 {
+    mCallback = callback;
+
     // The Cluster implementation has validated that the Feature Flags are set and the values themselves are in range. Do any needed
     // hardware interactions to actually set the camera to the new values of PTZ.  Then return a Status response. The server itself
     // will persist the new values.
     //
-    if (aPan.HasValue())
-    {
-        mCameraDeviceHAL->GetCameraHALInterface().SetPan(aPan.Value());
-    }
+    mCameraDeviceHAL->GetCameraHALInterface().SetPhysicalPTZ(aPan, aTilt, aZoom);
 
-    if (aTilt.HasValue())
-    {
-        mCameraDeviceHAL->GetCameraHALInterface().SetTilt(aTilt.Value());
-    }
-
-    if (aZoom.HasValue())
-    {
-        mCameraDeviceHAL->GetCameraHALInterface().SetZoom(aZoom.Value());
-    }
-
+    // For the purposes of the Camera App, run a timer equivalent to a typical physical elapsed time for PTZ. An actual HAL will
+    // invoke OnPhysicalMoveCompleted method once it has determined via its own means that the move is completed.
+    //
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this);
     return Status::Success;
 }
 
-Status CameraAVSettingsUserLevelManager::MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom)
+Status CameraAVSettingsUserLevelManager::MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
+                                                          PhysicalPTZCallback * callback)
 {
+    mCallback = callback;
+
     // The Cluster implementation has validated that the Feature Flags are set and the values themselves are in range. Do any needed
     // hardware interactions to actually set the camera to the new values of PTZ.  Then return a Status response. The server itself
     // will persist the new values.
     //
-    if (aPan.HasValue())
-    {
-        mCameraDeviceHAL->GetCameraHALInterface().SetPan(aPan.Value());
-    }
+    mCameraDeviceHAL->GetCameraHALInterface().SetPhysicalPTZ(aPan, aTilt, aZoom);
 
-    if (aTilt.HasValue())
-    {
-        mCameraDeviceHAL->GetCameraHALInterface().SetTilt(aTilt.Value());
-    }
-
-    if (aZoom.HasValue())
-    {
-        mCameraDeviceHAL->GetCameraHALInterface().SetZoom(aZoom.Value());
-    }
-
+    // For the purposes of the Camera App, run a timer equivalent to a typical physical elapsed time for PTZ. AAn actual HAL will
+    // invoke OnPhysicalMoveCompleted method once it has determined via its own means that the move is completed.
+    //
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this);
     return Status::Success;
 }
 
 Status CameraAVSettingsUserLevelManager::MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                                          Optional<uint8_t> aZoom)
+                                                          Optional<uint8_t> aZoom, PhysicalPTZCallback * callback)
 {
-    // The Cluster implementation has validated the preset is valid, and provided the MPTZ values associated with that preset.
-    // Do any needed hardware interactions to actually set the camera to the new values of PTZ.  Then return a Status response.
+    mCallback = callback;
+
+    // The Cluster implementation has validated that the Feature Flags are set and the values themselves are in range. Do any needed
+    // hardware interactions to actually set the camera to the new values of PTZ.  Then return a Status response. The server itself
+    // will persist the new values.
     //
-    if (aPan.HasValue())
-    {
-        mCameraDeviceHAL->GetCameraHALInterface().SetPan(aPan.Value());
-    }
+    mCameraDeviceHAL->GetCameraHALInterface().SetPhysicalPTZ(aPan, aTilt, aZoom);
 
-    if (aTilt.HasValue())
-    {
-        mCameraDeviceHAL->GetCameraHALInterface().SetTilt(aTilt.Value());
-    }
-
-    if (aZoom.HasValue())
-    {
-        mCameraDeviceHAL->GetCameraHALInterface().SetZoom(aZoom.Value());
-    }
-
+    // For the purposes of the Camera App, run a timer equivalent to a typical physical elapsed time for PTZ. AAn actual HAL will
+    // invoke OnPhysicalMoveCompleted method once it has determined via its own means that the move is completed.
+    //
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this);
     return Status::Success;
 }
 
@@ -321,4 +306,39 @@ CHIP_ERROR CameraAVSettingsUserLevelManager::PersistentAttributesLoadedCallback(
 {
     ChipLogDetail(Camera, "CameraAvSettingsUserLevelManagement: Persistent attributes loaded");
     return CHIP_NO_ERROR;
+}
+
+// Timer expiration to mimic PTZ physical movememt
+//
+static void onTimerExpiry(System::Layer * systemLayer, void * data)
+{
+    CameraAVSettingsUserLevelManager * delegate = reinterpret_cast<CameraAVSettingsUserLevelManager *>(data);
+
+    // All timers are cancelled on delegate shutdown, hence if this is invoked the delegate is alive
+    delegate->OnPhysicalMoveCompleted(Protocols::InteractionModel::Status::Success);
+}
+
+void CameraAVSettingsUserLevelManager::CancelActiveTimers()
+{
+    // Cancel the PTZ mimic timer if it is active
+    DeviceLayer::SystemLayer().CancelTimer(onTimerExpiry, this);
+}
+
+void CameraAVSettingsUserLevelManager::ShutdownApp()
+{
+    CancelActiveTimers();
+}
+
+// To be invoked by the camera once a physical PTZ action has completed. The callback method is realized by our cluster server,
+// make sure that is still alive before trying to invoke methods thereon.
+//
+void CameraAVSettingsUserLevelManager::OnPhysicalMoveCompleted(Protocols::InteractionModel::Status status)
+{
+    if (GetServer() != nullptr)
+    {
+        if (mCallback != nullptr)
+        {
+            mCallback->OnPhysicalMovementComplete(status);
+        }
+    }
 }

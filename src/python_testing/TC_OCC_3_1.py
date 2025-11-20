@@ -42,11 +42,12 @@ import logging
 import time
 from typing import Any, Optional
 
-import chip.clusters as Clusters
-from chip.interaction_model import Status
-from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import Status
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_OCC_3_1(MatterBaseTest):

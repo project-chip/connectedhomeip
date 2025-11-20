@@ -30,6 +30,12 @@ from chiptest.glob_matcher import GlobMatcher
 from chiptest.test_definition import TestRunTime, TestTag
 from chipyaml.paths_finder import PathsFinder
 
+log = logging.getLogger(__name__)
+
+# If running on Linux platform load the Linux specific code.
+if sys.platform == "linux":
+    import chiptest.linux
+
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))
 
@@ -42,12 +48,7 @@ class ManualHandling(enum.Enum):
 
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
-__LOG_LEVELS__ = {
-    'debug': logging.DEBUG,
-    'info': logging.INFO,
-    'warn': logging.WARN,
-    'fatal': logging.FATAL,
-}
+__LOG_LEVELS__ = logging.getLevelNamesMapping()
 
 
 @dataclass
@@ -123,7 +124,7 @@ class RunContext:
 )
 @click.option(
     '--runner',
-    type=click.Choice(['chip_repl_python', 'chip_tool_python', 'darwin_framework_tool_python'], case_sensitive=False),
+    type=click.Choice(['matter_repl_python', 'chip_tool_python', 'darwin_framework_tool_python'], case_sensitive=False),
     default='chip_tool_python',
     help='Run YAML tests using the specified runner.')
 @click.option(
@@ -139,12 +140,12 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
     runtime = TestRunTime.CHIP_TOOL_PYTHON
-    if runner == 'chip_repl_python':
-        runtime = TestRunTime.CHIP_REPL_PYTHON
+    if runner == 'matter_repl_python':
+        runtime = TestRunTime.MATTER_REPL_PYTHON
     elif runner == 'darwin_framework_tool_python':
         runtime = TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON
 
-    if chip_tool is None and not runtime == TestRunTime.CHIP_REPL_PYTHON:
+    if chip_tool is None and not runtime == TestRunTime.MATTER_REPL_PYTHON:
         paths_finder = PathsFinder()
         if runtime == TestRunTime.CHIP_TOOL_PYTHON:
             chip_tool = paths_finder.get('chip-tool')
@@ -152,18 +153,18 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
             chip_tool = paths_finder.get('darwin-framework-tool')
 
     if include_tags:
-        include_tags = set([TestTag.__members__[t] for t in include_tags])
+        include_tags = {TestTag.__members__[t] for t in include_tags}
 
     if exclude_tags:
-        exclude_tags = set([TestTag.__members__[t] for t in exclude_tags])
+        exclude_tags = {TestTag.__members__[t] for t in exclude_tags}
 
     # Figures out selected test that match the given name(s)
-    if runtime == TestRunTime.CHIP_REPL_PYTHON:
-        all_tests = [test for test in chiptest.AllReplYamlTests()]
+    if runtime == TestRunTime.MATTER_REPL_PYTHON:
+        all_tests = list(chiptest.AllReplYamlTests())
     elif runtime == TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON:
-        all_tests = [test for test in chiptest.AllDarwinFrameworkToolYamlTests()]
+        all_tests = list(chiptest.AllDarwinFrameworkToolYamlTests())
     else:
-        all_tests = [test for test in chiptest.AllChipToolYamlTests()]
+        all_tests = list(chiptest.AllChipToolYamlTests())
 
     tests = all_tests
 
@@ -178,7 +179,7 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
             TestTag.PURPOSEFUL_FAILURE,
         }
 
-        if runtime == TestRunTime.CHIP_REPL_PYTHON:
+        if runtime == TestRunTime.MATTER_REPL_PYTHON:
             exclude_tags.add(TestTag.CHIP_TOOL_PYTHON_ONLY)
 
     if 'all' not in target:
@@ -187,7 +188,7 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
             targeted = [test for test in all_tests if test.name.lower()
                         == name.lower()]
             if len(targeted) == 0:
-                logging.error("Unknown target: %s" % name)
+                log.error("Unknown target: '%s'", name)
             tests.extend(targeted)
 
     if target_glob:
@@ -195,9 +196,9 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
         tests = [test for test in tests if matcher.matches(test.name.lower())]
 
     if len(tests) == 0:
-        logging.error("No targets match, exiting.")
-        logging.error("Valid targets are (case-insensitive): %s" %
-                      (", ".join(test.name for test in all_tests)))
+        log.error("No targets match, exiting.")
+        log.error("Valid targets are (case-insensitive): '%s'",
+                  ", ".join(test.name for test in all_tests))
         exit(1)
 
     if target_skip_glob:
@@ -276,8 +277,8 @@ def cmd_list(context):
     '--closure-app',
     help='what closure app to use')
 @click.option(
-    '--chip-repl-yaml-tester',
-    help='what python script to use for running yaml tests using chip-repl as controller')
+    '--matter-repl-yaml-tester',
+    help='what python script to use for running yaml tests using matter-repl as controller')
 @click.option(
     '--chip-tool-with-python',
     help='what python script to use for running yaml tests using chip-tool as controller')
@@ -304,13 +305,19 @@ def cmd_list(context):
     default=0,
     show_default=True,
     help='Number of tests that are expected to fail in each iteration.  Overall test will pass if the number of failures matches this.  Nonzero values require --keep-going')
+@click.option(
+    '--ble-wifi',
+    is_flag=True,
+    default=False,
+    show_default=True,
+    help='Use Bluetooth and WiFi mock servers to perform BLE-WiFi commissioning. This option is available on Linux platform only.')
 @click.pass_context
 def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app,
             fabric_bridge_app, tv_app, bridge_app, lit_icd_app, microwave_oven_app, rvc_app, network_manager_app,
-            energy_gateway_app, energy_management_app, closure_app, chip_repl_yaml_tester,
-            chip_tool_with_python, pics_file, keep_going, test_timeout_seconds, expected_failures):
+            energy_gateway_app, energy_management_app, closure_app, matter_repl_yaml_tester,
+            chip_tool_with_python, pics_file, keep_going, test_timeout_seconds, expected_failures, ble_wifi):
     if expected_failures != 0 and not keep_going:
-        logging.exception(f"'--expected-failures {expected_failures}' used without '--keep-going'")
+        log.exception("--expected-failures '%s' used without '--keep-going'", expected_failures)
         sys.exit(2)
 
     runner = chiptest.runner.Runner()
@@ -359,14 +366,17 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     if closure_app is None:
         closure_app = paths_finder.get('closure-app')
 
-    if chip_repl_yaml_tester is None:
-        chip_repl_yaml_tester = paths_finder.get('yamltest_with_chip_repl_tester.py')
+    if matter_repl_yaml_tester is None:
+        matter_repl_yaml_tester = paths_finder.get('yamltest_with_matter_repl_tester.py')
 
     if chip_tool_with_python is None:
         if context.obj.runtime == TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON:
             chip_tool_with_python = paths_finder.get('darwinframeworktool.py')
         else:
             chip_tool_with_python = paths_finder.get('chiptool.py')
+
+    if ble_wifi and sys.platform != "linux":
+        raise click.BadOptionUsage("ble-wifi", "Option --ble-wifi is available on Linux platform only")
 
     # Command execution requires an array
     paths = chiptest.ApplicationPaths(
@@ -385,16 +395,30 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
         energy_gateway_app=[energy_gateway_app],
         energy_management_app=[energy_management_app],
         closure_app=[closure_app],
-        chip_repl_yaml_tester_cmd=['python3'] + [chip_repl_yaml_tester],
+        matter_repl_yaml_tester_cmd=['python3'] + [matter_repl_yaml_tester],
         chip_tool_with_python_cmd=['python3'] + [chip_tool_with_python],
     )
 
+    ble_controller_app = None
+    ble_controller_tool = None
+
     if sys.platform == 'linux':
         ns = chiptest.linux.IsolatedNetworkNamespace(
+            # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
+            setup_app_link_up=not ble_wifi,
+            # Change the app link name so the interface will be recognized as WiFi or Ethernet
+            # depending on the commissioning method used.
+            app_link_name='wlx-app' if ble_wifi else 'eth-app',
             unshared=context.obj.in_unshare)
+        if ble_wifi:
+            bus = chiptest.linux.DBusTestSystemBus()
+            bluetooth = chiptest.linux.BluetoothMock()
+            wifi = chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns)
+            ble_controller_app = 0   # Bind app to the first BLE controller
+            ble_controller_tool = 1  # Bind tool to the second BLE controller
         paths = chiptest.linux.PathsWithNetworkNamespaces(paths)
 
-    logging.info("Each test will be executed %d times" % iterations)
+    log.info("Each test will be executed %d times", iterations)
 
     apps_register = AppsRegister()
     apps_register.init()
@@ -402,46 +426,51 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     def cleanup():
         apps_register.uninit()
         if sys.platform == 'linux':
+            if ble_wifi:
+                wifi.terminate()
+                bluetooth.terminate()
+                bus.terminate()
             ns.terminate()
 
     for i in range(iterations):
-        logging.info("Starting iteration %d" % (i+1))
+        log.info("Starting iteration %d", i+1)
         observed_failures = 0
         for test in context.obj.tests:
             if context.obj.include_tags:
                 if not (test.tags & context.obj.include_tags):
-                    logging.debug("Test %s not included" % test.name)
+                    log.debug("Test '%s' not included", test.name)
                     continue
 
             if context.obj.exclude_tags:
                 if test.tags & context.obj.exclude_tags:
-                    logging.debug("Test %s excluded" % test.name)
+                    log.debug("Test '%s' excluded", test.name)
                     continue
 
             test_start = time.monotonic()
             try:
                 if context.obj.dry_run:
-                    logging.info("Would run test: %s" % test.name)
+                    log.info("Would run test: '%s'", test.name)
                 else:
-                    logging.info('%-20s - Starting test' % (test.name))
+                    log.info("%-20s - Starting test", test.name)
                 test.Run(
                     runner, apps_register, paths, pics_file, test_timeout_seconds, context.obj.dry_run,
-                    test_runtime=context.obj.runtime)
+                    test_runtime=context.obj.runtime,
+                    ble_controller_app=ble_controller_app,
+                    ble_controller_tool=ble_controller_tool,
+                )
                 if not context.obj.dry_run:
                     test_end = time.monotonic()
-                    logging.info('%-30s - Completed in %0.2f seconds' %
-                                 (test.name, (test_end - test_start)))
+                    log.info("%-30s - Completed in %0.2f seconds", test.name, test_end - test_start)
             except Exception:
                 test_end = time.monotonic()
-                logging.exception('%-30s - FAILED in %0.2f seconds' %
-                                  (test.name, (test_end - test_start)))
+                log.exception("%-30s - FAILED in %0.2f seconds", test.name, test_end - test_start)
                 observed_failures += 1
                 if not keep_going:
                     cleanup()
                     sys.exit(2)
 
         if observed_failures != expected_failures:
-            logging.exception(f'Iteration {i}: expected failure count {expected_failures}, but got {observed_failures}')
+            log.exception("Iteration %d: expected failure count %d, but got %d", i, expected_failures, observed_failures)
             cleanup()
             sys.exit(2)
 

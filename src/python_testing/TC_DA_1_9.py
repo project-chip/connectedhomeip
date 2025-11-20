@@ -48,9 +48,10 @@ import os
 import signal
 import subprocess
 
-from chip import ChipDeviceCtrl
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+from matter import ChipDeviceCtrl
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_DA_1_9(MatterBaseTest):
@@ -225,7 +226,7 @@ class TC_DA_1_9(MatterBaseTest):
                         self.default_controller.SetDACRevocationSetPath(revocation_set)
                         await self.default_controller.CommissionWithCode(
                             setupPayload=test_case['manual_pairing_code'],
-                            nodeid=1,
+                            nodeId=1,
                             discoveryType=ChipDeviceCtrl.DiscoveryType.DISCOVERY_NETWORK_ONLY,
                         )
                         resp = 'Y'
@@ -243,7 +244,8 @@ class TC_DA_1_9(MatterBaseTest):
                 asserts.assert_equal(
                     commissioning_success,
                     test_case['expects_commissioning_success'],
-                    f"Commissioning {'succeeded' if commissioning_success else 'failed'} when it should have {'succeeded' if test_case['expects_commissioning_success'] else 'failed'}"
+                    f"Commissioning {'succeeded' if commissioning_success else 'failed'} when it should "
+                    f"have {'succeeded' if test_case['expects_commissioning_success'] else 'failed'}"
                 )
 
 

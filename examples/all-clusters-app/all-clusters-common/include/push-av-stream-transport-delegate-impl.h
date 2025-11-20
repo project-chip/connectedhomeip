@@ -42,39 +42,68 @@ class PushAvStreamTransportManager : public PushAvStreamTransportDelegate
 {
 public:
     Protocols::InteractionModel::Status AllocatePushTransport(const TransportOptionsStruct & transportOptions,
-                                                              const uint16_t connectionID);
-    Protocols::InteractionModel::Status DeallocatePushTransport(const uint16_t connectionID);
+                                                              const uint16_t connectionID,
+                                                              FabricIndex accessingFabricIndex) override;
+
+    Protocols::InteractionModel::Status DeallocatePushTransport(const uint16_t connectionID) override;
+
     Protocols::InteractionModel::Status ModifyPushTransport(const uint16_t connectionID,
-                                                            const TransportOptionsStorage transportOptions);
+                                                            const TransportOptionsStorage transportOptions) override;
+
     Protocols::InteractionModel::Status SetTransportStatus(const std::vector<uint16_t> connectionIDList,
-                                                           TransportStatusEnum transportStatus);
+                                                           TransportStatusEnum transportStatus) override;
+
+    Protocols::InteractionModel::Status ManuallyTriggerTransport(
+        const uint16_t connectionID, TriggerActivationReasonEnum activationReason,
+        const Optional<Structs::TransportMotionTriggerTimeControlStruct::DecodableType> & timeControl) override;
 
     Protocols::InteractionModel::Status
-    ManuallyTriggerTransport(const uint16_t connectionID, TriggerActivationReasonEnum activationReason,
-                             const Optional<Structs::TransportMotionTriggerTimeControlStruct::DecodableType> & timeControl);
+    ValidateBandwidthLimit(StreamUsageEnum streamUsage, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                           const Optional<DataModel::Nullable<uint16_t>> & audioStreamId) override;
 
-    bool ValidateUrl(std::string url);
+    Protocols::InteractionModel::Status SelectVideoStream(StreamUsageEnum streamUsage, uint16_t & videoStreamId) override;
 
-    Protocols::InteractionModel::Status ValidateBandwidthLimit(StreamUsageEnum streamUsage,
-                                                               const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                                                               const Optional<DataModel::Nullable<uint16_t>> & audioStreamId);
-    Protocols::InteractionModel::Status SelectVideoStream(StreamUsageEnum streamUsage, uint16_t & videoStreamId);
+    bool ValidateStreamUsage(StreamUsageEnum streamUsage) override;
 
-    Protocols::InteractionModel::Status SelectAudioStream(StreamUsageEnum streamUsage, uint16_t & audioStreamId);
+    bool ValidateSegmentDuration(uint16_t segmentDuration, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId) override;
 
-    Protocols::InteractionModel::Status ValidateVideoStream(uint16_t videoStreamId);
+    Protocols::InteractionModel::Status SelectAudioStream(StreamUsageEnum streamUsage, uint16_t & audioStreamId) override;
 
-    Protocols::InteractionModel::Status ValidateAudioStream(uint16_t audioStreamId);
+    Protocols::InteractionModel::Status SetVideoStream(uint16_t videoStreamId) override;
 
-    PushAvStreamTransportStatusEnum GetTransportBusyStatus(const uint16_t connectionID);
+    Protocols::InteractionModel::Status SetAudioStream(uint16_t audioStreamId) override;
 
-    void OnAttributeChanged(AttributeId attributeId);
-    CHIP_ERROR LoadCurrentConnections(std::vector<TransportConfigurationStorage> & currentConnections);
-    CHIP_ERROR PersistentAttributesLoadedCallback();
+    Protocols::InteractionModel::Status ValidateZoneId(uint16_t zoneId) override;
+
+    bool ValidateMotionZoneListSize(size_t zoneListSize) override;
+
+    PushAvStreamTransportStatusEnum GetTransportBusyStatus(const uint16_t connectionID) override;
+
+    void OnAttributeChanged(AttributeId attributeId) override;
+
+    CHIP_ERROR LoadCurrentConnections(std::vector<TransportConfigurationStorage> & currentConnections) override;
+
+    CHIP_ERROR PersistentAttributesLoadedCallback() override;
+
+    void SetTLSCerts(Tls::CertificateTable::BufferedClientCert & clientCertEntry,
+                     Tls::CertificateTable::BufferedRootCert & rootCertEntry) override
+    {
+        // Handle TLS certificates if needed for implementation
+    }
+
+    CHIP_ERROR IsHardPrivacyModeActive(bool & isActive) override;
+
+    CHIP_ERROR IsSoftRecordingPrivacyModeActive(bool & isActive) override;
+
+    CHIP_ERROR IsSoftLivestreamPrivacyModeActive(bool & isActive) override;
+
+    void SetPushAvStreamTransportServer(PushAvStreamTransportServer * serverLogic) override
+    {
+        // Store pointer to server logic if needed for implementation
+    }
 
     void Init();
-    PushAvStreamTransportManager() = default;
-
+    PushAvStreamTransportManager()  = default;
     ~PushAvStreamTransportManager() = default;
 
 private:

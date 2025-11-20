@@ -111,11 +111,6 @@ static_library("shell") {
       "MainLoopBee.cpp",
       "streamer_bee.cpp",
     ]
-  } else if (chip_device_platform == "openiotsdk") {
-    sources += [
-      "MainLoopDefault.cpp",
-      "streamer_openiotsdk.cpp",
-    ]
   } else if (chip_device_platform == "asr") {
     sources += [
       "MainLoopDefault.cpp",
@@ -123,10 +118,6 @@ static_library("shell") {
     ]
   } else {
     sources += [ "MainLoopDefault.cpp" ]
-  }
-
-  if (current_os == "mbed") {
-    sources += [ "streamer_mbed.cpp" ]
   }
 
   cflags = [ "-Wconversion" ]

@@ -39,10 +39,11 @@ import logging
 import random
 from datetime import datetime, timedelta, timezone
 
-import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
@@ -131,7 +132,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
 
         return steps
 
-    @ async_test_body
+    @async_test_body
     async def test_TC_TSTAT_4_3(self):
         endpoint = self.get_endpoint()
 
@@ -157,8 +158,8 @@ class TC_TSTAT_4_3(MatterBaseTest):
                 logger.info(f"Active Preset Handlers: {activePresetHandle}")
 
                 # TH picks a preset handle from an entry in the SupportedPresets that does not match the ActivePresetHandle and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp and the ExpirationInMinutes is set to 1 minute.
-                possiblePresetHandles = list(
-                    preset.presetHandle for preset in supported_presets if preset.presetHandle != activePresetHandle)
+                possiblePresetHandles = [
+                    preset.presetHandle for preset in supported_presets if preset.presetHandle != activePresetHandle]
                 if len(possiblePresetHandles) > 0:
                     preset_handle = possiblePresetHandles[0]
                     # Verify that the AddThermostatSuggestion command returns INVALID_IN_STATE.
@@ -202,8 +203,8 @@ class TC_TSTAT_4_3(MatterBaseTest):
             activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
             logger.info(f"Active Preset Handlers: {activePresetHandle}")
             # TH picks a preset handle from an entry in the SupportedPresets that does not match the ActivePresetHandle and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp and the ExpirationInMinutes is set to 1 minute.
-            possiblePresetHandles = list(
-                preset.presetHandle for preset in supported_presets if preset.presetHandle != activePresetHandle)
+            possiblePresetHandles = [
+                preset.presetHandle for preset in supported_presets if preset.presetHandle != activePresetHandle]
             asserts.assert_greater_equal(
                 len(possiblePresetHandles), 1, "Couldn't run test step 6a since all preset handles are also the ActivePresetHandle on this Thermostat")
             presetHandle = possiblePresetHandles[0]
@@ -272,8 +273,8 @@ class TC_TSTAT_4_3(MatterBaseTest):
             activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
             logger.info(f"Active Preset Handlers: {activePresetHandle}")
             # TH picks any preset handle from the \"SupportedPresets\" variable that does not match the ActivePresetHandle and and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp and the ExpirationInMinutes is set to 1 minute.
-            possiblePresetHandles = list(
-                preset.presetHandle for preset in supported_presets if preset.presetHandle != activePresetHandle)
+            possiblePresetHandles = [
+                preset.presetHandle for preset in supported_presets if preset.presetHandle != activePresetHandle]
             asserts.assert_greater_equal(
                 len(possiblePresetHandles), 1, "Couldn't run test step 7a since all preset handles are also the ActivePresetHandle on this Thermostat")
             presetHandle = possiblePresetHandles[0]
@@ -370,8 +371,8 @@ class TC_TSTAT_4_3(MatterBaseTest):
             activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
             logger.info(f"Active Preset Handlers: {activePresetHandle}")
             # TH picks a preset handle from an entry in the SupportedPresets that does not match the ActivePresetHandle and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp and the ExpirationInMinutes is set to 1 minute.
-            possiblePresetHandles = list(
-                preset.presetHandle for preset in supported_presets if preset.presetHandle != activePresetHandle)
+            possiblePresetHandles = [
+                preset.presetHandle for preset in supported_presets if preset.presetHandle != activePresetHandle]
             asserts.assert_greater_equal(
                 len(possiblePresetHandles), 1, "Couldn't run test step 8a since all preset handles are also the ActivePresetHandle on this Thermostat")
             presetHandle = possiblePresetHandles[0]
@@ -449,8 +450,8 @@ class TC_TSTAT_4_3(MatterBaseTest):
             activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
             logger.info(f"Active Preset Handlers: {activePresetHandle}")
             # TH picks a preset handle from an entry in the SupportedPresets that does not match the ActivePresetHandle and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp and the ExpirationInMinutes is set to 2 minutes.
-            possiblePresetHandles = list(
-                preset.presetHandle for preset in supported_presets if preset.presetHandle != activePresetHandle)
+            possiblePresetHandles = [
+                preset.presetHandle for preset in supported_presets if preset.presetHandle != activePresetHandle]
             asserts.assert_greater_equal(
                 len(possiblePresetHandles), 1, "Couldn't run test step 9a since all preset handles are also the ActivePresetHandle on this Thermostat")
             firstPresetHandle = possiblePresetHandles[0]
@@ -558,8 +559,8 @@ class TC_TSTAT_4_3(MatterBaseTest):
             activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
             logger.info(f"Active Preset Handlers: {activePresetHandle}")
             # TH picks a preset handle from an entry in the SupportedPresets that does not match the ActivePresetHandle and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp plus 25 hours and the ExpirationInMinutes is set to 30 minutes.
-            possiblePresetHandles = list(
-                preset.presetHandle for preset in supported_presets if preset.presetHandle != activePresetHandle)
+            possiblePresetHandles = [
+                preset.presetHandle for preset in supported_presets if preset.presetHandle != activePresetHandle]
             asserts.assert_greater_equal(
                 len(possiblePresetHandles), 1, "Couldn't run test step 10 since all preset handles are also the ActivePresetHandle on this Thermostat")
             presetHandle = possiblePresetHandles[0]
@@ -580,8 +581,8 @@ class TC_TSTAT_4_3(MatterBaseTest):
             maxThermostatSuggestions = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaxThermostatSuggestions)
             logger.info(f"MaxThermostatSuggestions: {maxThermostatSuggestions}")
             # TH picks a preset handle from an entry in the SupportedPresets that does not match the ActivePresetHandle and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp and the ExpirationInMinutes is set to 1 minute for the number of times specified in the value of MaxThermostatSuggestions + 1.
-            possiblePresetHandles = list(
-                preset.presetHandle for preset in supported_presets if preset.presetHandle != activePresetHandle)
+            possiblePresetHandles = [
+                preset.presetHandle for preset in supported_presets if preset.presetHandle != activePresetHandle]
             asserts.assert_greater_equal(
                 len(possiblePresetHandles), 1, "Couldn't run test step 11 since all preset handles are also the ActivePresetHandle on this Thermostat")
             presetHandle = possiblePresetHandles[0]

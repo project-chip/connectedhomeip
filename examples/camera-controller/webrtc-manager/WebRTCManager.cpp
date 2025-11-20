@@ -18,8 +18,9 @@
 
 #include "WebRTCManager.h"
 
-#include <app/dynamic_server/AccessControl.h>
 #include <commands/interactive/InteractiveCommands.h>
+#include <controller/webrtc/WebRTCTransportRequestorManager.h>
+#include <controller/webrtc/access_control/WebRTCAccessControl.h>
 #include <crypto/RandUtils.h>
 #include <lib/support/StringBuilder.h>
 
@@ -41,6 +42,11 @@ constexpr int kVideoBitRate         = 3000;
 
 constexpr const char * kStreamGstDestIp    = "127.0.0.1";
 constexpr uint16_t kVideoStreamGstDestPort = 5000;
+
+// Constants for Audio
+constexpr int kAudioBitRate                = 64000;
+constexpr int kOpusPayloadType             = 111;
+constexpr uint16_t kAudioStreamGstDestPort = 5001;
 
 const char * GetPeerConnectionStateStr(rtc::PeerConnection::State state)
 {
@@ -85,7 +91,7 @@ const char * GetGatheringStateStr(rtc::PeerConnection::GatheringState state)
 
 } // namespace
 
-WebRTCManager::WebRTCManager() : mWebRTCRequestorServer(kWebRTCRequesterDynamicEndpointId, mWebRTCRequestorDelegate) {}
+WebRTCManager::WebRTCManager() {}
 
 WebRTCManager::~WebRTCManager()
 {
@@ -94,15 +100,22 @@ WebRTCManager::~WebRTCManager()
 
 void WebRTCManager::Init()
 {
-    dynamic_server::InitAccessControl();
-    mWebRTCRequestorServer.Init();
+    Controller::AccessControl::InitAccessControl(kWebRTCRequesterDynamicEndpointId);
+
+    mWebRTCRegisteredServerCluster.Create(kWebRTCRequesterDynamicEndpointId, mWebRTCRequestorDelegate);
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mWebRTCRegisteredServerCluster.Registration());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to register WebRTCTransportRequestor on endpoint %u: %" CHIP_ERROR_FORMAT,
+                     kWebRTCRequesterDynamicEndpointId, err.Format());
+    }
 }
 
-CHIP_ERROR WebRTCManager::HandleOffer(uint16_t sessionId, const WebRTCRequestorDelegate::OfferArgs & args)
+CHIP_ERROR WebRTCManager::HandleOffer(const WebRTCSessionStruct & session, const WebRTCRequestorDelegate::OfferArgs & args)
 {
     ChipLogProgress(Camera, "WebRTCManager::HandleOffer");
 
-    mWebRTCProviderClient.HandleOfferReceived(sessionId);
+    mWebRTCProviderClient.HandleOfferReceived(session.id);
 
     if (!mPeerConnection)
     {
@@ -119,7 +132,7 @@ CHIP_ERROR WebRTCManager::HandleOffer(uint16_t sessionId, const WebRTCRequestorD
     }
 
     // Store sessionId for the delayed callback
-    mPendingSessionId = sessionId;
+    mPendingSessionId = session.id;
 
     // Schedule the ProvideAnswer() call to run with a small delay to ensure the response is sent first
     DeviceLayer::SystemLayer().StartTimer(
@@ -133,11 +146,11 @@ CHIP_ERROR WebRTCManager::HandleOffer(uint16_t sessionId, const WebRTCRequestorD
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WebRTCManager::HandleAnswer(uint16_t sessionId, const std::string & sdp)
+CHIP_ERROR WebRTCManager::HandleAnswer(const WebRTCSessionStruct & session, const std::string & sdp)
 {
     ChipLogProgress(Camera, "WebRTCManager::HandleAnswer");
 
-    mWebRTCProviderClient.HandleAnswerReceived(sessionId);
+    mWebRTCProviderClient.HandleAnswerReceived(session.id);
 
     if (!mPeerConnection)
     {
@@ -149,7 +162,7 @@ CHIP_ERROR WebRTCManager::HandleAnswer(uint16_t sessionId, const std::string & s
     mPeerConnection->setRemoteDescription(answerDesc);
 
     // Store sessionId for the delayed callback
-    mPendingSessionId = sessionId;
+    mPendingSessionId = session.id;
 
     // Schedule the ProvideICECandidates() call to run with a small delay to ensure the response is sent first
     DeviceLayer::SystemLayer().StartTimer(
@@ -163,7 +176,8 @@ CHIP_ERROR WebRTCManager::HandleAnswer(uint16_t sessionId, const std::string & s
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WebRTCManager::HandleICECandidates(uint16_t sessionId, const std::vector<ICECandidateStruct> & candidates)
+CHIP_ERROR WebRTCManager::HandleICECandidates(const WebRTCSessionStruct & session,
+                                              const std::vector<ICECandidateStruct> & candidates)
 {
     ChipLogProgress(Camera, "WebRTCManager::HandleICECandidates");
 
@@ -225,6 +239,7 @@ void WebRTCManager::Disconnect()
 
     // Reset track
     mTrack.reset();
+    mAudioTrack.reset();
 
     // Clear state
     mCurrentVideoStreamId = 0;
@@ -250,7 +265,7 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
 
     chip::ScopedNodeId peerId(nodeId, fabricIndex);
 
-    mWebRTCProviderClient.Init(peerId, endpointId, &mWebRTCRequestorServer);
+    mWebRTCProviderClient.Init(peerId, endpointId, &mWebRTCRegisteredServerCluster.Cluster());
 
     rtc::InitLogger(rtc::LogLevel::Warning);
 
@@ -263,13 +278,38 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
         mLocalDescription = std::string(desc);
         ChipLogProgress(Camera, "Local Description:");
         ChipLogProgress(Camera, "%s", mLocalDescription.c_str());
+
+        // Extract any candidates embedded in the SDP description
+        std::vector<rtc::Candidate> candidates = desc.candidates();
+        ChipLogProgress(Camera, "Extracted %lu candidates from SDP description", candidates.size());
+
+        for (const auto & candidate : candidates)
+        {
+            ICECandidateInfo candidateInfo;
+            candidateInfo.candidate  = std::string(candidate);
+            candidateInfo.mid        = candidate.mid();
+            candidateInfo.mlineIndex = -1; // libdatachannel doesn't provide mlineIndex
+
+            ChipLogProgress(Camera, "[From SDP] Candidate: %s, mid: %s", candidateInfo.candidate.c_str(),
+                            candidateInfo.mid.c_str());
+
+            mLocalCandidates.push_back(candidateInfo);
+        }
     });
 
     mPeerConnection->onLocalCandidate([this](rtc::Candidate candidate) {
-        std::string candidateStr = std::string(candidate);
-        mLocalCandidates.push_back(candidateStr);
+        ICECandidateInfo candidateInfo;
+        candidateInfo.candidate = std::string(candidate);
+        candidateInfo.mid       = candidate.mid();
+
+        // Note: libdatachannel doesn't directly provide mlineIndex, so we use -1 to indicate it is not present.
+        candidateInfo.mlineIndex = -1;
+
         ChipLogProgress(Camera, "Local Candidate:");
-        ChipLogProgress(Camera, "%s", candidateStr.c_str());
+        ChipLogProgress(Camera, "%s", candidateInfo.candidate.c_str());
+        ChipLogProgress(Camera, "  mid: %s, mlineIndex: %d", candidateInfo.mid.c_str(), candidateInfo.mlineIndex);
+
+        mLocalCandidates.push_back(candidateInfo);
     });
 
     mPeerConnection->onStateChange([this](rtc::PeerConnection::State state) {
@@ -284,11 +324,10 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
                 mSessionEstablishedCallback(mCurrentVideoStreamId);
             }
         }
-        else if (state == rtc::PeerConnection::State::Disconnected || state == rtc::PeerConnection::State::Failed ||
-                 state == rtc::PeerConnection::State::Closed)
+        else if (state == rtc::PeerConnection::State::Failed || state == rtc::PeerConnection::State::Closed)
         {
-            // Clean up resources when connection is lost
-            CloseRTPSocket();
+            // Limit the clearup to Failed and Closed only to avoid prematurely ending sessions.
+            Disconnect();
         }
     });
 
@@ -300,7 +339,14 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
     mRTPSocket = socket(AF_INET, SOCK_DGRAM, 0);
     if (mRTPSocket == -1)
     {
-        ChipLogError(Camera, "Failed to create RTP socket: %s", strerror(errno));
+        ChipLogError(Camera, "Failed to create RTP Video socket: %s", strerror(errno));
+        return CHIP_ERROR_POSIX(errno);
+    }
+
+    mAudioRTPSocket = socket(AF_INET, SOCK_DGRAM, 0);
+    if (mAudioRTPSocket == -1)
+    {
+        ChipLogError(Camera, "Failed to create RTP Audio socket: %s", strerror(errno));
         return CHIP_ERROR_POSIX(errno);
     }
 
@@ -322,6 +368,28 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
             // This is an RTP packet
             sendto(mRTPSocket, reinterpret_cast<const char *>(message.data()), size_t(message.size()), 0,
                    reinterpret_cast<const struct sockaddr *>(&addr), sizeof(addr));
+        },
+        nullptr);
+
+    // For Audio
+    sockaddr_in audioAddr     = {};
+    audioAddr.sin_family      = AF_INET;
+    audioAddr.sin_addr.s_addr = inet_addr(kStreamGstDestIp);
+    audioAddr.sin_port        = htons(kAudioStreamGstDestPort);
+
+    rtc::Description::Audio audioMedia("audio", rtc::Description::Direction::RecvOnly);
+    audioMedia.addOpusCodec(kOpusPayloadType);
+    audioMedia.setBitrate(kAudioBitRate);
+    mAudioTrack = mPeerConnection->addTrack(audioMedia);
+
+    auto audioSession = std::make_shared<rtc::RtcpReceivingSession>();
+    mAudioTrack->setMediaHandler(audioSession);
+
+    mAudioTrack->onMessage(
+        [this, audioAddr](rtc::binary message) {
+            // This is an RTP Audio packet
+            sendto(mAudioRTPSocket, reinterpret_cast<const char *>(message.data()), static_cast<size_t>(message.size()), 0,
+                   reinterpret_cast<const struct sockaddr *>(&audioAddr), sizeof(audioAddr));
         },
         nullptr);
 

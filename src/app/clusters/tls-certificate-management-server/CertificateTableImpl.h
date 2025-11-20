@@ -52,6 +52,9 @@ struct CertificateId
 
     bool IsValid() { return (mCertificateId != kUndefinedCertificateId); }
 
+    uint16_t & Value() { return mCertificateId; }
+    const uint16_t & Value() const { return mCertificateId; }
+
     bool operator==(const CertificateId & other) const { return (mCertificateId == other.mCertificateId); }
 };
 
@@ -64,10 +67,10 @@ public:
     ~RootCertificateTable() { Finish(); };
 };
 
-class ClientCertificateTable : public app::Storage::FabricTableImpl<CertificateId, CertificateTable::ClientCertStruct>
+class ClientCertificateTable : public app::Storage::FabricTableImpl<CertificateId, CertificateTable::ClientCertWithKey>
 {
 public:
-    using Super = app::Storage::FabricTableImpl<CertificateId, CertificateTable::ClientCertStruct>;
+    using Super = app::Storage::FabricTableImpl<CertificateId, CertificateTable::ClientCertWithKey>;
 
     ClientCertificateTable() : Super(kMaxClientCertificatesPerFabric, kMaxCertificatesPerEndpoint) {}
     ~ClientCertificateTable() { Finish(); };
@@ -79,20 +82,43 @@ public:
     CertificateTableImpl() {}
     ~CertificateTableImpl() { Finish(); };
 
+    bool IsInitialized() { return (mStorage != nullptr); }
+
     CHIP_ERROR Init(PersistentStorageDelegate & storage) override;
     void Finish() override;
 
-    void SetEndpoint(EndpointId endpoint);
+    CHIP_ERROR SetEndpoint(EndpointId endpoint);
 
     // Data
-    CHIP_ERROR GetRootCertificateEntry(FabricIndex fabric_index, TLSCAID certificate_id, BufferedRootCert & entry) override;
-    CHIP_ERROR HasRootCertificateEntry(FabricIndex fabric_index, TLSCAID certificate_id) override;
-    CHIP_ERROR GetClientCertificateEntry(FabricIndex fabric_index, TLSCCDID certificate_id, BufferedClientCert & entry) override;
-    CHIP_ERROR HasClientCertificateEntry(FabricIndex fabric_index, TLSCCDID certificate_id) override;
+    CHIP_ERROR UpsertRootCertificateEntry(FabricIndex fabric_index, Optional<TLSCAID> & id, RootBuffer & buffer,
+                                          const ByteSpan & certificate) override;
+    CHIP_ERROR GetRootCertificateEntry(FabricIndex fabric_index, TLSCAID id, BufferedRootCert & entry) override;
+    CHIP_ERROR HasRootCertificateEntry(FabricIndex fabric_index, TLSCAID id) override;
+    CHIP_ERROR IterateRootCertificates(FabricIndex fabric, BufferedRootCert & store, IterateRootCertFnType iterateFn) override;
+    CHIP_ERROR RemoveRootCertificate(FabricIndex fabric, TLSCAID id) override;
+    CHIP_ERROR GetRootCertificateCount(FabricIndex fabric, uint8_t & outCount) override;
+
+    CHIP_ERROR PrepareClientCertificate(FabricIndex fabric, const ByteSpan & nonce, ClientBuffer & buffer, Optional<TLSCCDID> & id,
+                                        MutableByteSpan & csr, MutableByteSpan & nonceSignature) override;
+    CHIP_ERROR UpdateClientCertificateEntry(FabricIndex fabric_index, TLSCCDID id, ClientBuffer & buffer,
+                                            const ClientCertStruct & entry) override;
+    CHIP_ERROR GetClientCertificateEntry(FabricIndex fabric_index, TLSCCDID id, BufferedClientCert & entry) override;
+    CHIP_ERROR HasClientCertificateEntry(FabricIndex fabric_index, TLSCCDID id) override;
+    CHIP_ERROR IterateClientCertificates(FabricIndex fabric, BufferedClientCert & store,
+                                         IterateClientCertFnType iterateFn) override;
+    CHIP_ERROR RemoveClientCertificate(FabricIndex fabric, TLSCCDID id) override;
+    CHIP_ERROR GetClientCertificateCount(FabricIndex fabric, uint8_t & outCount) override;
+
+    CHIP_ERROR RemoveFabric(FabricIndex fabric) override;
 
 private:
+    CHIP_ERROR FindRootCertificateEntry(TLSCAID id, FabricIndex out_fabric);
+    CHIP_ERROR FindClientCertificateEntry(TLSCCDID id, FabricIndex out_fabric);
+
+    EndpointId mEndpointId = kInvalidEndpointId;
     RootCertificateTable mRootCertificates;
     ClientCertificateTable mClientCertificates;
+    PersistentStorageDelegate * mStorage = nullptr;
 };
 
 } // namespace Tls

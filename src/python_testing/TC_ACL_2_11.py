@@ -40,17 +40,18 @@
 
 import logging
 
-import chip.clusters as Clusters
-import matter_testing_infrastructure.chip.testing.global_attribute_ids as global_attribute_ids
-from chip.clusters.Attribute import ValueDecodeFailure
-from chip.clusters.ClusterObjects import ALL_ACCEPTED_COMMANDS, ALL_ATTRIBUTES, ALL_CLUSTERS
-from chip.clusters.Objects import AccessControl
-from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.basic_composition import arls_populated
-from chip.testing.event_attribute_reporting import EventSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+import matter.testing.global_attribute_ids as global_attribute_ids
+from matter.clusters.Attribute import ValueDecodeFailure
+from matter.clusters.ClusterObjects import ALL_ACCEPTED_COMMANDS, ALL_ATTRIBUTES, ALL_CLUSTERS
+from matter.clusters.Objects import AccessControl
+from matter.clusters.Types import NullValue
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.basic_composition import arls_populated
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_ACL_2_11(MatterBaseTest):

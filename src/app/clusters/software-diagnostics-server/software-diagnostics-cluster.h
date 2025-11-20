@@ -17,9 +17,9 @@
 #pragma once
 
 #include <app/clusters/software-diagnostics-server/software-diagnostics-logic.h>
-
 #include <app/clusters/software-diagnostics-server/software-fault-listener.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/SoftwareDiagnostics/ClusterId.h>
 #include <clusters/SoftwareDiagnostics/Commands.h>
 #include <clusters/SoftwareDiagnostics/Events.h>
@@ -27,6 +27,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Span.h>
 #include <protocols/interaction_model/StatusCode.h>
+
 #include <sys/types.h>
 
 namespace chip {
@@ -41,15 +42,15 @@ namespace Clusters {
 class SoftwareDiagnosticsServerCluster : public DefaultServerCluster, public SoftwareDiagnostics::SoftwareFaultListener
 {
 public:
-    SoftwareDiagnosticsServerCluster(const SoftwareDiagnosticsEnabledAttributes & enabledAttributes) :
-        DefaultServerCluster({ kRootEndpointId, SoftwareDiagnostics::Id }), mLogic(enabledAttributes)
+    SoftwareDiagnosticsServerCluster(const SoftwareDiagnosticsLogic::OptionalAttributeSet & optionalAttributeSet) :
+        DefaultServerCluster({ kRootEndpointId, SoftwareDiagnostics::Id }), mLogic(optionalAttributeSet)
     {}
 
     // software fault listener
     void OnSoftwareFaultDetect(const SoftwareDiagnostics::Events::SoftwareFault::Type & softwareFault) override
     {
         VerifyOrReturn(mContext != nullptr);
-        (void) mContext->interactionContext->eventsGenerator->GenerateEvent(softwareFault, kRootEndpointId);
+        (void) mContext->interactionContext.eventsGenerator.GenerateEvent(softwareFault, kRootEndpointId);
     }
 
     CHIP_ERROR Startup(ServerClusterContext & context) override
@@ -129,9 +130,9 @@ public:
     }
 
 private:
-    // Encodes the `value` in `encoder`, while handling a potential `readError` that occured
+    // Encodes the `value` in `encoder`, while handling a potential `readError` that occurred
     // when the input `value` was read:
-    //   - CHIP_ERROR_NOT_IMPLEMENTED results in a 0 being encoded
+    //   - CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE results in a 0 being encoded
     //   - any other read error is just forwarded
     CHIP_ERROR EncodeValue(uint64_t value, CHIP_ERROR readError, AttributeValueEncoder & encoder)
     {

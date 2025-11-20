@@ -60,8 +60,11 @@ tests:
                 value: 0
 
     - label:
-          "Step 1: TH sends a GetSetupPIN command to the DUT with test values
-          provided by the product maker."
+          "Step 1: TH sends a GetSetupPIN command to the DUT with a
+          TempAccountIdentifier field. This field SHALL specify the client’s
+          Temporary Account Identifier. The length of this field SHALL be
+          between 16 and 100 characters (e.g., '1234efgh5678abcd') to protect
+          the account holder against password guessing attacks."
       PICS: ALOGIN.S.C00.Rsp && PICS_SKIP_SAMPLE_APP
       command: "GetSetupPIN"
       timedInteractionTimeoutMs: 10000

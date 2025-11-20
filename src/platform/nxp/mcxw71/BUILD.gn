@@ -76,6 +76,7 @@ config("nxp_platform_config") {
 
 static_library("nxp_platform") {
   defines = [
+    "CONFIG_CHIP_NXP_PLATFORM_MCXW71=1",
     "NXP_DEVICE_MCXW7X=1",
     "NXP_USE_MML=1",
   ]
@@ -146,7 +147,7 @@ static_library("nxp_platform") {
     "${chip_root}/src/credentials/examples/DeviceAttestationCredsExample.h",
     "${chip_root}/src/credentials/examples/ExampleDACs.h",
     "${chip_root}/src/credentials/examples/ExamplePAI.h",
-    "${chip_root}/src/platform/nxp/common/crypto/PersistentStorageOpKeystoreS200.h",
+    "${chip_root}/src/platform/nxp/common/crypto/S200/PersistentStorageOpKeystoreS200.h",
     "${chip_root}/src/platform/nxp/mcxw71/BLEManagerImpl.h",
     "${chip_root}/src/platform/nxp/mcxw71/SMU2Manager.h",
   ]
@@ -159,9 +160,11 @@ static_library("nxp_platform") {
 
   if (chip_crypto == "platform") {
     sources += [
-      "../common/crypto/CHIPCryptoPalS200.cpp",
-      "../common/crypto/PersistentStorageOpKeystoreS200.cpp",
-      "../common/crypto/PersistentStorageOpKeystoreS200.h",
+      "../common/crypto/PersistentStorageOpKeystoreBase.cpp",
+      "../common/crypto/PersistentStorageOpKeystoreBase.h",
+      "../common/crypto/S200/CHIPCryptoPalS200.cpp",
+      "../common/crypto/S200/PersistentStorageOpKeystoreS200.cpp",
+      "../common/crypto/S200/PersistentStorageOpKeystoreS200.h",
     ]
     #if (nxp_enable_ot_cli) {
     #  defines += [ "CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI=1" ]
@@ -177,6 +180,12 @@ static_library("nxp_platform") {
 
     deps += [ "${chip_root}/third_party/openthread:openthread" ]
     public_deps += [ "${chip_root}/third_party/openthread:openthread-platform" ]
+
+    # If the user has requested a Matter CLI, use the OpenThread CLI
+    # implementation
+    if (nxp_enable_matter_cli) {
+      public_deps += [ "${chip_root}/third_party/openthread:openthread_cli" ]
+    }
 
     if (chip_mdns == "platform") {
       sources += [

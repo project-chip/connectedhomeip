@@ -38,17 +38,17 @@ namespace app {
 /// for every cluster maintaining such a context.
 struct ServerClusterContext
 {
-    DataModel::Provider * const provider                          = nullptr; /// underlying provider that the cluster operates in
-    PersistentStorageDelegate * const storage                     = nullptr; /// read/write persistent storage
-    AttributePersistenceProvider * const attributeStorage         = nullptr; /// read/write attribute data
-    DataModel::InteractionModelContext * const interactionContext = nullptr; /// outside-world communication
+    DataModel::Provider & provider;                  /// underlying provider that the cluster operates in
+    PersistentStorageDelegate & storage;             /// read/write persistent storage
+    AttributePersistenceProvider & attributeStorage; /// read/write attribute data
+    DataModel::InteractionModelContext & interactionContext;
 
     bool operator!=(const ServerClusterContext & other) const
     {
-        return (provider != other.provider)                 //
-            || (storage != other.storage)                   //
-            || (attributeStorage != other.attributeStorage) //
-            || (interactionContext != other.interactionContext);
+        return (&provider != &other.provider)                 //
+            || (&storage != &other.storage)                   //
+            || (&attributeStorage != &other.attributeStorage) //
+            || (&interactionContext != &other.interactionContext);
     }
 };
 

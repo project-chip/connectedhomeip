@@ -17,10 +17,9 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/ReadOnlyBuffer.h>
-
-#include <initializer_list>
 
 namespace chip {
 namespace app {
@@ -38,6 +37,16 @@ class AttributeListBuilder
 public:
     AttributeListBuilder(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) : mBuilder(builder) {}
 
+    /// Constructs a list of cluster attributes, typically for responding to a
+    /// `ServerClusterInterface::Attributes` call.
+    ///
+    /// It allows for one call that will add to the buffer all of:
+    ///   - mandatoryAttributes (all of them)
+    ///   - optionalAttributes IF AND ONLY IF enabledOptionalAttributes is set for them
+    ///   - GlobalAttributes()  (all of them)
+    CHIP_ERROR Append(Span<const DataModel::AttributeEntry> mandatoryAttributes,
+                      Span<const DataModel::AttributeEntry> optionalAttributes, AttributeSet enabledOptionalAttributes);
+
     struct OptionalAttributeEntry
     {
         bool enabled;                               // Is this optional attribute enabled?
@@ -51,6 +60,9 @@ public:
     ///   - mandatoryAttributes
     ///   - optionalAttributes IF AND ONLY IF they are enabled
     ///   - all of `GlobalAttributes()`
+    ///
+    /// NOTE: initializing separate OptionalAttributeEntry often costs flash. Prefer using AttributeSet if possible
+    ///       (historically shown to consume less flash)
     CHIP_ERROR Append(Span<const DataModel::AttributeEntry> mandatoryAttributes,
                       Span<const OptionalAttributeEntry> optionalAttributes);
 

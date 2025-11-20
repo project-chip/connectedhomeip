@@ -56,6 +56,17 @@ public:
 
     void SetForceError(bool value) { forceError = value; }
 
+    CHIP_ERROR GetOtaTlvEncryptionKeyId(uint32_t & value) override
+    {
+        value = 0;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR DecryptUsingOtaTlvEncryptionKey(MutableByteSpan & block, uint32_t & ivOffset) override
+    {
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+
 private:
     uint8_t mEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0 };
     bool forceError                                                = false;

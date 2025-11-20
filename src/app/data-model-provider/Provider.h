@@ -43,19 +43,11 @@ namespace DataModel {
 class Provider : public ProviderMetadataTree
 {
 public:
-    virtual ~Provider() = default;
+    ~Provider() override = default;
 
-    // `context` pointers  will be guaranteed valid until Shutdown is called()
-    virtual CHIP_ERROR Startup(InteractionModelContext context)
-    {
-        mContext = context;
-        return CHIP_NO_ERROR;
-    }
-    virtual CHIP_ERROR Shutdown() = 0;
-
-    // During the transition phase, we expect a large subset of code to require access to
-    // event emitting, path marking and other operations
-    [[nodiscard]] const InteractionModelContext & CurrentContext() const { return mContext; }
+    // `context` references  will be guaranteed valid until Shutdown is called()
+    virtual CHIP_ERROR Startup(InteractionModelContext context) { return CHIP_NO_ERROR; }
+    virtual CHIP_ERROR Shutdown() { return CHIP_NO_ERROR; }
 
     /// NOTE: this code is NOT required to handle `List` global attributes:
     ///       AcceptedCommandsList, GeneratedCommandsList OR AttributeList
@@ -93,7 +85,8 @@ public:
     ///   2) This function will only be called at the beginning and end of a series of consecutive attribute data
     ///   blocks for the same attribute, no matter what list operations those data blocks represent.
     ///   3) The opType argument indicates the type of notification (Start, Failure, Success).
-    virtual void ListAttributeWriteNotification(const ConcreteAttributePath & aPath, ListWriteOperation opType) = 0;
+    virtual void ListAttributeWriteNotification(const ConcreteAttributePath & aPath, ListWriteOperation opType,
+                                                FabricIndex accessingFabric) = 0;
 
     /// `handler` is used to send back the reply.
     ///    - returning `std::nullopt` means that return value was placed in handler directly.
@@ -123,9 +116,6 @@ public:
     ///     convenience to make writing Invoke calls easier.
     virtual std::optional<ActionReturnStatus> InvokeCommand(const InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
                                                             CommandHandler * handler) = 0;
-
-protected:
-    InteractionModelContext mContext = {};
 };
 
 } // namespace DataModel

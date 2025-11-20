@@ -43,12 +43,13 @@
 """Define Matter test case TC_SEPR_2_3."""
 
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.exceptions import ChipStackError
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
 from TC_SEPRTestBase import CommodityPriceTestBaseHelper
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.exceptions import ChipStackError
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 
 cluster = Clusters.CommodityPrice
 
@@ -147,7 +148,7 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
         self.step("1a")
         if tcp_support:
             try:
-                device = await self.default_controller.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000,
+                device = await self.default_controller.GetConnectedDevice(nodeId=self.dut_node_id, allowPASE=False, timeoutMs=1000,
                                                                           payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
             except (TimeoutError, ChipStackError):
                 asserts.fail("Unable to establish a CASE session over TCP to the device. Does the device support TCP?")

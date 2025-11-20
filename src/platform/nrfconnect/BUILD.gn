@@ -47,6 +47,8 @@ static_library("nrfconnect") {
     "DiagnosticDataProviderImplNrf.cpp",
     "DiagnosticDataProviderImplNrf.h",
     "ExternalFlashManager.h",
+    "FactoryResetTestEventTriggerHandler.cpp",
+    "FactoryResetTestEventTriggerHandler.h",
     "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.h",
     "PlatformManagerImpl.h",
@@ -64,6 +66,7 @@ static_library("nrfconnect") {
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
   deps = [
     "${chip_root}/src/app:app_config",
+    "${chip_root}/src/app:test-event-trigger",
     "${chip_root}/src/app/common:ids",
     "${chip_root}/src/platform/logging:headers",
   ]
@@ -135,6 +138,10 @@ static_library("nrfconnect") {
 
   if (chip_malloc_sys_heap) {
     sources += [ "../Zephyr/SysHeapMalloc.cpp" ]
+  }
+
+  if (chip_use_cracen_kmu) {
+    sources += [ "KMUKeyAllocator.h" ]
   }
 
   cflags = [ "-Wconversion" ]

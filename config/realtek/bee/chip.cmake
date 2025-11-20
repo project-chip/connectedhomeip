@@ -35,6 +35,15 @@ if (matter_enable_factory_data)
 list(APPEND CHIP_CFLAGS -DCONFIG_FACTORY_DATA=1)
 endif (matter_enable_factory_data)
 
+
+if (matter_dac_key_encryption)
+list(APPEND CHIP_CFLAGS -DCONFIG_DAC_KEY_ENC=1)
+endif (matter_dac_key_encryption)
+
+if (matter_enable_dlps)
+list(APPEND CHIP_CFLAGS -DDLPS_EN=1)
+endif (matter_enable_dlps)
+
 list(
     APPEND CHIP_CXXFLAGS
 
@@ -63,7 +72,7 @@ list(
     ${CHIP_ROOT}/src
     ${CHIP_ROOT}/src/system
     ${CHIP_ROOT}/src/app
-    ${CHIP_ROOT}/src/platform/realtek/BEE
+    ${CHIP_ROOT}/src/platform/realtek/freertos
     ${CHIP_ROOT}/src/platform/OpenThread
     ${CHIP_ROOT}/third_party/nlassert/repo/include
     ${CHIP_ROOT}/third_party/nlio/repo/include
@@ -135,7 +144,7 @@ if (matter_enable_rpc)
 string(APPEND CHIP_GN_ARGS "chip_build_pw_rpc_lib = true\n")
 string(APPEND CHIP_GN_ARGS "pw_log_BACKEND = \"//third_party/pigweed/repo/pw_log_basic\"\n")
 string(APPEND CHIP_GN_ARGS "pw_assert_BACKEND = \"//third_party/pigweed/repo/pw_assert_log:check_backend\"\n")
-string(APPEND CHIP_GN_ARGS "pw_sys_io_BACKEND = \"//examples/platform/realtek/bee/pw_sys_io:pw_sys_io_bee\"\n")
+string(APPEND CHIP_GN_ARGS "pw_sys_io_BACKEND = \"//examples/platform/realtek/pw_sys_io:pw_sys_io_bee\"\n")
 string(APPEND CHIP_GN_ARGS "dir_pw_third_party_nanopb = \"//third_party/nanopb/repo\"\n")
 string(APPEND CHIP_GN_ARGS "pw_build_LINK_DEPS = [\"//third_party/pigweed/repo/pw_assert:impl\", \"//third_party/pigweed/repo/pw_log:impl\"]\n")
 string(APPEND CHIP_GN_ARGS "pw_rpc_CONFIG = \"//third_party/pigweed/repo/pw_rpc:disable_global_mutex\"")
@@ -144,7 +153,7 @@ endif (matter_enable_rpc)
 if(matter_enable_ftd)
 string(APPEND CHIP_GN_ARGS "chip_openthread_ftd = true\n")
 string(APPEND CHIP_GN_ARGS "chip_enable_icd_server = false\n")
-endif()
+endif(matter_enable_ftd)
 
 if(matter_enable_mtd)
 string(APPEND CHIP_GN_ARGS "chip_openthread_ftd = false\n")
@@ -152,8 +161,8 @@ if(matter_enable_med)
 string(APPEND CHIP_GN_ARGS "chip_enable_icd_server = false\n")
 else()
 string(APPEND CHIP_GN_ARGS "chip_enable_icd_server = true\n")
-endif()
-endif()
+endif(matter_enable_med)
+endif(matter_enable_mtd)
 
 # Build Matter Shell
 if (matter_enable_shell)
@@ -173,6 +182,10 @@ else (matter_enable_rotating_id)
     string(APPEND CHIP_GN_ARGS "chip_enable_additional_data_advertising = false\n")
     string(APPEND CHIP_GN_ARGS "chip_enable_rotating_device_id = false\n")
 endif (matter_enable_rotating_id)
+
+if (matter_enable_cg_secure_dac_vendor)
+    string(APPEND CHIP_GN_ARGS "chip_use_cg_secure_dac_vendor = true\n")
+endif(matter_enable_cg_secure_dac_vendor)
 
 file(GENERATE OUTPUT ${CHIP_OUTPUT}/args.gn CONTENT ${CHIP_GN_ARGS})
 

@@ -19,10 +19,11 @@ import logging
 import typing
 from datetime import datetime, timedelta, timezone
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.interaction_model import InteractionModelError, Status
 
 logger = logging.getLogger(__name__)
 
@@ -85,7 +86,12 @@ class EEVSEBaseTestHelper:
                     endpoint=endpoint,
                     timedRequestTimeoutMs=timedRequestTimeoutMs)
 
+            # If the command was expected to fail but it succeeded, check it wasn't meant to fail
+            asserts.assert_equal(expected_status, Status.Success,
+                                 f"Unexpected Success returned when expected {expected_status}")
+
         except InteractionModelError as e:
+            # The command failed, which might be what we expected, check if it is the expected error
             asserts.assert_equal(e.status, expected_status,
                                  "Unexpected error returned")
 
@@ -105,7 +111,12 @@ class EEVSEBaseTestHelper:
                     endpoint=endpoint,
                     timedRequestTimeoutMs=timedRequestTimeoutMs)
 
+            # If the command was expected to fail but it succeeded, check it wasn't meant to fail
+            asserts.assert_equal(expected_status, Status.Success,
+                                 f"Unexpected Success returned when expected {expected_status}")
+
         except InteractionModelError as e:
+            # The command failed, which might be what we expected, check if it is the expected error
             asserts.assert_equal(e.status, expected_status,
                                  "Unexpected error returned")
 
@@ -115,7 +126,12 @@ class EEVSEBaseTestHelper:
                                        endpoint=endpoint,
                                        timedRequestTimeoutMs=timedRequestTimeoutMs)
 
+            # If the command was expected to fail but it succeeded, check it wasn't meant to fail
+            asserts.assert_equal(expected_status, Status.Success,
+                                 f"Unexpected Success returned when expected {expected_status}")
+
         except InteractionModelError as e:
+            # The command failed, which might be what we expected, check if it is the expected error
             asserts.assert_equal(e.status, expected_status,
                                  "Unexpected error returned")
 
@@ -126,7 +142,12 @@ class EEVSEBaseTestHelper:
                                        endpoint=endpoint,
                                        timedRequestTimeoutMs=timedRequestTimeoutMs)
 
+            # If the command was expected to fail but it succeeded, check it wasn't meant to fail
+            asserts.assert_equal(expected_status, Status.Success,
+                                 f"Unexpected Success returned when expected {expected_status}")
+
         except InteractionModelError as e:
+            # The command failed, which might be what we expected, check if it is the expected error
             asserts.assert_equal(e.status, expected_status,
                                  "Unexpected error returned")
 
@@ -137,7 +158,12 @@ class EEVSEBaseTestHelper:
                                        endpoint=endpoint,
                                        timedRequestTimeoutMs=timedRequestTimeoutMs)
 
+            # If the command was expected to fail but it succeeded, check it wasn't meant to fail
+            asserts.assert_equal(expected_status, Status.Success,
+                                 f"Unexpected Success returned when expected {expected_status}")
+
         except InteractionModelError as e:
+            # The command failed, which might be what we expected, check if it is the expected error
             asserts.assert_equal(e.status, expected_status,
                                  "Unexpected error returned")
 
@@ -148,7 +174,12 @@ class EEVSEBaseTestHelper:
                                                           endpoint=endpoint,
                                                           timedRequestTimeoutMs=timedRequestTimeoutMs)
 
+            # If the command was expected to fail but it succeeded, check it wasn't meant to fail
+            asserts.assert_equal(expected_status, Status.Success,
+                                 f"Unexpected Success returned when expected {expected_status}")
+
         except InteractionModelError as e:
+            # The command failed, which might be what we expected, check if it is the expected error
             asserts.assert_equal(e.status, expected_status,
                                  "Unexpected error returned")
 
@@ -164,7 +195,12 @@ class EEVSEBaseTestHelper:
                                        endpoint=endpoint,
                                        timedRequestTimeoutMs=timedRequestTimeoutMs)
 
+            # If the command was expected to fail but it succeeded, check it wasn't meant to fail
+            asserts.assert_equal(expected_status, Status.Success,
+                                 f"Unexpected Success returned when expected {expected_status}")
+
         except InteractionModelError as e:
+            # The command failed, which might be what we expected, check if it is the expected error
             asserts.assert_equal(e.status, expected_status,
                                  "Unexpected error returned")
 
@@ -297,7 +333,7 @@ class EEVSEBaseTestHelper:
 
         logger.info(
             f"minutesPastMidnight = {minutes_past_midnight} => "
-            f"{int(minutes_past_midnight/60)}:{int(minutes_past_midnight%60)}"
+            f"{int(minutes_past_midnight/60)}:{int(minutes_past_midnight % 60)}"
             f" Expected target_time = {target_time}")
 
         # Matter Epoch is 1st Jan 2000

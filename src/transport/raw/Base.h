@@ -40,7 +40,7 @@ namespace Transport {
 struct MessageTransportContext
 {
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    ActiveTCPConnectionState * conn = nullptr;
+    ActiveTCPConnectionHandle conn;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 };
 
@@ -52,9 +52,9 @@ public:
                                        MessageTransportContext * ctxt = nullptr) = 0;
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    virtual void HandleConnectionReceived(ActiveTCPConnectionState * conn){};
-    virtual void HandleConnectionAttemptComplete(ActiveTCPConnectionState * conn, CHIP_ERROR conErr){};
-    virtual void HandleConnectionClosed(ActiveTCPConnectionState * conn, CHIP_ERROR conErr){};
+    virtual void HandleConnectionReceived(ActiveTCPConnectionState & conn){};
+    virtual void HandleConnectionAttemptComplete(ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr){};
+    virtual void HandleConnectionClosed(ActiveTCPConnectionState & conn, CHIP_ERROR conErr){};
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 };
 
@@ -100,20 +100,10 @@ public:
      * Connect to the specified peer.
      */
     virtual CHIP_ERROR TCPConnect(const PeerAddress & address, Transport::AppTCPConnectionCallbackCtxt * appState,
-                                  Transport::ActiveTCPConnectionState ** peerConnState)
+                                  ActiveTCPConnectionHandle & peerConnState)
     {
         return CHIP_NO_ERROR;
     }
-
-    /**
-     * Handle disconnection from the specified peer if currently connected to it.
-     */
-    virtual void TCPDisconnect(const PeerAddress & address) {}
-
-    /**
-     * Disconnect on the active connection that is passed in.
-     */
-    virtual void TCPDisconnect(Transport::ActiveTCPConnectionState * conn, bool shouldAbort = 0) {}
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     /**
@@ -139,17 +129,17 @@ protected:
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     // Handle an incoming connection request from a peer.
-    void HandleConnectionReceived(ActiveTCPConnectionState * conn) { mDelegate->HandleConnectionReceived(conn); }
+    void HandleConnectionReceived(ActiveTCPConnectionState & conn) { mDelegate->HandleConnectionReceived(conn); }
 
     // Callback during connection establishment to notify of success or any
     // error.
-    void HandleConnectionAttemptComplete(ActiveTCPConnectionState * conn, CHIP_ERROR conErr)
+    void HandleConnectionAttemptComplete(ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr)
     {
         mDelegate->HandleConnectionAttemptComplete(conn, conErr);
     }
 
     // Callback to notify the higher layer of an unexpected connection closure.
-    void HandleConnectionClosed(ActiveTCPConnectionState * conn, CHIP_ERROR conErr)
+    void HandleConnectionClosed(ActiveTCPConnectionState & conn, CHIP_ERROR conErr)
     {
         mDelegate->HandleConnectionClosed(conn, conErr);
     }

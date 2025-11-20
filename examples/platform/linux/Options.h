@@ -58,6 +58,9 @@ struct LinuxDeviceOptions
     bool mWiFi                 = false;
     bool mThread               = false;
     bool cameraDeferredOffer   = false;
+    bool cameraTestVideosrc    = false;
+    bool cameraTestAudiosrc    = false;
+    bool cameraAudioPlayback   = false;
     chip::Optional<std::string> cameraVideoDevice;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     bool mWiFiPAF                = false;
@@ -109,7 +112,6 @@ struct LinuxDeviceOptions
     chip::Optional<std::string> vendorName;
     chip::Optional<std::string> productName;
     chip::Optional<std::string> hardwareVersionString;
-    chip::Optional<std::string> softwareVersionString;
     chip::Optional<std::string> serialNumber;
     static LinuxDeviceOptions & GetInstance();
 };

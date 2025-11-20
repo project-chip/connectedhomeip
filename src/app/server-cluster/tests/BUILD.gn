@@ -21,6 +21,7 @@ chip_test_suite("tests") {
   test_sources = [
     "TestAttributeListBuilder.cpp",
     "TestDefaultServerCluster.cpp",
+    "TestOptionalAttributeSet.cpp",
     "TestServerClusterInterfaceRegistry.cpp",
     "TestSingleEndpointServerClusterRegistry.cpp",
   ]
@@ -29,6 +30,7 @@ chip_test_suite("tests") {
 
   public_deps = [
     "${chip_root}/src/app/common:ids",
+    "${chip_root}/src/app/common:metadata",
     "${chip_root}/src/app/data-model-provider/tests:encode-decode",
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/src/app/server-cluster:registry",

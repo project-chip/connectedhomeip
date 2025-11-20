@@ -35,10 +35,13 @@ config("includes") {
 executable("chip-energy-gateway-app") {
   sources = [
     "${chip_root}/examples/energy-gateway-app/commodity-metering/src/CommodityMeteringEventTriggers.cpp",
-    "${chip_root}/examples/energy-gateway-app/commodity-metering/src/CommodityMeteringInstance.cpp",
+    "${chip_root}/examples/energy-gateway-app/commodity-metering/src/CommodityMeteringMain.cpp",
     "${chip_root}/examples/energy-gateway-app/commodity-price/src/CommodityPriceDelegate.cpp",
     "${chip_root}/examples/energy-gateway-app/commodity-price/src/CommodityPriceEventTriggers.cpp",
     "${chip_root}/examples/energy-gateway-app/commodity-price/src/CommodityPriceMain.cpp",
+    "${chip_root}/examples/energy-gateway-app/commodity-tariff/src/CommodityTariffEventTriggers.cpp",
+    "${chip_root}/examples/energy-gateway-app/commodity-tariff/src/CommodityTariffInstance.cpp",
+    "${chip_root}/examples/energy-gateway-app/commodity-tariff/src/CommodityTariffMain.cpp",
     "${chip_root}/examples/energy-gateway-app/common/src/EnergyGatewayAppCommonMain.cpp",
     "${chip_root}/examples/energy-gateway-app/electrical-grid-conditions/src/ElectricalGridConditionsDelegate.cpp",
     "${chip_root}/examples/energy-gateway-app/electrical-grid-conditions/src/ElectricalGridConditionsEventTriggers.cpp",
@@ -59,6 +62,7 @@ executable("chip-energy-gateway-app") {
   if (chip_examples_enable_imgui_ui) {
     deps += [
       "${chip_root}/examples/common/imgui_ui",
+      "${chip_root}/examples/common/imgui_ui/windows:connectivity",
       "${chip_root}/examples/common/imgui_ui/windows:occupancy_sensing",
       "${chip_root}/examples/common/imgui_ui/windows:qrcode",
     ]
@@ -72,6 +76,7 @@ executable("chip-energy-gateway-app") {
     "${chip_root}/examples/energy-gateway-app/electrical-grid-conditions/include",
     "${chip_root}/examples/energy-gateway-app/meter-identification/include",
     "${chip_root}/examples/energy-gateway-app/commodity-metering/include",
+    "${chip_root}/examples/energy-gateway-app/commodity-tariff/include",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
   ]
 

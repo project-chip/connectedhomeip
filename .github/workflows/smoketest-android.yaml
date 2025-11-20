@@ -30,21 +30,18 @@ jobs:
     android:
         name: Smoke Run - Android
 
-        env:
-            JAVA_HOME: /usr/lib/jvm/java-11-openjdk-amd64/
-
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-android:153
+            image: ghcr.io/project-chip/chip-build-android:174
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:

@@ -19,12 +19,13 @@ import logging
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-import chip.clusters as Clusters
-from chip.clusters import Globals
-from chip.clusters.Types import NullValue
-from chip.testing import matter_asserts
-from chip.testing.timeoperations import utc_time_in_matter_epoch
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters import Globals
+from matter.clusters.Types import NullValue
+from matter.testing import matter_asserts
+from matter.testing.timeoperations import utc_time_in_matter_epoch
 
 logger = logging.getLogger(__name__)
 
@@ -69,7 +70,7 @@ class CommodityPriceTestBaseHelper:
                                    struct: Clusters.CommodityPrice.Structs.CommodityPriceStruct,
                                    details: Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap = 0,
                                    now_time_must_be_within_period: bool = True):
-        """now_time_must_be_within_period - When verifying a 'CurrentPrice' then 
+        """now_time_must_be_within_period - When verifying a 'CurrentPrice' then
            the CurrentPrice has a single period, and so 'now' time must be within
            the current period.
 

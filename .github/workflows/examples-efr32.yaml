@@ -41,12 +41,12 @@ jobs:
     if: github.actor != 'restyled-io[bot]'
 
     container:
-      image: ghcr.io/project-chip/chip-build-efr32:153
+      image: ghcr.io/project-chip/chip-build-efr32:174
       volumes:
         - "/tmp/bloat_reports:/tmp/bloat_reports"
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Checkout submodules & Bootstrap
         uses: ./.github/actions/checkout-submodules-and-bootstrap
         with:
@@ -126,7 +126,6 @@ jobs:
             "./scripts/build/build_examples.py \
                 --enable-flashbundle \
                 --target efr32-brd4187c-lock-wifi-siwx917 \
-                --target efr32-brd4187c-light-wifi-rs9116 \
                 --target efr32-brd4187c-lock-wifi-wf200 \
                 build \
                 --copy-artifacts-to out/artifacts \

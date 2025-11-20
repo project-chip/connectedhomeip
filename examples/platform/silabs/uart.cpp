@@ -144,21 +144,16 @@ typedef struct
     uint16_t MaxSize;
 } Fifo_t;
 
-// uart transmit
-#if SILABS_LOG_OUT_UART
+#if SLI_SI91X_MCU_INTERFACE
 #define UART_MAX_QUEUE_SIZE 125
 #else
-#if (_SILICON_LABS_32B_SERIES < 3)
-#define UART_MAX_QUEUE_SIZE 25
-#else
-#define UART_MAX_QUEUE_SIZE 50
-#endif
+#define UART_MAX_QUEUE_SIZE 10
 #endif
 
 #ifdef CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE
-#define UART_TX_MAX_BUF_LEN (CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE + 2) // \r\n
+#define UART_TX_MAX_BUF_LEN (CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE)
 #else
-#define UART_TX_MAX_BUF_LEN (258)
+#error "CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE is not defined. Please define it in your project configuration."
 #endif
 
 static constexpr uint32_t kUartTxCompleteFlag = 1;
@@ -172,12 +167,16 @@ constexpr osThreadAttr_t kUartTaskAttr = { .name       = "UART",
                                            .cb_size    = osThreadCbSize,
                                            .stack_mem  = uartStack,
                                            .stack_size = kUartTaskSize,
-                                           .priority   = osPriorityBelowNormal };
+                                           .priority   = osPriorityRealtime6 }; // Must be above Matter Task priority
+
+uint32_t sMissedLogCount = 0; // Count of logs that were not sent to the UART due to queue full
 
 typedef struct
 {
     uint8_t data[UART_TX_MAX_BUF_LEN];
     uint16_t length = 0;
+    bool isLog      = false; // True if this is a log message, false if it is a command line message
+
 } UartTxStruct_t;
 
 static osMessageQueueId_t sUartTxQueue;
@@ -471,20 +470,25 @@ int16_t uartConsoleWrite(const char * Buf, uint16_t BufLength)
  */
 int16_t uartLogWrite(const char * log, uint16_t length)
 {
-    if (log == NULL || length < 1 || (length + 2) > UART_TX_MAX_BUF_LEN)
+    if (log == NULL || length < 1 || length > UART_TX_MAX_BUF_LEN)
     {
         return UART_CONSOLE_ERR;
     }
 
     UartTxStruct_t workBuffer;
+
     memcpy(workBuffer.data, log, length);
-    memcpy(workBuffer.data + length, "\r\n", 2);
-    workBuffer.length = length + 2;
+    workBuffer.length = length;
+    workBuffer.isLog  = true; // This is a log message
 
     // Don't wait when queue is full. Drop the log and return UART_CONSOLE_ERR
     if (osMessageQueuePut(sUartTxQueue, &workBuffer, osPriorityNormal, 0) == osOK)
     {
         return length;
+    }
+    else
+    {
+        sMissedLogCount++;
     }
 
     return UART_CONSOLE_ERR;
@@ -525,13 +529,29 @@ int16_t uartConsoleRead(char * Buf, uint16_t NbBytesToRead)
 void uartMainLoop(void * args)
 {
     UartTxStruct_t workBuffer;
+    bool isLog = false;
 
     while (1)
     {
         osStatus_t eventReceived = osMessageQueueGet(sUartTxQueue, &workBuffer, nullptr, osWaitForever);
         while (eventReceived == osOK)
         {
+            isLog = workBuffer.isLog; // Check if this is a log message
             uartSendBytes(workBuffer);
+            if (isLog)
+            {
+                memcpy(workBuffer.data, "\r\n", 2);
+                workBuffer.length = 2; // Reset length to 2 for the log end
+                uartSendBytes(workBuffer);
+            }
+            if (sMissedLogCount)
+            {
+                // If there are missed logs, log the count
+
+                workBuffer.length = sprintf(reinterpret_cast<char *>(workBuffer.data), "\r\nMissed Logs: %lu\r\n", sMissedLogCount);
+                sMissedLogCount   = 0; // Reset the count after logging
+                uartSendBytes(workBuffer);
+            }
             eventReceived = osMessageQueueGet(sUartTxQueue, &workBuffer, nullptr, 0);
         }
     }

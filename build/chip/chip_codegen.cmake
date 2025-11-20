@@ -33,12 +33,15 @@ function(chip_codegen TARGET_NAME)
 
     set(CHIP_CODEGEN_PREGEN_DIR "" CACHE PATH "Pre-generated directory to use instead of compile-time code generation.")
 
+    # Python is required for code generation
+    find_package(Python3 REQUIRED)
+
     # Output paths can contain placeholders such as
     # {{defined_cluster_name}} or {{server_cluster_name}}
     #
     # This translates them to the actually fully expanded path.
     execute_process(
-            COMMAND "${CHIP_ROOT}/scripts/codegen_paths.py" "--idl" "${ARG_INPUT}" ${ARG_OUTPUTS}
+            COMMAND "${Python3_EXECUTABLE}" -X utf8 "${CHIP_ROOT}/scripts/codegen_paths.py" "--idl" "${ARG_INPUT}" ${ARG_OUTPUTS}
             OUTPUT_VARIABLE GENERATED_PATHS_OUT
     )
     string(REPLACE "\n" ";" GENERATED_PATHS "${GENERATED_PATHS_OUT}")
@@ -60,12 +63,9 @@ function(chip_codegen TARGET_NAME)
             list(APPEND OUT_NAMES "${GEN_FOLDER}/${NAME}")
         endforeach()
 
-        # Python is expected to be in the path
-        # Forcing a call to find find_package here as ${Python3_EXECUTABLE} would be used
-        find_package(Python3 REQUIRED)
         add_custom_command(
             OUTPUT ${OUT_NAMES}
-            COMMAND "${Python3_EXECUTABLE}" "${CHIP_ROOT}/scripts/codegen.py"
+            COMMAND "${Python3_EXECUTABLE}" -X utf8 "${CHIP_ROOT}/scripts/codegen.py"
             ARGS "--generator" "${ARG_GENERATOR}"
                  "--output-dir" "${GEN_FOLDER}"
                  "--expected-outputs" "${GEN_FOLDER}/expected.outputs"
@@ -123,6 +123,7 @@ endfunction()
 #            "zap-generated/IMClusterCommandHandler.cpp"
 #     OUTPUT_PATH  DIR_NAME_VAR
 #     OUTPUT_FILES  FILE_NAMES_VAR
+#     ZCL_PATH     "path/to/custom/zcl.json" # Optional: override default ZCL path
 #   )
 #
 # Arguments:
@@ -135,11 +136,20 @@ endfunction()
 #
 #   OUTPUT_FILES - [OUT] output variable will contain the path of generated files.
 #                  suitable to be added within a build target
+#   ZCL_PATH     - [OPTIONAL] Path to a custom ZCL JSON file.
+#                  This maps to the '--zcl' argument in the "scripts/tools/zap/generate.py" script.
+#                  By default, generate.py attempts to autodetect the ZCL path from the .zap 
+#                  file which is often a relative path. When the .zap file is relocated or symlinked,
+#                  these relative paths become invalid, causing the build to fail.
+#                  Passing ZCL_PATH explicitly via CMake ensures the build remains robust and portable.
+#                  If ZCL_PATH is not provided, the default behavior is preserved unless CHIP_ENABLE_ZCL_ARG
+#                  is enabled, in which case the default path "src/app/zap-templates/zcl/zcl.json" is
+#                  automatically injected to simplify usage.
 #
 function(chip_zapgen TARGET_NAME)
     cmake_parse_arguments(ARG
          ""
-         "INPUT;GENERATOR;OUTPUT_PATH;OUTPUT_FILES"
+         "INPUT;GENERATOR;OUTPUT_PATH;OUTPUT_FILES;ZCL_PATH"
          "OUTPUTS"
          ${ARGN}
     )
@@ -180,6 +190,25 @@ function(chip_zapgen TARGET_NAME)
             message(SEND_ERROR "Unsupported zap generator: ${ARG_GENERATOR}")
         endif()
 
+        set(ZAPGEN_ARGS
+            "--no-prettify-output"
+            "--templates" "${TEMPLATE_PATH}"
+            "--output-dir" "${GEN_FOLDER}/${OUTPUT_SUBDIR}"
+            "--lock-file" "${CMAKE_BINARY_DIR}/zap_gen.lock"
+            "--parallel"
+            "${ARG_INPUT}"
+        )
+
+        # Optional ZCL path for zapgen:
+        # - If ZCL_PATH is passed, use it.
+        # - If CHIP_ENABLE_ZCL_ARG is ON, use default path.
+        # - Otherwise, skip --zcl to preserve default behavior.
+        if(ARG_ZCL_PATH)
+            list(APPEND ZAPGEN_ARGS "--zcl" "${ARG_ZCL_PATH}")
+        elseif(CHIP_ENABLE_ZCL_ARG)
+            list(APPEND ZAPGEN_ARGS "--zcl" "${CHIP_ROOT}/src/app/zap-templates/zcl/zcl.json")
+        endif()
+
         # Python is expected to be in the path
         # Forcing a call to find find_package here as ${Python3_EXECUTABLE} would be used
         find_package(Python3 REQUIRED)
@@ -190,14 +219,8 @@ function(chip_zapgen TARGET_NAME)
         #    Error: EEXIST: file already exists, mkdir '/var/folders/24/8k48jl6d249_n_qfxwsl6xvm0000gn/T/pkg/465fcc8a6282e28dc7a166859d5814d34e2fb94249a72fa9229033b5b32dff1a'
         add_custom_command(
             OUTPUT ${OUT_NAMES}
-            COMMAND "${Python3_EXECUTABLE}" "${CHIP_ROOT}/scripts/tools/zap/generate.py"
-            ARGS
-                "--no-prettify-output"
-                "--templates" "${TEMPLATE_PATH}"
-                "--output-dir" "${GEN_FOLDER}/${OUTPUT_SUBDIR}"
-                "--lock-file" "${CMAKE_BINARY_DIR}/zap_gen.lock"
-                "--parallel"
-                "${ARG_INPUT}"
+            COMMAND "${Python3_EXECUTABLE}" -X utf8 "${CHIP_ROOT}/scripts/tools/zap/generate.py"
+            ARGS ${ZAPGEN_ARGS}
             DEPENDS
                 "${ARG_INPUT}"
                 ${EXTRA_DEPENDENCIES}

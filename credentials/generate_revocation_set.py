@@ -46,7 +46,7 @@ from cryptography.x509.oid import NameOID
 __LOG_LEVELS__ = {
     'debug': logging.DEBUG,
     'info': logging.INFO,
-    'warn': logging.WARN,
+    'warn': logging.WARNING,
     'fatal': logging.FATAL,
 }
 
@@ -864,7 +864,7 @@ def cli():
 @optgroup.option('--use-test-net-dcld', type=str, default='', metavar='PATH', help="Location of `dcld` binary, to use `dcld` for mirroring TestNet.")
 @optgroup.option('--use-main-net-http', is_flag=True, type=str, help="Use RESTful API with HTTPS against public MainNet observer.")
 @optgroup.option('--use-test-net-http', is_flag=True, type=str, help="Use RESTful API with HTTPS against public TestNet observer.")
-@optgroup.option('--use-local-data', is_flag=True, type=bool, help="Fake response directory: see \" DATA_DIR/",)
+@optgroup.option('--use-local-data', is_flag=True, type=bool, help="Fake response directory: see \" DATA_DIR/")
 @optgroup.group('Required arguments if use-local-data is used', cls=AllOptionGroup)
 @optgroup.option('--certificates', type=click.File('rb'), multiple=True, help='Paths to PEM formated certificates (i.e. PAA) in DCL but missing from the revocation-points-response file.')
 @optgroup.option('--crls', type=click.File('rb'), multiple=True, help='Paths to the crl der files')

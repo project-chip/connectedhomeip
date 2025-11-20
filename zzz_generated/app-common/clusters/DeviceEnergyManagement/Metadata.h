@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace DeviceEnergyManagement {
 inline constexpr uint32_t kRevision = 4;
 
 namespace Attributes {
+
 namespace ESAType {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ESAType::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -52,10 +54,16 @@ namespace OptOutState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(OptOutState::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace OptOutState
+constexpr std::array<DataModel::AttributeEntry, 5> kMandatoryMetadata = {
+    ESAType::kMetadataEntry,     ESACanGenerate::kMetadataEntry, ESAState::kMetadataEntry,
+    AbsMinPower::kMetadataEntry, AbsMaxPower::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace PowerAdjustRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(PowerAdjustRequest::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace GeneralDiagnostics {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+
 namespace NetworkInterfaces {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(NetworkInterfaces::Id,
@@ -64,10 +66,17 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(TestEventTriggersEnabl
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
                                                           std::nullopt);
 } // namespace TestEventTriggersEnabled
+constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
+    NetworkInterfaces::kMetadataEntry,
+    RebootCount::kMetadataEntry,
+    TestEventTriggersEnabled::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace TestEventTrigger {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(TestEventTrigger::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kManage);

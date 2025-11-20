@@ -276,7 +276,7 @@ CHIP_ERROR QRCodeSetupPayloadParser::populateTLV(SetupPayload & outPayload, cons
     for (size_t i = 0; i < tlvBytesLength; i++)
     {
         uint64_t dest;
-        readBits(buf, index, dest, 8);
+        TEMPORARY_RETURN_IGNORED readBits(buf, index, dest, 8);
         tlvArray[i] = static_cast<uint8_t>(dest);
     }
 
@@ -381,8 +381,6 @@ CHIP_ERROR QRCodeSetupPayloadParser::populatePayloadFromBase38Data(std::string p
 
 CHIP_ERROR QRCodeSetupPayloadParser::populatePayloads(std::vector<SetupPayload> & outPayloads) const
 {
-    constexpr char kPayloadDelimiter = '*';
-
     std::string payload = ExtractPayload(mBase38Representation);
     VerifyOrReturnError(payload.length() != 0, CHIP_ERROR_INVALID_ARGUMENT);
 

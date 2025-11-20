@@ -36,22 +36,23 @@
 # === END CI TEST ARGUMENTS ===
 #
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_WEBRTCPTestBase import WEBRTCPTestBase
 
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.clusters.Types import NullValue
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
-class TC_WebRTCProvider_2_2(MatterBaseTest, WEBRTCPTestBase):
 
-    def desc_TC_WebRTCProvider_2_2(self) -> str:
+class TC_WebRTCP_2_2(MatterBaseTest, WEBRTCPTestBase):
+
+    def desc_TC_WebRTCP_2_2(self) -> str:
         """Returns a description of this test"""
         return "[TC-{picsCode}-2.2] Validate immediate processing of SolicitOffer with {DUT_Server}"
 
-    def steps_TC_WebRTCProvider_2_2(self) -> list[TestStep]:
+    def steps_TC_WebRTCP_2_2(self) -> list[TestStep]:
         """
         Define the step-by-step sequence for the test.
         """
@@ -66,8 +67,24 @@ class TC_WebRTCProvider_2_2(MatterBaseTest, WEBRTCPTestBase):
         ]
         return steps
 
+    def pics_TC_WebRTCP_2_2(self) -> list[str]:
+        """
+        Return the list of PICS applicable to this test case.
+        """
+        pics = [
+            "WEBRTCP.S",           # WebRTC Transport Provider Server
+            "WEBRTCP.S.A0000",     # CurrentSessions attribute
+            "WEBRTCP.S.C00.Rsp",   # SolicitOffer command
+            "WEBRTCP.S.C01.Tx",    # SolicitOfferResponse command
+            "WEBRTCP.S.C06.Rsp",   # EndSession command
+            "AVSM.S",              # CameraAVStreamManagement Server
+            "AVSM.S.F00",          # Audio Data Output feature
+            "AVSM.S.F01",          # Video Data Output feature
+        ]
+        return pics
+
     @async_test_body
-    async def test_TC_WebRTCProvider_2_2(self):
+    async def test_TC_WebRTCP_2_2(self):
         """
         Executes the test steps for the WebRTC Provider cluster scenario.
         """
@@ -107,7 +124,6 @@ class TC_WebRTCProvider_2_2(MatterBaseTest, WEBRTCPTestBase):
         resp = await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
         asserts.assert_equal(type(resp), Clusters.WebRTCTransportProvider.Commands.SolicitOfferResponse,
                              "Incorrect response type")
-        asserts.assert_not_equal(resp.webRTCSessionID, 0, "webrtcSessionID in SolicitOfferResponse should not be 0.")
         asserts.assert_false(resp.deferredOffer, "Expected 'deferredOffer' to be False.")
 
         # TODO: Enable this check after integrating with Camera AvStreamManager

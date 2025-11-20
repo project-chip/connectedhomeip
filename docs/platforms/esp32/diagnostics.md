@@ -9,10 +9,36 @@ Enable the following configuration options to use the ESP32 Diagnostic Logs
 Provider:
 
 ```
-CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE=y
+CONFIG_ENABLE_ESP_DIAGNOSTICS=y
 ```
 
-This option enables the diagnostic logs storage functionality.
+This option enables the diagnostic logs storage functionality. By default, this
+setting enables both traces and metrics.
+
+If you want to enable only metrics or only traces, configure the following
+options accordingly:
+
+To enable only metrics:
+
+```
+CONFIG_ENABLE_ESP_DIAGNOSTIC_TRACES=n
+CONFIG_ENABLE_ESP_DIAGNOSTIC_METRICS=y
+```
+
+To enable only traces:
+
+```
+CONFIG_ENABLE_ESP_DIAGNOSTIC_TRACES=y
+CONFIG_ENABLE_ESP_DIAGNOSTIC_METRICS=n
+```
+
+After modifying the configuration options, make sure to perform a clean build to
+ensure the changes are applied correctly:
+
+```
+idf.py fullclean
+idf.py build
+```
 
 ## Implementation Reference
 
@@ -41,12 +67,12 @@ Add the diagnostic logs provider delegate header to your application:
 Define buffers to store and retrieve diagnostic data:
 
 ```cpp
-#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS
 static uint8_t retrievalBuffer[CONFIG_RETRIEVAL_BUFFER_SIZE]; // Buffer for retrieving diagnostics
 static uint8_t endUserBuffer[CONFIG_END_USER_BUFFER_SIZE];    // Buffer for storing diagnostics
 
 using namespace chip::app::Clusters::DiagnosticLogs;
-#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS
 ```
 
 The buffer sizes can be configured through Kconfig options:
@@ -54,21 +80,21 @@ The buffer sizes can be configured through Kconfig options:
 -   `CONFIG_RETRIEVAL_BUFFER_SIZE`: Size of the buffer used for retrieving
     diagnostic data inside the diagnostic-logs-provider-delegate.
 -   `CONFIG_END_USER_BUFFER_SIZE`: Size of the buffer used to store diagnostic
-    data in esp32_diagnostic_trace backend.
+    data in esp32_diagnostics backend.
 
 ### 3. Initialize the Log Provider
 
 Implement the diagnostic logs cluster initialization callback:
 
 ```cpp
-#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS
 void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
 {
     auto & logProvider = LogProvider::GetInstance();
     logProvider.Init(endUserBuffer, CONFIG_END_USER_BUFFER_SIZE, retrievalBuffer, CONFIG_RETRIEVAL_BUFFER_SIZE);
     DiagnosticLogsServer::Instance().SetDiagnosticLogsProviderDelegate(endpoint, &logProvider);
 }
-#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS
 ```
 
 This callback initializes the log provider with the configured buffers and sets
@@ -102,6 +128,6 @@ through diagnosticlogs cluster refer readme.md in app folder.
 ## Important Notes
 
 -   The diagnostic logs provider **must** be explicitly enabled through the
-    `CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE` option
+    `CONFIG_ENABLE_ESP_DIAGNOSTICS` option
 -   Buffer sizes should be adjusted based on your application's needs
 -   The provider supports end-user support logs and crash logs (when configured)

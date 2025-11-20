@@ -21,6 +21,7 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
+#include <platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_utils.h>
 #include <platform/nxp/crypto/se05x/CHIPCryptoPAL_se05x.h>
 
 /* Device attestation key ids */

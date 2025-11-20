@@ -90,6 +90,7 @@ ASR
 AssertionError
 AST
 ASYNC
+AsyncZeroconfServiceTypes
 ATL
 ATLs
 atomics
@@ -144,6 +145,7 @@ betaprogram
 BinaryInputBasic
 Binfmt
 bitbake
+bitrate
 bld
 BLE
 BleApplicationDelegate
@@ -271,6 +273,7 @@ cn
 COAP
 codeaurora
 codebase
+codec
 codegen
 CodeGenerator
 CodeLab
@@ -336,6 +339,7 @@ cstdint
 csu
 csv
 ctl
+CTS
 ctrl
 ctypes
 CurrentHue
@@ -853,6 +857,7 @@ localhost
 LocalizationConfiguration
 localstatedir
 LockingState
+lookups
 LogEvent
 loopback
 LowPower
@@ -905,6 +910,7 @@ mcumgr
 MCUs
 mcux
 MCUXpresso
+MCXW
 mdash
 MDNS
 MediaInput
@@ -965,6 +971,7 @@ Murata
 mutex
 mutexes
 mv
+mve
 MX
 mydir
 MyPASSWORD
@@ -1036,7 +1043,6 @@ OnOffSwitchConfiguration
 OnPlatformEvent
 onwards
 OO
-openiotsdk
 openjdk
 OpenOCD
 OpenSSL
@@ -1053,6 +1059,7 @@ optionOverride
 optionsMask
 optionsOverride
 orgs
+Orchestrator
 OSS
 OTA
 OTADownloader
@@ -1257,6 +1264,7 @@ RGB
 riscv
 rloc
 rmw
+rnd
 rodata
 Rollershade
 rootfs
@@ -1276,6 +1284,7 @@ rtd
 RTL
 rtld
 RTOS
+RTS
 RTT
 RTX
 runArgs
@@ -1407,6 +1416,7 @@ SubscribeResponse
 SubscriptionId
 substeps
 subtype
+subtypes
 sudo
 SulfateConcentrationMeasurement
 SulfurDioxideConcentrationMeasurement
@@ -1501,6 +1511,7 @@ TotalTrihalomethanesConcentrationMeasurement
 TPK
 trackAlloc
 trackFree
+transcoder
 TransferSession
 transitionTime
 TransportMgrBase
@@ -1602,6 +1613,7 @@ VSC
 VSCode
 WaitNewInputEvent
 WakeOnLan
+Walkthrough
 WantedBy
 watchdogTimeout
 watchOS
@@ -1685,6 +1697,7 @@ zclwrite
 ZephyrConfig
 zephyrproject
 zhengyaohan
+Zeroconf
 Zigbee
 zigbeealliance
 zigbeethread

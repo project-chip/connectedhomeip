@@ -67,13 +67,13 @@ public:
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                  AttributeValueDecoder & decoder) override;
 
-    void ListAttributeWriteNotification(const ConcreteAttributePath & aPath, DataModel::ListWriteOperation opType) override;
+    void ListAttributeWriteNotification(const ConcreteAttributePath & aPath, DataModel::ListWriteOperation opType,
+                                        FabricIndex accessingFabric) override;
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
     /// attribute tree iteration
     CHIP_ERROR Endpoints(ReadOnlyBufferBuilder<DataModel::EndpointEntry> & out) override;
-    CHIP_ERROR SemanticTags(EndpointId endpointId, ReadOnlyBufferBuilder<SemanticTag> & builder) override;
     CHIP_ERROR DeviceTypes(EndpointId endpointId, ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> & builder) override;
     CHIP_ERROR ClientClusters(EndpointId endpointId, ReadOnlyBufferBuilder<ClusterId> & builder) override;
     CHIP_ERROR ServerClusters(EndpointId endpointId, ReadOnlyBufferBuilder<DataModel::ServerClusterEntry> & builder) override;
@@ -95,6 +95,10 @@ protected:
     virtual void InitDataModelForTesting();
 
 private:
+    // Context is available after startup and cleared in shutdown.
+    // This has a value for as long as we assume the context is valid.
+    std::optional<DataModel::InteractionModelContext> mContext;
+
     // Iteration is often done in a tight loop going through all values.
     // To avoid N^2 iterations, cache a hint of where something is positioned
     uint16_t mEndpointIterationHint = 0;

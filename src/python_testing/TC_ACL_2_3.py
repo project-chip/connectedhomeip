@@ -34,11 +34,12 @@
 import logging
 import random
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.interaction_model import Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 # These below variables are used to test the AccessControl clusters Extension attribute and come from the test plan here:
 # https://github.com/CHIP-Specifications/chip-test-plans/blob/59e8c45b8e7c24d5ce130b166520ff4f7bd935b6/src/cluster/AccessControl.adoc#tc-acl-2-6-accesscontrolentrychanged-event:~:text=D_OK_EMPTY%3A%20%221718%22%20which%20is%20an%20octstr%20of%20length%202%20containing%20valid%20TLV%3A

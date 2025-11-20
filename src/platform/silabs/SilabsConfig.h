@@ -145,7 +145,6 @@ public:
     static constexpr Key kConfigKey_clientid               = SilabsConfigKey(kMatterFactory_KeyBase, 0x16);
     static constexpr Key kConfigKey_Test_Event_Trigger_Key = SilabsConfigKey(kMatterFactory_KeyBase, 0x17);
     static constexpr Key kConfigKey_HardwareVersion        = SilabsConfigKey(kMatterFactory_KeyBase, 0x18);
-    static constexpr Key kConfigKey_SoftwareVersionString  = SilabsConfigKey(kMatterFactory_KeyBase, 0x19);
     // kConfigKey_PersistentUniqueId is the inputkey in the generating of the Rotating Device ID
     // SHALL NOT be the same as the UniqueID attribute exposed in the Basic Information cluster.
     static constexpr Key kConfigKey_PersistentUniqueId = SilabsConfigKey(kMatterFactory_KeyBase, 0x1F);
@@ -188,6 +187,7 @@ public:
     static constexpr Key kConfigKey_OpKeyMap              = SilabsConfigKey(kMatterConfig_KeyBase, 0x20);
     static constexpr Key kConfigKey_BootCount             = SilabsConfigKey(kMatterConfig_KeyBase, 0x21);
     static constexpr Key kConfigKey_TotalOperationalHours = SilabsConfigKey(kMatterConfig_KeyBase, 0x22);
+    static constexpr Key kConfigKey_MatterUpdateReboot    = SilabsConfigKey(kMatterConfig_KeyBase, 0x23);
 
     static constexpr Key kConfigKey_GroupKeyMax =
         SilabsConfigKey(kMatterConfig_KeyBase, 0x1E); // Allows 16 Group Keys to be created.
@@ -206,7 +206,7 @@ public:
     static constexpr Key kMinConfigKey_MatterFactory = SilabsConfigKey(kMatterFactory_KeyBase, 0x00);
     static constexpr Key kMaxConfigKey_MatterFactory = SilabsConfigKey(kMatterFactory_KeyBase, 0x30);
     static constexpr Key kMinConfigKey_MatterConfig  = SilabsConfigKey(kMatterConfig_KeyBase, 0x00);
-    static constexpr Key kMaxConfigKey_MatterConfig  = SilabsConfigKey(kMatterConfig_KeyBase, 0x22);
+    static constexpr Key kMaxConfigKey_MatterConfig  = SilabsConfigKey(kMatterConfig_KeyBase, 0x23);
 
     // Allows 32 Counters to be created.
     static constexpr Key kMinConfigKey_MatterCounter = SilabsConfigKey(kMatterCounter_KeyBase, 0x00);

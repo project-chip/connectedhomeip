@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace OtaSoftwareUpdateRequestor {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace DefaultOTAProviders {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(DefaultOTAProviders::Id,
@@ -37,10 +39,18 @@ namespace UpdateStateProgress {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(UpdateStateProgress::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace UpdateStateProgress
+constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
+    DefaultOTAProviders::kMetadataEntry,
+    UpdatePossible::kMetadataEntry,
+    UpdateState::kMetadataEntry,
+    UpdateStateProgress::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace AnnounceOTAProvider {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AnnounceOTAProvider::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kAdminister);

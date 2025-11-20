@@ -38,11 +38,12 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.commissioning import ROOT_ENDPOINT_ID
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.commissioning import ROOT_ENDPOINT_ID
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_CGEN_2_9(MatterBaseTest):
@@ -74,7 +75,7 @@ class TC_CGEN_2_9(MatterBaseTest):
         for fabric in fabrics:
             logging.info(f"Removing fabric at fabricIndex {fabric.fabricIndex}")
             response: Clusters.OperationalCredentials.Commands.NOCResponse = await commissioner.SendCommand(
-                nodeid=self.dut_node_id,
+                nodeId=self.dut_node_id,
                 endpoint=ROOT_ENDPOINT_ID,
                 payload=Clusters.OperationalCredentials.Commands.RemoveFabric(fabric.fabricIndex),
             )
@@ -119,7 +120,7 @@ class TC_CGEN_2_9(MatterBaseTest):
         await self.commission_devices()
 
         response = await commissioner.SendCommand(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
             payload=Clusters.GeneralCommissioning.Commands.ArmFailSafe(
                 expiryLengthSeconds=failsafe_expiry_length_seconds, breadcrumb=1),
@@ -133,7 +134,7 @@ class TC_CGEN_2_9(MatterBaseTest):
         # Step 2: Send SetTCAcknowledgements
         self.step(2)
         response = await commissioner.SendCommand(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
             payload=Clusters.GeneralCommissioning.Commands.SetTCAcknowledgements(
                 TCVersion=tc_version_to_simulate, TCUserResponse=tc_user_response_to_simulate
@@ -154,7 +155,7 @@ class TC_CGEN_2_9(MatterBaseTest):
         # Step 4: Send CommissioningComplete
         self.step(4)
         response = await commissioner.SendCommand(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
             payload=Clusters.GeneralCommissioning.Commands.CommissioningComplete(),
         )
@@ -171,7 +172,7 @@ class TC_CGEN_2_9(MatterBaseTest):
         await self.remove_commissioner_fabric()
 
         # Close the commissioner session with the device to clean up resources
-        commissioner.MarkSessionDefunct(nodeid=self.dut_node_id)
+        commissioner.MarkSessionDefunct(nodeId=self.dut_node_id)
 
         # Step 6: Put device in commissioning mode (requiring user input, so skip in CI)
         self.step(6)
@@ -191,7 +192,7 @@ class TC_CGEN_2_9(MatterBaseTest):
         # Step 8: Verify CommissioningComplete fails
         self.step(8)
         response = await commissioner.SendCommand(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
             payload=Clusters.GeneralCommissioning.Commands.CommissioningComplete(),
         )

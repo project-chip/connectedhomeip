@@ -41,15 +41,15 @@ shared_library("ChipDeviceCtrl") {
   } else {
     output_name = "_ChipServer"
   }
-  output_dir = "${target_out_dir}/chip"
+  output_dir = "${target_out_dir}/matter"
   include_dirs = [ "." ]
 
   sources = [
-    "chip/setup_payload/Generator.cpp",
-    "chip/setup_payload/Parser.cpp",
+    "matter/setup_payload/Generator.cpp",
+    "matter/setup_payload/Parser.cpp",
   ]
 
-  sources += [ "chip/native/CommonStackInit.cpp" ]
+  sources += [ "matter/native/CommonStackInit.cpp" ]
 
   defines = []
 
@@ -65,67 +65,69 @@ shared_library("ChipDeviceCtrl") {
       "ChipDeviceController-ScriptPairingDeviceDiscoveryDelegate.h",
       "ChipDeviceController-StorageDelegate.cpp",
       "ChipDeviceController-StorageDelegate.h",
+      "JsonTlv.cpp",
       "OpCredsBinding.cpp",
-      "chip/bdx/bdx-transfer.cpp",
-      "chip/bdx/bdx-transfer.h",
-      "chip/bdx/bdx.cpp",
-      "chip/bdx/test-bdx-transfer-server.cpp",
-      "chip/bdx/test-bdx-transfer-server.h",
-      "chip/clusters/attribute.cpp",
-      "chip/clusters/command.cpp",
-      "chip/commissioning/PlaceholderOperationalCredentialsIssuer.h",
-      "chip/credentials/cert.cpp",
-      "chip/credentials/cert.h",
-      "chip/crypto/p256keypair.cpp",
-      "chip/crypto/p256keypair.h",
-      "chip/discovery/NodeResolution.cpp",
-      "chip/fault_injection/FaultInjection.cpp",
-      "chip/icd/PyChipCheckInDelegate.cpp",
-      "chip/icd/PyChipCheckInDelegate.h",
-      "chip/interaction_model/Delegate.cpp",
-      "chip/interaction_model/Delegate.h",
-      "chip/internal/ChipThreadWork.cpp",
-      "chip/internal/ChipThreadWork.h",
-      "chip/internal/CommissionerImpl.cpp",
-      "chip/logging/LoggingFilter.cpp",
-      "chip/logging/LoggingRedirect.cpp",
-      "chip/native/ChipMainLoopWork.h",
-      "chip/native/PyChipError.cpp",
-      "chip/native/PyChipError.h",
-      "chip/tracing/TracingSetup.cpp",
-      "chip/utils/DeviceProxyUtils.cpp",
+      "matter/bdx/bdx-transfer.cpp",
+      "matter/bdx/bdx-transfer.h",
+      "matter/bdx/bdx.cpp",
+      "matter/bdx/test-bdx-transfer-server.cpp",
+      "matter/bdx/test-bdx-transfer-server.h",
+      "matter/clusters/attribute.cpp",
+      "matter/clusters/command.cpp",
+      "matter/commissioning/PlaceholderOperationalCredentialsIssuer.h",
+      "matter/credentials/cert.cpp",
+      "matter/credentials/cert.h",
+      "matter/crypto/p256keypair.cpp",
+      "matter/crypto/p256keypair.h",
+      "matter/discovery/NodeResolution.cpp",
+      "matter/fault_injection/FaultInjection.cpp",
+      "matter/icd/PyChipCheckInDelegate.cpp",
+      "matter/icd/PyChipCheckInDelegate.h",
+      "matter/interaction_model/Delegate.cpp",
+      "matter/interaction_model/Delegate.h",
+      "matter/internal/ChipThreadWork.cpp",
+      "matter/internal/ChipThreadWork.h",
+      "matter/internal/CommissionerImpl.cpp",
+      "matter/logging/LoggingFilter.cpp",
+      "matter/logging/LoggingRedirect.cpp",
+      "matter/native/ChipMainLoopWork.h",
+      "matter/native/PyChipError.cpp",
+      "matter/native/PyChipError.h",
+      "matter/tracing/TracingSetup.cpp",
+      "matter/utils/DeviceProxyUtils.cpp",
     ]
     if (chip_support_webrtc_python_bindings) {
       sources += [
-        "chip/webrtc/RTCClient.cpp",
-        "chip/webrtc/WebRTC.cpp",
-        "chip/webrtc/WebRTC.h",
-        "chip/webrtc/WebRTCTransportCluster.cpp",
+        "matter/webrtc/RTCClient.cpp",
+        "matter/webrtc/WebRTC.cpp",
+        "matter/webrtc/WebRTC.h",
+        "matter/webrtc/WebRTCTransportCluster.cpp",
       ]
     }
+    defines += [ "CHIP_CONFIG_MAX_ACTIVE_TCP_CONNECTIONS=20" ]
     defines += [ "CHIP_CONFIG_MAX_GROUPS_PER_FABRIC=50" ]
     defines += [ "CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC=50" ]
 
     if (chip_python_supports_stack_locking) {
-      sources += [ "chip/native/ChipMainLoopWork_StackLock.cpp" ]
+      sources += [ "matter/native/ChipMainLoopWork_StackLock.cpp" ]
     } else {
-      sources += [ "chip/native/ChipMainLoopWork_WorkSchedule.cpp" ]
+      sources += [ "matter/native/ChipMainLoopWork_WorkSchedule.cpp" ]
     }
   } else {
     sources += [
-      "chip/server/Options.cpp",
-      "chip/server/Options.h",
-      "chip/server/ServerInit.cpp",
+      "matter/server/Options.cpp",
+      "matter/server/Options.h",
+      "matter/server/ServerInit.cpp",
     ]
   }
 
   if (chip_enable_ble) {
     if (current_os == "linux") {
-      sources += [ "chip/ble/LinuxImpl.cpp" ]
+      sources += [ "matter/ble/LinuxImpl.cpp" ]
     } else if (current_os == "mac") {
       sources += [
-        "chip/ble/darwin/AdapterListing.mm",
-        "chip/ble/darwin/Scanning.mm",
+        "matter/ble/darwin/AdapterListing.mm",
+        "matter/ble/darwin/Scanning.mm",
       ]
       cflags = [ "-fobjc-arc" ]
     } else {
@@ -143,6 +145,7 @@ shared_library("ChipDeviceCtrl") {
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/dnssd",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support/jsontlv",
     "${chip_root}/src/platform",
     "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload",
@@ -198,93 +201,97 @@ shared_library("ChipDeviceCtrl") {
   configs += [ ":controller_wno_deprecate" ]
 }
 
-chip_python_wheel_action("chip-core") {
+matter_python_wheel_action("matter-core") {
   py_manifest_files = [
     {
       src_dir = "."
       sources = [
-        "chip/CertificateAuthority.py",
-        "chip/ChipBleBase.py",
-        "chip/ChipBleUtility.py",
-        "chip/ChipBluezMgr.py",
-        "chip/ChipCommissionableNodeCtrl.py",
-        "chip/ChipStack.py",
-        "chip/FabricAdmin.py",
-        "chip/__init__.py",
-        "chip/bdx/Bdx.py",
-        "chip/bdx/BdxProtocol.py",
-        "chip/bdx/BdxTransfer.py",
-        "chip/bdx/__init__.py",
-        "chip/ble/__init__.py",
-        "chip/ble/commissioning/__init__.py",
-        "chip/ble/get_adapters.py",
-        "chip/ble/library_handle.py",
-        "chip/ble/scan_devices.py",
-        "chip/ble/types.py",
-        "chip/clusters/Attribute.py",
-        "chip/clusters/Command.py",
-        "chip/clusters/__init__.py",
-        "chip/commissioning/__init__.py",
-        "chip/commissioning/commissioning_flow_blocks.py",
-        "chip/commissioning/pase.py",
-        "chip/configuration/__init__.py",
-        "chip/credentials/__init__.py",
-        "chip/credentials/cert.py",
-        "chip/crypto/__init__.py",
-        "chip/crypto/fabric.py",
-        "chip/crypto/p256keypair.py",
-        "chip/discovery/__init__.py",
-        "chip/discovery/library_handle.py",
-        "chip/discovery/types.py",
-        "chip/exceptions/__init__.py",
-        "chip/fault_injection/__init__.py",
-        "chip/interaction_model/__init__.py",
-        "chip/interaction_model/delegate.py",
-        "chip/internal/__init__.py",
-        "chip/internal/commissioner.py",
-        "chip/internal/thread.py",
-        "chip/internal/types.py",
-        "chip/logging/__init__.py",
-        "chip/logging/library_handle.py",
-        "chip/logging/types.py",
-        "chip/native/__init__.py",
-        "chip/setup_payload/__init__.py",
-        "chip/setup_payload/setup_payload.py",
-        "chip/storage/__init__.py",
-        "chip/tracing/__init__.py",
-        "chip/utils/CommissioningBuildingBlocks.py",
-        "chip/utils/__init__.py",
-        "chip/yaml/__init__.py",
-        "chip/yaml/data_model_lookup.py",
-        "chip/yaml/errors.py",
-        "chip/yaml/format_converter.py",
-        "chip/yaml/runner.py",
+        "matter/CertificateAuthority.py",
+        "matter/ChipBleBase.py",
+        "matter/ChipBleUtility.py",
+        "matter/ChipBluezMgr.py",
+        "matter/ChipCommissionableNodeCtrl.py",
+        "matter/ChipStack.py",
+        "matter/FabricAdmin.py",
+        "matter/MatterTlvJson.py",
+        "matter/__init__.py",
+        "matter/bdx/Bdx.py",
+        "matter/bdx/BdxProtocol.py",
+        "matter/bdx/BdxTransfer.py",
+        "matter/bdx/__init__.py",
+        "matter/ble/__init__.py",
+        "matter/ble/commissioning/__init__.py",
+        "matter/ble/get_adapters.py",
+        "matter/ble/library_handle.py",
+        "matter/ble/scan_devices.py",
+        "matter/ble/types.py",
+        "matter/clusters/Attribute.py",
+        "matter/clusters/Command.py",
+        "matter/clusters/__init__.py",
+        "matter/commissioning/__init__.py",
+        "matter/commissioning/commissioning_flow_blocks.py",
+        "matter/commissioning/pase.py",
+        "matter/configuration/__init__.py",
+        "matter/credentials/__init__.py",
+        "matter/credentials/cert.py",
+        "matter/crypto/__init__.py",
+        "matter/crypto/fabric.py",
+        "matter/crypto/p256keypair.py",
+        "matter/discovery/__init__.py",
+        "matter/discovery/library_handle.py",
+        "matter/discovery/types.py",
+        "matter/exceptions/__init__.py",
+        "matter/fault_injection/__init__.py",
+        "matter/interaction_model/__init__.py",
+        "matter/interaction_model/delegate.py",
+        "matter/internal/__init__.py",
+        "matter/internal/commissioner.py",
+        "matter/internal/thread.py",
+        "matter/internal/types.py",
+        "matter/logging/__init__.py",
+        "matter/logging/library_handle.py",
+        "matter/logging/types.py",
+        "matter/native/__init__.py",
+        "matter/setup_payload/__init__.py",
+        "matter/setup_payload/setup_payload.py",
+        "matter/storage/__init__.py",
+        "matter/tracing/__init__.py",
+        "matter/utils/CommissioningBuildingBlocks.py",
+        "matter/utils/__init__.py",
+        "matter/yaml/__init__.py",
+        "matter/yaml/data_model_lookup.py",
+        "matter/yaml/errors.py",
+        "matter/yaml/format_converter.py",
+        "matter/yaml/runner.py",
       ]
       if (chip_support_webrtc_python_bindings) {
         sources += [
-          "chip/webrtc/__init__.py",
-          "chip/webrtc/command.py",
-          "chip/webrtc/library_handle.py",
-          "chip/webrtc/peer_connection.py",
-          "chip/webrtc/types.py",
-          "chip/webrtc/utils.py",
-          "chip/webrtc/webrtc_client.py",
-          "chip/webrtc/webrtc_manager.py",
+          "matter/webrtc/__init__.py",
+          "matter/webrtc/async_websocket_client.py",
+          "matter/webrtc/browser_peer_connection.py",
+          "matter/webrtc/browser_webrtc_client.py",
+          "matter/webrtc/command.py",
+          "matter/webrtc/libdatachannel_peer_connection.py",
+          "matter/webrtc/libdatachannel_webrtc_client.py",
+          "matter/webrtc/library_handle.py",
+          "matter/webrtc/types.py",
+          "matter/webrtc/utils.py",
+          "matter/webrtc/webrtc_manager.py",
         ]
       }
 
       if (chip_support_commissioning_in_controller) {
-        sources += [ "chip/ChipDeviceCtrl.py" ]
+        sources += [ "matter/ChipDeviceCtrl.py" ]
       } else {
-        sources += [ "chip/server/__init__.py" ]
+        sources += [ "matter/server/__init__.py" ]
       }
     },
     {
       src_dir = target_out_dir
       if (chip_support_commissioning_in_controller) {
-        sources = [ "${target_out_dir}/chip/_ChipDeviceCtrl.so" ]
+        sources = [ "${target_out_dir}/matter/_ChipDeviceCtrl.so" ]
       } else {
-        sources = [ "${target_out_dir}/chip/_ChipServer.so" ]
+        sources = [ "${target_out_dir}/matter/_ChipServer.so" ]
       }
     },
     {
@@ -296,47 +303,48 @@ chip_python_wheel_action("chip-core") {
   inputs = []
 
   py_packages = [
-    "chip",
-    "chip.bdx",
-    "chip.ble",
-    "chip.ble.commissioning",
-    "chip.configuration",
-    "chip.commissioning",
-    "chip.clusters",
-    "chip.credentials",
-    "chip.crypto",
-    "chip.utils",
-    "chip.discovery",
-    "chip.exceptions",
-    "chip.internal",
-    "chip.interaction_model",
-    "chip.logging",
-    "chip.yaml",
-    "chip.native",
-    "chip.clusters",
-    "chip.setup_payload",
-    "chip.storage",
-    "chip.tracing",
-    "chip.fault_injection",
+    "matter",
+    "matter.bdx",
+    "matter.ble",
+    "matter.ble.commissioning",
+    "matter.configuration",
+    "matter.commissioning",
+    "matter.clusters",
+    "matter.credentials",
+    "matter.crypto",
+    "matter.utils",
+    "matter.discovery",
+    "matter.exceptions",
+    "matter.internal",
+    "matter.interaction_model",
+    "matter.logging",
+    "matter.yaml",
+    "matter.native",
+    "matter.clusters",
+    "matter.setup_payload",
+    "matter.storage",
+    "matter.tracing",
+    "matter.fault_injection",
   ]
   if (chip_support_webrtc_python_bindings) {
-    py_packages += [ "chip.webrtc" ]
+    py_packages += [ "matter.webrtc" ]
   }
 
   if (!chip_support_commissioning_in_controller) {
-    py_packages += [ "chip.server" ]
+    py_packages += [ "matter.server" ]
   }
 
   py_package_reqs = [
     "coloredlogs",
     "construct",
-    "dacite",
-    "rich",
-    "pyyaml",
-    "ipdb",
-    "deprecation",
     "cryptography",
+    "dacite",
+    "deprecation",
     "ecdsa",
+    "ipdb",
+    "matter-clusters",
+    "pyyaml",
+    "rich",
   ]
 
   if (current_cpu == "x64") {
@@ -360,8 +368,6 @@ chip_python_wheel_action("chip-core") {
 
   py_platform_tag = py_platform_tag + "_" + cpu_tag
 
-  tags = "cp37-abi3-" + py_platform_tag
-
   if (chip_support_commissioning_in_controller) {
     lib_name = "_ChipDeviceCtrl.so"
   } else {
@@ -369,27 +375,26 @@ chip_python_wheel_action("chip-core") {
   }
 
   py_package_name = "${chip_python_package_prefix}-core"
-  py_package_output = string_replace(py_package_name, "-", "_")
 
   public_deps = [ ":ChipDeviceCtrl" ]
 
-  output_name = "${py_package_output}-${chip_python_version}-${tags}.whl"
+  output_name = "${py_package_name}-${chip_python_version}-cp311-abi3-${py_platform_tag}.whl"
 }
 
-chip_python_wheel_action("chip-clusters") {
+matter_python_wheel_action("matter-clusters") {
   py_manifest_files = [
     {
       src_dir = "."
       sources = [
-        "chip/ChipUtility.py",
-        "chip/clusters/CHIPClusters.py",
-        "chip/clusters/ClusterObjects.py",
-        "chip/clusters/Objects.py",
-        "chip/clusters/TestObjects.py",
-        "chip/clusters/Types.py",
-        "chip/clusters/enum.py",
-        "chip/tlv/__init__.py",
-        "chip/tlv/tlvlist.py",
+        "matter/ChipUtility.py",
+        "matter/clusters/CHIPClusters.py",
+        "matter/clusters/ClusterObjects.py",
+        "matter/clusters/Objects.py",
+        "matter/clusters/TestObjects.py",
+        "matter/clusters/Types.py",
+        "matter/clusters/enum.py",
+        "matter/tlv/__init__.py",
+        "matter/tlv/tlvlist.py",
       ]
     },
     {
@@ -401,33 +406,32 @@ chip_python_wheel_action("chip-clusters") {
   inputs = []
 
   py_packages = [
-    "chip",
-    "chip.clusters",
-    "chip.tlv",
+    "matter",
+    "matter.clusters",
+    "matter.tlv",
   ]
 
   py_package_reqs = [
-    "dacite",
     "aenum",
+    "dacite",
   ]
 
   py_package_name = "${chip_python_package_prefix}-clusters"
-  py_package_output = string_replace(py_package_name, "-", "_")
   py_platform_tag = "any"
 
-  output_name = "${py_package_output}-${chip_python_version}-py3-none-any.whl"
+  output_name = "${py_package_name}-${chip_python_version}-py3-none-${py_platform_tag}.whl"
 }
 
-chip_python_wheel_action("chip-repl") {
-  py_scripts = [ "chip-repl.py" ]
+matter_python_wheel_action("matter-repl") {
+  py_scripts = [ "matter-repl.py" ]
 
   py_manifest_files = [
     {
       src_dir = "."
       sources = [
-        "chip/ChipBluezMgr.py",
-        "chip/ChipCoreBluetoothMgr.py",
-        "chip/ChipReplStartup.py",
+        "matter/ChipBluezMgr.py",
+        "matter/ChipCoreBluetoothMgr.py",
+        "matter/ReplStartup.py",
       ]
       sources += py_scripts
     },
@@ -439,7 +443,7 @@ chip_python_wheel_action("chip-repl") {
 
   inputs = []
 
-  py_packages = [ "chip" ]
+  py_packages = [ "matter" ]
 
   py_package_reqs = [
     "coloredlogs",
@@ -454,25 +458,19 @@ chip_python_wheel_action("chip-repl") {
     "ipython!=8.1.0",
     "rich",
     "ipykernel",
+    "pyobjc-framework-corebluetooth ; sys_platform==\"darwin\"",
+    "dbus-python==1.2.18 ; sys_platform==\"linux\"",
+    "pygobject==3.50.0 ; sys_platform==\"linux\"",
+    "matter-core",
   ]
 
-  if (current_os == "mac") {
-    py_package_reqs += [ "pyobjc-framework-corebluetooth" ]
-  } else if (current_os == "linux") {
-    py_package_reqs += [
-      "dbus-python==1.2.18",
-      "pygobject==3.50.0",
-    ]
-  }
-
   py_package_name = "${chip_python_package_prefix}-repl"
-  py_package_output = string_replace(py_package_name, "-", "_")
   py_platform_tag = "any"
 
   data_deps = [
-    ":chip-clusters",
-    ":chip-core",
+    ":matter-clusters",
+    ":matter-core",
   ]
 
-  output_name = "${py_package_output}-${chip_python_version}-py3-none-any.whl"
+  output_name = "${py_package_name}-${chip_python_version}-py3-none-${py_platform_tag}.whl"
 }

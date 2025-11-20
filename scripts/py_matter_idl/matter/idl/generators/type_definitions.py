@@ -20,6 +20,8 @@ from typing import Optional, Union
 from matter.idl import matter_idl_types  # to explicitly say 'Enum'
 from matter.idl.matter_idl_types import DataType
 
+LOGGER = logging.getLogger(__name__)
+
 
 def ToPowerOfTwo(bits: int) -> int:
     """
@@ -197,9 +199,9 @@ __CHIP_SIZED_TYPES__ = {
     "devtype_id": BasicInteger(idl_name="devtype_id", byte_count=4, is_signed=False),
     "elapsed_s": BasicInteger(idl_name="elapsed_s", byte_count=4, is_signed=False),
     "endpoint_no": BasicInteger(idl_name="endpoint_no", byte_count=2, is_signed=False),
-    "energy_mwh":  BasicInteger(idl_name="energy_mwh", byte_count=8, is_signed=True),
-    "energy_mvah":  BasicInteger(idl_name="energy_mvah", byte_count=8, is_signed=True),
-    "energy_mvarh":  BasicInteger(idl_name="energy_mvarh", byte_count=8, is_signed=True),
+    "energy_mwh": BasicInteger(idl_name="energy_mwh", byte_count=8, is_signed=True),
+    "energy_mvah": BasicInteger(idl_name="energy_mvah", byte_count=8, is_signed=True),
+    "energy_mvarh": BasicInteger(idl_name="energy_mvarh", byte_count=8, is_signed=True),
     "entry_idx": BasicInteger(idl_name="entry_idx", byte_count=2, is_signed=False),
     "epoch_s": BasicInteger(idl_name="epoch_s", byte_count=4, is_signed=False),
     "epoch_us": BasicInteger(idl_name="epoch_us", byte_count=8, is_signed=False),
@@ -344,13 +346,13 @@ class TypeLookupContext:
         """
         if name.lower() in ["enum8", "enum16"]:
             return True
-        return any(map(lambda e: e.name == name, self.all_enums))
+        return any((e.name == name for e in self.all_enums))
 
     def is_struct_type(self, name: str):
         """
         Determine if the given type name is type that is known to be a struct
         """
-        return any(map(lambda s: s.name == name, self.all_structs))
+        return any((s.name == name for s in self.all_structs))
 
     def is_untyped_bitmap_type(self, name: str):
         """Determine if the given type is a untyped bitmap (just an interger size)."""
@@ -366,7 +368,7 @@ class TypeLookupContext:
         if self.is_untyped_bitmap_type(name):
             return True
 
-        return any(map(lambda s: s.name == name, self.all_bitmaps))
+        return any((s.name == name for s in self.all_bitmaps))
 
 
 def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> Union[BasicInteger, BasicString, FundamentalType, IdlType, IdlEnumType, IdlBitmapType]:
@@ -416,7 +418,7 @@ def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> Union[Basic
     if lookup.find_struct(data_type.name):
         result.item_type = IdlItemType.STRUCT
     else:
-        logging.warning(
+        LOGGER.warning(
             "Data type %s is NOT known, but treating it as a generic IDL type." % data_type)
 
     return result

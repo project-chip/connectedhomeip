@@ -74,6 +74,7 @@
 #include <clusters/GeneralCommissioning/CommandIds.h>
 #include <clusters/GeneralDiagnostics/CommandIds.h>
 #include <clusters/GroupKeyManagement/CommandIds.h>
+#include <clusters/Groupcast/CommandIds.h>
 #include <clusters/Groups/CommandIds.h>
 #include <clusters/HepaFilterMonitoring/CommandIds.h>
 #include <clusters/IcdManagement/CommandIds.h>
@@ -154,6 +155,7 @@
 #include <clusters/WakeOnLan/CommandIds.h>
 #include <clusters/WaterHeaterManagement/CommandIds.h>
 #include <clusters/WaterHeaterMode/CommandIds.h>
+#include <clusters/WaterTankLevelMonitoring/CommandIds.h>
 #include <clusters/WebRTCTransportProvider/CommandIds.h>
 #include <clusters/WebRTCTransportRequestor/CommandIds.h>
 #include <clusters/WiFiNetworkDiagnostics/CommandIds.h>

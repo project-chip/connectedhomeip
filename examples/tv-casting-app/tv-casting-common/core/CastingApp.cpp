@@ -146,7 +146,7 @@ CHIP_ERROR CastingApp::PostStartRegistrations()
     // &server.GetCommissioningWindowManager().SetAppDelegate(??);
 
     // Initialize binding handlers
-    chip::BindingManager::GetInstance().Init(
+    chip::app::Clusters::Binding::Manager::GetInstance().Init(
         { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
 
     // Set FabricDelegate

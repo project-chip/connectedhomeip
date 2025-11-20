@@ -40,12 +40,13 @@ import logging
 import time
 from typing import Optional
 
-import chip.clusters as Clusters
-from chip.interaction_model import Status
-from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import (AttributeValue, MatterBaseTest, TestStep, default_matter_test_main, has_cluster,
-                                         run_if_endpoint_matches)
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import Status
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import (AttributeValue, MatterBaseTest, TestStep, default_matter_test_main, has_cluster,
+                                           run_if_endpoint_matches)
 
 
 class TC_FAN_4_1(MatterBaseTest):
@@ -172,7 +173,7 @@ class TC_FAN_4_1(MatterBaseTest):
 
         self.step(6)
         attr = fan.Attributes.FanMode(fan.Enums.FanModeEnum.kHigh)
-        resp = await self.default_controller.WriteAttribute(nodeid=self.dut_node_id, attributes=[(self.get_endpoint(), attr)])
+        resp = await self.default_controller.WriteAttribute(nodeId=self.dut_node_id, attributes=[(self.get_endpoint(), attr)])
         asserts.assert_equal(resp[0].Status, Status.Success, "Unexpected error writing FanMode attribute")
 
         self.step(7)
@@ -225,7 +226,7 @@ class TC_FAN_4_1(MatterBaseTest):
             """
             nonlocal step_num
             self.step(step_num)
-            resp = await self.default_controller.WriteAttribute(nodeid=self.dut_node_id, attributes=[(self.get_endpoint(), attr)])
+            resp = await self.default_controller.WriteAttribute(nodeId=self.dut_node_id, attributes=[(self.get_endpoint(), attr)])
             asserts.assert_in(resp[0].Status, [Status.Success, Status.InvalidInState], "Unexpected status returned")
             if resp[0].Status != Status.Success:
                 self.skip_step(step_num + 1)
@@ -311,7 +312,7 @@ class TC_FAN_4_1(MatterBaseTest):
         # Make sure that we can still adjust the Percent values now that it's back on
         self.step(step_num)
         attr = fan.Attributes.PercentSetting(50)
-        resp = await self.default_controller.WriteAttribute(nodeid=self.dut_node_id, attributes=[(self.get_endpoint(), attr)])
+        resp = await self.default_controller.WriteAttribute(nodeId=self.dut_node_id, attributes=[(self.get_endpoint(), attr)])
         asserts.assert_in(resp[0].Status, [Status.Success, Status.InvalidInState], "Invalid response from writing PercentSetting")
         step_num += 1
 

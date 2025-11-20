@@ -24,6 +24,9 @@
 #include <cstdint>
 #include <utility>
 
+// Including the Metadata from a concrete implementation
+#include <clusters/ActivatedCarbonFilterMonitoring/Metadata.h>
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -94,13 +97,13 @@ public:
                              chip::CharSpan aProductIdentifierValue)
     {
         SetProductIdentifierType(aProductIdentifierType);
-        SetProductIdentifierValue(aProductIdentifierValue);
+        TEMPORARY_RETURN_IGNORED SetProductIdentifierValue(aProductIdentifierValue);
     }
 
     ReplacementProductStruct & operator=(const ReplacementProductStruct & aReplacementProductStruct)
     {
         SetProductIdentifierType(aReplacementProductStruct.GetProductIdentifierType());
-        SetProductIdentifierValue(aReplacementProductStruct.GetProductIdentifierValue());
+        TEMPORARY_RETURN_IGNORED SetProductIdentifierValue(aReplacementProductStruct.GetProductIdentifierValue());
         return *this;
     }
 
@@ -255,7 +258,10 @@ struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInf
 
 namespace Commands {
 namespace ResetCondition {
-static constexpr CommandId Id = 0x00000000;
+// Getting these from a concrete implementation, Less error-prone if XML ever changes
+static constexpr CommandId Id = ActivatedCarbonFilterMonitoring::Commands::ResetCondition::Id;
+static constexpr DataModel::AcceptedCommandEntry kMetadataEntry =
+    ActivatedCarbonFilterMonitoring::Commands::ResetCondition::kMetadataEntry;
 
 struct DecodableType
 {

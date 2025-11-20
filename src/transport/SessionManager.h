@@ -312,8 +312,7 @@ public:
         auto * targetFabric = mFabricTable->FindFabricWithIndex(fabricIndex);
         VerifyOrReturnError(targetFabric != nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX);
 
-        auto err = targetFabric->FetchRootPubkey(targetPubKey);
-        VerifyOrDie(err == CHIP_NO_ERROR);
+        SuccessOrDie(targetFabric->FetchRootPubkey(targetPubKey));
 
         mSecureSessions.ForEachSession([&](auto * session) {
             Crypto::P256PublicKey comparePubKey;
@@ -331,8 +330,7 @@ public:
             auto * compareFabric = mFabricTable->FindFabricWithIndex(session->GetFabricIndex());
             VerifyOrDie(compareFabric != nullptr);
 
-            err = compareFabric->FetchRootPubkey(comparePubKey);
-            VerifyOrDie(err == CHIP_NO_ERROR);
+            SuccessOrDie(compareFabric->FetchRootPubkey(comparePubKey));
 
             if (comparePubKey.Matches(targetPubKey) && targetFabric->GetFabricId() == compareFabric->GetFabricId())
             {
@@ -475,24 +473,20 @@ public:
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     CHIP_ERROR TCPConnect(const Transport::PeerAddress & peerAddress, Transport::AppTCPConnectionCallbackCtxt * appState,
-                          Transport::ActiveTCPConnectionState ** peerConnState);
+                          Transport::ActiveTCPConnectionHandle & peerConnState);
 
-    CHIP_ERROR TCPDisconnect(const Transport::PeerAddress & peerAddress);
+    void HandleConnectionReceived(Transport::ActiveTCPConnectionState & conn) override;
 
-    void TCPDisconnect(Transport::ActiveTCPConnectionState * conn, bool shouldAbort = 0);
+    void HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr) override;
 
-    void HandleConnectionReceived(Transport::ActiveTCPConnectionState * conn) override;
-
-    void HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr) override;
-
-    void HandleConnectionClosed(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr) override;
+    void HandleConnectionClosed(Transport::ActiveTCPConnectionState & conn, CHIP_ERROR conErr) override;
 
     // Functors for callbacks into higher layers
-    using OnTCPConnectionReceivedCallback = void (*)(Transport::ActiveTCPConnectionState * conn);
+    using OnTCPConnectionReceivedCallback = void (*)(Transport::ActiveTCPConnectionHandle & conn);
 
-    using OnTCPConnectionCompleteCallback = void (*)(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr);
+    using OnTCPConnectionCompleteCallback = void (*)(Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr);
 
-    using OnTCPConnectionClosedCallback = void (*)(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr);
+    using OnTCPConnectionClosedCallback = void (*)(Transport::ActiveTCPConnectionState & conn, CHIP_ERROR conErr);
 
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
@@ -617,7 +611,7 @@ private:
     void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source);
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    void MarkSecureSessionOverTCPForEviction(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr);
+    void MarkSecureSessionOverTCPForEviction(Transport::ActiveTCPConnectionState & conn, CHIP_ERROR conErr);
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     static bool IsControlMessage(PayloadHeader & payloadHeader)

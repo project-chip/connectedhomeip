@@ -114,11 +114,6 @@ void ChipDeviceEventHandler::HandleFailSafeTimerExpired()
     {
         ChipLogProgress(AppServer, "ChipDeviceEventHandler::HandleFailSafeTimerExpired() when sUdcInProgress: %d, returning early",
                         sUdcInProgress);
-        sUdcInProgress                                            = false;
-        CastingPlayer::GetTargetCastingPlayer()->mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
-        CastingPlayer::GetTargetCastingPlayer()->mOnCompleted(CHIP_ERROR_TIMEOUT, nullptr);
-        CastingPlayer::GetTargetCastingPlayer()->mOnCompleted = nullptr;
-        CastingPlayer::GetTargetCastingPlayer()->mTargetCastingPlayer.reset();
         return;
     }
 
@@ -184,7 +179,7 @@ void ChipDeviceEventHandler::HandleBindingsChangedViaCluster(const chip::DeviceL
 
         // find targetNodeId from binding table by matching the binding's fabricIndex with the accessing fabricIndex
         // received in BindingsChanged event
-        for (const auto & binding : chip::BindingTable::GetInstance())
+        for (const auto & binding : chip::app::Clusters::Binding::Table::GetInstance())
         {
             ChipLogProgress(AppServer,
                             "ChipDeviceEventHandler::HandleBindingsChangedViaCluster() Read cached binding type=%d fabrixIndex=%d "
@@ -192,7 +187,8 @@ void ChipDeviceEventHandler::HandleBindingsChangedViaCluster(const chip::DeviceL
                             " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
                             binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
                             binding.remote, ChipLogValueMEI(binding.clusterId.value_or(0)));
-            if (binding.type == MATTER_UNICAST_BINDING && event->BindingsChanged.fabricIndex == binding.fabricIndex)
+            if (binding.type == chip::app::Clusters::Binding::MATTER_UNICAST_BINDING &&
+                event->BindingsChanged.fabricIndex == binding.fabricIndex)
             {
                 ChipLogProgress(AppServer,
                                 "ChipDeviceEventHandler::HandleBindingsChangedViaCluster() Matched accessingFabricIndex with "

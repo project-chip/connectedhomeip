@@ -489,6 +489,10 @@ Status ColorControlServer::stopMoveStepCommand(EndpointId endpoint, const Comman
     if (shouldExecuteIfOff(endpoint, commandData.optionsMask, commandData.optionsOverride) && !isColorLoopActive)
     {
         status = stopAllColorTransitions(endpoint);
+        if (status == Status::Success)
+        {
+            SetQuietReportRemainingTime(endpoint, 0, false /* isNewTransition */);
+        }
 
 #ifdef MATTER_DM_PLUGIN_COLOR_CONTROL_SERVER_HSV
         // Because Hue and Saturation have separate transitions and can be kicked separately,

@@ -27,6 +27,8 @@ from matter.idl.generators.storage import InMemoryStorage
 from matter.idl.matter_idl_parser import CreateParser
 from matter.idl.matter_idl_types import Idl
 
+LOGGER = logging.getLogger(__name__)
+
 
 class ParseHandler(xml.sax.handler.ContentHandler):
     """A parser for data model XML data definitions.
@@ -73,13 +75,13 @@ class ParseHandler(xml.sax.handler.ContentHandler):
             raise Exception("Unexpected nesting!")
 
     def startElement(self, name: str, attrs):
-        logging.debug("ELEMENT START: %r / %r" % (name, attrs))
+        LOGGER.debug("ELEMENT START: %r / %r" % (name, attrs))
         self._context.path.push(name)
         self._processing_stack.append(
             self._processing_stack[-1].GetNextProcessor(name, attrs))
 
     def endElement(self, name: str):
-        logging.debug("ELEMENT END: %r" % name)
+        LOGGER.debug("ELEMENT END: %r" % name)
 
         last = self._processing_stack.pop()
         last.EndProcessing()
@@ -119,7 +121,7 @@ def ParseXmls(sources: List[ParseSource], include_meta_data=True) -> Idl:
     handler = ParseHandler(include_meta_data=include_meta_data)
 
     for source in sources:
-        logging.info('Parsing %s...' % source.source_file_name)
+        LOGGER.info('Parsing %s...' % source.source_file_name)
         handler.PrepareParsing(source.source_file_name)
 
         parser = xml.sax.make_parser()
@@ -127,8 +129,8 @@ def ParseXmls(sources: List[ParseSource], include_meta_data=True) -> Idl:
         try:
             parser.parse(source.source)
         except AssertionError as e:
-            logging.error("AssertionError %s at %r", e,
-                          handler._context.GetCurrentLocationMeta())
+            LOGGER.error("AssertionError %s at %r", e,
+                         handler._context.GetCurrentLocationMeta())
             raise
 
     return handler.Finish()
@@ -164,7 +166,7 @@ def normalize_order(idl: Idl):
 __LOG_LEVELS__ = {
     'debug': logging.DEBUG,
     'info': logging.INFO,
-    'warn': logging.WARN,
+    'warn': logging.WARNING,
     'fatal': logging.FATAL,
 }
 
@@ -223,15 +225,15 @@ def main(log_level, no_print, output, compare, compare_output, filenames):
     )
 
     if (compare is None) != (compare_output is None):
-        logging.error(
+        LOGGER.error(
             "Either both or none of --compare AND --compare-output must be set")
         sys.exit(1)
 
-    logging.info("Starting to parse ...")
+    LOGGER.info("Starting to parse ...")
 
     sources = [ParseSource(source=name) for name in filenames]
     data = ParseXmls(sources)
-    logging.info("Parse completed")
+    LOGGER.info("Parse completed")
 
     if compare:
         other_idl = CreateParser(skip_meta=True).parse(
@@ -239,7 +241,7 @@ def main(log_level, no_print, output, compare, compare_output, filenames):
 
         # ensure that input file is filtered to only interesting
         # clusters
-        loaded_clusters = set([c.code for c in data.clusters])
+        loaded_clusters = {c.code for c in data.clusters}
         other_idl.clusters = [
             c for c in other_idl.clusters if c.code in loaded_clusters]
 

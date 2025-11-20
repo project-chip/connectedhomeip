@@ -22,7 +22,7 @@ from .context import Context
 from .handlers import ClusterHandler
 from .parsing import NormalizeName
 
-LOGGER = logging.getLogger('data-model-xml-data-parsing')
+LOGGER = logging.getLogger(__name__)
 
 
 def contains_valid_cluster_id(attrs: AttributesImpl) -> bool:

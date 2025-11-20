@@ -19,14 +19,13 @@ import("//build_overrides/mbedtls.gni")
 
 import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/lib/lib.gni")
+import("${chip_root}/src/platform/silabs/multi-ota/args.gni")
 import("silabs_board.gni")
 
 declare_args() {
   # Location of the efr32 SDK.
   efr32_sdk_root = "${chip_root}/third_party/silabs/simplicity_sdk"
   matter_support_root = "${chip_root}/third_party/silabs/matter_support"
-  wiseconnect_sdk_root =
-      "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
   wifi_sdk_root = "${chip_root}/third_party/silabs/wifi_sdk"
 
   # Build openthread with prebuilt silabs lib
@@ -36,11 +35,15 @@ declare_args() {
   use_thread_coap_lib = false
 
   # enable by default for thread/non-wifi-ncp builds
-  enable_openthread_cli = !(use_rs9116 || use_wf200 || use_SiWx917)
-  kvs_max_entries = 255
-  sl_nvm3_max_object_size = 4092
+  enable_openthread_cli = !(use_wf200 || use_SiWx917)
+
+  # Max KVS entry counts. Its the current maximal value we support.
+  kvs_max_entries = 511
+  sl_nvm3_max_object_size = 1024
   sl_nvm3_nvm_size = 40960
-  sl_nvm3_cache_size = 200
+
+  # NVM3 cache size. A cache size >= total object count is recommended.
+  sl_nvm3_cache_size = 600
 
   # Use Silabs factory data provider example.
   # Users can implement their own.
@@ -81,16 +84,15 @@ declare_args() {
   # Use SLC generated files
   slc_reuse_files = false
 
-  # Multi-chip OTA
-  chip_enable_multi_ota_requestor = false
-  chip_enable_multi_ota_encryption = false
-  chip_enable_ota_custom_tlv_testing = false
-
   # Factory Provision storage
   use_provision_flash_storage = wifi_soc
 
   # Enable TestEventTrigger in GeneralDiagnostics cluster
   sl_enable_test_event_trigger = false
+
+  sl_verbose_mode = false
+
+  sl_em4_sleep = false
 }
 
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
@@ -102,10 +104,6 @@ is_series_2 = silabs_family == "mgm24" || silabs_family == "efr32mg24" ||
               silabs_family == "efr32mg26"
 
 assert(efr32_sdk_root != "", "efr32_sdk_root must be specified")
-
-if (use_rs9116) {
-  assert(wiseconnect_sdk_root != "", "wiseconnect_sdk_root must be specified")
-}
 
 if (use_SiWx917) {
   assert(wifi_sdk_root != "", "wifi_sdk_root must be specified")
@@ -271,7 +269,7 @@ template("efr32_sdk") {
 
       libs += [ "${matter_support_root}/sdk-copies/protocol/openthread/libs/libsl_openthread_cm33_gcc.a" ]
 
-      if (!chip_enable_ble_rs911x) {
+      if (!sl_matter_enable_siwx_ble) {
         libs += [
           "${matter_support_root}/sdk-copies/protocol/bluetooth/bgcommon/lib/build/gcc/cortex-m33/bgcommon/release/libbgcommon.a",
           "${matter_support_root}/sdk-copies/protocol/bluetooth/bgstack/ll/build/gcc/xg24/release/liblinklayer.a",
@@ -303,7 +301,7 @@ template("efr32_sdk") {
 
       libs += [ "${matter_support_root}/sdk-copies/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg24_gcc_release.a" ]
 
-      if (!chip_enable_ble_rs911x) {
+      if (!sl_matter_enable_siwx_ble) {
         libs += [ "${matter_support_root}/sdk-copies/protocol/bluetooth/bgstack/ll/build/gcc/xg24/release/liblinklayer.a" ]
       }
 
@@ -368,8 +366,6 @@ template("efr32_sdk") {
         "${wifi_sdk_root}/components/common/inc",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/config",
         "${wifi_sdk_root}/components/device/silabs/si91x/wireless/inc",
-        "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc",
-        "${wifi_sdk_root}/components/device/silabs/si91x/wireless/firmware_upgrade",
 
         # wifi component
         "${wifi_sdk_root}/components/protocol/wifi/inc",
@@ -387,19 +383,11 @@ template("efr32_sdk") {
         "${wifi_sdk_root}/components/service/network_manager/inc",
 
         "${wifi_sdk_root}/components/protocol/wifi/si91x",
+        "${wifi_sdk_root}/components/device/silabs/si91x/wireless/firmware_upgrade",
       ]
     }
 
-    if (use_rs9116) {
-      # TODO: we should create a seperate directory for headers that are necessary for the underlying sdks
-      _include_dirs += [ "${chip_root}/src/platform/silabs/wifi/rs911x/ncp" ]
-    }
-
-    if (use_rs9116 || use_SiWx917) {
-      _include_dirs += [ "${chip_root}/src/platform/silabs/rs911x" ]
-    }
-
-    if (use_wf200 || use_rs9116 || use_SiWx917) {
+    if (use_wf200 || use_SiWx917) {
       _include_dirs += [ "${chip_root}/src/platform/silabs/wifi" ]
     }
 
@@ -408,16 +396,6 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/radio/rail_lib/hal",
         "${efr32_sdk_root}/platform/radio/rail_lib/hal/efr32",
       ]
-    }
-
-    if (chip_enable_ble_rs911x) {
-      if (use_rs9116) {
-        _include_dirs += [ "${wiseconnect_sdk_root}/sapi/include" ]
-      } else {
-        _include_dirs += [
-          "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc",
-        ]
-      }
     }
 
     if (use_system_view) {
@@ -443,7 +421,7 @@ template("efr32_sdk") {
       _include_dirs += [ "${efr32_sdk_root}/platform/driver/button/inc" ]
     }
 
-    if (invoker.enable_dic) {
+    if (invoker.enable_matter_aws) {
       _include_dirs += [ "${chip_root}/third_party/silabs/mqtt/stack" ]
     }
 
@@ -503,6 +481,8 @@ template("efr32_sdk") {
       "SL_RAIL_3_API=1",
       "SL_CODE_COMPONENT_OPENTHREAD=openthread",
       "SL_CODE_COMPONENT_INTERRUPT_MANAGER=interrupt_manager",
+      "SL_APP_PROPERTIES",
+      "SL_MATTER_EM4_SLEEP=${sl_em4_sleep}",
     ]
 
     if (silabs_log_enabled && chip_logging) {
@@ -535,18 +515,6 @@ template("efr32_sdk") {
       defines += [ "SL_MATTER_PROVISION_FLASH=0" ]
     }
 
-    if (chip_enable_ble_rs911x) {
-      defines += [
-        "RSI_BLE_ENABLE=1",
-        "BLE_ENABLE=1",
-        "RSI_LITTLE_ENDIAN=1",
-        "SLI_SI91X_ENABLE_BLE=1",
-        "SL_SI91X_ENABLE_LITTLE_ENDIAN=1",
-        "RSI_BLE_MAX_NBR_PERIPHERALS=1",
-        "RSI_BLE_MAX_NBR_CENTRALS=1",
-      ]
-    }
-
     if (defined(invoker.chip_enable_openthread) &&
         invoker.chip_enable_openthread) {
       defines += [
@@ -566,41 +534,23 @@ template("efr32_sdk") {
       ]
     }
 
-    if (chip_enable_multi_ota_encryption && chip_enable_multi_ota_requestor) {
-      defines += [ "SL_MATTER_ENABLE_OTA_ENCRYPTION=1" ]
-    }
-
-    if (chip_enable_ota_custom_tlv_testing && chip_enable_multi_ota_requestor) {
-      defines += [ "OTA_TEST_CUSTOM_TLVS=1" ]
-    }
-
     if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
-      if (enable_dic) {
+      if (enable_matter_aws) {
         assert(chip_enable_wifi_ipv4, "enable chip_enable_wifi_ipv4")
-        defines += [ "DIC_ENABLE=1" ]
+        defines += [ "SL_MATTER_ENABLE_AWS=1" ]
       }
       if (aws_sdk_ota) {
-        defines += [ "ENABLE_AWS_OTA_FEAT=1" ]
+        defines += [ "SL_MATTER_ENABLE_AWS_OTA_FEAT=1" ]
       }
       if (chip_enable_wifi_ipv4) {
         defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4=1" ]
       }
-      if (use_rs9116 || use_SiWx917) {
+      if (use_SiWx917) {
         defines += [
           "SL_HEAP_SIZE=32768",
           "SL_WIFI=1",
-          "SL_WFX_USE_SPI",
-          "EFX32_RS911X=1",
-          "RS911X_WIFI",
-          "RSI_WLAN_ENABLE",
-          "RSI_SPI_INTERFACE",
-          "RSI_WITH_OS",
-        ]
-      }
-      if (use_SiWx917) {
-        defines += [
+          "SL_MATTER_SIWX_WIFI_ENABLE",
           "EXP_BOARD=1",
-          "CHIP_917",
           "SLI_SI917=1",
           "CHIP_9117",
           "SL_WIFI_COMPONENT_INCLUDED",
@@ -616,7 +566,14 @@ template("efr32_sdk") {
         ]
       }
 
-      if (use_wf200 || use_rs9116 || use_SiWx917) {
+      if (wifi_ncp_module) {
+        defines += [
+          "USE_BYPASS_CLOCK=1",
+          "SL_SI91X_ACX_MODULE=1",
+        ]
+      }
+
+      if (use_wf200 || use_SiWx917) {
         import("${chip_root}/src/platform/silabs/wifi/args.gni")
       }
     }
@@ -675,6 +632,10 @@ template("efr32_sdk") {
       ]
     }
 
+    if (sl_verbose_mode) {
+      defines += [ "VERBOSE_MODE=1" ]
+    }
+
     if (sl_use_subscription_syncing) {
       defines += [ "CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED=1" ]
     }
@@ -722,6 +683,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/CMSIS/RTOS2/Source/os_systick.c",
       "${efr32_sdk_root}/platform/bootloader/api/btl_interface.c",
       "${efr32_sdk_root}/platform/bootloader/api/btl_interface_storage.c",
+      "${efr32_sdk_root}/platform/bootloader/app_properties/app_properties.c",
       "${efr32_sdk_root}/platform/bootloader/core/flash/btl_internal_flash.c",
       "${efr32_sdk_root}/platform/bootloader/security/sha/crypto_sha.c",
       "${efr32_sdk_root}/platform/common/src/sl_core_cortexm.c",
@@ -739,6 +701,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_object.c",
       "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_page.c",
       "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_utils.c",
+      "${efr32_sdk_root}/platform/emlib/src/em_burtc.c",
       "${efr32_sdk_root}/platform/emlib/src/em_cmu.c",
       "${efr32_sdk_root}/platform/emlib/src/em_crypto.c",
       "${efr32_sdk_root}/platform/emlib/src/em_emu.c",
@@ -880,7 +843,14 @@ template("efr32_sdk") {
       "${silabs_gen_folder}/autogen/sl_iostream_handles.c",
       "${silabs_gen_folder}/main.c",
     ]
-    if (enable_dic) {
+
+    if (chip_enable_multi_ota_requestor) {
+      if (use_SiWx917) {
+        sources += [ "${wifi_sdk_root}/components/device/silabs/si91x/wireless/firmware_upgrade/firmware_upgradation.c" ]
+      }
+    }
+
+    if (enable_matter_aws) {
       sources += [
         "${chip_root}/third_party/silabs/mqtt/stack/mqtt.c",
         "${efr32_sdk_root}/util/third_party/mbedtls/library/ctr_drbg.c",
@@ -908,26 +878,7 @@ template("efr32_sdk") {
       ]
     }
 
-    if (chip_enable_ble_rs911x) {
-      if (use_rs9116) {
-        sources += [
-          "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_ble_gap_apis.c",
-          "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_ble_gatt_apis.c",
-          "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_bt_common_apis.c",
-          "${wiseconnect_sdk_root}/sapi/driver/rsi_bt_ble.c",
-        ]
-      } else {
-        sources += [
-          "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_ble_gap_apis.c",
-          "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_ble_gatt_apis.c",
-          "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_bt_ble.c",
-          "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_bt_common_apis.c",
-          "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_common_apis.c",
-          "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_utils.c",
-          "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/sl_si91x_ble.c",
-        ]
-      }
-    } else {
+    if (!sl_matter_enable_siwx_ble) {
       sources += [
         "${efr32_sdk_root}/protocol/bluetooth/bgstack/ll/src/sl_btctrl_init.c",
         "${efr32_sdk_root}/protocol/bluetooth/bgstack/ll/src/sl_btctrl_init_tasklets.c",
@@ -1132,5 +1083,10 @@ template("efr32_sdk") {
     }
 
     public_configs = [ ":${sdk_target_name}_config" ]
+
+    if (sl_matter_enable_siwx_ble) {
+      public_configs +=
+          [ "${chip_root}/src/platform/silabs/SiWx/ble:siwx-ble-config" ]
+    }
   }
 }

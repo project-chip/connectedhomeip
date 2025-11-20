@@ -45,18 +45,19 @@ import sys
 from binascii import hexlify, unhexlify
 from typing import Optional
 
-import chip.clusters as Clusters
 import nest_asyncio
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, default_matter_test_main,
-                                         has_command, run_if_endpoint_matches)
-from chip.testing.pics import accepted_cmd_pics_str
-from chip.tlv import TLVReader
-from chip.utils import CommissioningBuildingBlocks
 from ecdsa import NIST256p, VerifyingKey
 from ecdsa.keys import BadSignatureError
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, default_matter_test_main,
+                                           has_command, run_if_endpoint_matches)
+from matter.testing.pics import accepted_cmd_pics_str
+from matter.tlv import TLVReader
+from matter.utils import CommissioningBuildingBlocks
 
 nest_asyncio.apply()
 
@@ -85,7 +86,7 @@ class MatterCertParser:
     def get_subject_names(self) -> dict[int, object]:
         if self.SUBJECT_TAG not in self.parsed_tlv:
             raise ValueError(f"Did not find Subject tag in Matter TLV certificate: {self.parsed_tlv}")
-        return {tag: value for tag, value in self.parsed_tlv[self.SUBJECT_TAG]}
+        return dict(self.parsed_tlv[self.SUBJECT_TAG])
 
     def get_public_key_bytes(self) -> bytes:
         if self.SUBJECT_PUBLIC_KEY_TAG not in self.parsed_tlv:

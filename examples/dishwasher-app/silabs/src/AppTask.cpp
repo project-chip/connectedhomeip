@@ -192,7 +192,7 @@ void AppTask::ActionInitiated(OperationalStateEnum action)
     }
     else if (action == OperationalStateEnum::kStopped)
     {
-        SILABS_LOG("Stoping dishwasher");
+        SILABS_LOG("Stopping dishwasher");
     }
     else if (action == OperationalStateEnum::kPaused)
     {

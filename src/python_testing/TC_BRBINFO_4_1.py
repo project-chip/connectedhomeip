@@ -67,13 +67,14 @@ import os
 import random
 import tempfile
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.apps import IcdAppServerSubprocess
-from chip.testing.event_attribute_reporting import EventSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.apps import IcdAppServerSubprocess
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 _ROOT_ENDPOINT_ID = 0
@@ -132,7 +133,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
 
     async def _send_keep_active_command(self, stay_active_duration_ms, timeout_ms, endpoint_id) -> int:
         logging.info("Sending keep active command")
-        keep_active = await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=endpoint_id, payload=Clusters.Objects.BridgedDeviceBasicInformation.Commands.KeepActive(stayActiveDuration=stay_active_duration_ms, timeoutMs=timeout_ms))
+        keep_active = await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=endpoint_id, payload=Clusters.Objects.BridgedDeviceBasicInformation.Commands.KeepActive(stayActiveDuration=stay_active_duration_ms, timeoutMs=timeout_ms))
         return keep_active
 
     async def _get_dynamic_endpoint(self) -> int:
@@ -294,7 +295,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         event = brb_info_cluster.Events.ActiveChanged
         urgent = 1
         cb = EventSubscriptionHandler(expected_cluster_id=event.cluster_id, expected_event_id=event.event_id)
-        self._active_change_event_subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=[(dynamic_endpoint_id, event, urgent)], reportInterval=[1, 3])
+        self._active_change_event_subscription = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=[(dynamic_endpoint_id, event, urgent)], reportInterval=[1, 3])
         self._active_change_event_subscription.SetEventUpdateCallback(callback=cb)
 
         self.step("3")

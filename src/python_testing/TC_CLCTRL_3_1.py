@@ -25,7 +25,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --timeout 120
+#       --timeout 30
 #       --endpoint 1
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
@@ -35,12 +35,14 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
-                                         default_matter_test_main)
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
+                                           default_matter_test_main)
 
 
 def main_state_matcher(main_state: Clusters.ClosureControl.Enums.MainStateEnum) -> AttributeMatcher:
@@ -68,11 +70,6 @@ def current_latch_matcher(current_latch: bool) -> AttributeMatcher:
 
 
 class TC_CLCTRL_3_1(MatterBaseTest):
-    @property
-    def default_timeout(self) -> int:
-        # Default timeout for this test case is 120 seconds, multiple calibrates can take a while
-        return 120
-
     async def read_clctrl_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.ClosureControl
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
@@ -87,16 +84,16 @@ class TC_CLCTRL_3_1(MatterBaseTest):
             TestStep("2b", "If the CL feature is not supported on the cluster, skip remaining steps and end test case."),
             TestStep("2c", "TH establishes a wildcard subscription to all attributes on the Closure Control Cluster, with MinIntervalFloor = 0, MaxIntervalCeiling = 30 and KeepSubscriptions = false."),
             TestStep("2d", "TH reads from the DUT the (0xFFFB) AttributeList attribute"),
-            TestStep("3a", "If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute"),
+            TestStep("3a", "TH reads from the DUT the MainState attribute"),
             TestStep("3b", "TH sends command Calibrate to DUT"),
-            TestStep("3c", "If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute"),
+            TestStep("3c", "TH reads from the DUT the MainState attribute"),
             TestStep("3d", "Wait until the TH receives a subscription report for the MainState attribute"),
             TestStep("4a", "TH sends command Calibrate to DUT"),
-            TestStep("4b", "If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute"),
+            TestStep("4b", "TH reads from the DUT the MainState attribute"),
             TestStep("4c", "TH sends command Calibrate to DUT"),
             TestStep("4d", "Wait until the TH receives a subscription report for the MainState attribute"),
             TestStep("5a", "If the LT feature is not supported on the cluster, skip steps 5b to 5i."),
-            TestStep("5b", "If the attribute is supported on the cluster, TH reads from the DUT the OverallCurrentState attribute."),
+            TestStep("5b", "TH reads from the DUT the OverallCurrentState attribute."),
             TestStep("5c", "If the attribute is supported on the cluster, TH reads from the DUT the LatchControlModes attribute."),
             TestStep("5d", "If CurrentLatch = False, skip steps 5e to 5i."),
             TestStep("5e", "If LatchControlModes Bit 1 = 0 (RemoteUnlatching = False), skip step 5f."),
@@ -104,22 +101,21 @@ class TC_CLCTRL_3_1(MatterBaseTest):
             TestStep("5g", "If LatchControlModes Bit 1 = 1 (RemoteUnlatching = True), skip step 5h."),
             TestStep("5h", "Unlatch the DUT manually to set OverallCurrentState.Latch to False."),
             TestStep("5i", "Wait until TH receives a subscription report with OverallCurrentState.Latch = False."),
-            TestStep("5j", "If the attribute is supported on the cluster, TH reads from the DUT the OverallCurrentState attribute."),
+            TestStep("5j", "TH reads from the DUT the OverallCurrentState attribute."),
             TestStep("5k", "If CurrentPosition = FullyClosed, skip steps 5l to 5m."),
             TestStep("5l", "TH sends command MoveTo with Position = MoveToFullyClosed."),
             TestStep("5m", "Wait until TH receives a subscription report with OverallCurrentState.Position = FullyClosed."),
             TestStep("6a", "TH sends command MoveTo to DUT with Position = MoveToFullyOpen"),
             TestStep("6b", "Wait until the TH receives a subscription report for the OverallCurrentState attribute"),
-            TestStep("6c", "If the attribute is supported on the cluster, TH reads from the DUT the OverallCurrentState attribute"),
-            TestStep("6d", "TH sends command MoveTo to DUT with Position = MoveToFullyClosed"),
-            TestStep("6e", "If attribute is supported on the cluster, TH reads from the DUT the MainState attribute"),
-            TestStep("6f", "TH sends command Calibrate to DUT"),
+            TestStep("6c", "TH sends command MoveTo to DUT with Position = MoveToFullyClosed"),
+            TestStep("6d", "TH reads from the DUT the MainState attribute"),
+            TestStep("6e", "TH sends command Calibrate to DUT"),
         ]
         return steps
 
     def pics_TC_CLCTRL_3_1(self) -> list[str]:
         pics = [
-            "CLCTRL.S"
+            "CLCTRL.S", "CLCTRL.S.F06"
         ]
         return pics
 
@@ -164,16 +160,15 @@ class TC_CLCTRL_3_1(MatterBaseTest):
         attribute_list = await self.read_clctrl_attribute_expect_success(endpoint, attributes.AttributeList)
         logging.info(f"AttributeList: {attribute_list}")
 
-        # STEP 3a: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
+        # STEP 3a: TH reads from the DUT the MainState attribute
         self.step("3a")
 
-        if attributes.MainState.attribute_id in attribute_list:
-            mainstate = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MainState)
-            # Check if the MainState attribute has the expected values
-            is_setup_required = mainstate == Clusters.ClosureControl.Enums.MainStateEnum.kSetupRequired
-            is_stopped = mainstate == Clusters.ClosureControl.Enums.MainStateEnum.kStopped
-            logging.info(f"Mainstate: {mainstate}")
-            asserts.assert_true(is_setup_required or is_stopped, "MainState is not in the expected state")
+        mainstate = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MainState)
+        # Check if the MainState attribute has the expected values
+        is_setup_required = mainstate == Clusters.ClosureControl.Enums.MainStateEnum.kSetupRequired
+        is_stopped = mainstate == Clusters.ClosureControl.Enums.MainStateEnum.kStopped
+        logging.info(f"Mainstate: {mainstate}")
+        asserts.assert_true(is_setup_required or is_stopped, "MainState is not in the expected state")
 
         # STEP 3b: TH sends command Calibrate to DUT
         self.step("3b")
@@ -186,15 +181,14 @@ class TC_CLCTRL_3_1(MatterBaseTest):
                 e.status, Status.Success, f"Failed to send command Calibrate: {e.status}")
             pass
 
-        # STEP 3c: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
+        # STEP 3c: TH reads from the DUT the MainState attribute
         self.step("3c")
 
-        if attributes.MainState.attribute_id in attribute_list:
-            mainstate = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MainState)
-            # Check if the MainState attribute has the expected values
-            asserts.assert_equal(mainstate, Clusters.ClosureControl.Enums.MainStateEnum.kCalibrating,
-                                 "MainState is not in the expected state")
-            logging.info(f"Mainstate: {mainstate}")
+        mainstate = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MainState)
+        # Check if the MainState attribute has the expected values
+        asserts.assert_equal(mainstate, Clusters.ClosureControl.Enums.MainStateEnum.kCalibrating,
+                             "MainState is not in the expected state")
+        logging.info(f"Mainstate: {mainstate}")
 
         # STEP 3d: Wait until the TH receives a subscription report for the MainState attribute
         self.step("3d")
@@ -214,14 +208,13 @@ class TC_CLCTRL_3_1(MatterBaseTest):
                 e.status, Status.Success, f"Failed to send command Calibrate: {e.status}")
             pass
 
-        # STEP 4b: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
+        # STEP 4b: TH reads from the DUT the MainState attribute
         self.step("4b")
 
-        if attributes.MainState.attribute_id in attribute_list:
-            mainstate = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MainState)
-            # Check if the MainState attribute has the expected values
-            asserts.assert_equal(mainstate, Clusters.ClosureControl.Enums.MainStateEnum.kCalibrating,
-                                 "MainState is not in the expected state")
+        mainstate = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MainState)
+        # Check if the MainState attribute has the expected values
+        asserts.assert_equal(mainstate, Clusters.ClosureControl.Enums.MainStateEnum.kCalibrating,
+                             "MainState is not in the expected state")
 
         # STEP 4c: TH sends command Calibrate to DUT
         self.step("4c")
@@ -248,16 +241,13 @@ class TC_CLCTRL_3_1(MatterBaseTest):
         if is_lt_feature_supported:
             logging.info("Motion Latching feature supported.")
 
-            # STEP 5b: If the attribute is supported on the cluster, TH reads from the DUT the OverallCurrentState attribute
+            # STEP 5b: TH reads from the DUT the OverallCurrentState attribute
             self.step("5b")
 
-            if attributes.OverallCurrentState.attribute_id in attribute_list:
-                overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
-                logging.info(f"OverallCurrentState: {overall_current_state}")
+            overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
+            logging.info(f"OverallCurrentState: {overall_current_state}")
 
-                CurrentLatch = overall_current_state.latch
-            else:
-                asserts.assert_true(False, "OverallCurrentState attribute is not supported.")
+            CurrentLatch = overall_current_state.latch
 
             # STEP 5c: If the attribute is supported on the cluster, TH reads from the DUT the LatchControlModes attribute
             self.step("5c")
@@ -267,7 +257,7 @@ class TC_CLCTRL_3_1(MatterBaseTest):
                 logging.info(f"LatchControlModes: {LatchControlModes}")
 
             else:
-                asserts.assert_true(False, "LatchControlModes attribute is not supported.")
+                asserts.assert_fail("LatchControlModes attribute is not supported.")
 
             # STEP 5d: If CurrentLatch = False, skip steps 5e to 5i
             self.step("5d")
@@ -330,19 +320,16 @@ class TC_CLCTRL_3_1(MatterBaseTest):
             # Skipping steps 5b to 5i
             self.mark_step_range_skipped("5b", "5i")
 
-        # STEP 5j: If the attribute is supported on the cluster, TH reads from the DUT the OverallCurrentState attribute
+        # STEP 5j: TH reads from the DUT the OverallCurrentState attribute
         self.step("5j")
 
-        if attributes.OverallCurrentState.attribute_id in attribute_list:
-            overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
-            logging.info(f"OverallCurrentState: {overall_current_state}")
+        overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
+        logging.info(f"OverallCurrentState: {overall_current_state}")
 
-            if overall_current_state is None:
-                logging.error("OverallCurrentState is None")
+        if overall_current_state is NullValue:
+            asserts.assert_fail("OverallCurrentState is NullValue.")
 
-            CurrentPosition = overall_current_state.position
-        else:
-            asserts.assert_true(False, "OverallCurrentState attribute is not supported.")
+        CurrentPosition = overall_current_state.position
 
         # STEP 5k: If CurrentPosition = FullyClosed, skip steps 5l to 5m
         self.step("5k")
@@ -397,19 +384,8 @@ class TC_CLCTRL_3_1(MatterBaseTest):
             expected_matchers=[current_position_matcher(Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyOpened)],
             timeout_sec=timeout)
 
-        # STEP 6c: If the attribute is supported on the cluster, TH reads from the DUT the OverallCurrentState attribute
+        # STEP 6c: TH sends command MoveTo to DUT with Position = MoveToFullyClosed
         self.step("6c")
-
-        if attributes.OverallCurrentState.attribute_id in attribute_list:
-            overall_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
-            logging.info(f"OverallCurrentState: {overall_state}")
-            asserts.assert_equal(overall_state.position, Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyOpened,
-                                 "OverallCurrentState.position is not FullyOpened")
-        else:
-            asserts.assert_true(False, "OverallCurrentState attribute is not supported.")
-
-        # STEP 6d: TH sends command MoveTo to DUT with Position = MoveToFullyClosed
-        self.step("6d")
 
         try:
             await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
@@ -420,17 +396,16 @@ class TC_CLCTRL_3_1(MatterBaseTest):
                 e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
             pass
 
-        # STEP 6e: If attribute is supported on the cluster, TH reads from the DUT the MainState attribute
+        # STEP 6d: TH reads from the DUT the MainState attribute
+        self.step("6d")
+
+        mainstate = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MainState)
+        # Check if the MainState attribute has the expected values
+        asserts.assert_equal(mainstate, Clusters.ClosureControl.Enums.MainStateEnum.kMoving,
+                             "MainState is not in the expected state")
+
+        # STEP 6e: TH sends command Calibrate to DUT
         self.step("6e")
-
-        if attributes.MainState.attribute_id in attribute_list:
-            mainstate = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MainState)
-            # Check if the MainState attribute has the expected values
-            asserts.assert_equal(mainstate, Clusters.ClosureControl.Enums.MainStateEnum.kMoving,
-                                 "MainState is not in the expected state")
-
-        # STEP 6f: TH sends command Calibrate to DUT
-        self.step("6f")
 
         try:
             await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.Calibrate(), endpoint=endpoint, timedRequestTimeoutMs=1000)

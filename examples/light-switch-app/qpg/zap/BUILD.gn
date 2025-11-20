@@ -18,4 +18,5 @@ import("${chip_root}/src/app/chip_data_model.gni")
 chip_data_model("zap") {
   zap_file = "switch.zap"
   is_server = true
+  public_deps = [ "${chip_root}/src/app/clusters/bindings:binding-manager" ]
 }

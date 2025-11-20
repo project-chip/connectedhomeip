@@ -20,6 +20,7 @@
 #include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-cluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/WiFiNetworkDiagnostics/Enums.h>
 #include <clusters/WiFiNetworkDiagnostics/Metadata.h>
 #include <lib/core/CHIPError.h>
@@ -34,6 +35,7 @@ namespace {
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::WiFiNetworkDiagnostics::Attributes;
 using namespace chip::app::DataModel;
 
 struct TestWiFiNetworkDiagnosticsCluster : public ::testing::Test
@@ -48,12 +50,8 @@ TEST_F(TestWiFiNetworkDiagnosticsCluster, CompileTest)
     {
     };
 
-    const WiFiNetworkDiagnosticsEnabledAttributes enabledAttributes{
-        .enableCurrentMaxRate = false,
-    };
-
     NullProvider nullProvider;
-    WiFiDiagnosticsServerCluster cluster(kRootEndpointId, nullProvider, enabledAttributes,
+    WiFiDiagnosticsServerCluster cluster(kRootEndpointId, nullProvider, WiFiDiagnosticsServerCluster::OptionalAttributeSet(),
                                          BitFlags<WiFiNetworkDiagnostics::Feature>(0));
 
     // Essentially say "code executes"
@@ -67,12 +65,9 @@ TEST_F(TestWiFiNetworkDiagnosticsCluster, AttributesTest)
         class NullProvider : public DeviceLayer::DiagnosticDataProvider
         {
         };
-        const WiFiNetworkDiagnosticsEnabledAttributes enabledAttributes{
-            .enableCurrentMaxRate = false,
-        };
 
         NullProvider nullProvider;
-        WiFiDiagnosticsServerCluster cluster(kRootEndpointId, nullProvider, enabledAttributes,
+        WiFiDiagnosticsServerCluster cluster(kRootEndpointId, nullProvider, WiFiDiagnosticsServerCluster::OptionalAttributeSet(),
                                              BitFlags<WiFiNetworkDiagnostics::Feature>(0));
 
         // without any enabled attributes, no commands are accepted
@@ -114,13 +109,9 @@ TEST_F(TestWiFiNetworkDiagnosticsCluster, AttributesTest)
             }
         };
 
-        const WiFiNetworkDiagnosticsEnabledAttributes enabledAttributes{
-            .enableCurrentMaxRate = false,
-        };
-
         ErrorCountsProvider errorCountsProvider;
         WiFiDiagnosticsServerCluster cluster(
-            kRootEndpointId, errorCountsProvider, enabledAttributes,
+            kRootEndpointId, errorCountsProvider, WiFiDiagnosticsServerCluster::OptionalAttributeSet(),
             BitFlags<WiFiNetworkDiagnostics::Feature>(WiFiNetworkDiagnostics::Feature::kErrorCounts));
 
         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
@@ -223,15 +214,12 @@ TEST_F(TestWiFiNetworkDiagnosticsCluster, AttributesTest)
             }
         };
 
-        const WiFiNetworkDiagnosticsEnabledAttributes enabledAttributes{
-            .enableCurrentMaxRate = true,
-        };
-
         AllProvider allProvider;
         BitFlags<WiFiNetworkDiagnostics::Feature> features;
         features.Set(WiFiNetworkDiagnostics::Feature::kErrorCounts);
         features.Set(WiFiNetworkDiagnostics::Feature::kPacketCounts);
-        WiFiDiagnosticsServerCluster cluster(kRootEndpointId, allProvider, enabledAttributes, features);
+        WiFiDiagnosticsServerCluster cluster(
+            kRootEndpointId, allProvider, WiFiDiagnosticsServerCluster::OptionalAttributeSet().Set<CurrentMaxRate::Id>(), features);
 
         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
         ASSERT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kRootEndpointId, WiFiNetworkDiagnostics::Id), commandsBuilder),

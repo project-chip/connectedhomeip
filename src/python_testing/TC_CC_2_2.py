@@ -39,12 +39,13 @@
 import logging
 import time
 
-import chip.clusters as Clusters
-from chip.clusters import ClusterObjects as ClusterObjects
-from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
 from test_plan_support import commission_if_required, read_attribute, verify_success
+
+import matter.clusters as Clusters
+from matter.clusters import ClusterObjects as ClusterObjects
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 
 
 class TC_CC_2_3(MatterBaseTest):

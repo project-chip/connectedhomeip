@@ -37,12 +37,13 @@
 
 import logging
 
-from chip.ChipDeviceCtrl import TransportPayloadCapability
-from chip.clusters import CameraAvStreamManagement, Objects, WebRTCTransportRequestor
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from chip.webrtc import PeerConnection, WebRTCManager
 from mobly import asserts
 from test_plan_support import commission_if_required
+
+from matter.ChipDeviceCtrl import TransportPayloadCapability
+from matter.clusters import CameraAvStreamManagement, Objects, WebRTCTransportRequestor
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 
 
 class TC_WEBRTC_1_5(MatterBaseTest):
@@ -67,15 +68,10 @@ class TC_WEBRTC_1_5(MatterBaseTest):
                 expectation="DUT responds with SUCCESS status code.",
             ),
             TestStep(
-                5,
-                description="DUT sends ProvideICECandidates command to the TH",
-                expectation="Verify that ProvideICECandidates command contains the same WebRTCSessionID saved in step 1 and contain a non-empty ICE candidates.",
+                5, description="TH waits for 10 seconds", expectation="Verify the WebRTC session has been successfully established."
             ),
             TestStep(
-                6, description="TH waits for 5 seconds", expectation="Verify the WebRTC session has been successfully established."
-            ),
-            TestStep(
-                7,
+                6,
                 description="TH sends the End command with the WebRTCSessionID saved in step 1 to the DUT.",
                 expectation="DUT responds with SUCCESS status code.",
             ),
@@ -84,10 +80,10 @@ class TC_WEBRTC_1_5(MatterBaseTest):
         return steps
 
     def desc_TC_WEBRTC_1_5(self) -> str:
-        return "[TC-WEBRTC-1.3] Validate Deferred Offer Flow for Battery-Powered Camera in Standby Mode."
+        return "[TC-WEBRTC-1.5] Validate Deferred Offer Flow for Battery-Powered Camera in Standby Mode."
 
     def pics_TC_WEBRTC_1_5(self) -> list[str]:
-        return ["WEBRTCR", "WEBRTCP"]
+        return ["WEBRTCR.S", "WEBRTCP.C"]
 
     @property
     def default_timeout(self) -> int:
@@ -98,7 +94,7 @@ class TC_WEBRTC_1_5(MatterBaseTest):
         self.step("precondition-1")
         endpoint = self.get_endpoint(default=1)
         webrtc_manager = WebRTCManager(event_loop=self.event_loop)
-        webrtc_peer: PeerConnection = webrtc_manager.create_peer(
+        webrtc_peer: LibdatachannelPeerConnection = webrtc_manager.create_peer(
             node_id=self.dut_node_id, fabric_index=self.default_controller.GetFabricIndexInternal(), endpoint=endpoint
         )
 
@@ -140,12 +136,6 @@ class TC_WEBRTC_1_5(MatterBaseTest):
         )
 
         self.step(5)
-        ice_session_id, remote_candidates = await webrtc_peer.get_remote_ice_candidates(timeout=30)
-        asserts.assert_equal(ice_session_id, session_id, "Invalid session id")
-        asserts.assert_true(len(remote_candidates) > 0, "Invalid ice candidates received")
-        webrtc_peer.set_remote_ice_candidates(remote_candidates)
-
-        self.step(6)
         if not await webrtc_peer.check_for_session_establishment():
             logging.error("Failed to establish webrtc session")
             raise Exception("Failed to establish webrtc session")
@@ -153,7 +143,7 @@ class TC_WEBRTC_1_5(MatterBaseTest):
         if not self.is_pics_sdk_ci_only:
             self.user_verify_video_stream("Verify WebRTC session by validating if video is received")
 
-        self.step(7)
+        self.step(6)
         await self.send_single_cmd(
             cmd=WebRTCTransportRequestor.Commands.End(
                 webRTCSessionID=session_id, reason=Objects.Globals.Enums.WebRTCEndReasonEnum.kUserHangup
@@ -162,7 +152,7 @@ class TC_WEBRTC_1_5(MatterBaseTest):
             payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
         )
 
-        webrtc_manager.close_all()
+        await webrtc_manager.close_all()
 
     async def read_avstr_attribute_expect_success(self, endpoint, attribute):
         return await self.read_single_attribute_check_success(
@@ -182,7 +172,7 @@ class TC_WEBRTC_1_5(MatterBaseTest):
             aRateDistortionTradeOffPoints = await self.read_avstr_attribute_expect_success(
                 endpoint, attrs.RateDistortionTradeOffPoints
             )
-            aMinViewport = await self.read_avstr_attribute_expect_success(endpoint, attrs.MinViewport)
+            aMinViewportRes = await self.read_avstr_attribute_expect_success(endpoint, attrs.MinViewportResolution)
             aVideoSensorParams = await self.read_avstr_attribute_expect_success(endpoint, attrs.VideoSensorParams)
 
             response = await self.send_single_cmd(
@@ -191,14 +181,13 @@ class TC_WEBRTC_1_5(MatterBaseTest):
                     videoCodec=aRateDistortionTradeOffPoints[0].codec,
                     minFrameRate=30,
                     maxFrameRate=aVideoSensorParams.maxFPS,
-                    minResolution=aMinViewport,
+                    minResolution=aMinViewportRes,
                     maxResolution=CameraAvStreamManagement.Structs.VideoResolutionStruct(
                         width=aVideoSensorParams.sensorWidth, height=aVideoSensorParams.sensorHeight
                     ),
                     minBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                     maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
-                    minKeyFrameInterval=2000,
-                    maxKeyFrameInterval=8000,
+                    keyFrameInterval=4000,
                     watermarkEnabled=watermark,
                     OSDEnabled=osd,
                 ),

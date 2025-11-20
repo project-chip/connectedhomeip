@@ -22,11 +22,13 @@ import sys
 import threading
 import typing
 
+log = logging.getLogger(__name__)
+
 
 class LogPipe(threading.Thread):
     """Create PTY-based PIPE for IPC.
 
-    Python provides a built-in mechanism for creating comunication PIPEs for
+    Python provides a built-in mechanism for creating communication PIPEs for
     subprocesses spawned with Popen(). However, created PIPEs will most likely
     enable IO buffering in the spawned process. In order to trick such process
     to flush its streams immediately, we are going to create a PIPE based on
@@ -77,7 +79,7 @@ class LogPipe(threading.Thread):
                     break
             except OSError:
                 break
-            logging.log(self.level, line.strip('\n'))
+            log.log(self.level, line.strip())
             self.captured_logs.append(line)
             if self.capture_delegate:
                 self.capture_delegate.Log(self.name, line)
@@ -166,4 +168,4 @@ class Runner:
             else:
                 raise Exception('Command %r failed: %d' % (cmd, s.returncode))
 
-        logging.debug('Command %r completed with error code 0', cmd)
+        log.debug("Command %r completed with error code 0", cmd)

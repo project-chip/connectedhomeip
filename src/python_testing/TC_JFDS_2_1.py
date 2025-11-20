@@ -39,12 +39,13 @@ import random
 import tempfile
 from configparser import ConfigParser
 
-import chip.clusters as Clusters
-from chip import CertificateAuthority
-from chip.storage import PersistentStorage
-from chip.testing.apps import AppServerSubprocess, JFControllerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import CertificateAuthority
+from matter.storage import VolatileTemporaryPersistentStorage
+from matter.testing.apps import AppServerSubprocess, JFControllerSubprocess
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_JFDS_2_1(MatterBaseTest):
@@ -81,6 +82,7 @@ class TC_JFDS_2_1(MatterBaseTest):
         #
         #####################################################################################################################################
         self.jfadmin_fabric_a_passcode = random.randint(110220011, 110220999)
+        self.jfadmin_fabric_a_discriminator = random.randint(0, 4095)
         self.jfctrl_fabric_a_vid = random.randint(0x0001, 0xFFF0)
 
         # Start Fabric A JF-Administrator App
@@ -88,7 +90,7 @@ class TC_JFDS_2_1(MatterBaseTest):
             jfa_server_app,
             storage_dir=self.storage_fabric_a,
             port=random.randint(5001, 5999),
-            discriminator=random.randint(0, 4095),
+            discriminator=self.jfadmin_fabric_a_discriminator,
             passcode=self.jfadmin_fabric_a_passcode,
             extra_args=["--capabilities", "0x04", "--rpc-server-port", "33033"])
         self.fabric_a_admin.start(
@@ -107,9 +109,10 @@ class TC_JFDS_2_1(MatterBaseTest):
 
         # Commission JF-ADMIN app with JF-Controller on Fabric A
         self.fabric_a_ctrl.send(
-            message=f"pairing onnetwork 1 {self.jfadmin_fabric_a_passcode} --anchor true",
+            message=f"pairing onnetwork-long 1 {self.jfadmin_fabric_a_passcode} {
+                self.jfadmin_fabric_a_discriminator} --anchor true",
             expected_output="[JF] Anchor Administrator (nodeId=1) commissioned with success",
-            timeout=10)
+            timeout=30)
 
         # Extract the Ecosystem A certificates and inject them in the storage that will be provided to a new Python Controller later
         jfcStorage = ConfigParser()
@@ -153,15 +156,16 @@ class TC_JFDS_2_1(MatterBaseTest):
             TestStep("2", "TH reads AnchorNodeID attribute from DUT",
                      "Verify that the DUT NodeId is returned"),
             TestStep("3", "TH reads AnchorVendorID attribute from DUT",
-                     "Verify that the VendorId of the DUT is returned")
-            # TestStep("4", "{PLACEHOLDER_NOT_IMPLEMENTED]TH reads FriendlyName from DUT",
-            #          "Verify that the a valid string is returned")
+                     "Verify that the VendorId of the DUT is returned"),
+            TestStep("4", "TH reads FriendlyName from DUT",
+                     "Verify that the a valid string is returned")
         ]
 
     @async_test_body
     async def test_TC_JFDS_2_1(self):
         # Creating a Controller for Ecosystem A
-        _fabric_a_persistent_storage = PersistentStorage(jsonData=self.ecoACtrlStorage)
+        _fabric_a_persistent_storage = VolatileTemporaryPersistentStorage(
+            self.ecoACtrlStorage['repl-config'], self.ecoACtrlStorage['sdk-config'])
         _certAuthorityManagerA = CertificateAuthority.CertificateAuthorityManager(
             chipStack=self.matter_stack._chip_stack,
             persistentStorage=_fabric_a_persistent_storage)
@@ -173,21 +177,27 @@ class TC_JFDS_2_1(MatterBaseTest):
 
         self.step("1")
         response = await devCtrlEcoA.ReadAttribute(
-            nodeid=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.AnchorRootCA)],
+            nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.AnchorRootCA)],
             returnClusterObject=True)
         asserts.assert_greater_equal(len(response[1][Clusters.JointFabricDatastore].anchorRootCA), 0)
 
         self.step("2")
         response = await devCtrlEcoA.ReadAttribute(
-            nodeid=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.AnchorNodeID)],
+            nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.AnchorNodeID)],
             returnClusterObject=True)
         asserts.assert_greater_equal(response[1][Clusters.JointFabricDatastore].anchorNodeID, 0)
 
         self.step("3")
         response = await devCtrlEcoA.ReadAttribute(
-            nodeid=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.AnchorVendorID)],
+            nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.AnchorVendorID)],
             returnClusterObject=True)
         asserts.assert_greater_equal(response[1][Clusters.JointFabricDatastore].anchorVendorID, 0)
+
+        self.step("4")
+        response = await devCtrlEcoA.ReadAttribute(
+            nodeId=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.FriendlyName)],
+            returnClusterObject=True)
+        asserts.assert_is_instance(response[1][Clusters.JointFabricDatastore].friendlyName, str)
 
         # Shutdown the Python Controllers started at the beginning of this script
         devCtrlEcoA.Shutdown()

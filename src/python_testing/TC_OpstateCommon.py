@@ -21,15 +21,16 @@ import time
 from dataclasses import dataclass
 from typing import Any
 
-import chip.clusters as Clusters
 import psutil
-from chip.clusters import ClusterObjects as ClusterObjects
-from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction
-from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from chip.testing.matter_testing import TestStep
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters import ClusterObjects as ClusterObjects
+from matter.clusters.Attribute import EventReadResult, SubscriptionTransaction
+from matter.clusters.Types import NullValue
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
+from matter.testing.matter_testing import TestStep
 
 
 def get_pid(name):
@@ -1207,15 +1208,27 @@ class TC_OPSTATE_BASE():
         asserts.assert_equal(event_data.completionErrorCode, cluster.Enums.ErrorStateEnum.kNoError,
                              f"Completion event error code mismatched from expectation on endpoint {endpoint}.")
 
+        # A delta for approximate time compares: time deltas cannot be accurate in comparisons, depending
+        # on network delay or in CI we may run into concurrency issues
+        approx_delta_seconds = 3.0
+
         if event_data.totalOperationalTime is not NullValue:
             expected_value = (1.5 * initial_countdown_time)
 
-            asserts.assert_less_equal(expected_value, event_data.totalOperationalTime,
-                                      f"The total operation time shall be at least {expected_value:.1f}")
+            # Need some fuzziness. Test plan says:
+            #   TotalOperationalTime is approximately 1.5 times the initial-countdown-time or null
+            # however "approximately" does not seem clearly defined
+            asserts.assert_almost_equal(expected_value, event_data.totalOperationalTime,
+                                        delta=approx_delta_seconds,
+                                        msg=f"The total operation time shall be about {expected_value:.1f} +/- {approx_delta_seconds}")
 
+        # Need some fuzziness. Test plan says:
+        #   PausedTime is 0.5 times the initial-countdown-time
+        # however given time/sleeps, this is highly unlikely to be always accurate, especially in CI
         expected_value = (0.5 * initial_countdown_time)
-        asserts.assert_less_equal(expected_value, event_data.pausedTime,
-                                  f"Paused time ({event_data.pausedTime}) shall be at least {expected_value:.1f}")
+        asserts.assert_almost_equal(expected_value, event_data.pausedTime,
+                                    delta=approx_delta_seconds,
+                                    msg=f"Paused time ({event_data.pausedTime}) shall be about {expected_value:.1f} +/- {approx_delta_seconds}")
 
     ############################
     #   TEST CASE 2.6 - Optional Reports with DUT as Server

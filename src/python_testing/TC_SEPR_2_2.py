@@ -43,12 +43,13 @@
 """Define Matter test case TC_SEPR_2_2."""
 
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.testing.event_attribute_reporting import EventSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
 from TC_SEPRTestBase import CommodityPriceTestBaseHelper
+
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.testing.event_attribute_reporting import EventSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 
 cluster = Clusters.CommodityPrice
 

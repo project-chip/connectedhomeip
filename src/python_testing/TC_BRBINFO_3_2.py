@@ -35,9 +35,10 @@
 # === END CI TEST ARGUMENTS ===
 
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_BRBINFO_3_2(MatterBaseTest):
@@ -50,6 +51,7 @@ class TC_BRBINFO_3_2(MatterBaseTest):
 
     def steps_TC_BRBINFO_3_2(self) -> list[TestStep]:
         steps = [
+            TestStep(0, "Commissioning, already done", is_commissioning=True),
             TestStep(1, "TH reads ConfigurationVersion and stores the value as initialConfigurationVersion",
                      "Verify that the value is in the inclusive range of 1 to 4294967295"),
             TestStep(2, "On the corresponding bridged device, change the configuration version in a way which results in functionality to be added or removed (e.g. rewire thermostat to support a new mode)"),
@@ -68,7 +70,7 @@ class TC_BRBINFO_3_2(MatterBaseTest):
 
     @async_test_body
     async def test_TC_BRBINFO_3_2(self):
-
+        self.step(0)
         endpoint = self.get_endpoint(default=3)
 
         attributes = Clusters.BridgedDeviceBasicInformation.Attributes

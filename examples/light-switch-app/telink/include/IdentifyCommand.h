@@ -18,7 +18,7 @@
 
 #include "controller/InvokeInteraction.h"
 #include "controller/ReadInteraction.h"
-#include <app/clusters/bindings/bindings.h>
+#include <app/clusters/bindings/BindingManager.h>
 
 #if defined(CONFIG_CHIP_LIB_SHELL)
 #include "lib/shell/Engine.h"
@@ -27,6 +27,7 @@
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::Clusters;
 
 #if defined(CONFIG_CHIP_LIB_SHELL)
 using Shell::Engine;
@@ -39,7 +40,7 @@ Engine sShellSwitchIdentifyReadSubCommands;
 Engine sShellSwitchGroupsIdentifySubCommands;
 #endif // CONFIG_CHIP_LIB_SHELL
 
-void ProcessIdentifyUnicastBindingRead(BindingCommandData * data, const EmberBindingTableEntry & binding,
+void ProcessIdentifyUnicastBindingRead(BindingCommandData * data, const Binding::TableEntry & binding,
                                        OperationalDeviceProxy * peer_device)
 {
     auto onSuccess = [](const ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
@@ -71,7 +72,7 @@ void ProcessIdentifyUnicastBindingRead(BindingCommandData * data, const EmberBin
     }
 }
 
-void ProcessIdentifyUnicastBindingCommand(BindingCommandData * data, const EmberBindingTableEntry & binding,
+void ProcessIdentifyUnicastBindingCommand(BindingCommandData * data, const Binding::TableEntry & binding,
                                           OperationalDeviceProxy * peer_device)
 {
     auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
@@ -104,7 +105,7 @@ void ProcessIdentifyUnicastBindingCommand(BindingCommandData * data, const Ember
     }
 }
 
-void ProcessIdentifyGroupBindingCommand(BindingCommandData * data, const EmberBindingTableEntry & binding)
+void ProcessIdentifyGroupBindingCommand(BindingCommandData * data, const Binding::TableEntry & binding)
 {
     Messaging::ExchangeManager & exchangeMgr = Server::GetInstance().GetExchangeManager();
 

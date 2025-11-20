@@ -21,52 +21,26 @@ Following crypto operations can be offloaded to SE05x secure element,
     4. ECDSA Verify
     5. HKDF
     6. HMAC
-    7. Spake(Disabled by default)
+    7. Spake
 
 Other crypto operations are done on host (using mbed-TLS)
 
-Use the config file
-`src/platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_config.h` to enable /
-disable offloading required crypto operation on SE05x.
+Following GN / cmake options can be used to enable / disable the crypto
+operations to be offloaded to SE05x
 
-```
-/*
- * Enable se05x for random number generation
- */
-#define ENABLE_SE05X_RND_GEN 1
+-   GN Options :
 
-/*
- * Enable se05x for Generate EC Key
- */
-#define ENABLE_SE05X_GENERATE_EC_KEY 1
-
-/*
- * Enable ECDSA Verify using se05x
- */
-#define ENABLE_SE05X_ECDSA_VERIFY 1
-
-/*
- * Enable se05x for PBKDF SHA256
- * Not supported for SE052F
- */
-#define ENABLE_SE05X_PBKDF2_SHA256 0
-
-/*
- * Enable se05x for HKDF SHA256
- * Not supported for SE052F
- */
-#define ENABLE_SE05X_HKDF_SHA256 1
-
-/*
- * Enable se05x for HMAC SHA256
- */
-#define ENABLE_SE05X_HMAC_SHA256 1
-
-/*
- * Enable se05x for DA
- */
-#define ENABLE_SE05X_DEVICE_ATTESTATION 0
-```
+    | GN Options                    | Description              | Type    | Default setting |
+    | ----------------------------- | ------------------------ | ------- | --------------- |
+    | chip_se05x_spake_verifier     | Spake2P Verifier on SE   | Boolean | Disabled        |
+    | chip_se05x_spake_prover       | Spake2P Prover on SE     | Boolean | Disabled        |
+    | chip_se05x_rnd_gen            | Random number generation | Boolean | Disabled        |
+    | chip_se05x_gen_ec_key         | Generate EC key in SE    | Boolean | Enabled         |
+    | chip_se05x_ecdsa_verify       | ECDSA Verify             | Boolean | Enabled         |
+    | chip_se05x_pbkdf2_sha256      | PBKDF2-SHA256            | Boolean | Disabled        |
+    | chip_se05x_hkdf_sha256        | HKDF-SHA256              | Boolean | Disabled        |
+    | chip_se05x_hmac_sha256        | HMAC-SHA256              | Boolean | Disabled        |
+    | chip_se05x_device_attestation | Device attestation       | Boolean | Disabled        |
 
 # SE05x Type Configuration
 
@@ -101,8 +75,11 @@ SE050E is enabled by default.
 
 To use SE05x for device attestation,
 
-1. Enable `ENABLE_SE05X_DEVICE_ATTESTATION` in CHIPCryptoPALHsm_se05x_config.h
-   config file
+1. Enable device attestation option when building the example -
+
+```
+gn gen out --args="chip_se05x_device_attestation=true"
+```
 
 2. Run the provision example (one time)
    `third_party/simw-top-mini/repo/demos/se05x_dev_attest_key_prov/` to

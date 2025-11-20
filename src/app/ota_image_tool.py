@@ -38,25 +38,25 @@ from enum import IntEnum
 
 sys.path.insert(0, os.path.join(
     os.path.dirname(__file__), '../controller/python'))
-from chip.tlv import TLVReader, TLVWriter, uint  # noqa: E402 isort:skip
+from matter.tlv import TLVReader, TLVWriter, uint  # noqa: E402 isort:skip
 
 HEADER_MAGIC = 0x1BEEF11E
 FIXED_HEADER_FORMAT = '<IQI'
 
-DIGEST_ALGORITHM_ID = dict(
-    sha256=1,
-    sha256_128=2,
-    sha256_120=3,
-    sha256_96=4,
-    sha256_64=5,
-    sha256_32=6,
-    sha384=7,
-    sha512=8,
-    sha3_224=9,
-    sha3_256=10,
-    sha3_384=11,
-    sha3_512=12,
-)
+DIGEST_ALGORITHM_ID = {
+    'sha256': 1,
+    'sha256_128': 2,
+    'sha256_120': 3,
+    'sha256_96': 4,
+    'sha256_64': 5,
+    'sha256_32': 6,
+    'sha384': 7,
+    'sha512': 8,
+    'sha3_224': 9,
+    'sha3_256': 10,
+    'sha3_384': 11,
+    'sha3_512': 12,
+}
 
 DIGEST_ALL_ALGORITHMS = hashlib.algorithms_available.intersection(
     DIGEST_ALGORITHM_ID.keys())
