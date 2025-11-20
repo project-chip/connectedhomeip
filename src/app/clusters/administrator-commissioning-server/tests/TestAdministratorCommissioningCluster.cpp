@@ -25,6 +25,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <platform/NetworkCommissioning.h>
+#include <platform/TestOnlyCommissionableDataProvider.h>
 
 namespace {
 
@@ -41,6 +42,8 @@ struct TestAdministratorCommissioningCluster : public ::testing::Test
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
+
+static chip::DeviceLayer::TestOnlyCommissionableDataProvider sTestCommissionableDataProvider;
 
 TEST_F(TestAdministratorCommissioningCluster, TestAttributes)
 {
@@ -156,7 +159,8 @@ TEST_F(TestAdministratorCommissioningCluster, TestReadAttributesDefaultValues)
 
     {
         Attributes::WindowStatus::TypeInfo::Type winStatus;
-        ASSERT_EQ(tester.ReadAttribute(Attributes::WindowStatus::Id, winStatus), CHIP_NO_ERROR);
+        auto status = tester.ReadAttribute(Attributes::WindowStatus::Id, winStatus);
+        ASSERT_TRUE(status.IsSuccess());
         EXPECT_EQ(winStatus, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);
     }
 
@@ -170,5 +174,44 @@ TEST_F(TestAdministratorCommissioningCluster, TestReadAttributesDefaultValues)
         Attributes::AdminVendorId::TypeInfo::Type adminVendor;
         ASSERT_EQ(tester.ReadAttribute(Attributes::AdminVendorId::Id, adminVendor), CHIP_NO_ERROR);
         ASSERT_TRUE(adminVendor.IsNull());
+    }
+}
+
+TEST_F(TestAdministratorCommissioningCluster, TestAttributeSpecComplianceAfterOpeningWindow)
+{
+    AdministratorCommissioningCluster cluster(kRootEndpointId, {});
+    chip::Test::ClusterTester tester(cluster);
+
+    Attributes::WindowStatus::TypeInfo::DecodableType winStatus;
+    auto status = tester.ReadAttribute(Attributes::WindowStatus::Id, winStatus);
+    ASSERT_TRUE(status.IsSuccess());
+    EXPECT_EQ(winStatus, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen);
+
+    Commands::OpenCommissioningWindow::Type request;
+    request.commissioningTimeout = 900;
+    uint16_t originDiscriminator;
+    EXPECT_EQ(sTestCommissionableDataProvider.GetSetupDiscriminator(originDiscriminator), CHIP_NO_ERROR);
+    request.discriminator = static_cast<uint16_t>(originDiscriminator + 1);
+    chip::Crypto::Spake2pVerifier verifier{};
+    request.PAKEPasscodeVerifier = chip::ByteSpan(reinterpret_cast<const uint8_t *>(&verifier), sizeof(verifier));
+    request.iterations           = chip::Crypto::kSpake2p_Min_PBKDF_Iterations;
+    auto result                  = tester.Invoke(Commands::OpenCommissioningWindow::Id, request);
+    ASSERT_TRUE(result.status.has_value());
+
+    if (result.status->IsSuccess())
+    {
+        status = tester.ReadAttribute(Attributes::WindowStatus::Id, winStatus);
+        ASSERT_TRUE(status.IsSuccess());
+        EXPECT_EQ(winStatus, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kEnhancedWindowOpen);
+
+        Attributes::AdminFabricIndex::TypeInfo::Type adminFabric;
+        status = tester.ReadAttribute(Attributes::AdminFabricIndex::Id, adminFabric);
+        ASSERT_TRUE(status.IsSuccess());
+        ASSERT_FALSE(adminFabric.IsNull());
+
+        Attributes::AdminVendorId::TypeInfo::Type adminVendor;
+        status = tester.ReadAttribute(Attributes::AdminVendorId::Id, adminVendor);
+        ASSERT_TRUE(status.IsSuccess());
+        ASSERT_FALSE(adminVendor.IsNull());
     }
 }
