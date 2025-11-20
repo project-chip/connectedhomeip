@@ -118,7 +118,7 @@ class TC_DA_1_1(MatterBaseTest):
 
             except Exception as e:
                 logging.error(f"Failed to restart app: {e}")
-                asserts.fail(f"App restart failed: {e}")        
+                asserts.fail(f"App restart failed: {e}")
 
     @async_test_body
     async def test_TC_DA_1_1(self):
@@ -150,7 +150,7 @@ class TC_DA_1_1(MatterBaseTest):
             setupPinCode=params.setupPinCode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
             filter=self.discriminator)
-        
+
         nocs_th1 = await self.read_nocs(th2)
 
 
