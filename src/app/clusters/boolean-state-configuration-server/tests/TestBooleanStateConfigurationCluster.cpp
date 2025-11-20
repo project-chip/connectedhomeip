@@ -243,7 +243,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestSensitivityClamping)
     TestServerClusterContext context;
     ScopedSafeAttributePersistence persistence(context);
 
-    // supportedSensitivityLevels is clamped to [2, 100]
+    // supportedSensitivityLevels is clamped to [2, 10]
     {
         // Test value below min
         auto config = DefaultConfig().WithSupportedSensitivityLevels(1);
@@ -253,7 +253,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestSensitivityClamping)
         uint8_t supportedLevels;
         EXPECT_EQ(tester.ReadAttribute(Attributes::SupportedSensitivityLevels::Id, supportedLevels),
                   Protocols::InteractionModel::Status::Success);
-        EXPECT_EQ(supportedLevels, 2);
+        EXPECT_EQ(supportedLevels, BooleanStateConfigurationCluster::kMinSupportedSensitivityLevels);
     }
     {
         // Test value above max
@@ -356,7 +356,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestPersistenceAndStartup)
         // Default sensitivity for this config is 3.
 
         BooleanStateConfigurationCluster cluster(kTestEndpointId, Feature::kSensitivityLevel, {}, smallerConfig);
-        cluster.Startup(context.Get()); // Should read 18 and clamp it to 14.
+        cluster.Startup(context.Get()); // Should read 6 and clamp it to 5.
 
         ClusterTester tester(cluster);
         uint8_t sensitivity;
@@ -370,7 +370,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestPersistenceAndStartup)
     // 4. Test that if persistence fails, default is used. Let's clear the storage.
     context.StorageDelegate().ClearStorage();
     {
-        auto config = DefaultConfig().WithSupportedSensitivityLevels(20).WithDefaultSensitivityLevel(5);
+        auto config = DefaultConfig().WithSupportedSensitivityLevels(9).WithDefaultSensitivityLevel(5);
 
         BooleanStateConfigurationCluster cluster(kTestEndpointId, Feature::kSensitivityLevel, {}, config);
         cluster.Startup(context.Get());
