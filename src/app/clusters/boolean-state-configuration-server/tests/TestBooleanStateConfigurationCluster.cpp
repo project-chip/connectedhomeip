@@ -257,14 +257,14 @@ TEST_F(TestBooleanStateConfigurationCluster, TestSensitivityClamping)
     }
     {
         // Test value above max
-        auto config = DefaultConfig().WithDefaultSensitivityLevel(101);
+        auto config = DefaultConfig().WithSupportedSensitivityLevels(101);
         BooleanStateConfigurationCluster cluster(kTestEndpointId, Feature::kSensitivityLevel, {}, config);
         ClusterTester tester(cluster);
 
         uint8_t supportedLevels;
         EXPECT_EQ(tester.ReadAttribute(Attributes::SupportedSensitivityLevels::Id, supportedLevels),
                   Protocols::InteractionModel::Status::Success);
-        EXPECT_EQ(supportedLevels, config.SupportedSensitivityLevels());
+        EXPECT_EQ(supportedLevels, BooleanStateConfigurationCluster::kMaxSupportedSensitivityLevels);
     }
 
     // defaultSensitivityLevel is clamped to supported-1
