@@ -17,12 +17,12 @@
 
 #pragma once
 
-#include <app/DefaultTimerDelegate.h>
 #include <devices/Types.h>
 #include <devices/boolean-state-sensor/BooleanStateSensorDevice.h>
 #include <functional>
 #include <lib/core/CHIPError.h>
 #include <map>
+#include <platform/DefaultTimerDelegate.h>
 
 namespace chip::app {
 

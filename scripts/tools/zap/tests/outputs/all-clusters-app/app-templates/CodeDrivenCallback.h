@@ -75,6 +75,10 @@ void MatterEthernetNetworkDiagnosticsClusterInitCallback(chip::EndpointId endpoi
 
 void MatterEthernetNetworkDiagnosticsClusterShutdownCallback(chip::EndpointId endpointId);
 
+void MatterTimeSynchronizationClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterTimeSynchronizationClusterShutdownCallback(chip::EndpointId endpointId);
+
 void MatterAdministratorCommissioningClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterAdministratorCommissioningClusterShutdownCallback(chip::EndpointId endpointId);

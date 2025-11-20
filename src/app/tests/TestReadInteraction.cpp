@@ -511,10 +511,12 @@ public:
         mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&TestImCustomDataModel::Instance());
         chip::Test::SetMockNodeConfig(TestMockNodeConfig());
         chip::Test::SetVersionTo(chip::Test::kTestDataVersion1);
+        chip::DeviceLayer::SetSystemLayerForTesting(&GetSystemLayer());
     }
 
     void TearDown() override
     {
+        chip::DeviceLayer::SetSystemLayerForTesting(nullptr);
         chip::Test::ResetMockNodeConfig();
         InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
         chip::app::EventManagement::DestroyEventManagement();
