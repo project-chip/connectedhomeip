@@ -22,6 +22,8 @@
 
 #include <access/AccessControl.h>
 #include <access/examples/ExampleAccessControlDelegate.h>
+#include <access/examples/ExtendedAccessControlDelegate.h>
+#include <access/examples/GroupcastAccessControlDelegate.h>
 #include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
 #include <app/DefaultSafeAttributePersistenceProvider.h>
@@ -314,7 +316,8 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
 #endif
 
         // Inject access control delegate
-        this->accessDelegate = Access::Examples::GetAccessControlDelegate();
+        sExtendedAccessControlDelegate.Init(Access::Examples::GetAccessControlDelegate(), Access::Groupcast::GetAccessControlDelegate(this->persistentStorageDelegate));
+        this->accessDelegate = &sExtendedAccessControlDelegate;
 
         // Inject ACL storage. (Don't initialize it.)
         this->aclStorage = &sAclStorage;
@@ -342,6 +345,7 @@ private:
     static PersistentStorageOperationalKeystore sPersistentStorageOperationalKeystore;
     static Credentials::PersistentStorageOpCertStore sPersistentStorageOpCertStore;
     static Credentials::GroupDataProviderImpl sGroupDataProvider;
+    static chip::Access::ExtendedAccessControlDelegate sExtendedAccessControlDelegate;
     static chip::app::DefaultTimerDelegate sTimerDelegate;
     static app::reporting::ReportSchedulerImpl sReportScheduler;
 
