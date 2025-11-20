@@ -24,7 +24,6 @@ from .using_codegen import (CodegenCppAppPregenerator, CodegenCppClustersTLVMeta
                             CodegenCppProtocolsTLVMetaPregenerator, CodegenJavaClassPregenerator, CodegenJavaJNIPregenerator)
 from .using_zap import ZapApplicationPregenerator
 
-
 log = logging.getLogger(__name__)
 
 
