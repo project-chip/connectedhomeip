@@ -356,7 +356,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestPersistenceAndStartup)
         // Default sensitivity for this config is 3.
 
         BooleanStateConfigurationCluster cluster(kTestEndpointId, Feature::kSensitivityLevel, {}, smallerConfig);
-        cluster.Startup(context.Get()); // Should read 6 and clamp it to 5.
+        cluster.Startup(context.Get()); // Should read 6 and clamp it to (max - 1 == 4)
 
         ClusterTester tester(cluster);
         uint8_t sensitivity;
