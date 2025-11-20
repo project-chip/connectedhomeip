@@ -197,8 +197,8 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         await asyncio.sleep(2)
 
         command = {"Name": "QueryImageSnapshot", "Cluster": "OtaSoftwareUpdateProvider", "Endpoint": 0}
-        self.write_to_app_pipe(command, self.fifo_in, subprocess=True)
-        response_data = self.read_from_app_pipe(self.fifo_out, subprocess=True)
+        self.write_to_app_pipe(command, self.fifo_in, is_subprocess=True)
+        response_data = self.read_from_app_pipe(self.fifo_out, is_subprocess=True)
 
         logging.info(f"Out of band command response: {response_data}")
 
