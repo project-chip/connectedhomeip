@@ -38,6 +38,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Laundry Washer Mode
     - Microwave Oven Control
     - Network Commissioning
+    - Network Identity Management
     - Operational State
     - Oven Cavity Operational State
     - Oven Mode
@@ -138,6 +139,7 @@ CodeDrivenClusters:
     - Identify
     - Illuminance Measurement
     - Localization Configuration
+    - Network Identity Management
     - OTA Software Update Provider
     - Occupancy Sensing
     - Operational Credentials

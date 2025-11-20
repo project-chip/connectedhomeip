@@ -87,6 +87,7 @@
         "messages-cluster.xml",
         "mode-base-cluster.xml",
         "mode-select-cluster.xml",
+        "network-identity-management-cluster.xml",
         "push-av-stream-transport-cluster.xml",
         "semantic-tag-namespace-enums.xml",
         "network-commissioning-cluster.xml",
@@ -390,6 +391,11 @@
             "SupportedThreadFeatures",
             "SupportedWiFiBands",
             "ThreadVersion"
+        ],
+        "Network Identity Management": [
+            "ClientTableSize",
+            "ClusterRevision",
+            "FeatureMap"
         ],
         "Occupancy Sensing": [
             "HoldTimeLimits",

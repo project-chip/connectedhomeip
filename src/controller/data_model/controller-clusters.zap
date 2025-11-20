@@ -2487,6 +2487,107 @@
           "apiMaturity": "provisional"
         },
         {
+          "name": "Network Identity Management",
+          "code": 1104,
+          "mfgCode": null,
+          "define": "NETWORK_IDENTITY_MANAGEMENT_CLUSTER",
+          "side": "client",
+          "enabled": 1,
+          "apiMaturity": "provisional",
+          "commands": [
+            {
+              "name": "AddClient",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "AddClientResponse",
+              "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "RemoveClient",
+              "code": 2,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "QueryIdentity",
+              "code": 3,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "QueryIdentityResponse",
+              "code": 4,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "ImportAdminSecret",
+              "code": 64,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "ExportAdminSecret",
+              "code": 65,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "ExportAdminSecretResponse",
+              "code": 66,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 1,
+              "isEnabled": 1
+            }
+          ]
+        },
+        {
+          "name": "Wi-Fi Network Management",
+          "code": 1105,
+          "mfgCode": null,
+          "define": "WIFI_NETWORK_MANAGEMENT_CLUSTER",
+          "side": "client",
+          "enabled": 1,
+          "commands": [
+            {
+              "name": "NetworkPassphraseRequest",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "NetworkPassphraseResponse",
+              "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 1,
+              "isEnabled": 1
+            }
+          ]
+        },
+        {
           "name": "Thread Border Router Management",
           "code": 1106,
           "mfgCode": null,
