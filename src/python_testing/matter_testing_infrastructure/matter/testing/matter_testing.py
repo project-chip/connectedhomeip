@@ -24,6 +24,7 @@ import queue
 import random
 import select
 import shlex
+import subprocess
 import textwrap
 import time
 import typing
@@ -971,7 +972,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                                  f"Expected write success for write to attribute {attribute_value} on endpoint {endpoint_id}")
         return write_result[0].Status
 
-    def read_from_app_pipe(self, app_pipe_out: Optional[str] = None, timeout=2.0, max_bytes=66536, chunk=4096, subprocess: Optional[bool] = False):
+    def read_from_app_pipe(self, app_pipe_out: Optional[str] = None, timeout=2.0, max_bytes=66536, chunk=4096, is_subprocess: Optional[bool] = False):
 
         # If is not empty from the args, verify if the fifo file exists.
         if app_pipe_out is not None and not os.path.exists(app_pipe_out):
@@ -986,7 +987,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         dut_ip = None
 
-        if subprocess == False:
+        if is_subprocess == False:
             dut_ip = os.getenv('LINUX_DUT_IP')
 
         # Checks for concatenate app_pipe and app_pid
@@ -1027,7 +1028,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             out = subprocess.check_output(cmd_list)
             return out
 
-    def write_to_app_pipe(self, command_dict: dict, app_pipe: Optional[str] = None, subprocess: Optional[bool] = False):
+    def write_to_app_pipe(self, command_dict: dict, app_pipe: Optional[str] = None, is_subprocess: Optional[bool] = False):
         """
         Send an out-of-band command to a Matter app.
         Args:
@@ -1066,7 +1067,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         command = json.dumps(command_dict)
         dut_ip = None
 
-        if subprocess == False:
+        if is_subprocess == False:
             dut_ip = os.getenv('LINUX_DUT_IP')
 
         # Checks for concatenate app_pipe and app_pid
