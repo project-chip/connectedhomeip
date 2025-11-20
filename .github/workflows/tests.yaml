@@ -139,6 +139,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/humidistat-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/icd-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/meter-identification-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/network-identity-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/proximity-ranging-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/push-av-stream-transport-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/semantic-tag-namespace-enums.xml \
