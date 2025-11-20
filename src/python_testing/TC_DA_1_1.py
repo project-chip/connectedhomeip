@@ -25,24 +25,24 @@
 #     factory-reset: true
 #     quiet: true
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-ready-pattern: "Server initialization complete"
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 0
 # === END CI TEST ARGUMENTS ===
 
 import logging
-from enum import Enum
-from typing import Optional
-
+import random
+from time import sleep
 from mobly import asserts
 
+from matter import ChipDeviceCtrl
 import matter.clusters as Clusters
-from matter.testing import matter_asserts
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_attribute
 
 logger = logging.getLogger(__name__)
@@ -68,55 +68,90 @@ class TC_DA_1_1(MatterBaseTest):
 
         return steps
 
+    def get_new_controller(self) -> ChipDeviceCtrl.ChipDeviceController:
+        new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
+        new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.matter_test_config.fabric_id + 1)
+        new_controller = new_fabric_admin.NewController(paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path))
+        return new_controller
+
+    async def read_nocs(self, dev_ctrl: ChipDeviceCtrl):
+        return await self.read_single_attribute_check_success(
+            dev_ctrl=dev_ctrl,
+            cluster=Clusters.OperationalCredentials,
+            attribute=Clusters.OperationalCredentials.Attributes.NOCs,
+            fabric_filtered=False)
+
+    async def read_fabrics(self, dev_ctrl: ChipDeviceCtrl):
+        return await self.read_single_attribute_check_success(
+            dev_ctrl=dev_ctrl,
+            cluster=Clusters.OperationalCredentials,
+            attribute=Clusters.OperationalCredentials.Attributes.Fabrics,
+            fabric_filtered=False)
+
+    def factory_reset_dut(self, dev_ctrl):
+        restart_flag_file = self.get_restart_flag_file()
+
+        if not restart_flag_file:
+            # No restart flag file: ask user to manually reboot
+            self.wait_for_user_input(prompt_msg="Reboot the DUT. Press Enter when ready.\n")
+
+            # After manual reboot, expire previous sessions so that we can re-establish connections
+            logging.info("Expiring sessions after manual device reboot")
+            dev_ctrl.ExpireSessions(self.dut_node_id)
+            logging.info("Manual device reboot completed")
+
+        else:
+            try:
+                # Create the restart flag file to signal the test runner
+                with open(restart_flag_file, "w") as f:
+                    f.write("restart")
+                logging.info("Created restart flag file to signal app restart")
+
+                # The test runner will automatically wait for the app-ready-pattern before continuing
+                # Waiting 1 second after the app-ready-pattern is detected as we need to wait a tad longer for the app to be ready and stable, otherwise TH2 connection fails later on in test step 14.
+                sleep(1)
+
+                # Expire sessions and re-establish connections
+                dev_ctrl.ExpireSessions(self.dut_node_id)
+
+                logging.info("App restart completed successfully")
+
+            except Exception as e:
+                logging.error(f"Failed to restart app: {e}")
+                asserts.fail(f"App restart failed: {e}")        
+
     @async_test_body
     async def test_TC_DA_1_1(self):
 
         self.step("precondition")
-        self.th1 = self.default_controller
-        th1_fabric_id = self.th1.fabricId
-        opcreds = Clusters.OperationalCredentials
-        
-        TH1_nodeid = self.matter_test_config.controller_node_id
-        logging.info(f"\n\n\n\n\n\t\t\t TH1_nodeid: {TH1_nodeid}\n\n\n\n\n\n")
-        
-        
-        
-        # new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
-        # new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.matter_test_config.fabric_id + 1)
 
-        # TH2_nodeid = self.matter_test_config.controller_node_id + 2
+        discriminator = random.randint(0, 4095)
+        th1 = self.default_controller
+        th2 = self.get_new_controller()
 
-        # self.th2 = new_fabric_admin.NewController(nodeId=TH2_nodeid,
-        #                                           paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path))
+        nocs_th1 = await self.read_nocs(th1)
+        asserts.assert_true(len(nocs_th1) == 1, "NOCs attribute must contain single entry in the list")
 
-
-
-
-        noc_th1 = await self.read_single_attribute_check_success(
-            dev_ctrl=self.th1,
-            # node_id=TH1_nodeid,
-            # endpoint=0,
-            cluster=opcreds,
-            attribute=opcreds.Attributes.NOCs,
-            fabric_filtered=False)
-
-        # logging.info(f"\n\n\n\n\n\t\t\t noc_th1: {noc_th1}, len: {len(noc_th1)}, noc: {noc_th1[0]}\n\n\n\n\n\n")
-        
-        
-        
-        asserts.assert_true(len(noc_th1) == 1, "NOCs attribute must contain single entry in the list")
-        
-        fabrics_th1 = await self.read_single_attribute_check_success(
-            dev_ctrl=self.th1,
-            cluster=opcreds,
-            attribute=opcreds.Attributes.Fabrics,
-            fabric_filtered=False)
-
+        fabrics_th1 = await self.read_fabrics(th1)
         asserts.assert_true(len(fabrics_th1) == 1, "Fabrics attribute must contain single entry in the list")
-        asserts.assert_equal(fabrics_th1[0].fabricID, th1_fabric_id, "TH1 FabricID and Fabrics attribute FabricID must match")
+        asserts.assert_equal(fabrics_th1[0].fabricID, self.th1.fabricId, "TH1 FabricID and Fabrics attribute FabricID must match")
+
+        self.factory_reset_dut(th1)
+
+        params = await self.th1.OpenCommissioningWindow(
+            nodeId=self.dut_node_id,
+            timeout=900,
+            iteration=10000,
+            discriminator=discriminator,
+            option=1)
+
+        await self.th2.CommissionOnNetwork(
+            nodeId=self.dut_node_id,
+            setupPinCode=params.setupPinCode,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+            filter=self.discriminator)
         
-        logging.info(f"\n\n\n\n\n\t\t\t fabrics_th1: {fabrics_th1}, len: {len(fabrics_th1)}, noc: {fabrics_th1[0]}\n\n\n\n\n\n")
-        
+        nocs_th1 = await self.read_nocs(th2)
 
 
 if __name__ == "__main__":
