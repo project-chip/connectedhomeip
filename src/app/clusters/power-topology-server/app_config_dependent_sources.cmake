@@ -16,6 +16,6 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/PowerTopologyServer.cpp"
+    "${CLUSTER_DIR}/PowerTopologyCluster.cpp"
     "${CLUSTER_DIR}/power-topology-server.h"
 )
