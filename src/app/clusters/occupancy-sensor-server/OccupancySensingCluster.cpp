@@ -94,7 +94,8 @@ OccupancySensing::OccupancySensorTypeEnum FeaturesToOccupancySensorType(BitFlags
 
 OccupancySensingCluster::OccupancySensingCluster(const Config & config) :
     DefaultServerCluster({ config.mEndpointId, OccupancySensing::Id }), mTimerDelegate(config.mTimerDelegate),
-    mDelegate(config.mDelegate), mFeatureMap(config.mFeatureMap), mHasHoldTime(config.mHasHoldTime)
+    mDelegate(config.mDelegate), mFeatureMap(config.mFeatureMap), mHasHoldTime(config.mHasHoldTime),
+    mShowDeprecatedAttributes(config.mShowDeprecatedAttributes)
 {
     SetHoldTimeLimits(config.mHoldTimeLimits);
     mHoldTime = std::clamp(config.mHoldTime, mHoldTimeLimits.holdTimeMin, mHoldTimeLimits.holdTimeMax);
@@ -190,9 +191,11 @@ CHIP_ERROR OccupancySensingCluster::Attributes(const ConcreteClusterPath & clust
     const AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
         { mHasHoldTime, Attributes::HoldTime::kMetadataEntry },
         { mHasHoldTime, Attributes::HoldTimeLimits::kMetadataEntry },
-        { mHasHoldTime && mFeatureMap.Has(Feature::kPassiveInfrared), Attributes::PIROccupiedToUnoccupiedDelay::kMetadataEntry },
-        { mHasHoldTime && mFeatureMap.Has(Feature::kUltrasonic), Attributes::UltrasonicOccupiedToUnoccupiedDelay::kMetadataEntry },
-        { mHasHoldTime && mFeatureMap.Has(Feature::kPhysicalContact),
+        { mHasHoldTime && mShowDeprecatedAttributes && mFeatureMap.Has(Feature::kPassiveInfrared),
+          Attributes::PIROccupiedToUnoccupiedDelay::kMetadataEntry },
+        { mHasHoldTime && mShowDeprecatedAttributes && mFeatureMap.Has(Feature::kUltrasonic),
+          Attributes::UltrasonicOccupiedToUnoccupiedDelay::kMetadataEntry },
+        { mHasHoldTime && mShowDeprecatedAttributes && mFeatureMap.Has(Feature::kPhysicalContact),
           Attributes::PhysicalContactOccupiedToUnoccupiedDelay::kMetadataEntry },
     };
 

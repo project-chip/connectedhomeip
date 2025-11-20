@@ -72,9 +72,16 @@ public:
             return *this;
         }
 
+        Config & WithDeprecatedAttributes(bool showDeprecatedAttributes)
+        {
+            mShowDeprecatedAttributes = showDeprecatedAttributes;
+            return *this;
+        }
+
         EndpointId mEndpointId;
         BitMask<OccupancySensing::Feature> mFeatureMap                        = 0;
         bool mHasHoldTime                                                     = false;
+        bool mShowDeprecatedAttributes                                        = true;
         uint16_t mHoldTime                                                    = 10;
         OccupancySensing::Structs::HoldTimeLimitsStruct::Type mHoldTimeLimits = { .holdTimeMin     = 1,
                                                                                   .holdTimeMax     = 300,
@@ -110,6 +117,7 @@ private:
     OccupancySensingDelegate * mDelegate;
     BitMask<OccupancySensing::Feature> mFeatureMap;
     bool mHasHoldTime = false;
+    bool mShowDeprecatedAttributes;
     uint16_t mHoldTime;
     OccupancySensing::Structs::HoldTimeLimitsStruct::Type mHoldTimeLimits;
     BitMask<OccupancySensing::OccupancyBitmap> mOccupancy = 0;
