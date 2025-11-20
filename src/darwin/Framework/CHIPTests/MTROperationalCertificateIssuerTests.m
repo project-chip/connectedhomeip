@@ -28,7 +28,7 @@ static const uint64_t kDeviceId = 0x12344321;
 static NSString * kOnboardingPayload = @"MT:-24J0AFN00KA0648G00";
 static const uint16_t kLocalPort = 5541;
 static const uint16_t kTestVendorId = 0xFFF1u;
-static NSString * csrNonceStr = @"01234567890123456789012345678901"; // 32 chars
+static NSString * kCSRNonceStr = @"01234567890123456789012345678901"; // 32 chars
 
 // Singleton controller we use.
 static MTRDeviceController * sController = nil;
@@ -55,7 +55,7 @@ static MTRTestKeys * sTestKeys = nil;
     XCTAssertEqual(error.code, 0);
 
     __auto_type * params = [[MTRCommissioningParameters alloc] init];
-    params.csrNonce = [csrNonceStr dataUsingEncoding:NSUTF8StringEncoding];
+    params.csrNonce = [kCSRNonceStr dataUsingEncoding:NSUTF8StringEncoding];
 
     NSError * commissionError = nil;
     [sController commissionNodeWithID:@(kDeviceId)
@@ -101,7 +101,7 @@ static MTRTestKeys * sTestKeys = nil;
     XCTAssertNotNil(attestationInfo);
     XCTAssertEqual(controller, sController);
 
-    XCTAssertEqualObjects(csrInfo.csrNonce, [csrNonceStr dataUsingEncoding:NSUTF8StringEncoding]);
+    XCTAssertEqualObjects(csrInfo.csrNonce, [kCSRNonceStr dataUsingEncoding:NSUTF8StringEncoding]);
 
     __auto_type * csrInfoCopy = [[MTROperationalCSRInfo alloc] initWithCSRElementsTLV:csrInfo.csrElementsTLV
                                                                  attestationSignature:csrInfo.attestationSignature];
