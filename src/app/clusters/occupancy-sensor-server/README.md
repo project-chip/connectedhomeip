@@ -158,8 +158,13 @@ void MySensorHardwareCallback(bool isOccupied)
 }
 ```
 
-Unlike the legacy implementation, the current implementation handles all timer related functionality related to the `holdTime` attribute. So the application should no longer maintain any `holdTime` timer.
+Unlike the legacy implementation, the current implementation handles all timer
+related functionality related to the `holdTime` attribute. So the application
+should no longer maintain any `holdTime` timer.
 
-The global attribute setter/getters are no longer available. This is now exclusively done using the public methods from the `OccupancySensingCluster` class.
+The global attribute setter/getters are no longer available. This is now
+exclusively done using the public methods from the `OccupancySensingCluster`
+class.
 
-Post attribute change callback are now exclusively handled by implementing an `OccupancySensingDelegate`.
+Post attribute change callback are now exclusively handled by implementing an
+`OccupancySensingDelegate`.
