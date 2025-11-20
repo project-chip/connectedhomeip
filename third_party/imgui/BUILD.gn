@@ -36,6 +36,8 @@ config("imgui_config") {
       "-framework",
       "OpenGL",
     ]
+  } else {
+    defines += [ "_REENTRANT" ]
   }
 }
 
