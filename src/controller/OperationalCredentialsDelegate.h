@@ -81,6 +81,13 @@ public:
      */
     virtual void SetFabricIdForNextNOCRequest(FabricId fabricId) {}
 
+    /**
+     * ObtainCsrNonce can be overridden to return CHIP_ERROR_NOT_IMPLEMENTED to
+     * indicate that whatever CSR nonce came from the CommissioningParameters
+     * should be used, or overridden to return a specific nonce that will be
+     * used instead of the one from CommissioningParameters, if AutoCommissioner
+     * is used.
+     */
     virtual CHIP_ERROR ObtainCsrNonce(MutableByteSpan & csrNonce)
     {
         VerifyOrReturnError(csrNonce.size() == kCSRNonceLength, CHIP_ERROR_INVALID_ARGUMENT);
