@@ -64,7 +64,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             expected_output (str): Expected string to see after a default timeout. Defaults to "Server initialization complete".
             timeout (int): Timeout to wait for the expected output. Defaults to 10 seconds
         """
-        logger.info(f"Launching provider app with with ota image {ota_image_path} over the port: {port}")
+        logger.info(f'Launching provider app with ota image {ota_image_path} over the port: {port}')
         # Image to launch
         self.provider_app_path = provider_app_path
         if not path.exists(provider_app_path):
