@@ -38,7 +38,7 @@ TEST_SETUP_QR_CODE = 'MT:-24J042C00KA0648G00'
 
 class App:
 
-    def __init__(self, runner, subproc):
+    def __init__(self, runner, subproc: SubprocessInfo):
         self.process = None
         self.outpipe = None
         self.runner = runner

@@ -170,7 +170,8 @@ class IsolatedNetworkNamespace:
         log.info("Waiting for IPv6 DaD to complete (no tentative addresses)")
         for _ in range(100):  # wait at most 10 seconds
             if 'tentative' not in subprocess.check_output(['ip', 'addr'], text=True):
-                log.debug("No more tentative addresses")
+                log.info("No more tentative addresses")
+                break
             time.sleep(0.1)
         else:
             log.warning("Some addresses look to still be tentative")

@@ -151,16 +151,15 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
 
     if chip_tool is not None:
         chip_tool = SubprocessInfo(kind='tool', path=chip_tool)
-    else:
-        if not runtime == TestRunTime.MATTER_REPL_PYTHON:
-            paths_finder = PathsFinder()
-            if runtime == TestRunTime.CHIP_TOOL_PYTHON:
-                chip_tool_path = paths_finder.get('chip-tool')
-            else:  # DARWIN_FRAMEWORK_TOOL_PYTHON
-                chip_tool_path = paths_finder.get('darwin-framework-tool')
+    elif not runtime == TestRunTime.MATTER_REPL_PYTHON:
+        paths_finder = PathsFinder()
+        if runtime == TestRunTime.CHIP_TOOL_PYTHON:
+            chip_tool_path = paths_finder.get('chip-tool')
+        else:  # DARWIN_FRAMEWORK_TOOL_PYTHON
+            chip_tool_path = paths_finder.get('darwin-framework-tool')
 
-            if chip_tool_path is not None:
-                chip_tool = SubprocessInfo(kind='tool', path=chip_tool_path)
+        if chip_tool_path is not None:
+            chip_tool = SubprocessInfo(kind='tool', path=chip_tool_path)
 
     if include_tags:
         include_tags = {TestTag.__members__[t] for t in include_tags}

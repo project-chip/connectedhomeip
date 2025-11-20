@@ -152,7 +152,7 @@ class Executor:
 
 
 class Runner:
-    def __init__(self, executor, capture_delegate=None):
+    def __init__(self, executor: Executor, capture_delegate=None):
         self.executor = executor
         self.capture_delegate = capture_delegate
 
