@@ -102,7 +102,8 @@ CHIP_ERROR BooleanStateConfigurationCluster::Startup(ServerClusterContext & cont
     }
 
     // internal state validation:
-    if (mFeatures.Has(Feature::kAlarmSuppress)) {
+    if (mFeatures.Has(Feature::kAlarmSuppress))
+    {
         // alarm Suppression requires visual/audible alarms
         VerifyOrReturnError(mFeatures.HasAny(Feature::kAudible, Feature::kVisual), CHIP_ERROR_INCORRECT_STATE);
     }
