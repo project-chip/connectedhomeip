@@ -32,8 +32,8 @@ class Instance : public AttributeAccessInterface
 public:
     Instance(EndpointId aEndpointId, Delegate & aDelegate, BitMask<Feature> aFeature,
              BitMask<OptionalAttributes> aOptionalAttributes) :
-        AttributeAccessInterface(MakeOptional(aEndpointId), Id), mDelegate(aDelegate), mFeature(aFeature),
-        mOptionalAttrs(aOptionalAttributes)
+        AttributeAccessInterface(MakeOptional(aEndpointId), Id),
+        mDelegate(aDelegate), mFeature(aFeature), mOptionalAttrs(aOptionalAttributes)
     {}
     ~Instance() { Shutdown(); }
 
