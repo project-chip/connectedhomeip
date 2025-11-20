@@ -18,6 +18,7 @@
 #pragma once
 
 #include "ElectricalPowerMeasurementCluster.h"
+#include "ElectricalPowerMeasurementDelegate.h"
 #include <app/AttributeAccessInterface.h>
 
 namespace chip {
