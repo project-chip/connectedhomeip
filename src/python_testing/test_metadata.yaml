@@ -150,6 +150,8 @@ not_automated:
       reason: Helper methods for Push AV Integration TCs
     - name: TC_TLS_Utils.py
       reason: Helper methods for TC tests dependent on TLS clusters
+    - name: TC_CADMIN_1_5
+      reason: "Flaky/broken: see https://github.com/project-chip/connectedhomeip/issues/42059"
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially
