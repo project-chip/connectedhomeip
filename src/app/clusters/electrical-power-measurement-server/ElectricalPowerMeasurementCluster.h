@@ -15,11 +15,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
- #pragma once
+#pragma once
 
- #include <lib/core/Optional.h>
- #include <app-common/zap-generated/cluster-objects.h>
- #include <protocols/interaction_model/StatusCode.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <lib/core/Optional.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {
@@ -37,11 +37,11 @@ public:
     virtual uint8_t GetNumberOfMeasurementTypes() = 0;
 
     /* These functions are called by the ReadAttribute handler to iterate through lists
-        * The cluster server will call Start<Type>Read to allow the delegate to create a temporary
-        * lock on the data.
-        * The delegate is expected to not change these values once Start<Type>Read has been called
-        * until the End<Type>Read() has been called (e.g. releasing a lock on the data)
-        */
+     * The cluster server will call Start<Type>Read to allow the delegate to create a temporary
+     * lock on the data.
+     * The delegate is expected to not change these values once Start<Type>Read has been called
+     * until the End<Type>Read() has been called (e.g. releasing a lock on the data)
+     */
     virtual CHIP_ERROR StartAccuracyRead()                                                     = 0;
     virtual CHIP_ERROR GetAccuracyByIndex(uint8_t, Structs::MeasurementAccuracyStruct::Type &) = 0;
     virtual CHIP_ERROR EndAccuracyRead()                                                       = 0;

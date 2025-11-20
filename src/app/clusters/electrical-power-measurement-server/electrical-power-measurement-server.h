@@ -17,7 +17,6 @@
  */
 #pragma once
 
-
 #include "ElectricalPowerMeasurementCluster.h"
 #include <app/AttributeAccessInterface.h>
 
@@ -30,7 +29,7 @@ class Instance : public AttributeAccessInterface
 {
 public:
     Instance(EndpointId aEndpointId, Delegate & aDelegate, BitMask<Feature> aFeature,
-                BitMask<OptionalAttributes> aOptionalAttributes) :
+             BitMask<OptionalAttributes> aOptionalAttributes) :
         AttributeAccessInterface(MakeOptional(aEndpointId), Id),
         mDelegate(aDelegate), mFeature(aFeature), mOptionalAttrs(aOptionalAttributes)
     {
