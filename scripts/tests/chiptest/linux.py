@@ -31,7 +31,6 @@ import sdbus
 
 from .runner import Executor, SubprocessInfo
 
-log = logging.getLogger(__name__)
 
 log = logging.getLogger(__name__)
 
