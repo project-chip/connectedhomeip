@@ -160,6 +160,20 @@ if build_conf.getboolean('CONFIG_BOOTLOADER_MCUBOOT'):
         merge_binaries('merged.bin', build_conf['CONFIG_SIGNED_OTA_IMAGE_FILE_NAME'],
                        'merged.bin', build_conf['CONFIG_TELINK_OTA_PARTITION_ADDR'])
 
+if build_conf.getboolean('CONFIG_CHIP_DFU_OVER_BT_SMP_BUILD'):
+    if os.path.exists('dfu.data'):
+        print("Start preparing image for DFU over BLE SMP")
+        with open("merged_dfu.bin", "wb") as output:
+            with open("zephyr.signed.bin", "rb") as input1:
+                output.write(input1.read())
+                print("zephyr.signed is written to merged_dfu.bin")
+            footer_size = os.path.getsize('dfu.data')
+            output.write(footer_size.to_bytes(1, 'little'))
+            with open('dfu.data', "rb") as input2:
+                output.write(input2.read())
+                print("Image footer is written to merged_dfu.bin")
+            print("Image for DFU over BLE SMP is ready!")
+
 # Merge Factory Data binary if configured
 if build_conf.getboolean('CONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE'):
     if os.path.exists('merged.bin'):

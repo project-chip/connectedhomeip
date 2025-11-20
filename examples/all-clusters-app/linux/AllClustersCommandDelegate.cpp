@@ -563,7 +563,7 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     else if (name == "SimulateConfigurationVersionChange")
     {
         uint32_t configurationVersion = 0;
-        ConfigurationMgr().GetConfigurationVersion(configurationVersion);
+        TEMPORARY_RETURN_IGNORED ConfigurationMgr().GetConfigurationVersion(configurationVersion);
         configurationVersion++;
 
         if (ConfigurationMgr().StoreConfigurationVersion(configurationVersion + 1) != CHIP_NO_ERROR)
@@ -596,7 +596,7 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     }
     else if (name == "UserIntentCommissioningStart")
     {
-        Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+        TEMPORARY_RETURN_IGNORED Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
     }
     else if (name == "SetTotalOperationalHours")
     {
@@ -648,7 +648,8 @@ void AllClustersAppCommandHandler::OnRebootSignalHandler(BootReasonType bootReas
     if (ConfigurationMgr().StoreBootReason(static_cast<uint32_t>(bootReason)) == CHIP_NO_ERROR)
     {
         Server::GetInstance().GenerateShutDownEvent();
-        PlatformMgr().ScheduleWork([](intptr_t) { PlatformMgr().StopEventLoopTask(); });
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(
+            [](intptr_t) { TEMPORARY_RETURN_IGNORED PlatformMgr().StopEventLoopTask(); });
     }
     else
     {
@@ -947,15 +948,18 @@ void AllClustersAppCommandHandler::OnOvenOperationalStateChange(std::string devi
     OperationalState::Instance * operationalStateInstance = OvenCavityOperationalState::GetOperationalStateInstance();
     if (operation == "Start" || operation == "Resume")
     {
-        operationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
+        TEMPORARY_RETURN_IGNORED operationalStateInstance->SetOperationalState(
+            to_underlying(OperationalState::OperationalStateEnum::kRunning));
     }
     else if (operation == "Pause")
     {
-        operationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused));
+        TEMPORARY_RETURN_IGNORED operationalStateInstance->SetOperationalState(
+            to_underlying(OperationalState::OperationalStateEnum::kPaused));
     }
     else if (operation == "Stop")
     {
-        operationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
+        TEMPORARY_RETURN_IGNORED operationalStateInstance->SetOperationalState(
+            to_underlying(OperationalState::OperationalStateEnum::kStopped));
     }
     else if (operation == "OnFault")
     {
@@ -999,7 +1003,7 @@ void AllClustersAppCommandHandler::OnSoilMoistureChange(EndpointId endpointId, D
         ChipLogDetail(NotSpecified, "Set SoilMoisture value to %u", soilMoisture.Value());
     }
 
-    SoilMeasurement::SetSoilMoistureMeasuredValue(soilMoisture);
+    TEMPORARY_RETURN_IGNORED SoilMeasurement::SetSoilMoistureMeasuredValue(soilMoisture);
 }
 
 void AllClustersAppCommandHandler::HandleSetOccupancyChange(EndpointId endpointId, uint8_t newOccupancyValue)
@@ -1076,5 +1080,6 @@ void AllClustersCommandDelegate::OnEventCommandReceived(const char * json)
         return;
     }
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(AllClustersAppCommandHandler::HandleCommand, reinterpret_cast<intptr_t>(handler));
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(AllClustersAppCommandHandler::HandleCommand,
+                                                                           reinterpret_cast<intptr_t>(handler));
 }

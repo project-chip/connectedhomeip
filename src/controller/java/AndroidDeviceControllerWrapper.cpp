@@ -820,6 +820,22 @@ void AndroidDeviceControllerWrapper::OnCommissioningStatusUpdate(PeerId peerId, 
                         jStageCompleted.jniValue(), static_cast<jlong>(error.AsInteger()));
 }
 
+void AndroidDeviceControllerWrapper::OnCommissioningStageStart(PeerId peerId, chip::Controller::CommissioningStage stage)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceScope scope(env);
+    jmethodID onCommissioningStageStartMethod;
+    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef.ObjectRef(), "onCommissioningStageStart",
+                                                             "(JLjava/lang/String;)V", &onCommissioningStageStartMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, err.Format()));
+
+    UtfString jStage(env, StageToString(stage));
+    env->CallVoidMethod(mJavaObjectRef.ObjectRef(), onCommissioningStageStartMethod, static_cast<jlong>(peerId.GetNodeId()),
+                        jStage.jniValue());
+}
+
 void AndroidDeviceControllerWrapper::OnReadCommissioningInfo(const chip::Controller::ReadCommissioningInfo & info)
 {
     // calls: onReadCommissioningInfo(int vendorId, int productId, int wifiEndpointId, int threadEndpointId)

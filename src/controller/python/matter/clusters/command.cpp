@@ -269,7 +269,7 @@ PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, u
             VerifyOrExit(writer != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
             TLV::TLVReader reader;
             reader.Init(tlvBuffer, static_cast<uint32_t>(tlvLength));
-            reader.Next();
+            TEMPORARY_RETURN_IGNORED reader.Next();
             SuccessOrExit(err = writer->CopyContainer(TLV::ContextTag(CommandDataIB::Tag::kFields), reader));
         }
 
@@ -292,7 +292,7 @@ PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, u
             // Making sure the value we used to override CommandRef was actually used.
             VerifyOrDie(finishCommandParams.commandRef.Value() == testOnlyCommandRefsOverride[i]);
             // Ignoring the result of adding to index as the test might be trying to set duplicate CommandRefs.
-            callback->AddCommandRefToIndexLookup(finishCommandParams.commandRef.Value(), i);
+            TEMPORARY_RETURN_IGNORED callback->AddCommandRefToIndexLookup(finishCommandParams.commandRef.Value(), i);
         }
         else
 #endif
@@ -376,7 +376,7 @@ PyChipError pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * de
         TLV::TLVReader reader;
         VerifyOrExit(writer != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         reader.Init(payload, length);
-        reader.Next();
+        TEMPORARY_RETURN_IGNORED reader.Next();
         SuccessOrExit(err = writer->CopyContainer(TLV::ContextTag(CommandDataIB::Tag::kFields), reader));
     }
 
@@ -452,7 +452,7 @@ PyChipError pychip_CommandSender_TestOnlySendCommandTimedRequestNoTimedInvoke(
         TLV::TLVReader reader;
         VerifyOrExit(writer != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         reader.Init(payload, length);
-        reader.Next();
+        TEMPORARY_RETURN_IGNORED reader.Next();
         SuccessOrExit(err = writer->CopyContainer(TLV::ContextTag(CommandDataIB::Tag::kFields), reader));
     }
 
@@ -500,7 +500,7 @@ PyChipError pychip_CommandSender_SendGroupCommand(chip::GroupId groupId, chip::C
         TLV::TLVReader reader;
         VerifyOrExit(writer != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         reader.Init(payload, length);
-        reader.Next();
+        TEMPORARY_RETURN_IGNORED reader.Next();
         SuccessOrExit(err = writer->CopyContainer(TLV::ContextTag(CommandDataIB::Tag::kFields), reader));
     }
 
