@@ -110,7 +110,7 @@ class AsyncioCallableHandle:
 
     def __init__(self, callback):
         self._callback = callback
-        self._loop = asyncio.get_event_loop()
+        self._loop = asyncio.get_running_loop()
         self._future = self._loop.create_future()
         self._result = None
         self._exception = None
