@@ -39,7 +39,6 @@ using namespace chip::app::Clusters::GeneralCommissioning::Attributes;
 using chip::app::AttributeListBuilder;
 using chip::app::DataModel::AcceptedCommandEntry;
 using chip::app::DataModel::AttributeEntry;
-using chip::Testing::IsAcceptedCommandsListEqualTo;
 
 // initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestGeneralCommissioningCluster : public ::testing::Test
