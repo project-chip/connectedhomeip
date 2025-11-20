@@ -39,10 +39,11 @@
 import logging
 import random
 from time import sleep
+
 from mobly import asserts
 
-from matter import ChipDeviceCtrl
 import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_attribute
 
 logger = logging.getLogger(__name__)
