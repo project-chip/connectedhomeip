@@ -38,6 +38,8 @@
 #       --int-arg ota_provider_port:5541
 #       --string-arg provider_app_path:${OTA_PROVIDER_APP}
 #       --string-arg ota_image:${SU_OTA_REQUESTOR_V2}
+#       --string-arg app_pipe:/tmp/su_2_8_fifo
+#       --string-arg app_pipe_out:/tmp/su_2_8_fifo_out
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -195,8 +197,8 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         await asyncio.sleep(2)
 
         command = {"Name": "QueryImageSnapshot", "Cluster": "OtaSoftwareUpdateProvider", "Endpoint": 0}
-        self.write_to_app_pipe(command, self.fifo_in)
-        response_data = self.read_from_app_pipe(self.fifo_out)
+        self.write_to_app_pipe(command, self.fifo_in, subprocess=True)
+        response_data = self.read_from_app_pipe(self.fifo_out, subprocess=True)
 
         logging.info(f"Out of band command response: {response_data}")
 
