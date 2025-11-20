@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster CommodityTariff (cluster code: 1792/0x04700)
+// Identifier constant values for cluster CommodityTariff (cluster code: 1792/0x0700)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

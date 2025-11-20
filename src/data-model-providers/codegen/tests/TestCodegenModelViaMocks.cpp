@@ -70,6 +70,7 @@
 #include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/Span.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 #include <optional>
@@ -185,13 +186,13 @@ public:
     CodegenDataModelProviderWithContext()
     {
         SetPersistentStorageDelegate(&mStorageDelegate);
-        Startup({
+        EXPECT_SUCCESS(Startup({
             .eventsGenerator         = mEventGenerator,
             .dataModelChangeListener = mChangeListener,
             .actionContext           = mActionContext,
-        });
+        }));
     }
-    ~CodegenDataModelProviderWithContext() override { Shutdown(); }
+    ~CodegenDataModelProviderWithContext() override { EXPECT_SUCCESS(Shutdown()); }
 
     TestProviderChangeListener & ChangeListener() { return mChangeListener; }
     const TestProviderChangeListener & ChangeListener() const { return mChangeListener; }
@@ -268,9 +269,9 @@ class CustomListCommandHandler : public CommandHandlerInterface
 public:
     CustomListCommandHandler(Optional<EndpointId> endpointId, ClusterId clusterId) : CommandHandlerInterface(endpointId, clusterId)
     {
-        CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this);
+        EXPECT_SUCCESS(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
     }
-    ~CustomListCommandHandler() { CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this); }
+    ~CustomListCommandHandler() { EXPECT_SUCCESS(CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this)); }
 
     void InvokeCommand(HandlerContext & handlerContext) override
     {
@@ -322,9 +323,9 @@ class ShimCommandHandler : public CommandHandlerInterfaceShim<Clusters::UnitTest
 public:
     ShimCommandHandler(Optional<EndpointId> endpointId, ClusterId clusterId) : CommandHandlerInterfaceShim(endpointId, clusterId)
     {
-        CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this);
+        EXPECT_SUCCESS(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
     }
-    ~ShimCommandHandler() { CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this); }
+    ~ShimCommandHandler() { EXPECT_SUCCESS(CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this)); }
 
     void InvokeCommand(HandlerContext & handlerContext) override
     {
@@ -390,7 +391,10 @@ private:
 class ScopedMockAccessControl
 {
 public:
-    ScopedMockAccessControl() { Access::GetAccessControl().Init(&mMock, mMock); }
+    ScopedMockAccessControl()
+    { // We are sometimes initializing twice, resulting in a failure
+        TEMPORARY_RETURN_IGNORED Access::GetAccessControl().Init(&mMock, mMock);
+    }
     ~ScopedMockAccessControl() { Access::GetAccessControl().Finish(); }
 
 private:
@@ -2219,7 +2223,7 @@ TEST_F(TestCodegenModelViaMocks, AttributeAccessInterfaceTakesPrecedenceOverServ
         ASSERT_TRUE(model.WriteAttribute(test.GetRequest(), decoder).IsSuccess());
     }
 
-    model.Registry().Unregister(&fakeClusterServer);
+    EXPECT_SUCCESS(model.Registry().Unregister(&fakeClusterServer));
 }
 
 TEST_F(TestCodegenModelViaMocks, AAISkippedIfNoEmberMetadata)
@@ -2261,7 +2265,7 @@ TEST_F(TestCodegenModelViaMocks, AAISkippedIfNoEmberMetadata)
         ASSERT_TRUE(model.WriteAttribute(test.GetRequest(), decoder).IsSuccess());
     }
 
-    model.Registry().Unregister(&fakeClusterServer);
+    EXPECT_SUCCESS(model.Registry().Unregister(&fakeClusterServer));
 }
 
 TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteBasicTypes)
@@ -2776,7 +2780,7 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesWrite)
         ASSERT_TRUE(result.has_value() && result->IsSuccess());
     }
 
-    model.Registry().Unregister(&fakeClusterServer);
+    EXPECT_SUCCESS(model.Registry().Unregister(&fakeClusterServer));
 }
 
 TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesRead)
@@ -2804,7 +2808,7 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesRead)
                   CHIP_NO_ERROR);
     }
 
-    model.Registry().Unregister(&fakeClusterServer);
+    EXPECT_SUCCESS(model.Registry().Unregister(&fakeClusterServer));
 }
 
 TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesRegistration)
@@ -2890,7 +2894,7 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesRegistration)
         ASSERT_TRUE(result.has_value() && result->GetUnderlyingError() == CHIP_ERROR_INCORRECT_STATE);
     }
 
-    model.Registry().Unregister(&fakeClusterServer);
+    EXPECT_SUCCESS(model.Registry().Unregister(&fakeClusterServer));
 }
 
 TEST_F(TestCodegenModelViaMocks, EventInfo)
@@ -2924,7 +2928,7 @@ TEST_F(TestCodegenModelViaMocks, EventInfo)
     ASSERT_EQ(model.EventInfo({ kMockEndpoint1, MockClusterId(1), kTestEventId }, entry), CHIP_NO_ERROR);
     ASSERT_EQ(entry.readPrivilege, Access::Privilege::kAdminister);
 
-    model.Registry().Unregister(&fakeClusterServer);
+    EXPECT_SUCCESS(model.Registry().Unregister(&fakeClusterServer));
 
     // once unregistered, go back to the default
     ASSERT_EQ(model.EventInfo({ kMockEndpoint1, MockClusterId(2), kTestEventId }, entry), CHIP_NO_ERROR);
@@ -3008,8 +3012,8 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesListClusters)
     }
     EXPECT_TRUE(updatedClusterFound);
 
-    model.Registry().Unregister(&fakeClusterServer);
-    model.Shutdown();
+    EXPECT_SUCCESS(model.Registry().Unregister(&fakeClusterServer));
+    EXPECT_SUCCESS(model.Shutdown());
 }
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
 TEST_F(TestCodegenModelViaMocks, EndpointUniqueID)

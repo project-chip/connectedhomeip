@@ -113,7 +113,7 @@ static void HandleNodeBrowse(void * context, DnssdService * services, size_t ser
         // check whether SRV, TXT and AAAA records were received in DNS responses
         else if (strlen(services[i].mHostName) == 0 || services[i].mTextEntrySize == 0 || !ipAddress.has_value())
         {
-            ChipDnssdResolve(&services[i], services[i].mInterface, HandleNodeResolve, context);
+            TEMPORARY_RETURN_IGNORED ChipDnssdResolve(&services[i], services[i].mInterface, HandleNodeResolve, context);
         }
         else
         {
@@ -391,7 +391,7 @@ void DnssdService::ToDiscoveredOperationalNodeBrowseData(DiscoveredNodeData & no
 {
     nodeData.Set<OperationalNodeBrowseData>();
 
-    ExtractIdFromInstanceName(mName, &nodeData.Get<OperationalNodeBrowseData>().peerId);
+    TEMPORARY_RETURN_IGNORED ExtractIdFromInstanceName(mName, &nodeData.Get<OperationalNodeBrowseData>().peerId);
     nodeData.Get<OperationalNodeBrowseData>().hasZeroTTL = (mTtlSeconds == 0);
 }
 
@@ -437,15 +437,8 @@ CHIP_ERROR DiscoveryImplPlatform::InitImpl()
     VerifyOrReturnError(mState == State::kUninitialized, CHIP_NO_ERROR);
     mState = State::kInitializing;
 
-    CHIP_ERROR err = ChipDnssdInit(HandleDnssdInit, HandleDnssdError, this);
-    if (err != CHIP_NO_ERROR)
-    {
-        mState = State::kUninitialized;
-        return err;
-    }
-    UpdateCommissionableInstanceName();
-
-    return CHIP_NO_ERROR;
+    ReturnErrorOnFailure(ChipDnssdInit(HandleDnssdInit, HandleDnssdError, this), mState = State::kUninitialized);
+    return UpdateCommissionableInstanceName();
 }
 
 void DiscoveryImplPlatform::Shutdown()
@@ -466,15 +459,12 @@ void DiscoveryImplPlatform::HandleDnssdInit(void * context, CHIP_ERROR initError
         // Post an event that will start advertising
         DeviceLayer::ChipDeviceEvent event{ .Type = DeviceLayer::DeviceEventType::kDnssdInitialized };
 
-        CHIP_ERROR error = DeviceLayer::PlatformMgr().PostEvent(&event);
-        if (error != CHIP_NO_ERROR)
-        {
-            ChipLogError(Discovery, "Posting DNS-SD platform initialized event failed with %" CHIP_ERROR_FORMAT, error.Format());
-        }
+        SuccessOrLog(DeviceLayer::PlatformMgr().PostEvent(&event), Discovery,
+                     "Posting DNS-SD platform initialized event failed with");
     }
     else
     {
-        ChipLogError(Discovery, "DNS-SD initialization failed with %" CHIP_ERROR_FORMAT, initError.Format());
+        ChipLogFailure(initError, Discovery, "DNS-SD initialization failed with");
         publisher->mState = State::kUninitialized;
     }
 }
@@ -722,7 +712,7 @@ void DiscoveryImplPlatform::NodeIdResolutionNoLongerNeeded(const PeerId & peerId
 CHIP_ERROR DiscoveryImplPlatform::DiscoverCommissionableNodes(DiscoveryFilter filter, DiscoveryContext & context)
 {
     ReturnErrorOnFailure(InitImpl());
-    StopDiscovery(context);
+    TEMPORARY_RETURN_IGNORED StopDiscovery(context);
 
     if (filter.type == DiscoveryFilterType::kInstanceName)
     {
@@ -768,7 +758,7 @@ CHIP_ERROR DiscoveryImplPlatform::DiscoverCommissionableNodes(DiscoveryFilter fi
 CHIP_ERROR DiscoveryImplPlatform::DiscoverCommissioners(DiscoveryFilter filter, DiscoveryContext & context)
 {
     ReturnErrorOnFailure(InitImpl());
-    StopDiscovery(context);
+    TEMPORARY_RETURN_IGNORED StopDiscovery(context);
 
     if (filter.type == DiscoveryFilterType::kInstanceName)
     {
@@ -812,7 +802,7 @@ CHIP_ERROR DiscoveryImplPlatform::DiscoverCommissioners(DiscoveryFilter filter, 
 CHIP_ERROR DiscoveryImplPlatform::DiscoverOperational(DiscoveryFilter filter, DiscoveryContext & context)
 {
     ReturnErrorOnFailure(InitImpl());
-    StopDiscovery(context);
+    TEMPORARY_RETURN_IGNORED StopDiscovery(context);
 
     char serviceName[kMaxOperationalServiceNameSize];
     ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kOperational));

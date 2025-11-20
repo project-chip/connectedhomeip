@@ -10,6 +10,7 @@
 	path = third_party/mbedtls/repo
 	url = https://github.com/ARMmbed/mbedtls.git
 	branch = mbedtls-2.28
+	excluded-platforms = esp32
 [submodule "qrcode"]
 	path = examples/common/QRCode/repo
 	url = https://github.com/nayuki/QR-Code-generator.git
@@ -50,7 +51,7 @@
 	path = third_party/freertos/repo
 	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git
 	branch  = V10.3.1-kernel-only
-	platforms = ameba,cc13xx_26xx,bouffalolab,esp32,infineon,qpg,cc32xx,realtek
+	platforms = ameba,cc13xx_26xx,bouffalolab,infineon,qpg,cc32xx,realtek
 [submodule "simw-top-mini"]
 	path = third_party/simw-top-mini/repo
 	url = https://github.com/NXP/plug-and-trust.git
@@ -204,6 +205,7 @@
 	path = third_party/boringssl/repo/src
 	url = https://github.com/google/boringssl.git
 	branch = master
+	excluded-platforms = esp32
 [submodule "third_party/mt793x_sdk/filogic"]
 	path = third_party/mt793x_sdk/filogic
 	url = https://github.com/MediaTek-Labs/genio-matter-bsp.git
@@ -300,7 +302,7 @@
 [submodule "third_party/lwip/repo"]
 	path = third_party/lwip/repo
 	url = https://github.com/lwip-tcpip/lwip.git
-	excluded-platforms = darwin
+	excluded-platforms = darwin,esp32
 [submodule "third_party/abseil-cpp/src"]
 	path = third_party/abseil-cpp/src
 	url = https://github.com/abseil/abseil-cpp.git
@@ -326,6 +328,11 @@
 [submodule "third_party/libtrustymatter/repo"]
 	path = third_party/libtrustymatter/repo
 	url = https://github.com/nxp-imx/libtrustymatter
+[submodule "third_party/imx-secure-enclave/repo"]
+	path = third_party/imx-secure-enclave/repo
+	url = https://github.com/nxp-imx/imx-secure-enclave.git
+	branch = lf-6.12.34_2.1.0
+	platforms = linux
 [submodule "third_party/amazon-kinesis-video-streams-webrtc-sdk-c/repo"]
 	path = third_party/amazon-kinesis-video-streams-webrtc-sdk-c/repo
 	url = https://github.com/awslabs/amazon-kinesis-video-streams-webrtc-sdk-c
