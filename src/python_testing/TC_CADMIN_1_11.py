@@ -35,7 +35,6 @@
 import logging
 import random
 from time import sleep
-from typing import Optional
 
 from mobly import asserts
 from support_modules.cadmin_support import CADMINBaseTest
@@ -61,23 +60,6 @@ class TC_CADMIN_1_11(CADMINBaseTest):
                 await th.OpenCommissioningWindow(
                     nodeId=self.dut_node_id, timeout=self.timeout, iteration=10000, discriminator=self.discriminator, option=1)
             errcode = PyChipError.from_code(ctx.exception.err)
-            logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
-            asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
-            asserts.assert_true(errcode.sdk_code == expectedErrCode,
-                                'Unexpected error code returned from CommissioningComplete')
-
-    async def OpenBasicCommissioningWindow(self, th: ChipDeviceCtrl, expectedErrCode: Optional[Clusters.AdministratorCommissioning.Enums.StatusCode] = None) -> CommissioningParameters:
-        if not expectedErrCode:
-            params = await th.OpenBasicCommissioningWindow(
-                nodeId=self.dut_node_id, timeout=self.timeout)
-            return params
-
-        else:
-            ctx = asserts.assert_raises(ChipStackError)
-            with ctx:
-                await th.OpenBasicCommissioningWindow(
-                    nodeId=self.dut_node_id, timeout=self.timeout)
-            errcode = ctx.exception.chip_error
             logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
             asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
             asserts.assert_true(errcode.sdk_code == expectedErrCode,
