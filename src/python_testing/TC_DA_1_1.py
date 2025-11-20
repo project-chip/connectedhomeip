@@ -158,7 +158,7 @@ class TC_DA_1_1(MatterBaseTest):
 
         fabrics_th1 = await self.read_fabrics(th1)
         asserts.assert_true(len(fabrics_th1) == 1, "Fabrics attribute must contain single entry in the list")
-        asserts.assert_equal(fabrics_th1[0].fabricID, self.th1.fabricId, "TH1 FabricID and Fabrics attribute FabricID must match")
+        asserts.assert_equal(fabrics_th1[0].fabricID, th1.fabricId, "TH1 FabricID and Fabrics attribute FabricID must match")
 
         self.factory_reset_dut(th1)
 
