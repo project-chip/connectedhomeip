@@ -596,7 +596,6 @@ void Instance::HandlePauseRequest(HandlerContext & ctx, const Commands::PauseReq
     if (status != Status::Success)
     {
         ChipLogError(Zcl, "DEM: PauseRequest(%ld) FAILURE", static_cast<long unsigned int>(duration));
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
         return;
     }
 }
@@ -716,7 +715,6 @@ void Instance::HandleModifyForecastRequest(HandlerContext & ctx, const Commands:
     if (status != Status::Success)
     {
         ChipLogError(Zcl, "DEM: ModifyForecastRequest FAILURE");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
         return;
     }
 }
