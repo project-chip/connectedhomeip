@@ -70,7 +70,7 @@ CHIP_ERROR LayerImplFreeRTOS::StartTimer(Clock::Timeout delay, TimerCompleteCall
         // HandleExpiredTimers() to re-start the timer.
         if (!mHandlingTimerComplete)
         {
-            StartPlatformTimer(delay);
+            ReturnErrorOnFailure(StartPlatformTimer(delay));
         }
     }
     return CHIP_NO_ERROR;
@@ -209,7 +209,7 @@ CHIP_ERROR LayerImplFreeRTOS::HandlePlatformTimer()
             delay = mTimerList.Earliest()->AwakenTime() - currentTime;
         }
 
-        StartPlatformTimer(delay);
+        return StartPlatformTimer(delay);
     }
 
     return CHIP_NO_ERROR;
