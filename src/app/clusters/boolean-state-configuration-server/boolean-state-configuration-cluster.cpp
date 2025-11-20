@@ -100,6 +100,13 @@ CHIP_ERROR BooleanStateConfigurationCluster::Startup(ServerClusterContext & cont
     {
         mCurrentSensitivityLevel = mSupportedSensitivityLevels - 1;
     }
+
+    // internal state validation:
+    if (mFeatures.Has(Feature::kAlarmSuppress)) {
+        // alarm Suppression requires visual/audible alarms
+        VerifyOrReturnError(mFeatures.HasAny(Feature::kAudible, Feature::kVisual), CHIP_ERROR_INCORRECT_STATE);
+    }
+
     return CHIP_NO_ERROR;
 }
 
@@ -110,12 +117,11 @@ CHIP_ERROR BooleanStateConfigurationCluster::AcceptedCommands(const ConcreteClus
     if (mFeatures.HasAny(Feature::kAudible, Feature::kVisual))
     {
         ReturnErrorOnFailure(builder.AppendElements({ Commands::EnableDisableAlarm::kMetadataEntry }));
+    }
 
-        // Alarm suppression has [VIS | AUD] conformance, so checks are nested here
-        if (mFeatures.Has(Feature::kAlarmSuppress))
-        {
-            ReturnErrorOnFailure(builder.AppendElements({ Commands::SuppressAlarm::kMetadataEntry }));
-        }
+    if (mFeatures.Has(Feature::kAlarmSuppress))
+    {
+        ReturnErrorOnFailure(builder.AppendElements({ Commands::SuppressAlarm::kMetadataEntry }));
     }
 
     return CHIP_NO_ERROR;
