@@ -987,7 +987,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         dut_ip = None
 
-        if is_subprocess == False:
+        if not is_subprocess:
             dut_ip = os.getenv('LINUX_DUT_IP')
 
         # Checks for concatenate app_pipe and app_pid
@@ -1067,7 +1067,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         command = json.dumps(command_dict)
         dut_ip = None
 
-        if is_subprocess == False:
+        if not is_subprocess:
             dut_ip = os.getenv('LINUX_DUT_IP')
 
         # Checks for concatenate app_pipe and app_pid
