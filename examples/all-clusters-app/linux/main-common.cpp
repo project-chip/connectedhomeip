@@ -50,6 +50,11 @@
 #include <app/clusters/laundry-dryer-controls-server/laundry-dryer-controls-server.h>
 #include <app/clusters/laundry-washer-controls-server/laundry-washer-controls-server.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
+#include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestor.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorUserConsent.h>
+#include <app/clusters/ota-requestor/ExtendedOTARequestorDriver.h>
 #include <app/clusters/push-av-stream-transport-server/CodegenIntegration.h>
 #include <app/clusters/thermostat-server/thermostat-server.h>
 #include <app/clusters/time-synchronization-server/time-synchronization-server.h>
@@ -62,6 +67,7 @@
 #include <platform/DefaultTimerDelegate.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <platform/Linux/OTAImageProcessorImpl.h>
 #include <platform/PlatformManager.h>
 #include <static-supported-modes-manager.h>
 #include <static-supported-temperature-levels.h>
@@ -120,6 +126,15 @@ Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
 Clusters::ValveConfigurationAndControl::ValveControlDelegate sValveDelegate;
 Clusters::TimeSynchronization::ExtendedTimeSyncDelegate sTimeSyncDelegate;
 Clusters::PushAvStreamTransport::PushAvStreamTransportManager gPushAvStreamTransportManager;
+
+DefaultOTARequestor gRequestorCore;
+DefaultOTARequestorStorage gRequestorStorage;
+DeviceLayer::ExtendedOTARequestorDriver gRequestorUser;
+BDXDownloader gDownloader;
+OTAImageProcessorImpl gImageProcessor;
+ota::DefaultOTARequestorUserConsent gUserConsentProvider;
+constexpr size_t kMaxFilePathSize              = 256;
+static char gOtaDownloadPath[kMaxFilePathSize] = "/tmp/test.bin";
 
 // Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
 constexpr const uint8_t kNamespaceCommon   = 7;
@@ -183,6 +198,22 @@ RegisteredServerCluster<Clusters::IdentifyCluster>
 
 } // namespace
 
+void InitOTARequestor()
+{
+    // Set the global instance of the OTA requestor core component
+    SetRequestorInstance(&gRequestorCore);
+
+    gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
+    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
+    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
+
+    gImageProcessor.SetOTAImageFile(gOtaDownloadPath);
+    gImageProcessor.SetOTADownloader(&gDownloader);
+
+    // Set the image processor instance used for handling image being downloaded
+    gDownloader.SetImageProcessorDelegate(&gImageProcessor);
+}
+
 #ifdef MATTER_DM_PLUGIN_DISHWASHER_ALARM_SERVER
 extern void MatterDishwasherAlarmServerInit();
 #endif
@@ -196,6 +227,7 @@ void ApplicationInit()
         TEMPORARY_RETURN_IGNORED sChipNamedPipeCommands.Stop();
     }
 
+    InitOTARequestor();
 #ifdef MATTER_DM_PLUGIN_DISHWASHER_ALARM_SERVER
     MatterDishwasherAlarmServerInit();
 #endif
