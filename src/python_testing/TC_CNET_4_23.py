@@ -467,17 +467,10 @@ class TC_CNET_4_23(MatterBaseTest):
         # Step 10: TH reads LastNetworkingStatus (should be kAuthFailure)
         self.step(10)
 
-        # Verify LastNetworkingStatus indicates a failure
-        # Can be kAuthFailure (incorrect password), kNetworkNotFound (network not in range),
-        # or kOtherConnectionFailure (general connection failure)
-        valid_failure_statuses = [
-            cnet.Enums.NetworkCommissioningStatusEnum.kAuthFailure,
-            cnet.Enums.NetworkCommissioningStatusEnum.kNetworkNotFound,
-            cnet.Enums.NetworkCommissioningStatusEnum.kOtherConnectionFailure
-        ]
+        # When authentication fails due to incorrect password, the DUT should return kAuthFailure
         await self._read_last_networking_status(
             endpoint,
-            valid_statuses=valid_failure_statuses
+            expected_status=cnet.Enums.NetworkCommissioningStatusEnum.kAuthFailure
         )
 
         # Step 11: TH sends ScanNetworks command with Breadcrumb = 6
