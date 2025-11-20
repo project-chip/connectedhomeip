@@ -422,7 +422,7 @@ def dump_ids_from_data_model_dirs():
             ) if requirement.conformance([], 0, 0).decision == ConformanceDecision.MANDATORY]
             client_provisional = [clusters[c].name for c in dt_client_mandatory if clusters[c].is_provisional]
             if server_provisional or client_provisional:
-                log.info("Found provisional mandatory clusters server:'%s'{} "
+                log.info("Found provisional mandatory clusters server:'%s' "
                          "client: '%s' in device type '%s' for revision '%s'",
                          server_provisional, client_provisional, d.name, dir)
                 return "P"

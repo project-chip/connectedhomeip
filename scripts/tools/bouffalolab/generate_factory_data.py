@@ -573,5 +573,6 @@ def main():
     log.info("MFD partition file: '%s'", mfd_output)
     log.info("QR code PNG file: '%s'", onboard_png)
 
-    if __name__ == "__main__":
-        main()
+
+if __name__ == "__main__":
+    main()

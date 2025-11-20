@@ -343,7 +343,7 @@ def is_backwards_compatible(original: Idl, updated: Idl):
 
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
-__LOG_LEVELS__ = logging.getLogger(__name__)
+__LOG_LEVELS__ = logging.getLevelNamesMapping()
 
 
 @click.command()
