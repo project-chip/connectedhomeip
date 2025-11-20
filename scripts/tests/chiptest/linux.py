@@ -31,7 +31,6 @@ import sdbus
 
 from .runner import Executor, SubprocessInfo
 
-
 log = logging.getLogger(__name__)
 
 test_environ = os.environ.copy()
