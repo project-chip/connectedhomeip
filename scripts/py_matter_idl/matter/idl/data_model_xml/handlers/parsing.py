@@ -262,20 +262,21 @@ def AttributesToAttribute(attrs: AttributesImpl) -> Attribute:
 def AttributesToEvent(attrs: AttributesImpl) -> Event:
     assert "name" in attrs
     assert "id" in attrs
-    assert "priority" in attrs
-
-    if attrs["priority"] == "critical":
-        priority = EventPriority.CRITICAL
-    elif attrs["priority"] == "info":
-        priority = EventPriority.INFO
-    elif attrs["priority"] == "debug":
-        priority = EventPriority.DEBUG
-    elif attrs["priority"] == "desc":
-        LOGGER.warning("Found an event with 'desc' priority: %s",
-                       list(attrs.items()))
-        priority = EventPriority.CRITICAL
+    if "priority" in attrs:
+        if attrs["priority"] == "critical":
+            priority = EventPriority.CRITICAL
+        elif attrs["priority"] == "info":
+            priority = EventPriority.INFO
+        elif attrs["priority"] == "debug":
+            priority = EventPriority.DEBUG
+        elif attrs["priority"] == "desc":
+            LOGGER.warning("Found an event with 'desc' priority: %s",
+                           list(attrs.items()))
+            priority = EventPriority.CRITICAL
+        else:
+            raise Exception("UNKNOWN event priority: %r" % attrs["priority"])
     else:
-        raise Exception("UNKNOWN event priority: %r" % attrs["priority"])
+        priority = EventPriority.INFO
 
     return Event(
         name=NormalizeName(attrs["name"]),
@@ -321,45 +322,3 @@ def AttributesToCommand(attrs: AttributesImpl) -> Command:
         input_param=None,  # not specified YET
         output_param=output_param
     )
-
-
-def ApplyConstraint(attrs, field: Field):
-    """
-    Handles constraints according to Matter IDL formats.
-
-    Specifically it does NOT handle min/max values as current IDL
-    format does not support having such values defined.
-    """
-    assert "type" in attrs
-
-    constraint_type = attrs["type"]
-
-    if constraint_type == "allowed":
-        pass  # unsure what to do allowed
-    elif constraint_type == "desc":
-        pass  # free-form description
-    elif constraint_type in {"countBetween", "maxCount"}:
-        pass  # cannot implement count
-    elif constraint_type == "min":
-        # field.data_type.min_value = ParseOptionalInt(attrs["value"])
-        pass
-    elif constraint_type == "max":
-        # field.data_type.max_value = ParseOptionalInt(attrs["value"])
-        pass
-    elif constraint_type == "between":
-        # TODO: examples existing in the parsed data which are NOT
-        #       handled:
-        #         - from="-2.5°C" to="2.5°C"
-        #         - from="0%" to="100%"
-        # field.data_type.min_value = ParseOptionalInt(attrs["from"])
-        # field.data_type.max_value = ParseOptionalInt(attrs["to"])
-        pass
-    elif constraint_type == "maxLength":
-        field.data_type.max_length = ParseOptionalInt(attrs["value"])
-    elif constraint_type == "minLength":
-        field.data_type.min_length = ParseOptionalInt(attrs["value"])
-    elif constraint_type == "lengthBetween":
-        field.data_type.min_length = ParseOptionalInt(attrs["from"])
-        field.data_type.max_length = ParseOptionalInt(attrs["to"])
-    else:
-        LOGGER.error(f"UNKNOWN constraint type {constraint_type}")
