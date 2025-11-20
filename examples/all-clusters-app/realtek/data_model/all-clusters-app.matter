@@ -8176,7 +8176,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x0B;
-    ram      attribute clusterRevision default = 2;
+    callback attribute clusterRevision;
 
     handle command SetUTCTime;
     handle command SetTrustedTimeSource;
@@ -8272,7 +8272,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 3;
+    callback attribute clusterRevision;
   }
 
   server cluster RelativeHumidityMeasurement {

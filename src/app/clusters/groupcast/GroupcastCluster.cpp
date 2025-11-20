@@ -65,7 +65,7 @@ std::optional<DataModel::ActionReturnStatus> GroupcastCluster::InvokeCommand(con
         Groupcast::Commands::LeaveGroup::DecodableType data;
         Groupcast::Commands::LeaveGroupResponse::Type response;
         ReturnErrorOnFailure(data.Decode(arguments, fabric_index));
-        mLogic.LeaveGroup(fabric_index, data, response);
+        TEMPORARY_RETURN_IGNORED mLogic.LeaveGroup(fabric_index, data, response);
         handler->AddResponse(request.path, response);
         return std::nullopt;
     }
