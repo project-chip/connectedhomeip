@@ -142,15 +142,15 @@ static void OnRegister(DNSServiceRef sdRef, DNSServiceFlags flags, DNSServiceErr
                     Error::ToString(err));
 
     auto sdCtx = reinterpret_cast<RegisterContext *>(context);
-    VerifyOrReturn(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
+    VerifyOrReturn(kDNSServiceErr_NoError == err, TEMPORARY_RETURN_IGNORED sdCtx->Finalize(err));
 
     // Once a service has been properly published it is normally unreachable because the hostname has not yet been
     // registered against the dns daemon. Register the records mapping the hostname to our IP.
     auto error = sdCtx->mHostNameRegistrar.Register(^(DNSServiceErrorType registerRecordError) {
         ReturnOnFailure(MdnsContexts::GetInstance().Has(sdCtx));
-        sdCtx->Finalize(registerRecordError);
+        TEMPORARY_RETURN_IGNORED sdCtx->Finalize(registerRecordError);
     });
-    VerifyOrReturn(CHIP_NO_ERROR == error, sdCtx->Finalize(error));
+    ReturnOnFailure(error, TEMPORARY_RETURN_IGNORED sdCtx->Finalize(error));
 };
 
 CHIP_ERROR Register(void * context, DnssdPublishCallback callback, uint32_t interfaceId, const char * type, const char * name,
@@ -191,7 +191,7 @@ static void OnBrowse(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interf
                      const char * type, const char * domain, void * context)
 {
     auto sdCtx = reinterpret_cast<BrowseHandler *>(context);
-    VerifyOrReturn(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
+    VerifyOrReturn(kDNSServiceErr_NoError == err, TEMPORARY_RETURN_IGNORED sdCtx->Finalize(err));
     sdCtx->OnBrowse(flags, name, type, domain, interfaceId);
 }
 
@@ -261,13 +261,13 @@ static void OnGetAddrInfo(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t i
     if (kDNSServiceErr_NoError == err)
     {
         InterfaceKey interfaceKey = { interfaceId, hostname, contextWithType->isSRPResolve };
-        sdCtx->OnNewAddress(interfaceKey, address);
+        TEMPORARY_RETURN_IGNORED sdCtx->OnNewAddress(interfaceKey, address);
     }
 
     if (!(flags & kDNSServiceFlagsMoreComing))
     {
-        VerifyOrReturn(sdCtx->HasAddress(), sdCtx->Finalize(kDNSServiceErr_BadState));
-        sdCtx->Finalize();
+        VerifyOrReturn(sdCtx->HasAddress(), TEMPORARY_RETURN_IGNORED sdCtx->Finalize(kDNSServiceErr_BadState));
+        TEMPORARY_RETURN_IGNORED sdCtx->Finalize();
     }
 }
 
@@ -290,7 +290,7 @@ static void GetAddrInfo(ResolveContext * sdCtx)
             (interface.first.isSRPResult) ? &sdCtx->resolveContextWithSRPType : &sdCtx->resolveContextWithNonSRPType;
         auto err = DNSServiceGetAddrInfo(&sdRefCopy, kDNSServiceFlagsShareConnection, interfaceId, protocol, hostname,
                                          OnGetAddrInfo, contextWithType);
-        VerifyOrReturn(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
+        VerifyOrReturn(kDNSServiceErr_NoError == err, TEMPORARY_RETURN_IGNORED sdCtx->Finalize(err));
         interface.second.isDNSLookUpRequested = true;
     }
 }
@@ -317,7 +317,7 @@ static void OnResolve(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t inter
 
     if (!(flags & kDNSServiceFlagsMoreComing))
     {
-        VerifyOrReturn(sdCtx->HasInterface(), sdCtx->Finalize(kDNSServiceErr_BadState));
+        VerifyOrReturn(sdCtx->HasInterface(), TEMPORARY_RETURN_IGNORED sdCtx->Finalize(kDNSServiceErr_BadState));
         GetAddrInfo(sdCtx);
     }
 }
@@ -405,7 +405,7 @@ void ChipDnssdShutdown()
 {
     // Drop our existing advertisements now, so they don't stick around while we
     // are not actually in a responsive state.
-    ChipDnssdRemoveServices();
+    TEMPORARY_RETURN_IGNORED ChipDnssdRemoveServices();
 }
 
 CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)
@@ -487,11 +487,10 @@ CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
 
     for (auto & resolve : resolves)
     {
-        resolve->Finalize(CHIP_ERROR_CANCELLED);
+        TEMPORARY_RETURN_IGNORED resolve->Finalize(CHIP_ERROR_CANCELLED);
     }
 
-    ctx->Finalize(CHIP_ERROR_CANCELLED);
-    return CHIP_NO_ERROR;
+    return ctx->Finalize(CHIP_ERROR_CANCELLED);
 }
 
 CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
@@ -568,7 +567,7 @@ void ChipDnssdResolveNoLongerNeeded(const char * instanceName)
         // sure whatever kicked them off cleans up resources as needed.
         do
         {
-            existingCtx->Finalize(CHIP_ERROR_CANCELLED);
+            TEMPORARY_RETURN_IGNORED existingCtx->Finalize(CHIP_ERROR_CANCELLED);
             existingCtx = MdnsContexts::GetInstance().GetExistingResolveForInstanceName(instanceName);
         } while (existingCtx != nullptr);
     }
