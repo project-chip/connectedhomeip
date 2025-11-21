@@ -42,7 +42,7 @@ namespace app {
 ///
 /// Given that this relies on global data at link time, there generally can be
 /// only one CodegenDataModelProvider per application. Per-cluster CodegenIntegration
-/// function access the global singleton instance via `CodegenDataModelProvider::Instance()`.
+/// functions access the global singleton instance via `CodegenDataModelProvider::Instance()`.
 class CodegenDataModelProvider : public DataModel::Provider
 {
 public:
