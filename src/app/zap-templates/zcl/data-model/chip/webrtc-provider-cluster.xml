@@ -22,14 +22,14 @@ Git: 0.9-fall2025-432-g64aebe458
 -->
 <configurator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../zcl.xsd">
   <domain name="Cameras"/>
-  <struct name="SFrameStruct" apiMaturity="provisional">
+  <struct name="SFrameStruct">
     <cluster code="0x0553"/>
     <item fieldId="0" name="CipherSuite" type="int16u" min="1"/>
     <item fieldId="1" name="BaseKey" type="octet_string" length="128"/>
     <item fieldId="2" name="KID" type="octet_string" length="8" minLength="2"/>
   </struct>
 
-  <cluster apiMaturity="provisional">
+  <cluster>
     <domain>Cameras</domain>
     <name>WebRTC Transport Provider</name>
     <code>0x0553</code>

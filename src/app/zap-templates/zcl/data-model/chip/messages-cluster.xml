@@ -62,7 +62,7 @@ limitations under the License.
     <item fieldId="1" name="Label" type="char_string" length="32" optional="true"/>
   </struct>
 
-  <cluster apiMaturity="provisional">
+  <cluster>
     <name>Messages</name>
     <domain>General</domain>
     <description>This cluster provides an interface for passing messages to be presented by a device.</description>

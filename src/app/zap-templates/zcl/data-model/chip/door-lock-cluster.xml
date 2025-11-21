@@ -131,7 +131,7 @@ limitations under the License.
          3. Everything that depends on a certain feature is optional because we have no way
             of setting up the dependencies here. Dependencies would be probably resolved in the
             cluster itself. Those attributes/commands are marked with a special comment. -->
-    
+
     <!-- Attributes -->
     <attribute side="server" code="0" name="LockState" define="LOCK_STATE" type="DlLockState" min="0" max="3" isNullable="true" reportable="true">
       <mandatoryConform/>
@@ -356,62 +356,62 @@ limitations under the License.
       </optionalConform>
     </attribute>
     <!-- Conformance feature [ALIRO] - optional -->
-    <attribute side="server" code="128" name="AliroReaderVerificationKey" define="ALIRO_READER_VERIFICATION_KEY" type="octet_string" length="65" optional="true" isNullable="true" apiMaturity="provisional">
+    <attribute side="server" code="128" name="AliroReaderVerificationKey" define="ALIRO_READER_VERIFICATION_KEY" type="octet_string" length="65" optional="true" isNullable="true">
       <access op="read" privilege="administer"/>
       <mandatoryConform>
         <feature name="ALIRO"/>
       </mandatoryConform>
     </attribute>
     <!-- Conformance feature [ALIRO] - optional -->
-    <attribute side="server" code="129" name="AliroReaderGroupIdentifier" define="ALIRO_READER_GROUP_IDENTIFIER" type="octet_string" length="16" optional="true" isNullable="true" apiMaturity="provisional">
+    <attribute side="server" code="129" name="AliroReaderGroupIdentifier" define="ALIRO_READER_GROUP_IDENTIFIER" type="octet_string" length="16" optional="true" isNullable="true">
       <access op="read" privilege="administer"/>
       <mandatoryConform>
         <feature name="ALIRO"/>
       </mandatoryConform>
     </attribute>
     <!-- Conformance feature [ALIRO] - optional -->
-    <attribute side="server" code="130" name="AliroReaderGroupSubIdentifier" define="ALIRO_READER_GROUP_SUBIDENTIFIER" type="octet_string" length="16" optional="true" apiMaturity="provisional">
+    <attribute side="server" code="130" name="AliroReaderGroupSubIdentifier" define="ALIRO_READER_GROUP_SUBIDENTIFIER" type="octet_string" length="16" optional="true">
       <access op="read" privilege="administer"/>
       <mandatoryConform>
         <feature name="ALIRO"/>
       </mandatoryConform>
     </attribute>
     <!-- Conformance feature [ALIRO] - optional -->
-    <attribute side="server" code="131" name="AliroExpeditedTransactionSupportedProtocolVersions" define="ALIRO_EXPEDITED_TRANSACTION_SUPPORTED_PROTOCOL_VERSIONS" type="array" entryType="octet_string" length="16" optional="true" apiMaturity="provisional">
+    <attribute side="server" code="131" name="AliroExpeditedTransactionSupportedProtocolVersions" define="ALIRO_EXPEDITED_TRANSACTION_SUPPORTED_PROTOCOL_VERSIONS" type="array" entryType="octet_string" length="16" optional="true">
       <access op="read" privilege="administer"/>
       <mandatoryConform>
         <feature name="ALIRO"/>
       </mandatoryConform>
     </attribute>
     <!-- Conformance feature [ALBU] - optional if ALIRO is supported -->
-    <attribute side="server" code="132" name="AliroGroupResolvingKey" define="ALIRO_GROUP_RESOLVING_KEY" type="octet_string" length="16" optional="true" isNullable="true" apiMaturity="provisional">
+    <attribute side="server" code="132" name="AliroGroupResolvingKey" define="ALIRO_GROUP_RESOLVING_KEY" type="octet_string" length="16" optional="true" isNullable="true">
       <access op="read" privilege="administer"/>
       <mandatoryConform>
         <feature name="ALBU"/>
       </mandatoryConform>
     </attribute>
     <!-- Conformance feature [ALBU] - optional if ALIRO is supported -->
-    <attribute side="server" code="133" name="AliroSupportedBLEUWBProtocolVersions" define="ALIRO_SUPPORTED_BLE_UWB_PROTOCOL_VERSIONS" type="array" entryType="octet_string" length="16" optional="true" apiMaturity="provisional">
+    <attribute side="server" code="133" name="AliroSupportedBLEUWBProtocolVersions" define="ALIRO_SUPPORTED_BLE_UWB_PROTOCOL_VERSIONS" type="array" entryType="octet_string" length="16" optional="true">
       <access op="read" privilege="administer"/>
       <mandatoryConform>
         <feature name="ALBU"/>
       </mandatoryConform>
     </attribute>
     <!-- Conformance feature [ALBU] - optional if ALIRO is supported -->
-    <attribute side="server" code="134" name="AliroBLEAdvertisingVersion" define="ALIRO_BLE_ADVERTISING_VERSION" type="int8u" optional="true" apiMaturity="provisional">
+    <attribute side="server" code="134" name="AliroBLEAdvertisingVersion" define="ALIRO_BLE_ADVERTISING_VERSION" type="int8u" optional="true">
       <access op="read" privilege="administer"/>
       <mandatoryConform>
         <feature name="ALBU"/>
       </mandatoryConform>
     </attribute>
     <!-- Conformance feature [ALIRO] - optional -->
-    <attribute side="server" code="135" name="NumberOfAliroCredentialIssuerKeysSupported" define="NUMBER_OF_ALIRO_CREDENTIAL_ISSUER_KEYS_SUPPORTED" type="int16u" optional="true" apiMaturity="provisional">
+    <attribute side="server" code="135" name="NumberOfAliroCredentialIssuerKeysSupported" define="NUMBER_OF_ALIRO_CREDENTIAL_ISSUER_KEYS_SUPPORTED" type="int16u" optional="true">
       <mandatoryConform>
         <feature name="ALIRO"/>
       </mandatoryConform>
     </attribute>
     <!-- Conformance feature [ALIRO] - optional -->
-    <attribute side="server" code="136" name="NumberOfAliroEndpointKeysSupported" define="NUMBER_OF_ALIRO_ENDPOINT_KEYS_SUPPORTED" type="int16u" optional="true" apiMaturity="provisional">
+    <attribute side="server" code="136" name="NumberOfAliroEndpointKeysSupported" define="NUMBER_OF_ALIRO_ENDPOINT_KEYS_SUPPORTED" type="int16u" optional="true">
       <mandatoryConform>
         <feature name="ALIRO"/>
       </mandatoryConform>
@@ -686,7 +686,7 @@ limitations under the License.
         <feature name="UBOLT"/>
       </mandatoryConform>
     </command>
-    <command source="client" code="40" name="SetAliroReaderConfig" mustUseTimedInvoke="true" optional="true" apiMaturity="provisional">
+    <command source="client" code="40" name="SetAliroReaderConfig" mustUseTimedInvoke="true" optional="true">
       <description>This command communicates an Aliro Reader configuration to the lock.</description>
       <access op="invoke" privilege="administer"/>
       <arg name="SigningKey" type="octet_string" length="32" />
@@ -697,7 +697,7 @@ limitations under the License.
         <feature name="ALIRO"/>
       </mandatoryConform>
     </command>
-    <command source="client" code="41" name="ClearAliroReaderConfig" mustUseTimedInvoke="true" optional="true" apiMaturity="provisional">
+    <command source="client" code="41" name="ClearAliroReaderConfig" mustUseTimedInvoke="true" optional="true">
       <description>This command clears an existing Aliro Reader configuration for the lock.</description>
       <access op="invoke" privilege="administer"/>
       <mandatoryConform>
