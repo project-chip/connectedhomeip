@@ -32,7 +32,7 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import time
+import asyncio
 
 from mobly import asserts
 
@@ -108,7 +108,7 @@ class TC_VALCC_4_2(MatterBaseTest):
         asserts.assert_less_equal(remaining_duration_dut, defaultOpenDuration, "RemainingDuration is not in the expected range")
 
         self.step(6)
-        time.sleep(5)
+        await asyncio.sleep(5)
 
         self.step(7)
         remaining_duration_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.RemainingDuration)

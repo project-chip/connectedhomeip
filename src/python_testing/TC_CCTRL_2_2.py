@@ -57,6 +57,7 @@
 
 # This test requires a TH_SERVER application. Please specify with --string-arg th_server_app_path:<path_to_app>
 
+import asyncio
 import logging
 import os
 import random
@@ -288,7 +289,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
         self.step(19)
         logging.info("Test now waits for 30 seconds")
         if not self.is_pics_sdk_ci_only:
-            time.sleep(30)
+            await asyncio.sleep(30)
 
         self.step(20)
         print(f'server node id {self.server_nodeid}')
@@ -341,7 +342,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
         previous_number_th_server_fabrics = len(th_server_fabrics_new)
 
         while time_remaining > 0:
-            time.sleep(2)
+            await asyncio.sleep(2)
             th_server_fabrics_new = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, fabric_filtered=False)
             if previous_number_th_server_fabrics != len(th_server_fabrics_new):
                 break

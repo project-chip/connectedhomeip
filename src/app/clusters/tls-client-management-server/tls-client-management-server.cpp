@@ -61,14 +61,14 @@ TlsClientManagementServer::~TlsClientManagementServer()
     mDelegate.SetTlsClientManagementServer(nullptr);
 
     // unregister
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
 CHIP_ERROR TlsClientManagementServer::Init()
 {
-    mCertificateTable.Init(Server::GetInstance().GetPersistentStorage());
-    mDelegate.Init(Server::GetInstance().GetPersistentStorage());
+    ReturnErrorOnFailure(mCertificateTable.Init(Server::GetInstance().GetPersistentStorage()));
+    ReturnErrorOnFailure(mDelegate.Init(Server::GetInstance().GetPersistentStorage()));
 
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INTERNAL);
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
@@ -78,10 +78,10 @@ CHIP_ERROR TlsClientManagementServer::Init()
 
 CHIP_ERROR TlsClientManagementServer::Finish()
 {
-    mCertificateTable.Finish();
+    TEMPORARY_RETURN_IGNORED mCertificateTable.Finish();
 
-    Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    TEMPORARY_RETURN_IGNORED Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
+    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 
     return CHIP_NO_ERROR;
@@ -169,6 +169,9 @@ void TlsClientManagementServer::HandleProvisionEndpoint(HandlerContext & ctx,
     if (status.IsSuccess())
     {
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+
+        MatterReportingAttributeChangeCallback(ctx.mRequestPath.mEndpointId, TlsClientManagement::Id,
+                                               TlsClientManagement::Attributes::ProvisionedEndpoints::Id);
     }
     else
     {
@@ -209,12 +212,19 @@ void TlsClientManagementServer::HandleRemoveEndpoint(HandlerContext & ctx, const
 
     auto status = mDelegate.RemoveProvisionedEndpointByID(ctx.mRequestPath.mEndpointId,
                                                           ctx.mCommandHandler.GetAccessingFabricIndex(), req.endpointID);
+
+    if (status == Status::Success)
+    {
+        MatterReportingAttributeChangeCallback(ctx.mRequestPath.mEndpointId, TlsClientManagement::Id,
+                                               TlsClientManagement::Attributes::ProvisionedEndpoints::Id);
+    }
+
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
 void TlsClientManagementServer::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
 {
-    mDelegate.RemoveFabric(fabricIndex);
+    TEMPORARY_RETURN_IGNORED mDelegate.RemoveFabric(fabricIndex);
 }
 
 /** @brief TlsClientManagement Cluster Server Init

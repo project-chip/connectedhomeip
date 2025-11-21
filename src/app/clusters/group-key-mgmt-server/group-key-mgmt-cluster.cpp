@@ -188,7 +188,7 @@ CHIP_ERROR WriteGroupKeyMap(const ConcreteDataAttributePath & aPath, AttributeVa
         ReturnErrorOnFailure(list.ComputeSize(&new_count));
 
         // Remove existing keys, ignore errors
-        provider->RemoveGroupKeys(fabric_index);
+        TEMPORARY_RETURN_IGNORED provider->RemoveGroupKeys(fabric_index);
 
         // Add the new keys
         auto iter = list.begin();

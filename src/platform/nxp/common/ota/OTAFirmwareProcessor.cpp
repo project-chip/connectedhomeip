@@ -68,8 +68,6 @@ CHIP_ERROR OTAFirmwareProcessor::Clear()
 CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
 {
     otaResult_t status;
-    static uint32_t ulEraseLen = 0;
-    static uint32_t ulCrtAddr  = 0;
 
     if (!mDescriptorProcessed)
     {
@@ -102,22 +100,11 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
     OTATlvProcessor::vOtaProcessInternalEncryption(mBlock);
 #endif
 
-    ulCrtAddr += block.size();
-
-    if (ulCrtAddr >= ulEraseLen)
+    status = OTA_MakeHeadRoomForNextBlock(block.size(), OTAImageProcessorImpl::FetchNextData, 0);
+    if (gOtaSuccess_c != status)
     {
-        ulEraseLen += 0x1000; // flash sector size
-
-        status = OTA_MakeHeadRoomForNextBlock(block.size(), OTAImageProcessorImpl::FetchNextData, 0);
-        if (gOtaSuccess_c != status)
-        {
-            ChipLogError(SoftwareUpdate, "Failed to make room for next block. Status: %d", status);
-            return CHIP_ERROR_OTA_PROCESSOR_MAKE_ROOM;
-        }
-    }
-    else
-    {
-        OTAImageProcessorImpl::FetchNextData(0);
+        ChipLogError(SoftwareUpdate, "Failed to make room for next block. Status: %d", status);
+        return CHIP_ERROR_OTA_PROCESSOR_MAKE_ROOM;
     }
 
 #if OTA_ENCRYPTION_ENABLE

@@ -34,8 +34,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 
 from mobly import asserts
 
@@ -67,7 +67,7 @@ class TC_PS_2_3(MatterBaseTest):
 
         self.step(3)
         logging.info("This test will now wait for 30 seconds.")
-        time.sleep(30)
+        await asyncio.sleep(30)
 
         counts = sub_handler.attribute_report_counts
         asserts.assert_less_equal(counts[ps.Attributes.BatTimeToFullCharge], 4, "Too many reports for BatTimeToFullCharge")
