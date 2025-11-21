@@ -211,6 +211,13 @@ enum RelativePositionTag : enum8 {
   kBehind = 6;
 }
 
+enum SoftwareVersionCertificationStatusEnum : enum8 {
+  kDevTest = 0;
+  kProvisional = 1;
+  kCertified = 2;
+  kRevoked = 3;
+}
+
 enum StreamUsageEnum : enum8 {
   kInternal = 0;
   kRecording = 1;
@@ -9882,8 +9889,8 @@ provisional cluster ContentControl = 1295 {
 }
 
 /** This cluster provides an interface for sending targeted commands to an Observer of a Content App on a Video Player device such as a Streaming Media Player, Smart TV or Smart Screen. The cluster server for Content App Observer is implemented by an endpoint that communicates with a Content App, such as a Casting Video Client. The cluster client for Content App Observer is implemented by a Content App endpoint. A Content App is informed of the NodeId of an Observer when a binding is set on the Content App. The Content App can then send the ContentAppMessage to the Observer (server cluster), and the Observer responds with a ContentAppMessageResponse. */
-provisional cluster ContentAppObserver = 1296 {
-  revision 1; // NOTE: Default/not specifically set
+cluster ContentAppObserver = 1296 {
+  revision 1;
 
   enum StatusEnum : enum8 {
     kSuccess = 0;
@@ -9897,17 +9904,17 @@ provisional cluster ContentAppObserver = 1296 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct ContentAppMessageRequest {
-    optional char_string data = 0;
-    char_string encodingHint = 1;
+    optional long_char_string<500> data = 0;
+    char_string<100> encodingHint = 1;
   }
 
   response struct ContentAppMessageResponse = 1 {
     StatusEnum status = 0;
-    optional char_string data = 1;
-    optional char_string encodingHint = 2;
+    optional long_char_string<500> data = 1;
+    optional char_string<100> encodingHint = 2;
   }
 
-  /** Upon receipt, the data field MAY be parsed and interpreted. Message encoding is specific to the Content App. A Content App MAY when possible read attributes from the Basic Information Cluster on the Observer and use this to determine the Message encoding. */
+  /** Upon receipt, the data field MAY be parsed and interpreted. */
   command ContentAppMessage(ContentAppMessageRequest): ContentAppMessageResponse = 0;
 }
 
@@ -10920,7 +10927,7 @@ provisional cluster CommodityTariff = 1792 {
 }
 
 /** Provides extended device information for all the logical devices represented by a Bridged Node. */
-provisional cluster EcosystemInformation = 1872 {
+cluster EcosystemInformation = 1872 {
   revision 1;
 
   struct DeviceTypeStruct {
