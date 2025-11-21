@@ -44,8 +44,8 @@ BooleanStateConfigurationCluster::BooleanStateConfigurationCluster(EndpointId en
                                                                    BitMask<BooleanStateConfiguration::Feature> features,
                                                                    OptionalAttributesSet optionalAttributes,
                                                                    const StartupConfiguration & config) :
-    DefaultServerCluster({ endpointId, BooleanStateConfiguration::Id }), mFeatures(features),
-    mOptionalAttributes([&features, &optionalAttributes]() -> FullOptionalAttributesSet {
+    DefaultServerCluster({ endpointId, BooleanStateConfiguration::Id }),
+    mFeatures(features), mOptionalAttributes([&features, &optionalAttributes]() -> FullOptionalAttributesSet {
         // constructs the attribute set, that once constructed stays const
         AttributeSet enabledOptionalAttributes;
 
@@ -160,7 +160,6 @@ BooleanStateConfigurationCluster::InvokeCommand(const DataModel::InvokeRequest &
 
         if (mAlarmsEnabled != alarms)
         {
-            AttributePersistence attributePersistence(mContext->attributeStorage);
             mAlarmsEnabled = alarms;
 
             AlarmModeBitMask::IntegerType rawAlarmsEnabled = mAlarmsEnabled.Raw();
