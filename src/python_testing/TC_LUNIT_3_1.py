@@ -159,7 +159,7 @@ class TC_LUNIT_3_1(MatterBaseTest):
                 self.mark_current_step_skipped()
 
         else:
-            self.skip_all_remaining_steps(1)
+            self.mark_all_remaining_steps_skipped(1)
             return
 
 

@@ -141,7 +141,7 @@ class TC_LTIME_3_1(MatterBaseTest):
         self.step(9)
         feature_map = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.FeatureMap)
         if (feature_map & self.cluster.Bitmaps.Feature.kCalendarFormat) == 0:
-            self.skip_all_remaining_steps(10)
+            self.mark_all_remaining_steps_skipped(10)
             return
 
         self.step(10)
