@@ -39,7 +39,7 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import time
+import asyncio
 
 from mobly import asserts
 from TC_EnergyReporting_Utils import EnergyReportingBaseTestHelper
@@ -88,13 +88,13 @@ class TC_EEM_2_3(MatterBaseTest, EnergyReportingBaseTestHelper):
         await self.send_test_event_trigger_start_fake_3kw_generator_5s()
 
         self.step("4")
-        time.sleep(6)
+        await asyncio.sleep(6)
 
         self.step("4a")
         cumulative_energy_exported = await self.read_eem_attribute_expect_success("CumulativeEnergyExported")
 
         self.step("5")
-        time.sleep(6)
+        await asyncio.sleep(6)
 
         self.step("5a")
         cumulative_energy_exported_2 = await self.read_eem_attribute_expect_success("CumulativeEnergyExported")

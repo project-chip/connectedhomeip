@@ -27,10 +27,10 @@
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
 import os
 import tempfile
-from time import sleep
 
 from mobly import asserts
 
@@ -157,7 +157,7 @@ class TC_SC_3_5(MatterBaseTest):
         params = await self.th_client.OpenCommissioningWindow(
             nodeId=self.th_server_local_nodeid, timeout=3*60, iteration=10000, discriminator=self.th_server_discriminator, option=1)
         new_random_passcode = params.setupPinCode
-        sleep(1)
+        await asyncio.sleep(1)
         logging.info("OpenCommissioningWindow complete")
 
         return new_random_passcode
@@ -167,7 +167,7 @@ class TC_SC_3_5(MatterBaseTest):
 
         revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
         await self.th_client.SendCommand(nodeId=self.th_server_local_nodeid, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=9000)
-        sleep(1)
+        await asyncio.sleep(1)
 
         return await self.open_commissioning_window()
 
