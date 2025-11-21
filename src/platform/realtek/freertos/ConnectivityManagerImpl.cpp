@@ -54,7 +54,7 @@ ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
 
 extern "C" void SetMatterBLEAdvEnabled(bool val)
 {
-    ConnectivityMgr().SetBLEAdvertisingEnabled(val);
+    TEMPORARY_RETURN_IGNORED ConnectivityMgr().SetBLEAdvertisingEnabled(val);
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_Init()

@@ -12,11 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This is the equivalent to app_config_dependent_sources.gni
-TARGET_SOURCES(
-  ${APP_TARGET}
-  PRIVATE
-    "${CLUSTER_DIR}/PowerTopologyCluster.cpp"
-    "${CLUSTER_DIR}/power-topology-server.h"
-    "${CLUSTER_DIR}/PowerTopologyDelegate.h"
-)
+import subprocess
+
+from .runner import Executor, SubprocessInfo
+
+
+class DarwinExecutor(Executor):
+    def run(self, subproc: SubprocessInfo, stdin=None, stdout=None, stderr=None):
+        # Try harder to avoid any stdout buffering in our tests
+        wrapped = subproc.wrap_with('stdbuf', '-o0', '-i0')
+        return subprocess.Popen(wrapped.to_cmd(), stdin=stdin, stdout=stdout, stderr=stderr)
