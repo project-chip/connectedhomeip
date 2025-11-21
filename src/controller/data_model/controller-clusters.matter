@@ -9912,7 +9912,7 @@ provisional cluster ContentAppObserver = 1296 {
 }
 
 /** This cluster provides an interface to manage regions of interest, or Zones, which can be either manufacturer or user defined. */
-provisional cluster ZoneManagement = 1360 {
+cluster ZoneManagement = 1360 {
   revision 1;
 
   enum StatusCodeEnum : enum8 {
@@ -10040,7 +10040,7 @@ provisional cluster ZoneManagement = 1360 {
 }
 
 /** The Camera AV Stream Management cluster is used to allow clients to manage, control, and configure various audio, video, and snapshot streams on a camera. */
-provisional cluster CameraAvStreamManagement = 1361 {
+cluster CameraAvStreamManagement = 1361 {
   revision 1;
 
   enum AudioCodecEnum : enum8 {
@@ -10313,7 +10313,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
 }
 
 /** This cluster provides an interface into controls associated with the operation of a device that provides pan, tilt, and zoom functions, either mechanically, or against a digital image. */
-provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
+cluster CameraAvSettingsUserLevelManagement = 1362 {
   revision 1;
 
   enum PhysicalMovementEnum : enum8 {
@@ -10544,7 +10544,7 @@ cluster WebRTCTransportRequestor = 1364 {
 }
 
 /** This cluster implements the upload of Audio and Video streams from the Push AV Stream Transport Cluster using suitable push-based transports. */
-provisional cluster PushAvStreamTransport = 1365 {
+cluster PushAvStreamTransport = 1365 {
   revision 1;
 
   enum CMAFInterfaceEnum : enum8 {
@@ -11377,7 +11377,7 @@ provisional cluster JointFabricAdministrator = 1875 {
 
 /** This Cluster is used to manage TLS Client Certificates and to provision
       TLS endpoints with enough information to facilitate subsequent connection. */
-provisional cluster TlsCertificateManagement = 2049 {
+cluster TlsCertificateManagement = 2049 {
   revision 1;
 
   fabric_scoped struct TLSCertStruct {
@@ -11490,7 +11490,7 @@ provisional cluster TlsCertificateManagement = 2049 {
 }
 
 /** This Cluster is used to provision TLS Endpoints with enough information to facilitate subsequent connection. */
-provisional cluster TlsClientManagement = 2050 {
+cluster TlsClientManagement = 2050 {
   revision 1;
 
   enum StatusCodeEnum : enum8 {
