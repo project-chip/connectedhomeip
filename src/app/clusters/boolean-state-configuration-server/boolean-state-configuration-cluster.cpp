@@ -15,6 +15,7 @@
  *
  */
 
+#include "app/persistence/AttributePersistence.h"
 #include <app/clusters/boolean-state-configuration-server/boolean-state-configuration-cluster.h>
 
 #include <algorithm>
@@ -42,8 +43,8 @@ BooleanStateConfigurationCluster::BooleanStateConfigurationCluster(EndpointId en
                                                                    BitMask<BooleanStateConfiguration::Feature> features,
                                                                    OptionalAttributesSet optionalAttributes,
                                                                    const StartupConfiguration & config) :
-    DefaultServerCluster({ endpointId, BooleanStateConfiguration::Id }),
-    mFeatures(features), mOptionalAttributes([&features, &optionalAttributes]() -> FullOptionalAttributesSet {
+    DefaultServerCluster({ endpointId, BooleanStateConfiguration::Id }), mFeatures(features),
+    mOptionalAttributes([&features, &optionalAttributes]() -> FullOptionalAttributesSet {
         // constructs the attribute set, that once constructed stays const
         AttributeSet enabledOptionalAttributes;
 
@@ -101,6 +102,13 @@ CHIP_ERROR BooleanStateConfigurationCluster::Startup(ServerClusterContext & cont
         mCurrentSensitivityLevel = mSupportedSensitivityLevels - 1;
     }
 
+    // alarms enabled persistence was handled by ember previously (as opposed to AAI usage of sensitivity level)
+    // TODO: this is VERY inconvenient/strange and we should really fix this inconsistence
+    AttributePersistence attributePersistence(context.attributeStorage);
+    AlarmModeBitMask::IntegerType alarmsEnabled;
+    attributePersistence.LoadNativeEndianValue({ mPath.mEndpointId, mPath.mClusterId, AlarmsEnabled::Id }, alarmsEnabled, AlarmModeBitMask::IntegerType(0));
+    mAlarmsEnabled = AlarmModeBitMask(alarmsEnabled);
+
     // internal state validation:
     if (mFeatures.Has(Feature::kAlarmSuppress))
     {
@@ -150,6 +158,10 @@ BooleanStateConfigurationCluster::InvokeCommand(const DataModel::InvokeRequest &
 
         if (mAlarmsEnabled != alarms)
         {
+            AttributePersistence attributePersistence(mContext->attributeStorage);
+            AlarmModeBitMask::IntegerType rawAlarmsEnabled = mAlarmsEnabled.Raw();
+            mContext->attributeStorage.WriteValue({ mPath.mEndpointId, mPath.mClusterId, AlarmsEnabled::Id },
+                                                  { &rawAlarmsEnabled, sizeof(rawAlarmsEnabled) });
             mAlarmsEnabled = alarms;
             NotifyAttributeChanged(AlarmsEnabled::Id);
         }
