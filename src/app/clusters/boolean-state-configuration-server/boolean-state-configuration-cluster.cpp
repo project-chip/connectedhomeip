@@ -14,8 +14,6 @@
  *    limitations under the License.
  *
  */
-
-#include "lib/support/logging/TextOnlyLogging.h"
 #include <app/clusters/boolean-state-configuration-server/boolean-state-configuration-cluster.h>
 
 #include <algorithm>
@@ -44,8 +42,8 @@ BooleanStateConfigurationCluster::BooleanStateConfigurationCluster(EndpointId en
                                                                    BitMask<BooleanStateConfiguration::Feature> features,
                                                                    OptionalAttributesSet optionalAttributes,
                                                                    const StartupConfiguration & config) :
-    DefaultServerCluster({ endpointId, BooleanStateConfiguration::Id }),
-    mFeatures(features), mOptionalAttributes([&features, &optionalAttributes]() -> FullOptionalAttributesSet {
+    DefaultServerCluster({ endpointId, BooleanStateConfiguration::Id }), mFeatures(features),
+    mOptionalAttributes([&features, &optionalAttributes]() -> FullOptionalAttributesSet {
         // constructs the attribute set, that once constructed stays const
         AttributeSet enabledOptionalAttributes;
 
@@ -294,6 +292,12 @@ void BooleanStateConfigurationCluster::GenerateSensorFault(SensorFaultBitMask fa
     BooleanStateConfiguration::Events::SensorFault::Type event;
     event.sensorFault = fault;
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
+
+    if (mSensorFault != fault)
+    {
+        mSensorFault = fault;
+        NotifyAttributeChanged(SensorFault::Id);
+    }
 }
 
 CHIP_ERROR BooleanStateConfigurationCluster::SetCurrentSensitivityLevel(uint8_t level)
