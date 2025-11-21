@@ -293,7 +293,7 @@ void BooleanStateConfigurationCluster::GenerateSensorFault(SensorFaultBitMask fa
     event.sensorFault = fault;
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 
-    if (mSensorFault != fault)
+    if (mOptionalAttributes.IsSet(SensorFault::Id) && (mSensorFault != fault))
     {
         mSensorFault = fault;
         NotifyAttributeChanged(SensorFault::Id);
