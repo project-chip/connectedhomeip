@@ -383,8 +383,8 @@ private:
     // My known values for MPTZ.
     MPTZStructType mMptzPosition;
 
-    // Note, where assigned, these are the extreme ends of the spec defined range (or a default if there is one), potentially overwritten by the delegate.
-    // Exception is MaxPresets that is an F quality attribute and assigned by the constructor
+    // Note, where assigned, these are the extreme ends of the spec defined range (or a default if there is one), potentially
+    // overwritten by the delegate. Exception is MaxPresets that is an F quality attribute and assigned by the constructor
     const uint8_t mMaxPresets;
     int16_t mPanMin  = kPanMinMinValue;
     int16_t mPanMax  = kPanMaxMaxValue;
