@@ -79,7 +79,7 @@ public:
         return *this;
     }
 
-    StartupConfigurationBuilder & WithAlarmsSupported(BooleanStateConfiguration::AlarmModeBitmap alarm)
+    StartupConfigurationBuilder & AddAlarmsSupported(BooleanStateConfiguration::AlarmModeBitmap alarm)
     {
         mAlarmsSupported.Set(alarm);
         return *this;
@@ -386,7 +386,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestAlarmsEnabledPersistence)
 
     // 1. Create a cluster, set a value for AlarmsEnabled, which should be persisted.
     {
-        auto config = DefaultConfig().WithAlarmsSupported(AlarmModeBitmap::kVisual);
+        auto config = DefaultConfig().AddAlarmsSupported(AlarmModeBitmap::kVisual);
         BooleanStateConfigurationCluster cluster(
             kTestEndpointId, { Feature::kVisual, Feature::kAudible },
             { BooleanStateConfigurationCluster::OptionalAttributesSet().Set<Attributes::AlarmsEnabled::Id>() }, config);
@@ -415,7 +415,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestAlarmsEnabledPersistence)
 
     // 2. Create a new cluster instance with the same context, and check if the value was restored.
     {
-        auto config = DefaultConfig().WithAlarmsSupported(AlarmModeBitmap::kAudible).WithAlarmsSupported(AlarmModeBitmap::kVisual);
+        auto config = DefaultConfig().AddAlarmsSupported(AlarmModeBitmap::kAudible).AddAlarmsSupported(AlarmModeBitmap::kVisual);
         BooleanStateConfigurationCluster cluster(
             kTestEndpointId, { Feature::kVisual, Feature::kAudible },
             { BooleanStateConfigurationCluster::OptionalAttributesSet().Set<Attributes::AlarmsEnabled::Id>() }, config);
@@ -432,7 +432,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestAlarmsEnabledPersistence)
     // 3. Test that if persistence fails, default is used. Let's clear the storage.
     context.StorageDelegate().ClearStorage();
     {
-        auto config = DefaultConfig().WithAlarmsSupported(AlarmModeBitmap::kAudible).WithAlarmsSupported(AlarmModeBitmap::kVisual);
+        auto config = DefaultConfig().AddAlarmsSupported(AlarmModeBitmap::kAudible).AddAlarmsSupported(AlarmModeBitmap::kVisual);
         BooleanStateConfigurationCluster cluster(
             kTestEndpointId, { Feature::kVisual, Feature::kAudible },
             { BooleanStateConfigurationCluster::OptionalAttributesSet().Set<Attributes::AlarmsEnabled::Id>() }, config);
