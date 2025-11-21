@@ -16,8 +16,9 @@
 #
 
 
+import signals
 from DeviceConformanceTests import DeviceConformanceTests
-from mobly import asserts, signals
+from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.conformance import ConformanceDecision, ConformanceException

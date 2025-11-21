@@ -77,6 +77,7 @@
 #
 # These tests run on every endpoint regardless of whether a switch is present because they are set up to auto-select.
 
+import asyncio
 import logging
 import queue
 import time
@@ -219,7 +220,7 @@ class TC_SwitchTests(MatterBaseTest):
         else:
             # This will await for the events to be generated properly. Note that there is a bit of a
             # race here for the button simulator, but this race is extremely unlikely to be lost.
-            time.sleep(SIMULATED_LONG_PRESS_LENGTH_SECONDS + 0.5)
+            await asyncio.sleep(SIMULATED_LONG_PRESS_LENGTH_SECONDS + 0.5)
 
     def _await_sequence_of_events(self, event_queue: queue.Queue, endpoint_id: int, sequence: list[ClusterObjects.ClusterEvent], timeout_sec: float):
         start_time = time.time()
@@ -386,7 +387,7 @@ class TC_SwitchTests(MatterBaseTest):
         # Step 9: Wait 10 seconds for event reports stable.
         # Verify that last SwitchLatched event received is for NewPosition 0.
         self.step(9)
-        time.sleep(10.0 if not self.is_ci else 1.0)
+        await asyncio.sleep(10.0 if not self.is_ci else 1.0)
 
         expected_switch_position = 0
         last_event = event_listener.get_last_event()

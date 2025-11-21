@@ -20,7 +20,8 @@ import time
 import typing
 from datetime import datetime, timedelta, timezone
 
-from mobly import asserts, signals
+import signals
+from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters.Types import Nullable, NullValue
