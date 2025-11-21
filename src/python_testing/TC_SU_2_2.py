@@ -984,15 +984,6 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # ------------------------------------------------------------------------------------
         logger.info(f"{step_number_s7}: No image transfer occurred due to invalid BDX URI (expected).")
 
-        # ------------------------------------------------------------------------------------
-        # [STEP_7]: Step #7.5 - Close Provider Process
-        # ------------------------------------------------------------------------------------
-        # Clear DefaultOTAProviders for a clean state
-        logger.info(f'{step_number_s7}: Step #7.5 - Closed Provider process.')
-
-        # Kill Provider process
-        self.current_provider_app_proc.terminate()
-
 
 if __name__ == "__main__":
     default_matter_test_main()
