@@ -98,24 +98,24 @@ void ClosureManager::Init()
     DeviceLayer::PlatformMgr().LockChipStack();
 
     // Closure endpoints initialization
-    TEMPORARY_RETURN_IGNORED mClosureEndpoint1.Init();
-    TEMPORARY_RETURN_IGNORED mClosurePanelEndpoint2.Init();
-    TEMPORARY_RETURN_IGNORED mClosurePanelEndpoint3.Init();
+    SuccessOrDie(mClosureEndpoint1.Init());
+    SuccessOrDie(mClosurePanelEndpoint2.Init());
+    SuccessOrDie(mClosurePanelEndpoint3.Init());
 
     // Set Taglist for Closure endpoints
-    TEMPORARY_RETURN_IGNORED SetTagList(/* endpoint= */ 1,
-                                        Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kEndpoint1TagList));
-    TEMPORARY_RETURN_IGNORED SetTagList(/* endpoint= */ 2,
-                                        Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kEndpoint2TagList));
-    TEMPORARY_RETURN_IGNORED SetTagList(/* endpoint= */ 3,
-                                        Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kEndpoint3TagList));
+    SuccessOrDie(
+        SetTagList(/* endpoint= */ 1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kEndpoint1TagList)));
+    SuccessOrDie(
+        SetTagList(/* endpoint= */ 2, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kEndpoint2TagList)));
+    SuccessOrDie(
+        SetTagList(/* endpoint= */ 3, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kEndpoint3TagList)));
 
     // Set Initial state for Closure endpoints
-    VerifyOrDie(SetClosureControlInitialState(mClosureEndpoint1) == CHIP_NO_ERROR);
+    SuccessOrDie(SetClosureControlInitialState(mClosureEndpoint1));
     ChipLogProgress(AppServer, "Initial state for Closure Control Endpoint set successfully");
-    VerifyOrDie(SetClosurePanelInitialState(mClosurePanelEndpoint2) == CHIP_NO_ERROR);
+    SuccessOrDie(SetClosurePanelInitialState(mClosurePanelEndpoint2));
     ChipLogProgress(AppServer, "Initial state for Closure Panel Endpoint 2 set successfully");
-    VerifyOrDie(SetClosurePanelInitialState(mClosurePanelEndpoint3) == CHIP_NO_ERROR);
+    SuccessOrDie(SetClosurePanelInitialState(mClosurePanelEndpoint3));
     ChipLogProgress(AppServer, "Initial state for Closure Panel Endpoint 3 set successfully");
 
     TestEventTriggerDelegate * pTestEventDelegate = Server::GetInstance().GetTestEventTriggerDelegate();
@@ -123,10 +123,7 @@ void ClosureManager::Init()
     if (pTestEventDelegate != nullptr)
     {
         CHIP_ERROR err = pTestEventDelegate->AddHandler(&mClosureEndpoint1.GetDelegate());
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(AppServer, "Failed to add handler for delegate: %s", chip::ErrorStr(err));
-        }
+        ChipLogFailure(err, AppServer, "Failed to add handler for delegate");
     }
     else
     {
