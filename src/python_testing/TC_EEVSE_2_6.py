@@ -40,8 +40,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 
 from mobly import asserts
 from TC_EEVSE_Utils import EEVSEBaseTestHelper
@@ -162,9 +162,9 @@ class TC_EEVSE_2_6(MatterBaseTest, EEVSEBaseTestHelper):
                                 min_interval_sec=0,
                                 max_interval_sec=10, keepSubscriptions=True)
 
-        def accumulate_reports(wait_time):
+        async def accumulate_reports(wait_time):
             logging.info(f"Test will now wait {wait_time} seconds to accumulate reports")
-            time.sleep(wait_time)
+            await asyncio.sleep(wait_time)
 
         self.step("6")
         await self.send_test_event_trigger_basic()
@@ -193,7 +193,7 @@ class TC_EEVSE_2_6(MatterBaseTest, EEVSEBaseTestHelper):
         self.step("10")
         wait = 12  # Wait 12 seconds - the spec says we should only get reports every 10s at most, unless a command changes it
         sub_handler.reset()
-        accumulate_reports(wait)
+        await accumulate_reports(wait)
 
         self.step("10a")
         count = sub_handler.attribute_report_counts[Clusters.EnergyEvse.Attributes.SessionID]
@@ -237,7 +237,7 @@ class TC_EEVSE_2_6(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("15")
         wait = 5  # We expect a change to the Session attributes after the EV is unplugged, Wait 5 seconds - allow time for the report to come in
-        accumulate_reports(wait)
+        await accumulate_reports(wait)
 
         self.step("15a")
         count = sub_handler.attribute_report_counts[Clusters.EnergyEvse.Attributes.SessionID]
@@ -270,7 +270,7 @@ class TC_EEVSE_2_6(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("18")
         wait = 5  # We expect a change to the Session attributes after the EV is plugged in again, Wait 5 seconds - allow time for the report to come in
-        accumulate_reports(wait)
+        await accumulate_reports(wait)
 
         self.step("18a")
         count = sub_handler.attribute_report_counts[Clusters.EnergyEvse.Attributes.SessionID]

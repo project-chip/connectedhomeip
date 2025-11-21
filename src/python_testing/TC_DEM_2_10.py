@@ -43,10 +43,9 @@
 
 """Define Matter test case TC_DEM_2_10."""
 
-
+import asyncio
 import logging
 import sys
-import time
 
 from mobly import asserts
 from TC_DEMTestBase import DEMTestBase
@@ -167,9 +166,9 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
                                 min_interval_sec=0,
                                 max_interval_sec=10, keepSubscriptions=False)
 
-        def accumulate_reports(wait_time):
+        async def accumulate_reports(wait_time):
             logging.info(f"Test will now wait {wait_time} seconds to accumulate reports")
-            time.sleep(wait_time)
+            await asyncio.sleep(wait_time)
 
         self.step("5")
         await self.send_test_event_trigger_user_opt_out_clear_all()
@@ -199,7 +198,7 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
             self.step("8")
             wait = 12  # Wait 12 seconds - the spec says we should only get reports every 10s at most, unless a command changes it
             sub_handler.reset()
-            accumulate_reports(wait)
+            await accumulate_reports(wait)
 
             self.step("9")
             count = sub_handler.attribute_report_counts[Clusters.DeviceEnergyManagement.Attributes.Forecast]
@@ -229,7 +228,7 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
 
             self.step("13")
             wait = 5  # We expect a change to the forecast attribute after the cancel, Wait 5 seconds - allow time for the report to come in
-            accumulate_reports(wait)
+            await accumulate_reports(wait)
 
             self.step("13a")
             count = sub_handler.attribute_report_counts[Clusters.DeviceEnergyManagement.Attributes.Forecast]
@@ -281,7 +280,7 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
 
             self.step("18")
             wait = 12  # Wait 12 seconds - the spec says we should only get reports every 10s at most, unless a command changes it
-            accumulate_reports(wait)
+            await accumulate_reports(wait)
 
             self.step("18a")
             count = sub_handler.attribute_report_counts[Clusters.DeviceEnergyManagement.Attributes.PowerAdjustmentCapability]
@@ -294,7 +293,7 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
 
             self.step("20")
             wait = 5  # We expect a change to the forecast attribute after the cancel, Wait 5 seconds - allow time for the report to come in
-            accumulate_reports(wait)
+            await accumulate_reports(wait)
 
             self.step("20a")
             count = sub_handler.attribute_report_counts[Clusters.DeviceEnergyManagement.Attributes.PowerAdjustmentCapability]

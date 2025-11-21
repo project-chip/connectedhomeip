@@ -36,8 +36,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 
 from mobly import asserts
 
@@ -285,7 +285,7 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
                              "Incorrect event type")
         asserts.assert_equal(event.zone, zoneID1, "Unexpected zoneID on ZoneTriggered")
         asserts.assert_equal(event.reason, enums.ZoneEventStoppedReasonEnum.kActionStopped, "Unexpected reason on ZoneStopped")
-        time.sleep(blindDuration)
+        await asyncio.sleep(blindDuration)
 
         self.step("4")
         # Generate 2 triggers in quick succession to see if ZoneStopped comes after Augmentation duration
@@ -314,7 +314,7 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
                              "Incorrect event type")
         asserts.assert_equal(event.zone, zoneID1, "Unexpected zoneID on ZoneTriggered")
         asserts.assert_equal(event.reason, enums.ZoneEventStoppedReasonEnum.kActionStopped, "Unexpected reason on ZoneStopped")
-        time.sleep(blindDuration)
+        await asyncio.sleep(blindDuration)
 
         self.step("5")
         # Repeat Step 3
@@ -335,7 +335,7 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
         if self.is_pics_sdk_ci_only:
             for i in range(maxDuration):
                 self.write_to_app_pipe({"Name": "ZoneTriggered", "ZoneId": zoneID1})
-                time.sleep(1)
+                await asyncio.sleep(1)
         else:
             self.wait_for_user_input(
                 prompt_msg=f"""Press enter and immediately start, and keep generating motion activity from zone {zoneID1} for a period exceeding {maxDuration} seconds.

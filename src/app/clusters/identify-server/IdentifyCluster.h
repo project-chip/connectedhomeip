@@ -131,6 +131,14 @@ public:
      */
     void TimerFired() override;
 
+    /**
+     * @brief Stops the identification process.
+     *
+     * This method sets the IdentifyTime attribute to 0, which effectively stops the identification.
+     * It triggers the OnIdentifyStop callback if identification was in progress.
+     */
+    void StopIdentifying();
+
     Identify::EffectIdentifierEnum GetEffectIdentifier() const { return mEffectIdentifier; }
     Identify::EffectVariantEnum GetEffectVariant() const { return mEffectVariant; }
     Identify::IdentifyTypeEnum GetIdentifyType() const { return mIdentifyType; }

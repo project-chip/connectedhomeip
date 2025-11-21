@@ -37,8 +37,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 
 import test_plan_support
 from mobly import asserts
@@ -142,7 +142,7 @@ class TC_I_2_4(MatterBaseTest):
 
         self.step(6)
         logging.info("Test waits for 12 seconds")
-        time.sleep(12)
+        await asyncio.sleep(12)
 
         self.step(7)
         count = sub_handler.attribute_report_counts[cluster.Attributes.IdentifyTime]
@@ -175,7 +175,7 @@ class TC_I_2_4(MatterBaseTest):
 
         self.step(14)
         logging.info("Test waits for 1 seconds")
-        time.sleep(1)
+        await asyncio.sleep(1)
 
         self.step(15)
         count = sub_handler.attribute_report_counts[cluster.Attributes.IdentifyTime]
@@ -212,7 +212,7 @@ class TC_I_2_4(MatterBaseTest):
 
         self.step(21)
         logging.info("Test waits for 12 seconds")
-        time.sleep(12)
+        await asyncio.sleep(12)
 
         self.step(22)
         count = sub_handler.attribute_report_counts[cluster.Attributes.IdentifyTime]
@@ -251,7 +251,7 @@ class TC_I_2_4(MatterBaseTest):
 
         self.step(29)
         logging.info("Test waits for 1 seconds")
-        time.sleep(1)
+        await asyncio.sleep(1)
 
         self.step(30)
         count = sub_handler.attribute_report_counts[cluster.Attributes.IdentifyTime]

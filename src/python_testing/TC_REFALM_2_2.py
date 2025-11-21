@@ -37,10 +37,10 @@
 #       --app-pipe /tmp/refalm_2_2_fifo
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
 import typing
 from dataclasses import dataclass
-from time import sleep
 
 from mobly import asserts
 
@@ -168,10 +168,10 @@ class TC_REFALM_2_2(MatterBaseTest):
             attribute=Clusters.RefrigeratorAlarm.Attributes.State
         )
 
-    def _wait_thresshold(self):
+    async def _wait_thresshold(self):
         """Wait the defined time at the PIXIT.REFALM.AlarmThreshold to trigger it."""
         logger.info(f"Sleeping for {self.refalm_threshold_seconds} seconds defined at PIXIT.REFALM.AlarmThreshold")
-        sleep(self.refalm_threshold_seconds)
+        await asyncio.sleep(self.refalm_threshold_seconds)
 
     def _send_open_door_command(self):
         command_dict = {"Name": "SetRefrigeratorDoorStatus", "EndpointId": self.endpoint,
@@ -212,7 +212,7 @@ class TC_REFALM_2_2(MatterBaseTest):
 
         # wait  PIXIT.REFALM.AlarmThreshold (1s)
         self.step(5)
-        self._wait_thresshold()
+        await self._wait_thresshold()
 
         # # read the status
         self.step(6)
@@ -254,7 +254,7 @@ class TC_REFALM_2_2(MatterBaseTest):
         logger.info("Manually open the door on the DUT")
         self._ask_for_open_door()
         logger.info("Wait for the time defined in PIXIT.REFALM.AlarmThreshold")
-        self._wait_thresshold()
+        await self._wait_thresshold()
         # Wait for the Notify event with the State value.
         event_data = event_callback.wait_for_event_report(cluster.Events.Notify, timeout_sec=5)
         logger.info(f"Event data {event_data}")
