@@ -41,8 +41,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 
 from mobly import asserts
 from TC_DEMTestBase import DEMTestBase
@@ -353,7 +353,7 @@ class TC_DEM_2_4(MatterBaseTest, DEMTestBase):
 
         self.step("18")
         logging.info(f"Sleeping for forecast.slots[0].minPauseDuration {forecast.slots[0].minPauseDuration}s")
-        time.sleep(forecast.slots[0].minPauseDuration)
+        await asyncio.sleep(forecast.slots[0].minPauseDuration)
         event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.Resumed)
         asserts.assert_equal(event_data.cause, Clusters.DeviceEnergyManagement.Enums.CauseEnum.kNormalCompletion)
 

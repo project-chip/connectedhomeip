@@ -280,8 +280,7 @@ def parse(parser_group: ParserGroup):
     runner_config = None
 
     runner = TestRunner()
-    loop = asyncio.get_event_loop()
-    return loop.run_until_complete(runner.run(parser_group.builder_config, runner_config))
+    return asyncio.run(runner.run(parser_group.builder_config, runner_config))
 
 
 @runner_base.command()
@@ -291,8 +290,7 @@ def dry_run(parser_group: ParserGroup):
     runner_config = TestRunnerConfig(hooks=TestRunnerLogger())
 
     runner = TestRunner()
-    loop = asyncio.get_event_loop()
-    return loop.run_until_complete(runner.run(parser_group.builder_config, runner_config))
+    return asyncio.run(runner.run(parser_group.builder_config, runner_config))
 
 
 @runner_base.command()
@@ -306,8 +304,7 @@ def run(parser_group: ParserGroup, adapter: str, stop_on_error: bool, stop_on_wa
     runner_config = TestRunnerConfig(adapter, parser_group.pseudo_clusters, runner_options, runner_hooks)
 
     runner = TestRunner()
-    loop = asyncio.get_event_loop()
-    return loop.run_until_complete(runner.run(parser_group.builder_config, runner_config))
+    return asyncio.run(runner.run(parser_group.builder_config, runner_config))
 
 
 @runner_base.command()
@@ -330,8 +327,7 @@ def websocket(parser_group: ParserGroup, adapter: str, stop_on_error: bool, stop
         server_address, server_port, server_path, server_arguments, websocket_runner_hooks)
 
     runner = WebSocketRunner(websocket_runner_config)
-    loop = asyncio.get_event_loop()
-    return loop.run_until_complete(runner.run(parser_group.builder_config, runner_config))
+    return asyncio.run(runner.run(parser_group.builder_config, runner_config))
 
 
 @runner_base.command()
@@ -349,8 +345,7 @@ def matter_repl(parser_group: ParserGroup, adapter: str, stop_on_error: bool, st
     if commission_on_network_dut:
         node_id_to_commission = parser_group.builder_config.parser_config.config_override['nodeId']
     runner = __import__(runner, fromlist=[None]).Runner(repl_storage_path, node_id_to_commission=node_id_to_commission)
-    loop = asyncio.get_event_loop()
-    return loop.run_until_complete(runner.run(parser_group.builder_config, runner_config))
+    return asyncio.run(runner.run(parser_group.builder_config, runner_config))
 
 
 @runner_base.command()

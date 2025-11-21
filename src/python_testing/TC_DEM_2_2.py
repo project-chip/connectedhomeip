@@ -44,11 +44,10 @@
 
 """Define Matter test case TC_DEM_2_2."""
 
-
+import asyncio
 import datetime
 import logging
 import sys
-import time
 
 from mobly import asserts
 from TC_DEMTestBase import DEMTestBase
@@ -365,7 +364,7 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
                              Clusters.DeviceEnergyManagement.Enums.PowerAdjustReasonEnum.kLocalOptimizationAdjustment)
 
         self.step("20")
-        time.sleep(10)
+        await asyncio.sleep(10)
 
         # Allow a little tolerance checking the duration returned in the event as CI tests can run "slower"
         event_data = events_callback.wait_for_event_report(Clusters.DeviceEnergyManagement.Events.PowerAdjustEnd)

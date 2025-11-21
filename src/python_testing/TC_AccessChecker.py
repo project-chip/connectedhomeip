@@ -348,7 +348,7 @@ class AccessChecker(BasicCompositionTests):
         self.step(check_step)
         enum = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
         in_progress_clusters = [Clusters.ColorControl.id]
-        privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue]
+        privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue and p != enum.kProxyView]
         for privilege in privilege_enum:
             logging.info(f"Testing for {privilege}")
             self.step(step_number_with_privilege(check_step, 'a', privilege))
@@ -379,7 +379,7 @@ class AccessChecker(BasicCompositionTests):
                  TestStep(2, "TH_commissioner reads the ACL attribute (done during test setup)"),
                  TestStep(3, "Repeat steps 3a and 3b for each permission level")]
         enum = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
-        privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue]
+        privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue and p != enum.kProxyView]
         for p in privilege_enum:
             steps.append(TestStep(step_number_with_privilege(3, 'a', p),
                          "TH_commissioner gives TH_second_commissioner the specified privilege"))
@@ -402,7 +402,7 @@ class AccessChecker(BasicCompositionTests):
                  TestStep(4, "TH_second_controller performs a wildcard read"),
                  TestStep(5, "Repeat steps 5a and 5b for each permission level")]
         enum = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
-        privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue]
+        privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue and p != enum.kProxyView]
         for p in privilege_enum:
             steps.append(TestStep(step_number_with_privilege(5, 'a', p),
                          "TH_commissioner gives TH_second_commissioner the specified privilege"))
@@ -423,7 +423,7 @@ class AccessChecker(BasicCompositionTests):
                  TestStep(2, "TH_commissioner reads the ACL attribute (done during test setup)"),
                  TestStep(3, "Repeat steps 3a and 3b for each permission level")]
         enum = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
-        privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue]
+        privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue and p != enum.kProxyView]
         for p in privilege_enum:
             steps.append(TestStep(step_number_with_privilege(3, 'a', p),
                          "TH_commissioner gives TH_second_controller the specified privilege"))

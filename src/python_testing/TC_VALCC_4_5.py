@@ -32,7 +32,7 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import time
+import asyncio
 
 from mobly import asserts
 
@@ -101,7 +101,7 @@ class TC_VALCC_4_5(MatterBaseTest):
         asserts.assert_true(current_state_dut is not NullValue, "CurrentState is null")
 
         while current_state_dut is Clusters.Objects.ValveConfigurationAndControl.Enums.ValveStateEnum.kTransitioning:
-            time.sleep(1)
+            await asyncio.sleep(1)
 
             current_state_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
             asserts.assert_true(current_state_dut is not NullValue, "CurrentState is null")
@@ -110,7 +110,7 @@ class TC_VALCC_4_5(MatterBaseTest):
                              "CurrentState is not the expected value")
 
         self.step(6)
-        time.sleep(6)
+        await asyncio.sleep(6)
 
         self.step(7)
         open_duration_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.OpenDuration)

@@ -199,6 +199,32 @@ constexpr uint8_t kWfxQueueSize = 10;
 // TODO: Figure out why we actually need this, we are already handling failure and retries somewhere else.
 constexpr uint16_t kWifiScanTimeoutTicks = 10000;
 
+// Convert sl_wifi_security_t to wfx_sec_t
+static wfx_sec_t ConvertSlWifiSecurityToWfx(sl_wifi_security_t security)
+{
+    switch (security)
+    {
+    case SL_WIFI_OPEN:
+        return WFX_SEC_NONE;
+    case SL_WIFI_WEP:
+        return WFX_SEC_WEP;
+    case SL_WIFI_WPA:
+    case SL_WIFI_WPA_ENTERPRISE: // map enterprise to WPA as closest
+        return WFX_SEC_WPA;
+    case SL_WIFI_WPA2:
+    case SL_WIFI_WPA2_ENTERPRISE: // map enterprise to WPA2 as closest
+    case SL_WIFI_WPA_WPA2_MIXED:
+        return WFX_SEC_WPA2;
+    case SL_WIFI_WPA3_TRANSITION:
+    case SL_WIFI_WPA3_TRANSITION_ENTERPRISE: // map enterprise to WPA3 transition
+    case SL_WIFI_WPA3:
+    case SL_WIFI_WPA3_ENTERPRISE:
+        return WFX_SEC_WPA3; // map enterprise to WPA3
+    default:
+        return WFX_SEC_UNSPECIFIED;
+    }
+}
+
 /**
  * @brief Network Scan callback when the device receive a scan operation from the controller.
  *        This callback is used whe the Network Commission Driver send a ScanNetworks command.
@@ -241,10 +267,11 @@ sl_status_t BackgroundScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t 
         VerifyOrReturnError(chip::CopySpanToMutableSpan(inBssid, outBssid) == CHIP_NO_ERROR,
                             SL_STATUS_SI91X_MEMORY_IS_NOT_SUFFICIENT);
 
-        // TODO: We should revisit this to make sure we are setting the correct values
-        currentScanResult.security = static_cast<wfx_sec_t>(result->scan_info[i].security_mode);
-        currentScanResult.rssi     = (-1) * result->scan_info[i].rssi_val; // The returned value is positive - we need to flip it
-        currentScanResult.chan     = result->scan_info[i].rf_channel;
+        // Convert sl_wifi_security_t to wfx_sec_t
+        currentScanResult.security =
+            ConvertSlWifiSecurityToWfx(static_cast<sl_wifi_security_t>(result->scan_info[i].security_mode));
+        currentScanResult.rssi = (-1) * result->scan_info[i].rssi_val; // The returned value is positive - we need to flip it
+        currentScanResult.chan = result->scan_info[i].rf_channel;
         // TODO: change this when SDK provides values
         currentScanResult.wiFiBand = WiFiBandEnum::k2g4;
 

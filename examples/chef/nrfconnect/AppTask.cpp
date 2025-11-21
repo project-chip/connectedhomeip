@@ -166,7 +166,7 @@ CHIP_ERROR AppTask::Init()
         return err;
     }
 
-    sThreadNetworkDriver.Init();
+    TEMPORARY_RETURN_IGNORED sThreadNetworkDriver.Init();
 #else
     return CHIP_ERROR_INTERNAL;
 #endif // CONFIG_NET_L2_OPENTHREAD
@@ -219,7 +219,7 @@ CHIP_ERROR AppTask::Init()
     // Add CHIP event handler and start CHIP thread.
     // Note that all the initialization code should happen prior to this point to avoid data races
     // between the main and the CHIP threads
-    PlatformMgr().AddEventHandler(ChipEventHandler, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().AddEventHandler(ChipEventHandler, 0);
 
     err = PlatformMgr().StartEventLoopTask();
     if (err != CHIP_NO_ERROR)
@@ -240,7 +240,7 @@ CHIP_ERROR AppTask::StartApp()
 {
     ReturnErrorOnFailure(Init());
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(AppTask::InitServer);
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(AppTask::InitServer);
 
     return CHIP_NO_ERROR;
 }
@@ -469,7 +469,7 @@ void AppTask::PostEvent(const AppEvent & event)
         return;
     }
     ChipLogProgress(AppServer, "MsgQ set event.Type = %u", chip::to_underlying(event.Type));
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(AppTask::MsgQConsume);
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(AppTask::MsgQConsume);
 }
 
 void AppTask::DispatchEvent(const AppEvent & event)

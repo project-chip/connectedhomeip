@@ -180,4 +180,29 @@ TEST_F(TestIdentifyClusterBackwardsCompatibility, TestLateLegacyInstantiation)
                 nullptr);
 }
 
+TEST_F(TestIdentifyClusterBackwardsCompatibility, StopIdentifyingTest)
+{
+    onIdentifyStopCalled = false;
+
+    // Old style struct
+    struct Identify identify(1, onIdentifyStart, onIdentifyStop, chip::app::Clusters::Identify::IdentifyTypeEnum::kNone,
+                             onEffectIdentifier, EffectIdentifierEnum::kBlink, EffectVariantEnum::kDefault, &mMockTimerDelegate);
+    EXPECT_EQ(identify.mCluster.Cluster().Startup(mContext.Get()), CHIP_NO_ERROR);
+
+    // Start identifying.
+    EXPECT_EQ(WriteAttribute(identify.mCluster.Cluster(), IdentifyTime::Id, 10u), CHIP_NO_ERROR);
+    EXPECT_TRUE(identify.mActive);
+
+    // Find the cluster on the endpoint and call StopIdentifying
+    IdentifyCluster * cluster = FindIdentifyClusterOnEndpoint(1);
+    ASSERT_NE(cluster, nullptr);
+    cluster->StopIdentifying();
+
+    // Verify identifying stopped
+    EXPECT_FALSE(identify.mActive);
+
+    // Verify stop callback was called
+    EXPECT_TRUE(onIdentifyStopCalled);
+}
+
 } // namespace
