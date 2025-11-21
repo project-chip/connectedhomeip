@@ -48,13 +48,16 @@ class TC_CADMIN_1_5(CADMINBaseTest):
 
     async def commission_on_network_expect_error(self, setup_code: int, discriminator: int):
         # This is expected to error as steps 4 and 7 expects timeout issue or pase connection error to occur due to commissioning window being closed already
+        # The two errors here correspond to either a failure to find the device on dns-sd because it's no longer advertising or a failure to connect
+        # over PASE (in the case where we have a cached address and attempt a connection). Both of these are indications that the commissioning window
+        # is properly closed, which is what this function is expecting.
         try:
             await self.th2.CommissionOnNetwork(
                 nodeId=self.dut_node_id, setupPinCode=setup_code,
                 filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
             asserts.fail("Unexpected success when commissioning")
-        except ChipStackError as cm:
-            asserts.assert_equal(cm.err, 0x00000032,
+        except ChipStackError as cm:  # chipstack-ok
+            asserts.assert_equal(cm.err, ChipDeviceCtrl.CHIP_ERROR_TIMEOUT,
                                  'Unexpected error code returned from Commissioning Attempt')
         except asyncio.exceptions.CancelledError:
             pass
@@ -121,6 +124,7 @@ class TC_CADMIN_1_5(CADMINBaseTest):
             expected_discriminator=params.randomDiscriminator
         )
         logging.info(f"Successfully found service with CM={service.txt.get('CM')}, D={service.txt.get('D')}")
+        logging.info("Test will now sleep for 190s while waiting for commissioning window to time out ... ")
         await asyncio.sleep(190)
 
         self.step(4)
