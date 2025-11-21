@@ -142,15 +142,15 @@ class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
             asserts.assert_in(attributes.PanMin.attribute_id, attribute_list,
                               "PanMin attribute is a mandatory attribute if MPAN.")
             pan_min_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.PanMin)
-            asserts.assert_less_equal(pan_min_dut, SPEC_PANMIN_MAX_VALUE, "PanMin is not in valid range.")
-            asserts.assert_greater_equal(pan_min_dut, SPEC_PANMIN_MIN_VALUE, "PanMin is not in valid range.")
+            asserts.assert_less_equal(pan_min_dut, self.SPEC_PANMIN_MAX_VALUE, "PanMin is not in valid range.")
+            asserts.assert_greater_equal(pan_min_dut, self.SPEC_PANMIN_MIN_VALUE, "PanMin is not in valid range.")
 
             self.step(6)
             asserts.assert_in(attributes.PanMax.attribute_id, attribute_list,
                               "PanMax attribute is a mandatory attribute if MPAN.")
             pan_max_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.PanMax)
-            asserts.assert_less_equal(pan_max_dut, SPEC_PANMAX_MAX_VALUE, "PanMax is not in valid range.")
-            asserts.assert_greater_equal(pan_max_dut, SPEC_PANMAX_MIN_VALUE, "PanMax is not in valid range.")
+            asserts.assert_less_equal(pan_max_dut, self.SPEC_PANMAX_MAX_VALUE, "PanMax is not in valid range.")
+            asserts.assert_greater_equal(pan_max_dut, self.SPEC_PANMAX_MIN_VALUE, "PanMax is not in valid range.")
 
             self.step(7)
             # Create new Value for Pan
@@ -214,15 +214,15 @@ class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
             asserts.assert_in(attributes.TiltMin.attribute_id, attribute_list,
                               "TiltMin attribute is a mandatory attribute if MTILT.")
             tilt_min_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.TiltMin)
-            asserts.assert_less_equal(tilt_min_dut, SPEC_TILTMIN_MAX_VALUE, "TiltMin is not in valid range.")
-            asserts.assert_greater_equal(tilt_min_dut, SPEC_TILTMIN_MIN_VALUE, "TiltMin is not in valid range.")
+            asserts.assert_less_equal(tilt_min_dut, self.SPEC_TILTMIN_MAX_VALUE, "TiltMin is not in valid range.")
+            asserts.assert_greater_equal(tilt_min_dut, self.SPEC_TILTMIN_MIN_VALUE, "TiltMin is not in valid range.")
 
             self.step(16)
             asserts.assert_in(attributes.TiltMax.attribute_id, attribute_list,
                               "TiltMax attribute is a mandatory attribute if MTILT.")
             tilt_max_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.TiltMax)
-            asserts.assert_less_equal(tilt_max_dut, SPEC_TILTMAX_MAX_VALUE, "TiltMax is not in valid range.")
-            asserts.assert_greater_equal(tilt_max_dut, SPEC_TILTMAX_MIN_VALUE, "TiltMax is not in valid range.")
+            asserts.assert_less_equal(tilt_max_dut, self.SPEC_TILTMAX_MAX_VALUE, "TiltMax is not in valid range.")
+            asserts.assert_greater_equal(tilt_max_dut, self.SPEC_TILTMAX_MIN_VALUE, "TiltMax is not in valid range.")
 
             self.step(17)
             # Create new Value for Tilt
@@ -271,8 +271,8 @@ class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
             asserts.assert_in(attributes.ZoomMax.attribute_id, attribute_list,
                               "ZoomMax attribute is a mandatory attribute if MZOOM.")
             zoom_max_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.ZoomMax)
-            asserts.assert_less_equal(zoom_max_dut, SPEC_ZOOMMAX_MAX_VALUE, "ZoomMax is not in valid range.")
-            asserts.assert_greater_equal(zoom_max_dut, SPEC_ZOOMMAX_MIN_VALUE, "ZoomMax is not in valid range.")
+            asserts.assert_less_equal(zoom_max_dut, self.SPEC_ZOOMMAX_MAX_VALUE, "ZoomMax is not in valid range.")
+            asserts.assert_greater_equal(zoom_max_dut, self.SPEC_ZOOMMAX_MIN_VALUE, "ZoomMax is not in valid range.")
 
             self.step(24)
             # Create new Value for Zoom
