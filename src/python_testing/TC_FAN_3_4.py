@@ -105,7 +105,7 @@ class TC_FAN_3_4(MatterBaseTest):
         if wind_support & Clusters.FanControl.Bitmaps.WindBitmap.kSleepWind:
             self.step(3)
             await self.write_wind_setting(endpoint=endpoint, wind_setting=Clusters.FanControl.Bitmaps.WindBitmap.kSleepWind)
-            # time.sleep(1)
+            # await asyncio.sleep(1)
 
             self.step(4)
             wind_setting = await self.read_wind_setting(endpoint=endpoint)
@@ -122,7 +122,7 @@ class TC_FAN_3_4(MatterBaseTest):
         if wind_support & Clusters.FanControl.Bitmaps.WindBitmap.kNaturalWind:
             self.step(6)
             await self.write_wind_setting(endpoint=endpoint, wind_setting=Clusters.FanControl.Bitmaps.WindBitmap.kNaturalWind)
-            # time.sleep(1)
+            # await asyncio.sleep(1)
 
             self.step(7)
             wind_setting = await self.read_wind_setting(endpoint=endpoint)

@@ -38,6 +38,7 @@ void LEDWidget::Init(const uint8_t led)
     mBlinkOffTimeMS   = 0;
     mLed              = led;
     mLedStatus        = false;
+    mLevel            = 0;
     Set(false);
 }
 

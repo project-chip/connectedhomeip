@@ -55,15 +55,6 @@ jobs:
               with:
                 gh-context: ${{ toJson(github) }}
 
-            # We cannot add esp-idf-kconfig==2.5.0 to rquirements.txt because it
-            # will break the nuttx workflow which requires the older version of
-            # the kconfiglib and esp-idf-kconfig==2.5.0 installs newer version
-            # so, install it in in the virtual environment here
-            - name: Install esp-idf-kconfig
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                    "pip install esp-idf-kconfig==2.5.0"
-
             - name: Build example All Clusters App(Target:ESP32C3)
               run: |
                   ./scripts/run_in_build_env.sh \
@@ -82,7 +73,7 @@ jobs:
                      /tmp/bloat_reports/
 
             - name: Remove built artifacts for all-clusters
-              run: rm -rf out/esp32-c3devkit-all-clusters
+              run: rm -rf out/esp32-c3devkit-all-clusters examples/all-clusters-app/esp32/managed_components
 
             - name: Prepare code pregen and ensure compile time pregen not possible
               run: |
@@ -110,7 +101,7 @@ jobs:
                   mv scripts/tools/zap/generate.py.renamed scripts/tools/zap/generate.py
 
             - name: Remove built artifacts for all-clusters-minimal
-              run: rm -rf out/esp32-m5stack-all-clusters-minimal
+              run: rm -rf out/esp32-m5stack-all-clusters-minimal examples/all-clusters-minimal-app/esp32/managed_components
 
             - name: Check for changed paths
               uses: dorny/paths-filter@v3
@@ -148,21 +139,30 @@ jobs:
                      "
 
             - name: Remove built artifacts for all-clusters-rpc-ipv6only
-              run: rm -rf out/esp32-devkitc-all-clusters-rpc-ipv6only
+              run: rm -rf out/esp32-devkitc-all-clusters-rpc-ipv6only examples/all-clusters-app/esp32/managed_components
 
             - name: Build example Lighting App (Target:ESP32C6)
-              run: scripts/examples/esp_example.sh lighting-app sdkconfig.wifi_thread.defaults esp32c6
+              run: |
+                scripts/examples/esp_example.sh lighting-app sdkconfig.wifi_thread.defaults esp32c6
+                rm -rf examples/lighting-app/esp32/{build,managed_components}
+              
 
             - name: Build example Lighting App (external platform)
-              run: scripts/examples/esp_example.sh lighting-app sdkconfig.ext_plat.defaults
+              run: |
+                scripts/examples/esp_example.sh lighting-app sdkconfig.ext_plat.defaults
+                rm -rf examples/lighting-app/esp32/{build,managed_components}
 
             - name: Build example Energy Gateway App
               if: steps.changed_paths.outputs.energy_gateway == 'true'
-              run: scripts/examples/esp_example.sh energy-gateway-app sdkconfig.defaults
+              run: |
+                scripts/examples/esp_example.sh energy-gateway-app sdkconfig.defaults
+                rm -rf examples/energy-gateway-app/esp32/{build,managed_components}
 
             - name: Build example Energy Management App
               if: steps.changed_paths.outputs.energy_management == 'true'
-              run: scripts/examples/esp_example.sh energy-management-app sdkconfig.defaults
+              run: |
+                scripts/examples/esp_example.sh energy-management-app sdkconfig.defaults
+                rm -rf examples/energy-management-app/esp32/{build,managed_components}
 
             - name: Uploading Size Reports
               uses: ./.github/actions/upload-size-reports
