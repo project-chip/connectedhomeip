@@ -146,7 +146,7 @@ class LengthBetweenHandler(BaseHandler):
         elif name == "to":
             self._field.data_type.max_length = ParseOptionalInt(attrs["value"])
         else:
-            LOGGER.error(f"UNKNOWN constraint type {name}")
+            log.error("UNKNOWN constraint type '%s'", name)
         return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
 
 
@@ -186,13 +186,13 @@ class ConstraintHandler(BaseHandler):
             if "value" in attrs:
                 self._field.data_type.max_length = ParseOptionalInt(attrs["value"])
             else:
-                LOGGER.warning("could not parse maxLength for %s (is it a constant sub-item?)", self._field.name)
+                log.warning("could not parse maxLength for %s (is it a constant sub-item?)", self._field.name)
         elif name == "minLength":
             self._field.data_type.min_length = ParseOptionalInt(attrs["value"])
         elif name == "lengthBetween":
             return LengthBetweenHandler(self.context, self._field)
         else:
-            LOGGER.error(f"UNKNOWN constraint type {name}")
+            log.error("UNKNOWN constraint type '%s'", name)
         return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
 
 
