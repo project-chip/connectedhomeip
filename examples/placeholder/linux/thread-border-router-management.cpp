@@ -39,7 +39,7 @@ class FakeBorderRouterDelegate final : public ThreadBorderRouterManagement::Dele
 
     void GetBorderRouterName(MutableCharSpan & borderRouterName) override
     {
-        CopyCharSpanToMutableCharSpan("netman-br"_span, borderRouterName);
+        TEMPORARY_RETURN_IGNORED CopyCharSpanToMutableCharSpan("netman-br"_span, borderRouterName);
     }
 
     CHIP_ERROR GetBorderAgentId(MutableByteSpan & borderAgentId) override
@@ -80,6 +80,7 @@ std::optional<ThreadBorderRouterManagement::ServerInstance> gThreadBorderRouterM
 void emberAfThreadBorderRouterManagementClusterInitCallback(EndpointId endpoint)
 {
     VerifyOrDie(!gThreadBorderRouterManagementServer);
-    gThreadBorderRouterManagementServer.emplace(endpoint, &gBorderRouterDelegate, Server::GetInstance().GetFailSafeContext())
+    TEMPORARY_RETURN_IGNORED gThreadBorderRouterManagementServer
+        .emplace(endpoint, &gBorderRouterDelegate, Server::GetInstance().GetFailSafeContext())
         .Init();
 }

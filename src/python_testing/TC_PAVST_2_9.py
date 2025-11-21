@@ -37,8 +37,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 
 from mobly import asserts
 from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess
@@ -161,7 +161,7 @@ class TC_PAVST_2_9(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                             pvcluster.Enums.TransportStatusEnum.kInactive, "Transport status should be Inactive")
 
         logger.info("Wait for 6 secs to PushAVTransport expiry")
-        time.sleep(6)
+        await asyncio.sleep(6)
 
         self.step(7)
         transport_configs = await self.read_single_attribute_check_success(
