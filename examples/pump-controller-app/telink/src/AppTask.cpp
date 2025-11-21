@@ -32,7 +32,7 @@ AppTask AppTask::sAppTask;
 CHIP_ERROR AppTask::Init(void)
 {
     SetExampleButtonCallbacks(StartActionEventHandler);
-    TEMPORARY_RETURN_IGNORED InitCommonParts();
+    ReturnErrorOnFailure(InitCommonParts());
 
     LedManager::getInstance().setLed(LedManager::EAppLed_App0, !PumpMgr().IsStopped());
 

@@ -223,7 +223,7 @@ int AppTask::Init()
     cc13xx_26xxLogInit();
 
     // Init Chip memory management before the stack
-    TEMPORARY_RETURN_IGNORED Platform::MemoryInit();
+    SuccessOrDie(Platform::MemoryInit());
 
     PLAT_LOG("Software Version: %d", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
     PLAT_LOG("Software Version String: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
