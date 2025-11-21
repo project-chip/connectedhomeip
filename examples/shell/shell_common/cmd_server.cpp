@@ -63,7 +63,7 @@ static CHIP_ERROR CmdAppServerStart(int argc, char ** argv)
     initParams.operationalServicePort        = sServerPortOperational;
     initParams.userDirectedCommissioningPort = sServerPortCommissioning;
 
-    TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().Init(initParams);
+    ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());

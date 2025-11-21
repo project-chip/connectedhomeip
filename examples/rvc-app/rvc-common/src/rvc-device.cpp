@@ -6,10 +6,10 @@ using namespace chip::app::Clusters;
 
 void RvcDevice::Init()
 {
-    TEMPORARY_RETURN_IGNORED mServiceAreaInstance.Init();
-    TEMPORARY_RETURN_IGNORED mRunModeInstance.Init();
-    TEMPORARY_RETURN_IGNORED mCleanModeInstance.Init();
-    TEMPORARY_RETURN_IGNORED mOperationalStateInstance.Init();
+    SuccessOrDie(mServiceAreaInstance.Init());
+    SuccessOrDie(mRunModeInstance.Init());
+    SuccessOrDie(mCleanModeInstance.Init());
+    SuccessOrDie(mOperationalStateInstance.Init());
 }
 
 void RvcDevice::SetDeviceToIdleState()
