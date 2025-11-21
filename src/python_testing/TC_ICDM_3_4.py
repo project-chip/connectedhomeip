@@ -36,8 +36,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 
 from mobly import asserts
 
@@ -118,7 +118,7 @@ class TC_ICDM_3_4(MatterBaseTest):
 
         self.step("2b")
         if not is_ci:
-            time.sleep(wait_time_reboot)
+            await asyncio.sleep(wait_time_reboot)
 
         self.step(3)
         if not is_ci:

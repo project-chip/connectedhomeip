@@ -42,9 +42,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-
+import asyncio
 import logging
-import time
 
 from mobly import asserts
 from TC_EWATERHTRBase import EWATERHTRBase
@@ -282,7 +281,7 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
         await self.check_whm_attribute("BoostState", Clusters.WaterHeaterManagement.Enums.BoostStateEnum.kActive)
 
         self.step("10")
-        time.sleep(6)
+        await asyncio.sleep(6)
         event_data = events_callback.wait_for_event_report(Clusters.WaterHeaterManagement.Events.BoostEnded)
 
         self.step("10a")
