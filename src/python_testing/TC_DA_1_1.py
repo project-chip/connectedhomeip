@@ -169,7 +169,7 @@ class TC_DA_1_1(MatterBaseTest):
         # Operational Credentials cluster and saves the returned list as nocs_th1
         self.step(1)
         nocs_th1 = await self.read_nocs(th1)
-        
+
         # Verify that there is a single entry in the list
         asserts.assert_true(len(nocs_th1) == 1, "NOCs attribute must contain single entry in the list")
 
@@ -177,10 +177,10 @@ class TC_DA_1_1(MatterBaseTest):
         # TH1 does a non-fabric-filtered read of the Fabrics attribute from the Node Operational Credentials cluster
         self.step(2)
         fabrics_th1 = await self.read_fabrics(th1)
-        
+
         # Verify that there is a single entry in the list
         asserts.assert_true(len(fabrics_th1) == 1, "Fabrics attribute must contain single entry in the list")
-        
+
         # Verify that the FabricID for that entry matches the FabricID for TH1
         asserts.assert_equal(fabrics_th1[0].fabricID, th1.fabricId, "TH1 FabricID and Fabrics attribute FabricID must match")
 
@@ -218,7 +218,7 @@ class TC_DA_1_1(MatterBaseTest):
         asserts.assert_true(len(nocs_th2) == 1, "NOCs attribute must contain single entry in the list")
 
         # Verify that the NOCs for that entry is different than the NOCs entry in nocs_th1
-        asserts.assert_not_equal(1,1, "The NOCs entry for TH2 must be different that the NOCs entry for TH1")
+        asserts.assert_not_equal(1, 1, "The NOCs entry for TH2 must be different that the NOCs entry for TH1")
 
 
 if __name__ == "__main__":
