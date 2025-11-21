@@ -176,7 +176,7 @@ BooleanStateConfigurationCluster::InvokeCommand(const DataModel::InvokeRequest &
         {
             // TODO: For backwards compatibility with previous code, we ignore the return code
             //       from the delegate handler. This feels off though...
-            (void) mDelegate->HandleEnableDisableAlarms(alarms);
+            RETURN_SAFELY_IGNORED mDelegate->HandleEnableDisableAlarms(alarms);
         }
 
         // This inverts the bits (0x03 is the current max bitmap):
