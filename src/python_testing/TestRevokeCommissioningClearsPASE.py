@@ -38,9 +38,9 @@
 
 from mobly import asserts
 
-import matter.clusters as Clusters
-from matter.exceptions import ChipStackError
-from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+import chip.clusters as Clusters
+from chip.exceptions import ChipStackError
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 
 
 class TestRevokeCommissioningClearsPASE(MatterBaseTest):
@@ -66,7 +66,7 @@ class TestRevokeCommissioningClearsPASE(MatterBaseTest):
 
         self.print_step(2, "TH2 establishes a PASE session with DUT")
         pase_node_id = self.dut_node_id + 1
-        await self.TH2.FindOrEstablishPASESession(setupCode=resp.commissioningParameters.setupQRCode, nodeId=pase_node_id)
+        await self.TH2.FindOrEstablishPASESession(setupCode=resp.commissioningParameters.setupQRCode, nodeid=pase_node_id)
 
         self.print_step(3, "Read VendorName from BasicInformation Cluster using TH2 over PASE, to ensure PASE session is established")
 
@@ -74,7 +74,7 @@ class TestRevokeCommissioningClearsPASE(MatterBaseTest):
         ROOT_NODE_ENDPOINT_ID = 0
 
         read_step3 = await self.TH2.ReadAttribute(
-            nodeId=pase_node_id,
+            nodeid=pase_node_id,
             attributes=(ROOT_NODE_ENDPOINT_ID, VendorNameAttr),
         )
 
@@ -86,7 +86,7 @@ class TestRevokeCommissioningClearsPASE(MatterBaseTest):
 
         self.print_step(4, "TH1 Sends RevokeCommissioning (over CASE) to clear PASE session on DUT")
         revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
-        await self.TH1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
+        await self.TH1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
 
         self.print_step(
             5, "Ensure that the PASE Session got cleared, by attempting to read VendorName using TH2 (over PASE) and Ensuring that the Command times out")
@@ -95,7 +95,7 @@ class TestRevokeCommissioningClearsPASE(MatterBaseTest):
 
         with asserts.assert_raises(ChipStackError) as e:
             await self.TH2.ReadAttribute(
-                nodeId=pase_node_id,
+                nodeid=pase_node_id,
                 attributes=(ROOT_NODE_ENDPOINT_ID, VendorNameAttr))
         asserts.assert_equal(e.exception.err, _CHIP_TIMEOUT_ERROR,
                              f"Expected timeout error reading VendorName attribute over PASE, got {e.exception.err}")
@@ -117,18 +117,18 @@ class TestRevokeCommissioningClearsPASE(MatterBaseTest):
         resp = await self.open_commissioning_window()
 
         self.print_step(8, "TH2 establishes a PASE session with DUT")
-        await self.TH2.FindOrEstablishPASESession(setupCode=resp.commissioningParameters.setupQRCode, nodeId=pase_node_id)
+        await self.TH2.FindOrEstablishPASESession(setupCode=resp.commissioningParameters.setupQRCode, nodeid=pase_node_id)
 
         self.print_step(9, "TH2 Sends RevokeCommissioning (Over PASE) to clear PASE session on DUT")
 
-        await self.TH2.SendCommand(nodeId=pase_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
+        await self.TH2.SendCommand(nodeid=pase_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
 
         self.print_step(
             10, "Ensure that the PASE Session got cleared, by attempting to read VendorName using TH2 (over PASE) and Ensuring that the Command times out")
 
         with asserts.assert_raises(ChipStackError) as e:
             await self.TH2.ReadAttribute(
-                nodeId=pase_node_id,
+                nodeid=pase_node_id,
                 attributes=(ROOT_NODE_ENDPOINT_ID, VendorNameAttr))
         asserts.assert_equal(e.exception.err, _CHIP_TIMEOUT_ERROR,
                              f"Expected timeout error reading VendorName attribute over PASE, got {e.exception.err}")
