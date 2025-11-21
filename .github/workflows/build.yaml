@@ -15,528 +15,530 @@
 name: Builds
 
 on:
-    push:
-        branches:
-            - master
-            - 'v*-branch'
-    pull_request:
-    merge_group:
-    workflow_dispatch:
-    workflow_call:
-      inputs:
-        run-codeql:
-          required: false
-          type: boolean
+  push:
+    branches:
+      - master
+      - "v*-branch"
+  pull_request:
+  merge_group:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      run-codeql:
+        required: false
+        type: boolean
 
 concurrency:
-    group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
-    cancel-in-progress: true
+  group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+  cancel-in-progress: true
 
 env:
-    CHIP_NO_LOG_TIMESTAMPS: true
+  CHIP_NO_LOG_TIMESTAMPS: true
 
 jobs:
-    build_linux_gcc_debug:
-        name: Build on Linux (gcc_debug)
+  changed_paths:
+    uses: ./.github/workflows/analyze-changed-paths.yaml
 
-        runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
+  build_linux_gcc_debug:
+    name: Build on Linux (gcc_debug)
+    needs: changed_paths
+    runs-on: ubuntu-latest
+    if: github.actor != 'restyled-io[bot]' && needs.changed_paths.outputs.non_md_changes == 'true'
 
-        container:
-            image: ghcr.io/project-chip/chip-build:174
-            volumes:
-                - "/:/runner-root-volume"
-                - "/tmp/log_output:/tmp/test_logs"
-            options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
-                net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
+    container:
+      image: ghcr.io/project-chip/chip-build:174
+      volumes:
+        - "/:/runner-root-volume"
+        - "/tmp/log_output:/tmp/test_logs"
+      options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
+        net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
-        steps:
-            - name: Dump GitHub context
-              env:
-                  GITHUB_CONTEXT: ${{ toJSON(github) }}
-              run: echo "$GITHUB_CONTEXT"
-            - name: Dump Concurrency context
-              env:
-                  CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
-              run: echo "$CONCURRENCY_CONTEXT"
-            - name: Checkout
-              uses: actions/checkout@v5
-            - name: Try to ensure the directories for core dumping exist and we
-                  can write them.
-              run: |
-                  mkdir /tmp/cores || true
-                  sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
-            - name: Checkout submodules & Bootstrap
-              uses: ./.github/actions/checkout-submodules-and-bootstrap
-              with:
-                platform: linux
-            - name: Initialize CodeQL
-              if: ${{ inputs.run-codeql  }}
-              uses: github/codeql-action/init@v4
-              with:
-                  languages: "cpp"
-                  queries: security-extended, security-and-quality
-            - name: Setup Build
-              run: scripts/build/gn_gen.sh --args="chip_config_memory_debug_checks=true chip_config_memory_debug_dmalloc=false"
-            - name: Run Build
-              run: scripts/run_in_build_env.sh "ninja -C ./out"
-            - name: Run Tests
-              run: scripts/tests/gn_tests.sh
-            - name: Clean out build output
-              run: rm -rf ./out
-
-            # Do not run below steps with CodeQL since we are getting "Out of runner space issues" with CodeQL and their added coverage is limited
-            - name: Set up Build Without Detail Logging
-              if: inputs.run-codeql != true
-              run: scripts/build/gn_gen.sh --args="chip_detail_logging=false"
-            - name: Run Build Without Detail Logging
-              if: inputs.run-codeql != true
-              run: scripts/run_in_build_env.sh "ninja -C ./out"
-            - name: Cleanout build output
-              if: inputs.run-codeql != true
-              run: rm -rf ./out
-            - name: Set up Build Without Progress Logging
-              if: inputs.run-codeql != true
-              run: scripts/build/gn_gen.sh --args="chip_detail_logging=false chip_progress_logging=false"
-            - name: Run Build Without Progress Logging
-              if: inputs.run-codeql != true
-              run: scripts/run_in_build_env.sh "ninja -C ./out"
-            - name: Clean out build output
-              if: inputs.run-codeql != true
-              run: rm -rf ./out
-            - name: Set up Build Without Error Logging
-              if: inputs.run-codeql != true
-              run: scripts/build/gn_gen.sh --args="chip_detail_logging=false chip_progress_logging=false chip_error_logging=false"
-            - name: Run Build Without Error Logging
-              if: inputs.run-codeql != true
-              run: scripts/run_in_build_env.sh "ninja -C ./out"
-            - name: Clean out build output
-              if: inputs.run-codeql != true
-              run: rm -rf ./out
-            - name: Set up Build Without Logging
-              if: inputs.run-codeql != true
-              run: scripts/build/gn_gen.sh --args="chip_logging=false"
-            - name: Run Build Without Logging
-              if: inputs.run-codeql != true
-              run: scripts/run_in_build_env.sh "ninja -C ./out"
-            - name: Uploading core files
-              uses: actions/upload-artifact@v5
-              if: ${{ failure() && !env.ACT }}
-              with:
-                  name: crash-core-linux-gcc-debug
-                  path: /tmp/cores/
-                  # Cores are big; don't hold on to them too long.
-                  retention-days: 5
-            - name: Perform CodeQL Analysis
-              if: ${{ inputs.run-codeql  }}
-              uses: ./.github/actions/perform-codeql-analysis
-              with:
-                language: cpp
-            # OBJDIR on linux is > 10K files and takes more than 50 minutes to upload, usually
-            # having the job timeout.
-            #
-            # If re-enabling, some subset of this should be picked
-            #
-            # - name: Uploading objdir for debugging
-            #   uses: actions/upload-artifact@v5
-            #   if: ${{ failure() && !env.ACT }}
-            #   with:
-            #       name: crash-objdir-linux-gcc-debug
-            #       path: out/
-            #       # objdirs are big; don't hold on to them too long.
-            #       retention-days: 5
-
-    build_linux:
-        name: Build on Linux (fake, gcc_release, clang, simulated)
-
-        runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
-
-        container:
-            image: ghcr.io/project-chip/chip-build:174
-            volumes:
-                - "/:/runner-root-volume"
-                - "/tmp/log_output:/tmp/test_logs"
-            options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
-                net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
-
-        steps:
-            - name: Dump GitHub context
-              env:
-                  GITHUB_CONTEXT: ${{ toJSON(github) }}
-              run: echo "$GITHUB_CONTEXT"
-            - name: Dump Concurrency context
-              env:
-                  CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
-              run: echo "$CONCURRENCY_CONTEXT"
-            - name: Checkout
-              uses: actions/checkout@v5
-              with:
-                  fetch-depth: 2
-                  persist-credentials: true
-            - name: Try to ensure the directories for core dumping exist and we
-                  can write them.
-              run: |
-                  mkdir /tmp/cores || true
-                  sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
-            - name: Checkout submodules & Bootstrap
-              uses: ./.github/actions/checkout-submodules-and-bootstrap
-              with:
-                platform: linux
-            # CodeQL + this job is consistently failing (in the step "Run Tests with sanitizers")
-            # deactivate until a better workaround is found
-            # - name: Initialize CodeQL
-            #   if: ${{ inputs.run-codeql  }}
-            #   uses: github/codeql-action/init@v4
-            #   with:
-            #       languages: "cpp"
-            - name: Setup and Build Simulated Device
-              run: |
-                  BUILD_TYPE=simulated
-                  GN_ARGS='chip_tests_zap_config="app1" chip_project_config_include_dirs=["../../examples/placeholder/linux/apps/app1/include", "../../config/standalone"] chip_config_network_layer_ble=false'
-                  CHIP_ROOT_PATH=examples/placeholder/linux
-                  CHIP_ROOT_PATH="$CHIP_ROOT_PATH" BUILD_TYPE="$BUILD_TYPE" scripts/build/gn_gen.sh --args="$GN_ARGS"
-                  scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
-            - name: Setup Build, Run Build and Run Tests
-              run: |
-                  BUILD_TYPE=gcc_release scripts/build/gn_gen.sh --args="is_debug=false"
-                  scripts/run_in_build_env.sh "ninja -C ./out/gcc_release"
-                  BUILD_TYPE=gcc_release scripts/tests/gn_tests.sh
-            - name: Clean output
-              run: rm -rf ./out
-            - name: Run Tests with sanitizers
-              # Sanitizer tests are not likely to find extra issues so running the same tests
-              # as above repeatedly on every pull request seems extra time. Instead keep this run
-              # for master only
-              if: github.event.pull_request.number == null
-              env:
-                  LSAN_OPTIONS: detect_leaks=1
-              run: |
-                  for BUILD_TYPE in asan tsan ubsan; do
-                      case $BUILD_TYPE in
-                          "asan") GN_ARGS='is_clang=true is_asan=true';;
-                          "msan") GN_ARGS='is_clang=true is_msan=true';;
-                          "tsan") GN_ARGS='is_clang=true is_tsan=true chip_enable_wifi=false';;
-                          "ubsan") GN_ARGS='is_clang=true is_ubsan=true';;
-                      esac
-
-                      rm -rf ./out/sanitizers
-                      BUILD_TYPE=sanitizers scripts/build/gn_gen.sh --args="$GN_ARGS" --add-export-compile-commands=*
-                      BUILD_TYPE=sanitizers scripts/tests/gn_tests.sh
-                  done
-            - name: Generate tests with sanitizers (for tidy)
-              if: github.event.pull_request.number != null
-              run: |
-                  rm -rf ./out/sanitizers
-                  BUILD_TYPE=sanitizers scripts/build/gn_gen.sh --args="is_clang=true is_asan=true" --add-export-compile-commands=*
-            - name: Ensure codegen is done for sanitize
-              run: |
-                  ./scripts/run_in_build_env.sh "./scripts/run_codegen_targets.sh out/sanitizers"
-            - name: Find changed files
-              id: changed-files
-              uses: tj-actions/changed-files@v47
-            - name: Clang-tidy validation
-              # NOTE: clang-tidy crashes on CodegenDataModel_Write due to Nullable/std::optional check.
-              #       See https://github.com/llvm/llvm-project/issues/97426
-              env:
-                  ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.changed_files }}
-              run: |
-                  touch out/changed_files.txt
-                  for file in ${ALL_CHANGED_FILES}; do
-                      echo "$file changed and will be considered for tidy"
-                      echo "$file" >>out/changed_files.txt
-                  done
-
-                  ./scripts/run_in_build_env.sh \
-                    "./scripts/run-clang-tidy-on-compile-commands.py \
-                       --compile-database out/sanitizers/compile_commands.json \
-                       --file-exclude-regex '/(repo|zzz_generated|lwip/standalone)/|-ReadImpl|-InvokeSubscribeImpl|CodegenDataModel_Write|QuieterReporting' \
-                       --file-list-file out/changed_files.txt \
-                       check \
-                    "
-            - name: Clean output
-              run: rm -rf ./out
-            - name: Build using build_examples.py
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py \
-                       --target linux-x64-minmdns-ipv6only-clang \
-                       --target linux-x64-rpc-console \
-                       build \
-                    "
-            - name: Create a pre-generate directory and ensure compile-time codegen would fail
-              run: |
-                  ./scripts/run_in_build_env.sh "./scripts/codepregen.py ./zzz_pregenerated"
-                  mv scripts/codegen.py scripts/codegen.py.renamed
-                  mv scripts/tools/zap/generate.py scripts/tools/zap/generate.py.renamed
-            - name: Clean output
-              run: rm -rf ./out
-            - name: Build using build_examples.py (pregen)
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py \
-                       --target linux-x64-all-clusters-ipv6only-clang \
-                       --target linux-x64-chip-tool-ipv6only-clang \
-                       --pregen-dir ./zzz_pregenerated \
-                       build \
-                    "
-            - name: Undo code pre-generation changes (make compile time codegen work again)
-              run: |
-                  rm -rf ./zzz_pregenerated
-                  mv scripts/codegen.py.renamed scripts/codegen.py
-                  mv scripts/tools/zap/generate.py.renamed scripts/tools/zap/generate.py
-            - name: Run fake linux tests with build_examples
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target linux-fake-tests build"
-            # CodeQL + this job is consistently failing (in the step "Run Tests with sanitizers")
-            # deactivate until a better solution is found
-            # - name: Perform CodeQL Analysis
-            #   if: ${{ inputs.run-codeql  }}
-            #   uses: ./.github/actions/perform-codeql-analysis
-            #   with:
-            #     language: cpp
-
-            - name: Uploading core files
-              uses: actions/upload-artifact@v5
-              if: ${{ failure() && !env.ACT }}
-              with:
-                  name: crash-core-linux
-                  path: /tmp/cores/
-                  # Cores are big; don't hold on to them too long.
-                  retention-days: 5
-            # OBJDIR on linux is > 10K files and takes more than 50 minutes to upload, usually
-            # having the job timeout.
-            #
-            # If re-enabling, some subset of this should be picked
-            #
-            # - name: Uploading objdir for debugging
-            #   uses: actions/upload-artifact@v5
-            #   if: ${{ failure() && !env.ACT }}
-            #   with:
-            #       name: crash-objdir-linux
-            #       path: out/
-            #       # objdirs are big; don't hold on to them too long.
-            #       retention-days: 5
-
-    build_linux_python_lib:
-        name: Build on Linux (python_lib)
-
-        runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
-
-        container:
-            image: ghcr.io/project-chip/chip-build:174
-            volumes:
-                - "/:/runner-root-volume"
-                - "/tmp/log_output:/tmp/test_logs"
-            options: --sysctl "net.ipv6.conf.all.disable_ipv6=0
-                net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
-
-        steps:
-            - name: Dump GitHub context
-              env:
-                  GITHUB_CONTEXT: ${{ toJSON(github) }}
-              run: echo "$GITHUB_CONTEXT"
-            - name: Dump Concurrency context
-              env:
-                  CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
-              run: echo "$CONCURRENCY_CONTEXT"
-            - name: Checkout
-              uses: actions/checkout@v5
-            - name: Checkout submodules & Bootstrap
-              uses: ./.github/actions/checkout-submodules-and-bootstrap
-              with:
-                platform: linux
-
-            - name: Setup Build, Run Build and Run Tests
-              run: |
-                  scripts/build/gn_gen.sh --args="enable_rtti=true chip_config_memory_debug_checks=false chip_config_memory_debug_dmalloc=false chip_generate_link_map_file=false"
-                  scripts/run_in_build_env.sh "ninja -C ./out"
-                  scripts/tests/gn_tests.sh
-            - name: Setup test python environment
-              shell: bash
-              run: |
-                  scripts/run_in_build_env.sh 'virtualenv pyenv'
-                  source pyenv/bin/activate
-                  python -m ensurepip --upgrade
-                  python -m pip install out/controller/python/matter*.whl
-
-            - name: Run Python tests
-              shell: bash
-              run: |
-                  source pyenv/bin/activate
-                  cd src/controller/python/tests
-                  python3 -m unittest -v
-            - name: Clean previous outputs
-              run: rm -rf out pyenv
-            - name: Run Python Setup Payload Generator Test
-              shell: bash
-              run: |
-                  scripts/run_in_build_env.sh 'scripts/examples/gn_build_example.sh examples/chip-tool out/'
-                  scripts/run_in_build_env.sh 'virtualenv pyenv'
-                  source pyenv/bin/activate
-                  python -m ensurepip --upgrade
-                  python -m pip install -r scripts/setup/requirements.setuppayload.txt
-                  python3 src/setup_payload/tests/run_python_setup_payload_test.py out/chip-tool
-            - name: Run revocation set generation tests
-              run: scripts/run_in_build_env.sh 'python3 -m unittest -v credentials/generate_revocation_set.py'
-
-    build_linux_python_lighting_device:
-        name: Build on Linux (python lighting-app)
-
-        runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
-
-        container:
-            image: ghcr.io/project-chip/chip-build:174
-            volumes:
-                - "/:/runner-root-volume"
-                - "/tmp/log_output:/tmp/test_logs"
-            options: --sysctl "net.ipv6.conf.all.disable_ipv6=0
-                net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
-
-        steps:
-            - name: Dump GitHub context
-              env:
-                  GITHUB_CONTEXT: ${{ toJSON(github) }}
-              run: echo "$GITHUB_CONTEXT"
-            - name: Dump Concurrency context
-              env:
-                  CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
-              run: echo "$CONCURRENCY_CONTEXT"
-            - name: Checkout
-              uses: actions/checkout@v5
-            - name: Checkout submodules & Bootstrap
-              uses: ./.github/actions/checkout-submodules-and-bootstrap
-              with:
-                platform: linux
-
-            - name: Setup Build
-              run: |
-                  scripts/build_python_device.sh --chip_detail_logging true
-
-    build_darwin:
-        name: Build on Darwin (clang, simulated)
-        runs-on: macos-14
-        if: github.actor != 'restyled-io[bot]'  && inputs.run-codeql != true
-
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v5
-              with:
-                  fetch-depth: 2
-                  persist-credentials: true
-            - name: Checkout submodules & Bootstrap
-              uses: ./.github/actions/checkout-submodules-and-bootstrap
-              with:
-                platform: darwin
-            - name: Try to ensure the directory for diagnostic log collection exists
-              run: |
-                  mkdir -p ~/Library/Logs/DiagnosticReports || true
-            #  Build on Darwin + CodeQL often takes 6 hours (which is more than the maximum allowed by GitHub Runners), Deactivate it until we can investigate this
-            # - name: Initialize CodeQL
-            #   if: ${{ inputs.run-codeql  }}
-            #   uses: github/codeql-action/init@v4
-            #   with:
-            #       languages: "cpp"
-
-            - name: Setup and Build Simulated Device
-              run: |
-                  BUILD_TYPE=simulated
-                  GN_ARGS='chip_tests_zap_config="app1" chip_project_config_include_dirs=["../../examples/placeholder/linux/apps/app1/include", "../../config/standalone"] chip_config_network_layer_ble=false'
-                  CHIP_ROOT_PATH=examples/placeholder/linux
-                  CHIP_ROOT_PATH="$CHIP_ROOT_PATH" BUILD_TYPE="$BUILD_TYPE" scripts/build/gn_gen.sh --args="$GN_ARGS"
-                  scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
-            - name: Setup Build, Run Build and Run Tests (asan + target_os=all)
-              # We can't enable leak checking here in LSAN_OPTIONS, because on
-              # Darwin that's only supported with a new enough clang, and we're
-              # not building with the pigweed clang here.
-              env:
-                  BUILD_TYPE: default
-              run: |
-                  # We want to build various standalone example apps (similar to what examples-linux-standalone.yaml
-                  # does), so use target_os="all" to get those picked up as part of the "unified" build.  But then
-                  # to save CI resources we want to exclude the "host clang" build, which uses the pigweed clang.
-                  scripts/build/gn_gen.sh --args='target_os="all" is_asan=true enable_host_clang_build=false' --add-export-compile-commands=*
-                  scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
-                  scripts/tests/gn_tests.sh
-            - name: Ensure codegen is done for default
-              run: |
-                  ./scripts/run_in_build_env.sh "./scripts/run_codegen_targets.sh out/default"
-            - name: Find changed files
-              id: changed-files
-              uses: tj-actions/changed-files@v47
-            - name: Clang-tidy validation
-              # NOTE: clang-tidy crashes on CodegenDataModel_Write due to Nullable/std::optional check.
-              #       See https://github.com/llvm/llvm-project/issues/97426
-              env:
-                  ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
-              run: |
-                  touch out/changed_files.txt
-                  for file in ${ALL_CHANGED_FILES}; do
-                      echo "$file changed and will be considered for tidy"
-                      echo "$file" >>out/changed_files.txt
-                  done
-
-                  ./scripts/run_in_build_env.sh \
-                    "./scripts/run-clang-tidy-on-compile-commands.py \
-                       --compile-database out/default/compile_commands.json \
-                       --file-exclude-regex '/(repo|zzz_generated|lwip/standalone)/|CodegenDataModel_Write|QuieterReporting|TestPascalString' \
-                       --file-list-file out/changed_files.txt \
-                       check \
-                    "
-            - name: Uploading diagnostic logs
-              uses: actions/upload-artifact@v5
-              if: ${{ failure() && !env.ACT }}
-              with:
-                  name: crash-log-darwin
-                  path: ~/Library/Logs/DiagnosticReports/
-
-            #  Build on Darwin + CodeQL often takes 6 hours (which is more than the maximum allowed by GitHub Runners), Deactivate it until we can investigate this
-            # - name: Perform CodeQL Analysis
-            #   if: ${{ inputs.run-codeql  }}
-            #   uses: ./.github/actions/perform-codeql-analysis
-            #   with:
-            #     language: cpp
-
-            # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
-            # TODO https://github.com/project-chip/connectedhomeip/issues/1512
-
-    build_linux_gcc_coverage:
-        name: Build on Linux (coverage)
-
+    steps:
+      - name: Dump GitHub context
         env:
-            TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
+        run: echo "$GITHUB_CONTEXT"
+      - name: Dump Concurrency context
+        env:
+          CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+        run: echo "$CONCURRENCY_CONTEXT"
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Try to ensure the directories for core dumping exist and we
+          can write them.
+        run: |
+          mkdir /tmp/cores || true
+          sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
+      - name: Checkout submodules & Bootstrap
+        uses: ./.github/actions/checkout-submodules-and-bootstrap
+        with:
+          platform: linux
+      - name: Initialize CodeQL
+        if: ${{ inputs.run-codeql  }}
+        uses: github/codeql-action/init@v4
+        with:
+          languages: "cpp"
+          queries: security-extended, security-and-quality
+      - name: Setup Build
+        run: scripts/build/gn_gen.sh --args="chip_config_memory_debug_checks=true chip_config_memory_debug_dmalloc=false"
+      - name: Run Build
+        run: scripts/run_in_build_env.sh "ninja -C ./out"
+      - name: Run Tests
+        run: scripts/tests/gn_tests.sh
+      - name: Clean out build output
+        run: rm -rf ./out
 
-        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
-        # Use namespace to get more disk space and slightly better performance (Compile and unit tests
-        # are CPU bound)
-        runs-on: namespace-profile-4x8
+      # Do not run below steps with CodeQL since we are getting "Out of runner space issues" with CodeQL and their added coverage is limited
+      - name: Set up Build Without Detail Logging
+        if: inputs.run-codeql != true
+        run: scripts/build/gn_gen.sh --args="chip_detail_logging=false"
+      - name: Run Build Without Detail Logging
+        if: inputs.run-codeql != true
+        run: scripts/run_in_build_env.sh "ninja -C ./out"
+      - name: Cleanout build output
+        if: inputs.run-codeql != true
+        run: rm -rf ./out
+      - name: Set up Build Without Progress Logging
+        if: inputs.run-codeql != true
+        run: scripts/build/gn_gen.sh --args="chip_detail_logging=false chip_progress_logging=false"
+      - name: Run Build Without Progress Logging
+        if: inputs.run-codeql != true
+        run: scripts/run_in_build_env.sh "ninja -C ./out"
+      - name: Clean out build output
+        if: inputs.run-codeql != true
+        run: rm -rf ./out
+      - name: Set up Build Without Error Logging
+        if: inputs.run-codeql != true
+        run: scripts/build/gn_gen.sh --args="chip_detail_logging=false chip_progress_logging=false chip_error_logging=false"
+      - name: Run Build Without Error Logging
+        if: inputs.run-codeql != true
+        run: scripts/run_in_build_env.sh "ninja -C ./out"
+      - name: Clean out build output
+        if: inputs.run-codeql != true
+        run: rm -rf ./out
+      - name: Set up Build Without Logging
+        if: inputs.run-codeql != true
+        run: scripts/build/gn_gen.sh --args="chip_logging=false"
+      - name: Run Build Without Logging
+        if: inputs.run-codeql != true
+        run: scripts/run_in_build_env.sh "ninja -C ./out"
+      - name: Uploading core files
+        uses: actions/upload-artifact@v5
+        if: ${{ failure() && !env.ACT }}
+        with:
+          name: crash-core-linux-gcc-debug
+          path: /tmp/cores/
+          # Cores are big; don't hold on to them too long.
+          retention-days: 5
+      - name: Perform CodeQL Analysis
+        if: ${{ inputs.run-codeql  }}
+        uses: ./.github/actions/perform-codeql-analysis
+        with:
+          language: cpp
+      # OBJDIR on linux is > 10K files and takes more than 50 minutes to upload, usually
+      # having the job timeout.
+      #
+      # If re-enabling, some subset of this should be picked
+      #
+      # - name: Uploading objdir for debugging
+      #   uses: actions/upload-artifact@v5
+      #   if: ${{ failure() && !env.ACT }}
+      #   with:
+      #       name: crash-objdir-linux-gcc-debug
+      #       path: out/
+      #       # objdirs are big; don't hold on to them too long.
+      #       retention-days: 5
 
-        container:
-            image: ghcr.io/project-chip/chip-build:174
-            options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
-                net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
+  build_linux:
+    name: Build on Linux (fake, gcc_release, clang, simulated)
+    needs: changed_paths
+    runs-on: ubuntu-latest
+    if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true && needs.changed_paths.outputs.non_md_changes == 'true'
 
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v5
-            - name: Checkout submodules & Bootstrap
-              uses: ./.github/actions/checkout-submodules-and-bootstrap
-              with:
-                platform: linux
-                bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+    container:
+      image: ghcr.io/project-chip/chip-build:174
+      volumes:
+        - "/:/runner-root-volume"
+        - "/tmp/log_output:/tmp/test_logs"
+      options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
+        net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
-            - name: Run Build Coverage
-              run: ./scripts/build_coverage.sh --yaml --xml
-            # This is a workaround to unblock CI: failure is due to missing gpg which got triggered when codecov-action@v5 made a new release
-            # TODO: install gpg in chip-build image directly
-            - name: Install gpg
-              run: |
-                apt-get update
-                apt-get install -y --no-install-recommends gnupg
-            - name: Upload coverage reports to Codecov with GitHub Action
-              uses: codecov/codecov-action@v5
-              env:
-                CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+    steps:
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
+        run: echo "$GITHUB_CONTEXT"
+      - name: Dump Concurrency context
+        env:
+          CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+        run: echo "$CONCURRENCY_CONTEXT"
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 2
+          persist-credentials: true
+      - name: Try to ensure the directories for core dumping exist and we
+          can write them.
+        run: |
+          mkdir /tmp/cores || true
+          sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
+      - name: Checkout submodules & Bootstrap
+        uses: ./.github/actions/checkout-submodules-and-bootstrap
+        with:
+          platform: linux
+      # CodeQL + this job is consistently failing (in the step "Run Tests with sanitizers")
+      # deactivate until a better workaround is found
+      # - name: Initialize CodeQL
+      #   if: ${{ inputs.run-codeql  }}
+      #   uses: github/codeql-action/init@v4
+      #   with:
+      #       languages: "cpp"
+      - name: Setup and Build Simulated Device
+        run: |
+          BUILD_TYPE=simulated
+          GN_ARGS='chip_tests_zap_config="app1" chip_project_config_include_dirs=["../../examples/placeholder/linux/apps/app1/include", "../../config/standalone"] chip_config_network_layer_ble=false'
+          CHIP_ROOT_PATH=examples/placeholder/linux
+          CHIP_ROOT_PATH="$CHIP_ROOT_PATH" BUILD_TYPE="$BUILD_TYPE" scripts/build/gn_gen.sh --args="$GN_ARGS"
+          scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
+      - name: Setup Build, Run Build and Run Tests
+        run: |
+          BUILD_TYPE=gcc_release scripts/build/gn_gen.sh --args="is_debug=false"
+          scripts/run_in_build_env.sh "ninja -C ./out/gcc_release"
+          BUILD_TYPE=gcc_release scripts/tests/gn_tests.sh
+      - name: Clean output
+        run: rm -rf ./out
+      - name: Run Tests with sanitizers
+        # Sanitizer tests are not likely to find extra issues so running the same tests
+        # as above repeatedly on every pull request seems extra time. Instead keep this run
+        # for master only
+        if: github.event.pull_request.number == null
+        env:
+          LSAN_OPTIONS: detect_leaks=1
+        run: |
+          for BUILD_TYPE in asan tsan ubsan; do
+              case $BUILD_TYPE in
+                  "asan") GN_ARGS='is_clang=true is_asan=true';;
+                  "msan") GN_ARGS='is_clang=true is_msan=true';;
+                  "tsan") GN_ARGS='is_clang=true is_tsan=true chip_enable_wifi=false';;
+                  "ubsan") GN_ARGS='is_clang=true is_ubsan=true';;
+              esac
+
+              rm -rf ./out/sanitizers
+              BUILD_TYPE=sanitizers scripts/build/gn_gen.sh --args="$GN_ARGS" --add-export-compile-commands=*
+              BUILD_TYPE=sanitizers scripts/tests/gn_tests.sh
+          done
+      - name: Generate tests with sanitizers (for tidy)
+        if: github.event.pull_request.number != null
+        run: |
+          rm -rf ./out/sanitizers
+          BUILD_TYPE=sanitizers scripts/build/gn_gen.sh --args="is_clang=true is_asan=true" --add-export-compile-commands=*
+      - name: Ensure codegen is done for sanitize
+        run: |
+          ./scripts/run_in_build_env.sh "./scripts/run_codegen_targets.sh out/sanitizers"
+      - name: Find changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v47
+      - name: Clang-tidy validation
+        # NOTE: clang-tidy crashes on CodegenDataModel_Write due to Nullable/std::optional check.
+        #       See https://github.com/llvm/llvm-project/issues/97426
+        env:
+          ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.changed_files }}
+        run: |
+          touch out/changed_files.txt
+          for file in ${ALL_CHANGED_FILES}; do
+              echo "$file changed and will be considered for tidy"
+              echo "$file" >>out/changed_files.txt
+          done
+
+          ./scripts/run_in_build_env.sh \
+            "./scripts/run-clang-tidy-on-compile-commands.py \
+               --compile-database out/sanitizers/compile_commands.json \
+               --file-exclude-regex '/(repo|zzz_generated|lwip/standalone)/|-ReadImpl|-InvokeSubscribeImpl|CodegenDataModel_Write|QuieterReporting' \
+               --file-list-file out/changed_files.txt \
+               check \
+            "
+      - name: Clean output
+        run: rm -rf ./out
+      - name: Build using build_examples.py
+        run: |
+          ./scripts/run_in_build_env.sh \
+            "./scripts/build/build_examples.py \
+               --target linux-x64-minmdns-ipv6only-clang \
+               --target linux-x64-rpc-console \
+               build \
+            "
+      - name: Create a pre-generate directory and ensure compile-time codegen would fail
+        run: |
+          ./scripts/run_in_build_env.sh "./scripts/codepregen.py ./zzz_pregenerated"
+          mv scripts/codegen.py scripts/codegen.py.renamed
+          mv scripts/tools/zap/generate.py scripts/tools/zap/generate.py.renamed
+      - name: Clean output
+        run: rm -rf ./out
+      - name: Build using build_examples.py (pregen)
+        run: |
+          ./scripts/run_in_build_env.sh \
+            "./scripts/build/build_examples.py \
+               --target linux-x64-all-clusters-ipv6only-clang \
+               --target linux-x64-chip-tool-ipv6only-clang \
+               --pregen-dir ./zzz_pregenerated \
+               build \
+            "
+      - name: Undo code pre-generation changes (make compile time codegen work again)
+        run: |
+          rm -rf ./zzz_pregenerated
+          mv scripts/codegen.py.renamed scripts/codegen.py
+          mv scripts/tools/zap/generate.py.renamed scripts/tools/zap/generate.py
+      - name: Run fake linux tests with build_examples
+        run: |
+          ./scripts/run_in_build_env.sh \
+            "./scripts/build/build_examples.py --target linux-fake-tests build"
+      # CodeQL + this job is consistently failing (in the step "Run Tests with sanitizers")
+      # deactivate until a better solution is found
+      # - name: Perform CodeQL Analysis
+      #   if: ${{ inputs.run-codeql  }}
+      #   uses: ./.github/actions/perform-codeql-analysis
+      #   with:
+      #     language: cpp
+
+      - name: Uploading core files
+        uses: actions/upload-artifact@v5
+        if: ${{ failure() && !env.ACT }}
+        with:
+          name: crash-core-linux
+          path: /tmp/cores/
+          # Cores are big; don't hold on to them too long.
+          retention-days: 5
+      # OBJDIR on linux is > 10K files and takes more than 50 minutes to upload, usually
+      # having the job timeout.
+      #
+      # If re-enabling, some subset of this should be picked
+      #
+      # - name: Uploading objdir for debugging
+      #   uses: actions/upload-artifact@v5
+      #   if: ${{ failure() && !env.ACT }}
+      #   with:
+      #       name: crash-objdir-linux
+      #       path: out/
+      #       # objdirs are big; don't hold on to them too long.
+      #       retention-days: 5
+
+  build_linux_python_lib:
+    name: Build on Linux (python_lib)
+    needs: changed_paths
+    runs-on: ubuntu-latest
+    if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true && needs.changed_paths.outputs.non_md_changes == 'true'
+
+    container:
+      image: ghcr.io/project-chip/chip-build:174
+      volumes:
+        - "/:/runner-root-volume"
+        - "/tmp/log_output:/tmp/test_logs"
+      options: --sysctl "net.ipv6.conf.all.disable_ipv6=0
+        net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
+
+    steps:
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
+        run: echo "$GITHUB_CONTEXT"
+      - name: Dump Concurrency context
+        env:
+          CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+        run: echo "$CONCURRENCY_CONTEXT"
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Checkout submodules & Bootstrap
+        uses: ./.github/actions/checkout-submodules-and-bootstrap
+        with:
+          platform: linux
+
+      - name: Setup Build, Run Build and Run Tests
+        run: |
+          scripts/build/gn_gen.sh --args="enable_rtti=true chip_config_memory_debug_checks=false chip_config_memory_debug_dmalloc=false chip_generate_link_map_file=false"
+          scripts/run_in_build_env.sh "ninja -C ./out"
+          scripts/tests/gn_tests.sh
+      - name: Setup test python environment
+        shell: bash
+        run: |
+          scripts/run_in_build_env.sh 'virtualenv pyenv'
+          source pyenv/bin/activate
+          python -m ensurepip --upgrade
+          python -m pip install out/controller/python/matter*.whl
+
+      - name: Run Python tests
+        shell: bash
+        run: |
+          source pyenv/bin/activate
+          cd src/controller/python/tests
+          python3 -m unittest -v
+      - name: Clean previous outputs
+        run: rm -rf out pyenv
+      - name: Run Python Setup Payload Generator Test
+        shell: bash
+        run: |
+          scripts/run_in_build_env.sh 'scripts/examples/gn_build_example.sh examples/chip-tool out/'
+          scripts/run_in_build_env.sh 'virtualenv pyenv'
+          source pyenv/bin/activate
+          python -m ensurepip --upgrade
+          python -m pip install -r scripts/setup/requirements.setuppayload.txt
+          python3 src/setup_payload/tests/run_python_setup_payload_test.py out/chip-tool
+      - name: Run revocation set generation tests
+        run: scripts/run_in_build_env.sh 'python3 -m unittest -v credentials/generate_revocation_set.py'
+
+  build_linux_python_lighting_device:
+    name: Build on Linux (python lighting-app)
+    needs: changed_paths
+    runs-on: ubuntu-latest
+    if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true && needs.changed_paths.outputs.non_md_changes == 'true'
+
+    container:
+      image: ghcr.io/project-chip/chip-build:174
+      volumes:
+        - "/:/runner-root-volume"
+        - "/tmp/log_output:/tmp/test_logs"
+      options: --sysctl "net.ipv6.conf.all.disable_ipv6=0
+        net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
+
+    steps:
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
+        run: echo "$GITHUB_CONTEXT"
+      - name: Dump Concurrency context
+        env:
+          CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+        run: echo "$CONCURRENCY_CONTEXT"
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Checkout submodules & Bootstrap
+        uses: ./.github/actions/checkout-submodules-and-bootstrap
+        with:
+          platform: linux
+
+      - name: Setup Build
+        run: |
+          scripts/build_python_device.sh --chip_detail_logging true
+
+  build_darwin:
+    name: Build on Darwin (clang, simulated)
+    needs: changed_paths
+    runs-on: macos-13
+    if: github.actor != 'restyled-io[bot]'  && inputs.run-codeql != true && needs.changed_paths.outputs.non_md_changes == 'true'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 2
+          persist-credentials: true
+      - name: Checkout submodules & Bootstrap
+        uses: ./.github/actions/checkout-submodules-and-bootstrap
+        with:
+          platform: darwin
+      - name: Try to ensure the directory for diagnostic log collection exists
+        run: |
+          mkdir -p ~/Library/Logs/DiagnosticReports || true
+      #  Build on Darwin + CodeQL often takes 6 hours (which is more than the maximum allowed by GitHub Runners), Deactivate it until we can investigate this
+      # - name: Initialize CodeQL
+      #   if: ${{ inputs.run-codeql  }}
+      #   uses: github/codeql-action/init@v4
+      #   with:
+      #       languages: "cpp"
+
+      - name: Setup and Build Simulated Device
+        run: |
+          BUILD_TYPE=simulated
+          GN_ARGS='chip_tests_zap_config="app1" chip_project_config_include_dirs=["../../examples/placeholder/linux/apps/app1/include", "../../config/standalone"] chip_config_network_layer_ble=false'
+          CHIP_ROOT_PATH=examples/placeholder/linux
+          CHIP_ROOT_PATH="$CHIP_ROOT_PATH" BUILD_TYPE="$BUILD_TYPE" scripts/build/gn_gen.sh --args="$GN_ARGS"
+          scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
+      - name: Setup Build, Run Build and Run Tests (asan + target_os=all)
+        # We can't enable leak checking here in LSAN_OPTIONS, because on
+        # Darwin that's only supported with a new enough clang, and we're
+        # not building with the pigweed clang here.
+        env:
+          BUILD_TYPE: default
+        run: |
+          # We want to build various standalone example apps (similar to what examples-linux-standalone.yaml
+          # does), so use target_os="all" to get those picked up as part of the "unified" build.  But then
+          # to save CI resources we want to exclude the "host clang" build, which uses the pigweed clang.
+          scripts/build/gn_gen.sh --args='target_os="all" is_asan=true enable_host_clang_build=false' --add-export-compile-commands=*
+          scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
+          scripts/tests/gn_tests.sh
+      - name: Ensure codegen is done for default
+        run: |
+          ./scripts/run_in_build_env.sh "./scripts/run_codegen_targets.sh out/default"
+      - name: Find changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v47
+      - name: Clang-tidy validation
+        # NOTE: clang-tidy crashes on CodegenDataModel_Write due to Nullable/std::optional check.
+        #       See https://github.com/llvm/llvm-project/issues/97426
+        env:
+          ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+        run: |
+          touch out/changed_files.txt
+          for file in ${ALL_CHANGED_FILES}; do
+              echo "$file changed and will be considered for tidy"
+              echo "$file" >>out/changed_files.txt
+          done
+
+          ./scripts/run_in_build_env.sh \
+            "./scripts/run-clang-tidy-on-compile-commands.py \
+               --compile-database out/default/compile_commands.json \
+               --file-exclude-regex '/(repo|zzz_generated|lwip/standalone)/|CodegenDataModel_Write|QuieterReporting|TestPascalString' \
+               --file-list-file out/changed_files.txt \
+               check \
+            "
+      - name: Uploading diagnostic logs
+        uses: actions/upload-artifact@v5
+        if: ${{ failure() && !env.ACT }}
+        with:
+          name: crash-log-darwin
+          path: ~/Library/Logs/DiagnosticReports/
+
+      #  Build on Darwin + CodeQL often takes 6 hours (which is more than the maximum allowed by GitHub Runners), Deactivate it until we can investigate this
+      # - name: Perform CodeQL Analysis
+      #   if: ${{ inputs.run-codeql  }}
+      #   uses: ./.github/actions/perform-codeql-analysis
+      #   with:
+      #     language: cpp
+
+      # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
+      # TODO https://github.com/project-chip/connectedhomeip/issues/1512
+
+  build_linux_gcc_coverage:
+    name: Build on Linux (coverage)
+    needs: changed_paths
+    env:
+      TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
+
+    if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true && needs.changed_paths.outputs.non_md_changes == 'true'
+    runs-on: ubuntu-latest
+
+    container:
+      image: ghcr.io/project-chip/chip-build:174
+      options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
+        net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Checkout submodules & Bootstrap
+        uses: ./.github/actions/checkout-submodules-and-bootstrap
+        with:
+          platform: linux
+          bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+
+      - name: Run Build Coverage
+        run: ./scripts/build_coverage.sh --yaml --xml
+      # This is a workaround to unblock CI: failure is due to missing gpg which got triggered when codecov-action@v5 made a new release
+      # TODO: install gpg in chip-build image directly
+      - name: Install gpg
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends gnupg
+      - name: Upload coverage reports to Codecov with GitHub Action
+        uses: codecov/codecov-action@v5
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
