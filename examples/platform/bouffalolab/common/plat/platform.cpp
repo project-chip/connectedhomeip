@@ -114,8 +114,8 @@ void ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 
         if (ConnectivityMgr().IsThreadAttached())
         {
-            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec),
-                                                        OTAConfig::InitOTARequestorHandler, nullptr);
+            TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(
+                chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec), OTAConfig::InitOTARequestorHandler, nullptr);
         }
         break;
 #endif
@@ -134,8 +134,8 @@ void ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 
             bl_route_hook_init();
 
-            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec),
-                                                        OTAConfig::InitOTARequestorHandler, nullptr);
+            TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(
+                chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec), OTAConfig::InitOTARequestorHandler, nullptr);
         }
         break;
 #endif
@@ -235,7 +235,7 @@ CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
     ChipLogProgress(NotSpecified, "Initializing CHIP stack");
     ReturnLogErrorOnFailure(PlatformMgr().InitChipStack());
 
-    chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(CHIP_BLE_DEVICE_NAME);
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(CHIP_BLE_DEVICE_NAME);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
@@ -255,7 +255,7 @@ CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
     ReturnErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice));
 #endif
 #endif
-    sThreadNetworkDriver.Init();
+    ReturnErrorAndLogOnFailure(sThreadNetworkDriver.Init(), NotSpecified, "Thread network init failed");
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -323,7 +323,7 @@ CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
 #endif
     PrintOnboardingCodes(rendezvousMode);
 
-    PlatformMgr().AddEventHandler(ChipEventHandler, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().AddEventHandler(ChipEventHandler, 0);
 
 #if PW_RPC_ENABLED
     chip::rpc::Init();
