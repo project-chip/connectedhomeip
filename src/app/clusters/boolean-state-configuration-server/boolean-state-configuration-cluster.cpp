@@ -15,12 +15,13 @@
  *
  */
 
-#include "app/persistence/AttributePersistence.h"
+#include "lib/support/logging/TextOnlyLogging.h"
 #include <app/clusters/boolean-state-configuration-server/boolean-state-configuration-cluster.h>
 
 #include <algorithm>
 #include <app/SafeAttributePersistenceProvider.h>
 #include <app/data-model/Decode.h>
+#include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/BooleanStateConfiguration/AttributeIds.h>
 #include <clusters/BooleanStateConfiguration/Commands.h>
@@ -106,7 +107,8 @@ CHIP_ERROR BooleanStateConfigurationCluster::Startup(ServerClusterContext & cont
     // TODO: this is VERY inconvenient/strange and we should really fix this inconsistence
     AttributePersistence attributePersistence(context.attributeStorage);
     AlarmModeBitMask::IntegerType alarmsEnabled;
-    attributePersistence.LoadNativeEndianValue({ mPath.mEndpointId, mPath.mClusterId, AlarmsEnabled::Id }, alarmsEnabled, AlarmModeBitMask::IntegerType(0));
+    attributePersistence.LoadNativeEndianValue({ mPath.mEndpointId, mPath.mClusterId, AlarmsEnabled::Id }, alarmsEnabled,
+                                               AlarmModeBitMask::IntegerType(0));
     mAlarmsEnabled = AlarmModeBitMask(alarmsEnabled);
 
     // internal state validation:
@@ -159,10 +161,15 @@ BooleanStateConfigurationCluster::InvokeCommand(const DataModel::InvokeRequest &
         if (mAlarmsEnabled != alarms)
         {
             AttributePersistence attributePersistence(mContext->attributeStorage);
-            AlarmModeBitMask::IntegerType rawAlarmsEnabled = mAlarmsEnabled.Raw();
-            mContext->attributeStorage.WriteValue({ mPath.mEndpointId, mPath.mClusterId, AlarmsEnabled::Id },
-                                                  { &rawAlarmsEnabled, sizeof(rawAlarmsEnabled) });
             mAlarmsEnabled = alarms;
+
+            AlarmModeBitMask::IntegerType rawAlarmsEnabled = mAlarmsEnabled.Raw();
+            if (CHIP_ERROR err = mContext->attributeStorage.WriteValue({ mPath.mEndpointId, mPath.mClusterId, AlarmsEnabled::Id },
+                                                                       { &rawAlarmsEnabled, sizeof(rawAlarmsEnabled) });
+                err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DataManagement, "Failed to persist alarms enabled: %" CHIP_ERROR_FORMAT, err.Format());
+            }
             NotifyAttributeChanged(AlarmsEnabled::Id);
         }
 

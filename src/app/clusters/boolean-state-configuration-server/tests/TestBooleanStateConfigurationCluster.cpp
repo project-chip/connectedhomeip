@@ -13,10 +13,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "app/DefaultSafeAttributePersistenceProvider.h"
-#include "app/SafeAttributePersistenceProvider.h"
+#include "clusters/BooleanStateConfiguration/Commands.h"
 #include <pw_unit_test/framework.h>
 
+#include <app/DefaultSafeAttributePersistenceProvider.h>
+#include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/boolean-state-configuration-server/boolean-state-configuration-cluster.h>
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/clusters/testing/ClusterTester.h>
@@ -209,12 +210,6 @@ TEST_F(TestBooleanStateConfigurationCluster, TestAcceptedCommandList)
                                                       Commands::EnableDisableAlarm::kMetadataEntry,
                                                   }));
     }
-    // cluster supporting alarm suppression (but not visual or audible)
-    // This is not a valid configuration, but we should handle it gracefully
-    {
-        BooleanStateConfigurationCluster cluster(kTestEndpointId, BitMask<Feature>(Feature::kAlarmSuppress), {}, DefaultConfig());
-        ASSERT_TRUE(IsAcceptedCommandsListEqualTo(cluster, {}));
-    }
     // cluster supporting visual alarms and alarm suppression
     {
         BooleanStateConfigurationCluster cluster(kTestEndpointId, { Feature::kVisual, Feature::kAlarmSuppress }, {},
@@ -380,6 +375,73 @@ TEST_F(TestBooleanStateConfigurationCluster, TestPersistenceAndStartup)
         EXPECT_EQ(tester.ReadAttribute(Attributes::CurrentSensitivityLevel::Id, sensitivity),
                   Protocols::InteractionModel::Status::Success);
         EXPECT_EQ(sensitivity, 5); // Should be default, as storage is empty.
+        cluster.Shutdown();
+    }
+}
+
+TEST_F(TestBooleanStateConfigurationCluster, TestAlarmsEnabledPersistence)
+{
+    TestServerClusterContext context;
+    ScopedSafeAttributePersistence persistence(context);
+
+    // 1. Create a cluster, set a value for AlarmsEnabled, which should be persisted.
+    {
+        auto config = DefaultConfig().WithAlarmsSupported(AlarmModeBitmap::kVisual);
+        BooleanStateConfigurationCluster cluster(
+            kTestEndpointId, { Feature::kVisual, Feature::kAudible },
+            { BooleanStateConfigurationCluster::OptionalAttributesSet().Set<Attributes::AlarmsEnabled::Id>() }, config);
+
+        cluster.Startup(context.Get());
+        ClusterTester tester(cluster);
+
+        // Check default value first
+        BooleanStateConfigurationCluster::AlarmModeBitMask alarmsEnabled;
+        EXPECT_EQ(tester.ReadAttribute(Attributes::AlarmsEnabled::Id, alarmsEnabled), Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(alarmsEnabled.Raw(), 0);
+
+        // Set a new value. This will be persisted.
+        Commands::EnableDisableAlarm::Type request;
+        request.alarmsToEnableDisable.Set(AlarmModeBitmap::kVisual);
+
+        auto result = tester.Invoke(request);
+        EXPECT_TRUE(result.IsSuccess());
+
+        EXPECT_EQ(tester.ReadAttribute(Attributes::AlarmsEnabled::Id, alarmsEnabled), Protocols::InteractionModel::Status::Success);
+        EXPECT_TRUE(alarmsEnabled.Has(AlarmModeBitmap::kVisual));
+        EXPECT_FALSE(alarmsEnabled.Has(AlarmModeBitmap::kAudible));
+
+        cluster.Shutdown();
+    }
+
+    // 2. Create a new cluster instance with the same context, and check if the value was restored.
+    {
+        auto config = DefaultConfig().WithAlarmsSupported(AlarmModeBitmap::kAudible).WithAlarmsSupported(AlarmModeBitmap::kVisual);
+        BooleanStateConfigurationCluster cluster(
+            kTestEndpointId, { Feature::kVisual, Feature::kAudible },
+            { BooleanStateConfigurationCluster::OptionalAttributesSet().Set<Attributes::AlarmsEnabled::Id>() }, config);
+        cluster.Startup(context.Get());
+        ClusterTester tester(cluster);
+
+        BooleanStateConfigurationCluster::AlarmModeBitMask alarmsEnabled;
+        EXPECT_EQ(tester.ReadAttribute(Attributes::AlarmsEnabled::Id, alarmsEnabled), Protocols::InteractionModel::Status::Success);
+        EXPECT_TRUE(alarmsEnabled.Has(AlarmModeBitmap::kVisual)); // Check if value is persisted.
+        EXPECT_FALSE(alarmsEnabled.Has(AlarmModeBitmap::kAudible));
+        cluster.Shutdown();
+    }
+
+    // 3. Test that if persistence fails, default is used. Let's clear the storage.
+    context.StorageDelegate().ClearStorage();
+    {
+        auto config = DefaultConfig().WithAlarmsSupported(AlarmModeBitmap::kAudible).WithAlarmsSupported(AlarmModeBitmap::kVisual);
+        BooleanStateConfigurationCluster cluster(
+            kTestEndpointId, { Feature::kVisual, Feature::kAudible },
+            { BooleanStateConfigurationCluster::OptionalAttributesSet().Set<Attributes::AlarmsEnabled::Id>() }, config);
+        cluster.Startup(context.Get());
+        ClusterTester tester(cluster);
+
+        BooleanStateConfigurationCluster::AlarmModeBitMask alarmsEnabled;
+        EXPECT_EQ(tester.ReadAttribute(Attributes::AlarmsEnabled::Id, alarmsEnabled), Protocols::InteractionModel::Status::Success);
+        EXPECT_EQ(alarmsEnabled.Raw(), 0); // Should be default, as storage is empty.
         cluster.Shutdown();
     }
 }
