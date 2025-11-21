@@ -39,7 +39,7 @@ import copy
 import logging
 from typing import Type, Union
 
-from mobly import asserts
+from mobly import asserts  # type: ignore
 
 import matter.clusters as Clusters
 from matter.exceptions import ChipStackError

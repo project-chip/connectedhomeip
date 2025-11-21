@@ -45,9 +45,7 @@ import matter.CertificateAuthority
 
 # isort: on
 
-import base_test
-import signals
-from mobly import asserts
+from mobly import asserts, base_test, signals
 
 import matter.clusters as Clusters
 import matter.logging

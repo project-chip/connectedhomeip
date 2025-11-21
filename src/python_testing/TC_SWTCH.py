@@ -211,7 +211,7 @@ class TC_SwitchTests(MatterBaseTest):
         else:
             self._send_long_press_named_pipe_command(endpoint_id, pressed_position, feature_map)
 
-    def _ask_for_release(self):
+    async def _ask_for_release(self):
         # Since we used a long press for this, "ask for release" on the button simulator just means waiting out the delay
         if not self._use_button_simulator():
             self.wait_for_user_input(
@@ -461,7 +461,7 @@ class TC_SwitchTests(MatterBaseTest):
         asserts.assert_equal(button_val, self.pressed_position, f"Button value is not {self.pressed_position}")
 
         self.step(7)
-        self._ask_for_release()
+        await self._ask_for_release()
 
         self.step("8a")
         if has_msr_feature and not has_msl_feature:
