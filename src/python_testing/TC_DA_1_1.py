@@ -74,6 +74,18 @@ class TC_DA_1_1(MatterBaseTest):
         """Execute the test steps."""
         steps = [
             TestStep("precondition", "DUT Commissioned to TH1's fabric", is_commissioning=True),
+            TestStep(1, "TH1 does a non-fabric filtered read of the NOCs attribute from the Node Operational Credentials cluster and saves the returned list as nocs_th1",
+                     "Verify that there is a single entry in the list"),
+            TestStep(2, "TH1 does a non-fabric-filtered read of the Fabrics attribute from the Node Operational Credentials cluster",
+                     "Verify that there is a single entry in the list and the FabricID for that entry matches the FabricID for TH1"),
+            TestStep(3, "Factory reset DUT and perform the necessary actions to put the DUT into a commissionable state"),
+            TestStep(4, "Commission DUT to TH2's Fabric"),
+            TestStep(5, "TH2 does a non-fabric-filtered read of Fabrics attribute list from DUT", """
+                     - Verify that there is only one entry in the 'Fabrics' List
+                     - Verify that the FabricID is the same as the TH2's Fabric ID
+                     - Verify that the entry saved in Step 2 for TH1' Fabric does not appear in the list"""),
+            TestStep(6, "TH2 does a non-fabric-filtered read of NOCs attribute list from DUT",
+                     "Verify that there is only one entry in the 'NOCs' List and the NOC for that entry is different than the NOC entry in nocs_th1"),
         ]
 
         return steps
@@ -146,25 +158,67 @@ class TC_DA_1_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_DA_1_1(self):
-
-        self.step("precondition")
-
         self.discriminator = random.randint(0, 4095)
         th1 = self.default_controller
         th2 = self.get_new_controller()
 
+        self.step("precondition")
+
+        # *** STEP 1 ***
+        # TH1 does a non-fabric filtered read of the NOCs attribute from the Node
+        # Operational Credentials cluster and saves the returned list as nocs_th1
+        self.step(1)
         nocs_th1 = await self.read_nocs(th1)
+        
+        # Verify that there is a single entry in the list
         asserts.assert_true(len(nocs_th1) == 1, "NOCs attribute must contain single entry in the list")
 
+        # *** STEP 2 ***
+        # TH1 does a non-fabric-filtered read of the Fabrics attribute from the Node Operational Credentials cluster
+        self.step(2)
         fabrics_th1 = await self.read_fabrics(th1)
+        
+        # Verify that there is a single entry in the list
         asserts.assert_true(len(fabrics_th1) == 1, "Fabrics attribute must contain single entry in the list")
+        
+        # Verify that the FabricID for that entry matches the FabricID for TH1
         asserts.assert_equal(fabrics_th1[0].fabricID, th1.fabricId, "TH1 FabricID and Fabrics attribute FabricID must match")
 
+        # *** STEP 3 ***
+        # Factory reset DUT and perform the necessary actions to put the DUT into a commissionable state
+        self.step(3)
         self.factory_reset_dut(th1)
 
+        # *** STEP 4 ***
+        # Commission DUT to TH2's Fabric
+        self.step(4)
+        # th2 = self.get_new_controller()
         await self.commission_dut(th2)
 
-        nocs_th1 = await self.read_nocs(th2)
+        # *** STEP 5 ***
+        # TH2 does a non-fabric-filtered read of Fabrics attribute list from DUT
+        self.step(5)
+        fabrics_th2 = await self.read_fabrics(th2)
+
+        # Verify that there is only one entry in the 'Fabrics' List
+        asserts.assert_true(len(fabrics_th2) == 1, "Fabrics attribute must contain single entry in the list")
+
+        # Verify that the FabricID is the same as the TH2’s Fabric ID
+        asserts.assert_equal(fabrics_th2[0].fabricID, th2.fabricId, "TH1 FabricID and Fabrics attribute FabricID must match")
+
+        # Verify that the entry saved in Step 2 for TH1' Fabric does not appear in the list
+        asserts.assert_not_in(th2.fabricId, fabrics_th1, "FabricID from TH2 must not appear in TH1's fabrics list")
+
+        # *** STEP 6 ***
+        # TH2 does a non-fabric-filtered read of NOCs attribute list from DUT
+        self.step(6)
+        nocs_th2 = await self.read_nocs(th2)
+
+        # Verify that there is only one entry in the 'NOCs' List
+        asserts.assert_true(len(nocs_th2) == 1, "NOCs attribute must contain single entry in the list")
+
+        # Verify that the NOCs for that entry is different than the NOCs entry in nocs_th1
+        asserts.assert_not_equal(1,1, "The NOCs entry for TH2 must be different that the NOCs entry for TH1")
 
 
 if __name__ == "__main__":
