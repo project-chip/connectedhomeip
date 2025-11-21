@@ -34,8 +34,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 
 from mobly import asserts
 
@@ -150,9 +150,13 @@ class TC_CLCTRL_6_1(MatterBaseTest):
         ]
         return pics
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_CLCTRL_6_1(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         dev_controller = self.default_controller
         attributes = Clusters.ClosureControl.Attributes
         timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
@@ -766,7 +770,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             # STEP 9k: TH sends command MoveTo with Position = MoveToFullyOpen.
             self.step("9k")
 
-            time.sleep(2)  # Adding a small delay to ensure the previous command is processed
+            await asyncio.sleep(2)  # Adding a small delay to ensure the previous command is processed
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
