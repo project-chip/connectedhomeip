@@ -46,25 +46,18 @@ from matter.testing.matter_testing import TestStep, async_test_body, default_mat
 
 class TC_CADMIN_1_5(CADMINBaseTest):
 
-    async def commission_on_network(self, setup_code: int, discriminator: int, expected_error: int = 0):
+    async def commission_on_network_expect_error(self, setup_code: int, discriminator: int):
         # This is expected to error as steps 4 and 7 expects timeout issue or pase connection error to occur due to commissioning window being closed already
-        if expected_error == 50:
-            with asserts.assert_raises(ChipStackError) as cm:
-                await self.th2.CommissionOnNetwork(
-                    nodeId=self.dut_node_id, setupPinCode=setup_code,
-                    filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
-            asserts.assert_true(int(cm.exception.code) == expected_error,
-                                'Unexpected error code returned from Commissioning Attempt')
-
-        else:
-            try:
-                await self.th2.CommissionOnNetwork(
-                    nodeId=self.dut_node_id, setupPinCode=setup_code,
-                    filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
-
-            except asyncio.CancelledError:
-                # This is expected to fail due to timeout, however there is no code to validate here, so just passing since the correct exception was raised to get to this point
-                pass
+        try:
+            await self.th2.CommissionOnNetwork(
+                nodeId=self.dut_node_id, setupPinCode=setup_code,
+                filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
+            asserts.fail("Unexpected success when commissioning")
+        except ChipStackError as cm:
+            asserts.assert_equal(cm.err, 0x00000032,
+                                 'Unexpected error code returned from Commissioning Attempt')
+        except asyncio.exceptions.CancelledError:
+            pass
 
     def steps_TC_CADMIN_1_5(self) -> list[TestStep]:
         return [
@@ -131,7 +124,7 @@ class TC_CADMIN_1_5(CADMINBaseTest):
         await asyncio.sleep(190)
 
         self.step(4)
-        await self.commission_on_network(setup_code=params.commissioningParameters.setupPinCode, discriminator=params.randomDiscriminator)
+        await self.commission_on_network_expect_error(setup_code=params.commissioningParameters.setupPinCode, discriminator=params.randomDiscriminator)
 
         self.step(5)
         params2 = await self.open_commissioning_window(dev_ctrl=self.th1, timeout=180, node_id=self.dut_node_id)
@@ -142,7 +135,7 @@ class TC_CADMIN_1_5(CADMINBaseTest):
         await asyncio.sleep(1)
 
         self.step(7)
-        await self.commission_on_network(setup_code=params2.commissioningParameters.setupPinCode, discriminator=params2.randomDiscriminator, expected_error=0x00000032)
+        await self.commission_on_network_expect_error(setup_code=params2.commissioningParameters.setupPinCode, discriminator=params2.randomDiscriminator)
 
         self.step(8)
         try:
