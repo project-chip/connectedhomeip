@@ -241,8 +241,7 @@ static CHIP_ERROR CommissioneeHandler(int argc, char ** argv)
     }
     if (strcmp(argv[0], "startbcm") == 0)
     {
-        Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
-        return CHIP_NO_ERROR;
+        return Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
     }
     return CHIP_ERROR_INVALID_ARGUMENT;
 }
