@@ -130,21 +130,22 @@ CHIP_ERROR CodegenDataModelProvider::Shutdown()
     Reset();
     mContext.reset();
     mRegistry.ClearContext();
+    mInitialized = false;
     return DataModel::Provider::Shutdown();
 }
 
-CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext context)
+CHIP_ERROR CodegenDataModelProvider::Init()
 {
+    VerifyOrReturnError(!mInitialized, CHIP_NO_ERROR);
+
     // server clusters require a valid persistent storage delegate
     VerifyOrReturnError(mPersistentStorageDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(DataModel::Provider::Startup(context));
 
-    mContext.emplace(context);
-
-    // Ember NVM requires have a data model provider. attempt to create one if one is not available
+    // Ember NVM requires an attribute persistence provider. attempt to create one if one is not available
     //
     // It is not a critical failure to not have one, however if one is not set up, ember NVM operations
     // will error out with a `persistence not available`.
+    // Note that cluster init callbacks may read attributes to restore state.
     if (GetAttributePersistenceProvider() == nullptr)
     {
 #if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
@@ -156,10 +157,20 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
 
     InitDataModelForTesting();
 
+    mInitialized = true;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext context)
+{
+    ReturnErrorOnFailure(Init());
+    ReturnErrorOnFailure(DataModel::Provider::Startup(context));
+    mContext.emplace(context);
+
     return mRegistry.SetContext(ServerClusterContext{
         .provider           = *this,
         .storage            = *mPersistentStorageDelegate,
-        .attributeStorage   = *GetAttributePersistenceProvider(), // guaranteed set up by the above logic
+        .attributeStorage   = *GetAttributePersistenceProvider(), // guaranteed set up by Init()
         .interactionContext = *mContext,                          // NOLINT(bugprone-unchecked-optional-access): emplaced above
     });
 }

@@ -27,7 +27,7 @@ CodegenDataModelProvider & CodegenDataModelProvider::Instance()
     return gCodegenModel;
 }
 
-DataModel::Provider * CodegenDataModelProviderInstance(PersistentStorageDelegate * delegate)
+CodegenDataModelProvider * CodegenDataModelProviderInstance(PersistentStorageDelegate * delegate)
 {
     auto instance = &CodegenDataModelProvider::Instance();
 

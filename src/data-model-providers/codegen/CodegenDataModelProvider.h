@@ -31,7 +31,7 @@
 namespace chip {
 namespace app {
 
-/// An implementation of `InteractionModel::Model` that relies on code-generation
+/// An implementation of `DataModel::Provider` that relies on code-generation
 /// via zap/ember.
 ///
 /// The Ember framework uses generated files (like endpoint-config.h and various
@@ -41,8 +41,8 @@ namespace app {
 /// as well as application-specific overrides to provide data model functionality.
 ///
 /// Given that this relies on global data at link time, there generally can be
-/// only one CodegenDataModelProvider per application (you can create more instances,
-/// however they would share the exact same underlying data and storage).
+/// only one CodegenDataModelProvider per application. Per-cluster CodegenIntegration
+/// function access the global singleton instance via `CodegenDataModelProvider::Instance()`.
 class CodegenDataModelProvider : public DataModel::Provider
 {
 public:
@@ -53,10 +53,19 @@ public:
     /// where path caching does not really apply (the same path may result in different outcomes)
     void Reset() { mPreviouslyFoundCluster = std::nullopt; }
 
-    void SetPersistentStorageDelegate(PersistentStorageDelegate * delegate) { mPersistentStorageDelegate = delegate; }
+    void SetPersistentStorageDelegate(PersistentStorageDelegate * delegate)
+    {
+        VerifyOrDie(!mInitialized);
+        mPersistentStorageDelegate = delegate;
+    }
     PersistentStorageDelegate * GetPersistentStorageDelegate() { return mPersistentStorageDelegate; }
 
     SingleEndpointServerClusterRegistry & Registry() { return mRegistry; }
+
+    /// Initialize clusters without starting them. This allows applications to configure
+    /// cluster delegates and other properties before the clusters are started via Startup().
+    /// If not called explicitly, Startup() will call this method automatically.
+    virtual CHIP_ERROR Init();
 
     /// Generic model implementations
     CHIP_ERROR Startup(DataModel::InteractionModelContext context) override;
@@ -102,6 +111,9 @@ private:
     // Iteration is often done in a tight loop going through all values.
     // To avoid N^2 iterations, cache a hint of where something is positioned
     uint16_t mEndpointIterationHint = 0;
+
+    // Tracks whether Init() has been called
+    bool mInitialized = false;
 
     // represents a remembered cluster reference that has been found as
     // looking for clusters is very common (for every attribute iteration)

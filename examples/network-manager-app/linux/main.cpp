@@ -93,7 +93,8 @@ void ApplicationShutdown()
 int main(int argc, char * argv[])
 {
     VerifyOrReturnValue(ChipLinuxAppInit(argc, argv) == 0, -1);
-    ApplicationEarlyInit();
-    ChipLinuxAppMainLoop();
+    auto & serverInitParams = ChipLinuxDefaultServerInitParams();
+    ApplicationEarlyInit(); // configure clusters before starting server
+    ChipLinuxAppMainLoop(serverInitParams);
     return 0;
 }

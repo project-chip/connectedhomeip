@@ -16,7 +16,7 @@
  */
 #pragma once
 
-#include <app/data-model-provider/Provider.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 
 namespace chip {
@@ -29,7 +29,7 @@ namespace app {
 ///                   in case default ember storage is required. Applications can also
 ///                   call SetAttributeStorageProvider themselves and provide nullptr here
 ///                   if required.
-DataModel::Provider * CodegenDataModelProviderInstance(PersistentStorageDelegate * delegate);
+CodegenDataModelProvider * CodegenDataModelProviderInstance(PersistentStorageDelegate * delegate);
 
 } // namespace app
 } // namespace chip
