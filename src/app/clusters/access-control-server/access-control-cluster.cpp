@@ -504,7 +504,15 @@ DataModel::ActionReturnStatus AccessControlCluster::ReadAttribute(const DataMode
         break;
     }
     case AccessControl::Attributes::ClusterRevision::Id:
+        // V1.5 BRANCH FIX
+        // At time of 1.5 branch, XML of 1.6 was in progress, so code-gen `kRevision`
+        // is wrong and was set to 3. Set it manually to the expected revision for
+        // Matter 1.5, which is ACL Cluster revision 2.
+#if 0
         value = kRevision;
+#else
+        value = 2;
+#endif
         break;
     default:
         valueFetchError = CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
