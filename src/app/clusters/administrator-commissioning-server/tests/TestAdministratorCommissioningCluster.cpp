@@ -146,7 +146,7 @@ TEST_F(TestAdministratorCommissioningCluster, TestReadAttributesDefaultValues)
     chip::Test::ClusterTester tester(cluster);
 
     {
-        Attributes::FeatureMap::TypeInfo::Type feature;
+        Attributes::FeatureMap::TypeInfo::Type feature{};
         ASSERT_EQ(tester.ReadAttribute(Attributes::FeatureMap::Id, feature), CHIP_NO_ERROR);
         ASSERT_EQ(feature, 0u);
     }
@@ -198,7 +198,7 @@ TEST_F(TestAdministratorCommissioningCluster, TestAttributeSpecComplianceAfterOp
     auto result                  = tester.Invoke(Commands::OpenCommissioningWindow::Id, request);
     ASSERT_TRUE(result.status.has_value());
 
-    if (result.status->IsSuccess())
+    if (result.status->IsSuccess()) // NOLINT(bugprone-unchecked-optional-access)
     {
         status = tester.ReadAttribute(Attributes::WindowStatus::Id, winStatus);
         ASSERT_TRUE(status.IsSuccess());
