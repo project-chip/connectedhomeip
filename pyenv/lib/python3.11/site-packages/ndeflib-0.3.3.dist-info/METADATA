@@ -1,0 +1,68 @@
+Metadata-Version: 2.1
+Name: ndeflib
+Version: 0.3.3
+Summary: NFC Data Exchange Format decoder and encoder.
+Home-page: https://ndeflib.readthedocs.io/
+Author: Stephen Tiedemann
+Author-email: stephen.tiedemann@gmail.com
+Maintainer: Stephen Tiedemann
+Maintainer-email: stephen.tiedemann@gmail.com
+License: ISC
+Keywords: ndef,nfc
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Natural Language :: English
+Classifier: License :: OSI Approved :: ISC License (ISCL)
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+
+===============================
+Parse or generate NDEF messages
+===============================
+
+.. image:: https://badge.fury.io/py/ndeflib.svg
+   :target: https://pypi.python.org/pypi/ndeflib
+   :alt: Python Package
+
+.. image:: https://readthedocs.org/projects/ndeflib/badge/?version=stable
+   :target: http://ndeflib.readthedocs.io/en/stable/?badge=stable
+   :alt: Stable Documentation
+
+.. image:: https://readthedocs.org/projects/ndeflib/badge/?version=latest
+   :target: http://ndeflib.readthedocs.io/en/latest/?badge=latest
+   :alt: Latest Documentation
+
+.. image:: https://travis-ci.org/nfcpy/ndeflib.svg?branch=master
+   :target: https://travis-ci.org/nfcpy/ndeflib
+   :alt: Build Status
+
+.. image:: https://codecov.io/gh/nfcpy/ndeflib/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/nfcpy/ndeflib
+   :alt: Code Coverage
+
+The ``ndeflib`` is an `ISC <http://choosealicense.com/licenses/isc/>`_-licensed Python package for parsing and generating NFC Data Exchange Format (NDEF) messages:
+
+.. code-block:: pycon
+
+   >>> import ndef
+   >>> hexstr = '9101085402656e48656c6c6f5101085402656e576f726c64'
+   >>> octets = bytearray.fromhex(hexstr)
+   >>> for record in ndef.message_decoder(octets): print(record)
+   NDEF Text Record ID '' Text 'Hello' Language 'en' Encoding 'UTF-8'
+   NDEF Text Record ID '' Text 'World' Language 'en' Encoding 'UTF-8'
+   >>> message = [ndef.TextRecord("Hello"), ndef.TextRecord("World")]
+   >>> b''.join(ndef.message_encoder(message)) == octets
+   True
+
+The ``ndeflib`` documentation can be found on `Read the Docs <https://ndeflib.readthedocs.io/>`_, the code on `GitHub <https://github.com/nfcpy/ndeflib>`_. It is `continously tested <https://travis-ci.org/nfcpy/ndeflib>`_ for Python 2.7 and 3.5 with pretty complete `test coverage <https://codecov.io/gh/nfcpy/ndeflib>`_.
+
+

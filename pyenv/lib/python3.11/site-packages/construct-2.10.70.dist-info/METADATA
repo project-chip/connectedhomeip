@@ -1,0 +1,83 @@
+Metadata-Version: 2.1
+Name: construct
+Version: 2.10.70
+Summary: A powerful declarative symmetric parser/builder for binary data
+Home-page: http://construct.readthedocs.org
+Author: Arkadiusz Bulski, Tomer Filiba, Corbin Simpson
+Author-email: arek.bulski@gmail.com, tomerfiliba@gmail.com, MostAwesomeDude@gmail.com
+License: MIT
+Project-URL: Source, https://github.com/construct/construct
+Project-URL: Documentation, https://construct.readthedocs.io/en/latest/
+Project-URL: Issues, https://github.com/construct/construct/issues
+Keywords: construct,kaitai,declarative,data structure,struct,binary,symmetric,parser,builder,parsing,building,pack,unpack,packer,unpacker
+Platform: POSIX
+Platform: Windows
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Software Development :: Build Tools
+Classifier: Topic :: Software Development :: Code Generators
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Requires-Python: >=3.6
+License-File: LICENSE
+Provides-Extra: extras
+Requires-Dist: arrow ; extra == 'extras'
+Requires-Dist: cloudpickle ; extra == 'extras'
+Requires-Dist: cryptography ; extra == 'extras'
+Requires-Dist: lz4 ; extra == 'extras'
+Requires-Dist: numpy ; extra == 'extras'
+Requires-Dist: ruamel.yaml ; extra == 'extras'
+
+Construct 2.10
+===================
+
+Construct is a powerful **declarative** and **symmetrical** parser and builder for binary data.
+
+Instead of writing *imperative code* to parse a piece of data, you declaratively define a *data structure* that describes your data. As this data structure is not code, you can use it in one direction to *parse* data into Pythonic objects, and in the other direction, to *build* objects into binary data.
+
+The library provides both simple, atomic constructs (such as integers of various sizes), as well as composite ones which allow you form hierarchical and sequential structures of increasing complexity. Construct features **bit and byte granularity**, easy debugging and testing, an **easy-to-extend subclass system**, and lots of primitive constructs to make your work easier:
+
+* Fields: raw bytes or numerical types
+* Structs and Sequences: combine simpler constructs into more complex ones
+* Bitwise: splitting bytes into bit-grained fields
+* Adapters: change how data is represented
+* Arrays/Ranges: duplicate constructs
+* Meta-constructs: use the context (history) to compute the size of data
+* If/Switch: branch the computational path based on the context
+* On-demand (lazy) parsing: read and parse only what you require
+* Pointers: jump from here to there in the data stream
+* Tunneling: prefix data with a byte count or compress it
+
+
+Example
+---------
+
+A ``Struct`` is a collection of ordered, named fields::
+
+    >>> format = Struct(
+    ...     "signature" / Const(b"BMP"),
+    ...     "width" / Int8ub,
+    ...     "height" / Int8ub,
+    ...     "pixels" / Array(this.width * this.height, Byte),
+    ... )
+    >>> format.build(dict(width=3,height=2,pixels=[7,8,9,11,12,13]))
+    b'BMP\x03\x02\x07\x08\t\x0b\x0c\r'
+    >>> format.parse(b'BMP\x03\x02\x07\x08\t\x0b\x0c\r')
+    Container(signature=b'BMP')(width=3)(height=2)(pixels=[7, 8, 9, 11, 12, 13])
+
+A ``Sequence`` is a collection of ordered fields, and differs from ``Array`` and ``GreedyRange`` in that those two are homogenous::
+
+    >>> format = Sequence(PascalString(Byte, "utf8"), GreedyRange(Byte))
+    >>> format.build([u"lalaland", [255,1,2]])
+    b'\nlalaland\xff\x01\x02'
+    >>> format.parse(b"\x004361789432197")
+    ['', [52, 51, 54, 49, 55, 56, 57, 52, 51, 50, 49, 57, 55]]
