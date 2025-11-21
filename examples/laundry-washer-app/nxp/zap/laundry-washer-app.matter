@@ -1947,7 +1947,7 @@ cluster LaundryWasherMode = 81 {
 
 /** This cluster supports remotely monitoring and controlling the different types of functionality available to a washing device, such as a washing machine. */
 cluster LaundryWasherControls = 83 {
-  revision 1;
+  revision 2;
 
   enum NumberOfRinsesEnum : enum8 {
     kNone = 0;
