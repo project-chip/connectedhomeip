@@ -34,8 +34,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 
 from mobly import asserts
 
@@ -766,7 +766,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             # STEP 9k: TH sends command MoveTo with Position = MoveToFullyOpen.
             self.step("9k")
 
-            time.sleep(2)  # Adding a small delay to ensure the previous command is processed
+            await asyncio.sleep(2)  # Adding a small delay to ensure the previous command is processed
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,

@@ -34,8 +34,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 
 from mobly import asserts
 
@@ -1021,7 +1021,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             # STEP 15d: Wait 2 seconds and TH reads from the DUT the OverallCurrentState.Position = FullyOpened.
             self.step("15d")
 
-            time.sleep(2)
+            await asyncio.sleep(2)
 
             overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
             logging.info(f"OverallCurrentState: {overall_current_state}")
@@ -1064,7 +1064,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             # STEP 15h: Wait 2 seconds and TH reads from the DUT the OverallCurrentState.Position = FullyClosed.
             self.step("15h")
 
-            time.sleep(2)
+            await asyncio.sleep(2)
             overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
             logging.info(f"OverallCurrentState: {overall_current_state}")
 
