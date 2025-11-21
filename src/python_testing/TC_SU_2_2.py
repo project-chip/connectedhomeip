@@ -43,6 +43,7 @@
 
 import asyncio
 import logging
+import os
 import time
 
 from mobly import asserts
@@ -174,7 +175,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             TestStep(4, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. "
                      "QueryStatus is set to Busy, Set DelayedActionTime to 3 minutes. On the subsequent QueryImage command, "
                      "TH/OTA-P sends a QueryImageResponse back to DUT. QueryStatus is set to 'UpdateAvailable'.",
-                     "Verify that the DUT waits for at least the time mentioned in the DelayedActionTime (3 minutes) before issuing another QueryImage command to the TH/OTA-P."
+                     "Verify that the DUT waits for at least the time mentioned in the DelayedActionTime (3 minutes) before issuing another QueryImage command to the TH/OTA-P. "
                      "Verify that there is a transfer of the software image after the second QueryImageResponse with UpdateAvailable status from the TH/OTA-P to the DUT."),
             TestStep(5, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. QueryStatus is set to 'UpdateAvailable'",
                      "ImageURI should have the https url from where the image can be downloaded.",
@@ -198,8 +199,12 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
     async def test_TC_SU_2_2(self):
         self.LOG_FILE_PATH = "provider.log"
         self.KVS_PATH = "/tmp/chip_kvs_provider"
-        self.provider_app_path = self.user_params.get('provider_app_path', None)
+        self.provider_app_path = self.user_params.get('provider_app_path')
         self.ota_image = self.user_params.get('ota_image')
+
+        # Validate provider_app_path
+        if not self.provider_app_path or not os.path.exists(self.provider_app_path):
+            raise FileNotFoundError(f'Invalid provider_app_path: {self.provider_app_path}.')
 
         self.step(0)
         # Controller has already commissioned the requestor
@@ -215,21 +220,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         provider_setupPinCode = 20202021
         provider_port = self.user_params.get('ota_provider_port', 5541)
 
-        self.provider_data = {
-            "discriminator": provider_discriminator,
-            "setup_pincode": provider_setupPinCode,
-            "port": provider_port,
-        }
-
         self.step(1)
-        # ------------------------------------------------------------------------------------
-        # [STEP_1]: Prerequisites - Setup Provider
-        # Steps:
-        #     1. Launch the OTA Provider process with given parameters.
-        #     2. Commission the Provider onto the specified fabric.
-        #     3. Configure ACLs on both Requestor and Provider to allow OTA cluster interactions.
-        #     4. Add the Provider to the Requestor's DefaultOTAProviders attribute if none exists.
-        # ------------------------------------------------------------------------------------
         step_number = "[STEP_1]"
         logger.info(f'{step_number}: Prerequisite #1.0 - Requestor (DUT), NodeID: {requestor_node_id}, FabricId: {fabric_id}')
         logger.info(f'{step_number}: Prerequisite #1.0 - Launched Provider')
@@ -241,9 +232,9 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         self.start_provider(
             provider_app_path=self.provider_app_path,
             ota_image_path=self.ota_image,
-            setup_pincode=self.provider_data["setup_pincode"],
-            discriminator=self.provider_data["discriminator"],
-            port=self.provider_data["port"],
+            setup_pincode=provider_setupPinCode,
+            discriminator=provider_discriminator,
+            port=provider_port,
             kvs_path=self.KVS_PATH,
             log_file=self.LOG_FILE_PATH,
             extra_args=provider_extra_args_updateAvailable,
@@ -265,7 +256,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         )
 
         # Prerequisite #3.0 - Add OTA Provider to the Requestor (Only if none exists, and only one time)
-        logger.info(f'{step_number}: Prerequisite #4.0 - Add Provider to Requestor(DUT) DefaultOTAProviders')
+        logger.info(f'{step_number}: Prerequisite #3.0 - Add Provider to Requestor(DUT) DefaultOTAProviders')
 
         # Read existing DefaultOTAProviders on the Requestor
         current_providers = await self.read_single_attribute_check_success(
@@ -278,7 +269,6 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # If there is already a provider, skip adding
         if current_providers:
             logger.info(f"Skipping add: Requestor already has providers {current_providers}")
-            return
 
         await self.set_default_ota_providers_list(controller, provider_node_id, requestor_node_id)
         logger.info("Prerequisite #4.0 - Write DefaultOTAProviders completed.")
@@ -407,7 +397,6 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
         # Kill Provider process
         self.current_provider_app_proc.terminate()
-        await asyncio.sleep(2)  # Wait for process to terminate
 
         self.step(2)
         # ------------------------------------------------------------------------------------
@@ -425,9 +414,9 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         self.start_provider(
             provider_app_path=self.provider_app_path,
             ota_image_path=self.ota_image,
-            setup_pincode=self.provider_data["setup_pincode"],
-            discriminator=self.provider_data["discriminator"],
-            port=self.provider_data["port"],
+            setup_pincode=provider_setupPinCode,
+            discriminator=provider_discriminator,
+            port=provider_port,
             kvs_path=self.KVS_PATH,
             log_file=self.LOG_FILE_PATH,
             extra_args=provider_extra_args_busy,
@@ -546,9 +535,9 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         self.start_provider(
             provider_app_path=self.provider_app_path,
             ota_image_path=self.ota_image,
-            setup_pincode=self.provider_data["setup_pincode"],
-            discriminator=self.provider_data["discriminator"],
-            port=self.provider_data["port"],
+            setup_pincode=provider_setupPinCode,
+            discriminator=provider_discriminator,
+            port=provider_port,
             kvs_path=self.KVS_PATH,
             log_file=self.LOG_FILE_PATH,
             extra_args=provider_extra_args_updateNotAvailable,
@@ -666,9 +655,9 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         self.start_provider(
             provider_app_path=self.provider_app_path,
             ota_image_path=self.ota_image,
-            setup_pincode=self.provider_data["setup_pincode"],
-            discriminator=self.provider_data["discriminator"],
-            port=self.provider_data["port"],
+            setup_pincode=provider_setupPinCode,
+            discriminator=provider_discriminator,
+            port=provider_port,
             kvs_path=self.KVS_PATH,
             log_file=self.LOG_FILE_PATH,
             extra_args=provider_extra_args_busy_180,
@@ -805,9 +794,9 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         self.start_provider(
             provider_app_path=self.provider_app_path,
             ota_image_path=self.ota_image,
-            setup_pincode=self.provider_data["setup_pincode"],
-            discriminator=self.provider_data["discriminator"],
-            port=self.provider_data["port"],
+            setup_pincode=provider_setupPinCode,
+            discriminator=provider_discriminator,
+            port=provider_port,
             kvs_path=self.KVS_PATH,
             log_file=self.LOG_FILE_PATH,
             extra_args=provider_extra_args_updateAvailable,
@@ -914,9 +903,9 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         self.start_provider(
             provider_app_path=self.provider_app_path,
             ota_image_path=self.ota_image,
-            setup_pincode=self.provider_data["setup_pincode"],
-            discriminator=self.provider_data["discriminator"],
-            port=self.provider_data["port"],
+            setup_pincode=provider_setupPinCode,
+            discriminator=provider_discriminator,
+            port=provider_port,
             kvs_path=self.KVS_PATH,
             log_file=self.LOG_FILE_PATH,
             extra_args=provider_extra_args_invalid_bdx,
