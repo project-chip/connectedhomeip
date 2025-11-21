@@ -108,7 +108,7 @@ class WebSocketRunner(TestRunner):
         if command:
             start_time = time.time()
 
-            instance = subprocess.Popen(
+            instance = subprocess.Popen(    # noqa: ASYNC220
                 command,
                 bufsize=0,                  # unbuffered
                 text=False,                 # keep output as bytes
