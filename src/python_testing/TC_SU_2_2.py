@@ -77,11 +77,13 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             unexpected_states (set): Set of unexpected states observed during the interval.
             interval_duration (list): List containing the duration (in seconds) of the interval, or None if not completed.
         """
+
         seen_states = set()
-        observed_states = set()
         state_sequence = []
         unexpected_states = set()
         final_seen = False
+        start_seen = False
+
         t_start_interval = None
         t_end_interval = None
         interval_duration = [None]
@@ -90,45 +92,48 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         logger.info(f'{step_name}: OTA matcher: start={start_states}, allowed={allowed_states}')
 
         def matcher(report):
-            nonlocal final_seen, t_start_interval, t_end_interval
+            nonlocal final_seen, t_start_interval, t_end_interval, start_seen
             val = report.value
             if val is None:
                 return False
 
             current_time = time.time()
 
-            # Record sequence states
+            # Record state if new
             if val not in seen_states:
                 state_sequence.append(val)
                 seen_states.add(val)
                 logger.info(f'{step_name}: State observed: {val} at {current_time}')
 
             # First start_state observed
-            if val in start_states and "start_seen" not in observed_states:
-                observed_states.add("start_seen")
+            if val in start_states and not start_seen:
+                start_seen = True
                 t_start_interval = current_time
                 logger.info(f'{step_name}: First start state recorded: {val}')
                 logger.info(f'{step_name}: t_start_interval: {t_start_interval}')
-                return False  # Keep waiting for interval
+                return False
 
-            # Track unexpected states during interval
-            if "start_seen" in observed_states and t_start_interval is not None and t_end_interval is None and current_time - t_start_interval < min_interval_sec - tolerance_sec:
-                if val not in allowed_states:
-                    unexpected_states.add(val)
-                    logger.info(f'{step_name}: Unexpected state during interval: {val}')
+            # Check unexpected states during interval
+            if start_seen and t_start_interval is not None and t_end_interval is None:
+                if current_time - t_start_interval < min_interval_sec - tolerance_sec:
+                    if val not in allowed_states:
+                        unexpected_states.add(val)
+                        logger.info(f'{step_name}: Unexpected state during interval: {val}')
 
-            # End interval after min_interval_sec
-            if t_start_interval is not None and t_end_interval is None and current_time - t_start_interval >= min_interval_sec + tolerance_sec:
-                t_end_interval = current_time
-                interval_duration[0] = t_end_interval - t_start_interval
-                logger.info(f'{step_name}: Interval completed after {min_interval_sec}s')
-                logger.info(f'{step_name}: t_end_interval: {t_end_interval}')
-                logger.info(f'{step_name}: interval_duration: {interval_duration}')
-                if final_state is None:
-                    return True  # End matcher if no final_state provided
-                return False     # Continue matcher if final_state is provided
+            # End interval after min time
+            if start_seen and t_start_interval is not None and t_end_interval is None:
+                if current_time - t_start_interval >= min_interval_sec + tolerance_sec:
+                    t_end_interval = current_time
+                    interval_duration[0] = t_end_interval - t_start_interval
+                    logger.info(f'{step_name}: Interval completed after {min_interval_sec}s')
+                    logger.info(f'{step_name}: t_end_interval: {t_end_interval}')
+                    logger.info(f'{step_name}: interval_duration: {interval_duration}')
 
-            # Final state check if given
+                    if final_state is None:
+                        return True
+                    return False
+
+            # Final state check
             if final_state and val == final_state and t_end_interval is not None:
                 final_seen = True
                 if val not in seen_states:
