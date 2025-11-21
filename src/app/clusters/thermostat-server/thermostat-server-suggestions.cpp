@@ -98,6 +98,8 @@ Status RemoveFromThermostatSuggestionsList(Delegate * delegate, uint8_t uniqueID
 bool AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                              const Commands::AddThermostatSuggestion::DecodableType & commandData)
 {
+    ChipLogError(Zcl, "checking preset handle size");
+
     // Check constraints for PresetHandle and ExpirationInMinutes field.
     if (commandData.presetHandle.size() >= kThermostatSuggestionPresetHandleSize)
     {
@@ -105,6 +107,7 @@ bool AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandP
         return true;
     }
 
+    ChipLogError(Zcl, "checking expirationInMinutes");
     if (commandData.expirationInMinutes < 30 || commandData.expirationInMinutes > 1440)
     {
         commandObj->AddStatus(commandPath, Status::ConstraintError);
@@ -120,6 +123,7 @@ bool AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandP
         return true;
     }
 
+    ChipLogError(Zcl, "checking delegate");
     // If time is not synced, return INVALID_IN_STATE in the AddThermostatSuggestionResponse.
     uint32_t currentMatterEpochTimestampInSeconds = 0;
     if (System::Clock::GetClock_MatterEpochS(currentMatterEpochTimestampInSeconds) != CHIP_NO_ERROR)
@@ -128,6 +132,7 @@ bool AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandP
         return true;
     }
 
+    ChipLogError(Zcl, "calling IsPresetHandlePresentInPresets");
     // If the preset hande doesn't exist in the Presets attribute, return NOT_FOUND.
     if (!IsPresetHandlePresentInPresets(delegate, commandData.presetHandle))
     {
@@ -135,6 +140,7 @@ bool AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandP
         return true;
     }
 
+    ChipLogError(Zcl, "checking thermostat suggestions list");
     // If the thermostat suggestions list is full, return RESOURCE_EXHAUSTED.
     if (delegate->GetNumberOfThermostatSuggestions() >= delegate->GetMaxThermostatSuggestions())
     {
@@ -142,6 +148,7 @@ bool AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandP
         return true;
     }
 
+    ChipLogError(Zcl, "checking time < 24");
     // If the effective time in UTC is greater than current time in UTC plus 24 hours, return INVALID_COMMAND.
     const uint32_t kSecondsInDay = 24 * 60 * 60;
     if (!commandData.effectiveTime.IsNull() &&

@@ -2974,10 +2974,10 @@ provisional cluster ContentControl = 1295 {
     optional char_string<64> ratingNameDesc = 1;
   }
 
-  info event RemainingScreenTimeExpired = 0 {
+  provisional info event RemainingScreenTimeExpired = 0 {
   }
 
-  info event EnteringBlockContentTimeWindow = 1 {
+  provisional info event EnteringBlockContentTimeWindow = 1 {
   }
 
   provisional readonly attribute boolean enabled = 0;

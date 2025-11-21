@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2025 Apple Inc. All rights reserved.
+
+Apple Matter Extensions is licensed under Apple Inc.'s MFi Sample Code
+License Agreement, which is contained in the LICENSE file distributed with
+the Apple Matter Extensions, and only to those who accept that license.
+-->
+<configurator>
+  <domain name="Apple Matter"/>
+
+  <clusterExtension code="0x0036">
+    <!-- Attributes -->
+    <attribute side="server" code="0x13490000" type="octet_string" isNullable="true">AppleWifiGatewayMacAddress</attribute>
+    <attribute side="server" code="0x13490001" type="octet_string" isNullable="true">AppleWifiGatewayIPv4Address</attribute>
+    <attribute side="server" code="0x13490002" type="octet_string" isNullable="true">AppleWifiSubnetMask</attribute>
+    <attribute side="server" code="0x13490003" type="int16u">AppleWifiDisconnectionCount</attribute>
+    <attribute side="server" code="0x13490004" type="int32u">AppleWifiDisconnectionDuration</attribute>
+    <attribute side="server" code="0x13490005" type="int32u">AppleWifiBeaconRxCount</attribute>
+    <attribute side="server" code="0x13490006" type="int32u" isNullable="true" optional="true">AppleWifiBeaconRxInterval</attribute>
+    <attribute side="server" code="0x13490007" type="int32u">AppleWifiBeaconLostCount</attribute>
+    <attribute side="server" code="0x13490008" type="array" entryType="octet_string">AppleWifiIPAddressList</attribute>
+    <attribute side="server" code="0x13490009" type="int32u" optional="true" name="AppleWifiTxPacketCount">
+      <mandatoryConform>
+        <feature name="PKTCNT"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x1349000A" type="int32u" optional="true" name="AppleWifiTxPacketErrorCount">
+      <mandatoryConform>
+        <feature name="ERRCNT"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x1349000B" type="int32u" optional="true" name="AppleWifiRxPacketCount">
+      <mandatoryConform>
+        <feature name="PKTCNT"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x1349000C" type="int32u" optional="true" name="AppleWifiRxPacketErrorCount">
+      <mandatoryConform>
+        <feature name="ERRCNT"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute side="server" code="0x1349000D" type="int16u">AppleWifiHardwareExceptionCount</attribute>
+    <attribute side="server" code="0x1349000E" type="systime_ms" isNullable="true" optional="true" name="AppleWifiResetCountBootRelativeTime">
+      <mandatoryConform>
+        <orTerm>
+          <feature name="PKTCNT"/>
+          <feature name="ERRCNT"/>
+        </orTerm>
+      </mandatoryConform>
+    </attribute>
+
+    <!-- Commands -->
+    <command source="client" code="0x13490000" name="AppleResetCounts" optional="true">
+      <description>This command is used to reset the count attributes.</description>
+      <access op="invoke" privilege="operate"/>
+      <mandatoryConform>
+        <orTerm>
+          <feature name="PKTCNT"/>
+          <feature name="ERRCNT"/>
+        </orTerm>
+      </mandatoryConform>
+    </command>
+  </clusterExtension>
+
+</configurator>

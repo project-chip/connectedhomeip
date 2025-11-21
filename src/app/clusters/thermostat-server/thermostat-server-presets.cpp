@@ -271,6 +271,12 @@ bool IsPresetHandlePresentInPresets(Delegate * delegate, const ByteSpan & preset
     {
         CHIP_ERROR err = delegate->GetPresetAtIndex(i, matchingPreset);
 
+        ChipLogError(Zcl, "IsPresetHandlePresentInPresets: matchingPreset");
+        ChipLogByteSpan(Zcl, matchingPreset.GetPresetHandle().Value());
+
+        ChipLogError(Zcl, "IsPresetHandlePresentInPresets: presetHandleToMatch");
+        ChipLogByteSpan(Zcl, presetHandleToMatch);
+
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
             return false;

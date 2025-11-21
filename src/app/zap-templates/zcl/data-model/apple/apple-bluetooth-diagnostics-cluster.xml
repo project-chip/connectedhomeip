@@ -1,0 +1,117 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2025 Apple Inc. All rights reserved.
+
+Apple Matter Extensions is licensed under Apple Inc.'s MFi Sample Code
+License Agreement, which is contained in the LICENSE file distributed with
+the Apple Matter Extensions, and only to those who accept that license.
+-->
+
+<configurator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../zcl.xsd">
+  <domain name="General"/>
+  <enum name="AppleBluetoothConnectionStatusEnum" type="enum8">
+    <cluster code="0x1349FC07"/>
+    <item name="Connected" value="0x00"/>
+    <item name="NotConnected" value="0x01"/>
+  </enum>
+
+  <enum name="AppleBluetoothVersionEnum" type="enum8">
+    <cluster code="0x1349FC07"/>
+    <item name="Version_4_0" value="0x00"/>
+    <item name="Version_4_1" value="0x01"/>
+    <item name="Version_4_2" value="0x02"/>
+    <item name="Version_5_0" value="0x03"/>
+    <item name="Version_5_1" value="0x04"/>
+    <item name="Version_5_2" value="0x05"/>
+    <item name="Version_5_3" value="0x06"/>
+    <item name="Version_5_4" value="0x07"/>
+    <item name="Version_6_0" value="0x08"/>
+  </enum>
+
+  <cluster>
+    <domain>General</domain>
+    <name>Apple Bluetooth Diagnostics</name>
+    <code>0x1349FC07</code>
+    <define>APPLE_BLUETOOTH_DIAGNOSTICS_CLUSTER</define>
+    <description>This cluster defines Apple-specific additions for tracking Bluetooth interface performance and health metrics.</description>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <globalAttribute code="0xFFFD" side="either" value="1"/>
+    <features>
+      <feature bit="0" code="PKTCNT" name="PacketCounts" summary="Node makes available the counts for the number of received and transmitted packets on the bluetooth interface.">
+        <optionalConform/>
+      </feature>
+      <feature bit="1" code="PKTERRCNT" name="PacketErrorCounts" summary="Node makes available the counts for the number of errors that have occurred during the reception and transmission of packets on the bluetooth interface.">
+        <optionalConform/>
+      </feature>
+    </features>
+    <attribute code="0x0000" side="server" name="AppleBluetoothVersion" define="APPLE_BLUETOOTH_VERSION" type="AppleBluetoothVersionEnum" isNullable="true" max="0x08"/>
+    <attribute code="0x0001" side="server" name="AppleBluetoothRSSI" define="APPLE_BLUETOOTH_RSSI" type="int8s" isNullable="true">
+      <quality changeOmitted="true"/>
+    </attribute>
+    <attribute code="0x0002" side="server" name="AppleBluetoothTxPowerLevel" define="APPLE_BLUETOOTH_TX_POWER_LEVEL" type="int8s">
+      <quality changeOmitted="true"/>
+    </attribute>
+    <attribute code="0x0003" side="server" name="AppleBluetoothPacketRxCount" define="APPLE_BLUETOOTH_PACKET_RX_COUNT" type="int32u" optional="true">
+      <quality changeOmitted="true"/>
+      <mandatoryConform>
+        <feature name="PKTCNT"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute code="0x0004" side="server" name="AppleBluetoothPacketTxCount" define="APPLE_BLUETOOTH_PACKET_TX_COUNT" type="int32u" optional="true">
+      <quality changeOmitted="true"/>
+      <mandatoryConform>
+        <feature name="PKTCNT"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute code="0x0005" side="server" name="AppleBluetoothPacketRxErrorCount" define="APPLE_BLUETOOTH_PACKET_RX_ERROR_COUNT" type="int32u" optional="true">
+      <quality changeOmitted="true"/>
+      <mandatoryConform>
+        <feature name="PKTERRCNT"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute code="0x0006" side="server" name="AppleBluetoothPacketTxErrorCount" define="APPLE_BLUETOOTH_PACKET_TX_ERROR_COUNT" type="int32u" optional="true">
+      <quality changeOmitted="true"/>
+      <mandatoryConform>
+        <feature name="PKTERRCNT"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute code="0x0007" side="server" name="AppleBluetoothOverrunCount" define="APPLE_BLUETOOTH_OVERRUN_COUNT" type="int32u">
+      <quality changeOmitted="true"/>
+    </attribute>
+    <attribute code="0x0008" side="server" name="AppleBluetoothConnectionStatus" define="APPLE_BLUETOOTH_CONNECTION_STATUS" type="AppleBluetoothConnectionStatusEnum" max="0x01"/>
+    <attribute code="0x0009" side="server" name="AppleBluetoothConnectionCount" define="APPLE_BLUETOOTH_CONNECTION_COUNT" type="int16u">
+      <quality changeOmitted="true"/>
+    </attribute>
+    <attribute code="0x000A" side="server" name="AppleBluetoothConnectionErrorCount" define="APPLE_BLUETOOTH_CONNECTION_ERROR_COUNT" type="int16u">
+      <quality changeOmitted="true"/>
+    </attribute>
+    <attribute code="0x000B" side="server" name="AppleBluetoothDisconnectionCount" define="APPLE_BLUETOOTH_DISCONNECTION_COUNT" type="int16u">
+      <quality changeOmitted="true"/>
+    </attribute>
+    <attribute code="0x000C" side="server" name="AppleBluetoothDisconnectionErrorCount" define="APPLE_BLUETOOTH_DISCONNECTION_ERROR_COUNT" type="int16u">
+      <quality changeOmitted="true"/>
+    </attribute>
+    <attribute code="0x000D" side="server" name="AppleBluetoothHardwareExceptionCount" define="APPLE_BLUETOOTH_HARDWARE_EXCEPTION_COUNT" type="int16u">
+      <quality changeOmitted="true"/>
+    </attribute>
+    <attribute code="0x000E" side="server" name="AppleBluetoothResetCountBootRelativeTime" define="APPLE_BLUETOOTH_RESET_COUNT_BOOT_RELATIVE_TIME" type="systime_ms" isNullable="true" optional="true">
+      <mandatoryConform>
+        <orTerm>
+          <feature name="PKTCNT"/>
+          <feature name="PKTERRCNT"/>
+        </orTerm>
+      </mandatoryConform>
+    </attribute>
+    <command code="0x00" source="client" name="ResetCounts" optional="true">
+      <description>This command is used to reset the count attributes.</description>
+      <mandatoryConform>
+        <orTerm>
+          <feature name="PKTCNT"/>
+          <feature name="PKTERRCNT"/>
+        </orTerm>
+      </mandatoryConform>
+    </command>
+
+  </cluster>
+</configurator>

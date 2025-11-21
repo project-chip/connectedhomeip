@@ -1,3 +1,0 @@
-[console_scripts]
-debugpy = debugpy.server.cli:main
-debugpy-adapter = debugpy.adapter.__main__:main
