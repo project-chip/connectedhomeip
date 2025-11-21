@@ -18,4 +18,5 @@ TARGET_SOURCES(
   PRIVATE
     "${CLUSTER_DIR}/PowerTopologyCluster.cpp"
     "${CLUSTER_DIR}/power-topology-server.h"
+    "${CLUSTER_DIR}/PowerTopologyDelegate.h"
 )
