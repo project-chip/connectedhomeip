@@ -476,10 +476,9 @@ MTR_DIRECT_MEMBERS
             // The underlying TLV tag can be encoded as either a string or an integer,
             // avoid changing it if the represented serial number is not changing.
             VerifyOrReturn(![existing isEqualToString:serialNumber]);
-            err = _payload.removeSerialNumber();
-        } else {
-            err = _payload.addSerialNumber(serialNumber.UTF8String);
+            TEMPORARY_RETURN_IGNORED _payload.removeSerialNumber();
         }
+        err = _payload.addSerialNumber(serialNumber.UTF8String);
     } else {
         err = _payload.removeSerialNumber();
     }
