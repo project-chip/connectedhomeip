@@ -43,7 +43,7 @@ public:
     void SetOTAImageFile(const char * imageFile) { mImageFile = imageFile; }
 
     // Full file path to where the new image will be executed from post-download
-    static char kImageExecPath[] = "/tmp/ota.update";
+    static char * kImageExecPath;
 
 private:
     //////////// Actual handlers for the OTAImageProcessorInterface ///////////////

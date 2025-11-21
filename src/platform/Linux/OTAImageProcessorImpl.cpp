@@ -24,6 +24,13 @@
 #include <sys/stat.h>
 
 namespace chip {
+namespace {
+
+char kImageExecPathData[] = "/tmp/ota.update";
+
+} // namespace
+
+char * OTAImageProcessorImpl::kImageExecPath = kImageExecPathData;
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
