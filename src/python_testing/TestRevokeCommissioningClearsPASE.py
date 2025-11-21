@@ -36,11 +36,10 @@
 # === END CI TEST ARGUMENTS ===
 
 
-from mobly import asserts
-
 import chip.clusters as Clusters
 from chip.exceptions import ChipStackError
 from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from mobly import asserts
 
 
 class TestRevokeCommissioningClearsPASE(MatterBaseTest):
