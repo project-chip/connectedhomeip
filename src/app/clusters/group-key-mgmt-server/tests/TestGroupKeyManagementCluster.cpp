@@ -142,12 +142,10 @@ struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementC
     void SetUp() override
     {
 
+        mOldGroupProvider = Credentials::GetGroupDataProvider();
         mRealProvider.SetStorageDelegate(&mTestContext.StorageDelegate());
         mRealProvider.SetSessionKeystore(&mMockKeystore);
-
         ASSERT_EQ(mRealProvider.Init(), CHIP_NO_ERROR);
-        ASSERT_EQ(mCluster.Startup(mTestContext.Get()), CHIP_NO_ERROR);
-
         Credentials::SetGroupDataProvider(&mRealProvider);
         tester.SetFabricIndex(TestHelpers::kTestFabricIndex);
     }
