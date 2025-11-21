@@ -490,7 +490,7 @@ CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
         TEMPORARY_RETURN_IGNORED resolve->Finalize(CHIP_ERROR_CANCELLED);
     }
 
-    return ctx->Finalize(CHIP_ERROR_CANCELLED);
+    return ctx->Finalize(CHIP_NO_ERROR);
 }
 
 CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
