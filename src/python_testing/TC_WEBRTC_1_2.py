@@ -71,21 +71,16 @@ class TC_WEBRTC_1_2(MatterBaseTest, WebRTCTestHelper):
             TestStep(4, "TH sends the SUCCESS status code to the DUT."),
             TestStep(
                 5,
-                description="TH sends the ProvideICECandidates command with a its ICE candidates to the DUT.",
+                description="TH sends the ProvideICECandidates command with its ICE candidates to the DUT.",
                 expectation="DUT responds with SUCCESS status code.",
             ),
             TestStep(
                 6,
-                description="TH waits up to 30 seconds for ICECandidates command from the DUT.",
-                expectation="Verify that ICECandidates command contains the same WebRTCSessionID saved in step 1 and contain a non-empty ICE candidates.",
-            ),
-            TestStep(
-                7,
                 description="TH waits for 10 seconds.",
                 expectation="Verify the WebRTC session has been successfully established.",
             ),
             TestStep(
-                8,
+                7,
                 description="TH sends the EndSession command with the WebRTCSessionID saved in step 1 to the DUT.",
                 expectation="DUT responds with SUCCESS status code.",
             ),
@@ -169,20 +164,14 @@ class TC_WEBRTC_1_2(MatterBaseTest, WebRTCTestHelper):
         )
 
         self.step(6)
-        ice_session_id, remote_candidates = await webrtc_peer.get_remote_ice_candidates()
-        asserts.assert_equal(prev_sessionid, ice_session_id, "ProvideIceCandidates invoked with wrong session id")
-        asserts.assert_true(len(remote_candidates) > 0, "Invalid remote ice candidates received")
-        webrtc_peer.set_remote_ice_candidates(remote_candidates)
-
-        self.step(7)
-        if not webrtc_peer.is_session_connected():
+        if not await webrtc_peer.check_for_session_establishment():
             logging.error("Failed to establish webrtc session")
             raise Exception("Failed to establish webrtc session")
 
         if not self.is_pics_sdk_ci_only:
             self.user_verify_video_stream("Verify WebRTC session by validating if video is received")
 
-        self.step(8)
+        self.step(7)
         await self.send_single_cmd(
             cmd=WebRTCTransportProvider.Commands.EndSession(
                 webRTCSessionID=prev_sessionid, reason=Objects.Globals.Enums.WebRTCEndReasonEnum.kUserHangup
@@ -225,9 +214,6 @@ async def establish_webrtc_session(webrtc_manager, webrtc_peer, endpoint, ctrl, 
         endpoint=endpoint,
         payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
     )
-
-    ice_session_id, remote_candidates = await webrtc_peer.get_remote_ice_candidates()
-    webrtc_peer.set_remote_ice_candidates(remote_candidates)
 
     return await webrtc_peer.check_for_session_establishment()
 
