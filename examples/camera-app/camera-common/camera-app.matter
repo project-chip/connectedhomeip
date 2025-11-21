@@ -2905,7 +2905,7 @@ provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
 }
 
 /** The WebRTC transport provider cluster provides a way for stream providers (e.g. Cameras) to stream or receive their data through WebRTC. */
-provisional cluster WebRTCTransportProvider = 1363 {
+cluster WebRTCTransportProvider = 1363 {
   revision 1;
 
   bitmap Feature : bitmap32 {
@@ -2990,7 +2990,7 @@ provisional cluster WebRTCTransportProvider = 1363 {
 }
 
 /** The WebRTC transport requestor cluster provides a way for stream consumers (e.g. Matter Stream Viewer) to establish a WebRTC connection with a stream provider. */
-provisional cluster WebRTCTransportRequestor = 1364 {
+cluster WebRTCTransportRequestor = 1364 {
   revision 1;
 
   readonly attribute access(read: administer) WebRTCSessionStruct currentSessions[] = 0;

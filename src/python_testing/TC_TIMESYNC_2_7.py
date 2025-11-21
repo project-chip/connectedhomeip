@@ -35,7 +35,7 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import time
+import asyncio
 import typing
 from datetime import timedelta
 
@@ -148,7 +148,7 @@ class TC_TIMESYNC_2_7(MatterBaseTest):
 
         self.print_step(14, "Wait 15s and read LocalTime")
         if tz_list_size > 1:
-            time.sleep(15)
+            await asyncio.sleep(15)
             local = await self.read_ts_attribute_expect_success(local_attr)
             compare_time(received=local, offset=timedelta(seconds=7200), tolerance=timedelta(seconds=5))
 

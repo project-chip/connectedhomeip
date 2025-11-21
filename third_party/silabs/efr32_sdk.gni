@@ -417,6 +417,10 @@ template("efr32_sdk") {
       defines += [ "ENABLE_WSTK_LEDS" ]
     }
 
+    if (sl_enable_rgb_led) {
+      defines += [ "SL_MATTER_RGB_LED_ENABLED=1" ]
+    }
+
     if (use_wstk_buttons) {
       _include_dirs += [ "${efr32_sdk_root}/platform/driver/button/inc" ]
     }
@@ -906,9 +910,15 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/driver/leddrv/src/sl_led.c",
         "${efr32_sdk_root}/platform/driver/leddrv/src/sl_pwm_led.c",
         "${efr32_sdk_root}/platform/driver/leddrv/src/sl_simple_led.c",
-        "${efr32_sdk_root}/platform/driver/leddrv/src/sl_simple_rgb_pwm_led.c",
-        "${silabs_gen_folder}/autogen/sl_simple_led_instances.c",
       ]
+      if (sl_enable_rgb_led) {
+        sources += [
+          "${efr32_sdk_root}/platform/driver/leddrv/src/sl_simple_rgb_pwm_led.c",
+          "${silabs_gen_folder}/autogen/sl_simple_rgb_pwm_led_instances.c",
+        ]
+      } else {
+        sources += [ "${silabs_gen_folder}/autogen/sl_simple_led_instances.c" ]
+      }
     }
 
     # SPI is only used for Wifi

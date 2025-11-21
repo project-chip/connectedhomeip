@@ -35,8 +35,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import queue
-import time
 import typing
 from datetime import datetime, timedelta, timezone
 
@@ -152,7 +152,7 @@ class TC_TIMESYNC_2_12(MatterBaseTest):
 
         self.print_step(10, "If tz_list_size > 1, TH waits until th_utc + 15s")
         if tz_list_size > 1:
-            time.sleep(get_wait_seconds_from_set_time(th_utc, 15))
+            await asyncio.sleep(get_wait_seconds_from_set_time(th_utc, 15))
 
         self.print_step(11, "If tz_list_size > 1, TH reads LocalTime")
         if tz_list_size > 1:
