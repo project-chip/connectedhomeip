@@ -489,7 +489,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
     // Ensure that each enabling/disabling of the general advertising clears
     // the extended mode, to make sure we always start fresh in the regular mode
     mFlags.Set(Flags::kExtendedAdvertisingEnabled, false);
-    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    return PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
     return CHIP_NO_ERROR;
 }
@@ -514,7 +514,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     mFlags.Set(Flags::kAdvertisingRefreshNeeded);
-    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    return PlatformMgr().ScheduleWork(DriveBLEState, 0);
     return CHIP_NO_ERROR;
 }
 
@@ -597,7 +597,7 @@ exit:
     // Force a reconfiguration of advertising in case we switched to non-connectable mode when
     // the BLE connection was established.
     mFlags.Set(Flags::kAdvertisingRefreshNeeded);
-    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    return PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
     return CHIP_NO_ERROR;
 }
