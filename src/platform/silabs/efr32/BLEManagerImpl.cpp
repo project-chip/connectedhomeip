@@ -57,6 +57,7 @@ extern "C" {
 
 using namespace ::chip;
 using namespace ::chip::Ble;
+using namespace ::chip::DeviceLayer::Silabs;
 
 namespace chip {
 namespace DeviceLayer {
@@ -734,21 +735,26 @@ void BLEManagerImpl::HandleConnectionCloseEvent(volatile sl_bt_msg_t * evt)
         mFlags.Set(Flags::kRestartAdvertising);
         mFlags.Set(Flags::kFastAdvertisingEnabled);
         PlatformMgr().ScheduleWork(DriveBLEState, 0);
+
+        if (Provision::Manager::GetInstance().IsProvisionRequired())
+        {
+            // Reset if provision is finished.
+            Provision::Manager::GetInstance().Step();
+        }
     }
 }
 
 void BLEManagerImpl::HandleWriteEvent(volatile sl_bt_msg_t * evt)
 {
     uint16_t attribute = evt->data.evt_gatt_server_user_write_request.characteristic;
-    bool do_provision  = chip::DeviceLayer::Silabs::Provision::Manager::GetInstance().IsProvisionRequired();
     ChipLogProgress(DeviceLayer, "Char Write Req, char : %d", attribute);
 
     if (gattdb_CHIPoBLEChar_Rx == attribute)
     {
-        if (do_provision)
+        if (Provision::Manager::GetInstance().IsProvisionRequired())
         {
-            chip::DeviceLayer::Silabs::Provision::Channel::Update(attribute);
-            chip::DeviceLayer::Silabs::Provision::Manager::GetInstance().Step();
+            Provision::Channel::Update(attribute);
+            Provision::Manager::GetInstance().Step();
         }
         else
         {
