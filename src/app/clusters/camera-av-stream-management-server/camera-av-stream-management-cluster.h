@@ -372,7 +372,12 @@ private:
      * When a server instance is created or destroyed, this method will be called to set and clear, respectively,
      * the pointer to the server instance.
      *
+<<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.h
+     * @param aCameraAVStreamManagementCluster A pointer to the CameraAVStreamManagementCluster object related to this delegate
+     * object.
+========
      * @param aCameraAVStreamManagementCluster A pointer to the CameraAVStreamManagementCluster object related to this delegate object.
+>>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.h
      */
     void SetCameraAVStreamManagementCluster(CameraAVStreamManagementCluster * aCameraAVStreamManagementCluster)
     {
@@ -395,7 +400,11 @@ enum class OptionalAttribute : uint32_t
     kStatusLightBrightness = 0x0080,
 };
 
+<<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.h
+class CameraAVStreamManagementCluster : public CommandHandlerInterface, public AttributeAccessInterface
+========
 class CameraAVStreamManagementCluster : public DefaultServerCluster
+>>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.h
 {
 public:
     /**
@@ -433,6 +442,7 @@ public:
      * for the transmission of its media streams.
      *
      */
+<<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.h
     CameraAVStreamManagementCluster(CameraAVStreamManagementDelegate & aDelegate, EndpointId aEndpointId,
                                     const BitFlags<Feature> aFeatures, const BitFlags<OptionalAttribute> aOptionalAttrs,
                                     uint8_t aMaxConcurrentEncoders, uint32_t aMaxEncodedPixelRate,
@@ -445,6 +455,18 @@ public:
                                     uint32_t aMaxNetworkBandwidth,
                                     const std::vector<Globals::StreamUsageEnum> & aSupportedStreamUsages,
                                     const std::vector<Globals::StreamUsageEnum> & aStreamUsagePriorities);
+========
+    CameraAVStreamManagementCluster(CameraAVStreamMgmtDelegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
+                             const BitFlags<OptionalAttribute> aOptionalAttrs, uint8_t aMaxConcurrentEncoders,
+                             uint32_t aMaxEncodedPixelRate, const VideoSensorParamsStruct & aVideoSensorParams,
+                             bool aNightVisionUsesInfrared, const VideoResolutionStruct & aMinViewPort,
+                             const std::vector<RateDistortionTradeOffStruct> & aRateDistortionTradeOffPoints,
+                             uint32_t aMaxContentBufferSize, const AudioCapabilitiesStruct & aMicrophoneCapabilities,
+                             const AudioCapabilitiesStruct & aSpkrCapabilities, TwoWayTalkSupportTypeEnum aTwoWayTalkSupport,
+                             const std::vector<SnapshotCapabilitiesStruct> & aSnapshotCapabilities, uint32_t aMaxNetworkBandwidth,
+                             const std::vector<Globals::StreamUsageEnum> & aSupportedStreamUsages,
+                             const std::vector<Globals::StreamUsageEnum> & aStreamUsagePriorities);
+>>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.h
 
     ~CameraAVStreamManagementCluster() override;
 
@@ -702,8 +724,14 @@ private:
     template <AttributeId TAttributeId>
     friend struct StreamTraits;
 
+<<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.h
     CameraAVStreamManagementDelegate & mDelegate;
+    EndpointId mEndpointId;
+    const BitFlags<Feature> mFeatures;
+========
+    CameraAVStreamMgmtDelegate & mDelegate;
     const BitFlags<Feature> mEnabledFeatures;
+>>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.h
     const BitFlags<OptionalAttribute> mOptionalAttrs;
 
     // Attributes
