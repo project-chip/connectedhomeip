@@ -51,7 +51,7 @@ from matter.testing.timeoperations import utc_time_in_matter_epoch
 logger = logging.getLogger(__name__)
 
 cluster = Clusters.Thermostat
-#time_cluster = Clusters.TimeSynchronization
+time_cluster = Clusters.TimeSynchronization
 
 
 class TC_TSTAT_4_3(MatterBaseTest):
@@ -213,15 +213,15 @@ class TC_TSTAT_4_3(MatterBaseTest):
             self.skip_step("4a")
             self.skip_step("4b")
 
-        #self.step("5")
-        #if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
+        self.step("5")
+        if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
             # TH picks a random preset handle that does not match any entry in the Presets attribute and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp the ExpirationInMinutes is set to 1 minute.
             #TODO: Add a check here to see if the preset handle exists. For now, using 0xFF.
-            #random_preset_handle = b"08"
-            #currentUTC = await self.read_single_attribute_check_success(endpoint=0, cluster=time_cluster, attribute=time_cluster.Attributes.UTCTime)
-            #if currentUTC is not NullValue:
+            random_preset_handle = b"08"
+            currentUTC = await self.read_single_attribute_check_success(endpoint=0, cluster=time_cluster, attribute=time_cluster.Attributes.UTCTime)
+            if currentUTC is not NullValue:
                 # Verify that the AddThermostatSuggestion command returns NOT_FOUND.
-                #await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
+                await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
                                                                   #preset_handle=random_preset_handle,
                                                                   #effective_time=currentUTC,
                                                                   #expiration_in_minutes=30,
@@ -238,13 +238,14 @@ class TC_TSTAT_4_3(MatterBaseTest):
             asserts.assert_greater_equal(
                 len(possiblePresetHandles), 1, "Couldn't run test step 6a since all preset handles are also the ActivePresetHandle on this Thermostat")
             presetHandle = possiblePresetHandles[0]
-            currentUTC = int((datetime.now(timezone.utc) - datetime(2000, 1, 1, 0, 0, 0, 0, timezone.utc)).total_seconds())
-            expirationInMinutes = 1
-            addThermostatSuggestionResponse = await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
-                                                                                                preset_handle=presetHandle,
-                                                                                                effective_time=currentUTC,
-                                                                                                expiration_in_minutes=expirationInMinutes,
-                                                                                                expected_status=Status.Success)
+            currentUTC = await self.read_single_attribute_check_success(endpoint=0, cluster=time_cluster, attribute=time_cluster.Attributes.UTCTime)
+            if currentUTC is not NullValue:
+                expirationInMinutes = 30
+                addThermostatSuggestionResponse = await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
+                                                                                                    preset_handle=presetHandle,
+                                                                                                    effective_time=currentUTC,
+                                                                                                    expiration_in_minutes=expirationInMinutes,
+                                                                                                    expected_status=Status.Success)
 
             # TH reads the CurrentThermostatSuggestion, the ThermostatSuggestionNotFollowingReason and the ActivePresetHandle attributes.
             currentThermostatSuggestion = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentThermostatSuggestion)
