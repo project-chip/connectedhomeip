@@ -20,7 +20,7 @@ Source: src/app_clusters/CameraAVSettingsUserLevelManagement.adoc
 Parameters:
 Git: 1.5-base-134-gd0f7ae249
 Alchemy: v1.6.4
-
+-->
 <configurator xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../zcl.xsd">
   <domain name="Cameras"/>
   <enum name="PhysicalMovementEnum" type="enum8">
