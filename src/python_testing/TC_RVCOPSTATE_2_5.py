@@ -161,10 +161,14 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
         asserts.assert_equal(ret.commandResponseState.errorStateID, expected_error,
                              f"errorStateID({ret.commandResponseState.errorStateID}) should be {error_enum_to_text(expected_error)}")
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_RVCOPSTATE_2_5(self):
 
-        self.endpoint = self.get_endpoint(default=1)
+        self.endpoint = self.get_endpoint()
         # Allow some user input steps to be skipped if running under CI
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
 
