@@ -20,7 +20,11 @@
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
+<<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
 #include <app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.h>
+========
+#include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.h>
+>>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
 #include <app/persistence/AttributePersistenceProvider.h>
 #include <app/persistence/AttributePersistenceProviderInstance.h>
 #include <app/reporting/reporting.h>
@@ -50,7 +54,11 @@ namespace Clusters {
 namespace CameraAvStreamManagement {
 
 CameraAVStreamManagementCluster::CameraAVStreamManagementCluster(
+<<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
     CameraAVStreamManagementDelegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
+========
+    EndpointId aEndpointId, CameraAVStreamMgmtDelegate & aDelegate, const BitFlags<Feature> aFeatures,
+>>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
     const BitFlags<OptionalAttribute> aOptionalAttrs, uint8_t aMaxConcurrentEncoders, uint32_t aMaxEncodedPixelRate,
     const VideoSensorParamsStruct & aVideoSensorParams, bool aNightVisionUsesInfrared,
     const VideoResolutionStruct & aMinViewPortRes,
@@ -200,8 +208,12 @@ CameraAVStreamManagementCluster::ReadAndEncodeRateDistortionTradeOffPoints(const
     return CHIP_NO_ERROR;
 }
 
+<<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
 CHIP_ERROR
 CameraAVStreamManagementCluster::ReadAndEncodeSnapshotCapabilities(const AttributeValueEncoder::ListEncodeHelper & encoder)
+========
+CHIP_ERROR CameraAVStreamManagementCluster::ReadAndEncodeSnapshotCapabilities(const AttributeValueEncoder::ListEncodeHelper & encoder)
+>>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
 {
     for (const auto & snapshotCapabilities : mSnapshotCapabilitiesList)
     {
@@ -211,8 +223,12 @@ CameraAVStreamManagementCluster::ReadAndEncodeSnapshotCapabilities(const Attribu
     return CHIP_NO_ERROR;
 }
 
+<<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
 CHIP_ERROR
 CameraAVStreamManagementCluster::ReadAndEncodeSupportedStreamUsages(const AttributeValueEncoder::ListEncodeHelper & encoder)
+========
+CHIP_ERROR CameraAVStreamManagementCluster::ReadAndEncodeSupportedStreamUsages(const AttributeValueEncoder::ListEncodeHelper & encoder)
+>>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
 {
     for (const auto & supportedStreamUsage : mSupportedStreamUsages)
     {
@@ -222,8 +238,12 @@ CameraAVStreamManagementCluster::ReadAndEncodeSupportedStreamUsages(const Attrib
     return CHIP_NO_ERROR;
 }
 
+<<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
 CHIP_ERROR
 CameraAVStreamManagementCluster::ReadAndEncodeAllocatedVideoStreams(const AttributeValueEncoder::ListEncodeHelper & encoder)
+========
+CHIP_ERROR CameraAVStreamManagementCluster::ReadAndEncodeAllocatedVideoStreams(const AttributeValueEncoder::ListEncodeHelper & encoder)
+>>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
 {
     CHIP_FAULT_INJECT(chip::FaultInjection::kFault_ClearInMemoryAllocatedVideoStreams, mAllocatedVideoStreams.clear(););
     CHIP_FAULT_INJECT(chip::FaultInjection::kFault_LoadPersistentCameraAVSMAttributes, LoadPersistentAttributes(););
@@ -236,8 +256,12 @@ CameraAVStreamManagementCluster::ReadAndEncodeAllocatedVideoStreams(const Attrib
     return CHIP_NO_ERROR;
 }
 
+<<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
 CHIP_ERROR
 CameraAVStreamManagementCluster::ReadAndEncodeAllocatedAudioStreams(const AttributeValueEncoder::ListEncodeHelper & encoder)
+========
+CHIP_ERROR CameraAVStreamManagementCluster::ReadAndEncodeAllocatedAudioStreams(const AttributeValueEncoder::ListEncodeHelper & encoder)
+>>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
 {
     CHIP_FAULT_INJECT(chip::FaultInjection::kFault_ClearInMemoryAllocatedAudioStreams, mAllocatedAudioStreams.clear(););
     CHIP_FAULT_INJECT(chip::FaultInjection::kFault_LoadPersistentCameraAVSMAttributes, LoadPersistentAttributes(););
@@ -250,8 +274,12 @@ CameraAVStreamManagementCluster::ReadAndEncodeAllocatedAudioStreams(const Attrib
     return CHIP_NO_ERROR;
 }
 
+<<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
 CHIP_ERROR
 CameraAVStreamManagementCluster::ReadAndEncodeAllocatedSnapshotStreams(const AttributeValueEncoder::ListEncodeHelper & encoder)
+========
+CHIP_ERROR CameraAVStreamManagementCluster::ReadAndEncodeAllocatedSnapshotStreams(const AttributeValueEncoder::ListEncodeHelper & encoder)
+>>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
 {
     CHIP_FAULT_INJECT(chip::FaultInjection::kFault_ClearInMemoryAllocatedSnapshotStreams, mAllocatedSnapshotStreams.clear(););
     CHIP_FAULT_INJECT(chip::FaultInjection::kFault_LoadPersistentCameraAVSMAttributes, LoadPersistentAttributes(););
@@ -336,7 +364,11 @@ CHIP_ERROR CameraAVStreamManagementCluster::AddVideoStream(const VideoStreamStru
 }
 
 CHIP_ERROR CameraAVStreamManagementCluster::UpdateVideoStreamRangeParams(VideoStreamStruct & videoStreamToUpdate,
+<<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
                                                                          const VideoStreamStruct & videoStream, bool & wasModified)
+========
+                                                                  const VideoStreamStruct & videoStream, bool & wasModified)
+>>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
 {
     // Store original values to detect changes
     uint16_t origMinFrameRate = videoStreamToUpdate.minFrameRate;
@@ -403,7 +435,11 @@ CHIP_ERROR CameraAVStreamManagementCluster::RemoveAudioStream(uint16_t audioStre
 }
 
 std::optional<uint16_t> CameraAVStreamManagementCluster::GetReusableSnapshotStreamId(
+<<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
     const CameraAVStreamManagementDelegate::SnapshotStreamAllocateArgs & requestedArgs) const
+========
+    const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & requestedArgs) const
+>>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
 {
     for (const auto & stream : mAllocatedSnapshotStreams)
     {
@@ -447,8 +483,12 @@ CHIP_ERROR CameraAVStreamManagementCluster::AddSnapshotStream(const SnapshotStre
 }
 
 CHIP_ERROR CameraAVStreamManagementCluster::UpdateSnapshotStreamRangeParams(
+<<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
     SnapshotStreamStruct & snapshotStreamToUpdate,
     const CameraAVStreamManagementDelegate::SnapshotStreamAllocateArgs & snapshotStream)
+========
+    SnapshotStreamStruct & snapshotStreamToUpdate, const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & snapshotStream)
+>>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
 {
     // Store original values to detect changes
     uint16_t origMinResWidth  = snapshotStreamToUpdate.minResolution.width;
@@ -546,8 +586,13 @@ CHIP_ERROR CameraAVStreamManagementCluster::UpdateSnapshotStreamRefCount(uint16_
     return (it->referenceCount > 0) ? (it->referenceCount--, CHIP_NO_ERROR) : CHIP_ERROR_INVALID_INTEGER_VALUE;
 }
 
+<<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
+// AttributeAccessInterface
+CHIP_ERROR CameraAVStreamManagementCluster::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+========
 DataModel::ActionReturnStatus CameraAVStreamManagementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                              AttributeValueEncoder & aEncoder)
+>>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
 {
     VerifyOrDie(request.path.mClusterId == CameraAvStreamManagement::Id);
     ChipLogProgress(Zcl, "Camera AVStream Management[ep=%d]: Reading", mPath.mEndpointId);
@@ -829,8 +874,12 @@ DataModel::ActionReturnStatus CameraAVStreamManagementCluster::ReadAttribute(con
     return CHIP_NO_ERROR;
 }
 
+<<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
+CHIP_ERROR CameraAVStreamManagementCluster::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+========
 DataModel::ActionReturnStatus CameraAVStreamManagementCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                                               AttributeValueDecoder & aDecoder)
+>>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
 {
     VerifyOrDie(request.path.mClusterId == CameraAvStreamManagement::Id);
 
@@ -1001,7 +1050,11 @@ DataModel::ActionReturnStatus CameraAVStreamManagementCluster::WriteAttribute(co
 }
 
 void CameraAVStreamManagementCluster::ModifyVideoStream(const uint16_t streamID, const Optional<bool> waterMarkEnabled,
+<<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
                                                         const Optional<bool> osdEnabled)
+========
+                                                 const Optional<bool> osdEnabled)
+>>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
 {
     for (VideoStreamStruct & stream : mAllocatedVideoStreams)
     {
@@ -1022,7 +1075,11 @@ void CameraAVStreamManagementCluster::ModifyVideoStream(const uint16_t streamID,
 }
 
 void CameraAVStreamManagementCluster::ModifySnapshotStream(const uint16_t streamID, const Optional<bool> waterMarkEnabled,
+<<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
                                                            const Optional<bool> osdEnabled)
+========
+                                                    const Optional<bool> osdEnabled)
+>>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
 {
     for (SnapshotStreamStruct & stream : mAllocatedSnapshotStreams)
     {
@@ -1782,8 +1839,13 @@ CHIP_ERROR CameraAVStreamManagementCluster::LoadAllocatedStreams()
     return reader.VerifyEndOfContainer();
 }
 
+<<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
+// CommandHandlerInterface
+void CameraAVStreamManagementCluster::InvokeCommand(HandlerContext & handlerContext)
+========
 CHIP_ERROR CameraAVStreamManagementCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                                              ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+>>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
 {
     if (HasFeature(kAudio))
     {
@@ -1999,6 +2061,10 @@ std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::In
     }
 }
 
+<<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
+bool CameraAVStreamManagementCluster::StreamPrioritiesHasDuplicates(
+    const std::vector<Globals::StreamUsageEnum> & aStreamUsagePriorities)
+========
 CHIP_ERROR CameraAVStreamManagementCluster::Attributes(const ConcreteClusterPath & path,
                                                        ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
@@ -2054,6 +2120,7 @@ CHIP_ERROR CameraAVStreamManagementCluster::Attributes(const ConcreteClusterPath
 }
 
 bool CameraAVStreamManagementCluster::StreamPrioritiesHasDuplicates(const std::vector<Globals::StreamUsageEnum> & aStreamUsagePriorities)
+>>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
 {
     std::set<Globals::StreamUsageEnum> seenStreamUsages;
 
@@ -2068,7 +2135,11 @@ bool CameraAVStreamManagementCluster::StreamPrioritiesHasDuplicates(const std::v
     return false;
 }
 
+<<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
+void CameraAVStreamManagementCluster::HandleVideoStreamAllocate(HandlerContext & ctx,
+========
 std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::HandleVideoStreamAllocate(CommandHandler * handler, const ConcreteCommandPath & commandPath,
+>>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
                                                                 const Commands::VideoStreamAllocate::DecodableType & commandData)
 {
     Status status = Status::Success;
@@ -2181,7 +2252,11 @@ std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::Ha
     }
 }
 
+<<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
+void CameraAVStreamManagementCluster::HandleVideoStreamModify(HandlerContext & ctx,
+========
 std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::HandleVideoStreamModify(CommandHandler * handler, const ConcreteCommandPath & commandPath,
+>>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
                                                               const Commands::VideoStreamModify::DecodableType & commandData)
 {
     auto & isWaterMarkEnabled = commandData.watermarkEnabled;
@@ -2229,8 +2304,13 @@ std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::Ha
     handler->AddStatus(commandPath, status);
 }
 
+<<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
+void CameraAVStreamManagementCluster::HandleVideoStreamDeallocate(
+    HandlerContext & ctx, const Commands::VideoStreamDeallocate::DecodableType & commandData)
+========
 std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::HandleVideoStreamDeallocate(CommandHandler * handler, const ConcreteCommandPath & commandPath,
                                                                   const Commands::VideoStreamDeallocate::DecodableType & commandData)
+>>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
 {
     auto & videoStreamID = commandData.videoStreamID;
 
@@ -2250,7 +2330,11 @@ std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::Ha
     handler->AddStatus(commandPath, status);
 }
 
+<<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
+void CameraAVStreamManagementCluster::HandleAudioStreamAllocate(HandlerContext & ctx,
+========
 std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::HandleAudioStreamAllocate(CommandHandler * handler, const ConcreteCommandPath & commandPath,
+>>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
                                                                 const Commands::AudioStreamAllocate::DecodableType & commandData)
 {
 
@@ -2333,8 +2417,13 @@ std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::Ha
     handler->AddResponse(commandPath, response);
 }
 
+<<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
+void CameraAVStreamManagementCluster::HandleAudioStreamDeallocate(
+    HandlerContext & ctx, const Commands::AudioStreamDeallocate::DecodableType & commandData)
+========
 std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::HandleAudioStreamDeallocate(CommandHandler * handler, const ConcreteCommandPath & commandPath,
                                                                   const Commands::AudioStreamDeallocate::DecodableType & commandData)
+>>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
 {
     auto & audioStreamID = commandData.audioStreamID;
 
@@ -2354,8 +2443,13 @@ std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::Ha
     handler->AddStatus(commandPath, status);
 }
 
+<<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
+void CameraAVStreamManagementCluster::HandleSnapshotStreamAllocate(
+    HandlerContext & ctx, const Commands::SnapshotStreamAllocate::DecodableType & commandData)
+========
 std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::HandleSnapshotStreamAllocate(CommandHandler * handler, const ConcreteCommandPath & commandPath,
                                                                    const Commands::SnapshotStreamAllocate::DecodableType & commandData)
+>>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
 {
 
     Commands::SnapshotStreamAllocateResponse::Type response;
@@ -2476,7 +2570,11 @@ std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::Ha
     handler->AddResponse(commandPath, response);
 }
 
+<<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
+void CameraAVStreamManagementCluster::HandleSnapshotStreamModify(HandlerContext & ctx,
+========
 std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::HandleSnapshotStreamModify(CommandHandler * handler, const ConcreteCommandPath & commandPath,
+>>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
                                                                  const Commands::SnapshotStreamModify::DecodableType & commandData)
 {
     Status status             = Status::Success;
@@ -2525,8 +2623,13 @@ std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::Ha
     handler->AddStatus(commandPath, status);
 }
 
+<<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
+void CameraAVStreamManagementCluster::HandleSnapshotStreamDeallocate(
+    HandlerContext & ctx, const Commands::SnapshotStreamDeallocate::DecodableType & commandData)
+========
 std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::HandleSnapshotStreamDeallocate(CommandHandler * handler, const ConcreteCommandPath & commandPath,
                                                                      const Commands::SnapshotStreamDeallocate::DecodableType & commandData)
+>>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
 {
     auto & snapshotStreamID = commandData.snapshotStreamID;
 
@@ -2546,7 +2649,11 @@ std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::Ha
     handler->AddStatus(commandPath, status);
 }
 
+<<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
+void CameraAVStreamManagementCluster::HandleSetStreamPriorities(HandlerContext & ctx,
+========
 std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::HandleSetStreamPriorities(CommandHandler * handler, const ConcreteCommandPath & commandPath,
+>>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
                                                                 const Commands::SetStreamPriorities::DecodableType & commandData)
 {
 
@@ -2599,7 +2706,11 @@ std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::Ha
     handler->AddStatus(commandPath, Status::Success);
 }
 
+<<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
+void CameraAVStreamManagementCluster::HandleCaptureSnapshot(HandlerContext & ctx,
+========
 std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::HandleCaptureSnapshot(CommandHandler * handler, const ConcreteCommandPath & commandPath,
+>>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
                                                             const Commands::CaptureSnapshot::DecodableType & commandData)
 {
 
@@ -2653,7 +2764,11 @@ std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::Ha
     handler->AddResponse(commandPath, response);
 }
 
+<<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
+bool CameraAVStreamManagementCluster::CheckSnapshotStreamsAvailability(HandlerContext & ctx)
+========
 bool CameraAVStreamManagementCluster::CheckSnapshotStreamsAvailability(CommandHandler * handler, const ConcreteCommandPath & commandPath)
+>>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
 {
     if (mAllocatedSnapshotStreams.empty())
     {
@@ -2665,7 +2780,11 @@ bool CameraAVStreamManagementCluster::CheckSnapshotStreamsAvailability(CommandHa
 }
 
 bool CameraAVStreamManagementCluster::ValidateSnapshotStreamId(const DataModel::Nullable<uint16_t> & snapshotStreamID,
+<<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
+                                                               HandlerContext & ctx)
+========
                                                                CommandHandler * handler, const ConcreteCommandPath & commandPath)
+>>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
 {
     auto found = std::find_if(mAllocatedSnapshotStreams.begin(), mAllocatedSnapshotStreams.end(),
                               [&](const SnapshotStreamStruct & s) { return s.snapshotStreamID == snapshotStreamID.Value(); });
@@ -2678,8 +2797,12 @@ bool CameraAVStreamManagementCluster::ValidateSnapshotStreamId(const DataModel::
     return true;
 }
 
+<<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
+bool CameraAVStreamManagementCluster::ValidateVideoStreamForModifyOrDeallocate(const uint16_t videoStreamID, HandlerContext & ctx,
+========
 bool CameraAVStreamManagementCluster::ValidateVideoStreamForModifyOrDeallocate(const uint16_t videoStreamID, CommandHandler * handler,
                                                                                const ConcreteCommandPath & commandPath,
+>>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
                                                                                bool isDeallocate)
 {
     return ValidateStreamForModifyOrDeallocateImpl(
@@ -2687,8 +2810,12 @@ bool CameraAVStreamManagementCluster::ValidateVideoStreamForModifyOrDeallocate(c
         isDeallocate);
 }
 
+<<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
+bool CameraAVStreamManagementCluster::ValidateAudioStreamForDeallocate(const uint16_t audioStreamID, HandlerContext & ctx)
+========
 bool CameraAVStreamManagementCluster::ValidateAudioStreamForDeallocate(const uint16_t audioStreamID, CommandHandler * handler,
                                                                        const ConcreteCommandPath & commandPath)
+>>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
 {
     return ValidateStreamForModifyOrDeallocateImpl(
         mAllocatedAudioStreams, audioStreamID, handler, commandPath, StreamType::kAudio, [](const AudioStreamStruct & s) { return s.audioStreamID; },
@@ -2696,16 +2823,25 @@ bool CameraAVStreamManagementCluster::ValidateAudioStreamForDeallocate(const uin
 }
 
 bool CameraAVStreamManagementCluster::ValidateSnapshotStreamForModifyOrDeallocate(const uint16_t snapshotStreamID,
+<<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
+                                                                                  HandlerContext & ctx, bool isDeallocate)
+========
                                                                                   CommandHandler * handler,
                                                                                   const ConcreteCommandPath & commandPath,
                                                                                   bool isDeallocate)
+>>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
 {
     return ValidateStreamForModifyOrDeallocateImpl(
         mAllocatedSnapshotStreams, snapshotStreamID, handler, commandPath, StreamType::kSnapshot,
         [](const SnapshotStreamStruct & s) { return s.snapshotStreamID; }, isDeallocate);
 }
 
+<<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
+bool CameraAVStreamManagementCluster::IsResourceAvailableForStreamAllocation(uint32_t candidateEncodedPixelRate,
+                                                                             bool encoderRequired)
+========
 bool CameraAVStreamManagementCluster::IsResourceAvailableForStreamAllocation(uint32_t candidateEncodedPixelRate, bool encoderRequired)
+>>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
 {
     uint64_t totalEncodedPixelRate = candidateEncodedPixelRate;
     uint16_t totalEncodersRequired = encoderRequired ? 1 : 0;

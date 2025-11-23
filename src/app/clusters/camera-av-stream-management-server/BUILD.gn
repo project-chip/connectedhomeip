@@ -11,5 +11,34 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+source_set("camera-av-stream-management-server-impl") {
+  sources = [ "camera-av-stream-management-cluster.cpp" ]
+
+  deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
+
+  public_deps = [ ":camera-av-stream-management-cluster" ]
+}
+
+source_set("camera-av-stream-management-cluster") {
+  sources = [ "camera-av-stream-management-cluster.h" ]
+
+  public_deps = [
+    "${chip_root}/src/app:constants",
+    "${chip_root}/src/app:interaction-model",
+    "${chip_root}/src/app/data-model-provider",
+    "${chip_root}/src/app/persistence",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/zzz_generated/app-common/clusters/CameraAvStreamManagement",
+  ]
+}
+
 group("camera-av-stream-management-server") {
+  public_deps = [
+    ":camera-av-stream-management-server-impl",
+  ]
 }
