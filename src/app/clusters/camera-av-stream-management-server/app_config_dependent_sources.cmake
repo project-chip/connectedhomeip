@@ -16,6 +16,12 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/camera-av-stream-management-server.cpp"
-    "${CLUSTER_DIR}/camera-av-stream-management-server.h"
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+)
+
+TARGET_SOURCES(
+  ${APP_TARGET}
+  PRIVATE
+    "${CLUSTER_DIR}/camera-av-stream-management-cluster.cpp"
+    "${CLUSTER_DIR}/camera-av-stream-management-cluster.h"
 )
