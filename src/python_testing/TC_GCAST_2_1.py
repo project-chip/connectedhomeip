@@ -14,7 +14,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-# TODO: Modify this
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 #
@@ -28,7 +27,6 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --endpoint 1
@@ -37,10 +35,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-from typing import List
-
 from mobly import asserts
-
 import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
@@ -57,9 +52,14 @@ class TC_GCAST_2_1(MatterBaseTest):
                 TestStep(2, "TH reads from the DUT the Membership attribute"),
                 TestStep(3, "TH reads from the DUT the MaxMembershipCount attribute")]
 
+    def pics_TC_GCAST_2_1(self) -> list[str]:
+        pics = ["GCAST.S"]
+        return pics
+
     @async_test_body
     async def test_TC_GCAST_2_1(self):
-        endpoint = 0 # TODO: Change this variable name
+        if self.matter_test_config.endpoint is None:
+            self.matter_test_config.endpoint = 1
         cluster = Clusters.Objects.Groupcast
         membership_attribute = Clusters.Groupcast.Attributes.Membership
         max_membership_count_attribute = Clusters.Groupcast.Attributes.MaxMembershipCount
@@ -67,15 +67,12 @@ class TC_GCAST_2_1(MatterBaseTest):
         self.step(1)
 
         self.step(2)
-        membership = await self.read_single_attribute_check_success(cluster, membership_attribute, endpoint=endpoint)
-        # Don't think I need to check these below?
-        # Return a list that is possibly empty
-        # Validate fabric-scoped list type
+        membership = await self.read_single_attribute_check_success(cluster, membership_attribute)
+        asserts.assert_is_instance(membership, list, "Membership attribute should be a list")
 
         self.step(3)
-        M_max = await self.read_single_attribute_check_success(cluster, max_membership_count_attribute, endpoint=endpoint)
+        M_max = await self.read_single_attribute_check_success(cluster, max_membership_count_attribute)
         asserts.assert_true(M_max >= 10)
-        # Store the value of M_max?
 
 if __name__ == "__main__":
     default_matter_test_main()

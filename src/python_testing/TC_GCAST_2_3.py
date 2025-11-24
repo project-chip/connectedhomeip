@@ -14,7 +14,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-# TODO: Modify this
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 #
@@ -28,7 +27,6 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --endpoint 1
@@ -38,23 +36,12 @@
 
 import logging
 import time
-from typing import List
-
-# TODO: These imports are the right ones when the environment is built,
-#  need to make sure that when I add new code that I add imports when needed
-# from mobly import asserts
-# from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-# import matter.clusters as Clusters
-# from matter.interaction_model import Status
-# from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-
-# TODO: TEMPORARY IMPORTS FOR SCRIPTING WITHOUT BUILDING ENVIRONMENT
 from mobly import asserts
-from matter_testing_infrastructure.matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
-from matter_testing_infrastructure.matter.testing.runner import TestStep
-from matter_testing_infrastructure.matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-import src.controller.python.matter.clusters as Clusters
-from src.controller.python.matter.interaction_model import InteractionModelError, Status
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+import matter.clusters as Clusters
+from matter.interaction_model import Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.interaction_model import InteractionModelError, Status
 
 logger = logging.getLogger(__name__)
 
@@ -83,16 +70,11 @@ class TC_GCAST_2_3(MatterBaseTest):
             TestStep(12, "Update Group G1 with KeyID already used by another group. "),
         ]
 
-    @async_test_body
-    async def test_TC_GCAST_2_3(self):
-        groupcast_cluster = Clusters.Objects.Groupcast
-        membership_attribute = Clusters.Groupcast.Attributes.Membership
-        if self.matter_test_config.endpoint is None:
-            self.matter_test_config.endpoint = 0
+    def pics_TC_GCAST_2_3(self) -> list[str]:
+        pics = ["GCAST.S", "GCAST.S.C00.Rsp", "GCAST.S.C02.Rsp"]
+        return pics
 
-        # PICS: GCAST.S, GCAST.S.C02.Rsp(UpdateGroupKey), GCAST.S.C00.Rsp(JoinGroup)
-
-        self.step("1a")
+    async def retrieve_join_group_cmds_endpoints(self):
         feature_map = await self.read_single_attribute_check_success(
             Clusters.Groupcast,
             Clusters.Groupcast.Attributes.FeatureMap)
@@ -104,14 +86,43 @@ class TC_GCAST_2_3(MatterBaseTest):
         if sd_enabled and not ln_enabled:
             join_group_cmd_endpoints = []
         elif ln_enabled:
-            pass
-            # join_group_cmd_endpoints
-        # TODO: Determine endpoints here, see this:
-        #  Typically a endpoint with a device type that can leverage group commands, example any Lighting device type (OnOff, Dimmable Light, color light)
+            device_type_list = await self.read_single_attribute_all_endpoints(
+                cluster=Clusters.Descriptor,
+                attribute=Clusters.Descriptor.Attributes.DeviceTypeList)
+            logging.info(f"Device Type List: {device_type_list}") # Example output -> device_type_list = {0: [Descriptor.Structs.DeviceTypeStruct(deviceType=18, revision=1), Descriptor.Structs.DeviceTypeStruct(deviceType=22, revision=3)], 1: [Descriptor.Structs.DeviceTypeStruct(deviceType=14, revision=2)]}
+            join_group_cmd_endpoints = []
+            for endpoint, device_types in device_type_list.items():
+                if endpoint == 0:
+                    continue
+                for device_type in device_types:
+                    if device_type.deviceType == 14:  # Aggregator
+                        continue
+                    else:
+                        server_list = await self.read_single_attribute_check_success(
+                            cluster=Clusters.Descriptor,
+                            attribute=Clusters.Descriptor.Attributes.ServerList,
+                            endpoint=endpoint)
+                        logging.info(f"Server List: {server_list}") # Example output -> [63, 62, 60, 51, 48, 44, 43, 40, 31, 29, 49, 42, 53]
+                        # TODO: will need to check if a cluster supports groupcast commands, then add it as a valid endpoint. Which clusters should be here apart from OnOff?
+                        if Clusters.OnOff.id in server_list:
+                            join_group_cmd_endpoints.append(endpoint)
+                            break # TODO: 1 endpoint is enough here?
+            asserts.assert_true(len(join_group_cmd_endpoints),
+                                "Endpoint list should not be empty. There should be a valid endpoint for the GroupCast JoinGroup Command.")
+        return join_group_cmd_endpoints
+
+    @async_test_body
+    async def test_TC_GCAST_2_3(self):
+        if self.matter_test_config.endpoint is None:
+            self.matter_test_config.endpoint = 1
+        groupcast_cluster = Clusters.Objects.Groupcast
+        membership_attribute = Clusters.Groupcast.Attributes.Membership
+
+        self.step("1a")
+        join_group_cmd_endpoints = self.retrieve_join_group_cmds_endpoints()
 
         self.step("1b")
-        # TODO: not sure if this is the right command.
-        await self.send_single_cmd(Clusters.Groups.Commands.RemoveAllGroups())
+        await self.send_single_cmd(Clusters.Groupcast.Commands.LeaveGroup(groupID=0))
 
         self.step("1c")
         sub = AttributeSubscriptionHandler(groupcast_cluster, membership_attribute)
@@ -167,7 +178,6 @@ class TC_GCAST_2_3(MatterBaseTest):
         asserts.assert_equal(group1_entry.expiringKeyID, keyID1, f"Expected ExpiringKeyID={keyID1}, got {group1_entry.expiringKeyID}")
 
         self.step(4)
-        # Update Group G2 generating a new Key with KeyId=ExpiringKeyID K1: {THcommand} {C_UPDATEGROUPKEY} (GroupID=G2, KeyID=K1, Key=InputKey4) | {resDutAlreadyExists}
         inputKey4 = bytes.fromhex("d0d1e2d3d4d5d6d7bed9dadbdcdddedf")
         try:
             await self.send_single_cmd(Clusters.Groupcast.Commands.UpdateGroupKey(
@@ -177,14 +187,13 @@ class TC_GCAST_2_3(MatterBaseTest):
             )
             asserts.fail("Unexpected success returned from sending UpdateGroupKey command.")
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.AlreadyExists, "Unexpected error returned from sending UpdateGroupKey command.")
+            asserts.assert_equal(e.status, Status.AlreadyExists,
+                                 f"Send UpdateGroupKey command error should be {Status.AlreadyExists} instead of {e.status}")
 
         self.step(5)
-        # TH Wait GracePeriod(GP) + tolerance (+10%)
         time.sleep(gracePeriod * 1.1)
 
         self.step(6)
-        # {THawaitsSubReport} new {A_MEMBERSHIP} within max interval.                      | No ExpiringKeyID; only KeyID=K3 remains
         sub.wait_for_attribute_report()
         membership_reports = sub.attribute_reports.get(membership_attribute, [])
         asserts.assert_greater(len(membership_reports), 0, "No membership reports received")
@@ -198,9 +207,7 @@ class TC_GCAST_2_3(MatterBaseTest):
         asserts.assert_equal(group1_entry.keyID, keyID3, f"Expected KeyID={keyID3}, got {group1_entry.keyID}")
         asserts.assert_is_none(group1_entry.expiringKeyID, "ExpiringKeyID should not be present")
 
-
         self.step(7)
-        # Repeat Step 4, It SHALL now succeed: {THcommand} {C_UPDATEGROUPKEY} (GroupID=G2, KeyID=K1, Key=InputKey4) | {resDutSuccess}
         await self.send_single_cmd(Clusters.Groupcast.Commands.UpdateGroupKey(
             groupID=groupID2,
             keyID=keyID1,
@@ -208,7 +215,6 @@ class TC_GCAST_2_3(MatterBaseTest):
         )
 
         self.step(8)
-        # Update Group G1 generating a new Key for an existing KeyID K2: {THcommand} {C_UPDATEGROUPKEY} (GroupID=G1, KeyID=K2, Key=InputKey3) | {resDutAlreadyExists}
         try:
             await self.send_single_cmd(Clusters.Groupcast.Commands.UpdateGroupKey(
                 groupID=groupID1,
@@ -217,10 +223,10 @@ class TC_GCAST_2_3(MatterBaseTest):
             )
             asserts.fail("Unexpected success returned from sending UpdateGroupKey command.")
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.AlreadyExists, "Unexpected error returned from sending UpdateGroupKey command.")
+            asserts.assert_equal(e.status, Status.AlreadyExists,
+                                 f"Send UpdateGroupKey command error should be {Status.AlreadyExists} instead of {e.status}")
 
         self.step(9)
-        # Update Group G1 with a new KeyID K4 without provide an InputKey: {THcommand} {C_UPDATEGROUPKEY} (GroupID=G1, KeyID=K4, Key omitted)               | {resDutFailure}
         keyID4 = 4
         try:
             await self.send_single_cmd(Clusters.Groupcast.Commands.UpdateGroupKey(
@@ -229,10 +235,10 @@ class TC_GCAST_2_3(MatterBaseTest):
             )
             asserts.fail("Unexpected success returned from sending UpdateGroupKey command.")
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Failure, "Unexpected error returned from sending UpdateGroupKey command.")
+            asserts.assert_equal(e.status, Status.Failure,
+                                 f"Send UpdateGroupKey command error should be {Status.Failure} instead of {e.status}")
 
         self.step(10)
-        # Update Group G1 generating a new KeyID K4 with invalid Key length: {THcommand} {C_UPDATEGROUPKEY} (GroupID=G1, KeyID=K4, Key= Input with length !=16) | {resDutConstraintError}
         inputKey4InvalidLength = bytes.fromhex("d0d1e2d3d4d5d6d7bed9dadbdcddde")
         try:
             await self.send_single_cmd(Clusters.Groupcast.Commands.UpdateGroupKey(
@@ -242,10 +248,10 @@ class TC_GCAST_2_3(MatterBaseTest):
             )
             asserts.fail("Unexpected success returned from sending UpdateGroupKey command.")
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected error returned from sending UpdateGroupKey command.")
+            asserts.assert_equal(e.status, Status.ConstraintError,
+                                 f"Send UpdateGroupKey command error should be {Status.ConstraintError} instead of {e.status}")
 
         self.step(11)
-        # Update Group G1 generating a new KeyID K4 with GracePeriod exceeding limit: {THcommand} {C_UPDATEGROUPKEY} (GroupID=G1, KeyID=K4, Key=InputKey4,GracePeriod=86401) | {resDutConstraintError}
         gracePeriodInvalidLimit = 86401
         try:
             await self.send_single_cmd(Clusters.Groupcast.Commands.UpdateGroupKey(
@@ -256,10 +262,10 @@ class TC_GCAST_2_3(MatterBaseTest):
             )
             asserts.fail("Unexpected success returned from sending UpdateGroupKey command.")
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected error returned from sending UpdateGroupKey command.")
+            asserts.assert_equal(e.status, Status.ConstraintError,
+                                 f"Send UpdateGroupKey command error should be {Status.ConstraintError} instead of {e.status}")
 
         self.step(12)
-        # Update Group G1 with KeyID already used by another group: {THcommand} {C_UPDATEGROUPKEY} (GroupID=G1, KeyID=K2) | {resDutSuccess}
         await self.send_single_cmd(Clusters.Groupcast.Commands.UpdateGroupKey(
             groupID=groupID1,
             keyID=keyID2)
