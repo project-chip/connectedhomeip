@@ -96,4 +96,4 @@ class MatterTestConfig:
     restart_flag_file: Optional[pathlib.Path] = None
 
     # Debug mode to capture attribute dump at end of test modules
-    # debug: bool = False
+    debug: bool = False
