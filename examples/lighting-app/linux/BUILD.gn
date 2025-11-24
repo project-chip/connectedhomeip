@@ -39,6 +39,8 @@ executable("chip-lighting-app") {
     "LightingAppCommandDelegate.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
+    "DevKitExtension.cpp",
+    "DevKitExtension.h",
   ]
 
   deps = [

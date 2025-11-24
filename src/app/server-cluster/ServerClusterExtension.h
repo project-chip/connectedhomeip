@@ -20,8 +20,7 @@
 #include <app/server-cluster/ServerClusterInterface.h>
 #include <lib/support/Span.h>
 
-namespace chip {
-namespace app {
+namespace chip::app {
 
 /// A proxy for a ServerClusterInterface that adds data version management and attribute change notifications.
 ///
@@ -70,5 +69,4 @@ protected:
     void NotifyAttributeChanged(const AttributePathParams & path);
 };
 
-} // namespace app
-} // namespace chip
+} // namespace chip::app
