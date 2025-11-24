@@ -44,10 +44,13 @@ public:
                                                                  GeneralDiagnostics::Attributes::ActiveRadioFaults::Id,     //
                                                                  GeneralDiagnostics::Attributes::ActiveNetworkFaults::Id,   //
                                                                  GeneralDiagnostics::Attributes::DeviceLoadStatus::Id       //
+                                                                 // NOTE: Uptime is optional in the XML, however mandatory since revision 2.
+                                                                 //       it will be forced as mandatory by the cluster constructor
                                                                  >;
 
     GeneralDiagnosticsCluster(OptionalAttributeSet optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature> featureFlags) :
-        DefaultServerCluster({ kRootEndpointId, GeneralDiagnostics::Id }), mOptionalAttributeSet(optionalAttributeSet),
+        DefaultServerCluster({ kRootEndpointId, GeneralDiagnostics::Id }), 
+        mOptionalAttributeSet(optionalAttributeSet.ForceSet<GeneralDiagnostics::Attributes::UpTime::Id>()),
         mFeatureFlags(featureFlags)
     {}
 

@@ -324,13 +324,9 @@ CHIP_ERROR GeneralDiagnosticsCluster::Attributes(const ConcreteClusterPath & pat
         GeneralDiagnostics::Attributes::ActiveHardwareFaults::kMetadataEntry,
         GeneralDiagnostics::Attributes::ActiveRadioFaults::kMetadataEntry,
         GeneralDiagnostics::Attributes::ActiveNetworkFaults::kMetadataEntry,
+        GeneralDiagnostics::Attributes::UpTime::kMetadataEntry,
         GeneralDiagnostics::Attributes::DeviceLoadStatus::kMetadataEntry,
     };
-
-    if (mFeatureFlags.Has(GeneralDiagnostics::Feature::kDeviceLoad))
-    {
-        mOptionalAttributeSet.Set<GeneralDiagnostics::Attributes::DeviceLoadStatus::Id>();
-    }
 
     return listBuilder.Append(Span(GeneralDiagnostics::Attributes::kMandatoryMetadata), Span(optionalAttributeEntries),
                               mOptionalAttributeSet);
