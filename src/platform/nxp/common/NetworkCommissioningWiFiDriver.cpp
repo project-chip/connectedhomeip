@@ -145,6 +145,9 @@ CHIP_ERROR NXPWiFiDriver::RevertConfiguration()
     /* Reset mStagingNetwork as it may have been updated during add/update network operation */
     mStagingNetwork = mSavedNetwork;
 
+    // succeed right away if we are already connected
+    VerifyOrReturnError(!is_sta_connected(), CHIP_NO_ERROR);
+
     // succeed right away if no saved network
     VerifyOrReturnError(mStagingNetwork.ssidLen > 0, CHIP_NO_ERROR);
     // Connect to saved network
