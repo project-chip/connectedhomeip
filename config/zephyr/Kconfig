@@ -564,6 +564,39 @@ config CHIP_SYSTEM_USE_ZEPHYR_SOCKET_EXTENSIONS
 	  Enables the use of Zephyr socket extensions in the Matter System Layer
 	  socket implementation.
 
+config CHIP_TASK_PRIORITY
+	int "Matter task priority"
+	default 1
+	help
+	  Set the Zephyr thread priority for the Matter main task (CHIP event loop).
+	  This value is passed to K_PRIO_PREEMPT(). Lower values mean higher priority.
+
+config CHIP_TASK_STACK_SIZE
+	int "Matter task stack size"
+	default 8192
+	help
+	  Set the stack size (in bytes) for the Matter main task (CHIP event loop).
+
+config MAX_EVENT_QUEUE_SIZE
+	int "Maximum Matter event queue size"
+	default 100
+	help
+	  Set the maximum number of events that can be queued in the Matter event loop.
+
+config CHIP_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+	int "MRP Local Active Retry Interval (ms)"
+	default 2000 if NET_L2_OPENTHREAD
+	default 300
+	help
+	  Sets the local active retry interval (in milliseconds) for Matter Message Reliability Protocol (MRP).
+
+config CHIP_MRP_LOCAL_IDLE_RETRY_INTERVAL
+	int "MRP Local Idle Retry Interval (ms)"
+	default 2000 if NET_L2_OPENTHREAD
+	default 500
+	help
+	  Sets the local idle retry interval (in milliseconds) for Matter Message Reliability Protocol (MRP).
+
 module = MATTER
 module-str = Matter
 source "${ZEPHYR_BASE}/subsys/logging/Kconfig.template.log_config"
