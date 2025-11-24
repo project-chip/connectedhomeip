@@ -38,9 +38,9 @@ DataModel::ActionReturnStatus DevKitInformationExtension::ReadAttribute(const Da
         return encoder.Encode(mDevKitName);
     case kUserLedAttributeId:
         return encoder.Encode(mHasLED);
+    default:
+        return mUnderlying.ReadAttribute(request, encoder);
     }
-
-    return mUnderlying.ReadAttribute(request, encoder);
 }
 CHIP_ERROR DevKitInformationExtension::Attributes(const ConcreteClusterPath & path,
                                                   ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
