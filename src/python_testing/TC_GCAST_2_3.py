@@ -74,7 +74,7 @@ class TC_GCAST_2_3(MatterBaseTest):
         pics = ["GCAST.S", "GCAST.S.C00.Rsp", "GCAST.S.C02.Rsp"]
         return pics
 
-    async def retrieve_join_group_cmds_endpoints(self):
+    async def retrieve_join_group_cmd_endpoints(self):
         feature_map = await self.read_single_attribute_check_success(
             Clusters.Groupcast,
             Clusters.Groupcast.Attributes.FeatureMap)
@@ -119,7 +119,7 @@ class TC_GCAST_2_3(MatterBaseTest):
         membership_attribute = Clusters.Groupcast.Attributes.Membership
 
         self.step("1a")
-        join_group_cmd_endpoints = self.retrieve_join_group_cmds_endpoints()
+        join_group_cmd_endpoints = self.retrieve_join_group_cmd_endpoints()
 
         self.step("1b")
         await self.send_single_cmd(Clusters.Groupcast.Commands.LeaveGroup(groupID=0))
