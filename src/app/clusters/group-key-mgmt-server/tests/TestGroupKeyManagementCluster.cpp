@@ -129,6 +129,83 @@ CreateGroupKeyMapList(size_t count, FabricIndex fabricIndex, GroupId startGroupI
 
 } // namespace TestHelpers
 
+class MockSessionKeystore : public Crypto::SessionKeystore
+{
+public:
+    using P256ECDHDerivedSecret        = Crypto::P256ECDHDerivedSecret;
+    using Symmetric128BitsKeyByteArray = Crypto::Symmetric128BitsKeyByteArray;
+    using Aes128KeyHandle              = Crypto::Aes128KeyHandle;
+    using Hmac128KeyHandle             = Crypto::Hmac128KeyHandle;
+    using HkdfKeyHandle                = Crypto::HkdfKeyHandle;
+    using Symmetric128BitsKeyHandle    = Crypto::Symmetric128BitsKeyHandle;
+    using AttestationChallenge         = Crypto::AttestationChallenge;
+
+    MockSessionKeystore()           = default;
+    ~MockSessionKeystore() override = default;
+
+    CHIP_ERROR CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Aes128KeyHandle & key) override
+    {
+        memcpy(key.AsMutable<Symmetric128BitsKeyByteArray>(), keyMaterial, sizeof(Symmetric128BitsKeyByteArray));
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Hmac128KeyHandle & key) override
+    {
+        memcpy(key.AsMutable<Symmetric128BitsKeyByteArray>(), keyMaterial, sizeof(Symmetric128BitsKeyByteArray));
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR CreateKey(const ByteSpan & keyMaterial, HkdfKeyHandle & key) override
+    {
+        auto & rawKey = key.AsMutable<std::array<uint8_t, 32>>(); // adjust if your Hkdf handle differs
+        VerifyOrReturnError(keyMaterial.size() <= rawKey.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(rawKey.data(), keyMaterial.data(), keyMaterial.size());
+        return CHIP_NO_ERROR;
+    }
+
+    void DestroyKey(Symmetric128BitsKeyHandle & key) override
+    {
+        memset(key.AsMutable<Symmetric128BitsKeyByteArray>(), 0, sizeof(Symmetric128BitsKeyByteArray));
+    }
+
+    void DestroyKey(HkdfKeyHandle & key) override
+    {
+        auto & rawKey = key.AsMutable<std::array<uint8_t, 32>>();
+        memset(rawKey.data(), 0, rawKey.size());
+    }
+
+    CHIP_ERROR DeriveKey(const P256ECDHDerivedSecret & /*secret*/, const ByteSpan & /*salt*/, const ByteSpan & /*info*/,
+                         Aes128KeyHandle & key) override
+    {
+        std::array<uint8_t, sizeof(Symmetric128BitsKeyByteArray)> dummy = {};
+        memcpy(key.AsMutable<Symmetric128BitsKeyByteArray>(), dummy.data(), dummy.size());
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR DeriveSessionKeys(const ByteSpan & /*secret*/, const ByteSpan & /*salt*/, const ByteSpan & /*info*/,
+                                 Aes128KeyHandle & i2rKey, Aes128KeyHandle & r2iKey,
+                                 AttestationChallenge & attestationChallenge) override
+    {
+        std::array<uint8_t, sizeof(Symmetric128BitsKeyByteArray)> dummy = {};
+        memcpy(i2rKey.AsMutable<Symmetric128BitsKeyByteArray>(), dummy.data(), dummy.size());
+        memcpy(r2iKey.AsMutable<Symmetric128BitsKeyByteArray>(), dummy.data(), dummy.size());
+        ZeroAttestationChallenge(attestationChallenge);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR DeriveSessionKeys(const HkdfKeyHandle & /*hkdfKey*/, const ByteSpan & /*salt*/, const ByteSpan & /*info*/,
+                                 Aes128KeyHandle & i2rKey, Aes128KeyHandle & r2iKey,
+                                 AttestationChallenge & attestationChallenge) override
+    {
+        return DeriveSessionKeys(ByteSpan{}, ByteSpan{}, ByteSpan{}, i2rKey, r2iKey, attestationChallenge);
+    }
+
+private:
+    void ZeroAttestationChallenge(AttestationChallenge & challenge)
+    {
+        memset(challenge.Bytes(), 0, AttestationChallenge::Capacity());
+    }
+};
 struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementCluster
 {
     TestServerClusterContext mTestContext;
