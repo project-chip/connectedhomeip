@@ -20,21 +20,12 @@
 
 namespace chip::app {
 
-// <attribute side="server" code="0xfff10000" define="DEV_KIT_NAME" type="char_string" writable="true" optional="false" default="Nordic Development Kit" name="DevKitName"/>
-// <attribute side="server" code="0xfff10001" define="USER_LED" type="boolean" length="0" writable="false" reportable="false" isNullable="false" default="false" optional="false" apiMaturity="provisional" name="UserLED">
-//   <access op="read" role="view"/>
-// </attribute>
-class DevKitInformationExtension : public ServerClusterExtension {
+class DevKitInformationExtension : public ServerClusterExtension
+{
 public:
-    DevKitInformationExtension(ServerClusterInterface & other,
-        CharSpan devKitName,
-        bool hasLED)
-        : ServerClusterExtension(other)
-        , mDevKitName(devKitName)
-        , mHasLED(hasLED)
-    {
-    }
-
+    DevKitInformationExtension(ServerClusterInterface & other, CharSpan devKitName, bool hasLED) :
+        ServerClusterExtension(other), mDevKitName(devKitName), mHasLED(hasLED)
+    {}
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;

@@ -16,16 +16,16 @@
  *    limitations under the License.
  */
 
+#include "DevKitExtension.h"
 #include "LightingAppCommandDelegate.h"
 #include "LightingManager.h"
-#include "DevKitExtension.h"
 #include <AppMain.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/server/Server.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
+#include <app/server/Server.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -88,14 +88,13 @@ void ApplicationInit()
         TEMPORARY_RETURN_IGNORED sChipNamedPipeCommands.Stop();
     }
 
-    ServerClusterInterface * interface = chip::app::CodegenDataModelProvider::Instance().Registry().Get({kRootEndpointId, BasicInformation::Id});
+    ServerClusterInterface * interface =
+        chip::app::CodegenDataModelProvider::Instance().Registry().Get({ kRootEndpointId, BasicInformation::Id });
     VerifyOrDie(interface != nullptr);
 
     static RegisteredServerCluster<DevKitInformationExtension> sExtension(*interface, "test_dev_kit"_span, true);
 
     // FIXME: extension
-    
-    
 }
 
 void ApplicationShutdown()

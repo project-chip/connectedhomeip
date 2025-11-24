@@ -36,11 +36,11 @@ config("includes") {
 
 executable("chip-lighting-app") {
   sources = [
+    "DevKitExtension.cpp",
+    "DevKitExtension.h",
     "LightingAppCommandDelegate.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
-    "DevKitExtension.cpp",
-    "DevKitExtension.h",
   ]
 
   deps = [
