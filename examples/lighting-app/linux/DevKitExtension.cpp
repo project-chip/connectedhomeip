@@ -25,7 +25,7 @@ constexpr AttributeId kUserLedAttributeId    = 0xFFF10001;
 constexpr DataModel::AttributeEntry kExtraAttributeMetadata[] = {
     { kDevKitNameAttributeId, {} /* qualities */, Access::Privilege::kView /* readPriv */, std::nullopt /* writePriv */ },
     { kUserLedAttributeId, {} /* qualities */, Access::Privilege::kView /* readPriv */, std::nullopt /* writePriv */ },
-}; // namespace LabelList
+};
 
 } // namespace
 
