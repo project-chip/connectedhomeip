@@ -15,11 +15,9 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
-import("${chip_root}/src/data-model-providers/codegen/model.gni")
 
 source_set("testing") {
   sources = [
-    "${chip_root}/src/data-model-providers/codegen/Instance.cpp",
     "AttributeTesting.cpp",
     "AttributeTesting.h",
     "ClusterTester.h",
@@ -45,6 +43,7 @@ source_set("testing") {
     "${chip_root}/src/credentials/tests:cert_test_vectors",
     "${chip_root}/src/data-model-providers/codegen:headers",
     "${chip_root}/src/data-model-providers/codegen:instance-header",
+    "${chip_root}/src/data-model-providers/codegen/tests:mock_model",
     "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging:messaging",
