@@ -28,9 +28,9 @@ from enum import Enum, auto
 from pathlib import Path
 from typing import Literal, cast
 
+from chiptest.accessories import AppsRegister
 from chiptest.runner import SubprocessInfo, SubprocessKind
 from chipyaml.paths_finder import PathsFinder
-from chiptest.accessories import AppsRegister
 
 log = logging.getLogger(__name__)
 

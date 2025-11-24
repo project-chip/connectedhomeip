@@ -24,7 +24,7 @@ from pathlib import Path
 from typing import Iterator, Set
 
 from . import runner
-from .test_definition import TestDefinition, TestTag, TestTarget, SubprocessInfoRepo
+from .test_definition import SubprocessInfoRepo, TestDefinition, TestTag, TestTarget
 
 log = logging.getLogger(__name__)
 
