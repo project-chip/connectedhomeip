@@ -88,11 +88,15 @@ void ApplicationInit()
         TEMPORARY_RETURN_IGNORED sChipNamedPipeCommands.Stop();
     }
 
-    ServerClusterInterface * interface =
-        chip::app::CodegenDataModelProvider::Instance().Registry().Get({ kRootEndpointId, BasicInformation::Id });
+    auto & registry = chip::app::CodegenDataModelProvider::Instance().Registry();
+
+    ServerClusterInterface * interface = registry.Get({ kRootEndpointId, BasicInformation::Id });
     VerifyOrDie(interface != nullptr);
 
     static RegisteredServerCluster<DevKitInformationExtension> sExtension(*interface, "test_dev_kit"_span, true);
+
+    registry.Unregister(interface);
+    VerifyOrDie(registry.Register(sExtension.Registration()) == CHIP_NO_ERROR);
 
     // FIXME: extension
 }
