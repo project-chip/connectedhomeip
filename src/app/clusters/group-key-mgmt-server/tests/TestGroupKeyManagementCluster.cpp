@@ -157,8 +157,8 @@ public:
 
     CHIP_ERROR CreateKey(const ByteSpan & keyMaterial, HkdfKeyHandle & key) override
     {
-        auto & rawKey = key.AsMutable<std::array<uint8_t, 32>>(); // adjust if your Hkdf handle differs
-        VerifyOrReturnError(keyMaterial.size() <= rawKey.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+        auto & rawKey = key.AsMutable<std::array<std::byte, CHIP_CONFIG_HKDF_KEY_HANDLE_CONTEXT_SIZE>>();
+        VerifyOrReturnError(keyMaterial.size() <= sizeof(rawKey), CHIP_ERROR_BUFFER_TOO_SMALL);
         memcpy(rawKey.data(), keyMaterial.data(), keyMaterial.size());
         return CHIP_NO_ERROR;
     }
@@ -170,8 +170,8 @@ public:
 
     void DestroyKey(HkdfKeyHandle & key) override
     {
-        auto & rawKey = key.AsMutable<std::array<uint8_t, 32>>();
-        memset(rawKey.data(), 0, rawKey.size());
+        auto & rawKey = key.AsMutable<std::byte[CHIP_CONFIG_HKDF_KEY_HANDLE_CONTEXT_SIZE]>();
+        memset(rawKey, 0, sizeof(rawKey));
     }
 
     CHIP_ERROR DeriveKey(const P256ECDHDerivedSecret & /*secret*/, const ByteSpan & /*salt*/, const ByteSpan & /*info*/,
@@ -206,6 +206,7 @@ private:
         memset(challenge.Bytes(), 0, AttestationChallenge::Capacity());
     }
 };
+
 struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementCluster
 {
     TestServerClusterContext mTestContext;
