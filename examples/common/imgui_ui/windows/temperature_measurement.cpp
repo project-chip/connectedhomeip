@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 #include "temperature_measurement.h"
-#include "helpers.h"
+#include "accessor_updaters.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-enums.h>

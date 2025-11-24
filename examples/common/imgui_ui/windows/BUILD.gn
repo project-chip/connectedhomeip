@@ -20,8 +20,8 @@ source_set("windows") {
   sources = [ "window.h" ]
 }
 
-source_set("helpers") {
-  sources = [ "helpers.h" ]
+source_set("accessor_updaters") {
+  sources = [ "accessor_updaters.h" ]
 }
 
 static_library("connectivity") {
@@ -84,7 +84,7 @@ static_library("humidity_measurement") {
   ]
 
   deps = [
-    ":helpers",
+    ":accessor_updaters",
     ":windows",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/third_party/imgui",
@@ -100,7 +100,7 @@ static_library("temperature_measurement") {
   ]
 
   deps = [
-    ":helpers",
+    ":accessor_updaters",
     ":windows",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/third_party/imgui",
@@ -116,7 +116,7 @@ static_library("fan_control") {
   ]
 
   deps = [
-    ":helpers",
+    ":accessor_updaters",
     ":windows",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/third_party/imgui",
