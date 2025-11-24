@@ -66,7 +66,11 @@ namespace Internal {
 
 namespace {
 
+#if KERNEL_VERSION_MAJOR >= 4 && KERNEL_VERSION_MINOR >= 3
+constexpr uint32_t kAdvertisingOptions = BT_LE_ADV_OPT_CONN;
+#else
 constexpr uint32_t kAdvertisingOptions = BT_LE_ADV_OPT_CONNECTABLE | BT_LE_ADV_OPT_ONE_TIME;
+#endif
 constexpr uint8_t kAdvertisingFlags    = BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR;
 
 const bt_uuid_128 UUID128_CHIPoBLEChar_RX =
