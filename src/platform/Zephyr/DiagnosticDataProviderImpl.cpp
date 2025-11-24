@@ -40,6 +40,11 @@
 #include <zephyr/dfu/mcuboot.h>
 #endif
 
+#ifdef CONFIG_WIFI
+#include <platform/Zephyr/InetUtils.h>
+#include <platform/Zephyr/wifi/WiFiManager.h>
+#endif
+
 #include <malloc.h>
 
 #if CHIP_DEVICE_CONFIG_HEAP_STATISTICS_MALLINFO
@@ -329,14 +334,14 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
         CHIP_ERROR error;
         uint8_t addressSize;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#ifdef CONFIG_WIFI
         if (interfaceType == Inet::InterfaceType::WiFi)
         {
             ifp->isOperational = ConnectivityMgr().IsWiFiStationConnected();
             error              = interfaceIterator.GetHardwareAddress(ifp->MacAddress, addressSize, sizeof(ifp->MacAddress));
         }
         else
-#endif
+#endif // CONFIG_WIFI
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
             if (interfaceType == Inet::InterfaceType::Thread)
         {
@@ -398,6 +403,134 @@ void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * net
         delete del;
     }
 }
+
+#ifdef CONFIG_WIFI
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(MutableByteSpan & value)
+{
+    WiFiManager::WiFiInfo info;
+    ReturnErrorOnFailure(WiFiManager::Instance().GetWiFiInfo(info));
+    VerifyOrReturnError(sizeof(info.mBssId) < value.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    memcpy(value.data(), info.mBssId, sizeof(info.mBssId));
+    value.reduce_size(sizeof(info.mBssId));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType)
+{
+    using app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum;
+
+    WiFiManager::WiFiInfo info;
+    CHIP_ERROR err = WiFiManager::Instance().GetWiFiInfo(info);
+    securityType   = info.mSecurityType;
+    return err;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wiFiVersion)
+{
+    WiFiManager::WiFiInfo info;
+    CHIP_ERROR err = WiFiManager::Instance().GetWiFiInfo(info);
+    wiFiVersion    = info.mWiFiVersion;
+    return err;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNumber)
+{
+    WiFiManager::WiFiInfo info;
+    CHIP_ERROR err = WiFiManager::Instance().GetWiFiInfo(info);
+    channelNumber  = info.mChannel;
+    return err;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
+{
+    WiFiManager::WiFiInfo info;
+    CHIP_ERROR err = WiFiManager::Instance().GetWiFiInfo(info);
+    rssi           = info.mRssi;
+    return err;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiCurrentMaxRate(uint64_t & currentMaxRate)
+{
+    WiFiManager::WiFiInfo info;
+    CHIP_ERROR err = WiFiManager::Instance().GetWiFiInfo(info);
+    // mCurrentPhyRate Value in MB
+    currentMaxRate = info.mCurrentPhyRate * 1000000;
+    return err;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconLostCount(uint32_t & beaconLostCount)
+{
+    WiFiManager::NetworkStatistics stats;
+    CHIP_ERROR err  = WiFiManager::Instance().GetNetworkStatistics(stats);
+    beaconLostCount = stats.mBeaconsLostCount;
+    return err;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconRxCount(uint32_t & beaconRxCount)
+{
+    WiFiManager::NetworkStatistics stats;
+    CHIP_ERROR err = WiFiManager::Instance().GetNetworkStatistics(stats);
+    beaconRxCount  = stats.mBeaconsSuccessCount;
+    return err;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount)
+{
+    WiFiManager::NetworkStatistics stats;
+    CHIP_ERROR err         = WiFiManager::Instance().GetNetworkStatistics(stats);
+    packetMulticastRxCount = stats.mPacketMulticastRxCount;
+    return err;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount)
+{
+    WiFiManager::NetworkStatistics stats;
+    CHIP_ERROR err         = WiFiManager::Instance().GetNetworkStatistics(stats);
+    packetMulticastTxCount = stats.mPacketMulticastTxCount;
+    return err;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount)
+{
+    WiFiManager::NetworkStatistics stats;
+    CHIP_ERROR err       = WiFiManager::Instance().GetNetworkStatistics(stats);
+    packetUnicastRxCount = stats.mPacketUnicastRxCount;
+    return err;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount)
+{
+    WiFiManager::NetworkStatistics stats;
+    CHIP_ERROR err       = WiFiManager::Instance().GetNetworkStatistics(stats);
+    packetUnicastTxCount = stats.mPacketUnicastTxCount;
+    return err;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiOverrunCount(uint64_t & overrunCount)
+{
+    WiFiManager::NetworkStatistics stats;
+    CHIP_ERROR err = WiFiManager::Instance().GetNetworkStatistics(stats);
+    overrunCount   = static_cast<uint64_t>(stats.mOverRunCount);
+    return err;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts()
+{
+    net_if * iface = InetUtils::GetWiFiInterface();
+    VerifyOrReturnError(iface != nullptr, INET_ERROR_UNKNOWN_INTERFACE);
+
+    if (net_mgmt(NET_REQUEST_STATS_RESET_WIFI, iface, NULL, 0))
+    {
+        ChipLogError(DeviceLayer, "WiFi statistics reset failed");
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    return CHIP_NO_ERROR;
+}
+#endif // CONFIG_WIFI
 
 } // namespace DeviceLayer
 } // namespace chip
