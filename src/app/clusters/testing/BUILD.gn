@@ -19,6 +19,7 @@ import("${chip_root}/src/data-model-providers/codegen/model.gni")
 
 source_set("testing") {
   sources = [
+    "${chip_root}/src/data-model-providers/codegen/Instance.cpp",
     "AttributeTesting.cpp",
     "AttributeTesting.h",
     "ClusterTester.h",
@@ -26,10 +27,10 @@ source_set("testing") {
     "MockCommandHandler.h",
     "ValidateGlobalAttributes.cpp",
     "ValidateGlobalAttributes.h",
-    "${chip_root}/src/data-model-providers/codegen/Instance.cpp",
   ]
 
   public_deps = [
+    "${chip_root}/src/access:access",
     "${chip_root}/src/app:command-handler",
     "${chip_root}/src/app:paths",
     "${chip_root}/src/app/MessageDef:MessageDef",
@@ -38,16 +39,15 @@ source_set("testing") {
     "${chip_root}/src/app/data-model-provider:data-model-provider",
     "${chip_root}/src/app/data-model-provider:metadata",
     "${chip_root}/src/app/data-model-provider/tests:encode-decode",
+    "${chip_root}/src/app/server:server",
     "${chip_root}/src/app/server-cluster:server-cluster",
     "${chip_root}/src/app/server-cluster/testing:testing",
+    "${chip_root}/src/credentials/tests:cert_test_vectors",
+    "${chip_root}/src/data-model-providers/codegen:headers",
+    "${chip_root}/src/data-model-providers/codegen:instance-header",
     "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging:messaging",
     "${chip_root}/src/protocols/interaction_model:interaction_model",
-    "${chip_root}/src/app/server:server",
-    "${chip_root}/src/access:access",
-    "${chip_root}/src/credentials/tests:cert_test_vectors",
-    "${chip_root}/src/data-model-providers/codegen:instance-header",
-    "${chip_root}/src/data-model-providers/codegen:headers",
   ]
 }
