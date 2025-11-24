@@ -49,7 +49,7 @@ public:
                                                                  >;
 
     GeneralDiagnosticsCluster(OptionalAttributeSet optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature> featureFlags) :
-        DefaultServerCluster({ kRootEndpointId, GeneralDiagnostics::Id }), 
+        DefaultServerCluster({ kRootEndpointId, GeneralDiagnostics::Id }),
         mOptionalAttributeSet(optionalAttributeSet.ForceSet<GeneralDiagnostics::Attributes::UpTime::Id>()),
         mFeatureFlags(featureFlags)
     {}
