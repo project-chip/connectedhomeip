@@ -22,6 +22,8 @@
 
 #include <imgui.h>
 
+#include <lib/support/TypeTraits.h>
+
 #include <math.h>
 #include <string>
 #include <string_view>
@@ -39,7 +41,7 @@ static const std::string GetBitmapValueString(const T maxValue, chip::BitMask<T>
 
 {
     // Check if any new value was added and communicate to user that the code needs updating.
-    if ((static_cast<std::underlying_type_t<T>>(maxValue) << 1) <= static_cast<std::underlying_type_t<T>>(bitmask.Raw()))
+    if (chip::to_underlying(maxValue) << 1 <= bitmask.Raw())
     {
         return "UI code needs uptating to support new value";
     }
