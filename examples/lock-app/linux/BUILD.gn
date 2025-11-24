@@ -25,6 +25,7 @@ executable("chip-lock-app") {
     "${chip_root}/examples/lock-app/lock-common",
     "${chip_root}/examples/lock-app/lock-common:lock-cluster-service",
     "${chip_root}/examples/platform/linux:app-main",
+    "${chip_root}/src/app/clusters/ota-requestor",
     "${chip_root}/src/lib",
     "${chip_root}/third_party/jsoncpp",
   ]

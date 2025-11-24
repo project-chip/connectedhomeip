@@ -18,6 +18,12 @@
 
 #include "AppMain.h"
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestor.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorUserConsent.h>
+#include <app/clusters/ota-requestor/ExtendedOTARequestorDriver.h>
+#include <platform/Linux/OTAImageProcessorImpl.h>
 
 #include "Identify.h"
 #include "LockAppCommandDelegate.h"
@@ -31,6 +37,30 @@ namespace {
 NamedPipeCommands sChipNamedPipeCommands;
 LockAppCommandDelegate sLockAppCommandDelegate;
 
+DefaultOTARequestor gRequestorCore;
+DefaultOTARequestorStorage gRequestorStorage;
+DeviceLayer::ExtendedOTARequestorDriver gRequestorUser;
+BDXDownloader gDownloader;
+OTAImageProcessorImpl gImageProcessor;
+ota::DefaultOTARequestorUserConsent gUserConsentProvider;
+static char gOtaDownloadPath[] = "/tmp/test.bin";
+
+void InitOTARequestor()
+{
+    // Set the global instance of the OTA requestor core component
+    SetRequestorInstance(&gRequestorCore);
+
+    gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
+    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
+    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
+
+    gImageProcessor.SetOTAImageFile(gOtaDownloadPath);
+    gImageProcessor.SetOTADownloader(&gDownloader);
+
+    // Set the image processor instance used for handling image being downloaded
+    gDownloader.SetImageProcessorDelegate(&gImageProcessor);
+}
+
 } // anonymous namespace
 
 void ApplicationInit()
@@ -43,6 +73,7 @@ void ApplicationInit()
         sChipNamedPipeCommands.Stop();
     }
 
+    InitOTARequestor();
     IdentifyInit();
 }
 

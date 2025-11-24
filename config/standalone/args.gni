@@ -18,6 +18,10 @@ import("//build_overrides/chip.gni")
 # options are used from examples/.
 chip_build_tests = false
 
+# Workaround for underspecified OTA requestor clusters in examples.
+# TODO: Remove this definition and the underspecified clusters.
+chip_enable_ota_requestor = true
+
 pw_build_PIP_CONSTRAINTS = [ "${chip_root}/scripts/setup/constraints.txt" ]
 pw_build_PIP_REQUIREMENTS =
     [ "${chip_root}/scripts/setup/requirements.build.txt" ]
