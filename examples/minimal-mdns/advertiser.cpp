@@ -256,7 +256,7 @@ OptionSet * allOptions[] = { &cmdLineOptions, &helpOptions, nullptr };
 
 void StopSignalHandler(int signal)
 {
-    DeviceLayer::PlatformMgr().StopEventLoopTask();
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().StopEventLoopTask();
 }
 
 } // namespace

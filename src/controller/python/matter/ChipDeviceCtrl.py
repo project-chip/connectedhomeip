@@ -1108,10 +1108,9 @@ class ChipDeviceControllerBase():
                     self.devCtrl, int(filterType), str(filter).encode("utf-8")))
 
             async def _wait_discovery():
-                while not await self._ChipStack.CallAsyncWithResult(
+                while not await self._ChipStack.CallAsyncWithResult(  # noqa: ASYNC110
                         lambda: self._dmLib.pychip_DeviceController_HasDiscoveredCommissionableNode(self.devCtrl)):
                     await asyncio.sleep(0.1)
-                return
 
             try:
                 if stopOnFirst:

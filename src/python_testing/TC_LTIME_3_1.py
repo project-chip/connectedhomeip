@@ -88,7 +88,7 @@ class TC_LTIME_3_1(MatterBaseTest):
 
     @run_if_endpoint_matches(has_cluster(Clusters.TimeFormatLocalization))
     async def test_TC_LTIME_3_1(self):
-        self.endpoint = self.get_endpoint(default=0)
+        self.endpoint = self.get_endpoint()
         self.cluster = Clusters.TimeFormatLocalization
         hour_format_values = [0, 1, 255]
 
