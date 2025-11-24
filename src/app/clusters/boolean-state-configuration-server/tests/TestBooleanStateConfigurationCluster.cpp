@@ -245,7 +245,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestSensitivityClamping)
         BooleanStateConfigurationCluster cluster(kTestEndpointId, Feature::kSensitivityLevel, {}, config);
         ClusterTester tester(cluster);
 
-        uint8_t supportedLevels;
+        uint8_t supportedLevels = 0;
         EXPECT_EQ(tester.ReadAttribute(Attributes::SupportedSensitivityLevels::Id, supportedLevels),
                   Protocols::InteractionModel::Status::Success);
         EXPECT_EQ(supportedLevels, BooleanStateConfigurationCluster::kMinSupportedSensitivityLevels);
@@ -256,7 +256,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestSensitivityClamping)
         BooleanStateConfigurationCluster cluster(kTestEndpointId, Feature::kSensitivityLevel, {}, config);
         ClusterTester tester(cluster);
 
-        uint8_t supportedLevels;
+        uint8_t supportedLevels = 0;
         EXPECT_EQ(tester.ReadAttribute(Attributes::SupportedSensitivityLevels::Id, supportedLevels),
                   Protocols::InteractionModel::Status::Success);
         EXPECT_EQ(supportedLevels, BooleanStateConfigurationCluster::kMaxSupportedSensitivityLevels);
@@ -270,7 +270,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestSensitivityClamping)
             BooleanStateConfigurationCluster::OptionalAttributesSet().Set<Attributes::DefaultSensitivityLevel::Id>(), config);
         ClusterTester tester(cluster);
 
-        uint8_t defaultLevel;
+        uint8_t defaultLevel = 0;
         EXPECT_EQ(tester.ReadAttribute(Attributes::DefaultSensitivityLevel::Id, defaultLevel),
                   Protocols::InteractionModel::Status::Success);
         EXPECT_EQ(defaultLevel, 4);
@@ -283,7 +283,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestSensitivityClamping)
         ClusterTester tester(cluster);
         cluster.Startup(context.Get());
 
-        uint8_t currentLevel;
+        uint8_t currentLevel = 0;
 
         // Write a valid level
         EXPECT_EQ(tester.WriteAttribute(Attributes::CurrentSensitivityLevel::Id, static_cast<uint8_t>(5)),
