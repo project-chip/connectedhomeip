@@ -115,6 +115,7 @@ config CHIP_DFU_OVER_BT_SMP
 
 config CHIP_DFU_OVER_BT_SMP_BUILD
 	bool "Enable DFU over BT SMP image building"
+	depends on CHIP_DFU_OVER_BT_SMP
 	default n
 
 config TELINK_OTA_PARTITION_ADDR

@@ -40,8 +40,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 
 from TC_EEVSE_Utils import EEVSEBaseTestHelper
 
@@ -138,7 +138,7 @@ class TC_EEVSE_2_4(MatterBaseTest, EEVSEBaseTestHelper):
         await self.send_test_event_trigger_basic()
 
         # After a few seconds...
-        time.sleep(3)
+        await asyncio.sleep(3)
 
         self.step("3a")
         await self.check_evse_attribute("State", Clusters.EnergyEvse.Enums.StateEnum.kNotPluggedIn)
