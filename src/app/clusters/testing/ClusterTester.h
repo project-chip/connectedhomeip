@@ -15,8 +15,6 @@
  */
 
 #pragma once
-#include <access/AccessControl.h>
-#include <access/examples/ExampleAccessControlDelegate.h>
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
