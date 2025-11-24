@@ -166,8 +166,8 @@ CodeDrivenClusters:
     - Push AV Stream Transport
     - Software Diagnostics
     - Time Format Localization
-    - Unit Localization
     - Time Synchronization
+    - Unit Localization
     - User Label
     - Wi-Fi Network Diagnostics
     # keep-sorted end
