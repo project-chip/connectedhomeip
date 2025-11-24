@@ -28,6 +28,7 @@ config("imgui_config") {
   defines = [ "CHIP_IMGUI_ENABLED=1" ]
 
   # Use pkg-config for SDL2 on all platforms
+  # FUTURE: SDL2 libs should be from `sdl2-config --libs`
   configs = [ ":sdl2_pkgconfig" ]
 
   if (current_os == "mac") {
