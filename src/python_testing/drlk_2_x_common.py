@@ -15,10 +15,10 @@
 #    limitations under the License.
 #
 
+import asyncio
 import logging
 import random
 import string
-import time
 
 from mobly import asserts
 
@@ -126,7 +126,7 @@ class DRLK_COMMON:
 
         # Allow for user overrides of these values
         self.user_index = self.user_params.get("user_index", 1)
-        self.endpoint = self.user_params.get("endpoint", 1)
+        self.endpoint = self.get_endpoint()
         credentialIndex = self.user_params.get("credential_index", 1)
         userCodeTemporaryDisableTime = self.user_params.get("user_code_temporary_disable_time", 15)
         wrongCodeEntryLimit = self.user_params.get("wrong_code_entry_limit", 3)
@@ -289,7 +289,7 @@ class DRLK_COMMON:
 
             if self.check_pics("DRLK.S.A0031"):
                 self.print_step("14", "Wait for UserCodeTemporaryDisableTime seconds")
-                time.sleep(userCodeTemporaryDisableTime_dut)
+                await asyncio.sleep(userCodeTemporaryDisableTime_dut)
 
             if not doAutoRelockTest:
                 self.print_step("15", "Send %s with valid Pincode and verify success" % lockUnlockText)
@@ -322,7 +322,7 @@ class DRLK_COMMON:
                 if self.check_pics("DRLK.S.A0000"):
                     self.print_step("18", "TH reads LockState attribute after AutoRelockTime Expires")
                     # Add additional wait time buffer for motor movement, etc.
-                    time.sleep(autoRelockTime_dut + 5)
+                    await asyncio.sleep(autoRelockTime_dut + 5)
                     lockstate_dut = await self.read_drlk_attribute_expect_success(attribute=attributes.LockState)
                     logging.info("Current LockState is %s" % (lockstate_dut))
                     asserts.assert_equal(lockstate_dut, Clusters.DoorLock.Enums.DlLockState.kLocked,

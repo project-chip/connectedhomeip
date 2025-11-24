@@ -86,6 +86,10 @@ class TC_BOOLCFG_4_4(MatterBaseTest):
         ]
         return pics
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_BOOLCFG_4_4(self):
 
@@ -94,7 +98,7 @@ class TC_BOOLCFG_4_4(MatterBaseTest):
                             "the --hex-arg flag as PIXIT.BOOLCFG.TEST_EVENT_TRIGGER_KEY:<key>, "
                             "e.g. --hex-arg PIXIT.BOOLCFG.TEST_EVENT_TRIGGER_KEY:000102030405060708090a0b0c0d0e0f")
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         enableKey = self.matter_test_config.global_test_params['PIXIT.BOOLCFG.TEST_EVENT_TRIGGER_KEY']
 
         self.step(1)

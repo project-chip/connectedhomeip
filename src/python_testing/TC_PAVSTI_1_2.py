@@ -152,10 +152,14 @@ class TC_PAVSTI_1_2(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             ),
         ]
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_PAVSTI_1_2(self):
         PICS_PRIVACY = "AVSM.S.F03"
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         pushavCluster = Clusters.PushAvStreamTransport
         avsmCluster = Clusters.CameraAvStreamManagement
         pushavAttr = Clusters.PushAvStreamTransport.Attributes

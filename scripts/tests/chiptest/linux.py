@@ -29,7 +29,7 @@ import time
 
 import sdbus
 
-from .test_definition import ApplicationPaths
+from .runner import Executor, SubprocessInfo
 
 log = logging.getLogger(__name__)
 
@@ -71,72 +71,72 @@ class IsolatedNetworkNamespace:
     # in the simulated isolated network.
     COMMANDS_SETUP = [
         # Create 2 virtual hosts: for app and for the tool
-        "ip netns add app",
-        "ip netns add tool",
+        "ip netns add app-{index}",
+        "ip netns add tool-{index}",
 
         # Create links for switch to net connections
-        "ip link add {app_link_name} type veth peer name {app_link_name}-switch",
-        "ip link add {tool_link_name} type veth peer name {tool_link_name}-switch",
-        "ip link add eth-ci type veth peer name eth-ci-switch",
+        "ip link add {app_link_name}-{index} type veth peer name {app_link_name}-sw-{index}",
+        "ip link add {tool_link_name}-{index} type veth peer name {tool_link_name}-sw-{index}",
+        "ip link add eth-ci-{index} type veth peer name eth-ci-sw-{index}",
 
         # Link the connections together
-        "ip link set {app_link_name} netns app",
-        "ip link set {tool_link_name} netns tool",
+        "ip link set {app_link_name}-{index} netns app-{index}",
+        "ip link set {tool_link_name}-{index} netns tool-{index}",
 
         # Bridge all the connections together.
-        "ip link add name br1 type bridge",
-        "ip link set br1 up",
-        "ip link set {app_link_name}-switch master br1",
-        "ip link set {tool_link_name}-switch master br1",
-        "ip link set eth-ci-switch master br1",
+        "ip link add name br1-{index} type bridge",
+        "ip link set br1-{index} up",
+        "ip link set {app_link_name}-sw-{index} master br1-{index}",
+        "ip link set {tool_link_name}-sw-{index} master br1-{index}",
+        "ip link set eth-ci-sw-{index} master br1-{index}",
 
         # Create link between virtual host 'tool' and the test runner
-        "ip addr add 10.10.10.5/24 dev eth-ci",
-        "ip link set dev eth-ci up",
-        "ip link set dev eth-ci-switch up",
+        "ip addr add 10.10.10.5/24 dev eth-ci-{index}",
+        "ip link set dev eth-ci-{index} up",
+        "ip link set dev eth-ci-sw-{index} up",
     ]
 
     # Bring up application connection link.
     COMMANDS_APP_LINK_UP = [
-        "ip netns exec app ip addr add 10.10.10.1/24 dev {app_link_name}",
-        "ip netns exec app ip link set dev {app_link_name} up",
-        "ip netns exec app ip link set dev lo up",
-        "ip link set dev {app_link_name}-switch up",
+        "ip netns exec app-{index} ip addr add 10.10.10.1/24 dev {app_link_name}-{index}",
+        "ip netns exec app-{index} ip link set dev {app_link_name}-{index} up",
+        "ip netns exec app-{index} ip link set dev lo up",
+        "ip link set dev {app_link_name}-sw-{index} up",
         # Force IPv6 to use ULAs that we control.
-        "ip netns exec app ip -6 addr flush {app_link_name}",
-        "ip netns exec app ip -6 a add fd00:0:1:1::1/64 dev {app_link_name}",
+        "ip netns exec app-{index} ip -6 addr flush {app_link_name}-{index}",
+        "ip netns exec app-{index} ip -6 a add fd00:0:1:1::1/64 dev {app_link_name}-{index}",
 
     ]
 
     # Bring up tool (controller) connection link.
     COMMANDS_TOOL_LINK_UP = [
-        "ip netns exec tool ip addr add 10.10.10.2/24 dev {tool_link_name}",
-        "ip netns exec tool ip link set dev {tool_link_name} up",
-        "ip netns exec tool ip link set dev lo up",
-        "ip link set dev {tool_link_name}-switch up",
+        "ip netns exec tool-{index} ip addr add 10.10.10.2/24 dev {tool_link_name}-{index}",
+        "ip netns exec tool-{index} ip link set dev {tool_link_name}-{index} up",
+        "ip netns exec tool-{index} ip link set dev lo up",
+        "ip link set dev {tool_link_name}-sw-{index} up",
         # Force IPv6 to use ULAs that we control.
-        "ip netns exec tool ip -6 addr flush {tool_link_name}",
-        "ip netns exec tool ip -6 a add fd00:0:1:1::2/64 dev {tool_link_name}",
+        "ip netns exec tool-{index} ip -6 addr flush {tool_link_name}-{index}",
+        "ip netns exec tool-{index} ip -6 a add fd00:0:1:1::2/64 dev {tool_link_name}-{index}",
     ]
 
     # Commands for removing namespaces previously created.
     COMMANDS_TERMINATE = [
-        "ip link set dev eth-ci down",
-        "ip link set dev eth-ci-switch down",
-        "ip addr del 10.10.10.5/24 dev eth-ci",
+        "ip link set dev eth-ci-{index} down",
+        "ip link set dev eth-ci-sw-{index} down",
+        "ip addr del 10.10.10.5/24 dev eth-ci-{index}",
 
-        "ip link set br1 down",
-        "ip link delete br1",
+        "ip link set br1-{index} down",
+        "ip link delete br1-{index}",
 
-        "ip link delete eth-ci-switch",
-        "ip link delete {tool_link_name}-switch",
-        "ip link delete {app_link_name}-switch",
+        "ip link delete eth-ci-sw-{index}",
+        "ip link delete {tool_link_name}-sw-{index}",
+        "ip link delete {app_link_name}-sw-{index}",
 
-        "ip netns del tool",
-        "ip netns del app",
+        "ip netns del tool-{index}",
+        "ip netns del app-{index}",
     ]
 
-    def __init__(self, setup_app_link_up=True, setup_tool_link_up=True,
+    def __init__(self, index=0, setup_app_link_up=True, setup_tool_link_up=True,
                  app_link_name='eth-app', tool_link_name='eth-tool',
                  unshared=False):
 
@@ -147,15 +147,19 @@ class IsolatedNetworkNamespace:
         else:
             EnsurePrivateState()
 
+        self.index = index
         self.app_link_name = app_link_name
         self.tool_link_name = tool_link_name
 
-        self.setup()
+        self._setup()
         if setup_app_link_up:
-            self.setup_app_link_up(wait_for_dad=False)
+            self._setup_app_link_up(wait_for_dad=False)
         if setup_tool_link_up:
-            self.setup_tool_link_up(wait_for_dad=False)
+            self._setup_tool_link_up(wait_for_dad=False)
         self._wait_for_duplicate_address_detection()
+
+    def netns_for_subprocess(self, subproc: SubprocessInfo):
+        return "{}-{}".format(subproc.kind, self.index)
 
     def _wait_for_duplicate_address_detection(self):
         # IPv6 does Duplicate Address Detection even though
@@ -170,25 +174,26 @@ class IsolatedNetworkNamespace:
         else:
             log.warning("Some addresses look to still be tentative")
 
-    def setup(self):
+    def _setup(self):
         for command in self.COMMANDS_SETUP:
-            self.run(command)
+            self._run(command)
 
-    def setup_app_link_up(self, wait_for_dad=True):
+    def _setup_app_link_up(self, wait_for_dad=True):
         for command in self.COMMANDS_APP_LINK_UP:
-            self.run(command)
+            self._run(command)
         if wait_for_dad:
             self._wait_for_duplicate_address_detection()
 
-    def setup_tool_link_up(self, wait_for_dad=True):
+    def _setup_tool_link_up(self, wait_for_dad=True):
         for command in self.COMMANDS_TOOL_LINK_UP:
-            self.run(command)
+            self._run(command)
         if wait_for_dad:
             self._wait_for_duplicate_address_detection()
 
-    def run(self, command: str):
+    def _run(self, command: str):
         command = command.format(app_link_name=self.app_link_name,
-                                 tool_link_name=self.tool_link_name)
+                                 tool_link_name=self.tool_link_name,
+                                 index=self.index)
         log.debug("Executing: '%s'", command)
         if subprocess.run(command.split()).returncode != 0:
             log.error("Failed to execute '%s'", command)
@@ -197,7 +202,16 @@ class IsolatedNetworkNamespace:
 
     def terminate(self):
         for command in self.COMMANDS_TERMINATE:
-            self.run(command)
+            self._run(command)
+
+
+class LinuxNamespacedExecutor(Executor):
+    def __init__(self, ns: IsolatedNetworkNamespace):
+        self.ns = ns
+
+    def run(self, subproc: SubprocessInfo, stdin=None, stdout=None, stderr=None):
+        wrapped = subproc.wrap_with("ip", "netns", "exec", self.ns.netns_for_subprocess(subproc))
+        return subprocess.Popen(wrapped.to_cmd(), stdin=stdin, stdout=stdout, stderr=stderr)
 
 
 class DBusTestSystemBus(subprocess.Popen):
@@ -303,7 +317,7 @@ class WpaSupplicantMock(threading.Thread):
                 # Mock AP association process.
                 await self.State.set_async("associating")
                 await self.State.set_async("associated")
-                self.mock.networking.setup_app_link_up()
+                self.mock.networking._setup_app_link_up()
                 await self.State.set_async("completed")
             await self.CurrentNetwork.set_async(path)
             asyncio.create_task(associate())
@@ -391,29 +405,3 @@ class WpaSupplicantMock(threading.Thread):
     def terminate(self):
         self.loop.call_soon_threadsafe(self.loop.stop)
         self.join()
-
-
-def PathsWithNetworkNamespaces(paths: ApplicationPaths) -> ApplicationPaths:
-    """
-    Returns a copy of paths with updated command arrays to invoke the
-    commands in an appropriate network namespace.
-    """
-    return ApplicationPaths(
-        chip_tool='ip netns exec tool'.split() + paths.chip_tool,
-        all_clusters_app='ip netns exec app'.split() + paths.all_clusters_app,
-        lock_app='ip netns exec app'.split() + paths.lock_app,
-        fabric_bridge_app='ip netns exec app'.split() + paths.fabric_bridge_app,
-        ota_provider_app='ip netns exec app'.split() + paths.ota_provider_app,
-        ota_requestor_app='ip netns exec app'.split() + paths.ota_requestor_app,
-        tv_app='ip netns exec app'.split() + paths.tv_app,
-        lit_icd_app='ip netns exec app'.split() + paths.lit_icd_app,
-        microwave_oven_app='ip netns exec app'.split() + paths.microwave_oven_app,
-        rvc_app='ip netns exec app'.split() + paths.rvc_app,
-        network_manager_app='ip netns exec app'.split() + paths.network_manager_app,
-        energy_gateway_app='ip netns exec app'.split() + paths.energy_gateway_app,
-        energy_management_app='ip netns exec app'.split() + paths.energy_management_app,
-        bridge_app='ip netns exec app'.split() + paths.bridge_app,
-        matter_repl_yaml_tester_cmd='ip netns exec tool'.split() + paths.matter_repl_yaml_tester_cmd,
-        chip_tool_with_python_cmd='ip netns exec tool'.split() + paths.chip_tool_with_python_cmd,
-        closure_app='ip netns exec app'.split() + paths.closure_app,
-    )
