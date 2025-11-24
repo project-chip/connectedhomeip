@@ -110,7 +110,7 @@ class KlvGenerator:
         The new list will contain only InputArgument objects, which
         generate a (K, L, V) tuple through output() method.
         '''
-        data = list()
+        data = []
 
         data = [obj for key, obj in vars(self.args).items() if isinstance(obj, InputArgument)]
         data = [arg.output() for arg in sorted(data, key=lambda x: x.key())]

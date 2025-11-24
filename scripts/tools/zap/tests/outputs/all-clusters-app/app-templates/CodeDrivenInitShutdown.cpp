@@ -30,6 +30,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::Identify::Id:
         MatterIdentifyClusterInitCallback(endpoint);
         break;
+    case app::Clusters::Descriptor::Id:
+        MatterDescriptorClusterInitCallback(endpoint);
+        break;
     case app::Clusters::Binding::Id:
         MatterBindingClusterInitCallback(endpoint);
         break;
@@ -63,6 +66,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::EthernetNetworkDiagnostics::Id:
         MatterEthernetNetworkDiagnosticsClusterInitCallback(endpoint);
         break;
+    case app::Clusters::TimeSynchronization::Id:
+        MatterTimeSynchronizationClusterInitCallback(endpoint);
+        break;
     case app::Clusters::AdministratorCommissioning::Id:
         MatterAdministratorCommissioningClusterInitCallback(endpoint);
         break;
@@ -90,6 +96,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
     {
     case app::Clusters::Identify::Id:
         MatterIdentifyClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::Descriptor::Id:
+        MatterDescriptorClusterShutdownCallback(endpoint);
         break;
     case app::Clusters::Binding::Id:
         MatterBindingClusterShutdownCallback(endpoint);
@@ -123,6 +132,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     case app::Clusters::EthernetNetworkDiagnostics::Id:
         MatterEthernetNetworkDiagnosticsClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::TimeSynchronization::Id:
+        MatterTimeSynchronizationClusterShutdownCallback(endpoint);
         break;
     case app::Clusters::AdministratorCommissioning::Id:
         MatterAdministratorCommissioningClusterShutdownCallback(endpoint);

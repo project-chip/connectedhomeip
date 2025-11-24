@@ -20,6 +20,7 @@
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
+#include <app/data-model-provider/ProviderChangeListener.h>
 #include <app/persistence/AttributePersistenceProvider.h>
 #include <app/persistence/AttributePersistenceProviderInstance.h>
 #include <app/persistence/PascalString.h>
@@ -1107,6 +1108,19 @@ chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpointIndex(unsig
     return emAfEndpoints[endpointIndex].deviceTypeList;
 }
 
+void GetSemanticTagsForEndpoint(EndpointId endpoint,
+                                Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type> & semanticTags)
+{
+    uint16_t endpointIndex = emberAfIndexFromEndpoint(endpoint);
+
+    if (endpointIndex == 0xFFFF)
+    {
+        semanticTags = Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>();
+        return;
+    }
+    semanticTags = emAfEndpoints[endpointIndex].tagList;
+}
+
 CHIP_ERROR GetSemanticTagForEndpointAtIndex(EndpointId endpoint, size_t index,
                                             Clusters::Descriptor::Structs::SemanticTagStruct::Type & tag)
 {
@@ -1414,7 +1428,8 @@ void emAfSaveAttributeToStorageIfNeeded(uint8_t * data, EndpointId endpoint, Clu
     auto * attrStorage = GetAttributePersistenceProvider();
     if (attrStorage)
     {
-        attrStorage->WriteValue(ConcreteAttributePath(endpoint, clusterId, metadata->attributeId), ByteSpan(data, dataSize));
+        TEMPORARY_RETURN_IGNORED attrStorage->WriteValue(ConcreteAttributePath(endpoint, clusterId, metadata->attributeId),
+                                                         ByteSpan(data, dataSize));
     }
     else
     {
@@ -1576,28 +1591,13 @@ DataVersion * emberAfDataVersionStorage(const ConcreteClusterPath & aConcreteClu
     return ep.dataVersions + clusterIndex;
 }
 
-namespace {
-class GlobalInteractionModelEngineChangedpathListener : public AttributesChangedListener
+DataModel::ProviderChangeListener * emberAfGlobalInteractionModelAttributesChangedListener()
 {
-public:
-    ~GlobalInteractionModelEngineChangedpathListener() = default;
-
-    void MarkDirty(const AttributePathParams & path) override
-    {
-        InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
-    }
-};
-
-} // namespace
-
-AttributesChangedListener * emberAfGlobalInteractionModelAttributesChangedListener()
-{
-    static GlobalInteractionModelEngineChangedpathListener listener;
-    return &listener;
+    return &InteractionModelEngine::GetInstance()->GetReportingEngine();
 }
 
 void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
-                             AttributesChangedListener * listener)
+                             DataModel::ProviderChangeListener * listener)
 {
     // Increase cluster data path
     DataVersion * version = emberAfDataVersionStorage(ConcreteClusterPath(endpoint, clusterId));
@@ -1616,7 +1616,7 @@ void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, Attribute
     listener->MarkDirty(AttributePathParams(endpoint, clusterId, attributeId));
 }
 
-void emberAfEndpointChanged(EndpointId endpoint, AttributesChangedListener * listener)
+void emberAfEndpointChanged(EndpointId endpoint, DataModel::ProviderChangeListener * listener)
 {
     listener->MarkDirty(AttributePathParams(endpoint));
 }

@@ -87,6 +87,10 @@ class TC_WEBRTCP_2_13(MatterBaseTest, WEBRTCPTestBase):
         ]
         return pics
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_WEBRTCP_2_13(self):
         """
@@ -95,7 +99,7 @@ class TC_WEBRTCP_2_13(MatterBaseTest, WEBRTCPTestBase):
 
         self.step("precondition")
         # Commission DUT - already done
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(1)
         # Allocate both Audio and Video streams
@@ -112,7 +116,7 @@ class TC_WEBRTCP_2_13(MatterBaseTest, WEBRTCPTestBase):
         if self.is_pics_sdk_ci_only:
             self.write_to_app_pipe({"Name": "SetHardPrivacyModeOn", "Value": True})
         else:
-            input("Please turn ON the physical privacy switch on the device, then press Enter to continue...")
+            self.wait_for_user_input("Please turn ON the physical privacy switch on the device, then press Enter to continue...")
 
         # Verify the attribute reflects the privacy switch state
         hard_privacy_mode = await self.read_single_attribute_check_success(
@@ -163,7 +167,7 @@ class TC_WEBRTCP_2_13(MatterBaseTest, WEBRTCPTestBase):
         if self.is_pics_sdk_ci_only:
             self.write_to_app_pipe({"Name": "SetHardPrivacyModeOn", "Value": False})
         else:
-            input("Please turn OFF the physical privacy switch on the device, then press Enter to continue...")
+            self.wait_for_user_input("Please turn OFF the physical privacy switch on the device, then press Enter to continue...")
 
         # Verify the attribute reflects the privacy switch state
         hard_privacy_mode = await self.read_single_attribute_check_success(

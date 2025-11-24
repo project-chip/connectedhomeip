@@ -38,6 +38,37 @@ import coloredlogs
 import tabulate
 import yaml
 
+try:
+    from matter.testing.metadata import extract_runs_args  # May fail if python environment not built yet
+except ImportError:
+    # Fallback to manual import from source tree
+    _MATTER_TESTING_PATH = os.path.join(os.path.dirname(
+        __file__), '..', '..', 'src', 'python_testing', 'matter_testing_infrastructure')
+    if _MATTER_TESTING_PATH not in sys.path:
+        sys.path.insert(0, _MATTER_TESTING_PATH)
+    try:
+        from matter.testing.metadata import extract_runs_args
+    except ImportError:
+        extract_runs_args = None  # filtering by app (--app-filter) will not work.
+
+
+def _get_apps_from_script(path: str) -> List[str]:
+    """
+    Parses a python script and returns the apps it is for.
+    """
+    try:
+        runs_args = extract_runs_args(path)
+        apps = set()
+        for run_config in runs_args.values():
+            if run_config and 'app' in run_config:
+                # app is like "${ALL_CLUSTERS_APP}"
+                app_name = run_config['app'].strip('${}')
+                apps.add(app_name)
+        return list(apps)
+    except Exception as e:
+        logging.warning(f"Failed to parse metadata from {path}: {e}")
+        return []
+
 
 def _get_native_machine_target():
     """
@@ -321,7 +352,7 @@ __RUNNERS__ = {
 __LOG_LEVELS__ = {
     "debug": logging.DEBUG,
     "info": logging.INFO,
-    "warn": logging.WARN,
+    "warn": logging.WARNING,
     "fatal": logging.FATAL,
 }
 
@@ -426,7 +457,7 @@ def _do_build_basic_apps(coverage: Optional[bool]):
     """
     logging.info("Building example apps...")
 
-    all_targets = dict([(t.key, t) for t in _get_targets(coverage)])
+    all_targets = {t.key: t for t in _get_targets(coverage)}
     targets = [
         all_targets["CHIP_TOOL"].target,
         all_targets["ALL_CLUSTERS_APP"].target,
@@ -543,7 +574,7 @@ class FilterList:
     filters: list[GlobFilter]
 
     def any_matches(self, txt: str) -> bool:
-        return any([f.matches(txt) for f in self.filters])
+        return any(f.matches(txt) for f in self.filters)
 
 
 def _parse_filters(entry: str) -> FilterList:
@@ -778,6 +809,19 @@ def gen_coverage(flat):
     type=click.Choice(list(__RUNNERS__.keys()), case_sensitive=False),
     help="Determines the verbosity of script output",
 )
+@click.option(
+    "--override-binary-path",
+    default=None,
+    nargs=2,
+    multiple=True,
+    help="Defines an override binary path for a given app. Can be used multiple times. E.g. --override-binary-path ALL_CLUSTERS_APP out/some/path/chip-all-clusters-app"
+)
+@click.option(
+    "--app-filter",
+    default=None,
+    type=str,
+    help="Run only tests that are for the given app. Comma separated list of apps. E.g. --app-filter ALL_CLUSTERS_APP,CHIP_TOOL",
+)
 def python_tests(
     test_filter,
     skip,
@@ -789,6 +833,8 @@ def python_tests(
     keep_going,
     coverage,
     fail_log_dir,
+    override_binary_path,
+    app_filter,
 ):
     """
     Run python tests via `run_python_test.py`
@@ -812,9 +858,14 @@ def python_tests(
         return _maybe_with_runner(os.path.basename(path), path, runner)
 
     # create an env file
+    override_binaries = dict(override_binary_path or [])
+
     with open("./out/test_env.yaml", "wt") as f:
         for target in _get_targets(coverage):
-            run_path = as_runner(f"out/{target.target}/{target.binary}")
+            if target.key in override_binaries:
+                run_path = as_runner(override_binaries[target.key])
+            else:
+                run_path = as_runner(f"out/{target.target}/{target.binary}")
             f.write(f"{target.key}: {run_path}\n")
         f.write("TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}\n")
         f.write("TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}\n")
@@ -823,6 +874,12 @@ def python_tests(
     if not test_filter:
         test_filter = "*"
     test_filter = _parse_filters(test_filter)
+
+    app_filter_list = None
+    if app_filter:
+        if not extract_runs_args:
+            raise Exception("`--app-filter` requires the python testing environment: ./scripts/tests/local.py build-python")
+        app_filter_list = _parse_filters(app_filter)
 
     if skip:
         print("SKIP IS %r" % skip)
@@ -848,12 +905,12 @@ def python_tests(
         os.mkdir(fail_log_dir)
 
     metadata = yaml.full_load(open("src/python_testing/test_metadata.yaml"))
-    excluded_patterns = set([item["name"] for item in metadata["not_automated"]])
+    excluded_patterns = {item["name"] for item in metadata["not_automated"]}
 
     # NOTE: for slow tests. we add logs to not get impatient
-    slow_test_duration = dict(
-        [(item["name"], item["duration"]) for item in metadata["slow_tests"]]
-    )
+    slow_test_duration = {
+        item["name"]: item["duration"] for item in metadata["slow_tests"]
+    }
 
     if not os.path.isdir("src/python_testing"):
         raise Exception(
@@ -873,6 +930,12 @@ def python_tests(
     try:
         to_run = []
         for script in [t for t in test_scripts if test_filter.any_matches(t)]:
+            if app_filter_list:
+                required_apps = _get_apps_from_script(script)
+                if not any(app_filter_list.any_matches(app) for app in required_apps):
+                    logging.info("Skipping %s due to app filter (requires %r)", script, required_apps)
+                    continue
+
             if from_filter:
                 if not fnmatch.fnmatch(script, from_filter):
                     logging.info("From-filter SKIP %s", script)
@@ -899,6 +962,9 @@ def python_tests(
                     "out/venv",
                     f"./scripts/tests/run_python_test.py --load-from-env out/test_env.yaml --script {script}",
                 ]
+
+                if app_filter_list:
+                    cmd.extend(('--app-filter', app_filter))
 
                 if dry_run:
                     print(shlex.join(cmd))
@@ -931,8 +997,8 @@ def python_tests(
                             f.write(result.stderr)
 
                     else:
-                        logging.info("STDOUT:\n%s", result.stdout.decode("utf8"))
-                        logging.warning("STDERR:\n%s", result.stderr.decode("utf8"))
+                        logging.info("STDOUT:\n%s", result.stdout.decode("utf8", errors='replace'))
+                        logging.warning("STDERR:\n%s", result.stderr.decode("utf8", errors='replace'))
                     if not keep_going:
                         sys.exit(1)
                     failed_tests.append(script)
@@ -1142,7 +1208,7 @@ def chip_tool_tests(
     # This likely should be run in docker to not allow breaking things
     # run as:
     #
-    # docker run --rm -it -v ~/devel/connectedhomeip:/workspace --privileged ghcr.io/project-chip/chip-build-vscode:168
+    # docker run --rm -it -v ~/devel/connectedhomeip:/workspace --privileged ghcr.io/project-chip/chip-build-vscode:174
     runner = __RUNNERS__[runner]
 
     # make sure we are fully aware if running with or without coverage
@@ -1167,9 +1233,9 @@ def chip_tool_tests(
     cmd.extend(["--exclude-tags", "EXTRA_SLOW"])
     cmd.extend(["--exclude-tags", "PURPOSEFUL_FAILURE"])
 
-    paths = dict(
-        [(t.key, f"./out/{t.target}/{t.binary}") for t in _get_targets(coverage)]
-    )
+    paths = {
+        t.key: f"./out/{t.target}/{t.binary}" for t in _get_targets(coverage)
+    }
 
     if runner == BinaryRunner.COVERAGE:
         # when running with coveage, chip-tool also is covered

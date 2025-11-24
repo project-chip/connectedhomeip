@@ -515,7 +515,7 @@ public:
                                              const ConcreteCommandPath & aRequestCommandPath, const Optional<uint16_t> & aRef) :
             CommandHandlerImpl(apCallback)
         {
-            GetCommandPathRegistry().Add(aRequestCommandPath, aRef.std_optional());
+            EXPECT_SUCCESS(GetCommandPathRegistry().Add(aRequestCommandPath, aRef.std_optional()));
             SetExchangeInterface(&mMockCommandResponder);
         }
         MockCommandResponder mMockCommandResponder;
@@ -583,7 +583,7 @@ void TestCommandInteraction::GenerateInvokeRequest(System::PacketBufferHandle & 
     CommandPathIB::Builder & commandPathBuilder = commandDataIBBuilder.CreatePath();
     EXPECT_EQ(commandDataIBBuilder.GetError(), CHIP_NO_ERROR);
 
-    commandPathBuilder.EndpointId(aEndpointId).ClusterId(aClusterId).CommandId(aCommandId).EndOfCommandPathIB();
+    EXPECT_SUCCESS(commandPathBuilder.EndpointId(aEndpointId).ClusterId(aClusterId).CommandId(aCommandId).EndOfCommandPathIB());
     EXPECT_EQ(commandPathBuilder.GetError(), CHIP_NO_ERROR);
 
     if (aCommandId == kTestCommandIdWithData)
@@ -599,13 +599,13 @@ void TestCommandInteraction::GenerateInvokeRequest(System::PacketBufferHandle & 
         EXPECT_EQ(pWriter->EndContainer(dummyType), CHIP_NO_ERROR);
     }
 
-    commandDataIBBuilder.EndOfCommandDataIB();
+    EXPECT_SUCCESS(commandDataIBBuilder.EndOfCommandDataIB());
     EXPECT_EQ(commandDataIBBuilder.GetError(), CHIP_NO_ERROR);
 
-    invokeRequests.EndOfInvokeRequests();
+    EXPECT_SUCCESS(invokeRequests.EndOfInvokeRequests());
     EXPECT_EQ(invokeRequests.GetError(), CHIP_NO_ERROR);
 
-    invokeRequestMessageBuilder.EndOfInvokeRequestMessage();
+    EXPECT_SUCCESS(invokeRequestMessageBuilder.EndOfInvokeRequestMessage());
     ASSERT_EQ(invokeRequestMessageBuilder.GetError(), CHIP_NO_ERROR);
 
     EXPECT_EQ(writer.Finalize(&aPayload), CHIP_NO_ERROR);
@@ -635,7 +635,7 @@ void TestCommandInteraction::GenerateInvokeResponse(System::PacketBufferHandle &
     CommandPathIB::Builder & commandPathBuilder = commandDataIBBuilder.CreatePath();
     EXPECT_EQ(commandDataIBBuilder.GetError(), CHIP_NO_ERROR);
 
-    commandPathBuilder.EndpointId(aEndpointId).ClusterId(aClusterId).CommandId(aCommandId).EndOfCommandPathIB();
+    EXPECT_SUCCESS(commandPathBuilder.EndpointId(aEndpointId).ClusterId(aClusterId).CommandId(aCommandId).EndOfCommandPathIB());
     EXPECT_EQ(commandPathBuilder.GetError(), CHIP_NO_ERROR);
 
     if (aCommandId == kTestCommandIdWithData)
@@ -657,16 +657,16 @@ void TestCommandInteraction::GenerateInvokeResponse(System::PacketBufferHandle &
         EXPECT_EQ(commandDataIBBuilder.Ref(*aCommandRef), CHIP_NO_ERROR);
     }
 
-    commandDataIBBuilder.EndOfCommandDataIB();
+    EXPECT_SUCCESS(commandDataIBBuilder.EndOfCommandDataIB());
     EXPECT_EQ(commandDataIBBuilder.GetError(), CHIP_NO_ERROR);
 
-    invokeResponseIBBuilder.EndOfInvokeResponseIB();
+    EXPECT_SUCCESS(invokeResponseIBBuilder.EndOfInvokeResponseIB());
     EXPECT_EQ(invokeResponseIBBuilder.GetError(), CHIP_NO_ERROR);
 
-    invokeResponses.EndOfInvokeResponses();
+    EXPECT_SUCCESS(invokeResponses.EndOfInvokeResponses());
     EXPECT_EQ(invokeResponses.GetError(), CHIP_NO_ERROR);
 
-    invokeResponseMessageBuilder.EndOfInvokeResponseMessage();
+    EXPECT_SUCCESS(invokeResponseMessageBuilder.EndOfInvokeResponseMessage());
     EXPECT_EQ(invokeResponseMessageBuilder.GetError(), CHIP_NO_ERROR);
 
     EXPECT_EQ(writer.Finalize(&aPayload), CHIP_NO_ERROR);
@@ -813,7 +813,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage1)
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(msgBuf));
     StatusResponseMessage::Builder response;
-    response.Init(&writer);
+    EXPECT_SUCCESS(response.Init(&writer));
     response.Status(Protocols::InteractionModel::Status::Busy);
     EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
 
@@ -850,8 +850,8 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage1)
     EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
     ExpireSessionAliceToBob();
     ExpireSessionBobToAlice();
-    CreateSessionAliceToBob();
-    CreateSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 // Command Sender sends invoke request, command handler drops invoke response, then test injects unknown message to client,
@@ -884,7 +884,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage2)
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(msgBuf));
     ReportDataMessage::Builder response;
-    response.Init(&writer);
+    EXPECT_SUCCESS(response.Init(&writer));
     EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
 
     PayloadHeader payloadHeader;
@@ -919,8 +919,8 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage2)
     EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
     ExpireSessionAliceToBob();
     ExpireSessionBobToAlice();
-    CreateSessionAliceToBob();
-    CreateSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 // Command Sender sends invoke request, command handler drops invoke response, then test injects malformed invoke response
@@ -953,7 +953,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage3)
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(msgBuf));
     InvokeResponseMessage::Builder response;
-    response.Init(&writer);
+    EXPECT_SUCCESS(response.Init(&writer));
     EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
 
     PayloadHeader payloadHeader;
@@ -987,8 +987,8 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage3)
     EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
     ExpireSessionAliceToBob();
     ExpireSessionBobToAlice();
-    CreateSessionAliceToBob();
-    CreateSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 // Command Sender sends invoke request, command handler drops invoke response, then test injects malformed status response to
@@ -1020,7 +1020,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage4)
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(msgBuf));
     StatusResponseMessage::Builder response;
-    response.Init(&writer);
+    EXPECT_SUCCESS(response.Init(&writer));
     EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
 
     PayloadHeader payloadHeader;
@@ -1054,8 +1054,8 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandInvalidMessage4)
     EXPECT_EQ(GetNumActiveCommandResponderObjects(), 0u);
     ExpireSessionAliceToBob();
     ExpireSessionBobToAlice();
-    CreateSessionAliceToBob();
-    CreateSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 TEST_F(TestCommandInteraction, TestCommandSender_WithWrongState)
@@ -1146,7 +1146,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSender_ExtendableApiWithP
                                      &pendingResponseTracker);
 
     uint16_t mockCommandRef = 1;
-    pendingResponseTracker.Add(mockCommandRef);
+    EXPECT_SUCCESS(pendingResponseTracker.Add(mockCommandRef));
     commandSender.mFinishedCommandCount = 1;
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
@@ -1173,7 +1173,7 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSender_ExtendableApiWithP
                                      &pendingResponseTracker);
 
     uint16_t mockCommandRef = 1;
-    pendingResponseTracker.Add(mockCommandRef);
+    EXPECT_SUCCESS(pendingResponseTracker.Add(mockCommandRef));
 
     commandSender.mFinishedCommandCount = 1;
 

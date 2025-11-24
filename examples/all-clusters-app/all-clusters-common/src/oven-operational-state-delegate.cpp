@@ -54,9 +54,10 @@ void emberAfOvenCavityOperationalStateClusterInitCallback(chip::EndpointId endpo
     gOvenCavityOperationalStateInstance =
         new OvenCavityOperationalState::Instance(gOvenCavityOperationalStateDelegate, operationalStateEndpoint);
 
-    gOvenCavityOperationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
+    TEMPORARY_RETURN_IGNORED gOvenCavityOperationalStateInstance->SetOperationalState(
+        to_underlying(OperationalState::OperationalStateEnum::kStopped));
 
-    gOvenCavityOperationalStateInstance->Init();
+    TEMPORARY_RETURN_IGNORED gOvenCavityOperationalStateInstance->Init();
 }
 
 void emberAfOvenCavityOperationalStateClusterShutdownCallback(chip::EndpointId endpointId)

@@ -101,6 +101,15 @@ CHIP_ERROR NXPWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChange
     return err;
 }
 
+CHIP_ERROR NXPWiFiDriver::ConnectWiFiStagedNetwork()
+{
+    // no needed to connect to the staged network if commissioning failed
+    VerifyOrReturnError(mSavedNetwork.ssidLen != 0, CHIP_ERROR_KEY_NOT_FOUND);
+
+    // Connect to saved network
+    return ConnectWiFiNetwork(mSavedNetwork.ssid, mSavedNetwork.ssidLen, mSavedNetwork.credentials, mSavedNetwork.credentialsLen);
+}
+
 void NXPWiFiDriver::Shutdown()
 {
     mpStatusChangeCallback = nullptr;
@@ -120,18 +129,27 @@ CHIP_ERROR NXPWiFiDriver::RevertConfiguration()
 {
     struct wlan_network searchedNetwork = { 0 };
 
-    /* If network was added we have to remove it (as the connection failed) from wifi driver to be able
-    to connect to another network next commissioning */
-    if (wlan_get_network_byname(mStagingNetwork.ssid, &searchedNetwork) == WM_SUCCESS)
+    /* If network was added we have to remove it (only if device is not connected to a wifi network) from wifi driver to be able
+    to connect to another network next commissioning.
+    Do not remove the network if the device is already connected to a WiFi network,
+    example scenario: TC-CNET-4.9
+    */
+    if (!is_sta_connected() && wlan_get_network_byname(mStagingNetwork.ssid, &searchedNetwork) == WM_SUCCESS)
     {
         if (wlan_remove_network(mStagingNetwork.ssid) != WM_SUCCESS)
         {
             return CHIP_ERROR_INTERNAL;
         }
     }
+
+    /* Reset mStagingNetwork as it may have been updated during add/update network operation */
     mStagingNetwork = mSavedNetwork;
 
-    return CHIP_NO_ERROR;
+    // succeed right away if no saved network
+    VerifyOrReturnError(mStagingNetwork.ssidLen > 0, CHIP_NO_ERROR);
+    // Connect to saved network
+    return ConnectWiFiNetwork(mStagingNetwork.ssid, mStagingNetwork.ssidLen, mStagingNetwork.credentials,
+                              mStagingNetwork.credentialsLen);
 }
 
 bool NXPWiFiDriver::NetworkMatch(const WiFiNetwork & network, ByteSpan networkId)
@@ -212,7 +230,7 @@ void NXPWiFiDriver::OnConnectWiFiNetwork(Status commissioningError, CharSpan deb
     /* Commit wifi network credentials in flash only if the connection succeeded */
     if (commissioningError == NetworkCommissioning::Status::kSuccess)
     {
-        CommitConfiguration();
+        TEMPORARY_RETURN_IGNORED CommitConfiguration();
     }
 
     if (mpConnectCallback != nullptr)

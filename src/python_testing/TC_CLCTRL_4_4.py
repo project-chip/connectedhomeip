@@ -132,15 +132,19 @@ class TC_CLCTRL_4_4(MatterBaseTest):
 
     def pics_TC_CLCTRL_4_4(self) -> list[str]:
         pics = [
-            "CLCTRL.S",
+            "CLCTRL.S", "CLCTRL.S.A0000"
         ]
         return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_CLCTRL_4_4(self):
         countdown_time_max: uint = 259200
 
-        endpoint: int = self.get_endpoint(default=1)
+        endpoint: int = self.get_endpoint()
         timeout: uint = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else countdown_time_max
 
         self.step(1)

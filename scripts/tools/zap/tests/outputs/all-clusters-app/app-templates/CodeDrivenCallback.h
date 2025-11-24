@@ -27,6 +27,10 @@ void MatterIdentifyClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterIdentifyClusterShutdownCallback(chip::EndpointId endpointId);
 
+void MatterDescriptorClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterDescriptorClusterShutdownCallback(chip::EndpointId endpointId);
+
 void MatterBindingClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterBindingClusterShutdownCallback(chip::EndpointId endpointId);
@@ -70,6 +74,10 @@ void MatterWiFiNetworkDiagnosticsClusterShutdownCallback(chip::EndpointId endpoi
 void MatterEthernetNetworkDiagnosticsClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterEthernetNetworkDiagnosticsClusterShutdownCallback(chip::EndpointId endpointId);
+
+void MatterTimeSynchronizationClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterTimeSynchronizationClusterShutdownCallback(chip::EndpointId endpointId);
 
 void MatterAdministratorCommissioningClusterInitCallback(chip::EndpointId endpointId);
 

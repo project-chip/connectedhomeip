@@ -83,7 +83,7 @@ def generate_factory_data(args: object):
     Generate custom OTA payload from InputArgument derived objects. The payload is
     written in a temporary file that will be appended to args.input_files.
     """
-    fields = dict()
+    fields = {}
 
     if args.dac_key is not None:
         args.dac_key.generate_private_key(args.dac_key_password)
@@ -240,7 +240,7 @@ def show_payload(args: object):
 def create_image(args: object):
     ota_image_tool.validate_header_attributes(args)
 
-    input_files = list()
+    input_files = []
 
     if args.json:
         with open(args.json, 'r') as fd:
@@ -347,7 +347,7 @@ def main():
     create_parser.add_argument('--input_ota_key', type=str, default="1234567890ABCDEFA1B2C3D4E5F6F1B4",
                                help='Input OTA Encryption KEY (string:16Bytes)')
 
-    create_parser.add_argument('-i', '--input_files', default=list(),
+    create_parser.add_argument('-i', '--input_files', default=[],
                                help='Path to input image payload file')
     create_parser.add_argument('output_file', help='Path to output image file')
 

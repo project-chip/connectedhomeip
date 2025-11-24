@@ -618,7 +618,7 @@ void TCPEndPointImplSockets::DoCloseImpl(CHIP_ERROR err, State oldState)
                 }
             }
 
-            static_cast<System::LayerSockets &>(GetSystemLayer()).StopWatchingSocket(&mWatch);
+            TEMPORARY_RETURN_IGNORED static_cast<System::LayerSockets &>(GetSystemLayer()).StopWatchingSocket(&mWatch);
             close(mSocket);
             mSocket = kInvalidSocketFd;
         }
@@ -741,8 +741,9 @@ CHIP_ERROR TCPEndPointImplSockets::GetSocket(IPAddressType addrType)
             mSocket = kInvalidSocketFd;
         });
         ReturnErrorOnFailure(static_cast<System::LayerSockets &>(GetSystemLayer()).StartWatchingSocket(mSocket, &mWatch));
-        auto watchCleanup = ScopeExit([&]() { static_cast<System::LayerSockets &>(GetSystemLayer()).StopWatchingSocket(&mWatch); });
-        mAddrType         = addrType;
+        auto watchCleanup = ScopeExit(
+            [&]() { TEMPORARY_RETURN_IGNORED static_cast<System::LayerSockets &>(GetSystemLayer()).StopWatchingSocket(&mWatch); });
+        mAddrType = addrType;
 
         // If creating an IPv6 socket, tell the kernel that it will be IPv6 only.  This makes it
         // posible to bind two sockets to the same port, one for IPv4 and one for IPv6.
@@ -834,7 +835,7 @@ void TCPEndPointImplSockets::HandlePendingIO(System::SocketEvents events)
         // writing, drive outbound data into the connection.
         if (IsConnected() && !mSendQueue.IsNull() && events.Has(System::SocketEventFlags::kWrite))
         {
-            DriveSending();
+            TEMPORARY_RETURN_IGNORED DriveSending();
         }
 
         // If in a state were receiving is allowed, and the app is ready to receive data, and data is ready
@@ -904,6 +905,7 @@ void TCPEndPointImplSockets::ReceiveData()
         RestartTCPUserTimeoutTimer();
     }
 #endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
+    TCPEndPointHandle handle(this);
     // If an error occurred, abort the connection.
     if (rcvLen < 0)
     {
@@ -921,7 +923,6 @@ void TCPEndPointImplSockets::ReceiveData()
 
         DoClose(CHIP_ERROR_POSIX(systemErrno), false);
     }
-
     else
     {
         // Mark the connection as being active.
@@ -948,7 +949,7 @@ void TCPEndPointImplSockets::ReceiveData()
             // Call the app's OnPeerClose.
             if (OnPeerClose != nullptr)
             {
-                OnPeerClose(*this);
+                OnPeerClose(handle);
             }
         }
 
@@ -978,7 +979,7 @@ void TCPEndPointImplSockets::ReceiveData()
     }
 
     // Drive any received data into the app.
-    DriveReceiving();
+    DriveReceiving(handle);
 }
 
 CHIP_ERROR TCPEndPointImplSockets::HandleIncomingConnection()

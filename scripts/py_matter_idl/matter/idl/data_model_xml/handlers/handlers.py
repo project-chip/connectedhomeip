@@ -23,8 +23,8 @@ from matter.idl.matter_idl_types import (ApiMaturity, Attribute, AttributeQualit
 from .base import BaseHandler, HandledDepth
 from .context import Context
 from .derivation import AddBaseInfoPostProcessor
-from .parsing import (ApplyConstraint, AttributesToAttribute, AttributesToBitFieldConstantEntry, AttributesToCommand,
-                      AttributesToEvent, AttributesToField, NormalizeDataType, NormalizeName, ParseInt, StringToAccessPrivilege)
+from .parsing import (AttributesToAttribute, AttributesToBitFieldConstantEntry, AttributesToCommand, AttributesToEvent,
+                      AttributesToField, NormalizeDataType, NormalizeName, ParseInt, ParseOptionalInt, StringToAccessPrivilege)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -136,6 +136,67 @@ class MandatoryConformFieldHandler(BaseHandler):
             self._field.qualities |= FieldQuality.OPTIONAL
 
 
+class LengthBetweenHandler(BaseHandler):
+    def __init__(self, context: Context, field: Field):
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
+        self._field = field
+
+    def GetNextProcessor(self, name: str, attrs: AttributesImpl):
+        if name == "from":
+            self._field.data_type.min_length = ParseOptionalInt(attrs["value"])
+        elif name == "to":
+            self._field.data_type.max_length = ParseOptionalInt(attrs["value"])
+        else:
+            LOGGER.error(f"UNKNOWN constraint type {name}")
+        return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
+
+
+class ConstraintHandler(BaseHandler):
+    def __init__(self, context: Context, field: Field):
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
+        self._field = field
+
+    def GetNextProcessor(self, name: str, attrs: AttributesImpl):
+        if name == "allowed":
+            pass  # unsure what to do allowed
+        elif name == "desc":
+            pass  # free-form description
+        elif name in {"countBetween", "maxCount", "minCount", "maxCodePoints"}:
+            pass  # cannot implement count
+        elif name == "min":
+            # field.data_type.min_value = ParseOptionalInt(attrs["value"])
+            pass
+        elif name == "max":
+            # Data with formulas like `value="1500 - StartTime"` cannot be handled
+            # field.data_type.max_value = ParseOptionalInt(attrs["value"])
+            pass
+        elif name == "between":
+            # TODO: examples existing in the parsed data which are NOT
+            #       handled:
+            #         - from="-2.5°C" to="2.5°C"
+            #         - from="0%" to="100%"
+            # field.data_type.min_value = ParseOptionalInt(attrs["from"])
+            # field.data_type.max_value = ParseOptionalInt(attrs["to"])
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        elif name == "maxLength":
+            # some items may have a "constant" like:
+            #   <maxLength>
+            #     <constant name="RESP_MAX" value="900"/>
+            #   </maxLength>
+            # we skip that for now...
+            if "value" in attrs:
+                self._field.data_type.max_length = ParseOptionalInt(attrs["value"])
+            else:
+                LOGGER.warning("could not parse maxLength for %s (is it a constant sub-item?)", self._field.name)
+        elif name == "minLength":
+            self._field.data_type.min_length = ParseOptionalInt(attrs["value"])
+        elif name == "lengthBetween":
+            return LengthBetweenHandler(self.context, self._field)
+        else:
+            LOGGER.error(f"UNKNOWN constraint type {name}")
+        return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
+
+
 class FieldHandler(BaseHandler):
     def __init__(self, context: Context, field: Field):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
@@ -143,12 +204,13 @@ class FieldHandler(BaseHandler):
 
     def GetNextProcessor(self, name: str, attrs: AttributesImpl):
         if name == "constraint":
-            ApplyConstraint(attrs, self._field)
-            return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
+            return ConstraintHandler(self.context, self._field)
         elif name == "mandatoryConform":
             return MandatoryConformFieldHandler(self.context, self._field)
         elif name == "optionalConform":
             self._field.qualities |= FieldQuality.OPTIONAL
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        elif name in {'disallowConform', 'describedConform'}:
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "access":
             # per-field access is not something we model
@@ -297,6 +359,19 @@ class EventsHandler(BaseHandler):
             return BaseHandler(self.context)
 
 
+class NestedConformHandler(BaseHandler):
+    def __init__(self, context: Context, attribute: Attribute):
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
+        self._attribute = attribute
+
+    def GetNextProcessor(self, name: str, attrs: AttributesImpl):
+        if name == "provisionalConform":
+            self._attribute.api_maturity = ApiMaturity.PROVISIONAL
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        else:
+            return BaseHandler(self.context)
+
+
 class AttributeHandler(BaseHandler):
     def __init__(self, context: Context, cluster: Cluster, attrs: AttributesImpl):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
@@ -345,7 +420,8 @@ class AttributeHandler(BaseHandler):
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         elif name in {"optionalConform", "otherwiseConform"}:
             self._attribute.definition.qualities |= FieldQuality.OPTIONAL
-            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+            # we have more conformance logic, maybe even provisional conform, so recurse
+            return NestedConformHandler(self.context, self._attribute)
         elif name == "mandatoryConform":
             return MandatoryConformFieldHandler(self.context, self._attribute.definition)
         elif name == "provisionalConform":
@@ -355,8 +431,7 @@ class AttributeHandler(BaseHandler):
             self._deprecated = True
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "constraint":
-            ApplyConstraint(attrs, self._attribute.definition)
-            return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
+            return ConstraintHandler(self.context, self._attribute.definition)
         else:
             return BaseHandler(self.context)
 
@@ -406,8 +481,8 @@ class CommandHandler(BaseHandler):
         elif ("direction" in attrs) and attrs["direction"] == "responseFromServer":
             is_command = False  # response
         else:
-            LOGGER.warning("Could not clearly determine command direction: %s" %
-                           [item for item in attrs.items()])
+            LOGGER.warning("Could not clearly determine command direction: %s",
+                           list(attrs.items()))
             # Do a best-guess. However we should NOT need to guess once
             # we have a good data set
             is_command = not attrs["name"].endswith("Response")
@@ -552,6 +627,31 @@ class DataTypesHandler(BaseHandler):
             return BaseHandler(self.context)
 
 
+class ClusterIdHandler(BaseHandler):
+    def __init__(self, context: Context, cluster: Cluster):
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
+        self._cluster = cluster
+
+    def GetNextProcessor(self, name: str, attrs: AttributesImpl):
+        if name == "provisionalConform":
+            self._cluster.api_maturity = ApiMaturity.PROVISIONAL
+            return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
+        else:
+            return BaseHandler(self.context)
+
+
+class ClusterIdsHandler(BaseHandler):
+    def __init__(self, context: Context, cluster: Cluster):
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
+        self._cluster = cluster
+
+    def GetNextProcessor(self, name: str, attrs: AttributesImpl):
+        if name == "clusterId":
+            return ClusterIdHandler(self.context, self._cluster)
+        else:
+            return BaseHandler(self.context)
+
+
 class ClusterHandlerPostProcessing(enum.Enum):
     FINALIZE_AND_ADD_TO_IDL = enum.auto()
     NO_POST_PROCESSING = enum.auto()
@@ -611,6 +711,8 @@ class ClusterHandler(BaseHandler):
     def GetNextProcessor(self, name: str, attrs: AttributesImpl):
         if name == "revisionHistory":
             return RevisionHistoryHandler(self.context, self._cluster)
+        elif name == "clusterIds":
+            return ClusterIdsHandler(self.context, self._cluster)
         elif name == "section":
             # Documentation data, skipped
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)

@@ -57,6 +57,7 @@
 
 # This test requires a TH_SERVER application. Please specify with --string-arg th_server_app_path:<path_to_app>
 
+import asyncio
 import logging
 import os
 import random
@@ -177,7 +178,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
 
         self.step(4)
         event_path = [(self.matter_test_config.endpoint, Clusters.CommissionerControl.Events.CommissioningRequestResult, 1)]
-        events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
+        events = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path)
 
         self.step(5)
         cmd = Clusters.CommissionerControl.Commands.CommissionNode(requestID=1, responseTimeoutSeconds=30)
@@ -191,7 +192,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
         params = await self.open_commissioning_window(dev_ctrl=self.default_controller, node_id=self.dut_node_id)
         self.step(7)
         pase_nodeid = self.dut_node_id + 1
-        await self.default_controller.FindOrEstablishPASESession(setupCode=params.commissioningParameters.setupQRCode, nodeid=pase_nodeid)
+        await self.default_controller.FindOrEstablishPASESession(setupCode=params.commissioningParameters.setupQRCode, nodeId=pase_nodeid)
         try:
             await self.send_single_cmd(cmd=cmd, node_id=pase_nodeid)
             asserts.fail("Unexpected success on CommissionNode")
@@ -215,10 +216,10 @@ class TC_CCTRL_2_2(MatterBaseTest):
 
         self.step(10)
         if not events:
-            new_event = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
+            new_event = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path)
         else:
             event_nums = [e.Header.EventNumber for e in events]
-            new_event = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path, eventNumberFilter=max(event_nums)+1)
+            new_event = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path, eventNumberFilter=max(event_nums)+1)
         asserts.assert_equal(new_event, [], "Unexpected event")
 
         self.step(11)
@@ -236,10 +237,10 @@ class TC_CCTRL_2_2(MatterBaseTest):
 
         self.step(13)
         if not events:
-            new_event = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
+            new_event = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path)
         else:
             event_nums = [e.Header.EventNumber for e in events]
-            new_event = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path, eventNumberFilter=max(event_nums)+1)
+            new_event = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path, eventNumberFilter=max(event_nums)+1)
         asserts.assert_equal(len(new_event), 1, "Unexpected event list len")
         asserts.assert_equal(new_event[0].Data.statusCode, 0, "Unexpected status code")
         asserts.assert_equal(new_event[0].Data.clientNodeID,
@@ -288,7 +289,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
         self.step(19)
         logging.info("Test now waits for 30 seconds")
         if not self.is_pics_sdk_ci_only:
-            time.sleep(30)
+            await asyncio.sleep(30)
 
         self.step(20)
         print(f'server node id {self.server_nodeid}')
@@ -312,7 +313,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
         self.step(24)
         events = new_event
         event_nums = [e.Header.EventNumber for e in events]
-        new_event = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path, eventNumberFilter=max(event_nums)+1)
+        new_event = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path, eventNumberFilter=max(event_nums)+1)
         asserts.assert_equal(len(new_event), 1, "Unexpected event list len")
         asserts.assert_equal(new_event[0].Data.statusCode, 0, "Unexpected status code")
         asserts.assert_equal(new_event[0].Data.clientNodeID,
@@ -341,7 +342,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
         previous_number_th_server_fabrics = len(th_server_fabrics_new)
 
         while time_remaining > 0:
-            time.sleep(2)
+            await asyncio.sleep(2)
             th_server_fabrics_new = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, fabric_filtered=False)
             if previous_number_th_server_fabrics != len(th_server_fabrics_new):
                 break
