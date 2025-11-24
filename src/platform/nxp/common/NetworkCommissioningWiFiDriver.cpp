@@ -230,7 +230,7 @@ void NXPWiFiDriver::OnConnectWiFiNetwork(Status commissioningError, CharSpan deb
     /* Commit wifi network credentials in flash only if the connection succeeded */
     if (commissioningError == NetworkCommissioning::Status::kSuccess)
     {
-        CommitConfiguration();
+        TEMPORARY_RETURN_IGNORED CommitConfiguration();
     }
 
     if (mpConnectCallback != nullptr)

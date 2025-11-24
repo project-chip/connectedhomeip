@@ -100,10 +100,14 @@ class TC_MOD_1_2(MatterBaseTest):
     def _log_attribute(self, name, value):
         logger.info(f"{name} attribute with value: {value} with type: {type(value)}")
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_MOD_1_2(self):
         self.cluster = Clusters.ModeSelect
-        self.endpoint = self.get_endpoint(1)
+        self.endpoint = self.get_endpoint()
 
         # Commision device
         # In the test plan step 1 is defined as a precondition.
