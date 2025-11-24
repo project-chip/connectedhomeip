@@ -24,7 +24,6 @@ import random
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import IntEnum
-from time import sleep
 from typing import Optional
 
 from mdns_discovery import mdns_discovery
@@ -307,7 +306,7 @@ class CADMINBaseTest(MatterBaseTest):
 
         try:
             comm_params = await th.OpenCommissioningWindow(
-                nodeid=node_id,
+                nodeId=node_id,
                 timeout=timeout,
                 iteration=iteration,
                 discriminator=discriminator if discriminator is not None else random.randint(0, 4095),
@@ -322,12 +321,12 @@ class CADMINBaseTest(MatterBaseTest):
         return params, window_status_accumulator
 
     async def write_nl_attr(self, dut_node_id: int, th: ChipDeviceCtrl, attr_val: object):
-        result = await th.WriteAttribute(nodeid=dut_node_id, attributes=[(0, attr_val)])
+        result = await th.WriteAttribute(nodeId=dut_node_id, attributes=[(0, attr_val)])
         asserts.assert_equal(result[0].Status, Status.Success, f"{th} node label write failed")
 
     async def read_nl_attr(self, dut_node_id: int, th: ChipDeviceCtrl, attr_val: object):
         try:
-            await th.ReadAttribute(nodeid=dut_node_id, attributes=[(0, attr_val)])
+            await th.ReadAttribute(nodeId=dut_node_id, attributes=[(0, attr_val)])
         except Exception as e:
             asserts.assert_equal(e.err, "Received error message from read attribute attempt")
             self.print_step(0, e)
@@ -355,13 +354,13 @@ class CADMINBaseTest(MatterBaseTest):
         """Revoke the current commissioning window."""
         revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
         await th.SendCommand(
-            nodeid=node_id,
+            nodeId=node_id,
             endpoint=0,
             payload=revokeCmd,
             timedRequestTimeoutMs=6000
         )
         # The failsafe cleanup is scheduled after the command completes
-        sleep(1)
+        await asyncio.sleep(1)
 
     @dataclass
     class TimingResults:
@@ -439,7 +438,7 @@ class CADMINBaseTest(MatterBaseTest):
             if attempt < max_attempts - 1:
                 logging.info(f"Waiting for service with CM={expected_cm_value} and D={expected_discriminator}, "
                              f"attempt {attempt+1}/{max_attempts}")
-                sleep(delay_sec)
+                await asyncio.sleep(delay_sec)
             else:
                 # Final retry attempt failed
                 asserts.fail(f"Failed to find DNS-SD advertisement with CM={expected_cm_value} and "

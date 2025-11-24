@@ -151,8 +151,11 @@ void TestExchange::DoRoundTripTest(MockExchangeDelegate & delegate1, MockExchang
     ec1->Close();
     ec2->Close();
 
-    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::Id, kMsgType_TEST1);
+    Messaging::UnsolicitedMessageHandler * removedHandler = nullptr;
+    err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::Id, kMsgType_TEST1,
+                                                                          &removedHandler);
     EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(removedHandler, &delegate2);
 }
 
 TEST_F(TestExchange, CheckBasicMessageRoundTrip)

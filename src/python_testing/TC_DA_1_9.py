@@ -44,9 +44,9 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import os
 import signal
-import subprocess
 
 from mobly import asserts
 
@@ -187,7 +187,8 @@ class TC_DA_1_9(MatterBaseTest):
             self.step(idx + 1)
 
             # Clean up any existing KVS files
-            subprocess.call("rm -f all-clusters-kvs*", shell=True)
+            proc = await asyncio.create_subprocess_shell("rm -f all-clusters-kvs*")
+            await proc.wait()
 
             # Create log files for this test case
             log_path = os.path.join(self.matter_test_config.logs_path, 'TC_DA_1_9')
@@ -205,10 +206,9 @@ class TC_DA_1_9(MatterBaseTest):
                     discriminator = test_case['discriminator']
                     app_args += f' --discriminator {discriminator}'
 
-                app_cmd = f"{self.app_path} {app_args}"
-
                 # Run the all-clusters-app in background
-                app_process = subprocess.Popen(app_cmd.split(), stdout=app_log_file, stderr=app_log_file)
+                app_process = await asyncio.create_subprocess_exec(self.app_path, *app_args.split(),
+                                                                   stdout=app_log_file, stderr=app_log_file)
 
                 revocation_set = os.path.join(self.revocation_set_base_path, test_case['revocation_set'])
                 # Prompt user with instructions
@@ -226,7 +226,7 @@ class TC_DA_1_9(MatterBaseTest):
                         self.default_controller.SetDACRevocationSetPath(revocation_set)
                         await self.default_controller.CommissionWithCode(
                             setupPayload=test_case['manual_pairing_code'],
-                            nodeid=1,
+                            nodeId=1,
                             discoveryType=ChipDeviceCtrl.DiscoveryType.DISCOVERY_NETWORK_ONLY,
                         )
                         resp = 'Y'
@@ -238,13 +238,14 @@ class TC_DA_1_9(MatterBaseTest):
                 commissioning_success = resp.lower() == 'y'
 
                 app_process.send_signal(signal.SIGTERM.value)
-                app_process.wait()
+                await app_process.wait()
 
                 # Verify results
                 asserts.assert_equal(
                     commissioning_success,
                     test_case['expects_commissioning_success'],
-                    f"Commissioning {'succeeded' if commissioning_success else 'failed'} when it should have {'succeeded' if test_case['expects_commissioning_success'] else 'failed'}"
+                    f"Commissioning {'succeeded' if commissioning_success else 'failed'} when it should "
+                    f"have {'succeeded' if test_case['expects_commissioning_success'] else 'failed'}"
                 )
 
 

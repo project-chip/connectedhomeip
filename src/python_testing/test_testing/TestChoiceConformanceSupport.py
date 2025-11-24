@@ -163,9 +163,9 @@ class TestConformanceSupport(MatterBaseTest):
         for combo in combos:
             # The first three IDs are all O.a, so we need exactly one for the conformance to be valid
             expected_failures = set()
-            if len(set([1, 2, 3]) & set(combo)) != 1:
+            if len({1, 2, 3} & set(combo)) != 1:
                 expected_failures.add('a')
-            if len(set([4, 5, 6]) & set(combo)) < 1:
+            if len({4, 5, 6} & set(combo)) < 1:
                 expected_failures.add('b')
             # For these, we are checking that choice conformance checkers
             # - Correctly report errors and correct cases when the gating feature is ON
@@ -173,9 +173,9 @@ class TestConformanceSupport(MatterBaseTest):
             # Errors where we incorrectly set disallowed features based on the gating feature are checked
             # elsewhere in the cert test in a comprehensive way. We just want to ensure that we are not
             # incorrectly reporting choice conformance error as well
-            if 13 in combo and ((len(set([7, 8, 9]) & set(combo)) != 1)):
+            if 13 in combo and len({7, 8, 9} & set(combo)) != 1:
                 expected_failures.add('c')
-            if 13 in combo and (len(set([10, 11, 12]) & set(combo)) < 1):
+            if 13 in combo and len({10, 11, 12} & set(combo)) < 1:
                 expected_failures.add('d')
 
             self.all_id_combos.append((combo, expected_failures))
@@ -184,7 +184,7 @@ class TestConformanceSupport(MatterBaseTest):
         if len(expected_failures) != len(problems):
             print(problems)
         asserts.assert_equal(len(expected_failures), len(problems), 'Unexpected number of choice conformance problems')
-        actual_failures = set([p.choice.marker for p in problems])
+        actual_failures = {p.choice.marker for p in problems}
         asserts.assert_equal(actual_failures, expected_failures, "Mismatch between failures")
 
     def test_features(self):

@@ -40,8 +40,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 from datetime import datetime, timedelta, timezone
 
 from mobly import asserts
@@ -325,7 +325,7 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
         self.step("9")
         # Wait 7 seconds
         logger.info("Waiting for 7 seconds for discharge timer to expire")
-        time.sleep(7)
+        await asyncio.sleep(7)
 
         self.step("9a")
         # TH reads from the DUT the SupplyState
@@ -361,7 +361,7 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
         self.step("10")
         # Wait 10 seconds
         logger.info("Waiting for 10 seconds for charging timer to expire")
-        time.sleep(10)
+        await asyncio.sleep(10)
 
         self.step("10a")
         # TH reads from the DUT the SupplyState

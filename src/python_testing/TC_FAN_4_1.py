@@ -36,8 +36,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 from typing import Optional
 
 from mobly import asserts
@@ -173,7 +173,7 @@ class TC_FAN_4_1(MatterBaseTest):
 
         self.step(6)
         attr = fan.Attributes.FanMode(fan.Enums.FanModeEnum.kHigh)
-        resp = await self.default_controller.WriteAttribute(nodeid=self.dut_node_id, attributes=[(self.get_endpoint(), attr)])
+        resp = await self.default_controller.WriteAttribute(nodeId=self.dut_node_id, attributes=[(self.get_endpoint(), attr)])
         asserts.assert_equal(resp[0].Status, Status.Success, "Unexpected error writing FanMode attribute")
 
         self.step(7)
@@ -226,7 +226,7 @@ class TC_FAN_4_1(MatterBaseTest):
             """
             nonlocal step_num
             self.step(step_num)
-            resp = await self.default_controller.WriteAttribute(nodeid=self.dut_node_id, attributes=[(self.get_endpoint(), attr)])
+            resp = await self.default_controller.WriteAttribute(nodeId=self.dut_node_id, attributes=[(self.get_endpoint(), attr)])
             asserts.assert_in(resp[0].Status, [Status.Success, Status.InvalidInState], "Unexpected status returned")
             if resp[0].Status != Status.Success:
                 self.skip_step(step_num + 1)
@@ -251,7 +251,7 @@ class TC_FAN_4_1(MatterBaseTest):
 
             self.step(step_num + 3)
             logging.info(f"Waiting for {wait_s} seconds to give the fan a chance to respond")
-            time.sleep(wait_s)
+            await asyncio.sleep(wait_s)
 
             self.step(step_num + 4)
             percent_current = await self.read_single_attribute_check_success(cluster=fan, attribute=fan.Attributes.PercentCurrent)
@@ -312,7 +312,7 @@ class TC_FAN_4_1(MatterBaseTest):
         # Make sure that we can still adjust the Percent values now that it's back on
         self.step(step_num)
         attr = fan.Attributes.PercentSetting(50)
-        resp = await self.default_controller.WriteAttribute(nodeid=self.dut_node_id, attributes=[(self.get_endpoint(), attr)])
+        resp = await self.default_controller.WriteAttribute(nodeId=self.dut_node_id, attributes=[(self.get_endpoint(), attr)])
         asserts.assert_in(resp[0].Status, [Status.Success, Status.InvalidInState], "Invalid response from writing PercentSetting")
         step_num += 1
 

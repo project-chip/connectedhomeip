@@ -69,6 +69,10 @@ class TC_WebRTCP_2_6(MatterBaseTest, WEBRTCPTestBase):
         ]
         return pics
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_WebRTCP_2_6(self):
         """
@@ -77,7 +81,7 @@ class TC_WebRTCP_2_6(MatterBaseTest, WEBRTCPTestBase):
 
         self.step("precondition")
         # Commission DUT - already done
-        webrtc_endpoint = self.get_endpoint(default=1)
+        webrtc_endpoint = self.get_endpoint()
 
         self.step(1)
         # Read the descriptor cluster on the endpoint containing the WebRTC Transport Provider cluster

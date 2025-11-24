@@ -38,6 +38,8 @@ constexpr uint8_t kJFAdminShift     = 1;
 constexpr uint8_t kJFAnchorShift    = 2;
 constexpr uint8_t kJFDatastoreShift = 3;
 
+constexpr chip::EndpointId kJointFabricAdminEndpointId = 1;
+
 JFAManager JFAManager::sJFA;
 
 CHIP_ERROR JFAManager::Init(Server & server)
@@ -97,7 +99,8 @@ void JFAManager::HandleCommissioningCompleteEvent()
             /* When JFA is commissioned, it has to be issued a NOC with Anchor CAT and Administrator CAT */
             if (cats.ContainsIdentifier(kAdminCATIdentifier) && cats.ContainsIdentifier(kAnchorCATIdentifier))
             {
-                (void) app::Clusters::JointFabricAdministrator::Attributes::AdministratorFabricIndex::Set(1, fabricIndex);
+                (void) app::Clusters::JointFabricAdministrator::Attributes::AdministratorFabricIndex::Set(
+                    kJointFabricAdminEndpointId, fabricIndex);
 
                 jfFabricIndex = fabricIndex;
             }
@@ -191,11 +194,11 @@ void JFAManager::OnConnected(void * context, Messaging::ExchangeManager & exchan
     switch (jfaManager->mOnConnectedAction)
     {
     case kStandardCommissioningComplete: {
-        jfaManager->SendCommissioningComplete();
+        TEMPORARY_RETURN_IGNORED jfaManager->SendCommissioningComplete();
         break;
     }
     case kJCMCommissioning: {
-        jfaManager->AnnounceJointFabricAdministrator();
+        TEMPORARY_RETURN_IGNORED jfaManager->AnnounceJointFabricAdministrator();
         break;
     }
 
@@ -225,6 +228,8 @@ CHIP_ERROR JFAManager::AnnounceJointFabricAdministrator()
     }
 
     ChipLogProgress(JointFabric, "AnnounceJointFabricAdministrator: invoke cluster command.");
+    request.endpointID = kJointFabricAdminEndpointId;
+
     Controller::ClusterBase cluster(*mExchangeMgr, mSessionHolder.Get().Value(), peerAdminJFAdminClusterEndpointId);
     return cluster.InvokeCommand(request, this, OnAnnounceJointFabricAdministratorResponse,
                                  OnAnnounceJointFabricAdministratorFailure);
@@ -238,7 +243,7 @@ void JFAManager::OnAnnounceJointFabricAdministratorResponse(void * context, cons
     ChipLogProgress(JointFabric, "OnAnnounceJointFabricAdministratorResponse");
 
     /* TODO: https://github.com/project-chip/connectedhomeip/issues/38202 */
-    jfaManagerCore->SendICACSRRequest();
+    TEMPORARY_RETURN_IGNORED jfaManagerCore->SendICACSRRequest();
 }
 
 void JFAManager::OnAnnounceJointFabricAdministratorFailure(void * context, CHIP_ERROR error)
@@ -277,7 +282,7 @@ void JFAManager::OnSendICACSRRequestResponse(void * context, const Commands::ICA
         jfaManagerCore->peerAdminICACPubKey.Matches(pubKey))
     {
         ChipLogProgress(JointFabric, "OnSendICACSRRequestResponse: validated ICAC CSR");
-        jfaManagerCore->SendCommissioningComplete();
+        TEMPORARY_RETURN_IGNORED jfaManagerCore->SendCommissioningComplete();
     }
 }
 

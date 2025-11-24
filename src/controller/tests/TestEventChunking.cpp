@@ -42,6 +42,7 @@
 #include <lib/support/CHIPCounter.h>
 #include <lib/support/TimeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <protocols/interaction_model/Constants.h>
 
 using namespace chip;
@@ -287,13 +288,13 @@ TEST_F(TestEventChunking, TestEventChunking)
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
-    CodegenDataModelProviderInstance(nullptr /* delegate */)->Shutdown();
+    EXPECT_SUCCESS(CodegenDataModelProviderInstance(nullptr /* delegate */)->Shutdown());
     engine->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
     DataVersion dataVersionStorage[MATTER_ARRAY_SIZE(testEndpointClusters)];
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
+    EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage)));
 
     chip::EventNumber firstEventNumber;
     chip::EventNumber lastEventNumber;
@@ -355,13 +356,13 @@ TEST_F(TestEventChunking, TestMixedEventsAndAttributesChunking)
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
-    CodegenDataModelProviderInstance(nullptr /* delegate */)->Shutdown();
+    EXPECT_SUCCESS(CodegenDataModelProviderInstance(nullptr /* delegate */)->Shutdown());
     engine->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
     DataVersion dataVersionStorage[MATTER_ARRAY_SIZE(testEndpointClusters)];
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
+    EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage)));
 
     chip::EventNumber firstEventNumber;
     chip::EventNumber lastEventNumber;
@@ -433,13 +434,13 @@ TEST_F(TestEventChunking, TestMixedEventsAndLargeAttributesChunking)
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
-    CodegenDataModelProviderInstance(nullptr /* delegate */)->Shutdown();
+    EXPECT_SUCCESS(CodegenDataModelProviderInstance(nullptr /* delegate */)->Shutdown());
     engine->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
     DataVersion dataVersionStorage[MATTER_ARRAY_SIZE(testEndpointClusters)];
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint4, Span<DataVersion>(dataVersionStorage));
+    EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint4, Span<DataVersion>(dataVersionStorage)));
 
     chip::EventNumber firstEventNumber;
     chip::EventNumber lastEventNumber;

@@ -243,7 +243,7 @@ std::optional<DataModel::ActionReturnStatus> WiFiDiagnosticsServerCluster::Invok
         // Note that ResetWiFiNetworkDiagnosticsCounts() does return a CHIP_ERROR; however, for backwards compatibility,
         // we completely ignore that return value. It would probably be more correct to return the result
         // of the reset, but that seems to potentially cause backwards compatibility issues.
-        mDiagnosticProvider.ResetWiFiNetworkDiagnosticsCounts();
+        TEMPORARY_RETURN_IGNORED mDiagnosticProvider.ResetWiFiNetworkDiagnosticsCounts();
         return Protocols::InteractionModel::Status::Success;
     }
     default:

@@ -48,12 +48,14 @@ TEST(TestInteractionModelEventEmitting, TestBasicType)
 
     std::optional<EventNumber> n1 = events->GenerateEvent(event, 0 /* EndpointId */);
 
-    ASSERT_EQ(n1, logOnlyEvents.CurrentEventNumber());
-    ASSERT_EQ(logOnlyEvents.LastOptions().mPath,
+    auto eventInfo = logOnlyEvents.GetNextEvent();
+    ASSERT_TRUE(eventInfo.has_value());
+    ASSERT_EQ(n1, eventInfo->eventNumber);   // NOLINT(bugprone-unchecked-optional-access)
+    ASSERT_EQ(eventInfo->eventOptions.mPath, // NOLINT(bugprone-unchecked-optional-access)
               ConcreteEventPath(0 /* endpointId */, StartUpEventType::GetClusterId(), StartUpEventType::GetEventId()));
 
     chip::app::Clusters::BasicInformation::Events::StartUp::DecodableType decoded_event;
-    CHIP_ERROR err = logOnlyEvents.DecodeLastEvent(decoded_event);
+    CHIP_ERROR err = eventInfo->GetEventData(decoded_event); // NOLINT(bugprone-unchecked-optional-access)
 
     if (err != CHIP_NO_ERROR)
     {
@@ -63,9 +65,11 @@ TEST(TestInteractionModelEventEmitting, TestBasicType)
     ASSERT_EQ(decoded_event.softwareVersion, kFakeSoftwareVersion);
 
     std::optional<EventNumber> n2 = events->GenerateEvent(event, /* endpointId = */ 1);
-    ASSERT_EQ(n2, logOnlyEvents.CurrentEventNumber());
+    eventInfo                     = logOnlyEvents.GetNextEvent();
+    ASSERT_TRUE(eventInfo.has_value());
+    ASSERT_EQ(n2, eventInfo->eventNumber); // NOLINT(bugprone-unchecked-optional-access)
 
-    ASSERT_EQ(logOnlyEvents.LastOptions().mPath,
+    ASSERT_EQ(eventInfo->eventOptions.mPath, // NOLINT(bugprone-unchecked-optional-access)
               ConcreteEventPath(1 /* endpointId */, StartUpEventType::GetClusterId(), StartUpEventType::GetEventId()));
 }
 
@@ -90,13 +94,14 @@ TEST(TestInteractionModelEventEmitting, TestFabricScoped)
     event.fabricIndex = kTestFabricIndex;
     n1                = events->GenerateEvent(event, /* endpointId = */ 0);
 
-    ASSERT_EQ(n1, logOnlyEvents.CurrentEventNumber());
-    ASSERT_EQ(logOnlyEvents.LastOptions().mPath,
+    auto eventInfo = logOnlyEvents.GetNextEvent();
+    ASSERT_EQ(n1, eventInfo->eventNumber);   // NOLINT(bugprone-unchecked-optional-access)
+    ASSERT_EQ(eventInfo->eventOptions.mPath, // NOLINT(bugprone-unchecked-optional-access)
               ConcreteEventPath(0 /* endpointId */, AccessControlEntryChangedType::GetClusterId(),
                                 AccessControlEntryChangedType::GetEventId()));
 
     chip::app::Clusters::AccessControl::Events::AccessControlEntryChanged::DecodableType decoded_event;
-    CHIP_ERROR err = logOnlyEvents.DecodeLastEvent(decoded_event);
+    CHIP_ERROR err = eventInfo->GetEventData(decoded_event); // NOLINT(bugprone-unchecked-optional-access)
 
     if (err != CHIP_NO_ERROR)
     {

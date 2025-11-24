@@ -511,10 +511,12 @@ public:
         mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&TestImCustomDataModel::Instance());
         chip::Test::SetMockNodeConfig(TestMockNodeConfig());
         chip::Test::SetVersionTo(chip::Test::kTestDataVersion1);
+        chip::DeviceLayer::SetSystemLayerForTesting(&GetSystemLayer());
     }
 
     void TearDown() override
     {
+        chip::DeviceLayer::SetSystemLayerForTesting(nullptr);
         chip::Test::ResetMockNodeConfig();
         InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
         chip::app::EventManagement::DestroyEventManagement();
@@ -640,16 +642,16 @@ void TestReadInteraction::GenerateReportData(System::PacketBufferHandle & aPaylo
 
     if (aReportType == ReportType::kInvalidNoAttributeId)
     {
-        attributePathBuilder.Node(1).Endpoint(2).Cluster(3).ListIndex(5).EndOfAttributePathIB();
+        EXPECT_SUCCESS(attributePathBuilder.Node(1).Endpoint(2).Cluster(3).ListIndex(5).EndOfAttributePathIB());
     }
     else if (aReportType == ReportType::kInvalidOutOfRangeAttributeId)
     {
-        attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(0xFFF18000).EndOfAttributePathIB();
+        EXPECT_SUCCESS(attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(0xFFF18000).EndOfAttributePathIB());
     }
     else
     {
         EXPECT_EQ(aReportType, ReportType::kValid);
-        attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).EndOfAttributePathIB();
+        EXPECT_SUCCESS(attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).EndOfAttributePathIB());
     }
 
     EXPECT_EQ(attributePathBuilder.GetError(), CHIP_NO_ERROR);
@@ -666,13 +668,13 @@ void TestReadInteraction::GenerateReportData(System::PacketBufferHandle & aPaylo
         EXPECT_EQ(pWriter->EndContainer(dummyType), CHIP_NO_ERROR);
     }
 
-    attributeDataIBBuilder.EndOfAttributeDataIB();
+    EXPECT_SUCCESS(attributeDataIBBuilder.EndOfAttributeDataIB());
     EXPECT_EQ(attributeDataIBBuilder.GetError(), CHIP_NO_ERROR);
 
-    attributeReportIBBuilder.EndOfAttributeReportIB();
+    EXPECT_SUCCESS(attributeReportIBBuilder.EndOfAttributeReportIB());
     EXPECT_EQ(attributeReportIBBuilder.GetError(), CHIP_NO_ERROR);
 
-    attributeReportIBsBuilder.EndOfAttributeReportIBs();
+    EXPECT_SUCCESS(attributeReportIBsBuilder.EndOfAttributeReportIBs());
     EXPECT_EQ(attributeReportIBsBuilder.GetError(), CHIP_NO_ERROR);
 
     reportDataMessageBuilder.MoreChunkedMessages(false);
@@ -681,7 +683,7 @@ void TestReadInteraction::GenerateReportData(System::PacketBufferHandle & aPaylo
     reportDataMessageBuilder.SuppressResponse(aSuppressResponse);
     EXPECT_EQ(reportDataMessageBuilder.GetError(), CHIP_NO_ERROR);
 
-    reportDataMessageBuilder.EndOfReportDataMessage();
+    EXPECT_SUCCESS(reportDataMessageBuilder.EndOfReportDataMessage());
     EXPECT_EQ(reportDataMessageBuilder.GetError(), CHIP_NO_ERROR);
 
     EXPECT_EQ(writer.Finalize(&aPayload), CHIP_NO_ERROR);
@@ -764,14 +766,14 @@ void TestReadInteraction::TestReadHandler()
         AttributePathIB::Builder & attributePathBuilder = attributePathListBuilder.CreatePath();
         EXPECT_EQ(attributePathListBuilder.GetError(), CHIP_NO_ERROR);
 
-        attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).EndOfAttributePathIB();
+        EXPECT_SUCCESS(attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).EndOfAttributePathIB());
         EXPECT_EQ(attributePathBuilder.GetError(), CHIP_NO_ERROR);
 
-        attributePathListBuilder.EndOfAttributePathIBs();
+        EXPECT_SUCCESS(attributePathListBuilder.EndOfAttributePathIBs());
         EXPECT_EQ(attributePathListBuilder.GetError(), CHIP_NO_ERROR);
 
         EXPECT_EQ(readRequestBuilder.GetError(), CHIP_NO_ERROR);
-        readRequestBuilder.IsFabricFiltered(false).EndOfReadRequestMessage();
+        EXPECT_SUCCESS(readRequestBuilder.IsFabricFiltered(false).EndOfReadRequestMessage());
         EXPECT_EQ(readRequestBuilder.GetError(), CHIP_NO_ERROR);
         EXPECT_EQ(writer.Finalize(&readRequestbuf), CHIP_NO_ERROR);
 
@@ -828,13 +830,13 @@ void TestReadInteraction::TestReadHandlerSetMaxReportingInterval()
         AttributePathIB::Builder & attributePathBuilder = attributePathListBuilder.CreatePath();
         EXPECT_EQ(attributePathListBuilder.GetError(), CHIP_NO_ERROR);
 
-        attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
+        EXPECT_SUCCESS(attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB());
         EXPECT_EQ(attributePathBuilder.GetError(), CHIP_NO_ERROR);
 
-        attributePathListBuilder.EndOfAttributePathIBs();
-        EXPECT_EQ(attributePathListBuilder.GetError(), CHIP_NO_ERROR);
+        EXPECT_SUCCESS(attributePathListBuilder.EndOfAttributePathIBs());
+        EXPECT_SUCCESS(attributePathListBuilder.GetError());
 
-        subscribeRequestBuilder.IsFabricFiltered(false).EndOfSubscribeRequestMessage();
+        EXPECT_SUCCESS(subscribeRequestBuilder.IsFabricFiltered(false).EndOfSubscribeRequestMessage());
         EXPECT_EQ(subscribeRequestBuilder.GetError(), CHIP_NO_ERROR);
 
         EXPECT_EQ(subscribeRequestBuilder.GetError(), CHIP_NO_ERROR);
@@ -1040,11 +1042,11 @@ void TestReadInteraction::TestReadHandlerInvalidAttributePath()
         AttributePathIB::Builder & attributePathBuilder = attributePathListBuilder.CreatePath();
         EXPECT_EQ(attributePathListBuilder.GetError(), CHIP_NO_ERROR);
 
-        attributePathBuilder.Node(1).Endpoint(2).Cluster(3).EndOfAttributePathIB();
+        EXPECT_SUCCESS(attributePathBuilder.Node(1).Endpoint(2).Cluster(3).EndOfAttributePathIB());
         EXPECT_EQ(attributePathBuilder.GetError(), CHIP_NO_ERROR);
 
         EXPECT_EQ(attributePathListBuilder.EndOfAttributePathIBs(), CHIP_NO_ERROR);
-        readRequestBuilder.EndOfReadRequestMessage();
+        EXPECT_SUCCESS(readRequestBuilder.EndOfReadRequestMessage());
         EXPECT_EQ(readRequestBuilder.GetError(), CHIP_NO_ERROR);
         EXPECT_EQ(writer.Finalize(&readRequestbuf), CHIP_NO_ERROR);
 
@@ -1092,7 +1094,7 @@ void TestReadInteraction::TestReadClientGenerateOneEventPaths()
     Span<EventPathParams> eventPaths(eventPathParams, 1 /*aEventPathParamsListSize*/);
     EXPECT_EQ(readClient.GenerateEventPaths(eventPathListBuilder, eventPaths), CHIP_NO_ERROR);
 
-    request.IsFabricFiltered(false).EndOfReadRequestMessage();
+    EXPECT_SUCCESS(request.IsFabricFiltered(false).EndOfReadRequestMessage());
     EXPECT_EQ(CHIP_NO_ERROR, request.GetError());
 
     EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
@@ -1104,7 +1106,7 @@ void TestReadInteraction::TestReadClientGenerateOneEventPaths()
     EXPECT_EQ(readRequestParser.Init(reader), CHIP_NO_ERROR);
 
 #if CHIP_CONFIG_IM_PRETTY_PRINT
-    readRequestParser.PrettyPrint();
+    EXPECT_SUCCESS(readRequestParser.PrettyPrint());
 #endif
 
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
@@ -1139,8 +1141,8 @@ void TestReadInteraction::TestReadClientGenerateTwoEventPaths()
     Span<EventPathParams> eventPaths(eventPathParams, 2 /*aEventPathParamsListSize*/);
     EXPECT_EQ(readClient.GenerateEventPaths(eventPathListBuilder, eventPaths), CHIP_NO_ERROR);
 
-    request.IsFabricFiltered(false).EndOfReadRequestMessage();
-    EXPECT_EQ(CHIP_NO_ERROR, request.GetError());
+    EXPECT_SUCCESS(request.IsFabricFiltered(false).EndOfReadRequestMessage());
+    EXPECT_SUCCESS(request.GetError());
 
     EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
 
@@ -1151,7 +1153,7 @@ void TestReadInteraction::TestReadClientGenerateTwoEventPaths()
     EXPECT_EQ(readRequestParser.Init(reader), CHIP_NO_ERROR);
 
 #if CHIP_CONFIG_IM_PRETTY_PRINT
-    readRequestParser.PrettyPrint();
+    EXPECT_SUCCESS(readRequestParser.PrettyPrint());
 #endif
 
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
@@ -1682,7 +1684,7 @@ void TestReadInteraction::TestSetDirtyBetweenChunks()
                         // At this time, we are in the middle of report for second item.
                         mNumAttributeResponsesWhenSetDirty = mNumAttributeResponse;
                         mNumArrayItemsWhenSetDirty         = mNumArrayItems;
-                        InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(dirtyPath);
+                        EXPECT_SUCCESS(InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(dirtyPath));
                     }
                 }
             }
@@ -1807,14 +1809,14 @@ void TestReadInteraction::TestProcessSubscribeRequest()
         AttributePathIB::Builder & attributePathBuilder = attributePathListBuilder.CreatePath();
         EXPECT_EQ(attributePathListBuilder.GetError(), CHIP_NO_ERROR);
 
-        attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
-        EXPECT_EQ(attributePathBuilder.GetError(), CHIP_NO_ERROR);
+        EXPECT_SUCCESS(attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB());
+        EXPECT_SUCCESS(attributePathBuilder.GetError());
 
-        attributePathListBuilder.EndOfAttributePathIBs();
-        EXPECT_EQ(attributePathListBuilder.GetError(), CHIP_NO_ERROR);
+        EXPECT_SUCCESS(attributePathListBuilder.EndOfAttributePathIBs());
+        EXPECT_SUCCESS(attributePathListBuilder.GetError());
 
-        subscribeRequestBuilder.IsFabricFiltered(false).EndOfSubscribeRequestMessage();
-        EXPECT_EQ(subscribeRequestBuilder.GetError(), CHIP_NO_ERROR);
+        EXPECT_SUCCESS(subscribeRequestBuilder.IsFabricFiltered(false).EndOfSubscribeRequestMessage());
+        EXPECT_SUCCESS(subscribeRequestBuilder.GetError());
 
         EXPECT_EQ(subscribeRequestBuilder.GetError(), CHIP_NO_ERROR);
         EXPECT_EQ(writer.Finalize(&subscribeRequestbuf), CHIP_NO_ERROR);
@@ -3557,8 +3559,8 @@ void TestReadInteraction::TestPostSubscribeRoundtripStatusReportTimeout()
     EXPECT_EQ(engine->GetNumActiveReadClients(), 0u);
     engine->Shutdown();
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
-    CreateSessionAliceToBob();
-    CreateSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscribeRoundtripStatusReportTimeout)
@@ -3632,8 +3634,8 @@ void TestReadInteraction::TestSubscribeRoundtripStatusReportTimeout()
     EXPECT_EQ(engine->GetNumActiveReadClients(), 0u);
     engine->Shutdown();
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
-    CreateSessionAliceToBob();
-    CreateSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadChunkingStatusReportTimeout)
@@ -3683,8 +3685,8 @@ void TestReadInteraction::TestReadChunkingStatusReportTimeout()
     EXPECT_EQ(engine->GetNumActiveReadClients(), 0u);
     engine->Shutdown();
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
-    CreateSessionAliceToBob();
-    CreateSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 // ReadClient sends the read request, but handler fails to send the one report (SendMessage returns an error).
@@ -3802,8 +3804,8 @@ void TestReadInteraction::TestSubscribeRoundtripChunkStatusReportTimeout()
     EXPECT_EQ(engine->GetNumActiveReadClients(), 0u);
     engine->Shutdown();
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
-    CreateSessionAliceToBob();
-    CreateSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestPostSubscribeRoundtripChunkStatusReportTimeout)
@@ -3903,8 +3905,8 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkStatusReportTimeout()
     EXPECT_EQ(engine->GetNumActiveReadClients(), 0u);
     engine->Shutdown();
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
-    CreateSessionAliceToBob();
-    CreateSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestPostSubscribeRoundtripChunkReportTimeout)
@@ -4003,8 +4005,8 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkReportTimeout()
 
     EXPECT_EQ(engine->GetNumActiveReadClients(), 0u);
     engine->Shutdown();
-    CreateSessionAliceToBob();
-    CreateSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestPostSubscribeRoundtripChunkReport)
@@ -4072,7 +4074,7 @@ void TestReadInteraction::TestPostSubscribeRoundtripChunkReport()
         dirtyPath1.mEndpointId  = chip::Test::kMockEndpoint3;
         dirtyPath1.mAttributeId = chip::Test::MockAttributeId(4);
 
-        engine->GetReportingEngine().SetDirty(dirtyPath1);
+        EXPECT_SUCCESS(engine->GetReportingEngine().SetDirty(dirtyPath1));
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
         delegate.mNumArrayItems        = 0;
@@ -4169,7 +4171,7 @@ void TestReadInteraction::TestReadClientReceiveInvalidMessage()
         System::PacketBufferTLVWriter writer;
         writer.Init(std::move(msgBuf));
         StatusResponseMessage::Builder response;
-        response.Init(&writer);
+        EXPECT_SUCCESS(response.Init(&writer));
         response.Status(Protocols::InteractionModel::Status::Busy);
         EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
         PayloadHeader payloadHeader;
@@ -4188,7 +4190,8 @@ void TestReadInteraction::TestReadClientReceiveInvalidMessage()
         GetLoopback().mNumMessagesToDrop                = 0;
         GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
         GetLoopback().mDroppedMessageCount              = 0;
-        readClient.OnMessageReceived(readClient.mExchange.Get(), payloadHeader, std::move(msgBuf));
+        EXPECT_EQ(readClient.OnMessageReceived(readClient.mExchange.Get(), payloadHeader, std::move(msgBuf)),
+                  CHIP_IM_GLOBAL_STATUS(Busy));
 
         DrainAndServiceIO();
 
@@ -4203,8 +4206,8 @@ void TestReadInteraction::TestReadClientReceiveInvalidMessage()
     engine->Shutdown();
     ExpireSessionAliceToBob();
     ExpireSessionBobToAlice();
-    CreateSessionAliceToBob();
-    CreateSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 // Read Client sends the subscribe request, Read Handler drops the response, then test injects unknown status response message
@@ -4257,7 +4260,7 @@ void TestReadInteraction::TestSubscribeClientReceiveInvalidStatusResponse()
         System::PacketBufferTLVWriter writer;
         writer.Init(std::move(msgBuf));
         StatusResponseMessage::Builder response;
-        response.Init(&writer);
+        EXPECT_SUCCESS(response.Init(&writer));
         response.Status(Protocols::InteractionModel::Status::Busy);
         EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
         PayloadHeader payloadHeader;
@@ -4279,7 +4282,8 @@ void TestReadInteraction::TestSubscribeClientReceiveInvalidStatusResponse()
         GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
         GetLoopback().mDroppedMessageCount              = 0;
 
-        readClient.OnMessageReceived(readClient.mExchange.Get(), payloadHeader, std::move(msgBuf));
+        EXPECT_EQ(readClient.OnMessageReceived(readClient.mExchange.Get(), payloadHeader, std::move(msgBuf)),
+                  CHIP_IM_GLOBAL_STATUS(Busy));
         DrainAndServiceIO();
 
         // TODO: Need to validate what status is being sent to the ReadHandler
@@ -4296,8 +4300,8 @@ void TestReadInteraction::TestSubscribeClientReceiveInvalidStatusResponse()
     engine->Shutdown();
     ExpireSessionAliceToBob();
     ExpireSessionBobToAlice();
-    CreateSessionAliceToBob();
-    CreateSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 // Read Client sends the subscribe request, Read Handler drops the response, then test injects well-formed status response
@@ -4350,7 +4354,7 @@ void TestReadInteraction::TestSubscribeClientReceiveWellFormedStatusResponse()
         System::PacketBufferTLVWriter writer;
         writer.Init(std::move(msgBuf));
         StatusResponseMessage::Builder response;
-        response.Init(&writer);
+        EXPECT_SUCCESS(response.Init(&writer));
         response.Status(Protocols::InteractionModel::Status::Success);
         EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
         PayloadHeader payloadHeader;
@@ -4372,7 +4376,8 @@ void TestReadInteraction::TestSubscribeClientReceiveWellFormedStatusResponse()
         GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
         GetLoopback().mDroppedMessageCount              = 0;
 
-        readClient.OnMessageReceived(readClient.mExchange.Get(), payloadHeader, std::move(msgBuf));
+        EXPECT_EQ(readClient.OnMessageReceived(readClient.mExchange.Get(), payloadHeader, std::move(msgBuf)),
+                  CHIP_ERROR_INVALID_MESSAGE_TYPE);
         DrainAndServiceIO();
 
         // TODO: Need to validate what status is being sent to the ReadHandler
@@ -4388,8 +4393,8 @@ void TestReadInteraction::TestSubscribeClientReceiveWellFormedStatusResponse()
     engine->Shutdown();
     ExpireSessionAliceToBob();
     ExpireSessionBobToAlice();
-    CreateSessionAliceToBob();
-    CreateSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 // Read Client sends the subscribe request, Read Handler drops the response, then test injects invalid report message for Read
@@ -4442,7 +4447,7 @@ void TestReadInteraction::TestSubscribeClientReceiveInvalidReportMessage()
         System::PacketBufferTLVWriter writer;
         writer.Init(std::move(msgBuf));
         ReportDataMessage::Builder response;
-        response.Init(&writer);
+        EXPECT_SUCCESS(response.Init(&writer));
         EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
         PayloadHeader payloadHeader;
         payloadHeader.SetExchangeID(0);
@@ -4463,7 +4468,8 @@ void TestReadInteraction::TestSubscribeClientReceiveInvalidReportMessage()
         GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
         GetLoopback().mDroppedMessageCount              = 0;
 
-        readClient.OnMessageReceived(readClient.mExchange.Get(), payloadHeader, std::move(msgBuf));
+        EXPECT_EQ(readClient.OnMessageReceived(readClient.mExchange.Get(), payloadHeader, std::move(msgBuf)),
+                  CHIP_ERROR_END_OF_TLV);
         DrainAndServiceIO();
 
         // TODO: Need to validate what status is being sent to the ReadHandler
@@ -4480,8 +4486,8 @@ void TestReadInteraction::TestSubscribeClientReceiveInvalidReportMessage()
     engine->Shutdown();
     ExpireSessionAliceToBob();
     ExpireSessionBobToAlice();
-    CreateSessionAliceToBob();
-    CreateSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 // Read Client create the subscription, handler sends unsolicited malformed report to client,
@@ -4533,7 +4539,7 @@ void TestReadInteraction::TestSubscribeClientReceiveUnsolicitedInvalidReportMess
         System::PacketBufferTLVWriter writer;
         writer.Init(std::move(msgBuf));
         ReportDataMessage::Builder response;
-        response.Init(&writer);
+        EXPECT_SUCCESS(response.Init(&writer));
         EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
 
         GetLoopback().mSentMessageCount = 0;
@@ -4607,10 +4613,10 @@ void TestReadInteraction::TestSubscribeClientReceiveInvalidSubscribeResponseMess
         System::PacketBufferTLVWriter writer;
         writer.Init(std::move(msgBuf));
         SubscribeResponseMessage::Builder response;
-        response.Init(&writer);
+        EXPECT_SUCCESS(response.Init(&writer));
         response.SubscriptionId(readClient.mSubscriptionId + 1);
         response.MaxInterval(1);
-        response.EndOfSubscribeResponseMessage();
+        EXPECT_SUCCESS(response.EndOfSubscribeResponseMessage());
         EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
         PayloadHeader payloadHeader;
         payloadHeader.SetExchangeID(0);
@@ -4631,7 +4637,8 @@ void TestReadInteraction::TestSubscribeClientReceiveInvalidSubscribeResponseMess
         GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
         GetLoopback().mDroppedMessageCount              = 0;
 
-        readClient.OnMessageReceived(readClient.mExchange.Get(), payloadHeader, std::move(msgBuf));
+        EXPECT_EQ(readClient.OnMessageReceived(readClient.mExchange.Get(), payloadHeader, std::move(msgBuf)),
+                  CHIP_ERROR_INVALID_SUBSCRIPTION);
         DrainAndServiceIO();
 
         // TODO: Need to validate what status is being sent to the ReadHandler
@@ -4646,8 +4653,8 @@ void TestReadInteraction::TestSubscribeClientReceiveInvalidSubscribeResponseMess
     engine->Shutdown();
     ExpireSessionAliceToBob();
     ExpireSessionBobToAlice();
-    CreateSessionAliceToBob();
-    CreateSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 // Read Client create the subscription, handler sends unsolicited malformed report with invalid subscription id to client,
@@ -4699,9 +4706,9 @@ void TestReadInteraction::TestSubscribeClientReceiveUnsolicitedReportMessageWith
         System::PacketBufferTLVWriter writer;
         writer.Init(std::move(msgBuf));
         ReportDataMessage::Builder response;
-        response.Init(&writer);
+        EXPECT_SUCCESS(response.Init(&writer));
         response.SubscriptionId(readClient.mSubscriptionId + 1);
-        response.EndOfReportDataMessage();
+        EXPECT_SUCCESS(response.EndOfReportDataMessage());
 
         EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
 
@@ -4776,9 +4783,9 @@ void TestReadInteraction::TestReadChunkingInvalidSubscriptionId()
         System::PacketBufferTLVWriter writer;
         writer.Init(std::move(msgBuf));
         ReportDataMessage::Builder response;
-        response.Init(&writer);
+        EXPECT_SUCCESS(response.Init(&writer));
         response.SubscriptionId(readClient.mSubscriptionId + 1);
-        response.EndOfReportDataMessage();
+        EXPECT_SUCCESS(response.EndOfReportDataMessage());
         PayloadHeader payloadHeader;
         payloadHeader.SetExchangeID(0);
         payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::ReportData);
@@ -4800,7 +4807,8 @@ void TestReadInteraction::TestReadChunkingInvalidSubscriptionId()
         GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
         GetLoopback().mDroppedMessageCount              = 0;
 
-        readClient.OnMessageReceived(readClient.mExchange.Get(), payloadHeader, std::move(msgBuf));
+        EXPECT_EQ(readClient.OnMessageReceived(readClient.mExchange.Get(), payloadHeader, std::move(msgBuf)),
+                  CHIP_ERROR_INVALID_SUBSCRIPTION);
         DrainAndServiceIO();
 
         // TODO: Need to validate what status is being sent to the ReadHandler
@@ -4816,8 +4824,8 @@ void TestReadInteraction::TestReadChunkingInvalidSubscriptionId()
     engine->Shutdown();
     ExpireSessionAliceToBob();
     ExpireSessionBobToAlice();
-    CreateSessionAliceToBob();
-    CreateSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 // Read Client sends a malformed subscribe request, interaction model engine fails to parse the request and generates a status
@@ -4845,7 +4853,7 @@ void TestReadInteraction::TestReadHandlerMalformedSubscribeRequest()
         ReadRequestMessage::Builder request;
         System::PacketBufferTLVWriter writer;
 
-        chip::app::InitWriterWithSpaceReserved(writer, 0);
+        EXPECT_SUCCESS(chip::app::InitWriterWithSpaceReserved(writer, 0));
 
         EXPECT_EQ(request.Init(&writer), CHIP_NO_ERROR);
         EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
@@ -4891,7 +4899,7 @@ void TestReadInteraction::TestReadHandlerMalformedReadRequest1()
         ReadRequestMessage::Builder request;
         System::PacketBufferTLVWriter writer;
 
-        chip::app::InitWriterWithSpaceReserved(writer, 0);
+        EXPECT_SUCCESS(chip::app::InitWriterWithSpaceReserved(writer, 0));
 
         EXPECT_EQ(request.Init(&writer), CHIP_NO_ERROR);
         EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
@@ -4935,7 +4943,7 @@ void TestReadInteraction::TestReadHandlerMalformedReadRequest2()
         ReadRequestMessage::Builder request;
         System::PacketBufferTLVWriter writer;
 
-        chip::app::InitWriterWithSpaceReserved(writer, 0);
+        EXPECT_SUCCESS(chip::app::InitWriterWithSpaceReserved(writer, 0));
         EXPECT_EQ(request.Init(&writer), CHIP_NO_ERROR);
         EXPECT_EQ(request.EndOfReadRequestMessage(), CHIP_NO_ERROR);
         EXPECT_EQ(writer.Finalize(&msgBuf), CHIP_NO_ERROR);
@@ -5011,11 +5019,11 @@ void TestReadInteraction::TestSubscribeSendUnknownMessage()
         System::PacketBufferHandle msgBuf;
         ReadRequestMessage::Builder request;
         System::PacketBufferTLVWriter writer;
-        chip::app::InitWriterWithSpaceReserved(writer, 0);
-        request.Init(&writer);
-        writer.Finalize(&msgBuf);
+        EXPECT_SUCCESS(chip::app::InitWriterWithSpaceReserved(writer, 0));
+        EXPECT_SUCCESS(request.Init(&writer));
+        EXPECT_SUCCESS(writer.Finalize(&msgBuf));
 
-        readClient.mExchange->SendMessage(Protocols::InteractionModel::MsgType::WriteRequest, std::move(msgBuf));
+        EXPECT_SUCCESS(readClient.mExchange->SendMessage(Protocols::InteractionModel::MsgType::WriteRequest, std::move(msgBuf)));
         DrainAndServiceIO();
         // client sends invalid write request, server sends out status report with invalid action and closes, client replies
         // with status report server replies with MRP Ack
@@ -5027,8 +5035,8 @@ void TestReadInteraction::TestSubscribeSendUnknownMessage()
     engine->Shutdown();
     ExpireSessionAliceToBob();
     ExpireSessionBobToAlice();
-    CreateSessionAliceToBob();
-    CreateSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 // Read Client creates a subscription with the server, server sends chunked reports, after the handler sends out invalid status
@@ -5083,11 +5091,11 @@ void TestReadInteraction::TestSubscribeSendInvalidStatusReport()
         System::PacketBufferHandle msgBuf;
         StatusResponseMessage::Builder request;
         System::PacketBufferTLVWriter writer;
-        chip::app::InitWriterWithSpaceReserved(writer, 0);
-        request.Init(&writer);
-        writer.Finalize(&msgBuf);
+        EXPECT_SUCCESS(chip::app::InitWriterWithSpaceReserved(writer, 0));
+        EXPECT_SUCCESS(request.Init(&writer));
+        EXPECT_SUCCESS(writer.Finalize(&msgBuf));
 
-        readClient.mExchange->SendMessage(Protocols::InteractionModel::MsgType::StatusResponse, std::move(msgBuf));
+        EXPECT_SUCCESS(readClient.mExchange->SendMessage(Protocols::InteractionModel::MsgType::StatusResponse, std::move(msgBuf)));
         DrainAndServiceIO();
 
         // client sends malformed status response, server sends out status report with invalid action and close, client replies
@@ -5100,8 +5108,8 @@ void TestReadInteraction::TestSubscribeSendInvalidStatusReport()
     engine->Shutdown();
     ExpireSessionAliceToBob();
     ExpireSessionBobToAlice();
-    CreateSessionAliceToBob();
-    CreateSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 // Read Client sends a malformed subscribe request, the server fails to parse the request and generates a status report to the
@@ -5129,9 +5137,9 @@ void TestReadInteraction::TestReadHandlerInvalidSubscribeRequest()
         ReadRequestMessage::Builder request;
         System::PacketBufferTLVWriter writer;
 
-        chip::app::InitWriterWithSpaceReserved(writer, 0);
-        request.Init(&writer);
-        writer.Finalize(&msgBuf);
+        EXPECT_SUCCESS(chip::app::InitWriterWithSpaceReserved(writer, 0));
+        EXPECT_SUCCESS(request.Init(&writer));
+        EXPECT_SUCCESS(writer.Finalize(&msgBuf));
 
         auto exchange = readClient.mpExchangeMgr->NewContext(readPrepareParams.mSessionHolder.Get().Value(), &readClient);
         ASSERT_NE(exchange, nullptr);
@@ -5193,16 +5201,16 @@ void TestReadInteraction::TestSubscribeInvalidateFabric()
         ASSERT_NE(engine->ActiveHandlerAt(0), nullptr);
         delegate.mpReadHandler = engine->ActiveHandlerAt(0);
 
-        GetFabricTable().Delete(GetAliceFabricIndex());
+        EXPECT_SUCCESS(GetFabricTable().Delete(GetAliceFabricIndex()));
         EXPECT_EQ(engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe), 0u);
-        GetFabricTable().Delete(GetBobFabricIndex());
+        EXPECT_SUCCESS(GetFabricTable().Delete(GetBobFabricIndex()));
         EXPECT_EQ(delegate.mError, CHIP_ERROR_IM_FABRIC_DELETED);
         ExpireSessionAliceToBob();
         ExpireSessionBobToAlice();
-        CreateAliceFabric();
-        CreateBobFabric();
-        CreateSessionAliceToBob();
-        CreateSessionBobToAlice();
+        EXPECT_SUCCESS(CreateAliceFabric());
+        EXPECT_SUCCESS(CreateBobFabric());
+        EXPECT_SUCCESS(CreateSessionAliceToBob());
+        EXPECT_SUCCESS(CreateSessionBobToAlice());
     }
     EXPECT_EQ(engine->GetNumActiveReadClients(), 0u);
     engine->Shutdown();
@@ -5250,8 +5258,8 @@ void TestReadInteraction::TestShutdownSubscription()
         EXPECT_TRUE(delegate.mGotReport);
         EXPECT_EQ(engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe), 1u);
 
-        engine->ShutdownSubscription(chip::ScopedNodeId(readClient.GetPeerNodeId(), readClient.GetFabricIndex()),
-                                     readClient.GetSubscriptionId().Value());
+        EXPECT_SUCCESS(engine->ShutdownSubscription(chip::ScopedNodeId(readClient.GetPeerNodeId(), readClient.GetFabricIndex()),
+                                                    readClient.GetSubscriptionId().Value()));
         EXPECT_TRUE(readClient.IsIdle());
     }
     engine->Shutdown();
@@ -5312,7 +5320,7 @@ void TestReadInteraction::TestSubscriptionReportWithDefunctSession()
         // Test that we send reports as needed.
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
-        engine->GetReportingEngine().SetDirty(subscribePath);
+        EXPECT_SUCCESS(engine->GetReportingEngine().SetDirty(subscribePath));
         DrainAndServiceIO();
 
         EXPECT_TRUE(delegate.mGotReport);
@@ -5326,7 +5334,7 @@ void TestReadInteraction::TestSubscriptionReportWithDefunctSession()
         readHandler->GetSession()->MarkAsDefunct();
         delegate.mGotReport            = false;
         delegate.mNumAttributeResponse = 0;
-        engine->GetReportingEngine().SetDirty(subscribePath);
+        EXPECT_SUCCESS(engine->GetReportingEngine().SetDirty(subscribePath));
 
         DrainAndServiceIO();
 
@@ -5342,7 +5350,7 @@ void TestReadInteraction::TestSubscriptionReportWithDefunctSession()
 
     // Get rid of our defunct session.
     ExpireSessionAliceToBob();
-    CreateSessionAliceToBob();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
 }
 
 } // namespace app
