@@ -24,14 +24,13 @@ from pathlib import Path
 from typing import Iterator, Set
 
 from . import runner
-from .test_definition import SubprocessInfoRepo, TestDefinition, TestTag, TestTarget
+from .test_definition import TestDefinition, TestTag, TestTarget
 
 log = logging.getLogger(__name__)
 
 __all__ = [
     "TestTarget",
     "TestDefinition",
-    "SubprocessInfoRepo",
     "runner",
 ]
 

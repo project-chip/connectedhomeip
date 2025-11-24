@@ -22,7 +22,7 @@ import subprocess
 import threading
 import typing
 from dataclasses import dataclass
-from typing import Literal
+from enum import StrEnum, auto
 
 log = logging.getLogger(__name__)
 
@@ -124,7 +124,9 @@ class RunnerWaitQueue:
         return self.queue.get()
 
 
-type SubprocessKind = Literal['app', 'tool']
+class SubprocessKind(StrEnum):
+    APP = auto()
+    TOOL = auto()
 
 
 @dataclass

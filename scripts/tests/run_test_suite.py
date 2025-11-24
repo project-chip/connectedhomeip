@@ -27,7 +27,7 @@ import click
 import coloredlogs
 from chiptest.accessories import AppsRegister
 from chiptest.glob_matcher import GlobMatcher
-from chiptest.runner import SubprocessInfo
+from chiptest.runner import SubprocessInfo, Executor
 from chiptest.test_definition import SubprocessInfoRepo, TestRunTime, TestTag
 from chipyaml.paths_finder import PathsFinder
 
@@ -174,7 +174,7 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
         log_fmt = '%(levelname)-7s %(message)s'
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
-    subproc_info_repo = SubprocessInfoRepo(paths_finder=PathsFinder(pathsfinder_searchpath))
+    subproc_info_repo = SubprocessInfoRepo(paths=PathsFinder(pathsfinder_searchpath))
 
     for p in app_path:
         subproc_info_repo.addSpec(p, kind='app')
@@ -316,9 +316,9 @@ def cmd_run(context, iterations, pics_file, keep_going, test_timeout_seconds, ex
 
     if 'chip-tool-with-python' not in context.obj.subproc_info_repo:
         if context.obj.runtime == TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON:
-            chip_tool_with_python = context.obj.subproc_info_repo.paths_finder.get('darwinframeworktool.py')
+            chip_tool_with_python = context.obj.subproc_info_repo.paths.get('darwinframeworktool.py')
         else:
-            chip_tool_with_python = context.obj.subproc_info_repo.paths_finder.get('chiptool.py')
+            chip_tool_with_python = context.obj.subproc_info_repo.paths.get('chiptool.py')
 
         if chip_tool_with_python is not None:
             context.obj.subproc_info_repo['chip-tool-with-python'] = SubprocessInfo(

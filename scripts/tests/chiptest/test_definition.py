@@ -29,7 +29,6 @@ from pathlib import Path
 
 from chiptest.accessories import AppsRegister
 from chiptest.runner import SubprocessInfo, SubprocessKind
-from chipyaml.paths_finder import PathsFinder
 
 log = logging.getLogger(__name__)
 
@@ -230,37 +229,39 @@ class SubprocEntry:
 
 BUILTIN_SUBPROC_KNOWHOW = {
     # Matter applications
-    'all-clusters': SubprocEntry(kind='app', path_lookup='chip-all-clusters-app'),
-    'lock': SubprocEntry(kind='app', path_lookup='chip-lock-app'),
-    'fabric-bridge': SubprocEntry(kind='app', path_lookup='fabric-bridge-app'),
-    'ota-provider': SubprocEntry(kind='app', path_lookup='chip-ota-provider-app'),
-    'ota-requestor': SubprocEntry(kind='app', path_lookup='chip-ota-requestor-app'),
-    'tv': SubprocEntry(kind='app', path_lookup='chip-tv-app'),
-    'bridge': SubprocEntry(kind='app', path_lookup='chip-bridge-app'),
-    'lit-icd': SubprocEntry(kind='app', path_lookup='lit-icd-app'),
-    'microwave-oven': SubprocEntry(kind='app', path_lookup='chip-microwave-oven-app'),
-    'rvc': SubprocEntry(kind='app', path_lookup='chip-rvc-app'),
-    'network-manager': SubprocEntry(kind='app', path_lookup='matter-network-manager-app'),
-    'energy-gateway': SubprocEntry(kind='app', path_lookup='chip-energy-gateway-app'),
-    'energy-management': SubprocEntry(kind='app', path_lookup='chip-energy-management-app'),
-    'closure': SubprocEntry(kind='app', path_lookup='closure-app'),
+    'all-clusters': SubprocEntry(kind=SubprocessKind.APP, path_lookup='chip-all-clusters-app'),
+    'lock': SubprocEntry(kind=SubprocessKind.APP, path_lookup='chip-lock-app'),
+    'fabric-bridge': SubprocEntry(kind=SubprocessKind.APP, path_lookup='fabric-bridge-app'),
+    'ota-provider': SubprocEntry(kind=SubprocessKind.APP, path_lookup='chip-ota-provider-app'),
+    'ota-requestor': SubprocEntry(kind=SubprocessKind.APP, path_lookup='chip-ota-requestor-app'),
+    'tv': SubprocEntry(kind=SubprocessKind.APP, path_lookup='chip-tv-app'),
+    'bridge': SubprocEntry(kind=SubprocessKind.APP, path_lookup='chip-bridge-app'),
+    'lit-icd': SubprocEntry(kind=SubprocessKind.APP, path_lookup='lit-icd-app'),
+    'microwave-oven': SubprocEntry(kind=SubprocessKind.APP, path_lookup='chip-microwave-oven-app'),
+    'rvc': SubprocEntry(kind=SubprocessKind.APP, path_lookup='chip-rvc-app'),
+    'network-manager': SubprocEntry(kind=SubprocessKind.APP, path_lookup='matter-network-manager-app'),
+    'energy-gateway': SubprocEntry(kind=SubprocessKind.APP, path_lookup='chip-energy-gateway-app'),
+    'energy-management': SubprocEntry(kind=SubprocessKind.APP, path_lookup='chip-energy-management-app'),
+    'closure': SubprocEntry(kind=SubprocessKind.APP, path_lookup='closure-app'),
 
     # Tools
-    'chip-tool': SubprocEntry(kind='tool', path_lookup='chip-tool'),
-    'darwin-framework-tool': SubprocEntry(kind='tool', path_lookup='darwin-framework-tool'),
-    'matter-repl-yaml-tester': SubprocEntry(kind='tool', path_lookup='yamltest_with_matter_repl_tester.py'),
+    'chip-tool': SubprocEntry(kind=SubprocessKind.TOOL, path_lookup='chip-tool'),
+    'darwin-framework-tool': SubprocEntry(kind=SubprocessKind.TOOL, path_lookup='darwin-framework-tool'),
+    'matter-repl-yaml-tester': SubprocEntry(kind=SubprocessKind.TOOL, path_lookup='yamltest_with_matter_repl_tester.py'),
 
     # No path_lookup as this is either chiptool.py or darwinframework.py depending on the platform
-    'chip-tool-with-python': SubprocEntry(kind='tool')
+    'chip-tool-with-python': SubprocEntry(kind=SubprocessKind.TOOL)
 }
 
 
 class SubprocessInfoRepo(dict):
-    def __init__(self, paths_finder: PathsFinder,
+    # We don't want to explicitly reference PathsFinder type because we don't want to create a dependency on
+    # diskcache which PathsFinder imports. Instead we just want a dict-like object
+    def __init__(self, paths: dict[str, Path],
                  subproc_knowhow: dict[str, SubprocEntry] = BUILTIN_SUBPROC_KNOWHOW,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.paths_finder = paths_finder
+        self.paths = paths
         self.subproc_knowhow = subproc_knowhow
 
     def addSpec(self, spec: str, kind: SubprocessKind | None = None):
@@ -270,9 +271,7 @@ class SubprocessInfoRepo(dict):
         if len(el) == 3:
             # <kind>:<key>:<path>
             kind_s, key, path = el
-            if kind_s not in ('app', 'tool'):
-                raise KeyError(f"Kind '{kind_s}' needs to be either 'tool' or 'app'")
-            kind = typing.cast(SubprocessKind, kind_s)
+            kind = SubprocessKind[kind_s]
             path = Path(path)
         elif len(el) == 2:
             # <key>:<path>
@@ -304,7 +303,7 @@ class SubprocessInfoRepo(dict):
             if path_lookup is None:
                 raise RuntimeError(f"No path lookup provided nor present in knowhow for key {key}")
 
-        if (path := self.paths_finder.get(path_lookup)) is None:
+        if (path := self.paths.get(path_lookup)) is None:
             raise RuntimeError("Cannot find path for '%s'", key)
 
         logging.info("Discovered '%s' path '%s'", key, path)
