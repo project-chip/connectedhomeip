@@ -318,7 +318,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestPersistenceAndStartup)
         ClusterTester tester(cluster);
 
         // check default value first
-        uint8_t sensitivity;
+        uint8_t sensitivity = 0;
         EXPECT_EQ(tester.ReadAttribute(Attributes::CurrentSensitivityLevel::Id, sensitivity),
                   Protocols::InteractionModel::Status::Success);
         EXPECT_EQ(sensitivity, config.DefaultSensitivityLevel());
@@ -337,7 +337,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestPersistenceAndStartup)
         BooleanStateConfigurationCluster cluster(kTestEndpointId, Feature::kSensitivityLevel, {}, config);
         cluster.Startup(context.Get());
         ClusterTester tester(cluster);
-        uint8_t sensitivity;
+        uint8_t sensitivity = 0;
         EXPECT_EQ(tester.ReadAttribute(Attributes::CurrentSensitivityLevel::Id, sensitivity),
                   Protocols::InteractionModel::Status::Success);
         EXPECT_EQ(sensitivity, 6); // Check if value is persisted.
@@ -354,7 +354,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestPersistenceAndStartup)
         cluster.Startup(context.Get()); // Should read 6 and clamp it to (max - 1 == 4)
 
         ClusterTester tester(cluster);
-        uint8_t sensitivity;
+        uint8_t sensitivity = 0;
         EXPECT_EQ(tester.ReadAttribute(Attributes::CurrentSensitivityLevel::Id, sensitivity),
                   Protocols::InteractionModel::Status::Success);
         EXPECT_EQ(sensitivity, 4); // 5-1. Clamped from persisted value.
@@ -371,7 +371,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestPersistenceAndStartup)
         cluster.Startup(context.Get());
         ClusterTester tester(cluster);
 
-        uint8_t sensitivity;
+        uint8_t sensitivity = 0;
         EXPECT_EQ(tester.ReadAttribute(Attributes::CurrentSensitivityLevel::Id, sensitivity),
                   Protocols::InteractionModel::Status::Success);
         EXPECT_EQ(sensitivity, 5); // Should be default, as storage is empty.
