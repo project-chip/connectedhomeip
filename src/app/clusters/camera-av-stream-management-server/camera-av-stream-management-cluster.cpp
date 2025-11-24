@@ -1060,15 +1060,22 @@ void CameraAVStreamManagementCluster::ModifyVideoStream(const uint16_t streamID,
     {
         if (stream.videoStreamID == streamID)
         {
+            bool wasModified = false;
             if (waterMarkEnabled.HasValue())
             {
+                wasModified             = (waterMarkEnabled != stream.watermarkEnabled);
                 stream.watermarkEnabled = waterMarkEnabled;
             }
             if (osdEnabled.HasValue())
             {
+                wasModified       = wasModified || (osdEnabled != stream.OSDEnabled);
                 stream.OSDEnabled = osdEnabled;
             }
-            ChipLogError(Camera, "Modified video stream with ID: %d", streamID);
+            if (wasModified)
+            {
+                TEMPORARY_RETURN_IGNORED PersistAndNotify<Attributes::AllocatedVideoStreams::Id>();
+                ChipLogProgress(Camera, "Modified video stream with ID: %d", streamID);
+            }
             return;
         }
     }
@@ -1085,15 +1092,22 @@ void CameraAVStreamManagementCluster::ModifySnapshotStream(const uint16_t stream
     {
         if (stream.snapshotStreamID == streamID)
         {
+            bool wasModified = false;
             if (waterMarkEnabled.HasValue())
             {
+                wasModified             = (waterMarkEnabled != stream.watermarkEnabled);
                 stream.watermarkEnabled = waterMarkEnabled;
             }
             if (osdEnabled.HasValue())
             {
+                wasModified       = wasModified || (osdEnabled != stream.OSDEnabled);
                 stream.OSDEnabled = osdEnabled;
             }
-            ChipLogError(Camera, "Modified snapshot stream with ID: %d", streamID);
+            if (wasModified)
+            {
+                TEMPORARY_RETURN_IGNORED PersistAndNotify<Attributes::AllocatedSnapshotStreams::Id>();
+                ChipLogProgress(Camera, "Modified snapshot stream with ID: %d", streamID);
+            }
             return;
         }
     }
@@ -1912,153 +1926,136 @@ std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::In
 {
     switch (aRequest.path.mCommandId)
     {
-    case Commands::VideoStreamAllocate::Id:
+    case Commands::VideoStreamAllocate::Id: {
         ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Allocating Video Stream", mPath.mEndpointId);
 
         if (!HasFeature(Feature::kVideo))
         {
-            aHandler->AddStatus(aRequest.path, Status::UnsupportedCommand);
+            return Status::UnsupportedCommand;
         }
-        else
-        {
-            Commands::VideoStreamAllocate::DecodableType commandData;
-            ReturnErrorOnFailure(commandData.Decode(aInputArgs));
-            return HandleVideoStreamAllocate(aHandler, aRequest.path, commandData);
-        }
+        Commands::VideoStreamAllocate::DecodableType commandData;
+        ReturnErrorOnFailure(commandData.Decode(aInputArgs));
+        Commands::VideoStreamAllocateResponse::Type response;
+        return HandleVideoStreamAllocate(aHandler, aRequest.path, commandData, response);
+    }
 
-        return std::nullopt;
-
-    case Commands::VideoStreamModify::Id:
+    case Commands::VideoStreamModify::Id: {
         ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Modifying Video Stream", mPath.mEndpointId);
 
         // VideoStreamModify should have either the WMARK or OSD feature supported
-        VerifyOrReturn(HasFeature(Feature::kVideo) && (HasFeature(Feature::kWatermark) || HasFeature(Feature::kOnScreenDisplay)),
-                       aHandler->AddStatus(aRequest.path, Status::UnsupportedCommand));
+        if (!HasFeature(Feature::kVideo) || (!HasFeature(Feature::kWatermark) && !HasFeature(Feature::kOnScreenDisplay)))
+        {
+            return Status::UnsupportedCommand;
+        }
 
         Commands::VideoStreamModify::DecodableType commandData;
         ReturnErrorOnFailure(commandData.Decode(aInputArgs));
         return HandleVideoStreamModify(aHandler, aRequest.path, commandData);
+    }
 
-        return std::nullopt;
-
-    case Commands::VideoStreamDeallocate::Id:
+    case Commands::VideoStreamDeallocate::Id: {
         ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Deallocating Video Stream", mPath.mEndpointId);
 
         if (!HasFeature(Feature::kVideo))
         {
-            aHandler->AddStatus(aRequest.path, Status::UnsupportedCommand);
+            return Status::UnsupportedCommand;
         }
-        else
-        {
-            Commands::VideoStreamDeallocate::DecodableType commandData;
-            ReturnErrorOnFailure(commandData.Decode(aInputArgs));
-            return HandleVideoStreamDeallocate(aHandler, aRequest.path, commandData);
-        }
+        Commands::VideoStreamDeallocate::DecodableType commandData;
+        ReturnErrorOnFailure(commandData.Decode(aInputArgs));
+        return HandleVideoStreamDeallocate(aHandler, aRequest.path, commandData);
+    }
 
-        return std::nullopt;
-
-    case Commands::AudioStreamAllocate::Id:
+    case Commands::AudioStreamAllocate::Id: {
         ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Allocating Audio Stream", mPath.mEndpointId);
 
         if (!HasFeature(Feature::kAudio))
         {
-            aHandler->AddStatus(aRequest.path, Status::UnsupportedCommand);
+            return Status::UnsupportedCommand;
         }
-        else
-        {
-            Commands::AudioStreamAllocate::DecodableType commandData;
-            ReturnErrorOnFailure(commandData.Decode(aInputArgs));
-            return HandleAudioStreamAllocate(aHandler, aRequest.path, commandData);
-        }
+        Commands::AudioStreamAllocate::DecodableType commandData;
+        ReturnErrorOnFailure(commandData.Decode(aInputArgs));
+        Commands::AudioStreamAllocateResponse::Type response;
+        return HandleAudioStreamAllocate(aHandler, aRequest.path, commandData, response);
+    }
 
-        return std::nullopt;
-
-    case Commands::AudioStreamDeallocate::Id:
+    case Commands::AudioStreamDeallocate::Id: {
         ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Deallocating Audio Stream", mPath.mEndpointId);
 
         if (!HasFeature(Feature::kAudio))
         {
-            aHandler->AddStatus(aRequest.path, Status::UnsupportedCommand);
+            return Status::UnsupportedCommand;
         }
-        else
-        {
-            Commands::AudioStreamDeallocate::DecodableType commandData;
-            ReturnErrorOnFailure(commandData.Decode(aInputArgs));
-            return HandleAudioStreamDeallocate(aHandler, aRequest.path, commandData);
-        }
+        Commands::AudioStreamDeallocate::DecodableType commandData;
+        ReturnErrorOnFailure(commandData.Decode(aInputArgs));
+        return HandleAudioStreamDeallocate(aHandler, aRequest.path, commandData);
+    }
 
-        return std::nullopt;
-
-    case Commands::SnapshotStreamAllocate::Id:
+    case Commands::SnapshotStreamAllocate::Id: {
         ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Allocating Snapshot Stream", mPath.mEndpointId);
 
         if (!HasFeature(Feature::kSnapshot))
         {
-            aHandler->AddStatus(aRequest.path, Status::UnsupportedCommand);
+            return Status::UnsupportedCommand;
         }
-        else
-        {
-            Commands::SnapshotStreamAllocate::DecodableType commandData;
-            ReturnErrorOnFailure(commandData.Decode(aInputArgs));
-            return HandleSnapshotStreamAllocate(aHandler, aRequest.path, commandData);
-        }
+        Commands::SnapshotStreamAllocate::DecodableType commandData;
+        ReturnErrorOnFailure(commandData.Decode(aInputArgs));
+        Commands::SnapshotStreamAllocateResponse::Type response;
+        return HandleSnapshotStreamAllocate(aHandler, aRequest.path, commandData, response);
+    }
 
-        return std::nullopt;
-
-    case Commands::SnapshotStreamModify::Id:
+    case Commands::SnapshotStreamModify::Id: {
         ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Modifying Snapshot Stream", mPath.mEndpointId);
 
         // SnapshotStreamModify should have either the WMARK or OSD feature supported
-        VerifyOrReturn(HasFeature(Feature::kSnapshot) && (HasFeature(Feature::kWatermark) || HasFeature(Feature::kOnScreenDisplay)),
-                       aHandler->AddStatus(aRequest.path, Status::UnsupportedCommand));
+        if (!HasFeature(Feature::kSnapshot) || (!HasFeature(Feature::kWatermark) && !HasFeature(Feature::kOnScreenDisplay)))
+        {
+            return Status::UnsupportedCommand;
+        }
 
         Commands::SnapshotStreamModify::DecodableType commandData;
         ReturnErrorOnFailure(commandData.Decode(aInputArgs));
         return HandleSnapshotStreamModify(aHandler, aRequest.path, commandData);
+    }
 
-        return std::nullopt;
-
-    case Commands::SnapshotStreamDeallocate::Id:
+    case Commands::SnapshotStreamDeallocate::Id: {
         ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Deallocating Snapshot Stream", mPath.mEndpointId);
 
         if (!HasFeature(Feature::kSnapshot))
         {
-            aHandler->AddStatus(aRequest.path, Status::UnsupportedCommand);
+            return Status::UnsupportedCommand;
         }
-        else
-        {
-            Commands::SnapshotStreamDeallocate::DecodableType commandData;
-            ReturnErrorOnFailure(commandData.Decode(aInputArgs));
-            return HandleSnapshotStreamDeallocate(aHandler, aRequest.path, commandData);
-        }
+        Commands::SnapshotStreamDeallocate::DecodableType commandData;
+        ReturnErrorOnFailure(commandData.Decode(aInputArgs));
+        return HandleSnapshotStreamDeallocate(aHandler, aRequest.path, commandData);
+    }
 
-        return std::nullopt;
-
-    case Commands::SetStreamPriorities::Id:
+    case Commands::SetStreamPriorities::Id: {
         ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Set Stream Priorities", mPath.mEndpointId);
 
         Commands::SetStreamPriorities::DecodableType commandData;
         ReturnErrorOnFailure(commandData.Decode(aInputArgs));
         return HandleSetStreamPriorities(aHandler, aRequest.path, commandData);
+    }
 
-        return std::nullopt;
-
-    case Commands::CaptureSnapshot::Id:
+    case Commands::CaptureSnapshot::Id: {
         ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Capture Snapshot image", mPath.mEndpointId);
 
         if (!HasFeature(Feature::kSnapshot))
         {
-            aHandler->AddStatus(aRequest.path, Status::UnsupportedCommand);
+            return Status::UnsupportedCommand;
         }
-        else
+        Commands::CaptureSnapshot::DecodableType commandData;
+        ReturnErrorOnFailure(commandData.Decode(aInputArgs));
+        Commands::CaptureSnapshotResponse::Type response;
+        Status status = HandleCaptureSnapshot(aHandler, aRequest.path, commandData, response);
+        if (status == Status::Success)
         {
-            Commands::CaptureSnapshot::DecodableType commandData;
-            ReturnErrorOnFailure(commandData.Decode(aInputArgs));
-            return HandleCaptureSnapshot(aHandler, aRequest.path, commandData);
+            return CHIP_NO_ERROR;
         }
-
-        return std::nullopt;
+        return status;
     }
+    }
+    return Status::UnsupportedCommand;
 }
 
 <<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
@@ -2135,65 +2132,60 @@ bool CameraAVStreamManagementCluster::StreamPrioritiesHasDuplicates(const std::v
     return false;
 }
 
+<<<<<<< HEAD
 <<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
 void CameraAVStreamManagementCluster::HandleVideoStreamAllocate(HandlerContext & ctx,
 ========
 std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::HandleVideoStreamAllocate(CommandHandler * handler, const ConcreteCommandPath & commandPath,
 >>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
                                                                 const Commands::VideoStreamAllocate::DecodableType & commandData)
+=======
+Status CameraAVStreamManagementCluster::HandleVideoStreamAllocate(
+    CommandHandler * handler, const ConcreteCommandPath & commandPath, const Commands::VideoStreamAllocate::DecodableType & commandData,
+    Commands::VideoStreamAllocateResponse::Type & response)
+>>>>>>> 6388493d0b (Modify command processing logic to return Status directly from)
 {
     Status status = Status::Success;
 
-    Commands::VideoStreamAllocateResponse::Type response;
     uint16_t videoStreamID = 0;
 
     // If Watermark feature is supported, then command should have the
     // isWaterMarkEnabled param. Or, if it is not supported, then command should
     // not have the param.
-    VerifyOrReturn((HasFeature(Feature::kWatermark) == commandData.watermarkEnabled.HasValue()),
-                   Status::InvalidCommand);
+    VerifyOrReturnError((HasFeature(Feature::kWatermark) == commandData.watermarkEnabled.HasValue()), Status::InvalidCommand);
 
     // If OSD feature is supported, then command should have the
     // isOSDEnabled param. Or, if it is not supported, then command should
     // not have the param.
-    VerifyOrReturn((HasFeature(Feature::kOnScreenDisplay) == commandData.OSDEnabled.HasValue()),
-                   Status::InvalidCommand);
+    VerifyOrReturnError((HasFeature(Feature::kOnScreenDisplay) == commandData.OSDEnabled.HasValue()), Status::InvalidCommand);
 
-    VerifyOrReturn(commandData.streamUsage == Globals::StreamUsageEnum::kRecording ||
-                       commandData.streamUsage == Globals::StreamUsageEnum::kAnalysis ||
-                       commandData.streamUsage == Globals::StreamUsageEnum::kLiveView,
-                   {
-                       ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid stream usage", mPath.mEndpointId);
-                       handler->AddStatus(commandPath, Status::ConstraintError);
-                   });
+    VerifyOrReturnError(commandData.streamUsage == Globals::StreamUsageEnum::kRecording ||
+                            commandData.streamUsage == Globals::StreamUsageEnum::kAnalysis ||
+                            commandData.streamUsage == Globals::StreamUsageEnum::kLiveView,
+                        Status::ConstraintError);
 
-    VerifyOrReturn(commandData.videoCodec != VideoCodecEnum::kUnknownEnumValue, {
-        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid video codec", mPath.mEndpointId);
-        handler->AddStatus(commandPath, Status::ConstraintError);
-    });
+    VerifyOrReturnError(commandData.videoCodec != VideoCodecEnum::kUnknownEnumValue, Status::ConstraintError);
 
-    VerifyOrReturn(commandData.minFrameRate >= 1 && commandData.minFrameRate <= commandData.maxFrameRate &&
-                       commandData.maxFrameRate >= 1,
-                   handler->AddStatus(commandPath, Status::ConstraintError));
+    VerifyOrReturnError(
+        commandData.minFrameRate >= 1 && commandData.minFrameRate <= commandData.maxFrameRate && commandData.maxFrameRate >= 1,
+        Status::ConstraintError);
 
-    VerifyOrReturn(commandData.minResolution.width >= 1 && commandData.minResolution.height >= 1,
-                   handler->AddStatus(commandPath, Status::ConstraintError));
+    VerifyOrReturnError(commandData.minResolution.width >= 1 && commandData.minResolution.height >= 1, Status::ConstraintError);
 
-    VerifyOrReturn(commandData.maxResolution.width >= 1 && commandData.maxResolution.height >= 1,
-                   handler->AddStatus(commandPath, Status::ConstraintError));
+    VerifyOrReturnError(commandData.maxResolution.width >= 1 && commandData.maxResolution.height >= 1, Status::ConstraintError);
 
-    VerifyOrReturn(commandData.minBitRate >= 1 && commandData.minBitRate <= commandData.maxBitRate && commandData.maxBitRate >= 1,
-                   handler->AddStatus(commandPath, Status::ConstraintError));
+    VerifyOrReturnError(
+        commandData.minBitRate >= 1 && commandData.minBitRate <= commandData.maxBitRate && commandData.maxBitRate >= 1,
+        Status::ConstraintError);
 
-    VerifyOrReturn(commandData.keyFrameInterval <= kMaxKeyFrameIntervalMaxValue,
-                   handler->AddStatus(commandPath, Status::ConstraintError));
+    VerifyOrReturnError(commandData.keyFrameInterval <= kMaxKeyFrameIntervalMaxValue, Status::ConstraintError);
 
     bool streamUsageSupported = std::find_if(mStreamUsagePriorities.begin(), mStreamUsagePriorities.end(),
                                              [&commandData](const Globals::StreamUsageEnum & entry) {
                                                  return entry == commandData.streamUsage;
                                              }) != mStreamUsagePriorities.end();
 
-    VerifyOrReturn(streamUsageSupported, handler->AddStatus(commandPath, Status::InvalidInState));
+    VerifyOrReturnError(streamUsageSupported, Status::InvalidInState);
 
     VideoStreamStruct videoStreamArgs;
     videoStreamArgs.videoStreamID    = 0;
@@ -2245,18 +2237,21 @@ std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::Ha
 
         response.videoStreamID = videoStreamID;
         handler->AddResponse(commandPath, response);
+
+        return Status::Success;
     }
-    else
-    {
-        handler->AddStatus(commandPath, status);
-    }
+    return status;
 }
 
+<<<<<<< HEAD
 <<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
 void CameraAVStreamManagementCluster::HandleVideoStreamModify(HandlerContext & ctx,
 ========
 std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::HandleVideoStreamModify(CommandHandler * handler, const ConcreteCommandPath & commandPath,
 >>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
+=======
+Status CameraAVStreamManagementCluster::HandleVideoStreamModify(CommandHandler * handler, const ConcreteCommandPath & commandPath,
+>>>>>>> 6388493d0b (Modify command processing logic to return Status directly from)
                                                               const Commands::VideoStreamModify::DecodableType & commandData)
 {
     auto & isWaterMarkEnabled = commandData.watermarkEnabled;
@@ -2266,31 +2261,21 @@ std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::Ha
     // If WatermarkEnabled is provided then the Watermark feature has to be supported
     if (commandData.watermarkEnabled.HasValue())
     {
-        VerifyOrReturn(HasFeature(Feature::kWatermark), {
-            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: WatermarkEnabled provided but Watermark Feature not set", mPath.mEndpointId);
-            handler->AddStatus(commandPath, Status::InvalidCommand);
-        });
+        VerifyOrReturnError(HasFeature(Feature::kWatermark), Status::InvalidCommand);
     }
 
     // If OSDEnabled is provided then the OSD feature has to be supported
     if (commandData.OSDEnabled.HasValue())
     {
-        VerifyOrReturn(HasFeature(Feature::kOnScreenDisplay), {
-            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: OSDEnabled provided but OSD Feature not set", mPath.mEndpointId);
-            handler->AddStatus(commandPath, Status::InvalidCommand);
-        });
+        VerifyOrReturnError(HasFeature(Feature::kOnScreenDisplay), Status::InvalidCommand);
     }
 
     // One of WatermarkEnabled or OSDEnabled has to be present
-    VerifyOrReturn(commandData.watermarkEnabled.HasValue() || commandData.OSDEnabled.HasValue(), {
-        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: One of WatermarkEnabled or OSDEnabled must be provided in VideoStreamModify",
-                     mPath.mEndpointId);
-        handler->AddStatus(commandPath, Status::InvalidCommand);
-    });
+    VerifyOrReturnError(commandData.watermarkEnabled.HasValue() || commandData.OSDEnabled.HasValue(), Status::InvalidCommand);
 
     if (!ValidateVideoStreamForModifyOrDeallocate(videoStreamID, handler, commandPath, /* isDeallocate = */ false))
     {
-        return;
+        return Status::NotFound;
     }
 
     // Call the delegate
@@ -2301,9 +2286,10 @@ std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::Ha
         ModifyVideoStream(videoStreamID, isWaterMarkEnabled, isOSDEnabled);
     }
 
-    handler->AddStatus(commandPath, status);
+    return status;
 }
 
+<<<<<<< HEAD
 <<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
 void CameraAVStreamManagementCluster::HandleVideoStreamDeallocate(
     HandlerContext & ctx, const Commands::VideoStreamDeallocate::DecodableType & commandData)
@@ -2311,12 +2297,16 @@ void CameraAVStreamManagementCluster::HandleVideoStreamDeallocate(
 std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::HandleVideoStreamDeallocate(CommandHandler * handler, const ConcreteCommandPath & commandPath,
                                                                   const Commands::VideoStreamDeallocate::DecodableType & commandData)
 >>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
+=======
+Status CameraAVStreamManagementCluster::HandleVideoStreamDeallocate(
+    CommandHandler * handler, const ConcreteCommandPath & commandPath, const Commands::VideoStreamDeallocate::DecodableType & commandData)
+>>>>>>> 6388493d0b (Modify command processing logic to return Status directly from)
 {
     auto & videoStreamID = commandData.videoStreamID;
 
     if (!ValidateVideoStreamForModifyOrDeallocate(videoStreamID, handler, commandPath, /* isDeallocate = */ true))
     {
-        return;
+        return Status::NotFound;
     }
 
     // Call the delegate
@@ -2327,59 +2317,45 @@ std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::Ha
         RemoveVideoStream(videoStreamID);
     }
 
-    handler->AddStatus(commandPath, status);
+    return status;
 }
 
+<<<<<<< HEAD
 <<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
 void CameraAVStreamManagementCluster::HandleAudioStreamAllocate(HandlerContext & ctx,
 ========
 std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::HandleAudioStreamAllocate(CommandHandler * handler, const ConcreteCommandPath & commandPath,
 >>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
                                                                 const Commands::AudioStreamAllocate::DecodableType & commandData)
+=======
+Status CameraAVStreamManagementCluster::HandleAudioStreamAllocate(
+    CommandHandler * handler, const ConcreteCommandPath & commandPath, const Commands::AudioStreamAllocate::DecodableType & commandData,
+    Commands::AudioStreamAllocateResponse::Type & response)
+>>>>>>> 6388493d0b (Modify command processing logic to return Status directly from)
 {
-
-    Commands::AudioStreamAllocateResponse::Type response;
     uint16_t audioStreamID = 0;
 
-    VerifyOrReturn(commandData.streamUsage == Globals::StreamUsageEnum::kRecording ||
-                       commandData.streamUsage == Globals::StreamUsageEnum::kAnalysis ||
-                       commandData.streamUsage == Globals::StreamUsageEnum::kLiveView,
-                   {
-                       ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid stream usage", mPath.mEndpointId);
-                       handler->AddStatus(commandPath, Status::ConstraintError);
-                   });
+    VerifyOrReturnError(commandData.streamUsage == Globals::StreamUsageEnum::kRecording ||
+                            commandData.streamUsage == Globals::StreamUsageEnum::kAnalysis ||
+                            commandData.streamUsage == Globals::StreamUsageEnum::kLiveView,
+                        Status::ConstraintError);
 
-    VerifyOrReturn(commandData.audioCodec != AudioCodecEnum::kUnknownEnumValue, {
-        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid audio codec", mPath.mEndpointId);
-        handler->AddStatus(commandPath, Status::ConstraintError);
-    });
+    VerifyOrReturnError(commandData.audioCodec != AudioCodecEnum::kUnknownEnumValue, Status::ConstraintError);
 
-    VerifyOrReturn(commandData.channelCount >= 1 && commandData.channelCount <= kMaxChannelCount, {
-        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid channel count", mPath.mEndpointId);
-        handler->AddStatus(commandPath, Status::ConstraintError);
-    });
+    VerifyOrReturnError(commandData.channelCount >= 1 && commandData.channelCount <= kMaxChannelCount, Status::ConstraintError);
 
-    VerifyOrReturn(commandData.sampleRate > 0, {
-        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid sampleRate", mPath.mEndpointId);
-        handler->AddStatus(commandPath, Status::ConstraintError);
-    });
+    VerifyOrReturnError(commandData.sampleRate > 0, Status::ConstraintError);
 
-    VerifyOrReturn(commandData.bitRate > 0, {
-        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid bitRate", mPath.mEndpointId);
-        handler->AddStatus(commandPath, Status::ConstraintError);
-    });
+    VerifyOrReturnError(commandData.bitRate > 0, Status::ConstraintError);
 
-    VerifyOrReturn(IsBitDepthValid(commandData.bitDepth), {
-        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid bitDepth", mPath.mEndpointId);
-        handler->AddStatus(commandPath, Status::ConstraintError);
-    });
+    VerifyOrReturnError(IsBitDepthValid(commandData.bitDepth), Status::ConstraintError);
 
     bool streamUsageSupported = std::find_if(mStreamUsagePriorities.begin(), mStreamUsagePriorities.end(),
                                              [&commandData](const Globals::StreamUsageEnum & entry) {
                                                  return entry == commandData.streamUsage;
                                              }) != mStreamUsagePriorities.end();
 
-    VerifyOrReturn(streamUsageSupported, handler->AddStatus(commandPath, Status::InvalidInState));
+    VerifyOrReturnError(streamUsageSupported, Status::InvalidInState);
 
     AudioStreamStruct audioStreamArgs;
     audioStreamArgs.audioStreamID  = 0;
@@ -2396,8 +2372,7 @@ std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::Ha
 
     if (status != Status::Success)
     {
-        handler->AddStatus(commandPath, status);
-        return;
+        return status;
     }
 
     // Check if the streamID matches an existing one in the
@@ -2415,8 +2390,11 @@ std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::Ha
 
     response.audioStreamID = audioStreamID;
     handler->AddResponse(commandPath, response);
+
+    return Status::Success;
 }
 
+<<<<<<< HEAD
 <<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
 void CameraAVStreamManagementCluster::HandleAudioStreamDeallocate(
     HandlerContext & ctx, const Commands::AudioStreamDeallocate::DecodableType & commandData)
@@ -2424,12 +2402,16 @@ void CameraAVStreamManagementCluster::HandleAudioStreamDeallocate(
 std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::HandleAudioStreamDeallocate(CommandHandler * handler, const ConcreteCommandPath & commandPath,
                                                                   const Commands::AudioStreamDeallocate::DecodableType & commandData)
 >>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
+=======
+Status CameraAVStreamManagementCluster::HandleAudioStreamDeallocate(
+    CommandHandler * handler, const ConcreteCommandPath & commandPath, const Commands::AudioStreamDeallocate::DecodableType & commandData)
+>>>>>>> 6388493d0b (Modify command processing logic to return Status directly from)
 {
     auto & audioStreamID = commandData.audioStreamID;
 
     if (!ValidateAudioStreamForDeallocate(audioStreamID, handler, commandPath))
     {
-        return;
+        return Status::NotFound;
     }
 
     // Call the delegate
@@ -2440,9 +2422,10 @@ std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::Ha
         RemoveAudioStream(audioStreamID);
     }
 
-    handler->AddStatus(commandPath, status);
+    return status;
 }
 
+<<<<<<< HEAD
 <<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
 void CameraAVStreamManagementCluster::HandleSnapshotStreamAllocate(
     HandlerContext & ctx, const Commands::SnapshotStreamAllocate::DecodableType & commandData)
@@ -2450,43 +2433,33 @@ void CameraAVStreamManagementCluster::HandleSnapshotStreamAllocate(
 std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::HandleSnapshotStreamAllocate(CommandHandler * handler, const ConcreteCommandPath & commandPath,
                                                                    const Commands::SnapshotStreamAllocate::DecodableType & commandData)
 >>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
+=======
+Status CameraAVStreamManagementCluster::HandleSnapshotStreamAllocate(
+    CommandHandler * handler, const ConcreteCommandPath & commandPath,
+    const Commands::SnapshotStreamAllocate::DecodableType & commandData, Commands::SnapshotStreamAllocateResponse::Type & response)
+>>>>>>> 6388493d0b (Modify command processing logic to return Status directly from)
 {
-
-    Commands::SnapshotStreamAllocateResponse::Type response;
     uint16_t snapshotStreamID = 0;
 
     // If Watermark feature is supported, then command should have the
     // isWaterMarkEnabled param. Or, if it is not supported, then command should
     // not have the param.
-    VerifyOrReturn((HasFeature(Feature::kWatermark) == commandData.watermarkEnabled.HasValue()),
-                   handler->AddStatus(commandPath, Status::InvalidCommand));
+    VerifyOrReturnError((HasFeature(Feature::kWatermark) == commandData.watermarkEnabled.HasValue()), Status::InvalidCommand);
 
     // If OSD feature is supported, then command should have the
     // isOSDEnabled param. Or, if it is not supported, then command should
     // not have the param.
-    VerifyOrReturn((HasFeature(Feature::kOnScreenDisplay) == commandData.OSDEnabled.HasValue()),
-                   handler->AddStatus(commandPath, Status::InvalidCommand));
+    VerifyOrReturnError((HasFeature(Feature::kOnScreenDisplay) == commandData.OSDEnabled.HasValue()), Status::InvalidCommand);
 
-    VerifyOrReturn(commandData.imageCodec != ImageCodecEnum::kUnknownEnumValue, {
-        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid image codec", mPath.mEndpointId);
-        handler->AddStatus(commandPath, Status::ConstraintError);
-    });
+    VerifyOrReturnError(commandData.imageCodec != ImageCodecEnum::kUnknownEnumValue, Status::ConstraintError);
 
-    VerifyOrReturn(commandData.maxFrameRate > 0, {
-        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid maxFrameRate", mPath.mEndpointId);
-        handler->AddStatus(commandPath, Status::ConstraintError);
-    });
+    VerifyOrReturnError(commandData.maxFrameRate > 0, Status::ConstraintError);
 
-    VerifyOrReturn(commandData.minResolution.width >= 1 && commandData.minResolution.height >= 1,
-                   handler->AddStatus(commandPath, Status::ConstraintError));
+    VerifyOrReturnError(commandData.minResolution.width >= 1 && commandData.minResolution.height >= 1, Status::ConstraintError);
 
-    VerifyOrReturn(commandData.maxResolution.width >= 1 && commandData.maxResolution.height >= 1,
-                   handler->AddStatus(commandPath, Status::ConstraintError));
+    VerifyOrReturnError(commandData.maxResolution.width >= 1 && commandData.maxResolution.height >= 1, Status::ConstraintError);
 
-    VerifyOrReturn(commandData.quality > 0 && commandData.quality <= kMaxImageQualityMetric, {
-        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid image quality", mPath.mEndpointId);
-        handler->AddStatus(commandPath, Status::ConstraintError);
-    });
+    VerifyOrReturnError(commandData.quality > 0 && commandData.quality <= kMaxImageQualityMetric, Status::ConstraintError);
 
     CameraAVStreamManagementDelegate::SnapshotStreamAllocateArgs snapshotStreamArgs;
     snapshotStreamArgs.imageCodec       = commandData.imageCodec;
@@ -2522,8 +2495,7 @@ std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::Ha
     else
     {
         // Stream allocation request does not match any SnapshotCapabilities struct
-        handler->AddStatus(commandPath, Status::DynamicConstraintError);
-        return;
+        return Status::DynamicConstraintError;
     }
 
     // Call the delegate
@@ -2531,8 +2503,7 @@ std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::Ha
 
     if (status != Status::Success)
     {
-        handler->AddStatus(commandPath, status);
-        return;
+        return status;
     }
 
     // Check if the streamID matches an existing one in the
@@ -2568,14 +2539,21 @@ std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::Ha
 
     response.snapshotStreamID = snapshotStreamID;
     handler->AddResponse(commandPath, response);
+
+    return Status::Success;
 }
 
+<<<<<<< HEAD
 <<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
 void CameraAVStreamManagementCluster::HandleSnapshotStreamModify(HandlerContext & ctx,
 ========
 std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::HandleSnapshotStreamModify(CommandHandler * handler, const ConcreteCommandPath & commandPath,
 >>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
                                                                  const Commands::SnapshotStreamModify::DecodableType & commandData)
+=======
+Status CameraAVStreamManagementCluster::HandleSnapshotStreamModify(
+    CommandHandler * handler, const ConcreteCommandPath & commandPath, const Commands::SnapshotStreamModify::DecodableType & commandData)
+>>>>>>> 6388493d0b (Modify command processing logic to return Status directly from)
 {
     Status status             = Status::Success;
     auto & isWaterMarkEnabled = commandData.watermarkEnabled;
@@ -2585,32 +2563,21 @@ std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::Ha
     // If WatermarkEnabled is provided then the Watermark feature has to be supported
     if (commandData.watermarkEnabled.HasValue())
     {
-        VerifyOrReturn(HasFeature(Feature::kWatermark), {
-            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: WatermarkEnabled provided but Watermark Feature not set", mPath.mEndpointId);
-            handler->AddStatus(commandPath, Status::InvalidCommand);
-        });
+        VerifyOrReturnError(HasFeature(Feature::kWatermark), Status::InvalidCommand);
     }
 
     // If OSDEnabled is provided then the OSD feature has to be supported
     if (commandData.OSDEnabled.HasValue())
     {
-        VerifyOrReturn(HasFeature(Feature::kOnScreenDisplay), {
-            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: OSDEnabled provided but OSD Feature not set", mPath.mEndpointId);
-            handler->AddStatus(commandPath, Status::InvalidCommand);
-        });
+        VerifyOrReturnError(HasFeature(Feature::kOnScreenDisplay), Status::InvalidCommand);
     }
 
     // One of WatermarkEnabled or OSDEnabled has to be present
-    VerifyOrReturn(commandData.watermarkEnabled.HasValue() || commandData.OSDEnabled.HasValue(), {
-        ChipLogError(Zcl,
-                     "CameraAVStreamMgmt[ep=%d]: One of WatermarkEnabled or OSDEnabled must be provided in SnapshotStreamModify",
-                     mPath.mEndpointId);
-        handler->AddStatus(commandPath, Status::InvalidCommand);
-    });
+    VerifyOrReturnError(commandData.watermarkEnabled.HasValue() || commandData.OSDEnabled.HasValue(), Status::InvalidCommand);
 
     if (!ValidateSnapshotStreamForModifyOrDeallocate(snapshotStreamID, handler, commandPath, /* isDeallocate = */ false))
     {
-        return;
+        return Status::NotFound;
     }
 
     status = mDelegate.SnapshotStreamModify(snapshotStreamID, isWaterMarkEnabled, isOSDEnabled);
@@ -2620,9 +2587,10 @@ std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::Ha
         ModifySnapshotStream(snapshotStreamID, isWaterMarkEnabled, isOSDEnabled);
     }
 
-    handler->AddStatus(commandPath, status);
+    return status;
 }
 
+<<<<<<< HEAD
 <<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
 void CameraAVStreamManagementCluster::HandleSnapshotStreamDeallocate(
     HandlerContext & ctx, const Commands::SnapshotStreamDeallocate::DecodableType & commandData)
@@ -2630,12 +2598,17 @@ void CameraAVStreamManagementCluster::HandleSnapshotStreamDeallocate(
 std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::HandleSnapshotStreamDeallocate(CommandHandler * handler, const ConcreteCommandPath & commandPath,
                                                                      const Commands::SnapshotStreamDeallocate::DecodableType & commandData)
 >>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
+=======
+Status CameraAVStreamManagementCluster::HandleSnapshotStreamDeallocate(
+    CommandHandler * handler, const ConcreteCommandPath & commandPath,
+    const Commands::SnapshotStreamDeallocate::DecodableType & commandData)
+>>>>>>> 6388493d0b (Modify command processing logic to return Status directly from)
 {
     auto & snapshotStreamID = commandData.snapshotStreamID;
 
     if (!ValidateSnapshotStreamForModifyOrDeallocate(snapshotStreamID, handler, commandPath, /* isDeallocate = */ true))
     {
-        return;
+        return Status::NotFound;
     }
 
     // Call the delegate
@@ -2646,115 +2619,115 @@ std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::Ha
         RemoveSnapshotStream(snapshotStreamID);
     }
 
-    handler->AddStatus(commandPath, status);
+    return status;
 }
 
+<<<<<<< HEAD
 <<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
 void CameraAVStreamManagementCluster::HandleSetStreamPriorities(HandlerContext & ctx,
 ========
 std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::HandleSetStreamPriorities(CommandHandler * handler, const ConcreteCommandPath & commandPath,
 >>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
                                                                 const Commands::SetStreamPriorities::DecodableType & commandData)
+=======
+Status CameraAVStreamManagementCluster::HandleSetStreamPriorities(
+    CommandHandler * handler, const ConcreteCommandPath & commandPath, const Commands::SetStreamPriorities::DecodableType & commandData)
+>>>>>>> 6388493d0b (Modify command processing logic to return Status directly from)
 {
-
     auto & streamPriorities = commandData.streamPriorities;
     std::vector<Globals::StreamUsageEnum> streamUsagePriorities;
     auto iter = streamPriorities.begin();
 
     // If any video, audio or snapshot streams exist fail the command.
-    VerifyOrReturn(mAllocatedVideoStreams.empty() && mAllocatedAudioStreams.empty() && mAllocatedSnapshotStreams.empty(),
-                   handler->AddStatus(commandPath, Status::InvalidInState));
+    VerifyOrReturnError(mAllocatedVideoStreams.empty() && mAllocatedAudioStreams.empty() && mAllocatedSnapshotStreams.empty(),
+                        Status::InvalidInState);
 
     while (iter.Next())
     {
         auto & streamUsage = iter.GetValue();
         if (streamUsage == Globals::StreamUsageEnum::kUnknownEnumValue)
         {
-            handler->AddStatus(commandPath, Status::InvalidCommand);
-            return;
+            return Status::InvalidCommand;
         }
         // If any requested value is not found in SupportedStreamUsages,
         // return DynamicConstraintError.
         auto it = std::find(mSupportedStreamUsages.begin(), mSupportedStreamUsages.end(), streamUsage);
-        VerifyOrReturn(it != mSupportedStreamUsages.end(),
-                       handler->AddStatus(commandPath, Status::DynamicConstraintError));
+        VerifyOrReturnError(it != mSupportedStreamUsages.end(), Status::DynamicConstraintError);
 
         streamUsagePriorities.push_back(streamUsage);
     }
 
     if (iter.GetStatus() != CHIP_NO_ERROR)
     {
-        handler->AddStatus(commandPath, Status::InvalidCommand);
-        return;
+        return Status::InvalidCommand;
     }
 
     // If there are duplicate stream usages in StreamPriorities,
     // return AlreadyExists
-    VerifyOrReturn(!StreamPrioritiesHasDuplicates(streamUsagePriorities),
-                   handler->AddStatus(commandPath, Status::AlreadyExists));
+    VerifyOrReturnError(!StreamPrioritiesHasDuplicates(streamUsagePriorities), Status::AlreadyExists);
 
     CHIP_ERROR err = SetStreamUsagePriorities(streamUsagePriorities);
 
     if (err != CHIP_NO_ERROR)
     {
-        handler->AddStatus(commandPath, Status::Failure);
-        return;
+        return Status::Failure;
     }
 
     mDelegate.OnStreamUsagePrioritiesChanged();
 
-    handler->AddStatus(commandPath, Status::Success);
+    return Status::Success;
 }
 
+<<<<<<< HEAD
 <<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
 void CameraAVStreamManagementCluster::HandleCaptureSnapshot(HandlerContext & ctx,
 ========
 std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::HandleCaptureSnapshot(CommandHandler * handler, const ConcreteCommandPath & commandPath,
 >>>>>>>> 04da978ec1 (Initial changes to moving CameraAVSM to code-driven model.):src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-cluster.cpp
                                                             const Commands::CaptureSnapshot::DecodableType & commandData)
+=======
+Status CameraAVStreamManagementCluster::HandleCaptureSnapshot(CommandHandler * handler, const ConcreteCommandPath & commandPath,
+                                                          const Commands::CaptureSnapshot::DecodableType & commandData,
+                                                          Commands::CaptureSnapshotResponse::Type & response)
+>>>>>>> 6388493d0b (Modify command processing logic to return Status directly from)
 {
-
-    Commands::CaptureSnapshotResponse::Type response;
     auto & snapshotStreamID    = commandData.snapshotStreamID;
     auto & requestedResolution = commandData.requestedResolution;
     ImageSnapshot image;
 
     if (!CheckSnapshotStreamsAvailability(handler, commandPath))
     {
-        return;
+        return Status::NotFound;
     }
 
     if (!snapshotStreamID.IsNull())
     {
         if (!ValidateSnapshotStreamId(snapshotStreamID, handler, commandPath))
         {
-            return;
+            return Status::NotFound;
         }
     }
 
-    VerifyOrReturn(commandData.requestedResolution.width >= 1 && commandData.requestedResolution.height >= 1,
-                   handler->AddStatus(commandPath, Status::ConstraintError));
+    VerifyOrReturnError(commandData.requestedResolution.width >= 1 && commandData.requestedResolution.height >= 1,
+                        Status::ConstraintError);
 
     // If SoftLivestreamPrivacyModeEnabled or HardPrivacyModeOn, return
     // InvalidInState.
-    VerifyOrReturn(!mSoftLivestreamPrivacyModeEnabled && !mHardPrivacyModeOn,
-                   handler->AddStatus(commandPath, Status::InvalidInState));
+    VerifyOrReturnError(!mSoftLivestreamPrivacyModeEnabled && !mHardPrivacyModeOn, Status::InvalidInState);
 
     // Call the delegate
     Status status = mDelegate.CaptureSnapshot(snapshotStreamID, requestedResolution, image);
 
     if (status != Status::Success)
     {
-        handler->AddStatus(commandPath, status);
-        return;
+        return status;
     }
 
     if (image.data.size() > kMaxSnapshotImageSize)
     {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Snapshot image file size(%lu) exceeded limit %lu", mPath.mEndpointId,
                      static_cast<unsigned long>(image.data.size()), static_cast<unsigned long>(kMaxSnapshotImageSize));
-        handler->AddStatus(commandPath, Status::ResourceExhausted);
-        return;
+        return Status::ResourceExhausted;
     }
 
     // Populate the response
@@ -2762,6 +2735,8 @@ std::optional<DataModel::ActionReturnStatus> CameraAVStreamManagementCluster::Ha
     response.resolution = image.imageRes;
     response.imageCodec = image.imageCodec;
     handler->AddResponse(commandPath, response);
+
+    return Status::Success;
 }
 
 <<<<<<<< HEAD:src/app/clusters/camera-av-stream-management-server/CameraAVStreamManagementCluster.cpp
