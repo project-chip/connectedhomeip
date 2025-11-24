@@ -340,7 +340,7 @@ void WiFiManager::_ScanToConnectFinishedCb(wifi_manager_error_e wifiErr, void * 
         foundAp = sInstance._WiFiGetFoundAP();
         if (foundAp != nullptr)
         {
-            PlatformMgrImpl().GLibMatterContextInvokeSync(_WiFiConnect, foundAp);
+            TEMPORARY_RETURN_IGNORED PlatformMgrImpl().GLibMatterContextInvokeSync(_WiFiConnect, foundAp);
         }
     }
     else
@@ -818,7 +818,7 @@ void WiFiManager::Init()
     sInstance.mModuleState     = WIFI_MANAGER_MODULE_STATE_DETACHED;
     sInstance.mConnectionState = WIFI_MANAGER_CONNECTION_STATE_DISCONNECTED;
 
-    PlatformMgrImpl().GLibMatterContextInvokeSync(_WiFiInitialize, static_cast<void *>(nullptr));
+    TEMPORARY_RETURN_IGNORED PlatformMgrImpl().GLibMatterContextInvokeSync(_WiFiInitialize, static_cast<void *>(nullptr));
 }
 
 void WiFiManager::Deinit()

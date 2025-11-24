@@ -80,7 +80,7 @@ class ChipDeviceScanner
 {
 public:
     ChipDeviceScanner(ChipDeviceScannerDelegate * delegate) : mDelegate(delegate){};
-    ~ChipDeviceScanner() { StopScan(); }
+    ~ChipDeviceScanner() { TEMPORARY_RETURN_IGNORED StopScan(); }
 
     /// Initiate a scan for devices, with the given scan filter data
     CHIP_ERROR StartScan(ScanFilterType filterType, const ScanFilterData & filterData);
