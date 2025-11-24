@@ -83,7 +83,7 @@ class TC_AVSUM_2_7(MatterBaseTest, AVSUMTestBase):
     async def test_TC_AVSUM_2_7(self):
         clusterAVSTR = Clusters.Objects.CameraAvStreamManagement
         attributesAVSTR = clusterAVSTR.Attributes
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(1)  # Already done, immediately go to step 2
 

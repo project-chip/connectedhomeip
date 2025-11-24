@@ -83,6 +83,10 @@ class TC_WebRTCP_2_2(MatterBaseTest, WEBRTCPTestBase):
         ]
         return pics
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_WebRTCP_2_2(self):
         """
@@ -97,7 +101,7 @@ class TC_WebRTCP_2_2(MatterBaseTest, WEBRTCPTestBase):
         await self.validate_allocated_audio_stream(audioStreamID)
         await self.validate_allocated_video_stream(videoStreamID)
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.WebRTCTransportProvider
 
         self.step(1)

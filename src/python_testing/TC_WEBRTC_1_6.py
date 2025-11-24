@@ -104,7 +104,7 @@ class TC_WEBRTC_1_6(MatterBaseTest, WebRTCTestHelper):
     async def test_TC_WEBRTC_1_6(self):
         self.step("precondition-1")
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         webrtc_manager = WebRTCManager(event_loop=self.event_loop)
         await webrtc_manager.ws_connect()
         webrtc_peer = None
