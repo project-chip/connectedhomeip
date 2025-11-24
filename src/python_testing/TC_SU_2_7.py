@@ -68,7 +68,7 @@
 
 import asyncio
 import logging
-from time import sleep, time
+from time import time
 
 from mobly import asserts
 from TC_SUTestBase import SoftwareUpdateBaseTest
@@ -349,7 +349,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kDownloading)
         # Wait some time to let it download some data and then Kill the current process
         logger.info("Wait 3 seconds to allow download some data")
-        sleep(3)
+        await asyncio.sleep(3)
         self.current_provider_app_proc.kill()
         time_middle = time()
         elapsed_time = time_middle - time_start
@@ -357,7 +357,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         # wait to until the 5 minutes
         minimun_wait_time = (60*5)-elapsed_time
         logger.info(f"Script will wait for {minimun_wait_time} to match the minimum 5 minutes wait ")
-        sleep(minimun_wait_time)
+        await asyncio.sleep(minimun_wait_time)
         logger.info("Completed waiting for 5 minutes")
         # Somehow here the provider app should be terminated
         # Download error should not come out in less than 5 minutes
