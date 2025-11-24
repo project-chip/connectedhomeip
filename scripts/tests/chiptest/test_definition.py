@@ -26,7 +26,6 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum, auto
 from pathlib import Path
-from typing import Literal, cast
 
 from chiptest.accessories import AppsRegister
 from chiptest.runner import SubprocessInfo, SubprocessKind
