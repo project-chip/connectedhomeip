@@ -137,6 +137,8 @@ class TC_I_2_4(MatterBaseTest):
         asserts.assert_equal(result, Status.Success, "Error when trying to write a IdentifyTime value")
 
         self.step(5)
+        # Add a small delay to allow value from step 4 to be sent via the subscription for non Matter SDK implementations
+        await asyncio.sleep(0.1)
         result = await self.write_single_attribute(cluster.Attributes.IdentifyTime(10), endpoint_id=endpoint)
         asserts.assert_equal(result, Status.Success, "Error when trying to write a IdentifyTime value")
 
@@ -170,6 +172,8 @@ class TC_I_2_4(MatterBaseTest):
         asserts.assert_equal(result, Status.Success, "Error when trying to write a IdentifyTime value")
 
         self.step(13)
+        # Add a small delay to allow value from step 12 to be sent via the subscription for non Matter SDK implementations
+        await asyncio.sleep(0.1)
         result = await self.write_single_attribute(cluster.Attributes.IdentifyTime(0), endpoint_id=endpoint)
         asserts.assert_equal(result, Status.Success, "Error when trying to write a IdentifyTime value")
 
@@ -204,6 +208,8 @@ class TC_I_2_4(MatterBaseTest):
             pass
 
         self.step(20)
+        # Add a small delay to allow value from step 19 to be sent via the subscription for non Matter SDK implementations
+        await asyncio.sleep(0.1)
         try:
             await self.send_single_cmd(cmd=cluster.Commands.Identify(identifyTime=10), endpoint=endpoint)
         except InteractionModelError as e:
@@ -243,6 +249,8 @@ class TC_I_2_4(MatterBaseTest):
             pass
 
         self.step(28)
+        # Add a small delay to allow value from step 27 to be sent via the subscription for non Matter SDK implementations
+        await asyncio.sleep(0.1)
         try:
             await self.send_single_cmd(cmd=cluster.Commands.Identify(identifyTime=0), endpoint=endpoint)
         except InteractionModelError as e:
