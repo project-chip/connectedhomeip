@@ -38,8 +38,8 @@
 #  [TC-OCC-3.1] test procedure step 3, 4
 #  [TC-OCC-3.2] test precedure step 3a, 3c
 
+import asyncio
 import logging
-import time
 from typing import Any, Optional
 
 from mobly import asserts
@@ -172,7 +172,7 @@ class TC_OCC_3_1(MatterBaseTest):
             self.write_to_app_pipe({"Name": "SetOccupancy", "EndpointId": 1, "Occupancy": 0})
 
         if has_hold_time:
-            time.sleep(hold_time + 2.0)  # add some extra 2 seconds to ensure hold time has passed.
+            await asyncio.sleep(hold_time + 2.0)  # add some extra 2 seconds to ensure hold time has passed.
         else:
             self.wait_for_user_input(
                 prompt_msg="Type any letter and press ENTER after the sensor occupancy is back to unoccupied state (occupancy attribute = 0)")

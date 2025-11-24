@@ -69,10 +69,14 @@ class TC_WHM_1_2(MatterBaseTest):
         ]
         return pics
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_WHM_1_2(self):
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         attributes = Clusters.WaterHeaterMode.Attributes
 
@@ -84,11 +88,11 @@ class TC_WHM_1_2(MatterBaseTest):
                                      "SupportedModes must have at least 2 entries!")
         asserts.assert_less_equal(len(supported_modes), 255,
                                   "SupportedModes must have at most 255 entries!")
-        modes = set([m.mode for m in supported_modes])
+        modes = {m.mode for m in supported_modes}
         asserts.assert_equal(len(modes), len(supported_modes),
                              "SupportedModes must have unique mode values")
 
-        labels = set([m.label for m in supported_modes])
+        labels = {m.label for m in supported_modes}
         asserts.assert_equal(len(labels), len(supported_modes),
                              "SupportedModes must have unique mode label values")
 

@@ -37,6 +37,10 @@ public:
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                  AttributeValueDecoder & decoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+
+    // Constraints for label entries
+    static constexpr size_t kMaxLabelSize = 16;
+    static constexpr size_t kMaxValueSize = 16;
 };
 
 } // namespace chip::app::Clusters

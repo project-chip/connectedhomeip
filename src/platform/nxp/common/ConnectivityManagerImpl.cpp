@@ -168,8 +168,8 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     }
     else if (event->Type == kPlatformNxpStartWlanInitWaitTimerEvent)
     {
-        DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kWlanInitWaitMs), ConnectNetworkTimerHandler,
-                                              (void *) event->Platform.pNetworkDataEvent);
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(
+            System::Clock::Milliseconds32(kWlanInitWaitMs), ConnectNetworkTimerHandler, (void *) event->Platform.pNetworkDataEvent);
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
     {
@@ -270,7 +270,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState()
             event.InternetConnectivityChange.ipAddress = IPAddress(*addr4);
         }
         err = PlatformMgr().PostEvent(&event);
-        VerifyOrDie(err == CHIP_NO_ERROR);
+        SuccessOrDie(err);
 
         ChipLogProgress(DeviceLayer, "%s Internet connectivity %s", "IPv4", (haveIPv4Conn) ? "ESTABLISHED" : "LOST");
     }
@@ -291,7 +291,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState()
 #endif
         }
         err = PlatformMgr().PostEvent(&event);
-        VerifyOrDie(err == CHIP_NO_ERROR);
+        SuccessOrDie(err);
 
         ChipLogProgress(DeviceLayer, "%s Internet connectivity %s", "IPv6", (haveIPv6Conn) ? "ESTABLISHED" : "LOST");
     }
@@ -471,7 +471,7 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
          */
         if (mWiFiStationState == kWiFiStationState_Connecting_Failed)
         {
-            NetworkCommissioning::NXPWiFiDriver::GetInstance().RevertConfiguration();
+            TEMPORARY_RETURN_IGNORED NetworkCommissioning::NXPWiFiDriver::GetInstance().RevertConfiguration();
             mWifiIsProvisioned = false;
         }
         sInstance._SetWiFiStationState(kWiFiStationState_NotConnected);
@@ -484,7 +484,7 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
 
     case WLAN_REASON_INITIALIZED:
         sInstance._SetWiFiStationState(kWiFiStationState_NotConnected);
-        sInstance._SetWiFiStationMode(kWiFiStationMode_Enabled);
+        TEMPORARY_RETURN_IGNORED sInstance._SetWiFiStationMode(kWiFiStationMode_Enabled);
         if (mIsWifiRecovering)
         {
             /*
@@ -636,8 +636,8 @@ void ConnectivityManagerImpl::BrHandleStateChange()
             mThreadNetIf      = tmpThrIf;
             mBorderRouterInit = true;
 
-            DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac);
-            chip::Dnssd::MakeHostName(mHostname, sizeof(mHostname), mac);
+            TEMPORARY_RETURN_IGNORED DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac);
+            TEMPORARY_RETURN_IGNORED chip::Dnssd::MakeHostName(mHostname, sizeof(mHostname), mac);
 
             BrInitAppLock(LockThreadStack, UnlockThreadStack);
             BrInitPlatform(ThreadStackMgrImpl().OTInstance(), extNetIfPtr, thrNetIfPtr);

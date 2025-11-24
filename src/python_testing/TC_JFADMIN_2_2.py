@@ -32,12 +32,12 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import base64
 import logging
 import os
 import random
 import tempfile
-import time
 from configparser import ConfigParser
 
 from mobly import asserts
@@ -208,12 +208,12 @@ class TC_JFADMIN_2_2(MatterBaseTest):
 
         self.step("5")
         # Wait for ArmFailSafe timer to expire
-        time.sleep(11)
+        await asyncio.sleep(11)
 
         self.step("6")
         # Get the ICAC from JF-Admin
         response = await devCtrlEcoA.ReadAttribute(
-            nodeid=1, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)],
+            nodeId=1, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)],
             returnClusterObject=True)
         _icac = response[0][Clusters.OperationalCredentials].NOCs[0].icac
         cmd = Clusters.JointFabricAdministrator.Commands.AddICAC(_icac)

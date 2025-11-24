@@ -24,7 +24,7 @@ from collections import namedtuple
 
 CHIP_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
-ALL_PLATFORMS = set([
+ALL_PLATFORMS = {
     'ameba',
     'android',
     'asr',
@@ -50,7 +50,7 @@ ALL_PLATFORMS = set([
     'genio',
     'silabs_docker',
     'unit_tests'
-])
+}
 
 Module = namedtuple('Module', 'name path platforms recursive')
 

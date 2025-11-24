@@ -89,7 +89,7 @@ void ChipDeviceEventHandler::Handle(const chip::DeviceLayer::ChipDeviceEvent * e
                 // persist the TargetCastingPlayer information into the CastingStore and call mOnCompleted()
                 EndpointListLoader::GetInstance()->Initialize(&exchangeMgr, &sessionHandle);
                 ChipLogProgress(AppServer, "ChipDeviceEventHandler::Handle() calling EndpointListLoader::GetInstance()->Load()");
-                EndpointListLoader::GetInstance()->Load();
+                TEMPORARY_RETURN_IGNORED EndpointListLoader::GetInstance()->Load();
             },
             [](void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error) {
                 ChipLogError(AppServer, "ChipDeviceEventHandler::Handle(): Connection to CastingPlayer failed");
@@ -114,18 +114,13 @@ void ChipDeviceEventHandler::HandleFailSafeTimerExpired()
     {
         ChipLogProgress(AppServer, "ChipDeviceEventHandler::HandleFailSafeTimerExpired() when sUdcInProgress: %d, returning early",
                         sUdcInProgress);
-        sUdcInProgress                                            = false;
-        CastingPlayer::GetTargetCastingPlayer()->mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
-        CastingPlayer::GetTargetCastingPlayer()->mOnCompleted(CHIP_ERROR_TIMEOUT, nullptr);
-        CastingPlayer::GetTargetCastingPlayer()->mOnCompleted = nullptr;
-        CastingPlayer::GetTargetCastingPlayer()->mTargetCastingPlayer.reset();
         return;
     }
 
     // if UDC was NOT in progress (when the Fail-Safe timer expired), start UDC
     ChipLogProgress(AppServer, "ChipDeviceEventHandler::HandleFailSafeTimerExpired() when sUdcInProgress: %d, starting UDC",
                     sUdcInProgress);
-    chip::DeviceLayer::SystemLayer().StartTimer(
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(
         chip::System::Clock::Milliseconds32(1),
         [](chip::System::Layer * aSystemLayer, void * aAppState) {
             ChipLogProgress(AppServer, "ChipDeviceEventHandler::HandleFailSafeTimerExpired() running OpenBasicCommissioningWindow");

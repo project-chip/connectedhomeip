@@ -90,7 +90,11 @@ class Context:
         """Creates a new cluster entry for the given name in the list of known
            base clusters.
         """
-        assert name not in self.abstract_base_clusters  # be unique
+        if name in self.abstract_base_clusters:
+            # This does NOT seem unique ... this seems like a bug
+            # See this currently with Label-Cluster.xml and Label-Cluster-LabelCluster.xml ...
+            LOGGER.warning("Duplicate defined base cluster: %s", name)
+            return self.abstract_base_clusters[name]
 
         cluster = Cluster(name=name, code=-1, parse_meta=parse_meta)
         self.abstract_base_clusters[name] = cluster

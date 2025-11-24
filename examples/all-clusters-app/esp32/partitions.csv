@@ -4,3 +4,8 @@ nvs,      data, nvs,     ,        0xC000,
 otadata,  data, ota,     ,        0x2000,
 phy_init, data, phy,     ,        0x1000,
 ota_0,    app,  ota_0,   ,        3800K,
+# This partition table is meant only for all-clusters-app.
+# OTA_0 partition size has been increased to fit all features,
+# and OTA_1 has been removed. This makes the app non-OTA upgradable.
+# Do NOT use this partition table in production builds,
+# production images must include an OTA_1 partition.
