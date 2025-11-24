@@ -216,8 +216,9 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         """
         if len(self.problems) > 0:
-            # Attempt to dump device attribute data for debugging when problems are found
-            self._dump_device_attributes_on_failure()
+            # Attempt to dump device attribute data for debugging when problems are found during Confirmation Tests
+            if self.matter_test_config.debug:
+                self._dump_device_attributes_on_failure()
 
             LOGGER.info("###########################################################")
             LOGGER.info("Problems found:")

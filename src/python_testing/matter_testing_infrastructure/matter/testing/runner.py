@@ -793,6 +793,7 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
     config.restart_flag_file = args.restart_flag_file
+    config.debug = args.debug
 
     # Map CLI arg to the current config field name used by tests
     config.pipe_name = args.app_pipe
@@ -852,6 +853,8 @@ def parse_matter_test_args(argv: Optional[List[str]] = None):
     basic_group.add_argument('--app-pipe', type=str, default=None, help="The full path of the app to send an out-of-band command")
     basic_group.add_argument('--restart-flag-file', type=str, default=None,
                              help="The full path of the file to use to signal a restart to the app")
+    basic_group.add_argument('--debug', action="store_true", default=False,
+                             help="Run the script in debug mode. This is needed to capture attribute dump at end of test modules if there are problems found during testing.")
     basic_group.add_argument('--timeout', type=int, help="Test timeout in seconds")
     basic_group.add_argument("--PICS", help="PICS file path", type=str)
 
