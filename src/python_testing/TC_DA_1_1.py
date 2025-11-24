@@ -99,6 +99,7 @@ class TC_DA_1_1(MatterBaseTest):
     async def read_nocs(self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController):
         return await self.read_single_attribute_check_success(
             dev_ctrl=dev_ctrl,
+            endpoint=0,
             cluster=Clusters.OperationalCredentials,
             attribute=Clusters.OperationalCredentials.Attributes.NOCs,
             fabric_filtered=False)
@@ -106,12 +107,15 @@ class TC_DA_1_1(MatterBaseTest):
     async def read_fabrics(self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController):
         return await self.read_single_attribute_check_success(
             dev_ctrl=dev_ctrl,
+            endpoint=0,
             cluster=Clusters.OperationalCredentials,
             attribute=Clusters.OperationalCredentials.Attributes.Fabrics,
             fabric_filtered=False)
 
     def factory_reset_dut(self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController):
         restart_flag_file = self.get_restart_flag_file()
+        
+        print(f"\n\n\n\n\n\n\t\t\t restart_flag_file: {restart_flag_file}\n\n\n\n\n\n")
 
         if not restart_flag_file:
             # No restart flag file: ask user to manually reboot
@@ -142,15 +146,16 @@ class TC_DA_1_1(MatterBaseTest):
                 logging.error(f"Failed to restart app: {e}")
                 asserts.fail(f"App restart failed: {e}")
 
-    async def commission_dut(self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController):
-        params = await dev_ctrl.OpenCommissioningWindow(
+    async def commission_dut(self, dev_ctrl1: ChipDeviceCtrl.ChipDeviceController,
+                             dev_ctrl2: ChipDeviceCtrl.ChipDeviceController):
+        params = await dev_ctrl1.OpenCommissioningWindow(
             nodeId=self.dut_node_id,
             timeout=900,
             iteration=10000,
             discriminator=self.discriminator,
             option=1)
 
-        await dev_ctrl.CommissionOnNetwork(
+        await dev_ctrl2.CommissionOnNetwork(
             nodeId=self.dut_node_id,
             setupPinCode=params.setupPinCode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
@@ -162,6 +167,7 @@ class TC_DA_1_1(MatterBaseTest):
         th1 = self.default_controller
         th2 = self.get_new_controller()
 
+        # DUT Commissioned to TH1's fabric
         self.step("precondition")
 
         # *** STEP 1 ***
@@ -171,7 +177,7 @@ class TC_DA_1_1(MatterBaseTest):
         nocs_th1 = await self.read_nocs(th1)
 
         # Verify that there is a single entry in the list
-        asserts.assert_true(len(nocs_th1) == 1, "NOCs attribute must contain single entry in the list")
+        asserts.assert_true(len(nocs_th1) == 1, f"NOCs attribute must contain a single entry in the list, got {len(nocs_th1)}")
 
         # *** STEP 2 ***
         # TH1 does a non-fabric-filtered read of the Fabrics attribute from the Node Operational Credentials cluster
@@ -179,10 +185,10 @@ class TC_DA_1_1(MatterBaseTest):
         fabrics_th1 = await self.read_fabrics(th1)
 
         # Verify that there is a single entry in the list
-        asserts.assert_true(len(fabrics_th1) == 1, "Fabrics attribute must contain single entry in the list")
+        asserts.assert_true(len(fabrics_th1) == 1, f"Fabrics attribute must contain a single entry in the list, got {len(fabrics_th1)}")
 
         # Verify that the FabricID for that entry matches the FabricID for TH1
-        asserts.assert_equal(fabrics_th1[0].fabricID, th1.fabricId, "TH1 FabricID and Fabrics attribute FabricID must match")
+        asserts.assert_equal(fabrics_th1[0].fabricID, th1.fabricId, f"TH1 FabricID ({fabrics_th1[0].fabricID}) and Fabrics attribute FabricID ({th1.fabricId}) must match")
 
         # *** STEP 3 ***
         # Factory reset DUT and perform the necessary actions to put the DUT into a commissionable state
@@ -192,22 +198,21 @@ class TC_DA_1_1(MatterBaseTest):
         # *** STEP 4 ***
         # Commission DUT to TH2's Fabric
         self.step(4)
-        # th2 = self.get_new_controller()
-        await self.commission_dut(th2)
+        await self.commission_dut(th1, th2)
 
         # *** STEP 5 ***
         # TH2 does a non-fabric-filtered read of Fabrics attribute list from DUT
         self.step(5)
         fabrics_th2 = await self.read_fabrics(th2)
-
+        
         # Verify that there is only one entry in the 'Fabrics' List
-        asserts.assert_true(len(fabrics_th2) == 1, "Fabrics attribute must contain single entry in the list")
+        asserts.assert_true(len(fabrics_th2) == 1, f"Fabrics attribute must contain a single entry in the list, got {len(fabrics_th2)}")
 
         # Verify that the FabricID is the same as the TH2’s Fabric ID
-        asserts.assert_equal(fabrics_th2[0].fabricID, th2.fabricId, "TH1 FabricID and Fabrics attribute FabricID must match")
+        asserts.assert_equal(fabrics_th2[0].fabricID, th2.fabricId, f"TH2 FabricID ({fabrics_th2[0].fabricID})and Fabrics attribute FabricID ({th2.fabricId}) must match")
 
         # Verify that the entry saved in Step 2 for TH1' Fabric does not appear in the list
-        asserts.assert_not_in(th2.fabricId, fabrics_th1, "FabricID from TH2 must not appear in TH1's fabrics list")
+        asserts.assert_not_in(th2.fabricId, fabrics_th1, f"FabricID ({th2.fabricId}) from TH2 must NOT appear in TH1's fabrics list")
 
         # *** STEP 6 ***
         # TH2 does a non-fabric-filtered read of NOCs attribute list from DUT
@@ -215,7 +220,7 @@ class TC_DA_1_1(MatterBaseTest):
         nocs_th2 = await self.read_nocs(th2)
 
         # Verify that there is only one entry in the 'NOCs' List
-        asserts.assert_true(len(nocs_th2) == 1, "NOCs attribute must contain single entry in the list")
+        asserts.assert_true(len(nocs_th2) == 1, "NOCs attribute must contain a single entry in the list")
 
         # Verify that the NOCs for that entry is different than the NOCs entry in nocs_th1
         asserts.assert_not_equal(1, 1, "The NOCs entry for TH2 must be different that the NOCs entry for TH1")
