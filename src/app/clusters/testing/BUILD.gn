@@ -15,6 +15,7 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
+import("${chip_root}/src/data-model-providers/codegen/model.gni")
 
 source_set("testing") {
   sources = [
@@ -25,6 +26,7 @@ source_set("testing") {
     "MockCommandHandler.h",
     "ValidateGlobalAttributes.cpp",
     "ValidateGlobalAttributes.h",
+    "${chip_root}/src/data-model-providers/codegen/Instance.cpp",
   ]
 
   public_deps = [
@@ -42,5 +44,10 @@ source_set("testing") {
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging:messaging",
     "${chip_root}/src/protocols/interaction_model:interaction_model",
+    "${chip_root}/src/app/server:server",
+    "${chip_root}/src/access:access",
+    "${chip_root}/src/credentials/tests:cert_test_vectors",
+    "${chip_root}/src/data-model-providers/codegen:instance-header",
+    "${chip_root}/src/data-model-providers/codegen:headers",
   ]
 }

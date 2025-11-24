@@ -15,6 +15,8 @@
  */
 
 #pragma once
+#include <access/AccessControl.h>
+#include <access/examples/ExampleAccessControlDelegate.h>
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
@@ -25,14 +27,21 @@
 #include <app/clusters/testing/MockCommandHandler.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
+#include <app/data-model-provider/tests/TestConstants.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/data-model/NullObject.h>
+#include <app/reporting/ReportSchedulerImpl.h>
 #include <app/server-cluster/ServerClusterInterface.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <app/server/Server.h>
+#include <credentials/tests/CHIPCert_unit_test_vectors.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/TLVReader.h>
 #include <lib/support/ReadOnlyBuffer.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
+#include <platform/DefaultTimerDelegate.h>
 
 #include <memory>
 #include <optional>
@@ -227,6 +236,114 @@ public:
     std::optional<LogOnlyEvents::EventInformation> GetNextGeneratedEvent()
     {
         return mTestServerClusterContext.EventsGenerator().GetNextEvent();
+    }
+
+    // Static helper methods for initializing Server and FabricTable for fabric-scoped attribute testing
+    //
+    // These methods should be called in SetUpTestSuite() and TearDownTestSuite() respectively
+    // when testing fabric-scoped attributes that require Server::GetInstance().GetFabricTable()
+    // to be populated (e.g., Access Control Cluster ACL attribute).
+    //
+    // Example usage:
+    //   struct TestMyCluster : public ::testing::Test
+    //   {
+    //       static void SetUpTestSuite()
+    //       {
+    //           ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
+    //           ASSERT_EQ(chip::Test::ClusterTester::InitServerForFabricScopedTesting(), CHIP_NO_ERROR);
+    //       }
+    //       static void TearDownTestSuite()
+    //       {
+    //           chip::Test::ClusterTester::ShutdownServerForFabricScopedTesting();
+    //           chip::Platform::MemoryShutdown();
+    //       }
+    //   };
+    //
+    // This initializes Server::GetInstance() with minimal configuration and adds a test fabric
+    // with index matching the fabric index used in test subject descriptors (kDenySubjectDescriptor).
+    static CHIP_ERROR InitServerForFabricScopedTesting()
+    {
+        // Static resources for Server initialization (initialized once per test suite)
+        static chip::TestPersistentStorageDelegate * sTestStorage           = nullptr;
+        static chip::app::DefaultTimerDelegate * sTimerDelegate             = nullptr;
+        static chip::app::reporting::ReportSchedulerImpl * sReportScheduler = nullptr;
+        static bool sServerInitialized                                      = false;
+
+        // Prevent multiple initializations
+        if (sServerInitialized)
+        {
+            return CHIP_NO_ERROR;
+        }
+
+        // Allocate static resources
+        sTestStorage     = new chip::TestPersistentStorageDelegate();
+        sTimerDelegate   = new chip::app::DefaultTimerDelegate();
+        sReportScheduler = new chip::app::reporting::ReportSchedulerImpl(sTimerDelegate);
+
+        // Initialize Server::GetInstance() to enable fabric-scoped attribute reading
+        // This is needed because some clusters (e.g., Access Control, Group Key Management) iterate over
+        // Server::GetInstance().GetFabricTable() when reading fabric-scoped attributes
+        chip::CommonCaseDeviceServerInitParams initParams;
+        initParams.persistentStorageDelegate = sTestStorage; // Use test storage instead of KVS
+        initParams.reportScheduler           = sReportScheduler;
+        ReturnErrorOnFailure(initParams.InitializeStaticResourcesBeforeServerInit());
+        // InitializeStaticResourcesBeforeServerInit() already sets accessDelegate to a default value
+        // which is sufficient for most clusters. If a specific cluster needs a custom AccessControl
+        // delegate, it should be set up separately in the test.
+        initParams.dataModelProvider      = chip::app::CodegenDataModelProviderInstance(sTestStorage);
+        initParams.operationalServicePort = 0; // Use any available port
+
+        // Initialize Server
+        ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
+
+        // Add a test fabric with index matching kDenySubjectDescriptor
+        // This allows fabric-scoped attribute readers to find the fabric when reading entries
+        const chip::FabricIndex testFabricIndex = chip::app::Testing::kDenySubjectDescriptor.fabricIndex;
+        chip::FabricTable & fabricTable         = chip::Server::GetInstance().GetFabricTable();
+
+        // Set the fabric index for the next addition
+        ReturnErrorOnFailure(fabricTable.SetFabricIndexForNextAddition(testFabricIndex));
+
+        // Add fabric using test certificates
+        using namespace chip::TestCerts;
+        chip::ByteSpan rcacSpan  = GetRootACertAsset().mCert;
+        chip::ByteSpan icacSpan  = GetIAA1CertAsset().mCert;
+        chip::ByteSpan nocSpan   = GetNodeA1CertAsset().mCert;
+        chip::ByteSpan opKeySpan = GetNodeA1CertAsset().mKey;
+
+        chip::FabricIndex addedFabricIndex = chip::kUndefinedFabricIndex;
+        ReturnErrorOnFailure(fabricTable.AddNewFabricForTest(rcacSpan, icacSpan, nocSpan, opKeySpan, &addedFabricIndex));
+        VerifyOrReturnError(addedFabricIndex == testFabricIndex, CHIP_ERROR_INTERNAL);
+
+        sServerInitialized = true;
+        return CHIP_NO_ERROR;
+    }
+
+    static void ShutdownServerForFabricScopedTesting()
+    {
+        // Static resources (must match InitServerForFabricScopedTesting)
+        static chip::TestPersistentStorageDelegate * sTestStorage           = nullptr;
+        static chip::app::DefaultTimerDelegate * sTimerDelegate             = nullptr;
+        static chip::app::reporting::ReportSchedulerImpl * sReportScheduler = nullptr;
+        static bool sServerInitialized                                      = false;
+
+        if (!sServerInitialized)
+        {
+            return;
+        }
+
+        chip::Server::GetInstance().Shutdown();
+        // AccessControl is cleaned up by Server::Shutdown(), no need to call Finish() separately
+
+        // Clean up static resources
+        delete sReportScheduler;
+        sReportScheduler = nullptr;
+        delete sTimerDelegate;
+        sTimerDelegate = nullptr;
+        delete sTestStorage;
+        sTestStorage = nullptr;
+
+        sServerInitialized = false;
     }
 
 private:
