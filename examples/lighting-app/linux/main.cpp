@@ -88,7 +88,7 @@ void ApplicationInit()
         TEMPORARY_RETURN_IGNORED sChipNamedPipeCommands.Stop();
     }
 
-    // Replaces the registered `BasicInformation` cluster with a customized on that adds some extra functionality.
+    // Replaces the registered `BasicInformation` cluster with a customized one that adds some extra functionality.
     auto & registry = chip::app::CodegenDataModelProvider::Instance().Registry();
 
     ServerClusterInterface * interface = registry.Get({ kRootEndpointId, BasicInformation::Id });
