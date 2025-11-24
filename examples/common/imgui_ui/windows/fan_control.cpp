@@ -125,19 +125,19 @@ void FanControl::Render()
     ImGui::Begin(mTitle.c_str());
     ImGui::Text("On Endpoint %d", mEndpointId);
 
-    int uiFanMode                                                            = static_cast<int>(mFanMode);
-    int uiPercentSetting                                                     = static_cast<int>(mPercentSetting);
-    int uiSpeedSetting                                                       = static_cast<int>(mSpeedSetting);
-    int uiAirflowDirection                                                   = static_cast<int>(mAirflowDirection);
-    int uiFanModeSequence                                                    = static_cast<int>(mFanModeSequence);
-    int uiPercent                                                            = static_cast<int>(mPercent);
-    int uiSpeedCurrent                                                       = static_cast<int>(mSpeedCurrent);
-    int uiSpeedMax                                                           = static_cast<int>(mSpeedMax);
-    int uiFeatureMap                                                         = static_cast<int>(mFeatureMap);
-    chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> uiRockSetting = mRockSetting;
-    chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> uiRockSupport = mRockSupport;
-    chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> uiWindSetting = mWindSetting;
-    chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> uiWindSupport = mWindSupport;
+    int uiFanMode          = static_cast<int>(mFanMode);
+    int uiPercentSetting   = static_cast<int>(mPercentSetting);
+    int uiSpeedSetting     = static_cast<int>(mSpeedSetting);
+    int uiAirflowDirection = static_cast<int>(mAirflowDirection);
+    int uiFanModeSequence  = static_cast<int>(mFanModeSequence);
+    int uiPercent          = static_cast<int>(mPercent);
+    int uiSpeedCurrent     = static_cast<int>(mSpeedCurrent);
+    int uiSpeedMax         = static_cast<int>(mSpeedMax);
+    int uiFeatureMap       = static_cast<int>(mFeatureMap);
+    int uiRockSetting      = mRockSetting.Raw();
+    int uiRockSupport      = mRockSupport.Raw();
+    int uiWindSetting      = mWindSetting.Raw();
+    int uiWindSupport      = mWindSupport.Raw();
 
     ImGui::SliderInt("Mode value", &uiFanMode, static_cast<int>(chip::app::Clusters::FanControl::FanModeEnum::kOff),
                      static_cast<int>(chip::app::Clusters::FanControl::FanModeEnum::kSmart));
@@ -182,6 +182,12 @@ void FanControl::Render()
         mTargetSpeedMax = static_cast<uint8_t>(uiSpeedMax);
     }
 
+    ImGui::LabelText("Feature map", "%d", uiFeatureMap);
+    if (static_cast<int>(mFeatureMap) != uiFeatureMap)
+    {
+        mTargetFeatureMap = static_cast<uint32_t>(uiFeatureMap);
+    }
+
     ImGui::SliderInt("Airflow direction", &uiAirflowDirection, 1, 0,
                      mAirflowDirection == chip::app::Clusters::FanControl::AirflowDirectionEnum::kForward ? "Forward" : "Reverse");
     if (static_cast<int>(mAirflowDirection) != uiAirflowDirection)
@@ -189,62 +195,30 @@ void FanControl::Render()
         mTargetAirflowDirection = static_cast<chip::app::Clusters::FanControl::AirflowDirectionEnum>(uiAirflowDirection);
     }
 
-    if (!uiRockSetting.Has(mRockSetting))
+    ImGui::LabelText("Rock support", "%s", GetRockBitmapValueString(uiRockSupport).c_str());
+    if (static_cast<int>(mRockSupport.Raw()) != uiRockSupport)
     {
-        mTargetRockSetting = uiRockSetting;
+        mTargetRockSupport = static_cast<chip::BitMask<chip::app::Clusters::FanControl::RockBitmap>>(uiRockSupport);
     }
 
-    if (mRockSupport != uiRockSupport)
+    const auto rockSettingString = GetRockBitmapValueString(mRockSetting);
+    ImGui::SliderInt("Rock setting", &uiRockSetting, 0, 1, rockSettingString.c_str());
+    if (uiRockSetting != mRockSetting.Raw())
     {
-        mTargetRockSupport = uiRockSupport;
+        mTargetRockSetting = static_cast<chip::BitMask<chip::app::Clusters::FanControl::RockBitmap>>(uiRockSetting);
     }
 
-    if (!uiWindSetting.Has(mWindSetting))
+    ImGui::LabelText("Wind support", "%s", GetWindBitmapValueString(uiWindSupport).c_str());
+    if (static_cast<int>(mWindSupport.Raw()) != uiWindSupport)
     {
-        mTargetWindSetting = uiWindSetting;
+        mTargetWindSupport = static_cast<chip::BitMask<chip::app::Clusters::FanControl::WindBitmap>>(uiWindSupport);
     }
 
-    if (mWindSupport != uiWindSupport)
+    const auto windSettingString = GetWindBitmapValueString(mWindSetting);
+    ImGui::SliderInt("Wind setting", &uiWindSetting, 0, 2, windSettingString.c_str());
+    if (uiWindSetting != mWindSetting.Raw())
     {
-        mTargetWindSupport = uiWindSupport;
-    }
-
-    ImGui::LabelText("Feature map", "%d", uiFeatureMap);
-    if (static_cast<int>(mFeatureMap) != uiFeatureMap)
-    {
-        mTargetFeatureMap = static_cast<uint32_t>(uiFeatureMap);
-    }
-
-    const auto flags = ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_SizingStretchProp;
-    if (ImGui::BeginTable("Wind and Rock", 2, flags))
-    {
-        ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_None, 1.0f);
-        ImGui::TableSetupColumn("Flags", ImGuiTableColumnFlags_None, 3.0f);
-        ImGui::TableHeadersRow();
-
-        ImGui::TableNextRow();
-        ImGui::TableSetColumnIndex(0);
-        ImGui::Text("Rock support");
-        ImGui::TableSetColumnIndex(1);
-        ImGui::Text("%s", GetRockBitmapValueString(uiRockSupport).c_str());
-        ImGui::TableNextRow();
-        ImGui::TableSetColumnIndex(0);
-        ImGui::Text("Rock setting");
-        ImGui::TableSetColumnIndex(1);
-        ImGui::Text("%s", GetRockBitmapValueString(uiRockSetting).c_str());
-
-        ImGui::TableNextRow();
-        ImGui::TableSetColumnIndex(0);
-        ImGui::Text("Wind support");
-        ImGui::TableSetColumnIndex(1);
-        ImGui::Text("%s", GetWindBitmapValueString(uiWindSupport).c_str());
-        ImGui::TableNextRow();
-        ImGui::TableSetColumnIndex(0);
-        ImGui::Text("Wind setting");
-        ImGui::TableSetColumnIndex(1);
-        ImGui::Text("%s", GetWindBitmapValueString(uiWindSetting).c_str());
-
-        ImGui::EndTable();
+        mTargetWindSetting = static_cast<chip::BitMask<chip::app::Clusters::FanControl::WindBitmap>>(uiWindSetting);
     }
 
     ImGui::End();
