@@ -1494,7 +1494,7 @@ cluster GeneralDiagnostics = 51 {
 
   readonly attribute NetworkInterface networkInterfaces[] = 0;
   readonly attribute int16u rebootCount = 1;
-  readonly attribute int64u upTime = 2;
+  readonly attribute optional int64u upTime = 2;
   readonly attribute optional int32u totalOperationalHours = 3;
   readonly attribute optional BootReasonEnum bootReason = 4;
   readonly attribute optional HardwareFaultEnum activeHardwareFaults[] = 5;

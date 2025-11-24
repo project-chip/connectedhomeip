@@ -452,7 +452,7 @@ class GeneralDiagnosticsCluster(
     }
   }
 
-  suspend fun readUpTimeAttribute(): ULong {
+  suspend fun readUpTimeAttribute(): ULong? {
     val ATTRIBUTE_ID: UInt = 2u
 
     val attributePath =
@@ -478,7 +478,12 @@ class GeneralDiagnosticsCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: ULong = tlvReader.getULong(AnonymousTag)
+    val decodedValue: ULong? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getULong(AnonymousTag)
+      } else {
+        null
+      }
 
     return decodedValue
   }
@@ -522,9 +527,14 @@ class GeneralDiagnosticsCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: ULong = tlvReader.getULong(AnonymousTag)
+          val decodedValue: ULong? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              tlvReader.getULong(AnonymousTag)
+            } else {
+              null
+            }
 
-          emit(ULongSubscriptionState.Success(decodedValue))
+          decodedValue?.let { emit(ULongSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(ULongSubscriptionState.SubscriptionEstablished)

@@ -7927,7 +7927,7 @@ class GeneralDiagnostics(Cluster):
             Fields=[
                 ClusterObjectFieldDescriptor(Label="networkInterfaces", Tag=0x00000000, Type=typing.List[GeneralDiagnostics.Structs.NetworkInterface]),
                 ClusterObjectFieldDescriptor(Label="rebootCount", Tag=0x00000001, Type=uint),
-                ClusterObjectFieldDescriptor(Label="upTime", Tag=0x00000002, Type=uint),
+                ClusterObjectFieldDescriptor(Label="upTime", Tag=0x00000002, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="totalOperationalHours", Tag=0x00000003, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="bootReason", Tag=0x00000004, Type=typing.Optional[GeneralDiagnostics.Enums.BootReasonEnum]),
                 ClusterObjectFieldDescriptor(Label="activeHardwareFaults", Tag=0x00000005, Type=typing.Optional[typing.List[GeneralDiagnostics.Enums.HardwareFaultEnum]]),
@@ -7944,7 +7944,7 @@ class GeneralDiagnostics(Cluster):
 
     networkInterfaces: typing.List[GeneralDiagnostics.Structs.NetworkInterface] = field(default_factory=lambda: [])
     rebootCount: uint = 0
-    upTime: uint = 0
+    upTime: typing.Optional[uint] = None
     totalOperationalHours: typing.Optional[uint] = None
     bootReason: typing.Optional[GeneralDiagnostics.Enums.BootReasonEnum] = None
     activeHardwareFaults: typing.Optional[typing.List[GeneralDiagnostics.Enums.HardwareFaultEnum]] = None
@@ -8209,9 +8209,9 @@ class GeneralDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: uint = 0
+            value: typing.Optional[uint] = None
 
         @dataclass
         class TotalOperationalHours(ClusterAttributeDescriptor):

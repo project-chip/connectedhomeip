@@ -70,10 +70,9 @@ namespace DeviceLoadStatus {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(DeviceLoadStatus::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace DeviceLoadStatus
-constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
+constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
     NetworkInterfaces::kMetadataEntry,
     RebootCount::kMetadataEntry,
-    UpTime::kMetadataEntry,
     TestEventTriggersEnabled::kMetadataEntry,
 
 };
