@@ -207,6 +207,7 @@ private:
 
 struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementCluster
 {
+
     TestServerClusterContext mTestContext;
     Credentials::GroupDataProviderImpl mRealProvider;
     Crypto::DefaultSessionKeystore mMockKeystore;
