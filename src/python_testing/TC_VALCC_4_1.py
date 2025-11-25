@@ -32,7 +32,7 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import time
+import asyncio
 
 from mobly import asserts
 
@@ -70,10 +70,14 @@ class TC_VALCC_4_1(MatterBaseTest):
         ]
         return pics
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_VALCC_4_1(self):
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(1)
         attributes = Clusters.ValveConfigurationAndControl.Attributes
@@ -97,7 +101,7 @@ class TC_VALCC_4_1(MatterBaseTest):
         asserts.assert_less_equal(remaining_duration_dut, 60, "RemainingDuration is not in the expected range")
 
         self.step(5)
-        time.sleep(5)
+        await asyncio.sleep(5)
 
         self.step(6)
         remaining_duration_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.RemainingDuration)

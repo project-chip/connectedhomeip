@@ -71,8 +71,8 @@ void ThermostatDelegate::InitializePresets()
 
         // Set the preset handle to the preset scenario value as a unique id.
         const uint8_t handle[] = { static_cast<uint8_t>(presetScenario) };
-        mPresets[index].SetPresetHandle(DataModel::MakeNullable(ByteSpan(handle)));
-        mPresets[index].SetName(NullOptional);
+        TEMPORARY_RETURN_IGNORED mPresets[index].SetPresetHandle(DataModel::MakeNullable(ByteSpan(handle)));
+        TEMPORARY_RETURN_IGNORED mPresets[index].SetName(NullOptional);
         int16_t coolingSetpointValue = static_cast<int16_t>(2500 + (index * 100));
         mPresets[index].SetCoolingSetpoint(MakeOptional(coolingSetpointValue));
 
@@ -208,7 +208,8 @@ CHIP_ERROR ThermostatDelegate::AppendToPendingPresetList(const PresetStructWithO
             // suffices as the unique preset handle. Need to fix this to actually provide unique handles once multiple presets of
             // each type are supported.
             const uint8_t handle[] = { static_cast<uint8_t>(preset.GetPresetScenario()) };
-            mPendingPresets[mNextFreeIndexInPendingPresetsList].SetPresetHandle(DataModel::MakeNullable(ByteSpan(handle)));
+            TEMPORARY_RETURN_IGNORED mPendingPresets[mNextFreeIndexInPendingPresetsList].SetPresetHandle(
+                DataModel::MakeNullable(ByteSpan(handle)));
         }
         mNextFreeIndexInPendingPresetsList++;
         return CHIP_NO_ERROR;
@@ -407,7 +408,7 @@ void ThermostatDelegate::TimerExpiredCallback(System::Layer * systemLayer, void 
         ChipLogError(Zcl, "TimerExpiredCallback: Failed to ReEvaluateCurrentSuggestion since context is null");
         return;
     }
-    ctx->ReEvaluateCurrentSuggestion();
+    TEMPORARY_RETURN_IGNORED ctx->ReEvaluateCurrentSuggestion();
 }
 
 void ThermostatDelegate::CancelExpirationTimer()
@@ -448,14 +449,15 @@ CHIP_ERROR ThermostatDelegate::ReEvaluateCurrentSuggestion()
         // TODO: Check if a hold is set and set the ThermostatSuggestionNotFollowingReason to OngoingHold and do not update
         // ActivePresetHandle. Otherwise set the ActivePresetHandle to the preset handle in the suggestion and set
         // ThermostatSuggestionNotFollowingReason to null.
-        SetActivePresetHandle(currentThermostatSuggestion.GetPresetHandle());
+        TEMPORARY_RETURN_IGNORED SetActivePresetHandle(currentThermostatSuggestion.GetPresetHandle());
         MatterReportingAttributeChangeCallback(mEndpointId, Thermostat::Id, Attributes::ActivePresetHandle::Id);
-        SetThermostatSuggestionNotFollowingReason(DataModel::NullNullable);
+        TEMPORARY_RETURN_IGNORED SetThermostatSuggestionNotFollowingReason(DataModel::NullNullable);
 
         // Start a timer from the timestamp in currentMatterEpochTimestamp to the timestamp in the expiration time.
         if (currentThermostatSuggestion.GetExpirationTime() > currentMatterEpochTimestamp)
         {
-            StartExpirationTimer(currentThermostatSuggestion.GetExpirationTime() - currentMatterEpochTimestamp);
+            TEMPORARY_RETURN_IGNORED StartExpirationTimer(currentThermostatSuggestion.GetExpirationTime() -
+                                                          currentMatterEpochTimestamp);
         }
     }
 
