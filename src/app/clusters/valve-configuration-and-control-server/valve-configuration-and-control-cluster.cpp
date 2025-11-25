@@ -43,7 +43,7 @@ CHIP_ERROR ValveConfigurationAndControlCluster::Startup(ServerClusterContext & c
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
-    // This feature shall not be supported if the cluster don't supports the TimeSync cluster.
+    // This feature shall not be supported if the cluster doesn't support the TimeSync cluster.
     if (mFeatures.Has(Feature::kTimeSync))
     {
         VerifyOrReturnError((mTsTracker != nullptr && mTsTracker->IsTimeSyncClusterSupported()), CHIP_ERROR_INVALID_ARGUMENT);
@@ -67,7 +67,7 @@ CHIP_ERROR ValveConfigurationAndControlCluster::Startup(ServerClusterContext & c
         mDefaultOpenDuration = defaultOpenDuration;
     }
 
-    // If enabled Level feature is enabled, try to get the DefaultOpenLevel value.
+    // If Level feature is enabled, try to get the DefaultOpenLevel value.
     if (mFeatures.Has(Feature::kLevel))
     {
         AttributePersistence attrPersistence{ context.attributeStorage };
@@ -313,7 +313,7 @@ ValveConfigurationAndControlCluster::HandleOpenCommand(const DataModel::InvokeRe
     // Check if the OpenDuration value is Null
     if (mOpenDuration.IsNull())
     {
-        // If null, set the remaning duration as Null
+        // If null, set the remaining duration as Null
         SetRemainingDuration(DataModel::NullNullable);
     }
     else
@@ -361,7 +361,7 @@ CHIP_ERROR ValveConfigurationAndControlCluster::SetAutoCloseTime()
 {
     if (!mOpenDuration.IsNull() && mTsTracker->IsValidUTCTime())
     {
-        // We have a syncronized UTC time in the TimeSync cluster, we can proceed to set the AutoCloseTime attribute
+        // We have a synchronized UTC time in the TimeSync cluster, we can proceed to set the AutoCloseTime attribute
         System::Clock::Microseconds64 utcTime;
         uint64_t chipEpochTime;
         ReturnErrorOnFailure(System::SystemClock().GetClock_RealTime(utcTime));
@@ -401,7 +401,7 @@ void ValveConfigurationAndControlCluster::HandleUpdateRemainingDurationInternal(
 
     if (mOpenDuration.IsNull() || mRemainingDuration.value().IsNull())
     {
-        // If openDuration is NULL, RemainingDuration should also be Null and this timer should't be running.
+        // If openDuration is NULL, RemainingDuration should also be Null and this timer shouldn't be running.
         SetRemainingDuration(DataModel::NullNullable);
         return;
     }
