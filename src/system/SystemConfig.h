@@ -639,7 +639,7 @@ struct LwIPEvent;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP_MONOTONIC_TIME
 
 /**
- *  @def CHIP_SYSTEM_CONFIG_USE_LWIP_SKIP_INIT
+ *  @def CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT
  *
  *  @brief
  *      Skip LwIP initalization during network setup.
