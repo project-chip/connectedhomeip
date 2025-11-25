@@ -28,6 +28,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --endpoint 1
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -36,9 +37,10 @@
 
 import logging
 
-from mobly import asserts
 
 import matter.clusters as Clusters
+from matter.clusters import ClusterObjects
+from matter.testing import matter_asserts
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
@@ -57,57 +59,47 @@ class TC_DISHALM_2_1(MatterBaseTest):
 
     def steps_TC_DISHALM_2_1(self) -> list[TestStep]:
         steps = [
-            TestStep(0, "Commission DUT to TH", is_commissioning=True),
-            TestStep(1, "TH reads from the DUT the Mask attribute", "Verify that the DUT response contains a 32-bit value"),
-            TestStep(2, "TH reads from the DUT the Latch attribute", "Verify that the DUT response contains a 32-bit value"),
-            TestStep(3, "TH reads from the DUT the State attribute", "Verify that the DUT response contains a 32-bit value"),
-            TestStep(4, "TH reads from the DUT the Supported attribute", "Verify that the DUT response contains a 32-bit value")
+            TestStep(1, "Commission DUT to TH", is_commissioning=True),
+            TestStep(2, "TH reads from the DUT the Mask attribute", "Verify that the DUT response contains a 32-bit value"),
+            TestStep(3, "TH reads from the DUT the Latch attribute", "Verify that the DUT response contains a 32-bit value"),
+            TestStep(4, "TH reads from the DUT the State attribute", "Verify that the DUT response contains a 32-bit value"),
+            TestStep(5, "TH reads from the DUT the Supported attribute", "Verify that the DUT response contains a 32-bit value")
         ]
         return steps
+
+    async def read_and_check_attributes_from_dishwasher_alarm(self, attribute: ClusterObjects.ClusterAttributeDescriptor):
+        resp = await self.read_single_attribute_check_success(
+            cluster=self.cluster,
+            attribute=attribute
+        )
+
+        matter_asserts.assert_valid_uint32(resp, attribute)
+
+        logger.info(f"Reading attribute: {attribute}, response: {resp}")
 
     @async_test_body
     async def test_TC_DISHALM_2_1(self):
 
         self.cluster = Clusters.DishwasherAlarm
-        self.endpoint = self.get_endpoint(1)
-
-        self.step(0)
+        self.endpoint = self.get_endpoint()
 
         self.step(1)
-        self.mask_attribute = Clusters.DishwasherAlarm.Attributes.Mask
-        mask = await self.read_single_attribute_check_success(
-            cluster=self.cluster,
-            attribute=self.mask_attribute
-        )
-
-        logger.info(f"Mask: {mask}")
 
         self.step(2)
-        self.latch_attribute = Clusters.DishwasherAlarm.Attributes.Latch
-        latch = await self.read_single_attribute_check_success(
-            cluster=self.cluster,
-            attribute=self.latch_attribute
-        )
-
-        logger.info(f"Latch: {latch}")
+        mask_attribute = Clusters.DishwasherAlarm.Attributes.Mask
+        await self.read_and_check_attributes_from_dishwasher_alarm(mask_attribute)
 
         self.step(3)
-        self.state_attribute = Clusters.DishwasherAlarm.Attributes.State
-        state = await self.read_single_attribute_check_success(
-            cluster=self.cluster,
-            attribute=self.state_attribute
-        )
-
-        logger.info(f"State: {state}")
+        latch_attribute = Clusters.DishwasherAlarm.Attributes.Latch
+        await self.read_and_check_attributes_from_dishwasher_alarm(latch_attribute)
 
         self.step(4)
-        self.supported_attribute = Clusters.DishwasherAlarm.Attributes.Supported
-        supported = await self.read_single_attribute_check_success(
-            cluster=self.cluster,
-            attribute=self.supported_attribute
-        )
+        state_attribute = Clusters.DishwasherAlarm.Attributes.State
+        await self.read_and_check_attributes_from_dishwasher_alarm(state_attribute)
 
-        logger.info(f"Supported: {supported}")
+        self.step(5)
+        supported_attribute = Clusters.DishwasherAlarm.Attributes.Supported
+        await self.read_and_check_attributes_from_dishwasher_alarm(supported_attribute)
 
 
 if __name__ == "__main__":
