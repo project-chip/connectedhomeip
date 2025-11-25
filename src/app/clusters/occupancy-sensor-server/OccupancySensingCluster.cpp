@@ -94,8 +94,7 @@ OccupancySensing::OccupancySensorTypeEnum FeaturesToOccupancySensorType(BitFlags
 
 OccupancySensingCluster::OccupancySensingCluster(const Config & config) :
     DefaultServerCluster({ config.mEndpointId, OccupancySensing::Id }), mHoldTimeDelegate(config.mHoldTimeDelegate),
-    mDelegate(config.mDelegate), mFeatureMap(config.mFeatureMap),
-    mShowDeprecatedAttributes(config.mShowDeprecatedAttributes)
+    mDelegate(config.mDelegate), mFeatureMap(config.mFeatureMap), mShowDeprecatedAttributes(config.mShowDeprecatedAttributes)
 {
     SetHoldTimeLimits(config.mHoldTimeLimits);
     mHoldTime = std::clamp(config.mHoldTime, mHoldTimeLimits.holdTimeMin, mHoldTimeLimits.holdTimeMax);

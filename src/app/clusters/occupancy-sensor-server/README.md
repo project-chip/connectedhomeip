@@ -6,17 +6,18 @@ an ultrasonic sensor to determine whether a room is occupied or unoccupied.
 
 ## Overview
 
-This directory contains a C++ implementation of the Matter Occupancy Sensing 
+This directory contains a C++ implementation of the Matter Occupancy Sensing
 cluster server. This implementation (`OccupancySensingCluster.h` and
 `OccupancySensingCluster.cpp`) is designed for flexibility. A key feature of
-this implementation is that it is completely decoupled from the underlying sensor
-hardware. The application is responsible for initializing its own sensor hardware
-and notifying the cluster of occupancy changes by calling the `SetOccupancy()`
-method.
+this implementation is that it is completely decoupled from the underlying
+sensor hardware. The application is responsible for initializing its own sensor
+hardware and notifying the cluster of occupancy changes by calling the
+`SetOccupancy()` method.
 
 The cluster implementation internally handles all timer logic related to the
-`HoldTime`, `PIROccupiedToUnoccupiedDelay`, `UltrasonicOccupiedToUnoccupiedDelay`,
-and `PhysicalContactOccupiedToUnoccupiedDelay` attributes, simplifying the
+`HoldTime`, `PIROccupiedToUnoccupiedDelay`,
+`UltrasonicOccupiedToUnoccupiedDelay`, and
+`PhysicalContactOccupiedToUnoccupiedDelay` attributes, simplifying the
 application's responsibility.
 
 It uses an optional delegate pattern
@@ -135,8 +136,8 @@ To use the cluster in this mode, your application can get a pointer to the
 cluster instance and call its methods directly using
 `OccupancySensing::FindClusterOnEndpoint(endpointId)`.
 
-Note that this method is for backwards compatibility only is not recommended
-for new applications.
+Note that this method is for backwards compatibility only is not recommended for
+new applications.
 
 ```cpp
 // In your application logic file

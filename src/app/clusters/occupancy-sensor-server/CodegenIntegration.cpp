@@ -69,8 +69,7 @@ public:
             config.WithDeprecatedAttributes(
                 AttributeSet(optionalAttributeBits).IsSet(Attributes::PIROccupiedToUnoccupiedDelay::Id) ||
                 AttributeSet(optionalAttributeBits).IsSet(Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id) ||
-                AttributeSet(optionalAttributeBits).IsSet(Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Id)
-            );
+                AttributeSet(optionalAttributeBits).IsSet(Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Id));
         }
 
         gServers[clusterInstanceIndex].Create(config);

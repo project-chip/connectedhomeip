@@ -76,12 +76,12 @@ public:
         }
 
         EndpointId mEndpointId;
-        BitMask<OccupancySensing::Feature> mFeatureMap                        = 0;
-        bool mShowDeprecatedAttributes                                        = true;
+        BitMask<OccupancySensing::Feature> mFeatureMap = 0;
+        bool mShowDeprecatedAttributes                 = true;
         uint16_t mHoldTime;
         OccupancySensing::Structs::HoldTimeLimitsStruct::Type mHoldTimeLimits;
         // The presence of mHoldTimeDelegate indicates that hold time limits are enforced and hold time functionality is active.
-        TimerDelegate * mHoldTimeDelegate     = nullptr;
+        TimerDelegate * mHoldTimeDelegate    = nullptr;
         OccupancySensingDelegate * mDelegate = nullptr;
     };
 
