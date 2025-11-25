@@ -80,7 +80,7 @@ CHIP_ERROR NXPWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChange
 
     err = PersistedStorage::KeyValueStoreMgr().Get(kWiFiCredentialsKeyName, mSavedNetwork.credentials,
                                                    sizeof(mSavedNetwork.credentials), &credentialsLen);
-    /* Password could be empty, do not return error if key not found, 
+    /* Password could be empty, do not return error if key not found,
     password is written in flash before SSID, if SSID is present but not password, it is not an error */
     if (err != CHIP_NO_ERROR &&  err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {

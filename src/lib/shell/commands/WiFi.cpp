@@ -124,9 +124,9 @@ static CHIP_ERROR WiFiConnectHandler(int argc, char ** argv)
         // If no password is provided, use an empty password
         passwordSpan = ByteSpan();
     }
-    
 
-    
+
+
 
     ChipLogProgress(Shell, "Adding/Updating network %s", argv[0]);
 
