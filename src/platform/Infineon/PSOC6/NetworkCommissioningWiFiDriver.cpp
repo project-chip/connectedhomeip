@@ -158,7 +158,7 @@ void P6WiFiDriver::OnConnectWiFiNetwork()
 {
     if (mpConnectCallback)
     {
-        CommitConfiguration();
+        TEMPORARY_RETURN_IGNORED CommitConfiguration();
         chip::DeviceLayer::PlatformMgr().LockChipStack();
         mpConnectCallback->OnResult(Status::kSuccess, CharSpan(), 0);
         chip::DeviceLayer::PlatformMgr().UnlockChipStack();

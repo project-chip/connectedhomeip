@@ -39,8 +39,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 
 from mobly import asserts
 from TC_EnergyReporting_Utils import EnergyReportingBaseTestHelper
@@ -101,7 +101,7 @@ class TC_EPM_2_2(MatterBaseTest, EnergyReportingBaseTestHelper):
 
         # After 3 seconds...
         self.step("4")
-        time.sleep(3)
+        await asyncio.sleep(3)
 
         self.step("4a")
         # Active power is Mandatory
@@ -120,7 +120,7 @@ class TC_EPM_2_2(MatterBaseTest, EnergyReportingBaseTestHelper):
 
         self.step("5")
         # After 3 seconds...
-        time.sleep(3)
+        await asyncio.sleep(3)
 
         self.step("5a")
         # Active power is Mandatory

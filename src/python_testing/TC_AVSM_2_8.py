@@ -106,7 +106,7 @@ class TC_AVSM_2_8(MatterBaseTest, AVSMTestBase):
         )
     )
     async def test_TC_AVSM_2_8(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.CameraAvStreamManagement
         attr = Clusters.CameraAvStreamManagement.Attributes
         commands = Clusters.CameraAvStreamManagement.Commands

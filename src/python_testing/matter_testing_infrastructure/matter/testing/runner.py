@@ -405,8 +405,7 @@ def run_tests_no_exit(
 
     # NOTE: It's not possible to pass event loop via Mobly TestRunConfig user params, because the
     #       Mobly deep copies the user params before passing them to the test class and the event
-    # loop is not serializable. So, we are setting the event loop as a test
-    # class member.
+    #       loop is not serializable. So, we are setting the event loop as a test class member.
     CommissionDeviceTest.event_loop = event_loop
     test_class.event_loop = event_loop
 
@@ -454,6 +453,15 @@ def run_tests_no_exit(
 
         # Execute the test class with the config
         ok = True
+
+        def _handler(loop, context):
+            loop.default_exception_handler(context)
+            nonlocal ok
+            # Fail the test run on unhandled exceptions.
+            ok = False
+
+        # Set custom exception handler to catch unhandled exceptions.
+        event_loop.set_exception_handler(_handler)
 
         runner = TestRunner(log_dir=test_config.log_path,
                             testbed_name=test_config.testbed_name)

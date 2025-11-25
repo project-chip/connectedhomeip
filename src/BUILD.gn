@@ -74,6 +74,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/boolean-state-server/tests",
       "${chip_root}/src/app/clusters/user-label-server/tests",
       "${chip_root}/src/app/clusters/identify-server/tests",
+      "${chip_root}/src/app/clusters/electrical-energy-measurement-server/tests",
       "${chip_root}/src/app/clusters/time-format-localization-server/tests",
       "${chip_root}/src/app/clusters/time-synchronization-server/tests",
       "${chip_root}/src/app/clusters/localization-configuration-server/tests",

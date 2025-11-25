@@ -65,6 +65,10 @@ class TC_DRLK_2_12(MatterBaseTest, DRLK_COMMON):
     def pics_TC_DRLK_2_12(self) -> list[str]:
         return ["DRLK.S.F0c"]
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_DRLK_2_12(self):
         await self.run_drlk_test_2_12()

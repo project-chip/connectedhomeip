@@ -111,7 +111,7 @@ static bool ParseJsonFileAndPopulateCandidates(const char * filepath,
     }
     else
     {
-        for (auto & iter : devSofVerModValue)
+        for (const auto & iter : devSofVerModValue)
         {
             OTAProviderExample::DeviceSoftwareVersionModel candidate;
             candidate.vendorId        = static_cast<chip::VendorId>(iter.get("vendorId", 1).asUInt());
@@ -437,13 +437,14 @@ public:
     void RunMainLoop() override { chip::DeviceLayer::PlatformMgr().RunEventLoop(); }
     void SignalSafeStopMainLoop() override
     {
-        chip::DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) {
+        CHIP_ERROR err = chip::DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) {
             ChipLogDetail(SoftwareUpdate, "Scheduling BdxOtaSender to ABORT TRANSFER");
 
             gOtaProvider.GetBdxOtaSender()->AbortTransfer();
 
-            chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+            SuccessOrDie(chip::DeviceLayer::PlatformMgr().StopEventLoopTask());
         });
+        SuccessOrDie(err);
 
         chip::Server::GetInstance().GenerateShutDownEvent();
     }
