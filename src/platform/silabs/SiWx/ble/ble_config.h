@@ -74,6 +74,7 @@ extern "C" {
 
 #define GATT_READ_ZERO_OFFSET 0x00
 #define GATT_READ_RESP 0x00
+#define GATT_BLOB_READ_RESP 0x01
 #define ALL_PHYS (0x00)
 
 #define RSI_BLE_DEV_ADDR_RESOLUTION_ENABLE (0)

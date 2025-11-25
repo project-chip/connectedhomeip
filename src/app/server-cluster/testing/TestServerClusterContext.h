@@ -66,17 +66,6 @@ public:
     /// Get a stable pointer to the underlying context
     app::ServerClusterContext & Get() { return mContext; }
 
-    /// Create a new context bound to this test context
-    app::ServerClusterContext Create()
-    {
-        return {
-            .provider           = mTestProvider,
-            .storage            = mTestStorage,
-            .attributeStorage   = mDefaultAttributePersistenceProvider,
-            .interactionContext = mTestContext,
-        };
-    };
-
     LogOnlyEvents & EventsGenerator() { return mTestEventsGenerator; }
     TestProviderChangeListener & ChangeListener() { return mTestDataModelChangeListener; }
     TestPersistentStorageDelegate & StorageDelegate() { return mTestStorage; }
