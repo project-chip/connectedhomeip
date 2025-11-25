@@ -76,17 +76,20 @@ class TC_GCAST_2_4(MatterBaseTest):
         logger.info(f"FeatureMap: {feature_map} : LN supported: {ln_enabled} | SD supported: {sd_enabled}")
         return ln_enabled, sd_enabled
 
-    async def retrieve_join_group_cmd_endpoints(self, ln_enabled, sd_enabled):
-        """Get the JoinGroup cmd endpoints list based on enabled features such as Listener/Sender."""
-        join_group_cmd_endpoints = None
+    async def valid_endpoints_list(self, ln_enabled, sd_enabled):
+        """
+        Get the JoinGroup cmd endpoints list based on enabled features such as Listener/Sender.
+        If only Sender is enabled, endpoints list is empty. If listener is enabled, the endpoint list is the
+        first valid endpoint (excluding root and aggregator), [EP1].
+        """
+        endpoints_list = []
         if sd_enabled and not ln_enabled:
-            join_group_cmd_endpoints = []
+            endpoints_list = []
         elif ln_enabled:
             device_type_list = await self.read_single_attribute_all_endpoints(
                 cluster=Clusters.Descriptor,
                 attribute=Clusters.Descriptor.Attributes.DeviceTypeList)
             logging.info(f"Device Type List: {device_type_list}")
-            join_group_cmd_endpoints = []
             for endpoint, device_types in device_type_list.items():
                 if endpoint == 0:
                     continue
@@ -100,14 +103,11 @@ class TC_GCAST_2_4(MatterBaseTest):
                             endpoint=endpoint)
                         logging.info(f"Server List: {server_list}")
                         if Clusters.OnOff.id in server_list:
-                            join_group_cmd_endpoints.append(endpoint)
-            asserts.assert_true(len(join_group_cmd_endpoints),
-                                "Endpoint list should not be empty. There should be a valid endpoint for the GroupCast JoinGroup Command.")
-        else:
-            asserts.assert_is_none(join_group_cmd_endpoints,
-                                   "Endpoint list is None, meaning Listener and Sender feature are both disabled.")
-        return join_group_cmd_endpoints
-
+                            endpoints_list.append(endpoint)
+            asserts.assert_true(len(endpoints_list),
+                                "Listener feature is enabled. Endpoint list should not be empty. There should be a valid endpoint for the GroupCast JoinGroup Command.")
+            endpoints_list = [endpoints_list[0]]
+        return endpoints_list
 
     @async_test_body
     async def test_TC_GCAST_2_4(self):
@@ -118,7 +118,9 @@ class TC_GCAST_2_4(MatterBaseTest):
 
         self.step("1a")
         ln_enabled, sd_enabled = await self.get_feature_map()
-        join_group_cmd_endpoints = await self.retrieve_join_group_cmd_endpoints(ln_enabled, sd_enabled)
+        if not ln_enabled and not sd_enabled:
+            asserts.fail("At least one of the following features must be enabled: Listener or Sender.")
+        endpoints_list = await self.valid_endpoints_list(ln_enabled, sd_enabled)
 
         self.step("1b")
         await self.send_single_cmd(Clusters.Groupcast.Commands.LeaveGroup(groupID=0))
@@ -134,7 +136,7 @@ class TC_GCAST_2_4(MatterBaseTest):
 
         await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
             groupID=groupID1,
-            endpoints=join_group_cmd_endpoints,
+            endpoints=endpoints_list,
             keyID=keyID1,
             key=inputKey1)
         )
@@ -145,7 +147,7 @@ class TC_GCAST_2_4(MatterBaseTest):
         inputKey2 = bytes.fromhex("d0d1e2d3d4d5d6d7d8d9dadbdcdddedf")
         await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
             groupID=groupID1,
-            endpoints=join_group_cmd_endpoints,
+            endpoints=endpoints_list,
             keyID=keyID2,
             gracePeriod=gracePeriod,
             key=inputKey2)

@@ -84,17 +84,20 @@ class TC_GCAST_2_5(MatterBaseTest):
         logger.info(f"FeatureMap: {feature_map} : LN supported: {ln_enabled} | SD supported: {sd_enabled}")
         return ln_enabled, sd_enabled
 
-    async def retrieve_join_group_cmd_endpoints(self, ln_enabled, sd_enabled):
-        """Get the JoinGroup cmd endpoints list based on enabled features such as Listener/Sender."""
-        join_group_cmd_endpoints = None
+    async def valid_endpoints_list(self, ln_enabled, sd_enabled):
+        """
+        Get the JoinGroup cmd endpoints list based on enabled features such as Listener/Sender.
+        If only Sender is enabled, endpoints list is empty. If listener is enabled and only 1 endpoint is valid (excluding
+        root and aggregator), endpoints list is [EP1]. If more than 1 endpoint is supported, endpoints list is [EP1, EP2].
+        """
+        endpoints_list = []
         if sd_enabled and not ln_enabled:
-            join_group_cmd_endpoints = []
+            endpoints_list = []
         elif ln_enabled:
             device_type_list = await self.read_single_attribute_all_endpoints(
                 cluster=Clusters.Descriptor,
                 attribute=Clusters.Descriptor.Attributes.DeviceTypeList)
             logging.info(f"Device Type List: {device_type_list}")
-            join_group_cmd_endpoints = []
             for endpoint, device_types in device_type_list.items():
                 if endpoint == 0:
                     continue
@@ -108,13 +111,14 @@ class TC_GCAST_2_5(MatterBaseTest):
                             endpoint=endpoint)
                         logging.info(f"Server List: {server_list}")
                         if Clusters.OnOff.id in server_list:
-                            join_group_cmd_endpoints.append(endpoint)
-            asserts.assert_true(len(join_group_cmd_endpoints),
-                                "Endpoint list should not be empty. There should be a valid endpoint for the GroupCast JoinGroup Command.")
-        else:
-            asserts.assert_is_none(join_group_cmd_endpoints,
-                                   "Endpoint list is None, meaning Listener and Sender feature are both disabled.")
-        return join_group_cmd_endpoints
+                            endpoints_list.append(endpoint)
+            asserts.assert_true(len(endpoints_list),
+                                "Listener feature is enabled. Endpoint list should not be empty. There should be a valid endpoint for the GroupCast JoinGroup Command.")
+            if len(endpoints_list) == 1:
+                endpoints_list = [endpoints_list[0]]
+            else:
+                endpoints_list = endpoints_list[:2]
+        return endpoints_list
 
 
     @async_test_body
@@ -126,7 +130,9 @@ class TC_GCAST_2_5(MatterBaseTest):
 
         self.step("1a")
         ln_enabled, sd_enabled = await self.get_feature_map()
-        join_group_cmd_endpoints = await self.retrieve_join_group_cmd_endpoints(ln_enabled, sd_enabled)
+        if not ln_enabled and not sd_enabled:
+            asserts.fail("At least one of the following features must be enabled: Listener or Sender.")
+        endpoints_list = await self.valid_endpoints_list(ln_enabled, sd_enabled)
 
         self.step("1b")
         groupID0 = 0
@@ -143,7 +149,7 @@ class TC_GCAST_2_5(MatterBaseTest):
 
         await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
             groupID=groupID1,
-            endpoints=join_group_cmd_endpoints,
+            endpoints=endpoints_list,
             keyID=keyID1,
             key=inputKey1)
         )
@@ -152,7 +158,7 @@ class TC_GCAST_2_5(MatterBaseTest):
         groupID2 = 2
         await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
             groupID=groupID2,
-            endpoints=join_group_cmd_endpoints,
+            endpoints=endpoints_list,
             keyID=keyID1)
         )
 
@@ -161,8 +167,8 @@ class TC_GCAST_2_5(MatterBaseTest):
             Clusters.Groupcast.Commands.LeaveGroup(groupID=groupID2)
         )
         asserts.assert_is_not_none(resp.endpoints, "LeaveGroupResponse endpoints should not be None")
-        asserts.assert_equal(resp.endpoints, join_group_cmd_endpoints,
-                             f"LeaveGroupResponse cmd endpoints list {resp.endpoints} is not equal to the endpoints list provided in step 1e {join_group_cmd_endpoints}")
+        asserts.assert_equal(resp.endpoints, endpoints_list,
+                             f"LeaveGroupResponse cmd endpoints list {resp.endpoints} is not equal to the endpoints list provided in step 1e {endpoints_list}")
 
         self.step("2b")
         sub.wait_for_attribute_report()
@@ -181,18 +187,18 @@ class TC_GCAST_2_5(MatterBaseTest):
         groupID3 = 3
         await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
             groupID=groupID3,
-            endpoints=join_group_cmd_endpoints,
+            endpoints=endpoints_list,
             keyID=keyID1)
         )
 
         self.step("4b")
-        if len(join_group_cmd_endpoints) == 1:
+        endpoint_1 = [endpoints_list[0]]
+        if len(endpoints_list) == 1:
             self.mark_step_range_skipped("4c", "4d")
+        else:
+            endpoint_2 = [endpoints_list[1]]
 
         self.step("4c")
-        updated_endpoint_list = join_group_cmd_endpoints.copy()
-        endpoint_2 = [updated_endpoint_list[1]]
-        del updated_endpoint_list[1]
         resp: Clusters.Groupcast.Commands.LeaveGroupResponse = await self.send_single_cmd(
             Clusters.Groupcast.Commands.LeaveGroup(
                 groupID=groupID3,
@@ -213,12 +219,11 @@ class TC_GCAST_2_5(MatterBaseTest):
                 group3_entry = entry
                 break
         asserts.assert_is_not_none(group3_entry, f"Group {groupID3} not found in membership report")
-        asserts.assert_equal(updated_endpoint_list, group3_entry.endpoints,
-                             f"Group {groupID3} endpoints {group3_entry.endpoints} should equal remaining endpoints {updated_endpoint_list} after removing {endpoint_2}")
+        asserts.assert_equal(endpoint_1, group3_entry.endpoints,
+                             f"Group {groupID3} endpoints {group3_entry.endpoints} should equal remaining endpoints {endpoint_1} after removing {endpoint_2}")
 
 
         self.step("4e")
-        endpoint_1 = [join_group_cmd_endpoints[0]]
         resp: Clusters.Groupcast.Commands.LeaveGroupResponse = await self.send_single_cmd(
             Clusters.Groupcast.Commands.LeaveGroup(
                 groupID=groupID3,
@@ -251,6 +256,7 @@ class TC_GCAST_2_5(MatterBaseTest):
             await self.send_single_cmd(Clusters.Groupcast.Commands.LeaveGroup(
                 groupID=groupIDNonExisting)
             )
+            asserts.fail("LeaveGroup command should have failed with a non-existing group, but it succeeded")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.NotFound,
                                  f"Send LeaveGroup command error should be {Status.NotFound} instead of {e.status}")
@@ -261,8 +267,8 @@ class TC_GCAST_2_5(MatterBaseTest):
                 groupID=groupID0)
         )
         if resp.listTooLarge is not True:
-            asserts.assert_equal(resp.endpoints, join_group_cmd_endpoints,
-                                 f"LeaveGroupResponse endpoints list {resp.endpoints} must be equal to the endpoint list provided for G1 at step 1a {join_group_cmd_endpoints}.")
+            asserts.assert_equal(resp.endpoints, endpoints_list,
+                                 f"LeaveGroupResponse endpoints list {resp.endpoints} must be equal to the endpoint list provided for G1 at step 1a {endpoints_list}.")
 
         self.step("7")
         sub.wait_for_attribute_report()
