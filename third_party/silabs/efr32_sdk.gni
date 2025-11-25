@@ -64,7 +64,6 @@ declare_args() {
 
   # ICD Matter Configuration flags
   sl_idle_mode_duration_s = 600  # 10min Idle Mode Duration
-  sl_short_idle_mode_duration_s = sl_idle_mode_duration_s
   sl_active_mode_duration_ms = 1000  # 1s Active Mode Duration
   sl_active_mode_threshold_ms = 500  # 500ms Active Mode Threshold
   sl_icd_supported_clients_per_fabric = 2  # 2 registration slots per fabric
@@ -120,6 +119,9 @@ declare_args() {
 
   # board related generated files path (used if slc_generate or slc_reuse_files is set)
   slc_gen_path = "${chip_root}/third_party/silabs/slc_gen/${silabs_board}/"
+
+  # Extra ICD configuration parameter. Defaults to previously set sl_idle_mode_duration_s
+  sl_short_idle_mode_duration_s = sl_idle_mode_duration_s
 }
 
 declare_args() {

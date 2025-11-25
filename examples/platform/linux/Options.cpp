@@ -144,6 +144,7 @@ enum
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     kDeviceOption_icdActiveModeDurationMs,
     kDeviceOption_icdIdleModeDuration,
+    kDeviceOption_icdShortIdleModeDuration,
 #endif
 #if ENABLE_CAMERA_SERVER
     kDeviceOption_Camera_DeferredOffer,
@@ -247,6 +248,7 @@ OptionDef sDeviceOptionDefs[] = {
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     { "icdActiveModeDurationMs", kArgumentRequired, kDeviceOption_icdActiveModeDurationMs },
     { "icdIdleModeDuration", kArgumentRequired, kDeviceOption_icdIdleModeDuration },
+    { "icdShortIdleModeDuration", kArgumentRequired, kDeviceOption_icdShortIdleModeDuration },
 #endif
 #if ENABLE_CAMERA_SERVER
     { "camera-deferred-offer", kNoArgument, kDeviceOption_Camera_DeferredOffer },
@@ -913,8 +915,32 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         }
         else
         {
-            // Covert from seconds to mini seconds
+            // Covert from seconds to milli seconds
             LinuxDeviceOptions::GetInstance().icdIdleModeDurationMs.SetValue(chip::System::Clock::Milliseconds32(value * 1000));
+        }
+        break;
+    }
+    case kDeviceOption_icdShortIdleModeDuration: {
+        uint32_t value = static_cast<uint32_t>(strtoul(aValue, nullptr, 0));
+        if ((value < 1) || (value > 86400))
+        {
+            PrintArgError("%s: invalid value specified for icdShortIdleModeDuration: %s\n", aProgram, aValue);
+            retval = false;
+        }
+        else
+        {
+            if (LinuxDeviceOptions::GetInstance().icdIdleModeDurationMs.HasValue() &&
+                (value > std::chrono::duration_cast<System::Clock::Seconds32>(
+                             LinuxDeviceOptions::GetInstance().icdIdleModeDurationMs.Value())
+                             .count()))
+            {
+                PrintArgError("%s: icdShortIdleModeDuration value must be <= than icdIdleModeDuration\n", aProgram, aValue);
+                retval = false;
+            }
+            else
+            {
+                LinuxDeviceOptions::GetInstance().shortIdleModeDurationS = chip::System::Clock::Seconds32(value);
+            }
         }
         break;
     }
