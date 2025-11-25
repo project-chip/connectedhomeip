@@ -48,7 +48,7 @@ logger = logging.getLogger(__name__)
 
 class TC_GCAST_2_6(MatterBaseTest):
     def desc_TC_GCAST_2_6(self):
-        return "[TC-GCAST-2.6] ExpireGracePeriod command effect with DUT as Server - PROVISIONAL"
+        return "[TC-GCAST-2.6] ConfigureAuxiliaryACL (Listener feature) with DUT as Server - PROVISIONAL"
 
     def steps_TC_G_2_6(self):
         return [
