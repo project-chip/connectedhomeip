@@ -21,12 +21,14 @@
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server/Server.h>
 #include <clusters/GeneralCommissioning/Enums.h>
 #include <clusters/GeneralCommissioning/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/Span.h>
+#include <platform/DeviceControlServer.h>
 #include <platform/NetworkCommissioning.h>
 
 namespace {
@@ -47,13 +49,27 @@ struct TestGeneralCommissioningCluster : public ::testing::Test
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
 
+GeneralCommissioningCluster::Context CreateStandardContext()
+{
+    return
+    {
+        .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
+            .configurationManager   = DeviceLayer::ConfigurationMgr(),                       //
+            .deviceControlServer    = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
+            .fabricTable            = Server::GetInstance().GetFabricTable(),                //
+            .failsafeContext        = Server::GetInstance().GetFailSafeContext(),            //
+            .platformManager        = DeviceLayer::PlatformMgr(),                            //
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+            .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    };
+}
+
 TEST_F(TestGeneralCommissioningCluster, TestAttributes)
 {
     // test without optional attributes
     {
-        GeneralCommissioningCluster cluster;
-        auto & optionalAttributes = cluster.GetOptionalAttributes();
-        optionalAttributes        = GeneralCommissioningCluster::OptionalAttributes(0);
+        GeneralCommissioningCluster cluster(CreateStandardContext(), GeneralCommissioningCluster::OptionalAttributes(0));
 
         ReadOnlyBufferBuilder<AttributeEntry> builder;
         ASSERT_EQ(cluster.Attributes({ kRootEndpointId, GeneralCommissioning::Id }, builder), CHIP_NO_ERROR);
@@ -87,9 +103,8 @@ TEST_F(TestGeneralCommissioningCluster, TestAttributes)
 
     // test with optional attributes
     {
-        GeneralCommissioningCluster cluster;
-        auto & optionalAttributes = cluster.GetOptionalAttributes();
-        optionalAttributes.Set<IsCommissioningWithoutPower::Id>();
+        GeneralCommissioningCluster cluster(
+            CreateStandardContext(), GeneralCommissioningCluster::OptionalAttributes().Set<IsCommissioningWithoutPower::Id>());
 
         ReadOnlyBufferBuilder<AttributeEntry> builder;
         ASSERT_EQ(cluster.Attributes({ kRootEndpointId, GeneralCommissioning::Id }, builder), CHIP_NO_ERROR);
@@ -130,9 +145,10 @@ TEST_F(TestGeneralCommissioningCluster, TestAttributes)
 
 TEST_F(TestGeneralCommissioningCluster, TestAcceptedCommands)
 {
+    GeneralCommissioningCluster cluster(CreateStandardContext(), GeneralCommissioningCluster::OptionalAttributes());
+
     {
         ReadOnlyBufferBuilder<AcceptedCommandEntry> builder;
-        GeneralCommissioningCluster cluster;
         ASSERT_EQ(cluster.AcceptedCommands({ kRootEndpointId, GeneralCommissioning::Id }, builder), CHIP_NO_ERROR);
 
         ReadOnlyBufferBuilder<AcceptedCommandEntry> expectedBuilder;

@@ -251,7 +251,9 @@ CHIP_ERROR NxpChipDnssdRemoveServices()
 
         if ((0 == strcmp(mServiceList[mServiceListFreeIndex]->mHostName, hostName)) &&
             ((0 == strcmp(mServiceList[mServiceListFreeIndex]->mServiceType, "_matter._tcp")) ||
-             (0 == strcmp(mServiceList[mServiceListFreeIndex]->mServiceType, "_matterc._udp"))))
+             (0 == strcmp(mServiceList[mServiceListFreeIndex]->mServiceType, "_matterc._udp"))) &&
+            (mServiceList[mServiceListFreeIndex]->mTtl > 0))
+        // if mTtl = 0 , the service is already in the removal process but not yet removed
         {
             mServiceListFreeIndex++;
         }
@@ -464,7 +466,8 @@ CHIP_ERROR NxpChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, 
             // browse results coming but the result is no error since we have a match in the SRP cache.
             error                 = CHIP_NO_ERROR;
             pBrowseContext->error = CHIP_NO_ERROR;
-            DeviceLayer::PlatformMgr().ScheduleWork(DispatchBrowseEmpty, reinterpret_cast<intptr_t>(pBrowseContext));
+            TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(DispatchBrowseEmpty,
+                                                                             reinterpret_cast<intptr_t>(pBrowseContext));
         }
         else
         {
@@ -583,7 +586,8 @@ CHIP_ERROR BrowseBySrp(otInstance * thrInstancePtr, char * serviceName, mDnsQuer
                     {
                         // Set error to CHIP_NO_ERROR to signal that there was at least one service found in the cache
                         error = CHIP_NO_ERROR;
-                        DeviceLayer::PlatformMgr().ScheduleWork(DispatchBrowse, reinterpret_cast<intptr_t>(serviceContext));
+                        TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(
+                            DispatchBrowse, reinterpret_cast<intptr_t>(serviceContext));
                     }
                     else
                     {
@@ -613,7 +617,8 @@ CHIP_ERROR ResolveBySrp(otInstance * thrInstancePtr, char * serviceName, mDnsQue
                 error = FromSrpCacheToMdnsData(service, host, mdnsReq, context->mMdnsService, context->mServiceTxtEntry);
                 if (error == CHIP_NO_ERROR)
                 {
-                    DeviceLayer::PlatformMgr().ScheduleWork(DispatchResolveSrp, reinterpret_cast<intptr_t>(context));
+                    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(DispatchResolveSrp,
+                                                                                     reinterpret_cast<intptr_t>(context));
                 }
                 break;
             }
@@ -809,7 +814,7 @@ static void OtBrowseCallback(otInstance * aInstance, const otMdnsBrowseResult * 
 
     if (CHIP_NO_ERROR == error)
     {
-        DeviceLayer::PlatformMgr().ScheduleWork(DispatchBrowse, reinterpret_cast<intptr_t>(tmpContext));
+        TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(DispatchBrowse, reinterpret_cast<intptr_t>(tmpContext));
     }
     else
     {
@@ -840,7 +845,8 @@ static void OtServiceCallback(otInstance * aInstance, const otMdnsSrvResult * aR
 
         pResolveContext->mMdnsService.mPort       = aResult->mPort;
         pResolveContext->mMdnsService.mTtlSeconds = aResult->mTtl;
-        DeviceLayer::PlatformMgr().ScheduleWork(DispatchTxtResolve, reinterpret_cast<intptr_t>(pResolveContext));
+        TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(DispatchTxtResolve,
+                                                                         reinterpret_cast<intptr_t>(pResolveContext));
     }
     else
     {
@@ -898,7 +904,8 @@ static void OtTxtCallback(otInstance * aInstance, const otMdnsTxtResult * aResul
 
     if (bSendDispatch)
     {
-        DeviceLayer::PlatformMgr().ScheduleWork(DispatchAddressResolve, reinterpret_cast<intptr_t>(pResolveContext));
+        TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(DispatchAddressResolve,
+                                                                         reinterpret_cast<intptr_t>(pResolveContext));
     }
     else
     {
@@ -917,7 +924,7 @@ static void OtAddressCallback(otInstance * aInstance, const otMdnsAddressResult 
     pResolveContext->mMdnsService.mAddressType = Inet::IPAddressType::kIPv6;
     pResolveContext->mMdnsService.mAddress     = std::optional(ToIPAddress(aResult->mAddresses[0].mAddress));
 
-    DeviceLayer::PlatformMgr().ScheduleWork(DispatchResolve, reinterpret_cast<intptr_t>(pResolveContext));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(DispatchResolve, reinterpret_cast<intptr_t>(pResolveContext));
 }
 
 static void DispatchBrowseEmpty(intptr_t context)
@@ -951,7 +958,8 @@ static void DispatchTxtResolve(intptr_t context)
     if (error != OT_ERROR_NONE)
     {
         resolveContext->error = MapOpenThreadError(error);
-        DeviceLayer::PlatformMgr().ScheduleWork(DispatchResolveError, reinterpret_cast<intptr_t>(resolveContext));
+        TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(DispatchResolveError,
+                                                                         reinterpret_cast<intptr_t>(resolveContext));
     }
 }
 
@@ -970,7 +978,8 @@ static void DispatchAddressResolve(intptr_t context)
     if (error != OT_ERROR_NONE)
     {
         resolveContext->error = MapOpenThreadError(error);
-        DeviceLayer::PlatformMgr().ScheduleWork(DispatchResolveError, reinterpret_cast<intptr_t>(resolveContext));
+        TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(DispatchResolveError,
+                                                                         reinterpret_cast<intptr_t>(resolveContext));
     }
 }
 
@@ -1048,7 +1057,8 @@ static void HandleResolveCleanup(mDnsQueryCtx & resolveContext, ResolveStep step
     // DispatchResolveError to handle the Matter callback with an error case. No IP address is reported and
     // the address resolve operation doesn’t need to be stopped again as was not started in the first place
     // or it's already handled by HandleResolveCleanup.
-    DeviceLayer::PlatformMgr().ScheduleWork(DispatchResolveError, reinterpret_cast<intptr_t>(&resolveContext));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(DispatchResolveError,
+                                                                     reinterpret_cast<intptr_t>(&resolveContext));
 }
 
 static mDnsQueryCtx * GetResolveElement(const char * aName, NameType aType)

@@ -31,10 +31,9 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-
+import asyncio
 import logging
 import random
-from time import sleep
 
 from mobly import asserts
 from support_modules.cadmin_support import CADMINBaseTest
@@ -144,7 +143,7 @@ class TC_CADMIN_1_11(CADMINBaseTest):
         revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
         await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
         # The failsafe cleanup is scheduled after the command completes, so give it a bit of time to do that
-        sleep(1)
+        await asyncio.sleep(1)
 
         self.step(9)
 
@@ -178,7 +177,7 @@ class TC_CADMIN_1_11(CADMINBaseTest):
             revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
             await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
             # The failsafe cleanup is scheduled after the command completes, so give it a bit of time to do that
-            sleep(1)
+            await asyncio.sleep(1)
 
         else:
             self.skip_step("9a")

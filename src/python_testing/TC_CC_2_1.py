@@ -241,10 +241,14 @@ class TC_CC_2_1(MatterBaseTest):
         logger.info(f"Num b : {bin(tmp_b)}")
         asserts.assert_equal(tmp_a, tmp_b, "Lower 4 bits of values are not equal")
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_CC_2_1(self):
         self.cluster = Clusters.ColorControl
-        self.endpoint = self.get_endpoint(1)
+        self.endpoint = self.get_endpoint()
         self.attributes = Clusters.ColorControl.Attributes
 
         self.step(1)

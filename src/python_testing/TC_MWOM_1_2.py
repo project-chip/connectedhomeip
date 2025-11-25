@@ -65,10 +65,14 @@ class TC_MWOM_1_2(MatterBaseTest):
         ]
         return pics
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_MWOM_1_2(self):
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         attributes = Clusters.MicrowaveOvenMode.Attributes
 

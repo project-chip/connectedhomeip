@@ -142,7 +142,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
         randomizedAddr.addr[5] |= 0xC0;
     }
 
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
     return CHIP_NO_ERROR;
 }
 
@@ -169,7 +169,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
     if (mFlags.Has(Flags::kAdvertisingEnabled) != val)
     {
         mFlags.Set(Flags::kAdvertisingEnabled, val);
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 
 exit:
@@ -190,7 +190,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     mFlags.Set(Flags::kRestartAdvertising);
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
     return CHIP_NO_ERROR;
 }
 
@@ -225,7 +225,7 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
     {
         mDeviceName[0] = 0;
     }
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
     return CHIP_NO_ERROR;
 }
 
@@ -343,7 +343,7 @@ CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const C
 
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
-    CloseConnection(conId);
+    TEMPORARY_RETURN_IGNORED CloseConnection(conId);
 }
 
 CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
@@ -659,7 +659,7 @@ void BLEManagerImpl::UpdateMtu(volatile sl_bt_msg_t * evt)
 void BLEManagerImpl::HandleBootEvent(void)
 {
     mFlags.Set(Flags::kSiLabsBLEStackInitialize);
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
 
 void BLEManagerImpl::HandleConnectEvent(volatile sl_bt_msg_t * evt)
@@ -672,7 +672,7 @@ void BLEManagerImpl::HandleConnectEvent(volatile sl_bt_msg_t * evt)
 
     AddConnection(connHandle, bondingHandle);
 
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
 
 void BLEManagerImpl::HandleConnectParams(volatile sl_bt_msg_t * evt)
@@ -692,7 +692,7 @@ void BLEManagerImpl::HandleConnectParams(volatile sl_bt_msg_t * evt)
                                         BLE_CONFIG_LATENCY, desiredTimeout, BLE_CONFIG_MIN_CE_LENGTH, BLE_CONFIG_MAX_CE_LENGTH);
     }
 
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
 
 void BLEManagerImpl::HandleConnectionCloseEvent(volatile sl_bt_msg_t * evt)
@@ -733,7 +733,7 @@ void BLEManagerImpl::HandleConnectionCloseEvent(volatile sl_bt_msg_t * evt)
         // maximum connection limit being reached.
         mFlags.Set(Flags::kRestartAdvertising);
         mFlags.Set(Flags::kFastAdvertisingEnabled);
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 }
 
@@ -747,7 +747,7 @@ void BLEManagerImpl::HandleWriteEvent(volatile sl_bt_msg_t * evt)
     {
         if (do_provision)
         {
-            chip::DeviceLayer::Silabs::Provision::Channel::Update(attribute);
+            TEMPORARY_RETURN_IGNORED chip::DeviceLayer::Silabs::Provision::Channel::Update(attribute);
             chip::DeviceLayer::Silabs::Provision::Manager::GetInstance().Step();
         }
         else
@@ -1015,7 +1015,7 @@ void BLEManagerImpl::BleAdvTimeoutHandler(void * arg)
     {
         ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start slow advertisement");
         BLEMgrImpl().mFlags.Set(Flags::kAdvertising);
-        BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
+        TEMPORARY_RETURN_IGNORED BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
 #if CHIP_DEVICE_CONFIG_EXT_ADVERTISING
         BLEMgrImpl().mFlags.Clear(Flags::kExtAdvertisingEnabled);
         BLEMgrImpl().StartBleAdvTimeoutTimer(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_CHANGE_TIME_MS);
