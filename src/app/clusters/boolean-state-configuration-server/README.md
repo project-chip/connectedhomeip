@@ -7,11 +7,6 @@ the sensor.
 The functionality of the cluster is documented in section 1.8 of the Matter
 Application Clusters specification.
 
-The Boolean State Configuration cluster provides a standardized way to configure
-and manage the behavior of a boolean sensor and its associated alarms. It is
-designed to be a generic cluster that can be used for various sensors that have
-a binary state (e.g., contact sensor, motion sensor).
-
 ## Application integration
 
 The application interacts with the cluster via a
