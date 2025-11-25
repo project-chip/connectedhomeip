@@ -211,6 +211,13 @@ enum RelativePositionTag : enum8 {
   kBehind = 6;
 }
 
+enum SoftwareVersionCertificationStatusEnum : enum8 {
+  kDevTest = 0;
+  kProvisional = 1;
+  kCertified = 2;
+  kRevoked = 3;
+}
+
 enum StreamUsageEnum : enum8 {
   kInternal = 0;
   kRecording = 1;
@@ -6294,7 +6301,7 @@ cluster LowPower = 1288 {
 }
 
 /** The Camera AV Stream Management cluster is used to allow clients to manage, control, and configure various audio, video, and snapshot streams on a camera. */
-provisional cluster CameraAvStreamManagement = 1361 {
+cluster CameraAvStreamManagement = 1361 {
   revision 1;
 
   enum AudioCodecEnum : enum8 {
@@ -6567,7 +6574,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
 }
 
 /** This cluster provides an interface into controls associated with the operation of a device that provides pan, tilt, and zoom functions, either mechanically, or against a digital image. */
-provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
+cluster CameraAvSettingsUserLevelManagement = 1362 {
   revision 1;
 
   enum PhysicalMovementEnum : enum8 {
@@ -6670,7 +6677,7 @@ provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
 }
 
 /** This cluster implements the upload of Audio and Video streams from the Push AV Stream Transport Cluster using suitable push-based transports. */
-provisional cluster PushAvStreamTransport = 1365 {
+cluster PushAvStreamTransport = 1365 {
   revision 1;
 
   enum CMAFInterfaceEnum : enum8 {
@@ -6852,7 +6859,7 @@ provisional cluster PushAvStreamTransport = 1365 {
 }
 
 /** This cluster provides facilities to configure and play Chime sounds, such as those used in a doorbell. */
-provisional cluster Chime = 1366 {
+cluster Chime = 1366 {
   revision 1;
 
   struct ChimeSoundStruct {
@@ -6869,12 +6876,13 @@ provisional cluster Chime = 1366 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+  /** This command will play the currently selected chime. */
   command PlayChimeSound(): DefaultSuccess = 0;
 }
 
 /** This Cluster is used to manage TLS Client Certificates and to provision
       TLS endpoints with enough information to facilitate subsequent connection. */
-provisional cluster TlsCertificateManagement = 2049 {
+cluster TlsCertificateManagement = 2049 {
   revision 1;
 
   fabric_scoped struct TLSCertStruct {
@@ -6987,7 +6995,7 @@ provisional cluster TlsCertificateManagement = 2049 {
 }
 
 /** This Cluster is used to provision TLS Endpoints with enough information to facilitate subsequent connection. */
-provisional cluster TlsClientManagement = 2050 {
+cluster TlsClientManagement = 2050 {
   revision 1;
 
   enum StatusCodeEnum : enum8 {
@@ -7994,7 +8002,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x0B;
-    ram      attribute clusterRevision default = 2;
+    callback attribute clusterRevision;
 
     handle command SetUTCTime;
     handle command SetTrustedTimeSource;

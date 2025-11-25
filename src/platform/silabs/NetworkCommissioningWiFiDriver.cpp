@@ -71,7 +71,7 @@ CHIP_ERROR SlWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeC
     mSavedNetwork.ssidLen        = ssidLen;
     mStagingNetwork              = mSavedNetwork;
 #endif
-    ConnectWiFiNetwork(mSavedNetwork.ssid, ssidLen, mSavedNetwork.credentials, credentialsLen);
+    TEMPORARY_RETURN_IGNORED ConnectWiFiNetwork(mSavedNetwork.ssid, ssidLen, mSavedNetwork.credentials, credentialsLen);
     return err;
 }
 
@@ -202,7 +202,7 @@ void SlWiFiDriver::OnConnectWiFiNetwork()
 {
     if (mpConnectCallback)
     {
-        CommitConfiguration();
+        TEMPORARY_RETURN_IGNORED CommitConfiguration();
         mpConnectCallback->OnResult(Status::kSuccess, CharSpan(), 0);
         mpConnectCallback = nullptr;
     }
@@ -299,13 +299,13 @@ void SlWiFiDriver::OnScanWiFiNetworkDone(wfx_wifi_scan_result_t * aScanResult)
             if (mScanResponseIter.Count() == 0)
             {
                 // if there is no network found, return kNetworkNotFound
-                DeviceLayer::SystemLayer().ScheduleLambda([nwDriver]() {
+                TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([nwDriver]() {
                     nwDriver->mpScanCallback->OnFinished(NetworkCommissioning::Status::kNetworkNotFound, CharSpan(), nullptr);
                     nwDriver->mpScanCallback = nullptr;
                 });
                 return;
             }
-            DeviceLayer::SystemLayer().ScheduleLambda([nwDriver]() {
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([nwDriver]() {
                 nwDriver->mpScanCallback->OnFinished(NetworkCommissioning::Status::kSuccess, CharSpan(), &mScanResponseIter);
                 nwDriver->mpScanCallback = nullptr;
             });

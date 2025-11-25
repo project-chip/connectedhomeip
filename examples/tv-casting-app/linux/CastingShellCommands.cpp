@@ -292,8 +292,7 @@ static CHIP_ERROR CastingHandler(int argc, char ** argv)
     {
         char * eptr;
         chip::FabricIndex fabricIndex = (chip::FabricIndex) strtol(argv[1], &eptr, 10);
-        chip::Server::GetInstance().GetFabricTable().Delete(fabricIndex);
-        return CHIP_NO_ERROR;
+        return chip::Server::GetInstance().GetFabricTable().Delete(fabricIndex);
     }
     if (strcmp(argv[0], "set-fabric") == 0)
     {

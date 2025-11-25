@@ -35,6 +35,7 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/TimeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -152,7 +153,7 @@ TEST_F(TestEventNumberCaching, TestEventNumberCaching)
 
     // Register our fake dynamic endpoint.
     DataVersion dataVersionStorage[MATTER_ARRAY_SIZE(testEndpointClusters)];
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
+    EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage)));
 
     chip::EventNumber firstEventNumber;
     chip::EventNumber lastEventNumber;
@@ -173,7 +174,7 @@ TEST_F(TestEventNumberCaching, TestEventNumberCaching)
 
     {
         Optional<EventNumber> highestEventNumber;
-        readCallback.mClusterCacheAdapter.GetHighestReceivedEventNumber(highestEventNumber);
+        EXPECT_SUCCESS(readCallback.mClusterCacheAdapter.GetHighestReceivedEventNumber(highestEventNumber));
         EXPECT_FALSE(highestEventNumber.HasValue());
         app::ReadClient readClient(engine, &GetExchangeManager(), readCallback.mClusterCacheAdapter.GetBufferedCallback(),
                                    app::ReadClient::InteractionType::Read);
@@ -184,13 +185,13 @@ TEST_F(TestEventNumberCaching, TestEventNumberCaching)
 
         EXPECT_EQ(readCallback.mEventsSeen, lastEventNumber - firstEventNumber + 1);
 
-        readCallback.mClusterCacheAdapter.ForEachEventData([](const app::EventHeader & header) {
+        EXPECT_SUCCESS(readCallback.mClusterCacheAdapter.ForEachEventData([](const app::EventHeader & header) {
             // We are not caching data.
             ADD_FAILURE(); // Can't use FAIL() because lambda has non-void return type.
             return CHIP_NO_ERROR;
-        });
+        }));
 
-        readCallback.mClusterCacheAdapter.GetHighestReceivedEventNumber(highestEventNumber);
+        EXPECT_SUCCESS(readCallback.mClusterCacheAdapter.GetHighestReceivedEventNumber(highestEventNumber));
         EXPECT_TRUE(highestEventNumber.HasValue() && highestEventNumber.Value() == lastEventNumber);
     }
 
@@ -204,7 +205,7 @@ TEST_F(TestEventNumberCaching, TestEventNumberCaching)
 
         readCallback.mClusterCacheAdapter.ClearEventCache(true);
         Optional<EventNumber> highestEventNumber;
-        readCallback.mClusterCacheAdapter.GetHighestReceivedEventNumber(highestEventNumber);
+        EXPECT_SUCCESS(readCallback.mClusterCacheAdapter.GetHighestReceivedEventNumber(highestEventNumber));
         EXPECT_FALSE(highestEventNumber.HasValue());
 
         const EventNumber kHighestEventNumberSeen = lastEventNumber - 1;
@@ -223,13 +224,13 @@ TEST_F(TestEventNumberCaching, TestEventNumberCaching)
         // We should only get events with event numbers larger than kHighestEventNumberSeen.
         EXPECT_EQ(readCallback.mEventsSeen, lastEventNumber - kHighestEventNumberSeen);
 
-        readCallback.mClusterCacheAdapter.ForEachEventData([](const app::EventHeader & header) {
+        EXPECT_SUCCESS(readCallback.mClusterCacheAdapter.ForEachEventData([](const app::EventHeader & header) {
             // We are not caching data.
             ADD_FAILURE(); // Can't use FAIL() because lambda has non-void return type.
             return CHIP_NO_ERROR;
-        });
+        }));
 
-        readCallback.mClusterCacheAdapter.GetHighestReceivedEventNumber(highestEventNumber);
+        EXPECT_SUCCESS(readCallback.mClusterCacheAdapter.GetHighestReceivedEventNumber(highestEventNumber));
         EXPECT_TRUE(highestEventNumber.HasValue() && highestEventNumber.Value() == lastEventNumber);
     }
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);

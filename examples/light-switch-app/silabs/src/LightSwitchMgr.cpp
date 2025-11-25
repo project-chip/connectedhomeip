@@ -83,7 +83,7 @@ void LightSwitchMgr::GenericSwitchOnInitialPress()
     data->endpoint = mGenericSwitchEndpoint;
     data->event    = Switch::Events::InitialPress::Id;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(GenericSwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(GenericSwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
 }
 
 /**
@@ -96,7 +96,7 @@ void LightSwitchMgr::GenericSwitchOnShortRelease()
     data->endpoint = mGenericSwitchEndpoint;
     data->event    = Switch::Events::ShortRelease::Id;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(GenericSwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(GenericSwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
 }
 
 StepModeEnum LightSwitchMgr::getStepMode()
@@ -139,7 +139,7 @@ void LightSwitchMgr::TriggerLightSwitchAction(LightSwitchAction action, bool isG
         break;
     }
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
 }
 
 void LightSwitchMgr::TriggerLevelControlAction(LevelControl::StepModeEnum stepMode, bool isGroupCommand)
@@ -155,7 +155,7 @@ void LightSwitchMgr::TriggerLevelControlAction(LevelControl::StepModeEnum stepMo
     stepData.optionsMask.Set(LightSwitchMgr::stepCommand.optionsMask);
     stepData.optionsOverride.Set(LightSwitchMgr::stepCommand.optionsOverride);
     data->commandData = stepData;
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
 }
 
 void LightSwitchMgr::GenericSwitchWorkerFunction(intptr_t context)
