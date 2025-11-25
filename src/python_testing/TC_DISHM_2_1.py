@@ -175,7 +175,7 @@ class TC_DISHM_2_1(MatterBaseTest):
             asserts.assert_true(self.mode_fail in modes,
                                 f"The MODE_CHANGE_FAIL PIXIT value {self.mode_fail} is not a supported mode")
             if self.is_ci:
-                logging.info("CI: Skipping manual precondition.")
+                self.mark_current_step_skipped()
             else:
                 self.wait_for_user_input(
                     prompt_msg=f"Manually put the device in a state from which it will FAIL to transition to mode {self.mode_fail}, and press Enter when ready.")
