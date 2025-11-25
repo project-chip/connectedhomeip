@@ -40,7 +40,6 @@ import time
 from mobly import asserts
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 import matter.clusters as Clusters
-from matter.interaction_model import Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from matter.interaction_model import InteractionModelError, Status
 
@@ -51,7 +50,7 @@ class TC_GCAST_2_3(MatterBaseTest):
     def desc_TC_GCAST_2_3(self):
         return "[TC-GCAST-2.3] Key rotation using UpdateGroupKey with GracePeriod with DUT as Server - PROVISIONAL"
 
-    def steps_TC_G_2_3(self):
+    def steps_TC_GCAST_2_3(self):
         return [
             TestStep("1a", "Commission DUT to TH (can be skipped if done in a preceding test)", is_commissioning=True),
             TestStep("1b", "TH removes any existing group and KeyID on the DUT"),

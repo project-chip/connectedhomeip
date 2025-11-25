@@ -54,7 +54,7 @@ class TC_GCAST_2_7(MatterBaseTest):
         return [
             TestStep("1a", "Commission DUT to TH (can be skipped if done in a preceding test)", is_commissioning=True),
             TestStep("1b", "TH removes any existing group and KeyID on the DUT"),
-            TestStep(2, "Iteratively Join group until until the Group count = M_max using a new GroupId and KeyId every time: "
+            TestStep(2, "Iteratively Join group until the Group count = M_max using a new GroupId and KeyId every time: "
                         "TH sends command JoinGroup (GroupID=Gn, Endpoints='see notes', KeyID=Kn, Key=InputKeyn) until the Group count = M_max"),
             TestStep(3, "Attempt to join 1 additional group: TH sends command JoinGroup (GroupID=Gn+1, Endpoints='see notes', KeyID=Kn+1, Key=InputKeyn+1)"),
             TestStep(4, "Leave one group: TH sends command LeaveGroup (GroupID=Gn)"),

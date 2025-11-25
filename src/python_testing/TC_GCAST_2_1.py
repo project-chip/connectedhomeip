@@ -47,8 +47,8 @@ class TC_GCAST_2_1(MatterBaseTest):
     def desc_TC_GCAST_2_1(self):
         return "[TC-GCAST-2.1] Attributes with DUT as Server - Provisional"
 
-    def steps_TC_G_2_2(self):
-        return [TestStep(1, "Comissioning, already done", is_commissioning=True),
+    def steps_TC_G_2_1(self):
+        return [TestStep(1, "Commissioning, already done", is_commissioning=True),
                 TestStep(2, "TH reads from the DUT the Membership attribute"),
                 TestStep(3, "TH reads from the DUT the MaxMembershipCount attribute")]
 
