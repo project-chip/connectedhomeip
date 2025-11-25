@@ -14,18 +14,22 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "lib/support/CodeUtils.h"
 #include <pw_unit_test/framework.h>
 
 #include <access/Privilege.h>
 #include <app/ConcreteClusterPath.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/ServerClusterExtension.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/shared/GlobalIds.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ReadOnlyBuffer.h>
 #include <protocols/interaction_model/Constants.h>
+
+#include <string>
 
 namespace {
 
@@ -88,6 +92,14 @@ private:
     const ConcreteClusterPath mPaths[2] = {};
 };
 
+constexpr AttributeId kTestAttribute1 = 0xFFF10000;
+constexpr AttributeId kTestAttribute2 = 0xFFF10001;
+
+constexpr DataModel::AttributeEntry kExtraAttributeMetadata[] = {
+    { kTestAttribute1, {} /* qualities */, Access::Privilege::kView /* readPriv */, Access::Privilege::kOperate /* writePriv */ },
+    { kTestAttribute2, {} /* qualities */, Access::Privilege::kView /* readPriv */, std::nullopt /* writePriv */ },
+};
+
 class TestableServerClusterExtension : public ServerClusterExtension
 {
 public:
@@ -95,7 +107,54 @@ public:
         ServerClusterExtension(path, underlying)
     {}
 
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override
+    {
+        if (mClusterPath == request.path)
+        {
+            switch (request.path.mAttributeId)
+            {
+            case kTestAttribute1:
+                return encoder.Encode<CharSpan>({ mStringAttribute.data(), mStringAttribute.size() });
+            case kTestAttribute2:
+                return encoder.Encode<uint32_t>(1234);
+            }
+        }
+        return mUnderlying.ReadAttribute(request, encoder);
+    }
+
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override
+    {
+        if (path == mClusterPath)
+        {
+            ReturnErrorOnFailure(builder.ReferenceExisting(kExtraAttributeMetadata));
+        }
+
+        return mUnderlying.Attributes(path, builder);
+    }
+
+    DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                 AttributeValueDecoder & decoder) override
+    {
+        if (mClusterPath == request.path)
+        {
+            // we are guaranteed to only be called for writable attributes
+            if (request.path.mAttributeId == kTestAttribute1)
+            {
+                CharSpan value;
+                ReturnErrorOnFailure(decoder.Decode(value));
+                mStringAttribute = std::string(value.data(), value.size());
+                return Status::Success;
+            }
+        }
+
+        return mUnderlying.WriteAttribute(request, decoder);
+    }
+
     void TestNotifyAttributeChanged(AttributeId id) { NotifyAttributeChanged(id); }
+
+private:
+    std::string mStringAttribute = "Sample String";
 };
 
 TEST(TestServerClusterExtension, TestExtensionPath)

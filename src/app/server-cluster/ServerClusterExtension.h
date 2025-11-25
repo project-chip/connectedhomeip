@@ -32,13 +32,12 @@ namespace chip::app {
 ///
 /// The class is intended to wrap a SINGLE cluster path for a given interface, even if the interface
 /// itself supports multiple paths.
-class ServerClusterExtension : public ServerClusterInterface {
+class ServerClusterExtension : public ServerClusterInterface
+{
 public:
-    explicit ServerClusterExtension(const ConcreteClusterPath & path, ServerClusterInterface & underlying)
-        : mClusterPath(path)
-        , mUnderlying(underlying)
-    {
-    }
+    explicit ServerClusterExtension(const ConcreteClusterPath & path, ServerClusterInterface & underlying) :
+        mClusterPath(path), mUnderlying(underlying)
+    {}
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown() override;
@@ -46,18 +45,18 @@ public:
     [[nodiscard]] DataVersion GetDataVersion(const ConcreteClusterPath & path) const override;
     [[nodiscard]] BitFlags<DataModel::ClusterQualityFlags> GetClusterFlags(const ConcreteClusterPath & path) const override;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
-        AttributeValueDecoder & decoder) override;
+                                                 AttributeValueDecoder & decoder) override;
     void ListAttributeWriteNotification(const ConcreteAttributePath & path, DataModel::ListWriteOperation opType,
-        FabricIndex accessingFabric) override;
+                                        FabricIndex accessingFabric) override;
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
-        AttributeValueEncoder & encoder) override;
+                                                AttributeValueEncoder & encoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
     CHIP_ERROR EventInfo(const ConcreteEventPath & path, DataModel::EventEntry & eventInfo) override;
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
-        chip::TLV::TLVReader & input_arguments,
-        CommandHandler * handler) override;
+                                                               chip::TLV::TLVReader & input_arguments,
+                                                               CommandHandler * handler) override;
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
-        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
     CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
 
 protected:
