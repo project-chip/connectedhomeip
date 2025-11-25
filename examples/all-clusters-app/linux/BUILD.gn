@@ -82,7 +82,6 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/src/app:attribute-persistence",
     "${chip_root}/src/app/clusters/identify-server",
-    "${chip_root}/src/app/clusters/ota-requestor",
     "${chip_root}/src/app/clusters/software-diagnostics-server:software-fault-listener",
     "${chip_root}/src/app/clusters/wifi-network-diagnostics-server:wifi-network-diagnostics-server",
     "${chip_root}/src/app/common:ids",
@@ -90,6 +89,10 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/src/lib",
     "${chip_root}/third_party/jsoncpp",
   ]
+
+  if (chip_enable_ota_requestor) {
+    deps += [ "${chip_root}/src/app/clusters/ota-requestor" ]
+  }
 
   include_dirs = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
