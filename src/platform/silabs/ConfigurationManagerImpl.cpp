@@ -66,7 +66,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     err = GenericConfigurationManagerImpl<SilabsConfig>::Init();
     SuccessOrExit(err);
 
-    IncreaseBootCount();
+    TEMPORARY_RETURN_IGNORED IncreaseBootCount();
     err = CHIP_NO_ERROR;
 
 exit:
@@ -81,7 +81,7 @@ bool ConfigurationManagerImpl::CanFactoryReset()
 
 void ConfigurationManagerImpl::InitiateFactoryReset()
 {
-    PlatformMgr().ScheduleWork(DoFactoryReset);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DoFactoryReset);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
@@ -95,7 +95,7 @@ CHIP_ERROR ConfigurationManagerImpl::IncreaseBootCount(void)
 
     if (SilabsConfig::ConfigValueExists(SilabsConfig::kConfigKey_BootCount))
     {
-        GetRebootCount(bootCount);
+        TEMPORARY_RETURN_IGNORED GetRebootCount(bootCount);
     }
 
     return SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_BootCount, bootCount + 1);
@@ -287,7 +287,7 @@ void ConfigurationManagerImpl::ClearThreadStack()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-    ThreadStackMgr().ClearAllSrpHostAndServices();
+    TEMPORARY_RETURN_IGNORED ThreadStackMgr().ClearAllSrpHostAndServices();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
     ChipLogProgress(DeviceLayer, "Clearing Thread provision");
     ThreadStackMgr().ErasePersistentInfo();

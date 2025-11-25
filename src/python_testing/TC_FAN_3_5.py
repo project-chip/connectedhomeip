@@ -81,13 +81,17 @@ class TC_FAN_3_5(MatterBaseTest):
     def pics_TC_FAN_3_5(self) -> list[str]:
         return ["FAN.S"]
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_FAN_3_5(self):
         if not self.check_pics("FAN.S.F04"):
             logger.info("Test skipped because PICS FAN.S.F04 is not set")
             return
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         # Part 1
 
