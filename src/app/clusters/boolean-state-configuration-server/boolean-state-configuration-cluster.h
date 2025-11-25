@@ -15,12 +15,13 @@
  */
 #pragma once
 
-#include "lib/core/DataModelTypes.h"
 #include <app/clusters/boolean-state-configuration-server/boolean-state-configuration-delegate.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/BooleanStateConfiguration/AttributeIds.h>
 #include <clusters/BooleanStateConfiguration/ClusterId.h>
+#include <lib/core/DataModelTypes.h>
+
 #include <cstdint>
 
 namespace chip::app::Clusters {
@@ -67,8 +68,6 @@ public:
     AlarmModeBitMask GetAlarmsActive() const { return mAlarmsActive; }
     AlarmModeBitMask GetAlarmsSuppressed() const { return mAlarmsSuppressed; }
     AlarmModeBitMask GetAlarmsEnabled() const { return mAlarmsEnabled; }
-
-
 
     // ServerClusterInterface/DefaultServerCluster implementation
     CHIP_ERROR Startup(ServerClusterContext & context) override;

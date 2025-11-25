@@ -14,10 +14,8 @@
  *    limitations under the License.
  *
  */
-#include "lib/core/DataModelTypes.h"
 #include <app/clusters/boolean-state-configuration-server/boolean-state-configuration-cluster.h>
 
-#include <algorithm>
 #include <app/SafeAttributePersistenceProvider.h>
 #include <app/data-model/Decode.h>
 #include <app/persistence/AttributePersistence.h>
@@ -28,6 +26,8 @@
 #include <clusters/BooleanStateConfiguration/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
+
+#include <algorithm>
 
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::BooleanStateConfiguration;

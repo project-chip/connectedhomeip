@@ -29,7 +29,6 @@ namespace Clusters {
 
 class BooleanStateConfigurationCluster;
 
-
 namespace BooleanStateConfiguration {
 
 /** @brief
@@ -38,7 +37,7 @@ namespace BooleanStateConfiguration {
 class Delegate
 {
 public:
-    Delegate() = default;
+    Delegate()          = default;
     virtual ~Delegate() = default;
 
     virtual CHIP_ERROR HandleSuppressAlarm(BooleanStateConfiguration::AlarmModeBitmap alarmToSuppress)             = 0;
@@ -49,7 +48,7 @@ public:
     //
     // Callback will be called for boolean state configuration cluster attributes such as
     // CurrentSensitivityLevel::Id, AlarmsActive::Id, AlarmsSuppressed::Id, AlarmsEnabled::Id and SensorFault::Id
-    virtual void OnAttributeChanged(AttributeId att, BooleanStateConfigurationCluster *cluster) {}
+    virtual void OnAttributeChanged(AttributeId att, BooleanStateConfigurationCluster * cluster) {}
 };
 
 } // namespace BooleanStateConfiguration
