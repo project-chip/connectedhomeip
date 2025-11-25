@@ -20,6 +20,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/static-cluster-config/OccupancySensing.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
@@ -49,10 +50,6 @@ public:
     {
         OccupancySensingCluster::Config config(endpointId);
         config.WithFeatures(static_cast<Feature>(featureMap));
-
-        bool hasSensorFeature = (featureMap &
-                                 (to_underlying(Feature::kPassiveInfrared) | to_underlying(Feature::kUltrasonic) |
-                                  to_underlying(Feature::kPhysicalContact)));
 
         // If the optional HoldTime attribute is enabled, enable the HoldTime logic.
         // The delay attributes are required if the corresponding sensor feature is present.
