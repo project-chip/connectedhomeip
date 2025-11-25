@@ -632,6 +632,13 @@ CHIP_ERROR TCPBase::DoHandleIncomingConnection(const Inet::TCPEndPointHandle & l
                                                const Inet::TCPEndPointHandle & endPoint, const Inet::IPAddress & peerAddress,
                                                uint16_t peerPort)
 {
+#if INET_CONFIG_TEST
+    if (sForceFailureInDoHandleIncomingConnection)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+#endif
+
     PeerAddress addr;
     CHIP_ERROR getPeerError = GetPeerAddress(*endPoint, addr);
     // See https://github.com/project-chip/connectedhomeip/issues/41746
@@ -642,11 +649,9 @@ CHIP_ERROR TCPBase::DoHandleIncomingConnection(const Inet::TCPEndPointHandle & l
         ChipLogFailure(getPeerError, Inet, "Failure getting peer info, using fallback");
         addr = PeerAddress::TCP(peerAddress, peerPort, Inet::InterfaceId::Null());
     }
+
     ActiveTCPConnectionState * activeConnection = AllocateConnection(endPoint, addr);
-    if (activeConnection == nullptr)
-    {
-        return CHIP_ERROR_TOO_MANY_CONNECTIONS;
-    }
+    VerifyOrReturnError(activeConnection != nullptr, CHIP_ERROR_TOO_MANY_CONNECTIONS);
 
     auto connectionCleanup = ScopeExit([&]() { activeConnection->Free(); });
 
@@ -740,6 +745,10 @@ void TCPBase::InitEndpoint(const Inet::TCPEndPointHandle & endpoint)
     endpoint->OnConnectComplete = HandleTCPEndPointConnectComplete;
     endpoint->SetConnectTimeout(mConnectTimeout);
 }
+
+#if INET_CONFIG_TEST
+bool TCPBase::sForceFailureInDoHandleIncomingConnection = false;
+#endif
 
 } // namespace Transport
 } // namespace chip
