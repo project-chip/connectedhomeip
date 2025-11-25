@@ -108,7 +108,7 @@ class TC_DISHM_2_1(MatterBaseTest):
         cluster = Clusters.Objects.DishwasherMode
         supported_modes_attribute = cluster.Attributes.SupportedModes
         current_mode_attribute = cluster.Attributes.CurrentMode
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         self.mode_fail = self.matter_test_config.global_test_params['PIXIT.DISHM.MODE_CHANGE_FAIL']
         self.mode_ok = self.matter_test_config.global_test_params['PIXIT.DISHM.MODE_CHANGE_OK']
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
