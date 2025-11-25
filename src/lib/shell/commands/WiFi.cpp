@@ -112,10 +112,11 @@ static CHIP_ERROR WiFiConnectHandler(int argc, char ** argv)
     /* Command accepts running with SSID and password (optional) as parameters */
     VerifyOrReturnError((argc == 1 || argc == 2), CHIP_ERROR_INVALID_ARGUMENT);
 
-    ByteSpan ssidSpan     = ByteSpan(Uint8::from_const_char(argv[0]), strlen(argv[0]));
+    ByteSpan ssidSpan = ByteSpan(Uint8::from_const_char(argv[0]), strlen(argv[0]));
     VerifyOrReturnError(IsSpanUsable(ssidSpan), CHIP_ERROR_INVALID_ARGUMENT);
     ByteSpan passwordSpan;
-    if(argc == 2){
+    if (argc == 2)
+    {
         passwordSpan = ByteSpan(Uint8::from_const_char(argv[1]), strlen(argv[1]));
         VerifyOrReturnError(IsSpanUsable(passwordSpan), CHIP_ERROR_INVALID_ARGUMENT);
     }
@@ -124,9 +125,6 @@ static CHIP_ERROR WiFiConnectHandler(int argc, char ** argv)
         // If no password is provided, use an empty password
         passwordSpan = ByteSpan();
     }
-
-
-
 
     ChipLogProgress(Shell, "Adding/Updating network %s", argv[0]);
 
