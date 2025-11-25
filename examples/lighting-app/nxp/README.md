@@ -52,14 +52,14 @@ to the respective platform's readme.
 A list of popular standard lighting app targets is presented below. These
 targets can be used with the `build_example.py` tool.
 
-| Target name                                                               | Description                                                                     |
-| ------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| `nxp-<device>-freertos-lighting-thread-cmake-frdm`                        | Default lighting app                                                            |
-| `nxp-<device>-freertos-lighting-thread-factory-cmake-frdm`                | Default lighting app with factory data                                          |
-| `nxp-<device>-freertos-lighting-thread-rotating-id-cmake-frdm`            | Lighting app with rotating device id support                                    |
-| `nxp-<device>-freertos-lighting-thread-factory-dac-conversion-cmake-frdm` | Lighting app that leverages a secure enclave to secure the DAC private key      |
-| `nxp-<device>-freertos-lighting-thread-sw-v2-cmake-frdm`                  | Lighting app with software version 2 (can be used to test OTA)                  |
-| `nxp-<device>-freertos-lighting-thread-factory-sw-v2-cmake-frdm`          | Lighting app with factory data and software version 2 (can be used to test OTA) |
+| Target name                                                         | Description                                                                     |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `nxp-<device>-freertos-lighting-thread-frdm`                        | Default lighting app                                                            |
+| `nxp-<device>-freertos-lighting-thread-factory-frdm`                | Default lighting app with factory data                                          |
+| `nxp-<device>-freertos-lighting-thread-rotating-id-frdm`            | Lighting app with rotating device id support                                    |
+| `nxp-<device>-freertos-lighting-thread-factory-dac-conversion-frdm` | Lighting app that leverages a secure enclave to secure the DAC private key      |
+| `nxp-<device>-freertos-lighting-thread-sw-v2-frdm`                  | Lighting app with software version 2 (can be used to test OTA)                  |
+| `nxp-<device>-freertos-lighting-thread-factory-sw-v2-frdm`          | Lighting app with factory data and software version 2 (can be used to test OTA) |
 
 where `device` is be one of the [supported platforms](#supported-platforms).
 
