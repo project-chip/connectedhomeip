@@ -263,6 +263,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # Prerequisite #3.0 - Add OTA Provider to the Requestor (Only if none exists, and only one time)
         logger.info(f'{step_number}: Prerequisite #3.0 - Add Provider to Requestor(DUT) DefaultOTAProviders')
 
+        # Prerequisite #4.0 - Current DefaultOTAProviders on Requestor
         # Read existing DefaultOTAProviders on the Requestor
         current_providers = await self.read_single_attribute_check_success(
             dev_ctrl=controller,
@@ -273,10 +274,10 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
         # If there is already a provider, skip adding
         if current_providers:
-            logger.info(f"Skipping add: Requestor already has providers {current_providers}")
-
-        await self.set_default_ota_providers_list(controller, provider_node_id, requestor_node_id)
-        logger.info("Prerequisite #4.0 - Write DefaultOTAProviders completed.")
+            logger.info(f'Skipping add: Requestor already has providers {current_providers}')
+        else:
+            await self.set_default_ota_providers_list(controller, provider_node_id, requestor_node_id)
+            logger.info("Prerequisite #4.0 - Write DefaultOTAProviders completed.")
 
         # ------------------------------------------------------------------------------------
         # [STEP_1]: Step #1.1 - Matcher for OTA records logs
@@ -440,7 +441,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # Start subscriptions
         await subscription_attr_state_busy.start(
             dev_ctrl=controller,
-            node_id=requestor_node_id,  # DUT
+            node_id=requestor_node_id,
             endpoint=0,
             fabric_filtered=False,
             min_interval_sec=0.5,
@@ -485,7 +486,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # [STEP_2]:  Step #2.3 - Start tasks to track OTA attributes:
         # ------------------------------------------------------------------------------------
         try:
-            # Wait until the final state (Idle) is reached or timeout (2.5 min)
+            # Wait for the 120s minimum interval to complete (overall task timeout is 150s)
             await subscription_attr_state_busy.await_all_expected_report_matches([matcher_busy_state_obj], timeout_sec=150.0)
         except Exception as e:
             logger.warning(f"OTA update encountered an error or timeout: {e}")
@@ -561,7 +562,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # Start subscriptions
         await subscription_attr_state_updatenotavailable.start(
             dev_ctrl=controller,
-            node_id=requestor_node_id,  # DUT
+            node_id=requestor_node_id,
             endpoint=0,
             fabric_filtered=False,
             min_interval_sec=0.5,
@@ -605,7 +606,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # UpdateState (updateNotAvailable sequence) with validation
         # ------------------------------------------------------------------------------------
         try:
-            # Wait until the final state (Idle) is reached or timeout (2.5 min)
+            # Wait for the 120s minimum interval to complete (overall task timeout is 150s)
             await subscription_attr_state_updatenotavailable.await_all_expected_report_matches([matcher_not_available_state_obj], timeout_sec=150.0)
         except Exception as e:
             logger.warning(f"OTA update encountered an error or timeout, test continues: {e}")
@@ -682,7 +683,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # Start subscriptions
         await subscription_attr_state_busy_180s.start(
             dev_ctrl=controller,
-            node_id=requestor_node_id,  # DUT
+            node_id=requestor_node_id,
             endpoint=0,
             fabric_filtered=False,
             min_interval_sec=0.5,
@@ -739,7 +740,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # UpdateState (Busy, 180s DelayedActionTime sequence) with validation
         # ------------------------------------------------------------------------------------
         try:
-            # Wait until the final state (Idle) is reached or timeout (3.5 min)
+            # Wait until the final state (Downloading) is reached or timeout (3.5 min)
             await subscription_attr_state_busy_180s.await_all_expected_report_matches([matcher_busy_state_delayed_180s_obj], timeout_sec=210.0)
             logger.info(f'{step_number_s4}: Step #4.3 - UpdateState Busy > Downloading transition (180s) successfully observed.')
         except Exception as e:
@@ -820,13 +821,12 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # Start subscriptions
         await subscription_state_no_download.start(
             dev_ctrl=controller,
-            node_id=requestor_node_id,  # DUT
+            node_id=requestor_node_id,
             endpoint=0,
             fabric_filtered=False,
             min_interval_sec=1,
             max_interval_sec=1
         )
-        # await asyncio.sleep(1)
 
         # ------------------------------------------------------------------------------------
         # [STEP_6]: Step #6.0 - Controller sends AnnounceOTAProvider command
@@ -929,7 +929,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # Start subscriptions
         await subscription_state_invalid_uri.start(
             dev_ctrl=controller,
-            node_id=requestor_node_id,  # DUT
+            node_id=requestor_node_id,
             endpoint=0,
             fabric_filtered=False,
             min_interval_sec=1,
