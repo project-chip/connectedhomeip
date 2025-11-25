@@ -17,10 +17,13 @@
 import argparse
 import logging
 import os
+import shlex
 import signal
 import subprocess
 import sys
 import time
+
+log = logging.getLogger(__name__)
 
 DEFAULT_CHIP_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 
@@ -40,13 +43,13 @@ class TestDriver:
         self.script_path = test_script
 
         if not os.path.exists(self.app_path):
-            logging.error('%s not found', self.app_path)
+            log.error("'%s' not found", self.app_path)
             raise FileNotFoundError(self.app_path)
         if not os.path.exists(self.run_python_test_path):
-            logging.error('%s not found', self.run_python_test_path)
+            log.error("'%s' not found", self.run_python_test_path)
             raise FileNotFoundError(self.run_python_test_path)
         if not os.path.exists(self.script_path):
-            logging.error('%s not found', self.script_path)
+            log.error("'%s' not found", self.script_path)
             raise FileNotFoundError(self.script_path)
 
     def get_base_run_python_cmd(self, run_python_test_path, app_path, app_args, script_path, script_args):
@@ -61,7 +64,7 @@ class TestDriver:
         if factory_reset_app:
             cmd = cmd + ' --factory-reset-app-only'
 
-        logging.info(f'Running cmd {cmd}')
+        log.info("Running cmd: %s", shlex.join(cmd))
 
         process = subprocess.Popen(cmd, stdout=sys.stdout, stderr=sys.stderr, shell=True, bufsize=1)
 
@@ -69,7 +72,7 @@ class TestDriver:
 
 
 def kill_process(app2_process):
-    logging.warning("Stopping app with SIGINT")
+    log.warning("Stopping app with SIGINT")
     app2_process.send_signal(signal.SIGINT.value)
     app2_process.wait()
 
