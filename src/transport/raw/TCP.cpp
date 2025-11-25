@@ -639,16 +639,9 @@ CHIP_ERROR TCPBase::DoHandleIncomingConnection(const Inet::TCPEndPointHandle & l
     }
 #endif
 
+    // GetPeerAddress may fail if the client has already closed the connection, just drop it.
     PeerAddress addr;
-    CHIP_ERROR getPeerError = GetPeerAddress(*endPoint, addr);
-    // See https://github.com/project-chip/connectedhomeip/issues/41746
-    // Failures here must be handled carefully so that broken connections
-    // continue to propagate to failure callbacks to avoid flaky tests
-    if (getPeerError != CHIP_NO_ERROR)
-    {
-        ChipLogFailure(getPeerError, Inet, "Failure getting peer info, using fallback");
-        addr = PeerAddress::TCP(peerAddress, peerPort, Inet::InterfaceId::Null());
-    }
+    ReturnErrorOnFailure(GetPeerAddress(*endPoint, addr));
 
     ActiveTCPConnectionState * activeConnection = AllocateConnection(endPoint, addr);
     VerifyOrReturnError(activeConnection != nullptr, CHIP_ERROR_TOO_MANY_CONNECTIONS);
