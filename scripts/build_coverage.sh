@@ -206,7 +206,7 @@ if [ "$skip_gn" == false ]; then
              --exclude-tags SLOW \
              --exclude-tags PURPOSEFUL_FAILURE \
              --tool-path chip-tool:\"$OUTPUT_ROOT/chip-tool\" \
-             --app-path all-clusters:\"$OUTPUT_ROOT/chip-all-clusters-app\"
+             --app-path all-clusters:\"$OUTPUT_ROOT/chip-all-clusters-app\" \
              --target TestUserLabelCluster \
              run \
              --iterations 1 \

@@ -312,6 +312,8 @@ jobs:
                         $([ "${DISABLE_CCACHE}" != "true" ] && echo --enable-ccache) \
                      "
 
+            - name: Show objdir-clone
+              run: "find objdur-clone -type f"
             - name: Run Tests using the python parser sending commands to chip-tool
               run: |
                   ./scripts/run_in_build_env.sh \

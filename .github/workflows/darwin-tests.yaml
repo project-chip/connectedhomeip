@@ -56,6 +56,8 @@ jobs:
       BUILD_VARIANT_FRAMEWORK_TOOL: no-ble
       LSAN_OPTIONS: detect_leaks=1 malloc_context_size=40 suppressions=scripts/tests/chiptest/lsan-mac-suppressions.txt
 
+      CHIP_PATHSFINDER_SEARCHPATH: objdir-clone:scripts/tests
+
     if: github.actor != 'restyled-io[bot]'
     runs-on: ${{matrix.os}}
 
@@ -124,22 +126,10 @@ jobs:
           ./scripts/run_in_build_env.sh \
           "./scripts/tests/run_test_suite.py \
              --runner darwin_framework_tool_python \
-             --chip-tool ./out/darwin-${{matrix.arch}}-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL}/darwin-framework-tool \
              --target-skip-glob '{TestAccessControlConstraints}' \
              run \
              --iterations 1 \
              --test-timeout-seconds 120 \
-             --all-clusters-app ./objdir-clone/darwin-${{matrix.arch}}-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
-             --lock-app ./objdir-clone/darwin-${{matrix.arch}}-lock-${BUILD_VARIANT}-unified/chip-lock-app \
-             --ota-provider-app ./objdir-clone/darwin-${{matrix.arch}}-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
-             --ota-requestor-app ./objdir-clone/darwin-${{matrix.arch}}-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
-             --tv-app ./objdir-clone/darwin-${{matrix.arch}}-tv-app-${BUILD_VARIANT}/chip-tv-app \
-             --bridge-app ./objdir-clone/darwin-${{matrix.arch}}-bridge-${BUILD_VARIANT}-unified/chip-bridge-app \
-             --microwave-oven-app ./objdir-clone/darwin-${{matrix.arch}}-microwave-oven-${BUILD_VARIANT}-unified/chip-microwave-oven-app \
-             --rvc-app ./objdir-clone/darwin-${{matrix.arch}}-rvc-${BUILD_VARIANT}-unified/chip-rvc-app \
-             --network-manager-app ./objdir-clone/darwin-${{matrix.arch}}-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
-             --energy-gateway-app ./objdir-clone/darwin-${{matrix.arch}}-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
-             --energy-management-app ./objdir-clone/darwin-${{matrix.arch}}-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
           "
       - name: Run OTA Test
         run: |

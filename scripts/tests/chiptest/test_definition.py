@@ -304,7 +304,7 @@ class SubprocessInfoRepo(dict):
             kind = self.subproc_knowhow[key].kind
         if path_lookup is None:
             if key not in self.subproc_knowhow:
-                raise KeyError(f"Key '{key}': path lookup neither provided nor specifed in know-how")
+                raise KeyError(f"Key '{key}': path lookup neither provided nor specified in know-how")
             path_lookup = self.subproc_knowhow[key].path_lookup
             if path_lookup is None:
                 raise RuntimeError(f"Key '{key}': Key exists in know-how but no path lookup specified")

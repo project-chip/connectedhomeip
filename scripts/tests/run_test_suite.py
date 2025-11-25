@@ -102,7 +102,7 @@ class RunContext:
     '--no-log-timestamps',
     default=False,
     is_flag=True,
-    help='Skip timestaps in log output')
+    help='Skip timestamps in log output')
 @click.option(
     '--root',
     default=None,
