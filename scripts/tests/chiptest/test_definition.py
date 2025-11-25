@@ -278,9 +278,11 @@ class SubprocessInfoRepo(dict):
             key, path = el
             path = Path(path)
             if kind is None:
+                if key not in self.subproc_knowhow:
+                    raise KeyError(f"Kind not provided for key '{key}' and not specified in know-how")
                 kind = self.subproc_knowhow[key].kind
         else:
-            raise RuntimeError("Cannot parse path spec '%s'", spec)
+            raise RuntimeError(f"Cannot parse path spec '{spec}'")
 
         s = SubprocessInfo(kind=kind, path=path)
         if path.suffix == '.py':
@@ -297,16 +299,20 @@ class SubprocessInfoRepo(dict):
             return
 
         if kind is None:
+            if key not in self.subproc_knowhow:
+                raise KeyError(f"Key '{key}': kind neither provided nor specified in know-how")
             kind = self.subproc_knowhow[key].kind
         if path_lookup is None:
+            if key not in self.subproc_knowhow:
+                raise KeyError(f"Key '{key}': path lookup neither provided nor specifed in know-how")
             path_lookup = self.subproc_knowhow[key].path_lookup
             if path_lookup is None:
-                raise RuntimeError(f"No path lookup provided nor present in knowhow for key {key}")
+                raise RuntimeError(f"Key '{key}': Key exists in know-how but no path lookup specified")
 
         if (path := self.paths.get(path_lookup)) is None:
-            raise RuntimeError("Cannot find path for '%s'", key)
+            raise RuntimeError(f"Cannot find path for '{key}'")
 
-        logging.info("Discovered '%s' path '%s'", key, path)
+        log.info("Discovered '%s' path '%s'", key, path)
         s = SubprocessInfo(kind=kind, path=path)
         if path.suffix == '.py':
             s = s.wrap_with('python3')

@@ -27,7 +27,7 @@ import click
 import coloredlogs
 from chiptest.accessories import AppsRegister
 from chiptest.glob_matcher import GlobMatcher
-from chiptest.runner import Executor, SubprocessInfo
+from chiptest.runner import Executor, SubprocessKind, SubprocessInfo
 from chiptest.test_definition import SubprocessInfoRepo, TestRunTime, TestTag
 from chipyaml.paths_finder import PathsFinder
 
@@ -147,14 +147,10 @@ class RunContext:
     '--custom-path', multiple=True,
     help='Set path with a custom kind, value should be <kind>:<key>:<path>'
 )
-@click.option(
-    '--discover-missing-paths', default=False, is_flag=True,
-    help='Discover paths and tools not explicitly defined'
-)
 @click.pass_context
 def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
          no_log_timestamps, root, pathsfinder_searchpath, internal_inside_unshare, include_tags, exclude_tags, runner,
-         app_path, tool_path, custom_path, discover_missing_paths):
+         app_path, tool_path, custom_path):
 
     # Implement --root and --pathsfinder_searchpath dependency logic:
     # - by default root and pathsfinder_searchpath should both be set to DEFAULT_CHIP_ROOT
@@ -177,9 +173,9 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
     subproc_info_repo = SubprocessInfoRepo(paths=PathsFinder(pathsfinder_searchpath))
 
     for p in app_path:
-        subproc_info_repo.addSpec(p, kind='app')
+        subproc_info_repo.addSpec(p, kind=SubprocessKind.APP)
     for p in tool_path:
-        subproc_info_repo.addSpec(p, kind='tool')
+        subproc_info_repo.addSpec(p, kind=SubprocessKind.TOOL)
     for p in custom_path:
         subproc_info_repo.addSpec(p)
 
