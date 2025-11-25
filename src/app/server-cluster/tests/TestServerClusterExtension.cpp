@@ -29,6 +29,10 @@
 #include <lib/support/ReadOnlyBuffer.h>
 #include <protocols/interaction_model/Constants.h>
 
+#include <app/clusters/testing/AttributeTesting.h>
+#include <app/clusters/testing/ClusterTester.h>
+#include <app/clusters/testing/ValidateGlobalAttributes.h>
+
 #include <string>
 
 namespace {
@@ -130,6 +134,7 @@ public:
             ReturnErrorOnFailure(builder.ReferenceExisting(kExtraAttributeMetadata));
         }
 
+        // Delegate to underlying for other paths
         return mUnderlying.Attributes(path, builder);
     }
 
@@ -155,9 +160,16 @@ public:
 
 private:
     std::string mStringAttribute = "Sample String";
+    std::vector<DataModel::AttributeEntry> mCombinedAttributes;
 };
 
-TEST(TestServerClusterExtension, TestExtensionPath)
+struct TestServerClusterExtension : public ::testing::Test
+{
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+};
+
+TEST_F(TestServerClusterExtension, TestExtensionPath)
 {
     const ConcreteClusterPath mockPath = { 1, 2 };
     MockServerCluster underlying(mockPath);
@@ -170,7 +182,7 @@ TEST(TestServerClusterExtension, TestExtensionPath)
     ASSERT_EQ(extension.GetPaths()[0], mockPath);
 }
 
-TEST(TestServerClusterExtension, TestGetDataVersion)
+TEST_F(TestServerClusterExtension, TestGetDataVersion)
 {
     const ConcreteClusterPath mockPath = { 2, 3 };
     MockServerCluster underlying(mockPath);
@@ -197,7 +209,7 @@ TEST(TestServerClusterExtension, TestGetDataVersion)
     ASSERT_EQ(extension.GetDataVersion(mockPath), oldVersion + 1);
 }
 
-TEST(TestServerClusterExtension, TestNotifyAttributeChangedWithContext)
+TEST_F(TestServerClusterExtension, TestNotifyAttributeChangedWithContext)
 {
     const ConcreteClusterPath mockPath  = { 1, 2 };
     const ConcreteClusterPath mockPath2 = { 1, 3 };
@@ -224,6 +236,37 @@ TEST(TestServerClusterExtension, TestNotifyAttributeChangedWithContext)
 
     ASSERT_EQ(context.ChangeListener().DirtyList().size(), 1u);
     ASSERT_EQ(context.ChangeListener().DirtyList()[0], AttributePathParams(mockPath.mEndpointId, mockPath.mClusterId, 234));
+}
+
+TEST_F(TestServerClusterExtension, TestExtensionAttributes)
+{
+    const ConcreteClusterPath mockPath = { 1, 2 };
+    MockServerCluster underlying(mockPath);
+    TestableServerClusterExtension extension(mockPath, underlying);
+
+    chip::Test::ClusterTester tester(extension);
+
+    // Verify attribute listing includes global and extended attributes
+    ASSERT_TRUE(chip::Testing::IsAttributesListEqualTo(extension, { kExtraAttributeMetadata[0], kExtraAttributeMetadata[1] }));
+
+    // Test reading kTestAttribute1 (string)
+    CharSpan readString;
+    ASSERT_EQ(tester.ReadAttribute(kTestAttribute1, readString), Status::Success);
+    ASSERT_TRUE(readString.data_equal("Sample String"_span));
+
+    // Test reading kTestAttribute2 (uint32_t)
+    uint32_t readUint;
+    ASSERT_EQ(tester.ReadAttribute(kTestAttribute2, readUint), Status::Success);
+    ASSERT_EQ(readUint, 1234u);
+
+    // Test writing kTestAttribute1 (string)
+    CharSpan newString = "New Test String"_span;
+    ASSERT_EQ(tester.WriteAttribute(kTestAttribute1, newString), Status::Success);
+
+    // Read back to verify write
+    CharSpan verifiedString;
+    ASSERT_EQ(tester.ReadAttribute(kTestAttribute1, verifiedString), Status::Success);
+    ASSERT_TRUE(verifiedString.data_equal(newString));
 }
 
 } // namespace
