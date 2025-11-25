@@ -117,7 +117,7 @@ CHIP_ERROR ESPWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChange
     // If the network configuration backup exists, it means that the device has been rebooted with
     // the fail-safe armed. Since ESP-WiFi persists all wifi credentials changes, the backup must
     // be restored on the boot. If there's no backup, the below function is a no-op.
-    RevertConfiguration();
+    TEMPORARY_RETURN_IGNORED RevertConfiguration();
 
     return CHIP_NO_ERROR;
 }
@@ -129,8 +129,8 @@ void ESPWiFiDriver::Shutdown()
 
 CHIP_ERROR ESPWiFiDriver::CommitConfiguration()
 {
-    PersistedStorage::KeyValueStoreMgr().Delete(kWiFiSSIDKeyName);
-    PersistedStorage::KeyValueStoreMgr().Delete(kWiFiCredentialsKeyName);
+    TEMPORARY_RETURN_IGNORED PersistedStorage::KeyValueStoreMgr().Delete(kWiFiSSIDKeyName);
+    TEMPORARY_RETURN_IGNORED PersistedStorage::KeyValueStoreMgr().Delete(kWiFiCredentialsKeyName);
 
     return CHIP_NO_ERROR;
 }
@@ -170,8 +170,8 @@ CHIP_ERROR ESPWiFiDriver::RevertConfiguration()
 exit:
 
     // Remove the backup.
-    PersistedStorage::KeyValueStoreMgr().Delete(kWiFiSSIDKeyName);
-    PersistedStorage::KeyValueStoreMgr().Delete(kWiFiCredentialsKeyName);
+    TEMPORARY_RETURN_IGNORED PersistedStorage::KeyValueStoreMgr().Delete(kWiFiSSIDKeyName);
+    TEMPORARY_RETURN_IGNORED PersistedStorage::KeyValueStoreMgr().Delete(kWiFiCredentialsKeyName);
 
     return error;
 }

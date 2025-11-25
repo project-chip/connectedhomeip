@@ -32,10 +32,9 @@
 #       --endpoint 0
 # === END CI TEST ARGUMENTS ===
 
-
+import asyncio
 import logging
 import random
-import time
 
 from mobly import asserts
 
@@ -247,7 +246,7 @@ class TC_ACL_2_10(MatterBaseTest):
 
                 # The test runner will automatically wait for the app-ready-pattern before continuing
                 # Waiting 1 second after the app-ready-pattern is detected as we need to wait a tad longer for the app to be ready and stable, otherwise TH2 connection fails later on in test step 14.
-                time.sleep(1)
+                await asyncio.sleep(1)
 
                 # Expire sessions and re-establish connections
                 self.th1.ExpireSessions(self.dut_node_id)
