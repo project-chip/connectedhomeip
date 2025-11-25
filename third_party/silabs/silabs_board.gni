@@ -20,6 +20,7 @@ declare_args() {
   # Find more information at https://www.silabs.com/development-tools/wireless.
   # A board tailored for specific mcu family and mcu model can be created with "CUSTOM".
   silabs_board = ""
+  silabs_board_lower = ""
 
   # Silabs mcu family used
   silabs_family = ""
@@ -69,8 +70,8 @@ declare_args() {
   # Enables LCD Qr Code on supported devices
   show_qr_code = !disable_lcd
 
-  # Enabling BLE on 917 NCP by default
-  chip_enable_ble_rs911x = use_SiWx917
+  # Enabling BLE on 917 SoC by default
+  sl_matter_enable_siwx_ble = use_SiWx917
 }
 
 # TODO - This needs to be removed once multiplexing issues resolved
@@ -123,6 +124,9 @@ if (is_si917_board) {
   silabs_family = "SiWx917-common"
   wifi_soc = true
 
+  # Enabling BLE on 917 NCP by default
+  sl_matter_enable_siwx_ble = true
+
   if (silabs_board == "BRD2708A" || silabs_board == "BRD2911A") {
     is_si917y_mcu = true
     silabs_mcu = "SIWG917Y111MGABA"
@@ -150,6 +154,8 @@ if (is_si917_board) {
   silabs_family = "efr32mg24"
   silabs_mcu = "EFR32MG24B310F1536IM48"
 
+  # TODO enable me once submodule is updated
+  # sl_enable_rgb_led = true
   # ThunderBoards don't have a LCD,
   show_qr_code = false
   disable_lcd = true
@@ -238,6 +244,13 @@ if (is_si917_board) {
       false,
       "The board ${silabs_board} is unsupported. A list of supported board can be found here https://t.ly/_b3SK")
 }
+
+silabs_board_lower = string_replace(silabs_board, "BRD", "brd")
+
+# REPLACE SUFFIXES
+silabs_board_lower = string_replace(silabs_board_lower, "A", "a")
+silabs_board_lower = string_replace(silabs_board_lower, "B", "b")
+silabs_board_lower = string_replace(silabs_board_lower, "C", "c")
 
 declare_args() {
   # Wifi SoC Board require a .rps file to be flashed to the device to run

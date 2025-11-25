@@ -17,27 +17,58 @@
 #pragma once
 
 #include <app/AppConfig.h>
+#include <app/FailSafeContext.h>
+#include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
+#include <app/server/CommissioningWindowManager.h>
 #include <clusters/GeneralCommissioning/AttributeIds.h>
 #include <clusters/GeneralCommissioning/ClusterId.h>
 #include <clusters/GeneralCommissioning/Commands.h>
 #include <clusters/GeneralCommissioning/Enums.h>
-#include <cstdint>
+#include <credentials/FabricTable.h>
 #include <lib/support/BitFlags.h>
+#include <platform/ConfigurationManager.h>
+#include <platform/DeviceControlServer.h>
+#include <platform/PlatformManager.h>
+
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+#include <app/server/TermsAndConditionsManager.h>  //nogncheck
+#include <app/server/TermsAndConditionsProvider.h> //nogncheck
+#endif                                             // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+
+#include <cstdint>
 
 namespace chip::app::Clusters {
 
-class GeneralCommissioningCluster : public DefaultServerCluster, chip::FabricTable::Delegate
+class GeneralCommissioningCluster : public DefaultServerCluster, chip::FabricTable::Delegate, public BreadCrumbTracker
 {
 public:
     using OptionalAttributes = OptionalAttributeSet<GeneralCommissioning::Attributes::IsCommissioningWithoutPower::Id>;
 
-    GeneralCommissioningCluster() : DefaultServerCluster({ kRootEndpointId, GeneralCommissioning::Id }), mOptionalAttributes(0) {}
+    /// Injected dependencies of this cluster
+    struct Context
+    {
+        CommissioningWindowManager & commissioningWindowManager;
+        DeviceLayer::ConfigurationManager & configurationManager;
+        DeviceLayer::DeviceControlServer & deviceControlServer;
+        FabricTable & fabricTable;
+        FailSafeContext & failsafeContext;
+        DeviceLayer::PlatformManager & platformManager;
 
-    OptionalAttributes & GetOptionalAttributes() { return mOptionalAttributes; }
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+        TermsAndConditionsProvider & termsAndConditionsProvider;
+#endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    };
 
-    void SetBreadCrumb(uint64_t value);
+    GeneralCommissioningCluster(Context && context, const OptionalAttributes & attrs) :
+        DefaultServerCluster({ kRootEndpointId, GeneralCommissioning::Id }), mClusterContext(std::move(context)),
+        mOptionalAttributes(attrs)
+    {}
+
+    Context & ClusterContext() { return mClusterContext; }
+
+    void SetBreadCrumb(uint64_t value) final;
 
     // Server cluster implementation
     CHIP_ERROR Startup(ServerClusterContext & context) override;
@@ -55,10 +86,7 @@ public:
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
     // Fabric delegate
-    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
-
-    // GeneralCommissioning is a singleton cluster that exists only on the root endpoint.
-    static GeneralCommissioningCluster & Instance();
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) final;
 
     // Feature map constant based on compile-time defines. This ensures feature map
     // is in sync with the actual supported features determined at build time.
@@ -70,7 +98,8 @@ public:
 #endif
 
 private:
-    OptionalAttributes mOptionalAttributes;
+    Context mClusterContext;
+    const OptionalAttributes mOptionalAttributes;
     uint64_t mBreadCrumb = 0;
 
     std::optional<DataModel::ActionReturnStatus>

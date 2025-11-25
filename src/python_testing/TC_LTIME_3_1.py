@@ -88,7 +88,7 @@ class TC_LTIME_3_1(MatterBaseTest):
 
     @run_if_endpoint_matches(has_cluster(Clusters.TimeFormatLocalization))
     async def test_TC_LTIME_3_1(self):
-        self.endpoint = self.get_endpoint(default=0)
+        self.endpoint = self.get_endpoint()
         self.cluster = Clusters.TimeFormatLocalization
         hour_format_values = [0, 1, 255]
 
@@ -145,7 +145,7 @@ class TC_LTIME_3_1(MatterBaseTest):
             return
 
         self.step(10)
-        calendar_type_values = set([i for i in range(0, 12)])
+        calendar_type_values = set(range(0, 12))
         calendar_type_values.add(255)
         cluster_supported_calendar_types = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.SupportedCalendarTypes)
         asserts.assert_true(set(cluster_supported_calendar_types).issubset(

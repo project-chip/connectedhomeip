@@ -26,15 +26,11 @@
 #include <clusters/GeneralCommissioning/Metadata.h>
 #include <cstdint>
 #include <optional>
+#include <platform/ConfigurationManager.h>
 #include <platform/DeviceControlServer.h>
 #include <platform/PlatformManager.h>
 #include <tracing/macros.h>
 #include <transport/SecureSession.h>
-
-#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-#include <app/server/TermsAndConditionsManager.h>  //nogncheck
-#include <app/server/TermsAndConditionsProvider.h> //nogncheck
-#endif
 
 using namespace chip;
 using namespace chip::app;
@@ -57,10 +53,11 @@ namespace {
         }                                                                                                                          \
     } while (false)
 
-CHIP_ERROR ReadIfSupported(CHIP_ERROR (ConfigurationManager::*getter)(uint8_t &), AttributeValueEncoder & aEncoder)
+CHIP_ERROR ReadIfSupported(ConfigurationManager & mgr, CHIP_ERROR (ConfigurationManager::*getter)(uint8_t &),
+                           AttributeValueEncoder & aEncoder)
 {
     uint8_t data   = 0;
-    CHIP_ERROR err = (DeviceLayer::ConfigurationMgr().*getter)(data);
+    CHIP_ERROR err = (mgr.*getter)(data);
     if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
     {
         data = 0;
@@ -81,15 +78,15 @@ typedef struct sTermsAndConditionsState
     Optional<uint32_t> updateAcceptanceDeadline;
 } TermsAndConditionsState;
 
-CHIP_ERROR GetTermsAndConditionsAttributeState(TermsAndConditionsProvider * tcProvider,
+CHIP_ERROR GetTermsAndConditionsAttributeState(TermsAndConditionsProvider & tcProvider,
                                                TermsAndConditionsState & outTermsAndConditionsState)
 {
     TermsAndConditionsState termsAndConditionsState;
 
-    ReturnErrorOnFailure(tcProvider->GetAcceptance(termsAndConditionsState.acceptance));
-    ReturnErrorOnFailure(tcProvider->GetAcknowledgementsRequired(termsAndConditionsState.acknowledgementsRequired));
-    ReturnErrorOnFailure(tcProvider->GetRequirements(termsAndConditionsState.requirements));
-    ReturnErrorOnFailure(tcProvider->GetUpdateAcceptanceDeadline(termsAndConditionsState.updateAcceptanceDeadline));
+    ReturnErrorOnFailure(tcProvider.GetAcceptance(termsAndConditionsState.acceptance));
+    ReturnErrorOnFailure(tcProvider.GetAcknowledgementsRequired(termsAndConditionsState.acknowledgementsRequired));
+    ReturnErrorOnFailure(tcProvider.GetRequirements(termsAndConditionsState.requirements));
+    ReturnErrorOnFailure(tcProvider.GetUpdateAcceptanceDeadline(termsAndConditionsState.updateAcceptanceDeadline));
 
     outTermsAndConditionsState = termsAndConditionsState;
     return CHIP_NO_ERROR;
@@ -139,22 +136,23 @@ void NotifyTermsAndConditionsAttributeChangeIfRequired(const TermsAndConditionsS
 }
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 
-void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t /* arg */)
+void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t self_ptr_arg)
 {
     if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
     {
+        auto self = reinterpret_cast<GeneralCommissioningCluster *>(self_ptr_arg);
+
         // Spec says to reset Breadcrumb attribute to 0.
-        GeneralCommissioningCluster::Instance().SetBreadCrumb(0);
+        self->SetBreadCrumb(0);
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         if (event->FailSafeTimerExpired.updateTermsAndConditionsHasBeenInvoked)
         {
             // Clear terms and conditions acceptance on failsafe timer expiration
-            TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
+            TermsAndConditionsProvider & tcProvider = self->ClusterContext().termsAndConditionsProvider;
             TermsAndConditionsState initialState, updatedState;
-            VerifyOrReturn(nullptr != tcProvider);
             VerifyOrReturn(CHIP_NO_ERROR == GetTermsAndConditionsAttributeState(tcProvider, initialState));
-            VerifyOrReturn(CHIP_NO_ERROR == tcProvider->RevertAcceptance());
+            VerifyOrReturn(CHIP_NO_ERROR == tcProvider.RevertAcceptance());
             VerifyOrReturn(CHIP_NO_ERROR == GetTermsAndConditionsAttributeState(tcProvider, updatedState));
             NotifyTermsAndConditionsAttributeChangeIfRequired(initialState, updatedState);
         }
@@ -162,15 +160,9 @@ void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t
     }
 }
 
-GeneralCommissioningCluster gInstance;
 } // anonymous namespace
 
 namespace chip::app::Clusters {
-
-GeneralCommissioningCluster & GeneralCommissioningCluster::Instance()
-{
-    return gInstance;
-}
 
 DataModel::ActionReturnStatus GeneralCommissioningCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                          AttributeValueEncoder & encoder)
@@ -197,61 +189,44 @@ DataModel::ActionReturnStatus GeneralCommissioningCluster::ReadAttribute(const D
         return encoder.Encode(info);
     }
     case RegulatoryConfig::Id:
-        return ReadIfSupported(&ConfigurationManager::GetRegulatoryLocation, encoder);
+        return ReadIfSupported(mClusterContext.configurationManager, &ConfigurationManager::GetRegulatoryLocation, encoder);
     case LocationCapability::Id:
-        return ReadIfSupported(&ConfigurationManager::GetLocationCapability, encoder);
+        return ReadIfSupported(mClusterContext.configurationManager, &ConfigurationManager::GetLocationCapability, encoder);
     case SupportsConcurrentConnection::Id:
         return encoder.Encode(CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION != 0);
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     case TCAcceptedVersion::Id: {
-        TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
         Optional<TermsAndConditions> outTermsAndConditions;
-
-        VerifyOrReturnError(nullptr != tcProvider, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-        ReturnErrorOnFailure(tcProvider->GetAcceptance(outTermsAndConditions));
-
+        ReturnErrorOnFailure(mClusterContext.termsAndConditionsProvider.GetAcceptance(outTermsAndConditions));
         return encoder.Encode(outTermsAndConditions.ValueOr(TermsAndConditions(0, 0)).GetVersion());
     }
     case TCMinRequiredVersion::Id: {
-        TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
         Optional<TermsAndConditions> outTermsAndConditions;
 
-        VerifyOrReturnError(nullptr != tcProvider, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-        ReturnErrorOnFailure(tcProvider->GetRequirements(outTermsAndConditions));
-
+        ReturnErrorOnFailure(mClusterContext.termsAndConditionsProvider.GetRequirements(outTermsAndConditions));
         return encoder.Encode(outTermsAndConditions.ValueOr(TermsAndConditions(0, 0)).GetVersion());
     }
     case TCAcknowledgements::Id: {
-        TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
         Optional<TermsAndConditions> outTermsAndConditions;
 
-        VerifyOrReturnError(nullptr != tcProvider, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-        ReturnErrorOnFailure(tcProvider->GetAcceptance(outTermsAndConditions));
-
+        ReturnErrorOnFailure(mClusterContext.termsAndConditionsProvider.GetAcceptance(outTermsAndConditions));
         return encoder.Encode(outTermsAndConditions.ValueOr(TermsAndConditions(0, 0)).GetValue());
     }
     case TCAcknowledgementsRequired::Id: {
-        TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
         bool acknowledgementsRequired;
-
-        VerifyOrReturnError(nullptr != tcProvider, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-        ReturnErrorOnFailure(tcProvider->GetAcknowledgementsRequired(acknowledgementsRequired));
-
+        ReturnErrorOnFailure(mClusterContext.termsAndConditionsProvider.GetAcknowledgementsRequired(acknowledgementsRequired));
         return encoder.Encode(acknowledgementsRequired);
     }
     case TCUpdateDeadline::Id: {
-        TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
         Optional<uint32_t> outUpdateAcceptanceDeadline;
+        ReturnErrorOnFailure(mClusterContext.termsAndConditionsProvider.GetUpdateAcceptanceDeadline(outUpdateAcceptanceDeadline));
 
-        VerifyOrReturnError(nullptr != tcProvider, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-        ReturnErrorOnFailure(tcProvider->GetUpdateAcceptanceDeadline(outUpdateAcceptanceDeadline));
-
+        // NOTE: encoding an optional as a Nullable (they are not fully compatible)
         if (!outUpdateAcceptanceDeadline.HasValue())
         {
             return encoder.EncodeNull();
         }
-
         return encoder.Encode(outUpdateAcceptanceDeadline.Value());
     }
 #endif
@@ -384,16 +359,15 @@ void GeneralCommissioningCluster::OnFabricRemoved(const FabricTable & fabricTabl
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     // If the FabricIndex matches the last remaining entry in the Fabrics list, then the device SHALL delete all Matter
     // related data on the node which was created since it was commissioned.
-    if (Server::GetInstance().GetFabricTable().FabricCount() == 0)
+    if (fabricTable.FabricCount() == 0)
     {
         ChipLogProgress(Zcl, "general-commissioning-server: Last Fabric index 0x%x was removed",
                         static_cast<unsigned>(fabricIndex));
 
-        TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
+        TermsAndConditionsProvider & tcProvider = mClusterContext.termsAndConditionsProvider;
         TermsAndConditionsState initialState, updatedState;
-        VerifyOrReturn(nullptr != tcProvider);
         VerifyOrReturn(CHIP_NO_ERROR == GetTermsAndConditionsAttributeState(tcProvider, initialState));
-        VerifyOrReturn(CHIP_NO_ERROR == tcProvider->ResetAcceptance());
+        VerifyOrReturn(CHIP_NO_ERROR == tcProvider.ResetAcceptance());
         VerifyOrReturn(CHIP_NO_ERROR == GetTermsAndConditionsAttributeState(tcProvider, updatedState));
         NotifyTermsAndConditionsAttributeChangeIfRequired(initialState, updatedState);
     }
@@ -410,15 +384,14 @@ void GeneralCommissioningCluster::SetBreadCrumb(uint64_t value)
 CHIP_ERROR GeneralCommissioningCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-    PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler, 0);
-    Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
-    return CHIP_NO_ERROR;
+    ReturnErrorOnFailure(mClusterContext.platformManager.AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
+    return mClusterContext.fabricTable.AddFabricDelegate(this);
 }
 
 void GeneralCommissioningCluster::Shutdown()
 {
-    PlatformMgrImpl().RemoveEventHandler(OnPlatformEventHandler, 0);
-    Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
+    mClusterContext.platformManager.RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
+    mClusterContext.fabricTable.RemoveFabricDelegate(this);
     DefaultServerCluster::Shutdown();
 }
 
@@ -427,7 +400,7 @@ GeneralCommissioningCluster::HandleArmFailSafe(const DataModel::InvokeRequest & 
                                                const GeneralCommissioning::Commands::ArmFailSafe::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("ArmFailSafe", "GeneralCommissioning");
-    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
+    auto & failSafeContext = mClusterContext.failsafeContext;
     Commands::ArmFailSafeResponse::Type response;
 
     ChipLogProgress(FailSafe, "GeneralCommissioning: Received ArmFailSafe (%us)",
@@ -448,8 +421,7 @@ GeneralCommissioningCluster::HandleArmFailSafe(const DataModel::InvokeRequest & 
     {
         // We do not allow CASE connections to arm the failsafe for the first time while the commissioning window is open in order
         // to allow commissioners the opportunity to obtain this failsafe for the purpose of commissioning
-        if (!failSafeContext.IsFailSafeArmed() &&
-            Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen() &&
+        if (!failSafeContext.IsFailSafeArmed() && mClusterContext.commissioningWindowManager.IsCommissioningWindowOpen() &&
             request.subjectDescriptor->authMode == Access::AuthMode::kCase)
         {
             response.errorCode = CommissioningErrorEnum::kBusyWithOtherAdmin;
@@ -485,9 +457,7 @@ GeneralCommissioningCluster::HandleCommissioningComplete(const DataModel::Invoke
 {
     MATTER_TRACE_SCOPE("CommissioningComplete", "GeneralCommissioning");
 
-    DeviceControlServer * devCtrl = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
-    auto & failSafe               = Server::GetInstance().GetFailSafeContext();
-    auto & fabricTable            = Server::GetInstance().GetFabricTable();
+    auto & failSafe = mClusterContext.failsafeContext;
 
     ChipLogProgress(FailSafe, "GeneralCommissioning: Received CommissioningComplete");
 
@@ -503,59 +473,56 @@ GeneralCommissioningCluster::HandleCommissioningComplete(const DataModel::Invoke
     }
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-    TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
+    TermsAndConditionsProvider & tcProvider = mClusterContext.termsAndConditionsProvider;
 
     // Ensure required terms and conditions have been accepted, then attempt to commit
-    if (nullptr != tcProvider)
+    Optional<TermsAndConditions> requiredTermsAndConditionsMaybe;
+    Optional<TermsAndConditions> acceptedTermsAndConditionsMaybe;
+
+    CheckSuccess(tcProvider.GetRequirements(requiredTermsAndConditionsMaybe), Failure);
+    CheckSuccess(tcProvider.GetAcceptance(acceptedTermsAndConditionsMaybe), Failure);
+
+    if (requiredTermsAndConditionsMaybe.HasValue() && !acceptedTermsAndConditionsMaybe.HasValue())
     {
-        Optional<TermsAndConditions> requiredTermsAndConditionsMaybe;
-        Optional<TermsAndConditions> acceptedTermsAndConditionsMaybe;
+        response.errorCode = CommissioningErrorEnum::kTCAcknowledgementsNotReceived;
+        handler->AddResponse(request.path, response);
+        return std::nullopt;
+    }
 
-        CheckSuccess(tcProvider->GetRequirements(requiredTermsAndConditionsMaybe), Failure);
-        CheckSuccess(tcProvider->GetAcceptance(acceptedTermsAndConditionsMaybe), Failure);
+    if (requiredTermsAndConditionsMaybe.HasValue() && acceptedTermsAndConditionsMaybe.HasValue())
+    {
+        TermsAndConditions requiredTermsAndConditions = requiredTermsAndConditionsMaybe.Value();
+        TermsAndConditions acceptedTermsAndConditions = acceptedTermsAndConditionsMaybe.Value();
 
-        if (requiredTermsAndConditionsMaybe.HasValue() && !acceptedTermsAndConditionsMaybe.HasValue())
+        if (!requiredTermsAndConditions.ValidateVersion(acceptedTermsAndConditions))
         {
-            response.errorCode = CommissioningErrorEnum::kTCAcknowledgementsNotReceived;
+            response.errorCode = CommissioningErrorEnum::kTCMinVersionNotMet;
             handler->AddResponse(request.path, response);
             return std::nullopt;
         }
 
-        if (requiredTermsAndConditionsMaybe.HasValue() && acceptedTermsAndConditionsMaybe.HasValue())
+        if (!requiredTermsAndConditions.ValidateValue(acceptedTermsAndConditions))
         {
-            TermsAndConditions requiredTermsAndConditions = requiredTermsAndConditionsMaybe.Value();
-            TermsAndConditions acceptedTermsAndConditions = acceptedTermsAndConditionsMaybe.Value();
-
-            if (!requiredTermsAndConditions.ValidateVersion(acceptedTermsAndConditions))
-            {
-                response.errorCode = CommissioningErrorEnum::kTCMinVersionNotMet;
-                handler->AddResponse(request.path, response);
-                return std::nullopt;
-            }
-
-            if (!requiredTermsAndConditions.ValidateValue(acceptedTermsAndConditions))
-            {
-                response.errorCode = CommissioningErrorEnum::kRequiredTCNotAccepted;
-                handler->AddResponse(request.path, response);
-                return std::nullopt;
-            }
+            response.errorCode = CommissioningErrorEnum::kRequiredTCNotAccepted;
+            handler->AddResponse(request.path, response);
+            return std::nullopt;
         }
+    }
 
-        if (failSafe.UpdateTermsAndConditionsHasBeenInvoked())
+    if (failSafe.UpdateTermsAndConditionsHasBeenInvoked())
+    {
+        // Commit terms and conditions acceptance on commissioning complete
+        err = tcProvider.CommitAcceptance();
+        if (err != CHIP_NO_ERROR)
         {
-            // Commit terms and conditions acceptance on commissioning complete
-            err = tcProvider->CommitAcceptance();
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(FailSafe, "GeneralCommissioning: Failed to commit terms and conditions: %" CHIP_ERROR_FORMAT,
-                             err.Format());
-            }
-            else
-            {
-                ChipLogProgress(FailSafe, "GeneralCommissioning: Successfully committed terms and conditions");
-            }
-            CheckSuccess(err, Failure);
+            ChipLogError(FailSafe, "GeneralCommissioning: Failed to commit terms and conditions: %" CHIP_ERROR_FORMAT,
+                         err.Format());
         }
+        else
+        {
+            ChipLogProgress(FailSafe, "GeneralCommissioning: Successfully committed terms and conditions");
+        }
+        CheckSuccess(err, Failure);
     }
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 
@@ -575,7 +542,7 @@ GeneralCommissioningCluster::HandleCommissioningComplete(const DataModel::Invoke
     // Handle NOC commands
     if (failSafe.NocCommandHasBeenInvoked())
     {
-        err = fabricTable.CommitPendingFabricData();
+        err = mClusterContext.fabricTable.CommitPendingFabricData();
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(FailSafe, "GeneralCommissioning: Failed to commit pending fabric data: %" CHIP_ERROR_FORMAT, err.Format());
@@ -590,7 +557,8 @@ GeneralCommissioningCluster::HandleCommissioningComplete(const DataModel::Invoke
 
     // Disarm the fail-safe and notify the DeviceControlServer
     failSafe.DisarmFailSafe();
-    err = devCtrl->PostCommissioningCompleteEvent(handle->AsSecureSession()->GetPeerNodeId(), handle->GetFabricIndex());
+    err = mClusterContext.deviceControlServer.PostCommissioningCompleteEvent(handle->AsSecureSession()->GetPeerNodeId(),
+                                                                             handle->GetFabricIndex());
     CheckSuccess(err, Failure);
 
     SetBreadCrumb(0);
@@ -604,7 +572,6 @@ GeneralCommissioningCluster::HandleSetRegulatoryConfig(const DataModel::InvokeRe
                                                        const Commands::SetRegulatoryConfig::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("SetRegulatoryConfig", "GeneralCommissioning");
-    DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
     Commands::SetRegulatoryConfigResponse::Type response;
     auto & countryCode = commandData.countryCode;
 
@@ -622,7 +589,7 @@ GeneralCommissioningCluster::HandleSetRegulatoryConfig(const DataModel::InvokeRe
     }
 
     uint8_t locationCapability;
-    if (ConfigurationMgr().GetLocationCapability(locationCapability) != CHIP_NO_ERROR)
+    if (mClusterContext.configurationManager.GetLocationCapability(locationCapability) != CHIP_NO_ERROR)
     {
         return Protocols::InteractionModel::Status::Failure;
     }
@@ -638,7 +605,7 @@ GeneralCommissioningCluster::HandleSetRegulatoryConfig(const DataModel::InvokeRe
         return std::nullopt;
     }
 
-    CheckSuccess(server->SetRegulatoryConfig(location, countryCode), Failure);
+    CheckSuccess(mClusterContext.deviceControlServer.SetRegulatoryConfig(location, countryCode), Failure);
     SetBreadCrumb(commandData.breadcrumb);
     response.errorCode = CommissioningErrorEnum::kOk;
     handler->AddResponse(request.path, response);
@@ -652,18 +619,13 @@ GeneralCommissioningCluster::HandleSetTCAcknowledgements(const DataModel::Invoke
 {
     MATTER_TRACE_SCOPE("SetTCAcknowledgements", "GeneralCommissioning");
 
-    auto & failSafeContext                  = Server::GetInstance().GetFailSafeContext();
-    TermsAndConditionsProvider * tcProvider = TermsAndConditionsManager::GetInstance();
-
-    if (nullptr == tcProvider)
-    {
-        return Protocols::InteractionModel::Status::Failure;
-    }
+    auto & failSafeContext                  = mClusterContext.failsafeContext;
+    TermsAndConditionsProvider & tcProvider = mClusterContext.termsAndConditionsProvider;
 
     Optional<TermsAndConditions> requiredTermsAndConditionsMaybe;
     Optional<TermsAndConditions> previousAcceptedTermsAndConditionsMaybe;
-    CheckSuccess(tcProvider->GetRequirements(requiredTermsAndConditionsMaybe), Failure);
-    CheckSuccess(tcProvider->GetAcceptance(previousAcceptedTermsAndConditionsMaybe), Failure);
+    CheckSuccess(tcProvider.GetRequirements(requiredTermsAndConditionsMaybe), Failure);
+    CheckSuccess(tcProvider.GetAcceptance(previousAcceptedTermsAndConditionsMaybe), Failure);
     TermsAndConditions acceptedTermsAndConditions = TermsAndConditions(commandData.TCUserResponse, commandData.TCVersion);
     Optional<TermsAndConditions> acceptedTermsAndConditionsPresent = Optional<TermsAndConditions>(acceptedTermsAndConditions);
 
@@ -692,14 +654,14 @@ GeneralCommissioningCluster::HandleSetTCAcknowledgements(const DataModel::Invoke
     {
         TermsAndConditionsState initialState, updatedState;
         CheckSuccess(GetTermsAndConditionsAttributeState(tcProvider, initialState), Failure);
-        CheckSuccess(tcProvider->SetAcceptance(acceptedTermsAndConditionsPresent), Failure);
+        CheckSuccess(tcProvider.SetAcceptance(acceptedTermsAndConditionsPresent), Failure);
         CheckSuccess(GetTermsAndConditionsAttributeState(tcProvider, updatedState), Failure);
         NotifyTermsAndConditionsAttributeChangeIfRequired(initialState, updatedState);
 
         // Commit or defer based on fail-safe state
         if (!failSafeContext.IsFailSafeArmed())
         {
-            CheckSuccess(tcProvider->CommitAcceptance(), Failure);
+            CheckSuccess(tcProvider.CommitAcceptance(), Failure);
         }
         else
         {

@@ -167,7 +167,7 @@ void SessionManager::Shutdown()
  */
 void SessionManager::FabricRemoved(FabricIndex fabricIndex)
 {
-    gGroupPeerTable->FabricRemoved(fabricIndex);
+    TEMPORARY_RETURN_IGNORED gGroupPeerTable->FabricRemoved(fabricIndex);
 }
 
 CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, PayloadHeader & payloadHeader,
@@ -211,7 +211,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
 
         packetHeader.SetDestinationGroupId(groupSession->GetGroupId());
         packetHeader.SetMessageCounter(mGroupClientCounter.GetCounter(isControlMsg));
-        mGroupClientCounter.IncrementCounter(isControlMsg);
+        TEMPORARY_RETURN_IGNORED mGroupClientCounter.IncrementCounter(isControlMsg);
         packetHeader.SetSessionType(Header::SessionType::kGroupSession);
         sourceNodeId = fabric->GetNodeId();
         packetHeader.SetSourceNodeId(sourceNodeId);
@@ -238,7 +238,8 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         CHIP_TRACE_MESSAGE_SENT(payloadHeader, packetHeader, destination_address, message->Start(), message->TotalLength());
 
         CryptoContext::NonceStorage nonce;
-        CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), packetHeader.GetMessageCounter(), sourceNodeId);
+        ReturnErrorOnFailure(
+            CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), packetHeader.GetMessageCounter(), sourceNodeId));
         CHIP_ERROR err = SecureMessageCodec::Encrypt(cryptoContext, nonce, payloadHeader, packetHeader, message);
         keyContext->Release();
         ReturnErrorOnFailure(err);
@@ -277,7 +278,7 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
 
         CryptoContext::NonceStorage nonce;
         sourceNodeId = session->GetLocalScopedNodeId().GetNodeId();
-        CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), messageCounter, sourceNodeId);
+        ReturnErrorOnFailure(CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), messageCounter, sourceNodeId));
 
         ReturnErrorOnFailure(SecureMessageCodec::Encrypt(cryptoContext, nonce, payloadHeader, packetHeader, message));
 
@@ -454,10 +455,10 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
 
         while (interfaceIt.Next())
         {
-            char name[Inet::InterfaceId::kMaxIfNameLength];
-            interfaceIt.GetInterfaceName(name, Inet::InterfaceId::kMaxIfNameLength);
             if (interfaceIt.SupportsMulticast() && interfaceIt.IsUp())
             {
+                char name[Inet::InterfaceId::kMaxIfNameLength];
+                TEMPORARY_RETURN_IGNORED interfaceIt.GetInterfaceName(name, Inet::InterfaceId::kMaxIfNameLength);
                 interfaceId = interfaceIt.GetInterfaceId();
                 if (CHIP_NO_ERROR == interfaceId.GetLinkLocalAddr(&addr))
                 {
@@ -946,10 +947,11 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
     CryptoContext::NonceStorage nonce;
     // PASE Sessions use the undefined node ID of all zeroes, since there is no node ID to use
     // and the key is short-lived and always different for each PASE session.
-    CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), packetHeader.GetMessageCounter(),
-                              secureSession->GetSecureSessionType() == SecureSession::Type::kCASE ? secureSession->GetPeerNodeId()
-                                                                                                  : kUndefinedNodeId);
-    if (SecureMessageCodec::Decrypt(secureSession->GetCryptoContext(), nonce, payloadHeader, packetHeader, msg) != CHIP_NO_ERROR)
+    CHIP_ERROR nonceResult = CryptoContext::BuildNonce(
+        nonce, packetHeader.GetSecurityFlags(), packetHeader.GetMessageCounter(),
+        secureSession->GetSecureSessionType() == SecureSession::Type::kCASE ? secureSession->GetPeerNodeId() : kUndefinedNodeId);
+    if ((nonceResult != CHIP_NO_ERROR) ||
+        SecureMessageCodec::Decrypt(secureSession->GetCryptoContext(), nonce, payloadHeader, packetHeader, msg) != CHIP_NO_ERROR)
     {
         ChipLogError(Inet, "Secure transport received message, but failed to decode/authenticate it, discarding");
         return;
@@ -1056,9 +1058,11 @@ static bool GroupKeyDecryptAttempt(const PacketHeader & partialPacketHeader, Pac
     }
 
     CryptoContext::NonceStorage nonce;
-    CryptoContext::BuildNonce(nonce, packetHeaderCopy.GetSecurityFlags(), packetHeaderCopy.GetMessageCounter(),
-                              packetHeaderCopy.GetSourceNodeId().Value());
-    decrypted = (CHIP_NO_ERROR == SecureMessageCodec::Decrypt(context, nonce, payloadHeader, packetHeaderCopy, msgCopy));
+    CHIP_ERROR nonceResult =
+        CryptoContext::BuildNonce(nonce, packetHeaderCopy.GetSecurityFlags(), packetHeaderCopy.GetMessageCounter(),
+                                  packetHeaderCopy.GetSourceNodeId().Value());
+    decrypted = (nonceResult == CHIP_NO_ERROR) &&
+        (CHIP_NO_ERROR == SecureMessageCodec::Decrypt(context, nonce, payloadHeader, packetHeaderCopy, msgCopy));
 
     return decrypted;
 }

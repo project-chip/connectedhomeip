@@ -101,6 +101,15 @@ CHIP_ERROR NXPWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChange
     return err;
 }
 
+CHIP_ERROR NXPWiFiDriver::ConnectWiFiStagedNetwork()
+{
+    // no needed to connect to the staged network if commissioning failed
+    VerifyOrReturnError(mSavedNetwork.ssidLen != 0, CHIP_ERROR_KEY_NOT_FOUND);
+
+    // Connect to saved network
+    return ConnectWiFiNetwork(mSavedNetwork.ssid, mSavedNetwork.ssidLen, mSavedNetwork.credentials, mSavedNetwork.credentialsLen);
+}
+
 void NXPWiFiDriver::Shutdown()
 {
     mpStatusChangeCallback = nullptr;
@@ -120,18 +129,30 @@ CHIP_ERROR NXPWiFiDriver::RevertConfiguration()
 {
     struct wlan_network searchedNetwork = { 0 };
 
-    /* If network was added we have to remove it (as the connection failed) from wifi driver to be able
-    to connect to another network next commissioning */
-    if (wlan_get_network_byname(mStagingNetwork.ssid, &searchedNetwork) == WM_SUCCESS)
+    /* If network was added we have to remove it (only if device is not connected to a wifi network) from wifi driver to be able
+    to connect to another network next commissioning.
+    Do not remove the network if the device is already connected to a WiFi network,
+    example scenario: TC-CNET-4.9
+    */
+    if (!is_sta_connected() && wlan_get_network_byname(mStagingNetwork.ssid, &searchedNetwork) == WM_SUCCESS)
     {
         if (wlan_remove_network(mStagingNetwork.ssid) != WM_SUCCESS)
         {
             return CHIP_ERROR_INTERNAL;
         }
     }
+
+    /* Reset mStagingNetwork as it may have been updated during add/update network operation */
     mStagingNetwork = mSavedNetwork;
 
-    return CHIP_NO_ERROR;
+    // succeed right away if we are already connected
+    VerifyOrReturnError(!is_sta_connected(), CHIP_NO_ERROR);
+
+    // succeed right away if no saved network
+    VerifyOrReturnError(mStagingNetwork.ssidLen > 0, CHIP_NO_ERROR);
+    // Connect to saved network
+    return ConnectWiFiNetwork(mStagingNetwork.ssid, mStagingNetwork.ssidLen, mStagingNetwork.credentials,
+                              mStagingNetwork.credentialsLen);
 }
 
 bool NXPWiFiDriver::NetworkMatch(const WiFiNetwork & network, ByteSpan networkId)
@@ -212,13 +233,39 @@ void NXPWiFiDriver::OnConnectWiFiNetwork(Status commissioningError, CharSpan deb
     /* Commit wifi network credentials in flash only if the connection succeeded */
     if (commissioningError == NetworkCommissioning::Status::kSuccess)
     {
-        CommitConfiguration();
+        TEMPORARY_RETURN_IGNORED CommitConfiguration();
     }
 
     if (mpConnectCallback != nullptr)
     {
         mpConnectCallback->OnResult(commissioningError, debugText, connectStatus);
         mpConnectCallback = nullptr;
+    }
+}
+
+void NXPWiFiDriver::OnNetworkStatusChange()
+{
+    ChipLogProgress(NetworkProvisioning, "NXPWiFiDriver::OnNetworkStatusChange\r\n");
+    Network configuredNetwork;
+
+    VerifyOrReturn(mpStatusChangeCallback != nullptr);
+    CHIP_ERROR err = GetConnectedNetwork(configuredNetwork);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to get configured network when updating network status: %s", err.AsString());
+        return;
+    }
+
+    if (configuredNetwork.networkIDLen)
+    {
+        mpStatusChangeCallback->OnNetworkingStatusChange(
+            Status::kSuccess, MakeOptional(ByteSpan(configuredNetwork.networkID, configuredNetwork.networkIDLen)), NullOptional);
+    }
+    else
+    {
+        mpStatusChangeCallback->OnNetworkingStatusChange(
+            Status::kUnknownError, MakeOptional(ByteSpan(configuredNetwork.networkID, configuredNetwork.networkIDLen)),
+            NullOptional);
     }
 }
 
@@ -430,7 +477,7 @@ uint32_t NXPWiFiDriver::GetSupportedWiFiBandsMask() const
     return bands;
 }
 
-static CHIP_ERROR GetConnectedNetwork(Network & network)
+CHIP_ERROR NXPWiFiDriver::GetConnectedNetwork(Network & network)
 {
     struct wlan_network wlan_network;
     int result;
@@ -472,7 +519,7 @@ bool NXPWiFiDriver::WiFiNetworkIterator::Next(Network & item)
     mExhausted        = true;
 
     Network connectedNetwork;
-    CHIP_ERROR err = GetConnectedNetwork(connectedNetwork);
+    CHIP_ERROR err = mDriver->GetConnectedNetwork(connectedNetwork);
 
     if (err == CHIP_NO_ERROR)
     {

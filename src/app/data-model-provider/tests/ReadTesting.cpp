@@ -41,7 +41,7 @@ CHIP_ERROR DecodeAttributeReportIBs(ByteSpan data, std::vector<DecodedAttributeD
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     TLV::TLVType outer1;
-    reportIBsReader.EnterContainer(outer1);
+    TEMPORARY_RETURN_IGNORED reportIBsReader.EnterContainer(outer1);
 
     ReturnErrorOnFailure(reportIBsReader.Next());
     if (reportIBsReader.GetType() != TLV::TLVType::kTLVType_Array)
@@ -50,7 +50,7 @@ CHIP_ERROR DecodeAttributeReportIBs(ByteSpan data, std::vector<DecodedAttributeD
     }
 
     TLV::TLVType outer2;
-    reportIBsReader.EnterContainer(outer2);
+    TEMPORARY_RETURN_IGNORED reportIBsReader.EnterContainer(outer2);
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     while (CHIP_NO_ERROR == (err = reportIBsReader.Next()))

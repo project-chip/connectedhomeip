@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 app_config_dependent_sources = [
+  "ResourceMonitoringCluster.cpp",
   "replacement-product-list-manager.h",
   "resource-monitoring-cluster-objects.cpp",
   "resource-monitoring-cluster-objects.h",
-  "resource-monitoring-server.cpp",
   "resource-monitoring-server.h",
 ]

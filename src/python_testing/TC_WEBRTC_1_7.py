@@ -106,11 +106,15 @@ class TC_WEBRTC_1_7(MatterBaseTest, WebRTCTestHelper):
     def default_timeout(self) -> int:
         return 4 * 60  # 4 minutes
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_WEBRTC_1_7(self):
         self.step("precondition-1")
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         webrtc_manager = WebRTCManager(event_loop=self.event_loop)
         webrtc_peer: LibdatachannelPeerConnection = webrtc_manager.create_peer(
             node_id=self.dut_node_id, fabric_index=self.default_controller.GetFabricIndexInternal(), endpoint=endpoint
@@ -266,7 +270,7 @@ async def webrtc_create_test_harness_controller(self):
     self.th1 = self.default_controller
     self.discriminator = random.randint(0, 4095)
     params = await self.th1.OpenCommissioningWindow(
-        nodeid=self.dut_node_id, timeout=900, iteration=10000, discriminator=self.discriminator, option=1)
+        nodeId=self.dut_node_id, timeout=900, iteration=10000, discriminator=self.discriminator, option=1)
 
     th2_certificate_authority = (
         self.certificate_authority_manager.NewCertificateAuthority()

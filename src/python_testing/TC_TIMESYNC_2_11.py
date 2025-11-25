@@ -35,8 +35,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import queue
-import time
 import typing
 from datetime import datetime, timedelta, timezone
 
@@ -119,7 +119,7 @@ class TC_TIMESYNC_2_11(MatterBaseTest):
         event = time_cluster.Events.DSTStatus
         cb = EventSubscriptionHandler(expected_cluster_id=event.cluster_id, expected_event_id=event.event_id)
         urgent = 1
-        subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=[(self.endpoint, event, urgent)], reportInterval=[1, 3])
+        subscription = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=[(self.endpoint, event, urgent)], reportInterval=[1, 3])
         subscription.SetEventUpdateCallback(callback=cb)
 
         self.print_step(4, "TH reads the DSTOffsetListMaxSize")
@@ -150,7 +150,7 @@ class TC_TIMESYNC_2_11(MatterBaseTest):
 
         self.print_step(9, "If dst_list_size > 1, TH waits until th_utc + 15s")
         if dst_list_size > 1:
-            time.sleep(get_wait_seconds_from_set_time(th_utc, 15))
+            await asyncio.sleep(get_wait_seconds_from_set_time(th_utc, 15))
 
         self.print_step(10, "If dst_list_size > 1, TH reads LocalTime")
         if dst_list_size > 1:
@@ -162,7 +162,7 @@ class TC_TIMESYNC_2_11(MatterBaseTest):
 
         self.print_step(12, "If dst_list_size > 1, TH waits until th_utc + 30s")
         if dst_list_size > 1:
-            time.sleep(get_wait_seconds_from_set_time(th_utc, 30))
+            await asyncio.sleep(get_wait_seconds_from_set_time(th_utc, 30))
 
         self.print_step(13, "If dst_list_size > 1, TH reads LocalTime")
         if dst_list_size > 1:

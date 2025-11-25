@@ -42,6 +42,9 @@ class TC_ACL_2_2(MatterBaseTest):
     def desc_TC_ACL_2_2(self) -> str:
         return "[TC-ACL-2.2] Cluster endpoint"
 
+    def pics_TC_ACL_2_2(self) -> list[str]:
+        return ['ACL.S']
+
     def steps_TC_ACL_2_2(self) -> list[TestStep]:
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
@@ -54,7 +57,7 @@ class TC_ACL_2_2(MatterBaseTest):
     async def test_TC_ACL_2_2(self):
         self.step(1)
         self.step(2)
-        data = await self.default_controller.ReadAttribute(nodeid=self.dut_node_id, attributes=[(Clusters.Descriptor.Attributes.ServerList)])
+        data = await self.default_controller.ReadAttribute(nodeId=self.dut_node_id, attributes=[(Clusters.Descriptor.Attributes.ServerList)])
         asserts.assert_true(Clusters.AccessControl.id in data[0][Clusters.Descriptor]
                             [Clusters.Descriptor.Attributes.ServerList], "ACL cluster not on EP0")
         self.step(3)

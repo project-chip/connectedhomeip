@@ -390,7 +390,7 @@ void emberAfCameraAvStreamManagementClusterInitCallback(EndpointId endpoint)
         sensorParams, nightVisionUsesInfrared, minViewport, rateDistortionTradeOffPoints, maxContentBufferSize, micCapabilities,
         spkrCapabilities, twowayTalkSupport, snapshotCapabilities, maxNetworkBandwidth, supportedStreamUsages,
         streamUsagePriorities);
-    sCameraAVStreamMgmtClusterServerInstance->Init();
+    TEMPORARY_RETURN_IGNORED sCameraAVStreamMgmtClusterServerInstance->Init();
 }
 
 void emberAfCameraAvStreamManagementClusterShutdownCallback(EndpointId endpoint)

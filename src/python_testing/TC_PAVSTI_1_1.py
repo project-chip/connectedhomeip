@@ -198,10 +198,14 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
             ),
         ]
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_PAVSTI_1_1(self):
         PICS_PRIVACY = "AVSM.S.F03"
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         pushavCluster = Clusters.PushAvStreamTransport
         avsmCluster = Clusters.CameraAvStreamManagement
         pushavAttr = Clusters.PushAvStreamTransport.Attributes
@@ -309,7 +313,7 @@ class TC_PAVSTI_1_1(MatterBaseTest, AVSMTestBase, PAVSTIUtils):
         event_callback = EventSubscriptionHandler(expected_cluster=pushavCluster)
         await event_callback.start(self.default_controller,
                                    self.dut_node_id,
-                                   self.get_endpoint(1))
+                                   self.get_endpoint())
 
         self.step(7)
         aConnectionID = (

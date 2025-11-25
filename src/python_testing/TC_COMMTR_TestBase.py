@@ -154,7 +154,7 @@ class CommodityMeteringTestBaseHelper(MatterBaseTest):
 
         try:
             asserts.assert_not_equal(reports[attribute][0].value, saved_value,
-                                     f"""Reported '{attribute_name}' value should be different from saved value. 
+                                     f"""Reported '{attribute_name}' value should be different from saved value.
                                      Subscriptions should only report when values have changed.""")
         except (KeyError, IndexError) as err:
             asserts.fail(f"There are no reports for attribute {attribute_name}:\n{err}")

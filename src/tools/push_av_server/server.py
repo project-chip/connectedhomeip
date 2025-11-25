@@ -751,6 +751,12 @@ class PushAvContext:
                 content={"detail": exc.detail}
             )
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.cleanup()
+
     async def start(self, shutdown_trigger: Optional[Callable[..., Awaitable]] = None):
         """
         Start the PUSH AV server. Note that method do not check if a server is already running.
@@ -791,7 +797,7 @@ if __name__ == "__main__":
         level=logging.DEBUG,
         datefmt="%H:%M:%S",
     )
-    logging.getLogger("hpack").setLevel(logging.WARN)
+    logging.getLogger("hpack").setLevel(logging.WARNING)
 
     parser = argparse.ArgumentParser(
         prog="push_av_tool.py",
@@ -814,16 +820,14 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    ctx = PushAvContext(args.host, args.port, args.working_directory, args.dns, args.server_ip, args.strict_mode)
+    with PushAvContext(args.host, args.port, args.working_directory, args.dns, args.server_ip, args.strict_mode) as ctx:
 
-    shutdown_event = asyncio.Event()
+        shutdown_event = asyncio.Event()
 
-    def _signal_handler():
-        print("SIGINT received. Shutting down web server.")
-        shutdown_event.set()
+        def _signal_handler():
+            print("SIGINT received. Shutting down web server.")
+            shutdown_event.set()
 
-    loop = asyncio.get_event_loop()
-    loop.add_signal_handler(signal.SIGINT, _signal_handler)
-    loop.run_until_complete(ctx.start(shutdown_trigger=shutdown_event.wait))
-
-    ctx.cleanup()
+        with asyncio.Runner() as runner:
+            runner.get_loop().add_signal_handler(signal.SIGINT, _signal_handler)
+            runner.run(ctx.start(shutdown_trigger=shutdown_event.wait))
