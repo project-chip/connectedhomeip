@@ -54,16 +54,23 @@ public:
                                  (to_underlying(Feature::kPassiveInfrared) | to_underlying(Feature::kUltrasonic) |
                                   to_underlying(Feature::kPhysicalContact)));
 
-        // If HoldTime is optional OR if any sensor feature is present, enable the HoldTime logic.
+        // If the optional HoldTime attribute is enabled, enable the HoldTime logic.
         // The delay attributes are required if the corresponding sensor feature is present.
-        if ((optionalAttributeBits & (1 << Attributes::HoldTime::Id)) || hasSensorFeature)
+        if (AttributeSet(optionalAttributeBits).IsSet(Attributes::HoldTime::Id))
         {
-            // Initializes hold time with default limits and default timer delegate. Application can use SetHoldTimeLimits() and
-            // SetHoldTime() later to customize.
+            // Initializes hold time with default limits and timer delegate. The Application can use SetHoldTimeLimits() and
+            // SetHoldTime() later to customize. Initial defaults come from typical values found in real devices on the market.
             constexpr chip::app::Clusters::OccupancySensing::Structs::HoldTimeLimitsStruct::Type kDefaultHoldTimeLimits = {
-                .holdTimeMin = 1, .holdTimeMax = 300, .holdTimeDefault = 10
+                .holdTimeMin = 1, .holdTimeMax = 300, .holdTimeDefault = 30
             };
             config.WithHoldTime(kDefaultHoldTimeLimits.holdTimeDefault, kDefaultHoldTimeLimits, gDefaultTimerDelegate);
+
+            // Show deprecated attributes if enabled in Zap
+            config.WithDeprecatedAttributes(
+                AttributeSet(optionalAttributeBits).IsSet(Attributes::PIROccupiedToUnoccupiedDelay::Id) ||
+                AttributeSet(optionalAttributeBits).IsSet(Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id) ||
+                AttributeSet(optionalAttributeBits).IsSet(Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Id)
+            );
         }
 
         gServers[clusterInstanceIndex].Create(config);

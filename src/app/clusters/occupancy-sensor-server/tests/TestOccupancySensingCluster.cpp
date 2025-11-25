@@ -970,13 +970,6 @@ TEST_F(TestOccupancySensingCluster, TestStartupWithInvalidPersistedHoldTime)
 
     // 3. Verify that the hold time is now the default, not the invalid value.
     EXPECT_EQ(cluster.GetHoldTime(), kDefaultHoldTime);
-
-    // 4. Verify that the corrected value has been written back to persistence.
-    uint16_t storedHoldTime;
-    AttributePersistence persistence(context.AttributePersistenceProvider());
-    EXPECT_TRUE(persistence.LoadNativeEndianValue({ kTestEndpointId, OccupancySensing::Id, Attributes::HoldTime::Id },
-                                                  storedHoldTime, kDefaultHoldTime));
-    EXPECT_EQ(storedHoldTime, kDefaultHoldTime);
 }
 
 TEST_F(TestOccupancySensingCluster, TestHoldTimeMaxIsAtLeast10)

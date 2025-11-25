@@ -23,8 +23,6 @@
 
 namespace chip::app::Clusters {
 
-class OccupancySensingCluster;
-
 class OccupancySensingDelegate
 {
 public:
@@ -57,12 +55,11 @@ public:
         }
 
         Config & WithHoldTime(uint16_t aHoldTime, const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & aHoldTimeLimits,
-                              TimerDelegate & aTimerDelegate)
+                              TimerDelegate & aHoldTimeDelegate)
         {
-            mHasHoldTime    = true;
-            mHoldTime       = aHoldTime;
-            mHoldTimeLimits = aHoldTimeLimits;
-            mTimerDelegate  = &aTimerDelegate;
+            mHoldTime         = aHoldTime;
+            mHoldTimeLimits   = aHoldTimeLimits;
+            mHoldTimeDelegate = &aHoldTimeDelegate;
             return *this;
         }
 
@@ -80,14 +77,12 @@ public:
 
         EndpointId mEndpointId;
         BitMask<OccupancySensing::Feature> mFeatureMap                        = 0;
-        bool mHasHoldTime                                                     = false;
         bool mShowDeprecatedAttributes                                        = true;
-        uint16_t mHoldTime                                                    = 10;
-        OccupancySensing::Structs::HoldTimeLimitsStruct::Type mHoldTimeLimits = { .holdTimeMin     = 1,
-                                                                                  .holdTimeMax     = 300,
-                                                                                  .holdTimeDefault = 10 };
-        TimerDelegate * mTimerDelegate                                        = nullptr;
-        OccupancySensingDelegate * mDelegate                                  = nullptr;
+        uint16_t mHoldTime;
+        OccupancySensing::Structs::HoldTimeLimitsStruct::Type mHoldTimeLimits;
+        // The presence of mHoldTimeDelegate indicates that hold time limits are enforced and hold time functionality is active.
+        TimerDelegate * mHoldTimeDelegate     = nullptr;
+        OccupancySensingDelegate * mDelegate = nullptr;
     };
 
     OccupancySensingCluster(const Config & config);
@@ -113,11 +108,11 @@ public:
 private:
     void DoSetOccupancy(bool occupied);
 
-    TimerDelegate * mTimerDelegate;
+    // The presence of mHoldTimeDelegate indicates that hold time limits are enforced and hold time functionality is active.
+    TimerDelegate * mHoldTimeDelegate;
     OccupancySensingDelegate * mDelegate;
-    BitMask<OccupancySensing::Feature> mFeatureMap;
-    bool mHasHoldTime = false;
-    bool mShowDeprecatedAttributes;
+    const BitMask<OccupancySensing::Feature> mFeatureMap;
+    const bool mShowDeprecatedAttributes;
     uint16_t mHoldTime;
     OccupancySensing::Structs::HoldTimeLimitsStruct::Type mHoldTimeLimits;
     BitMask<OccupancySensing::OccupancyBitmap> mOccupancy = 0;

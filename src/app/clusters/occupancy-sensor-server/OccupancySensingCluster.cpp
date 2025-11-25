@@ -36,14 +36,14 @@ namespace {
 // Mapping table from spec:
 //
 //  | Feature Flag Value    | Value of OccupancySensorTypeBitmap    | Value of OccupancySensorType
-//  | PIR | US | PHY        | ===================================== | ============================
+//  | PHY | US | PIR        | ===================================== | ============================
 //  | 0   | 0  | 0          | PIR ^*^                               | PIR
-//  | 1   | 0  | 0          | PIR                                   | PIR
+//  | 0   | 0  | 1          | PIR                                   | PIR
 //  | 0   | 1  | 0          | Ultrasonic                            | Ultrasonic
-//  | 1   | 1  | 0          | PIR + Ultrasonic                      | PIRAndUltrasonic
-//  | 0   | 0  | 1          | PhysicalContact                       | PhysicalContact
+//  | 0   | 1  | 1          | PIR + Ultrasonic                      | PIRAndUltrasonic
+//  | 1   | 0  | 0          | PhysicalContact                       | PhysicalContact
 //  | 1   | 0  | 1          | PhysicalContact + PIR                 | PIR
-//  | 0   | 1  | 1          | PhysicalContact + Ultrasonic          | Ultrasonic
+//  | 1   | 1  | 0          | PhysicalContact + Ultrasonic          | Ultrasonic
 //  | 1   | 1  | 1          | PhysicalContact + PIR + Ultrasonic    | PIRAndUltrasonic
 
 BitMask<OccupancySensing::OccupancySensorTypeBitmap>
@@ -93,8 +93,8 @@ OccupancySensing::OccupancySensorTypeEnum FeaturesToOccupancySensorType(BitFlags
 } // namespace
 
 OccupancySensingCluster::OccupancySensingCluster(const Config & config) :
-    DefaultServerCluster({ config.mEndpointId, OccupancySensing::Id }), mTimerDelegate(config.mTimerDelegate),
-    mDelegate(config.mDelegate), mFeatureMap(config.mFeatureMap), mHasHoldTime(config.mHasHoldTime),
+    DefaultServerCluster({ config.mEndpointId, OccupancySensing::Id }), mHoldTimeDelegate(config.mHoldTimeDelegate),
+    mDelegate(config.mDelegate), mFeatureMap(config.mFeatureMap),
     mShowDeprecatedAttributes(config.mShowDeprecatedAttributes)
 {
     SetHoldTimeLimits(config.mHoldTimeLimits);
@@ -105,7 +105,7 @@ CHIP_ERROR OccupancySensingCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
-    if (mHasHoldTime)
+    if (mHoldTimeDelegate)
     {
         AttributePersistence persistence(context.attributeStorage);
         uint16_t storedHoldTime;
@@ -113,21 +113,10 @@ CHIP_ERROR OccupancySensingCluster::Startup(ServerClusterContext & context)
         if (persistence.LoadNativeEndianValue({ mPath.mEndpointId, OccupancySensing::Id, Attributes::HoldTime::Id }, storedHoldTime,
                                               mHoldTime))
         {
-            // A value was found in persistence. If it's valid, use it.
-            // If it's not valid, SetHoldTime will return an error. In that case, we'll fall
-            // back to the default and write it back to persistence.
-            if (SetHoldTime(storedHoldTime).IsSuccess())
-            {
-                return CHIP_NO_ERROR;
-            }
+            // A value was found in persistence. If stored value is not valid,
+            // SetHoldTime will return an error and we keep the current mHoldTime.
+            RETURN_SAFELY_IGNORED SetHoldTime(storedHoldTime);
         }
-
-        // No value in persistence (or it was invalid), so store the default value.
-        const uint8_t buffer[] = { static_cast<uint8_t>(mHoldTime), static_cast<uint8_t>(mHoldTime >> 8) };
-        // Ensure the size of mHoldTime is coherent in case of future changes to the width of mHoldTime.
-        static_assert(sizeof(mHoldTime) == sizeof(buffer), "HoldTime size mismatch from previous specification.");
-        RETURN_SAFELY_IGNORED context.attributeStorage.WriteValue(
-            { mPath.mEndpointId, OccupancySensing::Id, Attributes::HoldTime::Id }, ByteSpan(buffer));
     }
     return CHIP_NO_ERROR;
 }
@@ -170,13 +159,13 @@ DataModel::ActionReturnStatus OccupancySensingCluster::WriteAttribute(const Data
     case Attributes::PIROccupiedToUnoccupiedDelay::Id:
     case Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id:
     case Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Id: {
-        if (!mHasHoldTime)
+        if (!mHoldTimeDelegate)
         {
             return Protocols::InteractionModel::Status::UnsupportedAttribute;
         }
         uint16_t newHoldTime;
         ReturnErrorOnFailure(aDecoder.Decode(newHoldTime));
-        return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, SetHoldTime(newHoldTime));
+        return SetHoldTime(newHoldTime);
     }
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
@@ -189,13 +178,13 @@ CHIP_ERROR OccupancySensingCluster::Attributes(const ConcreteClusterPath & clust
     AttributeListBuilder listBuilder(builder);
 
     const AttributeListBuilder::OptionalAttributeEntry optionalAttributes[] = {
-        { mHasHoldTime, Attributes::HoldTime::kMetadataEntry },
-        { mHasHoldTime, Attributes::HoldTimeLimits::kMetadataEntry },
-        { mHasHoldTime && mShowDeprecatedAttributes && mFeatureMap.Has(Feature::kPassiveInfrared),
+        { mHoldTimeDelegate != nullptr, Attributes::HoldTime::kMetadataEntry },
+        { mHoldTimeDelegate != nullptr, Attributes::HoldTimeLimits::kMetadataEntry },
+        { mHoldTimeDelegate != nullptr && mShowDeprecatedAttributes && mFeatureMap.Has(Feature::kPassiveInfrared),
           Attributes::PIROccupiedToUnoccupiedDelay::kMetadataEntry },
-        { mHasHoldTime && mShowDeprecatedAttributes && mFeatureMap.Has(Feature::kUltrasonic),
+        { mHoldTimeDelegate != nullptr && mShowDeprecatedAttributes && mFeatureMap.Has(Feature::kUltrasonic),
           Attributes::UltrasonicOccupiedToUnoccupiedDelay::kMetadataEntry },
-        { mHasHoldTime && mShowDeprecatedAttributes && mFeatureMap.Has(Feature::kPhysicalContact),
+        { mHoldTimeDelegate != nullptr && mShowDeprecatedAttributes && mFeatureMap.Has(Feature::kPhysicalContact),
           Attributes::PhysicalContactOccupiedToUnoccupiedDelay::kMetadataEntry },
     };
 
@@ -204,7 +193,7 @@ CHIP_ERROR OccupancySensingCluster::Attributes(const ConcreteClusterPath & clust
 
 DataModel::ActionReturnStatus OccupancySensingCluster::SetHoldTime(uint16_t holdTime)
 {
-    VerifyOrReturnError(mHasHoldTime, Protocols::InteractionModel::Status::UnsupportedAttribute);
+    VerifyOrReturnError(mHoldTimeDelegate, Protocols::InteractionModel::Status::UnsupportedAttribute);
     VerifyOrReturnError(holdTime >= mHoldTimeLimits.holdTimeMin, Protocols::InteractionModel::Status::ConstraintError);
     VerifyOrReturnError(holdTime <= mHoldTimeLimits.holdTimeMax, Protocols::InteractionModel::Status::ConstraintError);
 
@@ -214,12 +203,13 @@ DataModel::ActionReturnStatus OccupancySensingCluster::SetHoldTime(uint16_t hold
     }
 
     mHoldTime = holdTime;
+    NotifyAttributeChanged(Attributes::HoldTime::Id);
 
     // If a timer is currently active, we need to adjust its duration to reflect the new hold time.
-    if (mTimerDelegate && mTimerDelegate->IsTimerActive(this))
+    if (mHoldTimeDelegate->IsTimerActive(this))
     {
         // Calculate the time that has already elapsed since the timer was started.
-        System::Clock::Timestamp now                = mTimerDelegate->GetCurrentMonotonicTimestamp();
+        System::Clock::Timestamp now                = mHoldTimeDelegate->GetCurrentMonotonicTimestamp();
         System::Clock::Timestamp elapsedTime        = now - mTimerStartedTimestamp;
         System::Clock::Seconds16 newHoldTimeSeconds = System::Clock::Seconds16(mHoldTime);
 
@@ -228,14 +218,14 @@ DataModel::ActionReturnStatus OccupancySensingCluster::SetHoldTime(uint16_t hold
         // set the state to unoccupied.
         if (elapsedTime >= newHoldTimeSeconds)
         {
-            mTimerDelegate->CancelTimer(this);
+            mHoldTimeDelegate->CancelTimer(this);
             DoSetOccupancy(false);
         }
         else
         {
             // Otherwise, restart the timer for the remaining duration.
             System::Clock::Timeout remainingTime = newHoldTimeSeconds - elapsedTime;
-            mTimerDelegate->StartTimer(this, remainingTime);
+            mHoldTimeDelegate->StartTimer(this, remainingTime);
         }
     }
 
@@ -258,17 +248,17 @@ DataModel::ActionReturnStatus OccupancySensingCluster::SetHoldTime(uint16_t hold
 
 void OccupancySensingCluster::SetOccupancy(bool occupied)
 {
-    if (mHasHoldTime && mTimerDelegate)
+    if (mHoldTimeDelegate)
     {
         if (occupied)
         {
-            mTimerDelegate->CancelTimer(this);
+            mHoldTimeDelegate->CancelTimer(this);
             DoSetOccupancy(true);
         }
         else
         {
-            mTimerStartedTimestamp = mTimerDelegate->GetCurrentMonotonicTimestamp();
-            mTimerDelegate->StartTimer(this, System::Clock::Seconds16(mHoldTime));
+            mTimerStartedTimestamp = mHoldTimeDelegate->GetCurrentMonotonicTimestamp();
+            mHoldTimeDelegate->StartTimer(this, System::Clock::Seconds16(mHoldTime));
         }
         return;
     }
@@ -283,15 +273,8 @@ void OccupancySensingCluster::TimerFired()
 
 void OccupancySensingCluster::DoSetOccupancy(bool occupied)
 {
-    BitMask<OccupancySensing::OccupancyBitmap> newOccupancy =
-        occupied ? OccupancySensing::OccupancyBitmap::kOccupied : static_cast<OccupancySensing::OccupancyBitmap>(0);
-
-    if (mOccupancy == newOccupancy)
-    {
-        return;
-    }
-
-    mOccupancy = newOccupancy;
+    VerifyOrReturn(mOccupancy.Has(OccupancySensing::OccupancyBitmap::kOccupied) != occupied);
+    mOccupancy.Set(OccupancySensing::OccupancyBitmap::kOccupied, occupied);
     NotifyAttributeChanged(Attributes::Occupancy::Id);
 
     if (mDelegate)
