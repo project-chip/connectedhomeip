@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "lib/support/CodeUtils.h"
 #include <pw_unit_test/framework.h>
 
 #include <access/Privilege.h>
@@ -37,6 +38,7 @@ using namespace chip::Protocols::InteractionModel;
 constexpr uint32_t kMockRevision   = 123;
 constexpr uint32_t kMockFeatureMap = 0x112233;
 
+/// a basic mock cluster, just supporting one path
 class MockServerCluster : public DefaultServerCluster
 {
 public:
@@ -55,6 +57,35 @@ public:
             return Status::UnsupportedAttribute;
         }
     }
+};
+
+/// A dual path server cluster (just mocks GetPaths, nothing else)
+class MockDualPathServerCluster : public DefaultServerCluster
+{
+public:
+    MockDualPathServerCluster(const ConcreteClusterPath & p1, const ConcreteClusterPath & p2) :
+        DefaultServerCluster(p1), mPaths{ p1, p2 }
+    {}
+
+    // mock GetPaths, to have something
+    Span<const ConcreteClusterPath> GetPaths() const override { return Span(mPaths); }
+
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override
+    {
+        switch (request.path.mAttributeId)
+        {
+        case chip::app::Clusters::Globals::Attributes::ClusterRevision::Id:
+            return encoder.Encode(kMockRevision);
+        case chip::app::Clusters::Globals::Attributes::FeatureMap::Id:
+            return encoder.Encode(kMockFeatureMap);
+        default:
+            return Status::UnsupportedAttribute;
+        }
+    }
+
+private:
+    const ConcreteClusterPath mPaths[2] = {};
 };
 
 class TestableServerClusterExtension : public ServerClusterExtension
@@ -109,8 +140,9 @@ TEST(TestServerClusterExtension, TestGetDataVersion)
 
 TEST(TestServerClusterExtension, TestNotifyAttributeChangedWithContext)
 {
-    const ConcreteClusterPath mockPath = { 1, 2 };
-    MockServerCluster underlying(mockPath);
+    const ConcreteClusterPath mockPath  = { 1, 2 };
+    const ConcreteClusterPath mockPath2 = { 1, 3 };
+    MockDualPathServerCluster underlying(mockPath, mockPath2);
     TestableServerClusterExtension extension(mockPath, underlying);
 
     // Verify that NotifyAttributeChanged does NOT mark dirty when no context is set.
@@ -128,7 +160,8 @@ TEST(TestServerClusterExtension, TestNotifyAttributeChangedWithContext)
 
     DataVersion oldVersion = extension.GetDataVersion(mockPath);
     extension.TestNotifyAttributeChanged(234);
-    ASSERT_NE(extension.GetDataVersion(mockPath), oldVersion);
+    ASSERT_EQ(extension.GetDataVersion(mockPath), oldVersion + 1);
+    ASSERT_EQ(extension.GetDataVersion(mockPath2), oldVersion);
 
     ASSERT_EQ(context.ChangeListener().DirtyList().size(), 1u);
     ASSERT_EQ(context.ChangeListener().DirtyList()[0], AttributePathParams(mockPath.mEndpointId, mockPath.mClusterId, 234));
