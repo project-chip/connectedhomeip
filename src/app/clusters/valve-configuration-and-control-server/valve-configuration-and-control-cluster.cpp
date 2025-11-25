@@ -50,13 +50,13 @@ CHIP_ERROR ValveConfigurationAndControlCluster::Startup(ServerClusterContext & c
     // The RemainingDuration attribute shall be reported when:
     // - It changes from Null or  vice versa (default handling for QuieterReportingAttribute)
     // - It changes to 0
-    // - It increases. 
+    // - It increases.
     mRemainingDuration.policy().Set(QuieterReportingPolicyEnum::kMarkDirtyOnChangeToFromZero).Set(QuieterReportingPolicyEnum::kMarkDirtyOnIncrement);
 
     // Try to get the stored value for the DefaultOpenDuration attribute.
     MutableByteSpan defaultOpenDurationBytes(reinterpret_cast<uint8_t *>(&mDefaultOpenDuration), sizeof(mDefaultOpenDuration));
     const DataModel::Nullable<uint32_t> defaultOpenDuration = mDefaultOpenDuration;
-    if(context.attributeStorage.ReadValue({ mPath.mEndpointId, ValveConfigurationAndControl::Id, ValveConfigurationAndControl::Attributes::DefaultOpenDuration::Id }, 
+    if(context.attributeStorage.ReadValue({ mPath.mEndpointId, ValveConfigurationAndControl::Id, ValveConfigurationAndControl::Attributes::DefaultOpenDuration::Id },
         defaultOpenDurationBytes) != CHIP_NO_ERROR)
     {
         mDefaultOpenDuration = defaultOpenDuration;
@@ -92,7 +92,7 @@ CHIP_ERROR ValveConfigurationAndControlCluster::Attributes(const ConcreteCluster
 
     return listBuilder.Append(Span(ValveConfigurationAndControl::Attributes::kMandatoryMetadata), Span(optionalAttributeEntries));
 }
-    
+
 DataModel::ActionReturnStatus ValveConfigurationAndControlCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder)
 {
     switch(request.path.mAttributeId)
@@ -251,7 +251,7 @@ CHIP_ERROR ValveConfigurationAndControlCluster::CloseValve()
 
     // Set the TargetLevel to 0
     if (mFeatures.Has(Feature::kLevel))
-    {        
+    {
         SaveAndReportIfChanged(mTargetLevel, Percent(0), Attributes::TargetLevel::Id);
     }
 
@@ -306,7 +306,7 @@ std::optional<DataModel::ActionReturnStatus> ValveConfigurationAndControlCluster
 
     // Check if the OpenDuration value is Null
     if(mOpenDuration.IsNull())
-    {   
+    {
         // If null, set the remaning duration as Null
         SetRemainingDuration(DataModel::NullNullable);
     }
@@ -434,7 +434,7 @@ CHIP_ERROR ValveConfigurationAndControlCluster::SetRemainingDuration(const DataM
 //   - Use the DefaultOpenLevel attribute if implemented.
 //   - If DefaultOpenLevel is not implemented, set it to 100
 // - if the TargetLevel is provided
-//   - Validate that the TargetLevel and LevelStep are compatible. 
+//   - Validate that the TargetLevel and LevelStep are compatible.
 CHIP_ERROR ValveConfigurationAndControlCluster::GetAdjustedTargetLevel(const Optional<Percent> & targetLevel, DataModel::Nullable<chip::Percent> & adjustedTargetLevel) const
 {
     if(!targetLevel.HasValue())

@@ -36,7 +36,7 @@ public:
     using OptionalAttributeSet = chip::app::OptionalAttributeSet<
         ValveConfigurationAndControl::Attributes::DefaultOpenLevel::Id, ValveConfigurationAndControl::Attributes::ValveFault::Id,
         ValveConfigurationAndControl::Attributes::LevelStep::Id>;
-    
+
     ValveConfigurationAndControlCluster(EndpointId endpointId, BitFlags<ValveConfigurationAndControl::Feature> features, OptionalAttributeSet optionalAttributeSet, TimeSyncTracker * tsTracker);
 
     // Server cluster implementation
@@ -96,7 +96,7 @@ private:
     uint8_t mLevelStep { 1u };
     const BitFlags<ValveConfigurationAndControl::Feature> mFeatures;
     const OptionalAttributeSet mOptionalAttributeSet;
-    // 
+    //
     ValveConfigurationAndControl::Delegate * mDelegate;
     TimeSyncTracker * mTsTracker;
 };
