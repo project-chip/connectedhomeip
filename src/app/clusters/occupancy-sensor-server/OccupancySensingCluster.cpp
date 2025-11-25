@@ -97,15 +97,7 @@ OccupancySensingCluster::OccupancySensingCluster(const Config & config) :
     mDelegate(config.mDelegate), mFeatureMap(config.mFeatureMap), mHasHoldTime(config.mHasHoldTime),
     mShowDeprecatedAttributes(config.mShowDeprecatedAttributes)
 {
-    mHoldTimeLimits = config.mHoldTimeLimits;
-
-    // Here we sanitize the input limits to ensure they are valid, in case the caller
-    // provided invalid values.
-    mHoldTimeLimits.holdTimeMin = std::max(static_cast<uint16_t>(1), mHoldTimeLimits.holdTimeMin);
-    mHoldTimeLimits.holdTimeMax = std::max({ static_cast<uint16_t>(10), mHoldTimeLimits.holdTimeMin, mHoldTimeLimits.holdTimeMax });
-    mHoldTimeLimits.holdTimeDefault =
-        std::clamp(mHoldTimeLimits.holdTimeDefault, mHoldTimeLimits.holdTimeMin, mHoldTimeLimits.holdTimeMax);
-
+    SetHoldTimeLimits(config.mHoldTimeLimits);
     mHoldTime = std::clamp(config.mHoldTime, mHoldTimeLimits.holdTimeMin, mHoldTimeLimits.holdTimeMax);
 }
 
@@ -318,6 +310,27 @@ void OccupancySensingCluster::DoSetOccupancy(bool occupied)
 bool OccupancySensingCluster::IsOccupied() const
 {
     return mOccupancy.Has(OccupancySensing::OccupancyBitmap::kOccupied);
+}
+
+void OccupancySensingCluster::SetHoldTimeLimits(const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & holdTimeLimits)
+{
+    auto newHoldTimeLimits = holdTimeLimits;
+
+    // Here we sanitize the input limits to ensure they are valid, in case the caller
+    // provided invalid values.
+    newHoldTimeLimits.holdTimeMin = std::max(static_cast<uint16_t>(1), newHoldTimeLimits.holdTimeMin);
+    newHoldTimeLimits.holdTimeMax =
+        std::max({ static_cast<uint16_t>(10), newHoldTimeLimits.holdTimeMin, newHoldTimeLimits.holdTimeMax });
+    newHoldTimeLimits.holdTimeDefault =
+        std::clamp(newHoldTimeLimits.holdTimeDefault, newHoldTimeLimits.holdTimeMin, newHoldTimeLimits.holdTimeMax);
+
+    if (mHoldTimeLimits.holdTimeMin != newHoldTimeLimits.holdTimeMin ||
+        mHoldTimeLimits.holdTimeMax != newHoldTimeLimits.holdTimeMax ||
+        mHoldTimeLimits.holdTimeDefault != newHoldTimeLimits.holdTimeDefault)
+    {
+        mHoldTimeLimits = newHoldTimeLimits;
+        NotifyAttributeChanged(Attributes::HoldTimeLimits::Id);
+    }
 }
 
 uint16_t OccupancySensingCluster::GetHoldTime() const
