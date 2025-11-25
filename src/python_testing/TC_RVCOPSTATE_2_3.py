@@ -37,8 +37,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-from time import sleep
 
 from mobly import asserts
 
@@ -221,7 +221,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
         defined_states = [state.value for state in Clusters.OperationalState.Enums.OperationalStateEnum
                           if state is not Clusters.OperationalState.Enums.OperationalStateEnum.kUnknownEnumValue]
 
-        state_ids = set([s.operationalStateID for s in op_state_list])
+        state_ids = {s.operationalStateID for s in op_state_list}
 
         asserts.assert_true(all(id in state_ids for id in defined_states), "OperationalStateList is missing a required entry")
 
@@ -245,7 +245,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
                                 "invalid CountdownTime(%s). Must be in between 1 and 259200, or null " % initial_countdown_time)
 
             self.print_step(8, "Waiting for 5 seconds")
-            sleep(5)
+            await asyncio.sleep(5)
 
             self.print_step(9, "Read CountdownTime attribute")
             countdown_time = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CountdownTime)

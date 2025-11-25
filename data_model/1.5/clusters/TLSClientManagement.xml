@@ -62,9 +62,7 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0802" name="TLS Client Management">
-      <provisionalConform/>
-    </clusterId>
+    <clusterId id="0x0802" name="TLS Client Management"/>
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="TLSCLIENT" scope="Node"/>
   <dataTypes>

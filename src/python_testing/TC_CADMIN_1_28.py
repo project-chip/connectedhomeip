@@ -306,7 +306,7 @@ class TC_CADMIN_1_28(MatterBaseTest):
         self.step("1")
         try:
             response = await devCtrlEcoB.OpenJointCommissioningWindow(
-                nodeid=11,
+                nodeId=11,
                 endpointId=1,
                 timeout=400,
                 iteration=random.randint(1000, 100000),
@@ -325,7 +325,7 @@ class TC_CADMIN_1_28(MatterBaseTest):
         self.step("3")
         # Read JF-Admin NOC on Ecoystem B using jfc-app@EcoB
         response = await devCtrlEcoB.ReadAttribute(
-            nodeid=11, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)], fabricFiltered=False,
+            nodeId=11, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)], fabricFiltered=False,
             returnClusterObject=True)
 
         fabricIndex2_noc = None
@@ -344,7 +344,7 @@ class TC_CADMIN_1_28(MatterBaseTest):
         asserts.assert_true(_admin_cat_found, "Administrator CAT not found in Admin App NOC on Ecosystem B")
 
         response = await devCtrlEcoA.ReadAttribute(
-            nodeid=15, attributes=[(0, Clusters.AccessControl.Attributes.Acl)],
+            nodeId=15, attributes=[(0, Clusters.AccessControl.Attributes.Acl)],
             returnClusterObject=True)
         asserts.assert_not_equal(int('fffe0001', 16), response[0][Clusters.AccessControl].acl[0].subjects,
                                  "Anchor CAT not found in Subject field of JF-Admin on Fabric A(Joint Fabric)")
@@ -352,7 +352,7 @@ class TC_CADMIN_1_28(MatterBaseTest):
         self.step("4")
         # TODO: Uncomment step once https://github.com/project-chip/connectedhomeip/issues/40836 is fixed
         # response = await devCtrlEcoA.ReadAttribute(
-        #     nodeid=22, attributes=[(0, Clusters.BasicInformation.Attributes.ProductID)],
+        #     nodeId=22, attributes=[(0, Clusters.BasicInformation.Attributes.ProductID)],
         #     returnClusterObject=True)
         # asserts.assert_in(response[0][Clusters.BasicInformation].productID,
         #                   range(1, 65535), "Invalid Product ID for node 22 on Joint Fabric")

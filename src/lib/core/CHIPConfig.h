@@ -1622,7 +1622,8 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *  Scene Max name size + OnOff : 55 bytes
  *  Scene Max name size + LevelControl : 64 bytes
  *  Scene Max name size + ColorControl : 130 bytes
- *  Scene Max name size + OnOff + LevelControl + ColoControl : 175 bytes
+ *  Scene Max name size + ModeSelect : 55 bytes
+ *  Scene Max name size + OnOff + LevelControl + ColorControl + ModeSelect : 230 bytes
  *
  *  Cluster Sizes:
  *  OnOff Cluster Max Size: 21 bytes
@@ -1631,17 +1632,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * */
 #ifndef CHIP_CONFIG_SCENES_MAX_SERIALIZED_SCENE_SIZE_BYTES
 #define CHIP_CONFIG_SCENES_MAX_SERIALIZED_SCENE_SIZE_BYTES 256
-#endif
-
-/**
- * @def CHIP_CONFIG_MAX_SCENES_CONCURRENT_ITERATORS
- *
- * @brief Defines the number of simultaneous Scenes iterators that can be allocated
- *
- * Number of iterator instances that can be allocated at any one time
- */
-#ifndef CHIP_CONFIG_MAX_SCENES_CONCURRENT_ITERATORS
-#define CHIP_CONFIG_MAX_SCENES_CONCURRENT_ITERATORS 2
 #endif
 
 /**
@@ -1895,10 +1885,10 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @def CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE
  *
  * @brief Defines the entry iterator delegate pool size of the ICDObserver object pool in ICDManager.h.
- *        Two are used in the default implementation. Users can increase it to register more observers.
+ *        Three are used in the default implementation. Users can increase it to register more observers.
  */
 #ifndef CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE
-#define CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE 2
+#define CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE 3
 #endif
 
 /**
@@ -2008,18 +1998,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_TLS_MAX_CLIENT_CERTS_PER_FABRIC_TABLE_SIZE
 #define CHIP_CONFIG_TLS_MAX_CLIENT_CERTS_PER_FABRIC_TABLE_SIZE 5
 #endif // CHIP_CONFIG_TLS_MAX_CLIENT_CERTS_PER_FABRIC_TABLE_SIZE
-
-/**
- *  @def CHIP_CONFIG_ADDITIONAL_LIT_BACKOFF_INTERVAL
- *
- *  @brief
- *    A duration, in milliseconds, to be added to the backoff interval for sigma1 message retransmission in controller side if the
- * remote device is LIT. This additional interval is to mitigate the issue that the sigma2 message may not be able to reach the
- * controller in congested network in time.
- */
-#ifndef CHIP_CONFIG_ADDITIONAL_LIT_BACKOFF_INTERVAL
-#define CHIP_CONFIG_ADDITIONAL_LIT_BACKOFF_INTERVAL 0
-#endif // CHIP_CONFIG_ADDITIONAL_LIT_BACKOFF_INTERVAL
 
 /**
  * @def CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE

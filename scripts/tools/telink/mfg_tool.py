@@ -20,9 +20,10 @@ import base64
 import binascii
 import csv
 import json
-import logging as logger
+import logging
 import os
 import random
+import shlex
 import shutil
 import subprocess
 import sys
@@ -39,6 +40,8 @@ TOOLS = {
     'chip-tool': None,
 }
 
+log = logging.getLogger(__name__)
+
 INVALID_PASSCODES = [00000000, 11111111, 22222222, 33333333, 44444444, 55555555,
                      66666666, 77777777, 88888888, 99999999, 12345678, 87654321]
 
@@ -53,7 +56,7 @@ ROTATING_DEVICE_ID_UNIQUE_ID_LEN = 16
 HEX_PREFIX = "hex:"
 DEV_SN_CSV_HDR = "Serial Number,\n"
 
-NVS_MEMORY = dict()
+NVS_MEMORY = {}
 
 
 def nvs_memory_append(key, value):
@@ -77,7 +80,7 @@ def check_tools_exists(args):
         TOOLS['spake2p'] = shutil.which('spake2p')
 
     if TOOLS['spake2p'] is None:
-        logger.error('spake2p not found, please specify --spake2-path argument')
+        log.error("spake2p not found, please specify --spake2-path argument")
         sys.exit(1)
     # if the certs and keys are not in the generated partitions or the specific dac cert and key are used,
     # the chip-cert is not needed.
@@ -87,7 +90,7 @@ def check_tools_exists(args):
         else:
             TOOLS['chip-cert'] = shutil.which('chip-cert')
         if TOOLS['chip-cert'] is None:
-            logger.error('chip-cert not found, please specify --chip-cert-path argument')
+            log.error("chip-cert not found, please specify --chip-cert-path argument")
             sys.exit(1)
 
     if args.chip_tool_path:
@@ -95,37 +98,37 @@ def check_tools_exists(args):
     else:
         TOOLS['chip-tool'] = shutil.which('chip-tool')
     if TOOLS['chip-tool'] is None:
-        logger.error('chip-tool not found, please specify --chip-tool-path argument')
+        log.error("chip-tool not found, please specify --chip-tool-path argument")
         sys.exit(1)
 
-    logger.debug('Using following tools:')
-    logger.debug('spake2p:    {}'.format(TOOLS['spake2p']))
-    logger.debug('chip-cert:  {}'.format(TOOLS['chip-cert']))
-    logger.debug('chip-tool:  {}'.format(TOOLS['chip-tool']))
+    log.debug("Using following tools:")
+    log.debug("spake2p:    '%s'", TOOLS['spake2p'])
+    log.debug("chip-cert:  '%s'", TOOLS['chip-cert'])
+    log.debug("chip-tool:  '%s'", TOOLS['chip-tool'])
 
 
 def execute_cmd(cmd):
-    logger.debug('Executing Command: {}'.format(cmd))
+    log.debug("Executing Command: %s", shlex.join(cmd))
     status = subprocess.run(cmd, capture_output=True)
 
     try:
         status.check_returncode()
     except subprocess.CalledProcessError as e:
         if status.stderr:
-            logger.error('[stderr]: {}'.format(status.stderr.decode('utf-8').strip()))
-        logger.error('Command failed with error: {}'.format(e))
+            log.error("[stderr]: %s", status.stderr.decode('utf-8').strip())
+        log.exception("Command failed with error: %r", e)
         sys.exit(1)
 
 
 def check_str_range(s, min_len, max_len, name):
     if s and ((len(s) < min_len) or (len(s) > max_len)):
-        logger.error('%s must be between %d and %d characters', name, min_len, max_len)
+        log.error("'%s' must be between %d and %d characters", name, min_len, max_len)
         sys.exit(1)
 
 
 def check_int_range(value, min_value, max_value, name):
     if value and ((value < min_value) or (value > max_value)):
-        logger.error('%s is out of range, should be in range [%d, %d]', name, min_value, max_value)
+        log.error("'%s' is out of range, should be in range [%d, %d]", name, min_value, max_value)
         sys.exit(1)
 
 
@@ -134,13 +137,13 @@ def vid_pid_str(vid, pid):
 
 
 def read_der_file(path: str):
-    logger.debug("Reading der file {}...", path)
+    log.debug("Reading der file '%s'...", path)
     try:
         with open(path, 'rb') as f:
             data = f.read()
             return data
     except IOError as e:
-        logger.error(e)
+        log.exception(e)
         raise e
 
 
@@ -248,8 +251,8 @@ def generate_pai_certs(args, ca_key, ca_cert, out_key, out_cert):
     ])
 
     execute_cmd(cmd)
-    logger.info('Generated PAI certificate: {}'.format(out_cert))
-    logger.info('Generated PAI private key: {}'.format(out_key))
+    log.info("Generated PAI certificate: '%s'", out_cert)
+    log.info("Generated PAI private key: '%s'", out_key)
 
 
 def setup_root_certificates(args, dirs):
@@ -267,7 +270,7 @@ def setup_root_certificates(args, dirs):
 
         generate_pai_certs(args, args.key, args.cert, pai_cert['key_pem'], pai_cert['cert_pem'])
         convert_x509_cert_from_pem_to_der(pai_cert['cert_pem'], pai_cert['cert_der'])
-        logger.info('Generated PAI certificate in DER format: {}'.format(pai_cert['cert_der']))
+        log.info("Generated PAI certificate in DER format: '%s'", pai_cert['cert_der'])
 
     # If PAI is passed as input, generate DACs
     elif args.pai:
@@ -276,7 +279,7 @@ def setup_root_certificates(args, dirs):
         pai_cert['cert_der'] = os.sep.join([dirs['internal'], 'pai_cert.der'])
 
         convert_x509_cert_from_pem_to_der(pai_cert['cert_pem'], pai_cert['cert_der'])
-        logger.info('Generated PAI certificate in DER format: {}'.format(pai_cert['cert_der']))
+        log.info("Generated PAI certificate in DER format: '%s'", pai_cert['cert_der'])
 
     return pai_cert
 
@@ -328,23 +331,23 @@ def generate_dac_cert(iteration, args, out_dirs, discriminator, passcode, ca_key
                 ])
 
     execute_cmd(cmd)
-    logger.info('Generated DAC certificate: {}'.format(out_cert_pem))
-    logger.info('Generated DAC private key: {}'.format(out_key_pem))
+    log.info("Generated DAC certificate: '%s'", out_cert_pem)
+    log.info("Generated DAC private key: '%s'", out_key_pem)
 
     convert_x509_cert_from_pem_to_der(out_cert_pem, out_cert_der)
-    logger.info('Generated DAC certificate in DER format: {}'.format(out_cert_der))
+    log.info("Generated DAC certificate in DER format: '%s'", out_cert_der)
 
     generate_keypair_bin(out_key_pem, out_private_key_bin, out_public_key_bin)
-    logger.info('Generated DAC private key in binary format: {}'.format(out_private_key_bin))
-    logger.info('Generated DAC public key in binary format: {}'.format(out_public_key_bin))
+    log.info("Generated DAC private key in binary format: '%s'", out_private_key_bin)
+    log.info("Generated DAC public key in binary format: '%s'", out_public_key_bin)
 
     return out_cert_der, out_private_key_bin, out_public_key_bin
 
 
 def use_dac_cert_from_args(args, out_dirs):
-    logger.info('Using DAC from command line arguments...')
-    logger.info('DAC Certificate: {}'.format(args.dac_cert))
-    logger.info('DAC Private Key: {}'.format(args.dac_key))
+    log.info("Using DAC from command line arguments...")
+    log.info("DAC Certificate: '%s'", args.dac_cert)
+    log.info("DAC Private Key: '%s'", args.dac_key)
 
     # There should be only one UUID in the UUIDs list if DAC is specified
     out_cert_der = os.sep.join([out_dirs['internal'], 'DAC_cert.der'])
@@ -352,17 +355,17 @@ def use_dac_cert_from_args(args, out_dirs):
     out_public_key_bin = out_cert_der.replace('cert.der', 'public_key.bin')
 
     convert_x509_cert_from_pem_to_der(args.dac_cert, out_cert_der)
-    logger.info('Generated DAC certificate in DER format: {}'.format(out_cert_der))
+    log.info("Generated DAC certificate in DER format: '%s'", out_cert_der)
 
     generate_keypair_bin(args.dac_key, out_private_key_bin, out_public_key_bin)
-    logger.info('Generated DAC private key in binary format: {}'.format(out_private_key_bin))
-    logger.info('Generated DAC public key in binary format: {}'.format(out_public_key_bin))
+    log.info("Generated DAC private key in binary format: '%s'", out_private_key_bin)
+    log.info("Generated DAC public key in binary format: '%s'", out_public_key_bin)
 
     return out_cert_der, out_private_key_bin, out_public_key_bin
 
 
 def get_manualcode_args(vid, pid, flow, discriminator, passcode):
-    payload_args = list()
+    payload_args = []
     payload_args.append('--discriminator')
     payload_args.append(str(discriminator))
     payload_args.append('--setup-pin-code')
@@ -419,8 +422,8 @@ def generate_onboarding_data(args, out_dirs, discriminator, passcode):
     chip_qrcode = get_chip_qrcode(TOOLS['chip-tool'], args.vendor_id, args.product_id,
                                   args.commissioning_flow, discriminator, passcode, args.discovery_mode)
 
-    logger.info('Generated QR code: ' + chip_qrcode)
-    logger.info('Generated manual code: ' + chip_manualcode)
+    log.info("Generated QR code: '%s'", chip_qrcode)
+    log.info("Generated manual code: '%s'", chip_manualcode)
 
     csv_data = 'qrcode,manualcode,discriminator,passcode\n'
     csv_data += chip_qrcode + ',' + chip_manualcode + ',' + str(discriminator) + ',' + str(passcode) + '\n'
@@ -434,7 +437,7 @@ def generate_onboarding_data(args, out_dirs, discriminator, passcode):
     chip_qr = pyqrcode.create(chip_qrcode, version=2, error='M')
     chip_qr.png(qrcode_file, scale=6)
 
-    logger.info('Generated onboarding data and QR Code')
+    log.info("Generated onboarding data and QR Code")
 
 
 # This function generates the DACs, picks the commissionable data from the already present csv file,
@@ -473,7 +476,7 @@ def write_device_unique_data(args, out_dirs, pai_cert):
 
 
 def generate_partition(args, out_dirs):
-    logger.info('Generating partition image: offset: 0x{:X} size: 0x{:X}'.format(args.offset, args.size))
+    log.info("Generating partition image: offset: 0x%08X size: 0x%08X", args.offset, args.size)
     cbor_data = cbor.dumps(NVS_MEMORY)
     # Create hex file
     if len(cbor_data) > args.size:
@@ -485,7 +488,7 @@ def generate_partition(args, out_dirs):
 
 
 def generate_json_summary(args, out_dirs, pai_certs, dacs_cert, serial_num: str):
-    json_dict = dict()
+    json_dict = {}
 
     json_dict['serial_num'] = serial_num
 
@@ -650,14 +653,14 @@ def get_and_validate_args():
 
     # Validate in-tree parameter
     if args.count > 1 and args.in_tree:
-        logger.error('Option --in-tree can not be use together with --count > 1')
+        log.error("Option --in-tree can not be use together with --count > 1")
         sys.exit(1)
 
     # Validate discriminator and passcode
     check_int_range(args.discriminator, 0x0000, 0x0FFF, 'Discriminator')
     if args.passcode is not None:
         if ((args.passcode < 0x0000001 and args.passcode > 0x5F5E0FE) or (args.passcode in INVALID_PASSCODES)):
-            logger.error('Invalid passcode' + str(args.passcode))
+            log.error("Invalid passcode '%s'", args.passcode)
             sys.exit(1)
 
     # Validate the device instance information
@@ -676,26 +679,26 @@ def get_and_validate_args():
     # Validates the attestation related arguments
     # DAC key and DAC cert both should be present or none
     if (args.dac_key is not None) != (args.dac_cert is not None):
-        logger.error("dac_key and dac_cert should be both present or none")
+        log.error("dac_key and dac_cert should be both present or none")
         sys.exit(1)
     else:
         # Make sure PAI certificate is present if DAC is present
         if (args.dac_key is not None) and (args.pai is False):
-            logger.error('Please provide PAI certificate along with DAC certificate and DAC key')
+            log.error("Please provide PAI certificate along with DAC certificate and DAC key")
             sys.exit(1)
 
     # Validate the input certificate type, if DAC is not present
     if args.dac_key is None and args.dac_cert is None:
         if args.paa:
-            logger.info('Input Root certificate type PAA')
+            log.info("Input Root certificate type PAA")
         elif args.pai:
-            logger.info('Input Root certificate type PAI')
+            log.info("Input Root certificate type PAI")
         else:
-            logger.info('Do not include the device attestation certificates and keys in partition binaries')
+            log.info("Do not include the device attestation certificates and keys in partition binaries")
 
         # Check if Key and certificate are present
         if (args.paa or args.pai) and (args.key is None or args.cert is None):
-            logger.error('CA key and certificate are required to generate DAC key and certificate')
+            log.error("CA key and certificate are required to generate DAC key and certificate")
             sys.exit(1)
 
     check_str_range(args.product_label, 1, 64, 'Product Label')
@@ -706,22 +709,22 @@ def get_and_validate_args():
 
 
 def main():
-    logger.basicConfig(format='[%(asctime)s] [%(levelname)7s] - %(message)s', level=logger.INFO)
+    logging.basicConfig(format='[%(asctime)s] [%(levelname)7s] - %(message)s', level=logging.INFO)
     args = get_and_validate_args()
     check_tools_exists(args)
 
     if os.path.exists(args.output):
         if args.overwrite:
-            logger.info("Output directory already exists. All data will be overwritten.")
+            log.info("Output directory already exists. All data will be overwritten.")
             shutil.rmtree(args.output)
         else:
-            logger.error("Output directory exists! Please use different or remove existing.")
+            log.error("Output directory exists! Please use different or remove existing.")
             exit(1)
 
     # If serial number is not passed, then generate one
     if args.serial_num is None:
         serial_num_int = int(binascii.b2a_hex(os.urandom(SERIAL_NUMBER_LEN)), 16)
-        logger.info("Serial number not provided. Using generated one: {}".format(hex(serial_num_int)))
+        log.info("Serial number not provided. Using generated one: 0x%08X", serial_num_int)
     else:
         serial_num_int = int(args.serial_num, 16)
 
@@ -734,7 +737,7 @@ def main():
     for i in range(args.count):
         pai_cert = {}
         serial_num_str = format(serial_num_int + i, 'x')
-        logger.info("Generating for {}".format(serial_num_str))
+        log.info("Generating for '%s'", serial_num_str)
         dev_sn_file.write(serial_num_str + '\n')
         out_dirs = setup_out_dir(out_dir_top, args, serial_num_str)
         add_additional_kv(args, serial_num_str)

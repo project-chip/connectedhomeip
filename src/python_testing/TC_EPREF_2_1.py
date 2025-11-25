@@ -105,10 +105,14 @@ class TC_EPREF_2_1(MatterBaseTest):
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, Clusters.EnergyPreference.Attributes.CurrentLowPowerModeSensitivity(current_low_power_mode_sensitivity))])
         return result[0].Status
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_EPREF_2_1(self):
 
-        endpoint = self.user_params.get("endpoint", 1)
+        endpoint = self.get_endpoint()
 
         self.step("1")
         self.print_step(1, "Commissioning, already done")

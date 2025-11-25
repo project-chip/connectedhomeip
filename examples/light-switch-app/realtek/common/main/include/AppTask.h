@@ -31,7 +31,7 @@
 #include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#include <platform/realtek/BEE/FactoryDataProvider.h>
+#include <platform/realtek/freertos/FactoryDataProvider.h>
 
 class AppTask
 {

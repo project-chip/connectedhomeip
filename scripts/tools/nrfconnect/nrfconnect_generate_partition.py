@@ -18,11 +18,13 @@
 import argparse
 import codecs
 import json
-import logging as log
+import logging
 import sys
 
 import cbor2 as cbor
 from intelhex import IntelHex
+
+log = logging.getLogger(__name__)
 
 HEX_PREFIX = "hex:"
 
@@ -95,10 +97,10 @@ class PartitionCreator:
 
         If "key_value" of data entry is a dictionary, algorithm appends it to the created dictionary.
         """
-        output_dict = dict()
+        output_dict = {}
         for entry in data:
             if not isinstance(entry, dict):
-                log.debug("Processing entry {}".format(entry))
+                log.debug("Processing entry '%s'", entry)
                 if isinstance(data[entry], str) and data[entry].startswith(HEX_PREFIX):
                     output_dict[entry] = codecs.decode(data[entry][len(HEX_PREFIX):], "hex")
                 elif isinstance(data[entry], str):
@@ -119,7 +121,7 @@ class PartitionCreator:
             with open(self._input, "rb") as json_file:
                 return json.loads(json_file.read())
         except IOError as e:
-            log.error("Can not read Json file {}".format(self._input))
+            log.error("Can not read Json file '%s'", self._input)
             raise e
 
 
@@ -157,11 +159,11 @@ def main():
     args = parser.parse_args()
 
     if args.verbose:
-        log.basicConfig(format='[%(asctime)s][%(levelname)s] %(message)s', level=log.DEBUG)
+        logging.basicConfig(format='[%(asctime)s][%(levelname)s] %(message)s', level=logging.DEBUG)
     elif args.raw:
-        log.basicConfig(format='%(message)s', level=log.ERROR)
+        logging.basicConfig(format='%(message)s', level=logging.ERROR)
     else:
-        log.basicConfig(format='[%(asctime)s] %(message)s', level=log.INFO)
+        logging.basicConfig(format='[%(asctime)s] %(message)s', level=logging.INFO)
 
     partition_creator = PartitionCreator(args.offset, args.size, args.input, args.output)
     cbor_data = partition_creator.generate_cbor()
@@ -172,7 +174,7 @@ def main():
             if not args.raw:
                 print_flashing_help()
     except ValueError as e:
-        log.error(e)
+        log.exception(e)
         sys.exit(-1)
 
 

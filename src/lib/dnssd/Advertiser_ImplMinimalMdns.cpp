@@ -369,7 +369,7 @@ CHIP_ERROR AdvertiserMinMdns::Init(chip::Inet::EndPointManager<chip::Inet::UDPEn
 
     if (!mIsInitialized)
     {
-        UpdateCommissionableInstanceName();
+        TEMPORARY_RETURN_IGNORED UpdateCommissionableInstanceName();
     }
 
     // Re-set the server in the response sender in case this has been swapped in the
@@ -554,8 +554,9 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
             return CHIP_ERROR_NO_MEMORY;
         }
     }
-    MakeServiceSubtype(nameBuffer, sizeof(nameBuffer),
-                       DiscoveryFilter(DiscoveryFilterType::kCompressedFabricId, params.GetPeerId().GetCompressedFabricId()));
+    TEMPORARY_RETURN_IGNORED MakeServiceSubtype(
+        nameBuffer, sizeof(nameBuffer),
+        DiscoveryFilter(DiscoveryFilterType::kCompressedFabricId, params.GetPeerId().GetCompressedFabricId()));
     FullQName compressedFabricIdSubtype = operationalAllocator->AllocateQName(
         nameBuffer, kSubtypeServiceNamePart, kOperationalServiceName, kOperationalProtocol, kLocalDomain);
     VerifyOrReturnError(compressedFabricIdSubtype.nameCount != 0, CHIP_ERROR_NO_MEMORY);
@@ -673,7 +674,8 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
 
     if (const auto & vendorId = params.GetVendorId(); vendorId.has_value())
     {
-        MakeServiceSubtype(nameBuffer, sizeof(nameBuffer), DiscoveryFilter(DiscoveryFilterType::kVendorId, *vendorId));
+        TEMPORARY_RETURN_IGNORED MakeServiceSubtype(nameBuffer, sizeof(nameBuffer),
+                                                    DiscoveryFilter(DiscoveryFilterType::kVendorId, *vendorId));
         FullQName vendorServiceName =
             allocator->AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
         VerifyOrReturnError(vendorServiceName.nameCount != 0, CHIP_ERROR_NO_MEMORY);
@@ -690,7 +692,8 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
 
     if (const auto & deviceType = params.GetDeviceType(); deviceType.has_value())
     {
-        MakeServiceSubtype(nameBuffer, sizeof(nameBuffer), DiscoveryFilter(DiscoveryFilterType::kDeviceType, *deviceType));
+        TEMPORARY_RETURN_IGNORED MakeServiceSubtype(nameBuffer, sizeof(nameBuffer),
+                                                    DiscoveryFilter(DiscoveryFilterType::kDeviceType, *deviceType));
         FullQName vendorServiceName =
             allocator->AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
         VerifyOrReturnError(vendorServiceName.nameCount != 0, CHIP_ERROR_NO_MEMORY);
@@ -709,8 +712,9 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
     if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode)
     {
         {
-            MakeServiceSubtype(nameBuffer, sizeof(nameBuffer),
-                               DiscoveryFilter(DiscoveryFilterType::kShortDiscriminator, params.GetShortDiscriminator()));
+            TEMPORARY_RETURN_IGNORED MakeServiceSubtype(
+                nameBuffer, sizeof(nameBuffer),
+                DiscoveryFilter(DiscoveryFilterType::kShortDiscriminator, params.GetShortDiscriminator()));
             FullQName shortServiceName =
                 allocator->AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
             VerifyOrReturnError(shortServiceName.nameCount != 0, CHIP_ERROR_NO_MEMORY);
@@ -726,8 +730,9 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
         }
 
         {
-            MakeServiceSubtype(nameBuffer, sizeof(nameBuffer),
-                               DiscoveryFilter(DiscoveryFilterType::kLongDiscriminator, params.GetLongDiscriminator()));
+            TEMPORARY_RETURN_IGNORED MakeServiceSubtype(
+                nameBuffer, sizeof(nameBuffer),
+                DiscoveryFilter(DiscoveryFilterType::kLongDiscriminator, params.GetLongDiscriminator()));
             FullQName longServiceName =
                 allocator->AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
             VerifyOrReturnError(longServiceName.nameCount != 0, CHIP_ERROR_NO_MEMORY);
@@ -743,7 +748,8 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
 
         if (params.GetCommissioningMode() != CommissioningMode::kDisabled)
         {
-            MakeServiceSubtype(nameBuffer, sizeof(nameBuffer), DiscoveryFilter(DiscoveryFilterType::kCommissioningMode));
+            TEMPORARY_RETURN_IGNORED MakeServiceSubtype(nameBuffer, sizeof(nameBuffer),
+                                                        DiscoveryFilter(DiscoveryFilterType::kCommissioningMode));
             FullQName longServiceName =
                 allocator->AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
             VerifyOrReturnError(longServiceName.nameCount != 0, CHIP_ERROR_NO_MEMORY);
@@ -792,7 +798,7 @@ FullQName AdvertiserMinMdns::GetOperationalTxtEntries(OperationalQueryAllocator:
     size_t numTxtFields = 0;
 
     struct CommonTxtEntryStorage commonStorage;
-    AddCommonTxtEntries<OperationalAdvertisingParameters>(params, commonStorage, txtFields, numTxtFields);
+    TEMPORARY_RETURN_IGNORED AddCommonTxtEntries<OperationalAdvertisingParameters>(params, commonStorage, txtFields, numTxtFields);
     if (numTxtFields == 0)
     {
         return allocator->AllocateQNameFromArray(mEmptyTextEntries, 1);
@@ -840,7 +846,7 @@ FullQName AdvertiserMinMdns::GetCommissioningTxtEntries(const CommissionAdvertis
         txtFields[numTxtFields++] = txtDeviceName;
     }
     CommonTxtEntryStorage commonStorage;
-    AddCommonTxtEntries<CommissionAdvertisingParameters>(params, commonStorage, txtFields, numTxtFields);
+    TEMPORARY_RETURN_IGNORED AddCommonTxtEntries<CommissionAdvertisingParameters>(params, commonStorage, txtFields, numTxtFields);
 
     // the following sub types only apply to commissionable node advertisements
     char txtDiscriminator[chip::Dnssd::kKeyLongDiscriminatorMaxLength + 3];

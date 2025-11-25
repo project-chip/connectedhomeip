@@ -84,10 +84,10 @@ CHIP_ERROR MatterInitializer::Init_Matter_Stack(const char * appName)
 
     SetDeviceInstanceInfoProvider(&sFactoryDataProvider);
 
-    chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(appName);
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(appName);
 
 #if CONFIG_NETWORK_LAYER_BLE
-    ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+    TEMPORARY_RETURN_IGNORED ConnectivityMgr().SetBLEAdvertisingEnabled(true);
 #endif
 
     return CHIP_NO_ERROR;
@@ -104,7 +104,7 @@ CHIP_ERROR MatterInitializer::Init_Matter_Server(void)
     initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
-    chip::Server::GetInstance().Init(initParams);
+    TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().Init(initParams);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     // Initialize device attestation config

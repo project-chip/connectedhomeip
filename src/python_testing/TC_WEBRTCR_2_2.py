@@ -33,11 +33,12 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
 import os
 import random
 import tempfile
-from time import sleep
+import time
 
 from mobly import asserts
 from TC_WEBRTCRTestBase import WEBRTCRTestBase
@@ -80,7 +81,7 @@ class TC_WebRTCR_2_2(WEBRTCRTestBase):
             expected_output="Server initialization complete",
             timeout=30)
 
-        sleep(1)
+        time.sleep(1)
 
     def teardown_class(self):
         if self.th_server is not None:
@@ -139,14 +140,14 @@ class TC_WebRTCR_2_2(WEBRTCRTestBase):
 
         self.step(2)
         params = await self.default_controller.OpenCommissioningWindow(
-            nodeid=self.th_server_local_nodeid, timeout=3*60, iteration=10000, discriminator=self.discriminator, option=1)
+            nodeId=self.th_server_local_nodeid, timeout=3*60, iteration=10000, discriminator=self.discriminator, option=1)
         passcode = params.setupPinCode
-        sleep(1)
+        await asyncio.sleep(1)
 
         self.step(3)
         # Prompt user with instructions
         prompt_msg = (
-            "\nPlease commission the server app from DUT:\n"
+            f"\nPlease commission the server app from DUT: manual code='{params.setupManualCode}' QR code='{params.setupQRCode}' :\n"
             f"  pairing onnetwork 1 {passcode}\n"
             "Input 'Y' if DUT successfully commissions without any warnings\n"
             "Input 'N' if commissioner warns about commissioning the non-genuine device, "
@@ -187,11 +188,11 @@ class TC_WebRTCR_2_2(WEBRTCRTestBase):
             takeMutex=False,
         )
         await self.default_controller.SendCommand(
-            nodeid=self.th_server_local_nodeid,
+            nodeId=self.th_server_local_nodeid,
             endpoint=0,  # Fault‑Injection cluster lives on EP0
             payload=command,
         )
-        sleep(1)
+        await asyncio.sleep(1)
 
         self.step(5)
         # Prompt user with instructions

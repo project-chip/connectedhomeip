@@ -57,7 +57,7 @@ class TC_WEBRTCP_2_19(MatterBaseTest, WEBRTCPTestBase):
 
     def steps_TC_WEBRTCP_2_19(self) -> list[TestStep]:
         steps = [
-            TestStep("precondition", "DUT commissioned and streams allocated", is_commissioning=True),
+            TestStep("precondition", "DUT commissioned", is_commissioning=True),
             TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
                      "DUT responds with success and provides stream IDs"),
             TestStep(2, "TH sends the SolicitOffer command with valid stream IDs",
@@ -86,6 +86,10 @@ class TC_WEBRTCP_2_19(MatterBaseTest, WEBRTCPTestBase):
         ]
         return pics
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_WEBRTCP_2_19(self):
         """
@@ -94,7 +98,7 @@ class TC_WEBRTCP_2_19(MatterBaseTest, WEBRTCPTestBase):
 
         self.step("precondition")
         # Commission DUT - already done
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(1)
         # Allocate Audio and Video streams

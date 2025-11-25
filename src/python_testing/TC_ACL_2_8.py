@@ -46,7 +46,7 @@ from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_b
 class TC_ACL_2_8(MatterBaseTest):
     async def get_latest_event_number(self, acec_event: Clusters.AccessControl.Events.AccessControlEntryChanged) -> int:
         event_path = [(self.matter_test_config.endpoint, acec_event, 1)]
-        events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
+        events = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path)
         if not events:
             raise AssertionError(f"No events found for {acec_event} to determine the latest event number.")
         return max([e.Header.EventNumber for e in events])
@@ -190,7 +190,7 @@ class TC_ACL_2_8(MatterBaseTest):
         # Open commissioning window with default controller
         self.discriminator = random.randint(0, 4095)
         params = await self.default_controller.OpenCommissioningWindow(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             timeout=900,
             iteration=10000,
             discriminator=self.discriminator,
@@ -221,7 +221,7 @@ class TC_ACL_2_8(MatterBaseTest):
         self.step(3)
         # Open commissioning window with TH1
         params = await self.th1.OpenCommissioningWindow(
-            nodeid=self.dut_node_id, timeout=900, iteration=10000, discriminator=self.discriminator, option=1)
+            nodeId=self.dut_node_id, timeout=900, iteration=10000, discriminator=self.discriminator, option=1)
         # Commission TH2
         th2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
         th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(
@@ -516,6 +516,9 @@ class TC_ACL_2_8(MatterBaseTest):
 
     def desc_TC_ACL_2_8(self) -> str:
         return "[TC-ACL-2.8] ACL multi-fabric"
+
+    def pics_TC_ACL_2_8(self) -> list[str]:
+        return ['ACL.S']
 
     def steps_TC_ACL_2_8(self) -> list[TestStep]:
         steps = [

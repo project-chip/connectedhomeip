@@ -312,8 +312,7 @@ public:
         auto * targetFabric = mFabricTable->FindFabricWithIndex(fabricIndex);
         VerifyOrReturnError(targetFabric != nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX);
 
-        auto err = targetFabric->FetchRootPubkey(targetPubKey);
-        VerifyOrDie(err == CHIP_NO_ERROR);
+        SuccessOrDie(targetFabric->FetchRootPubkey(targetPubKey));
 
         mSecureSessions.ForEachSession([&](auto * session) {
             Crypto::P256PublicKey comparePubKey;
@@ -331,8 +330,7 @@ public:
             auto * compareFabric = mFabricTable->FindFabricWithIndex(session->GetFabricIndex());
             VerifyOrDie(compareFabric != nullptr);
 
-            err = compareFabric->FetchRootPubkey(comparePubKey);
-            VerifyOrDie(err == CHIP_NO_ERROR);
+            SuccessOrDie(compareFabric->FetchRootPubkey(comparePubKey));
 
             if (comparePubKey.Matches(targetPubKey) && targetFabric->GetFabricId() == compareFabric->GetFabricId())
             {

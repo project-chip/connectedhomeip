@@ -143,7 +143,7 @@ CHIP_ERROR UnitLocalizationServer::SetTemperatureUnit(TempUnitEnum newTempUnit)
 
 void MatterUnitLocalizationPluginServerInitCallback()
 {
-    UnitLocalizationServer::Instance().Init();
+    TEMPORARY_RETURN_IGNORED UnitLocalizationServer::Instance().Init();
     AttributeAccessInterfaceRegistry::Instance().Register(&UnitLocalizationServer::Instance());
 }
 

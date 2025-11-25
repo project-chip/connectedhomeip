@@ -130,7 +130,7 @@ class TC_AVSM_VideoStreamsPersistence(MatterBaseTest):
         has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kVideo)
     )
     async def test_TC_AVSM_VideoStreamsPersistence(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.CameraAvStreamManagement
         attr = Clusters.CameraAvStreamManagement.Attributes
         commands = Clusters.CameraAvStreamManagement.Commands
@@ -241,7 +241,7 @@ class TC_AVSM_VideoStreamsPersistence(MatterBaseTest):
             takeMutex=False,
         )
         await self.default_controller.SendCommand(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             endpoint=0,  # Fault‑Injection cluster lives on EP0
             payload=command,
         )
@@ -271,7 +271,7 @@ class TC_AVSM_VideoStreamsPersistence(MatterBaseTest):
             takeMutex=False,
         )
         await self.default_controller.SendCommand(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             endpoint=0,  # Fault‑Injection cluster lives on EP0
             payload=command,
         )
