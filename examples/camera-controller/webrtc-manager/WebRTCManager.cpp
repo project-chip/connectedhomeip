@@ -111,11 +111,11 @@ void WebRTCManager::Init()
     }
 }
 
-CHIP_ERROR WebRTCManager::HandleOffer(uint16_t sessionId, const WebRTCRequestorDelegate::OfferArgs & args)
+CHIP_ERROR WebRTCManager::HandleOffer(const WebRTCSessionStruct & session, const WebRTCRequestorDelegate::OfferArgs & args)
 {
     ChipLogProgress(Camera, "WebRTCManager::HandleOffer");
 
-    mWebRTCProviderClient.HandleOfferReceived(sessionId);
+    mWebRTCProviderClient.HandleOfferReceived(session.id);
 
     if (!mPeerConnection)
     {
@@ -132,25 +132,25 @@ CHIP_ERROR WebRTCManager::HandleOffer(uint16_t sessionId, const WebRTCRequestorD
     }
 
     // Store sessionId for the delayed callback
-    mPendingSessionId = sessionId;
+    mPendingSessionId = session.id;
 
     // Schedule the ProvideAnswer() call to run with a small delay to ensure the response is sent first
-    DeviceLayer::SystemLayer().StartTimer(
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(
         chip::System::Clock::Milliseconds32(300),
         [](chip::System::Layer * systemLayer, void * appState) {
             auto * self = static_cast<WebRTCManager *>(appState);
-            self->ProvideAnswer(self->mPendingSessionId, self->mLocalDescription);
+            TEMPORARY_RETURN_IGNORED self->ProvideAnswer(self->mPendingSessionId, self->mLocalDescription);
         },
         this);
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WebRTCManager::HandleAnswer(uint16_t sessionId, const std::string & sdp)
+CHIP_ERROR WebRTCManager::HandleAnswer(const WebRTCSessionStruct & session, const std::string & sdp)
 {
     ChipLogProgress(Camera, "WebRTCManager::HandleAnswer");
 
-    mWebRTCProviderClient.HandleAnswerReceived(sessionId);
+    mWebRTCProviderClient.HandleAnswerReceived(session.id);
 
     if (!mPeerConnection)
     {
@@ -162,21 +162,22 @@ CHIP_ERROR WebRTCManager::HandleAnswer(uint16_t sessionId, const std::string & s
     mPeerConnection->setRemoteDescription(answerDesc);
 
     // Store sessionId for the delayed callback
-    mPendingSessionId = sessionId;
+    mPendingSessionId = session.id;
 
     // Schedule the ProvideICECandidates() call to run with a small delay to ensure the response is sent first
-    DeviceLayer::SystemLayer().StartTimer(
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(
         chip::System::Clock::Milliseconds32(300),
         [](chip::System::Layer * systemLayer, void * appState) {
             auto * self = static_cast<WebRTCManager *>(appState);
-            self->ProvideICECandidates(self->mPendingSessionId);
+            TEMPORARY_RETURN_IGNORED self->ProvideICECandidates(self->mPendingSessionId);
         },
         this);
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WebRTCManager::HandleICECandidates(uint16_t sessionId, const std::vector<ICECandidateStruct> & candidates)
+CHIP_ERROR WebRTCManager::HandleICECandidates(const WebRTCSessionStruct & session,
+                                              const std::vector<ICECandidateStruct> & candidates)
 {
     ChipLogProgress(Camera, "WebRTCManager::HandleICECandidates");
 

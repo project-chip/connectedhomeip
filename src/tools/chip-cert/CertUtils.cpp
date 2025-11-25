@@ -191,12 +191,13 @@ void ToolChipDN::PrintDN(FILE * file, const char * name) const
     {
         if (IsChip64bitDNAttr(rdn[i].mAttrOID))
         {
-            Encoding::Uint64ToHex(rdn[i].mChipVal, valueStr, sizeof(valueStr), Encoding::HexFlags::kUppercaseAndNullTerminate);
+            TEMPORARY_RETURN_IGNORED Encoding::Uint64ToHex(rdn[i].mChipVal, valueStr, sizeof(valueStr),
+                                                           Encoding::HexFlags::kUppercaseAndNullTerminate);
         }
         else if (IsChip32bitDNAttr(rdn[i].mAttrOID))
         {
-            Encoding::Uint32ToHex(static_cast<uint32_t>(rdn[i].mChipVal), valueStr, sizeof(valueStr),
-                                  Encoding::HexFlags::kUppercaseAndNullTerminate);
+            TEMPORARY_RETURN_IGNORED Encoding::Uint32ToHex(static_cast<uint32_t>(rdn[i].mChipVal), valueStr, sizeof(valueStr),
+                                                           Encoding::HexFlags::kUppercaseAndNullTerminate);
         }
         else
         {

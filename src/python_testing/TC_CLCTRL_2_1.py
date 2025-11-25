@@ -76,10 +76,14 @@ class TC_CLCTRL_2_1(MatterBaseTest):
         ]
         return pics
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_CLCTRL_2_1(self):
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         # STEP 1: Commission DUT to TH (can be skipped if done in a preceding test)
         self.step(1)

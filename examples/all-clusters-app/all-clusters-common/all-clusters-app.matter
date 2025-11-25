@@ -211,6 +211,13 @@ enum RelativePositionTag : enum8 {
   kBehind = 6;
 }
 
+enum SoftwareVersionCertificationStatusEnum : enum8 {
+  kDevTest = 0;
+  kProvisional = 1;
+  kCertified = 2;
+  kRevoked = 3;
+}
+
 enum StreamUsageEnum : enum8 {
   kInternal = 0;
   kRecording = 1;
@@ -3332,7 +3339,7 @@ cluster LaundryWasherControls = 83 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster RvcRunMode = 84 {
-  revision 3;
+  revision 4;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -3362,7 +3369,7 @@ cluster RvcRunMode = 84 {
   }
 
   bitmap Feature : bitmap32 {
-    kDirectModeChange = 0x10000;
+    kDirectModeChange = 0x100000;
   }
 
   shared struct ModeTagStruct {
@@ -3400,7 +3407,7 @@ cluster RvcRunMode = 84 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster RvcCleanMode = 85 {
-  revision 3;
+  revision 5;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -3424,7 +3431,7 @@ cluster RvcCleanMode = 85 {
   }
 
   bitmap Feature : bitmap32 {
-    kDirectModeChange = 0x10000;
+    kDirectModeChange = 0x100000;
   }
 
   shared struct ModeTagStruct {
@@ -4102,7 +4109,7 @@ provisional cluster ScenesManagement = 98 {
 
 /** Attributes and commands for monitoring HEPA filters in a device */
 cluster HepaFilterMonitoring = 113 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   shared enum ChangeIndicationEnum : enum8 {
     kOK = 0 [spec_name = "OK"];
@@ -4146,13 +4153,13 @@ cluster HepaFilterMonitoring = 113 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  /** Reset the condition of the replaceable to the non degraded state */
+  /** Upon receipt, the device SHALL reset the Condition and ChangeIndicator attributes, indicating full resource availability and readiness for use, as initially configured. */
   command ResetCondition(): DefaultSuccess = 0;
 }
 
 /** Attributes and commands for monitoring activated carbon filters in a device */
 cluster ActivatedCarbonFilterMonitoring = 114 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   shared enum ChangeIndicationEnum : enum8 {
     kOK = 0 [spec_name = "OK"];
@@ -4196,7 +4203,7 @@ cluster ActivatedCarbonFilterMonitoring = 114 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  /** Reset the condition of the replaceable to the non degraded state */
+  /** Upon receipt, the device SHALL reset the Condition and ChangeIndicator attributes, indicating full resource availability and readiness for use, as initially configured. */
   command ResetCondition(): DefaultSuccess = 0;
 }
 
@@ -6294,7 +6301,7 @@ cluster LowPower = 1288 {
 }
 
 /** The Camera AV Stream Management cluster is used to allow clients to manage, control, and configure various audio, video, and snapshot streams on a camera. */
-provisional cluster CameraAvStreamManagement = 1361 {
+cluster CameraAvStreamManagement = 1361 {
   revision 1;
 
   enum AudioCodecEnum : enum8 {
@@ -6567,7 +6574,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
 }
 
 /** This cluster provides an interface into controls associated with the operation of a device that provides pan, tilt, and zoom functions, either mechanically, or against a digital image. */
-provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
+cluster CameraAvSettingsUserLevelManagement = 1362 {
   revision 1;
 
   enum PhysicalMovementEnum : enum8 {
@@ -6670,7 +6677,7 @@ provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
 }
 
 /** This cluster implements the upload of Audio and Video streams from the Push AV Stream Transport Cluster using suitable push-based transports. */
-provisional cluster PushAvStreamTransport = 1365 {
+cluster PushAvStreamTransport = 1365 {
   revision 1;
 
   enum CMAFInterfaceEnum : enum8 {
@@ -6852,7 +6859,7 @@ provisional cluster PushAvStreamTransport = 1365 {
 }
 
 /** This cluster provides facilities to configure and play Chime sounds, such as those used in a doorbell. */
-provisional cluster Chime = 1366 {
+cluster Chime = 1366 {
   revision 1;
 
   struct ChimeSoundStruct {
@@ -6869,12 +6876,13 @@ provisional cluster Chime = 1366 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+  /** This command will play the currently selected chime. */
   command PlayChimeSound(): DefaultSuccess = 0;
 }
 
 /** This Cluster is used to manage TLS Client Certificates and to provision
       TLS endpoints with enough information to facilitate subsequent connection. */
-provisional cluster TlsCertificateManagement = 2049 {
+cluster TlsCertificateManagement = 2049 {
   revision 1;
 
   fabric_scoped struct TLSCertStruct {
@@ -6987,7 +6995,7 @@ provisional cluster TlsCertificateManagement = 2049 {
 }
 
 /** This Cluster is used to provision TLS Endpoints with enough information to facilitate subsequent connection. */
-provisional cluster TlsClientManagement = 2050 {
+cluster TlsClientManagement = 2050 {
   revision 1;
 
   enum StatusCodeEnum : enum8 {
@@ -7994,7 +8002,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x0B;
-    ram      attribute clusterRevision default = 2;
+    callback attribute clusterRevision;
 
     handle command SetUTCTime;
     handle command SetTrustedTimeSource;

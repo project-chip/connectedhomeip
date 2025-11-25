@@ -23,6 +23,8 @@
 #include "LEDWidget.h"
 
 #ifdef DISPLAY_ENABLED
+#include "ClosureUI.h"
+#include "ClosureUIStrings.h"
 #include "lcd.h"
 #ifdef QR_CODE_ENABLED
 #include "qrcodegen.h"
@@ -42,11 +44,13 @@
 #include <assert.h>
 #include <lib/support/BitMask.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
+#include <stdio.h>
 
 #define APP_FUNCTION_BUTTON 0
 #define APP_CLOSURE_BUTTON 1
@@ -80,6 +84,7 @@ CHIP_ERROR AppTask::AppInit()
 
 #ifdef DISPLAY_ENABLED
     GetLCD().Init((uint8_t *) "Closure-App");
+    GetLCD().SetCustomUI(ClosureUI::DrawUI);
 #endif
 
     // Initialization of Closure Manager and endpoints of closure and closurepanel.
@@ -87,7 +92,7 @@ CHIP_ERROR AppTask::AppInit()
 
 // Update the LCD with the Stored value. Show QR Code if not provisioned
 #ifdef DISPLAY_ENABLED
-    GetLCD().WriteDemoUI(false);
+    UpdateClosureUI();
 #ifdef QR_CODE_ENABLED
 #ifdef SL_WIFI
     if (!ConnectivityMgr().IsWiFiStationProvisioned())
@@ -98,7 +103,7 @@ CHIP_ERROR AppTask::AppInit()
         GetLCD().ShowQRCode(true);
     }
 #endif // QR_CODE_ENABLED
-#endif
+#endif // DISPLAY_ENABLED
 
     return err;
 }
@@ -116,11 +121,11 @@ void AppTask::AppTaskMain(void * pvParameter)
     CHIP_ERROR err = sAppTask.Init();
     if (err != CHIP_NO_ERROR)
     {
-        SILABS_LOG("AppTask.Init() failed");
+        ChipLogError(AppServer, "AppTask Init failed");
         appError(err);
     }
 
-    SILABS_LOG("App Task started");
+    ChipLogProgress(AppServer, "App Task started");
 
     while (true)
     {
@@ -138,6 +143,192 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
     AppEvent button_event           = {};
     button_event.Type               = AppEvent::kEventType_Button;
     button_event.ButtonEvent.Action = btnAction;
-    button_event.Handler            = BaseApplication::ButtonHandler;
-    AppTask::GetAppTask().PostEvent(&button_event);
+
+    if (button == APP_CLOSURE_BUTTON && btnAction == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed))
+    {
+        button_event.Handler = ClosureButtonActionEventHandler;
+        sAppTask.PostEvent(&button_event);
+    }
+    else if (button == APP_FUNCTION_BUTTON)
+    {
+        button_event.Handler = BaseApplication::ButtonHandler;
+        sAppTask.PostEvent(&button_event);
+    }
 }
+
+void AppTask::ClosureButtonActionEventHandler(AppEvent * aEvent)
+{
+    if (aEvent->Type == AppEvent::kEventType_Button)
+    {
+        // Schedule work on the chip stack thread to ensure all CHIP API calls are safe
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(
+            [](intptr_t) {
+                // Check if an action is already in progress
+                if (ClosureManager::GetInstance().IsClosureControlMotionInProgress())
+                {
+                    // Stop the current action
+                    auto status = ClosureManager::GetInstance().GetClosureControlLogic().HandleStop();
+                    if (status != Protocols::InteractionModel::Status::Success)
+                    {
+                        ChipLogError(AppServer, "Failed to stop closure action: %u", to_underlying(status));
+                    }
+                }
+                else
+                {
+                    DataModel::Nullable<ClosureControl::GenericOverallCurrentState> currentState;
+                    CHIP_ERROR err = ClosureManager::GetInstance().GetClosureControlLogic().GetOverallCurrentState(currentState);
+
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        ChipLogError(AppServer, "Failed to get current closure state: %s", chip::ErrorStr(err));
+                        return;
+                    }
+                    if (currentState.IsNull())
+                    {
+                        ChipLogError(AppServer, "Failed to get current closure state: currentState is null");
+                        return;
+                    }
+                    if (!currentState.Value().position.HasValue() || currentState.Value().position.Value().IsNull())
+                    {
+                        ChipLogError(AppServer, "Failed to get current closure state: position is null");
+                        return;
+                    }
+
+                    // Get current position and determine target position (toggle)
+                    auto currentPosition = currentState.Value().position.Value().Value();
+                    ChipLogProgress(AppServer, "Current state - Position: %d", to_underlying(currentPosition));
+
+                    ClosureControl::TargetPositionEnum targetPosition =
+                        (currentPosition == ClosureControl::CurrentPositionEnum::kFullyOpened)
+                        ? ClosureControl::TargetPositionEnum::kMoveToFullyClosed
+                        : ClosureControl::TargetPositionEnum::kMoveToFullyOpen;
+                    ChipLogProgress(AppServer, "Target position: %d", to_underlying(targetPosition));
+
+                    Optional<bool> latch = chip::NullOptional;
+                    if (currentState.Value().latch.HasValue() && !currentState.Value().latch.Value().IsNull())
+                    {
+                        latch = MakeOptional(false);
+                    }
+
+                    Optional<Globals::ThreeLevelAutoEnum> speed = NullOptional;
+                    if (currentState.Value().speed.HasValue())
+                    {
+                        speed = chip::MakeOptional(currentState.Value().speed.Value());
+                    }
+
+                    // Move to the target position with latch set to false and preserved speed value
+                    auto status = ClosureManager::GetInstance().GetClosureControlLogic().HandleMoveTo(MakeOptional(targetPosition),
+                                                                                                      latch, speed);
+                    if (status != Protocols::InteractionModel::Status::Success)
+                    {
+                        ChipLogError(AppServer, "Failed to move closure to target position: %u", to_underlying(status));
+                    }
+                }
+            },
+            0);
+    }
+    else
+    {
+        ChipLogError(AppServer, "Unhandled event type in ClosureButtonActionEventHandler");
+    }
+}
+
+#ifdef DISPLAY_ENABLED
+void AppTask::UpdateClosureUIHandler(AppEvent * aEvent)
+{
+    if (aEvent->Type == AppEvent::kEventType_UpdateUI)
+    {
+        UpdateClosureUI();
+    }
+}
+
+void AppTask::UpdateClosureUI()
+{
+    ClosureManager & closureManager = ClosureManager::GetInstance();
+
+    // Lock chip stack when accessing CHIP attributes from app task context
+    DeviceLayer::PlatformMgr().LockChipStack();
+    auto uiData = closureManager.GetClosureUIData();
+    DeviceLayer::PlatformMgr().UnlockChipStack();
+
+    ClosureUI::SetMainState(uiData.mainState);
+
+    const char * positionSuffix = ClosureUIStrings::SUFFIX_UNKNOWN;
+    if (!uiData.overallCurrentState.IsNull() && uiData.overallCurrentState.Value().position.HasValue() &&
+        !uiData.overallCurrentState.Value().position.Value().IsNull())
+    {
+        switch (uiData.overallCurrentState.Value().position.Value().Value())
+        {
+        case chip::app::Clusters::ClosureControl::CurrentPositionEnum::kFullyClosed:
+            positionSuffix = ClosureUIStrings::POSITION_SUFFIX_CLOSED;
+            break;
+        case chip::app::Clusters::ClosureControl::CurrentPositionEnum::kFullyOpened:
+            positionSuffix = ClosureUIStrings::POSITION_SUFFIX_OPEN;
+            break;
+        case chip::app::Clusters::ClosureControl::CurrentPositionEnum::kPartiallyOpened:
+            positionSuffix = ClosureUIStrings::POSITION_SUFFIX_PARTIAL;
+            break;
+        case chip::app::Clusters::ClosureControl::CurrentPositionEnum::kOpenedForPedestrian:
+            positionSuffix = ClosureUIStrings::POSITION_SUFFIX_PEDESTRIAN;
+            break;
+        case chip::app::Clusters::ClosureControl::CurrentPositionEnum::kOpenedForVentilation:
+            positionSuffix = ClosureUIStrings::POSITION_SUFFIX_VENTILATION;
+            break;
+        default:
+            positionSuffix = ClosureUIStrings::SUFFIX_UNKNOWN;
+            break;
+        }
+    }
+    ClosureUI::FormatAndSetPosition(positionSuffix);
+
+    const char * latchSuffix = ClosureUIStrings::SUFFIX_UNKNOWN;
+    if (!uiData.overallCurrentState.IsNull() && uiData.overallCurrentState.Value().latch.HasValue() &&
+        !uiData.overallCurrentState.Value().latch.Value().IsNull())
+    {
+        latchSuffix = uiData.overallCurrentState.Value().latch.Value().Value() ? ClosureUIStrings::LATCH_SUFFIX_ENGAGED
+                                                                               : ClosureUIStrings::LATCH_SUFFIX_RELEASED;
+    }
+    ClosureUI::FormatAndSetLatch(latchSuffix);
+
+    const char * secureSuffix = ClosureUIStrings::SUFFIX_UNKNOWN;
+    if (!uiData.overallCurrentState.IsNull() && !uiData.overallCurrentState.Value().secureState.IsNull())
+    {
+        secureSuffix = uiData.overallCurrentState.Value().secureState.Value() ? ClosureUIStrings::SECURE_SUFFIX_YES
+                                                                              : ClosureUIStrings::SECURE_SUFFIX_NO;
+    }
+    ClosureUI::FormatAndSetSecure(secureSuffix);
+
+    const char * speedSuffix = ClosureUIStrings::SUFFIX_UNKNOWN;
+    if (!uiData.overallCurrentState.IsNull() && uiData.overallCurrentState.Value().speed.HasValue())
+    {
+        switch (uiData.overallCurrentState.Value().speed.Value())
+        {
+        case chip::app::Clusters::Globals::ThreeLevelAutoEnum::kLow:
+            speedSuffix = ClosureUIStrings::SPEED_SUFFIX_LOW;
+            break;
+        case chip::app::Clusters::Globals::ThreeLevelAutoEnum::kMedium:
+            speedSuffix = ClosureUIStrings::SPEED_SUFFIX_MEDIUM;
+            break;
+        case chip::app::Clusters::Globals::ThreeLevelAutoEnum::kHigh:
+            speedSuffix = ClosureUIStrings::SPEED_SUFFIX_HIGH;
+            break;
+        case chip::app::Clusters::Globals::ThreeLevelAutoEnum::kAuto:
+            speedSuffix = ClosureUIStrings::SPEED_SUFFIX_AUTO;
+            break;
+        default:
+            speedSuffix = ClosureUIStrings::SUFFIX_UNKNOWN;
+            break;
+        }
+    }
+    ClosureUI::FormatAndSetSpeed(speedSuffix);
+
+#ifdef SL_WIFI
+    if (ConnectivityMgr().IsWiFiStationProvisioned())
+#else
+    if (ConnectivityMgr().IsThreadProvisioned())
+#endif /* !SL_WIFI */
+    {
+        AppTask::GetAppTask().GetLCD().WriteDemoUI(false); // State doesn't matter for custom UI
+    }
+}
+#endif // DISPLAY_ENABLED

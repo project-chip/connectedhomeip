@@ -150,12 +150,12 @@ def test_case(func):
 
 
 def configurable_tests():
-    res = sorted([v for v in _configurable_test_sets])
+    res = sorted(_configurable_test_sets)
     return res
 
 
 def configurable_test_cases():
-    res = sorted([v for v in _configurable_tests])
+    res = sorted(_configurable_tests)
     return res
 
 
@@ -1096,7 +1096,7 @@ class BaseTestHelper:
         self.logger.info(
             f"Sending MoveToLevel command to device {nodeId} endpoint {endpoint}")
 
-        commonArgs = dict(transitionTime=0, optionsMask=1, optionsOverride=1)
+        commonArgs = {'transitionTime': 0, 'optionsMask': 1, 'optionsOverride': 1}
 
         async def _moveClusterLevel(setLevel):
             await self.devCtrl.SendCommand(nodeId,
@@ -1458,7 +1458,7 @@ class BaseTestHelper:
             restartRemoteThread.start()
 
             # Wait for some time so that the device will be resolving the address of the first controller after restarting
-            time.sleep(8)
+            await asyncio.sleep(8)
             restartRemoteThread.join(10.0)
 
             self.logger.info("Send a new subscription request from the second controller")
