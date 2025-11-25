@@ -335,9 +335,9 @@ int main(int argc, char * argv[])
     // If the event loop had been stopped due to an update being applied, boot into the new image
     if (gRequestorCore.GetCurrentUpdateState() == OTAUpdateStateEnum::kApplying)
     {
-        if (kMaxFilePathSize <= strlen(OTAImageProcessorImpl::kImageExecPath))
+        if (kMaxFilePathSize <= strlen(kImageExecPath))
         {
-            ChipLogError(SoftwareUpdate, "Buffer too small for the new image file path: %s", OTAImageProcessorImpl::kImageExecPath);
+            ChipLogError(SoftwareUpdate, "Buffer too small for the new image file path: %s", kImageExecPath);
             return -1;
         }
 
@@ -349,7 +349,7 @@ int main(int argc, char * argv[])
             ChipLogError(SoftwareUpdate, "Failed to store boot reason - SoftwareUpdateCompleted");
         }
 
-        argv[0] = OTAImageProcessorImpl::kImageExecPath;
+        argv[0] = kImageExecPath;
         execv(argv[0], argv);
 
         // If successfully executing the new image, execv should not return
