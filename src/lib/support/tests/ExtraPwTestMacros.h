@@ -86,17 +86,17 @@
 #define EXPECT_SUCCESS(expr) EXPECT_EQ((expr), CHIP_NO_ERROR)
 
 /**
- *  @def EXPECT_SUCCESS(expr)
+ *  @def ASSERT_SUCCESS(expr)
  *
  *  @brief
- *    Shorthand for EXPECT_EQ(expr, CHIP_NO_ERROR)
+ *    Shorthand for ASSERT_EQ(expr, CHIP_NO_ERROR)
  *
  *  Example usage:
  *
  *  @code
- *    EXPECT_SUCCESS(channel->SendMsg(msg));
+ *    ASSERT_SUCCESS(channel->SendMsg(msg));
  *  @endcode
  *
  *  @param[in]  expr        A scalar expression to be evaluated against CHIP_NO_ERROR.
  */
-#define EXPECT_SUCCESS(expr) EXPECT_EQ((expr), CHIP_NO_ERROR)
+#define ASSERT_SUCCESS(expr) ASSERT_EQ((expr), CHIP_NO_ERROR)
