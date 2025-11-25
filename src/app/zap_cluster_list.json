@@ -336,7 +336,7 @@
             "identify-server"
         ],
         "ILLUMINANCE_MEASUREMENT_CLUSTER": [
-            "illuminance-measurement"
+            "illuminance-measurement-server"
         ],
         "JOINT_FABRIC_DATASTORE_CLUSTER": [
             "joint-fabric-datastore-server"

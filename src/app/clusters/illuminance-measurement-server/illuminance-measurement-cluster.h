@@ -18,6 +18,7 @@
 
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
+#include <clusters/IlluminanceMeasurement/Metadata.h>
 #include <platform/DeviceInfoProvider.h>
 
 namespace chip::app::Clusters {
@@ -25,14 +26,14 @@ namespace chip::app::Clusters {
 class IlluminanceMeasurementCluster : public DefaultServerCluster
 {
 public:
-    // NOTE: this set is smaller than the full optional attributes supported by time synchronization
+    // NOTE: this set is smaller than the full optional attributes supported by illuminance measurement
     //       as other attributes are controlled by feature flags
     using OptionalAttributeSet = app::OptionalAttributeSet<IlluminanceMeasurement::Attributes::LightSensorType::Id,
                                                            IlluminanceMeasurement::Attributes::Tolerance::Id>;
 
     struct StartupConfiguration
     {
-        IlluminanceMeasurement::LightSensorTypeEnum lightSensorType{ IlluminanceMeasurement::LightSensorTypeEnum::kNone };
+        IlluminanceMeasurement::LightSensorTypeEnum lightSensorType{ IlluminanceMeasurement::LightSensorTypeEnum::kPhotodiode };
         IlluminanceMeasurement::Attributes::Tolerance::TypeInfo::Type tolerance{};
     };
 
@@ -50,12 +51,12 @@ public:
 
     IlluminanceMeasurement::Attributes::MeasuredValue::TypeInfo::Type GetMeasuredValue() const { return mMeasuredValue; }
 
-    IlluminanceMeasurement::Attributes::MixMeasuredValue::TypeInfo::Type GetMinMeasuredValue() const { return mMinMeasuredValue; }
+    IlluminanceMeasurement::Attributes::MinMeasuredValue::TypeInfo::Type GetMinMeasuredValue() const { return mMinMeasuredValue; }
 
     IlluminanceMeasurement::Attributes::Tolerance::TypeInfo::Type GetTolerance() const { return mTolerance; }
 
 protected:
-    IlluminanceMeasurement::LightSensorTypeEnum mLightSensorType{ IlluminanceMeasurement::LightSensorTypeEnum::kNone };
+    IlluminanceMeasurement::LightSensorTypeEnum mLightSensorType{ IlluminanceMeasurement::LightSensorTypeEnum::kPhotodiode };
     IlluminanceMeasurement::Attributes::MaxMeasuredValue::TypeInfo::Type mMaxMeasuredValue{};
     IlluminanceMeasurement::Attributes::MeasuredValue::TypeInfo::Type mMeasuredValue{};
     IlluminanceMeasurement::Attributes::MinMeasuredValue::TypeInfo::Type mMinMeasuredValue{};

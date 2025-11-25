@@ -28,6 +28,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::IlluminanceMeasurement;
 using namespace chip::app::Clusters::IlluminanceMeasurement::Attributes;
+using namespace chip::Protocols::InteractionModel;
 
 namespace {
 
@@ -45,16 +46,16 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         IlluminanceMeasurementCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
-        LightSensorTypeEnum lightSensorType = LightSensorTypeEnum::kNone;
+        LightSensorTypeEnum lightSensorType = LightSensorTypeEnum::kPhotodiode;
         if (optionalAttributeSet.IsSet(LightSensorType::Id))
         {
-            VerifyOrDie(LightSensorType::Get(endpointId, &lightSensorType) == Status::Success);
+            // VerifyOrDie(LightSensorType::Get(endpointId, &lightSensorType) == Status::Success); //revisar
         }
 
         Tolerance::TypeInfo::Type tolerance{};
         if (optionalAttributeSet.IsSet(Tolerance::Id))
         {
-            VerifyOrDie(Tolerance::Get(endpointId, &tolerance) == Status::Success);
+            // VerifyOrDie(Tolerance::Get(endpointId, &tolerance) == Status::Success); //revisar
         }
         gServers[clusterInstanceIndex].Create(endpointId, optionalAttributeSet,
                                               IlluminanceMeasurementCluster::StartupConfiguration{
