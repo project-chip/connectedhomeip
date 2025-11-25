@@ -71,6 +71,14 @@ const char PAYLOAD_B_RESPONSE[] = "Hi!";
 const char messageSize_TEST[]   = "\x00\x00\x00\x00";
 const size_t kMaxIncoming       = 2;
 
+char gPeerAddressBuffer[Transport::PeerAddress::kMaxToStringSize];
+
+char const * PeerAddrString(const Transport::PeerAddress & addr)
+{
+    addr.ToString(gPeerAddressBuffer, sizeof(gPeerAddressBuffer));
+    return gPeerAddressBuffer;
+}
+
 uint16_t GetRandomPort()
 {
     return static_cast<uint16_t>(CHIP_PORT + chip::Crypto::GetRandU16() % 1000);
@@ -146,46 +154,40 @@ public:
                       CHIP_NO_ERROR);
         }
 
-        ChipLogProgress(Inet, "Message Receive Handler called");
+        ChipLogProgress(Test, "Message Receive Handler called");
 
         mReceiveHandlerCallCount++;
     }
 
     void HandleConnectionAttemptComplete(ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr) override
     {
-        AppTCPConnectionCallbackCtxt * appConnCbCtxt = nullptr;
-        VerifyOrReturn(!conn.IsNull());
+        EXPECT_TRUE(conn);
+        ChipLogProgress(Test, "HandleConnectionAttemptComplete called: %p %s (%" CHIP_ERROR_FORMAT ")", &*conn,
+                        PeerAddrString(conn->mPeerAddr), conErr.Format());
+        mHandleConnectionCompleteCalled = &*conn;
+    }
 
-        mHandleConnectionCompleteCalled = true;
-        appConnCbCtxt                   = conn->mAppState;
-        VerifyOrReturn(appConnCbCtxt != nullptr);
+    void HandleConnectionReceived(ActiveTCPConnectionState & conn) override
+    {
+        ChipLogProgress(Test, "HandleConnectionReceived called: %p %s", &conn, PeerAddrString(conn.mPeerAddr));
+        mHandleConnectionReceivedCalled = &conn;
 
-        if (appConnCbCtxt->connCompleteCb != nullptr)
+        // Sanity check: incoming connection handle should be different to any active outgoing connection
+        if (activeTCPConnState)
         {
-            appConnCbCtxt->connCompleteCb(conn, conErr);
+            EXPECT_NE(&conn, &*activeTCPConnState);
         }
-        else
+        if (refHolder)
         {
-            ChipLogProgress(Inet, "Connection established. App callback missing.");
+            EXPECT_NE(&conn, &*refHolder);
         }
     }
 
     void HandleConnectionClosed(ActiveTCPConnectionState & conn, CHIP_ERROR conErr) override
     {
-        AppTCPConnectionCallbackCtxt * appConnCbCtxt = nullptr;
-
-        mHandleConnectionCloseCalled = true;
-        appConnCbCtxt                = conn.mAppState;
-        VerifyOrReturn(appConnCbCtxt != nullptr);
-
-        if (appConnCbCtxt->connClosedCb != nullptr)
-        {
-            appConnCbCtxt->connClosedCb(conn, conErr);
-        }
-        else
-        {
-            ChipLogProgress(Inet, "Connection Closed. App callback missing.");
-        }
+        ChipLogProgress(Test, "HandleConnectionClosed called: %p %s (%" CHIP_ERROR_FORMAT ")", &conn,
+                        PeerAddrString(conn.mPeerAddr), conErr.Format());
+        mHandleConnectionCloseCalled = &conn;
     }
 
     uint16_t InitializeMessageTest(TCPImpl & tcp, const IPAddress & addr)
@@ -199,8 +201,9 @@ public:
         EXPECT_SUCCESS(mTransportMgrBase.Init(&tcp));
 
         mReceiveHandlerCallCount        = 0;
-        mHandleConnectionCompleteCalled = false;
-        mHandleConnectionCloseCalled    = false;
+        mHandleConnectionCompleteCalled = nullptr;
+        mHandleConnectionCloseCalled    = nullptr;
+        mHandleConnectionReceivedCalled = nullptr;
 
         return port;
     }
@@ -225,6 +228,7 @@ public:
 
         CHIP_ERROR err = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), nullptr, refHolder);
         EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_TRUE(refHolder);
 
         // Should be able to send a message to itself by just calling send.
         chip::System::PacketBufferHandle buffer;
@@ -288,6 +292,7 @@ public:
 
         CHIP_ERROR err = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), nullptr, firstConnection);
         EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_TRUE(firstConnection);
 
         // Send the first message with expectation it is against first connection
         {
@@ -300,6 +305,7 @@ public:
 
         err = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), nullptr, secondConnection);
         EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_TRUE(secondConnection);
 
         // Send the second message with the expectation it is against the second connection
         // (the only way this works is if these 2 are the same connection, keyed off of PeerAddress
@@ -327,6 +333,7 @@ public:
         // Connect and wait for seeing active connection
         CHIP_ERROR err = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), nullptr, activeTCPConnState);
         EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_TRUE(activeTCPConnState);
 
         mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(5), [&tcp]() { return tcp.HasActiveConnections(); });
         EXPECT_EQ(tcp.HasActiveConnections(), true);
@@ -338,9 +345,10 @@ public:
         // handler being called.
         CHIP_ERROR err = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), nullptr, activeTCPConnState);
         EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_TRUE(activeTCPConnState);
 
         mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(5), [this]() { return mHandleConnectionCompleteCalled; });
-        EXPECT_EQ(mHandleConnectionCompleteCalled, true);
+        EXPECT_EQ(mHandleConnectionCompleteCalled, &*activeTCPConnState);
     }
 
     void HandleConnectCloseCbCalledTest(TCPImpl & tcp, const IPAddress & addr, uint16_t port)
@@ -349,13 +357,21 @@ public:
         // handler being called.
         CHIP_ERROR err = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), nullptr, activeTCPConnState);
         EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_TRUE(activeTCPConnState);
 
         mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(5), [this]() { return mHandleConnectionCompleteCalled; });
-        EXPECT_EQ(mHandleConnectionCompleteCalled, true);
+        EXPECT_EQ(mHandleConnectionCompleteCalled, &*activeTCPConnState);
 
-        activeTCPConnState.Release();
+        // Wait for the HandleConnectionReceived callback, otherwise we can't be sure the connection
+        // was actually accepted by the server. If we close the client connection too quickly, the
+        // connection may not be returned by accept() at all, or (on Darwin) may be returned as
+        // valid socket but with saLen == 0.
+        mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(5), [this]() { return mHandleConnectionReceivedCalled; });
+        EXPECT_NE(mHandleConnectionReceivedCalled, nullptr);
+
+        activeTCPConnState.Release(); // close the client-side connection
         mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(5), [&tcp]() { return !tcp.HasActiveConnections(); });
-        EXPECT_EQ(mHandleConnectionCloseCalled, true);
+        EXPECT_EQ(mHandleConnectionCloseCalled, mHandleConnectionReceivedCalled);
     }
 
     void HandleConnectCloseCbCalledWithFailureTest(TCPImpl & tcp, const IPAddress & addr, uint16_t port)
@@ -364,13 +380,14 @@ public:
         // handler being called.
         CHIP_ERROR err = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), nullptr, activeTCPConnState);
         EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_TRUE(activeTCPConnState);
 
         mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(5), [this]() { return mHandleConnectionCompleteCalled; });
-        EXPECT_EQ(mHandleConnectionCompleteCalled, true);
+        EXPECT_EQ(mHandleConnectionCompleteCalled, &*activeTCPConnState);
 
         activeTCPConnState.Release();
         mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(5), [&tcp]() { return !tcp.HasActiveConnections(); });
-        EXPECT_EQ(mHandleConnectionCloseCalled, false);
+        EXPECT_EQ(mHandleConnectionCloseCalled, nullptr);
     }
 
     void DisconnectTest(TCPImpl & tcp)
@@ -384,12 +401,6 @@ public:
         }
         mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(5), [&tcp]() { return !tcp.HasActiveConnections(); });
         EXPECT_EQ(tcp.HasActiveConnections(), false);
-    }
-
-    CHIP_ERROR TCPConnect(const Transport::PeerAddress & peerAddress, Transport::AppTCPConnectionCallbackCtxt * appState,
-                          Transport::ActiveTCPConnectionHandle & peerConnState)
-    {
-        return mTransportMgrBase.TCPConnect(peerAddress, appState, peerConnState);
     }
 
     using OnTCPConnectionReceivedCallback = void (*)(void * context, ActiveTCPConnectionState * conn);
@@ -406,11 +417,10 @@ public:
         mConnReceivedCb = connReceivedCb;
     }
 
-    int mReceiveHandlerCallCount = 0;
-
-    bool mHandleConnectionCompleteCalled = false;
-
-    bool mHandleConnectionCloseCalled = false;
+    int mReceiveHandlerCallCount           = 0;
+    void * mHandleConnectionCompleteCalled = nullptr;
+    void * mHandleConnectionCloseCalled    = nullptr;
+    void * mHandleConnectionReceivedCalled = nullptr;
 
 private:
     IOContext * mIOContext;
