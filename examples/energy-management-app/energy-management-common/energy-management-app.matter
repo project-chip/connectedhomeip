@@ -654,7 +654,7 @@ cluster BasicInformation = 40 {
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute int32u specificationVersion = 21;
   readonly attribute int16u maxPathsPerInvoke = 22;
-  readonly attribute int32u configurationVersion = 24;
+  provisional readonly attribute int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -850,7 +850,7 @@ cluster UnitLocalization = 45 {
   }
 
   attribute access(write: manage) optional TempUnitEnum temperatureUnit = 0;
-  provisional readonly attribute optional TempUnitEnum supportedTemperatureUnits[] = 1;
+  readonly attribute optional TempUnitEnum supportedTemperatureUnits[] = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1158,11 +1158,11 @@ cluster GeneralCommissioning = 48 {
   readonly attribute RegulatoryLocationTypeEnum regulatoryConfig = 2;
   readonly attribute RegulatoryLocationTypeEnum locationCapability = 3;
   readonly attribute boolean supportsConcurrentConnection = 4;
-  provisional readonly attribute access(read: administer) optional int16u TCAcceptedVersion = 5;
-  provisional readonly attribute access(read: administer) optional int16u TCMinRequiredVersion = 6;
-  provisional readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
-  provisional readonly attribute access(read: administer) optional boolean TCAcknowledgementsRequired = 8;
-  provisional readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
+  readonly attribute access(read: administer) optional int16u TCAcceptedVersion = 5;
+  readonly attribute access(read: administer) optional int16u TCMinRequiredVersion = 6;
+  readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
+  readonly attribute access(read: administer) optional boolean TCAcknowledgementsRequired = 8;
+  readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
   provisional readonly attribute access(read: manage) optional octet_string<8> recoveryIdentifier = 10;
   provisional readonly attribute access(read: manage) optional nullable NetworkRecoveryReasonEnum networkRecoveryReason = 11;
   provisional readonly attribute optional boolean isCommissioningWithoutPower = 12;
@@ -1305,9 +1305,9 @@ cluster NetworkCommissioning = 49 {
   readonly attribute access(read: administer) nullable NetworkCommissioningStatusEnum lastNetworkingStatus = 5;
   readonly attribute access(read: administer) nullable octet_string<32> lastNetworkID = 6;
   readonly attribute access(read: administer) nullable int32s lastConnectErrorValue = 7;
-  provisional readonly attribute optional WiFiBandEnum supportedWiFiBands[] = 8;
-  provisional readonly attribute optional ThreadCapabilitiesBitmap supportedThreadFeatures = 9;
-  provisional readonly attribute optional int16u threadVersion = 10;
+  readonly attribute optional WiFiBandEnum supportedWiFiBands[] = 8;
+  readonly attribute optional ThreadCapabilitiesBitmap supportedThreadFeatures = 9;
+  readonly attribute optional int16u threadVersion = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1999,7 +1999,7 @@ cluster ElectricalEnergyMeasurement = 145 {
 }
 
 /** This cluster is used to allow clients to control the operation of a hot water heating appliance so that it can be used with energy management. */
-provisional cluster WaterHeaterManagement = 148 {
+cluster WaterHeaterManagement = 148 {
   revision 2;
 
   enum BoostStateEnum : enum8 {
@@ -2059,7 +2059,7 @@ provisional cluster WaterHeaterManagement = 148 {
 }
 
 /** This cluster allows a client to manage the power draw of a device. An example of such a client could be an Energy Management System (EMS) which controls an Energy Smart Appliance (ESA). */
-provisional cluster DeviceEnergyManagement = 152 {
+cluster DeviceEnergyManagement = 152 {
   revision 4;
 
   enum AdjustmentCauseEnum : enum8 {
@@ -2203,19 +2203,19 @@ provisional cluster DeviceEnergyManagement = 152 {
     elapsed_s duration = 2;
   }
 
-  provisional info event PowerAdjustStart = 0 {
+  info event PowerAdjustStart = 0 {
   }
 
-  provisional info event PowerAdjustEnd = 1 {
+  info event PowerAdjustEnd = 1 {
     CauseEnum cause = 0;
     elapsed_s duration = 1;
     energy_mwh energyUse = 2;
   }
 
-  provisional info event Paused = 2 {
+  info event Paused = 2 {
   }
 
-  provisional info event Resumed = 3 {
+  info event Resumed = 3 {
     CauseEnum cause = 0;
   }
 
@@ -2601,7 +2601,7 @@ cluster WaterHeaterMode = 158 {
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
-provisional cluster DeviceEnergyManagementMode = 159 {
+cluster DeviceEnergyManagementMode = 159 {
   revision 2;
 
   enum ModeTag : enum16 {

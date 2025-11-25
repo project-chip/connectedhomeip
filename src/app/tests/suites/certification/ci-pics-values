@@ -1706,7 +1706,7 @@ BINFO.S.A0013=1
 BINFO.S.A0014=1
 BINFO.S.A0015=1
 BINFO.S.A0016=1
-BINFO.S.A0018=1
+BINFO.S.A0018=0 # V1.5 BRANCH FIX - Configuration version is still provisional
 
 # Events
 BINFO.S.E00=1

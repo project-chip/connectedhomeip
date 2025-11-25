@@ -68,13 +68,17 @@ TEST_F(TestBasicInformationCluster, TestAttributes)
 
         ReadOnlyBufferBuilder<AttributeEntry> expectedBuilder;
         ASSERT_EQ(expectedBuilder.AppendElements({
-                      DataModelRevision::kMetadataEntry, VendorName::kMetadataEntry, VendorID::kMetadataEntry,
-                      ProductName::kMetadataEntry, ProductID::kMetadataEntry, NodeLabel::kMetadataEntry, Location::kMetadataEntry,
-                      HardwareVersion::kMetadataEntry, HardwareVersionString::kMetadataEntry, SoftwareVersion::kMetadataEntry,
-                      SoftwareVersionString::kMetadataEntry, CapabilityMinima::kMetadataEntry, SpecificationVersion::kMetadataEntry,
-                      MaxPathsPerInvoke::kMetadataEntry, ConfigurationVersion::kMetadataEntry,
-                      UniqueID::kMetadataEntry, // required in latest spec
-                  }),
+            DataModelRevision::kMetadataEntry, VendorName::kMetadataEntry, VendorID::kMetadataEntry, ProductName::kMetadataEntry,
+                ProductID::kMetadataEntry, NodeLabel::kMetadataEntry, Location::kMetadataEntry, HardwareVersion::kMetadataEntry,
+                HardwareVersionString::kMetadataEntry, SoftwareVersion::kMetadataEntry, SoftwareVersionString::kMetadataEntry,
+                CapabilityMinima::kMetadataEntry, SpecificationVersion::kMetadataEntry, MaxPathsPerInvoke::kMetadataEntry,
+// V1.5 BRANCH FIX
+// Configuration version is still provisional and should not be included in 1.5.
+#if 0
+                      ConfigurationVersion::kMetadataEntry,
+#endif
+                UniqueID::kMetadataEntry, // required in latest spec
+        }),
                   CHIP_NO_ERROR);
         ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
         ASSERT_TRUE(Testing::EqualAttributeSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
@@ -91,22 +95,16 @@ TEST_F(TestBasicInformationCluster, TestAttributes)
 
         ReadOnlyBufferBuilder<AttributeEntry> expectedBuilder;
         ASSERT_EQ(expectedBuilder.AppendElements({
-                      DataModelRevision::kMetadataEntry,
-                      VendorName::kMetadataEntry,
-                      VendorID::kMetadataEntry,
-                      ProductName::kMetadataEntry,
-                      ProductID::kMetadataEntry,
-                      NodeLabel::kMetadataEntry,
-                      Location::kMetadataEntry,
-                      HardwareVersion::kMetadataEntry,
-                      HardwareVersionString::kMetadataEntry,
-                      SoftwareVersion::kMetadataEntry,
-                      SoftwareVersionString::kMetadataEntry,
-                      CapabilityMinima::kMetadataEntry,
-                      SpecificationVersion::kMetadataEntry,
-                      MaxPathsPerInvoke::kMetadataEntry,
+            DataModelRevision::kMetadataEntry, VendorName::kMetadataEntry, VendorID::kMetadataEntry, ProductName::kMetadataEntry,
+                ProductID::kMetadataEntry, NodeLabel::kMetadataEntry, Location::kMetadataEntry, HardwareVersion::kMetadataEntry,
+                HardwareVersionString::kMetadataEntry, SoftwareVersion::kMetadataEntry, SoftwareVersionString::kMetadataEntry,
+                CapabilityMinima::kMetadataEntry, SpecificationVersion::kMetadataEntry, MaxPathsPerInvoke::kMetadataEntry,
+// V1.5 BRANCH FIX
+// Configuration version is still provisional and should not be included in 1.5.
+#if 0
                       ConfigurationVersion::kMetadataEntry,
-                  }),
+#endif
+        }),
                   CHIP_NO_ERROR);
         ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
         ASSERT_TRUE(Testing::EqualAttributeSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));
@@ -132,31 +130,19 @@ TEST_F(TestBasicInformationCluster, TestAttributes)
 
         ReadOnlyBufferBuilder<AttributeEntry> expectedBuilder;
         ASSERT_EQ(expectedBuilder.AppendElements({
-                      DataModelRevision::kMetadataEntry,
-                      VendorName::kMetadataEntry,
-                      VendorID::kMetadataEntry,
-                      ProductName::kMetadataEntry,
-                      ProductID::kMetadataEntry,
-                      NodeLabel::kMetadataEntry,
-                      Location::kMetadataEntry,
-                      HardwareVersion::kMetadataEntry,
-                      HardwareVersionString::kMetadataEntry,
-                      SoftwareVersion::kMetadataEntry,
-                      SoftwareVersionString::kMetadataEntry,
-                      CapabilityMinima::kMetadataEntry,
-                      SpecificationVersion::kMetadataEntry,
-                      MaxPathsPerInvoke::kMetadataEntry,
+            DataModelRevision::kMetadataEntry, VendorName::kMetadataEntry, VendorID::kMetadataEntry, ProductName::kMetadataEntry,
+                ProductID::kMetadataEntry, NodeLabel::kMetadataEntry, Location::kMetadataEntry, HardwareVersion::kMetadataEntry,
+                HardwareVersionString::kMetadataEntry, SoftwareVersion::kMetadataEntry, SoftwareVersionString::kMetadataEntry,
+                CapabilityMinima::kMetadataEntry, SpecificationVersion::kMetadataEntry, MaxPathsPerInvoke::kMetadataEntry,
+// V1.5 BRANCH FIX
+// Configuration version is still provisional and should not be included in 1.5.
+#if 0
                       ConfigurationVersion::kMetadataEntry,
-                      UniqueID::kMetadataEntry,
-                      ManufacturingDate::kMetadataEntry,
-                      PartNumber::kMetadataEntry,
-                      ProductURL::kMetadataEntry,
-                      ProductLabel::kMetadataEntry,
-                      SerialNumber::kMetadataEntry,
-                      LocalConfigDisabled::kMetadataEntry,
-                      Reachable::kMetadataEntry,
-                      ProductAppearance::kMetadataEntry,
-                  }),
+#endif
+                UniqueID::kMetadataEntry, ManufacturingDate::kMetadataEntry, PartNumber::kMetadataEntry, ProductURL::kMetadataEntry,
+                ProductLabel::kMetadataEntry, SerialNumber::kMetadataEntry, LocalConfigDisabled::kMetadataEntry,
+                Reachable::kMetadataEntry, ProductAppearance::kMetadataEntry,
+        }),
                   CHIP_NO_ERROR);
         ASSERT_EQ(expectedBuilder.ReferenceExisting(app::DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
         ASSERT_TRUE(Testing::EqualAttributeSets(builder.TakeBuffer(), expectedBuilder.TakeBuffer()));

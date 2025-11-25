@@ -66,7 +66,12 @@ constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
     CapabilityMinima::kMetadataEntry,
     SpecificationVersion::kMetadataEntry,
     MaxPathsPerInvoke::kMetadataEntry,
+// V1.5 BRANCH FIX
+// Configuration version is still provisional and should not be included in 1.5.
+#if 0
     ConfigurationVersion::kMetadataEntry,
+#endif
+
     // NOTE: UniqueID used to NOT be mandatory in previous spec version, so we add
     // this as a separate condition
     // UniqueID::kMetadataEntry,
