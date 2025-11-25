@@ -18,12 +18,14 @@
 
 #include "AppMain.h"
 #include <app-common/zap-generated/ids/Clusters.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorUserConsent.h>
 #include <app/clusters/ota-requestor/ExtendedOTARequestorDriver.h>
 #include <platform/Linux/OTAImageProcessorImpl.h>
+#endif
 
 #include "Identify.h"
 #include "LockAppCommandDelegate.h"
@@ -37,6 +39,7 @@ namespace {
 NamedPipeCommands sChipNamedPipeCommands;
 LockAppCommandDelegate sLockAppCommandDelegate;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 DefaultOTARequestor gRequestorCore;
 DefaultOTARequestorStorage gRequestorStorage;
 DeviceLayer::ExtendedOTARequestorDriver gRequestorUser;
@@ -60,6 +63,7 @@ void InitOTARequestor()
     // Set the image processor instance used for handling image being downloaded
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
 }
+#endif
 
 } // anonymous namespace
 
@@ -73,7 +77,9 @@ void ApplicationInit()
         TEMPORARY_RETURN_IGNORED sChipNamedPipeCommands.Stop();
     }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     InitOTARequestor();
+#endif
     TEMPORARY_RETURN_IGNORED IdentifyInit();
 }
 

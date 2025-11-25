@@ -20,6 +20,11 @@
  * to the OTA Requestor object that handles them
  */
 
+#include <lib/core/DataModelTypes.h>
+#include <lib/support/logging/CHIPLogging.h>
+
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+
 #include <app/clusters/ota-requestor/OTARequestorCluster.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <app/static-cluster-config/OtaSoftwareUpdateRequestor.h>
@@ -70,8 +75,11 @@ public:
 
 } // namespace
 
-void MatterOtaSoftwareUpdateRequestorClusterInitCallback(EndpointId endpointId)
+#endif
+
+void MatterOtaSoftwareUpdateRequestorClusterInitCallback(chip::EndpointId endpointId)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     IntegrationDelegate integrationDelegate;
 
     CodegenClusterIntegration::RegisterServer(
@@ -84,10 +92,14 @@ void MatterOtaSoftwareUpdateRequestorClusterInitCallback(EndpointId endpointId)
             .fetchOptionalAttributes   = false,
         },
         integrationDelegate);
+#else
+    ChipLogError(SoftwareUpdate, "Trying to initialize OTA requestor with flag 'chip_enable_ota_requestor' disabled");
+#endif
 }
 
-void MatterOtaSoftwareUpdateRequestorClusterShutdownCallback(EndpointId endpointId)
+void MatterOtaSoftwareUpdateRequestorClusterShutdownCallback(chip::EndpointId endpointId)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     IntegrationDelegate integrationDelegate;
 
     CodegenClusterIntegration::UnregisterServer(
@@ -98,6 +110,7 @@ void MatterOtaSoftwareUpdateRequestorClusterShutdownCallback(EndpointId endpoint
             .maxClusterInstanceCount   = kOtaRequestorMaxClusterCount,
         },
         integrationDelegate);
+#endif
 }
 
 void MatterOtaSoftwareUpdateRequestorPluginServerInitCallback() {}
