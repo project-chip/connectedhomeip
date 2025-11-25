@@ -1214,6 +1214,10 @@ TEST_F(TestICDManager, TestShortIdleModeBehaviorSITvsLIT)
     ICDConfigurationData & icdConfigData = ICDConfigurationData::GetInstance();
     ICDConfigurationDataTestAccess privateIcdConfigData(&icdConfigData);
 
+    // Save original values
+    Seconds32 originalIdle        = configData.GetIdleModeDuration();
+    Milliseconds32 originalActive = configData.GetActiveModeDuration();
+
     // Enable required features (LIT support needed for short idle usage)
     BitFlags<Feature> featureMap;
     featureMap.Set(Feature::kLongIdleTimeSupport).Set(Feature::kUserActiveModeTrigger).Set(Feature::kCheckInProtocolSupport);
@@ -1279,9 +1283,14 @@ TEST_F(TestICDManager, TestShortIdleModeBehaviorSITvsLIT)
     EXPECT_EQ(CHIP_NO_ERROR, table.Remove(0));
     ICDNotifier::GetInstance().NotifyICDManagementEvent(ICDListener::ICDManagementEvents::kTableUpdated);
     EXPECT_EQ(icdConfigData.GetICDMode(), ICDConfigurationData::ICDMode::SIT);
-    // Since we are back to operating in SIT mode,we use the ShortIdleModeDuration
+    // Since we are back to operating in SIT mode, we use the ShortIdleModeDuration
     EXPECT_TRUE(icdConfigData.ShouldUseShortIdle());
     EXPECT_EQ(icdConfigData.GetModeBasedIdleModeDuration(), System::Clock::Seconds32(2));
+
+    // Restore original values
+    EXPECT_EQ(
+        privateConfigData.SetModeDurations(MakeOptional(originalActive), MakeOptional(Milliseconds32(originalIdle.count() * 1000))),
+        CHIP_NO_ERROR);
 }
 #endif // CHIP_CONFIG_ENABLE_ICD_LIT
 

@@ -194,10 +194,6 @@ TEST_F(TestICDConfigurationData, TestSetModeDurations)
     EXPECT_EQ(privateConfigData.SetModeDurations(MakeOptional(Milliseconds32(20000)), MakeOptional(Milliseconds32(1000))),
               CHIP_ERROR_INVALID_ARGUMENT);
 
-    // Restore original values
-    EXPECT_EQ(privateConfigData.SetModeDurations(MakeOptional(origActive), MakeOptional(Milliseconds32(origIdle.count() * 1000))),
-              CHIP_NO_ERROR);
-
     // Test SetModeDurations with shortIdleModeDuration
     // Valid all three params: active=1500ms, idle=8s, shortIdle=3s
     EXPECT_EQ(privateConfigData.SetModeDurations(std::optional<Milliseconds32>(Milliseconds32(1500)),
@@ -220,6 +216,10 @@ TEST_F(TestICDConfigurationData, TestSetModeDurations)
     EXPECT_EQ(privateConfigData.SetModeDurations(std::optional<Milliseconds32>(Milliseconds32(9000)),
                                                  std::optional<Seconds32>(Seconds32(5)), std::optional<Seconds32>(Seconds32(3))),
               CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Restore original values
+    EXPECT_EQ(privateConfigData.SetModeDurations(MakeOptional(origActive), MakeOptional(Milliseconds32(origIdle.count() * 1000))),
+              CHIP_NO_ERROR);
 }
 
 } // namespace app
