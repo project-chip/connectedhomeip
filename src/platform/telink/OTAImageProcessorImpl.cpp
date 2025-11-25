@@ -57,7 +57,8 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
     VerifyOrReturnError(mDownloader != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    return DeviceLayer::SystemLayer().ScheduleLambda([this] { mDownloader->OnPreparedForDownload(PrepareDownloadImpl()); });
+    return DeviceLayer::SystemLayer().ScheduleLambda(
+        [this] { TEMPORARY_RETURN_IGNORED mDownloader->OnPreparedForDownload(PrepareDownloadImpl()); });
 }
 const struct device * flash_dev;
 
@@ -168,12 +169,12 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & aBlock)
                           static_cast<unsigned>(mParams.totalFileBytes));
             if (downloadedBytesRestored)
             {
-                mDownloader->SkipData(downloadedBytesRestored - aBlock.size());
+                TEMPORARY_RETURN_IGNORED mDownloader->SkipData(downloadedBytesRestored - aBlock.size());
                 downloadedBytesRestored = 0;
             }
             else
             {
-                mDownloader->FetchNextData();
+                TEMPORARY_RETURN_IGNORED mDownloader->FetchNextData();
             }
         }
         else
@@ -265,7 +266,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & aBlock)
         mParams.totalFileBytes = header.mPayloadSize;
 
         // Restore interrupted OTA process
-        RestoreBytes(header.mImageDigest);
+        TEMPORARY_RETURN_IGNORED RestoreBytes(header.mImageDigest);
 
         mHeaderParser.Clear();
     }

@@ -145,6 +145,9 @@ CHIP_ERROR NXPWiFiDriver::RevertConfiguration()
     /* Reset mStagingNetwork as it may have been updated during add/update network operation */
     mStagingNetwork = mSavedNetwork;
 
+    // succeed right away if we are already connected
+    VerifyOrReturnError(!is_sta_connected(), CHIP_NO_ERROR);
+
     // succeed right away if no saved network
     VerifyOrReturnError(mStagingNetwork.ssidLen > 0, CHIP_NO_ERROR);
     // Connect to saved network
@@ -237,6 +240,32 @@ void NXPWiFiDriver::OnConnectWiFiNetwork(Status commissioningError, CharSpan deb
     {
         mpConnectCallback->OnResult(commissioningError, debugText, connectStatus);
         mpConnectCallback = nullptr;
+    }
+}
+
+void NXPWiFiDriver::OnNetworkStatusChange()
+{
+    ChipLogProgress(NetworkProvisioning, "NXPWiFiDriver::OnNetworkStatusChange\r\n");
+    Network configuredNetwork;
+
+    VerifyOrReturn(mpStatusChangeCallback != nullptr);
+    CHIP_ERROR err = GetConnectedNetwork(configuredNetwork);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to get configured network when updating network status: %s", err.AsString());
+        return;
+    }
+
+    if (configuredNetwork.networkIDLen)
+    {
+        mpStatusChangeCallback->OnNetworkingStatusChange(
+            Status::kSuccess, MakeOptional(ByteSpan(configuredNetwork.networkID, configuredNetwork.networkIDLen)), NullOptional);
+    }
+    else
+    {
+        mpStatusChangeCallback->OnNetworkingStatusChange(
+            Status::kUnknownError, MakeOptional(ByteSpan(configuredNetwork.networkID, configuredNetwork.networkIDLen)),
+            NullOptional);
     }
 }
 
@@ -448,7 +477,7 @@ uint32_t NXPWiFiDriver::GetSupportedWiFiBandsMask() const
     return bands;
 }
 
-static CHIP_ERROR GetConnectedNetwork(Network & network)
+CHIP_ERROR NXPWiFiDriver::GetConnectedNetwork(Network & network)
 {
     struct wlan_network wlan_network;
     int result;
@@ -490,7 +519,7 @@ bool NXPWiFiDriver::WiFiNetworkIterator::Next(Network & item)
     mExhausted        = true;
 
     Network connectedNetwork;
-    CHIP_ERROR err = GetConnectedNetwork(connectedNetwork);
+    CHIP_ERROR err = mDriver->GetConnectedNetwork(connectedNetwork);
 
     if (err == CHIP_NO_ERROR)
     {
