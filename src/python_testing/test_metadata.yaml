@@ -85,6 +85,8 @@ not_automated:
       reason: Unit test - does not run against an app
     - name: TestIdChecks.py
       reason: Unit test - does not run against an app
+    - name: TestSpecParsingDataType.py
+      reason: Unit test - does not run against an app
     - name: TestSpecParsingDeviceType.py
       reason: Unit test - does not run against an app
     - name: TestSpecParsingNamespace.py
