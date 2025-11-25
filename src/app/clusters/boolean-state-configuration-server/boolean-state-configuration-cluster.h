@@ -15,6 +15,7 @@
  */
 #pragma once
 
+#include "lib/core/DataModelTypes.h"
 #include <app/clusters/boolean-state-configuration-server/boolean-state-configuration-delegate.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
@@ -57,9 +58,17 @@ public:
     Protocols::InteractionModel::Status SetAlarmsActive(AlarmModeBitMask alarms);
     Protocols::InteractionModel::Status SuppressAlarms(AlarmModeBitMask alarms);
     CHIP_ERROR SetCurrentSensitivityLevel(uint8_t level);
+    uint8_t GetCurrentSesitivityLevel() const { return mCurrentSensitivityLevel; }
     void ClearAllAlarms();
     void GenerateSensorFault(SensorFaultBitMask fault);
     Protocols::InteractionModel::Status SetAllEnabledAlarmsActive();
+
+    SensorFaultBitMask GetSensorFault() const { return mSensorFault; }
+    AlarmModeBitMask GetAlarmsActive() const { return mAlarmsActive; }
+    AlarmModeBitMask GetAlarmsSuppressed() const { return mAlarmsSuppressed; }
+    AlarmModeBitMask GetAlarmsEnabled() const { return mAlarmsEnabled; }
+
+
 
     // ServerClusterInterface/DefaultServerCluster implementation
     CHIP_ERROR Startup(ServerClusterContext & context) override;
@@ -103,6 +112,9 @@ private:
     SensorFaultBitMask mSensorFault{ 0 };
 
     void GenerateAlarmsStateChangedEvent();
+
+    // Does NotifyAttributeChanged and also calls the delegate attribute changed callback
+    void OnClusterAttributeChanged(AttributeId attributeId);
 };
 
 } // namespace chip::app::Clusters
