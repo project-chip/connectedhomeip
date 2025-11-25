@@ -89,20 +89,15 @@
 #include "OTARequestorInitiator.h"
 #endif
 
-#if CONFIG_CHIP_TEST_EVENT && CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-#include <app/clusters/ota-requestor/OTATestEventTriggerDelegate.h>
+#ifdef CONFIG_CHIP_REGISTER_SIMPLE_TEST_EVENT_TRIGGER_DELEGATE && CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+#include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #endif
 
 #ifdef ENABLE_CHIP_SHELL
 #include <lib/shell/commands/WiFi.h>
 #endif
 
-#ifdef SMOKE_CO_ALARM
-#include <app/TestEventTriggerDelegate.h>
-#include <app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerHandler.h>
-#endif
-
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#ifdef CONFIG_CHIP_REGISTER_SIMPLE_TEST_EVENT_TRIGGER_DELEGATE
 #include <app/TestEventTriggerDelegate.h>
 #endif
 
@@ -147,13 +142,7 @@ app::Clusters::NetworkCommissioning::Instance
 extern char baseServiceInstanceName[];
 #endif
 
-#if CHIP_CONFIG_ENABLE_ICD_SERVER || (CONFIG_CHIP_TEST_EVENT && CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
-static uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
-                                                                                          0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb,
-                                                                                          0xcc, 0xdd, 0xee, 0xff };
-#endif
-
-#ifdef SMOKE_CO_ALARM
+#ifdef CONFIG_CHIP_REGISTER_SIMPLE_TEST_EVENT_TRIGGER_DELEGATE
 static uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
                                                                                           0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb,
                                                                                           0xcc, 0xdd, 0xee, 0xff };
@@ -184,23 +173,16 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
     initParams.reportScheduler = &sReportScheduler;
 #endif
 
-#if CONFIG_CHIP_TEST_EVENT && CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-    static OTATestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
-    initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
-#endif
-
-#ifdef SMOKE_CO_ALARM
-    static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
-    static SmokeCOTestEventTriggerHandler sSmokeCOTestEventTriggerHandler{};
-    VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
-    VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sSmokeCOTestEventTriggerHandler) == CHIP_NO_ERROR);
-    initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
-#endif
-
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#ifdef CONFIG_CHIP_REGISTER_SIMPLE_TEST_EVENT_TRIGGER_DELEGATE
     static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
     VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    static OTATestEventTriggerHandler sOtaTestEventTriggerHandler{};
+    VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sOtaTestEventTriggerHandler) == CHIP_NO_ERROR);
+#endif
+
 #endif
 
 #if CONFIG_OPERATIONAL_KEYSTORE
