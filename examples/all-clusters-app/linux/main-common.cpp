@@ -51,6 +51,7 @@
 #include <app/clusters/laundry-washer-controls-server/laundry-washer-controls-server.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/clusters/push-av-stream-transport-server/CodegenIntegration.h>
+#include <app/clusters/valve-configuration-and-control-server/CodegenIntegration.h>
 #include <app/clusters/thermostat-server/thermostat-server.h>
 #include <app/clusters/time-synchronization-server/time-synchronization-server.h>
 #include <app/clusters/unit-localization-server/unit-localization-server.h>
@@ -202,7 +203,7 @@ void ApplicationInit()
     Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
     Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
 
-    Clusters::ValveConfigurationAndControl::SetDefaultDelegate(chip::EndpointId(1), &sValveDelegate);
+    Clusters::ValveConfigurationAndControl::SetDelegate(chip::EndpointId(1), &sValveDelegate);
     Clusters::TimeSynchronization::SetDefaultDelegate(&sTimeSyncDelegate);
 
     Clusters::UnitLocalization::TempUnitEnum supportedUnits[2] = { Clusters::UnitLocalization::TempUnitEnum::kFahrenheit,

@@ -11,21 +11,26 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
 
-source_set("valve-configuration-and-control-server") {
-  sources = [
-    "valve-configuration-and-control-cluster.cpp",
-    "valve-configuration-and-control-cluster.h",
-  ]
+import("${chip_root}/build/chip/chip_test_suite.gni")
+
+chip_test_suite("tests") {
+  output_name = "libTestValveConfigurationAndControlCluster"
+
+  test_sources = [ "TestValveConfigurationAndControlCluster.cpp" ]
+
+  sources = []
+
+  cflags = [ "-Wconversion" ]
 
   public_deps = [
-    "${chip_root}/src/app/data-model-provider",
-    "${chip_root}/src/app/server",
-    "${chip_root}/src/app/server-cluster",
-    "${chip_root}/src/app/server-cluster",
-    "${chip_root}/src/app/cluster-building-blocks",
-    "${chip_root}/zzz_generated/app-common/clusters/ValveConfigurationAndControl",
+    "${chip_root}/src/app/clusters/testing",
+    "${chip_root}/src/app/clusters/valve-configuration-and-control-server",
+    "${chip_root}/src/app/server-cluster/testing:testing",
+    "${chip_root}/src/lib/support",
   ]
 }

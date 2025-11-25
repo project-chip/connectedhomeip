@@ -8628,22 +8628,22 @@ endpoint 1 {
   server cluster ValveConfigurationAndControl {
     emits event ValveStateChanged;
     emits event ValveFault;
-    ram      attribute openDuration;
-    persist  attribute defaultOpenDuration;
-    ram      attribute autoCloseTime;
+    callback attribute openDuration;
+    callback attribute defaultOpenDuration;
+    callback attribute autoCloseTime;
     callback attribute remainingDuration;
-    ram      attribute currentState;
-    ram      attribute targetState;
-    ram      attribute currentLevel;
-    ram      attribute targetLevel;
-    persist  attribute defaultOpenLevel default = 100;
-    ram      attribute valveFault default = 0;
-    ram      attribute levelStep default = 1;
+    callback attribute currentState;
+    callback attribute targetState;
+    callback attribute currentLevel;
+    callback attribute targetLevel;
+    callback attribute defaultOpenLevel;
+    callback attribute valveFault;
+    callback attribute levelStep;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
 
     handle command Open;
     handle command Close;
