@@ -400,6 +400,25 @@ public:
         EXPECT_EQ(mHandleConnectionCloseCalled, nullptr);
     }
 
+    void HandleConnLateFailureTest(TCPImpl & tcp, const IPAddress & addr, uint16_t port)
+    {
+        TCPBase::sForceFailureInDoHandleIncomingConnection = true;
+
+        // Connect and wait for seeing active connection and connection complete
+        CHIP_ERROR err = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), nullptr, activeTCPConnState);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_TRUE(activeTCPConnState);
+
+        mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(5), [this]() { return mHandleConnectionCompleteCalled; });
+        EXPECT_EQ(mHandleConnectionCompleteCalled, &*activeTCPConnState);
+
+        // Wait for client to receive close callback (server endpoint destroyed and closed socket)
+        mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(5), [this]() { return mHandleConnectionCloseCalled; });
+        EXPECT_EQ(mHandleConnectionCloseCalled, &*activeTCPConnState);
+
+        TCPBase::sForceFailureInDoHandleIncomingConnection = false;
+    }
+
     void DisconnectTest(TCPImpl & tcp)
     {
         // Disconnect and wait for seeing peer close
@@ -574,7 +593,8 @@ class TestTCP : public ::testing::Test
 public:
     static void SetUpTestSuite()
     {
-        TCPEndPoint::sForceEarlyFailureIncomingConnection = false;
+        TCPEndPoint::sForceEarlyFailureIncomingConnection  = false;
+        TCPBase::sForceFailureInDoHandleIncomingConnection = false;
         if (mIOContext == nullptr)
         {
             mIOContext = new IOContext();
@@ -681,6 +701,16 @@ protected:
         gMockTransportMgrDelegate.DisconnectTest(tcp);
 
         TCPEndPoint::sForceEarlyFailureIncomingConnection = false;
+    }
+
+    void HandleConnLateFailureTest(const IPAddress & addr)
+    {
+        TCPImpl tcp;
+        uint16_t port;
+        MockTransportMgrDelegate gMockTransportMgrDelegate(mIOContext);
+        ASSERT_SUCCESS(gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr, port));
+        gMockTransportMgrDelegate.HandleConnLateFailureTest(tcp, addr, port);
+        gMockTransportMgrDelegate.DisconnectTest(tcp);
     }
 
     // Callback used by CheckProcessReceivedBuffer.
@@ -813,6 +843,13 @@ TEST_F(TestTCP, HandleConnEarlyFailureTest4)
     IPAddress::FromString("127.0.0.1", addr);
     HandleConnEarlyFailureTest(addr);
 }
+
+TEST_F(TestTCP, HandleConnLateFailureTest4)
+{
+    IPAddress addr;
+    IPAddress::FromString("127.0.0.1", addr);
+    HandleConnLateFailureTest(addr);
+}
 #endif // INET_CONFIG_ENABLE_IPV4
 
 TEST_F(TestTCP, ConnectSendMessageThenCloseTest6)
@@ -841,6 +878,13 @@ TEST_F(TestTCP, HandleConnEarlyFailureTest6)
     IPAddress addr;
     IPAddress::FromString("::1", addr);
     HandleConnEarlyFailureTest(addr);
+}
+
+TEST_F(TestTCP, HandleConnLateFailureTest6)
+{
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+    HandleConnLateFailureTest(addr);
 }
 
 TEST_F(TestTCP, CheckTCPEndpointAfterCloseTest)
