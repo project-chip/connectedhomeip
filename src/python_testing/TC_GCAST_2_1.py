@@ -60,19 +60,19 @@ class TC_GCAST_2_1(MatterBaseTest):
     async def test_TC_GCAST_2_1(self):
         if self.matter_test_config.endpoint is None:
             self.matter_test_config.endpoint = 1
-        cluster = Clusters.Objects.Groupcast
+        groupcast_cluster = Clusters.Objects.Groupcast
         membership_attribute = Clusters.Groupcast.Attributes.Membership
         max_membership_count_attribute = Clusters.Groupcast.Attributes.MaxMembershipCount
 
         self.step(1)
 
         self.step(2)
-        membership = await self.read_single_attribute_check_success(cluster, membership_attribute)
+        membership = await self.read_single_attribute_check_success(groupcast_cluster, membership_attribute)
         asserts.assert_is_instance(membership, list, "Membership attribute should be a list")
 
         self.step(3)
-        M_max = await self.read_single_attribute_check_success(cluster, max_membership_count_attribute)
-        asserts.assert_true(M_max >= 10)
+        M_max = await self.read_single_attribute_check_success(groupcast_cluster, max_membership_count_attribute)
+        asserts.assert_true(M_max >= 10, "MaxMembershipCount attribute should be >= 10")
 
 if __name__ == "__main__":
     default_matter_test_main()

@@ -35,6 +35,8 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
+import secrets
+
 from mobly import asserts
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 import matter.clusters as Clusters
@@ -145,7 +147,7 @@ class TC_GCAST_2_5(MatterBaseTest):
         self.step("1d")
         groupID1 = 1
         keyID1 = 1
-        inputKey1 = bytes.fromhex("d0d1d2d3d4d5d6d7d8d9dadbdcdddedf")
+        inputKey1 = secrets.token_bytes(16)
 
         await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
             groupID=groupID1,

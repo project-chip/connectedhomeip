@@ -35,6 +35,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
+import secrets
 import time
 from mobly import asserts
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
@@ -140,7 +141,7 @@ class TC_GCAST_2_3(MatterBaseTest):
         self.step("1d")
         groupID1 = 1
         keyID1 = 1
-        inputKey1 = bytes.fromhex("d0d1d2d3d4d5d6d7d8d9dadbdcdddedf")
+        inputKey1 = secrets.token_bytes(16)
 
         await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
             groupID=groupID1,
@@ -152,7 +153,8 @@ class TC_GCAST_2_3(MatterBaseTest):
         self.step("1e")
         groupID2 = 2
         keyID2 = 2
-        inputKey2 = bytes.fromhex("d0d1e2d3d4d5d6d7d8d9dadbdcdddedf")
+        inputKey2 = secrets.token_bytes(16)
+
         await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
             groupID=groupID2,
             endpoints=endpoints_list,
@@ -163,7 +165,8 @@ class TC_GCAST_2_3(MatterBaseTest):
         self.step(2)
         keyID3 = 3
         gracePeriod = 5
-        inputKey3 = bytes.fromhex("d0d1e2d3d4d5d6d7d8d9dadbdcdddedf")
+        inputKey3 = secrets.token_bytes(16)
+
         await self.send_single_cmd(Clusters.Groupcast.Commands.UpdateGroupKey(
             groupID=groupID1,
             keyID=keyID3,
@@ -187,14 +190,14 @@ class TC_GCAST_2_3(MatterBaseTest):
         asserts.assert_equal(group1_entry.expiringKeyID, keyID1, f"Expected ExpiringKeyID={keyID1}, got {group1_entry.expiringKeyID}")
 
         self.step(4)
-        inputKey4 = bytes.fromhex("d0d1e2d3d4d5d6d7bed9dadbdcdddedf")
+        inputKey4 = secrets.token_bytes(16)
         try:
             await self.send_single_cmd(Clusters.Groupcast.Commands.UpdateGroupKey(
                 groupID=groupID2,
                 keyID=keyID1,
                 key=inputKey4)
             )
-            asserts.fail("Unexpected success returned from sending UpdateGroupKey command.")
+            asserts.fail("UpdateGroupKey command should have failed with ExpiringKeyID, but it succeeded.")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.AlreadyExists,
                                  f"Send UpdateGroupKey command error should be {Status.AlreadyExists} instead of {e.status}")
@@ -230,7 +233,7 @@ class TC_GCAST_2_3(MatterBaseTest):
                 keyID=keyID2,
                 key=inputKey3)
             )
-            asserts.fail("Unexpected success returned from sending UpdateGroupKey command.")
+            asserts.fail("UpdateGroupKey command should have failed with already existing keyID K2, but it succeeded.")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.AlreadyExists,
                                  f"Send UpdateGroupKey command error should be {Status.AlreadyExists} instead of {e.status}")
@@ -242,20 +245,20 @@ class TC_GCAST_2_3(MatterBaseTest):
                 groupID=groupID1,
                 keyID=keyID4)
             )
-            asserts.fail("Unexpected success returned from sending UpdateGroupKey command.")
+            asserts.fail("UpdateGroupKey command should have failed, but it succeeded.")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Failure,
                                  f"Send UpdateGroupKey command error should be {Status.Failure} instead of {e.status}")
 
         self.step(10)
-        inputKey4InvalidLength = bytes.fromhex("d0d1e2d3d4d5d6d7bed9dadbdcddde")
+        inputKey4InvalidLength = secrets.token_bytes(15)
         try:
             await self.send_single_cmd(Clusters.Groupcast.Commands.UpdateGroupKey(
                 groupID=groupID1,
                 keyID=keyID4,
                 key=inputKey4InvalidLength)
             )
-            asserts.fail("Unexpected success returned from sending UpdateGroupKey command.")
+            asserts.fail("UpdateGroupKey command should have failed because of Key with invalid length, but it succeeded.")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ConstraintError,
                                  f"Send UpdateGroupKey command error should be {Status.ConstraintError} instead of {e.status}")

@@ -36,7 +36,6 @@
 
 import logging
 import secrets
-
 from mobly import asserts
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 import matter.clusters as Clusters
@@ -47,25 +46,23 @@ from matter.interaction_model import InteractionModelError, Status
 logger = logging.getLogger(__name__)
 
 
-class TC_GCAST_2_4(MatterBaseTest):
-    def desc_TC_GCAST_2_4(self):
-        return "[TC-GCAST-2.4] ExpireGracePeriod command effect with DUT as Server - PROVISIONAL"
+class TC_GCAST_2_7(MatterBaseTest):
+    def desc_TC_GCAST_2_7(self):
+        return "[TC-GCAST-2.5] LeaveGroup partial & full removal with DUT as Server - PROVISIONAL"
 
-    def steps_TC_G_2_4(self):
+    def steps_TC_G_2_7(self):
         return [
             TestStep("1a", "Commission DUT to TH (can be skipped if done in a preceding test)", is_commissioning=True),
             TestStep("1b", "TH removes any existing group and KeyID on the DUT"),
-            TestStep("1c", "TH subscribes to Membership attribute with min interval 0s and max interval 30s"),
-            TestStep("1d", "Join Group G1 generating a new Key with KeyID K1 using JoinGroup"),
-            TestStep("1e", "Use JoinGroup to Update Group G1 Key while providing a grace period to K1."),
-            TestStep(2, "TH awaits subscription report of new Membership within max interval."),
-            TestStep(3, "Expire K1 on Group G1 immediately: TH sends command ExpireGracePeriod (GroupID=G1)"),
-            TestStep(4, "TH awaits subscription report of new Membership within max interval."),
-            TestStep(5, "Attempt to expire a KeyId on Group G1 where there is no ExpiringKey: TH sends command ExpireGracePeriod (GroupID=G1)"),
+            TestStep(2, "Iteratively Join group until until the Group count = M_max using a new GroupId and KeyId every time: "
+                        "TH sends command JoinGroup (GroupID=Gn, Endpoints='see notes', KeyID=Kn, Key=InputKeyn) until the Group count = M_max"),
+            TestStep(3, "Attempt to join 1 additional group: TH sends command JoinGroup (GroupID=Gn+1, Endpoints='see notes', KeyID=Kn+1, Key=InputKeyn+1)"),
+            TestStep(4, "Leave one group: TH sends command LeaveGroup (GroupID=Gn)"),
+            TestStep(5, "Repeat Step 2: TH sends command JoinGroup (GroupID=Gn+1, Endpoints='see notes', KeyID=Kn+1, Key=InputKeyn+1)"),
         ]
 
-    def pics_TC_GCAST_2_4(self) -> list[str]:
-        pics = ["GCAST.S", "GCAST.S.C02.Rsp", "GCAST.S.C03.Rsp"]
+    def pics_TC_GCAST_2_7(self) -> list[str]:
+        pics = ["GCAST.S", "GCAST.S.A0001"]
         return pics
 
     async def get_feature_map(self):
@@ -81,8 +78,8 @@ class TC_GCAST_2_4(MatterBaseTest):
     async def valid_endpoints_list(self, ln_enabled, sd_enabled):
         """
         Get the JoinGroup cmd endpoints list based on enabled features such as Listener/Sender.
-        If only Sender is enabled, endpoints list is empty. If listener is enabled, the endpoint list is the
-        first valid endpoint (excluding root and aggregator), [EP1].
+        If only Sender is enabled, endpoints list is empty. If listener is enabled and only 1 endpoint is valid (excluding
+        root and aggregator), endpoints list is [EP1]. If more than 1 endpoint is supported, endpoints list is [EP1, EP2].
         """
         endpoints_list = []
         if sd_enabled and not ln_enabled:
@@ -108,15 +105,19 @@ class TC_GCAST_2_4(MatterBaseTest):
                             endpoints_list.append(endpoint)
             asserts.assert_true(len(endpoints_list),
                                 "Listener feature is enabled. Endpoint list should not be empty. There should be a valid endpoint for the GroupCast JoinGroup Command.")
-            endpoints_list = [endpoints_list[0]]
+            if len(endpoints_list) == 1:
+                endpoints_list = [endpoints_list[0]]
+            else:
+                endpoints_list = endpoints_list[:2]
         return endpoints_list
 
+
     @async_test_body
-    async def test_TC_GCAST_2_4(self):
+    async def test_TC_GCAST_2_7(self):
         if self.matter_test_config.endpoint is None:
             self.matter_test_config.endpoint = 1
         groupcast_cluster = Clusters.Objects.Groupcast
-        membership_attribute = Clusters.Groupcast.Attributes.Membership
+        max_membership_count_attribute = Clusters.Groupcast.Attributes.MaxMembershipCount
 
         self.step("1a")
         ln_enabled, sd_enabled = await self.get_feature_map()
@@ -124,75 +125,57 @@ class TC_GCAST_2_4(MatterBaseTest):
             asserts.fail("At least one of the following features must be enabled: Listener or Sender.")
         endpoints_list = await self.valid_endpoints_list(ln_enabled, sd_enabled)
 
+        # Get M_Max Value
+        M_max = await self.read_single_attribute_check_success(groupcast_cluster, max_membership_count_attribute)
+        asserts.assert_true(M_max >= 10, "MaxMembershipCount attribute should be >= 10")
+
         self.step("1b")
-        await self.send_single_cmd(Clusters.Groupcast.Commands.LeaveGroup(groupID=0))
-
-        self.step("1c")
-        sub = AttributeSubscriptionHandler(groupcast_cluster, membership_attribute)
-        await sub.start(self.default_controller, self.dut_node_id, self.get_endpoint(), min_interval_sec=0, max_interval_sec=30)
-
-        self.step("1d")
-        groupID1 = 1
-        keyID1 = 1
-        inputKey1 = secrets.token_bytes(16)
-
-        await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
-            groupID=groupID1,
-            endpoints=endpoints_list,
-            keyID=keyID1,
-            key=inputKey1)
-        )
-
-        self.step("1e")
-        keyID2 = 2
-        gracePeriod = 5
-        inputKey2 = secrets.token_bytes(16)
-        await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
-            groupID=groupID1,
-            endpoints=endpoints_list,
-            keyID=keyID2,
-            gracePeriod=gracePeriod,
-            key=inputKey2)
-        )
+        groupID0 = 0
+        await self.send_single_cmd(Clusters.Groupcast.Commands.LeaveGroup(groupID=groupID0))
 
         self.step(2)
-        sub.wait_for_attribute_report()
-        membership_reports = sub.attribute_reports.get(membership_attribute, [])
-        asserts.assert_greater(len(membership_reports), 0, "No membership reports received")
-        latest_membership = membership_reports[-1].value
-        group1_entry = None
-        for entry in latest_membership:
-            if entry.groupID == groupID1:
-                group1_entry = entry
-                break
-        asserts.assert_is_not_none(group1_entry, f"Group {groupID1} not found in membership report")
-        asserts.assert_is_not_none(group1_entry.expiringKeyID, "ExpiringKeyID should be present")
-        asserts.assert_equal(group1_entry.expiringKeyID, keyID1,
-                             f"Expected ExpiringKeyID={keyID1}, got {group1_entry.expiringKeyID}")
+        for membership in range(M_max):
+            groupID = membership + 1
+            keyID = membership + 1
+            inputKey = secrets.token_bytes(16)
+
+            await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
+                groupID=groupID,
+                endpoints=endpoints_list,
+                keyID=keyID,
+                key=inputKey)
+            )
 
         self.step(3)
-        await self.send_single_cmd(Clusters.Groupcast.Commands.ExpireGracePeriod(groupID=groupID1))
+        groupIDExhausted = M_max + 1
+        keyIDExhausted = M_max + 1
+        inputKeyExhausted = secrets.token_bytes(16)
+        try:
+            await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
+                groupID=groupIDExhausted,
+                endpoints=endpoints_list,
+                keyID=keyIDExhausted,
+                key=inputKeyExhausted)
+            )
+            asserts.fail("JoinGroup command should have failed with ResourceExhausted, but it succeeded")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.ResourceExhausted,
+                                 f"Send JoinGroup command error should be {Status.ResourceExhausted} instead of {e.status}")
 
         self.step(4)
-        sub.wait_for_attribute_report()
-        membership_reports = sub.attribute_reports.get(membership_attribute, [])
-        asserts.assert_greater(len(membership_reports), 0, "No membership reports received")
-        latest_membership = membership_reports[-1].value
-        group1_entry = None
-        for entry in latest_membership:
-            if entry.groupID == groupID1:
-                group1_entry = entry
-                break
-        asserts.assert_is_not_none(group1_entry, f"Group {groupID1} not found in membership report")
-        asserts.assert_is_none(group1_entry.expiringKeyID, "ExpiringKeyID should not be present")
+        await self.send_single_cmd(Clusters.Groupcast.Commands.LeaveGroup(groupID=M_max))
 
         self.step(5)
-        try:
-            await self.send_single_cmd(Clusters.Groupcast.Commands.ExpireGracePeriod(groupID=groupID1))
-            asserts.fail("ExpireGracePeriod command should have failed when there is no ExpiringKey, but it succeeded")
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Failure,
-                                 f"Send ExpireGracePeriod command error should be {Status.Failure} instead of {e.status}")
+        groupIDLimit = M_max
+        keyIDLimit = M_max
+        inputKeyLimit = secrets.token_bytes(16)
+        await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(
+            groupID=groupIDLimit,
+            endpoints=endpoints_list,
+            keyID=keyIDLimit,
+            key=inputKeyLimit)
+        )
+
 
 if __name__ == "__main__":
     default_matter_test_main()
