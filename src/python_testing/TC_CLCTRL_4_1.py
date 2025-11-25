@@ -34,8 +34,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 
 from mobly import asserts
 
@@ -195,13 +195,17 @@ class TC_CLCTRL_4_1(MatterBaseTest):
 
     def pics_TC_CLCTRL_4_1(self) -> list[str]:
         pics = [
-            "CLCTRL.S"
+            "CLCTRL.S", "CLCTRL.S.F00"
         ]
         return pics
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_CLCTRL_4_1(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         dev_controller = self.default_controller
         attributes = Clusters.ClosureControl.Attributes
         timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
@@ -1021,7 +1025,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             # STEP 15d: Wait 2 seconds and TH reads from the DUT the OverallCurrentState.Position = FullyOpened.
             self.step("15d")
 
-            time.sleep(2)
+            await asyncio.sleep(2)
 
             overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
             logging.info(f"OverallCurrentState: {overall_current_state}")
@@ -1064,7 +1068,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             # STEP 15h: Wait 2 seconds and TH reads from the DUT the OverallCurrentState.Position = FullyClosed.
             self.step("15h")
 
-            time.sleep(2)
+            await asyncio.sleep(2)
             overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
             logging.info(f"OverallCurrentState: {overall_current_state}")
 

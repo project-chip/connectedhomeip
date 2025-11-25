@@ -34,9 +34,9 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
 import random
-import time
 
 from mobly import asserts
 
@@ -67,7 +67,7 @@ class TC_CGEN_2_4(MatterBaseTest):
     async def OpenCommissioningWindow(self) -> CommissioningParameters:
         try:
             params = await self.th1.OpenCommissioningWindow(
-                nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=self.discriminator, option=1)
+                nodeId=self.dut_node_id, timeout=600, iteration=10000, discriminator=self.discriminator, option=1)
             return params
 
         except Exception as e:
@@ -92,9 +92,9 @@ class TC_CGEN_2_4(MatterBaseTest):
         asserts.assert_true(errcode.sdk_part == expectedErrorPart, 'Unexpected error type returned from CommissioningComplete')
         asserts.assert_true(errcode.sdk_code == expectedErrCode, 'Unexpected error code returned from CommissioningComplete')
         revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
-        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
+        await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
         # The failsafe cleanup is scheduled after the command completes, so give it a bit of time to do that
-        time.sleep(1)
+        await asyncio.sleep(1)
 
     @async_test_body
     async def test_TC_CGEN_2_4(self):
@@ -134,7 +134,7 @@ class TC_CGEN_2_4(MatterBaseTest):
         logging.info('Step 17 - TH1 sends an arm failsafe')
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=0)
         # This will throw if not successful
-        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd)
+        await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=cmd)
 
         logging.info('Step 18 - TH1 reads the location capability')
         attr = Clusters.GeneralCommissioning.Attributes.LocationCapability
@@ -149,12 +149,12 @@ class TC_CGEN_2_4(MatterBaseTest):
         logging.info('Step 19 Send SetRgulatoryConfig with incorrect location newloc = {}'.format(newloc))
         cmd = Clusters.GeneralCommissioning.Commands.SetRegulatoryConfig(
             newRegulatoryConfig=newloc, countryCode="XX", breadcrumb=0)
-        ret = await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd)
+        ret = await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=cmd)
         asserts.assert_true(ret.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kValueOutsideRange)
 
         logging.info('Step 20 - TH2 sends CommissioningComplete')
         cmd = Clusters.GeneralCommissioning.Commands.CommissioningComplete()
-        resp = await self.th2.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd)
+        resp = await self.th2.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=cmd)
         asserts.assert_true(isinstance(resp, Clusters.GeneralCommissioning.Commands.CommissioningCompleteResponse),
                             'Incorrect response type from command')
         asserts.assert_true(
@@ -163,11 +163,11 @@ class TC_CGEN_2_4(MatterBaseTest):
         logging.info('Step 21 - TH1 sends an arm failsafe with timeout==0')
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=0)
         # This will throw if not successful
-        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd)
+        await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=cmd)
 
         logging.info('Step 22 - TH1 sends CommissioningComplete')
         cmd = Clusters.GeneralCommissioning.Commands.CommissioningComplete()
-        resp = await self.th2.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd)
+        resp = await self.th2.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=cmd)
         asserts.assert_true(isinstance(resp, Clusters.GeneralCommissioning.Commands.CommissioningCompleteResponse),
                             'Incorrect response type from command')
         asserts.assert_true(resp.errorCode == Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kNoFailSafe,
@@ -179,7 +179,7 @@ class TC_CGEN_2_4(MatterBaseTest):
 
         logging.info('Step 24 - TH1 removes TH2')
         cmd = Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=th2FabricIndex)
-        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd)
+        await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=cmd)
 
 
 if __name__ == "__main__":

@@ -33,6 +33,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/app/data-model-provider/tests:encode-decode",
     "${chip_root}/src/app/server-cluster/testing:testing",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:timer-delegate-mock",
   ]
 }
 
@@ -59,5 +60,6 @@ chip_test_suite("tests-backwards-compatibility") {
     "${chip_root}/src/app/server-cluster/testing:testing",
     "${chip_root}/src/data-model-providers/codegen/tests:mock_model",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:timer-delegate-mock",
   ]
 }

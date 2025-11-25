@@ -477,11 +477,13 @@ static void initializeEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
     {
         const EmberAfCluster * cluster = &(epType->cluster[clusterIndex]);
         EmberAfGenericClusterFunction f;
-        emberAfClusterInitCallback(definedEndpoint->endpoint, cluster->clusterId);
         if (cluster->IsServer())
         {
+            // Call the code-driven init callback before the emberAf... one,
+            // so the latter can be used to configure code-driven clusters
             MatterClusterServerInitCallback(definedEndpoint->endpoint, cluster->clusterId);
         }
+        emberAfClusterInitCallback(definedEndpoint->endpoint, cluster->clusterId);
         f = emberAfFindClusterFunction(cluster, MATTER_CLUSTER_FLAG_INIT_FUNCTION);
         if (f != nullptr)
         {
@@ -1428,7 +1430,8 @@ void emAfSaveAttributeToStorageIfNeeded(uint8_t * data, EndpointId endpoint, Clu
     auto * attrStorage = GetAttributePersistenceProvider();
     if (attrStorage)
     {
-        attrStorage->WriteValue(ConcreteAttributePath(endpoint, clusterId, metadata->attributeId), ByteSpan(data, dataSize));
+        TEMPORARY_RETURN_IGNORED attrStorage->WriteValue(ConcreteAttributePath(endpoint, clusterId, metadata->attributeId),
+                                                         ByteSpan(data, dataSize));
     }
     else
     {

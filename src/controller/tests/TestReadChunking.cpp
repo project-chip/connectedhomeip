@@ -46,6 +46,7 @@
 #include <lib/support/TimeUtils.h>
 #include <lib/support/UnitTestUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -321,7 +322,7 @@ public:
         path.mEndpointId  = kTestEndpointId5;
         path.mClusterId   = Clusters::UnitTesting::Id;
         path.mAttributeId = attr;
-        app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
+        EXPECT_SUCCESS(app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path));
     }
 
     // These setters
@@ -487,7 +488,7 @@ TEST_F(TestReadChunking, TestChunking)
 
     // Register our fake dynamic endpoint.
     DataVersion dataVersionStorage[MATTER_ARRAY_SIZE(testEndpointClusters)];
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
+    EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage)));
 
     app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::UnitTesting::Id);
     app::ReadPrepareParams readParams(sessionHandle);
@@ -550,7 +551,7 @@ TEST_F(TestReadChunking, TestListChunking)
 
     // Register our fake dynamic endpoint.
     DataVersion dataVersionStorage[MATTER_ARRAY_SIZE(testEndpoint3Clusters)];
-    emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, Span<DataVersion>(dataVersionStorage));
+    EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, Span<DataVersion>(dataVersionStorage)));
 
     app::AttributePathParams attributePath(kTestEndpointId3, app::Clusters::UnitTesting::Id, kTestListAttribute);
     app::ReadPrepareParams readParams(sessionHandle);
@@ -654,7 +655,7 @@ TEST_F(TestReadChunking, TestBadChunking)
 
     // Register our fake dynamic endpoint.
     DataVersion dataVersionStorage[MATTER_ARRAY_SIZE(testEndpoint3Clusters)];
-    emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, Span<DataVersion>(dataVersionStorage));
+    EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, Span<DataVersion>(dataVersionStorage)));
 
     app::AttributePathParams attributePath(kTestEndpointId3, app::Clusters::UnitTesting::Id, kTestBadAttribute);
     app::ReadPrepareParams readParams(sessionHandle);
@@ -719,7 +720,7 @@ TEST_F(TestReadChunking, TestDynamicEndpoint)
         app::ReadClient readClient(engine, &GetExchangeManager(), readCallback.mBufferedCallback,
                                    app::ReadClient::InteractionType::Subscribe);
         // Enable the new endpoint
-        emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
+        EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage)));
 
         EXPECT_EQ(readClient.SendRequest(readParams), CHIP_NO_ERROR);
 
@@ -728,7 +729,7 @@ TEST_F(TestReadChunking, TestDynamicEndpoint)
         EXPECT_TRUE(readCallback.mOnSubscriptionEstablished);
         readCallback.mAttributeCount = 0;
 
-        emberAfSetDynamicEndpoint(0, kTestEndpointId4, &testEndpoint4, Span<DataVersion>(dataVersionStorage));
+        EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId4, &testEndpoint4, Span<DataVersion>(dataVersionStorage)));
 
         DrainAndServiceIO();
 
@@ -804,7 +805,7 @@ auto TouchAttrOp(AttributeIdWithEndpointId attr)
         path.mClusterId   = Clusters::UnitTesting::Id;
         path.mAttributeId = attr.second;
         gIterationCount++;
-        app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
+        EXPECT_SUCCESS(app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path));
     };
 }
 
@@ -907,8 +908,8 @@ TEST_F(TestReadChunking, TestSetDirtyBetweenChunks)
     gMutableAttrAccess.Reset();
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage1));
-    emberAfSetDynamicEndpoint(1, kTestEndpointId5, &testEndpoint5, Span<DataVersion>(dataVersionStorage5));
+    EXPECT_SUCCESS(emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage1)));
+    EXPECT_SUCCESS(emberAfSetDynamicEndpoint(1, kTestEndpointId5, &testEndpoint5, Span<DataVersion>(dataVersionStorage5)));
 
     {
         app::AttributePathParams attributePath;

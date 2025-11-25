@@ -56,7 +56,7 @@ class TC_WEBRTCP_2_23(MatterBaseTest, WEBRTCPTestBase):
 
     def steps_TC_WEBRTCP_2_23(self) -> list[TestStep]:
         steps = [
-            TestStep("precondition", "DUT commissioned and streams allocated", is_commissioning=True),
+            TestStep("precondition", "DUT commissioned", is_commissioning=True),
             TestStep(1, "TH allocates both Audio and Video streams via CameraAVStreamManagement",
                      "Valid stream IDs are obtained"),
             TestStep(2, "TH reads the AllocatedAudioStreams and AllocatedVideoStreams attributes to check reference counts",
@@ -112,6 +112,10 @@ class TC_WEBRTCP_2_23(MatterBaseTest, WEBRTCPTestBase):
 
         asserts.fail(f'Could not find stream {stream_id}')
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_WEBRTCP_2_23(self):
         """
@@ -120,7 +124,7 @@ class TC_WEBRTCP_2_23(MatterBaseTest, WEBRTCPTestBase):
 
         self.step("precondition")
         # Commission DUT - already done
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(1)
         # Allocate Audio and Video streams

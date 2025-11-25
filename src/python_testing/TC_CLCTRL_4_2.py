@@ -156,14 +156,18 @@ class TC_CLCTRL_4_2(MatterBaseTest):
 
     def pics_TC_CLCTRL_4_2(self) -> list[str]:
         pics = [
-            "CLCTRL.S",
+            "CLCTRL.S", "CLCTRL.S.F01"
         ]
         return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_CLCTRL_4_2(self):
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         timeout: uint = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout  # default_timeout = 90 seconds
 
         self.step(1)

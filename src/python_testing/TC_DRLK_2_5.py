@@ -49,6 +49,10 @@ drlkcluster = Clusters.DoorLock
 
 class TC_DRLK_2_5(MatterBaseTest):
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     def steps_TC_DRLK_2_5(self) -> list[TestStep]:
         steps = [
             TestStep("precondition", "Commissioning already done.", is_commissioning=True),

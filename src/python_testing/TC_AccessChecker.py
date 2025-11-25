@@ -184,9 +184,9 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                     cmds[cluster_id] = set()
                 # discard MEI attributes as we do not have access information for them.
                 attrs[cluster_id].update(
-                    set([id for id in device_cluster_data[GlobalAttributeIds.ATTRIBUTE_LIST_ID] if is_standard_attribute_id(id)]))
+                    {id for id in device_cluster_data[GlobalAttributeIds.ATTRIBUTE_LIST_ID] if is_standard_attribute_id(id)})
                 cmds[cluster_id].update(
-                    set([id for id in device_cluster_data[GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID] if is_standard_command_id(id)]))
+                    {id for id in device_cluster_data[GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID] if is_standard_command_id(id)})
 
         # Remove MEI clusters - we don't have information available to check these.
         all_clusters = [id for id in all_clusters if is_standard_cluster_id(id)]
@@ -423,7 +423,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                 # Use an empty list for writes in case the list is large and does not fit
                 val = []
 
-            resp = await self.TH2.WriteAttribute(nodeid=self.dut_node_id, attributes=[(endpoint_id, attribute(val))])
+            resp = await self.TH2.WriteAttribute(nodeId=self.dut_node_id, attributes=[(endpoint_id, attribute(val))])
             if spec_requires == Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue:
                 # not writeable - expect either an unsupported write response or an unsupported access response (since ACL privilege check happens before writable check)
                 if resp[0].Status not in (Status.UnsupportedWrite, Status.UnsupportedAccess):
@@ -452,7 +452,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             if resp[0].Status == Status.Success and isinstance(val, list):
                 # Reset the value to the original if we managed to write an empty list
                 val = wildcard_read.attributes[endpoint_id][cluster_class][attribute]
-                await self.TH2.WriteAttribute(nodeid=self.dut_node_id, attributes=[(endpoint_id, attribute(val))])
+                await self.TH2.WriteAttribute(nodeId=self.dut_node_id, attributes=[(endpoint_id, attribute(val))])
 
     async def run_access_test(self, test_type: AccessTestType):
         # Step precondition, 1 and 2 are handled in the class setup, but need to be marked for every test
@@ -472,7 +472,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
         self.step(check_step)
         enum = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
         in_progress_clusters = [Clusters.ColorControl.id]
-        privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue]
+        privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue and p != enum.kProxyView]
         for privilege in privilege_enum:
             logging.info(f"Testing for {privilege}")
             self.step(step_number_with_privilege(check_step, 'a', privilege))
@@ -505,7 +505,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                  TestStep(2, "TH_commissioner reads the ACL attribute (done during test setup)"),
                  TestStep(3, "Repeat steps 3a and 3b for each permission level")]
         enum = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
-        privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue]
+        privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue and p != enum.kProxyView]
         for p in privilege_enum:
             steps.append(TestStep(step_number_with_privilege(3, 'a', p),
                          "TH_commissioner gives TH_second_commissioner the specified privilege"))
@@ -528,7 +528,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                  TestStep(4, "TH_second_controller performs a wildcard read"),
                  TestStep(5, "Repeat steps 5a and 5b for each permission level")]
         enum = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
-        privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue]
+        privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue and p != enum.kProxyView]
         for p in privilege_enum:
             steps.append(TestStep(step_number_with_privilege(5, 'a', p),
                          "TH_commissioner gives TH_second_commissioner the specified privilege"))
@@ -549,7 +549,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                  TestStep(2, "TH_commissioner reads the ACL attribute (done during test setup)"),
                  TestStep(3, "Repeat steps 3a and 3b for each permission level")]
         enum = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
-        privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue]
+        privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue and p != enum.kProxyView]
         for p in privilege_enum:
             steps.append(TestStep(step_number_with_privilege(3, 'a', p),
                          "TH_commissioner gives TH_second_controller the specified privilege"))

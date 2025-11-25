@@ -16,7 +16,7 @@ import logging
 import os
 from typing import Optional
 
-LOGGER = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class GeneratorStorage:
@@ -67,7 +67,7 @@ class FileSystemGeneratorStorage(GeneratorStorage):
         if not os.path.exists(target):
             return None
 
-        LOGGER.info("Checking existing data in %s" % target)
+        log.info("Checking existing data in '%s'", target)
         with open(target, 'rt') as existing:
             return existing.read()
 
@@ -77,10 +77,10 @@ class FileSystemGeneratorStorage(GeneratorStorage):
         target = os.path.join(self.output_dir, relative_path)
         target_dir = os.path.dirname(target)
         if not os.path.exists(target_dir):
-            LOGGER.info("Creating output directory: %s" % target_dir)
+            log.info("Creating output directory: '%s'", target_dir)
             os.makedirs(target_dir)
 
-        LOGGER.info("Writing new data to: %s" % target)
+        log.info("Writing new data to: '%s'", target)
         with open(target, "wt") as out:
             out.write(content)
 
