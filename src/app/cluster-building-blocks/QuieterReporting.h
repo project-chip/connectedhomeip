@@ -204,7 +204,7 @@ public:
 
         return isNewlyDirty ? AttributeDirtyState::kMustReport : AttributeDirtyState::kNoReportNeeded;
     }
-    
+
     /**
      * Same as the other `SetValue`, but assumes a changedPredicate that never overrides to dirty.
      *
