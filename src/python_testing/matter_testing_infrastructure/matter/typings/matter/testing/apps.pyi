@@ -45,8 +45,6 @@ class JFControllerSubprocess(Subprocess):
 class OTAProviderSubprocess(AppServerSubprocess):
     DEFAULT_ADMIN_NODE_ID: int
     PREFIX: bytes
-    log_file = ""
-    err_log_file = ""
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
                  passcode: int, ota_source: Union[OtaImagePath, ImageListPath],

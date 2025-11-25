@@ -27,8 +27,6 @@ not_automated:
       reason: Can not run thread CNET tests in CI
     - name: TC_CNET_4_22.py
       reason: It has no CI execution block, is not executed in CI
-    - name: TC_SU_2_8.py
-      reason: CI script not implemented
     - name: TC_DGGEN_3_2.py
       reason:
           src/python_testing/test_testing/test_TC_DGGEN_3_2.py is the Unit test
