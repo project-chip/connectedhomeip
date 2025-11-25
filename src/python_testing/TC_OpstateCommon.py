@@ -15,9 +15,9 @@
 #    limitations under the License.
 #
 
+import asyncio
 import logging
 import queue
-import time
 from dataclasses import dataclass
 from typing import Any
 
@@ -661,7 +661,7 @@ class TC_OPSTATE_BASE():
         # STEP 10: TH waits for {PIXIT.WAITTIME.COUNTDOWN}
         self.step(10)
         if await self.attribute_guard(endpoint=endpoint, attribute=attributes.CountdownTime):
-            time.sleep(wait_time)
+            await asyncio.sleep(wait_time)
 
         # STEP 11: TH reads from the DUT the CountdownTime attribute
         self.step(11)
@@ -815,7 +815,7 @@ class TC_OPSTATE_BASE():
 
         # STEP 7: TH waits for {PIXIT.WAITTIME.COUNTDOWN}
         self.step(7)
-        time.sleep(wait_time)
+        await asyncio.sleep(wait_time)
 
         # STEP 8: TH reads from the DUT the CountdownTime attribute
         self.step(8)
@@ -1099,7 +1099,7 @@ class TC_OPSTATE_BASE():
         # STEP 11: TH waits for initial-countdown-time
         self.step(11)
         logging.info(f'Sleeping for {initial_countdown_time:.1f} seconds.')
-        time.sleep(initial_countdown_time)
+        await asyncio.sleep(initial_countdown_time)
 
         # STEP 12: TH sends Stop command to the DUT
         self.step(12)
@@ -1145,7 +1145,7 @@ class TC_OPSTATE_BASE():
 
         # STEP 16: TH waits for {PIXIT.WAITTIME.REBOOT}
         self.step(16)
-        time.sleep(wait_time_reboot)
+        await asyncio.sleep(wait_time_reboot)
 
         # STEP 17: TH sends Start command to the DUT
         self.step(17)
@@ -1175,7 +1175,7 @@ class TC_OPSTATE_BASE():
 
         # STEP 21: TH waits for half of initial-countdown-time
         self.step(21)
-        time.sleep((initial_countdown_time / 2))
+        await asyncio.sleep((initial_countdown_time / 2))
 
         # STEP 22: TH sends Resume command to the DUT
         self.step(22)
@@ -1192,7 +1192,7 @@ class TC_OPSTATE_BASE():
 
         # STEP 24: TH waits for initial-countdown-time
         self.step(24)
-        time.sleep(initial_countdown_time)
+        await asyncio.sleep(initial_countdown_time)
 
         # STEP 25: TH sends Stop command to the DUT
         self.step(25)
@@ -1276,7 +1276,7 @@ class TC_OPSTATE_BASE():
                                              device=self.device,
                                              operation="Start",
                                              msg="Put DUT in running state")
-            time.sleep(1)
+            await asyncio.sleep(1)
             await self.read_and_expect_value(endpoint=endpoint,
                                              attribute=attributes.OperationalState,
                                              expected_value=cluster.Enums.OperationalStateEnum.kRunning)
@@ -1291,7 +1291,7 @@ class TC_OPSTATE_BASE():
         if countdownTime is not NullValue:
             self.step(5)
             logging.info('Test will now collect data for 10 seconds')
-            time.sleep(10)
+            await asyncio.sleep(10)
 
             count = sub_handler.attribute_report_counts[attributes.CountdownTime]
             sub_handler.reset()
@@ -1309,7 +1309,7 @@ class TC_OPSTATE_BASE():
             self.step(7)
             wait_count = 0
             while (attr_value != cluster.Enums.OperationalStateEnum.kStopped) and (wait_count < 20):
-                time.sleep(1)
+                await asyncio.sleep(1)
                 wait_count = wait_count + 1
                 attr_value = await self.read_expect_success(
                     endpoint=endpoint,
@@ -1327,7 +1327,7 @@ class TC_OPSTATE_BASE():
                                              device=self.device,
                                              operation="Start",
                                              msg="Put DUT in running state")
-            time.sleep(1)
+            await asyncio.sleep(1)
             await self.read_and_expect_value(endpoint=endpoint,
                                              attribute=attributes.OperationalState,
                                              expected_value=cluster.Enums.OperationalStateEnum.kRunning)
@@ -1350,7 +1350,7 @@ class TC_OPSTATE_BASE():
                                              device=self.device,
                                              operation="Pause",
                                              msg="Put DUT in paused state")
-            time.sleep(1)
+            await asyncio.sleep(1)
             count = sub_handler.attribute_report_counts[attributes.CountdownTime]
             asserts.assert_greater(count, 0, "Did not receive any reports for CountdownTime")
         else:

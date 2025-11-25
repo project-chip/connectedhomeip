@@ -1458,7 +1458,7 @@ class BaseTestHelper:
             restartRemoteThread.start()
 
             # Wait for some time so that the device will be resolving the address of the first controller after restarting
-            time.sleep(8)
+            await asyncio.sleep(8)
             restartRemoteThread.join(10.0)
 
             self.logger.info("Send a new subscription request from the second controller")

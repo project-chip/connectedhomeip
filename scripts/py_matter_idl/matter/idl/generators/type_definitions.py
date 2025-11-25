@@ -20,7 +20,7 @@ from typing import Optional, Union
 from matter.idl import matter_idl_types  # to explicitly say 'Enum'
 from matter.idl.matter_idl_types import DataType
 
-LOGGER = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 def ToPowerOfTwo(bits: int) -> int:
@@ -418,8 +418,7 @@ def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> Union[Basic
     if lookup.find_struct(data_type.name):
         result.item_type = IdlItemType.STRUCT
     else:
-        LOGGER.warning(
-            "Data type %s is NOT known, but treating it as a generic IDL type." % data_type)
+        log.warning("Data type '%s' is NOT known, but treating it as a generic IDL type.", data_type)
 
     return result
 

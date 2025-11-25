@@ -95,7 +95,7 @@ public:
         LayerImplFreeRTOS & layer = static_cast<LayerImplFreeRTOS &>(aLayer);
         if (layer.IsInitialized())
         {
-            layer.HandlePlatformTimer();
+            TEMPORARY_RETURN_IGNORED layer.HandlePlatformTimer();
         }
     }
 };
