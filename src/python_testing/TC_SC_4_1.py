@@ -55,9 +55,9 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import enum
 import logging
-from time import sleep
 from typing import Optional
 
 from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
@@ -680,14 +680,14 @@ class TC_SC_4_1(MatterBaseTest):
                                                   endpoint=0,
                                                   payload=revoke_cmd,
                                                   timedRequestTimeoutMs=6000)
-        sleep(1)  # Give some time for failsafe cleanup scheduling
+        await asyncio.sleep(1)  # Give some time for failsafe cleanup scheduling
 
     def desc_TC_TC_SC_4_1(self) -> str:
         return "[TC-SC-4.1] Commissionable Node Discovery with DUT as Commissionee"
 
     @async_test_body
     async def test_TC_SC_4_1(self):
-        self.endpoint = self.get_endpoint(default=1)
+        self.endpoint = self.get_endpoint()
         self.supports_icd = False
         self.supports_lit = False
         self.setup_code_type = None
