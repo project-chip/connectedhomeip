@@ -14,8 +14,11 @@
 
 import logging
 import os
+import shlex
 
 from .type_definitions import IdlFileType, InputIdlFile
+
+log = logging.getLogger(__name__)
 
 CODEGEN_PY_PATH = os.path.abspath(os.path.join(
     os.path.dirname(__file__), '..', 'codegen.py'))
@@ -41,8 +44,7 @@ class CodegenTarget:
         output_dir = os.path.join(
             output_root, self.idl.pregen_subdir, self.generator)
 
-        logging.info(
-            f"Generating: {self.generator}:{self.idl.full_path} into {output_dir}")
+        log.info("Generating: '%s:%s' into '%s'", self.generator, self.idl.full_path, output_dir)
 
         cmd = [
             CODEGEN_PY_PATH,
@@ -56,7 +58,7 @@ class CodegenTarget:
 
         cmd.append(self.idl.full_path)
 
-        logging.debug(f"Executing {cmd}")
+        log.debug("Executing: %s", shlex.join(cmd))
         self.runner.run(cmd)
 
 

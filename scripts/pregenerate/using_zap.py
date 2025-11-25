@@ -14,9 +14,12 @@
 
 import logging
 import os
+import shlex
 from enum import Enum, auto
 
 from .type_definitions import IdlFileType, InputIdlFile
+
+log = logging.getLogger(__name__)
 
 ZAP_GENERATE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'tools', 'zap', 'generate.py'))
 
@@ -54,7 +57,7 @@ class ZapTarget:
 
         output_dir = os.path.join(output_root, self.idl.pregen_subdir, self.generation_type.subdir)
 
-        logging.info(f"Generating: {self.generation_type}:{self.idl.full_path} into {output_dir}")
+        log.info("Generating: '%s:%s' into '%s'", self.generation_type, self.idl.full_path, output_dir)
 
         self.runner.ensure_directory_exists(output_dir)
 
@@ -70,7 +73,7 @@ class ZapTarget:
             '--parallel',
             idl_path
         ]
-        logging.debug(f"Executing {cmd}")
+        log.debug("Executing: %s", shlex.join(cmd))
         self.runner.run(cmd, cwd=self.sdk_root)
 
 

@@ -56,6 +56,9 @@ class TC_ACL_2_10(MatterBaseTest):
     def desc_TC_ACL_2_10(self) -> str:
         return "[TC-ACL-2.10] Persistence"
 
+    def pics_TC_ACL_2_10(self) -> list[str]:
+        return ['ACL.S.A0001']
+
     def steps_TC_ACL_2_10(self) -> list[TestStep]:
         steps = [
             TestStep(1, "TH1 commissions DUT using admin node ID",

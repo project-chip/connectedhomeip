@@ -42,6 +42,9 @@ class TC_ACL_2_2(MatterBaseTest):
     def desc_TC_ACL_2_2(self) -> str:
         return "[TC-ACL-2.2] Cluster endpoint"
 
+    def pics_TC_ACL_2_2(self) -> list[str]:
+        return ['ACL.S']
+
     def steps_TC_ACL_2_2(self) -> list[TestStep]:
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),

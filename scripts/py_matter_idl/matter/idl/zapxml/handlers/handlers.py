@@ -22,7 +22,7 @@ from .base import BaseHandler, HandledDepth
 from .context import Context, IdlPostProcessor
 from .parsing import AttrsToAccessPrivilege, AttrsToAttribute, ParseInt
 
-LOGGER = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 def _IsConformanceTagName(name: str) -> bool:
@@ -147,7 +147,7 @@ class AttributeHandler(BaseHandler):
                 elif attrs['op'] == 'write':
                     self._attribute.writeacl = role
                 else:
-                    LOGGER.error("Unknown access: %r" % attrs['op'])
+                    log.error("Unknown access: %r", attrs['op'])
 
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         elif name.lower() == 'description':
@@ -258,8 +258,7 @@ class StructHandler(BaseHandler, IdlPostProcessor):
                     found = True
 
             if not found:
-                LOGGER.error('Struct %s could not find cluster (code %d/0x%X)' %
-                             (self._struct.name, code, code))
+                log.error("Struct '%s' could not find cluster (code %d/0x%X)", self._struct.name, code, code)
 
     def EndProcessing(self):
         self.context.AddIdlPostProcessor(self)
@@ -302,8 +301,7 @@ class EnumHandler(BaseHandler, IdlPostProcessor):
                 found.add(c.code)
 
         if found != self._cluster_codes:
-            LOGGER.error('Enum %s could not find its clusters (codes: %r)' %
-                         (self._enum.name, self._cluster_codes - found))
+            log.error("Enum '%s' could not find its clusters (codes: %r)", self._enum.name, self._cluster_codes - found)
 
     def EndProcessing(self):
         self.context.AddIdlPostProcessor(self)
@@ -349,8 +347,7 @@ class BitmapHandler(BaseHandler):
                     c.bitmaps.append(self._bitmap)
                     found = True
             if not found:
-                LOGGER.error('Bitmap %s could not find its cluster (code %d/0x%X)' %
-                             (self._bitmap.name, code, code))
+                log.error("Bitmap '%s' could not find its cluster (code %d/0x%X)", self._bitmap.name, code, code)
 
     def EndProcessing(self):
         self.context.AddIdlPostProcessor(self)
@@ -472,8 +469,7 @@ class CommandHandler(BaseHandler):
             if self._command:
                 self._command.invokeacl = AttrsToAccessPrivilege(attrs)
             else:
-                LOGGER.warning(
-                    "Ignored access role for reply %r" % self._struct)
+                log.warning("Ignored access role for reply %r", self._struct)
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         elif name.lower() == 'arg':
             self._struct.fields.append(self.GetArgumentField(attrs))
@@ -512,8 +508,7 @@ class ClusterGlobalAttributeHandler(BaseHandler):
         if name.lower() == 'featurebit':
             # It is uncler what featurebits mean. likely a bitmap should be created
             # here, however only one such example exists currently: door-lock-cluster.xml
-            LOGGER.info('Ignoring featurebit tag for global attribute 0x%X (%d)' % (
-                self._code, self._code))
+            log.info("Ignoring featurebit tag for global attribute 0x%X (%d)", self._code, self._code)
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         else:
             return BaseHandler(self.context)
@@ -611,8 +606,7 @@ class ClusterExtensionHandler(ClusterHandler, IdlPostProcessor):
                 c.commands.extend(self._cluster.commands)
 
         if not found:
-            LOGGER.error('Could not extend cluster 0x%X (%d): cluster not found' %
-                         (self._cluster_code, self._cluster_code))
+            log.error("Could not extend cluster 0x%X (%d): cluster not found", self._cluster_code, self._cluster_code)
 
 
 class GlobalAttributeHandler(BaseHandler):
@@ -650,8 +644,7 @@ class GlobalHandler(BaseHandler):
             if attrs['side'].lower() == 'client':
                 # We expect to also have 'server' equivalent, so ignore client
                 # side attributes
-                LOGGER.debug(
-                    'Ignoring global client-side attribute %s' % (attrs['code']))
+                log.debug("Ignoring global client-side attribute '%s'", attrs['code'])
                 return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
 
             return GlobalAttributeHandler(self.context, AttrsToAttribute(attrs))
