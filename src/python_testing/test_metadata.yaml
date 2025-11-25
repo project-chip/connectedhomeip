@@ -74,7 +74,8 @@ not_automated:
     - name: TC_SUTestBase.py
       reason: Shared code for TC_SU, not a standalone test
     - name: TC_SU_2_2.py
-      reason: Test takes  around 10 minutes, skipped in CI. Works on CI if added.
+      reason:
+          Test takes around 10 minutes, skipped in CI. Works on CI if added.
     - name: TC_COMMTR_TestBase.py
       reason: Shared code for TC_COMMTR, not a standalone test
     - name: TC_MTRIDTestBase.py
