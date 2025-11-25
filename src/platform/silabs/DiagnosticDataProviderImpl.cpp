@@ -223,7 +223,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     ifp->offPremiseServicesReachableIPv4.SetNull();
     ifp->offPremiseServicesReachableIPv6.SetNull();
 
-    ThreadStackMgrImpl().GetPrimary802154MACAddress(ifp->MacAddress);
+    TEMPORARY_RETURN_IGNORED ThreadStackMgrImpl().GetPrimary802154MACAddress(ifp->MacAddress);
     ifp->hardwareAddress = ByteSpan(ifp->MacAddress, kMaxHardwareAddrSize);
 
     // The Thread implementation has only 1 interface and is IPv6-only
@@ -248,7 +248,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     NetworkInterface * head = NULL;
     for (Inet::InterfaceIterator interfaceIterator; interfaceIterator.HasCurrent(); interfaceIterator.Next())
     {
-        interfaceIterator.GetInterfaceName(ifp->Name, Inet::InterfaceId::kMaxIfNameLength);
+        TEMPORARY_RETURN_IGNORED interfaceIterator.GetInterfaceName(ifp->Name, Inet::InterfaceId::kMaxIfNameLength);
         ifp->name          = CharSpan::fromCharString(ifp->Name);
         ifp->isOperational = true;
         Inet::InterfaceType interfaceType;

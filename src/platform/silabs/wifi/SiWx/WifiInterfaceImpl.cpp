@@ -258,14 +258,13 @@ sl_status_t BackgroundScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t 
 
         // Copy the scanned SSID to the current scan ssid buffer that will be forwarded to the callback
         chip::MutableByteSpan currentScanSsid(currentScanResult.ssid, WFX_MAX_SSID_LENGTH);
-        VerifyOrReturnError(chip::CopySpanToMutableSpan(scannedSsidSpan, currentScanSsid) == CHIP_NO_ERROR,
-                            SL_STATUS_SI91X_MEMORY_IS_NOT_SUFFICIENT);
+        ReturnValueOnFailure(chip::CopySpanToMutableSpan(scannedSsidSpan, currentScanSsid),
+                             SL_STATUS_SI91X_MEMORY_IS_NOT_SUFFICIENT);
         currentScanResult.ssid_length = currentScanSsid.size();
 
         chip::ByteSpan inBssid(result->scan_info[i].bssid, kWifiMacAddressLength);
         chip::MutableByteSpan outBssid(currentScanResult.bssid, kWifiMacAddressLength);
-        VerifyOrReturnError(chip::CopySpanToMutableSpan(inBssid, outBssid) == CHIP_NO_ERROR,
-                            SL_STATUS_SI91X_MEMORY_IS_NOT_SUFFICIENT);
+        ReturnValueOnFailure(chip::CopySpanToMutableSpan(inBssid, outBssid), SL_STATUS_SI91X_MEMORY_IS_NOT_SUFFICIENT);
 
         // Convert sl_wifi_security_t to wfx_sec_t
         currentScanResult.security =
@@ -385,7 +384,7 @@ sl_status_t ScanCallback(sl_wifi_event_t event, sl_wifi_scan_result_t * scan_res
 
         chip::MutableByteSpan bssidSpan(wfx_rsi.ap_bssid.data(), kWifiMacAddressLength);
         chip::ByteSpan inBssid(scan_result->scan_info[0].bssid, kWifiMacAddressLength);
-        chip::CopySpanToMutableSpan(inBssid, bssidSpan);
+        TEMPORARY_RETURN_IGNORED chip::CopySpanToMutableSpan(inBssid, bssidSpan);
     }
 
     osSemaphoreRelease(sScanCompleteSemaphore);
@@ -402,7 +401,7 @@ sl_status_t InitiateScan()
 
     chip::ByteSpan requestedSsidSpan(wfx_rsi.credentials.ssid, wfx_rsi.credentials.ssidLength);
     chip::MutableByteSpan ssidSpan(ssid.value, ssid.length);
-    chip::CopySpanToMutableSpan(requestedSsidSpan, ssidSpan);
+    TEMPORARY_RETURN_IGNORED chip::CopySpanToMutableSpan(requestedSsidSpan, ssidSpan);
 
     sl_wifi_set_scan_callback(ScanCallback, NULL);
 
@@ -484,7 +483,7 @@ sl_status_t SetWifiConfigurations()
 
     chip::MutableByteSpan output(profile.config.ssid.value, WFX_MAX_SSID_LENGTH);
     chip::ByteSpan input(wfx_rsi.credentials.ssid, wfx_rsi.credentials.ssidLength);
-    chip::CopySpanToMutableSpan(input, output);
+    TEMPORARY_RETURN_IGNORED chip::CopySpanToMutableSpan(input, output);
 
     if (wfx_rsi.ap_chan != SL_WIFI_AUTO_CHANNEL)
     {
@@ -494,7 +493,7 @@ sl_status_t SetWifiConfigurations()
 
         chip::MutableByteSpan bssidSpan(profile.config.bssid.octet, kWifiMacAddressLength);
         chip::ByteSpan inBssid(wfx_rsi.ap_bssid.data(), kWifiMacAddressLength);
-        chip::CopySpanToMutableSpan(inBssid, bssidSpan);
+        TEMPORARY_RETURN_IGNORED chip::CopySpanToMutableSpan(inBssid, bssidSpan);
     }
 
     status = sl_net_set_profile(SL_NET_WIFI_CLIENT_INTERFACE, SL_NET_DEFAULT_WIFI_CLIENT_PROFILE_ID, &profile);
@@ -562,7 +561,7 @@ void WifiInterfaceImpl::MatterWifiTask(void * arg)
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     // Remove High performance request after the device is initialized
-    chip::DeviceLayer::Silabs::WifiSleepManager::GetInstance().RemoveHighPerformanceRequest();
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::Silabs::WifiSleepManager::GetInstance().RemoveHighPerformanceRequest();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     WifiInterfaceImpl::GetInstance().NotifyWifiTaskInitialized();
@@ -587,7 +586,7 @@ CHIP_ERROR WifiInterfaceImpl::InitWiFiStack(void)
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     // Force the device to high performance mode during the init sequence.
-    chip::DeviceLayer::Silabs::WifiSleepManager::GetInstance().RequestHighPerformanceWithoutTransition();
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::Silabs::WifiSleepManager::GetInstance().RequestHighPerformanceWithoutTransition();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, &config, &wifi_client_context, nullptr);
@@ -650,7 +649,7 @@ void WifiInterfaceImpl::ProcessEvent(WifiPlatformEvent event)
 // To avoid IOP issues, it is recommended to enable high-performance mode before joining the network.
 // TODO: Remove this once the IOP issue related to power save mode switching is fixed in the Wi-Fi SDK.
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-        chip::DeviceLayer::Silabs::WifiSleepManager::GetInstance().RequestHighPerformanceWithTransition();
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::Silabs::WifiSleepManager::GetInstance().RequestHighPerformanceWithTransition();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
         InitiateScan();
         JoinWifiNetwork();
@@ -716,7 +715,7 @@ sl_status_t WifiInterfaceImpl::JoinWifiNetwork(void)
     {
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
         // Remove High performance request that might have been added during the connect/retry process
-        chip::DeviceLayer::Silabs::WifiSleepManager::GetInstance().RemoveHighPerformanceRequest();
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::Silabs::WifiSleepManager::GetInstance().RemoveHighPerformanceRequest();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
         WifiPlatformEvent event = WifiPlatformEvent::kStationConnect;
@@ -771,12 +770,12 @@ CHIP_ERROR WifiInterfaceImpl::GetAccessPointInfo(wfx_wifi_scan_result_t & info)
 
     chip::MutableByteSpan output(info.ssid, WFX_MAX_SSID_LENGTH);
     chip::ByteSpan ssid(wfx_rsi.credentials.ssid, wfx_rsi.credentials.ssidLength);
-    chip::CopySpanToMutableSpan(ssid, output);
+    TEMPORARY_RETURN_IGNORED chip::CopySpanToMutableSpan(ssid, output);
     info.ssid_length = output.size();
 
     chip::ByteSpan apBssidSpan(wfx_rsi.ap_bssid.data(), wfx_rsi.ap_bssid.size());
     chip::MutableByteSpan bssidSpan(info.bssid, kWifiMacAddressLength);
-    chip::CopySpanToMutableSpan(apBssidSpan, bssidSpan);
+    TEMPORARY_RETURN_IGNORED chip::CopySpanToMutableSpan(apBssidSpan, bssidSpan);
 
     // TODO: add error processing
     sl_wifi_get_signal_strength(SL_WIFI_CLIENT_INTERFACE, &(rssi));

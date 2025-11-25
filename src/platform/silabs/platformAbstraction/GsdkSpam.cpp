@@ -115,7 +115,7 @@ SilabsPlatform::SilabsButtonCb SilabsPlatform::mButtonCallback = nullptr;
 
 CHIP_ERROR SilabsPlatform::Init(void)
 {
-    NvmInit();
+    TEMPORARY_RETURN_IGNORED NvmInit();
 #ifdef _SILICON_LABS_32B_SERIES_2
     // Read the cause of last reset.
     mRebootCause = RMU_ResetCauseGet();
