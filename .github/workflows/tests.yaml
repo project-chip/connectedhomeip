@@ -493,7 +493,7 @@ jobs:
                         --target darwin-${{matrix.arch}}-bridge-${BUILD_VARIANT}-unified \
                         --target darwin-${{matrix.arch}}-microwave-oven-${BUILD_VARIANT}-unified \
                         --target darwin-${{matrix.arch}}-rvc-${BUILD_VARIANT}-unified \
-                        --target darwin-${{matrix.arch}}-tv-app-${BUILD_VARIANT}-unified \
+                        --target darwin-${{matrix.arch}}-lit-icd-${BUILD_VARIANT}-unified \
                         --target darwin-${{matrix.arch}}-ota-provider-${BUILD_VARIANT}-unified \
                         build \
                         --copy-artifacts-to objdir-clone \
@@ -507,10 +507,10 @@ jobs:
                         --target darwin-${{matrix.arch}}-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT} \
                         --target darwin-${{matrix.arch}}-all-clusters-${BUILD_VARIANT} \
                         --target darwin-${{matrix.arch}}-ota-requestor-${BUILD_VARIANT} \
-                        --target darwin-${{matrix.arch}}-lit-icd-${BUILD_VARIANT} \
                         --target darwin-${{matrix.arch}}-network-manager-${BUILD_VARIANT} \
                         --target darwin-${{matrix.arch}}-energy-gateway-${BUILD_VARIANT} \
                         --target darwin-${{matrix.arch}}-energy-management-${BUILD_VARIANT} \
+                        --target darwin-${{matrix.arch}}-tv-app-${BUILD_VARIANT} \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
@@ -531,9 +531,9 @@ jobs:
                      --lock-app ./objdir-clone/darwin-${{matrix.arch}}-lock-${BUILD_VARIANT}-unified/chip-lock-app \
                      --ota-provider-app ./objdir-clone/darwin-${{matrix.arch}}-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
                      --ota-requestor-app ./objdir-clone/darwin-${{matrix.arch}}-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
-                     --tv-app ./objdir-clone/darwin-${{matrix.arch}}-tv-app-${BUILD_VARIANT}-unified/chip-tv-app \
+                     --tv-app ./objdir-clone/darwin-${{matrix.arch}}-tv-app-${BUILD_VARIANT}/chip-tv-app \
                      --bridge-app ./objdir-clone/darwin-${{matrix.arch}}-bridge-${BUILD_VARIANT}-unified/chip-bridge-app \
-                     --lit-icd-app ./objdir-clone/darwin-${{matrix.arch}}-lit-icd-${BUILD_VARIANT}/lit-icd-app \
+                     --lit-icd-app ./objdir-clone/darwin-${{matrix.arch}}-lit-icd-${BUILD_VARIANT}-unified/lit-icd-app \
                      --microwave-oven-app ./objdir-clone/darwin-${{matrix.arch}}-microwave-oven-${BUILD_VARIANT}-unified/chip-microwave-oven-app \
                      --rvc-app ./objdir-clone/darwin-${{matrix.arch}}-rvc-${BUILD_VARIANT}-unified/chip-rvc-app \
                      --network-manager-app ./objdir-clone/darwin-${{matrix.arch}}-network-manager-${BUILD_VARIANT}/matter-network-manager-app \

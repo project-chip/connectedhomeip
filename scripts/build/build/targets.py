@@ -212,6 +212,7 @@ def BuildHostTarget():
             'bridge',
             'closure',
             'light',
+            'lit-icd',
             'lock',
             'microwave-oven',
             'ota-provider',

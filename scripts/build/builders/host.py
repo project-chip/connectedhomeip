@@ -107,6 +107,7 @@ class HostApp(Enum):
             HostApp.BRIDGE: ":linux_bridge_app",
             HostApp.CLOSURE: ":linux_closure_app",
             HostApp.LIGHT: ":linux_lighting_app",
+            HostApp.LIT_ICD: ":linux_lit_icd_app",
             HostApp.LOCK: ":linux_lock_app",
             HostApp.MICROWAVE_OVEN: ":linux_microwave_oven_app",
             HostApp.OTA_PROVIDER: ":linux_ota_provider_app",
