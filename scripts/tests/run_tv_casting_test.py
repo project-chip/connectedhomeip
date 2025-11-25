@@ -28,6 +28,8 @@ from linux.log_line_processing import ProcessOutputCapture
 from linux.tv_casting_test_sequence_utils import App, Sequence, Step
 from linux.tv_casting_test_sequences import START_APP, STOP_APP
 
+log = logging.getLogger(__name__)
+
 """
 This script can be used to validate the casting experience between the Linux tv-casting-app and the Linux tv-app.
 
@@ -58,7 +60,7 @@ class TestStepException(Exception):
         self.sequence_name = sequence_name
         self.step = step
 
-        logging.error("EXCEPTION at %s/%r: %s", sequence_name, step, message)
+        log.error("EXCEPTION at %s/%r: %s", sequence_name, step, message)
 
 
 def remove_cached_files(cached_file_pattern: str):
@@ -72,9 +74,7 @@ def remove_cached_files(cached_file_pattern: str):
         try:
             os.remove(cached_file)
         except OSError as e:
-            logging.error(
-                f"Failed to remove cached file `{cached_file}` with error: `{e.strerror}`"
-            )
+            log.error("Failed to remove cached file `%s` with error: `%s`", cached_file, e.strerror)
             raise  # Re-raise the OSError to propagate it up.
 
 
@@ -98,7 +98,7 @@ def stop_app(test_sequence_name: str, app_name: str, app: ProcessOutputCapture):
             None,
         )
 
-    logging.info(f"{test_sequence_name}: {app_name} stopped.")
+    log.info("%s: '%s' stopped.", test_sequence_name, app_name)
 
 
 def parse_output_msg_in_subprocess(
@@ -153,11 +153,11 @@ def parse_output_msg_in_subprocess(
                     )
 
             if current_index == len(test_sequence_step.output_msg):
-                logging.info(
-                    f"{test_sequence_name} - Found the expected output string(s) in the {test_sequence_step.app.value} subprocess:"
-                )
+                log.info("%s - Found the expected output string(s) in the '%s' subprocess:",
+                         test_sequence_name, test_sequence_step.app.value
+                         )
                 for line in msg_block:
-                    logging.info(f"{test_sequence_name} - {line}")
+                    log.info("%s - '%s'", test_sequence_name, line)
 
                 # successful completion
                 return
@@ -190,9 +190,7 @@ def send_input_cmd_to_subprocess(
     app_subprocess.send_to_program(input_cmd)
 
     input_cmd = input_cmd.rstrip("\n")
-    logging.info(
-        f"{test_sequence_name} - Sent `{input_cmd}` to the {app_name} subprocess."
-    )
+    log.info("%s - Sent `%s` to the '%s' subprocess.", test_sequence_name, input_cmd, app_name)
 
 
 def handle_input_cmd(
@@ -224,7 +222,7 @@ def run_test_sequence_steps(
     """Run through the test steps from a test sequence starting from the current index and perform actions based on the presence of `output_msg` or `input_cmd`."""
 
     if test_sequence_steps is None:
-        logging.error("No test sequence steps provided.")
+        log.error("No test sequence steps provided.")
 
     while current_index < len(test_sequence_steps):
         # Current step in the list of steps.
@@ -413,9 +411,7 @@ if __name__ == "__main__":
         cached_file_pattern = "/tmp/chip_*"
         remove_cached_files(cached_file_pattern)
     except OSError:
-        logging.error(
-            f"Error while removing cached files with file pattern: {cached_file_pattern}"
-        )
+        log.error("Error while removing cached files with file pattern: '%s'", cached_file_pattern)
         sys.exit(1)
 
     # Test casting (discovery and commissioning) between the Linux tv-casting-app and the tv-app.

@@ -243,7 +243,7 @@ void NetworkCommissioningCluster::SendNonConcurrentConnectNetworkResponse()
 #endif // CONFIG_NETWORK_LAYER_BLE
     ChipLogProgress(NetworkProvisioning, "Non-concurrent mode. Send ConnectNetworkResponse(Success)");
     Commands::ConnectNetworkResponse::Type response;
-    response.networkingStatus = NetworkCommissioning::Status::kSuccess;
+    response.networkingStatus = Status::kSuccess;
     commandHandle->AddResponse(mAsyncCommandPath, response);
 }
 #endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
@@ -253,7 +253,7 @@ void NetworkCommissioningCluster::SetLastNetworkingStatusValue(
 {
     if (mLastNetworkingStatusValue.Update(networkingStatusValue))
     {
-        NotifyAttributeChanged(Attributes::LastNetworkingStatus::TypeInfo::GetAttributeId());
+        NotifyAttributeChanged(Attributes::LastNetworkingStatus::Id);
     }
 }
 

@@ -26,15 +26,11 @@
 #include <clusters/GeneralCommissioning/Metadata.h>
 #include <cstdint>
 #include <optional>
+#include <platform/ConfigurationManager.h>
 #include <platform/DeviceControlServer.h>
 #include <platform/PlatformManager.h>
 #include <tracing/macros.h>
 #include <transport/SecureSession.h>
-
-#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-#include <app/server/TermsAndConditionsManager.h>  //nogncheck
-#include <app/server/TermsAndConditionsProvider.h> //nogncheck
-#endif
 
 using namespace chip;
 using namespace chip::app;
@@ -57,10 +53,11 @@ namespace {
         }                                                                                                                          \
     } while (false)
 
-CHIP_ERROR ReadIfSupported(CHIP_ERROR (ConfigurationManager::*getter)(uint8_t &), AttributeValueEncoder & aEncoder)
+CHIP_ERROR ReadIfSupported(ConfigurationManager & mgr, CHIP_ERROR (ConfigurationManager::*getter)(uint8_t &),
+                           AttributeValueEncoder & aEncoder)
 {
     uint8_t data   = 0;
-    CHIP_ERROR err = (DeviceLayer::ConfigurationMgr().*getter)(data);
+    CHIP_ERROR err = (mgr.*getter)(data);
     if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
     {
         data = 0;
@@ -139,18 +136,20 @@ void NotifyTermsAndConditionsAttributeChangeIfRequired(const TermsAndConditionsS
 }
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
 
-void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t self)
+void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t self_ptr_arg)
 {
     if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
     {
+        auto self = reinterpret_cast<GeneralCommissioningCluster *>(self_ptr_arg);
+
         // Spec says to reset Breadcrumb attribute to 0.
-        reinterpret_cast<GeneralCommissioningCluster *>(self)->SetBreadCrumb(0);
+        self->SetBreadCrumb(0);
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         if (event->FailSafeTimerExpired.updateTermsAndConditionsHasBeenInvoked)
         {
             // Clear terms and conditions acceptance on failsafe timer expiration
-            TermsAndConditionsProvider & tcProvider = TermsAndConditionsManager::GetInstance();
+            TermsAndConditionsProvider & tcProvider = self->ClusterContext().termsAndConditionsProvider;
             TermsAndConditionsState initialState, updatedState;
             VerifyOrReturn(CHIP_NO_ERROR == GetTermsAndConditionsAttributeState(tcProvider, initialState));
             VerifyOrReturn(CHIP_NO_ERROR == tcProvider.RevertAcceptance());
@@ -190,56 +189,44 @@ DataModel::ActionReturnStatus GeneralCommissioningCluster::ReadAttribute(const D
         return encoder.Encode(info);
     }
     case RegulatoryConfig::Id:
-        return ReadIfSupported(&ConfigurationManager::GetRegulatoryLocation, encoder);
+        return ReadIfSupported(mClusterContext.configurationManager, &ConfigurationManager::GetRegulatoryLocation, encoder);
     case LocationCapability::Id:
-        return ReadIfSupported(&ConfigurationManager::GetLocationCapability, encoder);
+        return ReadIfSupported(mClusterContext.configurationManager, &ConfigurationManager::GetLocationCapability, encoder);
     case SupportsConcurrentConnection::Id:
         return encoder.Encode(CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION != 0);
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     case TCAcceptedVersion::Id: {
-        TermsAndConditionsProvider & tcProvider = TermsAndConditionsManager::GetInstance();
         Optional<TermsAndConditions> outTermsAndConditions;
-
-        ReturnErrorOnFailure(tcProvider.GetAcceptance(outTermsAndConditions));
-
+        ReturnErrorOnFailure(mClusterContext.termsAndConditionsProvider.GetAcceptance(outTermsAndConditions));
         return encoder.Encode(outTermsAndConditions.ValueOr(TermsAndConditions(0, 0)).GetVersion());
     }
     case TCMinRequiredVersion::Id: {
-        TermsAndConditionsProvider & tcProvider = TermsAndConditionsManager::GetInstance();
         Optional<TermsAndConditions> outTermsAndConditions;
 
-        ReturnErrorOnFailure(tcProvider.GetRequirements(outTermsAndConditions));
-
+        ReturnErrorOnFailure(mClusterContext.termsAndConditionsProvider.GetRequirements(outTermsAndConditions));
         return encoder.Encode(outTermsAndConditions.ValueOr(TermsAndConditions(0, 0)).GetVersion());
     }
     case TCAcknowledgements::Id: {
-        TermsAndConditionsProvider & tcProvider = TermsAndConditionsManager::GetInstance();
         Optional<TermsAndConditions> outTermsAndConditions;
 
-        ReturnErrorOnFailure(tcProvider.GetAcceptance(outTermsAndConditions));
-
+        ReturnErrorOnFailure(mClusterContext.termsAndConditionsProvider.GetAcceptance(outTermsAndConditions));
         return encoder.Encode(outTermsAndConditions.ValueOr(TermsAndConditions(0, 0)).GetValue());
     }
     case TCAcknowledgementsRequired::Id: {
-        TermsAndConditionsProvider & tcProvider = TermsAndConditionsManager::GetInstance();
         bool acknowledgementsRequired;
-
-        ReturnErrorOnFailure(tcProvider.GetAcknowledgementsRequired(acknowledgementsRequired));
-
+        ReturnErrorOnFailure(mClusterContext.termsAndConditionsProvider.GetAcknowledgementsRequired(acknowledgementsRequired));
         return encoder.Encode(acknowledgementsRequired);
     }
     case TCUpdateDeadline::Id: {
-        TermsAndConditionsProvider & tcProvider = TermsAndConditionsManager::GetInstance();
         Optional<uint32_t> outUpdateAcceptanceDeadline;
+        ReturnErrorOnFailure(mClusterContext.termsAndConditionsProvider.GetUpdateAcceptanceDeadline(outUpdateAcceptanceDeadline));
 
-        ReturnErrorOnFailure(tcProvider.GetUpdateAcceptanceDeadline(outUpdateAcceptanceDeadline));
-
+        // NOTE: encoding an optional as a Nullable (they are not fully compatible)
         if (!outUpdateAcceptanceDeadline.HasValue())
         {
             return encoder.EncodeNull();
         }
-
         return encoder.Encode(outUpdateAcceptanceDeadline.Value());
     }
 #endif
@@ -372,12 +359,12 @@ void GeneralCommissioningCluster::OnFabricRemoved(const FabricTable & fabricTabl
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     // If the FabricIndex matches the last remaining entry in the Fabrics list, then the device SHALL delete all Matter
     // related data on the node which was created since it was commissioned.
-    if (Server::GetInstance().GetFabricTable().FabricCount() == 0)
+    if (fabricTable.FabricCount() == 0)
     {
         ChipLogProgress(Zcl, "general-commissioning-server: Last Fabric index 0x%x was removed",
                         static_cast<unsigned>(fabricIndex));
 
-        TermsAndConditionsProvider & tcProvider = TermsAndConditionsManager::GetInstance();
+        TermsAndConditionsProvider & tcProvider = mClusterContext.termsAndConditionsProvider;
         TermsAndConditionsState initialState, updatedState;
         VerifyOrReturn(CHIP_NO_ERROR == GetTermsAndConditionsAttributeState(tcProvider, initialState));
         VerifyOrReturn(CHIP_NO_ERROR == tcProvider.ResetAcceptance());
@@ -397,14 +384,14 @@ void GeneralCommissioningCluster::SetBreadCrumb(uint64_t value)
 CHIP_ERROR GeneralCommissioningCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
-    ReturnErrorOnFailure(PlatformMgrImpl().AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
-    return Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
+    ReturnErrorOnFailure(mClusterContext.platformManager.AddEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this)));
+    return mClusterContext.fabricTable.AddFabricDelegate(this);
 }
 
 void GeneralCommissioningCluster::Shutdown()
 {
-    PlatformMgrImpl().RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
-    Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
+    mClusterContext.platformManager.RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
+    mClusterContext.fabricTable.RemoveFabricDelegate(this);
     DefaultServerCluster::Shutdown();
 }
 
@@ -413,7 +400,7 @@ GeneralCommissioningCluster::HandleArmFailSafe(const DataModel::InvokeRequest & 
                                                const GeneralCommissioning::Commands::ArmFailSafe::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("ArmFailSafe", "GeneralCommissioning");
-    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
+    auto & failSafeContext = mClusterContext.failsafeContext;
     Commands::ArmFailSafeResponse::Type response;
 
     ChipLogProgress(FailSafe, "GeneralCommissioning: Received ArmFailSafe (%us)",
@@ -434,8 +421,7 @@ GeneralCommissioningCluster::HandleArmFailSafe(const DataModel::InvokeRequest & 
     {
         // We do not allow CASE connections to arm the failsafe for the first time while the commissioning window is open in order
         // to allow commissioners the opportunity to obtain this failsafe for the purpose of commissioning
-        if (!failSafeContext.IsFailSafeArmed() &&
-            Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen() &&
+        if (!failSafeContext.IsFailSafeArmed() && mClusterContext.commissioningWindowManager.IsCommissioningWindowOpen() &&
             request.subjectDescriptor->authMode == Access::AuthMode::kCase)
         {
             response.errorCode = CommissioningErrorEnum::kBusyWithOtherAdmin;
@@ -471,9 +457,7 @@ GeneralCommissioningCluster::HandleCommissioningComplete(const DataModel::Invoke
 {
     MATTER_TRACE_SCOPE("CommissioningComplete", "GeneralCommissioning");
 
-    DeviceControlServer * devCtrl = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
-    auto & failSafe               = Server::GetInstance().GetFailSafeContext();
-    auto & fabricTable            = Server::GetInstance().GetFabricTable();
+    auto & failSafe = mClusterContext.failsafeContext;
 
     ChipLogProgress(FailSafe, "GeneralCommissioning: Received CommissioningComplete");
 
@@ -489,7 +473,7 @@ GeneralCommissioningCluster::HandleCommissioningComplete(const DataModel::Invoke
     }
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-    TermsAndConditionsProvider & tcProvider = TermsAndConditionsManager::GetInstance();
+    TermsAndConditionsProvider & tcProvider = mClusterContext.termsAndConditionsProvider;
 
     // Ensure required terms and conditions have been accepted, then attempt to commit
     Optional<TermsAndConditions> requiredTermsAndConditionsMaybe;
@@ -558,7 +542,7 @@ GeneralCommissioningCluster::HandleCommissioningComplete(const DataModel::Invoke
     // Handle NOC commands
     if (failSafe.NocCommandHasBeenInvoked())
     {
-        err = fabricTable.CommitPendingFabricData();
+        err = mClusterContext.fabricTable.CommitPendingFabricData();
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(FailSafe, "GeneralCommissioning: Failed to commit pending fabric data: %" CHIP_ERROR_FORMAT, err.Format());
@@ -573,7 +557,8 @@ GeneralCommissioningCluster::HandleCommissioningComplete(const DataModel::Invoke
 
     // Disarm the fail-safe and notify the DeviceControlServer
     failSafe.DisarmFailSafe();
-    err = devCtrl->PostCommissioningCompleteEvent(handle->AsSecureSession()->GetPeerNodeId(), handle->GetFabricIndex());
+    err = mClusterContext.deviceControlServer.PostCommissioningCompleteEvent(handle->AsSecureSession()->GetPeerNodeId(),
+                                                                             handle->GetFabricIndex());
     CheckSuccess(err, Failure);
 
     SetBreadCrumb(0);
@@ -587,7 +572,6 @@ GeneralCommissioningCluster::HandleSetRegulatoryConfig(const DataModel::InvokeRe
                                                        const Commands::SetRegulatoryConfig::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("SetRegulatoryConfig", "GeneralCommissioning");
-    DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
     Commands::SetRegulatoryConfigResponse::Type response;
     auto & countryCode = commandData.countryCode;
 
@@ -605,7 +589,7 @@ GeneralCommissioningCluster::HandleSetRegulatoryConfig(const DataModel::InvokeRe
     }
 
     uint8_t locationCapability;
-    if (ConfigurationMgr().GetLocationCapability(locationCapability) != CHIP_NO_ERROR)
+    if (mClusterContext.configurationManager.GetLocationCapability(locationCapability) != CHIP_NO_ERROR)
     {
         return Protocols::InteractionModel::Status::Failure;
     }
@@ -621,7 +605,7 @@ GeneralCommissioningCluster::HandleSetRegulatoryConfig(const DataModel::InvokeRe
         return std::nullopt;
     }
 
-    CheckSuccess(server->SetRegulatoryConfig(location, countryCode), Failure);
+    CheckSuccess(mClusterContext.deviceControlServer.SetRegulatoryConfig(location, countryCode), Failure);
     SetBreadCrumb(commandData.breadcrumb);
     response.errorCode = CommissioningErrorEnum::kOk;
     handler->AddResponse(request.path, response);
@@ -635,8 +619,8 @@ GeneralCommissioningCluster::HandleSetTCAcknowledgements(const DataModel::Invoke
 {
     MATTER_TRACE_SCOPE("SetTCAcknowledgements", "GeneralCommissioning");
 
-    auto & failSafeContext                  = Server::GetInstance().GetFailSafeContext();
-    TermsAndConditionsProvider & tcProvider = TermsAndConditionsManager::GetInstance();
+    auto & failSafeContext                  = mClusterContext.failsafeContext;
+    TermsAndConditionsProvider & tcProvider = mClusterContext.termsAndConditionsProvider;
 
     Optional<TermsAndConditions> requiredTermsAndConditionsMaybe;
     Optional<TermsAndConditions> previousAcceptedTermsAndConditionsMaybe;

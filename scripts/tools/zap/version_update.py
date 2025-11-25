@@ -25,14 +25,11 @@ from enum import Flag, auto
 import click
 import coloredlogs
 
+log = logging.getLogger(__name__)
+
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
-__LOG_LEVELS__ = {
-    'debug': logging.DEBUG,
-    'info': logging.INFO,
-    'warn': logging.WARNING,
-    'fatal': logging.FATAL,
-}
+__LOG_LEVELS__ = logging.getLevelNamesMapping()
 
 # A version is of the form: v2023.01.09-nightly
 #
@@ -101,8 +98,7 @@ def version_update(log_level, update, new_version):
     if new_version:
         parsed = ZAP_VERSION_RE.match(new_version)
         if not parsed:
-            logging.error(
-                f"Version '{new_version}' does not seem to parse as a ZAP VERSION")
+            log.error("Version '%s' does not seem to parse as a ZAP VERSION", new_version)
             sys.exit(1)
 
         # get the numeric version for zap_execution
@@ -125,23 +121,22 @@ def version_update(log_level, update, new_version):
         for m in ZAP_VERSION_RE.finditer(file_data):
             version = file_data[m.start():m.end()]
             if version not in found_versions:
-                logging.info('%s currently used in %s', version, name)
+                log.info("'%s' currently used in '%s'", version, name)
             found_versions.add(version)
 
         if not found_versions:
-            logging.warning('%s does NOT seem to contain any version (regex error?)', name)
+            log.warning("'%s' does NOT seem to contain any version (regex error?)", name)
 
         # If we update, perform the update
         if new_version:
-            logging.info('Updating content of %s to version %s', name, version)
+            log.info("Updating content of '%s' to version '%s'", name, version)
             search_pos = 0
             need_replace = False
             m = ZAP_VERSION_RE.search(file_data, search_pos)
             while m:
                 version = file_data[m.start():m.end()]
                 if version == new_version:
-                    logging.warning(
-                        "Nothing to replace. Version already %s", version)
+                    log.warning("Nothing to replace. Version already '%s'", version)
                     break
                 file_data = file_data[:m.start()] + \
                     new_version + file_data[m.end():]
@@ -153,8 +148,7 @@ def version_update(log_level, update, new_version):
                 m = ZAP_VERSION_RE.search(file_data, search_pos)
 
             if need_replace:
-                logging.info('Replacing with version %s in %s',
-                             new_version, name)
+                log.info("Replacing with version '%s' in '%s'", new_version, name)
 
                 with open(os.path.join(CHIP_ROOT_DIR, name), 'wt') as f:
                     f.write(file_data)
@@ -165,13 +159,12 @@ def version_update(log_level, update, new_version):
             file_data = f.read()
 
         m = ZAP_EXECUTION_MIN_RE.search(file_data)
-        logging.info("Min version %s in %s", m.group(2), ZAP_EXECUTION_SCRIPT)
+        log.info("Min version '%s' in '%s'", m.group(2), ZAP_EXECUTION_SCRIPT)
         if new_version:
             new_min_version = ("%d.%d.%d" % zap_min_version)
             file_data = file_data[:m.start()] + m.group(1) + \
                 new_min_version + m.group(3) + file_data[m.end():]
-            logging.info('Updating min version to %s in %s',
-                         new_min_version, ZAP_EXECUTION_SCRIPT)
+            log.info("Updating min version to '%s' in '%s'", new_min_version, ZAP_EXECUTION_SCRIPT)
 
             with open(os.path.join(CHIP_ROOT_DIR, ZAP_EXECUTION_SCRIPT), 'wt') as f:
                 f.write(file_data)
