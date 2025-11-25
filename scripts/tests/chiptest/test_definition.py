@@ -175,11 +175,10 @@ class App:
         log.debug("Success waiting for: '%s'", waitForString)
 
     def __updateSetUpCode(self):
-        if self.outpipe:
-            qrLine = self.outpipe.FindLastMatchingLine('.*SetupQRCode: *\\[(.*)]')
-            if not qrLine:
-                raise Exception("Unable to find QR code")
-            self.setupCode = qrLine.group(1)
+        qrLine = self.outpipe.FindLastMatchingLine('.*SetupQRCode: *\\[(.*)]')
+        if not qrLine:
+            raise Exception("Unable to find QR code")
+        self.setupCode = qrLine.group(1)
 
     def __terminateProcess(self):
         """

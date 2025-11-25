@@ -27,7 +27,7 @@ import click
 import coloredlogs
 from chiptest.accessories import AppsRegister
 from chiptest.glob_matcher import GlobMatcher
-from chiptest.runner import Executor, SubprocessInfo, SubprocessKind
+from chiptest.runner import Executor, SubprocessKind
 from chiptest.test_definition import SubprocessInfoRepo, TestRunTime, TestTag
 from chipyaml.paths_finder import PathsFinder
 
@@ -193,6 +193,8 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
     else:  # DARWIN_FRAMEWORK_TOOL_PYTHON
         subproc_info_repo.require('darwin-framework-tool')
         subproc_info_repo.require('chip-tool-with-python', path_lookup='darwinframeworktool.py')
+        # darwin-framework-tool is a chip-tool equivalent
+        subproc_info_repo['chip-tool'] = subproc_info_repo['darwin-framework-tool']
 
     if include_tags:
         include_tags = {TestTag.__members__[t] for t in include_tags}
@@ -309,16 +311,6 @@ def cmd_run(context, iterations, pics_file, keep_going, test_timeout_seconds, ex
     if expected_failures != 0 and not keep_going:
         log.error("--expected-failures '%s' used without '--keep-going'", expected_failures)
         sys.exit(2)
-
-    if 'chip-tool-with-python' not in context.obj.subproc_info_repo:
-        if context.obj.runtime == TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON:
-            chip_tool_with_python = context.obj.subproc_info_repo.paths.get('darwinframeworktool.py')
-        else:
-            chip_tool_with_python = context.obj.subproc_info_repo.paths.get('chiptool.py')
-
-        if chip_tool_with_python is not None:
-            context.obj.subproc_info_repo['chip-tool-with-python'] = SubprocessInfo(
-                kind='tool', path=chip_tool_with_python).wrap_with('python3')
 
     if ble_wifi and sys.platform != "linux":
         raise click.BadOptionUsage("ble-wifi", "Option --ble-wifi is available on Linux platform only")
