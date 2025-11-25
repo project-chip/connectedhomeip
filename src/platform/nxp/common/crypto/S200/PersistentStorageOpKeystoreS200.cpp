@@ -52,7 +52,7 @@ CHIP_ERROR P256KeypairNXP::ExportBlob(P256SerializedKeypairNXP & output) const
     auto res          = sss_sscp_key_store_export_key(&g_keyStore, keypair, output.Bytes(), &keyBlobLen, kSSS_blobType_ELKE_blob);
     VerifyOrReturnError(res == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
-    output.SetLength(keyBlobLen);
+    TEMPORARY_RETURN_IGNORED output.SetLength(keyBlobLen);
 
     return CHIP_NO_ERROR;
 }
@@ -99,13 +99,13 @@ CHIP_ERROR PersistentStorageOpKeystoreS200::SignWithOpKeypair(FabricIndex fabric
 
     P256SerializedKeypairNXP keyBlob;
     uint16_t keyBlobLen = keyBlob.Capacity();
-    keyBlob.SetLength(keyBlobLen);
+    TEMPORARY_RETURN_IGNORED keyBlob.SetLength(keyBlobLen);
 
     if (fabricIndex != mCachedFabricIndex)
     {
         error =
             mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::FabricOpKey(fabricIndex).KeyName(), keyBlob.Bytes(), keyBlobLen);
-        keyBlob.SetLength(keyBlobLen);
+        TEMPORARY_RETURN_IGNORED keyBlob.SetLength(keyBlobLen);
 
         if (error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
         {

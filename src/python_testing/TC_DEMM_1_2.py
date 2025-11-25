@@ -111,11 +111,15 @@ class TC_DEMM_1_2(MatterBaseTest, ModeBaseClusterChecks):
         else:
             logger.info('Extra Check: One or more modes failed No Optimization validation.')
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_DEMM_1_2(self):
 
         # Setup common mode check
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(1)
 
