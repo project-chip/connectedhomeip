@@ -40,7 +40,7 @@ using namespace chip::Test;
 class DummyDelegate : public Delegate
 {
 public:
-    DummyDelegate(){};
+    DummyDelegate() {};
     ~DummyDelegate() override = default;
 
     DataModel::Nullable<chip::Percent> HandleOpenValve(DataModel::Nullable<chip::Percent> level) override
@@ -56,7 +56,7 @@ public:
 class DummyTimeSyncTracker : public TimeSyncTracker
 {
 public:
-    bool IsTimeSyncClusterSupported() override { return false; }
+    bool IsTimeSyncClusterSupported() override { return true; }
     bool IsValidUTCTime() override { return false; }
 };
 
@@ -118,10 +118,9 @@ TEST_F(TestValveConfigurationAndControlCluster, AttributeTest)
 
     // Test 3: With Level feature (adds CurrentLevel, TargetLevel, and LevelStep attributes)
     {
-        const AttributeListBuilder::OptionalAttributeEntry optionalAttributeEntries[] = { 
-            { true, CurrentLevel::kMetadataEntry },
-            { true, TargetLevel::kMetadataEntry },
-            { true, LevelStep::kMetadataEntry } };
+        const AttributeListBuilder::OptionalAttributeEntry optionalAttributeEntries[] = { { true, CurrentLevel::kMetadataEntry },
+                                                                                          { true, TargetLevel::kMetadataEntry },
+                                                                                          { true, LevelStep::kMetadataEntry } };
 
         ValveConfigurationAndControlCluster::OptionalAttributeSet optionalAttributeSet;
         optionalAttributeSet.Set<LevelStep::Id>();
@@ -144,10 +143,10 @@ TEST_F(TestValveConfigurationAndControlCluster, AttributeTest)
 
     // Test 4: With optional DefaultOpenLevel attribute enabled.
     {
-        const AttributeListBuilder::OptionalAttributeEntry optionalAttributeEntries[] = { 
-            { true, CurrentLevel::kMetadataEntry },
-            { true, TargetLevel::kMetadataEntry },
-            { true, DefaultOpenLevel::kMetadataEntry }};
+        const AttributeListBuilder::OptionalAttributeEntry optionalAttributeEntries[] = { { true, CurrentLevel::kMetadataEntry },
+                                                                                          { true, TargetLevel::kMetadataEntry },
+                                                                                          { true,
+                                                                                            DefaultOpenLevel::kMetadataEntry } };
 
         ValveConfigurationAndControlCluster::OptionalAttributeSet optionalAttributeSet;
         optionalAttributeSet.Set<DefaultOpenLevel::Id>();
@@ -170,7 +169,7 @@ TEST_F(TestValveConfigurationAndControlCluster, AttributeTest)
 
     // Test 5: With TimeSync feature (adds AutoCloseTime attribute)
     {
-        const AttributeListBuilder::OptionalAttributeEntry optionalAttributeEntries[] = { { true, AutoCloseTime::kMetadataEntry }};
+        const AttributeListBuilder::OptionalAttributeEntry optionalAttributeEntries[] = { { true, AutoCloseTime::kMetadataEntry } };
         const BitFlags<Feature> features{ Feature::kTimeSync };
         ValveConfigurationAndControlCluster valveCluster(
             kRootEndpointId, features, ValveConfigurationAndControlCluster::OptionalAttributeSet(), &timeSyncTracker);
