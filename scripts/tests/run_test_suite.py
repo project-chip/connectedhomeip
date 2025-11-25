@@ -27,7 +27,7 @@ import click
 import coloredlogs
 from chiptest.accessories import AppsRegister
 from chiptest.glob_matcher import GlobMatcher
-from chiptest.runner import SubprocessInfo, Executor
+from chiptest.runner import Executor, SubprocessInfo
 from chiptest.test_definition import SubprocessInfoRepo, TestRunTime, TestTag
 from chipyaml.paths_finder import PathsFinder
 
