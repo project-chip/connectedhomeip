@@ -106,45 +106,32 @@ DataModel::ActionReturnStatus ValveConfigurationAndControlCluster::ReadAttribute
 {
     switch (request.path.mAttributeId)
     {
-    case ValveConfigurationAndControl::Attributes::FeatureMap::Id: {
+    case ValveConfigurationAndControl::Attributes::FeatureMap::Id:
         return encoder.Encode(mFeatures);
-    }
-    case ValveConfigurationAndControl::Attributes::ClusterRevision::Id: {
+    case ValveConfigurationAndControl::Attributes::ClusterRevision::Id:
         return encoder.Encode(ValveConfigurationAndControl::kRevision);
-    }
-    case ValveConfigurationAndControl::Attributes::OpenDuration::Id: {
+    case ValveConfigurationAndControl::Attributes::OpenDuration::Id:
         return encoder.Encode(mOpenDuration);
-    }
-    case ValveConfigurationAndControl::Attributes::DefaultOpenDuration::Id: {
+    case ValveConfigurationAndControl::Attributes::DefaultOpenDuration::Id:
         return encoder.Encode(mDefaultOpenDuration);
-    }
-    case ValveConfigurationAndControl::Attributes::AutoCloseTime::Id: {
+    case ValveConfigurationAndControl::Attributes::AutoCloseTime::Id:
         return encoder.Encode(mAutoCloseTime);
-    }
-    case ValveConfigurationAndControl::Attributes::RemainingDuration::Id: {
+    case ValveConfigurationAndControl::Attributes::RemainingDuration::Id:
         return encoder.Encode(mRemainingDuration.value());
-    }
-    case ValveConfigurationAndControl::Attributes::CurrentState::Id: {
+    case ValveConfigurationAndControl::Attributes::CurrentState::Id:
         return encoder.Encode(mCurrentState);
-    }
-    case ValveConfigurationAndControl::Attributes::TargetState::Id: {
+    case ValveConfigurationAndControl::Attributes::TargetState::Id:
         return encoder.Encode(mTargetState);
-    }
-    case ValveConfigurationAndControl::Attributes::CurrentLevel::Id: {
+    case ValveConfigurationAndControl::Attributes::CurrentLevel::Id:
         return encoder.Encode(mCurrentLevel);
-    }
-    case ValveConfigurationAndControl::Attributes::TargetLevel::Id: {
+    case ValveConfigurationAndControl::Attributes::TargetLevel::Id:
         return encoder.Encode(mTargetLevel);
-    }
-    case ValveConfigurationAndControl::Attributes::DefaultOpenLevel::Id: {
+    case ValveConfigurationAndControl::Attributes::DefaultOpenLevel::Id:
         return encoder.Encode(mDefaultOpenLevel);
-    }
-    case ValveConfigurationAndControl::Attributes::ValveFault::Id: {
+    case ValveConfigurationAndControl::Attributes::ValveFault::Id:
         return encoder.Encode(mValveFault);
-    }
-    case ValveConfigurationAndControl::Attributes::LevelStep::Id: {
+    case ValveConfigurationAndControl::Attributes::LevelStep::Id:
         return encoder.Encode(mLevelStep);
-    }
     default:
         return Status::UnsupportedAttribute;
     }
@@ -372,7 +359,7 @@ CHIP_ERROR ValveConfigurationAndControlCluster::SetAutoCloseTime()
     }
     else
     {
-        // No syncronized time or OpenDuration is null, setting the AutoCloseTime attribute to Null
+        // No synchronized time or OpenDuration is null, setting the AutoCloseTime attribute to Null
         SaveAndReportIfChanged(mAutoCloseTime, DataModel::NullNullable, Attributes::AutoCloseTime::Id);
     }
 

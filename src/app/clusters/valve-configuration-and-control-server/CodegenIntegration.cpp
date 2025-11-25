@@ -139,7 +139,7 @@ ValveConfigurationAndControlCluster * FindClusterOnEndpoint(EndpointId endpointI
 {
     IntegrationDelegate integrationDelegate;
 
-    ServerClusterInterface * booleanState = CodegenClusterIntegration::FindClusterOnEndpoint(
+    ServerClusterInterface * valveConfigurationAndControl = CodegenClusterIntegration::FindClusterOnEndpoint(
         {
             .endpointId                = endpointId,
             .clusterId                 = ValveConfigurationAndControl::Id,
@@ -148,7 +148,7 @@ ValveConfigurationAndControlCluster * FindClusterOnEndpoint(EndpointId endpointI
         },
         integrationDelegate);
 
-    return static_cast<ValveConfigurationAndControlCluster *>(booleanState);
+    return static_cast<ValveConfigurationAndControlCluster *>(valveConfigurationAndControl);
 }
 
 } // namespace chip::app::Clusters::ValveConfigurationAndControl

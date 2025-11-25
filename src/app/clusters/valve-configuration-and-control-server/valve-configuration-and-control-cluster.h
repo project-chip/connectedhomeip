@@ -101,7 +101,6 @@ private:
     uint8_t mLevelStep{ 1u };
     const BitFlags<ValveConfigurationAndControl::Feature> mFeatures;
     const OptionalAttributeSet mOptionalAttributeSet;
-    //
     ValveConfigurationAndControl::Delegate * mDelegate;
     TimeSyncTracker * mTsTracker;
 };
