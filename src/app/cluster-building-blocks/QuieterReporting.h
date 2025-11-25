@@ -204,8 +204,6 @@ public:
 
         return isNewlyDirty ? AttributeDirtyState::kMustReport : AttributeDirtyState::kNoReportNeeded;
     }
-
-    chip::System::Clock::Timeout GetLastReportTime() { return mLastDirtyTimestampMillis; }
     
     /**
      * Same as the other `SetValue`, but assumes a changedPredicate that never overrides to dirty.
