@@ -57,11 +57,31 @@ public:
     BooleanStateConfiguration::Delegate * GetDelegate() const { return mDelegate; }
 
     Protocols::InteractionModel::Status SetAlarmsActive(AlarmModeBitMask alarms);
+
+    /// Marks the given alarms as being suppressed.
+    ///
+    /// Prerequisites:
+    ///   - all input alarms MUST be supported
+    ///   - all input alarms MUST be currently active
+    ///
+    /// Treated as a NOOP (i.e. no delegate call and no event generated)
+    /// if the input alarms are already suppressed.
     Protocols::InteractionModel::Status SuppressAlarms(AlarmModeBitMask alarms);
+
     CHIP_ERROR SetCurrentSensitivityLevel(uint8_t level);
     uint8_t GetCurrentSensitivityLevel() const { return mCurrentSensitivityLevel; }
+
+    /// Clears out all active and suppressed alarm bits.
+    ///
+    /// Generates an `AlarmsStateChanged` event if any values are
+    /// cleared.
     void ClearAllAlarms();
+
+    /// Sets the current sensor fault to the given fault value
+    /// and generates a new sensor fault event.
     void GenerateSensorFault(SensorFaultBitMask fault);
+
+    /// Sets the active alarms as being all enabled alarms
     Protocols::InteractionModel::Status SetAllEnabledAlarmsActive();
 
     SensorFaultBitMask GetSensorFault() const { return mSensorFault; }

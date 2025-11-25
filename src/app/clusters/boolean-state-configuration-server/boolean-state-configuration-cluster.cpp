@@ -342,7 +342,9 @@ Status BooleanStateConfigurationCluster::SetAlarmsActive(AlarmModeBitMask alarms
 Status BooleanStateConfigurationCluster::SetAllEnabledAlarmsActive()
 {
     VerifyOrReturnError(mFeatures.HasAny(Feature::kAudible, Feature::kVisual), Status::Failure);
-    VerifyOrReturnError(mAlarmsEnabled.HasAny(), Status::Success);
+
+    // No change is a noop
+    VerifyOrReturnError(mAlarmsActive != mAlarmsEnabled, Status::Success);
 
     mAlarmsActive = mAlarmsEnabled;
     OnClusterAttributeChanged(AlarmsActive::Id);
