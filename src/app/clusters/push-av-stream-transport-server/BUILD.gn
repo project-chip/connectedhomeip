@@ -18,8 +18,6 @@ source_set("push-av-stream-transport-server") {
   sources = [
     "PushAVStreamTransportCluster.cpp",
     "PushAVStreamTransportCluster.h",
-    "PushAVStreamTransportLogic.cpp",
-    "PushAVStreamTransportLogic.h",
     "push-av-stream-transport-delegate.h",
     "push-av-stream-transport-storage.h",
   ]

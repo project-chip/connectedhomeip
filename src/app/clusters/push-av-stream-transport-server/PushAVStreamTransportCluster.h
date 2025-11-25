@@ -18,10 +18,21 @@
 
 #pragma once
 
-#include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportLogic.h>
+
 #include <app/clusters/push-av-stream-transport-server/constants.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-delegate.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/AttributeAccessInterface.h>
+#include <app/CommandHandlerInterface.h>
+#include <app/clusters/push-av-stream-transport-server/constants.h>
+#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-delegate.h>
+#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-storage.h>
+#include <app/clusters/tls-certificate-management-server/tls-certificate-management-server.h>
+#include <app/clusters/tls-client-management-server/tls-client-management-server.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <functional>
+#include <protocols/interaction_model/StatusCode.h>
+#include <vector>
 
 namespace chip {
 namespace app {
@@ -45,25 +56,41 @@ public:
      * @note The caller must ensure the delegate lives throughout the instance's lifetime
      */
     PushAvStreamTransportServer(EndpointId aEndpointId, BitFlags<PushAvStreamTransport::Feature> aFeatures) :
-        DefaultServerCluster({ aEndpointId, PushAvStreamTransport::Id }), mLogic(aEndpointId, aFeatures)
+        DefaultServerCluster({ aEndpointId, PushAvStreamTransport::Id }), mFeatures(aFeatures)
     {}
 
-    PushAvStreamTransportServerLogic & GetLogic() { return mLogic; }
+    // PushAvStreamTransportServerLogic & GetLogic() { return mLogic; }
 
     void SetDelegate(PushAvStreamTransportDelegate * delegate)
     {
-        mLogic.SetDelegate(delegate);
-        if (delegate != nullptr)
+        if (delegate == nullptr)
         {
-            delegate->SetPushAvStreamTransportServer(this);
+            ChipLogError(Zcl, "Push AV Stream Transport : Trying to set delegate to null");
+            return;
+        }
+
+        mDelegate = delegate;
+        mDelegate->SetPushAvStreamTransportServer(this);
+    }
+
+    void SetTLSClientManagementDelegate(TlsClientManagementDelegate * delegate)
+    {
+        mTLSClientManagementDelegate = delegate;
+        if (mTLSClientManagementDelegate == nullptr)
+        {
+            ChipLogError(Zcl, "Push AV Stream Transport : Trying to set TLS Client Management delegate to null");
+            return;
         }
     }
 
-    void SetTLSClientManagementDelegate(TlsClientManagementDelegate * delegate) { mLogic.SetTLSClientManagementDelegate(delegate); }
-
     void SetTlsCertificateManagementDelegate(TlsCertificateManagementDelegate * delegate)
     {
-        mLogic.SetTlsCertificateManagementDelegate(delegate);
+        mTlsCertificateManagementDelegate = delegate;
+        if (mTlsCertificateManagementDelegate == nullptr)
+        {
+            ChipLogError(Zcl, "Push AV Stream Transport: Trying to set TLS Certificate Management delegate to null");
+            return;
+        }
     }
 
     /**
@@ -80,11 +107,7 @@ public:
     Protocols::InteractionModel::Status
     NotifyTransportStarted(uint16_t connectionID, PushAvStreamTransport::TransportTriggerTypeEnum triggerType,
                            Optional<PushAvStreamTransport::TriggerActivationReasonEnum> activationReason =
-                               Optional<PushAvStreamTransport::TriggerActivationReasonEnum>())
-    {
-        return mLogic.NotifyTransportStarted(connectionID, triggerType, activationReason);
-    }
-
+                               Optional<PushAvStreamTransport::TriggerActivationReasonEnum>());
     /**
      * @brief API for application layer to notify when transport has stopped
      *
@@ -96,18 +119,15 @@ public:
      * @return Status::Success if event was generated successfully, failure otherwise
      */
     Protocols::InteractionModel::Status NotifyTransportStopped(uint16_t connectionID,
-                                                               PushAvStreamTransport::TransportTriggerTypeEnum triggerType)
+                                                               PushAvStreamTransport::TransportTriggerTypeEnum triggerType);
+
+    CHIP_ERROR Init()
     {
-        return mLogic.NotifyTransportStopped(connectionID, triggerType);
+        LoadPersistentAttributes();
+        return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Init() { return mLogic.Init(); }
-
-    void Shutdown() override
-    {
-        DefaultServerCluster::Shutdown();
-        mLogic.Shutdown();
-    }
+    void Shutdown() override;
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
@@ -121,12 +141,119 @@ public:
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
+    enum class UpsertResultEnum : uint8_t
+    {
+        kInserted = 0x00,
+        kUpdated  = 0x01,
+    };
+
+    struct PushAVStreamTransportDeallocateCallbackContext
+    {
+        PushAvStreamTransportServer * instance;
+        uint16_t connectionID;
+    };
+
+    std::vector<std::shared_ptr<PushAVStreamTransportDeallocateCallbackContext>> mTimerContexts;
+
+    BitFlags<PushAvStreamTransport::Feature> mFeatures;
+
+    std::vector<PushAvStreamTransport::SupportedFormatStruct> mSupportedFormats;
+
+    std::vector<PushAvStreamTransport::TransportConfigurationStorage> mCurrentConnections;
+
+    // Methods coming from previous LOGIC implementation
+    bool HasFeature(PushAvStreamTransport::Feature feature) const;
+
+    Protocols::InteractionModel::Status ValidateIncomingTransportOptions(
+        const PushAvStreamTransport::Structs::TransportOptionsStruct::DecodableType & transportOptions);
+
+    std::optional<DataModel::ActionReturnStatus>
+    HandleAllocatePushTransport(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                                const PushAvStreamTransport::Commands::AllocatePushTransport::DecodableType & commandData);
+
+    std::optional<DataModel::ActionReturnStatus>
+    HandleDeallocatePushTransport(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                                  const PushAvStreamTransport::Commands::DeallocatePushTransport::DecodableType & commandData);
+
+    std::optional<DataModel::ActionReturnStatus>
+    HandleModifyPushTransport(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                              const PushAvStreamTransport::Commands::ModifyPushTransport::DecodableType & commandData);
+
+    std::optional<DataModel::ActionReturnStatus>
+    HandleSetTransportStatus(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                             const PushAvStreamTransport::Commands::SetTransportStatus::DecodableType & commandData);
+
+    std::optional<DataModel::ActionReturnStatus>
+    HandleManuallyTriggerTransport(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                                   const PushAvStreamTransport::Commands::ManuallyTriggerTransport::DecodableType & commandData);
+
+    std::optional<DataModel::ActionReturnStatus>
+    HandleFindTransport(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                        const PushAvStreamTransport::Commands::FindTransport::DecodableType & commandData);
+
+    // Send Push AV Stream Transport events
+    Protocols::InteractionModel::Status
+    GeneratePushTransportBeginEvent(const uint16_t connectionID, const PushAvStreamTransport::TransportTriggerTypeEnum triggerType,
+                                    const Optional<PushAvStreamTransport::TriggerActivationReasonEnum> activationReason);
+    Protocols::InteractionModel::Status GeneratePushTransportEndEvent(const uint16_t connectionID);
+
 private:
-    PushAvStreamTransportServerLogic mLogic;
+    // PushAvStreamTransportServerLogic mLogic;
+
+    // Previous LOGIC state move to CLUSTER implementation
+    PushAvStreamTransportDelegate * mDelegate                            = nullptr;
+    TlsClientManagementDelegate * mTLSClientManagementDelegate           = nullptr;
+    TlsCertificateManagementDelegate * mTlsCertificateManagementDelegate = nullptr;
 
     // Helpers to read list items
     CHIP_ERROR ReadAndEncodeCurrentConnections(const AttributeValueEncoder::ListEncodeHelper & encoder, FabricIndex fabricIndex);
     CHIP_ERROR ReadAndEncodeSupportedFormats(const AttributeValueEncoder::ListEncodeHelper & encoder);
+
+    /// Convenience method that returns if the internal delegate is null and will log
+    /// an error if the check returns true
+    bool IsNullDelegateWithLogging(EndpointId endpointIdForLogging);
+
+    /**
+     * Helper function that loads all the persistent attributes from the KVS.
+     */
+    void LoadPersistentAttributes();
+
+    // Helper functions
+    uint16_t GenerateConnectionID();
+
+    PushAvStreamTransport::TransportConfigurationStorage * FindStreamTransportConnection(const uint16_t connectionID);
+
+    PushAvStreamTransport::TransportConfigurationStorage * FindStreamTransportConnectionWithinFabric(const uint16_t connectionID,
+                                                                                                     FabricIndex fabricIndex);
+
+    // Add/Remove Management functions for transport
+    UpsertResultEnum
+    UpsertStreamTransportConnection(const PushAvStreamTransport::TransportConfigurationStorage & transportConfiguration);
+
+    void RemoveStreamTransportConnection(const uint16_t connectionID);
+
+    static void PushAVStreamTransportDeallocateCallback(chip::System::Layer *, void * callbackContext);
+
+    void RemoveTimerAppState(const uint16_t connectionID);
+
+    Protocols::InteractionModel::Status CheckPrivacyModes(Globals::StreamUsageEnum streamUsage);
+
+    /**
+     * @brief Schedule deallocate with a given timeout
+     *
+     * @param connectionID    ID of the connection to deallocate
+     * @param timeoutSec      timeout in seconds
+     * @return               CHIP_ERROR code indicating the result of the operation
+     */
+    CHIP_ERROR ScheduleTransportDeallocate(uint16_t connectionID, uint32_t timeoutSec);
+
+    /**
+     * @brief Validates the provided URL.
+     *
+     * @param url The URL to validate
+     * @return true if URL is valid, false otherwise
+     */
+    bool ValidateUrl(const std::string & url);
 };
 
 } // namespace Clusters

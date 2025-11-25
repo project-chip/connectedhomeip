@@ -412,7 +412,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestTransportOptionsConstraints)
     Structs::TransportZoneOptionsStruct::Type zone2;
     DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType> decodedList;
 
-    PushAvStreamTransportServerLogic logic(1, BitFlags<Feature>(1));
+    PushAvStreamTransportServer server(1, BitFlags<Feature>(1));
 
     // Create CMAFContainerOptionsStruct object
     cmafContainerOptions.chunkDuration = 1000;
@@ -450,7 +450,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestTransportOptionsConstraints)
     transportOptions.expiryTime.ClearValue();
 
     // Invalid command because the motion zones are missing
-    EXPECT_EQ(logic.ValidateIncomingTransportOptions(transportOptions), Status::InvalidCommand);
+    EXPECT_EQ(server.ValidateIncomingTransportOptions(transportOptions), Status::InvalidCommand);
 
     // Create transport zone options structs
     zone1.zone.SetNonNull(1);
@@ -493,7 +493,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestTransportOptionsConstraints)
 
     // Upadate the trigger options in the transport options
     transportOptions.triggerOptions = triggerOptions;
-    EXPECT_EQ(logic.ValidateIncomingTransportOptions(transportOptions),
+    EXPECT_EQ(server.ValidateIncomingTransportOptions(transportOptions),
               Status::ConstraintError); // ConstraintError because segmentDuration is not set
 
     cmafContainerOptions.segmentDuration = 1000;
@@ -502,7 +502,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestTransportOptionsConstraints)
     cmafContainerOptions.trackName       = Span(trackName.data(), trackName.size());
     containerOptions.CMAFContainerOptions.SetValue(cmafContainerOptions);
     transportOptions.containerOptions = containerOptions;
-    EXPECT_EQ(logic.ValidateIncomingTransportOptions(transportOptions), Status::Success);
+    EXPECT_EQ(server.ValidateIncomingTransportOptions(transportOptions), Status::Success);
 }
 
 void PrintBufHex(const uint8_t * buf, size_t size)
@@ -627,15 +627,15 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     commandData.transportOptions = transportOptions;
 
     // Without a delegate, command is unsupported.
-    EXPECT_EQ(server.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
+    EXPECT_EQ(server.HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
 
     // Set the delegate to the server logic
-    server.GetLogic().SetDelegate(&mockDelegate);
-    server.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
-    EXPECT_EQ(server.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
+    server.SetDelegate(&mockDelegate);
+    server.SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+    EXPECT_EQ(server.HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
 
-    EXPECT_EQ(server.GetLogic().mCurrentConnections.size(), (size_t) 1);
-    uint16_t allocatedConnectionID = server.GetLogic().mCurrentConnections[0].connectionID;
+    EXPECT_EQ(server.mCurrentConnections.size(), (size_t) 1);
+    uint16_t allocatedConnectionID = server.mCurrentConnections[0].connectionID;
 
     /*
      * Test AllocatePushTransportResponse
@@ -899,11 +899,10 @@ TEST_F(TestPushAVStreamTransportServerLogic, Test_AllocateTransport_AllocateTran
     Commands::DeallocatePushTransport::DecodableType deallocateCommandData;
     deallocateCommandData.connectionID = allocatedConnectionID;
 
-    EXPECT_EQ(
-        server.GetLogic().HandleDeallocatePushTransport(deallocateCommandHandler, kDeallocateCommandPath, deallocateCommandData),
-        std::nullopt);
+    EXPECT_EQ(server.HandleDeallocatePushTransport(deallocateCommandHandler, kDeallocateCommandPath, deallocateCommandData),
+              std::nullopt);
 
-    EXPECT_EQ(server.GetLogic().mCurrentConnections.size(), (size_t) 0);
+    EXPECT_EQ(server.mCurrentConnections.size(), (size_t) 0);
 }
 
 TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_FindTransportResponse)
@@ -1014,12 +1013,12 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     commandData.transportOptions = transportOptions;
 
     // Set the delegate to the server logic
-    server.GetLogic().SetDelegate(&mockDelegate);
-    server.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
-    EXPECT_EQ(server.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
+    server.SetDelegate(&mockDelegate);
+    server.SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+    EXPECT_EQ(server.HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
 
-    EXPECT_EQ(server.GetLogic().mCurrentConnections.size(), (size_t) 1);
-    uint16_t allocatedConnectionID = server.GetLogic().mCurrentConnections[0].connectionID;
+    EXPECT_EQ(server.mCurrentConnections.size(), (size_t) 1);
+    uint16_t allocatedConnectionID = server.mCurrentConnections[0].connectionID;
 
     /*
      * Test ModifyPushTransport
@@ -1111,9 +1110,9 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     modifyCommandData.connectionID     = allocatedConnectionID;
     modifyCommandData.transportOptions = transportOptions;
 
-    server.GetLogic().HandleModifyPushTransport(modifyCommandHandler, kModifyCommandPath, modifyCommandData);
+    server.HandleModifyPushTransport(modifyCommandHandler, kModifyCommandPath, modifyCommandData);
 
-    EXPECT_EQ(server.GetLogic().mCurrentConnections.size(), (size_t) 1);
+    EXPECT_EQ(server.mCurrentConnections.size(), (size_t) 1);
 
     /*
      * Test FindPushTransport
@@ -1127,7 +1126,7 @@ TEST_F(MockEventLogging, Test_AllocateTransport_ModifyTransport_FindTransport_Fi
     // As connectionID is static, the new allocated connectionID will be 2.
     findCommandData.connectionID.SetNonNull(allocatedConnectionID);
 
-    server.GetLogic().HandleFindTransport(findCommandHandler, kFindCommandPath, findCommandData);
+    server.HandleFindTransport(findCommandHandler, kFindCommandPath, findCommandData);
 
     // Check the response
     const auto & responses = findCommandHandler.GetResponses();
@@ -1348,12 +1347,12 @@ TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTrigg
     Commands::AllocatePushTransport::DecodableType commandData;
     commandData.transportOptions = transportOptions;
 
-    server.GetLogic().SetDelegate(&mockDelegate);
-    server.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
-    EXPECT_EQ(server.GetLogic().HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
-    EXPECT_EQ(server.GetLogic().mCurrentConnections.size(), (size_t) 1);
+    server.SetDelegate(&mockDelegate);
+    server.SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+    EXPECT_EQ(server.HandleAllocatePushTransport(commandHandler, kCommandPath, commandData), std::nullopt);
+    EXPECT_EQ(server.mCurrentConnections.size(), (size_t) 1);
 
-    uint16_t allocatedConnectionID = server.GetLogic().mCurrentConnections[0].connectionID;
+    uint16_t allocatedConnectionID = server.mCurrentConnections[0].connectionID;
 
     /*
      * Test SetTransportStatus
@@ -1367,9 +1366,9 @@ TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTrigg
 
     setCommandData.connectionID.SetNonNull(allocatedConnectionID);
     setCommandData.transportStatus = TransportStatusEnum::kActive;
-    server.GetLogic().HandleSetTransportStatus(setCommandHandler, kSetCommandPath, setCommandData);
+    server.HandleSetTransportStatus(setCommandHandler, kSetCommandPath, setCommandData);
 
-    EXPECT_EQ(server.GetLogic().mCurrentConnections[0].transportStatus, TransportStatusEnum::kActive);
+    EXPECT_EQ(server.mCurrentConnections[0].transportStatus, TransportStatusEnum::kActive);
 
     MockCommandHandler triggerCommandHandler;
     triggerCommandHandler.SetFabricIndex(1);
@@ -1379,7 +1378,7 @@ TEST_F(MockEventLogging, Test_AllocateTransport_SetTransportStatus_ManuallyTrigg
     triggerCommandData.connectionID     = allocatedConnectionID;
     triggerCommandData.activationReason = TriggerActivationReasonEnum::kUserInitiated;
 
-    server.GetLogic().HandleManuallyTriggerTransport(triggerCommandHandler, kTriggerCommandPath, triggerCommandData);
+    server.HandleManuallyTriggerTransport(triggerCommandHandler, kTriggerCommandPath, triggerCommandData);
 
     chip::app::EventManagement & logMgmt = chip::app::EventManagement::GetInstance();
 
