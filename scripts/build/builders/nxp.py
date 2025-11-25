@@ -167,7 +167,7 @@ class NxpBuilder(GnBuilder):
                  board: NxpBoard = NxpBoard.MCXW71,
                  board_variant: NxpBoardVariant = None,
                  os_env: NxpOsUsed = NxpOsUsed.FREERTOS,
-                 build_system: NxpBuildSystem = NxpBuildSystem.GN,
+                 build_system: NxpBuildSystem = NxpBuildSystem.CMAKE,
                  low_power: bool = False,
                  smu2: bool = False,
                  enable_factory_data: bool = False,
@@ -338,16 +338,6 @@ class NxpBuilder(GnBuilder):
             if self.board == NxpBoard.RW61X:
                 flag_board_variant = "board_version=\"frdm\""
                 args.append(flag_board_variant)
-
-        if self.iw416_transceiver:
-            args.append('iw416_transceiver=true')
-
-        if self.w8801_transceiver:
-            # BLE not supported on this transceiver
-            args.append('w8801_transceiver=true chip_enable_ble=false')
-
-        if self.iwx12_transceiver:
-            args.append('iwx12_transceiver=true')
 
         return args
 

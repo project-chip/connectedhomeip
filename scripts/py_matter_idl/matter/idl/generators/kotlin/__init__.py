@@ -27,7 +27,7 @@ from matter.idl.generators.type_definitions import (BasicInteger, BasicString, F
 from matter.idl.matter_idl_types import (Attribute, Cluster, Command, DataType, Field, FieldQuality, Idl, Struct, StructQuality,
                                          StructTag)
 
-LOGGER = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 @dataclasses.dataclass
@@ -84,7 +84,7 @@ def _UnderlyingType(field: Field, context: TypeLookupContext) -> Optional[str]:
         elif actual == FundamentalType.DOUBLE:
             return 'Double'
         else:
-            LOGGER.warning('Unknown fundamental type: %r' % actual)
+            log.warning("Unknown fundamental type: %r", actual)
 
     return None
 

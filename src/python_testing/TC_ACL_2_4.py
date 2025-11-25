@@ -44,7 +44,10 @@ from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_b
 
 class TC_ACL_2_4(MatterBaseTest):
     def desc_TC_ACL_2_4(self) -> str:
-        return "[TC-ACL-2.4] ACL "
+        return "[TC-ACL-2.4] ACL Attribute"
+
+    def pics_TC_ACL_2_4(self) -> list[str]:
+        return ['ACL.S']
 
     def steps_TC_ACL_2_4(self) -> list[TestStep]:
         steps = [
