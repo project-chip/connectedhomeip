@@ -1054,7 +1054,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             command_dict (dict): dictionary with the command and data.
             app_pipe (Optional[str], optional): Name of the cluster pipe file  (i.e. /tmp/chip_all_clusters_fifo_55441 or /tmp/chip_rvc_fifo_11111). Raises
             FileNotFoundError if pipe file is not found. If None takes the value from the CI argument --app-pipe,  arg --app-pipe has his own file exists check.
-            is_subprocess (Optional[bool]): is an optional argument, if it is True then it means that the test runs a subprocess (i.e. provider) and LINUX_DUT_IP environment variable is not needed
+            is_subprocess (Optional[bool]): is an optional argument, if it is True then it means that the test need to write the pipe from a subprocess (i.e. Otaprovider) and LINUX_DUT_IP environment variable is not needed as the pipe is set locally
 
         This method uses the following environment variables:
 
