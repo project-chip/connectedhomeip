@@ -16,6 +16,8 @@
  */
 #pragma once
 
+#include "app/ConcreteClusterPath.h"
+#include "lib/core/DataModelTypes.h"
 #include <app/server-cluster/ServerClusterContext.h>
 #include <app/server-cluster/ServerClusterInterface.h>
 #include <lib/support/Span.h>
@@ -28,13 +30,15 @@ namespace chip::app {
 /// used as a base class for extending cluster functionality, like adding new attributes
 /// or commands to an existing server cluster interface.
 ///
-/// NOTE: class is generally designed to override a SINGLE cluster even though ServerClusterInterface
-///       could support multiple server clusters: it maintains a single data version delta that will
-///       apply globally whenever an extension attribute is notified as changed.
-class ServerClusterExtension : public ServerClusterInterface
-{
+/// The class is intended to wrap a SINGLE cluster path for a given interface, even if the interface
+/// itself supports multiple paths.
+class ServerClusterExtension : public ServerClusterInterface {
 public:
-    explicit ServerClusterExtension(ServerClusterInterface & underlying) : mUnderlying(underlying) {}
+    explicit ServerClusterExtension(const ConcreteClusterPath & path, ServerClusterInterface & underlying)
+        : mClusterPath(path)
+        , mUnderlying(underlying)
+    {
+    }
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown() override;
@@ -42,31 +46,36 @@ public:
     [[nodiscard]] DataVersion GetDataVersion(const ConcreteClusterPath & path) const override;
     [[nodiscard]] BitFlags<DataModel::ClusterQualityFlags> GetClusterFlags(const ConcreteClusterPath & path) const override;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                 AttributeValueDecoder & decoder) override;
+        AttributeValueDecoder & decoder) override;
     void ListAttributeWriteNotification(const ConcreteAttributePath & path, DataModel::ListWriteOperation opType,
-                                        FabricIndex accessingFabric) override;
+        FabricIndex accessingFabric) override;
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                AttributeValueEncoder & encoder) override;
+        AttributeValueEncoder & encoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
     CHIP_ERROR EventInfo(const ConcreteEventPath & path, DataModel::EventEntry & eventInfo) override;
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
-                                                               chip::TLV::TLVReader & input_arguments,
-                                                               CommandHandler * handler) override;
+        chip::TLV::TLVReader & input_arguments,
+        CommandHandler * handler) override;
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
-                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
     CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
 
 protected:
+    const ConcreteClusterPath mClusterPath;
     ServerClusterInterface & mUnderlying;
+
+    // Cluster context, set on Startup and reset to nullptr on shutdown.
     ServerClusterContext * mContext = nullptr;
 
-    // A data version increment for when the underlying cluster data changes
+    // A data version increment for when the underlying cluster data changes.
+    // Since data version is explicitly random to start and wraps, the underlying
+    // path version is generally "real version + delta".
     DataVersion mVersionDelta = 0;
 
-    /// Mark the given path as changed:
+    /// Mark the given attribute as changed:
     ///   - calls the underlying context if available (i.e. make sure reporting works)
     ///   - updates internal version delta
-    void NotifyAttributeChanged(const AttributePathParams & path);
+    void NotifyAttributeChanged(AttributeId id);
 };
 
 } // namespace chip::app

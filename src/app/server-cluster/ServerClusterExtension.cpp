@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include "lib/core/DataModelTypes.h"
 #include <app/server-cluster/ServerClusterExtension.h>
 
 namespace chip {
@@ -33,13 +34,11 @@ void ServerClusterExtension::Shutdown()
     mContext = nullptr;
 }
 
-void ServerClusterExtension::NotifyAttributeChanged(const AttributePathParams & path)
+void ServerClusterExtension::NotifyAttributeChanged(AttributeId id)
 {
     VerifyOrReturn(mContext != nullptr);
-    // NOTE: this changes ALL paths, which may not be desirable. However extensions
-    //       generally handle a single cluster, so this should mostly be ok
     mVersionDelta++;
-    mContext->interactionContext.dataModelChangeListener.MarkDirty(path);
+    mContext->interactionContext.dataModelChangeListener.MarkDirty({ mClusterPath.mEndpointId, mClusterPath.mClusterId, id });
 }
 
 Span<const ConcreteClusterPath> ServerClusterExtension::GetPaths() const
@@ -49,7 +48,8 @@ Span<const ConcreteClusterPath> ServerClusterExtension::GetPaths() const
 
 DataVersion ServerClusterExtension::GetDataVersion(const ConcreteClusterPath & path) const
 {
-    return mUnderlying.GetDataVersion(path) + mVersionDelta;
+    DataVersion underlying_version = mUnderlying.GetDataVersion(path);
+    return underlying_version + (path == mClusterPath ? mVersionDelta : 0);
 }
 
 BitFlags<DataModel::ClusterQualityFlags> ServerClusterExtension::GetClusterFlags(const ConcreteClusterPath & path) const
