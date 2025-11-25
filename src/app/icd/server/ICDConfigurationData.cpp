@@ -67,7 +67,8 @@ CHIP_ERROR ICDConfigurationData::SetModeDurations(Optional<System::Clock::Millis
     if (idleModeDuration.HasValue())
         tmpIdleModeDuration = std::chrono::duration_cast<System::Clock::Seconds32>(idleModeDuration.Value());
 
-    return SetModeDurations(activeModeDuration.std_optional(), tmpIdleModeDuration, std::nullopt);
+    // Here we set shortIdleModeDuration the same as idleModeDuration to maintain the api previous behaviour
+    return SetModeDurations(activeModeDuration.std_optional(), tmpIdleModeDuration, tmpIdleModeDuration);
 }
 
 CHIP_ERROR ICDConfigurationData::SetModeDurations(std::optional<System::Clock::Milliseconds32> activeModeDuration,
@@ -89,15 +90,14 @@ CHIP_ERROR ICDConfigurationData::SetModeDurations(std::optional<System::Clock::M
     {
         // shortIdleModeDuration was provided, it shall be lesser than or equal to idleModeDuration.
         tmpShortIdleModeDuration = shortIdleModeDuration.value();
-        VerifyOrReturnError(tmpShortIdleModeDuration <= tmpIdleModeDuration, CHIP_ERROR_INVALID_ARGUMENT);
     }
     else
     {
         // shortIdleModeDuration was not provided. To ensure correct mode transitions and device compliance,
         // shortIdleModeDuration must not exceed idleModeDuration, so we use the smaller of the current shortIdleModeDuration
         // and the resultant idleModeDuration.
-        // This approach overwrite a previous valid shortIdleModeDuration rather than erroing the call but maitains the previous api
-        // behavior.
+        // This approach overwrites a previous valid shortIdleModeDuration rather than erroring the call but maintains the previous
+        // api behavior.
         tmpShortIdleModeDuration = std::min(mShortIdleModeDuration, tmpIdleModeDuration);
     }
 

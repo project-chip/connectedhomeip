@@ -197,6 +197,29 @@ TEST_F(TestICDConfigurationData, TestSetModeDurations)
     // Restore original values
     EXPECT_EQ(privateConfigData.SetModeDurations(MakeOptional(origActive), MakeOptional(Milliseconds32(origIdle.count() * 1000))),
               CHIP_NO_ERROR);
+
+    // Test SetModeDurations with shortIdleModeDuration
+    // Valid all three params: active=1500ms, idle=8s, shortIdle=3s
+    EXPECT_EQ(privateConfigData.SetModeDurations(std::optional<Milliseconds32>(Milliseconds32(1500)),
+                                                 std::optional<Seconds32>(Seconds32(8)), std::optional<Seconds32>(Seconds32(3))),
+              CHIP_NO_ERROR);
+    // Invalid: shortIdle > idle (6s > 5s)
+    EXPECT_EQ(privateConfigData.SetModeDurations(std::optional<Milliseconds32>(Milliseconds32(1500)),
+                                                 std::optional<Seconds32>(Seconds32(5)), std::optional<Seconds32>(Seconds32(6))),
+              CHIP_ERROR_INVALID_ARGUMENT);
+    // Omit shortIdle: idle shrinks below previous shortIdle, shortIdle should clamp to new idle (=> equal, so not used)
+    EXPECT_EQ(privateConfigData.SetModeDurations(std::optional<Milliseconds32>(Milliseconds32(1500)),
+                                                 std::optional<Seconds32>(Seconds32(2)), std::nullopt),
+              CHIP_NO_ERROR);
+    // Provide only shortIdle (smaller than current idle=2s is not possible to be <2s unless 1s)
+    EXPECT_EQ(privateConfigData.SetModeDurations(std::nullopt, std::nullopt, std::optional<Seconds32>(Seconds32(1))),
+              CHIP_NO_ERROR);
+    // Error: none provided
+    EXPECT_EQ(privateConfigData.SetModeDurations(std::nullopt, std::nullopt, std::nullopt), CHIP_ERROR_INVALID_ARGUMENT);
+    // Error: active > idle with 3-param API
+    EXPECT_EQ(privateConfigData.SetModeDurations(std::optional<Milliseconds32>(Milliseconds32(9000)),
+                                                 std::optional<Seconds32>(Seconds32(5)), std::optional<Seconds32>(Seconds32(3))),
+              CHIP_ERROR_INVALID_ARGUMENT);
 }
 
 } // namespace app

@@ -1712,7 +1712,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @def CHIP_CONFIG_ICD_SHORT_IDLE_MODE_DURATION_SEC
  *
  * The CHIP_CONFIG_ICD_SHORT_IDLE_MODE_DURATION_SEC is a configuration for shorter idle mode interval for LIT capable devices
- * operating in SIT mode. This allows devices to report more frequently and maintain a more reliable availablity status with their
+ * operating in SIT mode. This allows devices to report more frequently and maintain a more reliable availability status with their
  * subscribers.
  *
  * The short idleMode duration SHALL be lesser than or equal to the IdleModeDuration.
