@@ -3314,9 +3314,9 @@ TEST_F(TestFabricTable, JFVidVerificationWorksWithoutVvsUsingTestCerts)
     EXPECT_EQ(fabricTable.FabricCount(), 0);
 
     FabricIndex kFabricIndex = kUndefinedFabricIndex;
-    fabricTable.AddNewFabricForTestIgnoringCollisions(TestCerts::GetJFBRootCertAsset().mCert, TestCerts::GetJFBIACertAsset().mCert,
-                                                      TestCerts::GetJFBNodeCertAsset().mCert, TestCerts::GetJFBNodeCertAsset().mKey,
-                                                      &kFabricIndex);
+    EXPECT_SUCCESS(fabricTable.AddNewFabricForTestIgnoringCollisions(
+        TestCerts::GetJFBRootCertAsset().mCert, TestCerts::GetJFBIACertAsset().mCert, TestCerts::GetJFBNodeCertAsset().mCert,
+        TestCerts::GetJFBNodeCertAsset().mKey, &kFabricIndex));
 
     EXPECT_EQ(fabricTable.FabricCount(), 1);
 

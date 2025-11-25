@@ -166,7 +166,7 @@ class AppsRegister:
 
         # args should contain a list of strings in key-value pair, e.g. [option1, value1, option2, value2, ...]
         if (len(args) % 2) != 0:
-            log.warning("Unexpected command line options '%r' - not key/value pairs (odd length)", args)
+            log.warning("Unexpected command line options %r - not key/value pairs (odd length)", args)
             return {}
 
         # Create a dictionary from the key-value pair list
