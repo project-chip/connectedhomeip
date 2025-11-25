@@ -1215,8 +1215,8 @@ TEST_F(TestICDManager, TestShortIdleModeBehaviorSITvsLIT)
     ICDConfigurationDataTestAccess privateIcdConfigData(&icdConfigData);
 
     // Save original values
-    Seconds32 originalIdle        = configData.GetIdleModeDuration();
-    Milliseconds32 originalActive = configData.GetActiveModeDuration();
+    Seconds32 originalIdle        = icdConfigData.GetIdleModeDuration();
+    Milliseconds32 originalActive = icdConfigData.GetActiveModeDuration();
 
     // Enable required features (LIT support needed for short idle usage)
     BitFlags<Feature> featureMap;
@@ -1288,9 +1288,9 @@ TEST_F(TestICDManager, TestShortIdleModeBehaviorSITvsLIT)
     EXPECT_EQ(icdConfigData.GetModeBasedIdleModeDuration(), System::Clock::Seconds32(2));
 
     // Restore original values
-    EXPECT_EQ(
-        privateConfigData.SetModeDurations(MakeOptional(originalActive), MakeOptional(Milliseconds32(originalIdle.count() * 1000))),
-        CHIP_NO_ERROR);
+    EXPECT_EQ(privateIcdConfigData.SetModeDurations(MakeOptional(originalActive),
+                                                    MakeOptional(Milliseconds32(originalIdle.count() * 1000))),
+              CHIP_NO_ERROR);
 }
 #endif // CHIP_CONFIG_ENABLE_ICD_LIT
 

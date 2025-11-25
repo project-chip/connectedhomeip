@@ -934,7 +934,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
                              LinuxDeviceOptions::GetInstance().icdIdleModeDurationMs.Value())
                              .count()))
             {
-                PrintArgError("%s: icdShortIdleModeDuration value must be <= than icdIdleModeDuration\n", aProgram, aValue);
+                PrintArgError("%s: icdShortIdleModeDuration value must be <= icdIdleModeDuration\n", aProgram, aValue);
                 retval = false;
             }
             else
