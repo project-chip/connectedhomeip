@@ -61,10 +61,6 @@ class TC_DeviceConformance(DeviceConformanceTests, MatterBaseTest):
         super().setup_class()
         await self.setup_class_helper()
 
-    @async_test_body
-    async def teardown_class(self):
-        super().teardown_class()
-
     def test_TC_IDM_10_2(self):
         # TODO: Turn this off after TE2
         # https://github.com/project-chip/connectedhomeip/issues/34615

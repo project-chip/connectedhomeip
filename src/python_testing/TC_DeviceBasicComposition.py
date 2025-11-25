@@ -304,10 +304,6 @@ class TC_DeviceBasicComposition(BasicCompositionTests, MatterBaseTest):
         await self.setup_class_helper()
         self.build_spec_xmls()
 
-    @async_test_body
-    async def teardown_class(self):
-        super().teardown_class()
-
     # ======= START OF ACTUAL TESTS =======
     def test_TC_SM_1_1(self):
         ROOT_NODE_DEVICE_TYPE = 0x16
