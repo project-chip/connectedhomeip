@@ -47,7 +47,8 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.matter_asserts import is_valid_int_value
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
+from matter.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_cluster, matchers,
+                                           run_if_endpoint_matches)
 
 
 class TC_DISHM_2_1(MatterBaseTest):
@@ -109,6 +110,14 @@ class TC_DISHM_2_1(MatterBaseTest):
         supported_modes_attribute = cluster.Attributes.SupportedModes
         current_mode_attribute = cluster.Attributes.CurrentMode
         endpoint = self.get_endpoint()
+
+        asserts.assert_true('PIXIT.DISHM.MODE_CHANGE_OK' in self.matter_test_config.global_test_params,
+                            "PIXIT.DISHM.MODE_CHANGE_OK must be included on the command line in "
+                            "the --int-arg flag as PIXIT.DISHM.MODE_CHANGE_OK:<mode id>")
+        asserts.assert_true('PIXIT.DISHM.MODE_CHANGE_FAIL' in self.matter_test_config.global_test_params,
+                            "PIXIT.DISHM.MODE_CHANGE_FAIL must be included on the command line in "
+                            "the --int-arg flag as PIXIT.DISHM.MODE_CHANGE_FAIL:<mode id>")
+
         self.mode_fail = self.matter_test_config.global_test_params['PIXIT.DISHM.MODE_CHANGE_FAIL']
         self.mode_ok = self.matter_test_config.global_test_params['PIXIT.DISHM.MODE_CHANGE_OK']
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
@@ -120,13 +129,6 @@ class TC_DISHM_2_1(MatterBaseTest):
         self.step(2)
         supported_modes_dut = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=supported_modes_attribute)
         modes = [m.mode for m in supported_modes_dut]
-
-        asserts.assert_true('PIXIT.DISHM.MODE_CHANGE_OK' in self.matter_test_config.global_test_params,
-                            "PIXIT.DISHM.MODE_CHANGE_OK must be included on the command line in "
-                            "the --int-arg flag as PIXIT.DISHM.MODE_CHANGE_OK:<mode id>")
-        asserts.assert_true('PIXIT.DISHM.MODE_CHANGE_FAIL' in self.matter_test_config.global_test_params,
-                            "PIXIT.DISHM.MODE_CHANGE_FAIL must be included on the command line in "
-                            "the --int-arg flag as PIXIT.DISHM.MODE_CHANGE_FAIL:<mode id>")
 
         # Check if the list of supported modes is larger than 2
         asserts.assert_greater_equal(len(supported_modes_dut), 2, "SupportedModes must have at least 2 entries!")
