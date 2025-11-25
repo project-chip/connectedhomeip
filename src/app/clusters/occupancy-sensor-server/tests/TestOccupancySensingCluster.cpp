@@ -822,23 +822,7 @@ TEST_F(TestOccupancySensingCluster, TestOccupancyHoldTimeRetrigger)
     EXPECT_FALSE(mMockTimerDelegate.IsTimerActive(&cluster));
 }
 
-TEST_F(TestOccupancySensingCluster, TestOnOccupancyChangedCallback)
-{
-    chip::Test::TestServerClusterContext context;
-    OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithDelegate(
-        &gTestOccupancySensingDelegate) };
-    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-
-    onOccupancyChangedCalled = false;
-    cluster.SetOccupancy(true);
-    EXPECT_TRUE(onOccupancyChangedCalled);
-
-    onOccupancyChangedCalled = false;
-    cluster.SetOccupancy(false);
-    EXPECT_TRUE(onOccupancyChangedCalled);
-}
-
-TEST_F(TestOccupancySensingCluster, TestOnHoldTimeChangedCallback)
+TEST_F(TestOccupancySensingCluster, TestClusterDelegate)
 {
     chip::Test::TestServerClusterContext context;
     OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }
@@ -846,6 +830,21 @@ TEST_F(TestOccupancySensingCluster, TestOnHoldTimeChangedCallback)
                                          .WithDelegate(&gTestOccupancySensingDelegate) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
+    // 1. Verify OnOccupancyChanged callback
+    onOccupancyChangedCalled = false;
+    cluster.SetOccupancy(true);
+    EXPECT_TRUE(onOccupancyChangedCalled);
+
+    onOccupancyChangedCalled = false;
+    cluster.SetOccupancy(false);
+    // With hold time enabled, the transition to unoccupied happens after the timer fires.
+    EXPECT_FALSE(onOccupancyChangedCalled);
+
+    // Advance the timer to trigger the transition
+    mMockTimerDelegate.AdvanceClock(System::Clock::Seconds16(10));
+    EXPECT_TRUE(onOccupancyChangedCalled);
+
+    // 2. Verify OnHoldTimeChanged callback
     onHoldTimeChangedCalled = false;
     EXPECT_EQ(cluster.SetHoldTime(5), CHIP_NO_ERROR);
     EXPECT_TRUE(onHoldTimeChangedCalled);
