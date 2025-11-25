@@ -190,7 +190,7 @@ class TC_DISHM_2_1(MatterBaseTest):
         # TH sends a ChangeToMode command to the DUT with NewMode set to PIXIT.DISHM.MODE_CHANGE_FAIL
         # NOTE: Skip this step as SDK is not enabled with this failure response
 
-        if not (can_test_mode_failure and can_manually_control:):
+        if not (can_test_mode_failure and can_manually_control):
             self.skip_step(7)
         else:
             self.step(7)
