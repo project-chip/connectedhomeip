@@ -55,6 +55,7 @@ namespace {
 constexpr size_t kMaxTcpActiveConnectionCount = 4;
 constexpr size_t kMaxTcpPendingPackets        = 4;
 constexpr size_t kPacketSizeBytes             = sizeof(uint32_t);
+constexpr int kMaxPortBindRetries             = 100;
 
 using TCPImpl    = Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>;
 using TestAccess = Transport::TCPBaseTestAccess<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>;
@@ -72,7 +73,22 @@ const size_t kMaxIncoming       = 2;
 
 uint16_t GetRandomPort()
 {
-    return static_cast<uint16_t>(CHIP_PORT + chip::Crypto::GetRandU16() % 100);
+    return static_cast<uint16_t>(CHIP_PORT + chip::Crypto::GetRandU16() % 1000);
+}
+
+// Helper function to retry port setup with different random ports if EADDRINUSE.
+// This can happen when ports are in TIME_WAIT state from running test repeatedly.
+uint16_t RetryPortSetup(std::function<CHIP_ERROR(uint16_t)> setupFn)
+{
+    for (int retryCount = 0; retryCount < kMaxPortBindRetries; retryCount++)
+    {
+        uint16_t port  = GetRandomPort();
+        CHIP_ERROR err = setupFn(port);
+        VerifyOrReturnValue(err == CHIP_ERROR_POSIX(EADDRINUSE), port);
+        ChipLogProgress(Test, "RetryPortSetup: Port %u in use, retrying...", port);
+    }
+    ChipLogError(Test, "RetryPortSetup: Failed to bind to a free port after %d retries, giving up", kMaxPortBindRetries);
+    chipAbort();
 }
 
 class MockTransportMgrDelegate : public chip::TransportMgrDelegate
@@ -172,23 +188,12 @@ public:
         }
     }
 
-    void InitializeMessageTest(TCPImpl & tcp, const IPAddress & addr, uint16_t port)
+    uint16_t InitializeMessageTest(TCPImpl & tcp, const IPAddress & addr)
     {
-        CHIP_ERROR err = tcp.Init(
-            Transport::TcpListenParameters(mIOContext->GetTCPEndPointManager()).SetAddressType(addr.Type()).SetListenPort(port));
-
-        // retry a few times in case the port is somehow in use; shouldn't happen generally
-        // as we pick a random port
-        for (int i = 0; (i < 50) && (err != CHIP_NO_ERROR); i++)
-        {
-            ChipLogProgress(NotSpecified, "RETRYING tcp initialization");
-            chip::test_utils::SleepMillis(100);
-            err = tcp.Init(Transport::TcpListenParameters(mIOContext->GetTCPEndPointManager())
-                               .SetAddressType(addr.Type())
-                               .SetListenPort(port));
-        }
-
-        EXPECT_EQ(err, CHIP_NO_ERROR);
+        uint16_t port = RetryPortSetup([&](uint16_t p) {
+            return tcp.Init(
+                Transport::TcpListenParameters(mIOContext->GetTCPEndPointManager()).SetAddressType(addr.Type()).SetListenPort(p));
+        });
 
         mTransportMgrBase.SetSessionManager(this);
         EXPECT_SUCCESS(mTransportMgrBase.Init(&tcp));
@@ -196,6 +201,8 @@ public:
         mReceiveHandlerCallCount        = 0;
         mHandleConnectionCompleteCalled = false;
         mHandleConnectionCloseCalled    = false;
+
+        return port;
     }
 
     template <size_t N>
@@ -573,11 +580,10 @@ protected:
     {
         TCPImpl tcp;
 
-        uint16_t port = GetRandomPort();
-        CHIP_ERROR err =
-            tcp.Init(Transport::TcpListenParameters(mIOContext->GetTCPEndPointManager()).SetAddressType(type).SetListenPort(port));
-
-        EXPECT_EQ(err, CHIP_NO_ERROR);
+        RetryPortSetup([&](uint16_t port) {
+            return tcp.Init(
+                Transport::TcpListenParameters(mIOContext->GetTCPEndPointManager()).SetAddressType(type).SetListenPort(port));
+        });
     }
 
     /////////////////////////// Messaging test
@@ -585,9 +591,8 @@ protected:
     {
         TCPImpl tcp;
 
-        uint16_t port = GetRandomPort();
         MockTransportMgrDelegate gMockTransportMgrDelegate(mIOContext);
-        gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr, port);
+        uint16_t port = gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr);
         gMockTransportMgrDelegate.SingleMessageTest(tcp, addr, port);
         gMockTransportMgrDelegate.DisconnectTest(tcp);
     }
@@ -596,9 +601,8 @@ protected:
     {
         TCPImpl tcp;
 
-        uint16_t port = GetRandomPort();
         MockTransportMgrDelegate gMockTransportMgrDelegate(mIOContext);
-        gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr, port);
+        uint16_t port = gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr);
         gMockTransportMgrDelegate.MultipleConnectionTest(tcp, addr, port);
         gMockTransportMgrDelegate.DisconnectTest(tcp);
     }
@@ -607,9 +611,8 @@ protected:
     {
         TCPImpl tcp;
 
-        uint16_t port = GetRandomPort();
         MockTransportMgrDelegate gMockTransportMgrDelegate(mIOContext);
-        gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr, port);
+        uint16_t port = gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr);
         gMockTransportMgrDelegate.ConnectTest(tcp, addr, port);
         gMockTransportMgrDelegate.DisconnectTest(tcp);
     }
@@ -618,9 +621,8 @@ protected:
     {
         TCPImpl tcp;
 
-        uint16_t port = GetRandomPort();
         MockTransportMgrDelegate gMockTransportMgrDelegate(mIOContext);
-        gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr, port);
+        uint16_t port = gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr);
         gMockTransportMgrDelegate.ConnectTest(tcp, addr, port);
         gMockTransportMgrDelegate.SingleMessageTest(tcp, addr, port);
         gMockTransportMgrDelegate.DisconnectTest(tcp);
@@ -630,9 +632,8 @@ protected:
     {
         TCPImpl tcp;
 
-        uint16_t port = GetRandomPort();
         MockTransportMgrDelegate gMockTransportMgrDelegate(mIOContext);
-        gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr, port);
+        uint16_t port = gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr);
         gMockTransportMgrDelegate.HandleConnectCompleteCbCalledTest(tcp, addr, port);
         gMockTransportMgrDelegate.DisconnectTest(tcp);
     }
@@ -641,9 +642,8 @@ protected:
     {
         TCPImpl tcp;
 
-        uint16_t port = GetRandomPort();
         MockTransportMgrDelegate gMockTransportMgrDelegate(mIOContext);
-        gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr, port);
+        uint16_t port = gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr);
         gMockTransportMgrDelegate.HandleConnectCloseCbCalledTest(tcp, addr, port);
         gMockTransportMgrDelegate.DisconnectTest(tcp);
     }
@@ -654,9 +654,8 @@ protected:
 
         TCPEndPoint::sForceEarlyFailureIncomingConnection = true;
 
-        uint16_t port = GetRandomPort();
         MockTransportMgrDelegate gMockTransportMgrDelegate(mIOContext);
-        gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr, port);
+        uint16_t port = gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr);
         gMockTransportMgrDelegate.HandleConnectCloseCbCalledWithFailureTest(tcp, addr, port);
         gMockTransportMgrDelegate.DisconnectTest(tcp);
 
@@ -720,11 +719,10 @@ TEST_F(TestTCP, InitializeAsTCPClient)
 {
     TCPImpl tcp;
     auto tcpListenParams = Transport::TcpListenParameters(mIOContext->GetTCPEndPointManager());
-    uint16_t port        = GetRandomPort();
-    CHIP_ERROR err =
-        tcp.Init(tcpListenParams.SetAddressType(IPAddressType::kIPv6).SetListenPort(port).SetServerListenEnabled(false));
 
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    RetryPortSetup([&](uint16_t port) {
+        return tcp.Init(tcpListenParams.SetAddressType(IPAddressType::kIPv6).SetListenPort(port).SetServerListenEnabled(false));
+    });
 
     bool isServerEnabled = tcpListenParams.IsServerListenEnabled();
     EXPECT_EQ(isServerEnabled, false);
@@ -735,10 +733,8 @@ TEST_F(TestTCP, InitializeAsTCPClientServer)
     TCPImpl tcp;
     auto tcpListenParams = Transport::TcpListenParameters(mIOContext->GetTCPEndPointManager());
 
-    uint16_t port  = GetRandomPort();
-    CHIP_ERROR err = tcp.Init(tcpListenParams.SetAddressType(IPAddressType::kIPv6).SetListenPort(port));
-
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    RetryPortSetup(
+        [&](uint16_t port) { return tcp.Init(tcpListenParams.SetAddressType(IPAddressType::kIPv6).SetListenPort(port)); });
 
     bool isServerEnabled = tcpListenParams.IsServerListenEnabled();
     EXPECT_EQ(isServerEnabled, true);
@@ -830,9 +826,8 @@ TEST_F(TestTCP, CheckTCPEndpointAfterCloseTest)
     IPAddress addr;
     IPAddress::FromString("::1", addr);
 
-    uint16_t port = GetRandomPort();
     MockTransportMgrDelegate gMockTransportMgrDelegate(mIOContext);
-    gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr, port);
+    uint16_t port = gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr);
     gMockTransportMgrDelegate.ConnectTest(tcp, addr, port);
 
     Transport::PeerAddress lPeerAddress = Transport::PeerAddress::TCP(addr, port);
@@ -854,9 +849,8 @@ TEST_F(TestTCP, CheckProcessReceivedBuffer)
     IPAddress addr;
     IPAddress::FromString("::1", addr);
 
-    uint16_t port = GetRandomPort();
     MockTransportMgrDelegate gMockTransportMgrDelegate(mIOContext);
-    gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr, port);
+    uint16_t port = gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr);
 
     // Send a packet to get TCP going, so that we can find a TCPEndPoint to pass to ProcessReceivedBuffer.
     // (The current TCPEndPoint implementation is not effectively mockable.)
