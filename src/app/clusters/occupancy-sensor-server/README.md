@@ -6,29 +6,24 @@ an ultrasonic sensor to determine whether a room is occupied or unoccupied.
 
 ## Overview
 
-This directory contains a modern, code-driven C++ implementation of the Matter
-Occupancy Sensing cluster server. This implementation
-(`OccupancySensingCluster.h` and `OccupancySensingCluster.cpp`) is designed for
-flexibility, avoiding the tight coupling present in older ZAP/Ember-based
-implementations.
-
-A key feature of this implementation is that it is completely decoupled from the
-underlying sensor hardware. The previous `occupancy-hal.h` has been removed, and
-the application is now responsible for initializing its own sensor hardware and
-notifying the cluster of occupancy changes by calling the `SetOccupancy()`
+This directory contains a C++ implementation of the Matter Occupancy Sensing 
+cluster server. This implementation (`OccupancySensingCluster.h` and
+`OccupancySensingCluster.cpp`) is designed for flexibility. A key feature of
+this implementation is that it is completely decoupled from the underlying sensor
+hardware. The application is responsible for initializing its own sensor hardware
+and notifying the cluster of occupancy changes by calling the `SetOccupancy()`
 method.
 
-The cluster implementation now internally handles all timer logic related to the
-`HoldTime`, `PIROccupiedToUnoccupiedDelay`,
-`UltrasonicOccupiedToUnoccupiedDelay`, and
-`PhysicalContactOccupiedToUnoccupiedDelay` attributes, simplifying the
+The cluster implementation internally handles all timer logic related to the
+`HoldTime`, `PIROccupiedToUnoccupiedDelay`, `UltrasonicOccupiedToUnoccupiedDelay`,
+and `PhysicalContactOccupiedToUnoccupiedDelay` attributes, simplifying the
 application's responsibility.
 
 It uses an optional delegate pattern
 (`chip::app::Clusters::OccupancySensingDelegate`) to notify the application
 about changes to the occupancy state or the hold time configuration.
 
-## Modern Code-Driven Usage (Recommended)
+## Usage
 
 For new applications using the `CodeDrivenDataModelProvider`, we strongly
 recommend instantiating and registering the cluster directly. This approach
@@ -125,7 +120,7 @@ void MySensorHardwareCallback(bool isOccupied)
 }
 ```
 
-## Legacy Ember-Style Usage
+## Legacy Usage (Not Recommended)
 
 For backwards compatibility with applications that rely on older ZAP-generated
 patterns (like the `all-clusters-app`), a compatibility layer is provided in
@@ -139,6 +134,9 @@ configure the cluster based on your ZAP configuration.
 To use the cluster in this mode, your application can get a pointer to the
 cluster instance and call its methods directly using
 `OccupancySensing::FindClusterOnEndpoint(endpointId)`.
+
+Note that this method is for backwards compatibility only is not recommended
+for new applications.
 
 ```cpp
 // In your application logic file

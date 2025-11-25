@@ -98,6 +98,9 @@ public:
     void TimerFired() override;
 
     DataModel::ActionReturnStatus SetHoldTime(uint16_t holdTime);
+
+    // SetHoldTimeLimits is a convenience method and shall only be used during initialization to set the fixed
+    // hold time limits attribute when it cannot be set using the constructor.
     void SetHoldTimeLimits(const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & holdTimeLimits);
     void SetOccupancy(bool occupied);
     bool IsOccupied() const;
