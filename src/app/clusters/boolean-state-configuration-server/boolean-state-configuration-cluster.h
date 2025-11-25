@@ -59,7 +59,7 @@ public:
     Protocols::InteractionModel::Status SetAlarmsActive(AlarmModeBitMask alarms);
     Protocols::InteractionModel::Status SuppressAlarms(AlarmModeBitMask alarms);
     CHIP_ERROR SetCurrentSensitivityLevel(uint8_t level);
-    uint8_t GetCurrentSesitivityLevel() const { return mCurrentSensitivityLevel; }
+    uint8_t GetCurrentSensitivityLevel() const { return mCurrentSensitivityLevel; }
     void ClearAllAlarms();
     void GenerateSensorFault(SensorFaultBitMask fault);
     Protocols::InteractionModel::Status SetAllEnabledAlarmsActive();
