@@ -24,9 +24,9 @@ namespace chip::app::Clusters {
 class TimeSyncTracker
 {
 public:
-    virtual ~TimeSyncTracker()               = default;
+    virtual ~TimeSyncTracker()                = default;
     virtual bool IsTimeSyncClusterSupported() = 0;
-    virtual bool IsValidUTCTime() = 0;
+    virtual bool IsValidUTCTime()             = 0;
 };
 
 } // namespace chip::app::Clusters

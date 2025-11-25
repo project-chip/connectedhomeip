@@ -16,8 +16,8 @@
  */
 
 #include "ValveControlDelegate.h"
-#include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-cluster.h>
 #include <app/clusters/valve-configuration-and-control-server/CodegenIntegration.h>
+#include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-cluster.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
@@ -64,8 +64,7 @@ void ValveControlDelegate::HandleRemainingDurationTick(uint32_t duration)
     {
         VerifyOrReturn(CHIP_NO_ERROR == valveCluster->UpdateCurrentLevel(sLevel),
                        ChipLogError(NotSpecified, "Updating current level failed"));
-        VerifyOrReturn(CHIP_NO_ERROR ==
-                           valveCluster->UpdateCurrentState(ValveConfigurationAndControl::ValveStateEnum::kOpen),
+        VerifyOrReturn(CHIP_NO_ERROR == valveCluster->UpdateCurrentState(ValveConfigurationAndControl::ValveStateEnum::kOpen),
                        ChipLogError(NotSpecified, "Updating current state failed"));
     }
     sLastOpenDuration = duration;

@@ -40,7 +40,7 @@ using namespace chip::Test;
 class DummyDelegate : public Delegate
 {
 public:
-    DummyDelegate() {};
+    DummyDelegate(){};
     ~DummyDelegate() override = default;
 
     DataModel::Nullable<chip::Percent> HandleOpenValve(DataModel::Nullable<chip::Percent> level) override

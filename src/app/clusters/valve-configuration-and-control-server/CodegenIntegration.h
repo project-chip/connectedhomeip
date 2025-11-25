@@ -21,7 +21,7 @@
 
 namespace chip::app::Clusters::ValveConfigurationAndControl {
 
-void SetDelegate(EndpointId endpointId,  Delegate * delegate);
+void SetDelegate(EndpointId endpointId, Delegate * delegate);
 
 ValveConfigurationAndControlCluster * FindClusterOnEndpoint(EndpointId endpointId);
 

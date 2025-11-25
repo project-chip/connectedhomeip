@@ -16,13 +16,13 @@
  *    limitations under the License.
  */
 #include "CodegenIntegration.h"
+#include <app/clusters/time-synchronization-server/CodegenIntegration.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-cluster.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-delegate.h>
 #include <app/static-cluster-config/ValveConfigurationAndControl.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
-#include <app/clusters/time-synchronization-server/CodegenIntegration.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -39,17 +39,17 @@ constexpr size_t kValveConfigurationAndControlMaxClusterCount =
 
 LazyRegisteredServerCluster<ValveConfigurationAndControlCluster> gServers[kValveConfigurationAndControlMaxClusterCount];
 
-class CodegenTimeSyncTracker : public TimeSyncTracker {
-    public:
+class CodegenTimeSyncTracker : public TimeSyncTracker
+{
+public:
+    bool IsTimeSyncClusterSupported() override { return (nullptr != TimeSynchronization::GetClusterInstance()); }
 
-    bool IsTimeSyncClusterSupported() override {
-        return (nullptr != TimeSynchronization::GetClusterInstance());
-    }
-
-    bool IsValidUTCTime() override {
-        if(IsTimeSyncClusterSupported())
+    bool IsValidUTCTime() override
+    {
+        if (IsTimeSyncClusterSupported())
         {
-            return TimeSynchronization::GetClusterInstance()->GetGranularity() != TimeSynchronization::GranularityEnum::kNoTimeGranularity;
+            return TimeSynchronization::GetClusterInstance()->GetGranularity() !=
+                TimeSynchronization::GranularityEnum::kNoTimeGranularity;
         }
         return false;
     }
@@ -65,7 +65,8 @@ public:
         // Create OptionalAttributeSet from optionalAttributeBits
         ValveConfigurationAndControlCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
 
-        gServers[clusterInstanceIndex].Create(endpointId, BitFlags<ValveConfigurationAndControl::Feature>(featureMap), optionalAttributeSet, &codegenTracker);
+        gServers[clusterInstanceIndex].Create(endpointId, BitFlags<ValveConfigurationAndControl::Feature>(featureMap),
+                                              optionalAttributeSet, &codegenTracker);
         return gServers[clusterInstanceIndex].Registration();
     }
 
@@ -110,19 +111,13 @@ void MatterValveConfigurationAndControlClusterShutdownCallback(EndpointId endpoi
         integrationDelegate);
 }
 
-void MatterValveConfigurationAndControlPluginServerInitCallback()
-{
+void MatterValveConfigurationAndControlPluginServerInitCallback() {}
 
-}
-
-void MatterValveConfigurationAndControlPluginServerShutdownCallback()
-{
-
-}
+void MatterValveConfigurationAndControlPluginServerShutdownCallback() {}
 
 namespace chip::app::Clusters::ValveConfigurationAndControl {
 
-void SetDelegate(EndpointId endpointId,  Delegate * delegate)
+void SetDelegate(EndpointId endpointId, Delegate * delegate)
 {
     IntegrationDelegate integrationDelegate;
 

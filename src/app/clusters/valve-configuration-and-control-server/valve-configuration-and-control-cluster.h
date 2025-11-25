@@ -21,23 +21,25 @@
 
 #pragma once
 
-#include "valve-configuration-and-control-delegate.h"
 #include "TimeSyncTracker.h"
+#include "valve-configuration-and-control-delegate.h"
 
-#include <clusters/ValveConfigurationAndControl/Metadata.h>
+#include <app/cluster-building-blocks/QuieterReporting.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
-#include <app/cluster-building-blocks/QuieterReporting.h>
+#include <clusters/ValveConfigurationAndControl/Metadata.h>
 #include <system/SystemLayer.h>
 
 namespace chip::app::Clusters {
-class ValveConfigurationAndControlCluster : public DefaultServerCluster {
+class ValveConfigurationAndControlCluster : public DefaultServerCluster
+{
 public:
-    using OptionalAttributeSet = chip::app::OptionalAttributeSet<
-        ValveConfigurationAndControl::Attributes::DefaultOpenLevel::Id, ValveConfigurationAndControl::Attributes::ValveFault::Id,
-        ValveConfigurationAndControl::Attributes::LevelStep::Id>;
+    using OptionalAttributeSet = chip::app::OptionalAttributeSet<ValveConfigurationAndControl::Attributes::DefaultOpenLevel::Id,
+                                                                 ValveConfigurationAndControl::Attributes::ValveFault::Id,
+                                                                 ValveConfigurationAndControl::Attributes::LevelStep::Id>;
 
-    ValveConfigurationAndControlCluster(EndpointId endpointId, BitFlags<ValveConfigurationAndControl::Feature> features, OptionalAttributeSet optionalAttributeSet, TimeSyncTracker * tsTracker);
+    ValveConfigurationAndControlCluster(EndpointId endpointId, BitFlags<ValveConfigurationAndControl::Feature> features,
+                                        OptionalAttributeSet optionalAttributeSet, TimeSyncTracker * tsTracker);
 
     // Server cluster implementation
     CHIP_ERROR Startup(ServerClusterContext & context) override;
@@ -62,9 +64,12 @@ public:
 
 private:
     DataModel::ActionReturnStatus WriteImpl(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder);
-    std::optional<DataModel::ActionReturnStatus> HandleOpenCommand(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments, CommandHandler * handler);
-    std::optional<DataModel::ActionReturnStatus> HandleCloseCommand(const DataModel::InvokeRequest & request, CommandHandler * handler);
-    CHIP_ERROR GetAdjustedTargetLevel(const Optional<Percent> & targetLevel, DataModel::Nullable<chip::Percent> & adjustedTargetLevel) const;
+    std::optional<DataModel::ActionReturnStatus> HandleOpenCommand(const DataModel::InvokeRequest & request,
+                                                                   TLV::TLVReader & input_arguments, CommandHandler * handler);
+    std::optional<DataModel::ActionReturnStatus> HandleCloseCommand(const DataModel::InvokeRequest & request,
+                                                                    CommandHandler * handler);
+    CHIP_ERROR GetAdjustedTargetLevel(const Optional<Percent> & targetLevel,
+                                      DataModel::Nullable<chip::Percent> & adjustedTargetLevel) const;
     bool ValueCompliesWithLevelStep(const uint8_t value) const;
     void HandleUpdateRemainingDurationInternal();
     CHIP_ERROR SetRemainingDuration(const DataModel::Nullable<ElapsedS> & remainingDuration);
@@ -73,31 +78,31 @@ private:
     void emitValveLevelEvent(chip::Percent currentLevel);
 
     template <typename T, typename U>
-    inline void SaveAndReportIfChanged(T& currentValue, const U & newValue, chip::AttributeId attributeId)
+    inline void SaveAndReportIfChanged(T & currentValue, const U & newValue, chip::AttributeId attributeId)
     {
-        if(currentValue != newValue)
+        if (currentValue != newValue)
         {
             currentValue = newValue;
             NotifyAttributeChanged(attributeId);
         }
     }
 
-    //Attributes
-    DataModel::Nullable<uint32_t> mOpenDuration { DataModel::NullNullable };
-    DataModel::Nullable<uint32_t> mDefaultOpenDuration { DataModel::NullNullable };
-    DataModel::Nullable<uint64_t> mAutoCloseTime { DataModel::NullNullable };
-    QuieterReportingAttribute<uint32_t> mRemainingDuration { DataModel::NullNullable };
-    DataModel::Nullable<ValveConfigurationAndControl::ValveStateEnum> mCurrentState { DataModel::NullNullable };
-    DataModel::Nullable<ValveConfigurationAndControl::ValveStateEnum> mTargetState { DataModel::NullNullable };
-    DataModel::Nullable<Percent> mCurrentLevel { DataModel::NullNullable };
-    DataModel::Nullable<Percent> mTargetLevel { DataModel::NullNullable };
-    Percent mDefaultOpenLevel { 100u };
-    BitMask<ValveConfigurationAndControl::ValveFaultBitmap> mValveFault { 0u };
-    uint8_t mLevelStep { 1u };
+    // Attributes
+    DataModel::Nullable<uint32_t> mOpenDuration{ DataModel::NullNullable };
+    DataModel::Nullable<uint32_t> mDefaultOpenDuration{ DataModel::NullNullable };
+    DataModel::Nullable<uint64_t> mAutoCloseTime{ DataModel::NullNullable };
+    QuieterReportingAttribute<uint32_t> mRemainingDuration{ DataModel::NullNullable };
+    DataModel::Nullable<ValveConfigurationAndControl::ValveStateEnum> mCurrentState{ DataModel::NullNullable };
+    DataModel::Nullable<ValveConfigurationAndControl::ValveStateEnum> mTargetState{ DataModel::NullNullable };
+    DataModel::Nullable<Percent> mCurrentLevel{ DataModel::NullNullable };
+    DataModel::Nullable<Percent> mTargetLevel{ DataModel::NullNullable };
+    Percent mDefaultOpenLevel{ 100u };
+    BitMask<ValveConfigurationAndControl::ValveFaultBitmap> mValveFault{ 0u };
+    uint8_t mLevelStep{ 1u };
     const BitFlags<ValveConfigurationAndControl::Feature> mFeatures;
     const OptionalAttributeSet mOptionalAttributeSet;
     //
     ValveConfigurationAndControl::Delegate * mDelegate;
     TimeSyncTracker * mTsTracker;
 };
-}
+} // namespace chip::app::Clusters
