@@ -208,11 +208,7 @@ private:
 struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementCluster
 {
     chip::Test::TestServerClusterContext mTestContext;
-<<<<<<< HEAD
     Credentials::GroupDataProviderImpl mRealProvider;
-=======
-    chip::Credentials::GroupDataProviderImpl mRealProvider;
->>>>>>> 0c9574f1c4 (Code Cleanup)
     Crypto::DefaultSessionKeystore mMockKeystore;
     GroupKeyManagementCluster mCluster;
     chip::Test::ClusterTester tester;
