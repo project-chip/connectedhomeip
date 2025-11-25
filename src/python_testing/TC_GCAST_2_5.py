@@ -69,6 +69,7 @@ class TC_GCAST_2_5(MatterBaseTest):
             TestStep(5, "Attempt to Leave a non-existing group: TH sends command LeaveGroup"),
             TestStep(6, "Leave all groups: TH sends command LeaveGroup with GroupID=0"),
             TestStep(7, "TH awaits subscription report of new Membership within max interval."),
+            TestStep(8, "Leave all groups: TH sends command LeaveGroup with GroupID=0."),
         ]
 
     def pics_TC_GCAST_2_5(self) -> list[str]:
