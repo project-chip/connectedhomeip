@@ -11,10 +11,23 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-app_config_dependent_sources = [
-  "BooleanStateConfigurationTestEventTriggerHandler.cpp",
-  "BooleanStateConfigurationTestEventTriggerHandler.h",
-  "CodegenIntegration.cpp",
-  "CodegenIntegration.h",
-  "boolean-state-configuration-server.h",
-]
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/build/chip/chip_test_suite.gni")
+
+chip_test_suite("tests") {
+  output_name = "libTestBooleanStateConfigurationCluster"
+
+  test_sources = [ "TestBooleanStateConfigurationCluster.cpp" ]
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    "${chip_root}/src/app/clusters/boolean-state-configuration-server",
+    "${chip_root}/src/app/clusters/testing",
+    "${chip_root}/src/lib/core:string-builder-adapters",
+    "${chip_root}/src/lib/support",
+  ]
+}
