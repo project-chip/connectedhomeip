@@ -23,6 +23,7 @@
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/static-cluster-config/OccupancySensing.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/endpoint-config-api.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <platform/DefaultTimerDelegate.h>
@@ -64,9 +65,10 @@ public:
 
             // Show deprecated attributes if enabled in Zap
             config.WithDeprecatedAttributes(
-                AttributeSet(optionalAttributeBits).IsSet(Attributes::PIROccupiedToUnoccupiedDelay::Id) ||
-                AttributeSet(optionalAttributeBits).IsSet(Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id) ||
-                AttributeSet(optionalAttributeBits).IsSet(Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Id));
+                emberAfContainsAttribute(endpointId, OccupancySensing::Id, Attributes::PIROccupiedToUnoccupiedDelay::Id) ||
+                emberAfContainsAttribute(endpointId, OccupancySensing::Id, Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id) ||
+                emberAfContainsAttribute(endpointId, OccupancySensing::Id,
+                                         Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Id));
         }
 
         gServers[clusterInstanceIndex].Create(config);
