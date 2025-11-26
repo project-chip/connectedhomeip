@@ -108,17 +108,11 @@ class TC_DA_1_1(MatterBaseTest):
             fabric_filtered=False)
 
     async def factory_reset_dut(self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController):
-        # Delete KVS files
-        kvs_files = list(pathlib.Path(".").glob("kvs1*"))
-        for kvs_file in kvs_files:
-            logging.info(f"Deleting KVS file: {kvs_file}")
-            kvs_file.unlink(missing_ok=True)
-
         # Trigger app restart for factory reset
         restart_flag_file = self.get_restart_flag_file()
         if restart_flag_file:
             with open(restart_flag_file, "w") as f:
-                f.write("restart")
+                f.write("reset")
             logging.info("Created restart flag file to signal app restart for factory reset")
 
             # Wait for app to restart and be ready

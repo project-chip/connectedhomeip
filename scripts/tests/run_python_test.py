@@ -233,21 +233,8 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
     test_run_id = str(uuid.uuid4())[:8]  # Use first 8 characters for shorter paths
     restart_flag_file = f"/tmp/chip_test_restart_app_{test_run_id}"
 
-    if factory_reset or factory_reset_app_only:
-        # Remove native app config
-        for path in glob.glob('/tmp/chip*') + glob.glob('/tmp/repl*'):
-            pathlib.Path(path).unlink(missing_ok=True)
-
-        # Remove native app KVS if that was used
-        if match := re.search(r"--KVS (?P<path>[^ ]+)", app_args):
-            log.info("Removing KVS path: '%s'", match.group("path"))
-            pathlib.Path(match.group("path")).unlink(missing_ok=True)
-
-    if factory_reset:
-        # Remove Python test admin storage if provided
-        if match := re.search(r"--storage-path (?P<path>[^ ]+)", script_args):
-            log.info("Removing storage path: '%s'", match.group("path"))
-            pathlib.Path(match.group("path")).unlink(missing_ok=True)
+    # Handle the different restart/reset scenarios
+    handle_reset_flags(app_args, script_args, factory_reset, factory_reset_app_only)
 
     app_manager_ref = None
     app_manager_lock = threading.Lock()
@@ -271,6 +258,9 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
                 app,
                 app_args,
                 app_ready_pattern,
+                script_args,
+                factory_reset,
+                factory_reset_app_only,
                 stream_output,
                 app_stdin_pipe,
                 restart_flag_file),
@@ -367,6 +357,9 @@ def monitor_app_restart_requests(
         app,
         app_args,
         app_ready_pattern,
+        script_args,
+        factory_reset,
+        factory_reset_app_only,
         stream_output,
         app_stdin_pipe,
         restart_flag_file):
@@ -376,6 +369,9 @@ def monitor_app_restart_requests(
                 log.info("App restart requested by test script")
                 # Remove the flag file immediately to prevent multiple restarts
                 os.unlink(restart_flag_file)
+
+                # Handle the different restart/reset scenarios
+                handle_reset_flags(app_args, script_args, factory_reset, factory_reset_app_only)
 
                 new_app_manager = AppProcessManager(app, app_args, app_ready_pattern, stream_output, app_stdin_pipe)
                 new_app_manager.start()
@@ -390,6 +386,23 @@ def monitor_app_restart_requests(
                 time.sleep(0.5)
         except Exception as e:
             log.error("Error in app restart monitor: %r", e)
+
+def handle_reset_flags(app_args, script_args, factory_reset, factory_reset_app_only):
+    if factory_reset or factory_reset_app_only:
+        # Remove native app config
+        for path in glob.glob('/tmp/chip*') + glob.glob('/tmp/repl*'):
+            pathlib.Path(path).unlink(missing_ok=True)
+
+        # Remove native app KVS if that was used
+        if match := re.search(r"--KVS (?P<path>[^ ]+)", app_args):
+            log.info("Removing KVS path: '%s'", match.group("path"))
+            pathlib.Path(match.group("path")).unlink(missing_ok=True)
+
+    if factory_reset:
+        # Remove Python test admin storage if provided
+        if match := re.search(r"--storage-path (?P<path>[^ ]+)", script_args):
+            log.info("Removing storage path: '%s'", match.group("path"))
+            pathlib.Path(match.group("path")).unlink(missing_ok=True)
 
 
 if __name__ == '__main__':
