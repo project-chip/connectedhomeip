@@ -427,6 +427,17 @@ class Globals:
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 7
 
+        class SoftwareVersionCertificationStatusEnum(MatterIntEnum):
+            kDevTest = 0x00
+            kProvisional = 0x01
+            kCertified = 0x02
+            kRevoked = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 4
+
         class StreamUsageEnum(MatterIntEnum):
             kInternal = 0x00
             kRecording = 0x01

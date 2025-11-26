@@ -112,7 +112,7 @@ int AppTask::Init()
 
     // Init Chip memory management before the stack
     PLAT_LOG("Initialize Memory");
-    chip::Platform::MemoryInit();
+    TEMPORARY_RETURN_IGNORED chip::Platform::MemoryInit();
 
     // Initialize LEDs
     PLAT_LOG("Initialize LEDs");
@@ -153,7 +153,7 @@ int AppTask::Init()
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
-    chip::Server::GetInstance().Init(initParams);
+    TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config
     PLAT_LOG("Initialize device attestation config");

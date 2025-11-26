@@ -178,7 +178,7 @@ CHIP_ERROR DFUOverSMP::GetDFUImageFooter(OTAImageHeader & footer, const struct f
         return CHIP_ERROR_READ_FAILED;
     }
     chip::ByteSpan footer_raw(buffer.data(), buffer.size());
-    mHeaderParser.AccumulateAndDecode(footer_raw, footer);
+    TEMPORARY_RETURN_IGNORED mHeaderParser.AccumulateAndDecode(footer_raw, footer);
     mHeaderParser.Clear();
 
     return CHIP_NO_ERROR;
@@ -225,7 +225,8 @@ CHIP_ERROR DFUOverSMP::CheckDFUImageFooter(OTAImageHeader * imageHeader)
     }
     if (imageHeader->mSoftwareVersion <= softwareVersion)
     {
-        ConfigurationMgr().GetSoftwareVersionString(activeSoftwareVersionString, VERSION_STRING_MAX_LENGTH);
+        TEMPORARY_RETURN_IGNORED ConfigurationMgr().GetSoftwareVersionString(activeSoftwareVersionString,
+                                                                             VERSION_STRING_MAX_LENGTH);
         memcpy(newSoftwareVersionString, imageHeader->mSoftwareVersionString.data(), imageHeader->mSoftwareVersionString.size());
         LOG_ERR("[DFU] Incorrect version of the update image!\nActive firmware version:\t %s\nUpdate version:\t %s",
                 newSoftwareVersionString, activeSoftwareVersionString);
