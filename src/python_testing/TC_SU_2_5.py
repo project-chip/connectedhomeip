@@ -40,6 +40,7 @@
 #       --string-arg ota_image:${SU_OTA_REQUESTOR_V2}
 #       --int-arg ota_image_expected_version:2
 #       --int-arg ota_provider_port:5541
+#       --int-arg ota_image_download_timeout:300
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -71,6 +72,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
     provider_node_id = 321
     provider_discriminator = 321
     provider_setup_pincode = 2321
+    ota_image_download_timeout = None
 
     @async_test_body
     async def teardown_test(self):
@@ -87,6 +89,12 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         self.ota_provider_port = self.user_params.get('ota_provider_port', 5541)
         self.kvs_path = self.user_params.get('provider_kvs_path', '/tmp/chip_kvs_provider')
         self.provider_log = self.user_params.get('provider_log_path', '/tmp/provider_log_2_5.log')
+        # On average the ota image build for the CI is 1.8 MB which takes 4-5 min to download. Adjust if needed.
+        self.ota_image_download_timeout = self.user_params.get('ota_image_download_timeout', 60*5)
+        logger.info(f"Image download timeout is set to {self.ota_image_download_timeout} seconds")
+
+        if self.ota_image_download_timeout <= 0:
+            asserts.fail("Invalid value for --int-arg ota_image_download_timeout:<seconds> value provided, must be equal or greater than 1.")
 
         if not self.expected_software_version:
             asserts.fail("Missing OTA image software version. Speficy using --int-arg ota_image_expected_version:<ota_image_expected_version>")
@@ -180,7 +188,8 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         update_state_match = AttributeMatcher.from_callable(
             "Update state is Applying",
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying)
-        update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=60*5)
+        update_state_attr_handler.await_all_expected_report_matches(
+            [update_state_match], timeout_sec=self.ota_image_download_timeout)
 
         # Wait for shutdown event ( this is triggered after the SU Completition)
         update_state_attr_handler.flush_reports()
@@ -253,7 +262,8 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         update_state_match = AttributeMatcher.from_callable(
             "Update state is Applying",
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying)
-        update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=60*5)
+        update_state_attr_handler.await_all_expected_report_matches(
+            [update_state_match], timeout_sec=self.ota_image_download_timeout)
 
         start_time = time()
         update_sw_vesion = AttributeMatcher.from_callable(
@@ -323,7 +333,8 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         update_state_match = AttributeMatcher.from_callable(
             "Update state is kDelayedOnApply",
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnApply)
-        update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=60*6)
+        update_state_attr_handler.await_all_expected_report_matches(
+            [update_state_match], timeout_sec=self.ota_image_download_timeout)
         update_state_attr_handler.reset()
         await update_state_attr_handler.cancel()
 
@@ -393,32 +404,18 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
                                                   fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
         await self.announce_ota_provider(self.controller, self.provider_node_id, self.requestor_node_id)
 
-        update_state_states_seen = set()
-        update_state_states_stack = []
-        update_state_previous_state = None
+        update_state_match = AttributeMatcher.from_callable(
+            "Update state is Downloading",
+            lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading)
+        update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=60)
 
-        def collect_update_state_data(report):
-            current_state_value = report.value
-            nonlocal update_state_states_seen, update_state_states_stack, update_state_previous_state
-            if current_state_value is None:
-                return False
-            if current_state_value not in update_state_states_seen:
-                update_state_states_seen.add(current_state_value)
-                update_state_states_stack.append(current_state_value)
+        update_state_match = AttributeMatcher.from_callable(
+            "Update state is kDelayedOnApply",
+            lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnApply)
+        update_state_attr_handler.await_all_expected_report_matches(
+            [update_state_match], timeout_sec=self.ota_image_download_timeout)
 
-            if current_state_value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnApply:
-                return True
-
-            update_state_previous_state = current_state_value
-            return False
-
-        callable_collect_update_state_data = AttributeMatcher.from_callable(
-            description="Record the Event Transition Until kDelayedOnApply",
-            matcher=collect_update_state_data
-        )
-        update_state_attr_handler.await_all_expected_report_matches([callable_collect_update_state_data], timeout_sec=60*6)
         start_time = time()
-        logger.info(f"Update State Stack secuence: {update_state_states_stack}")
         update_state_attr_handler.reset()
         await update_state_attr_handler.cancel()
         # Waiting for Software Version to change in the range defined in the delayedApplyTimeSec of 180 seconds
@@ -483,7 +480,8 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             "Waiting Update state is Applying",
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying)
 
-        update_state_attr_handler.await_all_expected_report_matches([update_state_match], timeout_sec=60*5)
+        update_state_attr_handler.await_all_expected_report_matches(
+            [update_state_match], timeout_sec=self.ota_image_download_timeout)
         update_state_match = AttributeMatcher.from_callable(
             "Waiting Update state is Idle",
             lambda report: report.value == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle)
