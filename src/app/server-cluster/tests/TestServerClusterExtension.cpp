@@ -161,7 +161,6 @@ public:
 
 private:
     std::string mStringAttribute = "Sample String";
-    std::vector<DataModel::AttributeEntry> mCombinedAttributes;
 };
 
 struct TestServerClusterExtension : public ::testing::Test
