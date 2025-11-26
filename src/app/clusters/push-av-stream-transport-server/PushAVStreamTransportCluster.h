@@ -18,9 +18,9 @@
 
 #pragma once
 
+#include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportLogic.h>
 #include <app/clusters/push-av-stream-transport-server/constants.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-delegate.h>
-#include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportLogic.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 
 namespace chip {
