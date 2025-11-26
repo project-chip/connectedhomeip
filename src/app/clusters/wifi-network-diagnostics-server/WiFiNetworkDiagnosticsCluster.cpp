@@ -16,7 +16,7 @@
  */
 
 #include <app/EventLogging.h>
-#include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-cluster.h>
+#include <app/clusters/wifi-network-diagnostics-server/WiFiNetworkDiagnosticsCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/WiFiNetworkDiagnostics/Ids.h>
 #include <clusters/WiFiNetworkDiagnostics/Metadata.h>
