@@ -49,7 +49,7 @@ CHIP_ERROR ValveControlDelegate::HandleCloseValve()
     sLevel            = 0;
     auto valveCluster = ValveConfigurationAndControl::FindClusterOnEndpoint(kValveEndpoint);
     VerifyOrReturnError(valveCluster != nullptr, CHIP_ERROR_UNINITIALIZED);
-    ReturnErrorOnFailure(valveCluster->UpdateCurrentLevel(sLevel));
+    valveCluster->UpdateCurrentLevel(sLevel);
     ChipLogProgress(NotSpecified, "Valve closed");
     return CHIP_NO_ERROR;
 }
@@ -62,10 +62,8 @@ void ValveControlDelegate::HandleRemainingDurationTick(uint32_t duration)
     VerifyOrReturn(valveCluster != nullptr);
     if (sLastOpenDuration == 0)
     {
-        VerifyOrReturn(CHIP_NO_ERROR == valveCluster->UpdateCurrentLevel(sLevel),
-                       ChipLogError(NotSpecified, "Updating current level failed"));
-        VerifyOrReturn(CHIP_NO_ERROR == valveCluster->UpdateCurrentState(ValveConfigurationAndControl::ValveStateEnum::kOpen),
-                       ChipLogError(NotSpecified, "Updating current state failed"));
+        valveCluster->UpdateCurrentLevel(sLevel);
+        valveCluster->UpdateCurrentState(ValveConfigurationAndControl::ValveStateEnum::kOpen);
     }
     sLastOpenDuration = duration;
 }

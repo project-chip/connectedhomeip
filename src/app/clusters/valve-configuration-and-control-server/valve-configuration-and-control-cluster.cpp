@@ -213,7 +213,7 @@ ValveConfigurationAndControlCluster::HandleCloseCommand(const DataModel::InvokeR
     // Check if there is any Fault registered
     if (mValveFault.HasAny())
     {
-        handler->AddClusterSpecificFailure(request.path, to_underlying(StatusCodeEnum::kFailureDueToFault));
+        ReturnErrorOnFailure(handler->AddClusterSpecificFailure(request.path, to_underlying(StatusCodeEnum::kFailureDueToFault)));
         return std::nullopt;
     }
 
@@ -276,7 +276,7 @@ ValveConfigurationAndControlCluster::HandleOpenCommand(const DataModel::InvokeRe
     // Check if there is any Fault registered
     if (mValveFault.HasAny())
     {
-        handler->AddClusterSpecificFailure(request.path, to_underlying(StatusCodeEnum::kFailureDueToFault));
+        ReturnErrorOnFailure(handler->AddClusterSpecificFailure(request.path, to_underlying(StatusCodeEnum::kFailureDueToFault)));
         return std::nullopt;
     }
 
@@ -401,17 +401,17 @@ void ValveConfigurationAndControlCluster::HandleUpdateRemainingDurationInternal(
     // Check the value of RemainingDuration, when reaches 0 the valve shall be closed.
     if (mRemainingDuration.value().Value() > 0)
     {
-        (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), HandleUpdateRemainingDuration, this);
+        LogErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), HandleUpdateRemainingDuration, this));
         SetRemainingDuration(--mRemainingDuration.value().Value());
     }
     else
     {
-        CloseValve();
-        (void) DeviceLayer::SystemLayer().CancelTimer(HandleUpdateRemainingDuration, this);
+        LogErrorOnFailure(CloseValve());
+        DeviceLayer::SystemLayer().CancelTimer(HandleUpdateRemainingDuration, this);
     }
 }
 
-CHIP_ERROR ValveConfigurationAndControlCluster::SetRemainingDuration(const DataModel::Nullable<ElapsedS> & remainingDuration)
+void ValveConfigurationAndControlCluster::SetRemainingDuration(const DataModel::Nullable<ElapsedS> & remainingDuration)
 {
     System::Clock::Milliseconds64 now = System::SystemClock().GetMonotonicMilliseconds64();
     AttributeDirtyState dirtyState    = mRemainingDuration.SetValue(remainingDuration, now);
@@ -419,7 +419,6 @@ CHIP_ERROR ValveConfigurationAndControlCluster::SetRemainingDuration(const DataM
     {
         NotifyAttributeChanged(Attributes::RemainingDuration::Id);
     }
-    return CHIP_NO_ERROR;
 }
 
 // The rules to get the TargetLevel from the command data
@@ -463,13 +462,12 @@ bool ValveConfigurationAndControlCluster::ValueCompliesWithLevelStep(const uint8
     return true;
 }
 
-CHIP_ERROR ValveConfigurationAndControlCluster::SetDelegate(Delegate * delegate)
+void ValveConfigurationAndControlCluster::SetDelegate(Delegate * delegate)
 {
     mDelegate = delegate;
-    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ValveConfigurationAndControlCluster::UpdateCurrentState(const ValveConfigurationAndControl::ValveStateEnum currentState)
+void ValveConfigurationAndControlCluster::UpdateCurrentState(const ValveConfigurationAndControl::ValveStateEnum currentState)
 {
     SaveAndReportIfChanged(mCurrentState, DataModel::Nullable<ValveStateEnum>(currentState), Attributes::CurrentState::Id);
 
@@ -479,11 +477,9 @@ CHIP_ERROR ValveConfigurationAndControlCluster::UpdateCurrentState(const ValveCo
     }
 
     emitValveChangeEvent(currentState);
-
-    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ValveConfigurationAndControlCluster::UpdateCurrentLevel(chip::Percent currentLevel)
+void ValveConfigurationAndControlCluster::UpdateCurrentLevel(chip::Percent currentLevel)
 {
     if (mFeatures.Has(Feature::kLevel))
     {
@@ -496,8 +492,6 @@ CHIP_ERROR ValveConfigurationAndControlCluster::UpdateCurrentLevel(chip::Percent
             UpdateCurrentState(currentLevel == 0 ? ValveStateEnum::kClosed : ValveStateEnum::kOpen);
         }
     }
-
-    return CHIP_NO_ERROR;
 }
 
 void ValveConfigurationAndControlCluster::emitValveLevelEvent(chip::Percent currentLevel)
@@ -514,12 +508,10 @@ void ValveConfigurationAndControlCluster::emitValveChangeEvent(ValveConfiguratio
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
-CHIP_ERROR ValveConfigurationAndControlCluster::EmitValveFault(chip::BitMask<ValveConfigurationAndControl::ValveFaultBitmap> fault)
+void ValveConfigurationAndControlCluster::EmitValveFault(chip::BitMask<ValveConfigurationAndControl::ValveFaultBitmap> fault)
 {
     ValveConfigurationAndControl::Events::ValveFault::Type event;
     event.valveFault = fault;
     mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
     mValveFault = fault;
-
-    return CHIP_NO_ERROR;
 }

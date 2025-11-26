@@ -53,13 +53,13 @@ public:
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
-    CHIP_ERROR SetDelegate(ValveConfigurationAndControl::Delegate * delegate);
+    void SetDelegate(ValveConfigurationAndControl::Delegate * delegate);
     static void HandleUpdateRemainingDuration(System::Layer * systemLayer, void * context);
 
     CHIP_ERROR CloseValve();
-    CHIP_ERROR UpdateCurrentLevel(chip::Percent currentLevel);
-    CHIP_ERROR UpdateCurrentState(ValveConfigurationAndControl::ValveStateEnum currentState);
-    CHIP_ERROR EmitValveFault(chip::BitMask<ValveConfigurationAndControl::ValveFaultBitmap> fault);
+    void UpdateCurrentLevel(chip::Percent currentLevel);
+    void UpdateCurrentState(ValveConfigurationAndControl::ValveStateEnum currentState);
+    void EmitValveFault(chip::BitMask<ValveConfigurationAndControl::ValveFaultBitmap> fault);
     void UpdateAutoCloseTime(uint64_t time);
 
 private:
@@ -72,7 +72,7 @@ private:
                                       DataModel::Nullable<chip::Percent> & adjustedTargetLevel) const;
     bool ValueCompliesWithLevelStep(const uint8_t value) const;
     void HandleUpdateRemainingDurationInternal();
-    CHIP_ERROR SetRemainingDuration(const DataModel::Nullable<ElapsedS> & remainingDuration);
+    void SetRemainingDuration(const DataModel::Nullable<ElapsedS> & remainingDuration);
     CHIP_ERROR SetAutoCloseTime();
     void emitValveChangeEvent(ValveConfigurationAndControl::ValveStateEnum currentState);
     void emitValveLevelEvent(chip::Percent currentLevel);
