@@ -30,6 +30,7 @@
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <set>
+#include <uriparser/Uri.h>
 
 static constexpr uint16_t kMaxConnectionId = 65535; // This is also invalid connectionID
 static constexpr uint16_t kMaxEndpointId   = 65534;
@@ -42,6 +43,34 @@ using namespace chip::app::Clusters::PushAvStreamTransport::Structs;
 using namespace chip::app::Clusters::PushAvStreamTransport::Attributes;
 using namespace Protocols::InteractionModel;
 using chip::Protocols::InteractionModel::Status;
+
+namespace {
+bool hasHttpsScheme(const UriUriA & uri)
+{
+    if (!uri.scheme.first || !uri.scheme.afterLast)
+        return false;
+
+    std::string scheme(uri.scheme.first, uri.scheme.afterLast);
+    return scheme == "https";
+}
+
+bool isValidRFC3986Uri(const std::string & uriStr)
+{
+    UriUriA uri;
+    const char * errorPos;
+
+    int result = uriParseSingleUriA(&uri, uriStr.c_str(), &errorPos);
+    if (result != URI_SUCCESS)
+    {
+        return false;
+    }
+
+    bool isHttps = hasHttpsScheme(uri);
+
+    uriFreeUriMembersA(&uri);
+    return isHttps;
+}
+} // namespace
 
 namespace chip {
 namespace app {
@@ -229,13 +258,13 @@ void PushAvStreamTransportServerLogic::PushAVStreamTransportDeallocateCallback(S
 
 bool PushAvStreamTransportServerLogic::ValidateUrl(const std::string & url)
 {
-    const std::string https = "https://";
-
-    // Check minimum length and https prefix
-    if (url.size() <= https.size() || url.substr(0, https.size()) != https)
+    if (!isValidRFC3986Uri(url))
     {
+        ChipLogError(Camera, "URL is not a valid RFC3986 URI: %s", url.c_str());
         return false;
     }
+
+    const std::string https = "https://";
 
     // Check that URL does not contain fragment character '#'
     if (url.find('#') != std::string::npos)

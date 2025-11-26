@@ -30,6 +30,7 @@ source_set("push-av-stream-transport-server") {
     "${chip_root}/src/app/clusters/tls-client-management-server",
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/src/lib/core:types",
+    "${chip_root}/third_party/uriparser:uriparser",
     "${chip_root}/zzz_generated/app-common/clusters/PushAvStreamTransport",
   ]
   public_configs = [ "${chip_root}/src:includes" ]

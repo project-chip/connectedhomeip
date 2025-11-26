@@ -1,0 +1,101 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+config("uriparser_config") {
+  include_dirs = [
+    "repo/include",
+    ".",
+  ]
+
+  # Enable both char and wchar_t support by default
+  defines = [
+    "URI_ENABLE_ANSI=1",
+    "URI_ENABLE_UNICODE=1",
+  ]
+}
+
+config("uriparser_config_disable_warnings") {
+  cflags = [
+    "-Wno-unused-parameter",
+    "-Wno-shadow",
+  ]
+}
+
+source_set("uriparser") {
+  sources = [
+    # Header files
+    "UriConfig.h",
+    "repo/include/uriparser/Uri.h",
+    "repo/include/uriparser/UriBase.h",
+    "repo/include/uriparser/UriDefsAnsi.h",
+    "repo/include/uriparser/UriDefsConfig.h",
+    "repo/include/uriparser/UriDefsUnicode.h",
+    "repo/include/uriparser/UriIp4.h",
+
+    # Source files
+    "repo/src/UriCommon.c",
+    "repo/src/UriCommon.h",
+    "repo/src/UriCompare.c",
+    "repo/src/UriCopy.c",
+    "repo/src/UriCopy.h",
+    "repo/src/UriEscape.c",
+    "repo/src/UriFile.c",
+    "repo/src/UriIp4.c",
+    "repo/src/UriIp4Base.c",
+    "repo/src/UriIp4Base.h",
+    "repo/src/UriMemory.c",
+    "repo/src/UriMemory.h",
+    "repo/src/UriNormalize.c",
+    "repo/src/UriNormalize.h",
+    "repo/src/UriNormalizeBase.c",
+    "repo/src/UriNormalizeBase.h",
+    "repo/src/UriParse.c",
+    "repo/src/UriParseBase.c",
+    "repo/src/UriParseBase.h",
+    "repo/src/UriQuery.c",
+    "repo/src/UriRecompose.c",
+    "repo/src/UriResolve.c",
+    "repo/src/UriSetFragment.c",
+    "repo/src/UriSetHostAuto.c",
+    "repo/src/UriSetHostBase.h",
+    "repo/src/UriSetHostCommon.c",
+    "repo/src/UriSetHostCommon.h",
+    "repo/src/UriSetHostIp4.c",
+    "repo/src/UriSetHostIp6.c",
+    "repo/src/UriSetHostIpFuture.c",
+    "repo/src/UriSetHostRegName.c",
+    "repo/src/UriSetPath.c",
+    "repo/src/UriSetPort.c",
+    "repo/src/UriSetQuery.c",
+    "repo/src/UriSetScheme.c",
+    "repo/src/UriSetUserInfo.c",
+    "repo/src/UriShorten.c",
+    "repo/src/UriVersion.c",
+  ]
+
+  public_configs = [ ":uriparser_config" ]
+
+  configs += [ ":uriparser_config_disable_warnings" ]
+
+  # Build as static library by default
+  defines = [
+    "URI_LIBRARY_BUILD",
+    "URI_STATIC_BUILD",
+  ]
+
+  include_dirs = [ "repo/src" ]
+}
