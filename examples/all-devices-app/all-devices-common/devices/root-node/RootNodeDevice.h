@@ -24,7 +24,7 @@
 #include <app/clusters/general-diagnostics-server/general-diagnostics-cluster.h>
 #include <app/clusters/group-key-mgmt-server/group-key-mgmt-cluster.h>
 #include <app/clusters/network-commissioning/NetworkCommissioningCluster.h>
-#include <app/clusters/operational-credentials-server/operational-credentials-cluster.h>
+#include <app/clusters/operational-credentials-server/OperationalCredentialsCluster.h>
 #include <app/clusters/software-diagnostics-server/software-diagnostics-cluster.h>
 #include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-cluster.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
