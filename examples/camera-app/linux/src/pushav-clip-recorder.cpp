@@ -119,7 +119,8 @@ bool PushAVClipRecorder::EnsureDirectoryExists(const std::string & path)
         {
             if (!std::filesystem::create_directories(p, ec))
             {
-                ChipLogError(Camera, "Failed to create directory: %s", p.c_str());
+                ChipLogError(Camera, "Failed to create directory: %s, error code: %d (%s)", p.c_str(), ec.value(),
+                             ec.message().c_str());
                 return false;
             }
             // Set permissions to file: (owner rwx, group rx)
@@ -130,23 +131,49 @@ bool PushAVClipRecorder::EnsureDirectoryExists(const std::string & path)
         }
         else if (!std::filesystem::is_directory(p, ec))
         {
-            ChipLogError(Camera, "Path is not a directory: %s", p.c_str());
+            ChipLogError(Camera, "Path is not a directory: %s, error code: %d (%s)", p.c_str(), ec.value(), ec.message().c_str());
             return false;
         }
 
         auto perms = std::filesystem::status(p, ec).permissions();
         if ((perms & std::filesystem::perms::owner_write) == std::filesystem::perms::none)
         {
-            ChipLogError(Camera, "Directory is not writable: %s", p.c_str());
+            ChipLogError(Camera, "Directory is not writable: %s, error code: %d (%s)", p.c_str(), ec.value(), ec.message().c_str());
             return false;
         }
         return true;
     };
 
     // Ensure base directory exists
-    if (!ensure(basePath))
+
+    std::string basePathStr = basePath.string();
+    std::string pathExists;
+    pathExists.reserve(basePathStr.length());
+
+    size_t startIndex = (basePathStr[0] == '/') ? 1 : 0;
+
+    for (size_t i = startIndex; i < basePathStr.length(); ++i)
     {
-        return false;
+        if (basePathStr[i] == '/' || i == basePathStr.length() - 1)
+        {
+            // Include the current character if it's the last character and not a slash
+            size_t endPos = (basePathStr[i] == '/' && i != basePathStr.length() - 1) ? i : i + 1;
+
+            // Build the path incrementally
+            pathExists = basePathStr.substr(0, endPos);
+
+            // Skip empty paths (can happen with consecutive slashes)
+            if (pathExists.empty() || pathExists.back() == '/')
+            {
+                continue;
+            }
+
+            if (!ensure(pathExists))
+            {
+                ChipLogError(Camera, "Failed to ensure directory exists: %s", pathExists.c_str());
+                return false;
+            }
+        }
     }
 
     // Clean up previous session directory if it exists

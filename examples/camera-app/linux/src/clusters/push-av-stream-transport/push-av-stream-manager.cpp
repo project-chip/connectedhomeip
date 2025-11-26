@@ -303,13 +303,16 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::ManuallyTrigge
 
 bool PushAvStreamTransportManager::IsCMAFInterfaceSupported(CMAFInterfaceEnum cmafInterface) const
 {
-    // Only CMAF interface 1 is supported in the current implementation
+    // CMAF interface 1 and DASH (interface 2) are supported in the current implementation
     switch (cmafInterface)
     {
     case CMAFInterfaceEnum::kInterface1:
         return true;
     case CMAFInterfaceEnum::kInterface2DASH:
-        return false;
+        ChipLogDetail(Camera,
+                      "DASH interface enabled - WARNING: This is still provisional and full compliance to CMAF ingest "
+                      "interface-2: DASH may not be available");
+        return true;
     case CMAFInterfaceEnum::kInterface2HLS:
         return false;
     case CMAFInterfaceEnum::kUnknownEnumValue:
