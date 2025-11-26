@@ -146,7 +146,7 @@ class TC_CNET_4_9(MatterBaseTest):
 
         if not current_cluster_connected:
             logging.info("Current cluster is not connected, skipping all remaining test steps")
-            self.skip_all_remaining_steps(4)
+            self.mark_all_remaining_steps_skipped(4)
             return
 
         # TH reads Networks attribute from the DUT on the current endpoint and saves the number of entries as "NumNetworks"
