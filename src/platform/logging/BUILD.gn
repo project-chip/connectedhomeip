@@ -63,7 +63,9 @@ group("default") {
       deps += [ "${chip_root}/src/platform/nxp:logging" ]
     } else if (chip_device_platform == "beken") {
       deps += [ "${chip_root}/src/platform/Beken:logging" ]
-    } else if (chip_device_platform == "stm32") {
+    } else if (chip_device_platform == "stm32wb") {
+      deps += [ ":stdio" ]
+    } else if (chip_device_platform == "stm32wba") {
       deps += [ ":stdio" ]
     } else if (chip_device_platform == "nuttx") {
       deps += [ "${chip_root}/src/platform/NuttX:logging" ]

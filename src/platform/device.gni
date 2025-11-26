@@ -211,8 +211,10 @@ if (chip_device_platform == "cc13x4_26x4") {
   _chip_device_layer = "ASR"
 } else if (chip_device_platform == "nuttx") {
   _chip_device_layer = "NuttX"
-} else if (chip_device_platform == "stm32") {
-  _chip_device_layer = "stm32"
+} else if (chip_device_platform == "stm32wb") {
+  _chip_device_layer = "stm32/stm32wb"
+} else if (chip_device_platform == "stm32wba") {
+  _chip_device_layer = "stm32/stm32wba"
 }
 
 declare_args() {
@@ -284,6 +286,6 @@ assert(
         chip_device_platform == "bl602" || chip_device_platform == "bl616" ||
         chip_device_platform == "bl702" || chip_device_platform == "bl702l" ||
         chip_device_platform == "mt793x" || chip_device_platform == "SiWx917" ||
-        chip_device_platform == "asr" || chip_device_platform == "stm32" ||
-        chip_device_platform == "nuttx",
+        chip_device_platform == "asr" || chip_device_platform == "stm32wb" ||
+        chip_device_platform == "stm32wba" || chip_device_platform == "nuttx",
     "Please select a valid value for chip_device_platform")

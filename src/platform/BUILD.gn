@@ -318,9 +318,12 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     } else if (chip_device_platform == "asr") {
       device_layer_target_define = "ASR"
       defines += [ "CHIP_DEVICE_LAYER_TARGET=ASR" ]
-    } else if (chip_device_platform == "stm32") {
-      device_layer_target_define = "STM32"
-      defines += [ "CHIP_DEVICE_LAYER_TARGET=stm32" ]
+    } else if (chip_device_platform == "stm32wb") {
+      device_layer_target_define = "STM32WB"
+      defines += [ "CHIP_DEVICE_LAYER_TARGET=stm32/stm32wb" ]
+    } else if (chip_device_platform == "stm32wba") {
+      device_layer_target_define = "STM32WBA"
+      defines += [ "CHIP_DEVICE_LAYER_TARGET=stm32/stm32wba" ]
     } else if (chip_device_platform == "nuttx") {
       device_layer_target_define = "NUTTX"
       defines += [
@@ -367,6 +370,8 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "OPEN_IOT_SDK",
       "ASR",
       "STM32",
+      "STM32WB",
+      "STM32WBA",
       "NUTTX",
     ]
     foreach(possible_device_layer_target_define,
@@ -641,8 +646,10 @@ if (chip_device_platform != "none") {
       _platform_target = "mt793x"
     } else if (chip_device_platform == "asr") {
       _platform_target = "ASR"
-    } else if (chip_device_platform == "stm32") {
-      _platform_target = "stm32"
+    } else if (chip_device_platform == "stm32wb") {
+      _platform_target = "stm32/stm32wb"
+    } else if (chip_device_platform == "stm32wba") {
+      _platform_target = "stm32/stm32wba"
     } else if (chip_device_platform == "nuttx") {
       _platform_target = "NuttX"
     } else {

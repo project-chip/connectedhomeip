@@ -18,7 +18,7 @@ declare_args() {
 }
 
 if (stm32_board == "") {
-  stm32_board = "STM32WB5MM-DK"
+  stm32_board = getenv("stm32_board")
 }
 
 assert(stm32_board != "", "stm32_board must be specified")
@@ -31,6 +31,9 @@ board_defines = []
 if (stm32_board == "STM32WB5MM-DK") {
   stm32_family = "stm32wb5"
   stm32_mcu = "STM32WB5MMGHX"
+} else if (stm32_board == "STM32WBA65I-DK1") {
+  stm32_family = "stm32wba6"
+  stm32_mcu = "STM32WBA65I-DK1"
 } else {
   assert(false, "The board ${stm32_board} not currently supported")
 }

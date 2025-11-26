@@ -1,0 +1,338 @@
+# stm32wba6_sdk.gn_helper
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("//build_overrides/freertos.gni")
+import("//build_overrides/mbedtls.gni")
+import("//build_overrides/lwip.gni")
+
+declare_args() {
+
+  # CSMSIS PATHS #
+  cmsis = "${chip_root}/third_party/st/STM32CubeWBA/Drivers/CMSIS"
+
+  ## PATHS FOR STM32WB FAMILY ##
+  stm32_wb_sdk = "${chip_root}/third_party/st/STM32CubeWBA/Drivers"
+  stm32_wb_hal = "${chip_root}/third_party/st/STM32CubeWBA/Drivers/STM32WBAxx_HAL_Driver"
+  cmsis_device_wb = "${chip_root}/third_party/st/STM32CubeWBA/Drivers/CMSIS/Device/ST/STM32WBAxx"
+  stm32_wpan_sdk = "${chip_root}/third_party/st/STM32CubeWBA/Middlewares/ST/STM32_WPAN"
+  stm32_wpan_sdk_patch = "${chip_root}/third_party/st/STM32CubeWBAPatch"
+  stm32_config_files = "${chip_root}/examples/platform/stm32/config_files/STM32WBA6"
+  stm32_system = "${chip_root}/examples/platform/stm32/common/STM32WBA65I-DK1/Common/WPAN/Modules"
+  stm32_system_interfaces = "${chip_root}/examples/platform/stm32/common/STM32WBA65I-DK1/Common/WPAN/Interfaces"
+  stm32_system_Config = "${chip_root}/examples/platform/stm32/common/STM32WBA65I-DK1/Common/WPAN/Config"
+  stm32_mbedtls_alt = "${chip_root}/third_party/st/STM32CubeWBA/Middlewares/ST/mbedtls_alt/interfaces/patterns"
+
+  ## PATHS FOR FREERTOS ##  
+  freertos_st = "${chip_root}/third_party/st/STM32CubeWBA/Middlewares/Third_Party/FreeRTOS/Source"
+  mbedtls_st = "${chip_root}/third_party/st/STM32CubeWBA/Middlewares/Third_Party/mbedtls"
+  
+}
+
+SOURCES = [
+  #HAL DRIVERS
+  "${stm32_wb_hal}/Src/stm32wbaxx_hal_adc_ex.c",
+  "${stm32_wb_hal}/Src/stm32wbaxx_hal_adc.c",
+  "${stm32_wb_hal}/Src/stm32wbaxx_hal_cortex.c",
+  "${stm32_wb_hal}/Src/stm32wbaxx_hal_crc_ex.c",
+  "${stm32_wb_hal}/Src/stm32wbaxx_hal_crc.c",
+  "${stm32_wb_hal}/Src/stm32wbaxx_hal_cryp_ex.c",
+  "${stm32_wb_hal}/Src/stm32wbaxx_hal_cryp.c",
+  "${stm32_wb_hal}/Src/stm32wbaxx_hal_dma_ex.c",
+  "${stm32_wb_hal}/Src/stm32wbaxx_hal_dma.c",
+  "${stm32_wb_hal}/Src/stm32wbaxx_hal_exti.c",
+  "${stm32_wb_hal}/Src/stm32wbaxx_hal_flash_ex.c",
+  "${stm32_wb_hal}/Src/stm32wbaxx_hal_flash.c",
+  "${stm32_wb_hal}/Src/stm32wbaxx_hal_gpio.c",
+  "${stm32_wb_hal}/Src/stm32wbaxx_hal_gtzc.c",
+  "${stm32_wb_hal}/Src/stm32wbaxx_hal_hsem.c",
+  "${stm32_wb_hal}/Src/stm32wbaxx_hal_i2c_ex.c",
+  "${stm32_wb_hal}/Src/stm32wbaxx_hal_i2c.c",
+  "${stm32_wb_hal}/Src/stm32wbaxx_hal_icache.c",
+  "${stm32_wb_hal}/Src/stm32wbaxx_hal_pka.c",
+  "${stm32_wb_hal}/Src/stm32wbaxx_hal_pwr_ex.c",
+  "${stm32_wb_hal}/Src/stm32wbaxx_hal_pwr.c",
+  "${stm32_wb_hal}/Src/stm32wbaxx_hal_ramcfg.c",
+  "${stm32_wb_hal}/Src/stm32wbaxx_hal_rcc_ex.c",
+  "${stm32_wb_hal}/Src/stm32wbaxx_hal_rcc.c",
+  "${stm32_wb_hal}/Src/stm32wbaxx_hal_rng_ex.c",
+  "${stm32_wb_hal}/Src/stm32wbaxx_hal_rng.c",
+  "${stm32_wb_hal}/Src/stm32wbaxx_hal_rtc_ex.c",
+  "${stm32_wb_hal}/Src/stm32wbaxx_hal_rtc.c",
+  "${stm32_wb_hal}/Src/stm32wbaxx_hal_tim_ex.c",
+  "${stm32_wb_hal}/Src/stm32wbaxx_hal_tim.c",
+  "${stm32_wb_hal}/Src/stm32wbaxx_hal_uart_ex.c",
+  "${stm32_wb_hal}/Src/stm32wbaxx_hal_uart.c",
+  "${stm32_wb_hal}/Src/stm32wbaxx_hal_spi.c",
+  "${stm32_wb_hal}/Src/stm32wbaxx_hal_spi_ex.c",
+  "${stm32_wb_hal}/Src/stm32wbaxx_hal.c",
+  "${stm32_wb_hal}/Src/stm32wbaxx_ll_tim.c",
+
+  
+  #WPAN 
+  "${stm32_wpan_sdk_patch}/link_layer/ll_sys/src/ll_sys_cs.c",
+  "${stm32_wpan_sdk_patch}/link_layer/ll_sys/src/ll_sys_dp_slp.c",
+  "${stm32_wpan_sdk_patch}/link_layer/ll_sys/src/ll_sys_intf.c",
+  "${stm32_wpan_sdk_patch}/link_layer/ll_sys/src/ll_sys_startup.c",
+  
+  "${stm32_wpan_sdk}/thread/openthread/platform/alarm.c",
+  "${stm32_wpan_sdk}/thread/openthread/platform/diag.c",
+  "${stm32_wpan_sdk}/thread/openthread/platform/entropy_renamed.c",
+  "${stm32_wpan_sdk}/thread/openthread/platform/logging_stm32wba.c",
+  "${stm32_wpan_sdk}/thread/openthread/platform/misc.c",
+  "${stm32_wpan_sdk}/thread/openthread/platform/spi-stubs.c",
+  "${stm32_wpan_sdk}/thread/openthread/platform/system.c",
+  "${stm32_wpan_sdk}/ble/svc/Src/svc_ctl.c",
+  
+  "${stm32_mbedtls_alt}/aes_alt.c",
+  "${stm32_mbedtls_alt}/ecdh_alt.c",
+  "${stm32_mbedtls_alt}/ecdsa_alt.c",
+  "${stm32_mbedtls_alt}/ecp_alt.c",
+  "${stm32_mbedtls_alt}/ecp_curves_alt.c",
+  "${stm32_mbedtls_alt}/entropy_hardware_alt.c",
+  "${stm32_mbedtls_alt}/gcm_alt.c",
+  "${stm32_mbedtls_alt}/rsa_alt.c",
+  "${stm32_mbedtls_alt}/sha256_alt.c",
+  
+  #FREERTOS
+  "${stm32_config_files}/FreeRTOSConfig.h",
+  "${freertos_st}/CMSIS_RTOS_V2/cmsis_os2.c",
+  "${freertos_st}/croutine.c",
+  "${freertos_st}/event_groups.c",
+  "${freertos_st}/list.c",
+  "${freertos_st}/portable/GCC/ARM_CM33_NTZ/non_secure/port.c",
+  "${freertos_st}/portable/GCC/ARM_CM33_NTZ/non_secure/portasm.c",
+  "${freertos_st}/portable/MemMang/heap_4.c",
+  "${freertos_st}/queue.c",
+  "${freertos_st}/stream_buffer.c",
+  "${freertos_st}/tasks.c",
+  "${freertos_st}/timers.c",
+  
+  #SYSTEM
+  "${stm32_system}/adc_ctrl.c",
+  "${stm32_system}/app_sys.c",
+  "${stm32_system}/crc_ctrl.c",
+  "${stm32_system}/otp.c",
+  "${stm32_system}/scm.c",
+  "${stm32_system}/stm_list.c",
+  "${stm32_system}/stm_queue.c",
+  "${stm32_system}/temp_measurement.c",
+  "${stm32_system}/BasicAES/baes_ccm.c",
+  "${stm32_system}/BasicAES/baes_cmac.c",
+  "${stm32_system}/BasicAES/baes_ecb.c",
+  "${stm32_system}/ble_timer/ble_timer.c",
+  "${stm32_system}/Flash/flash_driver.c",
+  "${stm32_system}/Flash/flash_manager.c",
+  "${stm32_system}/Flash/rf_timing_synchro.c",
+  "${stm32_system}/Flash/simple_nvm_arbiter.c",
+  "${stm32_system}/MemoryManager/advanced_memory_manager.c",
+  "${stm32_system}/MemoryManager/memory_manager.c",
+  "${stm32_system}/MemoryManager/stm32_mm.c",
+  "${stm32_system}/Nvm/nvm_emul.c",
+  "${stm32_system}/RFControl/rf_antenna_switch.c",
+  "${stm32_system}/RFControl/rf_external_pa.c",
+  "${stm32_system}/RTDebug/RTDebug_dtb.c",
+  "${stm32_system}/RTDebug/RTDebug.c",
+  "${stm32_system}/SerialCmdInterpreter/serial_cmd_interpreter.c",
+  "${stm32_system_interfaces}/hw_aes.c",
+  "${stm32_system_interfaces}/hw_otp.c",
+  "${stm32_system_interfaces}/hw_pka_p256.c",
+  "${stm32_system_interfaces}/hw_pka.c",
+  "${stm32_system_interfaces}/hw_rng.c",
+  "${stm32_system_interfaces}/stm32_lpm_if.c",
+  "${stm32_system_interfaces}/timer_if.c",
+  "${stm32_system_interfaces}/adv_trace_usart_if.c",
+  "${stm32_system_Config}/ADC_Ctrl/adc_ctrl_conf.c",
+  "${stm32_system_Config}/CRC_Ctrl/crc_ctrl_conf.c",
+  "${stm32_system_Config}/Debug_GPIO/app_debug.c",
+  "${stm32_system_Config}/Flash/simple_nvm_arbiter_conf.c",
+  "${stm32_system_Config}/Log/log_module.c",
+  "${stm32_system_Config}/LowPower/peripheral_init.c",
+  "${stm32_system_Config}/LowPower/user_low_power_config.c",
+  
+  #mbedtls
+      "${mbedtls_st}/library/aes.c",
+      "${mbedtls_st}/library/aesce.c",
+      "${mbedtls_st}/library/aesni.c",
+      "${mbedtls_st}/library/aria.c",
+      "${mbedtls_st}/library/asn1parse.c",
+      "${mbedtls_st}/library/asn1write.c",
+      "${mbedtls_st}/library/base64.c",
+      "${mbedtls_st}/library/bignum.c",
+      "${mbedtls_st}/library/bignum_core.c",
+      "${mbedtls_st}/library/bignum_mod_raw.c",
+      "${mbedtls_st}/library/block_cipher.c",
+      "${mbedtls_st}/library/camellia.c",
+      "${mbedtls_st}/library/ccm.c",
+      "${mbedtls_st}/library/chacha20.c",
+      "${mbedtls_st}/library/chachapoly.c",
+      "${mbedtls_st}/library/cipher.c",
+      "${mbedtls_st}/library/cipher_wrap.c",
+      "${mbedtls_st}/library/cmac.c",
+      "${mbedtls_st}/library/constant_time.c",
+      "${mbedtls_st}/library/ctr_drbg.c",
+      "${mbedtls_st}/library/debug.c",
+      "${mbedtls_st}/library/des.c",
+      "${mbedtls_st}/library/dhm.c",
+      "${mbedtls_st}/library/ecdh.c",
+      "${mbedtls_st}/library/ecdsa.c",
+      "${mbedtls_st}/library/ecjpake.c",
+      "${mbedtls_st}/library/ecp.c",
+      "${mbedtls_st}/library/ecp_curves.c",
+      "${mbedtls_st}/library/ecp_curves_new.c",
+      "${mbedtls_st}/library/entropy_poll.c",
+      "${mbedtls_st}/library/entropy.c",
+      "${mbedtls_st}/library/error.c",
+      "${mbedtls_st}/library/gcm.c",
+      "${mbedtls_st}/library/hkdf.c",
+      "${mbedtls_st}/library/hmac_drbg.c",
+      "${mbedtls_st}/library/lmots.c",
+      "${mbedtls_st}/library/lms.c",
+      "${mbedtls_st}/library/md.c",
+      "${mbedtls_st}/library/md5.c",
+      "${mbedtls_st}/library/memory_buffer_alloc.c",
+      "${mbedtls_st}/library/mps_reader.c",
+      "${mbedtls_st}/library/mps_trace.c",
+      "${mbedtls_st}/library/net_sockets.c",
+      "${mbedtls_st}/library/nist_kw.c",
+      "${mbedtls_st}/library/oid.c",
+      "${mbedtls_st}/library/padlock.c",
+      "${mbedtls_st}/library/pem.c",
+      "${mbedtls_st}/library/pk_ecc.c",
+      "${mbedtls_st}/library/pk.c",
+      "${mbedtls_st}/library/pk_wrap.c",
+      "${mbedtls_st}/library/pkcs5.c",
+      "${mbedtls_st}/library/pkcs7.c",
+      "${mbedtls_st}/library/pkparse.c",
+      "${mbedtls_st}/library/pkwrite.c",
+      "${mbedtls_st}/library/platform.c",
+      "${mbedtls_st}/library/platform_util.c",
+      "${mbedtls_st}/library/poly1305.c",
+      "${mbedtls_st}/library/ripemd160.c",
+      "${mbedtls_st}/library/rsa_alt_helpers.c",
+      "${mbedtls_st}/library/rsa.c",
+      "${mbedtls_st}/library/sha1.c",
+      "${mbedtls_st}/library/sha256.c",
+      "${mbedtls_st}/library/sha3.c",
+      "${mbedtls_st}/library/sha512.c",
+      "${mbedtls_st}/library/ssl_cache.c",
+      "${mbedtls_st}/library/ssl_ciphersuites.c",
+      "${mbedtls_st}/library/ssl_client.c",
+      "${mbedtls_st}/library/ssl_cookie.c",
+      "${mbedtls_st}/library/ssl_debug_helpers_generated.c",
+      "${mbedtls_st}/library/ssl_msg.c",
+      "${mbedtls_st}/library/ssl_ticket.c",
+      "${mbedtls_st}/library/ssl_tls.c",
+      "${mbedtls_st}/library/ssl_tls12_client.c",
+      "${mbedtls_st}/library/ssl_tls12_server.c",
+      "${mbedtls_st}/library/ssl_tls13_client.c",
+      "${mbedtls_st}/library/ssl_tls13_generic.c",
+      "${mbedtls_st}/library/ssl_tls13_keys.c",
+      "${mbedtls_st}/library/ssl_tls13_server.c",
+      "${mbedtls_st}/library/threading.c",
+      "${mbedtls_st}/library/timing.c",
+      "${mbedtls_st}/library/version_features.c",
+      "${mbedtls_st}/library/version.c",
+      "${mbedtls_st}/library/x509.c",
+      "${mbedtls_st}/library/x509_create.c",
+      "${mbedtls_st}/library/x509_crl.c",
+      "${mbedtls_st}/library/x509_crt.c",
+      "${mbedtls_st}/library/x509_csr.c",
+      "${mbedtls_st}/library/x509write_crt.c",
+      "${mbedtls_st}/library/x509write_csr.c",
+      "${mbedtls_st}/library/x509write.c",
+
+]
+  
+INCLUDE_DIRS = [
+  "${chip_root}/examples/platform/stm32/config_files/STM32WBA6/",
+  "${chip_root}/src/include/",
+  "${cmsis}/Include",
+  "${cmsis_device_wb}/Include",
+  "${stm32_wb_hal}/Inc",
+  "${stm32_wb_hal}/Inc/Legacy",
+  "${chip_root}/src/platform/stm32/stm32wba",
+  "${chip_root}/src/include/",
+  "${mbedtls_st}/include",
+  "${mbedtls_st}/library",
+
+  #WPAN
+  "${stm32_wpan_sdk}/",
+  "${stm32_wpan_sdk_patch}/link_layer/ll_cmd_lib/inc/_40nm_reg_files",
+  "${stm32_wpan_sdk_patch}/link_layer/ll_cmd_lib/inc/ot_inc",
+  "${stm32_wpan_sdk_patch}/link_layer/ll_cmd_lib/config/concurrent/ble_thread",
+  "${stm32_wpan_sdk_patch}/link_layer/ll_cmd_lib/inc",
+  "${stm32_wpan_sdk_patch}/link_layer/ll_sys/inc",
+  "${stm32_wpan_sdk}/ble",
+  "${stm32_wpan_sdk}/ble/stack/include",
+  "${stm32_wpan_sdk}/ble/stack/include/auto",
+  "${stm32_wpan_sdk}/ble/svc/Inc",
+  "${stm32_wpan_sdk}/ble/svc/Src",
+  "${stm32_wpan_sdk}/thread/openthread/common",
+  "${stm32_wpan_sdk}/thread/openthread/stack/include",
+  "${stm32_wpan_sdk}/thread/openthread/stack/src/core",
+  "${stm32_wpan_sdk}/thread/openthread/stack/include/openthread",
+  "${stm32_wpan_sdk}/thread/openthread/config",
+  "${stm32_wpan_sdk}/thread/openthread/platform",
+  "${stm32_mbedtls_alt}/",
+ 
+  #SYSTEM
+  "${stm32_system}/",
+  "${stm32_system}/BasicAES",
+  "${stm32_system}/ble_timer",
+  "${stm32_system}/Flash",
+  "${stm32_system}/MemoryManager",
+  "${stm32_system}/Nvm",
+  "${stm32_system}/RFControl",
+  "${stm32_system}/RTDebug",
+  "${stm32_system}/SerialCmdInterpreter",
+  "${stm32_system_interfaces}",
+  "${stm32_system_Config}/ADC_Ctrl",
+  "${stm32_system_Config}/CRC_Ctrl",
+  "${stm32_system_Config}/Debug_GPIO",
+  "${stm32_system_Config}/Flash",
+  "${stm32_system_Config}/Log",
+  "${stm32_system_Config}/LowPower",
+
+
+  
+  #FREERTOS INCLUDES
+  "${freertos_st}/include",
+  "${stm32_config_files}/",
+  "${freertos_st}/portable/GCC/ARM_CM33_NTZ/non_secure",
+  "${freertos_st}/portable",
+  "${freertos_st}/CMSIS_RTOS_V2",
+  "${stm32_wb_sdk}/CMSIS/Include",
+  "${stm32_wb_sdk}/CMSIS/RTOS2/Include",
+
+]
+
+DEFINES = [
+  "CHIP_PROJECT_CONFIG_INCLUDE=<CHIPProjectConfig.h>",
+  #"CHIP_PLATFORM_CONFIG_INCLUDE=<CHIPPlatformConfig.h>",
+  "CHIP_HAVE_CONFIG_H",
+  "OPENTHREAD_PROJECT_CORE_CONFIG_FILE=<stm32wba-openthread-light-no-tcp-config.h>",
+  "OPENTHREAD_CONFIG_FILE=<openthread_api_config_light_no_tcp.h>",
+  "MBEDTLS_CONFIG_FILE=<matter_config.h>",
+  "USE_FULL_LL_DRIVER",
+  "MAC",
+  #"BLE",
+  "OPENTHREAD_MTD",
+  "STM32WBA65xx",
+  "STM32WBA",
+  "STM32WBA65RIVx",
+  "STM32",
+  "DEBUG",
+  "USE_HAL_DRIVER",
+  "LOGGER_ENABLE=0",
+]
+LIBS = [
+  # add any .o/.a library here
+  "${stm32_wpan_sdk}/link_layer/ll_cmd_lib/lib/WBA6_LinkLayer_BLE_Thread_lib.a",
+  "${stm32_wpan_sdk}/ble/stack/lib/stm32wba_ble_stack_basic.a",
+  "${stm32_wpan_sdk_patch}/thread/openthread_lib/stm32wba_ot_mtd_lib_matter.a",
+]
+  
+FLAGS = [ 
+]
