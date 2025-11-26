@@ -32,7 +32,7 @@
 #       --endpoint 1
 #       --int-arg PIXIT.DISHM.MODE_CHANGE_OK:0
 #       --int-arg PIXIT.DISHM.MODE_CHANGE_FAIL:2
-#       --app-pipe /tmp/dishm_2_1_fifo
+#       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -57,7 +57,6 @@ class TC_DISHM_2_1(MatterBaseTest):
         super().__init__(*args)
         self.mode_ok = 0
         self.mode_fail = 0
-        self.is_ci = False
 
     def desc_TC_DISHM_2_1(self) -> str:
         return "[TC-DISHM-2.1] Change to Mode functionality with DUT as Server"
@@ -120,7 +119,6 @@ class TC_DISHM_2_1(MatterBaseTest):
 
         self.mode_fail = self.matter_test_config.global_test_params['PIXIT.DISHM.MODE_CHANGE_FAIL']
         self.mode_ok = self.matter_test_config.global_test_params['PIXIT.DISHM.MODE_CHANGE_OK']
-        self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
 
         # Commissioning, already done
         self.step(1)
@@ -130,12 +128,16 @@ class TC_DISHM_2_1(MatterBaseTest):
         supported_modes_dut = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=supported_modes_attribute)
         modes = [m.mode for m in supported_modes_dut]
 
+        can_test_mode_failure = self.check_pics("DISHM.S.M.CAN_TEST_MODE_FAILURE")
+        can_manually_control = self.check_pics("DISHM.S.M.CAN_MANUALLY_CONTROLLED")
+
         # Check if the list of supported modes is larger than 2
         asserts.assert_greater_equal(len(supported_modes_dut), 2, "SupportedModes must have at least 2 entries!")
 
-        # Verify that PIXIT.DISHM.MODE_CHANGE_FAIL is one of supported_modes_dut
-        asserts.assert_true(self.mode_fail in modes,
-                            f"{self.mode_fail} is not in supported_modes_dut: {modes}")
+        if can_test_mode_failure and can_manually_control:
+            # Verify that PIXIT.DISHM.MODE_CHANGE_FAIL is one of supported_modes_dut
+            asserts.assert_true(self.mode_fail in modes,
+                                f"{self.mode_fail} is not in supported_modes_dut: {modes}")
 
         # TH reads from the DUT the CurrentMode attribute
         self.step(3)
@@ -161,7 +163,6 @@ class TC_DISHM_2_1(MatterBaseTest):
                              f"Status is {change_to_mode_response.status} and it should be SUCCESS 0x00")
 
         # Manually put the device in a state from which it will FAIL to transition to PIXIT.DISHM.MODE_CHANGE_FAIL
-        self.step(5)
 
         # This step prepares the DUT for a negative transition scenario.
         # The goal is to place the DUT in a state where a subsequent ChangeToMode(newMode=MODE_CHANGE_FAIL)
@@ -169,16 +170,12 @@ class TC_DISHM_2_1(MatterBaseTest):
         # manually, in CI the example app does not expose a way to synthesize the internal condition.
         # Therefore, in CI we do not switch the DUT to mode_fail.
 
-        can_test_mode_failure = self.check_pics("DISHM.S.M.CAN_TEST_MODE_FAILURE")
-        can_manually_control = self.check_pics("DISHM.S.M.CAN_MANUALLY_CONTROLLED")
-        if can_test_mode_failure and can_manually_control:
-            asserts.assert_true(self.mode_fail in modes,
-                                f"The MODE_CHANGE_FAIL PIXIT value {self.mode_fail} is not a supported mode")
-            if self.is_ci:
-                self.mark_current_step_skipped()
-            else:
-                self.wait_for_user_input(
-                    prompt_msg=f"Manually put the device in a state from which it will FAIL to transition to mode {self.mode_fail}, and press Enter when ready.")
+        if not (can_test_mode_failure and can_manually_control):
+            self.skip_step(5)
+        else:
+            self.step(5)
+            self.wait_for_user_input(prompt_msg=(
+                f"Manually put the device in a state from which it will FAIL to transition to mode {self.mode_fail}, and press Enter when ready"))
 
         # TH reads from the DUT the CurrentMode attribute
         self.step(6)
@@ -225,10 +222,10 @@ class TC_DISHM_2_1(MatterBaseTest):
                              f"{old_current_mode_dut_2} is not equal to old_current_mode_dut: {old_current_mode_dut}")
 
         # Manually put the device in a state from which it will SUCCESSFULLY transition to PIXIT.DISHM.MODE_CHANGE_OK
-        self.step(9)
-        if self.is_ci:
-            logging.info("Continuing...")
+        if not can_manually_control:
+            self.skip_step(9)
         else:
+            self.step(9)
             self.wait_for_user_input(
                 prompt_msg=f"Manually put the device in a state from which it will SUCCESSFULLY transition to mode {self.mode_ok}, and press Enter when ready.")
 
