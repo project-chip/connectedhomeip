@@ -218,13 +218,15 @@ struct ServerInitParams
 /**
  * Transitional version of ServerInitParams to assist SDK integrators in
  * transitioning to injecting product/platform-owned resources. This version
- * of `ServerInitParams` statically owns and initializes (via the
- * `InitializeStaticResourcesBeforeServerInit()` method) the persistent storage
- * delegate, the group data provider, and the access control delegate. This is to reduce
- * the amount of copied boilerplate in all the example initializations (e.g. AppTask.cpp,
- * main.cpp).
+ * of `ServerInitParams` owns and initializes (via the `InitializeStaticResourcesBeforeServerInit()`
+ * method) the persistent storage delegate, the group data provider, and the access control delegate.
+ * This is to reduce the amount of copied boilerplate in all the example initializations
+ * (e.g. AppTask.cpp, main.cpp).
  *
  * This version SHOULD BE USED ONLY FOR THE IN-TREE EXAMPLES.
+ *
+ * IMPORTANT: Instances of this class MUST outlive the Server because Server::Init()
+ *            stores pointers to resources owned by this class.
  *
  * ACTION ITEMS FOR TRANSITION from a example in-tree to a product:
  *
@@ -266,8 +268,8 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
         {
             chip::DeviceLayer::PersistedStorage::KeyValueStoreManager & kvsManager =
                 DeviceLayer::PersistedStorage::KeyValueStoreMgr();
-            ReturnErrorOnFailure(sKvsPersistenStorageDelegate.Init(&kvsManager));
-            this->persistentStorageDelegate = &sKvsPersistenStorageDelegate;
+            ReturnErrorOnFailure(mKvsPersistenStorageDelegate.Init(&kvsManager));
+            this->persistentStorageDelegate = &mKvsPersistenStorageDelegate;
         }
 
         // PersistentStorageDelegate "software-based" operational key access injection
@@ -275,8 +277,8 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
         {
             // WARNING: PersistentStorageOperationalKeystore::Finish() is never called. It's fine for
             //          for examples and for now.
-            ReturnErrorOnFailure(sPersistentStorageOperationalKeystore.Init(this->persistentStorageDelegate));
-            this->operationalKeystore = &sPersistentStorageOperationalKeystore;
+            ReturnErrorOnFailure(mPersistentStorageOperationalKeystore.Init(this->persistentStorageDelegate));
+            this->operationalKeystore = &mPersistentStorageOperationalKeystore;
         }
 
         // OpCertStore can be injected but default to persistent storage default
@@ -285,8 +287,8 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
         {
             // WARNING: PersistentStorageOpCertStore::Finish() is never called. It's fine for
             //          for examples and for now, since all storage is immediate for that impl.
-            ReturnErrorOnFailure(sPersistentStorageOpCertStore.Init(this->persistentStorageDelegate));
-            this->opCertStore = &sPersistentStorageOpCertStore;
+            ReturnErrorOnFailure(mPersistentStorageOpCertStore.Init(this->persistentStorageDelegate));
+            this->opCertStore = &mPersistentStorageOpCertStore;
         }
 
         // Injection of report scheduler WILL lead to two schedulers being allocated. As recommended above, this should only be used
@@ -294,43 +296,58 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
         // CommonCaseDeviceServerInitParams should not be allocated.
         if (this->reportScheduler == nullptr)
         {
-            reportScheduler = &sReportScheduler;
+            this->reportScheduler = &mReportScheduler;
         }
 
         // Session Keystore injection
-        this->sessionKeystore = &sSessionKeystore;
+        if (this->sessionKeystore == nullptr)
+        {
+            this->sessionKeystore = &mSessionKeystore;
+        }
 
         // Group Data provider injection
-        sGroupDataProvider.SetStorageDelegate(this->persistentStorageDelegate);
-        sGroupDataProvider.SetSessionKeystore(this->sessionKeystore);
-        ReturnErrorOnFailure(sGroupDataProvider.Init());
-        this->groupDataProvider = &sGroupDataProvider;
+        if (this->groupDataProvider == nullptr)
+        {
+            mGroupDataProvider.SetStorageDelegate(this->persistentStorageDelegate);
+            mGroupDataProvider.SetSessionKeystore(this->sessionKeystore);
+            ReturnErrorOnFailure(mGroupDataProvider.Init());
+            this->groupDataProvider = &mGroupDataProvider;
+        }
 
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
-        ReturnErrorOnFailure(sSessionResumptionStorage.Init(this->persistentStorageDelegate));
-        this->sessionResumptionStorage = &sSessionResumptionStorage;
-#else
-        this->sessionResumptionStorage = nullptr;
+        if (this->sessionResumptionStorage == nullptr)
+        {
+            ChipLogProgress(AppServer, "Initializing session resumption storage...");
+            ReturnErrorOnFailure(mSessionResumptionStorage.Init(this->persistentStorageDelegate));
+            this->sessionResumptionStorage = &mSessionResumptionStorage;
+        }
 #endif
 
         // Inject access control delegate
-        this->accessDelegate = Access::Examples::GetAccessControlDelegate();
+        if (this->accessDelegate == nullptr)
+        {
+            this->accessDelegate = Access::Examples::GetAccessControlDelegate();
+        }
 
-        // Inject ACL storage. (Don't initialize it.)
-        this->aclStorage = &sAclStorage;
+        if (this->aclStorage == nullptr)
+        {
+            // Inject ACL storage. (Don't initialize it.)
+            this->aclStorage = &mAclStorage;
+        }
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-        ChipLogProgress(AppServer, "Initializing subscription resumption storage...");
-        ReturnErrorOnFailure(sSubscriptionResumptionStorage.Init(this->persistentStorageDelegate));
-        this->subscriptionResumptionStorage = &sSubscriptionResumptionStorage;
-#else
-        ChipLogProgress(AppServer, "Subscription persistence not supported");
+        if (this->subscriptionResumptionStorage == nullptr)
+        {
+            ChipLogProgress(AppServer, "Initializing subscription resumption storage...");
+            ReturnErrorOnFailure(mSubscriptionResumptionStorage.Init(this->persistentStorageDelegate));
+            this->subscriptionResumptionStorage = &mSubscriptionResumptionStorage;
+        }
 #endif
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
         if (this->icdCheckInBackOffStrategy == nullptr)
         {
-            this->icdCheckInBackOffStrategy = &sDefaultICDCheckInBackOffStrategy;
+            this->icdCheckInBackOffStrategy = &mICDCheckInBackOffStrategy;
         }
 #endif
 
@@ -338,23 +355,29 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
     }
 
 private:
-    static KvsPersistentStorageDelegate sKvsPersistenStorageDelegate;
-    static PersistentStorageOperationalKeystore sPersistentStorageOperationalKeystore;
-    static Credentials::PersistentStorageOpCertStore sPersistentStorageOpCertStore;
-    static Credentials::GroupDataProviderImpl sGroupDataProvider;
-    static chip::app::DefaultTimerDelegate sTimerDelegate;
-    static app::reporting::ReportSchedulerImpl sReportScheduler;
+    // Owned resources - these are instance members (not static) so each
+    // CommonCaseDeviceServerInitParams instance owns its own copy.
+    // They must outlive Server::Init() because that method stores pointers to them.
+    KvsPersistentStorageDelegate mKvsPersistenStorageDelegate;
+    PersistentStorageOperationalKeystore mPersistentStorageOperationalKeystore;
+    Credentials::PersistentStorageOpCertStore mPersistentStorageOpCertStore;
+    Credentials::GroupDataProviderImpl mGroupDataProvider;
+    app::DefaultTimerDelegate mTimerDelegate;
+    app::reporting::ReportSchedulerImpl mReportScheduler{ &mTimerDelegate };
 
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
-    static SimpleSessionResumptionStorage sSessionResumptionStorage;
+    SimpleSessionResumptionStorage mSessionResumptionStorage;
 #endif
+
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-    static app::SimpleSubscriptionResumptionStorage sSubscriptionResumptionStorage;
+    app::SimpleSubscriptionResumptionStorage mSubscriptionResumptionStorage;
 #endif
-    static app::DefaultAclStorage sAclStorage;
-    static Crypto::DefaultSessionKeystore sSessionKeystore;
+
+    app::DefaultAclStorage mAclStorage;
+    Crypto::DefaultSessionKeystore mSessionKeystore;
+
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-    static app::DefaultICDCheckInBackOffStrategy sDefaultICDCheckInBackOffStrategy;
+    app::DefaultICDCheckInBackOffStrategy mICDCheckInBackOffStrategy;
 #endif
 };
 
