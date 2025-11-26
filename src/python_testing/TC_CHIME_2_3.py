@@ -72,7 +72,7 @@ class TC_CHIME_2_3(MatterBaseTest, CHIMETestBase):
     async def test_TC_CHIME_2_3(self):
         cluster = Clusters.Objects.Chime
         attributes = cluster.Attributes
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(1)  # Already done, immediately go to step 2
 

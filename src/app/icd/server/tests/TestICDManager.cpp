@@ -274,7 +274,7 @@ TEST_F(TestICDManager, TestICDModeDurationsWith0ActiveModeDurationWithoutActiveS
 
     // Set New durations for test case
     Milliseconds32 oldActiveModeDuration = icdConfigData.GetActiveModeDuration();
-    mICDManager.SetModeDurations(MakeOptional<Milliseconds32>(0), NullOptional);
+    TEMPORARY_RETURN_IGNORED mICDManager.SetModeDurations(MakeOptional<Milliseconds32>(0), NullOptional);
 
     // Verify That ICDManager starts in Idle
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
@@ -332,7 +332,7 @@ TEST_F(TestICDManager, TestICDModeDurationsWith0ActiveModeDurationWithoutActiveS
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
 
     // Reset Old durations
-    mICDManager.SetModeDurations(MakeOptional(oldActiveModeDuration), NullOptional);
+    TEMPORARY_RETURN_IGNORED mICDManager.SetModeDurations(MakeOptional(oldActiveModeDuration), NullOptional);
 }
 
 /**
@@ -356,7 +356,7 @@ TEST_F(TestICDManager, TestICDModeDurationsWith0ActiveModeDurationWithActiveSub)
 
     // Set New durations for test case
     Milliseconds32 oldActiveModeDuration = icdConfigData.GetActiveModeDuration();
-    mICDManager.SetModeDurations(MakeOptional<Milliseconds32>(0), NullOptional);
+    TEMPORARY_RETURN_IGNORED mICDManager.SetModeDurations(MakeOptional<Milliseconds32>(0), NullOptional);
 
     // Verify That ICDManager starts in Idle
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
@@ -425,7 +425,7 @@ TEST_F(TestICDManager, TestICDModeDurationsWith0ActiveModeDurationWithActiveSub)
     EXPECT_EQ(mICDManager.GetOperaionalState(), ICDManager::OperationalState::IdleMode);
 
     // Reset Old durations
-    mICDManager.SetModeDurations(MakeOptional<Milliseconds32>(oldActiveModeDuration), NullOptional);
+    TEMPORARY_RETURN_IGNORED mICDManager.SetModeDurations(MakeOptional<Milliseconds32>(oldActiveModeDuration), NullOptional);
 }
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
@@ -862,7 +862,8 @@ TEST_F(TestICDManager, TestHandleTestEventTriggerInvalidateHalfCounterValues)
     EXPECT_EQ(ICDConfigurationData::GetInstance().GetICDCounter().GetValue(), startValue);
 
     // Trigger ICD kInvalidateHalfCounterValues event
-    mICDManager.HandleEventTrigger(static_cast<uint64_t>(ICDTestEventTriggerEvent::kInvalidateHalfCounterValues));
+    TEMPORARY_RETURN_IGNORED mICDManager.HandleEventTrigger(
+        static_cast<uint64_t>(ICDTestEventTriggerEvent::kInvalidateHalfCounterValues));
 
     // Validate counter has the expected value
     EXPECT_EQ(ICDConfigurationData::GetInstance().GetICDCounter().GetValue(), expectedValue);
@@ -881,7 +882,8 @@ TEST_F(TestICDManager, TestHandleTestEventTriggerInvalidateAllCounterValues)
     EXPECT_EQ(ICDConfigurationData::GetInstance().GetICDCounter().GetValue(), startValue);
 
     // Trigger ICD kInvalidateAllCounterValues event
-    mICDManager.HandleEventTrigger(static_cast<uint64_t>(ICDTestEventTriggerEvent::kInvalidateAllCounterValues));
+    TEMPORARY_RETURN_IGNORED mICDManager.HandleEventTrigger(
+        static_cast<uint64_t>(ICDTestEventTriggerEvent::kInvalidateAllCounterValues));
 
     // Validate counter has the expected value
     EXPECT_EQ(ICDConfigurationData::GetInstance().GetICDCounter().GetValue(), expectedValue);

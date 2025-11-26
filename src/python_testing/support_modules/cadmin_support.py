@@ -24,7 +24,6 @@ import random
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import IntEnum
-from time import sleep
 from typing import Optional
 
 from mdns_discovery import mdns_discovery
@@ -361,7 +360,7 @@ class CADMINBaseTest(MatterBaseTest):
             timedRequestTimeoutMs=6000
         )
         # The failsafe cleanup is scheduled after the command completes
-        sleep(1)
+        await asyncio.sleep(1)
 
     @dataclass
     class TimingResults:
@@ -439,7 +438,7 @@ class CADMINBaseTest(MatterBaseTest):
             if attempt < max_attempts - 1:
                 logging.info(f"Waiting for service with CM={expected_cm_value} and D={expected_discriminator}, "
                              f"attempt {attempt+1}/{max_attempts}")
-                sleep(delay_sec)
+                await asyncio.sleep(delay_sec)
             else:
                 # Final retry attempt failed
                 asserts.fail(f"Failed to find DNS-SD advertisement with CM={expected_cm_value} and "

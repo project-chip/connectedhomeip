@@ -104,7 +104,7 @@ void InitAirQualitySensorManager(intptr_t arg)
 
 CHIP_ERROR SensorManager::Init()
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(InitAirQualitySensorManager);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(InitAirQualitySensorManager);
     // Create cmsisos sw timer for air quality sensor timer.
     mSensorTimer = osTimerNew(SensorTimerEventHandler, osTimerPeriodic, nullptr, nullptr);
     if (mSensorTimer == NULL)
@@ -176,5 +176,6 @@ void SensorManager::SensorTimerEventHandler(void * arg)
 #endif // USE_AIR_QUALITY_SENSOR
     // create pointer for the int32_t air_quality
     int32_t * air_quality_ptr = new int32_t(air_quality);
-    DeviceLayer::PlatformMgr().ScheduleWork(writeAirQualityToAttribute, reinterpret_cast<intptr_t>(air_quality_ptr));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(writeAirQualityToAttribute,
+                                                                     reinterpret_cast<intptr_t>(air_quality_ptr));
 }

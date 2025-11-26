@@ -130,6 +130,8 @@ public:
     // commissioning window timeout.
     void OverrideMinCommissioningTimeout(System::Clock::Seconds32 timeout) { mMinCommissioningTimeoutOverride.SetValue(timeout); }
 
+    Optional<SessionHandle> GetPASESession() const { return mPASESession.Get(); }
+
 private:
     //////////// SessionDelegate Implementation ///////////////
     void OnSessionReleased() override;

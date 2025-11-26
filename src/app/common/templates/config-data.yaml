@@ -29,6 +29,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Administrator Commissioning
     - Basic Information
     - Boolean State
+    - Boolean State Configuration
     - Camera AV Settings User Level Management
     - Camera AV Stream Management
     - Chime
@@ -78,6 +79,7 @@ CommandHandlerInterfaceOnlyClusters:
     - TLS Client Management
     - Thread Border Router Management
     - Thread Network Directory
+    - Time Synchronization
     - User Label
     - Water Heater Management
     - Water Heater Mode
@@ -149,6 +151,7 @@ CodeDrivenClusters:
     - Basic Information
     - Binding
     - Boolean State
+    - Boolean State Configuration
     - Descriptor
     - Diagnostic Logs
     - Ethernet Network Diagnostics
@@ -165,6 +168,7 @@ CodeDrivenClusters:
     - Push AV Stream Transport
     - Software Diagnostics
     - Time Format Localization
+    - Time Synchronization
     - User Label
     - Wi-Fi Network Diagnostics
     # keep-sorted end

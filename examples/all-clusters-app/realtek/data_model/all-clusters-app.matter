@@ -211,6 +211,13 @@ enum RelativePositionTag : enum8 {
   kBehind = 6;
 }
 
+enum SoftwareVersionCertificationStatusEnum : enum8 {
+  kDevTest = 0;
+  kProvisional = 1;
+  kCertified = 2;
+  kRevoked = 3;
+}
+
 enum StreamUsageEnum : enum8 {
   kInternal = 0;
   kRecording = 1;
@@ -8176,7 +8183,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x0B;
-    ram      attribute clusterRevision default = 2;
+    callback attribute clusterRevision;
 
     handle command SetUTCTime;
     handle command SetTrustedTimeSource;
@@ -8784,16 +8791,16 @@ endpoint 1 {
     callback attribute currentSensitivityLevel;
     ram      attribute supportedSensitivityLevels default = 3;
     ram      attribute defaultSensitivityLevel default = 2;
-    ram      attribute alarmsActive;
-    ram      attribute alarmsSuppressed;
-    persist  attribute alarmsEnabled;
+    callback attribute alarmsActive;
+    callback attribute alarmsSuppressed;
+    callback attribute alarmsEnabled;
     ram      attribute alarmsSupported default = 0x03;
-    ram      attribute sensorFault default = 0;
+    callback attribute sensorFault;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x0F;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
 
     handle command SuppressAlarm;
     handle command EnableDisableAlarm;

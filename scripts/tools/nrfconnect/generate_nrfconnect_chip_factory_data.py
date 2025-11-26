@@ -18,7 +18,7 @@
 import argparse
 import base64
 import json
-import logging as log
+import logging
 import os
 import secrets
 import subprocess
@@ -52,6 +52,8 @@ except ImportError:
     no_jsonschema_module = True
 else:
     no_jsonschema_module = False
+
+log = logging.getLogger(__name__)
 
 # A user can not change the factory data version and must be coherent with
 # the factory data version set in the nRF Connect platform Kconfig file (CHIP_FACTORY_DATA_VERSION).
@@ -199,7 +201,7 @@ def gen_test_certs(chip_cert_exe: str,
         # convert to .der files
         for cert_k, cert_v in new_certificates.items():
             action_type = "convert-cert" if cert_k.find("CERT") != -1 else "convert-key"
-            log.info(cert_v + ".der")
+            log.info("%s.der", cert_v)
             cmd = [chip_cert_exe, action_type,
                    cert_v + ".pem",
                    cert_v + ".der",
@@ -236,7 +238,7 @@ class FactoryDataGenerator:
         try:
             self._validate_args()
         except AssertionError as e:
-            log.error(e)
+            log.exception(e)
             sys.exit(-1)
 
     def _validate_args(self):
@@ -309,7 +311,7 @@ class FactoryDataGenerator:
         # try to read DAC public and private keys
         dac_priv_key = get_raw_private_key_der(dac_key, self._args.dac_key_password)
         if dac_priv_key is None:
-            log.error("Cannot read DAC keys from : {}".format(dac_key))
+            log.error("Cannot read DAC keys from : '%s'", dac_key)
             sys.exit(-1)
 
         try:
@@ -364,7 +366,7 @@ class FactoryDataGenerator:
                 if is_json_valid:
                     json_file.write(json_object)
             except IOError:
-                log.error("Cannot save output file into directory: {}".format(self._args.output))
+                log.error("Cannot save output file into directory: '%s'", self._args.output)
 
             if self._args.generate_onboarding:
                 self._generate_onboarding_data()
@@ -374,7 +376,7 @@ class FactoryDataGenerator:
         if (isinstance(value, bytes) or isinstance(value, bytearray)):
             value = HEX_PREFIX + value.hex()
         if value or (isinstance(value, int) and value == 0):
-            log.debug("Adding entry '{}' with size {} and type {}".format(name, sys.getsizeof(value), type(value)))
+            log.debug("Adding entry '%s' with size %d and type '%s'", name, sys.getsizeof(value), type(value))
             self._factory_data.append((name, value))
 
     def _generate_spake2_verifier(self):
@@ -386,7 +388,7 @@ class FactoryDataGenerator:
         """ If rotating device unique ID has not been provided it should be generated """
         log.warning("Cannot find rotating device UID in provided arguments list. A new one will be generated.")
         rdu = secrets.token_bytes(16)
-        log.info("\n\nThe new rotate device UID: {}\n".format(rdu.hex()))
+        log.info("\n\nThe new rotate device UID: '%s'\n", rdu.hex())
         return rdu
 
     def _validate_output_json(self, output_json: str):
@@ -402,7 +404,7 @@ class FactoryDataGenerator:
                 validator = jsonschema.Draft202012Validator(schema=schema)
                 validator.validate(instance=json.loads(output_json))
         except IOError:
-            log.error("Provided JSON schema file is wrong: {}".format(self._args.schema))
+            log.error("Provided JSON schema file is wrong: '%s'", self._args.schema)
             return False
         else:
             log.info("Validate OK")
@@ -415,7 +417,7 @@ class FactoryDataGenerator:
                 data = f.read()
                 return data
         except IOError as e:
-            log.error(e)
+            log.exception(e)
             raise e
 
     def _generate_onboarding_data(self):
@@ -556,14 +558,14 @@ def main():
     args = parser.parse_args()
 
     if args.verbose:
-        log.basicConfig(format='[%(asctime)s][%(levelname)s] %(message)s', level=log.DEBUG)
+        logging.basicConfig(format='[%(asctime)s][%(levelname)s] %(message)s', level=logging.DEBUG)
     else:
-        log.basicConfig(format='[%(levelname)s] %(message)s', level=log.INFO)
+        logging.basicConfig(format='[%(levelname)s] %(message)s', level=logging.INFO)
 
     # check if json file already exist
     if (exists(args.output + ".json") and not args.overwrite):
-        log.error(("Output file: {} already exist, to create a new one add argument '--overwrite'. "
-                  "By default overwriting is disabled").format(args.output+".json"))
+        log.error("Output file: '%s' already exist, to create a new one add argument '--overwrite'. "
+                  "By default overwriting is disabled", args.output+".json")
         sys.exit(1)
 
     if args.schema and no_jsonschema_module:

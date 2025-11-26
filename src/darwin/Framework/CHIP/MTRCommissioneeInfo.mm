@@ -69,7 +69,7 @@ MTR_DIRECT_MEMBERS
         // attributes, using a wildcard-endpoint path.
         pathFilters.emplace_back(MTRClusterIDTypeNetworkCommissioningID, MTRAttributeIDTypeGlobalAttributeFeatureMapID);
 
-        info.attributes->ForEachAttribute([&](const ConcreteAttributePath & path) -> CHIP_ERROR {
+        TEMPORARY_RETURN_IGNORED info.attributes->ForEachAttribute([&](const ConcreteAttributePath & path) -> CHIP_ERROR {
             // Only grab paths that are included in extraAttributesToRead so that
             // API consumers don't develop dependencies on implementation details
             // (like which other attributes we happen to read).
@@ -118,7 +118,7 @@ MTR_DIRECT_MEMBERS
         _attributes = attributes;
 
         // Now grab the Network Commissioning information in a nicer form.
-        info.attributes->ForEachAttribute(MTRClusterIDTypeNetworkCommissioningID, [&](const ConcreteAttributePath & path) -> CHIP_ERROR {
+        TEMPORARY_RETURN_IGNORED info.attributes->ForEachAttribute(MTRClusterIDTypeNetworkCommissioningID, [&](const ConcreteAttributePath & path) -> CHIP_ERROR {
             if (path.mAttributeId != MTRAttributeIDTypeGlobalAttributeFeatureMapID) {
                 return CHIP_NO_ERROR;
             }
