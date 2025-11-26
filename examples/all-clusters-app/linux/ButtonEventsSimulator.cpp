@@ -196,7 +196,7 @@ void ButtonEventsSimulator::SetState(ButtonEventsSimulator::State newState)
 
 void ButtonEventsSimulator::StartTimer(System::Clock::Timeout duration)
 {
-    chip::DeviceLayer::SystemLayer().StartTimer(duration, &ButtonEventsSimulator::OnTimerDone, this);
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(duration, &ButtonEventsSimulator::OnTimerDone, this);
 }
 
 void ButtonEventsSimulator::Next()

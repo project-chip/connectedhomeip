@@ -75,6 +75,10 @@ void MatterEthernetNetworkDiagnosticsClusterInitCallback(chip::EndpointId endpoi
 
 void MatterEthernetNetworkDiagnosticsClusterShutdownCallback(chip::EndpointId endpointId);
 
+void MatterTimeSynchronizationClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterTimeSynchronizationClusterShutdownCallback(chip::EndpointId endpointId);
+
 void MatterAdministratorCommissioningClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterAdministratorCommissioningClusterShutdownCallback(chip::EndpointId endpointId);
@@ -98,3 +102,7 @@ void MatterUserLabelClusterShutdownCallback(chip::EndpointId endpointId);
 void MatterBooleanStateClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterBooleanStateClusterShutdownCallback(chip::EndpointId endpointId);
+
+void MatterBooleanStateConfigurationClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterBooleanStateConfigurationClusterShutdownCallback(chip::EndpointId endpointId);

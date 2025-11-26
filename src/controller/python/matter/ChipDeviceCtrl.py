@@ -1108,10 +1108,9 @@ class ChipDeviceControllerBase():
                     self.devCtrl, int(filterType), str(filter).encode("utf-8")))
 
             async def _wait_discovery():
-                while not await self._ChipStack.CallAsyncWithResult(
+                while not await self._ChipStack.CallAsyncWithResult(  # noqa: ASYNC110
                         lambda: self._dmLib.pychip_DeviceController_HasDiscoveredCommissionableNode(self.devCtrl)):
                     await asyncio.sleep(0.1)
-                return
 
             try:
                 if stopOnFirst:
@@ -1520,9 +1519,8 @@ class ChipDeviceControllerBase():
             int: The computed timeout value in milliseconds, representing the round-trip time.
         '''
         device = self.GetConnectedDeviceSync(nodeId)
-        res = self._ChipStack.Call(lambda: self._dmLib.pychip_DeviceProxy_ComputeRoundTripTimeout(
+        return self._ChipStack.Call(lambda: self._dmLib.pychip_DeviceProxy_ComputeRoundTripTimeout(
             device.deviceProxy, upperLayerProcessingTimeoutMs))
-        return res
 
     def GetRemoteSessionParameters(self, nodeId: int) -> typing.Optional[SessionParameters]:
         '''
@@ -1605,6 +1603,77 @@ class ChipDeviceControllerBase():
                 ClusterId=payload.cluster_id,
                 CommandId=payload.command_id,
             ), payload).raise_on_error()
+        return await future
+
+    def _prepare_write_attribute_requests(
+        self,
+        attributes: typing.List[typing.Union[
+            typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor],
+            typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]
+        ]]
+    ) -> typing.List[ClusterAttribute.AttributeWriteRequest]:
+        """Helper method to prepare attribute write requests."""
+        attrs = []
+        for v in attributes:
+            if len(v) == 2:
+                attrs.append(ClusterAttribute.AttributeWriteRequest(
+                    EndpointId=v[0],
+                    Attribute=v[1],
+                    DataVersion=0,
+                    HasDataVersion=0,
+                    Data=v[1].value))  # type: ignore[attr-defined]
+            else:
+                attrs.append(ClusterAttribute.AttributeWriteRequest(
+                    EndpointId=v[0],
+                    Attribute=v[1],
+                    DataVersion=v[2],
+                    HasDataVersion=1,
+                    Data=v[1].value))
+        return attrs
+
+    async def TestOnlyWriteAttributeWithMismatchedTimedRequestField(self, nodeid: int,
+                                                                    attributes: typing.List[typing.Union[
+                                                                        typing.Tuple[int,
+                                                                                     ClusterObjects.ClusterAttributeDescriptor],
+                                                                        typing.Tuple[int,
+                                                                                     ClusterObjects.ClusterAttributeDescriptor, int]
+                                                                    ]],
+                                                                    timedRequestTimeoutMs: int,
+                                                                    timedRequestFieldValue: bool,
+                                                                    interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
+                                                                    payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
+        '''
+        ONLY TO BE USED FOR TEST: Write attributes with decoupled Timed Request action and TimedRequest field.
+        This allows testing TIMED_REQUEST_MISMATCH scenarios:
+        - timedRequestTimeoutMs=0, timedRequestFieldValue=True: No action, but field=true (MISMATCH)
+        - timedRequestTimeoutMs>0, timedRequestFieldValue=False: Action sent, but field=false (MISMATCH)
+
+        Please see WriteAttribute for description of common parameters.
+
+        Additional parameters:
+            timedRequestTimeoutMs: Timeout for the Timed Request action (0 means no action)
+            timedRequestFieldValue: Value of the TimedRequest field in WriteRequest
+
+        Returns:
+            [AttributeStatus] (list - one for each path).
+
+        Raises:
+            InteractionModelError on error (expected: TIMED_REQUEST_MISMATCH)
+        '''
+        self.CheckIsActive()
+
+        eventLoop = asyncio.get_running_loop()
+        future = eventLoop.create_future()
+
+        device = await self.GetConnectedDevice(nodeid, timeoutMs=interactionTimeoutMs, payloadCapability=payloadCapability)
+
+        attrs = self._prepare_write_attribute_requests(attributes)
+
+        ClusterAttribute.TestOnlyWriteAttributeWithMismatchedTimedRequestField(
+            future, eventLoop, device.deviceProxy, attrs,
+            timedRequestTimeoutMs=timedRequestTimeoutMs,
+            timedRequestFieldValue=timedRequestFieldValue,
+            interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs).raise_on_error()
         return await future
 
     async def SendCommand(self, nodeId: int, endpoint: int, payload: ClusterObjects.ClusterCommand, responseType=None,
@@ -1704,10 +1773,13 @@ class ChipDeviceControllerBase():
             groupid, self.devCtrl, payload, busyWaitMs=busyWaitMs).raise_on_error()
 
         # None is the expected return for sending group commands.
-        return None
+        return
 
     async def WriteAttribute(self, nodeId: int,
-                             attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor]],
+                             attributes: typing.List[typing.Union[
+                                 typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor],
+                                 typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]
+                             ]],
                              timedRequestTimeoutMs: typing.Optional[int] = None,
                              interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
                              payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
@@ -1719,7 +1791,6 @@ class ChipDeviceControllerBase():
         attributes: A list of tuples of type (endpoint, cluster-object):
         interactionTimeoutMs: Overall timeout for the interaction. Omit or set to 'None' to have the SDK automatically compute the
                               right timeout value based on transport characteristics as well as the responsiveness of the target.
-
         E.g
             (1, Clusters.UnitTesting.Attributes.XYZAttribute('hello')) -- Write 'hello'
             to the XYZ attribute on the test cluster to endpoint 1
@@ -1740,7 +1811,10 @@ class ChipDeviceControllerBase():
                                           forceLegacyListEncoding=False)
 
     async def _WriteAttribute(self, nodeId: int,
-                              attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor]],
+                              attributes: typing.List[typing.Union[
+                                  typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor],
+                                  typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]
+                              ]],
                               timedRequestTimeoutMs: typing.Optional[int] = None,
                               interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
                               payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD, forceLegacyListEncoding: bool = False):
@@ -1752,14 +1826,7 @@ class ChipDeviceControllerBase():
 
         device = await self.GetConnectedDevice(nodeId, timeoutMs=interactionTimeoutMs, payloadCapability=payloadCapability)
 
-        attrs = []
-        for v in attributes:
-            if len(v) == 2:
-                attrs.append(ClusterAttribute.AttributeWriteRequest(
-                    v[0], v[1], 0, 0, v[1].value))  # type: ignore[attr-defined]  # 'value' added dynamically to ClusterAttributeDescriptor
-            else:
-                attrs.append(ClusterAttribute.AttributeWriteRequest(
-                    v[0], v[1], v[2], 1, v[1].value))
+        attrs = self._prepare_write_attribute_requests(attributes)
 
         ClusterAttribute.WriteAttributes(
             future, eventLoop, device.deviceProxy, attrs, timedRequestTimeoutMs=timedRequestTimeoutMs,
@@ -1767,7 +1834,10 @@ class ChipDeviceControllerBase():
         return await future
 
     async def TestOnlyWriteAttributeWithLegacyList(self, nodeId: int,
-                                                   attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor]],
+                                                   attributes: typing.List[typing.Union[
+                                                       typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor],
+                                                       typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]
+                                                   ]],
                                                    timedRequestTimeoutMs: typing.Optional[int] = None,
                                                    interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
                                                    payloadCapability: int = TransportPayloadCapability.MRP_PAYLOAD):
@@ -1897,29 +1967,26 @@ class ChipDeviceControllerBase():
         if pathTuple == ('*') or pathTuple == ():
             # Wildcard
             return ClusterAttribute.AttributePath()
-        elif not isinstance(pathTuple, tuple):
+        if not isinstance(pathTuple, tuple):
             if isinstance(pathTuple, int):
                 return ClusterAttribute.AttributePath(EndpointId=pathTuple)
-            elif issubclass(pathTuple, ClusterObjects.Cluster):  # type: ignore[misc, arg-type]
+            if issubclass(pathTuple, ClusterObjects.Cluster):  # type: ignore[misc, arg-type]
                 return ClusterAttribute.AttributePath.from_cluster(EndpointId=None, Cluster=pathTuple)  # type: ignore[arg-type]
-            elif issubclass(pathTuple, ClusterObjects.ClusterAttributeDescriptor):  # type: ignore[arg-type]
+            if issubclass(pathTuple, ClusterObjects.ClusterAttributeDescriptor):  # type: ignore[arg-type]
                 return ClusterAttribute.AttributePath.from_attribute(EndpointId=None, Attribute=pathTuple)  # type: ignore[arg-type]
-            else:
-                raise ValueError("Unsupported Attribute Path")
-        else:
-            # endpoint + (cluster) attribute / endpoint + cluster
-            if issubclass(pathTuple[1], ClusterObjects.Cluster):  # type: ignore[misc]
-                return ClusterAttribute.AttributePath.from_cluster(
-                    EndpointId=pathTuple[0],  # type: ignore[arg-type]
-                    Cluster=pathTuple[1]  # type: ignore[arg-type, misc]
-                )
-            elif issubclass(pathTuple[1], ClusterAttribute.ClusterAttributeDescriptor):  # type: ignore[arg-type, misc]
-                return ClusterAttribute.AttributePath.from_attribute(
-                    EndpointId=pathTuple[0],    # type: ignore[arg-type]
-                    Attribute=pathTuple[1]  # type: ignore[arg-type, misc]
-                )
-            else:
-                raise ValueError("Unsupported Attribute Path")
+            raise ValueError("Unsupported Attribute Path")
+        # endpoint + (cluster) attribute / endpoint + cluster
+        if issubclass(pathTuple[1], ClusterObjects.Cluster):  # type: ignore[misc]
+            return ClusterAttribute.AttributePath.from_cluster(
+                EndpointId=pathTuple[0],  # type: ignore[arg-type]
+                Cluster=pathTuple[1]  # type: ignore[arg-type, misc]
+            )
+        if issubclass(pathTuple[1], ClusterAttribute.ClusterAttributeDescriptor):  # type: ignore[arg-type, misc]
+            return ClusterAttribute.AttributePath.from_attribute(
+                EndpointId=pathTuple[0],    # type: ignore[arg-type]
+                Attribute=pathTuple[1]  # type: ignore[arg-type, misc]
+            )
+        raise ValueError("Unsupported Attribute Path")
 
     def _parseDataVersionFilterTuple(self, pathTuple: typing.List[typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int]]):
         endpoint = None
@@ -1956,40 +2023,36 @@ class ChipDeviceControllerBase():
         if pathTuple in [('*'), ()]:
             # Wildcard
             return ClusterAttribute.EventPath()
-        elif not isinstance(pathTuple, tuple):
+        if not isinstance(pathTuple, tuple):
             # mypy refactor (PR https://github.com/project-chip/connectedhomeip/pull/39827):
             # instantiate class types before passing to from_cluster/from_event
             # because these expect instances, not classes.
             if isinstance(pathTuple, int):
                 return ClusterAttribute.EventPath(EndpointId=pathTuple)
-            elif isinstance(pathTuple, type) and issubclass(pathTuple, ClusterObjects.Cluster):
+            if isinstance(pathTuple, type) and issubclass(pathTuple, ClusterObjects.Cluster):
                 return ClusterAttribute.EventPath.from_cluster(EndpointId=None, Cluster=pathTuple)
-            elif isinstance(pathTuple, type) and issubclass(pathTuple, ClusterObjects.ClusterEvent):
+            if isinstance(pathTuple, type) and issubclass(pathTuple, ClusterObjects.ClusterEvent):
                 return ClusterAttribute.EventPath.from_event(EndpointId=None, Event=pathTuple)
-            else:
-                raise ValueError("Unsupported Event Path")
-        else:
-            if pathTuple[0] == '*':
-                return ClusterAttribute.EventPath(Urgent=pathTuple[-1])
-            else:
-                urgent = bool(pathTuple[-1]) if len(pathTuple) > 2 else False
-                # endpoint + (cluster) event / endpoint + cluster
-                # mypy errors ignored due to valid use of dynamic types (e.g., int, str, or class types).
-                # Fixing these typing errors is a high risk to affect existing functionality.
-                # These mismatches are intentional and safe within the current logic.
-                if issubclass(pathTuple[1], ClusterObjects.Cluster):  # type: ignore[arg-type]
-                    return ClusterAttribute.EventPath.from_cluster(
-                        EndpointId=pathTuple[0],    # type: ignore[arg-type]
-                        Cluster=pathTuple[1], Urgent=urgent  # type: ignore[arg-type]
-                    )
-                elif issubclass(pathTuple[1], ClusterAttribute.ClusterEvent):  # type: ignore[arg-type]
-                    return ClusterAttribute.EventPath.from_event(
-                        EndpointId=pathTuple[0],    # type: ignore[arg-type]
-                        Event=pathTuple[1],  # type: ignore[arg-type]
-                        Urgent=urgent
-                    )
-                else:
-                    raise ValueError("Unsupported Attribute Path")
+            raise ValueError("Unsupported Event Path")
+        if pathTuple[0] == '*':
+            return ClusterAttribute.EventPath(Urgent=pathTuple[-1])
+        urgent = bool(pathTuple[-1]) if len(pathTuple) > 2 else False
+        # endpoint + (cluster) event / endpoint + cluster
+        # mypy errors ignored due to valid use of dynamic types (e.g., int, str, or class types).
+        # Fixing these typing errors is a high risk to affect existing functionality.
+        # These mismatches are intentional and safe within the current logic.
+        if issubclass(pathTuple[1], ClusterObjects.Cluster):  # type: ignore[arg-type]
+            return ClusterAttribute.EventPath.from_cluster(
+                EndpointId=pathTuple[0],    # type: ignore[arg-type]
+                Cluster=pathTuple[1], Urgent=urgent  # type: ignore[arg-type]
+            )
+        if issubclass(pathTuple[1], ClusterAttribute.ClusterEvent):  # type: ignore[arg-type]
+            return ClusterAttribute.EventPath.from_event(
+                EndpointId=pathTuple[0],    # type: ignore[arg-type]
+                Event=pathTuple[1],  # type: ignore[arg-type]
+                Urgent=urgent
+            )
+        raise ValueError("Unsupported Attribute Path")
 
     async def Read(
         self,
@@ -2204,8 +2267,7 @@ class ChipDeviceControllerBase():
                               payloadCapability=payloadCapability)
         if isinstance(res, ClusterAttribute.SubscriptionTransaction):
             return res
-        else:
-            return res.attributes
+        return res.attributes
 
     async def ReadEvent(
         self,
@@ -2278,8 +2340,7 @@ class ChipDeviceControllerBase():
                               autoResubscribe=autoResubscribe, payloadCapability=payloadCapability)
         if isinstance(res, ClusterAttribute.SubscriptionTransaction):
             return res
-        else:
-            return res.events
+        return res.events
 
     def SetIpk(self, ipk: bytes):
         '''

@@ -87,7 +87,7 @@ class TC_LUNIT_3_1(MatterBaseTest):
     @run_if_endpoint_matches(has_cluster(Clusters.UnitLocalization) and has_attribute(Clusters.UnitLocalization.Attributes.TemperatureUnit))
     async def test_TC_LUNIT_3_1(self):
 
-        endpoint = self.get_endpoint(default=0)
+        endpoint = self.get_endpoint()
         attributes = Clusters.UnitLocalization.Attributes
         features = await self.read_lunit_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
         self.supports_TEMP = bool(features & Clusters.UnitLocalization.Bitmaps.Feature.kTemperatureUnit)
@@ -159,7 +159,7 @@ class TC_LUNIT_3_1(MatterBaseTest):
                 self.mark_current_step_skipped()
 
         else:
-            self.skip_all_remaining_steps(1)
+            self.mark_all_remaining_steps_skipped(1)
             return
 
 

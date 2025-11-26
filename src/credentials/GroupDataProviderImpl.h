@@ -161,11 +161,11 @@ protected:
             mProvider(provider)
 
         {
-            Initialize(encryptionKey, hash, privacyKey);
+            TEMPORARY_RETURN_IGNORED Initialize(encryptionKey, hash, privacyKey);
         }
 
-        void Initialize(const Crypto::Symmetric128BitsKeyByteArray & encryptionKey, uint16_t hash,
-                        const Crypto::Symmetric128BitsKeyByteArray & privacyKey)
+        CHIP_ERROR Initialize(const Crypto::Symmetric128BitsKeyByteArray & encryptionKey, uint16_t hash,
+                              const Crypto::Symmetric128BitsKeyByteArray & privacyKey)
         {
             ReleaseKeys();
             mKeyHash = hash;
@@ -176,8 +176,8 @@ protected:
             // like more work, so let's use the transitional code below for now.
 
             Crypto::SessionKeystore * keystore = mProvider.GetSessionKeystore();
-            keystore->CreateKey(encryptionKey, mEncryptionKey);
-            keystore->CreateKey(privacyKey, mPrivacyKey);
+            ReturnErrorOnFailure(keystore->CreateKey(encryptionKey, mEncryptionKey));
+            return keystore->CreateKey(privacyKey, mPrivacyKey);
         }
 
         void ReleaseKeys()

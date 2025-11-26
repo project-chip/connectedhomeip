@@ -23,10 +23,10 @@ from matter.idl.matter_idl_types import (ApiMaturity, Attribute, AttributeQualit
 from .base import BaseHandler, HandledDepth
 from .context import Context
 from .derivation import AddBaseInfoPostProcessor
-from .parsing import (ApplyConstraint, AttributesToAttribute, AttributesToBitFieldConstantEntry, AttributesToCommand,
-                      AttributesToEvent, AttributesToField, NormalizeDataType, NormalizeName, ParseInt, StringToAccessPrivilege)
+from .parsing import (AttributesToAttribute, AttributesToBitFieldConstantEntry, AttributesToCommand, AttributesToEvent,
+                      AttributesToField, NormalizeDataType, NormalizeName, ParseInt, ParseOptionalInt, StringToAccessPrivilege)
 
-LOGGER = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 def is_unused_name(attrs: AttributesImpl):
@@ -56,18 +56,16 @@ class FeaturesHandler(BaseHandler):
     def GetNextProcessor(self, name: str, attrs: AttributesImpl):
         if name in {"section", "optionalConform"}:
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        elif name == "feature":
+        if name == "feature":
             if is_unused_name(attrs):
-                LOGGER.warning(
-                    f"Ignoring feature constant data for {attrs['name']}")
+                log.warning("Ignoring feature constant data for '%s'", attrs['name'])
                 return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
 
             self._bitmap.entries.append(
                 AttributesToBitFieldConstantEntry(attrs))
             # assume everything handled. Sub-item is only section
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        else:
-            return BaseHandler(self.context)
+        return BaseHandler(self.context)
 
 
 class BitmapHandler(BaseHandler):
@@ -110,13 +108,12 @@ class BitmapHandler(BaseHandler):
         if name == "section":
             # Documentation data, skipped
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        elif name == "bitfield":
+        if name == "bitfield":
             self._bitmap.entries.append(
                 AttributesToBitFieldConstantEntry(attrs))
             # Assume fully handled. We do not parse "mandatoryConform and such"
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        else:
-            return BaseHandler(self.context)
+        return BaseHandler(self.context)
 
 
 class MandatoryConformFieldHandler(BaseHandler):
@@ -136,6 +133,67 @@ class MandatoryConformFieldHandler(BaseHandler):
             self._field.qualities |= FieldQuality.OPTIONAL
 
 
+class LengthBetweenHandler(BaseHandler):
+    def __init__(self, context: Context, field: Field):
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
+        self._field = field
+
+    def GetNextProcessor(self, name: str, attrs: AttributesImpl):
+        if name == "from":
+            self._field.data_type.min_length = ParseOptionalInt(attrs["value"])
+        elif name == "to":
+            self._field.data_type.max_length = ParseOptionalInt(attrs["value"])
+        else:
+            log.error("UNKNOWN constraint type '%s'", name)
+        return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
+
+
+class ConstraintHandler(BaseHandler):
+    def __init__(self, context: Context, field: Field):
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
+        self._field = field
+
+    def GetNextProcessor(self, name: str, attrs: AttributesImpl):
+        if name == "allowed":
+            pass  # unsure what to do allowed
+        elif name == "desc":
+            pass  # free-form description
+        elif name in {"countBetween", "maxCount", "minCount", "maxCodePoints"}:
+            pass  # cannot implement count
+        elif name == "min":
+            # field.data_type.min_value = ParseOptionalInt(attrs["value"])
+            pass
+        elif name == "max":
+            # Data with formulas like `value="1500 - StartTime"` cannot be handled
+            # field.data_type.max_value = ParseOptionalInt(attrs["value"])
+            pass
+        elif name == "between":
+            # TODO: examples existing in the parsed data which are NOT
+            #       handled:
+            #         - from="-2.5°C" to="2.5°C"
+            #         - from="0%" to="100%"
+            # field.data_type.min_value = ParseOptionalInt(attrs["from"])
+            # field.data_type.max_value = ParseOptionalInt(attrs["to"])
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        elif name == "maxLength":
+            # some items may have a "constant" like:
+            #   <maxLength>
+            #     <constant name="RESP_MAX" value="900"/>
+            #   </maxLength>
+            # we skip that for now...
+            if "value" in attrs:
+                self._field.data_type.max_length = ParseOptionalInt(attrs["value"])
+            else:
+                log.warning("could not parse maxLength for %s (is it a constant sub-item?)", self._field.name)
+        elif name == "minLength":
+            self._field.data_type.min_length = ParseOptionalInt(attrs["value"])
+        elif name == "lengthBetween":
+            return LengthBetweenHandler(self.context, self._field)
+        else:
+            log.error("UNKNOWN constraint type '%s'", name)
+        return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
+
+
 class FieldHandler(BaseHandler):
     def __init__(self, context: Context, field: Field):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
@@ -143,34 +201,32 @@ class FieldHandler(BaseHandler):
 
     def GetNextProcessor(self, name: str, attrs: AttributesImpl):
         if name == "constraint":
-            ApplyConstraint(attrs, self._field)
-            return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
-        elif name == "mandatoryConform":
+            return ConstraintHandler(self.context, self._field)
+        if name == "mandatoryConform":
             return MandatoryConformFieldHandler(self.context, self._field)
-        elif name == "optionalConform":
+        if name == "optionalConform":
             self._field.qualities |= FieldQuality.OPTIONAL
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        elif name == "access":
+        if name in {'disallowConform', 'describedConform'}:
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        if name == "access":
             # per-field access is not something we model
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
-        elif name == "quality":
+        if name == "quality":
             if "nullable" in attrs and attrs["nullable"] != "false":
                 self._field.qualities = self._field.qualities | FieldQuality.NULLABLE
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
-        elif name == "enum":
-            LOGGER.warning(
-                f"Anonymous enumeration not supported when handling field {self._field.name}")
+        if name == "enum":
+            log.warning("Anonymous enumeration not supported when handling field '%s'", self._field.name)
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        elif name == "bitmap":
-            LOGGER.warning(
-                f"Anonymous bitmap not supported when handling field {self._field.name}")
+        if name == "bitmap":
+            log.warning("Anonymous bitmap not supported when handling field '%s'", self._field.name)
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        elif name == "entry":
+        if name == "entry":
             # Lists have "type=list" and then the type is inside entry
 
             if self._field.data_type.name != "list":
-                LOGGER.warning(
-                    f"Entry type provided for non-list element {self._field.name}")
+                log.warning("Entry type provided for non-list element '%s'", self._field.name)
 
             assert "type" in attrs
 
@@ -178,8 +234,7 @@ class FieldHandler(BaseHandler):
             self._field.data_type.name = NormalizeDataType(attrs["type"])
 
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
-        else:
-            return BaseHandler(self.context)
+        return BaseHandler(self.context)
 
 
 class StructHandler(BaseHandler):
@@ -195,12 +250,11 @@ class StructHandler(BaseHandler):
         if name == "section":
             # Documentation data, skipped
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        elif name == "field":
+        if name == "field":
             field = AttributesToField(attrs)
             self._struct.fields.append(field)
             return FieldHandler(self.context, field)
-        else:
-            return BaseHandler(self.context)
+        return BaseHandler(self.context)
 
 
 class EventHandler(BaseHandler):
@@ -216,20 +270,19 @@ class EventHandler(BaseHandler):
         if name == "section":
             # Documentation data, skipped
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        elif name == "field":
+        if name == "field":
             field = AttributesToField(attrs)
             self._event.fields.append(field)
             return FieldHandler(self.context, field)
-        elif name == "mandatoryConform":
+        if name == "mandatoryConform":
             # assume handled (we do not record conformance in IDL)
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        elif name == "access":
+        if name == "access":
             if "readPrivilege" in attrs:
                 self._event.readacl = StringToAccessPrivilege(
                     attrs["readPrivilege"])
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
-        else:
-            return BaseHandler(self.context)
+        return BaseHandler(self.context)
 
 
 class EnumHandler(BaseHandler):
@@ -264,11 +317,11 @@ class EnumHandler(BaseHandler):
         if name == "section":
             # Documentation data, skipped
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        elif name == "item":
+        if name == "item":
             for key in ["name", "value"]:
                 if key not in attrs:
-                    LOGGER.error("Enumeration %s entry is missing a '%s' entry (at %r)",
-                                 self._enum.name, key, self.context.GetCurrentLocationMeta())
+                    log.error("Enumeration '%s' entry is missing a '%s' entry (at %r)",
+                              self._enum.name, key, self.context.GetCurrentLocationMeta())
                     # bad entry, nothing I can do about it.
                     return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
 
@@ -278,8 +331,7 @@ class EnumHandler(BaseHandler):
             )
             # Assume fully handled
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        else:
-            return BaseHandler(self.context)
+        return BaseHandler(self.context)
 
 
 class EventsHandler(BaseHandler):
@@ -291,10 +343,21 @@ class EventsHandler(BaseHandler):
         if name == "section":
             # Documentation data, skipped
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        elif name == "event":
+        if name == "event":
             return EventHandler(self.context, self._cluster, attrs)
-        else:
-            return BaseHandler(self.context)
+        return BaseHandler(self.context)
+
+
+class NestedConformHandler(BaseHandler):
+    def __init__(self, context: Context, attribute: Attribute):
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
+        self._attribute = attribute
+
+    def GetNextProcessor(self, name: str, attrs: AttributesImpl):
+        if name == "provisionalConform":
+            self._attribute.api_maturity = ApiMaturity.PROVISIONAL
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        return BaseHandler(self.context)
 
 
 class AttributeHandler(BaseHandler):
@@ -313,14 +376,14 @@ class AttributeHandler(BaseHandler):
 
     def GetNextProcessor(self, name: str, attrs: AttributesImpl):
         if name == "enum":
-            LOGGER.warning(
-                f"Anonymous enumeration not supported when handling attribute {self._cluster.name}::{self._attribute.definition.name}")
+            log.warning("Anonymous enumeration not supported when handling attribute '%s::%s'",
+                        self._cluster.name, self._attribute.definition.name)
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        elif name == "bitmap":
-            LOGGER.warning(
-                f"Anonymous bitmap not supported when handling attribute {self._cluster.name}::{self._attribute.definition.name}")
+        if name == "bitmap":
+            log.warning("Anonymous bitmap not supported when handling attribute '%s::%s'",
+                        self._cluster.name, self._attribute.definition.name)
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        elif name == "access":
+        if name == "access":
             if "readPrivilege" in attrs:
                 self._attribute.readacl = StringToAccessPrivilege(
                     attrs["readPrivilege"])
@@ -338,27 +401,26 @@ class AttributeHandler(BaseHandler):
             if "timed" in attrs and attrs["timed"] != "false":
                 self._attribute.qualities = self._attribute.qualities | AttributeQuality.TIMED_WRITE
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
-        elif name == "quality":
+        if name == "quality":
             # Out of the many interesting bits, only "nullable" seems relevant for codegen
             if "nullable" in attrs and attrs["nullable"] != "false":
                 self._attribute.definition.qualities |= FieldQuality.NULLABLE
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
-        elif name in {"optionalConform", "otherwiseConform"}:
+        if name in {"optionalConform", "otherwiseConform"}:
             self._attribute.definition.qualities |= FieldQuality.OPTIONAL
-            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        elif name == "mandatoryConform":
+            # we have more conformance logic, maybe even provisional conform, so recurse
+            return NestedConformHandler(self.context, self._attribute)
+        if name == "mandatoryConform":
             return MandatoryConformFieldHandler(self.context, self._attribute.definition)
-        elif name == "provisionalConform":
+        if name == "provisionalConform":
             self._attribute.api_maturity = ApiMaturity.PROVISIONAL
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        elif name == "deprecateConform":
+        if name == "deprecateConform":
             self._deprecated = True
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        elif name == "constraint":
-            ApplyConstraint(attrs, self._attribute.definition)
-            return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
-        else:
-            return BaseHandler(self.context)
+        if name == "constraint":
+            return ConstraintHandler(self.context, self._attribute.definition)
+        return BaseHandler(self.context)
 
 
 class AttributesHandler(BaseHandler):
@@ -369,11 +431,10 @@ class AttributesHandler(BaseHandler):
     def GetNextProcessor(self, name: str, attrs: AttributesImpl):
         if name == "attribute":
             if is_unused_name(attrs):
-                LOGGER.warning(f"Ignoring attribute data for {attrs['name']}")
+                log.warning("Ignoring attribute data for '%s'", attrs['name'])
                 return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
             return AttributeHandler(self.context, self._cluster, attrs)
-        else:
-            return BaseHandler(self.context)
+        return BaseHandler(self.context)
 
 
 class CommandHandler(BaseHandler):
@@ -406,7 +467,8 @@ class CommandHandler(BaseHandler):
         elif ("direction" in attrs) and attrs["direction"] == "responseFromServer":
             is_command = False  # response
         else:
-            LOGGER.warning("Could not clearly determine command direction: %s", attrs.items())
+            log.warning("Could not clearly determine command direction: %s",
+                        attrs.items())
             # Do a best-guess. However we should NOT need to guess once
             # we have a good data set
             is_command = not attrs["name"].endswith("Response")
@@ -441,15 +503,14 @@ class CommandHandler(BaseHandler):
         if name in {"mandatoryConform", "optionalConform", "disallowConform"}:
             # Unclear how commands may be optional or mandatory
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        elif name == "access":
+        if name == "access":
             # <access invokePrivilege="admin" timed="true"/>
             if "invokePrivilege" in attrs:
                 if self._command:
                     self._command.invokeacl = StringToAccessPrivilege(
                         attrs["invokePrivilege"])
                 else:
-                    LOGGER.warning(
-                        f"Ignoring invoke privilege for {self._struct.name}")
+                    log.warning("Ignoring invoke privilege for '%s'", self._struct.name)
 
             if self._command:
                 if "timed" in attrs and attrs["timed"] != "false":
@@ -459,12 +520,11 @@ class CommandHandler(BaseHandler):
                     self._command.qualities |= CommandQuality.FABRIC_SCOPED
 
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
-        elif name == "field":
+        if name == "field":
             field = AttributesToField(attrs)
             self._struct.fields.append(field)
             return FieldHandler(self.context, field)
-        else:
-            return BaseHandler(self.context)
+        return BaseHandler(self.context)
 
 
 class CommandsHandler(BaseHandler):
@@ -475,23 +535,21 @@ class CommandsHandler(BaseHandler):
     def GetNextProcessor(self, name: str, attrs: AttributesImpl):
         if name == "command":
             if is_unused_name(attrs):
-                LOGGER.warning(f"Ignoring command data for {attrs['name']}")
+                log.warning("Ignoring command data for '%s'", attrs['name'])
                 return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
 
             if 'id' not in attrs:
-                LOGGER.error(
-                    f"Could not process command {attrs['name']}: no id")
+                log.error("Could not process command '%s': no id", attrs['name'])
                 # TODO: skip over these without failing the processing
                 #
                 # https://github.com/csa-data-model/projects/issues/364
                 return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
 
             return CommandHandler(self.context, self._cluster, attrs)
-        elif name in {"mandatoryConform", "optionalConform"}:
+        if name in {"mandatoryConform", "optionalConform"}:
             # Nothing to tag conformance
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        else:
-            return BaseHandler(self.context)
+        return BaseHandler(self.context)
 
 
 class RevisionHistoryHandler(BaseHandler):
@@ -515,16 +573,13 @@ class RevisionHistoryHandler(BaseHandler):
     def GetNextProcessor(self, name: str, attrs: AttributesImpl):
         if name == "revision":
             if 'revision' not in attrs:
-                LOGGER.error(
-                    f"Could not find a revision for {attrs}: no revision data")
+                log.error("Could not find a revision for %s: no revision data", attrs)
                 return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-            else:
-                rev = int(attrs['revision'])
-                if self._cluster.revision < rev:
-                    self._cluster.revision = rev
+            rev = int(attrs['revision'])
+            if self._cluster.revision < rev:
+                self._cluster.revision = rev
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
-        else:
-            return BaseHandler(self.context)
+        return BaseHandler(self.context)
 
 
 class DataTypesHandler(BaseHandler):
@@ -536,19 +591,41 @@ class DataTypesHandler(BaseHandler):
         if name == "section":
             # Documentation data, skipped
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        elif name == "number":
+        if name == "number":
             # Seems like a documentation of a number format
             #
             # TODO: actually ensure this has no meaning
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        elif name == "enum":
+        if name == "enum":
             return EnumHandler(self.context, self._cluster, attrs)
-        elif name == "bitmap":
+        if name == "bitmap":
             return BitmapHandler(self.context, self._cluster, attrs)
-        elif name == "struct":
+        if name == "struct":
             return StructHandler(self.context, self._cluster, attrs)
-        else:
-            return BaseHandler(self.context)
+        return BaseHandler(self.context)
+
+
+class ClusterIdHandler(BaseHandler):
+    def __init__(self, context: Context, cluster: Cluster):
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
+        self._cluster = cluster
+
+    def GetNextProcessor(self, name: str, attrs: AttributesImpl):
+        if name == "provisionalConform":
+            self._cluster.api_maturity = ApiMaturity.PROVISIONAL
+            return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
+        return BaseHandler(self.context)
+
+
+class ClusterIdsHandler(BaseHandler):
+    def __init__(self, context: Context, cluster: Cluster):
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
+        self._cluster = cluster
+
+    def GetNextProcessor(self, name: str, attrs: AttributesImpl):
+        if name == "clusterId":
+            return ClusterIdHandler(self.context, self._cluster)
+        return BaseHandler(self.context)
 
 
 class ClusterHandlerPostProcessing(enum.Enum):
@@ -610,10 +687,12 @@ class ClusterHandler(BaseHandler):
     def GetNextProcessor(self, name: str, attrs: AttributesImpl):
         if name == "revisionHistory":
             return RevisionHistoryHandler(self.context, self._cluster)
-        elif name == "section":
+        if name == "clusterIds":
+            return ClusterIdsHandler(self.context, self._cluster)
+        if name == "section":
             # Documentation data, skipped
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        elif name == "classification":
+        if name == "classification":
             if attrs['hierarchy'] == 'derived':
                 # This is a derived cluster. We have to add everything from the
                 # base cluster
@@ -625,15 +704,14 @@ class ClusterHandler(BaseHandler):
             # other elements like picsCode, scope and primaryTransaction seem to have
             # no direct mapping in the data model
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        elif name == "features":
+        if name == "features":
             return FeaturesHandler(self.context, self._cluster)
-        elif name == "dataTypes":
+        if name == "dataTypes":
             return DataTypesHandler(self.context, self._cluster)
-        elif name == "events":
+        if name == "events":
             return EventsHandler(self.context, self._cluster)
-        elif name == "attributes":
+        if name == "attributes":
             return AttributesHandler(self.context, self._cluster)
-        elif name == "commands":
+        if name == "commands":
             return CommandsHandler(self.context, self._cluster)
-        else:
-            return BaseHandler(self.context)
+        return BaseHandler(self.context)

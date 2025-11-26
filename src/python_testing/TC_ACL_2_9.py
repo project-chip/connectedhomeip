@@ -61,6 +61,9 @@ class TC_ACL_2_9(MatterBaseTest):
     def desc_TC_ACL_2_9(self) -> str:
         return "[TC-ACL-2.9] Cluster access"
 
+    def pics_TC_ACL_2_9(self) -> list[str]:
+        return ['ACL.S.A0001']
+
     def steps_TC_ACL_2_9(self) -> list[TestStep]:
         steps = [
             TestStep(

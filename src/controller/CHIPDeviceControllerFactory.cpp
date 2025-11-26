@@ -26,7 +26,6 @@
 
 #include <app/InteractionModelEngine.h>
 #include <app/OperationalSessionSetup.h>
-#include <app/TimerDelegates.h>
 #include <app/reporting/ReportSchedulerImpl.h>
 #include <app/util/DataModelHandler.h>
 #include <lib/core/ErrorStr.h>
@@ -35,6 +34,7 @@
 #if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
+#include <platform/DefaultTimerDelegate.h>
 #endif
 
 #include <app/server/Dnssd.h>

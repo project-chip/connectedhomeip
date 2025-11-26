@@ -57,6 +57,7 @@
 
 # This test requires a TH_SERVER application. Please specify with --string-arg th_server_app_path:<path_to_app>
 
+import asyncio
 import logging
 import os
 import random
@@ -221,7 +222,7 @@ class TC_CCTRL_2_3(MatterBaseTest):
 
         th_server_fabrics_new = None
         while time_remaining > 0:
-            time.sleep(2)
+            await asyncio.sleep(2)
             th_server_fabrics_new = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, fabric_filtered=False)
             if previous_number_th_server_fabrics != len(th_server_fabrics_new):
                 break

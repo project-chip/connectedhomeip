@@ -39,7 +39,7 @@ chip_detail_logging = sl_verbose_mode
 # Sanity check
 assert(chip_enable_wifi)
 silabs_plat_dir = "${chip_root}/src/platform/silabs"
-silabs_plat_si91x_wifi_dir = "${chip_root}/src/platform/silabs/SiWx917/wifi"
+silabs_plat_si91x_wifi_dir = "${chip_root}/src/platform/silabs/wifi"
 
 config("chip_examples_project_config") {
   # Link options that provide a replacement for dynamic memory operations in standard

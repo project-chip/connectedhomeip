@@ -232,6 +232,7 @@ static_library("interaction-model") {
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/lib/support:static-support",
+    "${chip_root}/src/lib/support:timer-delegate",
     "${chip_root}/src/protocols/interaction_model",
     "${chip_root}/src/protocols/secure_channel",
     "${chip_root}/src/system",
@@ -538,8 +539,6 @@ static_library("app") {
     "FailSafeContext.cpp",
     "FailSafeContext.h",
     "ReadHandler.cpp",
-    "TimerDelegates.cpp",
-    "TimerDelegates.h",
     "WriteHandler.cpp",
 
     # TODO: the following items cannot be included due to interaction-model circularity

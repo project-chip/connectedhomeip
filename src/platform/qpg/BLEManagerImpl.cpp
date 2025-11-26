@@ -122,7 +122,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
 #endif
     VerifyOrExit(sbleAdvTimeoutTimer != NULL, err = CHIP_ERROR_INCORRECT_STATE);
 
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
 exit:
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::Init() complete");
@@ -139,7 +139,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
     if (mFlags.Has(Flags::kAdvertisingEnabled) != val)
     {
         mFlags.Set(Flags::kAdvertisingEnabled, val);
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 
 exit:
@@ -160,7 +160,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     mFlags.Set(Flags::kAdvertisingRefreshNeeded);
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
     return CHIP_NO_ERROR;
 }
 
@@ -234,7 +234,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         // Force the advertising state to be refreshed to reflect new provisioning state.
         mFlags.Set(Flags::kAdvertisingRefreshNeeded);
 
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
         break;
 
@@ -710,7 +710,7 @@ void BLEManagerImpl::HandleDmMsg(qvCHIP_Ble_DmEvt_t * pDmEvt)
         // Receiving a connection stops the advertising processes.  So force a refresh of the advertising
         // state.
         mFlags.Set(Flags::kAdvertisingRefreshNeeded);
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
         break;
     }
     case QVCHIP_DM_CONN_CLOSE_IND: {
@@ -751,7 +751,7 @@ void BLEManagerImpl::HandleDmMsg(qvCHIP_Ble_DmEvt_t * pDmEvt)
         }
 
         mFlags.Set(Flags::kAdvertisingRefreshNeeded);
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
         break;
     }
     case QVCHIP_DM_CONN_UPDATE_IND: {
@@ -895,8 +895,8 @@ void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
         /* Stop advertising and defer restart for when stop confirmation is received from the stack */
         ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start slow advertisement");
         sInstance.mFlags.Set(Flags::kRestartAdvertising);
-        sInstance.StopAdvertising();
-        BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
+        TEMPORARY_RETURN_IGNORED sInstance.StopAdvertising();
+        TEMPORARY_RETURN_IGNORED BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
     }
 }
 

@@ -62,20 +62,7 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial revision"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
-  <conditions>
-    <condition name="AccessDevice" summary="The device grant access to a secured building or restricted area."/>
-  </conditions>
   <clusters>
-    <cluster id="0x0004" name="Groups" side="server">
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform>
-          <notTerm>
-            <condition name="AccessDevice"/>
-          </notTerm>
-        </optionalConform>
-      </otherwiseConform>
-    </cluster>
     <cluster id="0x0102" name="Window Covering" side="server">
       <disallowConform/>
     </cluster>
@@ -84,13 +71,6 @@ Davis, CA 95616, USA
     </cluster>
     <cluster id="0x0105" name="Closure Dimension" side="server">
       <mandatoryConform/>
-      <features>
-        <feature code="ACC">
-          <mandatoryConform>
-            <condition name="AccessDevice"/>
-          </mandatoryConform>
-        </feature>
-      </features>
     </cluster>
   </clusters>
 </deviceType>

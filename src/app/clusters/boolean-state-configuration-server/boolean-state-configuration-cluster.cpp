@@ -1,6 +1,5 @@
 /**
- *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,448 +14,386 @@
  *    limitations under the License.
  *
  */
+#include <app/clusters/boolean-state-configuration-server/boolean-state-configuration-cluster.h>
 
-#include "boolean-state-configuration-server.h"
-
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
-#include <app/AttributeAccessInterface.h>
-#include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/CommandHandler.h>
-#include <app/ConcreteCommandPath.h>
-#include <app/EventLogging.h>
 #include <app/SafeAttributePersistenceProvider.h>
-#include <app/data-model/Encode.h>
-#include <app/util/attribute-storage.h>
-#include <app/util/config.h>
+#include <app/data-model/Decode.h>
+#include <app/persistence/AttributePersistence.h>
+#include <app/server-cluster/AttributeListBuilder.h>
+#include <clusters/BooleanStateConfiguration/AttributeIds.h>
+#include <clusters/BooleanStateConfiguration/Commands.h>
+#include <clusters/BooleanStateConfiguration/Events.h>
+#include <clusters/BooleanStateConfiguration/Metadata.h>
 #include <lib/core/CHIPError.h>
-#include <lib/support/logging/CHIPLogging.h>
-#include <platform/CHIPDeviceConfig.h>
+#include <lib/support/CodeUtils.h>
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
+#include <algorithm>
+
+using namespace chip::app::DataModel;
+using namespace chip::app::Clusters::BooleanStateConfiguration;
 using namespace chip::app::Clusters::BooleanStateConfiguration::Attributes;
-using chip::app::Clusters::BooleanStateConfiguration::Delegate;
-using chip::Protocols::InteractionModel::Status;
+using namespace chip::Protocols::InteractionModel;
 
-static constexpr size_t kBooleanStateConfigurationDelegateTableSize =
-    MATTER_DM_BOOLEAN_STATE_CONFIGURATION_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+namespace chip::app::Clusters {
 
-static_assert(kBooleanStateConfigurationDelegateTableSize <= kEmberInvalidEndpointIndex,
-              "BooleanStateConfiguration Delegate table size error");
+constexpr uint8_t kAllKnownAlarmModes =
+    static_cast<uint8_t>(AlarmModeBitmap::kAudible) | static_cast<uint8_t>(AlarmModeBitmap::kVisual);
 
-static constexpr uint8_t kMinSupportedSensitivityLevels = 2;
-static constexpr uint8_t kMaxSupportedSensitivityLevels = 10;
+BooleanStateConfigurationCluster::BooleanStateConfigurationCluster(EndpointId endpointId,
+                                                                   BitMask<BooleanStateConfiguration::Feature> features,
+                                                                   OptionalAttributesSet optionalAttributes,
+                                                                   const StartupConfiguration & config) :
+    DefaultServerCluster({ endpointId, BooleanStateConfiguration::Id }),
+    mFeatures(features), mOptionalAttributes([&features, &optionalAttributes]() -> FullOptionalAttributesSet {
+        // constructs the attribute set, that once constructed stays const
+        AttributeSet enabledOptionalAttributes;
 
-static CHIP_ERROR StoreCurrentSensitivityLevel(EndpointId ep, uint8_t level);
+        if (features.Has(Feature::kSensitivityLevel))
+        {
+            enabledOptionalAttributes.ForceSet<CurrentSensitivityLevel::Id>();
+            enabledOptionalAttributes.ForceSet<SupportedSensitivityLevels::Id>();
+            if (optionalAttributes.IsSet(DefaultSensitivityLevel::Id))
+            {
+                enabledOptionalAttributes.ForceSet<DefaultSensitivityLevel::Id>();
+            }
+        }
 
-namespace {
-Delegate * gDelegateTable[kBooleanStateConfigurationDelegateTableSize] = { nullptr };
+        if (features.Has(Feature::kVisual) || features.Has(Feature::kAudible))
+        {
+            enabledOptionalAttributes.ForceSet<AlarmsActive::Id>();
+            enabledOptionalAttributes.ForceSet<AlarmsSupported::Id>();
 
-Delegate * GetDelegate(EndpointId endpoint)
+            if (optionalAttributes.IsSet(AlarmsEnabled::Id))
+            {
+                enabledOptionalAttributes.ForceSet<AlarmsEnabled::Id>();
+            }
+        }
+
+        if (features.Has(Feature::kAlarmSuppress))
+        {
+            enabledOptionalAttributes.ForceSet<AlarmsSuppressed::Id>();
+        }
+
+        if (optionalAttributes.IsSet(SensorFault::Id))
+        {
+            enabledOptionalAttributes.ForceSet<SensorFault::Id>();
+        }
+
+        return enabledOptionalAttributes;
+    }()),
+    mSupportedSensitivityLevels(
+        std::clamp(config.supportedSensitivityLevels, kMinSupportedSensitivityLevels, kMaxSupportedSensitivityLevels)),
+    mDefaultSensitivityLevel(std::min(config.defaultSensitivityLevel, static_cast<uint8_t>(mSupportedSensitivityLevels - 1))),
+    mAlarmsSupported(config.alarmsSupported)
+{}
+
+CHIP_ERROR BooleanStateConfigurationCluster::Startup(ServerClusterContext & context)
 {
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, BooleanStateConfiguration::Id,
-                                                       MATTER_DM_BOOLEAN_STATE_CONFIGURATION_CLUSTER_SERVER_ENDPOINT_COUNT);
-    return (ep >= kBooleanStateConfigurationDelegateTableSize ? nullptr : gDelegateTable[ep]);
-}
+    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
-bool isDelegateNull(Delegate * delegate)
-{
-    if (delegate == nullptr)
+    if (GetSafeAttributePersistenceProvider()->ReadScalarValue({ mPath.mEndpointId, mPath.mClusterId, CurrentSensitivityLevel::Id },
+                                                               mCurrentSensitivityLevel) != CHIP_NO_ERROR)
     {
-        return true;
-    }
-    return false;
-}
-
-class BooleanStateConfigAttrAccess : public AttributeAccessInterface
-{
-public:
-    BooleanStateConfigAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), BooleanStateConfiguration::Id) {}
-
-    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-
-private:
-    CHIP_ERROR WriteCurrentSensitivityLevel(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
-    CHIP_ERROR ReadCurrentSensitivityLevel(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder);
-};
-
-BooleanStateConfigAttrAccess gAttrAccess;
-
-CHIP_ERROR BooleanStateConfigAttrAccess::WriteCurrentSensitivityLevel(const ConcreteDataAttributePath & aPath,
-                                                                      AttributeValueDecoder & aDecoder)
-{
-    uint8_t curSenLevel;
-    ReturnErrorOnFailure(aDecoder.Decode(curSenLevel));
-
-    return StoreCurrentSensitivityLevel(aPath.mEndpointId, curSenLevel);
-}
-
-CHIP_ERROR BooleanStateConfigAttrAccess::ReadCurrentSensitivityLevel(const ConcreteReadAttributePath & aPath,
-                                                                     AttributeValueEncoder & aEncoder)
-{
-    uint8_t senLevel;
-    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->ReadScalarValue(aPath, senLevel);
-    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
-    {
-        uint8_t supportedSensLevel;
-        VerifyOrReturnError(Status::Success == SupportedSensitivityLevels::Get(aPath.mEndpointId, &supportedSensLevel),
-                            CHIP_IM_GLOBAL_STATUS(Failure));
-        VerifyOrReturnError(supportedSensLevel >= kMinSupportedSensitivityLevels, CHIP_IM_GLOBAL_STATUS(Failure));
-        VerifyOrReturnError(supportedSensLevel <= kMaxSupportedSensitivityLevels, CHIP_IM_GLOBAL_STATUS(Failure));
-        senLevel = static_cast<uint8_t>(supportedSensLevel - 1);
-    }
-    else if (err != CHIP_NO_ERROR)
-    {
-        return err;
+        mCurrentSensitivityLevel = mDefaultSensitivityLevel;
     }
 
-    ReturnErrorOnFailure(aEncoder.Encode(senLevel));
+    if (mCurrentSensitivityLevel >= mSupportedSensitivityLevels)
+    {
+        mCurrentSensitivityLevel = mSupportedSensitivityLevels - 1;
+    }
+
+    // alarms enabled persistence was handled by ember previously (as opposed to AAI usage of sensitivity level)
+    // TODO: this is VERY inconvenient/strange and we should really fix this inconsistence
+    AttributePersistence attributePersistence(context.attributeStorage);
+    AlarmModeBitMask::IntegerType alarmsEnabled;
+    attributePersistence.LoadNativeEndianValue({ mPath.mEndpointId, mPath.mClusterId, AlarmsEnabled::Id }, alarmsEnabled,
+                                               AlarmModeBitMask::IntegerType(0));
+    mAlarmsEnabled = AlarmModeBitMask(alarmsEnabled);
+
+    // internal state validation:
+    if (mFeatures.Has(Feature::kAlarmSuppress))
+    {
+        // alarm Suppression requires visual/audible alarms
+        VerifyOrReturnError(mFeatures.HasAny(Feature::kAudible, Feature::kVisual), CHIP_ERROR_INCORRECT_STATE);
+    }
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BooleanStateConfigAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR BooleanStateConfigurationCluster::AcceptedCommands(const ConcreteClusterPath & path,
+                                                              ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    if (aPath.mClusterId != BooleanStateConfiguration::Id)
+
+    if (mFeatures.HasAny(Feature::kAudible, Feature::kVisual))
     {
-        return CHIP_ERROR_INVALID_PATH_LIST;
+        ReturnErrorOnFailure(builder.AppendElements({ Commands::EnableDisableAlarm::kMetadataEntry }));
     }
 
-    switch (aPath.mAttributeId)
+    if (mFeatures.Has(Feature::kAlarmSuppress))
+    {
+        ReturnErrorOnFailure(builder.AppendElements({ Commands::SuppressAlarm::kMetadataEntry }));
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+std::optional<DataModel::ActionReturnStatus>
+BooleanStateConfigurationCluster::InvokeCommand(const DataModel::InvokeRequest & request, chip::TLV::TLVReader & input_arguments,
+                                                CommandHandler * handler)
+{
+    switch (request.path.mCommandId)
+    {
+    case Commands::SuppressAlarm::Id: {
+        Commands::SuppressAlarm::DecodableType request_data;
+        ReturnErrorOnFailure(request_data.Decode(input_arguments));
+
+        return SuppressAlarms(request_data.alarmsToSuppress);
+    }
+    case Commands::EnableDisableAlarm::Id: {
+        Commands::EnableDisableAlarm::DecodableType request_data;
+        ReturnErrorOnFailure(request_data.Decode(input_arguments));
+
+        const auto alarms = request_data.alarmsToEnableDisable;
+
+        VerifyOrReturnError(mAlarmsSupported.HasAll(alarms), Status::ConstraintError);
+
+        if (mAlarmsEnabled != alarms)
+        {
+            mAlarmsEnabled = alarms;
+
+            AlarmModeBitMask::IntegerType rawAlarmsEnabled = mAlarmsEnabled.Raw();
+            if (CHIP_ERROR err = mContext->attributeStorage.WriteValue({ mPath.mEndpointId, mPath.mClusterId, AlarmsEnabled::Id },
+                                                                       { &rawAlarmsEnabled, sizeof(rawAlarmsEnabled) });
+                err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DataManagement, "Failed to persist alarms enabled: %" CHIP_ERROR_FORMAT, err.Format());
+            }
+            OnClusterAttributeChanged(AlarmsEnabled::Id);
+        }
+
+        if (mDelegate != nullptr)
+        {
+            // TODO: For backwards compatibility with previous code, we ignore the return code
+            //       from the delegate handler. This feels off though...
+            TEMPORARY_RETURN_IGNORED mDelegate->HandleEnableDisableAlarms(alarms);
+        }
+
+        // This inverts the bits (0x03 is the current max bitmap):
+        //   - every "known" bit that is set to 0 in the request will be set to 1 in the `alarmsToDisable`
+        const BitMask<BooleanStateConfiguration::AlarmModeBitmap> alarmsToDisable{ static_cast<uint8_t>(~alarms.Raw() &
+                                                                                                        kAllKnownAlarmModes) };
+
+        bool generateEvent = false;
+        if (mAlarmsActive.HasAny(alarmsToDisable))
+        {
+            mAlarmsActive.Clear(alarmsToDisable);
+            OnClusterAttributeChanged(AlarmsActive::Id);
+            generateEvent = true;
+        }
+        if (mAlarmsSuppressed.HasAny(alarmsToDisable))
+        {
+            mAlarmsSuppressed.Clear(alarmsToDisable);
+            OnClusterAttributeChanged(AlarmsSuppressed::Id);
+            generateEvent = true;
+        }
+
+        if (generateEvent)
+        {
+            GenerateAlarmsStateChangedEvent();
+        }
+        return Status::Success;
+    }
+    default:
+        return Protocols::InteractionModel::Status::UnsupportedCommand;
+    }
+}
+
+ActionReturnStatus BooleanStateConfigurationCluster::ReadAttribute(const ReadAttributeRequest & request,
+                                                                   AttributeValueEncoder & encoder)
+{
+    switch (request.path.mAttributeId)
+    {
+    case ClusterRevision::Id:
+        return encoder.Encode(BooleanStateConfiguration::kRevision);
+    case FeatureMap::Id:
+        return encoder.Encode(mFeatures);
+    case CurrentSensitivityLevel::Id:
+        return encoder.Encode(mCurrentSensitivityLevel);
+    case SupportedSensitivityLevels::Id:
+        return encoder.Encode(mSupportedSensitivityLevels);
+    case DefaultSensitivityLevel::Id:
+        return encoder.Encode(mDefaultSensitivityLevel);
+    case AlarmsActive::Id:
+        return encoder.Encode(mAlarmsActive);
+    case AlarmsSuppressed::Id:
+        return encoder.Encode(mAlarmsSuppressed);
+    case AlarmsEnabled::Id:
+        return encoder.Encode(mAlarmsEnabled);
+    case AlarmsSupported::Id:
+        return encoder.Encode(mAlarmsSupported);
+    case SensorFault::Id:
+        return encoder.Encode(mSensorFault);
+    default:
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
+    }
+}
+
+ActionReturnStatus BooleanStateConfigurationCluster::WriteAttribute(const WriteAttributeRequest & request,
+                                                                    AttributeValueDecoder & decoder)
+{
+    switch (request.path.mAttributeId)
     {
     case CurrentSensitivityLevel::Id: {
-        return ReadCurrentSensitivityLevel(aPath, aEncoder);
+        uint8_t value;
+        ReturnErrorOnFailure(decoder.Decode(value));
+        return SetCurrentSensitivityLevel(value);
     }
-    default: {
-        break;
+    default:
+        return Protocols::InteractionModel::Status::UnsupportedWrite;
     }
-    }
-    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BooleanStateConfigAttrAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+CHIP_ERROR BooleanStateConfigurationCluster::Attributes(const ConcreteClusterPath & path,
+                                                        ReadOnlyBufferBuilder<AttributeEntry> & builder)
 {
-    if (aPath.mClusterId != BooleanStateConfiguration::Id)
-    {
-        return CHIP_ERROR_INVALID_PATH_LIST;
-    }
+    constexpr AttributeEntry optionalAttributesMeta[] = {
+        CurrentSensitivityLevel::kMetadataEntry,    //
+        SupportedSensitivityLevels::kMetadataEntry, //
+        DefaultSensitivityLevel::kMetadataEntry,    //
+        AlarmsActive::kMetadataEntry,               //
+        AlarmsSuppressed::kMetadataEntry,           //
+        AlarmsEnabled::kMetadataEntry,              //
+        AlarmsSupported::kMetadataEntry,            //
+        SensorFault::kMetadataEntry,                //
+    };
 
-    switch (aPath.mAttributeId)
-    {
-    case CurrentSensitivityLevel::Id: {
-        return WriteCurrentSensitivityLevel(aPath, aDecoder);
-    }
-    default: {
-        break;
-    }
-    }
-
-    return CHIP_NO_ERROR;
+    AttributeListBuilder listBuilder(builder);
+    return listBuilder.Append(Span(kMandatoryMetadata), Span<const AttributeEntry>{ optionalAttributesMeta }, mOptionalAttributes);
 }
-} // namespace
 
-static bool emitAlarmsStateChangedEvent(EndpointId ep)
+void BooleanStateConfigurationCluster::GenerateAlarmsStateChangedEvent()
 {
-    if (!HasFeature(ep, BooleanStateConfiguration::Feature::kAudible) &&
-        !HasFeature(ep, BooleanStateConfiguration::Feature::kVisual))
-    {
-        return false;
-    }
+    VerifyOrReturn(mContext != nullptr);
+    VerifyOrReturn(mFeatures.HasAny(Feature::kAudible, Feature::kVisual));
 
     BooleanStateConfiguration::Events::AlarmsStateChanged::Type event;
-    BitMask<BooleanStateConfiguration::AlarmModeBitmap> active;
-    VerifyOrReturnValue(Status::Success == AlarmsActive::Get(ep, &active), false);
-    event.alarmsActive = active;
+    event.alarmsActive = mAlarmsActive;
 
-    if (HasFeature(ep, BooleanStateConfiguration::Feature::kAlarmSuppress))
+    if (mFeatures.Has(Feature::kAlarmSuppress))
     {
-        BitMask<BooleanStateConfiguration::AlarmModeBitmap> suppressed;
-        VerifyOrReturnValue(Status::Success == AlarmsSuppressed::Get(ep, &suppressed), false);
-        event.alarmsSuppressed.SetValue(suppressed);
+        event.alarmsSuppressed.SetValue(mAlarmsSuppressed);
     }
-
-    EventNumber eventNumber;
-
-    CHIP_ERROR error = LogEvent(event, ep, eventNumber);
-
-    if (CHIP_NO_ERROR != error)
-    {
-        ChipLogError(Zcl, "Unable to emit AlarmsStateChanged event [ep=%d]", ep);
-        return false;
-    }
-
-    ChipLogProgress(Zcl, "Emit AlarmsStateChanged event [ep=%d]", ep);
-    return true;
+    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 }
 
-static CHIP_ERROR emitSensorFaultEvent(EndpointId ep, BitMask<BooleanStateConfiguration::SensorFaultBitmap> fault)
+void BooleanStateConfigurationCluster::GenerateSensorFault(SensorFaultBitMask fault)
 {
+    VerifyOrReturn(mContext != nullptr);
+
     BooleanStateConfiguration::Events::SensorFault::Type event;
-    EventNumber eventNumber;
-
     event.sensorFault = fault;
+    mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId);
 
-    CHIP_ERROR error = LogEvent(event, ep, eventNumber);
-
-    if (CHIP_NO_ERROR != error)
+    if (mOptionalAttributes.IsSet(SensorFault::Id) && (mSensorFault != fault))
     {
-        ChipLogError(Zcl, "Unable to emit SensorFault event [ep=%d]", ep);
-        return error;
+        mSensorFault = fault;
+        OnClusterAttributeChanged(SensorFault::Id);
     }
-
-    ChipLogProgress(Zcl, "Emit SensorFault event [ep=%d]", ep);
-    return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR StoreCurrentSensitivityLevel(EndpointId ep, uint8_t level)
+CHIP_ERROR BooleanStateConfigurationCluster::SetCurrentSensitivityLevel(uint8_t level)
 {
-    uint8_t supportedSensLevel;
-    VerifyOrReturnError(Status::Success == SupportedSensitivityLevels::Get(ep, &supportedSensLevel),
-                        CHIP_IM_GLOBAL_STATUS(Failure));
-    VerifyOrReturnError(supportedSensLevel >= kMinSupportedSensitivityLevels, CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    VerifyOrReturnError(supportedSensLevel <= kMaxSupportedSensitivityLevels, CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    VerifyOrReturnError(level < supportedSensLevel, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    VerifyOrReturnError(level < mSupportedSensitivityLevels, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    VerifyOrReturnError(mCurrentSensitivityLevel != level, CHIP_NO_ERROR);
 
-    ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(
-        ConcreteAttributePath(ep, BooleanStateConfiguration::Id, CurrentSensitivityLevel::Id), level));
+    mCurrentSensitivityLevel = level;
+    OnClusterAttributeChanged(CurrentSensitivityLevel::Id);
 
-    return CHIP_NO_ERROR;
+    // TODO: we should migrate this to not use `Safe` attribute persistence and use
+    //       a common persistence layer.
+    return GetSafeAttributePersistenceProvider()->WriteScalarValue(
+        { mPath.mEndpointId, mPath.mClusterId, CurrentSensitivityLevel::Id }, level);
 }
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace BooleanStateConfiguration {
-
-void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
+void BooleanStateConfigurationCluster::OnClusterAttributeChanged(AttributeId attributeId)
 {
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, BooleanStateConfiguration::Id,
-                                                       MATTER_DM_BOOLEAN_STATE_CONFIGURATION_CLUSTER_SERVER_ENDPOINT_COUNT);
-    // if endpoint is found
-    if (ep < kBooleanStateConfigurationDelegateTableSize)
+    NotifyAttributeChanged(attributeId);
+    if (mDelegate != nullptr)
     {
-        gDelegateTable[ep] = delegate;
+        mDelegate->OnAttributeChanged(attributeId, this);
     }
 }
 
-Delegate * GetDefaultDelegate(EndpointId endpoint)
+Status BooleanStateConfigurationCluster::SetAlarmsActive(AlarmModeBitMask alarms)
 {
-    return GetDelegate(endpoint);
+    VerifyOrReturnError(mFeatures.HasAny(Feature::kAudible, Feature::kVisual), Status::Failure);
+    VerifyOrReturnError(mAlarmsEnabled.HasAll(alarms), Status::Failure);
+
+    // No change is a noop
+    VerifyOrReturnError(mAlarmsActive != alarms, Status::Success);
+
+    mAlarmsActive = alarms;
+    OnClusterAttributeChanged(AlarmsActive::Id);
+    GenerateAlarmsStateChangedEvent();
+
+    return Status::Success;
 }
 
-CHIP_ERROR SetAlarmsActive(EndpointId ep, BitMask<BooleanStateConfiguration::AlarmModeBitmap> alarms)
+Status BooleanStateConfigurationCluster::SetAllEnabledAlarmsActive()
 {
-    VerifyOrReturnError(HasFeature(ep, BooleanStateConfiguration::Feature::kVisual) ||
-                            HasFeature(ep, BooleanStateConfiguration::Feature::kAudible),
-                        CHIP_IM_GLOBAL_STATUS(Failure));
+    VerifyOrReturnError(mFeatures.HasAny(Feature::kAudible, Feature::kVisual), Status::Failure);
 
-    BitMask<BooleanStateConfiguration::AlarmModeBitmap> alarmsEnabled;
-    VerifyOrReturnError(Status::Success == AlarmsEnabled::Get(ep, &alarmsEnabled), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
-    VerifyOrReturnError(alarmsEnabled.HasAll(alarms), CHIP_IM_GLOBAL_STATUS(Failure));
+    // No change is a noop
+    VerifyOrReturnError(mAlarmsActive != mAlarmsEnabled, Status::Success);
 
-    VerifyOrReturnError(Status::Success == AlarmsActive::Set(ep, alarms), CHIP_IM_GLOBAL_STATUS(Failure));
-    emitAlarmsStateChangedEvent(ep);
-
-    return CHIP_NO_ERROR;
+    mAlarmsActive = mAlarmsEnabled;
+    OnClusterAttributeChanged(AlarmsActive::Id);
+    GenerateAlarmsStateChangedEvent();
+    return Status::Success;
 }
 
-CHIP_ERROR SetAllEnabledAlarmsActive(EndpointId ep)
+void BooleanStateConfigurationCluster::ClearAllAlarms()
 {
-    VerifyOrReturnError(HasFeature(ep, BooleanStateConfiguration::Feature::kVisual) ||
-                            HasFeature(ep, BooleanStateConfiguration::Feature::kAudible),
-                        CHIP_IM_GLOBAL_STATUS(Failure));
+    VerifyOrReturn(mAlarmsActive.HasAny() || mAlarmsSuppressed.HasAny());
 
-    BitMask<BooleanStateConfiguration::AlarmModeBitmap> alarmsEnabled;
-    VerifyOrReturnError(Status::Success == AlarmsEnabled::Get(ep, &alarmsEnabled), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
-
-    if (alarmsEnabled.HasAny())
+    if (mAlarmsActive.HasAny())
     {
-        VerifyOrReturnError(Status::Success == AlarmsActive::Set(ep, alarmsEnabled), CHIP_IM_GLOBAL_STATUS(Failure));
-        emitAlarmsStateChangedEvent(ep);
+        mAlarmsActive.ClearAll();
+        OnClusterAttributeChanged(AlarmsActive::Id);
+    }
+    if (mAlarmsSuppressed.HasAny())
+    {
+        mAlarmsSuppressed.ClearAll();
+        OnClusterAttributeChanged(AlarmsSuppressed::Id);
     }
 
-    return CHIP_NO_ERROR;
+    GenerateAlarmsStateChangedEvent();
 }
 
-CHIP_ERROR ClearAllAlarms(EndpointId ep)
+Status BooleanStateConfigurationCluster::SuppressAlarms(AlarmModeBitMask alarms)
 {
-    BitMask<BooleanStateConfiguration::AlarmModeBitmap> alarmsActive, alarmsSuppressed;
-    bool emitEvent = false;
+    // Need SPRS feature and that is only available if [VIS | AUD]. These are all checked here.
+    VerifyOrReturnError(mFeatures.Has(Feature::kAlarmSuppress), Status::UnsupportedCommand);
+    VerifyOrReturnError(mFeatures.HasAny(Feature::kAudible, Feature::kVisual), Status::UnsupportedCommand);
 
-    VerifyOrReturnError(Status::Success == AlarmsActive::Get(ep, &alarmsActive), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
-    VerifyOrReturnError(Status::Success == AlarmsSuppressed::Get(ep, &alarmsSuppressed),
-                        CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+    // can only suppress valid active alarms
+    VerifyOrReturnError(mAlarmsSupported.HasAll(alarms), Status::ConstraintError);
+    VerifyOrReturnError(mAlarmsActive.HasAll(alarms), Status::InvalidInState);
 
-    if (alarmsActive.HasAny())
+    // validate this is not a NOOP
+    VerifyOrReturnError(!mAlarmsSuppressed.HasAll(alarms), Status::Success);
+
+    if (mDelegate != nullptr)
     {
-        alarmsActive.ClearAll();
-        VerifyOrReturnError(Status::Success == AlarmsActive::Set(ep, alarmsActive), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
-        emitEvent = true;
+        // TODO: To preserve original logic, we ignore error code from the
+        //       delegate, however this feels off.
+        TEMPORARY_RETURN_IGNORED mDelegate->HandleSuppressAlarm(alarms);
     }
 
-    if (alarmsSuppressed.HasAny())
-    {
-        alarmsSuppressed.ClearAll();
-        VerifyOrReturnError(Status::Success == AlarmsSuppressed::Set(ep, alarmsSuppressed),
-                            CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
-        emitEvent = true;
-    }
-
-    if (emitEvent)
-    {
-        emitAlarmsStateChangedEvent(ep);
-    }
-
-    return CHIP_NO_ERROR;
+    mAlarmsSuppressed.Set(alarms);
+    OnClusterAttributeChanged(AlarmsSuppressed::Id);
+    GenerateAlarmsStateChangedEvent();
+    return Status::Success;
 }
 
-CHIP_ERROR SuppressAlarms(EndpointId ep, BitMask<BooleanStateConfiguration::AlarmModeBitmap> alarm)
-{
-    CHIP_ERROR attribute_error = CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-
-    VerifyOrReturnError(HasFeature(ep, BooleanStateConfiguration::Feature::kAlarmSuppress),
-                        CHIP_IM_GLOBAL_STATUS(UnsupportedCommand));
-    VerifyOrReturnError(HasFeature(ep, BooleanStateConfiguration::Feature::kVisual) ||
-                            HasFeature(ep, BooleanStateConfiguration::Feature::kAudible),
-                        CHIP_IM_GLOBAL_STATUS(UnsupportedCommand));
-
-    BitMask<BooleanStateConfiguration::AlarmModeBitmap> alarmsActive, alarmsSuppressed, alarmsSupported;
-
-    VerifyOrReturnError(Status::Success == AlarmsSupported::Get(ep, &alarmsSupported), attribute_error);
-    VerifyOrReturnError(alarmsSupported.HasAll(alarm), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-
-    VerifyOrReturnError(Status::Success == AlarmsActive::Get(ep, &alarmsActive), attribute_error);
-    VerifyOrReturnError(alarmsActive.HasAll(alarm), CHIP_IM_GLOBAL_STATUS(InvalidInState));
-
-    Delegate * delegate = GetDelegate(ep);
-    if (!isDelegateNull(delegate))
-    {
-        delegate->HandleSuppressAlarm(alarm);
-    }
-
-    VerifyOrReturnError(Status::Success == AlarmsSuppressed::Get(ep, &alarmsSuppressed), attribute_error);
-    alarmsSuppressed.Set(alarm);
-    VerifyOrReturnError(Status::Success == AlarmsSuppressed::Set(ep, alarmsSuppressed), attribute_error);
-
-    emitAlarmsStateChangedEvent(ep);
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR SetCurrentSensitivityLevel(EndpointId ep, uint8_t level)
-{
-    return StoreCurrentSensitivityLevel(ep, level);
-}
-
-CHIP_ERROR EmitSensorFault(EndpointId ep, BitMask<BooleanStateConfiguration::SensorFaultBitmap> fault)
-{
-    ReturnErrorOnFailure(emitSensorFaultEvent(ep, fault));
-    return CHIP_NO_ERROR;
-}
-
-} // namespace BooleanStateConfiguration
-} // namespace Clusters
-} // namespace app
-} // namespace chip
-
-bool emberAfBooleanStateConfigurationClusterSuppressAlarmCallback(
-    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-    const BooleanStateConfiguration::Commands::SuppressAlarm::DecodableType & commandData)
-{
-    const auto & alarms = commandData.alarmsToSuppress;
-    CHIP_ERROR err      = BooleanStateConfiguration::SuppressAlarms(commandPath.mEndpointId, alarms);
-    if (err == CHIP_NO_ERROR)
-    {
-        commandObj->AddStatus(commandPath, Status::Success);
-    }
-    else if (err == CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute))
-    {
-        commandObj->AddStatus(commandPath, Status::Failure);
-    }
-    else
-    {
-        commandObj->AddStatus(commandPath, StatusIB(err).mStatus);
-    }
-
-    return true;
-}
-
-bool emberAfBooleanStateConfigurationClusterEnableDisableAlarmCallback(
-    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-    const BooleanStateConfiguration::Commands::EnableDisableAlarm::DecodableType & commandData)
-{
-    const auto & alarms     = commandData.alarmsToEnableDisable;
-    const auto & ep         = commandPath.mEndpointId;
-    Optional<Status> status = Optional<Status>::Missing();
-
-    if (!HasFeature(ep, BooleanStateConfiguration::Feature::kVisual) &&
-        !HasFeature(ep, BooleanStateConfiguration::Feature::kAudible))
-    {
-        commandObj->AddStatus(commandPath, Status::UnsupportedCommand);
-        return true;
-    }
-
-    BitMask<BooleanStateConfiguration::AlarmModeBitmap> alarmsActive, alarmsSuppressed, alarmsSupported, alarmsToDisable;
-    Delegate * delegate = GetDelegate(ep);
-    bool emit           = false;
-    uint8_t rawAlarm    = static_cast<uint8_t>(~alarms.Raw() & 0x03); // 0x03 is the current max bitmap
-    alarmsToDisable     = BitMask<BooleanStateConfiguration::AlarmModeBitmap>(rawAlarm);
-
-    VerifyOrExit(Status::Success == AlarmsSupported::Get(ep, &alarmsSupported), status.Emplace(Status::Failure));
-    VerifyOrExit(alarmsSupported.HasAll(alarms), status.Emplace(Status::ConstraintError));
-
-    VerifyOrExit(Status::Success == AlarmsEnabled::Set(ep, alarms), status.Emplace(Status::Failure));
-
-    if (!isDelegateNull(delegate))
-    {
-        delegate->HandleEnableDisableAlarms(alarms);
-    }
-
-    VerifyOrExit(Status::Success == AlarmsActive::Get(ep, &alarmsActive), status.Emplace(Status::Failure));
-    if (alarmsActive.HasAny(alarmsToDisable))
-    {
-        alarmsActive.Clear(alarmsToDisable);
-        VerifyOrExit(Status::Success == AlarmsActive::Set(ep, alarmsActive), status.Emplace(Status::Failure));
-        emit = true;
-    }
-
-    VerifyOrExit(Status::Success == AlarmsSuppressed::Get(ep, &alarmsSuppressed), status.Emplace(Status::Failure));
-    if (alarmsSuppressed.HasAny(alarmsToDisable))
-    {
-        alarmsSuppressed.Clear(alarmsToDisable);
-        VerifyOrExit(Status::Success == AlarmsSuppressed::Set(ep, alarmsSuppressed), status.Emplace(Status::Failure));
-        emit = true;
-    }
-
-    if (emit)
-    {
-        emitAlarmsStateChangedEvent(ep);
-    }
-
-exit:
-    if (status.HasValue())
-    {
-        commandObj->AddStatus(commandPath, status.Value());
-    }
-    else
-    {
-        commandObj->AddStatus(commandPath, Status::Success);
-    }
-
-    return true;
-}
-
-void MatterBooleanStateConfigurationPluginServerInitCallback()
-{
-    AttributeAccessInterfaceRegistry::Instance().Register(&gAttrAccess);
-}
-
-void MatterBooleanStateConfigurationPluginServerShutdownCallback()
-{
-    AttributeAccessInterfaceRegistry::Instance().Unregister(&gAttrAccess);
-}
+} // namespace chip::app::Clusters

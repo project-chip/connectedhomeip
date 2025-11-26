@@ -88,7 +88,7 @@ class TC_LTIME_3_1(MatterBaseTest):
 
     @run_if_endpoint_matches(has_cluster(Clusters.TimeFormatLocalization))
     async def test_TC_LTIME_3_1(self):
-        self.endpoint = self.get_endpoint(default=0)
+        self.endpoint = self.get_endpoint()
         self.cluster = Clusters.TimeFormatLocalization
         hour_format_values = [0, 1, 255]
 
@@ -141,7 +141,7 @@ class TC_LTIME_3_1(MatterBaseTest):
         self.step(9)
         feature_map = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.FeatureMap)
         if (feature_map & self.cluster.Bitmaps.Feature.kCalendarFormat) == 0:
-            self.skip_all_remaining_steps(10)
+            self.mark_all_remaining_steps_skipped(10)
             return
 
         self.step(10)
