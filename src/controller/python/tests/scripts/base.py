@@ -143,20 +143,19 @@ def test_case(func):
     def CheckEnableBeforeRun(*args, **kwargs):
         if TestIsEnabled(test_name=test_name):
             return func(*args, **kwargs)
-        elif inspect.iscoroutinefunction(func):
+        if inspect.iscoroutinefunction(func):
             # noop, so users can use await as usual
             return asyncio.sleep(0)
+        return None
     return CheckEnableBeforeRun
 
 
 def configurable_tests():
-    res = sorted(_configurable_test_sets)
-    return res
+    return sorted(_configurable_test_sets)
 
 
 def configurable_test_cases():
-    res = sorted(_configurable_tests)
-    return res
+    return sorted(_configurable_tests)
 
 
 class TestTimeout(threading.Thread):
