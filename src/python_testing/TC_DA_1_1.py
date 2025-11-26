@@ -22,10 +22,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${ALL_CLUSTERS_APP}
-#     factory-reset: true
-#     quiet: true
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-#     app-ready-pattern: "Server initialization complete"
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -33,7 +30,8 @@
 #       --passcode 20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --endpoint 0
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
