@@ -8758,7 +8758,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jobject value_unionSensorList;
-            chip::JniReferences::GetInstance().CreateArrayList(value_unionSensorList);
+            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(value_unionSensorList);
 
             auto iter_value_unionSensorList_0 = cppValue.unionSensorList.begin();
             while (iter_value_unionSensorList_0.Next())
@@ -8768,9 +8768,9 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 std::string newElement_0ClassName     = "java/lang/Integer";
                 std::string newElement_0CtorSignature = "(I)V";
                 jint jninewElement_0                  = static_cast<jint>(entry_0);
-                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
                     newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), jninewElement_0, newElement_0);
-                chip::JniReferences::GetInstance().AddToList(value_unionSensorList, newElement_0);
+                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value_unionSensorList, newElement_0);
             }
 
             jclass sensorListChangeStructClass;
