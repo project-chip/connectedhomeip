@@ -32,7 +32,7 @@ bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster,
     // build expectation with global attributes
     ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> expectedBuilder;
 
-    SuccessOrDie(expectedBuilder.EnsureAppendCapacity(expected.size() + app::DefaultServerCluster::GlobalAttributes().size()));
+    SuccessOrDie(expectedBuilder.EnsureAppendCapacity(expected.size()));
     for (const auto & entry : expected)
     {
         SuccessOrDie(expectedBuilder.Append(entry));
