@@ -281,7 +281,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestSensitivityClamping)
         auto config = DefaultConfig().WithSupportedSensitivityLevels(10);
         BooleanStateConfigurationCluster cluster(kTestEndpointId, Feature::kSensitivityLevel, {}, config);
         ClusterTester tester(cluster);
-        cluster.Startup(context.Get());
+        ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
         uint8_t currentLevel = 0;
 
@@ -314,7 +314,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestPersistenceAndStartup)
         auto config = DefaultConfig().WithSupportedSensitivityLevels(9);
 
         BooleanStateConfigurationCluster cluster(kTestEndpointId, Feature::kSensitivityLevel, {}, config);
-        cluster.Startup(context.Get());
+        ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         ClusterTester tester(cluster);
 
         // check default value first
@@ -335,7 +335,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestPersistenceAndStartup)
         auto config = DefaultConfig().WithSupportedSensitivityLevels(9);
 
         BooleanStateConfigurationCluster cluster(kTestEndpointId, Feature::kSensitivityLevel, {}, config);
-        cluster.Startup(context.Get());
+        ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         ClusterTester tester(cluster);
         uint8_t sensitivity = 0;
         EXPECT_EQ(tester.ReadAttribute(Attributes::CurrentSensitivityLevel::Id, sensitivity),
@@ -351,7 +351,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestPersistenceAndStartup)
         // Default sensitivity for this config is 3.
 
         BooleanStateConfigurationCluster cluster(kTestEndpointId, Feature::kSensitivityLevel, {}, smallerConfig);
-        cluster.Startup(context.Get()); // Should read 6 and clamp it to (max - 1 == 4)
+        ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR); // Should read 6 and clamp it to (max - 1 == 4)
 
         ClusterTester tester(cluster);
         uint8_t sensitivity = 0;
@@ -368,7 +368,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestPersistenceAndStartup)
         auto config = DefaultConfig().WithSupportedSensitivityLevels(9).WithDefaultSensitivityLevel(5);
 
         BooleanStateConfigurationCluster cluster(kTestEndpointId, Feature::kSensitivityLevel, {}, config);
-        cluster.Startup(context.Get());
+        ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         ClusterTester tester(cluster);
 
         uint8_t sensitivity = 0;
@@ -391,7 +391,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestAlarmsEnabledPersistence)
             kTestEndpointId, { Feature::kVisual, Feature::kAudible },
             { BooleanStateConfigurationCluster::OptionalAttributesSet().Set<Attributes::AlarmsEnabled::Id>() }, config);
 
-        cluster.Startup(context.Get());
+        ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         ClusterTester tester(cluster);
 
         // Check default value first
@@ -419,7 +419,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestAlarmsEnabledPersistence)
         BooleanStateConfigurationCluster cluster(
             kTestEndpointId, { Feature::kVisual, Feature::kAudible },
             { BooleanStateConfigurationCluster::OptionalAttributesSet().Set<Attributes::AlarmsEnabled::Id>() }, config);
-        cluster.Startup(context.Get());
+        ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         ClusterTester tester(cluster);
 
         BooleanStateConfigurationCluster::AlarmModeBitMask alarmsEnabled;
@@ -436,7 +436,7 @@ TEST_F(TestBooleanStateConfigurationCluster, TestAlarmsEnabledPersistence)
         BooleanStateConfigurationCluster cluster(
             kTestEndpointId, { Feature::kVisual, Feature::kAudible },
             { BooleanStateConfigurationCluster::OptionalAttributesSet().Set<Attributes::AlarmsEnabled::Id>() }, config);
-        cluster.Startup(context.Get());
+        ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
         ClusterTester tester(cluster);
 
         BooleanStateConfigurationCluster::AlarmModeBitMask alarmsEnabled;
