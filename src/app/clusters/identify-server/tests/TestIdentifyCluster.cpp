@@ -140,7 +140,7 @@ TEST_F(TestIdentifyCluster, ReadAttributesTest)
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
     // Read and verify IdentifyType
-    uint8_t identifyType;
+    uint8_t identifyType{};
     EXPECT_TRUE(tester.ReadAttribute(IdentifyType::Id, identifyType).IsSuccess());
     EXPECT_EQ(identifyType, (uint8_t) IdentifyTypeEnum::kVisibleIndicator);
 
