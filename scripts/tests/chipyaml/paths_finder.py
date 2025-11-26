@@ -48,8 +48,8 @@ class PathsFinder:
             del _PATHS_CACHE[target_name]
 
         log.debug("Cache miss for '%s'", target_name)
-        for dir in self.__search_path.split(':'):
-            for path in Path(dir).rglob(target_name):
+        for search_dir in self.__search_path.split(':'):
+            for path in Path(search_dir).rglob(target_name):
                 if not path.is_file() or path.name != target_name:
                     continue
 

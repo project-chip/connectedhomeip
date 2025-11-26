@@ -279,7 +279,7 @@ def _AllYamlTests():
         yield path
 
 
-def target_for_name(name: str):
+def target_for_name(name: str) -> TestTarget:
     if (name.startswith("TV_") or name.startswith("Test_TC_MC_") or
             name.startswith("Test_TC_LOWPOWER_") or name.startswith("Test_TC_KEYPADINPUT_") or
             name.startswith("Test_TC_APPLAUNCHER_") or name.startswith("Test_TC_MEDIAINPUT_") or
@@ -293,7 +293,7 @@ def target_for_name(name: str):
     if name.startswith("TestFabricSync"):
         return TestTarget.FABRIC_SYNC
     if name.startswith("OTA_"):
-        return TestTarget.OTA
+        return TestTarget.OTA_REQUESTOR
     if name.startswith("Test_TC_BRBINFO_") or name.startswith("Test_TC_ACT_"):
         return TestTarget.BRIDGE
     if name.startswith("TestIcd") or name.startswith("Test_TC_ICDM_"):

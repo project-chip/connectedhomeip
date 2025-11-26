@@ -145,14 +145,20 @@ class RunContext:
 )
 @click.option(
     '--custom-path', multiple=True,
-    help='Set path with a custom kind, value should be <kind>:<key>:<path>'
+    help="Set path with a custom kind, value should be <kind>:<key>:<path>, valid kind values are "
+        f"{[ v.value for v in SubprocessKind.__members__.values() ]}"
+)
+@click.option(
+    '--discover-paths',
+    is_flag=True,
+    default=False
 )
 @click.pass_context
 def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
          no_log_timestamps, root, pathsfinder_searchpath, internal_inside_unshare, include_tags, exclude_tags, runner,
-         app_path, tool_path, custom_path):
+         app_path, tool_path, custom_path, discover_paths):
 
-    # Implement --root and --pathsfinder_searchpath dependency logic:
+    # Implement --root and --pathsfinder-searchpath dependency logic:
     # - by default root and pathsfinder_searchpath should both be set to DEFAULT_CHIP_ROOT
     # - if --root=a and no --pathsfinder-searchpath option then root and pathsfinder_searchpath
     #   should both be set to 'a'
@@ -179,6 +185,9 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
     for p in custom_path:
         subproc_info_repo.addSpec(p)
 
+    if discover_paths:
+        subproc_info_repo.discover()
+
     runtime = TestRunTime.CHIP_TOOL_PYTHON
     if runner == 'matter_repl_python':
         runtime = TestRunTime.MATTER_REPL_PYTHON
@@ -189,12 +198,11 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
         subproc_info_repo.require('matter-repl-yaml-tester')
     elif runtime == TestRunTime.CHIP_TOOL_PYTHON:
         subproc_info_repo.require('chip-tool')
-        subproc_info_repo.require('chip-tool-with-python', path_lookup='chiptool.py')
+        subproc_info_repo.require('chip-tool-with-python', target_name='chiptool.py')
     else:  # DARWIN_FRAMEWORK_TOOL_PYTHON
-        subproc_info_repo.require('darwin-framework-tool')
-        subproc_info_repo.require('chip-tool-with-python', path_lookup='darwinframeworktool.py')
-        # darwin-framework-tool is a chip-tool equivalent
-        subproc_info_repo['chip-tool'] = subproc_info_repo['darwin-framework-tool']
+        # `chip-tool` on darwin is `darwin-framework-tool`
+        subproc_info_repo['chip-tool'] = subproc_info_repo.require('darwin-framework-tool')
+        subproc_info_repo.require('chip-tool-with-python', target_name='darwinframeworktool.py')
 
     if include_tags:
         include_tags = {TestTag.__members__[t] for t in include_tags}
