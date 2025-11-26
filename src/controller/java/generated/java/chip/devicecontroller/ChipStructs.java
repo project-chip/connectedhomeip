@@ -1845,6 +1845,112 @@ public static class NetworkCommissioningClusterWiFiInterfaceScanResultStruct {
     return output.toString();
   }
 }
+public static class GeneralDiagnosticsClusterDeviceLoadStruct {
+  public Integer currentSubscriptions;
+  public Integer currentSubscriptionsForFabric;
+  public Long totalSubscriptionsEstablished;
+  public Long totalInteractionModelMessagesSent;
+  public Long totalInteractionModelMessagesReceived;
+  private static final long CURRENT_SUBSCRIPTIONS_ID = 0L;
+  private static final long CURRENT_SUBSCRIPTIONS_FOR_FABRIC_ID = 1L;
+  private static final long TOTAL_SUBSCRIPTIONS_ESTABLISHED_ID = 2L;
+  private static final long TOTAL_INTERACTION_MODEL_MESSAGES_SENT_ID = 3L;
+  private static final long TOTAL_INTERACTION_MODEL_MESSAGES_RECEIVED_ID = 4L;
+
+  public GeneralDiagnosticsClusterDeviceLoadStruct(
+    Integer currentSubscriptions,
+    Integer currentSubscriptionsForFabric,
+    Long totalSubscriptionsEstablished,
+    Long totalInteractionModelMessagesSent,
+    Long totalInteractionModelMessagesReceived
+  ) {
+    this.currentSubscriptions = currentSubscriptions;
+    this.currentSubscriptionsForFabric = currentSubscriptionsForFabric;
+    this.totalSubscriptionsEstablished = totalSubscriptionsEstablished;
+    this.totalInteractionModelMessagesSent = totalInteractionModelMessagesSent;
+    this.totalInteractionModelMessagesReceived = totalInteractionModelMessagesReceived;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CURRENT_SUBSCRIPTIONS_ID, new UIntType(currentSubscriptions)));
+    values.add(new StructElement(CURRENT_SUBSCRIPTIONS_FOR_FABRIC_ID, new UIntType(currentSubscriptionsForFabric)));
+    values.add(new StructElement(TOTAL_SUBSCRIPTIONS_ESTABLISHED_ID, new UIntType(totalSubscriptionsEstablished)));
+    values.add(new StructElement(TOTAL_INTERACTION_MODEL_MESSAGES_SENT_ID, new UIntType(totalInteractionModelMessagesSent)));
+    values.add(new StructElement(TOTAL_INTERACTION_MODEL_MESSAGES_RECEIVED_ID, new UIntType(totalInteractionModelMessagesReceived)));
+
+    return new StructType(values);
+  }
+
+  public static GeneralDiagnosticsClusterDeviceLoadStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer currentSubscriptions = null;
+    Integer currentSubscriptionsForFabric = null;
+    Long totalSubscriptionsEstablished = null;
+    Long totalInteractionModelMessagesSent = null;
+    Long totalInteractionModelMessagesReceived = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CURRENT_SUBSCRIPTIONS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          currentSubscriptions = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == CURRENT_SUBSCRIPTIONS_FOR_FABRIC_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          currentSubscriptionsForFabric = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == TOTAL_SUBSCRIPTIONS_ESTABLISHED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          totalSubscriptionsEstablished = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == TOTAL_INTERACTION_MODEL_MESSAGES_SENT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          totalInteractionModelMessagesSent = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == TOTAL_INTERACTION_MODEL_MESSAGES_RECEIVED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          totalInteractionModelMessagesReceived = castingValue.value(Long.class);
+        }
+      }
+    }
+    return new GeneralDiagnosticsClusterDeviceLoadStruct(
+      currentSubscriptions,
+      currentSubscriptionsForFabric,
+      totalSubscriptionsEstablished,
+      totalInteractionModelMessagesSent,
+      totalInteractionModelMessagesReceived
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("GeneralDiagnosticsClusterDeviceLoadStruct {\n");
+    output.append("\tcurrentSubscriptions: ");
+    output.append(currentSubscriptions);
+    output.append("\n");
+    output.append("\tcurrentSubscriptionsForFabric: ");
+    output.append(currentSubscriptionsForFabric);
+    output.append("\n");
+    output.append("\ttotalSubscriptionsEstablished: ");
+    output.append(totalSubscriptionsEstablished);
+    output.append("\n");
+    output.append("\ttotalInteractionModelMessagesSent: ");
+    output.append(totalInteractionModelMessagesSent);
+    output.append("\n");
+    output.append("\ttotalInteractionModelMessagesReceived: ");
+    output.append(totalInteractionModelMessagesReceived);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class GeneralDiagnosticsClusterNetworkInterface {
   public String name;
   public Boolean isOperational;

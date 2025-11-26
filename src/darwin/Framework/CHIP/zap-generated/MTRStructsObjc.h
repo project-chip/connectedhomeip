@@ -492,6 +492,15 @@ MTR_DEPRECATED("Please use MTRNetworkCommissioningClusterWiFiInterfaceScanResult
 @property (nonatomic, copy) NSNumber * _Nonnull rssi MTR_DEPRECATED("Please use MTRNetworkCommissioningClusterWiFiInterfaceScanResultStruct", ios(16.1, 17.0), macos(13.0, 14.0), watchos(9.1, 10.0), tvos(16.1, 17.0));
 @end
 
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRGeneralDiagnosticsClusterDeviceLoadStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull currentSubscriptions MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull currentSubscriptionsForFabric MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull totalSubscriptionsEstablished MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull totalInteractionModelMessagesSent MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull totalInteractionModelMessagesReceived MTR_PROVISIONALLY_AVAILABLE;
+@end
+
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTRGeneralDiagnosticsClusterNetworkInterface : NSObject <NSCopying>
 @property (nonatomic, copy) NSString * _Nonnull name MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));

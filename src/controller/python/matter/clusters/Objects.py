@@ -7953,6 +7953,7 @@ class GeneralDiagnostics(Cluster):
                 ClusterObjectFieldDescriptor(Label="activeRadioFaults", Tag=0x00000006, Type=typing.Optional[typing.List[GeneralDiagnostics.Enums.RadioFaultEnum]]),
                 ClusterObjectFieldDescriptor(Label="activeNetworkFaults", Tag=0x00000007, Type=typing.Optional[typing.List[GeneralDiagnostics.Enums.NetworkFaultEnum]]),
                 ClusterObjectFieldDescriptor(Label="testEventTriggersEnabled", Tag=0x00000008, Type=bool),
+                ClusterObjectFieldDescriptor(Label="deviceLoadStatus", Tag=0x0000000A, Type=typing.Optional[GeneralDiagnostics.Structs.DeviceLoadStruct]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -7969,6 +7970,7 @@ class GeneralDiagnostics(Cluster):
     activeRadioFaults: typing.Optional[typing.List[GeneralDiagnostics.Enums.RadioFaultEnum]] = None
     activeNetworkFaults: typing.Optional[typing.List[GeneralDiagnostics.Enums.NetworkFaultEnum]] = None
     testEventTriggersEnabled: bool = False
+    deviceLoadStatus: typing.Optional[GeneralDiagnostics.Structs.DeviceLoadStruct] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -8048,8 +8050,28 @@ class GeneralDiagnostics(Cluster):
     class Bitmaps:
         class Feature(IntFlag):
             kDataModelTest = 0x1
+            kDeviceLoad = 0x2
 
     class Structs:
+        @dataclass
+        class DeviceLoadStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="currentSubscriptions", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="currentSubscriptionsForFabric", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="totalSubscriptionsEstablished", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="totalInteractionModelMessagesSent", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="totalInteractionModelMessagesReceived", Tag=4, Type=uint),
+                    ])
+
+            currentSubscriptions: 'uint' = 0
+            currentSubscriptionsForFabric: 'uint' = 0
+            totalSubscriptionsEstablished: 'uint' = 0
+            totalInteractionModelMessagesSent: 'uint' = 0
+            totalInteractionModelMessagesReceived: 'uint' = 0
+
         @dataclass
         class NetworkInterface(ClusterObject):
             @ChipUtility.classproperty
@@ -8305,6 +8327,22 @@ class GeneralDiagnostics(Cluster):
                 return ClusterObjectFieldDescriptor(Type=bool)
 
             value: bool = False
+
+        @dataclass
+        class DeviceLoadStatus(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000033
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000000A
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[GeneralDiagnostics.Structs.DeviceLoadStruct])
+
+            value: typing.Optional[GeneralDiagnostics.Structs.DeviceLoadStruct] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):

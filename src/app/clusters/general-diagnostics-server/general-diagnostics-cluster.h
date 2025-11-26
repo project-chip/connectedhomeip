@@ -43,14 +43,16 @@ public:
                                         GeneralDiagnostics::Attributes::BootReason::Id,            //
                                         GeneralDiagnostics::Attributes::ActiveHardwareFaults::Id,  //
                                         GeneralDiagnostics::Attributes::ActiveRadioFaults::Id,     //
-                                        GeneralDiagnostics::Attributes::ActiveNetworkFaults::Id    //
+                                        GeneralDiagnostics::Attributes::ActiveNetworkFaults::Id,   //
+                                        GeneralDiagnostics::Attributes::DeviceLoadStatus::Id       //
                                         // NOTE: Uptime is optional in the XML, however mandatory since revision 2.
                                         //       it will be forced as mandatory by the cluster constructor
                                         >;
 
-    GeneralDiagnosticsCluster(OptionalAttributeSet optionalAttributeSet) :
+    GeneralDiagnosticsCluster(OptionalAttributeSet optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature> featureFlags) :
         DefaultServerCluster({ kRootEndpointId, GeneralDiagnostics::Id }),
-        mOptionalAttributeSet(optionalAttributeSet.ForceSet<GeneralDiagnostics::Attributes::UpTime::Id>())
+        mOptionalAttributeSet(optionalAttributeSet.ForceSet<GeneralDiagnostics::Attributes::UpTime::Id>()),
+        mFeatureFlags(featureFlags)
     {}
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
@@ -120,17 +122,19 @@ public:
         return DeviceLayer::GetDiagnosticDataProvider().GetActiveNetworkFaults(networkFaults);
     }
 
-private:
-    const OptionalAttributeSet mOptionalAttributeSet;
+protected:
+    OptionalAttributeSet mOptionalAttributeSet;
     CHIP_ERROR ReadNetworkInterfaces(AttributeValueEncoder & aEncoder);
+    BitFlags<GeneralDiagnostics::Feature> mFeatureFlags;
 };
 
 class GeneralDiagnosticsClusterFullConfigurable : public GeneralDiagnosticsCluster
 {
 public:
     GeneralDiagnosticsClusterFullConfigurable(const GeneralDiagnosticsCluster::OptionalAttributeSet & optionalAttributeSet,
+                                              const BitFlags<GeneralDiagnostics::Feature> featureFlags,
                                               const GeneralDiagnosticsFunctionsConfig & functionsConfig) :
-        GeneralDiagnosticsCluster(optionalAttributeSet),
+        GeneralDiagnosticsCluster(optionalAttributeSet, featureFlags),
         mFunctionConfig(functionsConfig)
     {}
 
