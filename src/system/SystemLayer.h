@@ -32,6 +32,7 @@
 #include <system/SystemConfig.h>
 
 #include <lib/core/CHIPCallback.h>
+#include <lib/core/CriticalFailure.h>
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
@@ -82,7 +83,7 @@ public:
     /**
      * Initialize the Layer.
      */
-    virtual CHIP_ERROR Init() = 0;
+    virtual CriticalFailure Init() = 0;
 
     /**
      * Shut down the Layer.
@@ -116,7 +117,7 @@ public:
      *   @return CHIP_ERROR_NO_MEMORY If a timer cannot be allocated.
      *   @return Other Value indicating timer failed to start.
      */
-    virtual CHIP_ERROR StartTimer(Clock::Timeout aDelay, TimerCompleteCallback aComplete, void * aAppState) = 0;
+    virtual CriticalFailure StartTimer(Clock::Timeout aDelay, TimerCompleteCallback aComplete, void * aAppState) = 0;
 
     /**
      * @brief
@@ -196,7 +197,7 @@ public:
      * @retval CHIP_ERROR_NO_MEMORY         If the SystemLayer cannot allocate a new timer.
      * @retval CHIP_NO_ERROR                On success.
      */
-    virtual CHIP_ERROR ScheduleWork(TimerCompleteCallback aComplete, void * aAppState) = 0;
+    virtual CriticalFailure ScheduleWork(TimerCompleteCallback aComplete, void * aAppState) = 0;
 
     /**
      * @brief
@@ -211,7 +212,7 @@ public:
      * @retval other Platform-specific errors generated indicating the reason for failure.
      */
     template <typename Lambda>
-    CHIP_ERROR ScheduleLambda(const Lambda & lambda)
+    CriticalFailure ScheduleLambda(const Lambda & lambda)
     {
         static_assert(std::is_invocable_v<Lambda>, "lambda argument must be an invocable with no arguments");
         LambdaBridge bridge;
@@ -220,7 +221,7 @@ public:
     }
 
 private:
-    CHIP_ERROR ScheduleLambdaBridge(LambdaBridge && bridge);
+    CriticalFailure ScheduleLambdaBridge(LambdaBridge && bridge);
 
     // Not copyable
     Layer(const Layer &)             = delete;
