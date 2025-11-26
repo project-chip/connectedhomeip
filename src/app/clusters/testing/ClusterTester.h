@@ -223,6 +223,13 @@ public:
         return result;
     }
 
+    // convenience method: most requests have a `GetCommandId` (and GetClusterId() as well).
+    template <typename RequestType, typename ResponseType = typename RequestType::ResponseType>
+    [[nodiscard]] InvokeResult<ResponseType> Invoke(const RequestType & request)
+    {
+        return Invoke(RequestType::GetCommandId(), request);
+    }
+
     // Returns the next generated event from the event generator in the test server cluster context
     std::optional<LogOnlyEvents::EventInformation> GetNextGeneratedEvent()
     {

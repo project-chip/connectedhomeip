@@ -687,7 +687,7 @@ class TC_SC_4_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_SC_4_1(self):
-        self.endpoint = self.get_endpoint(default=1)
+        self.endpoint = self.get_endpoint()
         self.supports_icd = False
         self.supports_lit = False
         self.setup_code_type = None
