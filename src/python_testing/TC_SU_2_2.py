@@ -980,7 +980,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         await subscription_state_invalid_uri.cancel()
 
         # ------------------------------------------------------------------------------------
-        # [STEP_7]: Step # 7.4 - Verify NO image transfer occurs from TH/OTA-P to DUT due invalid BDX ImageURI in UpdateAvailable.
+        # [STEP_7]: Step # 7.4 - Verify NO image transfer occurs from TH/OTA-P to DUT due to invalid BDX ImageURI in UpdateAvailable.
         # ------------------------------------------------------------------------------------
         logger.info(f"{step_number_s7}: No image transfer occurred due to invalid BDX URI (expected).")
 
