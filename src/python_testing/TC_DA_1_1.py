@@ -36,15 +36,16 @@
 #       --endpoint 0
 # === END CI TEST ARGUMENTS ===
 
-import logging
-import random
-import pathlib
 import asyncio
-import matter.clusters as Clusters
+import logging
+import pathlib
+import random
+
 from mobly import asserts
+
+import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from mobly import asserts
 from matter.tlv import TLVReader
 
 logger = logging.getLogger(__name__)
