@@ -153,8 +153,7 @@ def generate_app(args: object):
     write_to_temp(OTA_APP_TLV_TEMP, payload)
     if args.enc_enable:
         return [OTA_APP_TLV_TEMP]
-    else:
-        return [OTA_APP_TLV_TEMP, args.app_input_file]
+    return [OTA_APP_TLV_TEMP, args.app_input_file]
 
 
 def generate_bootloader(args: object):
@@ -179,8 +178,7 @@ def generate_bootloader(args: object):
     write_to_temp(OTA_BOOTLOADER_TLV_TEMP, payload)
     if args.enc_enable:
         return [OTA_BOOTLOADER_TLV_TEMP]
-    else:
-        return [OTA_BOOTLOADER_TLV_TEMP, args.bl_input_file]
+    return [OTA_BOOTLOADER_TLV_TEMP, args.bl_input_file]
 
 
 def validate_json(data: str):

@@ -110,10 +110,9 @@ class Decoder:
                     if key == _CLUSTER:
                         raise KeyError(
                             f'Error: The cluster ({cluster_code}) definition can not be found. Please update the cluster definition.')
-                    else:
-                        value_code = hex(payload[key + 'Id'])
-                        raise KeyError(
-                            f'Error: The cluster ({cluster_code}) {key} ({value_code}) definition can not be found. Please update the cluster definition.')
+                    value_code = hex(payload[key + 'Id'])
+                    raise KeyError(
+                        f'Error: The cluster ({cluster_code}) {key} ({value_code}) definition can not be found. Please update the cluster definition.')
 
                 translated_payload[key] = value
             translated_payloads.append(translated_payload)

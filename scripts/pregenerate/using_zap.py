@@ -31,15 +31,13 @@ class ZapGeneratorType(Enum):
     def generation_template(self):
         if self == ZapGeneratorType.APPLICATION_TEMPLATES:
             return 'src/app/zap-templates/app-templates.json'
-        else:
-            raise Exception("Missing ZAP Generation type implementation")
+        raise Exception("Missing ZAP Generation type implementation")
 
     @property
     def subdir(self):
         if self == ZapGeneratorType.APPLICATION_TEMPLATES:
             return 'app-templates/zap-generated'
-        else:
-            raise Exception("Missing ZAP Generation type implementation")
+        raise Exception("Missing ZAP Generation type implementation")
 
 
 class ZapTarget:
