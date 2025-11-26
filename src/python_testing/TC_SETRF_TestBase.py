@@ -1170,153 +1170,115 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
     @staticmethod
     def _tariff_info_matcher() -> AttributeMatcher:
         def predicate(report: AttributeValue) -> bool:
-            if report.attribute == cluster.Attributes.TariffInfo:
-                return True
-            return False
+            return report.attribute == cluster.Attributes.TariffInfo
         return AttributeMatcher.from_callable(description="TariffInfo", matcher=predicate)
 
     @staticmethod
     def _tariff_unit_matcher() -> AttributeMatcher:
         def predicate(report: AttributeValue) -> bool:
-            if report.attribute == cluster.Attributes.TariffUnit:
-                return True
-            return False
+            return report.attribute == cluster.Attributes.TariffUnit
         return AttributeMatcher.from_callable(description="TariffUnit", matcher=predicate)
 
     @staticmethod
     def _start_date_matcher() -> AttributeMatcher:
         def predicate(report: AttributeValue) -> bool:
-            if report.attribute == cluster.Attributes.StartDate:
-                return True
-            return False
+            return report.attribute == cluster.Attributes.StartDate
         return AttributeMatcher.from_callable(description="StartDate", matcher=predicate)
 
     @staticmethod
     def _day_entries_matcher() -> AttributeMatcher:
         def predicate(report: AttributeValue) -> bool:
-            if report.attribute == cluster.Attributes.DayEntries:
-                return True
-            return False
+            return report.attribute == cluster.Attributes.DayEntries
         return AttributeMatcher.from_callable(description="DayEntries", matcher=predicate)
 
     @staticmethod
     def _day_patterns_matcher() -> AttributeMatcher:
         def predicate(report: AttributeValue) -> bool:
-            if report.attribute == cluster.Attributes.DayPatterns:
-                return True
-            return False
+            return report.attribute == cluster.Attributes.DayPatterns
         return AttributeMatcher.from_callable(description="DayPatterns", matcher=predicate)
 
     @staticmethod
     def _calendar_periods_matcher() -> AttributeMatcher:
         def predicate(report: AttributeValue) -> bool:
-            if report.attribute == cluster.Attributes.CalendarPeriods:
-                return True
-            return False
+            return report.attribute == cluster.Attributes.CalendarPeriods
         return AttributeMatcher.from_callable(description="CalendarPeriods", matcher=predicate)
 
     @staticmethod
     def _individual_days_matcher() -> AttributeMatcher:
         def predicate(report: AttributeValue) -> bool:
-            if report.attribute == cluster.Attributes.IndividualDays:
-                return True
-            return False
+            return report.attribute == cluster.Attributes.IndividualDays
         return AttributeMatcher.from_callable(description="IndividualDays", matcher=predicate)
 
     @staticmethod
     def _current_day_matcher() -> AttributeMatcher:
         def predicate(report: AttributeValue) -> bool:
-            if report.attribute == cluster.Attributes.CurrentDay:
-                return True
-            return False
+            return report.attribute == cluster.Attributes.CurrentDay
         return AttributeMatcher.from_callable(description="CurrentDay", matcher=predicate)
 
     @staticmethod
     def _next_day_matcher() -> AttributeMatcher:
         def predicate(report: AttributeValue) -> bool:
-            if report.attribute == cluster.Attributes.NextDay:
-                return True
-            return False
+            return report.attribute == cluster.Attributes.NextDay
         return AttributeMatcher.from_callable(description="NextDay", matcher=predicate)
 
     @staticmethod
     def _current_day_entry_matcher() -> AttributeMatcher:
         def predicate(report: AttributeValue) -> bool:
-            if report.attribute == cluster.Attributes.CurrentDayEntry:
-                return True
-            return False
+            return report.attribute == cluster.Attributes.CurrentDayEntry
         return AttributeMatcher.from_callable(description="CurrentDayEntry", matcher=predicate)
 
     @staticmethod
     def _current_day_entry_date_matcher() -> AttributeMatcher:
         def predicate(report: AttributeValue) -> bool:
-            if report.attribute == cluster.Attributes.CurrentDayEntryDate:
-                return True
-            return False
+            return report.attribute == cluster.Attributes.CurrentDayEntryDate
         return AttributeMatcher.from_callable(description="CurrentDayEntryDate", matcher=predicate)
 
     @staticmethod
     def _next_day_entry_matcher() -> AttributeMatcher:
         def predicate(report: AttributeValue) -> bool:
-            if report.attribute == cluster.Attributes.NextDayEntry:
-                return True
-            return False
+            return report.attribute == cluster.Attributes.NextDayEntry
         return AttributeMatcher.from_callable(description="NextDayEntry", matcher=predicate)
 
     @staticmethod
     def _next_day_entry_date_matcher() -> AttributeMatcher:
         def predicate(report: AttributeValue) -> bool:
-            if report.attribute == cluster.Attributes.NextDayEntryDate:
-                return True
-            return False
+            return report.attribute == cluster.Attributes.NextDayEntryDate
         return AttributeMatcher.from_callable(description="NextDayEntryDate", matcher=predicate)
 
     @staticmethod
     def _tariff_components_matcher() -> AttributeMatcher:
         def predicate(report: AttributeValue) -> bool:
-            if report.attribute == cluster.Attributes.TariffComponents:
-                return True
-            return False
+            return report.attribute == cluster.Attributes.TariffComponents
         return AttributeMatcher.from_callable(description="TariffComponents", matcher=predicate)
 
     @staticmethod
     def _tariff_periods_matcher() -> AttributeMatcher:
         def predicate(report: AttributeValue) -> bool:
-            if report.attribute == cluster.Attributes.TariffPeriods:
-                return True
-            return False
+            return report.attribute == cluster.Attributes.TariffPeriods
         return AttributeMatcher.from_callable(description="TariffPeriods", matcher=predicate)
 
     @staticmethod
     def _current_tariff_component_matcher() -> AttributeMatcher:
         def predicate(report: AttributeValue) -> bool:
-            if report.attribute == cluster.Attributes.CurrentTariffComponents:
-                return True
-            return False
+            return report.attribute == cluster.Attributes.CurrentTariffComponents
         return AttributeMatcher.from_callable(description="CurrentTariffComponents", matcher=predicate)
 
     @staticmethod
     def _next_tariff_component_matcher() -> AttributeMatcher:
         def predicate(report: AttributeValue) -> bool:
-            if report.attribute == cluster.Attributes.NextTariffComponents:
-                return True
-            return False
+            return report.attribute == cluster.Attributes.NextTariffComponents
         return AttributeMatcher.from_callable(description="NextTariffComponents", matcher=predicate)
 
     @staticmethod
     def _default_randomization_offset_matcher() -> AttributeMatcher:
         def predicate(report: AttributeValue) -> bool:
-            if report.attribute == cluster.Attributes.DefaultRandomizationOffset:
-                return True
-            return False
+            return report.attribute == cluster.Attributes.DefaultRandomizationOffset
         return AttributeMatcher.from_callable(description="DefaultRandomizationOffset", matcher=predicate)
 
     @staticmethod
     def _default_randomization_type_matcher() -> AttributeMatcher:
         def predicate(report: AttributeValue) -> bool:
-            if report.attribute == cluster.Attributes.DefaultRandomizationType:
-                return True
-            return False
+            return report.attribute == cluster.Attributes.DefaultRandomizationType
         return AttributeMatcher.from_callable(description="DefaultRandomizationType", matcher=predicate)
 
     def get_mandatory_matchers(self) -> List[AttributeMatcher]:

@@ -51,9 +51,7 @@ def current_latch_matcher(latch: bool) -> AttributeMatcher:
     def predicate(report: AttributeValue) -> bool:
         if report.attribute != Clusters.ClosureDimension.Attributes.CurrentState:
             return False
-        if report.value.latch == latch:
-            return True
-        return False
+        return report.value.latch == latch
     return AttributeMatcher.from_callable(description=f"CurrentState.Latch is {latch}", matcher=predicate)
 
 

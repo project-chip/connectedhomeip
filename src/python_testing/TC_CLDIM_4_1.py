@@ -51,9 +51,7 @@ def current_latch_matcher(latch: bool) -> AttributeMatcher:
     def predicate(report: AttributeValue) -> bool:
         if report.attribute != Clusters.ClosureDimension.Attributes.CurrentState:
             return False
-        if report.value.latch == latch:
-            return True
-        return False
+        return report.value.latch == latch
     return AttributeMatcher.from_callable(description=f"CurrentState.Latch is {latch}", matcher=predicate)
 
 
@@ -61,9 +59,7 @@ def current_position_matcher(position: int) -> AttributeMatcher:
     def predicate(report: AttributeValue) -> bool:
         if report.attribute != Clusters.ClosureDimension.Attributes.CurrentState:
             return False
-        if report.value.position == position:
-            return True
-        return False
+        return report.value.position == position
     return AttributeMatcher.from_callable(description=f"CurrentState.Position is {position}", matcher=predicate)
 
 
@@ -71,9 +67,7 @@ def current_position_and_speed_matcher(position: int, speed: Globals.Enums.Three
     def predicate(report: AttributeValue) -> bool:
         if report.attribute != Clusters.ClosureDimension.Attributes.CurrentState:
             return False
-        if (report.value.position == position) and (report.value.speed == speed):
-            return True
-        return False
+        return (report.value.position == position) and (report.value.speed == speed)
     return AttributeMatcher.from_callable(description=f"CurrentState.Position is {position} and CurrentState.Speed is {speed}", matcher=predicate)
 
 
