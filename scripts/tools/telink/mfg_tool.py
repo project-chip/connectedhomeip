@@ -151,7 +151,6 @@ def read_key_bin_file(path: str):
         with open(path, 'rb') as file:
             return file.read()
 
-
     except IOError or ValueError:
         return None
 

@@ -105,7 +105,7 @@ def test_finder_options(f):
     f = click.option("--configuration_directory", type=click.Path(exists=True), required=True, show_default=True,
                      default=_DEFAULT_DIRECTORY, help='Path to the directory containing the tests configuration.')(f)
     return click.option("--configuration_name", type=str, required=True, show_default=True,
-                     default=_CI_CONFIGURATION_NAME, help='Name of the collection configuration json file to use.')(f)
+                        default=_CI_CONFIGURATION_NAME, help='Name of the collection configuration json file to use.')(f)
 
 
 @click.command()

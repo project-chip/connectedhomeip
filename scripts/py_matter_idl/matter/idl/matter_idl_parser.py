@@ -322,7 +322,6 @@ class MatterIdlTransformer(Transformer):
             **args[1],
         )
 
-
     def event_access(self, privilege):
         return privilege[0]
 

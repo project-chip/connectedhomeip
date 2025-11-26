@@ -75,7 +75,7 @@ def test_parser_options(f):
     f = click.option('--use_default_pseudo_clusters', type=bool, show_default=True, default=True,
                      help='If enable this option use the set of default clusters provided by the matter_yamltests package.')(f)
     return click.option('--additional_pseudo_clusters_directory', type=click.Path(), show_default=True, default=None,
-                     help='Path to a directory containing additional pseudo clusters.')(f)
+                        help='Path to a directory containing additional pseudo clusters.')(f)
 
 
 def test_runner_options(f):
@@ -94,7 +94,7 @@ def test_runner_options(f):
     f = click.option('--use_test_harness_log_format', type=bool, default=False, show_default=True,
                      help='Use the test harness log format.')(f)
     return click.option('--delay-in-ms', type=int, default=0, show_default=True,
-                     help='Add a delay between test suite steps.')(f)
+                        help='Add a delay between test suite steps.')(f)
 
 
 def websocket_runner_options(f):
@@ -107,7 +107,7 @@ def websocket_runner_options(f):
     f = click.option('--server_path', type=click.Path(exists=True), default=None,
                      help='Path to a websocket server to run at launch.')(f)
     return click.option('--server_arguments', type=str, default=None,
-                     help='Optional arguments to pass to the websocket server at launch.')(f)
+                        help='Optional arguments to pass to the websocket server at launch.')(f)
 
 
 def matter_repl_runner_options(f):
@@ -116,7 +116,7 @@ def matter_repl_runner_options(f):
     f = click.option('--commission_on_network_dut', type=bool, default=False,
                      help='Prior to running test should we try to commission DUT on network.')(f)
     return click.option('--runner', type=str, default=None, show_default=True,
-                     help='The runner to run the test with.')(f)
+                        help='The runner to run the test with.')(f)
 
 
 @dataclass

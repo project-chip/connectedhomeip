@@ -91,7 +91,6 @@ def get_raw_private_key_der(der_file: str, password: str):
             keys = load_der_private_key(key_data, password, backend=default_backend())
             return keys.private_numbers().private_value.to_bytes(32, byteorder='big')
 
-
     except IOError or ValueError:
         return None
 

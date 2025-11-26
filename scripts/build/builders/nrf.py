@@ -171,7 +171,6 @@ class NrfConnectBuilder(Builder):
 
         return " -- " + " ".join(flags) if len(flags) > 0 else ""
 
-
     def generate(self):
         if not os.path.exists(self.output_dir):
             if not self._runner.dry_run:

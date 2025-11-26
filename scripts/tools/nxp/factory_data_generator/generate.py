@@ -112,7 +112,6 @@ class KlvGenerator:
         data = [obj for key, obj in vars(self.args).items() if isinstance(obj, InputArgument)]
         return [arg.output() for arg in sorted(data, key=lambda x: x.key())]
 
-
     def to_bin(self, klv, out, aes_key):
         fullContent = bytearray()
         with open(out, "wb") as file:

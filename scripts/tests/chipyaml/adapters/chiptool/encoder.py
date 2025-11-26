@@ -337,8 +337,7 @@ class Encoder:
         arguments = self.__maybe_add(
             arguments, request.identity, "commissioner-name")
         return self.__maybe_add(arguments, request.fabric_filtered,
-                                     "fabric-filtered")
-
+                                "fabric-filtered")
 
     def __maybe_add_destination(self, rv, request):
         if not self._supports_destination(request):

@@ -80,7 +80,6 @@ def gen_test_discriminator(discriminator):
     return random.randint(0, 0xfff)
 
 
-
 def gen_test_unique_id(unique_id):
 
     if isinstance(unique_id, bytes):
@@ -89,7 +88,6 @@ def gen_test_unique_id(unique_id):
         return unique_id
 
     return secrets.token_bytes(16)
-
 
 
 def gen_test_spake2(passcode, spake2p_it, spake2p_salt, spake2p_verifier=None):
@@ -322,7 +320,6 @@ def gen_mfd_partition(args, mfd_output):
         with open(der, 'rb') as file:
             keys = load_der_private_key(file.read(), password=None, backend=default_backend())
             return keys.private_numbers().private_value.to_bytes(32, byteorder='big')
-
 
     def encrypt_data(data_bytearray, key_bytearray, iv_bytearray):
         data_bytearray += bytes([0] * (16 - (len(data_bytearray) % 16)))

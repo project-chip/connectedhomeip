@@ -104,7 +104,6 @@ def to_pascal_case(s: str) -> str:
     return ''.join(word.capitalize() for word in snake_case_split)
 
 
-
 def to_camel_case(s) -> str:
     """convert to camel case; with no spaces or underscore between words, first word all lowercase and following words are uppercase
         same as pascal case but first letter is lower case

@@ -372,7 +372,6 @@ class NxpBuilder(GnBuilder):
 
         return " ".join(flags)
 
-
     def get_conf_file(self):
         thread_type = "mtd" if self.enable_mtd else "ftd"
 
