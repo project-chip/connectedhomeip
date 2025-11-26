@@ -17,8 +17,8 @@
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/clusters/resource-monitoring-server/CodegenIntegration.h>
 #include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
+#include <app/clusters/resource-monitoring-server/resource-monitoring-server.h>
 
 namespace chip {
 namespace app {

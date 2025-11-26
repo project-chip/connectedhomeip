@@ -17,9 +17,10 @@ import("//build_overrides/chip.gni")
 source_set("resource-monitoring-server") {
   sources = [
     "ResourceMonitoringCluster.cpp",
+    "ResourceMonitoringCluster.h",
+    "ResourceMonitoringDelegate.h",
     "resource-monitoring-cluster-objects.cpp",
     "resource-monitoring-cluster-objects.h",
-    "resource-monitoring-server.h",
   ]
 
   deps = [

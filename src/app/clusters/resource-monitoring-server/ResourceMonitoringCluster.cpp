@@ -14,8 +14,9 @@
  *    limitations under the License.
  */
 
+#include <app/clusters/resource-monitoring-server/ResourceMonitoringCluster.h>
+
 #include <app/SafeAttributePersistenceProvider.h>
-#include <app/clusters/resource-monitoring-server/resource-monitoring-server.h>
 #include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/ActivatedCarbonFilterMonitoring/Metadata.h>
@@ -36,7 +37,7 @@ namespace ResourceMonitoring {
 
 ResourceMonitoringCluster::ResourceMonitoringCluster(
     EndpointId aEndpointId, ClusterId aClusterId, const BitFlags<ResourceMonitoring::Feature> enabledFeatures,
-    chip::Optional<OptionalAttributeSet> optionalAttributeSet,
+    OptionalAttributeSet optionalAttributeSet,
     ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
     bool aResetConditionCommandSupported) :
     DefaultServerCluster(ConcreteClusterPath(aEndpointId, aClusterId)),
@@ -129,10 +130,8 @@ CHIP_ERROR ResourceMonitoringCluster::Attributes(const ConcreteClusterPath & pat
     AttributeListBuilder::OptionalAttributeEntry optionalAttributesEntries[] = {
         { haveCondition, Condition::kMetadataEntry },
         { haveCondition, DegradationDirection::kMetadataEntry },
-        { mOptionalAttributeSet.HasValue() && mOptionalAttributeSet.Value().IsSet(InPlaceIndicator::Id),
-          InPlaceIndicator::kMetadataEntry },
-        { mOptionalAttributeSet.HasValue() && mOptionalAttributeSet.Value().IsSet(LastChangedTime::Id),
-          LastChangedTime::kMetadataEntry },
+        { mOptionalAttributeSet.IsSet(InPlaceIndicator::Id), InPlaceIndicator::kMetadataEntry },
+        { mOptionalAttributeSet.IsSet(LastChangedTime::Id), LastChangedTime::kMetadataEntry },
         { haveReplacementProductList, ReplacementProductList::kMetadataEntry },
     };
 
@@ -147,7 +146,7 @@ CHIP_ERROR ResourceMonitoringCluster::ReadReplaceableProductList(AttributeValueE
     ReplacementProductListManager * productListManagerInstance = GetReplacementProductListManagerInstance();
     if (nullptr == productListManagerInstance)
     {
-        aEncoder.EncodeEmptyList();
+        TEMPORARY_RETURN_IGNORED aEncoder.EncodeEmptyList();
         return CHIP_NO_ERROR;
     }
 
@@ -244,7 +243,7 @@ ResourceMonitoringCluster::UpdateLastChangedTime(DataModel::Nullable<uint32_t> a
     {
         if (mPath.mClusterId == HepaFilterMonitoring::Id)
         {
-            chip::app::GetSafeAttributePersistenceProvider()->WriteScalarValue(
+            TEMPORARY_RETURN_IGNORED chip::app::GetSafeAttributePersistenceProvider()->WriteScalarValue(
                 ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, HepaFilterMonitoring::Attributes::LastChangedTime::Id),
                 mLastChangedTime);
             NotifyAttributeChanged(HepaFilterMonitoring::Attributes::LastChangedTime::Id);
@@ -252,7 +251,7 @@ ResourceMonitoringCluster::UpdateLastChangedTime(DataModel::Nullable<uint32_t> a
 
         if (mPath.mClusterId == ActivatedCarbonFilterMonitoring::Id)
         {
-            chip::app::GetSafeAttributePersistenceProvider()->WriteScalarValue(
+            TEMPORARY_RETURN_IGNORED chip::app::GetSafeAttributePersistenceProvider()->WriteScalarValue(
                 ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId,
                                       ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::Id),
                 mLastChangedTime);
@@ -382,7 +381,7 @@ bool ResourceMonitoringCluster::HasFeature(ResourceMonitoring::Feature aFeature)
 
 bool ResourceMonitoringCluster::HasOptionalAttribute(AttributeId aAttribute) const
 {
-    return mOptionalAttributeSet.HasValue() && mOptionalAttributeSet.Value().IsSet(aAttribute);
+    return mOptionalAttributeSet.IsSet(aAttribute);
 }
 
 Protocols::InteractionModel::Status Delegate::OnResetCondition()

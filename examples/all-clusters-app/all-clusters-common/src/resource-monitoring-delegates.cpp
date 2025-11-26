@@ -117,7 +117,7 @@ void emberAfActivatedCarbonFilterMonitoringClusterInitCallback(chip::EndpointId 
     gActivatedCarbonFilterInstance = new ResourceMonitoring::Instance(
         gActivatedCarbonFilterDelegate, endpoint, ActivatedCarbonFilterMonitoring::Id,
         static_cast<uint32_t>(gActivatedCarbonFeatureMap.to_ulong()), ResourceMonitoring::DegradationDirectionEnum::kDown, true);
-    gActivatedCarbonFilterInstance->Init();
+    TEMPORARY_RETURN_IGNORED gActivatedCarbonFilterInstance->Init();
 }
 
 void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
@@ -128,7 +128,7 @@ void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
     gHepaFilterInstance = new ResourceMonitoring::Instance(gHepaFilterDelegate, endpoint, HepaFilterMonitoring::Id,
                                                            static_cast<uint32_t>(gHepaFilterFeatureMap.to_ulong()),
                                                            ResourceMonitoring::DegradationDirectionEnum::kDown, true);
-    gHepaFilterInstance->Init();
+    TEMPORARY_RETURN_IGNORED gHepaFilterInstance->Init();
 }
 
 void emberAfActivatedCarbonFilterMonitoringClusterShutdownCallback(chip::EndpointId endpoint)

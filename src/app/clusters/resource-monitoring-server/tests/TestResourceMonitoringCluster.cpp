@@ -16,7 +16,7 @@
 
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/resource-monitoring-server/resource-monitoring-server.h>
+#include <app/clusters/resource-monitoring-server/ResourceMonitoringCluster.h>
 
 #include <app/clusters/testing/AttributeTesting.h>
 
