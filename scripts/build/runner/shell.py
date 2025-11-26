@@ -70,7 +70,7 @@ class ShellRunner:
             return
 
         outpipe = LogPipe(logging.INFO)
-        errpipe = LogPipe(logging.WARN)
+        errpipe = LogPipe(logging.WARNING)
 
         with subprocess.Popen(cmd, cwd=self.root_dir,
                               stdout=outpipe, stderr=errpipe) as s:
