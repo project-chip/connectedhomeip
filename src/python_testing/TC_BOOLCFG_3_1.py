@@ -133,7 +133,7 @@ class TC_BOOLCFG_3_1(MatterBaseTest):
                 result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attributes.CurrentSensitivityLevel(selected_non_default_level))])
                 asserts.assert_equal(result[0].Status, Status.Success, "CurrentSensitivityLevel write failed")
             else:
-                logging.info(f"Only one sensitivity level supported, step 7 not applicable")
+                logging.info("Only one sensitivity level supported, step 7 not applicable")
 
         self.step(8)
         if attributes.DefaultSensitivityLevel.attribute_id in attribute_list:
