@@ -36,7 +36,7 @@ class HostCryptoLibrary(Enum):
             return 'chip_crypto="mbedtls"'
         if self == HostCryptoLibrary.BORINGSSL:
             return 'chip_crypto="boringssl"'
-        return None
+        raise ValueError("Unknown host crypto library: %r" % self)
 
 
 class HostFuzzingType(Enum):
