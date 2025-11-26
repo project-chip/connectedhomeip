@@ -23,6 +23,8 @@ from typing import List
 
 import coloredlogs
 
+log = logging.getLogger(__name__)
+
 SCRIPT_ROOT = os.path.dirname(__file__)
 
 
@@ -60,9 +62,9 @@ def main():
     diffs = list(difflib.unified_diff(expected, actual))
 
     if diffs:
-        logging.error("DIFFERENCE between expected and generated output")
+        log.error("DIFFERENCE between expected and generated output")
         for line in diffs:
-            logging.warning("  " + line.strip())
+            log.warning("  %s", line.strip())
         sys.exit(1)
 
 

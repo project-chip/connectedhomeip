@@ -204,7 +204,7 @@ class TC_CNET_4_10(MatterBaseTest):
         current_cluster_connected = connected_network_count[self.get_endpoint()] == 1
         if not current_cluster_connected:
             logging.info("Current cluster is not connected, skipping all remaining test steps")
-            self.skip_all_remaining_steps()
+            self.mark_all_remaining_steps_skipped(4)
             return
 
         # Step 4: Arm failsafe and verify response

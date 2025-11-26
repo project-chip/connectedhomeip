@@ -489,8 +489,7 @@ class ClusterObjectTests:
         logger.info(f"return result is {res}")
         if len(res) != 0:
             raise AssertionError("failure: not expect to receive fabric-scoped event when fabric is undefined")
-        else:
-            logger.info("TestGenerateUndefinedFabricScopedEventRequests: Success")
+        logger.info("TestGenerateUndefinedFabricScopedEventRequests: Success")
 
     @classmethod
     @base.test_case
