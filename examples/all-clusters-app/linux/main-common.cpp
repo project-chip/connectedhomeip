@@ -203,7 +203,7 @@ void ApplicationInit()
     Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
     Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
 
-    Clusters::ValveConfigurationAndControl::SetDelegate(chip::EndpointId(1), &sValveDelegate);
+    Clusters::ValveConfigurationAndControl::SetDefaultDelegate(chip::EndpointId(1), &sValveDelegate);
     Clusters::TimeSynchronization::SetDefaultDelegate(&sTimeSyncDelegate);
 
     Clusters::UnitLocalization::TempUnitEnum supportedUnits[2] = { Clusters::UnitLocalization::TempUnitEnum::kFahrenheit,

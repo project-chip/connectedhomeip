@@ -117,24 +117,6 @@ void MatterValveConfigurationAndControlPluginServerShutdownCallback() {}
 
 namespace chip::app::Clusters::ValveConfigurationAndControl {
 
-void SetDelegate(EndpointId endpointId, Delegate * delegate)
-{
-    IntegrationDelegate integrationDelegate;
-
-    ServerClusterInterface * interface = CodegenClusterIntegration::FindClusterOnEndpoint(
-        {
-            .endpointId                = endpointId,
-            .clusterId                 = ValveConfigurationAndControl::Id,
-            .fixedClusterInstanceCount = kValveConfigurationAndControlFixedClusterCount,
-            .maxClusterInstanceCount   = kValveConfigurationAndControlMaxClusterCount,
-        },
-        integrationDelegate);
-
-    VerifyOrReturn(interface != nullptr);
-
-    static_cast<ValveConfigurationAndControlCluster *>(interface)->SetDelegate(delegate);
-}
-
 ValveConfigurationAndControlCluster * FindClusterOnEndpoint(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
@@ -149,6 +131,55 @@ ValveConfigurationAndControlCluster * FindClusterOnEndpoint(EndpointId endpointI
         integrationDelegate);
 
     return static_cast<ValveConfigurationAndControlCluster *>(valveConfigurationAndControl);
+}
+
+void SetDefaultDelegate(EndpointId endpointId, Delegate * delegate)
+{
+    ValveConfigurationAndControlCluster * interface = FindClusterOnEndpoint(endpointId);
+    VerifyOrReturn(interface != nullptr);
+    interface->SetDelegate(delegate);
+}
+
+CHIP_ERROR CloseValve(chip::EndpointId ep)
+{
+    ValveConfigurationAndControlCluster * interface = FindClusterOnEndpoint(ep);
+    VerifyOrReturnError(interface != nullptr, CHIP_ERROR_UNINITIALIZED);
+    return interface->CloseValve();
+}
+
+CHIP_ERROR UpdateCurrentLevel(chip::EndpointId ep, chip::Percent currentLevel)
+{
+    ValveConfigurationAndControlCluster * interface = FindClusterOnEndpoint(ep);
+    VerifyOrReturnError(interface != nullptr, CHIP_ERROR_UNINITIALIZED);
+    interface->UpdateCurrentLevel(currentLevel);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR UpdateCurrentState(chip::EndpointId ep, ValveConfigurationAndControl::ValveStateEnum currentState)
+{
+    ValveConfigurationAndControlCluster * interface = FindClusterOnEndpoint(ep);
+    VerifyOrReturnError(interface != nullptr, CHIP_ERROR_UNINITIALIZED);
+    interface->UpdateCurrentState(currentState);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EmitValveFault(chip::EndpointId ep, chip::BitMask<ValveConfigurationAndControl::ValveFaultBitmap> fault)
+{
+    ValveConfigurationAndControlCluster * interface = FindClusterOnEndpoint(ep);
+    VerifyOrReturnError(interface != nullptr, CHIP_ERROR_UNINITIALIZED);
+    interface->EmitValveFault(fault);
+    return CHIP_NO_ERROR;
+}
+
+void UpdateAutoCloseTime(uint64_t time)
+{
+    for(size_t serverIndex = 0; serverIndex < kValveConfigurationAndControlMaxClusterCount; serverIndex++)
+    {
+        if(gServers[serverIndex].IsConstructed())
+        {
+            gServers[serverIndex].Cluster().UpdateAutoCloseTime(time);
+        }
+    }
 }
 
 } // namespace chip::app::Clusters::ValveConfigurationAndControl

@@ -21,8 +21,19 @@
 
 namespace chip::app::Clusters::ValveConfigurationAndControl {
 
-void SetDelegate(EndpointId endpointId, Delegate * delegate);
-
 ValveConfigurationAndControlCluster * FindClusterOnEndpoint(EndpointId endpointId);
+
+/**
+ * The SetDelegate function relies on the ValveConfigurationAndControl being initialized in the 
+ * given endpoint.
+ */
+void SetDefaultDelegate(EndpointId endpointId, Delegate * delegate);
+
+
+CHIP_ERROR CloseValve(chip::EndpointId ep);
+CHIP_ERROR UpdateCurrentLevel(chip::EndpointId ep, chip::Percent currentLevel);
+CHIP_ERROR UpdateCurrentState(chip::EndpointId ep, ValveConfigurationAndControl::ValveStateEnum currentState);
+CHIP_ERROR EmitValveFault(chip::EndpointId ep, chip::BitMask<ValveConfigurationAndControl::ValveFaultBitmap> fault);
+void UpdateAutoCloseTime(uint64_t time);
 
 } // namespace chip::app::Clusters::ValveConfigurationAndControl

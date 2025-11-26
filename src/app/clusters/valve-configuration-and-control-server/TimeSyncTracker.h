@@ -21,6 +21,14 @@
 
 namespace chip::app::Clusters {
 
+/// Defines an interface to get the current status and availability
+/// of the TimeSynchronization cluster and UTC time.
+///
+/// This is needed for the Feature TimeSync of the ValveConfigurationAndControl
+/// cluster, according to spec this Feature shall only be enabled if the
+/// TimeSynchronization cluster is available.
+/// For the AutoCloseTime, the TimeSynchronization cluster should also have a 
+/// valid UTC time.
 class TimeSyncTracker
 {
 public:
