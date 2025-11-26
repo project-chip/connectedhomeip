@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2023-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -68,16 +68,11 @@ DataModel::ActionReturnStatus ResourceMonitoringCluster::WriteImpl(const DataMod
     switch (request.path.mAttributeId)
     {
     case ResourceMonitoring::Attributes::LastChangedTime::Id: {
-
-        uint32_t lastChangedTime = 0; // Initialize to a known value
-
-        DataModel::ActionReturnStatus status = persistence.DecodeAndStoreNativeEndianValue(request.path, decoder, lastChangedTime);
-        if (status == CHIP_NO_ERROR)
-        {
-            mLastChangedTime = DataModel::MakeNullable(lastChangedTime);
-        }
-        return status;
+        ReturnErrorOnFailure(chip::app::GetSafeAttributePersistenceProvider()->WriteScalarValue(
+            ConcreteAttributePath(GetEndpointId(), GetClusterId(), Attributes::LastChangedTime::Id), mLastChangedTime));
+        return Protocols::InteractionModel::Status::Success;
     }
+
     default:
         return Protocols::InteractionModel::Status::UnsupportedWrite;
     }
@@ -162,7 +157,7 @@ CHIP_ERROR ResourceMonitoringCluster::ReadReplaceableProductList(AttributeValueE
             iteratorError = productListManagerInstance->Next(replacementProductStruct);
         }
 
-        return (CHIP_ERROR_PROVIDER_LIST_EXHAUSTED == iteratorError) ? CHIP_NO_ERROR : iteratorError;
+        return iteratorError.NoErrorIf(CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
     });
 }
 
@@ -183,15 +178,10 @@ chip::Protocols::InteractionModel::Status ResourceMonitoringCluster::UpdateCondi
     mCondition            = newCondition;
     if (mCondition != oldConditionattr)
     {
-        if (mPath.mClusterId == HepaFilterMonitoring::Id)
-        {
-            NotifyAttributeChanged(HepaFilterMonitoring::Attributes::Condition::Id);
-        }
+        static_assert(HepaFilterMonitoring::Attributes::Condition::Id ==
+                      ActivatedCarbonFilterMonitoring::Attributes::Condition::Id);
 
-        if (mPath.mClusterId == ActivatedCarbonFilterMonitoring::Id)
-        {
-            NotifyAttributeChanged(ActivatedCarbonFilterMonitoring::Attributes::Condition::Id);
-        }
+        NotifyAttributeChanged(HepaFilterMonitoring::Attributes::Condition::Id);
     }
     return Protocols::InteractionModel::Status::Success;
 }
@@ -221,15 +211,10 @@ Protocols::InteractionModel::Status ResourceMonitoringCluster::UpdateInPlaceIndi
     mInPlaceIndicator        = newInPlaceIndicator;
     if (mInPlaceIndicator != oldInPlaceIndicator)
     {
-        if (mPath.mClusterId == HepaFilterMonitoring::Id)
-        {
-            NotifyAttributeChanged(HepaFilterMonitoring::Attributes::InPlaceIndicator::Id);
-        }
+        static_assert(HepaFilterMonitoring::Attributes::Condition::Id ==
+                      ActivatedCarbonFilterMonitoring::Attributes::Condition::Id);
 
-        if (mPath.mClusterId == ActivatedCarbonFilterMonitoring::Id)
-        {
-            NotifyAttributeChanged(ActivatedCarbonFilterMonitoring::Attributes::InPlaceIndicator::Id);
-        }
+        NotifyAttributeChanged(HepaFilterMonitoring::Attributes::InPlaceIndicator::Id);
     }
     return Protocols::InteractionModel::Status::Success;
 }
@@ -331,11 +316,11 @@ ResourceMonitoringCluster::ResetCondition(const ConcreteCommandPath & commandPat
                                           const ResourceMonitoring::Commands::ResetCondition::DecodableType & commandData,
                                           CommandHandler * handler)
 {
-    Status resetConditionStatus = mDelegate->OnResetCondition();
+    Protocols::InteractionModel::Status resetConditionStatus = mDelegate->OnResetCondition();
 
     handler->AddStatus(commandPath, resetConditionStatus);
 
-    return std::nullopt;
+    return resetConditionStatus;
 }
 
 CHIP_ERROR ResourceMonitoringCluster::AcceptedCommands(const ConcreteClusterPath & cluster,
