@@ -145,16 +145,16 @@ TEST_F(TestIdentifyCluster, ReadAttributesTest)
     EXPECT_EQ(identifyType, (uint8_t) IdentifyTypeEnum::kVisibleIndicator);
 
     // Read and verify FeatureMap
-    uint32_t featureMap;
+    uint32_t featureMap{};
     EXPECT_TRUE(tester.ReadAttribute(FeatureMap::Id, featureMap).IsSuccess());
     EXPECT_EQ(featureMap, 0u);
 
     // Read and verify ClusterRevision
-    uint16_t clusterRevision;
+    uint16_t clusterRevision{};
     EXPECT_TRUE(tester.ReadAttribute(Globals::Attributes::ClusterRevision::Id, clusterRevision).IsSuccess());
 
     // Read non-existent attribute
-    uint32_t nonExistentAttribute;
+    uint32_t nonExistentAttribute{};
     EXPECT_FALSE(tester.ReadAttribute(0xFFFF, nonExistentAttribute).IsSuccess());
 }
 
@@ -204,7 +204,7 @@ TEST_F(TestIdentifyCluster, IdentifyTimeCountdownTest)
     chip::Test::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    uint16_t identifyTime;
+    uint16_t identifyTime{};
     EXPECT_TRUE(tester.WriteAttribute(IdentifyTime::Id, static_cast<uint16_t>(5)).IsSuccess());
 
     // Advance the clock 1 second at a time and check the attribute value.
@@ -264,7 +264,7 @@ TEST_F(TestIdentifyCluster, OnStopNotCalledIfNotIdentifying)
     chip::Test::ClusterTester tester(cluster);
     EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
     // Ensure we are not identifying.
-    uint16_t identifyTime;
+    uint16_t identifyTime{};
     EXPECT_TRUE(tester.ReadAttribute(IdentifyTime::Id, identifyTime).IsSuccess());
     EXPECT_EQ(identifyTime, 0u);
 
@@ -289,7 +289,7 @@ TEST_F(TestIdentifyCluster, InvokeIdentifyCommandTest)
         auto result = tester.Invoke(Commands::Identify::Id, data);
         EXPECT_TRUE(result.IsSuccess());
 
-        uint16_t identifyTime;
+        uint16_t identifyTime{};
         EXPECT_TRUE(tester.ReadAttribute(IdentifyTime::Id, identifyTime).IsSuccess());
         EXPECT_EQ(identifyTime, kIdentifyTime);
     }
@@ -372,7 +372,7 @@ TEST_F(TestIdentifyCluster, TriggerEffectWhileIdentifyingTest)
     EXPECT_TRUE(result.IsSuccess());
     EXPECT_TRUE(onEffectIdentifierCalled);
 
-    uint16_t identifyTime;
+    uint16_t identifyTime{};
     EXPECT_TRUE(tester.ReadAttribute(IdentifyTime::Id, identifyTime).IsSuccess());
     EXPECT_EQ(identifyTime, 0u);
 }
@@ -393,7 +393,7 @@ TEST_F(TestIdentifyCluster, TriggerEffectFinishEffectTest)
     auto result = tester.Invoke(Commands::TriggerEffect::Id, data);
     EXPECT_TRUE(result.IsSuccess());
 
-    uint16_t identifyTime;
+    uint16_t identifyTime{};
     EXPECT_TRUE(tester.ReadAttribute(IdentifyTime::Id, identifyTime).IsSuccess());
     EXPECT_EQ(identifyTime, 1u);
 }
@@ -414,7 +414,7 @@ TEST_F(TestIdentifyCluster, TriggerEffectStopEffectTest)
     auto result = tester.Invoke(Commands::TriggerEffect::Id, data);
     EXPECT_TRUE(result.IsSuccess());
 
-    uint16_t identifyTime;
+    uint16_t identifyTime{};
     EXPECT_TRUE(tester.ReadAttribute(IdentifyTime::Id, identifyTime).IsSuccess());
     EXPECT_EQ(identifyTime, 0u);
 }
@@ -429,7 +429,7 @@ TEST_F(TestIdentifyCluster, StopIdentifyingTest)
     EXPECT_TRUE(tester.WriteAttribute(IdentifyTime::Id, static_cast<uint16_t>(10)).IsSuccess());
 
     // Verify identifying started
-    uint16_t identifyTime;
+    uint16_t identifyTime{};
     EXPECT_TRUE(tester.ReadAttribute(IdentifyTime::Id, identifyTime).IsSuccess());
     EXPECT_EQ(identifyTime, 10u);
 
@@ -464,7 +464,7 @@ TEST_F(TestIdentifyCluster, IdentifyTimeAttributeReportingTest)
     // 2. Test countdown does NOT report
     changeListener.DirtyList().clear();
     mMockTimerDelegate.AdvanceClock(System::Clock::Seconds16(1));
-    uint16_t identifyTime;
+    uint16_t identifyTime{};
     EXPECT_TRUE(tester.ReadAttribute(IdentifyTime::Id, identifyTime).IsSuccess());
     EXPECT_EQ(identifyTime, 9u);
     EXPECT_EQ(changeListener.DirtyList().size(), 0u);
