@@ -149,6 +149,7 @@ public:
                 CharSpan value;
                 ReturnErrorOnFailure(decoder.Decode(value));
                 mStringAttribute = std::string(value.data(), value.size());
+                NotifyAttributeChanged(kTestAttribute1);
                 return Status::Success;
             }
         }
