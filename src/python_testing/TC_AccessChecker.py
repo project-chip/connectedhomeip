@@ -293,7 +293,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
         """Helper to subscribe to an attribute expecting success."""
         try:
             subscription = await self.TH2.ReadAttribute(
-                nodeid=self.dut_node_id,
+                nodeId=self.dut_node_id,
                 attributes=[(endpoint_id, attribute)],
                 reportInterval=(0, 30),
                 keepSubscriptions=False,
@@ -326,7 +326,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
         """Helper to subscribe to an attribute expecting UnsupportedAccess error."""
         try:
             subscription = await self.TH2.ReadAttribute(
-                nodeid=self.dut_node_id,
+                nodeId=self.dut_node_id,
                 attributes=[(endpoint_id, attribute)],
                 reportInterval=(0, 30),
                 keepSubscriptions=False,
@@ -576,7 +576,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                  TestStep(2, "TH_commissioner reads the ACL attribute (done during test setup)"),
                  TestStep(3, "Repeat steps 3a and 3b for each permission level")]
         enum = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
-        privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue]
+        privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue and p != enum.kProxyView]
         for p in privilege_enum:
             steps.append(TestStep(step_number_with_privilege(3, 'a', p),
                          "TH_commissioner gives TH_second_commissioner the specified privilege"))
