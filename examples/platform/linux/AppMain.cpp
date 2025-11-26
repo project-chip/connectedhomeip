@@ -779,7 +779,7 @@ struct LinuxCommonCaseDeviceServerInitParams final : public chip::CommonCaseDevi
 {
     LinuxCommonCaseDeviceServerInitParams()
     {
-        InitializeStaticResourcesBeforeServerInit();
+        SuccessOrDie(InitializeStaticResourcesBeforeServerInit());
         dataModelProvider = app::CodegenDataModelProviderInstance(persistentStorageDelegate);
     }
 };

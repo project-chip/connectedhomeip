@@ -268,8 +268,8 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
         {
             chip::DeviceLayer::PersistedStorage::KeyValueStoreManager & kvsManager =
                 DeviceLayer::PersistedStorage::KeyValueStoreMgr();
-            ReturnErrorOnFailure(mKvsPersistenStorageDelegate.Init(&kvsManager));
-            this->persistentStorageDelegate = &mKvsPersistenStorageDelegate;
+            ReturnErrorOnFailure(mKvsPersistentStorageDelegate.Init(&kvsManager));
+            this->persistentStorageDelegate = &mKvsPersistentStorageDelegate;
         }
 
         // PersistentStorageDelegate "software-based" operational key access injection
@@ -358,7 +358,7 @@ private:
     // Owned resources - these are instance members (not static) so each
     // CommonCaseDeviceServerInitParams instance owns its own copy.
     // They must outlive Server::Init() because that method stores pointers to them.
-    KvsPersistentStorageDelegate mKvsPersistenStorageDelegate;
+    KvsPersistentStorageDelegate mKvsPersistentStorageDelegate;
     PersistentStorageOperationalKeystore mPersistentStorageOperationalKeystore;
     Credentials::PersistentStorageOpCertStore mPersistentStorageOpCertStore;
     Credentials::GroupDataProviderImpl mGroupDataProvider;
