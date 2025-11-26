@@ -114,11 +114,6 @@ class TC_DA_1_1(MatterBaseTest):
             logging.info(f"Deleting KVS file: {kvs_file}")
             kvs_file.unlink(missing_ok=True)
 
-        # Delete admin storage file
-        admin_storage = pathlib.Path("admin_storage.json")
-        if admin_storage.exists():
-            admin_storage.unlink()
-
         # Trigger app restart for factory reset
         restart_flag_file = self.get_restart_flag_file()
         if restart_flag_file:
