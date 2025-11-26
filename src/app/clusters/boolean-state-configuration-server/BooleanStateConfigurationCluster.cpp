@@ -14,7 +14,7 @@
  *    limitations under the License.
  *
  */
-#include <app/clusters/boolean-state-configuration-server/boolean-state-configuration-cluster.h>
+#include <app/clusters/boolean-state-configuration-server/BooleanStateConfigurationCluster.h>
 
 #include <app/SafeAttributePersistenceProvider.h>
 #include <app/data-model/Decode.h>
