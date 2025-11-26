@@ -88,7 +88,7 @@ public:
                     NSLog(@"Values: %@", values);
                     if (error == nil) {
                         constexpr chip::CommandId responseId = chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase responseName}}::Id;
-                        RemoteDataModelLogger::LogCommandAsJSON(@(endpointId), @(clusterId), @(responseId), values);
+                        TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogCommandAsJSON(@(endpointId), @(clusterId), @(responseId), values);
                     }
             {{else}}
                 ^(NSError * _Nullable error) {
@@ -99,9 +99,9 @@ public:
                         LogNSError("Error", error);
                         {{#if hasSpecificResponse}}
                           constexpr chip::CommandId responseId = chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase responseName}}::Id;
-                          RemoteDataModelLogger::LogCommandErrorAsJSON(@(endpointId), @(clusterId), @(responseId), error);
+                          TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogCommandErrorAsJSON(@(endpointId), @(clusterId), @(responseId), error);
                         {{else}}
-                          RemoteDataModelLogger::LogCommandErrorAsJSON(@(endpointId), @(clusterId), @(commandId), error);
+                          TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogCommandErrorAsJSON(@(endpointId), @(clusterId), @(commandId), error);
                         {{/if}}
                     }
                     if (responsesNeeded == 0) {
@@ -176,10 +176,10 @@ public:
         ^({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error) {
         NSLog(@"{{asUpperCamelCase parent.name preserveAcronyms=true}}.{{asUpperCamelCase name preserveAcronyms=true}} response %@", [value description]);
         if (error == nil) {
-          RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
+          TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
         } else {
           LogNSError("{{asUpperCamelCase parent.name preserveAcronyms=true}} {{asUpperCamelCase name preserveAcronyms=true}} read Error", error);
-          RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
+          TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
         }
         SetCommandExitStatus(error);
          }];
@@ -251,7 +251,7 @@ public:
         [cluster write{{>attribute}}WithValue:value params:params completion:^(NSError * _Nullable error) {
             if (error != nil) {
               LogNSError("{{asUpperCamelCase parent.name preserveAcronyms=true}} {{asUpperCamelCase name preserveAcronyms=true}} write Error", error);
-              RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
+              TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
             }
             SetCommandExitStatus(error);
             }];
@@ -307,9 +307,9 @@ public:
                                 reportHandler:^({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error) {
         NSLog(@"{{asUpperCamelCase parent.name preserveAcronyms=true}}.{{asUpperCamelCase name preserveAcronyms=true}} response %@", [value description]);
             if (error == nil) {
-              RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
+              TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
             } else {
-              RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
+              TEMPORARY_RETURN_IGNORED RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
             }
         SetCommandExitStatus(error);
          }];

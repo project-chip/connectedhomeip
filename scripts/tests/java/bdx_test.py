@@ -20,12 +20,15 @@
 import argparse
 import logging
 import queue
+import shlex
 import subprocess
 import threading
 import typing
 
 from colorama import Fore, Style
 from java.base import DumpProgramOutputToQueue
+
+log = logging.getLogger(__name__)
 
 
 class BDXTest:
@@ -70,7 +73,7 @@ class BDXTest:
     def TestCmdOnnetworkLongBDXDownloadLog(self, nodeid, setuppin, discriminator, timeout, logType, fileName):
         java_command = self.command + ['bdx', 'onnetwork-long-downloadLog',
                                        nodeid, setuppin, discriminator, timeout, logType, fileName]
-        logging.info(f"Execute: {java_command}")
+        log.info("Execute: %s", shlex.join(java_command))
         java_process = subprocess.Popen(
             java_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         DumpProgramOutputToQueue(self.thread_list, Fore.GREEN + "JAVA " + Style.RESET_ALL, java_process, self.queue)
@@ -78,7 +81,7 @@ class BDXTest:
 
     def RunTest(self):
         if self.command_name == 'onnetwork-long-downloadLog':
-            logging.info("Testing pairing onnetwork-long-downloadLog")
+            log.info("Testing pairing onnetwork-long-downloadLog")
             code = self.TestCmdOnnetworkLongBDXDownloadLog(
                 self.nodeid, self.setup_pin_code, self.discriminator, self.timeout, self.logType, self.fileName)
             if code != 0:

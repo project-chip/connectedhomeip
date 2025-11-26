@@ -49,7 +49,7 @@ void SwitchManager::ToggleHandler(AppEvent * aEvent)
     data->commandId       = chip::app::Clusters::OnOff::Commands::Toggle::Id;
     data->isGroup         = true;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
 }
 
 void SwitchManager::LevelHandler(AppEvent * aEvent)
@@ -72,7 +72,7 @@ void SwitchManager::LevelHandler(AppEvent * aEvent)
     sLevel                = data->level;
 
     ChipLogProgress(NotSpecified, "Level - %d", sLevel);
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
 }
 
 void SwitchManager::ColorHandler(AppEvent * aEvent)
@@ -106,7 +106,7 @@ void SwitchManager::ColorHandler(AppEvent * aEvent)
         ChipLogProgress(NotSpecified, "Color - GREEN");
     }
 
-    DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(SwitchWorkerFunction, reinterpret_cast<intptr_t>(data));
 }
 
 void SwitchManager::GenericSwitchInitialPressHandler(AppEvent * aEvent)
@@ -121,7 +121,7 @@ void SwitchManager::GenericSwitchInitialPressHandler(AppEvent * aEvent)
     }
 
     ChipLogDetail(NotSpecified, "GenericSwitchInitialPress new position %d", newPosition);
-    SystemLayer().ScheduleLambda([newPosition] {
+    TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([newPosition] {
         chip::app::Clusters::Switch::Attributes::CurrentPosition::Set(GENERICSWITCH_ENDPOINT_ID, newPosition);
         // InitialPress event takes newPosition as event data
         chip::app::Clusters::SwitchServer::Instance().OnInitialPress(GENERICSWITCH_ENDPOINT_ID, newPosition);
@@ -140,7 +140,7 @@ void SwitchManager::GenericSwitchLongPressHandler(AppEvent * aEvent)
     }
 
     ChipLogDetail(NotSpecified, "GenericSwitchLongPress new position %d", newPosition);
-    SystemLayer().ScheduleLambda([newPosition] {
+    TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([newPosition] {
         // LongPress event takes newPosition as event data
         chip::app::Clusters::SwitchServer::Instance().OnLongPress(GENERICSWITCH_ENDPOINT_ID, newPosition);
     });
@@ -159,7 +159,7 @@ void SwitchManager::GenericSwitchShortReleaseHandler(AppEvent * aEvent)
     }
 
     ChipLogDetail(NotSpecified, "GenericSwitchShortRelease new position %d", newPosition);
-    SystemLayer().ScheduleLambda([newPosition, previousPosition] {
+    TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([newPosition, previousPosition] {
         chip::app::Clusters::Switch::Attributes::CurrentPosition::Set(GENERICSWITCH_ENDPOINT_ID, newPosition);
         // Short Release event takes newPosition as event data
         chip::app::Clusters::SwitchServer::Instance().OnShortRelease(GENERICSWITCH_ENDPOINT_ID, previousPosition);
@@ -179,7 +179,7 @@ void SwitchManager::GenericSwitchLongReleaseHandler(AppEvent * aEvent)
     }
 
     ChipLogDetail(NotSpecified, "GenericSwitchLongRelease new position %d", newPosition);
-    SystemLayer().ScheduleLambda([newPosition, previousPosition] {
+    TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([newPosition, previousPosition] {
         chip::app::Clusters::Switch::Attributes::CurrentPosition::Set(GENERICSWITCH_ENDPOINT_ID, newPosition);
         // LongRelease event takes newPosition as event data
         chip::app::Clusters::SwitchServer::Instance().OnLongRelease(GENERICSWITCH_ENDPOINT_ID, previousPosition);
@@ -194,7 +194,7 @@ void SwitchManager::GenericSwitchMultipressOngoingHandler(AppEvent * aEvent)
 
     ChipLogDetail(NotSpecified, "GenericSwitchMultiPressOngoing (%d)", multiPressCount);
 
-    SystemLayer().ScheduleLambda([newPosition] {
+    TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([newPosition] {
         chip::app::Clusters::SwitchServer::Instance().OnMultiPressOngoing(GENERICSWITCH_ENDPOINT_ID, newPosition, multiPressCount);
     });
 }
@@ -205,7 +205,7 @@ void SwitchManager::GenericSwitchMultipressCompleteHandler(AppEvent * aEvent)
 
     ChipLogProgress(NotSpecified, "GenericSwitchMultiPressComplete (%d)", multiPressCount);
 
-    SystemLayer().ScheduleLambda([previousPosition] {
+    TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda([previousPosition] {
         chip::app::Clusters::SwitchServer::Instance().OnMultiPressComplete(GENERICSWITCH_ENDPOINT_ID, previousPosition,
                                                                            multiPressCount);
     });
