@@ -78,23 +78,21 @@ class FundamentalType(enum.Enum):
     def idl_name(self):
         if self == FundamentalType.BOOL:
             return "bool"
-        elif self == FundamentalType.FLOAT:
+        if self == FundamentalType.FLOAT:
             return "single"
-        elif self == FundamentalType.DOUBLE:
+        if self == FundamentalType.DOUBLE:
             return "double"
-        else:
-            raise Exception("Type not handled: %r" % self)
+        raise Exception("Type not handled: %r" % self)
 
     @property
     def byte_count(self):
         if self == FundamentalType.BOOL:
             return 1
-        elif self == FundamentalType.FLOAT:
+        if self == FundamentalType.FLOAT:
             return 4
-        elif self == FundamentalType.DOUBLE:
+        if self == FundamentalType.DOUBLE:
             return 8
-        else:
-            raise Exception("Type not handled: %r" % self)
+        raise Exception("Type not handled: %r" % self)
 
     @property
     def bits(self):
@@ -388,15 +386,15 @@ def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> Union[Basic
         return FundamentalType.BOOL
     if lowercase_name == 'single':
         return FundamentalType.FLOAT
-    elif lowercase_name == 'double':
+    if lowercase_name == 'double':
         return FundamentalType.DOUBLE
-    elif lowercase_name in ['char_string', 'long_char_string']:
+    if lowercase_name in ['char_string', 'long_char_string']:
         return BasicString(idl_name=lowercase_name, is_binary=False, max_length=data_type.max_length)
-    elif lowercase_name in ['octet_string', 'long_octet_string']:
+    if lowercase_name in ['octet_string', 'long_octet_string']:
         return BasicString(idl_name=lowercase_name, is_binary=True, max_length=data_type.max_length)
-    elif lowercase_name in ['enum8', 'enum16']:
+    if lowercase_name in ['enum8', 'enum16']:
         return IdlEnumType(idl_name=lowercase_name, base_type=__CHIP_SIZED_TYPES__[lowercase_name])
-    elif lowercase_name in ['bitmap8', 'bitmap16', 'bitmap32', 'bitmap64']:
+    if lowercase_name in ['bitmap8', 'bitmap16', 'bitmap32', 'bitmap64']:
         return IdlBitmapType(idl_name=lowercase_name, base_type=__CHIP_SIZED_TYPES__[lowercase_name])
 
     int_type = __CHIP_SIZED_TYPES__.get(lowercase_name, None)

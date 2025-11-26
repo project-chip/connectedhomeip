@@ -80,10 +80,9 @@ def make_asciidoc(target: str, include_in_progress: str, spec_dir: str, dry_run:
     if dry_run:
         log.info("Executing: %s", shlex.join(cmd))
         return ''
-    else:
-        ret = subprocess.check_output(cmd, cwd=spec_dir).decode('UTF-8').rstrip()
-        log.info(ret)
-        return ret
+    ret = subprocess.check_output(cmd, cwd=spec_dir).decode('UTF-8').rstrip()
+    log.info(ret)
+    return ret
 
 
 @click.command()

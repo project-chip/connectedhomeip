@@ -44,8 +44,7 @@ def ParseInt(value: str, data_type: Optional[DataType] = None) -> int:
             if parsed & (1 << (bits - 1)):
                 parsed -= 1 << bits
         return parsed
-    else:
-        return int(value)
+    return int(value)
 
 
 def ParseOptionalInt(value: str) -> Optional[int]:
@@ -286,14 +285,13 @@ def AttributesToEvent(attrs: AttributesImpl) -> Event:
 def StringToAccessPrivilege(value: str) -> AccessPrivilege:
     if value == "view":
         return AccessPrivilege.VIEW
-    elif value == "operate":
+    if value == "operate":
         return AccessPrivilege.OPERATE
-    elif value == "manage":
+    if value == "manage":
         return AccessPrivilege.MANAGE
-    elif value == "admin":
+    if value == "admin":
         return AccessPrivilege.ADMINISTER
-    else:
-        raise Exception("UNKNOWN privilege level: %r" % value)
+    raise Exception("UNKNOWN privilege level: %r" % value)
 
 
 def AttributesToCommand(attrs: AttributesImpl) -> Command:
