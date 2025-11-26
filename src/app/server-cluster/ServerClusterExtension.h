@@ -32,6 +32,10 @@ namespace chip::app {
 ///
 /// The class is intended to wrap a SINGLE cluster path for a given interface, even if the interface
 /// itself supports multiple paths.
+///
+/// NOTES:
+///   - if changing an attribute (via WriteAttribute or as part of other operations), remember to call
+///     NotifyAttributeChanged so that attribute subscriptions work correctly.
 class ServerClusterExtension : public ServerClusterInterface
 {
 public:
