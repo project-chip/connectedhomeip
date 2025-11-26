@@ -61,7 +61,7 @@ class TC_AVSUM_2_4(MatterBaseTest, AVSUMTestBase):
         return "[TC-AVSUM-2.4] MPTZMoveToPreset command validation"
 
     def steps_TC_AVSUM_2_4(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read the value of MaxPresets, fail if unsupported."),
             TestStep(3, "Read the value of MPTZPresets, fail if unsupported"),
@@ -82,13 +82,11 @@ class TC_AVSUM_2_4(MatterBaseTest, AVSUMTestBase):
             TestStep(18, "If PIXIT.CANBEMADEBUSY is set, place the DUT into a state where it cannot accept a command. Else exit the test case."),
             TestStep(19, "Send an MPTZMoveToPreset Command with a valid presetID. Verify busy failure response."),
         ]
-        return steps
 
     def pics_TC_AVSUM_2_4(self) -> list[str]:
-        pics = [
+        return [
             "AVSUM.S",
         ]
-        return pics
 
     @run_if_endpoint_matches(has_feature(Clusters.CameraAvSettingsUserLevelManagement,
                                          Clusters.CameraAvSettingsUserLevelManagement.Bitmaps.Feature.kMechanicalPresets))

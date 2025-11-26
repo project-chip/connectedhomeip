@@ -52,7 +52,7 @@ class TC_CNET_4_3(MatterBaseTest):
         return "[TC-CNET-4.3] [Ethernet] Verification for attributes check [DUT-Server]"
 
     def steps_TC_CNET_4_3(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, test_plan_support.commission_if_required(), "", is_commissioning=True),
             TestStep(2, "TH reads the MaxNetworks attribute from the DUT",
                      "Verify that MaxNetworks attribute value is within a range of 1 to 255"),
@@ -72,7 +72,6 @@ class TC_CNET_4_3(MatterBaseTest):
             TestStep(7, "TH reads the LastConnectErrorValue attribute from the DUT",
                      "Verify that LastConnectErrorValue attribute value is null")
         ]
-        return steps
 
     def pics_TC_CNET_4_3(self):
         """Return the PICS definitions associated with this test."""

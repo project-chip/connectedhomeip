@@ -131,7 +131,7 @@ class TC_CCTRL_2_3(MatterBaseTest):
         super().teardown_class()
 
     def steps_TC_CCTRL_2_3(self) -> list[TestStep]:
-        steps = [TestStep(1, "Get number of fabrics from TH_SERVER", is_commissioning=True),
+        return [TestStep(1, "Get number of fabrics from TH_SERVER", is_commissioning=True),
                  TestStep(2, "Reading Attribute VendorId from TH_SERVER"),
                  TestStep(3, "Reading Attribute ProductId from TH_SERVER"),
                  TestStep(4, "Send RequestCommissioningApproval command to DUT with CASE session with correct VendorId and ProductId"),
@@ -143,7 +143,6 @@ class TC_CCTRL_2_3(MatterBaseTest):
                  TestStep(10, "Send OpenCommissioningWindow command on Administrator Commissioning Cluster sent to TH_SERVER"),
                  TestStep(11, "Get number of fabrics from TH_SERVER, verify DUT successfully commissioned TH_SERVER (up to 30 seconds)")]
 
-        return steps
 
     # This test has some manual steps and one sleep for up to 30 seconds. Test typically
     # runs under 1 mins, so 3 minutes is more than enough.

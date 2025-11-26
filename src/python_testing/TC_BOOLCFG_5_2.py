@@ -57,7 +57,7 @@ class TC_BOOLCFG_5_2(MatterBaseTest):
         return "[TC-BOOLCFG-5.2] SuppressAlarm functionality for active alarms with DUT as Server"
 
     def steps_TC_BOOLCFG_5_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read FeatureMap attribute"),
             TestStep(3, "Verify SPRS feature is supported"),
@@ -72,13 +72,11 @@ class TC_BOOLCFG_5_2(MatterBaseTest):
             TestStep(10, "Read AlarmsActive attribute"),
             TestStep(11, "Send TestEventTrigger with SensorUntrigger event")
         ]
-        return steps
 
     def pics_TC_BOOLCFG_5_2(self) -> list[str]:
-        pics = [
+        return [
             "BOOLCFG.S",
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:

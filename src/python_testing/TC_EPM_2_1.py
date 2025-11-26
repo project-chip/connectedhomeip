@@ -64,7 +64,7 @@ class TC_EPM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
         return ["EPM.S"]
 
     def steps_TC_EPM_2_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commissioning, already done",
                      is_commissioning=True),
             TestStep("2", "TH reads PowerMode attribute",
@@ -109,7 +109,6 @@ class TC_EPM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
                      "Verify that the DUT response contains either null or an int64 value. Value has to be between a range of -2^62 to 2^62."),
         ]
 
-        return steps
 
     @async_test_body
     async def test_TC_EPM_2_1(self):

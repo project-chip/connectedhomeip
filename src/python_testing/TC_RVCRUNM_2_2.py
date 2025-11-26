@@ -92,10 +92,9 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
             endpoint=self.endpoint, cluster=cluster, attribute=attribute)
 
     async def read_run_supported_modes(self) -> Clusters.Objects.RvcRunMode.Attributes.SupportedModes:
-        ret = await self.read_mod_attribute_expect_success(
+        return await self.read_mod_attribute_expect_success(
             Clusters.RvcRunMode,
             Clusters.RvcRunMode.Attributes.SupportedModes)
-        return ret
 
     async def read_current_mode_with_check(self, expected_mode):
         run_mode = await self.read_mod_attribute_expect_success(
@@ -105,9 +104,8 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
                             "Expected the current mode to be %i, got %i" % (expected_mode, run_mode))
 
     async def send_change_to_mode_cmd(self, new_mode) -> Clusters.Objects.RvcRunMode.Commands.ChangeToModeResponse:
-        ret = await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=new_mode),
+        return await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=new_mode),
                                          endpoint=self.endpoint)
-        return ret
 
     async def send_change_to_mode_with_check(self, new_mode, expected_error):
         response = await self.send_change_to_mode_cmd(new_mode)
@@ -116,10 +114,9 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
                             (error_enum_to_text(expected_error), error_enum_to_text(response.status)))
 
     async def read_op_state_operational_state(self) -> Clusters.Objects.RvcOperationalState.Attributes.OperationalState:
-        ret = await self.read_mod_attribute_expect_success(
+        return await self.read_mod_attribute_expect_success(
             Clusters.RvcOperationalState,
             Clusters.RvcOperationalState.Attributes.OperationalState)
-        return ret
 
     def pics_TC_RVCRUNM_2_2(self) -> list[str]:
         return ["RVCRUNM.S"]

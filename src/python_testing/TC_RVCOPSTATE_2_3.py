@@ -166,9 +166,8 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
                                                                 error_enum_to_text(expected_error)))
 
     async def send_run_change_to_mode_cmd(self, new_mode) -> Clusters.Objects.RvcRunMode.Commands.ChangeToModeResponse:
-        ret = await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=new_mode),
+        return await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=new_mode),
                                          endpoint=self.endpoint)
-        return ret
 
     # Prints the instruction and waits for a user input to continue
     def print_instruction(self, step_number, instruction):

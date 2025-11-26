@@ -69,14 +69,13 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
 
     def pics_TC_DEM_2_2(self):
         """Return the PICS definitions associated with this test."""
-        pics = [
+        return [
             "DEM.S.F00",  # Depends on Feature 00 (PowerAdjustment)
         ]
-        return pics
 
     def steps_TC_DEM_2_2(self) -> list[TestStep]:
         """Execute the test steps."""
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
                      is_commissioning=True),
             TestStep("2", "TH reads from the DUT the _FeatureMap_ attribute",
@@ -162,7 +161,6 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
         ]
 
-        return steps
 
     @property
     def default_endpoint(self) -> int:

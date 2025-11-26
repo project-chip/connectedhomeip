@@ -62,7 +62,7 @@ class AliroAttributeVerify:
 class TC_DRLK_2_13(MatterBaseTest):
 
     def steps_TC_DRLK_2_13(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("0", "Commissoning with DUT is done", is_commissioning=True),
             TestStep("1a", "TH reads OperationalCredentials cluster's CurrentFabricIndex and save the attribute",
                      "TH Reads Attribute Successfully"),
@@ -167,7 +167,6 @@ class TC_DRLK_2_13(MatterBaseTest):
                      "Verify that the DUT sends SUCCESS response"),
         ]
 
-        return steps
 
     async def read_attributes_from_dut(self, endpoint, cluster, attribute, expected_status: Status = Status.Success):
         try:

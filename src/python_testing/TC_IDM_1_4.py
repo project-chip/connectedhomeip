@@ -56,7 +56,7 @@ from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_b
 class TC_IDM_1_4(MatterBaseTest):
 
     def steps_TC_IDM_1_4(self) -> list[TestStep]:
-        steps = [TestStep(1, "Get remote node's MaxPathsPerInvoke", is_commissioning=True),
+        return [TestStep(1, "Get remote node's MaxPathsPerInvoke", is_commissioning=True),
                  TestStep(2, "Sending `MaxPathsPerInvoke + 1` InvokeRequest if it fits into single MTU"),
                  TestStep(3, "Sending two InvokeRequests with identical paths"),
                  TestStep(4, "Sending two InvokeRequests with unique paths, but identical CommandRefs"),
@@ -67,7 +67,6 @@ class TC_IDM_1_4(MatterBaseTest):
                  TestStep(9, "Verify DUT supports extended Data Model Testing feature in General Diagnostics Cluster"),
                  TestStep(10, "Verify DUT has TestEventTriggersEnabled attribute set to true in General Diagnostics Cluster"),
                  TestStep(11, "Verify DUT capable of responding to request with multiple InvokeResponseMessages")]
-        return steps
 
     @async_test_body
     async def test_TC_IDM_1_4(self):

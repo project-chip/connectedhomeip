@@ -65,13 +65,12 @@ class TC_DEM_2_4(MatterBaseTest, DEMTestBase):
 
     def pics_TC_DEM_2_4(self):
         """Return the PICS definitions associated with this test."""
-        pics = [
+        return [
             "DEM.S.F04",  # Depends on F04(Pausable)
         ]
-        return pics
 
     def steps_TC_DEM_2_4(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
                      is_commissioning=True),
             TestStep("2", "TH reads from the DUT the _FeatureMap_ attribute",
@@ -169,7 +168,6 @@ class TC_DEM_2_4(MatterBaseTest, DEMTestBase):
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
         ]
 
-        return steps
 
     @async_test_body
     async def test_TC_DEM_2_4(self):

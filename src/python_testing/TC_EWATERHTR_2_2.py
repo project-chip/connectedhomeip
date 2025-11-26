@@ -67,7 +67,7 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
         return ["EWATERHTR.S"]
 
     def steps_TC_EWATERHTR_2_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
                      is_commissioning=True),
             TestStep("2", "Set up a subscription to all WaterHeaterManagement cluster events"),
@@ -201,7 +201,6 @@ class TC_EWATERHTR_2_2(MatterBaseTest, EWATERHTRBase):
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
         ]
 
-        return steps
 
     @async_test_body
     async def test_TC_EWATERHTR_2_2(self):

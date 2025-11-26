@@ -112,9 +112,8 @@ def bump_substep(step: str) -> str:
     next_end_char = chr(ord(end_char) + 1)
     if ord(next_end_char) > ord('z'):
         raise ValueError(f"Reached max substep for step '{step}'")
-    next_step = step_prefix + next_end_char
+    return step_prefix + next_end_char
 
-    return next_step
 
 
 class TC_SwitchTests(MatterBaseTest):

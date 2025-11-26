@@ -156,24 +156,22 @@ class CommodityPriceTestBaseHelper:
                                               Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap(0),
                                               timedRequestTimeoutMs: int = 3000):
         """If endpoint is None then it falls through to use the matter test config value"""
-        result = await self.send_single_cmd(cmd=Clusters.CommodityPrice.Commands.GetDetailedPriceRequest(
+        return await self.send_single_cmd(cmd=Clusters.CommodityPrice.Commands.GetDetailedPriceRequest(
             details=details),
             endpoint=endpoint,
             timedRequestTimeoutMs=timedRequestTimeoutMs)
 
-        return result
 
     async def send_get_detailed_forecast_request(self, endpoint=None,
                                                  details: Clusters.CommodityPrice.Bitmaps =
                                                  Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap(0),
                                                  timedRequestTimeoutMs: int = 3000):
         """If endpoint is None then it falls through to use the matter test config value"""
-        result = await self.send_single_cmd(cmd=Clusters.CommodityPrice.Commands.GetDetailedForecastRequest(
+        return await self.send_single_cmd(cmd=Clusters.CommodityPrice.Commands.GetDetailedForecastRequest(
             details=details),
             endpoint=endpoint,
             timedRequestTimeoutMs=timedRequestTimeoutMs)
 
-        return result
 
     async def send_test_event_trigger_price_update(self):
         await self.send_test_event_triggers(eventTrigger=self.kEventTriggerPriceUpdate)

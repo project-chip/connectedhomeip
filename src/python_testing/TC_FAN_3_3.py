@@ -69,7 +69,7 @@ class TC_FAN_3_3(MatterBaseTest):
         return "[TC-FAN-3.3] Optional rock functionality with DUT as Server"
 
     def steps_TC_FAN_3_3(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read from the DUT the RockSupport attribute and store"),
             TestStep(3, "RockLeftRight is supported, so write 0x01 to RockSetting"),
@@ -83,7 +83,6 @@ class TC_FAN_3_3(MatterBaseTest):
             TestStep(11, "RockRound is not supported, so write 0x04 to RockSetting to check for constraint error"),
             TestStep(12, "Write RockSetting to 0x00"),
         ]
-        return steps
 
     def pics_TC_FAN_3_3(self) -> list[str]:
         return ["FAN.S"]

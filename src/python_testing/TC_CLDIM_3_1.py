@@ -96,7 +96,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
         return "[TC-CLDIM-3.1] SetTarget Command Positioning Functionality with DUT as Server"
 
     def steps_TC_CLDIM_3_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read FeatureMap attribute"),
             TestStep("2b", "If Positioning feature is not supported, skip remaining steps"),
@@ -126,13 +126,11 @@ class TC_CLDIM_3_1(MatterBaseTest):
             TestStep("6c", "Verify TargetState attribute is updated"),
             TestStep("6d", "Wait for CurrentState.Position to be updated to MaxPosition and CurrentState.Speed to High"),
         ]
-        return steps
 
     def pics_TC_CLDIM_3_1(self) -> list[str]:
-        pics = [
+        return [
             "CLDIM.S", "CLDIM.S.F00"
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:

@@ -66,7 +66,7 @@ class TC_CLDIM_4_2(MatterBaseTest):
         return "[TC-CLDIM-4.2] Step Command Input Sanity Check with DUT as Server"
 
     def steps_TC_CLDIM_4_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read FeatureMap attribute"),
             TestStep("2b", "If Positioning feature is not supported, skip remaining steps"),
@@ -83,13 +83,11 @@ class TC_CLDIM_4_2(MatterBaseTest):
             TestStep(4, "Send Step command with invalid Speed"),
             TestStep(5, "Send Step command with NumberOfSteps = 0"),
         ]
-        return steps
 
     def pics_TC_CLDIM_4_2(self) -> list[str]:
-        pics = [
+        return [
             "CLDIM.S", "CLDIM.S.F00"
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:

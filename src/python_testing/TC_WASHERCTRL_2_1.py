@@ -57,15 +57,14 @@ class TC_WASHERCTRL_2_1(MatterBaseTest):
         return "[TC-WASHERCTRL-2.1] Optional Spin attributes with DUT as Server"
 
     def pics_TC_WASHERCTRL_2_1(self) -> list[str]:
-        pics = [
+        return [
             "WASHERCTRL.S.F00",
             "WASHERCTRL.S.A0000",
             "WASHERCTRL.S.A0001"
         ]
-        return pics
 
     def steps_TC_WASHERCTRL_2_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done",
                      is_commissioning=True),
             TestStep(2, description="TH reads from the DUT the SpinSpeeds attribute",
@@ -79,7 +78,6 @@ class TC_WASHERCTRL_2_1(MatterBaseTest):
                      expectation="Verify that the DUT response contains Status CONSTRAINT_ERROR response")
         ]
 
-        return steps
 
     @run_if_endpoint_matches(has_feature(Clusters.LaundryWasherControls,
                                          Clusters.LaundryWasherControls.Bitmaps.Feature.kSpin))

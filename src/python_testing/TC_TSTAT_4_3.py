@@ -91,7 +91,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
         return ["TSTAT.S", "TSTAT.S.F0a"]
 
     def steps_TC_TSTAT_4_3(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commissioning, already done",
                      is_commissioning=True),
             TestStep("2", "TH reads the Presets attribute and saves it in a SupportedPresets variable.",
@@ -130,7 +130,6 @@ class TC_TSTAT_4_3(MatterBaseTest):
                      "Verify that the AddThermostatSuggestion command returns SUCCESS and the ThermostatSuggestions attribute has one entry added to it for the first {MaxThermostatSuggestions} times. Verify that when the AddThermostatSuggestion command is called for the {MaxThermostatSuggestions + 1} time, the AddThermostatSuggestion command returns RESOURCE_EXHAUSTED.")
         ]
 
-        return steps
 
     @async_test_body
     async def test_TC_TSTAT_4_3(self):

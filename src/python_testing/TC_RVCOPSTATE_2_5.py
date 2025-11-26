@@ -87,7 +87,7 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
         return "[TC-RVCOPSTATE-2.5] Attributes with DUT as Server"
 
     def steps_TC_RVCOPSTATE_2_5(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commissioning, already done", is_commissioning=True),
             TestStep(
                 "2", "Manually put the device in a RVC Run Mode cluster mode with the Idle mode tag and in a device state that allows changing to {PIXIT_RUNMODE_CLEANMODE}"),
@@ -100,13 +100,11 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
             TestStep("9", "Manually confirm DUT has returned to the dock and completed docking-related activities"),
             TestStep("10", "TH reads CurrentMode attribute of the RVC Run Mode cluster"),
         ]
-        return steps
 
     def pics_TC_RVCOPSTATE_2_5(self) -> list[str]:
-        pics = [
+        return [
             "RVCOPSTATE.S",
         ]
-        return pics
 
     async def read_rvcrunm_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.RvcRunMode
@@ -140,9 +138,8 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
         return operational_state
 
     async def send_change_to_mode_cmd(self, new_mode) -> Clusters.Objects.RvcRunMode.Commands.ChangeToModeResponse:
-        ret = await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=new_mode),
+        return await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=new_mode),
                                          endpoint=self.endpoint)
-        return ret
 
     async def send_change_to_mode_with_check(self, new_mode, expected_error):
         response = await self.send_change_to_mode_cmd(new_mode)

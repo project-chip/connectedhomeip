@@ -62,9 +62,8 @@ from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matt
 class TC_CCTRL_2_1(MatterBaseTest):
 
     def steps_TC_CCTRL_2_1(self) -> list[TestStep]:
-        steps = [TestStep(1, "Read MCORE.FS PICS code", is_commissioning=True),
+        return [TestStep(1, "Read MCORE.FS PICS code", is_commissioning=True),
                  TestStep(2, "Validate SupportedDeviceCategories is set accordingly based on MCORE.FS")]
-        return steps
 
     @run_if_endpoint_matches(has_cluster(Clusters.CommissionerControl))
     async def test_TC_CCTRL_2_1(self):

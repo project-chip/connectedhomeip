@@ -274,6 +274,7 @@ class PAVSTTestBase:
                 asserts.fail("RESOURCE_EXHAUSTED")
             return e.status
         pass
+        return None
 
     async def check_and_delete_all_push_av_transports(self, endpoint, attribute):
         pvcluster = Clusters.PushAvStreamTransport
@@ -317,6 +318,7 @@ class PAVSTTestBase:
                 )
             return e.status
         pass
+        return None
 
     async def psvt_deallocate_push_transport(self, cmd, devCtrl=None):
         endpoint = self.get_endpoint()
@@ -335,6 +337,7 @@ class PAVSTTestBase:
                 )
             return e.status
         pass
+        return None
 
     async def psvt_set_transport_status(self, cmd, expected_status=None, devCtrl=None):
         endpoint = self.get_endpoint()
@@ -351,6 +354,7 @@ class PAVSTTestBase:
                 asserts.assert_true(e.status == Status.NotFound, "Unexpected error returned")
             return e.status
         pass
+        return None
 
     async def psvt_find_transport(self, cmd, expected_connectionID=None, devCtrl=None):
         endpoint = self.get_endpoint()
@@ -369,6 +373,7 @@ class PAVSTTestBase:
             )
             return e.status
         pass
+        return None
 
     async def psvt_manually_trigger_transport(self, cmd, expected_cluster_status=None, expected_status=None, devCtrl=None):
         endpoint = self.get_endpoint()
@@ -397,6 +402,7 @@ class PAVSTTestBase:
                 )
                 return e.status
         pass
+        return None
 
     async def psvt_create_test_harness_controller(self):
         self.th1 = self.default_controller
@@ -425,13 +431,12 @@ class PAVSTTestBase:
     async def read_currentfabricindex(self, th: ChipDeviceCtrl) -> int:
         cluster = Clusters.Objects.OperationalCredentials
         attribute = Clusters.OperationalCredentials.Attributes.CurrentFabricIndex
-        current_fabric_index = await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
-        return current_fabric_index
+        return await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
 
     async def psvt_remove_current_fabric(self, devCtrl):
         fabric_idx_cr2_2 = await self.read_currentfabricindex(th=devCtrl)
         removeFabricCmd2 = Clusters.OperationalCredentials.Commands.RemoveFabric(fabric_idx_cr2_2)
-        resp = await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=removeFabricCmd2)
-        return resp
+        return await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=removeFabricCmd2)
         asserts.assert_equal(
             resp.statusCode, Clusters.OperationalCredentials.Enums.NodeOperationalCertStatusEnum.kOk, "Expected removal of TH2's fabric to succeed")
+        return None

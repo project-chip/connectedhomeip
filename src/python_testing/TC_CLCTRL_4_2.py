@@ -88,7 +88,7 @@ class TC_CLCTRL_4_2(MatterBaseTest):
         return "[TC-CLCTRL-4.2] MoveTo Command Latching Functionality with DUT as Server"
 
     def steps_TC_CLCTRL_4_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read the FeatureMap attribute to determine supported features",
                      "FeatureMap of the ClosureControl cluster is returned by the DUT"),
@@ -152,13 +152,11 @@ class TC_CLCTRL_4_2(MatterBaseTest):
                      "OverallCurrentState.Latch should be False"),
             TestStep("6k", "Wait until a subscription report with MainState is received", "MainState should be Stopped"),
         ]
-        return steps
 
     def pics_TC_CLCTRL_4_2(self) -> list[str]:
-        pics = [
+        return [
             "CLCTRL.S", "CLCTRL.S.F01"
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:

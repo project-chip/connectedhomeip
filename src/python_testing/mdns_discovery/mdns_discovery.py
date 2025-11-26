@@ -355,13 +355,12 @@ class MdnsDiscovery:
         if self._discovered_services:
             logger.info(f"Service record information (PTR) for '{service_types}' discovered.")
 
-            ptr_records = [
+            return [
                 record
                 for record_list in self._discovered_services.values()
                 for record in record_list
             ]
 
-            return ptr_records
 
         logger.error(f"Service record information (PTR) for '{service_types}' not found.")
         return []

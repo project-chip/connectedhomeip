@@ -58,20 +58,18 @@ class TC_MWOCTRL_2_4(MatterBaseTest):
         return "[TC-MWOCTRL-2.4] WATTS functionality with DUT as Server"
 
     def steps_TC_MWOCTRL_2_4(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read the SupportedWatts attribute"),
             TestStep(3, "Read the SelectedWattIndex attribute"),
             TestStep(4, "Send the SetCookingParameters command"),
             TestStep(5, "Read and verify the SelectedWattIndex attribute"),
         ]
-        return steps
 
     def pics_TC_MWOCTRL_2_4(self) -> list[str]:
-        pics = [
+        return [
             "MWOCTRL.S",
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:

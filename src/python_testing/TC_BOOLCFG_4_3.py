@@ -57,7 +57,7 @@ class TC_BOOLCFG_4_3(MatterBaseTest):
         return "[TC-BOOLCFG-4.3] AlarmsEnabled functionality for inactive alarms with DUT as Server"
 
     def steps_TC_BOOLCFG_4_3(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read FeatureMap attribute"),
             TestStep("2b", "Read AttributeList attribute"),
@@ -86,13 +86,11 @@ class TC_BOOLCFG_4_3(MatterBaseTest):
             TestStep(23, "Read AlarmsActive attribute"),
             TestStep(24, "Send TestEventTrigger with SensorUntrigger event"),
         ]
-        return steps
 
     def pics_TC_BOOLCFG_4_3(self) -> list[str]:
-        pics = [
+        return [
             "BOOLCFG.S",
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:

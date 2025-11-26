@@ -53,8 +53,7 @@ class TC_ACL_2_7(MatterBaseTest):
     async def read_currentfabricindex(self, th: ChipDeviceCtrl) -> int:
         cluster = Clusters.Objects.OperationalCredentials
         attribute = Clusters.OperationalCredentials.Attributes.CurrentFabricIndex
-        current_fabric_index = await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
-        return current_fabric_index
+        return await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
 
     def _validate_events(self, events, expected_fabric_index, expected_node_id, other_fabric_index, controller_name, is_filtered):
         """Helper method to validate events for a TH"""
@@ -102,7 +101,7 @@ class TC_ACL_2_7(MatterBaseTest):
         return ['ACL.S.A0001']
 
     def steps_TC_ACL_2_7(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "TH1 commissions DUT using admin node ID",
                      is_commissioning=True),
             TestStep(2, "TH1 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",
@@ -124,7 +123,6 @@ class TC_ACL_2_7(MatterBaseTest):
             TestStep(11, "TH_CR1 sends RemoveFabric for TH2 fabric command to DUT_CE",
                      "Verify DUT_CE responses with NOCResponse with a StatusCode OK"),
         ]
-        return steps
 
     @run_if_endpoint_matches(has_attribute(Clusters.AccessControl.Attributes.Extension))
     async def test_TC_ACL_2_7(self):

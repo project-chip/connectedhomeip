@@ -55,7 +55,7 @@ class TC_CNET_4_2(MatterBaseTest):
         return "[TC-CNET-4.2] [Thread] Verification for attributes check [DUT-Server]"
 
     def steps_TC_CNET_4_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, test_plan_support.commission_if_required(),
                      "DUT is commissioned, TH can communicate with the DUT on thread dataset provided in --thread-dataset-hex parameter.", is_commissioning=True),
             TestStep(2, "TH reads the Networks attribute list from the DUT on all endpoints (all network commissioning clusters).",
@@ -88,7 +88,6 @@ class TC_CNET_4_2(MatterBaseTest):
             TestStep(12, "TH reads the ThreadVersion attribute from the DUT.",
                      "Verify that ThreadVersion attribute value is greater than or equal to 4.")
         ]
-        return steps
 
     def pics_TC_CNET_4_2(self) -> list[str]:
         """Return the PICS definitions associated with this test."""

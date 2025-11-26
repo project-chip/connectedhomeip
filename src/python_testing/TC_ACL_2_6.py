@@ -288,7 +288,7 @@ class TC_ACL_2_6(MatterBaseTest):
             )
 
     def steps_TC_ACL_2_6(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(
                 1,
                 "TH1 commissions DUT using admin node ID N1",
@@ -323,7 +323,6 @@ class TC_ACL_2_6(MatterBaseTest):
                 "Resetting ACL events to only admin/case, then re-running the test using the legacy list writing mechanism, where the client issues a series of AttributeDataIBs, with the first containing a path to the list itself and Data that is empty array, which signals clearing the list, and subsequent AttributeDataIBs containing updates.",
                 "Test succeeds with legacy list encoding mechanism"),
         ]
-        return steps
 
     @async_test_body
     async def test_TC_ACL_2_6(self):

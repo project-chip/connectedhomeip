@@ -413,7 +413,7 @@ class TC_ACL_2_5(MatterBaseTest):
         return "[TC-ACL-2.5]  AccessControlExtensionChanged event"
 
     def steps_TC_ACL_2_5(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "TH1 commissions DUT using admin node ID",
                      is_commissioning=True),
             TestStep(2, "TH1 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",
@@ -440,7 +440,6 @@ class TC_ACL_2_5(MatterBaseTest):
             TestStep(14, "Re-run the test using the legacy list writing mechanism, where the client issues a series of AttributeDataIBs, with the first containing a path to the list itself and Data that is empty array, which signals clearing the list, and subsequent AttributeDataIBs containing updates.",
                      "Test succeeds with legacy list encoding mechanism"),
         ]
-        return steps
 
     @run_if_endpoint_matches(has_attribute(Clusters.AccessControl.Attributes.Extension))
     async def test_TC_ACL_2_5(self):

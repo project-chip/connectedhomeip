@@ -63,14 +63,13 @@ class TC_SEPR_2_2(CommodityPriceTestBaseHelper, MatterBaseTest):
 
     def pics_TC_SEPR_2_2(self):
         """Return the PICS definitions associated with this test."""
-        pics = [
+        return [
             "SEPR.S"
         ]
-        return pics
 
     def steps_TC_SEPR_2_2(self) -> list[TestStep]:
         """Execute the test steps."""
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
                      is_commissioning=True),
             TestStep("2", "Set up a subscription to all CommodityPrice cluster events"),
@@ -133,7 +132,6 @@ class TC_SEPR_2_2(CommodityPriceTestBaseHelper, MatterBaseTest):
 
         ]
 
-        return steps
 
     @run_if_endpoint_matches(has_cluster(cluster))
     async def test_TC_SEPR_2_2(self):

@@ -47,7 +47,7 @@ class TC_CNET_4_1(MatterBaseTest):
         return ['CNET.S.F00']
 
     def steps_TC_CNET_4_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(0, test_plan_support.commission_if_required(), "", is_commissioning=True),
             TestStep(1, "TH reads the MaxNetworks attribute from the DUT",
                      "Verify that MaxNetworks attribute value is within a range of 1 to 255"),
@@ -74,7 +74,6 @@ class TC_CNET_4_1(MatterBaseTest):
                      "Verify that LastConnectErrorValue attribute value is null"),
 
         ]
-        return steps
 
     @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning,
                                          Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))

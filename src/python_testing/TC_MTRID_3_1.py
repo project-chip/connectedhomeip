@@ -71,7 +71,7 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
 
     def steps_TC_MTRID_3_1(self) -> list[TestStep]:
 
-        steps = [
+        return [
             TestStep("1", "Commissioning, already done", "DUT is commissioned.", is_commissioning=True),
             TestStep("2", """Set up a subscription to the Meter Identification cluster:
                      - MinIntervalFloor: 0
@@ -131,7 +131,6 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
             TestStep("16", "TH removes the subscriptions to the Meter Identification cluster.", "Subscription successfully removed."),
         ]
 
-        return steps
 
     @async_test_body
     async def test_TC_MTRID_3_1(self):

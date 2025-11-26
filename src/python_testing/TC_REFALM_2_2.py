@@ -103,14 +103,13 @@ class TC_REFALM_2_2(MatterBaseTest):
 
     def pics_TC_REFALM_2_2(self):
         """Return PICS definitions asscociated with this test."""
-        pics = [
+        return [
             "REFALM.S"
         ]
-        return pics
 
     def steps_TC_REFALM_2_2(self) -> list[TestStep]:
         """Execute the test steps."""
-        steps = [
+        return [
             TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test)", is_commissioning=True),
             TestStep(2, "Ensure that the door on the DUT is closed"),
             TestStep(3, "TH reads from the DUT the State attribute",
@@ -132,7 +131,6 @@ class TC_REFALM_2_2(MatterBaseTest):
                      "Receive a Notify event with the State attribute bit 0 set to 0."),
         ]
 
-        return steps
 
     async def _get_command_status(self, cmd: ClusterCommand):
         """Return the status of the executed command. By default the status is 0x0 unless a different

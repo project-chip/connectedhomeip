@@ -62,7 +62,7 @@ class TC_EEM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
         return ["EEM.S"]
 
     def steps_TC_EEM_2_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commissioning, already done",
                      is_commissioning=True),
             TestStep("2", "TH reads Accuracy attribute",
@@ -79,7 +79,6 @@ class TC_EEM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
                      "Verify that the DUT response contains either null or an CumulativeEnergyResetStruct value."),
         ]
 
-        return steps
 
     @async_test_body
     async def test_TC_EEM_2_1(self):

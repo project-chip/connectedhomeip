@@ -218,13 +218,12 @@ class TC_CGEN_2_2(MatterBaseTest):
 
     def pics_TC_CGEN_2_2(self):
         """Return the PICS definitions associated with this test."""
-        pics = [
+        return [
             "CGEN.S"
         ]
-        return pics
 
     def steps_TC_CGEN_2_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(0, 'Commissioning, already done', is_commissioning=True),
             TestStep(1, '''TH1 reads the TrustedRootCertificates attribute from the Node Operational Credentials cluster
                      and saves the number of list items as numTrustedRootsOriginal.'''),
@@ -291,7 +290,6 @@ class TC_CGEN_2_2(MatterBaseTest):
                      so the failsafe is required to time out at this point, despite having been re-armed in step 42.'''),
             TestStep(44, 'TH1 reads the TrustedRootCertificates attribute from the Node Operational Credentials cluster.'),
         ]
-        return steps
 
     @async_test_body
     async def test_TC_CGEN_2_2(self):

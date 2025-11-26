@@ -520,7 +520,7 @@ class TC_ACL_2_8(MatterBaseTest):
         return ['ACL.S']
 
     def steps_TC_ACL_2_8(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "TH1 commissions DUT using admin node ID N1",
                      "DUT is commissioned on TH1 fabric", is_commissioning=True),
             TestStep(2, "TH1 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",
@@ -544,7 +544,6 @@ class TC_ACL_2_8(MatterBaseTest):
             TestStep(11, "Re-run the test using the legacy list writing mechanism, where the client issues a series of AttributeDataIBs, with the first containing a path to the list itself and Data that is empty array, which signals clearing the list, and subsequent AttributeDataIBs containing updates.",
                      "Test succeeds with legacy list encoding mechanism"),
         ]
-        return steps
 
     @async_test_body
     async def test_TC_ACL_2_8(self):

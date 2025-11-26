@@ -69,7 +69,7 @@ class TC_COMMTR_2_1(CommodityMeteringTestBaseHelper):
 
     def steps_TC_COMMTR_2_1(self) -> list[TestStep]:
 
-        steps = [
+        return [
             TestStep("1", "Commissioning, already done", "DUT is commissioned", is_commissioning=True),
             TestStep("2", "TH reads MaximumMeteredQuantities attribute", """
                      - DUT replies a null value or a uint16 value;
@@ -83,7 +83,6 @@ class TC_COMMTR_2_1(CommodityMeteringTestBaseHelper):
             TestStep("5", "TH reads TariffUnit attribute", "DUT replies a null value or TariffUnitEnum value in range 0-1."),
         ]
 
-        return steps
 
     @run_if_endpoint_matches(has_cluster(Clusters.CommodityMetering))
     async def test_TC_COMMTR_2_1(self):

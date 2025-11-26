@@ -207,14 +207,13 @@ class TC_OPSTATE_BASE():
     ############################
 
     def STEPS_TC_OPSTATE_BASE_1_1(self) -> list[TestStep]:
-        steps = [TestStep(1, "Commissioning, already done", is_commissioning=True),
+        return [TestStep(1, "Commissioning, already done", is_commissioning=True),
                  TestStep(2, "TH reads from the DUT the ClusterRevision attribute"),
                  TestStep(3, "TH reads from the DUT the FeatureMap attribute"),
                  TestStep(4, "TH reads from the DUT the AttributeList attribute"),
                  TestStep(5, "TH reads from the DUT the AcceptedCommandList attribute"),
                  TestStep(6, "TH reads from the DUT the GeneratedCommandList attribute")
                  ]
-        return steps
 
     async def TEST_TC_OPSTATE_BASE_1_1(self, endpoint=1, cluster_revision=1, feature_map=0):
         cluster = self.test_info.cluster
@@ -301,7 +300,7 @@ class TC_OPSTATE_BASE():
     #   TEST CASE 2.1
     ############################
     def STEPS_TC_OPSTATE_BASE_2_1(self) -> list[TestStep]:
-        steps = [TestStep(1, "Commissioning, already done", is_commissioning=True),
+        return [TestStep(1, "Commissioning, already done", is_commissioning=True),
                  TestStep(2, "TH reads from the DUT the PhaseList attribute"),
                  TestStep(3, "TH reads from the DUT the CurrentPhase attribute"),
                  TestStep(4, "TH reads from the DUT the CountdownTime attribute"),
@@ -325,7 +324,6 @@ class TC_OPSTATE_BASE():
                  TestStep("7g", "Manually put the device in the CommandInvalidInState(0x03) error state"),
                  TestStep("7h", "TH reads from the DUT the OperationalError attribute")
                  ]
-        return steps
 
     async def TEST_TC_OPSTATE_BASE_2_1(self, endpoint=1):
         cluster = self.test_info.cluster
@@ -536,7 +534,7 @@ class TC_OPSTATE_BASE():
     #   TEST CASE 2.2
     ############################
     def STEPS_TC_OPSTATE_BASE_2_2(self) -> list[TestStep]:
-        steps = [TestStep(1, "Commissioning, already done", is_commissioning=True),
+        return [TestStep(1, "Commissioning, already done", is_commissioning=True),
                  TestStep(2, "Manually put the DUT into a state wherein it can receive a Start Command"),
                  TestStep(3, "TH reads from the DUT the OperationalStateList attribute"),
                  TestStep(4, "TH sends Start command to the DUT"),
@@ -554,7 +552,6 @@ class TC_OPSTATE_BASE():
                  TestStep(16, "Manually put the DUT into a state wherein it cannot receive a Start Command"),
                  TestStep(17, "TH sends Start command to the DUT")
                  ]
-        return steps
 
     async def TEST_TC_OPSTATE_BASE_2_2(self, endpoint=1):
         cluster = self.test_info.cluster
@@ -722,7 +719,7 @@ class TC_OPSTATE_BASE():
     #   TEST CASE 2.3
     ############################
     def STEPS_TC_OPSTATE_BASE_2_3(self) -> list[TestStep]:
-        steps = [TestStep(1, "Commissioning, already done", is_commissioning=True),
+        return [TestStep(1, "Commissioning, already done", is_commissioning=True),
                  TestStep(2, "Manually put the DUT into a state wherein it can receive a Pause Command"),
                  TestStep(3, "TH reads from the DUT the OperationalStateList attribute"),
                  TestStep(4, "TH sends Pause command to the DUT"),
@@ -741,7 +738,6 @@ class TC_OPSTATE_BASE():
                  TestStep(17, "TH sends Pause command to the DUT"),
                  TestStep(18, "TH sends Resume command to the DUT")
                  ]
-        return steps
 
     async def TEST_TC_OPSTATE_BASE_2_3(self, endpoint=1):
         cluster = self.test_info.cluster
@@ -902,12 +898,11 @@ class TC_OPSTATE_BASE():
     #   TEST CASE 2.4
     ############################
     def STEPS_TC_OPSTATE_BASE_2_4(self) -> list[TestStep]:
-        steps = [TestStep(1, "Commissioning, already done", is_commissioning=True),
+        return [TestStep(1, "Commissioning, already done", is_commissioning=True),
                  TestStep(2, "Set up a subscription to the OperationalError event"),
                  TestStep(3, "At the DUT take the vendor defined action to generate an OperationalError event"),
                  TestStep(4, "TH reads from the DUT the OperationalState attribute")
                  ]
-        return steps
 
     async def TEST_TC_OPSTATE_BASE_2_4(self, endpoint=1):
         cluster = self.test_info.cluster
@@ -970,7 +965,7 @@ class TC_OPSTATE_BASE():
     #   TEST CASE 2.5
     ############################
     def STEPS_TC_OPSTATE_BASE_2_5(self) -> list[TestStep]:
-        steps = [TestStep(1, "Commissioning, already done", is_commissioning=True),
+        return [TestStep(1, "Commissioning, already done", is_commissioning=True),
                  TestStep(2, "TH reads the DeviceTypeList from the Descriptor Cluster"),
                  TestStep(3, "If any device is in the set that mandates the OperationCompletion event, set istestmandated to True"),
                  TestStep(4, "If the test is mandated, but the event is not in the PICS, fail the test case"),
@@ -998,7 +993,6 @@ class TC_OPSTATE_BASE():
                  TestStep(25, "TH sends Stop command to the DUT"),
                  TestStep(26, "TH waits for OperationCompletion event")
                  ]
-        return steps
 
     async def TEST_TC_OPSTATE_BASE_2_5(self, endpoint=1):
         cluster = self.test_info.cluster
@@ -1233,7 +1227,7 @@ class TC_OPSTATE_BASE():
     #   TEST CASE 2.6 - Optional Reports with DUT as Server
     ############################
     def steps_TC_OPSTATE_BASE_2_6(self) -> list[TestStep]:
-        steps = [TestStep(1, "Commissioning, already done", is_commissioning=True),
+        return [TestStep(1, "Commissioning, already done", is_commissioning=True),
                  TestStep(2, "Subscribe to CountdownTime attribute"),
                  TestStep(3, "Manually put the DUT into a state where it will use the CountdownTime attribute, "
                              "the initial value of the CountdownTime is greater than 30, "
@@ -1252,7 +1246,6 @@ class TC_OPSTATE_BASE():
                  TestStep(10, "Test harness reads the CountdownTime attribute."),
                  TestStep(11, "Manually put the device in the Paused(0x02) operational state")
                  ]
-        return steps
 
     async def TEST_TC_OPSTATE_BASE_2_6(self, endpoint=1):
         cluster = self.test_info.cluster

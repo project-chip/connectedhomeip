@@ -369,8 +369,7 @@ class DclClientInterface:
         Send a GET request for a json object.
         '''
         try:
-            response = requests.get(url).json()
-            return response
+            return requests.get(url).json()
         except Exception as e:
             logging.error(f"Failed to fetch {url}: {e}")
             return None

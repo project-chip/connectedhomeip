@@ -54,7 +54,7 @@ class TC_DefaultChecker(MatterBaseTest, DefaultChecker):
         self.success = True
 
     def steps_TC_IDM_13_1(self):
-        steps = [TestStep(1, "TH performs a wildcard read of all attributes"),
+        return [TestStep(1, "TH performs a wildcard read of all attributes"),
                  TestStep(2, f"If the {FLAG_PRODUCT_NAME} flag is not set, check for \"Test\" in the product name",
                           "\"Test\" does not appear in the product name"),
                  TestStep(3, f"If the {FLAG_VENDOR_NAME} flag is not set, check for \"Test\" in the vendor name",
@@ -73,7 +73,6 @@ class TC_DefaultChecker(MatterBaseTest, DefaultChecker):
                  TestStep(10, f"If the {FLAG_FIXED_LABEL_DEFAULT_VALUES} flag is not set, and the FixedLabel cluster is present on the device, check that the fixed label cluster list does not contain any of the default labels", "List does not contain default labels"),
                  TestStep(11, "Fail on any problems")
                  ]
-        return steps
 
     def desc_TC_IDM_13_1(self):
         return "[TC-IDM-13.1] Accidental defaults check - [DUT as Server]"

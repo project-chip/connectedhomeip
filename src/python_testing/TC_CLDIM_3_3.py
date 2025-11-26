@@ -76,7 +76,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
         return "[TC-CLDIM-3.3] SetTarget Command Field Sanity Check with DUT as Server"
 
     def steps_TC_CLDIM_3_3(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read FeatureMap attribute"),
             TestStep("2b", "If Limitation feature is supported, read LimitRange attribute"),
@@ -119,13 +119,11 @@ class TC_CLDIM_3_3(MatterBaseTest):
             TestStep(10, "Send SetTarget command with invalid Speed when Speed is unsupported"),
             TestStep(11, "Send SetTarget command with invalid Speed"),
         ]
-        return steps
 
     def pics_TC_CLDIM_3_3(self) -> list[str]:
-        pics = [
+        return [
             "CLDIM.S",
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:

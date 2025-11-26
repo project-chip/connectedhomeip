@@ -92,8 +92,7 @@ class MatterCertParser:
         if self.SUBJECT_PUBLIC_KEY_TAG not in self.parsed_tlv:
             raise ValueError(f"Did not find Subject Public Key tag in Matter TLV certificate: {self.parsed_tlv}")
 
-        public_key_bytes = self.parsed_tlv[self.SUBJECT_PUBLIC_KEY_TAG]
-        return public_key_bytes
+        return self.parsed_tlv[self.SUBJECT_PUBLIC_KEY_TAG]
 
 
 # From Matter spec src/crypto_primitives/crypto_primitives.py
@@ -153,9 +152,8 @@ def generate_vendor_fabric_binding_message(
 
     fabric_id_bytes = fabric_id.to_bytes(length=8, byteorder='big')
     vendor_id_bytes = vendor_id.to_bytes(length=2, byteorder='big')
-    vendor_fabric_binding_message = FABRIC_BINDING_VERSION_1.to_bytes(
+    return FABRIC_BINDING_VERSION_1.to_bytes(
         length=1) + root_public_key_bytes + fabric_id_bytes + vendor_id_bytes
-    return vendor_fabric_binding_message
 
 # From Matter spec src/crypto_primitives/vid_verify_payload_test_vector.py
 
@@ -188,6 +186,7 @@ def get_unassigned_fabric_index(fabric_indices: list[int]) -> int:
             return fabric_index
     else:
         asserts.fail(f"Somehow could not find an unallocated fabric index in {fabric_indices}")
+    return None
 
 
 def get_entry_for_fabric(fabric_index: int, entries: list[object]) -> object:
@@ -294,6 +293,7 @@ class test_step(object):
             return None  # No exception
         if isinstance(exc_value, TestStepBlockPassException):
             return True  # Suppress special exception we expect to see.
+        return None
 
     @property
     def id(self):

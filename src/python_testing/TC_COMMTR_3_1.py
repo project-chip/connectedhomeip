@@ -70,7 +70,7 @@ class TC_COMMTR_3_1(CommodityMeteringTestBaseHelper):
 
     def steps_TC_COMMTR_3_1(self) -> list[TestStep]:
 
-        steps = [
+        return [
             TestStep("1", "Commissioning, already done", "DUT is commissioned", is_commissioning=True),
             TestStep("2", """Set up a subscription to the Commodity Metering cluster attributes:
                      - MinIntervalFloor: 0
@@ -115,7 +115,6 @@ class TC_COMMTR_3_1(CommodityMeteringTestBaseHelper):
             TestStep("14", "TH removes the subscription the Commodity Metering cluster.", "Subscription is removed successfully."),
         ]
 
-        return steps
 
     @run_if_endpoint_matches(has_cluster(Clusters.CommodityMetering))
     async def test_TC_COMMTR_3_1(self):

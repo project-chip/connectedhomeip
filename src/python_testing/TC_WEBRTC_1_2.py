@@ -50,7 +50,7 @@ from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 
 class TC_WEBRTC_1_2(MatterBaseTest, WebRTCTestHelper):
     def steps_TC_WEBRTC_1_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("precondition-1", commission_if_required(), is_commissioning=True),
             TestStep("precondition-2", "Confirm there is an active WebRTC sessions exist in DUT"),
             TestStep(
@@ -86,7 +86,6 @@ class TC_WEBRTC_1_2(MatterBaseTest, WebRTCTestHelper):
             ),
         ]
 
-        return steps
 
     def desc_TC_WEBRTC_1_2(self) -> str:
         return "[TC-WEBRTC-1.2] Validate that providing an existing WebRTC session ID with an SDP Offer successfully triggers the re-offer flow"

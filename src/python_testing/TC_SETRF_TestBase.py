@@ -1085,6 +1085,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         for tariff_period in self.tariffPeriodsValue:
             if tariff_componentID in tariff_period.tariffComponentIDs:
                 return tariff_period.label
+        return None
 
     async def get_tariff_components_IDs_from_tariff_components_attribute(self, tariff_components: List[cluster.Structs.TariffComponentStruct]) -> List[int]:
         """Extracts TariffComponentIDs from the list of TariffComponentStruct entities.

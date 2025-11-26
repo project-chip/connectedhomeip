@@ -65,7 +65,7 @@ class TC_EEVSE_2_5(MatterBaseTest, EEVSEBaseTestHelper):
         return ["EEVSE.S", "EEVSE.S.C04.Rsp"]
 
     def steps_TC_EEVSE_2_5(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
                      is_commissioning=True),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
@@ -110,7 +110,6 @@ class TC_EEVSE_2_5(MatterBaseTest, EEVSEBaseTestHelper):
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
         ]
 
-        return steps
 
     @async_test_body
     async def test_TC_EEVSE_2_5(self):
