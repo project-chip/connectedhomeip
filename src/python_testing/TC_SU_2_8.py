@@ -128,7 +128,7 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
         if not self.fifo_out:
             asserts.fail("Fifo output missing. Speficy using --string-arg app_pipe_out:<FIFO_APP_PIPE_OUTPUT>")
 
-        self.endpoint = self.get_endpoint(default=0)
+        self.endpoint = self.get_endpoint()
         self.requestor_node_id = self.dut_node_id
         self.th1 = self.default_controller
         self.fabric_id_th2 = self.th1.fabricId + 1
