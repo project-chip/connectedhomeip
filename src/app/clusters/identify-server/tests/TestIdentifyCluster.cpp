@@ -21,7 +21,7 @@
 #include <app/clusters/testing/ClusterTester.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
-#include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <app/server-cluster/testing/TestProviderChangeListener.h>
 #include <clusters/Identify/Attributes.h>
 #include <clusters/Identify/Commands.h>
 #include <clusters/Identify/Metadata.h>
@@ -160,12 +160,13 @@ TEST_F(TestIdentifyCluster, ReadAttributesTest)
 
 TEST_F(TestIdentifyCluster, WriteUnchangedIdentifyTimeDoesNotNotify)
 {
-    chip::Test::TestServerClusterContext context;
     IdentifyCluster cluster(IdentifyCluster::Config(kTestEndpointId, mMockTimerDelegate));
-    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-
-    auto & changeListener = context.ChangeListener();
     chip::Test::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    // Get TestProviderChangeListener from the interaction context
+    auto & changeListener = static_cast<chip::Test::TestProviderChangeListener &>(
+        tester.GetServerClusterContext().interactionContext.dataModelChangeListener);
 
     // Write a value to IdentifyTime and verify it was reported.
     changeListener.DirtyList().clear();
@@ -446,12 +447,13 @@ TEST_F(TestIdentifyCluster, StopIdentifyingTest)
 
 TEST_F(TestIdentifyCluster, IdentifyTimeAttributeReportingTest)
 {
-    chip::Test::TestServerClusterContext context;
     IdentifyCluster cluster(IdentifyCluster::Config(kTestEndpointId, mMockTimerDelegate));
-    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-
-    auto & changeListener = context.ChangeListener();
     chip::Test::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    // Get TestProviderChangeListener from the interaction context
+    auto & changeListener = static_cast<chip::Test::TestProviderChangeListener &>(
+        tester.GetServerClusterContext().interactionContext.dataModelChangeListener);
 
     // 1. Test client write from 0 to non-zero
     changeListener.DirtyList().clear();
