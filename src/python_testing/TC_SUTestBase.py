@@ -62,7 +62,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             kvs_path(str): Str of the path for the kvs path, if not will use temp file.
             log_file (Optional[str], optional): Destination for the app process logs. Defaults to None.
             expected_output (str): Expected string to see after a default timeout. Defaults to "Server initialization complete".
-            timeout (int): Timeout to wait for the expected output. Defaults to 10 seconds
+            timeout (int): Timeout to wait for the expected output. Defaults to 30 seconds
         """
         logger.info(f'Launching provider app with ota image {ota_image_path} over the port: {port}')
         # Image to launch
@@ -309,7 +309,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             attributes=[(0, acl_attribute)]
         )
 
-    async def extend_ota_acls(self, controller, provider_node_id, requestor_node_id):
+    async def extend_ota_acls(self, controller: ChipDeviceCtrl, provider_node_id, requestor_node_id):
         """
         Extend ACLs on both Provider and Requestor to allow OTA interaction.
         Preserves existing ACLs to avoid overwriting.
@@ -374,7 +374,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             f"OTA ACLs extended between provider {provider_node_id} and requestor {requestor_node_id}"
         )
 
-    async def write_acl(self, controller, node_id, acl):
+    async def write_acl(self, controller: ChipDeviceCtrl, node_id: int, acl: list):
         """
         Write the ACL list to a device.
 
@@ -385,6 +385,9 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
 
         Returns:
             True if successful.
+
+        Raises:
+            AssertionError: If ACL write fails.
         """
         result = await controller.WriteAttribute(
             nodeId=node_id,
