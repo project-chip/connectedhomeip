@@ -448,8 +448,8 @@ ValveConfigurationAndControlCluster::GetAdjustedTargetLevel(const Optional<Perce
     return CHIP_NO_ERROR;
 }
 
-// According to the spec, when using a TargetStep while the attribute LevelStep is set
-// the value of TargetStep should be 0, 100 or a multiple of LevelStep.
+// According to the spec, when using a TargetLevel while the attribute LevelStep is set
+// the value of TargetLevel should be 0, 100 or a multiple of LevelStep.
 bool ValveConfigurationAndControlCluster::ValueCompliesWithLevelStep(const uint8_t value) const
 {
     if (mOptionalAttributeSet.IsSet(Attributes::LevelStep::Id))
