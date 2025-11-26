@@ -185,58 +185,57 @@ class TC_AVSUM_2_4(MatterBaseTest, AVSUMTestBase):
                 self.skip_step(11)
             self.mark_all_remaining_steps_skipped(12)
             return
+        self.skip_step(7)
+        self.skip_step(8)
+        self.skip_step(9)
+        self.skip_step(10)
+        self.skip_step(11)
+        self.step(12)
+        # Empty list, expect Not Found
+        await self.send_move_to_preset_command(endpoint, max_presets_dut, expected_status=Status.NotFound)
+
+        # For now force a preset to be present so there is something to read
+        self.step(13)
+        await self.send_save_preset_command(endpoint, name="newpreset", presetID=max_presets_dut)
+        stored_preset = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPresets)
+
+        self.step(14)
+        newPan = newTilt = newZoom = None
+        if self.has_feature_mpan:
+            newPan = (pan_max_dut - pan_min_dut)//2
+        if self.has_feature_mtilt:
+            newTilt = (tilt_max_dut - tilt_min_dut)//2
+        if self.has_feature_mzoom:
+            newZoom = (zoom_max_dut)//2
+
+        sub_handler.reset()
+
+        self.step(15)
+        await self.send_mptz_set_position_command(endpoint, newPan, newTilt, newZoom)
+
+        # Once the MovementState has reset to Idle, proceed with the move to preset
+        sub_handler.await_all_expected_report_matches([movement_state_match], timeout_sec=10)
+
+        self.step(16)
+        sub_handler.reset()
+        await self.send_move_to_preset_command(endpoint, max_presets_dut)
+
+        # Once the MovementState has reset to Idle, read the attribute back and make sure it was set to the preset
+        sub_handler.await_all_expected_report_matches([movement_state_match], timeout_sec=10)
+        mptzposition_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPosition)
+
+        self.step(17)
+        self.verify_preset_matches(stored_preset[0], mptzposition_dut)
+
+        self.step(18)
+        if canbemadebusy:
+            self.step(19)
+            # Busy response check
+            if not self.is_pics_sdk_ci_only:
+                self.wait_for_user_input(prompt_msg="Place device into a busy state. Hit ENTER once ready.")
+                await self.send_move_to_preset_command(endpoint, max_presets_dut, expected_status=Status.Busy)
         else:
-            self.skip_step(7)
-            self.skip_step(8)
-            self.skip_step(9)
-            self.skip_step(10)
-            self.skip_step(11)
-            self.step(12)
-            # Empty list, expect Not Found
-            await self.send_move_to_preset_command(endpoint, max_presets_dut, expected_status=Status.NotFound)
-
-            # For now force a preset to be present so there is something to read
-            self.step(13)
-            await self.send_save_preset_command(endpoint, name="newpreset", presetID=max_presets_dut)
-            stored_preset = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPresets)
-
-            self.step(14)
-            newPan = newTilt = newZoom = None
-            if self.has_feature_mpan:
-                newPan = (pan_max_dut - pan_min_dut)//2
-            if self.has_feature_mtilt:
-                newTilt = (tilt_max_dut - tilt_min_dut)//2
-            if self.has_feature_mzoom:
-                newZoom = (zoom_max_dut)//2
-
-            sub_handler.reset()
-
-            self.step(15)
-            await self.send_mptz_set_position_command(endpoint, newPan, newTilt, newZoom)
-
-            # Once the MovementState has reset to Idle, proceed with the move to preset
-            sub_handler.await_all_expected_report_matches([movement_state_match], timeout_sec=10)
-
-            self.step(16)
-            sub_handler.reset()
-            await self.send_move_to_preset_command(endpoint, max_presets_dut)
-
-            # Once the MovementState has reset to Idle, read the attribute back and make sure it was set to the preset
-            sub_handler.await_all_expected_report_matches([movement_state_match], timeout_sec=10)
-            mptzposition_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPosition)
-
-            self.step(17)
-            self.verify_preset_matches(stored_preset[0], mptzposition_dut)
-
-            self.step(18)
-            if canbemadebusy:
-                self.step(19)
-                # Busy response check
-                if not self.is_pics_sdk_ci_only:
-                    self.wait_for_user_input(prompt_msg="Place device into a busy state. Hit ENTER once ready.")
-                    await self.send_move_to_preset_command(endpoint, max_presets_dut, expected_status=Status.Busy)
-            else:
-                self.skip_step(19)
+            self.skip_step(19)
 
 
 if __name__ == "__main__":

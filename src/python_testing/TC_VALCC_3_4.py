@@ -92,8 +92,7 @@ class TC_VALCC_3_4(MatterBaseTest):
 
             return
 
-        else:
-            logging.info("Test step skipped")
+        logging.info("Test step skipped")
 
         self.step(4)
         levelStep = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.LevelStep)

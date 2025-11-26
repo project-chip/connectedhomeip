@@ -99,8 +99,7 @@ class TC_BOOLCFG_3_1(MatterBaseTest):
                 logging.info("Test step skipped")
 
             return
-        else:
-            logging.info("Test step skipped")
+        logging.info("Test step skipped")
 
         self.step("2c")
         attribute_list = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)

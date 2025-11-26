@@ -384,7 +384,7 @@ class PAVSTTestBase:
                     e.clusterStatus == expected_cluster_status, "Unexpected error returned"
                 )
                 return e.clusterStatus
-            elif (e.status == Status.Busy):
+            if (e.status == Status.Busy):
                 asserts.fail("Transport is busy, currently uploading data")
             else:
                 if (expected_status is not None):
@@ -392,11 +392,10 @@ class PAVSTTestBase:
                         e.status == expected_status, "Unexpected error returned"
                     )
                     return e.status
-                else:
-                    asserts.assert_true(
-                        e.status == Status.NotFound, "Unexpected error returned"
-                    )
-                    return e.status
+                asserts.assert_true(
+                    e.status == Status.NotFound, "Unexpected error returned"
+                )
+                return e.status
         pass
 
     async def psvt_create_test_harness_controller(self):

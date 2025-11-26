@@ -262,8 +262,7 @@ def _read_nfc_tag_data(reader_objects: list, nfc_reader_index: int):
                 if hasattr(record, 'data') and record.data and len(record.data) > 1:
                     uri_string = record.data[1:].decode("utf-8")
                     return uri_string
-                else:
-                    raise ValueError("NDEF URI record payload is missing or too short")
+                raise ValueError("NDEF URI record payload is missing or too short")
         # If we get here, no URI record was found
         raise ValueError("No NDEF URI record found in message")
     finally:

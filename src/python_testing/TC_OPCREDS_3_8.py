@@ -291,7 +291,7 @@ class test_step(object):
 
     def __exit__(self, exc_type, exc_value, traceback):
         if type is None:
-            return  # No exception
+            return None  # No exception
         if isinstance(exc_value, TestStepBlockPassException):
             return True  # Suppress special exception we expect to see.
 
@@ -319,7 +319,7 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
     def get_next_step_id(self, current_step_id) -> object:
         if isinstance(current_step_id, int):
             return current_step_id + 1
-        elif isinstance(current_step_id, str):
+        if isinstance(current_step_id, str):
             match = re.search(r"^(?P<step_number>\d+)", current_step_id)
             if match:
                 return int(match.group('step_number')) + 1

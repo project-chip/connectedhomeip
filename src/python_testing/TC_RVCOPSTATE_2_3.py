@@ -51,72 +51,70 @@ from matter.testing.matter_testing import MatterBaseTest, async_test_body, defau
 def state_enum_to_text(state_enum):
     if state_enum == Clusters.OperationalState.Enums.OperationalStateEnum.kStopped:
         return "Stopped(0x00)"
-    elif state_enum == Clusters.OperationalState.Enums.OperationalStateEnum.kRunning:
+    if state_enum == Clusters.OperationalState.Enums.OperationalStateEnum.kRunning:
         return "Running(0x01)"
-    elif state_enum == Clusters.OperationalState.Enums.OperationalStateEnum.kPaused:
+    if state_enum == Clusters.OperationalState.Enums.OperationalStateEnum.kPaused:
         return "Paused(0x02)"
-    elif state_enum == Clusters.OperationalState.Enums.OperationalStateEnum.kError:
+    if state_enum == Clusters.OperationalState.Enums.OperationalStateEnum.kError:
         return "Error(0x03)"
-    elif state_enum == Clusters.RvcOperationalState.Enums.OperationalStateEnum.kSeekingCharger:
+    if state_enum == Clusters.RvcOperationalState.Enums.OperationalStateEnum.kSeekingCharger:
         return "SeekingCharger(0x40)"
-    elif state_enum == Clusters.RvcOperationalState.Enums.OperationalStateEnum.kCharging:
+    if state_enum == Clusters.RvcOperationalState.Enums.OperationalStateEnum.kCharging:
         return "Charging(0x41)"
-    elif state_enum == Clusters.RvcOperationalState.Enums.OperationalStateEnum.kDocked:
+    if state_enum == Clusters.RvcOperationalState.Enums.OperationalStateEnum.kDocked:
         return "Docked(0x42)"
-    elif state_enum == Clusters.RvcOperationalState.Enums.OperationalStateEnum.kEmptyingDustBin:
+    if state_enum == Clusters.RvcOperationalState.Enums.OperationalStateEnum.kEmptyingDustBin:
         return "EmptyingDustBin(0x43)"
-    elif state_enum == Clusters.RvcOperationalState.Enums.OperationalStateEnum.kCleaningMop:
+    if state_enum == Clusters.RvcOperationalState.Enums.OperationalStateEnum.kCleaningMop:
         return "CleaningMop(0x44)"
-    elif state_enum == Clusters.RvcOperationalState.Enums.OperationalStateEnum.kFillingWaterTank:
+    if state_enum == Clusters.RvcOperationalState.Enums.OperationalStateEnum.kFillingWaterTank:
         return "FillingWaterTank(0x45)"
-    elif state_enum == Clusters.RvcOperationalState.Enums.OperationalStateEnum.kUpdatingMaps:
+    if state_enum == Clusters.RvcOperationalState.Enums.OperationalStateEnum.kUpdatingMaps:
         return "UpdatingMaps(0x46)"
-    else:
-        return "UnknownEnumValue"
+    return "UnknownEnumValue"
 
 
 # Takes an OpState or RvcOpState error enum and returns a string representation
 def error_enum_to_text(error_enum):
     if error_enum == Clusters.OperationalState.Enums.ErrorStateEnum.kNoError:
         return "NoError(0x00)"
-    elif error_enum == Clusters.OperationalState.Enums.ErrorStateEnum.kUnableToStartOrResume:
+    if error_enum == Clusters.OperationalState.Enums.ErrorStateEnum.kUnableToStartOrResume:
         return "UnableToStartOrResume(0x01)"
-    elif error_enum == Clusters.OperationalState.Enums.ErrorStateEnum.kUnableToCompleteOperation:
+    if error_enum == Clusters.OperationalState.Enums.ErrorStateEnum.kUnableToCompleteOperation:
         return "UnableToCompleteOperation(0x02)"
-    elif error_enum == Clusters.OperationalState.Enums.ErrorStateEnum.kCommandInvalidInState:
+    if error_enum == Clusters.OperationalState.Enums.ErrorStateEnum.kCommandInvalidInState:
         return "CommandInvalidInState(0x03)"
-    elif error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kFailedToFindChargingDock:
+    if error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kFailedToFindChargingDock:
         return "FailedToFindChargingDock(0x40)"
-    elif error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kStuck:
+    if error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kStuck:
         return "Stuck(0x41)"
-    elif error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kDustBinMissing:
+    if error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kDustBinMissing:
         return "DustBinMissing(0x42)"
-    elif error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kDustBinFull:
+    if error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kDustBinFull:
         return "DustBinFull(0x43)"
-    elif error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kWaterTankEmpty:
+    if error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kWaterTankEmpty:
         return "WaterTankEmpty(0x44)"
-    elif error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kWaterTankMissing:
+    if error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kWaterTankMissing:
         return "WaterTankMissing(0x45)"
-    elif error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kWaterTankLidOpen:
+    if error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kWaterTankLidOpen:
         return "WaterTankLidOpen(0x46)"
-    elif error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kMopCleaningPadMissing:
+    if error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kMopCleaningPadMissing:
         return "MopCleaningPadMissing(0x47)"
-    elif error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kLowBattery:
+    if error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kLowBattery:
         return "LowBattery(0x48)"
-    elif error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kCannotReachTargetArea:
+    if error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kCannotReachTargetArea:
         return "CannotReachTargetArea(0x49)"
-    elif error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kDirtyWaterTankFull:
+    if error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kDirtyWaterTankFull:
         return "DirtyWaterTankFull(0x4A)"
-    elif error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kDirtyWaterTankMissing:
+    if error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kDirtyWaterTankMissing:
         return "DirtyWaterTankMissing(0x4B)"
-    elif error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kWheelsJammed:
+    if error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kWheelsJammed:
         return "WheelsJammed(0x4C)"
-    elif error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kBrushJammed:
+    if error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kBrushJammed:
         return "BrushJammed(0x4D)"
-    elif error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kNavigationSensorObscured:
+    if error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kNavigationSensorObscured:
         return "NavigationSensorObscured(0x4E)"
-    else:
-        return "UnknownEnumValue"
+    return "UnknownEnumValue"
 
 
 class TC_RVCOPSTATE_2_3(MatterBaseTest):

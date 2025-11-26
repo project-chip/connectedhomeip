@@ -184,8 +184,7 @@ class TC_CLCTRL_4_2(MatterBaseTest):
             logging.info("Latching feature is not supported, skipping remaining steps.")
             self.mark_all_remaining_steps_skipped("2c")
             return
-        else:
-            logging.info("Latching feature is supported, proceeding with the test.")
+        logging.info("Latching feature is supported, proceeding with the test.")
 
         self.step("2c")
         latch_control_modes: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.LatchControlModes)

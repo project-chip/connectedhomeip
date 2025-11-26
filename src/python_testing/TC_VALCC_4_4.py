@@ -107,8 +107,7 @@ class TC_VALCC_4_4(MatterBaseTest):
 
             return
 
-        else:
-            logging.info("Test step skipped")
+        logging.info("Test step skipped")
 
         self.step("3a")
         utcTime = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.Objects.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.UTCTime)

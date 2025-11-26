@@ -52,8 +52,7 @@ def current_latch_matcher(latch: bool) -> AttributeMatcher:
             return False
         if report.value.latch == latch:
             return True
-        else:
-            return False
+        return False
     return AttributeMatcher.from_callable(description=f"CurrentState.Latch is {latch}", matcher=predicate)
 
 
@@ -277,22 +276,21 @@ class TC_CLDIM_3_2(MatterBaseTest):
             logging.info("Manual latching is not required. Skipping steps 5c to 5d.")
             self.mark_step_range_skipped("5c", "5d")
             return
-        else:
-            # STEP 5c: Send SetTarget command with Latch=False
-            self.step("5c")
-            sub_handler.reset()
-            try:
-                await self.send_single_cmd(
-                    cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(latch=False),
-                    endpoint=endpoint, timedRequestTimeoutMs=1000
-                )
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success, "Unexpected status returned")
+        # STEP 5c: Send SetTarget command with Latch=False
+        self.step("5c")
+        sub_handler.reset()
+        try:
+            await self.send_single_cmd(
+                cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(latch=False),
+                endpoint=endpoint, timedRequestTimeoutMs=1000
+            )
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.Success, "Unexpected status returned")
 
-            # STEP 5d: Verify TargetState attribute is updated
-            self.step("5d")
-            target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
-            asserts.assert_equal(target_state.latch, False, "TargetState Latch is not False")
+        # STEP 5d: Verify TargetState attribute is updated
+        self.step("5d")
+        target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
+        asserts.assert_equal(target_state.latch, False, "TargetState Latch is not False")
 
         # STEP 5e: Wait for CurrentState.Latch to be updated to False
         self.step("5e")

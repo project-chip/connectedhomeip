@@ -46,8 +46,7 @@ class TC_ACL_2_5(MatterBaseTest):
     async def write_attribute_with_encoding_option(self, controller, node_id, path, forceLegacyListEncoding):
         if forceLegacyListEncoding:
             return await controller.TestOnlyWriteAttributeWithLegacyList(node_id, path)
-        else:
-            return await controller.WriteAttribute(node_id, path)
+        return await controller.WriteAttribute(node_id, path)
 
     async def internal_test_TC_ACL_2_5(self, force_legacy_encoding: bool):
         self.step(1)

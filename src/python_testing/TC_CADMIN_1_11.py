@@ -53,16 +53,15 @@ class TC_CADMIN_1_11(CADMINBaseTest):
                 nodeId=self.dut_node_id, timeout=self.timeout, iteration=10000, discriminator=self.discriminator, option=1)
             return params
 
-        else:
-            ctx = asserts.assert_raises(ChipStackError)
-            with ctx:
-                await th.OpenCommissioningWindow(
-                    nodeId=self.dut_node_id, timeout=self.timeout, iteration=10000, discriminator=self.discriminator, option=1)
-            errcode = PyChipError.from_code(ctx.exception.err)
-            logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
-            asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
-            asserts.assert_true(errcode.sdk_code == expectedErrCode,
-                                'Unexpected error code returned from CommissioningComplete')
+        ctx = asserts.assert_raises(ChipStackError)
+        with ctx:
+            await th.OpenCommissioningWindow(
+                nodeId=self.dut_node_id, timeout=self.timeout, iteration=10000, discriminator=self.discriminator, option=1)
+        errcode = PyChipError.from_code(ctx.exception.err)
+        logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
+        asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
+        asserts.assert_true(errcode.sdk_code == expectedErrCode,
+                            'Unexpected error code returned from CommissioningComplete')
 
     def steps_TC_CADMIN_1_11(self) -> list[TestStep]:
         return [

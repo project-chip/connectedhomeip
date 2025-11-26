@@ -1171,8 +1171,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         def predicate(report: AttributeValue) -> bool:
             if report.attribute == cluster.Attributes.TariffInfo:
                 return True
-            else:
-                return False
+            return False
         return AttributeMatcher.from_callable(description="TariffInfo", matcher=predicate)
 
     @staticmethod
@@ -1180,8 +1179,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         def predicate(report: AttributeValue) -> bool:
             if report.attribute == cluster.Attributes.TariffUnit:
                 return True
-            else:
-                return False
+            return False
         return AttributeMatcher.from_callable(description="TariffUnit", matcher=predicate)
 
     @staticmethod
@@ -1189,8 +1187,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         def predicate(report: AttributeValue) -> bool:
             if report.attribute == cluster.Attributes.StartDate:
                 return True
-            else:
-                return False
+            return False
         return AttributeMatcher.from_callable(description="StartDate", matcher=predicate)
 
     @staticmethod
@@ -1198,8 +1195,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         def predicate(report: AttributeValue) -> bool:
             if report.attribute == cluster.Attributes.DayEntries:
                 return True
-            else:
-                return False
+            return False
         return AttributeMatcher.from_callable(description="DayEntries", matcher=predicate)
 
     @staticmethod
@@ -1207,8 +1203,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         def predicate(report: AttributeValue) -> bool:
             if report.attribute == cluster.Attributes.DayPatterns:
                 return True
-            else:
-                return False
+            return False
         return AttributeMatcher.from_callable(description="DayPatterns", matcher=predicate)
 
     @staticmethod
@@ -1216,8 +1211,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         def predicate(report: AttributeValue) -> bool:
             if report.attribute == cluster.Attributes.CalendarPeriods:
                 return True
-            else:
-                return False
+            return False
         return AttributeMatcher.from_callable(description="CalendarPeriods", matcher=predicate)
 
     @staticmethod
@@ -1225,8 +1219,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         def predicate(report: AttributeValue) -> bool:
             if report.attribute == cluster.Attributes.IndividualDays:
                 return True
-            else:
-                return False
+            return False
         return AttributeMatcher.from_callable(description="IndividualDays", matcher=predicate)
 
     @staticmethod
@@ -1234,8 +1227,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         def predicate(report: AttributeValue) -> bool:
             if report.attribute == cluster.Attributes.CurrentDay:
                 return True
-            else:
-                return False
+            return False
         return AttributeMatcher.from_callable(description="CurrentDay", matcher=predicate)
 
     @staticmethod
@@ -1243,8 +1235,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         def predicate(report: AttributeValue) -> bool:
             if report.attribute == cluster.Attributes.NextDay:
                 return True
-            else:
-                return False
+            return False
         return AttributeMatcher.from_callable(description="NextDay", matcher=predicate)
 
     @staticmethod
@@ -1252,8 +1243,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         def predicate(report: AttributeValue) -> bool:
             if report.attribute == cluster.Attributes.CurrentDayEntry:
                 return True
-            else:
-                return False
+            return False
         return AttributeMatcher.from_callable(description="CurrentDayEntry", matcher=predicate)
 
     @staticmethod
@@ -1261,8 +1251,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         def predicate(report: AttributeValue) -> bool:
             if report.attribute == cluster.Attributes.CurrentDayEntryDate:
                 return True
-            else:
-                return False
+            return False
         return AttributeMatcher.from_callable(description="CurrentDayEntryDate", matcher=predicate)
 
     @staticmethod
@@ -1270,8 +1259,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         def predicate(report: AttributeValue) -> bool:
             if report.attribute == cluster.Attributes.NextDayEntry:
                 return True
-            else:
-                return False
+            return False
         return AttributeMatcher.from_callable(description="NextDayEntry", matcher=predicate)
 
     @staticmethod
@@ -1279,8 +1267,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         def predicate(report: AttributeValue) -> bool:
             if report.attribute == cluster.Attributes.NextDayEntryDate:
                 return True
-            else:
-                return False
+            return False
         return AttributeMatcher.from_callable(description="NextDayEntryDate", matcher=predicate)
 
     @staticmethod
@@ -1288,8 +1275,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         def predicate(report: AttributeValue) -> bool:
             if report.attribute == cluster.Attributes.TariffComponents:
                 return True
-            else:
-                return False
+            return False
         return AttributeMatcher.from_callable(description="TariffComponents", matcher=predicate)
 
     @staticmethod
@@ -1297,8 +1283,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         def predicate(report: AttributeValue) -> bool:
             if report.attribute == cluster.Attributes.TariffPeriods:
                 return True
-            else:
-                return False
+            return False
         return AttributeMatcher.from_callable(description="TariffPeriods", matcher=predicate)
 
     @staticmethod
@@ -1306,8 +1291,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         def predicate(report: AttributeValue) -> bool:
             if report.attribute == cluster.Attributes.CurrentTariffComponents:
                 return True
-            else:
-                return False
+            return False
         return AttributeMatcher.from_callable(description="CurrentTariffComponents", matcher=predicate)
 
     @staticmethod
@@ -1315,8 +1299,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         def predicate(report: AttributeValue) -> bool:
             if report.attribute == cluster.Attributes.NextTariffComponents:
                 return True
-            else:
-                return False
+            return False
         return AttributeMatcher.from_callable(description="NextTariffComponents", matcher=predicate)
 
     @staticmethod
@@ -1324,8 +1307,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         def predicate(report: AttributeValue) -> bool:
             if report.attribute == cluster.Attributes.DefaultRandomizationOffset:
                 return True
-            else:
-                return False
+            return False
         return AttributeMatcher.from_callable(description="DefaultRandomizationOffset", matcher=predicate)
 
     @staticmethod
@@ -1333,8 +1315,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
         def predicate(report: AttributeValue) -> bool:
             if report.attribute == cluster.Attributes.DefaultRandomizationType:
                 return True
-            else:
-                return False
+            return False
         return AttributeMatcher.from_callable(description="DefaultRandomizationType", matcher=predicate)
 
     def get_mandatory_matchers(self) -> List[AttributeMatcher]:

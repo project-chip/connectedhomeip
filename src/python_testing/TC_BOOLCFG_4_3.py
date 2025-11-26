@@ -131,8 +131,7 @@ class TC_BOOLCFG_4_3(MatterBaseTest):
                 logging.info("Test step skipped")
 
             return
-        else:
-            logging.info("Test step skipped")
+        logging.info("Test step skipped")
 
         self.step(4)
         enabledAlarms = 0

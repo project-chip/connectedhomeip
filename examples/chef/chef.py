@@ -470,7 +470,7 @@ def main() -> int:
                     archive_name = f"{label}-{device_name}"
                     if options.build_exclude and re.search(options.build_exclude, archive_name):
                         continue
-                    elif options.build_include and not re.search(options.build_include, archive_name):
+                    if options.build_include and not re.search(options.build_include, archive_name):
                         continue
                     if options.dry_run:
                         flush_print(archive_name)

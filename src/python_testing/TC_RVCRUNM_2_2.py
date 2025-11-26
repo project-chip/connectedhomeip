@@ -65,11 +65,11 @@ def error_enum_to_text(error_enum):
     except AttributeError:
         if error_enum == RvcStatusEnum.Success:
             return "Success(0x00)"
-        elif error_enum == RvcStatusEnum.UnsupportedMode:
+        if error_enum == RvcStatusEnum.UnsupportedMode:
             return "UnsupportedMode(0x01)"
-        elif error_enum == RvcStatusEnum.GenericFailure:
+        if error_enum == RvcStatusEnum.GenericFailure:
             return "GenericFailure(0x02)"
-        elif error_enum == RvcStatusEnum.InvalidInMode:
+        if error_enum == RvcStatusEnum.InvalidInMode:
             return "InvalidInMode(0x03)"
 
     raise AttributeError("Unknown Enum value")

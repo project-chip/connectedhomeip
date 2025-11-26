@@ -73,8 +73,7 @@ class TC_ACL_2_6(MatterBaseTest):
     async def write_attribute_with_encoding_option(self, controller, node_id, path, forceLegacyListEncoding):
         if forceLegacyListEncoding:
             return await controller.TestOnlyWriteAttributeWithLegacyList(node_id, path)
-        else:
-            return await controller.WriteAttribute(node_id, path)
+        return await controller.WriteAttribute(node_id, path)
 
     def desc_TC_ACL_2_6(self) -> str:
         return "[TC-ACL-2.6] AccessControlEntryChanged event"

@@ -696,11 +696,10 @@ class TC_CGEN_2_2(MatterBaseTest):
             logger.info(f'Step #38: {run_type} - Bypass steps from #38 onward ONLY in CI.')
             self.mark_all_remaining_steps_skipped(39)
             return
-        else:
-            t_start = time.time()
+        t_start = time.time()
 
-            # Get the current time and format it for logging
-            logger.info(f'Step #38: {run_type} - TH1 saves the Current time as t_start')
+        # Get the current time and format it for logging
+        logger.info(f'Step #38: {run_type} - TH1 saves the Current time as t_start')
 
         self.step(39)
         # Reused TrustedRootCertificate created in step #5 - Send command to add new trusted root certificate

@@ -597,77 +597,76 @@ class TC_DRLK_2_13(MatterBaseTest):
                     "Skipping execution from Step 29a to step 35 since 'max_aliro_keys_supported > numberofcredentialsupportedperuser' as per test plan spec")
                 self.mark_all_remaining_steps_skipped("29a")
                 return
-            else:
-                # Perform setUser as we have removed user in previous step and SetCredentials always expects a user with index to be present
-                self.step("29a")
-                if self.pics_guard(self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.C1a.Rsp")):
-                    try:
-                        await self.send_single_cmd(cmd=Clusters.Objects.DoorLock.Commands.SetUser(
-                            operationType=Clusters.DoorLock.Enums.DataOperationTypeEnum.kAdd,
-                            userIndex=1,
-                            userName="alirouser",
-                            userUniqueID=111,
-                            userStatus=Clusters.DoorLock.Enums.UserStatusEnum.kOccupiedEnabled,
-                            userType=Clusters.DoorLock.Enums.UserTypeEnum.kUnrestrictedUser,
-                            credentialRule=Clusters.DoorLock.Enums.CredentialRuleEnum.kSingle),
-                            endpoint=self.app_cluster_endpoint,
-                            timedRequestTimeoutMs=1000)
-                    except InteractionModelError as e:
-                        logging.exception(e)
-                        asserts.assert_equal(e.status, Status.Success, f"Unexpected error returned: {e}")
-                self.step("29b")
-                logging.info("setting 'start_credential_index' to value 1 ")
-                start_credential_index = 1
-                credentials_data = self.alirononevictableendpointkey
-                while 1:
-                    if start_credential_index <= (self.max_aliro_keys_supported - 1):
-                        if start_credential_index != 1:
-                            credentials_data = self.generate_unique_octbytes()
+            # Perform setUser as we have removed user in previous step and SetCredentials always expects a user with index to be present
+            self.step("29a")
+            if self.pics_guard(self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.C1a.Rsp")):
+                try:
+                    await self.send_single_cmd(cmd=Clusters.Objects.DoorLock.Commands.SetUser(
+                        operationType=Clusters.DoorLock.Enums.DataOperationTypeEnum.kAdd,
+                        userIndex=1,
+                        userName="alirouser",
+                        userUniqueID=111,
+                        userStatus=Clusters.DoorLock.Enums.UserStatusEnum.kOccupiedEnabled,
+                        userType=Clusters.DoorLock.Enums.UserTypeEnum.kUnrestrictedUser,
+                        credentialRule=Clusters.DoorLock.Enums.CredentialRuleEnum.kSingle),
+                        endpoint=self.app_cluster_endpoint,
+                        timedRequestTimeoutMs=1000)
+                except InteractionModelError as e:
+                    logging.exception(e)
+                    asserts.assert_equal(e.status, Status.Success, f"Unexpected error returned: {e}")
+            self.step("29b")
+            logging.info("setting 'start_credential_index' to value 1 ")
+            start_credential_index = 1
+            credentials_data = self.alirononevictableendpointkey
+            while 1:
+                if start_credential_index <= (self.max_aliro_keys_supported - 1):
+                    if start_credential_index != 1:
+                        credentials_data = self.generate_unique_octbytes()
 
-                        await self.set_credential_cmd(credentialData=credentials_data,
-                                                      operationType=cluster.Enums.DataOperationTypeEnum.kAdd,
-                                                      credential_enum=cluster.Enums.CredentialTypeEnum.kAliroNonEvictableEndpointKey,
-                                                      credentialIndex=start_credential_index, userIndex=1,
-                                                      userStatus=NullValue,
-                                                      userType=NullValue)
-                        start_credential_index += 1
-                        logging.info(f"The updated value of start_credential_index is {start_credential_index}")
-                    else:
-                        break
-                self.step("30")
-                await self.set_credential_cmd(credentialData=self.alirononevictableendpointkey,
-                                              operationType=cluster.Enums.DataOperationTypeEnum.kAdd,
-                                              credential_enum=cluster.Enums.CredentialTypeEnum.kAliroEvictableEndpointKey,
-                                              credentialIndex=1, userIndex=1, userStatus=NullValue,
-                                              userType=NullValue)
+                    await self.set_credential_cmd(credentialData=credentials_data,
+                                                  operationType=cluster.Enums.DataOperationTypeEnum.kAdd,
+                                                  credential_enum=cluster.Enums.CredentialTypeEnum.kAliroNonEvictableEndpointKey,
+                                                  credentialIndex=start_credential_index, userIndex=1,
+                                                  userStatus=NullValue,
+                                                  userType=NullValue)
+                    start_credential_index += 1
+                    logging.info(f"The updated value of start_credential_index is {start_credential_index}")
+                else:
+                    break
+            self.step("30")
+            await self.set_credential_cmd(credentialData=self.alirononevictableendpointkey,
+                                          operationType=cluster.Enums.DataOperationTypeEnum.kAdd,
+                                          credential_enum=cluster.Enums.CredentialTypeEnum.kAliroEvictableEndpointKey,
+                                          credentialIndex=1, userIndex=1, userStatus=NullValue,
+                                          userType=NullValue)
 
-                # step 31
-                self.step("31")
-                await self.set_credential_cmd(credentialData=self.alirononevictableendpointkey1,
-                                              operationType=cluster.Enums.DataOperationTypeEnum.kAdd,
-                                              credential_enum=cluster.Enums.CredentialTypeEnum.kAliroNonEvictableEndpointKey,
-                                              credentialIndex=self.max_aliro_keys_supported, userIndex=1, userStatus=NullValue,
-                                              userType=NullValue,
-                                              expected_status=Status.ResourceExhausted)
-                # step 32
-                await self.get_credentials_status(step="32", credentialIndex=1,
-                                                  credentialType=cluster.Enums.CredentialTypeEnum.kAliroEvictableEndpointKey,
-                                                  credential_exists=True, userIndex=1)
+            # step 31
+            self.step("31")
+            await self.set_credential_cmd(credentialData=self.alirononevictableendpointkey1,
+                                          operationType=cluster.Enums.DataOperationTypeEnum.kAdd,
+                                          credential_enum=cluster.Enums.CredentialTypeEnum.kAliroNonEvictableEndpointKey,
+                                          credentialIndex=self.max_aliro_keys_supported, userIndex=1, userStatus=NullValue,
+                                          userType=NullValue,
+                                          expected_status=Status.ResourceExhausted)
+            # step 32
+            await self.get_credentials_status(step="32", credentialIndex=1,
+                                              credentialType=cluster.Enums.CredentialTypeEnum.kAliroEvictableEndpointKey,
+                                              credential_exists=True, userIndex=1)
 
-                # step 33
-                await self.get_credentials_status(step="33", credentialIndex=self.max_aliro_keys_supported,
-                                                  credentialType=cluster.Enums.CredentialTypeEnum.kAliroNonEvictableEndpointKey,
-                                                  credential_exists=False, userIndex=NullValue)
-                # step 34
-                self.step("34")
-                if self.pics_guard(self.check_pics("DRLK.S.C26.Rsp")):
-                    await self.send_single_cmd(cmd=Clusters.DoorLock.Commands.ClearCredential(credential=NullValue),
-                                               endpoint=self.app_cluster_endpoint,
-                                               timedRequestTimeoutMs=1000)
+            # step 33
+            await self.get_credentials_status(step="33", credentialIndex=self.max_aliro_keys_supported,
+                                              credentialType=cluster.Enums.CredentialTypeEnum.kAliroNonEvictableEndpointKey,
+                                              credential_exists=False, userIndex=NullValue)
+            # step 34
+            self.step("34")
+            if self.pics_guard(self.check_pics("DRLK.S.C26.Rsp")):
+                await self.send_single_cmd(cmd=Clusters.DoorLock.Commands.ClearCredential(credential=NullValue),
+                                           endpoint=self.app_cluster_endpoint,
+                                           timedRequestTimeoutMs=1000)
 
-                # step 35
-                self.step("35")
-                await self.send_clear_user_cmd(user_index=1)
+            # step 35
+            self.step("35")
+            await self.send_clear_user_cmd(user_index=1)
 
 
 if __name__ == '__main__':

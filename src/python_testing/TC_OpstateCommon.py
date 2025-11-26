@@ -138,8 +138,7 @@ class TC_OPSTATE_BASE():
                 if found["revision"] <= device.revision:
                     logging.info("Revision matches")
                     return True
-                else:
-                    logging.info("Revision does not match")
+                logging.info("Revision does not match")
         return False
 
     async def send_cmd(self, endpoint, cmd, timedRequestTimeoutMs=None):

@@ -923,7 +923,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             if not read_ok:
                 self.record_error(test_name=test_name, location=location, problem=read_err_msg)
                 return None
-            elif not type_ok:
+            if not type_ok:
                 self.record_error(test_name=test_name, location=location, problem=type_err_msg)
                 return None
         return attr_ret
@@ -1232,7 +1232,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                     raise TestError("Image validation failed")
             except EOFError:
                 LOGGER.info("========= EOF on STDIN =========")
-                return None
+                return
 
     def _user_verify_prompt(self, prompt_msg: str, hook_method_name: str, validation_name: str, error_message: str) -> bool:
         """Helper to show a prompt and wait for user validation in TH."""
@@ -1250,8 +1250,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             except EOFError:
                 LOGGER.info("========= EOF on STDIN =========")
             return False
-        else:
-            return True  # Indicating skipped
+        return True  # Indicating skipped
 
     def user_verify_video_stream(self,
                                  prompt_msg: str) -> None:

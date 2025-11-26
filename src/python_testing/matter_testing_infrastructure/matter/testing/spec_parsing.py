@@ -288,14 +288,13 @@ def get_location_from_element(element: ElementTree.Element, cluster_id: Optional
     try:
         if element.tag == 'feature':
             return FeaturePathLocation(endpoint_id=0, cluster_id=cluster_id, feature_code=element.attrib['code'])
-        elif element.tag == 'command':
+        if element.tag == 'command':
             return CommandPathLocation(endpoint_id=0, cluster_id=cluster_id, command_id=int(element.attrib['id'], 0))
-        elif element.tag == 'attribute':
+        if element.tag == 'attribute':
             return AttributePathLocation(endpoint_id=0, cluster_id=cluster_id, attribute_id=int(element.attrib['id'], 0))
-        elif element.tag == 'event':
+        if element.tag == 'event':
             return EventPathLocation(endpoint_id=0, cluster_id=cluster_id, event_id=int(element.attrib['id'], 0))
-        else:
-            return cluster_location
+        return cluster_location
     except (KeyError, ValueError):
         # If we can't find the id or can't parse it
         return cluster_location

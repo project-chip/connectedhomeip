@@ -52,16 +52,15 @@ class TC_CADMIN_1_15(MatterBaseTest):
                 nodeId=self.dut_node_id, timeout=self.max_window_duration, iteration=10000, discriminator=self.discriminator, option=1)
             return params
 
-        else:
-            ctx = asserts.assert_raises(ChipStackError)
-            with ctx:
-                await th.OpenCommissioningWindow(
-                    nodeId=self.dut_node_id, timeout=self.max_window_duration, iteration=10000, discriminator=self.discriminator, option=1)
-            errcode = ctx.exception.chip_error
-            logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
-            asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
-            asserts.assert_true(errcode.sdk_code == expectedErrCode,
-                                'Unexpected error code returned from CommissioningComplete')
+        ctx = asserts.assert_raises(ChipStackError)
+        with ctx:
+            await th.OpenCommissioningWindow(
+                nodeId=self.dut_node_id, timeout=self.max_window_duration, iteration=10000, discriminator=self.discriminator, option=1)
+        errcode = ctx.exception.chip_error
+        logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
+        asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
+        asserts.assert_true(errcode.sdk_code == expectedErrCode,
+                            'Unexpected error code returned from CommissioningComplete')
 
     async def read_currentfabricindex(self, th: ChipDeviceCtrl) -> int:
         cluster = Clusters.Objects.OperationalCredentials

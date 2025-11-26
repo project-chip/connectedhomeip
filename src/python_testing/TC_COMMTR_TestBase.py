@@ -164,8 +164,7 @@ class CommodityMeteringTestBaseHelper(MatterBaseTest):
         def predicate(report: AttributeValue) -> bool:
             if report.attribute == cluster.Attributes.MeteredQuantity:
                 return True
-            else:
-                return False
+            return False
         return AttributeMatcher.from_callable(description="MeteredQuantity", matcher=predicate)
 
     @staticmethod
@@ -173,8 +172,7 @@ class CommodityMeteringTestBaseHelper(MatterBaseTest):
         def predicate(report: AttributeValue) -> bool:
             if report.attribute == cluster.Attributes.MaximumMeteredQuantities:
                 return True
-            else:
-                return False
+            return False
         return AttributeMatcher.from_callable(description="MaximumMeteredQuantities", matcher=predicate)
 
     @staticmethod
@@ -182,8 +180,7 @@ class CommodityMeteringTestBaseHelper(MatterBaseTest):
         def predicate(report: AttributeValue) -> bool:
             if report.attribute == cluster.Attributes.MeteredQuantityTimestamp:
                 return True
-            else:
-                return False
+            return False
         return AttributeMatcher.from_callable(description="MeteredQuantityTimestamp", matcher=predicate)
 
     @staticmethod
@@ -191,8 +188,7 @@ class CommodityMeteringTestBaseHelper(MatterBaseTest):
         def predicate(report: AttributeValue) -> bool:
             if report.attribute == cluster.Attributes.TariffUnit:
                 return True
-            else:
-                return False
+            return False
         return AttributeMatcher.from_callable(description="TariffUnit", matcher=predicate)
 
     def get_mandatory_matchers(self) -> List[AttributeMatcher]:

@@ -53,8 +53,7 @@ def current_latch_matcher(latch: bool) -> AttributeMatcher:
             return False
         if report.value.latch == latch:
             return True
-        else:
-            return False
+        return False
     return AttributeMatcher.from_callable(description=f"CurrentState.Latch is {latch}", matcher=predicate)
 
 
@@ -64,8 +63,7 @@ def current_position_matcher(position: int) -> AttributeMatcher:
             return False
         if report.value.position == position:
             return True
-        else:
-            return False
+        return False
     return AttributeMatcher.from_callable(description=f"CurrentState.Position is {position}", matcher=predicate)
 
 

@@ -129,8 +129,7 @@ class MeterIdentificationTestBaseHelper(MatterBaseTest):
         def predicate(report: AttributeValue) -> bool:
             if report.attribute == cluster.Attributes.MeterType:
                 return True
-            else:
-                return False
+            return False
         return AttributeMatcher.from_callable(description="MeterType", matcher=predicate)
 
     @staticmethod
@@ -138,8 +137,7 @@ class MeterIdentificationTestBaseHelper(MatterBaseTest):
         def predicate(report: AttributeValue) -> bool:
             if report.attribute == cluster.Attributes.PointOfDelivery:
                 return True
-            else:
-                return False
+            return False
         return AttributeMatcher.from_callable(description="PointOfDelivery", matcher=predicate)
 
     @staticmethod
@@ -147,8 +145,7 @@ class MeterIdentificationTestBaseHelper(MatterBaseTest):
         def predicate(report: AttributeValue) -> bool:
             if report.attribute == cluster.Attributes.MeterSerialNumber:
                 return True
-            else:
-                return False
+            return False
         return AttributeMatcher.from_callable(description="MeterSerialNumber", matcher=predicate)
 
     @staticmethod
@@ -156,8 +153,7 @@ class MeterIdentificationTestBaseHelper(MatterBaseTest):
         def predicate(report: AttributeValue) -> bool:
             if report.attribute == cluster.Attributes.ProtocolVersion:
                 return True
-            else:
-                return False
+            return False
         return AttributeMatcher.from_callable(description="ProtocolVersion", matcher=predicate)
 
     @staticmethod
@@ -165,8 +161,7 @@ class MeterIdentificationTestBaseHelper(MatterBaseTest):
         def predicate(report: AttributeValue) -> bool:
             if report.attribute == cluster.Attributes.PowerThreshold:
                 return True
-            else:
-                return False
+            return False
         return AttributeMatcher.from_callable(description="PowerThreshold", matcher=predicate)
 
     def get_mandatory_matchers(self) -> List[AttributeMatcher]:
