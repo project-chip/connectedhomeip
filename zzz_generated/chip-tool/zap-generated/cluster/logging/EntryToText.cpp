@@ -237,6 +237,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "RadonConcentrationMeasurement";
     case chip::app::Clusters::SoilMeasurement::Id:
         return "SoilMeasurement";
+    case chip::app::Clusters::AmbientSensingUnion::Id:
+        return "AmbientSensingUnion";
     case chip::app::Clusters::WiFiNetworkManagement::Id:
         return "WiFiNetworkManagement";
     case chip::app::Clusters::ThreadBorderRouterManagement::Id:
@@ -3939,6 +3941,37 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::SoilMeasurement::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::SoilMeasurement::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::AmbientSensingUnion::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::AmbientSensingUnion::Attributes::UnionID::Id:
+            return "UnionID";
+        case chip::app::Clusters::AmbientSensingUnion::Attributes::UnionName::Id:
+            return "UnionName";
+        case chip::app::Clusters::AmbientSensingUnion::Attributes::UnionHealth::Id:
+            return "UnionHealth";
+        case chip::app::Clusters::AmbientSensingUnion::Attributes::UnionSensorList::Id:
+            return "UnionSensorList";
+        case chip::app::Clusters::AmbientSensingUnion::Attributes::UnionSensorHealth::Id:
+            return "UnionSensorHealth";
+        case chip::app::Clusters::AmbientSensingUnion::Attributes::SensorID::Id:
+            return "SensorID";
+        case chip::app::Clusters::AmbientSensingUnion::Attributes::ZoneSensorList::Id:
+            return "ZoneSensorList";
+        case chip::app::Clusters::AmbientSensingUnion::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::AmbientSensingUnion::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::AmbientSensingUnion::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::AmbientSensingUnion::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::AmbientSensingUnion::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";

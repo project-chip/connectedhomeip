@@ -336,6 +336,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeSoilMeasurementID:
         result = @"SoilMeasurement";
         break;
+    case MTRClusterIDTypeAmbientSensingUnionID:
+        result = @"AmbientSensingUnion";
+        break;
     case MTRClusterIDTypeWiFiNetworkManagementID:
         result = @"WiFiNetworkManagement";
         break;
@@ -7402,6 +7405,66 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         }
         break;
 
+    case MTRClusterIDTypeAmbientSensingUnionID:
+
+        switch (attributeID) {
+
+            // Cluster AmbientSensingUnion attributes
+        case MTRAttributeIDTypeClusterAmbientSensingUnionAttributeUnionIDID:
+            result = @"UnionID";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientSensingUnionAttributeUnionNameID:
+            result = @"UnionName";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientSensingUnionAttributeUnionHealthID:
+            result = @"UnionHealth";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientSensingUnionAttributeUnionSensorListID:
+            result = @"UnionSensorList";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientSensingUnionAttributeUnionSensorHealthID:
+            result = @"UnionSensorHealth";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientSensingUnionAttributeSensorIDID:
+            result = @"SensorID";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientSensingUnionAttributeZoneSensorListID:
+            result = @"ZoneSensorList";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientSensingUnionAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientSensingUnionAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientSensingUnionAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientSensingUnionAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterAmbientSensingUnionAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            // Not a known AmbientSensingUnion attribute.
+            result = [NSString stringWithFormat:@"<Unknown attributeID %u>", attributeID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeWiFiNetworkManagementID:
 
         switch (attributeID) {
@@ -11500,6 +11563,16 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
         }
         break;
 
+    case MTRClusterIDTypeAmbientSensingUnionID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeWiFiNetworkManagementID:
 
         switch (commandID) {
@@ -13830,6 +13903,16 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
         }
         break;
 
+    case MTRClusterIDTypeAmbientSensingUnionID:
+
+        switch (commandID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
+            break;
+        }
+        break;
+
     case MTRClusterIDTypeWiFiNetworkManagementID:
 
         switch (commandID) {
@@ -15953,6 +16036,21 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
     case MTRClusterIDTypeSoilMeasurementID:
 
         switch (eventID) {
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];
+            break;
+        }
+        break;
+
+    case MTRClusterIDTypeAmbientSensingUnionID:
+
+        switch (eventID) {
+
+            // Cluster AmbientSensingUnion events
+        case MTREventIDTypeClusterAmbientSensingUnionEventSensorListChangeID:
+            result = @"SensorListChange";
+            break;
 
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];

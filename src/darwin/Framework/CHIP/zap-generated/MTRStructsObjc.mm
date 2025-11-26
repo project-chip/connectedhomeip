@@ -8421,6 +8421,33 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRAmbientSensingUnionClusterSensorListChangeEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _unionSensorList = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRAmbientSensingUnionClusterSensorListChangeEvent alloc] init];
+
+    other.unionSensorList = self.unionSensorList;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: unionSensorList:%@; >", NSStringFromClass([self class]), _unionSensorList];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRThreadNetworkDirectoryClusterThreadNetworkStruct
 - (instancetype)init
 {

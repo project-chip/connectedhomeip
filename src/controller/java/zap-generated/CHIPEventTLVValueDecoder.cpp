@@ -8746,6 +8746,62 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
+    case app::Clusters::AmbientSensingUnion::Id: {
+        using namespace app::Clusters::AmbientSensingUnion;
+        switch (aPath.mEventId)
+        {
+        case Events::SensorListChange::Id: {
+            Events::SensorListChange::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_unionSensorList;
+            chip::JniReferences::GetInstance().CreateArrayList(value_unionSensorList);
+
+            auto iter_value_unionSensorList_0 = cppValue.unionSensorList.begin();
+            while (iter_value_unionSensorList_0.Next())
+            {
+                auto & entry_0 = iter_value_unionSensorList_0.GetValue();
+                jobject newElement_0;
+                std::string newElement_0ClassName     = "java/lang/Integer";
+                std::string newElement_0CtorSignature = "(I)V";
+                jint jninewElement_0                  = static_cast<jint>(entry_0);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    newElement_0ClassName.c_str(), newElement_0CtorSignature.c_str(), jninewElement_0, newElement_0);
+                chip::JniReferences::GetInstance().AddToList(value_unionSensorList, newElement_0);
+            }
+
+            jclass sensorListChangeStructClass;
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$AmbientSensingUnionClusterSensorListChangeEvent",
+                sensorListChangeStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$AmbientSensingUnionClusterSensorListChangeEvent");
+                return nullptr;
+            }
+
+            jmethodID sensorListChangeStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(env, sensorListChangeStructClass, "<init>",
+                                                                "(Ljava/util/ArrayList;)V", &sensorListChangeStructCtor);
+            if (err != CHIP_NO_ERROR || sensorListChangeStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$AmbientSensingUnionClusterSensorListChangeEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(sensorListChangeStructClass, sensorListChangeStructCtor, value_unionSensorList);
+
+            return value;
+        }
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
     case app::Clusters::WiFiNetworkManagement::Id: {
         using namespace app::Clusters::WiFiNetworkManagement;
         switch (aPath.mEventId)

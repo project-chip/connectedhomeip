@@ -11094,6 +11094,22 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const AmbientSensingUnion::Events::SensorListChange::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("UnionSensorList", indent + 1, value.unionSensorList);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'UnionSensorList'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const TargetNavigator::Events::TargetUpdated::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -20547,6 +20563,72 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
+    case AmbientSensingUnion::Id: {
+        switch (path.mAttributeId)
+        {
+        case AmbientSensingUnion::Attributes::UnionID::Id: {
+            uint64_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("UnionID", 1, value);
+        }
+        case AmbientSensingUnion::Attributes::UnionName::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("UnionName", 1, value);
+        }
+        case AmbientSensingUnion::Attributes::UnionHealth::Id: {
+            chip::app::Clusters::AmbientSensingUnion::UnionHealthEnum value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("UnionHealth", 1, value);
+        }
+        case AmbientSensingUnion::Attributes::UnionSensorList::Id: {
+            chip::app::DataModel::DecodableList<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("UnionSensorList", 1, value);
+        }
+        case AmbientSensingUnion::Attributes::UnionSensorHealth::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::AmbientSensingUnion::UnionHealthEnum> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("UnionSensorHealth", 1, value);
+        }
+        case AmbientSensingUnion::Attributes::SensorID::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SensorID", 1, value);
+        }
+        case AmbientSensingUnion::Attributes::ZoneSensorList::Id: {
+            chip::app::DataModel::DecodableList<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ZoneSensorList", 1, value);
+        }
+        case AmbientSensingUnion::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogGeneratedCommandId("GeneratedCommandList", 1, value, AmbientSensingUnion::Id);
+        }
+        case AmbientSensingUnion::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogAcceptedCommandId("AcceptedCommandList", 1, value, AmbientSensingUnion::Id);
+        }
+        case AmbientSensingUnion::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogAttributeId("AttributeList", 1, value, AmbientSensingUnion::Id);
+        }
+        case AmbientSensingUnion::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case AmbientSensingUnion::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
     case WiFiNetworkManagement::Id: {
         switch (path.mAttributeId)
         {
@@ -24819,6 +24901,17 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             chip::app::Clusters::OccupancySensing::Events::OccupancyChanged::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OccupancyChanged", 1, value);
+        }
+        }
+        break;
+    }
+    case AmbientSensingUnion::Id: {
+        switch (header.mPath.mEventId)
+        {
+        case AmbientSensingUnion::Events::SensorListChange::Id: {
+            chip::app::Clusters::AmbientSensingUnion::Events::SensorListChange::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SensorListChange", 1, value);
         }
         }
         break;

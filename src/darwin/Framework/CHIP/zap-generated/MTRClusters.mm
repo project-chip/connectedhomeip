@@ -16528,6 +16528,81 @@ using chip::System::Clock::Timeout;
 
 @end
 
+@implementation MTRClusterAmbientSensingUnion
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeUnionIDWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientSensingUnionID) attributeID:@(MTRAttributeIDTypeClusterAmbientSensingUnionAttributeUnionIDID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeUnionNameWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientSensingUnionID) attributeID:@(MTRAttributeIDTypeClusterAmbientSensingUnionAttributeUnionNameID) params:params];
+}
+
+- (void)writeAttributeUnionNameWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeUnionNameWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)writeAttributeUnionNameWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientSensingUnionID) attributeID:@(MTRAttributeIDTypeClusterAmbientSensingUnionAttributeUnionNameID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeUnionHealthWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientSensingUnionID) attributeID:@(MTRAttributeIDTypeClusterAmbientSensingUnionAttributeUnionHealthID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeUnionSensorListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientSensingUnionID) attributeID:@(MTRAttributeIDTypeClusterAmbientSensingUnionAttributeUnionSensorListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeUnionSensorHealthWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientSensingUnionID) attributeID:@(MTRAttributeIDTypeClusterAmbientSensingUnionAttributeUnionSensorHealthID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeSensorIDWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientSensingUnionID) attributeID:@(MTRAttributeIDTypeClusterAmbientSensingUnionAttributeSensorIDID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeZoneSensorListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientSensingUnionID) attributeID:@(MTRAttributeIDTypeClusterAmbientSensingUnionAttributeZoneSensorListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientSensingUnionID) attributeID:@(MTRAttributeIDTypeClusterAmbientSensingUnionAttributeGeneratedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientSensingUnionID) attributeID:@(MTRAttributeIDTypeClusterAmbientSensingUnionAttributeAcceptedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientSensingUnionID) attributeID:@(MTRAttributeIDTypeClusterAmbientSensingUnionAttributeAttributeListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientSensingUnionID) attributeID:@(MTRAttributeIDTypeClusterAmbientSensingUnionAttributeFeatureMapID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeAmbientSensingUnionID) attributeID:@(MTRAttributeIDTypeClusterAmbientSensingUnionAttributeClusterRevisionID) params:params];
+}
+
+@end
+
 @implementation MTRClusterWiFiNetworkManagement
 
 - (void)networkPassphraseRequestWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRWiFiNetworkManagementClusterNetworkPassphraseResponseParams * _Nullable data, NSError * _Nullable error))completion

@@ -141,6 +141,7 @@
 | TotalVolatileOrganicCompoundsConcentrationMeasurement               | 0x042E |
 | RadonConcentrationMeasurement                                       | 0x042F |
 | SoilMeasurement                                                     | 0x0430 |
+| AmbientSensingUnion                                                 | 0x0432 |
 | WiFiNetworkManagement                                               | 0x0451 |
 | ThreadBorderRouterManagement                                        | 0x0452 |
 | ThreadNetworkDirectory                                              | 0x0453 |
@@ -11564,6 +11565,29 @@ private:
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster AmbientSensingUnion                                         | 0x0432 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * UnionID                                                           | 0x0000 |
+| * UnionName                                                         | 0x0001 |
+| * UnionHealth                                                       | 0x0002 |
+| * UnionSensorList                                                   | 0x0003 |
+| * UnionSensorHealth                                                 | 0x0004 |
+| * SensorID                                                          | 0x0005 |
+| * ZoneSensorList                                                    | 0x0006 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+| * SensorListChange                                                  | 0x0000 |
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
@@ -29313,6 +29337,84 @@ void registerClusterSoilMeasurement(Commands & commands, CredentialIssuerCommand
 
     commands.RegisterCluster(clusterName, clusterCommands);
 }
+void registerClusterAmbientSensingUnion(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::AmbientSensingUnion;
+
+    const char * clusterName = "AmbientSensingUnion";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<ReadAttribute>(Id, "union-id", Attributes::UnionID::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "union-name", Attributes::UnionName::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "union-health", Attributes::UnionHealth::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "union-sensor-list", Attributes::UnionSensorList::Id, credsIssuerConfig),           //
+        make_unique<ReadAttribute>(Id, "union-sensor-health", Attributes::UnionSensorHealth::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "sensor-id", Attributes::SensorID::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "zone-sensor-list", Attributes::ZoneSensorList::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<uint64_t>>(Id, "union-id", 0, UINT64_MAX, Attributes::UnionID::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::CharSpan>>(Id, "union-name", Attributes::UnionName::Id, WriteCommandType::kWrite,
+                                                    credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::AmbientSensingUnion::UnionHealthEnum>>(
+            Id, "union-health", 0, UINT8_MAX, Attributes::UnionHealth::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const uint8_t>>>(
+            Id, "union-sensor-list", Attributes::UnionSensorList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<
+            WriteAttributeAsComplex<chip::app::DataModel::List<const chip::app::Clusters::AmbientSensingUnion::UnionHealthEnum>>>(
+            Id, "union-sensor-health", Attributes::UnionSensorHealth::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "sensor-id", 0, UINT8_MAX, Attributes::SensorID::Id, WriteCommandType::kForceWrite,
+                                             credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const uint8_t>>>(
+            Id, "zone-sensor-list", Attributes::ZoneSensorList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                                //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<SubscribeAttribute>(Id, "union-id", Attributes::UnionID::Id, credsIssuerConfig),                            //
+        make_unique<SubscribeAttribute>(Id, "union-name", Attributes::UnionName::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "union-health", Attributes::UnionHealth::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "union-sensor-list", Attributes::UnionSensorList::Id, credsIssuerConfig),           //
+        make_unique<SubscribeAttribute>(Id, "union-sensor-health", Attributes::UnionSensorHealth::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "sensor-id", Attributes::SensorID::Id, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, "zone-sensor-list", Attributes::ZoneSensorList::Id, credsIssuerConfig),             //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                          //
+        make_unique<ReadEvent>(Id, "sensor-list-change", Events::SensorListChange::Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                     //
+        make_unique<SubscribeEvent>(Id, "sensor-list-change", Events::SensorListChange::Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
 void registerClusterWiFiNetworkManagement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     using namespace chip::app::Clusters::WiFiNetworkManagement;
@@ -32588,6 +32690,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterTotalVolatileOrganicCompoundsConcentrationMeasurement(commands, credsIssuerConfig);
     registerClusterRadonConcentrationMeasurement(commands, credsIssuerConfig);
     registerClusterSoilMeasurement(commands, credsIssuerConfig);
+    registerClusterAmbientSensingUnion(commands, credsIssuerConfig);
     registerClusterWiFiNetworkManagement(commands, credsIssuerConfig);
     registerClusterThreadBorderRouterManagement(commands, credsIssuerConfig);
     registerClusterThreadNetworkDirectory(commands, credsIssuerConfig);
