@@ -15,7 +15,7 @@
  */
 
 #include <app/EventLogging.h>
-#include <app/clusters/boolean-state-server/boolean-state-cluster.h>
+#include <app/clusters/boolean-state-server/BooleanStateCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/BooleanState/Metadata.h>
 
