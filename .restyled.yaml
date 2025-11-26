@@ -223,13 +223,18 @@ restylers:
       include:
           - "**/*.sh"
           - "**/*.bash"
-    - name: autopep8
-      image: public.ecr.aws/restyled-io/restyler-autopep8:v2.3
-    - name: isort
-      image: public.ecr.aws/restyled-io/restyler-isort:v7.0
+
+    # NOTE: The order of the Python restylers is important. The ruff auto-fixer
+    #       needs to run first because the changes it makes may break style which
+    #       then autopep8 and isort can fix. Also, the isort needs to run last
+    #       because autopep8 may move some imports but without sorting them.
     - name: ruff
       image: public.ecr.aws/restyled-io/restyler-ruff:v0.14
       command:
           - ruff
           - check
           - --fix-only
+    - name: autopep8
+      image: public.ecr.aws/restyled-io/restyler-autopep8:v2.3
+    - name: isort
+      image: public.ecr.aws/restyled-io/restyler-isort:v7.0
