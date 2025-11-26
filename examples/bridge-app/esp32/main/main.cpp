@@ -27,6 +27,8 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <bridged-actions-stub.h>
+#include "shell_extension/launch.h"
+#include "shell_extension/openthread_cli_register.h"
 #include <common/Esp32AppServer.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -428,6 +430,13 @@ extern "C" void app_main()
         ESP_LOGE(TAG, "esp_event_loop_create_default()  failed: %s", esp_err_to_name(err));
         return;
     }
+
+#if CONFIG_ENABLE_CHIP_SHELL
+#if CONFIG_OPENTHREAD_CLI
+    chip::RegisterOpenThreadCliCommands();
+#endif
+    chip::LaunchShell();
+#endif
 
     CHIP_ERROR chip_err = CHIP_NO_ERROR;
 
