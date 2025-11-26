@@ -159,6 +159,16 @@
 
 #define CHIP_DEVICE_CONFIG_EXT_ADVERTISING SL_MATTER_BLE_EXTENDED_ADV
 
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_MULTI_PAN
+ *
+ * Enable Multi-PAN support for Matter over Thread devices.
+ * When enabled, allows secondary OpenThread instance.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_MULTI_PAN
+#define CHIP_DEVICE_CONFIG_ENABLE_MULTI_PAN 0
+#endif // CHIP_DEVICE_CONFIG_ENABLE_MULTI_PAN
+
 /*
     ICD Configuration Defines
 */
