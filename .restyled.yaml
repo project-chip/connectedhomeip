@@ -227,7 +227,7 @@ restylers:
     # NOTE: The order of the Python restylers is important. The ruff auto-fixer
     #       needs to run first because the changes it makes may break style which
     #       then autopep8 and isort can fix. Also, the isort needs to run last
-    #       because autopep8 may move some imports but without sorting them.
+    #       because autopep8 may reformat import lines without sorting them.
     - name: ruff
       image: public.ecr.aws/restyled-io/restyler-ruff:v0.14
       command:
