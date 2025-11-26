@@ -224,7 +224,9 @@ DataModel::ActionReturnStatus OccupancySensingCluster::SetHoldTime(uint16_t hold
         {
             // Otherwise, restart the timer for the remaining duration.
             System::Clock::Timeout remainingTime = newHoldTimeSeconds - elapsedTime;
-            mHoldTimeDelegate->StartTimer(this, remainingTime);
+            // There's not much we can do it the timer fails to start. The Application is responsible for
+            // providing a working timer delegate, so we ignore the return value here.
+            RETURN_SAFELY_IGNORED mHoldTimeDelegate->StartTimer(this, remainingTime);
         }
     }
 
