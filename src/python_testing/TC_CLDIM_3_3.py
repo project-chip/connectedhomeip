@@ -51,10 +51,7 @@ def current_latch_matcher(latch: bool) -> AttributeMatcher:
     def predicate(report: AttributeValue) -> bool:
         if report.attribute != Clusters.ClosureDimension.Attributes.CurrentState:
             return False
-        if report.value.latch == latch:
-            return True
-        else:
-            return False
+        return report.value.latch == latch
     return AttributeMatcher.from_callable(description=f"CurrentState.Latch is {latch}", matcher=predicate)
 
 
@@ -62,10 +59,7 @@ def current_position_matcher(position: int) -> AttributeMatcher:
     def predicate(report: AttributeValue) -> bool:
         if report.attribute != Clusters.ClosureDimension.Attributes.CurrentState:
             return False
-        if report.value.position == position:
-            return True
-        else:
-            return False
+        return report.value.position == position
     return AttributeMatcher.from_callable(description=f"CurrentState.Position is {position}", matcher=predicate)
 
 
@@ -78,7 +72,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
         return "[TC-CLDIM-3.3] SetTarget Command Field Sanity Check with DUT as Server"
 
     def steps_TC_CLDIM_3_3(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read FeatureMap attribute"),
             TestStep("2b", "If Limitation feature is supported, read LimitRange attribute"),
@@ -121,13 +115,11 @@ class TC_CLDIM_3_3(MatterBaseTest):
             TestStep(10, "Send SetTarget command with invalid Speed when Speed is unsupported"),
             TestStep(11, "Send SetTarget command with invalid Speed"),
         ]
-        return steps
 
     def pics_TC_CLDIM_3_3(self) -> list[str]:
-        pics = [
+        return [
             "CLDIM.S",
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:

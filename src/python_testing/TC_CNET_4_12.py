@@ -146,13 +146,12 @@ class TC_CNET_4_12(MatterBaseTest):
 
     def pics_TC_CNET_4_12(self):
         """Return the PICS definitions associated with this test."""
-        pics = [
+        return [
             "CNET.S.F01"
         ]
-        return pics
 
     def steps_TC_CNET_4_12(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("precondition", "TH is commissioned", is_commissioning=True),
             TestStep(1, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900",
                      "Verify that DUT responds with ArmFailSafeResponse to the TH"),
@@ -214,7 +213,6 @@ class TC_CNET_4_12(MatterBaseTest):
                      "  . NetworkID field value as the extended PAN ID of PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET\n"
                      "  . Connected field value is of type bool and is TRUE")
         ]
-        return steps
 
     @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kThreadNetworkInterface))
     async def test_TC_CNET_4_12(self):

@@ -366,14 +366,13 @@ def get_setup_code() -> (str, bool):
         pref = input()
         if pref in ['q', 'Q']:
             return (get_qr(), SetupCodeType.QR)
-        elif pref in ['m', 'M']:
+        if pref in ['m', 'M']:
             print('please enter manual code')
             m = input()
             m = ''.join([i for i in m if m.isnumeric()])
             if len(m) == 11 or len(m) == 21:
                 return (m, SetupCodeType.MANUAL)
-            else:
-                print("Invalid manual code - please try again")
+            print("Invalid manual code - please try again")
 
 
 class TestConfig(object):
@@ -509,9 +508,8 @@ def main():
         for s in report:
             print(f'\t{s}')
         return 1
-    else:
-        print('TEST PASSED!')
-        return 0
+    print('TEST PASSED!')
+    return 0
 
 
 if __name__ == "__main__":

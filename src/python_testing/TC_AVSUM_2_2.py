@@ -57,7 +57,7 @@ class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
         return "[TC-AVSUM-2.2] MptzSetPosition Command Validation"
 
     def steps_TC_AVSUM_2_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read and verify MPTZPosition attribute."),
             TestStep(3, "Send an MPTZSetPosition command with no fields. Verify failure response"),
@@ -88,13 +88,11 @@ class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
             TestStep(28, "Set the invalid value via the MPTZSetPosition command. Verify failure response."),
             TestStep(29, "Read MPTZPosition. Verify the Zoom value is that set in Step 25."),
         ]
-        return steps
 
     def pics_TC_AVSUM_2_2(self) -> list[str]:
-        pics = [
+        return [
             "AVSUM.S",
         ]
-        return pics
 
     @run_if_endpoint_matches(has_cluster(Clusters.CameraAvSettingsUserLevelManagement))
     async def test_TC_AVSUM_2_2(self):
