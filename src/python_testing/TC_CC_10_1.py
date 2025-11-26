@@ -67,7 +67,6 @@ class TC_CC_10_1(MatterBaseTest):
             attributeValueList=efs_attribute_value_list
         )
 
-
     def desc_TC_CC_10_1(self) -> str:
         """Returns a description of this test"""
         return "4.2.29. [TC_CC_10_1] Scenes Management Cluster Interaction with DUT as Server"

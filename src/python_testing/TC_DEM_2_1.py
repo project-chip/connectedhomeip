@@ -95,7 +95,6 @@ class TC_DEM_2_1(MatterBaseTest, DEMTestBase):
                      "Verify that the DUT response contains an OptOutStateEnum (enum8) value."),
         ]
 
-
     @async_test_body
     async def test_TC_DEM_2_1(self):
         # pylint: disable=too-many-locals, too-many-statements

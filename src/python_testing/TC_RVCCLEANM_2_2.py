@@ -82,7 +82,7 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
 
     async def read_feature_map_attribute(self):
         return await self.read_mod_attribute_expect_success(Clusters.RvcCleanMode,
-                                                           Clusters.RvcCleanMode.Attributes.FeatureMap)
+                                                            Clusters.RvcCleanMode.Attributes.FeatureMap)
 
     async def send_clean_change_to_mode_cmd(self, newMode) -> Clusters.Objects.RvcCleanMode.Commands.ChangeToModeResponse:
         return await self.send_single_cmd(cmd=Clusters.Objects.RvcCleanMode.Commands.ChangeToMode(newMode=newMode), endpoint=self.endpoint)

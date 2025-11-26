@@ -71,8 +71,8 @@ class HelloTest(MatterBaseTest):
     # this function is marked is_commissioning=True.
     def steps_TC_ENDPOINT_2_1(self) -> list[TestStep]:
         return [TestStep(1, "Commissioning, already done", is_commissioning=True),
-                 TestStep(2, "Read ProductName on endpoint 9999"),
-                 ]
+                TestStep(2, "Read ProductName on endpoint 9999"),
+                ]
 
     def desc_TC_ENDPOINT_2_1(self) -> str:
         return '#.#.#. [TC-HELLO-x.x] Test Failure On Wrong Endpoint'
@@ -94,10 +94,10 @@ class HelloTest(MatterBaseTest):
 
     def steps_TC_PICSTEST_2_1(self) -> list[TestStep]:
         return [TestStep(1, "Commissioning, already done", is_commissioning=True),
-                 TestStep(2, "Skip this step based on pics"),
-                 TestStep(3, "Run this step"),
-                 TestStep(4, "Always skip this step")
-                 ]
+                TestStep(2, "Skip this step based on pics"),
+                TestStep(3, "Run this step"),
+                TestStep(4, "Always skip this step")
+                ]
 
     def desc_TC_PICSTEST_2_1(self) -> str:
         return "#.#.#. [TC-HELLO-x.x] Test pics"

@@ -131,7 +131,6 @@ class TC_REFALM_2_2(MatterBaseTest):
                      "Receive a Notify event with the State attribute bit 0 set to 0."),
         ]
 
-
     async def _get_command_status(self, cmd: ClusterCommand):
         """Return the status of the executed command. By default the status is 0x0 unless a different
         status on InteractionModel is returned. For this test we consider the status 0x0 as not succesfull."""

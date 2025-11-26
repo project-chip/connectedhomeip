@@ -77,7 +77,6 @@ class TC_WEBRTC_1_5(MatterBaseTest):
             ),
         ]
 
-
     def desc_TC_WEBRTC_1_5(self) -> str:
         return "[TC-WEBRTC-1.5] Validate Deferred Offer Flow for Battery-Powered Camera in Standby Mode."
 

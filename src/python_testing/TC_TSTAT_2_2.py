@@ -98,7 +98,6 @@ class TC_TSTAT_2_2(MatterBaseTest):
             TestStep("18", "Sets OccupiedCoolingSetpoint to default value"),
         ]
 
-
     @async_test_body
     async def test_TC_TSTAT_2_2(self):
         endpoint = self.get_endpoint()

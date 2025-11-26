@@ -410,7 +410,6 @@ class TC_SETRF_3_1(CommodityTariffTestBaseHelper):
                      Subscription successfully removed."""),
         ]
 
-
     @async_test_body
     async def test_TC_SETRF_3_1(self):
         """Implementation of test case TC_SETRF_3_1."""

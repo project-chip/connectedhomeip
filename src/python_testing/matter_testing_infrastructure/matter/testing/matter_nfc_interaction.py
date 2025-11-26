@@ -171,7 +171,6 @@ def _read_ndef_length(reader_connection_object):
     return (data[0] << 8) + data[1]
 
 
-
 def _read_ndef_data(reader_connection_object, length: int) -> bytes:
     """
     Read the NDEF message data from the NFC tag.

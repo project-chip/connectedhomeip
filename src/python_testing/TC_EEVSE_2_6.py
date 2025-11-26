@@ -133,7 +133,6 @@ class TC_EEVSE_2_6(MatterBaseTest, EEVSEBaseTestHelper):
                      "The subscription is cancelled successfully"),
         ]
 
-
     @async_test_body
     async def test_TC_EEVSE_2_6(self):
         self.step("1")

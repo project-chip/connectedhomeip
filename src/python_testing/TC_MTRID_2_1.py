@@ -88,7 +88,6 @@ class TC_MTRID_2_1(MeterIdentificationTestBaseHelper):
                      - PowerThresholdSource field has type PowerThresholdSourceEnum and value in range 0 - 2."""),
         ]
 
-
     @async_test_body
     async def test_TC_MTRID_2_1(self):
         """The main test procedure for TC_MTRID_2_1."""

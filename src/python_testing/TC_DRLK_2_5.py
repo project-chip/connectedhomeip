@@ -83,7 +83,6 @@ class TC_DRLK_2_5(MatterBaseTest):
             TestStep("12", "TH sends ClearUser Command to DUT.", "Verify that the DUT sends SUCCESS response."),
         ]
 
-
     async def read_attributes_from_dut(self, endpoint, cluster, attribute, expected_status: Status = Status.Success):
         try:
             attribute_value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,

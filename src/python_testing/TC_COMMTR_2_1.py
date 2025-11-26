@@ -83,7 +83,6 @@ class TC_COMMTR_2_1(CommodityMeteringTestBaseHelper):
             TestStep("5", "TH reads TariffUnit attribute", "DUT replies a null value or TariffUnitEnum value in range 0-1."),
         ]
 
-
     @run_if_endpoint_matches(has_cluster(Clusters.CommodityMetering))
     async def test_TC_COMMTR_2_1(self):
         """Implements test procedure for test case TC_COMMTR_2_1."""

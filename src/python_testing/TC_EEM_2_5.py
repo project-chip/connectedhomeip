@@ -73,7 +73,6 @@ class TC_EEM_2_5(MatterBaseTest, EnergyReportingBaseTestHelper):
             TestStep("6", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEM.TEST_EVENT_TRIGGER for Stop Fake Readings Test Event."),
         ]
 
-
     @async_test_body
     async def test_TC_EEM_2_5(self):
 

@@ -63,7 +63,6 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
         )
         return sub[ROOT_NODE_ENDPOINT_ID][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]
 
-
     async def write_acl(self, ctrl, acl):
         result = await ctrl.WriteAttribute(
             self.dut_node_id,

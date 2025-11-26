@@ -78,7 +78,6 @@ class TC_WASHERCTRL_2_1(MatterBaseTest):
                      expectation="Verify that the DUT response contains Status CONSTRAINT_ERROR response")
         ]
 
-
     @run_if_endpoint_matches(has_feature(Clusters.LaundryWasherControls,
                                          Clusters.LaundryWasherControls.Bitmaps.Feature.kSpin))
     async def test_TC_WASHERCTRL_2_1(self):

@@ -79,7 +79,6 @@ class TC_EEM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
                      "Verify that the DUT response contains either null or an CumulativeEnergyResetStruct value."),
         ]
 
-
     @async_test_body
     async def test_TC_EEM_2_1(self):
 

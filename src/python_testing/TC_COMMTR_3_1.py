@@ -115,7 +115,6 @@ class TC_COMMTR_3_1(CommodityMeteringTestBaseHelper):
             TestStep("14", "TH removes the subscription the Commodity Metering cluster.", "Subscription is removed successfully."),
         ]
 
-
     @run_if_endpoint_matches(has_cluster(Clusters.CommodityMetering))
     async def test_TC_COMMTR_3_1(self):
 

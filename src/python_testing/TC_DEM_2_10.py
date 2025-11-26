@@ -126,7 +126,6 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
                      "The subscription is cancelled successfully"),
         ]
 
-
     @async_test_body
     async def test_TC_DEM_2_10(self):
         # pylint: disable=too-many-locals, too-many-statements

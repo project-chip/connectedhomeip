@@ -142,7 +142,6 @@ class TC_CC_2_1(MatterBaseTest):
             TestStep(53, 'TH reads from the DUT the (0x003c) ColorPointBIntensity attribute')
         ]
 
-
     async def verify_primary_index(self, primary_index: int) -> bool:
         # Read all PrimaryN<X,Y,Intensity> attributes available in the cluster
         instance_attribute_names = [attr for attr in self.attributes.__dict__.keys(

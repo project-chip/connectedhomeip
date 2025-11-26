@@ -158,7 +158,6 @@ class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
                      Verify DUT responds w/ status SUCCESS(0x00)."""),
         ]
 
-
     @async_test_body
     async def test_TC_SETRF_2_3(self):
         """Implements test procedure for test case TC_SETRF_2_3."""

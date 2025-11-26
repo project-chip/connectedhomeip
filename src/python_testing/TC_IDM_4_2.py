@@ -158,7 +158,6 @@ class TC_IDM_4_2(MatterBaseTest):
 
         return sub[ep][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]
 
-
     async def add_ace_to_dut_acl(self, ctrl, ace, dut_acl_original):
         dut_acl = copy.deepcopy(dut_acl_original)
         dut_acl.append(ace)

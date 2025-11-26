@@ -84,7 +84,6 @@ class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
                      "Verify that the DUT response contains a BoostStateEnum (enum8) value that is less than or equal to 1."),
         ]
 
-
     @async_test_body
     async def test_TC_EWATERHTR_2_1(self):
 

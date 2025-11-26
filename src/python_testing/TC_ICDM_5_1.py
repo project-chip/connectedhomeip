@@ -120,7 +120,6 @@ class TC_ICDM_5_1(MatterBaseTest):
         assert_valid_icd_key(icd_value)
         return OperatingModeEnum(int(icd_value))
 
-
     #
     # Test Harness Helpers
     #

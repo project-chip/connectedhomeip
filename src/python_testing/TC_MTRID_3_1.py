@@ -131,7 +131,6 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
             TestStep("16", "TH removes the subscriptions to the Meter Identification cluster.", "Subscription successfully removed."),
         ]
 
-
     @async_test_body
     async def test_TC_MTRID_3_1(self):
 

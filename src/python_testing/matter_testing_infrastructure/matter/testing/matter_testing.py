@@ -1055,7 +1055,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             endpoint = self.get_endpoint()
 
         return await dev_ctrl.SendCommand(nodeId=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs,
-                                            payloadCapability=payloadCapability)
+                                          payloadCapability=payloadCapability)
 
     async def send_test_event_triggers(self, eventTrigger: int, enableKey: Optional[bytes] = None):
         """This helper function sends a test event trigger to the General Diagnostics cluster on endpoint 0
@@ -1360,7 +1360,7 @@ async def _get_all_matching_endpoints(self: MatterBaseTest, accept_function: End
         Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)
     ])
     return [e for e in wildcard.attributes.keys()
-                if accept_function(wildcard, e)]
+            if accept_function(wildcard, e)]
 
 
 # TODO(#37537): Remove these temporary aliases after transition period

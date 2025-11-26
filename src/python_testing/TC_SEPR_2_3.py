@@ -133,7 +133,6 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
 
         ]
 
-
     @run_if_endpoint_matches(has_feature(cluster, cluster.Bitmaps.Feature.kForecasting))
     async def test_TC_SEPR_2_3(self):
         """Run the test steps."""

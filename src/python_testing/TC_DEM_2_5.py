@@ -154,7 +154,6 @@ class TC_DEM_2_5(MatterBaseTest, DEMTestBase):
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
         ]
 
-
     @async_test_body
     async def test_TC_DEM_2_5(self):
         # pylint: disable=too-many-locals, too-many-statements

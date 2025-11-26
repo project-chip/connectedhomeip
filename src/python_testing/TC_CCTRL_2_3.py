@@ -132,20 +132,20 @@ class TC_CCTRL_2_3(MatterBaseTest):
 
     def steps_TC_CCTRL_2_3(self) -> list[TestStep]:
         return [TestStep(1, "Get number of fabrics from TH_SERVER", is_commissioning=True),
-                 TestStep(2, "Reading Attribute VendorId from TH_SERVER"),
-                 TestStep(3, "Reading Attribute ProductId from TH_SERVER"),
-                 TestStep(4, "Send RequestCommissioningApproval command to DUT with CASE session with correct VendorId and ProductId"),
-                 TestStep(5, "(Manual Step) Approve Commissioning Approval Request on DUT using method indicated by the manufacturer"),
-                 TestStep(6, "Reading Event CommissioningRequestResult from DUT, confirm one new event"),
-                 TestStep(7, "Send another RequestCommissioningApproval command to DUT with CASE session with same RequestId as the previous one"),
-                 TestStep(8, "Send CommissionNode command to DUT with CASE session, with valid parameters"),
-                 TestStep(9, "Send another CommissionNode command to DUT with CASE session, with with same RequestId as the previous one"),
-                 TestStep(10, "Send OpenCommissioningWindow command on Administrator Commissioning Cluster sent to TH_SERVER"),
-                 TestStep(11, "Get number of fabrics from TH_SERVER, verify DUT successfully commissioned TH_SERVER (up to 30 seconds)")]
-
+                TestStep(2, "Reading Attribute VendorId from TH_SERVER"),
+                TestStep(3, "Reading Attribute ProductId from TH_SERVER"),
+                TestStep(4, "Send RequestCommissioningApproval command to DUT with CASE session with correct VendorId and ProductId"),
+                TestStep(5, "(Manual Step) Approve Commissioning Approval Request on DUT using method indicated by the manufacturer"),
+                TestStep(6, "Reading Event CommissioningRequestResult from DUT, confirm one new event"),
+                TestStep(7, "Send another RequestCommissioningApproval command to DUT with CASE session with same RequestId as the previous one"),
+                TestStep(8, "Send CommissionNode command to DUT with CASE session, with valid parameters"),
+                TestStep(9, "Send another CommissionNode command to DUT with CASE session, with with same RequestId as the previous one"),
+                TestStep(10, "Send OpenCommissioningWindow command on Administrator Commissioning Cluster sent to TH_SERVER"),
+                TestStep(11, "Get number of fabrics from TH_SERVER, verify DUT successfully commissioned TH_SERVER (up to 30 seconds)")]
 
     # This test has some manual steps and one sleep for up to 30 seconds. Test typically
     # runs under 1 mins, so 3 minutes is more than enough.
+
     @property
     def default_timeout(self) -> int:
         return 3*60

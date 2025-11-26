@@ -83,7 +83,6 @@ class TC_SEPR_2_1(CommodityPriceTestBaseHelper, MatterBaseTest):
                      "Verify that the DUT response contains a list of CommodityPriceStruct entries"),
         ]
 
-
     @run_if_endpoint_matches(has_cluster(cluster))
     async def test_TC_SEPR_2_1(self):
         """Run the test steps."""

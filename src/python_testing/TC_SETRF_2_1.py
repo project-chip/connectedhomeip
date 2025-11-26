@@ -318,7 +318,6 @@ class TC_SETRF_2_1(CommodityTariffTestBaseHelper):
                      - If defaultRandomizationTypeValue is 0x00 (None), 0x02 (Random) or 0x03 (RandomPositive), Verify that the DUT response contains an int16 value greater or equal 0."""),
         ]
 
-
     @async_test_body
     async def test_TC_SETRF_2_1(self):
         """Implements test procedure for test case TC_SETRF_2_1."""

@@ -118,7 +118,6 @@ class TC_EEVSE_2_4(MatterBaseTest, EEVSEBaseTestHelper):
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
         ]
 
-
     @async_test_body
     async def test_TC_EEVSE_2_4(self):
         self.step("1")

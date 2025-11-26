@@ -178,7 +178,6 @@ class TC_EEVSE_2_7(MatterBaseTest, EEVSEBaseTestHelper):
 
         ]
 
-
     @run_if_endpoint_matches(has_feature(cluster, cluster.Bitmaps.Feature.kSoCReporting))
     async def test_TC_EEVSE_2_7(self):
         endpoint = self.get_endpoint()

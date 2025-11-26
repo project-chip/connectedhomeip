@@ -145,7 +145,6 @@ class TC_DEM_2_3(MatterBaseTest, DEMTestBase):
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
         ]
 
-
     @async_test_body
     async def test_TC_DEM_2_3(self):
 

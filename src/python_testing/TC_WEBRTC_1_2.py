@@ -86,7 +86,6 @@ class TC_WEBRTC_1_2(MatterBaseTest, WebRTCTestHelper):
             ),
         ]
 
-
     def desc_TC_WEBRTC_1_2(self) -> str:
         return "[TC-WEBRTC-1.2] Validate that providing an existing WebRTC session ID with an SDP Offer successfully triggers the re-offer flow"
 

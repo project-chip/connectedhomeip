@@ -105,7 +105,7 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
 
     async def send_change_to_mode_cmd(self, new_mode) -> Clusters.Objects.RvcRunMode.Commands.ChangeToModeResponse:
         return await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=new_mode),
-                                         endpoint=self.endpoint)
+                                          endpoint=self.endpoint)
 
     async def send_change_to_mode_with_check(self, new_mode, expected_error):
         response = await self.send_change_to_mode_cmd(new_mode)

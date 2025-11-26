@@ -156,7 +156,6 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
         ]
 
-
     @run_if_endpoint_matches(has_feature(cluster, cluster.Bitmaps.Feature.kChargingPreferences))
     async def test_TC_EEVSE_2_3(self):
 

@@ -161,7 +161,6 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
         ]
 
-
     @property
     def default_endpoint(self) -> int:
         return 1

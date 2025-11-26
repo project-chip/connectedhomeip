@@ -270,7 +270,7 @@ async def _get_all_matching_endpoints(test_instance, accept_function: EndpointCh
     """ Returns a list of endpoints matching the accept condition. """
     wildcard = await test_instance.default_controller.Read(test_instance.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)])
     return [e for e in wildcard.attributes.keys()
-                if accept_function(wildcard, e)]
+            if accept_function(wildcard, e)]
 
 
 async def should_run_test_on_endpoint(test_instance, accept_function: EndpointCheckFunction) -> bool:

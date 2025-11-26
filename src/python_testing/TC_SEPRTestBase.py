@@ -161,7 +161,6 @@ class CommodityPriceTestBaseHelper:
             endpoint=endpoint,
             timedRequestTimeoutMs=timedRequestTimeoutMs)
 
-
     async def send_get_detailed_forecast_request(self, endpoint=None,
                                                  details: Clusters.CommodityPrice.Bitmaps =
                                                  Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap(0),
@@ -171,7 +170,6 @@ class CommodityPriceTestBaseHelper:
             details=details),
             endpoint=endpoint,
             timedRequestTimeoutMs=timedRequestTimeoutMs)
-
 
     async def send_test_event_trigger_price_update(self):
         await self.send_test_event_triggers(eventTrigger=self.kEventTriggerPriceUpdate)

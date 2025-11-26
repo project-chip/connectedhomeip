@@ -109,7 +109,6 @@ class TC_EPM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
                      "Verify that the DUT response contains either null or an int64 value. Value has to be between a range of -2^62 to 2^62."),
         ]
 
-
     @async_test_body
     async def test_TC_EPM_2_1(self):
 

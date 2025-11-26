@@ -250,7 +250,6 @@ class TC_TSTAT_4_2(MatterBaseTest):
                      "Verify that the write request returned RESOURCE_EXHAUSTED (0x89)."),
         ]
 
-
     @async_test_body
     async def test_TC_TSTAT_4_2(self):
         endpoint = self.get_endpoint()

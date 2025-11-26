@@ -155,7 +155,6 @@ class TC_EWATERHTR_2_3(MatterBaseTest, EWATERHTRBase):
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
         ]
 
-
     @async_test_body
     async def test_TC_EWATERHTR_2_3(self):
 

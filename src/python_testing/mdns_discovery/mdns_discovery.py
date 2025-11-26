@@ -361,7 +361,6 @@ class MdnsDiscovery:
                 for record in record_list
             ]
 
-
         logger.error(f"Service record information (PTR) for '{service_types}' not found.")
         return []
 

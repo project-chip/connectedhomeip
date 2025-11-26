@@ -78,7 +78,6 @@ class TC_EEVSE_2_8(MatterBaseTest, EEVSEBaseTestHelper):
                      "Verify that the DUT response contains a string value with length <= 32 characters."),
         ]
 
-
     @run_if_endpoint_matches(has_feature(cluster, cluster.Bitmaps.Feature.kPlugAndCharge))
     async def test_TC_EEVSE_2_8(self):
 

@@ -115,7 +115,6 @@ def bump_substep(step: str) -> str:
     return step_prefix + next_end_char
 
 
-
 class TC_SwitchTests(MatterBaseTest):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

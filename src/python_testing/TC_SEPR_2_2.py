@@ -132,7 +132,6 @@ class TC_SEPR_2_2(CommodityPriceTestBaseHelper, MatterBaseTest):
 
         ]
 
-
     @run_if_endpoint_matches(has_cluster(cluster))
     async def test_TC_SEPR_2_2(self):
         """Run the test steps."""

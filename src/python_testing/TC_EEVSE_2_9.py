@@ -78,7 +78,6 @@ class TC_EEVSE_2_9(MatterBaseTest, EEVSEBaseTestHelper):
                      "Verify the data of the RFID event received by TH contains a UID with a maximum of 10 bytes."),
         ]
 
-
     @async_test_body
     async def test_TC_EEVSE_2_9(self):
 
