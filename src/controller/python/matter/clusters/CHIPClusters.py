@@ -2129,6 +2129,12 @@ class ChipClusters:
                 "type": "bool",
                 "reportable": True,
             },
+            0x0000000A: {
+                "attributeName": "DeviceLoadStatus",
+                "attributeId": 0x0000000A,
+                "type": "",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,

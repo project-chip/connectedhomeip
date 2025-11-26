@@ -69,22 +69,19 @@ def _UnderlyingType(field: Field, context: TypeLookupContext) -> Optional[str]:
     if isinstance(actual, BasicString):
         if actual.is_binary:
             return 'ByteArray'
-        else:
-            return 'String'
-    elif isinstance(actual, BasicInteger):
+        return 'String'
+    if isinstance(actual, BasicInteger):
         if actual.is_signed:
             return "Int{}s".format(actual.power_of_two_bits)
-        else:
-            return "Int{}u".format(actual.power_of_two_bits)
-    elif isinstance(actual, FundamentalType):
+        return "Int{}u".format(actual.power_of_two_bits)
+    if isinstance(actual, FundamentalType):
         if actual == FundamentalType.BOOL:
             return 'Boolean'
-        elif actual == FundamentalType.FLOAT:
+        if actual == FundamentalType.FLOAT:
             return 'Float'
-        elif actual == FundamentalType.DOUBLE:
+        if actual == FundamentalType.DOUBLE:
             return 'Double'
-        else:
-            log.warning("Unknown fundamental type: %r", actual)
+        log.warning("Unknown fundamental type: %r", actual)
 
     return None
 
@@ -304,12 +301,11 @@ def NamedFilter(choices: List, name: str):
 def ToBoxedJavaType(field: Field):
     if field.is_optional:
         return 'jobject'
-    elif field.data_type.name.lower() in ['octet_string', 'long_octet_string']:
+    if field.data_type.name.lower() in ['octet_string', 'long_octet_string']:
         return 'jbyteArray'
-    elif field.data_type.name.lower() in ['char_string', 'long_char_string']:
+    if field.data_type.name.lower() in ['char_string', 'long_char_string']:
         return 'jstring'
-    else:
-        return 'jobject'
+    return 'jobject'
 
 
 def LowercaseFirst(name: str) -> str:
@@ -428,13 +424,12 @@ class EncodableValue:
         if isinstance(t, FundamentalType):
             if t == FundamentalType.BOOL:
                 return "Boolean"
-            elif t == FundamentalType.FLOAT:
+            if t == FundamentalType.FLOAT:
                 return "Float"
-            elif t == FundamentalType.DOUBLE:
+            if t == FundamentalType.DOUBLE:
                 return "Double"
-            else:
-                raise Exception("Unknown fundamental type")
-        elif isinstance(t, BasicInteger):
+            raise Exception("Unknown fundamental type")
+        if isinstance(t, BasicInteger):
             if t.is_signed:
                 if t.byte_count <= 1:
                     return "Byte"
@@ -443,39 +438,35 @@ class EncodableValue:
                 if t.byte_count <= 4:
                     return "Int"
                 return "Long"
-            else:  # unsigned
-                if t.byte_count <= 1:
-                    return "UByte"
-                if t.byte_count <= 2:
-                    return "UShort"
-                if t.byte_count <= 4:
-                    return "UInt"
-                return "ULong"
-        elif isinstance(t, BasicString):
+            # unsigned
+            if t.byte_count <= 1:
+                return "UByte"
+            if t.byte_count <= 2:
+                return "UShort"
+            if t.byte_count <= 4:
+                return "UInt"
+            return "ULong"
+        if isinstance(t, BasicString):
             if t.is_binary:
                 return "ByteArray"
-            else:
-                return "String"
-        elif isinstance(t, IdlEnumType):
+            return "String"
+        if isinstance(t, IdlEnumType):
             if t.base_type.byte_count <= 1:
                 return "UByte"
-            elif t.base_type.byte_count <= 2:
+            if t.base_type.byte_count <= 2:
                 return "UShort"
-            elif t.base_type.byte_count <= 4:
+            if t.base_type.byte_count <= 4:
                 return "UInt"
-            else:
-                return "ULong"
-        elif isinstance(t, IdlBitmapType):
+            return "ULong"
+        if isinstance(t, IdlBitmapType):
             if t.base_type.byte_count <= 1:
                 return "UByte"
-            elif t.base_type.byte_count <= 2:
+            if t.base_type.byte_count <= 2:
                 return "UShort"
-            elif t.base_type.byte_count <= 4:
+            if t.base_type.byte_count <= 4:
                 return "UInt"
-            else:
-                return "ULong"
-        else:
-            return "Any"
+            return "ULong"
+        return "Any"
 
     @property
     def unboxed_java_signature(self):
@@ -487,19 +478,16 @@ class EncodableValue:
         if isinstance(t, FundamentalType):
             if t == FundamentalType.BOOL:
                 return "Z"
-            elif t == FundamentalType.FLOAT:
+            if t == FundamentalType.FLOAT:
                 return "F"
-            elif t == FundamentalType.DOUBLE:
+            if t == FundamentalType.DOUBLE:
                 return "D"
-            else:
-                raise Exception("Unknown fundamental type")
-        elif isinstance(t, BasicInteger):
+            raise Exception("Unknown fundamental type")
+        if isinstance(t, BasicInteger):
             if t.byte_count >= 3:
                 return "J"
-            else:
-                return "I"
-        else:
-            raise Exception("Not a basic type: %r" % self)
+            return "I"
+        raise Exception("Not a basic type: %r" % self)
 
     @property
     def boxed_java_signature(self):
@@ -515,34 +503,28 @@ class EncodableValue:
         if isinstance(t, FundamentalType):
             if t == FundamentalType.BOOL:
                 return "Ljava/lang/Boolean;"
-            elif t == FundamentalType.FLOAT:
+            if t == FundamentalType.FLOAT:
                 return "Ljava/lang/Float;"
-            elif t == FundamentalType.DOUBLE:
+            if t == FundamentalType.DOUBLE:
                 return "Ljava/lang/Double;"
-            else:
-                raise Exception("Unknown fundamental type")
-        elif isinstance(t, BasicInteger):
+            raise Exception("Unknown fundamental type")
+        if isinstance(t, BasicInteger):
             if t.byte_count >= 3:
                 return "Ljava/lang/Long;"
-            else:
-                return "Ljava/lang/Integer;"
-        elif isinstance(t, BasicString):
+            return "Ljava/lang/Integer;"
+        if isinstance(t, BasicString):
             if t.is_binary:
                 return "[B"
-            else:
-                return "Ljava/lang/String;"
-        elif isinstance(t, IdlEnumType):
+            return "Ljava/lang/String;"
+        if isinstance(t, IdlEnumType):
             if t.base_type.byte_count >= 3:
                 return "Ljava/lang/Long;"
-            else:
-                return "Ljava/lang/Integer;"
-        elif isinstance(t, IdlBitmapType):
+            return "Ljava/lang/Integer;"
+        if isinstance(t, IdlBitmapType):
             if t.base_type.byte_count >= 3:
                 return "Ljava/lang/Long;"
-            else:
-                return "Ljava/lang/Integer;"
-        else:
-            return "Lchip/controller/ChipStructs${}Cluster{};".format(self.context.cluster.name, self.data_type.name)
+            return "Ljava/lang/Integer;"
+        return "Lchip/controller/ChipStructs${}Cluster{};".format(self.context.cluster.name, self.data_type.name)
 
 
 def GlobalEncodableValueFrom(typeName: str, context: TypeLookupContext) -> EncodableValue:
