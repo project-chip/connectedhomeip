@@ -259,7 +259,9 @@ void OccupancySensingCluster::SetOccupancy(bool occupied)
         else
         {
             mTimerStartedTimestamp = mHoldTimeDelegate->GetCurrentMonotonicTimestamp();
-            mHoldTimeDelegate->StartTimer(this, System::Clock::Seconds16(mHoldTime));
+            // There's not much we can do it the timer fails to start. The Application is responsible for
+            // providing a working timer delegate, so we ignore the return value here.
+            RETURN_SAFELY_IGNORED mHoldTimeDelegate->StartTimer(this, System::Clock::Seconds16(mHoldTime));
         }
         return;
     }
