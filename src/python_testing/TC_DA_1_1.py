@@ -132,7 +132,7 @@ class TC_DA_1_1(MatterBaseTest):
 
             # Expire sessions and re-establish connections
             dev_ctrl.ExpireSessions(self.dut_node_id)
-            
+
             logging.info("App restart completed successfully")
 
     @async_test_body
@@ -166,10 +166,12 @@ class TC_DA_1_1(MatterBaseTest):
         fabrics_th1 = await self.read_fabrics(th1)
 
         # Verify that there is a single entry in the Fabrics list
-        asserts.assert_true(len(fabrics_th1) == 1, f"Fabrics attribute must contain a single entry in the list, got {len(fabrics_th1)}")
+        asserts.assert_true(len(fabrics_th1) == 1,
+                            f"Fabrics attribute must contain a single entry in the list, got {len(fabrics_th1)}")
 
         # Verify that the FabricID for that entry matches the FabricID for TH1
-        asserts.assert_equal(fabrics_th1[0].fabricID, th1.fabricId, f"TH1 FabricID ({fabrics_th1[0].fabricID}) and Fabrics attribute FabricID ({th1.fabricId}) must match")
+        asserts.assert_equal(fabrics_th1[0].fabricID, th1.fabricId,
+                             f"TH1 FabricID ({fabrics_th1[0].fabricID}) and Fabrics attribute FabricID ({th1.fabricId}) must match")
 
         # *** STEP 3 ***
         # Factory reset DUT and perform the necessary actions to put the DUT into a commissionable state
@@ -179,7 +181,8 @@ class TC_DA_1_1(MatterBaseTest):
         # *** STEP 4 ***
         # Commission DUT to TH2's Fabric
         self.step(4)
-        logging.info(f"Commissioning TH2 with {setupPayloadInfo[0].filter_type.value} discriminator: {setupPayloadInfo[0].filter_value}, passcode: {setupPayloadInfo[0].passcode}")
+        logging.info(
+            f"Commissioning TH2 with {setupPayloadInfo[0].filter_type.value} discriminator: {setupPayloadInfo[0].filter_value}, passcode: {setupPayloadInfo[0].passcode}")
         await th2.CommissionOnNetwork(
             nodeId=self.dut_node_id,
             setupPinCode=setupPayloadInfo[0].passcode,
@@ -193,10 +196,12 @@ class TC_DA_1_1(MatterBaseTest):
         fabrics_th2 = await self.read_fabrics(th2)
 
         # Verify that there is only one entry in the Fabrics List
-        asserts.assert_true(len(fabrics_th2) == 1, f"Fabrics attribute must contain a single entry in the list, got {len(fabrics_th2)}")
+        asserts.assert_true(len(fabrics_th2) == 1,
+                            f"Fabrics attribute must contain a single entry in the list, got {len(fabrics_th2)}")
 
         # Verify that the FabricID is the same as TH2's FabricID
-        asserts.assert_equal(fabrics_th2[0].fabricID, th2.fabricId, f"TH2 FabricID ({fabrics_th2[0].fabricID})and Fabrics attribute FabricID ({th2.fabricId}) must match")
+        asserts.assert_equal(fabrics_th2[0].fabricID, th2.fabricId,
+                             f"TH2 FabricID ({fabrics_th2[0].fabricID})and Fabrics attribute FabricID ({th2.fabricId}) must match")
 
         # Verify that TH2's Fabrics attribute's FabricID is different than from TH1's Fabrics attribute's FabricID
         asserts.assert_not_equal(fabrics_th2[0].fabricID, fabrics_th1[0].fabricID,
