@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "general-commissioning-cluster.h"
+#include "GeneralCommissioningCluster.h"
 
 #include <app/AppConfig.h>
 #include <app/reporting/reporting.h>
