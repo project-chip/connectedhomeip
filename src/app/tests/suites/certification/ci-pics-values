@@ -2729,6 +2729,11 @@ ICDM.S.C02.Tx=0
 ICDM.S.C03.Tx=0
 ICDM.S.C04.Tx=0
 
+# ICD Behavior
+
+# Server
+ICDB.S=1
+
 # Smoke CO Alarm Cluster
 SMOKECO.S=1
 SMOKECO.C=1

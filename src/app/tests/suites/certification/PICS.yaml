@@ -344,9 +344,6 @@ PICS:
     #
     #IDM
     #
-    - label: "Does the device implement the ICD Management cluster as a server?"
-      id: ICDM.S
-
     - label: "Is the device a Server"
       id: MCORE.IDM.S
 
@@ -8830,6 +8827,13 @@ PICS:
       id: FAN.S.C00.Rsp
 
     #ICD Management
+
+    - label: "Does the device implement the ICD Management cluster as a server?"
+      id: ICDM.S
+
+    - label: "Does the device implement the ICD Behavior as a server?"
+      id: ICDB.S
+
     #
     # Server Attribute
     #
