@@ -76,8 +76,7 @@ def to_constant_case(s: str) -> str:
        FOOBarBaz --> FOO_BAR_BAZ
     """
     snake_case = to_snake_case(s)
-    constant_case = snake_case.upper()
-    return constant_case
+    return snake_case.upper()
 
 
 def to_spinal_case(s: str) -> str:
@@ -102,9 +101,8 @@ def to_pascal_case(s: str) -> str:
 
     snake_case = to_snake_case(s)
     snake_case_split = snake_case.split('_')
-    pascal_case = ''.join(word.capitalize() for word in snake_case_split)
+    return ''.join(word.capitalize() for word in snake_case_split)
 
-    return pascal_case
 
 
 def to_camel_case(s) -> str:

@@ -147,10 +147,9 @@ class ZAPGenerateTarget:
     def MatterIdlTarget(zap_config: ZapInput, client_side=False, matter_file_name=None):
         if client_side:
             return ZAPGenerateTarget(zap_config, matter_file_name=matter_file_name, template="src/app/zap-templates/matter-idl-client.json", output_dir=None)
-        else:
-            # NOTE: this assumes `src/app/zap-templates/matter-idl-server.json` is the
-            #       DEFAULT generation target and it needs no output_dir
-            return ZAPGenerateTarget(zap_config, matter_file_name=matter_file_name, template=None, output_dir=None)
+        # NOTE: this assumes `src/app/zap-templates/matter-idl-server.json` is the
+        #       DEFAULT generation target and it needs no output_dir
+        return ZAPGenerateTarget(zap_config, matter_file_name=matter_file_name, template=None, output_dir=None)
 
     def __init__(self, zap_config: ZapInput, template, output_dir=None, matter_file_name=None):
         self.script = './scripts/tools/zap/generate.py'
@@ -177,8 +176,7 @@ class ZAPGenerateTarget:
             # directory (e.g. chef) so we claim the zap config is an output directory
             # for uniqueness
             return ZapDistinctOutput(input_template=None, output_directory=self.zap_config.value)
-        else:
-            return ZapDistinctOutput(input_template=self.template, output_directory=self.output_dir)
+        return ZapDistinctOutput(input_template=self.template, output_directory=self.output_dir)
 
     def log_command(self):
         """Log the command that will get run for this target

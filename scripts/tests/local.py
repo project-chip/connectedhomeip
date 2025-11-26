@@ -330,17 +330,18 @@ class BinaryRunner(enum.Enum):
     def execute_str(self, path: str):
         if self == BinaryRunner.NONE:
             return path
-        elif self == BinaryRunner.RR:
+        if self == BinaryRunner.RR:
             return f"exec rr record {path}"
-        elif self == BinaryRunner.VALGRIND:
+        if self == BinaryRunner.VALGRIND:
             return f"exec valgrind {path}"
-        elif self == BinaryRunner.COVERAGE:
+        if self == BinaryRunner.COVERAGE:
             # Expected path is like "out/<target>/<binary>"
             #
             # We output up to 10K of separate profiles that will be merged as a
             # final step.
             rawname = os.path.basename(path[: path.rindex("/")] + "-run-%10000m.profraw")
             return f'export LLVM_PROFILE_FILE="out/profiling/{rawname}"; exec {path}'
+        return None
 
 
 __RUNNERS__ = {

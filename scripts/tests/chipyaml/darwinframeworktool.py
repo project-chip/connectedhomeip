@@ -46,9 +46,8 @@ def darwinframeworktool_runner_options(f):
                      help='Path to a set of files containing clusters definitions.')(f)
     f = click.option('--PICS', type=click.Path(exists=True), show_default=True, default=_DEFAULT_PICS_FILE,
                      help='Path to the PICS file to use.')(f)
-    f = click.option('--additional_pseudo_clusters_directory', type=click.Path(), show_default=True, default=_DEFAULT_EXTENSIONS_DIR,
+    return click.option('--additional_pseudo_clusters_directory', type=click.Path(), show_default=True, default=_DEFAULT_EXTENSIONS_DIR,
                      help='Path to a directory containing additional pseudo clusters.')(f)
-    return f
 
 
 CONTEXT_SETTINGS['ignore_unknown_options'] = True

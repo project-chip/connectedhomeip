@@ -438,11 +438,10 @@ def aParsePassKeyString(sPassKey):
                 lstu32Passkey[i] = int(lstStrPassKey[i], 10)
 
     logger.info("\t-key: 0x%08X, 0x%08X, 0x%08X, 0x%08X", *lstu32Passkey[0:4])
-    abEncryptKey = struct.pack(">LLLL", lstu32Passkey[0],
+    return struct.pack(">LLLL", lstu32Passkey[0],
                                lstu32Passkey[1],
                                lstu32Passkey[2],
                                lstu32Passkey[3])
-    return abEncryptKey
 
 
 def aParseNonce(sNonceValue):

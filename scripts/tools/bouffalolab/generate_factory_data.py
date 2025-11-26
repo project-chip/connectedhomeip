@@ -77,9 +77,8 @@ def gen_test_discriminator(discriminator):
         if discriminator > 0xfff:
             raise Exception("discriminator is invalid value.")
 
-    discriminator = random.randint(0, 0xfff)
+    return random.randint(0, 0xfff)
 
-    return discriminator
 
 
 def gen_test_unique_id(unique_id):
@@ -89,9 +88,8 @@ def gen_test_unique_id(unique_id):
             raise Exception("rotating unique id has invalid length.")
         return unique_id
 
-    unique_id = secrets.token_bytes(16)
+    return secrets.token_bytes(16)
 
-    return unique_id
 
 
 def gen_test_spake2(passcode, spake2p_it, spake2p_salt, spake2p_verifier=None):
@@ -323,29 +321,25 @@ def gen_mfd_partition(args, mfd_output):
     def get_private_key(der):
         with open(der, 'rb') as file:
             keys = load_der_private_key(file.read(), password=None, backend=default_backend())
-            private_key = keys.private_numbers().private_value.to_bytes(32, byteorder='big')
+            return keys.private_numbers().private_value.to_bytes(32, byteorder='big')
 
-            return private_key
 
     def encrypt_data(data_bytearray, key_bytearray, iv_bytearray):
         data_bytearray += bytes([0] * (16 - (len(data_bytearray) % 16)))
         cryptor = AES.new(key_bytearray, AES.MODE_CBC, iv_bytearray)
-        ciphertext = cryptor.encrypt(data_bytearray)
-        return ciphertext
+        return cryptor.encrypt(data_bytearray)
 
     def convert_to_bytes(data):
         if isinstance(data, bytes) or isinstance(data, str):
             if isinstance(data, str):
                 return data.encode()
-            else:
-                return data
-        elif isinstance(data, int):
+            return data
+        if isinstance(data, int):
             byte_len = int((data.bit_length() + 7) / 8)
             return data.to_bytes(byte_len, byteorder='little')
-        elif data is None:
+        if data is None:
             return bytes([])
-        else:
-            raise Exception("Data is invalid type: {}".format(type(data)))
+        raise Exception("Data is invalid type: {}".format(type(data)))
 
     def gen_tlvs(mfdDict, need_sec):
         MFD_ID_RAW_MASK = 0x8000
@@ -460,10 +454,9 @@ def main():
     def to_bytes(input):
         if isinstance(input, str):
             return bytearray.fromhex(input)
-        elif isinstance(input, bytes):
+        if isinstance(input, bytes):
             return input
-        else:
-            return None
+        return None
 
     def hex_to_int(hex_string):
         return int(hex_string, 16)

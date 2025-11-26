@@ -74,9 +74,8 @@ def test_parser_options(f):
                      help='Stop parsing on first error.')(f)
     f = click.option('--use_default_pseudo_clusters', type=bool, show_default=True, default=True,
                      help='If enable this option use the set of default clusters provided by the matter_yamltests package.')(f)
-    f = click.option('--additional_pseudo_clusters_directory', type=click.Path(), show_default=True, default=None,
+    return click.option('--additional_pseudo_clusters_directory', type=click.Path(), show_default=True, default=None,
                      help='Path to a directory containing additional pseudo clusters.')(f)
-    return f
 
 
 def test_runner_options(f):
@@ -94,9 +93,8 @@ def test_runner_options(f):
                      help='Show additional logs provided by the adapter on error.')(f)
     f = click.option('--use_test_harness_log_format', type=bool, default=False, show_default=True,
                      help='Use the test harness log format.')(f)
-    f = click.option('--delay-in-ms', type=int, default=0, show_default=True,
+    return click.option('--delay-in-ms', type=int, default=0, show_default=True,
                      help='Add a delay between test suite steps.')(f)
-    return f
 
 
 def websocket_runner_options(f):
@@ -108,9 +106,8 @@ def websocket_runner_options(f):
                      help='Name of a websocket server to run at launch.')(f)
     f = click.option('--server_path', type=click.Path(exists=True), default=None,
                      help='Path to a websocket server to run at launch.')(f)
-    f = click.option('--server_arguments', type=str, default=None,
+    return click.option('--server_arguments', type=str, default=None,
                      help='Optional arguments to pass to the websocket server at launch.')(f)
-    return f
 
 
 def matter_repl_runner_options(f):
@@ -118,9 +115,8 @@ def matter_repl_runner_options(f):
                      help='Path to persistent storage configuration file.')(f)
     f = click.option('--commission_on_network_dut', type=bool, default=False,
                      help='Prior to running test should we try to commission DUT on network.')(f)
-    f = click.option('--runner', type=str, default=None, show_default=True,
+    return click.option('--runner', type=str, default=None, show_default=True,
                      help='The runner to run the test with.')(f)
-    return f
 
 
 @dataclass

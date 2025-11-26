@@ -336,10 +336,9 @@ class Encoder:
             arguments, request.busy_wait_ms, "busyWaitForMs")
         arguments = self.__maybe_add(
             arguments, request.identity, "commissioner-name")
-        arguments = self.__maybe_add(arguments, request.fabric_filtered,
+        return self.__maybe_add(arguments, request.fabric_filtered,
                                      "fabric-filtered")
 
-        return arguments
 
     def __maybe_add_destination(self, rv, request):
         if not self._supports_destination(request):
@@ -528,9 +527,9 @@ class Encoder:
         if cluster_name == '*' and self.__is_darwin_framework_tool:
             if argument_name == 'AttributeId':
                 return 'attribute-id'
-            elif argument_name == 'ClusterId':
+            if argument_name == 'ClusterId':
                 return 'cluster-id'
-            elif argument_name == 'Value':
+            if argument_name == 'Value':
                 return 'attribute-value'
         return value
 

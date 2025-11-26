@@ -60,8 +60,8 @@ class PartitionCreator:
         """
         if self.__data_to_save:
             # prepare raw data from Json
-            cbor_data = cbor.dumps(self.__data_to_save)
-            return cbor_data
+            return cbor.dumps(self.__data_to_save)
+        return None
 
     def create_hex(self, data: bytes):
         """
