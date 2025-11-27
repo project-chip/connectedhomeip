@@ -18,7 +18,7 @@
 
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/SafeAttributePersistenceProvider.h>
-#include <app/clusters/boolean-state-configuration-server/boolean-state-configuration-cluster.h>
+#include <app/clusters/boolean-state-configuration-server/BooleanStateConfigurationCluster.h>
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/clusters/testing/ClusterTester.h>
 #include <app/clusters/testing/ValidateGlobalAttributes.h>
