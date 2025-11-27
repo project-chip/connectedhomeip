@@ -16,6 +16,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/administrator-commissioning-server/AdministratorCommissioningCluster.h>
+#include <app/clusters/operational-credentials-server/operational-credentials-cluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
@@ -44,6 +45,8 @@ struct TestAdministratorCommissioningCluster : public ::testing::Test
 };
 
 static chip::DeviceLayer::TestOnlyCommissionableDataProvider sTestCommissionableDataProvider;
+
+const chip::FabricIndex kTestFabricIndex = chip::app::Testing::kTestFabrixIndex;
 
 TEST_F(TestAdministratorCommissioningCluster, TestAttributes)
 {
@@ -177,6 +180,169 @@ TEST_F(TestAdministratorCommissioningCluster, TestReadAttributesDefaultValues)
     }
 }
 
+/* class MockOperationalCertificateStore : public chip::Credentials::OperationalCertificateStore
+{
+public:
+    struct CertChain
+    {
+        ByteSpan rcac;
+        ByteSpan icac;
+        ByteSpan noc;
+    };
+
+    MockOperationalCertificateStore()           = default;
+    ~MockOperationalCertificateStore() override = default;
+
+    bool hasPendingRoot      = false;
+    bool hasPendingNoc       = false;
+    bool committed           = false;
+    FabricIndex pendingIndex = kUndefinedFabricIndex;
+
+    std::map<FabricIndex, CertChain> mCommitted;
+    std::map<FabricIndex, CertChain> mPending;
+
+    bool HasPendingRootCert() const override { return hasPendingRoot; }
+    bool HasPendingNocChain() const override { return hasPendingNoc; }
+
+    bool HasCertificateForFabric(FabricIndex fabricIndex, CertChainElement element) const override
+    {
+        auto it = mCommitted.find(fabricIndex);
+        if (it == mCommitted.end())
+            return false;
+
+        switch (element)
+        {
+        case CertChainElement::kRcac:
+            return it->second.rcac.data() != nullptr;
+        case CertChainElement::kIcac:
+            return it->second.icac.data() != nullptr;
+        case CertChainElement::kNoc:
+            return it->second.noc.data() != nullptr;
+        default:
+            return false;
+        }
+    }
+
+    CHIP_ERROR AddNewTrustedRootCertForFabric(FabricIndex fabricIndex, const ByteSpan & rcac) override
+    {
+        if (rcac.empty())
+            return CHIP_ERROR_INVALID_ARGUMENT;
+
+        hasPendingRoot             = true;
+        pendingIndex               = fabricIndex;
+        mPending[fabricIndex].rcac = rcac;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR AddNewOpCertsForFabric(FabricIndex fabricIndex, const ByteSpan & noc, const ByteSpan & icac) override
+    {
+        if (!hasPendingRoot || pendingIndex != fabricIndex)
+            return CHIP_ERROR_INCORRECT_STATE;
+
+        hasPendingNoc              = true;
+        mPending[fabricIndex].noc  = noc;
+        mPending[fabricIndex].icac = icac;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR UpdateOpCertsForFabric(FabricIndex fabricIndex, const ByteSpan & noc, const ByteSpan & icac) override
+    {
+        auto it = mCommitted.find(fabricIndex);
+        if (it == mCommitted.end())
+            return CHIP_ERROR_INCORRECT_STATE;
+
+        mPending[fabricIndex]      = it->second;
+        mPending[fabricIndex].noc  = noc;
+        mPending[fabricIndex].icac = icac;
+        hasPendingNoc              = true;
+        pendingIndex               = fabricIndex;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR CommitOpCertsForFabric(FabricIndex fabricIndex) override
+    {
+        auto it = mPending.find(fabricIndex);
+        if (it == mPending.end())
+            return CHIP_ERROR_INCORRECT_STATE;
+
+        mCommitted[fabricIndex] = it->second;
+        mPending.erase(it);
+        hasPendingNoc  = false;
+        hasPendingRoot = false;
+        committed      = true;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR RemoveOpCertsForFabric(FabricIndex fabricIndex) override
+    {
+        mCommitted.erase(fabricIndex);
+        mPending.erase(fabricIndex);
+        if (pendingIndex == fabricIndex)
+        {
+            hasPendingNoc  = false;
+            hasPendingRoot = false;
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    void RevertPendingOpCerts() override
+    {
+        mPending.clear();
+        hasPendingNoc  = false;
+        hasPendingRoot = false;
+    }
+
+    void RevertPendingOpCertsExceptRoot() override
+    {
+        for (auto & [index, chain] : mPending)
+        {
+            chain.icac = ByteSpan();
+            chain.noc  = ByteSpan();
+        }
+        hasPendingNoc = false;
+    }
+
+    CHIP_ERROR GetCertificate(FabricIndex fabricIndex, CertChainElement element, MutableByteSpan & outCertificate) const override
+    {
+        const CertChain * chain = nullptr;
+
+        auto pendingIt = mPending.find(fabricIndex);
+        if (pendingIt != mPending.end())
+            chain = &pendingIt->second;
+        else
+        {
+            auto committedIt = mCommitted.find(fabricIndex);
+            if (committedIt == mCommitted.end())
+                return CHIP_ERROR_NOT_FOUND;
+            chain = &committedIt->second;
+        }
+
+        const ByteSpan * src = nullptr;
+        switch (element)
+        {
+        case CertChainElement::kRcac:
+            src = &chain->rcac;
+            break;
+        case CertChainElement::kIcac:
+            src = &chain->icac;
+            break;
+        case CertChainElement::kNoc:
+            src = &chain->noc;
+            break;
+        }
+
+        if (src == nullptr || src->empty())
+            return CHIP_ERROR_NOT_FOUND;
+
+        if (outCertificate.size() < src->size())
+            return CHIP_ERROR_BUFFER_TOO_SMALL;
+
+        memcpy(outCertificate.data(), src->data(), src->size());
+        outCertificate.reduce_size(src->size());
+        return CHIP_NO_ERROR;
+    }
+}; */
+
 TEST_F(TestAdministratorCommissioningCluster, TestAttributeSpecComplianceAfterOpeningWindow)
 {
     AdministratorCommissioningCluster cluster(kRootEndpointId, {});
@@ -195,7 +361,15 @@ TEST_F(TestAdministratorCommissioningCluster, TestAttributeSpecComplianceAfterOp
     chip::Crypto::Spake2pVerifier verifier{};
     request.PAKEPasscodeVerifier = chip::ByteSpan(reinterpret_cast<const uint8_t *>(&verifier), sizeof(verifier));
     request.iterations           = chip::Crypto::kSpake2p_Min_PBKDF_Iterations;
-    auto result                  = tester.Invoke(Commands::OpenCommissioningWindow::Id, request);
+
+    // FabricTable & fabricTable = Server::GetInstance().GetFabricTable();
+    // FabricTable::InitParams initParams;
+    // initParams.opCertStore         = &mMockOpCertStore;
+    // initParams.storage             = &mTestContext.StorageDelegate();
+    // initParams.operationalKeystore = nullptr;
+    // fabricTable.Init(initParams);
+
+    auto result = tester.Invoke(Commands::OpenCommissioningWindow::Id, request);
     ASSERT_TRUE(result.status.has_value());
 
     if (result.status->IsSuccess()) // NOLINT(bugprone-unchecked-optional-access)
