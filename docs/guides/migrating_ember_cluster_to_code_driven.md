@@ -155,15 +155,6 @@ project's Slack channel.
             require Administrator access) and implement the `EventInfo` method
             if necessary.
 
--   [ ] **2.5: Remove/Improve Build Time Configuration:**
-
-    -   [ ] Some legacy cluster implementations contain build time switches
-            (`#ifdef`) throughout the code. This is undesirable because it makes
-            it difficult to change the behavior of an application in runtime.
-            When possible, avoid maintaining this pattern and think of new ways
-            this could be achieved, either using sub classes or configuration
-            injected via constructor.
-
 ### Part 3: Configuration and Integration
 
 -   [ ] **3.1: Update Build Files:**
@@ -208,3 +199,20 @@ project's Slack channel.
             `all-clusters-app`).
     -   [ ] Manually validate the cluster's functionality using `chip-tool` or
             `matter-repl`.
+
+## Improvements to Consider
+
+Cluster migrations are often not a full re-write of the code but rather the
+minimum necessary to make the code testable and decoupled from Ember/ZAP.
+Therefore, the suggestions in this section are optional.
+
+### Remove Build Time Switches
+
+Some legacy cluster implementations contain build time switches (`#ifdef`)
+throughout the code. This is undesirable because it makes it difficult to change
+the behavior of an application in runtime.
+
+When possible, avoid copying this pattern and think of new ways the same thing
+could be achieved. For example, use configuration injected via constructor or
+implement separate sub classes if code size increase is a concern and the build
+time options cause a significant difference in the cluster behavior.
