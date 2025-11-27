@@ -52,14 +52,11 @@ from typing import Any, List, Optional
 import click
 import coloredlogs
 
+log = logging.getLogger(__name__)
+
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
-__LOG_LEVELS__ = {
-    "debug": logging.DEBUG,
-    "info": logging.INFO,
-    "warn": logging.WARNING,
-    "fatal": logging.FATAL,
-}
+__LOG_LEVELS__ = logging.getLevelNamesMapping()
 
 
 class CompileCommand:
@@ -113,7 +110,7 @@ class CompileCommand:
 
 class ParsedCommands:
     def __init__(self, path: str):
-        logging.info("Processing json %s", path)
+        log.info("Processing JSON file '%s'", path)
 
         with open(path, "r") as f:
             self.json_data = json.load(f)
@@ -122,7 +119,7 @@ class ParsedCommands:
         # '/third_party/' and when multi-matching things, this makes for better best-guess matches
         self.json_data.sort(key=lambda a: a["file"])
 
-        logging.info("Done. Loaded %d entries", len(self.json_data))
+        log.info("Done. Loaded %d entries", len(self.json_data))
 
     def all_matching(self, reg_expr: str) -> List[Any]:
         r = re.compile(reg_expr)
@@ -145,11 +142,9 @@ class ParsedCommands:
             return None
 
         if len(matches) > 1:
-            logging.warning(
-                "Multiple matches found: %d matches for %s", len(matches), reg_expr
-            )
+            log.warning("Multiple matches found: %d matches for '%s'", len(matches), reg_expr)
             for m in matches:
-                logging.warning("  match: %s", m["file"])
+                log.warning("  match: '%s'", m["file"])
 
         entry = matches[0]
         return CompileCommand(entry["directory"], entry["file"], entry["command"])
@@ -184,8 +179,8 @@ def flags(compile_commands, file_expr):
     f = compile_commands.find(file_expr)
     if f is None:
         raise Exception(f"Failed to find file matching {file_expr}")
-    logging.info("Compiler settings for %s", f.file)
-    logging.debug("File data: %s", f)
+    log.info("Compiler settings for '%s'", f.file)
+    log.debug("File data: '%s'", f)
     f.print_flags()
 
 

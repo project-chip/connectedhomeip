@@ -54,13 +54,12 @@ class TC_MOD_1_2(MatterBaseTest):
 
     def pics_TC_MOD_1_2(self):
         """Return PICS definitions asscociated with this test."""
-        pics = [
+        return [
             "MOD.S"
         ]
-        return pics
 
     def steps_TC_MOD_1_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test).", is_commissioning=True),
             TestStep(2, "TH reads the SupportedModes attribute from DUT"),
             TestStep(3, "TH reads the CurrentMode attribute from the DUT"),
@@ -69,7 +68,6 @@ class TC_MOD_1_2(MatterBaseTest):
             TestStep(6, "TH reads the Description attribute from the DUT"),
             TestStep(7, "TH reads the StandardNamespace attribute from the DUT")
         ]
-        return steps
 
     def _verify_supported_mode(self, supported_mode):
         """Verify supported mode.

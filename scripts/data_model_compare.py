@@ -96,10 +96,9 @@ def _normalize_order(idl: Idl):
 def _get_name(item) -> str:
     if hasattr(item, "name"):
         return getattr(item, "name")
-    elif hasattr(item, "definition"):
+    if hasattr(item, "definition"):
         return getattr(item, "definition").name
-    else:
-        raise Exception("Cannot find name of `%r`" % item)
+    raise Exception("Cannot find name of `%r`" % item)
 
 
 def _compare_maturity(matter_items, data_model_items, path: list[str] = []):
