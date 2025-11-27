@@ -531,7 +531,7 @@ TEST_F(TestWriteInteraction, TestWriteRoundtripWithClusterObjects)
         {
             app::Clusters::UnitTesting::Structs::SimpleStruct::Type dataRx;
             TLV::TLVReader reader;
-            reader.Init(chip::Test::attributeDataTLV, chip::Test::attributeDataTLVLen);
+            reader.Init(chip::Testing::attributeDataTLV, chip::Testing::attributeDataTLVLen);
             EXPECT_SUCCESS(reader.Next());
             EXPECT_EQ(CHIP_NO_ERROR, DataModel::Decode(reader, dataRx));
             EXPECT_EQ(dataRx.a, dataTx.a);

@@ -50,72 +50,71 @@
  * This macro is used by the code in TestWriteInteraction.cpp, TestReadInteraction.cpp
  *  and TestCommandInteraction.cpp
  */
-#define PretendWeGotReplyFromServer(aContext, aClientExchange)                                                                     \
-    {                                                                                                                              \
-        Messaging::ReliableMessageMgr * localRm    = (aContext).GetExchangeManager().GetReliableMessageMgr();                      \
-        Messaging::ExchangeContext * localExchange = aClientExchange;                                                              \
-        EXPECT_EQ(localRm->TestGetCountRetransTable(), 2);                                                                         \
-                                                                                                                                   \
-        localRm->ClearRetransTable(localExchange);                                                                                 \
-        EXPECT_EQ(localRm->TestGetCountRetransTable(), 1);                                                                         \
-                                                                                                                                   \
-        localRm->EnumerateRetransTable([localExchange](auto * entry) {                                                             \
-            localExchange->SetPendingPeerAckMessageCounter(entry->retainedBuf.GetMessageCounter());                                \
-            return Loop::Break;                                                                                                    \
-        });                                                                                                                        \
+#define PretendWeGotReplyFromServer(aContext, aClientExchange)                                             \
+    {                                                                                                      \
+        Messaging::ReliableMessageMgr * localRm = (aContext).GetExchangeManager().GetReliableMessageMgr(); \
+        Messaging::ExchangeContext * localExchange = aClientExchange;                                      \
+        EXPECT_EQ(localRm->TestGetCountRetransTable(), 2);                                                 \
+                                                                                                           \
+        localRm->ClearRetransTable(localExchange);                                                         \
+        EXPECT_EQ(localRm->TestGetCountRetransTable(), 1);                                                 \
+                                                                                                           \
+        localRm->EnumerateRetransTable([localExchange](auto * entry) {                                     \
+            localExchange->SetPendingPeerAckMessageCounter(entry->retainedBuf.GetMessageCounter());        \
+            return Loop::Break;                                                                            \
+        });                                                                                                \
     }
 
 namespace chip {
-namespace Test {
+namespace Testing {
 
-constexpr EndpointId kTestEndpointId            = 1;
-constexpr EndpointId kTestDeniedEndpointId      = 66;
-constexpr EndpointId kTestUnsupportedEndpointId = 77;
+    constexpr EndpointId kTestEndpointId = 1;
+    constexpr EndpointId kTestDeniedEndpointId = 66;
+    constexpr EndpointId kTestUnsupportedEndpointId = 77;
 
-constexpr ClusterId kTestDeniedClusterId2     = 3;
-constexpr ClusterId kTestUnsupportedClusterId = 77;
-constexpr ClusterId kTestClusterId            = 6;
+    constexpr ClusterId kTestDeniedClusterId2 = 3;
+    constexpr ClusterId kTestUnsupportedClusterId = 77;
+    constexpr ClusterId kTestClusterId = 6;
 
-constexpr uint8_t kTestFieldValue1               = 1;
-constexpr chip::DataVersion kTestDataVersion1    = 3;
-constexpr chip::DataVersion kRejectedDataVersion = 1;
+    constexpr uint8_t kTestFieldValue1 = 1;
+    constexpr chip::DataVersion kTestDataVersion1 = 3;
+    constexpr chip::DataVersion kRejectedDataVersion = 1;
 
-extern uint8_t attributeDataTLV[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];
-extern size_t attributeDataTLVLen;
+    extern uint8_t attributeDataTLV[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];
+    extern size_t attributeDataTLVLen;
 
-} // namespace Test
+} // namespace Testing
 namespace app {
 
-bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion);
+    bool IsClusterDataVersionEqual(const ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion);
 
-void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPath, chip::TLV::TLVReader & aReader,
-                                  CommandHandler * apCommandObj);
+    void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPath, chip::TLV::TLVReader & aReader,
+        CommandHandler * apCommandObj);
 
-/// A customized class for read/write/invoke that matches functionality
-/// with the ember-compatibility-functions functionality here.
-///
-/// TODO: these functions currently redirect to ember functions, so could
-///       be merged with DataModelFixtures.h/cpp as well. This is not done since
-///       if we remove the direct ember dependency from IM, we can implement
-///       distinct functional classes.
-/// TODO items for above:
-///      - once IM only supports DataModel
-///      - break ember-overrides in this h/cpp file
-class TestImCustomDataModel : public CodegenDataModelProvider
-{
-public:
-    static TestImCustomDataModel & Instance();
+    /// A customized class for read/write/invoke that matches functionality
+    /// with the ember-compatibility-functions functionality here.
+    ///
+    /// TODO: these functions currently redirect to ember functions, so could
+    ///       be merged with DataModelFixtures.h/cpp as well. This is not done since
+    ///       if we remove the direct ember dependency from IM, we can implement
+    ///       distinct functional classes.
+    /// TODO items for above:
+    ///      - once IM only supports DataModel
+    ///      - break ember-overrides in this h/cpp file
+    class TestImCustomDataModel : public CodegenDataModelProvider {
+    public:
+        static TestImCustomDataModel & Instance();
 
-    CHIP_ERROR Shutdown() override { return CHIP_NO_ERROR; }
+        CHIP_ERROR Shutdown() override { return CHIP_NO_ERROR; }
 
-    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                AttributeValueEncoder & encoder) override;
-    DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                 AttributeValueDecoder & decoder) override;
-    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
-                                                               chip::TLV::TLVReader & input_arguments,
-                                                               CommandHandler * handler) override;
-};
+        DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+            AttributeValueEncoder & encoder) override;
+        DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
+            AttributeValueDecoder & decoder) override;
+        std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+            chip::TLV::TLVReader & input_arguments,
+            CommandHandler * handler) override;
+    };
 
 } // namespace app
 } // namespace chip
