@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/descriptor/descriptor-cluster.h>
+#include <app/clusters/descriptor/DescriptorCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/Descriptor/Attributes.h>
 #include <clusters/Descriptor/ClusterId.h>

@@ -209,8 +209,8 @@
 		514C7A012B64223400DD6D7B /* MTRServerAttribute_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 514C79FF2B64223400DD6D7B /* MTRServerAttribute_Internal.h */; };
 		514C7A022B64223400DD6D7B /* MTRServerEndpoint_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 514C7A002B64223400DD6D7B /* MTRServerEndpoint_Internal.h */; };
 		514C7A042B6436D500DD6D7B /* MTRServerCluster_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 514C7A032B6436D500DD6D7B /* MTRServerCluster_Internal.h */; };
-		51517B1D2E7DB25B00904908 /* descriptor-cluster.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 51517B1C2E7DB25B00904908 /* descriptor-cluster.cpp */; };
-		51517B1E2E7DB25B00904908 /* descriptor-cluster.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 51517B1C2E7DB25B00904908 /* descriptor-cluster.cpp */; };
+		51517B1D2E7DB25B00904908 /* DescriptorCluster.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 51517B1C2E7DB25B00904908 /* DescriptorCluster.cpp */; };
+		51517B1E2E7DB25B00904908 /* DescriptorCluster.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 51517B1C2E7DB25B00904908 /* DescriptorCluster.cpp */; };
 		51565CAE2A79D42100469F18 /* MTRConversion.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51565CAD2A79D42100469F18 /* MTRConversion.mm */; };
 		51565CB12A7AD77600469F18 /* MTRDeviceControllerDataStore.h in Headers */ = {isa = PBXBuildFile; fileRef = 51565CAF2A7AD77600469F18 /* MTRDeviceControllerDataStore.h */; };
 		51565CB22A7AD77600469F18 /* MTRDeviceControllerDataStore.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51565CB02A7AD77600469F18 /* MTRDeviceControllerDataStore.mm */; };
@@ -841,7 +841,7 @@
 		514C79FF2B64223400DD6D7B /* MTRServerAttribute_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRServerAttribute_Internal.h; sourceTree = "<group>"; };
 		514C7A002B64223400DD6D7B /* MTRServerEndpoint_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRServerEndpoint_Internal.h; sourceTree = "<group>"; };
 		514C7A032B6436D500DD6D7B /* MTRServerCluster_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRServerCluster_Internal.h; sourceTree = "<group>"; };
-		51517B1C2E7DB25B00904908 /* descriptor-cluster.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "descriptor-cluster.cpp"; path = "clusters/descriptor/descriptor-cluster.cpp"; sourceTree = "<group>"; };
+		51517B1C2E7DB25B00904908 /* DescriptorCluster.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = "DescriptorCluster.cpp"; path = "clusters/descriptor/DescriptorCluster.cpp"; sourceTree = "<group>"; };
 		51565CAD2A79D42100469F18 /* MTRConversion.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRConversion.mm; sourceTree = "<group>"; };
 		51565CAF2A7AD77600469F18 /* MTRDeviceControllerDataStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRDeviceControllerDataStore.h; sourceTree = "<group>"; };
 		51565CB02A7AD77600469F18 /* MTRDeviceControllerDataStore.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDeviceControllerDataStore.mm; sourceTree = "<group>"; };
@@ -1405,7 +1405,7 @@
 				75A202E72BA8DBB700A771DD /* reporting */,
 				5143041F2914CED9004DC7FE /* generic-callback-stubs.cpp */,
 				514C79F22B62ED5500DD6D7B /* attribute-storage.cpp */,
-				51517B1C2E7DB25B00904908 /* descriptor-cluster.cpp */,
+				51517B1C2E7DB25B00904908 /* DescriptorCluster.cpp */,
 				512FC0E22E7DB2FC00239104 /* CodegenIntegration.cpp */,
 				E04AC67B2BEEA17F00BA409B /* ember-io-storage.cpp */,
 				516415FE2B6B132200D5CE11 /* DataModelHandler.cpp */,
@@ -2589,7 +2589,7 @@
 				7592BCFF2CBEE98C00EB74A0 /* CodegenDataModelProvider_Write.cpp in Sources */,
 				B4D67A922D527F4A00C49965 /* DCLClient.cpp in Sources */,
 				B4D67A932D527F4A00C49965 /* DisplayTermsAndConditions.cpp in Sources */,
-				51517B1E2E7DB25B00904908 /* descriptor-cluster.cpp in Sources */,
+				51517B1E2E7DB25B00904908 /* DescriptorCluster.cpp in Sources */,
 				B4D67A952D527F4A00C49965 /* JsonSchemaMacros.cpp in Sources */,
 				B45373C12A9FEA9100807602 /* close.c in Sources */,
 				B45373D42A9FEB0C00807602 /* context.c in Sources */,
@@ -2695,7 +2695,7 @@
 				2C8C8FC2253E0C2100797F05 /* MTRPersistentStorageDelegateBridge.mm in Sources */,
 				99AECC802798A57F00B6355B /* MTRCommissioningParameters.mm in Sources */,
 				2CB7163C252E8A7C0026E2BB /* MTRDeviceControllerDelegateBridge.mm in Sources */,
-				51517B1D2E7DB25B00904908 /* descriptor-cluster.cpp in Sources */,
+				51517B1D2E7DB25B00904908 /* DescriptorCluster.cpp in Sources */,
 				997DED162695343400975E97 /* MTRThreadOperationalDataset.mm in Sources */,
 				515C1C6F284F9FFB00A48F0C /* MTRFramework.mm in Sources */,
 				510B18F72E385DCD000F9181 /* MTRDelegateManager.mm in Sources */,
