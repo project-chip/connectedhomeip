@@ -220,7 +220,7 @@ void TestAbortExchangesForFabric::CommonCheckAbortAllButOneExchange(bool dropRes
         // This version of the test allows us to validate logic that marks expired sessions as defunct
         // on encountering an MRP failure.
         //
-        loopback.mNumMessagesToDrop   = chip::Test::LoopbackTransport::kUnlimitedMessageCount;
+        loopback.mNumMessagesToDrop   = chip::Testing::LoopbackTransport::kUnlimitedMessageCount;
         loopback.mDroppedMessageCount = 0;
 
         //

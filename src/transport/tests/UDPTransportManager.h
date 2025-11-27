@@ -23,7 +23,7 @@
 #include <transport/raw/tests/NetworkTestHelpers.h>
 
 namespace chip {
-namespace Test {
+namespace Testing {
 
 class UDPTransportManager
 {
@@ -58,5 +58,5 @@ private:
     TransportMgr<chip::Transport::UDP> mTransportManager;
 };
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip
