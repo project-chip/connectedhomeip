@@ -25,7 +25,7 @@ chip_test_suite("tests") {
     "TestNetworkCommissioningCluster.cpp",
     "TestNetworkCommissioningClusterEthernet.cpp",
     "TestThreadResponse.cpp",
-    "TestWifiResponse.cpp"
+    "TestWifiResponse.cpp",
   ]
 
   sources = [ "FakeDrivers.h" ]
