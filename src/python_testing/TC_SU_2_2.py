@@ -267,20 +267,13 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         logger.info(f'{step_number}: Prerequisite #3.0 - Add Provider to Requestor(DUT) DefaultOTAProviders')
 
         # Prerequisite #4.0 - Current DefaultOTAProviders on Requestor
-        # Read existing DefaultOTAProviders on the Requestor
-        current_providers = await self.read_single_attribute_check_success(
-            dev_ctrl=controller,
-            cluster=Clusters.OtaSoftwareUpdateRequestor,
-            attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.DefaultOTAProviders
-        )
-        logger.info(f'Prerequisite #4.0 - Current DefaultOTAProviders on Requestor: {current_providers}')
+        # Clear any existing providers first
+        await self.clear_ota_providers(controller, requestor_node_id)
+        logger.info("Cleared existing DefaultOTAProviders on Requestor")
 
-        # If there is already a provider, skip adding
-        if current_providers:
-            logger.info(f'Skipping add: Requestor already has providers {current_providers}')
-        else:
-            await self.set_default_ota_providers_list(controller, provider_node_id, requestor_node_id)
-            logger.info("Prerequisite #4.0 - Write DefaultOTAProviders completed.")
+        # Add the test provider
+        await self.set_default_ota_providers_list(controller, provider_node_id, requestor_node_id)
+        logger.info("Prerequisite #4.0 - Write DefaultOTAProviders completed.")
 
         # ------------------------------------------------------------------------------------
         # [STEP_1]: Step #1.1 - Matcher for OTA records logs
