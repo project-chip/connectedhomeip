@@ -137,7 +137,7 @@ static void DispatchResolveError(intptr_t context);
 static void HandleResolveCleanup(mDnsQueryCtx & resolveContext, ResolveStep stepType);
 
 static mDnsQueryCtx * GetResolveElement(const char * instanceName, NameType aType);
-static mDnsQueryCtx * GetBrowseElement(const char * instanceName);
+static bool IsResolveElementValid(const mDnsQueryCtx * pResolveContext);
 
 static CHIP_ERROR ResolveBySrp(otInstance * thrInstancePtr, char * serviceName, mDnsQueryCtx * context, DnssdService * mdnsReq);
 static CHIP_ERROR BrowseBySrp(otInstance * thrInstancePtr, char * serviceName, mDnsQueryCtx * context);
@@ -946,20 +946,23 @@ static void DispatchTxtResolve(intptr_t context)
     mDnsQueryCtx * resolveContext = reinterpret_cast<mDnsQueryCtx *>(context);
     otError error;
 
-    // Stop SRV resolver before starting TXT one, ignore error as it will only happen if mMDS module is not initialized
-    otMdnsStopSrvResolver(ThreadStackMgrImpl().OTInstance(), &resolveContext->mSrvInfo);
-
-    resolveContext->mTxtInfo.mServiceInstance = resolveContext->mMdnsService.mName;
-    resolveContext->mTxtInfo.mServiceType     = resolveContext->mServiceType;
-    resolveContext->mTxtInfo.mCallback        = OtTxtCallback;
-    resolveContext->mTxtInfo.mInfraIfIndex    = mNetifIndex;
-
-    error = otMdnsStartTxtResolver(ThreadStackMgrImpl().OTInstance(), &resolveContext->mTxtInfo);
-    if (error != OT_ERROR_NONE)
+    if (IsResolveElementValid(resolveContext))
     {
-        resolveContext->error = MapOpenThreadError(error);
-        TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(DispatchResolveError,
-                                                                         reinterpret_cast<intptr_t>(resolveContext));
+        // Stop SRV resolver before starting TXT one, ignore error as it will only happen if mMDS module is not initialized
+        otMdnsStopSrvResolver(ThreadStackMgrImpl().OTInstance(), &resolveContext->mSrvInfo);
+
+        resolveContext->mTxtInfo.mServiceInstance = resolveContext->mMdnsService.mName;
+        resolveContext->mTxtInfo.mServiceType     = resolveContext->mServiceType;
+        resolveContext->mTxtInfo.mCallback        = OtTxtCallback;
+        resolveContext->mTxtInfo.mInfraIfIndex    = mNetifIndex;
+
+        error = otMdnsStartTxtResolver(ThreadStackMgrImpl().OTInstance(), &resolveContext->mTxtInfo);
+        if (error != OT_ERROR_NONE)
+        {
+            resolveContext->error = MapOpenThreadError(error);
+            TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(DispatchResolveError,
+                                                                             reinterpret_cast<intptr_t>(resolveContext));
+        }
     }
 }
 
@@ -967,47 +970,58 @@ static void DispatchAddressResolve(intptr_t context)
 {
     otError error;
     mDnsQueryCtx * resolveContext = reinterpret_cast<mDnsQueryCtx *>(context);
-    // Stop TXT resolver before starting address one, ignore error as it will only happen if mMDS module is not initialized
-    otMdnsStopTxtResolver(ThreadStackMgrImpl().OTInstance(), &resolveContext->mTxtInfo);
 
-    resolveContext->mAddrInfo.mCallback     = OtAddressCallback;
-    resolveContext->mAddrInfo.mHostName     = resolveContext->mMdnsService.mHostName;
-    resolveContext->mAddrInfo.mInfraIfIndex = mNetifIndex;
-
-    error = otMdnsStartIp6AddressResolver(ThreadStackMgrImpl().OTInstance(), &resolveContext->mAddrInfo);
-    if (error != OT_ERROR_NONE)
+    if (IsResolveElementValid(resolveContext))
     {
-        resolveContext->error = MapOpenThreadError(error);
-        TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(DispatchResolveError,
-                                                                         reinterpret_cast<intptr_t>(resolveContext));
+        // Stop TXT resolver before starting address one, ignore error as it will only happen if mMDS module is not initialized
+        otMdnsStopTxtResolver(ThreadStackMgrImpl().OTInstance(), &resolveContext->mTxtInfo);
+
+        resolveContext->mAddrInfo.mCallback     = OtAddressCallback;
+        resolveContext->mAddrInfo.mHostName     = resolveContext->mMdnsService.mHostName;
+        resolveContext->mAddrInfo.mInfraIfIndex = mNetifIndex;
+
+        error = otMdnsStartIp6AddressResolver(ThreadStackMgrImpl().OTInstance(), &resolveContext->mAddrInfo);
+        if (error != OT_ERROR_NONE)
+        {
+            resolveContext->error = MapOpenThreadError(error);
+            TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(DispatchResolveError,
+                                                                             reinterpret_cast<intptr_t>(resolveContext));
+        }
     }
 }
 
 static void DispatchResolve(intptr_t context)
 {
     mDnsQueryCtx * pResolveContext = reinterpret_cast<mDnsQueryCtx *>(context);
-    Dnssd::DnssdService & service  = pResolveContext->mMdnsService;
-    Span<Inet::IPAddress> ipAddrs;
 
-    // Stop Address resolver, we have finished resolving the service
-    otMdnsStopIp6AddressResolver(ThreadStackMgrImpl().OTInstance(), &pResolveContext->mAddrInfo);
-
-    if (service.mAddress.has_value())
+    if (IsResolveElementValid(pResolveContext))
     {
-        ipAddrs = Span<Inet::IPAddress>(&*service.mAddress, 1);
+        Dnssd::DnssdService & service  = pResolveContext->mMdnsService;
+        Span<Inet::IPAddress> ipAddrs;
+
+        // Stop Address resolver, we have finished resolving the service
+        otMdnsStopIp6AddressResolver(ThreadStackMgrImpl().OTInstance(), &pResolveContext->mAddrInfo);
+
+        if (service.mAddress.has_value())
+        {
+            ipAddrs = Span<Inet::IPAddress>(&*service.mAddress, 1);
+        }
+
+        // The context will be freed and the resolve operation is stopped. Matter will
+        // try to stop it again on the mDnsResolveCallback but nothing will happen because the
+        // element is no longer present in the list.
+        LIST_RemoveElement(&pResolveContext->link);
+
+        pResolveContext->mDnsResolveCallback(pResolveContext->matterCtx, &service, ipAddrs, pResolveContext->error);
+        Platform::Delete<mDnsQueryCtx>(pResolveContext);
     }
-
-    // The context will be freed and the resolve operation is stopped. Matter will
-    // try to stop it again on the mDnsResolveCallback but nothing will happen because the
-    // element is no longer present in the list.
-    LIST_RemoveElement(&pResolveContext->link);
-
-    pResolveContext->mDnsResolveCallback(pResolveContext->matterCtx, &service, ipAddrs, pResolveContext->error);
-    Platform::Delete<mDnsQueryCtx>(pResolveContext);
 }
 
 static void DispatchResolveSrp(intptr_t context)
 {
+    // When processing this function, the context is valid and not added to the resolve list. The OpenThread service
+    // resolver was not started, and a call to NxpChipDnssdShutdown or NxpChipDnssdResolveNoLongerNeeded will have
+    // no effect on this context. The only place that the context is being freed is below.
     mDnsQueryCtx * pResolveContext = reinterpret_cast<mDnsQueryCtx *>(context);
     Dnssd::DnssdService & service  = pResolveContext->mMdnsService;
     Span<Inet::IPAddress> ipAddrs;
@@ -1027,15 +1041,18 @@ static void DispatchResolveSrp(intptr_t context)
 static void DispatchResolveError(intptr_t context)
 {
     mDnsQueryCtx * pResolveContext = reinterpret_cast<mDnsQueryCtx *>(context);
-    Span<Inet::IPAddress> ipAddrs;
+    if (IsResolveElementValid(pResolveContext))
+    {
+        Span<Inet::IPAddress> ipAddrs;
 
-    // The context will be freed and the resolve operation is stopped. Matter will
-    // try to stop it again on the mDnsResolveCallback but nothing will happen because the
-    // element is no longer present in the list.
-    LIST_RemoveElement(&pResolveContext->link);
+        // The context will be freed and the resolve operation is stopped. Matter will
+        // try to stop it again on the mDnsResolveCallback but nothing will happen because the
+        // element is no longer present in the list.
+        LIST_RemoveElement(&pResolveContext->link);
 
-    pResolveContext->mDnsResolveCallback(pResolveContext->matterCtx, nullptr, ipAddrs, pResolveContext->error);
-    Platform::Delete<mDnsQueryCtx>(pResolveContext);
+        pResolveContext->mDnsResolveCallback(pResolveContext->matterCtx, nullptr, ipAddrs, pResolveContext->error);
+        Platform::Delete<mDnsQueryCtx>(pResolveContext);
+    }
 }
 
 static void HandleResolveCleanup(mDnsQueryCtx & resolveContext, ResolveStep stepType)
@@ -1103,5 +1120,18 @@ static mDnsQueryCtx * GetResolveElement(const char * aName, NameType aType)
     return pResolveContext;
 }
 
+static bool IsResolveElementValid(const mDnsQueryCtx *pResolveContext)
+{
+    mDnsQueryCtx * pContextIterator = reinterpret_cast<mDnsQueryCtx *>(LIST_GetHead(&mResolveList));
+    while (pContextIterator)
+    {
+        if (pContextIterator == pResolveContext)
+        {
+            return true;
+        }
+        pContextIterator = reinterpret_cast<mDnsQueryCtx *>(LIST_GetNext(&pContextIterator->link));
+    }
+    return false;
+}
 } // namespace Dnssd
 } // namespace chip
