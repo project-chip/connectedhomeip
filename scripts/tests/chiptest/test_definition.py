@@ -307,7 +307,7 @@ class SubprocessInfoRepo(dict):
             try:
                 self.require(key)
                 discovered_count += 1
-            except (LookupError, ValueError) as e
+            except (LookupError, ValueError) as e:
             log.exception("Exception while trying to discover '%s': %r", key, e)
 
         log.info("Discovery of %d paths took %.2f seconds", time.time() - start_ts)
