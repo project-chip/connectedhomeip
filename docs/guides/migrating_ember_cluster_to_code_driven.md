@@ -154,6 +154,15 @@ project's Slack channel.
             require Administrator access) and implement the `EventInfo` method
             if necessary.
 
+-   [ ] **2.5: Remove/Improve Build Time Configuration:**
+
+    -   [ ] Some legacy cluster implementations contain build time switches
+            (`#ifdef`) throughout the code. This is undesirable because it makes
+            it difficult to change the behavior of an application in runtime.
+            When possible, avoid maintaining this pattern and think of new ways
+            this could be achieved, either using subclasses or configuration
+            injected via constructor.
+
 ### Part 3: Configuration and Integration
 
 -   [ ] **3.1: Update Build Files:**
