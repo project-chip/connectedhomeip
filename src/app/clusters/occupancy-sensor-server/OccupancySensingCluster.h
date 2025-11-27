@@ -104,9 +104,11 @@ public:
     void SetHoldTimeLimits(const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & holdTimeLimits);
     void SetOccupancy(bool occupied);
     bool IsOccupied() const;
+    bool IsHoldTimeEnabled() const;
 
     uint16_t GetHoldTime() const;
     const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & GetHoldTimeLimits() const;
+    BitMask<OccupancySensing::Feature> GetFeatureMap() const;
 
 private:
     void DoSetOccupancy(bool occupied);

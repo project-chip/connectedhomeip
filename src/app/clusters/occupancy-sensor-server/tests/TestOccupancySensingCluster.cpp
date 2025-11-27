@@ -96,6 +96,7 @@ TEST_F(TestOccupancySensingCluster, TestReadFeatureMap)
         chip::Test::ClusterTester tester(cluster);
         EXPECT_EQ(tester.ReadAttribute(Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
         EXPECT_EQ(featureMap, featureMapPir);
+        EXPECT_EQ(cluster.GetFeatureMap(), BitMask<OccupancySensing::Feature>(featureMapPir));
     }
 
     {
@@ -106,6 +107,7 @@ TEST_F(TestOccupancySensingCluster, TestReadFeatureMap)
         chip::Test::ClusterTester tester(cluster);
         EXPECT_EQ(tester.ReadAttribute(Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
         EXPECT_EQ(featureMap, featureMapUltrasonic);
+        EXPECT_EQ(cluster.GetFeatureMap(), BitMask<OccupancySensing::Feature>(featureMapUltrasonic));
     }
 }
 
@@ -118,6 +120,7 @@ TEST_F(TestOccupancySensingCluster, TestHoldTimeAttribute)
     OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }.WithHoldTime(100, holdTimeLimitsConfig,
                                                                                                      mMockTimerDelegate) };
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    EXPECT_TRUE(cluster.IsHoldTimeEnabled());
     chip::Test::ClusterTester tester(cluster);
 
     // 1. Verify that we can set a valid hold time via direct method call
@@ -174,6 +177,7 @@ TEST_F(TestOccupancySensingCluster, TestHoldTimeAttribute)
     // 12. Verify that SetHoldTime returns UnsupportedAttribute if mHoldTimeDelegate is null (i.e. hold time not configured)
     OccupancySensingCluster clusterNoHoldTime{ OccupancySensingCluster::Config{ kTestEndpointId } };
     EXPECT_EQ(clusterNoHoldTime.Startup(context.Get()), CHIP_NO_ERROR);
+    EXPECT_FALSE(clusterNoHoldTime.IsHoldTimeEnabled());
     EXPECT_EQ(clusterNoHoldTime.SetHoldTime(10), Protocols::InteractionModel::Status::UnsupportedAttribute);
 }
 

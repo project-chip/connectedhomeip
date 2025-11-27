@@ -298,6 +298,11 @@ bool OccupancySensingCluster::IsOccupied() const
     return mOccupancy.Has(OccupancySensing::OccupancyBitmap::kOccupied);
 }
 
+bool OccupancySensingCluster::IsHoldTimeEnabled() const
+{
+    return mHoldTimeDelegate != nullptr;
+}
+
 void OccupancySensingCluster::SetHoldTimeLimits(const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & holdTimeLimits)
 {
     auto newHoldTimeLimits = holdTimeLimits;
@@ -327,6 +332,11 @@ uint16_t OccupancySensingCluster::GetHoldTime() const
 const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & OccupancySensingCluster::GetHoldTimeLimits() const
 {
     return mHoldTimeLimits;
+}
+
+BitMask<OccupancySensing::Feature> OccupancySensingCluster::GetFeatureMap() const
+{
+    return mFeatureMap;
 }
 
 } // namespace chip::app::Clusters
