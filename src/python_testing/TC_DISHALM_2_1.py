@@ -90,8 +90,6 @@ class TC_DISHALM_2_1(MatterBaseTest):
         latch_attribute = Clusters.DishwasherAlarm.Attributes.Latch
         if await self.attribute_guard(endpoint=self.endpoint, attribute=latch_attribute):
             await self.read_and_check_attributes_from_dishwasher_alarm(latch_attribute)
-        else:
-            logger.info("Skipping Latch attribute validation since it is nor present")
 
         self.step(4)
         state_attribute = Clusters.DishwasherAlarm.Attributes.State
