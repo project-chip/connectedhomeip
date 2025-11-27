@@ -194,10 +194,10 @@ class TC_GCAST_2_6(MatterBaseTest):
             asserts.assert_equal(e.status, Status.NotFound,
                                  f"Send ConfigureAuxiliaryACL command error should be {Status.NotFound} instead of {e.status}")
 
-        self.step(7)
         if not sd_enabled:
-            self.mark_all_remaining_steps_skipped("8")
+            self.mark_all_remaining_steps_skipped("7")
 
+        self.step(7)
         groupID2 = 2
         endpoints = []
         await self.send_single_cmd(Clusters.Groupcast.Commands.JoinGroup(

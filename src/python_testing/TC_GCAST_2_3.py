@@ -91,9 +91,7 @@ class TC_GCAST_2_3(MatterBaseTest):
         first valid endpoint (excluding root and aggregator), [EP1].
         """
         endpoints_list = []
-        if sd_enabled and not ln_enabled:
-            endpoints_list = []
-        elif ln_enabled:
+        if ln_enabled:
             device_type_list = await self.read_single_attribute_all_endpoints(
                 cluster=Clusters.Descriptor,
                 attribute=Clusters.Descriptor.Attributes.DeviceTypeList)
@@ -115,6 +113,10 @@ class TC_GCAST_2_3(MatterBaseTest):
             asserts.assert_true(len(endpoints_list),
                                 "Listener feature is enabled. Endpoint list should not be empty. There should be a valid endpoint for the GroupCast JoinGroup Command.")
             endpoints_list = [endpoints_list[0]]
+        elif sd_enabled:
+            endpoints_list = []
+        else:
+            asserts.fail("At least one of the following features must be enabled: Listener or Sender.")
         return endpoints_list
 
     @async_test_body
@@ -126,8 +128,6 @@ class TC_GCAST_2_3(MatterBaseTest):
 
         self.step("1a")
         ln_enabled, sd_enabled = await self.get_feature_map()
-        if not ln_enabled and not sd_enabled:
-            asserts.fail("At least one of the following features must be enabled: Listener or Sender.")
         endpoints_list = await self.valid_endpoints_list(ln_enabled, sd_enabled)
 
         self.step("1b")
@@ -196,7 +196,7 @@ class TC_GCAST_2_3(MatterBaseTest):
                 keyID=keyID1,
                 key=inputKey4)
             )
-            asserts.fail("UpdateGroupKey command should have failed with ExpiringKeyID, but it succeeded.")
+            asserts.fail("UpdateGroupKey command should have failed with as keyID1 still exists, but it succeeded.")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.AlreadyExists,
                                  f"Send UpdateGroupKey command error should be {Status.AlreadyExists} instead of {e.status}")

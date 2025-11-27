@@ -93,9 +93,7 @@ class TC_GCAST_2_5(MatterBaseTest):
         root and aggregator), endpoints list is [EP1]. If more than 1 endpoint is supported, endpoints list is [EP1, EP2].
         """
         endpoints_list = []
-        if sd_enabled and not ln_enabled:
-            endpoints_list = []
-        elif ln_enabled:
+        if ln_enabled:
             device_type_list = await self.read_single_attribute_all_endpoints(
                 cluster=Clusters.Descriptor,
                 attribute=Clusters.Descriptor.Attributes.DeviceTypeList)
@@ -120,6 +118,10 @@ class TC_GCAST_2_5(MatterBaseTest):
                 endpoints_list = [endpoints_list[0]]
             else:
                 endpoints_list = endpoints_list[:2]
+        elif sd_enabled:
+            endpoints_list = []
+        else:
+            asserts.fail("At least one of the following features must be enabled: Listener or Sender.")
         return endpoints_list
 
 
@@ -132,8 +134,6 @@ class TC_GCAST_2_5(MatterBaseTest):
 
         self.step("1a")
         ln_enabled, sd_enabled = await self.get_feature_map()
-        if not ln_enabled and not sd_enabled:
-            asserts.fail("At least one of the following features must be enabled: Listener or Sender.")
         endpoints_list = await self.valid_endpoints_list(ln_enabled, sd_enabled)
 
         self.step("1b")
@@ -275,8 +275,10 @@ class TC_GCAST_2_5(MatterBaseTest):
         self.step("7")
         sub.wait_for_attribute_report()
         membership_reports = sub.attribute_reports.get(membership_attribute, [])
-        asserts.assert_equal(len(membership_reports), 0,
-                             f"Expected no membership reports, but received {len(membership_reports)} reports.")
+        asserts.assert_greater(len(membership_reports), 0, "No membership reports received")
+        latest_membership = membership_reports[-1]
+        asserts.assert_equal(latest_membership.value, [],
+                             f"Expected membership attribute to be an empty list after leaving all groups, but got {latest_membership.value}")
 
         self.step("8")
         resp: Clusters.Groupcast.Commands.LeaveGroupResponse = await self.send_single_cmd(

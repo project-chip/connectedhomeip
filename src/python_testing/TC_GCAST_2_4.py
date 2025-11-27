@@ -61,6 +61,7 @@ class TC_GCAST_2_4(MatterBaseTest):
             TestStep(3, "Expire K1 on Group G1 immediately: TH sends command ExpireGracePeriod (GroupID=G1)"),
             TestStep(4, "TH awaits subscription report of new Membership within max interval."),
             TestStep(5, "Attempt to expire a KeyId on Group G1 where there is no ExpiringKey: TH sends command ExpireGracePeriod (GroupID=G1)"),
+            TestStep(6, "Attempt to expire a KeyId for non-existent GroupID: TH sends command ExpireGracePeriod (GroupID=G_Unknown)")
         ]
 
     def pics_TC_GCAST_2_4(self) -> list[str]:
@@ -84,9 +85,7 @@ class TC_GCAST_2_4(MatterBaseTest):
         first valid endpoint (excluding root and aggregator), [EP1].
         """
         endpoints_list = []
-        if sd_enabled and not ln_enabled:
-            endpoints_list = []
-        elif ln_enabled:
+        if ln_enabled:
             device_type_list = await self.read_single_attribute_all_endpoints(
                 cluster=Clusters.Descriptor,
                 attribute=Clusters.Descriptor.Attributes.DeviceTypeList)
@@ -108,6 +107,10 @@ class TC_GCAST_2_4(MatterBaseTest):
             asserts.assert_true(len(endpoints_list),
                                 "Listener feature is enabled. Endpoint list should not be empty. There should be a valid endpoint for the GroupCast JoinGroup Command.")
             endpoints_list = [endpoints_list[0]]
+        elif sd_enabled:
+            endpoints_list = []
+        else:
+            asserts.fail("At least one of the following features must be enabled: Listener or Sender.")
         return endpoints_list
 
     @async_test_body
@@ -119,8 +122,6 @@ class TC_GCAST_2_4(MatterBaseTest):
 
         self.step("1a")
         ln_enabled, sd_enabled = await self.get_feature_map()
-        if not ln_enabled and not sd_enabled:
-            asserts.fail("At least one of the following features must be enabled: Listener or Sender.")
         endpoints_list = await self.valid_endpoints_list(ln_enabled, sd_enabled)
 
         self.step("1b")
@@ -192,6 +193,15 @@ class TC_GCAST_2_4(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Failure,
                                  f"Send ExpireGracePeriod command error should be {Status.Failure} instead of {e.status}")
+
+        self.step(6)
+        groupIDUnknown = 2
+        try:
+            await self.send_single_cmd(Clusters.Groupcast.Commands.ExpireGracePeriod(groupID=groupIDUnknown))
+            asserts.fail("ExpireGracePeriod command should have failed for a non-existent groupID, but it succeeded")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.InvalidCommand,
+                                 f"Send ExpireGracePeriod command error should be {Status.InvalidCommand} instead of {e.status}")
 
 if __name__ == "__main__":
     default_matter_test_main()

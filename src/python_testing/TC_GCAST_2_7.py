@@ -46,7 +46,7 @@ logger = logging.getLogger(__name__)
 
 class TC_GCAST_2_7(MatterBaseTest):
     def desc_TC_GCAST_2_7(self):
-        return "[TC-GCAST-2.5] Capacity & MaxMembershipCount enforcement with DUT as Server - PROVISIONAL"
+        return "[TC-GCAST-2.7] Capacity & MaxMembershipCount enforcement with DUT as Server - PROVISIONAL"
 
     def steps_TC_GCAST_2_7(self):
         return [
