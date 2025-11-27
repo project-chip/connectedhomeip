@@ -345,7 +345,6 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
 
         self.step(check_step)
         enum = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
-        in_progress_clusters = [Clusters.ColorControl.id]
         privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue and p != enum.kProxyView]
         for privilege in privilege_enum:
             logging.info(f"Testing for {privilege}")
