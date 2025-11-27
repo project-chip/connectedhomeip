@@ -1703,7 +1703,7 @@ TEST_F(TestCodegenModelViaMocks, EmberAttributeReadErrorReading)
                                   MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE));
         testRequest.SetSubjectDescriptor(kAdminSubjectDescriptor);
 
-        chip::Testing::SetEmberReadOutput(chip::Protocols::InteractionModel::Status::Failure);
+        chip::Testing::SetEmberReadOutput(Protocols::InteractionModel::Status::Failure);
 
         // Actual read via an encoder
         std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
@@ -1715,7 +1715,7 @@ TEST_F(TestCodegenModelViaMocks, EmberAttributeReadErrorReading)
                                   MOCK_ATTRIBUTE_ID_FOR_NULLABLE_TYPE(ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE));
         testRequest.SetSubjectDescriptor(kAdminSubjectDescriptor);
 
-        chip::Testing::SetEmberReadOutput(chip::Protocols::InteractionModel::Status::Busy);
+        chip::Testing::SetEmberReadOutput(Protocols::InteractionModel::Status::Busy);
 
         // Actual read via an encoder
         std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
@@ -2559,12 +2559,12 @@ TEST_F(TestCodegenModelViaMocks, EmberWriteFailure)
 
     {
         AttributeValueDecoder decoder = test.DecoderFor<int32_t>(1234);
-        chip::Testing::SetEmberReadOutput(chip::Protocols::InteractionModel::Status::Failure);
+        chip::Testing::SetEmberReadOutput(Protocols::InteractionModel::Status::Failure);
         ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), Status::Failure);
     }
     {
         AttributeValueDecoder decoder = test.DecoderFor<int32_t>(1234);
-        chip::Testing::SetEmberReadOutput(chip::Protocols::InteractionModel::Status::Busy);
+        chip::Testing::SetEmberReadOutput(Protocols::InteractionModel::Status::Busy);
         ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), Status::Busy);
     }
     // reset things to success to not affect other tests
