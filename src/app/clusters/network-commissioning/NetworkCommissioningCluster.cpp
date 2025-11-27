@@ -253,7 +253,7 @@ void NetworkCommissioningCluster::SetLastNetworkingStatusValue(
 {
     if (mLastNetworkingStatusValue.Update(networkingStatusValue))
     {
-        NotifyAttributeChanged(Attributes::LastNetworkingStatus::Id);
+        NotifyAttributeChanged(Attributes::LastNetworkingStatus::TypeInfo::GetAttributeId());
     }
 }
 
@@ -1081,10 +1081,25 @@ DataModel::ActionReturnStatus NetworkCommissioningCluster::WriteAttribute(const 
     {
         bool value;
         ReturnErrorOnFailure(decoder.Decode(value));
-        return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, SetInterfaceEnabled(value));
+        CHIP_ERROR err = SetInterfaceEnabled(value);
+
+        // Spec. 11.9.6.5 -- "If not supported, a write to this attribute with a value of false SHALL fail with a status of INVALID_ACTION."
+        if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+        {
+            // return INVALID_ACTION only when trying to disable the interface
+            if (value)
+            {
+                return CHIP_NO_ERROR;
+            }
+            else
+            {
+                return Protocols::InteractionModel::Status::InvalidAction;
+            }
+        }
+        return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, err);
     }
 
-    return Protocols::InteractionModel::Status::InvalidAction;
+    return Protocols::InteractionModel::Status::UnsupportedWrite;
 }
 
 std::optional<DataModel::ActionReturnStatus> NetworkCommissioningCluster::InvokeCommand(const DataModel::InvokeRequest & request,
