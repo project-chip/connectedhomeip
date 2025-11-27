@@ -294,7 +294,6 @@ class SubprocessInfoRepo(dict):
 
         self[key] = s
 
-
     def discover(self):
         """
         Try to discover paths to all apps and tools in the know-how which we are still missing.
@@ -309,10 +308,9 @@ class SubprocessInfoRepo(dict):
                 self.require(key)
                 discovered_count += 1
             except (LookupError, ValueError) as e
-                log.exception("Exception while trying to discover '%s': %r", key, e)
+            log.exception("Exception while trying to discover '%s': %r", key, e)
 
         log.info("Discovery of %d paths took %.2f seconds", time.time() - start_ts)
-
 
     def require(self, key: str, kind: SubprocessKind | None = None, target_name: str | None = None):
         """

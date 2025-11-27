@@ -146,7 +146,7 @@ class RunContext:
 @click.option(
     '--custom-path', multiple=True,
     help="Set path with a custom kind, value should be <kind>:<key>:<path>, valid kind values are "
-        f"{[ v.value for v in SubprocessKind.__members__.values() ]}"
+    f"{[v.value for v in SubprocessKind.__members__.values()]}"
 )
 @click.option(
     '--discover-paths',
