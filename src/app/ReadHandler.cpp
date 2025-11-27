@@ -772,10 +772,41 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     VerifyOrReturnError(mMinIntervalFloorSeconds <= mMaxInterval, CHIP_ERROR_INVALID_ARGUMENT);
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    // For ICD device, adjust the max interval to the greater values between ICD IdleModeDuration and
-    // kSubscriptionMaxIntervalPublisherLimit This allows ICD device, to sleep for the full IdleDuration if nothing else requires it
-    // to wake up sooner.
-    mMaxInterval = GetPublisherSelectedIntervalLimit();
+
+    // To optimize ICD sleep/idle cycles, it is preferred to synchronize the subscription report interval
+    // with the IdleModeDuration defined in the ICD Management Cluster.
+    // We aim to use IdleModeDuration, but must respect the Min Interval Floor and Max Interval Ceiling.
+    // Note: This behavior can be overridden using the OnSubscriptionRequested callback defined
+    // in the application.
+
+    // Per spec and static checks, GetIdleModeDuration max value fits a uint16_t.
+    // The final selected interval must be a uint16_t but we use a uint32 here during calculation to prevent overflows.
+    uint32_t preferredMaxInterval = ICDConfigurationData::GetInstance().GetIdleModeDuration().count();
+    // Determine the max interval ceiling between GetPublisherSelectedIntervalLimit
+    // and the subscriber-requested MaxInterval.
+    uint16_t maxIntervalCeiling = std::max(GetPublisherSelectedIntervalLimit(), mMaxInterval);
+
+    // Spec doesn't allow IdleModeDuration of 0 but make sure here to prevent div0
+    if (preferredMaxInterval == 0)
+    {
+        preferredMaxInterval = maxIntervalCeiling;
+    }
+    else
+    {
+        // Must respect the minimal interval floor
+        if (preferredMaxInterval < mMinIntervalFloorSeconds)
+        {
+            // Round up to the nearest multiple of IdleModeDuration that is >= mMinIntervalFloorSeconds.
+            const uint32_t remainder = mMinIntervalFloorSeconds % preferredMaxInterval;
+            preferredMaxInterval =
+                remainder == 0 ? mMinIntervalFloorSeconds : (mMinIntervalFloorSeconds + (preferredMaxInterval - remainder));
+        }
+
+        // Use the smallest interval between preferredMaxInterval and maxIntervalCeiling.
+        // This also ensure that no overflow occurs when casting to uint16_t below
+        preferredMaxInterval = std::min<uint32_t>(preferredMaxInterval, maxIntervalCeiling);
+    }
+    mMaxInterval = static_cast<uint16_t>(preferredMaxInterval);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     //
