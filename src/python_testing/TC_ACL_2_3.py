@@ -64,15 +64,13 @@ class TC_ACL_2_3(MatterBaseTest):
     async def read_currentfabricindex(self, th: ChipDeviceCtrl) -> int:
         cluster = Clusters.Objects.OperationalCredentials
         attribute = Clusters.OperationalCredentials.Attributes.CurrentFabricIndex
-        current_fabric_index = await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
-        return current_fabric_index
+        return await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
 
     async def write_attribute_with_encoding_option(self, controller, node_id, path, forceLegacyListEncoding):
 
         if forceLegacyListEncoding:
             return await controller.TestOnlyWriteAttributeWithLegacyList(node_id, path)
-        else:
-            return await controller.WriteAttribute(node_id, path)
+        return await controller.WriteAttribute(node_id, path)
 
     async def internal_test_TC_ACL_2_3(self, force_legacy_encoding: bool):
         self.step(1)
@@ -331,7 +329,7 @@ class TC_ACL_2_3(MatterBaseTest):
         return ['ACL.S.A0001']
 
     def steps_TC_ACL_2_3(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "TH1 commissions DUT using admin node ID",
                      is_commissioning=True),
             TestStep(2, "TH1 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",
@@ -375,7 +373,6 @@ class TC_ACL_2_3(MatterBaseTest):
             TestStep(21, "Re-run the test using the legacy list writing mechanism, where the client issues a series of AttributeDataIBs, with the first containing a path to the list itself and Data that is empty array, which signals clearing the list, and subsequent AttributeDataIBs containing updates.",
                      "Test succeeds with legacy list encoding mechanism"),
         ]
-        return steps
 
     @run_if_endpoint_matches(has_attribute(Clusters.AccessControl.Attributes.Extension))
     async def test_TC_ACL_2_3(self):

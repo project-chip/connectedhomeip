@@ -250,8 +250,7 @@ class Flasher(firmware_utils.Flasher):
         def decrypt_data(data_bytearray, key_bytearray, iv_bytearray):
             data_bytearray += bytes([0] * (16 - (len(data_bytearray) % 16)))
             cryptor = AES.new(key_bytearray, AES.MODE_CBC, iv_bytearray)
-            plaintext = cryptor.decrypt(data_bytearray)
-            return plaintext
+            return cryptor.decrypt(data_bytearray)
 
         self.args["iv"] = None
 
@@ -330,14 +329,14 @@ class Flasher(firmware_utils.Flasher):
         mfd_str = ""
         if dict_sec.keys():
             for idx in range(1, 1 + max(dict_sec.keys())):
-                if idx in dict_sec.keys():
+                if idx in dict_sec:
                     mfd_str += dict_sec[idx] + ","
                 else:
                     mfd_str += ","
 
         mfd_str = mfd_str + ":"
         for idx in range(0x8001, 1 + max(dict_raw.keys())):
-            if idx in dict_raw.keys():
+            if idx in dict_raw:
                 mfd_str += dict_raw[idx] + ","
             else:
                 mfd_str += ","
@@ -378,9 +377,8 @@ class Flasher(firmware_utils.Flasher):
 
             if dts:
                 return dts
-            else:
-                return os.path.join(flashtool_path, "chips", self.args["chipname"],
-                                    "device_tree", "bl_factory_params_IoTKitA_{}.dts".format(self.args["xtal"]))
+            return os.path.join(flashtool_path, "chips", self.args["chipname"],
+                                "device_tree", "bl_factory_params_IoTKitA_{}.dts".format(self.args["xtal"]))
 
         def get_boot_image(flashtool_path, boot2_image):
 

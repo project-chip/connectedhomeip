@@ -451,11 +451,8 @@ class ClusterObjectTests:
             number_of_events = len(events)
             if number_of_events != 1:
                 return False
-
             parsed_event_number = events[0].Header.EventNumber
-            if parsed_event_number != current_event_filter:
-                return False
-            return True
+            return parsed_event_number == current_event_filter
 
         await cls._RetryForContent(request=lambda: devCtrl.ReadEvent(
             nodeId=NODE_ID,

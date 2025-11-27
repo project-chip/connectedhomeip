@@ -330,7 +330,7 @@
             "UpTime",
             "TotalOperationalHours",
             "BootReason",
-            "FeatureMap",
+            "DeviceLoadStatus",
             "ClusterRevision"
         ],
         "Group Key Management": [
@@ -387,7 +387,6 @@
             "PIROccupiedToUnoccupiedDelay",
             "UltrasonicOccupiedToUnoccupiedDelay",
             "PhysicalContactOccupiedToUnoccupiedDelay",
-            "FeatureMap",
             "ClusterRevision"
         ],
         "Operational Credentials": [

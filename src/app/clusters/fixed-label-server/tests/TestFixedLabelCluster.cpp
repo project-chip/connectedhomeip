@@ -16,7 +16,7 @@
 
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/fixed-label-server/fixed-label-cluster.h>
+#include <app/clusters/fixed-label-server/FixedLabelCluster.h>
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/clusters/testing/ClusterTester.h>
 #include <app/server-cluster/AttributeListBuilder.h>

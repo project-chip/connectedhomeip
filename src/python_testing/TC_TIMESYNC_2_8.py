@@ -36,6 +36,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
+import contextlib
 import typing
 from datetime import datetime, timedelta, timezone
 
@@ -100,10 +101,8 @@ class TC_TIMESYNC_2_8(MatterBaseTest):
         self.print_step(3, "Send SetUTCCommand")
         # It doesn't actually matter if this succeeds. The DUT is free to reject this command and use its own time.
         # If the DUT fails to get the time completely, all other tests will fail.
-        try:
+        with contextlib.suppress(InteractionModelError):
             await self.send_set_utc_cmd(utc_time_in_matter_epoch())
-        except InteractionModelError:
-            pass
 
         self.print_step(4, "Read UTCTime")
         utc = await self.read_ts_attribute_expect_success(utc_attr)

@@ -55,7 +55,7 @@ class TC_WEBRTCP_2_22(MatterBaseTest, WEBRTCPTestBase):
         return "[TC-WEBRTCP-2.22] Validate EndSession removes session from CurrentSessions"
 
     def steps_TC_WEBRTCP_2_22(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("precondition", "DUT commissioned", is_commissioning=True),
             TestStep(1, "TH allocates both Audio and Video streams via CameraAVStreamManagement",
                      "Valid stream IDs are obtained"),
@@ -70,10 +70,9 @@ class TC_WEBRTCP_2_22(MatterBaseTest, WEBRTCPTestBase):
             TestStep(6, "TH deallocates the Audio and Video streams via AudioStreamDeallocate and VideoStreamDeallocate commands",
                      "DUT responds with success status code for both deallocate commands")
         ]
-        return steps
 
     def pics_TC_WEBRTCP_2_22(self) -> list[str]:
-        pics = [
+        return [
             "WEBRTCP.S",
             "WEBRTCP.S.A0000",     # CurrentSessions attribute
             "WEBRTCP.S.C06.Rsp",   # EndSession command
@@ -81,7 +80,6 @@ class TC_WEBRTCP_2_22(MatterBaseTest, WEBRTCPTestBase):
             "AVSM.S.F00",          # Audio Data Output feature
             "AVSM.S.F01",          # Video Data Output feature
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:

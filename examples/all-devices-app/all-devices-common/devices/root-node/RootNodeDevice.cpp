@@ -68,7 +68,7 @@ CHIP_ERROR RootNodeDevice::Register(EndpointId endpointId, CodeDrivenDataModelPr
     mAdministratorCommissioningCluster.Create(endpointId, BitFlags<AdministratorCommissioning::Feature>{});
     ReturnErrorOnFailure(provider.AddCluster(mAdministratorCommissioningCluster.Registration()));
 
-    mGeneralDiagnosticsCluster.Create(GeneralDiagnosticsCluster::OptionalAttributeSet{});
+    mGeneralDiagnosticsCluster.Create(GeneralDiagnosticsCluster::OptionalAttributeSet{}, BitFlags<GeneralDiagnostics::Feature>{});
     ReturnErrorOnFailure(provider.AddCluster(mGeneralDiagnosticsCluster.Registration()));
 
     mGroupKeyManagementCluster.Create();
