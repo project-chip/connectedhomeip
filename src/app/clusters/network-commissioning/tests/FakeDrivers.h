@@ -13,8 +13,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <clusters/NetworkCommissioning/Enums.h>
 #include <clusters/NetworkCommissioning/Attributes.h>
+#include <clusters/NetworkCommissioning/Enums.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
 #include <platform/NetworkCommissioning.h>
@@ -31,12 +31,13 @@ public:
     public:
         void Set(Span<DeviceLayer::NetworkCommissioning::Network> networks)
         {
-            mNetworks = networks;
+            mNetworks    = networks;
             currentindex = 0;
         }
         bool Next(DeviceLayer::NetworkCommissioning::Network & item) override
         {
-            if (currentindex >= mNetworks.size()) return false;
+            if (currentindex >= mNetworks.size())
+                return false;
             item = mNetworks[currentindex++];
             return true;
         }
@@ -55,10 +56,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    uint8_t GetMaxNetworks() override
-    {
-        return 1;
-    };
+    uint8_t GetMaxNetworks() override { return 1; };
 
     void SetNetwork(ByteSpan interfaceName)
     {
@@ -68,18 +66,13 @@ public:
         mNetworkCount         = 1;
 
         mNetworkStatusChangeCallback->OnNetworkingStatusChange(
-            app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum::kSuccess, Optional{interfaceName}, testErrorValue);
+            app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum::kSuccess, Optional{ interfaceName },
+            testErrorValue);
     }
 
-    void SetNetworkConnected(bool connected)
-    {
-        mNetwork.connected = connected;
-    }
+    void SetNetworkConnected(bool connected) { mNetwork.connected = connected; }
 
-    void SetNoNetwork()
-    {
-        mNetworkCount = 0;
-    }
+    void SetNoNetwork() { mNetworkCount = 0; }
 
     DeviceLayer::NetworkCommissioning::NetworkIterator * GetNetworks() override
     {
@@ -89,16 +82,13 @@ public:
         }
         else
         {
-            mNetworkIterator.Set({&mNetwork, 1});
+            mNetworkIterator.Set({ &mNetwork, 1 });
         }
 
         return &mNetworkIterator;
     };
 
-    void EnableDisabling(bool enabledAllowed)
-    {
-        mSetEnabledAllowed = enabledAllowed;
-    }
+    void EnableDisabling(bool enabledAllowed) { mSetEnabledAllowed = enabledAllowed; }
 
     CHIP_ERROR SetEnabled(bool enabled) override
     {
@@ -116,15 +106,15 @@ public:
 
     bool GetEnabled() override { return mEnabled; };
 
-    Optional<int32_t> testErrorValue{123};
+    Optional<int32_t> testErrorValue{ 123 };
 
 private:
     NetworkStatusChangeCallback * mNetworkStatusChangeCallback;
     FakeNetworkIterator mNetworkIterator;
     DeviceLayer::NetworkCommissioning::Network mNetwork;
-    size_t mNetworkCount = 0;
+    size_t mNetworkCount    = 0;
     bool mSetEnabledAllowed = false;
-    bool mEnabled = true;
+    bool mEnabled           = true;
 };
 
 class FakeWiFiDriver : public DeviceLayer::NetworkCommissioning::WiFiDriver

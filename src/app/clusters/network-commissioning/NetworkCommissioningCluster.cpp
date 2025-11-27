@@ -1083,7 +1083,8 @@ DataModel::ActionReturnStatus NetworkCommissioningCluster::WriteAttribute(const 
         ReturnErrorOnFailure(decoder.Decode(value));
         CHIP_ERROR err = SetInterfaceEnabled(value);
 
-        // Spec. 11.9.6.5 -- "If not supported, a write to this attribute with a value of false SHALL fail with a status of INVALID_ACTION."
+        // Spec. 11.9.6.5 -- "If not supported, a write to this attribute with a value of false SHALL fail with a status of
+        // INVALID_ACTION."
         if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
         {
             // return INVALID_ACTION only when trying to disable the interface

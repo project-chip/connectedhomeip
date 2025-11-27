@@ -88,16 +88,15 @@ TEST_F(TestNetworkCommissioningClusterEthernet, TestAttributes)
     }
 
     // Attribute List
-    ASSERT_TRUE(Testing::IsAttributesListEqualTo(
-        cluster,
-        {
-            Attributes::MaxNetworks::kMetadataEntry,
-            Attributes::Networks::kMetadataEntry,
-            Attributes::InterfaceEnabled::kMetadataEntry,
-            Attributes::LastNetworkingStatus::kMetadataEntry,
-            Attributes::LastNetworkID::kMetadataEntry,
-            Attributes::LastConnectErrorValue::kMetadataEntry,
-        }));
+    ASSERT_TRUE(Testing::IsAttributesListEqualTo(cluster,
+                                                 {
+                                                     Attributes::MaxNetworks::kMetadataEntry,
+                                                     Attributes::Networks::kMetadataEntry,
+                                                     Attributes::InterfaceEnabled::kMetadataEntry,
+                                                     Attributes::LastNetworkingStatus::kMetadataEntry,
+                                                     Attributes::LastNetworkID::kMetadataEntry,
+                                                     Attributes::LastConnectErrorValue::kMetadataEntry,
+                                                 }));
 
     // Accepted Commands List
     // No commands when ethernet only
@@ -203,7 +202,8 @@ TEST_F(TestNetworkCommissioningClusterEthernet, TestAttributes)
 
     // Try disabling the interface when it is not supported
     // This should fail with InvalidAction
-    ASSERT_EQ(tester.WriteAttribute(Attributes::InterfaceEnabled::Id, false).GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidAction);
+    ASSERT_EQ(tester.WriteAttribute(Attributes::InterfaceEnabled::Id, false).GetStatusCode().GetStatus(),
+              Protocols::InteractionModel::Status::InvalidAction);
 
     // Now try disabling when it is supported
     // This should succeed and mark the attribute as dirty
