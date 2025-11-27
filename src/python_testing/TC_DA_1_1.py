@@ -36,7 +36,6 @@
 
 import asyncio
 import logging
-import pathlib
 import random
 
 from mobly import asserts
