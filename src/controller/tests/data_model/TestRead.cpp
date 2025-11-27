@@ -51,7 +51,6 @@ namespace {
 
 const MockNodeConfig & TestMockNodeConfig()
 {
-    using namespace chip::Testing;
     using namespace Clusters::Globals::Attributes;
 
     // clang-format off
@@ -5003,8 +5002,8 @@ TEST_F(TestRead, TestReadHandler_KeepSubscriptionTest)
 
     readParam.mAttributePathParamsListSize = 0;
     readClient                             = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(),
-                                              InteractionModelEngine::GetInstance()->GetExchangeManager(), readCallback,
-                                              ReadClient::InteractionType::Subscribe);
+                                                                          InteractionModelEngine::GetInstance()->GetExchangeManager(), readCallback,
+                                                                          ReadClient::InteractionType::Subscribe);
     EXPECT_EQ(readClient->SendRequest(readParam), CHIP_NO_ERROR);
 
     DrainAndServiceIO();
