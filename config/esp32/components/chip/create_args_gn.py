@@ -45,8 +45,7 @@ with open(compile_commands_path) as compile_commands_json:
 
     def get_compile_flags(src_file):
         compile_command = [
-            res["command"]
-            for res in filter(lambda cmd: cmd["file"] == src_file, compile_commands)
+            res["command"] for res in compile_commands if res["file"] == src_file
         ]
 
         if len(compile_command) != 1:

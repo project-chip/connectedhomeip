@@ -71,8 +71,7 @@ def CMakeTargetEscape(a):
     def Escape(c):
         if c in string.ascii_letters or c in string.digits or c in '_.+-':
             return c
-        else:
-            return '__'
+        return '__'
     return ''.join(map(Escape, a))
 
 
@@ -199,8 +198,7 @@ class Project(object):
     def GetAbsolutePath(self, path):
         if path.startswith('//'):
             return posixpath.join(self.root_path, path[2:])
-        else:
-            return path
+        return path
 
     def GetObjectSourceDependencies(self, gn_target_name, object_dependencies):
         """All OBJECT libraries whose sources have not been absorbed."""

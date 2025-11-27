@@ -89,9 +89,7 @@ def get_raw_private_key_der(der_file: str, password: str):
             if password is None:
                 log.warning("KEY password has not been provided. It means that DAC key is not encrypted.")
             keys = load_der_private_key(key_data, password, backend=default_backend())
-            private_key = keys.private_numbers().private_value.to_bytes(32, byteorder='big')
-
-            return private_key
+            return keys.private_numbers().private_value.to_bytes(32, byteorder='big')
 
     except IOError or ValueError:
         return None
@@ -414,8 +412,7 @@ class FactoryDataGenerator:
         log.debug("Processing der file...")
         try:
             with open(path, 'rb') as f:
-                data = f.read()
-                return data
+                return f.read()
         except IOError as e:
             log.exception(e)
             raise e

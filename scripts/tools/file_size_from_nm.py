@@ -179,8 +179,7 @@ def tree_display_name(name: str) -> list[str]:
         log.debug("Ember callback found: '%s' -> %r", name, d)
         if 'command' in d:
             return ["chip", "app", "Clusters", d['cluster'], "EMBER", d['command'], name]
-        else:
-            return ["chip", "app", "Clusters", d['cluster'], "EMBER", name]
+        return ["chip", "app", "Clusters", d['cluster'], "EMBER", name]
 
     if 'MatterPreAttributeChangeCallback' in name:
         return ["EMBER", "CALLBACKS", name]
