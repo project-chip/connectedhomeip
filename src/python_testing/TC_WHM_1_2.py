@@ -124,7 +124,7 @@ class TC_WHM_1_2(MatterBaseTest):
             off_manual_timed_present_in_this_mode = 0
             for t in m.modeTags:
                 is_mfg = (0x8000 <= t.value and t.value <= 0xBFFF)
-                asserts.assert_true(t.value in commonTags.keys() or t.value in derivedTags or is_mfg,
+                asserts.assert_true(t.value in commonTags or t.value in derivedTags or is_mfg,
                                     "Found a SupportedModes entry with invalid mode tag value!")
                 if t.value == Clusters.WaterHeaterMode.Enums.ModeTag.kOff:
                     off_present += 1

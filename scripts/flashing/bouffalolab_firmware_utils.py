@@ -329,14 +329,14 @@ class Flasher(firmware_utils.Flasher):
         mfd_str = ""
         if dict_sec.keys():
             for idx in range(1, 1 + max(dict_sec.keys())):
-                if idx in dict_sec.keys():
+                if idx in dict_sec:
                     mfd_str += dict_sec[idx] + ","
                 else:
                     mfd_str += ","
 
         mfd_str = mfd_str + ":"
         for idx in range(0x8001, 1 + max(dict_raw.keys())):
-            if idx in dict_raw.keys():
+            if idx in dict_raw:
                 mfd_str += dict_raw[idx] + ","
             else:
                 mfd_str += ","
