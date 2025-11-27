@@ -43,7 +43,7 @@ struct TestTimeSynchronizationCluster : public ::testing::Test
 
     TestTimeSynchronizationCluster() {}
 
-    chip::Test::TestServerClusterContext testContext;
+    TestServerClusterContext testContext;
     TimeSynchronization::DefaultTimeSyncDelegate delegate;
 };
 
