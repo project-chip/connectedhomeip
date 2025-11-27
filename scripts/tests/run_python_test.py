@@ -387,6 +387,7 @@ def monitor_app_restart_requests(
         except Exception as e:
             log.error("Error in app restart monitor: %r", e)
 
+
 def handle_reset_flags(app_args, script_args, factory_reset, factory_reset_app_only):
     if factory_reset or factory_reset_app_only:
         # Remove native app config
