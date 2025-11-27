@@ -699,7 +699,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             node_id=requestor_node_id,
             cmd=cmd
         )
-        logger.info(f'{step_number_s4}: Step #4.0 - FailSafe armed for 900s: {resp}')
+        logger.info(f'{step_number_s4}: Step #4.0 - Called ArmFailSafe to extend interaction window: {resp}')
 
         logger.info(f'{step_number_s4}: Step #4.0 - Controller sends AnnounceOTAProvider command')
         resp_announce = await self.announce_ota_provider(controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
