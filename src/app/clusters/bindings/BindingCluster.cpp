@@ -22,7 +22,7 @@
 
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
-#include <app/clusters/bindings/binding-cluster.h>
+#include <app/clusters/bindings/BindingCluster.h>
 #include <app/clusters/bindings/binding-table.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/Binding/Attributes.h>
