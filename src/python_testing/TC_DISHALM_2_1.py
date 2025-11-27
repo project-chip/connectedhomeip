@@ -80,6 +80,7 @@ class TC_DISHALM_2_1(MatterBaseTest):
     async def test_TC_DISHALM_2_1(self):
 
         self.cluster = Clusters.DishwasherAlarm
+        self.endpoint = self.get_endpoint()
 
         self.step(1)
 
@@ -89,7 +90,10 @@ class TC_DISHALM_2_1(MatterBaseTest):
 
         self.step(3)
         latch_attribute = Clusters.DishwasherAlarm.Attributes.Latch
-        await self.read_and_check_attributes_from_dishwasher_alarm(latch_attribute)
+        if await self.attribute_guard(endpoint=self.endpoint, attribute=latch_attribute):
+            await self.read_and_check_attributes_from_dishwasher_alarm(latch_attribute)
+        else:
+            logger.info("Skipping Latch attribute validation since it is nor present")
 
         self.step(4)
         state_attribute = Clusters.DishwasherAlarm.Attributes.State
