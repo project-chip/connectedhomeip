@@ -323,7 +323,7 @@ struct TestServerClusterShim : public ::testing::Test
 
 TEST_F(TestServerClusterShim, TestWriteAttributeOnlyProvidedPathsAreValid)
 {
-    TestServerClusterContext testContext;
+    chip::Testing::TestServerClusterContext testContext;
     chip::Test::SetMockNodeConfig(gTestNodeConfig);
     ServerClusterShim invalid_cluster(
         { { kMockEndpoint1,
@@ -356,7 +356,7 @@ TEST_F(TestServerClusterShim, TestWriteAttributeOnlyProvidedPathsAreValid)
 
 TEST_F(TestServerClusterShim, TestDataVersion)
 {
-    TestServerClusterContext testContext;
+    chip::Testing::TestServerClusterContext testContext;
     chip::Test::SetMockNodeConfig(gTestNodeConfig);
 
     ServerClusterShim cluster({ { kMockEndpoint3, MockClusterId(4) } });
@@ -377,7 +377,7 @@ TEST_F(TestServerClusterShim, TestDataVersion)
 
 TEST_F(TestServerClusterShim, AttributeWriteShortString)
 {
-    TestServerClusterContext testContext;
+    chip::Testing::TestServerClusterContext testContext;
     chip::Test::SetMockNodeConfig(gTestNodeConfig);
     ServerClusterShim cluster({ { kMockEndpoint3, MockClusterId(4) } });
     EXPECT_SUCCESS(cluster.Startup(testContext.Get()));
@@ -398,7 +398,7 @@ TEST_F(TestServerClusterShim, AttributeWriteShortString)
 
 TEST_F(TestServerClusterShim, EmberAttributeReadOctetString)
 {
-    TestServerClusterContext testContext;
+    chip::Testing::TestServerClusterContext testContext;
     chip::Test::SetMockNodeConfig(gTestNodeConfig);
     ServerClusterShim invalid_cluster({ { 1, 1 } });
     ServerClusterShim valid_cluster({ { kMockEndpoint3, MockClusterId(4) } });
@@ -443,7 +443,7 @@ TEST_F(TestServerClusterShim, EmberAttributeReadOctetString)
 
 TEST_F(TestServerClusterShim, IterateOverAttributes)
 {
-    TestServerClusterContext testContext;
+    chip::Testing::TestServerClusterContext testContext;
     chip::Test::SetMockNodeConfig(gTestNodeConfig);
     ServerClusterShim cluster({ { kMockEndpoint3, MockClusterId(4) } });
     EXPECT_SUCCESS(cluster.Startup(testContext.Get()));
@@ -493,7 +493,7 @@ TEST_F(TestServerClusterShim, EmberInvokeTest)
     // The only thing that can be validated is that this `DispatchSingleClusterCommand`
     // is actually invoked.
 
-    TestServerClusterContext testContext;
+    chip::Testing::TestServerClusterContext testContext;
     chip::Test::SetMockNodeConfig(gTestNodeConfig);
     ServerClusterShim cluster_with_invalid_path({ { kMockEndpoint3, MockClusterId(4) } });
     ServerClusterShim cluster_with_valid_path({ { kMockEndpoint1, MockClusterId(1) } });
@@ -537,7 +537,7 @@ TEST_F(TestServerClusterShim, EmberInvokeTest)
 
 TEST_F(TestServerClusterShim, IterateOverAcceptedCommands)
 {
-    TestServerClusterContext testContext;
+    chip::Testing::TestServerClusterContext testContext;
     chip::Test::SetMockNodeConfig(gTestNodeConfig);
     ServerClusterShim cluster({ { kMockEndpoint3, MockClusterId(4) }, { kMockEndpoint2, MockClusterId(2) } });
     EXPECT_SUCCESS(cluster.Startup(testContext.Get()));
@@ -576,7 +576,7 @@ TEST_F(TestServerClusterShim, IterateOverAcceptedCommands)
 
 TEST_F(TestServerClusterShim, IterateOverGeneratedCommands)
 {
-    TestServerClusterContext testContext;
+    chip::Testing::TestServerClusterContext testContext;
     chip::Test::SetMockNodeConfig(gTestNodeConfig);
     ServerClusterShim cluster({ { kMockEndpoint2, MockClusterId(2) }, { kMockEndpoint2, MockClusterId(3) } });
     EXPECT_SUCCESS(cluster.Startup(testContext.Get()));

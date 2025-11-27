@@ -20,7 +20,7 @@
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
-namespace Test {
+namespace Testing {
 
 /// A provider that is emtpy - it contains no endpoints and most
 /// calls fail with `Unsupported Endpoint`

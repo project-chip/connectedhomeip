@@ -40,7 +40,7 @@
 #include <vector>
 
 namespace chip {
-namespace Test {
+namespace Testing {
 
 // Helper class for testing clusters.
 //

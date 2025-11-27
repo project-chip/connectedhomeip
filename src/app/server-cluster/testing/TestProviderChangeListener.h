@@ -21,7 +21,7 @@
 #include <vector>
 
 namespace chip {
-namespace Test {
+namespace Testing {
 
 /// A provider change listener that stores all dirty reports
 /// into an internal vector

@@ -28,7 +28,7 @@
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
-namespace Test {
+namespace Testing {
 
 /// An action context that does not have a current exchange (just returns nullptr)
 class NullActionContext : public app::DataModel::ActionContext
