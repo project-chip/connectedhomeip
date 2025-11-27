@@ -36,6 +36,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
+import contextlib
 import queue
 import typing
 from datetime import datetime, timedelta, timezone
@@ -49,7 +50,6 @@ from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
 from matter.testing.timeoperations import get_wait_seconds_from_set_time, utc_time_in_matter_epoch
 from matter.tlv import uint
-import contextlib
 
 
 class TC_TIMESYNC_2_12(MatterBaseTest):

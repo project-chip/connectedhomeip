@@ -19,12 +19,12 @@
 
 # This is used to restart the remote device in cirque test
 
+import contextlib
 import logging
 import os
 import sys
 import threading
 import time
-import contextlib
 
 with contextlib.suppress(ImportError):
     import paramiko

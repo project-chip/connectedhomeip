@@ -14,8 +14,8 @@
 #    limitations under the License.
 
 import binascii
-import re
 import contextlib
+import re
 
 '''Fixes certain value formats known to exist in YAML tests
 

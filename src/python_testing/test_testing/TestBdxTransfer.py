@@ -38,6 +38,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
+import contextlib
 import os
 import random
 
@@ -46,7 +47,6 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.bdx import BdxProtocol, BdxTransfer
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-import contextlib
 
 
 class TestBdxTransfer(MatterBaseTest):

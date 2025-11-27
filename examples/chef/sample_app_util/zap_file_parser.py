@@ -29,13 +29,13 @@ Future work:
     available.
   - Add support for .matter files.
 """
+import contextlib
 import copy
 import json
 import os
 import re
 import uuid
 from typing import Dict, List, Optional, Sequence, TypedDict, Union
-import contextlib
 
 try:
     import yaml

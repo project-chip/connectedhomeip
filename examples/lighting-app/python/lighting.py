@@ -15,6 +15,7 @@
 #
 
 import asyncio
+import contextlib
 import os
 import string
 import sys
@@ -27,7 +28,6 @@ from dali.driver.hid import tridonic
 from dali.gear.general import DAPC, Off, RecallMaxLevel
 
 from matter.server import GetLibraryHandle, PostAttributeChangeCallback
-import contextlib
 
 dali_loop = None
 dev = None

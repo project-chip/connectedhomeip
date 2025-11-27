@@ -17,6 +17,7 @@
 import relative_importer  # isort: split # noqa: F401
 
 import asyncio
+import contextlib
 import importlib
 import os
 import sys
@@ -35,7 +36,6 @@ from matter.yamltests.parser_config import TestConfigParser
 from matter.yamltests.pseudo_clusters.pseudo_clusters import PseudoClusters, get_default_pseudo_clusters
 from matter.yamltests.runner import TestRunner, TestRunnerConfig, TestRunnerOptions
 from matter.yamltests.websocket_runner import WebSocketRunner, WebSocketRunnerConfig
-import contextlib
 
 #
 # Options
