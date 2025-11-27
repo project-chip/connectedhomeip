@@ -69,9 +69,11 @@ CHIP_ERROR MigrateFromSafeAttributePersistenceProvider(const ConcreteClusterPath
                                                        PersistentStorageDelegate & storageDelegate)
 {
     DefaultSafeAttributePersistenceProvider safeProvider;
-    safeProvider.Init(&storageDelegate);
+
+    ReturnErrorOnFailure(safeProvider.Init(&storageDelegate));
+
     DefaultAttributePersistenceProvider normProvider;
-    normProvider.Init(&storageDelegate);
+    ReturnErrorOnFailure(normProvider.Init(&storageDelegate));
 
     uint8_t attributeBuffer[attributeBufferSize] = {};
     MutableByteSpan buffer(attributeBuffer);
