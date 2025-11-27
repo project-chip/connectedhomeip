@@ -156,13 +156,10 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
     def pics_TC_SU_2_2(self):
         """Return the PICS definitions associated with this test."""
-        pics = [
-            "MCORE.OTA.Requestor",
-        ]
-        return pics
+        return ["MCORE.OTA.Requestor"]
 
     def steps_TC_SU_2_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(0, "Prerequisite: Commission the DUT (Requestor) with the TH/OTA-P (Provider)",
                      is_commissioning=True),
             TestStep(1, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. "
@@ -192,7 +189,6 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
                      "QueryStatus is set to 'UpdateAvailable', ImageURI field contains an invalid BDX ImageURI.",
                      "Verify that the DUT does not start transferring the software image.")
         ]
-        return steps
 
     @async_test_body
     async def teardown_test(self):
