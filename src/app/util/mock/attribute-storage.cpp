@@ -513,7 +513,7 @@ CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const Co
         CHIP_ERROR err = valueEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
             for (int i = 0; i < 6; i++)
             {
-                ReturnErrorOnFailure(encoder.Encode(::chip::ByteSpan(mockAttribute4, sizeof(mockAttribute4))));
+                ReturnErrorOnFailure(encoder.Encode(chip::ByteSpan(mockAttribute4, sizeof(mockAttribute4))));
             }
             return CHIP_NO_ERROR;
         });
