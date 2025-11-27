@@ -40,9 +40,10 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_WHM_1_2(MatterBaseTest):
@@ -55,23 +56,25 @@ class TC_WHM_1_2(MatterBaseTest):
         return "[TC-WHM-1.2] Cluster attributes with DUT as Server"
 
     def steps_TC_WHM_1_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read the SupportedModes attribute"),
             TestStep(3, "Read the CurrentMode attribute"),
         ]
-        return steps
 
     def pics_TC_WHM_1_2(self) -> list[str]:
-        pics = [
+        return [
             "WHM.S",
         ]
-        return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_WHM_1_2(self):
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         attributes = Clusters.WaterHeaterMode.Attributes
 
@@ -83,11 +86,11 @@ class TC_WHM_1_2(MatterBaseTest):
                                      "SupportedModes must have at least 2 entries!")
         asserts.assert_less_equal(len(supported_modes), 255,
                                   "SupportedModes must have at most 255 entries!")
-        modes = set([m.mode for m in supported_modes])
+        modes = {m.mode for m in supported_modes}
         asserts.assert_equal(len(modes), len(supported_modes),
                              "SupportedModes must have unique mode values")
 
-        labels = set([m.label for m in supported_modes])
+        labels = {m.label for m in supported_modes}
         asserts.assert_equal(len(labels), len(supported_modes),
                              "SupportedModes must have unique mode label values")
 

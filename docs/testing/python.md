@@ -12,7 +12,7 @@ Python tests located in src/python_testing
 -   [src/python_testing/hello_test.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/hello_test.py) -
     sample test showing test setup and test harness integration
 -   [https://github.com/google/mobly/blob/master/docs/tutorial.md](https://github.com/google/mobly/blob/master/docs/tutorial.md)
--   [ChipDeviceCtrl.py](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/chip/ChipDeviceCtrl.py) -
+-   [ChipDeviceCtrl.py](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/matter/ChipDeviceCtrl.py) -
     Controller implementation - [API documentation](./ChipDeviceCtrlAPI.md)
 -   [scripts/tests/run_python_test.py](https://github.com/project-chip/connectedhomeip/blob/master/scripts/tests/run_python_test.py)
     to easily set up app and script for testing - used in CI
@@ -25,7 +25,7 @@ Python tests located in src/python_testing
         section should include various parameters and their respective values,
         which will guide the test runner on how to execute the tests.
 -   All test classes inherit from `MatterBaseTest` in
-    [matter_testing.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/matter_testing_infrastructure/chip/testing/matter_testing.py)
+    [matter_testing.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/matter_testing_infrastructure/matter/testing/matter_testing.py)
     -   Support for commissioning using the python controller
     -   Default controller (`self.default_controller`) of type `ChipDeviceCtrl`
     -   `MatterBaseTest` inherits from the Mobly BaseTestClass
@@ -45,7 +45,7 @@ Python tests located in src/python_testing
 
 ### A simple test
 
-```
+```python
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 #
@@ -71,18 +71,16 @@ class TC_MYTEST_1_1(MatterBaseTest):
     async def test_TC_MYTEST_1_1(self):
 
         vendor_name = await self.read_single_attribute_check_success(
-            dev_ctrl=self.default_controller, <span style="color:#38761D"># defaults to
-self.default_controlller</span>
-            node_id = self.dut_node_id, <span style="color:#38761D"># defaults to
-self.dut_node_id</span>
+            dev_ctrl=self.default_controller,  # defaults to self.default_controller
+            node_id = self.dut_node_id,  # defaults to self.dut_node_id
             cluster=Clusters.BasicInformation,
             attribute=Clusters.BasicInformation.Attributes.VendorName,
-            endpoint = 0, <span style="color:#38761D">#defaults to 0</span>
+            endpoint = 0,  # defaults to 0
         )
-        asserts.assert_equal(vendor_name, “Test vendor name”, “Unexpected vendor name”)
+        asserts.assert_equal(vendor_name, "Test vendor name", "Unexpected vendor name")
 
 if __name__ == "__main__":
-default_matter_test_main()
+    default_matter_test_main()
 ```
 
 ---
@@ -103,12 +101,12 @@ the tests. Please see [Running tests in CI](#running-tests-in-ci).
 
 ## Cluster Codegen
 
--   [Objects.py](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/chip/clusters/Objects.py)
+-   [Objects.py](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/matter/clusters/Objects.py)
     for codegen,
--   [ClusterObjects.py](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/chip/clusters/ClusterObjects.py)
+-   [ClusterObjects.py](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/matter/clusters/ClusterObjects.py)
     for classes
 
-Common import used in test files: `import chip.clusters as Clusters`
+Common import used in test files: `import matter.clusters as Clusters`
 
 Each cluster is defined in the `Clusters.<ClusterName>` namespace and contains
 always:
@@ -225,29 +223,30 @@ Clusters.BasicInformation.Structs.ProductAppearanceStruct(
 
 ## Accessing Clusters and Cluster Elements by ID
 
-[ClusterObjects.py](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/chip/clusters/ClusterObjects.py)
+[ClusterObjects.py](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/matter/clusters/ClusterObjects.py)
 has a set of objects that map ID to the code generated object.
 
-`chip.clusters.ClusterObjects.ALL_CLUSTERS`
+`matter.clusters.ClusterObjects.ALL_CLUSTERS`
 
 -   `dict[int, Cluster]` - maps cluster ID to Cluster class
-    -   `cluster = chip.clusters.ClusterObjects.ALL_CLUSTERS[cluster_id]`
+    -   `cluster = matter.clusters.ClusterObjects.ALL_CLUSTERS[cluster_id]`
 
-`chip.clusters.ClusterObjects.ALL_ATTRIBUTES`
+`matter.clusters.ClusterObjects.ALL_ATTRIBUTES`
 
 -   `dict[int, dict[int, ClusterAttributeDescriptor]]` - maps cluster ID to a
     dict of attribute ID to attribute class
-    -   `attr = chip.clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id][attribute_id]`
+    -   `attr = matter.clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id][attribute_id]`
 
-`chip.clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS/ALL_GENERATED_COMMANDS`
+`matter.clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS/ALL_GENERATED_COMMANDS`
 
 -   dict[int, dict[int, ClusterCommand]]
--   cmd = chip.clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id][cmd_id]
+-   cmd =
+    matter.clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id][cmd_id]
 
 ## ChipDeviceCtrl API
 
 The `ChipDeviceCtrl` API is implemented in
-[ChipDeviceCtrl.py](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/chip/ChipDeviceCtrl.py).
+[ChipDeviceCtrl.py](https://github.com/project-chip/connectedhomeip/blob/master/src/controller/python/matter/ChipDeviceCtrl.py).
 
 The `ChipDeviceCtrl` implements a python-based controller that can be used to
 commission and control devices. The API is documented here in the
@@ -320,11 +319,11 @@ callbacks are called on update.
 
 Example for setting callbacks:
 
-```
+```python
 cb = EventSubscriptionHandler(cluster, cluster_id, event_id)
 
 urgent = 1
-subscription = await dev_ctrl.ReadEvent(nodeid=1, events=[(1, event, urgent)], reportInterval=[1, 3])
+subscription = await dev_ctrl.ReadEvent(nodeId=1, events=[(1, event, urgent)], reportInterval=[1, 3])
 subscription.SetEventUpdateCallback(callback=cb)
 
 try:
@@ -344,9 +343,9 @@ PyChipError
 
 Example:
 
-```
-res = await devCtrl.WriteAttribute(nodeid=0, attributes=[(0,Clusters.BasicInformation.Attributes.NodeLabel("Test"))])
-asserts.assert_equal(ret[0].status, Status.Success, “write failed”)
+```python
+res = await devCtrl.WriteAttribute(nodeId=0, attributes=[(0,Clusters.BasicInformation.Attributes.NodeLabel("Test"))])
+asserts.assert_equal(ret[0].status, Status.Success, "write failed")
 ```
 
 ### [SendCommand](./ChipDeviceCtrlAPI.md#sendcommand)
@@ -378,7 +377,7 @@ pai = await dev_ctrl.SendCommand(nodeid, 0, Clusters.OperationalCredentials.Comm
 ## Mobly helpers
 
 The test system is based on Mobly, and the
-[matter_testing.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/matter_testing_infrastructure/chip/testing/matter_testing.py)
+[matter_testing.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/matter_testing_infrastructure/matter/testing/matter_testing.py)
 class provides some helpers for Mobly integration.
 
 -   `default_matter_test_main`
@@ -531,11 +530,11 @@ Note: The name of the pipe can be anything while is a valid file path.
 
 Example of usage:
 
-```bash
-First run the app with the desired app-pipe path:
+```shell
+# First run the app with the desired app-pipe path:
 ./out/darwin-arm64-all-clusters/chip-all-clusters-app --app-pipe  /tmp/ref_alm_2_2
 
-Then execute the test with the app-pipe argument with the value defined while running the app.
+# Then execute the test with the app-pipe argument with the value defined while running the app.
 python3 src/python_testing/TC_REFALM_2_2.py --commissioning-method on-network --qr-code MT:-24J0AFN00KA0648G00  --PICS src/app/tests/suites/certification/ci-pics-values --app-pipe /tmp/ref_alm_2_2  --int-arg PIXIT.REFALM.AlarmThreshold:1
 ```
 
@@ -618,6 +617,133 @@ for the CI). These arguments can be passed as sets of key/value pairs using the
 
 ```shell
 --int-arg PIXIT.ACE.APPENDPOINT:1 --int-arg PIXIT.ACE.APPDEVTYPEID:0x0100 --string-arg PIXIT.ACE.APPCLUSTER:OnOff --string-arg PIXIT.ACE.APPATTRIBUTE:OnOff
+```
+
+## IDM Conformance tests
+
+The conformance tests are whole-node tests that ensure the device under test
+meets some of the basic interaction model, data model, and system model
+requirements in the specification. These tests are some of the most commonly
+failed tests as they often turn up real bugs on devices. The recommendation from
+the certification testing team is to run these tests before any other
+application-specific tests as failures on these tests normally result in device
+configuration changes that would necessitate re-test in other areas.
+
+The tests in
+[https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/TC_DeviceBasicComposition.py](TC_DeviceBasicComposition.py)
+cover the following checks:
+
+-   Root node checks for commissionable devices
+-   Base device checks for all endpoints
+-   Base cluster checks for all clusters (checking global attribute conformance)
+-   Basic utf-8 string format verification for string type attributes
+-   Tag list conformance for sibling endpoints
+-   Endpoint list verification for power source clusters
+-   Various Descriptor cluster checks
+-   "test" to create device description files in MatterTlvJson and text
+
+The tests in
+[https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/TC_DeviceConformance.py](TC_DeviceConformance.py)
+cover the following checks:
+
+-   Cluster conformance for every cluster is correct with respect to implemented
+    features, attributes and commands
+-   Cluster revisions are correct for the stated specification revision
+-   Device types implement all the required cluster and element overrides
+-   Device type revisions are correct for the stated specification revision
+-   Devices types respect superset rules
+
+The tests in
+[https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/TC_DefaultWarnings.py](TC_DefaultWarnings.py)
+cover the following checks:
+
+-   Checks for common unintentional default values in clusters that may have
+    been missed when implementing devices from the SDK
+
+### Running Conformance Tests
+
+There are a number of options for running conformance tests. Conformance tests
+can be run on devices that have been commissioned into the test framework
+fabric, similar to other certification tests. Because conformance tests operate
+entirely on a single wildcard read of the device attributes, they can be run
+over PASE on an uncommissioned device, or run against a device that has been
+commissioned into the test fabric. They can also be run against a MatterTlvJson
+file with a representation of this information. These files can be generated
+from the TC_DeviceBasicComposition.py tests, as described below.
+
+To run any of the python certification tests, you will first need to set up your
+environment as described in [Setup](#setup).
+
+#### Running conformance tests against an uncommissioned device over PASE
+
+First ensure the device is in commissioning mode. Then run the test against the
+device by supplying either the QR code, the manual pairing code or the
+discriminator / password pair.
+
+```shell
+python3 TC_DeviceConformance.py --qr-code MT:-24J0AFN00KA0648G00
+```
+
+```shell
+python3 TC_DeviceConformance.py --manual-code 34970112332
+```
+
+```shell
+python3 TC_DeviceConformance.py --discriminator 3840 --passcode 20202021
+```
+
+#### Running conformance tests against a commissioned device over CASE
+
+If the device has already been commissioned into the python testing fabric, you
+can run the test directly
+
+```shell
+python3 TC_DeviceConformance.py
+```
+
+This uses the default fabric storage and node ID. These can also be specified
+when running the tests.
+
+You can commission the device into the test fabric before running the test by
+using the `--commissioning-method` flag and the `--qr-code`, `--manual-code` or
+`--discriminator` and `--passcode` flags.
+
+For example:
+
+```shell
+python3 TC_DeviceConformance.py --discriminator 3840 --passcode 20202021 --commissioning-method on-network
+```
+
+You may also need to provide parameters for the commissioning method.
+
+If the commissioning-method is `ble-thread`, you will also need to provide the
+thread operational dataset via the `--thread-dataset-hex` parameter.
+
+If the commissioning method is `ble-wifi`, you will also need to provide the
+wifi SSID and password via the `--wifi-ssid` and `--wifi-passphrase` parameters.
+
+By default, the test stores fabric information in `admin_storage.json` in the
+current directory and uses a node ID of `0x12344321` for the device being
+tested. You can supply these directly by using the `--storage-path` and
+`--dut-node-id` flags.
+
+#### Running conformance tests against MatterTlvJson files
+
+Because the conformance tests are run against the attribute wildcard read from
+the device, they can also be run against a MatterTlvJson machine readable file
+without requiring the device to be physically present. To run against a
+previously generated MatterTlvJson device dump file:
+
+```shell
+python3 TC_DeviceConformance.py --string-arg test_from_file:device_dump_0xFFF1_0x8001_1.json
+```
+
+You can generate a MatterTlvJson file for a device by leveraging the
+certification test that generates these (TC-IDM-12.1, implemented in
+TC_DeviceBasicComposition.py).
+
+```shell
+python3 TC_DeviceBasicComposition.py --qr-code MT:-24J0AFN00KA0648G00 --tests test_TC_IDM_12_1
 ```
 
 ## Local host app testing

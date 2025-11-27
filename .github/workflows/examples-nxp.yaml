@@ -43,12 +43,12 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp:153
+            image: ghcr.io/project-chip/chip-build-nxp:175
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -73,36 +73,27 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-mcxw71-freertos-contact-sensor-low-power \
-                      --target nxp-mcxw71-freertos-lock-app \
+                      --target nxp-mcxw71-freertos-contact-sensor-thread-mtd-low-power-frdm \
                       build \
-                      --copy-artifacts-to out/artifacts \
                   "
             - name: Get MCXW71 contact sensor size stats
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nxp mcxw71+release contact \
-                    out/artifacts/nxp-mcxw71-freertos-contact-sensor-low-power/chip-mcxw71-contact-example.elf \
+                    out/nxp-mcxw71-freertos-contact-sensor-thread-mtd-low-power-frdm/app.elf \
                     /tmp/bloat_reports/
-            - name: Get MCXW71 lock app size stats
+
+            - name: Build MCXW72 examples
               run: |
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    nxp mcxw71+release lock \
-                    out/artifacts/nxp-mcxw71-freertos-lock-app/chip-mcxw71-lock-example.elf \
-                    /tmp/bloat_reports/
+                  scripts/run_in_build_env.sh "\
+                      ./scripts/build/build_examples.py \
+                      --target nxp-mcxw72-freertos-contact-sensor-thread-mtd-low-power-frdm \
+                      build \
+                  "
 
             - name: clean build
               run: rm -rf ./out
 
-            - name: Build RT1060 all clusters example app
-              run: |
-                  scripts/run_in_build_env.sh "\
-                      ./scripts/build/build_examples.py \
-                      --target nxp-rt1060-freertos-all-clusters-wifi-iw416-cmake \
-                      --target nxp-rt1060-freertos-all-clusters-wifi-w8801-no-ble-cmake \
-                      --target nxp-rt1060-freertos-all-clusters-wifi-ota-evkc-iwx12-cmake \
-                      build \
-                  "
             - name: Build RT1060 thermostat example app
               if:
                   github.event_name == 'push' || steps.changed_paths.outputs.nxp
@@ -110,54 +101,40 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rt1060-freertos-thermostat-thread-wifi-ota-evkc-iwx12-cmake \
+                      --target nxp-rt1060-freertos-thermostat-thread-wifi-ota-evkc-iwx12 \
                       build \
                   "
 
             - name: clean build
               run: rm -rf ./out
 
-            - name: Build RT1170 all clusters example app
+            - name: Build RT1170 thermostat example app
               if:
                   github.event_name == 'push' || steps.changed_paths.outputs.nxp
                   == 'true' || steps.changed_paths.outputs.pigweed == 'true'
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rt1170-freertos-all-clusters-wifi-iwx12-cmake \
-                      --target nxp-rt1170-freertos-all-clusters-wifi-ota-iwx12-cmake \
-                      build \
-                  "
-            - name: Build RT1170 thermostat example app
-              run: |
-                  scripts/run_in_build_env.sh "\
-                      ./scripts/build/build_examples.py \
-                      --target nxp-rt1170-freertos-thermostat-thread-wifi-ota-iwx12-cmake \
+                      --target nxp-rt1170-freertos-thermostat-thread-wifi-ota-iwx12 \
                       build \
                   "
 
             - name: clean build
               run: rm -rf ./out
 
-            - name: Build RW61X all clusters example app
-              run: |
-                  scripts/run_in_build_env.sh "\
-                      ./scripts/build/build_examples.py \
-                      --target nxp-rw61x-freertos-all-clusters-wifi-ota-se05x-cmake \
-                      build \
-                  "
             - name: Build RW61X thermostat OTBR example app
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rw61x-freertos-thermostat-thread-wifi-ota-factory-cmake \
+                      --target nxp-rw61x-freertos-thermostat-thread-wifi-ota-factory \
+                      --target nxp-rw61x-freertos-thermostat-wifi-se05x \
                       build \
                   "
             - name: Build RW61X thermostat ethernet example app
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rw61x-freertos-thermostat-ethernet-cmake-frdm \
+                      --target nxp-rw61x-freertos-thermostat-ethernet-frdm \
                       build \
                   "
 
@@ -176,11 +153,11 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp-zephyr:153
+            image: ghcr.io/project-chip/chip-build-nxp-zephyr:175
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:

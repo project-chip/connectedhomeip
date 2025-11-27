@@ -29,6 +29,7 @@
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <platform/PlatformManager.h>
+#include <soil-measurement-stub.h>
 
 #include "ButtonEventsSimulator.h"
 #include <air-quality-instance.h>
@@ -38,7 +39,6 @@
 #include <oven-modes.h>
 #include <oven-operational-state-delegate.h>
 #include <rvc-modes.h>
-#include <soil-measurement-stub.h>
 
 #include <memory>
 #include <string>
@@ -559,7 +559,7 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     else if (name == "SimulateConfigurationVersionChange")
     {
         uint32_t configurationVersion = 0;
-        ConfigurationMgr().GetConfigurationVersion(configurationVersion);
+        TEMPORARY_RETURN_IGNORED ConfigurationMgr().GetConfigurationVersion(configurationVersion);
         configurationVersion++;
 
         if (ConfigurationMgr().StoreConfigurationVersion(configurationVersion + 1) != CHIP_NO_ERROR)
@@ -590,6 +590,10 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
 
         self->OnSoilMoistureChange(endpoint, soilMoistureMeasuredValue);
     }
+    else if (name == "UserIntentCommissioningStart")
+    {
+        TEMPORARY_RETURN_IGNORED Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+    }
     else
     {
         ChipLogError(NotSpecified, "Unhandled command '%s': this should never happen", name.c_str());
@@ -612,7 +616,8 @@ void AllClustersAppCommandHandler::OnRebootSignalHandler(BootReasonType bootReas
     if (ConfigurationMgr().StoreBootReason(static_cast<uint32_t>(bootReason)) == CHIP_NO_ERROR)
     {
         Server::GetInstance().GenerateShutDownEvent();
-        PlatformMgr().ScheduleWork([](intptr_t) { PlatformMgr().StopEventLoopTask(); });
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(
+            [](intptr_t) { TEMPORARY_RETURN_IGNORED PlatformMgr().StopEventLoopTask(); });
     }
     else
     {
@@ -911,15 +916,18 @@ void AllClustersAppCommandHandler::OnOvenOperationalStateChange(std::string devi
     OperationalState::Instance * operationalStateInstance = OvenCavityOperationalState::GetOperationalStateInstance();
     if (operation == "Start" || operation == "Resume")
     {
-        operationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
+        TEMPORARY_RETURN_IGNORED operationalStateInstance->SetOperationalState(
+            to_underlying(OperationalState::OperationalStateEnum::kRunning));
     }
     else if (operation == "Pause")
     {
-        operationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused));
+        TEMPORARY_RETURN_IGNORED operationalStateInstance->SetOperationalState(
+            to_underlying(OperationalState::OperationalStateEnum::kPaused));
     }
     else if (operation == "Stop")
     {
-        operationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
+        TEMPORARY_RETURN_IGNORED operationalStateInstance->SetOperationalState(
+            to_underlying(OperationalState::OperationalStateEnum::kStopped));
     }
     else if (operation == "OnFault")
     {
@@ -954,23 +962,16 @@ void AllClustersAppCommandHandler::OnAirQualityChange(uint32_t aNewValue)
 
 void AllClustersAppCommandHandler::OnSoilMoistureChange(EndpointId endpointId, DataModel::Nullable<Percent> soilMoisture)
 {
-    SoilMeasurement::Instance * soilMeasurementInstance = SoilMeasurement::GetInstance();
-
     if (soilMoisture.IsNull())
     {
         ChipLogDetail(NotSpecified, "Set SoilMoisture value to null");
-    }
-    else if (soilMoisture.Value() > 100)
-    {
-        ChipLogDetail(NotSpecified, "Invalid SoilMoisture value");
-        return;
     }
     else
     {
         ChipLogDetail(NotSpecified, "Set SoilMoisture value to %u", soilMoisture.Value());
     }
 
-    soilMeasurementInstance->SetSoilMeasuredValue(soilMoisture);
+    TEMPORARY_RETURN_IGNORED SoilMeasurement::SetSoilMoistureMeasuredValue(soilMoisture);
 }
 
 void AllClustersAppCommandHandler::HandleSetOccupancyChange(EndpointId endpointId, uint8_t newOccupancyValue)
@@ -1047,5 +1048,6 @@ void AllClustersCommandDelegate::OnEventCommandReceived(const char * json)
         return;
     }
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(AllClustersAppCommandHandler::HandleCommand, reinterpret_cast<intptr_t>(handler));
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(AllClustersAppCommandHandler::HandleCommand,
+                                                                           reinterpret_cast<intptr_t>(handler));
 }

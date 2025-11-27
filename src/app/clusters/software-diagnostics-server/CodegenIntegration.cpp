@@ -14,16 +14,19 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/clusters/software-diagnostics-server/software-diagnostics-cluster.h>
-#include <app/clusters/software-diagnostics-server/software-diagnostics-logic.h>
+#include <app/clusters/software-diagnostics-server/SoftwareDiagnosticsCluster.h>
+#include <app/clusters/software-diagnostics-server/SoftwareDiagnosticsLogic.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/static-cluster-config/SoftwareDiagnostics.h>
 #include <app/util/attribute-storage.h>
-#include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <app/util/util.h>
+#include <data-model-providers/codegen/ClusterIntegration.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::SoftwareDiagnostics;
+using namespace chip::app::Clusters::SoftwareDiagnostics::Attributes;
 
 // for fixed endpoint, this file is ever only included IF software diagnostics is enabled and that MUST happen only on endpoint 0
 // the static assert is skipped in case of dynamic endpoints.
@@ -35,58 +38,56 @@ namespace {
 
 LazyRegisteredServerCluster<SoftwareDiagnosticsServerCluster> gServer;
 
-// compile-time evaluated method if "is <EP>::SoftwareDiagnostics::<ATTR>" enabled
-constexpr bool IsAttributeEnabled(EndpointId endpointId, AttributeId attributeId)
+class IntegrationDelegate : public CodegenClusterIntegration::Delegate
 {
-    for (auto & config : SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig)
+public:
+    ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
+                                                   uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        if (config.endpointNumber != endpointId)
-        {
-            continue;
-        }
-        for (auto & attr : config.enabledAttributes)
-        {
-            if (attr == attributeId)
-            {
-                return true;
-            }
-        }
+        gServer.Create(SoftwareDiagnosticsLogic::OptionalAttributeSet(optionalAttributeBits));
+        return gServer.Registration();
     }
-    return false;
-}
+
+    ServerClusterInterface * FindRegistration(unsigned clusterInstanceIndex) override
+    {
+        VerifyOrReturnValue(gServer.IsConstructed(), nullptr);
+        return &gServer.Cluster();
+    }
+    void ReleaseRegistration(unsigned clusterInstanceIndex) override { gServer.Destroy(); }
+};
 
 } // namespace
 
-void emberAfSoftwareDiagnosticsClusterInitCallback(EndpointId endpointId)
+void MatterSoftwareDiagnosticsClusterInitCallback(EndpointId endpointId)
 {
-    VerifyOrReturn(endpointId == kRootEndpointId);
-    const SoftwareDiagnosticsEnabledAttributes enabledAttributes{
-        .enableThreadMetrics     = IsAttributeEnabled(kRootEndpointId, Attributes::ThreadMetrics::Id),
-        .enableCurrentHeapFree   = IsAttributeEnabled(kRootEndpointId, Attributes::CurrentHeapFree::Id),
-        .enableCurrentHeapUsed   = IsAttributeEnabled(kRootEndpointId, Attributes::CurrentHeapUsed::Id),
-        .enableCurrentWatermarks = IsAttributeEnabled(kRootEndpointId, Attributes::CurrentHeapHighWatermark::Id),
-    };
+    IntegrationDelegate integrationDelegate;
 
-    gServer.Create(enabledAttributes);
-
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServer.Registration());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to register SoftwareDiagnostics on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId,
-                     err.Format());
-    }
+    // register a singleton server (root endpoint only)
+    CodegenClusterIntegration::RegisterServer(
+        {
+            .endpointId                = endpointId,
+            .clusterId                 = SoftwareDiagnostics::Id,
+            .fixedClusterInstanceCount = SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
+            .fetchFeatureMap           = false,
+            .fetchOptionalAttributes   = true,
+        },
+        integrationDelegate);
 }
 
-void emberAfSoftwareDiagnosticsClusterShutdownCallback(EndpointId endpointId)
+void MatterSoftwareDiagnosticsClusterShutdownCallback(EndpointId endpointId)
 {
-    VerifyOrReturn(endpointId == kRootEndpointId);
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to unregister SoftwareDiagnostics on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId,
-                     err.Format());
-    }
-    gServer.Destroy();
+    IntegrationDelegate integrationDelegate;
+
+    // register a singleton server (root endpoint only)
+    CodegenClusterIntegration::UnregisterServer(
+        {
+            .endpointId                = endpointId,
+            .clusterId                 = SoftwareDiagnostics::Id,
+            .fixedClusterInstanceCount = SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size(),
+            .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
+        },
+        integrationDelegate);
 }
 
 void MatterSoftwareDiagnosticsPluginServerInitCallback() {}

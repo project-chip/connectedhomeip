@@ -26,6 +26,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 #include <algorithm>
 #include <cstdlib>
@@ -49,8 +50,10 @@ constexpr chip::ClusterId kCluster3 = 3;
 class FakeServerClusterInterface : public DefaultServerCluster
 {
 public:
-    FakeServerClusterInterface(const ConcreteClusterPath & path) : DefaultServerCluster(path) {}
-    FakeServerClusterInterface(EndpointId endpoint, ClusterId cluster) : DefaultServerCluster({ endpoint, cluster }) {}
+    constexpr FakeServerClusterInterface(ConcreteClusterPath && path) : DefaultServerCluster(std::move(path)) {}
+    constexpr FakeServerClusterInterface(EndpointId endpoint, ClusterId cluster) :
+        DefaultServerCluster(ConcreteClusterPath::ConstExpr(endpoint, cluster))
+    {}
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override
@@ -370,7 +373,7 @@ TEST_F(TestSingleEndpointServerClusterRegistry, Context)
 
         // set up the registry
         TestServerClusterContext context;
-        EXPECT_EQ(registry.SetContext(context.Create()), CHIP_NO_ERROR);
+        EXPECT_EQ(registry.SetContext(ServerClusterContext{ context.Get() }), CHIP_NO_ERROR);
 
         EXPECT_TRUE(cluster1.HasContext());
         EXPECT_FALSE(cluster2.HasContext());
@@ -386,7 +389,7 @@ TEST_F(TestSingleEndpointServerClusterRegistry, Context)
         EXPECT_FALSE(cluster2.HasContext());
         EXPECT_FALSE(cluster3.HasContext());
 
-        EXPECT_EQ(registry.SetContext(context.Create()), CHIP_NO_ERROR);
+        EXPECT_EQ(registry.SetContext(ServerClusterContext{ context.Get() }), CHIP_NO_ERROR);
         EXPECT_TRUE(cluster1.HasContext());
         EXPECT_TRUE(cluster2.HasContext());
         EXPECT_FALSE(cluster3.HasContext());
@@ -401,7 +404,7 @@ TEST_F(TestSingleEndpointServerClusterRegistry, Context)
         EXPECT_TRUE(cluster3.HasContext());
 
         // re-setting context works
-        EXPECT_EQ(registry.SetContext(context.Create()), CHIP_NO_ERROR);
+        EXPECT_EQ(registry.SetContext(ServerClusterContext{ context.Get() }), CHIP_NO_ERROR);
         EXPECT_TRUE(cluster1.HasContext());
         EXPECT_FALSE(cluster2.HasContext());
         EXPECT_TRUE(cluster3.HasContext());
@@ -409,7 +412,7 @@ TEST_F(TestSingleEndpointServerClusterRegistry, Context)
         // also not valid, but different
         TestServerClusterContext otherContext;
 
-        EXPECT_EQ(registry.SetContext(otherContext.Create()), CHIP_NO_ERROR);
+        EXPECT_EQ(registry.SetContext(ServerClusterContext{ otherContext.Get() }), CHIP_NO_ERROR);
         EXPECT_TRUE(cluster1.HasContext());
         EXPECT_FALSE(cluster2.HasContext());
         EXPECT_TRUE(cluster3.HasContext());
@@ -539,7 +542,7 @@ TEST_F(TestSingleEndpointServerClusterRegistry, StartupErrors)
         EXPECT_FALSE(cluster2.HasContext());
 
         TestServerClusterContext context;
-        EXPECT_EQ(registry.SetContext(context.Create()), CHIP_ERROR_HAD_FAILURES);
+        EXPECT_EQ(registry.SetContext(ServerClusterContext{ context.Get() }), CHIP_ERROR_HAD_FAILURES);
         EXPECT_TRUE(cluster1.HasContext());
         EXPECT_FALSE(cluster2.HasContext());
 
@@ -576,7 +579,7 @@ TEST_F(TestSingleEndpointServerClusterRegistry, AllClustersIteration)
     EXPECT_NE(std::find(found_clusters.begin(), found_clusters.end(), &cluster2), found_clusters.end());
     EXPECT_NE(std::find(found_clusters.begin(), found_clusters.end(), &cluster3), found_clusters.end());
 
-    registry.Unregister(&cluster2);
+    EXPECT_SUCCESS(registry.Unregister(&cluster2));
 
     found_clusters.clear();
     for (auto * cluster : registry.AllServerClusterInstances())

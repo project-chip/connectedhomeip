@@ -37,10 +37,11 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 
 logger = logging.getLogger(__name__)
 
@@ -114,13 +115,18 @@ class TC_AVSM_2_2(MatterBaseTest):
                 "TH sends the SnapshotStreamAllocate command with values from step 6 except with MaxResolution set to {0,0} (outside of valid range).",
                 "DUT responds with a CONSTRAINT_ERROR status code.",
             ),
+            TestStep(
+                14,
+                "TH sends the SnapshotStreamAllocate command with values from step 6 except with Min and MaxResolution range not matching any entry in aSnapshotCapabilities.",
+                "DUT responds with a DYNAMIC_CONSTRAINT_ERROR status code.",
+            ),
         ]
 
     @run_if_endpoint_matches(
         has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kSnapshot)
     )
     async def test_TC_AVSM_2_2(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.CameraAvStreamManagement
         attr = Clusters.CameraAvStreamManagement.Attributes
         commands = Clusters.CameraAvStreamManagement.Commands
@@ -311,6 +317,47 @@ class TC_AVSM_2_2(MatterBaseTest):
                 "Unexpected status returned when expecting CONSTRAINT_ERROR due to MaxResolution set to {0,0} (outside of valid range)",
             )
             pass
+        self.step(14)
+        maxRes = Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(width=0, height=0)
+        for capability in aSnapshotCapabilities:
+            if capability.resolution.width > maxRes.width and capability.resolution.height > maxRes.height:
+                maxRes = capability.resolution
+        newResolution = Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(
+            width=maxRes.width + 1, height=maxRes.height + 1)
+        try:
+            # Set the min and max resolution range so that no snapshot
+            # capability resolution fall within it
+            snpStreamAllocateCmd = commands.SnapshotStreamAllocate(
+                imageCodec=aSnapshotCapabilities[0].imageCodec,
+                maxFrameRate=aSnapshotCapabilities[0].maxFrameRate,
+                minResolution=newResolution,
+                maxResolution=newResolution,
+                quality=90,
+                watermarkEnabled=watermark,
+                OSDEnabled=osd,
+            )
+            await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
+            asserts.fail(
+                "Unexpected success when expecting DYNAMIC_CONSTRAINT_ERROR due to Min and MaxResolution not matching any entry in snapshotCapabilities)",
+            )
+        except InteractionModelError as e:
+            asserts.assert_equal(
+                e.status,
+                Status.DynamicConstraintError,
+                "Unexpected status returned when expecting DYNAMIC_CONSTRAINT_ERROR due to Min and MaxResolution not matching any entry in snapshotCapabilities)",
+            )
+            pass
+
+        # Clear all allocated streams
+        aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
+        )
+
+        for stream in aAllocatedSnapshotStreams:
+            try:
+                await self.send_single_cmd(endpoint=endpoint, cmd=commands.SnapshotStreamDeallocate(snapshotStreamID=(stream.snapshotStreamID)))
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
 
 if __name__ == "__main__":

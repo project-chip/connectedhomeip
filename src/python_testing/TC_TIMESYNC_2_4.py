@@ -38,11 +38,12 @@
 import typing
 from datetime import timedelta
 
-import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
-from chip.testing.timeoperations import utc_time_in_matter_epoch
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
+from matter.testing.timeoperations import utc_time_in_matter_epoch
 
 
 class TC_TIMESYNC_2_4(MatterBaseTest):
@@ -52,7 +53,7 @@ class TC_TIMESYNC_2_4(MatterBaseTest):
 
     async def send_set_time_zone_cmd(self, tz: typing.List[Clusters.Objects.TimeSynchronization.Structs.TimeZoneStruct]) -> Clusters.Objects.TimeSynchronization.Commands.SetTimeZoneResponse:
         ret = await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetTimeZone(timeZone=tz), endpoint=self.endpoint)
-        asserts.assert_true(type_matches(ret, Clusters.Objects.TimeSynchronization.Commands.SetTimeZoneResponse),
+        asserts.assert_true(matchers.is_type(ret, Clusters.Objects.TimeSynchronization.Commands.SetTimeZoneResponse),
                             "Unexpected return type for SetTimeZone")
         return ret
 

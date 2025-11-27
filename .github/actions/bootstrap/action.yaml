@@ -25,13 +25,41 @@ runs:
         # In addition to the various setup files, the work directory matters as well,
         # because the bootstrapped Pigweed environment contains absolute paths.
         echo "Calculating bootstrap cache key for '$PWD'"
+        echo "Runner info:"
+        echo "  RUNNER_OS=$RUNNER_OS"
+        echo "  RUNNER_ARCH=$RUNNER_ARCH"
+        echo "  inputs.platform=${{ inputs.platform }}"
+        echo "  ImageOS=${ImageOS:-unknown}"
+        echo "  ImageVersion=${ImageVersion:-unknown}"
         FILES_HASH="${{ hashFiles('scripts/setup/*', 'scripts/tests/requirements.txt', 'scripts/py_matter_idl/*', 'third_party/pigweed/**') }}"
         case "$RUNNER_OS" in
-          macOS) OS_HASH="$(sw_vers | shasum -a 256 | cut -d' ' -f1)";;
-          *)     OS_HASH="$(shasum -a 256 /etc/lsb-release | cut -d' ' -f1)";;
+          macOS)
+            echo "+ sw_vers output:"
+            sw_vers || true
+            echo "+ uname -a:"
+            uname -a || true
+            echo "+ Xcode version:"
+            xcodebuild -version || true
+            OS_HASH="$(sw_vers | shasum -a 256 | cut -d' ' -f1)"
+            ;;
+          *)
+            echo "+ /etc/lsb-release:"
+            cat /etc/lsb-release || true
+            echo "+ uname -a:"
+            uname -a || true
+            OS_HASH="$(shasum -a 256 /etc/lsb-release | cut -d' ' -f1)"
+            ;;
         esac
+        echo "+ python details:"
+        echo "  which python: $(command -v python || true)"
+        echo "  python --version: $(python --version 2>&1 || true)"
         PYTHON_HASH="$(python --version | shasum -a 256 | cut -d' ' -f1)"
         FINAL_HASH="$(echo "$PWD:$FILES_HASH:$OS_HASH:$PYTHON_HASH" | shasum -a 256 | cut -d' ' -f1)"
+        echo "Hash components:"
+        echo "  FILES_HASH=$FILES_HASH"
+        echo "  OS_HASH=$OS_HASH"
+        echo "  PYTHON_HASH=$PYTHON_HASH"
+        echo "  FINAL_HASH=$FINAL_HASH"
         echo key="${RUNNER_OS}-${RUNNER_ARCH}-${{ inputs.platform }}-${FINAL_HASH}" | tee -a "$GITHUB_OUTPUT"
 
         # Split caches across backends
@@ -62,7 +90,9 @@ runs:
 
     - name: Save bootstrap cache
       uses: ./.github/actions/dynamic
-      if: ${{ fromJSON(steps.restore.outputs.outputs).cache-hit != 'true' }}
+      # Don't save cache if the build is a pull request, to prevent creation of multiple pr-ref caches with the same key.
+      # PR builds still will be able to restore from cache created by master build.
+      if: ${{ fromJSON(steps.restore.outputs.outputs).cache-hit != 'true' && github.event_name != 'pull_request' }}
       continue-on-error: true
       with:
         action: ${{ steps.prepare.outputs.backend }}/cache/save@v4
@@ -77,6 +107,7 @@ runs:
       if: ${{ always() && !env.ACT && fromJSON(steps.restore.outputs.outputs).cache-hit != 'true' }}
       with:
         name: ${{ inputs.bootstrap-log-name }}
+        overwrite: true # may as well, avoid errors of "artifact already exists"
         path: |
             .environment/gn_out/.ninja_log
             .environment/pigweed-venv/*.log

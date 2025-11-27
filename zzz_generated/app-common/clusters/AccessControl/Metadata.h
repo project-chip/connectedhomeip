@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -16,9 +17,10 @@ namespace app {
 namespace Clusters {
 namespace AccessControl {
 
-inline constexpr uint32_t kRevision = 2;
+inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
+
 namespace Acl {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(Acl::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
@@ -55,10 +57,23 @@ inline constexpr DataModel::AttributeEntry
     kMetadataEntry(Arl::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
 } // namespace Arl
+namespace AuxiliaryACL {
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(AuxiliaryACL::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kAdminister, std::nullopt);
+} // namespace AuxiliaryACL
+constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
+    Acl::kMetadataEntry,
+    SubjectsPerAccessControlEntry::kMetadataEntry,
+    TargetsPerAccessControlEntry::kMetadataEntry,
+    AccessControlEntriesPerFabric::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace ReviewFabricRestrictions {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(ReviewFabricRestrictions::Id,
@@ -78,6 +93,9 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kAdmin
 namespace FabricRestrictionReviewUpdate {
 inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kAdminister };
 } // namespace FabricRestrictionReviewUpdate
+namespace AuxiliaryAccessUpdated {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kAdminister };
+} // namespace AuxiliaryAccessUpdated
 
 } // namespace Events
 } // namespace AccessControl

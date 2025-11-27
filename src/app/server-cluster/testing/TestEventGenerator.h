@@ -20,68 +20,105 @@
 #include <app/EventLoggingTypes.h>
 #include <app/data-model-provider/EventsGenerator.h>
 #include <app/data-model/Decode.h>
+#include <deque>
 
 namespace chip {
 namespace Test {
 
-/// Keeps the "last event" in-memory to allow tests to validate
-/// that event writing and encoding worked.
-///
-/// Provides the ability to get last event information as well as
-/// to decode the last event contents for inspection.
+/// Keeps a queue of generated events that can be acquired later for testing purposes
 class LogOnlyEvents : public app::DataModel::EventsGenerator
 {
 public:
+    // struct to hold information about a generated event
+    struct EventInformation
+    {
+        EventNumber eventNumber;
+        app::EventOptions eventOptions;
+        bool wasDeliveredUrgently{ false };
+        ByteSpan GetEncodeByteSpan() const { return ByteSpan(mEventEncodeBuffer, mEncodedLength); }
+
+        // This relies on the default encoding of events which uses
+        // DataModel::Encode on a EventDataIB::Tag::kData
+        // The caller MUST ensure that T is the correct type for the event
+        // Use app::Clusters::<ClusterName>::Events::<EventName>::DecodableType to be spec compliant
+        template <typename T>
+        CHIP_ERROR GetEventData(T & dest)
+        {
+            // attempt to decode the last encoded event
+            TLV::TLVReader reader;
+            TLV::TLVType outerType;
+
+            reader.Init(GetEncodeByteSpan());
+
+            ReturnErrorOnFailure(reader.Next());
+            ReturnErrorOnFailure(reader.EnterContainer(outerType));
+
+            ReturnErrorOnFailure(reader.Next()); // MUST be positioned on the first element
+            ReturnErrorOnFailure(app::DataModel::Decode(reader, dest));
+
+            ReturnErrorOnFailure(reader.ExitContainer(outerType));
+
+            return CHIP_NO_ERROR;
+        }
+
+    private:
+        uint8_t mEventEncodeBuffer[128];
+        uint32_t mEncodedLength;
+
+        friend class LogOnlyEvents;
+    };
+
+    // Marks the last event (that has the given fabric index if given any) as delivered urgently.
+    void ScheduleUrgentEventDeliverySync(std::optional<FabricIndex> fabricIndex = std::nullopt) override
+    {
+        for (auto it = mEventQueue.rbegin(); it != mEventQueue.rend(); ++it)
+        {
+            if (!fabricIndex.has_value() || it->eventOptions.mFabricIndex == fabricIndex.value())
+            {
+                it->wasDeliveredUrgently = true;
+                break;
+            }
+        }
+    }
+
     CHIP_ERROR GenerateEvent(app::EventLoggingDelegate * eventContentWriter, const app::EventOptions & options,
                              EventNumber & generatedEventNumber) override
     {
         TLV::TLVWriter writer;
         TLV::TLVType outerType;
-        writer.Init(mLastEventEncodeBuffer);
+
+        EventInformation eventInfo;
+        writer.Init(eventInfo.mEventEncodeBuffer);
 
         ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
         ReturnErrorOnFailure(eventContentWriter->WriteEvent(writer));
         ReturnErrorOnFailure(writer.EndContainer(outerType));
         ReturnErrorOnFailure(writer.Finalize());
-        mLastEncodedSpan = ByteSpan(mLastEventEncodeBuffer, writer.GetLengthWritten());
+        eventInfo.mEncodedLength = writer.GetLengthWritten();
+        eventInfo.eventOptions   = options;
+        eventInfo.eventNumber = generatedEventNumber = ++mCurrentEventNumber;
 
-        mLastOptions         = options;
-        generatedEventNumber = ++mCurrentEventNumber;
+        mEventQueue.push_back(eventInfo);
 
         return CHIP_NO_ERROR;
     }
 
-    [[nodiscard]] EventNumber CurrentEventNumber() const { return mCurrentEventNumber; }
-    [[nodiscard]] const app::EventOptions & LastOptions() const { return mLastOptions; }
-    [[nodiscard]] ByteSpan LastWrittenEvent() const { return mLastEncodedSpan; }
-
-    // This relies on the default encoding of events which uses
-    // DataModel::Encode on a EventDataIB::Tag::kData
-    template <typename T>
-    CHIP_ERROR DecodeLastEvent(T & dest)
+    // Returns next event in the event queue, removing it from the queue.
+    // Returns `std::nullopt` if no event is in the queue (i.e. no event was generated after consuming last generated one).
+    [[nodiscard]] std::optional<EventInformation> GetNextEvent()
     {
-        // attempt to decode the last encoded event
-        TLV::TLVReader reader;
-        TLV::TLVType outerType;
-
-        reader.Init(LastWrittenEvent());
-
-        ReturnErrorOnFailure(reader.Next());
-        ReturnErrorOnFailure(reader.EnterContainer(outerType));
-
-        ReturnErrorOnFailure(reader.Next()); // MUST be positioned on the first element
-        ReturnErrorOnFailure(app::DataModel::Decode(reader, dest));
-
-        ReturnErrorOnFailure(reader.ExitContainer(outerType));
-
-        return CHIP_NO_ERROR;
+        if (mEventQueue.empty())
+        {
+            return std::nullopt;
+        }
+        std::optional<EventInformation> info{ std::move(mEventQueue.front()) };
+        mEventQueue.pop_front();
+        return info;
     }
 
 private:
+    std::deque<EventInformation> mEventQueue;
     EventNumber mCurrentEventNumber = 0;
-    app::EventOptions mLastOptions;
-    uint8_t mLastEventEncodeBuffer[128];
-    ByteSpan mLastEncodedSpan;
 };
 
 } // namespace Test

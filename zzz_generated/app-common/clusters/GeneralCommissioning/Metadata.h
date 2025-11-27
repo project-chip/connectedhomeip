@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace GeneralCommissioning {
 inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
+
 namespace Breadcrumb {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Breadcrumb::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kAdminister);
@@ -74,10 +76,16 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(IsCommissioningWithout
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
                                                           std::nullopt);
 } // namespace IsCommissioningWithoutPower
+constexpr std::array<DataModel::AttributeEntry, 5> kMandatoryMetadata = {
+    Breadcrumb::kMetadataEntry,         BasicCommissioningInfo::kMetadataEntry,       RegulatoryConfig::kMetadataEntry,
+    LocationCapability::kMetadataEntry, SupportsConcurrentConnection::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace ArmFailSafe {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ArmFailSafe::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kAdminister);

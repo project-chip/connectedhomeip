@@ -149,7 +149,7 @@ CHIP_ERROR AsyncTransferFacilitator::OnMessageReceived(Messaging::ExchangeContex
 
         // This should notify the transfer object to abort transfer so it can send a status report across the exchange
         // when we call ProcessOutputEvents below.
-        mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(err));
+        TEMPORARY_RETURN_IGNORED mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(err));
     }
     else if (!payloadHeader.HasMessageType(MessageType::BlockAckEOF))
     {
@@ -199,7 +199,7 @@ void AsyncResponder::NotifyEventHandled(const TransferSession::OutputEventType e
     {
         // If there was an error handling the output event, this should notify the transfer object to abort transfer
         // so it can send a status report across the exchange when we call ProcessOutputEvents below.
-        mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(status));
+        TEMPORARY_RETURN_IGNORED mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(status));
     }
 
     ProcessOutputEvents();

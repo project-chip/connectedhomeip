@@ -35,10 +35,11 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 # This test requires several additional command line arguments
 # run with
@@ -75,7 +76,7 @@ class TC_MWOCTRL_2_1(MatterBaseTest):
         return "[TC-MWOCTRL-2.1] Primary functionality with DUT as Server"
 
     def steps_TC_MWOCTRL_2_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read the MaxCookTime attribute and check limits",
                      "Verify that the DUT response contains an elapsed-s value between 1 and 86400 inclusive. Save value as MaxCookTime."
@@ -96,18 +97,20 @@ class TC_MWOCTRL_2_1(MatterBaseTest):
             TestStep(11, "Set the CookTime attribute to 0", "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
             TestStep(12, "Set the CookTime attribute to MaxCookTime+1", "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
         ]
-        return steps
 
     def pics_TC_MWOCTRL_2_1(self) -> list[str]:
-        pics = [
+        return [
             "MWOCTRL.S",
         ]
-        return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_MWOCTRL_2_1(self):
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(1)
         attributes = Clusters.MicrowaveOvenControl.Attributes

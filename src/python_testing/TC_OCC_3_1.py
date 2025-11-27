@@ -38,15 +38,16 @@
 #  [TC-OCC-3.1] test procedure step 3, 4
 #  [TC-OCC-3.2] test precedure step 3a, 3c
 
+import asyncio
 import logging
-import time
 from typing import Any, Optional
 
-import chip.clusters as Clusters
-from chip.interaction_model import Status
-from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import Status
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_OCC_3_1(MatterBaseTest):
@@ -72,7 +73,7 @@ class TC_OCC_3_1(MatterBaseTest):
         return "[TC-OCC-3.1] Primary functionality with server as DUT"
 
     def steps_TC_OCC_3_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commission DUT to TH.", is_commissioning=True),
             TestStep(2, "If HoldTime is supported, TH writes HoldTime attribute to 10 sec on DUT."),
             TestStep(3, "Prompt operator to await until DUT occupancy changes to unoccupied state."),
@@ -84,13 +85,11 @@ class TC_OCC_3_1(MatterBaseTest):
             TestStep("7a", "TH reads Occupancy attribute from DUT. Verify occupancy changed to unoccupied and Occupancy attribute was reported as unoccupied."),
             TestStep("7b", "If supported, verify OccupancyChangedEvent was reported as unoccupied."),
         ]
-        return steps
 
     def pics_TC_OCC_3_1(self) -> list[str]:
-        pics = [
+        return [
             "OCC.S",
         ]
-        return pics
 
     @async_test_body
     async def test_TC_OCC_3_1(self):
@@ -171,7 +170,7 @@ class TC_OCC_3_1(MatterBaseTest):
             self.write_to_app_pipe({"Name": "SetOccupancy", "EndpointId": 1, "Occupancy": 0})
 
         if has_hold_time:
-            time.sleep(hold_time + 2.0)  # add some extra 2 seconds to ensure hold time has passed.
+            await asyncio.sleep(hold_time + 2.0)  # add some extra 2 seconds to ensure hold time has passed.
         else:
             self.wait_for_user_input(
                 prompt_msg="Type any letter and press ENTER after the sensor occupancy is back to unoccupied state (occupancy attribute = 0)")

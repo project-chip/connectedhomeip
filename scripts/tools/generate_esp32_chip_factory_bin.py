@@ -28,6 +28,8 @@ import cryptography.x509
 import esp_idf_nvs_partition_gen.nvs_partition_gen as nvs_partition_gen
 from esp_secure_cert.tlv_format import generate_partition_ds, generate_partition_no_ds, tlv_priv_key_t, tlv_priv_key_type_t
 
+log = logging.getLogger(__name__)
+
 CHIP_TOPDIR = os.path.dirname(os.path.realpath(__file__))[:-len(os.path.join('scripts', 'tools'))]
 sys.path.insert(0, os.path.join(CHIP_TOPDIR, 'scripts', 'tools', 'spake2p'))
 from spake2p import generate_verifier  # noqa: E402 isort:skip
@@ -252,13 +254,13 @@ def get_supported_modes_dict(supported_modes):
 
 def check_str_range(s, min_len, max_len, name):
     if s and ((len(s) < min_len) or (len(s) > max_len)):
-        logging.error('%s must be between %d and %d characters', name, min_len, max_len)
+        log.error("'%s' must be between %d and %d characters", name, min_len, max_len)
         sys.exit(1)
 
 
 def check_int_range(value, min_value, max_value, name):
     if (value is not None) and ((value < min_value) or (value > max_value)):
-        logging.error('%s is out of range, should be in range [%d, %d]', name, min_value, max_value)
+        log.error("'%s' is out of range, should be in range [%d, %d]", name, min_value, max_value)
         sys.exit(1)
 
 
@@ -266,7 +268,7 @@ def validate_args(args):
     # Validate the passcode
     if args.passcode is not None:
         if ((args.passcode < 0x0000001 and args.passcode > 0x5F5E0FE) or (args.passcode in INVALID_PASSCODES)):
-            logging.error('Invalid passcode:' + str(args.passcode))
+            log.error("Invalid passcode: '%s'", args.passcode)
             sys.exit(1)
 
     check_int_range(args.discriminator, 0x0000, 0x0FFF, 'Discriminator')
@@ -282,7 +284,7 @@ def validate_args(args):
     check_str_range(args.mfg_date, 8, 16, 'Manufacturing date')
     check_str_range(args.rd_id_uid, 32, 32, 'Rotating device Unique id')
 
-    logging.info('Discriminator:{} Passcode:{}'.format(args.discriminator, args.passcode))
+    log.info("Discriminator: '%s' Passcode: '%s'", args.discriminator, args.passcode)
 
 
 def gen_spake2p_params(passcode):
@@ -319,10 +321,10 @@ def populate_factory_data(args, spake2p_params):
         secure_cert_partition_file_path = os.path.join(args.output_dir, ESP_SECURE_CERT_PARTITION_BIN)
         if args.ds_peripheral:
             if args.target != "esp32h2":
-                logging.error("DS peripheral is only supported for esp32h2 target")
+                log.error("DS peripheral is only supported for esp32h2 target")
                 exit(1)
             if args.efuse_key_id == -1:
-                logging.error("--efuse-key-id <value> is required when -ds or --ds-peripheral option is used")
+                log.error("--efuse-key-id <value> is required when -ds or --ds-peripheral option is used")
                 exit(1)
             priv_key = tlv_priv_key_t(key_type=tlv_priv_key_type_t.ESP_SECURE_CERT_ECDSA_PERIPHERAL_KEY,
                                       key_path=args.dac_key, key_pass=None)
@@ -431,8 +433,8 @@ def gen_raw_ec_keypair_from_der(key_file, pubkey_raw_file, privkey_raw_file):
     with open(key_file, 'rb') as f:
         key_data = f.read()
 
-    logging.warning('Leaking of DAC private keys may lead to attestation chain revokation')
-    logging.warning('Please make sure the DAC private is key protected using a password')
+    log.warning("Leaking of DAC private keys may lead to attestation chain revokation")
+    log.warning("Please make sure the DAC private is key protected using a password")
 
     # WARNING: Below line assumes that the DAC private key is not protected by a password,
     #          please be careful and use the password-protected key if reusing this code
@@ -464,8 +466,9 @@ def generate_nvs_csv(output_dir, out_csv_filename):
     with open(os.path.join(output_dir, out_csv_filename), 'w') as f:
         f.write(csv_content)
 
-    logging.info('Generated the factory partition csv file : {}'.format(
-        os.path.abspath(os.path.join(output_dir, out_csv_filename))))
+    log.info("Generated the factory partition csv file : '%s'",
+             os.path.abspath(os.path.join(output_dir, out_csv_filename))
+             )
 
 
 def generate_nvs_bin(encrypt, size, csv_filename, bin_filename, output_dir):
@@ -484,12 +487,15 @@ def generate_nvs_bin(encrypt, size, csv_filename, bin_filename, output_dir):
 
 
 def print_flashing_help(encrypt, output_dir,  bin_filename):
-    logging.info('Run below command to flash {}'.format(bin_filename))
-    logging.info('esptool.py -p (PORT) write_flash (FACTORY_PARTITION_ADDR) {}'.format(os.path.join(os.getcwd(), output_dir, bin_filename)))
-    if (encrypt):
-        logging.info('Run below command to flash {}'.format(NVS_KEY_PARTITION_BIN))
-        logging.info('esptool.py -p (PORT) write_flash --encrypt (NVS_KEY_PARTITION_ADDR) {}'.format(
-            os.path.join(os.getcwd(), output_dir, 'keys', NVS_KEY_PARTITION_BIN)))
+    log.info("Run below command to flash '%s'", bin_filename)
+    log.info("esptool.py -p (PORT) write_flash (FACTORY_PARTITION_ADDR) '%s'",
+             os.path.join(os.getcwd(), output_dir, bin_filename)
+             )
+    if encrypt:
+        log.info("Run below command to flash '%s'", NVS_KEY_PARTITION_BIN)
+        log.info("esptool.py -p (PORT) write_flash --encrypt (NVS_KEY_PARTITION_ADDR) '%s'",
+                 os.path.join(os.getcwd(), output_dir, 'keys', NVS_KEY_PARTITION_BIN)
+                 )
 
 
 def clean_up():
@@ -614,8 +620,8 @@ def generate_onboarding_data(args):
     chip_qrcode = payloads.generate_qrcode()
     chip_manualcode = payloads.generate_manualcode()
 
-    logging.info('Generated QR code: ' + chip_qrcode)
-    logging.info('Generated manual code: ' + chip_manualcode)
+    log.info("Generated QR code: '%s'", chip_qrcode)
+    log.info("Generated manual code: '%s'", chip_manualcode)
 
     csv_data = 'qrcode,manualcode\n'
     csv_data += chip_qrcode + ',' + chip_manualcode + '\n'

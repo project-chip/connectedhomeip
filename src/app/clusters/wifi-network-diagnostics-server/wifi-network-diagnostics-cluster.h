@@ -18,27 +18,40 @@
 
 #pragma once
 
-#include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-logic.h>
+#include <app/AttributeValueEncoder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
+#include <clusters/WiFiNetworkDiagnostics/Attributes.h>
 #include <clusters/WiFiNetworkDiagnostics/ClusterId.h>
+#include <clusters/WiFiNetworkDiagnostics/Enums.h>
+#include <lib/core/DataModelTypes.h>
+#include <platform/DiagnosticDataProvider.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 
-class WiFiDiagnosticsServerCluster : public DefaultServerCluster
+class WiFiDiagnosticsServerCluster : public DefaultServerCluster, public DeviceLayer::WiFiDiagnosticsDelegate
 {
 public:
+    // NOTE: this set is smaller than the full optional attributes supported by diagnostics
+    //       as other attributes are controlled by feature flags
+    using OptionalAttributeSet = chip::app::OptionalAttributeSet<WiFiNetworkDiagnostics::Attributes::CurrentMaxRate::Id>;
+
     WiFiDiagnosticsServerCluster(EndpointId endpointId, DeviceLayer::DiagnosticDataProvider & diagnosticProvider,
-                                 const WiFiNetworkDiagnosticsEnabledAttributes & enabledAttributes,
+                                 const OptionalAttributeSet & optionalAttributeSet,
                                  BitFlags<WiFiNetworkDiagnostics::Feature> featureFlags) :
         DefaultServerCluster({ endpointId, WiFiNetworkDiagnostics::Id }),
-        mLogic(endpointId, diagnosticProvider, enabledAttributes, featureFlags)
-    {}
+        mEndpointId(endpointId), mDiagnosticProvider(diagnosticProvider), mOptionalAttributeSet(optionalAttributeSet),
+        mFeatureFlags(featureFlags)
+    {
+        mDiagnosticProvider.SetWiFiDiagnosticsDelegate(this);
+    }
+
+    ~WiFiDiagnosticsServerCluster() { mDiagnosticProvider.SetWiFiDiagnosticsDelegate(nullptr); }
 
     // Server cluster implementation
-
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
@@ -48,10 +61,16 @@ public:
                                                                chip::TLV::TLVReader & input_arguments,
                                                                CommandHandler * handler) override;
 
-    WiFiDiagnosticsServerLogic & GetLogic() { return mLogic; }
+    // DeviceLayer::WiFiDiagnosticsDelegate implementation
+    void OnDisconnectionDetected(uint16_t reasonCode) override;
+    void OnAssociationFailureDetected(uint8_t associationFailureCause, uint16_t status) override;
+    void OnConnectionStatusChanged(uint8_t connectionStatus) override;
 
 private:
-    WiFiDiagnosticsServerLogic mLogic;
+    EndpointId mEndpointId;
+    DeviceLayer::DiagnosticDataProvider & mDiagnosticProvider;
+    const OptionalAttributeSet mOptionalAttributeSet;
+    const BitFlags<WiFiNetworkDiagnostics::Feature> mFeatureFlags;
 };
 
 } // namespace Clusters

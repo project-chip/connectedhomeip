@@ -140,7 +140,7 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     if (event->Type == DeviceEventType::kRtkWiFiStationDisconnectedEvent)
     {
         ChipLogProgress(DeviceLayer, "WiFiStationDisconnected");
-        NetworkCommissioning::AmebaWiFiDriver::GetInstance().SetLastDisconnectReason(event);
+        TEMPORARY_RETURN_IGNORED NetworkCommissioning::AmebaWiFiDriver::GetInstance().SetLastDisconnectReason(event);
         if (mWiFiStationState == kWiFiStationState_Connecting)
         {
             ChangeWiFiStationState(kWiFiStationState_Connecting_Failed);
@@ -194,7 +194,7 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(WiFiStationMode val)
 
     if (val != kWiFiStationMode_ApplicationControlled)
     {
-        DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
     }
 
     if (mWiFiStationMode != val)
@@ -217,7 +217,7 @@ bool ConnectivityManagerImpl::_IsWiFiStationProvisioned(void)
 void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
 {
     // Clear Ameba WiFi station config
-    Internal::AmebaUtils::ClearWiFiConfig();
+    TEMPORARY_RETURN_IGNORED Internal::AmebaUtils::ClearWiFiConfig();
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
@@ -233,7 +233,7 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
 
     mWiFiAPMode = val;
 
-    DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
 
 exit:
     return err;
@@ -244,7 +244,7 @@ void ConnectivityManagerImpl::_DemandStartWiFiAP(void)
     if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
     {
         mLastAPDemandTime = System::SystemClock().GetMonotonicTimestamp();
-        DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
     }
 }
 
@@ -253,7 +253,7 @@ void ConnectivityManagerImpl::_StopOnDemandWiFiAP(void)
     if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
     {
         mLastAPDemandTime = System::Clock::kZero;
-        DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
     }
 }
 
@@ -271,7 +271,7 @@ void ConnectivityManagerImpl::_MaintainOnDemandWiFiAP(void)
 void ConnectivityManagerImpl::_SetWiFiAPIdleTimeout(System::Clock::Timeout val)
 {
     mWiFiAPIdleTimeout = val;
-    DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
 }
 
 #define WIFI_BAND_2_4GHZ 2400
@@ -457,13 +457,13 @@ void ConnectivityManagerImpl::_OnWiFiScanDone()
 {
     // Schedule a call to DriveStationState method in case a station connect attempt was
     // deferred because the scan was in progress.
-    DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
 }
 
 void ConnectivityManagerImpl::_OnWiFiStationProvisionChange()
 {
     // Schedule a call to the DriveStationState method to adjust the station state as needed.
-    DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
 }
 
 // ==================== ConnectivityManager Private Methods ====================
@@ -601,7 +601,6 @@ void ConnectivityManagerImpl::OnStationDisconnected()
     {
         switch (reason)
         {
-        case RTW_NO_ERROR:
         case RTW_NONE_NETWORK:
             associationFailureCause =
                 chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kSsidNotFound);
@@ -612,18 +611,16 @@ void ConnectivityManagerImpl::OnStationDisconnected()
                 chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kAssociationFailed);
             delegate->OnAssociationFailureDetected(associationFailureCause, reason);
             break;
+#if defined(CONFIG_PLATFORM_8710C)
+        case RTW_4WAY_HANDSHAKE_TIMEOUT:
+#endif
         case RTW_WRONG_PASSWORD:
             associationFailureCause = chip::to_underlying(
                 chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kAuthenticationFailed);
             delegate->OnAssociationFailureDetected(associationFailureCause, reason);
             break;
-#if defined(CONFIG_PLATFORM_8710C)
-        case RTW_4WAY_HANDSHAKE_TIMEOUT:
-#endif
         case RTW_DHCP_FAIL:
         case RTW_UNKNOWN:
-            break;
-
         default:
             delegate->OnAssociationFailureDetected(associationFailureCause, reason);
             break;
@@ -631,6 +628,11 @@ void ConnectivityManagerImpl::OnStationDisconnected()
         delegate->OnDisconnectionDetected(reason);
         delegate->OnConnectionStatusChanged(
             chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::ConnectionStatusEnum::kNotConnected));
+    }
+
+    if (reason != RTW_NO_ERROR)
+    {
+        NetworkCommissioning::AmebaWiFiDriver::GetInstance().OnConnectWiFiNetworkFailed(reason);
     }
 
     UpdateInternetConnectivityState();
@@ -643,7 +645,8 @@ void ConnectivityManagerImpl::ChangeWiFiStationState(WiFiStationState newState)
         ChipLogProgress(DeviceLayer, "WiFi station state change: %s -> %s", WiFiStationStateToStr(mWiFiStationState),
                         WiFiStationStateToStr(newState));
         mWiFiStationState = newState;
-        SystemLayer().ScheduleLambda([]() { NetworkCommissioning::AmebaWiFiDriver::GetInstance().OnNetworkStatusChange(); });
+        TEMPORARY_RETURN_IGNORED SystemLayer().ScheduleLambda(
+            []() { NetworkCommissioning::AmebaWiFiDriver::GetInstance().OnNetworkStatusChange(); });
     }
 }
 
@@ -810,7 +813,7 @@ void ConnectivityManagerImpl::RefreshMessageLayer(void) {}
 void ConnectivityManagerImpl::RtkWiFiStationConnectedHandler(char * buf, int buf_len, int flags, void * userdata)
 {
     bool stationConnected;
-    Internal::AmebaUtils::IsStationConnected(stationConnected);
+    TEMPORARY_RETURN_IGNORED Internal::AmebaUtils::IsStationConnected(stationConnected);
     if (Internal::AmebaUtils::IsStationOpenSecurity())
     {
         // continue

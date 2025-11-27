@@ -84,7 +84,7 @@ jobs:
 
         runs-on: ubuntu-latest
         container:
-            image: ghcr.io/project-chip/chip-build-doxygen:153
+            image: ghcr.io/project-chip/chip-build-doxygen:175
 
         if: github.actor != 'restyled-io[bot]'
 
@@ -92,7 +92,7 @@ jobs:
             - name: "Print Actor"
               run: echo ${{github.actor}}
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Generate
               run: scripts/helpers/doxygen.sh
             - name: Extract branch name

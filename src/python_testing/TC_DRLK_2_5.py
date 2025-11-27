@@ -36,10 +36,11 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
 
 logger = logging.getLogger(__name__)
 
@@ -48,10 +49,13 @@ drlkcluster = Clusters.DoorLock
 
 class TC_DRLK_2_5(MatterBaseTest):
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     def steps_TC_DRLK_2_5(self) -> list[TestStep]:
-        steps = [
-
-
+        return [
+            TestStep("precondition", "Commissioning already done.", is_commissioning=True),
             TestStep("1", "TH reads NumberOfWeekDaySchedulesSupportedPerUser attribute.",
                      "Verify that TH is able to read the attribute successfully."),
             TestStep("2a", "TH sends SetUser Command to DUT.", "Verify that the DUT sends SUCCESS response."),
@@ -78,8 +82,6 @@ class TC_DRLK_2_5(MatterBaseTest):
             TestStep("11", "TH sends GetWeekDaySchedule Command to DUT.", "Verify that the DUT sends NOT_FOUND response."),
             TestStep("12", "TH sends ClearUser Command to DUT.", "Verify that the DUT sends SUCCESS response."),
         ]
-
-        return steps
 
     async def read_attributes_from_dut(self, endpoint, cluster, attribute, expected_status: Status = Status.Success):
         try:
@@ -119,7 +121,7 @@ class TC_DRLK_2_5(MatterBaseTest):
                 weekDayIndex=week_day_index, userIndex=user_index),
                 endpoint=self.app_cluster_endpoint,
                 timedRequestTimeoutMs=1000)
-            asserts.assert_true(type_matches(response, Clusters.DoorLock.Commands.GetWeekDayScheduleResponse),
+            asserts.assert_true(matchers.is_type(response, Clusters.DoorLock.Commands.GetWeekDayScheduleResponse),
                                 "Unexpected return type for GetWeekDayScheduleResponse")
 
             if (expected_status == Status.Success):
@@ -193,6 +195,9 @@ class TC_DRLK_2_5(MatterBaseTest):
         start_Minute = 45
         end_Hour = 16
         end_Minute = 55
+
+        # Commissioning
+        self.step("precondition")
 
         self.step("1")
         if self.pics_guard(self.check_pics("DRLK.S.F04") and self.check_pics("DRLK.S.A0014")):

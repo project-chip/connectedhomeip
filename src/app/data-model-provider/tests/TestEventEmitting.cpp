@@ -19,6 +19,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model-provider/EventsGenerator.h>
 #include <app/data-model/Decode.h>
+#include <app/server-cluster/testing/TestEventGenerator.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
 
@@ -32,65 +33,9 @@ using namespace chip::app::DataModel;
 
 using StartUpEventType              = chip::app::Clusters::BasicInformation::Events::StartUp::Type;
 using AccessControlEntryChangedType = chip::app::Clusters::AccessControl::Events::AccessControlEntryChanged::Type;
+using chip::Test::LogOnlyEvents;
 
 constexpr uint32_t kFakeSoftwareVersion = 0x1234abcd;
-
-/// Keeps the "last event" in-memory to allow tests to validate
-/// that event writing and encoding worked.
-class LogOnlyEvents : public EventsGenerator
-{
-public:
-    CHIP_ERROR GenerateEvent(EventLoggingDelegate * eventContentWriter, const EventOptions & options,
-                             EventNumber & generatedEventNumber) override
-    {
-        TLV::TLVWriter writer;
-        TLV::TLVType outerType;
-        writer.Init(mLastEventEncodeBuffer);
-
-        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
-        ReturnErrorOnFailure(eventContentWriter->WriteEvent(writer));
-        ReturnErrorOnFailure(writer.EndContainer(outerType));
-        ReturnErrorOnFailure(writer.Finalize());
-        mLastEncodedSpan = ByteSpan(mLastEventEncodeBuffer, writer.GetLengthWritten());
-
-        mLastOptions         = options;
-        generatedEventNumber = ++mCurrentEventNumber;
-
-        return CHIP_NO_ERROR;
-    }
-
-    EventNumber CurrentEventNumber() const { return mCurrentEventNumber; }
-    const EventOptions & LastOptions() const { return mLastOptions; }
-    ByteSpan LastWrittenEvent() const { return mLastEncodedSpan; }
-
-    // This relies on the default encoding of events which uses
-    // DataModel::Encode on a EventDataIB::Tag::kData
-    template <typename T>
-    CHIP_ERROR DecodeLastEvent(T & dest)
-    {
-        // attempt to decode the last encoded event
-        TLV::TLVReader reader;
-        TLV::TLVType outerType;
-
-        reader.Init(LastWrittenEvent());
-
-        ReturnErrorOnFailure(reader.Next());
-        ReturnErrorOnFailure(reader.EnterContainer(outerType));
-
-        ReturnErrorOnFailure(reader.Next()); // MUST be positioned on the first element
-        ReturnErrorOnFailure(DataModel::Decode(reader, dest));
-
-        ReturnErrorOnFailure(reader.ExitContainer(outerType));
-
-        return CHIP_NO_ERROR;
-    }
-
-private:
-    EventNumber mCurrentEventNumber = 0;
-    EventOptions mLastOptions;
-    uint8_t mLastEventEncodeBuffer[128];
-    ByteSpan mLastEncodedSpan;
-};
 
 } // namespace
 
@@ -103,12 +48,14 @@ TEST(TestInteractionModelEventEmitting, TestBasicType)
 
     std::optional<EventNumber> n1 = events->GenerateEvent(event, 0 /* EndpointId */);
 
-    ASSERT_EQ(n1, logOnlyEvents.CurrentEventNumber());
-    ASSERT_EQ(logOnlyEvents.LastOptions().mPath,
+    auto eventInfo = logOnlyEvents.GetNextEvent();
+    ASSERT_TRUE(eventInfo.has_value());
+    ASSERT_EQ(n1, eventInfo->eventNumber);   // NOLINT(bugprone-unchecked-optional-access)
+    ASSERT_EQ(eventInfo->eventOptions.mPath, // NOLINT(bugprone-unchecked-optional-access)
               ConcreteEventPath(0 /* endpointId */, StartUpEventType::GetClusterId(), StartUpEventType::GetEventId()));
 
     chip::app::Clusters::BasicInformation::Events::StartUp::DecodableType decoded_event;
-    CHIP_ERROR err = logOnlyEvents.DecodeLastEvent(decoded_event);
+    CHIP_ERROR err = eventInfo->GetEventData(decoded_event); // NOLINT(bugprone-unchecked-optional-access)
 
     if (err != CHIP_NO_ERROR)
     {
@@ -118,9 +65,11 @@ TEST(TestInteractionModelEventEmitting, TestBasicType)
     ASSERT_EQ(decoded_event.softwareVersion, kFakeSoftwareVersion);
 
     std::optional<EventNumber> n2 = events->GenerateEvent(event, /* endpointId = */ 1);
-    ASSERT_EQ(n2, logOnlyEvents.CurrentEventNumber());
+    eventInfo                     = logOnlyEvents.GetNextEvent();
+    ASSERT_TRUE(eventInfo.has_value());
+    ASSERT_EQ(n2, eventInfo->eventNumber); // NOLINT(bugprone-unchecked-optional-access)
 
-    ASSERT_EQ(logOnlyEvents.LastOptions().mPath,
+    ASSERT_EQ(eventInfo->eventOptions.mPath, // NOLINT(bugprone-unchecked-optional-access)
               ConcreteEventPath(1 /* endpointId */, StartUpEventType::GetClusterId(), StartUpEventType::GetEventId()));
 }
 
@@ -145,13 +94,14 @@ TEST(TestInteractionModelEventEmitting, TestFabricScoped)
     event.fabricIndex = kTestFabricIndex;
     n1                = events->GenerateEvent(event, /* endpointId = */ 0);
 
-    ASSERT_EQ(n1, logOnlyEvents.CurrentEventNumber());
-    ASSERT_EQ(logOnlyEvents.LastOptions().mPath,
+    auto eventInfo = logOnlyEvents.GetNextEvent();
+    ASSERT_EQ(n1, eventInfo->eventNumber);   // NOLINT(bugprone-unchecked-optional-access)
+    ASSERT_EQ(eventInfo->eventOptions.mPath, // NOLINT(bugprone-unchecked-optional-access)
               ConcreteEventPath(0 /* endpointId */, AccessControlEntryChangedType::GetClusterId(),
                                 AccessControlEntryChangedType::GetEventId()));
 
     chip::app::Clusters::AccessControl::Events::AccessControlEntryChanged::DecodableType decoded_event;
-    CHIP_ERROR err = logOnlyEvents.DecodeLastEvent(decoded_event);
+    CHIP_ERROR err = eventInfo->GetEventData(decoded_event); // NOLINT(bugprone-unchecked-optional-access)
 
     if (err != CHIP_NO_ERROR)
     {

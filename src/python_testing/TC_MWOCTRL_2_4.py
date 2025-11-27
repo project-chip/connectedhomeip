@@ -37,10 +37,11 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 # This test requires several additional command line arguments
 # run with
@@ -57,25 +58,27 @@ class TC_MWOCTRL_2_4(MatterBaseTest):
         return "[TC-MWOCTRL-2.4] WATTS functionality with DUT as Server"
 
     def steps_TC_MWOCTRL_2_4(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read the SupportedWatts attribute"),
             TestStep(3, "Read the SelectedWattIndex attribute"),
             TestStep(4, "Send the SetCookingParameters command"),
             TestStep(5, "Read and verify the SelectedWattIndex attribute"),
         ]
-        return steps
 
     def pics_TC_MWOCTRL_2_4(self) -> list[str]:
-        pics = [
+        return [
             "MWOCTRL.S",
         ]
-        return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_MWOCTRL_2_4(self):
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(1)
         attributes = Clusters.MicrowaveOvenControl.Attributes

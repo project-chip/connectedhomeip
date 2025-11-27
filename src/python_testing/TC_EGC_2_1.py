@@ -39,12 +39,13 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.testing import matter_asserts
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
 from TC_EGCTestBase import ElectricalGridConditionsTestBaseHelper
+
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.testing import matter_asserts
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 
 cluster = Clusters.ElectricalGridConditions
 
@@ -61,7 +62,7 @@ class TC_EGC_2_1(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
         return ["EGC.S"]
 
     def steps_TC_EGC_2_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
                      is_commissioning=True),
             TestStep("2", "TH reads from the DUT the LocalGenerationAvailable attribute.",
@@ -71,7 +72,6 @@ class TC_EGC_2_1(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
             TestStep("4", "TH reads from the DUT the ForecastConditions attribute.",
                      "Verify that the DUT response contains a list of ElectricalGridConditionsStruct entries"),
         ]
-        return steps
 
     @run_if_endpoint_matches(has_cluster(Clusters.ElectricalGridConditions))
     async def test_TC_EGC_2_1(self):

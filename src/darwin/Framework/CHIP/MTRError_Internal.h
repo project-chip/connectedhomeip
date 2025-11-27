@@ -18,7 +18,7 @@
 #import <Foundation/Foundation.h>
 
 #import "MTRDefines_Internal.h"
-#import "MTRError_Testable.h"
+#import "MTRError_Test.h"
 
 #include <app/MessageDef/StatusIB.h>
 #include <lib/core/CHIPError.h>

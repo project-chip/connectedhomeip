@@ -45,18 +45,19 @@ import sys
 from binascii import hexlify, unhexlify
 from typing import Optional
 
-import chip.clusters as Clusters
 import nest_asyncio
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, default_matter_test_main,
-                                         has_command, run_if_endpoint_matches)
-from chip.testing.pics import accepted_cmd_pics_str
-from chip.tlv import TLVReader
-from chip.utils import CommissioningBuildingBlocks
 from ecdsa import NIST256p, VerifyingKey
 from ecdsa.keys import BadSignatureError
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, default_matter_test_main,
+                                           has_command, run_if_endpoint_matches)
+from matter.testing.pics import accepted_cmd_pics_str
+from matter.tlv import TLVReader
+from matter.utils import CommissioningBuildingBlocks
 
 nest_asyncio.apply()
 
@@ -85,14 +86,13 @@ class MatterCertParser:
     def get_subject_names(self) -> dict[int, object]:
         if self.SUBJECT_TAG not in self.parsed_tlv:
             raise ValueError(f"Did not find Subject tag in Matter TLV certificate: {self.parsed_tlv}")
-        return {tag: value for tag, value in self.parsed_tlv[self.SUBJECT_TAG]}
+        return dict(self.parsed_tlv[self.SUBJECT_TAG])
 
     def get_public_key_bytes(self) -> bytes:
         if self.SUBJECT_PUBLIC_KEY_TAG not in self.parsed_tlv:
             raise ValueError(f"Did not find Subject Public Key tag in Matter TLV certificate: {self.parsed_tlv}")
 
-        public_key_bytes = self.parsed_tlv[self.SUBJECT_PUBLIC_KEY_TAG]
-        return public_key_bytes
+        return self.parsed_tlv[self.SUBJECT_PUBLIC_KEY_TAG]
 
 
 # From Matter spec src/crypto_primitives/crypto_primitives.py
@@ -152,9 +152,8 @@ def generate_vendor_fabric_binding_message(
 
     fabric_id_bytes = fabric_id.to_bytes(length=8, byteorder='big')
     vendor_id_bytes = vendor_id.to_bytes(length=2, byteorder='big')
-    vendor_fabric_binding_message = FABRIC_BINDING_VERSION_1.to_bytes(
+    return FABRIC_BINDING_VERSION_1.to_bytes(
         length=1) + root_public_key_bytes + fabric_id_bytes + vendor_id_bytes
-    return vendor_fabric_binding_message
 
 # From Matter spec src/crypto_primitives/vid_verify_payload_test_vector.py
 
@@ -187,6 +186,7 @@ def get_unassigned_fabric_index(fabric_indices: list[int]) -> int:
             return fabric_index
     else:
         asserts.fail(f"Somehow could not find an unallocated fabric index in {fabric_indices}")
+    return None
 
 
 def get_entry_for_fabric(fabric_index: int, entries: list[object]) -> object:
@@ -290,9 +290,10 @@ class test_step(object):
 
     def __exit__(self, exc_type, exc_value, traceback):
         if type is None:
-            return  # No exception
+            return None  # No exception
         if isinstance(exc_value, TestStepBlockPassException):
             return True  # Suppress special exception we expect to see.
+        return None
 
     @property
     def id(self):
@@ -318,7 +319,7 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
     def get_next_step_id(self, current_step_id) -> object:
         if isinstance(current_step_id, int):
             return current_step_id + 1
-        elif isinstance(current_step_id, str):
+        if isinstance(current_step_id, str):
             match = re.search(r"^(?P<step_number>\d+)", current_step_id)
             if match:
                 return int(match.group('step_number')) + 1

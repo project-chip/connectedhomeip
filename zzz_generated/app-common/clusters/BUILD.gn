@@ -63,6 +63,7 @@ template("declare_all_items_target") {
       "${chip_root}/zzz_generated/app-common/clusters/FormaldehydeConcentrationMeasurement" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/GeneralCommissioning" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/GeneralDiagnostics" + invoker.target,
+      "${chip_root}/zzz_generated/app-common/clusters/Groupcast" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/GroupKeyManagement" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/Groups" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/HepaFilterMonitoring" + invoker.target,
@@ -144,6 +145,7 @@ template("declare_all_items_target") {
       "${chip_root}/zzz_generated/app-common/clusters/WakeOnLan" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/WaterHeaterManagement" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/WaterHeaterMode" + invoker.target,
+      "${chip_root}/zzz_generated/app-common/clusters/WaterTankLevelMonitoring" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/WebRTCTransportProvider" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/WebRTCTransportRequestor" + invoker.target,
       "${chip_root}/zzz_generated/app-common/clusters/WiFiNetworkDiagnostics" + invoker.target,
@@ -160,3 +162,7 @@ declare_all_items_target("all-headers") { target = ":headers" }
 declare_all_items_target("all-ids") { target = ":ids" }
 declare_all_items_target("all-metadata") { target = ":metadata" }
 
+source_set("metadata-query") {
+  sources = [ "MetadataQuery.h" ]
+  public_deps = [ ":all-metadata" ]
+}

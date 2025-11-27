@@ -16,12 +16,26 @@
  */
 #include "CodegenInstance.h"
 
+#include <app/clusters/general-commissioning-server/CodegenIntegration.h>
+#include <app/clusters/general-commissioning-server/GeneralCommissioningCluster.h>
+#include <app/clusters/network-commissioning/NetworkCommissioningCluster.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace NetworkCommissioning {
+
+void Instance::CodegenGeneralCommissioningBreadcrumbTracker::SetBreadCrumb(uint64_t value)
+{
+    GeneralCommissioningCluster * cluster = GeneralCommissioning::Instance();
+    if (cluster == nullptr)
+    {
+        ChipLogError(Zcl, "General commissioning cluster not available. Failed to set breadcrumb.");
+        return;
+    }
+    cluster->SetBreadCrumb(value);
+}
 
 CHIP_ERROR Instance::Init()
 {
@@ -31,7 +45,7 @@ CHIP_ERROR Instance::Init()
 
 void Instance::Shutdown()
 {
-    CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster());
+    TEMPORARY_RETURN_IGNORED CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster());
     mCluster.Cluster().Shutdown();
 }
 

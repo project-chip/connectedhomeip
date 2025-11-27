@@ -39,11 +39,12 @@ import asyncio
 import enum
 import logging
 
-import chip.clusters as Clusters
-from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import (AttributeMatcher, MatterBaseTest, TestStep, async_test_body, default_matter_test_main,
-                                         type_matches)
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import (AttributeMatcher, MatterBaseTest, TestStep, async_test_body, default_matter_test_main,
+                                           matchers)
 
 
 class RvcStatusEnum(enum.IntEnum):
@@ -57,11 +58,11 @@ class RvcStatusEnum(enum.IntEnum):
 def error_enum_to_text(error_enum):
     if error_enum == RvcStatusEnum.Success:
         return "Success(0x00)"
-    elif error_enum == RvcStatusEnum.UnsupportedMode:
+    if error_enum == RvcStatusEnum.UnsupportedMode:
         return "UnsupportedMode(0x01)"
-    elif error_enum == RvcStatusEnum.GenericFailure:
+    if error_enum == RvcStatusEnum.GenericFailure:
         return "GenericFailure(0x02)"
-    elif error_enum == RvcStatusEnum.InvalidInMode:
+    if error_enum == RvcStatusEnum.InvalidInMode:
         return "InvalidInMode(0x03)"
     raise AttributeError("Unknown Enum value")
 
@@ -86,7 +87,7 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
         return "[TC-RVCOPSTATE-2.5] Attributes with DUT as Server"
 
     def steps_TC_RVCOPSTATE_2_5(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commissioning, already done", is_commissioning=True),
             TestStep(
                 "2", "Manually put the device in a RVC Run Mode cluster mode with the Idle mode tag and in a device state that allows changing to {PIXIT_RUNMODE_CLEANMODE}"),
@@ -99,13 +100,11 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
             TestStep("9", "Manually confirm DUT has returned to the dock and completed docking-related activities"),
             TestStep("10", "TH reads CurrentMode attribute of the RVC Run Mode cluster"),
         ]
-        return steps
 
     def pics_TC_RVCOPSTATE_2_5(self) -> list[str]:
-        pics = [
+        return [
             "RVCOPSTATE.S",
         ]
-        return pics
 
     async def read_rvcrunm_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.RvcRunMode
@@ -139,9 +138,8 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
         return operational_state
 
     async def send_change_to_mode_cmd(self, new_mode) -> Clusters.Objects.RvcRunMode.Commands.ChangeToModeResponse:
-        ret = await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=new_mode),
-                                         endpoint=self.endpoint)
-        return ret
+        return await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=new_mode),
+                                          endpoint=self.endpoint)
 
     async def send_change_to_mode_with_check(self, new_mode, expected_error):
         response = await self.send_change_to_mode_cmd(new_mode)
@@ -151,7 +149,7 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
     async def send_go_home_cmd(self) -> Clusters.Objects.RvcOperationalState.Commands.OperationalCommandResponse:
         ret = await self.send_single_cmd(cmd=Clusters.Objects.RvcOperationalState.Commands.GoHome(),
                                          endpoint=self.endpoint)
-        asserts.assert_true(type_matches(ret, Clusters.Objects.RvcOperationalState.Commands.OperationalCommandResponse),
+        asserts.assert_true(matchers.is_type(ret, Clusters.Objects.RvcOperationalState.Commands.OperationalCommandResponse),
                             "Unexpected return type for GoHome")
         return ret
 
@@ -160,10 +158,14 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
         asserts.assert_equal(ret.commandResponseState.errorStateID, expected_error,
                              f"errorStateID({ret.commandResponseState.errorStateID}) should be {error_enum_to_text(expected_error)}")
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_RVCOPSTATE_2_5(self):
 
-        self.endpoint = self.get_endpoint(default=1)
+        self.endpoint = self.get_endpoint()
         # Allow some user input steps to be skipped if running under CI
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
 
@@ -171,9 +173,15 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
         self.step("1")
         self.print_step(1, "Commissioning, already done")
 
-        if self.pics_guard(self.check_pics("RVCOPSTATE.S.A0004") and self.check_pics("RVCOPSTATE.S.C80.Rsp")
-                           and self.check_pics("RVCRUNM.S.A0000") and self.check_pics("RVCRUNM.S.A0001")
-                           and self.check_pics("RVCRUNM.S.M.CAN_MANUALLY_CONTROLLED")):
+        required_pics = [
+            "RVCOPSTATE.S.A0004",
+            "RVCOPSTATE.S.C80.Rsp",
+            "RVCRUNM.S.A0000",
+            "RVCRUNM.S.A0001",
+            "RVCRUNM.S.M.CAN_MANUALLY_CONTROLLED",
+            "RVCOPSTATE.S.M.CAN_MANUALLY_CONTROLLED",
+        ]
+        if self.pics_guard(all(self.check_pics(p) for p in required_pics)):
 
             # Manually put the device in a RVC Run Mode cluster mode with the Idle mode tag and in a device state that allows changing to {PIXIT_RUNMODE_CLEANMODE}
             self.step("2")
@@ -234,9 +242,6 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
 
             # TH sends GoHome command to the DUT
             self.step("8")
-
-            # TODO:  add this idle mode set to test plan, as RVC must be idle for GoHome to be performed successfully
-            await self.send_change_to_mode_with_check(idle_mode, RvcStatusEnum.Success)
 
             await self.send_go_home_cmd_with_check(Clusters.OperationalState.Enums.ErrorStateEnum.kNoError)
             await self.read_operational_state_with_check(Clusters.RvcOperationalState.Enums.OperationalStateEnum.kSeekingCharger)

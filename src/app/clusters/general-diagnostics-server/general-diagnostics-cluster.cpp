@@ -214,14 +214,6 @@ HandlePayloadTestRequest(CommandHandler & handler, const ConcreteCommandPath & c
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace {
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
-    GeneralDiagnostics::Attributes::NetworkInterfaces::kMetadataEntry,
-    GeneralDiagnostics::Attributes::RebootCount::kMetadataEntry,
-    GeneralDiagnostics::Attributes::UpTime::kMetadataEntry,
-    GeneralDiagnostics::Attributes::TestEventTriggersEnabled::kMetadataEntry,
-};
-}
 
 CHIP_ERROR GeneralDiagnosticsCluster::Startup(ServerClusterContext & context)
 {
@@ -286,13 +278,12 @@ DataModel::ActionReturnStatus GeneralDiagnosticsCluster::ReadAttribute(const Dat
         // Note: Attribute ID 0x0009 was removed (#30002).
 
     case GeneralDiagnostics::Attributes::FeatureMap::Id: {
-        BitFlags<GeneralDiagnostics::Feature> features;
 
 #if CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1
-        features.Set(Clusters::GeneralDiagnostics::Feature::kDataModelTest);
+        mFeatureFlags.Set(Clusters::GeneralDiagnostics::Feature::kDataModelTest);
 #endif // CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1
 
-        return encoder.Encode(features);
+        return encoder.Encode(mFeatureFlags);
     }
     case GeneralDiagnostics::Attributes::ClusterRevision::Id:
         return encoder.Encode(GeneralDiagnostics::kRevision);
@@ -327,15 +318,18 @@ CHIP_ERROR GeneralDiagnosticsCluster::Attributes(const ConcreteClusterPath & pat
 {
     AttributeListBuilder listBuilder(builder);
 
-    const AttributeListBuilder::OptionalAttributeEntry optionalAttributeEntries[] = {
-        { mEnabledAttributes.enableTotalOperationalHours, GeneralDiagnostics::Attributes::TotalOperationalHours::kMetadataEntry },
-        { mEnabledAttributes.enableBootReason, GeneralDiagnostics::Attributes::BootReason::kMetadataEntry },
-        { mEnabledAttributes.enableActiveHardwareFaults, GeneralDiagnostics::Attributes::ActiveHardwareFaults::kMetadataEntry },
-        { mEnabledAttributes.enableActiveRadioFaults, GeneralDiagnostics::Attributes::ActiveRadioFaults::kMetadataEntry },
-        { mEnabledAttributes.enableActiveNetworkFaults, GeneralDiagnostics::Attributes::ActiveNetworkFaults::kMetadataEntry },
+    static constexpr DataModel::AttributeEntry optionalAttributeEntries[] = {
+        GeneralDiagnostics::Attributes::TotalOperationalHours::kMetadataEntry,
+        GeneralDiagnostics::Attributes::BootReason::kMetadataEntry,
+        GeneralDiagnostics::Attributes::ActiveHardwareFaults::kMetadataEntry,
+        GeneralDiagnostics::Attributes::ActiveRadioFaults::kMetadataEntry,
+        GeneralDiagnostics::Attributes::ActiveNetworkFaults::kMetadataEntry,
+        GeneralDiagnostics::Attributes::UpTime::kMetadataEntry,
+        GeneralDiagnostics::Attributes::DeviceLoadStatus::kMetadataEntry,
     };
 
-    return listBuilder.Append(Span(kMandatoryAttributes), Span(optionalAttributeEntries));
+    return listBuilder.Append(Span(GeneralDiagnostics::Attributes::kMandatoryMetadata), Span(optionalAttributeEntries),
+                              mOptionalAttributeSet);
 }
 
 CHIP_ERROR GeneralDiagnosticsCluster::AcceptedCommands(const ConcreteClusterPath & path,
@@ -370,7 +364,7 @@ void GeneralDiagnosticsCluster::OnDeviceReboot(BootReasonEnum bootReason)
 
     GeneralDiagnostics::Events::BootReason::Type event{ bootReason };
 
-    (void) mContext->interactionContext->eventsGenerator->GenerateEvent(event, kRootEndpointId);
+    (void) mContext->interactionContext.eventsGenerator.GenerateEvent(event, kRootEndpointId);
 }
 
 void GeneralDiagnosticsCluster::OnHardwareFaultsDetect(const GeneralFaults<kMaxHardwareFaults> & previous,
@@ -386,7 +380,7 @@ void GeneralDiagnosticsCluster::OnHardwareFaultsDetect(const GeneralFaults<kMaxH
         reinterpret_cast<const GeneralDiagnostics::HardwareFaultEnum *>(previous.data()), previous.size());
     GeneralDiagnostics::Events::HardwareFaultChange::Type event{ currentList, previousList };
 
-    (void) mContext->interactionContext->eventsGenerator->GenerateEvent(event, kRootEndpointId);
+    (void) mContext->interactionContext.eventsGenerator.GenerateEvent(event, kRootEndpointId);
 }
 
 void GeneralDiagnosticsCluster::OnRadioFaultsDetect(const GeneralFaults<kMaxRadioFaults> & previous,
@@ -402,7 +396,7 @@ void GeneralDiagnosticsCluster::OnRadioFaultsDetect(const GeneralFaults<kMaxRadi
         reinterpret_cast<const GeneralDiagnostics::RadioFaultEnum *>(previous.data()), previous.size());
     GeneralDiagnostics::Events::RadioFaultChange::Type event{ currentList, previousList };
 
-    (void) mContext->interactionContext->eventsGenerator->GenerateEvent(event, kRootEndpointId);
+    (void) mContext->interactionContext.eventsGenerator.GenerateEvent(event, kRootEndpointId);
 }
 
 void GeneralDiagnosticsCluster::OnNetworkFaultsDetect(const GeneralFaults<kMaxNetworkFaults> & previous,
@@ -418,7 +412,7 @@ void GeneralDiagnosticsCluster::OnNetworkFaultsDetect(const GeneralFaults<kMaxNe
         reinterpret_cast<const GeneralDiagnostics::NetworkFaultEnum *>(previous.data()), previous.size());
     GeneralDiagnostics::Events::NetworkFaultChange::Type event{ currentList, previousList };
 
-    (void) mContext->interactionContext->eventsGenerator->GenerateEvent(event, kRootEndpointId);
+    (void) mContext->interactionContext.eventsGenerator.GenerateEvent(event, kRootEndpointId);
 }
 
 CHIP_ERROR GeneralDiagnosticsCluster::ReadNetworkInterfaces(AttributeValueEncoder & aEncoder)
@@ -468,7 +462,7 @@ GeneralDiagnosticsClusterFullConfigurable::InvokeCommand(const DataModel::Invoke
         return HandleTimeSnapshot(*handler, request.path, request_data);
     }
     case GeneralDiagnostics::Commands::PayloadTestRequest::Id: {
-        if (mFunctionConfig.enablePayloadSnaphot)
+        if (mFunctionConfig.enablePayloadSnapshot)
         {
             GeneralDiagnostics::Commands::PayloadTestRequest::DecodableType request_data;
             ReturnErrorOnFailure(request_data.Decode(input_arguments));

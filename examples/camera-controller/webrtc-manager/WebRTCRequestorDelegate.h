@@ -19,22 +19,24 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-enums.h>
-#include <app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-cluster.h>
+#include <app/clusters/webrtc-transport-requestor-server/WebRTCTransportRequestorCluster.h>
 
-class WebRTCRequestorDelegate : public chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorDelegate
+class WebRTCRequestorDelegate : public chip::app::Clusters::WebRTCTransportRequestor::Delegate
 {
 public:
     using ICECandidateStruct  = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
+    using WebRTCSessionStruct = chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type;
     using WebRTCEndReasonEnum = chip::app::Clusters::Globals::WebRTCEndReasonEnum;
 
     WebRTCRequestorDelegate()  = default;
     ~WebRTCRequestorDelegate() = default;
 
-    CHIP_ERROR HandleOffer(uint16_t sessionId, const OfferArgs & args) override;
+    CHIP_ERROR HandleOffer(const WebRTCSessionStruct & session, const OfferArgs & args) override;
 
-    CHIP_ERROR HandleAnswer(uint16_t sessionId, const std::string & sdpAnswer) override;
+    CHIP_ERROR HandleAnswer(const WebRTCSessionStruct & session, const std::string & sdpAnswer) override;
 
-    CHIP_ERROR HandleICECandidates(uint16_t sessionId, const std::vector<ICECandidateStruct> & candidates) override;
+    CHIP_ERROR HandleICECandidates(const WebRTCSessionStruct & session,
+                                   const std::vector<ICECandidateStruct> & candidates) override;
 
-    CHIP_ERROR HandleEnd(uint16_t sessionId, WebRTCEndReasonEnum reasonCode) override;
+    CHIP_ERROR HandleEnd(const WebRTCSessionStruct & session, WebRTCEndReasonEnum reasonCode) override;
 };

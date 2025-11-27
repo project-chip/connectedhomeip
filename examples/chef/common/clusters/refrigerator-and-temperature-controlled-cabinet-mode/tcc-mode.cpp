@@ -143,7 +143,7 @@ void emberAfRefrigeratorAndTemperatureControlledCabinetModeClusterInitCallback(c
     gTccModeDelegate = std::make_unique<RefrigeratorAndTemperatureControlledCabinetMode::TccModeDelegate>();
     gTccModeInstance =
         std::make_unique<ModeBase::Instance>(gTccModeDelegate.get(), 0x1, RefrigeratorAndTemperatureControlledCabinetMode::Id, 0);
-    gTccModeInstance->Init();
+    TEMPORARY_RETURN_IGNORED gTccModeInstance->Init();
 }
 
 #endif // MATTER_DM_PLUGIN_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SERVER

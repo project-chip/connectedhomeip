@@ -36,14 +36,15 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 
-import chip.clusters as Clusters
-from chip.testing.matter_stack_state import MatterStackState
-from chip.testing.matter_test_config import MatterTestConfig
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.testing.matter_stack_state import MatterStackState
+from matter.testing.matter_test_config import MatterTestConfig
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
@@ -69,7 +70,7 @@ class TC_ICDM_3_4(MatterBaseTest):
         return "[TC-ICDM-3.4] ICDCounter Persistence with DUT as Server"
 
     def steps_TC_ICDM_3_4(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(0, "Commissioning, already done", is_commissioning=True),
             TestStep(1, "TH reads from the DUT the ICDCounter attribute."),
             TestStep("2a", "Power cycle DUT."),
@@ -78,15 +79,13 @@ class TC_ICDM_3_4(MatterBaseTest):
                             IcdCounter2 is greater or equal to IcdCounter1. \
                             ICDCounter attribute can roll over. If the attribute rolls over, it will be greater or equal to 0.")
         ]
-        return steps
 
     def pics_TC_ICDM_3_4(self) -> list[str]:
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
-        pics = [
+        return [
             "ICDM.S",
             "ICDM.S.F00"
         ]
-        return pics
 
     #
     # ICDM 3.4 Test Body
@@ -117,7 +116,7 @@ class TC_ICDM_3_4(MatterBaseTest):
 
         self.step("2b")
         if not is_ci:
-            time.sleep(wait_time_reboot)
+            await asyncio.sleep(wait_time_reboot)
 
         self.step(3)
         if not is_ci:

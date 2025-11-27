@@ -53,17 +53,17 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 
 
 class TC_CCTRL_2_1(MatterBaseTest):
 
     def steps_TC_CCTRL_2_1(self) -> list[TestStep]:
-        steps = [TestStep(1, "Read MCORE.FS PICS code", is_commissioning=True),
-                 TestStep(2, "Validate SupportedDeviceCategories is set accordingly based on MCORE.FS")]
-        return steps
+        return [TestStep(1, "Read MCORE.FS PICS code", is_commissioning=True),
+                TestStep(2, "Validate SupportedDeviceCategories is set accordingly based on MCORE.FS")]
 
     @run_if_endpoint_matches(has_cluster(Clusters.CommissionerControl))
     async def test_TC_CCTRL_2_1(self):

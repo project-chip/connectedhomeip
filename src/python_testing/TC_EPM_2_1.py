@@ -41,10 +41,11 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_EnergyReporting_Utils import EnergyReportingBaseTestHelper
+
+import matter.clusters as Clusters
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +64,7 @@ class TC_EPM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
         return ["EPM.S"]
 
     def steps_TC_EPM_2_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commissioning, already done",
                      is_commissioning=True),
             TestStep("2", "TH reads PowerMode attribute",
@@ -107,8 +108,6 @@ class TC_EPM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
             TestStep("20", "TH reads NeutralCurrent attribute",
                      "Verify that the DUT response contains either null or an int64 value. Value has to be between a range of -2^62 to 2^62."),
         ]
-
-        return steps
 
     @async_test_body
     async def test_TC_EPM_2_1(self):

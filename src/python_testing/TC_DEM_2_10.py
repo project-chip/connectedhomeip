@@ -43,17 +43,17 @@
 
 """Define Matter test case TC_DEM_2_10."""
 
-
+import asyncio
 import logging
 import sys
-import time
 
-import chip.clusters as Clusters
-from chip.interaction_model import Status
-from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_DEMTestBase import DEMTestBase
+
+import matter.clusters as Clusters
+from matter.interaction_model import Status
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
@@ -67,14 +67,13 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
 
     def pics_TC_DEM_2_10(self):
         """Return the PICS definitions associated with this test."""
-        pics = [
+        return [
             "DEM.S"
         ]
-        return pics
 
     def steps_TC_DEM_2_10(self) -> list[TestStep]:
         """Execute the test steps."""
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
                      is_commissioning=True),
             TestStep("2", "TH reads from the DUT the FeatureMap",
@@ -127,8 +126,6 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
                      "The subscription is cancelled successfully"),
         ]
 
-        return steps
-
     @async_test_body
     async def test_TC_DEM_2_10(self):
         # pylint: disable=too-many-locals, too-many-statements
@@ -166,9 +163,9 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
                                 min_interval_sec=0,
                                 max_interval_sec=10, keepSubscriptions=False)
 
-        def accumulate_reports(wait_time):
+        async def accumulate_reports(wait_time):
             logging.info(f"Test will now wait {wait_time} seconds to accumulate reports")
-            time.sleep(wait_time)
+            await asyncio.sleep(wait_time)
 
         self.step("5")
         await self.send_test_event_trigger_user_opt_out_clear_all()
@@ -198,7 +195,7 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
             self.step("8")
             wait = 12  # Wait 12 seconds - the spec says we should only get reports every 10s at most, unless a command changes it
             sub_handler.reset()
-            accumulate_reports(wait)
+            await accumulate_reports(wait)
 
             self.step("9")
             count = sub_handler.attribute_report_counts[Clusters.DeviceEnergyManagement.Attributes.Forecast]
@@ -228,7 +225,7 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
 
             self.step("13")
             wait = 5  # We expect a change to the forecast attribute after the cancel, Wait 5 seconds - allow time for the report to come in
-            accumulate_reports(wait)
+            await accumulate_reports(wait)
 
             self.step("13a")
             count = sub_handler.attribute_report_counts[Clusters.DeviceEnergyManagement.Attributes.Forecast]
@@ -280,7 +277,7 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
 
             self.step("18")
             wait = 12  # Wait 12 seconds - the spec says we should only get reports every 10s at most, unless a command changes it
-            accumulate_reports(wait)
+            await accumulate_reports(wait)
 
             self.step("18a")
             count = sub_handler.attribute_report_counts[Clusters.DeviceEnergyManagement.Attributes.PowerAdjustmentCapability]
@@ -293,7 +290,7 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
 
             self.step("20")
             wait = 5  # We expect a change to the forecast attribute after the cancel, Wait 5 seconds - allow time for the report to come in
-            accumulate_reports(wait)
+            await accumulate_reports(wait)
 
             self.step("20a")
             count = sub_handler.attribute_report_counts[Clusters.DeviceEnergyManagement.Attributes.PowerAdjustmentCapability]

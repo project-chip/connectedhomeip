@@ -38,15 +38,14 @@ import logging
 import os
 import tempfile
 
-import websockets
-from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+from TC_WEBRTCRTestBase import WEBRTCRTestBase
 
-SERVER_URI = "ws://localhost:9002"
+from matter.testing.apps import AppServerSubprocess
+from matter.testing.matter_testing import TestStep, async_test_body, default_matter_test_main
 
 
-class TC_WebRTCRequestor_2_4(MatterBaseTest):
+class TC_WebRTCR_2_4(WEBRTCRTestBase):
     def setup_class(self):
         super().setup_class()
 
@@ -88,19 +87,27 @@ class TC_WebRTCRequestor_2_4(MatterBaseTest):
             self.storage.cleanup()
         super().teardown_class()
 
-    def desc_TC_WebRTCRequestor_2_4(self) -> str:
+    def desc_TC_WebRTCR_2_4(self) -> str:
         """Returns a description of this test"""
-        return "[TC-{picsCode}-2.4] Validate sending an SDP Answer command to {DUT_Server} with an existing session id"
+        return "[TC-{picsCode}-2.4] Validate Answer command with valid session id"
 
-    def steps_TC_WebRTCRequestor_2_4(self) -> list[TestStep]:
+    def steps_TC_WebRTCR_2_4(self) -> list[TestStep]:
         """
         Define the step-by-step sequence for the test.
         """
-        steps = [
+        return [
             TestStep(1, "Commission the {TH_Server} from DUT"),
-            TestStep(2, "Send ProvideOffer command to the {TH_Server}"),
+            TestStep(2, "Trigger {TH_Server} to send an Answer to DUT"),
         ]
-        return steps
+
+    def pics_TC_WebRTCR_2_4(self) -> list[str]:
+        """
+        Return the list of PICS applicable to this test case.
+        """
+        return [
+            "WEBRTCR.S",           # WebRTC Transport Requestor Server
+            "WEBRTCR.S.C01.Rsp",   # Answer command
+        ]
 
     # This test has some manual steps and one sleep for up to 30 seconds. Test typically
     # runs under 1 mins, so 3 minutes is more than enough.
@@ -108,20 +115,8 @@ class TC_WebRTCRequestor_2_4(MatterBaseTest):
     def default_timeout(self) -> int:
         return 3 * 60
 
-    async def send_command(self, command):
-        async with websockets.connect(SERVER_URI) as websocket:
-            logging.info(f"Connected to {SERVER_URI}")
-
-            # Send command
-            logging.info(f"Sending command: {command}")
-            await websocket.send(command)
-
-            # Receive response
-            await websocket.recv()
-            logging.info("Received command response")
-
     @async_test_body
-    async def test_TC_WebRTCRequestor_2_4(self):
+    async def test_TC_WebRTCR_2_4(self):
         """
         Executes the test steps for the WebRTC Provider cluster scenario.
         """
@@ -157,7 +152,7 @@ class TC_WebRTCRequestor_2_4(MatterBaseTest):
         prompt_msg = (
             "\nSend 'ProvideOffer' command to the server app from DUT:\n"
             "  webrtc establish-session 1\n"
-            "Input 'Y' if WebRTC session is successfully established\n"
+            "Input 'Y' if WebRTC session has been successfully established\n"
             "Input 'N' if WebRTC session is not established\n"
         )
 

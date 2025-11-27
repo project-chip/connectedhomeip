@@ -91,7 +91,7 @@ gboolean BluezEndpoint::BluezCharacteristicReadValue(BluezGattCharacteristic1 * 
     ChipLogDetail(DeviceLayer, "Received %s", __func__);
     GVariant * val = bluez_gatt_characteristic1_get_value(aChar);
     bluez_gatt_characteristic1_complete_read_value(aChar, aInvocation, val);
-    return TRUE;
+    return G_DBUS_METHOD_INVOCATION_HANDLED;
 }
 
 gboolean BluezEndpoint::BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation,
@@ -100,38 +100,39 @@ gboolean BluezEndpoint::BluezCharacteristicAcquireWrite(BluezGattCharacteristic1
     int fds[2]             = { -1, -1 };
     BluezConnection * conn = nullptr;
     const char * deviceObjectPath;
+    GAutoPtr<GUnixFDList> fdList;
     uint16_t mtu;
 
-    VerifyOrReturnValue(
-        g_variant_lookup(aOptions, "device", "&o", &deviceObjectPath), FALSE,
-        ChipLogError(DeviceLayer, "FAIL: No device in options in %s", __func__);
-        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "No device object path"));
-    VerifyOrReturnValue(
-        g_variant_lookup(aOptions, "mtu", "q", &mtu), FALSE, ChipLogError(DeviceLayer, "FAIL: No MTU in options in %s", __func__);
-        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "No MTU value"));
+    VerifyOrExit(g_variant_lookup(aOptions, "device", "&o", &deviceObjectPath), {
+        ChipLogError(DeviceLayer, "FAIL: %s: No device in options", __func__);
+        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "No device object path");
+    });
+    VerifyOrExit(g_variant_lookup(aOptions, "mtu", "q", &mtu), {
+        ChipLogError(DeviceLayer, "FAIL: %s: No MTU in options", __func__);
+        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "No MTU value");
+    });
 
     conn = GetBluezConnection(deviceObjectPath);
-    VerifyOrReturnValue(
-        conn != nullptr, FALSE,
-        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "No CHIPoBLE connection for the device"));
+    VerifyOrExit(conn != nullptr, {
+        ChipLogError(DeviceLayer, "FAIL: %s: No CHIPoBLE connection for device %s", __func__, deviceObjectPath);
+        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "No CHIPoBLE connection for the device");
+    });
 
     conn->SetMTU(mtu);
 
-    if (socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_NONBLOCK | SOCK_CLOEXEC, 0, fds) < 0)
-    {
-        ChipLogError(DeviceLayer, "FAIL: socketpair: %s in %s", StringOrNullMarker(strerror(errno)), __func__);
+    VerifyOrExit(socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_NONBLOCK | SOCK_CLOEXEC, 0, fds) == 0, {
+        ChipLogError(DeviceLayer, "FAIL: %s: socketpair: %s", __func__, StringOrNullMarker(strerror(errno)));
         g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "FD creation failed");
-        return FALSE;
-    }
+    });
 
     conn->SetupWriteHandler(fds[0]);
     bluez_gatt_characteristic1_set_write_acquired(aChar, TRUE);
 
-    GUnixFDList * fdList = g_unix_fd_list_new_from_array(&fds[1], 1);
-    bluez_gatt_characteristic1_complete_acquire_write(aChar, aInvocation, fdList, g_variant_new_handle(0), conn->GetMTU());
-    g_object_unref(fdList);
+    fdList.reset(g_unix_fd_list_new_from_array(&fds[1], 1));
+    bluez_gatt_characteristic1_complete_acquire_write(aChar, aInvocation, fdList.get(), g_variant_new_handle(0), conn->GetMTU());
 
-    return TRUE;
+exit:
+    return G_DBUS_METHOD_INVOCATION_HANDLED;
 }
 
 static gboolean BluezCharacteristicAcquireWriteError(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation,
@@ -140,7 +141,7 @@ static gboolean BluezCharacteristicAcquireWriteError(BluezGattCharacteristic1 * 
     ChipLogDetail(DeviceLayer, "Received %s", __func__);
     g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.NotSupported",
                                                "AcquireWrite for characteristic is unsupported");
-    return TRUE;
+    return G_DBUS_METHOD_INVOCATION_HANDLED;
 }
 
 gboolean BluezEndpoint::BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation,
@@ -150,48 +151,48 @@ gboolean BluezEndpoint::BluezCharacteristicAcquireNotify(BluezGattCharacteristic
     BluezConnection * conn       = nullptr;
     bool isAdditionalAdvertising = false;
     const char * deviceObjectPath;
+    GAutoPtr<GUnixFDList> fdList;
     uint16_t mtu;
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     isAdditionalAdvertising = (aChar == mC3.get());
 #endif
 
-    VerifyOrReturnValue(
-        !bluez_gatt_characteristic1_get_notifying(aChar), FALSE,
-        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.NotPermitted", "Already notifying"));
-    VerifyOrReturnValue(
-        g_variant_lookup(aOptions, "device", "&o", &deviceObjectPath), FALSE,
-        ChipLogError(DeviceLayer, "FAIL: No device in options in %s", __func__);
-        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "No device object path"));
-    VerifyOrReturnValue(
-        g_variant_lookup(aOptions, "mtu", "q", &mtu), FALSE, ChipLogError(DeviceLayer, "FAIL: No MTU in options in %s", __func__);
-        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "No MTU value"));
+    VerifyOrExit(!bluez_gatt_characteristic1_get_notifying(aChar),
+                 g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.NotPermitted", "Already notifying"));
+    VerifyOrExit(g_variant_lookup(aOptions, "device", "&o", &deviceObjectPath), {
+        ChipLogError(DeviceLayer, "FAIL: %s: No device in options", __func__);
+        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "No device object path");
+    });
+    VerifyOrExit(g_variant_lookup(aOptions, "mtu", "q", &mtu), {
+        ChipLogError(DeviceLayer, "FAIL: %s: No MTU in options", __func__);
+        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "No MTU value");
+    });
 
     conn = GetBluezConnection(deviceObjectPath);
-    VerifyOrReturnValue(
-        conn != nullptr, FALSE,
-        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "No CHIPoBLE connection for the device"));
+    VerifyOrExit(conn != nullptr, {
+        ChipLogError(DeviceLayer, "FAIL: %s: No CHIPoBLE connection for device %s", __func__, deviceObjectPath);
+        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "No CHIPoBLE connection for the device");
+    });
 
     conn->SetMTU(mtu);
 
-    if (socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_NONBLOCK | SOCK_CLOEXEC, 0, fds) < 0)
-    {
-        ChipLogError(DeviceLayer, "FAIL: socketpair: %s in %s", StringOrNullMarker(strerror(errno)), __func__);
+    VerifyOrExit(socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_NONBLOCK | SOCK_CLOEXEC, 0, fds) == 0, {
+        ChipLogError(DeviceLayer, "FAIL: %s: socketpair: %s", __func__, StringOrNullMarker(strerror(errno)));
         g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "FD creation failed");
-        return FALSE;
-    }
+    });
 
     conn->SetupNotifyHandler(fds[0], isAdditionalAdvertising);
     bluez_gatt_characteristic1_set_notify_acquired(aChar, TRUE);
     conn->SetNotifyAcquired(true);
 
-    GUnixFDList * fdList = g_unix_fd_list_new_from_array(&fds[1], 1);
-    bluez_gatt_characteristic1_complete_acquire_notify(aChar, aInvocation, fdList, g_variant_new_handle(0), conn->GetMTU());
-    g_object_unref(fdList);
+    fdList.reset(g_unix_fd_list_new_from_array(&fds[1], 1));
+    bluez_gatt_characteristic1_complete_acquire_notify(aChar, aInvocation, fdList.get(), g_variant_new_handle(0), conn->GetMTU());
 
     BLEManagerImpl::HandleTXCharCCCDWrite(conn);
 
-    return TRUE;
+exit:
+    return G_DBUS_METHOD_INVOCATION_HANDLED;
 }
 
 static gboolean BluezCharacteristicAcquireNotifyError(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation,
@@ -200,7 +201,7 @@ static gboolean BluezCharacteristicAcquireNotifyError(BluezGattCharacteristic1 *
     ChipLogDetail(DeviceLayer, "Received %s", __func__);
     g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.NotSupported",
                                                "AcquireNotify for characteristic is unsupported");
-    return TRUE;
+    return G_DBUS_METHOD_INVOCATION_HANDLED;
 }
 
 // NOTE: When using with BlueZ >= 5.80, this method can be removed. Also, the GetBluezConnectionViaDevice
@@ -212,13 +213,13 @@ gboolean BluezEndpoint::BluezCharacteristicConfirm(BluezGattCharacteristic1 * aC
     ChipLogDetail(DeviceLayer, "Indication confirmation: conn=%p", conn);
     bluez_gatt_characteristic1_complete_confirm(aChar, aInvocation);
     BLEManagerImpl::HandleTXComplete(conn);
-    return TRUE;
+    return G_DBUS_METHOD_INVOCATION_HANDLED;
 }
 
 static gboolean BluezCharacteristicConfirmError(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation)
 {
     g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "Confirm from characteristic is unsupported");
-    return TRUE;
+    return G_DBUS_METHOD_INVOCATION_HANDLED;
 }
 
 BluezGattCharacteristic1 * BluezEndpoint::CreateGattCharacteristic(BluezGattService1 * aService, const char * aCharName,
@@ -301,15 +302,16 @@ void BluezEndpoint::UpdateConnectionTable(BluezDevice1 & aDevice)
     if (conn != nullptr && !bluez_device1_get_connected(&aDevice))
     {
         ChipLogDetail(DeviceLayer, "BLE connection closed: conn=%p", conn);
+        // Drop the closed connection from the map.
+        mConnMap.erase(objectPath);
         // Notify the BLE layer that the connection was closed.
         BLEManagerImpl::HandleConnectionClosed(conn);
-        mConnMap.erase(objectPath);
         // The BLE layer notification above is done asynchronously (it will be processed
         // in the next event loop iteration). So, we can not delete the connection object
         // immediately, because the BLE layer might still use it. Instead, we will also
         // schedule the deletion of the connection object, so it will happen after the
         // BLE layer has processed the disconnection event.
-        DeviceLayer::SystemLayer().ScheduleLambda([conn] {
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([conn] {
             ChipLogDetail(DeviceLayer, "Freeing BLE connection: conn=%p", conn);
             chip::Platform::Delete(conn);
         });
@@ -371,7 +373,7 @@ BluezGattService1 * BluezEndpoint::CreateGattService(const char * aUUID)
     BluezGattService1 * service;
 
     mServicePath.reset(g_strdup_printf("%s/service", mRootPath.get()));
-    ChipLogDetail(DeviceLayer, "CREATE service object at %s", mServicePath.get());
+    ChipLogDetail(DeviceLayer, "Creating GATT service object at %s", mServicePath.get());
     object = bluez_object_skeleton_new(mServicePath.get());
 
     service = bluez_gatt_service1_skeleton_new();
@@ -573,7 +575,7 @@ void BluezEndpoint::Shutdown()
     // cleanup function releases the D-Bus manager client object, which handles D-Bus
     // signals. Otherwise, we will face race condition when the D-Bus signal is in
     // the middle of being processed when the cleanup function is called.
-    PlatformMgrImpl().GLibMatterContextInvokeSync(
+    TEMPORARY_RETURN_IGNORED PlatformMgrImpl().GLibMatterContextInvokeSync(
         +[](BluezEndpoint * self) {
             self->mAdapter.reset();
             self->mRoot.reset();

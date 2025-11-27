@@ -124,7 +124,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnOpenThreadStateChang
         ChipLogError(DeviceLayer, "Failed to post Thread state change: %" CHIP_ERROR_FORMAT, status.Format());
     }
 
-    DeviceLayer::SystemLayer().ScheduleLambda([]() { ThreadStackMgrImpl()._UpdateNetworkStatus(); });
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([]() { ThreadStackMgrImpl()._UpdateNetworkStatus(); });
 }
 
 template <class ImplClass>
@@ -225,7 +225,8 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnPlatformEvent(const
                         app::Clusters::ThreadNetworkDiagnostics::ConnectionStatusEnum::kNotConnected);
 
                     GeneralFaults<kMaxNetworkFaults> current;
-                    current.add(to_underlying(chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFaultEnum::kLinkDown));
+                    TEMPORARY_RETURN_IGNORED current.add(
+                        to_underlying(chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFaultEnum::kLinkDown));
                     delegate->OnNetworkFaultChanged(mNetworkFaults, current);
                     mNetworkFaults = current;
                 }
@@ -366,7 +367,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AttachToThreadN
 {
     Thread::OperationalDataset current_dataset;
     // Validate the dataset change with the current state
-    ThreadStackMgrImpl().GetThreadProvision(current_dataset);
+    TEMPORARY_RETURN_IGNORED ThreadStackMgrImpl().GetThreadProvision(current_dataset);
     if (dataset.AsByteSpan().data_equal(current_dataset.AsByteSpan()) && callback == nullptr)
     {
         return CHIP_NO_ERROR;
@@ -391,7 +392,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnThreadAttachFinishe
 {
     if (mpConnectCallback != nullptr)
     {
-        DeviceLayer::SystemLayer().ScheduleLambda([this]() {
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this]() {
             VerifyOrReturn(mpConnectCallback != nullptr);
             mpConnectCallback->OnResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
             mpConnectCallback = nullptr;
@@ -472,7 +473,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnNetworkScanFinished
         // If Thread scanning was done before commissioning, turn off the IPv6 interface.
         if (otThreadGetDeviceRole(mOTInst) == OT_DEVICE_ROLE_DISABLED && !otDatasetIsCommissioned(mOTInst))
         {
-            DeviceLayer::SystemLayer().ScheduleLambda([this]() {
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this]() {
                 Impl()->LockThreadStack();
                 otIp6SetEnabled(mOTInst, false);
                 Impl()->UnlockThreadStack();
@@ -481,7 +482,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnNetworkScanFinished
 
         if (mpScanCallback != nullptr)
         {
-            DeviceLayer::SystemLayer().ScheduleLambda([this]() {
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this]() {
                 mpScanCallback->OnFinished(NetworkCommissioning::Status::kSuccess, CharSpan(), &mScanResponseIter);
                 mpScanCallback = nullptr;
             });
@@ -636,424 +637,12 @@ exit:
 }
 
 template <class ImplClass>
-bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_HaveMeshConnectivity()
-{
-    VerifyOrReturnValue(mOTInst, false);
-    bool res;
-    otDeviceRole curRole;
-
-    Impl()->LockThreadStack();
-
-    // Get the current Thread role.
-    curRole = otThreadGetDeviceRole(mOTInst);
-
-    // If Thread is disabled, or the node is detached, then the node has no mesh connectivity.
-    if (curRole == OT_DEVICE_ROLE_DISABLED || curRole == OT_DEVICE_ROLE_DETACHED)
-    {
-        res = false;
-    }
-
-    // If the node is a child, that implies the existence of a parent node which provides connectivity
-    // to the mesh.
-    else if (curRole == OT_DEVICE_ROLE_CHILD)
-    {
-        res = true;
-    }
-
-    // Otherwise, if the node is acting as a router, scan the Thread neighbor table looking for at least
-    // one other node that is also acting as router.
-    else
-    {
-        otNeighborInfoIterator neighborIter = OT_NEIGHBOR_INFO_ITERATOR_INIT;
-        otNeighborInfo neighborInfo;
-
-        res = false;
-
-        while (otThreadGetNextNeighborInfo(mOTInst, &neighborIter, &neighborInfo) == OT_ERROR_NONE)
-        {
-            if (!neighborInfo.mIsChild)
-            {
-                res = true;
-                break;
-            }
-        }
-    }
-
-    Impl()->UnlockThreadStack();
-
-    return res;
-}
-
-template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThreadStatsCounters()
-{
-    VerifyOrReturnError(mOTInst, CHIP_ERROR_INCORRECT_STATE);
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    otError otErr;
-    otOperationalDataset activeDataset;
-
-    Impl()->LockThreadStack();
-#if CHIP_PROGRESS_LOGGING
-    {
-        otDeviceRole role;
-
-        role = otThreadGetDeviceRole(mOTInst);
-        ChipLogProgress(DeviceLayer, "Thread Role:                  %d\n", role);
-    }
-#endif // CHIP_PROGRESS_LOGGING
-
-    if (otDatasetIsCommissioned(mOTInst))
-    {
-        otErr = otDatasetGetActive(mOTInst, &activeDataset);
-        VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
-
-        if (activeDataset.mComponents.mIsChannelPresent)
-        {
-            ChipLogProgress(DeviceLayer, "Thread Channel:               %d\n", activeDataset.mChannel);
-        }
-    }
-
-#if CHIP_PROGRESS_LOGGING
-    {
-        const otIpCounters * ipCounters;
-        const otMacCounters * macCounters;
-
-        macCounters = otLinkGetCounters(mOTInst);
-
-        ChipLogProgress(DeviceLayer,
-                        "Rx Counters:\n"
-                        "PHY Rx Total:                 %" PRIu32 "\n"
-                        "MAC Rx Unicast:               %" PRIu32 "\n"
-                        "MAC Rx Broadcast:             %" PRIu32 "\n"
-                        "MAC Rx Data:                  %" PRIu32 "\n"
-                        "MAC Rx Data Polls:            %" PRIu32 "\n"
-                        "MAC Rx Beacons:               %" PRIu32 "\n"
-                        "MAC Rx Beacon Reqs:           %" PRIu32 "\n"
-                        "MAC Rx Other:                 %" PRIu32 "\n"
-                        "MAC Rx Filtered Whitelist:    %" PRIu32 "\n"
-                        "MAC Rx Filtered DestAddr:     %" PRIu32 "\n",
-                        macCounters->mRxTotal, macCounters->mRxUnicast, macCounters->mRxBroadcast, macCounters->mRxData,
-                        macCounters->mRxDataPoll, macCounters->mRxBeacon, macCounters->mRxBeaconRequest, macCounters->mRxOther,
-                        macCounters->mRxAddressFiltered, macCounters->mRxDestAddrFiltered);
-
-        ChipLogProgress(DeviceLayer,
-                        "Tx Counters:\n"
-                        "PHY Tx Total:                 %" PRIu32 "\n"
-                        "MAC Tx Unicast:               %" PRIu32 "\n"
-                        "MAC Tx Broadcast:             %" PRIu32 "\n"
-                        "MAC Tx Data:                  %" PRIu32 "\n"
-                        "MAC Tx Data Polls:            %" PRIu32 "\n"
-                        "MAC Tx Beacons:               %" PRIu32 "\n"
-                        "MAC Tx Beacon Reqs:           %" PRIu32 "\n"
-                        "MAC Tx Other:                 %" PRIu32 "\n"
-                        "MAC Tx Retry:                 %" PRIu32 "\n"
-                        "MAC Tx CCA Fail:              %" PRIu32 "\n",
-                        macCounters->mTxTotal, macCounters->mTxUnicast, macCounters->mTxBroadcast, macCounters->mTxData,
-                        macCounters->mTxDataPoll, macCounters->mTxBeacon, macCounters->mTxBeaconRequest, macCounters->mTxOther,
-                        macCounters->mTxRetry, macCounters->mTxErrCca);
-
-        ChipLogProgress(DeviceLayer,
-                        "Failure Counters:\n"
-                        "MAC Rx Decrypt Fail:          %" PRIu32 "\n"
-                        "MAC Rx No Frame Fail:         %" PRIu32 "\n"
-                        "MAC Rx Unknown Neighbor Fail: %" PRIu32 "\n"
-                        "MAC Rx Invalid Src Addr Fail: %" PRIu32 "\n"
-                        "MAC Rx FCS Fail:              %" PRIu32 "\n"
-                        "MAC Rx Other Fail:            %" PRIu32 "\n",
-                        macCounters->mRxErrSec, macCounters->mRxErrNoFrame, macCounters->mRxErrUnknownNeighbor,
-                        macCounters->mRxErrInvalidSrcAddr, macCounters->mRxErrFcs, macCounters->mRxErrOther);
-
-        ipCounters = otThreadGetIp6Counters(mOTInst);
-
-        ChipLogProgress(DeviceLayer,
-                        "IP Counters:\n"
-                        "IP Tx Success:                %" PRIu32 "\n"
-                        "IP Rx Success:                %" PRIu32 "\n"
-                        "IP Tx Fail:                   %" PRIu32 "\n"
-                        "IP Rx Fail:                   %" PRIu32 "\n",
-                        ipCounters->mTxSuccess, ipCounters->mRxSuccess, ipCounters->mTxFailure, ipCounters->mRxFailure);
-    }
-#endif // CHIP_PROGRESS_LOGGING
-exit:
-    Impl()->UnlockThreadStack();
-    return err;
-}
-
-template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThreadTopologyMinimal()
-{
-    VerifyOrReturnError(mOTInst, CHIP_ERROR_INCORRECT_STATE);
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-#if CHIP_PROGRESS_LOGGING
-    otError otErr;
-    const otExtAddress * extAddress;
-    uint16_t rloc16;
-    uint16_t routerId;
-    uint16_t leaderRouterId;
-    uint32_t partitionId;
-    int8_t parentAverageRssi;
-    int8_t parentLastRssi;
-    int8_t instantRssi;
-
-    Impl()->LockThreadStack();
-
-    rloc16 = otThreadGetRloc16(mOTInst);
-
-    // Router ID is the top 6 bits of the RLOC
-    routerId = (rloc16 >> 10) & 0x3f;
-
-    leaderRouterId = otThreadGetLeaderRouterId(mOTInst);
-
-    otErr = otThreadGetParentAverageRssi(mOTInst, &parentAverageRssi);
-    VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
-
-    otErr = otThreadGetParentLastRssi(mOTInst, &parentLastRssi);
-    VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
-
-    partitionId = otThreadGetPartitionId(mOTInst);
-
-    extAddress = otLinkGetExtendedAddress(mOTInst);
-
-    instantRssi = otPlatRadioGetRssi(mOTInst);
-
-    ChipLogProgress(DeviceLayer,
-                    "Thread Topology:\n"
-                    "RLOC16:           %04X\n"
-                    "Router ID:        %u\n"
-                    "Leader Router ID: %u\n"
-                    "Parent Avg RSSI:  %d\n"
-                    "Parent Last RSSI: %d\n"
-                    "Partition ID:     %" PRIu32 "\n",
-                    rloc16, routerId, leaderRouterId, parentAverageRssi, parentLastRssi, partitionId);
-
-    ChipLogProgress(DeviceLayer,
-                    "Extended Address: %02X%02X:%02X%02X:%02X%02X:%02X%02X\n"
-                    "Instant RSSI:     %d\n",
-                    extAddress->m8[0], extAddress->m8[1], extAddress->m8[2], extAddress->m8[3], extAddress->m8[4],
-                    extAddress->m8[5], extAddress->m8[6], extAddress->m8[7], instantRssi);
-
-exit:
-    Impl()->UnlockThreadStack();
-
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "GetAndLogThreadTopologyMinimul failed: %" CHIP_ERROR_FORMAT, err.Format());
-    }
-#endif // CHIP_PROGRESS_LOGGING
-    return err;
-}
-
-#define TELEM_NEIGHBOR_TABLE_SIZE (64)
-#define TELEM_PRINT_BUFFER_SIZE (64)
-
-#if CHIP_DEVICE_CONFIG_THREAD_FTD
-template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThreadTopologyFull()
-{
-    VerifyOrReturnError(mOTInst, CHIP_ERROR_INCORRECT_STATE);
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-#if CHIP_PROGRESS_LOGGING
-    otError otErr;
-    otIp6Address * leaderAddr    = NULL;
-    uint8_t * networkData        = NULL;
-    uint8_t * stableNetworkData  = NULL;
-    uint8_t networkDataLen       = 0;
-    uint8_t stableNetworkDataLen = 0;
-    const otExtAddress * extAddress;
-    otNeighborInfo neighborInfo[TELEM_NEIGHBOR_TABLE_SIZE];
-    otNeighborInfoIterator iter;
-    otNeighborInfoIterator iterCopy;
-    char printBuf[TELEM_PRINT_BUFFER_SIZE] = { 0 };
-    uint16_t rloc16;
-    uint16_t routerId;
-    uint16_t leaderRouterId;
-    uint8_t leaderWeight;
-    uint8_t leaderLocalWeight;
-    uint32_t partitionId;
-    int8_t instantRssi;
-    uint8_t networkDataVersion;
-    uint8_t stableNetworkDataVersion;
-    uint16_t neighborTableSize = 0;
-    uint16_t childTableSize    = 0;
-
-    Impl()->LockThreadStack();
-
-    rloc16 = otThreadGetRloc16(mOTInst);
-
-    // Router ID is the top 6 bits of the RLOC
-    routerId = (rloc16 >> 10) & 0x3f;
-
-    leaderRouterId = otThreadGetLeaderRouterId(mOTInst);
-
-    otErr = otThreadGetLeaderRloc(mOTInst, leaderAddr);
-    VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
-
-    leaderWeight = otThreadGetLeaderWeight(mOTInst);
-
-    leaderLocalWeight = otThreadGetLocalLeaderWeight(mOTInst);
-
-    otErr = otNetDataGet(mOTInst, false, networkData, &networkDataLen);
-    VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
-
-    networkDataVersion = otNetDataGetVersion(mOTInst);
-
-    otErr = otNetDataGet(mOTInst, true, stableNetworkData, &stableNetworkDataLen);
-    VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
-
-    stableNetworkDataVersion = otNetDataGetStableVersion(mOTInst);
-
-    extAddress = otLinkGetExtendedAddress(mOTInst);
-
-    partitionId = otThreadGetPartitionId(mOTInst);
-
-    instantRssi = otPlatRadioGetRssi(mOTInst);
-
-    iter              = OT_NEIGHBOR_INFO_ITERATOR_INIT;
-    iterCopy          = OT_NEIGHBOR_INFO_ITERATOR_INIT;
-    neighborTableSize = 0;
-    childTableSize    = 0;
-
-    while (otThreadGetNextNeighborInfo(mOTInst, &iter, &neighborInfo[iter]) == OT_ERROR_NONE)
-    {
-        neighborTableSize++;
-        if (neighborInfo[iterCopy].mIsChild)
-        {
-            childTableSize++;
-        }
-        iterCopy = iter;
-    }
-
-    snprintf(printBuf, TELEM_PRINT_BUFFER_SIZE, "%02X%02X:%02X%02X:%02X%02X:%02X%02X:%02X%02X:%02X%02X:%02X%02X:%02X%02X",
-             leaderAddr->mFields.m8[0], leaderAddr->mFields.m8[1], leaderAddr->mFields.m8[2], leaderAddr->mFields.m8[3],
-             leaderAddr->mFields.m8[4], leaderAddr->mFields.m8[5], leaderAddr->mFields.m8[6], leaderAddr->mFields.m8[7],
-             leaderAddr->mFields.m8[8], leaderAddr->mFields.m8[9], leaderAddr->mFields.m8[10], leaderAddr->mFields.m8[11],
-             leaderAddr->mFields.m8[12], leaderAddr->mFields.m8[13], leaderAddr->mFields.m8[14], leaderAddr->mFields.m8[15]);
-
-    ChipLogProgress(DeviceLayer,
-                    "Thread Topology:\n"
-                    "RLOC16:                        %04X\n"
-                    "Router ID:                     %u\n"
-                    "Leader Router ID:              %u\n"
-                    "Leader Address:                %s\n"
-                    "Leader Weight:                 %d\n"
-                    "Local Leader Weight:           %d\n"
-                    "Network Data Len:              %d\n"
-                    "Network Data Version:          %d\n"
-                    "Stable Network Data Version:   %d\n",
-                    rloc16, routerId, leaderRouterId, printBuf, leaderWeight, leaderLocalWeight, networkDataLen, networkDataVersion,
-                    stableNetworkDataVersion);
-
-    memset(printBuf, 0x00, TELEM_PRINT_BUFFER_SIZE);
-
-    ChipLogProgress(DeviceLayer,
-                    "Extended Address:              %02X%02X:%02X%02X:%02X%02X:%02X%02X\n"
-                    "Partition ID:                  %" PRIx32 "\n"
-                    "Instant RSSI:                  %d\n"
-                    "Neighbor Table Length:         %d\n"
-                    "Child Table Length:            %d\n",
-                    extAddress->m8[0], extAddress->m8[1], extAddress->m8[2], extAddress->m8[3], extAddress->m8[4],
-                    extAddress->m8[5], extAddress->m8[6], extAddress->m8[7], partitionId, instantRssi, neighborTableSize,
-                    childTableSize);
-
-    // Handle each neighbor event seperatly.
-    for (uint32_t i = 0; i < neighborTableSize; i++)
-    {
-        otNeighborInfo * neighbor = &neighborInfo[i];
-
-        if (neighbor->mIsChild)
-        {
-            otChildInfo * child = NULL;
-            otErr               = otThreadGetChildInfoById(mOTInst, neighbor->mRloc16, child);
-            VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
-
-            snprintf(printBuf, TELEM_PRINT_BUFFER_SIZE, ", Timeout: %10" PRIu32 " NetworkDataVersion: %3u", child->mTimeout,
-                     child->mNetworkDataVersion);
-        }
-        else
-        {
-            printBuf[0] = 0;
-        }
-
-        ChipLogProgress(DeviceLayer,
-                        "TopoEntry[%" PRIu32 "]:     %02X%02X:%02X%02X:%02X%02X:%02X%02X\n"
-                        "RLOC:              %04X\n"
-                        "Age:               %3" PRIu32 "\n"
-                        "LQI:               %1d\n"
-                        "AvgRSSI:           %3d\n"
-                        "LastRSSI:          %3d\n",
-                        i, neighbor->mExtAddress.m8[0], neighbor->mExtAddress.m8[1], neighbor->mExtAddress.m8[2],
-                        neighbor->mExtAddress.m8[3], neighbor->mExtAddress.m8[4], neighbor->mExtAddress.m8[5],
-                        neighbor->mExtAddress.m8[6], neighbor->mExtAddress.m8[7], neighbor->mRloc16, neighbor->mAge,
-                        neighbor->mLinkQualityIn, neighbor->mAverageRssi, neighbor->mLastRssi);
-
-        ChipLogProgress(DeviceLayer,
-                        "LinkFrameCounter:  %10" PRIu32 "\n"
-                        "MleFrameCounter:   %10" PRIu32 "\n"
-                        "RxOnWhenIdle:      %c\n"
-                        "FullFunction:      %c\n"
-                        "FullNetworkData:   %c\n"
-                        "IsChild:           %c%s\n",
-                        neighbor->mLinkFrameCounter, neighbor->mMleFrameCounter, neighbor->mRxOnWhenIdle ? 'Y' : 'n',
-                        neighbor->mFullThreadDevice ? 'Y' : 'n', neighbor->mFullNetworkData ? 'Y' : 'n',
-                        neighbor->mIsChild ? 'Y' : 'n', printBuf);
-    }
-
-exit:
-    Impl()->UnlockThreadStack();
-
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "GetAndLogThreadTopologyFull failed: %" CHIP_ERROR_FORMAT, err.Format());
-    }
-#endif // CHIP_PROGRESS_LOGGING
-    return err;
-}
-#else // CHIP_DEVICE_CONFIG_THREAD_FTD
-template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThreadTopologyFull()
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-#endif
-
-template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetPrimary802154MACAddress(uint8_t * buf)
 {
     VerifyOrReturnError(mOTInst, CHIP_ERROR_INCORRECT_STATE);
     const otExtAddress * extendedAddr = otLinkGetExtendedAddress(mOTInst);
     memcpy(buf, extendedAddr, sizeof(otExtAddress));
     return CHIP_NO_ERROR;
-}
-
-template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetExternalIPv6Address(chip::Inet::IPAddress & addr)
-{
-    VerifyOrReturnError(mOTInst, CHIP_ERROR_INCORRECT_STATE);
-    const otNetifAddress * otAddresses = otIp6GetUnicastAddresses(mOTInst);
-
-    // Look only for the global unicast addresses, not internally assigned by Thread.
-    for (const otNetifAddress * otAddress = otAddresses; otAddress != nullptr; otAddress = otAddress->mNext)
-    {
-        if (otAddress->mValid)
-        {
-            switch (otAddress->mAddressOrigin)
-            {
-            case OT_ADDRESS_ORIGIN_THREAD:
-                break;
-            case OT_ADDRESS_ORIGIN_SLAAC:
-            case OT_ADDRESS_ORIGIN_DHCPV6:
-            case OT_ADDRESS_ORIGIN_MANUAL:
-                addr = ToIPAddress(otAddress->mAddress);
-                return CHIP_NO_ERROR;
-            default:
-                break;
-            }
-        }
-    }
-
-    return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 }
 
 template <class ImplClass>
@@ -1068,16 +657,6 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ResetThreadNetworkDia
 {
     // Based on the spec, only OverrunCount should be resetted.
     mOverrunCount = 0;
-}
-
-template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetPollPeriod(uint32_t & buf)
-{
-    VerifyOrReturnError(mOTInst, CHIP_ERROR_INCORRECT_STATE);
-    Impl()->LockThreadStack();
-    buf = otLinkGetPollPeriod(mOTInst);
-    Impl()->UnlockThreadStack();
-    return CHIP_NO_ERROR;
 }
 
 /**
@@ -1826,7 +1405,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::DispatchAddressResolve
         DnsResult * dnsResult = reinterpret_cast<DnsResult *>(context);
         dnsResult->error      = error;
 
-        DeviceLayer::PlatformMgr().ScheduleWork(DispatchResolve, reinterpret_cast<intptr_t>(dnsResult));
+        TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(DispatchResolve, reinterpret_cast<intptr_t>(dnsResult));
     }
 }
 
@@ -1881,7 +1460,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsBrowseResult(otEr
 {
     CHIP_ERROR error;
     // type buffer size is kDnssdTypeAndProtocolMaxSize + . + kMaxDomainNameSize + . + termination character
-    char type[Dnssd::kDnssdTypeAndProtocolMaxSize + SrpClient::kMaxDomainNameSize + 3];
+    char type[Dnssd::kDnssdFullTypeAndProtocolMaxSize + SrpClient::kMaxDomainNameSize + 3];
     // hostname buffer size is kHostNameMaxLength + . + kMaxDomainNameSize + . + termination character
     char hostname[Dnssd::kHostNameMaxLength + SrpClient::kMaxDomainNameSize + 3];
     // secure space for the raw TXT data in the worst-case scenario relevant for Matter:
@@ -1927,7 +1506,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsBrowseResult(otEr
             static_assert(MATTER_ARRAY_SIZE(dnsResult->mMdnsService.mName) >= MATTER_ARRAY_SIZE(serviceName),
                           "The target buffer must be big enough");
             Platform::CopyString(dnsResult->mMdnsService.mName, serviceName);
-            DeviceLayer::PlatformMgr().ScheduleWork(DispatchBrowse, reinterpret_cast<intptr_t>(dnsResult));
+            TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(DispatchBrowse, reinterpret_cast<intptr_t>(dnsResult));
         }
         else
         {
@@ -1942,11 +1521,13 @@ exit:
 
     if (dnsResult == nullptr)
     {
-        DeviceLayer::PlatformMgr().ScheduleWork(DispatchBrowseNoMemory, reinterpret_cast<intptr_t>(aContext));
+        TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(DispatchBrowseNoMemory,
+                                                                         reinterpret_cast<intptr_t>(aContext));
     }
     else
     {
-        DeviceLayer::PlatformMgr().ScheduleWork(DispatchBrowseEmpty, reinterpret_cast<intptr_t>(dnsResult));
+        TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(DispatchBrowseEmpty,
+                                                                         reinterpret_cast<intptr_t>(dnsResult));
     }
 }
 
@@ -1994,7 +1575,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsAddressResolveRes
 
     dnsResult->error = error;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(DispatchResolve, reinterpret_cast<intptr_t>(dnsResult));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(DispatchResolve, reinterpret_cast<intptr_t>(dnsResult));
 }
 
 template <class ImplClass>
@@ -2044,7 +1625,8 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsResolveResult(otE
 exit:
     if (dnsResult == nullptr)
     {
-        DeviceLayer::PlatformMgr().ScheduleWork(DispatchResolveNoMemory, reinterpret_cast<intptr_t>(aContext));
+        TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(DispatchResolveNoMemory,
+                                                                         reinterpret_cast<intptr_t>(aContext));
         return;
     }
 
@@ -2053,11 +1635,12 @@ exit:
     // If IPv6 address in unspecified (AAAA record not present), send additional DNS query to obtain IPv6 address.
     if (otIp6IsAddressUnspecified(&serviceInfo.mHostAddress))
     {
-        DeviceLayer::PlatformMgr().ScheduleWork(DispatchAddressResolve, reinterpret_cast<intptr_t>(dnsResult));
+        TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(DispatchAddressResolve,
+                                                                         reinterpret_cast<intptr_t>(dnsResult));
     }
     else
     {
-        DeviceLayer::PlatformMgr().ScheduleWork(DispatchResolve, reinterpret_cast<intptr_t>(dnsResult));
+        TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(DispatchResolve, reinterpret_cast<intptr_t>(dnsResult));
     }
 }
 

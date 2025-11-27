@@ -128,13 +128,18 @@ DefaultAttributePersistenceProvider gDefaultAttributePersistence;
 CHIP_ERROR CodegenDataModelProvider::Shutdown()
 {
     Reset();
+    mContext.reset();
     mRegistry.ClearContext();
-    return CHIP_NO_ERROR;
+    return DataModel::Provider::Shutdown();
 }
 
 CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext context)
 {
+    // server clusters require a valid persistent storage delegate
+    VerifyOrReturnError(mPersistentStorageDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(DataModel::Provider::Startup(context));
+
+    mContext.emplace(context);
 
     // Ember NVM requires have a data model provider. attempt to create one if one is not available
     //
@@ -145,26 +150,17 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
 #if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
         ChipLogProgress(DataManagement, "Ember attribute persistence requires setting up");
 #endif
-        if (mPersistentStorageDelegate != nullptr)
-        {
-            ReturnErrorOnFailure(gDefaultAttributePersistence.Init(mPersistentStorageDelegate));
-            SetAttributePersistenceProvider(&gDefaultAttributePersistence);
-#if CHIP_CONFIG_DATA_MODEL_EXTRA_LOGGING
-        }
-        else
-        {
-            ChipLogError(DataManagement, "No storage delegate available, will not set up attribute persistence.");
-#endif
-        }
+        ReturnErrorOnFailure(gDefaultAttributePersistence.Init(mPersistentStorageDelegate));
+        SetAttributePersistenceProvider(&gDefaultAttributePersistence);
     }
 
     InitDataModelForTesting();
 
     return mRegistry.SetContext(ServerClusterContext{
-        .provider           = this,
-        .storage            = mPersistentStorageDelegate,
-        .attributeStorage   = GetAttributePersistenceProvider(),
-        .interactionContext = &mContext,
+        .provider           = *this,
+        .storage            = *mPersistentStorageDelegate,
+        .attributeStorage   = *GetAttributePersistenceProvider(), // guaranteed set up by the above logic
+        .interactionContext = *mContext,                          // NOLINT(bugprone-unchecked-optional-access): emplaced above
     });
 }
 
@@ -456,52 +452,9 @@ CHIP_ERROR CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath 
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
     if (interface != nullptr)
     {
-        size_t commandCount = 0;
-
-        CHIP_ERROR err = interface->EnumerateAcceptedCommands(
-            path,
-            [](CommandId id, void * context) -> Loop {
-                *reinterpret_cast<size_t *>(context) += 1;
-                return Loop::Continue;
-            },
-            reinterpret_cast<void *>(&commandCount));
-
-        if (err == CHIP_NO_ERROR)
-        {
-            using EnumerationData = struct
-            {
-                ConcreteCommandPath commandPath;
-                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> * acceptedCommandList;
-                CHIP_ERROR processingError;
-            };
-
-            EnumerationData enumerationData;
-            enumerationData.commandPath         = ConcreteCommandPath(path.mEndpointId, path.mClusterId, kInvalidCommandId);
-            enumerationData.processingError     = CHIP_NO_ERROR;
-            enumerationData.acceptedCommandList = &builder;
-
-            ReturnErrorOnFailure(builder.EnsureAppendCapacity(commandCount));
-
-            ReturnErrorOnFailure(interface->EnumerateAcceptedCommands(
-                path,
-                [](CommandId commandId, void * context) -> Loop {
-                    auto input                    = reinterpret_cast<EnumerationData *>(context);
-                    input->commandPath.mCommandId = commandId;
-                    CHIP_ERROR appendError        = input->acceptedCommandList->Append(AcceptedCommandEntryFor(input->commandPath));
-                    if (appendError != CHIP_NO_ERROR)
-                    {
-                        input->processingError = appendError;
-                        return Loop::Break;
-                    }
-                    return Loop::Continue;
-                },
-                reinterpret_cast<void *>(&enumerationData)));
-            ReturnErrorOnFailure(enumerationData.processingError);
-
-            // the two invocations MUST return the same sizes.
-            VerifyOrReturnError(builder.Size() == commandCount, CHIP_ERROR_INTERNAL);
-            return CHIP_NO_ERROR;
-        }
+        CHIP_ERROR err = interface->RetrieveAcceptedCommands(path, builder);
+        // If retrieving the accepted commands returns CHIP_ERROR_NOT_IMPLEMENTED then continue with normal procesing.
+        // Otherwise we finished.
         VerifyOrReturnError(err == CHIP_ERROR_NOT_IMPLEMENTED, err);
     }
 
@@ -544,49 +497,9 @@ CHIP_ERROR CodegenDataModelProvider::GeneratedCommands(const ConcreteClusterPath
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(path.mEndpointId, path.mClusterId);
     if (interface != nullptr)
     {
-        size_t commandCount = 0;
-
-        CHIP_ERROR err = interface->EnumerateGeneratedCommands(
-            path,
-            [](CommandId id, void * context) -> Loop {
-                *reinterpret_cast<size_t *>(context) += 1;
-                return Loop::Continue;
-            },
-            reinterpret_cast<void *>(&commandCount));
-
-        if (err == CHIP_NO_ERROR)
-        {
-            ReturnErrorOnFailure(builder.EnsureAppendCapacity(commandCount));
-
-            using EnumerationData = struct
-            {
-                ReadOnlyBufferBuilder<CommandId> * generatedCommandList;
-                CHIP_ERROR processingError;
-            };
-            EnumerationData enumerationData;
-            enumerationData.processingError      = CHIP_NO_ERROR;
-            enumerationData.generatedCommandList = &builder;
-
-            ReturnErrorOnFailure(interface->EnumerateGeneratedCommands(
-                path,
-                [](CommandId id, void * context) -> Loop {
-                    auto input = reinterpret_cast<EnumerationData *>(context);
-
-                    CHIP_ERROR appendError = input->generatedCommandList->Append(id);
-                    if (appendError != CHIP_NO_ERROR)
-                    {
-                        input->processingError = appendError;
-                        return Loop::Break;
-                    }
-                    return Loop::Continue;
-                },
-                reinterpret_cast<void *>(&enumerationData)));
-            ReturnErrorOnFailure(enumerationData.processingError);
-
-            // the two invocations MUST return the same sizes.
-            VerifyOrReturnError(builder.Size() == commandCount, CHIP_ERROR_INTERNAL);
-            return CHIP_NO_ERROR;
-        }
+        CHIP_ERROR err = interface->RetrieveGeneratedCommands(path, builder);
+        // If retrieving generated commands returns CHIP_ERROR_NOT_IMPLEMENTED then continue with normal procesing.
+        // Otherwise we finished.
         VerifyOrReturnError(err == CHIP_ERROR_NOT_IMPLEMENTED, err);
     }
 
@@ -620,32 +533,12 @@ CHIP_ERROR CodegenDataModelProvider::DeviceTypes(EndpointId endpointId, ReadOnly
     return builder.ReferenceExisting(emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err));
 }
 
-CHIP_ERROR CodegenDataModelProvider::SemanticTags(EndpointId endpointId, ReadOnlyBufferBuilder<SemanticTag> & builder)
-{
-    DataModel::Provider::SemanticTag semanticTag;
-    size_t count = 0;
-
-    while (GetSemanticTagForEndpointAtIndex(endpointId, count, semanticTag) == CHIP_NO_ERROR)
-    {
-        count++;
-    }
-
-    ReturnErrorOnFailure(builder.EnsureAppendCapacity(count));
-
-    for (size_t idx = 0; idx < count; idx++)
-    {
-        ReturnErrorOnFailure(GetSemanticTagForEndpointAtIndex(endpointId, idx, semanticTag));
-        ReturnErrorOnFailure(builder.Append(semanticTag));
-    }
-
-    return CHIP_NO_ERROR;
-}
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
 CHIP_ERROR CodegenDataModelProvider::EndpointUniqueID(EndpointId endpointId, MutableCharSpan & epUniqueId)
 {
     char buffer[Clusters::Descriptor::Attributes::EndpointUniqueID::TypeInfo::MaxLength()] = { 0 };
     MutableCharSpan epUniqueIdSpan(buffer);
-    emberAfGetEndpointUniqueIdForEndPoint(endpointId, epUniqueIdSpan);
+    ReturnErrorOnFailure(emberAfGetEndpointUniqueIdForEndPoint(endpointId, epUniqueIdSpan));
 
     memcpy(epUniqueId.data(), epUniqueIdSpan.data(), epUniqueIdSpan.size());
     return CHIP_NO_ERROR;

@@ -37,12 +37,13 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
 from TC_AVSMTestBase import AVSMTestBase
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 
 logger = logging.getLogger(__name__)
 
@@ -113,7 +114,7 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
         has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kSnapshot)
     )
     async def test_TC_AVSM_2_10(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.CameraAvStreamManagement
         attr = Clusters.CameraAvStreamManagement.Attributes
         commands = Clusters.CameraAvStreamManagement.Commands
@@ -162,8 +163,8 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
             if not self.is_pics_sdk_ci_only:
                 self.user_verify_snap_shot("Validate the snapshot image", captureSnapshotResponse.data)
         except InteractionModelError as e:
-            # TODO: Fail the test if this is reached, once the test infrastructure supports snapshot capture
-            logger.error(f"Snapshot capture is not supported: {e}")
+            if not self.is_pics_sdk_ci_only:
+                asserts.fail(f"Snapshot capture failed: {e}")
             pass
 
         self.step(4)
@@ -205,8 +206,8 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
             if not self.is_pics_sdk_ci_only:
                 self.user_verify_snap_shot("Validate the snapshot image", captureSnapshotResponse.data)
         except InteractionModelError as e:
-            # TODO: Fail the test if this is reached, once the test infrastructure supports snapshot capture
-            logger.error(f"Snapshot capture is not supported: {e}")
+            if not self.is_pics_sdk_ci_only:
+                asserts.fail(f"Snapshot capture failed: {e}")
             pass
 
         if self.privacySupport:
@@ -262,6 +263,11 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
                 e.status, Status.NotFound, "Unexpected error returned when expecting NOT_FOUND due to 0 allocated snapshot streams"
             )
             pass
+        if self.privacySupport:
+            # Cleanup Privacy state after test completion
+            result = await self.write_single_attribute(attr.SoftLivestreamPrivacyModeEnabled(False), endpoint_id=endpoint)
+            asserts.assert_equal(result, Status.Success, "Error when trying to write SoftLivestreamPrivacyModeEnabled")
+            logger.info(f"Tx'd : SoftLivestreamPrivacyModeEnabled{False}")
 
 
 if __name__ == "__main__":

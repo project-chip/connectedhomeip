@@ -36,10 +36,12 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body
+from matter.testing.runner import default_matter_test_main
 
 
 class HelloTest(MatterBaseTest):
@@ -68,10 +70,9 @@ class HelloTest(MatterBaseTest):
     # If the device needs to be commissioned before running the test, ensure the first step in
     # this function is marked is_commissioning=True.
     def steps_TC_ENDPOINT_2_1(self) -> list[TestStep]:
-        steps = [TestStep(1, "Commissioning, already done", is_commissioning=True),
-                 TestStep(2, "Read ProductName on endpoint 9999"),
-                 ]
-        return steps
+        return [TestStep(1, "Commissioning, already done", is_commissioning=True),
+                TestStep(2, "Read ProductName on endpoint 9999"),
+                ]
 
     def desc_TC_ENDPOINT_2_1(self) -> str:
         return '#.#.#. [TC-HELLO-x.x] Test Failure On Wrong Endpoint'
@@ -92,12 +93,11 @@ class HelloTest(MatterBaseTest):
         asserts.assert_equal(result.Reason.status, Status.UnsupportedEndpoint, "Failure reason should be UnsupportedEndpoint")
 
     def steps_TC_PICSTEST_2_1(self) -> list[TestStep]:
-        steps = [TestStep(1, "Commissioning, already done", is_commissioning=True),
-                 TestStep(2, "Skip this step based on pics"),
-                 TestStep(3, "Run this step"),
-                 TestStep(4, "Always skip this step")
-                 ]
-        return steps
+        return [TestStep(1, "Commissioning, already done", is_commissioning=True),
+                TestStep(2, "Skip this step based on pics"),
+                TestStep(3, "Run this step"),
+                TestStep(4, "Always skip this step")
+                ]
 
     def desc_TC_PICSTEST_2_1(self) -> str:
         return "#.#.#. [TC-HELLO-x.x] Test pics"

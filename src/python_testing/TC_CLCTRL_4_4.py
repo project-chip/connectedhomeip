@@ -35,14 +35,15 @@
 import logging
 import typing
 
-import chip.clusters as Clusters
-from chip.clusters.Types import Nullable, NullValue
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
-                                         default_matter_test_main)
-from chip.tlv import uint
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters.Types import Nullable, NullValue
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
+                                           default_matter_test_main)
+from matter.tlv import uint
 
 
 def current_latch_matcher(latch: bool) -> AttributeMatcher:
@@ -84,7 +85,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
         return "[TC-CLCTRL-4.4] MoveTo Command CountdownTime with Server as DUT"
 
     def steps_TC_CLCTRL_4_4(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read the AttributeList attribute to determine supported attributes",
                      "AttributeList of the ClosureControl cluster is returned by the DUT"),
@@ -127,19 +128,21 @@ class TC_CLCTRL_4_4(MatterBaseTest):
             TestStep("5e", "Wait until a subscription report with MainState is received", "MainState should be Stopped"),
             TestStep("5f", "Read the CountdownTime attribute", "CountdownTime should be 0"),
         ]
-        return steps
 
     def pics_TC_CLCTRL_4_4(self) -> list[str]:
-        pics = [
-            "CLCTRL.S",
+        return [
+            "CLCTRL.S", "CLCTRL.S.A0000"
         ]
-        return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_CLCTRL_4_4(self):
         countdown_time_max: uint = 259200
 
-        endpoint: int = self.get_endpoint(default=1)
+        endpoint: int = self.get_endpoint()
         timeout: uint = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else countdown_time_max
 
         self.step(1)
@@ -168,15 +171,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
         self.step("2e")
         if not is_latching_supported:
             logging.info("Latching feature not supported, skipping steps related to latching")
-            self.skip_step("2f")
-            self.skip_step("2g")
-            self.skip_step("2h")
-            self.skip_step("2i")
-            self.skip_step("2j")
-            self.skip_step("2k")
-            self.skip_step("2l")
-            self.skip_step("2m")
-
+            self.mark_step_range_skipped("2f", "2m")
         else:
             logging.info("Latching feature supported, proceeding with latch preparation steps")
 
@@ -197,11 +192,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
             self.step("2h")
             if current_latch is False:
                 logging.info("CurrentLatch is False, skipping Latch = False preparation steps")
-                self.skip_step("2i")
-                self.skip_step("2j")
-                self.skip_step("2k")
-                self.skip_step("2l")
-                self.skip_step("2m")
+                self.mark_step_range_skipped("2i", "2m")
             else:
                 logging.info("CurrentLatch is True, proceeding with Latch = False preparation steps")
 
@@ -265,6 +256,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
             self.step("4d")
             sub_handler.await_all_expected_report_matches(expected_matchers=[current_position_matcher(
                 Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyClosed)], timeout_sec=timeout)
+            sub_handler.reset()
 
         self.step("4e")
         try:
@@ -302,11 +294,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
         self.step("5a")
         if current_countdown_time is NullValue:
             logging.info("CurrentCountdownTime is Null, skipping steps 5b to 5f.")
-            self.skip_step("5b")
-            self.skip_step("5c")
-            self.skip_step("5d")
-            self.skip_step("5e")
-            self.skip_step("5f")
+            self.mark_step_range_skipped("5b", "5f")
         else:
             self.step("5b")
             try:

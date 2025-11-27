@@ -19,7 +19,7 @@
 #include <vector>
 
 #include "WebRTCTransportRequestorManager.h"
-#include <app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-cluster.h>
+#include <app/clusters/webrtc-transport-requestor-server/WebRTCTransportRequestorCluster.h>
 #include <controller/webrtc/access_control/WebRTCAccessControl.h>
 #include <platform/PlatformManager.h>
 
@@ -54,6 +54,16 @@ void WebRTCTransportRequestorManager::Init()
     }
 }
 
+void WebRTCTransportRequestorManager::Shutdown()
+{
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&mWebRTCRegisteredServerCluster.Cluster());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "WebRTCTransportRequestor unregister error: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    mWebRTCRegisteredServerCluster.Destroy();
+}
+
 void WebRTCTransportRequestorManager::InitCallbacks(OnOfferCallback onOnOfferCallback, OnAnswerCallback onAnswerCallback,
                                                     OnICECandidatesCallback onICECandidatesCallback, OnEndCallback onEndCallback)
 {
@@ -63,28 +73,27 @@ void WebRTCTransportRequestorManager::InitCallbacks(OnOfferCallback onOnOfferCal
     gOnEndCallback           = onEndCallback;
 }
 
-CHIP_ERROR WebRTCTransportRequestorManager::HandleOffer(uint16_t sessionId, const OfferArgs & args)
+CHIP_ERROR WebRTCTransportRequestorManager::HandleOffer(const WebRTCSessionStruct & session, const OfferArgs & args)
 {
     std::string offer = args.sdp;
-    int err           = gOnOfferCallback(sessionId, offer.c_str());
+    int err           = gOnOfferCallback(session.id, offer.c_str());
     return err == 0 ? CHIP_NO_ERROR : CHIP_ERROR_INCORRECT_STATE;
 }
 
-CHIP_ERROR WebRTCTransportRequestorManager::HandleAnswer(uint16_t sessionId, const std::string & sdpAnswer)
+CHIP_ERROR WebRTCTransportRequestorManager::HandleAnswer(const WebRTCSessionStruct & session, const std::string & sdpAnswer)
 {
     std::string answer = sdpAnswer;
-    int err            = gOnAnswerCallback(sessionId, answer.c_str());
+    int err            = gOnAnswerCallback(session.id, answer.c_str());
     return err == 0 ? CHIP_NO_ERROR : CHIP_ERROR_INCORRECT_STATE;
 }
 
-CHIP_ERROR WebRTCTransportRequestorManager::HandleICECandidates(uint16_t sessionId,
+CHIP_ERROR WebRTCTransportRequestorManager::HandleICECandidates(const WebRTCSessionStruct & session,
                                                                 const std::vector<ICECandidateStruct> & candidates)
 {
-
-    std::vector<std::string> remoteCandidates;
-    remoteCandidates.clear();
-    std::vector<const char *> cStrings;
-    cStrings.clear();
+    std::vector<OwnedIceCandidate> remoteCandidates;
+    remoteCandidates.reserve(candidates.size());
+    std::vector<IceCandidate> cStrings;
+    cStrings.reserve(candidates.size());
 
     if (candidates.empty())
     {
@@ -94,21 +103,31 @@ CHIP_ERROR WebRTCTransportRequestorManager::HandleICECandidates(uint16_t session
 
     for (const auto & candidate : candidates)
     {
-        remoteCandidates.push_back(std::string(candidate.candidate.begin(), candidate.candidate.end()));
+        OwnedIceCandidate aIceCandidate;
+        aIceCandidate.candidate     = std::make_unique<std::string>(candidate.candidate.begin(), candidate.candidate.end());
+        bool isSdpMidNull           = candidate.SDPMid.IsNull();
+        aIceCandidate.sdpMid        = isSdpMidNull
+                   ? nullptr
+                   : std::make_unique<std::string>(candidate.SDPMid.Value().begin(), candidate.SDPMid.Value().end());
+        aIceCandidate.sdpMLineIndex = candidate.SDPMLineIndex.IsNull() ? -1 : static_cast<int>(candidate.SDPMLineIndex.Value());
+        aIceCandidate.view = IceCandidate{ aIceCandidate.candidate->c_str(), isSdpMidNull ? nullptr : aIceCandidate.sdpMid->c_str(),
+                                           aIceCandidate.sdpMLineIndex };
+        remoteCandidates.push_back(std::move(aIceCandidate));
     }
 
-    for (const std::string & candidate : remoteCandidates)
+    for (const auto & candidate : remoteCandidates)
     {
-        cStrings.push_back(candidate.c_str());
+        cStrings.push_back(candidate.view);
     }
 
-    int err = gOnICECandidatesCallback(sessionId, cStrings.data(), static_cast<int>(cStrings.size()));
+    int err = gOnICECandidatesCallback(session.id, cStrings.data(), static_cast<int>(cStrings.size()));
     return err == 0 ? CHIP_NO_ERROR : CHIP_ERROR_INCORRECT_STATE;
 }
 
-CHIP_ERROR WebRTCTransportRequestorManager::HandleEnd(uint16_t sessionId, WebRTCTransportRequestor::WebRTCEndReasonEnum reasonCode)
+CHIP_ERROR WebRTCTransportRequestorManager::HandleEnd(const WebRTCSessionStruct & session,
+                                                      WebRTCTransportRequestor::WebRTCEndReasonEnum reasonCode)
 {
-    int err = gOnEndCallback(sessionId, static_cast<uint8_t>(reasonCode));
+    int err = gOnEndCallback(session.id, static_cast<uint8_t>(reasonCode));
     return err == 0 ? CHIP_NO_ERROR : CHIP_ERROR_INCORRECT_STATE;
 }
 

@@ -18,6 +18,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/server/Server.h>
 #include <clusters/GeneralDiagnostics/ClusterId.h>
 #include <clusters/GeneralDiagnostics/Metadata.h>
@@ -28,26 +29,30 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-struct GeneralDiagnosticsEnabledAttributes
-{
-    bool enableTotalOperationalHours : 1;
-    bool enableBootReason : 1;
-    bool enableActiveHardwareFaults : 1;
-    bool enableActiveRadioFaults : 1;
-    bool enableActiveNetworkFaults : 1;
-};
-
 struct GeneralDiagnosticsFunctionsConfig
 {
     bool enablePosixTime : 1;
-    bool enablePayloadSnaphot : 1;
+    bool enablePayloadSnapshot : 1;
 };
 
 class GeneralDiagnosticsCluster : public DefaultServerCluster
 {
 public:
-    GeneralDiagnosticsCluster(const GeneralDiagnosticsEnabledAttributes & enabledAttributes) :
-        DefaultServerCluster({ kRootEndpointId, GeneralDiagnostics::Id }), mEnabledAttributes(enabledAttributes)
+    using OptionalAttributeSet =
+        chip::app::OptionalAttributeSet<GeneralDiagnostics::Attributes::TotalOperationalHours::Id, //
+                                        GeneralDiagnostics::Attributes::BootReason::Id,            //
+                                        GeneralDiagnostics::Attributes::ActiveHardwareFaults::Id,  //
+                                        GeneralDiagnostics::Attributes::ActiveRadioFaults::Id,     //
+                                        GeneralDiagnostics::Attributes::ActiveNetworkFaults::Id,   //
+                                        GeneralDiagnostics::Attributes::DeviceLoadStatus::Id       //
+                                        // NOTE: Uptime is optional in the XML, however mandatory since revision 2.
+                                        //       it will be forced as mandatory by the cluster constructor
+                                        >;
+
+    GeneralDiagnosticsCluster(OptionalAttributeSet optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature> featureFlags) :
+        DefaultServerCluster({ kRootEndpointId, GeneralDiagnostics::Id }),
+        mOptionalAttributeSet(optionalAttributeSet.ForceSet<GeneralDiagnostics::Attributes::UpTime::Id>()),
+        mFeatureFlags(featureFlags)
     {}
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
@@ -117,17 +122,19 @@ public:
         return DeviceLayer::GetDiagnosticDataProvider().GetActiveNetworkFaults(networkFaults);
     }
 
-private:
-    const GeneralDiagnosticsEnabledAttributes mEnabledAttributes;
+protected:
+    OptionalAttributeSet mOptionalAttributeSet;
     CHIP_ERROR ReadNetworkInterfaces(AttributeValueEncoder & aEncoder);
+    BitFlags<GeneralDiagnostics::Feature> mFeatureFlags;
 };
 
 class GeneralDiagnosticsClusterFullConfigurable : public GeneralDiagnosticsCluster
 {
 public:
-    GeneralDiagnosticsClusterFullConfigurable(const GeneralDiagnosticsEnabledAttributes & enabledAttributes,
+    GeneralDiagnosticsClusterFullConfigurable(const GeneralDiagnosticsCluster::OptionalAttributeSet & optionalAttributeSet,
+                                              const BitFlags<GeneralDiagnostics::Feature> featureFlags,
                                               const GeneralDiagnosticsFunctionsConfig & functionsConfig) :
-        GeneralDiagnosticsCluster(enabledAttributes),
+        GeneralDiagnosticsCluster(optionalAttributeSet, featureFlags),
         mFunctionConfig(functionsConfig)
     {}
 

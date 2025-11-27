@@ -7,6 +7,7 @@
         -   [Initialize Ecosystem A (Vendor ID = 0xFFF1)](#initialize-ecosystem-a-vendor-id--0xfff1)
         -   [Initialize Ecosystem B (Vendor ID = 0xFFF2)](#initialize-ecosystem-b-vendor-id--0xfff2)
     -   [Manually Testing JCM (Joint Commissioning Method)](#manually-testing-jcm-joint-commissioning-method)
+    -   [Unit Testing Joint Fabric](#unit-testing-joint-fabric)
 
 ## Joint Fabric Example Applications
 
@@ -63,7 +64,7 @@ $ rm -rf /tmp/chip_*
 ```
 $ cd ~/connectedhomeip/examples/jf-admin-app/linux/out/debug
 $ rm -rf jfa_a_kvs && touch jfa_a_kvs
-$ ./jfa-app --capabilities 0x4 --passcode 110220033 --discriminator 3840  --secured-device-port 5533 --rpc-server-port 33033 --KVS jfa_a_kvs
+$ ./jfa-app --capabilities 0x4 --passcode 11022033 --discriminator 3840  --secured-device-port 5533 --rpc-server-port 33033 --KVS jfa_a_kvs
 ```
 
 -   Start jf-control-app
@@ -77,7 +78,7 @@ $ ./jfc-app --rpc-server-port 33033 --storage-directory jfc_a_storage_directory 
 -   Commission jf-admin-app
 
 ```
->>> pairing onnetwork-long 1 110220033 3840 --anchor true
+>>> pairing onnetwork-long 1 11022033 3840 --anchor true
 ```
 
 Check for the following logs on the jf-control-app side:
@@ -129,13 +130,13 @@ Subject: 1.3.6.1.4.1.37244.1.3 = 0000000000000003, OU = jf-anchor-icac
 ```
 $ cd ~/connectedhomeip/examples/lighting-app/linux/out/debug
 $ rm -rf light_a_kvs && touch light_a_kvs
-$ ./chip-lighting-app --capabilities 0x4 --passcode 110220044 --KVS light_a_kvs
+$ ./chip-lighting-app --capabilities 0x4 --passcode 11022044 --KVS light_a_kvs
 ```
 
 -   Commission lighting-app
 
 ```
->>> pairing onnetwork 2 110220044
+>>> pairing onnetwork 2 11022044
 ```
 
 Check that a Fabric having `AdminVendorID` set to 0xFFF1 has been installed:
@@ -161,7 +162,7 @@ should be found.
 ```
 $ cd ~/connectedhomeip/examples/jf-admin-app/linux/out/debug
 $ rm -rf jfa_b_kvs && touch jfa_b_kvs
-$ ./jfa-app --capabilities 0x4 --passcode 110220055 --discriminator 3841 --secured-device-port 5555 --rpc-server-port 33055 --KVS jfa_b_kvs
+$ ./jfa-app --capabilities 0x4 --passcode 11022055 --discriminator 3841 --secured-device-port 5555 --rpc-server-port 33055 --KVS jfa_b_kvs
 ```
 
 -   Start jf-control-app
@@ -175,7 +176,7 @@ $ ./jfc-app --rpc-server-port 33055 --storage-directory jfc_b_storage_directory 
 -   Commission jf-admin-app
 
 ```
->>> pairing onnetwork-long 11 110220055 3841 --anchor true
+>>> pairing onnetwork-long 11 11022055 3841 --anchor true
 ```
 
 Check for the following logs on the jf-control-app side:
@@ -228,13 +229,13 @@ Subject: 1.3.6.1.4.1.37244.1.3 = 0000000000000003, OU = jf-anchor-icac
 ```
 $ cd ~/connectedhomeip/examples/lighting-app/linux/out/debug
 $ rm -rf light_b_kvs && touch light_b_kvs
-$ ./chip-lighting-app --capabilities 0x4 --passcode 110220066 --KVS light_b_kvs
+$ ./chip-lighting-app --capabilities 0x4 --passcode 11022066 --KVS light_b_kvs
 ```
 
 -   Commission lighting-app
 
 ```
->>> pairing onnetwork 22 110220066
+>>> pairing onnetwork 22 11022066
 ```
 
 Check that a Fabric having `AdminVendorID` set to 0xFFF2 has been installed:
@@ -262,7 +263,7 @@ On the Ecosystem B Joint Fabric Controller application
 -   Open Joint Commissioning Window on JF Admin App of Ecosystem B
 
 ```
->>> jcm open-joint-commissioning-window 11 1 400 1000 1261
+>>> pairing open-joint-commissioning-window 11 1 400 1000 1261
 ```
 
 Check for the following logs on the jf-admin-app side:
@@ -278,3 +279,9 @@ On the Ecosystem A Joint Fabric Controller application
 ```
 pairing code 10 [manual pairing code] --jcm true
 ```
+
+## Unit Testing Joint Fabric
+
+To enable Joint Fabric related unit tests please use the following command:
+
+`gn gen out/test --args="chip_device_config_enable_joint_fabric=true"`

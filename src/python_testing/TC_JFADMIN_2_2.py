@@ -32,21 +32,22 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import base64
 import logging
 import os
 import random
 import tempfile
-import time
 from configparser import ConfigParser
 
-import chip.clusters as Clusters
-from chip import CertificateAuthority
-from chip.interaction_model import InteractionModelError
-from chip.storage import PersistentStorage
-from chip.testing.apps import AppServerSubprocess, JFControllerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import CertificateAuthority
+from matter.interaction_model import InteractionModelError
+from matter.storage import VolatileTemporaryPersistentStorage
+from matter.testing.apps import AppServerSubprocess, JFControllerSubprocess
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_JFADMIN_2_2(MatterBaseTest):
@@ -167,7 +168,8 @@ class TC_JFADMIN_2_2(MatterBaseTest):
     async def test_TC_JFADMIN_2_2(self):
 
         # Creating a Controller for Ecosystem A
-        _fabric_a_persistent_storage = PersistentStorage(jsonData=self.ecoACtrlStorage)
+        _fabric_a_persistent_storage = VolatileTemporaryPersistentStorage(
+            self.ecoACtrlStorage['repl-config'], self.ecoACtrlStorage['sdk-config'])
         _certAuthorityManagerA = CertificateAuthority.CertificateAuthorityManager(
             chipStack=self.matter_stack._chip_stack,
             persistentStorage=_fabric_a_persistent_storage)
@@ -206,12 +208,12 @@ class TC_JFADMIN_2_2(MatterBaseTest):
 
         self.step("5")
         # Wait for ArmFailSafe timer to expire
-        time.sleep(11)
+        await asyncio.sleep(11)
 
         self.step("6")
         # Get the ICAC from JF-Admin
         response = await devCtrlEcoA.ReadAttribute(
-            nodeid=1, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)],
+            nodeId=1, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)],
             returnClusterObject=True)
         _icac = response[0][Clusters.OperationalCredentials].NOCs[0].icac
         cmd = Clusters.JointFabricAdministrator.Commands.AddICAC(_icac)

@@ -206,7 +206,8 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
     ReturnErrorOnFailure(mpFabricTable->AddFabricDelegate(this));
     ReturnErrorOnFailure(mpExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id, this));
 
-    mReportingEngine.Init((eventManagement != nullptr) ? eventManagement : &EventManagement::GetInstance());
+    TEMPORARY_RETURN_IGNORED mReportingEngine.Init((eventManagement != nullptr) ? eventManagement
+                                                                                : &EventManagement::GetInstance());
 
     StatusIB::RegisterErrorFormatter();
 
@@ -278,7 +279,7 @@ void InteractionModelEngine::Shutdown()
     mAttributePathPool.ReleaseAll();
     mEventPathPool.ReleaseAll();
     mDataVersionFilterPool.ReleaseAll();
-    mpExchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id);
+    TEMPORARY_RETURN_IGNORED mpExchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id);
 
     mpCASESessionMgr = nullptr;
 
@@ -569,7 +570,7 @@ void InteractionModelEngine::TryToResumeSubscriptions()
     {
         mSubscriptionResumptionScheduled            = true;
         auto timeTillNextSubscriptionResumptionSecs = ComputeTimeSecondsTillNextSubscriptionResumption();
-        mpExchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(
+        TEMPORARY_RETURN_IGNORED mpExchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(
             System::Clock::Seconds32(timeTillNextSubscriptionResumptionSecs), ResumeSubscriptionsTimerCallback, this);
         mNumSubscriptionResumptionRetries++;
         ChipLogProgress(InteractionModel, "Schedule subscription resumption when failing to establish session, Retries: %" PRIu32,
@@ -748,7 +749,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
         VerifyOrReturnError(subscribeRequestParser.Init(reader) == CHIP_NO_ERROR, Status::InvalidAction);
 
 #if CHIP_CONFIG_IM_PRETTY_PRINT
-        subscribeRequestParser.PrettyPrint();
+        TEMPORARY_RETURN_IGNORED subscribeRequestParser.PrettyPrint();
 #endif
 
         VerifyOrReturnError(subscribeRequestParser.GetKeepSubscriptions(&keepExistingSubscriptions) == CHIP_NO_ERROR,
@@ -788,8 +789,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
                                         ", FabricIndex: %u, SubscriptionId: 0x%" PRIx32,
                                         ChipLogValueX64(subscriptionInfo.mNodeId), subscriptionInfo.mFabricIndex,
                                         subscriptionInfo.mSubscriptionId);
-                        mpSubscriptionResumptionStorage->Delete(subscriptionInfo.mNodeId, subscriptionInfo.mFabricIndex,
-                                                                subscriptionInfo.mSubscriptionId);
+                        TEMPORARY_RETURN_IGNORED mpSubscriptionResumptionStorage->Delete(
+                            subscriptionInfo.mNodeId, subscriptionInfo.mFabricIndex, subscriptionInfo.mSubscriptionId);
                     }
                 }
                 iterator->Release();
@@ -880,7 +881,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
         VerifyOrReturnError(readRequestParser.Init(reader) == CHIP_NO_ERROR, Status::InvalidAction);
 
 #if CHIP_CONFIG_IM_PRETTY_PRINT
-        readRequestParser.PrettyPrint();
+        TEMPORARY_RETURN_IGNORED readRequestParser.PrettyPrint();
 #endif
         {
             size_t requestedAttributePathCount = 0;
@@ -986,7 +987,7 @@ Status InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeContex
     VerifyOrReturnError(report.Init(reader) == CHIP_NO_ERROR, Status::InvalidAction);
 
 #if CHIP_CONFIG_IM_PRETTY_PRINT
-    report.PrettyPrint();
+    TEMPORARY_RETURN_IGNORED report.PrettyPrint();
 #endif
 
     SubscriptionId subscriptionId = 0;
@@ -1086,7 +1087,7 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
     else if (aPayloadHeader.HasMessageType(MsgType::TimedRequest))
     {
-        OnTimedRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), status);
+        TEMPORARY_RETURN_IGNORED OnTimedRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), status);
     }
     else
     {
@@ -1118,7 +1119,7 @@ void InteractionModelEngine::OnActiveModeNotification(ScopedNodeId aPeer, uint64
         // Get the next item before invoking `OnActiveModeNotification`.
         CATValues cats;
 
-        mpFabricTable->FetchCATs(pListItem->GetFabricIndex(), cats);
+        TEMPORARY_RETURN_IGNORED mpFabricTable->FetchCATs(pListItem->GetFabricIndex(), cats);
         if (ScopedNodeId(pListItem->GetPeerNodeId(), pListItem->GetFabricIndex()) == aPeer &&
             (cats.CheckSubjectAgainstCATs(aMonitoredSubject) ||
              aMonitoredSubject == mpFabricTable->FindFabricWithIndex(pListItem->GetFabricIndex())->GetNodeId()))
@@ -1924,13 +1925,11 @@ DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Pr
     mDataModelProvider = model;
     if (mDataModelProvider != nullptr)
     {
-        DataModel::InteractionModelContext context;
-
-        context.eventsGenerator         = &EventManagement::GetInstance();
-        context.dataModelChangeListener = &mReportingEngine;
-        context.actionContext           = this;
-
-        CHIP_ERROR err = mDataModelProvider->Startup(context);
+        CHIP_ERROR err = mDataModelProvider->Startup({
+            .eventsGenerator         = EventManagement::GetInstance(),
+            .dataModelChangeListener = mReportingEngine,
+            .actionContext           = *this,
+        });
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(InteractionModel, "Failure on interaction model startup: %" CHIP_ERROR_FORMAT, err.Format());
@@ -1972,7 +1971,7 @@ void InteractionModelEngine::OnTimedInvoke(TimedHandler * apTimedHandler, Messag
     Status status = OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), /* aIsTimedInvoke = */ true);
     if (status != Status::Success)
     {
-        StatusResponse::Send(status, apExchangeContext, /* aExpectResponse = */ false);
+        TEMPORARY_RETURN_IGNORED StatusResponse::Send(status, apExchangeContext, /* aExpectResponse = */ false);
     }
 }
 
@@ -1995,7 +1994,7 @@ void InteractionModelEngine::OnTimedWrite(TimedHandler * apTimedHandler, Messagi
     Status status = OnWriteRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), /* aIsTimedWrite = */ true);
     if (status != Status::Success)
     {
-        StatusResponse::Send(status, apExchangeContext, /* aExpectResponse = */ false);
+        TEMPORARY_RETURN_IGNORED StatusResponse::Send(status, apExchangeContext, /* aExpectResponse = */ false);
     }
 }
 

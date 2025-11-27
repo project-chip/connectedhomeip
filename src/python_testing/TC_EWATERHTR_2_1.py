@@ -44,10 +44,11 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_EWATERHTRBase import EWATERHTRBase
+
+import matter.clusters as Clusters
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
@@ -64,7 +65,7 @@ class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
         return ["EWATERHTR.S"]
 
     def steps_TC_EWATERHTR_2_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
                      is_commissioning=True),
             TestStep("2", "TH reads from the DUT the FeatureMap attribute.",
@@ -82,8 +83,6 @@ class TC_EWATERHTR_2_1(MatterBaseTest, EWATERHTRBase):
             TestStep("8", "TH reads from the DUT the BoostState attribute.",
                      "Verify that the DUT response contains a BoostStateEnum (enum8) value that is less than or equal to 1."),
         ]
-
-        return steps
 
     @async_test_body
     async def test_TC_EWATERHTR_2_1(self):

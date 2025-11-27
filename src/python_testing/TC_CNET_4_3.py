@@ -37,12 +37,13 @@
 
 import logging
 
-import chip.clusters as Clusters
 import test_plan_support
-from chip.clusters.Types import NullValue
-from chip.testing import matter_asserts
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.testing import matter_asserts
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 
 
 class TC_CNET_4_3(MatterBaseTest):
@@ -51,7 +52,7 @@ class TC_CNET_4_3(MatterBaseTest):
         return "[TC-CNET-4.3] [Ethernet] Verification for attributes check [DUT-Server]"
 
     def steps_TC_CNET_4_3(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, test_plan_support.commission_if_required(), "", is_commissioning=True),
             TestStep(2, "TH reads the MaxNetworks attribute from the DUT",
                      "Verify that MaxNetworks attribute value is within a range of 1 to 255"),
@@ -71,7 +72,6 @@ class TC_CNET_4_3(MatterBaseTest):
             TestStep(7, "TH reads the LastConnectErrorValue attribute from the DUT",
                      "Verify that LastConnectErrorValue attribute value is null")
         ]
-        return steps
 
     def pics_TC_CNET_4_3(self):
         """Return the PICS definitions associated with this test."""
@@ -106,7 +106,7 @@ class TC_CNET_4_3(MatterBaseTest):
         logging.info(f"Networks by endpoint: {networks_dict}")
         connected_network_count = {}
         for ep in networks_dict:
-            connected_network_count[ep] = sum(map(lambda x: x.connected, networks_dict[ep]))
+            connected_network_count[ep] = sum(x.connected for x in networks_dict[ep])
         logging.info(f"Connected networks count by endpoint: {connected_network_count}")
         asserts.assert_equal(sum(connected_network_count.values()), 1,
                              "Verify that only one entry has connected status as TRUE across ALL endpoints")
@@ -133,7 +133,7 @@ class TC_CNET_4_3(MatterBaseTest):
         last_network_id = await self.read_single_attribute_check_success(
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.LastNetworkID)
-        matching_networks_count = sum(map(lambda x: x.networkID == last_network_id, networks))
+        matching_networks_count = sum(x.networkID == last_network_id for x in networks)
         asserts.assert_equal(matching_networks_count, 1,
                              "Verify that LastNetworkID attribute matches the NetworkID value of one of the entries")
         asserts.assert_true(isinstance(last_network_id, bytes) and 1 <= len(last_network_id) <= 32,

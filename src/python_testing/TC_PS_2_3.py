@@ -34,13 +34,14 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 
-import chip.clusters as Clusters
-from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_PS_2_3(MatterBaseTest):
@@ -66,7 +67,7 @@ class TC_PS_2_3(MatterBaseTest):
 
         self.step(3)
         logging.info("This test will now wait for 30 seconds.")
-        time.sleep(30)
+        await asyncio.sleep(30)
 
         counts = sub_handler.attribute_report_counts
         asserts.assert_less_equal(counts[ps.Attributes.BatTimeToFullCharge], 4, "Too many reports for BatTimeToFullCharge")

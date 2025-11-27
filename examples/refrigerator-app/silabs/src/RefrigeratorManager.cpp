@@ -112,14 +112,14 @@ void RefrigeratorManager::TempCtrlAttributeChangeHandler(EndpointId endpointId, 
     }
 }
 
-void RefrigeratorManager::RefAlaramAttributeChangeHandler(EndpointId endpointId, AttributeId attributeId, uint8_t * value,
-                                                          uint16_t size)
+void RefrigeratorManager::RefAlarmAttributeChangeHandler(EndpointId endpointId, AttributeId attributeId, uint8_t * value,
+                                                         uint16_t size)
 {
     switch (attributeId)
     {
     case RefAlarmAttr::Mask::Id: {
         auto mask = static_cast<uint32_t>(*value);
-        mState    = static_cast<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>(mask);
+        mMask     = static_cast<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>(mask);
         RefAlarmAttr::Mask::Set(endpointId, mMask);
     }
     break;

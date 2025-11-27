@@ -31,17 +31,18 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
 from copy import deepcopy
-from time import sleep
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.exceptions import ChipStackError
-from chip.native import PyChipError
-from chip.testing.matter_testing import CustomCommissioningParameters, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from support_modules.cadmin_support import CADMINBaseTest
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.exceptions import ChipStackError
+from matter.native import PyChipError
+from matter.testing.matter_testing import CustomCommissioningParameters, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_CADMIN_1_9(CADMINBaseTest):
@@ -60,8 +61,7 @@ class TC_CADMIN_1_9(CADMINBaseTest):
                 filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
                 filter=params.randomDiscriminator
             )
-        errcode = PyChipError.from_code(ctx.exception.err)
-        return errcode
+        return PyChipError.from_code(ctx.exception.err)
 
     async def CommissionAttempt(self, params: CustomCommissioningParameters, expectedErrCode: int):
         if expectedErrCode == 3:
@@ -124,9 +124,9 @@ class TC_CADMIN_1_9(CADMINBaseTest):
 
         self.step(6)
         revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
-        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
+        await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
         # The failsafe cleanup is scheduled after the command completes, so give it a bit of time to do that
-        sleep(1)
+        await asyncio.sleep(1)
 
 
 if __name__ == "__main__":

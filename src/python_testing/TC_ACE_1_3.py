@@ -36,10 +36,11 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 def acl_subject(cat: int) -> int:
@@ -69,7 +70,7 @@ class TC_ACE_1_3(MatterBaseTest):
         return "[TC-ACE-1.3] Subjects"
 
     def steps_TC_ACE_1_3(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "TH0 writes ACL all view on PIXIT.ACE.TESTENDPOINT"),
             TestStep(3, "TH1 reads EP0 descriptor - expect SUCCESS"),
@@ -129,7 +130,6 @@ class TC_ACE_1_3(MatterBaseTest):
             TestStep(57, "TH3 reads EP0 descriptor - expect UNSUPPORTED_ACCESS"),
             TestStep(58, "TH0 writes ACL back to default")
         ]
-        return steps
 
     @async_test_body
     async def test_TC_ACE_1_3(self):

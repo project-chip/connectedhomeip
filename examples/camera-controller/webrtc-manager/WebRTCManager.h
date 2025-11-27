@@ -26,10 +26,18 @@
 #include <webrtc-manager/WebRTCProviderClient.h>
 #include <webrtc-manager/WebRTCRequestorDelegate.h>
 
+struct ICECandidateInfo
+{
+    std::string candidate;
+    std::string mid;
+    int mlineIndex;
+};
+
 class WebRTCManager
 {
 public:
     using ICECandidateStruct         = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
+    using WebRTCSessionStruct        = chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type;
     using StreamUsageEnum            = chip::app::Clusters::Globals::StreamUsageEnum;
     using SessionEstablishedCallback = std::function<void(uint16_t streamId)>;
 
@@ -48,11 +56,11 @@ public:
      */
     void SetSessionEstablishedCallback(SessionEstablishedCallback callback) { mSessionEstablishedCallback = callback; }
 
-    CHIP_ERROR HandleOffer(uint16_t sessionId, const WebRTCRequestorDelegate::OfferArgs & args);
+    CHIP_ERROR HandleOffer(const WebRTCSessionStruct & session, const WebRTCRequestorDelegate::OfferArgs & args);
 
-    CHIP_ERROR HandleAnswer(uint16_t sessionId, const std::string & sdp);
+    CHIP_ERROR HandleAnswer(const WebRTCSessionStruct & session, const std::string & sdp);
 
-    CHIP_ERROR HandleICECandidates(uint16_t sessionId, const std::vector<ICECandidateStruct> & candidates);
+    CHIP_ERROR HandleICECandidates(const WebRTCSessionStruct & session, const std::vector<ICECandidateStruct> & candidates);
 
     CHIP_ERROR Connnect(chip::Controller::DeviceCommissioner & commissioner, chip::NodeId nodeId, chip::EndpointId endpointId);
 
@@ -87,10 +95,11 @@ private:
     uint16_t mPendingSessionId = 0;
     std::string mLocalDescription;
 
-    // Local vector to store the ICE Candidate strings coming from the WebRTC stack
-    std::vector<std::string> mLocalCandidates;
+    // Local vector to store the ICE Candidate info coming from the WebRTC stack
+    std::vector<ICECandidateInfo> mLocalCandidates;
 
     std::shared_ptr<rtc::Track> mTrack;
+    std::shared_ptr<rtc::Track> mAudioTrack;
 
     // Callback to notify when session is established
     SessionEstablishedCallback mSessionEstablishedCallback;
@@ -99,7 +108,8 @@ private:
     uint16_t mCurrentVideoStreamId = 0;
 
     // UDP socket for RTP forwarding
-    int mRTPSocket = -1;
+    int mRTPSocket      = -1;
+    int mAudioRTPSocket = -1;
 
     // Close and reset the RTP socket
     void CloseRTPSocket();

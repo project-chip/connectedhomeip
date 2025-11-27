@@ -23,21 +23,22 @@ import sys
 import typing
 from pathlib import Path
 
-import chip.clusters as Clusters
 import click
-from chip import ChipDeviceCtrl
-from chip.clusters import Attribute
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.runner import AsyncMock, MockTestRunner
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.clusters import Attribute
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.runner import AsyncMock, MockTestRunner
 
 try:
-    from chip.testing.matter_test_config import MatterTestConfig
-    from chip.testing.matter_testing import get_default_paa_trust_store, run_tests_no_exit
+    from matter.testing.matter_test_config import MatterTestConfig
+    from matter.testing.matter_testing import get_default_paa_trust_store, run_tests_no_exit
 except ImportError:
     sys.path.append(os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..')))
-    from chip.testing.matter_test_config import MatterTestConfig
-    from chip.testing.matter_testing import get_default_paa_trust_store, run_tests_no_exit
+    from matter.testing.matter_test_config import MatterTestConfig
+    from matter.testing.matter_testing import get_default_paa_trust_store, run_tests_no_exit
 
 invoke_call_count = 0
 event_call_count = 0
@@ -57,30 +58,29 @@ def dynamic_invoke_return(*args, **argv):
     print(f'invoke call {invoke_call_count}')
     if invoke_call_count == 1:  # Commission node with no prior request, return failure - step 5
         raise InteractionModelError(status=Status.Failure)
-    elif invoke_call_count == 2:  # Commission node over pase - return unsupported access - step 7
+    if invoke_call_count == 2:  # Commission node over pase - return unsupported access - step 7
         raise InteractionModelError(status=Status.UnsupportedAccess)
-    elif invoke_call_count == 3:  # request commissioning approval over pase - return unsupported access - step 8
+    if invoke_call_count == 3:  # request commissioning approval over pase - return unsupported access - step 8
         raise InteractionModelError(status=Status.UnsupportedAccess)
-    elif invoke_call_count == 4:  # good RevokeCommissioning over CASE with bad vid - step 9
+    if invoke_call_count == 4:  # good RevokeCommissioning over CASE with bad vid - step 9
         return None
-    elif invoke_call_count == 5:  # good RequestCommissioningApproval over CASE with bad vid - step 10
+    if invoke_call_count == 5:  # good RequestCommissioningApproval over CASE with bad vid - step 10
         return None
-    elif invoke_call_count == 6:  # CommissionNode with bad request id - step 14
+    if invoke_call_count == 6:  # CommissionNode with bad request id - step 14
         raise InteractionModelError(status=Status.Failure)
-    elif invoke_call_count == 7:  # CommissionNode with bad timeout (low) - step 15
+    if invoke_call_count == 7:  # CommissionNode with bad timeout (low) - step 15
         raise InteractionModelError(status=Status.Failure)
-    elif invoke_call_count == 8:  # CommissionNode with bad timeout (high) - step 16
+    if invoke_call_count == 8:  # CommissionNode with bad timeout (high) - step 16
         raise InteractionModelError(status=Status.Failure)
-    elif invoke_call_count == 9:  # CommissionNode - step 17
+    if invoke_call_count == 9:  # CommissionNode - step 17
         # passcode 20202024
         return reverse_open
-    elif invoke_call_count == 10:  # RequestCommissioningApproval with good vid - step 22
+    if invoke_call_count == 10:  # RequestCommissioningApproval with good vid - step 22
         return None
-    elif invoke_call_count == 11:  # CommissionNode - step 25
+    if invoke_call_count == 11:  # CommissionNode - step 25
         # passcode 20202024
         return reverse_open
-    else:
-        raise InteractionModelError(Status.Failure)
+    raise InteractionModelError(Status.Failure)
 
 
 def dynamic_event_return(*args, **argv):
@@ -91,24 +91,23 @@ def dynamic_event_return(*args, **argv):
 
     if event_call_count == 1:  # reading events, start empty - no events
         return []
-    elif event_call_count == 2:  # read event with filter - expect empty
+    if event_call_count == 2:  # read event with filter - expect empty
         return []
-    elif event_call_count == 3:  # returned event
+    if event_call_count == 3:  # returned event
         header = Attribute.EventHeader(EndpointId=0, ClusterId=Clusters.CommissionerControl.id,
                                        EventId=Clusters.CommissionerControl.Events.CommissioningRequestResult.event_id, EventNumber=1)
         data = Clusters.CommissionerControl.Events.CommissioningRequestResult(
             requestID=0x1234567887654321, clientNodeID=112233, statusCode=0)
         result = Attribute.EventReadResult(Header=header, Status=Status.Success, Data=data)
         return [result]
-    elif event_call_count == 4:  # returned event with new request
+    if event_call_count == 4:  # returned event with new request
         header = Attribute.EventHeader(EndpointId=0, ClusterId=Clusters.CommissionerControl.id,
                                        EventId=Clusters.CommissionerControl.Events.CommissioningRequestResult.event_id, EventNumber=1)
         data = Clusters.CommissionerControl.Events.CommissioningRequestResult(
             requestID=0x1234567812345678, clientNodeID=112233, statusCode=0)
         result = Attribute.EventReadResult(Header=header, Status=Status.Success, Data=data)
         return [result]
-    else:
-        raise InteractionModelError(Status.Failure)
+    raise InteractionModelError(Status.Failure)
 
 
 def wildcard() -> Attribute.AsyncReadTransaction.ReadResponse:

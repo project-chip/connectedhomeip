@@ -26,6 +26,10 @@
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <system/SystemClock.h>
 
+// TODO: Ideally we should not depend on the codegen integration
+// It would be best if we could use generic cluster API instead
+#include <app/clusters/boolean-state-server/CodegenIntegration.h>
+
 #if HEAP_MONITORING
 #include "MemMonitoring.h"
 #endif
@@ -175,7 +179,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     Server::GetInstance().GetICDManager().RegisterObserver(&sAppTask);
 #endif
 
-    DiagnosticDataProviderImpl::GetDefaultInstance().GetCurrentHeapFree(currentHeapFree);
+    TEMPORARY_RETURN_IGNORED DiagnosticDataProviderImpl::GetDefaultInstance().GetCurrentHeapFree(currentHeapFree);
     ChipLogProgress(NotSpecified, "App Task started, with SRAM heap %lld left", currentHeapFree);
 
     while (true)
@@ -200,13 +204,23 @@ void AppTask::AppTaskMain(void * pvParameter)
             if (APP_EVENT_CONTACT_SENSOR_TRUE & appEvent)
             {
                 stateValueAttrValue = 1;
-                app::Clusters::BooleanState::Attributes::StateValue::Set(1, stateValueAttrValue);
+
+                auto booleanState = app::Clusters::BooleanState::FindClusterOnEndpoint(1);
+                if (booleanState != nullptr)
+                {
+                    booleanState->SetStateValue(stateValueAttrValue);
+                }
             }
 
             if (APP_EVENT_CONTACT_SENSOR_FALSE & appEvent)
             {
                 stateValueAttrValue = 0;
-                app::Clusters::BooleanState::Attributes::StateValue::Set(1, stateValueAttrValue);
+
+                auto booleanState = app::Clusters::BooleanState::FindClusterOnEndpoint(1);
+                if (booleanState != nullptr)
+                {
+                    booleanState->SetStateValue(stateValueAttrValue);
+                }
             }
 
             PlatformMgr().UnlockChipStack();

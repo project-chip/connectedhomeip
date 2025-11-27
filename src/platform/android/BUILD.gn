@@ -88,8 +88,10 @@ static_library("android") {
     ":tracing",
     "${chip_root}/src/app:app_config",
     "${chip_root}/src/app/common:ids",
+    "${chip_root}/src/app/common:metadata",
     "${chip_root}/src/lib/dnssd:platform_header",
     "${chip_root}/src/setup_payload",
+    "${chip_root}/src/transport/raw:nfc-application-delegate",
   ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
@@ -148,5 +150,5 @@ android_library("java") {
 }
 
 java_prebuilt("android_sdk") {
-  jar_path = "${android_sdk_root}/platforms/android-30/android.jar"
+  jar_path = "${android_sdk_root}/platforms/android-34/android.jar"
 }

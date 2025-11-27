@@ -23,7 +23,7 @@
 #include <app/ConcreteEventPath.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model/List.h>
-#include <clusters/Descriptor/Structs.h>
+#include <clusters/shared/Structs.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/Span.h>
 
@@ -40,11 +40,10 @@ class ProviderMetadataTree
 public:
     virtual ~ProviderMetadataTree() = default;
 
-    using SemanticTag = Clusters::Descriptor::Structs::SemanticTagStruct::Type;
+    using SemanticTag = Clusters::Globals::Structs::SemanticTagStruct::Type;
 
     virtual CHIP_ERROR Endpoints(ReadOnlyBufferBuilder<EndpointEntry> & builder) = 0;
 
-    virtual CHIP_ERROR SemanticTags(EndpointId endpointId, ReadOnlyBufferBuilder<SemanticTag> & builder)          = 0;
     virtual CHIP_ERROR DeviceTypes(EndpointId endpointId, ReadOnlyBufferBuilder<DeviceTypeEntry> & builder)       = 0;
     virtual CHIP_ERROR ClientClusters(EndpointId endpointId, ReadOnlyBufferBuilder<ClusterId> & builder)          = 0;
     virtual CHIP_ERROR ServerClusters(EndpointId endpointId, ReadOnlyBufferBuilder<ServerClusterEntry> & builder) = 0;

@@ -29,6 +29,7 @@
 #include <app/tests/AppTestContext.h>
 
 #include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
 using namespace chip::app;
@@ -426,7 +427,7 @@ void DataSeriesGenerator::Generate()
                 path.mListOp      = ConcreteDataAttributePath::ListOperation::ReplaceAll;
                 EXPECT_EQ(DataModel::Encode(writer, TLV::AnonymousTag(), value), CHIP_NO_ERROR);
 
-                writer.Finalize(&handle);
+                EXPECT_SUCCESS(writer.Finalize(&handle));
                 reader.Init(std::move(handle));
                 EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
                 callback->OnAttributeData(path, &reader, status);
@@ -449,7 +450,7 @@ void DataSeriesGenerator::Generate()
 
                 EXPECT_EQ(DataModel::Encode(writer, TLV::AnonymousTag(), listItem), CHIP_NO_ERROR);
 
-                writer.Finalize(&handle);
+                EXPECT_SUCCESS(writer.Finalize(&handle));
                 reader.Init(std::move(handle));
                 EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
                 callback->OnAttributeData(path, &reader, status);
@@ -469,7 +470,7 @@ void DataSeriesGenerator::Generate()
                 path.mListOp      = ConcreteDataAttributePath::ListOperation::ReplaceAll;
                 EXPECT_EQ(DataModel::Encode(writer, TLV::AnonymousTag(), value), CHIP_NO_ERROR);
 
-                writer.Finalize(&handle);
+                EXPECT_SUCCESS(writer.Finalize(&handle));
                 reader.Init(std::move(handle));
                 EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
                 callback->OnAttributeData(path, &reader, status);
@@ -488,7 +489,7 @@ void DataSeriesGenerator::Generate()
 
                 EXPECT_EQ(DataModel::Encode(writer, TLV::AnonymousTag(), (uint8_t) (i)), CHIP_NO_ERROR);
 
-                writer.Finalize(&handle);
+                EXPECT_SUCCESS(writer.Finalize(&handle));
                 reader.Init(std::move(handle));
                 EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
                 callback->OnAttributeData(path, &reader, status);
@@ -503,7 +504,7 @@ void DataSeriesGenerator::Generate()
 
         if (hasData)
         {
-            writer.Finalize(&handle);
+            EXPECT_SUCCESS(writer.Finalize(&handle));
             reader.Init(std::move(handle));
             EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
             callback->OnAttributeData(path, &reader, status);

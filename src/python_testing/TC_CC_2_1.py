@@ -39,12 +39,14 @@ import logging
 from enum import Enum
 from typing import Optional
 
-import chip.clusters as Clusters
-from chip.clusters import Attribute
-from chip.clusters.Types import NullValue
-from chip.testing import matter_asserts
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_attribute
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters import Attribute
+from matter.clusters import ClusterObjects as ClusterObjects
+from matter.clusters.Types import NullValue
+from matter.testing import matter_asserts
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_attribute
 
 logger = logging.getLogger(__name__)
 
@@ -65,14 +67,13 @@ class TC_CC_2_1(MatterBaseTest):
 
     def pics_TC_CC_2_1(self):
         """Return PICS definitions asscociated with this test."""
-        pics = [
+        return [
             "CC.S"
         ]
-        return pics
 
     def steps_TC_CC_2_1(self) -> list[TestStep]:
         """Execute the test steps."""
-        steps = [
+        return [
             TestStep(1, 'Wait for the commissioned device to be retrieved', is_commissioning=True),
             TestStep(2, 'TH reads from the DUT the (0x0000) CurrentHue attribute'),
             TestStep(3, 'TH reads from the DUT the (0x0001) CurrentSaturation attribute'),
@@ -140,8 +141,6 @@ class TC_CC_2_1(MatterBaseTest):
             TestStep(52, 'TH reads from the DUT the (0x003b) ColorPointBY attribute'),
             TestStep(53, 'TH reads from the DUT the (0x003c) ColorPointBIntensity attribute')
         ]
-
-        return steps
 
     async def verify_primary_index(self, primary_index: int) -> bool:
         # Read all PrimaryN<X,Y,Intensity> attributes available in the cluster
@@ -229,6 +228,7 @@ class TC_CC_2_1(MatterBaseTest):
                     asserts.assert_true((attr_val <= max_len),
                                         f"Attribute {attribute} with value {attr_val} is out of range (max): {max_len}")
             return attr_val
+        return None
 
     def _verify_lower_4bits(self, numa, numb):
         # Get the lowest 4 bits and compare them
@@ -239,10 +239,14 @@ class TC_CC_2_1(MatterBaseTest):
         logger.info(f"Num b : {bin(tmp_b)}")
         asserts.assert_equal(tmp_a, tmp_b, "Lower 4 bits of values are not equal")
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_CC_2_1(self):
         self.cluster = Clusters.ColorControl
-        self.endpoint = self.get_endpoint(1)
+        self.endpoint = self.get_endpoint()
         self.attributes = Clusters.ColorControl.Attributes
 
         self.step(1)

@@ -34,11 +34,12 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_VALCC_4_3(MatterBaseTest):
@@ -50,7 +51,7 @@ class TC_VALCC_4_3(MatterBaseTest):
         return "[TC-VALCC-4.3] AutoCloseTime functionality with (no synchronized time) DUT as Server"
 
     def steps_TC_VALCC_4_3(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read FeatureMap attribute"),
             TestStep("2b", "Verify TimeSync feature is supported"),
@@ -61,18 +62,20 @@ class TC_VALCC_4_3(MatterBaseTest):
             TestStep(6, "Send Close command"),
             TestStep(7, "Read AutoCloseTime attribute"),
         ]
-        return steps
 
     def pics_TC_VALCC_4_3(self) -> list[str]:
-        pics = [
+        return [
             "VALCC.S",
         ]
-        return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_VALCC_4_3(self):
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(1)
         attributes = Clusters.ValveConfigurationAndControl.Attributes
@@ -93,8 +96,7 @@ class TC_VALCC_4_3(MatterBaseTest):
 
             return
 
-        else:
-            logging.info("Test step skipped")
+        logging.info("Test step skipped")
 
         self.step("3a")
         utcTime = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.Objects.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.UTCTime)
@@ -110,8 +112,7 @@ class TC_VALCC_4_3(MatterBaseTest):
 
             return
 
-        else:
-            logging.info("Test step skipped")
+        logging.info("Test step skipped")
 
         self.step(4)
         try:

@@ -35,11 +35,12 @@
 import logging
 import typing
 
-import chip.clusters as Clusters
-from chip.clusters.Types import Nullable, NullValue
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from chip.tlv import uint
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters.Types import Nullable, NullValue
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.tlv import uint
 
 
 class TC_CLCTRL_2_1(MatterBaseTest):
@@ -51,7 +52,7 @@ class TC_CLCTRL_2_1(MatterBaseTest):
         return "[TC-CLCTRL-2.1] Attributes with Server as DUT"
 
     def steps_TC_CLCTRL_2_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read the AttributeList attribute to determine supported attributes",
                      "AttributeList of the ClosureControl cluster is returned by the DUT"),
@@ -67,18 +68,20 @@ class TC_CLCTRL_2_1(MatterBaseTest):
             TestStep(9, "Read the LatchControlModes attribute",
                      "LatchControlModes of the ClosureControl cluster is returned by the DUT if the LT feature is supported"),
         ]
-        return steps
 
     def pics_TC_CLCTRL_2_1(self) -> list[str]:
-        pics = [
+        return [
             "CLCTRL.S",
         ]
-        return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_CLCTRL_2_1(self):
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         # STEP 1: Commission DUT to TH (can be skipped if done in a preceding test)
         self.step(1)

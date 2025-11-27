@@ -1,5 +1,5 @@
 steps:
-    - name: "ghcr.io/project-chip/chip-build-vscode:153"
+    - name: "ghcr.io/project-chip/chip-build-vscode:175"
       entrypoint: "bash"
       args:
           - "-c"
@@ -7,7 +7,7 @@ steps:
               git config --global --add safe.directory "*"
               python scripts/checkout_submodules.py --shallow --recursive --platform esp32 nrfconnect silabs linux android 
       id: Submodules
-    - name: "ghcr.io/project-chip/chip-build-vscode:153"
+    - name: "ghcr.io/project-chip/chip-build-vscode:175"
       # NOTE: silabs boostrap is NOT done with the rest as it requests a conflicting
       #       jinja2 version (asks for 3.1.3 when constraints.txt asks for 3.0.3)
       env:
@@ -23,11 +23,12 @@ steps:
           - name: pwenv
             path: /pwenv
       timeout: 900s
-    - name: "ghcr.io/project-chip/chip-build-vscode:153"
+    - name: "ghcr.io/project-chip/chip-build-vscode:175"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
           - >-
+              pip install esp-idf-kconfig==2.5.0 &&
               perl -i -pe 's/^gdbgui==/# gdbgui==/' /opt/espressif/esp-idf/requirements.txt &&
               ./examples/chef/chef.py --build_all --build_exclude "noip|icd"
       id: CompileAll
@@ -38,14 +39,13 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "ghcr.io/project-chip/chip-build-vscode:153"
+    - name: "ghcr.io/project-chip/chip-build-vscode:175"
       # ICD device is currently not supported for ESP32 and NRF targets. New rule to compile only ICD
       # linux binary.
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
-          - ./examples/chef/chef.py --build_all --build_include linux_x86-icd nrf52840dk-icd
-      allowFailure: true # TODO: Remove this once compilation stability is established.
+          - ./examples/chef/chef.py --build_all --build_include "linux_x86-icd|nrf52840dk-icd"
       id: CompileICD
       waitFor:
           - CompileAll
@@ -54,7 +54,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "ghcr.io/project-chip/chip-build-vscode:153"
+    - name: "ghcr.io/project-chip/chip-build-vscode:175"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:

@@ -156,7 +156,7 @@ class BaseConstraint(ABC):
         response_type = type(value)
         if self._types:
             found_type_match = any(
-                [issubclass(response_type, expected) for expected in self._types])
+                issubclass(response_type, expected) for expected in self._types)
             if not found_type_match:
                 if len(self._types) == 1:
                     expected_str = f'type "{self._types[0].__name__}"'
@@ -183,43 +183,42 @@ class BaseConstraint(ABC):
     def _raise_error(self, reason):
         if isinstance(self, _ConstraintType):
             raise ConstraintTypeError(self._context, reason)
-        elif isinstance(self, _ConstraintContains):
+        if isinstance(self, _ConstraintContains):
             raise ConstraintContainsError(self._context, reason)
-        elif isinstance(self, _ConstraintExcludes):
+        if isinstance(self, _ConstraintExcludes):
             raise ConstraintExcludesError(self._context, reason)
-        elif isinstance(self, _ConstraintHasMaskClear):
+        if isinstance(self, _ConstraintHasMaskClear):
             raise ConstraintHasMaskClearError(self._context, reason)
-        elif isinstance(self, _ConstraintHasMaskSet):
+        if isinstance(self, _ConstraintHasMaskSet):
             raise ConstraintHasMaskSetError(self._context, reason)
-        elif isinstance(self, _ConstraintMinLength):
+        if isinstance(self, _ConstraintMinLength):
             raise ConstraintMinLengthError(self._context, reason)
-        elif isinstance(self, _ConstraintMaxLength):
+        if isinstance(self, _ConstraintMaxLength):
             raise ConstraintMaxLengthError(self._context, reason)
-        elif isinstance(self, _ConstraintIsHexString):
+        if isinstance(self, _ConstraintIsHexString):
             raise ConstraintIsHexStringError(self._context, reason)
-        elif isinstance(self, _ConstraintStartsWith):
+        if isinstance(self, _ConstraintStartsWith):
             raise ConstraintStartsWithError(self._context, reason)
-        elif isinstance(self, _ConstraintEndsWith):
+        if isinstance(self, _ConstraintEndsWith):
             raise ConstraintEndsWithError(self._context, reason)
-        elif isinstance(self, _ConstraintIsUpperCase):
+        if isinstance(self, _ConstraintIsUpperCase):
             raise ConstraintIsUpperCaseError(self._context, reason)
-        elif isinstance(self, _ConstraintIsLowerCase):
+        if isinstance(self, _ConstraintIsLowerCase):
             raise ConstraintIsLowerCaseError(self._context, reason)
-        elif isinstance(self, _ConstraintIsSetOfValues):
+        if isinstance(self, _ConstraintIsSetOfValues):
             raise ConstraintIsSetOfValuesError(self._context, reason)
-        elif isinstance(self, _ConstraintMinValue):
+        if isinstance(self, _ConstraintMinValue):
             raise ConstraintMinValueError(self._context, reason)
-        elif isinstance(self, _ConstraintMaxValue):
+        if isinstance(self, _ConstraintMaxValue):
             raise ConstraintMaxValueError(self._context, reason)
-        elif isinstance(self, _ConstraintNotValue):
+        if isinstance(self, _ConstraintNotValue):
             raise ConstraintNotValueError(self._context, reason)
-        elif isinstance(self, _ConstraintAnyOf):
+        if isinstance(self, _ConstraintAnyOf):
             raise ConstraintAnyOfError(self._context, reason)
-        elif isinstance(self, _ConstraintPython):
+        if isinstance(self, _ConstraintPython):
             raise ConstraintPythonError(self._context, reason)
-        else:
-            # This should not happens.
-            raise ConstraintParseError('Unknown constraint instance.')
+        # This should not happens.
+        raise ConstraintParseError('Unknown constraint instance.')
 
 
 class _ConstraintHasValue(BaseConstraint):
@@ -724,14 +723,13 @@ def _values_match(expected_value, received_value):
             if not _values_match(expected_item, received_item):
                 return False
         return True
-    elif isinstance(expected_value, dict):
+    if isinstance(expected_value, dict):
         for key, expected_item in expected_value.items():
             received_item = received_value.get(key)
             if not _values_match(expected_item, received_item):
                 return False
         return True
-    else:
-        return expected_value == received_value
+    return expected_value == received_value
 
 
 class _ConstraintContains(BaseConstraint):
@@ -827,7 +825,7 @@ class _ConstraintHasMaskSet(BaseConstraint):
         self._has_masks_set = has_masks_set
 
     def check_response(self, value, value_type_name) -> bool:
-        return all([(value & mask) != 0 for mask in self._has_masks_set])
+        return all((value & mask) != 0 for mask in self._has_masks_set)
 
     def get_reason(self, value, value_type_name) -> str:
         expected_masks = []
@@ -845,7 +843,7 @@ class _ConstraintHasMaskClear(BaseConstraint):
         self._has_masks_clear = has_masks_clear
 
     def check_response(self, value, value_type_name) -> bool:
-        return all([(value & mask) == 0 for mask in self._has_masks_clear])
+        return all((value & mask) == 0 for mask in self._has_masks_clear)
 
     def get_reason(self, value, value_type_name) -> str:
         unexpected_masks = []

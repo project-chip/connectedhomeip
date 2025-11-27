@@ -42,6 +42,7 @@ public:
     uint8_t GetConnectNetworkTimeoutSeconds() override { return 2; }
 
     void SetAddOrUpdateNetworkReturn(NetworkCommissioningStatusEnum value) { mAddOrUpdateStatus = value; }
+    void SetEnabledAllowed(bool enabledAllowed) { mEnabledAllowed = enabledAllowed; }
 
     NetworkCommissioningStatusEnum RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText,
                                                  uint8_t & outNetworkIndex) override
@@ -58,12 +59,22 @@ public:
         callback->OnResult(NetworkCommissioningStatusEnum::kSuccess, ""_span, 0);
     }
 
+    CHIP_ERROR SetEnabled(bool enabled) override
+    {
+        if (mEnabledAllowed)
+        {
+            return CHIP_NO_ERROR;
+        }
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+
     // BaseDriver
     uint8_t GetMaxNetworks() override { return 0; }
     DeviceLayer::NetworkCommissioning::NetworkIterator * GetNetworks() override { return nullptr; }
 
 private:
     NetworkCommissioningStatusEnum mAddOrUpdateStatus = NetworkCommissioningStatusEnum::kUnknownError;
+    bool mEnabledAllowed                              = false;
 };
 
 } // namespace Testing

@@ -31,7 +31,8 @@
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/WriteHandler.h>
-#include <app/clusters/ota-provider/ota-provider-cluster.h>
+#include <app/clusters/ota-provider/OTAProviderCluster.h>
+#include <app/data-model-provider/ProviderChangeListener.h>
 #include <app/data-model/Decode.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
@@ -282,6 +283,14 @@ Protocols::InteractionModel::Status emAfReadOrWriteAttribute(const EmberAfAttrib
     return Protocols::InteractionModel::Status::UnsupportedAttribute;
 }
 
+chip::Protocols::InteractionModel::Status emberAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
+                                                               chip::AttributeId attributeID, uint8_t * dataPtr,
+                                                               uint16_t readLength)
+{
+
+    return Protocols::InteractionModel::Status::UnsupportedAttribute;
+}
+
 namespace chip {
 namespace app {
 
@@ -305,13 +314,13 @@ CHIP_ERROR GetSemanticTagForEndpointAtIndex(EndpointId endpoint, size_t index,
 }
 
 void emberAfAttributeChanged(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
-                             AttributesChangedListener * listener)
+                             DataModel::ProviderChangeListener * listener)
 {
     gMockDataVersion++;
     listener->MarkDirty(AttributePathParams(endpoint, clusterId, attributeId));
 }
 
-void emberAfEndpointChanged(EndpointId endpoint, AttributesChangedListener * listener)
+void emberAfEndpointChanged(EndpointId endpoint, DataModel::ProviderChangeListener * listener)
 {
     listener->MarkDirty(AttributePathParams(endpoint));
 }

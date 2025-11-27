@@ -49,13 +49,13 @@ CHIP_ERROR RpcConnect(void)
 
 void registerCommandsJCM(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    const char * clusterName = "JCM";
+    const char * clusterName = "Pairing";
 
     commands_list clusterCommands = {
         make_unique<OpenJointCommissioningWindowCommand>(credsIssuerConfig),
     };
 
-    commands.RegisterCommandSet(clusterName, clusterCommands, "Commands for commissioning JF-enabled devices.");
+    commands.UpdateCommandSet(clusterName, clusterCommands);
 }
 
 // ================================================================================

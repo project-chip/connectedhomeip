@@ -37,12 +37,13 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.clusters import Globals
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
 from TC_AVSMTestBase import AVSMTestBase
+
+import matter.clusters as Clusters
+from matter.clusters import Globals
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 
 logger = logging.getLogger(__name__)
 
@@ -94,11 +95,16 @@ class TC_AVSM_2_11(MatterBaseTest, AVSMTestBase):
             ),
             TestStep(
                 8,
+                "TH reads StreamUsagePriorities attribute from CameraAVStreamManagement Cluster on DUT.",
+                "Verify the list is the same as set in StreamPriorities in step 7.",
+            ),
+            TestStep(
+                9,
                 "TH sends the SetStreamPriorities command with StreamPriorities containing a StreamUsage not in aSupportedStreamUsages.",
                 "DUT responds with a DYNAMIC_CONSTRAINT_ERROR status code.",
             ),
             TestStep(
-                9,
+                10,
                 "TH sends the SetStreamPriorities command with StreamPriorities containing duplicate StreamUsage values from aSupportedStreamUsages.",
                 "DUT responds with a ALREADY_EXISTS status code.",
             ),
@@ -110,7 +116,7 @@ class TC_AVSM_2_11(MatterBaseTest, AVSMTestBase):
         and has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kVideo)
     )
     async def test_TC_AVSM_2_11(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.CameraAvStreamManagement
         attr = Clusters.CameraAvStreamManagement.Attributes
         commands = Clusters.CameraAvStreamManagement.Commands
@@ -168,16 +174,26 @@ class TC_AVSM_2_11(MatterBaseTest, AVSMTestBase):
 
         self.step(7)
         try:
+            aStreamUsagePriorities = aSupportedStreamUsages[0:1]
             await self.send_single_cmd(
-                endpoint=endpoint, cmd=commands.SetStreamPriorities(streamPriorities=(aSupportedStreamUsages))
+                endpoint=endpoint, cmd=commands.SetStreamPriorities(streamPriorities=(aStreamUsagePriorities))
             )
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
             pass
 
         self.step(8)
+        readStreamUsagePriorities = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePriorities
+        )
+        logger.info(f"Rx'd StreamUsagePriorities: {readStreamUsagePriorities}")
+        asserts.assert_equal(readStreamUsagePriorities, aStreamUsagePriorities,
+                             "The read StreamUsagePriorities is different from the one set in SetStreamPriorities")
+
+        self.step(9)
         try:
-            notSupportedStreamUsage = next((e for e in Globals.Enums.StreamUsageEnum if e not in aSupportedStreamUsages), None)
+            notSupportedStreamUsage = next(
+                (e for e in Globals.Enums.StreamUsageEnum if e not in aSupportedStreamUsages and e != Globals.Enums.StreamUsageEnum.kInternal), None)
             await self.send_single_cmd(
                 endpoint=endpoint, cmd=commands.SetStreamPriorities(streamPriorities=([notSupportedStreamUsage]))
             )
@@ -192,7 +208,7 @@ class TC_AVSM_2_11(MatterBaseTest, AVSMTestBase):
             )
             pass
 
-        self.step(9)
+        self.step(10)
         try:
             await self.send_single_cmd(
                 endpoint=endpoint,

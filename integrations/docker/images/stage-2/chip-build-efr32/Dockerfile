@@ -12,8 +12,8 @@ RUN set -x \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
 
-# Download Simplicity SDK v2025.6.0 (f107f75)
-RUN git clone --depth=1 --single-branch --branch=v2025.6.0 https://github.com/SiliconLabs/simplicity_sdk.git /tmp/simplicity_sdk \
+# Download Simplicity SDK v2025.6.2 (9932cb1)
+RUN git clone --depth=1 --single-branch --branch=v2025.6.2 https://github.com/SiliconLabs/simplicity_sdk.git /tmp/simplicity_sdk \
     # Deleting files that are not needed to save space
     && rm -rf /tmp/simplicity_sdk/.git /tmp/simplicity_sdk/protocol/flex /tmp/simplicity_sdk/protocol/z-wave /tmp/simplicity_sdk/protocol/zigbee /tmp/simplicity_sdk/protocol/wisun /tmp/simplicity_sdk/util/third_party/tensorflow_extra \
     /tmp/simplicity_sdk/util/third_party/sqlite /tmp/simplicity_sdk/util/third_party/ot-br-posix /tmp/simplicity_sdk/util/third_party/tflite-micro /tmp/simplicity_sdk/util/third_party/tflite-fatfs /tmp/simplicity_sdk/util/third_party/unity_test_framework \
@@ -26,21 +26,16 @@ RUN git clone --depth=1 --single-branch --branch=v2025.6.0 https://github.com/Si
     && find /tmp/simplicity_sdk/platform/Device/SiliconLabs  -mindepth 1 -maxdepth 1 -type d ! \( -name 'EFR32MG24' -o -name 'EFR32MG26' -o -name 'MGM24' -o -name 'MGM26' \) -exec rm -rf {} + \
     && : # last line
 
-# Clone WiSeConnect Wi-Fi and Bluetooth Software 2.12.0 (a18b5dd)
-RUN git clone --depth=1 --single-branch --branch=2.12.0 https://github.com/SiliconLabs/wiseconnect-wifi-bt-sdk.git /tmp/wiseconnect-wifi-bt-sdk && \
-    cd /tmp/wiseconnect-wifi-bt-sdk && \
-    rm -rf .git examples \
-    && : # last line
-
-# Clone WiSeConnect SDK v3.5.0 (ca4c4b0)
-RUN git clone --depth=1 --single-branch --branch=v3.5.0 https://github.com/SiliconLabs/wiseconnect.git /tmp/wifi_sdk && \
+# Clone WiSeConnect SDK v3.5.2 (02e004c)
+RUN git clone --depth=1 --single-branch --branch=v3.5.2 https://github.com/SiliconLabs/wiseconnect.git /tmp/wifi_sdk && \
     cd /tmp/wifi_sdk && \
     rm -rf .git examples components/device/stm32 \
     && : # last line
 
 # SLC-cli install
 # TODO: figure out a way to make this a fixed version. Currently a moving target.
-RUN wget https://www.silabs.com/documents/login/software/slc_cli_linux.zip && \
+
+RUN wget https://www.silabs.com/documents/public/software/slc_cli_linux.zip && \
     unzip ./slc_cli_linux.zip -d /tmp && \
     rm ./slc_cli_linux.zip \
     && : # last line
@@ -68,11 +63,9 @@ RUN set -x \
 # Keep GSDK_ROOT name until rename transition to SISDK is completed
 ENV GSDK_ROOT=/opt/silabs/simplicity_sdk/
 ENV SISDK_ROOT=/opt/silabs/simplicity_sdk/
-ENV WISECONNECT_SDK_ROOT=/opt/silabs/wiseconnect-wifi-bt-sdk/
 ENV WIFI_SDK_ROOT=/opt/silabs/wifi_sdk/
 ENV PATH="${PATH}:/opt/silabs/slc_cli/"
 
 COPY --from=build /tmp/simplicity_sdk /opt/silabs/simplicity_sdk
-COPY --from=build /tmp/wiseconnect-wifi-bt-sdk/ /opt/silabs/wiseconnect-wifi-bt-sdk/
 COPY --from=build /tmp/wifi_sdk /opt/silabs/wifi_sdk
 COPY --from=build /tmp/slc_cli /opt/silabs/slc_cli

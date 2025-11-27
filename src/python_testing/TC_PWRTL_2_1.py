@@ -36,9 +36,10 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 
 
 class TC_PWRTL_2_1(MatterBaseTest):
@@ -46,12 +47,16 @@ class TC_PWRTL_2_1(MatterBaseTest):
     def pics_TC_PWRTL_2_1(self) -> list[str]:
         return ["PWRTL.S"]
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_PWRTL_2_1(self):
 
         attributes = Clusters.PowerTopology.Attributes
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         powertop_attr_list = Clusters.Objects.PowerTopology.Attributes.AttributeList
         powertop_cluster = Clusters.Objects.PowerTopology

@@ -87,6 +87,10 @@
 #     factory-reset: false
 #     quiet: true
 #   run9:
+#     script-args: --storage-path admin_storage.json --string-arg test_from_file:device_dump_0xFFF1_0x8001_1.json --tests test_TC_IDM_11_1
+#     factory-reset: false
+#     quiet: true
+#   run10:
 #     app: ${ENERGY_MANAGEMENT_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
@@ -97,7 +101,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#   run10:
+#   run11:
 #     app: ${LIT_ICD_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
@@ -108,7 +112,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#   run11:
+#   run12:
 #     app: ${CHIP_MICROWAVE_OVEN_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
@@ -119,7 +123,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#   run12:
+#   run13:
 #     app: ${CHIP_RVC_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
@@ -130,7 +134,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#   run13:
+#   run14:
 #     app: ${NETWORK_MANAGEMENT_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
@@ -141,9 +145,20 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#   run14:
+#   run15:
 #     app: ${LIGHTING_APP_NO_UNIQUE_ID}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --manual-code 10054912339
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run16:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --manual-code 10054912339
@@ -162,36 +177,39 @@
 # Run 6: Tests CASE connection using QR code (12.1 only)
 # Run 7: Tests CASE connection using manual discriminator and passcode (12.1 only)
 # Run 8: Tests reusing storage from run7 (i.e. factory-reset=false)
-# Run 9: Tests against energy-management-app
-# Run 10: Tests against lit-icd app
-# Run 11: Tests against microwave-oven app
-# Run 12: Tests against chip-rvc app
-# Run 13: Tests against network-management-app
-# Run 14: Tests against lighting-app-data-mode-no-unique-id
+# Run 9: Test using the generated attribute wildcard file from previous run
+# Run 10: Tests against energy-management-app
+# Run 11: Tests against lit-icd app
+# Run 12: Tests against microwave-oven app
+# Run 13: Tests against chip-rvc app
+# Run 14: Tests against network-management-app
+# Run 15: Tests against lighting-app-data-mode-no-unique-id
+# Run 16: Tests against all-devices-app
 
 import logging
 from dataclasses import dataclass
 from typing import Any, Callable
 
-import chip.clusters as Clusters
-import chip.clusters.ClusterObjects
-import chip.tlv
-from chip import ChipUtility
-from chip.clusters.Attribute import ValueDecodeFailure
-from chip.clusters.ClusterObjects import ClusterAttributeDescriptor, ClusterObjectFieldDescriptor
-from chip.clusters.Types import Nullable
-from chip.exceptions import ChipStackError
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.basic_composition import BasicCompositionTests
-from chip.testing.global_attribute_ids import (AttributeIdType, ClusterIdType, CommandIdType, GlobalAttributeIds, attribute_id_type,
-                                               cluster_id_type, command_id_type)
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from chip.testing.problem_notices import AttributePathLocation, ClusterPathLocation, CommandPathLocation, UnknownProblemLocation
-from chip.testing.taglist_and_topology_test import (create_device_type_list_for_root, create_device_type_lists,
-                                                    find_tag_list_problems, find_tree_roots, flat_list_ok,
-                                                    get_direct_children_of_root, parts_list_problems, separate_endpoint_types)
-from chip.tlv import uint
-from TC_DeviceConformance import get_supersets
+from test_testing.DeviceConformanceTests import get_supersets
+
+import matter.clusters as Clusters
+import matter.clusters.ClusterObjects
+import matter.tlv
+from matter import ChipUtility
+from matter.clusters.Attribute import ValueDecodeFailure
+from matter.clusters.ClusterObjects import ClusterAttributeDescriptor, ClusterObjectFieldDescriptor
+from matter.clusters.Types import Nullable
+from matter.exceptions import ChipStackError
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.basic_composition import BasicCompositionTests
+from matter.testing.global_attribute_ids import (AttributeIdType, ClusterIdType, CommandIdType, GlobalAttributeIds,
+                                                 attribute_id_type, cluster_id_type, command_id_type)
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.problem_notices import AttributePathLocation, ClusterPathLocation, CommandPathLocation, UnknownProblemLocation
+from matter.testing.taglist_and_topology_test import (create_device_type_list_for_root, create_device_type_lists,
+                                                      find_tag_list_problems, find_tree_roots, flat_list_ok,
+                                                      get_direct_children_of_root, parts_list_problems, separate_endpoint_types)
+from matter.tlv import uint
 
 
 def get_vendor_id(mei: int) -> int:
@@ -211,7 +229,7 @@ def check_int_in_range(min_value: int, max_value: int, allow_null: bool = False)
         if obj is None and allow_null:
             return
 
-        if not isinstance(obj, int) and not isinstance(obj, chip.tlv.uint):
+        if not isinstance(obj, int) and not isinstance(obj, matter.tlv.uint):
             raise ValueError(f"Value {str(obj)} is not an integer or uint (decoded type: {type(obj)})")
         int_val = int(obj)
         if (int_val < min_value) or (int_val > max_value):
@@ -242,7 +260,7 @@ def check_list_of_ints_in_range(min_value: int, max_value: int, min_size: int = 
                 f"Value {str(obj)} is a list of size {len(obj)}, but expected a list with size in range [{min_size}, {max_size}]")
 
         for val_idx, val in enumerate(obj):
-            if not isinstance(val, int) and not isinstance(val, chip.tlv.uint):
+            if not isinstance(val, int) and not isinstance(val, matter.tlv.uint):
                 raise ValueError(
                     f"At index {val_idx} in {str(obj)}, value {val} is not an int/uint, but an int/uint was expected (decoded type: {type(val)})")
 
@@ -333,6 +351,10 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
             self.fail_current_test("At least one endpoint was missing the descriptor cluster.")
 
     async def _read_non_standard_attribute_check_unsupported_read(self, endpoint_id, cluster_id, attribute_id) -> bool:
+        # If we're doing this from file, we don't have a way to assess this. Assume this is OK for now.
+        if self.test_from_file:
+            return True
+
         @dataclass
         class TempAttribute(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
@@ -353,7 +375,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
 
             value: 'uint' = 0
 
-        result = await self.default_controller.Read(nodeid=self.dut_node_id, attributes=[(endpoint_id, TempAttribute)])
+        result = await self.default_controller.Read(nodeId=self.dut_node_id, attributes=[(endpoint_id, TempAttribute)])
         try:
             attr_ret = result.tlvAttributes[endpoint_id][cluster_id][attribute_id]
         except KeyError:
@@ -362,8 +384,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         error_type_ok = attr_ret is not None and isinstance(
             attr_ret, Clusters.Attribute.ValueDecodeFailure) and isinstance(attr_ret.Reason, InteractionModelError)
 
-        got_expected_error = error_type_ok and attr_ret.Reason.status == Status.UnsupportedRead
-        return got_expected_error
+        return error_type_ok and attr_ret.Reason.status == Status.UnsupportedRead
 
     @async_test_body
     async def test_TC_IDM_10_1(self):
@@ -483,7 +504,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
                 globals = [a for a in cluster[GlobalAttributeIds.ATTRIBUTE_LIST_ID] if a >= global_range_min and a < mei_range_min]
-                unexpected_globals = sorted(list(set(globals) - set(allowed_globals)))
+                unexpected_globals = sorted(set(globals) - set(allowed_globals))
                 for unexpected in unexpected_globals:
                     location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=unexpected)
                     self.record_error(self.get_test_name(), location=location,
@@ -493,13 +514,13 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         # validate that all the returned attributes in the standard clusters contain only known attribute ids
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
-                if cluster_id not in chip.clusters.ClusterObjects.ALL_ATTRIBUTES:
+                if cluster_id not in matter.clusters.ClusterObjects.ALL_ATTRIBUTES:
                     # Skip clusters that are not part of the standard generated corpus (e.g. MS clusters)
                     continue
                 standard_attributes = [a for a in cluster[GlobalAttributeIds.ATTRIBUTE_LIST_ID]
                                        if a <= attribute_standard_range_max]
-                allowed_standard_attributes = chip.clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id]
-                unexpected_standard_attributes = sorted(list(set(standard_attributes) - set(allowed_standard_attributes)))
+                allowed_standard_attributes = matter.clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id]
+                unexpected_standard_attributes = sorted(set(standard_attributes) - set(allowed_standard_attributes))
                 for unexpected in unexpected_standard_attributes:
                     location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=unexpected)
                     self.record_error(self.get_test_name(), location=location,
@@ -522,24 +543,24 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         # Command lists only have a scoped range, so we only need to check for known command ids, no global range check
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
-                if cluster_id not in chip.clusters.ClusterObjects.ALL_CLUSTERS:
+                if cluster_id not in matter.clusters.ClusterObjects.ALL_CLUSTERS:
                     continue
                 standard_accepted_commands = [
                     a for a in cluster[GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID] if a <= command_standard_range_max]
                 standard_generated_commands = [
                     a for a in cluster[GlobalAttributeIds.GENERATED_COMMAND_LIST_ID] if a <= command_standard_range_max]
-                if cluster_id in chip.clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS:
-                    allowed_accepted_commands = [a for a in chip.clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id]]
+                if cluster_id in matter.clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS:
+                    allowed_accepted_commands = list(matter.clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id])
                 else:
                     allowed_accepted_commands = []
-                if cluster_id in chip.clusters.ClusterObjects.ALL_GENERATED_COMMANDS:
-                    allowed_generated_commands = [a for a in chip.clusters.ClusterObjects.ALL_GENERATED_COMMANDS[cluster_id]]
+                if cluster_id in matter.clusters.ClusterObjects.ALL_GENERATED_COMMANDS:
+                    allowed_generated_commands = list(matter.clusters.ClusterObjects.ALL_GENERATED_COMMANDS[cluster_id])
                 else:
                     allowed_generated_commands = []
 
                 # Compare the set of commands in the standard range that the DUT says it accepts vs. the commands we know about.
-                unexpected_accepted_commands = sorted(list(set(standard_accepted_commands) - set(allowed_accepted_commands)))
-                unexpected_generated_commands = sorted(list(set(standard_generated_commands) - set(allowed_generated_commands)))
+                unexpected_accepted_commands = sorted(set(standard_accepted_commands) - set(allowed_accepted_commands))
+                unexpected_generated_commands = sorted(set(standard_generated_commands) - set(allowed_generated_commands))
 
                 for unexpected in unexpected_accepted_commands:
                     location = CommandPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, command_id=unexpected)
@@ -593,14 +614,16 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                     location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,
                                                      attribute_id=manufacturer_value)
                     if suffix > attribute_standard_range_max and suffix < global_range_min:
-                        self.record_error(self.get_test_name(), location=location,
-                                          problem=f"Manufacturer attribute in undefined range {manufacturer_value} in cluster {cluster_id}",
-                                          spec_location=f"Cluster {cluster_id}")
+                        self.record_error(
+                            self.get_test_name(), location=location,
+                            problem=f"Manufacturer attribute in undefined range {manufacturer_value} in cluster {cluster_id}",
+                            spec_location=f"Cluster {cluster_id}")
                         success = False
                     elif suffix >= global_range_min:
-                        self.record_error(self.get_test_name(), location=location,
-                                          problem=f"Manufacturer attribute in global range {manufacturer_value} in cluster {cluster_id}",
-                                          spec_location=f"Cluster {cluster_id}")
+                        self.record_error(
+                            self.get_test_name(), location=location,
+                            problem=f"Manufacturer attribute in global range {manufacturer_value} in cluster {cluster_id}",
+                            spec_location=f"Cluster {cluster_id}")
                         success = False
 
         for endpoint_id, endpoint in self.endpoints_tlv.items():
@@ -632,7 +655,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         self.print_step(9, "Validate that all clusters in the standard range have a known cluster ID")
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             standard_clusters = [a for a in endpoint.keys() if a < mei_range_min]
-            unknown_clusters = sorted(list(set(standard_clusters) - set(chip.clusters.ClusterObjects.ALL_CLUSTERS)))
+            unknown_clusters = sorted(set(standard_clusters) - set(matter.clusters.ClusterObjects.ALL_CLUSTERS))
             for bad in unknown_clusters:
                 location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=bad)
                 self.record_error(self.get_test_name(
@@ -652,12 +675,12 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         self.print_step(11, "Validate that standard cluster FeatureMap attributes contains only known feature flags")
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
-                if cluster_id not in chip.clusters.ClusterObjects.ALL_CLUSTERS:
+                if cluster_id not in matter.clusters.ClusterObjects.ALL_CLUSTERS:
                     continue
                 feature_map = cluster[GlobalAttributeIds.FEATURE_MAP_ID]
                 feature_mask = 0
                 try:
-                    feature_map_enum = chip.clusters.ClusterObjects.ALL_CLUSTERS[cluster_id].Bitmaps.Feature
+                    feature_map_enum = matter.clusters.ClusterObjects.ALL_CLUSTERS[cluster_id].Bitmaps.Feature
                     for f in feature_map_enum:
                         feature_mask = feature_mask | f
                 except AttributeError:
@@ -679,7 +702,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
 
         test_failure = None
         try:
-            subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id,
+            subscription = await self.default_controller.ReadEvent(nodeId=self.dut_node_id,
                                                                    events=[('*')],
                                                                    fabricFiltered=False,
                                                                    reportInterval=(100, 1000))
@@ -920,7 +943,9 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
             for ep, problem in problems.items():
                 location = AttributePathLocation(endpoint_id=ep, cluster_id=Clusters.Descriptor.id,
                                                  attribute_id=Clusters.Descriptor.Attributes.TagList.attribute_id)
-                msg = f'problem on ep {ep}: missing feature = {problem.missing_feature}, missing attribute = {problem.missing_attribute}, duplicates = {problem.duplicates}, same_tags = {problem.same_tag}'
+                msg = (f'problem on ep {ep}: missing feature = {problem.missing_feature}, missing '
+                       f'attribute = {problem.missing_attribute}, duplicates = {problem.duplicates}, '
+                       f'same_tags = {problem.same_tag}')
                 self.record_error(self.get_test_name(), location=location, problem=msg, spec_location="Descriptor TagList")
 
         record_problems(problems)
@@ -1206,7 +1231,8 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                         self.record_error(
                             self.get_test_name(),
                             location=location,
-                            problem=f"EndpointUniqueId attribute length is {len(value)} bytes which exceeds the maximum allowed 32 bytes",
+                            problem=f"EndpointUniqueId attribute length is {len(value)} bytes which "
+                            f"exceeds the maximum allowed 32 bytes",
                             spec_location="EndpointUniqueId attribute"
                         )
                         self.fail_current_test(

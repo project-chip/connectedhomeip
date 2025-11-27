@@ -57,19 +57,21 @@
 
 # This test requires a TH_SERVER application. Please specify with --string-arg th_server_app_path:<path_to_app>
 
+import asyncio
 import logging
 import os
 import random
 import tempfile
 import time
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
-                                         run_if_endpoint_matches)
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.apps import AppServerSubprocess
+from matter.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
+                                           run_if_endpoint_matches)
 
 
 class TC_CCTRL_2_3(MatterBaseTest):
@@ -129,22 +131,21 @@ class TC_CCTRL_2_3(MatterBaseTest):
         super().teardown_class()
 
     def steps_TC_CCTRL_2_3(self) -> list[TestStep]:
-        steps = [TestStep(1, "Get number of fabrics from TH_SERVER", is_commissioning=True),
-                 TestStep(2, "Reading Attribute VendorId from TH_SERVER"),
-                 TestStep(3, "Reading Attribute ProductId from TH_SERVER"),
-                 TestStep(4, "Send RequestCommissioningApproval command to DUT with CASE session with correct VendorId and ProductId"),
-                 TestStep(5, "(Manual Step) Approve Commissioning Approval Request on DUT using method indicated by the manufacturer"),
-                 TestStep(6, "Reading Event CommissioningRequestResult from DUT, confirm one new event"),
-                 TestStep(7, "Send another RequestCommissioningApproval command to DUT with CASE session with same RequestId as the previous one"),
-                 TestStep(8, "Send CommissionNode command to DUT with CASE session, with valid parameters"),
-                 TestStep(9, "Send another CommissionNode command to DUT with CASE session, with with same RequestId as the previous one"),
-                 TestStep(10, "Send OpenCommissioningWindow command on Administrator Commissioning Cluster sent to TH_SERVER"),
-                 TestStep(11, "Get number of fabrics from TH_SERVER, verify DUT successfully commissioned TH_SERVER (up to 30 seconds)")]
-
-        return steps
+        return [TestStep(1, "Get number of fabrics from TH_SERVER", is_commissioning=True),
+                TestStep(2, "Reading Attribute VendorId from TH_SERVER"),
+                TestStep(3, "Reading Attribute ProductId from TH_SERVER"),
+                TestStep(4, "Send RequestCommissioningApproval command to DUT with CASE session with correct VendorId and ProductId"),
+                TestStep(5, "(Manual Step) Approve Commissioning Approval Request on DUT using method indicated by the manufacturer"),
+                TestStep(6, "Reading Event CommissioningRequestResult from DUT, confirm one new event"),
+                TestStep(7, "Send another RequestCommissioningApproval command to DUT with CASE session with same RequestId as the previous one"),
+                TestStep(8, "Send CommissionNode command to DUT with CASE session, with valid parameters"),
+                TestStep(9, "Send another CommissionNode command to DUT with CASE session, with with same RequestId as the previous one"),
+                TestStep(10, "Send OpenCommissioningWindow command on Administrator Commissioning Cluster sent to TH_SERVER"),
+                TestStep(11, "Get number of fabrics from TH_SERVER, verify DUT successfully commissioned TH_SERVER (up to 30 seconds)")]
 
     # This test has some manual steps and one sleep for up to 30 seconds. Test typically
     # runs under 1 mins, so 3 minutes is more than enough.
+
     @property
     def default_timeout(self) -> int:
         return 3*60
@@ -173,7 +174,7 @@ class TC_CCTRL_2_3(MatterBaseTest):
 
         self.step(6)
         event_path = [(self.matter_test_config.endpoint, Clusters.CommissionerControl.Events.CommissioningRequestResult, 1)]
-        events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
+        events = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path)
         asserts.assert_equal(len(events), 1, "Unexpected event list len")
         asserts.assert_equal(events[0].Data.statusCode, 0, "Unexpected status code")
         asserts.assert_equal(events[0].Data.clientNodeID,
@@ -220,7 +221,7 @@ class TC_CCTRL_2_3(MatterBaseTest):
 
         th_server_fabrics_new = None
         while time_remaining > 0:
-            time.sleep(2)
+            await asyncio.sleep(2)
             th_server_fabrics_new = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, fabric_filtered=False)
             if previous_number_th_server_fabrics != len(th_server_fabrics_new):
                 break

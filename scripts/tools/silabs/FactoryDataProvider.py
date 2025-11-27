@@ -75,7 +75,7 @@ class FactoryDataWriter:
     def WriteBits(self, bits, offset, input, numberOfBits, totalPayloadSizeInBits):
         if ((offset + numberOfBits) > totalPayloadSizeInBits):
             print("THIS IS NOT VALID")
-            return
+            return None
         # input < 1u << numberOfBits);
 
         index = offset
@@ -190,13 +190,13 @@ class FactoryDataWriter:
         # Retrieve the device current nvm3 data in a binary file
         # It will be used as base to add the new credentials
         inputImage = self.TEMP_FILE
-        cmd = ['commander', 'nvm3', 'read', '-o', inputImage, ]
+        cmd = ['commander', 'nvm3', 'read', '-o', inputImage]
         self.add_SerialNo_To_CMD(cmd)
         results = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
         if results.returncode != 0:
             # No nvm3 section found. Retrieve the device info
-            cmd = ['commander', 'device', 'info', ]
+            cmd = ['commander', 'device', 'info']
             self.add_SerialNo_To_CMD(cmd)
             try:
                 output = subprocess.check_output(cmd)
@@ -287,14 +287,14 @@ class FactoryDataWriter:
 
         # A tempfile was create/used, delete it.
         if inputImage == self.TEMP_FILE:
-            cmd = ['rm', '-rf', 'tmp_nvm3.s37', ]
+            cmd = ['rm', '-rf', 'tmp_nvm3.s37']
             subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
         results.check_returncode
 
         # Flash the binary if the device is connected
         if isDeviceConnected:
-            cmd = ['commander', 'flash', self.OUT_FILE, ]
+            cmd = ['commander', 'flash', self.OUT_FILE]
             self.add_SerialNo_To_CMD(cmd)
             results = subprocess.run(cmd)
 

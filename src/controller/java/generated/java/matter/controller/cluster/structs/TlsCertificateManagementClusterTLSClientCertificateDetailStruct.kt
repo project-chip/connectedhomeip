@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 
 class TlsCertificateManagementClusterTLSClientCertificateDetailStruct(
   val ccdid: UShort,
-  val clientCertificate: Optional<ByteArray>,
+  val clientCertificate: Optional<ByteArray>?,
   val intermediateCertificates: Optional<List<ByteArray>>,
   val fabricIndex: UByte,
 ) {
@@ -43,9 +43,13 @@ class TlsCertificateManagementClusterTLSClientCertificateDetailStruct(
     tlvWriter.apply {
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_CCDID), ccdid)
-      if (clientCertificate.isPresent) {
-        val optclientCertificate = clientCertificate.get()
-        put(ContextSpecificTag(TAG_CLIENT_CERTIFICATE), optclientCertificate)
+      if (clientCertificate != null) {
+        if (clientCertificate.isPresent) {
+          val optclientCertificate = clientCertificate.get()
+          put(ContextSpecificTag(TAG_CLIENT_CERTIFICATE), optclientCertificate)
+        }
+      } else {
+        putNull(ContextSpecificTag(TAG_CLIENT_CERTIFICATE))
       }
       if (intermediateCertificates.isPresent) {
         val optintermediateCertificates = intermediateCertificates.get()
@@ -73,10 +77,15 @@ class TlsCertificateManagementClusterTLSClientCertificateDetailStruct(
       tlvReader.enterStructure(tlvTag)
       val ccdid = tlvReader.getUShort(ContextSpecificTag(TAG_CCDID))
       val clientCertificate =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CLIENT_CERTIFICATE))) {
-          Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_CLIENT_CERTIFICATE)))
+        if (!tlvReader.isNull()) {
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_CLIENT_CERTIFICATE))) {
+            Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_CLIENT_CERTIFICATE)))
+          } else {
+            Optional.empty()
+          }
         } else {
-          Optional.empty()
+          tlvReader.getNull(ContextSpecificTag(TAG_CLIENT_CERTIFICATE))
+          null
         }
       val intermediateCertificates =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_INTERMEDIATE_CERTIFICATES))) {

@@ -670,8 +670,11 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
     DataModel::Nullable<GenericDimensionStateStruct> currentState;
     VerifyOrReturnError(GetCurrentState(currentState) == CHIP_NO_ERROR, Status::Failure);
     VerifyOrReturnError(!currentState.IsNull(), Status::InvalidInState);
-    VerifyOrReturnError(currentState.Value().position.HasValue() && !currentState.Value().position.Value().IsNull(),
-                        Status::InvalidInState);
+    if (mConformance.HasFeature(Feature::kPositioning))
+    {
+        VerifyOrReturnError(currentState.Value().position.HasValue() && !currentState.Value().position.Value().IsNull(),
+                            Status::InvalidInState);
+    }
 
     // If this command requests a position change while the Latch field of the CurrentState is True (Latched), and the Latch field
     // of this command is not set to False (Unlatched), a status code of INVALID_IN_STATE SHALL be returned.

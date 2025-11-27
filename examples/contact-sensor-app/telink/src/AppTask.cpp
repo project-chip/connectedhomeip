@@ -21,6 +21,10 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 
+// TODO: Ideally we should not depend on the codegen integration
+// It would be best if we could use generic cluster API instead
+#include <app/clusters/boolean-state-server/CodegenIntegration.h>
+
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 
@@ -31,7 +35,7 @@ AppTask AppTask::sAppTask;
 CHIP_ERROR AppTask::Init(void)
 {
     SetExampleButtonCallbacks(ContactActionEventHandler);
-    InitCommonParts();
+    TEMPORARY_RETURN_IGNORED InitCommonParts();
 
     LedManager::getInstance().setLed(LedManager::EAppLed_App0, ContactSensorMgr().IsContactClosed());
 
@@ -80,12 +84,9 @@ void AppTask::UpdateClusterStateInternal(intptr_t arg)
 
     ChipLogProgress(NotSpecified, "StateValue::Set : %d", newValue);
 
-    // write the new boolean state value
-    Protocols::InteractionModel::Status status = app::Clusters::BooleanState::Attributes::StateValue::Set(1, newValue);
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
-        ChipLogError(NotSpecified, "ERR: updating boolean status value %x", to_underlying(status));
-    }
+    auto booleanState = chip::app::Clusters::BooleanState::FindClusterOnEndpoint(1);
+    VerifyOrReturn(booleanState != nullptr);
+    booleanState->SetStateValue(newValue);
 }
 
 void AppTask::ContactActionEventHandler(AppEvent * aEvent)
@@ -126,21 +127,19 @@ void AppTask::ContactActionEventHandler(AppEvent * aEvent)
 
 void AppTask::UpdateClusterState(void)
 {
-    PlatformMgr().ScheduleWork(UpdateClusterStateInternal, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(UpdateClusterStateInternal, 0);
 }
 
 void AppTask::UpdateDeviceState(void)
 {
-    PlatformMgr().ScheduleWork(UpdateDeviceStateInternal, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(UpdateDeviceStateInternal, 0);
 }
 
 void AppTask::UpdateDeviceStateInternal(intptr_t arg)
 {
-    bool stateValueAttrValue = 0;
-
-    /* get boolean state attribute value */
-    (void) app::Clusters::BooleanState::Attributes::StateValue::Get(1, &stateValueAttrValue);
-
+    auto booleanState = chip::app::Clusters::BooleanState::FindClusterOnEndpoint(1);
+    VerifyOrReturn(booleanState != nullptr);
+    auto stateValueAttrValue = booleanState->GetStateValue();
     LedManager::getInstance().setLed(LedManager::EAppLed_App0, stateValueAttrValue);
 }
 

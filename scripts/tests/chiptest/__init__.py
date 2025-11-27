@@ -17,13 +17,23 @@
 import json
 import logging
 import os
+import shlex
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterator, Set
 
-from . import linux, runner
+from . import runner
 from .test_definition import ApplicationPaths, TestDefinition, TestTag, TestTarget
+
+log = logging.getLogger(__name__)
+
+__all__ = [
+    "TestTarget",
+    "TestDefinition",
+    "ApplicationPaths",
+    "runner",
+]
 
 _DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", ".."))
@@ -146,15 +156,15 @@ def _GetInDevelopmentTests() -> Set[str]:
         "Test_TC_PSCFG_1_1.yaml",  # Power source configuration cluster is deprecated and removed from all-clusters
         "Test_TC_PSCFG_2_1.yaml",  # Power source configuration cluster is deprecated and removed from all-clusters
         "Test_TC_PSCFG_2_2.yaml",  # Power source configuration cluster is deprecated and removed from all-clusters
-        "Test_TC_SMOKECO_2_2.yaml",          # chip-repl does not support local timeout (07/20/2023) and test assumes
+        "Test_TC_SMOKECO_2_2.yaml",          # matter-repl does not support local timeout (07/20/2023) and test assumes
                                              # TestEventTriggersEnabled is true, which it's not in CI.
-        "Test_TC_SMOKECO_2_3.yaml",          # chip-repl does not support local timeout (07/20/2023) and test assumes
+        "Test_TC_SMOKECO_2_3.yaml",          # matter-repl does not support local timeout (07/20/2023) and test assumes
                                              # TestEventTriggersEnabled is true, which it's not in CI.
-        "Test_TC_SMOKECO_2_4.yaml",          # chip-repl does not support local timeout (07/20/2023) and test assumes
+        "Test_TC_SMOKECO_2_4.yaml",          # matter-repl does not support local timeout (07/20/2023) and test assumes
                                              # TestEventTriggersEnabled is true, which it's not in CI.
-        "Test_TC_SMOKECO_2_5.yaml",          # chip-repl does not support local timeout (07/20/2023) and test assumes
+        "Test_TC_SMOKECO_2_5.yaml",          # matter-repl does not support local timeout (07/20/2023) and test assumes
                                              # TestEventTriggersEnabled is true, which it's not in CI.
-        "Test_TC_SMOKECO_2_6.yaml",          # chip-repl does not support local timeout (07/20/2023) and test assumes
+        "Test_TC_SMOKECO_2_6.yaml",          # matter-repl does not support local timeout (07/20/2023) and test assumes
                                              # TestEventTriggersEnabled is true, which it's not in CI.
         "Test_TC_BR_5.yaml",                 # [TODO] Fabric Sync example app has not been integrated into CI yet.
     }
@@ -224,25 +234,25 @@ def _GetDarwinFrameworkToolUnsupportedTests() -> Set[str]:
     }
 
 
-def _GetChipReplUnsupportedTests() -> Set[str]:
-    """Tests that fail in chip-repl for some reason"""
+def _GetReplUnsupportedTests() -> Set[str]:
+    """Tests that fail in matter-repl for some reason"""
     return {
-        "Test_AddNewFabricFromExistingFabric.yaml",     # chip-repl does not support GetCommissionerRootCertificate and IssueNocChain command
-        "Test_TC_OPCREDS_3_7.yaml",         # chip-repl does not support GetCommissionerRootCertificate and IssueNocChain command
-        "TestExampleCluster.yaml",          # chip-repl does not load custom pseudo clusters
-        "TestAttributesById.yaml",           # chip-repl does not support AnyCommands (06/06/2023)
-        "TestCommandsById.yaml",             # chip-repl does not support AnyCommands (06/06/2023)
-        "TestEventsById.yaml",               # chip-repl does not support AnyCommands (06/06/2023)
-        "TestReadNoneSubscribeNone.yaml",    # chip-repl does not support AnyCommands (07/27/2023)
-        "Test_TC_IDM_1_2.yaml",              # chip-repl does not support AnyCommands (19/07/2023)
-        "Test_TC_BRBINFO_2_1.yaml",          # chip-repl does not support AnyCommands (24/07/2024)
-        "TestThermostat.yaml",               # chip-repl does not support AnyCommands (14/10/2024)
-        "TestIcdManagementCluster.yaml",   # TODO(#30430): add ICD registration support in chip-repl
-        "Test_TC_ICDM_3_4.yaml",           # chip-repl does not support ICD registration
-        # chip-repl and chip-tool disagree on what the YAML here should look like: https://github.com/project-chip/connectedhomeip/issues/29110
+        "Test_AddNewFabricFromExistingFabric.yaml",     # matter-repl does not support GetCommissionerRootCertificate and IssueNocChain command
+        "Test_TC_OPCREDS_3_7.yaml",         # matter-repl does not support GetCommissionerRootCertificate and IssueNocChain command
+        "TestExampleCluster.yaml",          # matter-repl does not load custom pseudo clusters
+        "TestAttributesById.yaml",           # matter-repl does not support AnyCommands (06/06/2023)
+        "TestCommandsById.yaml",             # matter-repl does not support AnyCommands (06/06/2023)
+        "TestEventsById.yaml",               # matter-repl does not support AnyCommands (06/06/2023)
+        "TestReadNoneSubscribeNone.yaml",    # matter-repl does not support AnyCommands (07/27/2023)
+        "Test_TC_IDM_1_2.yaml",              # matter-repl does not support AnyCommands (19/07/2023)
+        "Test_TC_BRBINFO_2_1.yaml",          # matter-repl does not support AnyCommands (24/07/2024)
+        "TestThermostat.yaml",               # matter-repl does not support AnyCommands (14/10/2024)
+        "TestIcdManagementCluster.yaml",   # TODO(#30430): add ICD registration support in matter-repl
+        "Test_TC_ICDM_3_4.yaml",           # matter-repl does not support ICD registration
+        # matter-repl and chip-tool disagree on what the YAML here should look like: https://github.com/project-chip/connectedhomeip/issues/29110
         "TestClusterMultiFabric.yaml",
-        "TestDiagnosticLogs.yaml",          # chip-repl does not implement a BDXTransferServerDelegate
-        "TestDiagnosticLogsDownloadCommand.yaml",  # chip-repl does not implement the bdx download command
+        "TestDiagnosticLogs.yaml",          # matter-repl does not implement a BDXTransferServerDelegate
+        "TestDiagnosticLogsDownloadCommand.yaml",  # matter-repl does not implement the bdx download command
     }
 
 
@@ -315,9 +325,9 @@ def tests_with_command(chip_tool: str, is_manual: bool):
     cmd = [chip_tool, "tests", cmd]
     result = subprocess.run(cmd, capture_output=True, encoding="utf-8")
     if result.returncode != 0:
-        logging.error(f'Failed to run {cmd}:')
-        logging.error('STDOUT: ' + result.stdout)
-        logging.error('STDERR: ' + result.stderr)
+        log.error("Failed to run %s:", shlex.join(cmd))
+        log.error("STDOUT: %s", result.stdout)
+        log.error("STDERR: %s", result.stderr)
         result.check_returncode()
 
     test_tags = set()
@@ -349,7 +359,7 @@ def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool, treat_dft
     slow_tests = _GetSlowTests()
     extra_slow_tests = _GetExtraSlowTests()
     in_development_tests = _GetInDevelopmentTests()
-    chip_repl_unsupported_tests = _GetChipReplUnsupportedTests()
+    matter_repl_unsupported_tests = _GetReplUnsupportedTests()
     dft_unsupported_as_in_development_tests = _GetDarwinFrameworkToolUnsupportedTests()
     chip_tool_unsupported_as_in_development_tests = _GetChipToolUnsupportedTests()
     purposeful_failure_tests = _GetPurposefulFailureTests()
@@ -377,7 +387,7 @@ def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool, treat_dft
         if path.name in purposeful_failure_tests:
             tags.add(TestTag.PURPOSEFUL_FAILURE)
 
-        if treat_repl_unsupported_as_in_development and path.name in chip_repl_unsupported_tests:
+        if treat_repl_unsupported_as_in_development and path.name in matter_repl_unsupported_tests:
             tags.add(TestTag.IN_DEVELOPMENT)
 
         if use_short_run_name:
@@ -420,13 +430,3 @@ def AllChipToolTests(chip_tool: str):
 
     for test in tests_with_command(chip_tool, is_manual=True):
         yield test
-
-
-__all__ = [
-    "TestTarget",
-    "TestDefinition",
-    "AllTests",
-    "ApplicationPaths",
-    "linux",
-    "runner",
-]
