@@ -103,12 +103,13 @@ void MatterBooleanStateClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterBooleanStateClusterShutdownCallback(chip::EndpointId endpointId);
 
-void MatterIlluminanceMeasurementClusterInitCallback(chip::EndpointId endpointId);
-
-void MatterIlluminanceMeasurementClusterShutdownCallback(chip::EndpointId endpointId);
 void MatterBooleanStateConfigurationClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterBooleanStateConfigurationClusterShutdownCallback(chip::EndpointId endpointId);
+
+void MatterIlluminanceMeasurementClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterIlluminanceMeasurementClusterShutdownCallback(chip::EndpointId endpointId);
 
 void MatterOccupancySensingClusterInitCallback(chip::EndpointId endpointId);
 
