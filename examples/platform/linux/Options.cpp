@@ -687,14 +687,14 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         break;
 
     case kDeviceOption_UnsecuredCommissionerPort:
-        LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort = static_cast<uint16_t>(strtol(aValue, nullptr, 0));
+        LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort = static_cast<uint16_t>(strtoul(aValue, nullptr, 0));
         break;
 
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     case kDeviceOption_SecuredCommissionerPort:
-        LinuxDeviceOptions::GetInstance().securedCommissionerPort = static_cast<uint16_t>(strtol(aValue, nullptr, 0));
+        LinuxDeviceOptions::GetInstance().securedCommissionerPort = static_cast<uint16_t>(strtoul(aValue, nullptr, 0));
         break;
     case kCommissionerOption_FabricID:
         LinuxDeviceOptions::GetInstance().commissionerFabricId = static_cast<chip::FabricId>(strtoull(aValue, nullptr, 0));
@@ -719,7 +719,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 
     case kDeviceOption_InterfaceId:
         LinuxDeviceOptions::GetInstance().interfaceId =
-            Inet::InterfaceId(static_cast<chip::Inet::InterfaceId::PlatformType>(strtol(aValue, nullptr, 0)));
+            Inet::InterfaceId(static_cast<chip::Inet::InterfaceId::PlatformType>(strtoul(aValue, nullptr, 0)));
         break;
 
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
@@ -727,13 +727,13 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         LinuxDeviceOptions::GetInstance().traceStreamFilename.SetValue(std::string{ aValue });
         break;
     case kDeviceOption_TraceLog:
-        if (strtol(aValue, nullptr, 0) != 0)
+        if (strtoul(aValue, nullptr, 0) != 0)
         {
             LinuxDeviceOptions::GetInstance().traceStreamToLogEnabled = true;
         }
         break;
     case kDeviceOption_TraceDecode:
-        if (strtol(aValue, nullptr, 0) != 0)
+        if (strtoul(aValue, nullptr, 0) != 0)
         {
             LinuxDeviceOptions::GetInstance().traceStreamDecodeEnabled = true;
         }
@@ -809,15 +809,16 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         break;
 #if defined(PW_RPC_ENABLED)
     case kOptionRpcServerPort:
-        LinuxDeviceOptions::GetInstance().rpcServerPort = static_cast<uint16_t>(strtol(aValue, nullptr, 0));
+        LinuxDeviceOptions::GetInstance().rpcServerPort = static_cast<uint16_t>(strtoul(aValue, nullptr, 0));
         break;
 #endif
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     case kDeviceOption_SubscriptionCapacity:
-        LinuxDeviceOptions::GetInstance().subscriptionCapacity = static_cast<int32_t>(strtol(aValue, nullptr, 0));
+        LinuxDeviceOptions::GetInstance().subscriptionCapacity = static_cast<int32_t>(strtoul(aValue, nullptr, 0));
         break;
     case kDeviceOption_SubscriptionResumptionRetryIntervalSec:
-        LinuxDeviceOptions::GetInstance().subscriptionResumptionRetryIntervalSec = static_cast<int32_t>(strtol(aValue, nullptr, 0));
+        LinuxDeviceOptions::GetInstance().subscriptionResumptionRetryIntervalSec =
+            static_cast<int32_t>(strtoul(aValue, nullptr, 0));
         break;
     case kDeviceOption_IdleRetransmitTimeout: {
         auto mrpConfig            = GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig());
@@ -883,12 +884,12 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 #endif
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     case kDeviceOption_TermsAndConditions_Version: {
-        LinuxDeviceOptions::GetInstance().tcVersion.SetValue(static_cast<uint16_t>(strtol(aValue, nullptr, 0)));
+        LinuxDeviceOptions::GetInstance().tcVersion.SetValue(static_cast<uint16_t>(strtoul(aValue, nullptr, 0)));
         break;
     }
 
     case kDeviceOption_TermsAndConditions_Required: {
-        LinuxDeviceOptions::GetInstance().tcRequired.SetValue(static_cast<uint16_t>(strtol(aValue, nullptr, 0)));
+        LinuxDeviceOptions::GetInstance().tcRequired.SetValue(static_cast<uint16_t>(strtoul(aValue, nullptr, 0)));
         break;
     }
 #endif
@@ -934,7 +935,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
                              LinuxDeviceOptions::GetInstance().icdIdleModeDurationMs.Value())
                              .count()))
             {
-                PrintArgError("%s: icdShortIdleModeDuration value must be <= icdIdleModeDuration\n", aProgram, aValue);
+                PrintArgError("%s: icdShortIdleModeDuration value (%s) must be <= icdIdleModeDuration\n", aProgram, aValue);
                 retval = false;
             }
             else
