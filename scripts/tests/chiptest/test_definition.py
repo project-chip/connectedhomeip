@@ -308,7 +308,7 @@ class SubprocessInfoRepo(dict):
                 self.require(key)
                 discovered_count += 1
             except (LookupError, ValueError) as e:
-            log.exception("Exception while trying to discover '%s': %r", key, e)
+                log.exception("Exception while trying to discover '%s': %r", key, e)
 
         log.info("Discovery of %d paths took %.2f seconds", time.time() - start_ts)
 
@@ -324,7 +324,7 @@ class SubprocessInfoRepo(dict):
 
         if kind is None:
             if key not in self.subproc_knowhow:
-                raise Value(f"Key '{key}': kind neither provided nor specified in know-how")
+                raise ValueError(f"Key '{key}': kind neither provided nor specified in know-how")
             kind = self.subproc_knowhow[key].kind
         if target_name is None:
             if key not in self.subproc_knowhow:
