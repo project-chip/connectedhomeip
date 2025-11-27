@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/boolean-state-configuration-server/boolean-state-configuration-cluster.h>
+#include <app/clusters/boolean-state-configuration-server/BooleanStateConfigurationCluster.h>
 #include <app/static-cluster-config/BooleanStateConfiguration.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>

@@ -268,7 +268,7 @@ def AttributesToEvent(attrs: AttributesImpl) -> Event:
         elif attrs["priority"] == "debug":
             priority = EventPriority.DEBUG
         elif attrs["priority"] == "desc":
-            log.warning("Found an event with 'desc' priority: '%s'", list(attrs.items()))
+            log.warning("Found an event with 'desc' priority: '%s'", attrs.items())
             priority = EventPriority.CRITICAL
         else:
             raise Exception("UNKNOWN event priority: %r" % attrs["priority"])

@@ -55,7 +55,7 @@ class TC_DGSW_2_1(MatterBaseTest):
         return ["DGSW.S"]
 
     def steps_TC_DGSW_2_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read the ThreadMetrics attribute",
                      "The data type in each field of the struct must match the value listed in the specification(s) Table in 11.12.6.1"
@@ -70,7 +70,6 @@ class TC_DGSW_2_1(MatterBaseTest):
             TestStep(5, "Read the CurrentHeapHighWatermark attribute",
                      "The value will indicate the maximum amount of heap memory being used in bytes. This value can be reset by a node reboot."),
         ]
-        return steps
 
     @run_if_endpoint_matches(has_cluster(Clusters.SoftwareDiagnostics))
     async def test_TC_DGSW_2_1(self):

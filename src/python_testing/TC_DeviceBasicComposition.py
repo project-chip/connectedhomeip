@@ -384,8 +384,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         error_type_ok = attr_ret is not None and isinstance(
             attr_ret, Clusters.Attribute.ValueDecodeFailure) and isinstance(attr_ret.Reason, InteractionModelError)
 
-        got_expected_error = error_type_ok and attr_ret.Reason.status == Status.UnsupportedRead
-        return got_expected_error
+        return error_type_ok and attr_ret.Reason.status == Status.UnsupportedRead
 
     @async_test_body
     async def test_TC_IDM_10_1(self):
