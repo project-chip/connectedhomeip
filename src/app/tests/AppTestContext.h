@@ -18,24 +18,23 @@
 #include <messaging/tests/MessagingContext.h>
 
 namespace chip {
-namespace Test {
+namespace Testing {
 
-/**
- * @brief The context of test cases for messaging layer. It wil initialize network layer and system layer, and create
- *        two secure sessions, connected with each other. Exchanges can be created for each secure session.
- */
-class AppContext : public LoopbackMessagingContext
-{
-public:
-    // Performs shared setup for all tests in the test suite
-    static void SetUpTestSuite();
-    // Performs shared teardown for all tests in the test suite
-    static void TearDownTestSuite();
-    // Performs setup for each individual test in the test suite
-    virtual void SetUp();
-    // Performs teardown for each individual test in the test suite
-    virtual void TearDown();
-};
+    /**
+     * @brief The context of test cases for messaging layer. It wil initialize network layer and system layer, and create
+     *        two secure sessions, connected with each other. Exchanges can be created for each secure session.
+     */
+    class AppContext : public LoopbackMessagingContext {
+    public:
+        // Performs shared setup for all tests in the test suite
+        static void SetUpTestSuite();
+        // Performs shared teardown for all tests in the test suite
+        static void TearDownTestSuite();
+        // Performs setup for each individual test in the test suite
+        virtual void SetUp();
+        // Performs teardown for each individual test in the test suite
+        virtual void TearDown();
+    };
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip

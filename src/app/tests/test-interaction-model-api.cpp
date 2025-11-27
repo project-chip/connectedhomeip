@@ -99,7 +99,8 @@ static CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubje
         return attributeReport.EndOfAttributeReportIB();
     }
 
-    return AttributeValueEncoder(aAttributeReports, aSubjectDescriptor, aPath, 0 /* dataVersion */).Encode(Test::kTestFieldValue1);
+    return AttributeValueEncoder(aAttributeReports, aSubjectDescriptor, aPath, 0 /* dataVersion */)
+        .Encode(Testing::kTestFieldValue1);
 }
 
 TestImCustomDataModel & TestImCustomDataModel::Instance()

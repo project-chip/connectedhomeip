@@ -62,17 +62,17 @@ chip::EventId kTestEventIdCritical = 2;
 chip::EventId kTestEventIdNotKnown = 3;
 chip::TLV::Tag kTestEventTag       = chip::TLV::ContextTag(1);
 
-const chip::Test::MockNodeConfig & TestMockNodeConfig()
+const chip::Testing::MockNodeConfig & TestMockNodeConfig()
 {
     using namespace chip::app;
     using namespace chip::app::Clusters::Globals::Attributes;
-    using namespace chip::Test;
+    using namespace chip::Testing;
 
     // clang-format off
     static const MockNodeConfig config({
         MockEndpointConfig(kTestEndpointId, {
 
-            MockClusterConfig(chip::Test::kTestDeniedClusterId2,
+            MockClusterConfig(chip::Testing::kTestDeniedClusterId2,
                  {},                    /* attributes */
                  {kTestEventIdDebug}    /* events */
                 ),
@@ -100,7 +100,7 @@ public:
     {
         mNumOfTimesAclIsChecked++;
 
-        if (requestPath.cluster == chip::Test::kTestDeniedClusterId2)
+        if (requestPath.cluster == chip::Testing::kTestDeniedClusterId2)
         {
             return CHIP_ERROR_ACCESS_DENIED;
         }
@@ -143,7 +143,7 @@ void GenerateEvents()
 {
     chip::EventNumber eid1, eid2;
     chip::app::EventOptions options1;
-    options1.mPath     = { kTestEndpointId, chip::Test::kTestDeniedClusterId2, kTestEventIdDebug };
+    options1.mPath     = { kTestEndpointId, chip::Testing::kTestDeniedClusterId2, kTestEventIdDebug };
     options1.mPriority = chip::app::PriorityLevel::Info;
 
     chip::app::EventOptions options2;
@@ -236,13 +236,13 @@ public:
         mAccessControlDelegate                          = static_cast<TestAccessControlDelegate *>(GetTestAccessControlDelegate());
         mAccessControlDelegate->mNumOfTimesAclIsChecked = 0;
 
-        chip::Test::SetMockNodeConfig(TestMockNodeConfig());
+        chip::Testing::SetMockNodeConfig(TestMockNodeConfig());
     }
 
     // Performs teardown for each individual test in the test suite
     void TearDown() override
     {
-        chip::Test::ResetMockNodeConfig();
+        chip::Testing::ResetMockNodeConfig();
         chip::app::EventManagement::DestroyEventManagement();
         AppContext::TearDown();
     }
@@ -273,7 +273,7 @@ TEST_F(TestAclEvent, TestReadRoundtripWithEventStatusIBInEventReport)
     {
         chip::app::EventPathParams eventPathParams[1];
         eventPathParams[0].mEndpointId = kTestEndpointId;
-        eventPathParams[0].mClusterId  = chip::Test::kTestDeniedClusterId2;
+        eventPathParams[0].mClusterId  = chip::Testing::kTestDeniedClusterId2;
         eventPathParams[0].mEventId    = kTestEventIdDebug;
 
         ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
@@ -304,7 +304,7 @@ TEST_F(TestAclEvent, TestReadRoundtripWithEventStatusIBInEventReport)
     {
         chip::app::EventPathParams eventPathParams[1];
         eventPathParams[0].mEndpointId = kTestEndpointId;
-        eventPathParams[0].mClusterId  = chip::Test::kTestDeniedClusterId2;
+        eventPathParams[0].mClusterId  = chip::Testing::kTestDeniedClusterId2;
 
         ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
         readPrepareParams.mpEventPathParamsList    = eventPathParams;
@@ -359,7 +359,7 @@ TEST_F(TestAclEvent, TestReadRoundtripWithEventStatusIBInEventReport)
     {
         chip::app::EventPathParams eventPathParams[2];
         eventPathParams[0].mEndpointId = kTestEndpointId;
-        eventPathParams[0].mClusterId  = chip::Test::kTestDeniedClusterId2;
+        eventPathParams[0].mClusterId  = chip::Testing::kTestDeniedClusterId2;
         eventPathParams[0].mEventId    = kTestEventIdDebug;
 
         eventPathParams[1].mEndpointId = kTestEndpointId;
@@ -438,7 +438,7 @@ public:
 // - In that Case, we should get UnsupportedEvent as StatusIB and we should SKIP the second ACL check.
 TEST_F(TestAclEvent, TestUnsupportedEventWithValidClusterPath)
 {
-    using namespace chip::Test;
+    using namespace chip::Testing;
 
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
     // Shouldn't have anything in the retransmit table when starting the test.

@@ -45,7 +45,7 @@
 namespace {
 using namespace chip;
 using namespace chip::Access;
-using namespace chip::Test;
+using namespace chip::Testing;
 
 constexpr CommandId kTestUnsupportedCommandId = 77;
 constexpr CommandId kTestCommandId            = 4;
@@ -77,7 +77,7 @@ public:
     CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const chip::Access::RequestPath & requestPath,
                      Privilege requestPrivilege) override
     {
-        if (requestPath.cluster == chip::Test::kTestDeniedClusterId2 || requestPath.endpoint == chip::Test::kTestDeniedEndpointId)
+        if (requestPath.cluster == kTestDeniedClusterId2 || requestPath.endpoint == kTestDeniedEndpointId)
         {
             return CHIP_ERROR_ACCESS_DENIED;
         }
@@ -135,12 +135,12 @@ public:
         Access::GetAccessControl().Finish();
         EXPECT_SUCCESS(Access::GetAccessControl().Init(GetTestAccessControlDelegate(), gDeviceTypeResolver));
         mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&TestImCustomDataModel::Instance());
-        chip::Test::SetMockNodeConfig(TestMockNodeConfig());
+        SetMockNodeConfig(TestMockNodeConfig());
     }
 
     void TearDown() override
     {
-        chip::Test::ResetMockNodeConfig();
+        ResetMockNodeConfig();
         AppContext::TearDown();
         InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
     }

@@ -122,7 +122,7 @@ const MockNodeConfig & TestMockNodeConfig()
     return config;
 }
 
-class TestWriteInteraction : public chip::Test::AppContext
+class TestWriteInteraction : public chip::Testing::AppContext
 {
 public:
     void SetUp() override
@@ -141,11 +141,11 @@ public:
         ASSERT_EQ(chip::GroupTesting::InitData(&gGroupsProvider, GetBobFabricIndex(), span), CHIP_NO_ERROR);
 
         mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&TestImCustomDataModel::Instance());
-        chip::Test::SetMockNodeConfig(TestMockNodeConfig());
+        chip::Testing::SetMockNodeConfig(TestMockNodeConfig());
     }
     void TearDown() override
     {
-        chip::Test::ResetMockNodeConfig();
+        chip::Testing::ResetMockNodeConfig();
         InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
         chip::Credentials::GroupDataProvider * provider = chip::Credentials::GetGroupDataProvider();
         if (provider != nullptr)
@@ -576,7 +576,7 @@ TEST_F(TestWriteInteraction, TestWriteRoundtripWithClusterObjectsVersionMatch)
     DataModel::Nullable<app::Clusters::UnitTesting::Structs::SimpleStruct::Type> dataTx;
 
     Optional<DataVersion> version(kAcceptedDataVersion);
-    chip::Test::SetVersionTo(kAcceptedDataVersion);
+    chip::Testing::SetVersionTo(kAcceptedDataVersion);
 
     EXPECT_EQ(writeClient.EncodeAttribute(attributePathParams, dataTx, version), CHIP_NO_ERROR);
 
@@ -623,8 +623,8 @@ TEST_F(TestWriteInteraction, TestWriteRoundtripWithClusterObjectsVersionMismatch
     dataTxValue.b = true;
     DataModel::Nullable<app::Clusters::UnitTesting::Structs::SimpleStruct::Type> dataTx;
     dataTx.SetNonNull(dataTxValue);
-    Optional<DataVersion> version(chip::Test::kRejectedDataVersion);
-    chip::Test::SetVersionTo(kAcceptedDataVersion);
+    Optional<DataVersion> version(chip::Testing::kRejectedDataVersion);
+    chip::Testing::SetVersionTo(kAcceptedDataVersion);
     static_assert(kAcceptedDataVersion != kRejectedDataVersion);
 
     EXPECT_EQ(writeClient.EncodeAttribute(attributePathParams, dataTx, version), CHIP_NO_ERROR);

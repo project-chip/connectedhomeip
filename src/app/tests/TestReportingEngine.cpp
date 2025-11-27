@@ -74,21 +74,21 @@ const Test::MockNodeConfig & TestMockNodeConfig()
 namespace app {
 namespace reporting {
 
-class TestReportingEngine : public chip::Test::AppContext
+class TestReportingEngine : public chip::Testing::AppContext
 {
 public:
     void SetUp() override
     {
-        chip::Test::AppContext::SetUp();
+        chip::Testing::AppContext::SetUp();
         mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&TestImCustomDataModel::Instance());
-        chip::Test::SetMockNodeConfig(TestMockNodeConfig());
+        chip::Testing::SetMockNodeConfig(TestMockNodeConfig());
     }
 
     void TearDown() override
     {
-        chip::Test::ResetMockNodeConfig();
+        chip::Testing::ResetMockNodeConfig();
         InteractionModelEngine::GetInstance()->SetDataModelProvider(mOldProvider);
-        chip::Test::AppContext::TearDown();
+        chip::Testing::AppContext::TearDown();
     }
 
     template <typename... Args>
