@@ -446,9 +446,7 @@ void EnabledEndpointsWithServerCluster::EnsureMatchingEndpoint()
 }
 
 } // namespace app
-} // namespace chip
 
-namespace chip {
 namespace Testing {
 
 void ResetVersion()
