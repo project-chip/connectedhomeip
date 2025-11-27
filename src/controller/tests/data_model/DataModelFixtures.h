@@ -121,8 +121,7 @@ public:
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                  AttributeValueDecoder & decoder) override;
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
-                                                               TLV::TLVReader & input_arguments,
-                                                               CommandHandler * handler) override;
+                                                               TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
     struct EnableInfiniteReads
     {

@@ -163,8 +163,7 @@ void GenerateEvents()
 class MockInteractionModelApp : public app::ReadClient::Callback
 {
 public:
-    void OnEventData(const app::EventHeader & aEventHeader, TLV::TLVReader * apData,
-                     const app::StatusIB * apStatus) override
+    void OnEventData(const app::EventHeader & aEventHeader, TLV::TLVReader * apData, const app::StatusIB * apStatus) override
     {
         ++mNumDataElementIndex;
         mGotEventResponse = true;
@@ -201,7 +200,7 @@ public:
     int mNumAttributeResponse              = 0;
     bool mGotReport                        = false;
     bool mReadError                        = false;
-    app::ReadHandler * mpReadHandler = nullptr;
+    app::ReadHandler * mpReadHandler       = nullptr;
     app::StatusIB mLastStatusReceived;
     CHIP_ERROR mError = CHIP_NO_ERROR;
     std::vector<app::ConcreteAttributePath> mReceivedAttributePaths;
@@ -230,7 +229,7 @@ public:
 
         ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
         app::EventManagement::CreateEventManagement(&GetExchangeManager(), MATTER_ARRAY_SIZE(logStorageResources),
-                                                          gCircularEventBuffer, logStorageResources, &mEventCounter);
+                                                    gCircularEventBuffer, logStorageResources, &mEventCounter);
 
         Access::GetAccessControl().Finish();
         EXPECT_SUCCESS(Access::GetAccessControl().Init(GetTestAccessControlDelegate(), gDeviceTypeResolver));
@@ -386,7 +385,7 @@ TEST_F(TestAclEvent, TestReadRoundtripWithEventStatusIBInEventReport)
         EXPECT_EQ(delegate.mNumReadEventFailureStatusReceived, 1); // need exactly one UnsupportedAccess, nothing else
         EXPECT_EQ(delegate.mLastStatusReceived.mStatus,
                   Protocols::InteractionModel::Status::Success); // The Second Concrete Event Path is Valid, therefore Last
-                                                                       // Status is a Success
+                                                                 // Status is a Success
         EXPECT_FALSE(delegate.mReadError);
     }
     EXPECT_FALSE(engine->GetNumActiveReadClients());
@@ -454,8 +453,8 @@ TEST_F(TestAclEvent, TestUnsupportedEventWithValidClusterPath)
     ASSERT_EQ(model.Registry().Register(registration), CHIP_NO_ERROR);
 
     app::DataModel::Provider * mOldProvider = nullptr;
-    auto * engine                                 = app::InteractionModelEngine::GetInstance();
-    mOldProvider                                  = engine->SetDataModelProvider(&model);
+    auto * engine                           = app::InteractionModelEngine::GetInstance();
+    mOldProvider                            = engine->SetDataModelProvider(&model);
 
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
 
