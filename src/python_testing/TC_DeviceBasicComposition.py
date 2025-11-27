@@ -643,7 +643,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
 
         self.print_step(8, "Validate that all cluster ID prefixes are in the standard or MEI range")
         for endpoint_id, endpoint in self.endpoints_tlv.items():
-            cluster_prefixes = [a & 0xFFFF_0000 for a in endpoint.keys()]
+            cluster_prefixes = [a & 0xFFFF_0000 for a in endpoint]
             bad_clusters_ids = [a for a in cluster_prefixes if a >= bad_prefix_min]
             for bad_cluster_id in bad_clusters_ids:
                 location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=bad_cluster_id)
@@ -654,7 +654,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
 
         self.print_step(9, "Validate that all clusters in the standard range have a known cluster ID")
         for endpoint_id, endpoint in self.endpoints_tlv.items():
-            standard_clusters = [a for a in endpoint.keys() if a < mei_range_min]
+            standard_clusters = [a for a in endpoint if a < mei_range_min]
             unknown_clusters = sorted(set(standard_clusters) - set(matter.clusters.ClusterObjects.ALL_CLUSTERS))
             for bad in unknown_clusters:
                 location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=bad)
@@ -664,7 +664,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
 
         self.print_step(10, "Validate that all clusters in the MEI range have a suffix in the manufacturer suffix range")
         for endpoint_id, endpoint in self.endpoints_tlv.items():
-            mei_clusters = [a for a in endpoint.keys() if a >= mei_range_min]
+            mei_clusters = [a for a in endpoint if a >= mei_range_min]
             bad_clusters = [a for a in mei_clusters if ((a & 0x0000_FFFF) < 0xFC00) or ((a & 0x0000_FFFF) > 0xFFFE)]
             for bad in bad_clusters:
                 location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=bad)
