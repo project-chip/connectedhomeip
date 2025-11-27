@@ -43,6 +43,7 @@ class PseudoClusters:
         for cluster in self.clusters:
             if request.cluster == cluster.name:
                 return cluster
+        return None
 
     async def execute(self, request, definitions=None):
         status = {'error': 'FAILURE'}

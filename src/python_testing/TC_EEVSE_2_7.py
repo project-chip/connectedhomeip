@@ -71,7 +71,7 @@ class TC_EEVSE_2_7(MatterBaseTest, EEVSEBaseTestHelper):
         return ["EEVSE.S.F01"]
 
     def steps_TC_EEVSE_2_7(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
                      is_commissioning=True),
             TestStep("2", "TH reads from the DUT the FeatureMap",
@@ -177,8 +177,6 @@ class TC_EEVSE_2_7(MatterBaseTest, EEVSEBaseTestHelper):
                      "Value has to be null."),
 
         ]
-
-        return steps
 
     @run_if_endpoint_matches(has_feature(cluster, cluster.Bitmaps.Feature.kSoCReporting))
     async def test_TC_EEVSE_2_7(self):

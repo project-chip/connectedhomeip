@@ -40,8 +40,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 from datetime import datetime, timedelta, timezone
 
 from mobly import asserts
@@ -69,7 +69,7 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
         return ["EEVSE.S", "EEVSE.S.F04"]
 
     def steps_TC_EEVSE_2_10(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commissioning, already done", is_commissioning=True),
             TestStep("1a", "Set up a subscription to all EnergyEVSE cluster events"),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
@@ -163,7 +163,6 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
             TestStep("14", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for Basic Functionality Test Event Clear",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
         ]
-        return steps
 
     @run_if_endpoint_matches(has_feature(cluster, cluster.Bitmaps.Feature.kV2x))
     async def test_TC_EEVSE_2_10(self):
@@ -325,7 +324,7 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
         self.step("9")
         # Wait 7 seconds
         logger.info("Waiting for 7 seconds for discharge timer to expire")
-        time.sleep(7)
+        await asyncio.sleep(7)
 
         self.step("9a")
         # TH reads from the DUT the SupplyState
@@ -361,7 +360,7 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
         self.step("10")
         # Wait 10 seconds
         logger.info("Waiting for 10 seconds for charging timer to expire")
-        time.sleep(10)
+        await asyncio.sleep(10)
 
         self.step("10a")
         # TH reads from the DUT the SupplyState

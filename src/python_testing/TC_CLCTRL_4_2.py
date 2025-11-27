@@ -88,7 +88,7 @@ class TC_CLCTRL_4_2(MatterBaseTest):
         return "[TC-CLCTRL-4.2] MoveTo Command Latching Functionality with DUT as Server"
 
     def steps_TC_CLCTRL_4_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read the FeatureMap attribute to determine supported features",
                      "FeatureMap of the ClosureControl cluster is returned by the DUT"),
@@ -152,18 +152,20 @@ class TC_CLCTRL_4_2(MatterBaseTest):
                      "OverallCurrentState.Latch should be False"),
             TestStep("6k", "Wait until a subscription report with MainState is received", "MainState should be Stopped"),
         ]
-        return steps
 
     def pics_TC_CLCTRL_4_2(self) -> list[str]:
-        pics = [
+        return [
             "CLCTRL.S", "CLCTRL.S.F01"
         ]
-        return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_CLCTRL_4_2(self):
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         timeout: uint = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout  # default_timeout = 90 seconds
 
         self.step(1)
@@ -180,8 +182,7 @@ class TC_CLCTRL_4_2(MatterBaseTest):
             logging.info("Latching feature is not supported, skipping remaining steps.")
             self.mark_all_remaining_steps_skipped("2c")
             return
-        else:
-            logging.info("Latching feature is supported, proceeding with the test.")
+        logging.info("Latching feature is supported, proceeding with the test.")
 
         self.step("2c")
         latch_control_modes: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.LatchControlModes)

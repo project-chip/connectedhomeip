@@ -355,7 +355,7 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     // Add CHIP event handler and start CHIP thread.
     // Note that all the initialization code should happen prior to this point to avoid data races
     // between the main and the CHIP threads.
-    PlatformMgr().AddEventHandler(ChipEventHandler, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().AddEventHandler(ChipEventHandler, 0);
 
     err = chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(new AppFabricTableDelegate);
     if (err != CHIP_NO_ERROR)

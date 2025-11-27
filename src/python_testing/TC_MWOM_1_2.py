@@ -52,23 +52,25 @@ class TC_MWOM_1_2(MatterBaseTest):
         return "[TC-MWOM-1.2] Cluster attributes with DUT as Server"
 
     def steps_TC_MWOM_1_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read the SupportedModes attribute"),
             TestStep(3, "Read the CurrentMode attribute"),
         ]
-        return steps
 
     def pics_TC_MWOM_1_2(self) -> list[str]:
-        pics = [
+        return [
             "MWOM.S",
         ]
-        return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_MWOM_1_2(self):
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         attributes = Clusters.MicrowaveOvenMode.Attributes
 

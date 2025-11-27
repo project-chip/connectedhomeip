@@ -403,25 +403,21 @@ class TLVWriter(object):
                 if tagNum <= UINT16_MAX:
                     controlByte |= TLV_TAG_CONTROL_IMPLICIT_PROFILE_2Bytes
                     return struct.pack("<BH", controlByte, tagNum)
-                else:
-                    controlByte |= TLV_TAG_CONTROL_IMPLICIT_PROFILE_4Bytes
-                    return struct.pack("<BL", controlByte, tagNum)
-            elif profile == 0:
+                controlByte |= TLV_TAG_CONTROL_IMPLICIT_PROFILE_4Bytes
+                return struct.pack("<BL", controlByte, tagNum)
+            if profile == 0:
                 if tagNum <= UINT16_MAX:
                     controlByte |= TLV_TAG_CONTROL_COMMON_PROFILE_2Bytes
                     return struct.pack("<BH", controlByte, tagNum)
-                else:
-                    controlByte |= TLV_TAG_CONTROL_COMMON_PROFILE_4Bytes
-                    return struct.pack("<BL", controlByte, tagNum)
-            else:
-                vendorId = (profile >> 16) & 0xFFFF
-                profileNum = (profile >> 0) & 0xFFFF
-                if tagNum <= UINT16_MAX:
-                    controlByte |= TLV_TAG_CONTROL_FULLY_QUALIFIED_6Bytes
-                    return struct.pack("<BHHH", controlByte, vendorId, profileNum, tagNum)
-                else:
-                    controlByte |= TLV_TAG_CONTROL_FULLY_QUALIFIED_8Bytes
-                    return struct.pack("<BHHL", controlByte, vendorId, profileNum, profile, tagNum)
+                controlByte |= TLV_TAG_CONTROL_COMMON_PROFILE_4Bytes
+                return struct.pack("<BL", controlByte, tagNum)
+            vendorId = (profile >> 16) & 0xFFFF
+            profileNum = (profile >> 0) & 0xFFFF
+            if tagNum <= UINT16_MAX:
+                controlByte |= TLV_TAG_CONTROL_FULLY_QUALIFIED_6Bytes
+                return struct.pack("<BHHH", controlByte, vendorId, profileNum, tagNum)
+            controlByte |= TLV_TAG_CONTROL_FULLY_QUALIFIED_8Bytes
+            return struct.pack("<BHHL", controlByte, vendorId, profileNum, profile, tagNum)
         raise ValueError("Invalid object given for TLV tag")
 
     @staticmethod

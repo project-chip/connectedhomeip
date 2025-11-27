@@ -54,7 +54,7 @@ class TC_AVSUM_2_3(MatterBaseTest, AVSUMTestBase):
         return "[TC-AVSUM-2.3] MptzRelativeMove Command Validation"
 
     def steps_TC_AVSUM_2_3(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read and verify MPTZPosition attribute."),
             TestStep(3, "Send an MPTZRelativeMove command with no fields. Verify failure response"),
@@ -85,19 +85,17 @@ class TC_AVSUM_2_3(MatterBaseTest, AVSUMTestBase):
             TestStep(28, "If PIXIT.CANBEMADEBUSY is set, place the DUT into a state where it cannot accept a command. Else end the test cse."),
             TestStep(29, "Send an MPTZRelativeMove Command with any previously set relative value. Verify busy failure response."),
         ]
-        return steps
 
     def pics_TC_AVSUM_2_3(self) -> list[str]:
-        pics = [
+        return [
             "AVSUM.S",
         ]
-        return pics
 
     @run_if_endpoint_matches(has_cluster(Clusters.CameraAvSettingsUserLevelManagement))
     async def test_TC_AVSUM_2_3(self):
         cluster = Clusters.Objects.CameraAvSettingsUserLevelManagement
         attributes = cluster.Attributes
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(1)  # Already done, immediately go to step 2
 

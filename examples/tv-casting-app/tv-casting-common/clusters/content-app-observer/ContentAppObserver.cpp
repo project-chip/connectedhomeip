@@ -45,5 +45,5 @@ void ContentAppObserverManager::HandleContentAppMessage(chip::app::CommandRespon
     response.data         = chip::MakeOptional(CharSpan::fromCharString("exampleData"));
     response.encodingHint = chip::MakeOptional(CharSpan::fromCharString(encodingHintString.c_str()));
     response.status       = StatusEnum::kSuccess;
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }

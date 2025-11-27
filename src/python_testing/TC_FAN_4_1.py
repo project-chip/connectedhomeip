@@ -36,8 +36,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 from typing import Optional
 
 from mobly import asserts
@@ -73,6 +73,7 @@ class TC_FAN_4_1(MatterBaseTest):
             return [mode.kOff, mode.kHigh]
 
         asserts.fail(f"Unknown FanModeSequence {fan_mode_sequence}")
+        return None
 
     def _sub_step(self, start_step: int, attribute_to_set: str, value: str, verify_mode: str, verify_percent: str, verify_speed: str, spd_check: bool = False):
         spd = ""
@@ -251,7 +252,7 @@ class TC_FAN_4_1(MatterBaseTest):
 
             self.step(step_num + 3)
             logging.info(f"Waiting for {wait_s} seconds to give the fan a chance to respond")
-            time.sleep(wait_s)
+            await asyncio.sleep(wait_s)
 
             self.step(step_num + 4)
             percent_current = await self.read_single_attribute_check_success(cluster=fan, attribute=fan.Attributes.PercentCurrent)

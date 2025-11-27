@@ -66,14 +66,13 @@ class TC_DEM_2_1(MatterBaseTest, DEMTestBase):
 
     def pics_TC_DEM_2_1(self):
         """Return the PICS definitions associated with this test."""
-        pics = [
+        return [
             "DEM.S",
         ]
-        return pics
 
     def steps_TC_DEM_2_1(self) -> list[TestStep]:
         """Execute the test steps."""
-        steps = [
+        return [
             TestStep("1", "Commissioning, already done",
                      is_commissioning=True),
             TestStep("2", "TH reads from the DUT FeatureMap attribute.",
@@ -95,8 +94,6 @@ class TC_DEM_2_1(MatterBaseTest, DEMTestBase):
             TestStep("10", "If PA, STA, PAU, FA or CON feature is supported on the cluster, TH reads from the DUT the OptOutState attribute.",
                      "Verify that the DUT response contains an OptOutStateEnum (enum8) value."),
         ]
-
-        return steps
 
     @async_test_body
     async def test_TC_DEM_2_1(self):
