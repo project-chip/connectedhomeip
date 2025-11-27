@@ -16,7 +16,7 @@
  */
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/clusters/general-diagnostics-server/general-diagnostics-cluster.h>
+#include <app/clusters/general-diagnostics-server/GeneralDiagnosticsCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server/Server.h>
@@ -278,13 +278,12 @@ DataModel::ActionReturnStatus GeneralDiagnosticsCluster::ReadAttribute(const Dat
         // Note: Attribute ID 0x0009 was removed (#30002).
 
     case GeneralDiagnostics::Attributes::FeatureMap::Id: {
-        BitFlags<GeneralDiagnostics::Feature> features;
 
 #if CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1
-        features.Set(Clusters::GeneralDiagnostics::Feature::kDataModelTest);
+        mFeatureFlags.Set(Clusters::GeneralDiagnostics::Feature::kDataModelTest);
 #endif // CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1
 
-        return encoder.Encode(features);
+        return encoder.Encode(mFeatureFlags);
     }
     case GeneralDiagnostics::Attributes::ClusterRevision::Id:
         return encoder.Encode(GeneralDiagnostics::kRevision);
@@ -326,6 +325,7 @@ CHIP_ERROR GeneralDiagnosticsCluster::Attributes(const ConcreteClusterPath & pat
         GeneralDiagnostics::Attributes::ActiveRadioFaults::kMetadataEntry,
         GeneralDiagnostics::Attributes::ActiveNetworkFaults::kMetadataEntry,
         GeneralDiagnostics::Attributes::UpTime::kMetadataEntry,
+        GeneralDiagnostics::Attributes::DeviceLoadStatus::kMetadataEntry,
     };
 
     return listBuilder.Append(Span(GeneralDiagnostics::Attributes::kMandatoryMetadata), Span(optionalAttributeEntries),

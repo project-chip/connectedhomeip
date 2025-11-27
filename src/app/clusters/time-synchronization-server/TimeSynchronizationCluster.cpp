@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/time-synchronization-server/time-synchronization-cluster.h>
+#include <app/clusters/time-synchronization-server/TimeSynchronizationCluster.h>
 #include <app/clusters/time-synchronization-server/time-synchronization-delegate.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 
@@ -338,11 +338,11 @@ CHIP_ERROR TimeSynchronizationCluster::Startup(ServerClusterContext & context)
     }
     if (LoadTimeZone() != CHIP_NO_ERROR)
     {
-        ClearTimeZone();
+        TEMPORARY_RETURN_IGNORED ClearTimeZone();
     }
     if (LoadDSTOffset() != CHIP_NO_ERROR)
     {
-        ClearDSTOffset();
+        TEMPORARY_RETURN_IGNORED ClearDSTOffset();
     }
 
     // Set the granularity to none for now - this will force us to go to the delegate so it can

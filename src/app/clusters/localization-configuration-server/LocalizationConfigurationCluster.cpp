@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/localization-configuration-server/localization-configuration-cluster.h>
+#include <app/clusters/localization-configuration-server/LocalizationConfigurationCluster.h>
 #include <app/persistence/AttributePersistence.h>
 #include <app/persistence/AttributePersistenceProvider.h>
 #include <app/persistence/String.h>

@@ -22,7 +22,7 @@
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
-#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-logic.h>
+#include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportLogic.h>
 #include <app/reporting/reporting.h>
 #include <app/util/util.h>
 #include <assert.h>

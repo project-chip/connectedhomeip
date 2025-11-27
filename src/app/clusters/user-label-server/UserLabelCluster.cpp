@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/user-label-server/user-label-cluster.h>
+#include <app/clusters/user-label-server/UserLabelCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server/Server.h>
 #include <clusters/UserLabel/Metadata.h>

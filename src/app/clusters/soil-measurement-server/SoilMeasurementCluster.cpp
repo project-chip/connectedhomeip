@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include "soil-measurement-cluster.h"
+#include "SoilMeasurementCluster.h"
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/SoilMeasurement/Metadata.h>
 

@@ -120,8 +120,7 @@ def check_python_version() -> None:
 
 def load_cicd_config() -> Dict[str, Any]:
     with open(_CICD_CONFIG_FILE_NAME) as config_file:
-        config = json.loads(config_file.read())
-    return config
+        return json.loads(config_file.read())
 
 
 def flush_print(
@@ -470,7 +469,7 @@ def main() -> int:
                     archive_name = f"{label}-{device_name}"
                     if options.build_exclude and re.search(options.build_exclude, archive_name):
                         continue
-                    elif options.build_include and not re.search(options.build_include, archive_name):
+                    if options.build_include and not re.search(options.build_include, archive_name):
                         continue
                     if options.dry_run:
                         flush_print(archive_name)

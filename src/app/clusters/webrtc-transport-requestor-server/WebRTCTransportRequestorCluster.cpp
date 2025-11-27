@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "webrtc-transport-requestor-cluster.h"
+#include "WebRTCTransportRequestorCluster.h"
 
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <lib/support/CodeUtils.h>

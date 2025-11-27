@@ -60,7 +60,7 @@ class TC_ACL_2_10(MatterBaseTest):
         return ['ACL.S.A0001']
 
     def steps_TC_ACL_2_10(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "TH1 commissions DUT using admin node ID",
                      is_commissioning=True),
             TestStep(2, "TH1 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",
@@ -96,7 +96,6 @@ class TC_ACL_2_10(MatterBaseTest):
             TestStep(17, "TH1 writes DUT Endpoint 0 AccessControl cluster back to admin-only ACL entry",
                      "Result is SUCCESS"),
         ]
-        return steps
 
     @async_test_body
     async def test_TC_ACL_2_10(self):

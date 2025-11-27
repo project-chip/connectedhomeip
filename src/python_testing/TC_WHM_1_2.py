@@ -56,18 +56,16 @@ class TC_WHM_1_2(MatterBaseTest):
         return "[TC-WHM-1.2] Cluster attributes with DUT as Server"
 
     def steps_TC_WHM_1_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read the SupportedModes attribute"),
             TestStep(3, "Read the CurrentMode attribute"),
         ]
-        return steps
 
     def pics_TC_WHM_1_2(self) -> list[str]:
-        pics = [
+        return [
             "WHM.S",
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:
@@ -126,7 +124,7 @@ class TC_WHM_1_2(MatterBaseTest):
             off_manual_timed_present_in_this_mode = 0
             for t in m.modeTags:
                 is_mfg = (0x8000 <= t.value and t.value <= 0xBFFF)
-                asserts.assert_true(t.value in commonTags.keys() or t.value in derivedTags or is_mfg,
+                asserts.assert_true(t.value in commonTags or t.value in derivedTags or is_mfg,
                                     "Found a SupportedModes entry with invalid mode tag value!")
                 if t.value == Clusters.WaterHeaterMode.Enums.ModeTag.kOff:
                     off_present += 1

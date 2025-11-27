@@ -51,8 +51,7 @@ class DownloadType(enum.Enum):
 def _GetDefaultExtractRoot():
     if 'PW_ENVIRONMENT_ROOT' in os.environ:
         return os.environ['PW_ENVIRONMENT_ROOT']
-    else:
-        return ".zap"
+    return ".zap"
 
 
 def _LogPipeLines(pipe, prefix):

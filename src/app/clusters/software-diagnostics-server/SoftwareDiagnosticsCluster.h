@@ -16,7 +16,7 @@
  */
 #pragma once
 
-#include <app/clusters/software-diagnostics-server/software-diagnostics-logic.h>
+#include <app/clusters/software-diagnostics-server/SoftwareDiagnosticsLogic.h>
 #include <app/clusters/software-diagnostics-server/software-fault-listener.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>

@@ -47,7 +47,7 @@ class TC_CNET_4_1(MatterBaseTest):
         return ['CNET.S.F00']
 
     def steps_TC_CNET_4_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(0, test_plan_support.commission_if_required(), "", is_commissioning=True),
             TestStep(1, "TH reads the MaxNetworks attribute from the DUT",
                      "Verify that MaxNetworks attribute value is within a range of 1 to 255"),
@@ -74,7 +74,6 @@ class TC_CNET_4_1(MatterBaseTest):
                      "Verify that LastConnectErrorValue attribute value is null"),
 
         ]
-        return steps
 
     @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning,
                                          Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))
@@ -123,7 +122,7 @@ class TC_CNET_4_1(MatterBaseTest):
         network_ids_list = []
         # Search for connected networks and ids in all endpoints. Gather by endpoints. Join all the networks in a single list.
         for ep in networks_dict:
-            network_count[ep] = sum((x.connected for x in networks_dict[ep]))
+            network_count[ep] = sum(x.connected for x in networks_dict[ep])
             network_ids[ep] = [x.networkID for x in networks_dict[ep]]
             network_ids_list.extend(network_ids[ep])
         logger.info(f"All networkd ids found: {network_ids_list}")
@@ -168,7 +167,7 @@ class TC_CNET_4_1(MatterBaseTest):
             cluster=Clusters.NetworkCommissioning,
             attribute=Clusters.NetworkCommissioning.Attributes.LastNetworkID)
         logger.info(f"Last connected network: {last_network_id}")
-        matching_networks_count = sum((x == last_network_id for x in network_ids_list))
+        matching_networks_count = sum(x == last_network_id for x in network_ids_list)
         asserts.assert_equal(matching_networks_count, 1,
                              "Verify that LastNetworkID attribute matches the NetworkID count of the entries")
         asserts.assert_in(last_network_id, network_ids_list,

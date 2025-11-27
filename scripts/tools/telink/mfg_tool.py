@@ -140,8 +140,7 @@ def read_der_file(path: str):
     log.debug("Reading der file '%s'...", path)
     try:
         with open(path, 'rb') as f:
-            data = f.read()
-            return data
+            return f.read()
     except IOError as e:
         log.exception(e)
         raise e
@@ -150,9 +149,7 @@ def read_der_file(path: str):
 def read_key_bin_file(path: str):
     try:
         with open(path, 'rb') as file:
-            key_data = file.read()
-
-            return key_data
+            return file.read()
 
     except IOError or ValueError:
         return None
