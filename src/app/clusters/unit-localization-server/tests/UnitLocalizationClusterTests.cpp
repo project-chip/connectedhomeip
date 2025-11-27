@@ -18,13 +18,35 @@
 
 #include <app/clusters/unit-localization-server/unit-localization-server.h>
 
-struct TestUnitLocalizationCLuster : public ::testing::Test
+struct TestUnitLocalizationCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
 
-TEST_F(TestUnitLocalizationCLuster, AttributeTest)
+TEST_F(TestUnitLocalizationCluster, AttributeTest)
+{
+
+    TestServerClusterContext clusterContext;
+
+    ConcreteClusterPath clusterPath(kRootEndpointId, UnitLocalization::Id);
+    BitFlags<UnitLocalization::Feature> features{ 0 };
+
+    UnitLocalizationCluster cluster(clusterPath, features);
+
+    // Test attributes listing with no features enabled
+    ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
+
+    ASSERT_EQ(onlyMandatory.Attributes(clusterPath, attributesBuilder), CHIP_NO_ERROR);
+
+    ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedAttributes;
+    ASSERT_EQ(expectedAttributes.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
+    ASSERT_EQ(expectedAttributes.AppendElements({ UnitLocalization::Attributes::TemperatureUnit::}), CHIP_NO_ERROR);
+
+    ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedAttributes.TakeBuffer()));
+}
+
+TEST_F(TestUnitLocalizationCluster, MigrationTest)
 {
 
     TestServerClusterContext clusterContext;
