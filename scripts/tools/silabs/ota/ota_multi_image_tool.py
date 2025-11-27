@@ -39,6 +39,8 @@ import sys
 import crypto_utils
 import jsonschema
 
+log = logging.getLogger(__name__)
+
 sys.path.insert(0, os.path.join(
     os.path.dirname(__file__), '../factory_data_generator'))
 sys.path.insert(0, os.path.join(
@@ -79,7 +81,7 @@ def write_to_temp(path: str, payload: bytearray):
     with open(path, "wb") as _handle:
         _handle.write(payload)
 
-    logging.info(f"Data payload size for {path.split('/')[-1]}: {len(payload)}")
+    log.info("Data payload size for '%s': %d", path.split('/')[-1], len(payload))
 
 
 def generate_header(tag: int, length: int):
@@ -105,7 +107,7 @@ def generate_factory_data(args: object):
     if fields:
         writer = TLVWriter()
         writer.put(None, fields)
-        logging.info(f"factory data encryption enable: {args.enc_enable}")
+        log.info("factory data encryption enable: %s", args.enc_enable)
         if args.enc_enable:
             enc_factory_data = crypto_utils.encryptData(writer.encoding, args.input_ota_key, INITIALIZATION_VECTOR)
             enc_factory_data1 = bytes([ord(x) for x in enc_factory_data])
@@ -128,9 +130,9 @@ def generate_descriptor(version: int, versionStr: str, buildDate: str):
     vs = versionStr if versionStr is not None else "50000-default"
     bd = buildDate if buildDate is not None else "2023-01-01"
 
-    logging.info(f"\t-version: {v}")
-    logging.info(f"\t-version str: {vs}")
-    logging.info(f"\t-build date: {bd}")
+    log.info("\t-version: %d", v)
+    log.info("\t-version str: '%s'", vs)
+    log.info("\t-build date: '%s'", bd)
 
     v = v.to_bytes(4, "little")
     vs = bytearray(vs, "ascii") + bytearray(64 - len(vs))
@@ -143,10 +145,10 @@ def generate_app(args: object):
     """
     Generate app payload with descriptor. If a certain option is not specified, use the default values.
     """
-    logging.info("App descriptor information:")
+    log.info("App descriptor information:")
 
     descriptor = generate_descriptor(args.app_version, args.app_version_str, args.app_build_date)
-    logging.info(f"App encryption enable: {args.enc_enable}")
+    log.info("App encryption enable: %s", args.enc_enable)
     if args.enc_enable:
         inputFile = open(args.app_input_file, "rb")
         enc_file = crypto_utils.encryptData(inputFile.read(), args.input_ota_key, INITIALIZATION_VECTOR)
@@ -155,24 +157,23 @@ def generate_app(args: object):
         payload = generate_header(TAG.APPLICATION, len(descriptor) + file_size) + descriptor + enc_file1
     else:
         file_size = os.path.getsize(args.app_input_file)
-        logging.info(f"file size: {file_size}")
+        log.info("file size: %d", file_size)
         payload = generate_header(TAG.APPLICATION, len(descriptor) + file_size) + descriptor
 
     write_to_temp(OTA_APP_TLV_TEMP, payload)
     if args.enc_enable:
         return [OTA_APP_TLV_TEMP]
-    else:
-        return [OTA_APP_TLV_TEMP, args.app_input_file]
+    return [OTA_APP_TLV_TEMP, args.app_input_file]
 
 
 def generate_wifi_ta_image(args: object):
     """
     Generate WiFi TA image payload with descriptor. If a certain option is not specified, use the default values.
     """
-    logging.info("WiFi TA descriptor information:")
+    log.info("WiFi TA descriptor information:")
 
     descriptor = generate_descriptor(args.wifi_ta_version, args.wifi_ta_version_str, args.wifi_ta_build_date)
-    logging.info(f"WiFi TA encryption enable: {args.enc_enable}")
+    log.info("WiFi TA encryption enable: %s", args.enc_enable)
     if args.enc_enable:
         inputFile = open(args.wifi_ta_input_file, "rb")
         enc_file = crypto_utils.encryptData(inputFile.read(), args.input_ota_key, INITIALIZATION_VECTOR)
@@ -181,24 +182,23 @@ def generate_wifi_ta_image(args: object):
         payload = generate_header(TAG.WIFI_TA, len(descriptor) + file_size) + descriptor + enc_file1
     else:
         file_size = os.path.getsize(args.wifi_ta_input_file)
-        logging.info(f"file size: {file_size}")
+        log.info("file size: %d", file_size)
         payload = generate_header(TAG.WIFI_TA, len(descriptor) + file_size) + descriptor
 
     write_to_temp(OTA_WIFI_TA_TLV_TEMP, payload)
     if args.enc_enable:
         return [OTA_WIFI_TA_TLV_TEMP]
-    else:
-        return [OTA_WIFI_TA_TLV_TEMP, args.wifi_ta_input_file]
+    return [OTA_WIFI_TA_TLV_TEMP, args.wifi_ta_input_file]
 
 
 def generate_bootloader(args: object):
     """
     Generate SSBL payload with descriptor. If a certain option is not specified, use the default values.
     """
-    logging.info("SSBL descriptor information:")
+    log.info("SSBL descriptor information:")
 
     descriptor = generate_descriptor(args.bl_version, args.bl_version_str, args.bl_build_date)
-    logging.info(f"Bootloader encryption enable: {args.enc_enable}")
+    log.info("Bootloader encryption enable: %s", args.enc_enable)
     if args.enc_enable:
         inputFile = open(args.bl_input_file, "rb")
         enc_file = crypto_utils.encryptData(inputFile.read(), args.input_ota_key, INITIALIZATION_VECTOR)
@@ -207,14 +207,13 @@ def generate_bootloader(args: object):
         payload = generate_header(TAG.BOOTLOADER, len(descriptor) + file_size) + descriptor + enc_file1
     else:
         file_size = os.path.getsize(args.bl_input_file)
-        logging.info(f"file size: {file_size}")
+        log.info("file size: %d", file_size)
         payload = generate_header(TAG.BOOTLOADER, len(descriptor) + file_size) + descriptor
 
     write_to_temp(OTA_BOOTLOADER_TLV_TEMP, payload)
     if args.enc_enable:
         return [OTA_BOOTLOADER_TLV_TEMP]
-    else:
-        return [OTA_BOOTLOADER_TLV_TEMP, args.bl_input_file]
+    return [OTA_BOOTLOADER_TLV_TEMP, args.bl_input_file]
 
 
 def validate_json(data: str):
@@ -223,9 +222,9 @@ def validate_json(data: str):
 
     try:
         jsonschema.validate(instance=data, schema=payload_schema)
-        logging.info("JSON data is valid")
+        log.info("JSON data is valid")
     except jsonschema.exceptions.ValidationError as err:
-        logging.error(f"JSON data is invalid: {err}")
+        log.exception("JSON data is invalid: %r", err)
         sys.exit(1)
 
 
@@ -294,8 +293,8 @@ def create_image(args: object):
         print("Please specify an input option.")
         sys.exit(1)
 
-    logging.info("Input files used:")
-    [logging.info(f"\t- {_file}") for _file in input_files]
+    log.info("Input files used:")
+    [log.info("\t- '%s'", _file) for _file in input_files]
 
     args.input_files = input_files
     ota_image_tool.generate_image(args)

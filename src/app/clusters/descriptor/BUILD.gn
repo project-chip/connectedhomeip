@@ -16,8 +16,8 @@ import("//build_overrides/chip.gni")
 
 source_set("descriptor") {
   sources = [
-    "descriptor-cluster.cpp",
-    "descriptor-cluster.h",
+    "DescriptorCluster.cpp",
+    "DescriptorCluster.h",
   ]
 
   public_deps = [

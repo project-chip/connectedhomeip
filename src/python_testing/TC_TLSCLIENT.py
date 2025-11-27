@@ -62,7 +62,7 @@ class TC_TLSCLIENT(MatterBaseTest):
 
     async def common_setup(self):
         self.step(1)
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cr1_cmd = TLSUtils(self, endpoint=endpoint)
         cr1 = self.default_controller
 
@@ -107,7 +107,7 @@ class TC_TLSCLIENT(MatterBaseTest):
     async def test_TC_TLSCLIENT_2_1(self):
         self.step(1)
         attributes = Clusters.TlsClientManagement.Attributes
-        cr1_cmd = TLSUtils(self, endpoint=self.get_endpoint(default=1))
+        cr1_cmd = TLSUtils(self, endpoint=self.get_endpoint())
 
         self.step(2)
         max_provisioned = await cr1_cmd.read_tls_client_attribute(attributes.MaxProvisioned)

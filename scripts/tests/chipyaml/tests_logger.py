@@ -318,9 +318,9 @@ class TestRunnerLogger(TestRunnerHooks):
     def __prepare_data_for_printing(self, data):
         if isinstance(data, bytes):
             return data.decode('unicode_escape')
-        elif isinstance(data, list):
+        if isinstance(data, list):
             return [self.__prepare_data_for_printing(entry) for entry in data]
-        elif isinstance(data, dict):
+        if isinstance(data, dict):
             result = {}
             for key, value in data.items():
                 result[key] = self.__prepare_data_for_printing(value)

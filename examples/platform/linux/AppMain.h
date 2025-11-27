@@ -43,7 +43,8 @@ public:
     void SignalSafeStopMainLoop() override
     {
         chip::Server::GetInstance().GenerateShutDownEvent();
-        chip::DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) { chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); });
+        TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(
+            [](intptr_t) { TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); });
     }
 };
 

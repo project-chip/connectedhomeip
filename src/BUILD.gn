@@ -54,6 +54,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/administrator-commissioning-server/tests",
       "${chip_root}/src/app/clusters/access-control-server/tests",
       "${chip_root}/src/app/clusters/basic-information/tests",
+      "${chip_root}/src/app/clusters/boolean-state-configuration-server/tests",
       "${chip_root}/src/app/clusters/bindings/tests",
       "${chip_root}/src/app/clusters/descriptor/tests",
       "${chip_root}/src/app/clusters/general-commissioning-server/tests",

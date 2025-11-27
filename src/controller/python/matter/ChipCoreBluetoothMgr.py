@@ -213,7 +213,7 @@ class CoreBluetoothManager(ChipBleBase):
 
         if cond.op == "ready":
             return not self.ready_condition
-        elif cond.op == "scan":
+        if cond.op == "scan":
             for peripheral in self.peripheral_adv_list:
                 if cond.arg and str(peripheral.peripheral._.name) == cond.arg:
                     return False
@@ -444,13 +444,13 @@ class CoreBluetoothManager(ChipBleBase):
             if isinstance(ev, BleRxEvent):
                 eventStruct = BleRxEventStruct.fromBleRxEvent(ev)
                 return cast(pointer(eventStruct), c_void_p).value
-            elif isinstance(ev, BleTxEvent):
+            if isinstance(ev, BleTxEvent):
                 eventStruct = BleTxEventStruct.fromBleTxEvent(ev)
                 return cast(pointer(eventStruct), c_void_p).value
-            elif isinstance(ev, BleSubscribeEvent):
+            if isinstance(ev, BleSubscribeEvent):
                 eventStruct = BleSubscribeEventStruct.fromBleSubscribeEvent(ev)
                 return cast(pointer(eventStruct), c_void_p).value
-            elif isinstance(ev, BleDisconnectEvent):
+            if isinstance(ev, BleDisconnectEvent):
                 eventStruct = BleDisconnectEventStruct.fromBleDisconnectEvent(
                     ev)
                 return cast(pointer(eventStruct), c_void_p).value
