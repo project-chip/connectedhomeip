@@ -19,6 +19,8 @@
 #include "DeviceCallbacks.h"
 #include "esp_log.h"
 #include "nvs_flash.h"
+#include "shell_extension/launch.h"
+#include "shell_extension/openthread_cli_register.h"
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
@@ -27,8 +29,6 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <bridged-actions-stub.h>
-#include "shell_extension/launch.h"
-#include "shell_extension/openthread_cli_register.h"
 #include <common/Esp32AppServer.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
