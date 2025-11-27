@@ -175,12 +175,14 @@ class OTAProviderSubprocess(AppServerSubprocess):
         # Create the BinaryIO fp allow to use if path is provided.
         # Or assign it to the previously opened fp.
         if isinstance(log_file, str):
-            self.log_file = open(log_file, "ab")
+            # TODO: Handle file closure
+            self.log_file = open(log_file, "ab")  # noqa: SIM115
         else:
             self.log_file = log_file
 
         if isinstance(err_log_file, str):
-            self.err_log_file = open(err_log_file, "ab")
+            # TODO: Handle file closure
+            self.err_log_file = open(err_log_file, "ab")  # noqa: SIM115
         else:
             self.err_log_file = err_log_file
 

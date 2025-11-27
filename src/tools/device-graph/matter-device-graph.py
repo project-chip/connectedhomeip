@@ -200,9 +200,8 @@ class TC_MatterDeviceGraph(MatterBaseTest):
 
         deviceGraph.save(f'{sys.path[0]}/matter-device-graph.dot')
 
-        deviceDataFile = open(f'{sys.path[0]}/matter-device-data.txt', 'w')
-        deviceDataFile.write(pprint.pformat((wildcardResponse)))
-        deviceDataFile.close()
+        with open(f'{sys.path[0]}/matter-device-data.txt', 'w') as f:
+            f.write(pprint.pformat((wildcardResponse)))
 
 
 if __name__ == "__main__":

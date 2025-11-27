@@ -4,7 +4,6 @@ import argparse
 import os
 import subprocess
 import sys
-import typing
 from binascii import unhexlify
 from enum import Enum
 
@@ -63,20 +62,6 @@ def make_array_header(byte_string: bytes, name: str) -> str:
     """Returns the header define for an array with the given name and size."""
     byte_string = bytearray(byte_string)
     return 'extern const uint8_t ' + name + '[{:d}];\n'.format(len(byte_string))
-
-
-def open_outfile(filename=None) -> typing.BinaryIO:
-    """Opens either a file or stdout for output."""
-    if filename:
-        fh = open(filename, 'wb')
-    else:
-        fh = sys.stdout
-
-    try:
-        yield fh
-    finally:
-        if fh is not sys.stdout:
-            fh.close()
 
 
 class CertType(Enum):

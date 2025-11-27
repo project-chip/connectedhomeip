@@ -97,7 +97,8 @@ def detectZclFile(zapFile):
     path = DEFAULT_DATA_MODEL_DESCRIPTION_FILE
 
     if zapFile:
-        data = json.load(open(zapFile))
+        with open(zapFile) as f:
+            data = json.load(f)
         for package in data["package"]:
             if package["type"] != "zcl-properties":
                 continue

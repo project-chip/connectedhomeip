@@ -35,6 +35,7 @@ select = [
     # Simplify the code if possible
     "C4", "RET",
     "SIM118", "SIM101", "SIM103", "SIM105", "SIM109",
+    "SIM115",
     # Ensure that scripts are executable
     "EXE",
     # Check for common logging issues

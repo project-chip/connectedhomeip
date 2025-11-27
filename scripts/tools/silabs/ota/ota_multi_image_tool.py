@@ -150,8 +150,8 @@ def generate_app(args: object):
     descriptor = generate_descriptor(args.app_version, args.app_version_str, args.app_build_date)
     log.info("App encryption enable: %s", args.enc_enable)
     if args.enc_enable:
-        inputFile = open(args.app_input_file, "rb")
-        enc_file = crypto_utils.encryptData(inputFile.read(), args.input_ota_key, INITIALIZATION_VECTOR)
+        with open(args.app_input_file, "rb") as f:
+            enc_file = crypto_utils.encryptData(f.read(), args.input_ota_key, INITIALIZATION_VECTOR)
         enc_file1 = bytes([ord(x) for x in enc_file])
         file_size = len(enc_file1)
         payload = generate_header(TAG.APPLICATION, len(descriptor) + file_size) + descriptor + enc_file1
@@ -175,8 +175,8 @@ def generate_wifi_ta_image(args: object):
     descriptor = generate_descriptor(args.wifi_ta_version, args.wifi_ta_version_str, args.wifi_ta_build_date)
     log.info("WiFi TA encryption enable: %s", args.enc_enable)
     if args.enc_enable:
-        inputFile = open(args.wifi_ta_input_file, "rb")
-        enc_file = crypto_utils.encryptData(inputFile.read(), args.input_ota_key, INITIALIZATION_VECTOR)
+        with open(args.wifi_ta_input_file, "rb") as f:
+            enc_file = crypto_utils.encryptData(f.read(), args.input_ota_key, INITIALIZATION_VECTOR)
         enc_file1 = bytes([ord(x) for x in enc_file])
         file_size = len(enc_file1)
         payload = generate_header(TAG.WIFI_TA, len(descriptor) + file_size) + descriptor + enc_file1
@@ -200,8 +200,8 @@ def generate_bootloader(args: object):
     descriptor = generate_descriptor(args.bl_version, args.bl_version_str, args.bl_build_date)
     log.info("Bootloader encryption enable: %s", args.enc_enable)
     if args.enc_enable:
-        inputFile = open(args.bl_input_file, "rb")
-        enc_file = crypto_utils.encryptData(inputFile.read(), args.input_ota_key, INITIALIZATION_VECTOR)
+        with open(args.bl_input_file, "rb") as f:
+            enc_file = crypto_utils.encryptData(f.read(), args.input_ota_key, INITIALIZATION_VECTOR)
         enc_file1 = bytes([ord(x) for x in enc_file])
         file_size = len(enc_file1)
         payload = generate_header(TAG.BOOTLOADER, len(descriptor) + file_size) + descriptor + enc_file1

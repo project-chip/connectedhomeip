@@ -84,7 +84,7 @@ def main(log_level, no_log_timestamps, output, raw_profile_filename):
 
     expected_output = jinja2.Template(_CPP_TEMPLATE).render(raw_profile_filename=raw_profile_filename)
     if os.path.exists(output):
-        with open(output, 'rt') as f:
+        with open(output) as f:
             if f.read() == expected_output:
                 logging.info("File %s is already as expected. Will not re-write", output)
                 sys.exit(0)
