@@ -51,20 +51,18 @@ class TC_DISHALM_2_1(MatterBaseTest):
         return "198.2.1. [TC-DISHALM-2.1] Attributes with DUT as Server"
 
     def pics_TC_DISHALM_2_1(self):
-        pics = [
+        return [
             "DISHALM.S"
         ]
-        return pics
 
     def steps_TC_DISHALM_2_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commission DUT to TH", is_commissioning=True),
             TestStep(2, "TH reads from the DUT the Mask attribute", "Verify that the DUT response contains a 32-bit value"),
             TestStep(3, "TH reads from the DUT the Latch attribute", "Verify that the DUT response contains a 32-bit value"),
             TestStep(4, "TH reads from the DUT the State attribute", "Verify that the DUT response contains a 32-bit value"),
             TestStep(5, "TH reads from the DUT the Supported attribute", "Verify that the DUT response contains a 32-bit value")
         ]
-        return steps
 
     async def read_and_check_attributes_from_dishwasher_alarm(self, attribute: ClusterObjects.ClusterAttributeDescriptor):
         resp = await self.read_single_attribute_check_success(
