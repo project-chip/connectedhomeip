@@ -192,10 +192,7 @@ TEST_F(TestServerClusterExtension, TestGetDataVersion)
     // Initially, version is the same as underlying (since mVersionDelta is 0).
     ASSERT_EQ(extension.GetDataVersion(mockPath), underlying.GetDataVersion(mockPath));
 
-    // When NotifyAttributeChanged is called WITHOUT a context, mVersionDelta should still increment,
-    // but the underlying listener is not marked dirty.
-    // Since mContext is initially nullptr, mVersionDelta should NOT increase in the original code
-    // (due to VerifyOrReturn). So the version should remain the same as underlying initially
+    // Without a context, there is no need to increment (and cannot mark dirty).
     extension.TestNotifyAttributeChanged(4);
     ASSERT_EQ(extension.GetDataVersion(mockPath),
               underlying.GetDataVersion(mockPath)); // Should still be the same as no context is set
