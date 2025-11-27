@@ -327,7 +327,7 @@ def gen_mfd_partition(args, mfd_output):
         return cryptor.encrypt(data_bytearray)
 
     def convert_to_bytes(data):
-        if isinstance(data, bytes) or isinstance(data, str):
+        if isinstance(data, (bytes, str)):
             if isinstance(data, str):
                 return data.encode()
             return data

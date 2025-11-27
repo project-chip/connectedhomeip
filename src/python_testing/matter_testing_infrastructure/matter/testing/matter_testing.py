@@ -310,7 +310,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 if not trace:
                     return no_stack_trace
 
-                if isinstance(exception, signals.TestError) or isinstance(exception, signals.TestFailure):
+                if isinstance(exception, (signals.TestError, signals.TestFailure)):
                     # Exception gets raised by the mobly framework, so the proximal error is one line back in the stack trace
                     assert_candidates = [idx for idx, line in enumerate(trace) if "asserts" in line and "asserts.py" not in line]
                     if not assert_candidates:
