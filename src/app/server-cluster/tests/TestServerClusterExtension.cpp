@@ -255,7 +255,7 @@ TEST_F(TestServerClusterExtension, TestExtensionAttributes)
     ASSERT_TRUE(readString.data_equal("Sample String"_span));
 
     // Test reading kTestAttribute2 (uint32_t)
-    uint32_t readUint;
+    uint32_t readUint{};
     ASSERT_EQ(tester.ReadAttribute(kTestAttribute2, readUint), Status::Success);
     ASSERT_EQ(readUint, 1234u);
 
