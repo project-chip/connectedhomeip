@@ -44,6 +44,10 @@ OTARequestorCluster::OTARequestorCluster(EndpointId endpointId, OTARequestorInte
 
 CHIP_ERROR OTARequestorCluster::Startup(ServerClusterContext & context)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    ChipLogError(SoftwareUpdate, "Initializing OTA requestor on endpoint %u with flag 'chip_enable_ota_requestor' disabled",
+                 mPath.mEndpointId);
+#endif
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
     if (OtaRequestorInstance())
     {
@@ -69,7 +73,12 @@ DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(const DataModel
     case OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id: {
         if (!OtaRequestorInstance())
         {
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
             return CHIP_ERROR_INTERNAL;
+#else
+            // Return default values when the OTA requestor ought to be disabled for backwards compatibility.
+            return encoder.EncodeEmptyList();
+#endif
         }
         return encoder.EncodeList([this](const auto & listEncoder) -> CHIP_ERROR {
             ProviderLocationList::Iterator providerIterator = OtaRequestorInstance()->GetDefaultOTAProviderListIterator();
@@ -86,13 +95,23 @@ DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(const DataModel
     case OtaSoftwareUpdateRequestor::Attributes::UpdateState::Id:
         if (!OtaRequestorInstance())
         {
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
             return CHIP_ERROR_INTERNAL;
+#else
+            // Return default values when the OTA requestor ought to be disabled for backwards compatibility.
+            return encoder.Encode(OtaSoftwareUpdateRequestor::UpdateStateEnum::kUnknown);
+#endif
         }
         return encoder.Encode(OtaRequestorInstance()->GetCurrentUpdateState());
     case OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id:
         if (!OtaRequestorInstance())
         {
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
             return CHIP_ERROR_INTERNAL;
+#else
+            // Return default values when the OTA requestor ought to be disabled for backwards compatibility.
+            return encoder.EncodeNull();
+#endif
         }
         return encoder.Encode(OtaRequestorInstance()->GetCurrentUpdateStateProgress());
     case Globals::Attributes::FeatureMap::Id:
