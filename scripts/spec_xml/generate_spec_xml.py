@@ -28,6 +28,7 @@ from pathlib import Path
 import click
 import paths
 from lxml import etree
+
 from matter.testing.conformance import ConformanceDecision
 from matter.testing.spec_parsing import build_xml_clusters, build_xml_device_types
 
