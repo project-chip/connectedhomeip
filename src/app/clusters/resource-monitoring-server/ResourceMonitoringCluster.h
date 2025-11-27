@@ -26,7 +26,6 @@
 #include <app/data-model/Nullable.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
-#include <app/util/basic-types.h>
 #include <clusters/HepaFilterMonitoring/Enums.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>

@@ -68,9 +68,8 @@ DataModel::ActionReturnStatus ResourceMonitoringCluster::WriteImpl(const DataMod
     switch (request.path.mAttributeId)
     {
     case ResourceMonitoring::Attributes::LastChangedTime::Id: {
-        ReturnErrorOnFailure(chip::app::GetSafeAttributePersistenceProvider()->WriteScalarValue(
-            ConcreteAttributePath(GetEndpointId(), GetClusterId(), Attributes::LastChangedTime::Id), mLastChangedTime));
-        return Protocols::InteractionModel::Status::Success;
+        return chip::app::GetSafeAttributePersistenceProvider()->WriteScalarValue(
+            ConcreteAttributePath(GetEndpointId(), GetClusterId(), Attributes::LastChangedTime::Id), mLastChangedTime);
     }
 
     default:
@@ -135,14 +134,10 @@ CHIP_ERROR ResourceMonitoringCluster::Attributes(const ConcreteClusterPath & pat
 
 CHIP_ERROR ResourceMonitoringCluster::ReadReplaceableProductList(AttributeValueEncoder & aEncoder)
 {
-
-    VerifyOrReturnError(mEnabledFeatures.Has(ResourceMonitoring::Feature::kReplacementProductList), CHIP_NO_ERROR);
-
     ReplacementProductListManager * productListManagerInstance = GetReplacementProductListManagerInstance();
     if (nullptr == productListManagerInstance)
     {
-        TEMPORARY_RETURN_IGNORED aEncoder.EncodeEmptyList();
-        return CHIP_NO_ERROR;
+        return aEncoder.EncodeEmptyList();
     }
 
     productListManagerInstance->Reset();
@@ -250,19 +245,11 @@ void ResourceMonitoringCluster::LoadPersistentAttributes()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (mPath.mClusterId == HepaFilterMonitoring::Id)
-    {
-        err = chip::app::GetSafeAttributePersistenceProvider()->ReadScalarValue(
-            ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, HepaFilterMonitoring::Attributes::LastChangedTime::Id),
-            mLastChangedTime);
-    }
-    else if (mPath.mClusterId == ActivatedCarbonFilterMonitoring::Id)
-    {
-        err = chip::app::GetSafeAttributePersistenceProvider()->ReadScalarValue(
-            ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId,
-                                  ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::Id),
-            mLastChangedTime);
-    }
+    static_assert(HepaFilterMonitoring::Attributes::Condition::Id == ActivatedCarbonFilterMonitoring::Attributes::Condition::Id);
+
+    err = chip::app::GetSafeAttributePersistenceProvider()->ReadScalarValue(
+        ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, HepaFilterMonitoring::Attributes::LastChangedTime::Id),
+        mLastChangedTime);
 
     if (err == CHIP_NO_ERROR)
     {
@@ -316,11 +303,7 @@ ResourceMonitoringCluster::ResetCondition(const ConcreteCommandPath & commandPat
                                           const ResourceMonitoring::Commands::ResetCondition::DecodableType & commandData,
                                           CommandHandler * handler)
 {
-    Protocols::InteractionModel::Status resetConditionStatus = mDelegate->OnResetCondition();
-
-    handler->AddStatus(commandPath, resetConditionStatus);
-
-    return resetConditionStatus;
+    return mDelegate->OnResetCondition();
 }
 
 CHIP_ERROR ResourceMonitoringCluster::AcceptedCommands(const ConcreteClusterPath & cluster,
