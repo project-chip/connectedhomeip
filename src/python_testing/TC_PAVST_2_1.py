@@ -63,7 +63,7 @@ class TC_PAVST_2_1(MatterBaseTest):
 
     @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport))
     async def test_TC_PAVST_2_1(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.PushAvStreamTransport
         attr = Clusters.PushAvStreamTransport.Attributes
 
@@ -86,9 +86,11 @@ class TC_PAVST_2_1(MatterBaseTest):
             endpoint=endpoint, cluster=cluster, attribute=attr.CurrentConnections
         )
         for config in transport_configs:
-            isValidTransportStatus = (config.TransportStatus == cluster.TransportStatusEnum.kActive |
-                                      config.TransportStatus == cluster.TransportStatusEnum.kInactive)
-            asserts.assert_true(isValidTransportStatus, "TransportStatus must be a defined value!")
+            isValidTransportStatus = ((config.TransportStatus == cluster.TransportStatusEnum.kActive) |
+                                      (config.TransportStatus == cluster.TransportStatusEnum.kInactive))
+            isValidConnectionId = config.ConnectionId >= 0
+            isValidData = isValidTransportStatus and isValidConnectionId
+            asserts.assert_true(isValidData, "TransportStatus must be a defined value!")
 
 
 if __name__ == "__main__":

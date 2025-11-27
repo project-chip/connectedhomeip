@@ -24,6 +24,8 @@ chip_test_suite("tests") {
     "TestBdxMessages.cpp",
     "TestBdxTransferSession.cpp",
     "TestBdxUri.cpp",
+    "TestTransferDiagnosticLog.cpp",
+    "TestTransferFacilitator.cpp",
   ]
 
   public_deps = [

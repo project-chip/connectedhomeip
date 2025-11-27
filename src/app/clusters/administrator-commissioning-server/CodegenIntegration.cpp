@@ -72,7 +72,7 @@ public:
 
 } // namespace
 
-void emberAfAdministratorCommissioningClusterServerInitCallback(EndpointId endpointId)
+void MatterAdministratorCommissioningClusterInitCallback(EndpointId endpointId)
 {
     // The implementation of the server we use here is only for the RootNode (i.e. endpoint 0)
     // singleton. Other uses (e.g. fabric sync) will need their own implementations and would be added
@@ -94,7 +94,7 @@ void emberAfAdministratorCommissioningClusterServerInitCallback(EndpointId endpo
         integrationDelegate);
 }
 
-void MatterAdministratorCommissioningClusterServerShutdownCallback(EndpointId endpointId)
+void MatterAdministratorCommissioningClusterShutdownCallback(EndpointId endpointId)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
 

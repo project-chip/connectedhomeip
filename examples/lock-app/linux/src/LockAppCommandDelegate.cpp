@@ -244,5 +244,6 @@ void LockAppCommandDelegate::OnEventCommandReceived(const char * json)
         return;
     }
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(LockAppCommandHandler::HandleCommand, reinterpret_cast<intptr_t>(handler));
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(LockAppCommandHandler::HandleCommand,
+                                                                           reinterpret_cast<intptr_t>(handler));
 }

@@ -123,7 +123,8 @@ public:
 private:
     // DevicePairingDelegate implementation.
     void OnStatusUpdate(DevicePairingDelegate::Status status) override;
-    void OnPairingComplete(CHIP_ERROR error, const std::optional<RendezvousParameters> & rendezvousParameters) override;
+    void OnPairingComplete(CHIP_ERROR error, const std::optional<RendezvousParameters> & rendezvousParameters,
+                           const std::optional<SetupPayload> & setupPayload) override;
     void OnPairingDeleted(CHIP_ERROR error) override;
     void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) override;
 
@@ -228,6 +229,10 @@ private:
     DiscoveryType mDiscoveryType             = DiscoveryType::kAll;
     std::vector<SetupPayload> mSetupPayloads;
 
+    // The payload we are using for our current PASE connection attempt.  Only
+    // set while we are attempting PASE.
+    std::optional<SetupPayload> mCurrentPASEPayload;
+
     // While we are trying to pair, we intercept the DevicePairingDelegate
     // notifications from mCommissioner.  We want to make sure we send them on
     // to the original pairing delegate, if any.
@@ -244,7 +249,7 @@ private:
 
     // Current thing we are trying to connect to over UDP. If a PASE connection fails with
     // a CHIP_ERROR_TIMEOUT, the discovered parameters will be used to ask the
-    // mdns daemon to invalidate the
+    // mdns daemon to invalidate its caches.
     Optional<SetUpCodePairerParameters> mCurrentPASEParameters;
 
     // mWaitingForPASE is true if we have called either

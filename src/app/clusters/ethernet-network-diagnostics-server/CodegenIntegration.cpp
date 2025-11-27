@@ -62,7 +62,7 @@ public:
 
 } // namespace
 
-void emberAfEthernetNetworkDiagnosticsClusterServerInitCallback(EndpointId endpointId)
+void MatterEthernetNetworkDiagnosticsClusterInitCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -78,7 +78,7 @@ void emberAfEthernetNetworkDiagnosticsClusterServerInitCallback(EndpointId endpo
         integrationDelegate);
 }
 
-void MatterEthernetNetworkDiagnosticsClusterServerShutdownCallback(EndpointId endpointId)
+void MatterEthernetNetworkDiagnosticsClusterShutdownCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 

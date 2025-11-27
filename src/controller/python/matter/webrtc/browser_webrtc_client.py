@@ -27,7 +27,7 @@ class BrowserWebRTCClient:
         self.event_callbacks: dict[str, Callable] = {}
         self.ws_client = ws_client
         self.pending_cmd_responses: dict[str, asyncio.Future] = {}
-        self.event_loop = asyncio.get_event_loop()
+        self.event_loop = asyncio.get_running_loop()
         self._event_callbacks_without_parameter = ("GATHERING_STATE_COMPLETE",)
         self.id = id
 
@@ -72,8 +72,7 @@ class BrowserWebRTCClient:
 
     async def get_peer_connection_state(self):
         event = "GET_PEER_CONNECTION_STATE"
-        state = await self.send_message(event)
-        return state
+        return await self.send_message(event)
 
     def on_gathering_complete(self, callback):
         self.event_callbacks["GATHERING_STATE_COMPLETE"] = callback
@@ -115,7 +114,7 @@ class BrowserWebRTCClient:
     def parse_messsage(self, message: dict[str, Any]) -> WebSocketMessage:
         if not self.validate_message(message):
             # return a dummy WebSocketMessage to set exception
-            raise RuntimeError(f"Invalid message received from server {message =}")
+            raise RuntimeError(f"Invalid message received from server {message=}")
         return WebSocketMessage(**message)
 
     def validate_message(self, message: dict[str, Any]) -> bool:
@@ -124,4 +123,4 @@ class BrowserWebRTCClient:
         valid_keys = ("data", "error", "type", "sessionId")
         if len(message.keys()) < len(valid_keys):
             return False
-        return all([key in message for key in valid_keys])
+        return all(key in message for key in valid_keys)

@@ -29,6 +29,8 @@ from matter.idl.matter_idl_types import (AccessPrivilege, ApiMaturity, Attribute
                                          EventQuality, Field, FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct,
                                          StructQuality, StructTag)
 
+LOGGER = logging.getLogger(__name__)
+
 
 def UnionOfAllFlags(flags_list):
     if not flags_list:
@@ -145,8 +147,7 @@ class MatterIdlTransformer(Transformer):
         n = tokens[0].value
         if n.startswith('0x'):
             return int(n[2:], 16)
-        else:
-            return int(n)
+        return int(n)
 
     @v_args(inline=True)
     def negative_integer(self, value):
@@ -195,10 +196,9 @@ class MatterIdlTransformer(Transformer):
         if len(tokens) == 1:
             return DataType(name=tokens[0])
             # Just a string for data type
-        elif len(tokens) == 2:
+        if len(tokens) == 2:
             return DataType(name=tokens[0], max_length=tokens[1])
-        else:
-            raise Exception("Unexpected size for data type")
+        raise Exception("Unexpected size for data type")
 
     @v_args(inline=True)
     def constant_entry(self, api_maturity, id, number, spec_name):
@@ -315,14 +315,12 @@ class MatterIdlTransformer(Transformer):
 
         meta = None if self.skip_meta else ParseMetaData(meta)
 
-        cmd = Command(
+        return Command(
             parse_meta=meta,
             qualities=args[0],
             input_param=args[2], output_param=args[3], code=args[4],
             **args[1],
         )
-
-        return cmd
 
     def event_access(self, privilege):
         return privilege[0]
@@ -689,7 +687,7 @@ class ParserWithLines:
                         f"Different cluster definition for {c.name}/{c.code}")
             else:
                 clusters[c.code] = c
-        idl.clusters = [c for c in clusters.values()]
+        idl.clusters = list(clusters.values())
 
         for comment in self.transformer.doc_comments:
             comment.apply_to_idl(idl, file)
@@ -723,7 +721,7 @@ def CreateParser(skip_meta: bool = False, merge_globals=True):
 __LOG_LEVELS__ = {
     'debug': logging.DEBUG,
     'info': logging.INFO,
-    'warn': logging.WARN,
+    'warn': logging.WARNING,
     'fatal': logging.FATAL,
 }
 
@@ -744,9 +742,9 @@ def main(log_level, filename=None):
         format='%(asctime)s %(levelname)-7s %(message)s',
     )
 
-    logging.info("Starting to parse ...")
+    LOGGER.info("Starting to parse ...")
     data = CreateParser().parse(open(filename).read(), file_name=filename)
-    logging.info("Parse completed")
+    LOGGER.info("Parse completed")
 
-    logging.info("Data:")
+    LOGGER.info("Data:")
     pprint.pp(data)

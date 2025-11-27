@@ -44,10 +44,13 @@ from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_b
 
 class TC_ACL_2_4(MatterBaseTest):
     def desc_TC_ACL_2_4(self) -> str:
-        return "[TC-ACL-2.4] ACL "
+        return "[TC-ACL-2.4] ACL Attribute"
+
+    def pics_TC_ACL_2_4(self) -> list[str]:
+        return ['ACL.S']
 
     def steps_TC_ACL_2_4(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "TH1 commissions DUT using admin node ID N1", is_commissioning=True),
             TestStep(2, "TH1 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",
                      "Result is SUCCESS, value is stored as F1"),
@@ -131,7 +134,6 @@ class TC_ACL_2_4(MatterBaseTest):
             TestStep(45, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute value is acl_original",
                      "Result is SUCCESS"),
         ]
-        return steps
 
     @async_test_body
     async def test_TC_ACL_2_4(self):

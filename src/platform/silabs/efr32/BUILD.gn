@@ -62,26 +62,31 @@ static_library("efr32") {
     "${silabs_platform_dir}/SilabsConfig.cpp",
     "${silabs_platform_dir}/SilabsConfig.h",
     "${silabs_platform_dir}/SystemPlatformConfig.h",
+    "${silabs_platform_dir}/platformAbstraction/GsdkSpam.cpp",
+    "${silabs_platform_dir}/platformAbstraction/SilabsPlatform.cpp",
+    "${silabs_platform_dir}/platformAbstraction/SilabsPlatform.h",
+    "${silabs_platform_dir}/platformAbstraction/SilabsPlatformBase.h",
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
   ]
-
-  if (chip_enable_ble_rs911x) {
-    sources += [
-      "../rs911x/BLEManagerImpl.cpp",
-      "../rs911x/rsi_ble_config.h",
-      "../rs911x/wfx_sl_ble_init.cpp",
-      "../rs911x/wfx_sl_ble_init.h",
-    ]
-  } else {
-    sources += [ "BLEManagerImpl.cpp" ]
-  }
 
   public_deps = [
     "${chip_root}/src/platform:platform_base",
     "${chip_root}/src/platform/logging:headers",
     "${silabs_platform_dir}/platformAbstraction:gsdk",
   ]
+
+  # BLE implementation selection: use SiWx BLE wrapper or local EFR32 implementation
+  if (sl_matter_enable_siwx_ble) {
+    public_deps += [ "${silabs_platform_dir}/SiWx/ble:siwx-ble" ]
+    sources += [
+      "${silabs_platform_dir}/SiWx/ble/BLEManagerImpl.cpp",
+      "${silabs_platform_dir}/SiWx/ble/sl_si91x_ble_init.cpp",
+      "${silabs_platform_dir}/SiWx/ble/sl_si91x_ble_init.h",
+    ]
+  } else {
+    sources += [ "BLEManagerImpl.cpp" ]
+  }
   deps = [
     "${chip_root}/src/app/common:ids",
     "${sl_provision_root}:headers",

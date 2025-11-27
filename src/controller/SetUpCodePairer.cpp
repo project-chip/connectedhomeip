@@ -264,8 +264,7 @@ CHIP_ERROR SetUpCodePairer::StopDiscoveryOverDNSSD()
 
     mWaitingForDiscovery[kIPTransport] = false;
 
-    mCommissioner->StopCommissionableDiscovery();
-    return CHIP_NO_ERROR;
+    return mCommissioner->StopCommissionableDiscovery();
 }
 
 CHIP_ERROR SetUpCodePairer::StartDiscoveryOverWiFiPAF()
@@ -310,9 +309,10 @@ CHIP_ERROR SetUpCodePairer::StopDiscoveryOverWiFiPAF()
 {
     mWaitingForDiscovery[kWiFiPAFTransport] = false;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    DeviceLayer::ConnectivityMgr().WiFiPAFCancelIncompleteSubscribe();
-#endif
+    return DeviceLayer::ConnectivityMgr().WiFiPAFCancelIncompleteSubscribe();
+#else
     return CHIP_NO_ERROR;
+#endif
 }
 
 CHIP_ERROR SetUpCodePairer::StartDiscoveryOverNFC()
@@ -386,6 +386,8 @@ bool SetUpCodePairer::ConnectToDiscoveredDevice()
 
     while (!mDiscoveredParameters.empty())
     {
+        mCurrentPASEPayload.reset();
+
         // Grab the first element from the queue and try connecting to it.
         // Remove it from the queue before we try to connect, in case the
         // connection attempt fails and calls right back into us to try the next
@@ -397,18 +399,17 @@ bool SetUpCodePairer::ConnectToDiscoveredDevice()
         {
             auto longDiscriminator = *params.mLongDiscriminator;
             // Look for a matching setup passcode.
-            bool found = false;
             for (auto & payload : mSetupPayloads)
             {
                 if (payload.discriminator.MatchesLongDiscriminator(longDiscriminator))
                 {
                     params.SetSetupPINCode(payload.setUpPINCode);
                     params.SetSetupDiscriminator(payload.discriminator);
-                    found = true;
+                    mCurrentPASEPayload = payload;
                     break;
                 }
             }
-            if (!found)
+            if (!mCurrentPASEPayload)
             {
                 ChipLogError(Controller, "SetUpCodePairer: Discovered discriminator %u does not match any of our setup payloads",
                              longDiscriminator);
@@ -424,6 +425,7 @@ bool SetUpCodePairer::ConnectToDiscoveredDevice()
             {
                 params.SetSetupPINCode(mSetupPayloads[0].setUpPINCode);
                 params.SetSetupDiscriminator(mSetupPayloads[0].discriminator);
+                mCurrentPASEPayload = mSetupPayloads[0];
             }
             else
             {
@@ -466,6 +468,7 @@ bool SetUpCodePairer::ConnectToDiscoveredDevice()
         }
 
         // Failed to start establishing PASE.  Move on to the next item.
+        mCurrentPASEPayload.reset();
         PASEEstablishmentComplete();
     }
 
@@ -650,7 +653,7 @@ void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::CommonRe
     {
         // If the discovery type does not want the PASE auto retry mechanism, we will just store
         // a single IP. So the discovery process is stopped as it won't be of any help anymore.
-        StopDiscoveryOverDNSSD();
+        TEMPORARY_RETURN_IGNORED StopDiscoveryOverDNSSD();
         mDiscoveredParameters.emplace_back(resolutionData, matchedLongDiscriminator, 0);
     }
     else
@@ -784,7 +787,8 @@ void SetUpCodePairer::OnStatusUpdate(DevicePairingDelegate::Status status)
     }
 }
 
-void SetUpCodePairer::OnPairingComplete(CHIP_ERROR error, const std::optional<RendezvousParameters> & rendezvousParameters)
+void SetUpCodePairer::OnPairingComplete(CHIP_ERROR error, const std::optional<RendezvousParameters> & rendezvousParameters,
+                                        const std::optional<SetupPayload> & setupPayload)
 {
     // Save the pairing delegate so we can notify it.  We want to notify it
     // _after_ we restore the state on the commissioner, in case the delegate
@@ -792,6 +796,10 @@ void SetUpCodePairer::OnPairingComplete(CHIP_ERROR error, const std::optional<Re
     // notified.
     auto * pairingDelegate = mPairingDelegate;
     PASEEstablishmentComplete();
+
+    // Make sure to clear out mCurrentPASEPayload whether we succeeded or failed.
+    std::optional<SetupPayload> pasePayload;
+    pasePayload.swap(mCurrentPASEPayload);
 
     if (CHIP_NO_ERROR == error)
     {
@@ -801,7 +809,13 @@ void SetUpCodePairer::OnPairingComplete(CHIP_ERROR error, const std::optional<Re
         MATTER_LOG_METRIC_END(kMetricSetupCodePairerPairDevice, error);
         if (pairingDelegate != nullptr)
         {
-            pairingDelegate->OnPairingComplete(error, rendezvousParameters);
+            // We don't expect to have a setupPayload passed in here.
+            if (setupPayload)
+            {
+                ChipLogError(Controller,
+                             "Unexpected setupPayload passed to SetUpCodePairer::OnPairingComplete.  Where did it come from?");
+            }
+            pairingDelegate->OnPairingComplete(error, rendezvousParameters, pasePayload);
         }
         return;
     }
@@ -834,7 +848,7 @@ void SetUpCodePairer::OnPairingComplete(CHIP_ERROR error, const std::optional<Re
     MATTER_LOG_METRIC_END(kMetricSetupCodePairerPairDevice, error);
     if (pairingDelegate != nullptr)
     {
-        pairingDelegate->OnPairingComplete(error, rendezvousParameters);
+        pairingDelegate->OnPairingComplete(error, rendezvousParameters, pasePayload);
     }
 }
 

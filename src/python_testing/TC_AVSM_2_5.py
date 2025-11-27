@@ -139,7 +139,7 @@ class TC_AVSM_2_5(MatterBaseTest):
         has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kAudio)
     )
     async def test_TC_AVSM_2_5(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.CameraAvStreamManagement
         attr = Clusters.CameraAvStreamManagement.Attributes
         commands = Clusters.CameraAvStreamManagement.Commands
@@ -393,6 +393,17 @@ class TC_AVSM_2_5(MatterBaseTest):
                 "Unexpected status returned when expecting DYNAMIC_CONSTRAINT_ERROR due to unsupported sample rate",
             )
             pass
+
+        # Clear all allocated streams
+        aAllocatedAudioStreams = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedAudioStreams
+        )
+
+        for stream in aAllocatedAudioStreams:
+            try:
+                await self.send_single_cmd(endpoint=endpoint, cmd=commands.AudioStreamDeallocate(audioStreamID=(stream.audioStreamID)))
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
 
 if __name__ == "__main__":

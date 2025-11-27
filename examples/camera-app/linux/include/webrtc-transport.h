@@ -73,13 +73,13 @@ public:
     State GetState() { return mState; }
 
     // Send video data for a given stream ID
-    void SendVideo(const char * data, size_t size, uint16_t videoStreamID) override;
+    void SendVideo(const chip::ByteSpan & data, int64_t timestamp, uint16_t videoStreamID) override;
 
     // Send audio data for a given stream ID
-    void SendAudio(const char * data, size_t size, uint16_t audioStreamID) override;
+    void SendAudio(const chip::ByteSpan & data, int64_t timestamp, uint16_t audioStreamID) override;
 
     // Send synchronized audio/video data for given audio and video stream IDs
-    void SendAudioVideo(const char * data, size_t size, uint16_t videoStreamID, uint16_t audioStreamID) override;
+    void SendAudioVideo(const chip::ByteSpan & data, uint16_t videoStreamID, uint16_t audioStreamID) override;
 
     // Indicates that the transport is ready to send video data
     bool CanSendVideo() override;
@@ -93,7 +93,11 @@ public:
     // Stops WebRTC peer connection and cleanup
     void Stop();
 
-    void AddTracks(const std::string & videoMid = "video", const std::string & audioMid = "audio");
+    // Adds video track to the peerconnection with H264 codec with default payload type as 96
+    void AddVideoTrack(const std::string & videoMid = "video", int payloadType = 96);
+
+    // Adds audio track to the peerconnection with opus codec with default payload type as 111
+    void AddAudioTrack(const std::string & audioMid = "audio", int payloadType = 111);
 
     std::shared_ptr<WebRTCPeerConnection> GetPeerConnection() { return mPeerConnection; }
 
@@ -101,9 +105,9 @@ public:
 
     void SetSdpAnswer(std::string localSdp) { mLocalSdp = localSdp; }
 
-    std::vector<std::string> GetCandidates() { return mLocalCandidates; }
+    const std::vector<ICECandidateInfo> & GetCandidates() { return mLocalCandidates; }
 
-    void SetCandidates(std::vector<std::string> candidates) { mLocalCandidates = candidates; }
+    void SetCandidates(std::vector<ICECandidateInfo> candidates) { mLocalCandidates = candidates; }
 
     void AddRemoteCandidate(const std::string & candidate, const std::string & mid);
 
@@ -115,7 +119,7 @@ public:
 
     // WebRTC Callbacks
     void OnLocalDescription(const std::string & sdp, SDPType type);
-    void OnICECandidate(const std::string & candidate);
+    void OnICECandidate(const ICECandidateInfo & candidateInfo);
     void OnConnectionStateChanged(bool connected);
     void OnTrack(std::shared_ptr<WebRTCTrack> track);
 
@@ -134,7 +138,7 @@ private:
 
     std::string mLocalSdp;
     SDPType mLocalSdpType;
-    std::vector<std::string> mLocalCandidates;
+    std::vector<ICECandidateInfo> mLocalCandidates;
 
     RequestArgs mRequestArgs;
     OnTransportLocalDescriptionCallback mOnLocalDescription = nullptr;

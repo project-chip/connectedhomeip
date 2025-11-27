@@ -26,12 +26,9 @@ __all__ = ['CreateParser']
 
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
-__LOG_LEVELS__ = {
-    'debug': logging.DEBUG,
-    'info': logging.INFO,
-    'warn': logging.WARN,
-    'fatal': logging.FATAL,
-}
+__LOG_LEVELS__ = logging.getLevelNamesMapping()
+
+log = logging.getLogger(__name__)
 
 
 @click.command()
@@ -60,26 +57,26 @@ def main(log_level, rules, idl_path):
     )
 
     lint_rules = []
-    logging.info("Loading rules from %s" % rules)
+    log.info("Loading rules from '%s'", rules)
     lint_rules.extend(CreateParser().parse(open(rules, 'rt').read()))
 
-    logging.info("Parsing idl from %s" % idl_path)
+    log.info("Parsing idl from '%s'", idl_path)
     idl_tree = matter_idl_parser.CreateParser().parse(
         open(idl_path, "rt").read(), file_name=idl_path)
 
-    logging.info("Running %d lint rules" % len(lint_rules))
+    log.info("Running %d lint rules", len(lint_rules))
 
     errors = []
     for rule in lint_rules:
-        logging.info("   Running %s" % rule.name)
+        log.info("   Running '%s'", rule.name)
         errors.extend(rule.LintIdl(idl_tree))
-    logging.info("Done")
+    log.info("Done")
 
     for e in errors:
-        logging.error("ERROR: %s" % e)
+        log.error("ERROR: '%s'", e)
 
     if errors:
-        logging.error("Found %d lint errors" % len(errors))
+        log.error("Found %d lint errors", len(errors))
         sys.exit(1)
 
 
@@ -99,9 +96,9 @@ def parser(log_level, filename=None):
         format='%(asctime)s %(levelname)-7s %(message)s',
     )
 
-    logging.info("Starting to parse ...")
+    log.info("Starting to parse ...")
     data = CreateParser().parse(open(filename, 'rt').read())
-    logging.info("Parse completed")
+    log.info("Parse completed")
 
-    logging.info("Data:")
-    logging.info("%r" % data)
+    log.info("Data:")
+    log.info("%r", data)

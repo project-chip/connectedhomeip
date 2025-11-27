@@ -57,7 +57,7 @@ class TC_BOOLCFG_4_2(MatterBaseTest):
         return "[TC-BOOLCFG-4.2] AlarmsActive attribute with DUT as Server"
 
     def steps_TC_BOOLCFG_4_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read FeatureMap attribute"),
             TestStep("2b", "Read AttributeList attribute"),
@@ -74,13 +74,15 @@ class TC_BOOLCFG_4_2(MatterBaseTest):
             TestStep(8, "Send TestEventTrigger with SensorUntrigger event"),
             TestStep(9, "Read AlarmsActive attribute"),
         ]
-        return steps
 
     def pics_TC_BOOLCFG_4_2(self) -> list[str]:
-        pics = [
+        return [
             "BOOLCFG.S",
         ]
-        return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_BOOLCFG_4_2(self):
@@ -90,7 +92,7 @@ class TC_BOOLCFG_4_2(MatterBaseTest):
                             "the --hex-arg flag as PIXIT.BOOLCFG.TEST_EVENT_TRIGGER_KEY:<key>, "
                             "e.g. --hex-arg PIXIT.BOOLCFG.TEST_EVENT_TRIGGER_KEY:000102030405060708090a0b0c0d0e0f")
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         enableKey = self.matter_test_config.global_test_params['PIXIT.BOOLCFG.TEST_EVENT_TRIGGER_KEY']
 
         self.step(1)

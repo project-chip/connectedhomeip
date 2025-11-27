@@ -27,7 +27,7 @@
 #include <lib/dnssd/Advertiser.h>
 #include <messaging/ExchangeDelegate.h>
 #include <platform/CHIPDeviceConfig.h>
-#include <protocols/secure_channel/RendezvousParameters.h>
+#include <protocols/secure_channel/PASESession.h>
 #include <system/SystemClock.h>
 
 namespace chip {
@@ -129,6 +129,8 @@ public:
     // For tests only, allow overriding the spec-defined minimum value of the
     // commissioning window timeout.
     void OverrideMinCommissioningTimeout(System::Clock::Seconds32 timeout) { mMinCommissioningTimeoutOverride.SetValue(timeout); }
+
+    Optional<SessionHandle> GetPASESession() const { return mPASESession.Get(); }
 
 private:
     //////////// SessionDelegate Implementation ///////////////

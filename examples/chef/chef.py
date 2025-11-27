@@ -69,12 +69,12 @@ def splash() -> None:
 
 
 def load_config() -> None:
-    config = dict()
-    config["nrfconnect"] = dict()
-    config["esp32"] = dict()
-    config["silabs-thread"] = dict()
-    config["ameba"] = dict()
-    config["telink"] = dict()
+    config = {}
+    config["nrfconnect"] = {}
+    config["esp32"] = {}
+    config["silabs-thread"] = {}
+    config["ameba"] = {}
+    config["telink"] = {}
     configFile = f"{_CHEF_SCRIPT_PATH}/config.yaml"
     if (os.path.exists(configFile)):
         configStream = open(configFile, 'r')
@@ -120,8 +120,7 @@ def check_python_version() -> None:
 
 def load_cicd_config() -> Dict[str, Any]:
     with open(_CICD_CONFIG_FILE_NAME) as config_file:
-        config = json.loads(config_file.read())
-    return config
+        return json.loads(config_file.read())
 
 
 def flush_print(
@@ -470,12 +469,12 @@ def main() -> int:
                     archive_name = f"{label}-{device_name}"
                     if options.build_exclude and re.search(options.build_exclude, archive_name):
                         continue
-                    elif options.build_include and not re.search(options.build_include, archive_name):
+                    if options.build_include and not re.search(options.build_include, archive_name):
                         continue
                     if options.dry_run:
                         flush_print(archive_name)
                         continue
-                    command = f"./chef.py -cbr -d {device_name} -t {platform} "
+                    command = f"./chef.py -br -d {device_name} -t {platform} "
                     command += " ".join(args)
                     flush_print(f"Building {command}", with_border=True)
                     shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
@@ -855,7 +854,7 @@ def main() -> int:
                         CHEF_FLAGS += -DCONFIG_DEVICE_PRODUCT_ID={options.pid}
                         CHEF_FLAGS += -DCHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"{options.pid}\"
                         """
-                                            ))
+                    ))
                 if options.do_clean:
                     shell.run_cmd("make clean")
                 shell.run_cmd("make chef")
@@ -892,6 +891,7 @@ def main() -> int:
                  f'"CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", '
                  f'"CONFIG_ENABLE_PW_RPC={int(options.do_rpc)}", '
                  f'"CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME=\\"{str(options.pname)}\\""]'),
+                'chip_app_data_model_target = "//:chef-data-model"',
             ])
 
             uname_resp = shell.run_cmd("uname -m", return_cmd_output=True)

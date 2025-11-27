@@ -103,8 +103,6 @@ if [ "$#" == "0" ]; then
             Enable Synchronized Sleepy end device. (Default false)
             Must also set chip_enable_icd_server=true chip_openthread_ftd=false
             --icd can be used to configure both arguments
-        use_rs9116
-            Build wifi example with extension board rs9116. (Default false)
         use_SiWx917
             Build wifi example with extension board SiWx917. (Default false)
         use_wf200
@@ -134,6 +132,8 @@ if [ "$#" == "0" ]; then
             Enable the Alarm Based Wakeup for 917 SoC when sleep is enabled (Default false)
         si91x_alarm_periodic_time
             Periodic time at which the 917 SoC should wakeup (Default: 30sec)
+        wifi_ncp_module
+            Build SiWx917_ncp example for NCP module board (Default false)
         Presets
         --icd
             enable ICD features, set thread mtd
@@ -141,8 +141,8 @@ if [ "$#" == "0" ]; then
         --low-power
             disables all power consuming features for the most power efficient build
             This flag is to be used with --icd
-        --wifi <wf200 | rs9116>
-            build wifi example variant for given exansion board
+        --wifi <wf200 | SiWx917>
+            build wifi example variant for given expansion board
         --additional_data_advertising
             enable Addition data advertissing and rotating device ID
         --use_ot_lib
@@ -189,18 +189,16 @@ else
                 ;;
             --wifi)
                 if [ -z "$2" ]; then
-                    echo "--wifi requires rs9116 or SiWx917 or wf200"
+                    echo "--wifi requires SiWx917 or wf200"
                     exit 1
                 fi
 
-                if [ "$2" = "rs9116" ]; then
-                    optArgs+="use_rs9116=true "
-                elif [ "$2" = "SiWx917" ]; then
+                if [ "$2" = "SiWx917" ]; then
                     optArgs+="use_SiWx917=true "
                 elif [ "$2" = "wf200" ]; then
                     optArgs+="use_wf200=true "
                 else
-                    echo "Wifi usage: --wifi rs9116|SiWx917|wf200"
+                    echo "Wifi usage: --wifi SiWx917|wf200"
                     exit 1
                 fi
 
@@ -253,7 +251,6 @@ else
                 ;;
             --docker)
                 optArgs+="efr32_sdk_root=\"$GSDK_ROOT\" "
-                optArgs+="wiseconnect_sdk_root=\"$WISECONNECT_SDK_ROOT\" "
                 optArgs+="wifi_sdk_root=\"$WIFI_SDK_ROOT\" "
                 USE_DOCKER=true
                 shift
@@ -296,7 +293,7 @@ else
                 shift
                 ;;
             *)
-                if [ "$1" =~ *"use_rs9116=true"* ] || [ "$1" =~ *"use_SiWx917=true"* ] || [ "$1" =~ *"use_wf200=true"* ]; then
+                if [ "$1" =~ *"use_SiWx917=true"* ] || [ "$1" =~ *"use_wf200=true"* ]; then
                     USE_WIFI=true
                     # NCP Mode so base MCU is an EFR32
                     optArgs+="chip_device_platform =\"efr32\" "

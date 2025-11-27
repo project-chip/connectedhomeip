@@ -22,7 +22,7 @@ from dataclasses import dataclass, field
 
 from .adapter import TestAdapter
 from .hooks import TestRunnerHooks
-from .parser import TestParser
+from .parser import TestParser, build_revision_var_name
 from .parser_builder import TestParserBuilder, TestParserBuilderConfig
 from .pseudo_clusters.pseudo_clusters import PseudoClusters
 
@@ -149,7 +149,7 @@ class TestRunner(TestRunnerBase):
             result = await self._run_with_timeout(parser, runner_config)
             if isinstance(result, Exception) or isinstance(result, CancelledError):
                 raise (result)
-            elif not result:
+            if not result:
                 return False
 
         if runner_config and runner_config.hooks:
@@ -179,6 +179,7 @@ class TestRunner(TestRunnerBase):
         for item in request.arguments.get('values', []):
             if item.get('name') == key_name:
                 return item.get('value')
+        return None
 
     async def _run(self, parser: TestParser, config: TestRunnerConfig):
         status = True
@@ -188,19 +189,37 @@ class TestRunner(TestRunnerBase):
 
             test_duration = 0
             for idx, request in enumerate(parser.tests):
+                # Handle skipping tests where PICS do not apply.
                 if not request.is_pics_enabled:
                     hooks.step_skipped(request.label, request.pics)
                     continue
-                elif not config.adapter:
+
+                # Handle skipping steps where ClusterRevision does not apply.
+                if not request.is_revision_condition_passed:
+                    # Try to get the var name and value for a more informative message
+                    try:
+                        var_name = build_revision_var_name(
+                            request.endpoint, request.cluster)
+                        current_val = request.get_runtime_variable(var_name)
+                    except (ValueError, IndexError, KeyError):
+                        current_val = "unknown"
+
+                    reason = (f"Step skipped due to ClusterRevision range not matching (val={current_val}, "
+                              f"min={request.min_revision}, "
+                              f"max={request.max_revision})")
+                    hooks.step_skipped(request.label, reason)
+                    continue
+
+                # Handle normal flows of execution after condition skipping above.
+                if not config.adapter:
                     hooks.step_start(request)
                     hooks.step_unknown()
                     continue
-                elif config.pseudo_clusters.is_manual_step(request):
+                if config.pseudo_clusters.is_manual_step(request):
                     hooks.step_start(request)
                     await hooks.step_manual(request)
                     continue
-                else:
-                    hooks.step_start(request)
+                hooks.step_start(request)
 
                 start = time.time()
                 if config.pseudo_clusters.supports(request):

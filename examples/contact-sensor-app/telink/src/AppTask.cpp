@@ -35,7 +35,7 @@ AppTask AppTask::sAppTask;
 CHIP_ERROR AppTask::Init(void)
 {
     SetExampleButtonCallbacks(ContactActionEventHandler);
-    InitCommonParts();
+    TEMPORARY_RETURN_IGNORED InitCommonParts();
 
     LedManager::getInstance().setLed(LedManager::EAppLed_App0, ContactSensorMgr().IsContactClosed());
 
@@ -84,7 +84,7 @@ void AppTask::UpdateClusterStateInternal(intptr_t arg)
 
     ChipLogProgress(NotSpecified, "StateValue::Set : %d", newValue);
 
-    auto booleanState = chip::app::Clusters::BooleanState::GetClusterForEndpointIndex(1);
+    auto booleanState = chip::app::Clusters::BooleanState::FindClusterOnEndpoint(1);
     VerifyOrReturn(booleanState != nullptr);
     booleanState->SetStateValue(newValue);
 }
@@ -127,17 +127,17 @@ void AppTask::ContactActionEventHandler(AppEvent * aEvent)
 
 void AppTask::UpdateClusterState(void)
 {
-    PlatformMgr().ScheduleWork(UpdateClusterStateInternal, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(UpdateClusterStateInternal, 0);
 }
 
 void AppTask::UpdateDeviceState(void)
 {
-    PlatformMgr().ScheduleWork(UpdateDeviceStateInternal, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(UpdateDeviceStateInternal, 0);
 }
 
 void AppTask::UpdateDeviceStateInternal(intptr_t arg)
 {
-    auto booleanState = chip::app::Clusters::BooleanState::GetClusterForEndpointIndex(1);
+    auto booleanState = chip::app::Clusters::BooleanState::FindClusterOnEndpoint(1);
     VerifyOrReturn(booleanState != nullptr);
     auto stateValueAttrValue = booleanState->GetStateValue();
     LedManager::getInstance().setLed(LedManager::EAppLed_App0, stateValueAttrValue);

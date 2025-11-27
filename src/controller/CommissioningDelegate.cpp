@@ -148,6 +148,12 @@ const char * StageToString(CommissioningStage stage)
     case kRemoveThreadNetworkConfig:
         return "RemoveThreadNetworkConfig";
 
+    case kRequestWiFiCredentials:
+        return "RequestWiFiCredentials";
+
+    case kRequestThreadCredentials:
+        return "RequestThreadCredentials";
+
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
     case kUnpoweredPhaseComplete:
         return "UnpoweredPhaseComplete";

@@ -146,3 +146,6 @@ chip::Protocols::InteractionModel::Status MatterPreAttributeChangeCallback(const
  */
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value);
+
+void MatterClusterServerInitCallback(chip::EndpointId endpoint, chip::ClusterId clusterId);
+void MatterClusterServerShutdownCallback(chip::EndpointId endpoint, chip::ClusterId clusterId);

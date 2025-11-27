@@ -162,6 +162,9 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Commission the node with the given node ID.  The node ID must match the node
  * ID that was used to set up the commissioning session.
+ *
+ * NOTE: The forceWiFiScan and forceThreadScan properties of
+ * MTRCommissioningParameters are ignored by this API.
  */
 - (BOOL)commissionNodeWithID:(NSNumber *)nodeID
          commissioningParams:(MTRCommissioningParameters *)commissioningParams

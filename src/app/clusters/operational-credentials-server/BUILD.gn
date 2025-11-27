@@ -11,10 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-# transitional dependencies so that chip_data_model sets
-# the right dependencies
-group("operational-credentials-server") {
-  public_deps = [ "${chip_root}/zzz_generated/app-common/clusters/OperationalCredentials:metadata" ]
+source_set("operational-credentials-server") {
+  sources = [
+    "operational-credentials-cluster.cpp",
+    "operational-credentials-cluster.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app:app",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/zzz_generated/app-common/clusters/OperationalCredentials",
+  ]
 }

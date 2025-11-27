@@ -37,6 +37,7 @@ chip_test_suite("tests") {
     "TestBufferWriter.cpp",
     "TestBytesCircularBuffer.cpp",
     "TestBytesToHex.cpp",
+    "TestCHIPArgParser.cpp",
     "TestCHIPCounter.cpp",
     "TestCHIPMem.cpp",
     "TestCHIPMemString.cpp",
@@ -52,6 +53,7 @@ chip_test_suite("tests") {
     "TestPool.cpp",
     "TestPrivateHeap.cpp",
     "TestReadOnlyBuffer.cpp",
+    "TestReferenceCountedPtr.cpp",
     "TestSafeInt.cpp",
     "TestSafeString.cpp",
     "TestScoped.cpp",
@@ -72,9 +74,6 @@ chip_test_suite("tests") {
     "TestVariant.cpp",
     "TestZclString.cpp",
   ]
-  if (current_os != "mbed") {
-    test_sources += [ "TestCHIPArgParser.cpp" ]
-  }
 
   sources = []
 

@@ -61,7 +61,7 @@ if (wifi_soc) {
     ]
 
     include_dirs = [
-      "${chip_root}/src/platform/silabs/SiWx917",
+      "${chip_root}/src/platform/silabs/SiWx",
       "${silabs_project_dir}/include",
       "${examples_plat_dir}",
       "${chip_root}/src/lib",
@@ -123,8 +123,8 @@ silabs_executable("air_quality_sensor_app") {
     "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common/src/air-quality-sensor-manager.cpp",
     "${examples_common_plat_dir}/main.cpp",
     "src/AppTask.cpp",
+    "src/DataModelCallbacks.cpp",
     "src/SensorManager.cpp",
-    "src/ZclCallbacks.cpp",
   ]
 
   #TODO: This is a placeholder for the actual implementation

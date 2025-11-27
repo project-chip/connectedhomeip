@@ -32,3 +32,5 @@ pw_build_LINK_DEPS = [
   "$dir_pw_assert:impl",
   "$dir_pw_log:impl",
 ]
+
+chip_app_data_model_target = "//:bouffalolab-lighting"

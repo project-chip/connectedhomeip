@@ -23,7 +23,7 @@
 #include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-server.h>
 #include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
 #include <app/clusters/chime-server/chime-server.h>
-#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
+#include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
 #include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
 #include <app/clusters/zone-management-server/zone-management-server.h>
 
@@ -87,7 +87,7 @@ struct SnapshotStream
     bool IsCompatible(const chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs &
                           inputParams) const
     {
-        return (snapshotStreamParams.imageCodec == inputParams.imageCodec && snapshotStreamParams.quality == inputParams.quality &&
+        return (snapshotStreamParams.imageCodec == inputParams.imageCodec &&
                 snapshotStreamParams.frameRate <= inputParams.maxFrameRate &&
                 snapshotStreamParams.minResolution.width <= inputParams.minResolution.width &&
                 snapshotStreamParams.minResolution.height <= inputParams.minResolution.height &&
@@ -145,6 +145,8 @@ public:
 
     // Getter for PushAVStreamTransport Delegate
     virtual chip::app::Clusters::PushAvStreamTransportDelegate & GetPushAVTransportDelegate() = 0;
+
+    virtual void HandlePushAvZoneTrigger(uint16_t zoneId) = 0;
 
     // Class defining the Camera HAL interface
     class CameraHALInterface
@@ -245,7 +247,7 @@ public:
         // Get snapshot capabilities
         virtual std::vector<SnapshotCapabilitiesStruct> & GetSnapshotCapabilities() = 0;
 
-        // Get the maximum network bandwidth(mbps) that the camera would consume
+        // Get the maximum network bandwidth(bps) that the camera would consume
         // for transmission of its media streams.
         virtual uint32_t GetMaxNetworkBandwidth() = 0;
 
@@ -277,8 +279,9 @@ public:
         // Does camera have a hard privacy switch
         virtual bool HasHardPrivacySwitch() = 0;
 
-        // Get whether hard privacy mode is on
-        virtual bool GetHardPrivacyMode() = 0;
+        // Get/Set hard privacy mode
+        virtual CameraError SetHardPrivacyMode(bool hardPrivacyMode) = 0;
+        virtual bool GetHardPrivacyMode()                            = 0;
 
         // Get/Set night vision
         virtual CameraError SetNightVision(TriStateAutoEnum nightVision) = 0;

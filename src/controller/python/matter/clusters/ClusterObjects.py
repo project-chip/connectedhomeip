@@ -102,7 +102,12 @@ class ClusterObjectFieldDescriptor:
 
             # Get the type of the list. This is a generic, which has its sub-type information of the list element
             # inside its type argument.
-            (elementType, ) = typing.get_args(elementType)
+            try:
+                (listGenericArg, ) = typing.get_args(elementType)
+            except ValueError:
+                raise ValueError(
+                    f"Failed to decode field {debugPath} of type {self.Type}: Failed to find type of elements in {elementType}")
+            elementType = listGenericArg
 
             for i, v in enumerate(val):
                 self._PutSingleElementToTLV(
@@ -242,6 +247,10 @@ class ClusterCommand(ClusterObject):
 
     @ChipUtility.classproperty
     def command_id(self) -> int:
+        raise NotImplementedError()
+
+    @ChipUtility.classproperty
+    def is_client(self) -> bool:
         raise NotImplementedError()
 
     @ChipUtility.classproperty

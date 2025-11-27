@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
+#include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
 #include <app/static-cluster-config/PushAvStreamTransport.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
@@ -59,7 +59,7 @@ public:
 PushAvStreamTransportServer * FindClusterOnEndpoint(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
-    return static_cast<PushAvStreamTransportServer *>(CodegenClusterIntegration::GetClusterForEndpointIndex(
+    return static_cast<PushAvStreamTransportServer *>(CodegenClusterIntegration::FindClusterOnEndpoint(
         {
             .endpointId                = endpointId,
             .clusterId                 = PushAvStreamTransport::Id,
@@ -70,7 +70,7 @@ PushAvStreamTransportServer * FindClusterOnEndpoint(EndpointId endpointId)
 }
 
 } // namespace
-void emberAfPushAvStreamTransportClusterServerInitCallback(EndpointId endpointId)
+void MatterPushAvStreamTransportClusterInitCallback(EndpointId endpointId)
 {
 
     IntegrationDelegate integrationDelegate;
@@ -87,7 +87,7 @@ void emberAfPushAvStreamTransportClusterServerInitCallback(EndpointId endpointId
         integrationDelegate);
 }
 
-void MatterPushAvStreamTransportClusterServerShutdownCallback(EndpointId endpointId)
+void MatterPushAvStreamTransportClusterShutdownCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -117,7 +117,7 @@ void SetDelegate(EndpointId endpointId, PushAvStreamTransportDelegate * delegate
     if (PushAvStreamTransportServer * cluster = FindClusterOnEndpoint(endpointId); cluster != nullptr)
     {
         cluster->SetDelegate(delegate);
-        cluster->Init();
+        TEMPORARY_RETURN_IGNORED cluster->Init();
     }
 }
 

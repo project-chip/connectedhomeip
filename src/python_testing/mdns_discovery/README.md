@@ -166,7 +166,7 @@ get_quada_records()
         └── addr_resolver.ip_addresses_by_version(...)
                  └── extracts the resulting IPv6 addresses
         ▼
-returns list[QuadaRecord]
+returns list[AaaaRecord]
 ```
 
 #### 🎯 `get_ptr_records`

@@ -41,7 +41,7 @@ jobs:
     if: github.actor != 'restyled-io[bot]'
 
     container:
-      image: ghcr.io/project-chip/chip-build-efr32:167
+      image: ghcr.io/project-chip/chip-build-efr32:175
       volumes:
         - "/tmp/bloat_reports:/tmp/bloat_reports"
     steps:
@@ -126,7 +126,6 @@ jobs:
             "./scripts/build/build_examples.py \
                 --enable-flashbundle \
                 --target efr32-brd4187c-lock-wifi-siwx917 \
-                --target efr32-brd4187c-light-wifi-rs9116 \
                 --target efr32-brd4187c-lock-wifi-wf200 \
                 build \
                 --copy-artifacts-to out/artifacts \

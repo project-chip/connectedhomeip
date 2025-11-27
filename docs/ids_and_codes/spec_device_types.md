@@ -39,7 +39,7 @@ The following markers are used in this document (matches the ID master list):
 |66            |0x0042    |Water Valve                   |   |C  |C  |C    |C          |C  |
 |67            |0x0043    |Water Leak Detector           |   |C  |C  |C    |C          |C  |
 |68            |0x0044    |Rain Sensor                   |   |C  |C  |C    |C          |C  |
-|69            |0x0045    |Soil Sensor                   |   |   |   |     |           |P  |
+|69            |0x0045    |Soil Sensor                   |   |   |   |     |           |C  |
 |112           |0x0070    |Refrigerator                  |C  |C  |C  |C    |C          |C  |
 |113           |0x0071    |Temperature Controlled Cabinet|C  |C  |C  |C    |C          |C  |
 |114           |0x0072    |Room Air Conditioner          |C  |C  |C  |C    |C          |C  |
@@ -69,18 +69,19 @@ The following markers are used in this document (matches the ID master list):
 |271           |0x010F    |Mounted On/Off Control        |   |   |C  |C    |C          |C  |
 |272           |0x0110    |Mounted Dimmable Load Control |   |   |C  |C    |C          |C  |
 |304           |0x0130    |Joint Fabric Administrator    |   |   |P  |P    |P          |P  |
-|320           |0x0140    |Intercom                      |   |   |   |     |           |P  |
-|321           |0x0141    |Audio Doorbell                |   |   |   |     |           |P  |
-|322           |0x0142    |Camera                        |   |   |   |     |           |P  |
+|320           |0x0140    |Intercom                      |   |   |   |     |           |C  |
+|321           |0x0141    |Audio Doorbell                |   |   |   |     |           |C  |
+|322           |0x0142    |Camera                        |   |   |   |     |           |C  |
 |323           |0x0143    |Video Doorbell                |   |   |   |     |           |C  |
 |324           |0x0144    |Floodlight Camera             |   |   |   |     |           |C  |
-|325           |0x0145    |Snapshot Camera               |   |   |   |     |           |P  |
-|326           |0x0146    |Chime                         |   |   |   |     |           |P  |
-|327           |0x0147    |Camera Controller             |   |   |   |     |           |P  |
+|325           |0x0145    |Snapshot Camera               |   |   |   |     |           |C  |
+|326           |0x0146    |Chime                         |   |   |   |     |           |C  |
+|327           |0x0147    |Camera Controller             |   |   |   |     |           |C  |
+|328           |0x0148    |Doorbell                      |   |   |   |     |           |C  |
 |514           |0x0202    |Window Covering               |C  |C  |C  |C    |C          |C  |
 |515           |0x0203    |Window Covering Controller    |C  |C  |C  |C    |C          |C  |
-|560           |0x0230    |Closure                       |   |   |   |     |           |P  |
-|561           |0x0231    |Closure Panel                 |   |   |   |     |           |P  |
+|560           |0x0230    |Closure                       |   |   |   |     |           |C  |
+|561           |0x0231    |Closure Panel                 |   |   |   |     |           |C  |
 |574           |0x023E    |Closure Controller            |   |   |   |     |           |C  |
 |768           |0x0300    |Heating/Cooling Unit          |C  |   |   |     |           |   |
 |769           |0x0301    |Thermostat                    |C  |C  |C  |C    |C          |C  |
@@ -96,7 +97,7 @@ The following markers are used in this document (matches the ID master list):
 |1293          |0x050D    |Device Energy Management      |   |C  |C  |C    |C          |C  |
 |1295          |0x050F    |Water Heater                  |   |   |C  |C    |C          |C  |
 |1296          |0x0510    |Electrical Sensor             |   |C  |C  |C    |C          |C  |
-|1297          |0x0511    |Electrical Utility Meter      |   |   |   |     |           |P  |
+|1297          |0x0511    |Electrical Utility Meter      |   |   |   |     |           |C  |
 |1298          |0x0512    |Meter Reference Point         |   |   |   |     |           |C  |
 |1299          |0x0513    |Electrical Energy Tariff      |   |   |   |     |           |C  |
 |1300          |0x0514    |Electrical Meter              |   |   |   |     |           |C  |

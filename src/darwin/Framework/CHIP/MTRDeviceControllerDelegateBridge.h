@@ -39,7 +39,7 @@ public:
     // DevicePairingDelegate implementation
     void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
 
-    void OnPairingComplete(CHIP_ERROR error) override;
+    void OnPairingComplete(CHIP_ERROR error, const std::optional<chip::RendezvousParameters> & rendezvousParameters, const std::optional<chip::SetupPayload> & setupPayload) override;
 
     void OnPairingDeleted(CHIP_ERROR error) override;
 
@@ -52,6 +52,9 @@ public:
     void
     OnScanNetworksSuccess(const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & dataResponse) override;
     void OnScanNetworksFailure(CHIP_ERROR error) override;
+
+    CHIP_ERROR WiFiCredentialsNeeded(chip::EndpointId endpoint) override;
+    CHIP_ERROR ThreadCredentialsNeeded(chip::EndpointId endpoint) override;
 
     // Other helper methods
     void SetDeviceNodeID(chip::NodeId deviceNodeId);
@@ -75,11 +78,6 @@ private:
     MTRCommissioningParameters * mCommissioningParameters;
 
     MTRCommissioningStatus MapStatus(chip::Controller::DevicePairingDelegate::Status status);
-
-    id<MTRDeviceControllerDelegate_Internal> GetInternalDelegate() const
-    {
-        return static_cast<id<MTRDeviceControllerDelegate_Internal>>(mDelegate);
-    }
 };
 
 NS_ASSUME_NONNULL_END

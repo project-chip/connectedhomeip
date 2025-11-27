@@ -38,6 +38,8 @@ from matter.testing.global_attribute_ids import GlobalAttributeIds
 if TYPE_CHECKING:
     from matter.testing.matter_testing import MatterBaseTest
 
+LOGGER = logging.getLogger(__name__)
+
 EndpointCheckFunction = Callable[[
     Clusters.Attribute.AsyncReadTransaction.ReadResponse, int], bool]
 
@@ -267,9 +269,8 @@ def async_test_body(body):
 async def _get_all_matching_endpoints(test_instance, accept_function: EndpointCheckFunction) -> list[int]:
     """ Returns a list of endpoints matching the accept condition. """
     wildcard = await test_instance.default_controller.Read(test_instance.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)])
-    matching = [e for e in wildcard.attributes.keys()
-                if accept_function(wildcard, e)]
-    return matching
+    return [e for e in wildcard.attributes.keys()
+            if accept_function(wildcard, e)]
 
 
 async def should_run_test_on_endpoint(test_instance, accept_function: EndpointCheckFunction) -> bool:
@@ -304,14 +305,14 @@ def run_on_singleton_matching_endpoint(accept_function: EndpointCheckFunction):
             asserts.assert_less_equal(
                 len(matching), 1, "More than one matching endpoint found for singleton test.")
             if not matching:
-                logging.info(
+                LOGGER.info(
                     "Test is not applicable to any endpoint - skipping test")
                 asserts.skip('No endpoint matches test requirements')
                 return
             try:
                 old_endpoint = self.matter_test_config.endpoint
                 self.matter_test_config.endpoint = matching[0]
-                logging.info(
+                LOGGER.info(
                     f'Running test on endpoint {self.matter_test_config.endpoint}')
                 timeout = getattr(self.matter_test_config,
                                   'timeout', None) or self.default_timeout
@@ -356,11 +357,11 @@ def run_if_endpoint_matches(accept_function: EndpointCheckFunction):
             should_run_test = test_instance.event_loop.run_until_complete(
                 runner_with_timeout)
             if not should_run_test:
-                logging.info(
+                LOGGER.info(
                     "Test is not applicable to this endpoint - skipping test")
                 asserts.skip('Endpoint does not match test requirements')
                 return
-            logging.info(
+            LOGGER.info(
                 f'Running test on endpoint {test_instance.matter_test_config.endpoint}')
             timeout = getattr(test_instance.matter_test_config,
                               'timeout', None) or test_instance.default_timeout

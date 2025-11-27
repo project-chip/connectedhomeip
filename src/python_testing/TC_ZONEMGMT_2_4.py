@@ -36,8 +36,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 
 from mobly import asserts
 
@@ -108,10 +108,20 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
                      "Verify that the DUT responds with a NotFound status code"),
         ]
 
+    async def _trigger_motion_event(self, zone_id, prompt_msg=None):
+        # CI: Use app pipe to trigger zone event.
+        # Manual: User should trigger a motion event from the defined zone.
+        if self.is_pics_sdk_ci_only:
+            self.write_to_app_pipe({"Name": "ZoneTriggered", "ZoneId": zone_id})
+        else:
+            if prompt_msg is None:
+                prompt_msg = f"Press enter and immediately start motion activity in zone {zone_id}."
+            self.wait_for_user_input(prompt_msg=prompt_msg)
+
     @run_if_endpoint_matches(has_cluster(Clusters.ZoneManagement) and
                              has_cluster(Clusters.CameraAvStreamManagement))
     async def test_TC_ZONEMGMT_2_4(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.ZoneManagement
         attr = Clusters.ZoneManagement.Attributes
         commands = Clusters.ZoneManagement.Commands
@@ -255,9 +265,8 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
         event_listener = EventSubscriptionHandler(expected_cluster=cluster)
         await event_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30)
         event_delay_seconds = 5.0
-        # TODO: Check for self.is_ci
-        # CI call to trigger zone event.
-        self.write_to_app_pipe({"Name": "ZoneTriggered", "ZoneId": zoneID1})
+        await self._trigger_motion_event(zoneID1, prompt_msg=f"Press enter and immediately start motion activity in zone {zoneID1} and stop any motion after {initDuration} seconds of pressing enter.")
+
         event = event_listener.wait_for_event_report(
             cluster.Events.ZoneTriggered, timeout_sec=event_delay_seconds)
         asserts.assert_equal(type(event), cluster.Events.ZoneTriggered,
@@ -276,15 +285,16 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
                              "Incorrect event type")
         asserts.assert_equal(event.zone, zoneID1, "Unexpected zoneID on ZoneTriggered")
         asserts.assert_equal(event.reason, enums.ZoneEventStoppedReasonEnum.kActionStopped, "Unexpected reason on ZoneStopped")
-        time.sleep(blindDuration)
+        await asyncio.sleep(blindDuration)
 
         self.step("4")
-        # Generate 2 triggers in quick succession to see of ZoneStopped comes after Augmentation duration
+        # Generate 2 triggers in quick succession to see if ZoneStopped comes after Augmentation duration
 
         event_listener = EventSubscriptionHandler(expected_cluster=cluster)
         await event_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30)
         event_delay_seconds = 5.0
-        self.write_to_app_pipe({"Name": "ZoneTriggered", "ZoneId": zoneID1})
+        await self._trigger_motion_event(zoneID1, prompt_msg=f"Press enter and immediately start motion activity in zone {zoneID1}. Stop after 2-3 seconds. Be ready for a second prompt for another motion activity to trigger an event.")
+
         event = event_listener.wait_for_event_report(
             cluster.Events.ZoneTriggered, timeout_sec=event_delay_seconds)
         asserts.assert_equal(type(event), cluster.Events.ZoneTriggered,
@@ -293,7 +303,8 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
         asserts.assert_equal(event.reason, enums.ZoneEventTriggeredReasonEnum.kMotion, "Unexpected reason on ZoneTriggered")
 
         self.step("4a")
-        self.write_to_app_pipe({"Name": "ZoneTriggered", "ZoneId": zoneID1})
+        await self._trigger_motion_event(zoneID1, prompt_msg=f"Press enter and immediately start motion activity in zone {zoneID1} for a second time in quick succession.")
+
         event_delay_seconds = initDuration + augDuration + 1
 
         self.step("4b")
@@ -303,11 +314,12 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
                              "Incorrect event type")
         asserts.assert_equal(event.zone, zoneID1, "Unexpected zoneID on ZoneTriggered")
         asserts.assert_equal(event.reason, enums.ZoneEventStoppedReasonEnum.kActionStopped, "Unexpected reason on ZoneStopped")
-        time.sleep(blindDuration)
+        await asyncio.sleep(blindDuration)
 
         self.step("5")
         # Repeat Step 3
-        self.write_to_app_pipe({"Name": "ZoneTriggered", "ZoneId": zoneID1})
+        await self._trigger_motion_event(zoneID1, prompt_msg=f"Press enter and immediately start motion activity in zone {zoneID1}. Stop after 2-3 seconds.")
+
         event = event_listener.wait_for_event_report(
             cluster.Events.ZoneTriggered, timeout_sec=event_delay_seconds)
         asserts.assert_equal(type(event), cluster.Events.ZoneTriggered,
@@ -320,9 +332,14 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
         # time
         # Generate some activity triggers to facilitate advancing of triggerdetectedDuration
         # beyond maxduration
-        for i in range(maxDuration):
-            self.write_to_app_pipe({"Name": "ZoneTriggered", "ZoneId": zoneID1})
-            time.sleep(1)
+        if self.is_pics_sdk_ci_only:
+            for i in range(maxDuration):
+                self.write_to_app_pipe({"Name": "ZoneTriggered", "ZoneId": zoneID1})
+                await asyncio.sleep(1)
+        else:
+            self.wait_for_user_input(
+                prompt_msg=f"""Press enter and immediately start, and keep generating motion activity from zone {zoneID1} for a period exceeding {maxDuration} seconds.
+After {maxDuration}, keep generating some motion activity during the {blindDuration} seconds blind duration phase. DUT should not send any ZoneTriggered event during this phase.""")
 
         event_delay_seconds = maxDuration
         event = event_listener.wait_for_event_report(
@@ -336,9 +353,10 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
 
         self.step("5c")
         event_delay_seconds = blindDuration + 1
-        self.write_to_app_pipe({"Name": "ZoneTriggered", "ZoneId": zoneID1})
+        if self.is_pics_sdk_ci_only:
+            self.write_to_app_pipe({"Name": "ZoneTriggered", "ZoneId": zoneID1})
         event = event_listener.wait_for_event_expect_no_report(timeout_sec=event_delay_seconds)
-        logger.info(f"Successfully timed out without receiving any ZoneTriggered event for zone: {zoneID1}")
+        logger.info(f"Successfully timed out without receiving any ZoneTriggered event during blind duration for zone: {zoneID1}")
 
         self.step("6")
 

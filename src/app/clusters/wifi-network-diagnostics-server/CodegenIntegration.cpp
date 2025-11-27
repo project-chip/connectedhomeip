@@ -17,7 +17,6 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-cluster.h>
-#include <app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-logic.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/static-cluster-config/WiFiNetworkDiagnostics.h>
 #include <app/util/attribute-storage.h>
@@ -50,7 +49,7 @@ public:
         // and do not properly support secondary network interfaces or per-endpoint diagnostics.
         // See issue:#40317
         gServers[clusterInstanceIndex].Create(endpointId, DeviceLayer::GetDiagnosticDataProvider(),
-                                              WiFiDiagnosticsServerLogic::OptionalAttributeSet(optionalAttributeBits),
+                                              WiFiDiagnosticsServerCluster::OptionalAttributeSet(optionalAttributeBits),
                                               BitFlags<WiFiNetworkDiagnostics::Feature>(featureMap));
         return gServers[clusterInstanceIndex].Registration();
     }
@@ -65,8 +64,7 @@ public:
 
 } // namespace
 
-// This callback is called for any endpoint (fixed or dynamic) that is registered with the Ember machinery.
-void emberAfWiFiNetworkDiagnosticsClusterServerInitCallback(EndpointId endpointId)
+void MatterWiFiNetworkDiagnosticsClusterInitCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 
@@ -82,8 +80,7 @@ void emberAfWiFiNetworkDiagnosticsClusterServerInitCallback(EndpointId endpointI
         integrationDelegate);
 }
 
-// This callback is called for any endpoint (fixed or dynamic) that is registered with the Ember machinery.
-void MatterWiFiNetworkDiagnosticsClusterServerShutdownCallback(EndpointId endpointId)
+void MatterWiFiNetworkDiagnosticsClusterShutdownCallback(EndpointId endpointId)
 {
     IntegrationDelegate integrationDelegate;
 

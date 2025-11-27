@@ -18,12 +18,12 @@
 import datetime
 import random
 import string
-from typing import List, Optional, Union
+from typing import Callable, List, Optional, Union
 
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
-from cryptography.hazmat.primitives.asymmetric import ec, rsa, utils
-from cryptography.x509 import CertificateBuilder, random_serial_number
+from cryptography.hazmat.primitives.asymmetric import ec, utils
+from cryptography.x509 import CertificateBuilder, CertificateSigningRequest, random_serial_number
 from cryptography.x509.oid import NameOID
 from ecdsa.curves import curve_by_name
 from mobly import asserts
@@ -34,6 +34,7 @@ from pyasn1_modules import rfc2986, rfc5480
 import matter.clusters as Clusters
 import matter.testing.matchers as matchers
 from matter import ChipDeviceCtrl
+from matter.clusters.enum import MatterIntEnum
 from matter.clusters.Types import Nullable, NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing import matter_asserts
@@ -57,19 +58,19 @@ class TLSUtils:
         self.fabric_index = fabric_index
 
     class CertWithKey:
-        def __init__(self, cert: bytes, key: rsa.RSAPrivateKey):
+        def __init__(self, cert: bytes, key: ec.EllipticCurvePrivateKey):
             self.cert = cert
             self.key = key
 
-    def get_key(self) -> rsa.RSAPrivateKey:
-        return rsa.generate_private_key(
-            public_exponent=65537, key_size=2048
+    def get_key(self) -> ec.EllipticCurvePrivateKey:
+        return ec.generate_private_key(
+            ec.SECP256R1()
         )
 
     def gen_cert(self, public_key: bytes | None = None) -> bytes:
         return self.gen_cert_with_key(self.get_key(), public_key)
 
-    def gen_cert_chain(self, root: rsa.RSAPrivateKey, length: int):
+    def gen_cert_chain(self, root: ec.EllipticCurvePrivateKey, length: int):
         signer = root
         result = []
         for i in range(length):
@@ -79,7 +80,9 @@ class TLSUtils:
             signer = key
         return result
 
-    def gen_cert_with_key(self, signer: rsa.RSAPrivateKey, public_key: bytes | None = None, subject: x509.Name | None = None) -> bytes:
+    def gen_cert_with_key(self, signer: ec.EllipticCurvePrivateKey, public_key: bytes | None = None,
+                          subject: x509.Name | None = None, builder_lambda: Callable[
+            [], CertificateBuilder] = lambda: CertificateBuilder()) -> bytes:
         if not public_key:
             public_key = signer.public_key()
 
@@ -98,7 +101,7 @@ class TLSUtils:
             subject = root_cert_subject
 
         cert = (
-            CertificateBuilder()
+            builder_lambda()
             .subject_name(subject)
             .issuer_name(root_cert_subject)
             .public_key(public_key)
@@ -143,7 +146,7 @@ class TLSUtils:
         asserts.assert_greater_equal(caid, 0, "Invalid CCDID returned")
         asserts.assert_less_equal(caid, 65534, "Invalid CCDID returned")
 
-    def assert_valid_csr(self, response: Clusters.TlsCertificateManagement.Commands.ClientCSRResponse, nonce: bytes):
+    def assert_valid_csr(self, response: Clusters.TlsCertificateManagement.Commands.ClientCSRResponse, nonce: bytes) -> CertificateSigningRequest:
         # Verify der encoded and PKCS #10 (rfc2986 is PKCS #10) - next two requirements
         try:
             temp, _ = der_decoder(response.csr, asn1Spec=rfc2986.CertificationRequest())
@@ -179,13 +182,16 @@ class TLSUtils:
         csr_pubkey.verify(signature=nonce_signature, data=nonce, signature_algorithm=ec.ECDSA(hashes.SHA256()))
         return csr
 
+    def get_fingerprint(self, cert: bytes) -> bytes:
+        return x509.load_der_x509_certificate(cert).fingerprint(hashes.SHA256())
+
     async def send_provision_root_command(
             self, certificate: bytes, caid: Union[Nullable, int] = NullValue,
             expected_status: Status = Status.Success) -> Union[Clusters.TlsCertificateManagement.Commands.ProvisionRootCertificateResponse, InteractionModelError]:
         try:
             result = await self.test.send_single_cmd(cmd=Clusters.TlsCertificateManagement.Commands.ProvisionRootCertificate(certificate=certificate, caid=caid),
                                                      endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
-
+            asserts.assert_equal(Status.Success, expected_status, "Unexpected success")
             asserts.assert_true(matchers.is_type(result, Clusters.TlsCertificateManagement.Commands.ProvisionRootCertificateResponse),
                                 "Unexpected return type for ProvisionRootCertificate")
             return result
@@ -199,9 +205,23 @@ class TLSUtils:
         try:
             result = await self.test.send_single_cmd(cmd=Clusters.TlsCertificateManagement.Commands.FindRootCertificate(caid=caid),
                                                      endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
-
+            asserts.assert_equal(Status.Success, expected_status, "Unexpected success")
             asserts.assert_true(matchers.is_type(result, Clusters.TlsCertificateManagement.Commands.FindRootCertificateResponse),
                                 "Unexpected return type for FindRootCertificate")
+            return result
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
+            return e
+
+    async def send_lookup_root_command(
+            self, fingerprint: bytes,
+            expected_status: Status = Status.Success) -> Union[Clusters.TlsCertificateManagement.Commands.LookupRootCertificateResponse, InteractionModelError]:
+        try:
+            result = await self.test.send_single_cmd(cmd=Clusters.TlsCertificateManagement.Commands.LookupRootCertificate(fingerprint=fingerprint),
+                                                     endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
+            asserts.assert_equal(Status.Success, expected_status, "Unexpected success")
+            asserts.assert_true(matchers.is_type(result, Clusters.TlsCertificateManagement.Commands.LookupRootCertificateResponse),
+                                "Unexpected return type for LookupRootCertificate")
             return result
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
@@ -213,6 +233,7 @@ class TLSUtils:
         try:
             result = await self.test.send_single_cmd(cmd=Clusters.TlsCertificateManagement.Commands.RemoveRootCertificate(caid=caid),
                                                      endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
+            asserts.assert_equal(Status.Success, expected_status, "Unexpected success")
             return result
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
@@ -224,7 +245,7 @@ class TLSUtils:
         try:
             result = await self.test.send_single_cmd(cmd=Clusters.TlsCertificateManagement.Commands.ClientCSR(ccdid=ccdid, nonce=nonce),
                                                      endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
-
+            asserts.assert_equal(Status.Success, expected_status, "Unexpected success")
             asserts.assert_true(matchers.is_type(result, Clusters.TlsCertificateManagement.Commands.ClientCSRResponse),
                                 "Unexpected return type for ClientCSR")
             return result
@@ -238,6 +259,7 @@ class TLSUtils:
         try:
             result = await self.test.send_single_cmd(cmd=Clusters.TlsCertificateManagement.Commands.ProvisionClientCertificate(ccdid=ccdid, clientCertificate=certificate, intermediateCertificates=intermediates),
                                                      endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
+            asserts.assert_equal(Status.Success, expected_status, "Unexpected success")
 
             return result
         except InteractionModelError as e:
@@ -250,9 +272,23 @@ class TLSUtils:
         try:
             result = await self.test.send_single_cmd(cmd=Clusters.TlsCertificateManagement.Commands.FindClientCertificate(ccdid=ccdid),
                                                      endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
-
+            asserts.assert_equal(Status.Success, expected_status, "Unexpected success")
             asserts.assert_true(matchers.is_type(result, Clusters.TlsCertificateManagement.Commands.FindClientCertificateResponse),
                                 "Unexpected return type for FindClientCertificate")
+            return result
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
+            return e
+
+    async def send_lookup_client_command(
+            self, fingerprint: bytes,
+            expected_status: Status = Status.Success) -> Union[Clusters.TlsCertificateManagement.Commands.LookupClientCertificateResponse, InteractionModelError]:
+        try:
+            result = await self.test.send_single_cmd(cmd=Clusters.TlsCertificateManagement.Commands.LookupClientCertificate(fingerprint=fingerprint),
+                                                     endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
+            asserts.assert_equal(Status.Success, expected_status, "Unexpected success")
+            asserts.assert_true(matchers.is_type(result, Clusters.TlsCertificateManagement.Commands.LookupClientCertificateResponse),
+                                "Unexpected return type for LookupClientCertificate")
             return result
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
@@ -264,6 +300,7 @@ class TLSUtils:
         try:
             result = await self.test.send_single_cmd(cmd=Clusters.TlsCertificateManagement.Commands.RemoveClientCertificate(ccdid=ccdid),
                                                      endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
+            asserts.assert_equal(Status.Success, expected_status, "Unexpected success")
             return result
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
@@ -273,10 +310,14 @@ class TLSUtils:
         cluster = Clusters.TlsCertificateManagement
         return await self.test.read_single_attribute_check_success(endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id, cluster=cluster, attribute=attribute, payloadCapability=payloadCapability)
 
-    async def read_root_certs_attribute_as_map(self):
-        attribute_certs = await self.read_tls_cert_attribute(Clusters.TlsCertificateManagement.Attributes.ProvisionedRootCertificates)
+    async def read_tls_client_attribute(self, attribute, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD):
+        cluster = Clusters.TlsClientManagement
+        return await self.test.read_single_attribute_check_success(endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id, cluster=cluster, attribute=attribute, payloadCapability=payloadCapability)
+
+    async def read_root_certs_attribute_as_map(self, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD):
+        attribute_certs = await self.read_tls_cert_attribute(Clusters.TlsCertificateManagement.Attributes.ProvisionedRootCertificates, payloadCapability)
         matter_asserts.assert_list(attribute_certs, "Expected list")
-        found_certs = dict()
+        found_certs = {}
         for cert in attribute_certs:
             found_certs[cert.caid] = cert
         return found_certs
@@ -284,7 +325,7 @@ class TLSUtils:
     async def read_client_certs_attribute_as_map(self, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD):
         attribute_certs = await self.read_tls_cert_attribute(Clusters.TlsCertificateManagement.Attributes.ProvisionedClientCertificates, payloadCapability)
         matter_asserts.assert_list(attribute_certs, "Expected list")
-        found_certs = dict()
+        found_certs = {}
         for cert in attribute_certs:
             found_certs[cert.ccdid] = cert
         return found_certs
@@ -293,7 +334,7 @@ class TLSUtils:
             self,
             expected_status: Status = Status.Success):
         find_response = await self.send_find_client_command(expected_status=expected_status)
-        found_certs = dict()
+        found_certs = {}
         for cert in find_response.certificateDetails:
             found_certs[cert.ccdid] = cert
         return found_certs
@@ -308,8 +349,9 @@ class TLSUtils:
         hostname: bytes,
         port: uint,
         caid: uint,
+        endpoint_id: Union[Nullable, int] = NullValue,
         ccdid: Union[Nullable, uint] = NullValue,
-        expected_status: Status = Status.Success,
+        expected_status: Union[Status, MatterIntEnum] = Status.Success,
     ) -> Union[
         Clusters.TlsClientManagement.Commands.ProvisionEndpointResponse,
         InteractionModelError,
@@ -317,12 +359,12 @@ class TLSUtils:
         try:
             result = await self.test.send_single_cmd(
                 cmd=Clusters.TlsClientManagement.Commands.ProvisionEndpoint(
-                    hostname=hostname, port=port, caid=caid, ccdid=ccdid
+                    hostname=hostname, port=port, caid=caid, ccdid=ccdid, endpointID=endpoint_id
                 ),
                 endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id,
                 payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
             )
-
+            asserts.assert_equal(Status.Success, expected_status, "Unexpected success")
             asserts.assert_true(
                 matchers.is_type(
                     result,
@@ -330,6 +372,51 @@ class TLSUtils:
                 ),
                 "Unexpected return type for ProvisionEndpoint",
             )
+            return result
+        except InteractionModelError as e:
+            if matchers.is_type(expected_status, Status):
+                asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
+            else:
+                asserts.assert_equal(e.status, Status.Failure, "Unexpected error returned")
+                asserts.assert_equal(e.clusterStatus, expected_status, "Unexpected error returned")
+
+            return e
+
+    async def send_remove_tls_endpoint_command(
+        self,
+        endpoint_id: uint,
+        expected_status: Status = Status.Success,
+    ) -> InteractionModelError:
+        try:
+            result = await self.test.send_single_cmd(
+                cmd=Clusters.TlsClientManagement.Commands.RemoveEndpoint(
+                    endpointID=endpoint_id
+                ),
+                endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id,
+                payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
+            )
+            asserts.assert_equal(Status.Success, expected_status, "Unexpected success")
+            return result
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
+            return e
+
+    async def send_find_tls_endpoint_command(
+        self,
+        endpoint_id: uint,
+        expected_status: Status = Status.Success,
+    ) -> InteractionModelError:
+        try:
+            result = await self.test.send_single_cmd(
+                cmd=Clusters.TlsClientManagement.Commands.FindEndpoint(
+                    endpointID=endpoint_id
+                ),
+                endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id,
+                payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
+            )
+            asserts.assert_equal(Status.Success, expected_status, "Unexpected success")
+            asserts.assert_true(matchers.is_type(result, Clusters.TlsClientManagement.Commands.FindEndpointResponse),
+                                "Unexpected return type for FindEndpoint")
             return result
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")

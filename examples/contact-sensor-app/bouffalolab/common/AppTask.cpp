@@ -179,7 +179,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     Server::GetInstance().GetICDManager().RegisterObserver(&sAppTask);
 #endif
 
-    DiagnosticDataProviderImpl::GetDefaultInstance().GetCurrentHeapFree(currentHeapFree);
+    TEMPORARY_RETURN_IGNORED DiagnosticDataProviderImpl::GetDefaultInstance().GetCurrentHeapFree(currentHeapFree);
     ChipLogProgress(NotSpecified, "App Task started, with SRAM heap %lld left", currentHeapFree);
 
     while (true)
@@ -205,7 +205,7 @@ void AppTask::AppTaskMain(void * pvParameter)
             {
                 stateValueAttrValue = 1;
 
-                auto booleanState = app::Clusters::BooleanState::GetClusterForEndpointIndex(1);
+                auto booleanState = app::Clusters::BooleanState::FindClusterOnEndpoint(1);
                 if (booleanState != nullptr)
                 {
                     booleanState->SetStateValue(stateValueAttrValue);
@@ -216,7 +216,7 @@ void AppTask::AppTaskMain(void * pvParameter)
             {
                 stateValueAttrValue = 0;
 
-                auto booleanState = app::Clusters::BooleanState::GetClusterForEndpointIndex(1);
+                auto booleanState = app::Clusters::BooleanState::FindClusterOnEndpoint(1);
                 if (booleanState != nullptr)
                 {
                     booleanState->SetStateValue(stateValueAttrValue);

@@ -51,7 +51,7 @@ ContactSensorApp::AppTask & ContactSensorApp::AppTask::GetDefaultInstance()
 
 bool ContactSensorApp::AppTask::CheckStateClusterHandler(void)
 {
-    auto booleanState = BooleanState::GetClusterForEndpointIndex(APP_DEVICE_TYPE_ENDPOINT);
+    auto booleanState = BooleanState::FindClusterOnEndpoint(APP_DEVICE_TYPE_ENDPOINT);
     VerifyOrReturnError(booleanState != nullptr, false);
     bool val = booleanState->GetStateValue();
     return val;
@@ -59,7 +59,7 @@ bool ContactSensorApp::AppTask::CheckStateClusterHandler(void)
 
 CHIP_ERROR ContactSensorApp::AppTask::ProcessSetStateClusterHandler(void)
 {
-    auto booleanState = BooleanState::GetClusterForEndpointIndex(APP_DEVICE_TYPE_ENDPOINT);
+    auto booleanState = BooleanState::FindClusterOnEndpoint(APP_DEVICE_TYPE_ENDPOINT);
     VerifyOrReturnError(booleanState != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     bool val = booleanState->GetStateValue();

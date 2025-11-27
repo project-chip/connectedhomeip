@@ -69,21 +69,19 @@ class TC_COMMTR_2_1(CommodityMeteringTestBaseHelper):
 
     def steps_TC_COMMTR_2_1(self) -> list[TestStep]:
 
-        steps = [
+        return [
             TestStep("1", "Commissioning, already done", "DUT is commissioned", is_commissioning=True),
             TestStep("2", "TH reads MaximumMeteredQuantities attribute", """
                      - DUT replies a null value or a uint16 value;
                      - Store value as MaxMeteredQuantities."""),
             TestStep("3", "TH reads MeteredQuantity attribute", """
                      - DUT replies Null or a list of MeteredQuantityStruct entries.
-                     - Verify that the list length less or equal MaxMeteredQuantities from step 3;
+                     - Verify that the list length less or equal MaxMeteredQuantities from step 2;
                      - Verify that the TariffComponentIDs field is a list of uint32 values with length less or equal 128;
                      - Verify that the Quantity field has int64 type;"""),
             TestStep("4", "TH reads MeteredQuantityTimestamp attribute", "DUT replies a null value or epoch-s type."),
             TestStep("5", "TH reads TariffUnit attribute", "DUT replies a null value or TariffUnitEnum value in range 0-1."),
         ]
-
-        return steps
 
     @run_if_endpoint_matches(has_cluster(Clusters.CommodityMetering))
     async def test_TC_COMMTR_2_1(self):

@@ -17,13 +17,23 @@
 import json
 import logging
 import os
+import shlex
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterator, Set
 
-from . import linux, runner
+from . import runner
 from .test_definition import ApplicationPaths, TestDefinition, TestTag, TestTarget
+
+log = logging.getLogger(__name__)
+
+__all__ = [
+    "TestTarget",
+    "TestDefinition",
+    "ApplicationPaths",
+    "runner",
+]
 
 _DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", ".."))
@@ -315,9 +325,9 @@ def tests_with_command(chip_tool: str, is_manual: bool):
     cmd = [chip_tool, "tests", cmd]
     result = subprocess.run(cmd, capture_output=True, encoding="utf-8")
     if result.returncode != 0:
-        logging.error(f'Failed to run {cmd}:')
-        logging.error('STDOUT: ' + result.stdout)
-        logging.error('STDERR: ' + result.stderr)
+        log.error("Failed to run %s:", shlex.join(cmd))
+        log.error("STDOUT: %s", result.stdout)
+        log.error("STDERR: %s", result.stderr)
         result.check_returncode()
 
     test_tags = set()
@@ -420,13 +430,3 @@ def AllChipToolTests(chip_tool: str):
 
     for test in tests_with_command(chip_tool, is_manual=True):
         yield test
-
-
-__all__ = [
-    "TestTarget",
-    "TestDefinition",
-    "AllTests",
-    "ApplicationPaths",
-    "linux",
-    "runner",
-]

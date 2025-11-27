@@ -17,10 +17,10 @@
 
 #include <app/server/JointFabricDatastore.h>
 
+#include <algorithm>
+
 namespace chip {
 namespace app {
-
-#define CHIP_ERROR_IM_STATUS_CODE_CONSTRAINT_ERROR CHIP_CORE_ERROR(0x87)
 
 void JointFabricDatastore::AddListener(Listener & listener)
 {
@@ -70,6 +70,11 @@ void JointFabricDatastore::RemoveListener(Listener & listener)
 CHIP_ERROR JointFabricDatastore::AddPendingNode(NodeId nodeId, const CharSpan & friendlyName)
 {
     VerifyOrReturnError(mNodeInformationEntries.size() < kMaxNodes, CHIP_ERROR_NO_MEMORY);
+    // check that nodeId does not already exist
+    VerifyOrReturnError(
+        std::none_of(mNodeInformationEntries.begin(), mNodeInformationEntries.end(),
+                     [nodeId](const GenericDatastoreNodeInformationEntry & entry) { return entry.nodeID == nodeId; }),
+        CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     mNodeInformationEntries.push_back(GenericDatastoreNodeInformationEntry(
         nodeId, Clusters::JointFabricDatastore::DatastoreStateEnum::kPending, MakeOptional(friendlyName)));
@@ -122,16 +127,178 @@ CHIP_ERROR JointFabricDatastore::RemoveNode(NodeId nodeId)
     return CHIP_ERROR_NOT_FOUND;
 }
 
-CHIP_ERROR JointFabricDatastore::RefreshNode(NodeId nodeId)
+CHIP_ERROR JointFabricDatastore::RefreshNode(NodeId nodeId, ReadOnlyBuffer<DataModel::EndpointEntry> endpointsList)
 {
     // 1. && 2.
     ReturnErrorOnFailure(SetNode(nodeId, Clusters::JointFabricDatastore::DatastoreStateEnum::kPending));
 
-    // 3. TODO: Read the PartsList of the Descriptor cluster from the Node.
+    // 3.
 
-    // 4. TODO
+    // cycle through endpointsList and add them to the endpoint entries
+    for (const auto & endpoint : endpointsList)
+    {
+        auto it = std::find_if(
+            mEndpointEntries.begin(), mEndpointEntries.end(),
+            [&endpoint, &nodeId](const Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::Type & entry) {
+                return entry.nodeID == nodeId && entry.endpointID == endpoint.id;
+            });
+        if (it == mEndpointEntries.end())
+        {
+            Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::Type newEntry;
+            newEntry.endpointID = endpoint.id;
+            newEntry.nodeID     = nodeId;
+            mEndpointEntries.push_back(newEntry);
+        }
+    }
 
-    // 5. TODO
+    // Remove EndpointEntries that are not in the endpointsList
+    mEndpointEntries.erase(std::remove_if(mEndpointEntries.begin(), mEndpointEntries.end(),
+                                          [&](const auto & entry) {
+                                              if (entry.nodeID != nodeId)
+                                              {
+                                                  return false; // Not for this node, don't remove.
+                                              }
+                                              // Remove if not found in endpointsList.
+                                              return !std::any_of(
+                                                  endpointsList.begin(), endpointsList.end(),
+                                                  [&](const auto & endpoint) { return entry.endpointID == endpoint.id; });
+                                          }),
+                           mEndpointEntries.end());
+
+    // TODO: read the Endpoint Group ID List from the actual device
+
+    for (auto it = mEndpointGroupIDEntries.begin(); it != mEndpointGroupIDEntries.end();)
+    {
+        if (it->nodeID == nodeId)
+        {
+            if (it->statusEntry.state == Clusters::JointFabricDatastore::DatastoreStateEnum::kPending)
+            {
+                // TODO: add this entry to the actual device. Only mark as committed if successful.
+                // it->statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
+            }
+            else if (it->statusEntry.state == Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending)
+            {
+                // TODO: Remove the binding from the actual device. If successful, then remove the entry.
+                // otherwise update status to CommitFailed and return error
+                it = mEndpointGroupIDEntries.erase(it);
+                continue;
+            }
+            else if (it->statusEntry.state == Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitFailed)
+            {
+                CHIP_ERROR failureCode(it->statusEntry.failureCode);
+
+                if (failureCode == CHIP_IM_GLOBAL_STATUS(ConstraintError) ||
+                    failureCode == CHIP_IM_GLOBAL_STATUS(ResourceExhausted))
+                {
+                    // remove entry from the list
+                    it = mEndpointGroupIDEntries.erase(it);
+                    continue;
+                }
+                else
+                {
+                    // TODO: update binding on actual device.
+                    // TODO: check if change has been made, retry if not. Mark as committed upon success.
+                    // TODO: retry delete, remove entry if successful.
+                }
+            }
+        }
+
+        ++it;
+    }
+
+    // TODO: read the Endpoint Binding List from the actual device
+
+    for (auto it = mEndpointBindingEntries.begin(); it != mEndpointBindingEntries.end();)
+    {
+        if (it->nodeID == nodeId)
+        {
+            if (it->statusEntry.state == Clusters::JointFabricDatastore::DatastoreStateEnum::kPending)
+            {
+                // TODO: add this entry to the actual device. Only mark as committed if successful.
+                // it->statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
+            }
+            else if (it->statusEntry.state == Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending)
+            {
+                // TODO: Remove the binding from the actual device. If successful, then remove the entry.
+                // otherwise update status to CommitFailed and return error
+                it = mEndpointBindingEntries.erase(it);
+                continue;
+            }
+            else if (it->statusEntry.state == Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitFailed)
+            {
+                CHIP_ERROR failureCode(it->statusEntry.failureCode);
+
+                if (failureCode == CHIP_IM_GLOBAL_STATUS(ConstraintError) ||
+                    failureCode == CHIP_IM_GLOBAL_STATUS(ResourceExhausted))
+                {
+                    // remove entry from the list
+                    it = mEndpointBindingEntries.erase(it);
+                    continue;
+                }
+                else
+                {
+                    // TODO: update binding on actual device.
+                    // TODO: check if change has been made, retry if not. Mark as committed upon success.
+                    // TODO: retry delete, remove entry if successful.
+                }
+            }
+        }
+
+        ++it;
+    }
+
+    // TODO: read the Group Key Set List from the actual device
+
+    // 4.
+    for (auto it = mGroupKeySetList.begin(); it != mGroupKeySetList.end();)
+    {
+        // TODO: Apply any pending updates from datastore, upon success mark as committed
+        // Retry any CommitFailure entries from datastore, upon success can be removed.
+        // Ensure list from device matches list in datastore
+        ++it;
+    }
+
+    // TODO: read the ACL List from the actual device
+
+    // 5.
+    for (auto it = mACLEntries.begin(); it != mACLEntries.end();)
+    {
+        if (it->nodeID == nodeId)
+        {
+            if (it->statusEntry.state == Clusters::JointFabricDatastore::DatastoreStateEnum::kPending)
+            {
+                // TODO: add this entry to the actual device. Only mark as committed if successful.
+                // it->statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
+            }
+            else if (it->statusEntry.state == Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending)
+            {
+                // TODO: Remove the binding from the actual device. If successful, then remove the entry.
+                // otherwise update status to CommitFailed and return error
+                it = mACLEntries.erase(it);
+                continue;
+            }
+            else if (it->statusEntry.state == Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitFailed)
+            {
+                CHIP_ERROR failureCode(it->statusEntry.failureCode);
+
+                if (failureCode == CHIP_IM_GLOBAL_STATUS(ConstraintError) ||
+                    failureCode == CHIP_IM_GLOBAL_STATUS(ResourceExhausted))
+                {
+                    // remove entry from the list
+                    it = mACLEntries.erase(it);
+                    continue;
+                }
+                else
+                {
+                    // TODO: update binding on actual device.
+                    // TODO: check if change has been made, retry if not. Mark as committed upon success.
+                    // TODO: retry delete, remove entry if successful.
+                }
+            }
+        }
+
+        ++it;
+    }
 
     // 6.
     ReturnErrorOnFailure(SetNode(nodeId, Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted));
@@ -284,7 +451,7 @@ JointFabricDatastore::UpdateNodeKeySetList(Clusters::JointFabricDatastore::Struc
     {
         if (entry.groupKeySetID == groupKeySet.groupKeySetID)
         {
-            // TODO: update device
+            // TODO: Need to update the keySetList on the actual device
             entry.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
             return CHIP_NO_ERROR;
         }
@@ -301,7 +468,7 @@ CHIP_ERROR JointFabricDatastore::RemoveKeySet(uint16_t groupKeySetId)
         {
             if (it->statusEntry.state != Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending)
             {
-                return CHIP_ERROR_IM_STATUS_CODE_CONSTRAINT_ERROR; // Cannot remove a key set that is not pending
+                return CHIP_IM_GLOBAL_STATUS(ConstraintError); // Cannot remove a key set that is not pending
             }
 
             ReturnErrorOnFailure(RemoveGroupKeySetEntry(groupKeySetId));
@@ -318,12 +485,12 @@ CHIP_ERROR JointFabricDatastore::AddGroup(const Clusters::JointFabricDatastore::
     size_t index = 0;
     // Check if the group ID already exists in the datastore
     VerifyOrReturnError(IsGroupIDInDatastore(commandData.groupID, index) == CHIP_ERROR_NOT_FOUND,
-                        CHIP_ERROR_IM_STATUS_CODE_CONSTRAINT_ERROR);
+                        CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     if (commandData.groupCAT.ValueOr(0) == kAdminCATIdentifier || commandData.groupCAT.ValueOr(0) == kAnchorCATIdentifier)
     {
         // If the group is an AdminCAT or AnchorCAT, we cannot add it
-        return CHIP_ERROR_IM_STATUS_CODE_CONSTRAINT_ERROR;
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
 
     Clusters::JointFabricDatastore::Structs::DatastoreGroupInformationEntryStruct::Type groupEntry;
@@ -345,40 +512,73 @@ JointFabricDatastore::UpdateGroup(const Clusters::JointFabricDatastore::Commands
 {
     size_t index = 0;
     // Check if the group ID exists in the datastore
-    VerifyOrReturnError(IsGroupIDInDatastore(commandData.groupID, index) == CHIP_NO_ERROR,
-                        CHIP_ERROR_IM_STATUS_CODE_CONSTRAINT_ERROR);
+    VerifyOrReturnError(IsGroupIDInDatastore(commandData.groupID, index) == CHIP_NO_ERROR, CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     if (commandData.groupCAT.ValueOr(0) == kAdminCATIdentifier || commandData.groupCAT.ValueOr(0) == kAnchorCATIdentifier)
     {
         // If the group is an AdminCAT or AnchorCAT, we cannot update it
-        return CHIP_ERROR_IM_STATUS_CODE_CONSTRAINT_ERROR;
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
 
     // Update the group entry with the new data
     if (commandData.friendlyName.IsNull() == false)
     {
+        if (mGroupInformationEntries[index].friendlyName.data_equal(commandData.friendlyName.Value()) == false)
+        {
+            // TODO: Iterate through each Endpoint Information Entry:
+            // If the GroupIDList contains an entry with the given GroupID:
+            // Update the GroupIDList Entry in the Datastore with the new values and Status Pending
+            // Update the Groups on the given Node with the new values....
+        }
+        // Update the friendly name
         mGroupInformationEntries[index].friendlyName = commandData.friendlyName.Value();
     }
     if (commandData.groupKeySetID.IsNull() == false)
     {
+        if (mGroupInformationEntries[index].groupKeySetID != commandData.groupKeySetID.Value())
+        {
+            // If the groupKeySetID is being updated, we need to ensure that the new key set exists
+            ReturnErrorOnFailure(AddNodeKeySetEntry(commandData.groupID, commandData.groupKeySetID.Value()));
+            ReturnErrorOnFailure(RemoveNodeKeySetEntry(
+                commandData.groupID, mGroupInformationEntries[index].groupKeySetID.Value())); // Remove the old key set
+        }
         mGroupInformationEntries[index].groupKeySetID = commandData.groupKeySetID.Value();
     }
+
+    bool anyGroupCATFieldUpdated = false;
+
     if (commandData.groupCAT.IsNull() == false)
     {
+        if (mGroupInformationEntries[index].groupCAT != commandData.groupCAT.Value())
+        {
+            anyGroupCATFieldUpdated = true;
+        }
+        // Update the groupCAT
         mGroupInformationEntries[index].groupCAT = commandData.groupCAT.Value();
     }
     if (commandData.groupCATVersion.IsNull() == false)
     {
+        if (mGroupInformationEntries[index].groupCATVersion != commandData.groupCATVersion.Value())
+        {
+            anyGroupCATFieldUpdated = true;
+        }
         mGroupInformationEntries[index].groupCATVersion = commandData.groupCATVersion.Value();
     }
     if (commandData.groupPermission != Clusters::JointFabricDatastore::DatastoreAccessControlEntryPrivilegeEnum::kUnknownEnumValue)
     {
+        if (mGroupInformationEntries[index].groupPermission != commandData.groupPermission)
+        {
+            anyGroupCATFieldUpdated = true;
+        }
         // If the groupPermission is not set to kUnknownEnumValue, update it
         mGroupInformationEntries[index].groupPermission = commandData.groupPermission;
     }
 
-    // TODO: iterate through each Node Information Entry to check for membership, and when found, set to pending, update device, set
-    // to committed, etc.
+    if (anyGroupCATFieldUpdated)
+    {
+        // TODO: iterate through NodeACLList for entries referencing this group.
+        // if found, set status to pending, update corresponding ACL on device, and then mark as committed.
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -388,8 +588,7 @@ JointFabricDatastore::RemoveGroup(const Clusters::JointFabricDatastore::Commands
 {
     size_t index = 0;
     // Check if the group ID exists in the datastore
-    VerifyOrReturnError(IsGroupIDInDatastore(commandData.groupID, index) == CHIP_NO_ERROR,
-                        CHIP_ERROR_IM_STATUS_CODE_CONSTRAINT_ERROR);
+    VerifyOrReturnError(IsGroupIDInDatastore(commandData.groupID, index) == CHIP_NO_ERROR, CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     // Remove the group entry from the datastore
     auto it = mGroupInformationEntries.begin();
@@ -398,7 +597,7 @@ JointFabricDatastore::RemoveGroup(const Clusters::JointFabricDatastore::Commands
     if (it->groupCAT == kAdminCATIdentifier || it->groupCAT == kAnchorCATIdentifier)
     {
         // If the group is an AdminCAT or AnchorCAT, we cannot remove it
-        return CHIP_ERROR_IM_STATUS_CODE_CONSTRAINT_ERROR;
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
 
     mGroupInformationEntries.erase(it);
@@ -465,10 +664,12 @@ CHIP_ERROR JointFabricDatastore::IsNodeIdAndEndpointInEndpointInformationEntries
 
 CHIP_ERROR JointFabricDatastore::AddGroupIDToEndpointForNode(NodeId nodeId, chip::EndpointId endpointId, chip::GroupId groupId)
 {
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     size_t index = 0;
     ReturnErrorOnFailure(IsNodeIdAndEndpointInEndpointInformationEntries(nodeId, endpointId, index));
 
-    VerifyOrReturnError(IsGroupIDInDatastore(groupId, index) == CHIP_ERROR_NOT_FOUND, CHIP_ERROR_IM_STATUS_CODE_CONSTRAINT_ERROR);
+    VerifyOrReturnError(IsGroupIDInDatastore(groupId, index) == CHIP_ERROR_NOT_FOUND, CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     if (mGroupInformationEntries[index].groupKeySetID.IsNull() == false)
     {
@@ -493,11 +694,11 @@ CHIP_ERROR JointFabricDatastore::AddGroupIDToEndpointForNode(NodeId nodeId, chip
             newNodeKeySet.groupKeySetID     = groupKeySetID;
             newNodeKeySet.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kPending;
 
-            // TODO: Update device
-
             mNodeKeySetEntries.push_back(newNodeKeySet);
 
-            mNodeKeySetEntries.back().statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
+            ReturnErrorOnFailure(mDelegate->SyncNode(nodeId, newNodeKeySet, [this]() {
+                mNodeKeySetEntries.back().statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
+            }));
         }
     }
 
@@ -519,18 +720,18 @@ CHIP_ERROR JointFabricDatastore::AddGroupIDToEndpointForNode(NodeId nodeId, chip
     newGroupEntry.groupID           = groupId;
     newGroupEntry.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kPending;
 
-    // TODO: Update device
-
     // Add the new ACL entry to the datastore
     mEndpointGroupIDEntries.push_back(newGroupEntry);
 
-    mEndpointGroupIDEntries.back().statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
-
-    return CHIP_NO_ERROR;
+    return mDelegate->SyncNode(nodeId, newGroupEntry, [this]() {
+        mEndpointGroupIDEntries.back().statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
+    });
 }
 
 CHIP_ERROR JointFabricDatastore::RemoveGroupIDFromEndpointForNode(NodeId nodeId, chip::EndpointId endpointId, chip::GroupId groupId)
 {
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     size_t index = 0;
     ReturnErrorOnFailure(IsNodeIdAndEndpointInEndpointInformationEntries(nodeId, endpointId, index));
 
@@ -540,9 +741,11 @@ CHIP_ERROR JointFabricDatastore::RemoveGroupIDFromEndpointForNode(NodeId nodeId,
         {
             it->statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending;
 
-            // TODO: Update device
+            // zero-initialized struct to indicate deletion for the SyncNode call
+            Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type endpointGroupIdNullEntry{ 0 };
 
-            mEndpointGroupIDEntries.erase(it);
+            ReturnErrorOnFailure(
+                mDelegate->SyncNode(nodeId, endpointGroupIdNullEntry, [this, it]() { mEndpointGroupIDEntries.erase(it); }));
 
             if (IsGroupIDInDatastore(groupId, index) == CHIP_NO_ERROR)
             {
@@ -554,8 +757,11 @@ CHIP_ERROR JointFabricDatastore::RemoveGroupIDFromEndpointForNode(NodeId nodeId,
                         it2->groupKeySetID == mGroupInformationEntries[index].groupKeySetID.Value())
                     {
                         it2->statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending;
-                        // TODO: Update device
-                        it2 = mNodeKeySetEntries.erase(it2);
+
+                        // zero-initialized struct to indicate deletion for the SyncNode call
+                        Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type nodeKeySetNullEntry{ 0 };
+                        ReturnErrorOnFailure(
+                            mDelegate->SyncNode(nodeId, nodeKeySetNullEntry, [this, it2]() { mNodeKeySetEntries.erase(it2); }));
 
                         incrementIndex = false;
                     }
@@ -662,6 +868,8 @@ JointFabricDatastore::AddBindingToEndpointForNode(
     NodeId nodeId, chip::EndpointId endpointId,
     const Clusters::JointFabricDatastore::Structs::DatastoreBindingTargetStruct::Type & binding)
 {
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     size_t index = 0;
     ReturnErrorOnFailure(IsNodeIdAndEndpointInEndpointInformationEntries(nodeId, endpointId, index));
 
@@ -690,16 +898,16 @@ JointFabricDatastore::AddBindingToEndpointForNode(
     // Add the new binding entry to the datastore
     mEndpointBindingEntries.push_back(newBindingEntry);
 
-    // TODO: Update device
-
-    mEndpointBindingEntries.back().statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
-
-    return CHIP_NO_ERROR;
+    return mDelegate->SyncNode(nodeId, newBindingEntry, [this]() {
+        mEndpointBindingEntries.back().statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
+    });
 }
 
 CHIP_ERROR
 JointFabricDatastore::RemoveBindingFromEndpointForNode(uint16_t listId, NodeId nodeId, chip::EndpointId endpointId)
 {
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     size_t index = 0;
     ReturnErrorOnFailure(IsNodeIdAndEndpointInEndpointInformationEntries(nodeId, endpointId, index));
 
@@ -709,11 +917,9 @@ JointFabricDatastore::RemoveBindingFromEndpointForNode(uint16_t listId, NodeId n
         {
             it->statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending;
 
-            // TODO: Update device
-
-            mEndpointBindingEntries.erase(it);
-
-            return CHIP_NO_ERROR;
+            // zero-initialized struct to indicate deletion for the SyncNode call
+            Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type nullEntry{ 0 };
+            return mDelegate->SyncNode(nodeId, nullEntry, [this, it]() { mEndpointBindingEntries.erase(it); });
         }
     }
 
@@ -822,6 +1028,8 @@ CHIP_ERROR
 JointFabricDatastore::AddACLToNode(
     NodeId nodeId, const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlEntryStruct::DecodableType & aclEntry)
 {
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     size_t index = 0;
     ReturnErrorOnFailure(IsNodeIdInNodeInformationEntries(nodeId, index));
 
@@ -868,15 +1076,27 @@ JointFabricDatastore::AddACLToNode(
     // Add the new ACL entry to the datastore
     mACLEntries.push_back(newACLEntry);
 
-    // TODO: Update device
+    Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type entryToEncode;
+    entryToEncode.nodeID             = newACLEntry.nodeID;
+    entryToEncode.listID             = newACLEntry.listID;
+    entryToEncode.ACLEntry.authMode  = newACLEntry.ACLEntry.authMode;
+    entryToEncode.ACLEntry.privilege = newACLEntry.ACLEntry.privilege;
+    entryToEncode.ACLEntry.subjects =
+        DataModel::List<const uint64_t>(newACLEntry.ACLEntry.subjects.data(), newACLEntry.ACLEntry.subjects.size());
+    entryToEncode.ACLEntry.targets =
+        DataModel::List<const Clusters::JointFabricDatastore::Structs::DatastoreAccessControlTargetStruct::Type>(
+            newACLEntry.ACLEntry.targets.data(), newACLEntry.ACLEntry.targets.size());
+    entryToEncode.statusEntry = newACLEntry.statusEntry;
 
-    mACLEntries.back().statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
-
-    return CHIP_NO_ERROR;
+    return mDelegate->SyncNode(nodeId, entryToEncode, [this]() {
+        mACLEntries.back().statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
+    });
 }
 
 CHIP_ERROR JointFabricDatastore::RemoveACLFromNode(uint16_t listId, NodeId nodeId)
 {
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     size_t index = 0;
     ReturnErrorOnFailure(IsNodeIdInNodeInformationEntries(nodeId, index));
 
@@ -885,13 +1105,64 @@ CHIP_ERROR JointFabricDatastore::RemoveACLFromNode(uint16_t listId, NodeId nodeI
         if (it->nodeID == nodeId && it->listID == listId)
         {
             it->statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending;
-            // TODO: Update device
-            mACLEntries.erase(it);
-            return CHIP_NO_ERROR;
+
+            // zero-initialized struct to indicate deletion for the SyncNode call
+            Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type nullEntry{ 0 };
+            return mDelegate->SyncNode(nodeId, nullEntry, [this, it]() { mACLEntries.erase(it); });
         }
     }
 
     return CHIP_ERROR_NOT_FOUND;
+}
+
+CHIP_ERROR JointFabricDatastore::AddNodeKeySetEntry(GroupId groupId, uint16_t groupKeySetId)
+{
+    // TODO: Iterate through all nodes that are part of this group and add an entry for each node
+
+    // If the key set does not exist, create a new entry
+    Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type newEntry;
+    newEntry.nodeID            = groupId; // Using groupId as nodeId temporarily, will be updated when iterating through nodes
+    newEntry.groupKeySetID     = groupKeySetId;
+    newEntry.statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kPending;
+
+    mNodeKeySetEntries.push_back(newEntry);
+
+    // TODO: (1) Add keyset to device, (2) Update group entry on device to point to this keyset
+
+    // After adding the new entry, we can set it to committed
+    mNodeKeySetEntries.back().statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kCommitted;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR JointFabricDatastore::RemoveNodeKeySetEntry(GroupId groupId, uint16_t groupKeySetId)
+{
+    // NOTE: this method assumes its ok to remove the keyset from each node (its not in use by any group)
+
+    // TODO: Iterate through all nodes that are part of this group and add an entry for each node
+
+    bool any_node_removed = false;
+
+    for (auto it = mNodeKeySetEntries.begin(); it != mNodeKeySetEntries.end();)
+    {
+        // TODO: Iterate trough nodes in the group
+        if (it->groupKeySetID == groupKeySetId)
+        {
+            any_node_removed = true;
+
+            it->statusEntry.state = Clusters::JointFabricDatastore::DatastoreStateEnum::kDeletePending;
+
+            // TODO: Update device: send command to it->nodeID to remove this keyset
+
+            it = mNodeKeySetEntries.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
+
+    return any_node_removed ? CHIP_NO_ERROR : CHIP_ERROR_NOT_FOUND;
 }
 
 } // namespace app

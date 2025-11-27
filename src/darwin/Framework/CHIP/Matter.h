@@ -63,6 +63,7 @@
 #import <Matter/MTRLogging.h>
 #import <Matter/MTRManualSetupPayloadParser.h>
 #import <Matter/MTRMetrics.h>
+#import <Matter/MTRNetworkInterfaceInfo.h>
 #import <Matter/MTROTAHeader.h>
 #import <Matter/MTROTAProviderDelegate.h>
 #import <Matter/MTROnboardingPayloadParser.h>

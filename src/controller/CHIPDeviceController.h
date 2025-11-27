@@ -828,11 +828,7 @@ public:
 
     Credentials::DeviceAttestationVerifier * GetDeviceAttestationVerifier() const { return mDeviceAttestationVerifier; }
 
-    Optional<CommissioningParameters> GetCommissioningParameters()
-    {
-        // TODO: Return a non-optional const & to avoid a copy, mDefaultCommissioner is never null
-        return mDefaultCommissioner == nullptr ? NullOptional : MakeOptional(mDefaultCommissioner->GetCommissioningParameters());
-    }
+    const CommissioningParameters & GetCommissioningParameters() { return mDefaultCommissioner->GetCommissioningParameters(); }
 
     CHIP_ERROR UpdateCommissioningParameters(const CommissioningParameters & newParameters)
     {
@@ -866,7 +862,7 @@ protected:
 
     /* This function start the JCM verification steps
      */
-    virtual CHIP_ERROR StartJCMTrustVerification() { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    virtual CHIP_ERROR StartJCMTrustVerification(DeviceProxy * proxy) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
     virtual CHIP_ERROR ParseExtraCommissioningInfo(ReadCommissioningInfo & info, const CommissioningParameters & params)
@@ -1151,7 +1147,7 @@ private:
     SetUpCodePairer mSetUpCodePairer;
     AutoCommissioner mAutoCommissioner;
     CommissioningDelegate * mDefaultCommissioner =
-        nullptr; // Commissioning delegate to call when PairDevice / Commission functions are used
+        &mAutoCommissioner; // Commissioning delegate to call when PairDevice / Commission functions are used
     CommissioningDelegate * mCommissioningDelegate =
         nullptr; // Commissioning delegate that issued the PerformCommissioningStep command
     CompletionStatus mCommissioningCompletionStatus;

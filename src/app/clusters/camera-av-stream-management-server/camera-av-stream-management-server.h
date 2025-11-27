@@ -27,6 +27,7 @@
 #include <app/SafeAttributePersistenceProvider.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/TypeTraits.h>
+#include <optional>
 #include <protocols/interaction_model/StatusCode.h>
 #include <vector>
 
@@ -70,6 +71,61 @@ constexpr size_t kArrayTlvOverhead = 2;
 
 constexpr size_t kStreamUsagePrioritiesTlvSize = kArrayTlvOverhead + kStreamUsageTlvSize * kNumOfStreamUsageTypes;
 
+// Calculate VideoResolutionStruct TLV encoding size
+constexpr size_t kVideoResolutionStructMaxSerializedSize = TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t));
+
+// Calculate VideoStreamStruct TLV encoding size
+constexpr size_t kMaxOneVideoStreamStructSerializedSize =
+    TLV::EstimateStructOverhead(sizeof(uint16_t),                        // videoStreamID
+                                sizeof(Globals::StreamUsageEnum),        // streamUsage
+                                sizeof(VideoCodecEnum),                  // videoCodec
+                                sizeof(uint16_t),                        // minFrameRate
+                                sizeof(uint16_t),                        // maxFrameRate
+                                kVideoResolutionStructMaxSerializedSize, // minResolution
+                                kVideoResolutionStructMaxSerializedSize, // maxResolution
+                                sizeof(uint32_t),                        // minBitRate
+                                sizeof(uint32_t),                        // maxBitRate
+                                sizeof(uint16_t),                        // keyFrameInterval
+                                sizeof(bool),                            // watermarkEnabled (Optional<bool>)
+                                sizeof(bool),                            // OSDEnabled (Optional<bool>)
+                                sizeof(uint8_t)                          // referenceCount
+    );
+constexpr size_t kMaxAllocatedVideoStreamsSerializedSize =
+    kArrayTlvOverhead + (CHIP_CONFIG_MAX_NUM_CAMERA_VIDEO_STREAMS * kMaxOneVideoStreamStructSerializedSize);
+
+// Calculate SnapshotStreamStruct TLV encoding size
+constexpr size_t kMaxOneSnapshotStructSerializedSize =
+    TLV::EstimateStructOverhead(sizeof(uint16_t),                        // snapshotStreamID
+                                sizeof(ImageCodecEnum),                  // imageCodec
+                                sizeof(uint16_t),                        // frameRate
+                                kVideoResolutionStructMaxSerializedSize, // minResolution
+                                kVideoResolutionStructMaxSerializedSize, // maxResolution
+                                sizeof(uint8_t),                         // quality
+                                sizeof(uint8_t),                         // referenceCount
+                                sizeof(bool),                            // encodedPixels
+                                sizeof(bool),                            // hardwareEncoder
+                                sizeof(bool),                            // watermarkEnabled (Optional<bool>)
+                                sizeof(bool)                             // OSDEnabled (Optional<bool>)
+    );
+// Max size for the TLV-encoded array of SnapshotStreamStruct
+constexpr size_t kMaxAllocatedSnapshotStreamsSerializedSize =
+    kArrayTlvOverhead + (CHIP_CONFIG_MAX_NUM_CAMERA_SNAPSHOT_STREAMS * kMaxOneSnapshotStructSerializedSize);
+
+// Calculate AudioStreamStruct TLV encoding size
+constexpr size_t kMaxOneAudioStreamStructSerializedSize =
+    TLV::EstimateStructOverhead(sizeof(uint16_t),                 // audioStreamID
+                                sizeof(Globals::StreamUsageEnum), // streamUsage
+                                sizeof(AudioCodecEnum),           // audioCodec
+                                sizeof(uint8_t),                  // channelCount
+                                sizeof(uint32_t),                 // sampleRate
+                                sizeof(uint32_t),                 // bitRate
+                                sizeof(uint8_t),                  // bitDepth
+                                sizeof(uint8_t)                   // referenceCount
+    );
+// Max size for the TLV-encoded array of AudioStreamStruct
+constexpr size_t kMaxAllocatedAudioStreamsSerializedSize =
+    kArrayTlvOverhead + (CHIP_CONFIG_MAX_NUM_CAMERA_AUDIO_STREAMS * kMaxOneAudioStreamStructSerializedSize);
+
 enum class StreamAllocationAction
 {
     kNewAllocation, // Fresh stream allocation - always start
@@ -83,6 +139,10 @@ enum class StreamType
     kVideo,
     kSnapshot
 };
+
+// Forward declaration for the StreamTraits helper struct.
+template <AttributeId TAttributeId>
+struct StreamTraits;
 
 class CameraAVStreamMgmtServer;
 
@@ -190,6 +250,8 @@ public:
         Structs::VideoResolutionStruct::Type minResolution;
         Structs::VideoResolutionStruct::Type maxResolution;
         uint8_t quality;
+        bool encodedPixels;
+        bool hardwareEncoder;
         Optional<bool> watermarkEnabled;
         Optional<bool> OSDEnabled;
     };
@@ -262,22 +324,6 @@ public:
     virtual Protocols::InteractionModel::Status CaptureSnapshot(const DataModel::Nullable<uint16_t> streamID,
                                                                 const VideoResolutionStruct & resolution,
                                                                 ImageSnapshot & outImageSnapshot) = 0;
-
-    /**
-     *  Delegate functions to load the allocated video, audio, and snapshot streams.
-     *  The delegate application is responsible for creating and persisting
-     *  these streams (based on the Allocation commands). These Load APIs would be
-     *  used to load the pre-allocated stream context information into the cluster server list,
-     *  at initialization.
-     *  Once loaded, the cluster server would be serving Reads on these
-     *  attributes. The list is updatable via the Add/Remove functions for the
-     *  respective streams.
-     */
-    virtual CHIP_ERROR LoadAllocatedVideoStreams(std::vector<VideoStreamStruct> & allocatedVideoStreams) = 0;
-
-    virtual CHIP_ERROR LoadAllocatedAudioStreams(std::vector<AudioStreamStruct> & allocatedAudioStreams) = 0;
-
-    virtual CHIP_ERROR LoadAllocatedSnapshotStreams(std::vector<SnapshotStreamStruct> & allocatedSnapshotStreams) = 0;
 
     /**
      *  @brief Callback into the delegate once persistent attributes managed by
@@ -382,7 +428,7 @@ public:
      *                                          full-duplex, etc.
      * @param aSnapshotCapabilities             Indicates the set of supported snapshot capabilities by the device, e.g., the image
      *                                          codec, the resolution and the maximum frame rate.
-     * @param aMaxNetworkBandwidth              Indicates the maximum network bandwidth (in mbps) that the device would consume
+     * @param aMaxNetworkBandwidth              Indicates the maximum network bandwidth (in bps) that the device would consume
      * @param aSupportedStreamUsages            Indicates the possible stream types available
      * @param aStreamUsagePriorities            Indicates the priority ranking of the available streams
      * for the transmission of its media streams.
@@ -559,6 +605,19 @@ public:
 
     CHIP_ERROR SetStreamUsagePriorities(const std::vector<Globals::StreamUsageEnum> & newPriorities);
 
+    /**
+     * Called during the processing of an AllocateVideoStream request. The
+     * handler of the request iterates through the currently allocated video
+     * streams to check if the allocation request parameters fall within the
+     * ranges of an allocated stream so that the latter can be reused.
+     * If a match is found, the function returns the StreamID of the reusable
+     * stream.
+     *
+     * @param requestedArgs    parameters in the allocation request
+     *
+     */
+    std::optional<uint16_t> GetReusableVideoStreamId(const VideoStreamStruct & requestedArgs) const;
+
     CHIP_ERROR AddVideoStream(const VideoStreamStruct & videoStream);
 
     CHIP_ERROR UpdateVideoStreamRangeParams(VideoStreamStruct & videoStreamToUpdate, const VideoStreamStruct & videoStream,
@@ -569,6 +628,20 @@ public:
     CHIP_ERROR AddAudioStream(const AudioStreamStruct & audioStream);
 
     CHIP_ERROR RemoveAudioStream(uint16_t audioStreamId);
+
+    /**
+     * Called during the processing of an AllocateSnapshotStream request. The
+     * handler of the request iterates through the currently allocated snapshot
+     * streams to check if the allocation request parameters fall within the
+     * ranges of an allocated stream so that the latter can be reused.
+     * If a match is found, the function returns the StreamID of the reusable
+     * stream.
+     *
+     * @param requestedArgs    parameters in the allocation request
+     *
+     */
+    std::optional<uint16_t>
+    GetReusableSnapshotStreamId(const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & requestedArgs) const;
 
     CHIP_ERROR AddSnapshotStream(const SnapshotStreamStruct & snapshotStream);
 
@@ -598,7 +671,17 @@ public:
         }
     };
 
+    bool IsResourceAvailableForStreamAllocation(uint32_t candidateEncodedPixelRate, bool encoderRequired);
+
 private:
+    template <AttributeId TAttributeId>
+    CHIP_ERROR PersistAndNotify();
+
+    // Declared friend so that it can access the private stream vector members
+    // from CameraAVStreamMgmtServer.
+    template <AttributeId TAttributeId>
+    friend struct StreamTraits;
+
     CameraAVStreamMgmtDelegate & mDelegate;
     EndpointId mEndpointId;
     const BitFlags<Feature> mFeatures;
@@ -710,18 +793,30 @@ private:
         {
             if (!isDeallocate)
             {
-                auto sn_capab_it =
+                auto snCapabIt =
                     std::find_if(mSnapshotCapabilitiesList.begin(), mSnapshotCapabilitiesList.end(), [&](const auto & capability) {
-                        return capability.imageCodec == it->imageCodec && capability.maxFrameRate > it->frameRate;
+                        return capability.imageCodec == it->imageCodec && capability.maxFrameRate >= it->frameRate &&
+                            capability.resolution.width >= it->minResolution.width &&
+                            capability.resolution.height >= it->minResolution.height &&
+                            capability.resolution.width <= it->maxResolution.width &&
+                            capability.resolution.height <= it->maxResolution.height;
                     });
-                if (sn_capab_it != mSnapshotCapabilitiesList.end() && sn_capab_it->requiresHardwareEncoder.HasValue() &&
-                    !sn_capab_it->requiresHardwareEncoder.Value())
+                if (snCapabIt != mSnapshotCapabilitiesList.end())
                 {
-                    ChipLogError(Zcl,
-                                 "CameraAVStreamMgmt[ep=%d]: Snapshot stream with ID: %u based off an underlying video stream and "
-                                 "not modifiable",
-                                 mEndpointId, streamID);
-                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::DynamicConstraintError);
+                    if (snCapabIt->requiresHardwareEncoder.HasValue() && !snCapabIt->requiresHardwareEncoder.Value())
+                    {
+                        ChipLogError(
+                            Zcl,
+                            "CameraAVStreamMgmt[ep=%d]: Snapshot stream with ID: %u based off an underlying video stream and "
+                            "not modifiable",
+                            mEndpointId, streamID);
+                        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidInState);
+                        return false;
+                    }
+                }
+                else
+                {
+                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::InvalidInState);
                     return false;
                 }
             }
@@ -766,6 +861,19 @@ private:
 
     CHIP_ERROR StoreStreamUsagePriorities();
     CHIP_ERROR LoadStreamUsagePriorities();
+
+    template <AttributeId attributeId>
+    CHIP_ERROR StoreAllocatedStreams();
+
+    /**
+     * @brief
+     *  A templatized function that loads the allocated streams of a certain type from persistent storage.
+     *
+     * @tparam attributeId The attribute Id of the allocated stream list.
+     * @return CHIP_ERROR CHIP_NO_ERROR on success, otherwise another CHIP_ERROR.
+     */
+    template <AttributeId attributeId>
+    CHIP_ERROR LoadAllocatedStreams();
 
     void ModifyVideoStream(const uint16_t streamID, const Optional<bool> waterMarkEnabled, const Optional<bool> osdEnabled);
 

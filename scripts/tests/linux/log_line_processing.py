@@ -19,6 +19,8 @@ import threading
 import time
 from typing import List
 
+log = logging.getLogger(__name__)
+
 
 class ProcessOutputCapture:
     """
@@ -122,11 +124,11 @@ class ProcessOutputCapture:
 
         if exception_value:
             # When we fail because of an exception, report the entire log content
-            logging.error(f"-------- START: LOG DUMP FOR {self.command!r} -----")
+            log.error("-------- START: LOG DUMP FOR %r -----", self.command)
             with open(self.output_path, "rt") as f:
                 for output_line in f.readlines():
-                    logging.error(output_line.strip())
-            logging.error(f"-------- END:   LOG DUMP FOR {self.command!r} -----")
+                    log.error(output_line.strip())
+            log.error("-------- END:   LOG DUMP FOR %r -----", self.command)
 
     def next_output_line(self, timeout_sec=None):
         """Fetch an item from the output queue, potentially with a timeout."""

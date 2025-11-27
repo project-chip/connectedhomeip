@@ -154,7 +154,7 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
 
     def steps_TC_MCORE_FS_1_2(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commission DUT if not done", is_commissioning=True),
+            TestStep("precondition", "Commission DUT if not done", is_commissioning=True),
             TestStep(1, "TH subscribes to PartsList attribute of the Descriptor cluster of DUT_FSA endpoint 0."),
             TestStep(2, "Follow manufacturer provided instructions to have DUT_FSA commission TH_SERVER"),
             TestStep(3, "TH waits up to 30 seconds for subscription report from the PartsList attribute of the Descriptor to contain new endpoint"),
@@ -174,7 +174,7 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
     async def test_TC_MCORE_FS_1_2(self):
 
         # Commissioning - done
-        self.step(0)
+        self.step("precondition")
 
         min_report_interval_sec = self.user_params.get("min_report_interval_sec", 0)
         max_report_interval_sec = self.user_params.get("max_report_interval_sec", 30)
@@ -186,7 +186,7 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
             (root_endpoint, Clusters.Descriptor.Attributes.PartsList)
         ]
         self._partslist_subscription = await self.default_controller.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=subscription_contents,
             reportInterval=(min_report_interval_sec, max_report_interval_sec),
             keepSubscriptions=True

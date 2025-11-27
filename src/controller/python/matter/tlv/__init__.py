@@ -403,25 +403,21 @@ class TLVWriter(object):
                 if tagNum <= UINT16_MAX:
                     controlByte |= TLV_TAG_CONTROL_IMPLICIT_PROFILE_2Bytes
                     return struct.pack("<BH", controlByte, tagNum)
-                else:
-                    controlByte |= TLV_TAG_CONTROL_IMPLICIT_PROFILE_4Bytes
-                    return struct.pack("<BL", controlByte, tagNum)
-            elif profile == 0:
+                controlByte |= TLV_TAG_CONTROL_IMPLICIT_PROFILE_4Bytes
+                return struct.pack("<BL", controlByte, tagNum)
+            if profile == 0:
                 if tagNum <= UINT16_MAX:
                     controlByte |= TLV_TAG_CONTROL_COMMON_PROFILE_2Bytes
                     return struct.pack("<BH", controlByte, tagNum)
-                else:
-                    controlByte |= TLV_TAG_CONTROL_COMMON_PROFILE_4Bytes
-                    return struct.pack("<BL", controlByte, tagNum)
-            else:
-                vendorId = (profile >> 16) & 0xFFFF
-                profileNum = (profile >> 0) & 0xFFFF
-                if tagNum <= UINT16_MAX:
-                    controlByte |= TLV_TAG_CONTROL_FULLY_QUALIFIED_6Bytes
-                    return struct.pack("<BHHH", controlByte, vendorId, profileNum, tagNum)
-                else:
-                    controlByte |= TLV_TAG_CONTROL_FULLY_QUALIFIED_8Bytes
-                    return struct.pack("<BHHL", controlByte, vendorId, profileNum, profile, tagNum)
+                controlByte |= TLV_TAG_CONTROL_COMMON_PROFILE_4Bytes
+                return struct.pack("<BL", controlByte, tagNum)
+            vendorId = (profile >> 16) & 0xFFFF
+            profileNum = (profile >> 0) & 0xFFFF
+            if tagNum <= UINT16_MAX:
+                controlByte |= TLV_TAG_CONTROL_FULLY_QUALIFIED_6Bytes
+                return struct.pack("<BHHH", controlByte, vendorId, profileNum, tagNum)
+            controlByte |= TLV_TAG_CONTROL_FULLY_QUALIFIED_8Bytes
+            return struct.pack("<BHHL", controlByte, vendorId, profileNum, profile, tagNum)
         raise ValueError("Invalid object given for TLV tag")
 
     @staticmethod
@@ -716,19 +712,17 @@ def tlvTagToSortKey(tag):
 
 
 if __name__ == "__main__":
-    val = dict(
-        [
-            (1, 0),
-            (2, 65536),
-            (3, True),
-            (4, None),
-            (5, "Hello!"),
-            (6, bytearray([0xDE, 0xAD, 0xBE, 0xEF])),
-            (7, ["Goodbye!", 71024724507, False]),
-            ((0x235A0000, 42), "FOO"),
-            ((None, 42), "BAR"),
-        ]
-    )
+    val = {
+        1: 0,
+        2: 65536,
+        3: True,
+        4: None,
+        5: "Hello!",
+        6: bytearray([0xDE, 0xAD, 0xBE, 0xEF]),
+        7: ["Goodbye!", 71024724507, False],
+        (0x235A0000, 42): "FOO",
+        (None, 42): "BAR",
+    }
 
     writer = TLVWriter()
     encodedVal = writer.put(None, val)

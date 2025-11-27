@@ -46,7 +46,7 @@ from cryptography.x509.oid import NameOID
 __LOG_LEVELS__ = {
     'debug': logging.DEBUG,
     'info': logging.INFO,
-    'warn': logging.WARN,
+    'warn': logging.WARNING,
     'fatal': logging.FATAL,
 }
 
@@ -178,9 +178,8 @@ def is_self_signed_certificate(cert: x509.Certificate) -> bool:
     result = verify_cert(cert, cert)
     if result == CertVerificationResult.SUCCESS:
         return True
-    else:
-        logging.debug(
-            f"Certificate with subject: {cert.subject.rfc4514_string()} is not a valid self-signed certificate. Result: {result.name}")
+    logging.debug(
+        f"Certificate with subject: {cert.subject.rfc4514_string()} is not a valid self-signed certificate. Result: {result.name}")
     return False
 
 
@@ -207,13 +206,12 @@ def validate_cert_chain(crl_signer: x509.Certificate, crl_signer_delegator: x509
                 f"Cannot verify certificate subject: {crl_signer_delegator.subject.rfc4514_string()} issued by certificate subject: {paa.subject.rfc4514_string()}. Result: {result_delegator.name}")
             return False
         return True
-    else:
-        result = verify_cert(crl_signer, paa)
-        if not result == CertVerificationResult.SUCCESS:
-            logging.debug(
-                f"Cannot verify certificate subject: {crl_signer.subject.rfc4514_string()} issued by certificate subject: {paa.subject.rfc4514_string()}. Result: {result.name}")
-            return False
-        return True
+    result = verify_cert(crl_signer, paa)
+    if not result == CertVerificationResult.SUCCESS:
+        logging.debug(
+            f"Cannot verify certificate subject: {crl_signer.subject.rfc4514_string()} issued by certificate subject: {paa.subject.rfc4514_string()}. Result: {result.name}")
+        return False
+    return True
 
 
 def validate_vid_pid(revocation_point: RevocationPoint, crl_signer_certificate: x509.Certificate, crl_signer_delegator_certificate: x509.Certificate) -> bool:
@@ -371,8 +369,7 @@ class DclClientInterface:
         Send a GET request for a json object.
         '''
         try:
-            response = requests.get(url).json()
-            return response
+            return requests.get(url).json()
         except Exception as e:
             logging.error(f"Failed to fetch {url}: {e}")
             return None
@@ -430,7 +427,7 @@ class DclClientInterface:
             akid = get_akid(initial_cert)
         except ExtensionNotFound:
             logging.warning('Certificate AKID not found.')
-            return
+            return None
         paa_certificate = None
         while not paa_certificate:
             try:
@@ -441,7 +438,7 @@ class DclClientInterface:
 
             except Exception as e:
                 logging.error('Failed to get PAA certificate', e)
-                return
+                return None
             logging.debug(f"issuer_name: {issuer_certificate.subject.rfc4514_string()}")
             issuer_name = issuer_certificate.issuer
             try:
@@ -864,7 +861,7 @@ def cli():
 @optgroup.option('--use-test-net-dcld', type=str, default='', metavar='PATH', help="Location of `dcld` binary, to use `dcld` for mirroring TestNet.")
 @optgroup.option('--use-main-net-http', is_flag=True, type=str, help="Use RESTful API with HTTPS against public MainNet observer.")
 @optgroup.option('--use-test-net-http', is_flag=True, type=str, help="Use RESTful API with HTTPS against public TestNet observer.")
-@optgroup.option('--use-local-data', is_flag=True, type=bool, help="Fake response directory: see \" DATA_DIR/",)
+@optgroup.option('--use-local-data', is_flag=True, type=bool, help="Fake response directory: see \" DATA_DIR/")
 @optgroup.group('Required arguments if use-local-data is used', cls=AllOptionGroup)
 @optgroup.option('--certificates', type=click.File('rb'), multiple=True, help='Paths to PEM formated certificates (i.e. PAA) in DCL but missing from the revocation-points-response file.')
 @optgroup.option('--crls', type=click.File('rb'), multiple=True, help='Paths to the crl der files')

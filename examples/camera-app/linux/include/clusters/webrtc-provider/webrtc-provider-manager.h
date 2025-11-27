@@ -26,7 +26,7 @@
 #include <media-controller.h>
 #include <webrtc-transport.h>
 
-#include <unordered_map>
+#include <map>
 
 namespace chip {
 namespace app {
@@ -80,11 +80,21 @@ public:
 
     CHIP_ERROR ValidateAudioStreamID(uint16_t audioStreamId) override;
 
-    CHIP_ERROR IsPrivacyModeActive(bool & isActive) override;
+    CHIP_ERROR IsStreamUsageSupported(StreamUsageEnum streamUsage) override;
+
+    CHIP_ERROR IsHardPrivacyModeActive(bool & isActive) override;
+
+    CHIP_ERROR IsSoftRecordingPrivacyModeActive(bool & isActive) override;
+
+    CHIP_ERROR IsSoftLivestreamPrivacyModeActive(bool & isActive) override;
 
     bool HasAllocatedVideoStreams() override;
 
     bool HasAllocatedAudioStreams() override;
+
+    CHIP_ERROR ValidateSFrameConfig(uint16_t cipherSuite, size_t baseKeyLength) override;
+
+    CHIP_ERROR IsUTCTimeNull(bool & isNull) override;
 
     void LiveStreamPrivacyModeChanged(bool privacyModeEnabled);
 
@@ -100,6 +110,8 @@ private:
     void ScheduleEndSend(uint16_t sessionId);
 
     void RegisterWebrtcTransport(uint16_t sessionId);
+
+    void UnregisterWebrtcTransport(uint16_t sessionId);
 
     CHIP_ERROR SendOfferCommand(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle,
                                 uint16_t sessionId);
@@ -132,8 +144,8 @@ private:
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnConnectionFailureCallback;
 
     std::unordered_map<uint16_t, std::unique_ptr<WebrtcTransport>> mWebrtcTransportMap;
-    // This is to retrieve the sessionIds for a given NodeId
-    std::unordered_map<NodeId, uint16_t> mSessionIdMap;
+    // This is to retrieve the sessionIds for a given ScopedNodeId (NodeId + FabricIndex)
+    std::map<ScopedNodeId, uint16_t> mSessionIdMap;
 
     MediaController * mMediaController = nullptr;
 

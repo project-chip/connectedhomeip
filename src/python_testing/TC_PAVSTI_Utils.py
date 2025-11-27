@@ -68,6 +68,7 @@ class PushAvServerProcess(Subprocess):
                 str(self.host),
                 "--working-directory",
                 self._working_directory,
+                "--strict-mode"
             ]
         )
 
@@ -128,6 +129,13 @@ class PushAvServerProcess(Subprocess):
         """Request the server to create a new stream."""
         response = self._post_json("/streams")
         return response["stream_id"]
+
+    def update_track_name(self, stream_id: str, trackName: str) -> None:
+        """
+            Request the server to add a track name associated with stream_id.
+            This is required to validate trackName of the segments that are uploaded.
+        """
+        self._post_json(endpoint=f"/streams/{stream_id}/trackName", data={"trackName": trackName})
 
 
 class PAVSTIUtils:

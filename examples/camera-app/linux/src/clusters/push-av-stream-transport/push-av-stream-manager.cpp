@@ -18,6 +18,7 @@
 
 #include "push-av-stream-manager.h"
 
+#include <algorithm>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -36,6 +37,7 @@ PushAvStreamTransportManager::~PushAvStreamTransportManager()
 {
     // Unregister all transports from Media Controller before deleting them. This will ensure that any ongoing streams are
     // stopped.
+    StopSessionMonitor();
     if (mMediaController != nullptr)
     {
         for (auto & kv : mTransportMap)
@@ -50,6 +52,7 @@ PushAvStreamTransportManager::~PushAvStreamTransportManager()
 void PushAvStreamTransportManager::Init()
 {
     ChipLogProgress(Zcl, "Push AV Stream Transport Initialized");
+    StartSessionMonitor();
     return;
 }
 
@@ -69,7 +72,8 @@ void PushAvStreamTransportManager::SetPushAvStreamTransportServer(PushAvStreamTr
 }
 
 Protocols::InteractionModel::Status
-PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct & transportOptions, const uint16_t connectionID)
+PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct & transportOptions, const uint16_t connectionID,
+                                                    FabricIndex accessingFabricIndex)
 {
     if (mCameraDevice == nullptr)
     {
@@ -83,6 +87,8 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
         std::make_unique<PushAVTransport>(transportOptions, connectionID, mAudioStreamParams, mVideoStreamParams);
 
     mTransportMap[connectionID]->SetPushAvStreamTransportServer(mPushAvStreamTransportServer);
+    mTransportMap[connectionID]->SetPushAvStreamTransportManager(this);
+    mTransportMap[connectionID]->SetFabricIndex(accessingFabricIndex);
 
     if (mMediaController == nullptr)
     {
@@ -91,36 +97,55 @@ PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct
         return Status::NotFound;
     }
 
-    mMediaController->RegisterTransport(mTransportMap[connectionID].get(), transportOptions.videoStreamID.Value().Value(),
-                                        transportOptions.audioStreamID.Value().Value());
+    /*
+    Initialize video, audio stream ids with default invalid value (UINT16_MAX = 65535)
+    This is necessary because the MediaController API expects these values to be set.
+    If any of video/audio stream id is absent in the transport options,UINT16_MAX max is used as default value.
+    */
+    uint16_t videoStreamID = -1;
+    uint16_t audioStreamID = -1;
+
+    if (transportOptions.videoStreamID.HasValue() && !transportOptions.videoStreamID.Value().IsNull())
+    {
+        videoStreamID = transportOptions.videoStreamID.Value().Value();
+    }
+
+    if (transportOptions.audioStreamID.HasValue() && !transportOptions.audioStreamID.Value().IsNull())
+    {
+        audioStreamID = transportOptions.audioStreamID.Value().Value();
+    }
+    ChipLogProgress(
+        Camera, "PushAvStreamTransportManager, RegisterTransport for connectionID: [%u], videoStreamID: [%u], audioStreamID: [%u]",
+        connectionID, videoStreamID, audioStreamID);
+    mMediaController->RegisterTransport(mTransportMap[connectionID].get(), videoStreamID, audioStreamID);
     mMediaController->SetPreRollLength(mTransportMap[connectionID].get(), mTransportMap[connectionID].get()->GetPreRollLength());
 
-    double newTransportBandwidthMbps = 0.0;
-    GetBandwidthForStreams(transportOptions.videoStreamID, transportOptions.audioStreamID, newTransportBandwidthMbps);
+    uint32_t newTransportBandwidthbps = 0;
+    GetBandwidthForStreams(transportOptions.videoStreamID, transportOptions.audioStreamID, newTransportBandwidthbps);
 
-    mTransportMap[connectionID].get()->SetCurrentlyUsedBandwidthMbps(newTransportBandwidthMbps);
-    mTotalUsedBandwidthMbps += newTransportBandwidthMbps;
+    mTransportMap[connectionID].get()->SetCurrentlyUsedBandwidthbps(newTransportBandwidthbps);
+    mTotalUsedBandwidthbps += newTransportBandwidthbps;
     ChipLogDetail(Camera,
                   "AllocatePushTransport: Transport for connection %u allocated successfully. "
-                  "New transport bandwidth: %.2f Mbps. Total used bandwidth: %.2f Mbps.",
-                  connectionID, newTransportBandwidthMbps, mTotalUsedBandwidthMbps);
+                  "New transport bandwidth: %u bps. Total used bandwidth: %u bps.",
+                  connectionID, newTransportBandwidthbps, mTotalUsedBandwidthbps);
 
     if (transportOptions.triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion &&
         transportOptions.triggerOptions.motionZones.HasValue())
     {
-        std::vector<std::pair<uint16_t, uint8_t>> zoneSensitivityList;
+        std::vector<std::pair<chip::app::DataModel::Nullable<uint16_t>, uint8_t>> zoneSensitivityList;
 
         auto motionZones = transportOptions.triggerOptions.motionZones.Value().Value();
         for (const auto & zoneOption : motionZones)
         {
             if (zoneOption.sensitivity.HasValue())
             {
-                zoneSensitivityList.push_back({ zoneOption.zone.Value(), zoneOption.sensitivity.Value() });
+                zoneSensitivityList.push_back({ zoneOption.zone, zoneOption.sensitivity.Value() });
             }
             else
             {
                 zoneSensitivityList.push_back(
-                    { zoneOption.zone.Value(), transportOptions.triggerOptions.motionSensitivity.Value().Value() });
+                    { zoneOption.zone, transportOptions.triggerOptions.motionSensitivity.Value().Value() });
             }
         }
 
@@ -149,7 +174,7 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::DeallocatePush
         ChipLogError(Camera, "PushAvStreamTransportManager, failed to find Connection :[%u]", connectionID);
         return Status::NotFound;
     }
-    mTotalUsedBandwidthMbps -= mTransportMap[connectionID].get()->GetCurrentlyUsedBandwidthMbps();
+    mTotalUsedBandwidthbps -= mTransportMap[connectionID].get()->GetCurrentlyUsedBandwidthbps();
     mMediaController->UnregisterTransport(mTransportMap[connectionID].get());
     mTransportMap.erase(connectionID);
     mTransportOptionsMap.erase(connectionID);
@@ -166,18 +191,18 @@ PushAvStreamTransportManager::ModifyPushTransport(const uint16_t connectionID, c
         return Status::NotFound;
     }
 
-    double newTransportBandwidthMbps = 0.0;
-    GetBandwidthForStreams(transportOptions.videoStreamID, transportOptions.audioStreamID, newTransportBandwidthMbps);
+    uint32_t newTransportBandwidthbps = 0;
+    GetBandwidthForStreams(transportOptions.videoStreamID, transportOptions.audioStreamID, newTransportBandwidthbps);
 
-    mTotalUsedBandwidthMbps -= mTransportMap[connectionID].get()->GetCurrentlyUsedBandwidthMbps();
+    mTotalUsedBandwidthbps -= mTransportMap[connectionID].get()->GetCurrentlyUsedBandwidthbps();
 
-    mTransportMap[connectionID].get()->SetCurrentlyUsedBandwidthMbps(newTransportBandwidthMbps);
-    mTotalUsedBandwidthMbps += newTransportBandwidthMbps;
+    mTransportMap[connectionID].get()->SetCurrentlyUsedBandwidthbps(newTransportBandwidthbps);
+    mTotalUsedBandwidthbps += newTransportBandwidthbps;
 
     ChipLogDetail(Camera,
                   "ModifyPushTransport: Transport for connection %u allocated successfully. "
-                  "New transport bandwidth: %.2f Mbps. Total used bandwidth: %.2f Mbps.",
-                  connectionID, newTransportBandwidthMbps, mTotalUsedBandwidthMbps);
+                  "New transport bandwidth: %u bps. Total used bandwidth: %u bps.",
+                  connectionID, newTransportBandwidthbps, mTotalUsedBandwidthbps);
 
     mTransportOptionsMap[connectionID] = transportOptions;
     mTransportMap[connectionID].get()->ModifyPushTransport(transportOptions);
@@ -204,9 +229,8 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::SetTransportSt
 
     if (transportStatus == TransportStatusEnum::kActive)
     {
-        auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
         bool isActive;
-        CHIP_ERROR status = avsmController.IsPrivacyModeActive(isActive);
+        CHIP_ERROR status = IsAnyPrivacyModeActive(isActive);
         if (status != CHIP_NO_ERROR)
         {
             ChipLogError(Camera,
@@ -216,7 +240,8 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::SetTransportSt
 
         if (isActive)
         {
-            ChipLogError(Camera, "PushAvStreamTransportManager, Cannot set transport status to Active as privacy mode is enabled.");
+            ChipLogError(Camera,
+                         "PushAvStreamTransportManager, Cannot set transport status to Active as a privacy mode is enabled.");
             return Status::InvalidInState;
         }
     }
@@ -263,44 +288,9 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::ManuallyTrigge
 
 void PushAvStreamTransportManager::GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                                                           const Optional<DataModel::Nullable<uint16_t>> & audioStreamId,
-                                                          double & outBandwidthMbps)
+                                                          uint32_t & outBandwidthbps)
 {
-    outBandwidthMbps = 0.0;
-
-    if (videoStreamId.HasValue() && !videoStreamId.Value().IsNull())
-    {
-        uint16_t vStreamId = videoStreamId.Value().Value();
-
-        auto & availableVideoStreams = mCameraDevice->GetCameraAVStreamMgmtDelegate().GetAllocatedVideoStreams();
-        for (const chip::app::Clusters::CameraAvStreamManagement::Structs::VideoStreamStruct::Type & stream : availableVideoStreams)
-        {
-            if (stream.videoStreamID == vStreamId)
-            {
-                outBandwidthMbps += (stream.maxBitRate / 1000000.0);
-                ChipLogProgress(Camera, "GetBandwidthForStreams: VideoStream %u maxBitRate: %u bps (%.2f Mbps)", vStreamId,
-                                stream.maxBitRate, (stream.maxBitRate / 1000000.0));
-                break;
-            }
-        }
-    }
-
-    if (audioStreamId.HasValue() && !audioStreamId.Value().IsNull())
-    {
-        uint16_t aStreamId = audioStreamId.Value().Value();
-
-        auto & availableAudioStreams = mCameraDevice->GetCameraAVStreamMgmtDelegate().GetAllocatedAudioStreams();
-        for (const chip::app::Clusters::CameraAvStreamManagement::Structs::AudioStreamStruct::Type & stream : availableAudioStreams)
-        {
-            if (stream.audioStreamID == aStreamId)
-            {
-                outBandwidthMbps += (stream.bitRate / 1000000.0);
-                ChipLogProgress(Camera, "GetBandwidthForStreams: AudioStream %u bitRate: %u bps (%.2f Mbps)", aStreamId,
-                                stream.bitRate, (stream.bitRate / 1000000.0));
-                break;
-            }
-        }
-    }
-
+    mCameraDevice->GetCameraAVStreamMgmtController().GetBandwidthForStreams(videoStreamId, audioStreamId, outBandwidthbps);
     return;
 }
 
@@ -315,26 +305,26 @@ PushAvStreamTransportManager::ValidateBandwidthLimit(StreamUsageEnum streamUsage
         return Status::Failure;
     }
 
-    double newStreamBandwidthMbps = 0.0;
-    GetBandwidthForStreams(videoStreamId, audioStreamId, newStreamBandwidthMbps);
-    uint32_t maxNetworkBandwidthMbps = mCameraDevice->GetCameraHALInterface().GetMaxNetworkBandwidth();
+    uint32_t newStreamBandwidthbps = 0;
+    GetBandwidthForStreams(videoStreamId, audioStreamId, newStreamBandwidthbps);
+    uint32_t maxNetworkBandwidthbps = mCameraDevice->GetCameraHALInterface().GetMaxNetworkBandwidth();
 
-    double projectedTotalBandwidthMbps = mTotalUsedBandwidthMbps + newStreamBandwidthMbps;
+    uint32_t projectedTotalBandwidthbps = mTotalUsedBandwidthbps + newStreamBandwidthbps;
 
     ChipLogProgress(Camera,
-                    "ValidateBandwidthLimit: For streamUsage %u. New stream bandwidth: %.2f Mbps. "
-                    "Currently used bandwidth: %.2f Mbps. Projected total: %.2f Mbps. Max allowed: %u Mbps.",
-                    static_cast<uint16_t>(streamUsage), newStreamBandwidthMbps, mTotalUsedBandwidthMbps,
-                    projectedTotalBandwidthMbps, maxNetworkBandwidthMbps);
+                    "ValidateBandwidthLimit: For streamUsage %u. New stream bandwidth: %u bps. "
+                    "Currently used bandwidth: %u bps. Projected total: %u bps. Max allowed: %u bps.",
+                    static_cast<uint16_t>(streamUsage), newStreamBandwidthbps, mTotalUsedBandwidthbps, projectedTotalBandwidthbps,
+                    maxNetworkBandwidthbps);
 
-    if (projectedTotalBandwidthMbps > maxNetworkBandwidthMbps)
+    if (projectedTotalBandwidthbps > maxNetworkBandwidthbps)
     {
         ChipLogError(Camera,
                      "ValidateBandwidthLimit: ResourceExhausted for streamUsage %u. "
-                     "Projected total bandwidth (%.2f Mbps) would exceed maximum network bandwidth (%u Mbps). "
-                     "New stream requires %.2f Mbps, currently %.2f Mbps is in use.",
-                     static_cast<uint16_t>(streamUsage), projectedTotalBandwidthMbps, maxNetworkBandwidthMbps,
-                     newStreamBandwidthMbps, mTotalUsedBandwidthMbps);
+                     "Projected total bandwidth (%u bps) would exceed maximum network bandwidth (%u bps). "
+                     "New stream requires %u bps, currently %u bps is in use.",
+                     static_cast<uint16_t>(streamUsage), projectedTotalBandwidthbps, maxNetworkBandwidthbps, newStreamBandwidthbps,
+                     mTotalUsedBandwidthbps);
         return Status::ResourceExhausted;
     }
 
@@ -347,32 +337,53 @@ PushAvStreamTransportManager::ValidateBandwidthLimit(StreamUsageEnum streamUsage
 
 bool PushAvStreamTransportManager::ValidateStreamUsage(StreamUsageEnum streamUsage)
 {
-    // TODO: if StreamUsage is present in the StreamUsagePriorities list, return true, false otherwise
+    std::vector<StreamUsageEnum> supportedStreamUsages = mCameraDevice->GetCameraHALInterface().GetSupportedStreamUsages();
+    auto it = std::find(supportedStreamUsages.begin(), supportedStreamUsages.end(), streamUsage);
+    if (it == supportedStreamUsages.end())
+    {
+        ChipLogError(Camera, "Requested stream usage not found in supported stream usages");
+        return false;
+    }
     return true;
 }
 
-bool PushAvStreamTransportManager::ValidateSegmentDuration(uint16_t segmentDuration)
+bool PushAvStreamTransportManager::ValidateSegmentDuration(uint16_t segmentDuration,
+                                                           const Optional<DataModel::Nullable<uint16_t>> & videoStreamId)
 {
-    // TODO: if Segment Duration is multiple of KeyFrameInterval, return true, false otherwise
-    return true;
-}
+    // If the video stream ID is missing or null, error log and return false
+    if (!videoStreamId.HasValue())
+    {
+        ChipLogError(Camera, "Segment validation requested with no provided stream") return false;
+    }
+    else
+    {
+        if (videoStreamId.Value().IsNull())
+        {
+            ChipLogError(Camera, "Segment validation requested against a Null stream") return false;
+        }
+    }
 
-bool PushAvStreamTransportManager::ValidateUrl(const std::string & url)
-{
-    const std::string https = "https://";
+    auto & videoStreams = mCameraDevice->GetCameraAVStreamMgmtDelegate().GetAllocatedVideoStreams();
 
-    // Check minimum length and https prefix
-    if (url.size() <= https.size() || url.substr(0, https.size()) != https)
+    if (videoStreams.empty())
     {
         return false;
     }
 
-    // Check for non-empty host
-    size_t hostStart = https.size();
-    size_t hostEnd   = url.find('/', hostStart);
-    std::string host = (hostEnd == std::string::npos) ? url.substr(hostStart) : url.substr(hostStart, hostEnd - hostStart);
+    for (const VideoStreamStruct & stream : videoStreams)
+    {
+        if (stream.videoStreamID == videoStreamId.Value().Value())
+        {
+            // Segment duration must be an exact multiple of the key frame interval
+            if ((segmentDuration % stream.keyFrameInterval) == 0)
+            {
+                return true;
+            }
+            break;
+        }
+    }
 
-    return !host.empty();
+    return false;
 }
 
 Protocols::InteractionModel::Status PushAvStreamTransportManager::SelectVideoStream(StreamUsageEnum streamUsage,
@@ -383,19 +394,19 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::SelectVideoStr
         ChipLogError(Camera, "CameraDeviceInterface not initialized");
         return Status::Failure;
     }
-    auto & allocatedVideoStreams = mCameraDevice->GetCameraHALInterface().GetAvailableVideoStreams();
+    auto & allocatedVideoStreams = mCameraDevice->GetCameraAVStreamMgmtDelegate().GetAllocatedVideoStreams();
 
     if (allocatedVideoStreams.empty())
     {
-        return Status::Failure;
+        ChipLogError(Camera, "Attempt to select a video stream when none are allocated.");
+        return Status::InvalidInState;
     }
-    for (VideoStream & stream : allocatedVideoStreams)
+    for (const VideoStreamStruct & stream : allocatedVideoStreams)
     {
-        VideoStreamStruct & videoStreamParams = stream.videoStreamParams;
-        if (videoStreamParams.streamUsage == streamUsage)
+        if (stream.streamUsage == streamUsage)
         {
-            videoStreamId      = videoStreamParams.videoStreamID;
-            mVideoStreamParams = videoStreamParams;
+            videoStreamId      = stream.videoStreamID;
+            mVideoStreamParams = stream;
             return Status::Success;
         }
     }
@@ -412,18 +423,18 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::SelectAudioStr
         return Status::Failure;
     }
 
-    auto & allocatedAudioStreams = mCameraDevice->GetCameraHALInterface().GetAvailableAudioStreams();
+    auto & allocatedAudioStreams = mCameraDevice->GetCameraAVStreamMgmtDelegate().GetAllocatedAudioStreams();
     if (allocatedAudioStreams.empty())
     {
-        return Status::Failure;
+        ChipLogError(Camera, "Attempt to select an audio stream when none are allocated.");
+        return Status::InvalidInState;
     }
-    for (AudioStream & stream : allocatedAudioStreams)
+    for (const AudioStreamStruct & stream : allocatedAudioStreams)
     {
-        AudioStreamStruct & audioStreamParams = stream.audioStreamParams;
-        if (audioStreamParams.streamUsage == streamUsage)
+        if (stream.streamUsage == streamUsage)
         {
-            audioStreamId      = audioStreamParams.audioStreamID;
-            mAudioStreamParams = audioStreamParams;
+            audioStreamId      = stream.audioStreamID;
+            mAudioStreamParams = stream;
             return Status::Success;
         }
     }
@@ -450,7 +461,7 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::ValidateZoneId
     return Status::Failure;
 }
 
-bool PushAvStreamTransportManager::ValidateMotionZoneSize(uint16_t zoneSize)
+bool PushAvStreamTransportManager::ValidateMotionZoneListSize(size_t zoneListSize)
 {
     if (mCameraDevice == nullptr)
     {
@@ -458,14 +469,14 @@ bool PushAvStreamTransportManager::ValidateMotionZoneSize(uint16_t zoneSize)
         return false;
     }
     auto maxZones = mCameraDevice->GetZoneManagementDelegate().GetZoneMgmtServer()->GetMaxZones();
-    if (zoneSize >= maxZones)
+    if (zoneListSize >= maxZones)
     {
         return false;
     }
     return true;
 }
 
-Protocols::InteractionModel::Status PushAvStreamTransportManager::ValidateVideoStream(uint16_t videoStreamId)
+Protocols::InteractionModel::Status PushAvStreamTransportManager::SetVideoStream(uint16_t videoStreamId)
 {
     if (mCameraDevice == nullptr)
     {
@@ -473,15 +484,21 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::ValidateVideoS
         return Status::Failure;
     }
 
-    auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
-    if (CHIP_NO_ERROR == avsmController.ValidateVideoStreamID(videoStreamId))
+    auto & allocatedVideoStreams = mCameraDevice->GetCameraAVStreamMgmtDelegate().GetAllocatedVideoStreams();
+    for (const auto & stream : allocatedVideoStreams)
     {
-        return Status::Success;
+        if (videoStreamId == stream.videoStreamID)
+        {
+            ChipLogProgress(Camera, "Selecting validated video stream ID %u", videoStreamId);
+            mVideoStreamParams = stream;
+            return Status::Success;
+        }
     }
+
     return Status::Failure;
 }
 
-Protocols::InteractionModel::Status PushAvStreamTransportManager::ValidateAudioStream(uint16_t audioStreamId)
+Protocols::InteractionModel::Status PushAvStreamTransportManager::SetAudioStream(uint16_t audioStreamId)
 {
     if (mCameraDevice == nullptr)
     {
@@ -489,11 +506,15 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::ValidateAudioS
         return Status::Failure;
     }
 
-    auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
-
-    if (CHIP_NO_ERROR == avsmController.ValidateAudioStreamID(audioStreamId))
+    auto & allocatedAudioStreams = mCameraDevice->GetCameraAVStreamMgmtDelegate().GetAllocatedAudioStreams();
+    for (const auto & stream : allocatedAudioStreams)
     {
-        return Status::Success;
+        if (audioStreamId == stream.audioStreamID)
+        {
+            ChipLogProgress(Camera, "Selecting validated audio stream ID %u", audioStreamId);
+            mAudioStreamParams = stream;
+            return Status::Success;
+        }
     }
     return Status::Failure;
 }
@@ -516,7 +537,6 @@ PushAvStreamTransportStatusEnum PushAvStreamTransportManager::GetTransportBusySt
     }
 }
 
-// Below API may not be needed
 void PushAvStreamTransportManager::OnAttributeChanged(AttributeId attributeId)
 {
     ChipLogProgress(Zcl, "Attribute changed for AttributeId = " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
@@ -537,7 +557,7 @@ PushAvStreamTransportManager::PersistentAttributesLoadedCallback()
     return CHIP_NO_ERROR;
 }
 
-void PushAvStreamTransportManager::OnZoneTriggeredEvent(uint16_t zoneId)
+void PushAvStreamTransportManager::HandleZoneTrigger(uint16_t zoneId)
 {
     for (auto & pavst : mTransportMap)
     {
@@ -614,4 +634,151 @@ void PushAvStreamTransportManager::SetTLSCerts(Tls::CertificateTable::BufferedCl
     }
 
     mBufferClientCertKey.assign(keypairDer.data(), keypairDer.data() + keypairDer.size());
+}
+
+void PushAvStreamTransportManager::RecordingStreamPrivacyModeChanged(bool privacyModeEnabled)
+{
+    // To Do:
+    // Depending on the change delegate should set transport status for each known connection to either active or inactive, plus
+    // any other needed work.
+}
+
+CHIP_ERROR PushAvStreamTransportManager::IsHardPrivacyModeActive(bool & isActive)
+{
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
+
+    return avsmController.IsHardPrivacyModeActive(isActive);
+}
+
+CHIP_ERROR PushAvStreamTransportManager::IsSoftRecordingPrivacyModeActive(bool & isActive)
+{
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
+
+    return avsmController.IsSoftRecordingPrivacyModeActive(isActive);
+}
+
+CHIP_ERROR PushAvStreamTransportManager::IsSoftLivestreamPrivacyModeActive(bool & isActive)
+{
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
+
+    return avsmController.IsSoftLivestreamPrivacyModeActive(isActive);
+}
+
+CHIP_ERROR PushAvStreamTransportManager::IsAnyPrivacyModeActive(bool & isActive)
+{
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    auto & avsmController                  = mCameraDevice->GetCameraAVStreamMgmtController();
+    bool isHardPrivacyModeActive           = false;
+    bool isSoftRecordingPrivacyModeActve   = false;
+    bool isSoftLivestreamPrivacyModeActive = false;
+
+    CHIP_ERROR status = avsmController.IsHardPrivacyModeActive(isHardPrivacyModeActive);
+    status            = avsmController.IsSoftRecordingPrivacyModeActive(isSoftRecordingPrivacyModeActve);
+    status            = avsmController.IsSoftLivestreamPrivacyModeActive(isSoftLivestreamPrivacyModeActive);
+
+    isActive = isHardPrivacyModeActive || isSoftRecordingPrivacyModeActve || isSoftLivestreamPrivacyModeActive;
+    return CHIP_NO_ERROR;
+}
+
+uint64_t PushAvStreamTransportManager::OnTriggerActivated(uint8_t fabricIdx, uint8_t sessionGroup, uint16_t connectionID)
+{
+    std::lock_guard<std::mutex> lock(mSessionMapMutex);
+    auto sessionKey = CreateSessionKey(fabricIdx, sessionGroup);
+    if (mSessionMap.find(sessionKey) == mSessionMap.end())
+    {
+        mSessionMap[sessionKey] = SessionInfo();
+    }
+    auto & sessionInfo = mSessionMap[sessionKey];
+    auto now           = std::chrono::system_clock::now();
+    if (sessionInfo.activeConnectionIDs.size() == 0)
+    {
+        // This case is a new trigger activation.
+        sessionInfo.sessionNumber++;
+        sessionInfo.sessionStartedTimestamp = now;
+    }
+    sessionInfo.activeConnectionIDs.insert(connectionID);
+    return sessionInfo.sessionNumber;
+}
+
+void PushAvStreamTransportManager::OnTriggerDeactivated(uint8_t fabricIdx, uint8_t sessionGroup, uint16_t connectionID)
+{
+    std::lock_guard<std::mutex> lock(mSessionMapMutex);
+    auto sessionKey    = CreateSessionKey(fabricIdx, sessionGroup);
+    auto & sessionInfo = mSessionMap[sessionKey];
+    sessionInfo.activeConnectionIDs.erase(connectionID);
+}
+
+void PushAvStreamTransportManager::StartSessionMonitor()
+{
+    mStopMonitoring       = false;
+    mSessionMonitorThread = std::thread(&PushAvStreamTransportManager::SessionMonitor, this);
+}
+
+void PushAvStreamTransportManager::StopSessionMonitor()
+{
+    mStopMonitoring = true;
+    if (mSessionMonitorThread.joinable())
+    {
+        mSessionMonitorThread.join();
+    }
+}
+
+void PushAvStreamTransportManager::SessionMonitor()
+{
+    while (!mStopMonitoring)
+    {
+        std::vector<std::pair<uint16_t, uint64_t>> sessionsToRestart;
+        {
+            std::lock_guard<std::mutex> lock(mSessionMapMutex);
+            for (auto & session : mSessionMap)
+            {
+                auto & sessionInfo = session.second;
+                auto now           = std::chrono::system_clock::now();
+                auto elapsed = std::chrono::duration_cast<std::chrono::minutes>(now - sessionInfo.sessionStartedTimestamp).count();
+                if (!sessionInfo.activeConnectionIDs.empty() && elapsed >= kMaxSessionDuration)
+                {
+                    sessionInfo.sessionNumber++;
+                    sessionInfo.sessionStartedTimestamp = now;
+                    for (auto connectionID : sessionInfo.activeConnectionIDs)
+                    {
+                        sessionsToRestart.push_back({ connectionID, sessionInfo.sessionNumber });
+                    }
+                }
+            }
+        }
+
+        for (auto & [connectionID, newSessionNumber] : sessionsToRestart)
+        {
+            auto it = mTransportMap.find(connectionID);
+            if (it != mTransportMap.end())
+            {
+                it->second->StartNewSession(newSessionNumber);
+            }
+        }
+
+        std::this_thread::sleep_for(std::chrono::seconds(kSessionMonitorInterval));
+    }
 }

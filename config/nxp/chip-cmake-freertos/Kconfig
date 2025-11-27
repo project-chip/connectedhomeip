@@ -361,4 +361,13 @@ config CHIP_OTA_ENCRYPTION_KEY
 
 endif # CHIP_OTA_REQUESTOR
 
+if CHIP_BUILD_TESTS
+
+config NXP_CUSTOM_UNIT_TESTS_DIR
+	string "Path to custom NXP test directory"
+	help
+	Provide a path to the location of NXP custom Matter tests
+
+endif # CHIP_BUILD_TESTS
+
 endif # CHIP

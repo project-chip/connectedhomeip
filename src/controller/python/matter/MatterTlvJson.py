@@ -51,7 +51,7 @@ class TLVJsonConverter():
         # We don't currently have a way to size this properly, but we know attributes need to fit into 1 MTU.
         size = 1280
         buf = bytearray(size)
-        encoded_bytes = self._dmLib.pychip_JsonToTlv(json_string.encode("utf-8"),  (ctypes.c_ubyte * size).from_buffer(buf), size)
+        encoded_bytes = self._dmLib.pychip_JsonToTlv(json_string.encode("utf-8"), (ctypes.c_ubyte * size).from_buffer(buf), size)
         return buf[:encoded_bytes]
 
     def convert_dump_to_cache(self, json_tlv: typing.Any) -> AttributeCache:

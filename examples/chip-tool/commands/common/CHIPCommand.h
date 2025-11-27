@@ -185,6 +185,8 @@ protected:
 
     ChipDeviceCommissioner & GetCommissioner(std::string identity);
 
+    chip::Optional<int32_t> mInterfaceId;
+
 private:
     CHIP_ERROR MaybeSetUpStack();
     void MaybeTearDownStack();

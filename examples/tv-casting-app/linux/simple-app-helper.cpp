@@ -447,7 +447,7 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
                                                          idOptions);
         ChipLogProgress(AppServer, "CommandHandler() request, VerifyOrEstablishConnection() called, calling StopDiscovery()");
         // Stop discovery since we have discovered, and are now connecting to the desired CastingPlayer.
-        matter::casting::core::CastingPlayerDiscovery::GetInstance()->StopDiscovery();
+        TEMPORARY_RETURN_IGNORED matter::casting::core::CastingPlayerDiscovery::GetInstance()->StopDiscovery();
         return CHIP_NO_ERROR;
     }
     if (strcmp(argv[0], "setcommissionerpasscode") == 0)
@@ -542,7 +542,7 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
     {
         char * eptr;
         chip::FabricIndex fabricIndex = (chip::FabricIndex) strtol(argv[1], &eptr, 10);
-        chip::Server::GetInstance().GetFabricTable().Delete(fabricIndex);
+        TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().GetFabricTable().Delete(fabricIndex);
         return CHIP_NO_ERROR;
     }
     return CHIP_ERROR_INVALID_ARGUMENT;
@@ -580,7 +580,7 @@ CHIP_ERROR PrintAllCommands()
 
 void PrintBindings()
 {
-    for (const auto & binding : chip::BindingTable::GetInstance())
+    for (const auto & binding : chip::app::Clusters::Binding::Table::GetInstance())
     {
         ChipLogProgress(AppServer,
                         "PrintBindings() Binding type=%d fab=%d nodeId=0x" ChipLogFormatX64

@@ -37,8 +37,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 
 from mobly import asserts
 from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess
@@ -79,25 +79,23 @@ class TC_PAVST_2_9(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             TestStep("precondition", "Commissioning, already done", is_commissioning=True),
             TestStep(1, "TH Reads CurrentConnections attribute from PushAV Stream Transport Cluster on DUT",
                      "Verify the number of PushAV Connections in the list is 0. If not 0, issue DeAllocatePushAVTransport with `ConnectionID to remove any connections."),
-            TestStep(2, "TH Reads SupportedIngestMethods attribute from PushAV Stream Transport Cluster on DUT",
-                     "Store value as aSupportedIngestMethods."),
-            TestStep(3, "TH Reads SupportedFormats attribute from PushAV Stream Transport Cluster on DUT",
-                     "Store value as aSupportedFormats."),
-            TestStep(4, "TH Reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on DUT",
+            TestStep(2, "TH Reads SupportedFormats attribute from PushAV Stream Transport Cluster on DUT",
+                     "Store the IngestMethods as aSupportedIngestMethods, store the ContainerFormats as aSupportedContainerFormats."),
+            TestStep(3, "TH Reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on DUT",
                      "Store value as aAllocatedVideoStreams."),
-            TestStep(5, "TH Reads AllocatedAudioStreams attribute from CameraAVStreamManagement Cluster on DUT",
+            TestStep(4, "TH Reads AllocatedAudioStreams attribute from CameraAVStreamManagement Cluster on DUT",
                      "Store value as aAllocatedAudioStreams."),
-            TestStep(6, "TH sends the AllocatePushTransport command with valid parameters and ExpiryTime set to 5 seconds.",
+            TestStep(5, "TH sends the AllocatePushTransport command with valid parameters and ExpiryTime set to 5 seconds.",
                      "DUT responds with AllocatePushTransportResponse containing the allocated ConnectionID, TransportOptions, and TransportStatus in the TransportConfigurationStruct."),
-            TestStep(7, "TH Reads CurrentConnections attribute from PushAV Stream Transport Cluster on DUT over a large-payload session",
+            TestStep(6, "TH Reads CurrentConnections attribute from PushAV Stream Transport Cluster on DUT over a large-payload session",
                      "Verify the number of PushAV Connections is 1. Verify that the TransportStatus field is Inactive."),
-            TestStep(8, "After > 5 seconds, TH Reads CurrentConnections attribute from PushAV Stream Transport Cluster on DUT",
+            TestStep(7, "After > 5 seconds, TH Reads CurrentConnections attribute from PushAV Stream Transport Cluster on DUT",
                      "Verify the number of PushAV Connections is 0."),
         ]
 
     @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport))
     async def test_TC_PAVST_2_9(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         self.endpoint = endpoint
         self.node_id = self.dut_node_id
         pvcluster = Clusters.PushAvStreamTransport
@@ -123,20 +121,16 @@ class TC_PAVST_2_9(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                     asserts.assert_true(e.status == Status.Success, "Unexpected error returned")
 
         self.step(2)
-        aSupportedFormat = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedFormats
-        )
-        aSupportedIngestMethods = list({fmt.ingestMethod for fmt in aSupportedFormat})
-        logger.info(f"SupportedIngestMethods: {aSupportedIngestMethods}")
-
-        self.step(3)
         aSupportedFormats = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedFormats
         )
+        aSupportedIngestMethods = list({fmt.ingestMethod for fmt in aSupportedFormats})
+        logger.info(f"SupportedIngestMethods: {aSupportedIngestMethods}")
+
         aSupportedContainerFormats = list({fmt.containerFormat for fmt in aSupportedFormats})
         logger.info(f"SupportedContainerFormats: {aSupportedContainerFormats}")
 
-        self.step(4)
+        self.step(3)
         aAllocatedVideoStreams = await self.allocate_one_video_stream()
         asserts.assert_greater_equal(
             len(aAllocatedVideoStreams),
@@ -144,7 +138,7 @@ class TC_PAVST_2_9(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             "AllocatedVideoStreams must not be empty",
         )
 
-        self.step(5)
+        self.step(4)
         aAllocatedAudioStreams = await self.allocate_one_audio_stream()
         asserts.assert_greater_equal(
             len(aAllocatedAudioStreams),
@@ -152,13 +146,13 @@ class TC_PAVST_2_9(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             "AllocatedAudioStreams must not be empty",
         )
 
-        self.step(6)
-        status = await self.allocate_one_pushav_transport(endpoint, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}", expiryTime=5)
+        self.step(5)
+        status = await self.allocate_one_pushav_transport(endpoint, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/", expiryTime=5)
         asserts.assert_equal(
             status, Status.Success, "Push AV Transport should be allocated successfully"
         )
 
-        self.step(7)
+        self.step(6)
         transport_configs = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=pvcluster, attribute=pvattr.CurrentConnections
         )
@@ -167,9 +161,9 @@ class TC_PAVST_2_9(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                             pvcluster.Enums.TransportStatusEnum.kInactive, "Transport status should be Inactive")
 
         logger.info("Wait for 6 secs to PushAVTransport expiry")
-        time.sleep(6)
+        await asyncio.sleep(6)
 
-        self.step(8)
+        self.step(7)
         transport_configs = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=pvcluster, attribute=pvattr.CurrentConnections
         )

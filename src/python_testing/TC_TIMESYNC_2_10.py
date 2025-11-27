@@ -35,7 +35,7 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import time
+import asyncio
 import typing
 from datetime import datetime, timedelta, timezone
 
@@ -52,8 +52,7 @@ from matter.tlv import uint
 
 class TC_TIMESYNC_2_10(MatterBaseTest):
     async def send_set_time_zone_cmd(self, tz: typing.List[Clusters.Objects.TimeSynchronization.Structs.TimeZoneStruct]) -> Clusters.Objects.TimeSynchronization.Commands.SetTimeZoneResponse:
-        ret = await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetTimeZone(timeZone=tz), endpoint=self.endpoint)
-        return ret
+        return await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetTimeZone(timeZone=tz), endpoint=self.endpoint)
 
     async def send_set_dst_cmd(self, dst: typing.List[Clusters.Objects.TimeSynchronization.Structs.DSTOffsetStruct]) -> None:
         await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetDSTOffset(DSTOffset=dst))
@@ -95,7 +94,7 @@ class TC_TIMESYNC_2_10(MatterBaseTest):
         event = time_cluster.Events.DSTTableEmpty
         cb = EventSubscriptionHandler(expected_cluster_id=event.cluster_id, expected_event_id=event.event_id)
         urgent = 1
-        subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=[(self.endpoint, event, urgent)], reportInterval=[1, 3])
+        subscription = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=[(self.endpoint, event, urgent)], reportInterval=[1, 3])
         subscription.SetEventUpdateCallback(callback=cb)
 
         self.print_step(5, "Send SetTimeZone command")
@@ -113,7 +112,7 @@ class TC_TIMESYNC_2_10(MatterBaseTest):
         await self.send_set_dst_cmd(dst)
 
         self.print_step(8, "Wait until th_utc + 15s")
-        time.sleep(get_wait_seconds_from_set_time(th_utc, 15))
+        await asyncio.sleep(get_wait_seconds_from_set_time(th_utc, 15))
 
         self.print_step(9, "Read LocalTime from the DUT")
         await self.read_single_attribute_check_success(cluster=Clusters.TimeSynchronization,

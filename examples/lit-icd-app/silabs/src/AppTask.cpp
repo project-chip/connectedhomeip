@@ -123,7 +123,7 @@ void AppTask::ApplicationEventHandler(AppEvent * aEvent)
     // DO NOT COPY for product logic. LIT ICD app is a test app with very simple application logic to enable testing.
     // The goal of the app is just to enable testing of LIT ICD features without impacting product sample apps.
     PlatformMgr().ScheduleWork([](intptr_t) {
-        auto booleanState = chip::app::Clusters::BooleanState::GetClusterForEndpointIndex(1);
+        auto booleanState = chip::app::Clusters::BooleanState::FindClusterOnEndpoint(1);
         VerifyOrReturn(booleanState != nullptr);
         auto state = booleanState->GetStateValue();
         booleanState->SetStateValue(!state);

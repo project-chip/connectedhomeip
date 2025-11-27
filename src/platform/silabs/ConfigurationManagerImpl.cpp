@@ -39,6 +39,13 @@
 #include "ZigbeeCallbacks.h"
 #endif // SL_CATALOG_ZIGBEE_STACK_COMMON_PRESENT
 
+#if !SLI_SI91X_MCU_INTERFACE
+extern "C" {
+#include "btl_interface.h"
+#include "btl_reset_info.h"
+}
+#endif // !SLI_SI91X_MCU_INTERFACE
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -56,10 +63,10 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     CHIP_ERROR err;
 
     // Initialize the generic implementation base class.
-    err = Internal::GenericConfigurationManagerImpl<SilabsConfig>::Init();
+    err = GenericConfigurationManagerImpl<SilabsConfig>::Init();
     SuccessOrExit(err);
 
-    IncreaseBootCount();
+    TEMPORARY_RETURN_IGNORED IncreaseBootCount();
     err = CHIP_NO_ERROR;
 
 exit:
@@ -74,7 +81,7 @@ bool ConfigurationManagerImpl::CanFactoryReset()
 
 void ConfigurationManagerImpl::InitiateFactoryReset()
 {
-    PlatformMgr().ScheduleWork(DoFactoryReset);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DoFactoryReset);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
@@ -88,7 +95,7 @@ CHIP_ERROR ConfigurationManagerImpl::IncreaseBootCount(void)
 
     if (SilabsConfig::ConfigValueExists(SilabsConfig::kConfigKey_BootCount))
     {
-        GetRebootCount(bootCount);
+        TEMPORARY_RETURN_IGNORED GetRebootCount(bootCount);
     }
 
     return SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_BootCount, bootCount + 1);
@@ -97,8 +104,16 @@ CHIP_ERROR ConfigurationManagerImpl::IncreaseBootCount(void)
 CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
 {
     // rebootCause is obtained at bootup.
+    uint32_t rebootCause = Silabs::GetPlatform().GetRebootCause();
+
+    // Before looking into the bootloader reboot cause, check if we performed a matter update
+    if (rebootCause == to_underlying(BootReasonType::kSoftwareUpdateCompleted))
+    {
+        bootReason = to_underlying(BootReasonType::kSoftwareUpdateCompleted);
+        return CHIP_NO_ERROR;
+    }
+
     BootReasonType matterBootCause;
-    [[maybe_unused]] uint32_t rebootCause = Silabs::GetPlatform().GetRebootCause();
 
 #if defined(_RMU_RSTCAUSE_MASK)
     if (rebootCause & RMU_RSTCAUSE_PORST || rebootCause & RMU_RSTCAUSE_EXTRST) // PowerOn or External pin reset
@@ -272,7 +287,7 @@ void ConfigurationManagerImpl::ClearThreadStack()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-    ThreadStackMgr().ClearAllSrpHostAndServices();
+    TEMPORARY_RETURN_IGNORED ThreadStackMgr().ClearAllSrpHostAndServices();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
     ChipLogProgress(DeviceLayer, "Clearing Thread provision");
     ThreadStackMgr().ErasePersistentInfo();

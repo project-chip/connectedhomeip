@@ -45,7 +45,7 @@ void WaterLeakDetectorManager::InitInstance(EndpointId endpoint)
 
 void WaterLeakDetectorManager::OnLeakDetected(bool detected)
 {
-    auto booleanState = BooleanState::GetClusterForEndpointIndex(sInstance.mEndpoint);
+    auto booleanState = BooleanState::FindClusterOnEndpoint(sInstance.mEndpoint);
     VerifyOrReturn(booleanState != nullptr);
     booleanState->SetStateValue(detected);
     ChipLogDetail(NotSpecified, "Leak status updated to: %d", detected);

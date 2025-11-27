@@ -203,8 +203,6 @@ mobile-device-test.py provides the following options for running the tests:
 ```
   --controller-nodeid INTEGER     NodeId of the controller.
   --device-nodeid INTEGER         NodeId of the device.
-  -a, --address TEXT              Skip commissionee discovery, commission the
-                                  device with the IP directly.
 
   -t, --timeout INTEGER           The program will return with timeout after
                                   specified seconds.

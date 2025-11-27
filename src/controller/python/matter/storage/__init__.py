@@ -30,7 +30,7 @@ from ..native import GetLibraryHandle
 
 LOGGER = logging.getLogger(__name__)
 
-_SetKeyValueCbFunc = CFUNCTYPE(None, py_object, c_char_p, POINTER(c_char),  c_uint16)
+_SetKeyValueCbFunc = CFUNCTYPE(None, py_object, c_char_p, POINTER(c_char), c_uint16)
 _GetKeyValueCbFunc = CFUNCTYPE(None, py_object, c_char_p, POINTER(c_char), POINTER(c_uint16), POINTER(c_bool))
 _DeleteKeyValueCbFunc = CFUNCTYPE(None, py_object, c_char_p)
 

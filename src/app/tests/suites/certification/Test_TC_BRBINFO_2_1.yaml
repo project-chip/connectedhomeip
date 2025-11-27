@@ -160,55 +160,22 @@ tests:
               type: char_string
               maxLength: 32
 
-    #Issue https://github.com/project-chip/connectedhomeip/issues/23509
     - label: "Step 18: TH writes NodeLabel from the DUT."
-      PICS: BRBINFO.S.A0005 && PICS_USER_PROMPT
-      verification: |
-          ./chip-tool bridgeddevicebasicinformation write node-label '"newnode"' 1 3
-
-          Via the TH (chip-tool), verify the SUCCESS response for NodeLabel attribute write function.
-
-          Current sample apps do not have this implementation. However, if the vendor has implemented it, the below response will be displayed.
-
-          NOTE the quotes: single-quote/double-quote/string/double-quote/single-quote
-
-
-          [1660839701.840432][2444:2449] CHIP:DMG:                         }
-          [1660839701.840505][2444:2449] CHIP:DMG:
-          [1660839701.840578][2444:2449] CHIP:DMG:                         StatusIB =
-          [1660839701.840661][2444:2449] CHIP:DMG:                         {
-          [1660839701.840742][2444:2449] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1660839701.840827][2444:2449] CHIP:DMG:                         },
-          [1660839701.840905][2444:2449] CHIP:DMG:
-          [1660839701.840973][2444:2449] CHIP:DMG:                 },
-      cluster: "LogCommands"
-      command: "UserPrompt"
+      PICS: BRBINFO.S.A0005
+      command: "writeAttribute"
+      attribute: "NodeLabel"
       arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+          value: "newnode"
 
     - label: "Step 19: TH reads NodeLabel from the DUT"
-      PICS: BRBINFO.S.A0005 && PICS_USER_PROMPT
-      verification: |
-          ./chip-tool bridgeddevicebasicinformation read node-label 1 3
-
-          Via the TH (chip-tool), verify that the NodeLabel attribute value is changed to newnode.
-
-          Current sample apps do not have this implementation. However, if the vendor has implemented it, the below response will be displayed.
-
-          [1657696463.081741][15476:15481] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0039 Attribute 0x0000_0005 DataVersion: 2577979325
-          [1657696463.081791][15476:15481] CHIP:TOO:   NodeLabel: newnode
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+      PICS: BRBINFO.S.A0005
+      command: "readAttribute"
+      attribute: "NodeLabel"
+      response:
+          value: "newnode"
+          constraints:
+              type: char_string
+              maxLength: 32
 
     - label:
           "Step 20: TH reads attribute ID 6 from the DUT (matches in ID to

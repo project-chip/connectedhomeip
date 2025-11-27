@@ -65,11 +65,15 @@ Davis, CA 95616, USA
   <conditions>
     <condition name="ElectricalEnergy" summary="See description below."/>
   </conditions>
+  <conditionRequirements>
+    <deviceType id="0x0016" name="Root Node">
+      <conditionRequirement name="TimeSyncCond">
+        <mandatoryConform/>
+      </conditionRequirement>
+    </deviceType>
+  </conditionRequirements>
   <clusters>
     <cluster id="0x0003" name="Identify" side="server">
-      <mandatoryConform/>
-    </cluster>
-    <cluster id="0x0038" name="Time Synchronization" side="server">
       <mandatoryConform/>
     </cluster>
   </clusters>
