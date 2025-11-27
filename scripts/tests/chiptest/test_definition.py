@@ -231,17 +231,25 @@ BUILTIN_SUBPROC_KNOWHOW = {
     'all-clusters': SubprocEntry(kind=SubprocessKind.APP, target_name='chip-all-clusters-app'),
     'lock': SubprocEntry(kind=SubprocessKind.APP, target_name='chip-lock-app'),
     'fabric-bridge': SubprocEntry(kind=SubprocessKind.APP, target_name='fabric-bridge-app'),
+    'fabric-admin': SubprocEntry(kind=SubprocessKind.APP, target_name='fabric-admin'),
+    'fabric-sync': SubprocEntry(kind=SubprocessKind.APP, target_name='fabric-sync'),
     'ota-provider': SubprocEntry(kind=SubprocessKind.APP, target_name='chip-ota-provider-app'),
     'ota-requestor': SubprocEntry(kind=SubprocessKind.APP, target_name='chip-ota-requestor-app'),
     'tv': SubprocEntry(kind=SubprocessKind.APP, target_name='chip-tv-app'),
     'bridge': SubprocEntry(kind=SubprocessKind.APP, target_name='chip-bridge-app'),
+    'camera': SubprocEntry(kind=SubprocessKind.APP, target_name='chip-camera-app'),
     'lit-icd': SubprocEntry(kind=SubprocessKind.APP, target_name='lit-icd-app'),
+    'light': SubprocEntry(kind=SubprocessKind.APP, target_name='chip-lighting-app'),
+    'jf-control-app': SubprocEntry(kind=SubprocessKind.APP, target_name='jfc-app'),
+    'jf-admin-app': SubprocEntry(kind=SubprocessKind.APP, target_name='jfa-app'),
     'microwave-oven': SubprocEntry(kind=SubprocessKind.APP, target_name='chip-microwave-oven-app'),
     'rvc': SubprocEntry(kind=SubprocessKind.APP, target_name='chip-rvc-app'),
     'network-manager': SubprocEntry(kind=SubprocessKind.APP, target_name='matter-network-manager-app'),
     'energy-gateway': SubprocEntry(kind=SubprocessKind.APP, target_name='chip-energy-gateway-app'),
     'energy-management': SubprocEntry(kind=SubprocessKind.APP, target_name='chip-energy-management-app'),
     'closure': SubprocEntry(kind=SubprocessKind.APP, target_name='closure-app'),
+    'terms-and-conditions': SubprocEntry(kind=SubprocessKind.APP, target_name='chip-terms-and-conditions-app'),
+    'air-purifier': SubprocEntry(kind=SubprocessKind.APP, target_name='chip-air-purifier-app'),
 
     # Tools
     'chip-tool': SubprocEntry(kind=SubprocessKind.TOOL, target_name='chip-tool'),
@@ -445,7 +453,6 @@ class TestDefinition:
 
         try:
             target_app = self.target.value
-            log.info("Target app is '%s'", target_app)
             if not dry_run:
                 for key, subproc in subproc_info_repo.items():
                     # Do not add tools to the register
