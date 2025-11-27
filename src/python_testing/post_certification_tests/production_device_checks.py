@@ -148,7 +148,8 @@ class DclCheck(MatterBaseTest, BasicCompositionTests):
         logging.info(f'Found version info for vid=0x{self.vid_pid_str} in the DCL:')
         logging.info(f'{entry[key_model_versions]}')
         key_software_versions = 'softwareVersions'
-        asserts.assert_true(key_software_versions in entry[key_model_versions], f"Unable to find {key_software_versions} in software versions schema for {self.vid_pid_str}")
+        asserts.assert_true(key_software_versions in entry[key_model_versions],
+                            f"Unable to find {key_software_versions} in software versions schema for {self.vid_pid_str}")
         return entry[key_model_versions][key_software_versions]
 
     @async_test_body
