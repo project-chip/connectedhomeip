@@ -257,6 +257,14 @@ menu "CHIP Core"
                 Here, we are also enabling LWIP_CHECK_THREAD_SAFETY which will assert when
                 LwIP code gets called from any other context or without holding the LwIP lock.
 
+        config USE_LWIP_PBUF_RAM_PACKETBUFFER
+            bool "Use lwIP PBUF_RAM type for CHIP packet buffer"
+            default n
+            help
+                Enable this option to use lwIP PBUF_RAM type for CHIP packet buffer. Configure via
+                MAX_LARGE_BUFFER_SIZE_BYTES to support larger packets exceeding IPv6 MTU.
+                If not enabled, CHIP will use lwIP PBUF_POOL type for packet buffer.
+
     endmenu # "Networking Options"
 
     menu "System Options"
@@ -1217,9 +1225,10 @@ menu "CHIP Device Layer"
     menu "Matter TCP transport options"
         config ENABLE_TCP_TRANSPORT
             bool "Enable TCP transport"
+            select USE_LWIP_PBUF_RAM_PACKETBUFFER
             default n
             help
-                Enable TCP transport.
+                Enable TCP transport. If enabled, USE_LWIP_PBUF_RAM_PACKETBUFFER must be configured.
 
         config MAX_LARGE_BUFFER_SIZE_BYTES
             int "Max buffer size for TCP payloads"
