@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/fixed-label-server/fixed-label-cluster.h>
+#include <app/clusters/fixed-label-server/FixedLabelCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/FixedLabel/Metadata.h>
 
