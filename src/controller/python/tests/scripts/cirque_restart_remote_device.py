@@ -24,11 +24,10 @@ import os
 import sys
 import threading
 import time
+import contextlib
 
-try:
+with contextlib.suppress(ImportError):
     import paramiko
-except ImportError:
-    pass
 
 CHIP_REPO = os.path.join(os.path.abspath(
     os.path.dirname(__file__)), "..", "..", "..", "..", "..")

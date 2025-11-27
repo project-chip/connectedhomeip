@@ -27,6 +27,7 @@ from dali.driver.hid import tridonic
 from dali.gear.general import DAPC, Off, RecallMaxLevel
 
 from matter.server import GetLibraryHandle, PostAttributeChangeCallback
+import contextlib
 
 dali_loop = None
 dev = None
@@ -87,10 +88,8 @@ class LightingMgrCmd(Cmd):
             if "libedit" in readline.__doc__:
                 readline.parse_and_bind("bind ^I rl_complete")
             readline.set_completer_delims(" ")
-            try:
+            with contextlib.suppress(IOError):
                 readline.read_history_file(self.historyFileName)
-            except IOError:
-                pass
         except ImportError:
             pass
 
@@ -129,10 +128,8 @@ class LightingMgrCmd(Cmd):
         try:
             import readline
 
-            try:
+            with contextlib.suppress(IOError):
                 readline.write_history_file(self.historyFileName)
-            except IOError:
-                pass
         except ImportError:
             pass
 

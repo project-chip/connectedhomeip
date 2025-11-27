@@ -15,6 +15,7 @@
 
 import binascii
 import re
+import contextlib
 
 '''Fixes certain value formats known to exist in YAML tests
 
@@ -58,10 +59,8 @@ def try_apply_yaml_unrepresentable_integer_for_javascript_fixes(value):
     and we would fail at runtime.
     '''
     if type(value) is str:
-        try:
+        with contextlib.suppress(ValueError):
             value = int(value)
-        except ValueError:
-            pass
     return value
 
 

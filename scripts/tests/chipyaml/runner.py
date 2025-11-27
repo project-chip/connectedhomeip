@@ -35,6 +35,7 @@ from matter.yamltests.parser_config import TestConfigParser
 from matter.yamltests.pseudo_clusters.pseudo_clusters import PseudoClusters, get_default_pseudo_clusters
 from matter.yamltests.runner import TestRunner, TestRunnerConfig, TestRunnerOptions
 from matter.yamltests.websocket_runner import WebSocketRunner, WebSocketRunnerConfig
+import contextlib
 
 #
 # Options
@@ -200,10 +201,8 @@ class YamlTestParserGroup(click.Group):
 
         # There is a single test, extract the custom config
         if len(tests) == 1:
-            try:
+            with contextlib.suppress(Exception):
                 custom_options = TestConfigParser.get_config(tests[0])
-            except Exception:
-                pass
             for key, value in custom_options.items():
                 param = click.Option(['--' + key], default=value, show_default=True)
                 # click converts parameter name to lowercase internally, so we need to override

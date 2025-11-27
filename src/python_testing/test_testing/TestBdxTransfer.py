@@ -46,6 +46,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.bdx import BdxProtocol, BdxTransfer
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+import contextlib
 
 
 class TestBdxTransfer(MatterBaseTest):
@@ -186,10 +187,8 @@ class TestBdxTransfer(MatterBaseTest):
                 bdx_future.cancel()
 
             # Clean up the temporary log file used in this iteration.
-            try:
+            with contextlib.suppress(FileNotFoundError):
                 os.remove(filename)
-            except FileNotFoundError:
-                pass
 
 
 if __name__ == "__main__":

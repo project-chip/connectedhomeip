@@ -35,6 +35,7 @@ import os
 import re
 import uuid
 from typing import Dict, List, Optional, Sequence, TypedDict, Union
+import contextlib
 
 try:
     import yaml
@@ -101,15 +102,11 @@ def _read_value(input_string: str) -> str:
     elif "0x" in input_string:
         ret_val = int(input_string, 16)
     elif "." in input_string:
-        try:
+        with contextlib.suppress(ValueError):
             ret_val = float(input_string)
-        except ValueError:
-            pass
     else:
-        try:
+        with contextlib.suppress(ValueError):
             ret_val = int(input_string)
-        except ValueError:
-            pass
     return str(ret_val)
 
 
