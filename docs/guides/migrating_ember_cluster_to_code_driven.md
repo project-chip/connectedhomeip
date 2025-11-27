@@ -147,6 +147,7 @@ project's Slack channel.
             commands.
 
 -   [ ] **2.4: Implement Event Logic:**
+
     -   [ ] Replace any calls to `LogEvent` with
             `mContext->interactionContext.eventsGenerator.GenerateEvent` to make
             events unit-testable.
