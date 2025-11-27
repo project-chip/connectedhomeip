@@ -55,8 +55,8 @@ class TC_WEBRTCP_2_22(MatterBaseTest, WEBRTCPTestBase):
         return "[TC-WEBRTCP-2.22] Validate EndSession removes session from CurrentSessions"
 
     def steps_TC_WEBRTCP_2_22(self) -> list[TestStep]:
-        steps = [
-            TestStep("precondition", "DUT commissioned and streams allocated", is_commissioning=True),
+        return [
+            TestStep("precondition", "DUT commissioned", is_commissioning=True),
             TestStep(1, "TH allocates both Audio and Video streams via CameraAVStreamManagement",
                      "Valid stream IDs are obtained"),
             TestStep(2, "TH establishes a valid WebRTC session with DUT",
@@ -70,10 +70,9 @@ class TC_WEBRTCP_2_22(MatterBaseTest, WEBRTCPTestBase):
             TestStep(6, "TH deallocates the Audio and Video streams via AudioStreamDeallocate and VideoStreamDeallocate commands",
                      "DUT responds with success status code for both deallocate commands")
         ]
-        return steps
 
     def pics_TC_WEBRTCP_2_22(self) -> list[str]:
-        pics = [
+        return [
             "WEBRTCP.S",
             "WEBRTCP.S.A0000",     # CurrentSessions attribute
             "WEBRTCP.S.C06.Rsp",   # EndSession command
@@ -81,7 +80,10 @@ class TC_WEBRTCP_2_22(MatterBaseTest, WEBRTCPTestBase):
             "AVSM.S.F00",          # Audio Data Output feature
             "AVSM.S.F01",          # Video Data Output feature
         ]
-        return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_WEBRTCP_2_22(self):
@@ -91,7 +93,7 @@ class TC_WEBRTCP_2_22(MatterBaseTest, WEBRTCPTestBase):
 
         self.step("precondition")
         # Commission DUT - already done
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(1)
         # Allocate Audio and Video streams

@@ -16,7 +16,7 @@
  */
 
 #include "ValveControlDelegate.h"
-#include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-server.h>
+#include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-cluster.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;

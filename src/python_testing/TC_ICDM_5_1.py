@@ -67,7 +67,7 @@ kRootEndpointId = 0
 client1 = Client(
     checkInNodeID=1,
     subjectId=1,
-    key=bytes([x for x in range(0x10, 0x20)]),
+    key=bytes(list(range(0x10, 0x20))),
     clientType=ClientTypeEnum.kEphemeral
 )
 
@@ -87,8 +87,7 @@ class TC_ICDM_5_1(MatterBaseTest):
     def get_dut_instance_name(self) -> str:
         node_id = self.dut_node_id
         compressed_fabric_id = self.default_controller.GetCompressedFabricId()
-        instance_name = f'{compressed_fabric_id:016X}-{node_id:016X}'
-        return instance_name
+        return f'{compressed_fabric_id:016X}-{node_id:016X}'
 
     async def _get_icd_txt_record(self) -> OperatingModeEnum:
         discovery = mdns_discovery.MdnsDiscovery()
@@ -119,9 +118,7 @@ class TC_ICDM_5_1(MatterBaseTest):
         # Get TXT record
         icd_value = service.txt['ICD']
         assert_valid_icd_key(icd_value)
-        icdTxtRecord = OperatingModeEnum(int(icd_value))
-
-        return icdTxtRecord
+        return OperatingModeEnum(int(icd_value))
 
     #
     # Test Harness Helpers
@@ -132,7 +129,7 @@ class TC_ICDM_5_1(MatterBaseTest):
         return "[TC-ICDM-5.1] Operating Mode with DUT as Server"
 
     def steps_TC_ICDM_5_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(0, "Commissioning, already done", is_commissioning=True),
             TestStep(1, "TH reads from the DUT the RegisteredClients attribute"),
             TestStep("2a", "TH reads from the DUT the OperatingMode attribute."),
@@ -144,15 +141,13 @@ class TC_ICDM_5_1(MatterBaseTest):
             TestStep("5a", "TH reads from the DUT the OperatingMode attribute."),
             TestStep("5b", "Verify that the ICD DNS-SD TXT key is present."),
         ]
-        return steps
 
     def pics_TC_ICDM_5_1(self) -> list[str]:
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
-        pics = [
+        return [
             "ICDM.S",
             "ICDM.S.F02",
         ]
-        return pics
 
     #
     # ICDM 5.1 Test Body

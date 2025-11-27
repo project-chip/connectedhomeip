@@ -250,6 +250,10 @@ class ClusterCommand(ClusterObject):
         raise NotImplementedError()
 
     @ChipUtility.classproperty
+    def is_client(self) -> bool:
+        raise NotImplementedError()
+
+    @ChipUtility.classproperty
     def must_use_timed_invoke(cls) -> bool:
         return False
 
@@ -281,7 +285,7 @@ class Cluster(ClusterObject):
         '''
         if self._data_version is not None:
             yield "(data version)", self.data_version
-        for k in self.__dataclass_fields__.keys():
+        for k in self.__dataclass_fields__:
             if k in self.__dict__:
                 yield k, self.__dict__[k]
 

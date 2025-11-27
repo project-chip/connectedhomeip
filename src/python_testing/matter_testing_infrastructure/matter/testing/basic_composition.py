@@ -89,7 +89,7 @@ def MatterTlvToJson(tlv_data: dict[int, Any]) -> dict[str, Any]:
 
         if isinstance(value, bytes):
             return base64.b64encode(value).decode("UTF-8")
-        elif isinstance(value, list):
+        if isinstance(value, list):
             value = [ConvertValue(item) for item in value]
         elif isinstance(value, dict):
             value = MatterTlvToJson(value)
@@ -203,7 +203,7 @@ class BasicCompositionTests:
             pase_future = dev_ctrl.EstablishPASESession(setup_code, self.dut_node_id)
             task_list.append(asyncio.create_task(pase_future))
 
-        case_future = dev_ctrl.GetConnectedDevice(nodeid=node_id, allowPASE=False)
+        case_future = dev_ctrl.GetConnectedDevice(nodeId=node_id, allowPASE=False)
         task_list.append(asyncio.create_task(case_future))
 
         for task in task_list:

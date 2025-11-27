@@ -50,8 +50,8 @@ class TC_WEBRTCP_2_9(MatterBaseTest, WEBRTCPTestBase):
         return "[TC-WEBRTCP-2.9] Validate SolicitOffer with ICEServers and ICETransportPolicy"
 
     def steps_TC_WEBRTCP_2_9(self) -> list[TestStep]:
-        steps = [
-            TestStep("precondition", "DUT commissioned and streams allocated", is_commissioning=True),
+        return [
+            TestStep("precondition", "DUT commissioned", is_commissioning=True),
             TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
                      "DUT responds with success and provides stream IDs"),
             TestStep(2, "TH sends the SolicitOffer command with valid parameters and no ICEServers or ICETransportPolicy fields",
@@ -65,10 +65,9 @@ class TC_WEBRTCP_2_9(MatterBaseTest, WEBRTCPTestBase):
             TestStep(6, "TH sends the SolicitOffer command with both ICEServers and ICETransportPolicy fields",
                      "DUT responds with SolicitOfferResponse containing allocated WebRTCSessionID and accepts both ICE servers and transport policy"),
         ]
-        return steps
 
     def pics_TC_WEBRTCP_2_9(self) -> list[str]:
-        pics = [
+        return [
             "WEBRTCP.S",
             "WEBRTCP.S.C00.Rsp",   # SolicitOffer command
             "WEBRTCP.S.C01.Tx",    # SolicitOfferResponse command
@@ -76,7 +75,6 @@ class TC_WEBRTCP_2_9(MatterBaseTest, WEBRTCPTestBase):
             "AVSM.S.F00",          # Audio Data Output feature
             "AVSM.S.F01",          # Video Data Output feature
         ]
-        return pics
 
     async def _send_and_test_solicit_offer_and_cleanup(self, solicit_offer_request, success_message, endpoint):
         """Helper method to test SolicitOffer request and clean up the session"""
@@ -91,6 +89,10 @@ class TC_WEBRTCP_2_9(MatterBaseTest, WEBRTCPTestBase):
         await self.send_single_cmd(cmd=end_session_cmd, endpoint=endpoint)
         # EndSession command succeeds if no exception is thrown
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_WEBRTCP_2_9(self):
         """
@@ -99,7 +101,7 @@ class TC_WEBRTCP_2_9(MatterBaseTest, WEBRTCPTestBase):
 
         self.step("precondition")
         # Commission DUT - already done
-        endpoint = self.user_params.get("endpoint", 1)
+        endpoint = self.get_endpoint()
 
         self.step(1)
         # Allocate Audio and Video streams

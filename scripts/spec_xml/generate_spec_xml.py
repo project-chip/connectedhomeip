@@ -18,6 +18,7 @@ import contextlib
 import json
 import logging
 import os
+import shlex
 import subprocess
 import sys
 import textwrap
@@ -30,6 +31,8 @@ from lxml import etree
 
 from matter.testing.conformance import ConformanceDecision
 from matter.testing.spec_parsing import build_xml_clusters, build_xml_device_types
+
+log = logging.getLogger(__name__)
 
 logging.basicConfig(level=logging.DEBUG, format="[%(levelname)s] %(message)s")
 
@@ -75,12 +78,11 @@ def make_asciidoc(target: str, include_in_progress: str, spec_dir: str, dry_run:
         cmd.append(f'INCLUDE_IN_PROGRESS={" ".join(CURRENT_IN_PROGRESS_DEFINES)}')
     cmd.append(target)
     if dry_run:
-        logging.info(cmd)
+        log.info("Executing: %s", shlex.join(cmd))
         return ''
-    else:
-        ret = subprocess.check_output(cmd, cwd=spec_dir).decode('UTF-8').rstrip()
-        logging.info(ret)
-        return ret
+    ret = subprocess.check_output(cmd, cwd=spec_dir).decode('UTF-8').rstrip()
+    log.info(ret)
+    return ret
 
 
 @click.command()
@@ -152,7 +154,7 @@ def main(scraper, spec_root, output_dir, dry_run, include_in_progress, skip_scra
     '''
     if not skip_scrape:
         if not scraper:
-            logging.error('Missing --scraper option. It is required when --skip-scrape is not used.')
+            log.error("Missing --scraper option. It is required when --skip-scrape is not used.")
             return
         if not spec_root:
             logging.error('Missing --spec-root option. It is required when --skip-scrape is not used.')
@@ -171,9 +173,9 @@ def main(scraper, spec_root, output_dir, dry_run, include_in_progress, skip_scra
 def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress, no_namespace):
     logging.info('Generating main spec to get file include list - this may take a few minutes')
     main_out = make_asciidoc('pdf', include_in_progress, spec_root, dry_run)
-    logging.info('Generating cluster spec to get file include list - this may take a few minutes')
+    log.info("Generating cluster spec to get file include list - this may take a few minutes")
     cluster_out = make_asciidoc('pdf-appclusters-book', include_in_progress, spec_root, dry_run)
-    logging.info('Generating device type library to get file include list - this may take a few minutes')
+    log.info("Generating device type library to get file include list - this may take a few minutes")
     device_type_files = make_asciidoc('pdf-devicelibrary-book', include_in_progress, spec_root, dry_run)
     if not no_namespace:
         namespace_files = make_asciidoc('pdf-standardnamespaces-book', include_in_progress, spec_root, dry_run)
@@ -187,8 +189,8 @@ def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress, no_
             cmd.extend(['-a'])
             cmd.extend([d])
 
-    if (dry_run):
-        logging.info(cmd)
+    if dry_run:
+        log.info("Executing: %s", shlex.join(cmd))
         return
     subprocess.run(cmd, check=True)
     # Remove all the files that weren't compiled into the spec
@@ -204,7 +206,7 @@ def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress, no_
             continue
         adoc = os.path.basename(filename).replace('.xml', '.adoc')
         if adoc not in cluster_files:
-            logging.info(f'Removing {adoc} as it was not in the generated spec document')
+            log.info("Removing '%s' as it was not in the generated spec document", adoc)
             os.remove(os.path.join(clusters_output_dir, filename))
 
     for filename in os.listdir(device_types_output_dir):
@@ -213,14 +215,14 @@ def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress, no_
             continue
         adoc = os.path.basename(filename).replace('.xml', '.adoc')
         if adoc not in device_type_files:
-            logging.info(f'Removing {adoc} as it was not in the generated spec document')
+            log.info("Removing '%s' as it was not in the generated spec document", adoc)
             os.remove(os.path.join(device_types_output_dir, filename))
 
     if not no_namespace:
         for filename in os.listdir(namespaces_output_dir):
             adoc = os.path.basename(filename).replace('.xml', '.adoc')
             if adoc not in namespace_files:
-                logging.info(f'Removing {adoc} as it was not in the generated spec document')
+                log.info("Removing '%s' as it was not in the generated spec document", adoc)
                 os.remove(os.path.join(namespaces_output_dir, filename))
 
 
@@ -303,7 +305,7 @@ def cleanup_old_spec_dms(output_dir):
                 new_xml = etree.fromstring(missing_pre_1_3_base_device_type_clusters)
                 device_type = root.find('deviceType')
                 if device_type is None:
-                    logging.error("Unable to locate device type tag in BaseDeviceType")
+                    log.error("Unable to locate device type tag in BaseDeviceType")
                     return
                 device_type.append(new_xml)
                 changed = True
@@ -449,7 +451,7 @@ def dump_versions(scraper, spec_root, output_dir):
         with open(tag_file, 'wt', encoding='utf8') as output:
             output.write(f'{tag[0].split("/")[-1]}\n')
     else:
-        logging.warning(f"WARNING: no tag found for sha {sha}")
+        log.warning("WARNING: no tag found for sha '%s'", sha)
         with contextlib.suppress(FileNotFoundError):
             os.remove(tag_file)
 
@@ -515,14 +517,14 @@ def dump_ids_from_data_model_dirs():
             if id not in pics_code_clusters:
                 pics_code_clusters[id] = c.pics
             elif pics_code_clusters[id] != c.pics:
-                logging.warning(f"PICS Code is inconsistent among different versions of the spec for cluster ID #{id}!")
+                log.warning("PICS Code is inconsistent among different versions of the spec for cluster ID #%s!", id)
 
         # Device types don't currently have provisional markings in the spec
         # But a device type can't be certified if it has mandatory clusters that are provisional
         # TODO: create provisional
 
         def device_type_support_str(d):
-            logging.info(f"checking device type for {d.name} for {dir}")
+            log.info("checking device type for '%s' for '%s'", d.name, dir)
             dt_server_mandatory = [id for id, requirement in d.server_clusters.items() if requirement.conformance(
                 [], 0, 0).decision == ConformanceDecision.MANDATORY]
             server_provisional = [clusters[c].name for c in dt_server_mandatory if clusters[c].is_provisional]
@@ -530,8 +532,9 @@ def dump_ids_from_data_model_dirs():
             ) if requirement.conformance([], 0, 0).decision == ConformanceDecision.MANDATORY]
             client_provisional = [clusters[c].name for c in dt_client_mandatory if clusters[c].is_provisional]
             if server_provisional or client_provisional:
-                logging.info(
-                    f"Found provisional mandatory clusters server:{server_provisional} client: {client_provisional} in device type {d.name} for revision {dir}")
+                log.info("Found provisional mandatory clusters server:'%s' "
+                         "client: '%s' in device type '%s' for revision '%s'",
+                         server_provisional, client_provisional, d.name, dir)
                 return "P"
             return "C"
 
@@ -586,7 +589,7 @@ def dump_ids_from_data_model_dirs():
             hashes += f'{"-" * pics_code_len}|'
 
         version_len: dict[str, int] = {}
-        for dir in supported.keys():
+        for dir in supported:
             tag_path = os.path.join(paths.get_data_model_path(), dir, 'spec_tag')
             try:
                 with open(tag_path, "r") as tag_file:
@@ -607,7 +610,7 @@ def dump_ids_from_data_model_dirs():
             if pics_codes is not None:
                 line += f'{pics_codes[id]:<{pics_code_len}}|'
 
-            for dir in supported.keys():
+            for dir in supported:
                 try:
                     line += f'{supported[dir][id]:<{version_len[dir]}}|'
                 except KeyError:

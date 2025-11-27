@@ -22,6 +22,6 @@ TARGET_SOURCES(
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/boolean-state-cluster.cpp"
-    "${CLUSTER_DIR}/boolean-state-cluster.h"
+    "${CLUSTER_DIR}/BooleanStateCluster.cpp"
+    "${CLUSTER_DIR}/BooleanStateCluster.h"
 )

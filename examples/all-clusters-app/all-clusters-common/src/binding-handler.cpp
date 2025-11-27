@@ -42,7 +42,7 @@ static bool sSwitchOnOffState = false;
 static void ToggleSwitchOnOff(bool newState)
 {
     sSwitchOnOffState = newState;
-    Binding::Manager::GetInstance().NotifyBoundClusterChanged(1, OnOff::Id, nullptr);
+    TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().NotifyBoundClusterChanged(1, OnOff::Id, nullptr);
 }
 
 static CHIP_ERROR SwitchCommandHandler(int argc, char ** argv)
@@ -94,14 +94,16 @@ static void BoundDeviceChangedHandler(const Binding::TableEntry & binding, chip:
         if (sSwitchOnOffState)
         {
             Clusters::OnOff::Commands::On::Type onCommand;
-            Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(),
-                                             binding.remote, onCommand, onSuccess, onFailure);
+            TEMPORARY_RETURN_IGNORED Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
+                                                                      peer_device->GetSecureSession().Value(), binding.remote,
+                                                                      onCommand, onSuccess, onFailure);
         }
         else
         {
             Clusters::OnOff::Commands::Off::Type offCommand;
-            Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(),
-                                             binding.remote, offCommand, onSuccess, onFailure);
+            TEMPORARY_RETURN_IGNORED Controller::InvokeCommandRequest(peer_device->GetExchangeManager(),
+                                                                      peer_device->GetSecureSession().Value(), binding.remote,
+                                                                      offCommand, onSuccess, onFailure);
         }
     }
 }
@@ -114,7 +116,7 @@ static void BoundDeviceContextReleaseHandler(void * context)
 static void InitBindingHandlerInternal(intptr_t arg)
 {
     auto & server = chip::Server::GetInstance();
-    Binding::Manager::GetInstance().Init(
+    TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().Init(
         { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
     Binding::Manager::GetInstance().RegisterBoundDeviceChangedHandler(BoundDeviceChangedHandler);
     Binding::Manager::GetInstance().RegisterBoundDeviceContextReleaseHandler(BoundDeviceContextReleaseHandler);
@@ -126,7 +128,7 @@ CHIP_ERROR InitBindingHandlers()
     // so it requires the Server instance to be correctly initialized. Post the init function to
     // the event queue so that everything is ready when initialization is conducted.
     // TODO: Fix initialization order issue in Matter server.
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitBindingHandlerInternal);
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(InitBindingHandlerInternal);
 #if defined(ENABLE_CHIP_SHELL)
     RegisterSwitchCommands();
 #endif

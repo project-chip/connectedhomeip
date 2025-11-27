@@ -44,9 +44,9 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
 import random
-from time import sleep
 
 from mobly import asserts
 from support_modules.cadmin_support import CADMINBaseTest
@@ -87,7 +87,7 @@ class TC_CADMIN(CADMINBaseTest):
         self.step("3a")
         if commission_type == "ECM":
             params = await self.th1.OpenCommissioningWindow(
-                nodeid=self.dut_node_id,
+                nodeId=self.dut_node_id,
                 timeout=self.max_window_duration,
                 iteration=1000,
                 discriminator=1234,
@@ -96,7 +96,7 @@ class TC_CADMIN(CADMINBaseTest):
 
         elif commission_type == "BCM":
             obcCmd = Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180)
-            await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=obcCmd, timedRequestTimeoutMs=6000)
+            await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=obcCmd, timedRequestTimeoutMs=6000)
 
         else:
             asserts.fail(f"Unknown commissioning type: {commission_type}")
@@ -200,7 +200,7 @@ class TC_CADMIN(CADMINBaseTest):
             self.step(10)
             # TH_CR2 opens a commissioning window on DUT_CE using ECM
             self.discriminator = random.randint(0, 4095)
-            params2 = await self.th2.OpenCommissioningWindow(nodeid=self.dut_node_id, timeout=self.max_window_duration, iteration=1000, discriminator=self.discriminator, option=1)
+            params2 = await self.th2.OpenCommissioningWindow(nodeId=self.dut_node_id, timeout=self.max_window_duration, iteration=1000, discriminator=self.discriminator, option=1)
 
             self.step(11)
             # TH_CR1 starts a commissioning process with DUT_CE before the timeout from step 10
@@ -219,9 +219,9 @@ class TC_CADMIN(CADMINBaseTest):
 
             self.step(12)
             revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
-            await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
+            await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
             # The failsafe cleanup is scheduled after the command completes, so give it a bit of time to do that
-            sleep(1)
+            await asyncio.sleep(1)
 
         if commission_type == "ECM":
             self.step(13)
@@ -232,12 +232,12 @@ class TC_CADMIN(CADMINBaseTest):
         # TH_CR2 reads the CurrentFabricIndex attribute from the Operational
         # Credentials cluster and saves as th2_idx, TH_CR1 sends the RemoveFabric
         # command to the DUT with the FabricIndex set to th2_idx
-        th2_idx = await self.th2.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)])
+        th2_idx = await self.th2.ReadAttribute(nodeId=self.dut_node_id, attributes=[(0, Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)])
         outer_key = list(th2_idx.keys())[0]
         inner_key = list(th2_idx[outer_key].keys())[0]
         attribute_key = list(th2_idx[outer_key][inner_key].keys())[1]
         removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(th2_idx[outer_key][inner_key][attribute_key])
-        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
+        await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
 
     def pics_TC_CADMIN_1_3(self) -> list[str]:
         return ["CADMIN.S"]

@@ -58,9 +58,7 @@ CHIP_ERROR WiFiPAFBase::SendMessage(const Transport::PeerAddress & address, Pack
         ChipLogError(Inet, "WiFi-PAF: No valid session whose nodeId: %lu", address.GetRemoteId());
         return CHIP_ERROR_INCORRECT_STATE;
     }
-    mWiFiPAFLayer->SendMessage(*pTxInfo, std::move(msgBuf));
-
-    return CHIP_NO_ERROR;
+    return mWiFiPAFLayer->SendMessage(*pTxInfo, std::move(msgBuf));
 }
 
 bool WiFiPAFBase::CanSendToPeer(const Transport::PeerAddress & address)
@@ -106,15 +104,13 @@ CHIP_ERROR WiFiPAFBase::WiFiPAFMessageReceived(WiFiPAFSession & RxInfo, PacketBu
 CHIP_ERROR WiFiPAFBase::WiFiPAFMessageSend(WiFiPAFSession & TxInfo, PacketBufferHandle && msgBuf)
 {
     VerifyOrReturnError(mWiFiPAFLayer->GetWiFiPAFState() != State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
-    DeviceLayer::ConnectivityMgr().WiFiPAFSend(TxInfo, std::move(msgBuf));
-
-    return CHIP_NO_ERROR;
+    return DeviceLayer::ConnectivityMgr().WiFiPAFSend(TxInfo, std::move(msgBuf));
 }
 
 CHIP_ERROR WiFiPAFBase::WiFiPAFCloseSession(WiFiPAFSession & SessionInfo)
 {
     VerifyOrReturnError(mWiFiPAFLayer->GetWiFiPAFState() != State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
-    DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(SessionInfo.id, SessionInfo.role);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(SessionInfo.id, SessionInfo.role);
     mWiFiPAFLayer->SetWiFiPAFState(State::kInitialized);
 
     return CHIP_NO_ERROR;

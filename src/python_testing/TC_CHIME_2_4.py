@@ -50,7 +50,7 @@ class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
         return "[TC-CHIME-2.4] Verify functionality of the PlayChimeSound command"
 
     def steps_TC_CHIME_2_4(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Write the value of False to the Enabled attribute."),
             TestStep(3, "Invoke the PlayChimeSound command. Verify a success response, and no chime is played."),
@@ -64,19 +64,17 @@ class TC_CHIME_2_4(MatterBaseTest, CHIMETestBase):
             TestStep(11, "Obtain manual verification that the chime sound from step 9 is complete"),
             TestStep(12, "Invoke PlayChimeSound on the DUT. Verify that a different sound from the one played in step 9 is heard"),
         ]
-        return steps
 
     def pics_TC_CHIME_2_4(self) -> list[str]:
-        pics = [
+        return [
             "CHIME.S",
         ]
-        return pics
 
     @run_if_endpoint_matches(has_cluster(Clusters.Chime))
     async def test_TC_CHIME_2_4(self):
         cluster = Clusters.Objects.Chime
         attributes = cluster.Attributes
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
 
         self.step(1)  # Already done, immediately go to step 2

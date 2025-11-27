@@ -55,24 +55,26 @@ class TC_DISHM_1_2(MatterBaseTest, ModeBaseClusterChecks):
         return "[TC-DISHM-1.2] Cluster attributes with DUT as Server"
 
     def steps_TC_DISHM_1_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "TH reads from the DUT the SupportedModes attribute."),
             TestStep(3, "TH reads from the DUT the CurrentMode attribute.")
         ]
-        return steps
 
     def pics_TC_DISHM_1_2(self) -> list[str]:
-        pics = [
+        return [
             "DISHM.S"
         ]
-        return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_DISHM_1_2(self):
 
         # Setup common mode check
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(1)
 
