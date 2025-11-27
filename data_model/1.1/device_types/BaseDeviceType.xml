@@ -98,14 +98,13 @@ Davis, CA 95616, USA
   <clusters>
     <cluster id="0x001D" name="Descriptor" side="server">
       <mandatoryConform/>
-      <features>
-          <feature code="TAGLIST">
+    <features>
+            <feature code="TAGLIST">
             <mandatoryConform>
                 <condition name="Duplicate"/>
             </mandatoryConform>
-          </feature>
-      </features>
-    </cluster>
+            </feature>
+        </features></cluster>
     <cluster id="0x001E" name="Binding" side="server">
       <mandatoryConform>
         <andTerm>

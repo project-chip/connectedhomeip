@@ -110,26 +110,27 @@ Davis, CA 95616, USA
       <quality persistence="fixed"/>
       <optionalConform/>
       <constraint>
-          <maxLength value="32"/>
+        <maxLength value="32"/>
       </constraint>
-      </attribute><attribute id="0x0004" name="TagList" type="list" default="MS">
-          <entry type="SemanticTagStruct"/>
-          <access read="true" readPrivilege="view"/>
-          <quality persistence="fixed"/>
-          <mandatoryConform>
-              <feature name="TAGLIST"/>
-          </mandatoryConform>
-          <constraint>
-              <countBetween>
-              <from value="1"/>
-              <to value="6"/>
-              </countBetween>
-          </constraint>
-      </attribute>
-    </attributes>
-    <features>
-      <feature bit="0" code="TAGLIST" name="TagList" summary="The TagList attribute is present">
-          <describedConform/>
-      </feature>
-    </features>
+    </attribute>
+    <attribute id="0x0004" name="TagList" type="list" default="MS">
+      <entry type="SemanticTagStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="TAGLIST"/>
+      </mandatoryConform>
+      <constraint>
+        <countBetween>
+          <from value="1"/>
+          <to value="6"/>
+        </countBetween>
+      </constraint>
+    </attribute>
+  </attributes>
+  <features>
+    <feature bit="0" code="TAGLIST" name="TagList" summary="The TagList attribute is present">
+      <describedConform/>
+    </feature>
+  </features>
 </cluster>

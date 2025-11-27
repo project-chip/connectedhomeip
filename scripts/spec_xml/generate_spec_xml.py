@@ -28,7 +28,6 @@ from pathlib import Path
 import click
 import paths
 from lxml import etree
-
 from matter.testing.conformance import ConformanceDecision
 from matter.testing.spec_parsing import build_xml_clusters, build_xml_device_types
 
@@ -115,12 +114,12 @@ def make_asciidoc(target: str, include_in_progress: str, spec_dir: str, dry_run:
     default=False,
 )
 @click.option(
-    '--no-namespace',
-    help='Excludes namespace files. Must be used for data model version 1.1 and below',
+    '--pre-1-2',
+    help='Flag to set when generating spec for pre 1.2 spec versions',
     is_flag=True,
     default=False,
 )
-def main(scraper, spec_root, output_dir, dry_run, include_in_progress, skip_scrape, no_namespace):
+def main(scraper, spec_root, output_dir, dry_run, include_in_progress, skip_scrape, pre_1_2):
     '''
     This script is used to generate the data model XML files found in the SDK
     data_model directory.
@@ -157,30 +156,21 @@ def main(scraper, spec_root, output_dir, dry_run, include_in_progress, skip_scra
             log.error("Missing --scraper option. It is required when --skip-scrape is not used.")
             return
         if not spec_root:
-            logging.error('Missing --spec-root option. It is required when --skip-scrape is not used.')
+            log.error('Missing --spec-root option. It is required when --skip-scrape is not used.')
             return
-        scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress, no_namespace)
+        scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress, pre_1_2)
         if not dry_run:
             dump_versions(scraper, spec_root, output_dir)
     if not dry_run:
-        cleanup_old_spec_dms(output_dir)
+        cleanup_old_spec_dms(output_dir, pre_1_2)
         dump_json_ids(output_dir)
         dump_ids_from_data_model_dirs()
         # Update all the files in the python wheels
         generate_data_model_xmls_gni.generate_gni_file()
 
 
-def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress, no_namespace):
-    logging.info('Generating main spec to get file include list - this may take a few minutes')
-    main_out = make_asciidoc('pdf', include_in_progress, spec_root, dry_run)
-    log.info("Generating cluster spec to get file include list - this may take a few minutes")
-    cluster_out = make_asciidoc('pdf-appclusters-book', include_in_progress, spec_root, dry_run)
-    log.info("Generating device type library to get file include list - this may take a few minutes")
-    device_type_files = make_asciidoc('pdf-devicelibrary-book', include_in_progress, spec_root, dry_run)
-    if not no_namespace:
-        namespace_files = make_asciidoc('pdf-standardnamespaces-book', include_in_progress, spec_root, dry_run)
-
-    cluster_files = main_out + cluster_out
+def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress, pre_1_2):
+    log.info('Scraping main spec - this may take several seconds')
     cmd = [scraper, 'dm', '--dmRoot', output_dir, '--specRoot', spec_root, '--force']
     if include_in_progress == 'All':
         cmd.extend(['-a', 'in-progress'])
@@ -188,16 +178,30 @@ def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress, no_
         for d in CURRENT_IN_PROGRESS_DEFINES:
             cmd.extend(['-a'])
             cmd.extend([d])
-
     if dry_run:
         log.info("Executing: %s", shlex.join(cmd))
         return
     subprocess.run(cmd, check=True)
+
+    # Versions prior to 1.2 do not support file exclusion based on the pdf make
+    if pre_1_2:
+        return
+
+    log.info('Generating main spec to get file include list - this may take a few minutes')
+    main_out = make_asciidoc('pdf', include_in_progress, spec_root, dry_run)
+    log.info("Generating cluster spec to get file include list - this may take a few minutes")
+    cluster_out = make_asciidoc('pdf-appclusters-book', include_in_progress, spec_root, dry_run)
+    log.info("Generating device type library to get file include list - this may take a few minutes")
+    device_type_files = make_asciidoc('pdf-devicelibrary-book', include_in_progress, spec_root, dry_run)
+    log.info("Generating namespaces to get file include list - this may take a few minutes")
+    namespace_files = make_asciidoc('pdf-standardnamespaces-book', include_in_progress, spec_root, dry_run)
+
+    cluster_files = main_out + cluster_out
+
     # Remove all the files that weren't compiled into the spec
     clusters_output_dir = os.path.join(output_dir, 'clusters')
     device_types_output_dir = os.path.abspath(os.path.join(output_dir, 'device_types'))
-    if not no_namespace:
-        namespaces_output_dir = os.path.abspath(os.path.join(output_dir, 'namespaces'))
+    namespaces_output_dir = os.path.abspath(os.path.join(output_dir, 'namespaces'))
     for filename in os.listdir(clusters_output_dir):
         # There are a couple of clusters that appear in the same adoc file and they have prefixes.
         # Look for these specifically.
@@ -218,15 +222,14 @@ def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress, no_
             log.info("Removing '%s' as it was not in the generated spec document", adoc)
             os.remove(os.path.join(device_types_output_dir, filename))
 
-    if not no_namespace:
-        for filename in os.listdir(namespaces_output_dir):
-            adoc = os.path.basename(filename).replace('.xml', '.adoc')
-            if adoc not in namespace_files:
-                log.info("Removing '%s' as it was not in the generated spec document", adoc)
-                os.remove(os.path.join(namespaces_output_dir, filename))
+    for filename in os.listdir(namespaces_output_dir):
+        adoc = os.path.basename(filename).replace('.xml', '.adoc')
+        if adoc not in namespace_files:
+            log.info("Removing '%s' as it was not in the generated spec document", adoc)
+            os.remove(os.path.join(namespaces_output_dir, filename))
 
 
-def cleanup_old_spec_dms(output_dir):
+def cleanup_old_spec_dms(output_dir, pre_1_2):
     ''' There are a few old spec versions that have the same longstanding problems.
         Unfortunately, we don't have specific branches for all these spec versions
         since some were only tagged, and some were re-used for dot releases.
@@ -312,7 +315,7 @@ def cleanup_old_spec_dms(output_dir):
         if changed:
             tree.write(filename, pretty_print=True, xml_declaration=True, encoding='utf-8')
 
-    def _fix_pre_1_1():
+    def _fix_1_1():
         missing_1_1_BaseDeviceType_features = '''
         <features>
             <feature code="TAGLIST">
@@ -366,7 +369,7 @@ def cleanup_old_spec_dms(output_dir):
             if root.find("attributes/attribute[@name='EndpointUniqueID']") is None:
                 parent_el = root.find('attributes')
                 if parent_el is None:
-                    logging.error("Unable to locate attributes in Descriptor-Cluster")
+                    log.error("Unable to locate attributes in Descriptor-Cluster")
                     return
 
                 new_xml = etree.fromstring(missing_1_1_DescriptorCluster_EndpointUID)
@@ -376,7 +379,7 @@ def cleanup_old_spec_dms(output_dir):
             if root.find("attributes/attribute[@name='TagList']") is None:
                 parent_el = root.find('attributes')
                 if parent_el is None:
-                    logging.error("Unable to locate attributes in Descriptor-Cluster")
+                    log.error("Unable to locate attributes in Descriptor-Cluster")
                     return
 
                 new_xml = etree.fromstring(missing_1_1_DescriptorCluster_taglist)
@@ -390,6 +393,7 @@ def cleanup_old_spec_dms(output_dir):
                 changed = True
 
         if changed:
+            etree.indent(tree, space="  ", level=0)
             tree.write(filename, pretty_print=True, xml_declaration=True, encoding='utf-8')
 
         changed = False
@@ -402,12 +406,13 @@ def cleanup_old_spec_dms(output_dir):
             if root.find('clusters/cluster[@name="Descriptor"]/features') is None:
                 parent_el = root.find('clusters/cluster[@name="Descriptor"]')
                 if parent_el is None:
-                    logging.error("Unable to locate clusters/cluster[@name='Descriptor'] tag in BaseDeviceType")
+                    log.error("Unable to locate clusters/cluster[@name='Descriptor'] tag in BaseDeviceType")
                     return
                 new_xml = etree.fromstring(missing_1_1_BaseDeviceType_features)
                 parent_el.append(new_xml)
                 changed = True
         if changed:
+            etree.indent(tree, space="  ", level=0)
             tree.write(filename, pretty_print=True, xml_declaration=True, encoding='utf-8')
 
     def _fix_sit_lit_type():
@@ -431,8 +436,9 @@ def cleanup_old_spec_dms(output_dir):
 
     _fix_door_lock_device_type_features()
     _fix_pre_1_3_base_device_type()
-    _fix_pre_1_1()
     _fix_sit_lit_type()
+    if pre_1_2:
+        _fix_1_1()
 
 
 def dump_versions(scraper, spec_root, output_dir):
