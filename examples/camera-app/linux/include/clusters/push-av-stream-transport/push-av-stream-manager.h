@@ -18,7 +18,7 @@
 
 #pragma once
 #include <app-common/zap-generated/cluster-enums.h>
-#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
+#include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
 #include <app/clusters/tls-certificate-management-server/tls-certificate-management-server.h>
 #include <camera-device-interface.h>
 #include <chrono>

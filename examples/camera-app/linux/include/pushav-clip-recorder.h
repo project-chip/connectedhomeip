@@ -18,7 +18,7 @@
 #pragma once
 
 #include "pushav-uploader.h"
-#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
+#include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
 
 #include <algorithm>
 #include <atomic>

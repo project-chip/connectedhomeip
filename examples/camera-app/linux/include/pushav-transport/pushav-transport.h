@@ -29,8 +29,8 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
+#include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
 #include <app/clusters/push-av-stream-transport-server/constants.h>
-#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
 #include <functional>
 #include <memory>
 #include <protocols/interaction_model/StatusCode.h>
