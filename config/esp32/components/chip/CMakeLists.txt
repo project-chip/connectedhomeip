@@ -121,6 +121,12 @@ if(CONFIG_DISABLE_IPV4)
     endif()
 endif()
 
+if(CONFIG_ENABLE_TCP_TRANSPORT)
+    chip_gn_arg_append("chip_inet_config_enable_tcp_endpoint" "true")
+else()
+    chip_gn_arg_append("chip_inet_config_enable_tcp_endpoint" "false")
+endif()
+
 if(CONFIG_DISABLE_READ_CLIENT)
     chip_gn_arg_append("chip_enable_read_client"             "false")
 endif()
