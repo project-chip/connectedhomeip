@@ -236,6 +236,11 @@ public:
         return mTestServerClusterContext.EventsGenerator().GetNextEvent();
     }
 
+    std::vector<app::AttributePathParams> & GetDirtyList()
+    {
+        return mTestServerClusterContext.ChangeListener().DirtyList();
+    }
+
 private:
     bool VerifyClusterPathsValid()
     {

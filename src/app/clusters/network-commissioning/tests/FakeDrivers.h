@@ -13,13 +13,119 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "clusters/NetworkCommissioning/Enums.h"
-#include "lib/core/CHIPError.h"
+#include <clusters/NetworkCommissioning/Enums.h>
+#include <clusters/NetworkCommissioning/Attributes.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/Span.h>
 #include <platform/NetworkCommissioning.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace Testing {
+
+class FakeEthernetDriver : public DeviceLayer::NetworkCommissioning::EthernetDriver
+{
+public:
+    class FakeNetworkIterator : public DeviceLayer::NetworkCommissioning::NetworkIterator
+    {
+    public:
+        void Set(Span<DeviceLayer::NetworkCommissioning::Network> networks)
+        {
+            mNetworks = networks;
+            currentindex = 0;
+        }
+        bool Next(DeviceLayer::NetworkCommissioning::Network & item) override
+        {
+            if (currentindex >= mNetworks.size()) return false;
+            item = mNetworks[currentindex++];
+            return true;
+        }
+        size_t Count() override { return mNetworks.size(); }
+        void Release() override {}
+
+    private:
+        friend class FakeEthernetDriver;
+        Span<DeviceLayer::NetworkCommissioning::Network> mNetworks;
+        size_t currentindex = 0;
+    };
+
+    CHIP_ERROR Init(NetworkStatusChangeCallback * networkStatusChangeCallback) override
+    {
+        mNetworkStatusChangeCallback = networkStatusChangeCallback;
+        return CHIP_NO_ERROR;
+    }
+
+    uint8_t GetMaxNetworks() override
+    {
+        return 1;
+    };
+
+    void SetNetwork(ByteSpan interfaceName)
+    {
+        memcpy(mNetwork.networkID, interfaceName.data(), interfaceName.size());
+        mNetwork.networkIDLen = static_cast<uint8_t>(interfaceName.size());
+        mNetwork.connected    = true;
+        mNetworkCount         = 1;
+
+        mNetworkStatusChangeCallback->OnNetworkingStatusChange(
+            app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum::kSuccess, Optional{interfaceName}, testErrorValue);
+    }
+
+    void SetNetworkConnected(bool connected)
+    {
+        mNetwork.connected = connected;
+    }
+
+    void SetNoNetwork()
+    {
+        mNetworkCount = 0;
+    }
+
+    DeviceLayer::NetworkCommissioning::NetworkIterator * GetNetworks() override
+    {
+        if (mNetworkCount == 0)
+        {
+            mNetworkIterator.Set({});
+        }
+        else
+        {
+            mNetworkIterator.Set({&mNetwork, 1});
+        }
+
+        return &mNetworkIterator;
+    };
+
+    void EnableDisabling(bool enabledAllowed)
+    {
+        mSetEnabledAllowed = enabledAllowed;
+    }
+
+    CHIP_ERROR SetEnabled(bool enabled) override
+    {
+        if (GetEnabled() == enabled)
+        {
+            return CHIP_NO_ERROR;
+        }
+        if (mSetEnabledAllowed)
+        {
+            mEnabled = enabled;
+            return CHIP_NO_ERROR;
+        }
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+
+    bool GetEnabled() override { return mEnabled; };
+
+    Optional<int32_t> testErrorValue{123};
+
+private:
+    NetworkStatusChangeCallback * mNetworkStatusChangeCallback;
+    FakeNetworkIterator mNetworkIterator;
+    DeviceLayer::NetworkCommissioning::Network mNetwork;
+    size_t mNetworkCount = 0;
+    bool mSetEnabledAllowed = false;
+    bool mEnabled = true;
+};
 
 class FakeWiFiDriver : public DeviceLayer::NetworkCommissioning::WiFiDriver
 {
