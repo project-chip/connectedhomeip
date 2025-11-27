@@ -68,13 +68,12 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
 
     def pics_TC_SU_2_8(self):
         """Return the PICS definitions associated with this test."""
-        pics = [
+        return [
             "MCORE.OTA.Requestor",
         ]
-        return pics
 
     def steps_TC_SU_2_8(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(0, "Commissioning, already done.", is_commissioning=True),
             TestStep(1, "DUT sends a QueryImage commands to TH1/OTA-P.",
                      "Verify the QueryImage command received on the server has the following mandatory fields."
@@ -90,7 +89,6 @@ class TC_SU_2_8(SoftwareUpdateBaseTest, MatterBaseTest):
                      "TH1/OTA-P does not respond with QueryImage response command. StateTransition goes from idle to querying, then a download error happens and finally it goes back to idle."
                      "Subscribe to events for OtaSoftwareUpdateRequestor cluster and verify StateTransition reaches downloading state. Also check if the targetSoftwareVersion is 2."),
         ]
-        return steps
 
     @async_test_body
     async def setup_test(self):
