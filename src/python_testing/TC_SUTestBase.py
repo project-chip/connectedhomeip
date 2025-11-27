@@ -414,3 +414,13 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         logger.info('Cleanup - DefaultOTAProviders cleared')
 
         asserts.assert_equal(resp[0].Status, Status.Success, "Failed to clear DefaultOTAProviders")
+
+    def clear_kvs(self):
+        """
+         Temporary cleanup of provider KVS files at the tmp path.
+
+        Returns:
+            None
+        """
+        import subprocess
+        subprocess.run("rm -rf /tmp/chip_kvs*", shell=True)

@@ -196,6 +196,9 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
 
     @async_test_body
     async def teardown_test(self):
+        # Clear provider KVS after test to avoid interference with subsequent tests
+        self.clear_kvs()
+
         await self.clear_ota_providers(self.default_controller, self.dut_node_id)
         self.terminate_provider()
         super().teardown_test()
