@@ -61,5 +61,5 @@ public:
                                                     chip::TLV::TLVReader & input_arguments, app::CommandHandler * handler) override;
 };
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip

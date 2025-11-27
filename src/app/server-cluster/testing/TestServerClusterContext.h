@@ -85,5 +85,5 @@ private:
     app::ServerClusterContext mContext;
 };
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip

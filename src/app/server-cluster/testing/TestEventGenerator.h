@@ -121,5 +121,5 @@ private:
     EventNumber mCurrentEventNumber = 0;
 };
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip

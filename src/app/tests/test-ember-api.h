@@ -19,10 +19,10 @@
 
 namespace chip {
 namespace Testing {
-    extern chip::EndpointId numEndpoints;
+extern chip::EndpointId numEndpoints;
 }
 } // namespace chip
 
 // Used by the code in TestPowerSourceCluster.cpp (and generally things using mock ember functions may need this).
 uint16_t emberAfGetClusterServerEndpointIndex(chip::EndpointId endpoint, chip::ClusterId cluster,
-    uint16_t fixedClusterServerEndpointCount);
+                                              uint16_t fixedClusterServerEndpointCount);

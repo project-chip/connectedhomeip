@@ -115,7 +115,8 @@ MockClusterConfig::MockClusterConfig(ClusterId aId, std::initializer_list<MockAt
                                      std::initializer_list<MockEventConfig> aEvents,
                                      std::initializer_list<CommandId> aAcceptedCommands,
                                      std::initializer_list<CommandId> aGeneratedCommands, BitMask<MockClusterSide> side) :
-    id(aId), attributes(aAttributes), events(aEvents), mEmberCluster{}, mAcceptedCommands(aAcceptedCommands),
+    id(aId),
+    attributes(aAttributes), events(aEvents), mEmberCluster{}, mAcceptedCommands(aAcceptedCommands),
     mGeneratedCommands(aGeneratedCommands)
 {
     VerifyOrDie(aAttributes.size() < UINT16_MAX);
@@ -186,7 +187,8 @@ MockEndpointConfig::MockEndpointConfig(EndpointId aId, std::initializer_list<Moc
                                        std::initializer_list<EmberAfDeviceType> aDeviceTypes,
                                        std::initializer_list<app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> aTags,
                                        app::EndpointComposition aComposition, CharSpan aEndpointUniqueId) :
-    id(aId), composition(aComposition), clusters(aClusters), mDeviceTypes(aDeviceTypes), mSemanticTags(aTags), mEmberEndpoint{}
+    id(aId),
+    composition(aComposition), clusters(aClusters), mDeviceTypes(aDeviceTypes), mSemanticTags(aTags), mEmberEndpoint{}
 
 {
 

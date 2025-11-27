@@ -37,5 +37,5 @@ private:
     std::vector<app::AttributePathParams> mDirtyList;
 };
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip

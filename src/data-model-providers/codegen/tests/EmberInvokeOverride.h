@@ -21,11 +21,11 @@
 namespace chip {
 namespace Testing {
 
-    /// what was the last path on which DispatchSingleClusterCommand was called
-    app::ConcreteCommandPath GetLastDispatchPath();
+/// what was the last path on which DispatchSingleClusterCommand was called
+app::ConcreteCommandPath GetLastDispatchPath();
 
-    /// How many times was DispatchSingleClusterCommand called
-    uint32_t DispatchCount();
+/// How many times was DispatchSingleClusterCommand called
+uint32_t DispatchCount();
 
 } // namespace Testing
 } // namespace chip

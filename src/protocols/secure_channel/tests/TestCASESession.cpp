@@ -1621,8 +1621,8 @@ struct SessionResumptionTestStorage : SessionResumptionStorage
 {
     SessionResumptionTestStorage(CHIP_ERROR findMethodReturnCode, ScopedNodeId peerNodeId, ResumptionIdStorage * resumptionId,
                                  Crypto::P256ECDHDerivedSecret * sharedSecret) :
-        mFindMethodReturnCode(findMethodReturnCode), mPeerNodeId(peerNodeId), mResumptionId(resumptionId),
-        mSharedSecret(sharedSecret)
+        mFindMethodReturnCode(findMethodReturnCode),
+        mPeerNodeId(peerNodeId), mResumptionId(resumptionId), mSharedSecret(sharedSecret)
     {}
     SessionResumptionTestStorage(CHIP_ERROR findMethodReturnCode) : mFindMethodReturnCode(findMethodReturnCode) {}
     CHIP_ERROR FindByScopedNodeId(const ScopedNodeId & node, ResumptionIdStorage & resumptionId,
