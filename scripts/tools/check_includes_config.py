@@ -146,7 +146,7 @@ ALLOW: Dict[str, Set[str]] = {
     'src/app/clusters/push-av-stream-transport-server/push-av-stream-transport-server.h': {'vector'},
     'src/app/clusters/push-av-stream-transport-server/push-av-stream-transport-delegate.h': {'vector'},
     'src/app/clusters/push-av-stream-transport-server/push-av-stream-transport-storage.h': {'vector'},
-    'src/app/clusters/push-av-stream-transport-server/push-av-stream-transport-logic.cpp': {'set'},
+    'src/app/clusters/push-av-stream-transport-server/PushAVStreamTransportLogic.cpp': {'set'},
     'src/app/clusters/push-av-stream-transport-server/PushAVStreamTransportLogic.h': {'vector'},
     'src/app/clusters/zone-management-server/zone-management-server.h': {'vector'},
     'src/app/clusters/zone-management-server/zone-geometry.h': {'vector', 'set'},
