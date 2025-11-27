@@ -45,14 +45,14 @@ using namespace chip::Messaging;
 
 class MockExchangeDelegate;
 
-struct TestExchange : public Test::LoopbackMessagingContext
+struct TestExchange : public chip::Testing::LoopbackMessagingContext
 {
     void SetUp() override
     {
 #if CHIP_CRYPTO_PSA
         ASSERT_EQ(psa_crypto_init(), PSA_SUCCESS);
 #endif
-        chip::Test::LoopbackMessagingContext::SetUp();
+        chip::Testing::LoopbackMessagingContext::SetUp();
     }
 
     template <typename AfterRequestChecker, typename AfterResponseChecker>

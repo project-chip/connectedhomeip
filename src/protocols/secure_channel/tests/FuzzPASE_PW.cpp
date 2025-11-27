@@ -29,7 +29,7 @@ using namespace Messaging;
 using namespace System::Clock::Literals;
 
 // TODO: #35369 Refactor the classes below to Fixtures once Errors related to FuzzTest Fixtures are resolved
-class FuzzLoopbackMessagingContext : public chip::Test::MessagingContext
+class FuzzLoopbackMessagingContext : public chip::Testing::MessagingContext
 {
 public:
     ~FuzzLoopbackMessagingContext() {}
@@ -169,7 +169,7 @@ private:
     SessionManager mSessionManager;
 };
 
-class PASETestLoopbackTransportDelegate : public Test::LoopbackTransportDelegate
+class PASETestLoopbackTransportDelegate : public chip::Testing::LoopbackTransportDelegate
 {
 public:
     void OnMessageDropped() override { mMessageDropped = true; }

@@ -506,15 +506,15 @@ TEST_F(TestServerClusterShim, EmberInvokeTest)
         const InvokeRequest kInvokeRequest{ .path = kCommandPath };
         chip::TLV::TLVReader tlvReader;
 
-        const uint32_t kDispatchCountPre = chip::Test::DispatchCount();
+        const uint32_t kDispatchCountPre = chip::Testing::DispatchCount();
 
         // Using a handler set to nullptr as it is not used by the impl
         ASSERT_EQ(cluster_with_invalid_path.InvokeCommand(kInvokeRequest, tlvReader, /* handler = */ nullptr), Status::Failure);
-        EXPECT_EQ(chip::Test::DispatchCount(), kDispatchCountPre); // no dispatch expected
+        EXPECT_EQ(chip::Testing::DispatchCount(), kDispatchCountPre); // no dispatch expected
 
         ASSERT_EQ(cluster_with_valid_path.InvokeCommand(kInvokeRequest, tlvReader, /* handler = */ nullptr), std::nullopt);
-        EXPECT_EQ(chip::Test::DispatchCount(), kDispatchCountPre + 1); // one dispatch expected
-        EXPECT_EQ(chip::Test::GetLastDispatchPath(), kCommandPath);    // for the right path
+        EXPECT_EQ(chip::Testing::DispatchCount(), kDispatchCountPre + 1); // one dispatch expected
+        EXPECT_EQ(chip::Testing::GetLastDispatchPath(), kCommandPath);    // for the right path
     }
 
     {
@@ -522,16 +522,16 @@ TEST_F(TestServerClusterShim, EmberInvokeTest)
         const InvokeRequest kInvokeRequest{ .path = kCommandPath };
         chip::TLV::TLVReader tlvReader;
 
-        const uint32_t kDispatchCountPre = chip::Test::DispatchCount();
+        const uint32_t kDispatchCountPre = chip::Testing::DispatchCount();
 
         // Using a handler set to nullptr as it is not used by the impl
         ASSERT_EQ(cluster_with_invalid_path.InvokeCommand(kInvokeRequest, tlvReader, /* handler = */ nullptr), Status::Failure);
 
-        EXPECT_EQ(chip::Test::DispatchCount(), kDispatchCountPre); // no dispatch expected
+        EXPECT_EQ(chip::Testing::DispatchCount(), kDispatchCountPre); // no dispatch expected
 
         ASSERT_EQ(cluster_with_valid_path.InvokeCommand(kInvokeRequest, tlvReader, /* handler = */ nullptr), std::nullopt);
-        EXPECT_EQ(chip::Test::DispatchCount(), kDispatchCountPre + 1); // one dispatch expected
-        EXPECT_EQ(chip::Test::GetLastDispatchPath(), kCommandPath);    // for the right path
+        EXPECT_EQ(chip::Testing::DispatchCount(), kDispatchCountPre + 1); // one dispatch expected
+        EXPECT_EQ(chip::Testing::GetLastDispatchPath(), kCommandPath);    // for the right path
     }
 }
 

@@ -111,9 +111,6 @@ const T * findById(const std::vector<T> & vector, decltype(std::declval<T>().id)
 
 } // namespace
 
-namespace chip {
-namespace Testing {
-
 MockClusterConfig::MockClusterConfig(ClusterId aId, std::initializer_list<MockAttributeConfig> aAttributes,
                                      std::initializer_list<MockEventConfig> aEvents,
                                      std::initializer_list<CommandId> aAcceptedCommands,

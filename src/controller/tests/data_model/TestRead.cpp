@@ -51,6 +51,7 @@ namespace {
 
 const MockNodeConfig & TestMockNodeConfig()
 {
+    using namespace chip::Testing;
     using namespace Clusters::Globals::Attributes;
 
     // clang-format off
