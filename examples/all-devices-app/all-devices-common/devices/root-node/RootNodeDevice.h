@@ -20,7 +20,7 @@
 #include <app/clusters/administrator-commissioning-server/AdministratorCommissioningCluster.h>
 #include <app/clusters/basic-information/BasicInformationCluster.h>
 #include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
-#include <app/clusters/general-commissioning-server/general-commissioning-cluster.h>
+#include <app/clusters/general-commissioning-server/GeneralCommissioningCluster.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-cluster.h>
 #include <app/clusters/group-key-mgmt-server/group-key-mgmt-cluster.h>
 #include <app/clusters/network-commissioning/NetworkCommissioningCluster.h>
