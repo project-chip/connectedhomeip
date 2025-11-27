@@ -81,7 +81,7 @@ struct TestUserLabelCluster : public ::testing::Test
 
     TestUserLabelCluster() : userLabel(kRootEndpointId) {}
 
-    chip::Test::TestServerClusterContext testContext;
+    TestServerClusterContext testContext;
     UserLabelCluster userLabel;
     MockDeviceInfoProvider mDeviceInfoProvider;
 };

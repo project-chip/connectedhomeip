@@ -46,7 +46,7 @@ struct TestFixedLabelCluster : public ::testing::Test
 
     TestFixedLabelCluster() : fixedLabel(kRootEndpointId) {}
 
-    chip::Test::TestServerClusterContext testContext;
+    TestServerClusterContext testContext;
     FixedLabelCluster fixedLabel;
 };
 

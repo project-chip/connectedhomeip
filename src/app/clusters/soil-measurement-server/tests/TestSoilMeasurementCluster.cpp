@@ -73,7 +73,7 @@ struct TestSoilMeasurementCluster : public ::testing::Test
 
     TestSoilMeasurementCluster() : soilMeasurement(kEndpointWithSoilMeasurement, kDefaultSoilMoistureMeasurementLimits) {}
 
-    chip::Test::TestServerClusterContext testContext;
+    TestServerClusterContext testContext;
     SoilMeasurementClusterLocal soilMeasurement;
 };
 

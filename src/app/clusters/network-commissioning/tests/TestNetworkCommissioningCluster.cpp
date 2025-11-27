@@ -108,7 +108,7 @@ TEST_F(TestNetworkCommissioningCluster, TestNotifyOnEnableInterface)
     NoopBreadcrumbTracker tracker;
     NetworkCommissioningCluster cluster(kRootEndpointId, &fakeWifiDriver, tracker);
 
-    chip::Test::TestServerClusterContext context;
+    chip::Testing::TestServerClusterContext context;
     ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     {
