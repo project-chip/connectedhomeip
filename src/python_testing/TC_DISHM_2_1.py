@@ -62,7 +62,7 @@ class TC_DISHM_2_1(MatterBaseTest):
         return "[TC-DISHM-2.1] Change to Mode functionality with DUT as Server"
 
     def steps_TC_DISHM_2_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "TH reads from the DUT the SupportedModes attribute", "Verify that the DUT response contains a list of ModeOptionsStruct entries:"
                      "Verify that the list has two or more entries"
@@ -88,13 +88,11 @@ class TC_DISHM_2_1(MatterBaseTest):
             TestStep(14, "TH reads from the DUT the CurrentMode attribute",
                      "CurrentMode attribute value is an integer value and same as step 12")
         ]
-        return steps
 
     def pics_TC_DISHM_2_1(self) -> list[str]:
-        pics = [
+        return [
             "DISHM.S"
         ]
-        return pics
 
     @run_if_endpoint_matches(has_cluster(Clusters.DishwasherMode))
     async def test_TC_DISHM_2_1(self):
@@ -127,6 +125,9 @@ class TC_DISHM_2_1(MatterBaseTest):
         self.step(2)
         supported_modes_dut = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=supported_modes_attribute)
         modes = [m.mode for m in supported_modes_dut]
+
+        logging.info(f"SupportedModes: {supported_modes_dut}")
+        logging.info(f"Modes: {modes}")
 
         can_test_mode_failure = self.check_pics("DISHM.S.M.CAN_TEST_MODE_FAILURE")
         can_manually_control = self.check_pics("DISHM.S.M.CAN_MANUALLY_CONTROLLED")
@@ -185,30 +186,25 @@ class TC_DISHM_2_1(MatterBaseTest):
         is_valid_int_value(old_current_mode_dut)
 
         # TH sends a ChangeToMode command to the DUT with NewMode set to PIXIT.DISHM.MODE_CHANGE_FAIL
-        # NOTE: Skip this step as SDK is not enabled with this failure response
+        self.step(7)
+        cmd = cluster.Commands.ChangeToMode(newMode=self.mode_fail)
+        change_to_mode_response = await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
 
-        if not (can_test_mode_failure and can_manually_control):
-            self.skip_step(7)
-        else:
-            self.step(7)
-            cmd = cluster.Commands.ChangeToMode(newMode=self.mode_fail)
-            change_to_mode_response = await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
+        # DUT responds contains a ChangeToModeResponse command with Status field is set to GenericFailure(0x02), InvalidInMode(0x03), or in the MfgCodes (0x80 to 0xBF) range and StatusText field has a length between 1 and 64
+        asserts.assert_true(matchers.is_type(change_to_mode_response, cluster.Commands.ChangeToModeResponse),
+                            "Unexpected return type for ChangeToMode")
 
-            # DUT responds contains a ChangeToModeResponse command with Status field is set to GenericFailure(0x02), InvalidInMode(0x03), or in the MfgCodes (0x80 to 0xBF) range and StatusText field has a length between 1 and 64
-            asserts.assert_true(matchers.is_type(change_to_mode_response, cluster.Commands.ChangeToModeResponse),
-                                "Unexpected return type for ChangeToMode")
+        logging.info(f"response: {change_to_mode_response}")
 
-            logging.info(f"response: {change_to_mode_response}")
+        st = change_to_mode_response.status
 
-            st = change_to_mode_response.status
+        is_mfg_code = st in range(0x80, 0xC0)
+        is_err_code = (st == CommonCodes.GENERIC_FAILURE.value) or (st == CommonCodes.INVALID_IN_MODE.value) or is_mfg_code
 
-            is_mfg_code = st in range(0x80, 0xC0)
-            is_err_code = (st == CommonCodes.GENERIC_FAILURE.value) or (st == CommonCodes.INVALID_IN_MODE.value) or is_mfg_code
+        asserts.assert_true(is_err_code, f"Changing to mode {self.mode_fail} must fail due to the current state of the device")
 
-            asserts.assert_true(is_err_code, f"Changing to mode {self.mode_fail} must fail due to the current state of the device")
-
-            st_text_len = len(change_to_mode_response.statusText)
-            asserts.assert_true(st_text_len in range(1, 65), f"StatusText length {st_text_len} must be between 1 and 64")
+        st_text_len = len(change_to_mode_response.statusText)
+        asserts.assert_true(st_text_len in range(1, 65), f"StatusText length {st_text_len} must be between 1 and 64")
 
         # TH reads from the DUT the CurrentMode attribute
         self.step(8)
