@@ -50,7 +50,6 @@
 namespace {
 using namespace chip;
 using namespace chip::Access;
-using namespace chip::Testing;
 
 uint8_t gDebugEventBuffer[128];
 uint8_t gInfoEventBuffer[128];

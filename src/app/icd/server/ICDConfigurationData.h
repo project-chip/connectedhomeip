@@ -30,15 +30,15 @@
 namespace chip {
 
 namespace app {
-// Forward declaration of ICDManager to allow it to be friend with ICDConfigurationData.
-class ICDManager;
+    // Forward declaration of ICDManager to allow it to be friend with ICDConfigurationData.
+    class ICDManager;
 } // namespace app
 
-namespace Test {
-// Forward declaration of ICDConfigurationDataTestAccess tests to allow it to be friend with the ICDConfigurationData.
-// Used in unit tests
-class ICDConfigurationDataTestAccess;
-} // namespace Test
+namespace Testing {
+    // Forward declaration of ICDConfigurationDataTestAccess tests to allow it to be friend with the ICDConfigurationData.
+    // Used in unit tests
+    class ICDConfigurationDataTestAccess;
+} // namespace Testing
 
 /**
  * @brief ICDConfigurationData manages and stores ICD related configurations for the ICDManager.
@@ -47,13 +47,11 @@ class ICDConfigurationDataTestAccess;
  *
  *        Anyone can read the ICD configurations but only the ICDManager can changes those configurations.
  */
-class ICDConfigurationData
-{
+class ICDConfigurationData {
 public:
     static constexpr uint32_t kICDCounterPersistenceIncrement = 100;
 
-    enum class ICDMode : uint8_t
-    {
+    enum class ICDMode : uint8_t {
         SIT, // Short Interval Time ICD
         LIT, // Long Interval Time ICD
     };
@@ -145,7 +143,7 @@ private:
     // value is changed, they can leverage the Observer events the ICDManager generates. See src/app/icd/server/ICDStateObserver.h
     friend class chip::app::ICDManager;
 
-    friend class chip::Test::ICDConfigurationDataTestAccess;
+    friend class chip::Testing::ICDConfigurationDataTestAccess;
 
     void SetICDMode(ICDMode mode) { mICDMode = mode; };
     void SetFastPollingInterval(System::Clock::Milliseconds32 fastPollInterval) { mFastPollingInterval = fastPollInterval; };
@@ -195,7 +193,7 @@ private:
      *                    CHIP_NO_ERROR is returned if the new intervals were set
      */
     CHIP_ERROR SetModeDurations(Optional<System::Clock::Milliseconds32> activeModeDuration,
-                                Optional<System::Clock::Milliseconds32> idleModeDuration);
+        Optional<System::Clock::Milliseconds32> idleModeDuration);
 
     /**
      * @brief Change the ActiveModeDuration, IdleModeDuration and/or ShortIdleModeDuration values.
@@ -222,8 +220,8 @@ private:
      *         - shortIdleModeDuration > resulting idleModeDuration
      */
     CHIP_ERROR SetModeDurations(std::optional<System::Clock::Milliseconds32> activeModeDuration,
-                                std::optional<System::Clock::Seconds32> idleModeDuration,
-                                std::optional<System::Clock::Seconds32> shortIdleModeDuration);
+        std::optional<System::Clock::Seconds32> idleModeDuration,
+        std::optional<System::Clock::Seconds32> shortIdleModeDuration);
 
     void SetFeatureMap(BitFlags<app::Clusters::IcdManagement::Feature> featureMap) { mFeatureMap = featureMap; }
 
@@ -234,19 +232,18 @@ private:
     static constexpr System::Clock::Milliseconds32 kGuaranteedStayActiveDuration = System::Clock::Milliseconds32(30000);
 
     static_assert((CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC) <= kMaxIdleModeDuration.count(),
-                  "Spec requires the IdleModeDuration to be equal or inferior to 64800s.");
+        "Spec requires the IdleModeDuration to be equal or inferior to 64800s.");
     static_assert((CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC) >= kMinIdleModeDuration.count(),
-                  "Spec requires the IdleModeDuration to be equal or greater to 1s.");
+        "Spec requires the IdleModeDuration to be equal or greater to 1s.");
     System::Clock::Seconds32 mIdleModeDuration = System::Clock::Seconds32(CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC);
 
     // Shorter idleModeDuration when a LIT capable device operates in SIT mode.
     System::Clock::Seconds32 mShortIdleModeDuration = System::Clock::Seconds32(CHIP_CONFIG_ICD_SHORT_IDLE_MODE_DURATION_SEC);
     static_assert((CHIP_CONFIG_ICD_SHORT_IDLE_MODE_DURATION_SEC <= CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC),
-                  "mShortIdleModeDuration must be lesser or equal than mIdleModeDuration.");
+        "mShortIdleModeDuration must be lesser or equal than mIdleModeDuration.");
 
-    static_assert(System::Clock::Milliseconds32(CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS) <=
-                      System::Clock::Seconds32(CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC),
-                  "Spec requires the IdleModeDuration be equal or greater to the ActiveModeDuration.");
+    static_assert(System::Clock::Milliseconds32(CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS) <= System::Clock::Seconds32(CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC),
+        "Spec requires the IdleModeDuration be equal or greater to the ActiveModeDuration.");
     System::Clock::Milliseconds32 mActiveModeDuration = System::Clock::Milliseconds32(CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS);
 
     System::Clock::Milliseconds16 mActiveThreshold = System::Clock::Milliseconds16(CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS);
@@ -254,24 +251,24 @@ private:
     Protocols::SecureChannel::CheckInCounter mICDCounter;
 
     static_assert((CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC) >= 1,
-                  "Spec requires the minimum of supported clients per fabric be equal or greater to 1.");
+        "Spec requires the minimum of supported clients per fabric be equal or greater to 1.");
     uint16_t mFabricClientsSupported = CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC;
 
     static_assert((CHIP_CONFIG_ICD_MAXIMUM_CHECK_IN_BACKOFF_SEC) <= kMaxIdleModeDuration.count(),
-                  "Spec requires the MaximumCheckInBackOff to be equal or inferior to 64800s");
+        "Spec requires the MaximumCheckInBackOff to be equal or inferior to 64800s");
     static_assert((CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC) <= (CHIP_CONFIG_ICD_MAXIMUM_CHECK_IN_BACKOFF_SEC),
-                  "Spec requires the MaximumCheckInBackOff to be equal or superior to the IdleModeDuration");
+        "Spec requires the MaximumCheckInBackOff to be equal or superior to the IdleModeDuration");
     System::Clock::Seconds32 mMaximumCheckInBackOff = System::Clock::Seconds32(CHIP_CONFIG_ICD_MAXIMUM_CHECK_IN_BACKOFF_SEC);
 
     // SIT ICDs SHALL have a SlowPollingThreshold shorter than or equal to 15s (spec 9.16.1.5)
     static constexpr System::Clock::Milliseconds32 kSitIcdSlowPollMaximum = System::Clock::Milliseconds32(15000);
     static_assert((CHIP_DEVICE_CONFIG_ICD_SIT_SLOW_POLL_LIMIT).count() <= kSitIcdSlowPollMaximum.count(),
-                  "Spec requires the maximum slow poll interval for the SIT device to be smaller or equal than 15 s.");
+        "Spec requires the maximum slow poll interval for the SIT device to be smaller or equal than 15 s.");
     static constexpr System::Clock::Milliseconds32 kSITPollingThreshold = CHIP_DEVICE_CONFIG_ICD_SIT_SLOW_POLL_LIMIT;
 
 #if CHIP_CONFIG_ENABLE_ICD_LIT == 0
     static_assert((CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL <= kSitIcdSlowPollMaximum),
-                  "LIT support is required for slow polling intervals superior to 15 seconds");
+        "LIT support is required for slow polling intervals superior to 15 seconds");
 #endif
     // The Polling interval used in Idle mode
     System::Clock::Milliseconds32 mLITPollingInterval = CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
@@ -279,7 +276,7 @@ private:
     System::Clock::Milliseconds32 mFastPollingInterval = CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL;
 
     static_assert((CHIP_DEVICE_CONFIG_ICD_SIT_POLLING_INTERVAL <= kSitIcdSlowPollMaximum),
-                  "The SIT polling intervals must not exceed 15 seconds");
+        "The SIT polling intervals must not exceed 15 seconds");
     // The Polling interval used in Idle mode when a LIT capable device operates in SIT mode and that is mLITPollingInterval is
     // greater than mSITPollingInterval
     System::Clock::Milliseconds32 mSITPollingInterval = CHIP_DEVICE_CONFIG_ICD_SIT_POLLING_INTERVAL;
