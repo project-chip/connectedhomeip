@@ -468,7 +468,7 @@ class CommandHandler(BaseHandler):
             is_command = False  # response
         else:
             log.warning("Could not clearly determine command direction: %s",
-                        list(attrs.items()))
+                        attrs.items())
             # Do a best-guess. However we should NOT need to guess once
             # we have a good data set
             is_command = not attrs["name"].endswith("Response")

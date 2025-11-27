@@ -56,18 +56,16 @@ class TC_WHM_1_2(MatterBaseTest):
         return "[TC-WHM-1.2] Cluster attributes with DUT as Server"
 
     def steps_TC_WHM_1_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read the SupportedModes attribute"),
             TestStep(3, "Read the CurrentMode attribute"),
         ]
-        return steps
 
     def pics_TC_WHM_1_2(self) -> list[str]:
-        pics = [
+        return [
             "WHM.S",
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:

@@ -53,14 +53,10 @@ class AndroidBoard(Enum):
         raise Exception("Unknown board type: %r" % self)
 
     def IsIde(self):
-        if (
-            self == AndroidBoard.AndroidStudio_ARM
-            or self == AndroidBoard.AndroidStudio_ARM64
-            or self == AndroidBoard.AndroidStudio_X64
-            or self == AndroidBoard.AndroidStudio_X86
-        ):
-            return True
-        return False
+        return (self == AndroidBoard.AndroidStudio_ARM
+                or self == AndroidBoard.AndroidStudio_ARM64
+                or self == AndroidBoard.AndroidStudio_X64
+                or self == AndroidBoard.AndroidStudio_X86)
 
 
 class AndroidApp(Enum):

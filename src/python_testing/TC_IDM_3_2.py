@@ -90,7 +90,7 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
         return None, None
 
     def steps_TC_IDM_3_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(0, "Commissioning, already done", is_commissioning=True),
             TestStep(1, "TH sends the WriteRequestMessage to the DUT to write any attribute on an unsupported Endpoint. DUT responds with the Write Response action",
                      "Verify on the TH that the DUT sends the status code UNSUPPORTED_ENDPOINT"),
@@ -107,7 +107,6 @@ class TC_IDM_3_2(MatterBaseTest, BasicCompositionTests):
             TestStep(7, "TH sends the WriteRequestMessage to the DUT to modify the value of a specific attribute data that needs Timed Write transaction to write and this action is not part of a Timed Write transaction.",
                      "On the TH verify that the DUT sends a status code NEEDS_TIMED_INTERACTION."),
         ]
-        return steps
 
     @async_test_body
     async def test_TC_IDM_3_2(self):

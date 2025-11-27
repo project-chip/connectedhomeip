@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include <app/clusters/boolean-state-configuration-server/boolean-state-configuration-cluster.h>
+#include <app/clusters/boolean-state-configuration-server/BooleanStateConfigurationCluster.h>
 #include <app/clusters/boolean-state-configuration-server/boolean-state-configuration-delegate.h>
 #include <lib/core/CHIPError.h>
 #include <protocols/interaction_model/StatusCode.h>

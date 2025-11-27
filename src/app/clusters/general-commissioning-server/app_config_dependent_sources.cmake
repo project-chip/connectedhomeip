@@ -25,6 +25,6 @@ TARGET_SOURCES(
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/general-commissioning-cluster.cpp"
-    "${CLUSTER_DIR}/general-commissioning-cluster.h"
+    "${CLUSTER_DIR}/GeneralCommissioningCluster.cpp"
+    "${CLUSTER_DIR}/GeneralCommissioningCluster.h"
 )

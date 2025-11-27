@@ -67,14 +67,13 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
 
     def pics_TC_DEM_2_10(self):
         """Return the PICS definitions associated with this test."""
-        pics = [
+        return [
             "DEM.S"
         ]
-        return pics
 
     def steps_TC_DEM_2_10(self) -> list[TestStep]:
         """Execute the test steps."""
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
                      is_commissioning=True),
             TestStep("2", "TH reads from the DUT the FeatureMap",
@@ -126,8 +125,6 @@ class TC_DEM_2_10(MatterBaseTest, DEMTestBase):
             TestStep("22", "Cancel the subscription to the Device Energy Management cluster",
                      "The subscription is cancelled successfully"),
         ]
-
-        return steps
 
     @async_test_body
     async def test_TC_DEM_2_10(self):

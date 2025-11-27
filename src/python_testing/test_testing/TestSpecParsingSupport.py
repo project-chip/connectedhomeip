@@ -93,6 +93,7 @@ def get_access_enum_from_string(access_str: str) -> Clusters.AccessControl.Enums
     if access_str is None:
         return Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue
     asserts.fail("Unknown access string")
+    return None
 
 
 BASE_CLUSTER_XML_STR = (
