@@ -210,6 +210,10 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         if not self.provider_app_path or not os.path.exists(self.provider_app_path):
             raise FileNotFoundError(f'Invalid provider_app_path: {self.provider_app_path}.')
 
+        # Validate ota_image
+        if not self.ota_image or not os.path.exists(self.ota_image):
+            raise FileNotFoundError(f'Invalid ota_image: {self.ota_image}.')
+
         self.step(0)
         # Controller has already commissioned the requestor
 
@@ -221,7 +225,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # Prerequisite #1.0 - Provider info
         provider_node_id = 1
         provider_discriminator = 1111
-        provider_setupPinCode = 20202021
+        provider_setup_pincode = 20202021
         provider_port = self.user_params.get('ota_provider_port', 5541)
 
         self.step(1)
@@ -236,7 +240,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         self.start_provider(
             provider_app_path=self.provider_app_path,
             ota_image_path=self.ota_image,
-            setup_pincode=provider_setupPinCode,
+            setup_pincode=provider_setup_pincode,
             discriminator=provider_discriminator,
             port=provider_port,
             kvs_path=self.KVS_PATH,
@@ -247,7 +251,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # Prerequisite #2.0 - Commission Provider (Only one time)
         resp = await controller.CommissionOnNetwork(
             nodeId=provider_node_id,
-            setupPinCode=provider_setupPinCode,
+            setupPinCode=provider_setup_pincode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
             filter=provider_discriminator
         )
@@ -412,7 +416,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         self.start_provider(
             provider_app_path=self.provider_app_path,
             ota_image_path=self.ota_image,
-            setup_pincode=provider_setupPinCode,
+            setup_pincode=provider_setup_pincode,
             discriminator=provider_discriminator,
             port=provider_port,
             kvs_path=self.KVS_PATH,
@@ -495,6 +499,11 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         logger.info(f'{step_number_s2}: Step #2.4 - Full OTA UpdateState (Busy sequence) observed: {state_sequence_busy}')
 
         interval_duration_busy = interval_duration_ref[0]
+
+        # Assert interval completed check
+        if interval_duration_busy is None:
+            asserts.fail(f"Interval did not complete for Busy sequence {interval_duration_busy}.")
+
         logger.info(f"Interval duration: {interval_duration_busy:.2f}s")
         logger.info(f'{step_number_s2}: Step #2.4 - 120s interval: {interval_duration_busy:.2f}s, '
                     f'unexpected states: {list(observed_states_during_interval)}')
@@ -533,7 +542,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         self.start_provider(
             provider_app_path=self.provider_app_path,
             ota_image_path=self.ota_image,
-            setup_pincode=provider_setupPinCode,
+            setup_pincode=provider_setup_pincode,
             discriminator=provider_discriminator,
             port=provider_port,
             kvs_path=self.KVS_PATH,
@@ -613,8 +622,14 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         # Verify that only the allowed states (Idle, Querying) are observed during this interval.
         # ------------------------------------------------------------------------------------
         logger.info(f'{step_number_s3}: Step #3.4 - Full OTA UpdateState (updateNotAvailable sequence) observed: {state_sequence_notavailable}')
+
         # interval_duration = t_end_interval - t_start_interval
         interval_duration_notavailable = interval_duration_ref[0]
+
+        # Assert interval completed check
+        if interval_duration_notavailable is None:
+            asserts.fail(f"Interval did not complete for updateNotAvailable sequence {interval_duration_notavailable}.")
+
         logger.info(f'{step_number_s3}: Step #3.4 - 120s interval: {interval_duration_notavailable:.2f}s, '
                     f'unexpected states: {list(observed_states_during_interval)}')
 
@@ -653,7 +668,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         self.start_provider(
             provider_app_path=self.provider_app_path,
             ota_image_path=self.ota_image,
-            setup_pincode=provider_setupPinCode,
+            setup_pincode=provider_setup_pincode,
             discriminator=provider_discriminator,
             port=provider_port,
             kvs_path=self.KVS_PATH,
@@ -792,7 +807,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         self.start_provider(
             provider_app_path=self.provider_app_path,
             ota_image_path=self.ota_image,
-            setup_pincode=provider_setupPinCode,
+            setup_pincode=provider_setup_pincode,
             discriminator=provider_discriminator,
             port=provider_port,
             kvs_path=self.KVS_PATH,
@@ -900,7 +915,7 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
         self.start_provider(
             provider_app_path=self.provider_app_path,
             ota_image_path=self.ota_image,
-            setup_pincode=provider_setupPinCode,
+            setup_pincode=provider_setup_pincode,
             discriminator=provider_discriminator,
             port=provider_port,
             kvs_path=self.KVS_PATH,
