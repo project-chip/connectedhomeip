@@ -335,12 +335,12 @@ TEST_F(TestOTARequestorCluster, ReadAttributesTest)
     provider.providerNodeID = 1234u;
     provider.endpoint       = 8;
     provider.fabricIndex    = 2;
-    otaRequestor.AddDefaultOtaProvider(provider);
+    EXPECT_EQ(otaRequestor.AddDefaultOtaProvider(provider), CHIP_NO_ERROR);
     DataModel::DecodableList<DecodableProviderLocation> defaultOtaProviders;
     EXPECT_EQ(tester.ReadAttribute(OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id, defaultOtaProviders),
               CHIP_NO_ERROR);
     size_t defaultOtaProvidersSize;
-    defaultOtaProviders.ComputeSize(&defaultOtaProvidersSize);
+    ASSERT_EQ(defaultOtaProviders.ComputeSize(&defaultOtaProvidersSize), CHIP_NO_ERROR);
     EXPECT_EQ(defaultOtaProvidersSize, 1u);
     DataModel::DecodableList<DecodableProviderLocation>::Iterator defaultOtaProvidersIterator = defaultOtaProviders.begin();
     EXPECT_TRUE(defaultOtaProvidersIterator.Next());

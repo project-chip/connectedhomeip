@@ -60,7 +60,8 @@ void OTARequestorCluster::Shutdown()
 {
     if (OtaRequestorInstance())
     {
-        OtaRequestorInstance()->UnregisterEventHandler(mPath.mEndpointId);
+        SuccessOrLog(OtaRequestorInstance()->UnregisterEventHandler(mPath.mEndpointId), SoftwareUpdate,
+                     "Unable to unregister event handling for endpoint %u during shutdown", mPath.mEndpointId);
     }
     DefaultServerCluster::Shutdown();
 }
