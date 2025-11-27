@@ -212,6 +212,8 @@ public:
 namespace chip {
 namespace app {
 
+using namespace chip::Testing;
+
 class TestAclEvent : public AppContext
 {
 public:

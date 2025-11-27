@@ -26,7 +26,7 @@
 #include <utility>
 
 namespace chip {
-namespace Test {
+namespace Testing {
 namespace internal {
 uint16_t SizeForType(EmberAfAttributeType type)
 {
@@ -69,7 +69,7 @@ uint16_t SizeForType(EmberAfAttributeType type)
     case ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE:
     case ZCL_OCTET_STRING_ATTRIBUTE_TYPE:
     case ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE:
-        return kDefaultStringSize;
+        return internal::kDefaultStringSize;
     case ZCL_ARRAY_ATTRIBUTE_TYPE:
     case ZCL_STRUCT_ATTRIBUTE_TYPE:
         // These items are using AAI and are acceptable for tests
@@ -111,12 +111,14 @@ const T * findById(const std::vector<T> & vector, decltype(std::declval<T>().id)
 
 } // namespace
 
+namespace chip {
+namespace Testing {
+
 MockClusterConfig::MockClusterConfig(ClusterId aId, std::initializer_list<MockAttributeConfig> aAttributes,
                                      std::initializer_list<MockEventConfig> aEvents,
                                      std::initializer_list<CommandId> aAcceptedCommands,
                                      std::initializer_list<CommandId> aGeneratedCommands, BitMask<MockClusterSide> side) :
-    id(aId),
-    attributes(aAttributes), events(aEvents), mEmberCluster{}, mAcceptedCommands(aAcceptedCommands),
+    id(aId), attributes(aAttributes), events(aEvents), mEmberCluster{}, mAcceptedCommands(aAcceptedCommands),
     mGeneratedCommands(aGeneratedCommands)
 {
     VerifyOrDie(aAttributes.size() < UINT16_MAX);
@@ -187,8 +189,7 @@ MockEndpointConfig::MockEndpointConfig(EndpointId aId, std::initializer_list<Moc
                                        std::initializer_list<EmberAfDeviceType> aDeviceTypes,
                                        std::initializer_list<app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> aTags,
                                        app::EndpointComposition aComposition, CharSpan aEndpointUniqueId) :
-    id(aId),
-    composition(aComposition), clusters(aClusters), mDeviceTypes(aDeviceTypes), mSemanticTags(aTags), mEmberEndpoint{}
+    id(aId), composition(aComposition), clusters(aClusters), mDeviceTypes(aDeviceTypes), mSemanticTags(aTags), mEmberEndpoint{}
 
 {
 
@@ -246,5 +247,5 @@ const MockClusterConfig * MockNodeConfig::clusterByIds(EndpointId endpointId, Cl
     return endpoint->clusterById(clusterId, outClusterIndex);
 }
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip
