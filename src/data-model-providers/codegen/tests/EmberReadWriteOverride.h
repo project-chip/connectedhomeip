@@ -24,13 +24,13 @@
 namespace chip {
 namespace Testing {
 
-    /// specify what the next `emAfReadOrWriteAttribute` will contain
-    ///
-    /// It may return a value with success or some error. The byte span WILL BE COPIED.
-    void SetEmberReadOutput(std::variant<chip::ByteSpan, chip::Protocols::InteractionModel::Status> what);
+/// specify what the next `emAfReadOrWriteAttribute` will contain
+///
+/// It may return a value with success or some error. The byte span WILL BE COPIED.
+void SetEmberReadOutput(std::variant<chip::ByteSpan, chip::Protocols::InteractionModel::Status> what);
 
-    /// Grab the data currently in the buffer
-    chip::ByteSpan GetEmberBuffer();
+/// Grab the data currently in the buffer
+chip::ByteSpan GetEmberBuffer();
 
 } // namespace Testing
 } // namespace chip

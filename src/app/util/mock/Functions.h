@@ -33,28 +33,28 @@
 namespace chip {
 namespace Testing {
 
-    CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const app::ConcreteAttributePath & aPath,
-        app::AttributeReportIBs::Builder & aAttributeReports,
-        app::AttributeEncodeState * apEncoderState);
+CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const app::ConcreteAttributePath & aPath,
+                                     app::AttributeReportIBs::Builder & aAttributeReports,
+                                     app::AttributeEncodeState * apEncoderState);
 
-    /// Increase the current value for `GetVersion`
-    void BumpVersion();
+/// Increase the current value for `GetVersion`
+void BumpVersion();
 
-    /// Sets GetVersion to return 0
-    void ResetVersion();
+/// Sets GetVersion to return 0
+void ResetVersion();
 
-    /// Force the global cluster version to a specific value
-    void SetVersionTo(DataVersion version);
+/// Force the global cluster version to a specific value
+void SetVersionTo(DataVersion version);
 
-    /// Gets the current value for the version that will
-    /// be returned by emberAfDataVersionStorage
-    DataVersion GetVersion();
+/// Gets the current value for the version that will
+/// be returned by emberAfDataVersionStorage
+DataVersion GetVersion();
 
-    /// Configures the singular global mock attribute storage to use the specified configuration.
-    void SetMockNodeConfig(const MockNodeConfig & config);
+/// Configures the singular global mock attribute storage to use the specified configuration.
+void SetMockNodeConfig(const MockNodeConfig & config);
 
-    /// Resets the mock attribute storage to the default configuration.
-    void ResetMockNodeConfig();
+/// Resets the mock attribute storage to the default configuration.
+void ResetMockNodeConfig();
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip
