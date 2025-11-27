@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include "lib/core/DataModelTypes.h"
 #include <app/server-cluster/ServerClusterExtension.h>
+#include <lib/core/DataModelTypes.h>
 
 namespace chip {
 namespace app {

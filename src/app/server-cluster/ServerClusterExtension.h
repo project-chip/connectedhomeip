@@ -16,10 +16,10 @@
  */
 #pragma once
 
-#include "app/ConcreteClusterPath.h"
-#include "lib/core/DataModelTypes.h"
+#include <app/ConcreteClusterPath.h>
 #include <app/server-cluster/ServerClusterContext.h>
 #include <app/server-cluster/ServerClusterInterface.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/Span.h>
 
 namespace chip::app {
