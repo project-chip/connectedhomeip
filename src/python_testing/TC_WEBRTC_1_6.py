@@ -29,7 +29,7 @@ from matter.webrtc import BrowserPeerConnection, WebRTCManager
 
 class TC_WEBRTC_1_6(MatterBaseTest, WebRTCTestHelper):
     def steps_TC_WEBRTC_1_6(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("precondition-1", commission_if_required(), is_commissioning=True),
             TestStep("precondition-2", "Confirm no active WebRTC sessions exist in DUT"),
             TestStep("precondition-3", "Confirm DUT(Camera) supports Speaker feature AVSM.S.F04(SPKR)"),
@@ -85,7 +85,6 @@ class TC_WEBRTC_1_6(MatterBaseTest, WebRTCTestHelper):
                 expectation="DUT responds with SUCCESS status code.",
             ),
         ]
-        return steps
 
     def desc_TC_WEBRTC_1_6(self) -> str:
         return " [TC-WEBRTC-1.6] Validate Two-Way-Talk Full-Duplex support in camera(DUT) - PROVISIONAL"
@@ -104,7 +103,7 @@ class TC_WEBRTC_1_6(MatterBaseTest, WebRTCTestHelper):
     async def test_TC_WEBRTC_1_6(self):
         self.step("precondition-1")
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         webrtc_manager = WebRTCManager(event_loop=self.event_loop)
         await webrtc_manager.ws_connect()
         webrtc_peer = None

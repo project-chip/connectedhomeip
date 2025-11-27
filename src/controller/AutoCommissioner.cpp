@@ -970,9 +970,17 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             // reference to the operational credential delegate here
             if (mOperationalCredentialsDelegate != nullptr)
             {
-                MutableByteSpan nonce(mCSRNonce);
-                ReturnErrorOnFailure(mOperationalCredentialsDelegate->ObtainCsrNonce(nonce));
-                mParams.SetCSRNonce(ByteSpan(mCSRNonce, sizeof(mCSRNonce)));
+                uint8_t csrNonceBytes[sizeof(mCSRNonce)];
+                MutableByteSpan nonce(csrNonceBytes);
+                CHIP_ERROR csrError = mOperationalCredentialsDelegate->ObtainCsrNonce(nonce);
+                if (csrError != CHIP_ERROR_NOT_IMPLEMENTED)
+                {
+                    ReturnErrorOnFailure(csrError);
+
+                    MutableByteSpan savedCSRNonce(mCSRNonce);
+                    ReturnErrorOnFailure(CopySpanToMutableSpan(nonce, savedCSRNonce));
+                    mParams.SetCSRNonce(savedCSRNonce);
+                }
             }
             break;
         }

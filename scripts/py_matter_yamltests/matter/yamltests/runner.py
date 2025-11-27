@@ -149,7 +149,7 @@ class TestRunner(TestRunnerBase):
             result = await self._run_with_timeout(parser, runner_config)
             if isinstance(result, Exception) or isinstance(result, CancelledError):
                 raise (result)
-            elif not result:
+            if not result:
                 return False
 
         if runner_config and runner_config.hooks:
@@ -179,6 +179,7 @@ class TestRunner(TestRunnerBase):
         for item in request.arguments.get('values', []):
             if item.get('name') == key_name:
                 return item.get('value')
+        return None
 
     async def _run(self, parser: TestParser, config: TestRunnerConfig):
         status = True
@@ -214,12 +215,11 @@ class TestRunner(TestRunnerBase):
                     hooks.step_start(request)
                     hooks.step_unknown()
                     continue
-                elif config.pseudo_clusters.is_manual_step(request):
+                if config.pseudo_clusters.is_manual_step(request):
                     hooks.step_start(request)
                     await hooks.step_manual(request)
                     continue
-                else:
-                    hooks.step_start(request)
+                hooks.step_start(request)
 
                 start = time.time()
                 if config.pseudo_clusters.supports(request):

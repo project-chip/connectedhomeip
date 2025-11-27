@@ -28,7 +28,7 @@
 #       --passcode 20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --endpoint 1
+#       --endpoint 0
 # === END CI TEST ARGUMENTS ===
 
 
@@ -41,7 +41,7 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters.Types import Nullable
 from matter.interaction_model import Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_attribute, run_if_endpoint_matches
 
 # These below variables are used to test the AccessControl cluster Extension attribute and come from the test plan here: https://github.com/CHIP-Specifications/chip-test-plans/blob/59e8c45b8e7c24d5ce130b166520ff4f7bd935b6/src/cluster/AccessControl.adoc#tc-acl-2-6-accesscontrolentrychanged-event:~:text=D_OK_EMPTY%3A%20%221718%22%20which%20is%20an%20octstr%20of%20length%202%20containing%20valid%20TLV%3A
 D_OK_EMPTY = bytes.fromhex('1718')
@@ -53,8 +53,7 @@ class TC_ACL_2_7(MatterBaseTest):
     async def read_currentfabricindex(self, th: ChipDeviceCtrl) -> int:
         cluster = Clusters.Objects.OperationalCredentials
         attribute = Clusters.OperationalCredentials.Attributes.CurrentFabricIndex
-        current_fabric_index = await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
-        return current_fabric_index
+        return await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
 
     def _validate_events(self, events, expected_fabric_index, expected_node_id, other_fabric_index, controller_name, is_filtered):
         """Helper method to validate events for a TH"""
@@ -96,10 +95,13 @@ class TC_ACL_2_7(MatterBaseTest):
                 found_other_event, f"{controller_name} should not see any events from {other_controller}'s fabric when fabric filtered")
 
     def desc_TC_ACL_2_7(self) -> str:
-        return "[TC-ACL-2.7] Multiple fabrics test"
+        return "[TC-ACL-2.7] Extension multi-fabric"
+
+    def pics_TC_ACL_2_7(self) -> list[str]:
+        return ['ACL.S.A0001']
 
     def steps_TC_ACL_2_7(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "TH1 commissions DUT using admin node ID",
                      is_commissioning=True),
             TestStep(2, "TH1 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",
@@ -121,9 +123,8 @@ class TC_ACL_2_7(MatterBaseTest):
             TestStep(11, "TH_CR1 sends RemoveFabric for TH2 fabric command to DUT_CE",
                      "Verify DUT_CE responses with NOCResponse with a StatusCode OK"),
         ]
-        return steps
 
-    @async_test_body
+    @run_if_endpoint_matches(has_attribute(Clusters.AccessControl.Attributes.Extension))
     async def test_TC_ACL_2_7(self):
         self.step(1)
         self.th1 = self.default_controller

@@ -98,7 +98,7 @@ PacketBuffer * PacketBuffer::BuildFreeList()
     }
 
 #if !CHIP_SYSTEM_CONFIG_NO_LOCKING
-    Mutex::Init(sBufferPoolMutex);
+    SuccessOrDie(Mutex::Init(sBufferPoolMutex));
 #endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
     return static_cast<PacketBuffer *>(lHead);
@@ -626,7 +626,7 @@ PacketBufferHandle PacketBufferHandle::New(size_t aAvailableSize, uint16_t aRese
 #if !CHIP_SYSTEM_CONFIG_NO_LOCKING && CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
     if (!sBufferPoolMutex.isInitialized())
     {
-        Mutex::Init(sBufferPoolMutex);
+        SuccessOrDie(Mutex::Init(sBufferPoolMutex));
     }
 #endif
     LOCK_BUF_POOL();

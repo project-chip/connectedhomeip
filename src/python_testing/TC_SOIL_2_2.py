@@ -53,7 +53,7 @@ class TC_SOIL_2_2(MatterBaseTest):
         return "[TC-SOIL-2.2] Primary functionality with DUT as Server"
 
     def steps_TC_SOIL_2_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Set up a subscription wildcard subscription, with MinIntervalFloor set to 0, MaxIntervalCeiling set to 30 and KeepSubscriptions set to false"),
 
@@ -63,18 +63,16 @@ class TC_SOIL_2_2(MatterBaseTest):
             TestStep(6, "After a few seconds, read SoilMoistureMeasuredValue attribute"),
             TestStep(7, "Verify that the DUT sends at least one attribute report for SoilMoistureMeasuredValue"),
         ]
-        return steps
 
     def pics_TC_SOIL_2_2(self) -> list[str]:
-        pics = [
+        return [
             "SOIL.S",
         ]
-        return pics
 
     @run_if_endpoint_matches(has_cluster(Clusters.SoilMeasurement))
     async def test_TC_SOIL_2_2(self):
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(1)
         cluster = Clusters.SoilMeasurement

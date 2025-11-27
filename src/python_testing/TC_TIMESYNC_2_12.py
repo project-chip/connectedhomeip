@@ -35,8 +35,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import queue
-import time
 import typing
 from datetime import datetime, timedelta, timezone
 
@@ -53,8 +53,7 @@ from matter.tlv import uint
 
 class TC_TIMESYNC_2_12(MatterBaseTest):
     async def send_set_time_zone_cmd(self, tz: typing.List[Clusters.Objects.TimeSynchronization.Structs.TimeZoneStruct]) -> Clusters.Objects.TimeSynchronization.Commands.SetTimeZoneResponse:
-        ret = await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetTimeZone(timeZone=tz), endpoint=self.endpoint)
-        return ret
+        return await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetTimeZone(timeZone=tz), endpoint=self.endpoint)
 
     async def send_set_dst_cmd(self, dst: typing.List[Clusters.Objects.TimeSynchronization.Structs.DSTOffsetStruct]) -> None:
         await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetDSTOffset(DSTOffset=dst))
@@ -152,7 +151,7 @@ class TC_TIMESYNC_2_12(MatterBaseTest):
 
         self.print_step(10, "If tz_list_size > 1, TH waits until th_utc + 15s")
         if tz_list_size > 1:
-            time.sleep(get_wait_seconds_from_set_time(th_utc, 15))
+            await asyncio.sleep(get_wait_seconds_from_set_time(th_utc, 15))
 
         self.print_step(11, "If tz_list_size > 1, TH reads LocalTime")
         if tz_list_size > 1:
