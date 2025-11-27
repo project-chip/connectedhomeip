@@ -40,7 +40,7 @@
 #include <system/SystemLayerImpl.h>
 
 using namespace chip;
-using namespace chip::Test;
+using namespace chip::Testing;
 using namespace chip::app;
 using namespace chip::AddressResolve;
 using namespace chip::System;
@@ -117,7 +117,7 @@ class TestSubscriptionsInfoProvider : public SubscriptionsInfoProvider
 {
 public:
     TestSubscriptionsInfoProvider() = default;
-    ~TestSubscriptionsInfoProvider(){};
+    ~TestSubscriptionsInfoProvider() {};
 
     void SetHasActiveSubscription(bool value) { mHasActiveSubscription = value; };
     void SetHasPersistedSubscription(bool value) { mHasPersistedSubscription = value; };
@@ -139,7 +139,7 @@ System::Clock::ClockBase * pRealClock           = nullptr;
 namespace chip {
 namespace app {
 
-class TestICDManager : public Test::LoopbackMessagingContext
+class TestICDManager : public LoopbackMessagingContext
 {
 public:
     /*
@@ -261,7 +261,7 @@ TEST_F(TestICDManager, TestICDModeDurationsWith0ActiveModeDurationWithoutActiveS
 {
     typedef ICDListener::ICDManagementEvents ICDMEvent;
     ICDConfigurationData & icdConfigData = ICDConfigurationData::GetInstance();
-    ICDConfigurationDataTestAccess privateIcdConfigData(&icdConfigData);
+    Testing::ICDConfigurationDataTestAccess privateIcdConfigData(&icdConfigData);
 
     using Feature = Clusters::IcdManagement::Feature;
     BitFlags<Feature> featureMap;
@@ -343,7 +343,7 @@ TEST_F(TestICDManager, TestICDModeDurationsWith0ActiveModeDurationWithActiveSub)
 {
     typedef ICDListener::ICDManagementEvents ICDMEvent;
     ICDConfigurationData & icdConfigData = ICDConfigurationData::GetInstance();
-    ICDConfigurationDataTestAccess privateIcdConfigData(&icdConfigData);
+    Testing::ICDConfigurationDataTestAccess privateIcdConfigData(&icdConfigData);
 
     using Feature = Clusters::IcdManagement::Feature;
     BitFlags<Feature> featureMap;
@@ -486,7 +486,7 @@ TEST_F(TestICDManager, TestICDMRegisterUnregisterEvents)
 {
     typedef ICDListener::ICDManagementEvents ICDMEvent;
     ICDNotifier notifier = ICDNotifier::GetInstance();
-    ICDConfigurationDataTestAccess privateIcdConfigData(&ICDConfigurationData::GetInstance());
+    Testing::ICDConfigurationDataTestAccess privateIcdConfigData(&ICDConfigurationData::GetInstance());
 
     using Feature = Clusters::IcdManagement::Feature;
     BitFlags<Feature> featureMap;
@@ -712,7 +712,7 @@ TEST_F(TestICDManager, TestICDMDSLS)
 {
     typedef ICDListener::ICDManagementEvents ICDMEvent;
     ICDNotifier notifier = ICDNotifier::GetInstance();
-    ICDConfigurationDataTestAccess privateIcdConfigData(&ICDConfigurationData::GetInstance());
+    Testing::ICDConfigurationDataTestAccess privateIcdConfigData(&ICDConfigurationData::GetInstance());
 
     using Feature = Clusters::IcdManagement::Feature;
     BitFlags<Feature> featureMap;
@@ -1002,7 +1002,7 @@ TEST_F(TestICDManager, TestICDStateObserverOnEnterActiveMode)
 TEST_F(TestICDManager, TestICDStateObserverOnICDModeChange)
 {
     typedef ICDListener::ICDManagementEvents ICDMEvent;
-    ICDConfigurationDataTestAccess privateIcdConfigData(&ICDConfigurationData::GetInstance());
+    Testing::ICDConfigurationDataTestAccess privateIcdConfigData(&ICDConfigurationData::GetInstance());
 
     using Feature = Clusters::IcdManagement::Feature;
     BitFlags<Feature> featureMap;
@@ -1051,7 +1051,7 @@ TEST_F(TestICDManager, TestICDStateObserverOnICDModeChange)
 
 TEST_F(TestICDManager, TestICDStateObserverOnICDModeChangeOnInit)
 {
-    ICDConfigurationDataTestAccess privateIcdConfigData(&ICDConfigurationData::GetInstance());
+    Testing::ICDConfigurationDataTestAccess privateIcdConfigData(&ICDConfigurationData::GetInstance());
 
     using Feature = Clusters::IcdManagement::Feature;
     BitFlags<Feature> featureMap;
@@ -1098,7 +1098,7 @@ TEST_F(TestICDManager, TestICDStateObserverOnICDModeChangeOnInit)
  */
 TEST_F(TestICDManager, TestICDStateObserverOnTransitionToIdleModeGreaterActiveModeDuration)
 {
-    ICDConfigurationDataTestAccess privateIcdConfigData(&ICDConfigurationData::GetInstance());
+    Testing::ICDConfigurationDataTestAccess privateIcdConfigData(&ICDConfigurationData::GetInstance());
 
     // Set New durations for test case - ActiveModeDuration must be longuer than ICD_ACTIVE_TIME_JITTER_MS
     Milliseconds32 oldActiveModeDuration = ICDConfigurationData::GetInstance().GetActiveModeDuration();
@@ -1149,7 +1149,7 @@ TEST_F(TestICDManager, TestICDStateObserverOnTransitionToIdleModeGreaterActiveMo
  */
 TEST_F(TestICDManager, TestICDStateObserverOnTransitionToIdleModeEqualActiveModeDuration)
 {
-    ICDConfigurationDataTestAccess privateIcdConfigData(&ICDConfigurationData::GetInstance());
+    Testing::ICDConfigurationDataTestAccess privateIcdConfigData(&ICDConfigurationData::GetInstance());
 
     // Set New durations for test case - ActiveModeDuration must be equal to ICD_ACTIVE_TIME_JITTER_MS
     Milliseconds32 oldActiveModeDuration = ICDConfigurationData::GetInstance().GetActiveModeDuration();
@@ -1182,7 +1182,7 @@ TEST_F(TestICDManager, TestICDStateObserverOnTransitionToIdleModeEqualActiveMode
  */
 TEST_F(TestICDManager, TestICDStateObserverOnTransitionToIdleMode0ActiveModeDurationWithoutReq)
 {
-    ICDConfigurationDataTestAccess privateIcdConfigData(&ICDConfigurationData::GetInstance());
+    Testing::ICDConfigurationDataTestAccess privateIcdConfigData(&ICDConfigurationData::GetInstance());
 
     // Set New durations for test case - ActiveModeDuration equal 0
     Milliseconds32 oldActiveModeDuration = ICDConfigurationData::GetInstance().GetActiveModeDuration();
@@ -1214,7 +1214,7 @@ TEST_F(TestICDManager, TestShortIdleModeBehaviorSITvsLIT)
 {
     using Feature                        = Clusters::IcdManagement::Feature;
     ICDConfigurationData & icdConfigData = ICDConfigurationData::GetInstance();
-    ICDConfigurationDataTestAccess privateIcdConfigData(&icdConfigData);
+    Testing::ICDConfigurationDataTestAccess privateIcdConfigData(&icdConfigData);
 
     // Save original values
     Seconds32 originalIdle        = icdConfigData.GetIdleModeDuration();

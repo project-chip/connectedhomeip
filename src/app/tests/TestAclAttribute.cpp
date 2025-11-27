@@ -163,7 +163,7 @@ public:
 namespace chip {
 namespace app {
 
-class TestAclAttribute : public Test::AppContext
+class TestAclAttribute : public AppContext
 {
 public:
     void SetUp() override

@@ -54,7 +54,7 @@ public:
     IOContext & GetIOContext() { return mIOContext; }
 
 private:
-    Test::IOContext mIOContext;
+    IOContext mIOContext;
     TransportMgr<chip::Transport::UDP> mTransportManager;
 };
 

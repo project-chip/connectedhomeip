@@ -53,15 +53,15 @@ constexpr chip::AttributeId kTestFieldId2 = 2;
 using namespace chip;
 using namespace chip::Access;
 
-const Test::MockNodeConfig & TestMockNodeConfig()
+const Testing::MockNodeConfig & TestMockNodeConfig()
 {
     using namespace chip::app;
     using namespace chip::app::Clusters::Globals::Attributes;
 
     // clang-format off
-    static const Test::MockNodeConfig config({
-        Test::MockEndpointConfig(kTestEndpointId, {
-            Test::MockClusterConfig(kTestClusterId, {
+    static const Testing::MockNodeConfig config({
+        Testing::MockEndpointConfig(kTestEndpointId, {
+            Testing::MockClusterConfig(kTestClusterId, {
                 ClusterRevision::Id, FeatureMap::Id,
                 kTestFieldId1, kTestFieldId2,
             }),

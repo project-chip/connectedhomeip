@@ -125,7 +125,7 @@ public:
 namespace chip {
 namespace app {
 
-class TestAclCommand : public Test::AppContext
+class TestAclCommand : public AppContext
 {
 public:
     void SetUp() override

@@ -55,7 +55,7 @@ chip::Credentials::GroupDataProviderImpl gGroupsProvider(kMaxGroupsPerFabric, kM
 namespace chip {
 namespace app {
 
-using namespace chip::Test;
+using namespace chip::Testing;
 
 const MockNodeConfig & TestMockNodeConfig()
 {
