@@ -131,38 +131,37 @@ class TC_CCTRL_2_2(MatterBaseTest):
         super().teardown_class()
 
     def steps_TC_CCTRL_2_2(self) -> list[TestStep]:
-        steps = [TestStep(1, "Get number of fabrics from TH_SERVER", is_commissioning=True),
-                 TestStep(2, "Reading Attribute VendorId from TH_SERVER"),
-                 TestStep(3, "Reading Attribute ProductId from TH_SERVER"),
-                 TestStep(4, "Reading Event CommissioningRequestResult from DUT"),
-                 TestStep(5, "Send CommissionNode command to DUT with CASE session"),
-                 TestStep(6, "Send OpenCommissioningWindow command on Administrator Commissioning Cluster to DUT with CASE session"),
-                 TestStep(7, "Send CommissionNode command to DUT with PASE session"),
-                 TestStep(8, "Send RequestCommissioningApproval command to DUT with PASE session"),
-                 TestStep(9, "Send RevokeCommissioning command on Administrator Commissioning Cluster to DUT with CASE session"),
-                 TestStep(10, "Reading Event CommissioningRequestResult from DUT, confirm no new events"),
-                 TestStep(11, "Send RequestCommissioningApproval command to DUT with CASE session with incorrect vendorID"),
-                 TestStep(12, "(Manual Step) Approve Commissioning Approval Request on DUT using method indicated by the manufacturer"),
-                 TestStep(13, "Reading Event CommissioningRequestResult from DUT, confirm one new event"),
-                 TestStep(14, "Send CommissionNode command to DUT with CASE session, with invalid RequestId"),
-                 TestStep(15, "Send CommissionNode command to DUT with CASE session, with invalid ResponseTimeoutSeconds too low"),
-                 TestStep(16, "Send CommissionNode command to DUT with CASE session, with invalid ResponseTimeoutSeconds too high"),
-                 TestStep(17, "Send CommissionNode command to DUT with CASE session, with valid parameters"),
-                 TestStep(18, "Send OpenCommissioningWindow command on Administrator Commissioning Cluster sent to TH_SERVER"),
-                 TestStep(19, "Wait for DUT to fail commissioning TH_SERVER, 30 seconds"),
-                 TestStep(20, "Get number of fabrics from TH_SERVER"),
-                 TestStep(21, "Send RevokeCommissioning command on Administrator Commissioning Cluster sent to TH_SERVER"),
-                 TestStep(22, "Send RequestCommissioningApproval command to DUT with CASE session with correct vendorID"),
-                 TestStep(23, "(Manual Step) Approve Commissioning Approval Request on DUT using method indicated by the manufacturer"),
-                 TestStep(24, "Reading Event CommissioningRequestResult from DUT, confirm one new event"),
-                 TestStep(25, "Send CommissionNode command to DUT with CASE session, with valid parameters"),
-                 TestStep(26, "Send OpenCommissioningWindow command on Administrator Commissioning Cluster sent to TH_SERVER"),
-                 TestStep(27, "Get number of fabrics from TH_SERVER, verify DUT successfully commissioned TH_SERVER (up to 30 seconds)")]
-
-        return steps
+        return [TestStep(1, "Get number of fabrics from TH_SERVER", is_commissioning=True),
+                TestStep(2, "Reading Attribute VendorId from TH_SERVER"),
+                TestStep(3, "Reading Attribute ProductId from TH_SERVER"),
+                TestStep(4, "Reading Event CommissioningRequestResult from DUT"),
+                TestStep(5, "Send CommissionNode command to DUT with CASE session"),
+                TestStep(6, "Send OpenCommissioningWindow command on Administrator Commissioning Cluster to DUT with CASE session"),
+                TestStep(7, "Send CommissionNode command to DUT with PASE session"),
+                TestStep(8, "Send RequestCommissioningApproval command to DUT with PASE session"),
+                TestStep(9, "Send RevokeCommissioning command on Administrator Commissioning Cluster to DUT with CASE session"),
+                TestStep(10, "Reading Event CommissioningRequestResult from DUT, confirm no new events"),
+                TestStep(11, "Send RequestCommissioningApproval command to DUT with CASE session with incorrect vendorID"),
+                TestStep(12, "(Manual Step) Approve Commissioning Approval Request on DUT using method indicated by the manufacturer"),
+                TestStep(13, "Reading Event CommissioningRequestResult from DUT, confirm one new event"),
+                TestStep(14, "Send CommissionNode command to DUT with CASE session, with invalid RequestId"),
+                TestStep(15, "Send CommissionNode command to DUT with CASE session, with invalid ResponseTimeoutSeconds too low"),
+                TestStep(16, "Send CommissionNode command to DUT with CASE session, with invalid ResponseTimeoutSeconds too high"),
+                TestStep(17, "Send CommissionNode command to DUT with CASE session, with valid parameters"),
+                TestStep(18, "Send OpenCommissioningWindow command on Administrator Commissioning Cluster sent to TH_SERVER"),
+                TestStep(19, "Wait for DUT to fail commissioning TH_SERVER, 30 seconds"),
+                TestStep(20, "Get number of fabrics from TH_SERVER"),
+                TestStep(21, "Send RevokeCommissioning command on Administrator Commissioning Cluster sent to TH_SERVER"),
+                TestStep(22, "Send RequestCommissioningApproval command to DUT with CASE session with correct vendorID"),
+                TestStep(23, "(Manual Step) Approve Commissioning Approval Request on DUT using method indicated by the manufacturer"),
+                TestStep(24, "Reading Event CommissioningRequestResult from DUT, confirm one new event"),
+                TestStep(25, "Send CommissionNode command to DUT with CASE session, with valid parameters"),
+                TestStep(26, "Send OpenCommissioningWindow command on Administrator Commissioning Cluster sent to TH_SERVER"),
+                TestStep(27, "Get number of fabrics from TH_SERVER, verify DUT successfully commissioned TH_SERVER (up to 30 seconds)")]
 
     # This test has some manual steps and also multiple sleeps for up to 30 seconds. Test typically runs
     # under 2 mins, so 4 minutes is more than enough.
+
     @property
     def default_timeout(self) -> int:
         return 4*60

@@ -106,3 +106,7 @@ void MatterUserLabelClusterShutdownCallback(chip::EndpointId endpointId);
 void MatterBooleanStateClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterBooleanStateClusterShutdownCallback(chip::EndpointId endpointId);
+
+void MatterBooleanStateConfigurationClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterBooleanStateConfigurationClusterShutdownCallback(chip::EndpointId endpointId);

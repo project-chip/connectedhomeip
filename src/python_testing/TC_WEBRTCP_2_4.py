@@ -56,7 +56,7 @@ class TC_WebRTCP_2_4(MatterBaseTest, WEBRTCPTestBase):
         """
         Define the step-by-step sequence for the test.
         """
-        steps = [
+        return [
             TestStep(1, "Read CurrentSessions attribute => expect 0", is_commissioning=True),
             TestStep(2, "Allocate Audio and Video Streams"),
             TestStep(3, "Send ProvideOffer with non‑existent WebRTCSessionID => expect NotFound error"),
@@ -65,13 +65,12 @@ class TC_WebRTCP_2_4(MatterBaseTest, WEBRTCPTestBase):
             TestStep(6, "Send ProvideOffer with (saved WebRTCSessionID + 1) => expect NotFound error"),
             TestStep(7, "Send ProvideOffer with saved WebRTCSessionID (re‑offer) => expect ProvideOfferResponse with same IDs"),
         ]
-        return steps
 
     def pics_TC_WebRTCP_2_4(self) -> list[str]:
         """
         Return the list of PICS applicable to this test case.
         """
-        pics = [
+        return [
             "WEBRTCP.S",           # WebRTC Transport Provider Server
             "WEBRTCP.S.A0000",     # CurrentSessions attribute
             "WEBRTCP.S.C02.Rsp",   # ProvideOffer command
@@ -80,7 +79,6 @@ class TC_WebRTCP_2_4(MatterBaseTest, WEBRTCPTestBase):
             "AVSM.S.F00",          # Audio Data Output feature
             "AVSM.S.F01",          # Video Data Output feature
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:

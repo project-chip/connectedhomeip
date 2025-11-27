@@ -46,59 +46,57 @@ class Esp32App(Enum):
     def ExamplePath(self):
         if self == Esp32App.ALL_CLUSTERS:
             return 'examples/all-clusters-app'
-        elif self == Esp32App.ALL_CLUSTERS_MINIMAL:
+        if self == Esp32App.ALL_CLUSTERS_MINIMAL:
             return 'examples/all-clusters-minimal-app'
-        elif self == Esp32App.ENERGY_GATEWAY:
+        if self == Esp32App.ENERGY_GATEWAY:
             return 'examples/energy-gateway-app'
-        elif self == Esp32App.ENERGY_MANAGEMENT:
+        if self == Esp32App.ENERGY_MANAGEMENT:
             return 'examples/energy-management-app'
-        elif self == Esp32App.LIGHT:
+        if self == Esp32App.LIGHT:
             return 'examples/lighting-app'
-        elif self == Esp32App.LOCK:
+        if self == Esp32App.LOCK:
             return 'examples/lock-app'
-        elif self == Esp32App.SHELL:
+        if self == Esp32App.SHELL:
             return 'examples/shell'
-        elif self == Esp32App.BRIDGE:
+        if self == Esp32App.BRIDGE:
             return 'examples/bridge-app'
-        elif self == Esp32App.TEMPERATURE_MEASUREMENT:
+        if self == Esp32App.TEMPERATURE_MEASUREMENT:
             return 'examples/temperature-measurement-app'
-        elif self == Esp32App.OTA_REQUESTOR:
+        if self == Esp32App.OTA_REQUESTOR:
             return 'examples/ota-requestor-app'
-        elif self == Esp32App.OTA_PROVIDER:
+        if self == Esp32App.OTA_PROVIDER:
             return 'examples/ota-provider-app'
-        elif self == Esp32App.TESTS:
+        if self == Esp32App.TESTS:
             return 'src/test_driver'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
     @property
     def AppNamePrefix(self):
         if self == Esp32App.ALL_CLUSTERS:
             return 'chip-all-clusters-app'
-        elif self == Esp32App.ALL_CLUSTERS_MINIMAL:
+        if self == Esp32App.ALL_CLUSTERS_MINIMAL:
             return 'chip-all-clusters-minimal-app'
-        elif self == Esp32App.ENERGY_GATEWAY:
+        if self == Esp32App.ENERGY_GATEWAY:
             return 'chip-energy-gateway-app'
-        elif self == Esp32App.ENERGY_MANAGEMENT:
+        if self == Esp32App.ENERGY_MANAGEMENT:
             return 'chip-energy-management-app'
-        elif self == Esp32App.LIGHT:
+        if self == Esp32App.LIGHT:
             return 'chip-lighting-app'
-        elif self == Esp32App.LOCK:
+        if self == Esp32App.LOCK:
             return 'chip-lock-app'
-        elif self == Esp32App.SHELL:
+        if self == Esp32App.SHELL:
             return 'chip-shell'
-        elif self == Esp32App.BRIDGE:
+        if self == Esp32App.BRIDGE:
             return 'chip-bridge-app'
-        elif self == Esp32App.TEMPERATURE_MEASUREMENT:
+        if self == Esp32App.TEMPERATURE_MEASUREMENT:
             return 'chip-temperature-measurement-app'
-        elif self == Esp32App.OTA_REQUESTOR:
+        if self == Esp32App.OTA_REQUESTOR:
             return 'chip-ota-requestor-app'
-        elif self == Esp32App.OTA_PROVIDER:
+        if self == Esp32App.OTA_PROVIDER:
             return 'chip-ota-provider-app'
-        elif self == Esp32App.TESTS:
+        if self == Esp32App.TESTS:
             return None
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
     @property
     def FlashBundleName(self):
@@ -110,10 +108,9 @@ class Esp32App(Enum):
     def IsCompatible(self, board: Esp32Board):
         if board == Esp32Board.QEMU:
             return self == Esp32App.TESTS
-        elif board == Esp32Board.C3DevKit:
+        if board == Esp32Board.C3DevKit:
             return self == Esp32App.ALL_CLUSTERS or self == Esp32App.ALL_CLUSTERS_MINIMAL
-        else:
-            return (board in {Esp32Board.M5Stack, Esp32Board.DevKitC}) and (self != Esp32App.TESTS)
+        return (board in {Esp32Board.M5Stack, Esp32Board.DevKitC}) and (self != Esp32App.TESTS)
 
 
 def DefaultsFileName(board: Esp32Board, app: Esp32App, enable_rpcs: bool):
@@ -125,13 +122,13 @@ def DefaultsFileName(board: Esp32Board, app: Esp32App, enable_rpcs: bool):
                         Esp32App.TEMPERATURE_MEASUREMENT}
     if app == Esp32App.TESTS:
         return 'sdkconfig_qemu.defaults'
-    elif app not in rpc_enabled_apps:
+    if app not in rpc_enabled_apps:
         return 'sdkconfig.defaults'
 
     rpc = "_rpc" if enable_rpcs else ""
     if board == Esp32Board.DevKitC or board == Esp32Board.C3DevKit:
         return 'sdkconfig{}.defaults'.format(rpc)
-    elif board == Esp32Board.M5Stack:
+    if board == Esp32Board.M5Stack:
         # a subset of apps have m5stack specific configurations. However others
         # just compile for the same devices as aDevKitC
         specific_apps = {
@@ -142,10 +139,8 @@ def DefaultsFileName(board: Esp32Board, app: Esp32App, enable_rpcs: bool):
         }
         if app in specific_apps:
             return 'sdkconfig_m5stack{}.defaults'.format(rpc)
-        else:
-            return 'sdkconfig{}.defaults'.format(rpc)
-    else:
-        raise Exception('Unknown board type')
+        return 'sdkconfig{}.defaults'.format(rpc)
+    raise Exception('Unknown board type')
 
 
 class Esp32Builder(Builder):
@@ -180,15 +175,13 @@ class Esp32Builder(Builder):
     def TargetName(self):
         if self.board == Esp32Board.C3DevKit:
             return 'esp32c3'
-        else:
-            return 'esp32'
+        return 'esp32'
 
     @property
     def TargetFileName(self) -> Optional[str]:
         if self.board == Esp32Board.C3DevKit:
             return 'sdkconfig.defaults.esp32c3'
-        else:
-            return None
+        return None
 
     @property
     def ExamplePath(self):

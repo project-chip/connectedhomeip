@@ -44,6 +44,7 @@
 #   good way to disambiguate
 #
 
+import contextlib
 import fnmatch
 import logging
 import re
@@ -57,14 +58,11 @@ import coloredlogs
 import cxxfilt
 import plotly.express as px
 
+log = logging.getLogger(__name__)
+
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
-__LOG_LEVELS__ = {
-    "debug": logging.DEBUG,
-    "info": logging.INFO,
-    "warn": logging.WARNING,
-    "fatal": logging.FATAL,
-}
+__LOG_LEVELS__ = logging.getLevelNamesMapping()
 
 
 __CHART_STYLES__ = {
@@ -139,11 +137,9 @@ def tree_display_name(name: str) -> list[str]:
     'emberAf' prefixes to make them common and uses 'vtable for' information
     """
 
-    try:
+    # Allow to display the name as-is in case of failure.
+    with contextlib.suppress(cxxfilt.InvalidName):
         name = cxxfilt.demangle(name)
-    except cxxfilt.InvalidName:
-        # Allow display of the name as-is
-        pass
 
     if name.startswith("non-virtual thunk to "):
         name = name[21:]
@@ -179,11 +175,10 @@ def tree_display_name(name: str) -> list[str]:
         if not m:
             continue
         d = m.groupdict()
-        logging.debug("Ember callback found: %s -> %r", name, d)
+        log.debug("Ember callback found: '%s' -> %r", name, d)
         if 'command' in d:
             return ["chip", "app", "Clusters", d['cluster'], "EMBER", d['command'], name]
-        else:
-            return ["chip", "app", "Clusters", d['cluster'], "EMBER", name]
+        return ["chip", "app", "Clusters", d['cluster'], "EMBER", name]
 
     if 'MatterPreAttributeChangeCallback' in name:
         return ["EMBER", "CALLBACKS", name]
@@ -663,7 +658,7 @@ def symbols_from_objdump(elf_file: str) -> list[Symbol]:
 
         if symbol_file_name not in sources:
             if symbol_file_name not in unknown_file_names:
-                logging.warning('Source %r is not known', symbol_file_name)
+                log.warning('Source %r is not known', symbol_file_name)
                 unknown_file_names.add(symbol_file_name)
             path = [captures['section'], 'UNKNOWN', symbol_file_name, captures['name']]
         else:
@@ -720,7 +715,7 @@ def symbols_from_nm(elf_file: str) -> list[Symbol]:
             "v",
             "V",
         }:
-            logging.debug("Found %s of size %d", name, size)
+            log.debug("Found '%s' of size %d", name, size)
             symbols.append(Symbol(name=name, symbol_type=t, size=size, tree_path=tree_display_name(name)))
         elif t in {
             # BSS - 0-initialized, not code
@@ -729,7 +724,7 @@ def symbols_from_nm(elf_file: str) -> list[Symbol]:
         }:
             pass
         else:
-            logging.error("SKIPPING SECTION %s", t)
+            log.error("SKIPPING SECTION '%s'", t)
 
     return symbols
 
