@@ -70,7 +70,7 @@ protected:
     void SetUp() override
     {
         // Initialize CHIP stack if needed
-        Platform::MemoryInit();
+        VerifyOrDie(Platform::MemoryInit() == CHIP_NO_ERROR);
     }
 
     void TearDown() override { Platform::MemoryShutdown(); }
@@ -130,13 +130,13 @@ TEST_F(TestCommodityTariffBaseDataClass, ScalarValueNoChangeDetection)
     CTC_BaseDataClass<uint32_t> data(1);
 
     // Set initial value
-    data.SetNewValue(42);
-    data.UpdateBegin(nullptr);
-    data.UpdateFinish(true);
+    EXPECT_EQ(data.SetNewValue(42), CHIP_NO_ERROR);
+    EXPECT_EQ(data.UpdateBegin(nullptr), CHIP_NO_ERROR);
+    EXPECT_TRUE(data.UpdateFinish(true));
 
     // Try to set same value again
-    data.SetNewValue(42);
-    data.UpdateBegin(nullptr);
+    EXPECT_EQ(data.SetNewValue(42), CHIP_NO_ERROR);
+    EXPECT_EQ(data.UpdateBegin(nullptr), CHIP_NO_ERROR);
     EXPECT_FALSE(data.UpdateFinish(true)); // Should return false (no change)
 }
 
@@ -147,18 +147,18 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableValueTransitions)
     constexpr uint32_t data_sample_2 = 0xad;
 
     // Set non-null value
-    data.CreateNewSingleValue();
+    EXPECT_EQ(data.CreateNewSingleValue(), CHIP_NO_ERROR);
     data.GetNewValue().SetNonNull(data_sample_1);
-    data.MarkAsAssigned();
-    data.UpdateBegin(nullptr);
+    EXPECT_EQ(data.MarkAsAssigned(), CHIP_NO_ERROR);
+    EXPECT_EQ(data.UpdateBegin(nullptr), CHIP_NO_ERROR);
     EXPECT_TRUE(data.UpdateFinish(true));
 
     EXPECT_FALSE(data.GetValue().IsNull());
     EXPECT_TRUE(data.HasValue());
     EXPECT_EQ(data.GetValue().Value(), data_sample_1);
 
-    data.SetNewValue(DataModel::MakeNullable(data_sample_2));
-    data.UpdateBegin(nullptr);
+    EXPECT_EQ(data.SetNewValue(DataModel::MakeNullable(data_sample_2)), CHIP_NO_ERROR);
+    EXPECT_EQ(data.UpdateBegin(nullptr), CHIP_NO_ERROR);
     EXPECT_TRUE(data.UpdateFinish(true));
 
     EXPECT_FALSE(data.GetValue().IsNull());
@@ -166,8 +166,8 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableValueTransitions)
     EXPECT_EQ(data.GetValue().Value(), data_sample_2);
 
     // Set to null
-    data.SetNewValue(std::nullopt);
-    data.UpdateBegin(nullptr);
+    EXPECT_EQ(data.SetNewValue(std::nullopt), CHIP_NO_ERROR);
+    EXPECT_EQ(data.UpdateBegin(nullptr), CHIP_NO_ERROR);
     EXPECT_TRUE(data.UpdateFinish(true));
 
     EXPECT_TRUE(data.GetValue().IsNull());
@@ -183,14 +183,14 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableSetNewValue)
     // Test setting null value
     newValue.SetNull();
     EXPECT_EQ(data.SetNewValue(newValue), CHIP_NO_ERROR);
-    data.UpdateBegin(nullptr);
-    data.UpdateFinish(true);
+    EXPECT_EQ(data.UpdateBegin(nullptr), CHIP_NO_ERROR);
+    EXPECT_FALSE(data.UpdateFinish(true));
     EXPECT_TRUE(data.GetValue().IsNull());
 
     // Test setting non-null value
     newValue.SetNonNull(data_sample);
     EXPECT_EQ(data.SetNewValue(newValue), CHIP_NO_ERROR);
-    data.UpdateBegin(nullptr);
+    EXPECT_EQ(data.UpdateBegin(nullptr), CHIP_NO_ERROR);
     EXPECT_TRUE(data.UpdateFinish(true));
     EXPECT_EQ(data.GetValue().Value(), data_sample);
 }
@@ -232,8 +232,8 @@ TEST_F(TestCommodityTariffBaseDataClass, StructValueHandling)
     MockStruct testStruct = { .field1 = sample_field_one, .field2 = sample_field_two };
 
     EXPECT_EQ(data.SetNewValue(testStruct), CHIP_NO_ERROR);
-    data.UpdateBegin(nullptr);
-    data.UpdateFinish(true);
+    EXPECT_EQ(data.UpdateBegin(nullptr), CHIP_NO_ERROR);
+    EXPECT_TRUE(data.UpdateFinish(true));
 
     EXPECT_EQ(data.GetValue().field1, sample_field_one);
     EXPECT_EQ(data.GetValue().field2, sample_field_two);
@@ -271,8 +271,8 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableStructValueHandling)
     newValue.SetNonNull(testStruct);
 
     EXPECT_EQ(data.SetNewValue(newValue), CHIP_NO_ERROR);
-    data.UpdateBegin(nullptr);
-    data.UpdateFinish(true);
+    EXPECT_EQ(data.UpdateBegin(nullptr), CHIP_NO_ERROR);
+    EXPECT_TRUE(data.UpdateFinish(true));
 
     EXPECT_EQ(data.GetValue().Value().field1, sample_field_one);
     EXPECT_EQ(data.GetValue().Value().field2, sample_field_two);
@@ -292,7 +292,7 @@ TEST_F(TestCommodityTariffBaseDataClass, ListValueCreationAndCleanup)
     const DataModel::List<uint32_t> ListSample = DataModel::List<uint32_t>(SampleArr, SampleListLen);
 
     EXPECT_EQ(data.SetNewValue(ListSample), CHIP_NO_ERROR);
-    data.UpdateBegin(nullptr);
+    EXPECT_EQ(data.UpdateBegin(nullptr), CHIP_NO_ERROR);
     EXPECT_TRUE(data.UpdateFinish(true));
 
     EXPECT_EQ(data.GetValue().size(), SampleListLen);
@@ -311,20 +311,20 @@ TEST_F(TestCommodityTariffBaseDataClass, ListValueMemoryManagement)
     // Test that memory is properly freed
     void * originalPtr = nullptr;
 
-    data.CreateNewListValue(100);
+    EXPECT_EQ(data.CreateNewListValue(100), CHIP_NO_ERROR);
     originalPtr = data.GetNewValue().data();
-    data.MarkAsAssigned();
-    data.UpdateBegin(nullptr);
-    data.UpdateFinish(true);
+    EXPECT_EQ(data.MarkAsAssigned(), CHIP_NO_ERROR);
+    EXPECT_EQ(data.UpdateBegin(nullptr), CHIP_NO_ERROR);
+    EXPECT_TRUE(data.UpdateFinish(true));
 
     // Create new list - should free old memory
-    data.CreateNewListValue(50);
+    EXPECT_EQ(data.CreateNewListValue(50), CHIP_NO_ERROR);
     // Memory should be different (old was freed)
     EXPECT_NE(data.GetNewValue().data(), originalPtr);
 
     // Cleanup without commit
-    data.MarkAsAssigned();
-    data.UpdateBegin(nullptr);
+    EXPECT_EQ(data.MarkAsAssigned(), CHIP_NO_ERROR);
+    EXPECT_EQ(data.UpdateBegin(nullptr), CHIP_NO_ERROR);
     EXPECT_FALSE(data.UpdateFinish(false)); // Don't commit - should cleanup
     EXPECT_EQ(data.GetNewValue().data(), nullptr);
 }
@@ -353,7 +353,7 @@ TEST_F(TestCommodityTariffBaseDataClass, DoubleUpdatePrevention)
     CTC_BaseDataClass<uint32_t> data(1);
 
     // Start first update
-    data.CreateNewSingleValue();
+    EXPECT_EQ(data.CreateNewSingleValue(), CHIP_NO_ERROR);
 
     // Should fail - already in update
     EXPECT_EQ(data.CreateNewSingleValue(), CHIP_ERROR_INCORRECT_STATE);
@@ -474,8 +474,8 @@ CHIP_ERROR CTC_BaseDataClass<ComplexType>::CopyData(const StructType & input, St
 {
     output.id = input.id;
 
-    output.fillLabel(input.label);
-    output.fillList(input.nestedList);
+    EXPECT_EQ(output.fillLabel(input.label), CHIP_NO_ERROR);
+    EXPECT_EQ(output.fillList(input.nestedList), CHIP_NO_ERROR);
 
     return CHIP_NO_ERROR;
 }
@@ -524,7 +524,7 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_CreationA
 
     EXPECT_EQ(data.SetNewValue(sourceValue), CHIP_NO_ERROR);
 
-    data.UpdateBegin(nullptr);
+    EXPECT_EQ(data.UpdateBegin(nullptr), CHIP_NO_ERROR);
     EXPECT_TRUE(data.UpdateFinish(true));
 
     // Verify data was copied correctly
@@ -557,19 +557,19 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_NullTrans
     CharSpan testCharSpan = CharSpan::fromCharString(TEST_STR_SAMPLE_2);
 
     // First set non-null with resources
-    data.CreateNewListValue(1);
+    EXPECT_EQ(data.CreateNewListValue(1), CHIP_NO_ERROR);
     data.GetNewValue().Value()[0].id = 1;
-    data.GetNewValue().Value()[0].fillLabel(testCharSpan);
+    EXPECT_EQ(data.GetNewValue().Value()[0].fillLabel(testCharSpan), CHIP_NO_ERROR);
 
-    data.MarkAsAssigned();
-    data.UpdateBegin(nullptr);
+    EXPECT_EQ(data.MarkAsAssigned(), CHIP_NO_ERROR);
+    EXPECT_EQ(data.UpdateBegin(nullptr), CHIP_NO_ERROR);
     EXPECT_TRUE(data.UpdateFinish(true));
 
     EXPECT_FALSE(data.GetValue().IsNull());
 
     // Transition to null - should cleanup all resources
-    data.SetNewValue(std::nullopt);
-    data.UpdateBegin(nullptr);
+    EXPECT_EQ(data.SetNewValue(std::nullopt), CHIP_NO_ERROR);
+    EXPECT_EQ(data.UpdateBegin(nullptr), CHIP_NO_ERROR);
     EXPECT_TRUE(data.UpdateFinish(true));
 
     EXPECT_TRUE(data.GetValue().IsNull());
@@ -582,7 +582,7 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_UpdateRej
     CTC_BaseDataClass<ComplexType> data(1);
 
     // Create resource-intensive update but reject it
-    data.CreateNewListValue(3);
+    EXPECT_EQ(data.CreateNewListValue(3), CHIP_NO_ERROR);
 
     for (uint32_t i = 0; i < mItemsCount; i++)
     {
@@ -591,15 +591,15 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_UpdateRej
 
         data.GetNewValue().Value()[i].id = i;
         sprintf(tmpStrBuf, "resource_%" PRIu32 "", i);
-        data.GetNewValue().Value()[i].fillLabel(tmpCharSpan);
+        EXPECT_EQ(data.GetNewValue().Value()[i].fillLabel(tmpCharSpan), CHIP_NO_ERROR);
     }
 
-    data.MarkAsAssigned();
+    EXPECT_EQ(data.MarkAsAssigned(), CHIP_NO_ERROR);
 
     EXPECT_TRUE(data.HasNewValue());
     EXPECT_FALSE(data.HasValue());
 
-    data.UpdateBegin(nullptr);
+    EXPECT_EQ(data.UpdateBegin(nullptr), CHIP_NO_ERROR);
 
     EXPECT_FALSE(data.GetNewValue().IsNull());
     EXPECT_TRUE(data.GetValue().IsNull());
@@ -623,8 +623,8 @@ TEST_F(TestCommodityTariffBaseDataClass, NullableListOfResourceStructs_ZeroSizeL
     EXPECT_EQ(data.CreateNewListValue(0), CHIP_ERROR_INVALID_LIST_LENGTH);
     EXPECT_TRUE(data.GetNewValue().IsNull()); // Should be null for zero size
 
-    data.MarkAsAssigned();
-    data.UpdateBegin(nullptr);
+    EXPECT_EQ(data.MarkAsAssigned(), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(data.UpdateBegin(nullptr), CHIP_NO_ERROR);
     EXPECT_FALSE(data.UpdateFinish(true));
 
     EXPECT_TRUE(data.GetValue().IsNull());
