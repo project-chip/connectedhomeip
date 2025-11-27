@@ -161,7 +161,7 @@ project's Slack channel.
             (`#ifdef`) throughout the code. This is undesirable because it makes
             it difficult to change the behavior of an application in runtime.
             When possible, avoid maintaining this pattern and think of new ways
-            this could be achieved, either using subclasses or configuration
+            this could be achieved, either using sub classes or configuration
             injected via constructor.
 
 ### Part 3: Configuration and Integration
