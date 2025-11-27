@@ -1359,7 +1359,7 @@ async def _get_all_matching_endpoints(self: MatterBaseTest, accept_function: End
         Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
         Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)
     ])
-    return [e for e in wildcard.attributes.keys()
+    return [e for e in wildcard.attributes
             if accept_function(wildcard, e)]
 
 

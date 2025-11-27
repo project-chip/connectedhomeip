@@ -27,8 +27,8 @@ from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_cl
 
 
 def get_changes(old, new):
-    added = [e.name for id, e in new.items() if id not in old.keys()]
-    removed = [e.name for id, e in old.items() if id not in new.keys()]
+    added = [e.name for id, e in new.items() if id not in old]
+    removed = [e.name for id, e in old.items() if id not in new]
     same_ids = set(new.keys()).intersection(set(old.keys()))
 
     return added, removed, same_ids

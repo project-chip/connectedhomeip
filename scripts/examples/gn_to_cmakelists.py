@@ -751,7 +751,7 @@ def WriteProject(project):
         posixpath.join(project.build_path, "empty.cpp")))
     out.write('")\n')
 
-    for target_name in project.targets.keys():
+    for target_name in project.targets:
         out.write('\n')
         WriteTarget(out, Target(target_name, project), project)
 

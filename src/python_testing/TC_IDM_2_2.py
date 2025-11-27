@@ -221,7 +221,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             # Verify that returned attributes match the AttributeList
             # DataVersion is excluded as it is metadata and not a real attribute
             if global_attribute_ids.cluster_id_type(cluster.id) == global_attribute_ids.ClusterIdType.kStandard:
-                returned_attrs = sorted([x.attribute_id for x in read_request[endpoint][cluster].keys()
+                returned_attrs = sorted([x.attribute_id for x in read_request[endpoint][cluster]
                                          if x != Clusters.Attribute.DataVersion])
                 attr_list = sorted(read_request[endpoint][cluster][cluster.Attributes.AttributeList])
                 asserts.assert_equal(
@@ -237,7 +237,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                           read_request[endpoint][Clusters.Descriptor], "ServerList not in output")
 
         # Verify that returned clusters match the ServerList
-        returned_cluster_ids = sorted([cluster.id for cluster in read_request[endpoint].keys()])
+        returned_cluster_ids = sorted([cluster.id for cluster in read_request[endpoint]])
         server_list = sorted(read_request[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList])
         asserts.assert_equal(
             returned_cluster_ids,
@@ -245,7 +245,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             f"Returned cluster IDs {returned_cluster_ids} don't match ServerList {server_list} for endpoint {endpoint}")
 
         for cluster in read_request[endpoint]:
-            attribute_ids = [a.attribute_id for a in read_request[endpoint][cluster].keys()
+            attribute_ids = [a.attribute_id for a in read_request[endpoint][cluster]
                              if a != Clusters.Attribute.DataVersion]
             asserts.assert_equal(
                 sorted(attribute_ids),
@@ -270,12 +270,10 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         # Get all standard clusters supported on all endpoints
         supported_cluster_ids = set()
         for endpoint_clusters in self.endpoints.values():
-            supported_cluster_ids.update({cluster.id for cluster in endpoint_clusters.keys(
-            ) if global_attribute_ids.cluster_id_type(cluster.id) == global_attribute_ids.ClusterIdType.kStandard})
+            supported_cluster_ids.update({cluster.id for cluster in endpoint_clusters if global_attribute_ids.cluster_id_type(cluster.id) == global_attribute_ids.ClusterIdType.kStandard})
 
         # Get all possible standard clusters
-        all_standard_cluster_ids = {cluster_id for cluster_id in ClusterObjects.ALL_CLUSTERS.keys(
-        ) if global_attribute_ids.cluster_id_type(cluster_id) == global_attribute_ids.ClusterIdType.kStandard}
+        all_standard_cluster_ids = {cluster_id for cluster_id in ClusterObjects.ALL_CLUSTERS if global_attribute_ids.cluster_id_type(cluster_id) == global_attribute_ids.ClusterIdType.kStandard}
 
         # Find unsupported clusters
         unsupported_cluster_ids = all_standard_cluster_ids - supported_cluster_ids
@@ -295,7 +293,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
         # Test the unsupported cluster on all available endpoints
         # It should return UnsupportedCluster error from all endpoints
-        for endpoint_id in self.endpoints.keys():
+        for endpoint_id in self.endpoints:
             result = await self.read_single_attribute_expect_error(
                 endpoint=endpoint_id,
                 cluster=unsupported_cluster,
