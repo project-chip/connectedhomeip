@@ -39,6 +39,7 @@
 #       --string-arg provider_app_path:${OTA_PROVIDER_APP}
 #       --string-arg ota_image:${SU_OTA_REQUESTOR_V2}
 #       --int-arg ota_image_expected_version:2
+#       --int-arg ota_image_download_timeout:360
 #       --tests test_TC_SU_2_7_1
 #     factory-reset: true
 #     quiet: true
@@ -98,6 +99,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
     provider_discriminator = 321
     provider_setup_pincode = 2321
     requestor_node_id = None
+    ota_image_download_timeout = 0
 
     def all_steps(self) -> list[TestStep]:
         steps = [
@@ -140,6 +142,13 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         self.provider_port = self.user_params.get('ota_provider_port', 5541)
         self.provider_kvs_path = self.user_params.get('provider_kvs_path', '/tmp/chip_kvs_provider')
         self.provider_log = self.user_params.get('provider_log_path', '/tmp/provider_2_7.log')
+        # On average the ota image build for the CI is 1.8 MB which takes 4-6 min to download. Adjust time if needed.
+        self.ota_image_download_timeout = self.user_params.get('ota_image_download_timeout', 60*6)
+        logger.info(f"Image download timeout is set to {self.ota_image_download_timeout} seconds")
+
+        # Only verify for first part.
+        if self.current_test_info.name == 'test_TC_SU_2_7_1' and self.ota_image_download_timeout <= 0:
+            asserts.fail("Invalid value for --int-arg ota_image_download_timeout:<seconds> value provided, must be equal or greater than 1.")
 
         # Only verify for first part.
         if self.current_test_info.name == 'test_TC_SU_2_7_1' and not self.expected_software_version:
@@ -204,14 +213,17 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         await self.create_acl_entry(dev_ctrl=controller, provider_node_id=self.provider_node_id, requestor_node_id=self.requestor_node_id)
 
         self.step(1)
+
+        # Set the time interval based on the ota_image_download_timeout
+        max_interval = self.ota_image_download_timeout + 60
         # Craete event subcriber for basicinformation cluster
         basicinformation_handler = EventSubscriptionHandler(
             expected_cluster=Clusters.BasicInformation, expected_event_id=Clusters.BasicInformation.Events.ShutDown.event_id)
-        await basicinformation_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=420)
+        await basicinformation_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=max_interval)
         # Create event subscriber for StateTransition
         state_transition_event_handler = EventSubscriptionHandler(
             expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.StateTransition.event_id)
-        await state_transition_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=420)
+        await state_transition_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=max_interval)
         await self.announce_ota_provider(controller, self.provider_node_id, self.requestor_node_id)
         # Register event, should change to Querying
         event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=5)
@@ -226,7 +238,8 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
                                            self.ota_req.Enums.UpdateStateEnum.kDownloading, expected_target_version=self.expected_software_version)
 
         # Event for Applying
-        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60*5)
+        event_report = state_transition_event_handler.wait_for_event_report(
+            self.ota_req.Events.StateTransition, timeout_sec=self.ota_image_download_timeout)
         logger.info(f"Event report for Applying {event_report}")
         self.verify_state_transition_event(event_report, self.ota_req.Enums.UpdateStateEnum.kDownloading,
                                            self.ota_req.Enums.UpdateStateEnum.kApplying, expected_target_version=self.expected_software_version)
@@ -389,13 +402,14 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
             timeout=10
         )
         # EventHandlers
+        max_interval_basic = self.ota_image_download_timeout + 120
         update_state_attr_handler = AttributeSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
             expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
         )
         basicinformation_handler = EventSubscriptionHandler(
             expected_cluster=Clusters.BasicInformation, expected_event_id=Clusters.BasicInformation.Events.ShutDown.event_id)
-        await basicinformation_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=60*8)
+        await basicinformation_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=max_interval_basic)
         await update_state_attr_handler.start(dev_ctrl=controller, node_id=self.requestor_node_id, endpoint=0,
                                               fabric_filtered=False, min_interval_sec=0, max_interval_sec=5)
         await self.announce_ota_provider(controller, self.provider_node_id, self.requestor_node_id)
@@ -407,9 +421,10 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         await update_state_attr_handler.cancel()
         state_transition_event_handler = EventSubscriptionHandler(
             expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.StateTransition.event_id)
-        await state_transition_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=60*12)
+        await state_transition_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=max_interval)
         # Download complete then Applying
-        event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=60*5)
+        event_report = state_transition_event_handler.wait_for_event_report(
+            self.ota_req.Events.StateTransition, timeout_sec=self.ota_image_download_timeout)
         logger.info(f"Event report: {event_report}")
         asserts.assert_equal(event_report.newState, self.ota_req.Enums.UpdateStateEnum.kApplying)
 
@@ -491,7 +506,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
         await self.set_default_ota_providers_list(controller=controller, provider_node_id=self.provider_node_id, endpoint=0, requestor_node_id=self.requestor_node_id)
         state_transition_event_handler = EventSubscriptionHandler(
             expected_cluster=self.ota_req, expected_event_id=self.ota_req.Events.StateTransition.event_id)
-        await state_transition_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=60*6)
+        await state_transition_event_handler.start(controller, self.requestor_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=90)
         await self.announce_ota_provider(controller, self.provider_node_id, self.requestor_node_id)
         event_report = state_transition_event_handler.wait_for_event_report(self.ota_req.Events.StateTransition, timeout_sec=30)
         self.verify_state_transition_event(event_report, expected_previous_state=self.ota_req.Enums.UpdateStateEnum.kIdle,
