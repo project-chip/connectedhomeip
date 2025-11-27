@@ -106,6 +106,8 @@ class TC_BOOLCFG_3_1(MatterBaseTest):
 
         self.step(3)
         numberOfSupportedLevels = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.SupportedSensitivityLevels)
+        asserts.assert_greater_equal(numberOfSupportedLevels, 2,
+                                     "SupportedSensitivityLevels must be greater or equal than 2 when SENSLVL feature is supported")
 
         self.step(4)
         if attributes.DefaultSensitivityLevel.attribute_id in attribute_list:
@@ -124,13 +126,10 @@ class TC_BOOLCFG_3_1(MatterBaseTest):
 
         self.step(7)
         if attributes.DefaultSensitivityLevel.attribute_id in attribute_list:
-            if numberOfSupportedLevels > 1:
-                selected_non_default_level = choice([i for i in range(numberOfSupportedLevels) if i not in [default_level]])
-                logging.info(f"Write non-default sensitivity level ({selected_non_default_level}) to CurrentSensitivityLevel)")
-                result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attributes.CurrentSensitivityLevel(selected_non_default_level))])
-                asserts.assert_equal(result[0].Status, Status.Success, "CurrentSensitivityLevel write failed")
-            else:
-                logging.info("Only one sensitivity level supported, step 7 not applicable")
+            selected_non_default_level = choice([i for i in range(numberOfSupportedLevels) if i not in [default_level]])
+            logging.info(f"Write non-default sensitivity level ({selected_non_default_level}) to CurrentSensitivityLevel)")
+            result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attributes.CurrentSensitivityLevel(selected_non_default_level))])
+            asserts.assert_equal(result[0].Status, Status.Success, "CurrentSensitivityLevel write failed")
 
         self.step(8)
         if attributes.DefaultSensitivityLevel.attribute_id in attribute_list:
