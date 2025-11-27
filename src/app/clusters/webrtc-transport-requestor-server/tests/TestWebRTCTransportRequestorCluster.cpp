@@ -17,7 +17,7 @@
 
 #include <app/CommandHandler.h>
 #include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-cluster.h>
+#include <app/clusters/webrtc-transport-requestor-server/WebRTCTransportRequestorCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model/Decode.h>
 #include <app/server-cluster/DefaultServerCluster.h>

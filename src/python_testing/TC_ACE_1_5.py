@@ -50,8 +50,7 @@ class TC_ACE_1_5(MatterBaseTest):
     async def read_currentfabricindex(self, th: ChipDeviceCtrl) -> int:
         cluster = Clusters.Objects.OperationalCredentials
         attribute = Clusters.OperationalCredentials.Attributes.CurrentFabricIndex
-        current_fabric_index = await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
-        return current_fabric_index
+        return await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
 
     async def write_acl(self, acl: Clusters.AccessControl, th: ChipDeviceCtrl):
         result = await th.WriteAttribute(self.dut_node_id, [(0, Clusters.AccessControl.Attributes.Acl(acl))])

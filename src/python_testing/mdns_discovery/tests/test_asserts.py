@@ -701,6 +701,7 @@ class TestAssertValidIPv6Addresses(unittest.TestCase):
         except (AssertionError, signals.TestFailure) as e:
             return str(e)
         self.fail("Expected failure but assertion passed")
+        return None
 
     def test_valid_single_address(self):
         # Single valid IPv6 address should pass
@@ -1564,6 +1565,7 @@ class TestAssertValidTKey(unittest.TestCase):
         except (AssertionError, signals.TestFailure) as e:
             return str(e)
         self.fail("Expected failure but assertion passed")
+        return None
 
     def test_valid_values_strict(self):
         # In strict mode, only "0" should pass

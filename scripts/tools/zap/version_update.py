@@ -105,7 +105,7 @@ def version_update(log_level, update, new_version):
         #
         # This makes every group element (date section) to a base 10 integer,
         # so for 'v2023.01.11-nightly' this gets (2023, 1, 11)
-        zap_min_version = tuple((int(x, 10) for x in parsed.groups()[:3]))
+        zap_min_version = tuple(int(x, 10) for x in parsed.groups()[:3])
 
     files_to_update = []
     if UpdateChoice.USAGE in update:

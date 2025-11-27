@@ -85,7 +85,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
         return "[TC-CLCTRL-4.4] MoveTo Command CountdownTime with Server as DUT"
 
     def steps_TC_CLCTRL_4_4(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read the AttributeList attribute to determine supported attributes",
                      "AttributeList of the ClosureControl cluster is returned by the DUT"),
@@ -128,13 +128,11 @@ class TC_CLCTRL_4_4(MatterBaseTest):
             TestStep("5e", "Wait until a subscription report with MainState is received", "MainState should be Stopped"),
             TestStep("5f", "Read the CountdownTime attribute", "CountdownTime should be 0"),
         ]
-        return steps
 
     def pics_TC_CLCTRL_4_4(self) -> list[str]:
-        pics = [
+        return [
             "CLCTRL.S", "CLCTRL.S.A0000"
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:
