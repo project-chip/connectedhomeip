@@ -256,9 +256,9 @@ class MyPostCommissioningListener : public PostCommissioningListener
         Optional<SessionHandle> opt   = mSecureSession.Get();
         SessionHandle & sessionHandle = opt.Value();
         auto rotatingIdSpan           = CharSpan{ mRotatingId.data(), mRotatingId.size() };
-        ContentAppPlatform::GetInstance().ManageClientAccess(*mExchangeMgr, sessionHandle, mVendorId, mProductId, localNodeId,
-                                                             rotatingIdSpan, mPasscode, bindings, OnSuccessResponse,
-                                                             OnFailureResponse);
+        TEMPORARY_RETURN_IGNORED ContentAppPlatform::GetInstance().ManageClientAccess(
+            *mExchangeMgr, sessionHandle, mVendorId, mProductId, localNodeId, rotatingIdSpan, mPasscode, bindings,
+            OnSuccessResponse, OnFailureResponse);
         clearContext();
     }
 
@@ -716,8 +716,8 @@ void ContentAppFactoryImpl::InstallContentApp(uint16_t vendorId, uint16_t produc
 
         std::shared_ptr<DevicePairedCommand> pairingCommand = std::make_shared<DevicePairedCommand>(vendorId, productId, nodeId);
 
-        GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
-                                                    &pairingCommand->mOnDeviceConnectionFailureCallback);
+        TEMPORARY_RETURN_IGNORED GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
+                                                                             &pairingCommand->mOnDeviceConnectionFailureCallback);
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 }

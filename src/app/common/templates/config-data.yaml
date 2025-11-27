@@ -29,6 +29,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Administrator Commissioning
     - Basic Information
     - Boolean State
+    - Boolean State Configuration
     - Camera AV Settings User Level Management
     - Camera AV Stream Management
     - Chime
@@ -98,7 +99,6 @@ ClustersWithInitFunctions:
     - Groups
     - Level Control
     - Mode Select
-    - Occupancy Sensing
     - On/Off
     - Pump Configuration and Control
     - Sample MEI
@@ -151,6 +151,7 @@ CodeDrivenClusters:
     - Basic Information
     - Binding
     - Boolean State
+    - Boolean State Configuration
     - Descriptor
     - Diagnostic Logs
     - Ethernet Network Diagnostics
@@ -164,6 +165,7 @@ CodeDrivenClusters:
     - Illuminance Measurement
     - Localization Configuration
     - OTA Software Update Provider
+    - Occupancy Sensing
     - Operational Credentials
     - Push AV Stream Transport
     - Software Diagnostics

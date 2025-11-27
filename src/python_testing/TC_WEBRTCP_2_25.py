@@ -57,7 +57,7 @@ class TC_WEBRTCP_2_25(MatterBaseTest, WEBRTCPTestBase):
         return "[TC-WEBRTCP-2.25] Validate ProvideOffer SFrame configuration handling"
 
     def steps_TC_WEBRTCP_2_25(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("precondition", "DUT commissioned", is_commissioning=True),
             TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
                      "DUT responds with success and provides stream IDs"),
@@ -72,10 +72,9 @@ class TC_WEBRTCP_2_25(MatterBaseTest, WEBRTCPTestBase):
             TestStep(6, "TH deallocates the Audio and Video streams via AudioStreamDeallocate and VideoStreamDeallocate commands",
                      "DUT responds with success status code for both deallocate commands"),
         ]
-        return steps
 
     def pics_TC_WEBRTCP_2_25(self) -> list[str]:
-        pics = [
+        return [
             "WEBRTCP.S",
             "WEBRTCP.S.F02",       # SFrame End-to-End Encryption feature
             "WEBRTCP.S.C00.Rsp",   # SolicitOffer command
@@ -83,7 +82,10 @@ class TC_WEBRTCP_2_25(MatterBaseTest, WEBRTCPTestBase):
             "AVSM.S.F00",          # Audio Data Output feature
             "AVSM.S.F01",          # Video Data Output feature
         ]
-        return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_WEBRTCP_2_25(self):
@@ -93,7 +95,7 @@ class TC_WEBRTCP_2_25(MatterBaseTest, WEBRTCPTestBase):
 
         self.step("precondition")
         # Commission DUT - already done
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         # SFrame cipher suite constants (from SFrame RFC)
         CIPHER_SUITE_AES_128_GCM = 0x0001

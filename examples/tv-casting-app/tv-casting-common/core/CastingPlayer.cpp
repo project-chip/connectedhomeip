@@ -168,7 +168,7 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
                             //
                             // persist the TargetCastingPlayer information into the CastingStore and call mOnCompleted()
                             support::EndpointListLoader::GetInstance()->Initialize(&exchangeMgr, &sessionHandle);
-                            support::EndpointListLoader::GetInstance()->Load();
+                            TEMPORARY_RETURN_IGNORED support::EndpointListLoader::GetInstance()->Load();
                         },
                         [](void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error) {
                             ChipLogError(AppServer,
@@ -199,7 +199,7 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
         ChipLogProgress(AppServer, "CastingPlayer::VerifyOrEstablishConnection() Forcing expiry of armed FailSafe timer");
         // ChipDeviceEventHandler will handle the kFailSafeTimerExpired event by Opening the Basic Commissioning Window and Sending
         // the User Directed Commissioning Request
-        support::ChipDeviceEventHandler::SetUdcStatus(false);
+        TEMPORARY_RETURN_IGNORED support::ChipDeviceEventHandler::SetUdcStatus(false);
         chip::Server::GetInstance().GetFailSafeContext().ForceFailSafeTimerExpiry();
     }
     else
@@ -301,7 +301,7 @@ CHIP_ERROR CastingPlayer::StopConnecting(bool shouldSendIdentificationDeclaratio
     // CastingPlayer/Commissioner.
     if (support::ChipDeviceEventHandler::isUdcInProgress())
     {
-        support::ChipDeviceEventHandler::SetUdcStatus(false);
+        TEMPORARY_RETURN_IGNORED support::ChipDeviceEventHandler::SetUdcStatus(false);
     }
 
     ChipLogProgress(AppServer,
@@ -320,7 +320,7 @@ CHIP_ERROR CastingPlayer::StopConnecting(bool shouldSendIdentificationDeclaratio
     // CastingPlayer::SendUserDirectedCommissioningRequest() calls SetUdcStatus(true) before sending the UDC
     // IdentificationDeclaration message. Since StopConnecting() is attempting to cancel the commissioning process, we need to set
     // the UDC status to false after sending the message.
-    support::ChipDeviceEventHandler::SetUdcStatus(false);
+    TEMPORARY_RETURN_IGNORED support::ChipDeviceEventHandler::SetUdcStatus(false);
 
     ChipLogProgress(AppServer, "CastingPlayer::StopConnecting() User Directed Commissioning stopped");
     return err;
@@ -329,7 +329,7 @@ CHIP_ERROR CastingPlayer::StopConnecting(bool shouldSendIdentificationDeclaratio
 void CastingPlayer::resetState(CHIP_ERROR err)
 {
     ChipLogProgress(AppServer, "CastingPlayer::resetState()");
-    support::ChipDeviceEventHandler::SetUdcStatus(false);
+    TEMPORARY_RETURN_IGNORED support::ChipDeviceEventHandler::SetUdcStatus(false);
     mConnectionState               = CASTING_PLAYER_NOT_CONNECTED;
     mCommissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec;
 
@@ -360,7 +360,7 @@ void CastingPlayer::Disconnect()
 void CastingPlayer::RemoveFabric()
 {
     ChipLogProgress(AppServer, "CastingPlayer::RemoveFabric()");
-    chip::Server::GetInstance().GetFabricTable().Delete(mAttributes.fabricIndex);
+    TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().GetFabricTable().Delete(mAttributes.fabricIndex);
     mAttributes.fabricIndex = 0;
     mAttributes.nodeId      = 0;
 

@@ -87,10 +87,8 @@ REPORT_BY_CONFIG: ConfigDescription = {
 
 
 def demangle(symbol: str):
-    try:
+    with contextlib.suppress(cxxfilt.InvalidName):
         symbol = cxxfilt.demangle(symbol, external_only=False)
-    except cxxfilt.InvalidName:
-        pass
     return symbol
 
 

@@ -157,10 +157,7 @@ class ValidateMandatoryClusterParam(Mutator):
         if (self._param_key != "commands") and (not candidate.get("enabled")):
             return False
 
-        if self._cluster_specific_code is not None and self._cluster_specific_code != candidate["code"]:
-            return False
-
-        return True
+        return not (self._cluster_specific_code is not None and self._cluster_specific_code != candidate["code"])
 
     def _attributeSpecificChecks(self, param: object, cluster_name):
         if not param["included"]:

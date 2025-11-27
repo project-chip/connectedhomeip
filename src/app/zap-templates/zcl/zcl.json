@@ -330,7 +330,7 @@
             "UpTime",
             "TotalOperationalHours",
             "BootReason",
-            "FeatureMap",
+            "DeviceLoadStatus",
             "ClusterRevision"
         ],
         "Group Key Management": [
@@ -394,7 +394,6 @@
             "PIROccupiedToUnoccupiedDelay",
             "UltrasonicOccupiedToUnoccupiedDelay",
             "PhysicalContactOccupiedToUnoccupiedDelay",
-            "FeatureMap",
             "ClusterRevision"
         ],
         "Operational Credentials": [
@@ -773,7 +772,14 @@
         "Power Topology": ["FeatureMap"],
         "Power Source": ["ClusterRevision"],
         "Valve Configuration and Control": ["RemainingDuration"],
-        "Boolean State Configuration": ["CurrentSensitivityLevel"],
+        "Boolean State Configuration": [
+            "AlarmsActive",
+            "AlarmsEnabled",
+            "AlarmsSuppressed",
+            "ClusterRevision",
+            "CurrentSensitivityLevel",
+            "SensorFault"
+        ],
         "Water Heater Management": [
             "HeaterTypes",
             "HeatDemand",

@@ -33,11 +33,12 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
 import os
 import random
 import tempfile
-from time import sleep
+import time
 
 from mobly import asserts
 from TC_WEBRTCRTestBase import WEBRTCRTestBase
@@ -80,7 +81,7 @@ class TC_WebRTCR_2_5(WEBRTCRTestBase):
             expected_output="Server initialization complete",
             timeout=30)
 
-        sleep(1)
+        time.sleep(1)
 
     def teardown_class(self):
         if self.th_server is not None:
@@ -97,7 +98,7 @@ class TC_WebRTCR_2_5(WEBRTCRTestBase):
         """
         Define the step-by-step sequence for the test.
         """
-        steps = [
+        return [
             TestStep(1, "Commission the {TH_Server} from TH"),
             TestStep(2, "Open the Commissioning Window of the {TH_Server}"),
             TestStep(3, "Commission the {TH_Server} from DUT"),
@@ -107,18 +108,16 @@ class TC_WebRTCR_2_5(WEBRTCRTestBase):
             TestStep(7, "End the WebRTC session"),
             TestStep(8, "Read CurrentSessions attribute from DUT"),
         ]
-        return steps
 
     def pics_TC_WebRTCR_2_5(self) -> list[str]:
         """
         Return the list of PICS applicable to this test case.
         """
-        pics = [
+        return [
             "WEBRTCR.S",           # WebRTC Transport Requestor Server
             "WEBRTCR.S.A0000",     # CurrentSessions attribute
             "WEBRTCR.S.C03.Rsp",   # End command
         ]
-        return pics
 
     # This test has multiple manual steps for attribute reads and session management.
     # Test typically runs under 2 mins, so 5 minutes is sufficient.
@@ -145,7 +144,7 @@ class TC_WebRTCR_2_5(WEBRTCRTestBase):
         params = await self.default_controller.OpenCommissioningWindow(
             nodeId=self.th_server_local_nodeid, timeout=3*60, iteration=10000, discriminator=self.discriminator, option=1)
         passcode = params.setupPinCode
-        sleep(1)
+        await asyncio.sleep(1)
 
         self.step(3)
         # Prompt user with instructions

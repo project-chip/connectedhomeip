@@ -23,12 +23,13 @@ src/app/persistence/AttributePersistenceProvider.h
 src/app/server/Server.cpp
 
 # Cluster server implementations that currently use SafeAttributePersistenceProvider
-src/app/clusters/boolean-state-configuration-server/boolean-state-configuration-server.cpp
+src/app/clusters/boolean-state-configuration-server/boolean-state-configuration-cluster.cpp
+src/app/clusters/boolean-state-configuration-server/tests/TestBooleanStateConfigurationCluster.cpp
 src/app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-server.h
 src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h
 src/app/clusters/chime-server/chime-server.cpp
 src/app/clusters/mode-base-server/mode-base-server.cpp
-src/app/clusters/resource-monitoring-server/resource-monitoring-server.cpp
+src/app/clusters/resource-monitoring-server/ResourceMonitoringCluster.cpp
 src/app/clusters/thread-network-directory-server/thread-network-directory-server.cpp
 src/app/clusters/tls-certificate-management-server/tls-certificate-management-server.cpp
 src/app/clusters/tls-client-management-server/tls-client-management-server.cpp

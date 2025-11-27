@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/boolean-state-server/boolean-state-cluster.h>
+#include <app/clusters/boolean-state-server/BooleanStateCluster.h>
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/testing/AttributeTesting.h>
@@ -40,14 +40,13 @@ struct TestBooleanStateCluster : public ::testing::Test
 
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
-    void SetUp() override { ASSERT_EQ(booleanState.Startup(context), CHIP_NO_ERROR); }
+    void SetUp() override { ASSERT_EQ(booleanState.Startup(testContext.Get()), CHIP_NO_ERROR); }
 
     void TearDown() override { booleanState.Shutdown(); }
 
-    TestBooleanStateCluster() : context(testContext.Create()), booleanState(kRootEndpointId) {}
+    TestBooleanStateCluster() : booleanState(kRootEndpointId) {}
 
     chip::Test::TestServerClusterContext testContext;
-    ServerClusterContext context;
     BooleanStateCluster booleanState;
 };
 
