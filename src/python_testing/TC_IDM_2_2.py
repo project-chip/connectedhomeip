@@ -393,7 +393,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             # Ref: https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/data_model/Interaction-Model.adoc#101-status-code-table
             asserts.assert_equal(e.err, 0x580,
                                  "Incorrect error response for reading non-global attribute on all clusters at endpoint, should have returned GENERAL_ERROR + INVALID_ACTION")
-            return None
+            return
 
     async def _read_limited_access(self, endpoint, cluster_id):
         """Test reading all attributes from all clusters at an endpoint with limited access.
@@ -549,7 +549,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         self.verify_all_endpoints_clusters(read_request)
 
     def steps_TC_IDM_2_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "TH sends the Read Request Message to the DUT to read one attribute on a given cluster and endpoint, AttributePath = [[Endpoint = Specific Endpoint, Cluster = Specific ClusterID, Attribute = Specific Attribute]], On receipt of this message, DUT should send a report data action with the attribute value to the DUT.",
                      "On the TH verify the received report data message has the right attribute values.", is_commissioning=True),
             TestStep(2, "TH sends the Read Request Message to the DUT to read all attributes on a given cluster and Endpoint, AttributePath = [[Endpoint = Specific Endpoint, Cluster = Specific ClusterID]], On receipt of this message, DUT should send a report data action with the attribute value to the DUT.",
@@ -593,7 +593,6 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             TestStep(21, "TH sends a Read Request Message to read all events and attributes from the DUT.",
                      "Verify that the DUT sends back data of all attributes and events that the TH has access to."),
         ]
-        return steps
 
     # Update the test method to call functions directly with explicit parameters
     @async_test_body

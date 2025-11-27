@@ -56,7 +56,7 @@ class TC_WebRTCP_2_7(MatterBaseTest, WEBRTCPTestBase):
         """
         Define the step-by-step sequence for the test.
         """
-        steps = [
+        return [
             TestStep("precondition", "DUT commissioned and streams allocated", is_commissioning=True),
             TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
                      "DUT responds with success"),
@@ -68,13 +68,12 @@ class TC_WebRTCP_2_7(MatterBaseTest, WEBRTCPTestBase):
                      "DUT's HardPrivacyModeOn attribute becomes FALSE"),
             TestStep(5, "TH sends the SolicitOffer command with the same valid parameters"),
         ]
-        return steps
 
     def pics_TC_WebRTCP_2_7(self) -> list[str]:
         """
         Return the list of PICS applicable to this test case.
         """
-        pics = [
+        return [
             "WEBRTCP.S",           # WebRTC Transport Provider Server
             "WEBRTCP.S.C00.Rsp",   # SolicitOffer command
             "WEBRTCP.S.C01.Tx",    # SolicitOfferResponse command
@@ -83,7 +82,6 @@ class TC_WebRTCP_2_7(MatterBaseTest, WEBRTCPTestBase):
             "AVSM.S.F01",          # Video Data Output feature
             "AVSM.S.A0015",        # HardPrivacyModeOn attribute
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:

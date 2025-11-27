@@ -268,8 +268,7 @@ class TC_SC_4_1(MatterBaseTest):
             logging.info(f"\n\n\t** discriminator subtype: {discriminator_subtype}\n")
 
             return discriminator_subtype, discriminator
-        else:
-            asserts.fail("Failed to get the discriminator value from the setup payload info.")
+        asserts.fail("Failed to get the discriminator value from the setup payload info.")
 
         return None
 

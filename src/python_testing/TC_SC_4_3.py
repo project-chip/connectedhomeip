@@ -148,8 +148,7 @@ class TC_SC_4_3(MatterBaseTest):
 
             if input_int <= max_value:
                 return (True, f"Input ({input_value}) is valid.")
-            else:
-                return (False, f"Input ({input_value}) exceeds the allowed value {max_value}.")
+            return (False, f"Input ({input_value}) exceeds the allowed value {max_value}.")
         except ValueError:
             return (False, f"Input ({input_value}) is not a valid decimal number.")
 
@@ -170,21 +169,17 @@ class TC_SC_4_3(MatterBaseTest):
             T_int = int(t_value)
             if T_int & 1 == 0:
                 return True, f"T value ({t_value}) is valid and bit 0 is clear."
-            else:
-                return False, f"Bit 0 is not clear. T value ({t_value})"
+            return False, f"Bit 0 is not clear. T value ({t_value})"
 
             # Check that the value can be either 2, 4 or 6 depending on whether
             # DUT is a TCPClient, TCPServer or both.
             if self.check_pics(TCP_PICS_STR):
                 if (T_int & 0x04 != 0):
                     return True, f"T value ({t_value}) represents valid TCP support info."
-                else:
-                    return False, f"T value ({t_value}) does not have TCP bits set even though the MCORE.SC.TCP PICS indicates it is required."
-            else:
-                if (T_int & 0x04 != 0):
-                    return False, f"T value ({t_value}) has the TCP bits set even though the MCORE.SC.TCP PICS is not set."
-                else:
-                    return True, f"T value ({t_value}) is valid."
+                return False, f"T value ({t_value}) does not have TCP bits set even though the MCORE.SC.TCP PICS indicates it is required."
+            if (T_int & 0x04 != 0):
+                return False, f"T value ({t_value}) has the TCP bits set even though the MCORE.SC.TCP PICS is not set."
+            return True, f"T value ({t_value}) is valid."
         except ValueError:
             return False, f"T value ({t_value}) is not a valid integer"
 

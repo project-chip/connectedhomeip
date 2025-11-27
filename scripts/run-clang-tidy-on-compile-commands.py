@@ -165,7 +165,7 @@ class ClangTidyEntry:
                 for line in err.decode("utf-8").split("\n"):
                     line = line.strip()
 
-                    if any((s in line for s in skip_strings)):
+                    if any(s in line for s in skip_strings):
                         continue
 
                     if not line:
