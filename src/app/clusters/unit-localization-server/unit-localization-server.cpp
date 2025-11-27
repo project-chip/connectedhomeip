@@ -96,8 +96,7 @@ DataModel::ActionReturnStatus UnitLocalizationCluster::WriteImpl(const DataModel
 DataModel::ActionReturnStatus UnitLocalizationCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                                       AttributeValueDecoder & decoder)
 {
-    TEMPORARY_RETURN_IGNORED UnitLocalizationServer::Instance().Init();
-    AttributeAccessInterfaceRegistry::Instance().Register(&UnitLocalizationServer::Instance());
+    return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, WriteImpl(request, decoder));
 }
 
 DataModel::ActionReturnStatus UnitLocalizationCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
