@@ -163,7 +163,7 @@ def main(scraper, spec_root, output_dir, dry_run, include_in_progress, skip_scra
         if not dry_run:
             dump_versions(scraper, spec_root, output_dir)
     if not dry_run:
-        cleanup_old_spec_dms(output_dir, pre_1_2)
+        cleanup_old_spec_dms(output_dir)
         dump_json_ids(output_dir)
         dump_ids_from_data_model_dirs()
         # Update all the files in the python wheels
@@ -230,7 +230,7 @@ def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress, pre
             os.remove(os.path.join(namespaces_output_dir, filename))
 
 
-def cleanup_old_spec_dms(output_dir, pre_1_2):
+def cleanup_old_spec_dms(output_dir):
     ''' There are a few old spec versions that have the same longstanding problems.
         Unfortunately, we don't have specific branches for all these spec versions
         since some were only tagged, and some were re-used for dot releases.
@@ -316,106 +316,6 @@ def cleanup_old_spec_dms(output_dir, pre_1_2):
         if changed:
             tree.write(filename, pretty_print=True, xml_declaration=True, encoding='utf-8')
 
-    def _fix_1_1():
-        missing_1_1_BaseDeviceType_features = '''
-        <features>
-            <feature code="TAGLIST">
-            <mandatoryConform>
-                <condition name="Duplicate"/>
-            </mandatoryConform>
-            </feature>
-        </features>
-        '''
-        missing_1_1_DescriptorCluster_features = '''
-        <features>
-            <feature bit="0" code="TAGLIST" name="TagList" summary="The TagList attribute is present">
-            <describedConform/>
-            </feature>
-        </features>
-        '''
-        missing_1_1_DescriptorCluster_taglist = '''
-        <attribute id="0x0004" name="TagList" type="list" default="MS">
-            <entry type="SemanticTagStruct"/>
-            <access read="true" readPrivilege="view"/>
-            <quality persistence="fixed"/>
-            <mandatoryConform>
-                <feature name="TAGLIST"/>
-            </mandatoryConform>
-            <constraint>
-                <countBetween>
-                <from value="1"/>
-                <to value="6"/>
-                </countBetween>
-            </constraint>
-        </attribute>
-        '''
-        missing_1_1_DescriptorCluster_EndpointUID = '''
-        <attribute id="0x0005" name="EndpointUniqueID" type="string">
-            <access read="true" readPrivilege="view"/>
-            <quality persistence="fixed"/>
-            <optionalConform/>
-            <constraint>
-                <maxLength value="32"/>
-            </constraint>
-        </attribute>
-        '''
-        changed = False
-        filename = os.path.join(output_dir, 'clusters', 'Descriptor-Cluster.xml')
-        if not os.path.exists(filename):
-            return
-        with open(filename, 'rt+') as file:
-            tree = etree.parse(file)
-            root = tree.getroot()
-
-            if root.find("attributes/attribute[@name='EndpointUniqueID']") is None:
-                parent_el = root.find('attributes')
-                if parent_el is None:
-                    log.error("Unable to locate attributes in Descriptor-Cluster")
-                    return
-
-                new_xml = etree.fromstring(missing_1_1_DescriptorCluster_EndpointUID)
-                parent_el.append(new_xml)
-                changed = True
-
-            if root.find("attributes/attribute[@name='TagList']") is None:
-                parent_el = root.find('attributes')
-                if parent_el is None:
-                    log.error("Unable to locate attributes in Descriptor-Cluster")
-                    return
-
-                new_xml = etree.fromstring(missing_1_1_DescriptorCluster_taglist)
-                parent_el.append(new_xml)
-                changed = True
-
-            if root.find("features") is None:
-                parent_el = root
-                new_xml = etree.fromstring(missing_1_1_DescriptorCluster_features)
-                parent_el.append(new_xml)
-                changed = True
-
-        if changed:
-            etree.indent(tree, space="  ", level=0)
-            tree.write(filename, pretty_print=True, xml_declaration=True, encoding='utf-8')
-
-        changed = False
-        filename = os.path.join(output_dir, 'device_types', 'BaseDeviceType.xml')
-        if not os.path.exists(filename):
-            return
-        with open(filename, 'rt+') as file:
-            tree = etree.parse(file)
-            root = tree.getroot()
-            if root.find('clusters/cluster[@name="Descriptor"]/features') is None:
-                parent_el = root.find('clusters/cluster[@name="Descriptor"]')
-                if parent_el is None:
-                    log.error("Unable to locate clusters/cluster[@name='Descriptor'] tag in BaseDeviceType")
-                    return
-                new_xml = etree.fromstring(missing_1_1_BaseDeviceType_features)
-                parent_el.append(new_xml)
-                changed = True
-        if changed:
-            etree.indent(tree, space="  ", level=0)
-            tree.write(filename, pretty_print=True, xml_declaration=True, encoding='utf-8')
-
     def _fix_sit_lit_type():
         # In some spec revisions, the SIT and LIT conditions are listed as features.
         # This is probably fixable in alchemy, but let's just fix here until that
@@ -438,8 +338,6 @@ def cleanup_old_spec_dms(output_dir, pre_1_2):
     _fix_door_lock_device_type_features()
     _fix_pre_1_3_base_device_type()
     _fix_sit_lit_type()
-    if pre_1_2:
-        _fix_1_1()
 
 
 def dump_versions(scraper, spec_root, output_dir):

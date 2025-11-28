@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version="1.0"?>
 <!--
 Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
@@ -98,13 +98,7 @@ Davis, CA 95616, USA
   <clusters>
     <cluster id="0x001D" name="Descriptor" side="server">
       <mandatoryConform/>
-    <features>
-            <feature code="TAGLIST">
-            <mandatoryConform>
-                <condition name="Duplicate"/>
-            </mandatoryConform>
-            </feature>
-        </features></cluster>
+    </cluster>
     <cluster id="0x001E" name="Binding" side="server">
       <mandatoryConform>
         <andTerm>
