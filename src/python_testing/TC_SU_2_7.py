@@ -102,7 +102,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
     ota_image_download_timeout = 0
 
     def all_steps(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(0, "Commissioning, already done", is_commissioning=True),
             TestStep(1, "Perform a software update on the DUT.",
                      "Verify that the OTA-Subscriber receives a StateTransition event notification for all the state changes i.e. Querying, Downloading, Applying, Idle (optional)."),
@@ -126,7 +126,6 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
                      "SoftwareVersion - Same as the one available in the SoftwareVersion attribute of the Basic Information Cluster for the newly executing version."
                      "ProductID - Same as what is available in the ProductID attribute of the Basic Information Cluster."),
         ]
-        return steps
 
     @async_test_body
     async def setup_test(self):
