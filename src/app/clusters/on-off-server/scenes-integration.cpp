@@ -27,20 +27,20 @@ using namespace chip::app::Clusters::OnOff;
 
 using chip::Protocols::InteractionModel::Status;
 
-static constexpr size_t kOnOffMaxEnpointCount =
+static constexpr size_t kOnOffMaxEndpointCount =
     MATTER_DM_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 static void sceneOnOffCallback(EndpointId endpoint);
 using OnOffEndPointPair = scenes::DefaultSceneHandlerImpl::EndpointStatePair<bool>;
 using OnOffTransitionTimeInterface =
-    scenes::DefaultSceneHandlerImpl::TransitionTimeInterface<kOnOffMaxEnpointCount, MATTER_DM_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT>;
+    scenes::DefaultSceneHandlerImpl::TransitionTimeInterface<kOnOffMaxEndpointCount, MATTER_DM_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT>;
 
 #if CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 
 class DefaultOnOffSceneHandler : public scenes::DefaultSceneHandlerImpl
 {
 public:
-    DefaultSceneHandlerImpl::StatePairBuffer<bool, kOnOffMaxEnpointCount> mSceneEndpointStatePairs;
+    DefaultSceneHandlerImpl::StatePairBuffer<bool, kOnOffMaxEndpointCount> mSceneEndpointStatePairs;
     // As per spec, 1 attribute is scenable in the on off cluster
     static constexpr uint8_t scenableAttributeCount = 1;
 
