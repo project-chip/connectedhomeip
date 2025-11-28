@@ -140,13 +140,10 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
 
     def pics_TC_SU_2_5(self):
         """Return the PICS definitions associated with this test."""
-        pics = [
-            "MCORE.OTA.Requestor",
-        ]
-        return pics
+        return ["MCORE.OTA.Requestor"]
 
     def steps_TC_SU_2_5(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(0, "Commissioning, already done", is_commissioning=True),
             TestStep(1, "OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action field is set to \"Proceed\", DelayedActionTime is set to 0.", "Verify that the DUT starts updating its software."
                      "Once the update is finished, verify the SoftwareVersion attribute from the Basic Information cluster on the DUT to match the version downloaded for the software update."
@@ -162,7 +159,6 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
                      "Verify that the DUT does not send the NotifyUpdateApplied within a reasonable time."
                      "Verify the SoftwareVersion attribute from the Basic Information cluster of the DUT to be the same as it was previously."),
         ]
-        return steps
 
     @async_test_body
     async def test_TC_SU_2_5(self):
