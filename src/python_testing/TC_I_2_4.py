@@ -51,7 +51,6 @@ from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matt
 
 
 class TC_I_2_4(MatterBaseTest):
-    
     # Wait for a new report to be received or at maximum wait_time second
     def wait_for_identify_time_report_or_timeout(self, handler, attribute, pre_count, wait_time):
         timeout = time.time() + wait_time
