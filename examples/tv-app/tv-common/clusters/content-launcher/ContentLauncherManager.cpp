@@ -143,7 +143,7 @@ void ContentLauncherManager::HandleLaunchContent(CommandResponseHelper<LaunchRes
     // TODO: Insert code here
     response.data   = chip::MakeOptional(CharSpan::fromCharString("exampleData"));
     response.status = ContentLauncher::StatusEnum::kSuccess;
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 void ContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchResponseType> & helper, const CharSpan & contentUrl,
@@ -174,7 +174,7 @@ void ContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchRespons
         response.status = ContentLauncher::StatusEnum::kAuthFailed;
     }
 
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 CHIP_ERROR ContentLauncherManager::HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder)

@@ -36,8 +36,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 from dataclasses import dataclass
 
 from mobly import asserts
@@ -150,7 +150,7 @@ class TC_ICDM_3_2(MatterBaseTest):
         return "[TC-ICDM-3.2] Verify RegisterClient Command with DUT as Server"
 
     def steps_TC_ICDM_3_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(0, "Commissioning, already done", is_commissioning=True),
             TestStep(1, "TH reads from the DUT the RegisteredClients attribute. RegisteredClients is empty."),
             TestStep("2a", "TH sends RegisterClient command."),
@@ -173,15 +173,13 @@ class TC_ICDM_3_2(MatterBaseTest):
             TestStep("8d", "TH sends RegisterClient command with same CheckInNodeID5 and VerificationKey5 as in Step 6a and different MonitorSubID9 and Key9."),
             TestStep(9, "TH sends UnregisterClient command with the CheckInNodeID5 and VerificationKey5."),
         ]
-        return steps
 
     def pics_TC_ICDM_3_2(self) -> list[str]:
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
-        pics = [
+        return [
             "ICDM.S",
             "ICDM.S.F00"
         ]
-        return pics
 
     #
     # ICDM 3.2 Test Body
@@ -245,7 +243,7 @@ class TC_ICDM_3_2(MatterBaseTest):
 
             self.step("2d")
             if not is_ci:
-                time.sleep(wait_time_reboot)
+                await asyncio.sleep(wait_time_reboot)
 
             self.step("2e")
             registeredClients = await self._read_icdm_attribute_expect_success(

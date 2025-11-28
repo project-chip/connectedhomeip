@@ -341,5 +341,4 @@ class EEVSEBaseTestHelper:
 
         target_time_delta = target_time - matter_base_time
 
-        expected_target_time_epoch_s = int(target_time_delta.total_seconds())
-        return expected_target_time_epoch_s
+        return int(target_time_delta.total_seconds())

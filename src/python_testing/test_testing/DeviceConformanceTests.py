@@ -144,7 +144,7 @@ class DeviceConformanceTests(BasicCompositionTests):
             for cluster_id, cluster in endpoint.items():
                 cluster_location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id)
 
-                if cluster_id not in self.xml_clusters.keys():
+                if cluster_id not in self.xml_clusters:
                     if (cluster_id & 0xFFFF_0000) != 0:
                         # manufacturer cluster
                         continue
@@ -174,7 +174,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                                 location=location, problem="MACL feature is disallowed if the a supported device type is not present")
                         continue
 
-                    if f not in self.xml_clusters[cluster_id].features.keys():
+                    if f not in self.xml_clusters[cluster_id].features:
                         record_error(location=location,
                                      problem=f'Unknown feature with mask 0x{f:02x} (feature bit {f.bit_length() - 1})')
                         continue
@@ -194,7 +194,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                     if cluster_id in ignore_attributes and attribute_id in ignore_attributes[cluster_id]:
                         continue
                     location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
-                    if attribute_id not in self.xml_clusters[cluster_id].attributes.keys():
+                    if attribute_id not in self.xml_clusters[cluster_id].attributes:
                         # TODO: Consolidate the range checks with IDM-10.1 once that lands
                         if attribute_id <= 0x4FFF:
                             record_error(location=location, problem='Standard attribute found on device, but not in spec')
@@ -209,7 +209,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                     if cluster_id in ignore_attributes and attribute_id in ignore_attributes[cluster_id]:
                         continue
                     conformance_decision_with_choice = xml_attribute.conformance(feature_map, attribute_list, all_command_list)
-                    if conformance_decision_with_choice.is_mandatory() and attribute_id not in cluster.keys():
+                    if conformance_decision_with_choice.is_mandatory() and attribute_id not in cluster:
                         location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
                         record_error(
                             location=location, problem=f'Attribute 0x{attribute_id:02x} is required, but is not present on the DUT. {conformance_str(xml_attribute.conformance, feature_map, self.xml_clusters[cluster_id].features)}')
@@ -277,7 +277,7 @@ class DeviceConformanceTests(BasicCompositionTests):
 
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
-                if cluster_id not in self.xml_clusters.keys():
+                if cluster_id not in self.xml_clusters:
                     if (cluster_id & 0xFFFF_0000) != 0:
                         # manufacturer cluster
                         continue
@@ -313,7 +313,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                                      [Clusters.Descriptor.Attributes.DeviceTypeList] if device_type_id_type(x.deviceType) == DeviceTypeIdType.kStandard]
             for device_type in standard_device_types:
                 device_type_id = device_type.deviceType
-                if device_type_id not in self.xml_device_types.keys():
+                if device_type_id not in self.xml_device_types:
                     # problem recorded in 10.5
                     continue
                 expected_revision = self.xml_device_types[device_type_id].revision
@@ -366,7 +366,7 @@ class DeviceConformanceTests(BasicCompositionTests):
             for device_type in standard_device_types:
                 device_type_id = device_type.deviceType
                 location = DeviceTypePathLocation(device_type_id=device_type_id)
-                if device_type_id not in self.xml_device_types.keys():
+                if device_type_id not in self.xml_device_types:
                     record_error(location=location, problem='Unknown device type ID in standard range')
                     continue
 
@@ -492,7 +492,7 @@ class DeviceConformanceTests(BasicCompositionTests):
             if endpoint_id == 0:
                 continue
 
-            for cluster in endpoint.keys():
+            for cluster in endpoint:
                 if cluster in root_node_restricted_clusters:
                     problems.append(ProblemNotice("TC-IDM-14.1", location=ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=cluster.id),
                                                   severity=ProblemSeverity.ERROR, problem=f"Root-node-restricted cluster {cluster} appears on non-root-node endpoint"))
@@ -512,8 +512,8 @@ class DeviceConformanceTests(BasicCompositionTests):
         problems = []
         for endpoint_id, endpoint in self.endpoints.items():
             device_types = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]
-            have_closure = Clusters.ClosureControl in endpoint.keys() or Clusters.ClosureDimension in endpoint.keys()
-            have_window_covering = Clusters.WindowCovering in endpoint.keys()
+            have_closure = Clusters.ClosureControl in endpoint or Clusters.ClosureDimension in endpoint
+            have_window_covering = Clusters.WindowCovering in endpoint
 
             if have_closure and have_window_covering:
                 for dt in device_types:

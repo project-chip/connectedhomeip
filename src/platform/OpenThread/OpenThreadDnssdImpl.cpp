@@ -31,7 +31,7 @@ CHIP_ERROR OpenThreadDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsync
     MutableByteSpan mac(macBuffer);
     char hostname[kHostNameMaxLength + 1] = "";
     ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac));
-    MakeHostName(hostname, sizeof(hostname), mac);
+    TEMPORARY_RETURN_IGNORED MakeHostName(hostname, sizeof(hostname), mac);
 
     return ThreadStackMgr().ClearSrpHost(hostname);
 #else
@@ -67,7 +67,7 @@ CHIP_ERROR OpenThreadDnssdPublishService(const DnssdService * service, DnssdPubl
 CHIP_ERROR OpenThreadDnssdRemoveServices()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-    ThreadStackMgr().InvalidateAllSrpServices();
+    TEMPORARY_RETURN_IGNORED ThreadStackMgr().InvalidateAllSrpServices();
     return CHIP_NO_ERROR;
 #else
     return CHIP_ERROR_NOT_IMPLEMENTED;

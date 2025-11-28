@@ -73,24 +73,24 @@ CHIP_ERROR OTAImageProcessorImpl::Init(OTADownloader * downloader)
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
-    PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Finalize()
 {
-    PlatformMgr().ScheduleWork(HandleFinalize, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(HandleFinalize, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR OTAImageProcessorImpl::Apply()
 {
-    PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Abort()
 {
-    PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
@@ -109,7 +109,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
         return err;
     }
 
-    PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
@@ -178,7 +178,8 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 
     // Not calling bootloader_eraseStorageSlot(mSlotId) here because we erase during each write
 
-    imageProcessor->mDownloader->OnPreparedForDownload(err == SL_BOOTLOADER_OK ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL);
+    TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->OnPreparedForDownload(err == SL_BOOTLOADER_OK ? CHIP_NO_ERROR
+                                                                                                        : CHIP_ERROR_INTERNAL);
 }
 
 void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
@@ -228,7 +229,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
         }
     }
 
-    imageProcessor->ReleaseBlock();
+    TEMPORARY_RETURN_IGNORED imageProcessor->ReleaseBlock();
 
     ChipLogProgress(SoftwareUpdate, "OTA image downloaded successfully");
 }
@@ -325,7 +326,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
 #endif            // _SILICON_LABS_32B_SERIES_3 && CHIP_PROGRESS_LOGGING
     LockRadioProcessing();
     // Write that we are rebooting after a software update and reboot the device
-    SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_MatterUpdateReboot, true);
+    TEMPORARY_RETURN_IGNORED SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_MatterUpdateReboot, true);
     WRAP_BL_DFU_CALL(bootloader_rebootAndInstall())
     UnlockRadioProcessing(); // Unneccessay but for good measure
 }
@@ -339,7 +340,7 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
         return;
     }
     // Not clearing the image storage area as it is done during each write
-    imageProcessor->ReleaseBlock();
+    TEMPORARY_RETURN_IGNORED imageProcessor->ReleaseBlock();
 }
 
 void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
@@ -407,7 +408,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         }
     }
 
-    imageProcessor->mDownloader->FetchNextData();
+    TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->FetchNextData();
 }
 
 CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
@@ -441,7 +442,7 @@ CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
     // Allocate memory for block data if we don't have enough already
     if (mBlock.size() < block.size())
     {
-        ReleaseBlock();
+        TEMPORARY_RETURN_IGNORED ReleaseBlock();
 
         mBlock = MutableByteSpan(static_cast<uint8_t *>(chip::Platform::MemoryAlloc(block.size())), block.size());
         if (mBlock.data() == nullptr)

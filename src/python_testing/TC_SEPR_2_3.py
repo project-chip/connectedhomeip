@@ -63,16 +63,15 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
 
     def pics_TC_SEPR_2_3(self):
         """Return the PICS definitions associated with this test."""
-        pics = [
+        return [
             "SEPR.S",
             "SEPR.F00",
             "MCORE.SC.TCP",
         ]
-        return pics
 
     def steps_TC_SEPR_2_3(self) -> list[TestStep]:
         """Execute the test steps."""
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
                      is_commissioning=True),
             TestStep("1a", "Create CASE session connection via TCP if the DUT claims to support TCP",
@@ -133,8 +132,6 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
                             Each entry shall have a valid value of Price (Money), Source (a valid TariffPriceTypeEnum), it may include an optional Description (a string of max length 32) and may include an optional TariffComponentID (unsigned integer value)."""),
 
         ]
-
-        return steps
 
     @run_if_endpoint_matches(has_feature(cluster, cluster.Bitmaps.Feature.kForecasting))
     async def test_TC_SEPR_2_3(self):

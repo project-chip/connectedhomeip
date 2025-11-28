@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/clusters/operational-credentials-server/operational-credentials-cluster.h>
+#include <app/clusters/operational-credentials-server/OperationalCredentialsCluster.h>
 #include <app/static-cluster-config/OperationalCredentials.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
 

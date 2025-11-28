@@ -38,6 +38,8 @@ from colorama import Fore, Style
 from matter.testing.metadata import Metadata, MetadataReader
 from matter.testing.tasks import Subprocess
 
+log = logging.getLogger(__name__)
+
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))
 
@@ -103,7 +105,7 @@ class AppProcessManager:
         self.stdin_stop_event = threading.Event()
 
     def start(self):
-        logging.info(f"Starting app with args: {self.app_args}")
+        log.info("Starting app with args: '%s'", self.app_args)
         if self.app_ready_pattern and isinstance(self.app_ready_pattern, str):
             ready_pattern = re.compile(self.app_ready_pattern.encode())
         else:
@@ -114,7 +116,7 @@ class AppProcessManager:
                                       f_stderr=self.stream_output)
         self.app_process.start(expected_output=ready_pattern, timeout=30)
         if self.app_stdin_pipe:
-            logging.info("Forwarding stdin from '%s' to app", self.app_stdin_pipe)
+            log.info("Forwarding stdin from '%s' to app", self.app_stdin_pipe)
             self.stdin_stop_event.clear()
             self.stdin_thread = threading.Thread(
                 target=forward_fifo, args=(self.app_stdin_pipe, self.app_process.p.stdin, self.stdin_stop_event))
@@ -215,7 +217,7 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
             run.quiet = quiet
 
     for run in runs:
-        logging.info("Executing %s %s", run.py_script_path.split('/')[-1], run.run)
+        log.info("Executing '%s' '%s'", run.py_script_path.split('/')[-1], run.run)
         main_impl(run.app, run.factory_reset, run.factory_reset_app_only, run.app_args or "", run.app_ready_pattern,
                   run.app_stdin_pipe, run.py_script_path, run.script_args or "", run.script_gdb, run.quiet)
 
@@ -238,13 +240,13 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
 
         # Remove native app KVS if that was used
         if match := re.search(r"--KVS (?P<path>[^ ]+)", app_args):
-            logging.info("Removing KVS path: %s" % match.group("path"))
+            log.info("Removing KVS path: '%s'", match.group("path"))
             pathlib.Path(match.group("path")).unlink(missing_ok=True)
 
     if factory_reset:
         # Remove Python test admin storage if provided
         if match := re.search(r"--storage-path (?P<path>[^ ]+)", script_args):
-            logging.info("Removing storage path: %s" % match.group("path"))
+            log.info("Removing storage path: '%s'", match.group("path"))
             pathlib.Path(match.group("path")).unlink(missing_ok=True)
 
     app_manager_ref = None
@@ -309,11 +311,11 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         test_script_exit_code = test_script_process.wait()
 
         if test_script_exit_code != 0:
-            logging.error("Test script exited with returncode %d" % test_script_exit_code)
+            log.error("Test script exited with returncode %d", test_script_exit_code)
 
         # Stop the restart monitor thread if it exists
         if restart_monitor_thread and restart_monitor_thread.is_alive():
-            logging.info("Stopping app restart monitor thread")
+            log.info("Stopping app restart monitor thread")
             restart_monitor_thread.join(2.0)
 
         # Get the current app manager if it exists
@@ -323,7 +325,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
                 current_app_manager = app_manager_ref[0]
 
         if current_app_manager:
-            logging.info("Stopping app with SIGTERM")
+            log.info("Stopping app with SIGTERM")
             current_app_manager.stop()
             if current_app_manager.get_process():
                 app_exit_code = current_app_manager.get_process().returncode
@@ -335,28 +337,28 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
             if exit_code:
                 sys.stdout.write(stream_output.getvalue().decode('utf-8', errors='replace'))
             else:
-                logging.info("Test completed successfully")
+                log.info("Test completed successfully")
 
         if exit_code != 0:
-            logging.error("SUBPROCESS failure: ")
-            logging.error("  TEST SCRIPT: %d (%r)", test_script_exit_code, final_script_command)
-            logging.error("  APP:         %d (%r)", app_exit_code, [app] + shlex.split(app_args))
+            log.error("SUBPROCESS failure: ")
+            log.error("  TEST SCRIPT: %d (%r)", test_script_exit_code, final_script_command)
+            log.error("  APP:         %d (%r)", app_exit_code, [app] + shlex.split(app_args))
             sys.exit(exit_code)
 
     finally:
         # Stop the restart monitor thread if it exists
         if restart_monitor_thread and restart_monitor_thread.is_alive():
-            logging.info("Stopping app restart monitor thread")
+            log.info("Stopping app restart monitor thread")
             restart_monitor_thread.join(2.0)
 
         # Clean up any leftover flag files if they exist - ensure this always executes
-        logging.info("Cleaning up flag files")
+        log.info("Cleaning up flag files")
         if os.path.exists(restart_flag_file):
             try:
                 os.unlink(restart_flag_file)
-                logging.info(f"Cleaned up flag file: {restart_flag_file}")
+                log.info("Cleaned up flag file: '%s'", restart_flag_file)
             except Exception as e:
-                logging.warning(f"Failed to clean up flag file {restart_flag_file}: {e}")
+                log.warning("Failed to clean up flag file '%s': %r", restart_flag_file, e)
 
 
 def monitor_app_restart_requests(
@@ -371,7 +373,7 @@ def monitor_app_restart_requests(
     while True:
         try:
             if os.path.exists(restart_flag_file):
-                logging.info("App restart requested by test script")
+                log.info("App restart requested by test script")
                 # Remove the flag file immediately to prevent multiple restarts
                 os.unlink(restart_flag_file)
 
@@ -380,13 +382,10 @@ def monitor_app_restart_requests(
                 with app_manager_lock:
                     new_app_manager.start()
                     app_manager_ref[0] = new_app_manager
-
-                # After restart is complete, we can exit the monitor thread
-                logging.info("App restart completed, monitor thread exiting")
-            else:
-                time.sleep(0.5)
+                logging.info("App restart completed.")
+            time.sleep(0.5)
         except Exception as e:
-            logging.error(f"Error in app restart monitor: {e}")
+            log.error("Error in app restart monitor: %r", e)
 
 
 if __name__ == '__main__':
