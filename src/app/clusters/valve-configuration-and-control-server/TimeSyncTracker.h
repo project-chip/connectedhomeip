@@ -17,8 +17,6 @@
 #pragma once
 #include <cstdint>
 
-#include <app/clusters/time-synchronization-server/time-synchronization-cluster.h>
-
 namespace chip::app::Clusters {
 
 /// Defines an interface to get the current status and availability

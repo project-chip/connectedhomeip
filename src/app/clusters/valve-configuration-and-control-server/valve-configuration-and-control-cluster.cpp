@@ -21,6 +21,7 @@
 #include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/ValveConfigurationAndControl/Commands.h>
+#include <clusters/ValveConfigurationAndControl/Events.h>
 #include <lib/support/CodeUtils.h>
 
 #include <platform/CHIPDeviceLayer.h>
