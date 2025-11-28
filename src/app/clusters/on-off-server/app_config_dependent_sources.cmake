@@ -24,4 +24,6 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/mode-select-integration.h"
     "${CLUSTER_DIR}/on-off-server.cpp"
     "${CLUSTER_DIR}/on-off-server.h"
+    "${CLUSTER_DIR}/scenes-integration.cpp"
+    "${CLUSTER_DIR}/scenes-integration.h"
 )

@@ -22,12 +22,11 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af-types.h>
 #include <app/util/basic-types.h>
+#include <app/util/config.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <protocols/interaction_model/StatusCode.h>
 
-#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-#include <app/clusters/scenes-server/SceneTable.h>
-#endif
+#include "scenes-integration.h" // nogncheck
 
 /**********************************************************
  * Defines and Macros
@@ -54,7 +53,7 @@ public:
     static OnOffServer & Instance();
 
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-    chip::scenes::SceneHandler * GetSceneHandler();
+    chip::scenes::SceneHandler * GetSceneHandler() { return chip::app::Clusters::OnOff::Internal::Scenes::GlobalHandler(); }
 #endif
 
     bool offCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath);

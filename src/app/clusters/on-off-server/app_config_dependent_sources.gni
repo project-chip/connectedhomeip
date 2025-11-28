@@ -20,4 +20,6 @@ app_config_dependent_sources = [
   "mode-select-integration.h",
   "on-off-server.cpp",
   "on-off-server.h",
+  "scenes-integration.cpp",
+  "scenes-integration.h",
 ]
