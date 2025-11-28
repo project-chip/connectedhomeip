@@ -90,11 +90,11 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::BooleanStateConfiguration::Id:
         MatterBooleanStateConfigurationClusterInitCallback(endpoint);
         break;
-    case app::Clusters::OccupancySensing::Id:
-        MatterOccupancySensingClusterInitCallback(endpoint);
-        break;
     case app::Clusters::ValveConfigurationAndControl::Id:
         MatterValveConfigurationAndControlClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::OccupancySensing::Id:
+        MatterOccupancySensingClusterInitCallback(endpoint);
         break;
     }
 }
@@ -166,11 +166,11 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
     case app::Clusters::BooleanStateConfiguration::Id:
         MatterBooleanStateConfigurationClusterShutdownCallback(endpoint);
         break;
-    case app::Clusters::OccupancySensing::Id:
-        MatterOccupancySensingClusterShutdownCallback(endpoint);
-        break;
     case app::Clusters::ValveConfigurationAndControl::Id:
         MatterValveConfigurationAndControlClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::OccupancySensing::Id:
+        MatterOccupancySensingClusterShutdownCallback(endpoint);
         break;
     }
 }

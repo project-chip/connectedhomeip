@@ -107,10 +107,10 @@ void MatterBooleanStateConfigurationClusterInitCallback(chip::EndpointId endpoin
 
 void MatterBooleanStateConfigurationClusterShutdownCallback(chip::EndpointId endpointId);
 
-void MatterOccupancySensingClusterInitCallback(chip::EndpointId endpointId);
-
-void MatterOccupancySensingClusterShutdownCallback(chip::EndpointId endpointId);
-
 void MatterValveConfigurationAndControlClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterValveConfigurationAndControlClusterShutdownCallback(chip::EndpointId endpointId);
+
+void MatterOccupancySensingClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterOccupancySensingClusterShutdownCallback(chip::EndpointId endpointId);
