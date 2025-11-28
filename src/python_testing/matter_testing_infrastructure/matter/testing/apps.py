@@ -12,12 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-import os
 import signal
-import tempfile
 from dataclasses import dataclass
 from sys import stderr, stdout
+from tempfile import NamedTemporaryFile
 from typing import BinaryIO, Optional, Union
 
 from matter.testing.tasks import Subprocess
@@ -55,44 +53,30 @@ class AppServerSubprocess(Subprocess):
     err_log_file: BinaryIO = stderr.buffer
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
-                 passcode: int, port: int = 5540, extra_args: list[str] = [], kvs_path: Optional[str] = None, f_stdout: BinaryIO = stdout.buffer, f_stderr: BinaryIO = stderr.buffer):
-        # Create a temporary KVS file and keep the descriptor to avoid leaks.
+                 passcode: int, port: int = 5540, extra_args: list[str] = [], kvs_path: Optional[str] = None,
+                 f_stdout: BinaryIO = stdout.buffer, f_stderr: BinaryIO = stderr.buffer):
 
-        if kvs_path is not None:
-            self.kvs_fd = None
-            kvs_path = kvs_path
-        else:
-            self.kvs_fd, kvs_path = tempfile.mkstemp(dir=storage_dir, prefix="kvs-app-")
-        try:
-            # Build the command list
-            command = [app]
-            if extra_args:
-                command.extend(extra_args)
+        if kvs_path is None:
+            # Create a temporary KVS file in the specified storage directory. The underlying
+            # file will be automatically deleted when the object is garbage collected.
+            self.kvs_tmp_file = NamedTemporaryFile(dir=storage_dir, prefix="kvs-app-")  # noqa: SIM115
+            kvs_path = self.kvs_tmp_file.name
 
-            command.extend([
-                "--KVS", kvs_path,
-                '--secured-device-port', str(port),
-                "--discriminator", str(discriminator),
-                "--passcode", str(passcode)
-            ])
+        # Build the command list
+        command = [app]
+        if extra_args:
+            command.extend(extra_args)
 
-            # Start the server application
-            super().__init__(*command,  # Pass the constructed command list
-                             output_cb=lambda line, is_stderr: self.PREFIX + line, f_stdout=f_stdout, f_stderr=f_stderr)
-        except Exception:
-            # Do not leak KVS file descriptor on failure
-            if self.kvs_fd is not None:
-                os.close(self.kvs_fd)
-                raise
+        command.extend([
+            "--KVS", kvs_path,
+            '--secured-device-port', str(port),
+            "--discriminator", str(discriminator),
+            "--passcode", str(passcode)
+        ])
 
-    def __del__(self):
-        # Do not leak KVS file descriptor.
-        if hasattr(self, "kvs_fd"):
-            try:
-                if self.kvs_fd is not None:
-                    os.close(self.kvs_fd)
-            except OSError:
-                pass
+        # Start the server application
+        super().__init__(*command,  # Pass the constructed command list
+                         output_cb=lambda line, is_stderr: self.PREFIX + line, f_stdout=f_stdout, f_stderr=f_stderr)
 
 
 class IcdAppServerSubprocess(AppServerSubprocess):
@@ -157,7 +141,8 @@ class OTAProviderSubprocess(AppServerSubprocess):
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
                  passcode: int, ota_source: Union[OtaImagePath, ImageListPath],
-                 port: int = 5541, extra_args: list[str] = [], kvs_path: Optional[str] = None, log_file: Union[str, BinaryIO] = stdout.buffer, err_log_file: Union[str, BinaryIO] = stderr.buffer):
+                 port: int = 5541, extra_args: list[str] = [], kvs_path: Optional[str] = None,
+                 log_file: Union[str, BinaryIO] = stdout.buffer, err_log_file: Union[str, BinaryIO] = stderr.buffer):
         """Initialize the OTA Provider subprocess.
 
         Args:
@@ -172,26 +157,32 @@ class OTAProviderSubprocess(AppServerSubprocess):
             log_file(str,BinaryIO): Path to create the BinaryIO logger for stdoutput, if not use the default stdout.buffer.
             err_log_file(str,BinaryIO): Path to create the BinaryIO logger for stderr, if not use the default stderr.buffer.
         """
+
+        self._log_file = None
+        self._err_log_file = None
+
         # Create the BinaryIO fp allow to use if path is provided.
         # Or assign it to the previously opened fp.
         if isinstance(log_file, str):
-            # TODO: Handle file closure
-            self.log_file = open(log_file, "ab")  # noqa: SIM115
-        else:
-            self.log_file = log_file
-
+            self._log_file = open(log_file, "ab")  # noqa: SIM115
+            log_file = self._log_file
         if isinstance(err_log_file, str):
-            # TODO: Handle file closure
-            self.err_log_file = open(err_log_file, "ab")  # noqa: SIM115
-        else:
-            self.err_log_file = err_log_file
+            self._err_log_file = open(err_log_file, "ab")  # noqa: SIM115
+            err_log_file = self._err_log_file
 
         # Build OTA-specific arguments using the ota_source property
         combined_extra_args = ota_source.ota_args + extra_args
 
         # Initialize with the combined arguments
         super().__init__(app=app, storage_dir=storage_dir, discriminator=discriminator, passcode=passcode, port=port,
-                         extra_args=combined_extra_args, kvs_path=kvs_path, f_stdout=self.log_file, f_stderr=self.err_log_file)
+                         extra_args=combined_extra_args, kvs_path=kvs_path, f_stdout=log_file, f_stderr=err_log_file)
+
+    def terminate(self):
+        if self._log_file is not None:
+            self._log_file.close()
+        if self._err_log_file is not None:
+            self._err_log_file.close()
+        return super().terminate()
 
     def kill(self):
         self.p.send_signal(signal.SIGKILL)
