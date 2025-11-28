@@ -173,12 +173,12 @@ class PostProcessResponseResult:
         self.entries.append(log)
 
 
-def _value_or_none(data, key):
-    return data.get(key, None)
+def _value_or_none(data: dict, key):
+    return data.get(key)
 
 
-def _value_or_config(data, key, config):
-    return data[key] if key in data else config.get(key)
+def _value_or_config(data: dict, key, config):
+    return data.get(key, config.get(key))
 
 
 class EnumType:
