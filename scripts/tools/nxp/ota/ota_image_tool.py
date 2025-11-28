@@ -202,8 +202,7 @@ def generate_custom_tlvs(data):
 
     payload = bytearray()
     descriptor = bytearray()
-    iteration = 0
-    for entry in data["inputs"]:
+    for iteration, entry in enumerate(data["inputs"]):
         if "descriptor" in entry:
             for field in entry["descriptor"]:
                 if isinstance(field["value"], str):
@@ -223,7 +222,6 @@ def generate_custom_tlvs(data):
         write_to_temp(temp_output, payload)
 
         input_files += [temp_output, entry["path"]]
-        iteration += 1
         descriptor = bytearray()
 
     return input_files

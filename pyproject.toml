@@ -33,9 +33,7 @@ select = [
     # Consistent commas
     "COM",
     # Simplify the code if possible
-    "C4", "RET",
-    "SIM118", "SIM101", "SIM103", "SIM105", "SIM109",
-    "SIM115", "SIM210", "SIM910", "SIM401", "SIM201",
+    "C4", "RET", "SIM",
     # Ensure that scripts are executable
     "EXE",
     # Check for common logging issues
@@ -44,6 +42,7 @@ select = [
     "SLOT",
 ]
 ignore = [
+    "SIM114", "SIM110", "SIM102", "SIM300", # TODO: manual fixes needed
     "ASYNC109", # Sometimes we use "timeout" argument in async functions
     "ASYNC230", # Allow open() calls in async functions
     "COM812", # Do not enforce trailing commas in multi-line collections for now

@@ -234,69 +234,69 @@ def main():
     [h_generic, c_generic] = builder.generic_arrays()
     [h_top, c_top] = builder.headers(args.paiout)
     footer = builder.footer()
-    with open(args.outdir + args.paiout + '.h', "w") as hfile:
-        with open(args.outdir + args.paiout + '.cpp', "w") as cfile:
-            hfile.write(h_top)
-            hfile.write(h_generic)
-            cfile.write(c_top)
+    with (open(args.outdir + args.paiout + '.h', "w") as hfile,
+          open(args.outdir + args.paiout + '.cpp', "w") as cfile):
+        hfile.write(h_top)
+        hfile.write(h_generic)
+        cfile.write(c_top)
 
-            for vid in range(0xFFF1, 0xFFF4):
-                builder = DevCertBuilder(CertType.PAI, args.certdir,
-                                         args.testdir, args.chipcertdir, vid, 0x8000)
+        for vid in range(0xFFF1, 0xFFF4):
+            builder = DevCertBuilder(CertType.PAI, args.certdir,
+                                     args.testdir, args.chipcertdir, vid, 0x8000)
+            builder.make_certs_and_keys()
+            [h_full, c_full] = builder.full_arrays()
+            [h_generic, c_generic] = builder.generic_arrays()
+
+            define = '#if CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID == 0x{:X}\n'.format(vid)
+            end = '#endif\n'
+
+            hfile.write(define)
+            hfile.write(h_full)
+            hfile.write(end)
+
+            cfile.write(define)
+            cfile.write(c_full)
+            cfile.write(c_generic)
+            cfile.write(end)
+
+        hfile.write(footer)
+        cfile.write(footer)
+
+    with (open(args.outdir + args.dacout + '.h', "w") as hfile,
+          open(args.outdir + args.dacout + '.cpp', "w") as cfile):
+        builder = DevCertBuilder(
+            CertType.DAC, args.certdir, args.testdir, args.chipcertdir, 0xFFF1, 0x8000)
+        [h_top, c_top] = builder.headers(args.dacout)
+        [h_generic, c_generic] = builder.generic_arrays()
+        footer = builder.footer()
+
+        hfile.write(h_top)
+        hfile.write(h_generic)
+        cfile.write(c_top)
+
+        for vid in range(0xFFF1, 0xFFF4):
+            for pid in range(0x8000, 0x8020):
+                builder = DevCertBuilder(
+                    CertType.DAC, args.certdir, args.testdir, args.chipcertdir, vid, pid)
                 builder.make_certs_and_keys()
-                [h_full, c_full] = builder.full_arrays()
+                [h, c] = builder.full_arrays()
                 [h_generic, c_generic] = builder.generic_arrays()
 
-                define = '#if CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID == 0x{:X}\n'.format(vid)
+                define = '#if CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID == 0x{:X} && CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID == 0x{:X}\n'.format(
+                    vid, pid)
                 end = '#endif\n'
 
                 hfile.write(define)
-                hfile.write(h_full)
+                hfile.write(h)
                 hfile.write(end)
 
                 cfile.write(define)
-                cfile.write(c_full)
+                cfile.write(c)
                 cfile.write(c_generic)
                 cfile.write(end)
 
-            hfile.write(footer)
-            cfile.write(footer)
-
-    with open(args.outdir + args.dacout + '.h', "w") as hfile:
-        with open(args.outdir + args.dacout + '.cpp', "w") as cfile:
-            builder = DevCertBuilder(
-                CertType.DAC, args.certdir, args.testdir, args.chipcertdir, 0xFFF1, 0x8000)
-            [h_top, c_top] = builder.headers(args.dacout)
-            [h_generic, c_generic] = builder.generic_arrays()
-            footer = builder.footer()
-
-            hfile.write(h_top)
-            hfile.write(h_generic)
-            cfile.write(c_top)
-
-            for vid in range(0xFFF1, 0xFFF4):
-                for pid in range(0x8000, 0x8020):
-                    builder = DevCertBuilder(
-                        CertType.DAC, args.certdir, args.testdir, args.chipcertdir, vid, pid)
-                    builder.make_certs_and_keys()
-                    [h, c] = builder.full_arrays()
-                    [h_generic, c_generic] = builder.generic_arrays()
-
-                    define = '#if CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID == 0x{:X} && CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID == 0x{:X}\n'.format(
-                        vid, pid)
-                    end = '#endif\n'
-
-                    hfile.write(define)
-                    hfile.write(h)
-                    hfile.write(end)
-
-                    cfile.write(define)
-                    cfile.write(c)
-                    cfile.write(c_generic)
-                    cfile.write(end)
-
-            hfile.write(footer)
-            cfile.write(footer)
+        hfile.write(footer)
+        cfile.write(footer)
 
 
 if __name__ == '__main__':

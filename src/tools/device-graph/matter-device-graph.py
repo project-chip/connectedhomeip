@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 #
 #    Copyright (c) 2023 Project CHIP Authors
 #    All rights reserved.
@@ -117,7 +119,7 @@ def CreateEndpointGraph(graph, graphSection, endpoint, wildcardResponse):
     # console.print(f"DeviceTypeList: {listOfDeviceTypes}")
     # console.print(f"PartsList: {partsListFromWildcardRead}")
 
-    endpointLabel = f"Endpoint: {endpoint}\lDeviceTypeList: {listOfDeviceTypes}\lPartsList: {partsListFromWildcardRead}\l"  # noqa: W605
+    endpointLabel = f"Endpoint: {endpoint}\\lDeviceTypeList: {listOfDeviceTypes}\\lPartsList: {partsListFromWildcardRead}\\l"
 
     nextNodeRef = ""
     nodeRef = f"ep{endpoint}"
@@ -132,7 +134,7 @@ def CreateEndpointGraph(graph, graphSection, endpoint, wildcardResponse):
         try:
             clusterName = Clusters.ClusterObjects.ALL_CLUSTERS[clusterId].__name__
         except KeyError:
-            clusterName = f"Custom server\l0x{clusterId:08X}"  # noqa: W605
+            clusterName = f"Custom server\\l0x{clusterId:08X}"
 
         AddServerOrClientNode(graphSection, endpoint, clusterName, "olivedrab", nodeRef)
 
@@ -149,7 +151,7 @@ def CreateEndpointGraph(graph, graphSection, endpoint, wildcardResponse):
         try:
             clusterName = Clusters.ClusterObjects.ALL_CLUSTERS[clusterId].__name__
         except KeyError:
-            clusterName = f"Custom client\l0x{clusterId:08X}"  # noqa: W605
+            clusterName = f"Custom client\\l0x{clusterId:08X}"
 
         AddServerOrClientNode(graphSection, endpoint, clusterName, "orange", nodeRef)
 
@@ -194,9 +196,9 @@ class TC_MatterDeviceGraph(MatterBaseTest):
                 with deviceGraph.subgraph(name='cluster_rootnode') as rootNodeSection:
                     CreateEndpointGraph(deviceGraph, rootNodeSection, endpoint, wildcardResponse)
             else:
-                with deviceGraph.subgraph(name='cluster_endpoints') as endpointsSection:
-                    with endpointsSection.subgraph(name=f'cluster_{endpoint}') as endpointSection:
-                        CreateEndpointGraph(deviceGraph, endpointSection, endpoint, wildcardResponse)
+                with (deviceGraph.subgraph(name='cluster_endpoints') as endpointsSection,
+                      endpointsSection.subgraph(name=f'cluster_{endpoint}') as endpointSection):
+                    CreateEndpointGraph(deviceGraph, endpointSection, endpoint, wildcardResponse)
 
         deviceGraph.save(f'{sys.path[0]}/matter-device-graph.dot')
 
