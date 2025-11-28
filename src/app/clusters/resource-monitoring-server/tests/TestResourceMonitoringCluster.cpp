@@ -21,6 +21,7 @@
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/clusters/testing/ClusterTester.h>
+#include <app/clusters/testing/ValidateGlobalAttributes.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/testing/TestEventGenerator.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
@@ -36,11 +37,6 @@ using namespace chip::app::Clusters::ResourceMonitoring;
 using namespace chip::app::Clusters::ResourceMonitoring::Attributes;
 using namespace chip::Test;
 using chip::Test::TestServerClusterContext;
-
-constexpr std::bitset<4> kResourceMonitoringFeatureMap{
-    static_cast<uint32_t>(ResourceMonitoring::Feature::kCondition) | static_cast<uint32_t>(ResourceMonitoring::Feature::kWarning) |
-    static_cast<uint32_t>(ResourceMonitoring::Feature::kReplacementProductList)
-};
 
 namespace {
 
@@ -72,24 +68,24 @@ public:
         switch (mIndex)
         {
         case 0: {
-            TEMPORARY_RETURN_IGNORED item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kUpc);
-            TEMPORARY_RETURN_IGNORED item.SetProductIdentifierValue(CharSpan::fromCharString("PRODUCT_0"));
+            item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kUpc);
+            VerifyOrDie(item.SetProductIdentifierValue(CharSpan::fromCharString("PRODUCT_0")) == CHIP_NO_ERROR);
             break;
         case 1:
-            TEMPORARY_RETURN_IGNORED item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin8);
-            TEMPORARY_RETURN_IGNORED item.SetProductIdentifierValue(CharSpan::fromCharString("PRODUCT_1"));
+            item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin8);
+            VerifyOrDie(item.SetProductIdentifierValue(CharSpan::fromCharString("PRODUCT_1")) == CHIP_NO_ERROR);
             break;
         case 2:
-            TEMPORARY_RETURN_IGNORED item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kEan);
-            TEMPORARY_RETURN_IGNORED item.SetProductIdentifierValue(CharSpan::fromCharString("PRODUCT_2"));
+            item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kEan);
+            VerifyOrDie(item.SetProductIdentifierValue(CharSpan::fromCharString("PRODUCT_2")) == CHIP_NO_ERROR);
             break;
         case 3:
-            TEMPORARY_RETURN_IGNORED item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin14);
-            TEMPORARY_RETURN_IGNORED item.SetProductIdentifierValue(CharSpan::fromCharString("PRODUCT_3"));
+            item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin14);
+            VerifyOrDie(item.SetProductIdentifierValue(CharSpan::fromCharString("PRODUCT_3")) == CHIP_NO_ERROR);
             break;
         case 4:
-            TEMPORARY_RETURN_IGNORED item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kOem);
-            TEMPORARY_RETURN_IGNORED item.SetProductIdentifierValue(CharSpan::fromCharString("PRODUCT_4"));
+            item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kOem);
+            VerifyOrDie(item.SetProductIdentifierValue(CharSpan::fromCharString("PRODUCT_4")) == CHIP_NO_ERROR);
             break;
         default:
             return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
@@ -119,17 +115,19 @@ struct TestResourceMonitoringCluster : public ::testing::Test
 
     chip::Test::TestServerClusterContext testContext;
 
-    EndpointId kRootEndpointId = 1;
+    EndpointId kEndpointId = 1;
 
     ResourceMonitoringCluster activatedCarbonFilterMonitoring;
 
     ImmutableReplacementProductListManager replacementProductListManager;
 
+    static constexpr auto kResourceMonitoringFeatureMap =
+        BitFlags<ResourceMonitoring::Feature>(ResourceMonitoring::Feature::kCondition, ResourceMonitoring::Feature::kWarning,
+                                              ResourceMonitoring::Feature::kReplacementProductList);
+
     TestResourceMonitoringCluster() :
-        activatedCarbonFilterMonitoring(
-            kRootEndpointId, ActivatedCarbonFilterMonitoring::Id,
-            BitFlags<ResourceMonitoring::Feature>{ static_cast<uint32_t>(kResourceMonitoringFeatureMap.to_ulong()) },
-            OptionalAttributeSet(), ResourceMonitoring::DegradationDirectionEnum::kDown, true)
+        activatedCarbonFilterMonitoring(kEndpointId, ActivatedCarbonFilterMonitoring::Id, kResourceMonitoringFeatureMap,
+                                        OptionalAttributeSet(), ResourceMonitoring::DegradationDirectionEnum::kDown, true)
     {}
 };
 } // namespace
@@ -141,19 +139,12 @@ TEST_F(TestResourceMonitoringCluster, AttributeTest)
                                                          attributes),
               CHIP_NO_ERROR);
 
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> expected;
-    AttributeListBuilder listBuilder(expected);
-
-    AttributeListBuilder::OptionalAttributeEntry optionalAttributesEntries[] = {
-        { true, Condition::kMetadataEntry },
-        { true, DegradationDirection::kMetadataEntry },
-        { true, ReplacementProductList::kMetadataEntry },
-    };
-
-    ASSERT_EQ(
-        listBuilder.Append(Span(ActivatedCarbonFilterMonitoring::Attributes::kMandatoryMetadata), Span(optionalAttributesEntries)),
-        CHIP_NO_ERROR);
-    ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributes.TakeBuffer(), expected.TakeBuffer()));
+    ASSERT_TRUE(chip::Testing::IsAttributesListEqualTo(
+        activatedCarbonFilterMonitoring,
+        { ActivatedCarbonFilterMonitoring::Attributes::ChangeIndication::kMetadataEntry,
+          ActivatedCarbonFilterMonitoring::Attributes::Condition::kMetadataEntry,
+          ActivatedCarbonFilterMonitoring::Attributes::DegradationDirection::kMetadataEntry,
+          ActivatedCarbonFilterMonitoring::Attributes::ReplacementProductList::kMetadataEntry }));
 }
 
 TEST_F(TestResourceMonitoringCluster, ReadAttributeTest)
@@ -162,38 +153,45 @@ TEST_F(TestResourceMonitoringCluster, ReadAttributeTest)
 
     uint16_t revision{};
     ASSERT_EQ(tester.ReadAttribute(Globals::Attributes::ClusterRevision::Id, revision), CHIP_NO_ERROR);
+    EXPECT_EQ(revision, ActivatedCarbonFilterMonitoring::kRevision);
 
     uint32_t features{};
     ASSERT_EQ(tester.ReadAttribute(FeatureMap::Id, features), CHIP_NO_ERROR);
+    EXPECT_EQ(features, kResourceMonitoringFeatureMap.Raw());
 
     uint8_t changeIndication{};
     ASSERT_EQ(tester.ReadAttribute(ChangeIndication::Id, changeIndication), CHIP_NO_ERROR);
+    EXPECT_EQ(changeIndication, static_cast<uint8_t>(ResourceMonitoring::ChangeIndicationEnum::kOk));
 
     uint8_t degradationDirection{};
     ASSERT_EQ(tester.ReadAttribute(Attributes::DegradationDirection::Id, degradationDirection), CHIP_NO_ERROR);
+    EXPECT_EQ(degradationDirection, static_cast<uint8_t>(ResourceMonitoring::DegradationDirectionEnum::kDown));
 
     uint8_t condition{};
     ASSERT_EQ(tester.ReadAttribute(Condition::Id, condition), CHIP_NO_ERROR);
+    EXPECT_EQ(condition, static_cast<uint8_t>(100));
 
     bool inPlaceIndicator{};
     ASSERT_EQ(tester.ReadAttribute(InPlaceIndicator::Id, inPlaceIndicator), CHIP_NO_ERROR);
+    EXPECT_EQ(inPlaceIndicator, true);
 
     DataModel::Nullable<uint32_t> lastChangedTime;
     ASSERT_EQ(tester.ReadAttribute(LastChangedTime::Id, lastChangedTime), CHIP_NO_ERROR);
+    EXPECT_TRUE(lastChangedTime.IsNull());
 
     ActivatedCarbonFilterMonitoring::Attributes::ReplacementProductList::TypeInfo::DecodableType replacementProductList;
     ASSERT_EQ(tester.ReadAttribute(ReplacementProductList::Id, replacementProductList), CHIP_NO_ERROR);
 
     auto it = replacementProductList.begin();
-    it.Next();
+    ASSERT_TRUE(it.Next());
     ASSERT_TRUE(it.GetValue().productIdentifierValue.data_equal(CharSpan::fromCharString("PRODUCT_0")));
-    it.Next();
+    ASSERT_TRUE(it.Next());
     ASSERT_TRUE(it.GetValue().productIdentifierValue.data_equal(CharSpan::fromCharString("PRODUCT_1")));
-    it.Next();
+    ASSERT_TRUE(it.Next());
     ASSERT_TRUE(it.GetValue().productIdentifierValue.data_equal(CharSpan::fromCharString("PRODUCT_2")));
-    it.Next();
+    ASSERT_TRUE(it.Next());
     ASSERT_TRUE(it.GetValue().productIdentifierValue.data_equal(CharSpan::fromCharString("PRODUCT_3")));
-    it.Next();
+    ASSERT_TRUE(it.Next());
     ASSERT_TRUE(it.GetValue().productIdentifierValue.data_equal(CharSpan::fromCharString("PRODUCT_4")));
 
     ASSERT_FALSE(it.Next());

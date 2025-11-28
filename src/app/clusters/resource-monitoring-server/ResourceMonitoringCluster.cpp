@@ -71,19 +71,12 @@ DataModel::ActionReturnStatus ResourceMonitoringCluster::WriteImpl(const DataMod
         Attributes::LastChangedTime::TypeInfo::Type newLastChangedTime;
         ReturnErrorOnFailure(decoder.Decode(newLastChangedTime));
 
-        if (newLastChangedTime != mLastChangedTime)
-        {
-            if (CHIP_NO_ERROR ==
-                chip::app::GetSafeAttributePersistenceProvider()->WriteScalarValue(
-                    ConcreteAttributePath(GetEndpointId(), GetClusterId(), Attributes::LastChangedTime::Id), newLastChangedTime))
-            {
-                mLastChangedTime = newLastChangedTime;
-                NotifyAttributeChanged(Attributes::LastChangedTime::Id);
-                return Status::Success;
-            }
-        }
+        VerifyOrReturnValue(newLastChangedTime != mLastChangedTime, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
 
-        return Protocols::InteractionModel::Status::WriteIgnored;
+        ReturnErrorOnFailure(chip::app::GetSafeAttributePersistenceProvider()->WriteScalarValue(
+            ConcreteAttributePath(GetEndpointId(), GetClusterId(), Attributes::LastChangedTime::Id), newLastChangedTime));
+        mLastChangedTime = newLastChangedTime;
+        return Status::Success;
     }
 
     default:
