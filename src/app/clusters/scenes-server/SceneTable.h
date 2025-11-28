@@ -55,9 +55,8 @@ static constexpr size_t kScenesMaxTransitionTime = 60'000'000u;
 class SceneHandler : public IntrusiveListNodeBase<>
 {
 public:
-    SceneHandler() = default;
+    SceneHandler()          = default;
     virtual ~SceneHandler() = default;
-
 
     /// @brief Returns whether or not a cluster for scenes is supported on an endpoint
     ///
