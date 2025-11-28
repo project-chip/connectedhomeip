@@ -153,7 +153,7 @@ static void sceneOnOffCallback(EndpointId endpoint)
 }
 
 namespace chip::app::Clusters::OnOff::Internal::Scenes {
-chip::scenes::SceneHandler * GlobalOnOffSceneHandler()
+chip::scenes::SceneHandler * GlobalHandler()
 {
     return &sOnOffSceneHandler;
 }
