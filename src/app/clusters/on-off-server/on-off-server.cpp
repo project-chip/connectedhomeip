@@ -240,7 +240,7 @@ Status OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::CommandId com
         Internal::ModeSelectSetOnModeFromStartup(endpoint);
 
         // If OnMode is not a null value, then change the current mode to it.
-        UpdateModeBaseCurrentModeToOnMode(endpoint);
+        Internal::ModeBase::UpdateCurrentModeToOnMode(endpoint);
     }
     else // Set Off
     {

@@ -18,6 +18,8 @@
 #include <app/util/config.h>
 #include <lib/core/DataModelTypes.h>
 
+namespace chip::app::Clusters::OnOff::Internal::ModeBase {
+
 #ifdef MATTER_DM_PLUGIN_MODE_BASE
 
 /**
@@ -25,10 +27,12 @@
  * the OnMode attribute is set, update the CurrentMode attribute value to the OnMode value.
  * @param endpoint
  */
-void UpdateModeBaseCurrentModeToOnMode(chip::EndpointId endpoint);
+void UpdateCurrentModeToOnMode(chip::EndpointId endpoint);
 
 #else
 
-inline void UpdateModeBaseCurrentModeToOnMode(chip::EndpointId endpoint) {}
+inline void UpdatCurrentModeToOnMode(chip::EndpointId endpoint) {}
 
 #endif // MATTER_DM_PLUGIN_MODE_BASE
+
+} // namespace chip::app::Clusters::OnOff::Internal::ModeBase

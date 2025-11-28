@@ -23,34 +23,41 @@
 #include <app/clusters/mode-base-server/mode-base-cluster-objects.h> // nogncheck
 #include <app/clusters/mode-base-server/mode-base-server.h>          // nogncheck
 
-using namespace chip;
-using namespace chip::app::Clusters;
 using chip::Protocols::InteractionModel::Status;
 
-void UpdateModeBaseCurrentModeToOnMode(EndpointId endpoint)
+namespace chip::app::Clusters::OnOff::Internal::ModeBase {
+
+void UpdateCurrentModeToOnMode(chip::EndpointId endpoint)
 {
-    for (auto & modeBaseInstance : ModeBase::GetModeBaseInstanceList())
+    for (auto & modeBaseInstance : Clusters::ModeBase::GetModeBaseInstanceList())
     {
-        if (modeBaseInstance.GetEndpointId() == endpoint)
+        if (modeBaseInstance.GetEndpointId() != endpoint)
         {
-            if (modeBaseInstance.HasFeature(ModeBase::Feature::kOnOff))
-            {
-                ModeBase::Attributes::OnMode::TypeInfo::Type onMode = modeBaseInstance.GetOnMode();
-                if (!onMode.IsNull())
-                {
-                    Status status = modeBaseInstance.UpdateCurrentMode(onMode.Value());
-                    if (status == Status::Success)
-                    {
-                        ChipLogProgress(Zcl, "Changed the Current Mode to %x", onMode.Value());
-                    }
-                    else
-                    {
-                        ChipLogError(Zcl, "Failed to Changed the Current Mode to %x: %u", onMode.Value(), to_underlying(status));
-                    }
-                }
-            }
+            continue;
+        }
+
+        if (!modeBaseInstance.HasFeature(Clusters::ModeBase::Feature::kOnOff))
+        {
+            continue;
+        }
+        Clusters::ModeBase::Attributes::OnMode::TypeInfo::Type onMode = modeBaseInstance.GetOnMode();
+        if (onMode.IsNull())
+        {
+            continue;
+        }
+
+        Status status = modeBaseInstance.UpdateCurrentMode(onMode.Value());
+        if (status == Status::Success)
+        {
+            ChipLogProgress(Zcl, "Changed the Current Mode to %x", onMode.Value());
+        }
+        else
+        {
+            ChipLogError(Zcl, "Failed to Changed the Current Mode to %x: %u", onMode.Value(), to_underlying(status));
         }
     }
 }
+
+} // namespace chip::app::Clusters::OnOff::Internal::ModeBase
 
 #endif // MATTER_DM_PLUGIN_MODE_BASE
