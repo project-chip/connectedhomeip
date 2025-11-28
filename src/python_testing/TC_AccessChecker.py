@@ -189,7 +189,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             xml_cluster = self.xml_clusters[cluster_id]
             for attribute_id in attrs[cluster_id]:
                 location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
-                if attribute_id not in xml_cluster.attributes.keys():
+                if attribute_id not in xml_cluster.attributes:
                     self.record_error(test_name="Access Checker", location=location,
                                       problem="Cluster attribute not found in spec XML")
                     self.success = False
@@ -202,7 +202,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             # Check that we have information for all the required commands
             for command_id in cmds[cluster_id]:
                 location = CommandPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, command_id=command_id)
-                if command_id not in xml_cluster.accepted_commands.keys():
+                if command_id not in xml_cluster.accepted_commands:
                     self.record_error(test_name="Access Checker", location=location,
                                       problem="Cluster command not found in spec XML")
                     self.success = False

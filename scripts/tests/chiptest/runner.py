@@ -195,7 +195,7 @@ class Runner:
         if s.returncode != 0:
             if wait.timed_out:
                 raise Exception("Command %r exceeded test timeout (%d seconds)" % (cmd, wait.timeout_seconds))
-            else:
-                raise Exception('Command %r failed: %d' % (cmd, s.returncode))
+            raise Exception('Command %r failed: %d' % (cmd, s.returncode))
 
         log.debug("Command %r completed with error code 0", cmd)
+        return None

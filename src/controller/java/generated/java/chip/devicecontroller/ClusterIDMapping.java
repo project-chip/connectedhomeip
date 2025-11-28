@@ -3434,6 +3434,7 @@ public class ClusterIDMapping {
             ActiveRadioFaults(6L),
             ActiveNetworkFaults(7L),
             TestEventTriggersEnabled(8L),
+            DeviceLoadStatus(10L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
