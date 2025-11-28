@@ -63,13 +63,27 @@ DataModel::ActionReturnStatus ResourceMonitoringCluster::WriteAttribute(const Da
 DataModel::ActionReturnStatus ResourceMonitoringCluster::WriteImpl(const DataModel::WriteAttributeRequest & request,
                                                                    AttributeValueDecoder & decoder)
 {
-    AttributePersistence persistence{ mContext->attributeStorage };
 
     switch (request.path.mAttributeId)
     {
     case ResourceMonitoring::Attributes::LastChangedTime::Id: {
-        return chip::app::GetSafeAttributePersistenceProvider()->WriteScalarValue(
-            ConcreteAttributePath(GetEndpointId(), GetClusterId(), Attributes::LastChangedTime::Id), mLastChangedTime);
+
+        Attributes::LastChangedTime::TypeInfo::Type newLastChangedTime;
+        ReturnErrorOnFailure(decoder.Decode(newLastChangedTime));
+
+        if (newLastChangedTime != mLastChangedTime)
+        {
+            if (CHIP_NO_ERROR ==
+                chip::app::GetSafeAttributePersistenceProvider()->WriteScalarValue(
+                    ConcreteAttributePath(GetEndpointId(), GetClusterId(), Attributes::LastChangedTime::Id), newLastChangedTime))
+            {
+                mLastChangedTime = newLastChangedTime;
+                NotifyAttributeChanged(Attributes::LastChangedTime::Id);
+                return Status::Success;
+            }
+        }
+
+        return Protocols::InteractionModel::Status::WriteIgnored;
     }
 
     default:
@@ -103,7 +117,7 @@ DataModel::ActionReturnStatus ResourceMonitoringCluster::ReadAttribute(const Dat
         return encoder.Encode(mLastChangedTime);
 
     case ResourceMonitoring::Attributes::ReplacementProductList::Id: {
-        return DataModel::ActionReturnStatus{ ReadReplaceableProductList(encoder) };
+        return ReadReplaceableProductList(encoder);
     }
     case ResourceMonitoring::Attributes::ClusterRevision::Id:
         return encoder.Encode(HepaFilterMonitoring::kRevision);
@@ -206,8 +220,8 @@ Protocols::InteractionModel::Status ResourceMonitoringCluster::UpdateInPlaceIndi
     mInPlaceIndicator        = newInPlaceIndicator;
     if (mInPlaceIndicator != oldInPlaceIndicator)
     {
-        static_assert(HepaFilterMonitoring::Attributes::Condition::Id ==
-                      ActivatedCarbonFilterMonitoring::Attributes::Condition::Id);
+        static_assert(HepaFilterMonitoring::Attributes::InPlaceIndicator::Id ==
+                      ActivatedCarbonFilterMonitoring::Attributes::InPlaceIndicator::Id);
 
         NotifyAttributeChanged(HepaFilterMonitoring::Attributes::InPlaceIndicator::Id);
     }
@@ -274,6 +288,7 @@ void ResourceMonitoringCluster::LoadPersistentAttributes()
 CHIP_ERROR ResourceMonitoringCluster::Startup(ServerClusterContext & context)
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+
     LoadPersistentAttributes();
 
     return CHIP_NO_ERROR;
