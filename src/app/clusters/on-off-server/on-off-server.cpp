@@ -307,7 +307,7 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
 
         if (onOffValueForStartUp)
         {
-            Internal::ModeSelectSetOnModeFromStartup(endpoint);
+            Internal::ModeSelect::SetStartupOnMode(endpoint);
         }
     }
 #endif // IGNORE_ON_OFF_CLUSTER_START_UP_ON_OFF
