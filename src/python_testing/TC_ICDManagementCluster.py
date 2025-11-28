@@ -20,7 +20,7 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${LIT_ICD_APP}
+#     app: ${lit-icd}
 #     app-args: >
 #       --discriminator 1234
 #       --KVS kvs1

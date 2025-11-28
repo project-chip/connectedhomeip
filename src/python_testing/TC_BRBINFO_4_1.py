@@ -22,7 +22,7 @@
 # test-runner-runs:
 #   run1:
 #     app: examples/fabric-admin/scripts/fabric-sync-app.py
-#     app-args: --app-admin=${FABRIC_ADMIN_APP} --app-bridge=${FABRIC_BRIDGE_APP} --discriminator=1234
+#     app-args: --app-admin=${fabric-admin} --app-bridge=${fabric-bridge} --discriminator=1234
 #     app-ready-pattern: "Successfully opened pairing window on the device"
 #     app-stdin-pipe: dut-fsa-stdin
 #     script-args: >
@@ -31,14 +31,14 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --string-arg th_icd_server_app_path:${LIT_ICD_APP}
+#       --string-arg th_icd_server_app_path:${lit-icd}
 #       --string-arg dut_fsa_stdin_pipe:dut-fsa-stdin
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
 #   run2:
-#     app: ${FABRIC_SYNC_APP}
+#     app: ${fabric-sync}
 #     app-args: --discriminator=1234
 #     app-stdin-pipe: dut-fsa-stdin
 #     script-args: >
@@ -48,7 +48,7 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --bool-arg unified_fabric_sync_app:true
-#       --string-arg th_icd_server_app_path:${LIT_ICD_APP}
+#       --string-arg th_icd_server_app_path:${lit-icd}
 #       --string-arg dut_fsa_stdin_pipe:dut-fsa-stdin
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto

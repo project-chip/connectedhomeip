@@ -63,7 +63,7 @@ def _get_apps_from_script(path: str) -> List[str]:
         apps = set()
         for run_config in runs_args.values():
             if run_config and 'app' in run_config:
-                # app is like "${ALL_CLUSTERS_APP}"
+                # app is like "${all-clusters}"
                 app_name = run_config['app'].strip('${}')
                 apps.add(app_name)
         return list(apps)

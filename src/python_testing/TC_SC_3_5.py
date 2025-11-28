@@ -20,7 +20,7 @@
 #     factory-reset: true
 #     quiet: true
 #     script-args: >
-#       --string-arg th_server_app_path:${ALL_CLUSTERS_APP}
+#       --string-arg th_server_app_path:${all-clusters}
 #       --storage-path admin_storage.json
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto

@@ -34,7 +34,7 @@
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --string-arg app_path:${ALL_CLUSTERS_APP}
+#       --string-arg app_path:${all-clusters}
 #       --string-arg dac_provider_base_path:credentials/test/revoked-attestation-certificates/dac-provider-test-vectors
 #       --string-arg revocation_set_base_path:credentials/test/revoked-attestation-certificates/revocation-sets
 #       --string-arg app_log_path:/tmp/TC_DA_1_9

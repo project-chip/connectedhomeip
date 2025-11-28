@@ -22,7 +22,7 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${CHIP_RVC_APP}
+#     app: ${rvc}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/sear_1_5_fifo
 #     script-args: >
 #       --storage-path admin_storage.json

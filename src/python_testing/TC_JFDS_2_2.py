@@ -24,8 +24,8 @@
 # test-runner-runs:
 #   run1:
 #     script-args: >
-#       --string-arg jfa_server_app:${JF_ADMIN_APP}
-#       --string-arg jfc_server_app:${JF_CONTROL_APP}
+#       --string-arg jfa_server_app:${jf-admin}
+#       --string-arg jfc_server_app:${jf-control-app}
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true

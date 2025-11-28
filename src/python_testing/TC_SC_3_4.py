@@ -17,7 +17,7 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
+#     app: ${all-clusters}
 #     factory-reset: true
 #     quiet: true
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
@@ -29,7 +29,7 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #   run2:
-#     app: ${ALL_CLUSTERS_APP}
+#     app: ${all-clusters}
 #     factory-reset: false
 #     quiet: true
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json

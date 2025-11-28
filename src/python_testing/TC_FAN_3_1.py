@@ -21,7 +21,7 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${AIR_PURIFIER_APP}
+#     app: ${air-purifier}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace_file json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json

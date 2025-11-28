@@ -21,7 +21,7 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${CHIP_RVC_APP}
+#     app: ${rvc}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/rvccleanm_2_1_fifo
 #     script-args: >
 #       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values

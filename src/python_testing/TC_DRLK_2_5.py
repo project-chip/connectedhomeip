@@ -20,7 +20,7 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${CHIP_LOCK_APP}
+#     app: ${lock}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json

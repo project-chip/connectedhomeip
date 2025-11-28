@@ -20,7 +20,7 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${CAMERA_APP}
+#     app: ${camera}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/avsm_2_16_fifo
 #     script-args: >
 #       --storage-path admin_storage.json

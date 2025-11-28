@@ -21,7 +21,7 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${NETWORK_MANAGEMENT_APP}
+#     app: ${network-manager}
 #     factory-reset: true
 #     quiet: true
 #     app-args: >

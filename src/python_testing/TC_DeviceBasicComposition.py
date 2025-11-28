@@ -21,7 +21,7 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
+#     app: ${all-clusters}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -32,19 +32,19 @@
 #     factory-reset: true
 #     quiet: true
 #   run2:
-#     app: ${CHIP_LOCK_APP}
+#     app: ${lock}
 #     app-args: --discriminator 1234 --KVS kvs1
 #     script-args: --storage-path admin_storage.json --manual-code 10054912339
 #     factory-reset: true
 #     quiet: true
 #   run3:
-#     app: ${CHIP_LOCK_APP}
+#     app: ${lock}
 #     app-args: --discriminator 1234 --KVS kvs1
 #     script-args: --storage-path admin_storage.json --qr-code MT:-24J0Q1212-10648G00
 #     factory-reset: true
 #     quiet: true
 #   run4:
-#     app: ${CHIP_LOCK_APP}
+#     app: ${lock}
 #     app-args: --discriminator 1234 --KVS kvs1
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -53,7 +53,7 @@
 #     factory-reset: true
 #     quiet: true
 #   run5:
-#     app: ${CHIP_LOCK_APP}
+#     app: ${lock}
 #     app-args: --discriminator 1234 --KVS kvs1
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -62,7 +62,7 @@
 #     factory-reset: true
 #     quiet: true
 #   run6:
-#     app: ${CHIP_LOCK_APP}
+#     app: ${lock}
 #     app-args: --discriminator 1234 --KVS kvs1
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -71,7 +71,7 @@
 #     factory-reset: true
 #     quiet: true
 #   run7:
-#     app: ${CHIP_LOCK_APP}
+#     app: ${lock}
 #     app-args: --discriminator 1234 --KVS kvs1
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -81,7 +81,7 @@
 #     factory-reset: true
 #     quiet: true
 #   run8:
-#     app: ${CHIP_LOCK_APP}
+#     app: ${lock}
 #     app-args: --discriminator 1234 --KVS kvs1
 #     script-args: --storage-path admin_storage.json
 #     factory-reset: false
@@ -91,7 +91,7 @@
 #     factory-reset: false
 #     quiet: true
 #   run10:
-#     app: ${ENERGY_MANAGEMENT_APP}
+#     app: ${energy-management}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -102,7 +102,7 @@
 #     factory-reset: true
 #     quiet: true
 #   run11:
-#     app: ${LIT_ICD_APP}
+#     app: ${lit-icd}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -113,7 +113,7 @@
 #     factory-reset: true
 #     quiet: true
 #   run12:
-#     app: ${CHIP_MICROWAVE_OVEN_APP}
+#     app: ${microwave-oven}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -124,7 +124,7 @@
 #     factory-reset: true
 #     quiet: true
 #   run13:
-#     app: ${CHIP_RVC_APP}
+#     app: ${rvc}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -135,7 +135,7 @@
 #     factory-reset: true
 #     quiet: true
 #   run14:
-#     app: ${NETWORK_MANAGEMENT_APP}
+#     app: ${network-manager}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -146,7 +146,7 @@
 #     factory-reset: true
 #     quiet: true
 #   run15:
-#     app: ${LIGHTING_APP_NO_UNIQUE_ID}
+#     app: ${light}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -157,7 +157,7 @@
 #     factory-reset: true
 #     quiet: true
 #   run16:
-#     app: ${ALL_DEVICES_APP}
+#     app: ${all-devices}
 #     app-args: --discriminator 1234 --KVS kvs1
 #     script-args: >
 #       --storage-path admin_storage.json

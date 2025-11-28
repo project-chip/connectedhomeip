@@ -21,7 +21,7 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${CAMERA_APP}
+#     app: ${camera}
 #     app-args: --camera-deferred-offer --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/webrtcp_2_15_fifo
 #     script-args: >
 #       --PICS src/app/tests/suites/certification/ci-pics-values

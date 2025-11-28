@@ -21,7 +21,7 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${CHIP_RVC_APP}
+#     app: ${rvc}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/rvcopstate_2_1_fifo
 #     script-args: >
 #       --storage-path admin_storage.json

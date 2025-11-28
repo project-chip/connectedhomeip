@@ -21,7 +21,7 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
+#     app: ${all-clusters}
 #     app-args: >
 #       --discriminator 1234
 #       --KVS kvs1
@@ -39,7 +39,7 @@
 #     factory-reset: true
 #     quiet: true
 #   run2:
-#     app: ${ALL_CLUSTERS_APP}
+#     app: ${all-clusters}
 #     app-args: >
 #       --discriminator 1234
 #       --KVS kvs1

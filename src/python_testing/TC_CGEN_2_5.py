@@ -18,7 +18,7 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#       app: ${TERMS_AND_CONDITIONS_APP}
+#       app: ${terms-and-conditions}
 #       app-args: >
 #           --tc-min-required-version 1
 #           --tc-required-acknowledgements 1

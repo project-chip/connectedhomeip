@@ -25,7 +25,7 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
+#     app: ${all-clusters}
 #     app-args: --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --log-level INFO
