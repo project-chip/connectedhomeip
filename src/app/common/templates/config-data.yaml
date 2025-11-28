@@ -161,9 +161,9 @@ CodeDrivenClusters:
     - General Diagnostics
     - Group Key Management
     - Groupcast
+    - HEPA Filter Monitoring
     - ICD Management
     - Identify
-    - HEPA Filter Monitoring
     - Localization Configuration
     - OTA Software Update Provider
     - Operational Credentials
