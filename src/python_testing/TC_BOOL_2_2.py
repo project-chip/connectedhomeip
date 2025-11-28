@@ -104,7 +104,7 @@ class TC_BOOL_2_2(MatterBaseTest):
         self.step("2a")
 
         cbool = Clusters.BooleanState
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         node_id = self.dut_node_id
         dev_ctrl = self.default_controller
 
