@@ -13,13 +13,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "scenes-integration.h"
+#include <app/clusters/on-off-server/scenes-integration.h>
 
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 
-#include "on-off-server.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/scenes-server/scenes-server.h>
+#include <app/clusters/on-off-server/on-off-server.h>
+#include <app/clusters/scenes-server/scenes-server.h> // nogncheck
 
 using namespace chip;
 using namespace chip::app::Clusters;

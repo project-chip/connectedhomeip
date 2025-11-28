@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "mode-base-integration.h"
+#include <app/clusters/on-off-server/mode-base-integration.h>
 
 #ifdef MATTER_DM_PLUGIN_MODE_BASE
 

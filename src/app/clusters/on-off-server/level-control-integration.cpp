@@ -13,11 +13,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "level-control-integration.h"
+#include <app/clusters/on-off-server/level-control-integration.h>
 
 #ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL
 
-#include <app/clusters/level-control/level-control.h>
+#include <app/clusters/level-control/level-control.h> //nogncheck
 #include <app/util/attribute-storage.h>
 
 using namespace chip;

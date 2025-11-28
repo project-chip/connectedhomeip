@@ -29,10 +29,10 @@
 #include <tracing/macros.h>
 
 // integration with other clusters
-#include "level-control-integration.h"
-#include "mode-base-integration.h"
-#include "mode-select-integration.h"
-#include "scenes-integration.h"
+#include <app/clusters/on-off-server/level-control-integration.h>
+#include <app/clusters/on-off-server/mode-base-integration.h>
+#include <app/clusters/on-off-server/mode-select-integration.h>
+#include <app/clusters/on-off-server/scenes-integration.h>
 
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DiagnosticDataProvider.h>
@@ -731,8 +731,8 @@ static inline void unreg(OnOffEffect * inst)
 
 OnOffEffect::OnOffEffect(chip::EndpointId endpoint, OffWithEffectTriggerCommand offWithEffectTrigger,
                          EffectIdentifierEnum effectIdentifier, uint8_t effectVariant) :
-    mEndpoint(endpoint),
-    mOffWithEffectTrigger(offWithEffectTrigger), mEffectIdentifier(effectIdentifier), mEffectVariant(effectVariant)
+    mEndpoint(endpoint), mOffWithEffectTrigger(offWithEffectTrigger), mEffectIdentifier(effectIdentifier),
+    mEffectVariant(effectVariant)
 {
     reg(this);
 };
