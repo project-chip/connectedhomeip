@@ -444,7 +444,8 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
             status = setOnOffValue(endpoint, onOffValueForStartUp, true);
         }
 
-        if (onOffValueForStartUp) {
+        if (onOffValueForStartUp)
+        {
             Internal::ModeSelectSetOnModeFromStartup(endpoint);
         }
     }
