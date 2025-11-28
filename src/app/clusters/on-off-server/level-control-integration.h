@@ -48,5 +48,4 @@ inline bool EfectCallback(chip::EndpointId endpoint, bool newValue)
 }
 
 #endif // MATTER_DM_PLUGIN_LEVEL_CONTROL
-//
 } // namespace chip::app::Clusters::OnOff::Internal::LevelControl
