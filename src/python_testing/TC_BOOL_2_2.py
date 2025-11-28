@@ -88,7 +88,7 @@ class TC_BOOL_2_2(MatterBaseTest):
         ]
         return steps
 
-    def pics_TC_BOOLCFG_2_1(self) -> list[str]:
+    def pics_TC_BOOL_2_2(self) -> list[str]:
         pics = [
             "BOOLCFG.S",
         ]
