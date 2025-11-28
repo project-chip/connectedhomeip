@@ -173,9 +173,9 @@ CHIP_ERROR EmitValveFault(chip::EndpointId ep, chip::BitMask<ValveConfigurationA
 
 void UpdateAutoCloseTime(uint64_t time)
 {
-    for(size_t serverIndex = 0; serverIndex < kValveConfigurationAndControlMaxClusterCount; serverIndex++)
+    for (size_t serverIndex = 0; serverIndex < kValveConfigurationAndControlMaxClusterCount; serverIndex++)
     {
-        if(gServers[serverIndex].IsConstructed())
+        if (gServers[serverIndex].IsConstructed())
         {
             gServers[serverIndex].Cluster().UpdateAutoCloseTime(time);
         }
