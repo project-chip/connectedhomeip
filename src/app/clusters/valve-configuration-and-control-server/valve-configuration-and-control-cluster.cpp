@@ -402,7 +402,7 @@ void ValveConfigurationAndControlCluster::HandleUpdateRemainingDurationInternal(
     if (mRemainingDuration.value().Value() > 0)
     {
         LogErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), HandleUpdateRemainingDuration, this));
-        SetRemainingDuration(--mRemainingDuration.value().Value());
+        SetRemainingDuration(mRemainingDuration.value().Value() - 1);
     }
     else
     {
