@@ -311,7 +311,7 @@ class CHIPVirtualHome:
             raise AssertionError
 
     def assertEqual(self, val1, val2, note=None):
-        if not (val1 == val2):
+        if val1 != val2:
             if note:
                 self.logger.error(note)
             raise AssertionError

@@ -646,7 +646,7 @@ class _ConstraintIsUpperCase(BaseConstraint):
             chars = []
 
             for char in value:
-                if not char.upper() == char:
+                if char.upper() != char:
                     chars.append(char)
 
             if len(chars) == 1:
@@ -674,7 +674,7 @@ class _ConstraintIsLowerCase(BaseConstraint):
             chars = []
 
             for char in value:
-                if not char.lower() == char:
+                if char.lower() != char:
                     chars.append(char)
 
             if len(chars) == 1:
