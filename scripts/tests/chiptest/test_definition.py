@@ -476,7 +476,7 @@ class TestDefinition:
                     '--setup-code', setupCode, '--yaml-path', self.run_name, "--pics-file", pics_file)
 
                 if dry_run:
-                    log.info(shlex.join(python_cmd))
+                    log.info(shlex.join(python_cmd.to_cmd()))
                 else:
                     runner.RunSubprocess(python_cmd, name='MATTER_REPL_YAML_TESTER',
                                          dependencies=[apps_register], timeout_seconds=timeout_seconds)
@@ -508,8 +508,8 @@ class TestDefinition:
                 test_cmd = test_cmd.with_args(*server_args)
 
                 if dry_run:
-                    log.info(shlex.join(pairing_cmd))
-                    log.info(shlex.join(test_cmd))
+                    log.info(shlex.join(pairing_cmd.to_cmd()))
+                    log.info(shlex.join(test_cmd.to_cmd()))
                 else:
                     runner.RunSubprocess(pairing_cmd,
                                          name='PAIR', dependencies=[apps_register])
