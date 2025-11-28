@@ -17,7 +17,7 @@
 
 #include <app/util/config.h>
 
-#include "on-off-server.h"
+#include <app/clusters/on-off-server/on-off-server.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/data-model/Nullable.h>
