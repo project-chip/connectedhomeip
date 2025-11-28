@@ -178,34 +178,29 @@ class IsolatedNetworkNamespace:
             log.warning("Some addresses look to still be tentative")
 
     def _setup(self):
-        for command in self.COMMANDS_SETUP:
-            self._run(command)
+        self._run(*self.COMMANDS_SETUP)
 
     def setup_app_link_up(self, wait_for_dad: bool = True):
-        for command in self.COMMANDS_APP_LINK_UP:
-            self._run(command)
+        self._run(*self.COMMANDS_APP_LINK_UP)
         if wait_for_dad:
             self._wait_for_duplicate_address_detection()
 
-    def _setup_tool_link_up(self, wait_for_dad=True):
-        for command in self.COMMANDS_TOOL_LINK_UP:
-            self._run(command)
+    def _setup_tool_link_up(self, wait_for_dad: bool = True):
+        self._run(*self.COMMANDS_TOOL_LINK_UP)
         if wait_for_dad:
             self._wait_for_duplicate_address_detection()
 
-    def _run(self, command: str):
-        command = command.format(app_link_name=self.app_link_name,
-                                 tool_link_name=self.tool_link_name,
-                                 index=self.index)
-        log.debug("Executing: '%s'", command)
-        if subprocess.run(command.split()).returncode != 0:
-            log.error("Failed to execute '%s'", command)
-            log.error("Are you using --privileged if running in docker?")
-            sys.exit(1)
+    def _run(self, *command: str):
+        for c in command:
+            c = c.format(app_link_name=self.app_link_name, tool_link_name=self.tool_link_name, index=self.index)
+            log.debug("Executing: '%s'", c)
+            if subprocess.run(c.split()).returncode != 0:
+                log.error("Failed to execute '%s'", c)
+                log.error("Are you using --privileged if running in docker?")
+                sys.exit(1)
 
     def terminate(self):
-        for command in self.COMMANDS_TERMINATE:
-            self._run(command)
+        self._run(*self.COMMANDS_TERMINATE)
 
 
 class LinuxNamespacedExecutor(Executor):
