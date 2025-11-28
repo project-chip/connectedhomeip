@@ -48,21 +48,6 @@ public:
     DefaultOnOffSceneHandler()           = default;
     ~DefaultOnOffSceneHandler() override = default;
 
-    // Default function for OnOff cluster, only puts the OnOff cluster ID in the span if supported on the given endpoint
-    void GetSupportedClusters(EndpointId endpoint, Span<ClusterId> & clusterBuffer) override
-    {
-        ClusterId * buffer = clusterBuffer.data();
-        if (emberAfContainsServer(endpoint, OnOff::Id) && clusterBuffer.size() >= 1)
-        {
-            buffer[0] = OnOff::Id;
-            clusterBuffer.reduce_size(1);
-        }
-        else
-        {
-            clusterBuffer.reduce_size(0);
-        }
-    }
-
     // Default function for OnOff cluster, only checks if OnOff is enabled on the endpoint
     bool SupportsCluster(EndpointId endpoint, ClusterId cluster) override
     {
