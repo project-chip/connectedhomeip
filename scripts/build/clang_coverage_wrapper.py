@@ -26,7 +26,7 @@ import jinja2
 __LOG_LEVELS__ = {
     "debug": logging.DEBUG,
     "info": logging.INFO,
-    "warn": logging.WARN,
+    "warn": logging.WARNING,
     "fatal": logging.FATAL,
 }
 
@@ -59,7 +59,7 @@ struct StaticInitLLVMProfile {
 @click.option(
     "--log-level",
     default="INFO",
-    type=click.Choice([k for k in __LOG_LEVELS__.keys()], case_sensitive=False),
+    type=click.Choice([k for k in __LOG_LEVELS__], case_sensitive=False),
     help="Determines the verbosity of script output.",
 )
 @click.option(
