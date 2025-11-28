@@ -665,8 +665,7 @@ def WriteTarget(out, target, project):
     for dependency in dependencies:
         gn_dependency_type = project.targets.get(
             dependency, {}).get('type', None)
-        cmake_dependency_type = cmake_target_types.get(
-            gn_dependency_type, None)
+        cmake_dependency_type = cmake_target_types.get(gn_dependency_type)
         cmake_dependency_name = project.GetCMakeTargetName(dependency)
 
         if cmake_dependency_type.command != 'add_library':
