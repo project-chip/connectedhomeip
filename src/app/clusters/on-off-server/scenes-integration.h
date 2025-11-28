@@ -17,10 +17,9 @@
 
 #include <app/util/config.h>
 #include <lib/core/CHIPConfig.h>
+#include <app/clusters/scenes-server/SceneTable.h>
 
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-
-#include <app/clusters/scenes-server/SceneTable.h>
 
 namespace chip::app::Clusters::OnOff::Internal::Scenes {
 
