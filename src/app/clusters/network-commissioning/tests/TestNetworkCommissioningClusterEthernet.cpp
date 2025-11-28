@@ -75,7 +75,7 @@ TEST_F(TestNetworkCommissioningClusterEthernet, TestAttributes)
 
     // Cluster Revision
     {
-        Attributes::ClusterRevision::TypeInfo::DecodableType value;
+        Attributes::ClusterRevision::TypeInfo::DecodableType value{};
         ASSERT_TRUE(tester.ReadAttribute(Attributes::ClusterRevision::Id, value).IsSuccess());
         ASSERT_EQ(value, NetworkCommissioning::kRevision);
     }
@@ -209,7 +209,11 @@ TEST_F(TestNetworkCommissioningClusterEthernet, TestAttributes)
     // This should succeed and mark the attribute as dirty
     fakeEthernetDriver.EnableDisabling(true);
     ASSERT_TRUE(tester.WriteAttribute(Attributes::InterfaceEnabled::Id, false).IsSuccess());
-    EXPECT_FALSE(tester.GetDirtyList().empty());
+    ASSERT_FALSE(tester.GetDirtyList().empty());
+    auto val = tester.GetDirtyList().back();
+    EXPECT_EQ(val.mEndpointId, kRootEndpointId);
+    EXPECT_EQ(val.mClusterId, NetworkCommissioning::Id);
+    EXPECT_EQ(val.mAttributeId, Attributes::InterfaceEnabled::Id);
 
     // Verify persistence
     {

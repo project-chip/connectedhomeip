@@ -36,8 +36,7 @@ public:
         }
         bool Next(DeviceLayer::NetworkCommissioning::Network & item) override
         {
-            if (currentindex >= mNetworks.size())
-                return false;
+            VerifyOrReturnValue(currentindex < mNetworks.size(), false);
             item = mNetworks[currentindex++];
             return true;
         }
@@ -45,7 +44,6 @@ public:
         void Release() override {}
 
     private:
-        friend class FakeEthernetDriver;
         Span<DeviceLayer::NetworkCommissioning::Network> mNetworks;
         size_t currentindex = 0;
     };
@@ -60,7 +58,8 @@ public:
 
     void SetNetwork(ByteSpan interfaceName)
     {
-        memcpy(mNetwork.networkID, interfaceName.data(), interfaceName.size());
+        auto span = MutableByteSpan{ mNetwork.networkID, sizeof(mNetwork.networkID) };
+        SuccessOrDie(CopySpanToMutableSpan(interfaceName, span));
         mNetwork.networkIDLen = static_cast<uint8_t>(interfaceName.size());
         mNetwork.connected    = true;
         mNetworkCount         = 1;

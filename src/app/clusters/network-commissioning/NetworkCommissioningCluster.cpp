@@ -253,7 +253,7 @@ void NetworkCommissioningCluster::SetLastNetworkingStatusValue(
 {
     if (mLastNetworkingStatusValue.Update(networkingStatusValue))
     {
-        NotifyAttributeChanged(Attributes::LastNetworkingStatus::TypeInfo::GetAttributeId());
+        NotifyAttributeChanged(Attributes::LastNetworkingStatus::Id);
     }
 }
 
@@ -261,7 +261,7 @@ void NetworkCommissioningCluster::SetLastConnectErrorValue(Attributes::LastConne
 {
     if (mLastConnectErrorValue.Update(connectErrorValue))
     {
-        NotifyAttributeChanged(Attributes::LastConnectErrorValue::TypeInfo::GetAttributeId());
+        NotifyAttributeChanged(Attributes::LastConnectErrorValue::Id);
     }
 }
 
@@ -273,12 +273,12 @@ void NetworkCommissioningCluster::SetLastNetworkId(ByteSpan lastNetworkId)
 
     memcpy(mLastNetworkID, lastNetworkId.data(), lastNetworkId.size());
     mLastNetworkIDLen = static_cast<uint8_t>(lastNetworkId.size());
-    NotifyAttributeChanged(Attributes::LastNetworkID::TypeInfo::GetAttributeId());
+    NotifyAttributeChanged(Attributes::LastNetworkID::Id);
 }
 
 void NetworkCommissioningCluster::ReportNetworksListChanged()
 {
-    NotifyAttributeChanged(Attributes::Networks::TypeInfo::GetAttributeId());
+    NotifyAttributeChanged(Attributes::Networks::Id);
 }
 
 void NetworkCommissioningCluster::OnNetworkingStatusChange(Status aCommissioningError, Optional<ByteSpan> aNetworkId,
@@ -1087,15 +1087,7 @@ DataModel::ActionReturnStatus NetworkCommissioningCluster::WriteAttribute(const 
         // INVALID_ACTION."
         if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
         {
-            // return INVALID_ACTION only when trying to disable the interface
-            if (value)
-            {
-                return CHIP_NO_ERROR;
-            }
-            else
-            {
-                return Protocols::InteractionModel::Status::InvalidAction;
-            }
+            return Protocols::InteractionModel::Status::InvalidAction;
         }
         return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, err);
     }
