@@ -53,7 +53,7 @@ void UpdateCurrentModeToOnMode(chip::EndpointId endpoint)
         }
         else
         {
-            ChipLogError(Zcl, "Failed to Changed the Current Mode to %x: %u", onMode.Value(), to_underlying(status));
+            ChipLogError(Zcl, "Failed to change the Current Mode to %x: %u", onMode.Value(), to_underlying(status));
         }
     }
 }
