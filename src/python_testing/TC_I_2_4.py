@@ -39,6 +39,7 @@
 
 import asyncio
 import logging
+import time
 
 import test_plan_support
 from mobly import asserts
@@ -50,6 +51,14 @@ from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matt
 
 
 class TC_I_2_4(MatterBaseTest):
+    
+    # Wait for a new report to be received or at maximum wait_time second
+    def wait_for_identify_time_report_or_timeout(self, handler, attribute, pre_count, wait_time):
+        timeout = time.time() + wait_time
+        while pre_count == handler.attribute_report_counts[attribute]:
+            if time.time() >= timeout:
+                break
+
     def desc_TC_I_2_4(self) -> str:
         return "[TC-I-2.4] Reporting requirements with server as DUT"
 
@@ -133,12 +142,13 @@ class TC_I_2_4(MatterBaseTest):
         reportedIdentifyTimeValuesList = []
 
         self.step(4)
+        pre_count = sub_handler.attribute_report_counts[cluster.Attributes.IdentifyTime]
         result = await self.write_single_attribute(cluster.Attributes.IdentifyTime(5), endpoint_id=endpoint)
         asserts.assert_equal(result, Status.Success, "Error when trying to write a IdentifyTime value")
+        # Ensure one update report for this above change is received before continuing
+        self.wait_for_identify_time_report_or_timeout(sub_handler, cluster.Attributes.IdentifyTime,  pre_count, 1)
 
         self.step(5)
-        # Add a small delay to allow value from step 4 to be sent via the subscription for non Matter SDK implementations
-        await asyncio.sleep(0.1)
         result = await self.write_single_attribute(cluster.Attributes.IdentifyTime(10), endpoint_id=endpoint)
         asserts.assert_equal(result, Status.Success, "Error when trying to write a IdentifyTime value")
 
@@ -168,12 +178,13 @@ class TC_I_2_4(MatterBaseTest):
         reportedIdentifyTimeValuesList.clear()
 
         self.step(12)
+        pre_count = sub_handler.attribute_report_counts[cluster.Attributes.IdentifyTime]
         result = await self.write_single_attribute(cluster.Attributes.IdentifyTime(5), endpoint_id=endpoint)
         asserts.assert_equal(result, Status.Success, "Error when trying to write a IdentifyTime value")
+        # Ensure one update report for this above change is received before continuing
+        self.wait_for_identify_time_report_or_timeout(sub_handler, cluster.Attributes.IdentifyTime,  pre_count, 1)
 
         self.step(13)
-        # Add a small delay to allow value from step 12 to be sent via the subscription for non Matter SDK implementations
-        await asyncio.sleep(0.1)
         result = await self.write_single_attribute(cluster.Attributes.IdentifyTime(0), endpoint_id=endpoint)
         asserts.assert_equal(result, Status.Success, "Error when trying to write a IdentifyTime value")
 
@@ -201,15 +212,16 @@ class TC_I_2_4(MatterBaseTest):
         reportedIdentifyTimeValuesList.clear()
 
         self.step(19)
+        pre_count = sub_handler.attribute_report_counts[cluster.Attributes.IdentifyTime]
         try:
             await self.send_single_cmd(cmd=cluster.Commands.Identify(identifyTime=5), endpoint=endpoint)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
             pass
+        # Ensure one update report for this above change is received before continuing
+        self.wait_for_identify_time_report_or_timeout(sub_handler, cluster.Attributes.IdentifyTime,  pre_count, 1)
 
         self.step(20)
-        # Add a small delay to allow value from step 19 to be sent via the subscription for non Matter SDK implementations
-        await asyncio.sleep(0.1)
         try:
             await self.send_single_cmd(cmd=cluster.Commands.Identify(identifyTime=10), endpoint=endpoint)
         except InteractionModelError as e:
@@ -242,15 +254,16 @@ class TC_I_2_4(MatterBaseTest):
         reportedIdentifyTimeValuesList.clear()
 
         self.step(27)
+        pre_count = sub_handler.attribute_report_counts[cluster.Attributes.IdentifyTime]
         try:
             await self.send_single_cmd(cmd=cluster.Commands.Identify(identifyTime=5), endpoint=endpoint)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
             pass
+        # Ensure one update report for this above change is received before continuing
+        self.wait_for_identify_time_report_or_timeout(sub_handler, cluster.Attributes.IdentifyTime,  pre_count, 1)
 
         self.step(28)
-        # Add a small delay to allow value from step 27 to be sent via the subscription for non Matter SDK implementations
-        await asyncio.sleep(0.1)
         try:
             await self.send_single_cmd(cmd=cluster.Commands.Identify(identifyTime=0), endpoint=endpoint)
         except InteractionModelError as e:
