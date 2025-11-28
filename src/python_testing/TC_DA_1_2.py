@@ -33,6 +33,20 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --string-arg cd_cert_dir:credentials/development/cd-certs
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -48,6 +62,7 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import ec, utils
 from ecdsa.curves import curve_by_name
 from mobly import asserts
+from pathlib import Path
 from pyasn1.codec.der.decoder import decode as der_decoder
 from pyasn1.error import PyAsn1Error
 from pyasn1.type import univ
@@ -57,6 +72,7 @@ import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.conversions import hex_from_bytes
+from matter.testing.credentials import CredentialSource, get_cd_certs
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
 from matter.tlv import TLVReader
 
@@ -187,7 +203,11 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
 
     @async_test_body
     async def test_TC_DA_1_2(self):
-        cd_cert_dir = self.user_params.get("cd_cert_dir", 'credentials/development/cd-certs')
+        cd_cert_dir = self.user_params.get("cd_cert_dir")
+        if cd_cert_dir is None:
+            cd_cert_dir = CredentialSource.kDevelopment
+        else:
+            cd_cert_dir = Path(cd_cert_dir)
         post_cert_test = self.user_params.get("post_cert_test", False)
 
         do_test_over_pase = self.user_params.get("use_pase_only", False)
@@ -391,16 +411,16 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
         self.step(9)
         signature_cd = bytes(signer_info['signature'])
         certs = {}
-        for filename in os.listdir(cd_cert_dir):
-            if '.der' not in filename:
+        for filename in get_cd_certs(cd_cert_dir).iterdir():
+            if not filename.name.endswith('.der'):
                 continue
-            with open(os.path.join(cd_cert_dir, filename), 'rb') as f:
+            with filename.open("rb") as f:
                 logging.info(f'Parsing CD signing certificate file: {filename}')
                 try:
                     cert = x509.load_der_x509_certificate(f.read())
                 except ValueError:
                     logging.info(f'File {filename} is not a valid certificate, skipping')
-                    pass
+                    continue
                 pub = cert.public_key()
                 ski = x509.SubjectKeyIdentifier.from_public_key(pub).digest
                 certs[ski] = pub
