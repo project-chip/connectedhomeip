@@ -16,10 +16,10 @@ import("//build_overrides/chip.gni")
 
 source_set("valve-configuration-and-control-server") {
   sources = [
+    "TimeSyncTracker.h",
     "valve-configuration-and-control-cluster.cpp",
     "valve-configuration-and-control-cluster.h",
     "valve-configuration-and-control-delegate.h",
-    "TimeSyncTracker.h",
   ]
 
   public_deps = [
