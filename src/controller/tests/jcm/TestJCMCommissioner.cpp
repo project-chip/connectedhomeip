@@ -387,9 +387,13 @@ protected:
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
         mCommissioningParams.SetUseJCM(true);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-        mAutoCommissioner.SetCommissioningParameters(mCommissioningParams);
+        CHIP_ERROR err = mAutoCommissioner.SetCommissioningParameters(mCommissioningParams);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "mAutoCommissioner.SetCommissioningParameters failed with error: %s", ErrorStr(err));
+        }
 
-        CHIP_ERROR err = mClusterStateCache.SetUp(GetFabricTable(), GetJFBFabricIndex(), jfbNodeId);
+        err = mClusterStateCache.SetUp(GetFabricTable(), GetJFBFabricIndex(), jfbNodeId);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "MockClusterStateCache::SetUp failed with error: %s", ErrorStr(err));
@@ -431,7 +435,8 @@ TEST_F_FROM_FIXTURE(TestCommissioner, TestTrustVerificationStageFinishedProgress
     // Simulate user consenting
     mTrustVerificationDelegate.mShouldConsent = true;
     // Set up the mock ReadCommissioningInfo
-    mDeviceCommissioner->ParseExtraCommissioningInfo(mInfo, mCommissioningParams);
+    CHIP_ERROR err = mDeviceCommissioner->ParseExtraCommissioningInfo(mInfo, mCommissioningParams);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
 
     TrustVerificationStage stage = TrustVerificationStage::kIdle;
     TrustVerificationError error = TrustVerificationError::kSuccess;
