@@ -731,8 +731,8 @@ static inline void unreg(OnOffEffect * inst)
 
 OnOffEffect::OnOffEffect(chip::EndpointId endpoint, OffWithEffectTriggerCommand offWithEffectTrigger,
                          EffectIdentifierEnum effectIdentifier, uint8_t effectVariant) :
-    mEndpoint(endpoint), mOffWithEffectTrigger(offWithEffectTrigger), mEffectIdentifier(effectIdentifier),
-    mEffectVariant(effectVariant)
+    mEndpoint(endpoint),
+    mOffWithEffectTrigger(offWithEffectTrigger), mEffectIdentifier(effectIdentifier), mEffectVariant(effectVariant)
 {
     reg(this);
 };
