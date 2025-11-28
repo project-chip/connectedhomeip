@@ -56,7 +56,7 @@ class TC_WEBRTCP_2_15(MatterBaseTest, WEBRTCPTestBase):
         """
         Define the step-by-step sequence for the test.
         """
-        steps = [
+        return [
             TestStep("precondition", "DUT commissioned", is_commissioning=True),
             TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
                      "DUT responds with success"),
@@ -65,10 +65,9 @@ class TC_WEBRTCP_2_15(MatterBaseTest, WEBRTCPTestBase):
             TestStep(3, "TH reads CurrentSessions attribute from WebRTCTransportProvider on DUT",
                      "Verify the WebRTCSession entry has PeerEndpointID matching the OriginatingEndpointID from step 2"),
         ]
-        return steps
 
     def pics_TC_WEBRTCP_2_15(self) -> list[str]:
-        pics = [
+        return [
             "WEBRTCP.S",
             "WEBRTCP.S.A0000",     # CurrentSessions attribute
             "WEBRTCP.S.C02.Rsp",   # ProvideOffer command
@@ -77,7 +76,6 @@ class TC_WEBRTCP_2_15(MatterBaseTest, WEBRTCPTestBase):
             "AVSM.S.F00",          # Audio Data Output feature
             "AVSM.S.F01",          # Video Data Output feature
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:

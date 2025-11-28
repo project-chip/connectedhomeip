@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/descriptor/descriptor-cluster.h>
+#include <app/clusters/descriptor/DescriptorCluster.h>
 
 #if !CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES
 #include <app/static-cluster-config/Descriptor.h>

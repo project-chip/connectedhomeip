@@ -41,6 +41,8 @@ try:
 except ImportError:
     _has_coloredlogs = False
 
+log = logging.getLogger(__name__)
+
 
 class ListGeneratedFilesStorage(GeneratorStorage):
     """
@@ -59,12 +61,7 @@ class ListGeneratedFilesStorage(GeneratorStorage):
 
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
-__LOG_LEVELS__ = {
-    'debug': logging.DEBUG,
-    'info': logging.INFO,
-    'warn': logging.WARNING,
-    'fatal': logging.FATAL,
-}
+__LOG_LEVELS__ = logging.getLevelNamesMapping()
 
 
 @click.command()
@@ -111,9 +108,9 @@ def main(log_level, generator, option, output_dir, dry_run, name_only, expected_
 
     def formatKotlinFiles(paths):
         try:
-            logging.info("Prettifying %d kotlin files:", len(paths))
+            log.info("Prettifying %d kotlin files:", len(paths))
             for name in paths:
-                logging.info("    %s" % name)
+                log.info("    '%s'", name)
 
             VERSION = "0.58"
             JAR_NAME = f"ktfmt-{VERSION}-with-dependencies.jar"
@@ -148,7 +145,7 @@ def main(log_level, generator, option, output_dir, dry_run, name_only, expected_
     else:
         storage = FileSystemGeneratorStorage(output_dir)
 
-    logging.info("Parsing idl from %s" % idl_path)
+    log.info("Parsing idl from '%s'", idl_path)
     idl_tree = CreateParser().parse(open(idl_path, "rt").read(), file_name=idl_path)
 
     plugin_module = None
@@ -156,23 +153,23 @@ def main(log_level, generator, option, output_dir, dry_run, name_only, expected_
         # check that the plugin path is provided
         custom_params = generator.split(':')
         if len(custom_params) != 3:
-            logging.fatal("Custom generator format not valid. Please use --generator custom:<path>:<module>")
+            log.fatal("Custom generator format not valid. Please use --generator custom:<path>:<module>")
             sys.exit(1)
         (generator, plugin_path, plugin_module) = custom_params
 
-        logging.info("Using CustomGenerator at plugin path %s.%s" % (plugin_path, plugin_module))
+        log.info("Using CustomGenerator at plugin path '%s.%s'", plugin_path, plugin_module)
         sys.path.append(plugin_path)
         generator = 'CUSTOM'
 
     extra_args = {}
     for o in option:
         if ':' not in o:
-            logging.fatal("Please specify options as '<key>:<value>'. %r is not valid. " % o)
+            log.fatal("Please specify options as '<key>:<value>'. %r is not valid. ", o)
             sys.exit(1)
         key, value = o.split(':')
         extra_args[key] = value
 
-    logging.info("Running code generator %s" % generator)
+    log.info("Running code generator '%s'", generator)
     generator = CodeGenerator.FromString(generator).Create(storage, idl=idl_tree, plugin_module=plugin_module, **extra_args)
     generator.render(dry_run)
 
@@ -186,7 +183,7 @@ def main(log_level, generator, option, output_dir, dry_run, name_only, expected_
 
     if name_dict.get('.kt', []):
         try:
-            logging.debug("Formatting kt_files: %s" % name_dict['.kt'])
+            log.debug("Formatting kt_files: '%s'", name_dict['.kt'])
         except Exception:
             traceback.print_exc()
         formatKotlinFiles(name_dict['.kt'])
@@ -196,7 +193,7 @@ def main(log_level, generator, option, output_dir, dry_run, name_only, expected_
         cpp_files.extend(name_dict.get(ext, []))
     if cpp_files:
         try:
-            logging.debug("Formatting cpp_files: %s", cpp_files)
+            log.debug("Formatting cpp_files: '%s'", cpp_files)
             subprocess.check_call([getClangFormatBinary(), "-i"] + cpp_files)
         except Exception:
             traceback.print_exc()
@@ -210,20 +207,20 @@ def main(log_level, generator, option, output_dir, dry_run, name_only, expected_
                     expected.add(expanded_path)
 
             if expected != storage.generated_paths:
-                logging.fatal("expected and generated files do not match.")
+                log.fatal("expected and generated files do not match.")
 
                 extra = storage.generated_paths - expected
                 missing = expected - storage.generated_paths
 
                 for name in extra:
-                    logging.fatal("   '%s' was generated but not expected" % name)
+                    log.fatal("   '%s' was generated but not expected", name)
 
                 for name in missing:
-                    logging.fatal("   '%s' was expected but not generated" % name)
+                    log.fatal("   '%s' was expected but not generated", name)
 
                 sys.exit(1)
 
-    logging.info("Done")
+    log.info("Done")
 
 
 if __name__ == '__main__':
