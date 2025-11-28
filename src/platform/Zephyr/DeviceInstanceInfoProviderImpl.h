@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <platform/internal/GenericDeviceInstanceInfoProvider.h>
 #include <platform/Zephyr/ConfigurationManagerImpl.h>
+#include <platform/internal/GenericDeviceInstanceInfoProvider.h>
 
 namespace chip {
 namespace DeviceLayer {
