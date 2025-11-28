@@ -31,7 +31,7 @@ void UpdateCurrentModeToOnMode(chip::EndpointId endpoint);
 
 #else
 
-inline void UpdatCurrentModeToOnMode(chip::EndpointId endpoint) {}
+inline void UpdateCurrentModeToOnMode(chip::EndpointId endpoint) {}
 
 #endif // MATTER_DM_PLUGIN_MODE_BASE
 
