@@ -174,7 +174,7 @@ class PostProcessResponseResult:
 
 
 def _value_or_none(data, key):
-    return data[key] if key in data else None
+    return data.get(key, None)
 
 
 def _value_or_config(data, key, config):

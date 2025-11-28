@@ -358,7 +358,7 @@ def main():
         # `zap-cli` may extract things into a temporary directory. ensure extraction
         # does not conflict.
         with tempfile.TemporaryDirectory(prefix='zap') as temp_dir:
-            old_temp = os.environ['TEMP'] if 'TEMP' in os.environ else None
+            old_temp = os.environ.get("TEMP")
             os.environ['TEMP'] = temp_dir
 
             runGeneration(cmdLineArgs)
