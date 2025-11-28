@@ -22,7 +22,7 @@
 
 namespace chip::app::Clusters::OnOff::Internal::LevelControl {
 
-bool EfectCallback(EndpointId endpoint, bool newValue)
+bool EffectCallback(EndpointId endpoint, bool newValue)
 {
     VerifyOrReturnValue(emberAfContainsServer(endpoint, Clusters::LevelControl::Id), false);
     VerifyOrReturnValue(LevelControlHasFeature(endpoint, Clusters::LevelControl::Feature::kOnOff), false);

@@ -38,11 +38,11 @@ namespace chip::app::Clusters::OnOff::Internal::LevelControl {
  *
  * @return true if the effect callback is called (i.e. level control was enabled on the endpoint)
  */
-bool EfectCallback(chip::EndpointId endpoint, bool newValue);
+bool EffectCallback(chip::EndpointId endpoint, bool newValue);
 
 #else
 
-inline bool EfectCallback(chip::EndpointId endpoint, bool newValue)
+inline bool EffectCallback(chip::EndpointId endpoint, bool newValue)
 {
     return false;
 }
