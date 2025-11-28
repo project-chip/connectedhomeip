@@ -82,7 +82,7 @@ class TC_LUNIT_3_1(MatterBaseTest):
             "LUNIT.S",
         ]
 
-    @run_if_endpoint_matches(has_cluster(Clusters.UnitLocalization) and has_attribute(Clusters.UnitLocalization.Attributes.TemperatureUnit))
+    @run_if_endpoint_matches(has_cluster(Clusters.UnitLocalization))
     async def test_TC_LUNIT_3_1(self):
 
         endpoint = self.get_endpoint()
