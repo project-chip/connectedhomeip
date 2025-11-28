@@ -161,7 +161,7 @@ chip::scenes::SceneHandler * GlobalHandler()
 
 void RegisterGlobalHandler(chip::EndpointId endpoint)
 {
-    app::Clusters::ScenesManagement::ScenesServer::Instance().RegisterSceneHandler(endpoint, GlobalOnOffSceneHandler());
+    app::Clusters::ScenesManagement::ScenesServer::Instance().RegisterSceneHandler(endpoint, GlobalHandler());
 }
 
 } // namespace chip::app::Clusters::OnOff::Internal::Scenes
