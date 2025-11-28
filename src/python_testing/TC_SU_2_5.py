@@ -63,7 +63,7 @@ logger = logging.getLogger(__name__)
 
 class TC_SU_2_5(SoftwareUpdateBaseTest):
     "This test case verifies that the DUT behaves according to the spec when it is applying the software update."
-    kvs_path = None
+    provider_kvs_path = None
     provider_log = None
     current_requestor_app_pid = None
     ota_prov = Clusters.OtaSoftwareUpdateProvider
@@ -78,6 +78,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
     async def teardown_test(self):
         await self.clear_ota_providers(self.controller, self.requestor_node_id)
         self.terminate_provider()
+        self.clear_kvs()
         super().teardown_test()
 
     @async_test_body
@@ -87,7 +88,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
         self.expected_software_version = self.user_params.get('ota_image_expected_version')
         self.provider_app_path = self.user_params.get('provider_app_path')
         self.ota_provider_port = self.user_params.get('ota_provider_port', 5541)
-        self.kvs_path = self.user_params.get('provider_kvs_path', '/tmp/chip_kvs_provider')
+        self.provider_kvs_path = self.user_params.get('provider_kvs_path', '/tmp/chip_kvs_provider')
         self.provider_log = self.user_params.get('provider_log_path', '/tmp/provider_log_2_5.log')
         # On average the ota image build for the CI is 1.8 MB which takes 4-5 min to download. Adjust if needed.
         self.ota_image_download_timeout = self.user_params.get('ota_image_download_timeout', 60*5)
@@ -116,7 +117,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             setup_pincode=self.provider_setup_pincode,
             discriminator=self.provider_discriminator,
             port=self.ota_provider_port,
-            kvs_path=self.kvs_path,
+            kvs_path=self.provider_kvs_path,
             log_file=self.provider_log,
             extra_args=extra_arguments,
         )
@@ -230,7 +231,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             setup_pincode=self.provider_setup_pincode,
             discriminator=self.provider_discriminator,
             port=self.ota_provider_port,
-            kvs_path=self.kvs_path,
+            kvs_path=self.provider_kvs_path,
             log_file=self.provider_log,
             extra_args=extra_arguments,
         )
@@ -300,7 +301,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             setup_pincode=self.provider_setup_pincode,
             discriminator=self.provider_discriminator,
             port=self.ota_provider_port,
-            kvs_path=self.kvs_path,
+            kvs_path=self.provider_kvs_path,
             log_file=self.provider_log,
             extra_args=extra_arguments,
         )
@@ -379,7 +380,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             setup_pincode=self.provider_setup_pincode,
             discriminator=self.provider_discriminator,
             port=self.ota_provider_port,
-            kvs_path=self.kvs_path,
+            kvs_path=self.provider_kvs_path,
             log_file=self.provider_log,
             extra_args=extra_arguments,
         )
@@ -443,7 +444,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
             setup_pincode=self.provider_setup_pincode,
             discriminator=self.provider_discriminator,
             port=self.ota_provider_port,
-            kvs_path=self.kvs_path,
+            kvs_path=self.provider_kvs_path,
             log_file=self.provider_log,
             extra_args=extra_arguments,
         )
