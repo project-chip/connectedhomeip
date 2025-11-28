@@ -16,6 +16,10 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
+    "${CLUSTER_DIR}/level-control-integration.cpp"
+    "${CLUSTER_DIR}/level-control-integration.h"
+    "${CLUSTER_DIR}/mode-base-integration.cpp"
+    "${CLUSTER_DIR}/mode-base-integration.h"
     "${CLUSTER_DIR}/on-off-server.cpp"
     "${CLUSTER_DIR}/on-off-server.h"
 )

@@ -12,6 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 app_config_dependent_sources = [
+  "level-control-integration.cpp",
+  "level-control-integration.h",
+  "mode-base-integration.cpp",
+  "mode-base-integration.h",
   "on-off-server.cpp",
   "on-off-server.h",
 ]

@@ -28,21 +28,13 @@
 #include <protocols/interaction_model/StatusCode.h>
 #include <tracing/macros.h>
 
+// integration with other clusters
+#include "level-control-integration.h"
+#include "mode-base-integration.h"
+
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 #include <app/clusters/scenes-server/scenes-server.h>
 #endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-
-#ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL
-#include <app/clusters/level-control/level-control.h>
-#endif // MATTER_DM_PLUGIN_LEVEL_CONTROL
-
-#ifdef MATTER_DM_PLUGIN_MODE_BASE
-// nogncheck because the gn dependency checker does not understand
-// conditional includes, so will fail in an application that has an On/Off
-// cluster but no ModeBase-derived cluster.
-#include <app/clusters/mode-base-server/mode-base-cluster-objects.h> // nogncheck
-#include <app/clusters/mode-base-server/mode-base-server.h>          // nogncheck
-#endif                                                               // MATTER_DM_PLUGIN_MODE_BASE
 
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DiagnosticDataProvider.h>
@@ -56,41 +48,6 @@ using chip::Protocols::InteractionModel::Status;
 using BootReasonType = GeneralDiagnostics::BootReasonEnum;
 
 namespace {
-
-#ifdef MATTER_DM_PLUGIN_MODE_BASE
-
-/**
- * For all ModeBase alias clusters on the given endpoint, if the OnOff feature is supported and
- * the OnMode attribute is set, update the CurrentMode attribute value to the OnMode value.
- * @param endpoint
- */
-void UpdateModeBaseCurrentModeToOnMode(EndpointId endpoint)
-{
-    for (auto & modeBaseInstance : ModeBase::GetModeBaseInstanceList())
-    {
-        if (modeBaseInstance.GetEndpointId() == endpoint)
-        {
-            if (modeBaseInstance.HasFeature(ModeBase::Feature::kOnOff))
-            {
-                ModeBase::Attributes::OnMode::TypeInfo::Type onMode = modeBaseInstance.GetOnMode();
-                if (!onMode.IsNull())
-                {
-                    Status status = modeBaseInstance.UpdateCurrentMode(onMode.Value());
-                    if (status == Status::Success)
-                    {
-                        ChipLogProgress(Zcl, "Changed the Current Mode to %x", onMode.Value());
-                    }
-                    else
-                    {
-                        ChipLogError(Zcl, "Failed to Changed the Current Mode to %x: %u", onMode.Value(), to_underlying(status));
-                    }
-                }
-            }
-        }
-    }
-}
-
-#endif // MATTER_DM_PLUGIN_MODE_BASE
 
 template <typename EnumType>
 bool IsKnownEnumValue(EnumType value)
@@ -115,18 +72,6 @@ BootReasonType GetBootReason()
 }
 
 } // namespace
-
-#ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL
-static bool LevelControlWithOnOffFeaturePresent(EndpointId endpoint)
-{
-    if (!emberAfContainsServer(endpoint, LevelControl::Id))
-    {
-        return false;
-    }
-
-    return LevelControlHasFeature(endpoint, LevelControl::Feature::kOnOff);
-}
-#endif // MATTER_DM_PLUGIN_LEVEL_CONTROL
 
 static constexpr size_t kOnOffMaxEnpointCount =
     MATTER_DM_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
@@ -422,14 +367,11 @@ Status OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::CommandId com
             return status;
         }
 
-#ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL
-        // If initiatedByLevelChange is false, then we assume that the level change
-        // ZCL stuff has not happened and we do it here
-        if (!initiatedByLevelChange && LevelControlWithOnOffFeaturePresent(endpoint))
+        if (!initiatedByLevelChange)
         {
-            emberAfOnOffClusterLevelControlEffectCallback(endpoint, newValue);
+            Internal::OnOffControlChangeForLevelControl(endpoint, newValue);
         }
-#endif
+
 #ifdef MATTER_DM_PLUGIN_MODE_SELECT
         // If OnMode is not a null value, then change the current mode to it.
         if (emberAfContainsServer(endpoint, ModeSelect::Id) &&
@@ -443,22 +385,14 @@ Status OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::CommandId com
             }
         }
 #endif
-#ifdef MATTER_DM_PLUGIN_MODE_BASE
         // If OnMode is not a null value, then change the current mode to it.
         UpdateModeBaseCurrentModeToOnMode(endpoint);
-#endif
     }
     else // Set Off
     {
-#ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL
         // If initiatedByLevelChange is false, then we assume that the level change
         // ZCL stuff has not happened and we do it here
-        if (!initiatedByLevelChange && LevelControlWithOnOffFeaturePresent(endpoint))
-        {
-            emberAfOnOffClusterLevelControlEffectCallback(endpoint, newValue);
-        }
-        else
-#endif
+        if (initiatedByLevelChange || !Internal::OnOffControlChangeForLevelControl(endpoint, newValue))
         {
             // write the new on/off value
             status = Attributes::OnOff::Set(endpoint, newValue);
