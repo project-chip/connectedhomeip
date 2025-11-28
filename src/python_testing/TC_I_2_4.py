@@ -181,7 +181,7 @@ class TC_I_2_4(MatterBaseTest):
         result = await self.write_single_attribute(cluster.Attributes.IdentifyTime(5), endpoint_id=endpoint)
         asserts.assert_equal(result, Status.Success, "Error when trying to write a IdentifyTime value")
         # Ensure one update report for this above change is received before continuing
-        self.wait_for_identify_time_report_or_timeout(sub_handler, cluster.Attributes.IdentifyTime,  pre_count, 1)
+        self.wait_for_identify_time_report_or_timeout(sub_handler, cluster.Attributes.IdentifyTime, pre_count, 1)
 
         self.step(13)
         result = await self.write_single_attribute(cluster.Attributes.IdentifyTime(0), endpoint_id=endpoint)
