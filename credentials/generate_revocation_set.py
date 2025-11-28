@@ -883,9 +883,9 @@ def from_dcl(use_main_net_dcld: str, use_test_net_dcld: str, use_main_net_http: 
     if use_local_data:
         dcld_client = LocalFilesDclClient(crls, certificates, revocation_points_response)
     elif use_main_net_http or use_test_net_http:
-        dcld_client = RestDclClient(True if use_test_net_http else False)
+        dcld_client = RestDclClient(bool(use_test_net_http))
     else:
-        dcld_client = NodeDclClient(use_main_net_dcld or use_test_net_dcld, True if use_test_net_dcld else False)
+        dcld_client = NodeDclClient(use_main_net_dcld or use_test_net_dcld, bool(use_test_net_dcld))
 
     revocation_point_list = dcld_client.get_revocation_points()
     revocation_set = []
