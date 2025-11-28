@@ -29,7 +29,7 @@
  */
 void emberAfOnOffClusterLevelControlEffectCallback(chip::EndpointId endpoint, bool newValue);
 
-namespace chip::app::Clusters::OnOff::Internal {
+namespace chip::app::Clusters::OnOff::Internal::LevelControl {
 
 #ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL
 
@@ -38,15 +38,15 @@ namespace chip::app::Clusters::OnOff::Internal {
  *
  * @return true if the effect callback is called (i.e. level control was enabled on the endpoint)
  */
-bool OnOffControlChangeForLevelControl(chip::EndpointId endpoint, bool newValue);
+bool EfectCallback(chip::EndpointId endpoint, bool newValue);
 
 #else
 
-inline bool OnOffControlChangeForLevelControl(chip::EndpointId endpoint, bool newValue)
+inline bool EfectCallback(chip::EndpointId endpoint, bool newValue)
 {
     return false;
 }
 
 #endif // MATTER_DM_PLUGIN_LEVEL_CONTROL
 //
-} // namespace chip::app::Clusters::OnOff::Internal
+} // namespace chip::app::Clusters::OnOff::Internal::LevelControl

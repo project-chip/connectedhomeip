@@ -22,25 +22,23 @@
 #include <app/util/endpoint-config-api.h>
 #include <clusters/ModeSelect/Ids.h>
 
-using namespace chip;
-using namespace chip::app::Clusters;
 using chip::Protocols::InteractionModel::Status;
 
-namespace chip::app::Clusters::OnOff::Internal {
+namespace chip::app::Clusters::OnOff::Internal::ModeSelect {
 
-void ModeSelectSetOnModeFromStartup(EndpointId endpoint)
+void SetStartupOnMode(EndpointId endpoint)
 {
-    VerifyOrReturn(emberAfContainsAttribute(endpoint, ModeSelect::Id, ModeSelect::Attributes::OnMode::Id));
+    VerifyOrReturn(emberAfContainsAttribute(endpoint, Clusters::ModeSelect::Id, Clusters::ModeSelect::Attributes::OnMode::Id));
 
-    ModeSelect::Attributes::OnMode::TypeInfo::Type onMode;
+    Clusters::ModeSelect::Attributes::OnMode::TypeInfo::Type onMode;
 
-    VerifyOrReturn(ModeSelect::Attributes::OnMode::Get(endpoint, onMode) == Status::Success);
+    VerifyOrReturn(Clusters::ModeSelect::Attributes::OnMode::Get(endpoint, onMode) == Status::Success);
     VerifyOrReturn(!onMode.IsNull());
 
     ChipLogProgress(Zcl, "Changing Current Mode to %x", onMode.Value());
-    (void) ModeSelect::Attributes::CurrentMode::Set(endpoint, onMode.Value());
+    (void) Clusters::ModeSelect::Attributes::CurrentMode::Set(endpoint, onMode.Value());
 }
 
-} // namespace chip::app::Clusters::OnOff::Internal
+} // namespace chip::app::Clusters::OnOff::Internal::ModeSelect
 
 #endif

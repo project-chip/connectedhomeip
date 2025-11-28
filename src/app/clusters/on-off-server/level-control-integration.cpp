@@ -20,29 +20,17 @@
 #include <app/clusters/level-control/level-control.h> //nogncheck
 #include <app/util/attribute-storage.h>
 
-using namespace chip;
-using namespace chip::app::Clusters;
+namespace chip::app::Clusters::OnOff::Internal::LevelControl {
 
-static bool LevelControlWithOnOffFeaturePresent(EndpointId endpoint)
+bool EfectCallback(EndpointId endpoint, bool newValue)
 {
-    if (!emberAfContainsServer(endpoint, LevelControl::Id))
-    {
-        return false;
-    }
-
-    return LevelControlHasFeature(endpoint, LevelControl::Feature::kOnOff);
-}
-
-namespace chip::app::Clusters::OnOff::Internal {
-
-bool OnOffControlChangeForLevelControl(EndpointId endpoint, bool newValue)
-{
-    VerifyOrReturnValue(LevelControlWithOnOffFeaturePresent(endpoint), false);
+    VerifyOrReturnValue(emberAfContainsServer(endpoint, Clusters::LevelControl::Id), false);
+    VerifyOrReturnValue(LevelControlHasFeature(endpoint, Clusters::LevelControl::Feature::kOnOff), false);
 
     emberAfOnOffClusterLevelControlEffectCallback(endpoint, newValue);
     return true;
 }
 
-} // namespace chip::app::Clusters::OnOff::Internal
+} // namespace chip::app::Clusters::OnOff::Internal::LevelControl
 
 #endif // MATTER_DM_PLUGIN_LEVEL_CONTROL

@@ -234,10 +234,10 @@ Status OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::CommandId com
 
         if (!initiatedByLevelChange)
         {
-            Internal::OnOffControlChangeForLevelControl(endpoint, newValue);
+            Internal::LevelControl::EfectCallback(endpoint, newValue);
         }
 
-        Internal::ModeSelectSetOnModeFromStartup(endpoint);
+        Internal::ModeSelect::SetStartupOnMode(endpoint);
 
         // If OnMode is not a null value, then change the current mode to it.
         Internal::ModeBase::UpdateCurrentModeToOnMode(endpoint);
@@ -246,7 +246,7 @@ Status OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::CommandId com
     {
         // If initiatedByLevelChange is false, then we assume that the level change
         // ZCL stuff has not happened and we do it here
-        if (initiatedByLevelChange || !Internal::OnOffControlChangeForLevelControl(endpoint, newValue))
+        if (initiatedByLevelChange || !Internal::LevelControl::EfectCallback(endpoint, newValue))
         {
             // write the new on/off value
             status = Attributes::OnOff::Set(endpoint, newValue);

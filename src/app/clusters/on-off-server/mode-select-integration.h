@@ -18,16 +18,16 @@
 #include <app/util/config.h>
 #include <lib/core/DataModelTypes.h>
 
-namespace chip::app::Clusters::OnOff::Internal {
+namespace chip::app::Clusters::OnOff::Internal::ModeSelect {
 
 #ifdef MATTER_DM_PLUGIN_MODE_SELECT
 
-void ModeSelectSetOnModeFromStartup(chip::EndpointId endpoint);
+void SetStartupOnMode(chip::EndpointId endpoint);
 
 #else
 
-inline void ModeSelectSetOnModeFromStartup(chip::EndpointId endpoint) {}
+inline void SetStartupOnMode(chip::EndpointId endpoint) {}
 
 #endif // MATTER_DM_PLUGIN_MODE_SELECT
 
-} // namespace chip::app::Clusters::OnOff::Internal
+} // namespace chip::app::Clusters::OnOff::Internal::ModeSelect
