@@ -84,7 +84,7 @@ class TC_CLCTRL_5_1(MatterBaseTest):
         return "[TC_CLCTRL_5_1] Stop Command Primary Functionality with DUT as Server"
 
     def steps_TC_CLCTRL_5_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test).", is_commissioning=True),
             TestStep("2a", "TH reads from the DUT the (0xFFFC) FeatureMap attribute."),
             TestStep("2b", "If the IS feature is supported on the cluster, skip remaining steps and end test case."),
@@ -145,17 +145,19 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             TestStep("12c", "TH reads from the DUT the MainState attribute"),
             TestStep("12d", "Wait until TH receives a subscription report with MainState = Stopped.")
         ]
-        return steps
 
     def pics_TC_CLCTRL_5_1(self) -> list[str]:
-        pics = [
+        return [
             "CLCTRL.S", "CLCTRL.S.C00"
         ]
-        return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_CLCTRL_5_1(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         dev_controller = self.default_controller
         attributes = Clusters.ClosureControl.Attributes
         timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout

@@ -40,8 +40,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 from datetime import datetime, timedelta, timezone
 
 from mobly import asserts
@@ -67,7 +67,7 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
         return ["EEVSE.S"]
 
     def steps_TC_EEVSE_2_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
                      is_commissioning=True),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
@@ -162,8 +162,6 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
         ]
 
-        return steps
-
     @async_test_body
     async def test_TC_EEVSE_2_2(self):
 
@@ -183,7 +181,7 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
         await self.send_test_event_trigger_basic()
 
         # After a few seconds...
-        time.sleep(1)
+        await asyncio.sleep(1)
 
         self.step("3a")
         await self.check_evse_attribute("State", Clusters.EnergyEvse.Enums.StateEnum.kNotPluggedIn)
@@ -248,7 +246,7 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("7")
         # Sleep for the charging duration plus a couple of seconds to check it has stopped
-        time.sleep(charging_duration + 2)
+        await asyncio.sleep(charging_duration + 2)
         # check EnergyTransferredStoped (EvseStopped)
         event_data = events_callback.wait_for_event_report(
             Clusters.EnergyEvse.Events.EnergyTransferStopped)
@@ -301,7 +299,7 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
             await self.write_user_max_charge(1, user_max_charge_current)
 
             self.step("9a")
-            time.sleep(3)
+            await asyncio.sleep(3)
 
             expected_max_charge = min(
                 user_max_charge_current, circuit_capacity)

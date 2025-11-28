@@ -67,14 +67,13 @@ class TC_CC_2_1(MatterBaseTest):
 
     def pics_TC_CC_2_1(self):
         """Return PICS definitions asscociated with this test."""
-        pics = [
+        return [
             "CC.S"
         ]
-        return pics
 
     def steps_TC_CC_2_1(self) -> list[TestStep]:
         """Execute the test steps."""
-        steps = [
+        return [
             TestStep(1, 'Wait for the commissioned device to be retrieved', is_commissioning=True),
             TestStep(2, 'TH reads from the DUT the (0x0000) CurrentHue attribute'),
             TestStep(3, 'TH reads from the DUT the (0x0001) CurrentSaturation attribute'),
@@ -143,12 +142,9 @@ class TC_CC_2_1(MatterBaseTest):
             TestStep(53, 'TH reads from the DUT the (0x003c) ColorPointBIntensity attribute')
         ]
 
-        return steps
-
     async def verify_primary_index(self, primary_index: int) -> bool:
         # Read all PrimaryN<X,Y,Intensity> attributes available in the cluster
-        instance_attribute_names = [attr for attr in self.attributes.__dict__.keys(
-        ) if attr.startswith('Primary')]
+        instance_attribute_names = [attr for attr in self.attributes.__dict__ if attr.startswith('Primary')]
         # Attributes to search
         primary_list = ["Primary{primary}X", "Primary{primary}Y", "Primary{primary}Intensity"]
         # Validate the expected attribute is found.
@@ -231,6 +227,7 @@ class TC_CC_2_1(MatterBaseTest):
                     asserts.assert_true((attr_val <= max_len),
                                         f"Attribute {attribute} with value {attr_val} is out of range (max): {max_len}")
             return attr_val
+        return None
 
     def _verify_lower_4bits(self, numa, numb):
         # Get the lowest 4 bits and compare them
@@ -241,10 +238,14 @@ class TC_CC_2_1(MatterBaseTest):
         logger.info(f"Num b : {bin(tmp_b)}")
         asserts.assert_equal(tmp_a, tmp_b, "Lower 4 bits of values are not equal")
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_CC_2_1(self):
         self.cluster = Clusters.ColorControl
-        self.endpoint = self.get_endpoint(1)
+        self.endpoint = self.get_endpoint()
         self.attributes = Clusters.ColorControl.Attributes
 
         self.step(1)

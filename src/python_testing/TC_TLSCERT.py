@@ -76,7 +76,7 @@ class TC_TLSCERT(MatterBaseTest):
     async def common_setup(self, step_prefix: string = "1") -> TLSUtils:
         self.step(f'{step_prefix}.1')
         attributes = Clusters.TlsCertificateManagement.Attributes
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         # Establishing CR1 controller
         cr1_cmd = TLSUtils(self, endpoint=endpoint)
@@ -107,7 +107,7 @@ class TC_TLSCERT(MatterBaseTest):
     async def common_two_fabric_setup(self, step_prefix: string = "1") -> TwoFabricData:
         cr1_cmd = await self.common_setup(f'{step_prefix}.1')
         cr1 = self.default_controller
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(f'{step_prefix}.2')
         # Establishing CR2 controller
@@ -873,7 +873,7 @@ class TC_TLSCERT(MatterBaseTest):
         return ["TLSCERT.S"]
 
     def steps_TC_TLSCERT_2_9(self) -> list[TestStep]:
-        steps = [
+        return [
             *self.get_two_fabric_substeps(),
             TestStep(2, "Populate my_nonce[] with 4 distinct, random 32-octet values"),
             TestStep(3, "CR1 sends ClientCSR command with Nonce set to my_nonce[i], for each i in [0..1]",
@@ -915,7 +915,6 @@ class TC_TLSCERT(MatterBaseTest):
                      test_plan_support.verify_success()),
             TestStep(23, test_plan_support.remove_fabric('CR2', 'CR1'), test_plan_support.verify_success()),
         ]
-        return steps
 
     @run_if_endpoint_matches(has_cluster(Clusters.TlsCertificateManagement))
     async def test_TC_TLSCERT_2_9(self):

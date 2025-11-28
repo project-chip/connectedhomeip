@@ -189,7 +189,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             xml_cluster = self.xml_clusters[cluster_id]
             for attribute_id in attrs[cluster_id]:
                 location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
-                if attribute_id not in xml_cluster.attributes.keys():
+                if attribute_id not in xml_cluster.attributes:
                     self.record_error(test_name="Access Checker", location=location,
                                       problem="Cluster attribute not found in spec XML")
                     self.success = False
@@ -202,7 +202,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             # Check that we have information for all the required commands
             for command_id in cmds[cluster_id]:
                 location = CommandPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, command_id=command_id)
-                if command_id not in xml_cluster.accepted_commands.keys():
+                if command_id not in xml_cluster.accepted_commands:
                     self.record_error(test_name="Access Checker", location=location,
                                       problem="Cluster command not found in spec XML")
                     self.success = False
@@ -348,7 +348,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
         self.step(check_step)
         enum = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
         in_progress_clusters = [Clusters.ColorControl.id]
-        privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue]
+        privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue and p != enum.kProxyView]
         for privilege in privilege_enum:
             logging.info(f"Testing for {privilege}")
             self.step(step_number_with_privilege(check_step, 'a', privilege))
@@ -379,7 +379,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                  TestStep(2, "TH_commissioner reads the ACL attribute (done during test setup)"),
                  TestStep(3, "Repeat steps 3a and 3b for each permission level")]
         enum = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
-        privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue]
+        privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue and p != enum.kProxyView]
         for p in privilege_enum:
             steps.append(TestStep(step_number_with_privilege(3, 'a', p),
                          "TH_commissioner gives TH_second_commissioner the specified privilege"))
@@ -402,7 +402,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                  TestStep(4, "TH_second_controller performs a wildcard read"),
                  TestStep(5, "Repeat steps 5a and 5b for each permission level")]
         enum = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
-        privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue]
+        privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue and p != enum.kProxyView]
         for p in privilege_enum:
             steps.append(TestStep(step_number_with_privilege(5, 'a', p),
                          "TH_commissioner gives TH_second_commissioner the specified privilege"))
@@ -423,7 +423,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                  TestStep(2, "TH_commissioner reads the ACL attribute (done during test setup)"),
                  TestStep(3, "Repeat steps 3a and 3b for each permission level")]
         enum = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
-        privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue]
+        privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue and p != enum.kProxyView]
         for p in privilege_enum:
             steps.append(TestStep(step_number_with_privilege(3, 'a', p),
                          "TH_commissioner gives TH_second_controller the specified privilege"))

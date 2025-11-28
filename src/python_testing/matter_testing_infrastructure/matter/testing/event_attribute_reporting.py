@@ -166,8 +166,7 @@ class EventSubscriptionHandler:
             if event.Header.EventId == event_type.event_id:
                 LOGGER.info(f"Event {event_type.__name__} received: {event}")
                 return event.Data
-            else:
-                LOGGER.info(f"Received other event: {event.Header.EventId}, ignoring and waiting for {event_type.__name__}.")
+            LOGGER.info(f"Received other event: {event.Header.EventId}, ignoring and waiting for {event_type.__name__}.")
 
     def get_last_event(self) -> Optional[Any]:
         """Flush entire queue, returning last (newest) event only."""

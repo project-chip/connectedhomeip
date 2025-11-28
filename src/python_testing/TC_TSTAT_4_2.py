@@ -211,7 +211,7 @@ class TC_TSTAT_4_2(MatterBaseTest):
         return ["TSTAT.S"]
 
     def steps_TC_TSTAT_4_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commissioning, already done",
                      is_commissioning=True),
             TestStep("2", "TH writes to the Presets attribute without calling the AtomicRequest command",
@@ -249,8 +249,6 @@ class TC_TSTAT_4_2(MatterBaseTest):
             TestStep("18", "TH writes to the Presets attribute such that the total number of presets is greater than the number of presets supported",
                      "Verify that the write request returned RESOURCE_EXHAUSTED (0x89)."),
         ]
-
-        return steps
 
     @async_test_body
     async def test_TC_TSTAT_4_2(self):

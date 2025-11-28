@@ -53,7 +53,7 @@ class TC_WEBRTCP_2_11(MatterBaseTest, WebRTCTestHelper):
         return "[TC-WEBRTCP-2.11] Validate deferred Offer command timing"
 
     def steps_TC_WEBRTCP_2_11(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("precondition-1", commission_if_required(), is_commissioning=True),
             TestStep("precondition-2", "Confirm no active WebRTC sessions exist in DUT"),
             TestStep(
@@ -73,10 +73,9 @@ class TC_WEBRTCP_2_11(MatterBaseTest, WebRTCTestHelper):
                 "Offer command WebRTCSessionID matches the allocated session ID.",
             ),
         ]
-        return steps
 
     def pics_TC_WEBRTCP_2_11(self) -> list[str]:
-        pics = [
+        return [
             "WEBRTCP.S",
             "WEBRTCP.S.C00.Rsp",   # SolicitOffer command
             "WEBRTCP.S.C01.Tx",    # SolicitOfferResponse command
@@ -84,17 +83,20 @@ class TC_WEBRTCP_2_11(MatterBaseTest, WebRTCTestHelper):
             "AVSM.S.F00",          # Audio Data Output feature
             "AVSM.S.F01",          # Video Data Output feature
         ]
-        return pics
 
     @property
     def default_timeout(self) -> int:
         return 2 * 60  # 2 minutes
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_WEBRTCP_2_11(self):
         self.step("precondition-1")
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         webrtc_manager = WebRTCManager(event_loop=self.event_loop)
         webrtc_peer: LibdatachannelPeerConnection = webrtc_manager.create_peer(
             node_id=self.dut_node_id, fabric_index=self.default_controller.GetFabricIndexInternal(), endpoint=endpoint

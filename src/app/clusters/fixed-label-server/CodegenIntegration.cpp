@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/fixed-label-server/fixed-label-cluster.h>
+#include <app/clusters/fixed-label-server/FixedLabelCluster.h>
 #include <app/static-cluster-config/FixedLabel.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>

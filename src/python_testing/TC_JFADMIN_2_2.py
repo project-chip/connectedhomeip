@@ -32,12 +32,12 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import base64
 import logging
 import os
 import random
 import tempfile
-import time
 from configparser import ConfigParser
 
 from mobly import asserts
@@ -208,7 +208,7 @@ class TC_JFADMIN_2_2(MatterBaseTest):
 
         self.step("5")
         # Wait for ArmFailSafe timer to expire
-        time.sleep(11)
+        await asyncio.sleep(11)
 
         self.step("6")
         # Get the ICAC from JF-Admin
