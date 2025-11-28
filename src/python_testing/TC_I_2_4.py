@@ -218,7 +218,7 @@ class TC_I_2_4(MatterBaseTest):
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
             pass
         # Ensure one update report for this above change is received before continuing
-        self.wait_for_identify_time_report_or_timeout(sub_handler, cluster.Attributes.IdentifyTime,  pre_count, 1)
+        self.wait_for_identify_time_report_or_timeout(sub_handler, cluster.Attributes.IdentifyTime, pre_count, 1)
 
         self.step(20)
         try:
