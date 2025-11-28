@@ -41,7 +41,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32-qemu:168
+            image: ghcr.io/project-chip/chip-build-esp32-qemu:172
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
@@ -66,7 +66,7 @@ jobs:
                     --verbose                             \
                     --file-image-list ./out/esp32-qemu-tests/test_images.txt
             - name: Uploading Logs
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v5
               if: ${{ !env.ACT }}
               with:
                   name: qemu-esp32-logs
@@ -79,7 +79,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-tizen-qemu:168
+            image: ghcr.io/project-chip/chip-build-tizen-qemu:175
             options: --user root
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"

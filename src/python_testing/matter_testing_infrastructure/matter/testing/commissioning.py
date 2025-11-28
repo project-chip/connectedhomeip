@@ -260,9 +260,16 @@ def get_setup_payload_info_config(matter_test_config: Any) -> List[SetupPayloadI
         except ChipStackError:  # chipstack-ok: This disables ChipStackError linter check. Can not use 'with' because it is not expected to fail
             asserts.fail(f"QR code '{qr_code} failed to parse properly as a Matter setup code.")
 
+    manual_code_equivalents = [(s.long_discriminator >> 8, s.setup_passcode) for s in setup_payloads]
     for manual_code in matter_test_config.manual_code:
         try:
-            setup_payloads.append(SetupPayload().ParseManualPairingCode(manual_code))
+            # Remove any duplicate codes - where the discriminator and passcode match a previously added QR code.
+            # This lets testers pass in the QR and equivalent manual code in order to run
+            # the DD tests with a single set of parameters
+            temp_payload = SetupPayload().ParseManualPairingCode(manual_code)
+            if (temp_payload.short_discriminator, temp_payload.setup_passcode) in manual_code_equivalents:
+                continue
+            setup_payloads.append(temp_payload)
         except ChipStackError:  # chipstack-ok: This disables ChipStackError linter check. Can not use 'with' because it is not expected to fail
             asserts.fail(
                 f"Manual code code '{manual_code}' failed to parse properly as a Matter setup code. Check that all digits are correct and length is 11 or 21 characters.")

@@ -117,7 +117,7 @@ class TC_AVSM_2_13(MatterBaseTest):
         has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kVideo)
     )
     async def test_TC_AVSM_2_13(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.CameraAvStreamManagement
         attr = Clusters.CameraAvStreamManagement.Attributes
         commands = Clusters.CameraAvStreamManagement.Commands
@@ -249,6 +249,17 @@ class TC_AVSM_2_13(MatterBaseTest):
         )
         logger.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
         asserts.assert_equal(len(aAllocatedVideoStreams), 1, "The number of allocated video streams in the list is not 1")
+
+        # Clear all allocated streams
+        aAllocatedVideoStreams = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
+        )
+
+        for stream in aAllocatedVideoStreams:
+            try:
+                await self.send_single_cmd(endpoint=endpoint, cmd=commands.VideoStreamDeallocate(videoStreamID=(stream.videoStreamID)))
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
 
 if __name__ == "__main__":

@@ -94,7 +94,7 @@ class TC_PAVST_2_2(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
     @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport))
     async def test_TC_PAVST_2_2(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         self.endpoint = endpoint
         self.node_id = self.dut_node_id
         pvcluster = Clusters.PushAvStreamTransport
@@ -139,7 +139,7 @@ class TC_PAVST_2_2(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         )
 
         self.step(5)
-        status = await self.allocate_one_pushav_transport(endpoint, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
+        status = await self.allocate_one_pushav_transport(endpoint, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
         asserts.assert_equal(
             status, Status.Success, "Push AV Transport should be allocated successfully"
         )

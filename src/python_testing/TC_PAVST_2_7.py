@@ -44,6 +44,7 @@ from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess
 from TC_PAVSTTestBase import PAVSTTestBase
 
 import matter.clusters as Clusters
+from matter.clusters import Globals
 from matter.interaction_model import Status
 from matter.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
                                            run_if_endpoint_matches)
@@ -150,7 +151,7 @@ class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
     @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport))
     async def test_TC_PAVST_2_7(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         self.endpoint = endpoint
         self.node_id = self.dut_node_id
         pvcluster = Clusters.PushAvStreamTransport
@@ -187,7 +188,7 @@ class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         )
 
         status = await self.allocate_one_pushav_transport(endpoint, triggerType=pvcluster.Enums.TransportTriggerTypeEnum.kContinuous,
-                                                          tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
+                                                          tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
         asserts.assert_equal(
             status, Status.Success, "Push AV Transport should be allocated successfully"
         )
@@ -302,7 +303,7 @@ class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                           "maxPreRollLen": 4000}
 
         status = await self.allocate_one_pushav_transport(endpoint, trigger_Options=triggerOptions, tlsEndPoint=tlsEndpointId,
-                                                          url=f"https://{host_ip}:1234/streams/{uploadStreamId}")
+                                                          url=f"https://{host_ip}:1234/streams/{uploadStreamId}/")
         asserts.assert_equal(
             status, Status.Success, "Push AV Transport should be allocated successfully"
         )
@@ -350,18 +351,40 @@ class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         )
         privacySupported = aFeatureMap & Clusters.CameraAvStreamManagement.Bitmaps.Feature.kPrivacy
         if privacySupported:
-            # Write SoftLivestreamPrivacyModeEnabled=true and test INVALID_IN_STATE
-            await self.write_single_attribute(
-                attribute_value=Clusters.CameraAvStreamManagement.Attributes.SoftRecordingPrivacyModeEnabled(True),
-                endpoint_id=endpoint,
+            # The stream usage will be the first item in supported stream usages. Set the privacy appropriate to the usage
+            aStreamUsagePriorities = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=Clusters.CameraAvStreamManagement, attribute=Clusters.CameraAvStreamManagement.Attributes.StreamUsagePriorities
             )
 
+            streamUsage = aStreamUsagePriorities[0]
+
+            if (streamUsage == Globals.Enums.StreamUsageEnum.kRecording) or (streamUsage == Globals.Enums.StreamUsageEnum.kAnalysis):
+                # Write SoftRecordingPrivacyModeEnabled=true and test INVALID_IN_STATE
+                await self.write_single_attribute(
+                    attribute_value=Clusters.CameraAvStreamManagement.Attributes.SoftRecordingPrivacyModeEnabled(True),
+                    endpoint_id=endpoint,
+                )
+            else:
+                # Livestream
+                # Write SoftLivestreamPrivacyModeEnabled=true and test INVALID_IN_STATE
+                await self.write_single_attribute(
+                    attribute_value=Clusters.CameraAvStreamManagement.Attributes.SoftLivestreamPrivacyModeEnabled(True),
+                    endpoint_id=endpoint,
+                )
+
             status = await self.psvt_manually_trigger_transport(cmd, expected_status=Status.InvalidInState)
-            asserts.assert_true(status == Status.InvalidInState, f"Unexpected response {
-                                status} received on Manually Triggered push with privacy mode enabled")
+            asserts.assert_true(status == Status.InvalidInState,
+                                (f"Unexpected response {status} received on Manually Triggered push "
+                                 "with privacy mode enabled")
+                                )
 
             await self.write_single_attribute(
                 attribute_value=Clusters.CameraAvStreamManagement.Attributes.SoftRecordingPrivacyModeEnabled(False),
+                endpoint_id=endpoint,
+            )
+
+            await self.write_single_attribute(
+                attribute_value=Clusters.CameraAvStreamManagement.Attributes.SoftLivestreamPrivacyModeEnabled(False),
                 endpoint_id=endpoint,
             )
 

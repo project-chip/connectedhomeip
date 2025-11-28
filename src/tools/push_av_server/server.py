@@ -7,6 +7,7 @@ import logging
 import os.path
 import pathlib
 import random
+import re
 import signal
 import socket
 import ssl
@@ -24,7 +25,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.asymmetric.types import CertificateIssuerPrivateKeyTypes, CertificatePublicKeyTypes
 from cryptography.x509.oid import NameOID
 from fastapi import APIRouter, FastAPI, HTTPException, Request, Response
-from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
@@ -33,6 +34,11 @@ from zeroconf import ServiceInfo, Zeroconf
 module_dir_path = os.path.dirname(os.path.realpath(__file__))
 templates_path = os.path.join(module_dir_path, "templates")
 static_path = os.path.join(module_dir_path, "static")
+'''
+The initialisation segments must have .init extension as per CMAF-Ingest requirements.
+https://dashif.org/Ingest/#interface-2-naming
+'''
+VALID_EXTENSIONS = ["mpd", "m3u8", "m4s", "init"]
 
 
 class WorkingDirectory:
@@ -398,6 +404,11 @@ class SignClientCertificate(BaseModel):
     csr: str
 
 
+class TrackNameRequest(BaseModel):
+    """Request model to update track name for a stream"""
+    trackName: str
+
+
 class SupportedIngestInterface(str, Enum):
     cmaf = "cmaf-ingest"
     dash = "dash"
@@ -414,6 +425,9 @@ class PushAvServer:
         self.strict_mode = strict_mode
         self.router = APIRouter()
 
+        # In-memory map to track stream files: {stream_id: {"valid_files": [], "invalid_files": []}}
+        self.stream_files_map = {}
+
         # UI
         self.router.add_api_route("/", self.index, methods=["GET"], response_class=RedirectResponse)
         self.router.add_api_route("/ui/streams", self.ui_streams_list, methods=["GET"], response_class=HTMLResponse)
@@ -427,14 +441,10 @@ class PushAvServer:
         self.router.add_api_route("/streams", self.list_streams, methods=["GET"])
         self.router.add_api_route("/streams/probe/{stream_id}/{file_path:path}", self.ffprobe_check, methods=["GET"])
 
-        # TODO Rename API names to use fragment instead of segment (as this is what is actually being uploaded)
-        self.router.add_api_route("/streams/{stream_id}/{manifest}.{ext}", self.manifest_upload, methods=["PUT"])
-        self.router.add_api_route("/streams/{stream_id}/segment{segment_no}/{track_name}/clip{frag_no}.{frag_ext}",
-                                  self.segment_strict_cmaf_upload, methods=["PUT"], status_code=202)
-        self.router.add_api_route("/streams/{stream_id}/{file_path:path}",
-                                  self.segment_any_upload, methods=["PUT"], status_code=202)
+        self.router.add_api_route("/streams/{stream_id}/{file_path:path}.{ext}", self.handle_upload, methods=["PUT"])
 
         self.router.add_api_route("/streams/{stream_id}/{file_path:path}", self.segment_download, methods=["GET"])
+        self.router.add_api_route("/streams/{stream_id}/trackName", self.update_track_name, methods=["POST"], status_code=202)
         self.router.add_api_route("/certs", self.list_certs, methods=["GET"], status_code=200)
         self.router.add_api_route("/certs/{hierarchy}/{name}", self.certificate_details, methods=["GET"], status_code=200)
         self.router.add_api_route("/certs/{name}/keypair", self.create_client_keypair, methods=["POST"])
@@ -511,15 +521,21 @@ class PushAvServer:
         with open(p / "details.json", 'w', encoding='utf-8') as f:
             json.dump(stream, f, ensure_ascii=False, indent=4)
 
+        # Initialize entry in stream files map
+        self.stream_files_map[str(stream_id)] = {"valid_files": [], "invalid_files": []}
+
         return stream
 
     def list_streams(self):
-        dirs = [d for d in pathlib.Path(self.wd.path("streams")).iterdir() if d.is_dir()]
+        # Return streams directly from the in-memory map
+        streams = []
 
-        def stream_files(dir: Path):
-            return [f.relative_to(dir) for f in dir.glob("**/*") if f.is_file()]
-
-        streams = [{"id": d.name, "files": stream_files(d)} for d in dirs]
+        for stream_id, stream_data in self.stream_files_map.items():
+            streams.append({
+                "id": int(stream_id),
+                "valid_files": stream_data["valid_files"],
+                "invalid_files": stream_data["invalid_files"]
+            })
 
         return {"streams": streams}
 
@@ -542,41 +558,60 @@ class PushAvServer:
 
         return Response(status_code=202)
 
-    async def manifest_upload(self, stream_id: int, manifest: str, ext: str, req: Request):
-        """The DASH manifest is uploaded onto the base path without any file path"""
+    async def handle_upload(self, stream_id: int, file_path: str, ext: str, req: Request):
+        """
+            Handle any upload if strict-mode isn't enabled.
+            Otherwise, check if the segment path format complies with Matter Specification path.
+        """
         stream = self._read_stream_details(stream_id)
+        is_valid = True
+        validation_error_reason = ""
 
         if stream.get('strict_mode', False):
-            iface = stream.get('interface', None)
-            if (iface == SupportedIngestInterface.dash and ext != "mpd" or
-                iface == SupportedIngestInterface.hls and ext != "m3u8" or
-                    iface == SupportedIngestInterface.cmaf):
-                raise HTTPException(404, "Unsupported manifest object extension")
+            if ext not in VALID_EXTENSIONS:
+                is_valid = False
+                validation_error_reason = f"Invalid extension: {ext}, valid extensions are {', '.join(VALID_EXTENSIONS)}"
+            elif ext in ["mpd", "m3u8"]:
+                iface = stream.get('interface', None)
+                if (iface == SupportedIngestInterface.dash and ext != "mpd" or
+                        iface == SupportedIngestInterface.hls and ext != "m3u8"):
+                    is_valid = False
+                    validation_error_reason = "Unsupported manifest object extension"
+            elif ext == "m4s":
+                # Checks if CMAF extended path matches the pattern session_<SessionNumber>/<TrackName>/segment_<SegmentNumber>
+                # https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/PushAVStreamTransport.adoc#12-operation
+                segment_pattern = re.compile(r"^session_\d+/(?P<trackName>[^/]+)/segment_\d+$")
+                match = segment_pattern.match(file_path)
+                if not match:
+                    is_valid = False
+                    validation_error_reason = "Path does not adhere to Matter's extended path format: session_<SessionNumber>/<TrackName>/segment_<SegmentNumber>"
+                else:
+                    # Validate if the trackName is same as the one assigned during transport allocation.
+                    # https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/PushAVStreamTransport.adoc#685-trackname-field
+                    track_name_in_path = match.group("trackName")
+                    track_name = stream.get('trackName', None)
+                    if track_name and track_name != track_name_in_path:
+                        is_valid = False
+                        validation_error_reason = ("Track name mismatch: "
+                                                   f"{track_name_in_path} != {track_name}, "
+                                                   "must match TrackName provided in ContainerOptions")
 
-        dst = self.wd.mkdir("streams", str(stream_id), f"{manifest}.{ext}", is_file=True)
+        dst = self.wd.mkdir("streams", str(stream_id), f"{file_path}.{ext}", is_file=True)
+        extended_path = f"{file_path}.{ext}"
 
-        return await self._handle_upload(dst, req)
-
-    async def segment_any_upload(self, file_path: str, stream_id: int, req: Request):
-        logging.debug(f"segment_any_upload. stream_id={stream_id} file_path:{file_path}")
-        stream = self._read_stream_details(stream_id)
-
-        logging.debug(f"stream details = {stream}")
-        if stream.get('strict_mode', False):
-            raise HTTPException(404, "Wrong path. Fragments should follow Matter's specificied path.")
-
-        logging.debug("processing to store field via any_upload")
-        dst = self.wd.mkdir("streams", str(stream_id), file_path, is_file=True)
-
-        return await self._handle_upload(dst, req)
-
-    async def segment_strict_cmaf_upload(self, stream_id: int, segment_no: int, track_name: str, frag_no: int, frag_ext: str, req: Request):
-        logging.debug(
-            f"segment_strict_upload. stream_id={stream_id} segment_no={segment_no}, track_name={track_name}, frag_no={frag_no}, frag_ext={frag_ext}")
-        self._read_stream_details(stream_id)
-
-        dst = self.wd.mkdir("streams", str(stream_id), f"segment{segment_no}",
-                            track_name, f"clip{frag_no}.{frag_ext}", is_file=True)
+        # Add file to the appropriate list in the stream files map
+        logging.debug(f"Upload received: {extended_path}")
+        stream_id_str = str(stream_id)
+        if stream_id_str in self.stream_files_map:
+            if is_valid and extended_path not in self.stream_files_map[stream_id_str]["valid_files"]:
+                self.stream_files_map[stream_id_str]["valid_files"].append(extended_path)
+            if not is_valid:
+                logging.error(f"{extended_path}: {validation_error_reason}")
+                if extended_path not in self.stream_files_map[stream_id_str]["invalid_files"]:
+                    self.stream_files_map[stream_id_str]["invalid_files"].append({
+                        "file_path": extended_path,
+                        "validation_error_reason": validation_error_reason
+                    })
 
         return await self._handle_upload(dst, req)
 
@@ -647,6 +682,21 @@ class PushAvServer:
 
         return {key, cert, created}
 
+    async def update_track_name(self, stream_id: int, track_request: TrackNameRequest):
+        """
+        Updates the trackName for a given stream_id.
+        """
+        stream_details = self._read_stream_details(stream_id)
+
+        stream_details["trackName"] = track_request.trackName
+
+        details_path = self.wd.path("streams", str(stream_id), "details.json")
+        try:
+            with open(details_path, 'w', encoding='utf-8') as f:
+                json.dump(stream_details, f, ensure_ascii=False, indent=4)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to write stream details: {e}")
+
     def sign_client_certificate(
         self, name: str, req: SignClientCertificate, override: bool = True
     ):
@@ -685,10 +735,27 @@ class PushAvContext:
         # Streams holder
         self.directory.mkdir("streams")
 
+        logger = logging.getLogger("hypercorn.error")
         self.app = FastAPI()
         self.app.mount("/static", StaticFiles(directory=static_path), name="static")
         pas = PushAvServer(self.directory, self.device_hierarchy, strict_mode)
         self.app.include_router(pas.router)
+
+        @self.app.exception_handler(HTTPException)
+        async def http_exception_handler(request: Request, exc: HTTPException):
+            logger.error(
+                f"HTTPExecption: {exc.status_code} {exc.detail}"
+            )
+            return JSONResponse(
+                status_code=exc.status_code,
+                content={"detail": exc.detail}
+            )
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.cleanup()
 
     async def start(self, shutdown_trigger: Optional[Callable[..., Awaitable]] = None):
         """
@@ -730,7 +797,7 @@ if __name__ == "__main__":
         level=logging.DEBUG,
         datefmt="%H:%M:%S",
     )
-    logging.getLogger("hpack").setLevel(logging.WARN)
+    logging.getLogger("hpack").setLevel(logging.WARNING)
 
     parser = argparse.ArgumentParser(
         prog="push_av_tool.py",
@@ -753,16 +820,14 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    ctx = PushAvContext(args.host, args.port, args.working_directory, args.dns, args.server_ip, args.strict_mode)
+    with PushAvContext(args.host, args.port, args.working_directory, args.dns, args.server_ip, args.strict_mode) as ctx:
 
-    shutdown_event = asyncio.Event()
+        shutdown_event = asyncio.Event()
 
-    def _signal_handler():
-        print("SIGINT received. Shutting down web server.")
-        shutdown_event.set()
+        def _signal_handler():
+            print("SIGINT received. Shutting down web server.")
+            shutdown_event.set()
 
-    loop = asyncio.get_event_loop()
-    loop.add_signal_handler(signal.SIGINT, _signal_handler)
-    loop.run_until_complete(ctx.start(shutdown_trigger=shutdown_event.wait))
-
-    ctx.cleanup()
+        with asyncio.Runner() as runner:
+            runner.get_loop().add_signal_handler(signal.SIGINT, _signal_handler)
+            runner.run(ctx.start(shutdown_trigger=shutdown_event.wait))

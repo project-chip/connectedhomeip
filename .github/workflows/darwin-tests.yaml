@@ -38,7 +38,12 @@ jobs:
 
     strategy:
       matrix:
-        build_variant: [no-ble-no-shell-asan-clang]
+        include:
+        - os: macos-14
+          arch: arm64     # observed, not configured
+          dry-run: true
+          build_variant: no-ble-no-shell-asan-clang
+          chip_tool: ""
     env:
       BUILD_VARIANT: ${{matrix.build_variant}}
 
@@ -52,7 +57,7 @@ jobs:
       LSAN_OPTIONS: detect_leaks=1 malloc_context_size=40 suppressions=scripts/tests/chiptest/lsan-mac-suppressions.txt
 
     if: github.actor != 'restyled-io[bot]'
-    runs-on: macos-13
+    runs-on: ${{matrix.os}}
 
     steps:
       - name: Checkout
@@ -85,23 +90,32 @@ jobs:
       - name: Clean Build
         run: xcodebuild clean
         working-directory: src/darwin/Framework
-      - name: Build Apps
+      - name: Build Apps Using Unified Build
         run: |
           ./scripts/run_in_build_env.sh \
              "./scripts/build/build_examples.py \
-                --target darwin-x64-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL} \
-                --target darwin-x64-all-clusters-${BUILD_VARIANT} \
-                --target darwin-x64-lock-${BUILD_VARIANT} \
-                --target darwin-x64-ota-provider-${BUILD_VARIANT} \
-                --target darwin-x64-ota-requestor-${BUILD_VARIANT} \
-                --target darwin-x64-tv-app-${BUILD_VARIANT} \
-                --target darwin-x64-bridge-${BUILD_VARIANT} \
-                --target darwin-x64-lit-icd-${BUILD_VARIANT} \
-                --target darwin-x64-microwave-oven-${BUILD_VARIANT} \
-                --target darwin-x64-rvc-${BUILD_VARIANT} \
-                --target darwin-x64-network-manager-${BUILD_VARIANT} \
-                --target darwin-x64-energy-gateway-${BUILD_VARIANT} \
-                --target darwin-x64-energy-management-${BUILD_VARIANT} \
+                --target darwin-${{matrix.arch}}-lock-${BUILD_VARIANT}-unified \
+                --target darwin-${{matrix.arch}}-bridge-${BUILD_VARIANT}-unified \
+                --target darwin-${{matrix.arch}}-microwave-oven-${BUILD_VARIANT}-unified \
+                --target darwin-${{matrix.arch}}-rvc-${BUILD_VARIANT}-unified \
+                --target darwin-${{matrix.arch}}-ota-provider-${BUILD_VARIANT}-unified \
+                build \
+                --copy-artifacts-to objdir-clone \
+             "
+      - name: Clean out
+        run: rm -rf out/
+      - name: Build Remaining Apps That Don't Support Unified Build
+        run: |
+          ./scripts/run_in_build_env.sh \
+             "./scripts/build/build_examples.py \
+                --target darwin-${{matrix.arch}}-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL} \
+                --target darwin-${{matrix.arch}}-all-clusters-${BUILD_VARIANT} \
+                --target darwin-${{matrix.arch}}-ota-requestor-${BUILD_VARIANT} \
+                --target darwin-${{matrix.arch}}-tv-app-${BUILD_VARIANT} \
+                --target darwin-${{matrix.arch}}-lit-icd-${BUILD_VARIANT} \
+                --target darwin-${{matrix.arch}}-network-manager-${BUILD_VARIANT} \
+                --target darwin-${{matrix.arch}}-energy-gateway-${BUILD_VARIANT} \
+                --target darwin-${{matrix.arch}}-energy-management-${BUILD_VARIANT} \
                 build \
                 --copy-artifacts-to objdir-clone \
              "
@@ -110,37 +124,37 @@ jobs:
           ./scripts/run_in_build_env.sh \
           "./scripts/tests/run_test_suite.py \
              --runner darwin_framework_tool_python \
-             --chip-tool ./out/darwin-x64-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL}/darwin-framework-tool \
+             --chip-tool ./out/darwin-${{matrix.arch}}-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL}/darwin-framework-tool \
              --target-skip-glob '{TestAccessControlConstraints}' \
              run \
              --iterations 1 \
              --test-timeout-seconds 120 \
-             --all-clusters-app ./out/darwin-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
-             --lock-app ./out/darwin-x64-lock-${BUILD_VARIANT}/chip-lock-app \
-             --ota-provider-app ./out/darwin-x64-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
-             --ota-requestor-app ./out/darwin-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
-             --tv-app ./out/darwin-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
-             --bridge-app ./out/darwin-x64-bridge-${BUILD_VARIANT}/chip-bridge-app \
-             --microwave-oven-app ./out/darwin-x64-microwave-oven-${BUILD_VARIANT}/chip-microwave-oven-app \
-             --rvc-app ./out/darwin-x64-rvc-${BUILD_VARIANT}/chip-rvc-app \
-             --network-manager-app ./out/darwin-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
-             --energy-gateway-app ./out/darwin-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
-             --energy-management-app ./out/darwin-x64-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
+             --all-clusters-app ./objdir-clone/darwin-${{matrix.arch}}-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+             --lock-app ./objdir-clone/darwin-${{matrix.arch}}-lock-${BUILD_VARIANT}-unified/chip-lock-app \
+             --ota-provider-app ./objdir-clone/darwin-${{matrix.arch}}-ota-provider-${BUILD_VARIANT}-unified/chip-ota-provider-app \
+             --ota-requestor-app ./objdir-clone/darwin-${{matrix.arch}}-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
+             --tv-app ./objdir-clone/darwin-${{matrix.arch}}-tv-app-${BUILD_VARIANT}/chip-tv-app \
+             --bridge-app ./objdir-clone/darwin-${{matrix.arch}}-bridge-${BUILD_VARIANT}-unified/chip-bridge-app \
+             --microwave-oven-app ./objdir-clone/darwin-${{matrix.arch}}-microwave-oven-${BUILD_VARIANT}-unified/chip-microwave-oven-app \
+             --rvc-app ./objdir-clone/darwin-${{matrix.arch}}-rvc-${BUILD_VARIANT}-unified/chip-rvc-app \
+             --network-manager-app ./objdir-clone/darwin-${{matrix.arch}}-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
+             --energy-gateway-app ./objdir-clone/darwin-${{matrix.arch}}-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
+             --energy-management-app ./objdir-clone/darwin-${{matrix.arch}}-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
           "
       - name: Run OTA Test
         run: |
           ./scripts/run_in_build_env.sh \
           "./scripts/tests/run_darwin_framework_ota_test.py \
              run \
-             --darwin-framework-tool ./out/darwin-x64-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL}/darwin-framework-tool \
-             --ota-requestor-app ./out/darwin-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
+             --darwin-framework-tool ./out/darwin-${{matrix.arch}}-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL}/darwin-framework-tool \
+             --ota-requestor-app ./objdir-clone/darwin-${{matrix.arch}}-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
              --ota-data-file /tmp/rawImage \
              --ota-image-file /tmp/otaImage \
              --ota-destination-file /tmp/downloadedImage \
              --ota-candidate-file /tmp/otaCandidateJSON \
           "
       - name: Uploading core files
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: ${{ failure() && !env.ACT }}
         with:
           name: crash-core-darwin-${{ matrix.build_variant }}
@@ -148,19 +162,19 @@ jobs:
           # Cores are big; don't hold on to them too long.
           retention-days: 5
       - name: Uploading diagnostic logs
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: ${{ failure() && !env.ACT }}
         with:
           name: crash-log-darwin-${{ matrix.build_variant }}
           path: ~/Library/Logs/DiagnosticReports/
       - name: Uploading framework build log
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: ${{ failure() && !env.ACT }}
         with:
           name: framework-build-log-darwin-${BUILD_VARIANT_FRAMEWORK_TOOL}
-          path: out/darwin-x64-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL}/darwin_framework_build.log
+          path: out/darwin-${{matrix.arch}}-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL}/darwin_framework_build.log
       - name: Uploading objdir for debugging
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: ${{ failure() && !env.ACT }}
         with:
           name: crash-objdir-darwin-${{ matrix.build_variant }}

@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -70,7 +71,7 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
 
     def steps_TC_MTRID_3_1(self) -> list[TestStep]:
 
-        steps = [
+        return [
             TestStep("1", "Commissioning, already done", "DUT is commissioned.", is_commissioning=True),
             TestStep("2", """Set up a subscription to the Meter Identification cluster:
                      - MinIntervalFloor: 0
@@ -99,7 +100,7 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
                      - Store value as power_threshold."""),
             TestStep("8", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster.",
                      "TestEventTriggersEnabled is True."),
-            TestStep("9", """TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.MTRID.TEST_EVENT_TRIGGER_KEY 
+            TestStep("9", """TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.MTRID.TEST_EVENT_TRIGGER_KEY
                      and EventTrigger field set to PIXIT.MTRID.TEST_EVENT_TRIGGER for Attributes Value Set Test Event.""",
                      "DUT returns SUCCESS."),
             TestStep("10", "TH awaits a MeterType attribute with 10s timeout.", """
@@ -124,13 +125,11 @@ class TC_MTRID_3_1(MeterIdentificationTestBaseHelper):
                      - ApparentPowerThreshold field has type int64;
                      - PowerThresholdSource field has type PowerThresholdSourceEnum and value in range 0 - 2;
                      - The value does not match the power_threshold."""),
-            TestStep("15", """TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.MTRID.TEST_EVENT_TRIGGER_KEY 
+            TestStep("15", """TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.MTRID.TEST_EVENT_TRIGGER_KEY
                      and EventTrigger field set to PIXIT.MTRID.TEST_EVENT_TRIGGER for Test Event Clear.""",
                      "DUT returns SUCCESS."),
             TestStep("16", "TH removes the subscriptions to the Meter Identification cluster.", "Subscription successfully removed."),
         ]
-
-        return steps
 
     @async_test_body
     async def test_TC_MTRID_3_1(self):

@@ -17,19 +17,23 @@
  */
 
 #include "webrtc-abstract.h"
+#include <Options.h>
+#include <arpa/inet.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <rtc/rtc.hpp>
 
 namespace {
 
 // Constants
-constexpr int kVideoH264PayloadType = 96;
-constexpr int kVideoBitRate         = 3000;
-constexpr int kSSRC                 = 42;
-constexpr int kMaxFragmentSize      = 1188; // 1200 (max packet size) - 12 (RTP header size)
-constexpr int kAudioBitRate         = 64000;
-constexpr int kOpusPayloadType      = 111;
-constexpr int kAudioSSRC            = 43;
+constexpr int kVideoH264PayloadType    = 96;
+constexpr int kVideoBitRate            = 3000;
+constexpr int kSSRC                    = 42;
+constexpr int kMaxFragmentSize         = 1188; // 1200 (max packet size) - 12 (RTP header size)
+constexpr int kAudioBitRate            = 64000;
+constexpr int kOpusPayloadType         = 111;
+constexpr int kAudioSSRC               = 43;
+constexpr int kAudioPlaybackDestPort   = 6001;
+const char * kAudioPlaybackDestAddress = "127.0.0.1"; // Always localhost
 
 rtc::Description::Type SDPTypeToRtcType(SDPType type)
 {
@@ -110,6 +114,15 @@ class LibDataChannelTrack : public WebRTCTrack
 {
 public:
     LibDataChannelTrack(std::shared_ptr<rtc::Track> track, int payloadType = -1) : mTrack(track), mPayloadType(payloadType) {}
+
+    ~LibDataChannelTrack()
+    {
+        if (mAudioRTPSocket != -1)
+        {
+            close(mAudioRTPSocket);
+        }
+    }
+
     // Initialize libdatachannel's RTP packetizer for H.264
     void InitH264Packetizer()
     {
@@ -145,13 +158,41 @@ public:
         mOpusPacketizer = std::make_shared<rtc::OpusRtpPacketizer>(mRtpCfgAudio);
         mOpusSr         = std::make_shared<rtc::RtcpSrReporter>(mRtpCfgAudio);
         mOpusNack       = std::make_shared<rtc::RtcpNackResponder>();
+
+        if (LinuxDeviceOptions::GetInstance().cameraAudioPlayback)
+        {
+            // Receiving Session to recv audio from remote peer
+            mOpusPacketizer->addToChain(std::make_shared<rtc::RtcpReceivingSession>());
+        }
+
         mOpusPacketizer->addToChain(mOpusSr);
         mOpusPacketizer->addToChain(mOpusNack);
 
         mTrack->setMediaHandler(mOpusPacketizer);
+
+        // UDP socket to push audio data
+        if (LinuxDeviceOptions::GetInstance().cameraAudioPlayback)
+        {
+            mAudioRTPSocket = socket(AF_INET, SOCK_DGRAM, 0);
+            if (mAudioRTPSocket == -1)
+            {
+                ChipLogError(Camera, "Failed to create RTP Audio socket, Cannot play remote audio: %s", strerror(errno));
+                return;
+            }
+            sockaddr_in audioAddr     = {};
+            audioAddr.sin_family      = AF_INET;
+            audioAddr.sin_addr.s_addr = inet_addr(kAudioPlaybackDestAddress);
+            audioAddr.sin_port        = htons(kAudioPlaybackDestPort);
+            mTrack->onMessage(
+                [this, audioAddr](const rtc::binary data) {
+                    sendto(mAudioRTPSocket, reinterpret_cast<const char *>(data.data()), static_cast<size_t>(data.size()), 0,
+                           reinterpret_cast<const struct sockaddr *>(&audioAddr), sizeof(audioAddr));
+                },
+                nullptr);
+        }
     }
 
-    void SendData(const char * data, size_t size) override
+    void SendData(const chip::ByteSpan & data) override
     {
         if (mTrack && mTrack->isOpen())
         {
@@ -167,8 +208,8 @@ public:
                 mAudioInitDone = true;
             }
             // Feed RAW H.264 access unit. Packetizer does NAL split, FU-A/STAP-A, RTP headers, marker bit, SR/NACK.
-            rtc::binary frame(size);
-            std::memcpy(frame.data(), data, size);
+            rtc::binary frame(data.size());
+            std::memcpy(frame.data(), data.data(), data.size());
             mTrack->send(std::move(frame));
         }
         else
@@ -177,7 +218,7 @@ public:
         }
     }
 
-    void SendFrame(const char * data, size_t size, int64_t timestamp) override
+    void SendFrame(const chip::ByteSpan & data, int64_t timestamp) override
     {
         if (!IsReady())
         {
@@ -197,8 +238,8 @@ public:
             mAudioInitDone = true;
         }
         // Feed RAW H.264 access unit. Packetizer does NAL split, FU-A/STAP-A, RTP headers, marker bit, SR/NACK.
-        rtc::binary frame(size);
-        std::memcpy(frame.data(), data, size);
+        rtc::binary frame(data.size());
+        std::memcpy(frame.data(), data.data(), data.size());
         rtc::FrameInfo info(timestamp);
         mTrack->sendFrame(std::move(frame), info);
     }
@@ -222,6 +263,7 @@ private:
 
     std::shared_ptr<rtc::Track> mTrack;
     int mPayloadType;
+    int mAudioRTPSocket = -1;
 
     // For Video
     std::shared_ptr<rtc::RtpPacketizationConfig> mRtpCfg;
@@ -249,16 +291,51 @@ public:
     void SetCallbacks(OnLocalDescriptionCallback onLocalDescription, OnICECandidateCallback onICECandidate,
                       OnConnectionStateCallback onConnectionState, OnTrackCallback onTrack) override
     {
-        mPeerConnection->onLocalDescription(
-            [onLocalDescription](rtc::Description desc) { onLocalDescription(std::string(desc), RtcTypeToSDPType(desc.type())); });
+        mPeerConnection->onLocalDescription([onLocalDescription, onICECandidate](rtc::Description desc) {
+            // First, notify about the local description
+            onLocalDescription(std::string(desc), RtcTypeToSDPType(desc.type()));
 
-        mPeerConnection->onLocalCandidate([onICECandidate](rtc::Candidate candidate) { onICECandidate(std::string(candidate)); });
+            // Extract any candidates embedded in the SDP description
+            std::vector<rtc::Candidate> candidates = desc.candidates();
+            ChipLogProgress(Camera, "Extracted %lu candidates from SDP description", candidates.size());
+
+            for (const auto & candidate : candidates)
+            {
+                ICECandidateInfo candidateInfo;
+                candidateInfo.candidate  = std::string(candidate);
+                candidateInfo.mid        = candidate.mid();
+                candidateInfo.mlineIndex = -1; // libdatachannel doesn't provide mlineIndex
+
+                ChipLogProgress(Camera, "[From SDP] Candidate: %s, mid: %s", candidateInfo.candidate.c_str(),
+                                candidateInfo.mid.c_str());
+
+                onICECandidate(candidateInfo);
+            }
+        });
+
+        mPeerConnection->onLocalCandidate([onICECandidate](rtc::Candidate candidate) {
+            ICECandidateInfo candidateInfo;
+            candidateInfo.candidate = std::string(candidate);
+            candidateInfo.mid       = candidate.mid();
+
+            // Note: libdatachannel doesn't directly provide mlineIndex, so we use -1 to indicate it is not present.
+            candidateInfo.mlineIndex = -1;
+
+            onICECandidate(candidateInfo);
+        });
 
         mPeerConnection->onStateChange([onConnectionState](rtc::PeerConnection::State state) {
             ChipLogProgress(Camera, "[PeerConnection State: %s]", GetPeerConnectionStateStr(state));
             if (state == rtc::PeerConnection::State::Connected)
             {
                 onConnectionState(true);
+            }
+            else if (state == rtc::PeerConnection::State::Failed || state == rtc::PeerConnection::State::Closed)
+            {
+                // rtc::PeerConnection::State::Disconnected as a terminal state will trigger teardown on transient ICE disconnects;
+                // per WebRTC semantics, Disconnected can recover to Connected. Limit the false signal to Failed and Closed only to
+                // avoid prematurely ending sessions.
+                onConnectionState(false);
             }
         });
 

@@ -33,7 +33,8 @@ using namespace chip::app::Clusters::PushAvStreamTransport;
 using chip::Protocols::InteractionModel::Status;
 
 Protocols::InteractionModel::Status
-PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct & transportOptions, const uint16_t connectionID)
+PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct & transportOptions, const uint16_t connectionID,
+                                                    FabricIndex accessingFabricIndex)
 {
     PushAvStream stream{ connectionID, transportOptions, TransportStatusEnum::kInactive, PushAvStreamTransportStatusEnum::kIdle };
 
@@ -121,11 +122,6 @@ PushAvStreamTransportManager::ValidateBandwidthLimit(StreamUsageEnum streamUsage
     return Status::Success;
 }
 
-bool PushAvStreamTransportManager::ValidateUrl(const std::string & url)
-{
-    return true;
-}
-
 Protocols::InteractionModel::Status PushAvStreamTransportManager::SelectVideoStream(StreamUsageEnum streamUsage,
                                                                                     uint16_t & videoStreamId)
 {
@@ -142,14 +138,14 @@ Protocols::InteractionModel::Status PushAvStreamTransportManager::SelectAudioStr
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status PushAvStreamTransportManager::ValidateVideoStream(uint16_t videoStreamId)
+Protocols::InteractionModel::Status PushAvStreamTransportManager::SetVideoStream(uint16_t videoStreamId)
 {
     // TODO: Validate videoStreamID from the allocated videoStreams
     // Returning Status::Success to pass through checks in the Server Implementation.
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status PushAvStreamTransportManager::ValidateAudioStream(uint16_t audioStreamId)
+Protocols::InteractionModel::Status PushAvStreamTransportManager::SetAudioStream(uint16_t audioStreamId)
 {
     // TODO: Validate audioStreamID from the allocated audioStreams
     // Returning Status::Success to pass through checks in the Server Implementation.
@@ -207,7 +203,19 @@ PushAvStreamTransportManager::PersistentAttributesLoadedCallback()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PushAvStreamTransportManager::IsPrivacyModeActive(bool & isActive)
+CHIP_ERROR PushAvStreamTransportManager::IsHardPrivacyModeActive(bool & isActive)
+{
+    isActive = false;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PushAvStreamTransportManager::IsSoftRecordingPrivacyModeActive(bool & isActive)
+{
+    isActive = false;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PushAvStreamTransportManager::IsSoftLivestreamPrivacyModeActive(bool & isActive)
 {
     isActive = false;
     return CHIP_NO_ERROR;

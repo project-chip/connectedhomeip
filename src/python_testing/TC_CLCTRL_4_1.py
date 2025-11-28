@@ -34,8 +34,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 
 from mobly import asserts
 
@@ -96,7 +96,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         return "[TC_CLCTRL_4_1] MoveTo Command Position Functionality with DUT as Server"
 
     def steps_TC_CLCTRL_4_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test).", is_commissioning=True),
             TestStep("2a", "TH reads from the DUT the (0xFFFC) FeatureMap attribute."),
             TestStep("2b", "If the PS feature is not supported on the cluster, skip remaining steps and end test case."),
@@ -191,17 +191,19 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             TestStep("15h", "Wait 2 seconds and TH reads from the DUT the OverallCurrentState.Position = FullyClosed."),
             TestStep("15i", "Wait until TH receives a subscription report with MainState = Stopped."),
         ]
-        return steps
 
     def pics_TC_CLCTRL_4_1(self) -> list[str]:
-        pics = [
-            "CLCTRL.S"
+        return [
+            "CLCTRL.S", "CLCTRL.S.F00"
         ]
-        return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_CLCTRL_4_1(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         dev_controller = self.default_controller
         attributes = Clusters.ClosureControl.Attributes
         timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
@@ -1021,7 +1023,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             # STEP 15d: Wait 2 seconds and TH reads from the DUT the OverallCurrentState.Position = FullyOpened.
             self.step("15d")
 
-            time.sleep(2)
+            await asyncio.sleep(2)
 
             overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
             logging.info(f"OverallCurrentState: {overall_current_state}")
@@ -1064,7 +1066,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             # STEP 15h: Wait 2 seconds and TH reads from the DUT the OverallCurrentState.Position = FullyClosed.
             self.step("15h")
 
-            time.sleep(2)
+            await asyncio.sleep(2)
             overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
             logging.info(f"OverallCurrentState: {overall_current_state}")
 

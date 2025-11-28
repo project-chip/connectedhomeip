@@ -34,8 +34,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 
 from mobly import asserts
 
@@ -76,7 +76,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
         return "[TC_CLCTRL_6_1] Event Functionality with DUT as Server"
 
     def steps_TC_CLCTRL_6_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test).", is_commissioning=True),
             TestStep("2a", "TH reads from the DUT the (0xFFFC) FeatureMap attribute."),
             TestStep("2b", "TH reads TestEventTriggerEnabled attribute from General Diagnostics Cluster."),
@@ -142,17 +142,19 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             TestStep("9k", "TH sends command MoveTo with Position = MoveToFullyOpen."),
             TestStep("9l", "Verify that the DUT has emitted the SecureStateChanged event."),
         ]
-        return steps
 
     def pics_TC_CLCTRL_6_1(self) -> list[str]:
-        pics = [
+        return [
             "CLCTRL.S",
         ]
-        return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_CLCTRL_6_1(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         dev_controller = self.default_controller
         attributes = Clusters.ClosureControl.Attributes
         timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
@@ -766,7 +768,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             # STEP 9k: TH sends command MoveTo with Position = MoveToFullyOpen.
             self.step("9k")
 
-            time.sleep(2)  # Adding a small delay to ensure the previous command is processed
+            await asyncio.sleep(2)  # Adding a small delay to ensure the previous command is processed
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,

@@ -40,6 +40,7 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 
 logger = logging.getLogger(__name__)
@@ -96,7 +97,7 @@ class TC_AVSM_2_15(MatterBaseTest):
         has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kSnapshot)
     )
     async def test_TC_AVSM_2_15(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.CameraAvStreamManagement
         attr = Clusters.CameraAvStreamManagement.Attributes
         commands = Clusters.CameraAvStreamManagement.Commands
@@ -167,6 +168,17 @@ class TC_AVSM_2_15(MatterBaseTest):
         )
         logger.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
         asserts.assert_equal(len(aAllocatedSnapshotStreams), 1, "The number of allocated snapshot streams in the list is not 1.")
+
+        # Clear all allocated streams
+        aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
+        )
+
+        for stream in aAllocatedSnapshotStreams:
+            try:
+                await self.send_single_cmd(endpoint=endpoint, cmd=commands.SnapshotStreamDeallocate(snapshotStreamID=(stream.snapshotStreamID)))
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
 
 if __name__ == "__main__":

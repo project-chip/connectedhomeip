@@ -37,13 +37,18 @@ static constexpr uint8_t kMaxNumberOfPresetTypes = 6;
 
 static constexpr uint8_t kMaxNumberOfThermostatSuggestions = 5;
 
-// TODO: #34556 Support multiple presets of each type.
-// We will support only one preset of each preset type.
-static constexpr uint8_t kMaxNumberOfPresetsOfEachType = 1;
+static constexpr uint8_t kMaxNumberOfScheduleTypes = 2;
+
+// TODO: #34556 Support multiple presets/schedules of each type.
+// We will support only one preset of each preset/schedule type.
+static constexpr uint8_t kMaxNumberOfPresetsOfEachType   = 1;
+static constexpr uint8_t kMaxNumberOfSchedulesOfEachType = 1;
 
 // For testing the use case where number of presets added exceeds the number of presets supported, we will have the value of
 // kMaxNumberOfPresetsSupported < kMaxNumberOfPresetTypes * kMaxNumberOfPresetsOfEachType
 static constexpr uint8_t kMaxNumberOfPresetsSupported = kMaxNumberOfPresetTypes * kMaxNumberOfPresetsOfEachType - 1;
+
+static constexpr uint8_t kMaxNumberOfSchedulesSupported = kMaxNumberOfScheduleTypes * kMaxNumberOfSchedulesOfEachType - 1;
 
 class ThermostatDelegate : public Delegate
 {
@@ -91,6 +96,8 @@ public:
     CHIP_ERROR GetUniqueID(uint8_t & uniqueID) override;
 
     CHIP_ERROR ReEvaluateCurrentSuggestion() override;
+
+    CHIP_ERROR GetScheduleTypeAtIndex(size_t index, Structs::ScheduleTypeStruct::Type & scheduleType) override;
 
 private:
     static ThermostatDelegate sInstance;
@@ -154,6 +161,15 @@ private:
     DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> mThermostatSuggestionNotFollowingReason;
 
     bool mIsExpirationTimerRunning = false;
+
+    uint8_t mMaxNumberOfSchedulesAllowedPerScheduleType;
+
+    Structs::ScheduleTypeStruct::Type mScheduleTypes[kMaxNumberOfScheduleTypes];
+
+    /**
+     * @brief Initializes the schedules types array with example schedule types.
+     */
+    void InitializeScheduleTypes();
 };
 
 } // namespace Thermostat

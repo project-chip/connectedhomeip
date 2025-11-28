@@ -341,19 +341,34 @@ public:
      */
     virtual void HandleStopStateCallback(GenericOperationalError & err) = 0;
 
-private:
-    friend class Instance;
-
-    Instance * mInstance = nullptr;
-
     /**
      * This method is used by the SDK to set the instance pointer. This is done during the instantiation of a Instance object.
      * @param aInstance A pointer to the Instance object related to this delegate object.
+     * @note This method is for internal SDK use and should only be called by the `Instance` constructor and destructor.
      */
-    void SetInstance(Instance * aInstance) { mInstance = aInstance; }
+    void SetInstance(Instance * aInstance)
+    {
+        VerifyOrDie(mInstance == nullptr || aInstance == nullptr || mInstance == aInstance);
+        mInstance = aInstance;
+    }
+
+private:
+    Instance * mInstance = nullptr;
 
 protected:
-    Instance * GetInstance() const { return mInstance; }
+    /**
+     * @brief Provides access to the const Instance pointer.
+     *
+     * @return A const pointer to the Instance object associated with this delegate.
+     */
+    const Instance * GetInstance() const { return mInstance; }
+
+    /**
+     * @brief Provides access to the Instance pointer.
+     *
+     * @return A pointer to the Instance object associated with this delegate.
+     */
+    Instance * GetInstance() { return mInstance; }
 };
 
 } // namespace OperationalState

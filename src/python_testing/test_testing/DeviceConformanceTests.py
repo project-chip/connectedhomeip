@@ -16,7 +16,7 @@
 #
 
 
-from typing import Callable
+from typing import Callable, Optional
 
 import matter.clusters as Clusters
 from matter.testing.basic_composition import BasicCompositionTests
@@ -27,7 +27,8 @@ from matter.testing.global_attribute_ids import (ClusterIdType, DeviceTypeIdType
                                                  device_type_id_type, is_valid_device_type_id)
 from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
                                             ProblemNotice, ProblemSeverity)
-from matter.testing.spec_parsing import CommandType, XmlDeviceType, XmlDeviceTypeClusterRequirements
+from matter.testing.spec_parsing import (CommandType, PrebuiltDataModelDirectory, XmlDeviceType, XmlDeviceTypeClusterRequirements,
+                                         build_xml_device_types, build_xml_namespaces)
 from matter.tlv import uint
 
 
@@ -54,7 +55,7 @@ def get_supersets(xml_device_types: dict[int, XmlDeviceType]) -> list[set[int]]:
         To do this, we need to identify the top-level device type and generate the list of acceptable children
     '''
 
-    device_types_that_have_supersets = set([dt.superset_of_device_type_id for dt in xml_device_types.values()]) - {0}
+    device_types_that_have_supersets = {dt.superset_of_device_type_id for dt in xml_device_types.values()} - {0}
 
     # Ex. in the above example, the top level device types would be blinkable light and color temperature light
     # because they are supersets of other things, but have no device types that are supersets of them.
@@ -76,8 +77,10 @@ class DeviceConformanceTests(BasicCompositionTests):
         await super().setup_class_helper()
         self.build_spec_xmls()
 
-    def _get_device_type_id(self, device_type_name: str) -> int:
-        id = [id for id, dt in self.xml_device_types.items() if dt.name.lower() == device_type_name.lower()]
+    def _get_device_type_id(self, device_type_name: str, xml_device_types: Optional[dict[uint, XmlDeviceType]] = None) -> int:
+        if xml_device_types is None:
+            xml_device_types = self.xml_device_types
+        id = [id for id, dt in xml_device_types.items() if dt.name.lower() == device_type_name.lower()]
         if len(id) != 1:
             raise KeyError(f"Unable to find {device_type_name} device type")
         return id[0]
@@ -141,7 +144,7 @@ class DeviceConformanceTests(BasicCompositionTests):
             for cluster_id, cluster in endpoint.items():
                 cluster_location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id)
 
-                if cluster_id not in self.xml_clusters.keys():
+                if cluster_id not in self.xml_clusters:
                     if (cluster_id & 0xFFFF_0000) != 0:
                         # manufacturer cluster
                         continue
@@ -171,7 +174,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                                 location=location, problem="MACL feature is disallowed if the a supported device type is not present")
                         continue
 
-                    if f not in self.xml_clusters[cluster_id].features.keys():
+                    if f not in self.xml_clusters[cluster_id].features:
                         record_error(location=location,
                                      problem=f'Unknown feature with mask 0x{f:02x} (feature bit {f.bit_length() - 1})')
                         continue
@@ -191,7 +194,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                     if cluster_id in ignore_attributes and attribute_id in ignore_attributes[cluster_id]:
                         continue
                     location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
-                    if attribute_id not in self.xml_clusters[cluster_id].attributes.keys():
+                    if attribute_id not in self.xml_clusters[cluster_id].attributes:
                         # TODO: Consolidate the range checks with IDM-10.1 once that lands
                         if attribute_id <= 0x4FFF:
                             record_error(location=location, problem='Standard attribute found on device, but not in spec')
@@ -206,7 +209,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                     if cluster_id in ignore_attributes and attribute_id in ignore_attributes[cluster_id]:
                         continue
                     conformance_decision_with_choice = xml_attribute.conformance(feature_map, attribute_list, all_command_list)
-                    if conformance_decision_with_choice.is_mandatory() and attribute_id not in cluster.keys():
+                    if conformance_decision_with_choice.is_mandatory() and attribute_id not in cluster:
                         location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
                         record_error(
                             location=location, problem=f'Attribute 0x{attribute_id:02x} is required, but is not present on the DUT. {conformance_str(xml_attribute.conformance, feature_map, self.xml_clusters[cluster_id].features)}')
@@ -274,7 +277,7 @@ class DeviceConformanceTests(BasicCompositionTests):
 
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
-                if cluster_id not in self.xml_clusters.keys():
+                if cluster_id not in self.xml_clusters:
                     if (cluster_id & 0xFFFF_0000) != 0:
                         # manufacturer cluster
                         continue
@@ -310,7 +313,7 @@ class DeviceConformanceTests(BasicCompositionTests):
                                      [Clusters.Descriptor.Attributes.DeviceTypeList] if device_type_id_type(x.deviceType) == DeviceTypeIdType.kStandard]
             for device_type in standard_device_types:
                 device_type_id = device_type.deviceType
-                if device_type_id not in self.xml_device_types.keys():
+                if device_type_id not in self.xml_device_types:
                     # problem recorded in 10.5
                     continue
                 expected_revision = self.xml_device_types[device_type_id].revision
@@ -363,7 +366,7 @@ class DeviceConformanceTests(BasicCompositionTests):
             for device_type in standard_device_types:
                 device_type_id = device_type.deviceType
                 location = DeviceTypePathLocation(device_type_id=device_type_id)
-                if device_type_id not in self.xml_device_types.keys():
+                if device_type_id not in self.xml_device_types:
                     record_error(location=location, problem='Unknown device type ID in standard range')
                     continue
 
@@ -468,11 +471,11 @@ class DeviceConformanceTests(BasicCompositionTests):
         for endpoint_num, endpoint in self.endpoints.items():
             all_device_type_ids = [dt.deviceType for dt in endpoint[Clusters.Descriptor]
                                    [Clusters.Descriptor.Attributes.DeviceTypeList]]
-            application_device_type_ids = set([
-                dt for dt in all_device_type_ids if self.xml_device_types[dt].classification_class == 'simple'])
+            application_device_type_ids = {
+                dt for dt in all_device_type_ids if self.xml_device_types[dt].classification_class == 'simple'}
             if len(application_device_type_ids) <= 1:
                 continue
-            if any([application_device_type_ids.issubset(superset) for superset in supersets]):
+            if any(application_device_type_ids.issubset(superset) for superset in supersets):
                 continue
 
             location = AttributePathLocation(3, Clusters.Descriptor.id, Clusters.Descriptor.Attributes.DeviceTypeList.attribute_id)
@@ -489,8 +492,87 @@ class DeviceConformanceTests(BasicCompositionTests):
             if endpoint_id == 0:
                 continue
 
-            for cluster in endpoint.keys():
+            for cluster in endpoint:
                 if cluster in root_node_restricted_clusters:
                     problems.append(ProblemNotice("TC-IDM-14.1", location=ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=cluster.id),
                                                   severity=ProblemSeverity.ERROR, problem=f"Root-node-restricted cluster {cluster} appears on non-root-node endpoint"))
+        return problems
+
+    def check_closure_restricted_clusters(self) -> list[ProblemNotice]:
+        # This is a test that is SPECIFIC to the 1.5 spec, and thus we need the 1.5 spec information specifically
+        # to assess the revisions.
+        one_five_device_types, _ = build_xml_device_types(PrebuiltDataModelDirectory.k1_5)
+        # TODO: change this once https://github.com/project-chip/matter-test-scripts/issues/689 is implemented
+
+        window_covering_id = self._get_device_type_id('Window Covering', one_five_device_types)
+        closure_id = self._get_device_type_id('Closure', one_five_device_types)
+        closure_panel_id = self._get_device_type_id('Closure Panel', one_five_device_types)
+        restricted_device_type_ids = [window_covering_id, closure_id, closure_panel_id]
+
+        problems = []
+        for endpoint_id, endpoint in self.endpoints.items():
+            device_types = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]
+            have_closure = Clusters.ClosureControl in endpoint or Clusters.ClosureDimension in endpoint
+            have_window_covering = Clusters.WindowCovering in endpoint
+
+            if have_closure and have_window_covering:
+                for dt in device_types:
+                    device_type_id = dt.deviceType
+                    if device_type_id in restricted_device_type_ids and dt.revision <= one_five_device_types[device_type_id].revision:
+                        problems.append(ProblemNotice("TC-IDM-14.1", location=DeviceTypePathLocation(endpoint_id=endpoint_id, device_type_id=device_type_id), severity=ProblemSeverity.ERROR,
+                                                      problem=f"Endpoint with device type {one_five_device_types[device_type_id].name} has both window covering and closure clusters"))
+        return problems
+
+    def check_closure_restricted_sem_tags(self) -> list[ProblemNotice]:
+        # This is a test that is SPECIFIC to the 1.5 spec, and thus we need the 1.5 spec information specifically
+        # to assess the revisions.
+        one_five_device_types, _ = build_xml_device_types(PrebuiltDataModelDirectory.k1_5)
+        one_five_namespaces, _ = build_xml_namespaces(PrebuiltDataModelDirectory.k1_5)
+        # TODO: change this once https://github.com/project-chip/matter-test-scripts/issues/689 is implemented
+
+        def get_namespace_id(name: str) -> uint:
+            ids = [id for id, xml in one_five_namespaces.items() if xml.name.lower() == name.lower()]
+            if len(ids) != 1:
+                raise ValueError(f"Unable to find unique namespace for '{name}'")
+            return ids[0]
+
+        closure_id = self._get_device_type_id('Closure', one_five_device_types)
+        closure_panel_id = self._get_device_type_id('Closure Panel', one_five_device_types)
+        closure_namespace_id = get_namespace_id('Closure')
+        closure_panel_namespace_id = get_namespace_id('Closure Panel')
+
+        def check_tags_on_endpoint(device_type_id: int, allowed_namespace: int, max_num_tags_allowed_namespace: int, disallowed_namespace: int):
+            tag_list = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList]
+            allowed_tag_count = 0
+
+            for tag in tag_list:
+                if tag.namespaceID == disallowed_namespace:
+                    problems.append(ProblemNotice("TC-IDM-14.1", location=DeviceTypePathLocation(endpoint_id=endpoint_id, device_type_id=device_type_id), severity=ProblemSeverity.ERROR,
+                                                  problem=f"Endpoint with device type {one_five_device_types[device_type_id].name} has semantic tag {tag.tag} from namespace {one_five_namespaces[disallowed_namespace].name}"))
+                elif tag.namespaceID == allowed_namespace:
+                    allowed_tag_count += 1
+
+            if allowed_tag_count == 0:
+                problems.append(ProblemNotice("TC-IDM-14.1", location=DeviceTypePathLocation(endpoint_id=endpoint_id, device_type_id=device_type_id), severity=ProblemSeverity.ERROR,
+                                              problem=f"Endpoint with device type {one_five_device_types[device_type_id].name} is missing a {one_five_namespaces[allowed_namespace].name} namespace tag"))
+            elif allowed_tag_count > max_num_tags_allowed_namespace:
+                problems.append(ProblemNotice("TC-IDM-14.1", location=DeviceTypePathLocation(endpoint_id=endpoint_id, device_type_id=device_type_id), severity=ProblemSeverity.ERROR,
+                                              problem=f"Endpoint with device type {one_five_device_types[device_type_id].name} has multiple {one_five_namespaces[allowed_namespace].name} namespace tags"))
+
+        problems = []
+        for endpoint_id, endpoint in self.endpoints.items():
+            # If a Cloure or Closure Panel does not implement TagList, this is also invalid but is verified by another IDM test,
+            if Clusters.Descriptor.Attributes.TagList not in endpoint[Clusters.Descriptor]:
+                continue
+
+            device_types = endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]
+
+            for dt in device_types:
+                if dt.deviceType == closure_id:
+                    check_tags_on_endpoint(device_type_id=closure_id, allowed_namespace=closure_namespace_id,
+                                           max_num_tags_allowed_namespace=1, disallowed_namespace=closure_panel_namespace_id)
+                elif dt.deviceType == closure_panel_id:
+                    check_tags_on_endpoint(device_type_id=closure_panel_id, allowed_namespace=closure_panel_namespace_id,
+                                           max_num_tags_allowed_namespace=1, disallowed_namespace=closure_namespace_id)
+
         return problems

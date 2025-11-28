@@ -260,7 +260,7 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
     reader.Init(std::move(payload));
     VerifyOrReturnError(invokeRequestMessage.Init(reader) == CHIP_NO_ERROR, Status::InvalidAction);
 #if CHIP_CONFIG_IM_PRETTY_PRINT
-    invokeRequestMessage.PrettyPrint();
+    TEMPORARY_RETURN_IGNORED invokeRequestMessage.PrettyPrint();
 #endif
     VerifyOrDie(mpResponder);
     if (mpResponder->GetGroupId().HasValue())
@@ -980,7 +980,7 @@ void CommandHandlerImpl::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandH
     VerifyOrDieWithMsg(invokeRequestMessage.Init(reader) == CHIP_NO_ERROR, DataManagement,
                        "TH Failure: Failed 'invokeRequestMessage.Init(reader)'");
 #if CHIP_CONFIG_IM_PRETTY_PRINT
-    invokeRequestMessage.PrettyPrint();
+    TEMPORARY_RETURN_IGNORED invokeRequestMessage.PrettyPrint();
 #endif
 
     VerifyOrDieWithMsg(invokeRequestMessage.GetSuppressResponse(&mSuppressResponse) == CHIP_NO_ERROR, DataManagement,

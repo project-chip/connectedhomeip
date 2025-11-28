@@ -142,14 +142,13 @@ class TC_OPCREDS_3_4(MatterBaseTest):
                     26, f"TH1 {send_command('ArmFailSafe')} to the DUT with the ExpiryLengthSeconds field set to 0", None, verify_armfailsafe_response()),
                 TestStep(27, f"TH1 {send_command('OpenCommissioningWindow')} to the DUT"),
                 TestStep(
-                    28, f"TH1 connects to the DUT over PASE and {send_command('ArmFailSafe')} to the DUT with the ExpiryLengthSeconds field set to 900. Steps 29-30 are all performed over the PASE connection.", None, verify_armfailsafe_response()),
+                    28, "TH1 connects to the DUT over PASE. Steps 29-30 are all performed over the PASE connection.", None, verify_armfailsafe_response()),
                 TestStep(
-                    29, f"TH1 sends {send_command('ArmFailSafe')} command to the DUT with the ExpiryLengthSeconds field set to 0", None, verify_armfailsafe_response()),
+                    29, f"TH1 sends {send_command('ArmFailSafe')} command to the DUT with the ExpiryLengthSeconds field set to 900", None, verify_armfailsafe_response()),
                 TestStep(
                     30, f"TH1 {send_command('CSRRequest')} over PASE with the IsForUpdateNOC field set to true", None, verify_invalid_command()),
                 TestStep(31, f"TH1 {send_command('RevokeCommissioning')} to the DUT",
-                         "Verify that the commissioning window is closed"),
-                TestStep(32, f"TH1 {send_command('ArmFailSafe')} to the DUT with the ExpiryLengthSeconds field set to 0", None, verify_armfailsafe_response())]
+                         "Verify that the commissioning window is closed")]
 
     @async_test_body
     async def test_TC_OPCREDS_3_4(self):
@@ -314,7 +313,7 @@ class TC_OPCREDS_3_4(MatterBaseTest):
         resp = await self.open_commissioning_window()
 
         self.step(28)
-        await self.default_controller.FindOrEstablishPASESession(setupCode=resp.commissioningParameters.setupQRCode, nodeid=self.dut_node_id)
+        await self.default_controller.FindOrEstablishPASESession(setupCode=resp.commissioningParameters.setupQRCode, nodeId=self.dut_node_id)
 
         self.step(29)
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(900)
@@ -332,13 +331,7 @@ class TC_OPCREDS_3_4(MatterBaseTest):
 
         self.step(31)
         revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
-        await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
-
-        self.step(32)
-        cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(0)
-        resp = await self.send_single_cmd(dev_ctrl=self.default_controller, node_id=self.dut_node_id, cmd=cmd)
-        asserts.assert_equal(resp.errorCode, Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk,
-                             "Failure status returned from arm failsafe")
+        await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
 
 
 if __name__ == "__main__":

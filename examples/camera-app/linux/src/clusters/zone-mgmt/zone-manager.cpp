@@ -17,6 +17,7 @@
  */
 
 #include "camera-device-interface.h"
+#include "camera-device.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -207,7 +208,8 @@ void ZoneManager::OnZoneTriggerTimeout(chip::System::Layer * systemLayer, void *
     if (!zoneManager->mTriggerContexts.empty())
     {
         // Start the timer again if there are active triggers
-        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kTimerPeriod), OnZoneTriggerTimeout, zoneManager);
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kTimerPeriod), OnZoneTriggerTimeout,
+                                                                       zoneManager);
     }
 }
 
@@ -240,7 +242,8 @@ void ZoneManager::OnZoneTriggeredEvent(uint16_t zoneId,
         mTriggerContexts.push_back(trigCtxt);
 
         // Schedule the periodic timer
-        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kTimerPeriod), OnZoneTriggerTimeout, this);
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kTimerPeriod), OnZoneTriggerTimeout,
+                                                                       this);
     }
     else
     {
@@ -268,6 +271,11 @@ void ZoneManager::OnZoneTriggeredEvent(uint16_t zoneId,
             ChipLogProgress(Camera, "Trigger detected for ZoneId = %u, but ignored. Count = %u", zoneId,
                             foundTrigCtxt->triggerCount);
         }
+    }
+
+    if (mCameraDevice)
+    {
+        mCameraDevice->HandlePushAvZoneTrigger(zoneId);
     }
 }
 

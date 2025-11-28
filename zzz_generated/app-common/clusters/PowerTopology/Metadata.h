@@ -33,6 +33,12 @@ inline constexpr DataModel::AttributeEntry
                    BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
 } // namespace ActiveEndpoints
+namespace ElectricalCircuitNodes {
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(ElectricalCircuitNodes::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, Access::Privilege::kOperate);
+} // namespace ElectricalCircuitNodes
 constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
 
 };

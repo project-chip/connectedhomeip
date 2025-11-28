@@ -21,15 +21,19 @@
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
+#include <app/persistence/AttributePersistenceProvider.h>
+#include <app/persistence/AttributePersistenceProviderInstance.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
 #include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/CHIPFaultInjection.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 #include <cmath>
 #include <cstring>
+#include <optional>
 #include <set>
 
 using namespace chip;
@@ -77,7 +81,7 @@ CameraAVStreamMgmtServer::~CameraAVStreamMgmtServer()
     mDelegate.SetCameraAVStreamMgmtServer(nullptr);
 
     // Unregister command handler and attribute access interfaces
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
@@ -164,7 +168,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::Init()
                          mEndpointId));
     }
 
-    LoadPersistentAttributes();
+    TEMPORARY_RETURN_IGNORED LoadPersistentAttributes();
 
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INTERNAL);
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
@@ -219,6 +223,9 @@ CHIP_ERROR CameraAVStreamMgmtServer::ReadAndEncodeSupportedStreamUsages(const At
 
 CHIP_ERROR CameraAVStreamMgmtServer::ReadAndEncodeAllocatedVideoStreams(const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
+    CHIP_FAULT_INJECT(chip::FaultInjection::kFault_ClearInMemoryAllocatedVideoStreams, mAllocatedVideoStreams.clear(););
+    CHIP_FAULT_INJECT(chip::FaultInjection::kFault_LoadPersistentCameraAVSMAttributes, LoadPersistentAttributes(););
+
     for (const auto & videoStream : mAllocatedVideoStreams)
     {
         ReturnErrorOnFailure(encoder.Encode(videoStream));
@@ -229,6 +236,9 @@ CHIP_ERROR CameraAVStreamMgmtServer::ReadAndEncodeAllocatedVideoStreams(const At
 
 CHIP_ERROR CameraAVStreamMgmtServer::ReadAndEncodeAllocatedAudioStreams(const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
+    CHIP_FAULT_INJECT(chip::FaultInjection::kFault_ClearInMemoryAllocatedAudioStreams, mAllocatedAudioStreams.clear(););
+    CHIP_FAULT_INJECT(chip::FaultInjection::kFault_LoadPersistentCameraAVSMAttributes, LoadPersistentAttributes(););
+
     for (const auto & audioStream : mAllocatedAudioStreams)
     {
         ReturnErrorOnFailure(encoder.Encode(audioStream));
@@ -239,6 +249,9 @@ CHIP_ERROR CameraAVStreamMgmtServer::ReadAndEncodeAllocatedAudioStreams(const At
 
 CHIP_ERROR CameraAVStreamMgmtServer::ReadAndEncodeAllocatedSnapshotStreams(const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
+    CHIP_FAULT_INJECT(chip::FaultInjection::kFault_ClearInMemoryAllocatedSnapshotStreams, mAllocatedSnapshotStreams.clear(););
+    CHIP_FAULT_INJECT(chip::FaultInjection::kFault_LoadPersistentCameraAVSMAttributes, LoadPersistentAttributes(););
+
     for (const auto & snapshotStream : mAllocatedSnapshotStreams)
     {
         ReturnErrorOnFailure(encoder.Encode(snapshotStream));
@@ -269,53 +282,53 @@ CHIP_ERROR CameraAVStreamMgmtServer::SetStreamUsagePriorities(const std::vector<
     return CHIP_NO_ERROR;
 }
 
-bool CameraAVStreamMgmtServer::IsAllocatedVideoStreamReusable(const VideoStreamStruct & allocatedStream,
-                                                              const VideoStreamStruct & requestedArgs)
+std::optional<uint16_t> CameraAVStreamMgmtServer::GetReusableVideoStreamId(const VideoStreamStruct & requestedArgs) const
 {
-    // 1. Codec must match exactly (Allocated stream already has the codec)
-    if (requestedArgs.videoCodec != allocatedStream.videoCodec)
+    for (const auto & stream : mAllocatedVideoStreams)
     {
-        return false;
-    }
+        // 1. Codec must match exactly (Allocated stream already has the codec)
+        if (requestedArgs.videoCodec != stream.videoCodec)
+        {
+            continue;
+        }
 
-    // 2. Framerate check (request must be within allocated stream's current range)
-    if (!(requestedArgs.minFrameRate >= allocatedStream.minFrameRate && requestedArgs.maxFrameRate <= allocatedStream.maxFrameRate))
-    {
-        return false;
-    }
+        // 2. Framerate check (request must be within allocated stream's current range)
+        if (requestedArgs.minFrameRate < stream.minFrameRate || requestedArgs.maxFrameRate > stream.maxFrameRate)
+        {
+            continue;
+        }
 
-    // 3. Resolution check
-    if (!(requestedArgs.minResolution.width >= allocatedStream.minResolution.width &&
-          requestedArgs.minResolution.height >= allocatedStream.minResolution.height &&
-          requestedArgs.maxResolution.width <= allocatedStream.maxResolution.width &&
-          requestedArgs.maxResolution.height <= allocatedStream.maxResolution.height))
-    {
-        return false;
-    }
+        // 3. Resolution check
+        if (requestedArgs.minResolution.width < stream.minResolution.width ||
+            requestedArgs.minResolution.height < stream.minResolution.height ||
+            requestedArgs.maxResolution.width > stream.maxResolution.width ||
+            requestedArgs.maxResolution.height > stream.maxResolution.height)
+        {
+            continue;
+        }
 
-    // 4. Bitrate check
-    if (!(requestedArgs.minBitRate >= allocatedStream.minBitRate && requestedArgs.maxBitRate <= allocatedStream.maxBitRate))
-    {
-        return false;
-    }
+        // 4. Bitrate check
+        if (requestedArgs.minBitRate < stream.minBitRate || requestedArgs.maxBitRate > stream.maxBitRate)
+        {
+            continue;
+        }
 
-    // 5. KeyFrameInterval check
-    if (requestedArgs.keyFrameInterval != allocatedStream.keyFrameInterval)
-    {
-        return false;
-    }
+        // 5. KeyFrameInterval check
+        if (requestedArgs.keyFrameInterval != stream.keyFrameInterval)
+        {
+            continue;
+        }
 
-    return true;
+        return stream.videoStreamID;
+    }
+    return std::nullopt;
 }
 
 CHIP_ERROR CameraAVStreamMgmtServer::AddVideoStream(const VideoStreamStruct & videoStream)
 {
     mAllocatedVideoStreams.push_back(videoStream);
-    auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedVideoStreams::Id);
-    mDelegate.OnAttributeChanged(Attributes::AllocatedVideoStreams::Id);
-    MatterReportingAttributeChangeCallback(path);
 
-    return CHIP_NO_ERROR;
+    return PersistAndNotify<Attributes::AllocatedVideoStreams::Id>();
 }
 
 CHIP_ERROR CameraAVStreamMgmtServer::UpdateVideoStreamRangeParams(VideoStreamStruct & videoStreamToUpdate,
@@ -350,9 +363,10 @@ CHIP_ERROR CameraAVStreamMgmtServer::UpdateVideoStreamRangeParams(VideoStreamStr
         (origMaxResHeight != videoStreamToUpdate.maxResolution.height) || (origMinBitRate != videoStreamToUpdate.minBitRate) ||
         (origMaxBitRate != videoStreamToUpdate.maxBitRate);
 
-    auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedVideoStreams::Id);
-    mDelegate.OnAttributeChanged(Attributes::AllocatedVideoStreams::Id);
-    MatterReportingAttributeChangeCallback(path);
+    if (wasModified)
+    {
+        ReturnErrorOnFailure(PersistAndNotify<Attributes::AllocatedVideoStreams::Id>());
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -363,21 +377,15 @@ CHIP_ERROR CameraAVStreamMgmtServer::RemoveVideoStream(uint16_t videoStreamId)
         std::remove_if(mAllocatedVideoStreams.begin(), mAllocatedVideoStreams.end(),
                        [&](const VideoStreamStruct & vStream) { return vStream.videoStreamID == videoStreamId; }),
         mAllocatedVideoStreams.end());
-    auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedVideoStreams::Id);
-    mDelegate.OnAttributeChanged(Attributes::AllocatedVideoStreams::Id);
-    MatterReportingAttributeChangeCallback(path);
 
-    return CHIP_NO_ERROR;
+    return PersistAndNotify<Attributes::AllocatedVideoStreams::Id>();
 }
 
 CHIP_ERROR CameraAVStreamMgmtServer::AddAudioStream(const AudioStreamStruct & audioStream)
 {
     mAllocatedAudioStreams.push_back(audioStream);
-    auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedAudioStreams::Id);
-    mDelegate.OnAttributeChanged(Attributes::AllocatedAudioStreams::Id);
-    MatterReportingAttributeChangeCallback(path);
 
-    return CHIP_NO_ERROR;
+    return PersistAndNotify<Attributes::AllocatedAudioStreams::Id>();
 }
 
 CHIP_ERROR CameraAVStreamMgmtServer::RemoveAudioStream(uint16_t audioStreamId)
@@ -386,59 +394,63 @@ CHIP_ERROR CameraAVStreamMgmtServer::RemoveAudioStream(uint16_t audioStreamId)
         std::remove_if(mAllocatedAudioStreams.begin(), mAllocatedAudioStreams.end(),
                        [&](const AudioStreamStruct & aStream) { return aStream.audioStreamID == audioStreamId; }),
         mAllocatedAudioStreams.end());
-    auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedAudioStreams::Id);
-    mDelegate.OnAttributeChanged(Attributes::AllocatedAudioStreams::Id);
-    MatterReportingAttributeChangeCallback(path);
 
-    return CHIP_NO_ERROR;
+    return PersistAndNotify<Attributes::AllocatedAudioStreams::Id>();
 }
 
-bool CameraAVStreamMgmtServer::IsAllocatedSnapshotStreamReusable(
-    const SnapshotStreamStruct & allocatedStream, const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & requestedArgs)
+std::optional<uint16_t> CameraAVStreamMgmtServer::GetReusableSnapshotStreamId(
+    const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & requestedArgs) const
 {
-    // 1. Codec must match allocated stream's codec.
-    if (requestedArgs.imageCodec != allocatedStream.imageCodec)
+    for (const auto & stream : mAllocatedSnapshotStreams)
     {
-        return false;
-    }
+        // 1. Codec must match allocated stream's codec.
+        if (requestedArgs.imageCodec != stream.imageCodec)
+        {
+            continue;
+        }
 
-    // 2. Quality must match allocated stream's quality.
-    if (requestedArgs.quality != allocatedStream.quality)
-    {
-        return false;
-    }
+        // 2. Quality must match allocated stream's quality.
+        if (requestedArgs.quality != stream.quality)
+        {
+            continue;
+        }
 
-    // 3. Framerate check (request must be within allocated stream's current range)
-    if (!(requestedArgs.maxFrameRate >= allocatedStream.frameRate))
-    {
-        return false;
-    }
+        // 3. Framerate check (request must be within allocated stream's current range)
+        if (requestedArgs.maxFrameRate > stream.frameRate)
+        {
+            continue;
+        }
 
-    // 4. Resolution check
-    if (!(requestedArgs.minResolution.width >= allocatedStream.minResolution.width &&
-          requestedArgs.minResolution.height >= allocatedStream.minResolution.height &&
-          requestedArgs.maxResolution.width <= allocatedStream.maxResolution.width &&
-          requestedArgs.maxResolution.height <= allocatedStream.maxResolution.height))
-    {
-        return false;
-    }
+        // 4. Resolution check
+        if (requestedArgs.minResolution.width < stream.minResolution.width ||
+            requestedArgs.minResolution.height < stream.minResolution.height ||
+            requestedArgs.maxResolution.width > stream.maxResolution.width ||
+            requestedArgs.maxResolution.height > stream.maxResolution.height)
+        {
+            continue;
+        }
 
-    return true;
+        return stream.snapshotStreamID;
+    }
+    return std::nullopt;
 }
 
 CHIP_ERROR CameraAVStreamMgmtServer::AddSnapshotStream(const SnapshotStreamStruct & snapshotStream)
 {
     mAllocatedSnapshotStreams.push_back(snapshotStream);
-    auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedSnapshotStreams::Id);
-    mDelegate.OnAttributeChanged(Attributes::AllocatedSnapshotStreams::Id);
-    MatterReportingAttributeChangeCallback(path);
 
-    return CHIP_NO_ERROR;
+    return PersistAndNotify<Attributes::AllocatedSnapshotStreams::Id>();
 }
 
 CHIP_ERROR CameraAVStreamMgmtServer::UpdateSnapshotStreamRangeParams(
     SnapshotStreamStruct & snapshotStreamToUpdate, const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & snapshotStream)
 {
+    // Store original values to detect changes
+    uint16_t origMinResWidth  = snapshotStreamToUpdate.minResolution.width;
+    uint16_t origMinResHeight = snapshotStreamToUpdate.minResolution.height;
+    uint16_t origMaxResWidth  = snapshotStreamToUpdate.maxResolution.width;
+    uint16_t origMaxResHeight = snapshotStreamToUpdate.maxResolution.height;
+
     // Adjust the range parameters for the allocated snapshot stream to be the
     // intersection of the existing and the new one.
     snapshotStreamToUpdate.minResolution.width =
@@ -450,9 +462,16 @@ CHIP_ERROR CameraAVStreamMgmtServer::UpdateSnapshotStreamRangeParams(
     snapshotStreamToUpdate.maxResolution.height =
         std::min(snapshotStreamToUpdate.maxResolution.height, snapshotStream.maxResolution.height);
 
-    auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedSnapshotStreams::Id);
-    mDelegate.OnAttributeChanged(Attributes::AllocatedSnapshotStreams::Id);
-    MatterReportingAttributeChangeCallback(path);
+    // Check if any parameter was actually modified
+    bool wasModified = (origMinResWidth != snapshotStreamToUpdate.minResolution.width) ||
+        (origMinResHeight != snapshotStreamToUpdate.minResolution.height) ||
+        (origMaxResWidth != snapshotStreamToUpdate.maxResolution.width) ||
+        (origMaxResHeight != snapshotStreamToUpdate.maxResolution.height);
+
+    if (wasModified)
+    {
+        ReturnErrorOnFailure(PersistAndNotify<Attributes::AllocatedSnapshotStreams::Id>());
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -463,11 +482,8 @@ CHIP_ERROR CameraAVStreamMgmtServer::RemoveSnapshotStream(uint16_t snapshotStrea
         std::remove_if(mAllocatedSnapshotStreams.begin(), mAllocatedSnapshotStreams.end(),
                        [&](const SnapshotStreamStruct & sStream) { return sStream.snapshotStreamID == snapshotStreamId; }),
         mAllocatedSnapshotStreams.end());
-    auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedSnapshotStreams::Id);
-    mDelegate.OnAttributeChanged(Attributes::AllocatedSnapshotStreams::Id);
-    MatterReportingAttributeChangeCallback(path);
 
-    return CHIP_NO_ERROR;
+    return PersistAndNotify<Attributes::AllocatedSnapshotStreams::Id>();
 }
 
 CHIP_ERROR CameraAVStreamMgmtServer::UpdateVideoStreamRefCount(uint16_t videoStreamId, bool shouldIncrement)
@@ -985,15 +1001,22 @@ void CameraAVStreamMgmtServer::ModifyVideoStream(const uint16_t streamID, const 
     {
         if (stream.videoStreamID == streamID)
         {
+            bool wasModified = false;
             if (waterMarkEnabled.HasValue())
             {
+                wasModified             = (waterMarkEnabled != stream.watermarkEnabled);
                 stream.watermarkEnabled = waterMarkEnabled;
             }
             if (osdEnabled.HasValue())
             {
+                wasModified       = wasModified || (osdEnabled != stream.OSDEnabled);
                 stream.OSDEnabled = osdEnabled;
             }
-            ChipLogError(Camera, "Modified video stream with ID: %d", streamID);
+            if (wasModified)
+            {
+                TEMPORARY_RETURN_IGNORED PersistAndNotify<Attributes::AllocatedVideoStreams::Id>();
+                ChipLogProgress(Camera, "Modified video stream with ID: %d", streamID);
+            }
             return;
         }
     }
@@ -1006,15 +1029,22 @@ void CameraAVStreamMgmtServer::ModifySnapshotStream(const uint16_t streamID, con
     {
         if (stream.snapshotStreamID == streamID)
         {
+            bool wasModified = false;
             if (waterMarkEnabled.HasValue())
             {
+                wasModified             = (waterMarkEnabled != stream.watermarkEnabled);
                 stream.watermarkEnabled = waterMarkEnabled;
             }
             if (osdEnabled.HasValue())
             {
+                wasModified       = wasModified || (osdEnabled != stream.OSDEnabled);
                 stream.OSDEnabled = osdEnabled;
             }
-            ChipLogError(Camera, "Modified snapshot stream with ID: %d", streamID);
+            if (wasModified)
+            {
+                TEMPORARY_RETURN_IGNORED PersistAndNotify<Attributes::AllocatedSnapshotStreams::Id>();
+                ChipLogProgress(Camera, "Modified snapshot stream with ID: %d", streamID);
+            }
             return;
         }
     }
@@ -1104,7 +1134,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::SetViewport(const Globals::Structs::Viewpor
     }
     mViewport = aViewport;
 
-    StoreViewport(mViewport);
+    TEMPORARY_RETURN_IGNORED StoreViewport(mViewport);
     mDelegate.OnAttributeChanged(Attributes::Viewport::Id);
     auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::Viewport::Id);
     MatterReportingAttributeChangeCallback(path);
@@ -1256,25 +1286,26 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
     }
 
     // Load AllocatedVideoStreams
-    err = mDelegate.LoadAllocatedVideoStreams(mAllocatedVideoStreams);
+    err = LoadAllocatedStreams<Attributes::AllocatedVideoStreams::Id>();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load allocated video streams from the KVS.", mEndpointId);
     }
     // Load AllocatedAudioStreams
-    err = mDelegate.LoadAllocatedAudioStreams(mAllocatedAudioStreams);
+    err = LoadAllocatedStreams<Attributes::AllocatedAudioStreams::Id>();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load allocated audio streams from the KVS.", mEndpointId);
     }
 
     // Load AllocatedSnapshotStreams
-    err = mDelegate.LoadAllocatedSnapshotStreams(mAllocatedSnapshotStreams);
+    err = LoadAllocatedStreams<Attributes::AllocatedSnapshotStreams::Id>();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load allocated snapshot streams from the KVS.", mEndpointId);
     }
 
+    // Load StreamUsagePriorities
     err = LoadStreamUsagePriorities();
     if (err != CHIP_NO_ERROR)
     {
@@ -1552,7 +1583,7 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
     }
 
     // Signal delegate that all persistent configuration attributes have been loaded.
-    mDelegate.PersistentAttributesLoadedCallback();
+    TEMPORARY_RETURN_IGNORED mDelegate.PersistentAttributesLoadedCallback();
 }
 
 CHIP_ERROR CameraAVStreamMgmtServer::StoreViewport(const Globals::Structs::ViewportStruct::Type & viewport)
@@ -1636,6 +1667,126 @@ CHIP_ERROR CameraAVStreamMgmtServer::LoadStreamUsagePriorities()
     VerifyOrReturnError(err == CHIP_ERROR_END_OF_TLV, err);
 
     ReturnErrorOnFailure(reader.ExitContainer(arrayType));
+    return reader.VerifyEndOfContainer();
+}
+
+// Stream helper template struct containing necessary items for the
+// StoreAllocatedStreams and LoadAllocatedStream functions to work on
+// all the 3 stream types.
+template <AttributeId TAttributeId>
+struct StreamTraits;
+
+template <>
+struct StreamTraits<Attributes::AllocatedVideoStreams::Id>
+{
+    using StreamStructType                     = VideoStreamStruct;
+    static constexpr size_t kMaxSerializedSize = kMaxAllocatedVideoStreamsSerializedSize;
+    static constexpr StreamType kStreamType    = StreamType::kVideo;
+    static constexpr auto kStreamVectorMember  = &CameraAVStreamMgmtServer::mAllocatedVideoStreams;
+};
+
+template <>
+struct StreamTraits<Attributes::AllocatedAudioStreams::Id>
+{
+    using StreamStructType                     = AudioStreamStruct;
+    static constexpr size_t kMaxSerializedSize = kMaxAllocatedAudioStreamsSerializedSize;
+    static constexpr StreamType kStreamType    = StreamType::kAudio;
+    static constexpr auto kStreamVectorMember  = &CameraAVStreamMgmtServer::mAllocatedAudioStreams;
+};
+
+template <>
+struct StreamTraits<Attributes::AllocatedSnapshotStreams::Id>
+{
+    using StreamStructType                     = SnapshotStreamStruct;
+    static constexpr size_t kMaxSerializedSize = kMaxAllocatedSnapshotStreamsSerializedSize;
+    static constexpr StreamType kStreamType    = StreamType::kSnapshot;
+    static constexpr auto kStreamVectorMember  = &CameraAVStreamMgmtServer::mAllocatedSnapshotStreams;
+};
+
+template <AttributeId TAttributeId>
+CHIP_ERROR CameraAVStreamMgmtServer::PersistAndNotify()
+{
+    ReturnErrorAndLogOnFailure(StoreAllocatedStreams<TAttributeId>(), Zcl,
+                               "CameraAVStreamMgmt[ep=%d]: Failed to persist allocated streams", mEndpointId);
+
+    auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, TAttributeId);
+    mDelegate.OnAttributeChanged(TAttributeId);
+    MatterReportingAttributeChangeCallback(path);
+
+    return CHIP_NO_ERROR;
+}
+
+template <AttributeId attributeId>
+CHIP_ERROR CameraAVStreamMgmtServer::StoreAllocatedStreams()
+{
+    using Traits = StreamTraits<attributeId>;
+
+    uint8_t buffer[Traits::kMaxSerializedSize];
+    TLV::TLVWriter writer;
+    writer.Init(buffer);
+
+    TLV::TLVType arrayType;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType));
+
+    const auto & streams = (*this).*Traits::kStreamVectorMember;
+    for (const auto & stream : streams)
+    {
+        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::AnonymousTag(), stream));
+    }
+
+    ReturnErrorOnFailure(writer.EndContainer(arrayType));
+
+    size_t len = writer.GetLengthWritten();
+
+    auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, attributeId);
+    ReturnErrorOnFailure(GetAttributePersistenceProvider()->WriteValue(path, ByteSpan(buffer, len)));
+
+    ChipLogProgress(Zcl, "Saved %u %s streams", static_cast<unsigned int>(streams.size()), StreamTypeToString(Traits::kStreamType));
+    return CHIP_NO_ERROR;
+}
+
+template <AttributeId attributeId>
+CHIP_ERROR CameraAVStreamMgmtServer::LoadAllocatedStreams()
+{
+    using Traits = StreamTraits<attributeId>;
+
+    uint8_t buffer[Traits::kMaxSerializedSize];
+    MutableByteSpan span(buffer);
+
+    auto path      = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, attributeId);
+    auto & streams = (*this).*Traits::kStreamVectorMember;
+
+    CHIP_ERROR err = GetAttributePersistenceProvider()->ReadValue(path, span);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        streams.clear();
+        ChipLogProgress(Zcl, "No persisted %s streams found.", StreamTypeToString(Traits::kStreamType));
+        return CHIP_NO_ERROR;
+    }
+    ReturnErrorOnFailure(err);
+
+    TLV::TLVReader reader;
+    reader.Init(span);
+
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, TLV::AnonymousTag()));
+    TLV::TLVType arrayType;
+    ReturnErrorOnFailure(reader.EnterContainer(arrayType));
+
+    streams.clear();
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        typename Traits::StreamStructType stream;
+        ReturnErrorOnFailure(DataModel::Decode(reader, stream));
+        streams.push_back(stream);
+    }
+
+    VerifyOrReturnError(err == CHIP_ERROR_END_OF_TLV, err);
+
+    ReturnErrorOnFailure(reader.ExitContainer(arrayType));
+
+    ChipLogProgress(Zcl, "Loaded %u %s streams", static_cast<unsigned int>(streams.size()),
+                    StreamTypeToString(Traits::kStreamType));
+
     return reader.VerifyEndOfContainer();
 }
 
@@ -1884,7 +2035,7 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
         {
             // Add the allocated videostream object in the AllocatedVideoStreams list.
             videoStreamArgs.videoStreamID = videoStreamID;
-            AddVideoStream(videoStreamArgs);
+            TEMPORARY_RETURN_IGNORED AddVideoStream(videoStreamArgs);
 
             // Call delegate with the allocated stream parameters and new allocation action
             mDelegate.OnVideoStreamAllocated(videoStreamArgs, StreamAllocationAction::kNewAllocation);
@@ -1895,7 +2046,7 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
 
             VideoStreamStruct & videoStreamToUpdate = *it;
             // Reusing the existing stream. Update range parameters and check if they were modified
-            UpdateVideoStreamRangeParams(videoStreamToUpdate, videoStreamArgs, wasModified);
+            TEMPORARY_RETURN_IGNORED UpdateVideoStreamRangeParams(videoStreamToUpdate, videoStreamArgs, wasModified);
 
             // Call delegate with the final updated stream parameters and appropriate action
             mDelegate.OnVideoStreamAllocated(videoStreamToUpdate,
@@ -1974,7 +2125,7 @@ void CameraAVStreamMgmtServer::HandleVideoStreamDeallocate(HandlerContext & ctx,
 
     if (status == Status::Success)
     {
-        RemoveVideoStream(videoStreamID);
+        TEMPORARY_RETURN_IGNORED RemoveVideoStream(videoStreamID);
     }
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
@@ -2056,7 +2207,7 @@ void CameraAVStreamMgmtServer::HandleAudioStreamAllocate(HandlerContext & ctx,
     {
         // Add the allocated audiostream object in the AllocatedAudioStreams list.
         audioStreamArgs.audioStreamID = audioStreamID;
-        AddAudioStream(audioStreamArgs);
+        TEMPORARY_RETURN_IGNORED AddAudioStream(audioStreamArgs);
     }
 
     response.audioStreamID = audioStreamID;
@@ -2078,7 +2229,7 @@ void CameraAVStreamMgmtServer::HandleAudioStreamDeallocate(HandlerContext & ctx,
 
     if (status == Status::Success)
     {
-        RemoveAudioStream(audioStreamID);
+        TEMPORARY_RETURN_IGNORED RemoveAudioStream(audioStreamID);
     }
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
@@ -2193,13 +2344,13 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamAllocate(HandlerContext & ctx
         allocatedSnapshotStream.watermarkEnabled = snapshotStreamArgs.watermarkEnabled;
         allocatedSnapshotStream.OSDEnabled       = snapshotStreamArgs.OSDEnabled;
 
-        AddSnapshotStream(allocatedSnapshotStream);
+        TEMPORARY_RETURN_IGNORED AddSnapshotStream(allocatedSnapshotStream);
     }
     else
     {
         SnapshotStreamStruct & snapshotStreamToUpdate = *it;
         // Reusing the existing stream. Update range parameters
-        UpdateSnapshotStreamRangeParams(snapshotStreamToUpdate, snapshotStreamArgs);
+        TEMPORARY_RETURN_IGNORED UpdateSnapshotStreamRangeParams(snapshotStreamToUpdate, snapshotStreamArgs);
     }
 
     response.snapshotStreamID = snapshotStreamID;
@@ -2270,7 +2421,7 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamDeallocate(HandlerContext & c
 
     if (status == Status::Success)
     {
-        RemoveSnapshotStream(snapshotStreamID);
+        TEMPORARY_RETURN_IGNORED RemoveSnapshotStream(snapshotStreamID);
     }
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
@@ -2433,19 +2584,21 @@ bool CameraAVStreamMgmtServer::ValidateSnapshotStreamForModifyOrDeallocate(const
 
 bool CameraAVStreamMgmtServer::IsResourceAvailableForStreamAllocation(uint32_t candidateEncodedPixelRate, bool encoderRequired)
 {
-    uint32_t totalEncodedPixelRate = candidateEncodedPixelRate;
+    uint64_t totalEncodedPixelRate = candidateEncodedPixelRate;
     uint16_t totalEncodersRequired = encoderRequired ? 1 : 0;
 
     for (const VideoStreamStruct & stream : mAllocatedVideoStreams)
     {
-        totalEncodedPixelRate += (stream.maxFrameRate * stream.maxResolution.height * stream.maxResolution.width);
+        totalEncodedPixelRate +=
+            (static_cast<uint64_t>(stream.maxFrameRate) * stream.maxResolution.height * stream.maxResolution.width);
     }
 
     for (const SnapshotStreamStruct & stream : mAllocatedSnapshotStreams)
     {
         if (stream.encodedPixels)
         {
-            totalEncodedPixelRate += (stream.frameRate * stream.maxResolution.height * stream.maxResolution.width);
+            totalEncodedPixelRate +=
+                (static_cast<uint64_t>(stream.frameRate) * stream.maxResolution.height * stream.maxResolution.width);
             if (stream.hardwareEncoder)
             {
                 totalEncodersRequired++;

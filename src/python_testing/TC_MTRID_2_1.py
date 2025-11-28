@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -66,7 +67,7 @@ class TC_MTRID_2_1(MeterIdentificationTestBaseHelper):
         return ["MTRID.S"]
 
     def steps_TC_MTRID_2_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commissioning, already done", "DUT is commissioned.", is_commissioning=True),
             TestStep("2", "TH reads MeterType attribute", """
                      - DUT replies a null or a MeterTypeEnum value;
@@ -86,8 +87,6 @@ class TC_MTRID_2_1(MeterIdentificationTestBaseHelper):
                      - ApparentPowerThreshold field has type int64;
                      - PowerThresholdSource field has type PowerThresholdSourceEnum and value in range 0 - 2."""),
         ]
-
-        return steps
 
     @async_test_body
     async def test_TC_MTRID_2_1(self):

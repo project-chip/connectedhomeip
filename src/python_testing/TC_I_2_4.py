@@ -37,8 +37,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 
 import test_plan_support
 from mobly import asserts
@@ -109,14 +109,13 @@ class TC_I_2_4(MatterBaseTest):
                 ]
 
     def pics_TC_I_2_4(self) -> list[str]:
-        pics = [
+        return [
             "I.S",
         ]
-        return pics
 
     @run_if_endpoint_matches(has_cluster(Clusters.Identify))
     async def test_TC_I_2_4(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         # Commissioning - already done
         self.step(1)
@@ -142,7 +141,7 @@ class TC_I_2_4(MatterBaseTest):
 
         self.step(6)
         logging.info("Test waits for 12 seconds")
-        time.sleep(12)
+        await asyncio.sleep(12)
 
         self.step(7)
         count = sub_handler.attribute_report_counts[cluster.Attributes.IdentifyTime]
@@ -175,7 +174,7 @@ class TC_I_2_4(MatterBaseTest):
 
         self.step(14)
         logging.info("Test waits for 1 seconds")
-        time.sleep(1)
+        await asyncio.sleep(1)
 
         self.step(15)
         count = sub_handler.attribute_report_counts[cluster.Attributes.IdentifyTime]
@@ -212,7 +211,7 @@ class TC_I_2_4(MatterBaseTest):
 
         self.step(21)
         logging.info("Test waits for 12 seconds")
-        time.sleep(12)
+        await asyncio.sleep(12)
 
         self.step(22)
         count = sub_handler.attribute_report_counts[cluster.Attributes.IdentifyTime]
@@ -251,7 +250,7 @@ class TC_I_2_4(MatterBaseTest):
 
         self.step(29)
         logging.info("Test waits for 1 seconds")
-        time.sleep(1)
+        await asyncio.sleep(1)
 
         self.step(30)
         count = sub_handler.attribute_report_counts[cluster.Attributes.IdentifyTime]

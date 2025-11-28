@@ -53,20 +53,23 @@ class TC_WebRTCP_2_6(MatterBaseTest, WEBRTCPTestBase):
         """
         Define the step-by-step sequence for the test.
         """
-        steps = [
+        return [
+            TestStep("precondition", "DUT commissioned", is_commissioning=True),
             TestStep(1, "TH reads the descriptor cluster on the endpoint containing the WebRTC Transport Provider cluster"),
             TestStep(2, "TH verifies CameraAVStreamManagement cluster (ID 0x0551) is present in the server cluster list"),
         ]
-        return steps
 
     def pics_TC_WebRTCP_2_6(self) -> list[str]:
         """
         Return the list of PICS applicable to this test case.
         """
-        pics = [
+        return [
             "WEBRTCP.S",           # WebRTC Transport Provider Server
         ]
-        return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_WebRTCP_2_6(self):
@@ -74,8 +77,9 @@ class TC_WebRTCP_2_6(MatterBaseTest, WEBRTCPTestBase):
         Executes the test steps for validating CameraAVStreamManagement cluster presence.
         """
 
-        # Find the endpoint that has WebRTC Transport Provider cluster
-        webrtc_endpoint = self.get_endpoint(default=1)
+        self.step("precondition")
+        # Commission DUT - already done
+        webrtc_endpoint = self.get_endpoint()
 
         self.step(1)
         # Read the descriptor cluster on the endpoint containing the WebRTC Transport Provider cluster

@@ -128,6 +128,10 @@ extern uint32_t SystemCoreClock;
 #include "SEGGER_SYSVIEW_FreeRTOS.h"
 #endif
 
+#if defined(SL_MATTER_EM4_SLEEP) && (SL_MATTER_EM4_SLEEP == 1)
+void sl_matter_em4_check(uint32_t expected_idle_time_ms);
+#endif // defined(SL_MATTER_EM4_SLEEP) && (SL_MATTER_EM4_SLEEP == 1)
+
 /*-----------------------------------------------------------
  * Application specific definitions.
  *
@@ -143,6 +147,9 @@ extern uint32_t SystemCoreClock;
 /* Energy saving modes. */
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
 #define configUSE_TICKLESS_IDLE 1
+#if defined(SL_MATTER_EM4_SLEEP) && (SL_MATTER_EM4_SLEEP == 1)
+#define configPRE_SLEEP_PROCESSING(x) sl_matter_em4_check(x)
+#endif // defined(SL_MATTER_EM4_SLEEP) && (SL_MATTER_EM4_SLEEP == 1)
 #elif (SLI_SI91X_MCU_INTERFACE && SL_ICD_ENABLED)
 #define configUSE_TICKLESS_IDLE 1
 #define configEXPECTED_IDLE_TIME_BEFORE_SLEEP 70
@@ -183,7 +190,7 @@ extern uint32_t SystemCoreClock;
 // Keep the timerTask at the highest prio as some of our stacks tasks leverage eventing with timers.
 #define configTIMER_TASK_PRIORITY (55) /* Highest priority */
 #define configTIMER_QUEUE_LENGTH (10)
-#define configTIMER_TASK_STACK_DEPTH (1024)
+#define configTIMER_TASK_STACK_DEPTH (1280 / sizeof(StackType_t))
 
 #ifdef SLI_SI91X_MCU_INTERFACE
 #ifdef __NVIC_PRIO_BITS
@@ -250,15 +257,15 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 
 #ifndef configTOTAL_HEAP_SIZE
 #ifdef SL_WIFI
-#ifdef DIC_ENABLE
+#ifdef SL_MATTER_ENABLE_AWS
 #ifdef SLI_SI91X_MCU_INTERFACE
-#define configTOTAL_HEAP_SIZE ((size_t) ((75 + EXTRA_HEAP_k) * 1024))
+#define configTOTAL_HEAP_SIZE ((size_t) ((65 + EXTRA_HEAP_k) * 1024))
 #else
 #define configTOTAL_HEAP_SIZE ((size_t) ((68 + EXTRA_HEAP_k) * 1024))
 #endif // SLI_SI91X_MCU_INTERFACE
 #else
 #define configTOTAL_HEAP_SIZE ((size_t) ((42 + EXTRA_HEAP_k) * 1024))
-#endif // DIC
+#endif // SL_MATTER_ENABLE_AWS
 #else  // SL_WIFI
 #if SL_CONFIG_OPENTHREAD_LIB == 1
 #define configTOTAL_HEAP_SIZE ((size_t) ((40 + EXTRA_HEAP_k) * 1024))

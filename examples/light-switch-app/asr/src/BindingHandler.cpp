@@ -27,13 +27,14 @@
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::Clusters;
 
 void BindingHandler::Init()
 {
     // The initialization of binding manager will try establishing connection with unicast peers
     // so it requires the Server instance to be correctly initialized. Post the init function to
     // the event queue so that everything is ready when initialization is conducted.
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitInternal);
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(InitInternal);
 }
 
 void BindingHandler::OnInvokeCommandFailure(BindingData & aBindingData, CHIP_ERROR aError)
@@ -52,8 +53,8 @@ void BindingHandler::OnInvokeCommandFailure(BindingData & aBindingData, CHIP_ERR
         *data                              = aBindingData;
 
         // Establish new CASE session and retrasmit command that was not applied.
-        error = BindingManager::GetInstance().NotifyBoundClusterChanged(aBindingData.EndpointId, aBindingData.ClusterId,
-                                                                        static_cast<void *>(data));
+        error = Binding::Manager::GetInstance().NotifyBoundClusterChanged(aBindingData.EndpointId, aBindingData.ClusterId,
+                                                                          static_cast<void *>(data));
 
         if (CHIP_NO_ERROR != error)
         {
@@ -67,7 +68,7 @@ void BindingHandler::OnInvokeCommandFailure(BindingData & aBindingData, CHIP_ERR
     }
 }
 
-void BindingHandler::OnOffProcessCommand(CommandId aCommandId, const EmberBindingTableEntry & aBinding,
+void BindingHandler::OnOffProcessCommand(CommandId aCommandId, const Binding::TableEntry & aBinding,
                                          OperationalDeviceProxy * aDevice, void * aContext)
 {
     CHIP_ERROR ret     = CHIP_NO_ERROR;
@@ -143,7 +144,7 @@ void BindingHandler::OnOffProcessCommand(CommandId aCommandId, const EmberBindin
     }
 }
 
-void BindingHandler::LevelControlProcessCommand(CommandId aCommandId, const EmberBindingTableEntry & aBinding,
+void BindingHandler::LevelControlProcessCommand(CommandId aCommandId, const Binding::TableEntry & aBinding,
                                                 OperationalDeviceProxy * aDevice, void * aContext)
 {
     CHIP_ERROR ret     = CHIP_NO_ERROR;
@@ -192,13 +193,13 @@ void BindingHandler::LevelControlProcessCommand(CommandId aCommandId, const Embe
     }
 }
 
-void BindingHandler::LightSwitchChangedHandler(const EmberBindingTableEntry & aBinding, OperationalDeviceProxy * deviceProxy,
+void BindingHandler::LightSwitchChangedHandler(const Binding::TableEntry & aBinding, OperationalDeviceProxy * deviceProxy,
                                                void * context)
 {
     VerifyOrReturn(context != nullptr, ChipLogError(NotSpecified, "OnDeviceConnectedFn: context is null"));
     BindingData * data = static_cast<BindingData *>(context);
 
-    if (aBinding.type == MATTER_MULTICAST_BINDING && data->IsGroup)
+    if (aBinding.type == Binding::MATTER_MULTICAST_BINDING && data->IsGroup)
     {
         switch (data->ClusterId)
         {
@@ -213,7 +214,7 @@ void BindingHandler::LightSwitchChangedHandler(const EmberBindingTableEntry & aB
             break;
         }
     }
-    else if (aBinding.type == MATTER_UNICAST_BINDING && !data->IsGroup)
+    else if (aBinding.type == Binding::MATTER_UNICAST_BINDING && !data->IsGroup)
     {
         switch (data->ClusterId)
         {
@@ -241,20 +242,20 @@ void BindingHandler::InitInternal(intptr_t arg)
 {
     ASR_LOG("Initialize binding Handler");
     auto & server = chip::Server::GetInstance();
-    chip::BindingManager::GetInstance().Init(
+    TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().Init(
         { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
-    chip::BindingManager::GetInstance().RegisterBoundDeviceChangedHandler(LightSwitchChangedHandler);
-    chip::BindingManager::GetInstance().RegisterBoundDeviceContextReleaseHandler(LightSwitchContextReleaseHandler);
+    Binding::Manager::GetInstance().RegisterBoundDeviceChangedHandler(LightSwitchChangedHandler);
+    Binding::Manager::GetInstance().RegisterBoundDeviceContextReleaseHandler(LightSwitchContextReleaseHandler);
     BindingHandler::GetInstance().PrintBindingTable();
 }
 
 bool BindingHandler::IsGroupBound()
 {
-    BindingTable & bindingTable = BindingTable::GetInstance();
+    Binding::Table & bindingTable = Binding::Table::GetInstance();
 
     for (auto & entry : bindingTable)
     {
-        if (MATTER_MULTICAST_BINDING == entry.type)
+        if (Binding::MATTER_MULTICAST_BINDING == entry.type)
         {
             return true;
         }
@@ -264,7 +265,7 @@ bool BindingHandler::IsGroupBound()
 
 void BindingHandler::PrintBindingTable()
 {
-    BindingTable & bindingTable = BindingTable::GetInstance();
+    Binding::Table & bindingTable = Binding::Table::GetInstance();
 
     ASR_LOG("Binding Table size: [%d]:", bindingTable.Size());
     uint8_t i = 0;
@@ -272,7 +273,7 @@ void BindingHandler::PrintBindingTable()
     {
         switch (entry.type)
         {
-        case MATTER_UNICAST_BINDING:
+        case Binding::MATTER_UNICAST_BINDING:
             ASR_LOG("[%d] UNICAST:", i++);
             ASR_LOG("\t\t+ Fabric: %d\n \
             \t+ LocalEndpoint %d \n \
@@ -282,7 +283,7 @@ void BindingHandler::PrintBindingTable()
                     (int) entry.fabricIndex, (int) entry.local, (int) entry.clusterId.value_or(kInvalidClusterId),
                     (int) entry.remote, (int) entry.nodeId);
             break;
-        case MATTER_MULTICAST_BINDING:
+        case Binding::MATTER_MULTICAST_BINDING:
             ASR_LOG("[%d] GROUP:", i++);
             ASR_LOG("\t\t+ Fabric: %d\n \
             \t+ LocalEndpoint %d \n \
@@ -290,7 +291,7 @@ void BindingHandler::PrintBindingTable()
             \t+ GroupId %d",
                     (int) entry.fabricIndex, (int) entry.local, (int) entry.remote, (int) entry.groupId);
             break;
-        case MATTER_UNUSED_BINDING:
+        case Binding::MATTER_UNUSED_BINDING:
             ASR_LOG("[%d] UNUSED", i++);
             break;
         // case MATTER_MANY_TO_ONE_BINDING:
@@ -311,5 +312,6 @@ void BindingHandler::SwitchWorkerHandler(intptr_t context)
     VerifyOrReturn(context != 0, ChipLogError(NotSpecified, "SwitchWorkerFunction - Invalid work data"));
 
     BindingData * data = reinterpret_cast<BindingData *>(context);
-    BindingManager::GetInstance().NotifyBoundClusterChanged(data->EndpointId, data->ClusterId, static_cast<void *>(data));
+    TEMPORARY_RETURN_IGNORED Binding::Manager::GetInstance().NotifyBoundClusterChanged(data->EndpointId, data->ClusterId,
+                                                                                       static_cast<void *>(data));
 }

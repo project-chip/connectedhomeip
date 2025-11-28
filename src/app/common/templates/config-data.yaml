@@ -29,6 +29,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Administrator Commissioning
     - Basic Information
     - Boolean State
+    - Boolean State Configuration
     - Camera AV Settings User Level Management
     - Camera AV Stream Management
     - Chime
@@ -37,6 +38,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Commissioner Control
     - Commodity Price
     - Commodity Tariff
+    - Descriptor
     - Device Energy Management
     - Device Energy Management Mode
     - Diagnostic Logs
@@ -50,7 +52,10 @@ CommandHandlerInterfaceOnlyClusters:
     - General Commissioning
     - General Diagnostics
     - Group Key Management
+    - Groupcast
     - HEPA Filter Monitoring
+    - ICD Management
+    - Identify
     - Joint Fabric Administrator
     - Laundry Washer Mode
     - Microwave Oven Control
@@ -74,6 +79,8 @@ CommandHandlerInterfaceOnlyClusters:
     - TLS Client Management
     - Thread Border Router Management
     - Thread Network Directory
+    - Time Synchronization
+    - User Label
     - Water Heater Management
     - Water Heater Mode
     - WebRTC Transport Provider
@@ -89,11 +96,8 @@ ClustersWithInitFunctions:
     # keep-sorted start
     - Color Control
     - Groups
-    - Identify
     - Level Control
-    - Localization Configuration
     - Mode Select
-    - Occupancy Sensing
     - On/Off
     - Pump Configuration and Control
     - Sample MEI
@@ -106,7 +110,6 @@ ClustersWithAttributeChangedFunctions:
     - Bridged Device Basic Information
     - Door Lock
     - Fan Control
-    - Identify
     - Pump Configuration and Control
     - Thermostat
     - Window Covering
@@ -131,7 +134,6 @@ ClustersWithPreAttributeChangeFunctions:
     - Fan Control
     - Laundry Dryer Controls
     - Laundry Washer Controls
-    - Localization Configuration
     - Mode Select
     - Pump Configuration and Control
     - Thermostat
@@ -148,16 +150,25 @@ CodeDrivenClusters:
     - Basic Information
     - Binding
     - Boolean State
+    - Boolean State Configuration
+    - Descriptor
     - Diagnostic Logs
     - Ethernet Network Diagnostics
     - Fixed Label
     - General Commissioning
     - General Diagnostics
     - Group Key Management
+    - Groupcast
+    - ICD Management
+    - Identify
+    - Localization Configuration
     - OTA Software Update Provider
+    - Occupancy Sensing
     - Operational Credentials
     - Push AV Stream Transport
     - Software Diagnostics
     - Time Format Localization
+    - Time Synchronization
+    - User Label
     - Wi-Fi Network Diagnostics
     # keep-sorted end

@@ -26,7 +26,6 @@
 
 #include <app/InteractionModelEngine.h>
 #include <app/OperationalSessionSetup.h>
-#include <app/TimerDelegates.h>
 #include <app/reporting/ReportSchedulerImpl.h>
 #include <app/util/DataModelHandler.h>
 #include <lib/core/ErrorStr.h>
@@ -35,6 +34,7 @@
 #if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
+#include <platform/DefaultTimerDelegate.h>
 #endif
 
 #include <app/server/Dnssd.h>
@@ -194,9 +194,16 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
                                                             ,
                                                         tcpListenParams
+#if INET_CONFIG_ENABLE_IPV4
+                                                        ,
+                                                        Transport::TcpListenParameters(stateParams.tcpEndPointManager)
+                                                            .SetAddressType(Inet::IPAddressType::kIPv4)
+                                                            .SetListenPort(params.listenPort)
+                                                            .SetServerListenEnabled(false)
+#endif
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-                                                        ,
+                                                            ,
                                                         Transport::WiFiPAFListenParameters()
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
@@ -326,7 +333,8 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         .groupDataProvider         = stateParams.groupDataProvider,
         // Don't provide an MRP local config, so each CASE initiation will use
         // the then-current value.
-        .mrpLocalConfig = NullOptional,
+        .mrpLocalConfig            = NullOptional,
+        .minimumLITBackoffInterval = params.minimumLITBackoffInterval,
     };
 
     CASESessionManagerConfig sessionManagerConfig = {

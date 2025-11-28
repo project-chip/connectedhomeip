@@ -6198,7 +6198,10 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Now we can set up waiting for onSubscriptionPoolWorkComplete from the test
     XCTestExpectation * subscriptionPoolWorkCompleteForTriggerTestExpectation = [self expectationWithDescription:@"_triggerResubscribeWithReason work completed"];
+    __weak __auto_type weakDelegate = delegate;
     delegate.onSubscriptionPoolWorkComplete = ^{
+        __strong __auto_type strongDelegate = weakDelegate;
+        strongDelegate.onSubscriptionPoolWorkComplete = nil;
         [subscriptionPoolWorkCompleteForTriggerTestExpectation fulfill];
     };
 

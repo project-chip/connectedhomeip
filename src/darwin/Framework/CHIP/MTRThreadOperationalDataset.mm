@@ -58,7 +58,7 @@ size_t const MTRSizeThreadPANID = 2; // Thread's PAN ID is 2 bytes
 - (BOOL)_populateCppOperationalDataset
 {
     _cppThreadOperationalDataset.Clear();
-    _cppThreadOperationalDataset.SetNetworkName(self.networkName.UTF8String);
+    TEMPORARY_RETURN_IGNORED _cppThreadOperationalDataset.SetNetworkName(self.networkName.UTF8String);
 
     if (![self _checkDataLength:self.extendedPANID expectedLength:MTRSizeThreadExtendedPANID]) {
         MTR_LOG_ERROR("Invalid ExtendedPANID");
@@ -66,7 +66,7 @@ size_t const MTRSizeThreadPANID = 2; // Thread's PAN ID is 2 bytes
     }
     uint8_t extendedPanId[MTRSizeThreadExtendedPANID];
     [self.extendedPANID getBytes:&extendedPanId length:MTRSizeThreadExtendedPANID];
-    _cppThreadOperationalDataset.SetExtendedPanId(extendedPanId);
+    TEMPORARY_RETURN_IGNORED _cppThreadOperationalDataset.SetExtendedPanId(extendedPanId);
 
     if (![self _checkDataLength:self.masterKey expectedLength:MTRSizeThreadMasterKey]) {
         MTR_LOG_ERROR("Invalid MasterKey");
@@ -74,7 +74,7 @@ size_t const MTRSizeThreadPANID = 2; // Thread's PAN ID is 2 bytes
     }
     uint8_t masterKey[MTRSizeThreadMasterKey];
     [self.masterKey getBytes:&masterKey length:MTRSizeThreadMasterKey];
-    _cppThreadOperationalDataset.SetMasterKey(masterKey);
+    TEMPORARY_RETURN_IGNORED _cppThreadOperationalDataset.SetMasterKey(masterKey);
 
     if (![self _checkDataLength:self.PSKc expectedLength:MTRSizeThreadPSKc]) {
         MTR_LOG_ERROR("Invalid PKSc");
@@ -82,9 +82,9 @@ size_t const MTRSizeThreadPANID = 2; // Thread's PAN ID is 2 bytes
     }
     uint8_t PSKc[MTRSizeThreadPSKc];
     [self.PSKc getBytes:&PSKc length:MTRSizeThreadPSKc];
-    _cppThreadOperationalDataset.SetPSKc(PSKc);
+    TEMPORARY_RETURN_IGNORED _cppThreadOperationalDataset.SetPSKc(PSKc);
 
-    _cppThreadOperationalDataset.SetChannel([self.channelNumber unsignedShortValue]);
+    TEMPORARY_RETURN_IGNORED _cppThreadOperationalDataset.SetChannel([self.channelNumber unsignedShortValue]);
 
     // Thread's PAN ID is 2 bytes
     if (![self _checkDataLength:self.panID expectedLength:MTRSizeThreadPANID]) {
@@ -94,7 +94,7 @@ size_t const MTRSizeThreadPANID = 2; // Thread's PAN ID is 2 bytes
     uint16_t panID;
     memcpy(&panID, [self.panID bytes], MTRSizeThreadPANID);
     // The underlying CPP class assumes Big Endianness for the panID
-    _cppThreadOperationalDataset.SetPanId(CFSwapInt16HostToBig(panID));
+    TEMPORARY_RETURN_IGNORED _cppThreadOperationalDataset.SetPanId(CFSwapInt16HostToBig(panID));
 
     return YES;
 }
@@ -124,12 +124,12 @@ size_t const MTRSizeThreadPANID = 2; // Thread's PAN ID is 2 bytes
     uint8_t masterKey[MTRSizeThreadMasterKey];
     uint16_t panID;
     uint16_t channel;
-    dataset.GetNetworkName(networkName);
-    dataset.GetExtendedPanId(extendedPANID);
-    dataset.GetMasterKey(masterKey);
-    dataset.GetPSKc(pskc);
-    dataset.GetPanId(panID);
-    dataset.GetChannel(channel);
+    TEMPORARY_RETURN_IGNORED dataset.GetNetworkName(networkName);
+    TEMPORARY_RETURN_IGNORED dataset.GetExtendedPanId(extendedPANID);
+    TEMPORARY_RETURN_IGNORED dataset.GetMasterKey(masterKey);
+    TEMPORARY_RETURN_IGNORED dataset.GetPSKc(pskc);
+    TEMPORARY_RETURN_IGNORED dataset.GetPanId(panID);
+    TEMPORARY_RETURN_IGNORED dataset.GetChannel(channel);
     panID = CFSwapInt16BigToHost(panID);
 
     return [self initWithNetworkName:[NSString stringWithUTF8String:networkName]

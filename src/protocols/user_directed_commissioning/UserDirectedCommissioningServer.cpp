@@ -58,10 +58,10 @@ void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAdd
 
     uint8_t udcPayload[IdentificationDeclaration::kUdcTLVDataMaxBytes];
     size_t udcPayloadLength = std::min<size_t>(msg->DataLength(), sizeof(udcPayload));
-    msg->Read(udcPayload, udcPayloadLength);
+    TEMPORARY_RETURN_IGNORED msg->Read(udcPayload, udcPayloadLength);
 
     IdentificationDeclaration id;
-    id.ReadPayload(udcPayload, sizeof(udcPayload));
+    TEMPORARY_RETURN_IGNORED id.ReadPayload(udcPayload, sizeof(udcPayload));
 
     if (id.GetCancelPasscode())
     {
@@ -313,7 +313,7 @@ CHIP_ERROR IdentificationDeclaration::ReadPayload(uint8_t * udcPayload, size_t p
                 chip::TLV::TLVType listContainerType = chip::TLV::kTLVType_List;
                 ReturnErrorOnFailure(reader.EnterContainer(listContainerType));
 
-                while ((err = reader.Next()) == CHIP_NO_ERROR && mNumTargetAppInfos < sizeof(mTargetAppInfos))
+                while ((err = reader.Next()) == CHIP_NO_ERROR && mNumTargetAppInfos < kMaxTargetAppInfos)
                 {
                     containerTag = reader.GetTag();
                     if (!TLV::IsContextTag(containerTag))
@@ -555,6 +555,7 @@ void UserDirectedCommissioningServer::OnCommissionableNodeFound(const Dnssd::Dis
 
 void UserDirectedCommissioningServer::PrintUDCClients()
 {
+#if CHIP_PROGRESS_LOGGING
     for (uint8_t i = 0; i < kMaxUDCClients; i++)
     {
         UDCClientState * state = GetUDCClients().GetUDCClientState(i);
@@ -568,15 +569,20 @@ void UserDirectedCommissioningServer::PrintUDCClients()
             state->GetPeerAddress().ToString(addrBuffer);
 
             char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
-            Encoding::BytesToUppercaseHexString(state->GetRotatingId(), chip::Dnssd::kMaxRotatingIdLen, rotatingIdString,
-                                                sizeof(rotatingIdString));
+            const char * rotatingIdStringPtr                              = rotatingIdString;
+            if (Encoding::BytesToUppercaseHexString(state->GetRotatingId(), chip::Dnssd::kMaxRotatingIdLen, rotatingIdString,
+                                                    sizeof(rotatingIdString)) != CHIP_NO_ERROR)
+            {
+                rotatingIdStringPtr = "<invalid id>";
+            }
 
             ChipLogProgress(AppServer,
                             "PrintUDCClients() UDC Client[%d] instance=%s deviceName=%s address=%s, vid/pid=%d/%d disc=%d rid=%s",
                             i, state->GetInstanceName(), state->GetDeviceName(), addrBuffer, state->GetVendorId(),
-                            state->GetProductId(), state->GetLongDiscriminator(), rotatingIdString);
+                            state->GetProductId(), state->GetLongDiscriminator(), rotatingIdStringPtr);
         }
     }
+#endif
 }
 
 } // namespace UserDirectedCommissioning

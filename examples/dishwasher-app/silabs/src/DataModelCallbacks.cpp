@@ -28,9 +28,9 @@
 #include "DishwasherManager.h"
 #include "ElectricalSensorManager.h"
 
-#ifdef DIC_ENABLE
-#include "dic.h"
-#endif // DIC_ENABLE
+#ifdef SL_MATTER_ENABLE_AWS
+#include "MatterAws.h"
+#endif // SL_MATTER_ENABLE_AWS
 
 using namespace chip;
 using namespace chip::app::Clusters;

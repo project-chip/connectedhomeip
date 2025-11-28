@@ -90,8 +90,40 @@ GstFlowReturn OnNewVideoSampleFromAppSink(GstAppSink * appsink, gpointer user_da
     GstMapInfo map;
     if (gst_buffer_map(buffer, &map, GST_MAP_READ))
     {
+        // Check if SFrame encryption is enabled for this stream
+        auto & mediaController = self->GetMediaController();
+        Transport * transport  = mediaController.GetTransportForVideoStream(videoStreamID);
+
+        if (transport != nullptr && transport->sFrameConfig.HasValue())
+        {
+            auto & sframeConfig = transport->sFrameConfig.Value();
+            ChipLogProgress(Camera, "SFrame encryption enabled for video stream %u: cipherSuite=0x%04X, keyLen=%u", videoStreamID,
+                            sframeConfig.cipherSuite, static_cast<unsigned int>(sframeConfig.baseKey.size()));
+
+            // TODO: Implement SFrame encryption (occurs AFTER H.264 encoding, BEFORE RTP packetization)
+            // Current state: map.data contains H.264 encoded frames from GStreamer
+            //
+            // SFrame encryption steps:
+            // 1. Take the H.264 compressed payload (map.data, map.size)
+            // 2. Select encryption algorithm based on cipherSuite:
+            //    - 0x0001: AES-128-GCM-SHA256 (16 byte key)
+            //    - 0x0002: AES-256-GCM-SHA512 (32 byte key)
+            // 3. Encrypt the H.264 payload using sframeConfig.baseKey
+            // 4. Build SFrame header containing:
+            //    - Key ID (kid) from sframeConfig.kid
+            //    - Frame counter (incremented per frame)
+            // 5. Prepend SFrame header to encrypted payload:
+            //    Result: [SFrame Header | Encrypted(H.264 Payload)]
+            // 6. This will later be packed into RTP as:
+            //    [RTP Header | SFrame Header | Encrypted(H.264 Payload)]
+            //    SFUs can inspect RTP headers but payload remains encrypted
+        }
+
+        // If SFrame is enabled above, this should be: [SFrame Header | Encrypted(H.264)]
+        // If SFrame is disabled, this is raw H.264 encoded frames
+
         // Forward H.264 RTP data to media controller with the correct videoStreamID
-        self->GetMediaController().DistributeVideo(reinterpret_cast<const char *>(map.data), map.size, videoStreamID);
+        self->GetMediaController().DistributeVideo(reinterpret_cast<const uint8_t *>(map.data), map.size, videoStreamID);
         gst_buffer_unmap(buffer, &map);
     }
 
@@ -132,8 +164,40 @@ static GstFlowReturn OnNewAudioSampleFromAppSink(GstAppSink * appsink, gpointer 
     GstMapInfo map;
     if (gst_buffer_map(buffer, &map, GST_MAP_READ))
     {
+        // Check if SFrame encryption is enabled for this stream
+        auto & mediaController = self->GetMediaController();
+        Transport * transport  = mediaController.GetTransportForAudioStream(audioStreamID);
+
+        if (transport != nullptr && transport->sFrameConfig.HasValue())
+        {
+            auto & sframeConfig = transport->sFrameConfig.Value();
+            ChipLogProgress(Camera, "SFrame encryption enabled for audio stream %u: cipherSuite=0x%04X, keyLen=%u", audioStreamID,
+                            sframeConfig.cipherSuite, static_cast<unsigned int>(sframeConfig.baseKey.size()));
+
+            // TODO: Implement SFrame encryption (occurs AFTER Opus encoding, BEFORE RTP packetization)
+            // Current state: map.data contains Opus encoded frames from GStreamer
+            //
+            // SFrame encryption steps:
+            // 1. Take the Opus compressed payload (map.data, map.size)
+            // 2. Select encryption algorithm based on cipherSuite:
+            //    - 0x0001: AES-128-GCM-SHA256 (16 byte key)
+            //    - 0x0002: AES-256-GCM-SHA512 (32 byte key)
+            // 3. Encrypt the Opus payload using sframeConfig.baseKey
+            // 4. Build SFrame header containing:
+            //    - Key ID (kid) from sframeConfig.kid
+            //    - Frame counter (incremented per frame)
+            // 5. Prepend SFrame header to encrypted payload:
+            //    Result: [SFrame Header | Encrypted(Opus Payload)]
+            // 6. This will later be packed into RTP as:
+            //    [RTP Header | SFrame Header | Encrypted(Opus Payload)]
+            //    SFUs can inspect RTP headers but payload remains encrypted
+        }
+
+        // If SFrame is enabled above, this should be: [SFrame Header | Encrypted(Opus)]
+        // If SFrame is disabled, this is raw Opus encoded frames
+
         // Send raw Opus frames to the media controller
-        self->GetMediaController().DistributeAudio(reinterpret_cast<const char *>(map.data), map.size, audioStreamID);
+        self->GetMediaController().DistributeAudio(reinterpret_cast<const uint8_t *>(map.data), map.size, audioStreamID);
         gst_buffer_unmap(buffer, &map);
     }
 
@@ -621,6 +685,70 @@ GstElement * CameraDevice::CreateAudioPipeline(const std::string & device, int c
     return pipeline;
 }
 
+// Helper function to create a GStreamer pipeline for audio playback
+GstElement * CameraDevice::CreateAudioPlaybackPipeline(CameraError & error)
+{
+    GstElement * pipeline        = gst_pipeline_new("audio-playback-pipeline");
+    GstElement * udpsrc          = gst_element_factory_make("udpsrc", "audio_udpsrc");
+    GstElement * rtpjitterbuffer = gst_element_factory_make("rtpjitterbuffer", "rtp_jitter_buffer");
+    GstElement * rtpopusdepay    = gst_element_factory_make("rtpopusdepay", "rtp_opus_depay");
+    GstElement * opusdec         = gst_element_factory_make("opusdec", "opus_dec");
+    GstElement * audioconvert    = gst_element_factory_make("audioconvert", "audio_convert");
+    GstElement * audioresample   = gst_element_factory_make("audioresample", "audio_resample");
+    GstElement * capsfilter      = gst_element_factory_make("capsfilter", "audio_caps");
+    GstElement * queue           = gst_element_factory_make("queue", "audio_queue");
+    GstElement * autoaudiosink   = gst_element_factory_make("autoaudiosink", "audio_sink");
+
+    const std::vector<std::pair<GstElement *, const char *>> elements = {
+        { pipeline, "pipeline" },           { udpsrc, "udpsrc" },         { rtpjitterbuffer, "rtpjitterbuffer" },
+        { rtpopusdepay, "rtpopusdepay" },   { opusdec, "opusdec" },       { audioconvert, "audioconvert" },
+        { audioresample, "audioresample" }, { capsfilter, "capsfilter" }, { queue, "queue" },
+        { autoaudiosink, "autoaudiosink" }
+    };
+
+    if (GstreamerPipepline::isGstElementsNull(elements))
+    {
+        ChipLogError(Camera, "Not all audio playback pipeline elements could be created.");
+        GstreamerPipepline::unrefGstElements(pipeline, udpsrc, rtpjitterbuffer, rtpopusdepay, opusdec, audioconvert, audioresample,
+                                             capsfilter, queue, autoaudiosink);
+        error = CameraError::ERROR_INIT_FAILED;
+        return nullptr;
+    }
+
+    g_object_set(udpsrc, "port", 6001, nullptr);
+    GstCaps * udpsrc_caps =
+        gst_caps_new_simple("application/x-rtp", "media", G_TYPE_STRING, "audio", "encoding-name", G_TYPE_STRING, "OPUS", "payload",
+                            G_TYPE_INT, 111, "clock-rate", G_TYPE_INT, 48000, "channel", G_TYPE_INT, 1, nullptr);
+    g_object_set(udpsrc, "caps", udpsrc_caps, nullptr);
+    gst_caps_unref(udpsrc_caps);
+
+    // Configure rtpjitterbuffer
+    // latency is set high (2.5s) because too much underflow, clock-skew issues are observed with the piepline is receiving audio
+    // stream from libdatachannel.
+    g_object_set(rtpjitterbuffer, "latency", 2500, nullptr);
+
+    // Configure capsfilter for autoaudiosink
+    GstCaps * sink_caps = gst_caps_new_simple("audio/x-raw", "format", G_TYPE_STRING, "S16LE", "layout", G_TYPE_STRING,
+                                              "interleaved", "channels", G_TYPE_INT, 1, "rate", G_TYPE_INT, 48000, nullptr);
+    g_object_set(capsfilter, "caps", sink_caps, nullptr);
+    gst_caps_unref(sink_caps);
+    g_object_set(autoaudiosink, "sync", FALSE, nullptr);
+
+    gst_bin_add_many(GST_BIN(pipeline), udpsrc, rtpjitterbuffer, rtpopusdepay, opusdec, audioconvert, audioresample, capsfilter,
+                     queue, autoaudiosink, nullptr);
+
+    if (!gst_element_link_many(udpsrc, rtpjitterbuffer, rtpopusdepay, opusdec, audioconvert, audioresample, capsfilter, queue,
+                               autoaudiosink, nullptr))
+    {
+        ChipLogError(Camera, "Audio playback pipeline elements could not be linked.");
+        gst_object_unref(pipeline);
+        error = CameraError::ERROR_INIT_FAILED;
+        return nullptr;
+    }
+
+    return pipeline;
+}
+
 // Helper function to set V4L2 control
 CameraError CameraDevice::SetV4l2Control(uint32_t controlId, int value)
 {
@@ -785,6 +913,42 @@ CameraError CameraDevice::StartVideoStream(const VideoStreamStruct & allocatedSt
     GstStateChangeReturn result = gst_element_set_state(videoPipeline, GST_STATE_PLAYING);
     if (result == GST_STATE_CHANGE_FAILURE)
     {
+        // Get error message from GStreamer bus
+        GstBus * bus = gst_element_get_bus(videoPipeline);
+        if (bus)
+        {
+            GstMessage * msg = gst_bus_pop_filtered(bus, (GstMessageType) (GST_MESSAGE_ERROR | GST_MESSAGE_WARNING));
+            if (msg)
+            {
+                GError * err       = nullptr;
+                gchar * debug_info = nullptr;
+
+                if (GST_MESSAGE_TYPE(msg) == GST_MESSAGE_ERROR)
+                {
+                    gst_message_parse_error(msg, &err, &debug_info);
+                    ChipLogError(Camera, "GStreamer Error: %s", err ? err->message : "unknown");
+                    if (debug_info)
+                    {
+                        ChipLogError(Camera, "Debug info: %s", debug_info);
+                    }
+                }
+                else if (GST_MESSAGE_TYPE(msg) == GST_MESSAGE_WARNING)
+                {
+                    gst_message_parse_warning(msg, &err, &debug_info);
+                    ChipLogError(Camera, "GStreamer Warning: %s", err ? err->message : "unknown");
+                    if (debug_info)
+                    {
+                        ChipLogError(Camera, "Debug info: %s", debug_info);
+                    }
+                }
+
+                g_error_free(err);
+                g_free(debug_info);
+                gst_message_unref(msg);
+            }
+            gst_object_unref(bus);
+        }
+
         ChipLogError(Camera, "Failed to start video pipeline.");
         gst_object_unref(videoPipeline);
         it->videoContext = nullptr;
@@ -905,6 +1069,17 @@ CameraError CameraDevice::StartAudioStream(uint16_t streamID)
     // Store in stream context
     it->audioContext = audioPipeline;
 
+    // Start the audio playback pipeline
+    if (LinuxDeviceOptions::GetInstance().cameraAudioPlayback)
+    {
+        CameraError playbackError = StartAudioPlaybackStream();
+        if (playbackError != CameraError::SUCCESS)
+        {
+            ChipLogError(Camera, "Failed to start audio playback pipeline for stream ID: %u. Error: %d", streamID,
+                         static_cast<int>(playbackError));
+        }
+    }
+
     return CameraError::SUCCESS;
 }
 
@@ -931,6 +1106,70 @@ CameraError CameraDevice::StopAudioStream(uint16_t streamID)
         it->audioContext = nullptr;
     }
 
+    // Stop the audio playback pipeline
+    if (LinuxDeviceOptions::GetInstance().cameraAudioPlayback)
+    {
+        CameraError playbackError = StopAudioPlaybackStream();
+        if (playbackError != CameraError::SUCCESS)
+        {
+            ChipLogError(Camera, "Failed to stop audio playback pipeline for stream ID: %u. Error: %d", streamID,
+                         static_cast<int>(playbackError));
+        }
+    }
+
+    return CameraError::SUCCESS;
+}
+
+CameraError CameraDevice::StartAudioPlaybackStream()
+{
+
+    if (mAudioPlaybackPipeline != nullptr)
+    {
+        ChipLogError(Camera, "Audio playback pipeline already exists. Stop it before starting a new one.");
+        return CameraError::ERROR_AUDIO_STREAM_START_FAILED;
+    }
+
+    CameraError error      = CameraError::SUCCESS;
+    mAudioPlaybackPipeline = CreateAudioPlaybackPipeline(error);
+    if (mAudioPlaybackPipeline == nullptr)
+    {
+        ChipLogError(Camera, "Failed to create audio playback pipeline.");
+        return error;
+    }
+
+    GstStateChangeReturn result = gst_element_set_state(mAudioPlaybackPipeline, GST_STATE_PLAYING);
+    if (result == GST_STATE_CHANGE_FAILURE)
+    {
+        ChipLogError(Camera, "Failed to start audio playback pipeline.");
+        gst_object_unref(mAudioPlaybackPipeline);
+        mAudioPlaybackPipeline = nullptr;
+        return CameraError::ERROR_AUDIO_STREAM_START_FAILED;
+    }
+
+    ChipLogProgress(Camera, "Audio playback pipeline started");
+    return CameraError::SUCCESS;
+}
+
+CameraError CameraDevice::StopAudioPlaybackStream()
+{
+    if (mAudioPlaybackPipeline == nullptr)
+    {
+        ChipLogDetail(Camera, "Audio playback pipeline is not running or already stopped.");
+        return CameraError::SUCCESS;
+    }
+
+    ChipLogProgress(Camera, "Stopping audio playback pipeline");
+    GstStateChangeReturn result = gst_element_set_state(mAudioPlaybackPipeline, GST_STATE_NULL);
+    gst_object_unref(mAudioPlaybackPipeline);
+    mAudioPlaybackPipeline = nullptr;
+
+    if (result == GST_STATE_CHANGE_FAILURE)
+    {
+        ChipLogError(Camera, "Failed to stop audio playback pipeline.");
+        return CameraError::ERROR_AUDIO_STREAM_STOP_FAILED;
+    }
+
+    ChipLogProgress(Camera, "Audio playback pipeline stopped.");
     return CameraError::SUCCESS;
 }
 
@@ -1160,7 +1399,7 @@ CameraError CameraDevice::SetNightVision(TriStateAutoEnum nightVision)
 
 uint32_t CameraDevice::GetMaxNetworkBandwidth()
 {
-    return kMaxNetworkBandwidthMbps;
+    return kMaxNetworkBandwidthbps;
 }
 
 uint16_t CameraDevice::GetCurrentFrameRate()
@@ -1401,7 +1640,6 @@ CameraError CameraDevice::RemoveZoneTrigger(const uint16_t zoneID)
 void CameraDevice::HandleSimulatedZoneTriggeredEvent(uint16_t zoneID)
 {
     mZoneManager.OnZoneTriggeredEvent(zoneID, ZoneEventTriggeredReasonEnum::kMotion);
-    mPushAVTransportManager.OnZoneTriggeredEvent(zoneID);
 }
 
 void CameraDevice::HandleSimulatedZoneStoppedEvent(uint16_t zoneID)
@@ -1501,7 +1739,7 @@ void CameraDevice::InitializeAudioStreams()
 void CameraDevice::InitializeSnapshotStreams()
 {
     // Create single snapshot stream with typical supported parameters
-    uint16_t streamId;
+    uint16_t streamId = kInvalidStreamID;
     AddSnapshotStream({ ImageCodecEnum::kJpeg,
                         kSnapshotStreamFrameRate /* FrameRate */,
                         { kMinResolutionWidth, kMinResolutionHeight } /* MinResolution*/,
@@ -1522,34 +1760,60 @@ bool CameraDevice::AddSnapshotStream(const CameraAVStreamMgmtDelegate::SnapshotS
     }
 
     uint16_t streamId = 0;
-    for (const auto & s : mSnapshotStreams)
+    // Fetch a new stream ID if the passed ID is kInvalidStreamID, otherwise use
+    // the ID that was passed in. A valid streamID would be passed in when the
+    // stream list is being constructed from the persisted list of allocated
+    // streams that was loaded at Init()
+    if (outStreamID == kInvalidStreamID)
     {
-        // Find the highest existing stream ID.
-        if (s.snapshotStreamParams.snapshotStreamID > streamId)
+        for (const auto & s : mSnapshotStreams)
         {
-            streamId = s.snapshotStreamParams.snapshotStreamID;
+            // Find the highest existing stream ID.
+            if (s.snapshotStreamParams.snapshotStreamID > streamId)
+            {
+                streamId = s.snapshotStreamParams.snapshotStreamID;
+            }
         }
-    }
 
-    // Find a unique stream id, starting from the last used one above, incrementing and wrapping at 65535.
-    for (uint16_t attempts = 0; attempts < kMaxSnapshotStreams; ++attempts)
+        // Find a unique stream id, starting from the last used one above, incrementing and wrapping at 65535.
+        for (uint16_t attempts = 0; attempts < kMaxSnapshotStreams; ++attempts)
+        {
+            auto found = std::find_if(mSnapshotStreams.begin(), mSnapshotStreams.end(), [streamId](const SnapshotStream & s) {
+                return s.snapshotStreamParams.snapshotStreamID == streamId;
+            });
+            if (found == mSnapshotStreams.end())
+            {
+                break;
+            }
+            if (attempts == kMaxSnapshotStreams - 1)
+            {
+                ChipLogError(Camera, "No available slot for stream allocation");
+                return false;
+            }
+            streamId = static_cast<uint16_t>((streamId + 1) % kMaxSnapshotStreams); // Wraps to 0 after max-1
+        }
+
+        outStreamID = streamId;
+    }
+    else
     {
-        auto found = std::find_if(mSnapshotStreams.begin(), mSnapshotStreams.end(), [streamId](const SnapshotStream & s) {
-            return s.snapshotStreamParams.snapshotStreamID == streamId;
+        // Have a sanity check that the passed streamID does not already exist
+        // in the list
+        auto found = std::find_if(mSnapshotStreams.begin(), mSnapshotStreams.end(), [outStreamID](const SnapshotStream & s) {
+            return s.snapshotStreamParams.snapshotStreamID == outStreamID;
         });
+
         if (found == mSnapshotStreams.end())
         {
-            break;
+            streamId = outStreamID;
         }
-        if (attempts == kMaxSnapshotStreams - 1)
+        else
         {
-            ChipLogError(Camera, "No available slot for stream allocation");
+            ChipLogError(Camera, "StreamID %d already exists in the available snapshot stream list", outStreamID);
             return false;
         }
-        streamId = static_cast<uint16_t>((streamId + 1) % kMaxSnapshotStreams); // Wraps to 0 after max-1
     }
 
-    outStreamID                   = streamId;
     SnapshotStream snapshotStream = { { streamId, snapshotStreamAllocateArgs.imageCodec, snapshotStreamAllocateArgs.maxFrameRate,
                                         snapshotStreamAllocateArgs.minResolution, snapshotStreamAllocateArgs.maxResolution,
                                         snapshotStreamAllocateArgs.quality, 0 /* RefCount */ },
@@ -1603,6 +1867,11 @@ ZoneManagement::Delegate & CameraDevice::GetZoneManagementDelegate()
 MediaController & CameraDevice::GetMediaController()
 {
     return mMediaController;
+}
+
+void CameraDevice::HandlePushAvZoneTrigger(uint16_t zoneId)
+{
+    mPushAVTransportManager.HandleZoneTrigger(zoneId);
 }
 
 size_t CameraDevice::GetPreRollBufferSize()

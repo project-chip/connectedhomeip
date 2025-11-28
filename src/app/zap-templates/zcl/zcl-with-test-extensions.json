@@ -247,7 +247,7 @@
             "TariffUnit",
             "MaximumMeteredQuantities"
         ],
-        "Descriptor": ["ClusterRevision", "FeatureMap"],
+        "Descriptor": ["ClusterRevision", "FeatureMap", "EndpointUniqueID"],
         "Device Energy Management": [
             "ESAType",
             "ESACanGenerate",
@@ -331,7 +331,7 @@
             "UpTime",
             "TotalOperationalHours",
             "BootReason",
-            "FeatureMap",
+            "DeviceLoadStatus",
             "ClusterRevision"
         ],
         "Group Key Management": [
@@ -341,6 +341,7 @@
             "FeatureMap"
         ],
         "ICD Management": [
+            "ClusterRevision",
             "IdleModeDuration",
             "ActiveModeDuration",
             "ActiveModeThreshold",
@@ -351,7 +352,12 @@
             "OperatingMode",
             "FeatureMap"
         ],
-        "Identify": ["ClusterRevision"],
+        "Identify": [
+            "ClusterRevision",
+            "FeatureMap",
+            "IdentifyTime",
+            "IdentifyType"
+        ],
         "Joint Fabric Datastore": ["Status"],
         "Meter Identification": [
             "MeterType",
@@ -382,7 +388,6 @@
             "PIROccupiedToUnoccupiedDelay",
             "UltrasonicOccupiedToUnoccupiedDelay",
             "PhysicalContactOccupiedToUnoccupiedDelay",
-            "FeatureMap",
             "ClusterRevision"
         ],
         "Operational Credentials": [
@@ -514,7 +519,8 @@
             "LocalTime",
             "Granularity",
             "TimeZoneListMaxSize",
-            "DSTOffsetListMaxSize"
+            "DSTOffsetListMaxSize",
+            "ClusterRevision"
         ],
         "Temperature Control": ["SupportedTemperatureLevels"],
         "Dishwasher Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
@@ -759,7 +765,14 @@
         "Power Topology": ["FeatureMap"],
         "Power Source": ["ClusterRevision"],
         "Valve Configuration and Control": ["RemainingDuration"],
-        "Boolean State Configuration": ["CurrentSensitivityLevel"],
+        "Boolean State Configuration": [
+            "AlarmsActive",
+            "AlarmsEnabled",
+            "AlarmsSuppressed",
+            "ClusterRevision",
+            "CurrentSensitivityLevel",
+            "SensorFault"
+        ],
         "Water Heater Management": [
             "HeaterTypes",
             "HeatDemand",
@@ -824,6 +837,8 @@
             "FeatureMap"
         ],
         "Unit Localization": ["TemperatureUnit"],
+        "User Label": ["LabelList", "ClusterRevision", "FeatureMap"],
+        "Localization Configuration": ["ClusterRevision", "SupportedLocales"],
         "TLS Certificate Management": [
             "ClusterRevision",
             "MaxRootCertificates",

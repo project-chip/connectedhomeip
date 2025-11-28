@@ -1622,7 +1622,8 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *  Scene Max name size + OnOff : 55 bytes
  *  Scene Max name size + LevelControl : 64 bytes
  *  Scene Max name size + ColorControl : 130 bytes
- *  Scene Max name size + OnOff + LevelControl + ColoControl : 175 bytes
+ *  Scene Max name size + ModeSelect : 55 bytes
+ *  Scene Max name size + OnOff + LevelControl + ColorControl + ModeSelect : 230 bytes
  *
  *  Cluster Sizes:
  *  OnOff Cluster Max Size: 21 bytes
@@ -1631,17 +1632,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * */
 #ifndef CHIP_CONFIG_SCENES_MAX_SERIALIZED_SCENE_SIZE_BYTES
 #define CHIP_CONFIG_SCENES_MAX_SERIALIZED_SCENE_SIZE_BYTES 256
-#endif
-
-/**
- * @def CHIP_CONFIG_MAX_SCENES_CONCURRENT_ITERATORS
- *
- * @brief Defines the number of simultaneous Scenes iterators that can be allocated
- *
- * Number of iterator instances that can be allocated at any one time
- */
-#ifndef CHIP_CONFIG_MAX_SCENES_CONCURRENT_ITERATORS
-#define CHIP_CONFIG_MAX_SCENES_CONCURRENT_ITERATORS 2
 #endif
 
 /**
@@ -1716,6 +1706,21 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC
 #define CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC 300
+#endif
+
+/**
+ * @def CHIP_CONFIG_ICD_SHORT_IDLE_MODE_DURATION_SEC
+ *
+ * The CHIP_CONFIG_ICD_SHORT_IDLE_MODE_DURATION_SEC is a configuration for shorter idle mode interval for LIT capable devices
+ * operating in SIT mode. This allows devices to report more frequently and maintain a more reliable availability status with their
+ * subscribers.
+ *
+ * The short idleMode duration SHALL be lesser than or equal to the IdleModeDuration.
+ *
+ * NOTE: To make full use of the ShortIdleModeDuration, users SHOULD also set ICD_REPORT_ON_ENTER_ACTIVE_MODE
+ */
+#ifndef CHIP_CONFIG_ICD_SHORT_IDLE_MODE_DURATION_SEC
+#define CHIP_CONFIG_ICD_SHORT_IDLE_MODE_DURATION_SEC CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC
 #endif
 
 /**
@@ -1895,10 +1900,10 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @def CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE
  *
  * @brief Defines the entry iterator delegate pool size of the ICDObserver object pool in ICDManager.h.
- *        Two are used in the default implementation. Users can increase it to register more observers.
+ *        Three are used in the default implementation. Users can increase it to register more observers.
  */
 #ifndef CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE
-#define CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE 2
+#define CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE 3
 #endif
 
 /**
@@ -1921,6 +1926,21 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS
 #define CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS 5
 #endif // CHIP_CONFIG_MAX_BDX_LOG_TRANSFERS
+
+/**
+ *  @def CHIP_CONFIG_BDX_LOG_TRANSFER_MAX_BLOCK_SIZE
+ *
+ *  @brief
+ *    Maximum block size recommended by device for BDX transfers of diagnostic logs.
+ *    If increased, also increase CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX.
+ *    Note that SecureSession::AllowsLargePayload limits the payload size for all transport
+ *    types besides TCP, so, if using UDP, BDX blocks larger than a certain size (e.g. 1174)
+ *    will be unable to send.
+ *
+ */
+#ifndef CHIP_CONFIG_BDX_LOG_TRANSFER_MAX_BLOCK_SIZE
+#define CHIP_CONFIG_BDX_LOG_TRANSFER_MAX_BLOCK_SIZE 1024
+#endif // CHIP_CONFIG_BDX_LOG_TRANSFER_MAX_BLOCK_SIZE
 
 /**
  *  @def CHIP_CONFIG_TEST_GOOGLETEST
@@ -2002,6 +2022,33 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE
 #define CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE 5
 #endif // CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE
+
+/**
+ * @def CHIP_CONFIG_MAX_NUM_CAMERA_VIDEO_STREAMS
+ *
+ * @brief The maximum number of video streams per device
+ */
+#ifndef CHIP_CONFIG_MAX_NUM_CAMERA_VIDEO_STREAMS
+#define CHIP_CONFIG_MAX_NUM_CAMERA_VIDEO_STREAMS 8
+#endif // CHIP_CONFIG_MAX_NUM_CAMERA_VIDEO_STREAMS
+
+/**
+ * @def CHIP_CONFIG_MAX_NUM_CAMERA_AUDIO_STREAMS
+ *
+ * @brief The maximum number of audio streams per device
+ */
+#ifndef CHIP_CONFIG_MAX_NUM_CAMERA_AUDIO_STREAMS
+#define CHIP_CONFIG_MAX_NUM_CAMERA_AUDIO_STREAMS 8
+#endif // CHIP_CONFIG_MAX_NUM_CAMERA_AUDIO_STREAMS
+
+/**
+ * @def CHIP_CONFIG_MAX_NUM_CAMERA_SNAPSHOT_STREAMS
+ *
+ * @brief The maximum number of snapshot streams per device
+ */
+#ifndef CHIP_CONFIG_MAX_NUM_CAMERA_SNAPSHOT_STREAMS
+#define CHIP_CONFIG_MAX_NUM_CAMERA_SNAPSHOT_STREAMS 8
+#endif // CHIP_CONFIG_MAX_NUM_CAMERA_SNAPSHOT_STREAMS
 /**
  * @}
  */

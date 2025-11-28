@@ -37,8 +37,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 
 from mobly import asserts
 from TC_PAVSTI_Utils import PAVSTIUtils, PushAvServerProcess
@@ -95,7 +95,7 @@ class TC_PAVST_2_9(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
     @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport))
     async def test_TC_PAVST_2_9(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         self.endpoint = endpoint
         self.node_id = self.dut_node_id
         pvcluster = Clusters.PushAvStreamTransport
@@ -147,7 +147,7 @@ class TC_PAVST_2_9(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         )
 
         self.step(5)
-        status = await self.allocate_one_pushav_transport(endpoint, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}", expiryTime=5)
+        status = await self.allocate_one_pushav_transport(endpoint, tlsEndPoint=tlsEndpointId, url=f"https://{host_ip}:1234/streams/{uploadStreamId}/", expiryTime=5)
         asserts.assert_equal(
             status, Status.Success, "Push AV Transport should be allocated successfully"
         )
@@ -161,7 +161,7 @@ class TC_PAVST_2_9(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                             pvcluster.Enums.TransportStatusEnum.kInactive, "Transport status should be Inactive")
 
         logger.info("Wait for 6 secs to PushAVTransport expiry")
-        time.sleep(6)
+        await asyncio.sleep(6)
 
         self.step(7)
         transport_configs = await self.read_single_attribute_check_success(

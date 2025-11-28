@@ -27,11 +27,20 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
     switch (clusterId)
     {
+    case app::Clusters::Identify::Id:
+        MatterIdentifyClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::Descriptor::Id:
+        MatterDescriptorClusterInitCallback(endpoint);
+        break;
     case app::Clusters::AccessControl::Id:
         MatterAccessControlClusterInitCallback(endpoint);
         break;
     case app::Clusters::BasicInformation::Id:
         MatterBasicInformationClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::LocalizationConfiguration::Id:
+        MatterLocalizationConfigurationClusterInitCallback(endpoint);
         break;
     case app::Clusters::TimeFormatLocalization::Id:
         MatterTimeFormatLocalizationClusterInitCallback(endpoint);
@@ -66,6 +75,12 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::FixedLabel::Id:
         MatterFixedLabelClusterInitCallback(endpoint);
         break;
+    case app::Clusters::UserLabel::Id:
+        MatterUserLabelClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::OccupancySensing::Id:
+        MatterOccupancySensingClusterInitCallback(endpoint);
+        break;
     }
 }
 
@@ -73,11 +88,20 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
 {
     switch (clusterId)
     {
+    case app::Clusters::Identify::Id:
+        MatterIdentifyClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::Descriptor::Id:
+        MatterDescriptorClusterShutdownCallback(endpoint);
+        break;
     case app::Clusters::AccessControl::Id:
         MatterAccessControlClusterShutdownCallback(endpoint);
         break;
     case app::Clusters::BasicInformation::Id:
         MatterBasicInformationClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::LocalizationConfiguration::Id:
+        MatterLocalizationConfigurationClusterShutdownCallback(endpoint);
         break;
     case app::Clusters::TimeFormatLocalization::Id:
         MatterTimeFormatLocalizationClusterShutdownCallback(endpoint);
@@ -111,6 +135,12 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     case app::Clusters::FixedLabel::Id:
         MatterFixedLabelClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::UserLabel::Id:
+        MatterUserLabelClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::OccupancySensing::Id:
+        MatterOccupancySensingClusterShutdownCallback(endpoint);
         break;
     }
 }

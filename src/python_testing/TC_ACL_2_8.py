@@ -46,7 +46,7 @@ from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_b
 class TC_ACL_2_8(MatterBaseTest):
     async def get_latest_event_number(self, acec_event: Clusters.AccessControl.Events.AccessControlEntryChanged) -> int:
         event_path = [(self.matter_test_config.endpoint, acec_event, 1)]
-        events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
+        events = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path)
         if not events:
             raise AssertionError(f"No events found for {acec_event} to determine the latest event number.")
         return max([e.Header.EventNumber for e in events])
@@ -145,8 +145,7 @@ class TC_ACL_2_8(MatterBaseTest):
     async def write_attribute_with_encoding_option(self, controller, node_id, path, forceLegacyListEncoding):
         if forceLegacyListEncoding:
             return await controller.TestOnlyWriteAttributeWithLegacyList(node_id, path)
-        else:
-            return await controller.WriteAttribute(node_id, path)
+        return await controller.WriteAttribute(node_id, path)
 
     def _validate_events(self, events, expected_fabric_index, expected_node_id, other_fabric_index, controller_name, is_filtered, force_legacy_encoding):
         """Helper method to validate events for a controller"""
@@ -190,7 +189,7 @@ class TC_ACL_2_8(MatterBaseTest):
         # Open commissioning window with default controller
         self.discriminator = random.randint(0, 4095)
         params = await self.default_controller.OpenCommissioningWindow(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             timeout=900,
             iteration=10000,
             discriminator=self.discriminator,
@@ -221,7 +220,7 @@ class TC_ACL_2_8(MatterBaseTest):
         self.step(3)
         # Open commissioning window with TH1
         params = await self.th1.OpenCommissioningWindow(
-            nodeid=self.dut_node_id, timeout=900, iteration=10000, discriminator=self.discriminator, option=1)
+            nodeId=self.dut_node_id, timeout=900, iteration=10000, discriminator=self.discriminator, option=1)
         # Commission TH2
         th2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
         th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(
@@ -517,8 +516,11 @@ class TC_ACL_2_8(MatterBaseTest):
     def desc_TC_ACL_2_8(self) -> str:
         return "[TC-ACL-2.8] ACL multi-fabric"
 
+    def pics_TC_ACL_2_8(self) -> list[str]:
+        return ['ACL.S']
+
     def steps_TC_ACL_2_8(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "TH1 commissions DUT using admin node ID N1",
                      "DUT is commissioned on TH1 fabric", is_commissioning=True),
             TestStep(2, "TH1 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",
@@ -542,7 +544,6 @@ class TC_ACL_2_8(MatterBaseTest):
             TestStep(11, "Re-run the test using the legacy list writing mechanism, where the client issues a series of AttributeDataIBs, with the first containing a path to the list itself and Data that is empty array, which signals clearing the list, and subsequent AttributeDataIBs containing updates.",
                      "Test succeeds with legacy list encoding mechanism"),
         ]
-        return steps
 
     @async_test_body
     async def test_TC_ACL_2_8(self):
