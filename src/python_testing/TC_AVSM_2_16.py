@@ -144,7 +144,7 @@ class TC_AVSM_2_16(MatterBaseTest, AVSMTestBase):
         has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kVideo) and
         has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kAudio))
     async def test_TC_AVSM_2_16(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.CameraAvStreamManagement
         attr = Clusters.CameraAvStreamManagement.Attributes
         commands = Clusters.CameraAvStreamManagement.Commands
@@ -204,10 +204,13 @@ class TC_AVSM_2_16(MatterBaseTest, AVSMTestBase):
         if await self.attribute_guard(endpoint=endpoint, attribute=attr.HardPrivacyModeOn):
             # For CI: Use app pipe to simulate physical privacy switch being turned on
             # For manual testing: User should physically turn on the privacy switch
+            logger.info("HardPrivacy is supported")
+
             if self.is_pics_sdk_ci_only:
                 self.write_to_app_pipe({"Name": "SetHardPrivacyModeOn", "Value": False})
             else:
-                input("Please ensure that the physical privacy switch on the device is OFF, then press Enter to continue...")
+                self.wait_for_user_input(
+                    "Please ensure that the physical privacy switch on the device is OFF, then press Enter to continue...")
 
             # Verify the attribute reflects the privacy switch state
             hard_privacy_mode = await self.read_single_attribute_check_success(

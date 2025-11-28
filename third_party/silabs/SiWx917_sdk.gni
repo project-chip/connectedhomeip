@@ -63,7 +63,6 @@ template("siwx917_sdk") {
       "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/autogen",
       "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/config",
 
-      "${chip_root}/src/platform/silabs/rs911x",
       "${chip_root}/src/platform/silabs/wifi",
 
       # ble component
@@ -143,9 +142,6 @@ template("siwx917_sdk") {
       # sl memory manager
       "${efr32_sdk_root}/platform/service/memory_manager/inc",
       "${efr32_sdk_root}/platform/service/memory_manager/src",
-      "${efr32_sdk_root}/platform/service/memory_manager/profiler/inc",
-      "${efr32_sdk_root}/platform/service/memory_manager/profiler/config",
-      "${efr32_sdk_root}/util/silicon_labs/silabs_core/memory_manager",
 
       # OTA
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/firmware_upgrade",
@@ -194,8 +190,7 @@ template("siwx917_sdk") {
       "SL_WIFI=1",
       "CCP_SI917_BRINGUP=1",
       "SL_COMPONENT_CATALOG_PRESENT=1",
-      "RS911X_WIFI=1",
-      "RSI_WLAN_ENABLE",
+      "SL_MATTER_SIWX_WIFI_ENABLE=1",
       "SLI_SI91X_ENABLE_OS=1",
       "SLI_SI91X_MCU_INTERFACE=1",  #Enable CCP bus Interface, Differentiation:
                                     # 1->SOC and 0->NCP
@@ -210,8 +205,6 @@ template("siwx917_sdk") {
       "__HEAP_SIZE=0",
       "PLATFORM_HEADER=\"platform-header.h\"",
       "USE_NVM3=1",
-      "SLI_SI91X_ENABLE_BLE=1",
-      "SL_SI91X_ENABLE_LITTLE_ENDIAN=1",
       "__error_t_defined",
       "RSI_SAMPLE_HAL",
       "DEBUG_UART=1",
@@ -326,6 +319,7 @@ template("siwx917_sdk") {
         "SL_ACTIVE_MODE_THRESHOLD=${sl_active_mode_threshold_ms}",
         "SL_ACTIVE_MODE_DURATION_MS=${sl_active_mode_duration_ms}",
         "SL_IDLE_MODE_DURATION_S=${sl_idle_mode_duration_s}",
+        "SL_SHORT_IDLE_MODE_DURATION_S=${sl_short_idle_mode_duration_s}",
         "SL_ICD_SUPPORTED_CLIENTS_PER_FABRIC=${sl_icd_supported_clients_per_fabric}",
         "SL_SI91X_POWER_MANAGER_UC_AVAILABLE=1",
         "SL_SI91X_TICKLESS_MODE=1",
@@ -423,8 +417,8 @@ template("siwx917_sdk") {
         sources = [
           "${_mbedtls_root}/include/mbedtls/platform.h",
           "${_mbedtls_root}/include/mbedtls/version.h",
-          "${chip_root}/src/platform/silabs/SiWx917/siwx917-chip-mbedtls-config.h",
-          "${chip_root}/src/platform/silabs/SiWx917/siwx917-chip-psa-config.h",
+          "${chip_root}/src/platform/silabs/SiWx/siwx917-chip-mbedtls-config.h",
+          "${chip_root}/src/platform/silabs/SiWx/siwx917-chip-psa-config.h",
 
           # mbedtls
           "${_mbedtls_root}/library/aes.c",
@@ -563,7 +557,7 @@ template("siwx917_sdk") {
           # config file
           "${_mbedtls_root}/include/mbedtls/platform.h",
           "${_mbedtls_root}/include/mbedtls/version.h",
-          "${chip_root}/src/platform/silabs/SiWx917/siwx917-chip-mbedtls-config.h",
+          "${chip_root}/src/platform/silabs/SiWx/siwx917-chip-mbedtls-config.h",
 
           # mbedtls
           "${_mbedtls_root}/library/aes.c",
@@ -659,18 +653,9 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/service/network_manager/src/sl_net_basic_certificate_store.c",
 
       # basic_network_manager component
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/crypto/trng/src/sl_si91x_trng.c",
       "${wifi_sdk_root}/components/service/network_manager/src/sl_net_basic_profiles.c",
       "${wifi_sdk_root}/components/service/network_manager/src/sl_net_credentials.c",
-
-      # ble component
-      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_ble_gap_apis.c",
-      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_ble_gatt_apis.c",
-      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_bt_ble.c",
-      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_bt_common_apis.c",
-      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_common_apis.c",
-      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_utils.c",
-      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/sl_si91x_ble.c",
-      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/crypto/trng/src/sl_si91x_trng.c",
 
       # si91x_basic_buffers component
       "${wifi_sdk_root}/components/board/silabs/src/rsi_board.c",
@@ -745,22 +730,16 @@ template("siwx917_sdk") {
       "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/autogen/sl_si91x_button_instances.c",
       "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/autogen/sl_ulp_timer_init.c",
       "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/main.c",
-      "${matter_support_root}/board-support/si91x/support/hal/rsi_hal_mcu_m4.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/button/src/sl_si91x_button.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/clock_manager/src/sl_si91x_clock_manager.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/clock_manager/src/sli_si91x_clock_manager.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/nvm3/src/sl_si91x_nvm3_hal_flash.c",
 
       # sl memory manager
-      "${efr32_sdk_root}/platform/service/memory_manager/profiler/src/sli_memory_profiler_stubs.c",
-      "${efr32_sdk_root}/platform/service/memory_manager/src/sl_memory_manager.c",
       "${efr32_sdk_root}/platform/service/memory_manager/src/sl_memory_manager_cpp.cpp",
-      "${efr32_sdk_root}/platform/service/memory_manager/src/sl_memory_manager_dynamic_reservation.c",
       "${efr32_sdk_root}/platform/service/memory_manager/src/sl_memory_manager_pool.c",
       "${efr32_sdk_root}/platform/service/memory_manager/src/sl_memory_manager_pool_common.c",
-      "${efr32_sdk_root}/platform/service/memory_manager/src/sl_memory_manager_region.c",
-      "${efr32_sdk_root}/platform/service/memory_manager/src/sl_memory_manager_retarget.c",
-      "${efr32_sdk_root}/platform/service/memory_manager/src/sli_memory_manager_common.c",
+      "${efr32_sdk_root}/platform/service/memory_manager/src/sl_memory_manager_redirect.c",
 
       # iostream
       "${efr32_sdk_root}/platform/service/iostream/src/sl_iostream.c",
@@ -891,5 +870,10 @@ template("siwx917_sdk") {
     }
 
     public_configs = [ ":${sdk_target_name}_config" ]
+
+    if (sl_matter_enable_siwx_ble) {
+      public_configs +=
+          [ "${chip_root}/src/platform/silabs/SiWx/ble:siwx-ble-config" ]
+    }
   }
 }

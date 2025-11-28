@@ -51,10 +51,7 @@ def current_latch_matcher(latch: bool) -> AttributeMatcher:
     def predicate(report: AttributeValue) -> bool:
         if report.attribute != Clusters.ClosureDimension.Attributes.CurrentState:
             return False
-        if report.value.latch == latch:
-            return True
-        else:
-            return False
+        return report.value.latch == latch
     return AttributeMatcher.from_callable(description=f"CurrentState.Latch is {latch}", matcher=predicate)
 
 
@@ -62,10 +59,7 @@ def current_position_matcher(position: int) -> AttributeMatcher:
     def predicate(report: AttributeValue) -> bool:
         if report.attribute != Clusters.ClosureDimension.Attributes.CurrentState:
             return False
-        if report.value.position == position:
-            return True
-        else:
-            return False
+        return report.value.position == position
     return AttributeMatcher.from_callable(description=f"CurrentState.Position is {position}", matcher=predicate)
 
 
@@ -73,10 +67,7 @@ def current_position_and_speed_matcher(position: int, speed: Globals.Enums.Three
     def predicate(report: AttributeValue) -> bool:
         if report.attribute != Clusters.ClosureDimension.Attributes.CurrentState:
             return False
-        if (report.value.position == position) and (report.value.speed == speed):
-            return True
-        else:
-            return False
+        return (report.value.position == position) and (report.value.speed == speed)
     return AttributeMatcher.from_callable(description=f"CurrentState.Position is {position} and CurrentState.Speed is {speed}", matcher=predicate)
 
 
@@ -89,7 +80,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
         return "[TC-CLDIM-4.1] Step Command Primary Functionality with DUT as Server"
 
     def steps_TC_CLDIM_4_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read FeatureMap attribute"),
             TestStep("2b", "If Positioning feature is not supported, skip remaining steps"),
@@ -128,17 +119,19 @@ class TC_CLDIM_4_1(MatterBaseTest):
             TestStep("7f", "Verify TargetState attribute is at MaxPosition"),
             TestStep("7g", "Wait for CurrentState to be updated"),
         ]
-        return steps
 
     def pics_TC_CLDIM_4_1(self) -> list[str]:
-        pics = [
-            "CLDIM.S",
+        return [
+            "CLDIM.S", "CLDIM.S.F00"
         ]
-        return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_CLDIM_4_1(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
 
         # STEP 1: Commission DUT to TH (can be skipped if done in a preceding test)

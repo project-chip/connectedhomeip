@@ -55,7 +55,8 @@ class TC_WEBRTCP_2_20(MatterBaseTest, WEBRTCPTestBase):
         return "[TC-WEBRTCP-2.20] Validate ProvideICECandidates command processing - PROVISIONAL"
 
     def steps_TC_WEBRTCP_2_20(self) -> list[TestStep]:
-        steps = [
+        return [
+            TestStep("precondition", "DUT commissioned", is_commissioning=True),
             TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
                      "DUT responds with success and provides stream IDs"),
             TestStep(2, "TH sends the ProvideOffer command with an SDP Offer and null WebRTCSessionID to the DUT",
@@ -69,10 +70,9 @@ class TC_WEBRTCP_2_20(MatterBaseTest, WEBRTCPTestBase):
             TestStep(6, "TH deallocates the Audio and Video streams via AudioStreamDeallocate and VideoStreamDeallocate commands",
                      "DUT responds with success status code for both deallocate commands"),
         ]
-        return steps
 
     def pics_TC_WEBRTCP_2_20(self) -> list[str]:
-        pics = [
+        return [
             "WEBRTCP.S",
             "WEBRTCP.S.C02.Rsp",   # ProvideOffer command
             "WEBRTCP.S.C03.Tx",    # ProvideOfferResponse command
@@ -82,7 +82,10 @@ class TC_WEBRTCP_2_20(MatterBaseTest, WEBRTCPTestBase):
             "AVSM.S.F00",          # Audio Data Output feature
             "AVSM.S.F01",          # Video Data Output feature
         ]
-        return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_WEBRTCP_2_20(self):
@@ -90,7 +93,9 @@ class TC_WEBRTCP_2_20(MatterBaseTest, WEBRTCPTestBase):
         Executes the test steps for validating ProvideICECandidates command processing.
         """
 
-        endpoint = self.get_endpoint(default=1)
+        self.step("precondition")
+        # Commission DUT - already done
+        endpoint = self.get_endpoint()
 
         self.step(1)
         # Allocate Audio and Video streams

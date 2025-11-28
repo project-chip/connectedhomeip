@@ -38,7 +38,6 @@ import("${silabs_common_plat_dir}/args.gni")
 
 # Sanity check
 assert(!(chip_enable_wifi && chip_enable_openthread))
-assert(!(use_rs9116 && chip_enable_openthread))
 assert(!(use_SiWx917 && chip_enable_openthread))
 assert(!(use_wf200 && chip_enable_openthread))
 
@@ -186,8 +185,8 @@ source_set("efr32-common") {
   }
 
   if (sl_enable_rgb_led) {
-    sources += [ "${silabs_common_plat_dir}/led/RGBLEDWidget.cpp" ]
-    include_dirs = [ "${silabs_common_plat_dir}/rgb_led" ]
+    sources += [ "${silabs_common_plat_dir}/rgb_led/RGBLEDWidget.cpp" ]
+    include_dirs += [ "${silabs_common_plat_dir}/rgb_led" ]
   }
 
   if (chip_build_libshell) {

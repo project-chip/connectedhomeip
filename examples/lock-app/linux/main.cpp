@@ -19,6 +19,7 @@
 #include "AppMain.h"
 #include <app-common/zap-generated/ids/Clusters.h>
 
+#include "Identify.h"
 #include "LockAppCommandDelegate.h"
 #include "LockManager.h"
 
@@ -39,8 +40,10 @@ void ApplicationInit()
     if ((!path.empty()) and (sChipNamedPipeCommands.Start(path, &sLockAppCommandDelegate) != CHIP_NO_ERROR))
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
-        sChipNamedPipeCommands.Stop();
+        TEMPORARY_RETURN_IGNORED sChipNamedPipeCommands.Stop();
     }
+
+    TEMPORARY_RETURN_IGNORED IdentifyInit();
 }
 
 void ApplicationShutdown() {}

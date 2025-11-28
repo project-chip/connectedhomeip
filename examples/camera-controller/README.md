@@ -43,6 +43,7 @@ sudo apt install \
   gstreamer1.0-plugins-bad \
   gstreamer1.0-libav \
   libgstreamer1.0-dev \
+  libavformat60 \
   libgstreamer-plugins-base1.0-dev
 ```
 
@@ -94,7 +95,7 @@ environment to ensure all dependencies are correct.
 1. Pull the Cross-Compilation Docker Image
 
 ```
-docker pull ghcr.io/project-chip/chip-build-crosscompile:168
+docker pull ghcr.io/project-chip/chip-build-crosscompile:175
 ```
 
 2. Run the Docker Container This command starts an interactive shell inside the
@@ -102,7 +103,7 @@ docker pull ghcr.io/project-chip/chip-build-crosscompile:168
    container's /var/connectedhomeip directory.
 
 ```
-docker run -it -v ~/connectedhomeip:/var/connectedhomeip ghcr.io/project-chip/chip-build-crosscompile:168 /bin/bash
+docker run -it -v ~/connectedhomeip:/var/connectedhomeip ghcr.io/project-chip/chip-build-crosscompile:175 /bin/bash
 ```
 
 3. Build Inside the Container From within the Docker container's shell, execute

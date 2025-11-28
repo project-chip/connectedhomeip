@@ -130,7 +130,7 @@ class TC_RR_1_1(MatterBaseTest):
         has_user_labels = len(endpoints_with_user_label_list) > 0
         if has_user_labels:
             logging.info("--> User label cluster present on endpoints %s" %
-                         ", ".join(["%d" % ep for ep in endpoints_with_user_label_list.keys()]))
+                         ", ".join(["%d" % ep for ep in endpoints_with_user_label_list]))
         else:
             logging.info("--> User label cluster not present on any endpoitns")
 
@@ -299,7 +299,7 @@ class TC_RR_1_1(MatterBaseTest):
             logging.info(
                 f"-> Fabric at FabricIndex={fabric.fabricIndex}, FabricID: {fabric.fabricID}, NodeID: {fabric.nodeID}, Root Public key: {base64.b64encode(fabric.rootPublicKey)}")
 
-        asserts.assert_equal(set([f.fabricIndex for f in fabric_table]), set(fabric_table_entries_to_check.keys(
+        asserts.assert_equal({f.fabricIndex for f in fabric_table}, set(fabric_table_entries_to_check.keys(
         )), "Fabric table read did not have matching fabricIndex entries compared to expected fabrics configured!")
 
         for fabric in fabric_table:
@@ -370,7 +370,7 @@ class TC_RR_1_1(MatterBaseTest):
             logging.info("Establishing subscription %d/%d from controller node %s" % (sub_idx + 1, len(client_list), client.name))
 
             sub = await client.ReadAttribute(
-                nodeid=self.dut_node_id,
+                nodeId=self.dut_node_id,
                 attributes=subscription_contents,
                 reportInterval=(min_report_interval_sec, max_report_interval_sec),
                 keepSubscriptions=False
@@ -407,8 +407,8 @@ class TC_RR_1_1(MatterBaseTest):
         basic_info = await dev_ctrl.ReadAttribute(self.dut_node_id, large_read_paths)
 
         # Make sure everything came back from the read that we expected
-        asserts.assert_true(0 in basic_info.keys(), "Must have read endpoint 0 data")
-        asserts.assert_true(Clusters.BasicInformation in basic_info[0].keys(), "Must have read Basic Information cluster data")
+        asserts.assert_true(0 in basic_info, "Must have read endpoint 0 data")
+        asserts.assert_true(Clusters.BasicInformation in basic_info[0], "Must have read Basic Information cluster data")
         for attribute in large_read_contents:
             asserts.assert_true(attribute in basic_info[0][Clusters.BasicInformation],
                                 "Must have read back attribute %s" % (attribute.__name__))
@@ -949,9 +949,8 @@ class TC_RR_1_1(MatterBaseTest):
         swdiag_info = await dev_ctrl.ReadAttribute(self.dut_node_id, diagnostics_paths)
 
         # Make sure everything came back from the read that we expected
-        asserts.assert_true(0 in swdiag_info.keys(), "Must have read endpoint 0 data")
-        asserts.assert_true(Clusters.SoftwareDiagnostics in swdiag_info[0].keys(
-        ), "Must have read Software Diagnostics cluster data")
+        asserts.assert_true(0 in swdiag_info, "Must have read endpoint 0 data")
+        asserts.assert_true(Clusters.SoftwareDiagnostics in swdiag_info[0], "Must have read Software Diagnostics cluster data")
         for attribute in diagnostics_contents:
             asserts.assert_true(attribute in swdiag_info[0][Clusters.SoftwareDiagnostics],
                                 "Must have read back attribute %s" % (attribute.__name__))

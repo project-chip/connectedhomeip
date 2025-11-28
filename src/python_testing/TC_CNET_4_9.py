@@ -133,7 +133,7 @@ class TC_CNET_4_9(MatterBaseTest):
 
         # Verify that there is a single connected network across ALL network commissioning clusters
         for ep in networks_dict:
-            connected_network_count[ep] = sum(map(lambda x: x.connected, networks_dict[ep]))
+            connected_network_count[ep] = sum((x.connected for x in networks_dict[ep]))
             logging.info(f"Connected networks count by endpoint: {connected_network_count}")
             asserts.assert_equal(sum(connected_network_count.values()), 1,
                                  "Verify that only one entry has connected status as TRUE across ALL endpoints")
@@ -146,7 +146,7 @@ class TC_CNET_4_9(MatterBaseTest):
 
         if not current_cluster_connected:
             logging.info("Current cluster is not connected, skipping all remaining test steps")
-            self.skip_all_remaining_steps(4)
+            self.mark_all_remaining_steps_skipped(4)
             return
 
         # TH reads Networks attribute from the DUT on the current endpoint and saves the number of entries as "NumNetworks"

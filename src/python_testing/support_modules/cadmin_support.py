@@ -24,7 +24,6 @@ import random
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import IntEnum
-from time import sleep
 from typing import Optional
 
 from mdns_discovery import mdns_discovery
@@ -52,26 +51,24 @@ class CADMINBaseTest(MatterBaseTest):
     async def get_fabrics(self, th: ChipDeviceCtrl, fabric_filtered: bool = True) -> int:
         """Get fabrics information from the device."""
         OC_cluster = Clusters.OperationalCredentials
-        fabric_info = await self.read_single_attribute_check_success(
+        return await self.read_single_attribute_check_success(
             dev_ctrl=th,
             fabric_filtered=fabric_filtered,
             endpoint=0,
             cluster=OC_cluster,
             attribute=OC_cluster.Attributes.Fabrics
         )
-        return fabric_info
 
     async def read_currentfabricindex(self, th: ChipDeviceCtrl) -> int:
         """Read the current fabric index from the device."""
         cluster = Clusters.OperationalCredentials
         attribute = Clusters.OperationalCredentials.Attributes.CurrentFabricIndex
-        current_fabric_index = await self.read_single_attribute_check_success(
+        return await self.read_single_attribute_check_success(
             dev_ctrl=th,
             endpoint=0,
             cluster=cluster,
             attribute=attribute
         )
-        return current_fabric_index
 
     def calculate_clock_skew_factor(self, duration_seconds: int) -> int:
         """
@@ -84,8 +81,7 @@ class CADMINBaseTest(MatterBaseTest):
             Clock skew factor in milliseconds (1% of duration or 100ms, whichever is greater)
         """
         skew_percentage = 1 / 100.0
-        skew_ms = max(int(duration_seconds * 1000 * skew_percentage), 100)
-        return skew_ms
+        return max(int(duration_seconds * 1000 * skew_percentage), 100)
 
     async def create_window_status_subscription(
         self,
@@ -307,7 +303,7 @@ class CADMINBaseTest(MatterBaseTest):
 
         try:
             comm_params = await th.OpenCommissioningWindow(
-                nodeid=node_id,
+                nodeId=node_id,
                 timeout=timeout,
                 iteration=iteration,
                 discriminator=discriminator if discriminator is not None else random.randint(0, 4095),
@@ -322,12 +318,12 @@ class CADMINBaseTest(MatterBaseTest):
         return params, window_status_accumulator
 
     async def write_nl_attr(self, dut_node_id: int, th: ChipDeviceCtrl, attr_val: object):
-        result = await th.WriteAttribute(nodeid=dut_node_id, attributes=[(0, attr_val)])
+        result = await th.WriteAttribute(nodeId=dut_node_id, attributes=[(0, attr_val)])
         asserts.assert_equal(result[0].Status, Status.Success, f"{th} node label write failed")
 
     async def read_nl_attr(self, dut_node_id: int, th: ChipDeviceCtrl, attr_val: object):
         try:
-            await th.ReadAttribute(nodeid=dut_node_id, attributes=[(0, attr_val)])
+            await th.ReadAttribute(nodeId=dut_node_id, attributes=[(0, attr_val)])
         except Exception as e:
             asserts.assert_equal(e.err, "Received error message from read attribute attempt")
             self.print_step(0, e)
@@ -335,14 +331,13 @@ class CADMINBaseTest(MatterBaseTest):
     async def get_window_status(self, th: ChipDeviceCtrl) -> int:
         """Get the current commissioning window status."""
         AC_cluster = Clusters.AdministratorCommissioning
-        window_status = await self.read_single_attribute_check_success(
+        return await self.read_single_attribute_check_success(
             dev_ctrl=th,
             fabric_filtered=False,
             endpoint=0,
             cluster=AC_cluster,
             attribute=AC_cluster.Attributes.WindowStatus
         )
-        return window_status
 
     def generate_unique_random_value(self, exclude_value: int) -> int:
         """Generate a random value that's different from the specified value."""
@@ -355,13 +350,13 @@ class CADMINBaseTest(MatterBaseTest):
         """Revoke the current commissioning window."""
         revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
         await th.SendCommand(
-            nodeid=node_id,
+            nodeId=node_id,
             endpoint=0,
             payload=revokeCmd,
             timedRequestTimeoutMs=6000
         )
         # The failsafe cleanup is scheduled after the command completes
-        sleep(1)
+        await asyncio.sleep(1)
 
     @dataclass
     class TimingResults:
@@ -439,9 +434,10 @@ class CADMINBaseTest(MatterBaseTest):
             if attempt < max_attempts - 1:
                 logging.info(f"Waiting for service with CM={expected_cm_value} and D={expected_discriminator}, "
                              f"attempt {attempt+1}/{max_attempts}")
-                sleep(delay_sec)
+                await asyncio.sleep(delay_sec)
             else:
                 # Final retry attempt failed
                 asserts.fail(f"Failed to find DNS-SD advertisement with CM={expected_cm_value} and "
                              f"discriminator={expected_discriminator} after {max_attempts} attempts. "
                              f"Found services: {[str(s) for s in services]}")
+        return None

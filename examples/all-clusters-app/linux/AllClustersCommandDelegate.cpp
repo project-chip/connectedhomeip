@@ -22,7 +22,7 @@
 #include <app/EventLogging.h>
 #include <app/clusters/boolean-state-server/CodegenIntegration.h>
 #include <app/clusters/general-diagnostics-server/CodegenIntegration.h>
-#include <app/clusters/occupancy-sensor-server/occupancy-sensor-server.h>
+#include <app/clusters/occupancy-sensor-server/CodegenIntegration.h>
 #include <app/clusters/refrigerator-alarm-server/refrigerator-alarm-server.h>
 #include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
 #include <app/clusters/software-diagnostics-server/software-fault-listener.h>
@@ -356,24 +356,6 @@ void HandleSimulateSwitchIdle(Json::Value & jsonValue)
     (void) Switch::Attributes::CurrentPosition::Set(endpointId, 0);
 }
 
-void EmitOccupancyChangedEvent(EndpointId endpointId, uint8_t occupancyValue)
-{
-    Clusters::OccupancySensing::Events::OccupancyChanged::Type event{};
-    event.occupancy         = static_cast<BitMask<Clusters::OccupancySensing::OccupancyBitmap>>(occupancyValue);
-    EventNumber eventNumber = 0;
-
-    CHIP_ERROR err = LogEvent(event, endpointId, eventNumber);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "Failed to log OccupancyChanged event: %" CHIP_ERROR_FORMAT, err.Format());
-    }
-    else
-    {
-        ChipLogProgress(NotSpecified, "Logged OccupancyChanged(occupancy=%u) on Endpoint %u", static_cast<unsigned>(occupancyValue),
-                        static_cast<unsigned>(endpointId));
-    }
-}
-
 } // namespace
 
 AllClustersAppCommandHandler * AllClustersAppCommandHandler::FromJSON(const char * json)
@@ -560,7 +542,7 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     else if (name == "SimulateConfigurationVersionChange")
     {
         uint32_t configurationVersion = 0;
-        ConfigurationMgr().GetConfigurationVersion(configurationVersion);
+        TEMPORARY_RETURN_IGNORED ConfigurationMgr().GetConfigurationVersion(configurationVersion);
         configurationVersion++;
 
         if (ConfigurationMgr().StoreConfigurationVersion(configurationVersion + 1) != CHIP_NO_ERROR)
@@ -593,7 +575,7 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     }
     else if (name == "UserIntentCommissioningStart")
     {
-        Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+        TEMPORARY_RETURN_IGNORED Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
     }
     else if (name == "SetBooleanState")
     {
@@ -641,7 +623,8 @@ void AllClustersAppCommandHandler::OnRebootSignalHandler(BootReasonType bootReas
     if (ConfigurationMgr().StoreBootReason(static_cast<uint32_t>(bootReason)) == CHIP_NO_ERROR)
     {
         Server::GetInstance().GenerateShutDownEvent();
-        PlatformMgr().ScheduleWork([](intptr_t) { PlatformMgr().StopEventLoopTask(); });
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(
+            [](intptr_t) { TEMPORARY_RETURN_IGNORED PlatformMgr().StopEventLoopTask(); });
     }
     else
     {
@@ -940,15 +923,18 @@ void AllClustersAppCommandHandler::OnOvenOperationalStateChange(std::string devi
     OperationalState::Instance * operationalStateInstance = OvenCavityOperationalState::GetOperationalStateInstance();
     if (operation == "Start" || operation == "Resume")
     {
-        operationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
+        TEMPORARY_RETURN_IGNORED operationalStateInstance->SetOperationalState(
+            to_underlying(OperationalState::OperationalStateEnum::kRunning));
     }
     else if (operation == "Pause")
     {
-        operationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused));
+        TEMPORARY_RETURN_IGNORED operationalStateInstance->SetOperationalState(
+            to_underlying(OperationalState::OperationalStateEnum::kPaused));
     }
     else if (operation == "Stop")
     {
-        operationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
+        TEMPORARY_RETURN_IGNORED operationalStateInstance->SetOperationalState(
+            to_underlying(OperationalState::OperationalStateEnum::kStopped));
     }
     else if (operation == "OnFault")
     {
@@ -992,72 +978,17 @@ void AllClustersAppCommandHandler::OnSoilMoistureChange(EndpointId endpointId, D
         ChipLogDetail(NotSpecified, "Set SoilMoisture value to %u", soilMoisture.Value());
     }
 
-    SoilMeasurement::SetSoilMoistureMeasuredValue(soilMoisture);
+    TEMPORARY_RETURN_IGNORED SoilMeasurement::SetSoilMoistureMeasuredValue(soilMoisture);
 }
 
 void AllClustersAppCommandHandler::HandleSetOccupancyChange(EndpointId endpointId, uint8_t newOccupancyValue)
 {
-    BitMask<chip::app::Clusters::OccupancySensing::OccupancyBitmap> currentOccupancy;
-    Protocols::InteractionModel::Status status = OccupancySensing::Attributes::Occupancy::Get(endpointId, &currentOccupancy);
-
-    if (static_cast<BitMask<chip::app::Clusters::OccupancySensing::OccupancyBitmap>>(newOccupancyValue) == currentOccupancy)
-    {
-        ChipLogDetail(NotSpecified, "Skipping setting occupancy changed due to same value.");
-        return;
-    }
-
-    status = OccupancySensing::Attributes::Occupancy::Set(endpointId, newOccupancyValue);
-    ChipLogDetail(NotSpecified, "Set Occupancy attribute to %u", newOccupancyValue);
-
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
-        ChipLogDetail(NotSpecified, "Invalid value/endpoint to set.");
-        return;
-    }
-
-    EmitOccupancyChangedEvent(endpointId, newOccupancyValue);
-
-    if (1 == newOccupancyValue)
-    {
-        uint16_t * holdTime = chip::app::Clusters::OccupancySensing::GetHoldTimeForEndpoint(endpointId);
-        if (holdTime != nullptr)
-        {
-            CHIP_ERROR err = chip::DeviceLayer::SystemLayer().StartTimer(
-                chip::System::Clock::Seconds16(*holdTime), AllClustersAppCommandHandler::OccupancyPresentTimerHandler,
-                reinterpret_cast<void *>(static_cast<uintptr_t>(endpointId)));
-            ChipLogDetail(NotSpecified, "Start HoldTime timer");
-            if (CHIP_NO_ERROR != err)
-            {
-                ChipLogError(NotSpecified, "Failed to start HoldTime timer.");
-            }
-        }
-    }
-}
-
-void AllClustersAppCommandHandler::OccupancyPresentTimerHandler(System::Layer * systemLayer, void * appState)
-{
-    EndpointId endpointId = static_cast<EndpointId>(reinterpret_cast<uintptr_t>(appState));
-    chip::BitMask<Clusters::OccupancySensing::OccupancyBitmap> currentOccupancy;
-
-    Protocols::InteractionModel::Status status = OccupancySensing::Attributes::Occupancy::Get(endpointId, &currentOccupancy);
-    VerifyOrDie(status == Protocols::InteractionModel::Status::Success);
-
-    uint8_t clearValue = 0;
-    if (!currentOccupancy.Has(Clusters::OccupancySensing::OccupancyBitmap::kOccupied))
+    chip::app::Clusters::OccupancySensingCluster * cluster = OccupancySensing::FindClusterOnEndpoint(endpointId);
+    if (cluster == nullptr)
     {
         return;
     }
-
-    status = OccupancySensing::Attributes::Occupancy::Set(endpointId, clearValue);
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
-        ChipLogDetail(NotSpecified, "Failed to set occupancy state.");
-    }
-    else
-    {
-        ChipLogDetail(NotSpecified, "Set Occupancy attribute to clear");
-        EmitOccupancyChangedEvent(endpointId, clearValue);
-    }
+    cluster->SetOccupancy(newOccupancyValue == 1);
 }
 
 void AllClustersAppCommandHandler::OnBooleanStateChangeHandler(chip::EndpointId endpointId, bool newState)
@@ -1079,5 +1010,6 @@ void AllClustersCommandDelegate::OnEventCommandReceived(const char * json)
         return;
     }
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(AllClustersAppCommandHandler::HandleCommand, reinterpret_cast<intptr_t>(handler));
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(AllClustersAppCommandHandler::HandleCommand,
+                                                                           reinterpret_cast<intptr_t>(handler));
 }

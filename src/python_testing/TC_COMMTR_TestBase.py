@@ -154,7 +154,7 @@ class CommodityMeteringTestBaseHelper(MatterBaseTest):
 
         try:
             asserts.assert_not_equal(reports[attribute][0].value, saved_value,
-                                     f"""Reported '{attribute_name}' value should be different from saved value. 
+                                     f"""Reported '{attribute_name}' value should be different from saved value.
                                      Subscriptions should only report when values have changed.""")
         except (KeyError, IndexError) as err:
             asserts.fail(f"There are no reports for attribute {attribute_name}:\n{err}")
@@ -162,37 +162,25 @@ class CommodityMeteringTestBaseHelper(MatterBaseTest):
     @staticmethod
     def _metered_quantity_matcher() -> AttributeMatcher:
         def predicate(report: AttributeValue) -> bool:
-            if report.attribute == cluster.Attributes.MeteredQuantity:
-                return True
-            else:
-                return False
+            return report.attribute == cluster.Attributes.MeteredQuantity
         return AttributeMatcher.from_callable(description="MeteredQuantity", matcher=predicate)
 
     @staticmethod
     def _maximum_metered_quantities_matcher() -> AttributeMatcher:
         def predicate(report: AttributeValue) -> bool:
-            if report.attribute == cluster.Attributes.MaximumMeteredQuantities:
-                return True
-            else:
-                return False
+            return report.attribute == cluster.Attributes.MaximumMeteredQuantities
         return AttributeMatcher.from_callable(description="MaximumMeteredQuantities", matcher=predicate)
 
     @staticmethod
     def _metered_quantity_timestamp_matcher() -> AttributeMatcher:
         def predicate(report: AttributeValue) -> bool:
-            if report.attribute == cluster.Attributes.MeteredQuantityTimestamp:
-                return True
-            else:
-                return False
+            return report.attribute == cluster.Attributes.MeteredQuantityTimestamp
         return AttributeMatcher.from_callable(description="MeteredQuantityTimestamp", matcher=predicate)
 
     @staticmethod
     def _tariff_unit_matcher() -> AttributeMatcher:
         def predicate(report: AttributeValue) -> bool:
-            if report.attribute == cluster.Attributes.TariffUnit:
-                return True
-            else:
-                return False
+            return report.attribute == cluster.Attributes.TariffUnit
         return AttributeMatcher.from_callable(description="TariffUnit", matcher=predicate)
 
     def get_mandatory_matchers(self) -> List[AttributeMatcher]:

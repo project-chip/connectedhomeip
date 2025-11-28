@@ -34,7 +34,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-
 import asyncio
 import logging
 import queue
@@ -232,7 +231,7 @@ class TC_SC_3_6(MatterBaseTest):
             logging.info("Establishing subscription %d/%d from controller node %s" % (sub_idx + 1, len(client_list), client.name))
 
             sub = await client.ReadAttribute(
-                nodeid=self.dut_node_id,
+                nodeId=self.dut_node_id,
                 attributes=[(0, Clusters.BasicInformation.Attributes.NodeLabel)],
                 reportInterval=(min_report_interval_sec, max_report_interval_sec),
                 keepSubscriptions=False

@@ -53,13 +53,12 @@ class TC_LTIME_3_1(MatterBaseTest):
 
     def pics_TC_LTIME_3_1(self):
         """Return PICS definitions asscociated with this test."""
-        pics = [
+        return [
             "LTIME.S"
         ]
-        return pics
 
     def steps_TC_LTIME_3_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(0, "TH is commissioned with DUT", is_commissioning=True),
             TestStep(1, "TH reads HourFormat attribute from DUT",
                      "Verify that the HourFormat attribute is of Enum8 datatype and that the values are 0 (12hr), 1 (24hr), and 255 (UseActiveLocale) as per the HourFormatEnum in the specification."),
@@ -84,11 +83,10 @@ class TC_LTIME_3_1(MatterBaseTest):
             TestStep(15, "TH writes 50 to ActiveCalendarType attribute",
                      "Verify that the write request shows 0x87 (Constraint Error)."),
         ]
-        return steps
 
     @run_if_endpoint_matches(has_cluster(Clusters.TimeFormatLocalization))
     async def test_TC_LTIME_3_1(self):
-        self.endpoint = self.get_endpoint(default=0)
+        self.endpoint = self.get_endpoint()
         self.cluster = Clusters.TimeFormatLocalization
         hour_format_values = [0, 1, 255]
 
@@ -141,11 +139,11 @@ class TC_LTIME_3_1(MatterBaseTest):
         self.step(9)
         feature_map = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.FeatureMap)
         if (feature_map & self.cluster.Bitmaps.Feature.kCalendarFormat) == 0:
-            self.skip_all_remaining_steps(10)
+            self.mark_all_remaining_steps_skipped(10)
             return
 
         self.step(10)
-        calendar_type_values = set([i for i in range(0, 12)])
+        calendar_type_values = set(range(0, 12))
         calendar_type_values.add(255)
         cluster_supported_calendar_types = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.SupportedCalendarTypes)
         asserts.assert_true(set(cluster_supported_calendar_types).issubset(

@@ -214,6 +214,9 @@ public class ClusterIDMapping {
         if (clusterId == ActivatedCarbonFilterMonitoring.ID) {
             return new ActivatedCarbonFilterMonitoring();
         }
+        if (clusterId == WaterTankLevelMonitoring.ID) {
+            return new WaterTankLevelMonitoring();
+        }
         if (clusterId == BooleanStateConfiguration.ID) {
             return new BooleanStateConfiguration();
         }
@@ -1517,6 +1520,7 @@ public class ClusterIDMapping {
             AccessControlEntriesPerFabric(4L),
             CommissioningARL(5L),
             Arl(6L),
+            AuxiliaryACL(7L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -1544,7 +1548,8 @@ public class ClusterIDMapping {
         public enum Event {
             AccessControlEntryChanged(0L),
             AccessControlExtensionChanged(1L),
-            FabricRestrictionReviewUpdate(2L),;
+            FabricRestrictionReviewUpdate(2L),
+            AuxiliaryAccessUpdated(3L),;
             private final long id;
             Event(long id) {
                 this.id = id;
@@ -3429,6 +3434,7 @@ public class ClusterIDMapping {
             ActiveRadioFaults(6L),
             ActiveNetworkFaults(7L),
             TestEventTriggersEnabled(8L),
+            DeviceLoadStatus(10L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -8765,6 +8771,112 @@ public class ClusterIDMapping {
     }
     public static class ActivatedCarbonFilterMonitoring implements BaseCluster {
         public static final long ID = 114L;
+        public long getID() {
+            return ID;
+        }
+
+        public enum Attribute {
+            Condition(0L),
+            DegradationDirection(1L),
+            ChangeIndication(2L),
+            InPlaceIndicator(3L),
+            LastChangedTime(4L),
+            ReplacementProductList(5L),
+            GeneratedCommandList(65528L),
+            AcceptedCommandList(65529L),
+            AttributeList(65531L),
+            FeatureMap(65532L),
+            ClusterRevision(65533L),;
+            private final long id;
+            Attribute(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Attribute value(long id) throws NoSuchFieldError {
+                for (Attribute attribute : Attribute.values()) {
+                    if (attribute.getID() == id) {
+                        return attribute;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Event {;
+            private final long id;
+            Event(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Event value(long id) throws NoSuchFieldError {
+                for (Event event : Event.values()) {
+                    if (event.getID() == id) {
+                        return event;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Command {
+            ResetCondition(0L),;
+            private final long id;
+            Command(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Command value(long id) throws NoSuchFieldError {
+                for (Command command : Command.values()) {
+                    if (command.getID() == id) {
+                        return command;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }@Override
+        public String getAttributeName(long id) throws NoSuchFieldError {
+            return Attribute.value(id).toString();
+        }
+
+        @Override
+        public String getEventName(long id) throws NoSuchFieldError {
+            return Event.value(id).toString();
+        }
+
+        @Override
+        public String getCommandName(long id) throws NoSuchFieldError {
+            return Command.value(id).toString();
+        }
+
+        @Override
+        public long getAttributeID(String name) throws IllegalArgumentException {
+            return Attribute.valueOf(name).getID();
+        }
+
+        @Override
+        public long getEventID(String name) throws IllegalArgumentException {
+            return Event.valueOf(name).getID();
+        }
+
+        @Override
+        public long getCommandID(String name) throws IllegalArgumentException {
+            return Command.valueOf(name).getID();
+        }
+    }
+    public static class WaterTankLevelMonitoring implements BaseCluster {
+        public static final long ID = 121L;
         public long getID() {
             return ID;
         }
@@ -17221,6 +17333,9 @@ public class ClusterIDMapping {
             ScreenDailyTime(5L),
             RemainingScreenTime(6L),
             BlockUnrated(7L),
+            BlockChannelList(8L),
+            BlockApplicationList(9L),
+            BlockContentTimeWindow(10L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -17246,7 +17361,8 @@ public class ClusterIDMapping {
         }
 
         public enum Event {
-            RemainingScreenTimeExpired(0L),;
+            RemainingScreenTimeExpired(0L),
+            EnteringBlockContentTimeWindow(1L),;
             private final long id;
             Event(long id) {
                 this.id = id;
@@ -17276,7 +17392,13 @@ public class ClusterIDMapping {
             BlockUnratedContent(7L),
             UnblockUnratedContent(8L),
             SetOnDemandRatingThreshold(9L),
-            SetScheduledContentRatingThreshold(10L),;
+            SetScheduledContentRatingThreshold(10L),
+            AddBlockChannels(11L),
+            RemoveBlockChannels(12L),
+            AddBlockApplications(13L),
+            RemoveBlockApplications(14L),
+            SetBlockContentTimeWindow(15L),
+            RemoveBlockContentTimeWindow(16L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -17373,6 +17495,108 @@ public class ClusterIDMapping {
                     }
                     public static SetScheduledContentRatingThresholdCommandField value(int id) throws NoSuchFieldError {
                         for (SetScheduledContentRatingThresholdCommandField field : SetScheduledContentRatingThresholdCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum AddBlockChannelsCommandField {Channels(0),;
+                    private final int id;
+                    AddBlockChannelsCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static AddBlockChannelsCommandField value(int id) throws NoSuchFieldError {
+                        for (AddBlockChannelsCommandField field : AddBlockChannelsCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum RemoveBlockChannelsCommandField {ChannelIndexes(0),;
+                    private final int id;
+                    RemoveBlockChannelsCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static RemoveBlockChannelsCommandField value(int id) throws NoSuchFieldError {
+                        for (RemoveBlockChannelsCommandField field : RemoveBlockChannelsCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum AddBlockApplicationsCommandField {Applications(0),;
+                    private final int id;
+                    AddBlockApplicationsCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static AddBlockApplicationsCommandField value(int id) throws NoSuchFieldError {
+                        for (AddBlockApplicationsCommandField field : AddBlockApplicationsCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum RemoveBlockApplicationsCommandField {Applications(0),;
+                    private final int id;
+                    RemoveBlockApplicationsCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static RemoveBlockApplicationsCommandField value(int id) throws NoSuchFieldError {
+                        for (RemoveBlockApplicationsCommandField field : RemoveBlockApplicationsCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum SetBlockContentTimeWindowCommandField {TimeWindow(0),;
+                    private final int id;
+                    SetBlockContentTimeWindowCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static SetBlockContentTimeWindowCommandField value(int id) throws NoSuchFieldError {
+                        for (SetBlockContentTimeWindowCommandField field : SetBlockContentTimeWindowCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum RemoveBlockContentTimeWindowCommandField {TimeWindowIndexes(0),;
+                    private final int id;
+                    RemoveBlockContentTimeWindowCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static RemoveBlockContentTimeWindowCommandField value(int id) throws NoSuchFieldError {
+                        for (RemoveBlockContentTimeWindowCommandField field : RemoveBlockContentTimeWindowCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
