@@ -17,7 +17,7 @@
 
 #ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL
 
-#include <app/clusters/level-control/level-control.h> //nogncheck
+#include <app/clusters/level-control/level-control.h> // nogncheck
 #include <app/util/attribute-storage.h>
 
 namespace chip::app::Clusters::OnOff::Internal::LevelControl {
