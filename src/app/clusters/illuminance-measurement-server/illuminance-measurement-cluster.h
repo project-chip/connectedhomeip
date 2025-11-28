@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <clusters/IlluminanceMeasurement/Metadata.h>

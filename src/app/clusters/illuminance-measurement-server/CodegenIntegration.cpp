@@ -49,13 +49,13 @@ public:
         LightSensorTypeEnum lightSensorType = LightSensorTypeEnum::kPhotodiode;
         if (optionalAttributeSet.IsSet(LightSensorType::Id))
         {
-            // VerifyOrDie(LightSensorType::Get(endpointId, &lightSensorType) == Status::Success); //revisar
+            VerifyOrDie(LightSensorType::Get(endpointId, &lightSensorType) == Status::Success);
         }
 
         Tolerance::TypeInfo::Type tolerance{};
         if (optionalAttributeSet.IsSet(Tolerance::Id))
         {
-            // VerifyOrDie(Tolerance::Get(endpointId, &tolerance) == Status::Success); //revisar
+            VerifyOrDie(Tolerance::Get(endpointId, &tolerance) == Status::Success);
         }
         gServers[clusterInstanceIndex].Create(endpointId, optionalAttributeSet,
                                               IlluminanceMeasurementCluster::StartupConfiguration{
