@@ -156,7 +156,7 @@ class IsolatedNetworkNamespace:
 
         self._setup()
         if setup_app_link_up:
-            self._setup_app_link_up(wait_for_dad=False)
+            self.setup_app_link_up(wait_for_dad=False)
         if setup_tool_link_up:
             self._setup_tool_link_up(wait_for_dad=False)
         self._wait_for_duplicate_address_detection()
@@ -181,7 +181,7 @@ class IsolatedNetworkNamespace:
         for command in self.COMMANDS_SETUP:
             self._run(command)
 
-    def _setup_app_link_up(self, wait_for_dad: bool = True):
+    def setup_app_link_up(self, wait_for_dad: bool = True):
         for command in self.COMMANDS_APP_LINK_UP:
             self._run(command)
         if wait_for_dad:
@@ -324,7 +324,7 @@ class WpaSupplicantMock(threading.Thread):
                 # Mock AP association process.
                 await self.State.set_async("associating")
                 await self.State.set_async("associated")
-                self.mock.networking._setup_app_link_up()
+                self.mock.networking.setup_app_link_up()
                 await self.State.set_async("completed")
             await self.CurrentNetwork.set_async(path)
             asyncio.create_task(associate())
