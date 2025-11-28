@@ -98,6 +98,11 @@ void OnOffServer::timerCallback(System::Layer *, void * callbackContext)
     (control->callback)(control->endpoint);
 }
 
+chip::scenes::SceneHandler * OnOffServer::GetSceneHandler()
+{
+    return chip::app::Clusters::OnOff::Internal::Scenes::GlobalHandler();
+}
+
 void OnOffServer::scheduleTimerCallbackMs(EmberEventControl * control, uint32_t delayMs)
 {
     CHIP_ERROR err = DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayMs), timerCallback, control);
