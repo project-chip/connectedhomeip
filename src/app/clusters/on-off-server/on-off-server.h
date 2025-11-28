@@ -111,7 +111,7 @@ struct OnOffEffect
     using OffWithEffectTriggerCommand = void (*)(OnOffEffect *);
     using EffectVariantType           = std::underlying_type_t<chip::app::Clusters::OnOff::DelayedAllOffEffectVariantEnum>;
     static_assert(
-        std::is_same<EffectVariantType, std::underlying_type_t<chip::app::Clusters::OnOff::DyingLightEffectVariantEnum>>::value,
+        std::is_same_v<EffectVariantType, std::underlying_type_t<chip::app::Clusters::OnOff::DyingLightEffectVariantEnum>>,
         "chip::app::Clusters::OnOff::DelayedAllOffEffectVariantEnum and "
         "chip::app::Clusters::OnOff::DyingLightEffectVariantEnum underlying types differ.");
 
