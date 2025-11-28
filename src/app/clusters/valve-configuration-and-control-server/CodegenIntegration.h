@@ -24,7 +24,7 @@ namespace chip::app::Clusters::ValveConfigurationAndControl {
 ValveConfigurationAndControlCluster * FindClusterOnEndpoint(EndpointId endpointId);
 
 /**
- * The SetDelegate function relies on the ValveConfigurationAndControl being initialized in the 
+ * The SetDelegate function relies on the ValveConfigurationAndControl being initialized in the
  * given endpoint.
  */
 void SetDefaultDelegate(EndpointId endpointId, Delegate * delegate);
