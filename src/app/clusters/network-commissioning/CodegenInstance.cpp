@@ -46,7 +46,7 @@ CHIP_ERROR Instance::Init()
 void Instance::Shutdown()
 {
     TEMPORARY_RETURN_IGNORED CodegenDataModelProvider::Instance().Registry().Unregister(&mCluster.Cluster());
-    mCluster.Cluster().Shutdown();
+    mCluster.Cluster().Deinit();
 }
 
 } // namespace NetworkCommissioning
