@@ -18,8 +18,6 @@
 #include <app/util/config.h>
 #include <lib/core/DataModelTypes.h>
 
-#ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL
-
 /** @brief On/off Cluster Level Control Effect
  *
  * This is called by the framework when the on/off cluster initiates a command
@@ -33,6 +31,8 @@ void emberAfOnOffClusterLevelControlEffectCallback(chip::EndpointId endpoint, bo
 
 namespace chip::app::Clusters::OnOff::Internal {
 
+#ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL
+
 /**
  * Called by the on-off cluster to conditionally trigger emberAfOnOffClusterLevelControlEffectCallback.
  *
@@ -40,17 +40,13 @@ namespace chip::app::Clusters::OnOff::Internal {
  */
 bool OnOffControlChangeForLevelControl(chip::EndpointId endpoint, bool newValue);
 
-} // namespace chip::app::Clusters::OnOff::Internal
-
 #else
-
-namespace chip::app::Clusters::OnOff::Internal {
 
 inline bool OnOffControlChangeForLevelControl(chip::EndpointId endpoint, bool newValue)
 {
     return false;
 }
 
-} // namespace chip::app::Clusters::OnOff::Internal
-
 #endif // MATTER_DM_PLUGIN_LEVEL_CONTROL
+//
+} // namespace chip::app::Clusters::OnOff::Internal

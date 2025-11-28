@@ -20,6 +20,8 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/level-control-integration.h"
     "${CLUSTER_DIR}/mode-base-integration.cpp"
     "${CLUSTER_DIR}/mode-base-integration.h"
+    "${CLUSTER_DIR}/mode-select-integration.cpp"
+    "${CLUSTER_DIR}/mode-select-integration.h"
     "${CLUSTER_DIR}/on-off-server.cpp"
     "${CLUSTER_DIR}/on-off-server.h"
 )

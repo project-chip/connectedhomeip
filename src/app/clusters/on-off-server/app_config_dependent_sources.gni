@@ -16,6 +16,8 @@ app_config_dependent_sources = [
   "level-control-integration.h",
   "mode-base-integration.cpp",
   "mode-base-integration.h",
+  "mode-select-integration.cpp",
+  "mode-select-integration.h",
   "on-off-server.cpp",
   "on-off-server.h",
 ]

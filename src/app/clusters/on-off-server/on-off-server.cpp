@@ -31,6 +31,7 @@
 // integration with other clusters
 #include "level-control-integration.h"
 #include "mode-base-integration.h"
+#include "mode-select-integration.h"
 
 #ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 #include <app/clusters/scenes-server/scenes-server.h>
@@ -372,19 +373,8 @@ Status OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::CommandId com
             Internal::OnOffControlChangeForLevelControl(endpoint, newValue);
         }
 
-#ifdef MATTER_DM_PLUGIN_MODE_SELECT
-        // If OnMode is not a null value, then change the current mode to it.
-        if (emberAfContainsServer(endpoint, ModeSelect::Id) &&
-            emberAfContainsAttribute(endpoint, ModeSelect::Id, ModeSelect::Attributes::OnMode::Id))
-        {
-            ModeSelect::Attributes::OnMode::TypeInfo::Type onMode;
-            if (ModeSelect::Attributes::OnMode::Get(endpoint, onMode) == Status::Success && !onMode.IsNull())
-            {
-                ChipLogProgress(Zcl, "Changing Current Mode to %x", onMode.Value());
-                status = ModeSelect::Attributes::CurrentMode::Set(endpoint, onMode.Value());
-            }
-        }
-#endif
+        Internal::ModeSelectSetOnModeFromStartup(endpoint);
+
         // If OnMode is not a null value, then change the current mode to it.
         UpdateModeBaseCurrentModeToOnMode(endpoint);
     }
@@ -454,19 +444,9 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
             status = setOnOffValue(endpoint, onOffValueForStartUp, true);
         }
 
-#ifdef MATTER_DM_PLUGIN_MODE_SELECT
-        // If OnMode is not a null value, then change the current mode to it.
-        if (onOffValueForStartUp && emberAfContainsServer(endpoint, ModeSelect::Id) &&
-            emberAfContainsAttribute(endpoint, ModeSelect::Id, ModeSelect::Attributes::OnMode::Id))
-        {
-            ModeSelect::Attributes::OnMode::TypeInfo::Type onMode;
-            if (ModeSelect::Attributes::OnMode::Get(endpoint, onMode) == Status::Success && !onMode.IsNull())
-            {
-                ChipLogProgress(Zcl, "Changing Current Mode to %x", onMode.Value());
-                status = ModeSelect::Attributes::CurrentMode::Set(endpoint, onMode.Value());
-            }
+        if (onOffValueForStartUp) {
+            Internal::ModeSelectSetOnModeFromStartup(endpoint);
         }
-#endif
     }
 #endif // IGNORE_ON_OFF_CLUSTER_START_UP_ON_OFF
 
