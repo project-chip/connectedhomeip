@@ -178,8 +178,8 @@ class Runner:
                       dependencies: list[AppsRegister] | None = None,
                       timeout_seconds: int | None = None,
                       stdin: IO[Any] | None = None) -> tuple[subprocess.Popen[bytes], LogPipe, LogPipe]:
-        log.info('RunSubprocess starting application %s' % subproc)
         cmd = subproc.to_cmd()
+        log.info('RunSubprocess starting application %s', " ".join(cmd))
 
         outpipe = LogPipe(
             logging.DEBUG, capture_delegate=self.capture_delegate,
