@@ -24,6 +24,9 @@ exclude = [
     "docs/development_controllers/matter-repl/*.ipynb",
 ]
 
+[tool.pyright]
+reportMissingTypeStubs = "warning"
+
 [tool.ruff.lint]
 select = [
     # Standard errors and warnings
