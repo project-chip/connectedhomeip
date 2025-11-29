@@ -33,7 +33,6 @@
 #include <lib/support/CodeUtils.h>
 #include <tracing/macros.h>
 
-#include <array>
 #include <cstdint>
 
 using namespace chip;
@@ -42,13 +41,10 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ResourceMonitoring;
 using namespace Protocols::InteractionModel;
 
+using chip::Protocols::InteractionModel::Status;
+
 namespace {
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters::ResourceMonitoring;
-
-using chip::Protocols::InteractionModel::Status;
 
 // Helper function to register a legacy instance with the codegen data model provider
 void RegisterInstance(Instance * instance)
