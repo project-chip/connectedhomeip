@@ -121,7 +121,7 @@ class BlePeripheral:
         if not servDataDict:
             return None
         servDataDict = dict(servDataDict)
-        for i in servDataDict.keys():
+        for i in servDataDict:
             if str(i).lower() == str(CHIP_SERVICE_SHORT).lower():
                 return ParseServiceData(bytes(servDataDict[i]))
         return None

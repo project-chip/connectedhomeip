@@ -371,7 +371,7 @@ class FactoryDataGenerator:
 
     def _add_entry(self, name: str, value: any):
         """ Add single entry to list of tuples ("key", "value") """
-        if (isinstance(value, bytes) or isinstance(value, bytearray)):
+        if (isinstance(value, (bytes, bytearray))):
             value = HEX_PREFIX + value.hex()
         if value or (isinstance(value, int) and value == 0):
             log.debug("Adding entry '%s' with size %d and type '%s'", name, sys.getsizeof(value), type(value))

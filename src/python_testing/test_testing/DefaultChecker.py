@@ -91,7 +91,7 @@ class DefaultChecker(BasicCompositionTests):
     def check_default_calendar_format(self):
         cluster = Clusters.TimeFormatLocalization
         attr = cluster.Attributes.ActiveCalendarType
-        if cluster in self.endpoints[0].keys() and attr in self.endpoints[0][cluster].keys():
+        if cluster in self.endpoints[0] and attr in self.endpoints[0][cluster]:
             val = self.endpoints[0][cluster][attr]
             if val == cluster.Enums.CalendarTypeEnum.kBuddhist:
                 return _problem(AttributePathLocation(0, cluster.id, attr.attribute_id), "Calendar format is set to default (Buddhist)")
@@ -121,7 +121,7 @@ class DefaultChecker(BasicCompositionTests):
     def check_fixed_label_cluster_empty(self):
         cluster = Clusters.FixedLabel
         attr = cluster.Attributes.LabelList
-        if cluster in self.endpoints[0].keys():
+        if cluster in self.endpoints[0]:
             val = self.endpoints[0][cluster][attr]
             if val == []:
                 return _problem(AttributePathLocation(0, cluster.id, attr.attribute_id), "Fixed label list is empty")
@@ -133,7 +133,7 @@ class DefaultChecker(BasicCompositionTests):
     def check_fixed_label_cluster_defaults(self):
         cluster = Clusters.FixedLabel
         attr = cluster.Attributes.LabelList
-        if cluster in self.endpoints[0].keys():
+        if cluster in self.endpoints[0]:
             label_list = self.endpoints[0][cluster][attr]
 
             if any(label for label in label_list if label in DEFAULT_FIXED_LABEL_VALUES):

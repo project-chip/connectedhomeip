@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/clusters/ethernet-network-diagnostics-server/ethernet-diagnostics-cluster.h>
+#include <app/clusters/ethernet-network-diagnostics-server/EthernetDiagnosticsCluster.h>
 
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>

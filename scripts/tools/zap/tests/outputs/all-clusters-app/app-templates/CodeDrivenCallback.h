@@ -114,3 +114,7 @@ void MatterActivatedCarbonFilterMonitoringClusterShutdownCallback(chip::Endpoint
 void MatterBooleanStateConfigurationClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterBooleanStateConfigurationClusterShutdownCallback(chip::EndpointId endpointId);
+
+void MatterOccupancySensingClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterOccupancySensingClusterShutdownCallback(chip::EndpointId endpointId);
