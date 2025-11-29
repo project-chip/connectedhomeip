@@ -45,39 +45,27 @@ class ImmutableReplacementProductListManager : public chip::app::Clusters::Resou
 public:
     CHIP_ERROR Next(ReplacementProductStruct & item) override
     {
-        if (mIndex >= kReplacementProductListMaxSize)
-        {
-            return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-        }
 
-        switch (mIndex)
+        struct ReplacementProductStruct
         {
-        case 0: {
-            item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kUpc);
-            VerifyOrDie(item.SetProductIdentifierValue("PRODUCT_0"_span) == CHIP_NO_ERROR);
-            break;
-        case 1:
-            item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin8);
-            VerifyOrDie(item.SetProductIdentifierValue("PRODUCT_1"_span) == CHIP_NO_ERROR);
-            break;
-        case 2:
-            item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kEan);
-            VerifyOrDie(item.SetProductIdentifierValue("PRODUCT_2"_span) == CHIP_NO_ERROR);
-            break;
-        case 3:
-            item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin14);
-            VerifyOrDie(item.SetProductIdentifierValue("PRODUCT_3"_span) == CHIP_NO_ERROR);
-            break;
-        case 4:
-            item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kOem);
-            VerifyOrDie(item.SetProductIdentifierValue("PRODUCT_4"_span) == CHIP_NO_ERROR);
-            break;
-        default:
-            return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-            break;
-        }
-        }
+            CharSpan productIdentifierValue;
+            ResourceMonitoring::ProductIdentifierTypeEnum productIdentifierType;
+        };
+
+        constexpr ReplacementProductStruct kReplacementProducts[] = {
+            { "PRODUCT_0"_span, ResourceMonitoring::ProductIdentifierTypeEnum::kUpc },
+            { "PRODUCT_1"_span, ResourceMonitoring::ProductIdentifierTypeEnum::kGtin8 },
+            { "PRODUCT_2"_span, ResourceMonitoring::ProductIdentifierTypeEnum::kEan },
+            { "PRODUCT_3"_span, ResourceMonitoring::ProductIdentifierTypeEnum::kGtin14 },
+            { "PRODUCT_4"_span, ResourceMonitoring::ProductIdentifierTypeEnum::kOem },
+        };
+
+        VerifyOrReturnError(mIndex < MATTER_ARRAY_SIZE(kReplacementProducts), CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
+
+        item.SetProductIdentifierType(kReplacementProducts[mIndex].productIdentifierType);
+        VerifyOrDie(item.SetProductIdentifierValue(kReplacementProducts[mIndex].productIdentifierValue) == CHIP_NO_ERROR);
         mIndex++;
+
         return CHIP_NO_ERROR;
     }
 };
