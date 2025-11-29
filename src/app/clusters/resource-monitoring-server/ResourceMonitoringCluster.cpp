@@ -281,7 +281,7 @@ std::optional<DataModel::ActionReturnStatus> ResourceMonitoringCluster::InvokeCo
 {
     switch (request.path.mCommandId)
     {
-    case ResourceMonitoring::Commands::ResetCondition::Id:
+    case ResourceMonitoring::Commands::ResetCondition::Id: {
         ChipLogDetail(Zcl, "ResourceMonitoring::Commands::ResetCondition");
 
         ResourceMonitoring::Commands::ResetCondition::DecodableType data;
@@ -289,8 +289,9 @@ std::optional<DataModel::ActionReturnStatus> ResourceMonitoringCluster::InvokeCo
 
         return ResetCondition(request.path, data, handler);
     }
-
-    return Status::UnsupportedCommand;
+    default:
+        return Status::UnsupportedCommand;
+    }
 }
 
 std::optional<DataModel::ActionReturnStatus>
