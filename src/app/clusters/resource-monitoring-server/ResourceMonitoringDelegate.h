@@ -51,8 +51,6 @@ private:
      */
     void SetInstance(ResourceMonitoringCluster * aInstance) { mInstance = aInstance; }
 
-    friend class ResourceMonitoringCluster;
-
 protected:
     ResourceMonitoringCluster * GetInstance() { return mInstance; }
 
