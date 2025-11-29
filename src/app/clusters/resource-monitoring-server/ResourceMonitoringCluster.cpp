@@ -40,9 +40,9 @@ ResourceMonitoringCluster::ResourceMonitoringCluster(
     OptionalAttributeSet optionalAttributeSet,
     ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
     bool aResetConditionCommandSupported) :
-    DefaultServerCluster(ConcreteClusterPath(aEndpointId, aClusterId)),
-    mDegradationDirection(aDegradationDirection), mResetConditionCommandSupported(aResetConditionCommandSupported),
-    mEnabledFeatures(enabledFeatures), mOptionalAttributeSet(optionalAttributeSet)
+    DefaultServerCluster(ConcreteClusterPath(aEndpointId, aClusterId)), mDegradationDirection(aDegradationDirection),
+    mResetConditionCommandSupported(aResetConditionCommandSupported), mEnabledFeatures(enabledFeatures),
+    mOptionalAttributeSet(optionalAttributeSet)
 {}
 
 CHIP_ERROR ResourceMonitoringCluster::SetDelegate(Delegate * aDelegate)
@@ -93,28 +93,20 @@ DataModel::ActionReturnStatus ResourceMonitoringCluster::ReadAttribute(const Dat
     {
     case ResourceMonitoring::Attributes::Condition::Id:
         return encoder.Encode(mCondition);
-
     case ResourceMonitoring::Attributes::FeatureMap::Id:
         return encoder.Encode(mEnabledFeatures);
-
     case ResourceMonitoring::Attributes::DegradationDirection::Id:
         return encoder.Encode(mDegradationDirection);
-
     case ResourceMonitoring::Attributes::ChangeIndication::Id:
         return encoder.Encode(mChangeIndication);
-
     case ResourceMonitoring::Attributes::InPlaceIndicator::Id:
         return encoder.Encode(mInPlaceIndicator);
-
     case ResourceMonitoring::Attributes::LastChangedTime::Id:
         return encoder.Encode(mLastChangedTime);
-
-    case ResourceMonitoring::Attributes::ReplacementProductList::Id: {
+    case ResourceMonitoring::Attributes::ReplacementProductList::Id:
         return ReadReplaceableProductList(encoder);
-    }
     case ResourceMonitoring::Attributes::ClusterRevision::Id:
         return encoder.Encode(HepaFilterMonitoring::kRevision);
-
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
@@ -226,25 +218,18 @@ ResourceMonitoringCluster::UpdateLastChangedTime(DataModel::Nullable<uint32_t> a
 {
     auto oldLastchangedTime = mLastChangedTime;
     mLastChangedTime        = aNewLastChangedTime;
-    if (mLastChangedTime != oldLastchangedTime)
-    {
-        if (mPath.mClusterId == HepaFilterMonitoring::Id)
-        {
-            TEMPORARY_RETURN_IGNORED chip::app::GetSafeAttributePersistenceProvider()->WriteScalarValue(
-                ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, HepaFilterMonitoring::Attributes::LastChangedTime::Id),
-                mLastChangedTime);
-            NotifyAttributeChanged(HepaFilterMonitoring::Attributes::LastChangedTime::Id);
-        }
+    VerifyOrReturnValue(mLastChangedTime != oldLastchangedTime, Status::Success);
 
-        if (mPath.mClusterId == ActivatedCarbonFilterMonitoring::Id)
-        {
-            TEMPORARY_RETURN_IGNORED chip::app::GetSafeAttributePersistenceProvider()->WriteScalarValue(
-                ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId,
-                                      ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::Id),
-                mLastChangedTime);
-            NotifyAttributeChanged(ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::Id);
-        }
-    }
+    // same attribuyte ID for all clusters
+    constexpr AttributeId kAttributeId = HepaFilterMonitoring::Attributes::LastChangedTime::Id;
+    static_assert(kAttributeId == HepaFilterMonitoring::Attributes::LastChangedTime::Id);
+    static_assert(kAttributeId == ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::Id);
+
+    ReturnValueOnFailure(chip::app::GetSafeAttributePersistenceProvider()->WriteScalarValue(
+                             ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, kAttributeId), mLastChangedTime),
+                         Status::Failure);
+    NotifyAttributeChanged(kAttributeId);
+
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -252,11 +237,13 @@ void ResourceMonitoringCluster::LoadPersistentAttributes()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    static_assert(HepaFilterMonitoring::Attributes::Condition::Id == ActivatedCarbonFilterMonitoring::Attributes::Condition::Id);
+    // same attribuyte ID for all clusters
+    constexpr AttributeId kAttributeId = HepaFilterMonitoring::Attributes::Condition::Id;
+    static_assert(kAttributeId == HepaFilterMonitoring::Attributes::Condition::Id);
+    static_assert(kAttributeId == ActivatedCarbonFilterMonitoring::Attributes::Condition::Id);
 
     err = chip::app::GetSafeAttributePersistenceProvider()->ReadScalarValue(
-        ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, HepaFilterMonitoring::Attributes::LastChangedTime::Id),
-        mLastChangedTime);
+        ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, kAttributeId), mLastChangedTime);
 
     if (err == CHIP_NO_ERROR)
     {
@@ -317,10 +304,12 @@ ResourceMonitoringCluster::ResetCondition(const ConcreteCommandPath & commandPat
 CHIP_ERROR ResourceMonitoringCluster::AcceptedCommands(const ConcreteClusterPath & cluster,
                                                        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
     if (mResetConditionCommandSupported)
     {
-        ReturnErrorOnFailure(builder.Append(ResourceMonitoring::Commands::ResetCondition::kMetadataEntry));
+        constexpr DataModel::AcceptedCommandEntry kCommands[] = {
+            { ResourceMonitoring::Commands::ResetCondition::kMetadataEntry }
+        };
+        ReturnErrorOnFailure(builder.ReferenceExisting(kCommands));
     }
 
     return CHIP_NO_ERROR;
@@ -398,8 +387,7 @@ Protocols::InteractionModel::Status Delegate::OnResetCondition()
     }
 
     // call application specific post reset logic
-    status = PostResetCondition();
-    return status;
+    return PostResetCondition();
 }
 
 Protocols::InteractionModel::Status Delegate::PreResetCondition()
