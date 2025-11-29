@@ -220,7 +220,7 @@ ResourceMonitoringCluster::UpdateLastChangedTime(DataModel::Nullable<uint32_t> a
     mLastChangedTime        = aNewLastChangedTime;
     VerifyOrReturnValue(mLastChangedTime != oldLastchangedTime, Status::Success);
 
-    // same attribuyte ID for all clusters
+    // same attribute ID for all clusters
     constexpr AttributeId kAttributeId = HepaFilterMonitoring::Attributes::LastChangedTime::Id;
     static_assert(kAttributeId == HepaFilterMonitoring::Attributes::LastChangedTime::Id);
     static_assert(kAttributeId == ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::Id);
