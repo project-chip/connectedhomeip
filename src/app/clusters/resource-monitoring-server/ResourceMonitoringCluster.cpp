@@ -238,9 +238,9 @@ void ResourceMonitoringCluster::LoadPersistentAttributes()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // same attribuyte ID for all clusters
-    constexpr AttributeId kAttributeId = HepaFilterMonitoring::Attributes::Condition::Id;
-    static_assert(kAttributeId == HepaFilterMonitoring::Attributes::Condition::Id);
-    static_assert(kAttributeId == ActivatedCarbonFilterMonitoring::Attributes::Condition::Id);
+    constexpr AttributeId kAttributeId = HepaFilterMonitoring::Attributes::LastChangedTime::Id;
+    static_assert(kAttributeId == HepaFilterMonitoring::Attributes::LastChangedTime::Id);
+    static_assert(kAttributeId == ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::Id);
 
     err = chip::app::GetSafeAttributePersistenceProvider()->ReadScalarValue(
         ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, kAttributeId), mLastChangedTime);
