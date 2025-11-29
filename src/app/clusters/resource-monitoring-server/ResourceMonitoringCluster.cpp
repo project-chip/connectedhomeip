@@ -40,9 +40,9 @@ ResourceMonitoringCluster::ResourceMonitoringCluster(
     OptionalAttributeSet optionalAttributeSet,
     ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
     bool aResetConditionCommandSupported) :
-    DefaultServerCluster(ConcreteClusterPath(aEndpointId, aClusterId)), mDegradationDirection(aDegradationDirection),
-    mResetConditionCommandSupported(aResetConditionCommandSupported), mEnabledFeatures(enabledFeatures),
-    mOptionalAttributeSet(optionalAttributeSet)
+    DefaultServerCluster(ConcreteClusterPath(aEndpointId, aClusterId)),
+    mDegradationDirection(aDegradationDirection), mResetConditionCommandSupported(aResetConditionCommandSupported),
+    mEnabledFeatures(enabledFeatures), mOptionalAttributeSet(optionalAttributeSet)
 {}
 
 CHIP_ERROR ResourceMonitoringCluster::SetDelegate(Delegate * aDelegate)
