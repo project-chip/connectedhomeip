@@ -73,19 +73,19 @@ public:
             break;
         case 1:
             item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin8);
-            VerifyOrDie(item.SetProductIdentifierValue(CharSpan::fromCharString("PRODUCT_1")) == CHIP_NO_ERROR);
+            VerifyOrDie(item.SetProductIdentifierValue("PRODUCT_1"_span) == CHIP_NO_ERROR);
             break;
         case 2:
             item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kEan);
-            VerifyOrDie(item.SetProductIdentifierValue(CharSpan::fromCharString("PRODUCT_2")) == CHIP_NO_ERROR);
+            VerifyOrDie(item.SetProductIdentifierValue("PRODUCT_2"_span) == CHIP_NO_ERROR);
             break;
         case 3:
             item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin14);
-            VerifyOrDie(item.SetProductIdentifierValue(CharSpan::fromCharString("PRODUCT_3")) == CHIP_NO_ERROR);
+            VerifyOrDie(item.SetProductIdentifierValue("PRODUCT_3"_span) == CHIP_NO_ERROR);
             break;
         case 4:
             item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kOem);
-            VerifyOrDie(item.SetProductIdentifierValue(CharSpan::fromCharString("PRODUCT_4")) == CHIP_NO_ERROR);
+            VerifyOrDie(item.SetProductIdentifierValue("PRODUCT_4"_span) == CHIP_NO_ERROR);
             break;
         default:
             return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
