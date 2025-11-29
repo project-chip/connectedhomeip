@@ -40,21 +40,6 @@ using chip::Test::TestServerClusterContext;
 
 namespace {
 
-class ScopedSafeAttributePersistence
-{
-public:
-    ScopedSafeAttributePersistence(TestServerClusterContext & context) : mOldPersistence(app::GetSafeAttributePersistenceProvider())
-    {
-        VerifyOrDie(mPersistence.Init(&context.StorageDelegate()) == CHIP_NO_ERROR);
-        app::SetSafeAttributePersistenceProvider(&mPersistence);
-    }
-    ~ScopedSafeAttributePersistence() { app::SetSafeAttributePersistenceProvider(mOldPersistence); }
-
-private:
-    app::SafeAttributePersistenceProvider * mOldPersistence;
-    app::DefaultSafeAttributePersistenceProvider mPersistence;
-};
-
 class ImmutableReplacementProductListManager : public chip::app::Clusters::ResourceMonitoring::ReplacementProductListManager
 {
 public:
@@ -105,15 +90,23 @@ struct TestResourceMonitoringCluster : public ::testing::Test
 
     void SetUp() override
     {
-        TestServerClusterContext context;
-        ScopedSafeAttributePersistence persistence(context);
+        oldPersistence = app::GetSafeAttributePersistenceProvider();
+        ASSERT_EQ(safePersistence.Init(&testContext.StorageDelegate()), CHIP_NO_ERROR);
+        app::SetSafeAttributePersistenceProvider(&safePersistence);
+
         ASSERT_EQ(activatedCarbonFilterMonitoring.Startup(testContext.Get()), CHIP_NO_ERROR);
         activatedCarbonFilterMonitoring.SetReplacementProductListManagerInstance(&replacementProductListManager);
     }
 
-    void TearDown() override { activatedCarbonFilterMonitoring.Shutdown(); }
+    void TearDown() override
+    {
+        app::SetSafeAttributePersistenceProvider(oldPersistence);
+        activatedCarbonFilterMonitoring.Shutdown();
+    }
 
     chip::Test::TestServerClusterContext testContext;
+    app::SafeAttributePersistenceProvider * oldPersistence;
+    app::DefaultSafeAttributePersistenceProvider safePersistence;
 
     EndpointId kEndpointId = 1;
 
