@@ -197,7 +197,8 @@
     "cmake.configureOnOpen": false,
     "search.followSymlinks": false,
     "[python]": {
-        "editor.defaultFormatter": "ms-python.autopep8"
+        "editor.defaultFormatter": "ms-python.autopep8",
+        "editor.rulers": [132]
     },
     "autopep8.args": ["--max-line-length", "132"],
     "search.exclude": {
