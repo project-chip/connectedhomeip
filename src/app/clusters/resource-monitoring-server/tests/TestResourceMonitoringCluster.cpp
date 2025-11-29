@@ -69,7 +69,7 @@ public:
         {
         case 0: {
             item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kUpc);
-            VerifyOrDie(item.SetProductIdentifierValue(CharSpan::fromCharString("PRODUCT_0")) == CHIP_NO_ERROR);
+            VerifyOrDie(item.SetProductIdentifierValue("PRODUCT_0"_span) == CHIP_NO_ERROR);
             break;
         case 1:
             item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin8);
