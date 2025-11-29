@@ -45,7 +45,6 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
-
 // Helper function to register a legacy instance with the codegen data model provider
 void RegisterInstance(Instance * instance)
 {
