@@ -194,7 +194,7 @@ struct FabricEntryData : public PersistentData<kFabricMaxBytes>
 {
     using Serializer              = DefaultSerializer<StorageId, StorageData>;
     using TypedTableEntryData     = TableEntryData<StorageId, StorageData>;
-    using Store                   = PersistentStore<kEntryMaxBytes>;
+    using Buffer                  = PersistenceBuffer<kEntryMaxBytes>;
     using TypedEndpointEntryCount = EndpointEntryCount<StorageId, StorageData>;
 
     EndpointId endpoint_id;
@@ -357,8 +357,7 @@ struct FabricEntryData : public PersistentData<kFabricMaxBytes>
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    CHIP_ERROR SaveEntry(PersistentStorageDelegate & storage, const StorageId & id, const StorageData & data,
-                         Store & persistentStore)
+    CHIP_ERROR SaveEntry(PersistentStorageDelegate & storage, const StorageId & id, const StorageData & data, Buffer & buffer)
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
         // Look for empty storage space
@@ -372,7 +371,7 @@ struct FabricEntryData : public PersistentData<kFabricMaxBytes>
 
         if (CHIP_NO_ERROR == err)
         {
-            return persistentStore.Save(entry, &storage);
+            return entry.Save(&storage, buffer.BufferSpan());
         }
 
         if (CHIP_ERROR_NOT_FOUND == err) // If not found, entry.index should be the first free index
@@ -395,7 +394,7 @@ struct FabricEntryData : public PersistentData<kFabricMaxBytes>
                 return err;
             }
 
-            err = persistentStore.Save(entry, &storage);
+            err = entry.Save(&storage, buffer.BufferSpan());
 
             // on failure to save the entry, undoes the changes to Fabric Entry Data
             if (CHIP_NO_ERROR != err)
@@ -611,7 +610,7 @@ template <class StorageId, class StorageData>
 template <size_t kEntryMaxBytes>
 CHIP_ERROR FabricTableImpl<StorageId, StorageData>::SetTableEntry(FabricIndex fabric_index, const StorageId & id,
                                                                   const StorageData & data,
-                                                                  PersistentStore<kEntryMaxBytes> & writeBuffer)
+                                                                  PersistenceBuffer<kEntryMaxBytes> & writeBuffer)
 {
     using TypedFabricEntryData = FabricEntryData<StorageId, StorageData, Serializer::kEntryMaxBytes(),
                                                  Serializer::kFabricMaxBytes(), Serializer::kMaxPerFabric()>;
@@ -631,7 +630,7 @@ CHIP_ERROR FabricTableImpl<StorageId, StorageData>::SetTableEntry(FabricIndex fa
 template <class StorageId, class StorageData>
 template <size_t kEntryMaxBytes>
 CHIP_ERROR FabricTableImpl<StorageId, StorageData>::GetTableEntry(FabricIndex fabric_index, StorageId & entry_id,
-                                                                  StorageData & data, PersistentStore<kEntryMaxBytes> & buffer)
+                                                                  StorageData & data, PersistenceBuffer<kEntryMaxBytes> & buffer)
 {
     using TypedFabricEntryData = FabricEntryData<StorageId, StorageData, Serializer::kEntryMaxBytes(),
                                                  Serializer::kFabricMaxBytes(), Serializer::kMaxPerFabric()>;
@@ -643,7 +642,7 @@ CHIP_ERROR FabricTableImpl<StorageId, StorageData>::GetTableEntry(FabricIndex fa
     ReturnErrorOnFailure(fabric.Load(mStorage));
     VerifyOrReturnError(fabric.Find(entry_id, table_entry.index) == CHIP_NO_ERROR, CHIP_ERROR_NOT_FOUND);
 
-    CHIP_ERROR err = buffer.Load(table_entry, mStorage);
+    CHIP_ERROR err = table_entry.Load(mStorage, MutableByteSpan(buffer.mBuffer));
 
     // If entry.Load returns "buffer too small", the entry in memory is too big to be retrieved (this could happen if the
     // kEntryMaxBytes was reduced by OTA) and therefore must be deleted as is is no longer considered accessible.
@@ -800,12 +799,12 @@ void FabricTableImpl<StorageId, StorageData>::SetTableSize(uint16_t endpointTabl
 
 template <class StorageId, class StorageData>
 template <size_t kEntryMaxBytes, class UnaryFunc>
-CHIP_ERROR FabricTableImpl<StorageId, StorageData>::IterateEntries(FabricIndex fabric, PersistentStore<kEntryMaxBytes> & store,
+CHIP_ERROR FabricTableImpl<StorageId, StorageData>::IterateEntries(FabricIndex fabric, PersistenceBuffer<kEntryMaxBytes> & buffer,
                                                                    UnaryFunc iterateFn)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
-    EntryIteratorImpl<kEntryMaxBytes> iterator(*this, fabric, mEndpointId, mMaxPerFabric, mMaxPerEndpoint, store);
+    EntryIteratorImpl<kEntryMaxBytes> iterator(*this, fabric, mEndpointId, mMaxPerFabric, mMaxPerEndpoint, buffer);
     return iterateFn(iterator);
 }
 
@@ -813,9 +812,9 @@ template <class StorageId, class StorageData>
 template <size_t kEntryMaxBytes>
 FabricTableImpl<StorageId, StorageData>::EntryIteratorImpl<kEntryMaxBytes>::EntryIteratorImpl(
     FabricTableImpl & provider, FabricIndex fabricIdx, EndpointId endpoint, uint16_t maxPerFabric, uint16_t maxPerEndpoint,
-    PersistentStore<kEntryMaxBytes> & store) :
+    PersistenceBuffer<kEntryMaxBytes> & buffer) :
     mProvider(provider),
-    mStore(store), mFabric(fabricIdx), mEndpoint(endpoint), mMaxPerFabric(maxPerFabric), mMaxPerEndpoint(maxPerEndpoint)
+    mBuffer(buffer), mFabric(fabricIdx), mEndpoint(endpoint), mMaxPerFabric(maxPerFabric), mMaxPerEndpoint(maxPerEndpoint)
 {
     using TypedFabricEntryData = FabricEntryData<StorageId, StorageData, Serializer::kEntryMaxBytes(),
                                                  Serializer::kFabricMaxBytes(), Serializer::kMaxPerFabric()>;
@@ -850,7 +849,7 @@ bool FabricTableImpl<StorageId, StorageData>::EntryIteratorImpl<kEntryMaxBytes>:
         if (fabric.entry_map[mEntryIndex].IsValid())
         {
             TableEntryData<StorageId, StorageData> entry(mEndpoint, mFabric, output.mStorageId, output.mStorageData, mEntryIndex);
-            VerifyOrReturnError(mStore.Load(entry, mProvider.mStorage) == CHIP_NO_ERROR, false);
+            VerifyOrReturnError(entry.Load(mProvider.mStorage, mBuffer.BufferSpan()) == CHIP_NO_ERROR, false);
             mEntryIndex++;
 
             return true;
