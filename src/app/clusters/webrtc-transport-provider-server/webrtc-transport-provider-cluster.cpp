@@ -658,8 +658,8 @@ WebRTCTransportProviderServer::HandleSolicitOffer(CommandHandler & commandHandle
 
     args.sessionId             = sessionId;
     args.streamUsage           = req.streamUsage;
-    args.videoStreamId         = req.videoStreamID;
-    args.audioStreamId         = req.audioStreamID;
+    args.videoStreamId         = videoStreamID;
+    args.audioStreamId         = audioStreamID;
     args.peerNodeId            = GetNodeIdFromCtx(commandHandler);
     args.fabricIndex           = commandHandler.GetAccessingFabricIndex();
     args.originatingEndpointId = req.originatingEndpointID;
