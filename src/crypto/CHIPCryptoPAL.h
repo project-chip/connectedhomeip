@@ -541,6 +541,19 @@ struct alignas(size_t) P256KeypairContext
  */
 using P256SerializedKeypair = SensitiveDataBuffer<kP256_PublicKey_Length + kP256_PrivateKey_Length>;
 
+/**
+ * A platform-specific P256 keypair handle that is suitable for persistence.
+ * On platforms that don't use PSA (or a similar API) this is simply a P256SerializedKeypair.
+ *
+ * Note that there are no general APIs in the CHIP Crypto PAL that operate on
+ * P256KeypairHandles; such APIs are the domain of the relevant key store interfaces.
+ */
+#if CHIP_CONFIG_P256_KEYPAIR_HANDLE_SIZE > 0
+using P256KeypairHandle = SensitiveDataBuffer<CHIP_CONFIG_P256_KEYPAIR_HANDLE_SIZE>;
+#else
+using P256KeypairHandle = P256SerializedKeypair;
+#endif
+
 // Base class of P256Keypair. Do not use directly.
 class P256KeypairBase : public ECPKeypair<P256PublicKey, P256ECDHDerivedSecret, P256ECDSASignature>
 {
