@@ -223,7 +223,7 @@ struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementC
 
         mOldGroupProvider = Credentials::GetGroupDataProvider();
         mRealProvider.SetStorageDelegate(&mTestContext.StorageDelegate());
-        mRealProvider.SetSessionKeystore(&mMockKeystore);
+        mRealProvider.SetSessionKeystore(&mOpKeyStore);
         ASSERT_EQ(mRealProvider.Init(), CHIP_NO_ERROR);
         Credentials::SetGroupDataProvider(&mRealProvider);
         tester.SetFabricIndex(TestHelpers::kTestFabricIndex);
