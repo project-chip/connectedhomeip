@@ -213,12 +213,12 @@ namespace app {
 namespace Clusters {
 namespace WebRTCTransportProvider {
 
-WebRTCTransportProviderServer::WebRTCTransportProviderServer(EndpointId endpointId, Delegate & delegate) :
+WebRTCTransportProviderCluster::WebRTCTransportProviderCluster(EndpointId endpointId, Delegate & delegate) :
     DefaultServerCluster({ endpointId, Id }), mDelegate(delegate)
 {}
 
-DataModel::ActionReturnStatus WebRTCTransportProviderServer::ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                                           AttributeValueEncoder & encoder)
+DataModel::ActionReturnStatus WebRTCTransportProviderCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                                            AttributeValueEncoder & encoder)
 {
     switch (request.path.mAttributeId)
     {
@@ -242,9 +242,9 @@ DataModel::ActionReturnStatus WebRTCTransportProviderServer::ReadAttribute(const
     }
 }
 
-std::optional<DataModel::ActionReturnStatus> WebRTCTransportProviderServer::InvokeCommand(const DataModel::InvokeRequest & request,
-                                                                                          TLV::TLVReader & input_arguments,
-                                                                                          CommandHandler * handler)
+std::optional<DataModel::ActionReturnStatus> WebRTCTransportProviderCluster::InvokeCommand(const DataModel::InvokeRequest & request,
+                                                                                           TLV::TLVReader & input_arguments,
+                                                                                           CommandHandler * handler)
 {
     FabricIndex accessingFabricIndex = handler->GetAccessingFabricIndex();
 
@@ -280,21 +280,21 @@ std::optional<DataModel::ActionReturnStatus> WebRTCTransportProviderServer::Invo
     }
 }
 
-CHIP_ERROR WebRTCTransportProviderServer::AcceptedCommands(const ConcreteClusterPath & path,
-                                                           ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+CHIP_ERROR WebRTCTransportProviderCluster::AcceptedCommands(const ConcreteClusterPath & path,
+                                                            ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     return builder.ReferenceExisting(kAcceptedCommands);
 }
 
-CHIP_ERROR WebRTCTransportProviderServer::Attributes(const ConcreteClusterPath & path,
-                                                     ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+CHIP_ERROR WebRTCTransportProviderCluster::Attributes(const ConcreteClusterPath & path,
+                                                      ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     AttributeListBuilder listBuilder(builder);
-    return listBuilder.Append(Span(kMandatoryAttributes), Span<AttributeListBuilder::OptionalAttributeEntry>());
+    return listBuilder.Append(Span(kMandatoryMetadata), {});
 }
 
 // Helper functions
-WebRTCSessionStruct * WebRTCTransportProviderServer::FindSession(uint16_t sessionId)
+WebRTCSessionStruct * WebRTCTransportProviderCluster::FindSession(uint16_t sessionId)
 {
     for (auto & session : mCurrentSessions)
     {
@@ -307,7 +307,7 @@ WebRTCSessionStruct * WebRTCTransportProviderServer::FindSession(uint16_t sessio
     return nullptr;
 }
 
-WebRTCTransportProviderServer::UpsertResultEnum WebRTCTransportProviderServer::UpsertSession(const WebRTCSessionStruct & session)
+WebRTCTransportProviderCluster::UpsertResultEnum WebRTCTransportProviderCluster::UpsertSession(const WebRTCSessionStruct & session)
 {
     assertChipStackLockedByCurrentThread();
 
@@ -331,7 +331,7 @@ WebRTCTransportProviderServer::UpsertResultEnum WebRTCTransportProviderServer::U
     return result;
 }
 
-void WebRTCTransportProviderServer::RemoveSession(uint16_t sessionId)
+void WebRTCTransportProviderCluster::RemoveSession(uint16_t sessionId)
 {
     assertChipStackLockedByCurrentThread();
 
@@ -349,8 +349,8 @@ void WebRTCTransportProviderServer::RemoveSession(uint16_t sessionId)
     }
 }
 
-WebRTCSessionStruct * WebRTCTransportProviderServer::CheckForMatchingSession(const CommandHandler & commandHandler,
-                                                                             uint16_t sessionId)
+WebRTCSessionStruct * WebRTCTransportProviderCluster::CheckForMatchingSession(const CommandHandler & commandHandler,
+                                                                              uint16_t sessionId)
 {
     WebRTCSessionStruct * session = FindSession(sessionId);
     if (session == nullptr)
@@ -370,7 +370,7 @@ WebRTCSessionStruct * WebRTCTransportProviderServer::CheckForMatchingSession(con
     return session;
 }
 
-CHIP_ERROR WebRTCTransportProviderServer::GenerateSessionId(uint16_t & outSessionId)
+CHIP_ERROR WebRTCTransportProviderCluster::GenerateSessionId(uint16_t & outSessionId)
 {
     static uint16_t nextSessionId = 0;
     uint16_t candidateId          = 0;
@@ -399,7 +399,7 @@ CHIP_ERROR WebRTCTransportProviderServer::GenerateSessionId(uint16_t & outSessio
     return CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
 }
 
-Status WebRTCTransportProviderServer::CheckPrivacyModes(const char * commandName, StreamUsageEnum streamUsage)
+Status WebRTCTransportProviderCluster::CheckPrivacyModes(const char * commandName, StreamUsageEnum streamUsage)
 {
     bool hardPrivacyModeActive = false;
     CHIP_ERROR err             = mDelegate.IsHardPrivacyModeActive(hardPrivacyModeActive);
@@ -446,7 +446,7 @@ Status WebRTCTransportProviderServer::CheckPrivacyModes(const char * commandName
     return Status::Success;
 }
 
-Status WebRTCTransportProviderServer::CheckTurnsOrStunsRequiresUTCTime(
+Status WebRTCTransportProviderCluster::CheckTurnsOrStunsRequiresUTCTime(
     const char * commandName, const Optional<DataModel::DecodableList<ICEServerDecodableStruct>> & iceServers)
 {
     if (!iceServers.HasValue())
@@ -498,8 +498,8 @@ Status WebRTCTransportProviderServer::CheckTurnsOrStunsRequiresUTCTime(
 
 // Command Handlers
 std::optional<DataModel::ActionReturnStatus>
-WebRTCTransportProviderServer::HandleSolicitOffer(CommandHandler & commandHandler,
-                                                  const Commands::SolicitOffer::DecodableType & req)
+WebRTCTransportProviderCluster::HandleSolicitOffer(CommandHandler & commandHandler,
+                                                   const Commands::SolicitOffer::DecodableType & req)
 {
     auto videoStreamID = req.videoStreamID;
     auto audioStreamID = req.audioStreamID;
@@ -742,8 +742,8 @@ WebRTCTransportProviderServer::HandleSolicitOffer(CommandHandler & commandHandle
 }
 
 std::optional<DataModel::ActionReturnStatus>
-WebRTCTransportProviderServer::HandleProvideOffer(CommandHandler & commandHandler,
-                                                  const Commands::ProvideOffer::DecodableType & req)
+WebRTCTransportProviderCluster::HandleProvideOffer(CommandHandler & commandHandler,
+                                                   const Commands::ProvideOffer::DecodableType & req)
 {
     auto webRTCSessionID = req.webRTCSessionID;
     auto videoStreamID   = req.videoStreamID;
@@ -1006,8 +1006,8 @@ WebRTCTransportProviderServer::HandleProvideOffer(CommandHandler & commandHandle
 }
 
 std::optional<DataModel::ActionReturnStatus>
-WebRTCTransportProviderServer::HandleProvideAnswer(CommandHandler & commandHandler,
-                                                   const Commands::ProvideAnswer::DecodableType & req)
+WebRTCTransportProviderCluster::HandleProvideAnswer(CommandHandler & commandHandler,
+                                                    const Commands::ProvideAnswer::DecodableType & req)
 {
     uint16_t sessionId = req.webRTCSessionID;
     auto sdpSpan       = req.sdp;
@@ -1023,8 +1023,8 @@ WebRTCTransportProviderServer::HandleProvideAnswer(CommandHandler & commandHandl
 }
 
 std::optional<DataModel::ActionReturnStatus>
-WebRTCTransportProviderServer::HandleProvideICECandidates(CommandHandler & commandHandler,
-                                                          const Commands::ProvideICECandidates::DecodableType & req)
+WebRTCTransportProviderCluster::HandleProvideICECandidates(CommandHandler & commandHandler,
+                                                           const Commands::ProvideICECandidates::DecodableType & req)
 {
     // Extract command fields from the request.
     uint16_t sessionId = req.webRTCSessionID;
@@ -1065,7 +1065,7 @@ WebRTCTransportProviderServer::HandleProvideICECandidates(CommandHandler & comma
 }
 
 std::optional<DataModel::ActionReturnStatus>
-WebRTCTransportProviderServer::HandleEndSession(CommandHandler & commandHandler, const Commands::EndSession::DecodableType & req)
+WebRTCTransportProviderCluster::HandleEndSession(CommandHandler & commandHandler, const Commands::EndSession::DecodableType & req)
 {
     // Extract command fields from the request.
     uint16_t sessionId = req.webRTCSessionID;
@@ -1097,13 +1097,3 @@ WebRTCTransportProviderServer::HandleEndSession(CommandHandler & commandHandler,
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
-void MatterWebRTCTransportProviderPluginServerInitCallback()
-{
-    ChipLogProgress(Zcl, "Initializing WebRTC Transport Provider cluster.");
-}
-
-void MatterWebRTCTransportProviderPluginServerShutdownCallback()
-{
-    ChipLogProgress(Zcl, "Shutdown WebRTC Transport Provider cluster.");
-}

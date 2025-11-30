@@ -54,7 +54,7 @@ public:
 
     void SetMediaController(MediaController * mediaController);
 
-    void SetWebRTCTransportProvider(WebRTCTransportProviderServer * webRTCTransportProvider);
+    void SetWebRTCTransportProvider(WebRTCTransportProviderCluster * webRTCTransportProvider);
 
     CHIP_ERROR HandleSolicitOffer(const OfferRequestArgs & args, WebRTCSessionStruct & outSession,
                                   bool & outDeferredOffer) override;
@@ -149,7 +149,7 @@ private:
 
     MediaController * mMediaController = nullptr;
 
-    WebRTCTransportProviderServer * mWebRTCTransportProvider = nullptr;
+    WebRTCTransportProviderCluster * mWebRTCTransportProvider = nullptr;
 
     // Handle to the Camera Device interface. For accessing other
     // clusters, if required.

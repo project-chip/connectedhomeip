@@ -126,7 +126,7 @@ public:
 
     // Set the WebRTC Transport Provider server instance
     virtual void
-    SetWebRTCTransportProvider(chip::app::Clusters::WebRTCTransportProvider::WebRTCTransportProviderServer * provider) = 0;
+    SetWebRTCTransportProvider(chip::app::Clusters::WebRTCTransportProvider::WebRTCTransportProviderCluster * provider) = 0;
 
     // Getter for CameraAVStreamManagement Delegate
     virtual chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate() = 0;

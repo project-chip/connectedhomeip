@@ -46,7 +46,7 @@ private:
     CameraDeviceInterface * mCameraDevice;
 
     // SDK cluster servers
-    chip::app::LazyRegisteredServerCluster<chip::app::Clusters::WebRTCTransportProvider::WebRTCTransportProviderServer>
+    chip::app::LazyRegisteredServerCluster<chip::app::Clusters::WebRTCTransportProvider::WebRTCTransportProviderCluster>
         mWebRTCTransportProviderServer;
     std::unique_ptr<chip::app::Clusters::ChimeServer> mChimeServerPtr;
     std::unique_ptr<chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtServer> mAVStreamMgmtServerPtr;

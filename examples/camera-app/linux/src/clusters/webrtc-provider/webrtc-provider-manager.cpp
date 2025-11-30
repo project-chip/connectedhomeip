@@ -61,7 +61,7 @@ void WebRTCProviderManager::SetMediaController(MediaController * mediaController
     mMediaController = mediaController;
 }
 
-void WebRTCProviderManager::SetWebRTCTransportProvider(WebRTCTransportProviderServer * webRTCTransportProvider)
+void WebRTCProviderManager::SetWebRTCTransportProvider(WebRTCTransportProviderCluster * webRTCTransportProvider)
 {
     mWebRTCTransportProvider = webRTCTransportProvider;
 }

@@ -348,18 +348,18 @@ public:
     virtual CHIP_ERROR IsUTCTimeNull(bool & isNull) = 0;
 };
 
-class WebRTCTransportProviderServer : public DefaultServerCluster
+class WebRTCTransportProviderCluster : public DefaultServerCluster
 {
 public:
     /**
      * @brief
-     *   Constructs the WebRTCTransportProviderServer with the specified delegate and endpoint.
+     *   Constructs the WebRTCTransportProviderCluster with the specified delegate and endpoint.
      *
      * @param[in] endpointId The Endpoint where the WebRTC Transport Provider cluster is published.
      * @param[in] delegate   A reference to an implementation of the Delegate interface. Must remain
      *                       valid for the lifetime of this object.
      */
-    WebRTCTransportProviderServer(EndpointId endpointId, Delegate & delegate);
+    WebRTCTransportProviderCluster(EndpointId endpointId, Delegate & delegate);
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
