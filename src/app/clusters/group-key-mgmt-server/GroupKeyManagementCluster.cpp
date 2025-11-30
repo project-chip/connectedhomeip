@@ -33,6 +33,28 @@ using namespace chip::DeviceLayer;
 using chip::Protocols::InteractionModel::Status;
 
 namespace {
+// 1. Storage for the injected FabricTable pointer (null by default)
+FabricTable * sFabricTableForTest = nullptr;
+} // namespace
+
+// 2. Public static method to set the test FabricTable (for DI in tests)
+// This is added to the cluster class definition or a utility namespace.
+void GroupKeyManagementCluster::SetFabricTableForTest(FabricTable * table)
+{
+    sFabricTableForTest = table;
+}
+
+// 3. Helper to get the correct FabricTable instance (Injected or Global)
+FabricTable & GetFabricTable()
+{
+    if (sFabricTableForTest != nullptr)
+    {
+        return *sFabricTableForTest;
+    }
+    return Server::GetInstance().GetFabricTable();
+}
+
+namespace {
 struct GroupTableCodec
 {
     static constexpr TLV::Tag TagFabric()
@@ -143,7 +165,7 @@ CHIP_ERROR ReadGroupKeyMap(AttributeValueEncoder & aEncoder)
     return aEncoder.EncodeList([provider](const auto & encoder) -> CHIP_ERROR {
         CHIP_ERROR encodeStatus = CHIP_NO_ERROR;
 
-        for (auto & fabric : Server::GetInstance().GetFabricTable())
+        for (auto & fabric : GetFabricTable())
         {
             auto fabric_index = fabric.GetFabricIndex();
             auto iter         = provider->IterateGroupKeys(fabric_index);
@@ -240,7 +262,7 @@ CHIP_ERROR ReadGroupTable(AttributeValueEncoder & aEncoder)
     CHIP_ERROR err = aEncoder.EncodeList([provider](const auto & encoder) -> CHIP_ERROR {
         CHIP_ERROR encodeStatus = CHIP_NO_ERROR;
 
-        for (auto & fabric : Server::GetInstance().GetFabricTable())
+        for (auto & fabric : GetFabricTable())
         {
             auto fabric_index = fabric.GetFabricIndex();
             auto iter         = provider->IterateGroupInfo(fabric_index);
@@ -289,7 +311,7 @@ bool GetProviderAndFabric(CommandHandler * commandObj, const ConcreteCommandPath
 
     // Internal failures on internal inconsistencies.
     auto provider = GetGroupDataProvider();
-    auto fabric   = Server::GetInstance().GetFabricTable().FindFabricWithIndex(commandObj->GetAccessingFabricIndex());
+    auto fabric   = GetFabricTable().FindFabricWithIndex(commandObj->GetAccessingFabricIndex());
 
     if (nullptr == provider)
     {
