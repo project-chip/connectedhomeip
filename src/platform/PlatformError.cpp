@@ -19,6 +19,7 @@
 #include <platform/PlatformError.h>
 
 #include <lib/core/ErrorStr.h>
+#include <mutex>
 
 #include <string.h>
 
@@ -88,10 +89,12 @@ const char * DescribePlatformError(CHIP_ERROR aError)
 
 void RegisterPlatformErrorFormatter()
 {
-    static std::once_flag sRegistrationFlag;
     static ErrorFormatter sPlatformErrorFormatter = { FormatPlatformError, nullptr };
-
-    std::call_once(sRegistrationFlag, []() { RegisterErrorFormatter(&sPlatformErrorFormatter); });
+    static bool sRegistered                       = false;
+    if (sRegistered)
+        return;
+    RegisterErrorFormatter(&sPlatformErrorFormatter);
+    sRegistered = true;
 }
 
 bool FormatPlatformError(char * buf, uint16_t bufSize, CHIP_ERROR err)
