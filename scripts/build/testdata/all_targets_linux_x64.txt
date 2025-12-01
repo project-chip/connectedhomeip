@@ -13,7 +13,7 @@ linux-{arm64,x64}-{address-resolve-tool,air-purifier,air-quality-sensor,all-clus
 linux-x64-efr32-test-runner[-clang]
 imx-{all-clusters-app,all-clusters-minimal-app,chip-tool,lighting-app,ota-provider-app,thermostat}[-release][-trusty]
 infineon-psoc6-{all-clusters,all-clusters-minimal,light,lock}[-ota][-trustm][-updateimage]
-nxp-{mcxw71,mcxw72,rt1060,rt1170,rw61x}-{freertos,zephyr}-{all-clusters,contact-sensor,laundry-washer,lighting,lock-app,thermostat,unit-test}[-cmake][-dac-conversion][-ethernet][-evkc][-factory][-factory-build][-frdm][-iw416][-iw610][-iwx12][-lit][-log-all][-log-error][-log-none][-log-progress][-low-power][-matter-shell][-mtd][-no-ble][-ota][-rotating-id][-se05x][-smu2][-sw-v2][-thread][-w8801][-wifi]
+nxp-{mcxw71,mcxw72,rt1060,rt1170,rw61x}-{freertos,zephyr}-{all-clusters,contact-sensor,laundry-washer,lighting,lock-app,thermostat,unit-test}[-dac-conversion][-ethernet][-evkc][-factory][-factory-build][-frdm][-gn][-iw416][-iw610][-iwx12][-lit][-log-all][-log-error][-log-none][-log-progress][-low-power][-matter-shell][-mtd][-no-ble][-ota][-rotating-id][-se05x][-smu2][-sw-v2][-thread][-w8801][-wifi]
 nrf-{nrf52840dk,nrf52840dongle,nrf5340dk}-{all-clusters,all-clusters-minimal,light,light-switch,lock,pump,pump-controller,shell,window-covering}[-rpc]
 nrf-native-sim-tests
 nuttx-x64-light

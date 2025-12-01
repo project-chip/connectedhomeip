@@ -72,7 +72,7 @@ class TC_FAN_3_4(MatterBaseTest):
         return "[TC-FAN-3.4] Optional wind functionality with DUT as Server"
 
     def steps_TC_FAN_3_4(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read from the DUT the WindSupport attribute and store"),
             TestStep(3, "SleepWind is supported, so write 0x01 to WindSetting"),
@@ -83,10 +83,13 @@ class TC_FAN_3_4(MatterBaseTest):
             TestStep(8, "NaturalWind is not supported, so write 0x02 to WindSetting to check for constraint error"),
             TestStep(9, "Write WindSetting to 0x00"),
         ]
-        return steps
 
     def pics_TC_FAN_3_4(self) -> list[str]:
         return ["FAN.S"]
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_FAN_3_4(self):
@@ -95,7 +98,7 @@ class TC_FAN_3_4(MatterBaseTest):
             logger.info("Test skipped because PICS FAN.S.F03 is not set")
             return
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(1)
 

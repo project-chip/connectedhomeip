@@ -75,7 +75,7 @@ class FactoryDataWriter:
     def WriteBits(self, bits, offset, input, numberOfBits, totalPayloadSizeInBits):
         if ((offset + numberOfBits) > totalPayloadSizeInBits):
             print("THIS IS NOT VALID")
-            return
+            return None
         # input < 1u << numberOfBits);
 
         index = offset

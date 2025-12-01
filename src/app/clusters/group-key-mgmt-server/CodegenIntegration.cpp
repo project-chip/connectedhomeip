@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/group-key-mgmt-server/group-key-mgmt-cluster.h>
+#include <app/clusters/group-key-mgmt-server/GroupKeyManagementCluster.h>
 #include <app/static-cluster-config/GroupKeyManagement.h>
 #include <app/util/config.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>

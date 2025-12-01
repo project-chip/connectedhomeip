@@ -16,7 +16,7 @@
  */
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/localization-configuration-server/localization-configuration-cluster.h>
+#include <app/clusters/localization-configuration-server/LocalizationConfigurationCluster.h>
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
