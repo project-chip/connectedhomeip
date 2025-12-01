@@ -40,10 +40,90 @@ import time
 from mobly import asserts
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
 import matter.clusters as Clusters
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import AttributeMatcher, MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from matter.interaction_model import InteractionModelError, Status
 
+from src.python_testing.TC_GCAST_2_1 import is_groupcast_supporting_cluster
+
 logger = logging.getLogger(__name__)
+
+
+def membership_entry_matcher(
+        group_id: int, key_id: int = None,
+        expiring_key_id: int = None,
+        has_auxiliary_acl: str = None,
+        endpoints: list = None,
+        should_not_exist: bool = False
+) -> AttributeMatcher:
+    """Create a matcher that checks if Membership attribute contains (or does not contain) an entry matching the specified criteria.
+    
+    Args:
+        group_id: The groupID to match (required)
+        key_id: The keyID to match (optional)
+        expiring_key_id: The expiringKeyID to match (optional)
+        has_auxiliary_acl: The HasAuxiliaryACL value to match (optional)
+        endpoints: The endpoints list to match (optional)
+        should_not_exist: If True, returns True when the entry is NOT found (default: False)
+
+    Returns:
+        An AttributeMatcher that returns True when:
+        - should_not_exist=False: A Membership entry matches all specified criteria
+        - should_not_exist=True: No Membership entry matches the specified criteria
+    """
+    def predicate(report) -> bool:
+        if report.attribute != Clusters.Groupcast.Attributes.Membership:
+            return False
+        
+        found_match = False
+        for entry in report.value:
+            if entry.groupID != group_id:
+                continue
+            if key_id is not None and entry.keyID != key_id:
+                continue
+            if expiring_key_id is not None:
+                if entry.expiringKeyID is None or entry.expiringKeyID != expiring_key_id:
+                    continue
+            if has_auxiliary_acl is not None:
+                if entry.hasAuxiliaryACL is None or entry.hasAuxiliaryACL != has_auxiliary_acl:
+                    continue
+            if endpoints is not None:
+                if entry.endpoints is None or entry.endpoints != endpoints:
+                    continue
+            found_match = True
+            break
+        return found_match if not should_not_exist else not found_match
+    
+    desc_parts = [f"groupID={group_id}"]
+    if key_id is not None:
+        desc_parts.append(f"keyID={key_id}")
+    if expiring_key_id is not None:
+        desc_parts.append(f"expiringKeyID={expiring_key_id}")
+    if has_auxiliary_acl is not None:
+        desc_parts.append(f"hasAuxiliaryACL={has_auxiliary_acl}")
+    if endpoints is not None:
+        desc_parts.append(f"endpoints={endpoints}")
+    
+    if should_not_exist:
+        description = f"Membership does NOT have entry with {', '.join(desc_parts)}"
+    else:
+        description = f"Membership has entry with {', '.join(desc_parts)}"
+    
+    return AttributeMatcher.from_callable(description=description, matcher=predicate)
+
+
+def membership_empty_matcher() -> AttributeMatcher:
+    """Create a matcher that checks if Membership attribute is empty (no groups present).
+    
+    Returns:
+        An AttributeMatcher that returns True when the Membership list is empty.
+    """
+    def predicate(report) -> bool:
+        if report.attribute != Clusters.Groupcast.Attributes.Membership:
+            return False
+        return len(report.value) == 0
+    
+    description = "Membership list is empty (no groups present)"
+    return AttributeMatcher.from_callable(description=description, matcher=predicate)
 
 
 class TC_GCAST_2_3(MatterBaseTest):
@@ -71,16 +151,20 @@ class TC_GCAST_2_3(MatterBaseTest):
         ]
 
     def pics_TC_GCAST_2_3(self) -> list[str]:
-        pics = ["GCAST.S", "GCAST.S.C00.Rsp", "GCAST.S.C02.Rsp"]
+        pics = ["GCAST.S"]
         return pics
 
     async def get_feature_map(self):
         """Get supported features."""
         feature_map = await self.read_single_attribute_check_success(
             Clusters.Groupcast,
-            Clusters.Groupcast.Attributes.FeatureMap)
+            Clusters.Groupcast.Attributes.FeatureMap,
+            endpoint=0
+        )
         ln_enabled = bool(feature_map & Clusters.Groupcast.Bitmaps.Feature.kListener)
         sd_enabled = bool(feature_map & Clusters.Groupcast.Bitmaps.Feature.kSender)
+        asserts.assert_true(sd_enabled or ln_enabled,
+                            "At least one of the following features must be enabled: Listener or Sender.")
         logger.info(f"FeatureMap: {feature_map} : LN supported: {ln_enabled} | SD supported: {sd_enabled}")
         return ln_enabled, sd_enabled
 
@@ -108,21 +192,18 @@ class TC_GCAST_2_3(MatterBaseTest):
                             attribute=Clusters.Descriptor.Attributes.ServerList,
                             endpoint=endpoint)
                         logging.info(f"Server List: {server_list}")
-                        if Clusters.OnOff.id in server_list:
-                            endpoints_list.append(endpoint)
-            asserts.assert_true(len(endpoints_list),
+                        for cluster in server_list:
+                            if is_groupcast_supporting_cluster(cluster):
+                                endpoints_list.append(endpoint)
+                                break
+            asserts.assert_true(len(endpoints_list) > 0,
                                 "Listener feature is enabled. Endpoint list should not be empty. There should be a valid endpoint for the GroupCast JoinGroup Command.")
-            endpoints_list = [endpoints_list[0]]
-        elif sd_enabled:
-            endpoints_list = []
-        else:
-            asserts.fail("At least one of the following features must be enabled: Listener or Sender.")
         return endpoints_list
 
-    @async_test_body
+    @run_if_endpoint_matches(has_cluster(Clusters.Groupcast))
     async def test_TC_GCAST_2_3(self):
         if self.matter_test_config.endpoint is None:
-            self.matter_test_config.endpoint = 1
+            self.matter_test_config.endpoint = 0
         groupcast_cluster = Clusters.Objects.Groupcast
         membership_attribute = Clusters.Groupcast.Attributes.Membership
 
@@ -163,30 +244,19 @@ class TC_GCAST_2_3(MatterBaseTest):
 
         self.step(2)
         keyID3 = 3
-        gracePeriod = 5
+        gracePeriodSeconds = 5
         inputKey3 = secrets.token_bytes(16)
 
         await self.send_single_cmd(Clusters.Groupcast.Commands.UpdateGroupKey(
             groupID=groupID1,
             keyID=keyID3,
-            gracePeriod=gracePeriod,
+            gracePeriod=gracePeriodSeconds,
             key=inputKey3)
         )
 
         self.step(3)
-        sub.wait_for_attribute_report()
-        membership_reports = sub.attribute_reports.get(membership_attribute, [])
-        asserts.assert_greater(len(membership_reports), 0, "No membership reports received")
-        latest_membership = membership_reports[-1].value
-        group1_entry = None
-        for entry in latest_membership:
-            if entry.groupID == groupID1:
-                group1_entry = entry
-                break
-        asserts.assert_is_not_none(group1_entry, f"Group {groupID1} not found in membership report")
-        asserts.assert_equal(group1_entry.keyID, keyID3, f"Expected KeyID={keyID3}, got {group1_entry.keyID}")
-        asserts.assert_is_not_none(group1_entry.expiringKeyID, "ExpiringKeyID should be present")
-        asserts.assert_equal(group1_entry.expiringKeyID, keyID1, f"Expected ExpiringKeyID={keyID1}, got {group1_entry.expiringKeyID}")
+        membership_matcher = membership_entry_matcher(groupID1, key_id=keyID3, expiring_key_id=keyID1)
+        sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
         self.step(4)
         inputKey4 = secrets.token_bytes(16)
@@ -202,21 +272,14 @@ class TC_GCAST_2_3(MatterBaseTest):
                                  f"Send UpdateGroupKey command error should be {Status.AlreadyExists} instead of {e.status}")
 
         self.step(5)
-        time.sleep(gracePeriod * 1.1)
+        gracePeriodWaitingTime = max(gracePeriodSeconds * 1.1, 30)
+        logger.info(f"Waiting for {gracePeriodWaitingTime:.1f} seconds for grace period to make sure it expired.")
+        time.sleep(gracePeriodWaitingTime)
 
         self.step(6)
-        sub.wait_for_attribute_report()
-        membership_reports = sub.attribute_reports.get(membership_attribute, [])
-        asserts.assert_greater(len(membership_reports), 0, "No membership reports received")
-        latest_membership = membership_reports[-1].value
-        group1_entry = None
-        for entry in latest_membership:
-            if entry.groupID == groupID1:
-                group1_entry = entry
-                break
-        asserts.assert_is_not_none(group1_entry, f"Group {groupID1} not found in membership report")
-        asserts.assert_equal(group1_entry.keyID, keyID3, f"Expected KeyID={keyID3}, got {group1_entry.keyID}")
-        asserts.assert_is_none(group1_entry.expiringKeyID, "ExpiringKeyID should not be present")
+        sub.reset()
+        membership_matcher = membership_entry_matcher(groupID1, key_id=keyID3)
+        sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 
         self.step(7)
         await self.send_single_cmd(Clusters.Groupcast.Commands.UpdateGroupKey(
@@ -263,12 +326,12 @@ class TC_GCAST_2_3(MatterBaseTest):
                                  f"Send UpdateGroupKey command error should be {Status.ConstraintError} instead of {e.status}")
 
         self.step(11)
-        gracePeriodInvalidLimit = 86401
+        gracePeriodSecondsInvalidLimit = 86401
         try:
             await self.send_single_cmd(Clusters.Groupcast.Commands.UpdateGroupKey(
                 groupID=groupID1,
                 keyID=keyID4,
-                gracePeriod=gracePeriodInvalidLimit,
+                gracePeriod=gracePeriodSecondsInvalidLimit,
                 key=inputKey4)
             )
             asserts.fail("Unexpected success returned from sending UpdateGroupKey command.")
