@@ -125,7 +125,7 @@ def generate_dm_gni_file():
 
 def generate_credential_gni_file():
     _generate_gni_file(credentials_dir, CREDENTIALS_PREFIX, [
-                       "**/paa-root-certs/**/*.der", "**/paa-root-certs/**/*.pem", "**/cd-certs/**/*.der", "**/cd-certs/**/*.pem"], "credential_files.gni")
+                       "paa-root-certs/**/*.der", "paa-root-certs/**/*.pem", "cd-certs/**/*.der", "cd-certs/**/*.pem"], "credential_files.gni")
 
 
 # Run the function to generate the .gni file
