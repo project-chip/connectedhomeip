@@ -189,20 +189,21 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
                     continue
 
     # Grabbing the header from the XML templates
-    inputFile = open(f"{xmlPath}{fileName}", "r")
-    outputFile = open(f"{outputPathStr}/{fileName}", "ab")
-    xmlHeader = ""
-    inputLine = inputFile.readline().lstrip()
+    with (open(f"{xmlPath}{fileName}") as inputFile,
+          open(f"{outputPathStr}/{fileName}", "ab") as outputFile):
 
-    while 'clusterPICS' not in inputLine:
-        xmlHeader += inputLine
+        xmlHeader = ""
         inputLine = inputFile.readline().lstrip()
 
-    # Write the PICS XML header
-    outputFile.write(xmlHeader.encode())
+        while 'clusterPICS' not in inputLine:
+            xmlHeader += inputLine
+            inputLine = inputFile.readline().lstrip()
 
-    # Write the PICS XML data
-    tree.write(outputFile)
+        # Write the PICS XML header
+        outputFile.write(xmlHeader.encode())
+
+        # Write the PICS XML data
+        tree.write(outputFile)
 
 
 async def DeviceMapping(devCtrl, nodeID, outputPathStr):
