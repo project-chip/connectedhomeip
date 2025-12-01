@@ -378,9 +378,7 @@ class CoreBluetoothManager(ChipBleBase):
         svcId = bytearray(CHIP_SERVICE.data().bytes().tobytes())
 
         if self.devCtrl:
-            txEvent = BleTxEvent(
-                charId=charId, svcId=svcId, status=bool(not error)
-            )
+            txEvent = BleTxEvent(charId=charId, svcId=svcId, status=not error)
             self.chip_queue.put(txEvent)
             self.devCtrl.DriveBleIO()
 
@@ -393,7 +391,7 @@ class CoreBluetoothManager(ChipBleBase):
         charId = bytearray(characteristic.UUID().data().bytes().tobytes())
         svcId = bytearray(CHIP_SERVICE.data().bytes().tobytes())
         # look at error and send True/False on Success/Failure
-        success = bool(not error)
+        success = not error
         if characteristic.isNotifying():
             operation = BLE_SUBSCRIBE_OPERATION_SUBSCRIBE
             self.subscribe_condition = True
