@@ -16,5 +16,5 @@
 #pragma once
 
 // This header is for backwards compatibility only with codegen cluster
-// implementations. we just include the codegen version
+// implementations. We just include the codegen version
 #include "codegen/on-off-server.h" // nogncheck
