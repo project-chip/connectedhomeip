@@ -69,7 +69,6 @@
 
 import asyncio
 import logging
-from os import path
 from time import time
 
 from mobly import asserts
