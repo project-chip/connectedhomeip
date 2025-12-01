@@ -452,8 +452,7 @@ void ICDManager::UpdateOperationState(OperationalState state)
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
         )
         {
-            DeviceLayer::SystemLayer().StartTimer(configData.GetModeBasedIdleModeDuration(),
-                                                                           OnIdleModeDone, this);
+            DeviceLayer::SystemLayer().StartTimer(configData.GetModeBasedIdleModeDuration(), OnIdleModeDone, this);
         }
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
