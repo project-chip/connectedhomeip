@@ -41,12 +41,11 @@ class Instance
 public:
     Instance(EndpointId aEndpointId, Delegate & aDelegate, BitMask<Feature> aFeature,
              BitMask<OptionalAttributes> aOptionalAttributes) :
-        mEndpointId(aEndpointId), mDelegate(aDelegate), mFeature(aFeature), mOptionalAttrs(aOptionalAttributes),
-        mCluster(PowerTopologyCluster::Config{
-            .endpointId = aEndpointId,
-            .delegate   = aDelegate,
-            .features   = aFeature,
-        })
+        mFeature(aFeature), mOptionalAttrs(aOptionalAttributes), mCluster(PowerTopologyCluster::Config{
+                                                                     .endpointId = aEndpointId,
+                                                                     .delegate   = aDelegate,
+                                                                     .features   = aFeature,
+                                                                 })
     {}
     ~Instance() { Shutdown(); }
 
@@ -57,8 +56,6 @@ public:
     bool SupportsOptAttr(OptionalAttributes aOptionalAttrs) const;
 
 private:
-    EndpointId mEndpointId;
-    Delegate & mDelegate;
     BitMask<Feature> mFeature;
     BitMask<OptionalAttributes> mOptionalAttrs;
     RegisteredServerCluster<PowerTopologyCluster> mCluster;

@@ -36,8 +36,7 @@ void Instance::Shutdown()
     if (err != CHIP_NO_ERROR)
     {
 #if CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
-        ChipLogError(AppServer, "Failed to unregister cluster %u/" ChipLogFormatMEI ": %" CHIP_ERROR_FORMAT,
-                     mCluster.Cluster().GetPaths()[0].mEndpointId, ChipLogValueMEI(PowerTopology::Id), err.Format());
+        ChipLogError(AppServer, "Failed to unregister Power Topology cluster");
 #endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
     }
 }
