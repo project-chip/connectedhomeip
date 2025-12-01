@@ -22,10 +22,10 @@
 #include <clusters/IlluminanceMeasurement/Metadata.h>
 #include <platform/DeviceInfoProvider.h>
 
+namespace chip::app::Clusters {
+
 using namespace chip::app::Clusters::IlluminanceMeasurement;
 using namespace chip::app::Clusters::IlluminanceMeasurement::Attributes;
-
-namespace chip::app::Clusters {
 
 class IlluminanceMeasurementCluster : public DefaultServerCluster
 {
