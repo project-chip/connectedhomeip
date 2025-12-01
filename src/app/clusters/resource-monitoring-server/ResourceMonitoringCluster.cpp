@@ -241,7 +241,7 @@ void ResourceMonitoringCluster::LoadPersistentAttributes()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // same attribuyte ID for all clusters
+    // same attribute ID for all clusters
     constexpr AttributeId kAttributeId = HepaFilterMonitoring::Attributes::LastChangedTime::Id;
     static_assert(kAttributeId == HepaFilterMonitoring::Attributes::LastChangedTime::Id);
     static_assert(kAttributeId == ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::Id);
