@@ -394,6 +394,36 @@ jobs:
             # to fail (exit nonzero) on match.  And we want to exclude this file,
             # to avoid our grep regexp matching itself.
             - name:
+                Check for use of "VerifyOr*(expr==CHIP_NO_ERROR", which should
+                probably be "SuccessOr*(expr", "ReturnErrorOnFailure(expr", or "ReturnOnFailure(expr"
+              if: always()
+              run: |
+                git grep -I -n 'VerifyOr\(Exit\|Die\|Return\|ReturnError\|ReturnValue\)(.*== *CHIP_NO_ERROR' -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
+
+            # git grep exits with 0 if it finds a match, but we want
+            # to fail (exit nonzero) on match.  And we want to exclude this file,
+            # to avoid our grep regexp matching itself.
+            - name:
+                Check for use of "ChipLogError(... ChipErrorStr(", which should
+                be "ChipLogFailure(err, ...)"
+              if: always()
+              run: |
+                git grep -I -n 'ChipLogError(.*ErrorStr(' -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
+
+            # git grep exits with 0 if it finds a match, but we want
+            # to fail (exit nonzero) on match.  And we want to exclude this file,
+            # to avoid our grep regexp matching itself.
+            - name:
+                Check for use of "ChipLogError(... CHIP_ERROR_FORMAT", which should
+                be "ChipLogFailure(err, ...)"
+              if: always()
+              run: |
+                git grep -I -n 'ChipLogError(.*CHIP_ERROR_FORMAT' -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
+
+            # git grep exits with 0 if it finds a match, but we want
+            # to fail (exit nonzero) on match.  And we want to exclude this file,
+            # to avoid our grep regexp matching itself.
+            - name:
                   Check for use of "SuccessOrExit(CHIP_ERROR_*)", which should
                   probably be "SuccessOrExit(err = CHIP_ERROR_*)"
               if: always()
