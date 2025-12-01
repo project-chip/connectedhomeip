@@ -102,3 +102,11 @@ void MatterUserLabelClusterShutdownCallback(chip::EndpointId endpointId);
 void MatterBooleanStateClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterBooleanStateClusterShutdownCallback(chip::EndpointId endpointId);
+
+void MatterBooleanStateConfigurationClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterBooleanStateConfigurationClusterShutdownCallback(chip::EndpointId endpointId);
+
+void MatterOccupancySensingClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterOccupancySensingClusterShutdownCallback(chip::EndpointId endpointId);

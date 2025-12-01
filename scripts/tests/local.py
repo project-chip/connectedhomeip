@@ -330,17 +330,18 @@ class BinaryRunner(enum.Enum):
     def execute_str(self, path: str):
         if self == BinaryRunner.NONE:
             return path
-        elif self == BinaryRunner.RR:
+        if self == BinaryRunner.RR:
             return f"exec rr record {path}"
-        elif self == BinaryRunner.VALGRIND:
+        if self == BinaryRunner.VALGRIND:
             return f"exec valgrind {path}"
-        elif self == BinaryRunner.COVERAGE:
+        if self == BinaryRunner.COVERAGE:
             # Expected path is like "out/<target>/<binary>"
             #
             # We output up to 10K of separate profiles that will be merged as a
             # final step.
             rawname = os.path.basename(path[: path.rindex("/")] + "-run-%10000m.profraw")
             return f'export LLVM_PROFILE_FILE="out/profiling/{rawname}"; exec {path}'
+        return None
 
 
 __RUNNERS__ = {
@@ -1197,7 +1198,7 @@ def chip_tool_tests(
     # This likely should be run in docker to not allow breaking things
     # run as:
     #
-    # docker run --rm -it -v ~/devel/connectedhomeip:/workspace --privileged ghcr.io/project-chip/chip-build-vscode:174
+    # docker run --rm -it -v ~/devel/connectedhomeip:/workspace --privileged ghcr.io/project-chip/chip-build-vscode:175
     runner = __RUNNERS__[runner]
 
     # make sure we are fully aware if running with or without coverage

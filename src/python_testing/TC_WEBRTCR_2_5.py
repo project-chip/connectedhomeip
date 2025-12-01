@@ -98,7 +98,7 @@ class TC_WebRTCR_2_5(WEBRTCRTestBase):
         """
         Define the step-by-step sequence for the test.
         """
-        steps = [
+        return [
             TestStep(1, "Commission the {TH_Server} from TH"),
             TestStep(2, "Open the Commissioning Window of the {TH_Server}"),
             TestStep(3, "Commission the {TH_Server} from DUT"),
@@ -108,18 +108,16 @@ class TC_WebRTCR_2_5(WEBRTCRTestBase):
             TestStep(7, "End the WebRTC session"),
             TestStep(8, "Read CurrentSessions attribute from DUT"),
         ]
-        return steps
 
     def pics_TC_WebRTCR_2_5(self) -> list[str]:
         """
         Return the list of PICS applicable to this test case.
         """
-        pics = [
+        return [
             "WEBRTCR.S",           # WebRTC Transport Requestor Server
             "WEBRTCR.S.A0000",     # CurrentSessions attribute
             "WEBRTCR.S.C03.Rsp",   # End command
         ]
-        return pics
 
     # This test has multiple manual steps for attribute reads and session management.
     # Test typically runs under 2 mins, so 5 minutes is sufficient.

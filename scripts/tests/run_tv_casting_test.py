@@ -350,7 +350,7 @@ def test_casting_fn(
             raise ValueError(
                 f"{test_sequence_name}: The first step in the test sequence must contain `START_APP` as `input_cmd` to indicate starting the tv-app."
             )
-        elif test_sequence_steps[current_index].app != App.TV_APP:
+        if test_sequence_steps[current_index].app != App.TV_APP:
             raise ValueError(
                 f"{test_sequence_name}: The first step in the test sequence must be to start up the tv-app."
             )
@@ -373,7 +373,7 @@ def test_casting_fn(
                 raise ValueError(
                     f"{test_sequence_name}: The third step in the test sequence must contain `START_APP` as `input_cmd` to indicate starting the tv-casting-app."
                 )
-            elif test_sequence_steps[current_index].app != App.TV_CASTING_APP:
+            if test_sequence_steps[current_index].app != App.TV_CASTING_APP:
                 raise ValueError(
                     f"{test_sequence_name}: The third step in the test sequence must be to start up the tv-casting-app."
                 )

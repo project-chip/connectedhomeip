@@ -49,7 +49,7 @@ class TC_CHIME_2_3(MatterBaseTest, CHIMETestBase):
         return "[TC-CHIME-2.3] Verify that the SelectedChime can be changed"
 
     def steps_TC_CHIME_2_3(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read the InstalledChimeSounds attribute, store as myChimeSounds."),
             TestStep(3, "Read the SelectedChime attribute, store as mySelectedChime"),
@@ -60,13 +60,11 @@ class TC_CHIME_2_3(MatterBaseTest, CHIMETestBase):
             TestStep(8, "Read the SelectedChime attribute, verfy that it's unchanged"),
 
         ]
-        return steps
 
     def pics_TC_CHIME_2_3(self) -> list[str]:
-        pics = [
+        return [
             "CHIME.S",
         ]
-        return pics
 
     @run_if_endpoint_matches(has_cluster(Clusters.Chime))
     async def test_TC_CHIME_2_3(self):
