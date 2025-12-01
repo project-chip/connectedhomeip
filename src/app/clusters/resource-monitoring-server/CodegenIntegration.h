@@ -50,7 +50,7 @@ struct Instance
 
     virtual ~Instance();
 
-    CHIP_ERROR Init() { return mCluster.Cluster().Init(); };
+    CHIP_ERROR Init() { return mCluster.Cluster().Init(); }
 
     // Attribute setters
     Protocols::InteractionModel::Status UpdateCondition(uint8_t newCondition)
