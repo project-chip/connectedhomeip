@@ -72,7 +72,7 @@ void MatterUnitLocalizationClusterInitCallback(EndpointId endpointId)
             .clusterId                 = UnitLocalization::Id,
             .fixedClusterInstanceCount = UnitLocalization::StaticApplicationConfig::kFixedClusterConfig.size(),
             .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
-            .fetchFeatureMap           = false,
+            .fetchFeatureMap           = true,
             .fetchOptionalAttributes   = false,
         },
         integrationDelegate);

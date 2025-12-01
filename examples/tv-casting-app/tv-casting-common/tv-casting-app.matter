@@ -3211,7 +3211,7 @@ endpoint 0 {
 
   server cluster UnitLocalization {
     callback attribute temperatureUnit;
-    callback attribute featureMap;
+    ram      attribute featureMap default = 0x1;
     callback attribute clusterRevision;
   }
 

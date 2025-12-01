@@ -1805,7 +1805,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    callback attribute featureMap;
+    ram      attribute featureMap default = 1;
     callback attribute clusterRevision;
   }
 
