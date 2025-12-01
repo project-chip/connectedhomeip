@@ -366,7 +366,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
 
         asserts.assert_equal(resp[0].Status, Status.Success, "Failed to clear DefaultOTAProviders")
 
-    def clear_kvs(self):
+    def clear_kvs(self, kvs_prefix: str = None):
         """
         Temporary cleanup of provider KVS files at the tmp path.
 
@@ -374,7 +374,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             None
         """
         import subprocess
-        if hasattr(self, 'provider_kvs_path') and path.exists(self.provider_kvs_path):
-            subprocess.run(f"rm -rf {self.provider_kvs_path}*", shell=True)
-        else:
-            subprocess.run("rm -rf /tmp/chip_kvs*", shell=True)
+        if kvs_prefix is None:
+            kvs_prefix = "/tmp/chip_kvs"
+        subprocess.run(f"rm -rf {kvs_prefix}*", shell=True)
+        logger.info(f"KVS files removed with prefix {kvs_prefix}")
