@@ -85,7 +85,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
         return "[TC-CLCTRL-4.3] MoveTo Command Field Sanity Check with Server as DUT"
 
     def steps_TC_CLCTRL_4_3(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read the FeatureMap attribute to determine supported features",
                      "FeatureMap of the ClosureControl cluster is returned by the DUT"),
@@ -196,13 +196,11 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                      "OverallCurrentState.Latch has to be False"),
             TestStep("10i", "Send MoveTo command with Speed = CurrentSpeed", "Receive SUCCESS response from the DUT"),
         ]
-        return steps
 
     def pics_TC_CLCTRL_4_3(self) -> list[str]:
-        pics = [
+        return [
             "CLCTRL.S",
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:

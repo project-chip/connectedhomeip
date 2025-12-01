@@ -156,24 +156,20 @@ class CommodityPriceTestBaseHelper:
                                               Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap(0),
                                               timedRequestTimeoutMs: int = 3000):
         """If endpoint is None then it falls through to use the matter test config value"""
-        result = await self.send_single_cmd(cmd=Clusters.CommodityPrice.Commands.GetDetailedPriceRequest(
+        return await self.send_single_cmd(cmd=Clusters.CommodityPrice.Commands.GetDetailedPriceRequest(
             details=details),
             endpoint=endpoint,
             timedRequestTimeoutMs=timedRequestTimeoutMs)
-
-        return result
 
     async def send_get_detailed_forecast_request(self, endpoint=None,
                                                  details: Clusters.CommodityPrice.Bitmaps =
                                                  Clusters.CommodityPrice.Bitmaps.CommodityPriceDetailBitmap(0),
                                                  timedRequestTimeoutMs: int = 3000):
         """If endpoint is None then it falls through to use the matter test config value"""
-        result = await self.send_single_cmd(cmd=Clusters.CommodityPrice.Commands.GetDetailedForecastRequest(
+        return await self.send_single_cmd(cmd=Clusters.CommodityPrice.Commands.GetDetailedForecastRequest(
             details=details),
             endpoint=endpoint,
             timedRequestTimeoutMs=timedRequestTimeoutMs)
-
-        return result
 
     async def send_test_event_trigger_price_update(self):
         await self.send_test_event_triggers(eventTrigger=self.kEventTriggerPriceUpdate)
@@ -187,5 +183,4 @@ class CommodityPriceTestBaseHelper:
             matter_epoch = datetime(2000, 1, 1, 0, 0, 0, 0, tz)
 
             return matter_epoch + delta_from_epoch
-        else:
-            return None
+        return None

@@ -194,7 +194,7 @@ class TC_CNET_4_10(MatterBaseTest):
         logging.info(f"Networks by endpoint: {networks_dict}")
         connected_network_count = {}
         for ep in networks_dict:
-            connected_network_count[ep] = sum((x.connected for x in networks_dict[ep]))
+            connected_network_count[ep] = sum(x.connected for x in networks_dict[ep])
         logging.info(f"Connected networks count by endpoint: {connected_network_count}")
         asserts.assert_equal(sum(connected_network_count.values()), 1,
                              "Verify that only one entry has connected status as TRUE across ALL endpoints")
@@ -204,7 +204,7 @@ class TC_CNET_4_10(MatterBaseTest):
         current_cluster_connected = connected_network_count[self.get_endpoint()] == 1
         if not current_cluster_connected:
             logging.info("Current cluster is not connected, skipping all remaining test steps")
-            self.skip_all_remaining_steps()
+            self.mark_all_remaining_steps_skipped(4)
             return
 
         # Step 4: Arm failsafe and verify response

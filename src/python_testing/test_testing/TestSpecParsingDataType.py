@@ -729,7 +729,7 @@ class TestSpecParsingDataType(MatterBaseTest):
         for cluster_id, cluster in self.xml_clusters.items():
             for bitmap_name, bitmap in cluster.bitmaps.items():
                 # Check for potential multi-bit fields by looking at bit values
-                bits = [int(bit) for bit in bitmap.components.keys() if str(bit).isdigit()]
+                bits = [int(bit) for bit in bitmap.components if str(bit).isdigit()]
                 if bits and (max(bits) - min(bits) + 1) > len(bits):
                     # There might be gaps, which could indicate multi-bit fields
                     multi_bit_bitmaps.append((cluster.name, bitmap_name, bitmap))
@@ -738,7 +738,7 @@ class TestSpecParsingDataType(MatterBaseTest):
             self.print_step("Found", f"{len(multi_bit_bitmaps)} potential bitmaps with multi-bit fields:")
             for cluster_name, bitmap_name, bitmap in multi_bit_bitmaps:
                 self.print_step("Found", f"  - {cluster_name}: {bitmap_name} with {len(bitmap.components)} components")
-                bits = sorted([int(bit) for bit in bitmap.components.keys() if str(bit).isdigit()])
+                bits = sorted([int(bit) for bit in bitmap.components if str(bit).isdigit()])
                 self.print_step("Found", f"    Bits: {bits}")
         else:
             self.print_step("Found", "No bitmaps with potential multi-bit fields found")

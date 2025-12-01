@@ -51,7 +51,7 @@ class TC_VALCC_4_5(MatterBaseTest):
         return "[TC-VALCC-4.5] Auto close functionality with DUT as Server"
 
     def steps_TC_VALCC_4_5(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Send Open command with duration set to 5"),
             TestStep(3, "Read OpenDuration attribute"),
@@ -62,13 +62,11 @@ class TC_VALCC_4_5(MatterBaseTest):
             TestStep(8, "Read RemainingDuration attribute"),
             TestStep(9, "Read CurrentState attribute"),
         ]
-        return steps
 
     def pics_TC_VALCC_4_5(self) -> list[str]:
-        pics = [
+        return [
             "VALCC.S",
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:
