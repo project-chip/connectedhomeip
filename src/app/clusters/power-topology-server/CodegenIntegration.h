@@ -22,7 +22,6 @@
 #include "PowerTopologyCluster.h"
 #include "PowerTopologyDelegate.h"
 
-
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 
