@@ -22,6 +22,9 @@
 #include <clusters/IlluminanceMeasurement/Metadata.h>
 #include <platform/DeviceInfoProvider.h>
 
+using namespace chip::app::Clusters::IlluminanceMeasurement;
+using namespace chip::app::Clusters::IlluminanceMeasurement::Attributes;
+
 namespace chip::app::Clusters {
 
 class IlluminanceMeasurementCluster : public DefaultServerCluster
@@ -29,13 +32,12 @@ class IlluminanceMeasurementCluster : public DefaultServerCluster
 public:
     // NOTE: this set is smaller than the full optional attributes supported by illuminance measurement
     //       as other attributes are controlled by feature flags
-    using OptionalAttributeSet = app::OptionalAttributeSet<IlluminanceMeasurement::Attributes::LightSensorType::Id,
-                                                           IlluminanceMeasurement::Attributes::Tolerance::Id>;
+    using OptionalAttributeSet = app::OptionalAttributeSet<LightSensorType::Id, Tolerance::Id>;
 
     struct StartupConfiguration
     {
-        IlluminanceMeasurement::LightSensorTypeEnum lightSensorType{ IlluminanceMeasurement::LightSensorTypeEnum::kPhotodiode };
-        IlluminanceMeasurement::Attributes::Tolerance::TypeInfo::Type tolerance{};
+        DataModel::Nullable<LightSensorTypeEnum> lightSensorType{ LightSensorTypeEnum::kPhotodiode };
+        Tolerance::TypeInfo::Type tolerance{};
     };
 
     IlluminanceMeasurementCluster(EndpointId endpointId, const OptionalAttributeSet & optionalAttributeSet,
@@ -46,22 +48,22 @@ public:
                                                 AttributeValueEncoder & encoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
-    IlluminanceMeasurement::LightSensorTypeEnum GetLightSensorType() const { return mLightSensorType; }
+    DataModel::Nullable<LightSensorTypeEnum> GetLightSensorType() const { return mLightSensorType; }
 
-    IlluminanceMeasurement::Attributes::MaxMeasuredValue::TypeInfo::Type GetMaxMeasuredValue() const { return mMaxMeasuredValue; }
+    MaxMeasuredValue::TypeInfo::Type GetMaxMeasuredValue() const { return mMaxMeasuredValue; }
 
-    IlluminanceMeasurement::Attributes::MeasuredValue::TypeInfo::Type GetMeasuredValue() const { return mMeasuredValue; }
+    MeasuredValue::TypeInfo::Type GetMeasuredValue() const { return mMeasuredValue; }
 
-    IlluminanceMeasurement::Attributes::MinMeasuredValue::TypeInfo::Type GetMinMeasuredValue() const { return mMinMeasuredValue; }
+    MinMeasuredValue::TypeInfo::Type GetMinMeasuredValue() const { return mMinMeasuredValue; }
 
-    IlluminanceMeasurement::Attributes::Tolerance::TypeInfo::Type GetTolerance() const { return mTolerance; }
+    Tolerance::TypeInfo::Type GetTolerance() const { return mTolerance; }
 
 protected:
-    IlluminanceMeasurement::LightSensorTypeEnum mLightSensorType{ IlluminanceMeasurement::LightSensorTypeEnum::kPhotodiode };
-    IlluminanceMeasurement::Attributes::MaxMeasuredValue::TypeInfo::Type mMaxMeasuredValue{};
-    IlluminanceMeasurement::Attributes::MeasuredValue::TypeInfo::Type mMeasuredValue{};
-    IlluminanceMeasurement::Attributes::MinMeasuredValue::TypeInfo::Type mMinMeasuredValue{};
-    IlluminanceMeasurement::Attributes::Tolerance::TypeInfo::Type mTolerance{};
+    DataModel::Nullable<LightSensorTypeEnum> mLightSensorType{};
+    MaxMeasuredValue::TypeInfo::Type mMaxMeasuredValue{};
+    MeasuredValue::TypeInfo::Type mMeasuredValue{};
+    MinMeasuredValue::TypeInfo::Type mMinMeasuredValue{};
+    Tolerance::TypeInfo::Type mTolerance{};
     const OptionalAttributeSet mOptionalAttributeSet;
 };
 

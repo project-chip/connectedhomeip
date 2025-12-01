@@ -46,10 +46,10 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         IlluminanceMeasurementCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
-        LightSensorTypeEnum lightSensorType = LightSensorTypeEnum::kPhotodiode;
+        DataModel::Nullable<LightSensorTypeEnum> lightSensorType = LightSensorTypeEnum::kPhotodiode;
         if (optionalAttributeSet.IsSet(LightSensorType::Id))
         {
-            VerifyOrDie(LightSensorType::Get(endpointId, &lightSensorType) == Status::Success);
+            VerifyOrDie(LightSensorType::Get(endpointId, lightSensorType) == Status::Success);
         }
 
         Tolerance::TypeInfo::Type tolerance{};
