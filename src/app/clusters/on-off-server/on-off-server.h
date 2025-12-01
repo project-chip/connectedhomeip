@@ -22,10 +22,11 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af-types.h>
 #include <app/util/basic-types.h>
+#include <app/util/config.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <protocols/interaction_model/StatusCode.h>
 
-#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
+#if MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 #include <app/clusters/scenes-server/SceneTable.h>
 #endif
 
@@ -53,7 +54,7 @@ public:
 
     static OnOffServer & Instance();
 
-#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
+#if MATTER_DM_PLUGIN_SCENES_MANAGEMENT
     chip::scenes::SceneHandler * GetSceneHandler();
 #endif
 
@@ -102,7 +103,7 @@ private:
     static OnOffServer instance;
     chip::System::Clock::Timestamp nextDesiredOnWithTimedOffTimestamp;
 
-#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
+#if MATTER_DM_PLUGIN_SCENES_MANAGEMENT
     friend class DefaultOnOffSceneHandler;
 #endif
 };
