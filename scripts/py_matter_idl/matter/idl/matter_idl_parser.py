@@ -733,7 +733,7 @@ __LOG_LEVELS__ = {
     type=click.Choice(list(__LOG_LEVELS__.keys()), case_sensitive=False),
     help='Determines the verbosity of script output.')
 @click.argument('filename')
-def main(log_level, filename=None):
+def main(log_level, filename):
     # The IDL parser is generally not intended to be run as a stand-alone binary.
     # The ability to run is for debug and to print out the parsed AST.
 
@@ -743,7 +743,8 @@ def main(log_level, filename=None):
     )
 
     LOGGER.info("Starting to parse ...")
-    data = CreateParser().parse(open(filename).read(), file_name=filename)
+    with open(filename) as f:
+        data = CreateParser().parse(f.read(), file_name=filename)
     LOGGER.info("Parse completed")
 
     LOGGER.info("Data:")
