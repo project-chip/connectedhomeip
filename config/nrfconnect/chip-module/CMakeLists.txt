@@ -161,6 +161,9 @@ matter_add_gn_arg_bool  ("chip_enable_read_client"                CONFIG_CHIP_EN
 matter_add_gn_arg_bool  ("chip_mdns_minimal"                      CONFIG_WIFI_NRF70)
 matter_add_gn_arg_bool  ("chip_mdns_platform"                     CONFIG_NET_L2_OPENTHREAD)
 
+matter_add_gn_arg_bool  ("chip_system_config_use_sockets"                   NOT CONFIG_CHIP_USE_OPENTHREAD_ENDPOINT)
+matter_add_gn_arg_bool  ("chip_system_config_use_openthread_inet_endpoints" CONFIG_CHIP_USE_OPENTHREAD_ENDPOINT)
+
 if (CONFIG_CHIP_ENABLE_ICD_SUPPORT)
     matter_add_gn_arg_bool  ("chip_enable_icd_lit"                       CONFIG_CHIP_ICD_LIT_SUPPORT)
     matter_add_gn_arg_bool  ("chip_enable_icd_checkin"                   CONFIG_CHIP_ICD_CHECK_IN_SUPPORT)
@@ -188,8 +191,10 @@ else()
 endif()
 
 if (CONFIG_CHIP_CRYPTO_PSA)
-    matter_add_gn_arg_string("chip_crypto"             "psa")
-    matter_add_gn_arg_bool  ("chip_crypto_psa_spake2p" CONFIG_PSA_WANT_ALG_SPAKE2P_MATTER)
+    matter_add_gn_arg_string("chip_crypto"                      "psa")
+    matter_add_gn_arg_bool  ("chip_crypto_psa_spake2p"          CONFIG_PSA_WANT_ALG_SPAKE2P_MATTER)
+    matter_add_gn_arg_bool  ("chip_crypto_psa_aead_single_part" CONFIG_CHIP_CRYPTO_PSA_AEAD_SINGLE_PART)
+    matter_add_gn_arg_bool  ("chip_use_cracen_kmu"              CONFIG_CHIP_STORE_KEYS_IN_KMU)
 endif()
 
 if (BOARD STREQUAL "native_sim")
@@ -230,11 +235,23 @@ matter_generate_args_tmp_file()
 # Build chip library
 # ==============================================================================
 
+# Create Data Model target
+add_library(matter-data-model STATIC)
+
 matter_build(chip
     LIB_TESTS   ${CONFIG_CHIP_BUILD_TESTS}
     DEVICE_INFO_EXAMPLE_PROVIDER ${CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER}
     GN_DEPENDENCIES kernel
+    LINK_TARGETS matter-data-model
 )
+
+# Configure Data Model target
+target_link_libraries(matter-data-model PUBLIC zephyr_interface chip)
+add_dependencies(app matter-data-model)
+
+# Add empty C source to Data Model target to avoid CMake error due to no sources added to target
+file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/matter-data-model.c)
+target_sources(matter-data-model PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/matter-data-model.c)
 
 set_property(GLOBAL APPEND PROPERTY ZEPHYR_INTERFACE_LIBS chip)
 # Enable visibility of POSIX.1-2008 functions, such as strnlen
@@ -262,17 +279,6 @@ if (CONFIG_CHIP_LIB_SHELL)
     # the Matter shell library is linked using the '--whole-archive' flag.
     target_link_options(chip INTERFACE
         -Wl,-u,_ZN4chip5Shell6Engine11RunMainLoopEv
-    )
-endif()
-
-# ==============================================================================
-# Define 'chip-ota-image' target for building CHIP OTA image
-# ==============================================================================
-
-if (CONFIG_CHIP_OTA_IMAGE_BUILD AND NOT SYSBUILD)
-    chip_ota_image(chip-ota-image
-        INPUT_FILES ${PROJECT_BINARY_DIR}/dfu_multi_image.bin
-        OUTPUT_FILE ${PROJECT_BINARY_DIR}/${CONFIG_CHIP_OTA_IMAGE_FILE_NAME}
     )
 endif()
 

@@ -204,13 +204,25 @@ namespace Inet {
 
         aPacketInfo.Clear();
 
-        // TODO Handle return value of IPAddress::GetIPAddressFromSockAdd
         const auto * srcAddress = nw_endpoint_get_address(src_endpoint);
-        IPAddress::GetIPAddressFromSockAddr(*srcAddress, aPacketInfo.SrcAddress);
+        VerifyOrReturnError(nullptr != srcAddress, CHIP_ERROR_INVALID_ADDRESS);
+        ReturnErrorOnFailure(IPAddress::GetIPAddressFromSockAddr(*srcAddress, aPacketInfo.SrcAddress));
 
-        // TODO Handle return value of IPAddress::GetIPAddressFromSockAdd
+        // The IPPacketInfo that comes out of this function flows up the stack
+        // (UDP::OnUdpReceive → SessionManager::OnMessageReceived → SetPeerAddress)
+        // to build the PeerAddress for the newly-received message.  For IPv6
+        // link-local traffic the interface index (scope-id) is part of the
+        // address itself, so we must copy the scope from the incoming packet
+        // to ensure later replies are sent out on the same link.
+        if (aPacketInfo.SrcAddress.IsIPv6LinkLocal()) {
+            auto in6 = reinterpret_cast<const struct sockaddr_in6 *>(srcAddress);
+            uint32_t interfaceIndex = static_cast<uint32_t>(in6->sin6_scope_id);
+            aPacketInfo.Interface = InterfaceId(interfaceIndex);
+        }
+
         const auto * dstAddress = nw_endpoint_get_address(dest_endpoint);
-        IPAddress::GetIPAddressFromSockAddr(*dstAddress, aPacketInfo.DestAddress);
+        VerifyOrReturnError(nullptr != dstAddress, CHIP_ERROR_INVALID_ADDRESS);
+        ReturnErrorOnFailure(IPAddress::GetIPAddressFromSockAddr(*dstAddress, aPacketInfo.DestAddress));
 
         aPacketInfo.SrcPort = nw_endpoint_get_port(src_endpoint);
         aPacketInfo.DestPort = nw_endpoint_get_port(dest_endpoint);
@@ -234,7 +246,7 @@ namespace Inet {
 #endif // INET_CONFIG_ENABLE_IPV4
         {
             aAddress.ToString(addrStr);
-            if (interfaceIndex != InterfaceId::Null() && aAddress.IsIPv6LinkLocal()) {
+            if (interfaceIndex != InterfaceId::Null() && (aAddress.IsIPv6LinkLocal() || aAddress.IsIPv6Multicast())) {
                 char interface[InterfaceId::kMaxIfNameLength + 1] = {}; // +1 to prepend '%'
                 interface[0] = '%';
                 interface[1] = 0;

@@ -14,46 +14,98 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
+# for details about the block below.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   run1:
+#     app: ${CAMERA_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+# === END CI TEST ARGUMENTS ===
+#
 
-from chip.ChipDeviceCtrl import TransportPayloadCapability
-from chip.clusters import WebRTCTransportProvider
-from chip.clusters.Types import NullValue
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from chip.webrtc import PeerConnection, WebRTCManager
+import logging
+
 from mobly import asserts
+from TC_WEBRTC_Utils import WebRTCTestHelper
 from test_plan_support import commission_if_required
 
+from matter.ChipDeviceCtrl import TransportPayloadCapability
+from matter.clusters import Objects, WebRTCTransportProvider
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 
-class TC_WEBRTC_1_4(MatterBaseTest):
+
+class TC_WEBRTC_1_4(MatterBaseTest, WebRTCTestHelper):
     def steps_TC_WEBRTC_1_4(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("precondition-1", commission_if_required(), is_commissioning=True),
             TestStep("precondition-2", "Confirm no active WebRTC sessions exist in DUT"),
-            TestStep(1, "TH sends the SolicitOffer command without ICEServers and ICETransportPolicy to the DUT."),
-            TestStep(2, "DUT sends Offer command to TH/WEBRTCR."),
-            TestStep(3, "TH sends the SUCCESS status code to the DUT."),
-            TestStep(4, "TH sends the ProvideAnswer command with the WebRTCSessionID saved in step 1 and a SDP Offer to the DUT."),
-            TestStep(5, "TH sends the ICECandidates command with a its ICE candidates to the DUT."),
-            TestStep(6, "TH waits up to 30 seconds for ProvideICECandidates command from the DUT."),
-            TestStep(7, "TH waits for 10 seconds."),
-            TestStep(8, "TH sends the EndSession command with the WebRTCSessionID saved in step 1 to the DUT."),
+            TestStep(
+                1,
+                description="TH sends the SolicitOffer command without ICEServers and ICETransportPolicy to the DUT.",
+                expectation="DUT responds with SolicitOfferResponse containing allocated WebRTCSessionID and the DeferredOffer parameter set to FALSE. TH saves the WebRTCSessionID to be used in a later step.",
+            ),
+            TestStep(
+                2,
+                description="DUT sends Offer command to TH/WEBRTCR.",
+                expectation="Verify that Offer command contains the same WebRTCSessionID saved in step 1 and contain a non-empty SDP string.",
+            ),
+            TestStep(3, description="TH sends the SUCCESS status code to the DUT."),
+            TestStep(
+                4,
+                description="TH sends the ProvideAnswer command with the WebRTCSessionID saved in step 1 and a SDP Offer to the DUT.",
+                expectation="DUT responds with SUCCESS status code.",
+            ),
+            TestStep(
+                5,
+                description="TH sends the ProvideICECandidates command with a its ICE candidates to the DUT.",
+                expectation="DUT responds with SUCCESS status code.",
+            ),
+            TestStep(
+                6,
+                description="TH waits for 10 seconds.",
+                expectation="Verify the WebRTC session has been successfully established.",
+            ),
+            TestStep(
+                7,
+                description="TH sends the EndSession command with the WebRTCSessionID saved in step 1 to the DUT.",
+                expectation="DUT responds with SUCCESS status code.",
+            ),
         ]
 
-        return steps
-
     def desc_TC_WEBRTC_1_4(self) -> str:
-        return "[TC-WEBRTC-1.3] Validate Deferred Offer Flow for Battery-Powered Camera in Standby Mode."
+        return "[TC-WEBRTC-1.4] Validate Non-Deferred Offer Flow for Battery-Powered Camera in Standby Mode"
 
     def pics_TC_WEBRTC_1_4(self) -> list[str]:
-        return ["WEBRTCR", "WEBRTCP"]
+        return ["WEBRTCR.C", "WEBRTCP.S"]
+
+    @property
+    def default_timeout(self) -> int:
+        return 4 * 60  # 4 minutes
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_WEBRTC_1_4(self):
         self.step("precondition-1")
 
-        endpoint = self.get_endpoint(default=1)
-        webrtc_manager = WebRTCManager()
-        webrtc_peer: PeerConnection = webrtc_manager.create_peer(
+        endpoint = self.get_endpoint()
+        webrtc_manager = WebRTCManager(event_loop=self.event_loop)
+        webrtc_peer: LibdatachannelPeerConnection = webrtc_manager.create_peer(
             node_id=self.dut_node_id, fabric_index=self.default_controller.GetFabricIndexInternal(), endpoint=endpoint
         )
 
@@ -63,12 +115,15 @@ class TC_WEBRTC_1_4(MatterBaseTest):
         )
         asserts.assert_equal(len(current_sessions), 0, "Found an existing WebRTC session")
 
+        # Allocate video stream in DUT if possible, to receive actual video stream
+        # This step is not part of test plan
+        aVideoStreamID = await self.allocate_video_stream(endpoint)
+
         self.step(1)
-        solicit_offer_response: WebRTCTransportProvider.Commands.SolicitOfferResponse = await self.send_single_cmd(
+        solicit_offer_response: WebRTCTransportProvider.Commands.SolicitOfferResponse = await webrtc_peer.send_command(
             cmd=WebRTCTransportProvider.Commands.SolicitOffer(
-                streamUsage=WebRTCTransportProvider.Enums.StreamUsageEnum.kLiveView,
-                videoStreamID=NullValue,
-                audioStreamID=NullValue,
+                streamUsage=Objects.Globals.Enums.StreamUsageEnum.kLiveView,
+                videoStreamID=aVideoStreamID,
                 originatingEndpointID=1,
             ),
             endpoint=endpoint,
@@ -82,7 +137,7 @@ class TC_WEBRTC_1_4(MatterBaseTest):
 
         self.step(2)
         # TH should immediately get Offer from DUT
-        offer_sessionId, remote_offer_sdp = webrtc_peer.get_remote_offer(timeout=5)
+        offer_sessionId, remote_offer_sdp = await webrtc_peer.get_remote_offer(timeout_s=5)
         asserts.assert_equal(offer_sessionId, session_id, "Invalid session id")
         asserts.assert_true(len(remote_offer_sdp) > 0, "Invalid offer sdp received")
 
@@ -90,7 +145,7 @@ class TC_WEBRTC_1_4(MatterBaseTest):
         webrtc_peer.set_remote_offer(remote_offer_sdp)
 
         self.step(4)
-        local_answer = webrtc_peer.get_local_answer()
+        local_answer = await webrtc_peer.get_local_answer()
         await self.send_single_cmd(
             cmd=WebRTCTransportProvider.Commands.ProvideAnswer(webRTCSessionID=session_id, sdp=local_answer),
             endpoint=endpoint,
@@ -98,35 +153,36 @@ class TC_WEBRTC_1_4(MatterBaseTest):
         )
 
         self.step(5)
-        local_candidates = webrtc_peer.get_local_ice_candidates()
+        local_candidates = await webrtc_peer.get_local_ice_candidates()
+        local_candidates_struct_list = [
+            Objects.Globals.Structs.ICECandidateStruct(candidate=cand.candidate) for cand in local_candidates
+        ]
         await self.send_single_cmd(
-            cmd=WebRTCTransportProvider.Commands.ProvideICECandidates(webRTCSessionID=session_id, ICECandidates=local_candidates),
-            endpoint=endpoint,
-            payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
-        )
-
-        self.step(6)
-        ice_session_id, remote_candidates = webrtc_peer.get_remote_ice_candidates(timeout=30)
-        asserts.assert_equal(ice_session_id, session_id, "Invalid session id")
-        asserts.assert_true(len(remote_candidates) > 0, "Invalid ice candidates received")
-        webrtc_peer.set_remote_ice_candidates(remote_candidates)
-
-        self.step(7)
-        if not self.is_pics_sdk_ci_only:
-            self.wait_for_user_input("Verify WebRTC session is established")
-        else:
-            webrtc_peer.wait_for_session_establishment()
-
-        self.step(8)
-        await self.send_single_cmd(
-            cmd=WebRTCTransportProvider.Commands.EndSession(
-                webRTCSessionID=session_id, reason=WebRTCTransportProvider.Enums.WebRTCEndReasonEnum.kUserHangup
+            cmd=WebRTCTransportProvider.Commands.ProvideICECandidates(
+                webRTCSessionID=session_id, ICECandidates=local_candidates_struct_list
             ),
             endpoint=endpoint,
             payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
         )
 
-        webrtc_manager.close_all()
+        self.step(6)
+        if not await webrtc_peer.check_for_session_establishment():
+            logging.error("Failed to establish webrtc session")
+            raise Exception("Failed to establish webrtc session")
+
+        if not self.is_pics_sdk_ci_only:
+            self.user_verify_video_stream("Verify WebRTC session by validating if video is received")
+
+        self.step(7)
+        await self.send_single_cmd(
+            cmd=WebRTCTransportProvider.Commands.EndSession(
+                webRTCSessionID=session_id, reason=Objects.Globals.Enums.WebRTCEndReasonEnum.kUserHangup
+            ),
+            endpoint=endpoint,
+            payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
+        )
+
+        await webrtc_manager.close_all()
 
 
 if __name__ == "__main__":

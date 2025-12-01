@@ -141,11 +141,7 @@ bool MayHaveAccessibleEventPath(DataModel::Provider * aProvider, const EventPath
 
 /// Checks if the given path/attributeId, entry are ACL-accessible
 /// for the given subject descriptor
-///
-/// `attributeId` may be kInvalidAttributeId to signify wildcard permission check
-/// on the underlying cluster
-bool IsAccessibleAttributeEntry(const ConcreteClusterPath & path, const AttributeId attributeId,
-                                const Access::SubjectDescriptor & subjectDescriptor,
+bool IsAccessibleAttributeEntry(const ConcreteAttributePath & path, const Access::SubjectDescriptor & subjectDescriptor,
                                 const std::optional<DataModel::AttributeEntry> & entry)
 {
     if (!entry.has_value() || !entry->GetReadPrivilege().has_value())
@@ -154,17 +150,10 @@ bool IsAccessibleAttributeEntry(const ConcreteClusterPath & path, const Attribut
         return false;
     }
 
-    // requestPath.entityId optional value starts up as unset to
-    // signify wildcard check. We then set it later if we have a valid
-    // attributeID to check.
     Access::RequestPath requestPath{ .cluster     = path.mClusterId,
                                      .endpoint    = path.mEndpointId,
-                                     .requestType = Access::RequestType::kAttributeReadRequest };
-
-    if (attributeId != kInvalidAttributeId)
-    {
-        requestPath.entityId = attributeId;
-    }
+                                     .requestType = Access::RequestType::kAttributeReadRequest,
+                                     .entityId    = path.mAttributeId };
 
     // We know entry has value and GetReadPrivilege has value according to the check above
     // the assign below is safe.
@@ -217,7 +206,8 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
     ReturnErrorOnFailure(mpFabricTable->AddFabricDelegate(this));
     ReturnErrorOnFailure(mpExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id, this));
 
-    mReportingEngine.Init((eventManagement != nullptr) ? eventManagement : &EventManagement::GetInstance());
+    TEMPORARY_RETURN_IGNORED mReportingEngine.Init((eventManagement != nullptr) ? eventManagement
+                                                                                : &EventManagement::GetInstance());
 
     StatusIB::RegisterErrorFormatter();
 
@@ -289,7 +279,7 @@ void InteractionModelEngine::Shutdown()
     mAttributePathPool.ReleaseAll();
     mEventPathPool.ReleaseAll();
     mDataVersionFilterPool.ReleaseAll();
-    mpExchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id);
+    TEMPORARY_RETURN_IGNORED mpExchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id);
 
     mpCASESessionMgr = nullptr;
 
@@ -580,7 +570,7 @@ void InteractionModelEngine::TryToResumeSubscriptions()
     {
         mSubscriptionResumptionScheduled            = true;
         auto timeTillNextSubscriptionResumptionSecs = ComputeTimeSecondsTillNextSubscriptionResumption();
-        mpExchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(
+        TEMPORARY_RETURN_IGNORED mpExchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(
             System::Clock::Seconds32(timeTillNextSubscriptionResumptionSecs), ResumeSubscriptionsTimerCallback, this);
         mNumSubscriptionResumptionRetries++;
         ChipLogProgress(InteractionModel, "Schedule subscription resumption when failing to establish session, Retries: %" PRIu32,
@@ -657,14 +647,9 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
             {
                 // readPath is based on path expansion, so entire path is a `valid attribute path`.
                 //
-                // Here we check if the cluster is accessible at all for the given entry permissions.
-                // The check will validate cluster access and not try exact attribute matching.
-                //
-                // TODO: it is unclear why we are not using the actual path always since our goal seems
-                //       to just be "find a valid path that is readable". The reason the code looks like
-                //       this now is that this logic was originally written like this and the 'check' was
-                //       refactored to a common path.
-                if (IsAccessibleAttributeEntry(readPath, kInvalidAttributeId, aSubjectDescriptor, entry))
+                // Here we check if the cluster is accessible at all (at least one attribute) for the
+                // given entry permissions.
+                if (IsAccessibleAttributeEntry(readPath, aSubjectDescriptor, entry))
                 {
                     aHasValidAttributePath = true;
                     break;
@@ -678,7 +663,7 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
 
             std::optional<DataModel::AttributeEntry> entry = FindAttributeEntry(concretePath);
 
-            if (IsAccessibleAttributeEntry(concretePath, paramsList.mValue.mAttributeId, aSubjectDescriptor, entry))
+            if (IsAccessibleAttributeEntry(concretePath, aSubjectDescriptor, entry))
             {
                 aHasValidAttributePath = true;
             }
@@ -764,7 +749,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
         VerifyOrReturnError(subscribeRequestParser.Init(reader) == CHIP_NO_ERROR, Status::InvalidAction);
 
 #if CHIP_CONFIG_IM_PRETTY_PRINT
-        subscribeRequestParser.PrettyPrint();
+        TEMPORARY_RETURN_IGNORED subscribeRequestParser.PrettyPrint();
 #endif
 
         VerifyOrReturnError(subscribeRequestParser.GetKeepSubscriptions(&keepExistingSubscriptions) == CHIP_NO_ERROR,
@@ -804,8 +789,8 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
                                         ", FabricIndex: %u, SubscriptionId: 0x%" PRIx32,
                                         ChipLogValueX64(subscriptionInfo.mNodeId), subscriptionInfo.mFabricIndex,
                                         subscriptionInfo.mSubscriptionId);
-                        mpSubscriptionResumptionStorage->Delete(subscriptionInfo.mNodeId, subscriptionInfo.mFabricIndex,
-                                                                subscriptionInfo.mSubscriptionId);
+                        TEMPORARY_RETURN_IGNORED mpSubscriptionResumptionStorage->Delete(
+                            subscriptionInfo.mNodeId, subscriptionInfo.mFabricIndex, subscriptionInfo.mSubscriptionId);
                     }
                 }
                 iterator->Release();
@@ -896,7 +881,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
         VerifyOrReturnError(readRequestParser.Init(reader) == CHIP_NO_ERROR, Status::InvalidAction);
 
 #if CHIP_CONFIG_IM_PRETTY_PRINT
-        readRequestParser.PrettyPrint();
+        TEMPORARY_RETURN_IGNORED readRequestParser.PrettyPrint();
 #endif
         {
             size_t requestedAttributePathCount = 0;
@@ -1002,7 +987,7 @@ Status InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeContex
     VerifyOrReturnError(report.Init(reader) == CHIP_NO_ERROR, Status::InvalidAction);
 
 #if CHIP_CONFIG_IM_PRETTY_PRINT
-    report.PrettyPrint();
+    TEMPORARY_RETURN_IGNORED report.PrettyPrint();
 #endif
 
     SubscriptionId subscriptionId = 0;
@@ -1102,7 +1087,7 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
     else if (aPayloadHeader.HasMessageType(MsgType::TimedRequest))
     {
-        OnTimedRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), status);
+        TEMPORARY_RETURN_IGNORED OnTimedRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), status);
     }
     else
     {
@@ -1134,7 +1119,7 @@ void InteractionModelEngine::OnActiveModeNotification(ScopedNodeId aPeer, uint64
         // Get the next item before invoking `OnActiveModeNotification`.
         CATValues cats;
 
-        mpFabricTable->FetchCATs(pListItem->GetFabricIndex(), cats);
+        TEMPORARY_RETURN_IGNORED mpFabricTable->FetchCATs(pListItem->GetFabricIndex(), cats);
         if (ScopedNodeId(pListItem->GetPeerNodeId(), pListItem->GetFabricIndex()) == aPeer &&
             (cats.CheckSubjectAgainstCATs(aMonitoredSubject) ||
              aMonitoredSubject == mpFabricTable->FindFabricWithIndex(pListItem->GetFabricIndex())->GetNodeId()))
@@ -1812,7 +1797,16 @@ Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBe
 
     DataModel::AcceptedCommandEntry acceptedCommandEntry;
 
-    Status status = CheckCommandExistence(request.path, acceptedCommandEntry);
+    // Execute the ACL Access Granting Algorithm before existence checks, assuming the required_privilege for the element is
+    // Operate, to determine if the subject would have had at least some access against the concrete path. This is done so we don't
+    // leak information if we do fail existence checks.
+    // SPEC-DIVERGENCE: For non-concrete paths (Group Commands), the spec mandates only one ACL check AFTER the existence check.
+    // However, because this code is also used in the group path case, we end up performing an ADDITIONAL ACL check before the
+    // existence check. In practice, this divergence is not observable if all commands require at least Operate privilege.
+    Status status = CheckCommandAccess(request, Access::Privilege::kOperate);
+    VerifyOrReturnValue(status == Status::Success, status);
+
+    status = CheckCommandExistence(request.path, acceptedCommandEntry);
 
     if (status != Status::Success)
     {
@@ -1821,14 +1815,14 @@ Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBe
         return status;
     }
 
-    status = CheckCommandAccess(request, acceptedCommandEntry);
+    status = CheckCommandAccess(request, acceptedCommandEntry.GetInvokePrivilege());
     VerifyOrReturnValue(status == Status::Success, status);
 
     return CheckCommandFlags(request, acceptedCommandEntry);
 }
 
 Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandAccess(const DataModel::InvokeRequest & aRequest,
-                                                                               const DataModel::AcceptedCommandEntry & entry)
+                                                                               const Access::Privilege aRequiredPrivilege)
 {
     if (aRequest.subjectDescriptor == nullptr)
     {
@@ -1840,7 +1834,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandAccess(c
                                      .requestType = Access::RequestType::kCommandInvokeRequest,
                                      .entityId    = aRequest.path.mCommandId };
 
-    CHIP_ERROR err = Access::GetAccessControl().Check(*aRequest.subjectDescriptor, requestPath, entry.GetInvokePrivilege());
+    CHIP_ERROR err = Access::GetAccessControl().Check(*aRequest.subjectDescriptor, requestPath, aRequiredPrivilege);
     if (err != CHIP_NO_ERROR)
     {
         if ((err != CHIP_ERROR_ACCESS_DENIED) && (err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL))
@@ -1931,13 +1925,11 @@ DataModel::Provider * InteractionModelEngine::SetDataModelProvider(DataModel::Pr
     mDataModelProvider = model;
     if (mDataModelProvider != nullptr)
     {
-        DataModel::InteractionModelContext context;
-
-        context.eventsGenerator         = &EventManagement::GetInstance();
-        context.dataModelChangeListener = &mReportingEngine;
-        context.actionContext           = this;
-
-        CHIP_ERROR err = mDataModelProvider->Startup(context);
+        CHIP_ERROR err = mDataModelProvider->Startup({
+            .eventsGenerator         = EventManagement::GetInstance(),
+            .dataModelChangeListener = mReportingEngine,
+            .actionContext           = *this,
+        });
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(InteractionModel, "Failure on interaction model startup: %" CHIP_ERROR_FORMAT, err.Format());
@@ -1979,7 +1971,7 @@ void InteractionModelEngine::OnTimedInvoke(TimedHandler * apTimedHandler, Messag
     Status status = OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), /* aIsTimedInvoke = */ true);
     if (status != Status::Success)
     {
-        StatusResponse::Send(status, apExchangeContext, /* aExpectResponse = */ false);
+        TEMPORARY_RETURN_IGNORED StatusResponse::Send(status, apExchangeContext, /* aExpectResponse = */ false);
     }
 }
 
@@ -2002,7 +1994,7 @@ void InteractionModelEngine::OnTimedWrite(TimedHandler * apTimedHandler, Messagi
     Status status = OnWriteRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), /* aIsTimedWrite = */ true);
     if (status != Status::Success)
     {
-        StatusResponse::Send(status, apExchangeContext, /* aExpectResponse = */ false);
+        TEMPORARY_RETURN_IGNORED StatusResponse::Send(status, apExchangeContext, /* aExpectResponse = */ false);
     }
 }
 

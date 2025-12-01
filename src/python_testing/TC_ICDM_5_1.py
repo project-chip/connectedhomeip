@@ -38,11 +38,13 @@
 import logging
 from dataclasses import dataclass
 
-import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mdns_discovery import mdns_discovery
+from mdns_discovery.utils.asserts import assert_valid_icd_key
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 Cluster = Clusters.Objects.IcdManagement
 Commands = Cluster.Commands
@@ -65,7 +67,7 @@ kRootEndpointId = 0
 client1 = Client(
     checkInNodeID=1,
     subjectId=1,
-    key=bytes([x for x in range(0x10, 0x20)]),
+    key=bytes(list(range(0x10, 0x20))),
     clientType=ClientTypeEnum.kEphemeral
 )
 
@@ -82,21 +84,41 @@ class TC_ICDM_5_1(MatterBaseTest):
     async def _send_single_icdm_command(self, command):
         return await self.send_single_cmd(command, endpoint=kRootEndpointId)
 
+    def get_dut_instance_name(self) -> str:
+        node_id = self.dut_node_id
+        compressed_fabric_id = self.default_controller.GetCompressedFabricId()
+        return f'{compressed_fabric_id:016X}-{node_id:016X}'
+
     async def _get_icd_txt_record(self) -> OperatingModeEnum:
-        discovery = mdns_discovery.MdnsDiscovery(verbose_logging=True)
-        service = await discovery.get_operational_service(
-            node_id=self.dut_node_id,
-            compressed_fabric_id=self.default_controller.GetCompressedFabricId(),
+        discovery = mdns_discovery.MdnsDiscovery()
+        services = await discovery.get_operational_services(
             log_output=True, discovery_timeout_sec=240)
 
-        asserts.assert_is_not_none(
-            service, f"Failed to get operational node service information for {self.dut_node_id} on {self.default_controller.GetCompressedFabricId()}")
+        # Get operational service name
+        service_type = mdns_discovery.MdnsServiceType.OPERATIONAL.value
+        dut_instance_name = self.get_dut_instance_name()
+        service_name = f"{dut_instance_name}.{service_type}"
 
-        icdTxtRecord = OperatingModeEnum(int(service.txt_record['ICD']))
-        if icdTxtRecord.value != int(service.txt_record['ICD']):
-            raise AttributeError(f'Not a known ICD type: {service.txt_record["ICD"]}')
+        # Verify at least one service is present
+        asserts.assert_true(len(services) > 0,
+                            f"At least one operational service ('{service_type}') must present.")
 
-        return icdTxtRecord
+        # Get operational node service
+        service = None
+        for srv in services:
+            if service_name is not None and srv.service_name.upper() != service_name:
+                logger.info("   Name does NOT match \'%s\' vs \'%s\'", service_name, srv.service_name.upper())
+            if srv.service_name.replace(service_type.upper(), service_type) == service_name:
+                service = srv
+
+        # Verify operational node service is present
+        asserts.assert_is_not_none(service,
+                                   f"Failed to get operational node service information for {self.dut_node_id} on {self.default_controller.GetCompressedFabricId()}")
+
+        # Get TXT record
+        icd_value = service.txt['ICD']
+        assert_valid_icd_key(icd_value)
+        return OperatingModeEnum(int(icd_value))
 
     #
     # Test Harness Helpers
@@ -107,7 +129,7 @@ class TC_ICDM_5_1(MatterBaseTest):
         return "[TC-ICDM-5.1] Operating Mode with DUT as Server"
 
     def steps_TC_ICDM_5_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(0, "Commissioning, already done", is_commissioning=True),
             TestStep(1, "TH reads from the DUT the RegisteredClients attribute"),
             TestStep("2a", "TH reads from the DUT the OperatingMode attribute."),
@@ -119,15 +141,13 @@ class TC_ICDM_5_1(MatterBaseTest):
             TestStep("5a", "TH reads from the DUT the OperatingMode attribute."),
             TestStep("5b", "Verify that the ICD DNS-SD TXT key is present."),
         ]
-        return steps
 
     def pics_TC_ICDM_5_1(self) -> list[str]:
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
-        pics = [
+        return [
             "ICDM.S",
             "ICDM.S.F02",
         ]
-        return pics
 
     #
     # ICDM 5.1 Test Body

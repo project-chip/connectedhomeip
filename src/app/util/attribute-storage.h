@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <app/data-model-provider/ProviderChangeListener.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-metadata.h>
 #include <app/util/config.h>
@@ -55,7 +56,7 @@ static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
 
 #define DECLARE_DYNAMIC_ATTRIBUTE_LIST_END()                                                                                       \
     {                                                                                                                              \
-        ZAP_EMPTY_DEFAULT(), 0xFFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)                                     \
+        ZAP_EMPTY_DEFAULT(), 0xFFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE)      \
     } /* cluster revision */                                                                                                       \
     }
 
@@ -65,9 +66,14 @@ static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
 // * Writable attributes must have MATTER_ATTRIBUTE_FLAG_WRITABLE
 // * Nullable attributes (have X in the quality column in the spec) must have MATTER_ATTRIBUTE_FLAG_NULLABLE
 // * Attributes that have T in the Access column in the spec must have MATTER_ATTRIBUTE_FLAG_MUST_USE_TIMED_WRITE
+//
+// NOTE: ZAP_ATTRIBUTE_MASK(READABLE) is added by default to ensure backward compatibility, since DECLARE_DYNAMIC_ATTRIBUTE() is a
+// widely used API. If you want to add a write-only dynamic attribute, either expand the macro or contribute a
+// DECLARE_WRITEONLY_DYNAMIC_ATTRIBUTE API.
 #define DECLARE_DYNAMIC_ATTRIBUTE(attId, attType, attSizeBytes, attrMask)                                                          \
     {                                                                                                                              \
-        ZAP_EMPTY_DEFAULT(), attId, attSizeBytes, ZAP_TYPE(attType), attrMask | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)               \
+        ZAP_EMPTY_DEFAULT(), attId, attSizeBytes, ZAP_TYPE(attType),                                                               \
+            attrMask | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE)                                         \
     }
 
 /**
@@ -186,6 +192,15 @@ chip::DataVersion * emberAfDataVersionStorage(const chip::app::ConcreteClusterPa
  * @brief Returns the number of pre-compiled endpoints.
  */
 uint16_t emberAfFixedEndpointCount();
+
+/**
+ * Get semantic tag list associated with the provided endpoint.
+ * Result is as an empty Span if the endpoint is invalid.
+ * @param endpoint The target endpoint.
+ * @param semanticTags The Span of SemanticTagStructs that will point to the tag list.
+ */
+void GetSemanticTagsForEndpoint(chip::EndpointId endpoint,
+                                chip::Span<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> & semanticTags);
 
 /**
  * Get the semantic tags of the endpoint.
@@ -331,7 +346,7 @@ CHIP_ERROR emberAfSetDeviceTypeList(chip::EndpointId endpoint, chip::Span<const 
 
 /// Returns a change listener that uses the global InteractionModelEngine
 /// instance to report dirty paths
-chip::app::AttributesChangedListener * emberAfGlobalInteractionModelAttributesChangedListener();
+chip::app::DataModel::ProviderChangeListener * emberAfGlobalInteractionModelAttributesChangedListener();
 
 /// Mark the given attribute as having changed:
 ///   - increases the cluster data version for the given cluster
@@ -340,15 +355,15 @@ chip::app::AttributesChangedListener * emberAfGlobalInteractionModelAttributesCh
 ///     receive updated attribute values for a cluster.
 ///
 /// This is a convenience function to make it clear when a `emberAfDataVersionStorage` increase
-/// and a `AttributesChangeListener::MarkDirty` always occur in lock-step.
+/// and a `ProviderChangeListener::MarkDirty` always occur in lock-step.
 void emberAfAttributeChanged(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                             chip::app::AttributesChangedListener * listener);
+                             chip::app::DataModel::ProviderChangeListener * listener);
 
 /// Mark attributes on the given endpoint as having changed.
 ///
 /// Schedules reporting engine to consider the endpoint dirty, however does NOT increase/alter
 /// any cluster data versions.
-void emberAfEndpointChanged(chip::EndpointId endpoint, chip::app::AttributesChangedListener * listener);
+void emberAfEndpointChanged(chip::EndpointId endpoint, chip::app::DataModel::ProviderChangeListener * listener);
 
 /// Maintains a increasing index of structural changes within ember
 /// that determine if existing "indexes" and metadata pointers within ember

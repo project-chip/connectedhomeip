@@ -20,11 +20,12 @@ import("${build_root}/config/linux/pkg_config.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
 
+import("${chip_root}/src/crypto/crypto.gni")
+
 assert(chip_device_platform == "linux")
 
 if (chip_enable_openthread) {
   import("//build_overrides/openthread.gni")
-  import("//build_overrides/ot_br_posix.gni")
 }
 
 if (chip_enable_nfc_based_commissioning) {
@@ -78,6 +79,7 @@ static_library("Linux") {
   deps = [
     "${chip_root}/src/app:app_config",
     "${chip_root}/src/app/common:ids",
+    "${chip_root}/src/app/common:metadata",
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/credentials:credentials_header",
     "${chip_root}/src/setup_payload",
@@ -110,6 +112,13 @@ static_library("Linux") {
     ]
   }
 
+  if (chip_with_trusty_os) {
+    sources += [
+      "DeviceAttestationCredsTrusty.cpp",
+      "DeviceAttestationCredsTrusty.h",
+    ]
+  }
+
   public_deps = [
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/platform:platform_base",
@@ -124,6 +133,8 @@ static_library("Linux") {
       "NFCCommissioningManagerImpl.h",
     ]
     public_configs += [ ":nfc_commissioning_config" ]
+
+    deps += [ "${chip_root}/src/transport/raw:nfc-application-delegate" ]
   }
 
   if (chip_mdns == "platform") {
@@ -164,16 +175,11 @@ static_library("Linux") {
     public_deps += [ "dbus/bluez" ]
   }
 
+  if (chip_with_trusty_os) {
+    public_deps += [ "${chip_root}/third_party/libtrustymatter" ]
+  }
+
   if (chip_device_config_enable_wifipaf) {
     public_deps += [ "${chip_root}/src/wifipaf" ]
   }
-}
-
-source_set("logging") {
-  deps = [
-    "${chip_root}/src/platform:platform_base",
-    "${chip_root}/src/platform/logging:headers",
-  ]
-
-  sources = [ "Logging.cpp" ]
 }

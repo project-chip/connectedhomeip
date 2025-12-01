@@ -42,9 +42,9 @@ namespace FaultInjection {
 // X-Macro style enumeration of Fault Names and their ID.
 // This list is used to generate the "Id" enum and the array of strings sFaultNames[]
 // WARNING: When adding/modifying Faults to the below macro, make sure the changes are duplicated to the CHIPFaultId enum in the
-// Python Module src/controller/python/chip/fault_injection/__init__.py
+// Python Module src/controller/python/matter/fault_injection/__init__.py
 
-// BEGIN-IF-CHANGE-ALSO-CHANGE(src/controller/python/chip/fault_injection/__init__.py)
+// BEGIN-IF-CHANGE-ALSO-CHANGE(src/controller/python/matter/fault_injection/__init__.py)
 #define CHIP_FAULTS_ENUMERATE(X)                                                                                                   \
     X(AllocExchangeContext, 0) /**< Fail the allocation of an ExchangeContext */                                                   \
     X(DropIncomingUDPMsg, 1)   /**< Drop an incoming UDP message without any processing */                                         \
@@ -78,11 +78,17 @@ namespace FaultInjection {
     X(CASECorruptTBEData2Encrypted, 28)                  /**< Send Sigma2 with improperly generated TBEData2Encrypted */           \
     X(CASECorruptSigma2NOC, 29)                          /**< Send Sigma2 with invalid responderNOC */                             \
     X(CASECorruptSigma2ICAC, 30)                         /**< Send Sigma2 with invalid responderICAC */                            \
-    X(CASECorruptSigma2Signature, 31)                    /**< Send Sigma2 with invalid signature */
+    X(CASECorruptSigma2Signature, 31)                    /**< Send Sigma2 with invalid signature */                                \
+    X(ModifyWebRTCICECandidatesSessionId, 32)            /**< Modify session ID in outgoing WebRTC ICECandidates command */        \
+    X(EmptyWebRTCICECandidatesList, 33)                  /**< Empty Candidates List in outgoing WebRTC ICECandidates command */    \
+    X(ClearInMemoryAllocatedVideoStreams, 34)            /**< Empty in-memory allocated video streams during attribute read */     \
+    X(ClearInMemoryAllocatedAudioStreams, 35)            /**< Empty in-memory allocated audio streams during attribute read */     \
+    X(ClearInMemoryAllocatedSnapshotStreams, 36)         /**< Empty in-memory allocated snapshot streams during attribute read */  \
+    X(LoadPersistentCameraAVSMAttributes, 37)            /**< Load persisted Camera AVSM attributes during attribute read */
 
-// END-IF-CHANGE-ALSO-CHANGE(src/controller/python/chip/fault_injection/__init__.py)
+// END-IF-CHANGE-ALSO-CHANGE(src/controller/python/matter/fault_injection/__init__.py)
 // WARNING: When adding/modifying Faults to the below macro, make sure the changes are duplicated to the CHIPFaultId enum in the
-// Python Module src/controller/python/chip/fault_injection/__init__.py
+// Python Module src/controller/python/matter/fault_injection/__init__.py
 
 /**
  * @brief   Fault injection points
@@ -92,7 +98,7 @@ namespace FaultInjection {
  * is identified by a member of this enum.
  *
  * @note IMPORTANT: This enum must be kept in sync with the CHIPFaultId enum in
- * src/controller/python/chip/fault_injection/__init__.py
+ * src/controller/python/matter/fault_injection/__init__.py
  * If you change values here, update them there as well.
  */
 
@@ -114,6 +120,18 @@ static_assert(kFault_IMInvoke_SkipSecondResponse == 14,
 static_assert(kFault_ModifyWebRTCAnswerSessionId == 15,
               "Test plan specification and automation code relies on this value being 15");
 static_assert(kFault_ModifyWebRTCOfferSessionId == 16, "Test plan specification and automation code relies on this value being 16");
+static_assert(kFault_ModifyWebRTCICECandidatesSessionId == 32,
+              "Test plan specification and automation code relies on this value being 32");
+static_assert(kFault_EmptyWebRTCICECandidatesList == 33,
+              "Test plan specification and automation code relies on this value being 33");
+static_assert(kFault_ClearInMemoryAllocatedVideoStreams == 34,
+              "Test plan specification and automation code relies on this value being 34");
+static_assert(kFault_ClearInMemoryAllocatedAudioStreams == 35,
+              "Test plan specification and automation code relies on this value being 35");
+static_assert(kFault_ClearInMemoryAllocatedSnapshotStreams == 36,
+              "Test plan specification and automation code relies on this value being 36");
+static_assert(kFault_LoadPersistentCameraAVSMAttributes == 37,
+              "Test plan specification and automation code relies on this value being 37");
 
 DLL_EXPORT nl::FaultInjection::Manager & GetManager();
 

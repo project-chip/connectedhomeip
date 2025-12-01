@@ -27,7 +27,7 @@
 #include <lib/dnssd/Advertiser.h>
 #include <messaging/ExchangeDelegate.h>
 #include <platform/CHIPDeviceConfig.h>
-#include <protocols/secure_channel/RendezvousParameters.h>
+#include <protocols/secure_channel/PASESession.h>
 #include <system/SystemClock.h>
 
 namespace chip {
@@ -88,6 +88,15 @@ public:
                                                Crypto::Spake2pVerifier & verifier, uint32_t iterations, chip::ByteSpan salt,
                                                FabricIndex fabricIndex, VendorId vendorId);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    CHIP_ERROR OpenJointCommissioningWindow(System::Clock::Seconds32 commissioningTimeout, uint16_t discriminator,
+                                            Crypto::Spake2pVerifier & verifier, uint32_t iterations, ByteSpan salt,
+                                            FabricIndex fabricIndex, VendorId vendorId);
+
+    // Tracks whether joint commissioning mode is ongoing
+    bool IsJCM() const;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+
     void CloseCommissioningWindow();
 
     app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum CommissioningWindowStatusForCluster() const;
@@ -120,6 +129,8 @@ public:
     // For tests only, allow overriding the spec-defined minimum value of the
     // commissioning window timeout.
     void OverrideMinCommissioningTimeout(System::Clock::Seconds32 timeout) { mMinCommissioningTimeoutOverride.SetValue(timeout); }
+
+    Optional<SessionHandle> GetPASESession() const { return mPASESession.Get(); }
 
 private:
     //////////// SessionDelegate Implementation ///////////////
@@ -190,6 +201,11 @@ private:
         app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen;
 
     bool mIsBLE = true;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    // Boolean that tracks whether we are currently in a Joint Commissioning Mode.
+    bool mJCM = false;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
     PASESession mPairingSession;
 

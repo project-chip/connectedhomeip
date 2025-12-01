@@ -32,6 +32,7 @@
 #import "MTRDeviceTestDelegate.h"
 #import "MTRDevice_Internal.h"
 #import "MTRErrorTestUtils.h"
+#import "MTRSecureCodingTestHelpers.h"
 #import "MTRTestCase+ServerAppRunner.h"
 #import "MTRTestCase.h"
 #import "MTRTestControllerDelegate.h"
@@ -60,6 +61,18 @@ static MTRDeviceController * sController = nil;
 
 // Keys we can use to restart the controller.
 static MTRTestKeys * sTestKeys = nil;
+
+static NSDate * MatterEpoch(void)
+{
+    __auto_type * utcTz = [NSTimeZone timeZoneForSecondsFromGMT:0];
+    __auto_type * dateComponents = [[NSDateComponents alloc] init];
+    dateComponents.timeZone = utcTz;
+    dateComponents.year = 2000;
+    dateComponents.month = 1;
+    dateComponents.day = 1;
+    NSCalendar * gregorianCalendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+    return [gregorianCalendar dateFromComponents:dateComponents];
+}
 
 static void WaitForCommissionee(XCTestExpectation * expectation)
 {
@@ -2870,21 +2883,12 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertTrue(dstOffset.count > 0);
     MTRTimeSynchronizationClusterDSTOffsetStruct * currentDSTOffset = dstOffset[0];
 
-    __auto_type * utcTz = [NSTimeZone timeZoneForSecondsFromGMT:0];
-    __auto_type * dateComponents = [[NSDateComponents alloc] init];
-    dateComponents.timeZone = utcTz;
-    dateComponents.year = 2000;
-    dateComponents.month = 1;
-    dateComponents.day = 1;
-    NSCalendar * gregorianCalendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
-    NSDate * matterEpoch = [gregorianCalendar dateFromComponents:dateComponents];
-
     NSDate * nextReportedDSTTransition;
     if (currentDSTOffset.validUntil == nil) {
         nextReportedDSTTransition = nil;
     } else {
         double validUntilMicroSeconds = currentDSTOffset.validUntil.doubleValue;
-        nextReportedDSTTransition = [NSDate dateWithTimeInterval:validUntilMicroSeconds / 1e6 sinceDate:matterEpoch];
+        nextReportedDSTTransition = [NSDate dateWithTimeInterval:validUntilMicroSeconds / 1e6 sinceDate:MatterEpoch()];
     }
 
     __auto_type * tz = [NSTimeZone localTimeZone];
@@ -3326,41 +3330,21 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertTrue(storedAttributeCountDifferenceFromMTRDeviceReport > 300);
 }
 
-- (NSData *)_encodeEncodable:(id<NSSecureCoding>)encodable
-{
-    // We know all our encodables are in fact NSObject.
-    NSObject * obj = (NSObject *) encodable;
-
-    NSError * encodeError;
-    NSData * encodedData = [NSKeyedArchiver archivedDataWithRootObject:encodable requiringSecureCoding:YES error:&encodeError];
-    XCTAssertNil(encodeError, @"Failed to encode %@", NSStringFromClass(obj.class));
-    return encodedData;
-}
-
 - (void)doEncodeDecodeRoundTrip:(id<NSSecureCoding>)encodable
 {
-    NSData * encodedData = [self _encodeEncodable:encodable];
-
     // We know all our encodables are in fact NSObject.
     NSObject * obj = (NSObject *) encodable;
 
     NSError * decodeError;
-    id decodedValue = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObject:obj.class] fromData:encodedData error:&decodeError];
+    id decodedValue = RoundTripEncodable(encodable, &decodeError);
     XCTAssertNil(decodeError, @"Failed to decode %@", NSStringFromClass([obj class]));
-    XCTAssertTrue([decodedValue isKindOfClass:obj.class], @"Expected %@ but got %@", NSStringFromClass(obj.class), NSStringFromClass([decodedValue class]));
-
     XCTAssertEqualObjects(obj, decodedValue, @"Decoding for %@ did not round-trip correctly", NSStringFromClass([obj class]));
 }
 
 - (void)_ensureDecodeFails:(id<NSSecureCoding>)encodable
 {
-    NSData * encodedData = [self _encodeEncodable:encodable];
-
-    // We know all our encodables are in fact NSObject.
-    NSObject * obj = (NSObject *) encodable;
-
     NSError * decodeError;
-    id decodedValue = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObject:obj.class] fromData:encodedData error:&decodeError];
+    id decodedValue = RoundTripEncodable(encodable, &decodeError);
     XCTAssertNil(decodedValue);
     XCTAssertNotNil(decodeError);
 }
@@ -4482,7 +4466,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Delegate 4
     XCTestExpectation * gotReportEnd4 = [self expectationWithDescription:@"Report end for delegate 4"];
     __auto_type * delegate4 = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
-    delegate3.skipSetupSubscription = YES;
+    delegate4.skipSetupSubscription = YES;
     __weak __auto_type weakDelegate4 = delegate4;
     __block NSUInteger attributesReceived4 = 0;
     delegate4.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
@@ -6214,7 +6198,10 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Now we can set up waiting for onSubscriptionPoolWorkComplete from the test
     XCTestExpectation * subscriptionPoolWorkCompleteForTriggerTestExpectation = [self expectationWithDescription:@"_triggerResubscribeWithReason work completed"];
+    __weak __auto_type weakDelegate = delegate;
     delegate.onSubscriptionPoolWorkComplete = ^{
+        __strong __auto_type strongDelegate = weakDelegate;
+        strongDelegate.onSubscriptionPoolWorkComplete = nil;
         [subscriptionPoolWorkCompleteForTriggerTestExpectation fulfill];
     };
 
@@ -6222,6 +6209,128 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [device _handleResubscriptionNeededWithDelayOnDeviceQueue:@(0)];
 
     [self waitForExpectations:@[ subscriptionPoolWorkCompleteForTriggerTestExpectation ] timeout:kTimeoutInSeconds];
+}
+
+- (void)test049_CorrectTimeOnDevice
+{
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    XCTAssertNotNil(controller);
+
+    MTRTestCaseServerApp * app = [self startCommissionedAppWithName:@"all-clusters"
+                                                          arguments:@[]
+                                                         controller:controller
+                                                            payload:kOnboardingPayload2
+                                                             nodeID:@(kDeviceId2)];
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId2) controller:controller];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.forceTimeUpdateShortDelayToZero = YES;
+
+    XCTestExpectation * reachableExpectation = [self expectationWithDescription:@"Device is reachable"];
+    delegate.onReachable = ^{
+        [reachableExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ reachableExpectation ] timeout:60];
+
+    // We relaunch the app multiple times, to try to trigger time
+    // synchronization loss detection. These are the different cases:
+    //
+    //   1) Relaunch with a bad clock, this should just trigger an update,
+    //      because it's the first time that we detect a bad time.
+    //   2) Relaunch with a bad clock again, this should not trigger an update,
+    //      because we avoid doing it too soon after a previous update (see
+    //      MTR_DEVICE_TIME_SYNCHRONIZATION_LOSS_CHECK_CADENCE).
+    //   3) Set the cadence to zero and relaunch with a bad clock again. This
+    //      should trigger an update, because with cadence being zero we won't
+    //      block an update.
+    //   4) Relaunch with a slightly bad clock (and cadence still set to zero).
+    //      This should not trigger an update, because the time is not out of
+    //      sync enough.
+    for (int i = 0; i < 4; ++i) {
+        if (i == 2) {
+            delegate.forceTimeSynchronizationLossDetectionCadenceToZero = YES;
+        }
+
+        __weak __auto_type weakDelegate = delegate;
+
+        XCTestExpectation * subscriptionDroppedExpectation = [self expectationWithDescription:@"Subscription has dropped"];
+        delegate.onNotReachable = ^() {
+            [subscriptionDroppedExpectation fulfill];
+        };
+
+        XCTestExpectation * resubscriptionReachableExpectation =
+            [self expectationWithDescription:@"Resubscription has become reachable"];
+        XCTestExpectation * gotReportsExpectation = [self expectationWithDescription:@"Resubscription got reports"];
+        XCTestExpectation * correctedTime = [self expectationWithDescription:@"onUTCTimeSet called"];
+        delegate.onReachable = ^() {
+            __strong __auto_type strongDelegate = weakDelegate;
+
+            strongDelegate.onReportEnd = ^() {
+                __strong __auto_type strongDelegate = weakDelegate;
+                strongDelegate.onReportEnd = nil;
+                [gotReportsExpectation fulfill];
+            };
+
+            strongDelegate.onUTCTimeSet = ^(NSError * _Nullable error) {
+                XCTAssertNil(error);
+                [correctedTime fulfill];
+            };
+            if (i == 1 || i == 3) {
+                correctedTime.inverted = YES;
+            }
+            [resubscriptionReachableExpectation fulfill];
+        };
+
+        double utcTime;
+        if (i < 3) {
+            utcTime = 0;
+        } else {
+            // Set an incorrect time that's within the range that we ignore (we
+            // offset it by 4 minutes, which is smaller than the 5 minutes that
+            // MTR_DEVICE_TIME_DIFFERENCE_TRIGGERING_TIME_SYNC is currently set
+            // to.
+            utcTime = [[NSDate dateWithTimeIntervalSinceNow:-240] timeIntervalSinceDate:MatterEpoch()];
+        }
+        // This will add duplicate arguments, but that shouldn't hurt anything. Last one will take precedence.
+        BOOL started = [self restartApp:app additionalArguments:@[ @"--use_mock_clock", @(utcTime).stringValue ]];
+        XCTAssertTrue(started);
+
+        [self waitForExpectations:@[ subscriptionDroppedExpectation, resubscriptionReachableExpectation, gotReportsExpectation ] timeout:60];
+
+        // correctedTime is sometimes inverted, so wait on it separately with a lower timeout to avoid
+        // always waiting for at least a minute every time we don't expect onUTCTimeset to be called.
+        [self waitForExpectations:@[ correctedTime ] timeout:10];
+    }
+}
+
+- (void)test050_readAttributePaths_withWildCardPath
+{
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+
+    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Subscription has been set up"];
+
+    delegate.onReportEnd = ^{
+        [subscriptionExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+
+    // read wildcard values
+    NSArray * values = [device readAttributePaths:@[ [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:nil attributeID:nil] ]];
+
+    XCTAssertNotNil(values);
+    // Conservatively assume all-clusters-app has more than 100 attributes ready by MTRDevice by subscription establishment time (last count 1308)
+    XCTAssertGreaterThan(values.count, 100);
 }
 
 @end

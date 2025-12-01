@@ -64,26 +64,26 @@ class ClosureControlCluster(
     object SubscriptionEstablished : CurrentErrorListAttributeSubscriptionState()
   }
 
-  class OverallStateAttribute(val value: ClosureControlClusterOverallStateStruct?)
+  class OverallCurrentStateAttribute(val value: ClosureControlClusterOverallCurrentStateStruct?)
 
-  sealed class OverallStateAttributeSubscriptionState {
-    data class Success(val value: ClosureControlClusterOverallStateStruct?) :
-      OverallStateAttributeSubscriptionState()
+  sealed class OverallCurrentStateAttributeSubscriptionState {
+    data class Success(val value: ClosureControlClusterOverallCurrentStateStruct?) :
+      OverallCurrentStateAttributeSubscriptionState()
 
-    data class Error(val exception: Exception) : OverallStateAttributeSubscriptionState()
+    data class Error(val exception: Exception) : OverallCurrentStateAttributeSubscriptionState()
 
-    object SubscriptionEstablished : OverallStateAttributeSubscriptionState()
+    object SubscriptionEstablished : OverallCurrentStateAttributeSubscriptionState()
   }
 
-  class OverallTargetAttribute(val value: ClosureControlClusterOverallTargetStruct?)
+  class OverallTargetStateAttribute(val value: ClosureControlClusterOverallTargetStateStruct?)
 
-  sealed class OverallTargetAttributeSubscriptionState {
-    data class Success(val value: ClosureControlClusterOverallTargetStruct?) :
-      OverallTargetAttributeSubscriptionState()
+  sealed class OverallTargetStateAttributeSubscriptionState {
+    data class Success(val value: ClosureControlClusterOverallTargetStateStruct?) :
+      OverallTargetStateAttributeSubscriptionState()
 
-    data class Error(val exception: Exception) : OverallTargetAttributeSubscriptionState()
+    data class Error(val exception: Exception) : OverallTargetStateAttributeSubscriptionState()
 
-    object SubscriptionEstablished : OverallTargetAttributeSubscriptionState()
+    object SubscriptionEstablished : OverallTargetStateAttributeSubscriptionState()
   }
 
   class GeneratedCommandListAttribute(val value: List<UInt>)
@@ -138,7 +138,7 @@ class ClosureControlCluster(
     position: UByte?,
     latch: Boolean?,
     speed: UByte?,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration,
   ) {
     val commandId: UInt = 1u
 
@@ -166,7 +166,7 @@ class ClosureControlCluster(
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun calibrate(timedInvokeTimeout: Duration? = null) {
+  suspend fun calibrate(timedInvokeTimeout: Duration) {
     val commandId: UInt = 2u
 
     val tlvWriter = TlvWriter()
@@ -463,7 +463,7 @@ class ClosureControlCluster(
     }
   }
 
-  suspend fun readOverallStateAttribute(): OverallStateAttribute {
+  suspend fun readOverallCurrentStateAttribute(): OverallCurrentStateAttribute {
     val ATTRIBUTE_ID: UInt = 3u
 
     val attributePath =
@@ -485,25 +485,25 @@ class ClosureControlCluster(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Overallstate attribute not found in response" }
+    requireNotNull(attributeData) { "Overallcurrentstate attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: ClosureControlClusterOverallStateStruct? =
+    val decodedValue: ClosureControlClusterOverallCurrentStateStruct? =
       if (!tlvReader.isNull()) {
-        ClosureControlClusterOverallStateStruct.fromTlv(AnonymousTag, tlvReader)
+        ClosureControlClusterOverallCurrentStateStruct.fromTlv(AnonymousTag, tlvReader)
       } else {
         tlvReader.getNull(AnonymousTag)
         null
       }
 
-    return OverallStateAttribute(decodedValue)
+    return OverallCurrentStateAttribute(decodedValue)
   }
 
-  suspend fun subscribeOverallStateAttribute(
+  suspend fun subscribeOverallCurrentStateAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<OverallStateAttributeSubscriptionState> {
+  ): Flow<OverallCurrentStateAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 3u
     val attributePaths =
       listOf(
@@ -522,7 +522,7 @@ class ClosureControlCluster(
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            OverallStateAttributeSubscriptionState.Error(
+            OverallCurrentStateAttributeSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -535,28 +535,30 @@ class ClosureControlCluster(
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) { "Overallstate attribute not found in Node State update" }
+          requireNotNull(attributeData) {
+            "Overallcurrentstate attribute not found in Node State update"
+          }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: ClosureControlClusterOverallStateStruct? =
+          val decodedValue: ClosureControlClusterOverallCurrentStateStruct? =
             if (!tlvReader.isNull()) {
-              ClosureControlClusterOverallStateStruct.fromTlv(AnonymousTag, tlvReader)
+              ClosureControlClusterOverallCurrentStateStruct.fromTlv(AnonymousTag, tlvReader)
             } else {
               tlvReader.getNull(AnonymousTag)
               null
             }
 
-          decodedValue?.let { emit(OverallStateAttributeSubscriptionState.Success(it)) }
+          decodedValue?.let { emit(OverallCurrentStateAttributeSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(OverallStateAttributeSubscriptionState.SubscriptionEstablished)
+          emit(OverallCurrentStateAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }
   }
 
-  suspend fun readOverallTargetAttribute(): OverallTargetAttribute {
+  suspend fun readOverallTargetStateAttribute(): OverallTargetStateAttribute {
     val ATTRIBUTE_ID: UInt = 4u
 
     val attributePath =
@@ -578,25 +580,25 @@ class ClosureControlCluster(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Overalltarget attribute not found in response" }
+    requireNotNull(attributeData) { "Overalltargetstate attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: ClosureControlClusterOverallTargetStruct? =
+    val decodedValue: ClosureControlClusterOverallTargetStateStruct? =
       if (!tlvReader.isNull()) {
-        ClosureControlClusterOverallTargetStruct.fromTlv(AnonymousTag, tlvReader)
+        ClosureControlClusterOverallTargetStateStruct.fromTlv(AnonymousTag, tlvReader)
       } else {
         tlvReader.getNull(AnonymousTag)
         null
       }
 
-    return OverallTargetAttribute(decodedValue)
+    return OverallTargetStateAttribute(decodedValue)
   }
 
-  suspend fun subscribeOverallTargetAttribute(
+  suspend fun subscribeOverallTargetStateAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<OverallTargetAttributeSubscriptionState> {
+  ): Flow<OverallTargetStateAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 4u
     val attributePaths =
       listOf(
@@ -615,7 +617,7 @@ class ClosureControlCluster(
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            OverallTargetAttributeSubscriptionState.Error(
+            OverallTargetStateAttributeSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -628,22 +630,117 @@ class ClosureControlCluster(
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) { "Overalltarget attribute not found in Node State update" }
+          requireNotNull(attributeData) {
+            "Overalltargetstate attribute not found in Node State update"
+          }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: ClosureControlClusterOverallTargetStruct? =
+          val decodedValue: ClosureControlClusterOverallTargetStateStruct? =
             if (!tlvReader.isNull()) {
-              ClosureControlClusterOverallTargetStruct.fromTlv(AnonymousTag, tlvReader)
+              ClosureControlClusterOverallTargetStateStruct.fromTlv(AnonymousTag, tlvReader)
             } else {
               tlvReader.getNull(AnonymousTag)
               null
             }
 
-          decodedValue?.let { emit(OverallTargetAttributeSubscriptionState.Success(it)) }
+          decodedValue?.let { emit(OverallTargetStateAttributeSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(OverallTargetAttributeSubscriptionState.SubscriptionEstablished)
+          emit(OverallTargetStateAttributeSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readLatchControlModesAttribute(): UByte? {
+    val ATTRIBUTE_ID: UInt = 5u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Latchcontrolmodes attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UByte? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUByte(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
+  }
+
+  suspend fun subscribeLatchControlModesAttribute(
+    minInterval: Int,
+    maxInterval: Int,
+  ): Flow<UByteSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 5u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            UByteSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Latchcontrolmodes attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UByte? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              tlvReader.getUByte(AnonymousTag)
+            } else {
+              null
+            }
+
+          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(UByteSubscriptionState.SubscriptionEstablished)
         }
       }
     }

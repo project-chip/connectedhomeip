@@ -37,14 +37,15 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 
-import chip.clusters as Clusters
 import test_plan_support
-from chip.testing.matter_testing import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, default_matter_test_main,
-                                         has_cluster, run_if_endpoint_matches)
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 
 
 class TC_LVL_2_3(MatterBaseTest):
@@ -125,13 +126,13 @@ class TC_LVL_2_3(MatterBaseTest):
         await self.send_single_cmd(cmd)
         # NOTE: added this sleep to let the DUT have some time to move
         logging.info("Test waits for 1 seconds")
-        time.sleep(1)
+        await asyncio.sleep(1)
 
         self.step(5)
         start_current_level = await self.read_single_attribute_check_success(cluster=lvl, attribute=lvl.Attributes.CurrentLevel)
 
         self.step(6)
-        sub_handler = ClusterAttributeChangeAccumulator(lvl)
+        sub_handler = AttributeSubscriptionHandler(expected_cluster=lvl)
         await sub_handler.start(self.default_controller, self.dut_node_id, self.get_endpoint())
 
         self.step(7)
@@ -140,7 +141,7 @@ class TC_LVL_2_3(MatterBaseTest):
 
         self.step(8)
         logging.info('Test will now collect data for 30 seconds')
-        time.sleep(30)
+        await asyncio.sleep(30)
 
         self.step(9)
         count = sub_handler.attribute_report_counts[lvl.Attributes.CurrentLevel]
@@ -169,7 +170,8 @@ class TC_LVL_2_3(MatterBaseTest):
 
         self.step(13)
         if (lvl.Bitmaps.Feature.kLighting & feature_map) == 0:
-            self.skip_all_remaining_steps(15)
+            self.mark_all_remaining_steps_skipped(15)
+            return
 
         self.step(15)
         # reports are stored by the handler, so just reset so we get a clean look
@@ -182,7 +184,7 @@ class TC_LVL_2_3(MatterBaseTest):
 
         self.step(17)
         logging.info("Test waits for 5 seconds")
-        time.sleep(5)
+        await asyncio.sleep(5)
 
         self.step(18)
         cmd = Clusters.LevelControl.Commands.MoveToLevel(
@@ -191,7 +193,7 @@ class TC_LVL_2_3(MatterBaseTest):
 
         self.step(19)
         logging.info("Test waits for 20 seconds")
-        time.sleep(20)
+        await asyncio.sleep(20)
 
         self.step(20)
         count = sub_handler.attribute_report_counts[lvl.Attributes.RemainingTime]

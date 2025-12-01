@@ -18,6 +18,7 @@
 
 #include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-server.h>
 #include <camera-av-settings-user-level-management-instance.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -30,10 +31,13 @@ std::unique_ptr<AVSettingsUserLevelManagementDelegate> gDelegate;
 std::unique_ptr<CameraAvSettingsUserLevelMgmtServer> gAVSettingsUserLevelManagementCluster;
 static constexpr EndpointId kEndpointId = 1;
 
+static void onTimerExpiry(System::Layer * systemLayer, void * data);
+
 void Shutdown()
 {
     if (gAVSettingsUserLevelManagementCluster != nullptr)
     {
+        gDelegate->CancelActiveTimers();
         gDelegate                             = nullptr;
         gAVSettingsUserLevelManagementCluster = nullptr;
     }
@@ -50,7 +54,7 @@ void AVSettingsUserLevelManagementDelegate::VideoStreamAllocated(uint16_t aStrea
 {
     // The app needs to invoke this whenever the AV Stream Manager allocates a video stream; this informs the server of the
     // id that is now subject to DPTZ, and the default viewport of the device
-    Structs::ViewportStruct::Type viewport = { 0, 0, 1920, 1080 };
+    Globals::Structs::ViewportStruct::Type viewport = { 0, 0, 1920, 1080 };
     this->GetServer()->AddMoveCapableVideoStream(aStreamID, viewport);
 }
 
@@ -61,7 +65,7 @@ void AVSettingsUserLevelManagementDelegate::VideoStreamDeallocated(uint16_t aStr
     this->GetServer()->RemoveMoveCapableVideoStream(aStreamID);
 }
 
-void AVSettingsUserLevelManagementDelegate::DefaultViewportUpdated(Structs::ViewportStruct::Type aViewport)
+void AVSettingsUserLevelManagementDelegate::DefaultViewportUpdated(Globals::Structs::ViewportStruct::Type aViewport)
 {
     // The app needs to invoke this whenever the AV Stream Manager updates the device level default Viewport.  This informs
     // the server of the new viewport that shall be appled to all known streams.
@@ -69,31 +73,41 @@ void AVSettingsUserLevelManagementDelegate::DefaultViewportUpdated(Structs::View
 }
 
 Status AVSettingsUserLevelManagementDelegate::MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                                              Optional<uint8_t> aZoom)
+                                                              Optional<uint8_t> aZoom, PhysicalPTZCallback * callback)
 {
     // The Cluster implementation has validated that the Feature Flags are set and the values themselves are in range. Do any needed
-    // hardware interactions to actually set the camera to the new values of PTZ.  Then return a Status response. The server itself
-    // will persist the new values.
+    // hardware interactions to actually set the camera to the new values of PTZ.  Once the hardware has confirmed movements, invoke
+    // the callback. The server itself will persist the new values.
     //
+    mCallback = callback;
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this);
+
     return Status::Success;
 }
 
 Status AVSettingsUserLevelManagementDelegate::MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                                               Optional<uint8_t> aZoom)
+                                                               Optional<uint8_t> aZoom, PhysicalPTZCallback * callback)
 {
     // The Cluster implementation has validated that the Feature Flags are set and the values themselves are in range. Do any needed
-    // hardware interactions to actually set the camera to the new values of PTZ.  Then return a Status response. The server itself
-    // will persist the new values.
+    // hardware interactions to actually set the camera to the new values of PTZ.  Once the hardware has confirmed movements, invoke
+    // the callback. The server itself will persist the new values.
     //
+    mCallback = callback;
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this);
+
     return Status::Success;
 }
 
 Status AVSettingsUserLevelManagementDelegate::MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt,
-                                                               Optional<uint8_t> aZoom)
+                                                               Optional<uint8_t> aZoom, PhysicalPTZCallback * callback)
 {
     // The Cluster implementation has validated the preset is valid, and provided the MPTZ values associated with that preset.
-    // Do any needed hardware interactions to actually set the camera to the new values of PTZ.  Then return a Status response.
+    // Do any needed hardware interactions to actually set the camera to the new values of PTZ.  Once the hardware has confirmed
+    // movements, invoke the callback. The server itself will persist the new values.
     //
+    mCallback = callback;
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this);
+
     return Status::Success;
 }
 
@@ -113,7 +127,8 @@ Status AVSettingsUserLevelManagementDelegate::MPTZRemovePreset(uint8_t aPreset)
     return Status::Success;
 }
 
-Status AVSettingsUserLevelManagementDelegate::DPTZSetViewport(uint16_t aVideoStreamID, Structs::ViewportStruct::Type aViewport)
+Status AVSettingsUserLevelManagementDelegate::DPTZSetViewport(uint16_t aVideoStreamID,
+                                                              Globals::Structs::ViewportStruct::Type aViewport)
 {
     // The Cluster implementation has ensured that the videoStreamID represents a valid stream.
     // The application needs to interact with its instance of AVStreamManagement to access the stream, validate the viewport
@@ -124,7 +139,7 @@ Status AVSettingsUserLevelManagementDelegate::DPTZSetViewport(uint16_t aVideoStr
 
 Status AVSettingsUserLevelManagementDelegate::DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX,
                                                                Optional<int16_t> aDeltaY, Optional<int8_t> aZoomDelta,
-                                                               Structs::ViewportStruct::Type & aViewport)
+                                                               Globals::Structs::ViewportStruct::Type & aViewport)
 {
     // The Cluster implementation has ensured that the videoStreamID represents a valid stream.
     // The application needs to interact with its instance of AVStreamManagement to access the stream, validate
@@ -143,7 +158,7 @@ CHIP_ERROR AVSettingsUserLevelManagementDelegate::LoadMPTZPresets(std::vector<MP
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AVSettingsUserLevelManagementDelegate::LoadDPTZStreams(std::vector<DPTZStruct> dptzStreams)
+CHIP_ERROR AVSettingsUserLevelManagementDelegate::LoadDPTZStreams(std::vector<DPTZStruct> & dptzStreams)
 {
     dptzStreams.clear();
     return CHIP_NO_ERROR;
@@ -152,6 +167,41 @@ CHIP_ERROR AVSettingsUserLevelManagementDelegate::LoadDPTZStreams(std::vector<DP
 CHIP_ERROR AVSettingsUserLevelManagementDelegate::PersistentAttributesLoadedCallback()
 {
     return CHIP_NO_ERROR;
+}
+
+// Timer expiration to mimic PTZ physical movememt
+//
+static void onTimerExpiry(System::Layer * systemLayer, void * data)
+{
+    AVSettingsUserLevelManagementDelegate * delegate = reinterpret_cast<AVSettingsUserLevelManagementDelegate *>(data);
+
+    // All timers are cancelled on delegate shutdown, hence if this is invoked the delegate is alive
+    delegate->OnPhysicalMoveCompleted(Protocols::InteractionModel::Status::Success);
+}
+
+void AVSettingsUserLevelManagementDelegate::ShutdownApp()
+{
+    CancelActiveTimers();
+}
+
+void AVSettingsUserLevelManagementDelegate::CancelActiveTimers()
+{
+    // Cancel the PTZ mimic timer if it is active
+    DeviceLayer::SystemLayer().CancelTimer(onTimerExpiry, this);
+}
+
+// To be invoked by the camera once a physical PTZ action has completed. The callback method is realized by our cluster server,
+// make sure that is still alive before trying to invoke methods thereon.
+//
+void AVSettingsUserLevelManagementDelegate::OnPhysicalMoveCompleted(Protocols::InteractionModel::Status status)
+{
+    if (GetServer() != nullptr)
+    {
+        if (mCallback != nullptr)
+        {
+            mCallback->OnPhysicalMovementComplete(status);
+        }
+    }
 }
 
 void emberAfCameraAvSettingsUserLevelManagementClusterInitCallback(chip::EndpointId aEndpointId)
@@ -180,16 +230,17 @@ void emberAfCameraAvSettingsUserLevelManagementClusterInitCallback(chip::Endpoin
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kTiltMin,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kTiltMax,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMin,
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMax);
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMax,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kMovementState);
 
     gAVSettingsUserLevelManagementCluster = std::make_unique<CameraAvSettingsUserLevelMgmtServer>(
         kEndpointId, *gDelegate.get(), avsumFeatures, avsumAttrs, appMaxPresets);
-    gAVSettingsUserLevelManagementCluster->Init();
+    TEMPORARY_RETURN_IGNORED gAVSettingsUserLevelManagementCluster->Init();
 
     // Set app specific limits to pan, tilt, zoom
-    gAVSettingsUserLevelManagementCluster->SetPanMin(appPanMin);
-    gAVSettingsUserLevelManagementCluster->SetPanMax(appPanMax);
-    gAVSettingsUserLevelManagementCluster->SetTiltMin(appTiltMin);
-    gAVSettingsUserLevelManagementCluster->SetTiltMax(appTiltMax);
-    gAVSettingsUserLevelManagementCluster->SetZoomMax(appZoomMax);
+    TEMPORARY_RETURN_IGNORED gAVSettingsUserLevelManagementCluster->SetPanMin(appPanMin);
+    TEMPORARY_RETURN_IGNORED gAVSettingsUserLevelManagementCluster->SetPanMax(appPanMax);
+    TEMPORARY_RETURN_IGNORED gAVSettingsUserLevelManagementCluster->SetTiltMin(appTiltMin);
+    TEMPORARY_RETURN_IGNORED gAVSettingsUserLevelManagementCluster->SetTiltMax(appTiltMax);
+    TEMPORARY_RETURN_IGNORED gAVSettingsUserLevelManagementCluster->SetZoomMax(appZoomMax);
 }

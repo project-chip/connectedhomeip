@@ -38,7 +38,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-infineon:134
+            image: ghcr.io/project-chip/chip-build-infineon:175
             env:
                # TODO: this should probably be part of the dockerfile itself
                CY_TOOLS_PATHS: /opt/Tools/ModusToolbox/tools_3.2
@@ -46,7 +46,7 @@ jobs:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -112,6 +112,8 @@ jobs:
                       /tmp/bloat_reports/
 
             - name: Build CYW30739 Lighting App
+              # CYW30739 builds disabled: https://github.com/project-chip/connectedhomeip/issues/39964
+              if: false
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py \
@@ -123,6 +125,8 @@ jobs:
                       --copy-artifacts-to out/artifacts \
                     "
             - name: Get light size stats
+              # CYW30739 builds disabled: https://github.com/project-chip/connectedhomeip/issues/39964
+              if: false
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     cyw30739 CYW30739B2-P5-EVK-01 light \
@@ -141,8 +145,12 @@ jobs:
                     out/artifacts/cyw30739-cyw930739m2evb_02-light/lighting_app-CYW930739M2EVB-02.elf \
                     /tmp/bloat_reports/
             - name: Clean out build output
+              # CYW30739 builds disabled: https://github.com/project-chip/connectedhomeip/issues/39964
+              if: false
               run: rm -rf ./out
             - name: Build CYW30739 Light Switch App
+              # CYW30739 builds disabled: https://github.com/project-chip/connectedhomeip/issues/39964
+              if: false
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py \
@@ -153,6 +161,8 @@ jobs:
                       --copy-artifacts-to out/artifacts \
                     "
             - name: Get light-switch size stats
+              # CYW30739 builds disabled: https://github.com/project-chip/connectedhomeip/issues/39964
+              if: false
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     cyw30739 CYW30739B2-P5-EVK-01 light-switch \
@@ -167,8 +177,12 @@ jobs:
                     out/artifacts/cyw30739-cyw30739b2_p5_evk_03-light-switch/light_switch_app-CYW30739B2-P5-EVK-03.elf \
                     /tmp/bloat_reports/
             - name: Clean out build output
+              # CYW30739 builds disabled: https://github.com/project-chip/connectedhomeip/issues/39964
+              if: false
               run: rm -rf ./out
             - name: Build CYW30739 Lock App
+              # CYW30739 builds disabled: https://github.com/project-chip/connectedhomeip/issues/39964
+              if: false
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py \
@@ -179,6 +193,8 @@ jobs:
                       --copy-artifacts-to out/artifacts \
                     "
             - name: Get lock size stats
+              # CYW30739 builds disabled: https://github.com/project-chip/connectedhomeip/issues/39964
+              if: false
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     cyw30739 CYW30739B2-P5-EVK-01 lock \
@@ -193,8 +209,12 @@ jobs:
                     out/artifacts/cyw30739-cyw30739b2_p5_evk_03-lock/lock_app-CYW30739B2-P5-EVK-03.elf \
                     /tmp/bloat_reports/
             - name: Clean out build output
+              # CYW30739 builds disabled: https://github.com/project-chip/connectedhomeip/issues/39964
+              if: false
               run: rm -rf ./out
             - name: Build CYW30739 Thermostat App
+              # CYW30739 builds disabled: https://github.com/project-chip/connectedhomeip/issues/39964
+              if: false
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py \
@@ -205,6 +225,8 @@ jobs:
                       --copy-artifacts-to out/artifacts \
                     "
             - name: Get thermostat size stats
+              # CYW30739 builds disabled: https://github.com/project-chip/connectedhomeip/issues/39964
+              if: false
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     cyw30739 CYW30739B2-P5-EVK-01 thermostat \
@@ -219,6 +241,8 @@ jobs:
                     out/artifacts/cyw30739-cyw30739b2_p5_evk_03-thermostat/thermostat-CYW30739B2-P5-EVK-03.elf \
                     /tmp/bloat_reports/
             - name: Clean out build output
+              # CYW30739 builds disabled: https://github.com/project-chip/connectedhomeip/issues/39964
+              if: false
               run: rm -rf ./out
             - name: Uploading Size Reports
               uses: ./.github/actions/upload-size-reports

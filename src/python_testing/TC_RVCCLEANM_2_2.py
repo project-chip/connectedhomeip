@@ -22,14 +22,14 @@
 # test-runner-runs:
 #   run1:
 #     app: ${CHIP_RVC_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/rvccleanm_2_2_fifo
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
 #       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
-#       --app-pipe_prefix /tmp/chip_rvc_fifo_
+#       --app-pipe /tmp/rvccleanm_2_2_fifo
 #       --endpoint 1
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
@@ -39,9 +39,10 @@
 
 import enum
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
 
 
 class RvcStatusEnum(enum.IntEnum):
@@ -70,29 +71,24 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
             endpoint=self.endpoint, cluster=cluster, attribute=attribute)
 
     async def read_run_supported_modes(self) -> Clusters.Objects.RvcRunMode.Attributes.SupportedModes:
-        ret = await self.read_mod_attribute_expect_success(
+        return await self.read_mod_attribute_expect_success(
             Clusters.RvcRunMode,
             Clusters.RvcRunMode.Attributes.SupportedModes)
-        return ret
 
     async def read_clean_supported_modes(self) -> Clusters.Objects.RvcCleanMode.Attributes.SupportedModes:
-        ret = await self.read_mod_attribute_expect_success(
+        return await self.read_mod_attribute_expect_success(
             Clusters.RvcCleanMode,
             Clusters.RvcCleanMode.Attributes.SupportedModes)
-        return ret
 
     async def read_feature_map_attribute(self):
-        ret = await self.read_mod_attribute_expect_success(Clusters.RvcCleanMode,
-                                                           Clusters.RvcCleanMode.Attributes.FeatureMap)
-        return ret
+        return await self.read_mod_attribute_expect_success(Clusters.RvcCleanMode,
+                                                            Clusters.RvcCleanMode.Attributes.FeatureMap)
 
     async def send_clean_change_to_mode_cmd(self, newMode) -> Clusters.Objects.RvcCleanMode.Commands.ChangeToModeResponse:
-        ret = await self.send_single_cmd(cmd=Clusters.Objects.RvcCleanMode.Commands.ChangeToMode(newMode=newMode), endpoint=self.endpoint)
-        return ret
+        return await self.send_single_cmd(cmd=Clusters.Objects.RvcCleanMode.Commands.ChangeToMode(newMode=newMode), endpoint=self.endpoint)
 
     async def send_run_change_to_mode_cmd(self, newMode) -> Clusters.Objects.RvcRunMode.Commands.ChangeToModeResponse:
-        ret = await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=newMode), endpoint=self.endpoint)
-        return ret
+        return await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=newMode), endpoint=self.endpoint)
 
     # Prints the instruction and waits for a user input to continue
     def print_instruction(self, step_number, instruction):
@@ -173,7 +169,7 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
 
         self.print_step("7b", "Send ChangeToMode command")
         response = await self.send_clean_change_to_mode_cmd(self.new_clean_mode_th)
-        asserts.assert_true(type_matches(response, Clusters.RvcCleanMode.Commands.ChangeToModeResponse),
+        asserts.assert_true(matchers.is_type(response, Clusters.RvcCleanMode.Commands.ChangeToModeResponse),
                             "The response should ChangeToModeResponse command")
         if directmode_enabled:
             asserts.assert_equal(response.status, RvcStatusEnum.Success,

@@ -25,6 +25,7 @@
 #if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
 #include <imgui_ui/ui.h>
 #include <imgui_ui/windows/boolean_state.h>
+#include <imgui_ui/windows/connectivity.h>
 #include <imgui_ui/windows/occupancy_sensing.h>
 #include <imgui_ui/windows/qrcode.h>
 #endif
@@ -36,7 +37,6 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 
 namespace {
-constexpr char kChipEventFifoPathPrefix[] = "/tmp/chip_water_leak_detector_fifo_";
 NamedPipeCommands sChipNamedPipeCommands;
 WaterLeakDetectorAppAttrUpdateDelegate sWaterLeakDetectorAppAttrUpdateDelegate;
 } // namespace
@@ -51,19 +51,19 @@ void ApplicationShutdown() {}
 int main(int argc, char * argv[])
 {
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
+    std::string path = std::string(LinuxDeviceOptions::GetInstance().app_pipe);
 
-    std::string path = kChipEventFifoPathPrefix + std::to_string(getpid());
-
-    if (sChipNamedPipeCommands.Start(path, &sWaterLeakDetectorAppAttrUpdateDelegate) != CHIP_NO_ERROR)
+    if ((!path.empty()) and (sChipNamedPipeCommands.Start(path, &sWaterLeakDetectorAppAttrUpdateDelegate) != CHIP_NO_ERROR))
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
-        sChipNamedPipeCommands.Stop();
+        SuccessOrDie(sChipNamedPipeCommands.Stop());
     }
 
 #if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
     example::Ui::ImguiUi ui;
 
     ui.AddWindow(std::make_unique<example::Ui::Windows::QRCode>());
+    ui.AddWindow(std::make_unique<example::Ui::Windows::Connectivity>());
     ui.AddWindow(std::make_unique<example::Ui::Windows::BooleanState>(chip::EndpointId(1), "Water Leak Detector"));
 
     ChipLinuxAppMainLoop(&ui);

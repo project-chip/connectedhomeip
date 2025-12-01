@@ -291,6 +291,7 @@ void ContentAppPlatform::SetupAppPlatform()
 
 ContentApp * ContentAppPlatform::GetContentAppInternal(const CatalogVendorApp & vendorApp)
 {
+    VerifyOrReturnValue(mContentAppFactory != nullptr, nullptr, ChipLogError(DeviceLayer, "mContentAppFactory is null"));
     if (vendorApp.catalogVendorId != mContentAppFactory->GetPlatformCatalogVendorId())
     {
         return nullptr;
@@ -325,6 +326,7 @@ ContentApp * ContentAppPlatform::LoadContentAppInternal(const CatalogVendorApp &
 ContentApp * ContentAppPlatform::LoadContentAppByClient(uint16_t vendorId, uint16_t productId)
 {
     ChipLogProgress(DeviceLayer, "LoadContentAppByVendorId() - vendorId %d, productId %d", vendorId, productId);
+    VerifyOrReturnValue(mContentAppFactory != nullptr, nullptr, ChipLogError(DeviceLayer, "mContentAppFactory is null"));
 
     CatalogVendorApp vendorApp;
     CHIP_ERROR err = mContentAppFactory->LookupCatalogVendorApp(vendorId, productId, &vendorApp);
@@ -339,6 +341,7 @@ ContentApp * ContentAppPlatform::LoadContentAppByClient(uint16_t vendorId, uint1
 
 ContentApp * ContentAppPlatform::LoadContentApp(const CatalogVendorApp & vendorApp)
 {
+    VerifyOrReturnValue(mContentAppFactory != nullptr, nullptr, ChipLogError(DeviceLayer, "mContentAppFactory is null"));
     if (vendorApp.catalogVendorId == mContentAppFactory->GetPlatformCatalogVendorId())
     {
         return LoadContentAppInternal(vendorApp);
@@ -356,6 +359,7 @@ ContentApp * ContentAppPlatform::LoadContentApp(const CatalogVendorApp & vendorA
 
 ContentApp * ContentAppPlatform::GetContentApp(const CatalogVendorApp & vendorApp)
 {
+    VerifyOrReturnValue(mContentAppFactory != nullptr, nullptr, ChipLogError(DeviceLayer, "mContentAppFactory is null"));
     if (vendorApp.catalogVendorId == mContentAppFactory->GetPlatformCatalogVendorId())
     {
         return GetContentAppInternal(vendorApp);
@@ -615,8 +619,8 @@ CHIP_ERROR ContentAppPlatform::GetACLEntryIndex(size_t * foundIndex, FabricIndex
             CHIP_ERROR err = Access::GetAccessControl().ReadEntry(fabricIndex, --index, entry);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogDetail(DeviceLayer, "ContentAppPlatform::GetACLEntryIndex error reading entry %d err %s",
-                              static_cast<int>(index), ErrorStr(err));
+                ChipLogDetail(DeviceLayer, "ContentAppPlatform::GetACLEntryIndex error reading entry %d: %" CHIP_ERROR_FORMAT,
+                              static_cast<int>(index), err.Format());
             }
             else
             {
@@ -624,9 +628,10 @@ CHIP_ERROR ContentAppPlatform::GetACLEntryIndex(size_t * foundIndex, FabricIndex
                 err = entry.GetSubjectCount(count);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogDetail(DeviceLayer,
-                                  "ContentAppPlatform::GetACLEntryIndex error reading subject count for entry %d err %s",
-                                  static_cast<int>(index), ErrorStr(err));
+                    ChipLogDetail(
+                        DeviceLayer,
+                        "ContentAppPlatform::GetACLEntryIndex error reading subject count for entry %d: %" CHIP_ERROR_FORMAT,
+                        static_cast<int>(index), err.Format());
                     continue;
                 }
                 if (count)
@@ -638,9 +643,10 @@ CHIP_ERROR ContentAppPlatform::GetACLEntryIndex(size_t * foundIndex, FabricIndex
                         err = entry.GetSubject(i, subject);
                         if (err != CHIP_NO_ERROR)
                         {
-                            ChipLogDetail(DeviceLayer,
-                                          "ContentAppPlatform::GetACLEntryIndex error reading subject %i for entry %d err %s",
-                                          static_cast<int>(i), static_cast<int>(index), ErrorStr(err));
+                            ChipLogDetail(
+                                DeviceLayer,
+                                "ContentAppPlatform::GetACLEntryIndex error reading subject %i for entry %d: %" CHIP_ERROR_FORMAT,
+                                static_cast<int>(i), static_cast<int>(index), err.Format());
                             continue;
                         }
                         if (subject == subjectNodeId)
@@ -669,6 +675,8 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & e
 {
     VerifyOrReturnError(successCb != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(failureCb != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mContentAppFactory != nullptr, CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogError(DeviceLayer, "mContentAppFactory is null"));
 
     Access::Privilege vendorPrivilege = mContentAppFactory->GetVendorPrivilege(targetVendorId);
 
@@ -684,8 +692,8 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & e
             err = Access::GetAccessControl().DeleteEntry(nullptr, fabricIndex, index);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogDetail(DeviceLayer, "ContentAppPlatform::ManageClientAccess error entry %d err %s", static_cast<int>(index),
-                              ErrorStr(err));
+                ChipLogDetail(DeviceLayer, "ContentAppPlatform::ManageClientAccess error entry %d: %" CHIP_ERROR_FORMAT,
+                              static_cast<int>(index), err.Format());
             }
         }
     }
@@ -693,7 +701,7 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & e
     Access::AccessControl::Entry entry;
     ReturnErrorOnFailure(GetAccessControl().PrepareEntry(entry));
     ReturnErrorOnFailure(entry.SetAuthMode(Access::AuthMode::kCase));
-    entry.SetFabricIndex(fabricIndex);
+    ReturnErrorOnFailure(entry.SetFabricIndex(fabricIndex));
     ReturnErrorOnFailure(entry.SetPrivilege(vendorPrivilege));
     ReturnErrorOnFailure(entry.AddSubject(nullptr, subjectNodeId));
 

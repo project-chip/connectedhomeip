@@ -20,6 +20,8 @@
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/icd/server/ICDConfigurationData.h>
 #include <lib/support/BitFlags.h>
+#include <optional>
+#include <system/SystemLayerImpl.h>
 
 namespace chip {
 namespace Test {
@@ -33,7 +35,21 @@ public:
     ICDConfigurationDataTestAccess() = delete;
     ICDConfigurationDataTestAccess(ICDConfigurationData * data) : mData(data) {}
 
+    // Add wrappers for private methods used in tests
     void SetFeatureMap(BitFlags<app::Clusters::IcdManagement::Feature> featureMap) { mData->SetFeatureMap(featureMap); }
+    void SetICDMode(ICDConfigurationData::ICDMode mode) { mData->SetICDMode(mode); }
+    CHIP_ERROR SetSlowPollingInterval(System::Clock::Milliseconds32 interval) { return mData->SetSlowPollingInterval(interval); }
+    CHIP_ERROR SetSITPollingInterval(System::Clock::Milliseconds32 interval) { return mData->SetSITPollingInterval(interval); }
+    CHIP_ERROR SetModeDurations(Optional<System::Clock::Milliseconds32> active, Optional<System::Clock::Milliseconds32> idle)
+    {
+        return mData->SetModeDurations(active, idle);
+    }
+    CHIP_ERROR SetModeDurations(std::optional<System::Clock::Milliseconds32> active, std::optional<System::Clock::Seconds32> idle,
+                                std::optional<System::Clock::Seconds32> shortIdle)
+    {
+        return mData->SetModeDurations(active, idle, shortIdle);
+    }
+    System::Clock::Milliseconds32 GetSitSlowPollMaximum() { return mData->kSitIcdSlowPollMaximum; }
 
 private:
     ICDConfigurationData * mData = nullptr;

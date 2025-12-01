@@ -37,11 +37,13 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
-from TC_AVSMTestBase import AVSMTestBase
+from TC_AVSMTestBase import AVSMTestBase, wmark_osd_matcher
+
+import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 
 logger = logging.getLogger(__name__)
 
@@ -58,23 +60,43 @@ class TC_AVSM_2_3(MatterBaseTest, AVSMTestBase):
             TestStep("precondition", "DUT commissioned and preconditions", is_commissioning=True),
             TestStep(
                 1,
-                "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on TH_SERVER",
+                "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify SNP & (WMARK|OSD) is supported.",
             ),
             TestStep(
                 2,
-                "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
+                "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify the number of allocated snapshot streams in the list is 1. Store StreamID as aStreamID. If WMARK is supported, store WaterMarkEnabled as aWmark. If OSD is supported, store OSDEnabled as aOSD.",
+                "Store HardwareEncoder as aHardwareEncoder",
             ),
             TestStep(
                 3,
-                "TH sends the SnapshotStreamModify command with SnapshotStreamID set to aStreamID. If WMARK is supported, set WaterMarkEnabled to !aWmark`and if OSD is supported, set OSDEnabled to `!aOSD in the command.",
-                "DUT responds with a SUCCESS status code.",
+                "TH sends the SnapshotStreamModify command with SnapshotStreamID set to aStreamID. No WaterMarkEnabled or OSDEnabled provided.",
+                "DUT responds with an INVALID_COMMAND status code.",
             ),
             TestStep(
                 4,
-                "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
-                "Verify the following: If WMARK is supported, verify WaterMarkEnabled == !aWmark. If OSD is supported, verify OSDEnabled == !aOSD.",
+                "TH sends the SnapshotStreamModify command with SnapshotStreamID set to aStreamID + 1.",
+                "DUT responds with an NOT_FOUND status code.",
+            ),
+            TestStep(
+                5,
+                "Establish a subscription to the AllocatedSnapshotStreams attribute"
+            ),
+            TestStep(
+                6,
+                "TH sends the SnapshotStreamModify command with SnapshotStreamID set to aStreamID. If WMARK is supported, set WaterMarkEnabled to !aWmark`and if OSD is supported, set OSDEnabled to `!aOSD in the command.",
+                "If HardwareEncoder is True, DUT responds with a SUCCESS status code.",
+                "If HardwareEncoder is False, DUT responds with an INVALID_INSTATE status code.",
+            ),
+            TestStep(
+                7,
+                "If HardwareEncoder is True, wait until a subscription report with AllocatedSnapshotStreams attribute is received",
+            ),
+            TestStep(
+                8,
+                "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on DUT",
+                "If HardwareEncoder is True, verify the following: If WMARK is supported, verify WaterMarkEnabled == !aWmark. If OSD is supported, verify OSDEnabled == !aOSD.",
             ),
         ]
 
@@ -86,7 +108,7 @@ class TC_AVSM_2_3(MatterBaseTest, AVSMTestBase):
         )
     )
     async def test_TC_AVSM_2_3(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.CameraAvStreamManagement
         attr = Clusters.CameraAvStreamManagement.Attributes
         commands = Clusters.CameraAvStreamManagement.Commands
@@ -104,8 +126,7 @@ class TC_AVSM_2_3(MatterBaseTest, AVSMTestBase):
         logger.info(f"Rx'd snpSupport: {snpSupport}, wmarkSupport: {wmarkSupport}, osdSupport: {osdSupport}")
         asserts.assert_true(
             (snpSupport and (wmarkSupport or osdSupport)),
-            cluster.Bitmaps.Feature.kSnapshot,
-            "SNP & (WMARK|OSD) is supported is not supported.",
+            "SNP & (WMARK|OSD) is not supported.",
         )
 
         self.step(2)
@@ -115,22 +136,86 @@ class TC_AVSM_2_3(MatterBaseTest, AVSMTestBase):
         logger.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
         asserts.assert_equal(len(aAllocatedSnapshotStreams), 1, "The number of allocated snapshot streams in the list is not 1.")
         aStreamID = aAllocatedSnapshotStreams[0].snapshotStreamID
-        # TODO: SnapshotStreamStruct does not have WaterMarkEnabled and OSDEnabled fields. Update This.
-
+        aWmark = aAllocatedSnapshotStreams[0].watermarkEnabled
+        aOSD = aAllocatedSnapshotStreams[0].OSDEnabled
+        aHardwareEncoder = aAllocatedSnapshotStreams[0].hardwareEncoder
         self.step(3)
         try:
-            # TODO: SnapshotStreamStruct does not have WaterMarkEnabled and OSDEnabled fields. Update This.
-            await self.send_single_cmd(endpoint=endpoint, cmd=commands.SnapshotStreamModify(snapshotStreamID=aStreamID))
+            cmd = commands.SnapshotStreamModify(
+                snapshotStreamID=aStreamID,
+                watermarkEnabled=None,
+                OSDEnabled=None,
+            )
+            await self.send_single_cmd(endpoint=endpoint, cmd=cmd)
+            asserts.fail("Unexpected success when expecting INVALID_COMMAND due to absence of WatermarkEnabled and OSDEnabled)")
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+            asserts.assert_equal(e.status, Status.InvalidCommand, "Unexpected error when expecting INVALID_COMMAND")
             pass
 
         self.step(4)
+        try:
+            cmd = commands.SnapshotStreamModify(
+                snapshotStreamID=aStreamID + 1,
+                watermarkEnabled=None if aWmark is None else not aWmark,
+                OSDEnabled=None if aOSD is None else not aOSD,
+            )
+            await self.send_single_cmd(endpoint=endpoint, cmd=cmd)
+            asserts.fail("Unexpected success when expecting NOT_FOUND due to wrong streamID")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.NotFound, "Unexpected error when expecting NOT_FOUND")
+            pass
+
+        self.step(5)
+        # Establish subscription to AllocatedSnapshotStreams
+        sub_handler = AttributeSubscriptionHandler(cluster, attr.AllocatedSnapshotStreams)
+        await sub_handler.start(self.default_controller, self.dut_node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
+
+        sub_handler.reset()
+
+        self.step(6)
+        try:
+            cmd = commands.SnapshotStreamModify(
+                snapshotStreamID=aStreamID,
+                watermarkEnabled=None if aWmark is None else not aWmark,
+                OSDEnabled=None if aOSD is None else not aOSD,
+            )
+            await self.send_single_cmd(endpoint=endpoint, cmd=cmd)
+        except InteractionModelError as e:
+            if aHardwareEncoder:
+                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+            else:
+                asserts.assert_equal(e.status, Status.InvalidInState, "Wrong error code returned")
+            pass
+
+        self.step(7)
+        if aHardwareEncoder:
+            expected_wmark = None if aWmark is None else not aWmark
+            expected_osd = None if aOSD is None else not aOSD
+            sub_handler.await_all_expected_report_matches(expected_matchers=[wmark_osd_matcher(
+                attr.AllocatedSnapshotStreams, expected_wmark, expected_osd, wmarkSupport, osdSupport)], timeout_sec=20)
+
+        self.step(8)
         aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
         )
         logger.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
-        # TODO: SnapshotStreamStruct does not have WaterMarkEnabled and OSDEnabled fields. Update This.
+        if wmarkSupport and aHardwareEncoder:
+            asserts.assert_equal(
+                aAllocatedSnapshotStreams[0].watermarkEnabled, not aWmark, "WaterMarkEnabled is not equal to !aWmark"
+            )
+        if osdSupport and aHardwareEncoder:
+            asserts.assert_equal(aAllocatedSnapshotStreams[0].OSDEnabled, not aOSD, "OSDEnabled is not equal to !aOSD")
+
+        # Clear all allocated streams
+        aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
+        )
+
+        for stream in aAllocatedSnapshotStreams:
+            try:
+                await self.send_single_cmd(endpoint=endpoint, cmd=commands.SnapshotStreamDeallocate(snapshotStreamID=(stream.snapshotStreamID)))
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
 
 if __name__ == "__main__":

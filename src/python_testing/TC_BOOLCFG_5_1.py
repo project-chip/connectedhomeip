@@ -38,10 +38,11 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 sensorTrigger = 0x0080_0000_0000_0000
 sensorUntrigger = 0x0080_0000_0000_0001
@@ -56,7 +57,7 @@ class TC_BOOLCFG_5_1(MatterBaseTest):
         return "[TC-BOOLCFG-5.1] SuppressAlarm functionality for inactive alarms with DUT as Server"
 
     def steps_TC_BOOLCFG_5_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read FeatureMap attribute"),
             TestStep(3, "Verify SPRS feature is supported"),
@@ -72,13 +73,15 @@ class TC_BOOLCFG_5_1(MatterBaseTest):
             TestStep("9b", "Suppress AUD alarm using SuppressAlarm command"),
             TestStep(10, "Read AlarmsSuppressed attribute"),
         ]
-        return steps
 
     def pics_TC_BOOLCFG_5_1(self) -> list[str]:
-        pics = [
+        return [
             "BOOLCFG.S",
         ]
-        return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_BOOLCFG_5_1(self):
@@ -88,7 +91,7 @@ class TC_BOOLCFG_5_1(MatterBaseTest):
                             "the --hex-arg flag as PIXIT.BOOLCFG.TEST_EVENT_TRIGGER_KEY:<key>, "
                             "e.g. --hex-arg PIXIT.BOOLCFG.TEST_EVENT_TRIGGER_KEY:000102030405060708090a0b0c0d0e0f")
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         enableKey = self.matter_test_config.global_test_params['PIXIT.BOOLCFG.TEST_EVENT_TRIGGER_KEY']
 
         self.step(1)
@@ -111,8 +114,7 @@ class TC_BOOLCFG_5_1(MatterBaseTest):
                 logging.info("Test step skipped")
 
             return
-        else:
-            logging.info("Test step skipped")
+        logging.info("Test step skipped")
 
         self.step(4)
         enabledAlarms = 0

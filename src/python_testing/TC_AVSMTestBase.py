@@ -17,16 +17,39 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters import Globals
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import AttributeMatcher, AttributeValue
 
 logger = logging.getLogger(__name__)
 
 
+def wmark_osd_matcher(attribute_id: int, wmark: bool | None, osd: bool | None, wmark_check: bool, osd_check: bool) -> "AttributeMatcher":
+    def predicate(report: AttributeValue) -> bool:
+        if report.attribute != attribute_id:
+            return False
+
+        if len(report.value) == 0:
+            return False
+
+        stream = report.value[0]
+        wmark_match = (not wmark_check) or (stream.watermarkEnabled == wmark)
+        osd_match = (not osd_check) or (stream.OSDEnabled == osd)
+
+        return wmark_match and osd_match
+
+    return AttributeMatcher.from_callable(
+        description=f"check watermarkEnabled is {wmark} and OSDEnabled is {osd}",
+        matcher=predicate
+    )
+
+
 class AVSMTestBase:
     async def precondition_one_allocated_snapshot_stream(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         cluster = Clusters.CameraAvStreamManagement
         attr = Clusters.CameraAvStreamManagement.Attributes
         commands = Clusters.CameraAvStreamManagement.Commands
@@ -76,8 +99,8 @@ class AVSMTestBase:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
             pass
 
-    async def precondition_one_allocated_audio_stream(self):
-        endpoint = self.get_endpoint(default=1)
+    async def precondition_one_allocated_audio_stream(self, streamUsage: Globals.Enums.StreamUsageEnum = None):
+        endpoint = self.get_endpoint()
         cluster = Clusters.CameraAvStreamManagement
         attr = Clusters.CameraAvStreamManagement.Attributes
         commands = Clusters.CameraAvStreamManagement.Commands
@@ -101,19 +124,24 @@ class AVSMTestBase:
             endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneCapabilities
         )
         logger.info(f"Rx'd MicrophoneCapabilities: {aMicrophoneCapabilities}")
-        aRankedStreamPriorities = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attr.RankedVideoStreamPrioritiesList
+        aStreamUsagePriorities = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePriorities
         )
-        logger.info(f"Rx'd RankedVideoStreamPrioritiesList : {aRankedStreamPriorities}")
-        asserts.assert_greater(len(aRankedStreamPriorities), 0, "RankedVideoStreamPrioritiesList is empty")
+        logger.info(f"Rx'd StreamUsagePriorities : {aStreamUsagePriorities}")
+        asserts.assert_greater(len(aStreamUsagePriorities), 0, "StreamUsagePriorities is empty")
+        if streamUsage:
+            asserts.assert_in(streamUsage, aStreamUsagePriorities,
+                              f"{Globals.Enums.StreamUsageEnum(streamUsage).name} is not a supported stream usage")
+        else:
+            streamUsage = aStreamUsagePriorities[0]
 
         try:
             adoStreamAllocateCmd = commands.AudioStreamAllocate(
-                streamUsage=aRankedStreamPriorities[0],
+                streamUsage=streamUsage,
                 audioCodec=aMicrophoneCapabilities.supportedCodecs[0],
                 channelCount=aMicrophoneCapabilities.maxNumberOfChannels,
                 sampleRate=aMicrophoneCapabilities.supportedSampleRates[0],
-                bitRate=1024,
+                bitRate=30000,
                 bitDepth=aMicrophoneCapabilities.supportedBitDepths[0],
             )
             audioStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=adoStreamAllocateCmd)
@@ -125,8 +153,8 @@ class AVSMTestBase:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
             pass
 
-    async def precondition_one_allocated_video_stream(self):
-        endpoint = self.get_endpoint(default=1)
+    async def precondition_one_allocated_video_stream(self, streamUsage: Globals.Enums.StreamUsageEnum = None):
+        endpoint = self.get_endpoint()
         cluster = Clusters.CameraAvStreamManagement
         attr = Clusters.CameraAvStreamManagement.Attributes
         commands = Clusters.CameraAvStreamManagement.Commands
@@ -146,18 +174,18 @@ class AVSMTestBase:
             return
 
         # Allocate one for the test steps
-        aRankedStreamPriorities = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attr.RankedVideoStreamPrioritiesList
+        aStreamUsagePriorities = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePriorities
         )
-        logger.info(f"Rx'd RankedVideoStreamPrioritiesList: {aRankedStreamPriorities}")
+        logger.info(f"Rx'd StreamUsagePriorities: {aStreamUsagePriorities}")
         aRateDistortionTradeOffPoints = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.RateDistortionTradeOffPoints
         )
         logger.info(f"Rx'd RateDistortionTradeOffPoints: {aRateDistortionTradeOffPoints}")
-        aMinViewport = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attr.MinViewport
+        aMinViewportRes = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.MinViewportResolution
         )
-        logger.info(f"Rx'd MinViewport: {aMinViewport}")
+        logger.info(f"Rx'd MinViewportResolution: {aMinViewportRes}")
         aVideoSensorParams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.VideoSensorParams
         )
@@ -172,21 +200,25 @@ class AVSMTestBase:
         osd = True if (aFeatureMap & cluster.Bitmaps.Feature.kOnScreenDisplay) != 0 else None
 
         try:
-            asserts.assert_greater(len(aRankedStreamPriorities), 0, "RankedVideoStreamPrioritiesList is empty")
+            asserts.assert_greater(len(aStreamUsagePriorities), 0, "StreamUsagePriorities is empty")
+            if streamUsage:
+                asserts.assert_in(streamUsage, aStreamUsagePriorities,
+                                  f"{Globals.Enums.StreamUsageEnum(streamUsage).name} is not a supported stream usage")
+            else:
+                streamUsage = aStreamUsagePriorities[0]
             asserts.assert_greater(len(aRateDistortionTradeOffPoints), 0, "RateDistortionTradeOffPoints is empty")
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
-                streamUsage=aRankedStreamPriorities[0],
+                streamUsage=streamUsage,
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                minFrameRate=15,  # An acceptable value for min frame rate
+                minFrameRate=30,  # An acceptable value for min frame rate
                 maxFrameRate=aVideoSensorParams.maxFPS,
-                minResolution=aMinViewport,
+                minResolution=aMinViewportRes,
                 maxResolution=cluster.Structs.VideoResolutionStruct(
                     width=aVideoSensorParams.sensorWidth, height=aVideoSensorParams.sensorHeight
                 ),
                 minBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
-                minFragmentLen=4000,
-                maxFragmentLen=4000,
+                keyFrameInterval=4000,
                 watermarkEnabled=watermark,
                 OSDEnabled=osd
             )

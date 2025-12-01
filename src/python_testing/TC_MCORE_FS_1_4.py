@@ -66,13 +66,14 @@ import os
 import random
 import tempfile
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.interaction_model import Status
-from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
-from chip.testing.tasks import Subprocess
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.interaction_model import Status
+from matter.testing.apps import AppServerSubprocess
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
+from matter.testing.tasks import Subprocess
 
 
 class FabricSyncApp(Subprocess):
@@ -269,7 +270,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
         discriminator = random.randint(0, 4095)
         # Open commissioning window on TH_SERVER_NO_UID.
         params = await self.default_controller.OpenCommissioningWindow(
-            nodeid=th_server_th_node_id,
+            nodeId=th_server_th_node_id,
             option=self.default_controller.CommissioningWindowPasscode.kTokenWithRandomPin,
             discriminator=discriminator,
             iteration=10000,
@@ -312,7 +313,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
             attribute=Clusters.BridgedDeviceBasicInformation.Attributes.UniqueID,
             node_id=th_fsa_bridge_th_node_id,
             endpoint=th_fsa_bridge_th_server_endpoint)
-        asserts.assert_true(type_matches(th_fsa_bridge_th_server_unique_id, str), "UniqueID should be a string")
+        asserts.assert_true(matchers.is_type(th_fsa_bridge_th_server_unique_id, str), "UniqueID should be a string")
         asserts.assert_true(th_fsa_bridge_th_server_unique_id, "UniqueID should not be an empty string")
         logging.info("UniqueID generated for TH_SERVER_NO_UID: %s", th_fsa_bridge_th_server_unique_id)
 
@@ -321,7 +322,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
         discriminator = random.randint(0, 4095)
         # Open commissioning window on TH_FSA_BRIDGE.
         params = await self.default_controller.OpenCommissioningWindow(
-            nodeid=th_fsa_bridge_th_node_id,
+            nodeId=th_fsa_bridge_th_node_id,
             option=self.default_controller.CommissioningWindowPasscode.kTokenWithRandomPin,
             discriminator=discriminator,
             iteration=10000,
@@ -401,7 +402,7 @@ class TC_MCORE_FS_1_4(MatterBaseTest):
             cluster=Clusters.BridgedDeviceBasicInformation,
             attribute=Clusters.BridgedDeviceBasicInformation.Attributes.UniqueID,
             endpoint=dut_fsa_bridge_th_server_endpoint)
-        asserts.assert_true(type_matches(dut_fsa_bridge_th_server_unique_id, str), "UniqueID should be a string")
+        asserts.assert_true(matchers.is_type(dut_fsa_bridge_th_server_unique_id, str), "UniqueID should be a string")
         asserts.assert_true(dut_fsa_bridge_th_server_unique_id, "UniqueID should not be an empty string")
         logging.info("UniqueID for TH_SERVER_NO_UID on DUT_FSA: %s", th_fsa_bridge_th_server_unique_id)
 

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2022, 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
  *      mbedTLS based implementation of CHIP crypto primitives
  */
 
-#include "CHIPCryptoPAL.h"
+#include <crypto/CHIPCryptoPAL.h>
 
 #include <type_traits>
 
@@ -41,6 +41,7 @@
 #include <mbedtls/x509_crt.h>
 #endif // defined(MBEDTLS_X509_CRT_PARSE_C)
 #include <mbedtls/oid.h>
+#include <mbedtls/version.h>
 #include <mbedtls/x509.h>
 #include <mbedtls/x509_csr.h>
 
@@ -248,7 +249,7 @@ CHIP_ERROR ECDH_derive_secret_H(P256KeypairContext * mKeypair, const P256PublicK
 
     result = mbedtls_mpi_write_binary(&mpi_secret, out_secret.Bytes() /*Uint8::to_uchar(out_secret)*/, secret_length);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-    out_secret.SetLength(secret_length);
+    TEMPORARY_RETURN_IGNORED out_secret.SetLength(secret_length);
 
 exit:
     keypair = nullptr;
@@ -414,7 +415,7 @@ CHIP_ERROR Serialize_H(const P256KeypairContext mKeypair, const P256PublicKey mP
     bbuf.Put(privkey, sizeof(privkey));
     VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    output.SetLength(bbuf.Needed());
+    TEMPORARY_RETURN_IGNORED output.SetLength(bbuf.Needed());
 
 exit:
     ClearSecretData(privkey, sizeof(privkey));

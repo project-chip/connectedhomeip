@@ -19,10 +19,11 @@ import logging
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.testing import matter_asserts
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.testing import matter_asserts
 
 logger = logging.getLogger(__name__)
 
@@ -78,5 +79,4 @@ class ElectricalGridConditionsTestBaseHelper:
             matter_epoch = datetime(2000, 1, 1, 0, 0, 0, 0, tz)
 
             return matter_epoch + delta_from_epoch
-        else:
-            return None
+        return None

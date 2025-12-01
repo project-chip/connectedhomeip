@@ -6,7 +6,6 @@
 :hidden:
 
 *
-matter-migration-guide/*
 matter-syscfg/*
 matter-users-guide/*
 ```

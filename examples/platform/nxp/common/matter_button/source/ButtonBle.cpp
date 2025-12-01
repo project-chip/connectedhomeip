@@ -19,7 +19,9 @@
 #include "ButtonBle.h"
 #include "AppTaskBase.h"
 #include "BLEApplicationManager.h"
+#if (CONFIG_ENABLE_FEEDBACK == 1)
 #include "UserInterfaceFeedback.h"
+#endif
 
 extern "C" {
 #include "app.h"
@@ -138,5 +140,5 @@ void chip::NXP::App::ButtonBle::HandleTimerExpire()
     ChipLogProgress(DeviceLayer, "Device will factory reset...");
 
     // Actually trigger Factory Reset
-    chip::Server::GetInstance().ScheduleFactoryReset();
+    chip::NXP::App::GetAppTask().FactoryResetHandler();
 }

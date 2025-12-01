@@ -12,4 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Configuration file
+import("//build_overrides/build.gni")
+
+# chip_se05x_smcom:
+# To configure the physical connection to secure element.
+# Possible values: t=1oi2c (For T=1 Protocol over I2C), vcom (For COM port on windows).
+
+# chip_se05x_auth:
+# To configure the session type to SE05x.
+# Possible values: none (For plain session), scp03 (Platform SCP03 authenticated session).
+
+# chip_se05x_host_gpio:
+# Enable / Disable the implementation of GPIO functions to control the SE05x secure element power.
+# Possible values:
+#  - none : GPIO function will have no impact.
+#  - rpi  : Enable GPIO function for Raspberry pi platform.
+#           Connect power pin of SE05x to Pin#11 of raspberry pi.
+
+declare_args() {
+  chip_se05x_smcom = "t=1oi2c"
+  chip_se05x_auth = "none"
+  chip_se05x_host_gpio = "none"
+}

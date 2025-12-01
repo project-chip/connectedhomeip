@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace OvenCavityOperationalState {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
+
 namespace PhaseList {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(PhaseList::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
@@ -46,10 +48,16 @@ namespace OperationalError {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(OperationalError::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace OperationalError
+constexpr std::array<DataModel::AttributeEntry, 5> kMandatoryMetadata = {
+    PhaseList::kMetadataEntry,        CurrentPhase::kMetadataEntry,     OperationalStateList::kMetadataEntry,
+    OperationalState::kMetadataEntry, OperationalError::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {
+
 namespace Stop {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Stop::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);
@@ -60,6 +68,16 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Start::Id, BitFl
 } // namespace Start
 
 } // namespace Commands
+
+namespace Events {
+namespace OperationalError {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace OperationalError
+namespace OperationCompletion {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace OperationCompletion
+
+} // namespace Events
 } // namespace OvenCavityOperationalState
 } // namespace Clusters
 } // namespace app

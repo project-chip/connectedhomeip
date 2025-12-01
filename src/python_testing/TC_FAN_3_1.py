@@ -40,12 +40,13 @@ import operator
 from enum import Enum
 from typing import Any
 
-import chip.clusters as Clusters
-from chip.clusters import ClusterObjects as ClusterObjects
-from chip.interaction_model import Status
-from chip.testing.matter_testing import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, async_test_body,
-                                         default_matter_test_main)
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters import ClusterObjects as ClusterObjects
+from matter.interaction_model import Status
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class OrderEnum(Enum):
@@ -159,15 +160,15 @@ class TC_FAN_3_1(MatterBaseTest):
         attr = cluster.Attributes
 
         self.subscriptions = [
-            ClusterAttributeChangeAccumulator(cluster, attr.PercentSetting),
-            ClusterAttributeChangeAccumulator(cluster, attr.PercentCurrent),
-            ClusterAttributeChangeAccumulator(cluster, attr.FanMode)
+            AttributeSubscriptionHandler(cluster, attr.PercentSetting),
+            AttributeSubscriptionHandler(cluster, attr.PercentCurrent),
+            AttributeSubscriptionHandler(cluster, attr.FanMode)
         ]
 
         if self.supports_multispeed:
             self.subscriptions.extend([
-                ClusterAttributeChangeAccumulator(cluster, attr.SpeedSetting),
-                ClusterAttributeChangeAccumulator(cluster, attr.SpeedCurrent)
+                AttributeSubscriptionHandler(cluster, attr.SpeedSetting),
+                AttributeSubscriptionHandler(cluster, attr.SpeedCurrent)
             ])
 
         for sub in self.subscriptions:
@@ -249,10 +250,14 @@ class TC_FAN_3_1(MatterBaseTest):
     def pics_TC_FAN_3_1(self) -> list[str]:
         return ["FAN.S"]
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_FAN_3_1(self):
         # Setup
-        self.endpoint = self.get_endpoint(default=1)
+        self.endpoint = self.get_endpoint()
         cluster = Clusters.FanControl
         attr = cluster.Attributes
 

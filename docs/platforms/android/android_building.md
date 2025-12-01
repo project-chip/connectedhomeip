@@ -43,7 +43,7 @@ directory.
 
 ## Requirements for building
 
-You need Android SDK 26 & NDK 23.2.8568313 downloaded to your machine. Set the
+You need Android SDK 34 & NDK 28.2.13676358 downloaded to your machine. Set the
 `$ANDROID_HOME` environment variable to where the SDK is downloaded and the
 `$ANDROID_NDK_HOME` environment variable to point to where the NDK package is
 downloaded.
@@ -52,32 +52,32 @@ downloaded.
 2. Install NDK:
     1. Tools -> SDK Manager -> SDK Tools Tab
     2. Click [x] Show Package Details
-    3. Select NDK (Side by Side) -> 23.2.8568313
+    3. Select NDK (Side by Side) -> 28.2.13676358
     4. Apply
 3. Install Command Line Tools:
     1. Tools -> SDK Manager -> SDK Tools Tab -> Android SDK Command Line Tools
        10.0
     2. Apply
-4. Install SDK 30:
-    1. Tools -> SDK Manager -> SDK Platforms Tab -> Android 11.0 (R) SDK Level
-       30
+4. Install SDK 34:
+    1. Tools -> SDK Manager -> SDK Platforms Tab -> Android 14.0 (Upside Down
+       Cake) API Level 34
     2. Apply
 5. Install Emulator:
-    1. Tools -> Device Manager -> Create device -> Pixel 5 -> Android S API 31
+    1. Tools -> Device Manager -> Create device -> Pixel 5 -> Android S API 34
        -> Download
 
 ### Linux
 
 ```
 export ANDROID_HOME=~/Android/Sdk
-export ANDROID_NDK_HOME=~/Android/Sdk/ndk/23.2.8568313
+export ANDROID_NDK_HOME=~/Android/Sdk/ndk/28.2.13676358
 ```
 
 ### MacOS
 
 ```
 export ANDROID_HOME=~/Library/Android/sdk
-export ANDROID_NDK_HOME=~/Library/Android/sdk/ndk/23.2.8568313
+export ANDROID_NDK_HOME=~/Library/Android/sdk/ndk/28.2.13676358
 ```
 
 <a name="abi"></a>
@@ -98,21 +98,22 @@ architecture:
 
 ### Gradle & JDK Version
 
-All Android projects utilize Gradle version 7.3.3 and JDK version 11.0.
+All Android projects utilize Gradle plugin version 8.5.1, Gradle version 8.7 and
+JDK version 17.0.
 
-For developer using java 11 in MacOS, the JAVA can be configured as follows via
+For developer using java 17 in MacOS, the JAVA can be configured as follows via
 `sdkman`:
 
 ```
-sdk install java 11.0.26-tem
+sdk install java 17.0.14-tem
 ```
 
-For developer using openjdk-11-jdk in Linux, the JAVA_HOME environment variable
+For developer using openjdk-17-jdk in Linux, the JAVA_HOME environment variable
 can be configured as follows:
 
 ```
-sudo apt-get install openjdk-11-jdk
-export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+sudo apt-get install openjdk-17-jdk
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 ```
 
 <a name="kotlin"></a>

@@ -51,6 +51,10 @@ extern "C" {
 #include "fsl_silicon_id.h"
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+#include "OtaSupport.h"
+#endif
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -62,7 +66,7 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
     return sInstance;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::DetermineBootReason(uint8_t rebootCause)
+CHIP_ERROR ConfigurationManagerImpl::DetermineBootReason(uint32_t rebootCause)
 {
 #if CONFIG_BOOT_REASON_SDK_SUPPORT
     /*
@@ -82,18 +86,14 @@ CHIP_ERROR ConfigurationManagerImpl::DetermineBootReason(uint8_t rebootCause)
     }
     else if (rebootCause == kPOWER_ResetCauseSysResetReq)
     {
-        /*
-        kConfigKey_SoftwareUpdateCompleted not supported for now
-        if (NXPConfig::ConfigValueExists(NXPConfig::kConfigKey_SoftwareUpdateCompleted))
+        bootReason = BootReasonType::kSoftwareReset;
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+        OtaImgState_t img_state = OTA_GetImgState();
+        if (img_state == OtaImgState_RunCandidate)
         {
             bootReason = BootReasonType::kSoftwareUpdateCompleted;
         }
-        else
-        {
-            bootReason = BootReasonType::kSoftwareReset;
-        }
-        */
-        bootReason = BootReasonType::kSoftwareReset;
+#endif
     }
 
     return StoreBootReason(to_underlying(bootReason));
@@ -114,7 +114,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     uint32_t rebootCount = 0;
 
 #if CONFIG_BOOT_REASON_SDK_SUPPORT
-    uint8_t rebootCause = POWER_GetResetCause();
+    uint32_t rebootCause = POWER_GetResetCause();
     POWER_ClearResetCause(rebootCause);
 #endif
 
@@ -217,7 +217,7 @@ bool ConfigurationManagerImpl::CanFactoryReset()
 
 void ConfigurationManagerImpl::InitiateFactoryReset()
 {
-    PlatformMgr().ScheduleWork(DoFactoryReset);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DoFactoryReset);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key persistedStorageKey,
@@ -323,7 +323,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     err = NXPConfig::FactoryResetConfig();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "FactoryResetConfig() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD

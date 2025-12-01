@@ -38,10 +38,11 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 sensorTrigger = 0x0080_0000_0000_0000
 sensorUntrigger = 0x0080_0000_0000_0001
@@ -56,7 +57,7 @@ class TC_BOOLCFG_4_3(MatterBaseTest):
         return "[TC-BOOLCFG-4.3] AlarmsEnabled functionality for inactive alarms with DUT as Server"
 
     def steps_TC_BOOLCFG_4_3(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read FeatureMap attribute"),
             TestStep("2b", "Read AttributeList attribute"),
@@ -85,13 +86,15 @@ class TC_BOOLCFG_4_3(MatterBaseTest):
             TestStep(23, "Read AlarmsActive attribute"),
             TestStep(24, "Send TestEventTrigger with SensorUntrigger event"),
         ]
-        return steps
 
     def pics_TC_BOOLCFG_4_3(self) -> list[str]:
-        pics = [
+        return [
             "BOOLCFG.S",
         ]
-        return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_BOOLCFG_4_3(self):
@@ -101,7 +104,7 @@ class TC_BOOLCFG_4_3(MatterBaseTest):
                             "the --hex-arg flag as PIXIT.BOOLCFG.TEST_EVENT_TRIGGER_KEY:<key>, "
                             "e.g. --hex-arg PIXIT.BOOLCFG.TEST_EVENT_TRIGGER_KEY:000102030405060708090a0b0c0d0e0f")
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         enableKey = self.matter_test_config.global_test_params['PIXIT.BOOLCFG.TEST_EVENT_TRIGGER_KEY']
 
         self.step(1)
@@ -126,8 +129,7 @@ class TC_BOOLCFG_4_3(MatterBaseTest):
                 logging.info("Test step skipped")
 
             return
-        else:
-            logging.info("Test step skipped")
+        logging.info("Test step skipped")
 
         self.step(4)
         enabledAlarms = 0

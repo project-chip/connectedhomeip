@@ -42,6 +42,8 @@ public:
 
     virtual ~MatterContext() = default;
 
+    EndpointId GetEndpointId() const { return mEndpoint; }
+
 private:
     EndpointId mEndpoint;
 };

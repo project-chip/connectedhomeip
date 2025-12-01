@@ -39,12 +39,13 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_EnergyReporting_Utils import EnergyReportingBaseTestHelper
+
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +62,7 @@ class TC_EPM_2_2(MatterBaseTest, EnergyReportingBaseTestHelper):
         return ["EPM.S"]
 
     def steps_TC_EPM_2_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commissioning, already done",
                      is_commissioning=True),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
@@ -84,8 +85,6 @@ class TC_EPM_2_2(MatterBaseTest, EnergyReportingBaseTestHelper):
             TestStep("6", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EPM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EPM.TEST_EVENT_TRIGGER for Stop Fake Readings Test Event."),
         ]
 
-        return steps
-
     @async_test_body
     async def test_TC_EPM_2_2(self):
 
@@ -100,7 +99,7 @@ class TC_EPM_2_2(MatterBaseTest, EnergyReportingBaseTestHelper):
 
         # After 3 seconds...
         self.step("4")
-        time.sleep(3)
+        await asyncio.sleep(3)
 
         self.step("4a")
         # Active power is Mandatory
@@ -119,7 +118,7 @@ class TC_EPM_2_2(MatterBaseTest, EnergyReportingBaseTestHelper):
 
         self.step("5")
         # After 3 seconds...
-        time.sleep(3)
+        await asyncio.sleep(3)
 
         self.step("5a")
         # Active power is Mandatory

@@ -19,7 +19,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${BRIDGE_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/brbinfo_3_2_fifo
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -29,18 +29,16 @@
 #       --endpoint 3
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --app-pipe /tmp/brbinfo_3_2_fifo
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import json
-import logging
-from time import sleep
-from typing import Any
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_BRBINFO_3_2(MatterBaseTest):
@@ -52,42 +50,30 @@ class TC_BRBINFO_3_2(MatterBaseTest):
         return "[TC-BRBINFO-3.2] Attributes with DUT as Server"
 
     def steps_TC_BRBINFO_3_2(self) -> list[TestStep]:
-        steps = [
-            TestStep(1, "TH reads ConfigurationVersion from the DUT and stores the value as initialConfigurationVersion",
+        return [
+            TestStep(0, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "TH reads ConfigurationVersion and stores the value as initialConfigurationVersion",
                      "Verify that the value is in the inclusive range of 1 to 4294967295"),
-            TestStep(2, "Change the configuration version in a way which results in functionality to be added or removed (e.g. rewire thermostat to support a new mode)"),
-            TestStep(3, "TH reads ConfigurationVersion from the DUT",
+            TestStep(2, "On the corresponding bridged device, change the configuration version in a way which results in functionality to be added or removed (e.g. rewire thermostat to support a new mode)"),
+            TestStep(3, "TH reads ConfigurationVersion from the DUT (same endpoint as in step 1)",
                      "Verify that the value is higher than the value of initialConfigurationVersion"),
         ]
-        return steps
 
     def pics_TC_BRBINFO_3_2(self) -> list[str]:
-        pics = [
+        return [
             "BRBINFO.S",
             "BRBINFO.S.A.A0018",
             "BRBINFO.S.M.DeviceConfigurationChange",
         ]
-        return pics
 
-    def _send_named_pipe_command(self, command_dict: dict[str, Any]):
-        app_pid = self.matter_test_config.app_pid
-        if app_pid == 0:
-            asserts.fail("The --app-pid flag must be set when usage of door state simulation named pipe is required (e.g. CI)")
-
-        app_pipe = f"/tmp/chip_bridge_fifo_{app_pid}"
-        command = json.dumps(command_dict)
-
-        # Sends an out-of-band command to the sample app
-        with open(app_pipe, "w") as outfile:
-            logging.info(f"Sending named pipe command to {app_pipe}: '{command}'")
-            outfile.write(command + "\n")
-        # Delay for pipe command to be processed (otherwise tests may be flaky).
-        sleep(0.1)
+    @property
+    def default_endpoint(self) -> int:
+        return 3
 
     @async_test_body
     async def test_TC_BRBINFO_3_2(self):
-
-        endpoint = self.get_endpoint(default=3)
+        self.step(0)
+        endpoint = self.get_endpoint()
 
         attributes = Clusters.BridgedDeviceBasicInformation.Attributes
 
@@ -98,10 +84,10 @@ class TC_BRBINFO_3_2(MatterBaseTest):
         self.step(2)
         if self.is_pics_sdk_ci_only:
             command_dict = {"Name": "SimulateConfigurationVersionChange"}
-            self._send_named_pipe_command(command_dict)
+            self.write_to_app_pipe(command_dict)
         else:
             self.wait_for_user_input(
-                prompt_msg="Change the configuration version in a way which results in functionality to be added or removed, then continue")
+                prompt_msg="On the corresponding bridged device, change the configuration version in a way which results in functionality to be added or removed (e.g. rewire thermostat to support a new mode), then continue")
 
         self.step(3)
         newConfigurationVersion = await self.read_brbinfo_attribute_expect_success(endpoint=endpoint, attribute=attributes.ConfigurationVersion)

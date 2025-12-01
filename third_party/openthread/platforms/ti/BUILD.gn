@@ -15,6 +15,7 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/openthread.gni")
 import("//build_overrides/ti_simplelink_sdk.gni")
+import("${chip_root}/src/lib/lib.gni")
 
 import("${ti_simplelink_sdk_build_root}/ti_simplelink_board.gni")
 import("${ti_simplelink_sdk_build_root}/ti_simplelink_sdk.gni")
@@ -69,6 +70,12 @@ source_set("libopenthread-ti") {
     "${openthread_ti_root}/src/radio.c",
     "${openthread_ti_root}/src/settings.c",
   ]
+
+  if (chip_build_libshell) {
+    public_deps += [ "..:libopenthread-platform" ]
+    sources += [ "${openthread_root}/examples/apps/cli/cli_uart.cpp" ]
+  }
+
   public_configs = [
     ":openthread_ti_config",
     "${openthread_root}:openthread_config",

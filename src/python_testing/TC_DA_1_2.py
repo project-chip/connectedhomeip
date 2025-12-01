@@ -39,13 +39,8 @@ import logging
 import os
 import random
 import re
+from typing import Tuple
 
-import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.basic_composition import BasicCompositionTests
-from chip.testing.conversions import hex_from_bytes
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
-from chip.tlv import TLVReader
 from cryptography import x509
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat._oid import ExtensionOID
@@ -58,6 +53,13 @@ from pyasn1.error import PyAsn1Error
 from pyasn1.type import univ
 from pyasn1_modules import rfc5652
 
+import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.basic_composition import BasicCompositionTests
+from matter.testing.conversions import hex_from_bytes
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
+from matter.tlv import TLVReader
+
 
 def get_value_for_oid(oid_dotted_str: str, cert: x509.Certificate) -> str:
     rdn = list(filter(lambda rdn: oid_dotted_str in rdn.oid.dotted_string, cert.subject))
@@ -67,7 +69,7 @@ def get_value_for_oid(oid_dotted_str: str, cert: x509.Certificate) -> str:
     return rdn[0].value.strip()
 
 
-def parse_ids_from_subject(cert: x509.Certificate) -> tuple([str, str]):
+def parse_ids_from_subject(cert: x509.Certificate) -> Tuple[str, str]:
     vid_str = get_value_for_oid('1.3.6.1.4.1.37244.2.1', cert)
     pid_str = get_value_for_oid('1.3.6.1.4.1.37244.2.2', cert)
 
@@ -87,7 +89,7 @@ def parse_single_vidpid_from_common_name(commonName: str, tag_str: str) -> str:
     return s
 
 
-def parse_ids_from_common_name(cert: x509.Certificate) -> tuple([str, str]):
+def parse_ids_from_common_name(cert: x509.Certificate) -> Tuple[str, str]:
     common = get_value_for_oid('2.5.4.3', cert)
     vid_str = parse_single_vidpid_from_common_name(common, 'Mvid:')
     pid_str = parse_single_vidpid_from_common_name(common, 'Mpid:')
@@ -95,7 +97,7 @@ def parse_ids_from_common_name(cert: x509.Certificate) -> tuple([str, str]):
     return vid_str, pid_str
 
 
-def parse_ids_from_certs(dac: x509.Certificate, pai: x509.Certificate) -> tuple([int, int, int, int]):
+def parse_ids_from_certs(dac: x509.Certificate, pai: x509.Certificate) -> Tuple[int, int, int, int]:
     dac_vid_str, dac_pid_str = parse_ids_from_subject(dac)
     pai_vid_str, pai_pid_str = parse_ids_from_subject(pai)
 
@@ -190,7 +192,8 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
 
         do_test_over_pase = self.user_params.get("use_pase_only", False)
         if do_test_over_pase:
-            self.connect_over_pase(self.default_controller)
+            setupCode = self.matter_test_config.qr_code_content or self.matter_test_config.manual_code
+            await self.default_controller.FindOrEstablishPASESession(setupCode[0], self.dut_node_id)
 
         # Commissioning - done
         self.step(0)
@@ -203,13 +206,13 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
 
         self.step(2)
         attestation_resp = await self.send_single_cmd(cmd=opcreds.Commands.AttestationRequest(attestationNonce=nonce))
-        asserts.assert_true(type_matches(attestation_resp, opcreds.Commands.AttestationResponse),
+        asserts.assert_true(matchers.is_type(attestation_resp, opcreds.Commands.AttestationResponse),
                             "DUT returned invalid response to AttestationRequest")
 
         self.step("3a")
         type = opcreds.Enums.CertificateChainTypeEnum.kDACCertificate
         dac_resp = await self.send_single_cmd(cmd=opcreds.Commands.CertificateChainRequest(certificateType=type))
-        asserts.assert_true(type_matches(dac_resp, opcreds.Commands.CertificateChainResponse),
+        asserts.assert_true(matchers.is_type(dac_resp, opcreds.Commands.CertificateChainResponse),
                             "DUT returned invalid response to CertificateChainRequest")
         der_dac = dac_resp.certificate
         asserts.assert_less_equal(len(der_dac), 600, "Returned DAC is > 600 bytes")
@@ -223,7 +226,7 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
         self.step("3b")
         type = opcreds.Enums.CertificateChainTypeEnum.kPAICertificate
         pai_resp = await self.send_single_cmd(cmd=opcreds.Commands.CertificateChainRequest(certificateType=type))
-        asserts.assert_true(type_matches(pai_resp, opcreds.Commands.CertificateChainResponse),
+        asserts.assert_true(matchers.is_type(pai_resp, opcreds.Commands.CertificateChainResponse),
                             "DUT returned invalid response to CertificateChainRequest")
         der_pai = pai_resp.certificate
         asserts.assert_less_equal(len(der_pai), 600, "Returned PAI is > 600 bytes")
@@ -346,8 +349,8 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
         dac_vid, dac_pid, pai_vid, pai_pid = parse_ids_from_certs(parsed_dac, parsed_pai)
 
         self.step("7.1")
-        has_origin_vid = 9 in cd.keys()
-        has_origin_pid = 10 in cd.keys()
+        has_origin_vid = 9 in cd
+        has_origin_pid = 10 in cd
         if has_origin_pid != has_origin_vid:
             asserts.fail("Found one of origin PID or VID in CD but not both")
 
@@ -375,7 +378,7 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
             self.mark_current_step_skipped()
 
         self.step(8)
-        has_paa_list = 11 in cd.keys()
+        has_paa_list = 11 in cd
 
         if has_paa_list:
             akids = [ext.value.key_identifier for ext in parsed_pai.extensions if ext.oid == ExtensionOID.AUTHORITY_KEY_IDENTIFIER]
@@ -402,7 +405,7 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
                 ski = x509.SubjectKeyIdentifier.from_public_key(pub).digest
                 certs[ski] = pub
 
-        asserts.assert_true(subject_key_identifier in certs.keys(), "Subject key identifier not found in CD certs")
+        asserts.assert_true(subject_key_identifier in certs, "Subject key identifier not found in CD certs")
         try:
             certs[subject_key_identifier].verify(signature=signature_cd, data=cd_tlv,
                                                  signature_algorithm=ec.ECDSA(hashes.SHA256()))
@@ -416,7 +419,7 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
         asserts.assert_equal(len(returned_nonce), 32, "Returned nonce is incorrect size")
 
         self.step(11)
-        has_firmware_information = 4 in decoded.keys()
+        has_firmware_information = 4 in decoded
         if has_firmware_information:
             try:
                 int(decoded[4], 16)

@@ -313,7 +313,7 @@ public:
             return *this;
 
         ClearSecretData(mBytes);
-        SetLength(other.Length());
+        TEMPORARY_RETURN_IGNORED SetLength(other.Length());
         ::memcpy(Bytes(), other.ConstBytes(), other.Length());
         return *this;
     }
@@ -618,6 +618,24 @@ public:
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR ECDH_derive_secret(const P256PublicKey & remote_public_key, P256ECDHDerivedSecret & out_secret) const override;
+
+    /**
+     * @brief Loads a P256 keypair from raw private and public key byte spans.
+     *
+     * !!!!!! IMPORTANT !!!!!!!
+     * Raw private keys SHOULD NOT be loaded directly without extreme care about ensuring they do not get retained in
+     * memory (e.g. stack or heap) and have the shortest possible lifecycle. Please consider replacing basic example
+     * usage of private key loading with delegation of signing to another part of the system that preferably has key
+     * material isolation or protection.
+     *
+     * Combines the public and private key data into a serialized keypair format,
+     * then deserializes it into this keypair object.
+     *
+     * @param private_key ByteSpan containing the raw private key bytes.
+     * @param public_key ByteSpan containing the raw public key bytes.
+     * @return CHIP_ERROR indicating success or failure of the operation.
+     */
+    CHIP_ERROR HazardousOperationLoadKeypairFromRaw(ByteSpan private_key, ByteSpan public_key);
 
     /** @brief Return public key for the keypair.
      **/
@@ -1871,6 +1889,45 @@ private:
     State mState           = State::kPrintHeader;
     size_t mProcessedBytes = 0;
     StringBuilder<kLineBufferSize> mStringBuilder{};
+};
+
+// Utility class to take subject Key IDs (AKID/SKID) and convert them to DCL format ("A5:FF:00.....:DE:AD").
+class KeyIdStringifier
+{
+public:
+    KeyIdStringifier() = default;
+
+    /**
+     * @brief Returns the null-terminated string buffer owned by the class containing converted KeyID.
+     *
+     * LIFETIME NOTE: The last returned value from KeyIdToHex is valid until the next call.
+     *
+     * This is optimized for standard 20-byte AKID/SKID but works for any length, truncating very long ones.
+     *
+     * @param keyIdBuffer - buffer of bytes of the key ID.
+     * @return pointer to class-owned storage of a null-terminated string in DCL format.
+     */
+    const char * KeyIdToHex(ByteSpan keyIdBuffer)
+    {
+        mStringBuilder.Reset();
+        if (keyIdBuffer.empty())
+        {
+            mStringBuilder.Add("<EMPTY KEY ID>");
+            return mStringBuilder.c_str();
+        }
+
+        mStringBuilder.AddFormat("%02X", keyIdBuffer[0]);
+        for (size_t i = 1; i < keyIdBuffer.size(); ++i)
+        {
+            mStringBuilder.Add(":");
+            mStringBuilder.AddFormat("%02X", keyIdBuffer[i]);
+        }
+
+        return mStringBuilder.AddMarkerIfOverflow().c_str();
+    }
+
+private:
+    StringBuilder<(Crypto::kAuthorityKeyIdentifierLength * 3) + 1> mStringBuilder;
 };
 
 /**

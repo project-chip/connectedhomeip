@@ -19,6 +19,7 @@
 #include <app/data-model-provider/ActionContext.h>
 #include <app/data-model-provider/Context.h>
 #include <app/data-model-provider/Provider.h>
+#include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/server-cluster/ServerClusterContext.h>
 #include <app/server-cluster/testing/EmptyProvider.h>
 #include <app/server-cluster/testing/TestEventGenerator.h>
@@ -47,34 +48,28 @@ class TestServerClusterContext
 {
 public:
     TestServerClusterContext() :
+        mTestContext{
+            .eventsGenerator         = mTestEventsGenerator,
+            .dataModelChangeListener = mTestDataModelChangeListener,
+            .actionContext           = mNullActionContext,
+        },
         mContext{
-            .provider           = &mTestProvider,
-            .storage            = &mTestStorage,
-            .interactionContext = &mTestContext,
+            .provider           = mTestProvider,
+            .storage            = mTestStorage,
+            .attributeStorage   = mDefaultAttributePersistenceProvider,
+            .interactionContext = mTestContext,
         }
     {
-        mTestContext.eventsGenerator         = &mTestEventsGenerator;
-        mTestContext.dataModelChangeListener = &mTestDataModelChangeListener;
-        mTestContext.actionContext           = &mNullActionContext;
+        SuccessOrDie(mDefaultAttributePersistenceProvider.Init(&mTestStorage));
     }
 
     /// Get a stable pointer to the underlying context
     app::ServerClusterContext & Get() { return mContext; }
 
-    /// Create a new context bound to this test context
-    app::ServerClusterContext Create()
-    {
-        return {
-            .provider           = &mTestProvider,
-            .storage            = &mTestStorage,
-            .interactionContext = &mTestContext,
-
-        };
-    };
-
     LogOnlyEvents & EventsGenerator() { return mTestEventsGenerator; }
     TestProviderChangeListener & ChangeListener() { return mTestDataModelChangeListener; }
     TestPersistentStorageDelegate & StorageDelegate() { return mTestStorage; }
+    app::DefaultAttributePersistenceProvider & AttributePersistenceProvider() { return mDefaultAttributePersistenceProvider; }
     app::DataModel::InteractionModelContext & ImContext() { return mTestContext; }
 
 private:
@@ -83,6 +78,7 @@ private:
     TestProviderChangeListener mTestDataModelChangeListener;
     EmptyProvider mTestProvider;
     TestPersistentStorageDelegate mTestStorage;
+    app::DefaultAttributePersistenceProvider mDefaultAttributePersistenceProvider;
 
     app::DataModel::InteractionModelContext mTestContext;
 

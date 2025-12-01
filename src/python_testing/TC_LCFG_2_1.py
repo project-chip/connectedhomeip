@@ -38,12 +38,13 @@
 import logging
 import random
 
-import chip.clusters as Clusters
 import langcodes
-from chip.interaction_model import Status
-from chip.testing.matter_asserts import assert_non_empty_string
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import Status
+from matter.testing.matter_asserts import assert_non_empty_string
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 
 
 class Test_TC_LCFG_2_1(MatterBaseTest):
@@ -69,7 +70,7 @@ class Test_TC_LCFG_2_1(MatterBaseTest):
     @run_if_endpoint_matches(has_cluster(Clusters.LocalizationConfiguration))
     async def test_TC_LCFG_2_1(self):
 
-        endpoint = self.get_endpoint(default=0)
+        endpoint = self.get_endpoint()
         value_not_present_in_supported_locales = "fw-GB"
         max_lenght_string = 35
         max_length_list = 32
@@ -138,7 +139,7 @@ class Test_TC_LCFG_2_1(MatterBaseTest):
             value_present_in_supported_locales = random.choice(filtered_supported_locales)
         else:
             logging.info("SupportedLocales attribute has only one element and is the same value as ActiveLocale. Skipping remaining test steps.")
-            self.skip_all_remaining_steps(5)
+            self.mark_all_remaining_steps_skipped(5)
             return
 
         result = await self.write_single_attribute(attribute_value=Clusters.LocalizationConfiguration.Attributes.ActiveLocale(value_present_in_supported_locales), endpoint_id=endpoint, expect_success=True)

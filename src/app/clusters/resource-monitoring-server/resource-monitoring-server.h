@@ -132,7 +132,8 @@ private:
 
     // CommandHandlerInterface
     void InvokeCommand(HandlerContext & ctx) override;
-    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
+    CHIP_ERROR RetrieveAcceptedCommands(const ConcreteClusterPath & cluster,
+                                        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
     // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
@@ -152,18 +153,25 @@ private:
 
 class Delegate
 {
-    friend class Instance;
 
 private:
     Instance * mInstance = nullptr;
 
-    /**
-     * This method is used by the SDK to set the instance pointer. This is done during the instantiation of an Instance object.
-     * @param aInstance A pointer to the Instance object related to this delegate object.
-     */
-    void SetInstance(Instance * aInstance) { mInstance = aInstance; }
-
 protected:
+    /**
+     * @brief Provides access to the const Instance pointer.
+     * This method is placed in the protected section because it must be called by classes derived from the delegate.
+     *
+     * @return A const pointer to the Instance object associated with this delegate.
+     */
+    const Instance * GetInstance() const { return mInstance; }
+
+    /**
+     * @brief Provides access to the Instance pointer.
+     * This method is placed in the protected section because it must be called by classes derived from the delegate.
+     *
+     * @return A pointer to the Instance object associated with this delegate.
+     */
     Instance * GetInstance() { return mInstance; }
 
 public:
@@ -218,6 +226,17 @@ public:
      *                              the failure.
      */
     virtual Protocols::InteractionModel::Status PostResetCondition();
+
+    /**
+     * This method is used by the SDK to set the instance pointer. This is done during the instantiation of a Instance object.
+     * @param aInstance A pointer to the Instance object related to this delegate object.
+     * @note This method is for internal SDK use and should only be called by the `Instance` constructor and destructor.
+     */
+    void SetInstance(Instance * aInstance)
+    {
+        VerifyOrDie(mInstance == nullptr || aInstance == nullptr || mInstance == aInstance);
+        mInstance = aInstance;
+    }
 };
 
 } // namespace ResourceMonitoring

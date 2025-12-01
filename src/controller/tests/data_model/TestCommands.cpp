@@ -38,6 +38,7 @@
 #include <lib/core/TLV.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/tests/MessagingContext.h>
 #include <protocols/interaction_model/Constants.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -142,8 +143,8 @@ TEST_F(TestCommands, TestDataResponse)
 
     ScopedChange directive(gCommandResponseDirective, CommandResponseDirective::kSendDataResponse);
 
-    chip::Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
-                                           onFailureCb);
+    EXPECT_SUCCESS(
+        Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 
@@ -181,8 +182,8 @@ TEST_F(TestCommands, TestSuccessNoDataResponse)
 
     ScopedChange directive(gCommandResponseDirective, CommandResponseDirective::kSendSuccessStatusCode);
 
-    chip::Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
-                                           onFailureCb);
+    EXPECT_SUCCESS(chip::Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request,
+                                                          onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 
@@ -219,7 +220,8 @@ TEST_F(TestCommands, TestMultipleSuccessNoDataResponses)
 
     ScopedChange directive(gCommandResponseDirective, CommandResponseDirective::kSendMultipleSuccessStatusCodes);
 
-    Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb, onFailureCb);
+    EXPECT_SUCCESS(
+        Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 
@@ -257,8 +259,8 @@ TEST_F(TestCommands, TestAsyncResponse)
 
     ScopedChange directive(gCommandResponseDirective, CommandResponseDirective::kAsync);
 
-    chip::Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
-                                           onFailureCb);
+    EXPECT_SUCCESS(chip::Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request,
+                                                          onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 
@@ -302,8 +304,8 @@ TEST_F(TestCommands, TestFailure)
 
     ScopedChange directive(gCommandResponseDirective, CommandResponseDirective::kSendError);
 
-    chip::Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
-                                           onFailureCb);
+    EXPECT_SUCCESS(chip::Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request,
+                                                          onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 
@@ -340,7 +342,8 @@ TEST_F(TestCommands, TestMultipleFailures)
 
     ScopedChange directive(gCommandResponseDirective, CommandResponseDirective::kSendMultipleErrors);
 
-    Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb, onFailureCb);
+    EXPECT_SUCCESS(
+        Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 
@@ -369,7 +372,7 @@ TEST_F(TestCommands, TestSuccessNoDataResponseWithClusterStatus)
     auto onSuccessCb = [&onSuccessWasCalled, &statusCheck](const app::ConcreteCommandPath & commandPath,
                                                            const app::StatusIB & aStatus, const auto & dataResponse) {
         statusCheck        = (aStatus.mStatus == Protocols::InteractionModel::Status::Success &&
-                       aStatus.mClusterStatus.Value() == kTestSuccessClusterStatus);
+                       *aStatus.mClusterStatus == kTestSuccessClusterStatus);
         onSuccessWasCalled = true;
     };
 
@@ -379,8 +382,8 @@ TEST_F(TestCommands, TestSuccessNoDataResponseWithClusterStatus)
 
     ScopedChange directive(gCommandResponseDirective, CommandResponseDirective::kSendSuccessStatusCodeWithClusterStatus);
 
-    chip::Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
-                                           onFailureCb);
+    EXPECT_SUCCESS(chip::Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request,
+                                                          onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 
@@ -411,15 +414,15 @@ TEST_F(TestCommands, TestFailureWithClusterStatus)
         {
             app::StatusIB status(aError);
             statusCheck = (status.mStatus == Protocols::InteractionModel::Status::Failure &&
-                           status.mClusterStatus == MakeOptional(kTestFailureClusterStatus));
+                           status.mClusterStatus == kTestFailureClusterStatus);
         }
         onFailureWasCalled = true;
     };
 
     ScopedChange directive(gCommandResponseDirective, CommandResponseDirective::kSendErrorWithClusterStatus);
 
-    chip::Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
-                                           onFailureCb);
+    EXPECT_SUCCESS(chip::Controller::InvokeCommandRequest(&GetExchangeManager(), sessionHandle, kTestEndpointId, request,
+                                                          onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 

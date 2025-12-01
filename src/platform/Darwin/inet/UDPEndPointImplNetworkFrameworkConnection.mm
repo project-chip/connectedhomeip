@@ -336,9 +336,22 @@ namespace Inet {
 
             IPAddress remoteAddress;
             IPAddress::GetIPAddressFromSockAddr(*nw_endpoint_get_address(remoteEndpoint), remoteAddress);
-            const uint16_t remotePort = nw_endpoint_get_port(remoteEndpoint);
+            VerifyOrReturnValue(pktInfo.DestAddress == remoteAddress, false);
 
-            return pktInfo.DestAddress == remoteAddress && pktInfo.DestPort == remotePort;
+            const uint16_t remotePort = nw_endpoint_get_port(remoteEndpoint);
+            VerifyOrReturnValue(pktInfo.DestPort == remotePort, false);
+
+            if (pktInfo.Interface != InterfaceId::Null()) {
+                uint32_t interfaceIndex = 0;
+                __auto_type * sa = nw_endpoint_get_address(remoteEndpoint);
+                if (sa && sa->sa_family == AF_INET6) {
+                    __auto_type in6 = reinterpret_cast<const struct sockaddr_in6 *>(sa);
+                    interfaceIndex = static_cast<uint32_t>(in6->sin6_scope_id);
+                    VerifyOrReturnValue(interfaceIndex == pktInfo.Interface.GetPlatformInterface(), false);
+                }
+            }
+
+            return true;
         }
 
         void UDPEndPointImplNetworkFrameworkConnection::ConnectionWrapper::RefreshTimeout()

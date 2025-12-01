@@ -34,10 +34,11 @@
 import logging
 from random import choice
 
-import chip.clusters as Clusters
-from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_BOOLCFG_3_1(MatterBaseTest):
@@ -49,7 +50,7 @@ class TC_BOOLCFG_3_1(MatterBaseTest):
         return "[TC-BOOLCFG-3.1] SensitivityLevel with DUT as Server"
 
     def steps_TC_BOOLCFG_3_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read FeatureMap attribute"),
             TestStep("2b", "Verify SENSLVL feature is supported"),
@@ -64,18 +65,20 @@ class TC_BOOLCFG_3_1(MatterBaseTest):
             TestStep(10, "Write CurrentSensitivityLevel attribute to 255"),
             TestStep(11, "Write CurrentSensitivityLevel attribute to the initial current value"),
         ]
-        return steps
 
     def pics_TC_BOOLCFG_3_1(self) -> list[str]:
-        pics = [
+        return [
             "BOOLCFG.S",
         ]
-        return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_BOOLCFG_3_1(self):
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(1)
         attributes = Clusters.BooleanStateConfiguration.Attributes
@@ -94,8 +97,7 @@ class TC_BOOLCFG_3_1(MatterBaseTest):
                 logging.info("Test step skipped")
 
             return
-        else:
-            logging.info("Test step skipped")
+        logging.info("Test step skipped")
 
         self.step("2c")
         attribute_list = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)

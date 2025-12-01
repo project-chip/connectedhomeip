@@ -217,7 +217,7 @@ void Poller::WatchFree(AvahiWatch * watch)
 
 void Poller::WatchFree(AvahiWatch & watch)
 {
-    DeviceLayer::SystemLayerSockets().StopWatchingSocket(&watch.mSocketWatch);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayerSockets().StopWatchingSocket(&watch.mSocketWatch);
     mWatches.erase(std::remove_if(mWatches.begin(), mWatches.end(),
                                   [&watch](const std::unique_ptr<AvahiWatch> & aValue) { return aValue.get() == &watch; }),
                    mWatches.end());
@@ -320,7 +320,7 @@ void Poller::SystemTimerUpdate(AvahiTimeout * timer)
     {
         mEarliestTimeout = timer->mAbsTimeout;
         auto delay       = std::chrono::duration_cast<chip::System::Clock::Milliseconds32>(steady_clock::now() - mEarliestTimeout);
-        DeviceLayer::SystemLayer().StartTimer(delay, SystemTimerCallback, this);
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(delay, SystemTimerCallback, this);
     }
 }
 
@@ -347,7 +347,7 @@ exit:
 
 void MdnsAvahi::Shutdown()
 {
-    StopPublish();
+    TEMPORARY_RETURN_IGNORED StopPublish();
     if (mClient)
     {
         avahi_client_free(mClient);
@@ -389,7 +389,7 @@ void MdnsAvahi::HandleClientState(AvahiClient * client, AvahiClientState state)
     case AVAHI_CLIENT_S_COLLISION:
     case AVAHI_CLIENT_S_REGISTERING:
         ChipLogProgress(DeviceLayer, "Avahi re-register required");
-        StopPublish();
+        TEMPORARY_RETURN_IGNORED StopPublish();
         mErrorCallback(mAsyncReturnContext, CHIP_ERROR_FORCED_RESET);
         break;
     case AVAHI_CLIENT_CONNECTING:
@@ -857,10 +857,15 @@ CHIP_ERROR MdnsAvahi::Resolve(const char * name, const char * type, DnssdService
 {
     AvahiIfIndex avahiInterface     = static_cast<AvahiIfIndex>(interface.GetPlatformInterface());
     ResolveContext * resolveContext = AllocateResolveContext();
-    CHIP_ERROR error                = CHIP_NO_ERROR;
-    resolveContext->mInstance       = this;
-    resolveContext->mCallback       = callback;
-    resolveContext->mContext        = context;
+    if (resolveContext == nullptr)
+    {
+        ChipLogError(Discovery, "Failed to allocate resolve context");
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    CHIP_ERROR error          = CHIP_NO_ERROR;
+    resolveContext->mInstance = this;
+    resolveContext->mCallback = callback;
+    resolveContext->mContext  = context;
 
     if (!interface.IsPresent())
     {

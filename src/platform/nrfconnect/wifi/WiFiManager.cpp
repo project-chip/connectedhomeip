@@ -68,9 +68,8 @@ NetworkCommissioning::WiFiScanResponse ToScanResponse(const wifi_scan_result * r
 {
     NetworkCommissioning::WiFiScanResponse response = {};
 
-    if (result != nullptr)
+    if (result != nullptr && sizeof(response.ssid) >= result->ssid_length)
     {
-        static_assert(sizeof(response.ssid) == sizeof(result->ssid), "SSID length mismatch");
         static_assert(sizeof(response.bssid) == sizeof(result->mac), "BSSID length mismatch");
 
         // TODO: Distinguish WPA versions
@@ -153,7 +152,7 @@ const Map<wifi_iface_state, WiFiManager::StationStatus, 10>
                               { WIFI_STATE_GROUP_HANDSHAKE, WiFiManager::StationStatus::PROVISIONING },
                               { WIFI_STATE_COMPLETED, WiFiManager::StationStatus::FULLY_PROVISIONED } });
 
-const Map<uint32_t, WiFiManager::NetEventHandler, 5> WiFiManager::sEventHandlerMap({
+const Map<uint64_t, WiFiManager::NetEventHandler, 5> WiFiManager::sEventHandlerMap({
     { NET_EVENT_WIFI_SCAN_RESULT, WiFiManager::ScanResultHandler },
     { NET_EVENT_WIFI_SCAN_DONE, WiFiManager::ScanDoneHandler },
     { NET_EVENT_WIFI_CONNECT_RESULT, WiFiManager::ConnectHandler },
@@ -161,7 +160,7 @@ const Map<uint32_t, WiFiManager::NetEventHandler, 5> WiFiManager::sEventHandlerM
     { NET_EVENT_WIFI_DISCONNECT_COMPLETE, WiFiManager::DisconnectHandler },
 });
 
-void WiFiManager::WifiMgmtEventHandler(net_mgmt_event_callback * cb, uint32_t mgmtEvent, net_if * iface)
+void WiFiManager::WifiMgmtEventHandler(net_mgmt_event_callback * cb, uint64_t mgmtEvent, net_if * iface)
 {
     if (iface == Instance().mNetIf)
     {
@@ -172,11 +171,36 @@ void WiFiManager::WifiMgmtEventHandler(net_mgmt_event_callback * cb, uint32_t mg
     }
 }
 
-void WiFiManager::IPv6MgmtEventHandler(net_mgmt_event_callback * cb, uint32_t mgmtEvent, net_if * iface)
+void WiFiManager::IPv6MgmtEventHandler(net_mgmt_event_callback * cb, uint64_t mgmtEvent, net_if * iface)
 {
     if (((mgmtEvent == NET_EVENT_IPV6_ADDR_ADD) || (mgmtEvent == NET_EVENT_IPV6_ADDR_DEL)) && cb->info)
     {
         IPv6AddressChangeHandler(cb->info);
+    }
+}
+
+void WiFiManager::SuppEventHandler(net_mgmt_event_callback * cb, uint64_t mgmtEvent, net_if * iface)
+{
+    if (mgmtEvent == NET_EVENT_SUPPLICANT_NOT_READY)
+    {
+        SystemLayer().ScheduleLambda([] {
+            if (Instance().mWiFiState == WIFI_STATE_COMPLETED)
+            {
+                Instance().mReconnect = true;
+                Instance().NotifyDisconnected(WLAN_REASON_UNSPECIFIED);
+            }
+        });
+    }
+    else if (mgmtEvent == NET_EVENT_SUPPLICANT_READY)
+    {
+        SystemLayer().ScheduleLambda([] {
+            if (Instance().mWantedNetwork.IsConfigured() && Instance().mReconnect)
+            {
+                Instance().mReconnect = false;
+                Instance().SetLowPowerMode(Instance().mWiFiPsEnabled);
+                Instance().Scan(Instance().mWantedNetwork.GetSsidSpan(), nullptr, nullptr, true /* internal scan */);
+            }
+        });
     }
 }
 
@@ -187,9 +211,11 @@ CHIP_ERROR WiFiManager::Init()
 
     net_mgmt_init_event_callback(&mWiFiMgmtClbk, WifiMgmtEventHandler, kWifiManagementEvents);
     net_mgmt_init_event_callback(&mIPv6MgmtClbk, IPv6MgmtEventHandler, kIPv6ManagementEvents);
+    net_mgmt_init_event_callback(&mSuppClbk, SuppEventHandler, kSupplicantEvents);
 
     net_mgmt_add_event_callback(&mWiFiMgmtClbk);
     net_mgmt_add_event_callback(&mIPv6MgmtClbk);
+    net_mgmt_add_event_callback(&mSuppClbk);
 
     ChipLogDetail(DeviceLayer, "WiFiManager has been initialized");
 
@@ -526,7 +552,7 @@ void WiFiManager::ConnectHandler(Platform::UniquePtr<uint8_t> data, size_t lengt
             CHIP_ERROR error = chip::DeviceLayer::PlatformMgr().PostEvent(&event);
             if (error != CHIP_NO_ERROR)
             {
-                ChipLogError(DeviceLayer, "Cannot post event [error: %s]", ErrorStr(error));
+                ChipLogError(DeviceLayer, "Cannot post event: %" CHIP_ERROR_FORMAT, error.Format());
             }
 
             WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();
@@ -558,6 +584,7 @@ void WiFiManager::DisconnectHandler(Platform::UniquePtr<uint8_t> data, size_t le
         const wifi_status * status = reinterpret_cast<const wifi_status *>(rawData);
         uint16_t reason;
 
+        ChipLogProgress(DeviceLayer, "WiFi station disconnected, reason: %d", status->disconn_reason);
         switch (status->disconn_reason)
         {
         case WIFI_REASON_DISCONN_UNSPECIFIED:
@@ -576,25 +603,29 @@ void WiFiManager::DisconnectHandler(Platform::UniquePtr<uint8_t> data, size_t le
             reason = WLAN_REASON_UNSPECIFIED;
             break;
         }
-        Instance().SetLastDisconnectReason(reason);
-
-        ChipLogProgress(DeviceLayer, "WiFi station disconnected");
-        Instance().mWiFiState = WIFI_STATE_DISCONNECTED;
-        Instance().PostConnectivityStatusChange(kConnectivity_Lost);
-
-        WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();
-        if (delegate)
-        {
-            delegate->OnConnectionStatusChanged(
-                to_underlying(app::Clusters::WiFiNetworkDiagnostics::ConnectionStatusEnum::kNotConnected));
-            delegate->OnDisconnectionDetected(reason);
-        }
+        Instance().NotifyDisconnected(reason);
     });
 
     if (CHIP_NO_ERROR == err)
     {
         // the ownership has been transferred to the worker thread - release the buffer
         data.release();
+    }
+}
+
+void WiFiManager::NotifyDisconnected(uint16_t reason)
+{
+    SetLastDisconnectReason(reason);
+
+    mWiFiState = WIFI_STATE_DISCONNECTED;
+    PostConnectivityStatusChange(kConnectivity_Lost);
+
+    WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();
+    if (delegate)
+    {
+        delegate->OnConnectionStatusChanged(
+            to_underlying(app::Clusters::WiFiNetworkDiagnostics::ConnectionStatusEnum::kNotConnected));
+        delegate->OnDisconnectionDetected(reason);
     }
 }
 
@@ -692,7 +723,8 @@ CHIP_ERROR WiFiManager::SetLowPowerMode(bool onoff)
     if ((currentConfig.ps_params.enabled == WIFI_PS_ENABLED && onoff == false) ||
         (currentConfig.ps_params.enabled == WIFI_PS_DISABLED && onoff == true))
     {
-        wifi_ps_params params{ .enabled = onoff ? WIFI_PS_ENABLED : WIFI_PS_DISABLED };
+        mWiFiPsEnabled = onoff;
+        wifi_ps_params params{ .enabled = mWiFiPsEnabled ? WIFI_PS_ENABLED : WIFI_PS_DISABLED };
         if (net_mgmt(NET_REQUEST_WIFI_PS, mNetIf, &params, sizeof(params)))
         {
             ChipLogError(DeviceLayer, "Set low power mode request failed");

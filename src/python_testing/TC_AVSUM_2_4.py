@@ -35,11 +35,14 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import chip.clusters as Clusters
-from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
 from TC_AVSUMTestBase import AVSUMTestBase
+
+import matter.clusters as Clusters
+from matter.interaction_model import Status
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import (AttributeMatcher, MatterBaseTest, TestStep, default_matter_test_main, has_feature,
+                                           run_if_endpoint_matches)
 
 
 class TC_AVSUM_2_4(MatterBaseTest, AVSUMTestBase):
@@ -58,40 +61,39 @@ class TC_AVSUM_2_4(MatterBaseTest, AVSUMTestBase):
         return "[TC-AVSUM-2.4] MPTZMoveToPreset command validation"
 
     def steps_TC_AVSUM_2_4(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read the value of MaxPresets, fail if unsupported."),
             TestStep(3, "Read the value of MPTZPresets, fail if unsupported"),
             TestStep(4, "Send a MPTZMovePreset command with a presetID of MaxPresets+1. Verify Constraint Error failure response."),
-            TestStep(5, "If MPTZPresets is empty, jump to step 11"),
-            TestStep(6, "Verify that the size of the Presets List is not greater than MaxPresets"),
-            TestStep(7, "Loop over the supported presets, for each verify the PresetID and Name are in range"),
-            TestStep(8, "For each found preset, invoke MoveToPreset with the PresetID. Verify that the MPTZPosition is that from the Preset"),
-            TestStep(9, "If PIXIT.CANBEMADEBUSY is set, place the DUT into a state where it cannot accept a command. Else exit the test case."),
-            TestStep(10, "Send an MPTZMoveToPreset Command with a valid presetID. Verify busy failure response. End the text case"),
-            TestStep(11, "Send a MPTZMovePreset command with a presetID of MaxPresets. Verify Not Found failure response."),
-            TestStep(12, "Create a new saved preset with PresetID of MaxPresets"),
-            TestStep(13, "Create a new MPTZPosition that is the mid-point of all support PTZ attributes"),
-            TestStep(14, "Move to a the MPTZPosition created in step 13."),
-            TestStep(15, "Move to the saved preset from step 12"),
-            TestStep(16, "Verify that the MPTZPosition is that of the preset"),
-            TestStep(17, "If PIXIT.CANBEMADEBUSY is set, place the DUT into a state where it cannot accept a command. Else exit the test case."),
-            TestStep(18, "Send an MPTZMoveToPreset Command with a valid presetID. Verify busy failure response."),
+            TestStep(5, "Establish a subscription to the MovementState attribute"),
+            TestStep(6, "If MPTZPresets is empty, jump to step 11"),
+            TestStep(7, "Verify that the size of the Presets List is not greater than MaxPresets"),
+            TestStep(8, "Loop over the supported presets, for each verify the PresetID and Name are in range"),
+            TestStep(9, "For each found preset, invoke MoveToPreset with the PresetID. Wait on the subscription report showing movement complete, then verify that the MPTZPosition is that from the Preset"),
+            TestStep(10, "If PIXIT.CANBEMADEBUSY is set, place the DUT into a state where it cannot accept a command. Else exit the test case."),
+            TestStep(11, "Send an MPTZMoveToPreset Command with a valid presetID. Verify busy failure response. End the text case"),
+            TestStep(12, "Send a MPTZMovePreset command with a presetID of MaxPresets. Verify Not Found failure response."),
+            TestStep(13, "Create a new saved preset with PresetID of MaxPresets"),
+            TestStep(14, "Create a new MPTZPosition that is the mid-point of all support PTZ attributes"),
+            TestStep(15, "Move to a the MPTZPosition created in step 13."),
+            TestStep(16, "Move to the saved preset from step 12"),
+            TestStep(17, "Wait on the subscription report showing movement complete, then verify that the MPTZPosition is that of the preset"),
+            TestStep(18, "If PIXIT.CANBEMADEBUSY is set, place the DUT into a state where it cannot accept a command. Else exit the test case."),
+            TestStep(19, "Send an MPTZMoveToPreset Command with a valid presetID. Verify busy failure response."),
         ]
-        return steps
 
     def pics_TC_AVSUM_2_4(self) -> list[str]:
-        pics = [
+        return [
             "AVSUM.S",
         ]
-        return pics
 
     @run_if_endpoint_matches(has_feature(Clusters.CameraAvSettingsUserLevelManagement,
                                          Clusters.CameraAvSettingsUserLevelManagement.Bitmaps.Feature.kMechanicalPresets))
     async def test_TC_AVSUM_2_4(self):
         cluster = Clusters.Objects.CameraAvSettingsUserLevelManagement
         attributes = cluster.Attributes
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         # PIXIT check
         canbemadebusy = self.user_params.get("PIXIT.CANBEMADEBUSY", False)
 
@@ -137,76 +139,101 @@ class TC_AVSUM_2_4(MatterBaseTest, AVSUMTestBase):
         await self.send_move_to_preset_command(endpoint, max_presets_dut+1, expected_status=Status.ConstraintError)
 
         self.step(5)
+        # Establish subscription to MovementState
+        sub_handler = AttributeSubscriptionHandler(cluster, attributes.MovementState)
+        await sub_handler.start(self.default_controller, self.dut_node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
+
+        # Create attribute matchers
+        movement_state_match = AttributeMatcher.from_callable(
+            "MovementState is IDLE",
+            lambda report: report.value == cluster.Enums.PhysicalMovementEnum.kIdle)
+
+        self.step(6)
         if mptz_presets_dut:
-            self.step(6)
+            self.step(7)
             asserts.assert_less_equal(len(mptz_presets_dut), max_presets_dut,
                                       "MPTZPresets size is greater than the allowed max.")
 
-            self.step(7)
             self.step(8)
+            self.step(9)
             for mptzpreset in mptz_presets_dut:
                 asserts.assert_less_equal(mptzpreset.presetID, max_presets_dut, "PresetID is out of range")
                 asserts.assert_less_equal(len(mptzpreset.name), 32, "Preset name is too long")
                 self.ptz_range_validation(mptzpreset.settings, tilt_min_dut, tilt_max_dut,
                                           pan_min_dut, pan_max_dut, zoom_max_dut)
+
+                sub_handler.reset()
+
                 # Move to the Preset
                 await self.send_move_to_preset_command(endpoint, mptzpreset.presetID)
+
+                # Once the MovementState has reset to Idle, read the attribute back and make sure it was set
+                sub_handler.await_all_expected_report_matches([movement_state_match], timeout_sec=10)
                 mptzposition_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPosition)
                 self.verify_preset_matches(mptzpreset, mptzposition_dut)
 
-            self.step(9)
+            self.step(10)
             if canbemadebusy:
-                self.step(10)
+                self.step(11)
                 # Busy response check
                 if not self.is_ci:
                     self.wait_for_user_input(prompt_msg="Place device into a busy state. Hit ENTER once ready.")
                     await self.send_move_to_preset_command(endpoint, mptz_presets_dut[0].presetID, expected_status=Status.Busy)
             else:
-                self.skip_step(10)
-            self.skip_all_remaining_steps(11)
+                self.skip_step(11)
+            self.mark_all_remaining_steps_skipped(12)
+            return
+        self.skip_step(7)
+        self.skip_step(8)
+        self.skip_step(9)
+        self.skip_step(10)
+        self.skip_step(11)
+        self.step(12)
+        # Empty list, expect Not Found
+        await self.send_move_to_preset_command(endpoint, max_presets_dut, expected_status=Status.NotFound)
+
+        # For now force a preset to be present so there is something to read
+        self.step(13)
+        await self.send_save_preset_command(endpoint, name="newpreset", presetID=max_presets_dut)
+        stored_preset = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPresets)
+
+        self.step(14)
+        newPan = newTilt = newZoom = None
+        if self.has_feature_mpan:
+            newPan = (pan_max_dut - pan_min_dut)//2
+        if self.has_feature_mtilt:
+            newTilt = (tilt_max_dut - tilt_min_dut)//2
+        if self.has_feature_mzoom:
+            newZoom = (zoom_max_dut)//2
+
+        sub_handler.reset()
+
+        self.step(15)
+        await self.send_mptz_set_position_command(endpoint, newPan, newTilt, newZoom)
+
+        # Once the MovementState has reset to Idle, proceed with the move to preset
+        sub_handler.await_all_expected_report_matches([movement_state_match], timeout_sec=10)
+
+        self.step(16)
+        sub_handler.reset()
+        await self.send_move_to_preset_command(endpoint, max_presets_dut)
+
+        # Once the MovementState has reset to Idle, read the attribute back and make sure it was set to the preset
+        sub_handler.await_all_expected_report_matches([movement_state_match], timeout_sec=10)
+        mptzposition_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPosition)
+
+        self.step(17)
+        self.verify_preset_matches(stored_preset[0], mptzposition_dut)
+
+        self.step(18)
+        if canbemadebusy:
+            self.step(19)
+            # Busy response check
+            if not self.is_pics_sdk_ci_only:
+                self.wait_for_user_input(prompt_msg="Place device into a busy state. Hit ENTER once ready.")
+                await self.send_move_to_preset_command(endpoint, max_presets_dut, expected_status=Status.Busy)
         else:
-            self.skip_step(6)
-            self.skip_step(7)
-            self.skip_step(8)
-            self.skip_step(9)
-            self.skip_step(10)
-            self.step(11)
-            # Empty list, expect Not Found
-            await self.send_move_to_preset_command(endpoint, max_presets_dut, expected_status=Status.NotFound)
-
-            # For now force a preset to be present so there is something to read
-            self.step(12)
-            await self.send_save_preset_command(endpoint, name="newpreset", presetID=max_presets_dut)
-            stored_preset = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPresets)
-
-            self.step(13)
-            newPan = newTilt = newZoom = None
-            if self.has_feature_mpan:
-                newPan = (pan_max_dut - pan_min_dut)//2
-            if self.has_feature_mtilt:
-                newTilt = (tilt_max_dut - tilt_min_dut)//2
-            if self.has_feature_mzoom:
-                newZoom = (zoom_max_dut)//2
-
-            self.step(14)
-            await self.send_mptz_set_position_command(endpoint, newPan, newTilt, newZoom)
-
-            self.step(15)
-            await self.send_move_to_preset_command(endpoint, max_presets_dut)
-            mptzposition_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPosition)
-
-            self.step(16)
-            self.verify_preset_matches(stored_preset[0], mptzposition_dut)
-
-            self.step(17)
-            if canbemadebusy:
-                self.step(18)
-                # Busy response check
-                if not self.is_ci:
-                    self.wait_for_user_input(prompt_msg="Place device into a busy state. Hit ENTER once ready.")
-                    await self.send_move_to_preset_command(endpoint, max_presets_dut, expected_status=Status.Busy)
-            else:
-                self.skip_step(18)
+            self.skip_step(19)
 
 
 if __name__ == "__main__":

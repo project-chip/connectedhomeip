@@ -108,14 +108,19 @@ gboolean WiFiIPChangeListener(GIOChannel * ch, GIOCondition /* condition */, voi
                             continue;
                         }
 
-                        if (ConnectivityMgrImpl().GetWiFiIfName() == nullptr)
+                        ChipLogDetail(DeviceLayer, "Got IP address on interface: %s", name);
+
+                        const char * wifiIfName = ConnectivityMgrImpl().GetWiFiIfName();
+                        if (wifiIfName == nullptr)
                         {
-                            ChipLogDetail(DeviceLayer, "No wifi interface name. Ignoring IP update event.");
+                            ChipLogDetail(DeviceLayer, "Ignoring IP update event: No WiFi interface name configured");
                             continue;
                         }
 
-                        if (strcmp(name, ConnectivityMgrImpl().GetWiFiIfName()) != 0)
+                        if (strcmp(name, wifiIfName) != 0)
                         {
+                            ChipLogDetail(DeviceLayer, "Ignoring IP update event: Interface name mismatch: %s != %s", name,
+                                          wifiIfName);
                             continue;
                         }
 
@@ -259,7 +264,8 @@ void PlatformManagerImpl::_Shutdown()
 
         if (ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
         {
-            ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
+            TEMPORARY_RETURN_IGNORED ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours +
+                                                                                   static_cast<uint32_t>(upTime / 3600));
         }
         else
         {

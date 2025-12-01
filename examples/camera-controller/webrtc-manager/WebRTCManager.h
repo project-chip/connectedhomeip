@@ -19,16 +19,27 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <functional>
 #include <platform/CHIPDeviceLayer.h>
 #include <rtc/rtc.hpp>
 #include <webrtc-manager/WebRTCProviderClient.h>
 #include <webrtc-manager/WebRTCRequestorDelegate.h>
 
+struct ICECandidateInfo
+{
+    std::string candidate;
+    std::string mid;
+    int mlineIndex;
+};
+
 class WebRTCManager
 {
 public:
-    using ICECandidateStruct = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
-    using StreamUsageEnum    = chip::app::Clusters::Globals::StreamUsageEnum;
+    using ICECandidateStruct         = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
+    using WebRTCSessionStruct        = chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type;
+    using StreamUsageEnum            = chip::app::Clusters::Globals::StreamUsageEnum;
+    using SessionEstablishedCallback = std::function<void(uint16_t streamId)>;
 
     static WebRTCManager & Instance()
     {
@@ -38,28 +49,43 @@ public:
 
     void Init();
 
-    CHIP_ERROR HandleOffer(uint16_t sessionId, const WebRTCRequestorDelegate::OfferArgs & args);
+    /**
+     * @brief Set callback to be invoked when WebRTC session is established
+     *
+     * @param callback Function to call when session is established
+     */
+    void SetSessionEstablishedCallback(SessionEstablishedCallback callback) { mSessionEstablishedCallback = callback; }
 
-    CHIP_ERROR HandleAnswer(uint16_t sessionId, const std::string & sdp);
+    CHIP_ERROR HandleOffer(const WebRTCSessionStruct & session, const WebRTCRequestorDelegate::OfferArgs & args);
 
-    CHIP_ERROR HandleICECandidates(uint16_t sessionId, const std::vector<ICECandidateStruct> & candidates);
+    CHIP_ERROR HandleAnswer(const WebRTCSessionStruct & session, const std::string & sdp);
+
+    CHIP_ERROR HandleICECandidates(const WebRTCSessionStruct & session, const std::vector<ICECandidateStruct> & candidates);
 
     CHIP_ERROR Connnect(chip::Controller::DeviceCommissioner & commissioner, chip::NodeId nodeId, chip::EndpointId endpointId);
 
-    CHIP_ERROR ProvideOffer(chip::app::DataModel::Nullable<uint16_t> sessionId, StreamUsageEnum streamUsage);
+    CHIP_ERROR ProvideOffer(chip::app::DataModel::Nullable<uint16_t> sessionId, StreamUsageEnum streamUsage,
+                            chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamId,
+                            chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamId);
 
-    CHIP_ERROR SolicitOffer(StreamUsageEnum streamUsage);
-
+    CHIP_ERROR SolicitOffer(StreamUsageEnum streamUsage, chip::Optional<chip::app::DataModel::Nullable<uint16_t>> videoStreamId,
+                            chip::Optional<chip::app::DataModel::Nullable<uint16_t>> audioStreamId);
     CHIP_ERROR ProvideAnswer(uint16_t sessionId, const std::string & sdp);
 
     CHIP_ERROR ProvideICECandidates(uint16_t sessionId);
+
+    /**
+     * @brief Close the WebRTC connection and clean up resources
+     */
+    void Disconnect();
 
 private:
     // Make the constructor private to enforce the singleton pattern
     WebRTCManager();
     ~WebRTCManager();
 
-    chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorServer mWebRTCRequestorServer;
+    chip::app::LazyRegisteredServerCluster<chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorServer>
+        mWebRTCRegisteredServerCluster;
 
     WebRTCProviderClient mWebRTCProviderClient;
     WebRTCRequestorDelegate mWebRTCRequestorDelegate;
@@ -68,9 +94,23 @@ private:
 
     uint16_t mPendingSessionId = 0;
     std::string mLocalDescription;
-    // Local vector to store the ICE Candidate strings coming from the WebRTC
-    // stack
-    std::vector<std::string> mLocalCandidates;
+
+    // Local vector to store the ICE Candidate info coming from the WebRTC stack
+    std::vector<ICECandidateInfo> mLocalCandidates;
 
     std::shared_ptr<rtc::Track> mTrack;
+    std::shared_ptr<rtc::Track> mAudioTrack;
+
+    // Callback to notify when session is established
+    SessionEstablishedCallback mSessionEstablishedCallback;
+
+    // Track the current video stream ID for the session
+    uint16_t mCurrentVideoStreamId = 0;
+
+    // UDP socket for RTP forwarding
+    int mRTPSocket      = -1;
+    int mAudioRTPSocket = -1;
+
+    // Close and reset the RTP socket
+    void CloseRTPSocket();
 };

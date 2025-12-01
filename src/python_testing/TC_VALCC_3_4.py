@@ -34,10 +34,11 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_VALCC_3_4(MatterBaseTest):
@@ -49,7 +50,7 @@ class TC_VALCC_3_4(MatterBaseTest):
         return "[TC-VALCC-3.4] LevelStep behavior with DUT as Server"
 
     def steps_TC_VALCC_3_4(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read AttributeList attribute"),
             TestStep(3, "Verify LevelStep is supported"),
@@ -57,18 +58,20 @@ class TC_VALCC_3_4(MatterBaseTest):
             TestStep(5, "Verify the supported level values using Open Command"),
             TestStep(6, "Send Close command"),
         ]
-        return steps
 
     def pics_TC_VALCC_3_4(self) -> list[str]:
-        pics = [
+        return [
             "VALCC.S",
         ]
-        return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_VALCC_3_4(self):
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(1)
         attributes = Clusters.ValveConfigurationAndControl.Attributes
@@ -87,8 +90,7 @@ class TC_VALCC_3_4(MatterBaseTest):
 
             return
 
-        else:
-            logging.info("Test step skipped")
+        logging.info("Test step skipped")
 
         self.step(4)
         levelStep = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.LevelStep)

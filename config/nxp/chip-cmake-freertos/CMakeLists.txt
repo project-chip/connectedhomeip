@@ -52,6 +52,7 @@ matter_add_gn_arg_bool("nxp_use_factory_data" ${CONFIG_CHIP_FACTORY_DATA})
 matter_add_gn_arg_bool("nxp_enable_secure_whole_factory_data" ${CONFIG_CHIP_ENABLE_SECURE_WHOLE_FACTORY_DATA})
 matter_add_gn_arg_bool("nxp_enable_secure_EL2GO_factory_data" ${CONFIG_CHIP_ENABLE_EL2GO_FACTORY_DATA})
 matter_add_gn_arg_bool("nxp_enable_matter_cli" CONFIG_CHIP_LIB_SHELL)
+matter_add_gn_arg_bool("nxp_multiple_ble_connections" CONFIG_CHIP_NXP_MULTIPLE_BLE_CONNECTIONS)
 matter_add_gn_arg_bool("nxp_enable_pairing_autostart" CONFIG_CHIP_ENABLE_PAIRING_AUTOSTART)
 matter_add_gn_arg_bool("nxp_use_low_power" CONFIG_NXP_USE_LOW_POWER)
 matter_add_gn_arg_bool("nxp_use_plain_dac_key" CONFIG_NXP_USE_PLAIN_DAC_KEY)
@@ -65,16 +66,20 @@ matter_add_gn_arg_list("default_configs_specs" " ")
 # Required for freeRTOS build in case default value needs to be set to "none" for optimization
 matter_add_gn_arg_string("chip_stack_lock_tracking" "${CONFIG_CHIP_STACK_LOCK_TRACKING}")
 
+# Adding nxp crypto implementation
+matter_add_gn_arg_string("nxp_crypto_impl" "${CONFIG_CHIP_NXP_CRYPTO_IMPL}")
+
 # OT specific gn arguments
 if(CONFIG_NET_L2_OPENTHREAD)
     matter_add_gn_arg_string("openthread_root" "${CHIP_ROOT}/${CONFIG_OT_ROOT}")
     matter_add_gn_arg_string("openthread_external_mbedtls" "${CHIP_ROOT}/third_party/nxp/nxp_matter_support/gn_build:${CONFIG_OT_EXTERNAL_MBEDTLS}")
-    matter_add_gn_arg_string("openthread_project_core_config_file" "${CHIP_ROOT}/${CONFIG_OT_PROJECT_CORE_CONFIG_FILE}")
+    matter_add_gn_arg_string("openthread_project_core_config_file" "${CONFIG_OT_PROJECT_CORE_CONFIG_FILE}")
     matter_add_gn_arg_string("openthread_core_config_platform_check_file" ${CONFIG_OT_CORE_CONFIG_PLATFORM_CHECK_FILE})
     matter_add_gn_arg_string("openthread_external_platform" "${CHIP_ROOT}/third_party/openthread/platforms/nxp/${CONFIG_CHIP_NXP_PLATFORM_FOLDER_NAME}:${CONFIG_OT_EXTERNAL_PLATFORM}")
     matter_add_gn_arg_list("openthread_core_config_deps" "\"${CHIP_ROOT}/${CONFIG_OT_CORE_CONFIG_DEPS}\"")
     matter_add_gn_arg("chip_device_config_thread_network_endpoint_id" ${CONFIG_CHIP_THREAD_NETWORK_ENDPOINT_ID})
     matter_add_gn_arg_string("nxp_ot_spinel_interface_link" ${CONFIG_OT_NXP_SPINEL_INTERFACE_LINK})
+     matter_add_gn_arg_string("nxp_ot_lib_config_file" "${CONFIG_OT_PROJECT_LIB_CONFIG_FILE}")
 endif()
 
 if(CONFIG_CHIP_SECONDARY_NETWORK_IF)
@@ -111,6 +116,11 @@ matter_common_gn_args(
     PROJECT_CONFIG_INC_DIR ${CONFIG_CHIP_PROJECT_CONFIG_INCLUDE_DIRS}
     DEVICE_INFO_EXAMPLE_PROVIDER CONFIG_CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
 )
+
+if(NOT "${CONFIG_NXP_CUSTOM_UNIT_TESTS_DIR}" STREQUAL "")
+    # Only for NXP internal usage
+    matter_add_gn_arg_string("nxp_custom_unit_tests_dir" "${CONFIG_NXP_CUSTOM_UNIT_TESTS_DIR}")
+endif()
 
 matter_generate_args_tmp_file()
 

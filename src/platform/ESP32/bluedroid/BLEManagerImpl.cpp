@@ -430,7 +430,7 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
         mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
     }
 }
@@ -683,7 +683,7 @@ void BLEManagerImpl::gattc_profile_event_handler(esp_gattc_cb_event_t event, esp
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
         sInstance.mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
     }
 
@@ -823,7 +823,7 @@ CHIP_ERROR BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
     err = MapBLEError(esp_ble_gatts_close(mAppIf, conId));
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "esp_ble_gatts_close() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "esp_ble_gatts_close() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     // Release the associated connection state record.
@@ -865,7 +865,7 @@ CHIP_ERROR BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const Chi
                                                   data->Start(), true /* need_confirm */));
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "esp_ble_gatts_send_indicate() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "esp_ble_gatts_send_indicate() failed: %" CHIP_ERROR_FORMAT, err.Format());
         ExitNow();
     }
 
@@ -965,7 +965,7 @@ void BLEManagerImpl::DriveBLEState(void)
         err = MapBLEError(esp_ble_gatts_app_register(CHIPoBLEAppId));
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(DeviceLayer, "esp_ble_gatts_app_register() failed: %s", ErrorStr(err));
+            ChipLogError(DeviceLayer, "esp_ble_gatts_app_register() failed: %" CHIP_ERROR_FORMAT, err.Format());
             ExitNow();
         }
 
@@ -980,7 +980,7 @@ void BLEManagerImpl::DriveBLEState(void)
         err = MapBLEError(esp_ble_gatts_create_attr_tab(CHIPoBLEGATTAttrs, mAppIf, CHIPoBLEGATTAttrCount, 0));
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(DeviceLayer, "esp_ble_gatts_create_attr_tab() failed: %s", ErrorStr(err));
+            ChipLogError(DeviceLayer, "esp_ble_gatts_create_attr_tab() failed: %" CHIP_ERROR_FORMAT, err.Format());
             ExitNow();
         }
 
@@ -995,7 +995,7 @@ void BLEManagerImpl::DriveBLEState(void)
         err = MapBLEError(esp_ble_gatts_start_service(mServiceAttrHandle));
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(DeviceLayer, "esp_ble_gatts_start_service() failed: %s", ErrorStr(err));
+            ChipLogError(DeviceLayer, "esp_ble_gatts_start_service() failed: %" CHIP_ERROR_FORMAT, err.Format());
             ExitNow();
         }
 
@@ -1040,7 +1040,7 @@ void BLEManagerImpl::DriveBLEState(void)
             err = MapBLEError(esp_ble_gap_stop_advertising());
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(DeviceLayer, "esp_ble_gap_stop_advertising() failed: %s", ErrorStr(err));
+                ChipLogError(DeviceLayer, "esp_ble_gap_stop_advertising() failed: %" CHIP_ERROR_FORMAT, err.Format());
                 ExitNow();
             }
 
@@ -1058,7 +1058,7 @@ void BLEManagerImpl::DriveBLEState(void)
         err = MapBLEError(esp_ble_gatts_stop_service(mServiceAttrHandle));
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(DeviceLayer, "esp_ble_gatts_stop_service() failed: %s", ErrorStr(err));
+            ChipLogError(DeviceLayer, "esp_ble_gatts_stop_service() failed: %" CHIP_ERROR_FORMAT, err.Format());
             ExitNow();
         }
 
@@ -1071,7 +1071,7 @@ void BLEManagerImpl::DriveBLEState(void)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
         mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
     }
 }
@@ -1089,7 +1089,7 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
         err = MapBLEError(esp_bt_controller_mem_release(ESP_BT_MODE_CLASSIC_BT));
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(DeviceLayer, "esp_bt_controller_mem_release() failed: %s", ErrorStr(err));
+            ChipLogError(DeviceLayer, "esp_bt_controller_mem_release() failed: %" CHIP_ERROR_FORMAT, err.Format());
             ExitNow();
         }
 
@@ -1098,7 +1098,7 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
         err                               = MapBLEError(esp_bt_controller_init(&bt_cfg));
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(DeviceLayer, "esp_bt_controller_init() failed: %s", ErrorStr(err));
+            ChipLogError(DeviceLayer, "esp_bt_controller_init() failed: %" CHIP_ERROR_FORMAT, err.Format());
             ExitNow();
         }
     }
@@ -1109,7 +1109,7 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
         err = MapBLEError(esp_bt_controller_enable(ESP_BT_MODE_BLE));
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(DeviceLayer, "esp_bt_controller_enable() failed: %s", ErrorStr(err));
+            ChipLogError(DeviceLayer, "esp_bt_controller_enable() failed: %" CHIP_ERROR_FORMAT, err.Format());
             ExitNow();
         }
     }
@@ -1120,7 +1120,7 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
         err = MapBLEError(esp_bluedroid_init());
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(DeviceLayer, "esp_bluedroid_init() failed: %s", ErrorStr(err));
+            ChipLogError(DeviceLayer, "esp_bluedroid_init() failed: %" CHIP_ERROR_FORMAT, err.Format());
             ExitNow();
         }
     }
@@ -1131,7 +1131,7 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
         err = MapBLEError(esp_bluedroid_enable());
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(DeviceLayer, "esp_bluedroid_enable() failed: %s", ErrorStr(err));
+            ChipLogError(DeviceLayer, "esp_bluedroid_enable() failed: %" CHIP_ERROR_FORMAT, err.Format());
             ExitNow();
         }
     }
@@ -1140,7 +1140,7 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
     err = MapBLEError(esp_ble_gatts_register_callback(HandleGATTEvent));
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "esp_ble_gatts_register_callback() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "esp_ble_gatts_register_callback() failed: %" CHIP_ERROR_FORMAT, err.Format());
         ExitNow();
     }
 
@@ -1148,7 +1148,7 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
     err = MapBLEError(esp_ble_gap_register_callback(HandleGAPEvent));
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "esp_ble_gap_register_callback() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "esp_ble_gap_register_callback() failed: %" CHIP_ERROR_FORMAT, err.Format());
         ExitNow();
     }
 
@@ -1156,7 +1156,7 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
     err = MapBLEError(esp_ble_gatt_set_local_mtu(CHIP_MAX_MTU_SIZE));
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "esp_ble_gatt_set_local_mtu() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "esp_ble_gatt_set_local_mtu() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
     SuccessOrExit(err);
 
@@ -1204,7 +1204,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     err = MapBLEError(esp_ble_gap_set_device_name(mDeviceName));
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "esp_ble_gap_set_device_name() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "esp_ble_gap_set_device_name() failed: %" CHIP_ERROR_FORMAT, err.Format());
         ExitNow();
     }
 
@@ -1242,7 +1242,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(deviceIdInfo);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "GetBLEDeviceIdentificationInfo(): %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "GetBLEDeviceIdentificationInfo(): %" CHIP_ERROR_FORMAT, err.Format());
         ExitNow();
     }
 
@@ -1254,7 +1254,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     err = MapBLEError(esp_ble_gap_config_adv_data_raw(advData, sizeof(advData)));
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "esp_ble_gap_config_adv_data_raw(<raw_data>) failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "esp_ble_gap_config_adv_data_raw(<raw_data>) failed: %" CHIP_ERROR_FORMAT, err.Format());
         ExitNow();
     }
 
@@ -1323,7 +1323,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     err = MapBLEError(esp_ble_gap_start_advertising(&advertParams));
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "esp_ble_gap_start_advertising() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "esp_ble_gap_start_advertising() failed: %" CHIP_ERROR_FORMAT, err.Format());
         ExitNow();
     }
 
@@ -1427,7 +1427,7 @@ void BLEManagerImpl::HandleGATTControlEvent(esp_gatts_cb_event_t event, esp_gatt
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
         mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
     }
     if (controlOpComplete)
@@ -1557,7 +1557,7 @@ void BLEManagerImpl::HandleRXCharWrite(esp_ble_gatts_cb_param_t * param)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "HandleRXCharWrite() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "HandleRXCharWrite() failed: %" CHIP_ERROR_FORMAT, err.Format());
         if (needResp)
         {
             esp_ble_gatts_send_response(mAppIf, param->write.conn_id, param->write.trans_id, ESP_GATT_INTERNAL_ERROR, NULL);
@@ -1579,7 +1579,7 @@ void BLEManagerImpl::HandleTXCharRead(esp_ble_gatts_cb_param_t * param)
     err = MapBLEError(esp_ble_gatts_send_response(mAppIf, param->read.conn_id, param->read.trans_id, ESP_GATT_OK, &rsp));
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "esp_ble_gatts_send_response() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "esp_ble_gatts_send_response() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
@@ -1606,7 +1606,7 @@ void BLEManagerImpl::HandleTXCharCCCDRead(esp_ble_gatts_cb_param_t * param)
                                                   (conState != NULL) ? ESP_GATT_OK : ESP_GATT_INTERNAL_ERROR, &rsp));
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "esp_ble_gatts_send_response() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "esp_ble_gatts_send_response() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
@@ -1651,7 +1651,7 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(esp_ble_gatts_cb_param_t * param)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "HandleTXCharCCCDWrite() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "HandleTXCharCCCDWrite() failed: %" CHIP_ERROR_FORMAT, err.Format());
         if (needResp)
         {
             esp_ble_gatts_send_response(mAppIf, param->write.conn_id, param->write.trans_id, ESP_GATT_INTERNAL_ERROR, NULL);
@@ -1763,7 +1763,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureBle(uint32_t aAdapterId, bool aIsCentral)
         err = MapBLEError(esp_ble_gattc_register_callback(esp_gattc_cb));
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(DeviceLayer, "esp_ble_gattc_register_callback() failed: %s", ErrorStr(err));
+            ChipLogError(DeviceLayer, "esp_ble_gattc_register_callback() failed: %" CHIP_ERROR_FORMAT, err.Format());
             ExitNow();
         }
         ChipLogProgress(Ble, "Before initialising (PROFILE\n");
@@ -1771,7 +1771,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureBle(uint32_t aAdapterId, bool aIsCentral)
         int rc = esp_ble_gattc_app_register(PROFILE_A_APP_ID);
         if (rc != 0)
         {
-            ChipLogError(DeviceLayer, "esp_ble_gattc_app_register() failed %s", ErrorStr(err));
+            ChipLogError(DeviceLayer, "esp_ble_gattc_app_register() failed: %d", rc);
             ExitNow();
         }
     }
@@ -1846,7 +1846,7 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
     if (err != CHIP_NO_ERROR)
     {
         BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, err);
-        ChipLogError(Ble, "Failed to initialize device scanner: %s", ErrorStr(err));
+        ChipLogError(Ble, "Failed to initialize device scanner: %" CHIP_ERROR_FORMAT, err.Format());
         return;
     }
 
@@ -1856,7 +1856,7 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
     if (err != CHIP_NO_ERROR)
     {
         mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
-        ChipLogError(Ble, "Failed to start a BLE scan: %s", chip::ErrorStr(err));
+        ChipLogError(Ble, "Failed to start a BLE scan: %" CHIP_ERROR_FORMAT, err.Format());
         BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, err);
         return;
     }
@@ -2138,7 +2138,7 @@ void BLEManagerImpl::HandleGAPEvent(esp_gap_ble_cb_event_t event, esp_ble_gap_cb
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
         sInstance.mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
     }
     PlatformMgr().ScheduleWork(DriveBLEState, 0);

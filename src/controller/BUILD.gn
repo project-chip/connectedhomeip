@@ -105,6 +105,7 @@ static_library("controller") {
     ":interactions",
     "${chip_root}/src/app",
     "${chip_root}/src/app/server",
+    "${chip_root}/src/credentials/jcm:jcm",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/dnssd",
     "${chip_root}/src/lib/support",
@@ -118,6 +119,9 @@ static_library("controller") {
   ]
 
   cflags = [ "-Wconversion" ]
+  if (chip_support_webrtc_python_bindings) {
+    public_deps += [ "${chip_root}/src/controller/webrtc:chip_webrtc" ]
+  }
 
   public_configs = [ "${chip_root}/src:includes" ]
 }

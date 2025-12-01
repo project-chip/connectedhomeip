@@ -184,7 +184,7 @@ class ThreadBorderRouterManagementCluster(
   suspend fun setActiveDatasetRequest(
     activeDataset: ByteArray,
     breadcrumb: ULong?,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration,
   ) {
     val commandId: UInt = 3u
 
@@ -209,10 +209,7 @@ class ThreadBorderRouterManagementCluster(
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun setPendingDatasetRequest(
-    pendingDataset: ByteArray,
-    timedInvokeTimeout: Duration? = null,
-  ) {
+  suspend fun setPendingDatasetRequest(pendingDataset: ByteArray, timedInvokeTimeout: Duration) {
     val commandId: UInt = 4u
 
     val tlvWriter = TlvWriter()

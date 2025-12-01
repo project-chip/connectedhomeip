@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include <platform/nrfconnect/ExternalFlashManager.h>
-
 #if CONFIG_CHIP_OTA_REQUESTOR
 #include <platform/nrfconnect/OTAImageProcessorImpl.h>
 
@@ -57,11 +55,3 @@ void InitBasicOTARequestor();
 void OtaConfirmNewImage();
 
 #endif // CONFIG_CHIP_OTA_REQUESTOR
-
-/**
- * Get ExternalFlashManager static instance.
- *
- * Returned object can be used to control the QSPI external flash,
- * which can be introduced into sleep mode and woken up on demand.
- */
-chip::DeviceLayer::ExternalFlashManager & GetFlashHandler();

@@ -43,6 +43,7 @@
 #import "lib/core/CHIPError.h"
 #import "lib/core/DataModelTypes.h"
 
+#import <app-common/zap-generated/cluster-objects.h>
 #import <app/AttributePathParams.h>
 #import <app/BufferedReadCallback.h>
 #import <app/ClusterStateCache.h>
@@ -200,6 +201,31 @@ static bool CheckMemberOfType(NSDictionary<NSString *, id> * responseValue, NSSt
     NSString * errorMessage, NSError * __autoreleasing * error);
 static void LogStringAndReturnError(NSString * errorStr, CHIP_ERROR errorCode, NSError * __autoreleasing * error);
 static void LogStringAndReturnError(NSString * errorStr, MTRErrorCode errorCode, NSError * __autoreleasing * error);
+
+// entity could be an attribute, command, or event.
+static NSUInteger HashPath(NSNumber * _Nullable endpoint, NSNumber * _Nullable cluster, NSNumber * _Nullable entity)
+{
+    static_assert(sizeof(NSUInteger) == 4 || sizeof(NSUInteger) >= 8, "Unexpected NSUInteger size");
+
+    // Endpoint could be 16 bits, but is typically 8 bits.
+    // Cluster could be 32 bits, but is typically 12-16 bits, sometimes even 8.
+    // Entity could be 32 bits, but is typically 12-16 bits, sometimes even 8.
+
+    // The only time cluster or entity is > 16 bits is when vendor prefixes are
+    // used, and typically those would not both have vendor prefixes.
+
+    unsigned short endpointValue = endpoint.unsignedShortValue;
+    unsigned long clusterValue = cluster.unsignedLongValue;
+    unsigned long entityValue = entity.unsignedLongValue;
+
+    if constexpr (sizeof(NSUInteger) == 4) {
+        // Give endpoint its own 8 bits.  Then give 12 bits to each of the others.
+        return endpointValue ^ (clusterValue << 8) ^ (entityValue << 20);
+    } else {
+        // sizeof(NSUInteger) >= 8.  Give endpoint 10 bits, 27 bits each to the others.
+        return endpointValue ^ (clusterValue << 10) ^ (((NSUInteger) entityValue) << 37);
+    }
+}
 
 @implementation MTRReadClientContainer
 - (void)cleanup
@@ -1534,7 +1560,7 @@ exit:
             commandSender.release();
             return CHIP_NO_ERROR;
         });
-    std::move(*bridge).DispatchAction(self);
+    std::move(*bridge).DispatchAction(self, CommandHasLargePayload(static_cast<ClusterId>(clusterID.unsignedLongLongValue), static_cast<CommandId>(commandID.unsignedLongLongValue)));
 }
 
 - (void)_invokeKnownCommandWithEndpointID:(NSNumber *)endpointID
@@ -2021,7 +2047,6 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
                 });
             };
 
-            SetupPayload setupPayload;
             auto errorCode = OpenCommissioningWindowHelper::OpenCommissioningWindow(commissioner, self.nodeID,
                 chip::System::Clock::Seconds16(static_cast<uint16_t>(durationVal)), static_cast<uint16_t>(discriminatorVal),
                 passcode, resultCallback);
@@ -2467,7 +2492,7 @@ static NSString * FormatPossiblyWildcardClusterElement(NSNumber * _Nullable poss
 
 - (NSUInteger)hash
 {
-    return _endpoint.unsignedShortValue ^ _cluster.unsignedLongValue ^ _attribute.unsignedLongValue;
+    return HashPath(_endpoint, _cluster, _attribute);
 }
 
 - (id)copyWithZone:(NSZone *)zone
@@ -2594,7 +2619,7 @@ static NSString * const sAttributeIDKey = @"attributeIDKey";
 
 - (NSUInteger)hash
 {
-    return _endpoint.unsignedShortValue ^ _cluster.unsignedLongValue ^ _event.unsignedLongValue;
+    return HashPath(_endpoint, _cluster, _event);
 }
 
 - (id)copyWithZone:(NSZone *)zone
@@ -2715,7 +2740,7 @@ static NSString * const sEventAttributeIDKey = @"attributeIDKey";
 
 - (NSUInteger)hash
 {
-    return _endpoint.unsignedShortValue ^ _cluster.unsignedLongValue;
+    return HashPath(_endpoint, _cluster, nil);
 }
 
 - (id)copyWithZone:(NSZone *)zone
@@ -2762,7 +2787,7 @@ static NSString * const sClusterKey = @"clusterKey";
 @end
 
 @implementation MTRAttributePath
-- (instancetype)initWithPath:(const ConcreteDataAttributePath &)path
+- (instancetype)initWithPath:(const ConcreteAttributePath &)path
 {
     if (self = [super initWithPath:path]) {
         _attribute = @(path.mAttributeId);
@@ -2805,7 +2830,7 @@ static NSString * const sClusterKey = @"clusterKey";
 
 - (NSUInteger)hash
 {
-    return self.endpoint.unsignedShortValue ^ self.cluster.unsignedLongValue ^ _attribute.unsignedLongValue;
+    return HashPath(self.endpoint, self.cluster, _attribute);
 }
 
 - (id)copyWithZone:(NSZone *)zone
@@ -2901,7 +2926,7 @@ static NSString * const sAttributeKey = @"attributeKey";
 
 - (NSUInteger)hash
 {
-    return self.endpoint.unsignedShortValue ^ self.cluster.unsignedLongValue ^ _event.unsignedLongValue;
+    return HashPath(self.endpoint, self.cluster, _event);
 }
 
 - (id)copyWithZone:(NSZone *)zone
@@ -2992,7 +3017,7 @@ static NSString * const sEventKey = @"eventKey";
 
 - (NSUInteger)hash
 {
-    return self.endpoint.unsignedShortValue ^ self.cluster.unsignedLongValue ^ _command.unsignedLongValue;
+    return HashPath(self.endpoint, self.cluster, _command);
 }
 
 - (id)copyWithZone:(NSZone *)zone

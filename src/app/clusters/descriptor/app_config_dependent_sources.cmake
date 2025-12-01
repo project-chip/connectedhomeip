@@ -16,5 +16,13 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-  "${CLUSTER_DIR}/descriptor.cpp"
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+)
+
+# These are the things that BUILD.gn dependencies would pull
+TARGET_SOURCES(
+  ${APP_TARGET}
+  PRIVATE
+    "${CLUSTER_DIR}/DescriptorCluster.h"
+    "${CLUSTER_DIR}/DescriptorCluster.cpp"
 )

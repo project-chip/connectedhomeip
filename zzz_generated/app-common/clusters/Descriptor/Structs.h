@@ -23,7 +23,7 @@
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/List.h>
 #include <app/data-model/Nullable.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
 #include <lib/core/TLV.h>
 #include <lib/support/BitMask.h>
@@ -60,33 +60,6 @@ public:
 using DecodableType = Type;
 
 } // namespace DeviceTypeStruct
-namespace SemanticTagStruct {
-enum class Fields : uint8_t
-{
-    kMfgCode     = 0,
-    kNamespaceID = 1,
-    kTag         = 2,
-    kLabel       = 3,
-};
-
-struct Type
-{
-public:
-    DataModel::Nullable<chip::VendorId> mfgCode;
-    uint8_t namespaceID = static_cast<uint8_t>(0);
-    uint8_t tag         = static_cast<uint8_t>(0);
-    Optional<DataModel::Nullable<chip::CharSpan>> label;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace SemanticTagStruct
 } // namespace Structs
 } // namespace Descriptor
 } // namespace Clusters

@@ -42,6 +42,7 @@
         "DISHWASHER_ALARM_CLUSTER": [],
         "DISHWASHER_MODE_CLUSTER": [],
         "ELECTRICAL_GRID_CONDITIONS_CLUSTER": [],
+        "GROUPCAST_CLUSTER": [],
         "METER_IDENTIFICATION_CLUSTER": [],
         "MICROWAVE_OVEN_MODE_CLUSTER": [],
         "DOOR_LOCK_CLUSTER": [],
@@ -65,10 +66,8 @@
         "ICD_MANAGEMENT_CLUSTER": [],
         "IDENTIFY_CLUSTER": [],
         "ILLUMINANCE_MEASUREMENT_CLUSTER": [],
-        "JOINT_FABRIC_DATASTORE_CLUSTER": ["joint-fabric-datastore-server"],
-        "JOINT_FABRIC_ADMINISTRATOR_CLUSTER": [
-            "joint-fabric-administrator-server"
-        ],
+        "JOINT_FABRIC_DATASTORE_CLUSTER": [],
+        "JOINT_FABRIC_ADMINISTRATOR_CLUSTER": [],
         "KEYPAD_INPUT_CLUSTER": [],
         "LAUNDRY_WASHER_MODE_CLUSTER": [],
         "LEVEL_CONTROL_CLUSTER": [],
@@ -107,9 +106,7 @@
         "PROXY_CONFIGURATION_CLUSTER": [],
         "PROXY_DISCOVERY_CLUSTER": [],
         "PROXY_VALID_CLUSTER": [],
-        "PUMP_CONFIGURATION_AND_CONTROL_CLUSTER": [
-            "pump-configuration-and-control-client"
-        ],
+        "PUMP_CONFIGURATION_AND_CONTROL_CLUSTER": [],
         "PWM_CLUSTER": [],
         "REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER": [],
         "RADON_CONCENTRATION_MEASUREMENT_CLUSTER": [],
@@ -126,7 +123,7 @@
         "TARGET_NAVIGATOR_CLUSTER": [],
         "TEMPERATURE_CONTROL_CLUSTER": [],
         "TEMPERATURE_MEASUREMENT_CLUSTER": [],
-        "THERMOSTAT_CLUSTER": ["thermostat-client"],
+        "THERMOSTAT_CLUSTER": [],
         "THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER": [],
         "THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER": [],
         "THREAD_NETWORK_DIAGNOSTICS_CLUSTER": [],
@@ -173,7 +170,7 @@
         "BALLAST_CONFIGURATION_CLUSTER": [],
         "BASIC_INFORMATION_CLUSTER": ["basic-information"],
         "BINDING_CLUSTER": ["bindings"],
-        "BOOLEAN_STATE_CLUSTER": [],
+        "BOOLEAN_STATE_CLUSTER": ["boolean-state-server"],
         "BOOLEAN_STATE_CONFIGURATION_CLUSTER": [
             "boolean-state-configuration-server"
         ],
@@ -199,9 +196,9 @@
         "COLOR_CONTROL_CLUSTER": ["color-control-server"],
         "COMMISSIONER_CONTROL_CLUSTER": ["commissioner-control-server"],
         "COMMISSIONING_CLUSTER": [],
-        "COMMODITY_METERING_CLUSTER": [],
+        "COMMODITY_METERING_CLUSTER": ["commodity-metering-server"],
         "COMMODITY_PRICE_CLUSTER": ["commodity-price-server"],
-        "COMMODITY_TARIFF_CLUSTER": [],
+        "COMMODITY_TARIFF_CLUSTER": ["commodity-tariff-server"],
         "CONTENT_LAUNCHER_CLUSTER": ["content-launch-server"],
         "CONTENT_CONTROL_CLUSTER": ["content-control-server"],
         "CONTENT_APP_OBSERVER_CLUSTER": ["content-app-observer"],
@@ -215,6 +212,7 @@
         "ELECTRICAL_GRID_CONDITIONS_CLUSTER": [
             "electrical-grid-conditions-server"
         ],
+        "GROUPCAST_CLUSTER": ["groupcast-server"],
         "METER_IDENTIFICATION_CLUSTER": ["meter-identification-server"],
         "MICROWAVE_OVEN_MODE_CLUSTER": ["mode-base-server"],
         "DOOR_LOCK_CLUSTER": ["door-lock-server"],
@@ -266,7 +264,7 @@
         "NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],
-        "PUSH_AV_STREAM_TRANSPORT_CLUSTER": [],
+        "PUSH_AV_STREAM_TRANSPORT_CLUSTER": ["push-av-stream-transport-server"],
         "SAMPLE_MEI_CLUSTER": ["sample-mei-server"],
         "OCCUPANCY_SENSING_CLUSTER": ["occupancy-sensor-server"],
         "ON_OFF_CLUSTER": ["on-off-server"],
@@ -340,8 +338,10 @@
         "TIME_FORMAT_LOCALIZATION_CLUSTER": ["time-format-localization-server"],
         "TIME_SYNCHRONIZATION_CLUSTER": ["time-synchronization-server"],
         "TIMER_CLUSTER": ["timer-server"],
-        "TLS_CERTIFICATE_MANAGEMENT_CLUSTER": [],
-        "TLS_CLIENT_MANAGEMENT_CLUSTER": [],
+        "TLS_CERTIFICATE_MANAGEMENT_CLUSTER": [
+            "tls-certificate-management-server"
+        ],
+        "TLS_CLIENT_MANAGEMENT_CLUSTER": ["tls-client-management-server"],
         "TVOC_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],
@@ -366,6 +366,6 @@
         "WATER_HEATER_MANAGEMENT_CLUSTER": ["water-heater-management-server"],
         "WATER_HEATER_MODE_CLUSTER": ["mode-base-server"],
         "WI_FI_NETWORK_DIAGNOSTICS_CLUSTER": [],
-        "ZONE_MANAGEMENT_CLUSTER": []
+        "ZONE_MANAGEMENT_CLUSTER": ["zone-management-server"]
     }
 }

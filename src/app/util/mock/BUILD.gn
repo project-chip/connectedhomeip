@@ -57,6 +57,6 @@ source_set("mock_codegen_data_model") {
   public_deps += [ ":mock_ember" ]
   deps = [
     "${chip_root}/src/app:required-privileges",
-    "${chip_root}/src/app/util/persistence:persistence",
+    "${chip_root}/src/app/persistence:default",
   ]
 }

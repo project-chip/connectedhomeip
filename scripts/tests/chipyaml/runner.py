@@ -17,6 +17,7 @@
 import relative_importer  # isort: split # noqa: F401
 
 import asyncio
+import contextlib
 import importlib
 import os
 import sys
@@ -74,9 +75,8 @@ def test_parser_options(f):
                      help='Stop parsing on first error.')(f)
     f = click.option('--use_default_pseudo_clusters', type=bool, show_default=True, default=True,
                      help='If enable this option use the set of default clusters provided by the matter_yamltests package.')(f)
-    f = click.option('--additional_pseudo_clusters_directory', type=click.Path(), show_default=True, default=None,
-                     help='Path to a directory containing additional pseudo clusters.')(f)
-    return f
+    return click.option('--additional_pseudo_clusters_directory', type=click.Path(), show_default=True, default=None,
+                        help='Path to a directory containing additional pseudo clusters.')(f)
 
 
 def test_runner_options(f):
@@ -94,9 +94,8 @@ def test_runner_options(f):
                      help='Show additional logs provided by the adapter on error.')(f)
     f = click.option('--use_test_harness_log_format', type=bool, default=False, show_default=True,
                      help='Use the test harness log format.')(f)
-    f = click.option('--delay-in-ms', type=int, default=0, show_default=True,
-                     help='Add a delay between test suite steps.')(f)
-    return f
+    return click.option('--delay-in-ms', type=int, default=0, show_default=True,
+                        help='Add a delay between test suite steps.')(f)
 
 
 def websocket_runner_options(f):
@@ -108,19 +107,17 @@ def websocket_runner_options(f):
                      help='Name of a websocket server to run at launch.')(f)
     f = click.option('--server_path', type=click.Path(exists=True), default=None,
                      help='Path to a websocket server to run at launch.')(f)
-    f = click.option('--server_arguments', type=str, default=None,
-                     help='Optional arguments to pass to the websocket server at launch.')(f)
-    return f
+    return click.option('--server_arguments', type=str, default=None,
+                        help='Optional arguments to pass to the websocket server at launch.')(f)
 
 
-def chip_repl_runner_options(f):
+def matter_repl_runner_options(f):
     f = click.option('--repl_storage_path', type=str, default='/tmp/repl-storage.json',
                      help='Path to persistent storage configuration file.')(f)
     f = click.option('--commission_on_network_dut', type=bool, default=False,
                      help='Prior to running test should we try to commission DUT on network.')(f)
-    f = click.option('--runner', type=str, default=None, show_default=True,
-                     help='The runner to run the test with.')(f)
-    return f
+    return click.option('--runner', type=str, default=None, show_default=True,
+                        help='The runner to run the test with.')(f)
 
 
 @dataclass
@@ -204,10 +201,8 @@ class YamlTestParserGroup(click.Group):
 
         # There is a single test, extract the custom config
         if len(tests) == 1:
-            try:
+            with contextlib.suppress(Exception):
                 custom_options = TestConfigParser.get_config(tests[0])
-            except Exception:
-                pass
             for key, value in custom_options.items():
                 param = click.Option(['--' + key], default=value, show_default=True)
                 # click converts parameter name to lowercase internally, so we need to override
@@ -218,37 +213,37 @@ class YamlTestParserGroup(click.Group):
         ctx.custom_options = custom_options
 
 
-CONTEXT_SETTINGS = dict(
-    default_map={
+CONTEXT_SETTINGS = {
+    'default_map': {
         'chiptool': {
-            'adapter': 'matter_chip_tool_adapter.adapter',
+            'adapter': 'chipyaml.adapters.chiptool.adapter',
             'server_name': 'chip-tool',
             'server_arguments': 'interactive server',
         },
         'darwinframeworktool': {
-            'adapter': 'matter_chip_tool_adapter.adapter',
+            'adapter': 'chipyaml.adapters.chiptool.adapter',
             'server_name': 'darwin-framework-tool',
             'server_arguments': 'interactive server',
         },
         'app1': {
             'configuration_directory': 'examples/placeholder/linux/apps/app1',
-            'adapter': 'matter_placeholder_adapter.adapter',
+            'adapter': 'chipyaml.adapters.placeholder.adapter',
             'server_name': 'chip-app1',
             'server_arguments': '--interactive',
         },
         'app2': {
             'configuration_directory': 'examples/placeholder/linux/apps/app2',
-            'adapter': 'matter_placeholder_adapter.adapter',
+            'adapter': 'chipyaml.adapters.placeholder.adapter',
             'server_name': 'chip-app2',
             'server_arguments': '--interactive',
         },
-        'chip-repl': {
-            'adapter': 'matter_yamltest_repl_adapter.adapter',
-            'runner': 'matter_yamltest_repl_adapter.runner',
+        'matter-repl': {
+            'adapter': 'chipyaml.adapters.repl.adapter',
+            'runner': 'chipyaml.adapters.repl.runner',
         },
     },
-    max_content_width=120,
-)
+    'max_content_width': 120,
+}
 
 
 @click.group(cls=YamlTestParserGroup, context_settings=CONTEXT_SETTINGS)
@@ -280,8 +275,7 @@ def parse(parser_group: ParserGroup):
     runner_config = None
 
     runner = TestRunner()
-    loop = asyncio.get_event_loop()
-    return loop.run_until_complete(runner.run(parser_group.builder_config, runner_config))
+    return asyncio.run(runner.run(parser_group.builder_config, runner_config))
 
 
 @runner_base.command()
@@ -291,8 +285,7 @@ def dry_run(parser_group: ParserGroup):
     runner_config = TestRunnerConfig(hooks=TestRunnerLogger())
 
     runner = TestRunner()
-    loop = asyncio.get_event_loop()
-    return loop.run_until_complete(runner.run(parser_group.builder_config, runner_config))
+    return asyncio.run(runner.run(parser_group.builder_config, runner_config))
 
 
 @runner_base.command()
@@ -306,8 +299,7 @@ def run(parser_group: ParserGroup, adapter: str, stop_on_error: bool, stop_on_wa
     runner_config = TestRunnerConfig(adapter, parser_group.pseudo_clusters, runner_options, runner_hooks)
 
     runner = TestRunner()
-    loop = asyncio.get_event_loop()
-    return loop.run_until_complete(runner.run(parser_group.builder_config, runner_config))
+    return asyncio.run(runner.run(parser_group.builder_config, runner_config))
 
 
 @runner_base.command()
@@ -330,16 +322,15 @@ def websocket(parser_group: ParserGroup, adapter: str, stop_on_error: bool, stop
         server_address, server_port, server_path, server_arguments, websocket_runner_hooks)
 
     runner = WebSocketRunner(websocket_runner_config)
-    loop = asyncio.get_event_loop()
-    return loop.run_until_complete(runner.run(parser_group.builder_config, runner_config))
+    return asyncio.run(runner.run(parser_group.builder_config, runner_config))
 
 
 @runner_base.command()
 @test_runner_options
-@chip_repl_runner_options
+@matter_repl_runner_options
 @pass_parser_group
-def chip_repl(parser_group: ParserGroup, adapter: str, stop_on_error: bool, stop_on_warning: bool, stop_at_number: int, show_adapter_logs: bool, show_adapter_logs_on_error: bool, use_test_harness_log_format: bool, delay_in_ms: int, runner: str, repl_storage_path: str, commission_on_network_dut: bool):
-    """Run the test suite using chip-repl."""
+def matter_repl(parser_group: ParserGroup, adapter: str, stop_on_error: bool, stop_on_warning: bool, stop_at_number: int, show_adapter_logs: bool, show_adapter_logs_on_error: bool, use_test_harness_log_format: bool, delay_in_ms: int, runner: str, repl_storage_path: str, commission_on_network_dut: bool):
+    """Run the test suite using matter-repl."""
     adapter = __import__(adapter, fromlist=[None]).Adapter(parser_group.builder_config.parser_config.definitions)
     runner_options = TestRunnerOptions(stop_on_error, stop_on_warning, stop_at_number, delay_in_ms)
     runner_hooks = TestRunnerLogger(show_adapter_logs, show_adapter_logs_on_error, use_test_harness_log_format)
@@ -349,8 +340,7 @@ def chip_repl(parser_group: ParserGroup, adapter: str, stop_on_error: bool, stop
     if commission_on_network_dut:
         node_id_to_commission = parser_group.builder_config.parser_config.config_override['nodeId']
     runner = __import__(runner, fromlist=[None]).Runner(repl_storage_path, node_id_to_commission=node_id_to_commission)
-    loop = asyncio.get_event_loop()
-    return loop.run_until_complete(runner.run(parser_group.builder_config, runner_config))
+    return asyncio.run(runner.run(parser_group.builder_config, runner_config))
 
 
 @runner_base.command()

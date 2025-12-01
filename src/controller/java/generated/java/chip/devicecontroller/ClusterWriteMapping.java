@@ -738,6 +738,8 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("rvcOperationalState", writeRvcOperationalStateInteractionInfo);
     Map<String, InteractionInfo> writeScenesManagementInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("scenesManagement", writeScenesManagementInteractionInfo);
+    Map<String, InteractionInfo> writeGroupcastInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("groupcast", writeGroupcastInteractionInfo);
     Map<String, InteractionInfo> writeHepaFilterMonitoringInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeHepaFilterMonitoringLastChangedTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo hepaFilterMonitoringlastChangedTimeCommandParameterInfo =
@@ -786,6 +788,30 @@ public class ClusterWriteMapping {
     );
     writeActivatedCarbonFilterMonitoringInteractionInfo.put("writeLastChangedTimeAttribute", writeActivatedCarbonFilterMonitoringLastChangedTimeAttributeInteractionInfo);
     writeAttributeMap.put("activatedCarbonFilterMonitoring", writeActivatedCarbonFilterMonitoringInteractionInfo);
+    Map<String, InteractionInfo> writeWaterTankLevelMonitoringInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeWaterTankLevelMonitoringLastChangedTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo waterTankLevelMonitoringlastChangedTimeCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Long.class, 
+            Long.class 
+        );
+    writeWaterTankLevelMonitoringLastChangedTimeCommandParams.put(
+        "value",
+        waterTankLevelMonitoringlastChangedTimeCommandParameterInfo
+    );
+    InteractionInfo writeWaterTankLevelMonitoringLastChangedTimeAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.WaterTankLevelMonitoringCluster) cluster).writeLastChangedTimeAttribute(
+          (DefaultClusterCallback) callback,
+          (Long) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeWaterTankLevelMonitoringLastChangedTimeCommandParams
+    );
+    writeWaterTankLevelMonitoringInteractionInfo.put("writeLastChangedTimeAttribute", writeWaterTankLevelMonitoringLastChangedTimeAttributeInteractionInfo);
+    writeAttributeMap.put("waterTankLevelMonitoring", writeWaterTankLevelMonitoringInteractionInfo);
     Map<String, InteractionInfo> writeBooleanStateConfigurationInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeBooleanStateConfigurationCurrentSensitivityLevelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo booleanStateConfigurationcurrentSensitivityLevelCommandParameterInfo =
@@ -2353,248 +2379,6 @@ public class ClusterWriteMapping {
       writeColorControlOptionsCommandParams
     );
     writeColorControlInteractionInfo.put("writeOptionsAttribute", writeColorControlOptionsAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> writeColorControlWhitePointXCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo colorControlwhitePointXCommandParameterInfo =
-        new CommandParameterInfo(
-            "value", 
-            Integer.class, 
-            Integer.class 
-        );
-    writeColorControlWhitePointXCommandParams.put(
-        "value",
-        colorControlwhitePointXCommandParameterInfo
-    );
-    InteractionInfo writeColorControlWhitePointXAttributeInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.ColorControlCluster) cluster).writeWhitePointXAttribute(
-          (DefaultClusterCallback) callback,
-          (Integer) commandArguments.get("value")
-        );
-      },
-      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeColorControlWhitePointXCommandParams
-    );
-    writeColorControlInteractionInfo.put("writeWhitePointXAttribute", writeColorControlWhitePointXAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> writeColorControlWhitePointYCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo colorControlwhitePointYCommandParameterInfo =
-        new CommandParameterInfo(
-            "value", 
-            Integer.class, 
-            Integer.class 
-        );
-    writeColorControlWhitePointYCommandParams.put(
-        "value",
-        colorControlwhitePointYCommandParameterInfo
-    );
-    InteractionInfo writeColorControlWhitePointYAttributeInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.ColorControlCluster) cluster).writeWhitePointYAttribute(
-          (DefaultClusterCallback) callback,
-          (Integer) commandArguments.get("value")
-        );
-      },
-      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeColorControlWhitePointYCommandParams
-    );
-    writeColorControlInteractionInfo.put("writeWhitePointYAttribute", writeColorControlWhitePointYAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> writeColorControlColorPointRXCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo colorControlcolorPointRXCommandParameterInfo =
-        new CommandParameterInfo(
-            "value", 
-            Integer.class, 
-            Integer.class 
-        );
-    writeColorControlColorPointRXCommandParams.put(
-        "value",
-        colorControlcolorPointRXCommandParameterInfo
-    );
-    InteractionInfo writeColorControlColorPointRXAttributeInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.ColorControlCluster) cluster).writeColorPointRXAttribute(
-          (DefaultClusterCallback) callback,
-          (Integer) commandArguments.get("value")
-        );
-      },
-      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeColorControlColorPointRXCommandParams
-    );
-    writeColorControlInteractionInfo.put("writeColorPointRXAttribute", writeColorControlColorPointRXAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> writeColorControlColorPointRYCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo colorControlcolorPointRYCommandParameterInfo =
-        new CommandParameterInfo(
-            "value", 
-            Integer.class, 
-            Integer.class 
-        );
-    writeColorControlColorPointRYCommandParams.put(
-        "value",
-        colorControlcolorPointRYCommandParameterInfo
-    );
-    InteractionInfo writeColorControlColorPointRYAttributeInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.ColorControlCluster) cluster).writeColorPointRYAttribute(
-          (DefaultClusterCallback) callback,
-          (Integer) commandArguments.get("value")
-        );
-      },
-      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeColorControlColorPointRYCommandParams
-    );
-    writeColorControlInteractionInfo.put("writeColorPointRYAttribute", writeColorControlColorPointRYAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> writeColorControlColorPointRIntensityCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo colorControlcolorPointRIntensityCommandParameterInfo =
-        new CommandParameterInfo(
-            "value", 
-            Integer.class, 
-            Integer.class 
-        );
-    writeColorControlColorPointRIntensityCommandParams.put(
-        "value",
-        colorControlcolorPointRIntensityCommandParameterInfo
-    );
-    InteractionInfo writeColorControlColorPointRIntensityAttributeInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.ColorControlCluster) cluster).writeColorPointRIntensityAttribute(
-          (DefaultClusterCallback) callback,
-          (Integer) commandArguments.get("value")
-        );
-      },
-      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeColorControlColorPointRIntensityCommandParams
-    );
-    writeColorControlInteractionInfo.put("writeColorPointRIntensityAttribute", writeColorControlColorPointRIntensityAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> writeColorControlColorPointGXCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo colorControlcolorPointGXCommandParameterInfo =
-        new CommandParameterInfo(
-            "value", 
-            Integer.class, 
-            Integer.class 
-        );
-    writeColorControlColorPointGXCommandParams.put(
-        "value",
-        colorControlcolorPointGXCommandParameterInfo
-    );
-    InteractionInfo writeColorControlColorPointGXAttributeInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.ColorControlCluster) cluster).writeColorPointGXAttribute(
-          (DefaultClusterCallback) callback,
-          (Integer) commandArguments.get("value")
-        );
-      },
-      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeColorControlColorPointGXCommandParams
-    );
-    writeColorControlInteractionInfo.put("writeColorPointGXAttribute", writeColorControlColorPointGXAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> writeColorControlColorPointGYCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo colorControlcolorPointGYCommandParameterInfo =
-        new CommandParameterInfo(
-            "value", 
-            Integer.class, 
-            Integer.class 
-        );
-    writeColorControlColorPointGYCommandParams.put(
-        "value",
-        colorControlcolorPointGYCommandParameterInfo
-    );
-    InteractionInfo writeColorControlColorPointGYAttributeInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.ColorControlCluster) cluster).writeColorPointGYAttribute(
-          (DefaultClusterCallback) callback,
-          (Integer) commandArguments.get("value")
-        );
-      },
-      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeColorControlColorPointGYCommandParams
-    );
-    writeColorControlInteractionInfo.put("writeColorPointGYAttribute", writeColorControlColorPointGYAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> writeColorControlColorPointGIntensityCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo colorControlcolorPointGIntensityCommandParameterInfo =
-        new CommandParameterInfo(
-            "value", 
-            Integer.class, 
-            Integer.class 
-        );
-    writeColorControlColorPointGIntensityCommandParams.put(
-        "value",
-        colorControlcolorPointGIntensityCommandParameterInfo
-    );
-    InteractionInfo writeColorControlColorPointGIntensityAttributeInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.ColorControlCluster) cluster).writeColorPointGIntensityAttribute(
-          (DefaultClusterCallback) callback,
-          (Integer) commandArguments.get("value")
-        );
-      },
-      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeColorControlColorPointGIntensityCommandParams
-    );
-    writeColorControlInteractionInfo.put("writeColorPointGIntensityAttribute", writeColorControlColorPointGIntensityAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> writeColorControlColorPointBXCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo colorControlcolorPointBXCommandParameterInfo =
-        new CommandParameterInfo(
-            "value", 
-            Integer.class, 
-            Integer.class 
-        );
-    writeColorControlColorPointBXCommandParams.put(
-        "value",
-        colorControlcolorPointBXCommandParameterInfo
-    );
-    InteractionInfo writeColorControlColorPointBXAttributeInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.ColorControlCluster) cluster).writeColorPointBXAttribute(
-          (DefaultClusterCallback) callback,
-          (Integer) commandArguments.get("value")
-        );
-      },
-      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeColorControlColorPointBXCommandParams
-    );
-    writeColorControlInteractionInfo.put("writeColorPointBXAttribute", writeColorControlColorPointBXAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> writeColorControlColorPointBYCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo colorControlcolorPointBYCommandParameterInfo =
-        new CommandParameterInfo(
-            "value", 
-            Integer.class, 
-            Integer.class 
-        );
-    writeColorControlColorPointBYCommandParams.put(
-        "value",
-        colorControlcolorPointBYCommandParameterInfo
-    );
-    InteractionInfo writeColorControlColorPointBYAttributeInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.ColorControlCluster) cluster).writeColorPointBYAttribute(
-          (DefaultClusterCallback) callback,
-          (Integer) commandArguments.get("value")
-        );
-      },
-      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeColorControlColorPointBYCommandParams
-    );
-    writeColorControlInteractionInfo.put("writeColorPointBYAttribute", writeColorControlColorPointBYAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> writeColorControlColorPointBIntensityCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo colorControlcolorPointBIntensityCommandParameterInfo =
-        new CommandParameterInfo(
-            "value", 
-            Integer.class, 
-            Integer.class 
-        );
-    writeColorControlColorPointBIntensityCommandParams.put(
-        "value",
-        colorControlcolorPointBIntensityCommandParameterInfo
-    );
-    InteractionInfo writeColorControlColorPointBIntensityAttributeInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.ColorControlCluster) cluster).writeColorPointBIntensityAttribute(
-          (DefaultClusterCallback) callback,
-          (Integer) commandArguments.get("value")
-        );
-      },
-      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeColorControlColorPointBIntensityCommandParams
-    );
-    writeColorControlInteractionInfo.put("writeColorPointBIntensityAttribute", writeColorControlColorPointBIntensityAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeColorControlStartUpColorTemperatureMiredsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo colorControlstartUpColorTemperatureMiredsCommandParameterInfo =
         new CommandParameterInfo(
@@ -4525,6 +4309,28 @@ public class ClusterWriteMapping {
       writeUnitTestingGlobalEnumCommandParams
     );
     writeUnitTestingInteractionInfo.put("writeGlobalEnumAttribute", writeUnitTestingGlobalEnumAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeUnitTestingUnsupportedAttributeRequiringAdminPrivilegeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo unitTestingunsupportedAttributeRequiringAdminPrivilegeCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Boolean.class, 
+            Boolean.class 
+        );
+    writeUnitTestingUnsupportedAttributeRequiringAdminPrivilegeCommandParams.put(
+        "value",
+        unitTestingunsupportedAttributeRequiringAdminPrivilegeCommandParameterInfo
+    );
+    InteractionInfo writeUnitTestingUnsupportedAttributeRequiringAdminPrivilegeAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.UnitTestingCluster) cluster).writeUnsupportedAttributeRequiringAdminPrivilegeAttribute(
+          (DefaultClusterCallback) callback,
+          (Boolean) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeUnitTestingUnsupportedAttributeRequiringAdminPrivilegeCommandParams
+    );
+    writeUnitTestingInteractionInfo.put("writeUnsupportedAttributeRequiringAdminPrivilegeAttribute", writeUnitTestingUnsupportedAttributeRequiringAdminPrivilegeAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeUnitTestingUnsupportedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo unitTestingunsupportedCommandParameterInfo =
         new CommandParameterInfo(

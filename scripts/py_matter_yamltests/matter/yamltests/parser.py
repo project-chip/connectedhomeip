@@ -18,7 +18,7 @@ import logging
 import re
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import Optional
+from typing import Any, Optional
 
 from . import fixes
 from .constraints import get_constraints, is_typed_constraint, is_variable_aware_constraint
@@ -27,6 +27,8 @@ from .errors import (TestStepEnumError, TestStepEnumSpecifierNotUnknownError, Te
                      TestStepKeyError, TestStepValueNameError)
 from .pics_checker import PICSChecker
 from .yaml_loader import YamlLoader
+
+LOGGER = logging.getLogger(__name__)
 
 ANY_COMMANDS_CLUSTER_NAME = 'AnyCommands'
 ANY_COMMANDS_LIST = [
@@ -42,6 +44,11 @@ ANY_COMMANDS_LIST = [
 
 # If True, enum values should use a valid name instead of a raw value
 STRICT_ENUM_VALUE_CHECK = False
+
+
+def build_revision_var_name(endpoint, cluster) -> str:
+    """Helper to create a unique variable name for the cluster revision read-out."""
+    return f'__cluster_revision_read_EP_{endpoint}_CL_{cluster}'
 
 
 class UnknownPathQualifierError(TestStepError):
@@ -85,8 +92,8 @@ class TestStepEventKeyError(UnknownPathQualifierError):
 
 class PostProcessCheckStatus(Enum):
     '''Indicates the post processing check step status.'''
-    SUCCESS = 'success',
-    WARNING = 'warning',
+    SUCCESS = 'success'
+    WARNING = 'warning'
     ERROR = 'error'
 
 
@@ -299,6 +306,8 @@ class _TestStepWithPlaceholders:
 
         self.identity = _value_or_none(test, 'identity')
         self.fabric_filtered = _value_or_none(test, 'fabricFiltered')
+        self.min_revision = _value_or_none(test, 'minRevision')
+        self.max_revision = _value_or_none(test, 'maxRevision')
         self.min_interval = _value_or_none(test, 'minInterval')
         self.max_interval = _value_or_none(test, 'maxInterval')
         self.keep_subscriptions = _value_or_none(test, 'keepSubscriptions')
@@ -577,7 +586,7 @@ class _TestStepWithPlaceholders:
                     target_key = value['name']
                     if mapping_type.get(target_key) is None:
                         raise TestStepValueNameError(
-                            value, target_key, [key for key in mapping_type])
+                            value, target_key, list(mapping_type))
                     mapping = mapping_type[target_key]
 
                 if key == 'value':
@@ -746,6 +755,10 @@ class TestStep:
                 self._test.group_id)
             self._test.node_id = self._config_variable_substitution(
                 self._test.node_id)
+            self._test.min_revision = self._config_variable_substitution(
+                self._test.min_revision)
+            self._test.max_revision = self._config_variable_substitution(
+                self._test.max_revision)
             test.update_arguments(self.arguments)
             test.update_responses(self.responses)
 
@@ -853,6 +866,60 @@ class TestStep:
     def pics(self):
         return self._test.pics
 
+    @property
+    def min_revision(self):
+        return self._test.min_revision
+
+    @property
+    def max_revision(self):
+        return self._test.max_revision
+
+    @property
+    def is_revision_condition_passed(self) -> bool:
+        """Checks if the revision conditions passed properly based on min/maxRevision.
+
+        This is evaluated at runtime by the runner.
+
+        Returns True if step can be run, False if it cannot be run, or raises an exception
+        if there was an error processing revision (i.e. internal error).
+        """
+        # If no revision checks are defined, the step is OK to run.
+        if self.min_revision is None and self.max_revision is None:
+            return True
+
+        endpoint = self.endpoint
+        cluster = self.cluster
+
+        # The runner will have executed a prior step to read the revision, based
+        # on the parser having injected that step (search for minRevision in
+        # `YamlTests` class).
+        var_name = build_revision_var_name(endpoint, cluster)
+
+        cluster_revision = self.get_runtime_variable(var_name)
+
+        if cluster_revision is None:
+            raise KeyError(
+                f"Step '{self.label}': Cannot check min/maxRevision. "
+                f"ClusterRevision variable '{var_name}' is not set (read step may have been skipped or failed)."
+            )
+
+        # Perform the checks
+        try:
+            # Ensure values are integers for comparison
+            cluster_revision = int(cluster_revision)
+
+            return all([
+                (self.min_revision is None) or (cluster_revision >= int(self.min_revision)),
+                (self.max_revision is None) or (cluster_revision <= int(self.max_revision)),
+            ])
+        except (ValueError, TypeError) as e:
+            # Failed to convert revision to int. This can happen with malformed YAML.
+            raise ValueError(
+                f"Step '{self.label}': Error checking min/maxRevision. "
+                f"cluster_revision='{cluster_revision}', min='{self.min_revision}', max='{self.max_revision}'. "
+                f"Error: {e}."
+            )
+
     def _get_last_event_number(self, responses) -> Optional[int]:
         if not self.is_event:
             return None
@@ -875,6 +942,10 @@ class TestStep:
 
         return event_number
 
+    def get_runtime_variable(self, name: str) -> Any:
+        """Gets a runtime variable from the test context, or None if missing."""
+        return self._runtime_config_variable_storage.get(name)
+
     def post_process_response(self, received_responses):
         result = PostProcessResponseResult()
 
@@ -892,7 +963,7 @@ class TestStep:
             if last_event_number:
                 if 'LastReceivedEventNumber' in self._runtime_config_variable_storage:
                     if self._runtime_config_variable_storage['LastReceivedEventNumber'] > last_event_number:
-                        logging.warning(
+                        LOGGER.warning(
                             "Received an older event than expected: received %r < %r",
                             last_event_number,
                             self._runtime_config_variable_storage['LastReceivedEventNumber']
@@ -935,13 +1006,13 @@ class TestStep:
             return result
         # This is different from the case where no response is specified at all, which implies that the step expect
         # a success with any associatied value(s).
-        elif self.responses == [{'values': [{}]}] and len(received_responses_copy):
+        if self.responses == [{'values': [{}]}] and len(received_responses_copy):
             # if there are multiple responses and the test specifies that it does not really care
             # about which values are returned, that is valid too.
             return result
         # Anything more complex where the response field as been defined with some values and the number
         # of expected responses differs from the number of received responses is an error.
-        elif len(received_responses_copy) != 0:
+        if len(received_responses_copy) != 0:
             result.error(check_type, error_failure_wrong_response_number)
 
         return result
@@ -1114,14 +1185,13 @@ class TestStep:
                 if not self._response_value_validation(expected_item, received_item):
                     return False
             return True
-        elif isinstance(expected_value, dict):
+        if isinstance(expected_value, dict):
             for key, expected_item in expected_value.items():
                 received_item = received_value.get(key)
                 if not self._response_value_validation(expected_item, received_item):
                     return False
             return True
-        else:
-            return expected_value == received_value
+        return expected_value == received_value
 
     def _response_constraints_validation(self, expected_response, received_response, result):
         check_type = PostProcessCheckType.CONSTRAINT_VALIDATION
@@ -1157,7 +1227,8 @@ class TestStep:
 
             for constraint in constraints:
                 try:
-                    constraint.validate(received_value, response_type_name, self._runtime_config_variable_storage)
+                    constraint.validate(
+                        received_value, response_type_name, self._runtime_config_variable_storage)
                     result.success(check_type, error_success)
                 except TestStepError as e:
                     e.update_context(expected_response, self.step_index)
@@ -1214,13 +1285,13 @@ class TestStep:
     def _config_variable_substitution(self, value):
         if type(value) is list:
             return [self._config_variable_substitution(entry) for entry in value]
-        elif type(value) is dict:
+        if type(value) is dict:
             mapped_value = {}
             for key in value:
                 mapped_value[key] = self._config_variable_substitution(
                     value[key])
             return mapped_value
-        elif type(value) is str:
+        if type(value) is str:
             # For most tests, a single config variable is used and it can be replaced as in.
             # But some other tests were relying on the fact that the expression was put 'as if' in
             # the generated code and was resolved before being sent over the wire. For such
@@ -1246,8 +1317,7 @@ class TestStep:
             # TODO we should move away from eval. That will mean that we will need to do extra
             # parsing, but it would be safer then just blindly running eval.
             return value if not substitution_occured else eval(value)
-        else:
-            return value
+        return value
 
 
 class YamlTests:
@@ -1263,9 +1333,19 @@ class YamlTests:
 
     def __init__(self, parsing_config_variable_storage: dict, definitions: SpecDefinitions, pics_checker: PICSChecker, tests: dict):
         self._parsing_config_variable_storage = parsing_config_variable_storage
+        self._runtime_config_variable_storage = copy.deepcopy(
+            parsing_config_variable_storage)
+        self._definitions = definitions
+        self._pics_checker = pics_checker
+
+        tests_with_cluster_revision_injections = self._tests_with_cluster_revision_checks(
+            tests)
+
+        # Build list of enabled tests from the starting point where pseudo steps are added/injected for
+        # things like min/maxRevision tests.
         enabled_tests = []
         try:
-            for step_index, step in enumerate(tests):
+            for step_index, step in enumerate(tests_with_cluster_revision_injections):
                 test_with_placeholders = _TestStepWithPlaceholders(
                     step, self._parsing_config_variable_storage, definitions, pics_checker)
                 if test_with_placeholders.is_enabled:
@@ -1276,11 +1356,92 @@ class YamlTests:
 
         fixes.try_update_yaml_node_id_test_runner_state(
             enabled_tests, self._parsing_config_variable_storage)
-        self._runtime_config_variable_storage = copy.deepcopy(
-            parsing_config_variable_storage)
+
         self._tests = enabled_tests
         self._index = 0
         self.count = len(self._tests)
+
+    def _tests_with_cluster_revision_checks(self, tests: dict) -> list[TestStep]:
+        """Injection Logic for synthetic steps needed to process cluster revision checks."""
+
+        # Pre-pass: Find all (endpoint, cluster) pairs that *need* a revision check.
+        default_endpoint = self._get_config_value(
+            self._parsing_config_variable_storage, 'endpoint')
+        default_cluster = self._get_config_value(
+            self._parsing_config_variable_storage, 'cluster')
+
+        needed_revisions = set()  # Set of (endpoint, cluster) tuples
+        for step in tests:
+            # A step needs a revision check if it has min/maxRevision and is not disabled.
+            if 'disabled' in step and step['disabled']:
+                continue
+
+            if 'minRevision' in step or 'maxRevision' in step:
+                endpoint = step.get('endpoint', default_endpoint)
+                cluster = step.get('cluster', default_cluster)
+
+                if endpoint is not None and cluster is not None:
+                    needed_revisions.add((endpoint, cluster))
+
+        # Main pass: Inject steps
+        injected_tests = []
+        seen_injections = set()  # Set of (endpoint, cluster) tuples
+
+        for step in tests:
+            endpoint = step.get('endpoint', default_endpoint)
+            cluster = step.get('cluster', default_cluster)
+            key = (endpoint, cluster)
+            is_disabled = 'disabled' in step and step['disabled']
+            step_has_revision_condition = 'minRevision' in step or 'maxRevision' in step
+
+            # Determine if an enabled step is the first that would need a cluster revision not yet read.
+            # Prepend the read to such steps.
+            if step_has_revision_condition and (key in needed_revisions) and (key not in seen_injections) and (not is_disabled):
+                # Inject the step *before* the current step.
+                revision_var_name = build_revision_var_name(endpoint, cluster)
+
+                # Add to config storage so it's a known variable
+                if revision_var_name not in self._parsing_config_variable_storage:
+                    self._parsing_config_variable_storage[revision_var_name] = None
+
+                # Also update the runtime storage, since it was already copied.
+                if revision_var_name not in self._runtime_config_variable_storage:
+                    self._runtime_config_variable_storage[revision_var_name] = None
+
+                injected_step = {
+                    'label': f'Read ClusterRevision for conditions (EP: {endpoint}, CL: {cluster})',
+                    'cluster': cluster,
+                    'endpoint': endpoint,
+                    'command': 'readAttribute',
+                    'attribute': 'ClusterRevision',
+                    'response': {
+                        'saveAs': revision_var_name,
+                        'constraints': {
+                            'type': 'int16u'
+                        }
+                    }
+                }
+
+                injected_tests.append(injected_step)
+                seen_injections.add(key)
+
+            injected_tests.append(step)
+
+        return injected_tests
+
+    def _get_config_value(self, config_storage, key):
+        value = config_storage.get(key)
+        if isinstance(value, dict) and 'defaultValue' in value:
+            return value['defaultValue']
+        return value
+
+    def set_runtime_variable(self, name: str, value: Any) -> None:
+        """Sets a runtime variable in the test context."""
+        self._runtime_config_variable_storage[name] = value
+
+    def get_runtime_variable(self, name: str) -> Any:
+        """Gets a runtime variable from the test context, or None if missing."""
+        return self._runtime_config_variable_storage.get(name)
 
     def __iter__(self):
         return self

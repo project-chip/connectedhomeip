@@ -17,8 +17,9 @@
 
 import logging
 
-from chip.clusters.Types import NullValue
 from mobly import asserts
+
+from matter.clusters.Types import NullValue
 
 logger = logging.getLogger(__name__)
 
@@ -118,8 +119,9 @@ class ModeBaseClusterChecks:
 
                 # Check if is tag is common, derived or mfg.
                 is_mfg = (START_MFGTAGS_RANGE <= tag.value <= END_MFGTAGS_RANGE)
+                value = hex(tag.value)
                 if not (is_mfg or tag.value in self.mode_tags):
-                    asserts.fail("Mode tag value is not a common, derived or vendor tag.")
+                    asserts.fail(f"Mode tag value: {value} is not a common tag, derived tag or vendor tag")
 
                 # Confirm if tag is common or derived.
                 if not is_mfg:

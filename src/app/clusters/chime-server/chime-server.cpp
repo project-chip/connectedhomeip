@@ -52,7 +52,7 @@ ChimeServer::~ChimeServer()
     mDelegate.SetChimeServer(nullptr);
 
     // unregister
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
@@ -207,7 +207,7 @@ Status ChimeServer::SetSelectedChime(uint8_t chimeID)
 {
     if (!IsSupportedChimeID(chimeID))
     {
-        return Protocols::InteractionModel::Status::ConstraintError;
+        return Protocols::InteractionModel::Status::NotFound;
     }
 
     bool activeIDChanged = !(mSelectedChime == chimeID);
@@ -218,7 +218,7 @@ Status ChimeServer::SetSelectedChime(uint8_t chimeID)
         // Write new value to persistent storage.
         auto endpointId            = GetEndpointId();
         ConcreteAttributePath path = ConcreteAttributePath(endpointId, Chime::Id, SelectedChime::Id);
-        GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mSelectedChime);
+        TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mSelectedChime);
 
         // and mark as dirty
         MatterReportingAttributeChangeCallback(path);
@@ -237,7 +237,7 @@ Status ChimeServer::SetEnabled(bool Enabled)
         // Write new value to persistent storage.
         auto endpointId            = GetEndpointId();
         ConcreteAttributePath path = ConcreteAttributePath(endpointId, Chime::Id, Enabled::Id);
-        GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mEnabled);
+        TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mEnabled);
 
         // and mark as dirty
         MatterReportingAttributeChangeCallback(path);
@@ -261,9 +261,15 @@ void ChimeServer::HandlePlayChimeSound(HandlerContext & ctx, const Commands::Pla
 {
 
     ChipLogDetail(Zcl, "Chime: PlayChimeSound");
+    Status status = Status::Success;
 
-    // call the delegate to play the chime
-    Status status = mDelegate.PlayChimeSound();
+    // Only invoke the delegate if enabled, otherwise don't play a sound, and "silently" return
+    if (mEnabled)
+    {
+        // call the delegate to play the chime
+        status = mDelegate.PlayChimeSound();
+    }
+
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 

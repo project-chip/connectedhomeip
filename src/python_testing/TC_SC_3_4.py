@@ -40,10 +40,11 @@
 # === END CI TEST ARGUMENTS ===
 
 
-from chip.exceptions import ChipStackError
-from chip.fault_injection import CHIPFaultId, FailAtFault, GetFaultCounter, ResetFaultCounters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+from matter.exceptions import ChipStackError
+from matter.fault_injection import CHIPFaultId, FailAtFault, GetFaultCounter, ResetFaultCounters
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 CHIP_ERROR_CODES = {
     "CHIP_ERROR_INVALID_CASE_PARAMETER": 0x54,
@@ -57,9 +58,9 @@ class TC_SC_3_4(MatterBaseTest):
         return "[TC-SC-3.4] CASE Error Handling [DUT_Responder] "
 
     def steps_TC_SC_3_4(self) -> list[TestStep]:
-        steps = [
+        return [
 
-            TestStep("precondition", "DUT is commissioned and TH has an open CASE Session with DUT"),
+            TestStep("precondition", "DUT is commissioned and TH has an open CASE Session with DUT", is_commissioning=True),
 
             TestStep(1, "TH constructs and sends a Sigma1 message with a resumptionID and NO initiatorResumeMIC to DUT",
                      "DUT sends a status report to the TH with a FAILURE general code , Protocol ID of SECURE_CHANNEL (0x0000), and Protocol Code of INVALID_PARAMETER (0X0002). DUT MUST perform no further processing after sending the status report."),
@@ -98,20 +99,15 @@ class TC_SC_3_4(MatterBaseTest):
                      "DUT sends a status report to the TH with a FAILURE general code , Protocol ID of SECURE_CHANNEL (0x0000), and Protocol Code of INVALID_PARAMETER (0X0002). DUT MUST perform no further processing after sending the status report."),
 
         ]
-        return steps
 
     async def reestablish_CASE_and_verify_DUT_Fails_with_Error(self, expectedErrorName):
         ''' Session should be evicted or terminated before calling this method, such as using MarkSessionForEviction()'''
 
         expectedErrorCode = CHIP_ERROR_CODES.get(expectedErrorName)
 
-        try:
-            await self.th.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000)
-            asserts.fail(
-                "Unexpected success return from CASE Establishment after injecting fault, CASE Establishment should have failed")
-        except ChipStackError as e:
-            asserts.assert_equal(e.err,  expectedErrorCode,
-                                 f"Expected to return {expectedErrorName}")
+        with asserts.assert_raises(ChipStackError) as e:
+            await self.th.GetConnectedDevice(nodeId=self.dut_node_id, allowPASE=False)
+        asserts.assert_equal(e.exception.err,  expectedErrorCode, f"Expected to return {expectedErrorName}")
 
     def ensure_fault_injection_point_was_reached(self, faultID):
         asserts.assert_equal(GetFaultCounter(faultID), 1)
@@ -125,8 +121,8 @@ class TC_SC_3_4(MatterBaseTest):
         self.step("precondition")
         # DUT Should be Commissioned Already, Now we try to Establish a CASE Session with it
         try:
-            await self.th.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000)
-        except ChipStackError as e:
+            await self.th.GetConnectedDevice(nodeId=self.dut_node_id, allowPASE=False)
+        except ChipStackError as e:  # chipstack-ok: This disables ChipStackError linter check. Can not use assert_raises because error is not expected
             asserts.fail(
                 f"Unexpected Failure, TH Should be able to establish a CASE Session with DUT \nError = {e}")
 
@@ -137,7 +133,7 @@ class TC_SC_3_4(MatterBaseTest):
                     numCallsToFail=1
                     )
         # Evicting Session to trigger a new CASE Handshake
-        self.th.MarkSessionForEviction(nodeid=self.dut_node_id)
+        self.th.MarkSessionForEviction(nodeId=self.dut_node_id)
         await self.reestablish_CASE_and_verify_DUT_Fails_with_Error("CHIP_ERROR_INVALID_CASE_PARAMETER")
         self.ensure_fault_injection_point_was_reached(faultID=CHIPFaultId.CASESkipInitiatorResumeMIC)
 
@@ -146,7 +142,7 @@ class TC_SC_3_4(MatterBaseTest):
                     numCallsToSkip=0,
                     numCallsToFail=1
                     )
-        self.th.MarkSessionForEviction(nodeid=self.dut_node_id)
+        self.th.MarkSessionForEviction(nodeId=self.dut_node_id)
         await self.reestablish_CASE_and_verify_DUT_Fails_with_Error("CHIP_ERROR_INVALID_CASE_PARAMETER")
         self.ensure_fault_injection_point_was_reached(faultID=CHIPFaultId.CASESkipResumptionID)
 
@@ -155,10 +151,10 @@ class TC_SC_3_4(MatterBaseTest):
                     numCallsToSkip=0,
                     numCallsToFail=1
                     )
-        self.th.MarkSessionForEviction(nodeid=self.dut_node_id)
+        self.th.MarkSessionForEviction(nodeId=self.dut_node_id)
         try:
-            await self.th.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000)
-        except ChipStackError as e:
+            await self.th.GetConnectedDevice(nodeId=self.dut_node_id, allowPASE=False)
+        except ChipStackError as e:  # chipstack-ok: This disables ChipStackError linter check. Can not use assert_raises because error is not expected
             asserts.fail(
                 f"Unexpected CASE Establishment Failure, CASE Should have succeeded. Having an invalid InitiatorResumeMIC should have resulted in CASE falling back to the standard CASE without resumption. \nError = {e}")
         self.ensure_fault_injection_point_was_reached(faultID=CHIPFaultId.CASECorruptInitiatorResumeMIC)
@@ -168,7 +164,7 @@ class TC_SC_3_4(MatterBaseTest):
                     numCallsToSkip=0,
                     numCallsToFail=1
                     )
-        self.th.MarkSessionForEviction(nodeid=self.dut_node_id)
+        self.th.MarkSessionForEviction(nodeId=self.dut_node_id)
         # We need to delete the session resumption info to trigger the TH to send a Sigma1 WITHOUT resumption and avoid the "CASE with resumption" path.
         # This is necessary because the "CASE with resumption" path would result in the responder not processing/validating the "faulty" DestinationID in the received Sigma1.
         # This will also be used for all subesquent steps to make sure that we take the standard CASE path (without resumption)
@@ -182,7 +178,7 @@ class TC_SC_3_4(MatterBaseTest):
                     numCallsToSkip=0,
                     numCallsToFail=1
                     )
-        self.th.MarkSessionForEviction(nodeid=self.dut_node_id)
+        self.th.MarkSessionForEviction(nodeId=self.dut_node_id)
         self.th.DeleteAllSessionResumptionStorage()
 
         await self.reestablish_CASE_and_verify_DUT_Fails_with_Error("CHIP_ERROR_INVALID_CASE_PARAMETER")
@@ -193,7 +189,7 @@ class TC_SC_3_4(MatterBaseTest):
                     numCallsToSkip=0,
                     numCallsToFail=1
                     )
-        self.th.MarkSessionForEviction(nodeid=self.dut_node_id)
+        self.th.MarkSessionForEviction(nodeId=self.dut_node_id)
         self.th.DeleteAllSessionResumptionStorage()
 
         await self.reestablish_CASE_and_verify_DUT_Fails_with_Error("CHIP_ERROR_INVALID_CASE_PARAMETER")
@@ -204,7 +200,7 @@ class TC_SC_3_4(MatterBaseTest):
                     numCallsToSkip=0,
                     numCallsToFail=1
                     )
-        self.th.MarkSessionForEviction(nodeid=self.dut_node_id)
+        self.th.MarkSessionForEviction(nodeId=self.dut_node_id)
         self.th.DeleteAllSessionResumptionStorage()
 
         await self.reestablish_CASE_and_verify_DUT_Fails_with_Error("CHIP_ERROR_INVALID_CASE_PARAMETER")
@@ -215,7 +211,7 @@ class TC_SC_3_4(MatterBaseTest):
                     numCallsToSkip=0,
                     numCallsToFail=1
                     )
-        self.th.MarkSessionForEviction(nodeid=self.dut_node_id)
+        self.th.MarkSessionForEviction(nodeId=self.dut_node_id)
         self.th.DeleteAllSessionResumptionStorage()
 
         await self.reestablish_CASE_and_verify_DUT_Fails_with_Error("CHIP_ERROR_INVALID_CASE_PARAMETER")
@@ -226,7 +222,7 @@ class TC_SC_3_4(MatterBaseTest):
                     numCallsToSkip=0,
                     numCallsToFail=1
                     )
-        self.th.MarkSessionForEviction(nodeid=self.dut_node_id)
+        self.th.MarkSessionForEviction(nodeId=self.dut_node_id)
         self.th.DeleteAllSessionResumptionStorage()
 
         await self.reestablish_CASE_and_verify_DUT_Fails_with_Error("CHIP_ERROR_INVALID_CASE_PARAMETER")
@@ -237,7 +233,7 @@ class TC_SC_3_4(MatterBaseTest):
                     numCallsToSkip=0,
                     numCallsToFail=1
                     )
-        self.th.MarkSessionForEviction(nodeid=self.dut_node_id)
+        self.th.MarkSessionForEviction(nodeId=self.dut_node_id)
         self.th.DeleteAllSessionResumptionStorage()
 
         await self.reestablish_CASE_and_verify_DUT_Fails_with_Error("CHIP_ERROR_INVALID_CASE_PARAMETER")

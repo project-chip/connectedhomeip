@@ -31,7 +31,7 @@ CHIP_ERROR TizenToChipError(int tizenError)
     case TIZEN_ERROR_NONE:
         return CHIP_NO_ERROR;
     case TIZEN_ERROR_OUT_OF_MEMORY:
-        return CHIP_NO_ERROR;
+        return CHIP_ERROR_NO_MEMORY;
     default:
         return CHIP_ERROR_INTERNAL;
 

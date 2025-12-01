@@ -33,11 +33,12 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.interaction_model import Status
-from chip.testing.matter_asserts import assert_valid_uint8
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import Status
+from matter.testing.matter_asserts import assert_valid_uint8
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_EPREF_2_1(MatterBaseTest):
@@ -46,7 +47,7 @@ class TC_EPREF_2_1(MatterBaseTest):
         return "[TC-EPREF-2.1] Attributes with DUT as Server"
 
     def steps_TC_EPREF_2_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commissioning, already done", is_commissioning=True),
             TestStep("2", "TH reads from the DUT the FeatureMap attribute",
                      "Execute steps 3 to 5 if BALA feature is set to 1 and execute steps 6 to 7b if LPMS feature is set to 1"),
@@ -60,13 +61,11 @@ class TC_EPREF_2_1(MatterBaseTest):
             TestStep("7a", "TH writes to the DUT the CurrentLowPowerModeSensitivity attribute"),
             TestStep("7b", "TH writes to the DUT the CurrentLowPowerModeSensitivity attribute with an out of index value"),
         ]
-        return steps
 
     def pics_TC_EPREF_2_1(self) -> list[str]:
-        pics = [
+        return [
             "EPREF.S",
         ]
-        return pics
 
     async def read_epref_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.EnergyPreference
@@ -104,10 +103,14 @@ class TC_EPREF_2_1(MatterBaseTest):
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, Clusters.EnergyPreference.Attributes.CurrentLowPowerModeSensitivity(current_low_power_mode_sensitivity))])
         return result[0].Status
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_EPREF_2_1(self):
 
-        endpoint = self.user_params.get("endpoint", 1)
+        endpoint = self.get_endpoint()
 
         self.step("1")
         self.print_step(1, "Commissioning, already done")

@@ -294,7 +294,7 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
     ReadRequestMessage::Builder request;
     System::PacketBufferTLVWriter writer;
 
-    InitWriterWithSpaceReserved(writer, kReservedSizeForTLVEncodingOverhead);
+    TEMPORARY_RETURN_IGNORED InitWriterWithSpaceReserved(writer, kReservedSizeForTLVEncodingOverhead);
     ReturnErrorOnFailure(request.Init(&writer));
 
     if (!attributePaths.empty())
@@ -569,7 +569,7 @@ exit:
         {
             status = Status::InvalidSubscription;
         }
-        StatusResponse::Send(status, apExchangeContext, false /*aExpectResponse*/);
+        TEMPORARY_RETURN_IGNORED StatusResponse::Send(status, apExchangeContext, false /*aExpectResponse*/);
     }
 
     if ((!IsSubscriptionType() && !mPendingMoreChunks) || err != CHIP_NO_ERROR)
@@ -607,7 +607,7 @@ void ReadClient::OnUnsolicitedReportData(Messaging::ExchangeContext * apExchange
             status = Status::InvalidAction;
         }
 
-        StatusResponse::Send(status, mExchange.Get(), false /*aExpectResponse*/);
+        TEMPORARY_RETURN_IGNORED StatusResponse::Send(status, mExchange.Get(), false /*aExpectResponse*/);
         Close(err);
     }
 }
@@ -628,7 +628,7 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload,
 #if CHIP_CONFIG_IM_PRETTY_PRINT
     if (aReportType != ReportType::kUnsolicited)
     {
-        report.PrettyPrint();
+        TEMPORARY_RETURN_IGNORED report.PrettyPrint();
     }
 #endif
 
@@ -1054,7 +1054,11 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
                  "Subscription Liveness timeout with SubscriptionID = 0x%08" PRIx32 ", Peer = %02x:" ChipLogFormatX64,
                  _this->mSubscriptionId, _this->GetFabricIndex(), ChipLogValueX64(_this->GetPeerNodeId()));
 
-    if (_this->mIsPeerLIT)
+    // If subscription client is able to handle check-in messages and peer operation mode is LIT,
+    // use CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT as subscriptionTerminationCause.
+    // This will cause us to wait for a check-in message before trying to re-subscribe, instead of trying
+    // (and probably failing, because we are dealing with a LIT ICD) off a timer.
+    if (_this->mIsPeerLIT && _this->mReadPrepareParams.mRegisteredCheckInToken)
     {
         subscriptionTerminationCause = CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT;
     }
@@ -1098,7 +1102,7 @@ CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aP
     ReturnErrorOnFailure(subscribeResponse.Init(reader));
 
 #if CHIP_CONFIG_IM_PRETTY_PRINT
-    subscribeResponse.PrettyPrint();
+    TEMPORARY_RETURN_IGNORED subscribeResponse.PrettyPrint();
 #endif
 
     SubscriptionId subscriptionId = 0;
@@ -1184,7 +1188,14 @@ CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadP
         mReadPrepareParams.mSessionHolder = aReadPrepareParams.mSessionHolder;
     }
 
-    mIsPeerLIT = aReadPrepareParams.mIsPeerLIT;
+    mIsPeerLIT                                 = aReadPrepareParams.mIsPeerLIT;
+    mReadPrepareParams.mRegisteredCheckInToken = aReadPrepareParams.mRegisteredCheckInToken;
+
+    if (aReadPrepareParams.mRegisteredCheckInToken)
+    {
+        ChipLogProgress(DataManagement, "ICD Check-In token has been registered in peer device " ChipLogFormatScopedNodeId,
+                        ChipLogValueScopedNodeId(mPeer));
+    }
 
     mMinIntervalFloorSeconds = aReadPrepareParams.mMinIntervalFloorSeconds;
 
@@ -1198,7 +1209,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadP
     System::PacketBufferHandle msgBuf;
     System::PacketBufferTLVWriter writer;
     SubscribeRequestMessage::Builder request;
-    InitWriterWithSpaceReserved(writer, kReservedSizeForTLVEncodingOverhead);
+    TEMPORARY_RETURN_IGNORED InitWriterWithSpaceReserved(writer, kReservedSizeForTLVEncodingOverhead);
 
     ReturnErrorOnFailure(request.Init(&writer));
 

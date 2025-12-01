@@ -5,6 +5,7 @@
 #pragma once
 
 #include <app/data-model-provider/MetadataTypes.h>
+#include <array>
 #include <lib/core/DataModelTypes.h>
 
 #include <cstdint>
@@ -19,6 +20,7 @@ namespace PumpConfigurationAndControl {
 inline constexpr uint32_t kRevision = 4;
 
 namespace Attributes {
+
 namespace MaxPressure {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxPressure::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
@@ -111,10 +113,75 @@ namespace ControlMode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ControlMode::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kManage);
 } // namespace ControlMode
+constexpr std::array<DataModel::AttributeEntry, 7> kMandatoryMetadata = {
+    MaxPressure::kMetadataEntry,
+    MaxSpeed::kMetadataEntry,
+    MaxFlow::kMetadataEntry,
+    EffectiveOperationMode::kMetadataEntry,
+    EffectiveControlMode::kMetadataEntry,
+    Capacity::kMetadataEntry,
+    OperationMode::kMetadataEntry,
+
+};
 
 } // namespace Attributes
 
 namespace Commands {} // namespace Commands
+
+namespace Events {
+namespace SupplyVoltageLow {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace SupplyVoltageLow
+namespace SupplyVoltageHigh {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace SupplyVoltageHigh
+namespace PowerMissingPhase {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace PowerMissingPhase
+namespace SystemPressureLow {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace SystemPressureLow
+namespace SystemPressureHigh {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace SystemPressureHigh
+namespace DryRunning {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace DryRunning
+namespace MotorTemperatureHigh {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace MotorTemperatureHigh
+namespace PumpMotorFatalFailure {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace PumpMotorFatalFailure
+namespace ElectronicTemperatureHigh {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace ElectronicTemperatureHigh
+namespace PumpBlocked {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace PumpBlocked
+namespace SensorFailure {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace SensorFailure
+namespace ElectronicNonFatalFailure {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace ElectronicNonFatalFailure
+namespace ElectronicFatalFailure {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace ElectronicFatalFailure
+namespace GeneralFault {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace GeneralFault
+namespace Leakage {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace Leakage
+namespace AirDetection {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace AirDetection
+namespace TurbineOperation {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace TurbineOperation
+
+} // namespace Events
 } // namespace PumpConfigurationAndControl
 } // namespace Clusters
 } // namespace app

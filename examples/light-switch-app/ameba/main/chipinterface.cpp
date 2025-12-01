@@ -15,41 +15,49 @@
  *    limitations under the License.
  */
 
+#include <chip_porting.h>
 #include <platform_stdlib.h>
 
-#include "AmebaObserver.h"
-#include "BindingHandler.h"
-#include "CHIPDeviceManager.h"
-#include "DeviceCallbacks.h"
-#include "Globals.h"
-#include "LEDWidget.h"
-#include "chip_porting.h"
-#include <DeviceInfoProviderImpl.h>
-#include <lwip_netconf.h>
+#include <AmebaObserver.h>
+#include <BindingHandler.h>
+#include <CHIPDeviceManager.h>
+#include <DeviceCallbacks.h>
+#include <Globals.h>
+#include <LEDWidget.h>
 
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/Server.h>
+#if CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION
+#include <app/server/TermsAndConditionsManager.h>
+#endif
 #include <app/util/endpoint-config-api.h>
 #include <data-model-providers/codegen/Instance.h>
 #include <lib/core/ErrorStr.h>
 #include <platform/Ameba/AmebaConfig.h>
+#include <platform/Ameba/DeviceInfoProviderImpl.h>
 #include <platform/Ameba/NetworkCommissioningDriver.h>
-#include <setup_payload/OnboardingCodesUtil.h>
 #if CONFIG_ENABLE_AMEBA_CRYPTO
 #include <platform/Ameba/crypto/AmebaPersistentStorageOperationalKeystore.h>
 #endif
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <support/CHIPMem.h>
-
+#if CONFIG_ENABLE_CHIP_SHELL
+#include <shell/launch_shell.h>
+#endif
 #if CONFIG_ENABLE_PW_RPC
 #include <Rpc.h>
 #endif
 
-#if CONFIG_ENABLE_CHIP_SHELL
-#include <shell/launch_shell.h>
+#ifdef CONFIG_PLATFORM_8721D
+#define STATUS_LED_GPIO_NUM PB_5
+#elif defined(CONFIG_PLATFORM_8710C)
+#define STATUS_LED_GPIO_NUM PA_20
+#else
+#define STATUS_LED_GPIO_NUM NC
 #endif
 
 using namespace ::chip;
@@ -57,6 +65,9 @@ using namespace ::chip::app;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::System;
+
+static DeviceCallbacks EchoCallbacks;
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 namespace { // Network Commissioning
 constexpr EndpointId kNetworkCommissioningEndpointMain      = 0;
@@ -75,13 +86,6 @@ void NetWorkCommissioningInstInit()
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 }
 
-Identify gIdentify0 = {
-    chip::EndpointId{ 0 },
-    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
-    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
-    Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
-};
-
 Identify gIdentify1 = {
     chip::EndpointId{ 1 },
     [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
@@ -89,29 +93,20 @@ Identify gIdentify1 = {
     Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
 };
 
-#ifdef CONFIG_PLATFORM_8721D
-#define STATUS_LED_GPIO_NUM PB_5
-#elif defined(CONFIG_PLATFORM_8710C)
-#define STATUS_LED_GPIO_NUM PA_20
-#else
-#define STATUS_LED_GPIO_NUM NC
-#endif
-
-static DeviceCallbacks EchoCallbacks;
-chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
-
 static void InitServer(intptr_t context)
 {
     // Init ZCL Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
     initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
+
 #if CONFIG_ENABLE_AMEBA_CRYPTO
     ChipLogProgress(DeviceLayer, "platform crypto enabled!");
     static chip::AmebaPersistentStorageOperationalKeystore sAmebaPersistentStorageOpKeystore;
     VerifyOrDie((sAmebaPersistentStorageOpKeystore.Init(initParams.persistentStorageDelegate)) == CHIP_NO_ERROR);
     initParams.operationalKeystore = &sAmebaPersistentStorageOpKeystore;
 #endif
+
     static AmebaObserver sAmebaObserver;
     initParams.appDelegate = &sAmebaObserver;
     chip::Server::GetInstance().Init(initParams);
@@ -119,6 +114,13 @@ static void InitServer(intptr_t context)
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     NetWorkCommissioningInstInit();
+
+#if CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION
+    const Optional<app::TermsAndConditions> termsAndConditions = Optional<app::TermsAndConditions>(
+        app::TermsAndConditions(CHIP_AMEBA_TC_REQUIRED_ACKNOWLEDGEMENTS, CHIP_AMEBA_TC_MIN_REQUIRED_VERSION));
+    PersistentStorageDelegate & persistentStorageDelegate = Server::GetInstance().GetPersistentStorage();
+    chip::app::TermsAndConditionsManager::GetInstance().Init(&persistentStorageDelegate, termsAndConditions);
+#endif
 
     if (RTW_SUCCESS != wifi_is_connected_to_ap())
     {
@@ -129,6 +131,7 @@ static void InitServer(intptr_t context)
 #if CONFIG_ENABLE_CHIP_SHELL
     InitBindingHandler();
 #endif
+
     chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sAmebaObserver);
 }
 

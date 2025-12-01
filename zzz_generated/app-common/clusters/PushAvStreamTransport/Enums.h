@@ -28,6 +28,19 @@ namespace app {
 namespace Clusters {
 namespace PushAvStreamTransport {
 
+// Enum for CMAFInterfaceEnum
+enum class CMAFInterfaceEnum : uint8_t
+{
+    kInterface1     = 0x00,
+    kInterface2DASH = 0x01,
+    kInterface2HLS  = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
 // Enum for ContainerFormatEnum
 enum class ContainerFormatEnum : uint8_t
 {
@@ -60,6 +73,9 @@ enum class StatusCodeEnum : uint8_t
     kInvalidCombination     = 0x06,
     kInvalidTriggerType     = 0x07,
     kInvalidTransportStatus = 0x08,
+    kInvalidOptions         = 0x09,
+    kInvalidStreamUsage     = 0x0A,
+    kInvalidTime            = 0x0B,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown

@@ -1,6 +1,6 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
-// Identifier constant values for cluster ContentLauncher (cluster code: 1290/0x0450A)
+// Identifier constant values for cluster ContentLauncher (cluster code: 1290/0x050A)
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 

@@ -326,7 +326,8 @@ CHIP_ERROR EventManagement::ConstructEvent(EventLoadOutContext * apContext, Even
     // Revisit FabricRemovedCB function should the encoding of fabricIndex change in the future.
     if (apOptions->mFabricIndex != kUndefinedFabricIndex)
     {
-        apContext->mWriter.Put(TLV::ProfileTag(kEventManagementProfile, kFabricIndexTag), apOptions->mFabricIndex);
+        TEMPORARY_RETURN_IGNORED apContext->mWriter.Put(TLV::ProfileTag(kEventManagementProfile, kFabricIndexTag),
+                                                        apOptions->mFabricIndex);
     }
     ReturnErrorOnFailure(eventDataIBBuilder.EndOfEventDataIB());
     ReturnErrorOnFailure(eventReportBuilder.EndOfEventReportIB());
@@ -342,8 +343,9 @@ void EventManagement::CreateEventManagement(Messaging::ExchangeManager * apExcha
                                             System::Clock::Milliseconds64 aMonotonicStartupTime)
 {
 
-    sInstance.Init(apExchangeManager, aNumBuffers, apCircularEventBuffer, apLogStorageResources, apEventNumberCounter,
-                   aMonotonicStartupTime, &InteractionModelEngine::GetInstance()->GetReportingEngine());
+    TEMPORARY_RETURN_IGNORED sInstance.Init(apExchangeManager, aNumBuffers, apCircularEventBuffer, apLogStorageResources,
+                                            apEventNumberCounter, aMonotonicStartupTime,
+                                            &InteractionModelEngine::GetInstance()->GetReportingEngine());
 }
 
 /**
@@ -522,38 +524,52 @@ CHIP_ERROR EventManagement::CopyEvent(const TLVReader & aReader, TLVWriter & aWr
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EventManagement::CheckEventContext(EventLoadOutContext * eventLoadOutContext,
-                                              const EventManagement::EventEnvelopeContext & event)
+bool EventManagement::IncludeEventInReport(EventLoadOutContext * eventLoadOutContext,
+                                           const EventManagement::EventEnvelopeContext & event)
 {
     if (eventLoadOutContext->mCurrentEventNumber < eventLoadOutContext->mStartingEventNumber)
     {
-        return CHIP_ERROR_UNEXPECTED_EVENT;
+        return false;
     }
 
     if (event.mFabricIndex.HasValue() &&
         (event.mFabricIndex.Value() == kUndefinedFabricIndex ||
          eventLoadOutContext->mSubjectDescriptor.fabricIndex != event.mFabricIndex.Value()))
     {
-        return CHIP_ERROR_UNEXPECTED_EVENT;
+        return false;
     }
 
+    bool isPathInterested = false;
     ConcreteEventPath path(event.mEndpointId, event.mClusterId, event.mEventId);
-    CHIP_ERROR ret = CHIP_ERROR_UNEXPECTED_EVENT;
-
+    // Check whether the event path is in the interested paths
     for (auto * interestedPath = eventLoadOutContext->mpInterestedEventPaths; interestedPath != nullptr;
          interestedPath        = interestedPath->mpNext)
     {
         if (interestedPath->mValue.IsEventPathSupersetOf(path))
         {
-            ret = CHIP_NO_ERROR;
+            isPathInterested = true;
             break;
         }
     }
-
-    ReturnErrorOnFailure(ret);
+    if (!isPathInterested)
+    {
+        return false;
+    }
 
     DataModel::EventEntry eventInfo;
-    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetDataModelProvider()->EventInfo(path, eventInfo));
+    if (InteractionModelEngine::GetInstance()->GetDataModelProvider()->EventInfo(path, eventInfo) != CHIP_NO_ERROR)
+    {
+        // If we cannot get event info here, that means the data model doesn't support the
+        // event (eg. the endpoint is removed).  Return false, because we can't even perform ACL checks here,
+        // since we don't know what permissions to check for.  This is not an error condition
+        // (other than omitting the event), because the only way we can end up in this situation
+        // is with a wildcard event path.
+        //
+        // TODO: We should not record the event in the log buffer when the event is not supported by the data model, see #41448.
+        // TODO: We should remove the event from the log buffer when the event path is no longer valid (eg. when the endpoint of the
+        // event path is removed), see #41448
+        return false;
+    }
 
     Access::RequestPath requestPath{ .cluster     = event.mClusterId,
                                      .endpoint    = event.mEndpointId,
@@ -563,17 +579,18 @@ CHIP_ERROR EventManagement::CheckEventContext(EventLoadOutContext * eventLoadOut
         Access::GetAccessControl().Check(eventLoadOutContext->mSubjectDescriptor, requestPath, eventInfo.readPrivilege);
     if (accessControlError != CHIP_NO_ERROR)
     {
-        VerifyOrReturnError((accessControlError == CHIP_ERROR_ACCESS_DENIED) ||
-                                (accessControlError == CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL),
-                            accessControlError);
-        ret = CHIP_ERROR_UNEXPECTED_EVENT;
+        // If we don't have the access for the event, the only way we could have gotten here
+        // is due to a wildcard event path that includes the event.  Return false so that
+        // the event will be excluded in the generated event report.
+        return false;
     }
 
-    return ret;
+    // If all the checks pass, the event will be included in the generated event report.
+    return true;
 }
 
 CHIP_ERROR EventManagement::EventIterator(const TLVReader & aReader, size_t aDepth, EventLoadOutContext * apEventLoadOutContext,
-                                          EventEnvelopeContext * event)
+                                          EventEnvelopeContext * event, bool & encodeEvent)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLVReader innerReader;
@@ -602,25 +619,17 @@ CHIP_ERROR EventManagement::EventIterator(const TLVReader & aReader, size_t aDep
     apEventLoadOutContext->mCurrentTime        = event->mCurrentTime;
     apEventLoadOutContext->mCurrentEventNumber = event->mEventNumber;
 
-    err = CheckEventContext(apEventLoadOutContext, *event);
-    if (err == CHIP_NO_ERROR)
-    {
-        err = CHIP_EVENT_ID_FOUND;
-    }
-    else if (err == CHIP_ERROR_UNEXPECTED_EVENT)
-    {
-        err = CHIP_NO_ERROR;
-    }
-
-    return err;
+    encodeEvent = IncludeEventInReport(apEventLoadOutContext, *event);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR EventManagement::CopyEventsSince(const TLVReader & aReader, size_t aDepth, void * apContext)
 {
     EventLoadOutContext * const loadOutContext = static_cast<EventLoadOutContext *>(apContext);
     EventEnvelopeContext event;
-    CHIP_ERROR err = EventIterator(aReader, aDepth, loadOutContext, &event);
-    if (err == CHIP_EVENT_ID_FOUND)
+    bool encodeEvent = false;
+    CHIP_ERROR err   = EventIterator(aReader, aDepth, loadOutContext, &event, encodeEvent);
+    if ((err == CHIP_NO_ERROR) && encodeEvent)
     {
         // checkpoint the writer
         TLV::TLVWriter checkpoint = loadOutContext->mWriter;
@@ -861,6 +870,11 @@ CHIP_ERROR EventManagement::GenerateEvent(EventLoggingDelegate * eventPayloadWri
     return LogEvent(eventPayloadWriter, options, generatedEventNumber);
 }
 
+void EventManagement::ScheduleUrgentEventDeliverySync(std::optional<FabricIndex> fabricIndex)
+{
+    mpEventReporter->ScheduleUrgentEventDeliverySync(FromStdOptional(fabricIndex));
+}
+
 void CircularEventBuffer::Init(uint8_t * apBuffer, uint32_t aBufferLength, CircularEventBuffer * apPrev,
                                CircularEventBuffer * apNext, PriorityLevel aPriorityLevel)
 {
@@ -893,7 +907,7 @@ void CircularEventReader::Init(CircularEventBufferWrapper * apBufWrapper)
     if (apBufWrapper->mpCurrent == nullptr)
         return;
 
-    TLVReader::Init(*apBufWrapper, apBufWrapper->mpCurrent->DataLength());
+    TEMPORARY_RETURN_IGNORED TLVReader::Init(*apBufWrapper, apBufWrapper->mpCurrent->DataLength());
     mMaxLen = apBufWrapper->mpCurrent->DataLength();
     for (prev = apBufWrapper->mpCurrent->GetPreviousCircularEventBuffer(); prev != nullptr;
          prev = prev->GetPreviousCircularEventBuffer())
@@ -907,7 +921,7 @@ void CircularEventReader::Init(CircularEventBufferWrapper * apBufWrapper)
 CHIP_ERROR CircularEventBufferWrapper::GetNextBuffer(TLVReader & aReader, const uint8_t *& aBufStart, uint32_t & aBufLen)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    mpCurrent->GetNextBuffer(aReader, aBufStart, aBufLen);
+    TEMPORARY_RETURN_IGNORED mpCurrent->GetNextBuffer(aReader, aBufStart, aBufLen);
     SuccessOrExit(err);
 
     if ((aBufLen == 0) && (mpCurrent->GetPreviousCircularEventBuffer() != nullptr))

@@ -23,7 +23,86 @@
 
 #include <lib/support/CodeUtils.h>
 
-#define NETWORK_FRAMEWORK_DEBUG 1
+#include <arpa/inet.h>
+
+#define NETWORK_FRAMEWORK_DEBUG 0
+
+#if NETWORK_FRAMEWORK_DEBUG
+namespace {
+constexpr const char * kNoAddress = "<no-address>";
+constexpr size_t kMaxIPStrLen = INET6_ADDRSTRLEN + 1 /*%*/ + IFNAMSIZ + 1 /*:*/ + 5 /*65535*/ + 1 /*\0*/;
+
+bool FormatIPv4Address(const struct sockaddr * sa, uint16_t port, char * out, socklen_t len)
+{
+    __auto_type in4 = reinterpret_cast<const struct sockaddr_in *>(sa);
+    VerifyOrReturnValue(nullptr != inet_ntop(AF_INET, &in4->sin_addr, out, len), false);
+
+    size_t offset = strlen(out);
+    size_t available = len - offset;
+    int written = snprintf(out + offset, available, ":%u", port);
+    return (written >= 0 && static_cast<size_t>(written) < available);
+}
+
+bool FormatIPv6Address(const struct sockaddr * sa, uint16_t port, char * out, socklen_t len)
+{
+    __auto_type in6 = reinterpret_cast<const struct sockaddr_in6 *>(sa);
+    VerifyOrReturnValue(nullptr != inet_ntop(AF_INET6, &in6->sin6_addr, out, len), false);
+
+    size_t offset = strlen(out);
+    size_t available = len - offset;
+    int written = 0;
+
+    uint32_t interfaceIndex = static_cast<uint32_t>(in6->sin6_scope_id);
+    if (interfaceIndex == 0) {
+        written = snprintf(out + offset, available, ":%u", port);
+    } else {
+        char interfaceName[IFNAMSIZ] = { 0 };
+        if (nullptr != if_indextoname(interfaceIndex, interfaceName)) {
+            written = snprintf(out + offset, available, "%%%s:%u", interfaceName, port);
+        } else {
+            written = snprintf(out + offset, available, "%%<%u>:%u", interfaceIndex, port);
+        }
+    }
+
+    return (written >= 0 && static_cast<size_t>(written) < available);
+}
+
+bool FormatIPAddress(const struct sockaddr * sa, uint16_t port, char * out, socklen_t len)
+{
+    VerifyOrReturnValue(nullptr != sa, false);
+
+    bool hasAddress = false;
+
+    if (sa->sa_family == AF_INET) {
+        hasAddress = FormatIPv4Address(sa, port, out, len);
+    } else if (sa->sa_family == AF_INET6) {
+        hasAddress = FormatIPv6Address(sa, port, out, len);
+    }
+
+    return hasAddress;
+}
+
+//
+// We intentionally do not use nw_endpoint_copy_address_string() here because:
+//   - For IPv6 endpoints created via nw_endpoint_create_host("<addr>%<ifname>", "<port>"),
+//     nw_endpoint_copy_address_string() will return only the raw 128-bit address and port,
+//     omitting the “%<ifname>” zone ID. This makes it impossible to see which interface
+//     (sin6_scope_id) was actually encoded into the endpoint.
+//   - To reliably log “IP%<interface>:port” for debugging, we must extract the sockaddr
+//     directly via nw_endpoint_get_address() and inspect sin6_scope_id ourselves.
+//
+char * FormatEndpointAddressWithInterface(nw_endpoint_t endpoint)
+{
+    __auto_type * sa = nw_endpoint_get_address(endpoint);
+    uint16_t port = nw_endpoint_get_port(endpoint);
+    char addressStr[kMaxIPStrLen] = { 0 };
+
+    bool hasAddress = FormatIPAddress(sa, port, addressStr, sizeof(addressStr));
+    return strdup(hasAddress ? addressStr : kNoAddress);
+}
+
+}
+#endif
 
 namespace chip {
 namespace Inet {
@@ -90,13 +169,13 @@ namespace Inet {
 
             if (error) {
                 CHIP_ERROR err = CHIP_ERROR_POSIX(nw_error_get_error_code(error));
-                ChipLogDetail(Inet, "%s - Error: %s", str, chip::ErrorStr(err));
+                ChipLogDetail(Inet, "%s - Error: %" CHIP_ERROR_FORMAT, str, err.Format());
             } else {
                 ChipLogDetail(Inet, "%s", str);
             }
         }
 
-        void DebugPrintConnectionGroupState(nw_connection_group_state_t state, nw_error_t error)
+        void DebugPrintConnectionGroupState(nw_connection_group_state_t state, nw_interface_t interface, nw_error_t error)
         {
             const char * str = nullptr;
 
@@ -120,11 +199,12 @@ namespace Inet {
                 chipDie();
             }
 
+            const char * interfaceName = nw_interface_get_name(interface);
             if (error) {
                 CHIP_ERROR err = CHIP_ERROR_POSIX(nw_error_get_error_code(error));
-                ChipLogDetail(Inet, "%s - Error: %s", str, chip::ErrorStr(err));
+                ChipLogDetail(Inet, "%s (%s) - Error: %" CHIP_ERROR_FORMAT, str, interfaceName, err.Format());
             } else {
-                ChipLogDetail(Inet, "%s", str);
+                ChipLogDetail(Inet, "%s (%s)", str, interfaceName);
             }
         }
 
@@ -157,7 +237,7 @@ namespace Inet {
 
             if (error) {
                 CHIP_ERROR err = CHIP_ERROR_POSIX(nw_error_get_error_code(error));
-                ChipLogDetail(Inet, "%s - Error: %s", str, chip::ErrorStr(err));
+                ChipLogDetail(Inet, "%s - Error: %" CHIP_ERROR_FORMAT, str, err.Format());
             } else {
                 ChipLogDetail(Inet, "%s", str);
             }
@@ -202,12 +282,10 @@ namespace Inet {
             __auto_type dstEndPoint = nw_path_copy_effective_remote_endpoint(path);
             VerifyOrReturn(nil != dstEndPoint, ChipLogError(Inet, "%s", kNilPathDestinationEndPoint));
 
-            __auto_type * srcAddress = nw_endpoint_copy_address_string(srcEndPoint);
-            __auto_type srcPort = nw_endpoint_get_port(srcEndPoint);
-            __auto_type * dstAddress = nw_endpoint_copy_address_string(dstEndPoint);
-            __auto_type dstPort = nw_endpoint_get_port(dstEndPoint);
+            __auto_type * srcAddress = FormatEndpointAddressWithInterface(srcEndPoint);
+            __auto_type * dstAddress = FormatEndpointAddressWithInterface(dstEndPoint);
 
-            ChipLogError(Inet, "Connection source: %s:%u destination: %s:%u", srcAddress, srcPort, dstAddress, dstPort);
+            ChipLogError(Inet, "Connection source: %s destination: %s", srcAddress, dstAddress);
 
             free(srcAddress);
             free(dstAddress);
@@ -239,10 +317,9 @@ namespace Inet {
             }
 
             if (str == kEndpointTypeAddress) {
-                __auto_type * address = nw_endpoint_copy_address_string(endpoint);
-                __auto_type port = nw_endpoint_get_port(endpoint);
-                ChipLogError(Inet, "%s (%s:%u)", str, address, port);
-                free(address);
+                char * addressStr = FormatEndpointAddressWithInterface(endpoint);
+                ChipLogError(Inet, "%s (%s)", str, addressStr);
+                free(addressStr);
             } else {
                 ChipLogDetail(Inet, "%s", str);
             }
@@ -258,11 +335,11 @@ namespace Inet {
         }
 #else
         void DebugPrintListenerState(nw_listener_state_t state, nw_error_t error) {};
-        void DebugPrintConnectionGroupState(nw_connection_group_state_t state, nw_error_t error) {};
+        void DebugPrintConnectionGroupState(nw_connection_group_state_t state, nw_interface_t interface, nw_error_t error) {};
         void DebugPrintConnectionState(nw_connection_state_t state, nw_error_t error) {};
         void DebugPrintConnection(const nw_connection_t connection) {};
         void DebugPrintEndPoint(nw_endpoint_t endpoint) {};
-        void DebugPrintPacketInfo(IPPacketInfo & packetInfo);
+        void DebugPrintPacketInfo(IPPacketInfo & packetInfo) {};
 #endif
     } // namespace Darwin
 } // namespace Inet

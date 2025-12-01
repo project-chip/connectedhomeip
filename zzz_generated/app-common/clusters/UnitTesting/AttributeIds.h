@@ -12,6 +12,10 @@ namespace app {
 namespace Clusters {
 namespace UnitTesting {
 namespace Attributes {
+
+// Total number of attributes supported by the cluster, including global attributes
+inline constexpr uint32_t kAttributesCount = 95;
+
 namespace Boolean {
 inline constexpr AttributeId Id = 0x00000000;
 } // namespace Boolean
@@ -207,6 +211,10 @@ inline constexpr AttributeId Id = 0x00000033;
 namespace GlobalStruct {
 inline constexpr AttributeId Id = 0x00000034;
 } // namespace GlobalStruct
+
+namespace UnsupportedAttributeRequiringAdminPrivilege {
+inline constexpr AttributeId Id = 0x000000FE;
+} // namespace UnsupportedAttributeRequiringAdminPrivilege
 
 namespace Unsupported {
 inline constexpr AttributeId Id = 0x000000FF;

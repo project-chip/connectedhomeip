@@ -71,6 +71,13 @@ struct List : public Span<T>
     static constexpr bool kIsFabricScoped = DataModel::IsFabricScoped<T>::value;
 };
 
+// Template deduction guides to allow construction of List from a pointer or
+// array without having to specify the type of the list entries explicitly.
+template <class T>
+List(T * data, size_t size) -> List<T>;
+template <class T, size_t N>
+List(T (&databuf)[N]) -> List<T>;
+
 template <typename X>
 inline CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, List<X> list)
 {

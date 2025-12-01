@@ -20,6 +20,7 @@ declare_args() {
   # Find more information at https://www.silabs.com/development-tools/wireless.
   # A board tailored for specific mcu family and mcu model can be created with "CUSTOM".
   silabs_board = ""
+  silabs_board_lower = ""
 
   # Silabs mcu family used
   silabs_family = ""
@@ -43,13 +44,14 @@ declare_args() {
 
   # WIFI rcp boards options for wifi apps.
   use_wf200 = false
-  use_rs9116 = false
   use_SiWx917 = false
 
   wifi_soc = false
 
+  wifi_ncp_module = false
+
   #Disable MQTT by default
-  enable_dic = false
+  enable_matter_aws = false
 
   # Disable AWS SDK OTA by default
   aws_sdk_ota = false
@@ -59,18 +61,21 @@ declare_args() {
 
   # RGB LED support
   sl_enable_rgb_led = false
+
+  #Si917Y boards
+  is_si917y_mcu = false
 }
 
 declare_args() {
   # Enables LCD Qr Code on supported devices
   show_qr_code = !disable_lcd
 
-  # Enabling BLE on 9116/917 NCP by default
-  chip_enable_ble_rs911x = use_rs9116 || use_SiWx917
+  # Enabling BLE on 917 SoC by default
+  sl_matter_enable_siwx_ble = use_SiWx917
 }
 
 # TODO - This needs to be removed once multiplexing issues resolved
-if (use_SiWx917 || use_rs9116) {
+if (use_SiWx917) {
   disable_lcd = true
   show_qr_code = false
   use_external_flash = false
@@ -95,14 +100,39 @@ if (silabs_board == "" && sl_build_unit_tests) {
 assert(silabs_board != "", "silabs_board must be specified")
 
 # Si917 WIFI board ----------
-if (silabs_board == "BRD4338A" || silabs_board == "BRD2605A" ||
-    silabs_board == "BRD4343A" || silabs_board == "BRD4342A") {
+si917_wifi_boards = [
+  "BRD4338A",
+  "BRD2605A",
+  "BRD4343A",
+  "BRD4342A",
+  "BRD2708A",
+  "BRD2911A",
+]
+
+# Check if silabs_board is a Si917 board
+is_si917_board = false
+foreach(board, si917_wifi_boards) {
+  if (silabs_board == board) {
+    is_si917_board = true
+  }
+}
+
+if (is_si917_board) {
   if (silabs_board == "BRD2605A") {
     sl_enable_rgb_led = true
   }
   silabs_family = "SiWx917-common"
-  silabs_mcu = "SiWG917M111MGTBA"
   wifi_soc = true
+
+  # Enabling BLE on 917 NCP by default
+  sl_matter_enable_siwx_ble = true
+
+  if (silabs_board == "BRD2708A" || silabs_board == "BRD2911A") {
+    is_si917y_mcu = true
+    silabs_mcu = "SIWG917Y111MGABA"
+  } else {
+    silabs_mcu = "SiWG917M111MGTBA"
+  }
 
   assert(!sl_enable_si70xx_sensor,
          "${silabs_board} does not support the si90xx sensor!")
@@ -123,6 +153,8 @@ if (silabs_board == "BRD4338A" || silabs_board == "BRD2605A" ||
 } else if (silabs_board == "BRD2601B") {
   silabs_family = "efr32mg24"
   silabs_mcu = "EFR32MG24B310F1536IM48"
+
+  sl_enable_rgb_led = true
 
   # ThunderBoards don't have a LCD,
   show_qr_code = false
@@ -199,6 +231,7 @@ if (silabs_board == "BRD4338A" || silabs_board == "BRD2605A" ||
   # ThunderBoards don't have a LCD,
   show_qr_code = false
   disable_lcd = true
+  sl_enable_rgb_led = true
 
   # Custom Board ----------
 } else if (silabs_board == "CUSTOM") {
@@ -212,6 +245,13 @@ if (silabs_board == "BRD4338A" || silabs_board == "BRD2605A" ||
       false,
       "The board ${silabs_board} is unsupported. A list of supported board can be found here https://t.ly/_b3SK")
 }
+
+silabs_board_lower = string_replace(silabs_board, "BRD", "brd")
+
+# REPLACE SUFFIXES
+silabs_board_lower = string_replace(silabs_board_lower, "A", "a")
+silabs_board_lower = string_replace(silabs_board_lower, "B", "b")
+silabs_board_lower = string_replace(silabs_board_lower, "C", "c")
 
 declare_args() {
   # Wifi SoC Board require a .rps file to be flashed to the device to run

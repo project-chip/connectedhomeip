@@ -81,6 +81,7 @@ CHIP_ERROR LightingManager::Init()
     {
         mCurrentLevel = brightness.Value();
     }
+
     if (Clusters::ColorControl::Attributes::CurrentX::Get(1, &currentx) == Protocols::InteractionModel::Status::Success)
     {
         mCurrentX = currentx;
@@ -153,17 +154,18 @@ bool LightingManager::InitiateAction(int32_t aActor, Action_t aAction, uint8_t *
         action_initiated = true;
 
         new_state = kState_OnInitiated;
+        if (mOffEffectArmed)
+        {
+            CancelTimer();
+            mOffEffectArmed = false;
+        }
     }
     else if (mState == kState_OnCompleted && aAction == OFF_ACTION && mOffEffectArmed == false)
     {
         action_initiated = true;
 
         new_state = kState_OffInitiated;
-    }
-
-    if (action_initiated)
-    {
-        if (mAutoTurnOffTimerArmed && new_state == kState_OffInitiated)
+        if (mAutoTurnOffTimerArmed)
         {
             // If auto turn off timer has been armed and someone initiates turning off,
             // cancel the timer and continue as normal.
@@ -171,32 +173,21 @@ bool LightingManager::InitiateAction(int32_t aActor, Action_t aAction, uint8_t *
 
             CancelTimer();
         }
-
-        if (mOffEffectArmed && new_state == kState_OnInitiated)
-        {
-            CancelTimer();
-            mOffEffectArmed = false;
-        }
-
-        StartTimer(ACTUATOR_MOVEMENT_PERIOS_MS);
-
-        // Since the timer started successfully, update the state and trigger callback
-        mState = new_state;
-
-        if (mActionInitiated_CB)
-        {
-            mActionInitiated_CB(aAction, aActor);
-        }
     }
-
-    if (aAction == LEVEL_ACTION)
+    else if (aAction == LEVEL_ACTION)
     {
         action_initiated = true;
-        if (mCurrentLevel != *aValue)
-        {
-            mCurrentLevel = *aValue;
-            AppTask::GetAppTask().PostLightActionRequest(aActor, aAction, aValue);
-        }
+    }
+
+    if (action_initiated && (aAction == ON_ACTION || aAction == OFF_ACTION))
+    {
+        StartTimer(ACTUATOR_MOVEMENT_PERIOS_MS);
+        mState = new_state;
+    }
+
+    if (action_initiated && mActionInitiated_CB)
+    {
+        mActionInitiated_CB(aAction, aActor, aValue);
     }
 
     return action_initiated;
@@ -251,6 +242,7 @@ void LightingManager::AutoTurnOffTimerEventHandler(AppEvent * aEvent)
 {
     LightingManager * light = static_cast<LightingManager *>(aEvent->TimerEvent.Context);
     int32_t actor           = AppEvent::kEventType_Timer;
+    uint8_t value           = aEvent->LightEvent.Value;
 
     // Make sure auto turn off timer is still armed.
     if (!light->mAutoTurnOffTimerArmed)
@@ -262,13 +254,14 @@ void LightingManager::AutoTurnOffTimerEventHandler(AppEvent * aEvent)
 
     SILABS_LOG("Auto Turn Off has been triggered!");
 
-    light->InitiateAction(actor, OFF_ACTION, nullptr); // nullptr: no additional data needed for OFF_ACTION
+    light->InitiateAction(actor, OFF_ACTION, &value);
 }
 
 void LightingManager::OffEffectTimerEventHandler(AppEvent * aEvent)
 {
     LightingManager * light = static_cast<LightingManager *>(aEvent->TimerEvent.Context);
     int32_t actor           = AppEvent::kEventType_Timer;
+    uint8_t value           = aEvent->LightEvent.Value;
 
     // Make sure auto turn off timer is still armed.
     if (!light->mOffEffectArmed)
@@ -280,7 +273,7 @@ void LightingManager::OffEffectTimerEventHandler(AppEvent * aEvent)
 
     SILABS_LOG("OffEffect completed");
 
-    light->InitiateAction(actor, OFF_ACTION, nullptr); // nullptr: no additional data needed for OFF_ACTION
+    light->InitiateAction(actor, OFF_ACTION, &value);
 }
 
 void LightingManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
@@ -373,8 +366,8 @@ bool LightingManager::InitiateLightCtrlAction(int32_t aActor, Action_t aAction, 
 
         if (aAttributeId == ColorControl::Attributes::CurrentX::Id)
         {
-            VerifyOrReturnValue(colorData.xy.y != *reinterpret_cast<uint16_t *>(value), action_initiated);
-            colorData.xy.y   = *reinterpret_cast<uint16_t *>(value);
+            VerifyOrReturnValue(colorData.xy.x != *reinterpret_cast<uint16_t *>(value), action_initiated);
+            colorData.xy.x   = *reinterpret_cast<uint16_t *>(value);
             action_initiated = true;
         }
         else if (aAttributeId == ColorControl::Attributes::CurrentY::Id)
@@ -392,13 +385,15 @@ bool LightingManager::InitiateLightCtrlAction(int32_t aActor, Action_t aAction, 
         {
             VerifyOrReturnValue(colorData.hsv.h != *value, action_initiated);
             colorData.hsv.h  = *value;
+            mCurrentHue      = *value;
             action_initiated = true;
         }
         else if (aAttributeId == ColorControl::Attributes::CurrentSaturation::Id)
         {
             VerifyOrReturnValue(colorData.hsv.s != *value, action_initiated);
-            colorData.hsv.s  = *value;
-            action_initiated = true;
+            colorData.hsv.s    = *value;
+            mCurrentSaturation = *value;
+            action_initiated   = true;
         }
         break;
 

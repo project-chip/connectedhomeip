@@ -18,7 +18,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/occ_3_1_fifo
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -27,7 +27,7 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --endpoint 1
-#       --app-pipe_prefix /tmp/chip_all_clusters_fifo_
+#       --app-pipe /tmp/occ_3_1_fifo
 #       --bool-arg simulate_occupancy:true
 #     factory-reset: true
 #     quiet: true
@@ -38,15 +38,16 @@
 #  [TC-OCC-3.1] test procedure step 3, 4
 #  [TC-OCC-3.2] test precedure step 3a, 3c
 
+import asyncio
 import logging
-import time
 from typing import Any, Optional
 
-import chip.clusters as Clusters
-from chip.interaction_model import Status
-from chip.testing.matter_testing import (ClusterAttributeChangeAccumulator, EventChangeCallback, MatterBaseTest, TestStep,
-                                         async_test_body, await_sequence_of_reports, default_matter_test_main)
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import Status
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_OCC_3_1(MatterBaseTest):
@@ -72,7 +73,7 @@ class TC_OCC_3_1(MatterBaseTest):
         return "[TC-OCC-3.1] Primary functionality with server as DUT"
 
     def steps_TC_OCC_3_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commission DUT to TH.", is_commissioning=True),
             TestStep(2, "If HoldTime is supported, TH writes HoldTime attribute to 10 sec on DUT."),
             TestStep(3, "Prompt operator to await until DUT occupancy changes to unoccupied state."),
@@ -84,13 +85,11 @@ class TC_OCC_3_1(MatterBaseTest):
             TestStep("7a", "TH reads Occupancy attribute from DUT. Verify occupancy changed to unoccupied and Occupancy attribute was reported as unoccupied."),
             TestStep("7b", "If supported, verify OccupancyChangedEvent was reported as unoccupied."),
         ]
-        return steps
 
     def pics_TC_OCC_3_1(self) -> list[str]:
-        pics = [
+        return [
             "OCC.S",
         ]
-        return pics
 
     @async_test_body
     async def test_TC_OCC_3_1(self):
@@ -132,11 +131,11 @@ class TC_OCC_3_1(MatterBaseTest):
         endpoint_id = self.get_endpoint()
         node_id = self.dut_node_id
         dev_ctrl = self.default_controller
-        attrib_listener = ClusterAttributeChangeAccumulator(cluster)
+        attrib_listener = AttributeSubscriptionHandler(expected_cluster=cluster)
         await attrib_listener.start(dev_ctrl, node_id, endpoint=endpoint_id, min_interval_sec=0, max_interval_sec=30)
 
         if occupancy_event_supported:
-            event_listener = EventChangeCallback(cluster)
+            event_listener = EventSubscriptionHandler(expected_cluster=cluster)
             await event_listener.start(dev_ctrl, node_id, endpoint=endpoint_id, min_interval_sec=0, max_interval_sec=30)
 
         self.step("5a")
@@ -154,8 +153,8 @@ class TC_OCC_3_1(MatterBaseTest):
 
         # subscription verification
         post_prompt_settle_delay_seconds = 1.0 if self.is_ci else 10.0
-        await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.Occupancy, sequence=[
-            1], timeout_sec=post_prompt_settle_delay_seconds)
+        attrib_listener.await_sequence_of_reports(attribute=cluster.Attributes.Occupancy, sequence=[
+                                                  1], timeout_sec=post_prompt_settle_delay_seconds)
 
         if occupancy_event_supported:
             self.step("5c")
@@ -171,7 +170,7 @@ class TC_OCC_3_1(MatterBaseTest):
             self.write_to_app_pipe({"Name": "SetOccupancy", "EndpointId": 1, "Occupancy": 0})
 
         if has_hold_time:
-            time.sleep(hold_time + 2.0)  # add some extra 2 seconds to ensure hold time has passed.
+            await asyncio.sleep(hold_time + 2.0)  # add some extra 2 seconds to ensure hold time has passed.
         else:
             self.wait_for_user_input(
                 prompt_msg="Type any letter and press ENTER after the sensor occupancy is back to unoccupied state (occupancy attribute = 0)")
@@ -182,7 +181,7 @@ class TC_OCC_3_1(MatterBaseTest):
         occupancy_dut = await self.read_occ_attribute_expect_success(attribute=attributes.Occupancy)
         asserts.assert_equal(occupancy_dut, 0, "Occupancy state is not back to 0 after HoldTime period")
 
-        await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.Occupancy, sequence=[
+        attrib_listener.await_sequence_of_reports(attribute=cluster.Attributes.Occupancy, sequence=[
             0], timeout_sec=post_prompt_settle_delay_seconds)
 
         if occupancy_event_supported:

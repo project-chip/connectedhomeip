@@ -21,13 +21,14 @@
 # spec expectations before the 1.4 release and we should continue to do so going forward.
 
 import click
-from chip.testing.conformance import ConformanceDecision
-from chip.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types
+
+from matter.testing.conformance import ConformanceDecision
+from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types
 
 
 def get_changes(old, new):
-    added = [e.name for id, e in new.items() if id not in old.keys()]
-    removed = [e.name for id, e in old.items() if id not in new.keys()]
+    added = [e.name for id, e in new.items() if id not in old]
+    removed = [e.name for id, e in old.items() if id not in new]
     same_ids = set(new.keys()).intersection(set(old.keys()))
 
     return added, removed, same_ids
@@ -170,7 +171,8 @@ def get_all_provisional_device_types(new_revision: PrebuiltDataModelDirectory):
 REVISIONS = {'1.3': PrebuiltDataModelDirectory.k1_3,
              '1.4': PrebuiltDataModelDirectory.k1_4,
              '1.4.1': PrebuiltDataModelDirectory.k1_4_1,
-             '1.4.2': PrebuiltDataModelDirectory.k1_4_2}
+             '1.4.2': PrebuiltDataModelDirectory.k1_4_2,
+             '1.5': PrebuiltDataModelDirectory.k1_5}
 
 
 @click.command()

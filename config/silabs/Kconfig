@@ -1,0 +1,833 @@
+#
+#   Copyright (c) 2021 Project CHIP Authors
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+
+rsource "../zephyr/Kconfig"
+
+if CHIP
+menu "Silabs Matter Config"
+
+# See config/zephyr/Kconfig for full definition
+config CHIP_DEVICE_VENDOR_NAME
+	string "Vendor Name"
+	default "Silicon Laboratories"
+
+# See config/zephyr/Kconfig for full definition
+config CHIP_OTA_REQUESTOR
+	bool "Enable OTA Requestor"
+	default n
+	imply DFU_MULTI_IMAGE
+	imply DFU_TARGET
+	#imply BOOTLOADER_MCUBOOT # TODO MATTER-4888
+	imply IMG_MANAGER
+	imply STREAM_FLASH
+	imply STREAM_FLASH_ERASE
+
+config CHIP_OTA_REQUESTOR_BUFFER_SIZE
+	int "OTA Requestor image buffer size"
+	default 1024
+	depends on CHIP_OTA_REQUESTOR
+	help
+	  Configures the size of the buffer used by OTA Requestor when downloading
+	  and writing a new firmware image to flash.
+
+config CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
+	bool "Auto-reboot when firmware update is applied"
+	default y
+	depends on CHIP_OTA_REQUESTOR
+	imply REBOOT
+	help
+	  Reboots the device automatically after downloading a new firmware update
+	  to swap the old and the new firmware images. The reboot happens only when
+	  a user consents to apply the firmware update.
+
+config CHIP_OTA_IMAGE_BUILD
+	bool
+	default y if CHIP_OTA_REQUESTOR
+	depends on SIGN_IMAGES
+	select DFU_MULTI_IMAGE_PACKAGE_BUILD
+
+config CHIP_EXAMPLE_DEVICE_INFO_PROVIDER
+	bool "Include default device information provider build"
+	default y
+
+config CHIP_DEBUG_SYMBOLS
+	bool "Generate debug symbols"
+	default y
+	help
+	  Enables building the application with debug symbols.
+
+config CHIP_LOG_VERIFY_OR_DIE
+	bool "Log source code location on VerifyOrDie failure"
+	default y
+	help
+	  Enables the feature to log the file name and line number where the Matter
+	  stack calls the VerifyOrDie macro with the condition evaluating to false.
+
+config CHIP_LOG_FILE_NAME
+	bool "Log file name instead of entire file path"
+	default y
+	help
+	  Enables using a file name instead of an entire file path whenever the
+	  source code location needs to be logged. This is achieved by overriding
+	  the __FILE__ macro with __FILE_NAME__.
+	  This reduces the code size in debug configurations that enable verbose
+	  assertion macros.
+
+config CHIP_MALLOC_SYS_HEAP
+	default n if !ARCH_POSIX
+
+config CHIP_TASK_STACK_SIZE
+	int "The Matter thread stack size"
+	default 10240
+	help
+	  Configures the stack size available for the CHIP (Matter) thread.
+
+config CHIP_FACTORY_DATA_BUILD
+	bool "Generate factory data contents"
+	help
+	  Enables generation of the factory data contents during the building. This
+	  option requires the factory_data partition in Partition Manager
+	  configuration file (pm_static.yml). As a result, a new output file is
+	  created (factory_data.hex).
+
+config CHIP_FACTORY_DATA_VERSION
+	int
+	default 1
+	help
+	  Provides the version of the generated factory data parameter set. This is
+	  a hidden configuration option that the user cannot change. You can use
+	  this value in the factory data provider implementation to verify that the
+	  factory data saved in the flash memory has the expected version.
+
+config CHIP_FACTORY_DATA_ROTATING_DEVICE_UID_MAX_LEN
+	int "Maximum length of rotating device ID unique ID in bytes"
+	default 16
+	depends on CHIP_FACTORY_DATA
+	help
+	  Maximum acceptable length of rotating device ID unique ID in bytes.
+
+if CHIP_FACTORY_DATA_BUILD
+
+# Factory data definitions
+config CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE
+	bool "Merge generated factory data with merged.hex output build file"
+	default y
+	help
+	  Enables merging the generated factory data with the merged.hex output
+	  build file. As a result, the merged.hex build output file, which is used
+	  when flashing the firmware using the west tool, includes the factory data
+	  as well.
+
+config CHIP_FACTORY_DATA_GENERATE_ONBOARDING_CODES
+	bool "Generate onboarding codes during the generation of a factory data set"
+	default y
+	help
+	  Enables generation of onboarding codes (manual pairing code and QR code)
+	  during the generation of a factory data set. You can provide the 
+	  onboarding codes to a Matter controller to commission a device to a Matter 
+	  network.
+
+# Select source of the certificates
+choice CHIP_FACTORY_DATA_CERT_SOURCE
+	prompt "Attestation certificate file source"
+	default CHIP_FACTORY_DATA_USE_DEFAULT_CERTS
+
+	config CHIP_FACTORY_DATA_USE_DEFAULT_CERTS
+		bool "Use pre-generated development certificates"
+		help
+		  Uses pre-generated certificate files from the
+		  credentials/development/attestation/ directory that match the
+		  configured Product ID. This can be used for development purpose.
+
+	config CHIP_FACTORY_DATA_CERT_SOURCE_GENERATED
+		bool "Auto-generate certificates"
+		help
+		  Generates new certificates instead of using pre-generated ones. The
+		  certificates are generated on every build.
+
+	config CHIP_FACTORY_DATA_CERT_SOURCE_USER
+		bool "Use user-provided certificate files"
+		help
+		  Uses user-provided certificate files. The user needs to specify the
+		  absolute paths to all necessary files.
+
+endchoice
+
+config CHIP_FACTORY_DATA_GENERATE_CD
+	bool "Generates Certification Declaration to the output build directory"
+	help
+	  Generates the new Certification Declaration and stores it to the output build directory.
+
+if CHIP_FACTORY_DATA_CERT_SOURCE_USER
+
+config CHIP_FACTORY_DATA_USER_CERTS_DAC_CERT
+	string "Path to the DAC certificate (DER format)"
+	help
+	  Provides the absolute path to the DAC certificate file in the DER format.
+
+config CHIP_FACTORY_DATA_USER_CERTS_DAC_KEY
+	string "Path to the DAC private key (DER format)"
+	help
+	  Provides the absolute path to the DAC keypair file in the DER format. Both
+	  public and private keys must be present (the private key will be extracted
+	  automatically).
+
+config CHIP_FACTORY_DATA_USER_CERTS_PAI_CERT
+	string "Path to the PAI certificate (DER format)"
+	help
+	  Provides the absolute path to the PAI certificate in the DER format.
+
+endif # CHIP_FACTORY_DATA_CERT_SOURCE_USER
+
+# Configs for SPAKE2+ generation
+config CHIP_FACTORY_DATA_GENERATE_SPAKE2_VERIFIER
+	bool "Generate SPAKE2+ verifier"
+	default y
+	help
+	  Enables the generation of the SPAKE2+ verifier for the configured SPAKE2+
+	  passcode, iteration count and salt.
+
+config CHIP_DEVICE_GENERATE_ROTATING_DEVICE_UID
+	bool "Generate Rotating device ID unique ID"
+	default y
+	help
+	  Enables the generation of a random Rotating device ID unique ID.
+
+endif # CHIP_FACTORY_DATA_BUILD
+
+# See config/zephyr/Kconfig for full definition
+config CHIP_FACTORY_RESET_ERASE_SETTINGS
+	default y
+	depends on NVS || ZMS
+
+config CHIP_LOG_SIZE_OPTIMIZATION
+	bool "Disable some detailed logs to decrease flash usage"
+	help
+	  Disables some log levels for specific Matter log modules that provide
+	  information that is too detailed to be used in most cases. You can find
+	  full configuration enabled by this option in the
+	  platform/silabs/CHIPPlatformConfig.h file.
+
+config CHIP_OPENTHREAD_JOINER_ENABLED
+	bool "Specify whether the Thread Joiner functionality is used when it is enabled"
+	default n
+	depends on NET_L2_OPENTHREAD
+	depends on OPENTHREAD_JOINER
+	help
+	  If disabled, it allows to optimize memory usage even if Thread Joiner
+	  support is enabled.
+
+config CHIP_ENABLE_READ_CLIENT
+	bool "Enable Read Client in the Interaction Model"
+	help
+	  Enable support for Read Client in the Interaction Model.
+	  This config can be disabled for device types that do not require Read Client functionality.
+	  Disabling this config can save flash and RAM space.
+
+config CHIP_MIGRATE_OPERATIONAL_KEYS_TO_ITS
+	bool "Operational keys migration feature"
+	depends on CHIP_CRYPTO_IMPL_PSA
+	help
+	  Enables migration of the operational keys stored in the persistent storage to the PSA ITS secure storage.
+	  Enable this feature while updating the firmware of in-field devices that run Mbed TLS cryptography backend
+	  to the firmware based on PSA Crypto API.
+
+config CHIP_FACTORY_RESET_ON_KEY_MIGRATION_FAILURE
+	bool "Perform factory reset if the operational key migration failed"
+	default y
+	depends on CHIP_MIGRATE_OPERATIONAL_KEYS_TO_ITS
+	help
+	  Perform factory reset of the device if the operational key for Fabric has not been migrated
+	  properly to PSA ITS storage.
+
+config CHIP_PERSISTENT_SUBSCRIPTIONS
+	default n
+	# selecting experimental for this feature since there is an issue with multiple controllers.
+	select EXPERIMENTAL
+
+config CHIP_MAX_FABRICS
+	int "Maximum number of Matter fabrics"
+	default 5
+	help
+	  The maximum number of Matter fabrics that device can be joined to.
+
+config CHIP_MAX_ACTIVE_CASE_CLIENTS
+	int "Maximum number of outgoing CASE sessions"
+	default CHIP_MAX_FABRICS if CHIP_PERSISTENT_SUBSCRIPTIONS
+	default 2
+	help
+	  The maximum number of outgoing CASE sessions that can be simultaneously handled by the end device.
+
+config CHIP_MAX_ACTIVE_DEVICES
+	int "Maximum number of simultaneous connections over CASE"
+	default CHIP_MAX_FABRICS if CHIP_PERSISTENT_SUBSCRIPTIONS
+	default 4
+	help
+	  The maximum number of devices to which the Server implementers will be able to
+	  concurrently connect over CASE and interact with.
+
+config CHIP_SUBSCRIPTION_RESUMPTION_MIN_RETRY_INTERVAL
+	int "Minimum subscription resumption interval in seconds"
+	default 20
+	depends on CHIP_PERSISTENT_SUBSCRIPTIONS
+	help
+	  The minimum interval in seconds before resuming a subscription that timed out.
+
+config CHIP_SUBSCRIPTION_RESUMPTION_RETRY_MULTIPLIER
+	int "The multiplier for subscription resumption retry in seconds"
+	default 40
+	depends on CHIP_PERSISTENT_SUBSCRIPTIONS
+	help
+	  The multiplier per subscription resumption retry attempt that is multiplied by the index of Fibonacci sequence
+	  and added to CHIP_SUBSCRIPTION_RESUMPTION_MIN_RETRY_INTERVAL to obtain final wait time for next retry.
+
+config CHIP_ENABLE_BDX_LOG_TRANSFER
+	bool "Enable BDX transfer for diagnostic logs"
+	help
+	  Enables the BDX protocol for diagnostics log transfer purposes.
+
+
+config CHIP_WIFI
+	bool "Enable Silicon Labs Wi-Fi support"
+	default y if BOARD_SIWX917_RB4338A
+	default y if BOARD_SIWX917_RB4342A
+	select WIFI
+	imply NET_STATISTICS
+	imply NET_PKT_TXTIME
+	imply NET_PKT_TIMESTAMP
+	imply BUILD_OUTPUT_META
+	imply NET_IPV6_ND # enable Neighbor Discovery to handle Router Advertisements
+	imply NET_IPV6_NBR_CACHE
+	imply NET_STATISTICS_IPV6
+	imply NET_STATISTICS_USER_API
+
+config CHIP_MEMORY_PROFILING
+	bool "Enable features for tracking memory usage"
+	# Matter stack
+	select CHIP_STATISTICS
+	# Heap
+	select CHIP_MALLOC_SYS_HEAP_WATERMARKS_SUPPORT if CHIP_MALLOC_SYS_HEAP
+	select SYS_HEAP_RUNTIME_STATS if CHIP_MALLOC_SYS_HEAP	
+	# Crypto
+	select MBEDTLS_MEMORY_DEBUG if !CHIP_CRYPTO_IMPL_PSA
+	# Network
+	select NET_STATISTICS
+	select NET_SHELL
+	select NET_BUF_POOL_USAGE
+	select OPENTHREAD_SHELL if !CHIP_WIFI
+	# Settings
+	select SETTINGS_SHELL
+	# Zephyr
+	select KERNEL_SHELL
+	help
+	  Enables features for tracking memory usage in Matter.
+
+config CHIP_WIFI_CONNECTION_RECOVERY_MINIMUM_INTERVAL
+	int "Define the minimum connection recovery time interval in milliseconds"
+	depends on CHIP_WIFI
+	default 500
+	help
+	  Specifies the minimum connection recovery interval (in milliseconds).
+
+config CHIP_WIFI_CONNECTION_RECOVERY_MAXIMUM_INTERVAL
+	int "Define the maximum connection recovery time interval in milliseconds"
+	depends on CHIP_WIFI
+	default 3600000 # 1 hour
+	help
+	  Specifies the maximum connection recovery interval (in milliseconds).
+
+config CHIP_WIFI_CONNECTION_RECOVERY_MAX_RETRIES_NUMBER
+	int "Define the maximum amount of connection recovery occurrences"
+	depends on CHIP_WIFI
+	default 0
+	help
+	  Specifies the maximum number of connection recovery attempts.
+	  If set to 0, no limitation is applied and attempts
+	  to recover the connection are performed indefinitely.
+
+config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
+	int "Define the connection recovery jitter in milliseconds"
+	depends on CHIP_WIFI
+	default 2000
+	help
+	  Specifies the maximum connection recovery jitter interval (in milliseconds).
+	  Once the wait time reaches the current maximum value (defined by CHIP_WIFI_CONNECTION_RECOVERY_MAXIMUM_INTERVAL),
+	  a random jitter interval is added to it to avoid periodicity. The random jitter is selected
+	  within range [-JITTER; +JITTER].
+
+choice CHIP_LAST_FABRIC_REMOVED_ACTION
+	prompt "An action to perform after removing the last fabric"
+	default CHIP_LAST_FABRIC_REMOVED_ERASE_AND_REBOOT
+
+	config CHIP_LAST_FABRIC_REMOVED_NONE
+		bool "After removing the last fabric do not perform any action"
+		help
+		  After removing the last fabric the device will not perform factory reset
+		  or reboot. The current state will be left as it is and the BLE advertising
+		  will not start automatically.
+
+	config CHIP_LAST_FABRIC_REMOVED_ERASE_AND_REBOOT
+		bool "After removing the last fabric erase NVS and reboot"
+		help
+		  After removing the last fabric the device will perform the factory reset and
+		  then reboot. The current RAM state will be removed and the new commissioning to
+		  the new fabric will use the initial fabric index. This option is the most safe.
+
+	config CHIP_LAST_FABRIC_REMOVED_ERASE_AND_PAIRING_START
+		bool "After removing the last fabric erase NVS and start Bluetooth LE advertising"
+		help
+		  After removing the last fabric the device will perform the factory reset without 
+		  rebooting and start the Bluetooth LE advertisement automatically.
+		  The current RAM state will be saved and the new commissioning to the next 
+		  fabric will use the next possible fabric index. This option should not be used for
+		  devices that normally do not advertise Bluetooth LE on boot to keep their original 
+		  behavior.
+
+	config CHIP_LAST_FABRIC_REMOVED_ERASE_ONLY
+		bool "After removing the last fabric erase NVS only"
+		help
+		  After removing the last fabric the device will perform the factory reset only without
+		  rebooting. The current RAM state will be saved and the new commissioning to the next 
+		  fabric will use the next possible fabric index.
+
+endchoice
+
+config CHIP_LAST_FABRIC_REMOVED_ACTION_DELAY
+	int "After removing the last fabric wait defined time [in milliseconds] to perform an action"
+	depends on !CHIP_LAST_FABRIC_REMOVED_NONE
+	default 1000
+	help
+	  After removing the last fabric the device will wait for the defined time and then perform
+	  an action chosen by the CHIP_LAST_FABRIC_REMOVED_ACTION option. This schedule will allow for
+	  avoiding race conditions before the device removes non-volatile data.
+
+# ==============================================================================
+# System configuration
+# ==============================================================================
+
+choice LIBC_IMPLEMENTATION
+    default NEWLIB_LIBC
+endchoice
+
+config ASSERT
+    default y
+
+config ASSERT_NO_COND_INFO
+    default y
+
+config ASSERT_NO_MSG_INFO
+    default y
+
+config HW_STACK_PROTECTION
+    default y
+
+config MAIN_STACK_SIZE
+	int
+    default 6144
+
+config INIT_STACKS
+    default y
+
+config SYSTEM_WORKQUEUE_STACK_SIZE
+    default 2560 if CHIP_WIFI
+    default 2048 if CHIP_ICD_LIT_SUPPORT
+
+config HEAP_MEM_POOL_IGNORE_MIN
+    default y if CHIP_WIFI
+
+#We use sys_heap based allocators, so make sure we don't reserve unused libc heap anyway
+
+config NVS_LOOKUP_CACHE_SIZE
+    default 512 if NVS
+
+config ZMS_LOOKUP_CACHE_SIZE
+    default 512 if ZMS
+
+# ==============================================================================
+# Zephyr networking configuration
+# ==============================================================================
+
+config NET_IPV6_MLD
+    default y
+
+config NET_IPV6_NBR_CACHE
+    default y if CHIP_WIFI
+    default n if NET_L2_OPENTHREAD
+
+config NET_IF_UNICAST_IPV6_ADDR_COUNT
+    default 6
+
+config NET_IF_MCAST_IPV6_ADDR_COUNT
+    default 14
+
+config NET_IF_IPV6_PREFIX_COUNT
+    default NET_IF_UNICAST_IPV6_ADDR_COUNT if CHIP_WIFI
+
+config NET_PKT_RX_COUNT
+    default 8
+
+config NET_PKT_TX_COUNT
+    default 8
+
+config NET_BUF_RX_COUNT
+    default 16
+
+config NET_BUF_TX_COUNT
+    default 16
+
+config NET_SOCKETS_POLL_MAX
+    default 6 if CHIP_WIFI
+
+# ==============================================================================
+# Bluetooth Low Energy configuration
+# ==============================================================================
+
+config BT
+    default y
+
+config BT_PERIPHERAL
+    default y
+
+config BT_PERIPHERAL_PREF_MIN_INT
+    default 36
+
+config BT_PERIPHERAL_PREF_MAX_INT
+    default 36
+
+# Increase BT timeout to 5 s to improve connection reliability and avoid fast drop outs.
+config BT_PERIPHERAL_PREF_TIMEOUT
+    default 500
+
+config BT_GAP_AUTO_UPDATE_CONN_PARAMS
+    default y
+
+# Decrease connection parameters update time, as some Matter controllers request
+# enabling IP networking faster than BT connection parameters are updated, what may result
+# in commissioning instabilities.
+config BT_CONN_PARAM_UPDATE_TIMEOUT
+    default 1000
+
+config BT_GATT_DYNAMIC_DB
+    default y
+
+config BT_DEVICE_NAME_DYNAMIC
+    default y
+
+config BT_DEVICE_NAME_MAX
+    default 15
+
+config BT_MAX_CONN
+    default 1
+
+config BT_L2CAP_TX_MTU
+    default 247
+
+config BT_BUF_ACL_RX_SIZE
+    default 251
+
+config BT_BUF_ACL_TX_SIZE
+    default 251
+
+config BT_RX_STACK_SIZE
+    default 1200
+
+config BT_DEVICE_NAME_GATT_WRITABLE
+    default n
+
+config BT_GATT_CACHING
+    default n
+
+# ==============================================================================
+# DFU configuration
+# ==============================================================================
+config BOOT_IMAGE_ACCESS_HOOKS
+    default n 
+
+config UPDATEABLE_IMAGE_NUMBER
+    default 2 
+
+config DFU_MULTI_IMAGE_MAX_IMAGE_COUNT
+    int "Maximum number of images for multi-image DFU"
+    default 2
+
+# ==============================================================================
+# OpenThread configuration
+# ==============================================================================
+
+config NET_L2_OPENTHREAD
+    default y if !CHIP_WIFI
+
+if NET_L2_OPENTHREAD
+
+config OPENTHREAD_THREAD_STACK_SIZE
+    default 6144 if (PSA_CRYPTO_DRIVER_CC3XX && PSA_CRYPTO_DRIVER_OBERON) || PSA_CRYPTO_DRIVER_CRACEN
+    default 4096
+
+config OPENTHREAD_DEFAULT_TX_POWER
+    default 20 if MPSL_FEM
+
+endif # NET_L2_OPENTHREAD
+
+# ==============================================================================
+# Crypto configuration
+# ==============================================================================
+
+menu "Crypto configuration"
+
+choice CHIP_CRYPTO_IMPL
+    prompt "Crypto implementation"
+    default CHIP_CRYPTO_IMPL_PSA
+
+config CHIP_CRYPTO_IMPL_MBEDTLS
+    bool "mbedtls"
+
+config CHIP_CRYPTO_IMPL_PSA
+    bool "psa"
+endchoice
+
+config CHIP_CRYPTO
+    string
+    default "mbedtls" if CHIP_CRYPTO_IMPL_MBEDTLS
+    default "psa" if CHIP_CRYPTO_IMPL_PSA
+    help
+      Configures the cryptographic implementation between PSA or mbedTLS.
+
+config MBEDTLS_ENABLE_HEAP
+	bool "Enable MbedTLS heap"
+    default y 
+
+config MBEDTLS_HEAP_SIZE
+	int "MbedTLS heap size"
+    default 8192
+
+config MBEDTLS_ECP_C
+    bool
+    default y
+
+config MBEDTLS_ECP_DP_SECP256R1_ENABLED
+    default y
+
+config MBEDTLS_HMAC_DRBG_ENABLED
+    bool
+    default y
+config MBEDTLS_PKCS1_V15
+    bool
+    default y
+
+
+if CHIP_CRYPTO_IMPL_PSA
+
+    config PSA_CRYPTO_SW_ONLY
+	bool
+	default y if BOARD_SIWX917_RB4338A
+	default n
+
+	config PSA_WANT_ALG_SPAKE2P_MATTER
+        bool
+        default y
+    config PSA_WANT_KEY_TYPE_AES
+        bool
+        default y
+    config PSA_WANT_ALG_CCM
+        bool
+        default y
+    config PSA_WANT_ALG_CMAC
+        bool
+        default y
+    config PSA_WANT_ALG_SHA_224
+        bool
+        default y
+    config PSA_WANT_ALG_SHA_256
+        bool
+        default y
+    config PSA_WANT_ALG_ECB_NO_PADDING
+        bool
+        default y
+    config PSA_WANT_KEY_TYPE_ECC_KEY_PAIR
+        bool
+        default y
+    config PSA_WANT_KEY_TYPE_ECC_PUBLIC_KEY
+        bool
+        default y
+    config PSA_WANT_ECC_SECP_R1_256
+        bool
+        default y
+    config PSA_WANT_KEY_TYPE_ECC_KEY_PAIR_BASIC
+        bool
+        default y
+    config PSA_WANT_KEY_TYPE_ECC_KEY_PAIR_IMPORT
+        bool
+        default y
+    config PSA_WANT_KEY_TYPE_ECC_KEY_PAIR_EXPORT
+        bool
+        default y
+    config PSA_WANT_KEY_TYPE_ECC_KEY_PAIR_GENERATE
+        bool
+        default y
+    config PSA_WANT_ALG_PBKDF2_AES_CMAC_PRF_128
+        bool
+        default y
+    config PSA_WANT_ALG_ECDH
+        bool
+        default y
+    config PSA_WANT_ALG_ECDSA
+        bool
+        default y
+    config PSA_WANT_ALG_HKDF
+        bool
+        default y
+    config PSA_WANT_ALG_HMAC
+        bool
+        default y
+    config PSA_WANT_KEY_TYPE_HMAC
+        bool
+        default y
+    config PSA_WANT_ALG_JPAKE
+        bool
+        default y
+    config MBEDTLS_PSA_CRYPTO_C
+        bool
+        default y
+    config MBEDTLS_KEY_EXCHANGE_RSA_ENABLED
+        bool
+        default y
+    config MBEDTLS_KEY_EXCHANGE_RSA_PSK_ENABLED
+        bool
+        default y
+	config MBEDTLS_RSA_C
+		bool
+		default y
+	config MBEDTLS_CMAC
+		bool
+		default y		
+    config MBEDTLS_USE_PSA_CRYPTO
+        bool
+        default y
+
+# Extend the maximum number of PSA key slots to fit Matter requirements
+config MBEDTLS_PSA_KEY_SLOT_COUNT
+    default 64
+endif # CHIP_CRYPTO_IMPL_PSA
+
+
+if CHIP_CRYPTO_IMPL_MBEDTLS
+config MBEDTLS_X509_REMOVE_INFO
+	bool
+	default y
+config MBEDTLS_X509_CSR_WRITE_C
+	bool
+	default y
+config MBEDTLS_X509_CRT_WRITE_C
+	bool
+	default y
+config MBEDTLS_X509_CRL_PARSE_C
+	bool
+	default y
+config MBEDTLS_X509_CSR_PARSE_C
+	bool
+	default y
+config MBEDTLS_PKCS5_C
+    bool
+    default y
+config MBEDTLS_PK_WRITE_C
+	bool
+	default y	
+config MBEDTLS_PK_HAVE_ECC_KEYS
+    bool "Enable PK Have ECC Keys"
+    default y
+
+endif # CHIP_CRYPTO_IMPL_MBEDTLS
+
+config MBEDTLS_ENTROPY_C
+    bool
+    default y
+
+config MBEDTLS_ECDH_C
+    bool "Enable ECDH"
+    default y
+
+config MBEDTLS_HKDF_C
+    bool "Enable HKDF"
+    default y
+
+config MBEDTLS_ECDSA_C
+    bool "Enable ECDSA support in MbedTLS"
+    default y
+
+config SECURE_STORAGE
+    bool "Enable secure storage"
+    default y
+
+config MBEDTLS_ECP_NIST_OPTIM
+    bool "Enable ECP NIST Optim"
+    default y
+
+config MBEDTLS_HAVE_ASM
+    bool "Enable ASM"
+    default y
+
+config MBEDTLS_CIPHER_CCM_ENABLED
+    bool 
+    default y
+
+config MBEDTLS_CIPHER_AES_128_CCM
+    bool "Enable AES-128-CCM cipher support in MbedTLS"
+    default y
+
+config MBEDTLS_SSL_OUT_CONTENT_LEN
+    int "Maximum content length for MbedTLS SSL output"
+    default 1560
+
+config MBEDTLS_AES_ONLY_128_BIT_KEY_LENGTH
+    bool "Restrict AES to 128-bit key length in MbedTLS"
+    default y
+
+if BOARD_SIWX917_RB4338A
+config MBEDTLS_AES_ROM_TABLES
+    bool 
+    default y
+
+config MBEDTLS_AES_FEWER_TABLES
+    bool
+    default n
+endif # BOARD_SIWX917_RB4338A
+
+endmenu
+
+
+menu "Silabs Demo Interface"
+
+config SILABS_LOW_POWER
+	bool "Optimize power usage"
+	default n
+
+config SILABS_LED_SUPPORT
+	bool "Enable LED support"
+	default n if SILABS_LOW_POWER
+	default y
+config BUTTONS_SUPPORT
+	bool "Enable Buttons support"
+	default y
+
+config ENABLE_SILABS_LCD
+	bool "Enable LCD Support"
+	default n if SILABS_LOW_POWER
+	default y
+
+endmenu
+
+endmenu
+endif # CHIP

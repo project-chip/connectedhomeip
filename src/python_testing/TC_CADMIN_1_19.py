@@ -31,18 +31,22 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.exceptions import ChipStackError
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+
 from mobly import asserts
-from support_modules.cadmin_support import CADMINSupport
+from support_modules.cadmin_support import CADMINBaseTest
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.exceptions import ChipStackError
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import AttributeValue, TestStep, async_test_body, default_matter_test_main
 
 
-class TC_CADMIN_1_19(MatterBaseTest):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.support = CADMINSupport(self)
+class TC_CADMIN_1_19(CADMINBaseTest):
+    # This test can take a long time to run especially in highly congested lab networks since it creates a lot of fabrics and commissions those to the DUT so we need to increase the timeout to run this test.
+    @property
+    def default_timeout(self) -> int:
+        return 600
 
     def steps_TC_CADMIN_1_19(self) -> list[TestStep]:
         return [
@@ -73,6 +77,9 @@ class TC_CADMIN_1_19(MatterBaseTest):
                      "{resDutSuccess}"),
             TestStep(10, "TH reads the CommissionedFabrics attributes from the Node Operational Credentials cluster.",
                      "Verify this is equal to initial_number_of_fabrics."),
+            TestStep(11, "TH subscribes to the window status attribute", "Success"),
+            TestStep(12, "TH sends the RevokeCommissioning command", "Success"),
+            TestStep(13, "TH waits to receive an attribute report that indicates the window status is closed", "Report is received"),
         ]
 
     def pics_TC_CADMIN_1_19(self) -> list[str]:
@@ -91,7 +98,7 @@ class TC_CADMIN_1_19(MatterBaseTest):
         self.max_window_duration = duration.maxCumulativeFailsafeSeconds
 
         self.step(3)
-        fabrics = await self.support.get_fabrics(th=self.th1)
+        fabrics = await self.get_fabrics(th=self.th1, fabric_filtered=False)
         initial_number_of_fabrics = len(fabrics)
 
         self.step(4)
@@ -110,9 +117,11 @@ class TC_CADMIN_1_19(MatterBaseTest):
             params = await self.open_commissioning_window(dev_ctrl=self.th1, timeout=self.max_window_duration, node_id=self.dut_node_id)
 
             self.step("5b")
-            fids_ca = self.certificate_authority_manager.NewCertificateAuthority(caIndex=fid)
-            fids_fa = fids_ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=fid + 1)
-            fids = fids_fa.NewController(nodeId=fid + 1)
+            # Use a unique fabric ID that won't conflict with existing fabrics
+            new_fabric_idx = fid + initial_number_of_fabrics + 1
+            fids_ca = self.certificate_authority_manager.NewCertificateAuthority()
+            fids_fa = fids_ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=new_fabric_idx)
+            fids = fids_fa.NewController(nodeId=new_fabric_idx)
 
             await fids.CommissionOnNetwork(
                 nodeId=self.dut_node_id, setupPinCode=params.commissioningParameters.setupPinCode,
@@ -137,29 +146,42 @@ class TC_CADMIN_1_19(MatterBaseTest):
         next_fabric = current_fabrics + 1
         fids_ca2 = self.certificate_authority_manager.NewCertificateAuthority(caIndex=next_fabric)
         fids_fa2 = fids_ca2.NewFabricAdmin(vendorId=0xFFF1, fabricId=next_fabric)
-        try:
+        with asserts.assert_raises(ChipStackError) as cm:
             fids2 = fids_fa2.NewController(nodeId=next_fabric)
             await fids2.CommissionOnNetwork(
                 nodeId=self.dut_node_id, setupPinCode=params.commissioningParameters.setupPinCode,
-                filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=params.randomDiscriminator)
-
-        except ChipStackError as e:
-            # When attempting to create a new controller we are expected to get the following response:
-            # src/credentials/FabricTable.cpp:833: CHIP Error 0x0000000B: No memory
-            # Since the FabricTable is full and unable to create any new fabrics
-            self.print_step("Max number of fabrics", "reached")
-            asserts.assert_equal(e.err,  0x0000000B,
-                                 "Expected to return table is full since max number of fabrics has been created already")
+                filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=params.randomDiscriminator
+            )
+        # When attempting to create a new controller we are expected to get the following response:
+        # src/credentials/FabricTable.cpp:833: CHIP Error 0x0000000B: No memory
+        # Since the FabricTable is full and unable to create any new fabrics
+        self.print_step("Max number of fabrics", "reached")
+        asserts.assert_equal(cm.exception.err,  0x0000000B,
+                             "Expected to return table is full since max number of fabrics has been created already")
 
         self.step(9)
         for fab_idx in fabric_idxs:
             removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(fab_idx)
-            await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
+            await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
 
         self.step(10)
         # TH reads the CommissionedFabrics attributes from the Node Operational Credentials cluster.
         current_fabrics = await self.read_single_attribute_check_success(dev_ctrl=self.th1, fabric_filtered=False, endpoint=0, cluster=OC_cluster, attribute=OC_cluster.Attributes.CommissionedFabrics)
         asserts.assert_equal(current_fabrics, initial_number_of_fabrics, "Expected number of fabrics not correct")
+
+        self.step(11)
+        attribute_reports = AttributeSubscriptionHandler(
+            expected_cluster=Clusters.AdministratorCommissioning, expected_attribute=Clusters.AdministratorCommissioning.Attributes.WindowStatus)
+        await attribute_reports.start(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=0)
+
+        self.step(12)
+        revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
+        await self.send_single_cmd(cmd=revokeCmd, dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=0, timedRequestTimeoutMs=6000)
+
+        self.step(13)
+        val = AttributeValue(endpoint_id=0, attribute=Clusters.AdministratorCommissioning.Attributes.WindowStatus,
+                             value=Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen)
+        attribute_reports.await_all_final_values_reported([val], timeout_sec=5)
 
 
 if __name__ == "__main__":

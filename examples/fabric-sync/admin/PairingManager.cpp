@@ -104,7 +104,7 @@ PairingManager::PairingManager() :
 CHIP_ERROR PairingManager::Init(Controller::DeviceCommissioner * commissioner)
 {
     VerifyOrReturnError(commissioner != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    FabricAdmin::Instance().GetDefaultICDClientStorage().UpdateFabricList(commissioner->GetFabricIndex());
+    ReturnErrorOnFailure(FabricAdmin::Instance().GetDefaultICDClientStorage().UpdateFabricList(commissioner->GetFabricIndex()));
     mCommissioner = commissioner;
 
     return CHIP_NO_ERROR;
@@ -282,6 +282,10 @@ void PairingManager::OnPairingDeleted(CHIP_ERROR err)
 
 void PairingManager::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
 {
+    // The pairing delegate OnCommissioningComplete might clear our internal state,
+    // so we need to save the value of mDeviceIsICD before calling it.
+    auto deviceIsICD = mDeviceIsICD;
+
     if (mPairingDelegate)
     {
         mPairingDelegate->OnCommissioningComplete(nodeId, err);
@@ -295,12 +299,12 @@ void PairingManager::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
 
         // mCommissioner has a lifetime that is the entire life of the application itself
         // so it is safe to provide to StartDeviceSynchronization.
-        DeviceSynchronizer::Instance().StartDeviceSynchronization(mCommissioner, nodeId, mDeviceIsICD);
+        DeviceSynchronizer::Instance().StartDeviceSynchronization(mCommissioner, nodeId, deviceIsICD);
     }
     else
     {
         // When ICD device commissioning fails, the ICDClientInfo stored in OnICDRegistrationComplete needs to be removed.
-        if (mDeviceIsICD)
+        if (deviceIsICD)
         {
             CHIP_ERROR deleteEntryError = FabricAdmin::Instance().GetDefaultICDClientStorage().DeleteEntry(
                 ScopedNodeId(nodeId, mCommissioner->GetFabricIndex()));
@@ -344,8 +348,9 @@ void PairingManager::OnICDRegistrationComplete(ScopedNodeId nodeId, uint32_t icd
 {
     char icdSymmetricKeyHex[Crypto::kAES_CCM128_Key_Length * 2 + 1];
 
-    Encoding::BytesToHex(mICDSymmetricKey.Value().data(), mICDSymmetricKey.Value().size(), icdSymmetricKeyHex,
-                         sizeof(icdSymmetricKeyHex), Encoding::HexFlags::kNullTerminate);
+    TEMPORARY_RETURN_IGNORED Encoding::BytesToHex(mICDSymmetricKey.Value().data(), mICDSymmetricKey.Value().size(),
+                                                  icdSymmetricKeyHex, sizeof(icdSymmetricKeyHex),
+                                                  Encoding::HexFlags::kNullTerminate);
 
     app::ICDClientInfo clientInfo;
     clientInfo.peer_node         = nodeId;
@@ -447,7 +452,7 @@ void PairingManager::OnDeviceAttestationCompleted(Controller::DeviceCommissioner
                             "Failed validation: vendorID or productID must not be 0."
                             "Requested VID: %u, Requested PID: %u.",
                             payload.vendorID, payload.productID);
-            deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(
+            TEMPORARY_RETURN_IGNORED deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(
                 device, Credentials::AttestationVerificationResult::kInvalidArgument);
             return;
         }
@@ -459,7 +464,7 @@ void PairingManager::OnDeviceAttestationCompleted(Controller::DeviceCommissioner
                             "Requested VID: %u, Requested PID: %u,"
                             "Detected VID: %u, Detected PID %u.",
                             payload.vendorID, payload.productID, info.BasicInformationVendorId(), info.BasicInformationProductId());
-            deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(
+            TEMPORARY_RETURN_IGNORED deviceCommissioner->ContinueCommissioningAfterDeviceAttestation(
                 device,
                 payload.vendorID == info.BasicInformationVendorId()
                     ? Credentials::AttestationVerificationResult::kDacProductIdMismatch
@@ -496,7 +501,8 @@ CommissioningParameters PairingManager::GetCommissioningParameters()
 
         if (!mICDSymmetricKey.HasValue())
         {
-            Crypto::DRBG_get_bytes(mRandomGeneratedICDSymmetricKey, sizeof(mRandomGeneratedICDSymmetricKey));
+            TEMPORARY_RETURN_IGNORED Crypto::DRBG_get_bytes(mRandomGeneratedICDSymmetricKey,
+                                                            sizeof(mRandomGeneratedICDSymmetricKey));
             mICDSymmetricKey.SetValue(ByteSpan(mRandomGeneratedICDSymmetricKey));
         }
         if (!mICDCheckInNodeId.HasValue())

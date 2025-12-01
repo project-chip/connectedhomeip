@@ -32,7 +32,7 @@ public:
     class EthernetNetworkIterator final : public NetworkIterator
     {
     public:
-        EthernetNetworkIterator(NxpEthDriver * aDriver) : mDriver(aDriver) {}
+        EthernetNetworkIterator() = default;
         size_t Count() { return 1; }
         bool Next(Network & item) override
         {
@@ -60,7 +60,8 @@ public:
     netif * GetEthInetIf() { return &netif_app; };
 
     // BaseDriver
-    NetworkIterator * GetNetworks() override { return new EthernetNetworkIterator(this); };
+    /* current network ID is a concatenation of the prefix "eth_" and the ethernet interface number */
+    NetworkIterator * GetNetworks() override;
     uint8_t GetMaxNetworks() { return 1; }
     CHIP_ERROR Init(NetworkStatusChangeCallback * networkStatusChangeCallback) override;
     void Shutdown()
@@ -75,11 +76,13 @@ public:
     }
 
 private:
+    void OnNetworkStatusChange();
     static void print_ip_addresses(struct netif * netif);
     static void eth_netif_ext_status_callback(struct netif * netif, netif_nsc_reason_t reason,
                                               const netif_ext_callback_args_t * args);
     phy_handle_t phyHandle;
     struct netif netif_app;
+    NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
 };
 
 } // namespace NetworkCommissioning

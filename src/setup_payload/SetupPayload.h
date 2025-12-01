@@ -92,7 +92,8 @@ const int kTotalPayloadDataSizeInBits =
 
 const int kTotalPayloadDataSizeInBytes = kTotalPayloadDataSizeInBits / 8;
 
-const char * const kQRCodePrefix = "MT:";
+inline constexpr const char * kQRCodePrefix = "MT:";
+inline constexpr char kPayloadDelimiter     = '*';
 
 /// The rendezvous type this device supports.
 enum class RendezvousInformationFlag : uint8_t
@@ -102,6 +103,7 @@ enum class RendezvousInformationFlag : uint8_t
     kBLE       = 1 << 1, ///< Device supports BLE
     kOnNetwork = 1 << 2, ///< Device supports Setup on network
     kWiFiPAF   = 1 << 3, ///< Device supports Wi-Fi Public Action Frame for discovery
+    kNFC       = 1 << 4, ///< Device supports NFC-based Commissioning
 };
 using RendezvousInformationFlags = chip::BitFlags<RendezvousInformationFlag, uint8_t>;
 

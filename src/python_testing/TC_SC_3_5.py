@@ -20,25 +20,26 @@
 #     factory-reset: true
 #     quiet: true
 #     script-args: >
-#       --string-arg th_server_app_path:out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app
+#       --string-arg th_server_app_path:${ALL_CLUSTERS_APP}
 #       --storage-path admin_storage.json
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
 import os
 import tempfile
-from time import sleep
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.fault_injection import CHIPFaultId
-from chip.interaction_model import InteractionModelError
-from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter import ChipDeviceCtrl
+from matter.fault_injection import CHIPFaultId
+from matter.interaction_model import InteractionModelError
+from matter.testing.apps import AppServerSubprocess
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 
 class TC_SC_3_5(MatterBaseTest):
@@ -74,13 +75,12 @@ class TC_SC_3_5(MatterBaseTest):
         return "[TC-SC-3.5] CASE Error Handling [DUT_Initiator] "
 
     def pics_TC_SC_3_5(self) -> list[str]:
-        pics = [
+        return [
             "MCORE.ROLE.COMMISSIONER",
         ]
-        return pics
 
     def steps_TC_SC_3_5(self) -> list[TestStep]:
-        steps = [
+        return [
 
             TestStep("precondition", "TH_SERVER has been commissioned to TH_CLIENT", is_commissioning=True),
 
@@ -126,7 +126,6 @@ class TC_SC_3_5(MatterBaseTest):
 
 
         ]
-        return steps
 
     def start_th_server(self):
 
@@ -154,9 +153,9 @@ class TC_SC_3_5(MatterBaseTest):
 
         # Instructing TH Server to accept a new Commissioner, which is the DUT
         params = await self.th_client.OpenCommissioningWindow(
-            nodeid=self.th_server_local_nodeid, timeout=3*60, iteration=10000, discriminator=self.th_server_discriminator, option=1)
+            nodeId=self.th_server_local_nodeid, timeout=3*60, iteration=10000, discriminator=self.th_server_discriminator, option=1)
         new_random_passcode = params.setupPinCode
-        sleep(1)
+        await asyncio.sleep(1)
         logging.info("OpenCommissioningWindow complete")
 
         return new_random_passcode
@@ -165,8 +164,8 @@ class TC_SC_3_5(MatterBaseTest):
         ''' Before reopening Commissioning Window, we need to instruct TH_Server to revoke any active OpenCommissioningWindows '''
 
         revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
-        await self.th_client.SendCommand(nodeid=self.th_server_local_nodeid, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=9000)
-        sleep(1)
+        await self.th_client.SendCommand(nodeId=self.th_server_local_nodeid, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=9000)
+        await asyncio.sleep(1)
 
         return await self.open_commissioning_window()
 
@@ -182,7 +181,7 @@ class TC_SC_3_5(MatterBaseTest):
 
         try:
             await self.th_client.SendCommand(
-                nodeid=self.th_server_local_nodeid,
+                nodeId=self.th_server_local_nodeid,
                 endpoint=0,  # Fault‑Injection cluster lives on EP0
                 payload=command,
             )

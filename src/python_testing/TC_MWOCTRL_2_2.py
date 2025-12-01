@@ -37,10 +37,11 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 # This test requires several additional command line arguments
 # run with
@@ -75,7 +76,7 @@ class TC_MWOCTRL_2_2(MatterBaseTest):
         return "[TC-MWOCTRL-2.2] Secondary functionality with DUT as Server"
 
     def steps_TC_MWOCTRL_2_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Set MinPowerValue variable"),
             TestStep(3, "Read the MinPower attribute"),
@@ -94,19 +95,21 @@ class TC_MWOCTRL_2_2(MatterBaseTest):
             TestStep(16, "If PowerStep=1, exit test case."),
             TestStep(17, "Set PowerSetting to a value that is not an integer multiple of PowerStep"),
         ]
-        return steps
 
     def pics_TC_MWOCTRL_2_2(self) -> list[str]:
-        pics = [
+        return [
             "MWOCTRL.S",
             "MWOCTRL.S.F00",
         ]
-        return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_MWOCTRL_2_2(self):
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(1)
         attributes = Clusters.MicrowaveOvenControl.Attributes
@@ -117,7 +120,7 @@ class TC_MWOCTRL_2_2(MatterBaseTest):
 
         if not is_pwrnum_feature_supported:
             logging.info("PWRNUM is not supported so skipping remaining test steps")
-            self.skip_all_remaining_steps(2)
+            self.mark_all_remaining_steps_skipped(2)
             return
 
         logging.info("The PWRNUM feature is supported so continuing with remaining test steps")

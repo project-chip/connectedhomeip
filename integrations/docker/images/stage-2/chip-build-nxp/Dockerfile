@@ -10,13 +10,14 @@ RUN set -x \
 
 WORKDIR /opt/nxp/
 
-ARG NXP_SDK_EXAMPLE_PATH=nxp_matter_support/github_sdk/sdk_next/repo/mcuxsdk/examples
-
 RUN set -x \
-    && git clone --branch manifest-update-for-sdk-25-03 https://github.com/NXP/nxp_matter_support.git \
+    && git clone https://github.com/NXP/nxp_matter_support.git \
+    && cd nxp_matter_support \
+    # Checkout commit aligned with updated west manifest using MCUX SDK 25.06.00,
+    # including patches for Matter support in specific components
+    && git checkout deb06197654ed2e4a688be05467a0954b91fd61d \
     && pip3 install --break-system-packages -U --no-cache-dir west \
-    && ./nxp_matter_support/scripts/update_nxp_sdk.py --platform common \
-    && cd $NXP_SDK_EXAMPLE_PATH \
+    && ./scripts/update_nxp_sdk.py --platform common \
     && : # last line
 
 FROM ghcr.io/project-chip/chip-build:${VERSION}

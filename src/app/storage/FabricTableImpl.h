@@ -27,6 +27,51 @@ namespace app {
 namespace Storage {
 
 /**
+ * @brief Container which exposes various compile-time constants for specializations
+ * of FabricTableImpl.
+ */
+template <class StorageId, class StorageData>
+class DefaultSerializer
+{
+public:
+    // gcc bug prevents us from using a static variable; see:
+    // https://stackoverflow.com/questions/50638053/constexpr-static-data-member-without-initializer
+    // The number of bytes used by an entry (StorageData) + its metadata when persisting to storage
+    static constexpr size_t kEntryMaxBytes();
+    // The number of bytes used by an ID (StorageId)
+    static constexpr size_t kIdMaxBytes() { return TLV::EstimateStructOverhead(sizeof(StorageId)); }
+    // The number of bytes used by FabricEntryData, which is dependent on the size of StorageId
+    static constexpr size_t kFabricMaxBytes()
+    {
+        return TLV::EstimateStructOverhead(sizeof(uint8_t), // entry_count
+                                           kMaxPerFabric() * kIdMaxBytes());
+    }
+    // The max number of entries per fabric; this value directly affects memory usage
+    static constexpr uint16_t kMaxPerFabric();
+    // The max number of entries for the endpoint (programmatic limit)
+    static constexpr uint16_t kMaxPerEndpoint();
+
+    DefaultSerializer() {}
+    ~DefaultSerializer(){};
+
+    static CHIP_ERROR SerializeId(TLV::TLVWriter & writer, const StorageId & id);
+    static CHIP_ERROR DeserializeId(TLV::TLVReader & reader, StorageId & id);
+
+    static CHIP_ERROR SerializeData(TLV::TLVWriter & writer, const StorageData & data);
+    static CHIP_ERROR DeserializeData(TLV::TLVReader & reader, StorageData & data);
+
+    static StorageKeyName EndpointEntryCountKey(EndpointId endpoint);
+    // The key for persisting the data for a fabric
+    static StorageKeyName FabricEntryDataKey(FabricIndex fabric, EndpointId endpoint);
+    // The key for persisting the data for an entry in a fabric; FabricEntryDataKey should be a root prefix
+    // of this key, such that removing a fabric removes all its entries
+    static StorageKeyName FabricEntryKey(FabricIndex fabric, EndpointId endpoint, uint16_t idx);
+
+    // Clears the data to default values
+    static void Clear(StorageData & data) { data.Clear(); }
+}; // class DefaultSerializer
+
+/**
  * @brief Implementation of a storage accessor in nonvolatile storage of a templatized table that stores by fabric index.
  *        This class does not actually hold the entries, but rather acts as a wrapper/accessor around the storage layer,
  *        reading entries from the storage pointed to by calling SetEndpoint.
@@ -34,14 +79,16 @@ namespace Storage {
  * FabricTableImpl is an implementation that allows to store arbitrary entities using PersistentStorageDelegate.
  * It handles the storage of entities by their StorageId and EnpointId over multiple fabrics.
  */
-template <class StorageId, class StorageData, size_t kIteratorsMax>
+template <class StorageId, class StorageData>
 class FabricTableImpl
 {
-    using TableEntry    = Data::TableEntry<StorageId, StorageData>;
-    using EntryIterator = CommonIterator<TableEntry>;
-    using EntryIndex    = Data::EntryIndex;
+    using TableEntry = Data::TableEntryRef<StorageId, StorageData>;
 
 public:
+    using EntryIterator = CommonIterator<TableEntry>;
+    using EntryIndex    = Data::EntryIndex;
+    using Serializer    = DefaultSerializer<StorageId, StorageData>;
+
     virtual ~FabricTableImpl() { Finish(); };
 
     CHIP_ERROR Init(PersistentStorageDelegate & storage);
@@ -65,9 +112,33 @@ public:
 
     // Data
     CHIP_ERROR GetRemainingCapacity(FabricIndex fabric_index, uint8_t & capacity);
-    CHIP_ERROR SetTableEntry(FabricIndex fabric_index, const TableEntry & entry);
-    CHIP_ERROR GetTableEntry(FabricIndex fabric_index, StorageId entry_id, TableEntry & entry);
-    CHIP_ERROR RemoveTableEntry(FabricIndex fabric_index, StorageId entry_id);
+
+    /**
+     * @brief Writes the entry to persistent storage.
+     * @param fabric_index the fabric to write the entry to
+     * @param entry_id the unique entry identifier
+     * @param data the source data
+     * @param writeBuffer the buffer that will be used to write the data before being persisted; PersistentStorageDelegate does not
+     * offer a way to stream bytes to be written
+     */
+    template <size_t kEntryMaxBytes>
+    CHIP_ERROR SetTableEntry(FabricIndex fabric_index, const StorageId & entry_id, const StorageData & data,
+                             PersistentStore<kEntryMaxBytes> & writeBuffer);
+
+    /**
+     * @brief Loads the entry from persistent storage.
+     * @param fabric_index the fabric to load the entry from
+     * @param entry_id the unique entry identifier
+     * @param data the target for the loaded data
+     * @param buffer the buffer that will be used to load from persistence; some data types in the data argument, such as
+     * DecodableList, point directly into the buffer, and as such for those types of structures the lifetime of the buffer needs to
+     * be equal to or greater than data
+     */
+    template <size_t kEntryMaxBytes>
+    CHIP_ERROR GetTableEntry(FabricIndex fabric_index, StorageId & entry_id, StorageData & data,
+                             PersistentStore<kEntryMaxBytes> & buffer);
+    CHIP_ERROR FindTableEntry(FabricIndex fabric_index, const StorageId & entry_id, EntryIndex & idx);
+    CHIP_ERROR RemoveTableEntry(FabricIndex fabric_index, const StorageId & entry_id);
     CHIP_ERROR RemoveTableEntryAtPosition(EndpointId endpoint, FabricIndex fabric_index, EntryIndex entry_idx);
 
     // Fabrics
@@ -82,6 +153,19 @@ public:
     void SetTableSize(uint16_t endpointEntryTableSize, uint16_t maxPerFabric);
     bool IsInitialized() { return (mStorage != nullptr); }
 
+    /**
+     * @brief Iterates through all entries in fabric, calling iterateFn with the allocated iterator.
+     * @tparam kEntryMaxBytes size of the buffer for loading entries, should match DefaultSerializer::kEntryMaxBytes
+     * @tparam UnaryFunc a function of type std::function<CHIP_ERROR(EntryIterator & iterator)>; template arg for GCC inlining
+     * efficiency
+     * @param fabric the fabric to iterate entries for
+     * @param store the in-memory buffer that an entry will be read into
+     * @param iterateFn a function that will be called with the iterator; if this function returns an error result, iteration stops
+     * and IterateEntries returns that same error result.
+     */
+    template <size_t kEntryMaxBytes, class UnaryFunc>
+    CHIP_ERROR IterateEntries(FabricIndex fabric, PersistentStore<kEntryMaxBytes> & store, UnaryFunc iterateFn);
+
 protected:
     // This constructor is meant for test purposes, it allows to change the defined max for entries per fabric and global, which
     // allows to simulate OTA where this value was changed
@@ -95,20 +179,23 @@ protected:
     /**
      * @brief Implementation of an iterator over the elements in the FabricTableImpl.
      *
-     * If you would like to expose iterators in your subclass of FabricTableImpl, use this class
-     * in an ObjectPool<EntryIteratorImpl> field to allow callers to obtain an iterator.
+     * If you would like to expose iterators in your subclass of FabricTableImpl, you can:
+     * A) Use this class in an ObjectPool<EntryIteratorImpl> field to allow callers to obtain an iterator, with AutoRelease to free
+     * resources B) Use IterateEntries to allocate on stack
      */
+    template <size_t kEntryMaxBytes>
     class EntryIteratorImpl : public EntryIterator
     {
     public:
         EntryIteratorImpl(FabricTableImpl & provider, FabricIndex fabricIdx, EndpointId endpoint, uint16_t maxEntriesPerFabric,
-                          uint16_t maxEntriesPerEndpoint);
+                          uint16_t maxEntriesPerEndpoint, PersistentStore<kEntryMaxBytes> & store);
         size_t Count() override;
         bool Next(TableEntry & output) override;
         void Release() override;
 
     protected:
         FabricTableImpl & mProvider;
+        PersistentStore<kEntryMaxBytes> & mStore;
         FabricIndex mFabric  = kUndefinedFabricIndex;
         EndpointId mEndpoint = kInvalidEndpointId;
         EntryIndex mNextEntryIdx;
@@ -123,38 +210,6 @@ protected:
     EndpointId mEndpointId               = kInvalidEndpointId;
     PersistentStorageDelegate * mStorage = nullptr;
 }; // class FabricTableImpl
-
-template <class StorageId, class StorageData>
-class DefaultSerializer
-{
-public:
-    // gcc bug prevents us from using a static variable; see:
-    // https://stackoverflow.com/questions/50638053/constexpr-static-data-member-without-initializer
-    // The number of bytes used by an entry (StorageData) + its metadata when persisting to storage
-    static constexpr size_t kEntryMaxBytes();
-    // The number of bytes used by FabricEntryData, which is dependent on the size of StorageId
-    static constexpr size_t kFabricMaxBytes();
-    // The max number of entries per fabric; this value directly affects memory usage
-    static constexpr uint16_t kMaxPerFabric();
-    // The max number of entries for the endpoint (programmatic limit)
-    static constexpr uint16_t kMaxPerEndpoint();
-
-    DefaultSerializer() {}
-    ~DefaultSerializer(){};
-
-    static CHIP_ERROR SerializeId(TLV::TLVWriter & writer, const StorageId & id);
-    static CHIP_ERROR DeserializeId(TLV::TLVReader & reader, StorageId & id);
-
-    static CHIP_ERROR SerializeData(TLV::TLVWriter & writer, const StorageData & data);
-    static CHIP_ERROR DeserializeData(TLV::TLVReader & reader, StorageData & data);
-
-    static StorageKeyName EndpointEntryCountKey(EndpointId endpoint);
-    // The key for persisting the data for a fabric
-    static StorageKeyName FabricEntryDataKey(FabricIndex fabric, EndpointId endpoint);
-    // The key for persisting the data for an entry in a fabric; FabricEntryDataKey should be a root prefix
-    // of this key, such that removing a fabric removes all its entries
-    static StorageKeyName FabricEntryKey(FabricIndex fabric, EndpointId endpoint, uint16_t idx);
-}; // class DefaultSerializer
 
 } // namespace Storage
 } // namespace app

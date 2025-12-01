@@ -21,6 +21,7 @@ RUN set -x \
     patch \
     qemu-system-arm \
     xz-utils \
+    gdb-multiarch \
     # Cleanup
     && apt-get clean \
     && rm -rf /var/lib/apt/lists \
@@ -100,13 +101,13 @@ RUN set -x \
     /usr/lib/ \
     # Disable failing systemd services
     && guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda \
-    glob rm $SYSTEMD_SYSTEM/clone_partitions.service : \
-    glob rm $SYSTEMD_SYSTEM/deviced.service : \
-    glob rm $SYSTEMD_SYSTEM/mm-resource-managerd.service : \
-    glob rm $SYSTEMD_SYSTEM/mnt-inform.mount : \
-    glob rm $SYSTEMD_SYSTEM/muse-server.* : \
-    glob rm $SYSTEMD_SYSTEM/murphyd.service : \
-    glob rm $SYSTEMD_SYSTEM/pulseaudio.service \
+    rm-f $SYSTEMD_SYSTEM/clone_partitions.service : \
+    rm-f $SYSTEMD_SYSTEM/deviced.service : \
+    rm-f $SYSTEMD_SYSTEM/mm-resource-managerd.service : \
+    rm-f $SYSTEMD_SYSTEM/mnt-inform.mount : \
+    glob rm-f $SYSTEMD_SYSTEM/muse-server.* : \
+    rm-f $SYSTEMD_SYSTEM/murphyd.service : \
+    rm-f $SYSTEMD_SYSTEM/pulseaudio.service \
     # Mount Tizen system partition on /opt-ro instead of /opt
     && SYSTEMD_UNIT_OPT_RO_MOUNT=$SYSTEMD_SYSTEM/opt\\x2dro.mount \
     && guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda \

@@ -16,76 +16,76 @@
  *    limitations under the License.
  */
 
+#include "webrtc-abstract.h"
 #include <lib/support/logging/CHIPLogging.h>
+#include <rtc/rtc.hpp>
 #include <webrtc-transport.h>
 
-// Default payload types for codecs used in this example app
-const int kH264CodecPayloadType = 96;
-const int kOpusCodecPayloadType = 111;
-// Random ssrc values for video and audio streams, each media track should have a unique SSRC value to send/receive RTP payload
-const int kVideoSSRC = 42;
-const int kAudioSSRC = 43;
-
-WebrtcTransport::WebrtcTransport(uint16_t sessionID, uint64_t nodeID, std::shared_ptr<rtc::PeerConnection> peerConnection)
+SDPType RtcTypeToSDPType(rtc::Description::Type type)
 {
-    ChipLogProgress(Camera, "WebrtcTransport created for sessionID: %u", sessionID);
-    mSessionID            = sessionID;
-    mNodeID               = nodeID;
-    mPeerConnection       = peerConnection;
-    mVideoSampleTimestamp = 0;
-    mAudioSampleTimestamp = 0;
+    switch (type)
+    {
+    case rtc::Description::Type::Offer:
+        return SDPType::Offer;
+    case rtc::Description::Type::Answer:
+        return SDPType::Answer;
+    case rtc::Description::Type::Pranswer:
+        return SDPType::Pranswer;
+    case rtc::Description::Type::Rollback:
+        return SDPType::Rollback;
+    default:
+        return SDPType::Offer;
+    }
+}
 
-    // TODO: Get the codec details from AV stream management
-    // Create video track
-    auto videoDesc = rtc::Description::Video();
-    videoDesc.addSSRC(kVideoSSRC, "video-send");
-    videoDesc.addH264Codec(kH264CodecPayloadType);
-    mVideoTrack = mPeerConnection->addTrack(videoDesc);
-
-    // Create audio track
-    auto audioDesc = rtc::Description::Audio();
-    audioDesc.addSSRC(kAudioSSRC, "audio-send");
-    audioDesc.addOpusCodec(kOpusCodecPayloadType);
-    mAudioTrack = mPeerConnection->addTrack(audioDesc);
+WebrtcTransport::WebrtcTransport()
+{
+    ChipLogProgress(Camera, "WebrtcTransport created");
+    mRequestArgs = { 0, 0, 0, 0, 0, 0 }; // Initialize request arguments to zero
 }
 
 WebrtcTransport::~WebrtcTransport()
 {
-    ChipLogProgress(Camera, "WebrtcTransport destroyed for sessionID: [%u]", mSessionID);
+    ClosePeerConnection();
+    ChipLogProgress(Camera, "WebrtcTransport destroyed for sessionID: [%u]", mRequestArgs.sessionId);
 }
 
-void WebrtcTransport::SendVideo(const char * data, size_t size, uint16_t videoStreamID)
+void WebrtcTransport::SetCallbacks(OnTransportLocalDescriptionCallback onLocalDescription,
+                                   OnTransportConnectionStateCallback onConnectionState)
 {
-    // ChipLogProgress(Camera, "Sending video data of size: %u bytes", (int) size);
-    auto * b           = reinterpret_cast<const std::byte *>(data);
-    rtc::binary sample = {};
-    sample.assign(b, b + size);
-    // TODO: Get the video stream parameters, payload type from AV stream management
-    // Computing the timestamp based on frame rate 30fps and timestamp unit is microseconds (us)
-    int sampleDurationUs = 1000 * 1000 / 30;
-    rtc::FrameInfo frameInfo(mVideoSampleTimestamp);
-    frameInfo.payloadType = kH264CodecPayloadType;
-    mVideoSampleTimestamp += static_cast<uint32_t>(sampleDurationUs);
-    mVideoTrack->sendFrame(sample, frameInfo);
+    mOnLocalDescription = onLocalDescription;
+    mOnConnectionState  = onConnectionState;
+}
+
+void WebrtcTransport::SetRequestArgs(const RequestArgs & args)
+{
+    mRequestArgs = args;
+}
+
+WebrtcTransport::RequestArgs & WebrtcTransport::GetRequestArgs()
+{
+    return mRequestArgs;
+}
+
+void WebrtcTransport::SendVideo(const chip::ByteSpan & data, int64_t timestamp, uint16_t videoStreamID)
+{
+    if (mLocalVideoTrack)
+    {
+        mLocalVideoTrack->SendFrame(data, timestamp);
+    }
 }
 
 // Implementation of SendAudio method
-void WebrtcTransport::SendAudio(const char * data, size_t size, uint16_t audioStreamID)
+void WebrtcTransport::SendAudio(const chip::ByteSpan & data, int64_t timestamp, uint16_t audioStreamID)
 {
-    auto * b           = reinterpret_cast<const std::byte *>(data);
-    rtc::binary sample = {};
-    sample.assign(b, b + size);
-    // TODO: Get the audio stream parameters, payload type from AV stream management
-    // Default sample rate 48000 Hz, frame duration is 20ms, computing number of samples per frame
-    int samplesPerFrame = (48000 * 20) / 1000;
-    rtc::FrameInfo frameInfo(mAudioSampleTimestamp);
-    frameInfo.payloadType = kOpusCodecPayloadType;
-    mAudioSampleTimestamp += static_cast<uint32_t>(samplesPerFrame);
-    mAudioTrack->sendFrame(sample, frameInfo);
+    if (mLocalAudioTrack)
+    {
+        mLocalAudioTrack->SendFrame(data, timestamp);
+    }
 }
 
 // Implementation of SendAudioVideo method
-void WebrtcTransport::SendAudioVideo(const char * data, size_t size, uint16_t videoStreamID, uint16_t audioStreamID)
+void WebrtcTransport::SendAudioVideo(const chip::ByteSpan & data, uint16_t videoStreamID, uint16_t audioStreamID)
 {
     // Placeholder for actual WebRTC implementation to send synchronized audio/video data
 }
@@ -93,11 +93,140 @@ void WebrtcTransport::SendAudioVideo(const char * data, size_t size, uint16_t vi
 // Implementation of CanSendVideo method
 bool WebrtcTransport::CanSendVideo()
 {
-    return mVideoTrack != nullptr && mPeerConnection != nullptr;
+    return mLocalVideoTrack != nullptr;
 }
 
 // Implementation of CanSendAudio method
 bool WebrtcTransport::CanSendAudio()
 {
-    return mAudioTrack != nullptr && mPeerConnection != nullptr;
+    return mLocalAudioTrack != nullptr;
+}
+
+const char * WebrtcTransport::GetStateStr() const
+{
+    switch (mState)
+    {
+    case State::Idle:
+        return "Idle";
+
+    case State::SendingOffer:
+        return "SendingOffer";
+
+    case State::SendingAnswer:
+        return "SendingAnswer";
+
+    case State::SendingICECandidates:
+        return "SendingICECandidates";
+
+    case State::SendingEnd:
+        return "SendingEnd";
+    }
+    return "N/A";
+}
+
+void WebrtcTransport::MoveToState(const State targetState)
+{
+    mState = targetState;
+    ChipLogProgress(Camera, "WebrtcTransport moving to [ %s ]", GetStateStr());
+}
+
+void WebrtcTransport::SetCommandType(const CommandType commandtype)
+{
+    mCommandType = commandtype;
+}
+
+void WebrtcTransport::Start()
+{
+    if (mPeerConnection.get())
+    {
+        ChipLogProgress(Camera, "Start, mPeerConnection is already created");
+        return;
+    }
+
+    mPeerConnection = CreateWebRTCPeerConnection();
+
+    mPeerConnection->SetCallbacks([this](const std::string & sdp, SDPType type) { this->OnLocalDescription(sdp, type); },
+                                  [this](const ICECandidateInfo & candidateInfo) { this->OnICECandidate(candidateInfo); },
+                                  [this](bool connected) { this->OnConnectionStateChanged(connected); },
+                                  [this](std::shared_ptr<WebRTCTrack> track) { this->OnTrack(track); });
+}
+
+void WebrtcTransport::Stop()
+{
+    if (mPeerConnection != nullptr)
+    {
+        mPeerConnection->Close();
+    }
+
+    mLocalVideoTrack = nullptr;
+    mLocalAudioTrack = nullptr;
+}
+
+void WebrtcTransport::AddVideoTrack(const std::string & videoMid, int payloadType)
+{
+    if (mPeerConnection != nullptr)
+    {
+        // Adding local tracks to send video data to remote peer
+        mLocalVideoTrack = mPeerConnection->AddTrack(MediaType::Video, videoMid, payloadType);
+    }
+}
+
+void WebrtcTransport::AddAudioTrack(const std::string & audioMid, int payloadType)
+{
+    if (mPeerConnection != nullptr)
+    {
+        // Adding local tracks to send audio data to remote peer
+        mLocalAudioTrack = mPeerConnection->AddTrack(MediaType::Audio, audioMid, payloadType);
+    }
+}
+
+void WebrtcTransport::AddRemoteCandidate(const std::string & candidate, const std::string & mid)
+{
+    ChipLogProgress(Camera, "Adding remote candidate for sessionID: %u", mRequestArgs.sessionId);
+    mPeerConnection->AddRemoteCandidate(candidate, mid);
+}
+
+// WebRTC Callbacks
+void WebrtcTransport::OnLocalDescription(const std::string & sdp, SDPType type)
+{
+    ChipLogProgress(Camera, "Local description received for sessionID: %u", mRequestArgs.sessionId);
+    mLocalSdp     = sdp;
+    mLocalSdpType = type;
+    if (mOnLocalDescription)
+        mOnLocalDescription(sdp, type, mRequestArgs.sessionId);
+}
+
+bool WebrtcTransport::ClosePeerConnection()
+{
+    if (mPeerConnection == nullptr)
+    {
+        return false;
+    }
+    mPeerConnection->Close();
+    mPeerConnection.reset();
+
+    return true;
+}
+
+void WebrtcTransport::OnICECandidate(const ICECandidateInfo & candidateInfo)
+{
+    ChipLogProgress(Camera, "ICE Candidate received for sessionID: %u", mRequestArgs.sessionId);
+    mLocalCandidates.push_back(candidateInfo);
+    ChipLogProgress(Camera, "Local Candidate:");
+    ChipLogProgress(Camera, "%s", candidateInfo.candidate.c_str());
+    ChipLogProgress(Camera, "  mid: %s, mlineIndex: %d", candidateInfo.mid.c_str(), candidateInfo.mlineIndex);
+}
+
+void WebrtcTransport::OnConnectionStateChanged(bool connected)
+{
+    ChipLogProgress(Camera, "Connection state changed for sessionID: %u", mRequestArgs.sessionId);
+    if (mOnConnectionState)
+        mOnConnectionState(connected, mRequestArgs.sessionId);
+}
+
+void WebrtcTransport::OnTrack(std::shared_ptr<WebRTCTrack> track)
+{
+    // Only logging the track addition here as it's not used in the current implementation. In future, we can add functionality to
+    // handle
+    ChipLogProgress(Camera, "Remote track added for the sessionID: %u, type: %s", mRequestArgs.sessionId, track->GetType().c_str());
 }

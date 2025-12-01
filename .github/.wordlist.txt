@@ -80,12 +80,17 @@ armeabi
 armino
 ARMmbed
 armv
+ARD
+SCL
+SDA
+VCC
 ASAN
 asdk
 ASR
 AssertionError
 AST
 ASYNC
+AsyncZeroconfServiceTypes
 ATL
 ATLs
 atomics
@@ -127,6 +132,7 @@ BallastConfiguration
 BarrierControl
 BasicCHIPRegression
 BasicInformation
+Batcher
 baudrate
 BCM
 BD
@@ -139,6 +145,7 @@ betaprogram
 BinaryInputBasic
 Binfmt
 bitbake
+bitrate
 bld
 BLE
 BleApplicationDelegate
@@ -255,6 +262,7 @@ ClusterName
 ClusterObjectTests
 ClusterRevision
 ClusterTestGeneration
+CMAC
 cmake
 CMakeLists
 CMD
@@ -265,6 +273,7 @@ cn
 COAP
 codeaurora
 codebase
+codec
 codegen
 CodeGenerator
 CodeLab
@@ -272,8 +281,8 @@ codelabs
 ColorControl
 Combinators
 Comcast
-Commandline
 CommandHandlerInterface
+Commandline
 CommandName
 Commissionable
 CommissionableDataProvider
@@ -301,13 +310,14 @@ connstring
 conntype
 const
 ContentApp
-ContentApp's
 ContentAppPlatform
+ContentApp's
 ContentLaunch
 ContentLauncher
 contrib
 controllee
 conv
+Cooktop
 CopperConcentrationMeasurement
 Corstone
 cortexa
@@ -329,6 +339,7 @@ cstdint
 csu
 csv
 ctl
+CTS
 ctrl
 ctypes
 CurrentHue
@@ -443,6 +454,7 @@ DL
 DM
 DMG
 DMM
+DMTT
 DNS
 Dnsmasq
 dnsmasqd
@@ -468,8 +480,8 @@ DS
 DSLS
 duplicative
 DUT
-DUTS
 DUT's
+DUTS
 DV
 DVK
 dynload
@@ -529,10 +541,10 @@ EthernetNetworkDiagnostics
 ethernets
 EthyleneConcentrationMeasurement
 EthyleneOxideConcentrationMeasurement
+EV
 EvalCode
 EvalCodeWithName
 EvalFrameDefault
-EV
 EVB
 EventLogging
 evk
@@ -567,9 +579,10 @@ feff
 ffaa
 ffeebaefa
 FFF
-FFFFFFFFFFFF0102
 fffe
 fffff
+FFFFFFFFFFFF0102
+FFmpeg
 Fi
 filepath
 fini
@@ -584,6 +597,7 @@ formatters
 FOTA
 FreeRTOS
 FreeRTOSConfig
+FRDM
 FS
 fsl
 fstab
@@ -613,13 +627,13 @@ GenericWiFiConfigurationManagerImpl
 GetDeviceId
 GetDeviceInfo
 GetDns
-getter
-getters
 GetInDevelopmentTests
 GetIP
 getManualTests
 GetSafeAttributePersistenceProvider
 getstarted
+getter
+getters
 GH
 ghcr
 ghp
@@ -672,9 +686,10 @@ HomePod
 HomePods
 hostapd
 hostname
+hotfixes
 href
-HSM
 hsm
+HSM
 HTTPS
 Humidistat
 HW
@@ -755,14 +770,14 @@ itemName
 iterable
 itsfoss
 IW
-JDK
-jinja
 JCM
+JDK
+jf
+jinja
 JLink
 JLinkExe
 JLinkRTTClient
 JN
-jf
 jni
 jpg
 jre
@@ -833,6 +848,8 @@ LightingApp
 LightingColor
 LightingState
 LinkSoftwareAndDocumentationPack
+linter
+linters
 lladdr
 LocalConfigDisabled
 localedef
@@ -840,6 +857,7 @@ localhost
 LocalizationConfiguration
 localstatedir
 LockingState
+lookups
 LogEvent
 loopback
 LowPower
@@ -892,6 +910,7 @@ mcumgr
 MCUs
 mcux
 MCUXpresso
+MCXW
 mdash
 MDNS
 MediaInput
@@ -952,6 +971,7 @@ Murata
 mutex
 mutexes
 mv
+mve
 MX
 mydir
 MyPASSWORD
@@ -1023,7 +1043,6 @@ OnOffSwitchConfiguration
 OnPlatformEvent
 onwards
 OO
-openiotsdk
 openjdk
 OpenOCD
 OpenSSL
@@ -1040,6 +1059,7 @@ optionOverride
 optionsMask
 optionsOverride
 orgs
+Orchestrator
 OSS
 OTA
 OTADownloader
@@ -1135,6 +1155,7 @@ PowerProfile
 PowerSource
 PowerSourceConfiguration
 pre
+PrebuiltDataModelDirectory
 preprocessor
 Presetup
 PressureMeasurement
@@ -1158,6 +1179,7 @@ PRs
 PSA
 PSCAN
 PSECT
+Pseudocode
 PSK
 PSoC
 PTR
@@ -1228,8 +1250,8 @@ repo
 repos
 req
 Requestor
-Requestor's
 RequestorCanConsent
+Requestor's
 Requestors
 responder
 RestrictedEvent
@@ -1242,6 +1264,7 @@ RGB
 riscv
 rloc
 rmw
+rnd
 rodata
 Rollershade
 rootfs
@@ -1261,17 +1284,19 @@ rtd
 RTL
 rtld
 RTOS
+RTS
 RTT
 RTX
 runArgs
-runIf
 RUNAS
+runIf
 RunMain
 runtime
 RVC
 rw
 RXD
 sandboxed
+sankey
 saveAs
 saveDataVersschemaionAs
 sbin
@@ -1287,8 +1312,8 @@ SDB
 SDC
 SDHC
 SDK
-SDK's
 sdkconfig
+SDK's
 SDKs
 SDKTARGETSYSROOT
 sdl
@@ -1391,6 +1416,7 @@ SubscribeResponse
 SubscriptionId
 substeps
 subtype
+subtypes
 sudo
 SulfateConcentrationMeasurement
 SulfurDioxideConcentrationMeasurement
@@ -1415,6 +1441,7 @@ sysv
 TargetNavigator
 TBD
 tbody
+TBR
 tcl
 TCP
 teardown
@@ -1484,6 +1511,7 @@ TotalTrihalomethanesConcentrationMeasurement
 TPK
 trackAlloc
 trackFree
+transcoder
 TransferSession
 transitionTime
 TransportMgrBase
@@ -1491,8 +1519,8 @@ triaged
 triaging
 TriggerEffect
 TRNG
-trustm
 TrustedRootCertificates
+trustm
 tsan
 TSG
 tsv
@@ -1524,6 +1552,7 @@ Ultrafast
 UNBLUR
 uncommissioned
 Unencrypted
+unfixable
 unfocus
 Unicast
 UniFlash
@@ -1557,8 +1586,8 @@ util
 utils
 UUID
 ux
-validator
 valgrind
+validator
 vcom
 VCP
 Vectorcall
@@ -1584,6 +1613,7 @@ VSC
 VSCode
 WaitNewInputEvent
 WakeOnLan
+Walkthrough
 WantedBy
 watchdogTimeout
 watchOS
@@ -1667,8 +1697,8 @@ zclwrite
 ZephyrConfig
 zephyrproject
 zhengyaohan
+Zeroconf
 Zigbee
 zigbeealliance
 zigbeethread
 zsdk
-TBR

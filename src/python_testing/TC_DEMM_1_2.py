@@ -37,9 +37,10 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from modebase_cluster_check import ModeBaseClusterChecks
+
+import matter.clusters as Clusters
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
@@ -57,18 +58,16 @@ class TC_DEMM_1_2(MatterBaseTest, ModeBaseClusterChecks):
         return "[TC-DEMM-1.2] Cluster attributes with DUT as Server"
 
     def steps_TC_DEMM_1_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "TH reads from the DUT the SupportedModes attribute."),
             TestStep(3, "TH reads from the DUT the CurrentMode attribute."),
         ]
-        return steps
 
     def pics_TC_DEMM_1_2(self) -> list[str]:
-        pics = [
+        return [
             "DEMM.S"
         ]
-        return pics
 
     def validate_no_optimization_modes(self, supported_modes):
         """
@@ -110,11 +109,15 @@ class TC_DEMM_1_2(MatterBaseTest, ModeBaseClusterChecks):
         else:
             logger.info('Extra Check: One or more modes failed No Optimization validation.')
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_DEMM_1_2(self):
 
         # Setup common mode check
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(1)
 

@@ -1,0 +1,88 @@
+/*
+ *
+ *    Copyright (c) 2025 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#pragma once
+
+#include <app/ConcreteCommandPath.h>
+#include <app/clusters/webrtc-transport-requestor-server/WebRTCTransportRequestorCluster.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/TLV.h>
+
+struct IceCandidate
+{
+    const char * candidate;
+    const char * sdpMid;
+    int sdpMLineIndex;
+};
+
+struct OwnedIceCandidate
+{
+    std::unique_ptr<std::string> candidate, sdpMid;
+    int sdpMLineIndex;
+    IceCandidate view{};
+};
+
+// The Python callbacks to call when certain events happen in WebRTCTransportRequestor.
+using OnOfferCallback         = int (*)(uint16_t, const char *);
+using OnAnswerCallback        = int (*)(uint16_t, const char *);
+using OnICECandidatesCallback = int (*)(uint16_t, const IceCandidate *, int);
+using OnEndCallback           = int (*)(uint16_t, uint8_t);
+
+constexpr chip::EndpointId kWebRTCRequesterDynamicEndpointId = 1;
+
+class WebRTCTransportRequestorManager : public chip::app::Clusters::WebRTCTransportRequestor::Delegate
+{
+public:
+    using ICECandidateStruct  = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
+    using WebRTCSessionStruct = chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type;
+    using WebRTCEndReasonEnum = chip::app::Clusters::Globals::WebRTCEndReasonEnum;
+
+    static WebRTCTransportRequestorManager & Instance()
+    {
+        static WebRTCTransportRequestorManager instance;
+        return instance;
+    }
+
+    // methods to be called by python
+    void Init();
+
+    void Shutdown();
+
+    void InitCallbacks(OnOfferCallback onOnOfferCallback, OnAnswerCallback onAnswerCallback,
+                       OnICECandidatesCallback onICECandidatesCallback, OnEndCallback onEndCallback);
+
+    // delegate methods
+    CHIP_ERROR HandleOffer(const WebRTCSessionStruct & session, const OfferArgs & args) override;
+
+    CHIP_ERROR HandleAnswer(const WebRTCSessionStruct & session, const std::string & sdpAnswer) override;
+
+    CHIP_ERROR HandleICECandidates(const WebRTCSessionStruct & session,
+                                   const std::vector<ICECandidateStruct> & candidates) override;
+
+    CHIP_ERROR HandleEnd(const WebRTCSessionStruct & session, WebRTCEndReasonEnum reasonCode) override;
+
+    // method to be called by provider client
+    void UpsertSession(const chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type & session);
+
+private:
+    WebRTCTransportRequestorManager()  = default;
+    ~WebRTCTransportRequestorManager() = default;
+
+    chip::app::LazyRegisteredServerCluster<chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorServer>
+        mWebRTCRegisteredServerCluster;
+};

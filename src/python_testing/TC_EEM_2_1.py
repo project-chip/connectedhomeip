@@ -41,11 +41,12 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_EnergyReporting_Utils import EnergyReportingBaseTestHelper
+
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +62,7 @@ class TC_EEM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
         return ["EEM.S"]
 
     def steps_TC_EEM_2_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("1", "Commissioning, already done",
                      is_commissioning=True),
             TestStep("2", "TH reads Accuracy attribute",
@@ -77,8 +78,6 @@ class TC_EEM_2_1(MatterBaseTest, EnergyReportingBaseTestHelper):
             TestStep("7", "TH reads CumulativeEnergyReset attribute",
                      "Verify that the DUT response contains either null or an CumulativeEnergyResetStruct value."),
         ]
-
-        return steps
 
     @async_test_body
     async def test_TC_EEM_2_1(self):

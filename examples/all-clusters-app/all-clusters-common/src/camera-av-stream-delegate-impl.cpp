@@ -147,7 +147,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamDeallocate
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocate(const SnapshotStreamStruct & allocateArgs,
+Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocate(const SnapshotStreamAllocateArgs & allocateArgs,
                                                                                   uint16_t & outStreamID)
 {
     outStreamID = kInvalidStreamID;
@@ -208,9 +208,14 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamDealloc
     return Status::Success;
 }
 
-void CameraAVStreamManager::OnRankedStreamPrioritiesChanged()
+void CameraAVStreamManager::OnVideoStreamAllocated(const VideoStreamStruct & allocatedStream, StreamAllocationAction action)
 {
-    ChipLogProgress(Zcl, "Ranked stream priorities changed");
+    ChipLogProgress(Zcl, "Video stream has been allocated");
+}
+
+void CameraAVStreamManager::OnStreamUsagePrioritiesChanged()
+{
+    ChipLogProgress(Zcl, "Stream usage priorities changed");
 }
 
 void CameraAVStreamManager::OnAttributeChanged(AttributeId attributeId)
@@ -252,35 +257,44 @@ Protocols::InteractionModel::Status CameraAVStreamManager::CaptureSnapshot(const
 }
 
 CHIP_ERROR
-CameraAVStreamManager::LoadAllocatedVideoStreams(std::vector<VideoStreamStruct> & allocatedVideoStreams)
-{
-    allocatedVideoStreams.clear();
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-CameraAVStreamManager::LoadAllocatedAudioStreams(std::vector<AudioStreamStruct> & allocatedAudioStreams)
-{
-    allocatedAudioStreams.clear();
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-CameraAVStreamManager::LoadAllocatedSnapshotStreams(std::vector<SnapshotStreamStruct> & allocatedSnapshotStreams)
-{
-    allocatedSnapshotStreams.clear();
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
 CameraAVStreamManager::PersistentAttributesLoadedCallback()
 {
-    ChipLogError(Zcl, "Persistent attributes loaded");
+    ChipLogDetail(Zcl, "Persistent attributes loaded");
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+CameraAVStreamManager::OnTransportAcquireAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID)
+{
+    ChipLogDetail(Zcl, "Transport acquired audio/video streams");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+CameraAVStreamManager::OnTransportReleaseAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID)
+{
+    ChipLogDetail(Zcl, "Transport released audio/video streams");
+
+    return CHIP_NO_ERROR;
+}
+
+const std::vector<VideoStreamStruct> & CameraAVStreamManager::GetAllocatedVideoStreams() const
+{
+    return videoStreamStructs;
+}
+
+const std::vector<AudioStreamStruct> & CameraAVStreamManager::GetAllocatedAudioStreams() const
+{
+    return audioStreamStructs;
+}
+
+void CameraAVStreamManager::GetBandwidthForStreams(const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                                                   const Optional<DataModel::Nullable<uint16_t>> & audioStreamId,
+                                                   uint32_t & outBandwidthbps)
+{
+    ChipLogDetail(Zcl, "Get bandwidth for streams called");
 }
 
 void CameraAVStreamManager::InitializeAvailableVideoStreams()
@@ -334,11 +348,28 @@ void emberAfCameraAvStreamManagementClusterInitCallback(EndpointId endpoint)
 
     BitFlags<Feature> features;
     features.Set(Feature::kSnapshot);
+    features.Set(Feature::kVideo);
     features.Set(Feature::kNightVision);
+    features.Set(Feature::kImageControl);
+    features.Set(Feature::kAudio);
+    features.Set(Feature::kPrivacy);
+    features.Set(Feature::kSpeaker);
+    features.Set(Feature::kLocalStorage);
+    features.Set(Feature::kWatermark);
+    features.Set(Feature::kOnScreenDisplay);
+    features.Set(Feature::kHighDynamicRange);
 
+    // Pure optional attributes that aren't covered by a feature flag, or are attested by the server given feature flag settings
     BitFlags<OptionalAttribute> optionalAttrs;
-    optionalAttrs.Set(OptionalAttribute::kNightVision);
+    optionalAttrs.Set(OptionalAttribute::kHardPrivacyModeOn);
     optionalAttrs.Set(OptionalAttribute::kNightVisionIllum);
+    optionalAttrs.Set(OptionalAttribute::kMicrophoneAGCEnabled);
+    optionalAttrs.Set(OptionalAttribute::kStatusLightEnabled);
+    optionalAttrs.Set(OptionalAttribute::kStatusLightBrightness);
+    optionalAttrs.Set(OptionalAttribute::kImageFlipVertical);
+    optionalAttrs.Set(OptionalAttribute::kImageFlipHorizontal);
+    optionalAttrs.Set(OptionalAttribute::kImageRotation);
+
     uint32_t maxConcurrentVideoEncoders  = 1;
     uint32_t maxEncodedPixelRate         = 10000;
     VideoSensorParamsStruct sensorParams = { 4608, 2592, 120, Optional<uint16_t>(30) }; // Typical numbers for Pi camera.
@@ -350,16 +381,16 @@ void emberAfCameraAvStreamManagementClusterInitCallback(EndpointId endpoint)
     AudioCapabilitiesStruct spkrCapabilities{};
     TwoWayTalkSupportTypeEnum twowayTalkSupport                  = TwoWayTalkSupportTypeEnum::kNotSupported;
     std::vector<SnapshotCapabilitiesStruct> snapshotCapabilities = {};
-    uint32_t maxNetworkBandwidth                                 = 64;
+    uint32_t maxNetworkBandwidth                                 = 64 * 1000 * 1000; // 64 Mbps
     std::vector<StreamUsageEnum> supportedStreamUsages           = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
-    std::vector<StreamUsageEnum> rankedStreamPriorities          = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
+    std::vector<StreamUsageEnum> streamUsagePriorities           = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
 
     sCameraAVStreamMgmtClusterServerInstance = std::make_unique<CameraAVStreamMgmtServer>(
         *sCameraAVStreamMgrInstance.get(), endpoint, features, optionalAttrs, maxConcurrentVideoEncoders, maxEncodedPixelRate,
         sensorParams, nightVisionUsesInfrared, minViewport, rateDistortionTradeOffPoints, maxContentBufferSize, micCapabilities,
         spkrCapabilities, twowayTalkSupport, snapshotCapabilities, maxNetworkBandwidth, supportedStreamUsages,
-        rankedStreamPriorities);
-    sCameraAVStreamMgmtClusterServerInstance->Init();
+        streamUsagePriorities);
+    TEMPORARY_RETURN_IGNORED sCameraAVStreamMgmtClusterServerInstance->Init();
 }
 
 void emberAfCameraAvStreamManagementClusterShutdownCallback(EndpointId endpoint)

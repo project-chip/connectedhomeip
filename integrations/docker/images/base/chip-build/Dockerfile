@@ -40,6 +40,8 @@ RUN set -x \
     clang-tidy \
     cmake \
     curl \
+    dbus-daemon \
+    ffmpeg \
     flex \
     g++ \
     generate-ninja \
@@ -54,8 +56,12 @@ RUN set -x \
     lcov \
     libavahi-client-dev \
     libavahi-common-dev \
+    libavcodec-dev \
+    libavformat-dev \
+    libavutil-dev \
     libcairo2-dev \
     libcairo-dev \
+    libcurl4-openssl-dev \
     libdbus-1-dev \
     libdbus-glib-1-dev \
     libdmalloc-dev \
@@ -64,6 +70,7 @@ RUN set -x \
     libglib2.0-dev \
     libgstreamer1.0-0 \
     libgstreamer1.0-dev \
+    libgstreamer-plugins-base1.0-dev \
     libical-dev \
     libjpeg-dev \
     libmbedtls-dev \
@@ -143,6 +150,20 @@ RUN set -x \
     && rm -rf bloaty \
     && : # last line
 
+# Code built with thread sanitizer can sometimes fail to run with an error message
+# similar to the following:
+# FATAL: ThreadSanitizer: unexpected memory mapping 0x7763c5472000-0x7763c5900000
+#
+# This happens for example when the build is executed on a Ubuntu 24.04 host. It
+# is reported to be linked with kernel versions 6.6.6 and higher. In order for the
+# build to succeed ASLR entropy needs to be reduced. This can be done with the
+# sysctl command:
+# sudo sysctl vm.mmap_rnd_bits=28
+#
+# This command is not persistent across reboots. This is desired as reducing
+# ASLR entropy has negative impact on exploit mitigation.
+# Reference: https://github.com/google/sanitizers/issues/1716
+
 # Build glib-2.0 from source with enabled thread sanitizer. This is needed for
 # running CHIP tests with TSAN enabled. When running applications with TSAN
 # all shared libraries should be built with TSAN enabled, otherwise TSAN might
@@ -156,7 +177,8 @@ RUN case ${TARGETPLATFORM} in \
     && export CCACHE_DISABLE=1 PYTHONDONTWRITEBYTECODE=1 \
     && GLIB_VERSION=$(pkg-config --modversion glib-2.0) \
     && git clone --depth=1 --branch=$GLIB_VERSION https://github.com/GNOME/glib.git \
-    && CFLAGS="-O2 -g -fsanitize=thread" meson glib/build glib -Dtests=false \
+    && (CFLAGS="-O2 -g -fsanitize=thread" meson glib/build glib -Dtests=false || \
+    { cat glib/build/meson-logs/meson-log.txt; exit 1; }) \
     && DESTDIR=../build-image ninja -C glib/build install \
     && mv glib/build-image/usr/local/lib64/lib* $LD_LIBRARY_PATH_TSAN \
     && rm -rf glib \

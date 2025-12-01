@@ -54,5 +54,5 @@ Usage examples:
 4. Find out possible target choices:
 
     ```sh
-    ./scripts/build/build_examples.py--log-level fatal targets
+    ./scripts/build/build_examples.py --log-level fatal targets
     ```

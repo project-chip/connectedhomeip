@@ -16,9 +16,8 @@
  *    limitations under the License.
  */
 
-#include <controller/AutoCommissioner.h>
-
 #include <app/InteractionModelTimeout.h>
+#include <controller/AutoCommissioner.h>
 #include <controller/CHIPDeviceController.h>
 #include <credentials/CHIPCert.h>
 #include <lib/support/SafeInt.h>
@@ -36,7 +35,7 @@ using chip::app::DataModel::NullNullable;
 
 AutoCommissioner::AutoCommissioner()
 {
-    SetCommissioningParameters(CommissioningParameters());
+    TEMPORARY_RETURN_IGNORED SetCommissioningParameters(CommissioningParameters());
 }
 
 AutoCommissioner::~AutoCommissioner() {}
@@ -144,7 +143,7 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
     else
     {
         ChipLogProgress(Controller, "Setting attestation nonce to random value");
-        Crypto::DRBG_get_bytes(mAttestationNonce, sizeof(mAttestationNonce));
+        TEMPORARY_RETURN_IGNORED Crypto::DRBG_get_bytes(mAttestationNonce, sizeof(mAttestationNonce));
     }
     mParams.SetAttestationNonce(ByteSpan(mAttestationNonce, sizeof(mAttestationNonce)));
 
@@ -157,7 +156,7 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
     else
     {
         ChipLogProgress(Controller, "Setting CSR nonce to random value");
-        Crypto::DRBG_get_bytes(mCSRNonce, sizeof(mCSRNonce));
+        TEMPORARY_RETURN_IGNORED Crypto::DRBG_get_bytes(mCSRNonce, sizeof(mCSRNonce));
     }
     mParams.SetCSRNonce(ByteSpan(mCSRNonce, sizeof(mCSRNonce)));
 
@@ -185,7 +184,7 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
                 auto span = MutableCharSpan(mTimeZoneNames[i], kMaxTimeZoneNameLen);
                 // The buffer backing "span" is statically allocated and is of size kMaxSupportedTimeZones, so this should never
                 // fail.
-                CopyCharSpanToMutableCharSpan(params.GetTimeZone().Value()[i].name.Value(), span);
+                TEMPORARY_RETURN_IGNORED CopyCharSpanToMutableCharSpan(params.GetTimeZone().Value()[i].name.Value(), span);
                 mTimeZoneBuf[i].name.SetValue(span);
             }
             else
@@ -204,7 +203,7 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         {
             // The buffer backing "span" is statically allocated and is of size kMaxDefaultNtpSize.
             auto span = MutableCharSpan(mDefaultNtp, kMaxDefaultNtpSize);
-            CopyCharSpanToMutableCharSpan(params.GetDefaultNTP().Value().Value(), span);
+            TEMPORARY_RETURN_IGNORED CopyCharSpanToMutableCharSpan(params.GetDefaultNTP().Value().Value(), span);
             auto default_ntp = MakeNullable(CharSpan(mDefaultNtp, params.GetDefaultNTP().Value().Value().size()));
             mParams.SetDefaultNTP(default_ntp);
         }
@@ -274,36 +273,80 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
 
 CommissioningStage AutoCommissioner::GetNextCommissioningStageNetworkSetup(CommissioningStage currentStage, CHIP_ERROR & lastErr)
 {
-    if (IsSecondaryNetworkSupported())
+    if (!IsSomeNetworkSupported())
     {
-        if (TryingSecondaryNetwork())
-        {
-            // Try secondary network interface.
-            return mDeviceCommissioningInfo.network.wifi.endpoint == kRootEndpointId ? CommissioningStage::kThreadNetworkSetup
-                                                                                     : CommissioningStage::kWiFiNetworkSetup;
-        }
-        // Try primary network interface
-        return mDeviceCommissioningInfo.network.wifi.endpoint == kRootEndpointId ? CommissioningStage::kWiFiNetworkSetup
-                                                                                 : CommissioningStage::kThreadNetworkSetup;
+        ChipLogError(Controller, "Network setup is needed, but commissionee does not support any network types we know about");
+        lastErr = CHIP_ERROR_INCORRECT_STATE;
+        return CommissioningStage::kCleanup;
     }
 
-    if (mParams.GetWiFiCredentials().HasValue() && mDeviceCommissioningInfo.network.wifi.endpoint != kInvalidEndpointId)
+    enum class NetworkType
     {
-        return CommissioningStage::kWiFiNetworkSetup;
+        kWiFi,
+        kThread,
+    };
+
+    NetworkType networkToUse;
+    if (TryingSecondaryNetwork())
+    {
+        // Try secondary network interface.
+        networkToUse =
+            mDeviceCommissioningInfo.network.wifi.endpoint == kRootEndpointId ? NetworkType::kThread : NetworkType::kWiFi;
     }
-    if (mParams.GetThreadOperationalDataset().HasValue() && mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId)
+    else if (IsSecondaryNetworkSupported())
     {
+        // Try primary network interface.
+        TryPrimaryNetwork();
+        networkToUse =
+            mDeviceCommissioningInfo.network.wifi.endpoint == kRootEndpointId ? NetworkType::kWiFi : NetworkType::kThread;
+    }
+    else if (mParams.GetWiFiCredentials().HasValue() && mDeviceCommissioningInfo.network.wifi.endpoint != kInvalidEndpointId)
+    {
+        networkToUse = NetworkType::kWiFi;
+    }
+    else if (mParams.GetThreadOperationalDataset().HasValue() &&
+             mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId)
+    {
+        networkToUse = NetworkType::kThread;
+    }
+    else
+    {
+        // If we have ended up here, then the commissionee does not support trying two different
+        // network technologies.  If it did, then either we would have credentials for one of them
+        // and take one of those branches, or we would not have credentials for either one and
+        // IsSecondaryNetworkSupported() would have tested true.
+        //
+        // Also, since we got here, we don't (yet) have credentials for the one network technology
+        // the commissionee supports. Go ahead and just try to use that one network technology,
+        // which should be the primary network (on the root endpoint).
+        //
+        // Note that we don't call TryPrimaryNetwork() here, because that's only used when there
+        // will be a secondary network to try.  Which in this case there isn't.
+        networkToUse =
+            mDeviceCommissioningInfo.network.wifi.endpoint == kRootEndpointId ? NetworkType::kWiFi : NetworkType::kThread;
+    }
+
+    if (networkToUse == NetworkType::kWiFi)
+    {
+        if (mParams.GetWiFiCredentials().HasValue())
+        {
+            // Just go ahead and set that up.
+            return CommissioningStage::kWiFiNetworkSetup;
+        }
+
+        // We need credentials but don't have them.  We need to ask for those.
+        return CommissioningStage::kRequestWiFiCredentials;
+    }
+
+    // networkToUse must be kThread here.
+    if (mParams.GetThreadOperationalDataset().HasValue())
+    {
+        // Just go ahead and set that up.
         return CommissioningStage::kThreadNetworkSetup;
     }
 
-    ChipLogError(Controller, "Required network information not provided in commissioning parameters");
-    ChipLogError(Controller, "Parameters supplied: wifi (%s) thread (%s)", mParams.GetWiFiCredentials().HasValue() ? "yes" : "no",
-                 mParams.GetThreadOperationalDataset().HasValue() ? "yes" : "no");
-    ChipLogError(Controller, "Device supports: wifi (%s) thread(%s)",
-                 mDeviceCommissioningInfo.network.wifi.endpoint == kInvalidEndpointId ? "no" : "yes",
-                 mDeviceCommissioningInfo.network.thread.endpoint == kInvalidEndpointId ? "no" : "yes");
-    lastErr = CHIP_ERROR_INVALID_ARGUMENT;
-    return CommissioningStage::kCleanup;
+    // We need credentials but don't have them.  We need to ask for those.
+    return CommissioningStage::kRequestThreadCredentials;
 }
 
 CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(CommissioningStage currentStage, CHIP_ERROR & lastErr)
@@ -383,15 +426,13 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         return CommissioningStage::kAttestationRevocationCheck;
     case CommissioningStage::kAttestationRevocationCheck:
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-        if (mParams.GetExecuteJCM().ValueOr(false))
+        if (mParams.GetUseJCM().ValueOr(false))
         {
-            return CommissioningStage::kJFValidateNOC;
+            return CommissioningStage::kJCMTrustVerification;
         }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
         return CommissioningStage::kSendOpCertSigningRequest;
-    case CommissioningStage::kJFValidateNOC:
-        return CommissioningStage::kSendVIDVerificationRequest;
-    case CommissioningStage::kSendVIDVerificationRequest:
+    case CommissioningStage::kJCMTrustVerification:
         return CommissioningStage::kSendOpCertSigningRequest;
     case CommissioningStage::kSendOpCertSigningRequest:
         return CommissioningStage::kValidateCSR;
@@ -434,6 +475,16 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
             {
                 // Perform Scan (kScanNetworks) and collect credentials (kNeedsNetworkCreds) right before configuring network.
                 // This order of steps allows the workflow to return to collect credentials again if network enablement fails.
+
+                // TODO: This is broken when we have multiple network commissioning endpoints
+                // We always end up doing the scan on endpoint 0, even if we have disabled that
+                // endpoint and are trying to use the secondary network commissioning endpoint.
+                // We should probably have separate stages for "scan Thread" and "scan Wi-Fi", which
+                // would allow GetEndpoint() to do the right thing.  The IsScanNeeded() check should
+                // also be changed to check the actual endpoint we are going to try to commission
+                // here, not just "all the endpoints".
+                //
+                // See https://github.com/project-chip/connectedhomeip/issues/40755
                 return CommissioningStage::kScanNetworks;
             }
             ChipLogProgress(Controller, "No NetworkScan enabled or WiFi/Thread endpoint not specified, skipping ScanNetworks");
@@ -450,6 +501,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
             return CommissioningStage::kEvictPreviousCaseSessions;
         }
     case CommissioningStage::kScanNetworks:
+    case CommissioningStage::kRequestWiFiCredentials:
+    case CommissioningStage::kRequestThreadCredentials:
         return CommissioningStage::kNeedsNetworkCreds;
     case CommissioningStage::kNeedsNetworkCreds:
         return GetNextCommissioningStageNetworkSetup(currentStage, lastErr);
@@ -480,7 +533,25 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         }
         return CommissioningStage::kEvictPreviousCaseSessions;
     case CommissioningStage::kEvictPreviousCaseSessions:
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    {
+        // If there is no secure session, means commissioning has been continued after the unpowered phase was completed
+        // In such case, move on setup the CASE session over operational network
+        if (!mCommissioneeDeviceProxy->GetSecureSession().HasValue())
+        {
+            return CommissioningStage::kFindOperationalForStayActive;
+        }
+
+        // If the transport is NFC, move to unpowered phase complete to end the first phase of commissioning
+        auto transportType =
+            mCommissioneeDeviceProxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType();
+        return (transportType == Transport::Type::kNfc && mDeviceCommissioningInfo.general.isCommissioningWithoutPower)
+            ? CommissioningStage::kUnpoweredPhaseComplete
+            : CommissioningStage::kFindOperationalForStayActive;
+    }
+#else
         return CommissioningStage::kFindOperationalForStayActive;
+#endif
     case CommissioningStage::kPrimaryOperationalNetworkFailed:
         if (mDeviceCommissioningInfo.network.wifi.endpoint == kRootEndpointId)
         {
@@ -501,6 +572,10 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         return CommissioningStage::kSendComplete;
     case CommissioningStage::kSendComplete:
         return CommissioningStage::kCleanup;
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    case CommissioningStage::kUnpoweredPhaseComplete:
+        return CommissioningStage::kCleanup; // End commissioning (phase 1)
+#endif
 
     // Neither of these have a next stage so return kError;
     case CommissioningStage::kCleanup:
@@ -513,7 +588,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
 // No specific actions to take when an error happens since this command can fail and commissioning can still succeed.
 static void OnFailsafeFailureForCASE(void * context, CHIP_ERROR error)
 {
-    ChipLogProgress(Controller, "ExtendFailsafe received failure response %s\n", chip::ErrorStr(error));
+    ChipLogProgress(Controller, "ExtendFailsafe received failure response: %" CHIP_ERROR_FORMAT, error.Format());
 }
 
 // No specific actions to take upon success.
@@ -549,9 +624,11 @@ EndpointId AutoCommissioner::GetEndpoint(const CommissioningStage & stage) const
 {
     switch (stage)
     {
+    case CommissioningStage::kRequestWiFiCredentials:
     case CommissioningStage::kWiFiNetworkSetup:
     case CommissioningStage::kWiFiNetworkEnable:
         return mDeviceCommissioningInfo.network.wifi.endpoint;
+    case CommissioningStage::kRequestThreadCredentials:
     case CommissioningStage::kThreadNetworkSetup:
     case CommissioningStage::kThreadNetworkEnable:
         return mDeviceCommissioningInfo.network.thread.endpoint;
@@ -571,7 +648,14 @@ CHIP_ERROR AutoCommissioner::StartCommissioning(DeviceCommissioner * commissione
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    if (proxy == nullptr || !proxy->GetSecureSession().HasValue())
+    // Proxy is expected to have a valid secure session before starting to commission. However, in case of continuing
+    // commissioning post unpowered phase, allow proceeding if the stage is evict secure CASE sessions
+    if (proxy == nullptr ||
+        (!proxy->GetSecureSession().HasValue()
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+         && commissioner->GetCommissioningStage() != CommissioningStage::kEvictPreviousCaseSessions
+#endif
+         ))
     {
         ChipLogError(Controller, "Device proxy secure session error");
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -580,8 +664,15 @@ CHIP_ERROR AutoCommissioner::StartCommissioning(DeviceCommissioner * commissione
     mCommissioner            = commissioner;
     mCommissioneeDeviceProxy = proxy;
 
-    auto transportType =
-        mCommissioneeDeviceProxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType();
+    // When commissioning is started after unpowered phase, there will be no secure session since the CASE session first needs to be
+    // setup over operational network. Hence assume transport is UDP in such case.
+    auto transportType = Transport::Type::kUdp;
+    if (mCommissioneeDeviceProxy->GetSecureSession().HasValue())
+    {
+        transportType =
+            mCommissioneeDeviceProxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType();
+    }
+
     mNeedsNetworkSetup = (transportType == Transport::Type::kBle);
 #if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
     mNeedsNetworkSetup = mNeedsNetworkSetup || (transportType == Transport::Type::kNfc);
@@ -590,7 +681,7 @@ CHIP_ERROR AutoCommissioner::StartCommissioning(DeviceCommissioner * commissione
     mNeedsNetworkSetup = mNeedsNetworkSetup || (transportType == Transport::Type::kWiFiPAF);
 #endif
     CHIP_ERROR err               = CHIP_NO_ERROR;
-    CommissioningStage nextStage = GetNextCommissioningStage(CommissioningStage::kSecurePairing, err);
+    CommissioningStage nextStage = GetNextCommissioningStage(commissioner->GetCommissioningStage(), err);
 
     mCommissioner->PerformCommissioningStep(mCommissioneeDeviceProxy, nextStage, mParams, this, GetEndpoint(nextStage),
                                             GetCommandTimeout(mCommissioneeDeviceProxy, nextStage));
@@ -617,6 +708,13 @@ Optional<System::Clock::Timeout> AutoCommissioner::GetCommandTimeout(DeviceProxy
         break;
     case CommissioningStage::kThreadNetworkEnable:
         timeout = System::Clock::Seconds16(mDeviceCommissioningInfo.network.thread.minConnectionTime);
+        break;
+    case CommissioningStage::kScanNetworks:
+        // We're not sure which sort of scan we will do, so just use the larger
+        // of the timeouts we might have.  Note that anything we select here is
+        // still clamped to be at least kMinimumCommissioningStepTimeout below.
+        timeout = System::Clock::Seconds16(
+            std::max(mDeviceCommissioningInfo.network.wifi.maxScanTime, mDeviceCommissioningInfo.network.thread.maxScanTime));
         break;
     case CommissioningStage::kSendNOC:
     case CommissioningStage::kSendOpCertSigningRequest:
@@ -679,6 +777,17 @@ CHIP_ERROR AutoCommissioner::NOCChainGenerated(ByteSpan noc, ByteSpan icac, Byte
     return CHIP_NO_ERROR;
 }
 
+void AutoCommissioner::CleanupCommissioning()
+{
+    ResetNetworkAttemptType();
+    mPAI.Free();
+    mDAC.Free();
+    mCommissioneeDeviceProxy = nullptr;
+    mOperationalDeviceProxy  = OperationalDeviceProxy();
+    mDeviceCommissioningInfo = ReadCommissioningInfo();
+    mNeedsDST                = false;
+}
+
 CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report)
 {
     CompletionStatus completionStatus;
@@ -719,6 +828,10 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
 
             // If we are configured to scan networks, then don't error out.
             // Instead, allow the app to try another network.
+            //
+            // TODO: This doesn't actually work, because in order to provide credentials someone
+            // had to SetWiFiCredentials() or SetThreadOperationalDataset() on our params, so
+            // IsScanNeeded() will no longer test true for that network technology.
             if (IsScanNeeded())
             {
                 if (completionStatus.err == CHIP_NO_ERROR)
@@ -732,9 +845,28 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             }
         }
 
-        if (err != CHIP_NO_ERROR && IsSecondaryNetworkSupported() && !TryingSecondaryNetwork() &&
-            completionStatus.failedStage.HasValue() && completionStatus.failedStage.Value() >= kWiFiNetworkSetup &&
-            completionStatus.failedStage.Value() <= kICDSendStayActive)
+        auto isNetworkFailureStage = [](CommissioningStage stage) {
+            // If we were somewhere between network setup and and trying to finish up commissioning,
+            // treat that as a network failure stage; trying the secondary network might work
+            // better.
+            if (stage >= kWiFiNetworkSetup && stage <= kICDSendStayActive)
+            {
+                return true;
+            }
+
+            // If we were trying to request credentials and failed (because our delegate does not
+            // implement that functionality, for example), treat that as a network failure stage and
+            // try the other network type.
+            if (stage == kRequestThreadCredentials || stage == kRequestWiFiCredentials || stage == kNeedsNetworkCreds)
+            {
+                return true;
+            }
+
+            return false;
+        };
+
+        if (err != CHIP_NO_ERROR && TryingPrimaryNetwork() && completionStatus.failedStage.HasValue() &&
+            isNetworkFailureStage(completionStatus.failedStage.Value()))
         {
             // Primary network failed, disable primary network interface and try secondary network interface.
             TrySecondaryNetwork();
@@ -787,26 +919,6 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
                 }
             }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-            if (mParams.GetExecuteJCM().ValueOr(false) &&
-                (mDeviceCommissioningInfo.JFAdministratorFabricIndex != kUndefinedFabricIndex))
-            {
-                ReturnErrorOnFailure(AllocateMemoryAndCopySpan(mJFAdminRCAC, mDeviceCommissioningInfo.JFAdminRCAC));
-                mParams.SetJFAdminRCAC(mJFAdminRCAC.Span());
-
-                ReturnErrorOnFailure(AllocateMemoryAndCopySpan(mJFAdminICAC, mDeviceCommissioningInfo.JFAdminICAC));
-                mParams.SetJFAdminICAC(mJFAdminICAC.Span());
-
-                ReturnErrorOnFailure(AllocateMemoryAndCopySpan(mJFAdminNOC, mDeviceCommissioningInfo.JFAdminNOC));
-                mParams.SetJFAdminNOC(mJFAdminNOC.Span());
-
-                mParams.SetJFAdminEndpointId(mDeviceCommissioningInfo.JFAdminEndpointId)
-                    .SetJFAdministratorFabricIndex(mDeviceCommissioningInfo.JFAdministratorFabricIndex)
-                    .SetJFAdminFabricId(mDeviceCommissioningInfo.JFAdminFabricTable.fabricId)
-                    .SetJFAdminVendorId(mDeviceCommissioningInfo.JFAdminFabricTable.vendorId);
-            }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-
             break;
         }
         case CommissioningStage::kConfigureTimeZone:
@@ -815,14 +927,14 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
         case CommissioningStage::kSendPAICertificateRequest: {
             auto reportPAISpan = report.Get<RequestedCertificate>().certificate;
 
-            ReturnErrorOnFailure(AllocateMemoryAndCopySpan(mPAI, reportPAISpan));
+            mPAI.CopyFromSpan(reportPAISpan);
             mParams.SetPAI(mPAI.Span());
             break;
         }
         case CommissioningStage::kSendDACCertificateRequest: {
             auto reportDACSpan = report.Get<RequestedCertificate>().certificate;
 
-            ReturnErrorOnFailure(AllocateMemoryAndCopySpan(mDAC, reportDACSpan));
+            mDAC.CopyFromSpan(reportDACSpan);
             mParams.SetDAC(ByteSpan(mDAC.Span()));
             break;
         }
@@ -858,9 +970,17 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             // reference to the operational credential delegate here
             if (mOperationalCredentialsDelegate != nullptr)
             {
-                MutableByteSpan nonce(mCSRNonce);
-                ReturnErrorOnFailure(mOperationalCredentialsDelegate->ObtainCsrNonce(nonce));
-                mParams.SetCSRNonce(ByteSpan(mCSRNonce, sizeof(mCSRNonce)));
+                uint8_t csrNonceBytes[sizeof(mCSRNonce)];
+                MutableByteSpan nonce(csrNonceBytes);
+                CHIP_ERROR csrError = mOperationalCredentialsDelegate->ObtainCsrNonce(nonce);
+                if (csrError != CHIP_ERROR_NOT_IMPLEMENTED)
+                {
+                    ReturnErrorOnFailure(csrError);
+
+                    MutableByteSpan savedCSRNonce(mCSRNonce);
+                    ReturnErrorOnFailure(CopySpanToMutableSpan(nonce, savedCSRNonce));
+                    mParams.SetCSRNonce(savedCSRNonce);
+                }
             }
             break;
         }
@@ -887,21 +1007,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             mOperationalDeviceProxy = report.Get<OperationalNodeFoundData>().operationalProxy;
             break;
         case CommissioningStage::kCleanup:
-            if (IsSecondaryNetworkSupported() && TryingSecondaryNetwork())
-            {
-                ResetTryingSecondaryNetwork();
-            }
-            mPAI.Free();
-            mDAC.Free();
-#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-            mJFAdminRCAC.Free();
-            mJFAdminICAC.Free();
-            mJFAdminNOC.Free();
-#endif
-            mCommissioneeDeviceProxy = nullptr;
-            mOperationalDeviceProxy  = OperationalDeviceProxy();
-            mDeviceCommissioningInfo = ReadCommissioningInfo();
-            mNeedsDST                = false;
+            CleanupCommissioning();
             return CHIP_NO_ERROR;
         default:
             break;
@@ -967,22 +1073,6 @@ CHIP_ERROR AutoCommissioner::PerformStep(CommissioningStage nextStage)
 
     mCommissioner->PerformCommissioningStep(proxy, nextStage, mParams, this, GetEndpoint(nextStage),
                                             GetCommandTimeout(proxy, nextStage));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR AutoCommissioner::AllocateMemoryAndCopySpan(Platform::ScopedMemoryBufferWithSize<uint8_t> & scopedBuffer, ByteSpan span)
-{
-    if (!span.size())
-    {
-        return CHIP_ERROR_INVALID_MESSAGE_LENGTH;
-    }
-
-    if (!scopedBuffer.Alloc(span.size()))
-    {
-        ChipLogError(Controller, "AutoCommissioner: AllocateMemoryAndCopySpan failed");
-        return CHIP_ERROR_NO_MEMORY;
-    }
-    memcpy(scopedBuffer.Get(), span.data(), scopedBuffer.AllocatedSize());
     return CHIP_NO_ERROR;
 }
 

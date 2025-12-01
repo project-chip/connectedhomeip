@@ -30,6 +30,7 @@
 #include <controller/WriteInteraction.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/tests/MessagingContext.h>
 #include <protocols/interaction_model/Constants.h>
 
@@ -202,8 +203,8 @@ TEST_F(TestWrite, TestDataResponse)
         onFailureCbInvoked = true;
     };
 
-    chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
-        sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb);
+    EXPECT_SUCCESS(chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
+        sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 
@@ -243,8 +244,9 @@ TEST_F(TestWrite, TestDataResponseWithAcceptedDataVersion)
 
     chip::Optional<chip::DataVersion> dataVersion;
     dataVersion.SetValue(kAcceptedDataVersion);
-    chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
-        sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb, nullptr, dataVersion);
+    chip::Test::SetVersionTo(kAcceptedDataVersion);
+    EXPECT_SUCCESS(chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
+        sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb, nullptr, dataVersion));
 
     DrainAndServiceIO();
 
@@ -282,8 +284,11 @@ TEST_F(TestWrite, TestDataResponseWithRejectedDataVersion)
     };
 
     chip::Optional<chip::DataVersion> dataVersion(kRejectedDataVersion);
-    chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
-        sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb, nullptr, dataVersion);
+    chip::Test::SetVersionTo(kAcceptedDataVersion);
+    static_assert(kAcceptedDataVersion != kRejectedDataVersion);
+
+    EXPECT_SUCCESS(chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
+        sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb, nullptr, dataVersion));
 
     DrainAndServiceIO();
 
@@ -321,8 +326,8 @@ TEST_F(TestWrite, TestAttributeError)
         onFailureCbInvoked = true;
     };
 
-    Controller::WriteAttribute<Attributes::ListStructOctetString::TypeInfo>(sessionHandle, kTestEndpointId, value, onSuccessCb,
-                                                                            onFailureCb);
+    EXPECT_SUCCESS(Controller::WriteAttribute<Attributes::ListStructOctetString::TypeInfo>(sessionHandle, kTestEndpointId, value,
+                                                                                           onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 
@@ -358,8 +363,8 @@ TEST_F(TestWrite, TestFabricScopedAttributeWithoutFabricIndex)
         onFailureCbInvoked = true;
     };
 
-    chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListFabricScoped::TypeInfo>(
-        sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb);
+    EXPECT_SUCCESS(chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListFabricScoped::TypeInfo>(
+        sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 
@@ -384,8 +389,8 @@ TEST_F(TestWrite, TestMultipleSuccessResponses)
     // not safe to do so.
     auto onFailureCb = [&failureCalls](const ConcreteAttributePath * attributePath, CHIP_ERROR aError) { ++failureCalls; };
 
-    chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::Boolean::TypeInfo>(sessionHandle, kTestEndpointId, true,
-                                                                                           onSuccessCb, onFailureCb);
+    EXPECT_SUCCESS(chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::Boolean::TypeInfo>(
+        sessionHandle, kTestEndpointId, true, onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 
@@ -411,8 +416,8 @@ TEST_F(TestWrite, TestMultipleFailureResponses)
     // not safe to do so.
     auto onFailureCb = [&failureCalls](const ConcreteAttributePath * attributePath, CHIP_ERROR aError) { ++failureCalls; };
 
-    chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::Boolean::TypeInfo>(sessionHandle, kTestEndpointId, true,
-                                                                                           onSuccessCb, onFailureCb);
+    EXPECT_SUCCESS(chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::Boolean::TypeInfo>(
+        sessionHandle, kTestEndpointId, true, onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 
@@ -451,8 +456,8 @@ TEST_F(TestWrite, TestWriteClusterSpecificStatuses)
 
         StatusIB pathStatus = writeCb->GetPathStatus();
         EXPECT_EQ(pathStatus.mStatus, Protocols::InteractionModel::Status::Success);
-        ASSERT_TRUE(pathStatus.mClusterStatus.HasValue());
-        EXPECT_EQ(pathStatus.mClusterStatus.Value(), kExampleClusterSpecificSuccess);
+        ASSERT_TRUE(pathStatus.mClusterStatus.has_value());
+        EXPECT_EQ(*pathStatus.mClusterStatus, kExampleClusterSpecificSuccess); // NOLINT(bugprone-unchecked-optional-access)
 
         EXPECT_EQ(chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 0u);
         EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
@@ -484,8 +489,8 @@ TEST_F(TestWrite, TestWriteClusterSpecificStatuses)
 
         StatusIB pathStatus = writeCb->GetPathStatus();
         EXPECT_EQ(pathStatus.mStatus, Protocols::InteractionModel::Status::Failure);
-        ASSERT_TRUE(pathStatus.mClusterStatus.HasValue());
-        EXPECT_EQ(pathStatus.mClusterStatus.Value(), kExampleClusterSpecificFailure);
+        ASSERT_TRUE(pathStatus.mClusterStatus.has_value());
+        EXPECT_EQ(*pathStatus.mClusterStatus, kExampleClusterSpecificFailure); // NOLINT(bugprone-unchecked-optional-access)
 
         EXPECT_EQ(chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers(), 0u);
         EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);

@@ -130,7 +130,7 @@ void ThreadStackManagerImpl::OnDbusPropertiesChanged(OpenthreadBorderRouter * pr
             if (key == nullptr || value == nullptr)
                 continue;
             // ownership of key and value is still holding by the iter
-            DeviceLayer::SystemLayer().ScheduleLambda([me]() { me->_UpdateNetworkStatus(); });
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([me]() { me->_UpdateNetworkStatus(); });
 
             if (strcmp(key, kPropertyDeviceRole) == 0)
             {
@@ -301,9 +301,7 @@ CHIP_ERROR ThreadStackManagerImpl::_GetThreadProvision(Thread::OperationalDatase
         ReturnErrorOnFailure(mDataset.Init(ByteSpan(data, size)));
     }
 
-    dataset.Init(mDataset.AsByteSpan());
-
-    return CHIP_NO_ERROR;
+    return dataset.Init(mDataset.AsByteSpan());
 }
 
 bool ThreadStackManagerImpl::_IsThreadProvisioned()
@@ -410,7 +408,7 @@ void ThreadStackManagerImpl::_OnThreadBrAttachFinished(GObject * source_object, 
         {
             ChipLogError(DeviceLayer, "Failed to perform finish Thread network scan: %s",
                          err == nullptr ? "unknown error" : err->message);
-            DeviceLayer::SystemLayer().ScheduleLambda([this_]() {
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this_]() {
                 if (this_->mpConnectCallback != nullptr)
                 {
                     // TODO: Replace this with actual thread attach result.
@@ -421,7 +419,7 @@ void ThreadStackManagerImpl::_OnThreadBrAttachFinished(GObject * source_object, 
         }
         else
         {
-            DeviceLayer::SystemLayer().ScheduleLambda([this_]() {
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this_]() {
                 if (this_->mpConnectCallback != nullptr)
                 {
                     // TODO: Replace this with actual thread attach result.
@@ -514,65 +512,57 @@ CHIP_ERROR ThreadStackManagerImpl::_SetPollingInterval(System::Clock::Millisecon
 }
 #endif /* CHIP_CONFIG_ENABLE_ICD_SERVER */
 
-bool ThreadStackManagerImpl::_HaveMeshConnectivity()
-{
-    // TODO: Remove Weave legacy APIs
-    // For a leader with a child, the child is considered to have mesh connectivity
-    // and the leader is not, which is a very confusing definition.
-    // This API is Weave legacy and should be removed.
-
-    ChipLogError(DeviceLayer, "HaveMeshConnectivity has confusing behavior and shouldn't be called");
-    return false;
-}
-
-CHIP_ERROR ThreadStackManagerImpl::_GetAndLogThreadStatsCounters()
-{
-    // TODO: Remove Weave legacy APIs
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR ThreadStackManagerImpl::_GetAndLogThreadTopologyMinimal()
-{
-    // TODO: Remove Weave legacy APIs
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR ThreadStackManagerImpl::_GetAndLogThreadTopologyFull()
-{
-    // TODO: Remove Weave legacy APIs
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
 CHIP_ERROR ThreadStackManagerImpl::_GetPrimary802154MACAddress(uint8_t * buf)
 {
     VerifyOrReturnError(mProxy, CHIP_ERROR_INCORRECT_STATE);
-    guint64 extAddr = openthread_border_router_get_extended_address(mProxy.get());
 
-    for (size_t i = 0; i < sizeof(extAddr); i++)
+    // The ExtendedAddress d-bus property from otbr-agent is defined to not emit changed signals.
+    // This means the generated api, which uses a caching proxy underneath, will not obtain a value
+    // and will always return NULL. In order to retrieve the value in this case, we must directly
+    // call the Get function to get it, then we manually cache locally since it does not change.
+    if (std::all_of(mExtendedAddress, mExtendedAddress + sizeof(mExtendedAddress), [](uint8_t v) { return v == 0; }))
     {
-        buf[sizeof(uint64_t) - i - 1] = (extAddr & UINT8_MAX);
-        extAddr >>= CHAR_BIT;
+        GAutoPtr<GError> err;
+        GAutoPtr<GVariant> response(g_dbus_proxy_call_sync(G_DBUS_PROXY(mProxy.get()), "org.freedesktop.DBus.Properties.Get",
+                                                           g_variant_new("(ss)", "io.openthread.BorderRouter", "ExtendedAddress"),
+                                                           G_DBUS_CALL_FLAGS_NONE, -1, nullptr, &err.GetReceiver()));
+
+        VerifyOrReturnError(err == nullptr, CHIP_ERROR_INTERNAL,
+                            ChipLogError(DeviceLayer, "openthread: failed to read ExtendedAddress property: %s", err->message));
+
+        VerifyOrReturnError(response, CHIP_ERROR_KEY_NOT_FOUND,
+                            ChipLogError(DeviceLayer, "openthread: failed to get a response for ExtendedAddress property"));
+
+        GAutoPtr<GVariant> tupleContent(g_variant_get_child_value(response.get(), 0));
+
+        VerifyOrReturnError(tupleContent, CHIP_ERROR_KEY_NOT_FOUND,
+                            ChipLogError(DeviceLayer, "openthread: failed to find tuple in ExtendedAddress response"));
+
+        GAutoPtr<GVariant> value(g_variant_get_variant(tupleContent.get()));
+
+        VerifyOrReturnError(value, CHIP_ERROR_KEY_NOT_FOUND,
+                            ChipLogError(DeviceLayer, "openthread: failed to find tuple value in ExtendedAddress response"));
+
+        VerifyOrReturnError(g_variant_is_of_type(value.get(), G_VARIANT_TYPE_UINT64), CHIP_ERROR_KEY_NOT_FOUND,
+                            ChipLogError(DeviceLayer, "openthread: ExtendedAddress property returned unexpected type: %s",
+                                         g_variant_get_type_string(value.get())));
+
+        guint64 address_value = g_variant_get_uint64(value.get());
+        for (size_t i = 0; i < sizeof(address_value); i++)
+        {
+            mExtendedAddress[sizeof(mExtendedAddress) - i - 1] = (address_value & UINT8_MAX);
+            address_value >>= CHAR_BIT;
+        }
     }
 
+    memcpy(buf, mExtendedAddress, sizeof(mExtendedAddress));
     return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ThreadStackManagerImpl::_GetExternalIPv6Address(chip::Inet::IPAddress & addr)
-{
-    // TODO: Remove Weave legacy APIs
-    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_GetThreadVersion(uint16_t & version)
 {
     // TODO https://github.com/project-chip/connectedhomeip/issues/30602
     // Needs to be implemented with DBUS io.openthread.BorderRouter Thread API
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR ThreadStackManagerImpl::_GetPollPeriod(uint32_t & buf)
-{
-    // TODO: Remove Weave legacy APIs
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
@@ -610,7 +600,7 @@ void ThreadStackManagerImpl::_OnNetworkScanFinished(GAsyncResult * res)
         {
             ChipLogError(DeviceLayer, "Failed to perform finish Thread network scan: %s",
                          err == nullptr ? "unknown error" : err->message);
-            DeviceLayer::SystemLayer().ScheduleLambda([this]() {
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this]() {
                 if (mpScanCallback != nullptr)
                 {
                     LinuxScanResponseIterator<ThreadScanResponse> iter(nullptr);
@@ -686,7 +676,7 @@ void ThreadStackManagerImpl::_OnNetworkScanFinished(GAsyncResult * res)
         }
     }
 
-    DeviceLayer::SystemLayer().ScheduleLambda([this, scanResult]() {
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, scanResult]() {
         // Note: We cannot post a event in ScheduleLambda since std::vector is not trivial copiable. This results in the use of
         // const_cast but should be fine for almost all cases, since we actually handled the ownership of this element to this
         // lambda.

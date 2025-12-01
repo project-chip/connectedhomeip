@@ -18,7 +18,9 @@
 
 #pragma once
 
+#include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/EventLogging.h>
 #include <app/reporting/reporting.h>
 #include <lib/core/CHIPError.h>
@@ -38,7 +40,13 @@ public:
     MatterContext(EndpointId endpointId) : mEndpointId(endpointId) {}
     virtual ~MatterContext() = default;
 
-    virtual void MarkDirty(AttributeId attributeId) { MatterReportingAttributeChangeCallback(mEndpointId, Id, attributeId); }
+    virtual void MarkDirty(AttributeId attributeId)
+    {
+        MatterReportingAttributeChangeCallback(mEndpointId, Id, attributeId);
+
+        ConcreteAttributePath attributePath(mEndpointId, Id, attributeId);
+        MatterClosureControlClusterServerAttributeChangedCallback(attributePath);
+    }
 
     template <typename EventType>
     CHIP_ERROR GenerateEvent(EventType event)
@@ -46,6 +54,8 @@ public:
         EventNumber eventNumber;
         return LogEvent(event, mEndpointId, eventNumber);
     }
+
+    EndpointId GetEndpointId() const { return mEndpointId; }
 
 private:
     EndpointId mEndpointId = kInvalidEndpointId;

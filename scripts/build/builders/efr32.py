@@ -37,72 +37,68 @@ class Efr32App(Enum):
     def ExampleName(self):
         if self == Efr32App.LIGHT:
             return 'lighting-app'
-        elif self == Efr32App.LOCK:
+        if self == Efr32App.LOCK:
             return 'lock-app'
-        elif self == Efr32App.SWITCH:
+        if self == Efr32App.SWITCH:
             return 'light-switch-app'
-        elif self == Efr32App.WINDOW_COVERING:
+        if self == Efr32App.WINDOW_COVERING:
             return 'window-app'
-        elif self == Efr32App.THERMOSTAT:
+        if self == Efr32App.THERMOSTAT:
             return 'thermostat'
-        elif self == Efr32App.PUMP:
+        if self == Efr32App.PUMP:
             return 'pump-app'
-        elif self == Efr32App.AIR_QUALITY_SENSOR:
+        if self == Efr32App.AIR_QUALITY_SENSOR:
             return 'air-quality-sensor-app'
-        elif self == Efr32App.CLOSURE:
+        if self == Efr32App.CLOSURE:
             return 'closure-app'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
     def AppNamePrefix(self):
         if self == Efr32App.LIGHT:
             return 'matter-silabs-lighting-example'
-        elif self == Efr32App.LOCK:
+        if self == Efr32App.LOCK:
             return 'matter-silabs-lock-example'
-        elif self == Efr32App.SWITCH:
+        if self == Efr32App.SWITCH:
             return 'matter-silabs-light-switch-example'
-        elif self == Efr32App.WINDOW_COVERING:
+        if self == Efr32App.WINDOW_COVERING:
             return 'matter-silabs-window-example'
-        elif self == Efr32App.THERMOSTAT:
+        if self == Efr32App.THERMOSTAT:
             return 'matter-silabs-thermostat-example'
-        elif self == Efr32App.PUMP:
+        if self == Efr32App.PUMP:
             return 'matter-silabs-pump-example'
-        elif self == Efr32App.UNIT_TEST:
+        if self == Efr32App.UNIT_TEST:
             return 'matter-silabs-device_tests'
-        elif self == Efr32App.AIR_QUALITY_SENSOR:
+        if self == Efr32App.AIR_QUALITY_SENSOR:
             return 'matter-silabs-air-quality-sensor-example'
-        elif self == Efr32App.CLOSURE:
+        if self == Efr32App.CLOSURE:
             return 'matter-silabs-closure-example'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
     def FlashBundleName(self):
         if self == Efr32App.LIGHT:
             return 'lighting_app.flashbundle.txt'
-        elif self == Efr32App.LOCK:
+        if self == Efr32App.LOCK:
             return 'lock_app.flashbundle.txt'
-        elif self == Efr32App.SWITCH:
+        if self == Efr32App.SWITCH:
             return 'light_switch_app.flashbundle.txt'
-        elif self == Efr32App.WINDOW_COVERING:
+        if self == Efr32App.WINDOW_COVERING:
             return 'window_app.flashbundle.txt'
-        elif self == Efr32App.THERMOSTAT:
+        if self == Efr32App.THERMOSTAT:
             return 'thermostat_app.flashbundle.txt'
-        elif self == Efr32App.PUMP:
+        if self == Efr32App.PUMP:
             return 'pump_app.flashbundle.txt'
-        elif self == Efr32App.UNIT_TEST:
+        if self == Efr32App.UNIT_TEST:
             return os.path.join('tests', 'efr32_device_tests.flashbundle.txt')
-        elif self == Efr32App.AIR_QUALITY_SENSOR:
+        if self == Efr32App.AIR_QUALITY_SENSOR:
             return 'air_quality_sensor_app.flashbundle.txt'
-        elif self == Efr32App.CLOSURE:
+        if self == Efr32App.CLOSURE:
             return 'closure_app.flashbundle.txt'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception('Unknown app type: %r' % self)
 
     def BuildRoot(self, root):
         if self == Efr32App.UNIT_TEST:
             return os.path.join(root, 'src', 'test_driver', 'efr32')
-        else:
-            return os.path.join(root, 'examples', self.ExampleName(), 'silabs')
+        return os.path.join(root, 'examples', self.ExampleName(), 'silabs')
 
 
 class Efr32Board(Enum):
@@ -121,40 +117,45 @@ class Efr32Board(Enum):
     BRD2605A = 13
     BRD4343A = 14
     BRD4342A = 15
+    BRD2708A = 16
+    BRD2911A = 17
 
     def GnArgName(self):
         if self == Efr32Board.BRD2704B:
             return 'BRD2704B'
-        elif self == Efr32Board.BRD4316A:
+        if self == Efr32Board.BRD4316A:
             return 'BRD4316A'
-        elif self == Efr32Board.BRD4317A:
+        if self == Efr32Board.BRD4317A:
             return 'BRD4317A'
-        elif self == Efr32Board.BRD4318A:
+        if self == Efr32Board.BRD4318A:
             return 'BRD4318A'
-        elif self == Efr32Board.BRD4319A:
+        if self == Efr32Board.BRD4319A:
             return 'BRD4319A'
-        elif self == Efr32Board.BRD4186A:
+        if self == Efr32Board.BRD4186A:
             return 'BRD4186A'
-        elif self == Efr32Board.BRD4187A:
+        if self == Efr32Board.BRD4187A:
             return 'BRD4187A'
-        elif self == Efr32Board.BRD2601B:
+        if self == Efr32Board.BRD2601B:
             return 'BRD2601B'
-        elif self == Efr32Board.BRD4186C:
+        if self == Efr32Board.BRD4186C:
             return 'BRD4186C'
-        elif self == Efr32Board.BRD4187C:
+        if self == Efr32Board.BRD4187C:
             return 'BRD4187C'
-        elif self == Efr32Board.BRD4338A:
+        if self == Efr32Board.BRD4338A:
             return 'BRD4338A'
-        elif self == Efr32Board.BRD2703A:
+        if self == Efr32Board.BRD2703A:
             return 'BRD2703A'
-        elif self == Efr32Board.BRD2605A:
+        if self == Efr32Board.BRD2605A:
             return 'BRD2605A'
-        elif self == Efr32Board.BRD4343A:
+        if self == Efr32Board.BRD4343A:
             return 'BRD4343A'
-        elif self == Efr32Board.BRD4342A:
+        if self == Efr32Board.BRD4342A:
             return 'BRD4342A'
-        else:
-            raise Exception('Unknown board #: %r' % self)
+        if self == Efr32Board.BRD2708A:
+            return 'BRD2708A'
+        if self == Efr32Board.BRD2911A:
+            return 'BRD2911A'
+        raise Exception('Unknown board #: %r' % self)
 
 
 class Efr32Builder(GnBuilder):
@@ -175,7 +176,6 @@ class Efr32Builder(GnBuilder):
                  enable_icd: bool = False,
                  enable_low_power: bool = False,
                  enable_wifi: bool = False,
-                 enable_rs9116: bool = False,
                  enable_wf200: bool = False,
                  enable_917_ncp: bool = False,
                  enable_wifi_ipv4: bool = False,
@@ -230,14 +230,12 @@ class Efr32Builder(GnBuilder):
                 # Wifi SoC platform
                 self.extra_gn_options.append('chip_device_platform=\"SiWx917\"')
             else:
-                if enable_rs9116:
-                    self.extra_gn_options.append('use_rs9116=true chip_device_platform =\"efr32\"')
-                elif enable_wf200:
+                if enable_wf200:
                     self.extra_gn_options.append('use_wf200=true chip_device_platform =\"efr32\"')
                 elif enable_917_ncp:
                     self.extra_gn_options.append('use_SiWx917=true chip_device_platform =\"efr32\"')
                 else:
-                    raise Exception('Wifi usage: ...-wifi-[rs9116|wf200|siwx917]-...')
+                    raise Exception('Wifi usage: ...-wifi-[wf200|siwx917]-...')
 
         if enable_wifi_ipv4:
             self.extra_gn_options.append('chip_enable_wifi_ipv4=true')
@@ -272,10 +270,6 @@ class Efr32Builder(GnBuilder):
 
         if "GSDK_ROOT" in os.environ and not enable_wifi:
             self.extra_gn_options.append(f"openthread_root=\"{sdk_path}/util/third_party/openthread\"")
-
-        if "WISECONNECT_SDK_ROOT" in os.environ:
-            wiseconnect_sdk_path = shlex.quote(os.environ['WISECONNECT_SDK_ROOT'])
-            self.extra_gn_options.append(f"wiseconnect_sdk_root=\"{wiseconnect_sdk_path}\"")
 
         if "WIFI_SDK_ROOT" in os.environ:
             wifi_sdk_path = shlex.quote(os.environ['WIFI_SDK_ROOT'])

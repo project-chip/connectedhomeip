@@ -49,10 +49,10 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <NetworkCommissioningDriver.h>
-#include <app/clusters/network-commissioning/network-commissioning.h>
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 #include <platform/bouffalolab/common/ThreadStackManagerImpl.h>
@@ -73,6 +73,8 @@
 #endif
 #endif
 
+#include <app/clusters/network-commissioning/network-commissioning.h>
+
 #include <AppTask.h>
 #include <plat.h>
 
@@ -87,6 +89,10 @@ chip::app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::BLWiFiDriver::GetInstance()));
 }
 #endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver> sThreadNetworkDriver(0 /*endpointId*/);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 #if CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE
 namespace {
@@ -108,8 +114,8 @@ void ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 
         if (ConnectivityMgr().IsThreadAttached())
         {
-            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec),
-                                                        OTAConfig::InitOTARequestorHandler, nullptr);
+            TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(
+                chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec), OTAConfig::InitOTARequestorHandler, nullptr);
         }
         break;
 #endif
@@ -128,8 +134,8 @@ void ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 
             bl_route_hook_init();
 
-            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec),
-                                                        OTAConfig::InitOTARequestorHandler, nullptr);
+            TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(
+                chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec), OTAConfig::InitOTARequestorHandler, nullptr);
         }
         break;
 #endif
@@ -229,7 +235,7 @@ CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
     ChipLogProgress(NotSpecified, "Initializing CHIP stack");
     ReturnLogErrorOnFailure(PlatformMgr().InitChipStack());
 
-    chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(CHIP_BLE_DEVICE_NAME);
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(CHIP_BLE_DEVICE_NAME);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
@@ -249,7 +255,7 @@ CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
     ReturnErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice));
 #endif
 #endif
-
+    ReturnErrorAndLogOnFailure(sThreadNetworkDriver.Init(), NotSpecified, "Thread network init failed");
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -317,7 +323,7 @@ CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
 #endif
     PrintOnboardingCodes(rendezvousMode);
 
-    PlatformMgr().AddEventHandler(ChipEventHandler, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().AddEventHandler(ChipEventHandler, 0);
 
 #if PW_RPC_ENABLED
     chip::rpc::Init();

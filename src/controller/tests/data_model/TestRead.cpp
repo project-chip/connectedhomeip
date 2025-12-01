@@ -34,6 +34,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/tests/MessagingContext.h>
 #include <protocols/interaction_model/Constants.h>
 #include <system/SystemClock.h>
@@ -67,6 +68,10 @@ const MockNodeConfig & TestMockNodeConfig()
                 Clusters::UnitTesting::Attributes::Int16u::Id,
                 Clusters::UnitTesting::Attributes::ListFabricScoped::Id,
                 Clusters::UnitTesting::Attributes::ListStructOctetString::Id,
+                kPerpetualAttributeid,
+            }),
+            MockClusterConfig(kPerpetualClusterId, {
+                ClusterRevision::Id, FeatureMap::Id, 1
             }),
         }),
         MockEndpointConfig(kMockEndpoint1, {
@@ -249,8 +254,8 @@ TEST_F(TestRead, TestReadAttributeResponse)
         onFailureCbInvoked = true;
     };
 
-    Controller::ReadAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
-        &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb);
+    EXPECT_SUCCESS(Controller::ReadAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
+        &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 
@@ -425,7 +430,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
-            reader.Get(receivedAttribute1);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute1));
             EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
@@ -434,7 +439,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
@@ -443,7 +448,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
@@ -499,7 +504,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
@@ -508,7 +513,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
         delegate.mNumAttributeResponse = 0;
@@ -552,7 +557,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
-            reader.Get(receivedAttribute1);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute1));
             EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
@@ -561,7 +566,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
@@ -570,7 +575,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             uint64_t receivedAttribute3;
-            reader.Get(receivedAttribute3);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute3));
             EXPECT_EQ(receivedAttribute3, mockAttribute3);
         }
 
@@ -579,7 +584,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
         delegate.mNumAttributeResponse = 0;
@@ -627,7 +632,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
-            reader.Get(receivedAttribute1);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute1));
             EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
@@ -636,7 +641,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
@@ -645,7 +650,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
         delegate.mNumAttributeResponse = 0;
@@ -688,7 +693,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
-            reader.Get(receivedAttribute1);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute1));
             EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
@@ -697,7 +702,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
@@ -706,7 +711,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             uint64_t receivedAttribute3;
-            reader.Get(receivedAttribute3);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute3));
             EXPECT_EQ(receivedAttribute3, mockAttribute3);
         }
 
@@ -715,7 +720,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
         delegate.mNumAttributeResponse = 0;
@@ -766,7 +771,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
-            reader.Get(receivedAttribute1);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute1));
             EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
@@ -775,7 +780,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
@@ -784,7 +789,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
         delegate.mNumAttributeResponse = 0;
@@ -832,7 +837,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
-            reader.Get(receivedAttribute1);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute1));
             EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
@@ -841,7 +846,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
@@ -850,7 +855,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
         delegate.mNumAttributeResponse = 0;
@@ -893,7 +898,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
-            reader.Get(receivedAttribute1);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute1));
             EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
@@ -902,7 +907,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
@@ -911,7 +916,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             uint64_t receivedAttribute3;
-            reader.Get(receivedAttribute3);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute3));
             EXPECT_EQ(receivedAttribute3, mockAttribute3);
         }
 
@@ -920,7 +925,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
         delegate.mNumAttributeResponse = 0;
@@ -972,7 +977,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
-            reader.Get(receivedAttribute1);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute1));
             EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
@@ -981,7 +986,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
@@ -990,7 +995,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             uint64_t receivedAttribute3;
-            reader.Get(receivedAttribute3);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute3));
             EXPECT_EQ(receivedAttribute3, mockAttribute3);
         }
 
@@ -999,7 +1004,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
         delegate.mNumAttributeResponse             = 0;
@@ -1058,7 +1063,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
-            reader.Get(receivedAttribute1);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute1));
             EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
@@ -1067,7 +1072,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
-            reader.Get(receivedAttribute1);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute1));
             EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
@@ -1076,7 +1081,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
@@ -1085,7 +1090,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             uint64_t receivedAttribute3;
-            reader.Get(receivedAttribute3);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute3));
             EXPECT_EQ(receivedAttribute3, mockAttribute3);
         }
 
@@ -1094,7 +1099,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
-            reader.Get(receivedAttribute1);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute1));
             EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
         {
@@ -1102,7 +1107,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
@@ -1163,7 +1168,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
-            reader.Get(receivedAttribute1);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute1));
             EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
@@ -1172,7 +1177,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
-            reader.Get(receivedAttribute1);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute1));
             EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
@@ -1181,7 +1186,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
@@ -1190,7 +1195,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             uint64_t receivedAttribute3;
-            reader.Get(receivedAttribute3);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute3));
             EXPECT_EQ(receivedAttribute3, mockAttribute3);
         }
 
@@ -1199,7 +1204,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
-            reader.Get(receivedAttribute1);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute1));
             EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
@@ -1208,7 +1213,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
         delegate.mNumAttributeResponse             = 0;
@@ -1246,7 +1251,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             bool receivedAttribute1;
-            reader.Get(receivedAttribute1);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute1));
             EXPECT_EQ(receivedAttribute1, mockAttribute1);
         }
 
@@ -1255,7 +1260,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             int16_t receivedAttribute2;
-            reader.Get(receivedAttribute2);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute2));
             EXPECT_EQ(receivedAttribute2, mockAttribute2);
         }
 
@@ -1264,7 +1269,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             uint64_t receivedAttribute3;
-            reader.Get(receivedAttribute3);
+            EXPECT_SUCCESS(reader.Get(receivedAttribute3));
             EXPECT_EQ(receivedAttribute3, mockAttribute3);
         }
 
@@ -1273,7 +1278,7 @@ TEST_F(TestRead, TestReadSubscribeAttributeResponseWithCache)
             TLV::TLVReader reader;
             EXPECT_EQ(cache.Get(attributePath, reader), CHIP_NO_ERROR);
             uint8_t receivedAttribute4[256];
-            reader.GetBytes(receivedAttribute4, 256);
+            EXPECT_EQ(reader.GetBytes(receivedAttribute4, 256), CHIP_ERROR_WRONG_TLV_TYPE);
             EXPECT_TRUE(memcmp(receivedAttribute4, mockAttribute4, 256));
         }
         delegate.mNumAttributeResponse = 0;
@@ -1301,8 +1306,8 @@ TEST_F(TestRead, TestReadEventResponse)
 
     auto onDoneCb = [&onDoneCbInvoked](ReadClient * apReadClient) { onDoneCbInvoked = true; };
 
-    Controller::ReadEvent<Clusters::UnitTesting::Events::TestEvent::DecodableType>(
-        &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, onDoneCb);
+    EXPECT_SUCCESS(Controller::ReadEvent<Clusters::UnitTesting::Events::TestEvent::DecodableType>(
+        &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, onDoneCb));
 
     DrainAndServiceIO();
 
@@ -1334,8 +1339,8 @@ TEST_F(TestRead, TestReadAttributeError)
         onFailureCbInvoked = true;
     };
 
-    Controller::ReadAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
-        &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb);
+    EXPECT_SUCCESS(Controller::ReadAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
+        &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 
@@ -1365,8 +1370,8 @@ TEST_F(TestRead, TestReadAttributeTimeout)
         onFailureCbInvoked = true;
     };
 
-    Controller::ReadAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
-        &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb);
+    EXPECT_SUCCESS(Controller::ReadAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
+        &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb));
 
     ExpireSessionAliceToBob();
 
@@ -1388,8 +1393,8 @@ TEST_F(TestRead, TestReadAttributeTimeout)
     // Let's put back the sessions so that the next tests (which assume a valid initialized set of sessions)
     // can function correctly.
     //
-    CreateSessionAliceToBob();
-    CreateSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
@@ -1469,6 +1474,93 @@ TEST_F(TestRead, TestResubscribeAttributeTimeout)
         AttributePathParams attributePathParams[1];
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
         readPrepareParams.mAttributePathParamsListSize = MATTER_ARRAY_SIZE(attributePathParams);
+        attributePathParams[0].mEndpointId             = kTestEndpointId;
+        attributePathParams[0].mClusterId              = Clusters::UnitTesting::Id;
+        attributePathParams[0].mAttributeId            = Clusters::UnitTesting::Attributes::Boolean::Id;
+
+        constexpr uint16_t maxIntervalCeilingSeconds = 1;
+
+        readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
+
+        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        //
+        // Drive servicing IO till we have established a subscription.
+        //
+        GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                    [&]() { return callback.mOnSubscriptionEstablishedCount >= 1; });
+        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
+        EXPECT_EQ(callback.mOnError, 0);
+        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 0);
+
+        ReadHandler * readHandler = InteractionModelEngine::GetInstance()->ActiveHandlerAt(0);
+
+        uint16_t minInterval;
+        uint16_t maxInterval;
+        readHandler->GetReportingIntervals(minInterval, maxInterval);
+
+        //
+        // Disable packet transmission, and drive IO till we have reported a re-subscription attempt.
+        //
+        //
+        GetLoopback().mNumMessagesToDrop = LoopbackTransport::kUnlimitedMessageCount;
+        GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)),
+                                    [&]() { return callback.mOnResubscriptionsAttempted > 0; });
+
+        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 1);
+        EXPECT_EQ(callback.mLastError, CHIP_ERROR_TIMEOUT);
+
+        GetLoopback().mNumMessagesToDrop = 0;
+        callback.ClearCounters();
+
+        //
+        // Drive servicing IO till we have established a subscription.
+        //
+        GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                    [&]() { return callback.mOnSubscriptionEstablishedCount == 1; });
+        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
+
+        //
+        // With re-sub enabled, we shouldn't have encountered any errors
+        //
+        EXPECT_EQ(callback.mOnError, 0);
+        EXPECT_EQ(callback.mOnDone, 0);
+    }
+
+    SetMRPMode(MessagingContext::MRPMode::kDefault);
+
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+//
+// This validates the re-subscription logic within ReadClient that has registered an icd token with the LIT device.
+// This achieves it by overriding the timeout for the liveness timer within ReadClient to be a smaller value than
+// the nominal max interval of the subscription. This causes the subscription to fail on the client side, triggering
+// re-subscription when device is operating as LIT and client has not registered its token in device.
+//
+TEST_F(TestRead, TestResubscribeAttributeTimeoutLITWithoutRegisteringToken)
+{
+    auto sessionHandle = GetSessionBobToAlice();
+
+    SetMRPMode(MessagingContext::MRPMode::kResponsive);
+
+    {
+        TestResubscriptionCallback callback;
+        ReadClient readClient(InteractionModelEngine::GetInstance(), &GetExchangeManager(), callback,
+                              ReadClient::InteractionType::Subscribe);
+
+        callback.SetReadClient(&readClient);
+
+        ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
+
+        // Read full wildcard paths, repeat twice to ensure chunking.
+        AttributePathParams attributePathParams[1];
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+        readPrepareParams.mAttributePathParamsListSize = MATTER_ARRAY_SIZE(attributePathParams);
+        readPrepareParams.mIsPeerLIT                   = true;
+        readPrepareParams.mRegisteredCheckInToken      = false;
         attributePathParams[0].mEndpointId             = kTestEndpointId;
         attributePathParams[0].mClusterId              = Clusters::UnitTesting::Id;
         attributePathParams[0].mAttributeId            = Clusters::UnitTesting::Attributes::Boolean::Id;
@@ -2374,8 +2466,8 @@ TEST_F(TestRead, TestSubscribe_OnActiveModeNotification)
 
         readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
         readPrepareParams.mIsPeerLIT                 = true;
-
-        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
+        readPrepareParams.mRegisteredCheckInToken    = true;
+        auto err                                     = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         //
@@ -2462,8 +2554,8 @@ TEST_F(TestRead, TestSubscribe_SubGoAwayInserverOnActiveModeNotification)
 
         readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
         readPrepareParams.mIsPeerLIT                 = true;
-
-        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
+        readPrepareParams.mRegisteredCheckInToken    = true;
+        auto err                                     = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         //
@@ -2533,8 +2625,8 @@ TEST_F(TestRead, TestSubscribe_MismatchedSubGoAwayInserverOnActiveModeNotificati
 
         readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
         readPrepareParams.mIsPeerLIT                 = true;
-
-        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
+        readPrepareParams.mRegisteredCheckInToken    = true;
+        auto err                                     = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         //
@@ -2589,8 +2681,8 @@ TEST_F(TestRead, TestSubscribeFailed_OnActiveModeNotification)
 
         readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
         readPrepareParams.mIsPeerLIT                 = true;
-
-        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
+        readPrepareParams.mRegisteredCheckInToken    = true;
+        auto err                                     = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         GetLoopback().mNumMessagesToDrop = LoopbackTransport::kUnlimitedMessageCount;
@@ -2659,8 +2751,8 @@ TEST_F(TestRead, TestSubscribe_DynamicLITSubscription)
 
         readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
         readPrepareParams.mIsPeerLIT                 = true;
-
-        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
+        readPrepareParams.mRegisteredCheckInToken    = true;
+        auto err                                     = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         //
@@ -2716,7 +2808,7 @@ TEST_F(TestRead, TestSubscribe_DynamicLITSubscription)
             path.mEndpointId  = kRootEndpointId;
             path.mClusterId   = Clusters::IcdManagement::Id;
             path.mAttributeId = Clusters::IcdManagement::Attributes::OperatingMode::Id;
-            InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
+            EXPECT_SUCCESS(InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path));
         }
         callback.ClearCounters();
         GetIOContext().DriveIOUntil(System::Clock::Seconds16(60),
@@ -2770,8 +2862,8 @@ TEST_F(TestRead, TestSubscribe_ImmediatelyResubscriptionForLIT)
 
         readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
         readPrepareParams.mIsPeerLIT                 = true;
-
-        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
+        readPrepareParams.mRegisteredCheckInToken    = true;
+        auto err                                     = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         //
@@ -3176,8 +3268,8 @@ TEST_F(TestRead, TestReadFabricScopedWithoutFabricFilter)
         onFailureCbInvoked = true;
     };
 
-    Controller::ReadAttribute<Clusters::UnitTesting::Attributes::ListFabricScoped::TypeInfo>(
-        &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, false /* fabric filtered */);
+    EXPECT_SUCCESS(Controller::ReadAttribute<Clusters::UnitTesting::Attributes::ListFabricScoped::TypeInfo>(
+        &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, false /* fabric filtered */));
 
     DrainAndServiceIO();
 
@@ -3230,8 +3322,8 @@ TEST_F(TestRead, TestReadFabricScopedWithFabricFilter)
         onFailureCbInvoked = true;
     };
 
-    Controller::ReadAttribute<Clusters::UnitTesting::Attributes::ListFabricScoped::TypeInfo>(
-        &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, true /* fabric filtered */);
+    EXPECT_SUCCESS(Controller::ReadAttribute<Clusters::UnitTesting::Attributes::ListFabricScoped::TypeInfo>(
+        &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, true /* fabric filtered */));
 
     DrainAndServiceIO();
 
@@ -3297,7 +3389,7 @@ public:
             path.mEndpointId  = aPath.mEndpointId;
             path.mClusterId   = aPath.mClusterId;
             path.mAttributeId = aPath.mAttributeId;
-            InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
+            EXPECT_SUCCESS(InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path));
         }
     }
 
@@ -3378,6 +3470,8 @@ TEST_F(TestRead, TestSubscribeAttributeDeniedNotExistPath)
 TEST_F(TestRead, TestReadHandler_KillOverQuotaSubscriptions)
 {
     // Note: We cannot use DrainAndServiceIO() since the perpetual read will make DrainAndServiceIO never return.
+    CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
+
     using namespace SubscriptionPathQuotaHelpers;
     auto sessionHandle = GetSessionBobToAlice();
 
@@ -3491,7 +3585,7 @@ TEST_F(TestRead, TestReadHandler_KillOverQuotaSubscriptions)
         path.mEndpointId  = kTestEndpointId;
         path.mClusterId   = Clusters::UnitTesting::Id;
         path.mAttributeId = Clusters::UnitTesting::Attributes::Int16u::Id;
-        InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
+        EXPECT_SUCCESS(InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path));
     }
     readCallback.ClearCounters();
 
@@ -3545,7 +3639,7 @@ TEST_F(TestRead, TestReadHandler_KillOverQuotaSubscriptions)
         path.mEndpointId  = kTestEndpointId;
         path.mClusterId   = Clusters::UnitTesting::Id;
         path.mAttributeId = Clusters::UnitTesting::Attributes::Int16u::Id;
-        InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
+        EXPECT_SUCCESS(InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path));
     }
     readCallback.ClearCounters();
     readCallbackFabric2.ClearCounters();
@@ -3647,7 +3741,7 @@ TEST_F(TestRead, TestReadHandler_KillOldestSubscriptions)
         path.mEndpointId  = kTestEndpointId;
         path.mClusterId   = Clusters::UnitTesting::Id;
         path.mAttributeId = Clusters::UnitTesting::Attributes::Int16u::Id;
-        InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path);
+        EXPECT_SUCCESS(InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(path));
     }
     readCallback.ClearCounters();
     DrainAndServiceIO();
@@ -3725,6 +3819,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback2;
             std::vector<std::unique_ptr<ReadClient>> readClients;
 
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
+
             EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest,
                                          AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                          ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
@@ -3768,6 +3864,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback2;
             std::vector<std::unique_ptr<ReadClient>> readClients;
 
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
+
             EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1, AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                          ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
             EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1, AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
@@ -3807,6 +3905,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback1;
             TestPerpetualListReadCallback backgroundReadCallback2;
             std::vector<std::unique_ptr<ReadClient>> readClients;
+
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
 
             EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest,
                                          AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
@@ -3852,6 +3952,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback1;
             TestPerpetualListReadCallback backgroundReadCallback2;
             std::vector<std::unique_ptr<ReadClient>> readClients;
+
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
 
             EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest,
                                          AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
@@ -3901,6 +4003,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback readCallbackForOversizedRead;
             TestPerpetualListReadCallback backgroundReadCallback;
             std::vector<std::unique_ptr<ReadClient>> readClients;
+
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
 
             EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
                                          AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
@@ -3953,6 +4057,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback readCallbackForOversizedRead;
             TestPerpetualListReadCallback backgroundReadCallback;
             std::vector<std::unique_ptr<ReadClient>> readClients;
+
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
 
             EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1, AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                          ReadClient::InteractionType::Read, &backgroundReadCallback, readClients);
@@ -4008,6 +4114,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback;
             std::vector<std::unique_ptr<ReadClient>> readClients;
 
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
+
             EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1, AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                          ReadClient::InteractionType::Read, &backgroundReadCallback, readClients);
             EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
@@ -4053,6 +4161,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback1;
             TestPerpetualListReadCallback backgroundReadCallback2;
             std::vector<std::unique_ptr<ReadClient>> readClients;
+
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
 
             EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1, AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                          ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
@@ -4101,6 +4211,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback1;
             TestPerpetualListReadCallback backgroundReadCallback2;
             std::vector<std::unique_ptr<ReadClient>> readClients;
+
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
 
             EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
                                          AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
@@ -4154,6 +4266,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback3;
             std::vector<std::unique_ptr<ReadClient>> readClients;
 
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
+
             EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1, AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                          ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
             EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1, AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
@@ -4205,6 +4319,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback3;
             std::vector<std::unique_ptr<ReadClient>> readClients;
 
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
+
             EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1, 1, AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                          ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
             EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1, 1, AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
@@ -4253,6 +4369,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback2;
             TestPerpetualListReadCallback backgroundReadCallback3;
             std::vector<std::unique_ptr<ReadClient>> readClients;
+
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
 
             EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest,
                                          AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
@@ -4304,6 +4422,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback2;
             std::vector<std::unique_ptr<ReadClient>> readClients;
 
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
+
             EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest,
                                          AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                          ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
@@ -4350,6 +4470,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback2;
             std::vector<std::unique_ptr<ReadClient>> readClients;
 
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
+
             EstablishReadOrSubscriptions(GetSessionCharlieToDavid(), 1, 1,
                                          AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                          ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
@@ -4391,6 +4513,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback1;
             TestPerpetualListReadCallback backgroundReadCallback2;
             std::vector<std::unique_ptr<ReadClient>> readClients;
+
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
 
             EstablishReadOrSubscriptions(GetSessionCharlieToDavid(), 1, 1,
                                          AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
@@ -4434,6 +4558,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback1;
             TestPerpetualListReadCallback backgroundReadCallback2;
             std::vector<std::unique_ptr<ReadClient>> readClients;
+
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
 
             EstablishReadOrSubscriptions(GetSessionCharlieToDavid(), 1, 1,
                                          AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
@@ -4484,6 +4610,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback2;
             std::vector<std::unique_ptr<ReadClient>> readClients;
 
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
+
             EstablishReadOrSubscriptions(GetSessionCharlieToDavid(), 3,
                                          InteractionModelEngine::kMinSupportedPathsPerReadRequest - 1,
                                          AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
@@ -4533,6 +4661,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback1;
             TestPerpetualListReadCallback backgroundReadCallback2;
             std::vector<std::unique_ptr<ReadClient>> readClients;
+
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
 
             EstablishReadOrSubscriptions(GetSessionCharlieToDavid(), 2,
                                          InteractionModelEngine::kMinSupportedPathsPerReadRequest - 1,
@@ -4762,8 +4892,8 @@ TEST_F(TestRead, TestReadAttribute_ManyDataValues)
     // not safe to do so.
     auto onFailureCb = [&failureCalls](const ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) { ++failureCalls; };
 
-    Controller::ReadAttribute<Clusters::UnitTesting::Attributes::Boolean::TypeInfo>(&GetExchangeManager(), sessionHandle,
-                                                                                    kTestEndpointId, onSuccessCb, onFailureCb);
+    EXPECT_SUCCESS(Controller::ReadAttribute<Clusters::UnitTesting::Attributes::Boolean::TypeInfo>(
+        &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 
@@ -4795,8 +4925,8 @@ TEST_F(TestRead, TestReadAttribute_ManyDataValuesWrongPath)
     // not safe to do so.
     auto onFailureCb = [&failureCalls](const ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) { ++failureCalls; };
 
-    Controller::ReadAttribute<Clusters::UnitTesting::Attributes::Boolean::TypeInfo>(&GetExchangeManager(), sessionHandle,
-                                                                                    kTestEndpointId, onSuccessCb, onFailureCb);
+    EXPECT_SUCCESS(Controller::ReadAttribute<Clusters::UnitTesting::Attributes::Boolean::TypeInfo>(
+        &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 
@@ -4828,8 +4958,8 @@ TEST_F(TestRead, TestReadAttribute_ManyErrors)
     // not safe to do so.
     auto onFailureCb = [&failureCalls](const ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) { ++failureCalls; };
 
-    Controller::ReadAttribute<Clusters::UnitTesting::Attributes::Boolean::TypeInfo>(&GetExchangeManager(), sessionHandle,
-                                                                                    kTestEndpointId, onSuccessCb, onFailureCb);
+    EXPECT_SUCCESS(Controller::ReadAttribute<Clusters::UnitTesting::Attributes::Boolean::TypeInfo>(
+        &GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb));
 
     DrainAndServiceIO();
 

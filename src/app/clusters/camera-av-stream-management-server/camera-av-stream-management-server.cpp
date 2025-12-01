@@ -21,15 +21,20 @@
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
+#include <app/persistence/AttributePersistenceProvider.h>
+#include <app/persistence/AttributePersistenceProviderInstance.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
 #include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/CHIPFaultInjection.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 #include <cmath>
 #include <cstring>
+#include <optional>
+#include <set>
 
 using namespace chip;
 using namespace chip::app;
@@ -38,7 +43,6 @@ using namespace chip::app::Clusters::CameraAvStreamManagement;
 using namespace chip::app::Clusters::CameraAvStreamManagement::Structs;
 using namespace chip::app::Clusters::CameraAvStreamManagement::Attributes;
 using namespace Protocols::InteractionModel;
-using StreamUsageEnum = chip::app::Clusters::Globals::StreamUsageEnum;
 
 namespace chip {
 namespace app {
@@ -48,22 +52,24 @@ namespace CameraAvStreamManagement {
 CameraAVStreamMgmtServer::CameraAVStreamMgmtServer(
     CameraAVStreamMgmtDelegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
     const BitFlags<OptionalAttribute> aOptionalAttrs, uint8_t aMaxConcurrentEncoders, uint32_t aMaxEncodedPixelRate,
-    const VideoSensorParamsStruct & aVideoSensorParams, bool aNightVisionUsesInfrared, const VideoResolutionStruct & aMinViewPort,
+    const VideoSensorParamsStruct & aVideoSensorParams, bool aNightVisionUsesInfrared,
+    const VideoResolutionStruct & aMinViewPortRes,
     const std::vector<Structs::RateDistortionTradeOffPointsStruct::Type> & aRateDistortionTradeOffPoints,
     uint32_t aMaxContentBufferSize, const AudioCapabilitiesStruct & aMicrophoneCapabilities,
     const AudioCapabilitiesStruct & aSpeakerCapabilities, TwoWayTalkSupportTypeEnum aTwoWayTalkSupport,
     const std::vector<Structs::SnapshotCapabilitiesStruct::Type> & aSnapshotCapabilities, uint32_t aMaxNetworkBandwidth,
-    const std::vector<StreamUsageEnum> & aSupportedStreamUsages, const std::vector<StreamUsageEnum> & aRankedStreamPriorities) :
+    const std::vector<Globals::StreamUsageEnum> & aSupportedStreamUsages,
+    const std::vector<Globals::StreamUsageEnum> & aStreamUsagePriorities) :
     CommandHandlerInterface(MakeOptional(aEndpointId), CameraAvStreamManagement::Id),
     AttributeAccessInterface(MakeOptional(aEndpointId), CameraAvStreamManagement::Id), mDelegate(aDelegate),
     mEndpointId(aEndpointId), mFeatures(aFeatures), mOptionalAttrs(aOptionalAttrs), mMaxConcurrentEncoders(aMaxConcurrentEncoders),
     mMaxEncodedPixelRate(aMaxEncodedPixelRate), mVideoSensorParams(aVideoSensorParams),
-    mNightVisionUsesInfrared(aNightVisionUsesInfrared), mMinViewPort(aMinViewPort),
+    mNightVisionUsesInfrared(aNightVisionUsesInfrared), mMinViewPortResolution(aMinViewPortRes),
     mRateDistortionTradeOffPointsList(aRateDistortionTradeOffPoints), mMaxContentBufferSize(aMaxContentBufferSize),
     mMicrophoneCapabilities(aMicrophoneCapabilities), mSpeakerCapabilities(aSpeakerCapabilities),
     mTwoWayTalkSupport(aTwoWayTalkSupport), mSnapshotCapabilitiesList(aSnapshotCapabilities),
     mMaxNetworkBandwidth(aMaxNetworkBandwidth), mSupportedStreamUsages(aSupportedStreamUsages),
-    mRankedVideoStreamPriorities(aRankedStreamPriorities)
+    mStreamUsagePriorities(aStreamUsagePriorities)
 {
     mDelegate.SetCameraAVStreamMgmtServer(this);
 }
@@ -75,7 +81,7 @@ CameraAVStreamMgmtServer::~CameraAVStreamMgmtServer()
     mDelegate.SetCameraAVStreamMgmtServer(nullptr);
 
     // Unregister command handler and attribute access interfaces
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
+    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
@@ -97,6 +103,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::Init()
             "CameraAVStreamMgmt[ep=%d]: Feature configuration error. At least one of Audio, Video, or Snapshot feature required",
             mEndpointId));
 
+    // Verify cross-feature dependencies
     if (HasFeature(Feature::kImageControl) || HasFeature(Feature::kWatermark) || HasFeature(Feature::kOnScreenDisplay) ||
         HasFeature(Feature::kHighDynamicRange))
     {
@@ -117,13 +124,14 @@ CHIP_ERROR CameraAVStreamMgmtServer::Init()
     }
 
     // Ensure Optional attribute bits have been correctly passed and have supporting feature bits set.
-    if (SupportsOptAttr(OptionalAttribute::kNightVision) || SupportsOptAttr(OptionalAttribute::kNightVisionIllum))
+    if (SupportsOptAttr(OptionalAttribute::kNightVisionIllum))
     {
-        VerifyOrReturnError(HasFeature(Feature::kNightVision), CHIP_ERROR_INVALID_ARGUMENT,
-                            ChipLogError(Zcl,
-                                         "CameraAVStreamMgmt[ep=%d]: Feature configuration error. if NIghtVision is enabled, then "
-                                         "NightVision feature required",
-                                         mEndpointId));
+        VerifyOrReturnError(
+            HasFeature(Feature::kNightVision), CHIP_ERROR_INVALID_ARGUMENT,
+            ChipLogError(Zcl,
+                         "CameraAVStreamMgmt[ep=%d]: Feature configuration error. if NIghtVisionIllum is enabled, then "
+                         "NightVision feature required",
+                         mEndpointId));
     }
 
     if (SupportsOptAttr(OptionalAttribute::kMicrophoneAGCEnabled))
@@ -135,6 +143,8 @@ CHIP_ERROR CameraAVStreamMgmtServer::Init()
                 mEndpointId));
     }
 
+    // If any of the image control attributes are present, we must have the feature.
+    // Conversely, if we have the feature, at least one of the attributes must be present
     if (SupportsOptAttr(OptionalAttribute::kImageFlipHorizontal) || SupportsOptAttr(OptionalAttribute::kImageFlipVertical) ||
         SupportsOptAttr(OptionalAttribute::kImageRotation))
     {
@@ -154,11 +164,11 @@ CHIP_ERROR CameraAVStreamMgmtServer::Init()
             CHIP_ERROR_INVALID_ARGUMENT,
             ChipLogError(Zcl,
                          "CameraAVStreamMgmt[ep=%d]: Feature configuration error. if ImageControl feature supported, then "
-                         "at least one of ImageFlip or Rotation should be supported",
+                         "at least one of the ImageFlip or Rotation attributes shall be supported",
                          mEndpointId));
     }
 
-    LoadPersistentAttributes();
+    TEMPORARY_RETURN_IGNORED LoadPersistentAttributes();
 
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INTERNAL);
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
@@ -213,6 +223,9 @@ CHIP_ERROR CameraAVStreamMgmtServer::ReadAndEncodeSupportedStreamUsages(const At
 
 CHIP_ERROR CameraAVStreamMgmtServer::ReadAndEncodeAllocatedVideoStreams(const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
+    CHIP_FAULT_INJECT(chip::FaultInjection::kFault_ClearInMemoryAllocatedVideoStreams, mAllocatedVideoStreams.clear(););
+    CHIP_FAULT_INJECT(chip::FaultInjection::kFault_LoadPersistentCameraAVSMAttributes, LoadPersistentAttributes(););
+
     for (const auto & videoStream : mAllocatedVideoStreams)
     {
         ReturnErrorOnFailure(encoder.Encode(videoStream));
@@ -223,6 +236,9 @@ CHIP_ERROR CameraAVStreamMgmtServer::ReadAndEncodeAllocatedVideoStreams(const At
 
 CHIP_ERROR CameraAVStreamMgmtServer::ReadAndEncodeAllocatedAudioStreams(const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
+    CHIP_FAULT_INJECT(chip::FaultInjection::kFault_ClearInMemoryAllocatedAudioStreams, mAllocatedAudioStreams.clear(););
+    CHIP_FAULT_INJECT(chip::FaultInjection::kFault_LoadPersistentCameraAVSMAttributes, LoadPersistentAttributes(););
+
     for (const auto & audioStream : mAllocatedAudioStreams)
     {
         ReturnErrorOnFailure(encoder.Encode(audioStream));
@@ -233,6 +249,9 @@ CHIP_ERROR CameraAVStreamMgmtServer::ReadAndEncodeAllocatedAudioStreams(const At
 
 CHIP_ERROR CameraAVStreamMgmtServer::ReadAndEncodeAllocatedSnapshotStreams(const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
+    CHIP_FAULT_INJECT(chip::FaultInjection::kFault_ClearInMemoryAllocatedSnapshotStreams, mAllocatedSnapshotStreams.clear(););
+    CHIP_FAULT_INJECT(chip::FaultInjection::kFault_LoadPersistentCameraAVSMAttributes, LoadPersistentAttributes(););
+
     for (const auto & snapshotStream : mAllocatedSnapshotStreams)
     {
         ReturnErrorOnFailure(encoder.Encode(snapshotStream));
@@ -242,9 +261,9 @@ CHIP_ERROR CameraAVStreamMgmtServer::ReadAndEncodeAllocatedSnapshotStreams(const
 }
 
 CHIP_ERROR
-CameraAVStreamMgmtServer::ReadAndEncodeRankedVideoStreamPrioritiesList(const AttributeValueEncoder::ListEncodeHelper & encoder)
+CameraAVStreamMgmtServer::ReadAndEncodeStreamUsagePriorities(const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
-    for (const auto & streamUsage : mRankedVideoStreamPriorities)
+    for (const auto & streamUsage : mStreamUsagePriorities)
     {
         ReturnErrorOnFailure(encoder.Encode(streamUsage));
     }
@@ -252,23 +271,102 @@ CameraAVStreamMgmtServer::ReadAndEncodeRankedVideoStreamPrioritiesList(const Att
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CameraAVStreamMgmtServer::SetRankedVideoStreamPriorities(const std::vector<StreamUsageEnum> & newPriorities)
+CHIP_ERROR CameraAVStreamMgmtServer::SetStreamUsagePriorities(const std::vector<Globals::StreamUsageEnum> & newPriorities)
 {
-    mRankedVideoStreamPriorities = newPriorities;
-    ReturnErrorOnFailure(StoreRankedVideoStreamPriorities());
-    auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::RankedVideoStreamPrioritiesList::Id);
-    mDelegate.OnAttributeChanged(Attributes::RankedVideoStreamPrioritiesList::Id);
+    mStreamUsagePriorities = newPriorities;
+    ReturnErrorOnFailure(StoreStreamUsagePriorities());
+    auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::StreamUsagePriorities::Id);
+    mDelegate.OnAttributeChanged(Attributes::StreamUsagePriorities::Id);
     MatterReportingAttributeChangeCallback(path);
 
     return CHIP_NO_ERROR;
 }
 
+std::optional<uint16_t> CameraAVStreamMgmtServer::GetReusableVideoStreamId(const VideoStreamStruct & requestedArgs) const
+{
+    for (const auto & stream : mAllocatedVideoStreams)
+    {
+        // 1. Codec must match exactly (Allocated stream already has the codec)
+        if (requestedArgs.videoCodec != stream.videoCodec)
+        {
+            continue;
+        }
+
+        // 2. Framerate check (request must be within allocated stream's current range)
+        if (requestedArgs.minFrameRate < stream.minFrameRate || requestedArgs.maxFrameRate > stream.maxFrameRate)
+        {
+            continue;
+        }
+
+        // 3. Resolution check
+        if (requestedArgs.minResolution.width < stream.minResolution.width ||
+            requestedArgs.minResolution.height < stream.minResolution.height ||
+            requestedArgs.maxResolution.width > stream.maxResolution.width ||
+            requestedArgs.maxResolution.height > stream.maxResolution.height)
+        {
+            continue;
+        }
+
+        // 4. Bitrate check
+        if (requestedArgs.minBitRate < stream.minBitRate || requestedArgs.maxBitRate > stream.maxBitRate)
+        {
+            continue;
+        }
+
+        // 5. KeyFrameInterval check
+        if (requestedArgs.keyFrameInterval != stream.keyFrameInterval)
+        {
+            continue;
+        }
+
+        return stream.videoStreamID;
+    }
+    return std::nullopt;
+}
+
 CHIP_ERROR CameraAVStreamMgmtServer::AddVideoStream(const VideoStreamStruct & videoStream)
 {
     mAllocatedVideoStreams.push_back(videoStream);
-    auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedVideoStreams::Id);
-    mDelegate.OnAttributeChanged(Attributes::AllocatedVideoStreams::Id);
-    MatterReportingAttributeChangeCallback(path);
+
+    return PersistAndNotify<Attributes::AllocatedVideoStreams::Id>();
+}
+
+CHIP_ERROR CameraAVStreamMgmtServer::UpdateVideoStreamRangeParams(VideoStreamStruct & videoStreamToUpdate,
+                                                                  const VideoStreamStruct & videoStream, bool & wasModified)
+{
+    // Store original values to detect changes
+    uint16_t origMinFrameRate = videoStreamToUpdate.minFrameRate;
+    uint16_t origMaxFrameRate = videoStreamToUpdate.maxFrameRate;
+    uint16_t origMinResWidth  = videoStreamToUpdate.minResolution.width;
+    uint16_t origMinResHeight = videoStreamToUpdate.minResolution.height;
+    uint16_t origMaxResWidth  = videoStreamToUpdate.maxResolution.width;
+    uint16_t origMaxResHeight = videoStreamToUpdate.maxResolution.height;
+    uint32_t origMinBitRate   = videoStreamToUpdate.minBitRate;
+    uint32_t origMaxBitRate   = videoStreamToUpdate.maxBitRate;
+
+    // Adjust the range parameters for the allocated video stream to be the
+    // intersection of the existing and the new one.
+    videoStreamToUpdate.minFrameRate         = std::max(videoStreamToUpdate.minFrameRate, videoStream.minFrameRate);
+    videoStreamToUpdate.maxFrameRate         = std::min(videoStreamToUpdate.maxFrameRate, videoStream.maxFrameRate);
+    videoStreamToUpdate.minResolution.width  = std::max(videoStreamToUpdate.minResolution.width, videoStream.minResolution.width);
+    videoStreamToUpdate.minResolution.height = std::max(videoStreamToUpdate.minResolution.height, videoStream.minResolution.height);
+    videoStreamToUpdate.maxResolution.width  = std::min(videoStreamToUpdate.maxResolution.width, videoStream.maxResolution.width);
+    videoStreamToUpdate.maxResolution.height = std::min(videoStreamToUpdate.maxResolution.height, videoStream.maxResolution.height);
+    videoStreamToUpdate.minBitRate           = std::max(videoStreamToUpdate.minBitRate, videoStream.minBitRate);
+    videoStreamToUpdate.maxBitRate           = std::min(videoStreamToUpdate.maxBitRate, videoStream.maxBitRate);
+
+    // Check if any parameter was actually modified
+    wasModified = (origMinFrameRate != videoStreamToUpdate.minFrameRate) ||
+        (origMaxFrameRate != videoStreamToUpdate.maxFrameRate) || (origMinResWidth != videoStreamToUpdate.minResolution.width) ||
+        (origMinResHeight != videoStreamToUpdate.minResolution.height) ||
+        (origMaxResWidth != videoStreamToUpdate.maxResolution.width) ||
+        (origMaxResHeight != videoStreamToUpdate.maxResolution.height) || (origMinBitRate != videoStreamToUpdate.minBitRate) ||
+        (origMaxBitRate != videoStreamToUpdate.maxBitRate);
+
+    if (wasModified)
+    {
+        ReturnErrorOnFailure(PersistAndNotify<Attributes::AllocatedVideoStreams::Id>());
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -279,21 +377,15 @@ CHIP_ERROR CameraAVStreamMgmtServer::RemoveVideoStream(uint16_t videoStreamId)
         std::remove_if(mAllocatedVideoStreams.begin(), mAllocatedVideoStreams.end(),
                        [&](const VideoStreamStruct & vStream) { return vStream.videoStreamID == videoStreamId; }),
         mAllocatedVideoStreams.end());
-    auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedVideoStreams::Id);
-    mDelegate.OnAttributeChanged(Attributes::AllocatedVideoStreams::Id);
-    MatterReportingAttributeChangeCallback(path);
 
-    return CHIP_NO_ERROR;
+    return PersistAndNotify<Attributes::AllocatedVideoStreams::Id>();
 }
 
 CHIP_ERROR CameraAVStreamMgmtServer::AddAudioStream(const AudioStreamStruct & audioStream)
 {
     mAllocatedAudioStreams.push_back(audioStream);
-    auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedAudioStreams::Id);
-    mDelegate.OnAttributeChanged(Attributes::AllocatedAudioStreams::Id);
-    MatterReportingAttributeChangeCallback(path);
 
-    return CHIP_NO_ERROR;
+    return PersistAndNotify<Attributes::AllocatedAudioStreams::Id>();
 }
 
 CHIP_ERROR CameraAVStreamMgmtServer::RemoveAudioStream(uint16_t audioStreamId)
@@ -302,19 +394,84 @@ CHIP_ERROR CameraAVStreamMgmtServer::RemoveAudioStream(uint16_t audioStreamId)
         std::remove_if(mAllocatedAudioStreams.begin(), mAllocatedAudioStreams.end(),
                        [&](const AudioStreamStruct & aStream) { return aStream.audioStreamID == audioStreamId; }),
         mAllocatedAudioStreams.end());
-    auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedAudioStreams::Id);
-    mDelegate.OnAttributeChanged(Attributes::AllocatedAudioStreams::Id);
-    MatterReportingAttributeChangeCallback(path);
 
-    return CHIP_NO_ERROR;
+    return PersistAndNotify<Attributes::AllocatedAudioStreams::Id>();
+}
+
+std::optional<uint16_t> CameraAVStreamMgmtServer::GetReusableSnapshotStreamId(
+    const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & requestedArgs) const
+{
+    for (const auto & stream : mAllocatedSnapshotStreams)
+    {
+        // 1. Codec must match allocated stream's codec.
+        if (requestedArgs.imageCodec != stream.imageCodec)
+        {
+            continue;
+        }
+
+        // 2. Quality must match allocated stream's quality.
+        if (requestedArgs.quality != stream.quality)
+        {
+            continue;
+        }
+
+        // 3. Framerate check (request must be within allocated stream's current range)
+        if (requestedArgs.maxFrameRate > stream.frameRate)
+        {
+            continue;
+        }
+
+        // 4. Resolution check
+        if (requestedArgs.minResolution.width < stream.minResolution.width ||
+            requestedArgs.minResolution.height < stream.minResolution.height ||
+            requestedArgs.maxResolution.width > stream.maxResolution.width ||
+            requestedArgs.maxResolution.height > stream.maxResolution.height)
+        {
+            continue;
+        }
+
+        return stream.snapshotStreamID;
+    }
+    return std::nullopt;
 }
 
 CHIP_ERROR CameraAVStreamMgmtServer::AddSnapshotStream(const SnapshotStreamStruct & snapshotStream)
 {
     mAllocatedSnapshotStreams.push_back(snapshotStream);
-    auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedSnapshotStreams::Id);
-    mDelegate.OnAttributeChanged(Attributes::AllocatedSnapshotStreams::Id);
-    MatterReportingAttributeChangeCallback(path);
+
+    return PersistAndNotify<Attributes::AllocatedSnapshotStreams::Id>();
+}
+
+CHIP_ERROR CameraAVStreamMgmtServer::UpdateSnapshotStreamRangeParams(
+    SnapshotStreamStruct & snapshotStreamToUpdate, const CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs & snapshotStream)
+{
+    // Store original values to detect changes
+    uint16_t origMinResWidth  = snapshotStreamToUpdate.minResolution.width;
+    uint16_t origMinResHeight = snapshotStreamToUpdate.minResolution.height;
+    uint16_t origMaxResWidth  = snapshotStreamToUpdate.maxResolution.width;
+    uint16_t origMaxResHeight = snapshotStreamToUpdate.maxResolution.height;
+
+    // Adjust the range parameters for the allocated snapshot stream to be the
+    // intersection of the existing and the new one.
+    snapshotStreamToUpdate.minResolution.width =
+        std::max(snapshotStreamToUpdate.minResolution.width, snapshotStream.minResolution.width);
+    snapshotStreamToUpdate.minResolution.height =
+        std::max(snapshotStreamToUpdate.minResolution.height, snapshotStream.minResolution.height);
+    snapshotStreamToUpdate.maxResolution.width =
+        std::min(snapshotStreamToUpdate.maxResolution.width, snapshotStream.maxResolution.width);
+    snapshotStreamToUpdate.maxResolution.height =
+        std::min(snapshotStreamToUpdate.maxResolution.height, snapshotStream.maxResolution.height);
+
+    // Check if any parameter was actually modified
+    bool wasModified = (origMinResWidth != snapshotStreamToUpdate.minResolution.width) ||
+        (origMinResHeight != snapshotStreamToUpdate.minResolution.height) ||
+        (origMaxResWidth != snapshotStreamToUpdate.maxResolution.width) ||
+        (origMaxResHeight != snapshotStreamToUpdate.maxResolution.height);
+
+    if (wasModified)
+    {
+        ReturnErrorOnFailure(PersistAndNotify<Attributes::AllocatedSnapshotStreams::Id>());
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -325,11 +482,63 @@ CHIP_ERROR CameraAVStreamMgmtServer::RemoveSnapshotStream(uint16_t snapshotStrea
         std::remove_if(mAllocatedSnapshotStreams.begin(), mAllocatedSnapshotStreams.end(),
                        [&](const SnapshotStreamStruct & sStream) { return sStream.snapshotStreamID == snapshotStreamId; }),
         mAllocatedSnapshotStreams.end());
-    auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::AllocatedSnapshotStreams::Id);
-    mDelegate.OnAttributeChanged(Attributes::AllocatedSnapshotStreams::Id);
-    MatterReportingAttributeChangeCallback(path);
 
-    return CHIP_NO_ERROR;
+    return PersistAndNotify<Attributes::AllocatedSnapshotStreams::Id>();
+}
+
+CHIP_ERROR CameraAVStreamMgmtServer::UpdateVideoStreamRefCount(uint16_t videoStreamId, bool shouldIncrement)
+{
+    auto it = std::find_if(mAllocatedVideoStreams.begin(), mAllocatedVideoStreams.end(),
+                           [videoStreamId](const VideoStreamStruct & vStream) { return vStream.videoStreamID == videoStreamId; });
+
+    if (it == mAllocatedVideoStreams.end())
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    if (shouldIncrement)
+    {
+        return (it->referenceCount < UINT8_MAX) ? (it->referenceCount++, CHIP_NO_ERROR) : CHIP_ERROR_INVALID_INTEGER_VALUE;
+    }
+
+    return (it->referenceCount > 0) ? (it->referenceCount--, CHIP_NO_ERROR) : CHIP_ERROR_INVALID_INTEGER_VALUE;
+}
+
+CHIP_ERROR CameraAVStreamMgmtServer::UpdateAudioStreamRefCount(uint16_t audioStreamId, bool shouldIncrement)
+{
+    auto it = std::find_if(mAllocatedAudioStreams.begin(), mAllocatedAudioStreams.end(),
+                           [audioStreamId](const AudioStreamStruct & aStream) { return aStream.audioStreamID == audioStreamId; });
+
+    if (it == mAllocatedAudioStreams.end())
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    if (shouldIncrement)
+    {
+        return (it->referenceCount < UINT8_MAX) ? (it->referenceCount++, CHIP_NO_ERROR) : CHIP_ERROR_INVALID_INTEGER_VALUE;
+    }
+
+    return (it->referenceCount > 0) ? (it->referenceCount--, CHIP_NO_ERROR) : CHIP_ERROR_INVALID_INTEGER_VALUE;
+}
+
+CHIP_ERROR CameraAVStreamMgmtServer::UpdateSnapshotStreamRefCount(uint16_t snapshotStreamId, bool shouldIncrement)
+{
+    auto it = std::find_if(
+        mAllocatedSnapshotStreams.begin(), mAllocatedSnapshotStreams.end(),
+        [snapshotStreamId](const SnapshotStreamStruct & sStream) { return sStream.snapshotStreamID == snapshotStreamId; });
+
+    if (it == mAllocatedSnapshotStreams.end())
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    if (shouldIncrement)
+    {
+        return (it->referenceCount < UINT8_MAX) ? (it->referenceCount++, CHIP_NO_ERROR) : CHIP_ERROR_INVALID_INTEGER_VALUE;
+    }
+
+    return (it->referenceCount > 0) ? (it->referenceCount--, CHIP_NO_ERROR) : CHIP_ERROR_INVALID_INTEGER_VALUE;
 }
 
 // AttributeAccessInterface
@@ -372,11 +581,12 @@ CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPat
                                          mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mNightVisionUsesInfrared));
         break;
-    case MinViewport::Id:
-        VerifyOrReturnError(
-            HasFeature(Feature::kVideo), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get MinViewport, feature is not supported", mEndpointId));
-        ReturnErrorOnFailure(aEncoder.Encode(mMinViewPort));
+    case MinViewportResolution::Id:
+        VerifyOrReturnError(HasFeature(Feature::kVideo), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+                            ChipLogError(Zcl,
+                                         "CameraAVStreamMgmt[ep=%d]: can not get MinViewportResolution, feature is not supported",
+                                         mEndpointId));
+        ReturnErrorOnFailure(aEncoder.Encode(mMinViewPortResolution));
         break;
     case RateDistortionTradeOffPoints::Id:
         VerifyOrReturnError(
@@ -462,14 +672,9 @@ CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPat
         ReturnErrorOnFailure(aEncoder.EncodeList(
             [this](const auto & encoder) -> CHIP_ERROR { return this->ReadAndEncodeAllocatedSnapshotStreams(encoder); }));
         break;
-    case RankedVideoStreamPrioritiesList::Id:
-        VerifyOrReturnError(
-            HasFeature(Feature::kVideo), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get RankedVideoStreamPrioritiesList, feature is not supported",
-                         mEndpointId));
-
+    case StreamUsagePriorities::Id:
         ReturnErrorOnFailure(aEncoder.EncodeList(
-            [this](const auto & encoder) -> CHIP_ERROR { return this->ReadAndEncodeRankedVideoStreamPrioritiesList(encoder); }));
+            [this](const auto & encoder) -> CHIP_ERROR { return this->ReadAndEncodeStreamUsagePriorities(encoder); }));
         break;
     case SoftRecordingPrivacyModeEnabled::Id:
         VerifyOrReturnError(
@@ -493,7 +698,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPat
         break;
     case NightVision::Id:
         VerifyOrReturnError(
-            SupportsOptAttr(OptionalAttribute::kNightVision), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            HasFeature(Feature::kNightVision), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
             ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get NightVision, attribute is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mNightVision));
         break;
@@ -569,19 +774,21 @@ CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPat
     case ImageRotation::Id:
         VerifyOrReturnError(
             SupportsOptAttr(OptionalAttribute::kImageRotation), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get ImageRotation, feature is not supported", mEndpointId));
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get ImageRotation, attribute is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mImageRotation));
         break;
     case ImageFlipHorizontal::Id:
-        VerifyOrReturnError(
-            SupportsOptAttr(OptionalAttribute::kImageFlipHorizontal), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get ImageFlipHorizontal, feature is not supported", mEndpointId));
+        VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kImageFlipHorizontal), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+                            ChipLogError(Zcl,
+                                         "CameraAVStreamMgmt[ep=%d]: can not get ImageFlipHorizontal, attribute is not supported",
+                                         mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mImageFlipHorizontal));
         break;
     case ImageFlipVertical::Id:
-        VerifyOrReturnError(
-            SupportsOptAttr(OptionalAttribute::kImageFlipVertical), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get ImageFlipHorizontal, feature is not supported", mEndpointId));
+        VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kImageFlipVertical), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+                            ChipLogError(Zcl,
+                                         "CameraAVStreamMgmt[ep=%d]: can not get ImageFlipHorizontal, attribute is not supported",
+                                         mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mImageFlipVertical));
         break;
     case LocalVideoRecordingEnabled::Id:
@@ -599,15 +806,16 @@ CHIP_ERROR CameraAVStreamMgmtServer::Read(const ConcreteReadAttributePath & aPat
         ReturnErrorOnFailure(aEncoder.Encode(mLocalSnapshotRecordingEnabled));
         break;
     case StatusLightEnabled::Id:
-        VerifyOrReturnError(
-            SupportsOptAttr(OptionalAttribute::kStatusLightEnabled), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not get StatusLightEnabled, feature is not supported", mEndpointId));
+        VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kStatusLightEnabled), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+                            ChipLogError(Zcl,
+                                         "CameraAVStreamMgmt[ep=%d]: can not get StatusLightEnabled, attribute is not supported",
+                                         mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mStatusLightEnabled));
         break;
     case StatusLightBrightness::Id:
         VerifyOrReturnError(SupportsOptAttr(OptionalAttribute::kStatusLightBrightness), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl,
-                                         "CameraAVStreamMgmt[ep=%d]: can not get StatusLightBrightness, feature is not supported",
+                                         "CameraAVStreamMgmt[ep=%d]: can not get StatusLightBrightness, attribute is not supported",
                                          mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mStatusLightBrightness));
         break;
@@ -653,7 +861,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::Write(const ConcreteDataAttributePath & aPa
     }
     case NightVision::Id: {
         VerifyOrReturnError(
-            SupportsOptAttr(OptionalAttribute::kNightVision), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
+            HasFeature(Feature::kNightVision), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
             ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not set NightVision, feature is not supported", mEndpointId));
 
         TriStateAutoEnum nightVision;
@@ -674,7 +882,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::Write(const ConcreteDataAttributePath & aPa
         VerifyOrReturnError(
             HasFeature(Feature::kVideo), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
             ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: can not set Viewport, feature is not supported", mEndpointId));
-        ViewportStruct viewPort;
+        Globals::Structs::ViewportStruct::Type viewPort;
         ReturnErrorOnFailure(aDecoder.Decode(viewPort));
         return SetViewport(viewPort);
     }
@@ -793,15 +1001,22 @@ void CameraAVStreamMgmtServer::ModifyVideoStream(const uint16_t streamID, const 
     {
         if (stream.videoStreamID == streamID)
         {
+            bool wasModified = false;
             if (waterMarkEnabled.HasValue())
             {
+                wasModified             = (waterMarkEnabled != stream.watermarkEnabled);
                 stream.watermarkEnabled = waterMarkEnabled;
             }
             if (osdEnabled.HasValue())
             {
+                wasModified       = wasModified || (osdEnabled != stream.OSDEnabled);
                 stream.OSDEnabled = osdEnabled;
             }
-            ChipLogError(Camera, "Modified video stream with ID: %d", streamID);
+            if (wasModified)
+            {
+                TEMPORARY_RETURN_IGNORED PersistAndNotify<Attributes::AllocatedVideoStreams::Id>();
+                ChipLogProgress(Camera, "Modified video stream with ID: %d", streamID);
+            }
             return;
         }
     }
@@ -814,15 +1029,22 @@ void CameraAVStreamMgmtServer::ModifySnapshotStream(const uint16_t streamID, con
     {
         if (stream.snapshotStreamID == streamID)
         {
+            bool wasModified = false;
             if (waterMarkEnabled.HasValue())
             {
+                wasModified             = (waterMarkEnabled != stream.watermarkEnabled);
                 stream.watermarkEnabled = waterMarkEnabled;
             }
             if (osdEnabled.HasValue())
             {
+                wasModified       = wasModified || (osdEnabled != stream.OSDEnabled);
                 stream.OSDEnabled = osdEnabled;
             }
-            ChipLogError(Camera, "Modified snapshot stream with ID: %d", streamID);
+            if (wasModified)
+            {
+                TEMPORARY_RETURN_IGNORED PersistAndNotify<Attributes::AllocatedSnapshotStreams::Id>();
+                ChipLogProgress(Camera, "Modified snapshot stream with ID: %d", streamID);
+            }
             return;
         }
     }
@@ -883,7 +1105,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::SetNightVisionIllum(TriStateAutoEnum aNight
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CameraAVStreamMgmtServer::SetViewport(const ViewportStruct & aViewport)
+CHIP_ERROR CameraAVStreamMgmtServer::SetViewport(const Globals::Structs::ViewportStruct::Type & aViewport)
 {
     // The following validation steps are required
     // 1. the new viewport is not larger than the sensor max
@@ -892,7 +1114,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::SetViewport(const ViewportStruct & aViewpor
     //
     uint16_t requestedWidth  = static_cast<uint16_t>(aViewport.x2 - aViewport.x1);
     uint16_t requestedHeight = static_cast<uint16_t>(aViewport.y2 - aViewport.y1);
-    if ((requestedWidth < mMinViewPort.width) || (requestedHeight < mMinViewPort.height) ||
+    if ((requestedWidth < mMinViewPortResolution.width) || (requestedHeight < mMinViewPortResolution.height) ||
         (requestedWidth > mVideoSensorParams.sensorWidth) || (requestedHeight > mVideoSensorParams.sensorHeight))
     {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: SetViewport with invalid viewport dimensions", mEndpointId);
@@ -912,7 +1134,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::SetViewport(const ViewportStruct & aViewpor
     }
     mViewport = aViewport;
 
-    StoreViewport(mViewport);
+    TEMPORARY_RETURN_IGNORED StoreViewport(mViewport);
     mDelegate.OnAttributeChanged(Attributes::Viewport::Id);
     auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::Viewport::Id);
     MatterReportingAttributeChangeCallback(path);
@@ -1064,30 +1286,30 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
     }
 
     // Load AllocatedVideoStreams
-    err = mDelegate.LoadAllocatedVideoStreams(mAllocatedVideoStreams);
+    err = LoadAllocatedStreams<Attributes::AllocatedVideoStreams::Id>();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load allocated video streams from the KVS.", mEndpointId);
     }
     // Load AllocatedAudioStreams
-    err = mDelegate.LoadAllocatedAudioStreams(mAllocatedAudioStreams);
+    err = LoadAllocatedStreams<Attributes::AllocatedAudioStreams::Id>();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load allocated audio streams from the KVS.", mEndpointId);
     }
 
     // Load AllocatedSnapshotStreams
-    err = mDelegate.LoadAllocatedSnapshotStreams(mAllocatedSnapshotStreams);
+    err = LoadAllocatedStreams<Attributes::AllocatedSnapshotStreams::Id>();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load allocated snapshot streams from the KVS.", mEndpointId);
     }
 
-    err = LoadRankedVideoStreamPriorities();
+    // Load StreamUsagePriorities
+    err = LoadStreamUsagePriorities();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the RankedVideoStreamPrioritiesList from the KVS.",
-                      mEndpointId);
+        ChipLogDetail(Zcl, "CameraAVStreamMgmt[ep=%d]: Unable to load the StreamUsagePriorities from the KVS.", mEndpointId);
     }
 
     // Load SoftRecordingPrivacyModeEnabled
@@ -1158,7 +1380,7 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
     }
 
     // Load Viewport
-    ViewportStruct viewport;
+    Globals::Structs::ViewportStruct::Type viewport;
     err = LoadViewport(viewport);
     if (err == CHIP_NO_ERROR)
     {
@@ -1361,10 +1583,10 @@ void CameraAVStreamMgmtServer::LoadPersistentAttributes()
     }
 
     // Signal delegate that all persistent configuration attributes have been loaded.
-    mDelegate.PersistentAttributesLoadedCallback();
+    TEMPORARY_RETURN_IGNORED mDelegate.PersistentAttributesLoadedCallback();
 }
 
-CHIP_ERROR CameraAVStreamMgmtServer::StoreViewport(const ViewportStruct & viewport)
+CHIP_ERROR CameraAVStreamMgmtServer::StoreViewport(const Globals::Structs::ViewportStruct::Type & viewport)
 {
     uint8_t buffer[kViewportStructMaxSerializedSize];
     MutableByteSpan bufferSpan(buffer);
@@ -1379,7 +1601,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::StoreViewport(const ViewportStruct & viewpo
     return GetSafeAttributePersistenceProvider()->SafeWriteValue(path, bufferSpan);
 }
 
-CHIP_ERROR CameraAVStreamMgmtServer::LoadViewport(ViewportStruct & viewport)
+CHIP_ERROR CameraAVStreamMgmtServer::LoadViewport(Globals::Structs::ViewportStruct::Type & viewport)
 {
     uint8_t buffer[kViewportStructMaxSerializedSize];
     MutableByteSpan bufferSpan(buffer);
@@ -1396,9 +1618,9 @@ CHIP_ERROR CameraAVStreamMgmtServer::LoadViewport(ViewportStruct & viewport)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CameraAVStreamMgmtServer::StoreRankedVideoStreamPriorities()
+CHIP_ERROR CameraAVStreamMgmtServer::StoreStreamUsagePriorities()
 {
-    uint8_t buffer[kRankedVideoStreamPrioritiesTlvSize];
+    uint8_t buffer[kStreamUsagePrioritiesTlvSize];
     MutableByteSpan bufferSpan(buffer);
     TLV::TLVWriter writer;
     writer.Init(bufferSpan);
@@ -1406,24 +1628,24 @@ CHIP_ERROR CameraAVStreamMgmtServer::StoreRankedVideoStreamPriorities()
     TLV::TLVType arrayType;
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType));
 
-    for (size_t i = 0; i < mRankedVideoStreamPriorities.size(); i++)
+    for (size_t i = 0; i < mStreamUsagePriorities.size(); i++)
     {
-        ReturnErrorOnFailure(writer.Put(TLV::AnonymousTag(), mRankedVideoStreamPriorities[i]));
+        ReturnErrorOnFailure(writer.Put(TLV::AnonymousTag(), mStreamUsagePriorities[i]));
     }
     ReturnErrorOnFailure(writer.EndContainer(arrayType));
 
     bufferSpan.reduce_size(writer.GetLengthWritten());
 
-    auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::RankedVideoStreamPrioritiesList::Id);
+    auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::StreamUsagePriorities::Id);
     return GetSafeAttributePersistenceProvider()->SafeWriteValue(path, bufferSpan);
 }
 
-CHIP_ERROR CameraAVStreamMgmtServer::LoadRankedVideoStreamPriorities()
+CHIP_ERROR CameraAVStreamMgmtServer::LoadStreamUsagePriorities()
 {
-    uint8_t buffer[kRankedVideoStreamPrioritiesTlvSize];
+    uint8_t buffer[kStreamUsagePrioritiesTlvSize];
     MutableByteSpan bufferSpan(buffer);
 
-    auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::RankedVideoStreamPrioritiesList::Id);
+    auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, Attributes::StreamUsagePriorities::Id);
     ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->SafeReadValue(path, bufferSpan));
 
     TLV::TLVReader reader;
@@ -1433,18 +1655,138 @@ CHIP_ERROR CameraAVStreamMgmtServer::LoadRankedVideoStreamPriorities()
     TLV::TLVType arrayType;
     ReturnErrorOnFailure(reader.EnterContainer(arrayType));
 
-    mRankedVideoStreamPriorities.clear();
-    StreamUsageEnum streamUsage;
+    mStreamUsagePriorities.clear();
+    Globals::StreamUsageEnum streamUsage;
     CHIP_ERROR err;
     while ((err = reader.Next(TLV::kTLVType_UnsignedInteger, TLV::AnonymousTag())) == CHIP_NO_ERROR)
     {
         ReturnErrorOnFailure(reader.Get(streamUsage));
-        mRankedVideoStreamPriorities.push_back(streamUsage);
+        mStreamUsagePriorities.push_back(streamUsage);
     }
 
     VerifyOrReturnError(err == CHIP_ERROR_END_OF_TLV, err);
 
     ReturnErrorOnFailure(reader.ExitContainer(arrayType));
+    return reader.VerifyEndOfContainer();
+}
+
+// Stream helper template struct containing necessary items for the
+// StoreAllocatedStreams and LoadAllocatedStream functions to work on
+// all the 3 stream types.
+template <AttributeId TAttributeId>
+struct StreamTraits;
+
+template <>
+struct StreamTraits<Attributes::AllocatedVideoStreams::Id>
+{
+    using StreamStructType                     = VideoStreamStruct;
+    static constexpr size_t kMaxSerializedSize = kMaxAllocatedVideoStreamsSerializedSize;
+    static constexpr StreamType kStreamType    = StreamType::kVideo;
+    static constexpr auto kStreamVectorMember  = &CameraAVStreamMgmtServer::mAllocatedVideoStreams;
+};
+
+template <>
+struct StreamTraits<Attributes::AllocatedAudioStreams::Id>
+{
+    using StreamStructType                     = AudioStreamStruct;
+    static constexpr size_t kMaxSerializedSize = kMaxAllocatedAudioStreamsSerializedSize;
+    static constexpr StreamType kStreamType    = StreamType::kAudio;
+    static constexpr auto kStreamVectorMember  = &CameraAVStreamMgmtServer::mAllocatedAudioStreams;
+};
+
+template <>
+struct StreamTraits<Attributes::AllocatedSnapshotStreams::Id>
+{
+    using StreamStructType                     = SnapshotStreamStruct;
+    static constexpr size_t kMaxSerializedSize = kMaxAllocatedSnapshotStreamsSerializedSize;
+    static constexpr StreamType kStreamType    = StreamType::kSnapshot;
+    static constexpr auto kStreamVectorMember  = &CameraAVStreamMgmtServer::mAllocatedSnapshotStreams;
+};
+
+template <AttributeId TAttributeId>
+CHIP_ERROR CameraAVStreamMgmtServer::PersistAndNotify()
+{
+    ReturnErrorAndLogOnFailure(StoreAllocatedStreams<TAttributeId>(), Zcl,
+                               "CameraAVStreamMgmt[ep=%d]: Failed to persist allocated streams", mEndpointId);
+
+    auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, TAttributeId);
+    mDelegate.OnAttributeChanged(TAttributeId);
+    MatterReportingAttributeChangeCallback(path);
+
+    return CHIP_NO_ERROR;
+}
+
+template <AttributeId attributeId>
+CHIP_ERROR CameraAVStreamMgmtServer::StoreAllocatedStreams()
+{
+    using Traits = StreamTraits<attributeId>;
+
+    uint8_t buffer[Traits::kMaxSerializedSize];
+    TLV::TLVWriter writer;
+    writer.Init(buffer);
+
+    TLV::TLVType arrayType;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType));
+
+    const auto & streams = (*this).*Traits::kStreamVectorMember;
+    for (const auto & stream : streams)
+    {
+        ReturnErrorOnFailure(DataModel::Encode(writer, TLV::AnonymousTag(), stream));
+    }
+
+    ReturnErrorOnFailure(writer.EndContainer(arrayType));
+
+    size_t len = writer.GetLengthWritten();
+
+    auto path = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, attributeId);
+    ReturnErrorOnFailure(GetAttributePersistenceProvider()->WriteValue(path, ByteSpan(buffer, len)));
+
+    ChipLogProgress(Zcl, "Saved %u %s streams", static_cast<unsigned int>(streams.size()), StreamTypeToString(Traits::kStreamType));
+    return CHIP_NO_ERROR;
+}
+
+template <AttributeId attributeId>
+CHIP_ERROR CameraAVStreamMgmtServer::LoadAllocatedStreams()
+{
+    using Traits = StreamTraits<attributeId>;
+
+    uint8_t buffer[Traits::kMaxSerializedSize];
+    MutableByteSpan span(buffer);
+
+    auto path      = ConcreteAttributePath(mEndpointId, CameraAvStreamManagement::Id, attributeId);
+    auto & streams = (*this).*Traits::kStreamVectorMember;
+
+    CHIP_ERROR err = GetAttributePersistenceProvider()->ReadValue(path, span);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        streams.clear();
+        ChipLogProgress(Zcl, "No persisted %s streams found.", StreamTypeToString(Traits::kStreamType));
+        return CHIP_NO_ERROR;
+    }
+    ReturnErrorOnFailure(err);
+
+    TLV::TLVReader reader;
+    reader.Init(span);
+
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, TLV::AnonymousTag()));
+    TLV::TLVType arrayType;
+    ReturnErrorOnFailure(reader.EnterContainer(arrayType));
+
+    streams.clear();
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        typename Traits::StreamStructType stream;
+        ReturnErrorOnFailure(DataModel::Decode(reader, stream));
+        streams.push_back(stream);
+    }
+
+    VerifyOrReturnError(err == CHIP_ERROR_END_OF_TLV, err);
+
+    ReturnErrorOnFailure(reader.ExitContainer(arrayType));
+
+    ChipLogProgress(Zcl, "Loaded %u %s streams", static_cast<unsigned int>(streams.size()),
+                    StreamTypeToString(Traits::kStreamType));
+
     return reader.VerifyEndOfContainer();
 }
 
@@ -1592,6 +1934,21 @@ void CameraAVStreamMgmtServer::InvokeCommand(HandlerContext & handlerContext)
     }
 }
 
+bool CameraAVStreamMgmtServer::StreamPrioritiesHasDuplicates(const std::vector<Globals::StreamUsageEnum> & aStreamUsagePriorities)
+{
+    std::set<Globals::StreamUsageEnum> seenStreamUsages;
+
+    for (auto streamUsage : aStreamUsagePriorities)
+    {
+        if (!seenStreamUsages.insert(streamUsage).second)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
                                                          const Commands::VideoStreamAllocate::DecodableType & commandData)
 {
@@ -1612,14 +1969,17 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
     VerifyOrReturn((HasFeature(Feature::kOnScreenDisplay) == commandData.OSDEnabled.HasValue()),
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
 
-    VerifyOrReturn(commandData.streamUsage != StreamUsageEnum::kUnknownEnumValue, {
-        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid stream usage", mEndpointId);
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-    });
+    VerifyOrReturn(commandData.streamUsage == Globals::StreamUsageEnum::kRecording ||
+                       commandData.streamUsage == Globals::StreamUsageEnum::kAnalysis ||
+                       commandData.streamUsage == Globals::StreamUsageEnum::kLiveView,
+                   {
+                       ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid stream usage", mEndpointId);
+                       ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+                   });
 
     VerifyOrReturn(commandData.videoCodec != VideoCodecEnum::kUnknownEnumValue, {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid video codec", mEndpointId);
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
     VerifyOrReturn(commandData.minFrameRate >= 1 && commandData.minFrameRate <= commandData.maxFrameRate &&
@@ -1635,14 +1995,13 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
     VerifyOrReturn(commandData.minBitRate >= 1 && commandData.minBitRate <= commandData.maxBitRate && commandData.maxBitRate >= 1,
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
 
-    VerifyOrReturn(commandData.minFragmentLen <= commandData.maxFragmentLen &&
-                       commandData.maxFragmentLen <= kMaxFragmentLenMaxValue,
+    VerifyOrReturn(commandData.keyFrameInterval <= kMaxKeyFrameIntervalMaxValue,
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
 
-    bool streamUsageSupported = std::find_if(mRankedVideoStreamPriorities.begin(), mRankedVideoStreamPriorities.end(),
-                                             [&commandData](const StreamUsageEnum & entry) {
+    bool streamUsageSupported = std::find_if(mStreamUsagePriorities.begin(), mStreamUsagePriorities.end(),
+                                             [&commandData](const Globals::StreamUsageEnum & entry) {
                                                  return entry == commandData.streamUsage;
-                                             }) != mRankedVideoStreamPriorities.end();
+                                             }) != mStreamUsagePriorities.end();
 
     VerifyOrReturn(streamUsageSupported, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState));
 
@@ -1656,8 +2015,7 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
     videoStreamArgs.maxResolution    = commandData.maxResolution;
     videoStreamArgs.minBitRate       = commandData.minBitRate;
     videoStreamArgs.maxBitRate       = commandData.maxBitRate;
-    videoStreamArgs.minFragmentLen   = commandData.minFragmentLen;
-    videoStreamArgs.maxFragmentLen   = commandData.maxFragmentLen;
+    videoStreamArgs.keyFrameInterval = commandData.keyFrameInterval;
     videoStreamArgs.watermarkEnabled = commandData.watermarkEnabled;
     videoStreamArgs.OSDEnabled       = commandData.OSDEnabled;
     videoStreamArgs.referenceCount   = 0;
@@ -1667,18 +2025,32 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
 
     if (status == Status::Success)
     {
-
         // Check if the streamID matches an existing one in the
         // mAllocatedVideoStreams.
-        bool streamExists = std::find_if(mAllocatedVideoStreams.begin(), mAllocatedVideoStreams.end(),
-                                         [&videoStreamID](const VideoStreamStruct & entry) {
-                                             return entry.videoStreamID == videoStreamID;
-                                         }) != mAllocatedVideoStreams.end();
-        if (!streamExists)
+        auto it =
+            std::find_if(mAllocatedVideoStreams.begin(), mAllocatedVideoStreams.end(),
+                         [videoStreamID](const VideoStreamStruct & vStream) { return vStream.videoStreamID == videoStreamID; });
+
+        if (it == mAllocatedVideoStreams.end())
         {
             // Add the allocated videostream object in the AllocatedVideoStreams list.
             videoStreamArgs.videoStreamID = videoStreamID;
-            AddVideoStream(videoStreamArgs);
+            TEMPORARY_RETURN_IGNORED AddVideoStream(videoStreamArgs);
+
+            // Call delegate with the allocated stream parameters and new allocation action
+            mDelegate.OnVideoStreamAllocated(videoStreamArgs, StreamAllocationAction::kNewAllocation);
+        }
+        else
+        {
+            bool wasModified = false;
+
+            VideoStreamStruct & videoStreamToUpdate = *it;
+            // Reusing the existing stream. Update range parameters and check if they were modified
+            TEMPORARY_RETURN_IGNORED UpdateVideoStreamRangeParams(videoStreamToUpdate, videoStreamArgs, wasModified);
+
+            // Call delegate with the final updated stream parameters and appropriate action
+            mDelegate.OnVideoStreamAllocated(videoStreamToUpdate,
+                                             wasModified ? StreamAllocationAction::kModification : StreamAllocationAction::kReuse);
         }
 
         response.videoStreamID = videoStreamID;
@@ -1693,25 +2065,42 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
 void CameraAVStreamMgmtServer::HandleVideoStreamModify(HandlerContext & ctx,
                                                        const Commands::VideoStreamModify::DecodableType & commandData)
 {
-    Status status             = Status::Success;
     auto & isWaterMarkEnabled = commandData.watermarkEnabled;
     auto & isOSDEnabled       = commandData.OSDEnabled;
     auto & videoStreamID      = commandData.videoStreamID;
 
-    // If Watermark feature is supported, then command should have the
-    // isWaterMarkEnabled param. Or, if it is not supported, then command should
-    // not have the param.
-    VerifyOrReturn((HasFeature(Feature::kWatermark) == commandData.watermarkEnabled.HasValue()),
-                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
+    // If WatermarkEnabled is provided then the Watermark feature has to be supported
+    if (commandData.watermarkEnabled.HasValue())
+    {
+        VerifyOrReturn(HasFeature(Feature::kWatermark), {
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: WatermarkEnabled provided but Watermark Feature not set", mEndpointId);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        });
+    }
 
-    // If OSD feature is supported, then command should have the
-    // isOSDEnabled param. Or, if it is not supported, then command should
-    // not have the param.
-    VerifyOrReturn((HasFeature(Feature::kOnScreenDisplay) == commandData.OSDEnabled.HasValue()),
-                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
+    // If OSDEnabled is provided then the OSD feature has to be supported
+    if (commandData.OSDEnabled.HasValue())
+    {
+        VerifyOrReturn(HasFeature(Feature::kOnScreenDisplay), {
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: OSDEnabled provided but OSD Feature not set", mEndpointId);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        });
+    }
+
+    // One of WatermarkEnabled or OSDEnabled has to be present
+    VerifyOrReturn(commandData.watermarkEnabled.HasValue() || commandData.OSDEnabled.HasValue(), {
+        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: One of WatermarkEnabled or OSDEnabled must be provided in VideoStreamModify",
+                     mEndpointId);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+    });
+
+    if (!ValidateVideoStreamForModifyOrDeallocate(videoStreamID, ctx, /* isDeallocate = */ false))
+    {
+        return;
+    }
 
     // Call the delegate
-    status = mDelegate.VideoStreamModify(videoStreamID, isWaterMarkEnabled, isOSDEnabled);
+    Status status = mDelegate.VideoStreamModify(videoStreamID, isWaterMarkEnabled, isOSDEnabled);
 
     if (status == Status::Success)
     {
@@ -1726,12 +2115,17 @@ void CameraAVStreamMgmtServer::HandleVideoStreamDeallocate(HandlerContext & ctx,
 {
     auto & videoStreamID = commandData.videoStreamID;
 
+    if (!ValidateVideoStreamForModifyOrDeallocate(videoStreamID, ctx, /* isDeallocate = */ true))
+    {
+        return;
+    }
+
     // Call the delegate
     Status status = mDelegate.VideoStreamDeallocate(videoStreamID);
 
     if (status == Status::Success)
     {
-        RemoveVideoStream(videoStreamID);
+        TEMPORARY_RETURN_IGNORED RemoveVideoStream(videoStreamID);
     }
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
@@ -1744,13 +2138,21 @@ void CameraAVStreamMgmtServer::HandleAudioStreamAllocate(HandlerContext & ctx,
     Commands::AudioStreamAllocateResponse::Type response;
     uint16_t audioStreamID = 0;
 
-    VerifyOrReturn(commandData.streamUsage != StreamUsageEnum::kUnknownEnumValue, {
-        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid stream usage", mEndpointId);
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-    });
+    VerifyOrReturn(commandData.streamUsage == Globals::StreamUsageEnum::kRecording ||
+                       commandData.streamUsage == Globals::StreamUsageEnum::kAnalysis ||
+                       commandData.streamUsage == Globals::StreamUsageEnum::kLiveView,
+                   {
+                       ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid stream usage", mEndpointId);
+                       ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+                   });
 
     VerifyOrReturn(commandData.audioCodec != AudioCodecEnum::kUnknownEnumValue, {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid audio codec", mEndpointId);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+    });
+
+    VerifyOrReturn(commandData.channelCount >= 1 && commandData.channelCount <= kMaxChannelCount, {
+        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid channel count", mEndpointId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
@@ -1769,15 +2171,10 @@ void CameraAVStreamMgmtServer::HandleAudioStreamAllocate(HandlerContext & ctx,
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
-    VerifyOrReturn(commandData.channelCount >= 1 && commandData.channelCount <= kMaxChannelCount, {
-        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid channel count", mEndpointId);
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-    });
-
-    bool streamUsageSupported = std::find_if(mRankedVideoStreamPriorities.begin(), mRankedVideoStreamPriorities.end(),
-                                             [&commandData](const StreamUsageEnum & entry) {
+    bool streamUsageSupported = std::find_if(mStreamUsagePriorities.begin(), mStreamUsagePriorities.end(),
+                                             [&commandData](const Globals::StreamUsageEnum & entry) {
                                                  return entry == commandData.streamUsage;
-                                             }) != mRankedVideoStreamPriorities.end();
+                                             }) != mStreamUsagePriorities.end();
 
     VerifyOrReturn(streamUsageSupported, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState));
 
@@ -1810,7 +2207,7 @@ void CameraAVStreamMgmtServer::HandleAudioStreamAllocate(HandlerContext & ctx,
     {
         // Add the allocated audiostream object in the AllocatedAudioStreams list.
         audioStreamArgs.audioStreamID = audioStreamID;
-        AddAudioStream(audioStreamArgs);
+        TEMPORARY_RETURN_IGNORED AddAudioStream(audioStreamArgs);
     }
 
     response.audioStreamID = audioStreamID;
@@ -1820,15 +2217,19 @@ void CameraAVStreamMgmtServer::HandleAudioStreamAllocate(HandlerContext & ctx,
 void CameraAVStreamMgmtServer::HandleAudioStreamDeallocate(HandlerContext & ctx,
                                                            const Commands::AudioStreamDeallocate::DecodableType & commandData)
 {
-
     auto & audioStreamID = commandData.audioStreamID;
+
+    if (!ValidateAudioStreamForDeallocate(audioStreamID, ctx))
+    {
+        return;
+    }
 
     // Call the delegate
     Status status = mDelegate.AudioStreamDeallocate(audioStreamID);
 
     if (status == Status::Success)
     {
-        RemoveAudioStream(audioStreamID);
+        TEMPORARY_RETURN_IGNORED RemoveAudioStream(audioStreamID);
     }
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
@@ -1841,9 +2242,21 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamAllocate(HandlerContext & ctx
     Commands::SnapshotStreamAllocateResponse::Type response;
     uint16_t snapshotStreamID = 0;
 
+    // If Watermark feature is supported, then command should have the
+    // isWaterMarkEnabled param. Or, if it is not supported, then command should
+    // not have the param.
+    VerifyOrReturn((HasFeature(Feature::kWatermark) == commandData.watermarkEnabled.HasValue()),
+                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
+
+    // If OSD feature is supported, then command should have the
+    // isOSDEnabled param. Or, if it is not supported, then command should
+    // not have the param.
+    VerifyOrReturn((HasFeature(Feature::kOnScreenDisplay) == commandData.OSDEnabled.HasValue()),
+                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
+
     VerifyOrReturn(commandData.imageCodec != ImageCodecEnum::kUnknownEnumValue, {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid image codec", mEndpointId);
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
     VerifyOrReturn(commandData.maxFrameRate > 0, {
@@ -1862,16 +2275,43 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamAllocate(HandlerContext & ctx
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
-    SnapshotStreamStruct snapshotStreamArgs;
-    snapshotStreamArgs.snapshotStreamID = 0;
+    CameraAVStreamMgmtDelegate::SnapshotStreamAllocateArgs snapshotStreamArgs;
     snapshotStreamArgs.imageCodec       = commandData.imageCodec;
-    snapshotStreamArgs.frameRate        = commandData.maxFrameRate;
+    snapshotStreamArgs.maxFrameRate     = commandData.maxFrameRate;
     snapshotStreamArgs.minResolution    = commandData.minResolution;
     snapshotStreamArgs.maxResolution    = commandData.maxResolution;
     snapshotStreamArgs.quality          = commandData.quality;
+    snapshotStreamArgs.encodedPixels    = false;
+    snapshotStreamArgs.hardwareEncoder  = false;
     snapshotStreamArgs.watermarkEnabled = commandData.watermarkEnabled;
     snapshotStreamArgs.OSDEnabled       = commandData.OSDEnabled;
-    snapshotStreamArgs.referenceCount   = 0;
+
+    // Fetch matching snapshot capabilities to figure out the requirement for
+    // hardware encoder for this snapshot stream
+    auto snCapabIt = std::find_if(mSnapshotCapabilitiesList.begin(), mSnapshotCapabilitiesList.end(), [&](const auto & capability) {
+        return capability.imageCodec == commandData.imageCodec && capability.maxFrameRate >= commandData.maxFrameRate &&
+            capability.resolution.width >= commandData.minResolution.width &&
+            capability.resolution.height >= commandData.minResolution.height &&
+            capability.resolution.width <= commandData.maxResolution.width &&
+            capability.resolution.height <= commandData.maxResolution.height;
+    });
+
+    if (snCapabIt != mSnapshotCapabilitiesList.end())
+    {
+        // Set the configuration for the hardware encoder for the snapshot
+        // stream
+        snapshotStreamArgs.encodedPixels = snCapabIt->requiresEncodedPixels;
+        if (snCapabIt->requiresEncodedPixels && snCapabIt->requiresHardwareEncoder.HasValue())
+        {
+            snapshotStreamArgs.hardwareEncoder = snCapabIt->requiresHardwareEncoder.Value();
+        }
+    }
+    else
+    {
+        // Stream allocation request does not match any SnapshotCapabilities struct
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
+        return;
+    }
 
     // Call the delegate
     Status status = mDelegate.SnapshotStreamAllocate(snapshotStreamArgs, snapshotStreamID);
@@ -1884,15 +2324,33 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamAllocate(HandlerContext & ctx
 
     // Check if the streamID matches an existing one in the
     // mAllocatedSnapshotStreams.
-    bool streamExists = std::find_if(mAllocatedSnapshotStreams.begin(), mAllocatedSnapshotStreams.end(),
-                                     [&snapshotStreamID](const SnapshotStreamStruct & entry) {
-                                         return entry.snapshotStreamID == snapshotStreamID;
-                                     }) != mAllocatedSnapshotStreams.end();
-    if (!streamExists)
+    auto it = std::find_if(
+        mAllocatedSnapshotStreams.begin(), mAllocatedSnapshotStreams.end(),
+        [snapshotStreamID](const SnapshotStreamStruct & sStream) { return sStream.snapshotStreamID == snapshotStreamID; });
+
+    if (it == mAllocatedSnapshotStreams.end())
     {
-        // Add the allocated snapshotstream object in the AllocatedSnapshotStreams list.
-        snapshotStreamArgs.snapshotStreamID = snapshotStreamID;
-        AddSnapshotStream(snapshotStreamArgs);
+        // Add the allocated snapshot stream object in the mAllocatedSnapshotStreams list.
+        SnapshotStreamStruct allocatedSnapshotStream;
+        allocatedSnapshotStream.snapshotStreamID = snapshotStreamID;
+        allocatedSnapshotStream.referenceCount   = 0;
+        allocatedSnapshotStream.imageCodec       = snapshotStreamArgs.imageCodec;
+        allocatedSnapshotStream.frameRate        = snapshotStreamArgs.maxFrameRate;
+        allocatedSnapshotStream.minResolution    = snapshotStreamArgs.minResolution;
+        allocatedSnapshotStream.maxResolution    = snapshotStreamArgs.maxResolution;
+        allocatedSnapshotStream.quality          = snapshotStreamArgs.quality;
+        allocatedSnapshotStream.encodedPixels    = snapshotStreamArgs.encodedPixels;
+        allocatedSnapshotStream.hardwareEncoder  = snapshotStreamArgs.hardwareEncoder;
+        allocatedSnapshotStream.watermarkEnabled = snapshotStreamArgs.watermarkEnabled;
+        allocatedSnapshotStream.OSDEnabled       = snapshotStreamArgs.OSDEnabled;
+
+        TEMPORARY_RETURN_IGNORED AddSnapshotStream(allocatedSnapshotStream);
+    }
+    else
+    {
+        SnapshotStreamStruct & snapshotStreamToUpdate = *it;
+        // Reusing the existing stream. Update range parameters
+        TEMPORARY_RETURN_IGNORED UpdateSnapshotStreamRangeParams(snapshotStreamToUpdate, snapshotStreamArgs);
     }
 
     response.snapshotStreamID = snapshotStreamID;
@@ -1907,19 +2365,37 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamModify(HandlerContext & ctx,
     auto & isOSDEnabled       = commandData.OSDEnabled;
     auto & snapshotStreamID   = commandData.snapshotStreamID;
 
-    // If Watermark feature is supported, then command should have the
-    // isWaterMarkEnabled param. Or, if it is not supported, then command should
-    // not have the param.
-    VerifyOrReturn((HasFeature(Feature::kWatermark) == commandData.watermarkEnabled.HasValue()),
-                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
+    // If WatermarkEnabled is provided then the Watermark feature has to be supported
+    if (commandData.watermarkEnabled.HasValue())
+    {
+        VerifyOrReturn(HasFeature(Feature::kWatermark), {
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: WatermarkEnabled provided but Watermark Feature not set", mEndpointId);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        });
+    }
 
-    // If OSD feature is supported, then command should have the
-    // isOSDEnabled param. Or, if it is not supported, then command should
-    // not have the param.
-    VerifyOrReturn((HasFeature(Feature::kOnScreenDisplay) == commandData.OSDEnabled.HasValue()),
-                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand));
+    // If OSDEnabled is provided then the OSD feature has to be supported
+    if (commandData.OSDEnabled.HasValue())
+    {
+        VerifyOrReturn(HasFeature(Feature::kOnScreenDisplay), {
+            ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: OSDEnabled provided but OSD Feature not set", mEndpointId);
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        });
+    }
 
-    // Call the delegate
+    // One of WatermarkEnabled or OSDEnabled has to be present
+    VerifyOrReturn(commandData.watermarkEnabled.HasValue() || commandData.OSDEnabled.HasValue(), {
+        ChipLogError(Zcl,
+                     "CameraAVStreamMgmt[ep=%d]: One of WatermarkEnabled or OSDEnabled must be provided in SnapshotStreamModify",
+                     mEndpointId);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+    });
+
+    if (!ValidateSnapshotStreamForModifyOrDeallocate(snapshotStreamID, ctx, /* isDeallocate = */ false))
+    {
+        return;
+    }
+
     status = mDelegate.SnapshotStreamModify(snapshotStreamID, isWaterMarkEnabled, isOSDEnabled);
 
     if (status == Status::Success)
@@ -1933,15 +2409,19 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamModify(HandlerContext & ctx,
 void CameraAVStreamMgmtServer::HandleSnapshotStreamDeallocate(HandlerContext & ctx,
                                                               const Commands::SnapshotStreamDeallocate::DecodableType & commandData)
 {
-
     auto & snapshotStreamID = commandData.snapshotStreamID;
+
+    if (!ValidateSnapshotStreamForModifyOrDeallocate(snapshotStreamID, ctx, /* isDeallocate = */ true))
+    {
+        return;
+    }
 
     // Call the delegate
     Status status = mDelegate.SnapshotStreamDeallocate(snapshotStreamID);
 
     if (status == Status::Success)
     {
-        RemoveSnapshotStream(snapshotStreamID);
+        TEMPORARY_RETURN_IGNORED RemoveSnapshotStream(snapshotStreamID);
     }
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
@@ -1952,18 +2432,28 @@ void CameraAVStreamMgmtServer::HandleSetStreamPriorities(HandlerContext & ctx,
 {
 
     auto & streamPriorities = commandData.streamPriorities;
-    std::vector<StreamUsageEnum> rankedStreamPriorities;
+    std::vector<Globals::StreamUsageEnum> streamUsagePriorities;
     auto iter = streamPriorities.begin();
+
+    // If any video, audio or snapshot streams exist fail the command.
+    VerifyOrReturn(mAllocatedVideoStreams.empty() && mAllocatedAudioStreams.empty() && mAllocatedSnapshotStreams.empty(),
+                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState));
 
     while (iter.Next())
     {
         auto & streamUsage = iter.GetValue();
-        if (streamUsage == StreamUsageEnum::kUnknownEnumValue)
+        if (streamUsage == Globals::StreamUsageEnum::kUnknownEnumValue)
         {
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
             return;
         }
-        rankedStreamPriorities.push_back(streamUsage);
+        // If any requested value is not found in SupportedStreamUsages,
+        // return DynamicConstraintError.
+        auto it = std::find(mSupportedStreamUsages.begin(), mSupportedStreamUsages.end(), streamUsage);
+        VerifyOrReturn(it != mSupportedStreamUsages.end(),
+                       ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError));
+
+        streamUsagePriorities.push_back(streamUsage);
     }
 
     if (iter.GetStatus() != CHIP_NO_ERROR)
@@ -1972,7 +2462,12 @@ void CameraAVStreamMgmtServer::HandleSetStreamPriorities(HandlerContext & ctx,
         return;
     }
 
-    CHIP_ERROR err = SetRankedVideoStreamPriorities(rankedStreamPriorities);
+    // If there are duplicate stream usages in StreamPriorities,
+    // return AlreadyExists
+    VerifyOrReturn(!StreamPrioritiesHasDuplicates(streamUsagePriorities),
+                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::AlreadyExists));
+
+    CHIP_ERROR err = SetStreamUsagePriorities(streamUsagePriorities);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -1980,7 +2475,7 @@ void CameraAVStreamMgmtServer::HandleSetStreamPriorities(HandlerContext & ctx,
         return;
     }
 
-    mDelegate.OnRankedStreamPrioritiesChanged();
+    mDelegate.OnStreamUsagePrioritiesChanged();
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Success);
 }
@@ -1994,8 +2489,26 @@ void CameraAVStreamMgmtServer::HandleCaptureSnapshot(HandlerContext & ctx,
     auto & requestedResolution = commandData.requestedResolution;
     ImageSnapshot image;
 
+    if (!CheckSnapshotStreamsAvailability(ctx))
+    {
+        return;
+    }
+
+    if (!snapshotStreamID.IsNull())
+    {
+        if (!ValidateSnapshotStreamId(snapshotStreamID, ctx))
+        {
+            return;
+        }
+    }
+
     VerifyOrReturn(commandData.requestedResolution.width >= 1 && commandData.requestedResolution.height >= 1,
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
+
+    // If SoftLivestreamPrivacyModeEnabled or HardPrivacyModeOn, return
+    // InvalidInState.
+    VerifyOrReturn(!mSoftLivestreamPrivacyModeEnabled && !mHardPrivacyModeOn,
+                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState));
 
     // Call the delegate
     Status status = mDelegate.CaptureSnapshot(snapshotStreamID, requestedResolution, image);
@@ -2008,6 +2521,8 @@ void CameraAVStreamMgmtServer::HandleCaptureSnapshot(HandlerContext & ctx,
 
     if (image.data.size() > kMaxSnapshotImageSize)
     {
+        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Snapshot image file size(%lu) exceeded limit %lu", mEndpointId,
+                     static_cast<unsigned long>(image.data.size()), static_cast<unsigned long>(kMaxSnapshotImageSize));
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ResourceExhausted);
         return;
     }
@@ -2017,6 +2532,94 @@ void CameraAVStreamMgmtServer::HandleCaptureSnapshot(HandlerContext & ctx,
     response.resolution = image.imageRes;
     response.imageCodec = image.imageCodec;
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+}
+
+bool CameraAVStreamMgmtServer::CheckSnapshotStreamsAvailability(HandlerContext & ctx)
+{
+    if (mAllocatedSnapshotStreams.empty())
+    {
+        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: No snapshot streams are allocated", mEndpointId);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
+        return false;
+    }
+    return true;
+}
+
+bool CameraAVStreamMgmtServer::ValidateSnapshotStreamId(const DataModel::Nullable<uint16_t> & snapshotStreamID,
+                                                        HandlerContext & ctx)
+{
+    auto found = std::find_if(mAllocatedSnapshotStreams.begin(), mAllocatedSnapshotStreams.end(),
+                              [&](const SnapshotStreamStruct & s) { return s.snapshotStreamID == snapshotStreamID.Value(); });
+    if (found == mAllocatedSnapshotStreams.end())
+    {
+        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: No snapshot stream exist by id %d", mEndpointId, snapshotStreamID.Value());
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
+        return false;
+    }
+    return true;
+}
+
+bool CameraAVStreamMgmtServer::ValidateVideoStreamForModifyOrDeallocate(const uint16_t videoStreamID, HandlerContext & ctx,
+                                                                        bool isDeallocate)
+{
+    return ValidateStreamForModifyOrDeallocateImpl(
+        mAllocatedVideoStreams, videoStreamID, ctx, StreamType::kVideo, [](const VideoStreamStruct & s) { return s.videoStreamID; },
+        isDeallocate);
+}
+
+bool CameraAVStreamMgmtServer::ValidateAudioStreamForDeallocate(const uint16_t audioStreamID, HandlerContext & ctx)
+{
+    return ValidateStreamForModifyOrDeallocateImpl(
+        mAllocatedAudioStreams, audioStreamID, ctx, StreamType::kAudio, [](const AudioStreamStruct & s) { return s.audioStreamID; },
+        /* isDeallocate = */ true);
+}
+
+bool CameraAVStreamMgmtServer::ValidateSnapshotStreamForModifyOrDeallocate(const uint16_t snapshotStreamID, HandlerContext & ctx,
+                                                                           bool isDeallocate)
+{
+    return ValidateStreamForModifyOrDeallocateImpl(
+        mAllocatedSnapshotStreams, snapshotStreamID, ctx, StreamType::kSnapshot,
+        [](const SnapshotStreamStruct & s) { return s.snapshotStreamID; }, isDeallocate);
+}
+
+bool CameraAVStreamMgmtServer::IsResourceAvailableForStreamAllocation(uint32_t candidateEncodedPixelRate, bool encoderRequired)
+{
+    uint64_t totalEncodedPixelRate = candidateEncodedPixelRate;
+    uint16_t totalEncodersRequired = encoderRequired ? 1 : 0;
+
+    for (const VideoStreamStruct & stream : mAllocatedVideoStreams)
+    {
+        totalEncodedPixelRate +=
+            (static_cast<uint64_t>(stream.maxFrameRate) * stream.maxResolution.height * stream.maxResolution.width);
+    }
+
+    for (const SnapshotStreamStruct & stream : mAllocatedSnapshotStreams)
+    {
+        if (stream.encodedPixels)
+        {
+            totalEncodedPixelRate +=
+                (static_cast<uint64_t>(stream.frameRate) * stream.maxResolution.height * stream.maxResolution.width);
+            if (stream.hardwareEncoder)
+            {
+                totalEncodersRequired++;
+            }
+        }
+    }
+
+    // Check if the cumulative encoded pixel rate is within the bounds of the MaxEncodedPixelRate
+    if (totalEncodedPixelRate > mMaxEncodedPixelRate)
+    {
+        return false;
+    }
+
+    // Check if the number of streams is within the bounds of
+    // MaxConcurrentEncoders
+    if ((mAllocatedVideoStreams.size() + totalEncodersRequired) > mMaxConcurrentEncoders)
+    {
+        return false;
+    }
+
+    return true;
 }
 
 } // namespace CameraAvStreamManagement

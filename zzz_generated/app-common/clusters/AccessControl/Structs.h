@@ -23,7 +23,7 @@
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/List.h>
 #include <app/data-model/Nullable.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
 #include <lib/core/TLV.h>
 #include <lib/support/BitMask.h>
@@ -169,11 +169,12 @@ using DecodableType = Type;
 namespace AccessControlEntryStruct {
 enum class Fields : uint8_t
 {
-    kPrivilege   = 1,
-    kAuthMode    = 2,
-    kSubjects    = 3,
-    kTargets     = 4,
-    kFabricIndex = 254,
+    kPrivilege     = 1,
+    kAuthMode      = 2,
+    kSubjects      = 3,
+    kTargets       = 4,
+    kAuxiliaryType = 5,
+    kFabricIndex   = 254,
 };
 
 struct Type
@@ -183,6 +184,7 @@ public:
     AccessControlEntryAuthModeEnum authMode   = static_cast<AccessControlEntryAuthModeEnum>(0);
     DataModel::Nullable<DataModel::List<const uint64_t>> subjects;
     DataModel::Nullable<DataModel::List<const Structs::AccessControlTargetStruct::Type>> targets;
+    Optional<AccessControlAuxiliaryTypeEnum> auxiliaryType;
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     static constexpr bool kIsFabricScoped = true;
@@ -205,6 +207,7 @@ public:
     AccessControlEntryAuthModeEnum authMode   = static_cast<AccessControlEntryAuthModeEnum>(0);
     DataModel::Nullable<DataModel::DecodableList<uint64_t>> subjects;
     DataModel::Nullable<DataModel::DecodableList<Structs::AccessControlTargetStruct::DecodableType>> targets;
+    Optional<AccessControlAuxiliaryTypeEnum> auxiliaryType;
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);

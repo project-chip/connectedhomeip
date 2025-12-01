@@ -36,14 +36,15 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 from dataclasses import dataclass
 
-import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
@@ -149,7 +150,7 @@ class TC_ICDM_3_2(MatterBaseTest):
         return "[TC-ICDM-3.2] Verify RegisterClient Command with DUT as Server"
 
     def steps_TC_ICDM_3_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(0, "Commissioning, already done", is_commissioning=True),
             TestStep(1, "TH reads from the DUT the RegisteredClients attribute. RegisteredClients is empty."),
             TestStep("2a", "TH sends RegisterClient command."),
@@ -172,21 +173,19 @@ class TC_ICDM_3_2(MatterBaseTest):
             TestStep("8d", "TH sends RegisterClient command with same CheckInNodeID5 and VerificationKey5 as in Step 6a and different MonitorSubID9 and Key9."),
             TestStep(9, "TH sends UnregisterClient command with the CheckInNodeID5 and VerificationKey5."),
         ]
-        return steps
 
     def pics_TC_ICDM_3_2(self) -> list[str]:
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
-        pics = [
+        return [
             "ICDM.S",
             "ICDM.S.F00"
         ]
-        return pics
 
     #
     # ICDM 3.2 Test Body
     #
 
-    @ async_test_body
+    @async_test_body
     async def test_TC_ICDM_3_2(self):
         is_ci = self.check_pics("PICS_SDK_CI_ONLY")
 
@@ -244,7 +243,7 @@ class TC_ICDM_3_2(MatterBaseTest):
 
             self.step("2d")
             if not is_ci:
-                time.sleep(wait_time_reboot)
+                await asyncio.sleep(wait_time_reboot)
 
             self.step("2e")
             registeredClients = await self._read_icdm_attribute_expect_success(
@@ -362,7 +361,7 @@ class TC_ICDM_3_2(MatterBaseTest):
             newAcls.append(newAclEntry)
 
             try:
-                await self.default_controller.WriteAttribute(nodeid=self.dut_node_id, attributes=[(0, ac.Attributes.Acl(newAcls))])
+                await self.default_controller.WriteAttribute(nodeId=self.dut_node_id, attributes=[(0, ac.Attributes.Acl(newAcls))])
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, "Unexpected error returned")
@@ -406,7 +405,7 @@ class TC_ICDM_3_2(MatterBaseTest):
         finally:
             # Reset ACLs
             try:
-                await self.default_controller.WriteAttribute(nodeid=self.dut_node_id, attributes=[(0, ac.Attributes.Acl(previousAcl))])
+                await self.default_controller.WriteAttribute(nodeId=self.dut_node_id, attributes=[(0, ac.Attributes.Acl(previousAcl))])
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, "Unexpected error returned")

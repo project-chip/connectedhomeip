@@ -38,9 +38,14 @@
 #include <lib/core/TLVDebug.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CHIPCounter.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
 #include <protocols/interaction_model/Constants.h>
+
+#include <app/server-cluster/DefaultServerCluster.h>
+
+#include <app/util/mock/MockNodeConfig.h>
 
 namespace {
 using namespace chip;
@@ -54,7 +59,37 @@ chip::ClusterId kTestClusterId2    = 7;
 chip::EndpointId kTestEndpointId   = 1;
 chip::EventId kTestEventIdDebug    = 1;
 chip::EventId kTestEventIdCritical = 2;
+chip::EventId kTestEventIdNotKnown = 3;
 chip::TLV::Tag kTestEventTag       = chip::TLV::ContextTag(1);
+
+const chip::Test::MockNodeConfig & TestMockNodeConfig()
+{
+    using namespace chip::app;
+    using namespace chip::app::Clusters::Globals::Attributes;
+    using namespace chip::Test;
+
+    // clang-format off
+    static const MockNodeConfig config({
+        MockEndpointConfig(kTestEndpointId, {
+
+            MockClusterConfig(chip::Test::kTestDeniedClusterId2,
+                 {},                    /* attributes */
+                 {kTestEventIdDebug}    /* events */
+                ),
+            MockClusterConfig(kTestClusterId2,
+                 {},                    /* attributes */
+                 {kTestEventIdCritical} /* events */
+                ),
+            MockClusterConfig(MockClusterId(2),
+                 {},                    /* attributes */
+                 {} /* events */
+                )
+
+        })
+    });
+    // clang-format on
+    return config;
+}
 
 class TestAccessControlDelegate : public AccessControl::Delegate
 {
@@ -63,12 +98,15 @@ public:
     CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const chip::Access::RequestPath & requestPath,
                      Privilege requestPrivilege) override
     {
+        mNumOfTimesAclIsChecked++;
+
         if (requestPath.cluster == chip::Test::kTestDeniedClusterId2)
         {
             return CHIP_ERROR_ACCESS_DENIED;
         }
         return CHIP_NO_ERROR;
     }
+    uint8_t mNumOfTimesAclIsChecked = 0;
 };
 
 AccessControl::Delegate * GetTestAccessControlDelegate()
@@ -193,15 +231,24 @@ public:
                                                           gCircularEventBuffer, logStorageResources, &mEventCounter);
 
         Access::GetAccessControl().Finish();
-        Access::GetAccessControl().Init(GetTestAccessControlDelegate(), gDeviceTypeResolver);
+        EXPECT_SUCCESS(Access::GetAccessControl().Init(GetTestAccessControlDelegate(), gDeviceTypeResolver));
+
+        mAccessControlDelegate                          = static_cast<TestAccessControlDelegate *>(GetTestAccessControlDelegate());
+        mAccessControlDelegate->mNumOfTimesAclIsChecked = 0;
+
+        chip::Test::SetMockNodeConfig(TestMockNodeConfig());
     }
 
     // Performs teardown for each individual test in the test suite
     void TearDown() override
     {
+        chip::Test::ResetMockNodeConfig();
         chip::app::EventManagement::DestroyEventManagement();
         AppContext::TearDown();
     }
+
+protected:
+    TestAccessControlDelegate * mAccessControlDelegate = nullptr;
 
 private:
     chip::MonotonicallyIncreasingCounter<chip::EventNumber> mEventCounter;
@@ -314,9 +361,111 @@ TEST_F(TestAclEvent, TestReadRoundtripWithEventStatusIBInEventReport)
         eventPathParams[0].mEndpointId = kTestEndpointId;
         eventPathParams[0].mClusterId  = chip::Test::kTestDeniedClusterId2;
         eventPathParams[0].mEventId    = kTestEventIdDebug;
+
         eventPathParams[1].mEndpointId = kTestEndpointId;
         eventPathParams[1].mClusterId  = kTestClusterId2;
         eventPathParams[1].mEventId    = kTestEventIdCritical;
+
+        ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
+        readPrepareParams.mpEventPathParamsList    = eventPathParams;
+        readPrepareParams.mEventPathParamsListSize = 2;
+        readPrepareParams.mEventNumber.SetValue(1);
+
+        MockInteractionModelApp delegate;
+        EXPECT_FALSE(delegate.mGotEventResponse);
+
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
+                                   chip::app::ReadClient::InteractionType::Read);
+
+        EXPECT_EQ(readClient.SendRequest(readPrepareParams), CHIP_NO_ERROR);
+
+        DrainAndServiceIO();
+        EXPECT_TRUE(delegate.mGotEventResponse);
+        EXPECT_EQ(delegate.mNumReadEventFailureStatusReceived, 1); // need exactly one UnsupportedAccess, nothing else
+        EXPECT_EQ(delegate.mLastStatusReceived.mStatus,
+                  chip::Protocols::InteractionModel::Status::Success); // The Second Concrete Event Path is Valid, therefore Last
+                                                                       // Status is a Success
+        EXPECT_FALSE(delegate.mReadError);
+    }
+    EXPECT_FALSE(engine->GetNumActiveReadClients());
+    engine->Shutdown();
+    EXPECT_FALSE(GetExchangeManager().GetNumActiveExchanges());
+}
+
+// This DefaultServerCluster is only used for Testing the case where EventInfo() returns a Failure
+class FakeDefaultServerCluster : public DefaultServerCluster
+{
+public:
+    static constexpr uint32_t kFakeFeatureMap      = 0x35;
+    static constexpr uint32_t kFakeClusterRevision = 1234;
+
+    FakeDefaultServerCluster(const ConcreteClusterPath & path) : DefaultServerCluster(path) {}
+
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override
+    {
+        using namespace chip::app::Clusters;
+
+        switch (request.path.mAttributeId)
+        {
+        case Globals::Attributes::FeatureMap::Id: {
+            uint32_t value = kFakeFeatureMap;
+            return encoder.Encode<uint32_t>(std::move(value));
+        }
+        case Globals::Attributes::ClusterRevision::Id: {
+            uint32_t value = kFakeClusterRevision;
+            return encoder.Encode<uint32_t>(std::move(value));
+        }
+        }
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    CHIP_ERROR EventInfo(const ConcreteEventPath & path, DataModel::EventEntry & eventInfo) override
+    {
+        if (path.mEventId == kTestEventIdNotKnown)
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+
+        return CHIP_NO_ERROR;
+    }
+
+    Access::Privilege mEventInfoFakePrivilege = Access::Privilege::kView;
+};
+
+// Testing the case when:
+// - EventInfo() returns an Error with a Concrete Event Path AND and the path has a Valid Endpoint and Cluster.
+// - In that Case, we should get UnsupportedEvent as StatusIB and we should SKIP the second ACL check.
+TEST_F(TestAclEvent, TestUnsupportedEventWithValidClusterPath)
+{
+    using namespace chip::Test;
+
+    Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
+    // Shouldn't have anything in the retransmit table when starting the test.
+    EXPECT_FALSE(rm->TestGetCountRetransTable());
+
+    const ConcreteClusterPath kTestClusterPath(kTestEndpointId, MockClusterId(2));
+    FakeDefaultServerCluster fakeClusterServer(kTestClusterPath);
+    ServerClusterRegistration registration(fakeClusterServer);
+
+    CodegenDataModelProvider model;
+    ASSERT_EQ(model.Registry().Register(registration), CHIP_NO_ERROR);
+
+    chip::app::DataModel::Provider * mOldProvider = nullptr;
+    auto * engine                                 = chip::app::InteractionModelEngine::GetInstance();
+    mOldProvider                                  = engine->SetDataModelProvider(&model);
+
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
+
+    GenerateEvents();
+
+    // A custom AccessControl::Delegate has been installed that grants privilege to any cluster except the test cluster.
+    // When reading events with concrete paths without enough privilege, we will get a EventStatusIB
+    {
+        chip::app::EventPathParams eventPathParams[1];
+        eventPathParams[0].mEndpointId = kTestEndpointId;
+        eventPathParams[0].mClusterId  = MockClusterId(2);
+        eventPathParams[0].mEventId    = kTestEventIdNotKnown;
 
         ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
         readPrepareParams.mpEventPathParamsList    = eventPathParams;
@@ -332,13 +481,25 @@ TEST_F(TestAclEvent, TestReadRoundtripWithEventStatusIBInEventReport)
         EXPECT_EQ(readClient.SendRequest(readPrepareParams), CHIP_NO_ERROR);
 
         DrainAndServiceIO();
+
         EXPECT_TRUE(delegate.mGotEventResponse);
-        EXPECT_TRUE(delegate.mNumReadEventFailureStatusReceived);
+        EXPECT_EQ(delegate.mNumReadEventFailureStatusReceived, 1); // need exactly one UnsupportedEvent, nothing else
+        EXPECT_EQ(delegate.mLastStatusReceived.mStatus, Protocols::InteractionModel::Status::UnsupportedEvent);
+
+        // Since we failed the Existence check, we shouldn't reach the 2nd ACL Check, and should have only done the 1st ACL Check
+        // (against the View Privilege according to Spec)
+        EXPECT_EQ(mAccessControlDelegate->mNumOfTimesAclIsChecked, 1);
         EXPECT_FALSE(delegate.mReadError);
     }
+
     EXPECT_FALSE(engine->GetNumActiveReadClients());
+
     engine->Shutdown();
     EXPECT_FALSE(GetExchangeManager().GetNumActiveExchanges());
+    engine->SetDataModelProvider(mOldProvider);
+
+    EXPECT_SUCCESS(model.Registry().Unregister(&fakeClusterServer));
+    EXPECT_SUCCESS(model.Shutdown());
 }
 
 } // namespace app

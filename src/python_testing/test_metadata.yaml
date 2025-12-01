@@ -1,41 +1,30 @@
 # Tests that are NOT executed in CI, along with the reason on
 # why they are not.
 not_automated:
+    - name: TC_DD_3_23.py
+      reason:
+          NFC-Thread hardware setup needed for running this test-case and CI
+          does not support it
     - name: MinimalRepresentation.py
       reason: Code/Test not being used or not shared code for any other tests
     - name: TC_AVSMTestBase.py
       reason: Shared code for TC_AVSM, not a standalone test
-    - name: TC_AVSM_2_2.py
-      reason: Camera App does not support all features required for this TC
-    - name: TC_AVSM_2_3.py
-      reason: Camera App does not support all features required for this TC
-    - name: TC_AVSM_2_4.py
-      reason: Camera App does not support all features required for this TC
-    - name: TC_AVSM_2_5.py
-      reason: Camera App does not support all features required for this TC
-    - name: TC_AVSM_2_6.py
-      reason: Camera App does not support all features required for this TC
-    - name: TC_AVSM_2_7.py
-      reason: Camera App does not support all features required for this TC
-    - name: TC_AVSM_2_8.py
-      reason: Camera App does not support all features required for this TC
-    - name: TC_AVSM_2_9.py
-      reason: Camera App does not support all features required for this TC
-    - name: TC_AVSM_2_10.py
-      reason: Camera App does not support all features required for this TC
-    - name: TC_AVSM_2_11.py
-      reason: Camera App does not support all features required for this TC
     - name: TC_CNET_4_2.py
       reason: It has no CI execution block, it not executed in CI
-    - name: TC_CNET_4_3.py
-      reason:
-          network commissioning cluster does not return expected values on linux
-          example apps -
-          https://github.com/project-chip/connectedhomeip/issues/37824
+    - name: TC_CNET_4_1.py
+      reason: Required commissioning not implemented on CI
     - name: TC_CNET_4_4.py
+      reason: It has no CI execution block, is not executed in CI
+    - name: TC_CNET_4_9.py
+      reason: It has no CI execution block, is not executed in CI
+    - name: TC_CNET_4_10.py
+      reason: It has no CI execution block, is not executed in CI
+    - name: TC_CNET_4_12.py
       reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_15.py
       reason: It has no CI execution block, is not executed in CI
+    - name: TC_CNET_4_16.py
+      reason: Can not run thread CNET tests in CI
     - name: TC_CNET_4_22.py
       reason: It has no CI execution block, is not executed in CI
     - name: TC_DGGEN_3_2.py
@@ -80,6 +69,14 @@ not_automated:
       reason: Shared code for TC_EGC, not a standalone test
     - name: TC_SEPRTestBase.py
       reason: Shared code for TC_SEPR, not a standalone test
+    - name: TC_SETRF_TestBase.py
+      reason: Shared code for TC_SETRF, not a standalone test
+    - name: TC_SUTestBase.py
+      reason: Shared code for TC_SU, not a standalone test
+    - name: TC_COMMTR_TestBase.py
+      reason: Shared code for TC_COMMTR, not a standalone test
+    - name: TC_MTRIDTestBase.py
+      reason: Shared code for TC_MTRID, not a standalone test
     - name: TestConformanceTest.py
       reason:
           Unit test of the conformance test (TC_DeviceConformance) - does not
@@ -88,9 +85,15 @@ not_automated:
       reason: Unit test - does not run against an app
     - name: TestIdChecks.py
       reason: Unit test - does not run against an app
+    - name: TestSpecParsingDataType.py
+      reason: Unit test - does not run against an app
     - name: TestSpecParsingDeviceType.py
       reason: Unit test - does not run against an app
+    - name: TestSpecParsingNamespace.py
+      reason: Unit test - does not run against an app
     - name: TestConformanceTest.py
+      reason: Unit test - does not run against an app
+    - name: TestPics.py
       reason: Unit test - does not run against an app
     - name: TestSpecParsingSelection.py
       reason: Unit test - does not run against an app
@@ -123,28 +126,30 @@ not_automated:
     - name: TC_AVSUMTestBase.py
       reason:
           Shared code for Camera AV Settings (TC_AVSUM*), not a standalone test.
-    - name: TC_WEBRTC_1_1.py
-      reason:
-          Depends on Python WebRTC bindings. Will be enabled once local tests
-          are fully verified.
-    - name: TC_WEBRTC_1_2.py
-      reason:
-          Depends on Python WebRTC bindings. Will be enabled once local tests
-          are fully verified.
-    - name: TC_WEBRTC_1_3.py
-      reason:
-          Depends on Python WebRTC bindings. Will be enabled once local tests
-          are fully verified.
-    - name: TC_WEBRTC_1_4.py
-      reason:
-          Depends on Python WebRTC bindings. Will be enabled once local tests
-          are fully verified.
     - name: TC_WEBRTC_1_5.py
       reason:
-          Depends on Python WebRTC bindings. Will be enabled once local tests
-          are fully verified.
+          Depends on Python WebRTC bindings and Camera App. Will be enabled once
+          local tests are fully verified.
     - name: TC_WEBRTC_Utils.py
       reason: Helper methods for WebRTC TCs, not a standalone test.
+    - name: TC_WEBRTC_1_6.py
+      reason: Depends on a browser peer for webrtc. CI is not supported.
+    - name: TC_CHIMETestBase.py
+      reason: Shared code for the Chime Cluster, not a standalone test.
+    - name: TC_WEBRTCRTestBase.py
+      reason:
+          Shared code for the WebRTC Requestor Cluster, not a standalone test.
+    - name: TC_WEBRTCPTestBase.py
+      reason:
+          Shared code for the WebRTC Provider Cluster, not a standalone test.
+    - name: TC_PAVSTTestBase.py
+      reason:
+          Shared code for Push AV Cluster tests (TC_PAVST_*), not a standalone
+          test.
+    - name: TC_PAVSTI_Utils.py
+      reason: Helper methods for Push AV Integration TCs
+    - name: TC_TLS_Utils.py
+      reason: Helper methods for TC tests dependent on TLS clusters
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially
@@ -153,10 +158,12 @@ slow_tests:
     - { name: mobile-device-test.py, duration: 3 minutes }
     - { name: TC_AccessChecker.py, duration: 1.5 minutes }
     - { name: TC_BRBINFO_4_1.py, duration: 2 minutes }
+    - { name: TC_CADMIN_1_3_4.py, duration: 4 minutes }
     - { name: TC_CADMIN_1_19.py, duration: 30 seconds }
     - { name: TC_CADMIN_1_22_24.py, duration: 3 minutes }
     - { name: TC_CADMIN_1_9.py, duration: 40 seconds }
     - { name: TC_CC_2_2.py, duration: 1.5 minutes }
+    - { name: TC_CLCTRL_4_1.py, duration: 45 seconds }
     - { name: TC_DEM_2_10.py, duration: 40 seconds }
     - { name: TC_DeviceBasicComposition.py, duration: 25 seconds }
     - { name: TC_DRLK_2_12.py, duration: 30 seconds }

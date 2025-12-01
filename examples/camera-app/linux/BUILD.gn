@@ -22,10 +22,7 @@ import("${build_root}/config/linux/pkg_config.gni")
 assert(chip_build_tools)
 
 config("config") {
-  cflags = [
-    "-Wconversion",
-    "-Wno-shadow",
-  ]
+  cflags = [ "-Wno-shadow" ]
 
   if (is_clang) {
     # libdatachannel has a lot of these like:
@@ -41,19 +38,33 @@ config("config") {
     "include/clusters/webrtc-provider",
     "include/clusters/camera-avstream-mgmt",
     "include/clusters/camera-avsettingsuserlevel-mgmt",
+    "include/clusters/push-av-stream-transport",
+    "include/clusters/zone-mgmt",
     "include/media-controller",
-    "include/network-stream-source",
     "include/transport",
+    "include/uploader",
+    "include/pushav-transport",
     "${chip_root}/examples/camera-app/camera-common/include",
     "${chip_root}/examples/camera-app/camera-common/include/media-controller",
+    "${chip_root}/examples/camera-app/camera-common/include/camera-avstream-controller",
+    "${chip_root}/examples/camera-app/camera-common/include/webrtc-provider-controller",
     "${chip_root}/examples/camera-app/camera-common/include/transport",
     "${chip_root}/third_party/libdatachannel/repo/include",
+  ]
+}
+
+pkg_config("ffmpeg") {
+  packages = [
+    "libavformat",
+    "libavcodec",
+    "libavutil",
   ]
 }
 
 pkg_config("gstreamer") {
   packages = [
     "gstreamer-1.0",
+    "gstreamer-app-1.0",
     "gobject-2.0",
   ]
 }
@@ -63,15 +74,26 @@ executable("chip-camera-app") {
 
   configs += [ ":gstreamer" ]
 
+  configs += [ ":ffmpeg" ]
+  libs = [ "curl" ]
+
   sources = [
     "${chip_root}/examples/camera-app/linux/include/media-controller/default-media-controller.h",
+    "${chip_root}/examples/camera-app/linux/include/pushav-prerollbuffer.h",
+    "${chip_root}/examples/camera-app/linux/src/CameraAppCommandDelegate.cpp",
     "${chip_root}/examples/camera-app/linux/src/camera-device.cpp",
     "${chip_root}/examples/camera-app/linux/src/clusters/camera-avsettingsuserlevel-mgmt/camera-avsettingsuserlevel-manager.cpp",
     "${chip_root}/examples/camera-app/linux/src/clusters/camera-avstream-mgmt/camera-av-stream-manager.cpp",
     "${chip_root}/examples/camera-app/linux/src/clusters/chime/chime-manager.cpp",
+    "${chip_root}/examples/camera-app/linux/src/clusters/push-av-stream-transport/push-av-stream-manager.cpp",
     "${chip_root}/examples/camera-app/linux/src/clusters/webrtc-provider/webrtc-provider-manager.cpp",
+    "${chip_root}/examples/camera-app/linux/src/clusters/zone-mgmt/zone-manager.cpp",
     "${chip_root}/examples/camera-app/linux/src/media-controller/default-media-controller.cpp",
-    "${chip_root}/examples/camera-app/linux/src/network-stream-source/network-stream-source.cpp",
+    "${chip_root}/examples/camera-app/linux/src/pushav-clip-recorder.cpp",
+    "${chip_root}/examples/camera-app/linux/src/pushav-prerollbuffer.cpp",
+    "${chip_root}/examples/camera-app/linux/src/pushav-transport/pushav-transport.cpp",
+    "${chip_root}/examples/camera-app/linux/src/uploader/pushav-uploader.cpp",
+    "${chip_root}/examples/camera-app/linux/src/webrtc-libdatachannel.cpp",
     "${chip_root}/examples/camera-app/linux/src/webrtc-transport.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",

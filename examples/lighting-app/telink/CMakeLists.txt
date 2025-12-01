@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2022-2024 Project CHIP Authors
+#    Copyright (c) 2022-2025 Project CHIP Authors
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -74,7 +74,8 @@ if(CONFIG_TFLM_FEATURE)
                  src/tflm/models/micro_speech_quantized_model_data.h
                  src/tflm/micro_speech/micro_model_settings.h
                  src/tflm/micro_speech/tflite_micro_micro_speech.cpp
-                 src/tflm/micro_speech/tflite_micro_micro_speech.h)
+                 src/tflm/micro_speech/tflite_micro_micro_speech.h
+                 src/tflm/errno_stub.c)
 endif()
 
 chip_configure_data_model(app
@@ -88,6 +89,11 @@ endif()
 
 if(CONFIG_BOOTLOADER_MCUBOOT)
   target_sources(app PRIVATE ${TELINK_COMMON}/util/src/OTAUtil.cpp)
+endif()
+
+if(CONFIG_MCUMGR_TRANSPORT_BT)
+    zephyr_library_link_libraries(MCUBOOT_BOOTUTIL)
+    target_sources(app PRIVATE ${TELINK_COMMON}/util/src/DFUOverSMP.cpp)
 endif()
 
 if (CONFIG_CHIP_PW_RPC)

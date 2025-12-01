@@ -23,7 +23,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/switch_2_2_fifo
 #     script-args: >
 #       --test-case test_TC_SWTCH_2_2
 #       --endpoint 1
@@ -34,11 +34,12 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --app-pipe /tmp/switch_2_2_fifo
 #     factory-reset: true
 #     quiet: true
 #   run2:
 #     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/switch_fifo
 #     script-args: >
 #       --test-case test_TC_SWTCH_2_3
 #       --test-case test_TC_SWTCH_2_4
@@ -51,11 +52,12 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --app-pipe /tmp/switch_fifo
 #     factory-reset: true
 #     quiet: true
 #   run3:
 #     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/switch_fifo
 #     script-args: >
 #       --test-case test_TC_SWTCH_2_3
 #       --test-case test_TC_SWTCH_2_4
@@ -68,28 +70,29 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --app-pipe /tmp/switch_fifo
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 #
 # These tests run on every endpoint regardless of whether a switch is present because they are set up to auto-select.
 
-import json
+import asyncio
 import logging
 import queue
 import time
 from datetime import datetime, timedelta
-from typing import Any
 
-import chip.clusters as Clusters
 import test_plan_support
-from chip.clusters import ClusterObjects as ClusterObjects
-from chip.clusters.Attribute import EventReadResult
-from chip.testing.matter_testing import (AttributeValue, ClusterAttributeChangeAccumulator, EventChangeCallback, MatterBaseTest,
-                                         TestStep, await_sequence_of_reports, default_matter_test_main, has_feature,
-                                         run_if_endpoint_matches)
-from chip.tlv import uint
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.clusters import ClusterObjects as ClusterObjects
+from matter.clusters.Attribute import EventReadResult
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
+from matter.testing.matter_testing import (AttributeValue, MatterBaseTest, TestStep, default_matter_test_main, has_feature,
+                                           run_if_endpoint_matches)
+from matter.tlv import uint
 
 logger = logging.getLogger(__name__)
 
@@ -109,9 +112,7 @@ def bump_substep(step: str) -> str:
     next_end_char = chr(ord(end_char) + 1)
     if ord(next_end_char) > ord('z'):
         raise ValueError(f"Reached max substep for step '{step}'")
-    next_step = step_prefix + next_end_char
-
-    return next_step
+    return step_prefix + next_end_char
 
 
 class TC_SwitchTests(MatterBaseTest):
@@ -123,21 +124,6 @@ class TC_SwitchTests(MatterBaseTest):
         super().setup_test()
         self.is_ci = self._use_button_simulator()
 
-    def _send_named_pipe_command(self, command_dict: dict[str, Any]):
-        app_pid = self.matter_test_config.app_pid
-        if app_pid == 0:
-            asserts.fail("The --app-pid flag must be set when usage of button simulation named pipe is required (e.g. CI)")
-
-        app_pipe = f"/tmp/chip_all_clusters_fifo_{app_pid}"
-        command = json.dumps(command_dict)
-
-        # Sends an out-of-band command to the sample app
-        with open(app_pipe, "w") as outfile:
-            logging.info(f"Sending named pipe command to {app_pipe}: '{command}'")
-            outfile.write(command + "\n")
-        # Delay for pipe command to be processed (otherwise tests may be flaky).
-        time.sleep(0.1)
-
     def _use_button_simulator(self) -> bool:
         return self.check_pics("PICS_SDK_CI_ONLY") or self.user_params.get("use_button_simulator", False)
 
@@ -145,21 +131,21 @@ class TC_SwitchTests(MatterBaseTest):
         command_dict = {"Name": 'SimulateMultiPress', "EndpointId": endpoint_id,
                         "ButtonId": pressed_position, "MultiPressPressedTimeMillis": 500, "MultiPressReleasedTimeMillis": 500,
                         "MultiPressNumPresses": number_of_presses, "FeatureMap": feature_map, "MultiPressMax": multi_press_max}
-        self._send_named_pipe_command(command_dict)
+        self.write_to_app_pipe(command_dict)
 
     def _send_long_press_named_pipe_command(self, endpoint_id: int, pressed_position: int, feature_map: int):
         command_dict = {"Name": "SimulateLongPress", "EndpointId": endpoint_id,
                         "ButtonId": pressed_position, "LongPressDelayMillis": int(1000 * (SIMULATED_LONG_PRESS_LENGTH_SECONDS - 0.5)),
                         "LongPressDurationMillis": int(1000 * SIMULATED_LONG_PRESS_LENGTH_SECONDS), "FeatureMap": feature_map}
-        self._send_named_pipe_command(command_dict)
+        self.write_to_app_pipe(command_dict)
 
     def _send_latching_switch_named_pipe_command(self, endpoint_id: int, new_position: int):
         command_dict = {"Name": "SimulateLatchPosition", "EndpointId": endpoint_id, "PositionId": new_position}
-        self._send_named_pipe_command(command_dict)
+        self.write_to_app_pipe(command_dict)
 
     def _send_switch_idle_named_pipe_command(self, endpoint_id: int):
         command_dict = {"Name": "SimulateSwitchIdle", "EndpointId": endpoint_id}
-        self._send_named_pipe_command(command_dict)
+        self.write_to_app_pipe(command_dict)
 
     def _ask_for_switch_idle(self, endpoint_id: int, omit_for_simulator: bool = False):
         if not self._use_button_simulator():
@@ -223,7 +209,7 @@ class TC_SwitchTests(MatterBaseTest):
         else:
             self._send_long_press_named_pipe_command(endpoint_id, pressed_position, feature_map)
 
-    def _ask_for_release(self):
+    async def _ask_for_release(self):
         # Since we used a long press for this, "ask for release" on the button simulator just means waiting out the delay
         if not self._use_button_simulator():
             self.wait_for_user_input(
@@ -232,7 +218,7 @@ class TC_SwitchTests(MatterBaseTest):
         else:
             # This will await for the events to be generated properly. Note that there is a bit of a
             # race here for the button simulator, but this race is extremely unlikely to be lost.
-            time.sleep(SIMULATED_LONG_PRESS_LENGTH_SECONDS + 0.5)
+            await asyncio.sleep(SIMULATED_LONG_PRESS_LENGTH_SECONDS + 0.5)
 
     def _await_sequence_of_events(self, event_queue: queue.Queue, endpoint_id: int, sequence: list[ClusterObjects.ClusterEvent], timeout_sec: float):
         start_time = time.time()
@@ -294,7 +280,7 @@ class TC_SwitchTests(MatterBaseTest):
 
         logging.info(f"Successfully waited for no further events on {expected_cluster} for {elapsed:.1f} seconds")
 
-    def _received_event(self, event_listener: EventChangeCallback, target_event: ClusterObjects.ClusterEvent, timeout_s: int) -> bool:
+    def _received_event(self, event_listener: EventSubscriptionHandler, target_event: ClusterObjects.ClusterEvent, timeout_s: int) -> bool:
         """
             Returns true if this event was received, false otherwise
         """
@@ -338,9 +324,9 @@ class TC_SwitchTests(MatterBaseTest):
 
         # Step 2: Set up subscription to all events of Switch cluster on the endpoint.
         self.step(2)
-        event_listener = EventChangeCallback(cluster)
+        event_listener = EventSubscriptionHandler(expected_cluster=cluster)
         await event_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
-        attrib_listener = ClusterAttributeChangeAccumulator(cluster)
+        attrib_listener = AttributeSubscriptionHandler(expected_cluster=cluster)
         await attrib_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
 
         # Pre-get number of positions for step 7 later.
@@ -399,7 +385,7 @@ class TC_SwitchTests(MatterBaseTest):
         # Step 9: Wait 10 seconds for event reports stable.
         # Verify that last SwitchLatched event received is for NewPosition 0.
         self.step(9)
-        time.sleep(10.0 if not self.is_ci else 1.0)
+        await asyncio.sleep(10.0 if not self.is_ci else 1.0)
 
         expected_switch_position = 0
         last_event = event_listener.get_last_event()
@@ -451,7 +437,7 @@ class TC_SwitchTests(MatterBaseTest):
         endpoint_id = self.get_endpoint()
 
         self.step(2)
-        event_listener = EventChangeCallback(cluster)
+        event_listener = EventSubscriptionHandler(expected_cluster=cluster)
         await event_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
 
         self.step(3)
@@ -473,7 +459,7 @@ class TC_SwitchTests(MatterBaseTest):
         asserts.assert_equal(button_val, self.pressed_position, f"Button value is not {self.pressed_position}")
 
         self.step(7)
-        self._ask_for_release()
+        await self._ask_for_release()
 
         self.step("8a")
         if has_msr_feature and not has_msl_feature:
@@ -537,13 +523,14 @@ class TC_SwitchTests(MatterBaseTest):
 
         if not has_ms_feature:
             logging.info("Skipping rest of test: SWTCH.S.F01(MS) feature not present")
-            self.skip_all_remaining_steps("2")
+            self.mark_all_remaining_steps_skipped("2")
+            return
 
         # Step 2: Set up subscription to all events and attributes of Switch cluster on the endpoint
         self.step(2)
-        event_listener = EventChangeCallback(cluster)
+        event_listener = EventSubscriptionHandler(expected_cluster=cluster)
         await event_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
-        attrib_listener = ClusterAttributeChangeAccumulator(cluster)
+        attrib_listener = AttributeSubscriptionHandler(expected_cluster=cluster)
         await attrib_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
 
         # Step 3: Operator does not operate switch on the DUT
@@ -564,8 +551,8 @@ class TC_SwitchTests(MatterBaseTest):
         # - TH expects report of CurrentPosition 1, followed by a report of Current Position 0.
         logging.info(
             f"Starting to wait for {post_prompt_settle_delay_seconds:.1f} seconds for CurrentPosition to go {switch_pressed_position}, then 0.")
-        await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.CurrentPosition, sequence=[
-                                  switch_pressed_position, 0], timeout_sec=post_prompt_settle_delay_seconds)
+        attrib_listener.await_sequence_of_reports(attribute=cluster.Attributes.CurrentPosition, sequence=[
+                                                  switch_pressed_position, 0], timeout_sec=post_prompt_settle_delay_seconds)
 
         # - TH expects at least InitialPress with NewPosition = 1
         logging.info(f"Starting to wait for {post_prompt_settle_delay_seconds:.1f} seconds for InitialPress event.")
@@ -704,7 +691,7 @@ class TC_SwitchTests(MatterBaseTest):
         pressed_position = self._default_pressed_position
 
         self.step(2)
-        event_listener = EventChangeCallback(cluster)
+        event_listener = EventSubscriptionHandler(expected_cluster=cluster)
         await event_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
 
         self.step(3)
@@ -752,7 +739,7 @@ class TC_SwitchTests(MatterBaseTest):
             test_multi_press_sequence("6b", count=3)
 
         if not has_msl_feature:
-            self.skip_all_remaining_steps(7)
+            self.mark_all_remaining_steps_skipped(7)
             return
 
         self.step(7)
@@ -882,7 +869,7 @@ class TC_SwitchTests(MatterBaseTest):
         pressed_position = self._default_pressed_position
 
         self.step(2)
-        event_listener = EventChangeCallback(cluster)
+        event_listener = EventSubscriptionHandler(expected_cluster=cluster)
         await event_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
 
         self.step(3)
@@ -918,7 +905,7 @@ class TC_SwitchTests(MatterBaseTest):
 
         self.step("7a")
         if not has_msl_feature:
-            self.skip_all_remaining_steps("7b")
+            self.mark_all_remaining_steps_skipped("7b")
             return
 
         # subscription is already established

@@ -35,11 +35,12 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import chip.clusters as Clusters
-from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
 from TC_AVSUMTestBase import AVSUMTestBase
+
+import matter.clusters as Clusters
+from matter.interaction_model import Status
+from matter.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 
 
 class TC_AVSUM_2_6(MatterBaseTest, AVSUMTestBase):
@@ -48,7 +49,7 @@ class TC_AVSUM_2_6(MatterBaseTest, AVSUMTestBase):
         return "[TC-AVSUM-2.6] MPTZRemovePreset command validation"
 
     def steps_TC_AVSUM_2_6(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read the value of MaxPresets, fail if unsupported."),
             TestStep(3, "Read the value of MPTZPresets, fail if unsupported"),
@@ -62,20 +63,18 @@ class TC_AVSUM_2_6(MatterBaseTest, AVSUMTestBase):
             TestStep(11, "Read MPTZPresets, verify this is empty."),
             TestStep(12, "Repeat step 10, sending a MPTZRemovePreset command for a PresetID of MaxPresets. Verify failure."),
         ]
-        return steps
 
     def pics_TC_AVSUM_2_6(self) -> list[str]:
-        pics = [
+        return [
             "AVSUM.S", "AVSUM.S.F04"
         ]
-        return pics
 
     @run_if_endpoint_matches(has_feature(Clusters.CameraAvSettingsUserLevelManagement,
                                          Clusters.CameraAvSettingsUserLevelManagement.Bitmaps.Feature.kMechanicalPresets))
     async def test_TC_AVSUM_2_6(self):
         cluster = Clusters.Objects.CameraAvSettingsUserLevelManagement
         attributes = cluster.Attributes
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(1)  # Already done, immediately go to step 2
         attribute_list = await self.read_avsum_attribute_expect_success(endpoint, attributes.AttributeList)
@@ -109,14 +108,13 @@ class TC_AVSUM_2_6(MatterBaseTest, AVSUMTestBase):
                 if mptzpreset.presetID == presetID:
                     notFound = False
                     break
-
             asserts.assert_true(notFound, "Preset not removed despite invocation of MPTZRemovePreset")
 
             # Repeat removal of already removed value, verify Not Found
             self.step(7)
             await self.send_remove_preset_command(endpoint, presetID, expected_status=Status.NotFound)
 
-            self.skip_all_remaining_steps(8)
+            self.mark_all_remaining_steps_skipped(8)
             return
 
         self.skip_step(5)

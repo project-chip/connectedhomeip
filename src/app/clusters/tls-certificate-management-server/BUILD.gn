@@ -1,0 +1,42 @@
+# Copyright (c) 2025 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import("//build_overrides/chip.gni")
+
+source_set("certificate-table") {
+  public = [
+    "CertificateTable.h",
+    "CertificateTableImpl.h",
+    "IncrementingIdHelper.h",
+  ]
+
+  deps = [ "${chip_root}/src/app" ]
+
+  sources = [ "CertificateTableImpl.cpp" ]
+
+  public_deps = [ "${chip_root}/src/app/storage:fabric-table" ]
+}
+
+source_set("tls-certificate-management-server") {
+  public = [ "tls-certificate-management-server.h" ]
+
+  deps = [
+    ":certificate-table",
+    "${chip_root}/src/app:attribute-persistence",
+    "${chip_root}/src/app/server",
+    "${chip_root}/zzz_generated/app-common/clusters:all-headers",
+    "${chip_root}/zzz_generated/app-common/clusters:all-metadata",
+  ]
+
+  sources = [ "tls-certificate-management-server.cpp" ]
+}

@@ -15,47 +15,54 @@
 # limitations under the License.
 
 import contextlib
-import glob
 import json
+import logging
 import os
-import re
+import shlex
 import subprocess
-import xml.etree.ElementTree as ElementTree
+import sys
+import textwrap
+import typing
 from pathlib import Path
 
 import click
-from chip.testing.spec_parsing import build_xml_clusters
-from paths import get_chip_root, get_documentation_file_path
+import paths
+from lxml import etree
+
+from matter.testing.conformance import ConformanceDecision
+from matter.testing.spec_parsing import build_xml_clusters, build_xml_device_types
+
+log = logging.getLogger(__name__)
+
+logging.basicConfig(level=logging.DEBUG, format="[%(levelname)s] %(message)s")
+
+# Replace hardcoded paths with dynamic paths using paths.py functions
+DEFAULT_CHIP_ROOT = paths.get_chip_root()
+try:
+    import generate_data_model_xmls_gni
+except ModuleNotFoundError:
+    sys.path.append(os.path.join(paths.get_python_testing_path(), 'matter_testing_infrastructure'))
+    import generate_data_model_xmls_gni
+
 
 CURRENT_IN_PROGRESS_DEFINES = [
+    "access-closure",
     "cameras",
     "closures",
-    "device-location",
-    "endpointuniqueid",
-    "energy-drlc",
+    "electrical-grid-conditions",
     "energy-mtrid",
     "energy-price",
     "energy-tariff",
-    "hrap-2",
-    "hrap-tbrd",
-    "hvac-preset-suggestions",
-    "hvac-thermostat-events",
     "irrigation-system",
-    "metering network-recovery",
+    "metering",
     "nfcCommissioning",
-    "paftp",
+    "q-phase-2",
     "rvc-direct-mode",
-    "rvc-moreopstates",
-    "rvc-vacthenmop",
+    "rvc-go-home",
     "soil-sensor",
-    "thermostat-controller",
-    "tls",
+    "temperature-sensor-with-screen",
+    "tls"
 ]
-
-
-# Replace hardcoded paths with dynamic paths using paths.py functions
-DEFAULT_CHIP_ROOT = get_chip_root()
-DEFAULT_DOCUMENTATION_FILE = get_documentation_file_path()
 
 
 def get_xml_path(filename, output_dir):
@@ -71,18 +78,17 @@ def make_asciidoc(target: str, include_in_progress: str, spec_dir: str, dry_run:
         cmd.append(f'INCLUDE_IN_PROGRESS={" ".join(CURRENT_IN_PROGRESS_DEFINES)}')
     cmd.append(target)
     if dry_run:
-        print(cmd)
+        log.info("Executing: %s", shlex.join(cmd))
         return ''
-    else:
-        ret = subprocess.check_output(cmd, cwd=spec_dir).decode('UTF-8').rstrip()
-        print(ret)
-        return ret
+    ret = subprocess.check_output(cmd, cwd=spec_dir).decode('UTF-8').rstrip()
+    log.info(ret)
+    return ret
 
 
 @click.command()
 @click.option(
     '--scraper',
-    required=True,
+    required=False,  # Required when --skip-scrape is not set. Checked in main().
     type=str,
     help='Path to the location of the scraper tool')
 @click.option(
@@ -103,32 +109,69 @@ def make_asciidoc(target: str, include_in_progress: str, spec_dir: str, dry_run:
     '--include-in-progress',
     type=click.Choice(['All', 'None', 'Current']), default='All')
 @click.option(
-    '--legacy',
-    default=False,
+    '--skip-scrape',
+    help='Runs only the updates that happen after the scrape from the spec repo',
     is_flag=True,
-    help='Use the DM editor spec scraper (legacy) rather than alchemy')
-def main(scraper, spec_root, output_dir, dry_run, include_in_progress, legacy):
-    if legacy:
-        scrape_clusters(scraper, spec_root, output_dir, dry_run, include_in_progress)
-        scrape_device_types(scraper, spec_root, output_dir, dry_run, include_in_progress)
-    else:
+    default=False,
+)
+def main(scraper, spec_root, output_dir, dry_run, include_in_progress, skip_scrape):
+    '''
+    This script is used to generate the data model XML files found in the SDK
+    data_model directory.
+
+    This script runs against a checked out version of the specification
+    repo (https://github.com/CHIP-Specifications/connectedhomeip-spec).
+    Check out the desired spec revision, then pass the root of
+    the checkout to the script in the --spec-root parameter.
+
+    This script can set the desired include flags for the data model
+    files. For in-progress (ballot) specification revisions, the
+    include level will be "Current". This sets the include flags to
+    the set of flags at the top of this file. When generating files for
+    an in-progress spec, ensure the include flags match the set of
+    includes noted in the ballot. For specifications that are being
+    finalized, where the includes have been removed from the spec in
+    preparation for release, use "None". "All" can be used to get a
+    full tip-of-tree spec data model. None of the files checked into
+    the repo currently use "All".
+
+    The output directory will be data_model/<desired_revision>, passed
+    in through the --output-dir flag.
+
+    This script uses alchemy (https://github.com/project-chip/alchemy) for
+    creating the data model XML files. Download the desired release package
+    and pass the location of the alchemy executable in the --scraper parameter.
+
+    Information on structuring PRs for data model files and adding new files
+    to the supporting test script can be found in the README.md file in
+    the data_model folder.
+    '''
+    if not skip_scrape:
+        if not scraper:
+            log.error("Missing --scraper option. It is required when --skip-scrape is not used.")
+            return
         scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress)
+        if not dry_run:
+            dump_versions(scraper, spec_root, output_dir)
     if not dry_run:
-        dump_versions(scraper, spec_root, output_dir, legacy)
-        dump_cluster_ids(output_dir)
+        cleanup_old_spec_dms(output_dir)
+        dump_json_ids(output_dir)
+        dump_ids_from_data_model_dirs()
+        # Update all the files in the python wheels
+        generate_data_model_xmls_gni.generate_gni_file()
 
 
 def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress):
-    print('Generating main spec to get file include list - this may take a few minutes')
+    log.info("Generating main spec to get file include list - this may take a few minutes")
     main_out = make_asciidoc('pdf', include_in_progress, spec_root, dry_run)
-    print('Generating cluster spec to get file include list - this may take a few minutes')
+    log.info("Generating cluster spec to get file include list - this may take a few minutes")
     cluster_out = make_asciidoc('pdf-appclusters-book', include_in_progress, spec_root, dry_run)
-    print('Generating device type library to get file include list - this may take a few minutes')
+    log.info("Generating device type library to get file include list - this may take a few minutes")
     device_type_files = make_asciidoc('pdf-devicelibrary-book', include_in_progress, spec_root, dry_run)
     namespace_files = make_asciidoc('pdf-standardnamespaces-book', include_in_progress, spec_root, dry_run)
 
     cluster_files = main_out + cluster_out
-    cmd = [scraper, 'dm', '--dmRoot', output_dir, '--specRoot', spec_root]
+    cmd = [scraper, 'dm', '--dmRoot', output_dir, '--specRoot', spec_root, '--force']
     if include_in_progress == 'All':
         cmd.extend(['-a', 'in-progress'])
     elif include_in_progress == 'Current':
@@ -136,10 +179,10 @@ def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress):
             cmd.extend(['-a'])
             cmd.extend([d])
 
-    if (dry_run):
-        print(cmd)
+    if dry_run:
+        log.info("Executing: %s", shlex.join(cmd))
         return
-    subprocess.run(cmd)
+    subprocess.run(cmd, check=True)
     # Remove all the files that weren't compiled into the spec
     clusters_output_dir = os.path.join(output_dir, 'clusters')
     device_types_output_dir = os.path.abspath(os.path.join(output_dir, 'device_types'))
@@ -152,7 +195,7 @@ def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress):
             continue
         adoc = os.path.basename(filename).replace('.xml', '.adoc')
         if adoc not in cluster_files:
-            print(f'Removing {adoc} as it was not in the generated spec document')
+            log.info("Removing '%s' as it was not in the generated spec document", adoc)
             os.remove(os.path.join(clusters_output_dir, filename))
 
     for filename in os.listdir(device_types_output_dir):
@@ -161,104 +204,127 @@ def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress):
             continue
         adoc = os.path.basename(filename).replace('.xml', '.adoc')
         if adoc not in device_type_files:
-            print(f'Removing {adoc} as it was not in the generated spec document')
+            log.info("Removing '%s' as it was not in the generated spec document", adoc)
             os.remove(os.path.join(device_types_output_dir, filename))
 
     for filename in os.listdir(namespaces_output_dir):
         adoc = os.path.basename(filename).replace('.xml', '.adoc')
         if adoc not in namespace_files:
-            print(f'Removing {adoc} as it was not in the generated spec document')
+            log.info("Removing '%s' as it was not in the generated spec document", adoc)
             os.remove(os.path.join(namespaces_output_dir, filename))
 
 
-def scrape_clusters(scraper, spec_root, output_dir, dry_run, include_in_progress):
-    src_dir = os.path.abspath(os.path.join(spec_root, 'src'))
-    sdm_clusters_dir = os.path.abspath(os.path.join(src_dir, 'service_device_management'))
-    app_clusters_dir = os.path.abspath(os.path.join(src_dir, 'app_clusters'))
-    dm_clusters_dir = os.path.abspath(os.path.join(src_dir, 'data_model'))
-    media_clusters_dir = os.path.abspath(os.path.join(app_clusters_dir, 'media'))
-
-    clusters_output_dir = os.path.join(output_dir, 'clusters')
-
-    if not os.path.exists(clusters_output_dir):
-        os.makedirs(clusters_output_dir)
-
-    print('Generating main spec to get file include list - this may take a few minutes')
-    main_out = make_asciidoc('pdf', include_in_progress, spec_root, dry_run)
-    print('Generating cluster spec to get file include list - this may take a few minutes')
-    cluster_out = make_asciidoc('pdf-appclusters-book', include_in_progress, spec_root, dry_run)
-
-    def scrape_cluster(filename: str) -> None:
-        base = Path(filename).stem
-        if base not in main_out and base not in cluster_out:
-            print(f'Skipping file: {base} as it is not compiled into the asciidoc')
+def cleanup_old_spec_dms(output_dir):
+    ''' There are a few old spec versions that have the same longstanding problems.
+        Unfortunately, we don't have specific branches for all these spec versions
+        since some were only tagged, and some were re-used for dot releases.
+        Applying the fixes here. Alchemy will continue to provide a faithful
+        representation of the spec, and going forward, we should correct these
+        types of problems in the spec where possible.
+    '''
+    def _fix_door_lock_device_type_features():
+        '''Door lock device type has a typo in the required features
+           for the user feature in the door lock cluster element requirements.
+           - FPG should be FGP (fingerprint)
+        '''
+        changed = False
+        filename = os.path.join(output_dir, 'device_types', 'DoorLock.xml')
+        if not os.path.exists(filename):
             return
-        xml_path = get_xml_path(filename, clusters_output_dir)
-        cmd = [scraper, 'cluster', '-i', filename, '-o', xml_path, '-nd']
-        if include_in_progress == 'All':
-            cmd.extend(['--define', 'in-progress'])
-        elif include_in_progress == 'Current':
-            cmd.extend(['--define'])
-            cmd.extend(CURRENT_IN_PROGRESS_DEFINES)
-        if dry_run:
-            print(cmd)
-        else:
-            subprocess.run(cmd)
+        with open(filename, 'rt+') as file:
+            tree = etree.parse(file)
+            root = tree.getroot()
+            for feature_tag in root.iter('feature'):
+                if feature_tag.attrib.get('name', '') == 'FPG':
+                    feature_tag.attrib['name'] = 'FGP'
+                    changed = True
+            for condition_tag in root.iter('condition'):
+                if condition_tag.attrib.get('name', '') == 'FPG':
+                    condition_tag.attrib['name'] = 'FGP'
+                    condition_tag.tag = 'feature'
+                    changed = True
+        if changed:
+            tree.write(filename, pretty_print=True, xml_declaration=True, encoding='utf-8')
 
-    def scrape_all_clusters(dir: str, exclude_list: list[str] = []) -> None:
-        for filename in glob.glob(f'{dir}/*.adoc'):
-            scrape_cluster(filename)
-
-    scrape_all_clusters(dm_clusters_dir)
-    scrape_all_clusters(sdm_clusters_dir)
-    scrape_all_clusters(app_clusters_dir)
-    scrape_all_clusters(media_clusters_dir)
-
-    for xml_path in glob.glob(f'{clusters_output_dir}/*.xml'):
-        tree = ElementTree.parse(f'{xml_path}')
-        root = tree.getroot()
-        cluster = next(root.iter('cluster'))
-        try:
-            next(cluster.iter('clusterIds'))
-        except StopIteration:
-            print(f'Removing file {xml_path} as it does not include any cluster definitions')
-            os.remove(xml_path)
-            continue
-
-
-def scrape_device_types(scraper, spec_root, output_dir, dry_run, include_in_progress):
-    device_type_dir = os.path.abspath(os.path.join(spec_root, 'src', 'device_types'))
-    device_types_output_dir = os.path.abspath(os.path.join(output_dir, 'device_types'))
-    clusters_output_dir = os.path.abspath(os.path.join(output_dir, 'clusters'))
-
-    if not os.path.exists(device_types_output_dir):
-        os.makedirs(device_types_output_dir)
-
-    print('Generating device type library to get file include list - this may take a few minutes')
-    device_type_output = make_asciidoc('pdf-devicelibrary-book', include_in_progress, spec_root, dry_run)
-
-    def scrape_device_type(filename: str) -> None:
-        base = Path(filename).stem
-        if base not in device_type_output:
-            print(f'Skipping file: {filename} as it is not compiled into the asciidoc')
+    def _fix_pre_1_3_base_device_type():
+        ''' The 1.2 spec tables in the base device type are all weird because they
+            include separate tables for matter and zigbee still. Given that those
+            specs are frozen, add in the information from the missing table.
+            This is taken directly from the 1.3 base device type specification.
+            There were no changes between 1.0 and 1.3 to this device type.
+        '''
+        missing_pre_1_3_base_device_type_clusters = '''
+            <clusters>
+            <cluster id="0x001D" name="Descriptor" side="server">
+            <mandatoryConform/>
+            <features>
+                <feature code="" name="TagList">
+                <mandatoryConform>
+                    <condition name="Duplicate"/>
+                </mandatoryConform>
+                </feature>
+            </features>
+            </cluster>
+            <cluster id="0x001E" name="Binding" side="server">
+            <mandatoryConform>
+                <andTerm>
+                <condition name="Simple"/>
+                <condition name="Client"/>
+                </andTerm>
+            </mandatoryConform>
+            </cluster>
+            <cluster id="0x0040" name="Fixed Label" side="server">
+            <optionalConform/>
+            </cluster>
+            <cluster id="0x0041" name="User Label" side="server">
+            <optionalConform/>
+            </cluster>
+        </clusters>
+        '''
+        changed = False
+        filename = os.path.join(output_dir, 'device_types', 'BaseDeviceType.xml')
+        if not os.path.exists(filename):
             return
-        xml_path = get_xml_path(filename, device_types_output_dir)
-        cmd = [scraper, 'devicetype', '-c', '-cls', clusters_output_dir,
-               '-nd', '-i', filename, '-o', xml_path]
-        if dry_run:
-            print(cmd)
-        else:
-            print(' '.join(cmd))
-            subprocess.run(cmd)
+        with open(filename, 'rt+') as file:
+            tree = etree.parse(file)
+            root = tree.getroot()
+            if root.find('clusters') is None:
+                # Cluster info is missing and we need to add it
+                new_xml = etree.fromstring(missing_pre_1_3_base_device_type_clusters)
+                device_type = root.find('deviceType')
+                if device_type is None:
+                    log.error("Unable to locate device type tag in BaseDeviceType")
+                    return
+                device_type.append(new_xml)
+                changed = True
+        if changed:
+            tree.write(filename, pretty_print=True, xml_declaration=True, encoding='utf-8')
 
-    exclude_list = [r"section_*"]
-    for filename in glob.glob(f'{device_type_dir}/*.adoc'):
-        for exclude in exclude_list:
-            if not re.match(exclude, os.path.basename(filename)):
-                scrape_device_type(filename)
+    def _fix_sit_lit_type():
+        # In some spec revisions, the SIT and LIT conditions are listed as features.
+        # This is probably fixable in alchemy, but let's just fix here until that
+        # gets pushed through.
+        changed = False
+        filename = os.path.join(output_dir, 'device_types', 'RootNodeDeviceType.xml')
+        if not os.path.exists(filename):
+            return
+        with open(filename, 'rt+') as file:
+            tree = etree.parse(file)
+            root = tree.getroot()
+            for tag in root.iter('feature'):
+                if tag.attrib.get('name', '') in ['SIT', 'LIT']:
+                    # These should be conditions
+                    tag.tag = 'condition'
+                    changed = True
+        if changed:
+            tree.write(filename, pretty_print=True, xml_declaration=True, encoding='utf-8')
+
+    _fix_door_lock_device_type_features()
+    _fix_pre_1_3_base_device_type()
+    _fix_sit_lit_type()
 
 
-def dump_versions(scraper, spec_root, output_dir, legacy):
+def dump_versions(scraper, spec_root, output_dir):
     sha_file = os.path.abspath(os.path.join(output_dir, 'spec_sha'))
     tag_file = os.path.abspath(os.path.join(output_dir, 'spec_tag'))
     out = subprocess.run(['git', 'rev-parse', 'HEAD'],
@@ -274,55 +340,180 @@ def dump_versions(scraper, spec_root, output_dir, legacy):
         with open(tag_file, 'wt', encoding='utf8') as output:
             output.write(f'{tag[0].split("/")[-1]}\n')
     else:
-        print(f"WARNING: no tag found for sha {sha}")
+        log.warning("WARNING: no tag found for sha '%s'", sha)
         with contextlib.suppress(FileNotFoundError):
             os.remove(tag_file)
 
     scraper_file = os.path.abspath(os.path.join(output_dir, 'scraper_version'))
     version_cmd = 'version'
-    if legacy:
-        version_cmd = '--version'
     out = subprocess.run([scraper, version_cmd],
                          capture_output=True, encoding="utf8")
     version = out.stdout
     with open(scraper_file, "wt", encoding='utf8') as output:
-        if legacy:
-            output.write(version)
-        else:
-            output.write(f'alchemy {version}')
+        output.write(f'alchemy {version}')
 
 
-def dump_cluster_ids(output_dir):
+def dump_json_ids(output_dir):
     clusters_output_dir = os.path.abspath(
         os.path.join(output_dir, 'clusters'))
-    header = '# List of currently defined spec clusters\n'
-    header += 'This file was **AUTOMATICALLY** generated by `python scripts/generate_spec_xml.py`. DO NOT EDIT BY HAND!\n\n'
+    device_types_output_dir = os.path.abspath(
+        os.path.join(output_dir, 'device_types'))
+    clusters_json_file = os.path.join(clusters_output_dir, 'cluster_ids.json')
+    device_type_json_file = os.path.join(device_types_output_dir, 'device_type_ids.json')
 
-    clusters, problems = build_xml_clusters(Path(clusters_output_dir))
-    all_name_lens = [len(c.name) for c in clusters.values()]
-    name_len = max(all_name_lens)
-    title_id_decimal = ' ID (Decimal) '
-    title_id_hex = ' ID (hex) '
-    title_name_raw = ' Name '
-    title_name = f'{title_name_raw:<{name_len}}'
-    dec_len = len(title_id_decimal)
-    hex_len = len(title_id_hex)
-    title = f'|{title_id_decimal}|{title_id_hex}|{title_name}|\n'
-    hashes = f'|{"-" * dec_len}|{"-" * hex_len}|{"-" * name_len}|\n'
-    s = title + hashes
-    json_dict = {id: c.name for id, c in sorted(clusters.items())}
-    for id, cluster in sorted(clusters.items()):
-        hex_id = f'0x{id:04X}'
-        s += f'|{id:<{dec_len}}|{hex_id:<{hex_len}}|{cluster.name:<{name_len}}|\n'
+    clusters, _ = build_xml_clusters(Path(clusters_output_dir))
+    device_types, _ = build_xml_device_types(Path(device_types_output_dir))
 
-    with open(DEFAULT_DOCUMENTATION_FILE, 'w') as fout:
-        fout.write(header)
-        fout.write(s)
+    def write_json(elements: dict, path: str) -> None:
+        json_dict = {id: c.name for id, c in sorted(elements.items())}
 
-    json_file = os.path.join(clusters_output_dir, 'cluster_ids.json')
-    with open(json_file, "w") as outfile:
-        json.dump(json_dict, outfile, indent=4)
-        outfile.write('\n')
+        with open(path, "wt+") as outfile:
+            json.dump(json_dict, outfile, indent=4)
+            outfile.write('\n')
+    write_json(clusters, clusters_json_file)
+    write_json(device_types, device_type_json_file)
+
+
+IdToNameDict = dict[int, str]
+IdToPICSCodeDict = dict[int, str]
+IdToSupportedDict = dict[int, str]
+
+
+def dump_ids_from_data_model_dirs():
+    all_clusters: IdToNameDict = {}
+    all_device_types: IdToNameDict = {}
+
+    version_clusters: dict[str, IdToSupportedDict] = {}
+    version_device_types: dict[str, IdToSupportedDict] = {}
+
+    pics_code_clusters: IdToPICSCodeDict = {}
+
+    data_model_path = paths.get_data_model_path()
+    data_model_dirs = [d for d in os.listdir(data_model_path) if os.path.isdir(os.path.join(data_model_path, d))]
+    # Don't include master right now - it's in progress, not official
+    data_model_dirs = sorted([d for d in data_model_dirs if 'master' not in d])
+    for dir in data_model_dirs:
+        clusters, _ = build_xml_clusters(Path(os.path.join(data_model_path, dir, 'clusters')))
+        device_types, _ = build_xml_device_types(Path(os.path.join(data_model_path, dir, 'device_types')))
+
+        def cluster_support_str(c):
+            return "P" if c.is_provisional else "C"
+
+        version_clusters[dir] = {id: cluster_support_str(c) for id, c in clusters.items()}
+
+        # Update the PICS Codes
+        for id, c in clusters.items():
+            if id not in pics_code_clusters:
+                pics_code_clusters[id] = c.pics
+            elif pics_code_clusters[id] != c.pics:
+                log.warning("PICS Code is inconsistent among different versions of the spec for cluster ID #%s!", id)
+
+        # Device types don't currently have provisional markings in the spec
+        # But a device type can't be certified if it has mandatory clusters that are provisional
+        # TODO: create provisional
+
+        def device_type_support_str(d):
+            log.info("checking device type for '%s' for '%s'", d.name, dir)
+            dt_server_mandatory = [id for id, requirement in d.server_clusters.items() if requirement.conformance(
+                [], 0, 0).decision == ConformanceDecision.MANDATORY]
+            server_provisional = [clusters[c].name for c in dt_server_mandatory if clusters[c].is_provisional]
+            dt_client_mandatory = [id for id, requirement in d.client_clusters.items(
+            ) if requirement.conformance([], 0, 0).decision == ConformanceDecision.MANDATORY]
+            client_provisional = [clusters[c].name for c in dt_client_mandatory if clusters[c].is_provisional]
+            if server_provisional or client_provisional:
+                log.info("Found provisional mandatory clusters server:'%s' "
+                         "client: '%s' in device type '%s' for revision '%s'",
+                         server_provisional, client_provisional, d.name, dir)
+                return "P"
+            return "C"
+
+        version_device_types[dir] = {id: device_type_support_str(d) for id, d in device_types.items()}
+
+        all_clusters.update({id: c.name for id, c in clusters.items()})
+        all_device_types.update({id: d.name for id, d in device_types.items()})
+
+    def print_out_ids(filename: Path,
+                      spec_section: str,
+                      id_to_name: IdToNameDict,
+                      supported: dict[str, IdToSupportedDict],
+                      pics_codes: typing.Optional[IdToPICSCodeDict] = None):
+        header = f'# List of currently defined spec {spec_section}\n'
+        header += 'This file was **AUTOMATICALLY** generated by `python scripts/generate_spec_xml.py`. DO NOT EDIT BY HAND!\n\n'
+        table = '''
+                     The following markers are used in this document (matches the ID master list):
+                     | State | Description                    |
+                     |-------|--------------------------------|
+                     | blank | Not supported in this revision |
+                     | C     | Certifiable                    |
+                     | P     | Provisional                    |
+
+                  '''
+        header = header + textwrap.dedent(table)
+
+        # Name Column
+        all_name_lens = [len(n) for n in id_to_name.values()]
+        name_len = max(all_name_lens)
+        title_name_raw = ' Name '
+        title_name = f'{title_name_raw:<{name_len}}'
+
+        # ID Columns
+        title_id_decimal = ' ID (Decimal) '
+        dec_len = len(title_id_decimal)
+        title_id_hex = ' ID (hex) '
+        hex_len = len(title_id_hex)
+
+        # Create title and hashes
+        title = f'|{title_id_decimal}|{title_id_hex}|{title_name}|'
+        hashes = f'|{"-" * dec_len}|{"-" * hex_len}|{"-" * name_len}|'
+
+        # PICS code column (only for clusters)
+        if pics_codes is not None:
+            all_pics_code_lens = [len(p) for p in pics_code_clusters.values()]
+            pics_code_len = max(all_pics_code_lens)
+            title_pics_code_raw = ' PICS Code '
+            title_pics_code = f'{title_pics_code_raw:<{pics_code_len}}'
+
+            # Update title and hashes
+            title += f'{title_pics_code}|'
+            hashes += f'{"-" * pics_code_len}|'
+
+        version_len: dict[str, int] = {}
+        for dir in supported:
+            tag_path = os.path.join(paths.get_data_model_path(), dir, 'spec_tag')
+            try:
+                with open(tag_path, "r") as tag_file:
+                    version = tag_file.read().strip()
+            except FileNotFoundError:
+                version = dir
+            title += f'{version}|'
+            version_len[dir] = len(version)
+            hashes += f'{"-" * version_len[dir]}|'
+        table_header = f'{title}\n{hashes}\n'
+
+        lines = []
+        for id, name in sorted(id_to_name.items()):
+            hex_id = f'0x{id:04X}'
+            line = f'|{id:<{dec_len}}|{hex_id:<{hex_len}}|{name:<{name_len}}|'
+
+            # Add PICS code (only for clusters)
+            if pics_codes is not None:
+                line += f'{pics_codes[id]:<{pics_code_len}}|'
+
+            for dir in supported:
+                try:
+                    line += f'{supported[dir][id]:<{version_len[dir]}}|'
+                except KeyError:
+                    line += f'{" " * version_len[dir]}|'
+            lines.append(line)
+
+        with open(filename, 'w') as fout:
+            fout.write(header)
+            fout.write(table_header)
+            fout.write("\n".join(lines))
+            fout.write("\n")
+
+    print_out_ids(paths.get_cluster_documentation_file_path(), "clusters",  all_clusters, version_clusters, pics_code_clusters)
+    print_out_ids(paths.get_device_types_documentation_file_path(), "device types", all_device_types, version_device_types)
 
 
 if __name__ == '__main__':

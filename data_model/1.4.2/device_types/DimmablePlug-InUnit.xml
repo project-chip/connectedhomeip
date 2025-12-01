@@ -118,16 +118,10 @@ Davis, CA 95616, USA
       </attributes>
     </cluster>
     <cluster id="0x0062" name="Scenes Management" side="server">
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
+      <mandatoryConform/>
       <commands>
         <command id="0x0040" name="CopyScene">
-          <otherwiseConform>
-            <provisionalConform/>
-            <mandatoryConform/>
-          </otherwiseConform>
+          <mandatoryConform/>
         </command>
       </commands>
     </cluster>

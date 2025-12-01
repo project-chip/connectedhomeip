@@ -38,14 +38,9 @@ declare_args() {
 
 # Workaround to prevent the assert when we are building the unit tests
 if (chip_enable_wifi && !wifi_soc && !sl_build_unit_tests) {
-  assert(use_rs9116 || use_wf200 || use_SiWx917)
+  assert(use_wf200 || use_SiWx917)
   import("${chip_root}/src/platform/silabs/wifi/args.gni")
 
-  if (use_rs9116) {
-    import("${silabs_platform_dir}/wifi/rs911x/rs911x.gni")
-  } else if (use_SiWx917) {
-    import("${silabs_platform_dir}/wifi/SiWx/ncp/rs9117.gni")
-  }
   if (use_wf200) {
     import("${silabs_platform_dir}/wifi/wf200/wf200.gni")
   }
@@ -59,14 +54,6 @@ config("wifi-platform-config") {
     defines += [ "WIFI_DEBUG_ENABLED=1" ]
   } else {
     defines += [ "WIFI_DEBUG_ENABLED=0" ]
-  }
-
-  if (use_rs9116) {
-    # All the stuff from wiseconnect
-    include_dirs += rs911x_inc_plat
-  } else if (use_SiWx917) {
-    # All the stuff from wiseconnect
-    include_dirs += rs9117_inc_plat
   }
 
   if (chip_default_wifi_ssid != "") {
@@ -100,6 +87,12 @@ config("wifi-platform-config") {
   if (!disable_lcd) {
     defines += [ "DISPLAY_ENABLED" ]
   }
+  if (use_SiWx917 || wifi_soc) {
+    include_dirs += [
+      "${chip_root}/src/platform/silabs/SiWx/ble",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc",
+    ]
+  }
 }
 
 source_set("state-provider") {
@@ -126,33 +119,11 @@ source_set("wifi-platform") {
     "${silabs_platform_dir}/wifi/icd:power-save-interface",
   ]
 
-  if (use_rs9116) {
-    sources += rs911x_src_plat
-
-    # All the stuff from wiseconnect
-    sources += rs911x_src_sapi
-  } else if (use_SiWx917) {
-    sources += rs911x_src_plat
-
-    # All the stuff from wiseconnect
-    sources += rs9117_src_sapi
+  if (use_SiWx917) {
+    public_deps += [ "${silabs_platform_dir}/wifi/SiWx/ncp:siwx-ncp" ]
+    sources += [ "${silabs_platform_dir}/wifi/SiWx/WifiInterfaceImpl.cpp" ]
   } else if (use_wf200) {
     sources += wf200_plat_src
-  }
-
-  if (wifi_soc) {
-    sources += [
-      "${silabs_platform_dir}/wifi/SiWx/WifiInterfaceImpl.cpp",
-      "${silabs_platform_dir}/wifi/SiWx/WifiInterfaceImpl.h",
-      "${silabs_platform_dir}/wifi/wiseconnect-interface/WiseconnectWifiInterface.cpp",
-      "${silabs_platform_dir}/wifi/wiseconnect-interface/WiseconnectWifiInterface.h",
-      "${wifi_sdk_root}/components/service/network_manager/src/sl_net_for_lwip.c",
-    ]
-
-    public_deps += [ "${lwip_root}:lwip" ]
-  }
-
-  if (use_wf200 || use_rs9116) {
     sources += [
       "${silabs_platform_dir}/wifi/lwip-support/dhcp_client.cpp",
       "${silabs_platform_dir}/wifi/lwip-support/dhcp_client.h",
@@ -162,6 +133,17 @@ source_set("wifi-platform") {
       "${silabs_platform_dir}/wifi/lwip-support/lwip_netif.h",
     ]
   }
+
+  if (wifi_soc) {
+    sources += [
+      "${silabs_platform_dir}/wifi/SiWx/WifiInterfaceImpl.cpp",
+      "${wifi_sdk_root}/components/service/network_manager/src/sl_net_for_lwip.c",
+      "${wifi_sdk_root}/components/service/network_manager/src/sli_net_common_utility.c",
+    ]
+
+    public_deps += [ "${lwip_root}:lwip" ]
+  }
+
   if (chip_enable_icd_server) {
     public_deps += [
       "${chip_root}/src/app/icd/server:configuration-data",

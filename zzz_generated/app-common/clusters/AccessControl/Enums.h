@@ -28,6 +28,18 @@ namespace app {
 namespace Clusters {
 namespace AccessControl {
 
+// Enum for AccessControlAuxiliaryTypeEnum
+enum class AccessControlAuxiliaryTypeEnum : uint8_t
+{
+    kSystem    = 0x00,
+    kGroupcast = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+
 // Enum for AccessControlEntryAuthModeEnum
 enum class AccessControlEntryAuthModeEnum : uint8_t
 {
@@ -88,6 +100,7 @@ enum class Feature : uint32_t
 {
     kExtension     = 0x1,
     kManagedDevice = 0x2,
+    kAuxiliary     = 0x4,
 };
 } // namespace AccessControl
 } // namespace Clusters

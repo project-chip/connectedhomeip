@@ -20,7 +20,7 @@
 #include "UniqueIdGetter.h"
 
 #include <app/ReadClient.h>
-#include <bridge/include/FabricBridge.h>
+#include <bridge/FabricBridge.h>
 #include <controller/CHIPDeviceController.h>
 #include <lib/core/DataModelTypes.h>
 #include <memory>

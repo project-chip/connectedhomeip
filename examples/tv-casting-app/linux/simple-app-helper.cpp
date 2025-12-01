@@ -28,6 +28,7 @@
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/StringBuilder.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/TestOnlyCommissionableDataProvider.h>
 
@@ -99,8 +100,8 @@ void InvokeContentLauncherLaunchURL(matter::casting::memory::Strong<matter::cast
     launchURLCommand->Invoke(
         request, nullptr,
         [](void * context, const chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type::ResponseType & response) {
-            ChipLogProgress(AppServer, "LaunchURL Success with response.data: %.*s", static_cast<int>(response.data.Value().size()),
-                            response.data.Value().data());
+            ChipLogProgress(AppServer, "LaunchURL Success with response.data: %s",
+                            chip::NullTerminated(response.data.Value()).c_str());
         },
         [](void * context, CHIP_ERROR error) {
             ChipLogError(AppServer, "LaunchURL Failure with err %" CHIP_ERROR_FORMAT, error.Format());
@@ -446,7 +447,7 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
                                                          idOptions);
         ChipLogProgress(AppServer, "CommandHandler() request, VerifyOrEstablishConnection() called, calling StopDiscovery()");
         // Stop discovery since we have discovered, and are now connecting to the desired CastingPlayer.
-        matter::casting::core::CastingPlayerDiscovery::GetInstance()->StopDiscovery();
+        TEMPORARY_RETURN_IGNORED matter::casting::core::CastingPlayerDiscovery::GetInstance()->StopDiscovery();
         return CHIP_NO_ERROR;
     }
     if (strcmp(argv[0], "setcommissionerpasscode") == 0)
@@ -541,7 +542,7 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
     {
         char * eptr;
         chip::FabricIndex fabricIndex = (chip::FabricIndex) strtol(argv[1], &eptr, 10);
-        chip::Server::GetInstance().GetFabricTable().Delete(fabricIndex);
+        TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().GetFabricTable().Delete(fabricIndex);
         return CHIP_NO_ERROR;
     }
     return CHIP_ERROR_INVALID_ARGUMENT;
@@ -579,7 +580,7 @@ CHIP_ERROR PrintAllCommands()
 
 void PrintBindings()
 {
-    for (const auto & binding : chip::BindingTable::GetInstance())
+    for (const auto & binding : chip::app::Clusters::Binding::Table::GetInstance())
     {
         ChipLogProgress(AppServer,
                         "PrintBindings() Binding type=%d fab=%d nodeId=0x" ChipLogFormatX64

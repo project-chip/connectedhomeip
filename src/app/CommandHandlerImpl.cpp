@@ -70,8 +70,15 @@ CHIP_ERROR CommandHandlerImpl::AllocateBuffer()
 
         const size_t commandBufferMaxSize = mpResponder->GetCommandResponseMaxBufferSize();
         auto commandPacket                = System::PacketBufferHandle::New(commandBufferMaxSize);
-
         VerifyOrReturnError(!commandPacket.IsNull(), CHIP_ERROR_NO_MEMORY);
+        // On some platforms we can get more available length in the packet than what we requested.
+        // It is vital that we only use up to commandBufferMaxSize for the entire packet and
+        // nothing more.
+        uint32_t reservedSize = 0;
+        if (commandPacket->AvailableDataLength() > commandBufferMaxSize)
+        {
+            reservedSize = static_cast<uint32_t>(commandPacket->AvailableDataLength() - commandBufferMaxSize);
+        }
 
         mCommandMessageWriter.Init(std::move(commandPacket));
         ReturnErrorOnFailure(mInvokeResponseBuilder.InitWithEndBufferReserved(&mCommandMessageWriter));
@@ -80,6 +87,10 @@ CHIP_ERROR CommandHandlerImpl::AllocateBuffer()
         {
             ReturnErrorOnFailure(mInvokeResponseBuilder.ReserveSpaceForMoreChunkedMessages());
         }
+
+        // Reserving space for MIC at the end.
+        ReturnErrorOnFailure(
+            mInvokeResponseBuilder.GetWriter()->ReserveBuffer(reservedSize + Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
 
         // Sending an InvokeResponse to an InvokeResponse is going to be removed from the spec soon.
         // It was never implemented in the SDK, and there are no command responses that expect a
@@ -249,7 +260,7 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
     reader.Init(std::move(payload));
     VerifyOrReturnError(invokeRequestMessage.Init(reader) == CHIP_NO_ERROR, Status::InvalidAction);
 #if CHIP_CONFIG_IM_PRETTY_PRINT
-    invokeRequestMessage.PrettyPrint();
+    TEMPORARY_RETURN_IGNORED invokeRequestMessage.PrettyPrint();
 #endif
     VerifyOrDie(mpResponder);
     if (mpResponder->GetGroupId().HasValue())
@@ -525,6 +536,11 @@ Status CommandHandlerImpl::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
             request.subjectDescriptor = &subjectDescriptor;
             request.invokeFlags.Set(DataModel::InvokeFlags::kTimed, IsTimedInvoke());
 
+            // SPEC-DIVERGENCE: The spec mandates only one ACL check after the existence check for non-concrete paths (Group
+            // Commands). However, calling ValidateCommandCanBeDispatched here introduces an additional ACL check before the
+            // existence check, because that function also performs an early access check (it is shared with the concrete path
+            // case). This results in two ACL checks for group commands. In practice, this divergence is not observable if all
+            // commands require at least Operate privilege.
             Status preCheckStatus = mpCallback->ValidateCommandCanBeDispatched(request);
             if (preCheckStatus != Status::Success)
             {
@@ -600,14 +616,13 @@ CHIP_ERROR CommandHandlerImpl::FallibleAddStatus(const ConcreteCommandPath & pat
             context = "no additional context";
         }
 
-        if (status.HasClusterSpecificCode())
+        if (const auto clusterStatus = status.GetClusterSpecificCode(); clusterStatus.has_value())
         {
             ChipLogError(DataManagement,
                          "Endpoint=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI " status " ChipLogFormatIMStatus
                          " ClusterSpecificCode=%u (%s)",
                          path.mEndpointId, ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mCommandId),
-                         ChipLogValueIMStatus(status.GetStatus()), static_cast<unsigned>(status.GetClusterSpecificCode().Value()),
-                         context);
+                         ChipLogValueIMStatus(status.GetStatus()), static_cast<unsigned>(*clusterStatus), context);
         }
         else
         {
@@ -965,7 +980,7 @@ void CommandHandlerImpl::TestOnlyInvokeCommandRequestWithFaultsInjected(CommandH
     VerifyOrDieWithMsg(invokeRequestMessage.Init(reader) == CHIP_NO_ERROR, DataManagement,
                        "TH Failure: Failed 'invokeRequestMessage.Init(reader)'");
 #if CHIP_CONFIG_IM_PRETTY_PRINT
-    invokeRequestMessage.PrettyPrint();
+    TEMPORARY_RETURN_IGNORED invokeRequestMessage.PrettyPrint();
 #endif
 
     VerifyOrDieWithMsg(invokeRequestMessage.GetSuppressResponse(&mSuppressResponse) == CHIP_NO_ERROR, DataManagement,
