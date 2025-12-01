@@ -68,7 +68,7 @@ static constexpr size_t kTlsEndpointMaxBytes =
 struct BufferedEndpoint
 {
     TlsClientManagementDelegate::EndpointStructType mEndpoint;
-    PersistentStore<kTlsEndpointMaxBytes> mBuffer;
+    PersistenceBuffer<kTlsEndpointMaxBytes> mBuffer;
 };
 
 class GlobalEndpointData : public PersistentData<kPersistentBufferNextIdBytes>
