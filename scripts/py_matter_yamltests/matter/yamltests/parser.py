@@ -586,7 +586,7 @@ class _TestStepWithPlaceholders:
                     target_key = value['name']
                     if mapping_type.get(target_key) is None:
                         raise TestStepValueNameError(
-                            value, target_key, [key for key in mapping_type])
+                            value, target_key, list(mapping_type))
                     mapping = mapping_type[target_key]
 
                 if key == 'value':
@@ -1006,13 +1006,13 @@ class TestStep:
             return result
         # This is different from the case where no response is specified at all, which implies that the step expect
         # a success with any associatied value(s).
-        elif self.responses == [{'values': [{}]}] and len(received_responses_copy):
+        if self.responses == [{'values': [{}]}] and len(received_responses_copy):
             # if there are multiple responses and the test specifies that it does not really care
             # about which values are returned, that is valid too.
             return result
         # Anything more complex where the response field as been defined with some values and the number
         # of expected responses differs from the number of received responses is an error.
-        elif len(received_responses_copy) != 0:
+        if len(received_responses_copy) != 0:
             result.error(check_type, error_failure_wrong_response_number)
 
         return result
@@ -1185,14 +1185,13 @@ class TestStep:
                 if not self._response_value_validation(expected_item, received_item):
                     return False
             return True
-        elif isinstance(expected_value, dict):
+        if isinstance(expected_value, dict):
             for key, expected_item in expected_value.items():
                 received_item = received_value.get(key)
                 if not self._response_value_validation(expected_item, received_item):
                     return False
             return True
-        else:
-            return expected_value == received_value
+        return expected_value == received_value
 
     def _response_constraints_validation(self, expected_response, received_response, result):
         check_type = PostProcessCheckType.CONSTRAINT_VALIDATION
@@ -1286,13 +1285,13 @@ class TestStep:
     def _config_variable_substitution(self, value):
         if type(value) is list:
             return [self._config_variable_substitution(entry) for entry in value]
-        elif type(value) is dict:
+        if type(value) is dict:
             mapped_value = {}
             for key in value:
                 mapped_value[key] = self._config_variable_substitution(
                     value[key])
             return mapped_value
-        elif type(value) is str:
+        if type(value) is str:
             # For most tests, a single config variable is used and it can be replaced as in.
             # But some other tests were relying on the fact that the expression was put 'as if' in
             # the generated code and was resolved before being sent over the wire. For such
@@ -1318,8 +1317,7 @@ class TestStep:
             # TODO we should move away from eval. That will mean that we will need to do extra
             # parsing, but it would be safer then just blindly running eval.
             return value if not substitution_occured else eval(value)
-        else:
-            return value
+        return value
 
 
 class YamlTests:

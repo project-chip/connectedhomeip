@@ -183,12 +183,13 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
 
         if (!mICDSymmetricKey.HasValue())
         {
-            Crypto::DRBG_get_bytes(mRandomGeneratedICDSymmetricKey, sizeof(mRandomGeneratedICDSymmetricKey));
+            TEMPORARY_RETURN_IGNORED Crypto::DRBG_get_bytes(mRandomGeneratedICDSymmetricKey,
+                                                            sizeof(mRandomGeneratedICDSymmetricKey));
             mICDSymmetricKey.SetValue(ByteSpan(mRandomGeneratedICDSymmetricKey));
         }
         if (!mICDCheckInNodeId.HasValue())
         {
-            mICDCheckInNodeId.SetValue(CurrentCommissioner().GetNodeId());
+            TEMPORARY_RETURN_IGNORED mICDCheckInNodeId.SetValue(CurrentCommissioner().GetNodeId());
         }
         if (!mICDMonitoredSubject.HasValue())
         {
@@ -498,8 +499,9 @@ void PairingCommand::OnICDRegistrationComplete(ScopedNodeId nodeId, uint32_t icd
 {
     char icdSymmetricKeyHex[Crypto::kAES_CCM128_Key_Length * 2 + 1];
 
-    Encoding::BytesToHex(mICDSymmetricKey.Value().data(), mICDSymmetricKey.Value().size(), icdSymmetricKeyHex,
-                         sizeof(icdSymmetricKeyHex), Encoding::HexFlags::kNullTerminate);
+    TEMPORARY_RETURN_IGNORED Encoding::BytesToHex(mICDSymmetricKey.Value().data(), mICDSymmetricKey.Value().size(),
+                                                  icdSymmetricKeyHex, sizeof(icdSymmetricKeyHex),
+                                                  Encoding::HexFlags::kNullTerminate);
 
     app::ICDClientInfo clientInfo;
     clientInfo.check_in_node     = ScopedNodeId(mICDCheckInNodeId.Value(), nodeId.GetFabricIndex());
@@ -515,7 +517,7 @@ void PairingCommand::OnICDRegistrationComplete(ScopedNodeId nodeId, uint32_t icd
 
     if (err != CHIP_NO_ERROR)
     {
-        CHIPCommand::sICDClientStorage.RemoveKey(clientInfo);
+        TEMPORARY_RETURN_IGNORED CHIPCommand::sICDClientStorage.RemoveKey(clientInfo);
         ChipLogError(chipTool, "Failed to persist symmetric key for " ChipLogFormatX64 ": %s", ChipLogValueX64(nodeId.GetNodeId()),
                      err.AsString());
         SetCommandExitStatus(err);
@@ -558,7 +560,7 @@ CHIP_ERROR PairingCommand::WiFiCredentialsNeeded(EndpointId endpoint)
     // outermost ScheduleLambda is only there to avoid the prompt interleaving
     // with logging that happens on the Matter thread after this function
     // returns.
-    DeviceLayer::SystemLayer().ScheduleLambda([this] {
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this] {
         mPrompterThread.emplace([this] {
             do
             {
@@ -582,7 +584,7 @@ CHIP_ERROR PairingCommand::WiFiCredentialsNeeded(EndpointId endpoint)
                 ChipLogError(chipTool, "Invalid value for password");
             } while (true);
 
-            DeviceLayer::SystemLayer().ScheduleLambda([this] {
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this] {
                 // Ensure that the background thread (and its writes to our members) is done.
                 mPrompterThread->join();
                 mPrompterThread.reset();
@@ -591,9 +593,9 @@ CHIP_ERROR PairingCommand::WiFiCredentialsNeeded(EndpointId endpoint)
                 CommissioningParameters params = commissioner.GetCommissioningParameters();
                 auto credentials               = Controller::WiFiCredentials(mSSID, mPassword);
                 params.SetWiFiCredentials(credentials);
-                commissioner.UpdateCommissioningParameters(params);
+                TEMPORARY_RETURN_IGNORED commissioner.UpdateCommissioningParameters(params);
 
-                commissioner.NetworkCredentialsReady();
+                TEMPORARY_RETURN_IGNORED commissioner.NetworkCredentialsReady();
             });
         });
     });
@@ -616,7 +618,7 @@ CHIP_ERROR PairingCommand::ThreadCredentialsNeeded(EndpointId endpoint)
     // outermost ScheduleLambda is only there to avoid the prompt interleaving
     // with logging that happens on the Matter thread after this function
     // returns.
-    DeviceLayer::SystemLayer().ScheduleLambda([this] {
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this] {
         mPrompterThread.emplace([this] {
             do
             {
@@ -629,7 +631,7 @@ CHIP_ERROR PairingCommand::ThreadCredentialsNeeded(EndpointId endpoint)
                 ChipLogError(chipTool, "Invalid value for operational dataset");
             } while (true);
 
-            DeviceLayer::SystemLayer().ScheduleLambda([this] {
+            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this] {
                 // Ensure that the background thread (and its writes to our members) is done.
                 mPrompterThread->join();
                 mPrompterThread.reset();
@@ -637,9 +639,9 @@ CHIP_ERROR PairingCommand::ThreadCredentialsNeeded(EndpointId endpoint)
                 auto & commissioner            = CurrentCommissioner();
                 CommissioningParameters params = commissioner.GetCommissioningParameters();
                 params.SetThreadOperationalDataset(mOperationalDataset);
-                commissioner.UpdateCommissioningParameters(params);
+                TEMPORARY_RETURN_IGNORED commissioner.UpdateCommissioningParameters(params);
 
-                commissioner.NetworkCredentialsReady();
+                TEMPORARY_RETURN_IGNORED commissioner.NetworkCredentialsReady();
             });
         });
     });

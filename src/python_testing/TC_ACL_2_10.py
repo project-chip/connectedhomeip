@@ -32,10 +32,9 @@
 #       --endpoint 0
 # === END CI TEST ARGUMENTS ===
 
-
+import asyncio
 import logging
 import random
-import time
 
 from mobly import asserts
 
@@ -57,8 +56,11 @@ class TC_ACL_2_10(MatterBaseTest):
     def desc_TC_ACL_2_10(self) -> str:
         return "[TC-ACL-2.10] Persistence"
 
+    def pics_TC_ACL_2_10(self) -> list[str]:
+        return ['ACL.S.A0001']
+
     def steps_TC_ACL_2_10(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "TH1 commissions DUT using admin node ID",
                      is_commissioning=True),
             TestStep(2, "TH1 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",
@@ -94,7 +96,6 @@ class TC_ACL_2_10(MatterBaseTest):
             TestStep(17, "TH1 writes DUT Endpoint 0 AccessControl cluster back to admin-only ACL entry",
                      "Result is SUCCESS"),
         ]
-        return steps
 
     @async_test_body
     async def test_TC_ACL_2_10(self):
@@ -247,7 +248,7 @@ class TC_ACL_2_10(MatterBaseTest):
 
                 # The test runner will automatically wait for the app-ready-pattern before continuing
                 # Waiting 1 second after the app-ready-pattern is detected as we need to wait a tad longer for the app to be ready and stable, otherwise TH2 connection fails later on in test step 14.
-                time.sleep(1)
+                await asyncio.sleep(1)
 
                 # Expire sessions and re-establish connections
                 self.th1.ExpireSessions(self.dut_node_id)

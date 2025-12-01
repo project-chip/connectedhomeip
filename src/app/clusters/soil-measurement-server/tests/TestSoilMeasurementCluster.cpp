@@ -16,7 +16,7 @@
 
 #include <pw_unit_test/framework.h>
 
-#include <app/clusters/soil-measurement-server/soil-measurement-cluster.h>
+#include <app/clusters/soil-measurement-server/SoilMeasurementCluster.h>
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/clusters/testing/ClusterTester.h>
 #include <app/server-cluster/AttributeListBuilder.h>
@@ -67,16 +67,13 @@ struct TestSoilMeasurementCluster : public ::testing::Test
 
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
-    void SetUp() override { ASSERT_EQ(soilMeasurement.Startup(context), CHIP_NO_ERROR); }
+    void SetUp() override { ASSERT_EQ(soilMeasurement.Startup(testContext.Get()), CHIP_NO_ERROR); }
 
     void TearDown() override { soilMeasurement.Shutdown(); }
 
-    TestSoilMeasurementCluster() :
-        context(testContext.Create()), soilMeasurement(kEndpointWithSoilMeasurement, kDefaultSoilMoistureMeasurementLimits)
-    {}
+    TestSoilMeasurementCluster() : soilMeasurement(kEndpointWithSoilMeasurement, kDefaultSoilMoistureMeasurementLimits) {}
 
     chip::Test::TestServerClusterContext testContext;
-    ServerClusterContext context;
     SoilMeasurementClusterLocal soilMeasurement;
 };
 

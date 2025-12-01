@@ -100,25 +100,25 @@ CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Finalize()
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleFinalize, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandleFinalize, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Apply()
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Abort()
 {
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
@@ -130,7 +130,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
         ChipLogError(SoftwareUpdate, "Cannot set block data: %" CHIP_ERROR_FORMAT, err.Format());
         return err;
     }
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this));
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
@@ -327,7 +327,7 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
     if (imageProcessor->mOTAUpdatePartition == NULL)
     {
         ChipLogError(SoftwareUpdate, "OTA partition not found");
-        imageProcessor->mDownloader->OnPreparedForDownload(CHIP_ERROR_INTERNAL);
+        TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->OnPreparedForDownload(CHIP_ERROR_INTERNAL);
         return;
     }
 #ifdef CONFIG_ENABLE_DELTA_OTA
@@ -340,7 +340,7 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 
     if (err != ESP_OK)
     {
-        imageProcessor->mDownloader->OnPreparedForDownload(ESP32Utils::MapError(err));
+        TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->OnPreparedForDownload(ESP32Utils::MapError(err));
         return;
     }
 #ifdef CONFIG_ENABLE_DELTA_OTA
@@ -378,7 +378,7 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 #endif
 
     imageProcessor->mHeaderParser.Init();
-    imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
+    TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
     PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadInProgress);
 }
 
@@ -446,7 +446,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
         otaState = DeviceLayer::kOtaDownloadComplete;
     }
 
-    imageProcessor->ReleaseBlock();
+    TEMPORARY_RETURN_IGNORED imageProcessor->ReleaseBlock();
     PostOTAStateChangeEvent(otaState);
 }
 
@@ -481,7 +481,7 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
     {
         ESP_LOGE(TAG, "ESP OTA abort failed");
     }
-    imageProcessor->ReleaseBlock();
+    TEMPORARY_RETURN_IGNORED imageProcessor->ReleaseBlock();
     PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadAborted);
 }
 
@@ -558,7 +558,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
     }
 
     imageProcessor->mParams.downloadedBytes += blockToWrite.size();
-    imageProcessor->mDownloader->FetchNextData();
+    TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->FetchNextData();
 }
 
 void OTAImageProcessorImpl::HandleApply(intptr_t context)
@@ -578,7 +578,8 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
 
 #ifdef CONFIG_OTA_AUTO_REBOOT_ON_APPLY
     // HandleApply is called after delayed action time seconds are elapsed, so it would be safe to schedule the restart
-    DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(CONFIG_OTA_AUTO_REBOOT_DELAY_MS), HandleRestart, nullptr);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(CONFIG_OTA_AUTO_REBOOT_DELAY_MS),
+                                                                   HandleRestart, nullptr);
 #else
     ESP_LOGI(TAG, "Please reboot the device manually to apply the new image");
 #endif
@@ -588,14 +589,14 @@ CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
 {
     if (block.empty())
     {
-        ReleaseBlock();
+        TEMPORARY_RETURN_IGNORED ReleaseBlock();
         return CHIP_NO_ERROR;
     }
     if (mBlock.size() < block.size())
     {
         if (!mBlock.empty())
         {
-            ReleaseBlock();
+            TEMPORARY_RETURN_IGNORED ReleaseBlock();
         }
         uint8_t * mBlock_ptr = static_cast<uint8_t *>(Platform::MemoryAlloc(block.size()));
         if (mBlock_ptr == nullptr)

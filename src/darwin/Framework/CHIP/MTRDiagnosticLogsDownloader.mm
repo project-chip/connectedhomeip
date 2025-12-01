@@ -667,16 +667,16 @@ CHIP_ERROR DiagnosticLogsDownloaderBridge::OnTransferBegin(chip::bdx::BDXTransfe
 
         if (error != nil) {
             auto err = [MTRError errorToCHIPErrorCode:error];
-            transfer->Reject(err);
+            TEMPORARY_RETURN_IGNORED transfer->Reject(err);
         } else {
-            transfer->Accept();
+            TEMPORARY_RETURN_IGNORED transfer->Accept();
         }
     };
 
     auto abortHandler = ^(NSError * error) {
         assertChipStackLockedByCurrentThread();
         auto err = [MTRError errorToCHIPErrorCode:error];
-        transfer->Reject(err);
+        TEMPORARY_RETURN_IGNORED transfer->Reject(err);
     };
 
     [mDelegate handleBDXTransferSessionBeginForFileDesignator:fileDesignator
@@ -728,9 +728,9 @@ CHIP_ERROR DiagnosticLogsDownloaderBridge::OnTransferData(chip::bdx::BDXTransfer
 
         if (error != nil) {
             auto err = [MTRError errorToCHIPErrorCode:error];
-            transfer->Reject(err);
+            TEMPORARY_RETURN_IGNORED transfer->Reject(err);
         } else {
-            transfer->Continue();
+            TEMPORARY_RETURN_IGNORED transfer->Continue();
         }
     };
 

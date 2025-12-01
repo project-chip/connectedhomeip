@@ -44,11 +44,12 @@ with open(compile_commands_path) as compile_commands_json:
     compile_commands = json.load(compile_commands_json)
 
     def get_compile_flags(src_file):
-        compile_command = list(map(lambda res: res["command"],
-                               filter(lambda cmd: cmd["file"] == src_file, compile_commands)))
+        compile_command = [
+            res["command"] for res in compile_commands if res["file"] == src_file
+        ]
 
         if len(compile_command) != 1:
-            raise Exception("Failed to resolve compile flags for %s", src_file)
+            raise Exception(f"Failed to resolve compile flags for {src_file}")
 
         compile_command = compile_command[0]
         # Trim compiler, input and output
@@ -57,12 +58,10 @@ with open(compile_commands_path) as compile_commands_json:
         replace = "-I%s" % args.idf_path
         replace_with = "-isystem%s" % args.idf_path
 
-        compile_flags = list(map(lambda f: ('"%s"' % f).replace(
-            replace, replace_with), compile_flags))
+        compile_flags = [f'"{f}"'.replace(replace, replace_with) for f in compile_flags]
 
         if args.filter_out:
-            filter_out = list(map(lambda f: ('"%s"' % f),
-                              args.filter_out.split(';')))
+            filter_out = [f'"{f}"' for f in args.filter_out.split(';')]
             compile_flags = [c for c in compile_flags if c not in filter_out]
 
         return compile_flags

@@ -156,6 +156,17 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run16:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --manual-code 10054912339
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 # Run 1: runs through all tests
@@ -173,6 +184,7 @@
 # Run 13: Tests against chip-rvc app
 # Run 14: Tests against network-management-app
 # Run 15: Tests against lighting-app-data-mode-no-unique-id
+# Run 16: Tests against all-devices-app
 
 import logging
 from dataclasses import dataclass
@@ -372,8 +384,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         error_type_ok = attr_ret is not None and isinstance(
             attr_ret, Clusters.Attribute.ValueDecodeFailure) and isinstance(attr_ret.Reason, InteractionModelError)
 
-        got_expected_error = error_type_ok and attr_ret.Reason.status == Status.UnsupportedRead
-        return got_expected_error
+        return error_type_ok and attr_ret.Reason.status == Status.UnsupportedRead
 
     @async_test_body
     async def test_TC_IDM_10_1(self):
@@ -493,7 +504,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
                 globals = [a for a in cluster[GlobalAttributeIds.ATTRIBUTE_LIST_ID] if a >= global_range_min and a < mei_range_min]
-                unexpected_globals = sorted(list(set(globals) - set(allowed_globals)))
+                unexpected_globals = sorted(set(globals) - set(allowed_globals))
                 for unexpected in unexpected_globals:
                     location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=unexpected)
                     self.record_error(self.get_test_name(), location=location,
@@ -509,7 +520,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                 standard_attributes = [a for a in cluster[GlobalAttributeIds.ATTRIBUTE_LIST_ID]
                                        if a <= attribute_standard_range_max]
                 allowed_standard_attributes = matter.clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id]
-                unexpected_standard_attributes = sorted(list(set(standard_attributes) - set(allowed_standard_attributes)))
+                unexpected_standard_attributes = sorted(set(standard_attributes) - set(allowed_standard_attributes))
                 for unexpected in unexpected_standard_attributes:
                     location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=unexpected)
                     self.record_error(self.get_test_name(), location=location,
@@ -539,17 +550,17 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                 standard_generated_commands = [
                     a for a in cluster[GlobalAttributeIds.GENERATED_COMMAND_LIST_ID] if a <= command_standard_range_max]
                 if cluster_id in matter.clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS:
-                    allowed_accepted_commands = [a for a in matter.clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id]]
+                    allowed_accepted_commands = list(matter.clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id])
                 else:
                     allowed_accepted_commands = []
                 if cluster_id in matter.clusters.ClusterObjects.ALL_GENERATED_COMMANDS:
-                    allowed_generated_commands = [a for a in matter.clusters.ClusterObjects.ALL_GENERATED_COMMANDS[cluster_id]]
+                    allowed_generated_commands = list(matter.clusters.ClusterObjects.ALL_GENERATED_COMMANDS[cluster_id])
                 else:
                     allowed_generated_commands = []
 
                 # Compare the set of commands in the standard range that the DUT says it accepts vs. the commands we know about.
-                unexpected_accepted_commands = sorted(list(set(standard_accepted_commands) - set(allowed_accepted_commands)))
-                unexpected_generated_commands = sorted(list(set(standard_generated_commands) - set(allowed_generated_commands)))
+                unexpected_accepted_commands = sorted(set(standard_accepted_commands) - set(allowed_accepted_commands))
+                unexpected_generated_commands = sorted(set(standard_generated_commands) - set(allowed_generated_commands))
 
                 for unexpected in unexpected_accepted_commands:
                     location = CommandPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, command_id=unexpected)
@@ -632,7 +643,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
 
         self.print_step(8, "Validate that all cluster ID prefixes are in the standard or MEI range")
         for endpoint_id, endpoint in self.endpoints_tlv.items():
-            cluster_prefixes = [a & 0xFFFF_0000 for a in endpoint.keys()]
+            cluster_prefixes = [a & 0xFFFF_0000 for a in endpoint]
             bad_clusters_ids = [a for a in cluster_prefixes if a >= bad_prefix_min]
             for bad_cluster_id in bad_clusters_ids:
                 location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=bad_cluster_id)
@@ -643,8 +654,8 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
 
         self.print_step(9, "Validate that all clusters in the standard range have a known cluster ID")
         for endpoint_id, endpoint in self.endpoints_tlv.items():
-            standard_clusters = [a for a in endpoint.keys() if a < mei_range_min]
-            unknown_clusters = sorted(list(set(standard_clusters) - set(matter.clusters.ClusterObjects.ALL_CLUSTERS)))
+            standard_clusters = [a for a in endpoint if a < mei_range_min]
+            unknown_clusters = sorted(set(standard_clusters) - set(matter.clusters.ClusterObjects.ALL_CLUSTERS))
             for bad in unknown_clusters:
                 location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=bad)
                 self.record_error(self.get_test_name(
@@ -653,7 +664,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
 
         self.print_step(10, "Validate that all clusters in the MEI range have a suffix in the manufacturer suffix range")
         for endpoint_id, endpoint in self.endpoints_tlv.items():
-            mei_clusters = [a for a in endpoint.keys() if a >= mei_range_min]
+            mei_clusters = [a for a in endpoint if a >= mei_range_min]
             bad_clusters = [a for a in mei_clusters if ((a & 0x0000_FFFF) < 0xFC00) or ((a & 0x0000_FFFF) > 0xFFFE)]
             for bad in bad_clusters:
                 location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=bad)

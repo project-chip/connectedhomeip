@@ -310,7 +310,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 if not trace:
                     return no_stack_trace
 
-                if isinstance(exception, signals.TestError) or isinstance(exception, signals.TestFailure):
+                if isinstance(exception, (signals.TestError, signals.TestFailure)):
                     # Exception gets raised by the mobly framework, so the proximal error is one line back in the stack trace
                     assert_candidates = [idx for idx, line in enumerate(trace) if "asserts" in line and "asserts.py" not in line]
                     if not assert_candidates:
@@ -444,16 +444,20 @@ class MatterBaseTest(base_test.BaseTestClass):
         """Checks if the 'PICS_SDK_CI_ONLY' PICS flag is enabled."""
         return self.check_pics('PICS_SDK_CI_ONLY')
 
+    @property
+    def default_endpoint(self) -> int:
+        return 0
+
     #
     # Matter Test API - Parameter Getters
     #
 
-    def get_endpoint(self, default: Optional[int] = 0) -> int:
+    def get_endpoint(self) -> int:
         """Gets the target endpoint ID from config, with a fallback default."""
         endpoint = self.matter_test_config.endpoint
         if endpoint is not None:
             return endpoint
-        return 0 if default is None else default
+        return self.default_endpoint
 
     def get_wifi_ssid(self, default: str = "") -> str:
         ''' Get WiFi SSID
@@ -847,8 +851,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         try:
             commissioning_params = await dev_ctrl.OpenCommissioningWindow(nodeId=node_id, timeout=timeout, iteration=1000,
                                                                           discriminator=rnd_discriminator, option=dev_ctrl.CommissioningWindowPasscode.kTokenWithRandomPin)
-            params = CustomCommissioningParameters(commissioning_params, rnd_discriminator)
-            return params
+            return CustomCommissioningParameters(commissioning_params, rnd_discriminator)
 
         except InteractionModelError as e:
             asserts.fail(e.status, 'Failed to open commissioning window')
@@ -919,7 +922,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             if not read_ok:
                 self.record_error(test_name=test_name, location=location, problem=read_err_msg)
                 return None
-            elif not type_ok:
+            if not type_ok:
                 self.record_error(test_name=test_name, location=location, problem=type_err_msg)
                 return None
         return attr_ret
@@ -1051,9 +1054,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         if endpoint is None:
             endpoint = self.get_endpoint()
 
-        result = await dev_ctrl.SendCommand(nodeId=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs,
-                                            payloadCapability=payloadCapability)
-        return result
+        return await dev_ctrl.SendCommand(nodeId=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs,
+                                          payloadCapability=payloadCapability)
 
     async def send_test_event_triggers(self, eventTrigger: int, enableKey: Optional[bytes] = None):
         """This helper function sends a test event trigger to the General Diagnostics cluster on endpoint 0
@@ -1067,7 +1069,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         #    --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
         if enableKey is None:
             if 'enableKey' not in self.matter_test_config.global_test_params:
-                enableKey = bytes([b for b in range(16)])
+                enableKey = bytes(list(range(16)))
             else:
                 enableKey = self.matter_test_config.global_test_params['enableKey']
 
@@ -1228,7 +1230,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                     raise TestError("Image validation failed")
             except EOFError:
                 LOGGER.info("========= EOF on STDIN =========")
-                return None
+                return
 
     def _user_verify_prompt(self, prompt_msg: str, hook_method_name: str, validation_name: str, error_message: str) -> bool:
         """Helper to show a prompt and wait for user validation in TH."""
@@ -1246,8 +1248,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             except EOFError:
                 LOGGER.info("========= EOF on STDIN =========")
             return False
-        else:
-            return True  # Indicating skipped
+        return True  # Indicating skipped
 
     def user_verify_video_stream(self,
                                  prompt_msg: str) -> None:
@@ -1307,13 +1308,12 @@ class MatterBaseTest(base_test.BaseTestClass):
         Raises:
             TestError: Indicating Push AV Stream validation step failed.
         """
-        skipped = self._user_verify_prompt(
+        return self._user_verify_prompt(
             prompt_msg=prompt_msg,
             hook_method_name='show_push_av_stream_prompt',
             validation_name='Push AV Stream Validation',
             error_message='Push AV Stream validation failed'
         )
-        return skipped
 
 
 def _async_runner(body, self: MatterBaseTest, *args, **kwargs):
@@ -1359,9 +1359,8 @@ async def _get_all_matching_endpoints(self: MatterBaseTest, accept_function: End
         Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID),
         Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)
     ])
-    matching = [e for e in wildcard.attributes.keys()
-                if accept_function(wildcard, e)]
-    return matching
+    return [e for e in wildcard.attributes
+            if accept_function(wildcard, e)]
 
 
 # TODO(#37537): Remove these temporary aliases after transition period

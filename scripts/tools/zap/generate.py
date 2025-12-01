@@ -31,6 +31,8 @@ from typing import Generator, Optional
 from clang_format import getClangFormatBinary
 from zap_execution import ZapTool
 
+log = logging.getLogger(__name__)
+
 # TODO: Can we share this constant definition with zap_regen_all.py?
 DEFAULT_DATA_MODEL_DESCRIPTION_FILE = 'src/app/zap-templates/zcl/zcl.json'
 
@@ -300,7 +302,7 @@ def runClangPrettifier(templates_file, output_dir):
             print('Formatted %d files using %s (%s)' %
                   (len(clangOutputs), clang_format, subprocess.check_output([clang_format, '--version'])))
             for outputName in clangOutputs:
-                logging.debug("Formatted: %s", outputName)
+                log.debug("Formatted: '%s'", outputName)
     except subprocess.CalledProcessError as err:
         print('clang-format error: %s', err)
 

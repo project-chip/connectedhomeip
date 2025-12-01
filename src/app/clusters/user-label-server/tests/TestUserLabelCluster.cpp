@@ -18,13 +18,14 @@
 
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/clusters/testing/ClusterTester.h>
-#include <app/clusters/user-label-server/user-label-cluster.h>
+#include <app/clusters/user-label-server/UserLabelCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/UserLabel/Attributes.h>
 #include <clusters/UserLabel/Enums.h>
 #include <clusters/UserLabel/Metadata.h>
 #include <clusters/UserLabel/Structs.h>
+#include <platform/DeviceInfoProvider.h>
 
 namespace {
 
@@ -35,21 +36,54 @@ using namespace chip::app::Clusters::UserLabel;
 using namespace chip::app::Clusters::UserLabel::Attributes;
 using namespace chip::Test;
 
+// Mock DeviceInfoProvider for testing
+class MockDeviceInfoProvider : public DeviceLayer::DeviceInfoProvider
+{
+public:
+    MockDeviceInfoProvider()           = default;
+    ~MockDeviceInfoProvider() override = default;
+
+    FixedLabelIterator * IterateFixedLabel(EndpointId endpoint) override { return nullptr; }
+    UserLabelIterator * IterateUserLabel(EndpointId endpoint) override { return nullptr; }
+    SupportedCalendarTypesIterator * IterateSupportedCalendarTypes() override { return nullptr; }
+    SupportedLocalesIterator * IterateSupportedLocales() override { return nullptr; }
+
+protected:
+    // Simple no-op implementations - we only need these to return success
+    // so that the cluster's validation logic can be tested
+    CHIP_ERROR SetUserLabelLength(EndpointId endpoint, size_t val) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR GetUserLabelLength(EndpointId endpoint, size_t & val) override
+    {
+        val = 0;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR SetUserLabelAt(EndpointId endpoint, size_t index, const UserLabelType & userLabel) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR DeleteUserLabelAt(EndpointId endpoint, size_t index) override { return CHIP_NO_ERROR; }
+};
+
 struct TestUserLabelCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
 
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
-    void SetUp() override { ASSERT_EQ(userLabel.Startup(context), CHIP_NO_ERROR); }
+    void SetUp() override
+    {
+        DeviceLayer::SetDeviceInfoProvider(&mDeviceInfoProvider);
+        ASSERT_EQ(userLabel.Startup(testContext.Get()), CHIP_NO_ERROR);
+    }
 
-    void TearDown() override { userLabel.Shutdown(); }
+    void TearDown() override
+    {
+        userLabel.Shutdown();
+        DeviceLayer::SetDeviceInfoProvider(nullptr);
+    }
 
-    TestUserLabelCluster() : context(testContext.Create()), userLabel(kRootEndpointId) {}
+    TestUserLabelCluster() : userLabel(kRootEndpointId) {}
 
     chip::Test::TestServerClusterContext testContext;
-    ServerClusterContext context;
     UserLabelCluster userLabel;
+    MockDeviceInfoProvider mDeviceInfoProvider;
 };
 
 } // namespace
@@ -82,4 +116,57 @@ TEST_F(TestUserLabelCluster, ReadAttributeTest)
     {
         ASSERT_GT(it.GetValue().label.size(), 0u);
     }
+}
+
+TEST_F(TestUserLabelCluster, WriteValidLabelListTest)
+{
+    ClusterTester tester(userLabel);
+    Structs::LabelStruct::Type labels[] = {
+        { .label = "room"_span, .value = "bedroom 2"_span },
+        { .label = "orientation"_span, .value = "North"_span },
+    };
+    ASSERT_EQ(tester.WriteAttribute(LabelList::Id, DataModel::List(labels)), CHIP_NO_ERROR);
+}
+
+TEST_F(TestUserLabelCluster, WriteLabelWithLabelTooLongTest)
+{
+    ClusterTester tester(userLabel);
+    constexpr auto tooLongLabel = "this_label_is_way_too_long"_span;
+    static_assert(tooLongLabel.size() > UserLabelCluster::kMaxLabelSize);
+    Structs::LabelStruct::Type labels[] = {
+        { .label = tooLongLabel, .value = "value"_span },
+    };
+    ASSERT_EQ(tester.WriteAttribute(LabelList::Id, DataModel::List(labels)), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+}
+
+TEST_F(TestUserLabelCluster, WriteLabelWithValueTooLongTest)
+{
+    ClusterTester tester(userLabel);
+    constexpr auto tooLongValue = "this_value_is_way_too_long"_span;
+    static_assert(tooLongValue.size() > UserLabelCluster::kMaxValueSize);
+    Structs::LabelStruct::Type labels[] = {
+        { .label = "room"_span, .value = tooLongValue },
+    };
+    ASSERT_EQ(tester.WriteAttribute(LabelList::Id, DataModel::List(labels)), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+}
+
+TEST_F(TestUserLabelCluster, WriteEmptyLabelsTest)
+{
+    ClusterTester tester(userLabel);
+    Structs::LabelStruct::Type labels[] = {
+        { .label = ""_span, .value = ""_span }, // empty label and value are allowed per spec
+    };
+    ASSERT_EQ(tester.WriteAttribute(LabelList::Id, DataModel::List(labels)), CHIP_NO_ERROR);
+}
+
+TEST_F(TestUserLabelCluster, WriteMaxSizeLabelListTest)
+{
+    ClusterTester tester(userLabel);
+    std::array<Structs::LabelStruct::Type, chip::DeviceLayer::kMaxUserLabelListLength> labels;
+    for (size_t i = 0; i < labels.size(); i++)
+    {
+        labels[i].label = "label"_span;
+        labels[i].value = "value"_span;
+    }
+    ASSERT_EQ(tester.WriteAttribute(LabelList::Id, DataModel::List(labels.data(), labels.size())), CHIP_NO_ERROR);
 }

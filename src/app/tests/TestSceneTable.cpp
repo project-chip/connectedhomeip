@@ -26,6 +26,7 @@
 #include <lib/core/TLV.h>
 #include <lib/support/Span.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 #include <lib/core/StringBuilderAdapters.h>
 #include <pw_unit_test/framework.h>
@@ -385,54 +386,6 @@ public:
     TestSceneHandler() = default;
     ~TestSceneHandler() override {}
 
-    // Fills in cluster buffer and adjusts its size to lower than the maximum number of cluster per scenes
-    virtual void GetSupportedClusters(EndpointId endpoint, Span<ClusterId> & clusterBuffer) override
-    {
-        ClusterId * buffer = clusterBuffer.data();
-        if (endpoint == kTestEndpoint1)
-        {
-            if (clusterBuffer.size() >= 2)
-            {
-                buffer[0] = kOnOffClusterId;
-                buffer[1] = kLevelControlClusterId;
-                clusterBuffer.reduce_size(2);
-            }
-        }
-        else if (endpoint == kTestEndpoint2)
-        {
-            if (clusterBuffer.size() >= 2)
-            {
-                buffer[0] = kOnOffClusterId;
-                buffer[1] = kColorControlClusterId;
-                clusterBuffer.reduce_size(2);
-            }
-        }
-        else if (endpoint == kTestEndpoint3)
-        {
-            if (clusterBuffer.size() >= 3)
-            {
-                buffer[0] = kOnOffClusterId;
-                buffer[1] = kLevelControlClusterId;
-                buffer[2] = kColorControlClusterId;
-                clusterBuffer.reduce_size(3);
-            }
-        }
-        else if (endpoint == kTestEndpoint4)
-        {
-            if (clusterBuffer.size() >= 3)
-            {
-                buffer[0] = MockClusterId(kOnOffClusterId);
-                buffer[1] = MockClusterId(kLevelControlClusterId);
-                buffer[2] = MockClusterId(kColorControlClusterId);
-                clusterBuffer.reduce_size(3);
-            }
-        }
-        else
-        {
-            clusterBuffer.reduce_size(0);
-        }
-    }
-
     // Default function only checks if endpoint and clusters are valid
     bool SupportsCluster(EndpointId endpoint, ClusterId cluster) override
     {
@@ -712,9 +665,9 @@ TestSceneHandler * TestSceneTable::mpSceneHandler                   = nullptr;
 
 void ResetSceneTable(SceneTable * sceneTable)
 {
-    sceneTable->RemoveFabric(kFabric1);
-    sceneTable->RemoveFabric(kFabric2);
-    sceneTable->RemoveFabric(kFabric3);
+    EXPECT_SUCCESS(sceneTable->RemoveFabric(kFabric1));
+    EXPECT_SUCCESS(sceneTable->RemoveFabric(kFabric2));
+    EXPECT_SUCCESS(sceneTable->RemoveFabric(kFabric3));
 }
 
 TEST_F(TestSceneTable, TestHandlerRegistration)
@@ -1402,8 +1355,7 @@ TEST_F(TestSceneTable, TestStoreScenes)
     EXPECT_EQ(kScene7, sceneList[0]);
 
     uint8_t sceneCount = 0;
-    sceneTable->GetEndpointSceneCount(sceneCount);
-    sceneTable->GetFabricSceneCount(kFabric1, sceneCount);
+    EXPECT_SUCCESS(sceneTable->GetFabricSceneCount(kFabric1, sceneCount));
 }
 
 TEST_F(TestSceneTable, TestOverwriteScenes)
@@ -1412,8 +1364,8 @@ TEST_F(TestSceneTable, TestOverwriteScenes)
     ASSERT_NE(nullptr, sceneTable);
 
     uint8_t sceneCount = 0;
-    sceneTable->GetEndpointSceneCount(sceneCount);
-    sceneTable->GetFabricSceneCount(kFabric1, sceneCount);
+    EXPECT_SUCCESS(sceneTable->GetEndpointSceneCount(sceneCount));
+    EXPECT_SUCCESS(sceneTable->GetFabricSceneCount(kFabric1, sceneCount));
     SceneTableEntry scene;
     // Overwriting the first entry
     EXPECT_EQ(CHIP_NO_ERROR, sceneTable->SetSceneTableEntry(kFabric1, scene10));
@@ -2002,7 +1954,7 @@ TEST_F(TestSceneTable, TestEndpointScenes)
     // Test removal of fabric clears scene fabric on all endpoints
     sceneTable = scenes::GetSceneTableImpl(kTestEndpoint1, defaultTestTableSize);
     ASSERT_NE(nullptr, sceneTable);
-    sceneTable->RemoveFabric(kFabric1);
+    EXPECT_SUCCESS(sceneTable->RemoveFabric(kFabric1));
     EXPECT_EQ(CHIP_ERROR_NOT_FOUND, sceneTable->GetSceneTableEntry(kFabric1, sceneId1, scene));
     EXPECT_EQ(CHIP_ERROR_NOT_FOUND, sceneTable->GetSceneTableEntry(kFabric1, sceneId2, scene));
     EXPECT_EQ(CHIP_ERROR_NOT_FOUND, sceneTable->GetSceneTableEntry(kFabric1, sceneId3, scene));
@@ -2031,7 +1983,7 @@ TEST_F(TestSceneTable, TestEndpointScenes)
     EXPECT_EQ(CHIP_ERROR_NOT_FOUND, sceneTable->GetSceneTableEntry(kFabric1, sceneId6, scene));
     EXPECT_EQ(CHIP_ERROR_NOT_FOUND, sceneTable->GetSceneTableEntry(kFabric1, sceneId7, scene));
 
-    sceneTable->RemoveFabric(kFabric2);
+    EXPECT_SUCCESS(sceneTable->RemoveFabric(kFabric2));
 
     // Validate endpoints are empty
     sceneTable = scenes::GetSceneTableImpl(kTestEndpoint1, defaultTestTableSize);

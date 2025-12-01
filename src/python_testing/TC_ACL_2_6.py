@@ -73,11 +73,13 @@ class TC_ACL_2_6(MatterBaseTest):
     async def write_attribute_with_encoding_option(self, controller, node_id, path, forceLegacyListEncoding):
         if forceLegacyListEncoding:
             return await controller.TestOnlyWriteAttributeWithLegacyList(node_id, path)
-        else:
-            return await controller.WriteAttribute(node_id, path)
+        return await controller.WriteAttribute(node_id, path)
 
     def desc_TC_ACL_2_6(self) -> str:
         return "[TC-ACL-2.6] AccessControlEntryChanged event"
+
+    def pics_TC_ACL_2_6(self) -> list[str]:
+        return ['ACL.S']
 
     async def internal_test_TC_ACL_2_6(self, force_legacy_encoding: bool):
         self.step(1)
@@ -205,8 +207,8 @@ class TC_ACL_2_6(MatterBaseTest):
             self._validate_event_fields(e1, Clusters.AccessControl.Enums.ChangeTypeEnum.kAdded, acl_entries[1], f1)
 
         # Set comparison for debugging
-        subscription_event_set = set(self.event_key(e) for e in received_subscription_events)
-        read_event_set = set(self.event_key(e) for e in read_events)
+        subscription_event_set = {self.event_key(e) for e in received_subscription_events}
+        read_event_set = {self.event_key(e) for e in read_events}
         if subscription_event_set != read_event_set:
             sub_only = subscription_event_set - read_event_set
             read_only = read_event_set - subscription_event_set
@@ -286,7 +288,7 @@ class TC_ACL_2_6(MatterBaseTest):
             )
 
     def steps_TC_ACL_2_6(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(
                 1,
                 "TH1 commissions DUT using admin node ID N1",
@@ -321,7 +323,6 @@ class TC_ACL_2_6(MatterBaseTest):
                 "Resetting ACL events to only admin/case, then re-running the test using the legacy list writing mechanism, where the client issues a series of AttributeDataIBs, with the first containing a path to the list itself and Data that is empty array, which signals clearing the list, and subsequent AttributeDataIBs containing updates.",
                 "Test succeeds with legacy list encoding mechanism"),
         ]
-        return steps
 
     @async_test_body
     async def test_TC_ACL_2_6(self):

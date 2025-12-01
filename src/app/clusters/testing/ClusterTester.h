@@ -14,22 +14,29 @@
  *    limitations under the License.
  */
 
+#pragma once
 #include <app/AttributeValueDecoder.h>
 #include <app/AttributeValueEncoder.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteClusterPath.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/ConcreteEventPath.h>
+#include <app/clusters/testing/MockCommandHandler.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
+#include <app/data-model/NullObject.h>
 #include <app/server-cluster/ServerClusterInterface.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/TLVReader.h>
 #include <lib/support/ReadOnlyBuffer.h>
 
 #include <memory>
+#include <optional>
+#include <type_traits>
 #include <vector>
 
 namespace chip {
@@ -120,33 +127,116 @@ public:
         return mCluster.WriteAttribute(writeOperation.GetRequest(), decoder);
     }
 
-    // Invoke a command with `data` as arguments.
-    // The `data` parameter must be of the correct type for the command being invoked.
-    // Use `app::Clusters::<ClusterName>::Commands::<CommandName>::Type` for the `data` parameter to be spec compliant (see the
-    // comment of the class for usage example).
+    // Result structure for Invoke operations, containing both status and decoded response.
+    template <typename ResponseType>
+    struct InvokeResult
+    {
+        std::optional<app::DataModel::ActionReturnStatus> status;
+        std::optional<ResponseType> response;
+
+        // Returns true if the command was successful and response is available
+        bool IsSuccess() const
+        {
+            if constexpr (std::is_same_v<ResponseType, app::DataModel::NullObjectType>)
+                return status.has_value() && status->IsSuccess();
+            else
+                return status.has_value() && status->IsSuccess() && response.has_value();
+        }
+    };
+
+    // Invoke a command and return the decoded result.
+    // The `request` parameter must be of the correct type for the command being invoked.
+    // Use `app::Clusters::<ClusterName>::Commands::<CommandName>::Type` for the `request` parameter to be spec compliant
     // Will construct the command path using the first path returned by `GetPaths()` on the cluster.
     // @returns `CHIP_ERROR_INCORRECT_STATE` if `GetPaths()` doesn't return a list with one path.
-    template <typename T>
-    std::optional<app::DataModel::ActionReturnStatus> InvokeCommand(CommandId commandId, const T & data,
-                                                                    app::CommandHandler * handler)
+    template <typename RequestType, typename ResponseType = typename RequestType::ResponseType>
+    [[nodiscard]] InvokeResult<ResponseType> Invoke(chip::CommandId commandId, const RequestType & request)
     {
-        VerifyOrReturnError(VerifyClusterPathsValid(), CHIP_ERROR_INCORRECT_STATE);
-        auto path                                   = mCluster.GetPaths()[0];
-        const app::DataModel::InvokeRequest request = { .path = { path.mEndpointId, path.mClusterId, commandId } };
+        InvokeResult<ResponseType> result;
 
-        constexpr size_t kTlvBufferSize = 128; // Typically CommanderSender will use a TLV of size kMaxSecureSduLengthBytes. For
-                                               // now, just use 128 for the unit test.
-        uint8_t buffer[kTlvBufferSize];
-        TLV::TLVWriter tlvWriter;
-        tlvWriter.Init(buffer);
-        ReturnErrorOnFailure(data.Encode(tlvWriter, TLV::AnonymousTag()));
+        const auto & paths = mCluster.GetPaths();
+        VerifyOrReturnValue(paths.size() == 1u, result);
 
-        TLV::TLVReader tlvReader;
-        tlvReader.Init(buffer, tlvWriter.GetLengthWritten());
-        ReturnErrorOnFailure(tlvReader.Next());
+        mHandler.ClearResponses();
+        mHandler.ClearStatuses();
 
-        return mCluster.InvokeCommand(request, tlvReader, handler);
+        const app::DataModel::InvokeRequest invokeRequest = { .path = { paths[0].mEndpointId, paths[0].mClusterId, commandId } };
+
+        TLV::TLVWriter writer;
+        writer.Init(mTlvBuffer);
+
+        TLV::TLVReader reader;
+
+        VerifyOrReturnValue(request.Encode(writer, TLV::AnonymousTag()) == CHIP_NO_ERROR, result);
+        VerifyOrReturnValue(writer.Finalize() == CHIP_NO_ERROR, result);
+
+        reader.Init(mTlvBuffer, writer.GetLengthWritten());
+        VerifyOrReturnValue(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()) == CHIP_NO_ERROR, result);
+
+        result.status = mCluster.InvokeCommand(invokeRequest, reader, &mHandler);
+
+        // If InvokeCommand returned nullopt, it means the command implementation handled the response.
+        // We need to check the mock handler for a data response or a status response.
+        if (!result.status.has_value())
+        {
+            if (mHandler.HasResponse())
+            {
+                // A data response was added, so the command is successful.
+                result.status = app::DataModel::ActionReturnStatus(CHIP_NO_ERROR);
+            }
+            else if (mHandler.HasStatus())
+            {
+                // A status response was added. Use the last one.
+                result.status = app::DataModel::ActionReturnStatus(mHandler.GetLastStatus().status);
+            }
+            else
+            {
+                // Neither response nor status was provided; this is unexpected.
+                // This would happen either in error (as mentioned here) or if the command is supposed
+                // to be handled asynchronously. ClusterTester does not support such asynchronous processing.
+                result.status = app::DataModel::ActionReturnStatus(CHIP_ERROR_INCORRECT_STATE);
+                ChipLogError(
+                    Test, "InvokeCommand returned nullopt, but neither HasResponse nor HasStatus is true. Setting error status.");
+            }
+        }
+
+        // If command was successful and there's a response, decode it (skip for NullObjectType)
+        if constexpr (!std::is_same_v<ResponseType, app::DataModel::NullObjectType>)
+        {
+            if (result.status.has_value() && result.status->IsSuccess() && mHandler.HasResponse())
+            {
+                ResponseType decodedResponse;
+                CHIP_ERROR decodeError = mHandler.DecodeResponse(decodedResponse);
+                if (decodeError == CHIP_NO_ERROR)
+                {
+                    result.response = std::move(decodedResponse);
+                }
+                else
+                {
+                    // Decode failed; reflect error in status and log
+                    result.status = app::DataModel::ActionReturnStatus(decodeError);
+                    ChipLogError(Test, "DecodeResponse failed: %s", decodeError.AsString());
+                }
+            }
+        }
+
+        return result;
     }
+
+    // convenience method: most requests have a `GetCommandId` (and GetClusterId() as well).
+    template <typename RequestType, typename ResponseType = typename RequestType::ResponseType>
+    [[nodiscard]] InvokeResult<ResponseType> Invoke(const RequestType & request)
+    {
+        return Invoke(RequestType::GetCommandId(), request);
+    }
+
+    // Returns the next generated event from the event generator in the test server cluster context
+    std::optional<LogOnlyEvents::EventInformation> GetNextGeneratedEvent()
+    {
+        return mTestServerClusterContext.EventsGenerator().GetNextEvent();
+    }
+
+    std::vector<app::AttributePathParams> & GetDirtyList() { return mTestServerClusterContext.ChangeListener().DirtyList(); }
 
 private:
     bool VerifyClusterPathsValid()
@@ -162,6 +252,15 @@ private:
 
     TestServerClusterContext mTestServerClusterContext{};
     app::ServerClusterInterface & mCluster;
+
+    // Buffer size for TLV encoding/decoding of command payloads.
+    // 256 bytes was chosen as a conservative upper bound for typical command payloads in tests.
+    // All command payloads used in tests must fit within this buffer; tests with larger payloads will fail.
+    // If protocol or test requirements change, this value may need to be increased.
+    static constexpr size_t kTlvBufferSize = 256;
+
+    app::Testing::MockCommandHandler mHandler;
+    uint8_t mTlvBuffer[kTlvBufferSize];
     std::vector<std::unique_ptr<app::Testing::ReadOperation>> mReadOperations;
 };
 

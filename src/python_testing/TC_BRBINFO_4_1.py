@@ -133,8 +133,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
 
     async def _send_keep_active_command(self, stay_active_duration_ms, timeout_ms, endpoint_id) -> int:
         logging.info("Sending keep active command")
-        keep_active = await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=endpoint_id, payload=Clusters.Objects.BridgedDeviceBasicInformation.Commands.KeepActive(stayActiveDuration=stay_active_duration_ms, timeoutMs=timeout_ms))
-        return keep_active
+        return await self.default_controller.SendCommand(nodeId=self.dut_node_id, endpoint=endpoint_id, payload=Clusters.Objects.BridgedDeviceBasicInformation.Commands.KeepActive(stayActiveDuration=stay_active_duration_ms, timeoutMs=timeout_ms))
 
     async def _get_dynamic_endpoint(self) -> int:
         root_part_list = await self.read_single_attribute_check_success(cluster=Clusters.Descriptor, attribute=Clusters.Descriptor.Attributes.PartsList, endpoint=_ROOT_ENDPOINT_ID)
@@ -144,8 +143,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
             self.set_of_dut_endpoints_before_adding_device), "Expected only new endpoints to be added")
         unique_endpoints_set = set_of_endpoints_after_adding_device - self.set_of_dut_endpoints_before_adding_device
         asserts.assert_equal(len(unique_endpoints_set), 1, "Expected only one new endpoint")
-        newly_added_endpoint = list(unique_endpoints_set)[0]
-        return newly_added_endpoint
+        return list(unique_endpoints_set)[0]
 
     @async_test_body
     async def setup_class(self):
