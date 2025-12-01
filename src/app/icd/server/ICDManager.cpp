@@ -430,6 +430,7 @@ void ICDManager::UpdateOperationState(OperationalState state)
     // Active mode can be re-triggered.
     VerifyOrReturn(mOperationalState != state || state == OperationalState::ActiveMode);
 
+    ICDConfigurationData & configData = ICDConfigurationData::GetInstance();
     if (state == OperationalState::IdleMode)
     {
         mOperationalState = OperationalState::IdleMode;
@@ -439,25 +440,27 @@ void ICDManager::UpdateOperationState(OperationalState state)
             std::bind(&ICDManager::ShouldCheckInMsgsBeSentAtActiveModeFunction, this, std::placeholders::_1, std::placeholders::_2);
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
-        // When the active mode interval is 0, we stay in idleMode until a notification brings the icd into active mode
-        // unless the device would need to send Check-In messages
-        if (ICDConfigurationData::GetInstance().GetActiveModeDuration() > kZero
+        // When the ActiveModeDuration is set to 0, the ICDManager does not need to periodically transition to active mode.
+        // Instead, It can stay in idle mode until a notification, Report or other network event automatically toggles the ICD into
+        // active mode. The following conditions will schedule a transition to Active Mode after the Idle Mode duration expires.
+        // - An ActiveModeDuration interval must be respected.
+        // - The device state indicates to shorten its idle duration and report faster to provide better responsiveness
+        // - Check-In messages must be sent
+        if (configData.GetActiveModeDuration() > kZero || configData.ShouldUseShortIdle()
 #if CHIP_CONFIG_ENABLE_ICD_CIP
             || CheckInMessagesWouldBeSent(sendCheckInMessagesOnActiveMode)
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
         )
         {
-            DeviceLayer::SystemLayer().StartTimer(ICDConfigurationData::GetInstance().GetIdleModeDuration(), OnIdleModeDone, this);
+            DeviceLayer::SystemLayer().StartTimer(configData.GetModeBasedIdleModeDuration(), OnIdleModeDone, this);
         }
-
-        Milliseconds32 slowPollInterval = ICDConfigurationData::GetInstance().GetSlowPollingInterval();
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
         // Going back to Idle, all Check-In messages are sent
         mICDSenderPool.ReleaseAll();
 #endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
-        CHIP_ERROR err = DeviceLayer::ConnectivityMgr().SetPollingInterval(slowPollInterval);
+        CHIP_ERROR err = DeviceLayer::ConnectivityMgr().SetPollingInterval(configData.GetSlowPollingInterval());
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "Failed to set Slow Polling Interval: err %" CHIP_ERROR_FORMAT, err.Format());
@@ -474,13 +477,13 @@ void ICDManager::UpdateOperationState(OperationalState state)
             DeviceLayer::SystemLayer().CancelTimer(OnIdleModeDone, this);
 
             mOperationalState                 = OperationalState::ActiveMode;
-            Milliseconds32 activeModeDuration = ICDConfigurationData::GetInstance().GetActiveModeDuration();
+            Milliseconds32 activeModeDuration = configData.GetActiveModeDuration();
 
             if (activeModeDuration == kZero && !mKeepActiveFlags.HasAny())
             {
                 // Network Activity triggered the active mode and activeModeDuration is 0.
                 // Stay active for at least Active Mode Threshold.
-                activeModeDuration = ICDConfigurationData::GetInstance().GetActiveModeThreshold();
+                activeModeDuration = configData.GetActiveModeThreshold();
             }
 
             DeviceLayer::SystemLayer().StartTimer(activeModeDuration, OnActiveModeDone, this);
@@ -496,8 +499,7 @@ void ICDManager::UpdateOperationState(OperationalState state)
             mTransitionToIdleCalled = false;
             DeviceLayer::SystemLayer().StartTimer(activeModeJitterInterval, OnTransitionToIdle, this);
 
-            CHIP_ERROR err =
-                DeviceLayer::ConnectivityMgr().SetPollingInterval(ICDConfigurationData::GetInstance().GetFastPollingInterval());
+            CHIP_ERROR err = DeviceLayer::ConnectivityMgr().SetPollingInterval(configData.GetFastPollingInterval());
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(AppServer, "Failed to set Fast Polling Interval: err %" CHIP_ERROR_FORMAT, err.Format());
@@ -511,7 +513,7 @@ void ICDManager::UpdateOperationState(OperationalState state)
         }
         else
         {
-            ExtendActiveMode(ICDConfigurationData::GetInstance().GetActiveModeThreshold());
+            ExtendActiveMode(configData.GetActiveModeThreshold());
         }
     }
 }
