@@ -52,27 +52,48 @@ const char * DescribePlatformError(CHIP_ERROR aError)
     static thread_local char errBuf[128];
 #else
     static char errBuf[128];
-#endif // CHIP_SYSTEM_CONFIG_THREAD_LOCAL_STORAGE
+#endif
 
+    // Use thread-safe strerror_r on POSIX systems
+#if defined(_GNU_SOURCE)
+    // GNU version returns char*
+    const char * s = strerror_r(lError, errBuf, sizeof(errBuf));
+    if (s != nullptr)
+    {
+        if (s != errBuf)
+        {
+            strncpy(errBuf, s, sizeof(errBuf) - 1);
+            errBuf[sizeof(errBuf) - 1] = '\0';
+        }
+        return errBuf;
+    }
+#elif defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200112L
+    // POSIX version returns int
+    if (strerror_r(lError, errBuf, sizeof(errBuf)) == 0)
+    {
+        return errBuf;
+    }
+#else
+    // Fallback to strerror (not thread-safe but only if no alternative)
     const char * s = strerror(lError);
     if (s != nullptr)
     {
-        strncpy(errBuf, s, sizeof(errBuf) - 1);
-        errBuf[sizeof(errBuf) - 1] = '\0';
+        snprintf(errBuf, sizeof(errBuf), "%s", s);
         return errBuf;
     }
+#endif
 
     return "Unknown platform error";
 }
 
 void RegisterPlatformErrorFormatter()
 {
+    static std::once_flag sRegistrationFlag;
     static ErrorFormatter sPlatformErrorFormatter = { FormatPlatformError, nullptr };
-    static bool sRegistered                       = false;
-    if (sRegistered)
-        return;
-    RegisterErrorFormatter(&sPlatformErrorFormatter);
-    sRegistered = true;
+    
+    std::call_once(sRegistrationFlag, []() {
+        RegisterErrorFormatter(&sPlatformErrorFormatter);
+    });
 }
 
 bool FormatPlatformError(char * buf, uint16_t bufSize, CHIP_ERROR err)

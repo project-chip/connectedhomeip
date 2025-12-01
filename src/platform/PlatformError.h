@@ -47,7 +47,7 @@ namespace Internal {
  *
  *  @return A NULL-terminated descriptive C string describing the error.
  */
-const char * DescribePlatformError(CHIP_ERROR code);
+const char * DescribePlatformError(CHIP_ERROR aError);
 
 /**
  * @brief Registers the platform-specific error formatter.
@@ -69,13 +69,13 @@ void RegisterPlatformErrorFormatter();
  *
  * @param[in] buf                   Buffer into which the error string will be placed.
  * @param[in] bufSize               Size of the supplied buffer in bytes.
- * @param[in] err                   The error to be described.
+ * @param[in] aError                   The error to be described.
  *
  * @return true                     If a description string was written into the supplied buffer.
  * @return false                    If the supplied error was not a Platform error.
  *
  */
-bool FormatPlatformError(char * buf, uint16_t bufSize, CHIP_ERROR err);
+bool FormatPlatformError(char * buf, uint16_t bufSize, CHIP_ERROR aError);
 
 } // namespace Internal
 } // namespace Platform
