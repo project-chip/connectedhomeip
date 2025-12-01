@@ -262,17 +262,28 @@ def main():
                 [h_full, c_full] = builder.full_arrays()
                 [h_generic, c_generic] = builder.generic_arrays()
 
-                define = '#if CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID == 0x{:X}\n'.format(vid)
-                end = '#endif\n'
+                define = '#if ' if vid == 0xFFF1 else '#elif '
+                define += 'CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID == 0x{:X}\n'.format(vid)
 
                 hfile.write(define)
                 hfile.write(h_full)
-                hfile.write(end)
 
                 cfile.write(define)
                 cfile.write(c_full)
                 cfile.write(c_generic)
-                cfile.write(end)
+
+            define = "#else\n"
+            end = "#endif\n"
+
+            hfile.write(end)
+
+            cfile.write(define)
+            builder.own.cert_array_name = ""
+            builder.own.private_key_array_name = ""
+            builder.own.public_key_array_name = ""
+            _, c_generic = builder.generic_arrays()
+            cfile.write(c_generic)
+            cfile.write(end)
 
             hfile.write(footer)
             cfile.write(footer)
@@ -297,18 +308,29 @@ def main():
                     [h, c] = builder.full_arrays()
                     [h_generic, c_generic] = builder.generic_arrays()
 
-                    define = '#if CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID == 0x{:X} && CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID == 0x{:X}\n'.format(
+                    define = '#if ' if vid == 0xFFF1 and pid == 0x8000 else '#elif '
+                    define += 'CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID == 0x{:X} && CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID == 0x{:X}\n'.format(
                         vid, pid)
-                    end = '#endif\n'
 
                     hfile.write(define)
                     hfile.write(h)
-                    hfile.write(end)
 
                     cfile.write(define)
                     cfile.write(c)
                     cfile.write(c_generic)
-                    cfile.write(end)
+
+            define = "#else\n"
+            end = "#endif\n"
+
+            hfile.write(end)
+
+            cfile.write(define)
+            builder.own.cert_array_name = ""
+            builder.own.private_key_array_name = ""
+            builder.own.public_key_array_name = ""
+            _, c_generic = builder.generic_arrays()
+            cfile.write(c_generic)
+            cfile.write(end)
 
             hfile.write(footer)
             cfile.write(footer)

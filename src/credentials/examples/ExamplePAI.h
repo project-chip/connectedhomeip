@@ -35,13 +35,11 @@ extern ByteSpan kPaiPrivateKey;
 extern const uint8_t kDevelopmentPAI_Cert_FFF1[463];
 extern const uint8_t kDevelopmentPAI_PublicKey_FFF1[65];
 extern const uint8_t kDevelopmentPAI_PrivateKey_FFF1[32];
-#endif
-#if CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID == 0xFFF2
+#elif CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID == 0xFFF2
 extern const uint8_t kDevelopmentPAI_Cert_FFF2[441];
 extern const uint8_t kDevelopmentPAI_PublicKey_FFF2[65];
 extern const uint8_t kDevelopmentPAI_PrivateKey_FFF2[32];
-#endif
-#if CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID == 0xFFF3
+#elif CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID == 0xFFF3
 extern const uint8_t kDevelopmentPAI_Cert_FFF3[440];
 extern const uint8_t kDevelopmentPAI_PublicKey_FFF3[65];
 extern const uint8_t kDevelopmentPAI_PrivateKey_FFF3[32];
