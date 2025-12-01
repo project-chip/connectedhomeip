@@ -45,7 +45,7 @@ struct FabricList : public CommonPersistentData::FabricList
 
 constexpr size_t kPersistentBufferMax = 128;
 
-struct LinkedData : public PersistentData<kPersistentBufferMax>
+struct LinkedData : public PersistableData<kPersistentBufferMax>
 {
     static constexpr uint16_t kMinLinkId = 1;
 
@@ -59,7 +59,7 @@ struct LinkedData : public PersistentData<kPersistentBufferMax>
     bool first      = true;
 };
 
-struct FabricData : public PersistentData<kPersistentBufferMax>
+struct FabricData : public PersistableData<kPersistentBufferMax>
 {
     static constexpr TLV::Tag TagFirstGroup() { return TLV::ContextTag(1); }
     static constexpr TLV::Tag TagGroupCount() { return TLV::ContextTag(2); }
@@ -247,20 +247,20 @@ struct FabricData : public PersistentData<kPersistentBufferMax>
         return CHIP_ERROR_NOT_FOUND;
     }
 
-    CHIP_ERROR Save(PersistentStorageDelegate * storage) override
+    CHIP_ERROR Save(PersistentStorageDelegate * storage)
     {
         ReturnErrorOnFailure(Register(storage));
-        return PersistentData::Save(storage);
+        return PersistableData::Save(storage);
     }
 
-    CHIP_ERROR Delete(PersistentStorageDelegate * storage) override
+    CHIP_ERROR Delete(PersistentStorageDelegate * storage)
     {
         ReturnErrorOnFailure(Unregister(storage));
-        return PersistentData::Delete(storage);
+        return PersistableData::Delete(storage);
     }
 };
 
-struct GroupData : public GroupDataProvider::GroupInfo, PersistentData<kPersistentBufferMax>
+struct GroupData : public GroupDataProvider::GroupInfo, PersistableData<kPersistentBufferMax>
 {
     static constexpr TLV::Tag TagName() { return TLV::ContextTag(1); }
     static constexpr TLV::Tag TagFirstEndpoint() { return TLV::ContextTag(2); }
@@ -536,7 +536,7 @@ struct KeyMapData : public GroupDataProvider::GroupKey, LinkedData
     }
 };
 
-struct EndpointData : GroupDataProvider::GroupEndpoint, PersistentData<kPersistentBufferMax>
+struct EndpointData : GroupDataProvider::GroupEndpoint, PersistableData<kPersistentBufferMax>
 {
     static constexpr TLV::Tag TagEndpoint() { return TLV::ContextTag(1); }
     static constexpr TLV::Tag TagNext() { return TLV::ContextTag(2); }
@@ -621,7 +621,7 @@ struct EndpointData : GroupDataProvider::GroupEndpoint, PersistentData<kPersiste
     }
 };
 
-struct KeySetData : PersistentData<kPersistentBufferMax>
+struct KeySetData : PersistableData<kPersistentBufferMax>
 {
     static constexpr TLV::Tag TagPolicy() { return TLV::ContextTag(1); }
     static constexpr TLV::Tag TagNumKeys() { return TLV::ContextTag(2); }

@@ -72,7 +72,7 @@ static constexpr size_t kPersistentBufferNextIdBytes =
                            EstimateStructOverhead(sizeof(CertificateId), sizeof(FabricIndex)) *
                                (kMaxClientCertificatesPerFabric * CHIP_CONFIG_MAX_FABRICS)); // mClientCertMapping
 
-class GlobalCertificateData : public PersistentData<kPersistentBufferNextIdBytes>
+class GlobalCertificateData : public PersistableData<kPersistentBufferNextIdBytes>
 {
     IncrementingIdHelper<CertificateId, kMaxRootCertificatesPerFabric * CHIP_CONFIG_MAX_FABRICS> mRoot;
     IncrementingIdHelper<CertificateId, kMaxClientCertificatesPerFabric * CHIP_CONFIG_MAX_FABRICS> mClient;
@@ -156,9 +156,9 @@ public:
                                          TLV::ContextTag(TagCertificate::kStoredFabricIndex));
     }
 
-    CHIP_ERROR Load(PersistentStorageDelegate * storage) override
+    CHIP_ERROR Load(PersistentStorageDelegate * storage)
     {
-        CHIP_ERROR err = PersistentData::Load(storage);
+        CHIP_ERROR err = PersistableData::Load(storage);
         VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
         if (CHIP_ERROR_NOT_FOUND == err)
         {

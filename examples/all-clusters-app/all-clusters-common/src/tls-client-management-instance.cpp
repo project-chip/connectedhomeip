@@ -71,7 +71,7 @@ struct BufferedEndpoint
     PersistenceBuffer<kTlsEndpointMaxBytes> mBuffer;
 };
 
-class GlobalEndpointData : public PersistentData<kPersistentBufferNextIdBytes>
+class GlobalEndpointData : public PersistableData<kPersistentBufferNextIdBytes>
 {
     IncrementingIdHelper<TlsEndpointId, kMaxProvisionedEndpoints * CHIP_CONFIG_MAX_FABRICS> mEndpoints;
     EndpointId mEndpointId = kInvalidEndpointId;
@@ -124,9 +124,9 @@ public:
         return reader.ExitContainer(container);
     }
 
-    CHIP_ERROR Load(PersistentStorageDelegate * storage) override
+    CHIP_ERROR Load(PersistentStorageDelegate * storage)
     {
-        CHIP_ERROR err = PersistentData::Load(storage);
+        CHIP_ERROR err = PersistableData::Load(storage);
         VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
         if (CHIP_ERROR_NOT_FOUND == err)
         {

@@ -97,9 +97,22 @@ struct PersistenceBuffer
     MutableByteSpan BufferSpan() { return MutableByteSpan(mBuffer); }
 };
 
-/// @brief Combines a PersistenceBuffer with DataAccessor helpers.
-/// Only exists for compatibility with existing code;
-/// new code should use PersistenceBuffer and DataAccessor separately.
+/// @brief A DataAccessor with a built-in buffer.
+/// @tparam kMaxSerializedSize inherited from PersistableData
+///
+/// Note: Unlike `PersistentData` (deprecated), this class does not make the Load/Save/Delete
+/// methods virtual. PersistableData objects are not intended to be used polymorphically.
+/// It also does not store a PersistentStorageDelegate pointer internally.
+template <size_t kMaxSerializedSize>
+class PersistableData : public DataAccessor, protected PersistenceBuffer<kMaxSerializedSize>
+{
+public:
+    CHIP_ERROR Save(PersistentStorageDelegate * storage) { return DataAccessor::Save(storage, this->BufferSpan()); }
+    CHIP_ERROR Load(PersistentStorageDelegate * storage) { return DataAccessor::Load(storage, this->BufferSpan()); }
+};
+
+///// Deprecated types retained for for backward compatibility ////////////////
+
 template <size_t kMaxSerializedSize>
 struct [[deprecated("Use PersistenceBuffer and DataAccessor separately")]] PersistentStore
     : public PersistenceBuffer<kMaxSerializedSize>
@@ -119,9 +132,8 @@ struct [[deprecated("Use PersistenceBuffer and DataAccessor separately")]] Persi
     CHIP_ERROR Delete(DataAccessor & persistent, PersistentStorageDelegate * storage) { return persistent.Delete(storage); }
 };
 
-/// @brief Combines PersistentStore and DataAccessor
 template <size_t kMaxSerializedSize>
-struct PersistentData : PersistentStore<kMaxSerializedSize>, DataAccessor
+struct [[deprecated("Use PersistableData")]] PersistentData : PersistentStore<kMaxSerializedSize>, DataAccessor
 {
     using SizedStore = PersistentStore<kMaxSerializedSize>;
 

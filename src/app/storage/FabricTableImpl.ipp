@@ -48,7 +48,7 @@ enum class TagEntry : uint8_t
 // byte value, 1 byte end struct. 8 Bytes leaves space for potential increase in count_value size.
 static constexpr size_t kPersistentBufferEntryCountBytes = 8;
 
-struct BaseEntryCount : public PersistentData<kPersistentBufferEntryCountBytes>
+struct BaseEntryCount : public PersistableData<kPersistentBufferEntryCountBytes>
 {
     uint8_t count_value = 0;
     BaseEntryCount(uint8_t count = 0) : count_value(count) {}
@@ -72,9 +72,9 @@ struct BaseEntryCount : public PersistentData<kPersistentBufferEntryCountBytes>
         return reader.ExitContainer(container);
     }
 
-    CHIP_ERROR Load(PersistentStorageDelegate * storage) override
+    CHIP_ERROR Load(PersistentStorageDelegate * storage)
     {
-        CHIP_ERROR err = PersistentData::Load(storage);
+        CHIP_ERROR err = PersistableData::Load(storage);
         VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
         if (CHIP_ERROR_NOT_FOUND == err)
         {
@@ -190,7 +190,7 @@ struct TableEntryData : DataAccessor
  * FabricEntryData is an access to a linked list of entries
  */
 template <class StorageId, class StorageData, size_t kEntryMaxBytes, size_t kFabricMaxBytes, uint16_t kMaxPerFabric>
-struct FabricEntryData : public PersistentData<kFabricMaxBytes>
+struct FabricEntryData : public PersistableData<kFabricMaxBytes>
 {
     using Serializer              = DefaultSerializer<StorageId, StorageData>;
     using TypedTableEntryData     = TableEntryData<StorageId, StorageData>;
@@ -464,7 +464,7 @@ struct FabricEntryData : public PersistentData<kFabricMaxBytes>
         return err;
     }
 
-    CHIP_ERROR Load(PersistentStorageDelegate * storage) override
+    CHIP_ERROR Load(PersistentStorageDelegate * storage)
     {
         VerifyOrReturnError(nullptr != storage, CHIP_ERROR_INVALID_ARGUMENT);
         uint8_t deleted_entries_count = 0;
