@@ -187,7 +187,8 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::InvokeCom
         }
     }
 
-    // Ember always returns responses via the handler, so std::nullopt must be returned here to follow the InvokeCommand API contract
+    // Ember always returns responses via the handler, so std::nullopt must be returned here to follow the InvokeCommand API
+    // contract
     DispatchSingleClusterCommand(request.path, input_arguments, handler);
     return std::nullopt;
 }
