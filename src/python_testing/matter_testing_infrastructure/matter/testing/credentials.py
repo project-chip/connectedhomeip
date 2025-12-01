@@ -80,7 +80,7 @@ def get_paa_root_certs(credential_source: Union[CredentialSource, Traversable]) 
 
 def get_cd_certs(credential_source: Union[CredentialSource, Traversable]) -> Traversable:
     """
-    Get the directory of the PAA root certs of a specific source from either a directory or stored zip.
+    Get the directory of the CD certs of a specific source from either a directory or stored zip.
 
     `credential_source` given as a path MUST be of type Traversable (often `pathlib.Path(somepathstring)`).
     """
