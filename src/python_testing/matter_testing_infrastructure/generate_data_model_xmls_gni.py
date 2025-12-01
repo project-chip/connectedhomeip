@@ -23,7 +23,6 @@ package without requiring a full chip SDK checkout.
 import os
 from pathlib import Path
 
-
 import jinja2
 
 # Set chip_root to be dynamically based on the script's location

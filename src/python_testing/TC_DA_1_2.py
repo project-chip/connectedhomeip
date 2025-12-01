@@ -52,6 +52,7 @@
 import logging
 import random
 import re
+from pathlib import Path
 from typing import Tuple
 
 from cryptography import x509
@@ -61,7 +62,6 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import ec, utils
 from ecdsa.curves import curve_by_name
 from mobly import asserts
-from pathlib import Path
 from pyasn1.codec.der.decoder import decode as der_decoder
 from pyasn1.error import PyAsn1Error
 from pyasn1.type import univ

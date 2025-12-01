@@ -14,13 +14,13 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-from enum import Enum, auto
-from typing import Union
-from importlib.abc import Traversable
-import importlib.resources as pkg_resources
 import importlib
+import importlib.resources as pkg_resources
 import os
 import zipfile
+from enum import Enum, auto
+from importlib.abc import Traversable
+from typing import Union
 
 
 class CredentialSource(Enum):
