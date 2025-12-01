@@ -119,6 +119,9 @@ declare_args() {
 
   # board related generated files path (used if slc_generate or slc_reuse_files is set)
   slc_gen_path = "${chip_root}/third_party/silabs/slc_gen/${silabs_board}/"
+
+  # Extra ICD configuration parameter. Defaults to previously set sl_idle_mode_duration_s
+  sl_short_idle_mode_duration_s = sl_idle_mode_duration_s
 }
 
 declare_args() {
@@ -609,6 +612,7 @@ template("efr32_sdk") {
         "SL_ACTIVE_MODE_THRESHOLD=${sl_active_mode_threshold_ms}",
         "SL_ACTIVE_MODE_DURATION_MS=${sl_active_mode_duration_ms}",
         "SL_IDLE_MODE_DURATION_S=${sl_idle_mode_duration_s}",
+        "SL_SHORT_IDLE_MODE_DURATION_S=${sl_short_idle_mode_duration_s}",
         "SL_ICD_SUPPORTED_CLIENTS_PER_FABRIC=${sl_icd_supported_clients_per_fabric}",
         "SL_TRANSPORT_IDLE_INTERVAL=${sl_transport_idle_interval_ms}",
         "SL_TRANSPORT_ACTIVE_INTERVAL=${sl_transport_active_interval_ms}",
