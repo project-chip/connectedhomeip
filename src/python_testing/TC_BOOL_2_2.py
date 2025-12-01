@@ -90,7 +90,7 @@ class TC_BOOL_2_2(MatterBaseTest):
 
     def pics_TC_BOOL_2_2(self) -> list[str]:
         pics = [
-            "BOOLCFG.S",
+            "BOOL.S",
         ]
         return pics
 
