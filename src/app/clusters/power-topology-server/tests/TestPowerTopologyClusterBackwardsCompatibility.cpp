@@ -16,9 +16,9 @@
  *    limitations under the License.
  */
 
-#include "MockPowerTopologyDelegate.h"
 #include <app/clusters/power-topology-server/CodegenIntegration.h>
 #include <app/clusters/power-topology-server/PowerTopologyCluster.h>
+#include <app/clusters/power-topology-server/tests/MockPowerTopologyDelegate.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <pw_unit_test/framework.h>
 

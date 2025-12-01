@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "MockPowerTopologyDelegate.h"
+#include <app/clusters/power-topology-server/tests/MockPowerTopologyDelegate.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;

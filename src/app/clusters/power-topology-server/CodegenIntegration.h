@@ -19,8 +19,8 @@
 
 #include <lib/core/Optional.h>
 
-#include "PowerTopologyCluster.h"
-#include "PowerTopologyDelegate.h"
+#include <app/clusters/power-topology-server/PowerTopologyCluster.h>
+#include <app/clusters/power-topology-server/PowerTopologyDelegate.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
@@ -41,12 +41,12 @@ class Instance
 public:
     Instance(EndpointId aEndpointId, Delegate & aDelegate, BitMask<Feature> aFeature,
              BitMask<OptionalAttributes> aOptionalAttributes) :
-        mEndpointId(aEndpointId),
-        mDelegate(aDelegate), mFeature(aFeature), mOptionalAttrs(aOptionalAttributes), mCluster(PowerTopologyCluster::Config{
-                                                                                           .endpointId = aEndpointId,
-                                                                                           .delegate   = aDelegate,
-                                                                                           .features   = aFeature,
-                                                                                       })
+        mEndpointId(aEndpointId), mDelegate(aDelegate), mFeature(aFeature), mOptionalAttrs(aOptionalAttributes),
+        mCluster(PowerTopologyCluster::Config{
+            .endpointId = aEndpointId,
+            .delegate   = aDelegate,
+            .features   = aFeature,
+        })
     {}
     ~Instance() { Shutdown(); }
 

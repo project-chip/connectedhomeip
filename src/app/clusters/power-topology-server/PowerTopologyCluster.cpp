@@ -15,10 +15,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "PowerTopologyCluster.h"
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/EventLogging.h>
+#include <app/clusters/power-topology-server/PowerTopologyCluster.h>
 #include <app/reporting/reporting.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/PowerTopology/Metadata.h>

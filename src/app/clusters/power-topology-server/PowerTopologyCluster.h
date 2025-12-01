@@ -16,8 +16,8 @@
  */
 #pragma once
 
-#include "PowerTopologyDelegate.h"
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/clusters/power-topology-server/PowerTopologyDelegate.h>
 #include <app/reporting/reporting.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>

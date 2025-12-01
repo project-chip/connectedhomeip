@@ -19,7 +19,7 @@
 #include <app/clusters/power-topology-server/PowerTopologyCluster.h>
 #include <pw_unit_test/framework.h>
 
-#include "MockPowerTopologyDelegate.h"
+#include <app/clusters/power-topology-server/tests/MockPowerTopologyDelegate.h>
 #include <app/clusters/testing/ClusterTester.h>
 #include <app/clusters/testing/ValidateGlobalAttributes.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
