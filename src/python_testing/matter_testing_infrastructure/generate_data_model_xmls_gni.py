@@ -69,7 +69,7 @@ GNI_TEMPLATE = """\
 
 
 def get_file_names(directory: str, file_globs: list[str]):
-    ''' Function to find and collect all .xml files'''
+    ''' Function to find and collect all files matching glob patterns'''
     file_list = []
     globs = []
     for g in file_globs:
