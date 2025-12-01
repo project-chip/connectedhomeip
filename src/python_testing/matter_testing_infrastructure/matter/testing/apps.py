@@ -142,7 +142,7 @@ class OTAProviderSubprocess(AppServerSubprocess):
     def __init__(self, app: str, storage_dir: str, discriminator: int,
                  passcode: int, ota_source: Union[OtaImagePath, ImageListPath],
                  port: int = 5541, extra_args: list[str] = [], kvs_path: Optional[str] = None,
-                 log_file: Union[str, BinaryIO] = stdout.buffer, err_log_file: Union[str, BinaryIO] = stderr.buffer):
+                 log_file: str | BinaryIO = stdout.buffer, err_log_file: str | BinaryIO = stderr.buffer):
         """Initialize the OTA Provider subprocess.
 
         Args:
