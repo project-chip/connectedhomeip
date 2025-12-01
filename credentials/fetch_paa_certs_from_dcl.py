@@ -136,9 +136,14 @@ def use_dcld(dcld, production, cmdlist):
 @optgroup.option('--use-test-net-http', is_flag=True, type=str, help="Use RESTful API with HTTPS against public TestNet observer.")
 @optgroup.group('Optional arguments')
 @optgroup.option('--paa-trust-store-path', default='paa-root-certs', type=str, metavar='PATH', help="PAA trust store path (default: paa-root-certs)")
-def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_http, paa_trust_store_path):
-    """DCL PAA mirroring tools"""
-    fetch_paa_certs(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_http, paa_trust_store_path)
+@optgroup.option('--cds', default=False, is_flag=True)
+@optgroup.option('--cd-path', default='cd-certs')
+def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_http, paa_trust_store_path, cds, cd_path):
+    """DCL mirroring tools"""
+    if cds:
+        fetch_cd_signing_certs(cd_path)
+    else:
+        fetch_paa_certs(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_http, paa_trust_store_path)
 
 
 def get_cert_from_rest(rest_node_url, subject, subject_key_id):
