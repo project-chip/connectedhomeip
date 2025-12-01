@@ -642,7 +642,7 @@ CHIP_ERROR FabricTableImpl<StorageId, StorageData>::GetTableEntry(FabricIndex fa
     ReturnErrorOnFailure(fabric.Load(mStorage));
     VerifyOrReturnError(fabric.Find(entry_id, table_entry.index) == CHIP_NO_ERROR, CHIP_ERROR_NOT_FOUND);
 
-    CHIP_ERROR err = table_entry.Load(mStorage, MutableByteSpan(buffer.mBuffer));
+    CHIP_ERROR err = table_entry.Load(mStorage, buffer.BufferSpan());
 
     // If entry.Load returns "buffer too small", the entry in memory is too big to be retrieved (this could happen if the
     // kEntryMaxBytes was reduced by OTA) and therefore must be deleted as is is no longer considered accessible.
