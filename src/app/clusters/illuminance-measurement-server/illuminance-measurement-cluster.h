@@ -24,20 +24,21 @@
 
 namespace chip::app::Clusters {
 
-using namespace chip::app::Clusters::IlluminanceMeasurement;
-using namespace chip::app::Clusters::IlluminanceMeasurement::Attributes;
-
 class IlluminanceMeasurementCluster : public DefaultServerCluster
 {
 public:
     // NOTE: this set is smaller than the full optional attributes supported by illuminance measurement
     //       as other attributes are controlled by feature flags
-    using OptionalAttributeSet = app::OptionalAttributeSet<LightSensorType::Id, Tolerance::Id>;
+    using OptionalAttributeSet =
+        app::OptionalAttributeSet<chip::app::Clusters::IlluminanceMeasurement::Attributes::LightSensorType::Id,
+                                  chip::app::Clusters::IlluminanceMeasurement::Attributes::Tolerance::Id>;
 
     struct StartupConfiguration
     {
-        DataModel::Nullable<LightSensorTypeEnum> lightSensorType{ LightSensorTypeEnum::kPhotodiode };
-        Tolerance::TypeInfo::Type tolerance{};
+        DataModel::Nullable<chip::app::Clusters::IlluminanceMeasurement::LightSensorTypeEnum> lightSensorType{
+            chip::app::Clusters::IlluminanceMeasurement::LightSensorTypeEnum::kPhotodiode
+        };
+        chip::app::Clusters::IlluminanceMeasurement::Attributes::Tolerance::TypeInfo::Type tolerance{};
     };
 
     IlluminanceMeasurementCluster(EndpointId endpointId, const OptionalAttributeSet & optionalAttributeSet,
@@ -48,22 +49,34 @@ public:
                                                 AttributeValueEncoder & encoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
-    DataModel::Nullable<LightSensorTypeEnum> GetLightSensorType() const { return mLightSensorType; }
+    DataModel::Nullable<chip::app::Clusters::IlluminanceMeasurement::LightSensorTypeEnum> GetLightSensorType() const
+    {
+        return mLightSensorType;
+    }
 
-    MaxMeasuredValue::TypeInfo::Type GetMaxMeasuredValue() const { return mMaxMeasuredValue; }
+    chip::app::Clusters::IlluminanceMeasurement::Attributes::MaxMeasuredValue::TypeInfo::Type GetMaxMeasuredValue() const
+    {
+        return mMaxMeasuredValue;
+    }
 
-    MeasuredValue::TypeInfo::Type GetMeasuredValue() const { return mMeasuredValue; }
+    chip::app::Clusters::IlluminanceMeasurement::Attributes::MeasuredValue::TypeInfo::Type GetMeasuredValue() const
+    {
+        return mMeasuredValue;
+    }
 
-    MinMeasuredValue::TypeInfo::Type GetMinMeasuredValue() const { return mMinMeasuredValue; }
+    chip::app::Clusters::IlluminanceMeasurement::Attributes::MinMeasuredValue::TypeInfo::Type GetMinMeasuredValue() const
+    {
+        return mMinMeasuredValue;
+    }
 
-    Tolerance::TypeInfo::Type GetTolerance() const { return mTolerance; }
+    chip::app::Clusters::IlluminanceMeasurement::Attributes::Tolerance::TypeInfo::Type GetTolerance() const { return mTolerance; }
 
 protected:
-    DataModel::Nullable<LightSensorTypeEnum> mLightSensorType{};
-    MaxMeasuredValue::TypeInfo::Type mMaxMeasuredValue{};
-    MeasuredValue::TypeInfo::Type mMeasuredValue{};
-    MinMeasuredValue::TypeInfo::Type mMinMeasuredValue{};
-    Tolerance::TypeInfo::Type mTolerance{};
+    DataModel::Nullable<chip::app::Clusters::IlluminanceMeasurement::LightSensorTypeEnum> mLightSensorType{};
+    chip::app::Clusters::IlluminanceMeasurement::Attributes::MaxMeasuredValue::TypeInfo::Type mMaxMeasuredValue{};
+    chip::app::Clusters::IlluminanceMeasurement::Attributes::MeasuredValue::TypeInfo::Type mMeasuredValue{};
+    chip::app::Clusters::IlluminanceMeasurement::Attributes::MinMeasuredValue::TypeInfo::Type mMinMeasuredValue{};
+    chip::app::Clusters::IlluminanceMeasurement::Attributes::Tolerance::TypeInfo::Type mTolerance{};
     const OptionalAttributeSet mOptionalAttributeSet;
 };
 
