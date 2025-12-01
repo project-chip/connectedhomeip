@@ -164,8 +164,7 @@ class TC_SU_2_7(SoftwareUpdateBaseTest):
     async def teardown_test(self):
         await self.clear_ota_providers(self.controller, self.requestor_node_id)
         self.terminate_provider()
-        if hasattr(self, 'provider_kvs_path') and path.exists(self.provider_kvs_path):
-            self.clear_kvs(kvs_prefix=self.provider_kvs_path)
+        self.clear_kvs(kvs_prefix=self.provider_kvs_path)
         super().teardown_test()
 
     def desc_TC_SU_2_7_1(self) -> str:
