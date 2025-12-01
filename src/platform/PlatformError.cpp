@@ -91,9 +91,7 @@ void RegisterPlatformErrorFormatter()
     static std::once_flag sRegistrationFlag;
     static ErrorFormatter sPlatformErrorFormatter = { FormatPlatformError, nullptr };
 
-    std::call_once(sRegistrationFlag, []() {
-        RegisterErrorFormatter(&sPlatformErrorFormatter);
-    });
+    std::call_once(sRegistrationFlag, []() { RegisterErrorFormatter(&sPlatformErrorFormatter); });
 }
 
 bool FormatPlatformError(char * buf, uint16_t bufSize, CHIP_ERROR err)
