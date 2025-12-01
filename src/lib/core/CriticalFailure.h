@@ -40,7 +40,7 @@ namespace chip {
  * If this divergence creates significant friction, e.g. in continuous integration, we may want
  * to consistently annotate with [[nodiscard]], even in the case where no handling is necessary.
  */
-#ifdef CALLER_HANDLES_CRITICAL_FAILURE
+#if CALLER_HANDLES_CRITICAL_FAILURE
 class [[nodiscard]] CriticalFailure
 {
     CHIP_ERROR error;

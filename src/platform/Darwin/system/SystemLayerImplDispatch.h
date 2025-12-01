@@ -57,7 +57,7 @@ public:
     void SetDispatchQueue(dispatch_queue_t dispatchQueue) override { mDispatchQueue = dispatchQueue; };
     dispatch_queue_t GetDispatchQueue() override { return mDispatchQueue; };
     void HandleDispatchQueueEvents(Clock::Timeout timeout) override;
-    CHIP_ERROR ScheduleWorkWithBlock(dispatch_block_t block) override;
+    CriticalFailure ScheduleWorkWithBlock(dispatch_block_t block) override;
     CriticalFailure StartTimerWithBlock(dispatch_block_t block, Clock::Timeout delay) override;
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS

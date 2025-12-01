@@ -133,7 +133,7 @@ namespace System {
         mLayerState.ResetFromShuttingDown(); // Return to uninitialized state to permit re-initialization.
     }
 
-    CHIP_ERROR LayerImplDispatch::ScheduleWorkWithBlock(dispatch_block_t block)
+    CriticalFailure LayerImplDispatch::ScheduleWorkWithBlock(dispatch_block_t block)
     {
 #if SYSTEM_LAYER_IMPL_DISPATCH_DEBUG
         ChipLogError(Inet, "%s (block: %p)", __func__, block);
