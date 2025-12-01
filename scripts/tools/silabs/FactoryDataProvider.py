@@ -214,9 +214,9 @@ class FactoryDataWriter:
                 print("Device not connected")
                 # When no device is connected user needs to provide the mcu family for which those credentials are to be created
                 if self._args.mcu_family:
-                    if "EFR32MG12" == self._args.mcu_family:
+                    if self._args.mcu_family == "EFR32MG12":
                         inputImage = self.BASE_MG12_FILE
-                    elif "EFR32MG24" == self._args.mcu_family:
+                    elif self._args.mcu_family == "EFR32MG24":
                         inputImage = self.BASE_MG24_FILE
                 else:
                     print("Connect debug port or provide the mcu_family")

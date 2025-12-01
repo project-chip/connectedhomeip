@@ -30,7 +30,6 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --bool-arg ignore_in_progress:True
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --tests test_TC_ACE_2_2
@@ -332,7 +331,6 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
 
     async def run_access_test(self, test_type: AccessTestType):
         # Step precondition, 1 and 2 are handled in the class setup, but need to be marked for every test
-        ignore_in_progress = self.user_params.get("ignore_in_progress", False)
         self.step("precondition")
         self.step(1)
         self.step(2)
@@ -347,7 +345,6 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
 
         self.step(check_step)
         enum = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
-        in_progress_clusters = [Clusters.ColorControl.id]
         privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue and p != enum.kProxyView]
         for privilege in privilege_enum:
             logging.info(f"Testing for {privilege}")
@@ -356,8 +353,6 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             self.step(step_number_with_privilege(check_step, 'b', privilege))
             for endpoint_id, endpoint in self.endpoints_tlv.items():
                 for cluster_id, device_cluster_data in endpoint.items():
-                    if ignore_in_progress and cluster_id in in_progress_clusters:
-                        continue
                     if not is_standard_cluster_id(cluster_id) or cluster_id not in self.xml_clusters or cluster_id not in Clusters.ClusterObjects.ALL_ATTRIBUTES:
                         # These cases have already been recorded by the _record_errors function
                         continue

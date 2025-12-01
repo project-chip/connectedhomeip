@@ -765,8 +765,8 @@ def compute_symbol_diff(orig: list[Symbol], base: list[Symbol]) -> list[Symbol]:
     result = []
 
     for path in unique_paths:
-        orig_symbol = orig_items.get(path, None)
-        base_symbol = base_items.get(path, None)
+        orig_symbol = orig_items.get(path)
+        base_symbol = base_items.get(path)
 
         if not orig_symbol:
             if not base_symbol:

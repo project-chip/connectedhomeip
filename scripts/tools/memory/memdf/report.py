@@ -174,9 +174,8 @@ def open_output(config: Config,
             return
     if suffix:
         filename += suffix
-    f = open(filename, 'w')
-    yield f
-    f.close()
+    with open(filename, 'w') as f:
+        yield f
 
 
 # Single-table writers.

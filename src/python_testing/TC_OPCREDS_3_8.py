@@ -203,11 +203,8 @@ def make_vid_matcher(fabric_index: int, expected_vid: int) -> AttributeMatcher:
     def predicate(report: AttributeValue) -> bool:
         if report.attribute != Clusters.OperationalCredentials.Attributes.Fabrics or report.endpoint_id != 0 or not isinstance(report.value, list):
             return False
-        for entry in report.value:
-            if entry.fabricIndex == fabric_index and entry.vendorID == expected_vid:
-                return True
-        else:
-            return False
+        return any(entry.fabricIndex == fabric_index and entry.vendorID == expected_vid
+                   for entry in report.value)
     return AttributeMatcher.from_callable(description=f"Fabrics list entry report for FabricIndex {fabric_index} has VendorID field set to 0x{expected_vid:04x}", matcher=predicate)
 
 
@@ -215,11 +212,8 @@ def make_vvs_matcher(fabric_index: int, expected_vvs: bytes) -> AttributeMatcher
     def predicate(report: AttributeValue) -> bool:
         if report.attribute != Clusters.OperationalCredentials.Attributes.Fabrics or report.endpoint_id != 0 or not isinstance(report.value, list):
             return False
-        for entry in report.value:
-            if entry.fabricIndex == fabric_index and entry.VIDVerificationStatement == expected_vvs:
-                return True
-        else:
-            return False
+        return any(entry.fabricIndex == fabric_index and entry.VIDVerificationStatement == expected_vvs
+                   for entry in report.value)
     return AttributeMatcher.from_callable(description=f"Fabrics list entry report for FabricIndex {fabric_index} has VIDVerificationStatement field set to correct VIDVerificationStatement value just set", matcher=predicate)
 
 
