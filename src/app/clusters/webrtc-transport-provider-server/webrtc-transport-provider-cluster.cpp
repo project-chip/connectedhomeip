@@ -45,10 +45,6 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
     Commands::ProvideICECandidates::kMetadataEntry, Commands::EndSession::kMetadataEntry,
 };
 
-constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
-    CurrentSessions::kMetadataEntry,
-};
-
 NodeId GetNodeIdFromCtx(const CommandHandler & commandHandler)
 {
     auto descriptor = commandHandler.GetSubjectDescriptor();
