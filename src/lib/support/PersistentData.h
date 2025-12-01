@@ -22,7 +22,8 @@
 #include <lib/support/Span.h>
 
 namespace chip {
-/// @brief Data accessor allowing data to be persisted by PersistentStore to be accessed
+
+/// @brief Data that can be persisted via PersistentStorageDelegate in TLV format.
 struct DataAccessor
 {
     virtual ~DataAccessor()                                     = default;
@@ -84,10 +85,13 @@ struct DataAccessor
 
 /// @brief A buffer to be used when loading or serializing persistent data
 /// @tparam kMaxSerializedSize size of the buffer necessary to retrieve an entry from the storage.
+///
+/// Note: Generic APIs that utilize a persistence buffer should prefer taking
+/// a MutableByteSpan, to avoid unnecessarily templating on the buffer size.
 template <size_t kMaxSerializedSize>
 struct PersistenceBuffer
 {
-    uint8_t mBuffer[kMaxSerializedSize] = { 0 };
+    uint8_t mBuffer[kMaxSerializedSize];
 
     // Returns a MutableByteSpan representing this buffer.
     MutableByteSpan BufferSpan() { return MutableByteSpan(mBuffer); }
@@ -97,7 +101,8 @@ struct PersistenceBuffer
 /// Only exists for compatibility with existing code;
 /// new code should use PersistenceBuffer and DataAccessor separately.
 template <size_t kMaxSerializedSize>
-struct PersistentStore : public PersistenceBuffer<kMaxSerializedSize>
+struct [[deprecated("Use PersistenceBuffer and DataAccessor separately")]] PersistentStore
+    : public PersistenceBuffer<kMaxSerializedSize>
 {
     virtual ~PersistentStore() = default;
 
