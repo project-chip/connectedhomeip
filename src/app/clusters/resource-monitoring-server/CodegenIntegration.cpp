@@ -67,16 +67,7 @@ ResourceMonitoringCluster::OptionalAttributeSet ConstructOptionalAttributeSet(En
 
     ResourceMonitoringCluster::OptionalAttributeSet optionalAttributeSet;
 
-    if (emberAfContainsAttribute(endpointId, clusterId, ResourceMonitoring::Attributes::Condition::Id))
-    {
-        optionalAttributeSet.Set<ResourceMonitoring::Attributes::Condition::Id>();
-    }
-
-    if (emberAfContainsAttribute(endpointId, clusterId, ResourceMonitoring::Attributes::DegradationDirection::Id))
-    {
-        optionalAttributeSet.Set<ResourceMonitoring::Attributes::DegradationDirection::Id>();
-    }
-
+    // Only InPlaceIndicator  and LastChangedTime are truly optional. All the rest are fully described by  their feature set.
     if (emberAfContainsAttribute(endpointId, clusterId, ResourceMonitoring::Attributes::InPlaceIndicator::Id))
     {
         optionalAttributeSet.Set<ResourceMonitoring::Attributes::InPlaceIndicator::Id>();

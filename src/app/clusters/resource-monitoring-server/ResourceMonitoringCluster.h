@@ -43,7 +43,6 @@ class ResourceMonitoringCluster : public DefaultServerCluster
 
 public:
     using OptionalAttributeSet = chip::app::OptionalAttributeSet<
-        ResourceMonitoring::Attributes::Condition::Id, ResourceMonitoring::Attributes::DegradationDirection::Id,
         ResourceMonitoring::Attributes::InPlaceIndicator::Id, ResourceMonitoring::Attributes::LastChangedTime::Id>;
 
     /**
