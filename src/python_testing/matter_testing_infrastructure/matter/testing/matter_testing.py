@@ -1047,8 +1047,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             asserts.assert_true(dut_uname is not None, "The LINUX_DUT_USER environment variable must be set")
             LOGGER.info(f"Using DUT user name: {dut_uname}")
             cmd_list = ["ssh", f"{dut_uname}@{dut_ip}", f"cat {app_pipe_out}"]
-            out = subprocess.check_output(cmd_list)
-            return out
+            return subprocess.check_output(cmd_list)
 
     def write_to_app_pipe(self, command_dict: dict, app_pipe: Optional[str] = None, is_subprocess: Optional[bool] = False):
         """
