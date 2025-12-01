@@ -1806,9 +1806,21 @@ Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBe
     const Status existenceStatus = CheckCommandExistence(request.path, acceptedCommandEntry);
     const bool commandExists     = (existenceStatus == Status::Success);
 
-    // Default to Operate when the command metadata is unknown so we can fail closed while still avoiding
-    // leaking information about whether the path actually exists. When the metadata lookup succeeds we
-    // enforce the precise privilege declared for the command.
+    // If the command exists, then the spec defines either doing a check for Operate access
+    // followed by a check for the actual access level of the command (in the concrete path case)
+    // or just doing a check for the actual access level of the command (in the non-concrete path case).
+    // Since all commands require at least Operate access in the spec (and the spec algorithm would be
+    // wrong if they did not), this is equivalent to doing a single check for the actual access level of the command.
+    //
+    // If the command does not exist, but we still got here, we must be in the concrete path case, and the spec
+    // then defines a single check for the Operate access level, whose failure must take precedence over the
+    // existence check in terms of what is communicated back to the client.
+    //
+    // The code below implements equivalent logic:
+    // * If the command exists, the only possible failure is due to insufficient access, and it's
+    //   enough to check the actual access level of the command.
+    // * If the command does not exist, a check for Operate is done, and if that fails the corresponding
+    //   status is returned.  If it succeeds, then the "no such command" status is returned.
     Access::Privilege privilegeToCheck = commandExists ? acceptedCommandEntry.GetInvokePrivilege() : Access::Privilege::kOperate;
 
     Status accessStatus = CheckCommandAccess(request, privilegeToCheck);
