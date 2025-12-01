@@ -49,12 +49,6 @@ public:
     virtual CHIP_ERROR GetActiveEndpointAtIndex(size_t index, EndpointId & endpointId) = 0;
 };
 
-enum class OptionalAttributes : uint32_t
-{
-    kOptionalAttributeAvailableEndpoints = 0x1,
-    kOptionalAttributeActiveEndpoints    = 0x2,
-};
-
 } // namespace PowerTopology
 } // namespace Clusters
 } // namespace app

@@ -87,6 +87,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::BooleanState::Id:
         MatterBooleanStateClusterInitCallback(endpoint);
         break;
+    case app::Clusters::PowerTopology::Id:
+        MatterPowerTopologyClusterInitCallback(endpoint);
+        break;
     }
 }
 
@@ -153,6 +156,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     case app::Clusters::BooleanState::Id:
         MatterBooleanStateClusterShutdownCallback(endpoint);
+        break;
+    case app::Clusters::PowerTopology::Id:
+        MatterPowerTopologyClusterShutdownCallback(endpoint);
         break;
     }
 }

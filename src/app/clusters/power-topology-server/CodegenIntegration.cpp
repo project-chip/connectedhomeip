@@ -1,0 +1,85 @@
+/*
+ *
+ *    Copyright (c) 2025 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#include "CodegenIntegration.h"
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace PowerTopology {
+
+CHIP_ERROR Instance::Init()
+{
+    return CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());
+}
+
+void Instance::Shutdown()
+{
+    CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster()));
+}
+
+bool Instance::HasFeature(Feature aFeature) const
+{
+    return mCluster.Cluster().Features().Has(aFeature);
+}
+
+bool Instance::SupportsOptAttr(OptionalAttributes aOptionalAttrs) const
+{
+    switch (aOptionalAttrs)
+    {
+    case OptionalAttributes::kOptionalAttributeAvailableEndpoints:
+        return mCluster.Cluster().OptionalAttributes().IsSet(Attributes::AvailableEndpoints::Id);
+    case OptionalAttributes::kOptionalAttributeActiveEndpoints:
+        return mCluster.Cluster().OptionalAttributes().IsSet(Attributes::ActiveEndpoints::Id);
+    default:
+        return false;
+    }
+}
+
+CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    switch (aPath.mAttributeId)
+    {
+    case Attributes::AvailableEndpoints::Id:
+        return ReadAvailableEndpoints(aEncoder);
+    case Attributes::ActiveEndpoints::Id:
+        return ReadActiveEndpoints(aEncoder);
+    }
+
+    return CHIP_ERROR_INVALID_ARGUMENT;
+}
+
+CHIP_ERROR Instance::ReadAvailableEndpoints(AttributeValueEncoder & aEncoder)
+{
+    return mCluster.Cluster().GetAvailableEndpoints(aEncoder);
+}
+
+CHIP_ERROR Instance::ReadActiveEndpoints(AttributeValueEncoder & aEncoder)
+{
+    return mCluster.Cluster().GetActiveEndpoints(aEncoder);
+}
+
+} // namespace PowerTopology
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
+void MatterPowerTopologyClusterInitCallback(chip::EndpointId endpoint) {}
+
+void MatterPowerTopologyClusterShutdownCallback(chip::EndpointId endpoint) {}
