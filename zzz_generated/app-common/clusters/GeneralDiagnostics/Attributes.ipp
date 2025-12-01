@@ -50,6 +50,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, activeNetworkFaults);
     case Attributes::TestEventTriggersEnabled::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, testEventTriggersEnabled);
+    case Attributes::DeviceLoadStatus::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, deviceLoadStatus);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():

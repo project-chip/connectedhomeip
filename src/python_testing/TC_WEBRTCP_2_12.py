@@ -55,7 +55,7 @@ class TC_WEBRTCP_2_12(MatterBaseTest, WEBRTCPTestBase):
         return "[TC-WEBRTCP-2.12] Validate SolicitOffer resource exhaustion"
 
     def steps_TC_WEBRTCP_2_12(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("precondition", "DUT commissioned", is_commissioning=True),
             TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
                      "DUT responds with success and provides stream IDs"),
@@ -66,10 +66,9 @@ class TC_WEBRTCP_2_12(MatterBaseTest, WEBRTCPTestBase):
             TestStep(4, "TH waits for DUT to send End command with reason OutOfResources",
                      "DUT sends End command with reason OutOfResources (value 0x08)")
         ]
-        return steps
 
     def pics_TC_WEBRTCP_2_12(self) -> list[str]:
-        pics = [
+        return [
             "WEBRTCP.S",
             "WEBRTCP.S.C00.Rsp",   # SolicitOffer command
             "WEBRTCP.S.C01.Tx",    # SolicitOfferResponse command
@@ -77,7 +76,6 @@ class TC_WEBRTCP_2_12(MatterBaseTest, WEBRTCPTestBase):
             "AVSM.S.F00",          # Audio Data Output feature
             "AVSM.S.F01",          # Video Data Output feature
         ]
-        return pics
 
     @property
     def default_endpoint(self) -> int:

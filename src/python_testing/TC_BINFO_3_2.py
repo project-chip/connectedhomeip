@@ -50,7 +50,7 @@ class TC_BINFO_3_2(MatterBaseTest):
         return "[TC-BINFO-3.2] Attributes with DUT as Server"
 
     def steps_TC_BINFO_3_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(0, "Commissioning, already done", is_commissioning=True),
             TestStep(1, "TH reads ConfigurationVersion from the DUT and stores the value as initialConfigurationVersion",
                      "Verify that the value is in the inclusive range of 1 to 4294967295"),
@@ -58,14 +58,12 @@ class TC_BINFO_3_2(MatterBaseTest):
             TestStep(3, "TH reads ConfigurationVersion from the DUT",
                      "Verify that the value is higher than the value of initialConfigurationVersion"),
         ]
-        return steps
 
     def pics_TC_BINFO_3_2(self) -> list[str]:
-        pics = [
+        return [
             "BINFO.S",
             "BINFO.S.M.DeviceConfigurationChange",
         ]
-        return pics
 
     @async_test_body
     async def test_TC_BINFO_3_2(self):
