@@ -46,8 +46,8 @@ class Delegate
 private:
     ResourceMonitoringCluster * mInstance = nullptr;
     /**
-     * This method is used by the SDK to set the instance pointer. This is done during the instantiation of an Instance object.
-     * @param aInstance A pointer to the Instance object related to this delegate object.
+     * This method is used by the SDK to set the instance pointer. This is done during the instantiation of a ResourceMonitoringCluster object.
+     * @param aInstance A pointer to the ResourceMonitoringCluster object related to this delegate object.
      */
     void SetInstance(ResourceMonitoringCluster * aInstance) { mInstance = aInstance; }
 
