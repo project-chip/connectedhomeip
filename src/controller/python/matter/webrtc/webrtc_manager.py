@@ -158,6 +158,7 @@ class WebRTCManager(WebRTCRequestorNativeBindings):
                     return WebRTCManager._peerconnection_map[node_id]
             except KeyError:
                 return None
+        return None
 
     @staticmethod
     async def remove_peer(session_id: int) -> None:

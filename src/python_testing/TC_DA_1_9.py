@@ -99,10 +99,9 @@ class TC_DA_1_9(MatterBaseTest):
         return "[TC-DA-1.9] Device Attestation Revocation [DUT-Commissioner]"
 
     def pics_TC_DA_1_9(self) -> list[str]:
-        pics = [
+        return [
             "MCORE.ROLE.COMMISSIONER",
         ]
-        return pics
 
     def steps_TC_DA_1_9(self) -> list[TestStep]:
         return [

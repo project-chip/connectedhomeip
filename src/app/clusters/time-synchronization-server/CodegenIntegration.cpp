@@ -17,7 +17,7 @@
  */
 
 #include <app/clusters/time-synchronization-server/CodegenIntegration.h>
-#include <app/clusters/time-synchronization-server/time-synchronization-cluster.h>
+#include <app/clusters/time-synchronization-server/TimeSynchronizationCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
 #include <app/static-cluster-config/TimeSynchronization.h>
 #include <data-model-providers/codegen/ClusterIntegration.h>
