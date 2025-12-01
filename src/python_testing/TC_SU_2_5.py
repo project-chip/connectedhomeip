@@ -78,7 +78,7 @@ class TC_SU_2_5(SoftwareUpdateBaseTest):
     async def teardown_test(self):
         await self.clear_ota_providers(self.controller, self.requestor_node_id)
         self.terminate_provider()
-        self.clear_kvs()
+        self.clear_kvs(kvs_prefix=self.provider_kvs_path)
         super().teardown_test()
 
     @async_test_body
