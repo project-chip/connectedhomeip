@@ -33,6 +33,7 @@
 #       --int-arg PIXIT.DISHM.MODE_CHANGE_OK:0
 #       --int-arg PIXIT.DISHM.MODE_CHANGE_FAIL:2
 #       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --app-pipe /tmp/dishm_2_1_fifo
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
