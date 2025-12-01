@@ -152,7 +152,7 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
     if chip_tool is not None:
         chip_tool = SubprocessInfo(kind='tool', path=chip_tool)
     elif not runtime == TestRunTime.MATTER_REPL_PYTHON:
-        paths_finder = PathsFinder()
+        paths_finder = PathsFinder(os.path.join(root, 'objdir-clone'))
         if runtime == TestRunTime.CHIP_TOOL_PYTHON:
             chip_tool_path = paths_finder.get('chip-tool')
         else:  # DARWIN_FRAMEWORK_TOOL_PYTHON
@@ -329,7 +329,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
         log.error("--expected-failures '%s' used without '--keep-going'", expected_failures)
         sys.exit(2)
 
-    paths_finder = PathsFinder()
+    paths_finder = PathsFinder(os.path.join(context.obj.root, 'objdir-clone'))
 
     def build_app(arg_value, kind: str, key: str):
         app_path = arg_value if arg_value else paths_finder.get(key)
