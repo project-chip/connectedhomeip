@@ -11,23 +11,25 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
 
-source_set("resource-monitoring-server") {
-  sources = [
-    "ResourceMonitoringCluster.cpp",
-    "ResourceMonitoringCluster.h",
-    "ResourceMonitoringDelegate.h",
-    "resource-monitoring-cluster-objects.cpp",
-    "resource-monitoring-cluster-objects.h",
-  ]
+import("${chip_root}/build/chip/chip_test_suite.gni")
 
-  deps = [
-    "${chip_root}/src/app/data-model-provider",
-    "${chip_root}/src/app/server",
-    "${chip_root}/src/app/server-cluster",
-    "${chip_root}/zzz_generated/app-common/clusters/ActivatedCarbonFilterMonitoring",
-    "${chip_root}/zzz_generated/app-common/clusters/HepaFilterMonitoring",
+chip_test_suite("tests") {
+  output_name = "libTestResourceMonitoringCluster"
+
+  test_sources = [ "TestResourceMonitoringCluster.cpp" ]
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    "${chip_root}/src/app:attribute-persistence",
+    "${chip_root}/src/app/clusters/resource-monitoring-server",
+    "${chip_root}/src/app/clusters/testing",
+    "${chip_root}/src/app/server-cluster/testing:testing",
+    "${chip_root}/src/lib/support",
   ]
 }

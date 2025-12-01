@@ -1,5 +1,5 @@
-/*
- *    Copyright (c) 2021-2025 Project CHIP Authors
+/**
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -13,7 +13,21 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
-#include <app/clusters/resource-monitoring-server/CodegenIntegration.h>
+#include <app/util/config.h>
+#include <lib/core/DataModelTypes.h>
+
+namespace chip::app::Clusters::OnOff::Internal::ModeSelect {
+
+#ifdef MATTER_DM_PLUGIN_MODE_SELECT
+
+void SetStartupOnMode(chip::EndpointId endpoint);
+
+#else
+
+inline void SetStartupOnMode(chip::EndpointId endpoint) {}
+
+#endif // MATTER_DM_PLUGIN_MODE_SELECT
+
+} // namespace chip::app::Clusters::OnOff::Internal::ModeSelect

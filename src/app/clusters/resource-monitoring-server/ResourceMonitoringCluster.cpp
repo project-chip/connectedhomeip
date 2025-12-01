@@ -1,7 +1,5 @@
 /*
- *
- *    Copyright (c) 2023 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright (c) 2023-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,27 +14,20 @@
  *    limitations under the License.
  */
 
-#include <app/AttributeAccessInterface.h>
-#include <app/AttributeAccessInterfaceRegistry.h>
-#include <app/CommandHandlerInterface.h>
-#include <app/CommandHandlerInterfaceRegistry.h>
-#include <app/ConcreteAttributePath.h>
-#include <app/ConcreteClusterPath.h>
-#include <app/InteractionModelEngine.h>
+#include <app/clusters/resource-monitoring-server/ResourceMonitoringCluster.h>
+
 #include <app/SafeAttributePersistenceProvider.h>
-#include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
-#include <app/clusters/resource-monitoring-server/resource-monitoring-server.h>
-#include <app/data-model/Nullable.h>
-#include <app/reporting/reporting.h>
-#include <app/util/attribute-storage.h>
-#include <lib/core/CHIPError.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/TypeTraits.h>
-#include <protocols/interaction_model/StatusCode.h>
+#include <app/persistence/AttributePersistence.h>
+#include <app/server-cluster/AttributeListBuilder.h>
+#include <clusters/ActivatedCarbonFilterMonitoring/Metadata.h>
+#include <clusters/HepaFilterMonitoring/Metadata.h>
+#include <platform/DeviceInfoProvider.h>
+#include <tracing/macros.h>
 
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ResourceMonitoring;
+using namespace chip::app::Clusters::ResourceMonitoring::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
 namespace chip {
@@ -44,66 +35,161 @@ namespace app {
 namespace Clusters {
 namespace ResourceMonitoring {
 
-Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeatureMap,
-                   ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
-                   bool aResetConditionCommandSupported) :
-    CommandHandlerInterface(Optional<EndpointId>(aEndpointId), aClusterId),
-    AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId), mDelegate(aDelegate), mEndpointId(aEndpointId),
-    mClusterId(aClusterId), mDegradationDirection(aDegradationDirection), mFeatureMap(aFeatureMap),
-    mResetConditionCommandSupported(aResetConditionCommandSupported)
+ResourceMonitoringCluster::ResourceMonitoringCluster(
+    EndpointId aEndpointId, ClusterId aClusterId, const BitFlags<ResourceMonitoring::Feature> enabledFeatures,
+    OptionalAttributeSet optionalAttributeSet,
+    ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
+    bool aResetConditionCommandSupported) :
+    DefaultServerCluster(ConcreteClusterPath(aEndpointId, aClusterId)),
+    mDegradationDirection(aDegradationDirection), mResetConditionCommandSupported(aResetConditionCommandSupported),
+    mEnabledFeatures(enabledFeatures), mOptionalAttributeSet(optionalAttributeSet)
+{}
+
+CHIP_ERROR ResourceMonitoringCluster::SetDelegate(Delegate * aDelegate)
 {
+    VerifyOrReturnError(aDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    mDelegate = aDelegate;
     mDelegate->SetInstance(this);
+    return mDelegate->Init();
 }
 
-Instance::~Instance()
+DataModel::ActionReturnStatus ResourceMonitoringCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                                                                        AttributeValueDecoder & decoder)
 {
-    if (mDelegate)
+    return NotifyAttributeChangedIfSuccess(request.path.mAttributeId, WriteImpl(request, decoder));
+}
+
+DataModel::ActionReturnStatus ResourceMonitoringCluster::WriteImpl(const DataModel::WriteAttributeRequest & request,
+                                                                   AttributeValueDecoder & decoder)
+{
+
+    switch (request.path.mAttributeId)
     {
-        mDelegate->SetInstance(nullptr);
+    case ResourceMonitoring::Attributes::LastChangedTime::Id: {
+
+        Attributes::LastChangedTime::TypeInfo::Type newLastChangedTime;
+        ReturnErrorOnFailure(decoder.Decode(newLastChangedTime));
+
+        VerifyOrReturnValue(newLastChangedTime != mLastChangedTime, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
+
+        ReturnErrorOnFailure(chip::app::GetSafeAttributePersistenceProvider()->WriteScalarValue(
+            ConcreteAttributePath(GetEndpointId(), GetClusterId(), Attributes::LastChangedTime::Id), newLastChangedTime));
+        mLastChangedTime = newLastChangedTime;
+        return Status::Success;
     }
-    TEMPORARY_RETURN_IGNORED CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(this);
-    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
+
+    default:
+        return Protocols::InteractionModel::Status::UnsupportedWrite;
+    }
 }
 
-CHIP_ERROR Instance::Init()
+// Implements the read functionality for non-standard attributes.
+DataModel::ActionReturnStatus ResourceMonitoringCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                                       AttributeValueEncoder & encoder)
 {
-    ChipLogDetail(Zcl, "ResourceMonitoring: Init");
 
-    // Check if the cluster has been selected in zap
-    VerifyOrDie(emberAfContainsServer(mEndpointId, mClusterId));
-
-    LoadPersistentAttributes();
-
-    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
-    VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
-    ChipLogDetail(Zcl, "ResourceMonitoring: calling mDelegate->Init()");
-    ReturnErrorOnFailure(mDelegate->Init());
-
-    return CHIP_NO_ERROR;
-}
-
-bool Instance::HasFeature(ResourceMonitoring::Feature aFeature) const
-{
-    return ((mFeatureMap & to_underlying(aFeature)) != 0);
-}
-
-chip::Protocols::InteractionModel::Status Instance::UpdateCondition(uint8_t aNewCondition)
-{
-    auto oldCondition = mCondition;
-    mCondition        = aNewCondition;
-    if (mCondition != oldCondition)
+    switch (request.path.mAttributeId)
     {
-        MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::Condition::Id);
+    case ResourceMonitoring::Attributes::Condition::Id:
+        return encoder.Encode(mCondition);
+    case ResourceMonitoring::Attributes::FeatureMap::Id:
+        return encoder.Encode(mEnabledFeatures);
+    case ResourceMonitoring::Attributes::DegradationDirection::Id:
+        return encoder.Encode(mDegradationDirection);
+    case ResourceMonitoring::Attributes::ChangeIndication::Id:
+        return encoder.Encode(mChangeIndication);
+    case ResourceMonitoring::Attributes::InPlaceIndicator::Id:
+        return encoder.Encode(mInPlaceIndicator);
+    case ResourceMonitoring::Attributes::LastChangedTime::Id:
+        return encoder.Encode(mLastChangedTime);
+    case ResourceMonitoring::Attributes::ReplacementProductList::Id:
+        return ReadReplaceableProductList(encoder);
+    case ResourceMonitoring::Attributes::ClusterRevision::Id:
+        if (mPath.mClusterId == HepaFilterMonitoring::Id)
+        {
+            return encoder.Encode(HepaFilterMonitoring::kRevision);
+        }
+        return encoder.Encode(ActivatedCarbonFilterMonitoring::kRevision);
+    default:
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
+    }
+}
+
+CHIP_ERROR ResourceMonitoringCluster::Attributes(const ConcreteClusterPath & path,
+                                                 ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+{
+    AttributeListBuilder listBuilder(builder);
+
+    const bool haveCondition              = mEnabledFeatures.Has(Feature::kCondition);
+    const bool haveReplacementProductList = mEnabledFeatures.Has(Feature::kReplacementProductList);
+
+    AttributeListBuilder::OptionalAttributeEntry optionalAttributesEntries[] = {
+        { haveCondition, Condition::kMetadataEntry },
+        { haveCondition, DegradationDirection::kMetadataEntry },
+        { mOptionalAttributeSet.IsSet(InPlaceIndicator::Id), InPlaceIndicator::kMetadataEntry },
+        { mOptionalAttributeSet.IsSet(LastChangedTime::Id), LastChangedTime::kMetadataEntry },
+        { haveReplacementProductList, ReplacementProductList::kMetadataEntry },
+    };
+
+    return listBuilder.Append(Span(HepaFilterMonitoring::Attributes::kMandatoryMetadata), Span(optionalAttributesEntries));
+}
+
+CHIP_ERROR ResourceMonitoringCluster::ReadReplaceableProductList(AttributeValueEncoder & aEncoder)
+{
+    ReplacementProductListManager * productListManagerInstance = GetReplacementProductListManagerInstance();
+    if (nullptr == productListManagerInstance)
+    {
+        return aEncoder.EncodeEmptyList();
+    }
+
+    productListManagerInstance->Reset();
+
+    return aEncoder.EncodeList([productListManagerInstance](const auto & encoder) -> CHIP_ERROR {
+        ReplacementProductStruct replacementProductStruct;
+        CHIP_ERROR iteratorError = productListManagerInstance->Next(replacementProductStruct);
+
+        while (CHIP_NO_ERROR == iteratorError)
+        {
+            ReturnErrorOnFailure(encoder.Encode(replacementProductStruct));
+            iteratorError = productListManagerInstance->Next(replacementProductStruct);
+        }
+
+        return iteratorError.NoErrorIf(CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
+    });
+}
+
+ResourceMonitoring::ReplacementProductListManager * ResourceMonitoringCluster::GetReplacementProductListManagerInstance()
+{
+    return mReplacementProductListManager;
+}
+
+void ResourceMonitoringCluster::SetReplacementProductListManagerInstance(
+    ResourceMonitoring::ReplacementProductListManager * replacementProductListManager)
+{
+    mReplacementProductListManager = replacementProductListManager;
+}
+
+chip::Protocols::InteractionModel::Status ResourceMonitoringCluster::UpdateCondition(uint8_t newCondition)
+{
+    auto oldConditionattr = mCondition;
+    mCondition            = newCondition;
+    if (mCondition != oldConditionattr)
+    {
+        static_assert(HepaFilterMonitoring::Attributes::Condition::Id ==
+                      ActivatedCarbonFilterMonitoring::Attributes::Condition::Id);
+
+        NotifyAttributeChanged(HepaFilterMonitoring::Attributes::Condition::Id);
     }
     return Protocols::InteractionModel::Status::Success;
 }
 
-chip::Protocols::InteractionModel::Status
-Instance::UpdateChangeIndication(chip::app::Clusters::ResourceMonitoring::ChangeIndicationEnum aNewChangeIndication)
+Protocols::InteractionModel::Status ResourceMonitoringCluster::UpdateChangeIndication(
+    chip::app::Clusters::ResourceMonitoring::ChangeIndicationEnum aNewChangeIndication)
 {
     if (aNewChangeIndication == chip::app::Clusters::ResourceMonitoring::ChangeIndicationEnum::kWarning)
     {
-        if (!HasFeature(ResourceMonitoring::Feature::kWarning))
+        if (!mEnabledFeatures.Has(ResourceMonitoring::Feature::kWarning))
         {
             return Protocols::InteractionModel::Status::InvalidValue;
         }
@@ -112,209 +198,57 @@ Instance::UpdateChangeIndication(chip::app::Clusters::ResourceMonitoring::Change
     mChangeIndication        = aNewChangeIndication;
     if (mChangeIndication != oldChangeIndication)
     {
-        MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::ChangeIndication::Id);
+        NotifyAttributeChanged(ResourceMonitoring::Attributes::ChangeIndication::Id);
     }
     return Protocols::InteractionModel::Status::Success;
 }
 
-chip::Protocols::InteractionModel::Status Instance::UpdateInPlaceIndicator(bool aNewInPlaceIndicator)
+Protocols::InteractionModel::Status ResourceMonitoringCluster::UpdateInPlaceIndicator(bool newInPlaceIndicator)
 {
     auto oldInPlaceIndicator = mInPlaceIndicator;
-    mInPlaceIndicator        = aNewInPlaceIndicator;
+    mInPlaceIndicator        = newInPlaceIndicator;
     if (mInPlaceIndicator != oldInPlaceIndicator)
     {
-        MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::InPlaceIndicator::Id);
+        static_assert(HepaFilterMonitoring::Attributes::InPlaceIndicator::Id ==
+                      ActivatedCarbonFilterMonitoring::Attributes::InPlaceIndicator::Id);
+
+        NotifyAttributeChanged(HepaFilterMonitoring::Attributes::InPlaceIndicator::Id);
     }
     return Protocols::InteractionModel::Status::Success;
 }
 
-chip::Protocols::InteractionModel::Status Instance::UpdateLastChangedTime(DataModel::Nullable<uint32_t> aNewLastChangedTime)
+chip::Protocols::InteractionModel::Status
+ResourceMonitoringCluster::UpdateLastChangedTime(DataModel::Nullable<uint32_t> aNewLastChangedTime)
 {
     auto oldLastchangedTime = mLastChangedTime;
     mLastChangedTime        = aNewLastChangedTime;
-    if (mLastChangedTime != oldLastchangedTime)
-    {
-        TEMPORARY_RETURN_IGNORED chip::app::GetSafeAttributePersistenceProvider()->WriteScalarValue(
-            ConcreteAttributePath(mEndpointId, mClusterId, Attributes::LastChangedTime::Id), mLastChangedTime);
-        MatterReportingAttributeChangeCallback(mEndpointId, mClusterId, Attributes::LastChangedTime::Id);
-    }
+    VerifyOrReturnValue(mLastChangedTime != oldLastchangedTime, Status::Success);
+
+    // same attribute ID for all clusters
+    constexpr AttributeId kAttributeId = HepaFilterMonitoring::Attributes::LastChangedTime::Id;
+    static_assert(kAttributeId == HepaFilterMonitoring::Attributes::LastChangedTime::Id);
+    static_assert(kAttributeId == ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::Id);
+
+    ReturnValueOnFailure(chip::app::GetSafeAttributePersistenceProvider()->WriteScalarValue(
+                             ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, kAttributeId), mLastChangedTime),
+                         Status::Failure);
+    NotifyAttributeChanged(kAttributeId);
+
     return Protocols::InteractionModel::Status::Success;
 }
 
-void Instance::SetReplacementProductListManagerInstance(ReplacementProductListManager * aReplacementProductListManager)
-{
-    mReplacementProductListManager = aReplacementProductListManager;
-}
-
-uint8_t Instance::GetCondition() const
-{
-    return mCondition;
-}
-chip::app::Clusters::ResourceMonitoring::ChangeIndicationEnum Instance::GetChangeIndication() const
-{
-    return mChangeIndication;
-}
-
-chip::app::Clusters::ResourceMonitoring::DegradationDirectionEnum Instance::GetDegradationDirection() const
-{
-    return mDegradationDirection;
-}
-
-bool Instance::GetInPlaceIndicator() const
-{
-    return mInPlaceIndicator;
-}
-
-DataModel::Nullable<uint32_t> Instance::GetLastChangedTime() const
-{
-    return mLastChangedTime;
-}
-
-ReplacementProductListManager * Instance::GetReplacementProductListManagerInstance()
-{
-    return mReplacementProductListManager;
-}
-
-// This method is called by the interaction model engine when a command destined for this instance is received.
-void Instance::InvokeCommand(HandlerContext & handlerContext)
-{
-    ChipLogDetail(Zcl, "ResourceMonitoring Instance::InvokeCommand");
-    switch (handlerContext.mRequestPath.mCommandId)
-    {
-    case ResourceMonitoring::Commands::ResetCondition::Id:
-        ChipLogDetail(Zcl, "ResourceMonitoring::Commands::ResetCondition");
-
-        HandleCommand<ResourceMonitoring::Commands::ResetCondition::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleResetCondition(ctx, commandData); });
-        break;
-    }
-}
-
-// List the commands supported by this instance.
-CHIP_ERROR Instance::RetrieveAcceptedCommands(const ConcreteClusterPath & cluster,
-                                              ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
-{
-    ChipLogDetail(Zcl, "resourcemonitoring: RetrieveAcceptedCommands");
-    ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
-    if (mResetConditionCommandSupported)
-    {
-        ReturnErrorOnFailure(builder.Append(ResourceMonitoring::Commands::ResetCondition::kMetadataEntry));
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR Instance::ReadReplaceableProductList(AttributeValueEncoder & aEncoder)
+void ResourceMonitoringCluster::LoadPersistentAttributes()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    if (HasFeature(ResourceMonitoring::Feature::kReplacementProductList))
-    {
-        ReplacementProductListManager * productListManagerInstance = GetReplacementProductListManagerInstance();
-        if (nullptr == productListManagerInstance)
-        {
-            TEMPORARY_RETURN_IGNORED aEncoder.EncodeEmptyList();
-            return CHIP_NO_ERROR;
-        }
 
-        productListManagerInstance->Reset();
+    // same attribute ID for all clusters
+    constexpr AttributeId kAttributeId = HepaFilterMonitoring::Attributes::LastChangedTime::Id;
+    static_assert(kAttributeId == HepaFilterMonitoring::Attributes::LastChangedTime::Id);
+    static_assert(kAttributeId == ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::Id);
 
-        err = aEncoder.EncodeList([productListManagerInstance](const auto & encoder) -> CHIP_ERROR {
-            ReplacementProductStruct replacementProductStruct;
-            CHIP_ERROR iteratorError = productListManagerInstance->Next(replacementProductStruct);
+    err = chip::app::GetSafeAttributePersistenceProvider()->ReadScalarValue(
+        ConcreteAttributePath(mPath.mEndpointId, mPath.mClusterId, kAttributeId), mLastChangedTime);
 
-            while (CHIP_NO_ERROR == iteratorError)
-            {
-                ReturnErrorOnFailure(encoder.Encode(replacementProductStruct));
-                iteratorError = productListManagerInstance->Next(replacementProductStruct);
-            }
-            return (CHIP_ERROR_PROVIDER_LIST_EXHAUSTED == iteratorError) ? CHIP_NO_ERROR : iteratorError;
-        });
-    }
-    return err;
-}
-
-// Implements the read functionality for non-standard attributes.
-CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
-{
-    switch (aPath.mAttributeId)
-    {
-    case Attributes::Condition::Id: {
-        ReturnErrorOnFailure(aEncoder.Encode(mCondition));
-        break;
-    }
-    case Attributes::FeatureMap::Id: {
-        ReturnErrorOnFailure(aEncoder.Encode(mFeatureMap));
-        break;
-    }
-    case Attributes::DegradationDirection::Id: {
-        ReturnErrorOnFailure(aEncoder.Encode(mDegradationDirection));
-        break;
-    }
-    case Attributes::ChangeIndication::Id: {
-        ReturnErrorOnFailure(aEncoder.Encode(mChangeIndication));
-        break;
-    }
-    case Attributes::InPlaceIndicator::Id: {
-        ReturnErrorOnFailure(aEncoder.Encode(mInPlaceIndicator));
-        break;
-    }
-    case Attributes::LastChangedTime::Id: {
-        ReturnErrorOnFailure(aEncoder.Encode(mLastChangedTime));
-        break;
-    }
-    case Attributes::ReplacementProductList::Id: {
-        return ReadReplaceableProductList(aEncoder);
-        break;
-    }
-    }
-    return CHIP_NO_ERROR;
-}
-
-// Implements checking before attribute writes.
-CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
-{
-    switch (aPath.mAttributeId)
-    {
-    case Attributes::LastChangedTime::Id: {
-        DataModel::Nullable<uint32_t> newLastChangedTime;
-        ReturnErrorOnFailure(aDecoder.Decode(newLastChangedTime));
-        TEMPORARY_RETURN_IGNORED UpdateLastChangedTime(newLastChangedTime);
-        break;
-    }
-    }
-    return CHIP_NO_ERROR;
-}
-
-template <typename RequestT, typename FuncT>
-void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)
-{
-    ChipLogDetail(Zcl, "ResourceMonitoring: HandleCommand");
-    if (handlerContext.mCommandHandled || (handlerContext.mRequestPath.mCommandId != RequestT::GetCommandId()))
-    {
-        return;
-    }
-
-    RequestT requestPayload;
-
-    // If the command matches what the caller is looking for, let's mark this as being handled
-    // even if errors happen after this. This ensures that we don't execute any fall-back strategies
-    // to handle this command since at this point, the caller is taking responsibility for handling
-    // the command in its entirety, warts and all.
-    handlerContext.SetCommandHandled();
-
-    if (DataModel::Decode(handlerContext.mPayload, requestPayload) != CHIP_NO_ERROR)
-    {
-        handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Protocols::InteractionModel::Status::InvalidCommand);
-        return;
-    }
-
-    func(handlerContext, requestPayload);
-}
-
-void Instance::LoadPersistentAttributes()
-{
-    CHIP_ERROR err = chip::app::GetSafeAttributePersistenceProvider()->ReadScalarValue(
-        ConcreteAttributePath(mEndpointId, mClusterId, Attributes::LastChangedTime::Id), mLastChangedTime);
     if (err == CHIP_NO_ERROR)
     {
         if (mLastChangedTime.IsNull())
@@ -335,27 +269,102 @@ void Instance::LoadPersistentAttributes()
     }
 }
 
-void Instance::HandleResetCondition(HandlerContext & ctx,
-                                    const ResourceMonitoring::Commands::ResetCondition::DecodableType & commandData)
+CHIP_ERROR ResourceMonitoringCluster::Startup(ServerClusterContext & context)
 {
+    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
-    Status resetConditionStatus = mDelegate->OnResetCondition();
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, resetConditionStatus);
+    LoadPersistentAttributes();
+
+    return CHIP_NO_ERROR;
 }
 
-Status Delegate::OnResetCondition()
+// This method is called by the interaction model engine when a command destined for this instance is received.
+std::optional<DataModel::ActionReturnStatus> ResourceMonitoringCluster::InvokeCommand(const DataModel::InvokeRequest & request,
+                                                                                      chip::TLV::TLVReader & input_arguments,
+                                                                                      CommandHandler * handler)
 {
-    ChipLogDetail(Zcl, "ResourceMonitoringServer::OnResetCondition()");
+    switch (request.path.mCommandId)
+    {
+    case ResourceMonitoring::Commands::ResetCondition::Id: {
+        ChipLogDetail(Zcl, "ResourceMonitoring::Commands::ResetCondition");
 
+        ResourceMonitoring::Commands::ResetCondition::DecodableType data;
+        ReturnErrorOnFailure(data.Decode(input_arguments));
+
+        return ResetCondition(request.path, data, handler);
+    }
+    default:
+        return Status::UnsupportedCommand;
+    }
+}
+
+std::optional<DataModel::ActionReturnStatus>
+ResourceMonitoringCluster::ResetCondition(const ConcreteCommandPath & commandPath,
+                                          const ResourceMonitoring::Commands::ResetCondition::DecodableType & commandData,
+                                          CommandHandler * handler)
+{
+    return mDelegate->OnResetCondition();
+}
+
+CHIP_ERROR ResourceMonitoringCluster::AcceptedCommands(const ConcreteClusterPath & cluster,
+                                                       ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+{
+    if (mResetConditionCommandSupported)
+    {
+        constexpr DataModel::AcceptedCommandEntry kCommands[] = {
+            { ResourceMonitoring::Commands::ResetCondition::kMetadataEntry }
+        };
+        ReturnErrorOnFailure(builder.ReferenceExisting(kCommands));
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+uint8_t ResourceMonitoringCluster::GetCondition() const
+{
+    return mCondition;
+}
+chip::app::Clusters::ResourceMonitoring::ChangeIndicationEnum ResourceMonitoringCluster::GetChangeIndication() const
+{
+    return mChangeIndication;
+}
+
+chip::app::Clusters::ResourceMonitoring::DegradationDirectionEnum ResourceMonitoringCluster::GetDegradationDirection() const
+{
+    return mDegradationDirection;
+}
+
+bool ResourceMonitoringCluster::GetInPlaceIndicator() const
+{
+    return mInPlaceIndicator;
+}
+
+DataModel::Nullable<uint32_t> ResourceMonitoringCluster::GetLastChangedTime() const
+{
+    return mLastChangedTime;
+}
+
+bool ResourceMonitoringCluster::HasFeature(ResourceMonitoring::Feature aFeature) const
+{
+    return mEnabledFeatures.Has(aFeature);
+}
+
+bool ResourceMonitoringCluster::HasOptionalAttribute(AttributeId aAttribute) const
+{
+    return mOptionalAttributeSet.IsSet(aAttribute);
+}
+
+Protocols::InteractionModel::Status Delegate::OnResetCondition()
+{
     // call application specific pre reset logic,
     // anything other than Success will cause the command to fail, and not do any of the resets
     auto status = PreResetCondition();
-    if (status != Status::Success)
+    if (status != Protocols::InteractionModel::Status::Success)
     {
         return status;
     }
     // Handle the reset of the condition attribute, if supported
-    if (emberAfContainsAttribute(mInstance->GetEndpointId(), mInstance->GetClusterId(), Attributes::Condition::Id))
+    if (mInstance->HasFeature(ResourceMonitoring::Feature::kCondition))
     {
         if (mInstance->GetDegradationDirection() == DegradationDirectionEnum::kDown)
         {
@@ -371,7 +380,7 @@ Status Delegate::OnResetCondition()
     mInstance->UpdateChangeIndication(ChangeIndicationEnum::kOk);
 
     // Handle the reset of the LastChangedTime attribute, if supported
-    if (emberAfContainsAttribute(mInstance->GetEndpointId(), mInstance->GetClusterId(), Attributes::LastChangedTime::Id))
+    if (mInstance->HasOptionalAttribute(ResourceMonitoring::Attributes::LastChangedTime::Id))
     {
         System::Clock::Milliseconds64 currentUnixTimeMS;
         CHIP_ERROR err = System::SystemClock().GetClock_RealTimeMS(currentUnixTimeMS);
@@ -383,20 +392,17 @@ Status Delegate::OnResetCondition()
     }
 
     // call application specific post reset logic
-    status = PostResetCondition();
-    return status;
+    return PostResetCondition();
 }
 
-Status Delegate::PreResetCondition()
+Protocols::InteractionModel::Status Delegate::PreResetCondition()
 {
-    ChipLogDetail(Zcl, "ResourceMonitoringServer::PreResetCondition()");
-    return Status::Success;
+    return Protocols::InteractionModel::Status::Success;
 }
 
-Status Delegate::PostResetCondition()
+Protocols::InteractionModel::Status Delegate::PostResetCondition()
 {
-    ChipLogDetail(Zcl, "ResourceMonitoringServer::PostResetCondition()");
-    return Status::Success;
+    return Protocols::InteractionModel::Status::Success;
 }
 
 } // namespace ResourceMonitoring
