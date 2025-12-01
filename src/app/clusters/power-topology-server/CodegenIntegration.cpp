@@ -59,29 +59,6 @@ bool Instance::SupportsOptAttr(OptionalAttributes aOptionalAttrs) const
     }
 }
 
-CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
-{
-    switch (aPath.mAttributeId)
-    {
-    case Attributes::AvailableEndpoints::Id:
-        return ReadAvailableEndpoints(aEncoder);
-    case Attributes::ActiveEndpoints::Id:
-        return ReadActiveEndpoints(aEncoder);
-    }
-
-    return CHIP_ERROR_INVALID_ARGUMENT;
-}
-
-CHIP_ERROR Instance::ReadAvailableEndpoints(AttributeValueEncoder & aEncoder)
-{
-    return mCluster.Cluster().GetAvailableEndpoints(aEncoder);
-}
-
-CHIP_ERROR Instance::ReadActiveEndpoints(AttributeValueEncoder & aEncoder)
-{
-    return mCluster.Cluster().GetActiveEndpoints(aEncoder);
-}
-
 } // namespace PowerTopology
 } // namespace Clusters
 } // namespace app

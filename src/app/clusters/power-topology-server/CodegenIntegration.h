@@ -41,12 +41,11 @@ class Instance
 public:
     Instance(EndpointId aEndpointId, Delegate & aDelegate, BitMask<Feature> aFeature,
              BitMask<OptionalAttributes> aOptionalAttributes) :
-        mFeature(aFeature),
-        mOptionalAttrs(aOptionalAttributes), mCluster(PowerTopologyCluster::Config{
-                                                 .endpointId = aEndpointId,
-                                                 .delegate   = aDelegate,
-                                                 .features   = aFeature,
-                                             })
+        mCluster(PowerTopologyCluster::Config{
+            .endpointId = aEndpointId,
+            .delegate   = aDelegate,
+            .features   = aFeature,
+        })
     {}
     ~Instance() { Shutdown(); }
 
@@ -57,14 +56,7 @@ public:
     bool SupportsOptAttr(OptionalAttributes aOptionalAttrs) const;
 
 private:
-    BitMask<Feature> mFeature;
-    BitMask<OptionalAttributes> mOptionalAttrs;
     RegisteredServerCluster<PowerTopologyCluster> mCluster;
-
-    // AttributeAccessInterface
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadAvailableEndpoints(AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadActiveEndpoints(AttributeValueEncoder & aEncoder);
 };
 
 } // namespace PowerTopology
