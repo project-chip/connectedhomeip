@@ -163,9 +163,6 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
     });
 }
 
-// Command validation queries this provider for metadata before InvokeCommand runs, so the dispatch sequence below relies on the
-// same catalog of clusters and handlers that validation already approved.  That keeps the privilege and flag checks performed by
-// `ValidateCommandCanBeDispatched` in sync with the handler that ultimately processes the request.
 std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::InvokeCommand(const DataModel::InvokeRequest & request,
                                                                                      TLV::TLVReader & input_arguments,
                                                                                      CommandHandler * handler)
@@ -178,7 +175,7 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::InvokeCom
     CommandHandlerInterface * handler_interface =
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(request.path.mEndpointId, request.path.mClusterId);
 
-    if (handler_interface != nullptr)
+    if (handler_interface)
     {
         CommandHandlerInterface::HandlerContext context(*handler, request.path, input_arguments);
         handler_interface->InvokeCommand(context);
@@ -190,7 +187,7 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::InvokeCom
         }
     }
 
-    // Let the generated dispatcher handle any remaining paths; it sets the status on our behalf.
+    // Ember always sets the return in the handler, where std::nullopt must be returned to follow the InvokeCommand API contract
     DispatchSingleClusterCommand(request.path, input_arguments, handler);
     return std::nullopt;
 }
@@ -457,10 +454,7 @@ CHIP_ERROR CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath 
         CHIP_ERROR err = interface->RetrieveAcceptedCommands(path, builder);
         // If retrieving the accepted commands returns CHIP_ERROR_NOT_IMPLEMENTED then continue with normal processing.
         // Otherwise we finished.
-        if (err != CHIP_ERROR_NOT_IMPLEMENTED)
-        {
-            return err;
-        }
+        VerifyOrReturnError(err == CHIP_ERROR_NOT_IMPLEMENTED, err);
     }
     VerifyOrReturnError(serverCluster->acceptedCommandList != nullptr, CHIP_NO_ERROR);
 

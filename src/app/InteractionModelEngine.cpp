@@ -1793,14 +1793,6 @@ void InteractionModelEngine::DispatchCommand(CommandHandlerImpl & apCommandObj, 
 
 Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBeDispatched(const DataModel::InvokeRequest & request)
 {
-    // The specification describes a validate-then-authorize flow that first resolves command metadata
-    // (which implicitly checks existence) and then enforces the privilege declared for that command.
-    // We reverse those steps: authorization happens first so we never reveal whether a command exists
-    // to a caller lacking sufficient privilege. This produces the same result as the spec today because
-    // all Matter commands require at least Operate privilege and we fall back to Operate when metadata
-    // is unavailable; if a command ever shipped with a lower privilege requirement we would need to
-    // revisit this ordering.
-
     DataModel::AcceptedCommandEntry acceptedCommandEntry;
 
     const Status existenceStatus = CheckCommandExistence(request.path, acceptedCommandEntry);
