@@ -4958,7 +4958,7 @@
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
         { ZAP_CLUSTER_INDEX(0), 28, 187 },                                                                                         \
-        { ZAP_CLUSTER_INDEX(28), 73, 3396 },                                                                                       \
+        { ZAP_CLUSTER_INDEX(28), 73, 3392 },                                                                                       \
         { ZAP_CLUSTER_INDEX(101), 7, 101 },                                                                                        \
         { ZAP_CLUSTER_INDEX(108), 2, 0 },                                                                                          \
     }
@@ -4972,7 +4972,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 #define ATTRIBUTE_SINGLETONS_SIZE (0)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (3684)
+#define ATTRIBUTE_MAX_SIZE (3680)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (4)
