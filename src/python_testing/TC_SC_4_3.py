@@ -285,7 +285,7 @@ class TC_SC_4_3(MatterBaseTest):
         self.step(9)
 
         def txt_has_key(key: str):
-            return txt_record_returned and key in txt_record.txt.keys()
+            return txt_record_returned and key in txt_record.txt
 
         # Verify hostname character length (12 or 16)
         assert_valid_hostname(srv_record.hostname)

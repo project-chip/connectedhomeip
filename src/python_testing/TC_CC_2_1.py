@@ -144,8 +144,7 @@ class TC_CC_2_1(MatterBaseTest):
 
     async def verify_primary_index(self, primary_index: int) -> bool:
         # Read all PrimaryN<X,Y,Intensity> attributes available in the cluster
-        instance_attribute_names = [attr for attr in self.attributes.__dict__.keys(
-        ) if attr.startswith('Primary')]
+        instance_attribute_names = [attr for attr in self.attributes.__dict__ if attr.startswith('Primary')]
         # Attributes to search
         primary_list = ["Primary{primary}X", "Primary{primary}Y", "Primary{primary}Intensity"]
         # Validate the expected attribute is found.
