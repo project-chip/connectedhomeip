@@ -163,7 +163,7 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
 
             logging.info("OperationalState: %s" % (operational_state))
 
-            in_range = (0x80 <= operational_state and operational_state <= 0xBF)
+            in_range = 0x80 <= operational_state <= 0xBF
             asserts.assert_true(operational_state in defined_states or in_range, "OperationalState has an invalid ID value!")
 
             if self.check_pics("RVCOPSTATE.S.M.ST_STOPPED"):
