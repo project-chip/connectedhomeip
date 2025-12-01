@@ -335,16 +335,19 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         )
 
         # Create OTA ACL entries (both directions)
+
+        # Requestor is allowed to access OTA cluster on the Provider (Requestor > Provider)
         await self.create_acl_entry(
             dev_ctrl=controller,
-            provider_node_id=provider_node_id,
-            requestor_node_id=requestor_node_id
+            provider_node_id=provider_node_id,      # write ACLs on the Provider
+            requestor_node_id=requestor_node_id     # the Requestor gets access
         )
 
+        # Provider is allowed to access OTA cluster on the Requestor (Provider > Requestor)
         await self.create_acl_entry(
             dev_ctrl=controller,
-            provider_node_id=requestor_node_id,
-            requestor_node_id=provider_node_id
+            provider_node_id=requestor_node_id,     # write ACLs on the Requestor
+            requestor_node_id=provider_node_id      # the Provider gets access
         )
 
         # Read updated ACLs
@@ -417,3 +420,13 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         logger.info('Cleanup - DefaultOTAProviders cleared')
 
         asserts.assert_equal(resp[0].Status, Status.Success, "Failed to clear DefaultOTAProviders")
+
+    def clear_kvs(self):
+        """
+         Temporary cleanup of provider KVS files at the tmp path.
+
+        Returns:
+            None
+        """
+        import subprocess
+        subprocess.run("rm -rf /tmp/chip_kvs*", shell=True)
