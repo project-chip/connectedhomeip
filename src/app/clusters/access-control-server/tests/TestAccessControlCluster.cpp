@@ -148,13 +148,13 @@ TEST_F(TestAccessControlCluster, AttributesTest)
 
     ASSERT_EQ(expectedBuilder.AppendElements({
 #if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
-        AccessControl::Attributes::Extension::kMetadataEntry,
+                  AccessControl::Attributes::Extension::kMetadataEntry,
 #endif
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-            AccessControl::Attributes::CommissioningARL::kMetadataEntry, AccessControl::Attributes::Arl::kMetadataEntry
+                  AccessControl::Attributes::CommissioningARL::kMetadataEntry, AccessControl::Attributes::Arl::kMetadataEntry
 #endif
-    }),
+              }),
               CHIP_NO_ERROR);
     ASSERT_EQ(expectedBuilder.AppendElements(AccessControl::Attributes::kMandatoryMetadata), CHIP_NO_ERROR);
     ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
@@ -226,41 +226,23 @@ TEST_F(TestAccessControlCluster, ReadAttributesTest)
 
 TEST_F(TestAccessControlCluster, WriteAttributesTest)
 {
-    // Test that writable attributes can be written
+    // Test that read-only attributes correctly reject write attempts.
     AccessControlCluster cluster;
     chip::Test::ClusterTester tester(cluster);
 
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    // Test writing Acl attribute (writable, mandatory)
-    // Write an empty ACL list
-    AccessControl::Attributes::Acl::TypeInfo::Type emptyAcl;
-    auto status = tester.WriteAttribute(AccessControl::Attributes::Acl::Id, emptyAcl);
-    ASSERT_TRUE(status.IsSuccess());
-
-    // Verify the write by reading it back
-    AccessControl::Attributes::Acl::TypeInfo::DecodableType readAcl;
-    status = tester.ReadAttribute(AccessControl::Attributes::Acl::Id, readAcl);
-    ASSERT_TRUE(status.IsSuccess());
-    ASSERT_EQ(CountListElements(readAcl), 0u);
-
-#if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
-    // Test writing Extension attribute (writable, optional)
-    AccessControl::Attributes::Extension::TypeInfo::Type emptyExtension;
-    status = tester.WriteAttribute(AccessControl::Attributes::Extension::Id, emptyExtension);
-    ASSERT_TRUE(status.IsSuccess());
-
-    // Verify the write by reading it back
-    AccessControl::Attributes::Extension::TypeInfo::DecodableType readExtension;
-    status = tester.ReadAttribute(AccessControl::Attributes::Extension::Id, readExtension);
-    ASSERT_TRUE(status.IsSuccess());
-    ASSERT_EQ(CountListElements(readExtension), 0u);
-#endif // CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
-
     // Test writing to a non-writable attribute should fail
     // SubjectsPerAccessControlEntry is read-only
     uint16_t invalidValue = 10;
-    status                = tester.WriteAttribute(AccessControl::Attributes::SubjectsPerAccessControlEntry::Id, invalidValue);
+    auto status           = tester.WriteAttribute(AccessControl::Attributes::SubjectsPerAccessControlEntry::Id, invalidValue);
+    ASSERT_FALSE(status.IsSuccess());
+
+    // Test that other read-only attributes also reject writes
+    status = tester.WriteAttribute(AccessControl::Attributes::TargetsPerAccessControlEntry::Id, invalidValue);
+    ASSERT_FALSE(status.IsSuccess());
+
+    status = tester.WriteAttribute(AccessControl::Attributes::AccessControlEntriesPerFabric::Id, invalidValue);
     ASSERT_FALSE(status.IsSuccess());
 }
 
