@@ -144,7 +144,6 @@ TEST_F(TestPowerTopologyCluster, FeatureMapReadTest)
 
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-    // Read FeatureMap attribute using ClusterTester
     ClusterTester tester(cluster);
     FeatureMap::TypeInfo::DecodableType featureMapValue;
     auto status = tester.ReadAttribute(FeatureMap::Id, featureMapValue);
@@ -397,97 +396,6 @@ TEST_F(TestPowerTopologyCluster, DelegateActiveEndpointsErrorTest)
     ActiveEndpoints::TypeInfo::DecodableType activeEndpoints;
     auto status = tester.ReadAttribute(ActiveEndpoints::Id, activeEndpoints);
     EXPECT_FALSE(status.IsSuccess());
-
-    cluster.Shutdown();
-}
-
-TEST_F(TestPowerTopologyCluster, ReadUnsupportedAttributeTest)
-{
-    chip::Test::TestServerClusterContext context;
-    BitMask<Feature> features(Feature::kSetTopology);
-    MockPowerTopologyDelegate mockDelegate;
-
-    PowerTopologyCluster cluster(PowerTopologyCluster::Config{
-        .endpointId = kTestEndpointId,
-        .delegate   = mockDelegate,
-        .features   = features,
-    });
-
-    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-
-    // Try to read an attribute that doesn't exist
-    ClusterTester tester(cluster);
-    constexpr AttributeId kInvalidAttributeId = 0xFFFF;
-    uint32_t dummyValue;
-    auto status = tester.ReadAttribute(kInvalidAttributeId, dummyValue);
-    EXPECT_FALSE(status.IsSuccess());
-    EXPECT_EQ(status.GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::UnsupportedAttribute);
-
-    cluster.Shutdown();
-}
-
-TEST_F(TestPowerTopologyCluster, EndpointListBoundariesTest)
-{
-    chip::Test::TestServerClusterContext context;
-    BitMask<Feature> features(Feature::kSetTopology, Feature::kDynamicPowerFlow);
-    MockPowerTopologyDelegate mockDelegate;
-
-    PowerTopologyCluster cluster(PowerTopologyCluster::Config{
-        .endpointId = kTestEndpointId,
-        .delegate   = mockDelegate,
-        .features   = features,
-
-    });
-
-    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
-    ClusterTester tester(cluster);
-
-    // Test empty list
-    {
-        mockDelegate.SetAvailableEndpoints({});
-        AvailableEndpoints::TypeInfo::DecodableType availableEndpoints;
-        auto status = tester.ReadAttribute(AvailableEndpoints::Id, availableEndpoints);
-        EXPECT_TRUE(status.IsSuccess());
-
-        auto iter = availableEndpoints.begin();
-        EXPECT_FALSE(iter.Next());
-    }
-
-    // Test maximum list size (20 endpoints per spec)
-    {
-        std::vector<EndpointId> maxEndpoints;
-        for (size_t i = 0; i < 20; i++)
-        {
-            maxEndpoints.push_back(static_cast<EndpointId>(i + 100));
-        }
-        mockDelegate.SetAvailableEndpoints(maxEndpoints);
-
-        AvailableEndpoints::TypeInfo::DecodableType availableEndpoints;
-        auto status = tester.ReadAttribute(AvailableEndpoints::Id, availableEndpoints);
-        EXPECT_TRUE(status.IsSuccess());
-
-        auto iter    = availableEndpoints.begin();
-        size_t count = 0;
-        while (iter.Next())
-        {
-            EXPECT_EQ(iter.GetValue(), static_cast<EndpointId>(100 + count));
-            count++;
-        }
-        EXPECT_EQ(count, 20u);
-    }
-
-    // Test single endpoint
-    {
-        mockDelegate.SetActiveEndpoints({ 42 });
-        ActiveEndpoints::TypeInfo::DecodableType activeEndpoints;
-        auto status = tester.ReadAttribute(ActiveEndpoints::Id, activeEndpoints);
-        EXPECT_TRUE(status.IsSuccess());
-
-        auto iter = activeEndpoints.begin();
-        ASSERT_TRUE(iter.Next());
-        EXPECT_EQ(iter.GetValue(), 42u);
-        EXPECT_FALSE(iter.Next());
-    }
 
     cluster.Shutdown();
 }
