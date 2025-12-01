@@ -80,7 +80,7 @@ CHIP_ERROR PowerTopologyCluster::Startup(ServerClusterContext & context)
 {
 
     VerifyOrReturnError(
-        !(mFeatureFlags.Has(Feature::kDynamicPowerFlow) && !mFeatureFlags.Has(Feature::kSetTopology)), CHIP_ERROR_INCORRECT_STATE,
+        mFeatureFlags.Has(Feature::kSetTopology) || !mFeatureFlags.Has(Feature::kDynamicPowerFlow), CHIP_ERROR_INCORRECT_STATE,
         ChipLogError(Zcl, "Power Topology Cluster: DynamicPowerFlow feature requires SetTopology feature to be enabled"));
     return DefaultServerCluster::Startup(context);
 }
