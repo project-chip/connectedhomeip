@@ -1074,10 +1074,19 @@ CHIP_ERROR WebRTCProviderManager::SendAnswerCommand(Messaging::ExchangeManager &
 
     WebrtcTransport::RequestArgs requestArgs = transport->GetRequestArgs();
     // Now invoke the command using the found session handle
-    return Controller::InvokeCommandRequest(&exchangeMgr, sessionHandle, requestArgs.originatingEndpointId, command, onSuccess,
-                                            onFailure,
-                                            /* timedInvokeTimeoutMs = */ NullOptional, /* responseTimeout = */ NullOptional,
-                                            /* outCancelFn = */ nullptr, /*allowLargePayload = */ true);
+    CHIP_ERROR err = Controller::InvokeCommandRequest(
+        &exchangeMgr, sessionHandle, requestArgs.originatingEndpointId, command, onSuccess, onFailure,
+        /* timedInvokeTimeoutMs = */ NullOptional, /* responseTimeout = */ NullOptional,
+        /* outCancelFn = */ nullptr, /*allowLargePayload = */ true);
+
+    // Flush any queued up ICE candidates after the answer is sent
+    if (transport->HasCandidates())
+    {
+        transport->MoveToState(WebrtcTransport::State::SendingICECandidates);
+        ScheduleICECandidatesSend(sessionId);
+    }
+
+    return err;
 }
 
 CHIP_ERROR WebRTCProviderManager::SendICECandidatesCommand(Messaging::ExchangeManager & exchangeMgr,
