@@ -42,12 +42,12 @@ class Instance
 public:
     Instance(EndpointId aEndpointId, Delegate & aDelegate, BitMask<Feature> aFeature,
              BitMask<OptionalAttributes> aOptionalAttributes) :
-        mEndpointId(aEndpointId), mDelegate(aDelegate), mFeature(aFeature), mOptionalAttrs(aOptionalAttributes),
-        mCluster(PowerTopologyCluster::Config{
-            .endpointId = aEndpointId,
-            .delegate   = aDelegate,
-            .features   = aFeature,
-        })
+        mEndpointId(aEndpointId),
+        mDelegate(aDelegate), mFeature(aFeature), mOptionalAttrs(aOptionalAttributes), mCluster(PowerTopologyCluster::Config{
+                                                                                           .endpointId = aEndpointId,
+                                                                                           .delegate   = aDelegate,
+                                                                                           .features   = aFeature,
+                                                                                       })
     {}
     ~Instance() { Shutdown(); }
 
