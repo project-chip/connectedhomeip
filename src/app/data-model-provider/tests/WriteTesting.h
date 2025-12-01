@@ -103,22 +103,6 @@ public:
         }
     }
 
-    // Specialization for List types - check if list elements are fabric-scoped
-    template <typename T>
-    CHIP_ERROR EncodeValue(TLV::TLVWriter & writer, TLV::Tag tag, const chip::app::DataModel::List<T> & value)
-    {
-        // Check if the element type (removing const) is fabric-scoped
-        using ElementType = std::remove_const_t<T>;
-        if constexpr (chip::app::DataModel::IsFabricScoped<ElementType>::value)
-        {
-            return chip::app::DataModel::EncodeForWrite(writer, tag, value);
-        }
-        else
-        {
-            return chip::app::DataModel::Encode(writer, tag, value);
-        }
-    }
-
     template <typename T>
     TLV::TLVReader ReadEncodedValue(const T & value)
     {

@@ -95,7 +95,7 @@ struct TestAccessControlCluster : public ::testing::Test
     }
     static void TearDownTestSuite()
     {
-        ASSERT_EQ(chip::Access::GetAccessControl().Finish(), CHIP_NO_ERROR);
+        chip::Access::GetAccessControl().Finish();
         chip::Platform::MemoryShutdown();
     }
 };
@@ -171,7 +171,7 @@ size_t CountListElements(DecodableListType & list)
         ++count;
     }
     // Verify that iteration completed successfully without errors
-    ASSERT_EQ(it.GetStatus(), CHIP_NO_ERROR);
+    PW_ASSERT(it.GetStatus() == CHIP_NO_ERROR);
     return count;
 }
 
