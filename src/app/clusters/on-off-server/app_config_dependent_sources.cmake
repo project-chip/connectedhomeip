@@ -24,6 +24,7 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/codegen/mode-select-integration.h"
     "${CLUSTER_DIR}/codegen/on-off-server.cpp"
     "${CLUSTER_DIR}/codegen/on-off-server.h"
+    "${CLUSTER_DIR}/on-off-server.h"
     "${CLUSTER_DIR}/codegen/scenes-integration.cpp"
     "${CLUSTER_DIR}/codegen/scenes-integration.h"
 )
