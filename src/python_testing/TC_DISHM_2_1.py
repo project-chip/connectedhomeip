@@ -169,10 +169,12 @@ class TC_DISHM_2_1(MatterBaseTest):
         # The goal is to place the DUT in a state where a subsequent ChangeToMode(newMode=MODE_CHANGE_FAIL)
         # would fail (e.g. device is busy/incompatible state). On real devices this can be done
         # manually, in CI the example app does not expose a way to synthesize the internal condition.
-        # Therefore, in CI we do not switch the DUT to mode_fail.
 
-        if not (can_test_mode_failure and can_manually_control):
+        if not can_test_mode_failure:
             self.skip_step(5)
+        elif not can_manually_control:
+            self.step(5)
+            self.write_to_app_pipe({"Name": "ModeChange", "Device": "DishWasher", "Type": "ToggleFailTransition"})
         else:
             self.step(5)
             self.wait_for_user_input(prompt_msg=(
@@ -218,8 +220,11 @@ class TC_DISHM_2_1(MatterBaseTest):
                              f"{old_current_mode_dut_2} is not equal to old_current_mode_dut: {old_current_mode_dut}")
 
         # Manually put the device in a state from which it will SUCCESSFULLY transition to PIXIT.DISHM.MODE_CHANGE_OK
+        if not can_test_mode_failure:
+            self.skip_test(9)
         if not can_manually_control:
-            self.skip_step(9)
+            self.step(9)
+            self.write_to_app_pipe({"Name": "ModeChange", "Device": "DishWasher", "Type": "ToggleFailTransition"})
         else:
             self.step(9)
             self.wait_for_user_input(

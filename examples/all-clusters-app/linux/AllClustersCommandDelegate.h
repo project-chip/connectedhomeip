@@ -33,7 +33,6 @@ public:
     static void HandleCommand(intptr_t context);
 
     AllClustersAppCommandHandler(Json::Value && jasonValue) : mJsonValue(std::move(jasonValue)) {}
-
 private:
     Json::Value mJsonValue;
 

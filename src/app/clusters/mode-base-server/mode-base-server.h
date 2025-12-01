@@ -126,6 +126,9 @@ public:
     // Get mode value by mode tag
     CHIP_ERROR GetModeValueByModeTag(uint16_t modeTag, uint8_t & value);
 
+    bool GetFailTransition() { return failTransition; }
+    void ToggleFailTransition() { failTransition = !failTransition; }
+
 private:
     Delegate * mDelegate;
 
@@ -138,6 +141,8 @@ private:
     DataModel::Nullable<uint8_t> mStartUpMode;
     DataModel::Nullable<uint8_t> mOnMode;
     uint32_t mFeature;
+
+    bool failTransition = false;
 
     template <typename RequestT, typename FuncT>
     void HandleCommand(HandlerContext & handlerContext, FuncT func);

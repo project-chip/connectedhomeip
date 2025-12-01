@@ -846,6 +846,11 @@ void AllClustersAppCommandHandler::OnModeChangeHandler(std::string device, std::
     {
         modeInstance->UpdateOnMode(mode);
     }
+    else if (type == "ToggleFailTransition")
+    {
+        modeInstance->ToggleFailTransition();
+        return;
+    }
     else
     {
         ChipLogDetail(NotSpecified, "Invalid mode type : %s", type.c_str());
