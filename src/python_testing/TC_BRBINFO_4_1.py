@@ -177,7 +177,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
             dut_fsa_stdin_pipe = self.user_params.get("dut_fsa_stdin_pipe")
             if not dut_fsa_stdin_pipe:
                 asserts.fail("CI setup requires --string-arg dut_fsa_stdin_pipe:<path_to_pipe>")
-            self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")  # noqa SIM115
+            self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")  # noqa: SIM115
 
         self.th_icd_server_port = 5543
         self.th_icd_server_discriminator = random.randint(0, 4095)
