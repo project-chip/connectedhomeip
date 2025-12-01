@@ -2980,6 +2980,7 @@ endpoint 1 {
     callback attribute presetTypes;
     callback attribute scheduleTypes;
     ram      attribute numberOfPresets default = 0;
+    callback attribute numberOfScheduleTransitionPerDay;
     ram      attribute activePresetHandle;
     callback attribute presets;
     ram      attribute setpointHoldExpiryTimestamp;

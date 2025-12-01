@@ -40,6 +40,7 @@ ThermostatDelegate::ThermostatDelegate()
     mIndexOfCurrentSuggestion                   = mMaxThermostatSuggestions;
     mNextFreeIndexInThermostatSuggestionsList   = 0;
     mMaxNumberOfSchedulesAllowedPerScheduleType = kMaxNumberOfSchedulesSupported;
+    mMaxNumberOfScheduleTransitionPerDay        = kMaxNumberOfScheduleTransitionPerDay;
 
     // Start the unique ID from 0 and it increases montonically.
     mUniqueID = 0;
@@ -443,7 +444,6 @@ CHIP_ERROR ThermostatDelegate::ReEvaluateCurrentSuggestion()
 
     if (!nullableCurrentThermostatSuggestion.IsNull())
     {
-
         ThermostatSuggestionStructWithOwnedMembers & currentThermostatSuggestion = nullableCurrentThermostatSuggestion.Value();
 
         // TODO: Check if a hold is set and set the ThermostatSuggestionNotFollowingReason to OngoingHold and do not update
@@ -510,4 +510,9 @@ CHIP_ERROR ThermostatDelegate::GetScheduleTypeAtIndex(size_t index, Structs::Sch
         return CHIP_NO_ERROR;
     }
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+}
+
+DataModel::Nullable<uint8_t> ThermostatDelegate::GetNumberOfScheduleTransitionPerDay()
+{
+    return mMaxNumberOfScheduleTransitionPerDay;
 }

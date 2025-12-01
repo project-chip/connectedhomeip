@@ -5203,6 +5203,22 @@
               "reportableChange": 0
             },
             {
+              "name": "NumberOfScheduleTransitionPerDay",
+              "code": 77,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int8u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "ActivePresetHandle",
               "code": 78,
               "mfgCode": null,

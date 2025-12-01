@@ -848,6 +848,7 @@
             "MaxThermostatSuggestions",
             "CurrentThermostatSuggestion",
             "ThermostatSuggestionNotFollowingReason",
+            "NumberOfScheduleTransitionPerDay",
             "ClusterRevision"
         ],
         "Time Format Localization": ["ClusterRevision"],

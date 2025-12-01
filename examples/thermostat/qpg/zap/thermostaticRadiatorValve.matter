@@ -3090,7 +3090,7 @@ endpoint 1 {
     ram      attribute numberOfPresets default = 0;
     ram      attribute numberOfSchedules default = 0;
     ram      attribute numberOfScheduleTransitions default = 0;
-    ram      attribute numberOfScheduleTransitionPerDay;
+    callback attribute numberOfScheduleTransitionPerDay;
     ram      attribute activePresetHandle;
     ram      attribute activeScheduleHandle;
     callback attribute presets;
