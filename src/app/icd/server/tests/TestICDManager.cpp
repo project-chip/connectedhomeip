@@ -1226,9 +1226,10 @@ TEST_F(TestICDManager, TestShortIdleModeBehaviorSITvsLIT)
     EXPECT_EQ(icdConfigData.GetICDMode(), ICDConfigurationData::ICDMode::SIT);
 
     // Configure IdleModeDuration = 10s, ShortIdleModeDuration = 2s (Active to 1000 to ensure transitions to active)
-    EXPECT_SUCCESS(privateIcdConfigData.SetModeDurations(std::optional<System::Clock::Milliseconds32>(Milliseconds32(1000)),
-                                                         std::optional<System::Clock::Seconds32>(10_s),
-                                                         std::optional<System::Clock::Seconds32>(2_s)));
+    EXPECT_EQ(CHIP_NO_ERROR,
+              privateIcdConfigData.SetModeDurations(std::optional<System::Clock::Milliseconds32>(Milliseconds32(1000)),
+                                                    std::optional<System::Clock::Seconds32>(10_s),
+                                                    std::optional<System::Clock::Seconds32>(2_s)));
 
     // In SIT with ShortIdleModeDuration < IdleModeDuration and LIT feature present we shall use the ShortIdleModeDuration
     EXPECT_TRUE(icdConfigData.ShouldUseShortIdle());
