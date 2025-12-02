@@ -85,7 +85,7 @@ Davis, CA 95616, USA
         <condition name="Zigbee"/>
       </optionalConform>
     </cluster>
-    <cluster id="0x0038" name="Time Sync" side="client">
+    <cluster id="0x0038" name="TimeSync" side="client">
       <otherwiseConform>
         <provisionalConform/>
         <optionalConform/>

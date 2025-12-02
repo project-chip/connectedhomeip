@@ -72,31 +72,31 @@ Davis, CA 95616, USA
   </features>
   <dataTypes>
     <enum name="InputTypeEnum">
-      <item value="0" name="Internal" summary="Indicates content not coming from a physical input.">
+      <item value="0" name="INTERNAL" summary="Indicates content not coming from a physical input.">
         <mandatoryConform/>
       </item>
-      <item value="1" name="Aux">
+      <item value="1" name="AUX">
         <mandatoryConform/>
       </item>
-      <item value="2" name="Coax">
+      <item value="2" name="COAX">
         <mandatoryConform/>
       </item>
-      <item value="3" name="Composite">
+      <item value="3" name="COMPOSITE">
         <mandatoryConform/>
       </item>
       <item value="4" name="HDMI">
         <mandatoryConform/>
       </item>
-      <item value="5" name="Input">
+      <item value="5" name="INPUT">
         <mandatoryConform/>
       </item>
-      <item value="6" name="Line">
+      <item value="6" name="LINE">
         <mandatoryConform/>
       </item>
-      <item value="7" name="Optical">
+      <item value="7" name="OPTICAL">
         <mandatoryConform/>
       </item>
-      <item value="8" name="Video">
+      <item value="8" name="VIDEO">
         <mandatoryConform/>
       </item>
       <item value="9" name="SCART">
@@ -105,11 +105,11 @@ Davis, CA 95616, USA
       <item value="10" name="USB">
         <mandatoryConform/>
       </item>
-      <item value="11" name="Other">
+      <item value="11" name="OTHER">
         <mandatoryConform/>
       </item>
     </enum>
-    <struct name="InputInfoStruct">
+    <struct name="InputInfo">
       <field id="0" name="Index" type="uint8">
         <mandatoryConform/>
       </field>
@@ -129,7 +129,7 @@ Davis, CA 95616, USA
   </dataTypes>
   <attributes>
     <attribute id="0x0000" name="InputList" type="list">
-      <entry type="InputInfoStruct"/>
+      <entry type="InputInfo"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>

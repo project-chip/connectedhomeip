@@ -69,7 +69,6 @@ Davis, CA 95616, USA
     <attribute id="0x0000" name="Sources" type="list">
       <entry type="endpoint-no"/>
       <access read="true" readPrivilege="view"/>
-      <quality persistence="nonVolatile"/>
       <mandatoryConform/>
       <constraint>
         <maxCount value="6"/>

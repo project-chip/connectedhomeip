@@ -57,12 +57,12 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0035" name="Thread Network Diagnostics Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0035" name="ThreadNetworkDiagnostics Cluster" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0035" name="Thread Network Diagnostics"/>
+    <clusterId id="0x0035" name="ThreadNetworkDiagnostics"/>
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="DGTHREAD" scope="Node"/>
   <features>
@@ -81,14 +81,14 @@ Davis, CA 95616, USA
   </features>
   <dataTypes>
     <enum name="ConnectionStatusEnum">
-      <item value="0" name="Connected" summary="Node is connected">
+      <item value="0" name="Connected">
         <mandatoryConform/>
       </item>
-      <item value="1" name="NotConnected" summary="Node is not connected">
+      <item value="1" name="NotConnected">
         <mandatoryConform/>
       </item>
     </enum>
-    <enum name="NetworkFaultEnum">
+    <enum name="NetworkFault">
       <item value="0" name="Unspecified" summary="Indicates an unspecified fault.">
         <mandatoryConform/>
       </item>
@@ -102,26 +102,26 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
     </enum>
-    <enum name="RoutingRoleEnum">
-      <item value="0" name="Unspecified" summary="Unspecified routing role.">
+    <enum name="RoutingRoleENUM">
+      <item value="0" name="Unspecified" summary="SHALL be used to indicate an unspecified routing role.">
         <mandatoryConform/>
       </item>
-      <item value="1" name="Unassigned" summary="The Node does not currently have a role as a result of the Thread interface not currently being configured or operational.">
+      <item value="1" name="Unassigned" summary="SHALL be used to indicate the Node does not currently have a role as a result of the Thread interface not currently being configured or operational.">
         <mandatoryConform/>
       </item>
-      <item value="2" name="SleepyEndDevice" summary="The Node acts as a Sleepy End Device with RX-off-when-idle sleepy radio behavior.">
+      <item value="2" name="SleepyEndDevice" summary="SHALL be used to indicate the Node acts as a Sleepy End Device with RX-off-when-idle sleepy radio behavior.">
         <mandatoryConform/>
       </item>
-      <item value="3" name="EndDevice" summary="The Node acts as an End Device without RX-off-when-idle sleepy radio behavior.">
+      <item value="3" name="EndDevice" summary="SHALL be used to indicate the Node acts as an End Device without RX-off-when-idle sleepy radio behavior.">
         <mandatoryConform/>
       </item>
-      <item value="4" name="REED" summary="The Node acts as an Router Eligible End Device.">
+      <item value="4" name="REED" summary="SHALL be used to indicate the Node acts as an Router Eligible End Device.">
         <mandatoryConform/>
       </item>
-      <item value="5" name="Router" summary="The Node acts as a Router Device.">
+      <item value="5" name="Router" summary="SHALL be used to indicate the Node acts as a Router Device.">
         <mandatoryConform/>
       </item>
-      <item value="6" name="Leader" summary="The Node acts as a Leader Device.">
+      <item value="6" name="Leader" summary="SHALL be used to indicate the Node acts as a Leader Device.">
         <mandatoryConform/>
       </item>
     </enum>
@@ -201,7 +201,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </struct>
-    <struct name="OperationalDatasetComponents">
+    <struct name="OperationalDatasetComponentsStruct">
       <field id="0" name="ActiveTimestampPresent" type="bool">
         <mandatoryConform/>
       </field>
@@ -271,7 +271,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </struct>
-    <struct name="SecurityPolicy">
+    <struct name="SecurityPolicyStruct">
       <field id="0" name="RotationTime" type="uint16">
         <mandatoryConform/>
       </field>
@@ -286,7 +286,7 @@ Davis, CA 95616, USA
       <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0001" name="RoutingRole" type="RoutingRoleEnum">
+    <attribute id="0x0001" name="RoutingRole" type="RoutingRoleENUM">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform/>
@@ -671,7 +671,7 @@ Davis, CA 95616, USA
       <quality nullable="true"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x003B" name="SecurityPolicy" type="SecurityPolicy">
+    <attribute id="0x003B" name="SecurityPolicy" type="SecurityPolicyStruct">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform/>
@@ -684,13 +684,13 @@ Davis, CA 95616, USA
         <allowed value="4"/>
       </constraint>
     </attribute>
-    <attribute id="0x003D" name="OperationalDatasetComponents" type="OperationalDatasetComponents">
+    <attribute id="0x003D" name="OperationalDatasetComponents" type="OperationalDatasetComponentsStruct">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <mandatoryConform/>
     </attribute>
     <attribute id="0x003E" name="ActiveNetworkFaults" type="list">
-      <entry type="NetworkFaultEnum"/>
+      <entry type="NetworkFault"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
       <constraint>
@@ -718,14 +718,14 @@ Davis, CA 95616, USA
       <access readPrivilege="view"/>
       <optionalConform/>
       <field id="0" name="Current" type="list">
-        <entry type="NetworkFaultEnum"/>
+        <entry type="NetworkFault"/>
         <mandatoryConform/>
         <constraint>
           <maxCount value="4"/>
         </constraint>
       </field>
       <field id="1" name="Previous" type="list">
-        <entry type="NetworkFaultEnum"/>
+        <entry type="NetworkFault"/>
         <mandatoryConform/>
         <constraint>
           <maxCount value="4"/>

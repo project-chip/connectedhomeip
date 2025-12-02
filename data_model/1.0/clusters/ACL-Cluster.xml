@@ -66,7 +66,7 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="ACL" scope="Node"/>
   <dataTypes>
-    <enum name="AccessControlEntryAuthModeEnum">
+    <enum name="AuthModeEnum">
       <item value="1" name="PASE" summary="Passcode authenticated session">
         <mandatoryConform/>
       </item>
@@ -77,7 +77,18 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
     </enum>
-    <enum name="AccessControlEntryPrivilegeEnum">
+    <enum name="ChangeTypeEnum">
+      <item value="0" name="Changed" summary="Entry or extension was changed">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Added" summary="Entry or extension was added">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Removed" summary="Entry or extension was removed">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="PrivilegeEnum">
       <item value="1" name="View" summary="Can read and observe all (except Access Control Cluster and as seen by a non- Proxy)">
         <mandatoryConform/>
       </item>
@@ -97,23 +108,12 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
     </enum>
-    <enum name="ChangeTypeEnum">
-      <item value="0" name="Changed" summary="Entry or extension was changed">
-        <mandatoryConform/>
-      </item>
-      <item value="1" name="Added" summary="Entry or extension was added">
-        <mandatoryConform/>
-      </item>
-      <item value="2" name="Removed" summary="Entry or extension was removed">
-        <mandatoryConform/>
-      </item>
-    </enum>
     <struct name="AccessControlEntryStruct">
-      <field id="1" name="Privilege" type="AccessControlEntryPrivilegeEnum">
+      <field id="1" name="Privilege" type="PrivilegeEnum">
         <access fabricSensitive="true"/>
         <mandatoryConform/>
       </field>
-      <field id="2" name="AuthMode" type="AccessControlEntryAuthModeEnum">
+      <field id="2" name="AuthMode" type="AuthModeEnum">
         <access fabricSensitive="true"/>
         <mandatoryConform/>
       </field>
@@ -129,7 +129,7 @@ Davis, CA 95616, USA
         </constraint>
       </field>
       <field id="4" name="Targets" type="list">
-        <entry type="AccessControlTargetStruct"/>
+        <entry type="TargetStruct"/>
         <access fabricSensitive="true"/>
         <quality nullable="true"/>
         <mandatoryConform/>
@@ -151,7 +151,7 @@ Davis, CA 95616, USA
       </field>
       <access fabricScoped="true"/>
     </struct>
-    <struct name="AccessControlTargetStruct">
+    <struct name="TargetStruct">
       <field id="0" name="Cluster" type="cluster-id">
         <quality nullable="true"/>
         <mandatoryConform/>
@@ -199,12 +199,12 @@ Davis, CA 95616, USA
         <min value="3"/>
       </constraint>
     </attribute>
-    <attribute id="0x0004" name="AccessControlEntriesPerFabric" type="uint16" default="4">
+    <attribute id="0x0004" name="AccessControlEntriesPerFabric" type="uint16" default="3">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
       <constraint>
-        <min value="4"/>
+        <min value="3"/>
       </constraint>
     </attribute>
   </attributes>

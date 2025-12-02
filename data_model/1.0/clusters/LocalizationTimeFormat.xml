@@ -57,12 +57,12 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x002C" name="Time Format Localization Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x002C" name="TimeFormatLocalization Cluster" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x002C" name="Time Format Localization"/>
+    <clusterId id="0x002C" name="TimeFormatLocalization"/>
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="LTIME" scope="Node"/>
   <features>
@@ -71,60 +71,60 @@ Davis, CA 95616, USA
     </feature>
   </features>
   <dataTypes>
-    <enum name="CalendarTypeEnum">
-      <item value="0" name="Buddhist" summary="Dates conveyed using the Buddhist calendar">
+    <enum name="CalendarType">
+      <item value="0" name="Buddhist" summary="Dates SHALL be conveyed using the Buddhist calendar">
         <mandatoryConform/>
       </item>
-      <item value="1" name="Chinese" summary="Dates conveyed using the Chinese calendar">
+      <item value="1" name="Chinese" summary="Dates SHALL be conveyed using the Chinese calendar">
         <mandatoryConform/>
       </item>
-      <item value="2" name="Coptic" summary="Dates conveyed using the Coptic calendar">
+      <item value="2" name="Coptic" summary="Dates SHALL be conveyed using the Coptic calendar">
         <mandatoryConform/>
       </item>
-      <item value="3" name="Ethiopian" summary="Dates conveyed using the Ethiopian calendar">
+      <item value="3" name="Ethiopian" summary="Dates SHALL be conveyed using the Ethiopian calendar">
         <mandatoryConform/>
       </item>
-      <item value="4" name="Gregorian" summary="Dates conveyed using the Gregorian calendar">
+      <item value="4" name="Gregorian" summary="Dates SHALL be conveyed using the Gregorian calendar">
         <mandatoryConform/>
       </item>
-      <item value="5" name="Hebrew" summary="Dates conveyed using the Hebrew calendar">
+      <item value="5" name="Hebrew" summary="Dates SHALL be conveyed using the Hebrew calendar">
         <mandatoryConform/>
       </item>
-      <item value="6" name="Indian" summary="Dates conveyed using the Indian calendar">
+      <item value="6" name="Indian" summary="Dates SHALL be conveyed using the Indian calendar">
         <mandatoryConform/>
       </item>
-      <item value="7" name="Islamic" summary="Dates conveyed using the Islamic calendar">
+      <item value="7" name="Islamic" summary="Dates SHALL be conveyed using the Islamic calendar">
         <mandatoryConform/>
       </item>
-      <item value="8" name="Japanese" summary="Dates conveyed using the Japanese calendar">
+      <item value="8" name="Japanese" summary="Dates SHALL be conveyed using the Japanese calendar">
         <mandatoryConform/>
       </item>
-      <item value="9" name="Korean" summary="Dates conveyed using the Korean calendar">
+      <item value="9" name="Korean" summary="Dates SHALL be conveyed using the Korean calendar">
         <mandatoryConform/>
       </item>
-      <item value="10" name="Persian" summary="Dates conveyed using the Persian calendar">
+      <item value="10" name="Persian" summary="Dates SHALL be conveyed using the Persian calendar">
         <mandatoryConform/>
       </item>
-      <item value="11" name="Taiwanese" summary="Dates conveyed using the Taiwanese calendar">
+      <item value="11" name="Taiwanese" summary="Dates SHALL be conveyed using the Taiwanese calendar">
         <mandatoryConform/>
       </item>
     </enum>
-    <enum name="HourFormatEnum">
-      <item value="0" name="12hr" summary="Time conveyed with a 12-hour clock">
+    <enum name="HourFormat">
+      <item value="0" name="12hr" summary="Time SHALL be conveyed with a 12-hour clock">
         <mandatoryConform/>
       </item>
-      <item value="1" name="24hr" summary="Time conveyed with a 24-hour clock">
+      <item value="1" name="24hr" summary="Time SHALL be conveyed with a 24-hour clock">
         <mandatoryConform/>
       </item>
     </enum>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="HourFormat" type="HourFormatEnum" default="null">
+    <attribute id="0x0000" name="HourFormat" type="HourFormat" default="null">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0001" name="ActiveCalendarType" type="CalendarTypeEnum" default="null">
+    <attribute id="0x0001" name="ActiveCalendarType" type="CalendarType" default="null">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform>
@@ -132,7 +132,7 @@ Davis, CA 95616, USA
       </mandatoryConform>
     </attribute>
     <attribute id="0x0002" name="SupportedCalendarTypes" type="list">
-      <entry type="CalendarTypeEnum"/>
+      <entry type="CalendarType"/>
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform>

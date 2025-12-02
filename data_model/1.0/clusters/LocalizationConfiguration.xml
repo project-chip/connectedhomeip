@@ -57,12 +57,12 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x002B" name="Localization Configuration Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x002B" name="LocalizationConfiguration Cluster" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x002B" name="Localization Configuration"/>
+    <clusterId id="0x002B" name="LocalizationConfiguration"/>
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="LCFG" scope="Node"/>
   <attributes>

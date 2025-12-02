@@ -57,12 +57,12 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0034" name="Software Diagnostics Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0034" name="SoftwareDiagnostics Cluster" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0034" name="Software Diagnostics"/>
+    <clusterId id="0x0034" name="SoftwareDiagnostics"/>
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="DGSW" scope="Node"/>
   <features>
@@ -71,7 +71,7 @@ Davis, CA 95616, USA
     </feature>
   </features>
   <dataTypes>
-    <struct name="ThreadMetricsStruct">
+    <struct name="ThreadMetricsStructStruct">
       <field id="0" name="ID" type="uint64">
         <mandatoryConform/>
       </field>
@@ -94,7 +94,7 @@ Davis, CA 95616, USA
   </dataTypes>
   <attributes>
     <attribute id="0x0000" name="ThreadMetrics" type="list">
-      <entry type="ThreadMetricsStruct"/>
+      <entry type="ThreadMetricsStructStruct"/>
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
       <constraint>

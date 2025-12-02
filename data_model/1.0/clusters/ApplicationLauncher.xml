@@ -57,12 +57,12 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x050C" name="Application Launcher Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x050C" name="App Launcher Cluster" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x050C" name="Application Launcher"/>
+    <clusterId id="0x050C" name="App Launcher"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="APPLAUNCHER" scope="Endpoint"/>
   <features>
@@ -72,30 +72,30 @@ Davis, CA 95616, USA
   </features>
   <dataTypes>
     <enum name="StatusEnum">
-      <item value="0" name="Success" summary="Command succeeded">
+      <item value="0" name="SUCCESS" summary="Command succeeded">
         <mandatoryConform/>
       </item>
-      <item value="1" name="AppNotAvailable" summary="Requested app is not available.">
+      <item value="1" name="APP_NOT_AVAILABLE" summary="Requested app is not available.">
         <mandatoryConform/>
       </item>
-      <item value="2" name="SystemBusy" summary="Video platform unable to honor command.">
+      <item value="2" name="SYSTEM_BUSY" summary="Video platform unable to honor command.">
         <mandatoryConform/>
       </item>
     </enum>
-    <struct name="ApplicationEPStruct">
-      <field id="0" name="Application" type="ApplicationStruct">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="Endpoint" type="endpoint-no" default="MS">
-        <optionalConform/>
-      </field>
-    </struct>
-    <struct name="ApplicationStruct">
+    <struct name="Application">
       <field id="0" name="CatalogVendorID" type="uint16">
         <mandatoryConform/>
       </field>
       <field id="1" name="ApplicationID" type="string">
         <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="ApplicationEP">
+      <field id="0" name="Application" type="Application">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Endpoint" type="endpoint-no" default="MS">
+        <optionalConform/>
       </field>
     </struct>
   </dataTypes>
@@ -108,7 +108,7 @@ Davis, CA 95616, USA
         <feature name="AP"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0001" name="CurrentApp" type="ApplicationEPStruct" default="null">
+    <attribute id="0x0001" name="CurrentApp" type="ApplicationEP" default="null">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <optionalConform/>
@@ -121,7 +121,7 @@ Davis, CA 95616, USA
     <command id="0x00" name="LaunchApp" direction="commandToServer" response="LauncherResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
-      <field id="0" name="Application" type="ApplicationStruct">
+      <field id="0" name="Application" type="Application">
         <mandatoryConform>
           <feature name="AP"/>
         </mandatoryConform>
@@ -136,7 +136,7 @@ Davis, CA 95616, USA
     <command id="0x01" name="StopApp" direction="commandToServer" response="LauncherResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
-      <field id="0" name="Application" type="ApplicationStruct" default="MS">
+      <field id="0" name="Application" type="Application" default="MS">
         <mandatoryConform>
           <feature name="AP"/>
         </mandatoryConform>
@@ -148,7 +148,7 @@ Davis, CA 95616, USA
     <command id="0x02" name="HideApp" direction="commandToServer" response="LauncherResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
-      <field id="0" name="Application" type="ApplicationStruct" default="MS">
+      <field id="0" name="Application" type="Application" default="MS">
         <mandatoryConform>
           <feature name="AP"/>
         </mandatoryConform>

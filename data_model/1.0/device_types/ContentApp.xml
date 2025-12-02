@@ -79,7 +79,7 @@ Davis, CA 95616, USA
     <cluster id="0x050A" name="Content Launcher" side="server">
       <optionalConform/>
     </cluster>
-    <cluster id="0x050C" name="Application Launcher" side="server">
+    <cluster id="0x050C" name="App Launcher" side="server">
       <mandatoryConform/>
       <features>
         <feature code="AP">
@@ -87,7 +87,7 @@ Davis, CA 95616, USA
         </feature>
       </features>
     </cluster>
-    <cluster id="0x050D" name="Application Basic" side="server">
+    <cluster id="0x050D" name="App Basic" side="server">
       <mandatoryConform/>
     </cluster>
     <cluster id="0x050E" name="Account Login" side="server">

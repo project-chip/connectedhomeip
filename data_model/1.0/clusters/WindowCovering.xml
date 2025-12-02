@@ -71,23 +71,19 @@ Davis, CA 95616, USA
   <classification hierarchy="base" role="application" picsCode="WNCV" scope="Endpoint"/>
   <features>
     <feature bit="0" code="LF" name="Lift" summary="Lift Control and behavior for lifting/sliding window coverings">
-      <optionalConform choice="a" more="true" min="1"/>
-    </feature>
-    <feature bit="1" code="TL" name="Tilt" summary="Tilt Control and behavior for tilting window coverings">
-      <optionalConform choice="a" more="true" min="1"/>
-    </feature>
-    <feature bit="2" code="PA_LF" name="PositionAwareLift" summary="Position Aware lift control is supported.">
-      <optionalConform>
-        <feature name="LF"/>
-      </optionalConform>
-    </feature>
-    <feature bit="3" code="ABS" name="AbsolutePosition" summary="Absolute positioning is supported.">
       <optionalConform/>
     </feature>
-    <feature bit="4" code="PA_TL" name="PositionAwareTilt" summary="Position Aware tilt control is supported.">
-      <optionalConform>
-        <feature name="TL"/>
-      </optionalConform>
+    <feature bit="1" code="TL" name="Tilt" summary="Tilt Control and behavior for tilting window coverings">
+      <optionalConform/>
+    </feature>
+    <feature bit="2" code="PA_LF" name="Position Aware Lift" summary="Position Aware lift control is supported.">
+      <optionalConform/>
+    </feature>
+    <feature bit="3" code="ABS" name="Absolute Position" summary="Absolute positioning is supported.">
+      <optionalConform/>
+    </feature>
+    <feature bit="4" code="PA_TL" name="Position Aware Tilt" summary="Position Aware tilt control is supported.">
+      <optionalConform/>
     </feature>
   </features>
   <attributes>

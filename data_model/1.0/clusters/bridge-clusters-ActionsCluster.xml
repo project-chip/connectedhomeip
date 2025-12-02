@@ -67,10 +67,10 @@ Davis, CA 95616, USA
   <classification hierarchy="base" role="application" picsCode="ACT" scope="Node"/>
   <dataTypes>
     <enum name="ActionErrorEnum">
-      <item value="0" name="Unknown" summary="Other reason not listed in the row(s) below">
+      <item value="0" name="unknown" summary="other reason not listed in the row(s) below">
         <mandatoryConform/>
       </item>
-      <item value="1" name="Interrupted" summary="The action was interrupted by another command or interaction">
+      <item value="1" name="interrupted" summary="The action was interrupted by another command or interaction">
         <mandatoryConform/>
       </item>
     </enum>
@@ -89,77 +89,39 @@ Davis, CA 95616, USA
       </item>
     </enum>
     <enum name="ActionTypeEnum">
-      <item value="0" name="Other" summary="Use this only when none of the other values applies">
+      <item value="0" name="other" summary="use this only when none of the other values applies">
         <mandatoryConform/>
       </item>
-      <item value="1" name="Scene" summary="Bring the endpoints into a certain state">
+      <item value="1" name="scene" summary="bring the endpoints into a certain state">
         <mandatoryConform/>
       </item>
-      <item value="2" name="Sequence" summary="A sequence of states with a certain time pattern">
+      <item value="2" name="sequence" summary="a sequence of states with a certain time pattern">
         <mandatoryConform/>
       </item>
-      <item value="3" name="Automation" summary="Control an automation (e.g. motion sensor controlling lights)">
+      <item value="3" name="automation" summary="control an automation (e.g. motion sensor controlling lights)">
         <mandatoryConform/>
       </item>
-      <item value="4" name="Exception" summary="Sequence that will run when something doesn&apos;t happen">
+      <item value="4" name="exception" summary="sequence that will run when something doesn&apos;t happen">
         <mandatoryConform/>
       </item>
-      <item value="5" name="Notification" summary="Use the endpoints to send a message to user">
+      <item value="5" name="notification" summary="use the endpoints to send a message to user">
         <mandatoryConform/>
       </item>
-      <item value="6" name="Alarm" summary="Higher priority notification">
+      <item value="6" name="alarm" summary="higher priority notification">
         <mandatoryConform/>
       </item>
     </enum>
     <enum name="EndpointListTypeEnum">
-      <item value="0" name="Other" summary="Another group of endpoints">
+      <item value="0" name="other" summary="another group of endpoints">
         <mandatoryConform/>
       </item>
-      <item value="1" name="Room" summary="User-configured group of endpoints where an endpoint can be in only one room">
+      <item value="1" name="room" summary="user-configured group of endpoints where an endpoint can be in only one room">
         <mandatoryConform/>
       </item>
-      <item value="2" name="Zone" summary="User-configured group of endpoints where an endpoint can be in any number of zones">
+      <item value="2" name="zone" summary="user-configured group of endpoints where an endpoint can be in any number of zones">
         <mandatoryConform/>
       </item>
     </enum>
-    <bitmap name="CommandBits">
-      <bitfield name="InstantAction" bit="0" summary="Indicate support for InstantAction command">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="InstantActionWithTransition" bit="1" summary="Indicate support for InstantActionWithTransition command">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="StartAction" bit="2" summary="Indicate support for StartAction command">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="StartActionWithDuration" bit="3" summary="Indicate support for StartActionWithDuration command">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="StopAction" bit="4" summary="Indicate support for StopAction command">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="PauseAction" bit="5" summary="Indicate support for PauseAction command">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="PauseActionWithDuration" bit="6" summary="Indicate support for PauseActionWithDuration command">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="ResumeAction" bit="7" summary="Indicate support for ResumeAction command">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="EnableAction" bit="8" summary="Indicate support for EnableAction command">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="EnableActionWithDuration" bit="9" summary="Indicate support for EnableActionWithDuration command">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="DisableAction" bit="10" summary="Indicate support for DisableAction command">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="DisableActionWithDuration" bit="11" summary="Indicate support for DisableActionWithDuration command">
-        <mandatoryConform/>
-      </bitfield>
-    </bitmap>
     <struct name="ActionStruct">
       <field id="0" name="ActionID" type="uint16">
         <mandatoryConform/>
@@ -176,7 +138,7 @@ Davis, CA 95616, USA
       <field id="3" name="EndpointListID" type="uint16">
         <mandatoryConform/>
       </field>
-      <field id="4" name="SupportedCommands" type="CommandBits">
+      <field id="4" name="SupportedCommands" type="map16">
         <mandatoryConform/>
         <constraint>
           <between>

@@ -57,30 +57,30 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x050D" name="Application Basic Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x050D" name="App Basic Cluster" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x050D" name="Application Basic"/>
+    <clusterId id="0x050D" name="App Basic"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="APBSC" scope="Endpoint"/>
   <dataTypes>
     <enum name="ApplicationStatusEnum">
-      <item value="0" name="Stopped" summary="Application is not running.">
+      <item value="0" name="STOPPED" summary="Application is not running.">
         <mandatoryConform/>
       </item>
-      <item value="1" name="ActiveVisibleFocus" summary="Application is running, is visible to the user, and is the active target for input.">
+      <item value="1" name="ACTIVE_VISIBLE_FOCUS" summary="Application is running, is visible to the user, and is the active target for input.">
         <mandatoryConform/>
       </item>
-      <item value="2" name="ActiveHidden" summary="Application is running but not visible to the user.">
+      <item value="2" name="ACTIVE_HIDDEN" summary="Application is running but not visible to the user.">
         <mandatoryConform/>
       </item>
-      <item value="3" name="ActiveVisibleNotFocus" summary="Application is running and visible, but is not the active target for input.">
+      <item value="3" name="ACTIVE_VISIBLE_NOT_FOCUS" summary="Application is running and visible, but is not the active target for input.">
         <mandatoryConform/>
       </item>
     </enum>
-    <struct name="ApplicationStruct">
+    <struct name="Application">
       <field id="0" name="CatalogVendorID" type="uint16">
         <mandatoryConform/>
       </field>
@@ -116,7 +116,7 @@ Davis, CA 95616, USA
       <quality persistence="fixed"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x0004" name="Application" type="ApplicationStruct">
+    <attribute id="0x0004" name="Application" type="Application">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>

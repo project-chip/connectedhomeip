@@ -67,17 +67,17 @@ Davis, CA 95616, USA
   <classification hierarchy="base" role="application" picsCode="TGTNAV" scope="Endpoint"/>
   <dataTypes>
     <enum name="StatusEnum">
-      <item value="0" name="Success" summary="Command succeeded">
+      <item value="0" name="SUCCESS" summary="Command succeeded">
         <mandatoryConform/>
       </item>
-      <item value="1" name="TargetNotFound" summary="Requested target was not found in the TargetList">
+      <item value="1" name="TARGET_NOT_FOUND" summary="Requested target was not found in the TargetList">
         <mandatoryConform/>
       </item>
-      <item value="2" name="NotAllowed" summary="Target request is not allowed in current state.">
+      <item value="2" name="NOT_ALLOWED" summary="Target request is not allowed in current state.">
         <mandatoryConform/>
       </item>
     </enum>
-    <struct name="TargetInfoStruct">
+    <struct name="TargetInfo">
       <field id="0" name="Identifier" type="uint8">
         <mandatoryConform/>
       </field>
@@ -88,7 +88,7 @@ Davis, CA 95616, USA
   </dataTypes>
   <attributes>
     <attribute id="0x0000" name="TargetList" type="list">
-      <entry type="TargetInfoStruct"/>
+      <entry type="TargetInfo"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>

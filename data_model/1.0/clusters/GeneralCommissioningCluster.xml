@@ -73,7 +73,7 @@ Davis, CA 95616, USA
       <item value="1" name="ValueOutsideRange" summary="Attempting to set regulatory configuration to a region or indoor/outdoor mode for which the server does not have proper configuration.">
         <mandatoryConform/>
       </item>
-      <item value="2" name="InvalidAuthentication" summary="Executed CommissioningComplete outside CASE session.">
+      <item value="2" name="InvalidAuthentication" summary="Executed CommissioningComplete outside CASE session">
         <mandatoryConform/>
       </item>
       <item value="3" name="NoFailSafe" summary="Executed CommissioningComplete when there was no active Fail-Safe context.">
@@ -94,7 +94,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
     </enum>
-    <struct name="BasicCommissioningInfo">
+    <struct name="BasicCommissioningInfoStruct">
       <field id="0" name="FailSafeExpiryLengthSeconds" type="uint16">
         <mandatoryConform/>
       </field>
@@ -111,7 +111,7 @@ Davis, CA 95616, USA
       <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0001" name="BasicCommissioningInfo" type="BasicCommissioningInfo">
+    <attribute id="0x0001" name="BasicCommissioningInfo" type="BasicCommissioningInfoStruct">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>

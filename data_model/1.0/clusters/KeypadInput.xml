@@ -78,13 +78,13 @@ Davis, CA 95616, USA
   </features>
   <dataTypes>
     <enum name="StatusEnum">
-      <item value="0" name="Success" summary="Command succeeded">
+      <item value="0" name="SUCCESS" summary="Command succeeded">
         <mandatoryConform/>
       </item>
-      <item value="1" name="UnsupportedKey" summary="Command failed: Key code is not supported.">
+      <item value="1" name="UNSUPPORTED_KEY" summary="Command failed: Key code is not supported.">
         <mandatoryConform/>
       </item>
-      <item value="2" name="InvalidKeyInCurrentState" summary="Command failed: Requested key code is invalid in the context of the responder&apos;s current state.">
+      <item value="2" name="INVALID_KEY_IN_CURRENT_STATE" summary="Command failed: Requested key code is invalid in the context of the responder&apos;s current state.">
         <mandatoryConform/>
       </item>
     </enum>

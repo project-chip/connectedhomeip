@@ -57,22 +57,22 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" name="Time Synchronization Cluster Clusters" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0038" name="TimeSync Cluster" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0038" name="Time Sync" picsCode="TIMESYNC"/>
+    <clusterId id="0x0038" name="TimeSync"/>
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="TIMESYNC" scope="Node"/>
   <features>
-    <feature bit="0" code="TZ" name="TimeZone" summary="Server supports time zone.">
+    <feature bit="0" code="TZ" name="Time Zone" summary="Server supports time zone.">
       <optionalConform/>
     </feature>
-    <feature bit="1" code="NTPC" name="NTPClient" summary="Server supports an NTP or SNTP client.">
+    <feature bit="1" code="NTPC" name="NTP Client" summary="Server supports an NTP or SNTP client.">
       <optionalConform/>
     </feature>
-    <feature bit="2" code="NTPS" name="NTPServer" summary="Server supports an NTP server role.">
+    <feature bit="2" code="NTPS" name="NTP Server" summary="Server supports an NTP server role.">
       <optionalConform/>
     </feature>
   </features>
@@ -147,7 +147,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
     </enum>
-    <struct name="DSTOffsetStruct">
+    <struct name="DstOffsetType">
       <field id="0" name="Offset" type="int32">
         <mandatoryConform/>
         <constraint>
@@ -161,7 +161,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </struct>
-    <struct name="TimeZoneStruct">
+    <struct name="TimeZoneType">
       <field id="0" name="Offset" type="int32">
         <mandatoryConform/>
         <constraint>
@@ -227,7 +227,7 @@ Davis, CA 95616, USA
       </constraint>
     </attribute>
     <attribute id="0x0005" name="TimeZone" type="list">
-      <entry type="TimeZoneStruct"/>
+      <entry type="TimeZoneType"/>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <mandatoryConform>
         <feature name="TZ"/>
@@ -239,8 +239,8 @@ Davis, CA 95616, USA
         </countBetween>
       </constraint>
     </attribute>
-    <attribute id="0x0006" name="DSTOffset" type="list" default="empty">
-      <entry type="DSTOffsetStruct"/>
+    <attribute id="0x0006" name="DstOffset" type="list" default="empty">
+      <entry type="DstOffsetType"/>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <mandatoryConform>
         <feature name="TZ"/>
@@ -293,19 +293,19 @@ Davis, CA 95616, USA
     </command>
   </commands>
   <events>
-    <event id="0x00" name="DSTTableEmpty" priority="info">
+    <event id="0x00" name="DstTableEmpty">
       <access readPrivilege="view"/>
       <mandatoryConform>
         <feature name="TZ"/>
       </mandatoryConform>
     </event>
-    <event id="0x01" name="DSTStatus" priority="info">
+    <event id="0x01" name="DstStatus">
       <access readPrivilege="view"/>
       <mandatoryConform>
         <feature name="TZ"/>
       </mandatoryConform>
     </event>
-    <event id="0x02" name="TimeZoneStatus" priority="info">
+    <event id="0x02" name="TimeZoneStatus">
       <access readPrivilege="view"/>
       <mandatoryConform>
         <feature name="TZ"/>

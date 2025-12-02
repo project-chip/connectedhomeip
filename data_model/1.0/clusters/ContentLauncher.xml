@@ -127,17 +127,17 @@ Davis, CA 95616, USA
       </item>
     </enum>
     <enum name="StatusEnum">
-      <item value="0" name="Success" summary="Command succeeded">
+      <item value="0" name="SUCCESS" summary="Command succeeded">
         <mandatoryConform/>
       </item>
-      <item value="1" name="URLNotAvailable" summary="Requested URL could not be reached by device.">
+      <item value="1" name="URL_NOT_AVAILABLE" summary="Requested URL could not be reached by device.">
         <mandatoryConform/>
       </item>
-      <item value="2" name="AuthFailed" summary="Requested URL returned 401 error code.">
+      <item value="2" name="AUTH_FAILED" summary="Requested URL returned 401 error code.">
         <mandatoryConform/>
       </item>
     </enum>
-    <struct name="AdditionalInfoStruct">
+    <struct name="AdditionalInfo">
       <field id="0" name="Name" type="string">
         <mandatoryConform/>
         <constraint>
@@ -151,36 +151,36 @@ Davis, CA 95616, USA
         </constraint>
       </field>
     </struct>
-    <struct name="BrandingInformationStruct">
+    <struct name="BrandingInformation">
       <field id="0" name="ProviderName" type="string">
         <mandatoryConform/>
         <constraint>
           <maxLength value="256"/>
         </constraint>
       </field>
-      <field id="1" name="Background" type="StyleInformationStruct" default="MS">
+      <field id="1" name="Background" type="StyleInformation" default="MS">
         <optionalConform/>
       </field>
-      <field id="2" name="Logo" type="StyleInformationStruct" default="MS">
+      <field id="2" name="Logo" type="StyleInformation" default="MS">
         <optionalConform/>
       </field>
-      <field id="3" name="ProgressBar" type="StyleInformationStruct" default="MS">
+      <field id="3" name="ProgressBar" type="StyleInformation" default="MS">
         <optionalConform/>
       </field>
-      <field id="4" name="Splash" type="StyleInformationStruct" default="MS">
+      <field id="4" name="Splash" type="StyleInformation" default="MS">
         <optionalConform/>
       </field>
-      <field id="5" name="WaterMark" type="StyleInformationStruct" default="MS">
+      <field id="5" name="WaterMark" type="StyleInformation" default="MS">
         <optionalConform/>
       </field>
     </struct>
-    <struct name="ContentSearchStruct">
+    <struct name="ContentSearch">
       <field id="0" name="ParameterList" type="list" default="0">
-        <entry type="ParameterStruct"/>
+        <entry type="Parameter"/>
         <mandatoryConform/>
       </field>
     </struct>
-    <struct name="DimensionStruct">
+    <struct name="Dimension">
       <field id="0" name="Width" type="double" default="MS">
         <mandatoryConform/>
       </field>
@@ -191,7 +191,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </struct>
-    <struct name="ParameterStruct">
+    <struct name="Parameter">
       <field id="0" name="Type" type="ParameterEnum">
         <mandatoryConform/>
       </field>
@@ -202,12 +202,12 @@ Davis, CA 95616, USA
         </constraint>
       </field>
       <field id="2" name="ExternalIDList" type="list" default="empty">
-        <entry type="AdditionalInfoStruct"/>
+        <entry type="AdditionalInfo"/>
         <optionalConform/>
       </field>
     </struct>
-    <struct name="StyleInformationStruct">
-      <field id="0" name="ImageURL" type="string" default="MS">
+    <struct name="StyleInformation">
+      <field id="0" name="ImageUrl" type="string" default="MS">
         <optionalConform/>
         <constraint>
           <maxLength value="8192"/>
@@ -222,7 +222,7 @@ Davis, CA 95616, USA
           <allowed value="9"/>
         </constraint>
       </field>
-      <field id="2" name="Size" type="DimensionStruct" default="MS">
+      <field id="2" name="Size" type="Dimension" default="MS">
         <optionalConform/>
       </field>
     </struct>
@@ -257,7 +257,7 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="CS"/>
       </mandatoryConform>
-      <field id="0" name="Search" type="ContentSearchStruct">
+      <field id="0" name="Search" type="ContentSearch">
         <mandatoryConform/>
         <constraint>
           <desc/>
@@ -284,7 +284,7 @@ Davis, CA 95616, USA
       <field id="1" name="DisplayString" type="string" default="MS">
         <optionalConform/>
       </field>
-      <field id="2" name="BrandingInformation" type="BrandingInformationStruct" default="MS">
+      <field id="2" name="BrandingInformation" type="BrandingInformation" default="MS">
         <optionalConform/>
       </field>
     </command>

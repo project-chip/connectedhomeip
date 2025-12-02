@@ -64,7 +64,7 @@ Davis, CA 95616, USA
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <clusters>
-    <cluster id="0x0050" name="Mode Select" side="server">
+    <cluster id="0x0050" name="Generic Mode Select" side="server">
       <mandatoryConform/>
     </cluster>
   </clusters>

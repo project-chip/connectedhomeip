@@ -57,119 +57,77 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0200" name="Pump Configuration and Control Cluster" revision="4">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0200" name="Pump Configuration and Control Cluster" revision="3">
   <revisionHistory>
-    <revision revision="1" summary="Mandatory global ClusterRevision attribute added"/>
+    <revision revision="1" summary="mandatory global ClusterRevision attribute added"/>
     <revision revision="2" summary="All Hubs changes"/>
     <revision revision="3" summary="New data model format and notation, added additional events"/>
-    <revision revision="4" summary="Added feature map"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0200" name="Pump Configuration and Control"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="PCC" scope="Endpoint"/>
-  <features>
-    <feature bit="0" code="PRSCONST" name="ConstantPressure" summary="Supports operating in constant pressure mode">
-      <optionalConform choice="a" more="true" min="1"/>
-    </feature>
-    <feature bit="1" code="PRSCOMP" name="CompensatedPressure" summary="Supports operating in compensated pressure mode">
-      <optionalConform choice="a" more="true" min="1"/>
-    </feature>
-    <feature bit="2" code="FLW" name="ConstantFlow" summary="Supports operating in constant flow mode">
-      <optionalConform choice="a" more="true" min="1"/>
-    </feature>
-    <feature bit="3" code="SPD" name="ConstantSpeed" summary="Supports operating in constant speed mode">
-      <optionalConform choice="a" more="true" min="1"/>
-    </feature>
-    <feature bit="4" code="TEMP" name="ConstantTemperature" summary="Supports operating in constant temperature mode">
-      <optionalConform choice="a" more="true" min="1"/>
-    </feature>
-    <feature bit="5" code="AUTO" name="Automatic" summary="Supports operating in automatic mode">
-      <optionalConform/>
-    </feature>
-    <feature bit="6" code="LOCAL" name="LocalOperation" summary="Supports operating using local settings">
-      <optionalConform/>
-    </feature>
-  </features>
   <dataTypes>
-    <enum name="ControlModeEnum">
-      <item value="0" name="ConstantSpeed" summary="The pump is running at a constant speed.">
-        <mandatoryConform>
-          <feature name="SPD"/>
-        </mandatoryConform>
+    <enum name="ControlModeAttribute">
+      <item value="0" name="ConstantSpeed" summary="The pump is running at a constant speed. The setpoint is interpreted as a percentage of the range derived from the [MinConstSpeed – MaxConstSpeed] attributes.">
+        <mandatoryConform/>
       </item>
-      <item value="1" name="ConstantPressure" summary="The pump will regulate its speed to maintain a constant differential pressure over its flanges.">
-        <mandatoryConform>
-          <feature name="PRSCONST"/>
-        </mandatoryConform>
+      <item value="1" name="ConstantPressure" summary="The pump will regulate its speed to maintain a constant differential pressure over its flanges. The setpoint is interpreted as a percentage of the range of the sensor used for this control mode. In case of the internal pressure sensor, this will be the range derived from the [MinConstPressure – MaxConstPressure] attributes. In case of a remote pressure sensor, this will be the range derived from the [MinMeasuredValue – MaxMeasuredValue] attributes of the remote pressure sensor.">
+        <mandatoryConform/>
       </item>
-      <item value="2" name="ProportionalPressure" summary="The pump will regulate its speed to maintain a constant differential pressure over its flanges.">
-        <mandatoryConform>
-          <feature name="PRSCOMP"/>
-        </mandatoryConform>
+      <item value="2" name="ProportionalPressure" summary="The pump will regulate its speed to maintain a constant differential pressure over its flanges. The setpoint is interpreted as a percentage of the range derived of the [MinCompPressure – MaxCompPressure] attributes. The internal setpoint will be lowered (compensated) dependent on the flow in the pump (lower flow =&gt; lower internal setpoint)">
+        <mandatoryConform/>
       </item>
-      <item value="3" name="ConstantFlow" summary="The pump will regulate its speed to maintain a constant flow through the pump.">
-        <mandatoryConform>
-          <feature name="FLW"/>
-        </mandatoryConform>
+      <item value="3" name="ConstantFlow" summary="The pump will regulate its speed to maintain a constant flow through the pump. The setpoint is interpreted as a percentage of the range of the sensor used for this control mode. In case of the internal flow sensor, this will be the range derived from the [MinConstFlow – MaxConstFlow] attributes. In case of a remote flow sensor, this will be the range derived from the [MinMeasuredValue – MaxMeasuredValue] attributes of the remote flow sensor.">
+        <mandatoryConform/>
       </item>
-      <item value="5" name="ConstantTemperature" summary="The pump will regulate its speed to maintain a constant temperature.">
-        <mandatoryConform>
-          <feature name="TEMP"/>
-        </mandatoryConform>
+      <item value="5" name="ConstantTemperature" summary="The pump will regulate its speed to maintain a constant temperature. The setpoint is interpreted as a percentage of the range of the sensor used for this control mode. In case of the internal temperature sensor, this will be the range derived from the [MinConstTemp – MaxConstTemp] attributes. In case of a remote temperature sensor, this will be the range derived from the [MinMeasuredValue – MaxMeasuredValue] attributes of the remote temperature sensor.">
+        <mandatoryConform/>
       </item>
-      <item value="7" name="Automatic" summary="The operation of the pump is automatically optimized to provide the most suitable performance with respect to comfort and energy savings.">
-        <mandatoryConform>
-          <feature name="AUTO"/>
-        </mandatoryConform>
+      <item value="7" name="Automatic" summary="The operation of the pump is automatically optimized to provide the most suitable performance with respect to comfort and energy savings. This behavior is manufacturer defined. The pump can be stopped by setting the setpoint of the level control cluster to 0, or by using the On/Off cluster. If the pump is started (at any setpoint), the speed of the pump is entirely determined by the pump.">
+        <mandatoryConform/>
       </item>
     </enum>
-    <enum name="OperationModeEnum">
-      <item value="0" name="Normal" summary="The pump is controlled by a setpoint, as defined by a connected remote sensor or by the ControlMode attribute.">
+    <enum name="OperationModeAttribute">
+      <item value="0" name="Normal" summary="The pump is controlled by a setpoint, as defined by a connected remote sensor or by the ControlMode attribute. (N.B. The setpoint is an internal variable which MAY be controlled between 0% and 100%, e.g., by means of the Level Control cluster)">
         <mandatoryConform/>
       </item>
-      <item value="1" name="Minimum" summary="This value sets the pump to run at the minimum possible speed it can without being stopped.">
-        <mandatoryConform>
-          <feature name="SPD"/>
-        </mandatoryConform>
+      <item value="1" name="Minimum" summary="This value sets the pump to run at the minimum possible speed it can without being stopped">
+        <mandatoryConform/>
       </item>
-      <item value="2" name="Maximum" summary="This value sets the pump to run at its maximum possible speed.">
-        <mandatoryConform>
-          <feature name="SPD"/>
-        </mandatoryConform>
+      <item value="2" name="Maximum" summary="This value sets the pump to run at its maximum possible speed">
+        <mandatoryConform/>
       </item>
-      <item value="3" name="Local" summary="This value sets the pump to run with the local settings of the pump, regardless of what these are.">
-        <mandatoryConform>
-          <feature name="LOCAL"/>
-        </mandatoryConform>
+      <item value="3" name="Local" summary="This value sets the pump to run with the local settings of the pump, regardless of what these are">
+        <mandatoryConform/>
       </item>
     </enum>
-    <bitmap name="PumpStatusBitmap">
-      <bitfield name="DeviceFault" bit="0" summary="A fault related to the system or pump device is detected.">
+    <bitmap name="PumpStatusAttribute">
+      <bitfield name="DeviceFault" bit="0" summary="A fault related to the system or pump device is detected (Corresponds to an Event ID in the range 6-16, see Events)">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="SupplyFault" bit="1" summary="A fault related to the supply to the pump is detected.">
+      <bitfield name="SupplyFault" bit="1" summary="A fault related to the supply to the pump is detected (Corresponds to an Event code in the range 0-5 or 13, see Events)">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="SpeedLow" bit="2" summary="Setpoint is too low to achieve.">
+      <bitfield name="SpeedLow" bit="2" summary="Setpoint is too low to achieve">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="SpeedHigh" bit="3" summary="Setpoint is too high to achieve.">
+      <bitfield name="SpeedHigh" bit="3" summary="Setpoint is too high to achieve">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="LocalOverride" bit="4" summary="Device control is overridden by hardware, such as an external STOP button or via a local HMI.">
+      <bitfield name="LocalOverride" bit="4" summary="Device control is overridden by hardware, such as an external STOP button or via a local HMI. While LocalOverride is set, the EffectiveOperationMode is adjusted to Local. Any request changing OperationMode SHALL generate a FAILURE error status until LocalOverride is cleared on the physical device. When LocalOverride is cleared, the device SHALL return to the operation mode set in OperationMode.">
         <mandatoryConform/>
       </bitfield>
       <bitfield name="Running" bit="5" summary="Pump is currently running">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="RemotePressure" bit="6" summary="A remote pressure sensor is used as the sensor for the regulation of the pump.">
+      <bitfield name="RemotePressure" bit="6" summary="A remote pressure sensor is used as the sensor for the regulation of the pump. EffectiveControlMode is ConstantPressure, and the setpoint for the pump is interpreted as a percentage of the range of the remote sensor ([MinMeasuredValue – MaxMeasuredValue])">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="RemoteFlow" bit="7" summary="A remote flow sensor is used as the sensor for the regulation of the pump.">
+      <bitfield name="RemoteFlow" bit="7" summary="A remote flow sensor is used as the sensor for the regulation of the pump. EffectiveControlMode is ConstantFlow, and the setpoint for the pump is interpreted as a percentage of the range of the remote sensor ([MinMeasuredValue – MaxMeasuredValue])">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="RemoteTemperature" bit="8" summary="A remote temperature sensor is used as the sensor for the regulation of the pump.">
+      <bitfield name="RemoteTemperature" bit="8" summary="A remote temperature sensor is used as the sensor for the regulation of the pump. EffectiveControlMode is ConstantTemperature, and setpoint is interpreted as a percentage of the range of the remote sensor ([MinMeasuredValue – MaxMeasuredValue])">
         <mandatoryConform/>
       </bitfield>
     </bitmap>
@@ -193,201 +151,52 @@ Davis, CA 95616, USA
     <attribute id="0x0003" name="MinConstPressure" type="int16" default="null">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" persistence="fixed"/>
-      <otherwiseConform>
-        <mandatoryConform>
-          <feature name="PRSCONST"/>
-        </mandatoryConform>
-        <optionalConform>
-          <feature name="AUTO"/>
-        </optionalConform>
-      </otherwiseConform>
+      <optionalConform/>
     </attribute>
     <attribute id="0x0004" name="MaxConstPressure" type="int16" default="null">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" persistence="fixed"/>
-      <otherwiseConform>
-        <mandatoryConform>
-          <feature name="PRSCONST"/>
-        </mandatoryConform>
-        <optionalConform>
-          <feature name="AUTO"/>
-        </optionalConform>
-      </otherwiseConform>
+      <optionalConform/>
     </attribute>
     <attribute id="0x0005" name="MinCompPressure" type="int16" default="null">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" persistence="fixed"/>
-      <otherwiseConform>
-        <mandatoryConform>
-          <feature name="PRSCOMP"/>
-        </mandatoryConform>
-        <optionalConform>
-          <feature name="AUTO"/>
-        </optionalConform>
-      </otherwiseConform>
+      <optionalConform/>
     </attribute>
     <attribute id="0x0006" name="MaxCompPressure" type="int16" default="null">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" persistence="fixed"/>
-      <otherwiseConform>
-        <mandatoryConform>
-          <feature name="PRSCOMP"/>
-        </mandatoryConform>
-        <optionalConform>
-          <feature name="AUTO"/>
-        </optionalConform>
-      </otherwiseConform>
+      <optionalConform/>
     </attribute>
     <attribute id="0x0007" name="MinConstSpeed" type="uint16" default="null">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" persistence="fixed"/>
-      <otherwiseConform>
-        <mandatoryConform>
-          <feature name="SPD"/>
-        </mandatoryConform>
-        <optionalConform>
-          <feature name="AUTO"/>
-        </optionalConform>
-      </otherwiseConform>
+      <optionalConform/>
     </attribute>
     <attribute id="0x0008" name="MaxConstSpeed" type="uint16" default="null">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" persistence="fixed"/>
-      <otherwiseConform>
-        <mandatoryConform>
-          <feature name="SPD"/>
-        </mandatoryConform>
-        <optionalConform>
-          <feature name="AUTO"/>
-        </optionalConform>
-      </otherwiseConform>
+      <optionalConform/>
     </attribute>
     <attribute id="0x0009" name="MinConstFlow" type="uint16" default="null">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" persistence="fixed"/>
-      <otherwiseConform>
-        <mandatoryConform>
-          <feature name="FLW"/>
-        </mandatoryConform>
-        <optionalConform>
-          <feature name="AUTO"/>
-        </optionalConform>
-      </otherwiseConform>
+      <optionalConform/>
     </attribute>
     <attribute id="0x000A" name="MaxConstFlow" type="uint16" default="null">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" persistence="fixed"/>
-      <otherwiseConform>
-        <mandatoryConform>
-          <feature name="FLW"/>
-        </mandatoryConform>
-        <optionalConform>
-          <feature name="AUTO"/>
-        </optionalConform>
-      </otherwiseConform>
+      <optionalConform/>
     </attribute>
     <attribute id="0x000B" name="MinConstTemp" type="int16" default="null">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" persistence="fixed"/>
-      <otherwiseConform>
-        <mandatoryConform>
-          <feature name="TEMP"/>
-        </mandatoryConform>
-        <optionalConform>
-          <feature name="AUTO"/>
-        </optionalConform>
-      </otherwiseConform>
-      <constraint>
-        <min value="-27315"/>
-      </constraint>
+      <optionalConform/>
     </attribute>
     <attribute id="0x000C" name="MaxConstTemp" type="int16" default="null">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" persistence="fixed"/>
-      <otherwiseConform>
-        <mandatoryConform>
-          <feature name="TEMP"/>
-        </mandatoryConform>
-        <optionalConform>
-          <feature name="AUTO"/>
-        </optionalConform>
-      </otherwiseConform>
-      <constraint>
-        <min value="-27315"/>
-      </constraint>
-    </attribute>
-    <attribute id="0x0010" name="PumpStatus" type="PumpStatusBitmap" default="0">
-      <access read="true" readPrivilege="view"/>
-      <quality reportable="true"/>
       <optionalConform/>
-      <constraint>
-        <desc/>
-      </constraint>
-    </attribute>
-    <attribute id="0x0011" name="EffectiveOperationMode" type="OperationModeEnum" default="desc">
-      <access read="true" readPrivilege="view"/>
-      <quality persistence="nonVolatile"/>
-      <mandatoryConform/>
-      <constraint>
-        <desc/>
-      </constraint>
-    </attribute>
-    <attribute id="0x0012" name="EffectiveControlMode" type="ControlModeEnum" default="desc">
-      <access read="true" readPrivilege="view"/>
-      <quality persistence="nonVolatile"/>
-      <mandatoryConform/>
-      <constraint>
-        <desc/>
-      </constraint>
-    </attribute>
-    <attribute id="0x0013" name="Capacity" type="int16" default="null">
-      <access read="true" readPrivilege="view"/>
-      <quality nullable="true" reportable="true"/>
-      <mandatoryConform/>
-    </attribute>
-    <attribute id="0x0014" name="Speed" type="uint16" default="null">
-      <access read="true" readPrivilege="view"/>
-      <quality nullable="true"/>
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x0015" name="LifetimeRunningHours" type="uint24" default="0">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality nullable="true" persistence="nonVolatile"/>
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x0016" name="Power" type="uint24" default="null">
-      <access read="true" readPrivilege="view"/>
-      <quality nullable="true"/>
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x0017" name="LifetimeEnergyConsumed" type="uint32" default="0">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality nullable="true" persistence="nonVolatile"/>
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x0020" name="OperationMode" type="OperationModeEnum" default="0">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality persistence="nonVolatile"/>
-      <mandatoryConform/>
-      <constraint>
-        <desc/>
-      </constraint>
-    </attribute>
-    <attribute id="0x0021" name="ControlMode" type="ControlModeEnum" default="0">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality persistence="nonVolatile"/>
-      <optionalConform/>
-      <constraint>
-        <desc/>
-      </constraint>
-    </attribute>
-    <attribute id="0x0022" name="AlarmMask" type="map16" default="0">
-      <access read="true" readPrivilege="view"/>
-      <quality persistence="nonVolatile"/>
-      <deprecateConform/>
-      <constraint>
-        <desc/>
-      </constraint>
     </attribute>
   </attributes>
   <events>

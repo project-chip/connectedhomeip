@@ -57,12 +57,12 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x002D" name="Unit Localization Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x002D" name="UnitLocalization Cluster" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x002D" name="Unit Localization"/>
+    <clusterId id="0x002D" name="UnitLocalization"/>
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="LUNIT" scope="Node"/>
   <features>
@@ -71,7 +71,7 @@ Davis, CA 95616, USA
     </feature>
   </features>
   <dataTypes>
-    <enum name="TempUnitEnum">
+    <enum name="TempUnit">
       <item value="0" name="Fahrenheit" summary="Temperature conveyed in Fahrenheit">
         <mandatoryConform/>
       </item>
@@ -84,7 +84,7 @@ Davis, CA 95616, USA
     </enum>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="TemperatureUnit" type="TempUnitEnum" default="null">
+    <attribute id="0x0000" name="TemperatureUnit" type="TempUnit" default="null">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality nullable="true" persistence="nonVolatile"/>
       <mandatoryConform>

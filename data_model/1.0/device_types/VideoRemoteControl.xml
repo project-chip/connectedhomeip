@@ -97,7 +97,7 @@ Davis, CA 95616, USA
     <cluster id="0x050B" name="Audio Output" side="client">
       <optionalConform/>
     </cluster>
-    <cluster id="0x050C" name="Application Launcher" side="client">
+    <cluster id="0x050C" name="App Launcher" side="client">
       <optionalConform/>
     </cluster>
     <cluster id="0x050E" name="Account Login" side="client">

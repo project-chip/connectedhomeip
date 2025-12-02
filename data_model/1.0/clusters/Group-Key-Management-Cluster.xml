@@ -71,15 +71,15 @@ Davis, CA 95616, USA
     </feature>
   </features>
   <dataTypes>
-    <enum name="GroupKeyMulticastPolicyEnum">
-      <item value="0" name="PerGroupID" summary="Indicates filtering of multicast messages for a specific Group ID">
+    <enum name="GroupKeyMulticastPolicy">
+      <item value="0" name="PerGroupID" summary="The 16-bit Group Identifier of the Multicast Address SHALL be the Group ID of the group.">
         <mandatoryConform/>
       </item>
-      <item value="1" name="AllNodes" summary="Indicates not filtering of multicast messages">
+      <item value="1" name="AllNodes" summary="The 16-bit Group Identifier of the Multicast Address SHALL be 0xFFFF.">
         <mandatoryConform/>
       </item>
     </enum>
-    <enum name="GroupKeySecurityPolicyEnum">
+    <enum name="GroupKeySecurityPolicy">
       <item value="0" name="TrustFirst" summary="Message counter synchronization using trust-first">
         <mandatoryConform/>
       </item>
@@ -127,7 +127,7 @@ Davis, CA 95616, USA
       <field id="0" name="GroupKeySetID" type="uint16">
         <mandatoryConform/>
       </field>
-      <field id="1" name="GroupKeySecurityPolicy" type="GroupKeySecurityPolicyEnum">
+      <field id="1" name="GroupKeySecurityPolicy" type="enum8">
         <access fabricSensitive="true"/>
         <mandatoryConform/>
       </field>
@@ -170,7 +170,7 @@ Davis, CA 95616, USA
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
-      <field id="8" name="GroupKeyMulticastPolicy" type="GroupKeyMulticastPolicyEnum">
+      <field id="8" name="GroupKeyMulticastPolicy" type="enum8">
         <access fabricSensitive="true"/>
         <otherwiseConform>
           <provisionalConform/>

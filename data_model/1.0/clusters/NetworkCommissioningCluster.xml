@@ -66,14 +66,14 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="CNET" scope="Node"/>
   <features>
-    <feature bit="0" code="WI" name="WiFiNetworkInterface" summary="Wi-Fi related features">
-      <optionalConform choice="a"/>
+    <feature bit="0" code="WI" name="Wi-Fi network interface" summary="Wi-Fi related features">
+      <optionalConform/>
     </feature>
-    <feature bit="1" code="TH" name="ThreadNetworkInterface" summary="Thread related features">
-      <optionalConform choice="a"/>
+    <feature bit="1" code="TH" name="Thread network interface" summary="Thread related features">
+      <optionalConform/>
     </feature>
-    <feature bit="2" code="ET" name="EthernetNetworkInterface" summary="Ethernet related features">
-      <optionalConform choice="a"/>
+    <feature bit="2" code="ET" name="Ethernet network interface" summary="Ethernet related features">
+      <optionalConform/>
     </feature>
   </features>
   <dataTypes>
@@ -118,41 +118,25 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
     </enum>
-    <enum name="WiFiBandEnum">
-      <item value="0" name="2G4" summary="2.4GHz - 2.401GHz to 2.495GHz (802.11b/g/n/ax)">
-        <optionalConform choice="a" more="true" min="1"/>
-      </item>
-      <item value="1" name="3G65" summary="3.65GHz - 3.655GHz to 3.695GHz (802.11y)">
-        <optionalConform choice="a" more="true" min="1"/>
-      </item>
-      <item value="2" name="5G" summary="5GHz - 5.150GHz to 5.895GHz (802.11a/n/ac/ax)">
-        <optionalConform choice="a" more="true" min="1"/>
-      </item>
-      <item value="3" name="6G" summary="6GHz - 5.925GHz to 7.125GHz (802.11ax / WiFi 6E)">
-        <optionalConform choice="a" more="true" min="1"/>
-      </item>
-      <item value="4" name="60G" summary="60GHz - 57.24GHz to 70.20GHz (802.11ad/ay)">
-        <optionalConform choice="a" more="true" min="1"/>
-      </item>
-    </enum>
+    <enum name="WiFiBandEnum"/>
     <bitmap name="WiFiSecurityBitmap">
-      <bitfield name="Unencrypted" bit="0" summary="Supports unencrypted Wi-Fi">
+      <bitfield name="Unencrypted" bit="0" summary="Unencrypted">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="WEP" bit="1" summary="Supports Wi-Fi using WEP security">
+      <bitfield name="WEP" bit="1" summary="WEP">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="WPA-PERSONAL" bit="2" summary="Supports Wi-Fi using WPA-Personal security">
+      <bitfield name="WPAPERSONAL" bit="2" summary="WPA-PERSONAL">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="WPA2-PERSONAL" bit="3" summary="Supports Wi-Fi using WPA2-Personal security">
+      <bitfield name="WpA2PERSONAL" bit="3" summary="WPA2-PERSONAL">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="WPA3-PERSONAL" bit="4" summary="Supports Wi-Fi using WPA3-Personal security">
+      <bitfield name="WpA3PERSONAL" bit="4" summary="WPA3-PERSONAL">
         <mandatoryConform/>
       </bitfield>
     </bitmap>
-    <struct name="NetworkInfoStruct">
+    <struct name="NetworkInfoStructure">
       <field id="0" name="NetworkID" type="octstr">
         <mandatoryConform/>
         <constraint>
@@ -166,7 +150,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </struct>
-    <struct name="ThreadInterfaceScanResultStruct">
+    <struct name="ThreadInterfaceScanResultStructure">
       <field id="0" name="PanId" type="uint16">
         <mandatoryConform>
           <feature name="TH"/>
@@ -226,7 +210,7 @@ Davis, CA 95616, USA
         </mandatoryConform>
       </field>
     </struct>
-    <struct name="WiFiInterfaceScanResultStruct">
+    <struct name="WiFiInterfaceScanResultStructure">
       <field id="0" name="Security" type="WiFiSecurityBitmap">
         <mandatoryConform>
           <feature name="WI"/>
@@ -275,7 +259,7 @@ Davis, CA 95616, USA
       </constraint>
     </attribute>
     <attribute id="0x0001" name="Networks" type="list" default="empty">
-      <entry type="NetworkInfoStruct"/>
+      <entry type="NetworkInfoStructure"/>
       <access read="true" readPrivilege="admin"/>
       <mandatoryConform/>
       <constraint>
@@ -382,7 +366,7 @@ Davis, CA 95616, USA
         </constraint>
       </field>
       <field id="2" name="WiFiScanResults" type="list">
-        <entry type="WiFiInterfaceScanResultStruct"/>
+        <entry type="WiFiInterfaceScanResultStructure"/>
         <mandatoryConform>
           <feature name="WI"/>
         </mandatoryConform>
@@ -391,7 +375,7 @@ Davis, CA 95616, USA
         </constraint>
       </field>
       <field id="3" name="ThreadScanResults" type="list">
-        <entry type="ThreadInterfaceScanResultStruct"/>
+        <entry type="ThreadInterfaceScanResultStructure"/>
         <mandatoryConform>
           <feature name="TH"/>
         </mandatoryConform>

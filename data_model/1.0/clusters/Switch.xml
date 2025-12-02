@@ -67,10 +67,18 @@ Davis, CA 95616, USA
   <classification hierarchy="base" role="application" picsCode="SWTCH" scope="Endpoint"/>
   <features>
     <feature bit="0" code="LS" name="Latching Switch">
-      <optionalConform choice="a"/>
+      <mandatoryConform>
+        <notTerm>
+          <feature name="MS"/>
+        </notTerm>
+      </mandatoryConform>
     </feature>
     <feature bit="1" code="MS" name="Momentary Switch">
-      <optionalConform choice="a"/>
+      <mandatoryConform>
+        <notTerm>
+          <feature name="LS"/>
+        </notTerm>
+      </mandatoryConform>
     </feature>
     <feature bit="2" code="MSR" name="Momentary Switch Release">
       <optionalConform>

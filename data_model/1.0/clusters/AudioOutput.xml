@@ -78,20 +78,20 @@ Davis, CA 95616, USA
       <item value="1" name="BT">
         <mandatoryConform/>
       </item>
-      <item value="2" name="Optical">
+      <item value="2" name="OPTICAL">
         <mandatoryConform/>
       </item>
-      <item value="3" name="Headphone">
+      <item value="3" name="HEADPHONE">
         <mandatoryConform/>
       </item>
-      <item value="4" name="Internal">
+      <item value="4" name="INTERNAL">
         <mandatoryConform/>
       </item>
-      <item value="5" name="Other">
+      <item value="5" name="OTHER">
         <mandatoryConform/>
       </item>
     </enum>
-    <struct name="OutputInfoStruct">
+    <struct name="OutputInfo">
       <field id="0" name="Index" type="uint8">
         <mandatoryConform/>
       </field>
@@ -108,7 +108,7 @@ Davis, CA 95616, USA
   </dataTypes>
   <attributes>
     <attribute id="0x0000" name="OutputList" type="list">
-      <entry type="OutputInfoStruct"/>
+      <entry type="OutputInfo"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>

@@ -57,12 +57,12 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0037" name="Ethernet Network Diagnostics Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0037" name="EthernetNetworkDiagnostics Cluster" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0037" name="Ethernet Network Diagnostics"/>
+    <clusterId id="0x0037" name="EthernetNetworkDiagnostics"/>
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="DGETH" scope="Node"/>
   <features>

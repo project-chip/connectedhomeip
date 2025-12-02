@@ -75,19 +75,19 @@ Davis, CA 95616, USA
       <quality singleton="true"/>
       <mandatoryConform/>
     </cluster>
-    <cluster id="0x002B" name="Localization Configuration" side="server">
+    <cluster id="0x002B" name="LocalizationConfiguration" side="server">
       <quality singleton="true"/>
       <mandatoryConform>
         <condition name="LanguageLocale"/>
       </mandatoryConform>
     </cluster>
-    <cluster id="0x002C" name="Time Format Localization" side="server">
+    <cluster id="0x002C" name="TimeFormatLocalization" side="server">
       <quality singleton="true"/>
       <mandatoryConform>
         <condition name="TimeLocale"/>
       </mandatoryConform>
     </cluster>
-    <cluster id="0x002D" name="Unit Localization" side="server">
+    <cluster id="0x002D" name="UnitLocalization" side="server">
       <quality singleton="true"/>
       <mandatoryConform>
         <condition name="UnitLocale"/>
@@ -112,33 +112,33 @@ Davis, CA 95616, USA
       <quality singleton="true"/>
       <optionalConform/>
     </cluster>
-    <cluster id="0x0033" name="General Diagnostics" side="server">
+    <cluster id="0x0033" name="GeneralDiagnostics" side="server">
       <quality singleton="true"/>
       <mandatoryConform/>
     </cluster>
-    <cluster id="0x0034" name="Software Diagnostics" side="server">
+    <cluster id="0x0034" name="SoftwareDiagnostics" side="server">
       <quality singleton="true"/>
       <optionalConform/>
     </cluster>
-    <cluster id="0x0035" name="Thread Network Diagnostics" side="server">
+    <cluster id="0x0035" name="ThreadNetworkDiagnostics" side="server">
       <quality singleton="true"/>
       <optionalConform>
         <condition name="Thread"/>
       </optionalConform>
     </cluster>
-    <cluster id="0x0036" name="WiFi Network Diagnostics" side="server">
+    <cluster id="0x0036" name="WiFiNetworkDiagnostics" side="server">
       <quality singleton="true"/>
       <optionalConform>
         <condition name="Wi-Fi"/>
       </optionalConform>
     </cluster>
-    <cluster id="0x0037" name="Ethernet Network Diagnostics" side="server">
+    <cluster id="0x0037" name="EthernetNetworkDiagnostics" side="server">
       <quality singleton="true"/>
       <optionalConform>
         <condition name="Ethernet"/>
       </optionalConform>
     </cluster>
-    <cluster id="0x0038" name="Time Sync" side="server">
+    <cluster id="0x0038" name="TimeSync" side="server">
       <quality singleton="true"/>
       <otherwiseConform>
         <provisionalConform/>

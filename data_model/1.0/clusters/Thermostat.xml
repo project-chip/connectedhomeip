@@ -57,14 +57,13 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0201" name="Thermostat Cluster" revision="6">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0201" name="Thermostat Cluster" revision="5">
   <revisionHistory>
     <revision revision="1" summary="mandatory global ClusterRevision attribute added; fixed some defaults; CCB 1823, 1480"/>
     <revision revision="2" summary="CCB 1981 2186 2249 2250 2251; NFR Thermostat Setback"/>
     <revision revision="3" summary="CCB 2477 2560 2773 2777 2815 2816 3029"/>
     <revision revision="4" summary="All Hubs changes"/>
     <revision revision="5" summary="New data model format and notation, added FeatureMap, collapsed attribute sets, clarified edge cases around limits, default value of xxxSetpointLimit now respects AbsxxxSetpointLimit"/>
-    <revision revision="6" summary="Introduced the LTNE feature and adapted text (spec issue #5778)"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0201" name="Thermostat"/>
@@ -72,20 +71,14 @@ Davis, CA 95616, USA
   <classification hierarchy="base" role="application" picsCode="TSTAT" scope="Endpoint"/>
   <features>
     <feature bit="0" code="HEAT" name="Heating" summary="Thermostat is capable of managing a heating device">
-      <otherwiseConform>
-        <mandatoryConform>
-          <feature name="AUTO"/>
-        </mandatoryConform>
-        <optionalConform choice="a" more="true" min="1"/>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="AUTO"/>
+      </mandatoryConform>
     </feature>
     <feature bit="1" code="COOL" name="Cooling" summary="Thermostat is capable of managing a cooling device">
-      <otherwiseConform>
-        <mandatoryConform>
-          <feature name="AUTO"/>
-        </mandatoryConform>
-        <optionalConform choice="a" more="true" min="1"/>
-      </otherwiseConform>
+      <mandatoryConform>
+        <feature name="AUTO"/>
+      </mandatoryConform>
     </feature>
     <feature bit="2" code="OCC" name="Occupancy" summary="Supports Occupied and Unoccupied setpoints">
       <optionalConform/>
@@ -97,9 +90,6 @@ Davis, CA 95616, USA
       <optionalConform/>
     </feature>
     <feature bit="5" code="AUTO" name="Auto Mode" summary="Supports a System Mode of Auto">
-      <optionalConform/>
-    </feature>
-    <feature bit="6" code="LTNE" name="Local Temperature Not Exposed" summary="Thermostat does not expose the LocalTemperature Value in the LocalTemperature attribute">
       <optionalConform/>
     </feature>
   </features>
@@ -237,11 +227,7 @@ Davis, CA 95616, USA
     <attribute id="0x0010" name="LocalTemperatureCalibration" type="SignedTemperatureCX10tempS8Type" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
-      <optionalConform>
-        <notTerm>
-          <feature name="LTNE"/>
-        </notTerm>
-      </optionalConform>
+      <optionalConform/>
       <constraint>
         <between>
           <from value="0"/>
@@ -362,7 +348,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x001A" name="RemoteSensing" type="map8" default="0">
       <bitmap>
-        <bitfield name="LocalTemperature" bit="0" summary="When set, LocalTemperature Value is derived from a remote node">
+        <bitfield name="LocalTemperature" bit="0" summary="When set, LocalTemperature is derived from a remote node">
           <mandatoryConform/>
         </bitfield>
         <bitfield name="OutdoorTemperature" bit="1" summary="When set, OutdoorTemperature is derived from a remote node">

@@ -100,7 +100,7 @@ Davis, CA 95616, USA
     <cluster id="0x050B" name="Audio Output" side="server">
       <optionalConform/>
     </cluster>
-    <cluster id="0x050C" name="Application Launcher" side="server">
+    <cluster id="0x050C" name="App Launcher" side="server">
       <mandatoryConform>
         <condition name="ContentAppPlatform"/>
       </mandatoryConform>

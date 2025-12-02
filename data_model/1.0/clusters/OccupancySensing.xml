@@ -67,40 +67,8 @@ Davis, CA 95616, USA
     <clusterId id="0x0406" name="Occupancy Sensing"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="OCC" scope=""/>
-  <dataTypes>
-    <enum name="OccupancySensorTypeEnum">
-      <item value="0" name="PIR" summary="Indicates a passive infrared sensor.">
-        <mandatoryConform/>
-      </item>
-      <item value="1" name="Ultrasonic" summary="Indicates a ultrasonic sensor.">
-        <mandatoryConform/>
-      </item>
-      <item value="2" name="PIRAndUltrasonic" summary="Indicates a passive infrared and ultrasonic sensor.">
-        <mandatoryConform/>
-      </item>
-      <item value="3" name="PhysicalContact" summary="Indicates a physical contact sensor.">
-        <mandatoryConform/>
-      </item>
-    </enum>
-    <bitmap name="OccupancyBitmap">
-      <bitfield name="Occupied" bit="0" summary="Indicates the sensed occupancy state; 1 = occupied, 0 = unoccupied.">
-        <mandatoryConform/>
-      </bitfield>
-    </bitmap>
-    <bitmap name="OccupancySensorTypeBitmap">
-      <bitfield name="PIR" bit="0" summary="Indicates a passive infrared sensor.">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="Ultrasonic" bit="1" summary="Indicates a ultrasonic sensor.">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="PhysicalContact" bit="2" summary="Indicates a physical contact sensor.">
-        <mandatoryConform/>
-      </bitfield>
-    </bitmap>
-  </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="Occupancy" type="OccupancyBitmap">
+    <attribute id="0x0000" name="Occupancy" type="map8">
       <access read="true" readPrivilege="view"/>
       <quality reportable="true"/>
       <mandatoryConform/>
@@ -108,14 +76,39 @@ Davis, CA 95616, USA
         <max value="1"/>
       </constraint>
     </attribute>
-    <attribute id="0x0001" name="OccupancySensorType" type="OccupancySensorTypeEnum" default="MS">
+    <attribute id="0x0001" name="OccupancySensorType" type="enum8" default="MS">
+      <enum>
+        <item value="0" name="PIR" summary="PIR">
+          <mandatoryConform/>
+        </item>
+        <item value="1" name="Ultrasonic" summary="Ultrasonic">
+          <mandatoryConform/>
+        </item>
+        <item value="2" name="PirAndUltrasonic" summary="PIR and ultrasonic">
+          <mandatoryConform/>
+        </item>
+        <item value="3" name="PhysicalContact" summary="Physical contact">
+          <mandatoryConform/>
+        </item>
+      </enum>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
       <constraint>
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0002" name="OccupancySensorTypeBitmap" type="OccupancySensorTypeBitmap">
+    <attribute id="0x0002" name="OccupancySensorTypeBitmap" type="map8">
+      <bitmap>
+        <bitfield name="PIR" bit="0" summary="PIR">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="Ultrasonic" bit="1" summary="Ultrasonic">
+          <mandatoryConform/>
+        </bitfield>
+        <bitfield name="PhysicalContact" bit="2" summary="Physical contact">
+          <mandatoryConform/>
+        </bitfield>
+      </bitmap>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
       <constraint>

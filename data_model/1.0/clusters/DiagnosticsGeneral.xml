@@ -57,16 +57,16 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0033" name="General Diagnostics Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0033" name="GeneralDiagnostics Cluster" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0033" name="General Diagnostics"/>
+    <clusterId id="0x0033" name="GeneralDiagnostics"/>
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="DGGEN" scope="Node"/>
   <dataTypes>
-    <enum name="BootReasonEnum">
+    <enum name="BootReasonENUM">
       <item value="0" name="Unspecified" summary="The Node is unable to identify the Power-On reason as one of the other provided enumeration values.">
         <mandatoryConform/>
       </item>
@@ -125,19 +125,19 @@ Davis, CA 95616, USA
       </item>
     </enum>
     <enum name="InterfaceTypeEnum">
-      <item value="0" name="Unspecified" summary="Indicates an interface of an unspecified type.">
+      <item value="0" name="Unspecified" summary="SHALL be used to indicate an interface of an unspecified type.">
         <mandatoryConform/>
       </item>
-      <item value="1" name="WiFi" summary="Indicates a Wi-Fi interface.">
+      <item value="1" name="WiFi" summary="SHALL be used to indicate a Wi-Fi interface.">
         <optionalConform/>
       </item>
-      <item value="2" name="Ethernet" summary="Indicates a Ethernet interface.">
+      <item value="2" name="Ethernet" summary="SHALL be used to indicate a Ethernet interface.">
         <optionalConform/>
       </item>
-      <item value="3" name="Cellular" summary="Indicates a Cellular interface.">
+      <item value="3" name="Cellular" summary="SHALL be used to indicate a Cellular interface.">
         <optionalConform/>
       </item>
-      <item value="4" name="Thread" summary="Indicates a Thread interface.">
+      <item value="4" name="Thread" summary="SHALL be used to indicate a Thread interface.">
         <optionalConform/>
       </item>
     </enum>
@@ -178,7 +178,7 @@ Davis, CA 95616, USA
         <optionalConform/>
       </item>
     </enum>
-    <struct name="NetworkInterface">
+    <struct name="NetworkInterfaceStruct">
       <field id="0" name="Name" type="string">
         <mandatoryConform/>
         <constraint>
@@ -226,7 +226,7 @@ Davis, CA 95616, USA
   </dataTypes>
   <attributes>
     <attribute id="0x0000" name="NetworkInterfaces" type="list">
-      <entry type="NetworkInterface"/>
+      <entry type="NetworkInterfaceStruct"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
       <constraint>
@@ -248,7 +248,7 @@ Davis, CA 95616, USA
       <quality changeOmitted="true" persistence="nonVolatile"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x0004" name="BootReason" type="BootReasonEnum">
+    <attribute id="0x0004" name="BootReason" type="BootReasonENUM">
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
     </attribute>
@@ -354,7 +354,7 @@ Davis, CA 95616, USA
     <event id="0x03" name="BootReason" priority="critical">
       <access readPrivilege="view"/>
       <mandatoryConform/>
-      <field id="0" name="BootReason" type="BootReasonEnum">
+      <field id="0" name="BootReason" type="BootReason">
         <mandatoryConform/>
       </field>
     </event>
