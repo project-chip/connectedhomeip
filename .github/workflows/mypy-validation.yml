@@ -52,7 +52,7 @@ jobs:
         run: |
           set +e
 
-          OUTPUT=$(./scripts/run_in_python_env.sh out/venv "mypy --config-file=src/python_testing/matter_testing_infrastructure/mypy.ini --follow-imports=skip src/controller/python/matter/ChipDeviceCtrl.py" 2>&1)
+          OUTPUT=$(./scripts/run_in_python_env.sh out/venv "mypy --follow-imports=skip src/controller/python/matter/ChipDeviceCtrl.py" 2>&1)
           STATUS=$?
 
           echo "$OUTPUT"
@@ -73,9 +73,8 @@ jobs:
 
       - name: Run mypy validation (MatterJsonTlv.py)
         run: |
-          ./scripts/run_in_python_env.sh out/venv "mypy --config-file=src/python_testing/matter_testing_infrastructure/mypy.ini --follow-imports=skip \
+          ./scripts/run_in_python_env.sh out/venv "mypy --follow-imports=skip \
             src/controller/python/matter/MatterTlvJson.py"
-
 
       - name: Run mypy validation
         run: |
@@ -85,7 +84,7 @@ jobs:
           # TODO: Expand this list to include more files once they are mypy-compatible
           # Eventually we should just check all files in the chip/testing directory
 
-          ./scripts/run_in_python_env.sh out/venv "mypy --config-file=src/python_testing/matter_testing_infrastructure/mypy.ini \
+          ./scripts/run_in_python_env.sh out/venv "mypy \
             src/python_testing/matter_testing_infrastructure/matter/testing/apps.py \
             src/python_testing/matter_testing_infrastructure/matter/testing/tasks.py \
             src/python_testing/matter_testing_infrastructure/matter/testing/taglist_and_topology_test.py \
