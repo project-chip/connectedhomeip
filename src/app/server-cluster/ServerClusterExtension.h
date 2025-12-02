@@ -46,7 +46,7 @@ namespace chip::app {
 /// registry.Register(extension->Registration());
 /// ```
 ///
-/// An extension could be chained like `Extension2(path2, Extension1(path1 underlying))` if more than
+/// An extension could be chained like `Extension2(path2, Extension1(path1, underlying))` if more than
 /// one extension is desired.
 ///
 /// NOTES:
