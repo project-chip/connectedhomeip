@@ -228,7 +228,9 @@ public:
 
         ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
         chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), MATTER_ARRAY_SIZE(logStorageResources),
-                                                          gCircularEventBuffer, logStorageResources, &mEventCounter);
+                                                          gCircularEventBuffer, logStorageResources, &mEventCounter,
+                                                          &InteractionModelEngine::GetInstance()->GetReportingEngine(),
+                                                          CodegenDataModelProviderInstance(nullptr /* delegate */));
 
         Access::GetAccessControl().Finish();
         EXPECT_SUCCESS(Access::GetAccessControl().Init(GetTestAccessControlDelegate(), gDeviceTypeResolver));
@@ -260,10 +262,9 @@ TEST_F(TestAclEvent, TestReadRoundtripWithEventStatusIBInEventReport)
     Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
     // Shouldn't have anything in the retransmit table when starting the test.
     EXPECT_FALSE(rm->TestGetCountRetransTable());
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
 
     GenerateEvents();
-
-    auto * engine = chip::app::InteractionModelEngine::GetInstance();
 
     engine->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);

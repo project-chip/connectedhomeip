@@ -33,6 +33,7 @@
 #include <app/MessageDef/EventDataIB.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/data-model-provider/EventsGenerator.h>
+#include <app/data-model-provider/Provider.h>
 #include <app/util/basic-types.h>
 #include <lib/core/TLVCircularBuffer.h>
 #include <lib/support/CHIPCounter.h>
@@ -241,7 +242,8 @@ public:
     CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers,
                     CircularEventBuffer * apCircularEventBuffer, const LogStorageResources * const apLogStorageResources,
                     MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter,
-                    System::Clock::Milliseconds64 aMonotonicStartupTime, EventReporter * apEventReporter);
+                    System::Clock::Milliseconds64 aMonotonicStartupTime, EventReporter * apEventReporter,
+                    DataModel::Provider * apDataModelProvider);
 
     static EventManagement & GetInstance();
 
@@ -274,7 +276,8 @@ public:
     static void
     CreateEventManagement(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers,
                           CircularEventBuffer * apCircularEventBuffer, const LogStorageResources * const apLogStorageResources,
-                          MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter,
+                          MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter, EventReporter * apEventReporter,
+                          DataModel::Provider * apDataModelProvider,
                           System::Clock::Milliseconds64 aMonotonicStartupTime = System::SystemClock().GetMonotonicMilliseconds64());
 
     static void DestroyEventManagement();
@@ -374,6 +377,19 @@ public:
     CHIP_ERROR FabricRemoved(FabricIndex aFabricIndex);
 
     /**
+     * @brief Iterate all events and remove the events whose associated EventPath is invalid (DataModelProvider fails to provide
+     * the EventInfo for the EventPath).
+     *
+     * This API should be called when the endpoint/cluster structure changes, such that
+     * previously logged events may reference now-invalid paths. It ensures that the event
+     * log does not contain events with paths that are no longer valid in the current data model.
+     *
+     * @retval #CHIP_NO_ERROR on success
+     * @retval other CHIP_ERROR codes on failure
+     */
+    CHIP_ERROR RemoveEventsWithInvalidPath();
+
+    /**
      * @brief
      *   Fetch the most recently vended Number for a particular priority level
      *
@@ -396,6 +412,18 @@ public:
     CHIP_ERROR GenerateEvent(EventLoggingDelegate * eventPayloadWriter, const EventOptions & options,
                              EventNumber & generatedEventNumber) override;
     void ScheduleUrgentEventDeliverySync(std::optional<FabricIndex> fabricIndex = std::nullopt) override;
+
+    using EventFilterFunction = bool (*)(const ConcreteEventPath & eventPath);
+
+    /**
+     * @brief Filter Events from the inputEvent
+     *
+     * @param[out] outputEvents  The output events after filtering
+     * @param[in] inputEvents    The input events
+     * @param[in] filter         The filter function, if the event is excluded, the function will return false,
+     *                           otherwise it will return true.
+     */
+    static CHIP_ERROR FilterEvents(TLV::TLVWriter & outputEvents, const TLV::TLVReader & inputEvents, EventFilterFunction filter);
 
 private:
     static EventManagement sInstance;
@@ -532,6 +560,24 @@ private:
     static CHIP_ERROR CopyAndAdjustDeltaTime(const TLV::TLVReader & aReader, size_t aDepth, void * apContext);
 
     /**
+     * @brief Internal iterator function used to filter though event logs
+     */
+    static CHIP_ERROR FilterEventsCB(const TLV::TLVReader & aReader, size_t aDepth, void * apContext);
+
+    /**
+     * @brief Internal filter function to check whether the DataModelProvider can get the EventInfo for the EventPath
+     */
+    static bool CheckEventPath(const ConcreteEventPath & path)
+    {
+        if (GetInstance().mpDataModelProvider)
+        {
+            DataModel::EventEntry eventInfo;
+            return GetInstance().mpDataModelProvider->EventInfo(path, eventInfo) == CHIP_NO_ERROR;
+        }
+        return false;
+    }
+
+    /**
      * @brief checking if the tail's event can be moved to higher priority, if not, dropped, if yes, note how much space it
      * requires, and return.
      */
@@ -578,7 +624,8 @@ private:
 
     System::Clock::Milliseconds64 mMonotonicStartupTime{};
 
-    EventReporter * mpEventReporter = nullptr;
+    EventReporter * mpEventReporter           = nullptr;
+    DataModel::Provider * mpDataModelProvider = nullptr;
 };
 
 } // namespace app

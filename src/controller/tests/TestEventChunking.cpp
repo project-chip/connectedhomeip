@@ -88,7 +88,9 @@ protected:
         VerifyOrDieWithMsg((err = mEventCounter.Init(0)) == CHIP_NO_ERROR, AppServer,
                            "Init EventCounter failed: %" CHIP_ERROR_FORMAT, err.Format());
         chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), MATTER_ARRAY_SIZE(logStorageResources),
-                                                          gCircularEventBuffer, logStorageResources, &mEventCounter);
+                                                          gCircularEventBuffer, logStorageResources, &mEventCounter,
+                                                          &InteractionModelEngine::GetInstance()->GetReportingEngine(),
+                                                          CodegenDataModelProviderInstance(nullptr));
     }
 
     // Performs teardown for each test in the suite

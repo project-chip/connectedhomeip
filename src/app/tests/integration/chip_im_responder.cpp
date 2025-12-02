@@ -35,10 +35,12 @@
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/tests/MockReportScheduler.h>
 #include <app/tests/integration/common.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPCounter.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
@@ -128,6 +130,7 @@ uint8_t gCritEventBuffer[2048];
 chip::app::CircularEventBuffer gCircularEventBuffer[3];
 
 chip::MonotonicallyIncreasingCounter<chip::EventNumber> gEventCounter;
+chip::TestPersistentStorageDelegate gTestPersistentStorageDelegate;
 
 CHIP_ERROR InitializeEventLogging(chip::Messaging::ExchangeManager * apMgr)
 {
@@ -139,12 +142,19 @@ CHIP_ERROR InitializeEventLogging(chip::Messaging::ExchangeManager * apMgr)
         { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
     };
 
+    chip::app::InteractionModelEngine::GetInstance()->SetDataModelProvider(
+        chip::app::CodegenDataModelProviderInstance(&gTestPersistentStorageDelegate));
     chip::app::EventManagement::CreateEventManagement(apMgr, MATTER_ARRAY_SIZE(logStorageResources), gCircularEventBuffer,
-                                                      logStorageResources, &gEventCounter);
+                                                      logStorageResources, &gEventCounter,
+                                                      &chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine(),
+                                                      chip::app::CodegenDataModelProviderInstance(&gTestPersistentStorageDelegate));
     return CHIP_NO_ERROR;
 }
 
 } // namespace
+
+// Mock function for linking - provides stub implementation required by CodegenDataModelProviderInstance.
+void InitDataModelHandler() {}
 
 int main(int argc, char * argv[])
 {

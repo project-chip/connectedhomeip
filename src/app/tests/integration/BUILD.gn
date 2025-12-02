@@ -28,11 +28,12 @@ source_set("common") {
   deps = [
     "${chip_root}/src/credentials",
     "${chip_root}/src/crypto",
-    "${chip_root}/src/lib/support:testing",
     "${chip_root}/src/messaging",
     "${chip_root}/src/protocols",
     "${chip_root}/src/transport",
   ]
+
+  public_deps = [ "${chip_root}/src/lib/support:testing" ]
 }
 
 executable("chip-im-initiator") {

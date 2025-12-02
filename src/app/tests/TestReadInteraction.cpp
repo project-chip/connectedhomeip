@@ -506,8 +506,9 @@ public:
         AppContext::SetUp();
 
         ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
-        chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), MATTER_ARRAY_SIZE(logStorageResources),
-                                                          gCircularEventBuffer, logStorageResources, &mEventCounter);
+        chip::app::EventManagement::CreateEventManagement(
+            &GetExchangeManager(), MATTER_ARRAY_SIZE(logStorageResources), gCircularEventBuffer, logStorageResources,
+            &mEventCounter, &InteractionModelEngine::GetInstance()->GetReportingEngine(), &TestImCustomDataModel::Instance());
         mOldProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&TestImCustomDataModel::Instance());
         chip::Test::SetMockNodeConfig(TestMockNodeConfig());
         chip::Test::SetVersionTo(chip::Test::kTestDataVersion1);

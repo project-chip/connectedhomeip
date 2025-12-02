@@ -76,7 +76,9 @@ protected:
 
         ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
         chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), MATTER_ARRAY_SIZE(logStorageResources),
-                                                          gCircularEventBuffer, logStorageResources, &mEventCounter);
+                                                          gCircularEventBuffer, logStorageResources, &mEventCounter,
+                                                          &InteractionModelEngine::GetInstance()->GetReportingEngine(),
+                                                          CodegenDataModelProviderInstance(nullptr));
     }
 
     // Performs teardown for each test in the suite.  Run once for each test function.
