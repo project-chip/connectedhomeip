@@ -1498,11 +1498,19 @@ class ChipDeviceControllerBase():
 
         # The callback might have been received synchronously (during self._ChipStack.CallAsync()).
         # In that case the Future has already been set it will return immediately
-        if timeoutMs is not None:
-            timeout = float(timeoutMs) / 1000
-            await asyncio.wait_for(future, timeout=timeout)
-        else:
-            await future
+        try:
+            if timeoutMs is not None:
+                timeout = float(timeoutMs) / 1000
+                await asyncio.wait_for(future, timeout=timeout)
+            else:
+                await future
+        finally:
+            # Ensure we clean up the future if we stop waiting for it (e.g. timeout or cancellation).
+            # This signals to the callback that we are no longer interested in the result,
+            # preventing "Future exception was never retrieved" errors if the callback later
+            # tries to set an exception.
+            if not future.done():
+                future.cancel()
 
         return DeviceProxyWrapper(future.result(), DeviceProxyWrapper.DeviceProxyType.OPERATIONAL, self._dmLib)
 
