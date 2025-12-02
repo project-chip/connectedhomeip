@@ -18,6 +18,7 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -32,7 +33,7 @@ class CommodityTariffClusterTariffComponentStruct(
   val powerThreshold: Optional<CommodityTariffClusterPowerThresholdStruct>,
   val threshold: Long?,
   val label: Optional<String>?,
-  val predicted: Optional<Boolean>,
+  val predicted: Optional<Boolean>
 ) {
   override fun toString(): String = buildString {
     append("CommodityTariffClusterTariffComponentStruct {\n")
@@ -54,9 +55,9 @@ class CommodityTariffClusterTariffComponentStruct(
       put(ContextSpecificTag(TAG_TARIFF_COMPONENT_ID), tariffComponentID)
       if (price != null) {
         if (price.isPresent) {
-          val optprice = price.get()
-          optprice.toTlv(ContextSpecificTag(TAG_PRICE), this)
-        }
+        val optprice = price.get()
+        optprice.toTlv(ContextSpecificTag(TAG_PRICE), this)
+      }
       } else {
         putNull(ContextSpecificTag(TAG_PRICE))
       }
@@ -83,9 +84,9 @@ class CommodityTariffClusterTariffComponentStruct(
       }
       if (label != null) {
         if (label.isPresent) {
-          val optlabel = label.get()
-          put(ContextSpecificTag(TAG_LABEL), optlabel)
-        }
+        val optlabel = label.get()
+        put(ContextSpecificTag(TAG_LABEL), optlabel)
+      }
       } else {
         putNull(ContextSpecificTag(TAG_LABEL))
       }
@@ -111,99 +112,61 @@ class CommodityTariffClusterTariffComponentStruct(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): CommodityTariffClusterTariffComponentStruct {
       tlvReader.enterStructure(tlvTag)
       val tariffComponentID = tlvReader.getUInt(ContextSpecificTag(TAG_TARIFF_COMPONENT_ID))
-      val price =
-        if (!tlvReader.isNull()) {
-          if (tlvReader.isNextTag(ContextSpecificTag(TAG_PRICE))) {
-            Optional.of(
-              CommodityTariffClusterTariffPriceStruct.fromTlv(
-                ContextSpecificTag(TAG_PRICE),
-                tlvReader,
-              )
-            )
-          } else {
-            Optional.empty()
-          }
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_PRICE))
-          null
-        }
-      val friendlyCredit =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_FRIENDLY_CREDIT))) {
-          Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_FRIENDLY_CREDIT)))
-        } else {
-          Optional.empty()
-        }
-      val auxiliaryLoad =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_AUXILIARY_LOAD))) {
-          Optional.of(
-            CommodityTariffClusterAuxiliaryLoadSwitchSettingsStruct.fromTlv(
-              ContextSpecificTag(TAG_AUXILIARY_LOAD),
-              tlvReader,
-            )
-          )
-        } else {
-          Optional.empty()
-        }
-      val peakPeriod =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_PEAK_PERIOD))) {
-          Optional.of(
-            CommodityTariffClusterPeakPeriodStruct.fromTlv(
-              ContextSpecificTag(TAG_PEAK_PERIOD),
-              tlvReader,
-            )
-          )
-        } else {
-          Optional.empty()
-        }
-      val powerThreshold =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_POWER_THRESHOLD))) {
-          Optional.of(
-            CommodityTariffClusterPowerThresholdStruct.fromTlv(
-              ContextSpecificTag(TAG_POWER_THRESHOLD),
-              tlvReader,
-            )
-          )
-        } else {
-          Optional.empty()
-        }
-      val threshold =
-        if (!tlvReader.isNull()) {
-          tlvReader.getLong(ContextSpecificTag(TAG_THRESHOLD))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_THRESHOLD))
-          null
-        }
-      val label =
-        if (!tlvReader.isNull()) {
-          if (tlvReader.isNextTag(ContextSpecificTag(TAG_LABEL))) {
-            Optional.of(tlvReader.getString(ContextSpecificTag(TAG_LABEL)))
-          } else {
-            Optional.empty()
-          }
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_LABEL))
-          null
-        }
-      val predicted =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_PREDICTED))) {
-          Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_PREDICTED)))
-        } else {
-          Optional.empty()
-        }
-
+      val price = if (!tlvReader.isNull()) {
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_PRICE))) {
+      Optional.of(CommodityTariffClusterTariffPriceStruct.fromTlv(ContextSpecificTag(TAG_PRICE), tlvReader))
+    } else {
+      Optional.empty()
+    }
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_PRICE))
+      null
+    }
+      val friendlyCredit = if (tlvReader.isNextTag(ContextSpecificTag(TAG_FRIENDLY_CREDIT))) {
+      Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_FRIENDLY_CREDIT)))
+    } else {
+      Optional.empty()
+    }
+      val auxiliaryLoad = if (tlvReader.isNextTag(ContextSpecificTag(TAG_AUXILIARY_LOAD))) {
+      Optional.of(CommodityTariffClusterAuxiliaryLoadSwitchSettingsStruct.fromTlv(ContextSpecificTag(TAG_AUXILIARY_LOAD), tlvReader))
+    } else {
+      Optional.empty()
+    }
+      val peakPeriod = if (tlvReader.isNextTag(ContextSpecificTag(TAG_PEAK_PERIOD))) {
+      Optional.of(CommodityTariffClusterPeakPeriodStruct.fromTlv(ContextSpecificTag(TAG_PEAK_PERIOD), tlvReader))
+    } else {
+      Optional.empty()
+    }
+      val powerThreshold = if (tlvReader.isNextTag(ContextSpecificTag(TAG_POWER_THRESHOLD))) {
+      Optional.of(CommodityTariffClusterPowerThresholdStruct.fromTlv(ContextSpecificTag(TAG_POWER_THRESHOLD), tlvReader))
+    } else {
+      Optional.empty()
+    }
+      val threshold = if (!tlvReader.isNull()) {
+      tlvReader.getLong(ContextSpecificTag(TAG_THRESHOLD))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_THRESHOLD))
+      null
+    }
+      val label = if (!tlvReader.isNull()) {
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_LABEL))) {
+      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_LABEL)))
+    } else {
+      Optional.empty()
+    }
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_LABEL))
+      null
+    }
+      val predicted = if (tlvReader.isNextTag(ContextSpecificTag(TAG_PREDICTED))) {
+      Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_PREDICTED)))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
-      return CommodityTariffClusterTariffComponentStruct(
-        tariffComponentID,
-        price,
-        friendlyCredit,
-        auxiliaryLoad,
-        peakPeriod,
-        powerThreshold,
-        threshold,
-        label,
-        predicted,
-      )
+      return CommodityTariffClusterTariffComponentStruct(tariffComponentID, price, friendlyCredit, auxiliaryLoad, peakPeriod, powerThreshold, threshold, label, predicted)
     }
   }
 }

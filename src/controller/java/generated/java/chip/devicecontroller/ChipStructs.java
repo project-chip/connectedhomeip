@@ -11293,6 +11293,7 @@ public static class SoilMeasurementClusterMeasurementAccuracyRangeStruct {
     return output.toString();
   }
 }
+
 public static class SoilMeasurementClusterMeasurementAccuracyStruct {
   public Integer measurementType;
   public Boolean measured;

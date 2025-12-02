@@ -16,13 +16,18 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ContentControlClusterAppInfoStruct(val catalogVendorID: UShort, val applicationID: String) {
+class ContentControlClusterAppInfoStruct(
+  val catalogVendorID: UShort,
+  val applicationID: String
+) {
   override fun toString(): String = buildString {
     append("ContentControlClusterAppInfoStruct {\n")
     append("\tcatalogVendorID : $catalogVendorID\n")
@@ -47,7 +52,7 @@ class ContentControlClusterAppInfoStruct(val catalogVendorID: UShort, val applic
       tlvReader.enterStructure(tlvTag)
       val catalogVendorID = tlvReader.getUShort(ContextSpecificTag(TAG_CATALOG_VENDOR_ID))
       val applicationID = tlvReader.getString(ContextSpecificTag(TAG_APPLICATION_ID))
-
+      
       tlvReader.exitContainer()
 
       return ContentControlClusterAppInfoStruct(catalogVendorID, applicationID)

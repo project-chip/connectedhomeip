@@ -20,15 +20,17 @@ import chip.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ContentControlClusterTimeWindowStruct(
-  val timeWindowIndex: UInt?,
-  val dayOfWeek: UInt,
-  val timePeriod: List<ContentControlClusterTimePeriodStruct>,
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ContentControlClusterTimeWindowStruct (
+    val timeWindowIndex: UInt?,
+    val dayOfWeek: UInt,
+    val timePeriod: List<ContentControlClusterTimePeriodStruct>) {
+  override fun toString(): String  = buildString {
     append("ContentControlClusterTimeWindowStruct {\n")
     append("\ttimeWindowIndex : $timeWindowIndex\n")
     append("\tdayOfWeek : $dayOfWeek\n")
@@ -40,10 +42,10 @@ class ContentControlClusterTimeWindowStruct(
     tlvWriter.apply {
       startStructure(tlvTag)
       if (timeWindowIndex != null) {
-        put(ContextSpecificTag(TAG_TIME_WINDOW_INDEX), timeWindowIndex)
-      } else {
-        putNull(ContextSpecificTag(TAG_TIME_WINDOW_INDEX))
-      }
+      put(ContextSpecificTag(TAG_TIME_WINDOW_INDEX), timeWindowIndex)
+    } else {
+      putNull(ContextSpecificTag(TAG_TIME_WINDOW_INDEX))
+    }
       put(ContextSpecificTag(TAG_DAY_OF_WEEK), dayOfWeek)
       startArray(ContextSpecificTag(TAG_TIME_PERIOD))
       for (item in timePeriod.iterator()) {
@@ -59,25 +61,23 @@ class ContentControlClusterTimeWindowStruct(
     private const val TAG_DAY_OF_WEEK = 1
     private const val TAG_TIME_PERIOD = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ContentControlClusterTimeWindowStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ContentControlClusterTimeWindowStruct {
       tlvReader.enterStructure(tlvTag)
-      val timeWindowIndex =
-        if (!tlvReader.isNull()) {
-          tlvReader.getUInt(ContextSpecificTag(TAG_TIME_WINDOW_INDEX))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_TIME_WINDOW_INDEX))
-          null
-        }
+      val timeWindowIndex = if (!tlvReader.isNull()) {
+      tlvReader.getUInt(ContextSpecificTag(TAG_TIME_WINDOW_INDEX))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_TIME_WINDOW_INDEX))
+      null
+    }
       val dayOfWeek = tlvReader.getUInt(ContextSpecificTag(TAG_DAY_OF_WEEK))
-      val timePeriod =
-        buildList<ContentControlClusterTimePeriodStruct> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_TIME_PERIOD))
-          while (!tlvReader.isEndOfContainer()) {
-            add(ContentControlClusterTimePeriodStruct.fromTlv(AnonymousTag, tlvReader))
-          }
-          tlvReader.exitContainer()
-        }
-
+      val timePeriod = buildList<ContentControlClusterTimePeriodStruct> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_TIME_PERIOD))
+      while(!tlvReader.isEndOfContainer()) {
+        add(ContentControlClusterTimePeriodStruct.fromTlv(AnonymousTag, tlvReader))
+      }
+      tlvReader.exitContainer()
+    }
+      
       tlvReader.exitContainer()
 
       return ContentControlClusterTimeWindowStruct(timeWindowIndex, dayOfWeek, timePeriod)

@@ -18,6 +18,7 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -25,7 +26,7 @@ import matter.tlv.TlvWriter
 
 class MessagesClusterMessageResponseOptionStruct(
   val messageResponseID: Optional<UInt>,
-  val label: Optional<String>,
+  val label: Optional<String>
 ) {
   override fun toString(): String = buildString {
     append("MessagesClusterMessageResponseOptionStruct {\n")
@@ -55,19 +56,17 @@ class MessagesClusterMessageResponseOptionStruct(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): MessagesClusterMessageResponseOptionStruct {
       tlvReader.enterStructure(tlvTag)
-      val messageResponseID =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MESSAGE_RESPONSE_ID))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_MESSAGE_RESPONSE_ID)))
-        } else {
-          Optional.empty()
-        }
-      val label =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_LABEL))) {
-          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_LABEL)))
-        } else {
-          Optional.empty()
-        }
-
+      val messageResponseID = if (tlvReader.isNextTag(ContextSpecificTag(TAG_MESSAGE_RESPONSE_ID))) {
+      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_MESSAGE_RESPONSE_ID)))
+    } else {
+      Optional.empty()
+    }
+      val label = if (tlvReader.isNextTag(ContextSpecificTag(TAG_LABEL))) {
+      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_LABEL)))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
       return MessagesClusterMessageResponseOptionStruct(messageResponseID, label)

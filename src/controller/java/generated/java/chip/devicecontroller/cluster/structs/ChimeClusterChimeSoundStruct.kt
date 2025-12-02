@@ -17,13 +17,19 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ChimeClusterChimeSoundStruct(val chimeID: UInt, val name: String) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ChimeClusterChimeSoundStruct (
+    val chimeID: UInt,
+    val name: String) {
+  override fun toString(): String  = buildString {
     append("ChimeClusterChimeSoundStruct {\n")
     append("\tchimeID : $chimeID\n")
     append("\tname : $name\n")
@@ -43,11 +49,11 @@ class ChimeClusterChimeSoundStruct(val chimeID: UInt, val name: String) {
     private const val TAG_CHIME_ID = 0
     private const val TAG_NAME = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ChimeClusterChimeSoundStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ChimeClusterChimeSoundStruct {
       tlvReader.enterStructure(tlvTag)
       val chimeID = tlvReader.getUInt(ContextSpecificTag(TAG_CHIME_ID))
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
-
+      
       tlvReader.exitContainer()
 
       return ChimeClusterChimeSoundStruct(chimeID, name)
