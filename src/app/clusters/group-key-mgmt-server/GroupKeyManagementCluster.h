@@ -51,7 +51,6 @@ public:
     // TODO: Once there is MCSP support, this may need to change.
     static constexpr bool IsMCSPSupported() { return false; }
     static void SetFabricTableForTest(FabricTable * table);
-    static FabricTable & GetFabricTable();
 };
 } // namespace Clusters
 } // namespace app
