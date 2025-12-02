@@ -25,7 +25,7 @@
 namespace chip::app {
 
 /// A proxy for a ServerClusterInterface that adds data version management and attribute change notification
-/// capability taht works together with an underlying server cluster interface:
+/// capability that works together with an underlying server cluster interface:
 ///   - a ServerClusterContext received from startup is retained
 ///   - a data version delta is maintained compared to underlying, to account for extra data
 ///
