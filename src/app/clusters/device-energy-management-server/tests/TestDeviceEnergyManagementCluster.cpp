@@ -58,7 +58,7 @@ TEST_F(TestDeviceEnergyManagementCluster, TestNoFeatures)
     DeviceEnergyManagementMockDelegate mockDelegate;
     BitMask<Feature> noFeatures;
 
-    DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, noFeatures, &mockDelegate));
+    DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, noFeatures, mockDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     // Verify only mandatory attributes are present
@@ -86,7 +86,7 @@ TEST_F(TestDeviceEnergyManagementCluster, TestPowerAdjustmentFeature)
     DeviceEnergyManagementMockDelegate mockDelegate;
     BitMask<Feature> features(Feature::kPowerAdjustment);
 
-    DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, features, &mockDelegate));
+    DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, features, mockDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     // Verify PowerAdjustmentCapability and OptOutState attributes are present
@@ -117,7 +117,7 @@ TEST_F(TestDeviceEnergyManagementCluster, TestForecastFeature)
     DeviceEnergyManagementMockDelegate mockDelegate;
     BitMask<Feature> features(Feature::kPowerForecastReporting);
 
-    DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, features, &mockDelegate));
+    DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, features, mockDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     // Verify Forecast attribute is present
@@ -142,7 +142,7 @@ TEST_F(TestDeviceEnergyManagementCluster, TestAllFeatures)
                                  Feature::kStartTimeAdjustment, Feature::kPausable, Feature::kForecastAdjustment,
                                  Feature::kConstraintBasedAdjustment);
 
-    DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, allFeatures, &mockDelegate));
+    DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, allFeatures, mockDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     // Verify all optional attributes are present
@@ -171,7 +171,7 @@ TEST_F(TestDeviceEnergyManagementCluster, TestMandatoryAttributes)
     DeviceEnergyManagementMockDelegate mockDelegate;
     BitMask<Feature> noFeatures;
 
-    DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, noFeatures, &mockDelegate));
+    DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, noFeatures, mockDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     chip::Test::ClusterTester tester(cluster);
@@ -209,7 +209,7 @@ TEST_F(TestDeviceEnergyManagementCluster, TestPowerAdjustRequest)
     DeviceEnergyManagementMockDelegate mockDelegate;
     BitMask<Feature> features(Feature::kPowerAdjustment);
 
-    DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, features, &mockDelegate));
+    DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, features, mockDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     chip::Test::ClusterTester tester(cluster);
@@ -241,7 +241,7 @@ TEST_F(TestDeviceEnergyManagementCluster, TestCancelPowerAdjustRequest)
     DeviceEnergyManagementMockDelegate mockDelegate;
     BitMask<Feature> features(Feature::kPowerAdjustment);
 
-    DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, features, &mockDelegate));
+    DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, features, mockDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     chip::Test::ClusterTester tester(cluster);
@@ -275,7 +275,7 @@ TEST_F(TestDeviceEnergyManagementCluster, TestStartTimeAdjustRequest)
     DeviceEnergyManagementMockDelegate mockDelegate;
     BitMask<Feature> features(Feature::kStartTimeAdjustment);
 
-    DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, features, &mockDelegate));
+    DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, features, mockDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     chip::Test::ClusterTester tester(cluster);
@@ -308,7 +308,7 @@ TEST_F(TestDeviceEnergyManagementCluster, TestPauseRequest)
     DeviceEnergyManagementMockDelegate mockDelegate;
     BitMask<Feature> features(Feature::kPausable);
 
-    DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, features, &mockDelegate));
+    DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, features, mockDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     chip::Test::ClusterTester tester(cluster);
@@ -355,7 +355,7 @@ TEST_F(TestDeviceEnergyManagementCluster, TestResumeRequest)
     DeviceEnergyManagementMockDelegate mockDelegate;
     BitMask<Feature> features(Feature::kPausable);
 
-    DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, features, &mockDelegate));
+    DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, features, mockDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     chip::Test::ClusterTester tester(cluster);
@@ -388,7 +388,7 @@ TEST_F(TestDeviceEnergyManagementCluster, TestModifyForecastRequest)
     DeviceEnergyManagementMockDelegate mockDelegate;
     BitMask<Feature> features(Feature::kForecastAdjustment);
 
-    DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, features, &mockDelegate));
+    DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, features, mockDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     chip::Test::ClusterTester tester(cluster);
@@ -416,7 +416,7 @@ TEST_F(TestDeviceEnergyManagementCluster, TestRequestConstraintBasedForecast_Suc
     DeviceEnergyManagementMockDelegate mockDelegate;
     BitMask<Feature> features(Feature::kConstraintBasedAdjustment);
 
-    DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, features, &mockDelegate));
+    DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, features, mockDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     Commands::RequestConstraintBasedForecast::Type command;
@@ -439,7 +439,7 @@ TEST_F(TestDeviceEnergyManagementCluster, TestCancelRequest)
     DeviceEnergyManagementMockDelegate mockDelegate;
     BitMask<Feature> features(Feature::kStartTimeAdjustment);
 
-    DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, features, &mockDelegate));
+    DeviceEnergyManagementCluster cluster(DeviceEnergyManagementCluster::Config(kTestEndpointId, features, mockDelegate));
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     chip::Test::ClusterTester tester(cluster);

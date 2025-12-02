@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2023-2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -35,16 +35,6 @@ namespace app {
 namespace Clusters {
 
 namespace {
-// Helper function to add a status response when an error occurs during command handling
-DataModel::ActionReturnStatus AddResponseOnError(const DataModel::InvokeRequest & request, CommandHandler * handler,
-                                                 DataModel::ActionReturnStatus status)
-{
-    if (status.IsError())
-    {
-        handler->AddStatus(request.path, status.GetStatusCode());
-    }
-    return status;
-}
 
 bool IsWithinRange(const int64_t power, const uint32_t duration,
                    const DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::Type & powerAdjustmentCapability)
@@ -66,10 +56,10 @@ bool IsWithinRange(const int64_t power, const uint32_t duration,
 
 // Helper function to validate that the ESA is in the expected state before processing a command
 DataModel::ActionReturnStatus ValidateESAState(const DataModel::InvokeRequest & request, CommandHandler * handler,
-                                               DeviceEnergyManagement::Delegate * delegate,
+                                               DeviceEnergyManagement::Delegate & delegate,
                                                DeviceEnergyManagement::ESAStateEnum expectedState)
 {
-    DeviceEnergyManagement::ESAStateEnum currentState = delegate->GetESAState();
+    DeviceEnergyManagement::ESAStateEnum currentState = delegate.GetESAState();
     if (currentState != expectedState)
     {
         ChipLogError(Zcl, "DEM: ESAState mismatch - expected %d, got %d", static_cast<int>(expectedState),
@@ -86,8 +76,6 @@ using namespace DeviceEnergyManagement::Attributes;
 DataModel::ActionReturnStatus DeviceEnergyManagementCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                            AttributeValueEncoder & encoder)
 {
-    VerifyOrReturnValue(mDelegate != nullptr, Status::Failure);
-
     switch (request.path.mAttributeId)
     {
     case FeatureMap::Id:
@@ -97,28 +85,28 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::ReadAttribute(const
         return encoder.Encode(kRevision);
 
     case ESAType::Id:
-        return encoder.Encode(mDelegate->GetESAType());
+        return encoder.Encode(mDelegate.GetESAType());
 
     case ESACanGenerate::Id:
-        return encoder.Encode(mDelegate->GetESACanGenerate());
+        return encoder.Encode(mDelegate.GetESACanGenerate());
 
     case ESAState::Id:
-        return encoder.Encode(mDelegate->GetESAState());
+        return encoder.Encode(mDelegate.GetESAState());
 
     case AbsMinPower::Id:
-        return encoder.Encode(mDelegate->GetAbsMinPower());
+        return encoder.Encode(mDelegate.GetAbsMinPower());
 
     case AbsMaxPower::Id:
-        return encoder.Encode(mDelegate->GetAbsMaxPower());
+        return encoder.Encode(mDelegate.GetAbsMaxPower());
 
     case PowerAdjustmentCapability::Id:
-        return encoder.Encode(mDelegate->GetPowerAdjustmentCapability());
+        return encoder.Encode(mDelegate.GetPowerAdjustmentCapability());
 
     case Forecast::Id:
-        return encoder.Encode(mDelegate->GetForecast());
+        return encoder.Encode(mDelegate.GetForecast());
 
     case OptOutState::Id:
-        return encoder.Encode(mDelegate->GetOptOutState());
+        return encoder.Encode(mDelegate.GetOptOutState());
 
     default:
         return Status::UnsupportedAttribute;
@@ -129,8 +117,6 @@ std::optional<DataModel::ActionReturnStatus> DeviceEnergyManagementCluster::Invo
                                                                                           TLV::TLVReader & input_arguments,
                                                                                           CommandHandler * handler)
 {
-    VerifyOrReturnValue(mDelegate != nullptr, Status::Failure);
-
     using namespace Commands;
 
     switch (request.path.mCommandId)
@@ -225,7 +211,7 @@ CHIP_ERROR DeviceEnergyManagementCluster::AcceptedCommands(const ConcreteCluster
 DataModel::ActionReturnStatus
 DeviceEnergyManagementCluster::CheckOptOutAllowsRequest(DeviceEnergyManagement::AdjustmentCauseEnum adjustmentCause)
 {
-    OptOutStateEnum optOutState = mDelegate->GetOptOutState();
+    OptOutStateEnum optOutState = mDelegate.GetOptOutState();
 
     if (adjustmentCause == AdjustmentCauseEnum::kUnknownEnumValue)
     {
@@ -280,10 +266,10 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandlePowerAdjustRe
     PowerAdjustRequest::DecodableType commandData;
     ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
 
-    ReturnErrorOnFailure(AddResponseOnError(request, handler, CheckOptOutAllowsRequest(commandData.cause)).GetUnderlyingError());
+    ReturnErrorOnFailure(CheckOptOutAllowsRequest(commandData.cause).GetUnderlyingError());
 
     DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> powerAdjustmentCapability =
-        mDelegate->GetPowerAdjustmentCapability();
+        mDelegate.GetPowerAdjustmentCapability();
     if (powerAdjustmentCapability.IsNull())
     {
         ChipLogError(Zcl, "DEM: PowerAdjustmentCapability is Null");
@@ -294,28 +280,27 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandlePowerAdjustRe
     {
         ChipLogError(Zcl, "DEM: Power is not within range- power: '%" PRIdLEAST64 "', duration: '%" PRIdLEAST32 "'",
                      commandData.power, commandData.duration);
-        return AddResponseOnError(request, handler, Status::ConstraintError);
+        return Status::ConstraintError;
     }
 
-    ESAStateEnum ESAState = mDelegate->GetESAState();
+    ESAStateEnum ESAState = mDelegate.GetESAState();
     if (ESAState != ESAStateEnum::kOnline && ESAState != ESAStateEnum::kPowerAdjustActive)
     {
-        return AddResponseOnError(request, handler, Status::InvalidInState);
+        return Status::InvalidInState;
     }
 
     // Call on delegate to start the power adjustment if the ESAState PowerAdjustActive, the delegate might refuse the adjustment
     // The delegate is responsible of updating its PowerAdjustmentCapability's cause to the new cause if the adjustment is accepted
     ReturnErrorOnFailure(
-        AddResponseOnError(request, handler,
-                           mDelegate->PowerAdjustRequest(commandData.power, commandData.duration, commandData.cause))
+        DataModel::ActionReturnStatus(mDelegate.PowerAdjustRequest(commandData.power, commandData.duration, commandData.cause))
             .GetUnderlyingError());
 
     // Verify the delegate's PowerAdjustmentCapability's cause was updated to the new cause if the adjustment is accepted
-    powerAdjustmentCapability = mDelegate->GetPowerAdjustmentCapability();
+    powerAdjustmentCapability = mDelegate.GetPowerAdjustmentCapability();
     if (powerAdjustmentCapability.IsNull())
     {
         ChipLogError(Zcl, "DEM: PowerAdjustmentCapability is Null");
-        return AddResponseOnError(request, handler, Status::ConstraintError);
+        return Status::ConstraintError;
     }
     if (powerAdjustmentCapability.Value().cause != static_cast<DeviceEnergyManagement::PowerAdjustReasonEnum>(commandData.cause))
     {
@@ -323,7 +308,7 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandlePowerAdjustRe
                      "DEM: PowerAdjustmentCapability's cause was not updated to the new cause- expected: '0x%" PRIx32
                      "', got: '0x%" PRIx32 "'",
                      static_cast<uint32_t>(commandData.cause), static_cast<uint32_t>(powerAdjustmentCapability.Value().cause));
-        return AddResponseOnError(request, handler, Status::ConstraintError);
+        return Status::ConstraintError;
     }
 
     return Status::Success;
@@ -340,15 +325,15 @@ DeviceEnergyManagementCluster::HandleCancelPowerAdjustRequest(const DataModel::I
 
     ReturnErrorOnFailure(ValidateESAState(request, handler, mDelegate, ESAStateEnum::kPowerAdjustActive).GetUnderlyingError());
 
-    ReturnErrorOnFailure(AddResponseOnError(request, handler, mDelegate->CancelPowerAdjustRequest()).GetUnderlyingError());
+    ReturnErrorOnFailure(DataModel::ActionReturnStatus(mDelegate.CancelPowerAdjustRequest()).GetUnderlyingError());
 
     // Verify the delegate's PowerAdjustmentCapability's cause was updated to the new cause if the adjustment is accepted
     DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> powerAdjustmentCapability =
-        mDelegate->GetPowerAdjustmentCapability();
+        mDelegate.GetPowerAdjustmentCapability();
     if (powerAdjustmentCapability.IsNull())
     {
         ChipLogError(Zcl, "DEM: PowerAdjustmentCapability is Null");
-        return AddResponseOnError(request, handler, Status::ConstraintError);
+        return Status::ConstraintError;
     }
 
     if (powerAdjustmentCapability.Value().cause != PowerAdjustReasonEnum::kNoAdjustment)
@@ -358,11 +343,10 @@ DeviceEnergyManagementCluster::HandleCancelPowerAdjustRequest(const DataModel::I
                      "', got: '0x%" PRIx32 "'",
                      static_cast<uint32_t>(PowerAdjustReasonEnum::kNoAdjustment),
                      static_cast<uint32_t>(powerAdjustmentCapability.Value().cause));
-        return AddResponseOnError(request, handler, Status::ConstraintError);
+        return Status::ConstraintError;
     }
 
-    handler->AddStatus(request.path, Status::Success);
-    return DataModel::ActionReturnStatus(Status::Success);
+    return Status::Success;
 }
 
 DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleStartTimeAdjustRequest(const DataModel::InvokeRequest & request,
@@ -374,13 +358,13 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleStartTimeAdju
     StartTimeAdjustRequest::DecodableType commandData;
     ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
 
-    ReturnErrorOnFailure(AddResponseOnError(request, handler, CheckOptOutAllowsRequest(commandData.cause)).GetUnderlyingError());
+    ReturnErrorOnFailure(CheckOptOutAllowsRequest(commandData.cause).GetUnderlyingError());
 
-    DataModel::Nullable<Structs::ForecastStruct::Type> forecastNullable = mDelegate->GetForecast();
+    DataModel::Nullable<Structs::ForecastStruct::Type> forecastNullable = mDelegate.GetForecast();
     if (forecastNullable.IsNull())
     {
         ChipLogError(Zcl, "DEM: Forecast is Null");
-        return AddResponseOnError(request, handler, Status::Failure);
+        return Status::Failure;
     }
 
     auto & forecast = forecastNullable.Value();
@@ -389,7 +373,7 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleStartTimeAdju
     if (!forecast.earliestStartTime.HasValue() || !forecast.latestEndTime.HasValue())
     {
         ChipLogError(Zcl, "DEM: EarliestStartTime / LatestEndTime do not have values");
-        return AddResponseOnError(request, handler, Status::Failure);
+        return Status::Failure;
     }
 
     DataModel::Nullable<uint32_t> & earliestStartTimeNullable = forecast.earliestStartTime.Value();
@@ -403,7 +387,7 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleStartTimeAdju
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "DEM: Unable to get current time - err:%" CHIP_ERROR_FORMAT, err.Format());
-            return AddResponseOnError(request, handler, Status::Failure);
+            return Status::Failure;
         }
         earliestStartTimeEpoch = matterEpoch; // Null means we can start immediately (NOW)
     }
@@ -418,7 +402,7 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleStartTimeAdju
         ChipLogError(Zcl, "DEM: Bad requestedStartTime %lu, earlier than earliestStartTime %lu.",
                      static_cast<unsigned long>(commandData.requestedStartTime),
                      static_cast<unsigned long>(earliestStartTimeEpoch));
-        return AddResponseOnError(request, handler, Status::ConstraintError);
+        return Status::ConstraintError;
     }
 
     if ((commandData.requestedStartTime + duration) > latestEndTimeEpoch)
@@ -426,22 +410,22 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleStartTimeAdju
         ChipLogError(Zcl, "DEM: Bad requestedStartTimeEpoch + duration %lu, later than latestEndTime %lu.",
                      static_cast<unsigned long>(commandData.requestedStartTime + duration),
                      static_cast<unsigned long>(latestEndTimeEpoch));
-        return AddResponseOnError(request, handler, Status::ConstraintError);
+        return Status::ConstraintError;
     }
 
     // Store original forecastID to verify it was incremented
     uint32_t originalForecastID = forecast.forecastID;
 
     ReturnErrorOnFailure(
-        AddResponseOnError(request, handler, mDelegate->StartTimeAdjustRequest(commandData.requestedStartTime, commandData.cause))
+        DataModel::ActionReturnStatus(mDelegate.StartTimeAdjustRequest(commandData.requestedStartTime, commandData.cause))
             .GetUnderlyingError());
 
     // Verify the delegate updated the Forecast attribute as required
-    DataModel::Nullable<Structs::ForecastStruct::Type> updatedForecastNullable = mDelegate->GetForecast();
+    DataModel::Nullable<Structs::ForecastStruct::Type> updatedForecastNullable = mDelegate.GetForecast();
     if (updatedForecastNullable.IsNull())
     {
         ChipLogError(Zcl, "DEM: Forecast is Null after StartTimeAdjustRequest");
-        return AddResponseOnError(request, handler, Status::Failure);
+        return Status::Failure;
     }
 
     auto & updatedForecast = updatedForecastNullable.Value();
@@ -452,7 +436,7 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleStartTimeAdju
         ChipLogError(Zcl, "DEM: Forecast.startTime was not updated to requestedStartTime - expected: %lu, got: %lu",
                      static_cast<unsigned long>(commandData.requestedStartTime),
                      static_cast<unsigned long>(updatedForecast.startTime));
-        return AddResponseOnError(request, handler, Status::ConstraintError);
+        return Status::ConstraintError;
     }
 
     // Verify Forecast.forecastID was incremented (new ForecastID)
@@ -460,7 +444,7 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleStartTimeAdju
     {
         ChipLogError(Zcl, "DEM: Forecast.forecastID was not incremented - original: %lu, got: %lu",
                      static_cast<unsigned long>(originalForecastID), static_cast<unsigned long>(updatedForecast.forecastID));
-        return AddResponseOnError(request, handler, Status::ConstraintError);
+        return Status::ConstraintError;
     }
 
     // Verify Forecast.endTime was updated to requestedStartTime + duration
@@ -469,11 +453,10 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleStartTimeAdju
     {
         ChipLogError(Zcl, "DEM: Forecast.endTime was not updated correctly - expected: %lu, got: %lu",
                      static_cast<unsigned long>(expectedEndTime), static_cast<unsigned long>(updatedForecast.endTime));
-        return AddResponseOnError(request, handler, Status::ConstraintError);
+        return Status::ConstraintError;
     }
 
-    handler->AddStatus(request.path, Status::Success);
-    return DataModel::ActionReturnStatus(Status::Success);
+    return Status::Success;
 }
 
 DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandlePauseRequest(const DataModel::InvokeRequest & request,
@@ -485,13 +468,13 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandlePauseRequest(
     PauseRequest::DecodableType commandData;
     ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
 
-    ReturnErrorOnFailure(AddResponseOnError(request, handler, CheckOptOutAllowsRequest(commandData.cause)).GetUnderlyingError());
+    ReturnErrorOnFailure(CheckOptOutAllowsRequest(commandData.cause).GetUnderlyingError());
 
-    DataModel::Nullable<Structs::ForecastStruct::Type> forecast = mDelegate->GetForecast();
+    DataModel::Nullable<Structs::ForecastStruct::Type> forecast = mDelegate.GetForecast();
     if (forecast.IsNull())
     {
         ChipLogError(Zcl, "DEM: Forecast is Null");
-        return AddResponseOnError(request, handler, Status::Failure);
+        return Status::Failure;
     }
 
     // Value SHALL be between the MinPauseDuration and MaxPauseDuration indicated in the
@@ -499,7 +482,7 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandlePauseRequest(
     if (forecast.Value().activeSlotNumber.IsNull())
     {
         ChipLogError(Zcl, "DEM: activeSlotNumber Is Null");
-        return AddResponseOnError(request, handler, Status::Failure);
+        return Status::Failure;
     }
 
     uint16_t activeSlotNumber = forecast.Value().activeSlotNumber.Value();
@@ -507,7 +490,7 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandlePauseRequest(
     {
         ChipLogError(Zcl, "DEM: Bad activeSlotNumber %d, size()=%d.", activeSlotNumber,
                      static_cast<int>(forecast.Value().slots.size()));
-        return AddResponseOnError(request, handler, Status::Failure);
+        return Status::Failure;
     }
 
     const auto & activeSlot = forecast.Value().slots[activeSlotNumber];
@@ -515,39 +498,38 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandlePauseRequest(
     if (!activeSlot.slotIsPausable.HasValue())
     {
         ChipLogError(Zcl, "DEM: activeSlotNumber %d does not include slotIsPausable.", activeSlotNumber);
-        return AddResponseOnError(request, handler, Status::Failure);
+        return Status::Failure;
     }
 
     if (!activeSlot.minPauseDuration.HasValue())
     {
         ChipLogError(Zcl, "DEM: activeSlotNumber %d does not include minPauseDuration.", activeSlotNumber);
-        return AddResponseOnError(request, handler, Status::Failure);
+        return Status::Failure;
     }
 
     if (!activeSlot.maxPauseDuration.HasValue())
     {
         ChipLogError(Zcl, "DEM: activeSlotNumber %d does not include maxPauseDuration.", activeSlotNumber);
-        return AddResponseOnError(request, handler, Status::Failure);
+        return Status::Failure;
     }
 
     if (!activeSlot.slotIsPausable.Value())
     {
         ChipLogError(Zcl, "DEM: activeSlotNumber %d is NOT pausable.", activeSlotNumber);
-        return AddResponseOnError(request, handler, Status::Failure);
+        return Status::Failure;
     }
 
     if ((commandData.duration < activeSlot.minPauseDuration.Value()) ||
         (commandData.duration > activeSlot.maxPauseDuration.Value()))
     {
         ChipLogError(Zcl, "DEM: out of range pause duration %lu", static_cast<unsigned long>(commandData.duration));
-        return AddResponseOnError(request, handler, Status::ConstraintError);
+        return Status::ConstraintError;
     }
 
-    ReturnErrorOnFailure(AddResponseOnError(request, handler, mDelegate->PauseRequest(commandData.duration, commandData.cause))
-                             .GetUnderlyingError());
+    ReturnErrorOnFailure(
+        DataModel::ActionReturnStatus(mDelegate.PauseRequest(commandData.duration, commandData.cause)).GetUnderlyingError());
 
-    handler->AddStatus(request.path, Status::Success);
-    return DataModel::ActionReturnStatus(Status::Success);
+    return Status::Success;
 }
 
 DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleResumeRequest(const DataModel::InvokeRequest & request,
@@ -561,15 +543,14 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleResumeRequest
 
     ReturnErrorOnFailure(ValidateESAState(request, handler, mDelegate, ESAStateEnum::kPaused).GetUnderlyingError());
 
-    ReturnErrorOnFailure(AddResponseOnError(request, handler, mDelegate->ResumeRequest()).GetUnderlyingError());
+    ReturnErrorOnFailure(DataModel::ActionReturnStatus(mDelegate.ResumeRequest()).GetUnderlyingError());
 
     // Verify the Delegate updated its state and ForecastUpdateReason
-    VerifyOrReturnError(mDelegate->GetESAState() != ESAStateEnum::kPaused, Status::InvalidInState);
-    VerifyOrReturnError(mDelegate->GetForecast().Value().forecastUpdateReason == ForecastUpdateReasonEnum::kInternalOptimization,
+    VerifyOrReturnError(mDelegate.GetESAState() != ESAStateEnum::kPaused, Status::InvalidInState);
+    VerifyOrReturnError(mDelegate.GetForecast().Value().forecastUpdateReason == ForecastUpdateReasonEnum::kInternalOptimization,
                         Status::InvalidInState);
 
-    handler->AddStatus(request.path, Status::Success);
-    return DataModel::ActionReturnStatus(Status::Success);
+    return Status::Success;
 }
 
 DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleModifyForecastRequest(const DataModel::InvokeRequest & request,
@@ -581,13 +562,13 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleModifyForecas
     ModifyForecastRequest::DecodableType commandData;
     ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
 
-    ReturnErrorOnFailure(AddResponseOnError(request, handler, CheckOptOutAllowsRequest(commandData.cause)).GetUnderlyingError());
+    ReturnErrorOnFailure(CheckOptOutAllowsRequest(commandData.cause).GetUnderlyingError());
 
-    DataModel::Nullable<Structs::ForecastStruct::Type> forecast = mDelegate->GetForecast();
+    DataModel::Nullable<Structs::ForecastStruct::Type> forecast = mDelegate.GetForecast();
     if (forecast.IsNull())
     {
         ChipLogError(Zcl, "DEM: Forecast is Null");
-        return AddResponseOnError(request, handler, Status::Failure);
+        return Status::Failure;
     }
 
     // Check the various values in the slot structures
@@ -600,14 +581,14 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleModifyForecas
         if (slotAdjustment.slotIndex >= forecast.Value().slots.size())
         {
             ChipLogError(Zcl, "DEM: Bad slot index %d", slotAdjustment.slotIndex);
-            return AddResponseOnError(request, handler, Status::Failure);
+            return Status::Failure;
         }
 
         // Check to see if trying to modify a slot which has already been run
         if (!forecast.Value().activeSlotNumber.IsNull() && slotAdjustment.slotIndex < forecast.Value().activeSlotNumber.Value())
         {
             ChipLogError(Zcl, "DEM: Modifying already run slot index %d", slotAdjustment.slotIndex);
-            return AddResponseOnError(request, handler, Status::ConstraintError);
+            return Status::ConstraintError;
         }
 
         const Structs::SlotStruct::Type & slot = forecast.Value().slots[slotAdjustment.slotIndex];
@@ -620,7 +601,7 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleModifyForecas
                 slotAdjustment.nominalPower.Value() > slot.maxPowerAdjustment.Value())
             {
                 ChipLogError(Zcl, "DEM: Bad nominalPower");
-                return AddResponseOnError(request, handler, Status::ConstraintError);
+                return Status::ConstraintError;
             }
         }
 
@@ -629,22 +610,20 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleModifyForecas
             slotAdjustment.duration > slot.maxDurationAdjustment.Value())
         {
             ChipLogError(Zcl, "DEM: Bad min/max duration");
-            return AddResponseOnError(request, handler, Status::ConstraintError);
+            return Status::ConstraintError;
         }
     }
 
     if (iterator.GetStatus() != CHIP_NO_ERROR)
     {
-        return AddResponseOnError(request, handler, Status::InvalidCommand);
+        return Status::InvalidCommand;
     }
 
-    ReturnErrorOnFailure(
-        AddResponseOnError(request, handler,
-                           mDelegate->ModifyForecastRequest(commandData.forecastID, commandData.slotAdjustments, commandData.cause))
-            .GetUnderlyingError());
+    ReturnErrorOnFailure(DataModel::ActionReturnStatus(mDelegate.ModifyForecastRequest(
+                                                           commandData.forecastID, commandData.slotAdjustments, commandData.cause))
+                             .GetUnderlyingError());
 
-    handler->AddStatus(request.path, Status::Success);
-    return DataModel::ActionReturnStatus(Status::Success);
+    return Status::Success;
 }
 
 DataModel::ActionReturnStatus
@@ -656,14 +635,14 @@ DeviceEnergyManagementCluster::HandleRequestConstraintBasedForecast(const DataMo
     RequestConstraintBasedForecast::DecodableType commandData;
     ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
 
-    ReturnErrorOnFailure(AddResponseOnError(request, handler, CheckOptOutAllowsRequest(commandData.cause)).GetUnderlyingError());
+    ReturnErrorOnFailure(CheckOptOutAllowsRequest(commandData.cause).GetUnderlyingError());
 
     uint32_t currentUtcTime = 0;
     CHIP_ERROR err          = System::Clock::GetClock_MatterEpochS(currentUtcTime);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "DEM: Failed to get UTC time");
-        return AddResponseOnError(request, handler, Status::Failure);
+        return Status::Failure;
     }
 
     // Check for invalid power levels and whether the constraint time/duration is in the past
@@ -676,7 +655,7 @@ DeviceEnergyManagementCluster::HandleRequestConstraintBasedForecast(const DataMo
             // Check to see if this constraint is in the past
             if (constraint.startTime < currentUtcTime)
             {
-                return AddResponseOnError(request, handler, Status::ConstraintError);
+                return Status::ConstraintError;
             }
 
             if (mFeatureFlags.Has(Feature::kPowerForecastReporting))
@@ -684,24 +663,24 @@ DeviceEnergyManagementCluster::HandleRequestConstraintBasedForecast(const DataMo
                 if (!constraint.nominalPower.HasValue())
                 {
                     ChipLogError(Zcl, "DEM: RequestConstraintBasedForecast no nominalPower");
-                    return AddResponseOnError(request, handler, Status::InvalidCommand);
+                    return Status::InvalidCommand;
                 }
 
-                if (constraint.nominalPower.Value() < mDelegate->GetAbsMinPower() ||
-                    constraint.nominalPower.Value() > mDelegate->GetAbsMaxPower())
+                if (constraint.nominalPower.Value() < mDelegate.GetAbsMinPower() ||
+                    constraint.nominalPower.Value() > mDelegate.GetAbsMaxPower())
                 {
                     ChipLogError(Zcl,
                                  "DEM: RequestConstraintBasedForecast nominalPower " ChipLogFormatX64
                                  " out of range [" ChipLogFormatX64 ", " ChipLogFormatX64 "]",
-                                 ChipLogValueX64(constraint.nominalPower.Value()), ChipLogValueX64(mDelegate->GetAbsMinPower()),
-                                 ChipLogValueX64(mDelegate->GetAbsMaxPower()));
-                    return AddResponseOnError(request, handler, Status::ConstraintError);
+                                 ChipLogValueX64(constraint.nominalPower.Value()), ChipLogValueX64(mDelegate.GetAbsMinPower()),
+                                 ChipLogValueX64(mDelegate.GetAbsMaxPower()));
+                    return Status::ConstraintError;
                 }
 
                 if (!constraint.maximumEnergy.HasValue())
                 {
                     ChipLogError(Zcl, "DEM: RequestConstraintBasedForecast no value for maximumEnergy");
-                    return AddResponseOnError(request, handler, Status::InvalidCommand);
+                    return Status::InvalidCommand;
                 }
             }
 
@@ -710,20 +689,20 @@ DeviceEnergyManagementCluster::HandleRequestConstraintBasedForecast(const DataMo
                 if (!constraint.loadControl.HasValue())
                 {
                     ChipLogError(Zcl, "DEM: RequestConstraintBasedForecast no loadControl");
-                    return AddResponseOnError(request, handler, Status::InvalidCommand);
+                    return Status::InvalidCommand;
                 }
 
                 if (constraint.loadControl.Value() < -100 || constraint.loadControl.Value() > 100)
                 {
                     ChipLogError(Zcl, "DEM: RequestConstraintBasedForecast bad loadControl %d", constraint.loadControl.Value());
-                    return AddResponseOnError(request, handler, Status::ConstraintError);
+                    return Status::ConstraintError;
                 }
             }
         }
 
         if (iterator.GetStatus() != CHIP_NO_ERROR)
         {
-            return AddResponseOnError(request, handler, Status::InvalidCommand);
+            return Status::InvalidCommand;
         }
     }
 
@@ -743,7 +722,7 @@ DeviceEnergyManagementCluster::HandleRequestConstraintBasedForecast(const DataMo
                     prevConstraint.startTime + prevConstraint.duration >= constraint.startTime)
                 {
                     ChipLogError(Zcl, "DEM: RequestConstraintBasedForecast overlapping constraint times");
-                    return AddResponseOnError(request, handler, Status::ConstraintError);
+                    return Status::ConstraintError;
                 }
 
                 prevConstraint = constraint;
@@ -752,16 +731,15 @@ DeviceEnergyManagementCluster::HandleRequestConstraintBasedForecast(const DataMo
 
         if (iterator.GetStatus() != CHIP_NO_ERROR)
         {
-            return AddResponseOnError(request, handler, Status::InvalidCommand);
+            return Status::InvalidCommand;
         }
     }
 
     ReturnErrorOnFailure(
-        AddResponseOnError(request, handler, mDelegate->RequestConstraintBasedForecast(commandData.constraints, commandData.cause))
+        DataModel::ActionReturnStatus(mDelegate.RequestConstraintBasedForecast(commandData.constraints, commandData.cause))
             .GetUnderlyingError());
 
-    handler->AddStatus(request.path, Status::Success);
-    return DataModel::ActionReturnStatus(Status::Success);
+    return Status::Success;
 }
 
 DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleCancelRequest(const DataModel::InvokeRequest & request,
@@ -773,7 +751,7 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleCancelRequest
     CancelRequest::DecodableType commandData;
     ReturnErrorOnFailure(DataModel::Decode(input_arguments, commandData));
 
-    DataModel::Nullable<Structs::ForecastStruct::Type> forecast = mDelegate->GetForecast();
+    DataModel::Nullable<Structs::ForecastStruct::Type> forecast = mDelegate.GetForecast();
 
     Status status = Status::Failure;
     if (forecast.IsNull())
@@ -788,15 +766,14 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleCancelRequest
     }
     else
     {
-        status = mDelegate->CancelRequest();
+        status = mDelegate.CancelRequest();
         if (status == Status::Success &&
-            mDelegate->GetForecast().Value().forecastUpdateReason != ForecastUpdateReasonEnum::kInternalOptimization)
+            mDelegate.GetForecast().Value().forecastUpdateReason != ForecastUpdateReasonEnum::kInternalOptimization)
         {
-            return AddResponseOnError(request, handler, Status::Failure);
+            return Status::Failure;
         }
     }
 
-    handler->AddStatus(request.path, status);
     return status;
 }
 

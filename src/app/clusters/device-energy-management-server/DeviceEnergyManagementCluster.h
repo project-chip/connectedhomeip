@@ -34,24 +34,22 @@ namespace Clusters {
 
 class DeviceEnergyManagementCluster : public DefaultServerCluster
 {
-
-public:
+private:
     using OptionalAttributesSet = OptionalAttributeSet<                    //
         DeviceEnergyManagement::Attributes::PowerAdjustmentCapability::Id, //
         DeviceEnergyManagement::Attributes::Forecast::Id,                  //
         DeviceEnergyManagement::Attributes::OptOutState::Id                //
         >;
 
+public:
     struct Config
     {
         EndpointId endpointId;
         BitMask<DeviceEnergyManagement::Feature> featureFlags;
-        DeviceEnergyManagement::Delegate * delegate;
+        DeviceEnergyManagement::Delegate & delegate;
 
         Config(EndpointId aEndpointId, BitMask<DeviceEnergyManagement::Feature> aFeatures,
-               DeviceEnergyManagement::Delegate * aDelegate) :
-            endpointId(aEndpointId),
-            featureFlags(aFeatures), delegate(aDelegate)
+               DeviceEnergyManagement::Delegate & aDelegate) : endpointId(aEndpointId), featureFlags(aFeatures), delegate(aDelegate)
         {}
     };
     // We don't want to allow the default constructor as this cluster requires a delegate to be set
@@ -72,13 +70,12 @@ public:
             return attrs;
         }())
     {
-        VerifyOrDie(config.delegate != nullptr);
-        mDelegate->SetEndpointId(config.endpointId);
+        mDelegate.SetEndpointId(config.endpointId);
     }
 
     const OptionalAttributesSet & OptionalAttributes() const { return mEnabledOptionalAttributes; }
     const BitFlags<DeviceEnergyManagement::Feature> & Features() const { return mFeatureFlags; }
-    DeviceEnergyManagement::Delegate * GetDelegate() const { return mDelegate; }
+    DeviceEnergyManagement::Delegate & GetDelegate() { return mDelegate; }
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
@@ -107,7 +104,7 @@ private:
     DataModel::ActionReturnStatus HandleCancelRequest(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments,
                                                       CommandHandler * handler);
 
-    DeviceEnergyManagement::Delegate * mDelegate = nullptr;
+    DeviceEnergyManagement::Delegate & mDelegate;
     const BitFlags<DeviceEnergyManagement::Feature> mFeatureFlags;
     const OptionalAttributesSet mEnabledOptionalAttributes;
 };

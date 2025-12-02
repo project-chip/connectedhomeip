@@ -26,7 +26,7 @@ namespace Clusters {
 namespace DeviceEnergyManagement {
 
 Instance::Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature) :
-    mCluster(DeviceEnergyManagementCluster::Config(aEndpointId, aFeature, &aDelegate))
+    mCluster(DeviceEnergyManagementCluster::Config(aEndpointId, aFeature, aDelegate))
 {}
 
 CHIP_ERROR Instance::Init()
