@@ -25,6 +25,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --endpoint 1
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -38,7 +39,8 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.interaction_model import Status
-from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from matter.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_feature,
+                                           run_if_endpoint_matches, async_test_body)
 
 
 class TC_BOOLCFG_3_1(MatterBaseTest):
@@ -52,9 +54,7 @@ class TC_BOOLCFG_3_1(MatterBaseTest):
     def steps_TC_BOOLCFG_3_1(self) -> list[TestStep]:
         return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep("2a", "Read FeatureMap attribute", "DUT replies with the FeatureMap attribute"),
-            TestStep("2b", "Verify SENSLVL feature is supported"),
-            TestStep("2c", "Read AttributeList attribute", "DUT replies with the AttributeList attribute"),
+            TestStep(2, "Read AttributeList attribute", "DUT replies with the AttributeList attribute"),
             TestStep(3, "Read SupportedSensitivityLevels attribute", "DUT response is success"),
             TestStep(4, "Read DefaultSensitivityLevel attribute, if supported", "DUT response is success"),
             TestStep(5, "Read CurrentSensitivityLevel attribute", "DUT response is success"),
@@ -70,38 +70,19 @@ class TC_BOOLCFG_3_1(MatterBaseTest):
 
     def pics_TC_BOOLCFG_3_1(self) -> list[str]:
         return [
-            "BOOLCFG.S",
+            "BOOLCFG.S.F03",
         ]
 
-    @property
-    def default_endpoint(self) -> int:
-        return 1
-
-    @async_test_body
+    @run_if_endpoint_matches(has_feature(Clusters.BooleanStateConfiguration, Clusters.BooleanStateConfiguration.Bitmaps.Feature.kSensitivityLevel))
     async def test_TC_BOOLCFG_3_1(self):
 
         endpoint = self.get_endpoint()
-
-        self.step(1)
         attributes = Clusters.BooleanStateConfiguration.Attributes
 
-        self.step("2a")
-        feature_map = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
-        is_sens_level_feature_supported = feature_map & Clusters.BooleanStateConfiguration.Bitmaps.Feature.kSensitivityLevel
+        # Commissioning
+        self.step(1)
 
-        self.step("2b")
-        if not is_sens_level_feature_supported:
-            logging.info("SENS feature not supported, skipping test case")
-
-            # Skipping all remainig steps
-            for step in self.get_test_steps(self.current_test_info.name)[self.current_step_index:]:
-                self.step(step.test_plan_number)
-                logging.info("SENSLVL feature not supported, skipping remaining steps")
-
-            return
-        logging.info("Test step skipped")
-
-        self.step("2c")
+        self.step(2)
         attribute_list = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
 
         self.step(3)
