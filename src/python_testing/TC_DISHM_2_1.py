@@ -189,27 +189,30 @@ class TC_DISHM_2_1(MatterBaseTest):
         is_valid_int_value(old_current_mode_dut)
 
         # TH sends a ChangeToMode command to the DUT with NewMode set to PIXIT.DISHM.MODE_CHANGE_FAIL
-        self.step(7)
-        cmd = cluster.Commands.ChangeToMode(newMode=self.mode_fail)
-        change_to_mode_response = await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
+        if not can_test_mode_failure:
+            self.skip_step(7)
+        else:
+            self.step(7)
+            cmd = cluster.Commands.ChangeToMode(newMode=self.mode_fail)
+            change_to_mode_response = await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
 
-        # DUT responds contains a ChangeToModeResponse command with Status field is set to GenericFailure(0x02), InvalidInMode(0x03), or in the MfgCodes (0x80 to 0xBF) range and StatusText field has a length between 1 and 64
-        asserts.assert_true(matchers.is_type(change_to_mode_response, cluster.Commands.ChangeToModeResponse),
-                            "Unexpected return type for ChangeToMode")
+            # DUT responds contains a ChangeToModeResponse command with Status field is set to GenericFailure(0x02), InvalidInMode(0x03), or in the MfgCodes (0x80 to 0xBF) range and StatusText field has a length between 1 and 64
+            asserts.assert_true(matchers.is_type(change_to_mode_response, cluster.Commands.ChangeToModeResponse),
+                                "Unexpected return type for ChangeToMode")
 
-        logging.info(f"response: {change_to_mode_response}")
+            logging.info(f"response: {change_to_mode_response}")
 
-        st = change_to_mode_response.status
+            st = change_to_mode_response.status
 
-        is_mfg_code = st in range(0x80, 0xC0)
-        is_err_code = (st == CommonCodes.GENERIC_FAILURE.value) or (st == CommonCodes.INVALID_IN_MODE.value) or is_mfg_code
+            is_mfg_code = st in range(0x80, 0xC0)
+            is_err_code = (st == CommonCodes.GENERIC_FAILURE.value) or (st == CommonCodes.INVALID_IN_MODE.value) or is_mfg_code
 
-        asserts.assert_true(is_err_code, f"Changing to mode {self.mode_fail} must fail due to the current state of the device")
+            asserts.assert_true(is_err_code, f"Changing to mode {self.mode_fail} must fail due to the current state of the device")
 
-        st_text_len = len(change_to_mode_response.statusText)
-        asserts.assert_true(st_text_len in range(1, 65), f"StatusText length {st_text_len} must be between 1 and 64")
+            st_text_len = len(change_to_mode_response.statusText)
+            asserts.assert_true(st_text_len in range(1, 65), f"StatusText length {st_text_len} must be between 1 and 64")
 
-        # TH reads from the DUT the CurrentMode attribute
+       # TH reads from the DUT the CurrentMode attribute
         self.step(8)
         old_current_mode_dut_2 = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=current_mode_attribute)
 
@@ -222,8 +225,8 @@ class TC_DISHM_2_1(MatterBaseTest):
 
         # Manually put the device in a state from which it will SUCCESSFULLY transition to PIXIT.DISHM.MODE_CHANGE_OK
         if not can_test_mode_failure:
-            self.skip_test(9)
-        if not can_manually_control:
+            self.skip_step(9)
+        elif not can_manually_control:
             self.step(9)
             self.write_to_app_pipe({"Name": "ModeChange", "Device": "DishWasher", "Type": "ToggleFailTransition"})
         else:
