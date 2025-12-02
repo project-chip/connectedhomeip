@@ -368,15 +368,23 @@ class Terminable(Protocol):
     default=False,
     show_default=True,
     help='Use Bluetooth and WiFi mock servers to perform BLE-WiFi commissioning. This option is available on Linux platform only.')
+@click.option(
+    '--save-failures-to',
+    type=click.Path(),
+    help='Save the names of failed tests to the specified file.')
+@click.option(
+    '--tests-from-file',
+    type=click.Path(exists=True),
+    help='Read the list of tests to run from the specified file.')
 @click.pass_context
 def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | None, lock_app: Path | None,
             ota_provider_app: Path | None, ota_requestor_app: Path | None, fabric_bridge_app: Path | None, tv_app: Path | None,
             bridge_app: Path | None, lit_icd_app: Path | None, microwave_oven_app: Path | None, rvc_app: Path | None,
             network_manager_app: Path | None, energy_gateway_app: Path | None, energy_management_app: Path | None,
             closure_app: Path | None, matter_repl_yaml_tester: Path | None, chip_tool_with_python: Path | None, pics_file: Path,
-            keep_going: bool, test_timeout_seconds: int | None, expected_failures: int, ble_wifi: bool) -> None:
+            keep_going: bool, test_timeout_seconds: int | None, expected_failures: int, ble_wifi: bool,
+            save_failures_to: str | None, tests_from_file: Path | None) -> None:
     assert isinstance(context.obj, RunContext)
-
     if expected_failures != 0 and not keep_going:
         raise click.BadOptionUsage("--expected-failures", f"--expected-failures '{expected_failures}' used without '--keep-going'")
 
@@ -442,6 +450,7 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
     ble_controller_app = None
     ble_controller_tool = None
     to_terminate: list[Terminable] = []
+    failed_tests: list[str] = []
 
     def cleanup() -> None:
         for item in reversed(to_terminate):
@@ -451,6 +460,11 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
             except Exception as e:
                 log.warning("Encountered exception during cleanup: %r", e)
         to_terminate.clear()
+
+        if save_failures_to and failed_tests:
+            with open(save_failures_to, 'w') as f:
+                for test in failed_tests:
+                    f.write(f"{test}\n")
 
     try:
         if sys.platform == 'linux':
@@ -486,7 +500,14 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
         for i in range(iterations):
             log.info("Starting iteration %d", i+1)
             observed_failures = 0
-            for test in context.obj.tests:
+            tests_to_run = context.obj.tests
+
+            if tests_from_file:
+                with open(tests_from_file, 'r') as f:
+                    target_test_names = {line.strip() for line in f if line.strip()}
+                tests_to_run = [t for t in tests_to_run if t.name in target_test_names]
+
+            for test in tests_to_run:
                 test_start = time.monotonic()
                 try:
                     if context.obj.dry_run:
@@ -506,7 +527,9 @@ def cmd_run(context: click.Context, iterations: int, all_clusters_app: Path | No
                     test_end = time.monotonic()
                     log.exception("%-30s - FAILED in %0.2f seconds", test.name, test_end - test_start)
                     observed_failures += 1
+                    failed_tests.append(test.name)
                     if not keep_going:
+                        cleanup()
                         sys.exit(2)
 
             if observed_failures != expected_failures:
