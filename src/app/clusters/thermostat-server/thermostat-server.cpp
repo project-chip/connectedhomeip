@@ -50,7 +50,7 @@ constexpr int16_t kDefaultMinCoolSetpointLimit    = 1600; // 16C (61 F) is the d
 constexpr int16_t kDefaultMaxCoolSetpointLimit    = 3200; // 32C (90 F) is the default
 constexpr int16_t kDefaultHeatingSetpoint         = 2000;
 constexpr int16_t kDefaultCoolingSetpoint         = 2600;
-constexpr int8_t kDefaultDeadBand                 = 25; // 2.5C is the default
+constexpr int8_t kDefaultDeadBand                 = 20; // 2.0C is the default
 
 // IMPORTANT NOTE:
 // No Side effects are permitted in emberAfThermostatClusterServerPreAttributeChangedCallback
