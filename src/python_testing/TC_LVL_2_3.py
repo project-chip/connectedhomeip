@@ -37,8 +37,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 
 import test_plan_support
 from mobly import asserts
@@ -126,7 +126,7 @@ class TC_LVL_2_3(MatterBaseTest):
         await self.send_single_cmd(cmd)
         # NOTE: added this sleep to let the DUT have some time to move
         logging.info("Test waits for 1 seconds")
-        time.sleep(1)
+        await asyncio.sleep(1)
 
         self.step(5)
         start_current_level = await self.read_single_attribute_check_success(cluster=lvl, attribute=lvl.Attributes.CurrentLevel)
@@ -141,7 +141,7 @@ class TC_LVL_2_3(MatterBaseTest):
 
         self.step(8)
         logging.info('Test will now collect data for 30 seconds')
-        time.sleep(30)
+        await asyncio.sleep(30)
 
         self.step(9)
         count = sub_handler.attribute_report_counts[lvl.Attributes.CurrentLevel]
@@ -184,7 +184,7 @@ class TC_LVL_2_3(MatterBaseTest):
 
         self.step(17)
         logging.info("Test waits for 5 seconds")
-        time.sleep(5)
+        await asyncio.sleep(5)
 
         self.step(18)
         cmd = Clusters.LevelControl.Commands.MoveToLevel(
@@ -193,7 +193,7 @@ class TC_LVL_2_3(MatterBaseTest):
 
         self.step(19)
         logging.info("Test waits for 20 seconds")
-        time.sleep(20)
+        await asyncio.sleep(20)
 
         self.step(20)
         count = sub_handler.attribute_report_counts[lvl.Attributes.RemainingTime]

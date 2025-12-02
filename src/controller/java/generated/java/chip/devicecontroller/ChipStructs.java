@@ -983,21 +983,41 @@ public static class ActionsClusterEndpointListStruct {
 public static class BasicInformationClusterCapabilityMinimaStruct {
   public Integer caseSessionsPerFabric;
   public Integer subscriptionsPerFabric;
+  public Optional<Integer> simultaneousInvocationsSupported;
+  public Optional<Integer> simultaneousWritesSupported;
+  public Optional<Integer> readPathsSupported;
+  public Optional<Integer> subscribePathsSupported;
   private static final long CASE_SESSIONS_PER_FABRIC_ID = 0L;
   private static final long SUBSCRIPTIONS_PER_FABRIC_ID = 1L;
+  private static final long SIMULTANEOUS_INVOCATIONS_SUPPORTED_ID = 2L;
+  private static final long SIMULTANEOUS_WRITES_SUPPORTED_ID = 3L;
+  private static final long READ_PATHS_SUPPORTED_ID = 4L;
+  private static final long SUBSCRIBE_PATHS_SUPPORTED_ID = 5L;
 
   public BasicInformationClusterCapabilityMinimaStruct(
     Integer caseSessionsPerFabric,
-    Integer subscriptionsPerFabric
+    Integer subscriptionsPerFabric,
+    Optional<Integer> simultaneousInvocationsSupported,
+    Optional<Integer> simultaneousWritesSupported,
+    Optional<Integer> readPathsSupported,
+    Optional<Integer> subscribePathsSupported
   ) {
     this.caseSessionsPerFabric = caseSessionsPerFabric;
     this.subscriptionsPerFabric = subscriptionsPerFabric;
+    this.simultaneousInvocationsSupported = simultaneousInvocationsSupported;
+    this.simultaneousWritesSupported = simultaneousWritesSupported;
+    this.readPathsSupported = readPathsSupported;
+    this.subscribePathsSupported = subscribePathsSupported;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(CASE_SESSIONS_PER_FABRIC_ID, new UIntType(caseSessionsPerFabric)));
     values.add(new StructElement(SUBSCRIPTIONS_PER_FABRIC_ID, new UIntType(subscriptionsPerFabric)));
+    values.add(new StructElement(SIMULTANEOUS_INVOCATIONS_SUPPORTED_ID, simultaneousInvocationsSupported.<BaseTLVType>map((nonOptionalsimultaneousInvocationsSupported) -> new UIntType(nonOptionalsimultaneousInvocationsSupported)).orElse(new EmptyType())));
+    values.add(new StructElement(SIMULTANEOUS_WRITES_SUPPORTED_ID, simultaneousWritesSupported.<BaseTLVType>map((nonOptionalsimultaneousWritesSupported) -> new UIntType(nonOptionalsimultaneousWritesSupported)).orElse(new EmptyType())));
+    values.add(new StructElement(READ_PATHS_SUPPORTED_ID, readPathsSupported.<BaseTLVType>map((nonOptionalreadPathsSupported) -> new UIntType(nonOptionalreadPathsSupported)).orElse(new EmptyType())));
+    values.add(new StructElement(SUBSCRIBE_PATHS_SUPPORTED_ID, subscribePathsSupported.<BaseTLVType>map((nonOptionalsubscribePathsSupported) -> new UIntType(nonOptionalsubscribePathsSupported)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -1008,6 +1028,10 @@ public static class BasicInformationClusterCapabilityMinimaStruct {
     }
     Integer caseSessionsPerFabric = null;
     Integer subscriptionsPerFabric = null;
+    Optional<Integer> simultaneousInvocationsSupported = Optional.empty();
+    Optional<Integer> simultaneousWritesSupported = Optional.empty();
+    Optional<Integer> readPathsSupported = Optional.empty();
+    Optional<Integer> subscribePathsSupported = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == CASE_SESSIONS_PER_FABRIC_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -1019,11 +1043,35 @@ public static class BasicInformationClusterCapabilityMinimaStruct {
           UIntType castingValue = element.value(UIntType.class);
           subscriptionsPerFabric = castingValue.value(Integer.class);
         }
+      } else if (element.contextTagNum() == SIMULTANEOUS_INVOCATIONS_SUPPORTED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          simultaneousInvocationsSupported = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == SIMULTANEOUS_WRITES_SUPPORTED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          simultaneousWritesSupported = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == READ_PATHS_SUPPORTED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          readPathsSupported = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == SUBSCRIBE_PATHS_SUPPORTED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          subscribePathsSupported = Optional.of(castingValue.value(Integer.class));
+        }
       }
     }
     return new BasicInformationClusterCapabilityMinimaStruct(
       caseSessionsPerFabric,
-      subscriptionsPerFabric
+      subscriptionsPerFabric,
+      simultaneousInvocationsSupported,
+      simultaneousWritesSupported,
+      readPathsSupported,
+      subscribePathsSupported
     );
   }
 
@@ -1036,6 +1084,18 @@ public static class BasicInformationClusterCapabilityMinimaStruct {
     output.append("\n");
     output.append("\tsubscriptionsPerFabric: ");
     output.append(subscriptionsPerFabric);
+    output.append("\n");
+    output.append("\tsimultaneousInvocationsSupported: ");
+    output.append(simultaneousInvocationsSupported);
+    output.append("\n");
+    output.append("\tsimultaneousWritesSupported: ");
+    output.append(simultaneousWritesSupported);
+    output.append("\n");
+    output.append("\treadPathsSupported: ");
+    output.append(readPathsSupported);
+    output.append("\n");
+    output.append("\tsubscribePathsSupported: ");
+    output.append(subscribePathsSupported);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -1780,6 +1840,112 @@ public static class NetworkCommissioningClusterWiFiInterfaceScanResultStruct {
     output.append("\n");
     output.append("\trssi: ");
     output.append(rssi);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class GeneralDiagnosticsClusterDeviceLoadStruct {
+  public Integer currentSubscriptions;
+  public Integer currentSubscriptionsForFabric;
+  public Long totalSubscriptionsEstablished;
+  public Long totalInteractionModelMessagesSent;
+  public Long totalInteractionModelMessagesReceived;
+  private static final long CURRENT_SUBSCRIPTIONS_ID = 0L;
+  private static final long CURRENT_SUBSCRIPTIONS_FOR_FABRIC_ID = 1L;
+  private static final long TOTAL_SUBSCRIPTIONS_ESTABLISHED_ID = 2L;
+  private static final long TOTAL_INTERACTION_MODEL_MESSAGES_SENT_ID = 3L;
+  private static final long TOTAL_INTERACTION_MODEL_MESSAGES_RECEIVED_ID = 4L;
+
+  public GeneralDiagnosticsClusterDeviceLoadStruct(
+    Integer currentSubscriptions,
+    Integer currentSubscriptionsForFabric,
+    Long totalSubscriptionsEstablished,
+    Long totalInteractionModelMessagesSent,
+    Long totalInteractionModelMessagesReceived
+  ) {
+    this.currentSubscriptions = currentSubscriptions;
+    this.currentSubscriptionsForFabric = currentSubscriptionsForFabric;
+    this.totalSubscriptionsEstablished = totalSubscriptionsEstablished;
+    this.totalInteractionModelMessagesSent = totalInteractionModelMessagesSent;
+    this.totalInteractionModelMessagesReceived = totalInteractionModelMessagesReceived;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CURRENT_SUBSCRIPTIONS_ID, new UIntType(currentSubscriptions)));
+    values.add(new StructElement(CURRENT_SUBSCRIPTIONS_FOR_FABRIC_ID, new UIntType(currentSubscriptionsForFabric)));
+    values.add(new StructElement(TOTAL_SUBSCRIPTIONS_ESTABLISHED_ID, new UIntType(totalSubscriptionsEstablished)));
+    values.add(new StructElement(TOTAL_INTERACTION_MODEL_MESSAGES_SENT_ID, new UIntType(totalInteractionModelMessagesSent)));
+    values.add(new StructElement(TOTAL_INTERACTION_MODEL_MESSAGES_RECEIVED_ID, new UIntType(totalInteractionModelMessagesReceived)));
+
+    return new StructType(values);
+  }
+
+  public static GeneralDiagnosticsClusterDeviceLoadStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer currentSubscriptions = null;
+    Integer currentSubscriptionsForFabric = null;
+    Long totalSubscriptionsEstablished = null;
+    Long totalInteractionModelMessagesSent = null;
+    Long totalInteractionModelMessagesReceived = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CURRENT_SUBSCRIPTIONS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          currentSubscriptions = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == CURRENT_SUBSCRIPTIONS_FOR_FABRIC_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          currentSubscriptionsForFabric = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == TOTAL_SUBSCRIPTIONS_ESTABLISHED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          totalSubscriptionsEstablished = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == TOTAL_INTERACTION_MODEL_MESSAGES_SENT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          totalInteractionModelMessagesSent = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == TOTAL_INTERACTION_MODEL_MESSAGES_RECEIVED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          totalInteractionModelMessagesReceived = castingValue.value(Long.class);
+        }
+      }
+    }
+    return new GeneralDiagnosticsClusterDeviceLoadStruct(
+      currentSubscriptions,
+      currentSubscriptionsForFabric,
+      totalSubscriptionsEstablished,
+      totalInteractionModelMessagesSent,
+      totalInteractionModelMessagesReceived
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("GeneralDiagnosticsClusterDeviceLoadStruct {\n");
+    output.append("\tcurrentSubscriptions: ");
+    output.append(currentSubscriptions);
+    output.append("\n");
+    output.append("\tcurrentSubscriptionsForFabric: ");
+    output.append(currentSubscriptionsForFabric);
+    output.append("\n");
+    output.append("\ttotalSubscriptionsEstablished: ");
+    output.append(totalSubscriptionsEstablished);
+    output.append("\n");
+    output.append("\ttotalInteractionModelMessagesSent: ");
+    output.append(totalInteractionModelMessagesSent);
+    output.append("\n");
+    output.append("\ttotalInteractionModelMessagesReceived: ");
+    output.append(totalInteractionModelMessagesReceived);
     output.append("\n");
     output.append("}\n");
     return output.toString();

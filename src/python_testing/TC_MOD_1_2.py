@@ -54,13 +54,12 @@ class TC_MOD_1_2(MatterBaseTest):
 
     def pics_TC_MOD_1_2(self):
         """Return PICS definitions asscociated with this test."""
-        pics = [
+        return [
             "MOD.S"
         ]
-        return pics
 
     def steps_TC_MOD_1_2(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test).", is_commissioning=True),
             TestStep(2, "TH reads the SupportedModes attribute from DUT"),
             TestStep(3, "TH reads the CurrentMode attribute from the DUT"),
@@ -69,7 +68,6 @@ class TC_MOD_1_2(MatterBaseTest):
             TestStep(6, "TH reads the Description attribute from the DUT"),
             TestStep(7, "TH reads the StandardNamespace attribute from the DUT")
         ]
-        return steps
 
     def _verify_supported_mode(self, supported_mode):
         """Verify supported mode.
@@ -100,10 +98,14 @@ class TC_MOD_1_2(MatterBaseTest):
     def _log_attribute(self, name, value):
         logger.info(f"{name} attribute with value: {value} with type: {type(value)}")
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_MOD_1_2(self):
         self.cluster = Clusters.ModeSelect
-        self.endpoint = self.get_endpoint(1)
+        self.endpoint = self.get_endpoint()
 
         # Commision device
         # In the test plan step 1 is defined as a precondition.

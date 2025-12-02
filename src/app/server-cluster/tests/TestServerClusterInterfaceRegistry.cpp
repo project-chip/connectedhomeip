@@ -86,6 +86,34 @@ private:
     Span<const ConcreteClusterPath> mActualPaths;
 };
 
+class FailingStartupCluster : public DefaultServerCluster
+{
+public:
+    FailingStartupCluster(const ConcreteClusterPath & path) : DefaultServerCluster(path) {}
+    FailingStartupCluster(EndpointId endpoint, ClusterId cluster) : DefaultServerCluster({ endpoint, cluster }) {}
+
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    CHIP_ERROR Startup(ServerClusterContext & context) override
+    {
+        ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+        mStartupCalls++;
+        return CHIP_ERROR_CANCELLED;
+    }
+    void Shutdown() override { mShutdownCalls++; }
+
+    uint32_t GetStartupCallCount() const { return mStartupCalls; }
+    uint32_t GetShutdownCallCount() const { return mShutdownCalls; }
+
+private:
+    uint32_t mStartupCalls  = 0;
+    uint32_t mShutdownCalls = 0;
+};
+
 struct TestServerClusterInterfaceRegistry : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
@@ -211,7 +239,7 @@ TEST_F(TestServerClusterInterfaceRegistry, Context)
 
         // set up the registry
         TestServerClusterContext context;
-        EXPECT_EQ(registry.SetContext(context.Create()), CHIP_NO_ERROR);
+        EXPECT_EQ(registry.SetContext(ServerClusterContext{ context.Get() }), CHIP_NO_ERROR);
 
         EXPECT_TRUE(cluster1.HasContext());
         EXPECT_FALSE(cluster2.HasContext());
@@ -227,7 +255,7 @@ TEST_F(TestServerClusterInterfaceRegistry, Context)
         EXPECT_FALSE(cluster2.HasContext());
         EXPECT_FALSE(cluster3.HasContext());
 
-        EXPECT_EQ(registry.SetContext(context.Create()), CHIP_NO_ERROR);
+        EXPECT_EQ(registry.SetContext(ServerClusterContext{ context.Get() }), CHIP_NO_ERROR);
         EXPECT_TRUE(cluster1.HasContext());
         EXPECT_TRUE(cluster2.HasContext());
         EXPECT_FALSE(cluster3.HasContext());
@@ -242,7 +270,7 @@ TEST_F(TestServerClusterInterfaceRegistry, Context)
         EXPECT_TRUE(cluster3.HasContext());
 
         // re-setting context works
-        EXPECT_EQ(registry.SetContext(context.Create()), CHIP_NO_ERROR);
+        EXPECT_EQ(registry.SetContext(ServerClusterContext{ context.Get() }), CHIP_NO_ERROR);
         EXPECT_TRUE(cluster1.HasContext());
         EXPECT_FALSE(cluster2.HasContext());
         EXPECT_TRUE(cluster3.HasContext());
@@ -250,7 +278,7 @@ TEST_F(TestServerClusterInterfaceRegistry, Context)
         // also not valid, but different
         TestServerClusterContext otherContext;
 
-        EXPECT_EQ(registry.SetContext(otherContext.Create()), CHIP_NO_ERROR);
+        EXPECT_EQ(registry.SetContext(ServerClusterContext{ otherContext.Get() }), CHIP_NO_ERROR);
         EXPECT_TRUE(cluster1.HasContext());
         EXPECT_FALSE(cluster2.HasContext());
         EXPECT_TRUE(cluster3.HasContext());
@@ -321,4 +349,54 @@ TEST_F(TestServerClusterInterfaceRegistry, UnregisterErrors)
 
     // Can't unregister a null cluster.
     EXPECT_EQ(registry.Unregister(nullptr), CHIP_ERROR_NOT_FOUND);
+}
+
+TEST_F(TestServerClusterInterfaceRegistry, StartupShutdownWithoutContext)
+{
+    // register before the context
+    RegisteredServerCluster<FailingStartupCluster> cluster1(kEp1, kCluster1);
+    RegisteredServerCluster<FailingStartupCluster> cluster2(kEp1, kCluster2);
+    RegisteredServerCluster<FailingStartupCluster> cluster3(kEp2, kCluster1);
+
+    {
+        ServerClusterInterfaceRegistry registry;
+
+        // all registrations are ok
+        EXPECT_EQ(registry.Register(cluster1.Registration()), CHIP_NO_ERROR);
+        EXPECT_EQ(registry.Register(cluster2.Registration()), CHIP_NO_ERROR);
+
+        // startup was NOT called (no context yet)
+        EXPECT_EQ(cluster1.Cluster().GetStartupCallCount(), 0u);
+        EXPECT_EQ(cluster2.Cluster().GetStartupCallCount(), 0u);
+
+        TestServerClusterContext context;
+
+        // the clusters are explicitly set to fail startup, so SetContext returns an error.
+        // TODO: is this sane? Register() with a startup failure does NOT return a failure.
+        EXPECT_EQ(registry.SetContext(ServerClusterContext{ context.Get() }), CHIP_ERROR_HAD_FAILURES);
+
+        // Startup called after registration, with failure that is NOT reported (only logged)
+        EXPECT_EQ(cluster3.Cluster().GetStartupCallCount(), 0u);
+        EXPECT_EQ(registry.Register(cluster3.Registration()), CHIP_NO_ERROR);
+
+        // all startups were called, even though there was an error
+        EXPECT_EQ(cluster1.Cluster().GetStartupCallCount(), 1u);
+        EXPECT_EQ(cluster2.Cluster().GetStartupCallCount(), 1u);
+        EXPECT_EQ(cluster3.Cluster().GetStartupCallCount(), 1u);
+        EXPECT_EQ(cluster1.Cluster().GetShutdownCallCount(), 0u);
+        EXPECT_EQ(cluster2.Cluster().GetShutdownCallCount(), 0u);
+        EXPECT_EQ(cluster3.Cluster().GetShutdownCallCount(), 0u);
+
+        // unregister will call shutdown
+        EXPECT_EQ(registry.Unregister(&cluster2.Cluster()), CHIP_NO_ERROR);
+        EXPECT_EQ(cluster2.Cluster().GetShutdownCallCount(), 1u);
+    }
+
+    // registry deletion will call shutdown for the rest
+    EXPECT_EQ(cluster1.Cluster().GetStartupCallCount(), 1u);
+    EXPECT_EQ(cluster2.Cluster().GetStartupCallCount(), 1u);
+    EXPECT_EQ(cluster3.Cluster().GetStartupCallCount(), 1u);
+    EXPECT_EQ(cluster1.Cluster().GetShutdownCallCount(), 1u);
+    EXPECT_EQ(cluster2.Cluster().GetShutdownCallCount(), 1u);
+    EXPECT_EQ(cluster3.Cluster().GetShutdownCallCount(), 1u);
 }

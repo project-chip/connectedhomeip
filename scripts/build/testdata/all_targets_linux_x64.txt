@@ -13,7 +13,7 @@ linux-{arm64,x64}-{address-resolve-tool,air-purifier,air-quality-sensor,all-clus
 linux-x64-efr32-test-runner[-clang]
 imx-{all-clusters-app,all-clusters-minimal-app,chip-tool,lighting-app,ota-provider-app,thermostat}[-release][-trusty]
 infineon-psoc6-{all-clusters,all-clusters-minimal,light,lock}[-ota][-trustm][-updateimage]
-nxp-{mcxw71,mcxw72,rt1060,rt1170,rw61x}-{freertos,zephyr}-{all-clusters,contact-sensor,laundry-washer,lighting,lock-app,thermostat,unit-test}[-cmake][-dac-conversion][-ethernet][-evkc][-factory][-factory-build][-frdm][-iw416][-iw610][-iwx12][-lit][-log-all][-log-error][-log-none][-log-progress][-low-power][-matter-shell][-mtd][-no-ble][-ota][-rotating-id][-se05x][-smu2][-sw-v2][-thread][-w8801][-wifi]
+nxp-{mcxw71,mcxw72,rt1060,rt1170,rw61x}-{freertos,zephyr}-{all-clusters,contact-sensor,laundry-washer,lighting,lock-app,thermostat,unit-test}[-dac-conversion][-ethernet][-evkc][-factory][-factory-build][-frdm][-gn][-iw416][-iw610][-iwx12][-lit][-log-all][-log-error][-log-none][-log-progress][-low-power][-matter-shell][-mtd][-no-ble][-ota][-rotating-id][-se05x][-smu2][-sw-v2][-thread][-w8801][-wifi]
 nrf-{nrf52840dk,nrf52840dongle,nrf5340dk}-{all-clusters,all-clusters-minimal,light,light-switch,lock,pump,pump-controller,shell,window-covering}[-rpc]
 nrf-native-sim-tests
 nuttx-x64-light
@@ -21,4 +21,4 @@ qpg-qpg6200-{light,light-switch,lock,persistent-storage,shell,thermostat}[-updat
 realtek-{rtl8777g,rtl87x2g}-{all-clusters,light-switch,lighting,lock,ota-requestor,thermostat,window}
 stm32-stm32wb5mm-dk-light
 tizen-{arm,arm64}-{all-clusters,chip-tool,light,tests}[-asan][-coverage][-no-ble][-no-thread][-no-wifi][-ubsan][-with-ui]
-telink-{tl3218x,tl3218x_ml3m,tl3218x_retention,tl7218x,tl7218x_ml7g,tl7218x_ml7m,tl7218x_retention,tlsr9118bdk40d,tlsr9518adk80d,tlsr9528a,tlsr9528a_retention}-{air-quality-sensor,all-clusters,all-clusters-minimal,bridge,contact-sensor,light,light-switch,lock,ota-requestor,pump,pump-controller,shell,smoke-co-alarm,temperature-measurement,thermostat,window-covering}[-4mb][-compress-lzma][-dfu][-factory-data][-mars][-ota][-precompiled-ot][-rpc][-shell][-tflm][-thread-analyzer][-usb]
+telink-{tl3218x,tl3218x_ml3m,tl3218x_retention,tl7218x,tl7218x_ml7g,tl7218x_ml7m,tl7218x_retention,tlsr9118bdk40d,tlsr9518adk80d,tlsr9528a,tlsr9528a_retention}-{air-quality-sensor,all-clusters,all-clusters-minimal,bridge,contact-sensor,light,light-switch,lock,ota-requestor,pump,pump-controller,shell,smoke-co-alarm,temperature-measurement,thermostat,window-covering}[-4mb][-compress-lzma][-dfu-smp][-factory-data][-mars][-ota][-precompiled-ot][-rpc][-shell][-tflm][-thread-analyzer][-usb]

@@ -110,16 +110,19 @@ class TC_FAN_2_1(MatterBaseTest):
         elif fan_mode_sequence == 5:
             fan_modes = [fm_enum.kOff, fm_enum.kHigh]
 
-        fan_modes = [f for f in fan_modes if not (remove_auto and f == fm_enum.kAuto)]
-        return fan_modes
+        return [f for f in fan_modes if not (remove_auto and f == fm_enum.kAuto)]
 
     def pics_TC_FAN_2_1(self) -> list[str]:
         return ["FAN.S"]
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_FAN_2_1(self):
         # Setup
-        self.endpoint = self.get_endpoint(default=1)
+        self.endpoint = self.get_endpoint()
         cluster = Clusters.FanControl
         attribute = cluster.Attributes
         feature = cluster.Bitmaps.Feature

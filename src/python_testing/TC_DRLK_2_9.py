@@ -54,7 +54,7 @@ drlkcluster = Clusters.DoorLock
 class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
 
     def steps_TC_DRLK_2_9(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("precondition", "Commissioning already done.", is_commissioning=True),
             TestStep("1", "TH reads NumberOfTotalUsersSupported attribute.",
                      "Verify that TH is able to read the attribute successfully."),
@@ -160,8 +160,6 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
             TestStep("37", "TH sends ClearAliroReaderConfig Command to DUT.",
                      "Verify that the DUT sends SUCCESS response."),
         ]
-
-        return steps
 
     async def read_attributes_from_dut(self, endpoint, cluster, attribute, expected_status: Status = Status.Success):
         try:
@@ -353,6 +351,10 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
             logging.exception(f"Got exception when performing SetAliroReaderConfig {e}")
             asserts.assert_equal(e.status, expected_status, f"Unexpected error returned: {e}")
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_DRLK_2_9(self):
 
@@ -381,7 +383,7 @@ class TC_DRLK_2_9(MatterBaseTest, DRLK_COMMON):
         self.maxrfidcodelength = None
         self.minrfidcodelength = None
 
-        self.endpoint = self.get_endpoint(default=1)
+        self.endpoint = self.get_endpoint()
         print("endpoint", self.endpoint)
 
         # Aliro Keys for setting Aliro configuration and credential

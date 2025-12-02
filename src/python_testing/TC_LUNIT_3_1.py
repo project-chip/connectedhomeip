@@ -64,7 +64,7 @@ class TC_LUNIT_3_1(MatterBaseTest):
         return "[TC-LUNIT-2.1] Read and Write Unit Localization Cluster Attributes with DUT as Server"
 
     def steps_TC_LUNIT_3_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep(0, "Commission DUT if required", is_commissioning=True),
             TestStep(1, "TH reads from the DUT the TemperatureUnit attribute"),
             TestStep(2, "If supported, TH reads from the DUT the SupportedTemperatureUnits attribute",
@@ -76,18 +76,16 @@ class TC_LUNIT_3_1(MatterBaseTest):
             TestStep(6, "If SupportedTemperatureUnits is not supported, TH writes Kelvin",
                      "Write either returns SUCCESS or CONSTRAINT_ERROR")
         ]
-        return steps
 
     def pics_TC_LUNIT_3_1(self) -> list[str]:
-        pics = [
+        return [
             "LUNIT.S",
         ]
-        return pics
 
     @run_if_endpoint_matches(has_cluster(Clusters.UnitLocalization) and has_attribute(Clusters.UnitLocalization.Attributes.TemperatureUnit))
     async def test_TC_LUNIT_3_1(self):
 
-        endpoint = self.get_endpoint(default=0)
+        endpoint = self.get_endpoint()
         attributes = Clusters.UnitLocalization.Attributes
         features = await self.read_lunit_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
         self.supports_TEMP = bool(features & Clusters.UnitLocalization.Bitmaps.Feature.kTemperatureUnit)
@@ -159,7 +157,7 @@ class TC_LUNIT_3_1(MatterBaseTest):
                 self.mark_current_step_skipped()
 
         else:
-            self.skip_all_remaining_steps(1)
+            self.mark_all_remaining_steps_skipped(1)
             return
 
 

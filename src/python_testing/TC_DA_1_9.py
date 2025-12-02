@@ -44,9 +44,9 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import os
 import signal
-import subprocess
 
 from mobly import asserts
 
@@ -99,10 +99,9 @@ class TC_DA_1_9(MatterBaseTest):
         return "[TC-DA-1.9] Device Attestation Revocation [DUT-Commissioner]"
 
     def pics_TC_DA_1_9(self) -> list[str]:
-        pics = [
+        return [
             "MCORE.ROLE.COMMISSIONER",
         ]
-        return pics
 
     def steps_TC_DA_1_9(self) -> list[TestStep]:
         return [
@@ -187,7 +186,8 @@ class TC_DA_1_9(MatterBaseTest):
             self.step(idx + 1)
 
             # Clean up any existing KVS files
-            subprocess.call("rm -f all-clusters-kvs*", shell=True)
+            proc = await asyncio.create_subprocess_shell("rm -f all-clusters-kvs*")
+            await proc.wait()
 
             # Create log files for this test case
             log_path = os.path.join(self.matter_test_config.logs_path, 'TC_DA_1_9')
@@ -205,10 +205,9 @@ class TC_DA_1_9(MatterBaseTest):
                     discriminator = test_case['discriminator']
                     app_args += f' --discriminator {discriminator}'
 
-                app_cmd = f"{self.app_path} {app_args}"
-
                 # Run the all-clusters-app in background
-                app_process = subprocess.Popen(app_cmd.split(), stdout=app_log_file, stderr=app_log_file)
+                app_process = await asyncio.create_subprocess_exec(self.app_path, *app_args.split(),
+                                                                   stdout=app_log_file, stderr=app_log_file)
 
                 revocation_set = os.path.join(self.revocation_set_base_path, test_case['revocation_set'])
                 # Prompt user with instructions
@@ -238,7 +237,7 @@ class TC_DA_1_9(MatterBaseTest):
                 commissioning_success = resp.lower() == 'y'
 
                 app_process.send_signal(signal.SIGTERM.value)
-                app_process.wait()
+                await app_process.wait()
 
                 # Verify results
                 asserts.assert_equal(

@@ -71,7 +71,7 @@ class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
 
     def steps_TC_SETRF_2_3(self) -> list[TestStep]:
 
-        steps = [
+        return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
                      "DUT is commissioning to TH.", is_commissioning=True),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster.",
@@ -157,8 +157,6 @@ class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
             TestStep("22", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.SETRF.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.SETRF.TEST_EVENT_TRIGGER for Test Event Clear.", """
                      Verify DUT responds w/ status SUCCESS(0x00)."""),
         ]
-
-        return steps
 
     @async_test_body
     async def test_TC_SETRF_2_3(self):

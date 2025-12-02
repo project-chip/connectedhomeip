@@ -331,7 +331,7 @@
             "UpTime",
             "TotalOperationalHours",
             "BootReason",
-            "FeatureMap",
+            "DeviceLoadStatus",
             "ClusterRevision"
         ],
         "Group Key Management": [
@@ -388,7 +388,6 @@
             "PIROccupiedToUnoccupiedDelay",
             "UltrasonicOccupiedToUnoccupiedDelay",
             "PhysicalContactOccupiedToUnoccupiedDelay",
-            "FeatureMap",
             "ClusterRevision"
         ],
         "Operational Credentials": [
@@ -520,7 +519,8 @@
             "LocalTime",
             "Granularity",
             "TimeZoneListMaxSize",
-            "DSTOffsetListMaxSize"
+            "DSTOffsetListMaxSize",
+            "ClusterRevision"
         ],
         "Temperature Control": ["SupportedTemperatureLevels"],
         "Dishwasher Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
@@ -573,7 +573,8 @@
             "InPlaceIndicator",
             "LastChangedTime",
             "ReplacementProductList",
-            "FeatureMap"
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "HEPA Filter Monitoring": [
             "Condition",
@@ -582,7 +583,8 @@
             "InPlaceIndicator",
             "LastChangedTime",
             "ReplacementProductList",
-            "FeatureMap"
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "Carbon Monoxide Concentration Measurement": [
             "MeasuredValue",
@@ -765,7 +767,14 @@
         "Power Topology": ["FeatureMap"],
         "Power Source": ["ClusterRevision"],
         "Valve Configuration and Control": ["RemainingDuration"],
-        "Boolean State Configuration": ["CurrentSensitivityLevel"],
+        "Boolean State Configuration": [
+            "AlarmsActive",
+            "AlarmsEnabled",
+            "AlarmsSuppressed",
+            "ClusterRevision",
+            "CurrentSensitivityLevel",
+            "SensorFault"
+        ],
         "Water Heater Management": [
             "HeaterTypes",
             "HeatDemand",

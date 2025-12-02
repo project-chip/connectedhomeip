@@ -35,8 +35,8 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import queue
-import time
 
 from mobly import asserts
 
@@ -119,7 +119,7 @@ class TC_TIMESYNC_2_13(MatterBaseTest):
         await self.send_single_cmd(cmd=Clusters.TimeSynchronization.Commands.SetTrustedTimeSource(trustedTimeSource=tts))
 
         self.print_step(9, "TH1 waits 5 seconds")
-        time.sleep(5)
+        await asyncio.sleep(5)
 
         self.print_step(10, "TH1 sends the SetTrustedTimeSource command with TrustedTimeSource set to NULL")
         await self.send_single_cmd(cmd=Clusters.TimeSynchronization.Commands.SetTrustedTimeSource(NullValue))

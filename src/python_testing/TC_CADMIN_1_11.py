@@ -31,11 +31,9 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-
+import asyncio
 import logging
 import random
-from time import sleep
-from typing import Optional
 
 from mobly import asserts
 from support_modules.cadmin_support import CADMINBaseTest
@@ -51,37 +49,19 @@ from matter.testing.matter_testing import TestStep, async_test_body, default_mat
 class TC_CADMIN_1_11(CADMINBaseTest):
     async def OpenCommissioningWindow(self, th, expectedErrCode) -> CommissioningParameters:
         if expectedErrCode is None:
-            params = await th.OpenCommissioningWindow(
+            return await th.OpenCommissioningWindow(
                 nodeId=self.dut_node_id, timeout=self.timeout, iteration=10000, discriminator=self.discriminator, option=1)
-            return params
 
-        else:
-            ctx = asserts.assert_raises(ChipStackError)
-            with ctx:
-                await th.OpenCommissioningWindow(
-                    nodeId=self.dut_node_id, timeout=self.timeout, iteration=10000, discriminator=self.discriminator, option=1)
-            errcode = PyChipError.from_code(ctx.exception.err)
-            logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
-            asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
-            asserts.assert_true(errcode.sdk_code == expectedErrCode,
-                                'Unexpected error code returned from CommissioningComplete')
-
-    async def OpenBasicCommissioningWindow(self, th: ChipDeviceCtrl, expectedErrCode: Optional[Clusters.AdministratorCommissioning.Enums.StatusCode] = None) -> CommissioningParameters:
-        if not expectedErrCode:
-            params = await th.OpenBasicCommissioningWindow(
-                nodeId=self.dut_node_id, timeout=self.timeout)
-            return params
-
-        else:
-            ctx = asserts.assert_raises(ChipStackError)
-            with ctx:
-                await th.OpenBasicCommissioningWindow(
-                    nodeId=self.dut_node_id, timeout=self.timeout)
-            errcode = ctx.exception.chip_error
-            logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
-            asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
-            asserts.assert_true(errcode.sdk_code == expectedErrCode,
-                                'Unexpected error code returned from CommissioningComplete')
+        ctx = asserts.assert_raises(ChipStackError)
+        with ctx:
+            await th.OpenCommissioningWindow(
+                nodeId=self.dut_node_id, timeout=self.timeout, iteration=10000, discriminator=self.discriminator, option=1)
+        errcode = PyChipError.from_code(ctx.exception.err)
+        logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
+        asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
+        asserts.assert_true(errcode.sdk_code == expectedErrCode,
+                            'Unexpected error code returned from CommissioningComplete')
+        return None
 
     def steps_TC_CADMIN_1_11(self) -> list[TestStep]:
         return [
@@ -162,7 +142,7 @@ class TC_CADMIN_1_11(CADMINBaseTest):
         revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
         await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
         # The failsafe cleanup is scheduled after the command completes, so give it a bit of time to do that
-        sleep(1)
+        await asyncio.sleep(1)
 
         self.step(9)
 
@@ -196,7 +176,7 @@ class TC_CADMIN_1_11(CADMINBaseTest):
             revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
             await self.th1.SendCommand(nodeId=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
             # The failsafe cleanup is scheduled after the command completes, so give it a bit of time to do that
-            sleep(1)
+            await asyncio.sleep(1)
 
         else:
             self.skip_step("9a")

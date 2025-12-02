@@ -62,12 +62,10 @@ class TC_CC_10_1(MatterBaseTest):
                     efs_attribute_value_list.append(pair)
                     break
 
-        extension_field_set = Clusters.ScenesManagement.Structs.ExtensionFieldSetStruct(
+        return Clusters.ScenesManagement.Structs.ExtensionFieldSetStruct(
             clusterID=Clusters.Objects.ColorControl.id,
             attributeValueList=efs_attribute_value_list
         )
-
-        return extension_field_set
 
     def desc_TC_CC_10_1(self) -> str:
         """Returns a description of this test"""
@@ -78,7 +76,7 @@ class TC_CC_10_1(MatterBaseTest):
         return ["CC.S", "S.S"]
 
     def steps_TC_CC_10_1(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("0", "Commissioning, already done", is_commissioning=True),
             TestStep("0a", "TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT using a key that is pre-installed on the TH. GroupKeySet fields are as follows: GroupKeySetID: 0x01a1, GroupKeySecurityPolicy: TrustFirst (0), EpochKey0: a0a1a2a3a4a5a6a7a8a9aaabacadaeaf, EpochStartTime0: 1110000, EpochKey1: b0b1b2b3b4b5b6b7b8b9babbbcbdbebf, EpochStartTime1: 1110001, EpochKey2: c0c1c2c3c4c5c6c7c8c9cacbcccdcecf, EpochStartTime2: 1110002"),
             TestStep("0b", "TH binds GroupIds 0x0001 with GroupKeySetID 0x01a1 in the GroupKeyMap attribute list on GroupKeyManagement cluster by writing the GroupKeyMap attribute with two entries as follows: * List item 1: - FabricIndex: 1 - GroupId: 0x0001 - GroupKeySetId: 0x01a1"),
@@ -121,13 +119,12 @@ class TC_CC_10_1(MatterBaseTest):
             TestStep("9b", "TH sends a _RecallScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x05 and the _TransitionTime_ omitted."),
             TestStep("9c", "TH reads _EnhancedCurrentHue and CurrentSaturation attributes_ from DUT."),
             TestStep(
-                "10a", "TH sends a _AddScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x06, the TransitionTime field set to 0 and the ExtensionFieldSetStructs set to: '[{ ClusterID: 0x0300, AttributeValueList: [{ AttributeID: 0x4002, ValueUnsigned16: 1 }, { AttributeID: 0x4002, ValueUnsigned16: 1 }, { AttributeID: 0x4004, ValueUnsigned16: 5 }]}]'"),
+                "10a", "TH sends a _AddScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x06, the TransitionTime field set to 0 and the ExtensionFieldSetStructs set to: '[{ ClusterID: 0x0300, AttributeValueList: [{ AttributeID: 0x4002, ValueUnsigned8: 1 }, { AttributeID: 0x4003, ValueUnsigned8: 1 }, { AttributeID: 0x4004, ValueUnsigned16: 5 }]}]'"),
             TestStep("10b", "TH sends a _RecallScene_ command to DUT with the _GroupID_ field set to _G~1~_, the _SceneID_ field set to 0x06 and the _TransitionTime_ omitted."),
             TestStep("10c", "TH read _ColorLoopActive attribute_ from DUT."),
             TestStep("10d", "TH read _ColorLoopDirection attribute_ from DUT."),
             TestStep("10e", "TH read _ColorLoopTime attribute_ from DUT."),
         ]
-        return steps
 
     @async_test_body
     async def setup_test(self):

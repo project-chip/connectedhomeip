@@ -27,12 +27,18 @@ import click
 import coloredlogs
 from chiptest.accessories import AppsRegister
 from chiptest.glob_matcher import GlobMatcher
+from chiptest.runner import Executor, SubprocessInfo
 from chiptest.test_definition import TestRunTime, TestTag
 from chipyaml.paths_finder import PathsFinder
+
+log = logging.getLogger(__name__)
 
 # If running on Linux platform load the Linux specific code.
 if sys.platform == "linux":
     import chiptest.linux
+
+if sys.platform == 'darwin':
+    import chiptest.darwin
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -46,12 +52,7 @@ class ManualHandling(enum.Enum):
 
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
-__LOG_LEVELS__ = {
-    'debug': logging.DEBUG,
-    'info': logging.INFO,
-    'warn': logging.WARNING,
-    'fatal': logging.FATAL,
-}
+__LOG_LEVELS__ = logging.getLevelNamesMapping()
 
 
 @dataclass
@@ -148,12 +149,17 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
     elif runner == 'darwin_framework_tool_python':
         runtime = TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON
 
-    if chip_tool is None and not runtime == TestRunTime.MATTER_REPL_PYTHON:
+    if chip_tool is not None:
+        chip_tool = SubprocessInfo(kind='tool', path=chip_tool)
+    elif runtime != TestRunTime.MATTER_REPL_PYTHON:
         paths_finder = PathsFinder()
         if runtime == TestRunTime.CHIP_TOOL_PYTHON:
-            chip_tool = paths_finder.get('chip-tool')
-        else:
-            chip_tool = paths_finder.get('darwin-framework-tool')
+            chip_tool_path = paths_finder.get('chip-tool')
+        else:  # DARWIN_FRAMEWORK_TOOL_PYTHON
+            chip_tool_path = paths_finder.get('darwin-framework-tool')
+
+        if chip_tool_path is not None:
+            chip_tool = SubprocessInfo(kind='tool', path=chip_tool_path)
 
     if include_tags:
         include_tags = {TestTag.__members__[t] for t in include_tags}
@@ -191,7 +197,7 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
             targeted = [test for test in all_tests if test.name.lower()
                         == name.lower()]
             if len(targeted) == 0:
-                logging.error("Unknown target: %s" % name)
+                log.error("Unknown target: '%s'", name)
             tests.extend(targeted)
 
     if target_glob:
@@ -199,9 +205,9 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
         tests = [test for test in tests if matcher.matches(test.name.lower())]
 
     if len(tests) == 0:
-        logging.error("No targets match, exiting.")
-        logging.error("Valid targets are (case-insensitive): %s" %
-                      (", ".join(test.name for test in all_tests)))
+        log.error("No targets match, exiting.")
+        log.error("Valid targets are (case-insensitive): '%s'",
+                  ", ".join(test.name for test in all_tests))
         exit(1)
 
     if target_skip_glob:
@@ -320,86 +326,65 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
             energy_gateway_app, energy_management_app, closure_app, matter_repl_yaml_tester,
             chip_tool_with_python, pics_file, keep_going, test_timeout_seconds, expected_failures, ble_wifi):
     if expected_failures != 0 and not keep_going:
-        logging.exception(f"'--expected-failures {expected_failures}' used without '--keep-going'")
+        log.error("--expected-failures '%s' used without '--keep-going'", expected_failures)
         sys.exit(2)
-
-    runner = chiptest.runner.Runner()
 
     paths_finder = PathsFinder()
 
-    if all_clusters_app is None:
-        all_clusters_app = paths_finder.get('chip-all-clusters-app')
+    def build_app(arg_value, kind: str, key: str):
+        app_path = arg_value if arg_value else paths_finder.get(key)
+        if app_path is not None:
+            return SubprocessInfo(kind=kind, path=app_path)
+        return None
 
-    if lock_app is None:
-        lock_app = paths_finder.get('chip-lock-app')
-
-    if fabric_bridge_app is None:
-        fabric_bridge_app = paths_finder.get('fabric-bridge-app')
-
-    if ota_provider_app is None:
-        ota_provider_app = paths_finder.get('chip-ota-provider-app')
-
-    if ota_requestor_app is None:
-        ota_requestor_app = paths_finder.get('chip-ota-requestor-app')
-
-    if tv_app is None:
-        tv_app = paths_finder.get('chip-tv-app')
-
-    if bridge_app is None:
-        bridge_app = paths_finder.get('chip-bridge-app')
-
-    if lit_icd_app is None:
-        lit_icd_app = paths_finder.get('lit-icd-app')
-
-    if microwave_oven_app is None:
-        microwave_oven_app = paths_finder.get('chip-microwave-oven-app')
-
-    if rvc_app is None:
-        rvc_app = paths_finder.get('chip-rvc-app')
-
-    if network_manager_app is None:
-        network_manager_app = paths_finder.get('matter-network-manager-app')
-
-    if energy_gateway_app is None:
-        energy_gateway_app = paths_finder.get('chip-energy-gateway-app')
-
-    if energy_management_app is None:
-        energy_management_app = paths_finder.get('chip-energy-management-app')
-
-    if closure_app is None:
-        closure_app = paths_finder.get('closure-app')
-
-    if matter_repl_yaml_tester is None:
-        matter_repl_yaml_tester = paths_finder.get('yamltest_with_matter_repl_tester.py')
+    all_clusters_app = build_app(all_clusters_app, 'app', 'chip-all-clusters-app')
+    lock_app = build_app(lock_app, 'app', 'chip-lock-app')
+    fabric_bridge_app = build_app(fabric_bridge_app, 'app', 'fabric-bridge-app')
+    ota_provider_app = build_app(ota_provider_app, 'app', 'chip-ota-provider-app')
+    ota_requestor_app = build_app(ota_requestor_app, 'app', 'chip-ota-requestor-app')
+    tv_app = build_app(tv_app, 'app', 'chip-tv-app')
+    bridge_app = build_app(bridge_app, 'app', 'chip-bridge-app')
+    lit_icd_app = build_app(lit_icd_app, 'app', 'lit-icd-app')
+    microwave_oven_app = build_app(microwave_oven_app, 'app', 'chip-microwave-oven-app')
+    rvc_app = build_app(rvc_app, 'app', 'chip-rvc-app')
+    network_manager_app = build_app(network_manager_app, 'app', 'matter-network-manager-app')
+    energy_gateway_app = build_app(energy_gateway_app, 'app', 'chip-energy-gateway-app')
+    energy_management_app = build_app(energy_management_app, 'app', 'chip-energy-management-app')
+    closure_app = build_app(closure_app, 'app', 'closure-app')
+    matter_repl_yaml_tester = build_app(matter_repl_yaml_tester, 'tool',
+                                        'yamltest_with_matter_repl_tester.py').wrap_with('python3')
 
     if chip_tool_with_python is None:
         if context.obj.runtime == TestRunTime.DARWIN_FRAMEWORK_TOOL_PYTHON:
-            chip_tool_with_python = paths_finder.get('darwinframeworktool.py')
+            chip_tool_with_python = build_app(None, 'tool', 'darwinframeworktool.py')
         else:
-            chip_tool_with_python = paths_finder.get('chiptool.py')
+            chip_tool_with_python = build_app(None, 'tool', 'chiptool.py')
+
+        if chip_tool_with_python is not None:
+            chip_tool_with_python = chip_tool_with_python.wrap_with('python3')
 
     if ble_wifi and sys.platform != "linux":
         raise click.BadOptionUsage("ble-wifi", "Option --ble-wifi is available on Linux platform only")
 
     # Command execution requires an array
     paths = chiptest.ApplicationPaths(
-        chip_tool=[context.obj.chip_tool],
-        all_clusters_app=[all_clusters_app],
-        lock_app=[lock_app],
-        fabric_bridge_app=[fabric_bridge_app],
-        ota_provider_app=[ota_provider_app],
-        ota_requestor_app=[ota_requestor_app],
-        tv_app=[tv_app],
-        bridge_app=[bridge_app],
-        lit_icd_app=[lit_icd_app],
-        microwave_oven_app=[microwave_oven_app],
-        rvc_app=[rvc_app],
-        network_manager_app=[network_manager_app],
-        energy_gateway_app=[energy_gateway_app],
-        energy_management_app=[energy_management_app],
-        closure_app=[closure_app],
-        matter_repl_yaml_tester_cmd=['python3'] + [matter_repl_yaml_tester],
-        chip_tool_with_python_cmd=['python3'] + [chip_tool_with_python],
+        chip_tool=context.obj.chip_tool,
+        all_clusters_app=all_clusters_app,
+        lock_app=lock_app,
+        fabric_bridge_app=fabric_bridge_app,
+        ota_provider_app=ota_provider_app,
+        ota_requestor_app=ota_requestor_app,
+        tv_app=tv_app,
+        bridge_app=bridge_app,
+        lit_icd_app=lit_icd_app,
+        microwave_oven_app=microwave_oven_app,
+        rvc_app=rvc_app,
+        network_manager_app=network_manager_app,
+        energy_gateway_app=energy_gateway_app,
+        energy_management_app=energy_management_app,
+        closure_app=closure_app,
+        matter_repl_yaml_tester_cmd=matter_repl_yaml_tester,
+        chip_tool_with_python_cmd=chip_tool_with_python,
     )
 
     ble_controller_app = None
@@ -407,21 +392,31 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
 
     if sys.platform == 'linux':
         ns = chiptest.linux.IsolatedNetworkNamespace(
+            index=0,
             # Do not bring up the app interface link automatically when doing BLE-WiFi commissioning.
             setup_app_link_up=not ble_wifi,
             # Change the app link name so the interface will be recognized as WiFi or Ethernet
             # depending on the commissioning method used.
             app_link_name='wlx-app' if ble_wifi else 'eth-app',
             unshared=context.obj.in_unshare)
+
         if ble_wifi:
             bus = chiptest.linux.DBusTestSystemBus()
             bluetooth = chiptest.linux.BluetoothMock()
             wifi = chiptest.linux.WpaSupplicantMock("MatterAP", "MatterAPPassword", ns)
             ble_controller_app = 0   # Bind app to the first BLE controller
             ble_controller_tool = 1  # Bind tool to the second BLE controller
-        paths = chiptest.linux.PathsWithNetworkNamespaces(paths)
 
-    logging.info("Each test will be executed %d times" % iterations)
+        executor = chiptest.linux.LinuxNamespacedExecutor(ns)
+    elif sys.platform == 'darwin':
+        executor = chiptest.darwin.DarwinExecutor()
+    else:
+        log.warning("No platform-specific executor for '%s'", sys.platform)
+        executor = Executor()
+
+    runner = chiptest.runner.Runner(executor=executor)
+
+    log.info("Each test will be executed %d times", iterations)
 
     apps_register = AppsRegister()
     apps_register.init()
@@ -436,25 +431,25 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
             ns.terminate()
 
     for i in range(iterations):
-        logging.info("Starting iteration %d" % (i+1))
+        log.info("Starting iteration %d", i+1)
         observed_failures = 0
         for test in context.obj.tests:
             if context.obj.include_tags:
                 if not (test.tags & context.obj.include_tags):
-                    logging.debug("Test %s not included" % test.name)
+                    log.debug("Test '%s' not included", test.name)
                     continue
 
             if context.obj.exclude_tags:
                 if test.tags & context.obj.exclude_tags:
-                    logging.debug("Test %s excluded" % test.name)
+                    log.debug("Test '%s' excluded", test.name)
                     continue
 
             test_start = time.monotonic()
             try:
                 if context.obj.dry_run:
-                    logging.info("Would run test: %s" % test.name)
+                    log.info("Would run test: '%s'", test.name)
                 else:
-                    logging.info('%-20s - Starting test' % (test.name))
+                    log.info("%-20s - Starting test", test.name)
                 test.Run(
                     runner, apps_register, paths, pics_file, test_timeout_seconds, context.obj.dry_run,
                     test_runtime=context.obj.runtime,
@@ -463,19 +458,17 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
                 )
                 if not context.obj.dry_run:
                     test_end = time.monotonic()
-                    logging.info('%-30s - Completed in %0.2f seconds' %
-                                 (test.name, (test_end - test_start)))
+                    log.info("%-30s - Completed in %0.2f seconds", test.name, test_end - test_start)
             except Exception:
                 test_end = time.monotonic()
-                logging.exception('%-30s - FAILED in %0.2f seconds' %
-                                  (test.name, (test_end - test_start)))
+                log.exception("%-30s - FAILED in %0.2f seconds", test.name, test_end - test_start)
                 observed_failures += 1
                 if not keep_going:
                     cleanup()
                     sys.exit(2)
 
         if observed_failures != expected_failures:
-            logging.exception(f'Iteration {i}: expected failure count {expected_failures}, but got {observed_failures}')
+            log.error("Iteration %d: expected failure count %d, but got %d", i, expected_failures, observed_failures)
             cleanup()
             sys.exit(2)
 
