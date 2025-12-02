@@ -109,10 +109,13 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     if (err == CHIP_NO_ERROR) {
       err = [self _setFieldsFromDecodableStruct:decodedStruct];
       {{#if (and (isStrEqual (asUpperCamelCase parent.name preserveAcronyms=true) "OperationalCredentials")
-                 (isStrEqual (asUpperCamelCase name preserveAcronyms=true) "AttestationResponse"))}}
+                 (or
+                   (isStrEqual (asUpperCamelCase name preserveAcronyms=true) "AttestationResponse")
+                   (isStrEqual (asUpperCamelCase name preserveAcronyms=true) "SignVIDVerificationResponse")
+                 ))}}
       if (err == CHIP_NO_ERROR) {
         do {
-          // AttestationResponse has an extra attestationChallenge field.  Once we
+          // AttestationResponse and SignVIDVerificationResponse have an extra attestationChallenge field.  Once we
           // have some sort of more direct decoding from the responseValue, we can
           // probably make this less hardcoded.
           //

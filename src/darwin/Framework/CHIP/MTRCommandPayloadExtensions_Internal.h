@@ -25,4 +25,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSData * attestationChallenge;
 @end
 
+@interface MTROperationalCredentialsClusterSignVIDVerificationResponseParams ()
+@property (nonatomic, copy) NSData * attestationChallenge;
+@end
+
 NS_ASSUME_NONNULL_END
