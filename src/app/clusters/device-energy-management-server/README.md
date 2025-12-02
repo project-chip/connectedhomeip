@@ -3,7 +3,7 @@
 The Device Energy Management (DEM) cluster allows energy management systems to
 communicate with Energy Smart Appliances (ESAs) to optimize energy usage. It
 enables power adjustments, forecast scheduling, and constraint-based power
-management for devices like EVSEs, water heaters, and other smart appliances.
+management for devices like EVSE, water heaters, and other smart appliances.
 
 ## Overview
 
