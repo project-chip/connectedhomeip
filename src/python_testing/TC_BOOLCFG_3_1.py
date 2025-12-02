@@ -40,7 +40,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_feature,
-                                           run_if_endpoint_matches, async_test_body)
+                                           run_if_endpoint_matches)
 
 
 class TC_BOOLCFG_3_1(MatterBaseTest):
