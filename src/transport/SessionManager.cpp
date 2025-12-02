@@ -1232,7 +1232,7 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & partialPack
 
         CHIP_TRACE_MESSAGE_RECEIVED(payloadHeader, packetHeaderCopy, &groupSession, peerAddress, msg->Start(), msg->TotalLength());
         SessionHandle session(groupSession);
-        
+
         CountMessagesReceived(session, payloadHeader);
         mCB->OnMessageReceived(packetHeaderCopy, payloadHeader, session,
                                SessionMessageDelegate::DuplicateMessage::No, std::move(msg));
