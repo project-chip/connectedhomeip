@@ -17,7 +17,9 @@
  */
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
+#include <clusters/PowerTopology/Enums.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
 
 namespace chip {

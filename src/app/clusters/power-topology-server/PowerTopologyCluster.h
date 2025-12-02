@@ -16,11 +16,12 @@
  */
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/power-topology-server/PowerTopologyDelegate.h>
-#include <app/reporting/reporting.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/OptionalAttributeSet.h>
+#include <clusters/PowerTopology/AttributeIds.h>
+#include <clusters/PowerTopology/ClusterId.h>
+#include <clusters/PowerTopology/Enums.h>
 
 namespace chip::app::Clusters::PowerTopology {
 

@@ -25,7 +25,6 @@ source_set("power-topology-server") {
     "${chip_root}/src/app/data-model-provider",
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/server-cluster",
-    "${chip_root}/src/data-model-providers/codegen:headers",
     "${chip_root}/zzz_generated/app-common/clusters/PowerTopology",
   ]
 }
