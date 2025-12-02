@@ -36,8 +36,6 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ResourceMonitoring;
 using namespace chip::app::Clusters::ResourceMonitoring::Attributes;
 using namespace chip::Testing;
-using chip::Testing::ClusterTester;
-using chip::Testing::TestServerClusterContext;
 
 namespace {
 
