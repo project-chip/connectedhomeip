@@ -196,6 +196,51 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRDataTypeAttributionData
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _contextInformation = @(0);
+
+        _sourceContext = nil;
+
+        _nodeID = nil;
+
+        _groupID = nil;
+
+        _systemTimeStamp = nil;
+
+        _epochTimeStamp = nil;
+
+        _fabricIndex = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDataTypeAttributionData alloc] init];
+
+    other.contextInformation = self.contextInformation;
+    other.sourceContext = self.sourceContext;
+    other.nodeID = self.nodeID;
+    other.groupID = self.groupID;
+    other.systemTimeStamp = self.systemTimeStamp;
+    other.epochTimeStamp = self.epochTimeStamp;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contextInformation:%@; sourceContext:%@; nodeID:%@; groupID:%@; systemTimeStamp:%@; epochTimeStamp:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _contextInformation, _sourceContext, _nodeID, _groupID, _systemTimeStamp, _epochTimeStamp, _fabricIndex];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRDataTypeICECandidateStruct
 - (instancetype)init
 {
@@ -362,6 +407,39 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: mfgCode:%@; namespaceID:%@; tag:%@; label:%@; >", NSStringFromClass([self class]), _mfgCode, _namespaceID, _tag, _label];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDataTypeSuppliedAttributionData
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _contextInformation = @(0);
+
+        _sourceContext = nil;
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDataTypeSuppliedAttributionData alloc] init];
+
+    other.contextInformation = self.contextInformation;
+    other.sourceContext = self.sourceContext;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contextInformation:%@; sourceContext:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _contextInformation, _sourceContext, _fabricIndex];
     return descriptionString;
 }
 
@@ -8467,6 +8545,111 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: occupancy:%@; >", NSStringFromClass([self class]), _occupancy];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRAmbientContextSensingClusterAmbientContextTypeStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _ambientContextSensed = [NSArray array];
+
+        _detectionStartTime = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRAmbientContextSensingClusterAmbientContextTypeStruct alloc] init];
+
+    other.ambientContextSensed = self.ambientContextSensed;
+    other.detectionStartTime = self.detectionStartTime;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ambientContextSensed:%@; detectionStartTime:%@; >", NSStringFromClass([self class]), _ambientContextSensed, _detectionStartTime];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRAmbientContextSensingClusterHoldTimeLimitsStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _holdTimeMin = @(0);
+
+        _holdTimeMax = @(0);
+
+        _holdTimeDefault = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRAmbientContextSensingClusterHoldTimeLimitsStruct alloc] init];
+
+    other.holdTimeMin = self.holdTimeMin;
+    other.holdTimeMax = self.holdTimeMax;
+    other.holdTimeDefault = self.holdTimeDefault;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: holdTimeMin:%@; holdTimeMax:%@; holdTimeDefault:%@; >", NSStringFromClass([self class]), _holdTimeMin, _holdTimeMax, _holdTimeDefault];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRAmbientContextSensingClusterPredictedActivityStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _startTimestamp = @(0);
+
+        _endTimestamp = @(0);
+
+        _ambientContextType = nil;
+
+        _crowdDetected = nil;
+
+        _crowdCount = nil;
+
+        _confidence = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRAmbientContextSensingClusterPredictedActivityStruct alloc] init];
+
+    other.startTimestamp = self.startTimestamp;
+    other.endTimestamp = self.endTimestamp;
+    other.ambientContextType = self.ambientContextType;
+    other.crowdDetected = self.crowdDetected;
+    other.crowdCount = self.crowdCount;
+    other.confidence = self.confidence;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: startTimestamp:%@; endTimestamp:%@; ambientContextType:%@; crowdDetected:%@; crowdCount:%@; confidence:%@; >", NSStringFromClass([self class]), _startTimestamp, _endTimestamp, _ambientContextType, _crowdDetected, _crowdCount, _confidence];
     return descriptionString;
 }
 

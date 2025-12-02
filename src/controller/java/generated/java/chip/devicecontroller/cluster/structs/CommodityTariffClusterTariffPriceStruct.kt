@@ -17,18 +17,20 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import java.util.Optional
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class CommodityTariffClusterTariffPriceStruct(
-  val priceType: UInt,
-  val price: Optional<Long>,
-  val priceLevel: Optional<Int>,
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class CommodityTariffClusterTariffPriceStruct (
+    val priceType: UInt,
+    val price: Optional<Long>,
+    val priceLevel: Optional<Int>) {
+  override fun toString(): String  = buildString {
     append("CommodityTariffClusterTariffPriceStruct {\n")
     append("\tpriceType : $priceType\n")
     append("\tprice : $price\n")
@@ -41,13 +43,13 @@ class CommodityTariffClusterTariffPriceStruct(
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_PRICE_TYPE), priceType)
       if (price.isPresent) {
-        val optprice = price.get()
-        put(ContextSpecificTag(TAG_PRICE), optprice)
-      }
+      val optprice = price.get()
+      put(ContextSpecificTag(TAG_PRICE), optprice)
+    }
       if (priceLevel.isPresent) {
-        val optpriceLevel = priceLevel.get()
-        put(ContextSpecificTag(TAG_PRICE_LEVEL), optpriceLevel)
-      }
+      val optpriceLevel = priceLevel.get()
+      put(ContextSpecificTag(TAG_PRICE_LEVEL), optpriceLevel)
+    }
       endStructure()
     }
   }
@@ -57,22 +59,20 @@ class CommodityTariffClusterTariffPriceStruct(
     private const val TAG_PRICE = 1
     private const val TAG_PRICE_LEVEL = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): CommodityTariffClusterTariffPriceStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : CommodityTariffClusterTariffPriceStruct {
       tlvReader.enterStructure(tlvTag)
       val priceType = tlvReader.getUInt(ContextSpecificTag(TAG_PRICE_TYPE))
-      val price =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_PRICE))) {
-          Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_PRICE)))
-        } else {
-          Optional.empty()
-        }
-      val priceLevel =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_PRICE_LEVEL))) {
-          Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_PRICE_LEVEL)))
-        } else {
-          Optional.empty()
-        }
-
+      val price = if (tlvReader.isNextTag(ContextSpecificTag(TAG_PRICE))) {
+      Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_PRICE)))
+    } else {
+      Optional.empty()
+    }
+      val priceLevel = if (tlvReader.isNextTag(ContextSpecificTag(TAG_PRICE_LEVEL))) {
+      Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_PRICE_LEVEL)))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
       return CommodityTariffClusterTariffPriceStruct(priceType, price, priceLevel)

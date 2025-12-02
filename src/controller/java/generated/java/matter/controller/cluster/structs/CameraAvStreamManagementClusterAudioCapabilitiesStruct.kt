@@ -16,6 +16,7 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
@@ -27,7 +28,7 @@ class CameraAvStreamManagementClusterAudioCapabilitiesStruct(
   val maxNumberOfChannels: UByte,
   val supportedCodecs: List<UByte>,
   val supportedSampleRates: List<UInt>,
-  val supportedBitDepths: List<UByte>,
+  val supportedBitDepths: List<UByte>
 ) {
   override fun toString(): String = buildString {
     append("CameraAvStreamManagementClusterAudioCapabilitiesStruct {\n")
@@ -67,45 +68,34 @@ class CameraAvStreamManagementClusterAudioCapabilitiesStruct(
     private const val TAG_SUPPORTED_SAMPLE_RATES = 2
     private const val TAG_SUPPORTED_BIT_DEPTHS = 3
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): CameraAvStreamManagementClusterAudioCapabilitiesStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): CameraAvStreamManagementClusterAudioCapabilitiesStruct {
       tlvReader.enterStructure(tlvTag)
       val maxNumberOfChannels = tlvReader.getUByte(ContextSpecificTag(TAG_MAX_NUMBER_OF_CHANNELS))
-      val supportedCodecs =
-        buildList<UByte> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_SUPPORTED_CODECS))
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getUByte(AnonymousTag))
-          }
-          tlvReader.exitContainer()
-        }
-      val supportedSampleRates =
-        buildList<UInt> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_SUPPORTED_SAMPLE_RATES))
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getUInt(AnonymousTag))
-          }
-          tlvReader.exitContainer()
-        }
-      val supportedBitDepths =
-        buildList<UByte> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_SUPPORTED_BIT_DEPTHS))
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getUByte(AnonymousTag))
-          }
-          tlvReader.exitContainer()
-        }
-
+      val supportedCodecs = buildList<UByte> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_SUPPORTED_CODECS))
+      while(!tlvReader.isEndOfContainer()) {
+        add(tlvReader.getUByte(AnonymousTag))
+      }
+      tlvReader.exitContainer()
+    }
+      val supportedSampleRates = buildList<UInt> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_SUPPORTED_SAMPLE_RATES))
+      while(!tlvReader.isEndOfContainer()) {
+        add(tlvReader.getUInt(AnonymousTag))
+      }
+      tlvReader.exitContainer()
+    }
+      val supportedBitDepths = buildList<UByte> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_SUPPORTED_BIT_DEPTHS))
+      while(!tlvReader.isEndOfContainer()) {
+        add(tlvReader.getUByte(AnonymousTag))
+      }
+      tlvReader.exitContainer()
+    }
+      
       tlvReader.exitContainer()
 
-      return CameraAvStreamManagementClusterAudioCapabilitiesStruct(
-        maxNumberOfChannels,
-        supportedCodecs,
-        supportedSampleRates,
-        supportedBitDepths,
-      )
+      return CameraAvStreamManagementClusterAudioCapabilitiesStruct(maxNumberOfChannels, supportedCodecs, supportedSampleRates, supportedBitDepths)
     }
   }
 }

@@ -18,6 +18,7 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -27,7 +28,7 @@ class CameraAvStreamManagementClusterVideoSensorParamsStruct(
   val sensorWidth: UShort,
   val sensorHeight: UShort,
   val maxFPS: UShort,
-  val maxHDRFPS: Optional<UShort>,
+  val maxHDRFPS: Optional<UShort>
 ) {
   override fun toString(): String = buildString {
     append("CameraAvStreamManagementClusterVideoSensorParamsStruct {\n")
@@ -58,29 +59,20 @@ class CameraAvStreamManagementClusterVideoSensorParamsStruct(
     private const val TAG_MAX_FPS = 2
     private const val TAG_MAX_HDRFPS = 3
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): CameraAvStreamManagementClusterVideoSensorParamsStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): CameraAvStreamManagementClusterVideoSensorParamsStruct {
       tlvReader.enterStructure(tlvTag)
       val sensorWidth = tlvReader.getUShort(ContextSpecificTag(TAG_SENSOR_WIDTH))
       val sensorHeight = tlvReader.getUShort(ContextSpecificTag(TAG_SENSOR_HEIGHT))
       val maxFPS = tlvReader.getUShort(ContextSpecificTag(TAG_MAX_FPS))
-      val maxHDRFPS =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MAX_HDRFPS))) {
-          Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_MAX_HDRFPS)))
-        } else {
-          Optional.empty()
-        }
-
+      val maxHDRFPS = if (tlvReader.isNextTag(ContextSpecificTag(TAG_MAX_HDRFPS))) {
+      Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_MAX_HDRFPS)))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
-      return CameraAvStreamManagementClusterVideoSensorParamsStruct(
-        sensorWidth,
-        sensorHeight,
-        maxFPS,
-        maxHDRFPS,
-      )
+      return CameraAvStreamManagementClusterVideoSensorParamsStruct(sensorWidth, sensorHeight, maxFPS, maxHDRFPS)
     }
   }
 }

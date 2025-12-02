@@ -17,22 +17,24 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import java.util.Optional
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ElectricalEnergyMeasurementClusterEnergyMeasurementStruct(
-  val energy: Long,
-  val startTimestamp: Optional<ULong>,
-  val endTimestamp: Optional<ULong>,
-  val startSystime: Optional<ULong>,
-  val endSystime: Optional<ULong>,
-  val apparentEnergy: Optional<Long>,
-  val reactiveEnergy: Optional<Long>,
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ElectricalEnergyMeasurementClusterEnergyMeasurementStruct (
+    val energy: Long,
+    val startTimestamp: Optional<ULong>,
+    val endTimestamp: Optional<ULong>,
+    val startSystime: Optional<ULong>,
+    val endSystime: Optional<ULong>,
+    val apparentEnergy: Optional<Long>,
+    val reactiveEnergy: Optional<Long>) {
+  override fun toString(): String  = buildString {
     append("ElectricalEnergyMeasurementClusterEnergyMeasurementStruct {\n")
     append("\tenergy : $energy\n")
     append("\tstartTimestamp : $startTimestamp\n")
@@ -49,29 +51,29 @@ class ElectricalEnergyMeasurementClusterEnergyMeasurementStruct(
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_ENERGY), energy)
       if (startTimestamp.isPresent) {
-        val optstartTimestamp = startTimestamp.get()
-        put(ContextSpecificTag(TAG_START_TIMESTAMP), optstartTimestamp)
-      }
+      val optstartTimestamp = startTimestamp.get()
+      put(ContextSpecificTag(TAG_START_TIMESTAMP), optstartTimestamp)
+    }
       if (endTimestamp.isPresent) {
-        val optendTimestamp = endTimestamp.get()
-        put(ContextSpecificTag(TAG_END_TIMESTAMP), optendTimestamp)
-      }
+      val optendTimestamp = endTimestamp.get()
+      put(ContextSpecificTag(TAG_END_TIMESTAMP), optendTimestamp)
+    }
       if (startSystime.isPresent) {
-        val optstartSystime = startSystime.get()
-        put(ContextSpecificTag(TAG_START_SYSTIME), optstartSystime)
-      }
+      val optstartSystime = startSystime.get()
+      put(ContextSpecificTag(TAG_START_SYSTIME), optstartSystime)
+    }
       if (endSystime.isPresent) {
-        val optendSystime = endSystime.get()
-        put(ContextSpecificTag(TAG_END_SYSTIME), optendSystime)
-      }
+      val optendSystime = endSystime.get()
+      put(ContextSpecificTag(TAG_END_SYSTIME), optendSystime)
+    }
       if (apparentEnergy.isPresent) {
-        val optapparentEnergy = apparentEnergy.get()
-        put(ContextSpecificTag(TAG_APPARENT_ENERGY), optapparentEnergy)
-      }
+      val optapparentEnergy = apparentEnergy.get()
+      put(ContextSpecificTag(TAG_APPARENT_ENERGY), optapparentEnergy)
+    }
       if (reactiveEnergy.isPresent) {
-        val optreactiveEnergy = reactiveEnergy.get()
-        put(ContextSpecificTag(TAG_REACTIVE_ENERGY), optreactiveEnergy)
-      }
+      val optreactiveEnergy = reactiveEnergy.get()
+      put(ContextSpecificTag(TAG_REACTIVE_ENERGY), optreactiveEnergy)
+    }
       endStructure()
     }
   }
@@ -85,60 +87,43 @@ class ElectricalEnergyMeasurementClusterEnergyMeasurementStruct(
     private const val TAG_APPARENT_ENERGY = 5
     private const val TAG_REACTIVE_ENERGY = 6
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): ElectricalEnergyMeasurementClusterEnergyMeasurementStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ElectricalEnergyMeasurementClusterEnergyMeasurementStruct {
       tlvReader.enterStructure(tlvTag)
       val energy = tlvReader.getLong(ContextSpecificTag(TAG_ENERGY))
-      val startTimestamp =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_START_TIMESTAMP))) {
-          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_START_TIMESTAMP)))
-        } else {
-          Optional.empty()
-        }
-      val endTimestamp =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_END_TIMESTAMP))) {
-          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_END_TIMESTAMP)))
-        } else {
-          Optional.empty()
-        }
-      val startSystime =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_START_SYSTIME))) {
-          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_START_SYSTIME)))
-        } else {
-          Optional.empty()
-        }
-      val endSystime =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_END_SYSTIME))) {
-          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_END_SYSTIME)))
-        } else {
-          Optional.empty()
-        }
-      val apparentEnergy =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_APPARENT_ENERGY))) {
-          Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_APPARENT_ENERGY)))
-        } else {
-          Optional.empty()
-        }
-      val reactiveEnergy =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_REACTIVE_ENERGY))) {
-          Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_REACTIVE_ENERGY)))
-        } else {
-          Optional.empty()
-        }
-
+      val startTimestamp = if (tlvReader.isNextTag(ContextSpecificTag(TAG_START_TIMESTAMP))) {
+      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_START_TIMESTAMP)))
+    } else {
+      Optional.empty()
+    }
+      val endTimestamp = if (tlvReader.isNextTag(ContextSpecificTag(TAG_END_TIMESTAMP))) {
+      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_END_TIMESTAMP)))
+    } else {
+      Optional.empty()
+    }
+      val startSystime = if (tlvReader.isNextTag(ContextSpecificTag(TAG_START_SYSTIME))) {
+      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_START_SYSTIME)))
+    } else {
+      Optional.empty()
+    }
+      val endSystime = if (tlvReader.isNextTag(ContextSpecificTag(TAG_END_SYSTIME))) {
+      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_END_SYSTIME)))
+    } else {
+      Optional.empty()
+    }
+      val apparentEnergy = if (tlvReader.isNextTag(ContextSpecificTag(TAG_APPARENT_ENERGY))) {
+      Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_APPARENT_ENERGY)))
+    } else {
+      Optional.empty()
+    }
+      val reactiveEnergy = if (tlvReader.isNextTag(ContextSpecificTag(TAG_REACTIVE_ENERGY))) {
+      Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_REACTIVE_ENERGY)))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
-      return ElectricalEnergyMeasurementClusterEnergyMeasurementStruct(
-        energy,
-        startTimestamp,
-        endTimestamp,
-        startSystime,
-        endSystime,
-        apparentEnergy,
-        reactiveEnergy,
-      )
+      return ElectricalEnergyMeasurementClusterEnergyMeasurementStruct(energy, startTimestamp, endTimestamp, startSystime, endSystime, apparentEnergy, reactiveEnergy)
     }
   }
 }

@@ -237,6 +237,8 @@ char const * ClusterIdToText(chip::ClusterId id)
         return "RadonConcentrationMeasurement";
     case chip::app::Clusters::SoilMeasurement::Id:
         return "SoilMeasurement";
+    case chip::app::Clusters::AmbientContextSensing::Id:
+        return "AmbientContextSensing";
     case chip::app::Clusters::WiFiNetworkManagement::Id:
         return "WiFiNetworkManagement";
     case chip::app::Clusters::ThreadBorderRouterManagement::Id:
@@ -3941,6 +3943,49 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         case chip::app::Clusters::SoilMeasurement::Attributes::FeatureMap::Id:
             return "FeatureMap";
         case chip::app::Clusters::SoilMeasurement::Attributes::ClusterRevision::Id:
+            return "ClusterRevision";
+        default:
+            return "Unknown";
+        }
+    }
+    case chip::app::Clusters::AmbientContextSensing::Id: {
+        switch (id)
+        {
+        case chip::app::Clusters::AmbientContextSensing::Attributes::HumanActivityDetected::Id:
+            return "HumanActivityDetected";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::ObjectIdentified::Id:
+            return "ObjectIdentified";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::AudioContextDetected::Id:
+            return "AudioContextDetected";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::AmbientContextType::Id:
+            return "AmbientContextType";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::AmbientContextTypeSupported::Id:
+            return "AmbientContextTypeSupported";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::SimultaneousDetectionLimit::Id:
+            return "SimultaneousDetectionLimit";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::CountThresholdReached::Id:
+            return "CountThresholdReached";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::CountThreshold::Id:
+            return "CountThreshold";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::ObjectCount::Id:
+            return "ObjectCount";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::HoldTime::Id:
+            return "HoldTime";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::HoldTimeLimits::Id:
+            return "HoldTimeLimits";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::PredictedActivity::Id:
+            return "PredictedActivity";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::PrivacyMode::Id:
+            return "PrivacyMode";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::GeneratedCommandList::Id:
+            return "GeneratedCommandList";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::AcceptedCommandList::Id:
+            return "AcceptedCommandList";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::AttributeList::Id:
+            return "AttributeList";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::FeatureMap::Id:
+            return "FeatureMap";
+        case chip::app::Clusters::AmbientContextSensing::Attributes::ClusterRevision::Id:
             return "ClusterRevision";
         default:
             return "Unknown";

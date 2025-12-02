@@ -16,7 +16,9 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -25,7 +27,7 @@ import matter.tlv.TlvWriter
 class GroupKeyManagementClusterGroupKeyMapStruct(
   val groupId: UShort,
   val groupKeySetID: UShort,
-  val fabricIndex: UByte,
+  val fabricIndex: UByte
 ) {
   override fun toString(): String = buildString {
     append("GroupKeyManagementClusterGroupKeyMapStruct {\n")
@@ -55,7 +57,7 @@ class GroupKeyManagementClusterGroupKeyMapStruct(
       val groupId = tlvReader.getUShort(ContextSpecificTag(TAG_GROUP_ID))
       val groupKeySetID = tlvReader.getUShort(ContextSpecificTag(TAG_GROUP_KEY_SET_ID))
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
-
+      
       tlvReader.exitContainer()
 
       return GroupKeyManagementClusterGroupKeyMapStruct(groupId, groupKeySetID, fabricIndex)

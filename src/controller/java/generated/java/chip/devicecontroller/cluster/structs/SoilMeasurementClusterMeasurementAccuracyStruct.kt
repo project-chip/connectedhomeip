@@ -20,17 +20,19 @@ import chip.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class SoilMeasurementClusterMeasurementAccuracyStruct(
-  val measurementType: UInt,
-  val measured: Boolean,
-  val minMeasuredValue: Long,
-  val maxMeasuredValue: Long,
-  val accuracyRanges: List<SoilMeasurementClusterMeasurementAccuracyRangeStruct>,
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class SoilMeasurementClusterMeasurementAccuracyStruct (
+    val measurementType: UInt,
+    val measured: Boolean,
+    val minMeasuredValue: Long,
+    val maxMeasuredValue: Long,
+    val accuracyRanges: List<SoilMeasurementClusterMeasurementAccuracyRangeStruct>) {
+  override fun toString(): String  = buildString {
     append("SoilMeasurementClusterMeasurementAccuracyStruct {\n")
     append("\tmeasurementType : $measurementType\n")
     append("\tmeasured : $measured\n")
@@ -63,35 +65,23 @@ class SoilMeasurementClusterMeasurementAccuracyStruct(
     private const val TAG_MAX_MEASURED_VALUE = 3
     private const val TAG_ACCURACY_RANGES = 4
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): SoilMeasurementClusterMeasurementAccuracyStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : SoilMeasurementClusterMeasurementAccuracyStruct {
       tlvReader.enterStructure(tlvTag)
       val measurementType = tlvReader.getUInt(ContextSpecificTag(TAG_MEASUREMENT_TYPE))
       val measured = tlvReader.getBoolean(ContextSpecificTag(TAG_MEASURED))
       val minMeasuredValue = tlvReader.getLong(ContextSpecificTag(TAG_MIN_MEASURED_VALUE))
       val maxMeasuredValue = tlvReader.getLong(ContextSpecificTag(TAG_MAX_MEASURED_VALUE))
-      val accuracyRanges =
-        buildList<SoilMeasurementClusterMeasurementAccuracyRangeStruct> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_ACCURACY_RANGES))
-          while (!tlvReader.isEndOfContainer()) {
-            add(
-              SoilMeasurementClusterMeasurementAccuracyRangeStruct.fromTlv(AnonymousTag, tlvReader)
-            )
-          }
-          tlvReader.exitContainer()
-        }
-
+      val accuracyRanges = buildList<SoilMeasurementClusterMeasurementAccuracyRangeStruct> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_ACCURACY_RANGES))
+      while(!tlvReader.isEndOfContainer()) {
+        add(SoilMeasurementClusterMeasurementAccuracyRangeStruct.fromTlv(AnonymousTag, tlvReader))
+      }
+      tlvReader.exitContainer()
+    }
+      
       tlvReader.exitContainer()
 
-      return SoilMeasurementClusterMeasurementAccuracyStruct(
-        measurementType,
-        measured,
-        minMeasuredValue,
-        maxMeasuredValue,
-        accuracyRanges,
-      )
+      return SoilMeasurementClusterMeasurementAccuracyStruct(measurementType, measured, minMeasuredValue, maxMeasuredValue, accuracyRanges)
     }
   }
 }

@@ -17,17 +17,19 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import java.util.Optional
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ThermostatClusterSystemModeChangeEvent(
-  val previousSystemMode: Optional<UInt>,
-  val currentSystemMode: UInt,
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ThermostatClusterSystemModeChangeEvent (
+    val previousSystemMode: Optional<UInt>,
+    val currentSystemMode: UInt) {
+  override fun toString(): String  = buildString {
     append("ThermostatClusterSystemModeChangeEvent {\n")
     append("\tpreviousSystemMode : $previousSystemMode\n")
     append("\tcurrentSystemMode : $currentSystemMode\n")
@@ -38,9 +40,9 @@ class ThermostatClusterSystemModeChangeEvent(
     tlvWriter.apply {
       startStructure(tlvTag)
       if (previousSystemMode.isPresent) {
-        val optpreviousSystemMode = previousSystemMode.get()
-        put(ContextSpecificTag(TAG_PREVIOUS_SYSTEM_MODE), optpreviousSystemMode)
-      }
+      val optpreviousSystemMode = previousSystemMode.get()
+      put(ContextSpecificTag(TAG_PREVIOUS_SYSTEM_MODE), optpreviousSystemMode)
+    }
       put(ContextSpecificTag(TAG_CURRENT_SYSTEM_MODE), currentSystemMode)
       endStructure()
     }
@@ -50,16 +52,15 @@ class ThermostatClusterSystemModeChangeEvent(
     private const val TAG_PREVIOUS_SYSTEM_MODE = 0
     private const val TAG_CURRENT_SYSTEM_MODE = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ThermostatClusterSystemModeChangeEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ThermostatClusterSystemModeChangeEvent {
       tlvReader.enterStructure(tlvTag)
-      val previousSystemMode =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_PREVIOUS_SYSTEM_MODE))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_PREVIOUS_SYSTEM_MODE)))
-        } else {
-          Optional.empty()
-        }
+      val previousSystemMode = if (tlvReader.isNextTag(ContextSpecificTag(TAG_PREVIOUS_SYSTEM_MODE))) {
+      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_PREVIOUS_SYSTEM_MODE)))
+    } else {
+      Optional.empty()
+    }
       val currentSystemMode = tlvReader.getUInt(ContextSpecificTag(TAG_CURRENT_SYSTEM_MODE))
-
+      
       tlvReader.exitContainer()
 
       return ThermostatClusterSystemModeChangeEvent(previousSystemMode, currentSystemMode)

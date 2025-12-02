@@ -17,13 +17,18 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class SwitchClusterInitialPressEvent(val newPosition: UInt) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class SwitchClusterInitialPressEvent (
+    val newPosition: UInt) {
+  override fun toString(): String  = buildString {
     append("SwitchClusterInitialPressEvent {\n")
     append("\tnewPosition : $newPosition\n")
     append("}\n")
@@ -40,10 +45,10 @@ class SwitchClusterInitialPressEvent(val newPosition: UInt) {
   companion object {
     private const val TAG_NEW_POSITION = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): SwitchClusterInitialPressEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : SwitchClusterInitialPressEvent {
       tlvReader.enterStructure(tlvTag)
       val newPosition = tlvReader.getUInt(ContextSpecificTag(TAG_NEW_POSITION))
-
+      
       tlvReader.exitContainer()
 
       return SwitchClusterInitialPressEvent(newPosition)

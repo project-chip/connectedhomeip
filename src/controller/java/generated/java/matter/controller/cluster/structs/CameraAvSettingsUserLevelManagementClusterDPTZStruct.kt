@@ -16,7 +16,9 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -24,7 +26,7 @@ import matter.tlv.TlvWriter
 
 class CameraAvSettingsUserLevelManagementClusterDPTZStruct(
   val videoStreamID: UShort,
-  val viewport: CameraAvSettingsUserLevelManagementClusterViewportStruct,
+  val viewport: CameraAvSettingsUserLevelManagementClusterViewportStruct
 ) {
   override fun toString(): String = buildString {
     append("CameraAvSettingsUserLevelManagementClusterDPTZStruct {\n")
@@ -46,18 +48,11 @@ class CameraAvSettingsUserLevelManagementClusterDPTZStruct(
     private const val TAG_VIDEO_STREAM_ID = 0
     private const val TAG_VIEWPORT = 1
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): CameraAvSettingsUserLevelManagementClusterDPTZStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): CameraAvSettingsUserLevelManagementClusterDPTZStruct {
       tlvReader.enterStructure(tlvTag)
       val videoStreamID = tlvReader.getUShort(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
-      val viewport =
-        CameraAvSettingsUserLevelManagementClusterViewportStruct.fromTlv(
-          ContextSpecificTag(TAG_VIEWPORT),
-          tlvReader,
-        )
-
+      val viewport = CameraAvSettingsUserLevelManagementClusterViewportStruct.fromTlv(ContextSpecificTag(TAG_VIEWPORT), tlvReader)
+      
       tlvReader.exitContainer()
 
       return CameraAvSettingsUserLevelManagementClusterDPTZStruct(videoStreamID, viewport)

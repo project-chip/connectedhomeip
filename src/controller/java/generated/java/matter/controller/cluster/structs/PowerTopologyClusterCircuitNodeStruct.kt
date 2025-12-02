@@ -18,6 +18,7 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -27,7 +28,7 @@ class PowerTopologyClusterCircuitNodeStruct(
   val node: ULong,
   val endpoint: Optional<UShort>,
   val label: Optional<String>,
-  val fabricIndex: UByte,
+  val fabricIndex: UByte
 ) {
   override fun toString(): String = buildString {
     append("PowerTopologyClusterCircuitNodeStruct {\n")
@@ -64,20 +65,18 @@ class PowerTopologyClusterCircuitNodeStruct(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): PowerTopologyClusterCircuitNodeStruct {
       tlvReader.enterStructure(tlvTag)
       val node = tlvReader.getULong(ContextSpecificTag(TAG_NODE))
-      val endpoint =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ENDPOINT))) {
-          Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_ENDPOINT)))
-        } else {
-          Optional.empty()
-        }
-      val label =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_LABEL))) {
-          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_LABEL)))
-        } else {
-          Optional.empty()
-        }
+      val endpoint = if (tlvReader.isNextTag(ContextSpecificTag(TAG_ENDPOINT))) {
+      Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_ENDPOINT)))
+    } else {
+      Optional.empty()
+    }
+      val label = if (tlvReader.isNextTag(ContextSpecificTag(TAG_LABEL))) {
+      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_LABEL)))
+    } else {
+      Optional.empty()
+    }
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
-
+      
       tlvReader.exitContainer()
 
       return PowerTopologyClusterCircuitNodeStruct(node, endpoint, label, fabricIndex)

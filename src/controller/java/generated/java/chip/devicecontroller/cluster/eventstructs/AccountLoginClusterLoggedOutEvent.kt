@@ -17,14 +17,19 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import java.util.Optional
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class AccountLoginClusterLoggedOutEvent(val node: Optional<ULong>, val fabricIndex: UInt) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class AccountLoginClusterLoggedOutEvent (
+    val node: Optional<ULong>,
+    val fabricIndex: UInt) {
+  override fun toString(): String  = buildString {
     append("AccountLoginClusterLoggedOutEvent {\n")
     append("\tnode : $node\n")
     append("\tfabricIndex : $fabricIndex\n")
@@ -35,9 +40,9 @@ class AccountLoginClusterLoggedOutEvent(val node: Optional<ULong>, val fabricInd
     tlvWriter.apply {
       startStructure(tlvTag)
       if (node.isPresent) {
-        val optnode = node.get()
-        put(ContextSpecificTag(TAG_NODE), optnode)
-      }
+      val optnode = node.get()
+      put(ContextSpecificTag(TAG_NODE), optnode)
+    }
       put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
@@ -47,16 +52,15 @@ class AccountLoginClusterLoggedOutEvent(val node: Optional<ULong>, val fabricInd
     private const val TAG_NODE = 0
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): AccountLoginClusterLoggedOutEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : AccountLoginClusterLoggedOutEvent {
       tlvReader.enterStructure(tlvTag)
-      val node =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_NODE))) {
-          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_NODE)))
-        } else {
-          Optional.empty()
-        }
+      val node = if (tlvReader.isNextTag(ContextSpecificTag(TAG_NODE))) {
+      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_NODE)))
+    } else {
+      Optional.empty()
+    }
       val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
-
+      
       tlvReader.exitContainer()
 
       return AccountLoginClusterLoggedOutEvent(node, fabricIndex)

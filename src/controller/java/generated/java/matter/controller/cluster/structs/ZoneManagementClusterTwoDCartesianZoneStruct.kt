@@ -28,7 +28,7 @@ class ZoneManagementClusterTwoDCartesianZoneStruct(
   val name: String,
   val use: UByte,
   val vertices: List<ZoneManagementClusterTwoDCartesianVertexStruct>,
-  val color: Optional<String>,
+  val color: Optional<String>
 ) {
   override fun toString(): String = buildString {
     append("ZoneManagementClusterTwoDCartesianZoneStruct {\n")
@@ -67,21 +67,19 @@ class ZoneManagementClusterTwoDCartesianZoneStruct(
       tlvReader.enterStructure(tlvTag)
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
       val use = tlvReader.getUByte(ContextSpecificTag(TAG_USE))
-      val vertices =
-        buildList<ZoneManagementClusterTwoDCartesianVertexStruct> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_VERTICES))
-          while (!tlvReader.isEndOfContainer()) {
-            add(ZoneManagementClusterTwoDCartesianVertexStruct.fromTlv(AnonymousTag, tlvReader))
-          }
-          tlvReader.exitContainer()
-        }
-      val color =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_COLOR))) {
-          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_COLOR)))
-        } else {
-          Optional.empty()
-        }
-
+      val vertices = buildList<ZoneManagementClusterTwoDCartesianVertexStruct> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_VERTICES))
+      while(!tlvReader.isEndOfContainer()) {
+        add(ZoneManagementClusterTwoDCartesianVertexStruct.fromTlv(AnonymousTag, tlvReader))
+      }
+      tlvReader.exitContainer()
+    }
+      val color = if (tlvReader.isNextTag(ContextSpecificTag(TAG_COLOR))) {
+      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_COLOR)))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
       return ZoneManagementClusterTwoDCartesianZoneStruct(name, use, vertices, color)

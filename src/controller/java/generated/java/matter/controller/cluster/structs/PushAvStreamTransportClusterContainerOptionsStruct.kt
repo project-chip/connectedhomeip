@@ -18,6 +18,7 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -25,7 +26,7 @@ import matter.tlv.TlvWriter
 
 class PushAvStreamTransportClusterContainerOptionsStruct(
   val containerType: UByte,
-  val CMAFContainerOptions: Optional<PushAvStreamTransportClusterCMAFContainerOptionsStruct>,
+  val CMAFContainerOptions: Optional<PushAvStreamTransportClusterCMAFContainerOptionsStruct>
 ) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterContainerOptionsStruct {\n")
@@ -50,24 +51,15 @@ class PushAvStreamTransportClusterContainerOptionsStruct(
     private const val TAG_CONTAINER_TYPE = 0
     private const val TAG_CMAF_CONTAINER_OPTIONS = 1
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): PushAvStreamTransportClusterContainerOptionsStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): PushAvStreamTransportClusterContainerOptionsStruct {
       tlvReader.enterStructure(tlvTag)
       val containerType = tlvReader.getUByte(ContextSpecificTag(TAG_CONTAINER_TYPE))
-      val CMAFContainerOptions =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CMAF_CONTAINER_OPTIONS))) {
-          Optional.of(
-            PushAvStreamTransportClusterCMAFContainerOptionsStruct.fromTlv(
-              ContextSpecificTag(TAG_CMAF_CONTAINER_OPTIONS),
-              tlvReader,
-            )
-          )
-        } else {
-          Optional.empty()
-        }
-
+      val CMAFContainerOptions = if (tlvReader.isNextTag(ContextSpecificTag(TAG_CMAF_CONTAINER_OPTIONS))) {
+      Optional.of(PushAvStreamTransportClusterCMAFContainerOptionsStruct.fromTlv(ContextSpecificTag(TAG_CMAF_CONTAINER_OPTIONS), tlvReader))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
       return PushAvStreamTransportClusterContainerOptionsStruct(containerType, CMAFContainerOptions)

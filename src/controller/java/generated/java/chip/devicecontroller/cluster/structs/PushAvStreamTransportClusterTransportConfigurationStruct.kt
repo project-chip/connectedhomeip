@@ -17,19 +17,21 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import java.util.Optional
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class PushAvStreamTransportClusterTransportConfigurationStruct(
-  val connectionID: UInt,
-  val transportStatus: UInt,
-  val transportOptions: Optional<PushAvStreamTransportClusterTransportOptionsStruct>,
-  val fabricIndex: UInt,
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class PushAvStreamTransportClusterTransportConfigurationStruct (
+    val connectionID: UInt,
+    val transportStatus: UInt,
+    val transportOptions: Optional<PushAvStreamTransportClusterTransportOptionsStruct>,
+    val fabricIndex: UInt) {
+  override fun toString(): String  = buildString {
     append("PushAvStreamTransportClusterTransportConfigurationStruct {\n")
     append("\tconnectionID : $connectionID\n")
     append("\ttransportStatus : $transportStatus\n")
@@ -44,9 +46,9 @@ class PushAvStreamTransportClusterTransportConfigurationStruct(
       put(ContextSpecificTag(TAG_CONNECTION_ID), connectionID)
       put(ContextSpecificTag(TAG_TRANSPORT_STATUS), transportStatus)
       if (transportOptions.isPresent) {
-        val opttransportOptions = transportOptions.get()
-        opttransportOptions.toTlv(ContextSpecificTag(TAG_TRANSPORT_OPTIONS), this)
-      }
+      val opttransportOptions = transportOptions.get()
+      opttransportOptions.toTlv(ContextSpecificTag(TAG_TRANSPORT_OPTIONS), this)
+    }
       put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
@@ -58,34 +60,20 @@ class PushAvStreamTransportClusterTransportConfigurationStruct(
     private const val TAG_TRANSPORT_OPTIONS = 2
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): PushAvStreamTransportClusterTransportConfigurationStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : PushAvStreamTransportClusterTransportConfigurationStruct {
       tlvReader.enterStructure(tlvTag)
       val connectionID = tlvReader.getUInt(ContextSpecificTag(TAG_CONNECTION_ID))
       val transportStatus = tlvReader.getUInt(ContextSpecificTag(TAG_TRANSPORT_STATUS))
-      val transportOptions =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_TRANSPORT_OPTIONS))) {
-          Optional.of(
-            PushAvStreamTransportClusterTransportOptionsStruct.fromTlv(
-              ContextSpecificTag(TAG_TRANSPORT_OPTIONS),
-              tlvReader,
-            )
-          )
-        } else {
-          Optional.empty()
-        }
+      val transportOptions = if (tlvReader.isNextTag(ContextSpecificTag(TAG_TRANSPORT_OPTIONS))) {
+      Optional.of(PushAvStreamTransportClusterTransportOptionsStruct.fromTlv(ContextSpecificTag(TAG_TRANSPORT_OPTIONS), tlvReader))
+    } else {
+      Optional.empty()
+    }
       val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
-
+      
       tlvReader.exitContainer()
 
-      return PushAvStreamTransportClusterTransportConfigurationStruct(
-        connectionID,
-        transportStatus,
-        transportOptions,
-        fabricIndex,
-      )
+      return PushAvStreamTransportClusterTransportConfigurationStruct(connectionID, transportStatus, transportOptions, fabricIndex)
     }
   }
 }

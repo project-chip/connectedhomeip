@@ -16,6 +16,7 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
@@ -26,7 +27,7 @@ import matter.tlv.TlvWriter
 class ContentControlClusterTimeWindowStruct(
   val timeWindowIndex: UShort?,
   val dayOfWeek: UByte,
-  val timePeriod: List<ContentControlClusterTimePeriodStruct>,
+  val timePeriod: List<ContentControlClusterTimePeriodStruct>
 ) {
   override fun toString(): String = buildString {
     append("ContentControlClusterTimeWindowStruct {\n")
@@ -61,23 +62,21 @@ class ContentControlClusterTimeWindowStruct(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ContentControlClusterTimeWindowStruct {
       tlvReader.enterStructure(tlvTag)
-      val timeWindowIndex =
-        if (!tlvReader.isNull()) {
-          tlvReader.getUShort(ContextSpecificTag(TAG_TIME_WINDOW_INDEX))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_TIME_WINDOW_INDEX))
-          null
-        }
+      val timeWindowIndex = if (!tlvReader.isNull()) {
+      tlvReader.getUShort(ContextSpecificTag(TAG_TIME_WINDOW_INDEX))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_TIME_WINDOW_INDEX))
+      null
+    }
       val dayOfWeek = tlvReader.getUByte(ContextSpecificTag(TAG_DAY_OF_WEEK))
-      val timePeriod =
-        buildList<ContentControlClusterTimePeriodStruct> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_TIME_PERIOD))
-          while (!tlvReader.isEndOfContainer()) {
-            add(ContentControlClusterTimePeriodStruct.fromTlv(AnonymousTag, tlvReader))
-          }
-          tlvReader.exitContainer()
-        }
-
+      val timePeriod = buildList<ContentControlClusterTimePeriodStruct> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_TIME_PERIOD))
+      while(!tlvReader.isEndOfContainer()) {
+        add(ContentControlClusterTimePeriodStruct.fromTlv(AnonymousTag, tlvReader))
+      }
+      tlvReader.exitContainer()
+    }
+      
       tlvReader.exitContainer()
 
       return ContentControlClusterTimeWindowStruct(timeWindowIndex, dayOfWeek, timePeriod)

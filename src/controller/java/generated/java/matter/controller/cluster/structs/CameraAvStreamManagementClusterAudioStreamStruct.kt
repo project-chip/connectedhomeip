@@ -16,7 +16,9 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -30,7 +32,7 @@ class CameraAvStreamManagementClusterAudioStreamStruct(
   val sampleRate: UInt,
   val bitRate: UInt,
   val bitDepth: UByte,
-  val referenceCount: UByte,
+  val referenceCount: UByte
 ) {
   override fun toString(): String = buildString {
     append("CameraAvStreamManagementClusterAudioStreamStruct {\n")
@@ -70,10 +72,7 @@ class CameraAvStreamManagementClusterAudioStreamStruct(
     private const val TAG_BIT_DEPTH = 6
     private const val TAG_REFERENCE_COUNT = 7
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): CameraAvStreamManagementClusterAudioStreamStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): CameraAvStreamManagementClusterAudioStreamStruct {
       tlvReader.enterStructure(tlvTag)
       val audioStreamID = tlvReader.getUShort(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
       val streamUsage = tlvReader.getUByte(ContextSpecificTag(TAG_STREAM_USAGE))
@@ -83,19 +82,10 @@ class CameraAvStreamManagementClusterAudioStreamStruct(
       val bitRate = tlvReader.getUInt(ContextSpecificTag(TAG_BIT_RATE))
       val bitDepth = tlvReader.getUByte(ContextSpecificTag(TAG_BIT_DEPTH))
       val referenceCount = tlvReader.getUByte(ContextSpecificTag(TAG_REFERENCE_COUNT))
-
+      
       tlvReader.exitContainer()
 
-      return CameraAvStreamManagementClusterAudioStreamStruct(
-        audioStreamID,
-        streamUsage,
-        audioCodec,
-        channelCount,
-        sampleRate,
-        bitRate,
-        bitDepth,
-        referenceCount,
-      )
+      return CameraAvStreamManagementClusterAudioStreamStruct(audioStreamID, streamUsage, audioCodec, channelCount, sampleRate, bitRate, bitDepth, referenceCount)
     }
   }
 }

@@ -16,7 +16,9 @@
  */
 package matter.controller.cluster.eventstructs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -24,7 +26,7 @@ import matter.tlv.TlvWriter
 
 class AccessControlClusterAuxiliaryAccessUpdatedEvent(
   val adminNodeID: ULong?,
-  val fabricIndex: UByte,
+  val fabricIndex: UByte
 ) {
   override fun toString(): String = buildString {
     append("AccessControlClusterAuxiliaryAccessUpdatedEvent {\n")
@@ -50,20 +52,16 @@ class AccessControlClusterAuxiliaryAccessUpdatedEvent(
     private const val TAG_ADMIN_NODE_ID = 0
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader,
-    ): AccessControlClusterAuxiliaryAccessUpdatedEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : AccessControlClusterAuxiliaryAccessUpdatedEvent {
       tlvReader.enterStructure(tlvTag)
-      val adminNodeID =
-        if (!tlvReader.isNull()) {
-          tlvReader.getULong(ContextSpecificTag(TAG_ADMIN_NODE_ID))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_ADMIN_NODE_ID))
-          null
-        }
+      val adminNodeID = if (!tlvReader.isNull()) {
+        tlvReader.getULong(ContextSpecificTag(TAG_ADMIN_NODE_ID))
+      } else {
+        tlvReader.getNull(ContextSpecificTag(TAG_ADMIN_NODE_ID))
+        null
+      }
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
-
+      
       tlvReader.exitContainer()
 
       return AccessControlClusterAuxiliaryAccessUpdatedEvent(adminNodeID, fabricIndex)

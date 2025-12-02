@@ -30,7 +30,7 @@ class CommodityPriceClusterCommodityPriceStruct(
   val price: Optional<Long>,
   val priceLevel: Optional<Short>,
   val description: Optional<String>,
-  val components: Optional<List<CommodityPriceClusterCommodityPriceComponentStruct>>,
+  val components: Optional<List<CommodityPriceClusterCommodityPriceComponentStruct>>
 ) {
   override fun toString(): String = buildString {
     append("CommodityPriceClusterCommodityPriceStruct {\n")
@@ -67,10 +67,10 @@ class CommodityPriceClusterCommodityPriceStruct(
       if (components.isPresent) {
         val optcomponents = components.get()
         startArray(ContextSpecificTag(TAG_COMPONENTS))
-        for (item in optcomponents.iterator()) {
-          item.toTlv(AnonymousTag, this)
-        }
-        endArray()
+      for (item in optcomponents.iterator()) {
+        item.toTlv(AnonymousTag, this)
+      }
+      endArray()
       }
       endStructure()
     }
@@ -87,61 +87,42 @@ class CommodityPriceClusterCommodityPriceStruct(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): CommodityPriceClusterCommodityPriceStruct {
       tlvReader.enterStructure(tlvTag)
       val periodStart = tlvReader.getUInt(ContextSpecificTag(TAG_PERIOD_START))
-      val periodEnd =
-        if (!tlvReader.isNull()) {
-          tlvReader.getUInt(ContextSpecificTag(TAG_PERIOD_END))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_PERIOD_END))
-          null
-        }
-      val price =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_PRICE))) {
-          Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_PRICE)))
-        } else {
-          Optional.empty()
-        }
-      val priceLevel =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_PRICE_LEVEL))) {
-          Optional.of(tlvReader.getShort(ContextSpecificTag(TAG_PRICE_LEVEL)))
-        } else {
-          Optional.empty()
-        }
-      val description =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_DESCRIPTION))) {
-          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_DESCRIPTION)))
-        } else {
-          Optional.empty()
-        }
-      val components =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_COMPONENTS))) {
-          Optional.of(
-            buildList<CommodityPriceClusterCommodityPriceComponentStruct> {
-              tlvReader.enterArray(ContextSpecificTag(TAG_COMPONENTS))
-              while (!tlvReader.isEndOfContainer()) {
-                add(
-                  CommodityPriceClusterCommodityPriceComponentStruct.fromTlv(
-                    AnonymousTag,
-                    tlvReader,
-                  )
-                )
-              }
-              tlvReader.exitContainer()
-            }
-          )
-        } else {
-          Optional.empty()
-        }
-
+      val periodEnd = if (!tlvReader.isNull()) {
+      tlvReader.getUInt(ContextSpecificTag(TAG_PERIOD_END))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_PERIOD_END))
+      null
+    }
+      val price = if (tlvReader.isNextTag(ContextSpecificTag(TAG_PRICE))) {
+      Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_PRICE)))
+    } else {
+      Optional.empty()
+    }
+      val priceLevel = if (tlvReader.isNextTag(ContextSpecificTag(TAG_PRICE_LEVEL))) {
+      Optional.of(tlvReader.getShort(ContextSpecificTag(TAG_PRICE_LEVEL)))
+    } else {
+      Optional.empty()
+    }
+      val description = if (tlvReader.isNextTag(ContextSpecificTag(TAG_DESCRIPTION))) {
+      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_DESCRIPTION)))
+    } else {
+      Optional.empty()
+    }
+      val components = if (tlvReader.isNextTag(ContextSpecificTag(TAG_COMPONENTS))) {
+      Optional.of(buildList<CommodityPriceClusterCommodityPriceComponentStruct> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_COMPONENTS))
+      while(!tlvReader.isEndOfContainer()) {
+        add(CommodityPriceClusterCommodityPriceComponentStruct.fromTlv(AnonymousTag, tlvReader))
+      }
+      tlvReader.exitContainer()
+    })
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
-      return CommodityPriceClusterCommodityPriceStruct(
-        periodStart,
-        periodEnd,
-        price,
-        priceLevel,
-        description,
-        components,
-      )
+      return CommodityPriceClusterCommodityPriceStruct(periodStart, periodEnd, price, priceLevel, description, components)
     }
   }
 }
