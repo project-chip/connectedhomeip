@@ -164,6 +164,13 @@ private:
     CHIP_ERROR IsAnyPrivacyModeActive(bool & isActive);
 
     /**
+     * @brief Checks if the specified CMAF interface type is supported.
+     * @param cmafInterface The CMAF interface enum to validate.
+     * @return true if the interface is supported, false otherwise.
+     */
+    bool IsCMAFInterfaceSupported(CMAFInterfaceEnum cmafInterface) const;
+
+    /**
      * @brief Calculates the total bandwidth in bps for the given video and audio stream IDs.
      * @param videoStreamId Optional nullable video stream ID.
      * @param audioStreamId Optional nullable audio stream ID.
