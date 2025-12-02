@@ -242,9 +242,7 @@ Status OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::CommandId com
             Internal::LevelControl::EffectCallback(endpoint, newValue);
         }
 
-        Internal::ModeSelect::SetStartupOnMode(endpoint);
-
-        // If OnMode is not a null value, then change the current mode to it.
+        Internal::ModeSelect::UpdateCurrentModeToOnMode(endpoint);
         Internal::ModeBase::UpdateCurrentModeToOnMode(endpoint);
     }
     else // Set Off
@@ -312,7 +310,7 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
 
         if (onOffValueForStartUp)
         {
-            Internal::ModeSelect::SetStartupOnMode(endpoint);
+            Internal::ModeSelect::UpdateCurrentModeToOnMode(endpoint);
         }
     }
 #endif // IGNORE_ON_OFF_CLUSTER_START_UP_ON_OFF
@@ -736,8 +734,8 @@ static inline void unreg(OnOffEffect * inst)
 
 OnOffEffect::OnOffEffect(chip::EndpointId endpoint, OffWithEffectTriggerCommand offWithEffectTrigger,
                          EffectIdentifierEnum effectIdentifier, uint8_t effectVariant) :
-    mEndpoint(endpoint),
-    mOffWithEffectTrigger(offWithEffectTrigger), mEffectIdentifier(effectIdentifier), mEffectVariant(effectVariant)
+    mEndpoint(endpoint), mOffWithEffectTrigger(offWithEffectTrigger), mEffectIdentifier(effectIdentifier),
+    mEffectVariant(effectVariant)
 {
     reg(this);
 };
