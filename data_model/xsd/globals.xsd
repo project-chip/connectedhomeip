@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:include schemaLocation="bitmap.xsd" />
+    <xs:include schemaLocation="command.xsd" />
+    <xs:include schemaLocation="enum.xsd" />
+    <xs:include schemaLocation="number.xsd" />
+    <xs:include schemaLocation="struct.xsd" />
+
+    <xs:element name="bitmaps">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="bitmap" type="BitmapType" minOccurs="0" maxOccurs="unbounded"></xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="commands">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="command" type="CommandType" minOccurs="0" maxOccurs="unbounded"></xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="enums">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="enum" type="EnumType" minOccurs="0" maxOccurs="unbounded"></xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="structs">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="struct" type="StructType" minOccurs="0" maxOccurs="unbounded"></xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="typeDefs">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="number" type="NumberType" minOccurs="0" maxOccurs="unbounded"></xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>
