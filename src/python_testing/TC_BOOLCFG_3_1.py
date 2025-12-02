@@ -114,6 +114,7 @@ class TC_BOOLCFG_3_1(MatterBaseTest):
             default_level = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.DefaultSensitivityLevel)
         else:
             logging.info("DefaultSensitivityLevel not present in AttributeList, step 4 skipped")
+            self.mark_current_step_skipped()
 
         self.step(5)
         current_level = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentSensitivityLevel)
