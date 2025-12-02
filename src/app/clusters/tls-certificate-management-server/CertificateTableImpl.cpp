@@ -156,16 +156,10 @@ public:
                                          TLV::ContextTag(TagCertificate::kStoredFabricIndex));
     }
 
-    CHIP_ERROR Load(PersistentStorageDelegate * storage)
+    CHIP_ERROR Load(PersistentStorageDelegate * storage) // NOLINT(bugprone-derived-method-shadowing-base-method)
     {
         CHIP_ERROR err = PersistableData::Load(storage);
-        VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
-        if (CHIP_ERROR_NOT_FOUND == err)
-        {
-            Clear();
-        }
-
-        return CHIP_NO_ERROR;
+        return (err == CHIP_ERROR_NOT_FOUND) ? CHIP_NO_ERROR : err; // NOT_FOUND is OK; DataAccessor::Load already called Clear()
     }
 
     CHIP_ERROR GetNextClientCertificateId(FabricIndex fabric, TLSCCDID & id)

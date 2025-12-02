@@ -247,13 +247,13 @@ struct FabricData : public PersistableData<kPersistentBufferMax>
         return CHIP_ERROR_NOT_FOUND;
     }
 
-    CHIP_ERROR Save(PersistentStorageDelegate * storage)
+    CHIP_ERROR Save(PersistentStorageDelegate * storage) // NOLINT(bugprone-derived-method-shadowing-base-method)
     {
         ReturnErrorOnFailure(Register(storage));
         return PersistableData::Save(storage);
     }
 
-    CHIP_ERROR Delete(PersistentStorageDelegate * storage)
+    CHIP_ERROR Delete(PersistentStorageDelegate * storage) // NOLINT(bugprone-derived-method-shadowing-base-method)
     {
         ReturnErrorOnFailure(Unregister(storage));
         return PersistableData::Delete(storage);

@@ -53,6 +53,8 @@ struct BaseEntryCount : public PersistableData<kPersistentBufferEntryCountBytes>
     uint8_t count_value = 0;
     BaseEntryCount(uint8_t count = 0) : count_value(count) {}
 
+    void Clear() override { count_value = 0; }
+
     CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override
     {
         TLV::TLVType container;
@@ -72,16 +74,10 @@ struct BaseEntryCount : public PersistableData<kPersistentBufferEntryCountBytes>
         return reader.ExitContainer(container);
     }
 
-    CHIP_ERROR Load(PersistentStorageDelegate * storage)
+    CHIP_ERROR Load(PersistentStorageDelegate * storage) // NOLINT(bugprone-derived-method-shadowing-base-method)
     {
         CHIP_ERROR err = PersistableData::Load(storage);
-        VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
-        if (CHIP_ERROR_NOT_FOUND == err)
-        {
-            count_value = 0;
-        }
-
-        return CHIP_NO_ERROR;
+        return (err == CHIP_ERROR_NOT_FOUND) ? CHIP_NO_ERROR : err; // NOT_FOUND is OK; DataAccessor::Load already called Clear()
     }
 };
 
@@ -94,8 +90,6 @@ struct EndpointEntryCount : public BaseEntryCount
 
     EndpointEntryCount(EndpointId endpoint, uint8_t count = 0) : BaseEntryCount(count), endpoint_id(endpoint) {}
     ~EndpointEntryCount() {}
-
-    void Clear() override { count_value = 0; }
 
     CHIP_ERROR UpdateKey(StorageKeyName & key) const override
     {
@@ -464,7 +458,7 @@ struct FabricEntryData : public PersistableData<kFabricMaxBytes>
         return err;
     }
 
-    CHIP_ERROR Load(PersistentStorageDelegate * storage)
+    CHIP_ERROR Load(PersistentStorageDelegate * storage) // NOLINT(bugprone-derived-method-shadowing-base-method)
     {
         VerifyOrReturnError(nullptr != storage, CHIP_ERROR_INVALID_ARGUMENT);
         uint8_t deleted_entries_count = 0;
