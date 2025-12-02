@@ -45,7 +45,6 @@ _EXCLUDE_DEVICE_FROM_LINUX_CI = [
     "rootnode_genericswitch_2dfff6e516",  # not actively developed,
     "rootnode_mounteddimmableloadcontrol_a9a1a87f2d",  # not actively developed,
     "rootnode_mountedonoffcontrol_ec30c757a6",  # not actively developed,
-    "rootnode_onofflight_samplemei",  # not actively developed,
     "rootnode_watervalve_6bb39f1f67",  # not actively developed,
 ]
 # Pattern to filter (based on device-name) devices that need ICD support.
