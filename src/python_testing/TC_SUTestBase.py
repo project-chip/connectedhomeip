@@ -311,7 +311,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
 
     async def extend_ota_acls(self, controller, provider_node_id, requestor_node_id):
         """
-        Extend ACLs on both Provider and Requestor to allow OTA interaction.
+        Extend ACLs on Provider to allow interaction with the Requestor.
         Preserves existing ACLs to avoid overwriting.
 
         Args:
@@ -327,11 +327,11 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             attribute=Clusters.AccessControl.Attributes.Acl,
         )
 
-        # Create OTA ACL entries (both directions)
+        # Create OTA ACL, the Requestor is allowed to access on the Provider
         await self.create_acl_entry(
             dev_ctrl=controller,
-            provider_node_id=provider_node_id,
-            requestor_node_id=requestor_node_id
+            provider_node_id=provider_node_id,      # write ACLs on the Provider
+            requestor_node_id=requestor_node_id     # allow access from the Requestor
         )
 
         # Read updated ACLs

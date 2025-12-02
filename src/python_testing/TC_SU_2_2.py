@@ -76,6 +76,9 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
             state_sequence (list): List of observed states during the interval.
             unexpected_states (set): Set of unexpected states observed during the interval.
             interval_duration (list): List containing the duration (in seconds) of the interval, or None if not completed.
+
+        Notes:
+            tolerance_sec (float): Used to allow for minor timing deviations when checking if the minimum interval has been reached.
         """
 
         seen_states = set()
@@ -194,8 +197,6 @@ class TC_SU_2_2(SoftwareUpdateBaseTest):
     async def teardown_test(self):
         # Clear provider KVS (self.KVS_PATH) after test to avoid interference with subsequent tests
         self.clear_kvs(kvs_path_prefix=self.KVS_PATH)
-
-        # await self.clear_ota_providers(self.default_controller, self.dut_node_id)
         self.terminate_provider()
         super().teardown_test()
 
