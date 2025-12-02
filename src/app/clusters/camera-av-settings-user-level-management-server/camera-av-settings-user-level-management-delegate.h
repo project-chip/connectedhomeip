@@ -19,10 +19,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/AttributeAccessInterface.h>
-#include <app/CommandHandlerInterface.h>
-#include <app/SafeAttributePersistenceProvider.h>
-#include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-cluster.h>
 #include <protocols/interaction_model/StatusCode.h>
 #include <string>
 #include <vector>
@@ -30,79 +27,21 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace CameraAvSettingsUserLevelManagement {
 
-using MPTZStructType       = Structs::MPTZStruct::Type;
-using MPTZPresetStructType = Structs::MPTZPresetStruct::Type;
-using DPTZStruct           = Structs::DPTZStruct::Type;
-
-constexpr int16_t kPanMinMinValue  = -180;
-constexpr int16_t kPanMinMaxValue  = 0;
-constexpr int16_t kPanMaxMinValue  = 1;
-constexpr int16_t kPanMaxMaxValue  = 180;
-constexpr int16_t kTiltMinMinValue = -180;
-constexpr int16_t kTiltMinMaxValue = 0;
-constexpr int16_t kTiltMaxMinValue = 1;
-constexpr int16_t kTiltMaxMaxValue = 180;
-constexpr uint8_t kZoomMaxMinValue = 2;
-constexpr uint8_t kZoomMaxMaxValue = 100;
-
-// Spec defined defaults for Pan, Tilt, and Zoom
-constexpr int16_t kDefaultPan  = 0;
-constexpr int16_t kDefaultTilt = 0;
-constexpr uint8_t kDefaultZoom = 1;
-
-constexpr size_t kMptzPositionStructMaxSerializedSize =
-    TLV::EstimateStructOverhead(sizeof(int16_t), sizeof(int16_t), sizeof(uint8_t));
+// Forward declarations
 
 class CameraAvSettingsUserLevelMgmtServer;
 
-struct MPTZPresetHelper
-{
-private:
-    uint8_t mPresetID;
-    std::string mName;
-    MPTZStructType mMptzPosition;
-
-public:
-    virtual ~MPTZPresetHelper() = default;
-    MPTZPresetHelper() {}
-    MPTZPresetHelper(uint8_t aPreset, CharSpan aName, MPTZStructType aPosition)
-    {
-        SetPresetID(aPreset);
-        SetName(aName);
-        SetMptzPosition(aPosition);
-    }
-
-    // Accessors and Mutators
-    //
-    std::string GetName() const { return mName; }
-    void SetName(chip::CharSpan aName) { mName = std::string(aName.begin(), aName.end()); }
-
-    uint8_t GetPresetID() const { return mPresetID; }
-    void SetPresetID(uint8_t aPreset) { mPresetID = aPreset; }
-
-    MPTZStructType GetMptzPosition() const { return mMptzPosition; }
-    void SetMptzPosition(MPTZStructType aPosition) { mMptzPosition = aPosition; }
-};
-
-class PhysicalPTZCallback
-{
-public:
-    PhysicalPTZCallback()                                                               = default;
-    virtual ~PhysicalPTZCallback()                                                      = default;
-    virtual void OnPhysicalMovementComplete(Protocols::InteractionModel::Status status) = 0;
-};
 
 /** @brief
  *  Defines interfaces for implementing application-specific logic for various aspects of the CameraAvUserSettingsManagement
  * Cluster. Specifically, it defines interfaces for the interaction with manual and digital pan, tilt, and zoom functions.
  */
-class Delegate
+class CameraAvSettingsUserLevelmanagementDelegate
 {
 public:
-    Delegate()          = default;
-    virtual ~Delegate() = default;
+    CameraAvSettingsUserLevelmanagementDelegate()          = default;
+    virtual ~CameraAvSettingsUserLevelmanagementDelegate() = default;
 
     /**
      * Allows the delegate to perform any specific functions such as timer cancellation on a shutdown, this is invoked prior to
@@ -235,7 +174,7 @@ public:
      *  server list, at initialization.
      */
     virtual CHIP_ERROR LoadMPTZPresets(std::vector<MPTZPresetHelper> & mptzPresetHelpers) = 0;
-    virtual CHIP_ERROR LoadDPTZStreams(std::vector<DPTZStruct> & dptzStreams)             = 0;
+    virtual CHIP_ERROR LoadDPTZStreams(std::vector<CameraAvSettingsUserLevelManagement::Structs::DPTZStruct> & dptzStreams)             = 0;
 
 private:
     friend class CameraAvSettingsUserLevelMgmtServer;
@@ -249,205 +188,7 @@ protected:
     CameraAvSettingsUserLevelMgmtServer * GetServer() const { return mServer; }
 };
 
-enum class OptionalAttributes : uint32_t
-{
-    kMptzPosition  = 0x0001,
-    kMaxPresets    = 0x0002,
-    kMptzPresets   = 0x0004,
-    kDptzStreams   = 0x0008,
-    kZoomMax       = 0x0010,
-    kTiltMin       = 0x0020,
-    kTiltMax       = 0x0040,
-    kPanMin        = 0x0080,
-    kPanMax        = 0x0100,
-    kMovementState = 0x0200,
-};
 
-class CameraAvSettingsUserLevelMgmtServer : public AttributeAccessInterface,
-                                            public CommandHandlerInterface,
-                                            public PhysicalPTZCallback
-{
-public:
-    /**
-     * Creates a server instance. The Init() function needs to be called for this instance to be registered and
-     * called by the interaction model at the appropriate times.
-     * @param aEndpointId       The endpoint on which this cluster exists. This must match the zap configuration.
-     * @param aDelegate         A reference to the delegate to be used by this server.
-     * @param aFeatures         The bitflags value that identifies which features are supported by this instance.
-     * @param aOptionalAttrs    The bitflags value that identifies the optional attributes supported by this instance.
-     *                                           instance.
-     * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
-     */
-    CameraAvSettingsUserLevelMgmtServer(EndpointId aEndpointId, Delegate & aDelegate, BitFlags<Feature> aFeatures,
-                                        BitFlags<OptionalAttributes> aOptionalAttrs, uint8_t aMaxPresets);
-    ~CameraAvSettingsUserLevelMgmtServer() override;
-
-    CHIP_ERROR Init();
-
-    // Handle any dynamic cleanup required prior to the destructor being called on an app shutdown.  To be invoked by
-    // an app as part of its own shutdown sequence and prior to the destruction of the app/delegate.
-    void Shutdown();
-
-    bool HasFeature(Feature aFeature) const;
-
-    bool SupportsOptAttr(OptionalAttributes aOptionalAttr) const;
-
-    // Attribute Accessors and Mutators
-    CHIP_ERROR SetTiltMin(int16_t aTiltMin);
-
-    CHIP_ERROR SetTiltMax(int16_t aTiltMax);
-
-    CHIP_ERROR SetPanMin(int16_t aPanMin);
-
-    CHIP_ERROR SetPanMax(int16_t aPanMax);
-
-    CHIP_ERROR SetZoomMax(uint8_t aZoomMax);
-
-    const MPTZStructType & GetMptzPosition() const { return mMptzPosition; }
-
-    uint8_t GetMaxPresets() const { return mMaxPresets; }
-
-    const std::vector<DPTZStruct> GetDptzRelativeMove() const { return mDptzStreams; }
-
-    uint8_t GetZoomMax() const { return mZoomMax; }
-
-    int16_t GetTiltMin() const { return mTiltMin; }
-
-    int16_t GetTiltMax() const { return mTiltMax; }
-
-    int16_t GetPanMin() const { return mPanMin; }
-
-    int16_t GetPanMax() const { return mPanMax; }
-
-    /**
-     * Allows for a delegate or application to set the pan value given physical changes on the device itself, possibly due to direct
-     * user changes
-     */
-    void SetPan(Optional<int16_t> aPan);
-
-    /**
-     * Allows for a delegate or application to set the tilt value given physical changes on the device itself, possibly due to
-     * direct user changes
-     */
-    void SetTilt(Optional<int16_t> aTilt);
-
-    /**
-     * Allows for a delegate or application to set the zoom value given physical changes on the device itself, possibly due to
-     * direct user changes
-     */
-    void SetZoom(Optional<uint8_t> aZoom);
-
-    /**
-     * Allows for a delegate or application to provide the ID and default Viewport of an allocated video stream that is capable of
-     * digital movement. This should be invoked by a delegate on the conclusion of allocating a video stream via the AV Stream
-     * Management cluster.
-     */
-    void AddMoveCapableVideoStream(uint16_t aVideoStreamID, Globals::Structs::ViewportStruct::Type aViewport);
-
-    /**
-     * Allows for a delegate or application to update the viewport of an already allocated video stream.
-     * This should be invoked whenever a viewport is updated by DPTZSetVewport or DPTZRelativeMove
-     */
-    void UpdateMoveCapableVideoStream(uint16_t aVideoStreamID, Globals::Structs::ViewportStruct::Type aViewport);
-
-    /**
-     * Allows for a delegate or application to update all of the viewports for all of the allocated video streams.
-     * This should be invoked whenever the device default viewport is updated via a write to Viewport on the
-     * AV Stream Management Cluster
-     */
-    void UpdateMoveCapableVideoStreams(Globals::Structs::ViewportStruct::Type aViewport);
-
-    /**
-     * Allows for a delegate or application to remove a video stream from the set that is capable of digital movement.
-     * This should be invoked by a delegate on the conclusion of deallocating a video stream via the AV Stream Management cluster.
-     */
-    void RemoveMoveCapableVideoStream(uint16_t aVideoStreamID);
-
-    EndpointId GetEndpointId() { return AttributeAccessInterface::GetEndpointId().Value(); }
-
-    // Physical PTZ Interface
-    void OnPhysicalMovementComplete(Protocols::InteractionModel::Status status) override;
-
-    // Is a command already being processed
-    bool IsMoving() const { return mMovementState == PhysicalMovementEnum::kMoving; }
-
-private:
-    Delegate & mDelegate;
-    EndpointId mEndpointId;
-    BitFlags<Feature> mFeatures;
-    BitFlags<OptionalAttributes> mOptionalAttrs;
-
-    // Next available preset ID
-    uint8_t mCurrentPresetID = 1;
-
-    // My known values for MPTZ.
-    MPTZStructType mMptzPosition;
-
-    // Note, where assigned, these are the extreme ends of the spec defined range (or a default if there is one), potentially overwritten by the delegate. 
-    // Exception is MaxPresets that is an F quality attribute and assigned by the constructor
-    const uint8_t mMaxPresets;
-    int16_t mPanMin  = kPanMinMinValue;
-    int16_t mPanMax  = kPanMaxMaxValue;
-    int16_t mTiltMin = kTiltMinMinValue;
-    int16_t mTiltMax = kTiltMaxMaxValue;
-    uint8_t mZoomMax = kZoomMaxMaxValue;
-
-    std::vector<MPTZPresetHelper> mMptzPresetHelpers;
-    std::vector<DPTZStruct> mDptzStreams;
-
-    PhysicalMovementEnum mMovementState;
-
-    // Holding variables for values subject to successful physical movement
-    Optional<int16_t> mTargetPan;
-    Optional<int16_t> mTargetTilt;
-    Optional<uint8_t> mTargetZoom;
-
-    // Attribute handler interface
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-
-    // Helper Read functions for complex attribute types
-    CHIP_ERROR ReadAndEncodeMPTZPresets(AttributeValueEncoder & encoder);
-    CHIP_ERROR ReadAndEncodeDPTZStreams(AttributeValueEncoder & encoder);
-
-    CHIP_ERROR StoreMPTZPosition(const MPTZStructType & mptzPosition);
-    CHIP_ERROR LoadMPTZPosition(MPTZStructType & mptzPosition);
-
-    /**
-     * Helper function that loads all the persistent attributes from the KVS.
-     */
-    void LoadPersistentAttributes();
-
-    // Command handler interface
-    void InvokeCommand(HandlerContext & ctx) override;
-    void HandleMPTZSetPosition(HandlerContext & ctx, const Commands::MPTZSetPosition::DecodableType & commandData);
-    void HandleMPTZRelativeMove(HandlerContext & ctx, const Commands::MPTZRelativeMove::DecodableType & commandData);
-    void HandleMPTZMoveToPreset(HandlerContext & ctx, const Commands::MPTZMoveToPreset::DecodableType & commandData);
-    void HandleMPTZSavePreset(HandlerContext & ctx, const Commands::MPTZSavePreset::DecodableType & commandData);
-    void HandleMPTZRemovePreset(HandlerContext & ctx, const Commands::MPTZRemovePreset::DecodableType & commandData);
-    void HandleDPTZSetViewport(HandlerContext & ctx, const Commands::DPTZSetViewport::DecodableType & commandData);
-    void HandleDPTZRelativeMove(HandlerContext & ctx, const Commands::DPTZRelativeMove::DecodableType & commandData);
-
-    /**
-     * Helper function that manages preset IDs
-     */
-    void UpdatePresetID();
-
-    /**
-     * Helper function that validates whether a given video stream ID is already known
-     */
-    bool KnownVideoStreamID(uint16_t aVideoStreamID);
-
-    /**
-     * Mutator for MovementState, only accessible by the server instance
-     */
-    void SetMovementState(PhysicalMovementEnum aMovementState);
-    /**
-     * Helper function for attribute handlers to mark the attribute as dirty
-     */
-    void MarkDirty(AttributeId aAttributeId);
-};
-
-} // namespace CameraAvSettingsUserLevelManagement
 } // namespace Clusters
 } // namespace app
 } // namespace chip

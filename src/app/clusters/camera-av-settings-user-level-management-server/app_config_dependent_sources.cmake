@@ -16,6 +16,9 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/camera-av-settings-user-level-management-server.cpp"
-    "${CLUSTER_DIR}/camera-av-settings-user-level-management-server.h"
+    "${CLUSTER_DIR}/camera-av-settings-user-level-management-cluster.cpp"
+    "${CLUSTER_DIR}/camera-av-settings-user-level-management-cluster.h"
+    "${CLUSTER_DIR}/camera-av-settings-user-level-management-logic.cpp"
+    "${CLUSTER_DIR}/camera-av-settings-user-level-management-logic.h"    
+    "${CLUSTER_DIR}/camera-av-settings-user-level-management-delegate.h"    
 )
