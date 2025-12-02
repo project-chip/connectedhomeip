@@ -572,7 +572,7 @@ public:
     CHIP_ERROR Initialize(ECPKeyTarget key_target) override;
 
     /**
-     * @brief Export the keypair as a P256SerializedKeypair containing raw public and private key bytes.
+     * @brief Exports the keypair as a P256SerializedKeypair containing raw public and private key bytes.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR Serialize(P256SerializedKeypair & output) const override;
