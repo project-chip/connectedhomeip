@@ -1268,7 +1268,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
 
 
 if __name__ == "__main__":
-    # TODO: This is a temporal solution to enable asyncio debug mode for the test run.
+    # TODO: This is a temporary solution to enable asyncio debug mode for the test run.
     #       Please remove it once the root cause of the issue #42068 is identified and fixed.
     os.environ["PYTHONASYNCIODEBUG"] = "1"
     default_matter_test_main()
