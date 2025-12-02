@@ -42,14 +42,6 @@ from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_b
 
 logger = logging.getLogger(__name__)
 
-# Clusters that support groupcast commands
-GROUPCAST_SUPPORTING_CLUSTERS = {
-    Clusters.OnOff.id,
-    Clusters.LevelControl.id,
-    Clusters.ColorControl.id,
-    Clusters.SceneManagement.id
-}
-
 
 class TC_GCAST_2_1(MatterBaseTest):
     def desc_TC_GCAST_2_1(self):
@@ -76,19 +68,12 @@ class TC_GCAST_2_1(MatterBaseTest):
 
         self.step(2)
         membership = await self.read_single_attribute_check_success(groupcast_cluster, membership_attribute)
-        asserts.assert_is_instance(membership, list, "Membership attribute list should be a list")
-        asserts.assert_equal(membership, [], "Membership attribute list should be empt.y")
+        asserts.assert_is_instance(membership, list, "Membership attribute list should be a list.")
+        asserts.assert_equal(membership, [], "Membership attribute list should be empty.")
 
         self.step(3)
         M_max = await self.read_single_attribute_check_success(groupcast_cluster, max_membership_count_attribute)
         asserts.assert_true(M_max >= 10, "MaxMembershipCount attribute should be >= 10")
-
-def is_groupcast_supporting_cluster(cluster_id: int) -> bool:
-    """
-    Utility method to check if a cluster supports groupcast commands.
-    """
-    # TODO(#42221): Use groupcast conformance when available
-    return cluster_id in GROUPCAST_SUPPORTING_CLUSTERS
 
 
 if __name__ == "__main__":

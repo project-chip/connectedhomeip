@@ -41,7 +41,7 @@ import matter.clusters as Clusters
 from matter.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from matter.interaction_model import InteractionModelError, Status
 
-from src.python_testing.TC_GCAST_2_1 import is_groupcast_supporting_cluster
+from src.python_testing.TC_GCAST_common import get_feature_map, valid_endpoints_list
 
 logger = logging.getLogger(__name__)
 
@@ -65,54 +65,6 @@ class TC_GCAST_2_7(MatterBaseTest):
         pics = ["GCAST.S"]
         return pics
 
-    async def get_feature_map(self):
-        """Get supported features."""
-        feature_map = await self.read_single_attribute_check_success(
-            Clusters.Groupcast,
-            Clusters.Groupcast.Attributes.FeatureMap,
-            endpoint=0
-        )
-        ln_enabled = bool(feature_map & Clusters.Groupcast.Bitmaps.Feature.kListener)
-        sd_enabled = bool(feature_map & Clusters.Groupcast.Bitmaps.Feature.kSender)
-        asserts.assert_true(sd_enabled or ln_enabled,
-                            "At least one of the following features must be enabled: Listener or Sender.")
-        logger.info(f"FeatureMap: {feature_map} : LN supported: {ln_enabled} | SD supported: {sd_enabled}")
-        return ln_enabled, sd_enabled
-
-    async def valid_endpoints_list(self, ln_enabled, sd_enabled):
-        """
-        Get the JoinGroup cmd endpoints list based on enabled features such as Listener/Sender.
-        If only Sender is enabled, endpoints list is empty. If listener is enabled and only 1 endpoint is valid (excluding
-        root and aggregator), endpoints list is [EP1]. If more than 1 endpoint is supported, endpoints list is [EP1, EP2].
-        """
-        endpoints_list = []
-        if ln_enabled:
-            device_type_list = await self.read_single_attribute_all_endpoints(
-                cluster=Clusters.Descriptor,
-                attribute=Clusters.Descriptor.Attributes.DeviceTypeList)
-            logging.info(f"Device Type List: {device_type_list}")
-            for endpoint, device_types in device_type_list.items():
-                if endpoint == 0:
-                    continue
-                for device_type in device_types:
-                    if device_type.deviceType == 14:  # Aggregator
-                        continue
-                    else:
-                        server_list = await self.read_single_attribute_check_success(
-                            cluster=Clusters.Descriptor,
-                            attribute=Clusters.Descriptor.Attributes.ServerList,
-                            endpoint=endpoint)
-                        logging.info(f"Server List: {server_list}")
-                        for cluster in server_list:
-                            if is_groupcast_supporting_cluster(cluster):
-                                endpoints_list.append(endpoint)
-            asserts.assert_true(len(endpoints_list) > 0,
-                                "Listener feature is enabled. Endpoint list should not be empty. There should be a valid endpoint for the GroupCast JoinGroup Command.")
-            if len(endpoints_list) > 1:
-                endpoints_list = endpoints_list[:2]
-        return endpoints_list
-
-
     @run_if_endpoint_matches(has_cluster(Clusters.Groupcast))
     async def test_TC_GCAST_2_7(self):
         if self.matter_test_config.endpoint is None:
@@ -121,12 +73,11 @@ class TC_GCAST_2_7(MatterBaseTest):
         max_membership_count_attribute = Clusters.Groupcast.Attributes.MaxMembershipCount
 
         self.step("1a")
-        ln_enabled, sd_enabled = await self.get_feature_map()
-        if not ln_enabled and not sd_enabled:
-            asserts.fail("At least one of the following features must be enabled: Listener or Sender.")
-        endpoints_list = await self.valid_endpoints_list(ln_enabled, sd_enabled)
+        ln_enabled, sd_enabled = await get_feature_map(self)
+        endpoints_list = await valid_endpoints_list(self, ln_enabled)
+        if len(endpoints_list) > 1:
+            endpoints_list = endpoints_list[:2]
 
-        # Get M_Max Value
         M_max = await self.read_single_attribute_check_success(groupcast_cluster, max_membership_count_attribute)
         asserts.assert_true(M_max >= 10, "MaxMembershipCount attribute should be >= 10")
 
