@@ -1030,7 +1030,7 @@ def bool_named_arg(s: str) -> Tuple[str, bool]:
 
     name = match.group("name")
     if match.group("truth_value"):
-        value = True if match.group("truth_value").lower() == "true" else False
+        value = match.group("truth_value").lower() == "true"
     else:
         value = int(match.group("decimal_value")) != 0
 
