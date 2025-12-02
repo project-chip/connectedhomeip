@@ -20,11 +20,11 @@ namespace chip::Testing {
 bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster,
                              std::initializer_list<const app::DataModel::AttributeEntry> expected)
 {
-    std::vector<const app::DataModel::AttributeEntry> attributes(expected);
+    std::vector<app::DataModel::AttributeEntry> attributes(expected.begin(), expected.end());
     return IsAttributesListEqualTo(cluster, std::move(attributes));
 }
 
-bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster, std::vector<const app::DataModel::AttributeEntry> expected)
+bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster, std::vector<app::DataModel::AttributeEntry> expected)
 {
     VerifyOrDie(cluster.GetPaths().size() == 1);
     auto path = cluster.GetPaths()[0];

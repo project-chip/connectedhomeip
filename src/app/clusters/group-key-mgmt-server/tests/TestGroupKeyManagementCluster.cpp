@@ -91,8 +91,8 @@ TEST_F(TestGroupKeyManagementCluster, CommandsTest)
 TEST_F(TestGroupKeyManagementCluster, AttributesTest)
 {
     GroupKeyManagementCluster cluster;
-    std::vector<const app::DataModel::AttributeEntry> mandatoryAttributes(
-        GroupKeyManagement::Attributes::kMandatoryMetadata.begin(), GroupKeyManagement::Attributes::kMandatoryMetadata.end());
+    std::vector<app::DataModel::AttributeEntry> mandatoryAttributes(GroupKeyManagement::Attributes::kMandatoryMetadata.begin(),
+                                                                    GroupKeyManagement::Attributes::kMandatoryMetadata.end());
 
     // There are only mandatory attributes in this cluster, so it should match the ones in Metadata exactly
     ASSERT_TRUE(chip::Testing::IsAttributesListEqualTo(cluster, std::move(mandatoryAttributes)));
