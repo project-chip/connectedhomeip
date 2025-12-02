@@ -67,7 +67,7 @@ CHIP_ERROR PersistentStorageOpKeystorese05x::NewOpKeypairForFabric(FabricIndex f
 
     memcpy(serializedKeypair.Bytes(), &publickey, pubkey_len);
     memcpy(serializedKeypair.Bytes() + pubkey_len, &privatekey[0], privatekey_len);
-    serializedKeypair.SetLength(privatekey_len + pubkey_len);
+    TEMPORARY_RETURN_IGNORED serializedKeypair.SetLength(privatekey_len + pubkey_len);
 
     // This is required to ensure we pass the key id (mapping to fabric id) to CHIPCryptoPALHsm_se05x_p256.cpp NIST256 class.
     ReturnErrorOnFailure(mPendingKeypair->Deserialize(serializedKeypair));
@@ -75,7 +75,7 @@ CHIP_ERROR PersistentStorageOpKeystorese05x::NewOpKeypairForFabric(FabricIndex f
     ChipLogDetail(Crypto,
                   "PersistentStorageOpKeystorese05x::NewOpKeypairForFabric ::Create NIST256 key in SE05x (at id = 0x%" PRIx32 ")",
                   hsmKeyId);
-    mPendingKeypair->Initialize(Crypto::ECPKeyTarget::ECDSA);
+    TEMPORARY_RETURN_IGNORED mPendingKeypair->Initialize(Crypto::ECPKeyTarget::ECDSA);
     size_t csrLength = outCertificateSigningRequest.size();
     CHIP_ERROR err   = mPendingKeypair->NewCertificateSigningRequest(outCertificateSigningRequest.data(), csrLength);
     if (err != CHIP_NO_ERROR)

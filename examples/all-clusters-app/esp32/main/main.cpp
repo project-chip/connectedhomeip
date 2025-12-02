@@ -210,7 +210,7 @@ extern "C" void app_main()
         ESP_LOGE(TAG, "GetAppTask().StartAppTask() failed : %" CHIP_ERROR_FORMAT, error.Format());
     }
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 }
 
 bool lowPowerClusterSleep()

@@ -23,6 +23,7 @@
 #include <app/icd/server/tests/ICDConfigurationDataTestAccess.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/TimeUtils.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/tests/MessagingContext.h>
 #include <system/SystemLayerImpl.h>
 
@@ -138,7 +139,7 @@ TEST_F(TestICDConfigurationData, TestGetAndSetSlowPollingInterval)
 
     // Reduce slow polling interval to 5s, shorter than SITPollingInterval
     System::Clock::Milliseconds32 shortSlowPollInterval(5000);
-    privateConfigData.SetSlowPollingInterval(shortSlowPollInterval);
+    EXPECT_SUCCESS(privateConfigData.SetSlowPollingInterval(shortSlowPollInterval));
     EXPECT_EQ(privateConfigData.SetSlowPollingInterval(shortSlowPollInterval), CHIP_NO_ERROR);
     EXPECT_EQ(configData.GetSlowPollingInterval(), shortSlowPollInterval);
 
@@ -191,6 +192,29 @@ TEST_F(TestICDConfigurationData, TestSetModeDurations)
 
     // Set invalid: active > idle
     EXPECT_EQ(privateConfigData.SetModeDurations(MakeOptional(Milliseconds32(20000)), MakeOptional(Milliseconds32(1000))),
+              CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Test SetModeDurations with shortIdleModeDuration
+    // Valid all three params: active=1500ms, idle=8s, shortIdle=3s
+    EXPECT_EQ(privateConfigData.SetModeDurations(std::optional<Milliseconds32>(Milliseconds32(1500)),
+                                                 std::optional<Seconds32>(Seconds32(8)), std::optional<Seconds32>(Seconds32(3))),
+              CHIP_NO_ERROR);
+    // Invalid: shortIdle > idle (6s > 5s)
+    EXPECT_EQ(privateConfigData.SetModeDurations(std::optional<Milliseconds32>(Milliseconds32(1500)),
+                                                 std::optional<Seconds32>(Seconds32(5)), std::optional<Seconds32>(Seconds32(6))),
+              CHIP_ERROR_INVALID_ARGUMENT);
+    // Omit shortIdle: idle shrinks below previous shortIdle, shortIdle should clamp to new idle (=> equal, so not used)
+    EXPECT_EQ(privateConfigData.SetModeDurations(std::optional<Milliseconds32>(Milliseconds32(1500)),
+                                                 std::optional<Seconds32>(Seconds32(2)), std::nullopt),
+              CHIP_NO_ERROR);
+    // Provide only shortIdle (smaller than current idle=2s is not possible to be <2s unless 1s)
+    EXPECT_EQ(privateConfigData.SetModeDurations(std::nullopt, std::nullopt, std::optional<Seconds32>(Seconds32(1))),
+              CHIP_NO_ERROR);
+    // Error: none provided
+    EXPECT_EQ(privateConfigData.SetModeDurations(std::nullopt, std::nullopt, std::nullopt), CHIP_ERROR_INVALID_ARGUMENT);
+    // Error: active > idle with 3-param API
+    EXPECT_EQ(privateConfigData.SetModeDurations(std::optional<Milliseconds32>(Milliseconds32(9000)),
+                                                 std::optional<Seconds32>(Seconds32(5)), std::optional<Seconds32>(Seconds32(3))),
               CHIP_ERROR_INVALID_ARGUMENT);
 
     // Restore original values

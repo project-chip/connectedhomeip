@@ -49,7 +49,7 @@ from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 
 class TC_WEBRTC_1_4(MatterBaseTest, WebRTCTestHelper):
     def steps_TC_WEBRTC_1_4(self) -> list[TestStep]:
-        steps = [
+        return [
             TestStep("precondition-1", commission_if_required(), is_commissioning=True),
             TestStep("precondition-2", "Confirm no active WebRTC sessions exist in DUT"),
             TestStep(
@@ -75,22 +75,15 @@ class TC_WEBRTC_1_4(MatterBaseTest, WebRTCTestHelper):
             ),
             TestStep(
                 6,
-                description="TH waits up to 30 seconds for ICECandidates command from the DUT.",
-                expectation="Verify that ICECandidates command contains the same WebRTCSessionID saved in step 1 and contain a non-empty ICE candidates.",
-            ),
-            TestStep(
-                7,
                 description="TH waits for 10 seconds.",
                 expectation="Verify the WebRTC session has been successfully established.",
             ),
             TestStep(
-                8,
+                7,
                 description="TH sends the EndSession command with the WebRTCSessionID saved in step 1 to the DUT.",
                 expectation="DUT responds with SUCCESS status code.",
             ),
         ]
-
-        return steps
 
     def desc_TC_WEBRTC_1_4(self) -> str:
         return "[TC-WEBRTC-1.4] Validate Non-Deferred Offer Flow for Battery-Powered Camera in Standby Mode"
@@ -102,11 +95,15 @@ class TC_WEBRTC_1_4(MatterBaseTest, WebRTCTestHelper):
     def default_timeout(self) -> int:
         return 4 * 60  # 4 minutes
 
+    @property
+    def default_endpoint(self) -> int:
+        return 1
+
     @async_test_body
     async def test_TC_WEBRTC_1_4(self):
         self.step("precondition-1")
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         webrtc_manager = WebRTCManager(event_loop=self.event_loop)
         webrtc_peer: LibdatachannelPeerConnection = webrtc_manager.create_peer(
             node_id=self.dut_node_id, fabric_index=self.default_controller.GetFabricIndexInternal(), endpoint=endpoint
@@ -169,12 +166,6 @@ class TC_WEBRTC_1_4(MatterBaseTest, WebRTCTestHelper):
         )
 
         self.step(6)
-        ice_session_id, remote_candidates = await webrtc_peer.get_remote_ice_candidates(timeout_s=30)
-        asserts.assert_equal(ice_session_id, session_id, "Invalid session id")
-        asserts.assert_true(len(remote_candidates) > 0, "Invalid ice candidates received")
-        webrtc_peer.set_remote_ice_candidates(remote_candidates)
-
-        self.step(7)
         if not await webrtc_peer.check_for_session_establishment():
             logging.error("Failed to establish webrtc session")
             raise Exception("Failed to establish webrtc session")
@@ -182,7 +173,7 @@ class TC_WEBRTC_1_4(MatterBaseTest, WebRTCTestHelper):
         if not self.is_pics_sdk_ci_only:
             self.user_verify_video_stream("Verify WebRTC session by validating if video is received")
 
-        self.step(8)
+        self.step(7)
         await self.send_single_cmd(
             cmd=WebRTCTransportProvider.Commands.EndSession(
                 webRTCSessionID=session_id, reason=Objects.Globals.Enums.WebRTCEndReasonEnum.kUserHangup

@@ -33,7 +33,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:172
+            image: ghcr.io/project-chip/chip-build:175
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
@@ -58,7 +58,7 @@ jobs:
                         --copy-artifacts-to objdir-clone \
                      "
             - name: Uploading binaries
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v5
               if: ${{ !env.ACT }}
               with:
                   name: objdir-linux
@@ -92,7 +92,7 @@ jobs:
                         --copy-artifacts-to objdir-clone \
                      "
             - name: Uploading binaries
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v5
               if: ${{ !env.ACT }}
               with:
                   name: crash-darwin

@@ -95,6 +95,7 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
         super().setup_class()
 
         self._partslist_subscription = None
+        self.dut_fsa_stdin = None
         self.th_server = None
         self.storage = None
 
@@ -114,7 +115,7 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
             dut_fsa_stdin_pipe = self.user_params.get("dut_fsa_stdin_pipe")
             if not dut_fsa_stdin_pipe:
                 asserts.fail("CI setup requires --string-arg dut_fsa_stdin_pipe:<path_to_pipe>")
-            self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")
+            self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")  # noqa: SIM115
 
         self.th_server_port = th_server_port
         self.th_server_setup_params = SetupParameters(
@@ -136,6 +137,8 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
         if self._partslist_subscription is not None:
             self._partslist_subscription.Shutdown()
             self._partslist_subscription = None
+        if self.dut_fsa_stdin is not None:
+            self.dut_fsa_stdin.close()
         if self.th_server is not None:
             self.th_server.terminate()
         if self.storage is not None:
@@ -186,7 +189,7 @@ class TC_MCORE_FS_1_2(MatterBaseTest):
             (root_endpoint, Clusters.Descriptor.Attributes.PartsList)
         ]
         self._partslist_subscription = await self.default_controller.ReadAttribute(
-            nodeid=self.dut_node_id,
+            nodeId=self.dut_node_id,
             attributes=subscription_contents,
             reportInterval=(min_report_interval_sec, max_report_interval_sec),
             keepSubscriptions=True

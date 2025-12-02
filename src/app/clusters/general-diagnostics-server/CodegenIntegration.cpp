@@ -16,7 +16,7 @@
  */
 
 #include <app/clusters/general-diagnostics-server/CodegenIntegration.h>
-#include <app/clusters/general-diagnostics-server/general-diagnostics-cluster.h>
+#include <app/clusters/general-diagnostics-server/GeneralDiagnosticsCluster.h>
 #include <app/static-cluster-config/GeneralDiagnostics.h>
 #include <app/util/config.h>
 #include <app/util/util.h>
@@ -61,17 +61,17 @@ public:
 #if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER)
             .enablePosixTime = true,
 #else
-            .enablePosixTime      = false,
+            .enablePosixTime       = false,
 #endif
 #if defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
-            .enablePayloadSnaphot = true,
+            .enablePayloadSnapshot = true,
 #else
-            .enablePayloadSnaphot = false,
+            .enablePayloadSnapshot = false,
 #endif
         };
-        gServer.Create(optionalAttributeSet, functionsConfig);
+        gServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap), functionsConfig);
 #else
-        gServer.Create(optionalAttributeSet);
+        gServer.Create(optionalAttributeSet, BitFlags<GeneralDiagnostics::Feature>(featureMap));
 #endif
         return gServer.Registration();
     }
@@ -97,7 +97,7 @@ void MatterGeneralDiagnosticsClusterInitCallback(EndpointId endpointId)
             .clusterId                 = GeneralDiagnostics::Id,
             .fixedClusterInstanceCount = GeneralDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size(),
             .maxClusterInstanceCount   = 1, // Cluster is a singleton on the root node and this is the only thing supported
-            .fetchFeatureMap           = false,
+            .fetchFeatureMap           = true,
             .fetchOptionalAttributes   = true,
         },
         integrationDelegate);

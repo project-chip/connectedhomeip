@@ -17,7 +17,7 @@
 
 #include <app/CommandHandler.h>
 #include <app/clusters/testing/AttributeTesting.h>
-#include <app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-cluster.h>
+#include <app/clusters/webrtc-transport-requestor-server/WebRTCTransportRequestorCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model/Decode.h>
 #include <app/server-cluster/DefaultServerCluster.h>
@@ -51,30 +51,30 @@ class MockWebRTCTransportRequestorDelegate : public Delegate
 public:
     MockWebRTCTransportRequestorDelegate() : mLastSessionId(0), mLastEndReason(WebRTCEndReasonEnum::kUnknownEnumValue) {}
 
-    CHIP_ERROR HandleOffer(uint16_t sessionId, const OfferArgs & args) override
+    CHIP_ERROR HandleOffer(const WebRTCSessionStruct & session, const OfferArgs & args) override
     {
-        mLastSessionId = sessionId;
+        mLastSessionId = session.id;
         mLastOfferArgs = args;
         return mOfferResult;
     }
 
-    CHIP_ERROR HandleAnswer(uint16_t sessionId, const std::string & sdpAnswer) override
+    CHIP_ERROR HandleAnswer(const WebRTCSessionStruct & session, const std::string & sdpAnswer) override
     {
-        mLastSessionId = sessionId;
+        mLastSessionId = session.id;
         mLastSdpAnswer = sdpAnswer;
         return mAnswerResult;
     }
 
-    CHIP_ERROR HandleICECandidates(uint16_t sessionId, const std::vector<ICECandidateStruct> & candidates) override
+    CHIP_ERROR HandleICECandidates(const WebRTCSessionStruct & session, const std::vector<ICECandidateStruct> & candidates) override
     {
-        mLastSessionId  = sessionId;
+        mLastSessionId  = session.id;
         mLastCandidates = candidates;
         return mICECandidatesResult;
     }
 
-    CHIP_ERROR HandleEnd(uint16_t sessionId, WebRTCEndReasonEnum reasonCode) override
+    CHIP_ERROR HandleEnd(const WebRTCSessionStruct & session, WebRTCEndReasonEnum reasonCode) override
     {
-        mLastSessionId = sessionId;
+        mLastSessionId = session.id;
         mLastEndReason = reasonCode;
         return mEndResult;
     }
@@ -160,7 +160,8 @@ TEST_F(TestWebRTCTransportRequestorCluster, TestCurrentSessionsAttribute)
     // Add a test session
     WebRTCSessionStruct testSession;
     testSession.id          = 1;
-    testSession.peerNodeID  = chip::kUndefinedNodeId;
+    testSession.peerNodeID  = 1;
+    testSession.fabricIndex = 1;
     testSession.streamUsage = StreamUsageEnum::kLiveView;
 
     auto result = server.UpsertSession(testSession);
@@ -182,7 +183,7 @@ TEST_F(TestWebRTCTransportRequestorCluster, TestCurrentSessionsAttribute)
     EXPECT_EQ(sessions[0].streamUsage, StreamUsageEnum::kRecording);
 
     // Remove the session
-    server.RemoveSession(1);
+    server.RemoveSession(1, testSession.peerNodeID, testSession.fabricIndex);
     sessions = server.GetCurrentSessions();
     EXPECT_TRUE(sessions.empty());
 }
@@ -194,12 +195,14 @@ TEST_F(TestWebRTCTransportRequestorCluster, TestSessionManagement)
 
     // Test adding multiple sessions
     WebRTCSessionStruct session1;
-    session1.id         = 1;
-    session1.peerNodeID = 0x1234ULL;
+    session1.id          = 1;
+    session1.peerNodeID  = 0x1234ULL;
+    session1.fabricIndex = 1;
 
     WebRTCSessionStruct session2;
-    session2.id         = 2;
-    session2.peerNodeID = 0x5678ULL;
+    session2.id          = 2;
+    session2.peerNodeID  = 0x5678ULL;
+    session2.fabricIndex = 1;
 
     server.UpsertSession(session1);
     server.UpsertSession(session2);
@@ -208,13 +211,13 @@ TEST_F(TestWebRTCTransportRequestorCluster, TestSessionManagement)
     EXPECT_EQ(sessions.size(), 2u);
 
     // Remove specific session
-    server.RemoveSession(1);
+    server.RemoveSession(1, session1.peerNodeID, session1.fabricIndex);
     sessions = server.GetCurrentSessions();
     EXPECT_EQ(sessions.size(), 1u);
     EXPECT_EQ(sessions[0].id, 2);
 
     // Remove non-existent session (should be no-op)
-    server.RemoveSession(999);
+    server.RemoveSession(999, 0, 0);
     sessions = server.GetCurrentSessions();
     EXPECT_EQ(sessions.size(), 1u);
 }
@@ -225,7 +228,9 @@ TEST_F(TestWebRTCTransportRequestorCluster, TestDelegateHandleOffer)
     WebRTCTransportRequestorServer server(kTestEndpointId, mockDelegate);
 
     // Setup test data
-    uint16_t testSessionId = 123;
+    WebRTCSessionStruct testSession;
+    testSession.id         = 123;
+    testSession.peerNodeID = 0x1234ULL;
     std::string testSdp    = "test_sdp_offer";
 
     // Test successful offer handling
@@ -235,15 +240,15 @@ TEST_F(TestWebRTCTransportRequestorCluster, TestDelegateHandleOffer)
     offerArgs.sdp        = testSdp;
     offerArgs.peerNodeId = 0x1234ULL; // Use ULL suffix for uint64_t/NodeId
 
-    CHIP_ERROR result = mockDelegate.HandleOffer(testSessionId, offerArgs);
+    CHIP_ERROR result = mockDelegate.HandleOffer(testSession, offerArgs);
     EXPECT_EQ(result, CHIP_NO_ERROR);
-    EXPECT_EQ(mockDelegate.GetLastSessionId(), testSessionId);
+    EXPECT_EQ(mockDelegate.GetLastSessionId(), 123);
     EXPECT_EQ(mockDelegate.GetLastOfferArgs().sdp, testSdp);
     EXPECT_EQ(mockDelegate.GetLastOfferArgs().peerNodeId, 0x1234ULL);
 
     // Test error case
     mockDelegate.SetOfferResult(CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    result = mockDelegate.HandleOffer(testSessionId, offerArgs);
+    result = mockDelegate.HandleOffer(testSession, offerArgs);
     EXPECT_EQ(result, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 }
 
@@ -253,20 +258,21 @@ TEST_F(TestWebRTCTransportRequestorCluster, TestDelegateHandleAnswer)
     WebRTCTransportRequestorServer server(kTestEndpointId, mockDelegate);
 
     // Setup test data
-    uint16_t testSessionId    = 456;
+    WebRTCSessionStruct testSession;
+    testSession.id            = 456;
     std::string testSdpAnswer = "test_sdp_answer";
 
     // Test successful answer handling
     mockDelegate.SetAnswerResult(CHIP_NO_ERROR);
 
-    CHIP_ERROR result = mockDelegate.HandleAnswer(testSessionId, testSdpAnswer);
+    CHIP_ERROR result = mockDelegate.HandleAnswer(testSession, testSdpAnswer);
     EXPECT_EQ(result, CHIP_NO_ERROR);
-    EXPECT_EQ(mockDelegate.GetLastSessionId(), testSessionId);
+    EXPECT_EQ(mockDelegate.GetLastSessionId(), 456);
     EXPECT_EQ(mockDelegate.GetLastSdpAnswer(), testSdpAnswer);
 
     // Test error case
     mockDelegate.SetAnswerResult(CHIP_ERROR_INTERNAL);
-    result = mockDelegate.HandleAnswer(testSessionId, testSdpAnswer);
+    result = mockDelegate.HandleAnswer(testSession, testSdpAnswer);
     EXPECT_EQ(result, CHIP_ERROR_INTERNAL);
 }
 
@@ -276,7 +282,8 @@ TEST_F(TestWebRTCTransportRequestorCluster, TestDelegateHandleICECandidates)
     WebRTCTransportRequestorServer server(kTestEndpointId, mockDelegate);
 
     // Setup test data
-    uint16_t testSessionId = 789;
+    WebRTCSessionStruct testSession;
+    testSession.id = 789;
     std::vector<ICECandidateStruct> testCandidates;
 
     ICECandidateStruct candidate1;
@@ -290,14 +297,14 @@ TEST_F(TestWebRTCTransportRequestorCluster, TestDelegateHandleICECandidates)
     // Test successful ICE candidates handling
     mockDelegate.SetICECandidatesResult(CHIP_NO_ERROR);
 
-    CHIP_ERROR result = mockDelegate.HandleICECandidates(testSessionId, testCandidates);
+    CHIP_ERROR result = mockDelegate.HandleICECandidates(testSession, testCandidates);
     EXPECT_EQ(result, CHIP_NO_ERROR);
-    EXPECT_EQ(mockDelegate.GetLastSessionId(), testSessionId);
+    EXPECT_EQ(mockDelegate.GetLastSessionId(), 789);
     EXPECT_EQ(mockDelegate.GetLastCandidates().size(), 2u);
 
     // Test error case
     mockDelegate.SetICECandidatesResult(CHIP_ERROR_INVALID_ARGUMENT);
-    result = mockDelegate.HandleICECandidates(testSessionId, testCandidates);
+    result = mockDelegate.HandleICECandidates(testSession, testCandidates);
     EXPECT_EQ(result, CHIP_ERROR_INVALID_ARGUMENT);
 }
 
@@ -307,26 +314,27 @@ TEST_F(TestWebRTCTransportRequestorCluster, TestDelegateHandleEnd)
     WebRTCTransportRequestorServer server(kTestEndpointId, mockDelegate);
 
     // Setup test data
-    uint16_t testSessionId         = 999;
+    WebRTCSessionStruct testSession;
+    testSession.id                 = 999;
     WebRTCEndReasonEnum testReason = WebRTCEndReasonEnum::kInviteTimeout;
 
     // Test successful end handling
     mockDelegate.SetEndResult(CHIP_NO_ERROR);
 
-    CHIP_ERROR result = mockDelegate.HandleEnd(testSessionId, testReason);
+    CHIP_ERROR result = mockDelegate.HandleEnd(testSession, testReason);
     EXPECT_EQ(result, CHIP_NO_ERROR);
-    EXPECT_EQ(mockDelegate.GetLastSessionId(), testSessionId);
+    EXPECT_EQ(mockDelegate.GetLastSessionId(), 999);
     EXPECT_EQ(mockDelegate.GetLastEndReason(), testReason);
 
     // Test different reason codes
     WebRTCEndReasonEnum testReason2 = WebRTCEndReasonEnum::kUserBusy;
-    result                          = mockDelegate.HandleEnd(testSessionId, testReason2);
+    result                          = mockDelegate.HandleEnd(testSession, testReason2);
     EXPECT_EQ(result, CHIP_NO_ERROR);
     EXPECT_EQ(mockDelegate.GetLastEndReason(), testReason2);
 
     // Test error case
     mockDelegate.SetEndResult(CHIP_ERROR_TIMEOUT);
-    result = mockDelegate.HandleEnd(testSessionId, testReason);
+    result = mockDelegate.HandleEnd(testSession, testReason);
     EXPECT_EQ(result, CHIP_ERROR_TIMEOUT);
 }
 

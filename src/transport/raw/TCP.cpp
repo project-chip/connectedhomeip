@@ -141,10 +141,9 @@ ActiveTCPConnectionState * TCPBase::AllocateConnection(const Inet::TCPEndPointHa
     {
         for (size_t i = 0; i < mActiveConnectionsSize; i++)
         {
-            if (!mActiveConnections[i].InUse())
+            ActiveTCPConnectionState * activeConnection = &mActiveConnections[i];
+            if (!activeConnection->InUse() && (activeConnection->GetReferenceCount() == 0))
             {
-                ActiveTCPConnectionState * activeConnection = &mActiveConnections[i];
-                VerifyOrDie(activeConnection->GetReferenceCount() == 0);
                 // Update state for the active connection
                 activeConnection->Init(endpoint, address, [this](auto & conn) { TCPDisconnect(conn, true); });
                 return activeConnection;
@@ -155,7 +154,14 @@ ActiveTCPConnectionState * TCPBase::AllocateConnection(const Inet::TCPEndPointHa
         // (i.e. that have a ref count of 0)
         for (size_t i = 0; i < mActiveConnectionsSize; i++)
         {
-            ActiveTCPConnectionHandle releaseUnclaimed(&mActiveConnections[i]);
+            ActiveTCPConnectionState * activeConnection = &mActiveConnections[i];
+            if (!activeConnection->InUse() && (activeConnection->GetReferenceCount() != 0))
+            {
+                char addrStr[Transport::PeerAddress::kMaxToStringSize];
+                activeConnection->mPeerAddr.ToString(addrStr);
+                ChipLogError(Inet, "Leaked TCP connection %p to %s.", activeConnection, addrStr);
+            }
+            ActiveTCPConnectionHandle releaseUnclaimed(activeConnection);
         }
     }
     return nullptr;
@@ -181,14 +187,14 @@ ActiveTCPConnectionHandle TCPBase::FindInUseConnection(const PeerAddress & addre
         {
             Inet::IPAddress addr;
             uint16_t port;
-            if (conn.IsConnected() && conn.mEndPoint->GetPeerInfo(&addr, &port) != CHIP_NO_ERROR)
+            if (conn.IsConnected())
             {
-                // Failure to get peer information means the connection is bad, re-establish connection
-                CHIP_ERROR err = TryResetConnection(conn);
+                // Failure to get peer information means the connection is bad; close it
+                CHIP_ERROR err = conn.mEndPoint->GetPeerInfo(&addr, &port);
                 if (err != CHIP_NO_ERROR)
                 {
                     CloseConnectionInternal(conn, err, SuppressCallback::No);
-                    continue;
+                    return nullptr;
                 }
             }
 
@@ -585,7 +591,8 @@ void TCPBase::HandleTCPEndPointConnectComplete(const Inet::TCPEndPointHandle & e
     });
 
     // Set the TCPKeepalive configurations on the established connection
-    endPoint->EnableKeepAlive(activeConnection->mTCPKeepAliveIntervalSecs, activeConnection->mTCPMaxNumKeepAliveProbes);
+    TEMPORARY_RETURN_IGNORED endPoint->EnableKeepAlive(activeConnection->mTCPKeepAliveIntervalSecs,
+                                                       activeConnection->mTCPMaxNumKeepAliveProbes);
 
     ChipLogProgress(Inet, "Connection established successfully with %s.", addrStr);
 
@@ -625,13 +632,19 @@ CHIP_ERROR TCPBase::DoHandleIncomingConnection(const Inet::TCPEndPointHandle & l
                                                const Inet::TCPEndPointHandle & endPoint, const Inet::IPAddress & peerAddress,
                                                uint16_t peerPort)
 {
+#if INET_CONFIG_TEST
+    if (sForceFailureInDoHandleIncomingConnection)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+#endif
+
+    // GetPeerAddress may fail if the client has already closed the connection, just drop it.
     PeerAddress addr;
     ReturnErrorOnFailure(GetPeerAddress(*endPoint, addr));
+
     ActiveTCPConnectionState * activeConnection = AllocateConnection(endPoint, addr);
-    if (activeConnection == nullptr)
-    {
-        return CHIP_ERROR_TOO_MANY_CONNECTIONS;
-    }
+    VerifyOrReturnError(activeConnection != nullptr, CHIP_ERROR_TOO_MANY_CONNECTIONS);
 
     auto connectionCleanup = ScopeExit([&]() { activeConnection->Free(); });
 
@@ -641,13 +654,16 @@ CHIP_ERROR TCPBase::DoHandleIncomingConnection(const Inet::TCPEndPointHandle & l
     endPoint->OnConnectionClosed = HandleTCPEndPointConnectionClosed;
 
     // By default, disable TCP Nagle buffering by setting TCP_NODELAY socket option to true
-    endPoint->EnableNoDelay();
+    // If it fails, we can still use the connection
+    RETURN_SAFELY_IGNORED endPoint->EnableNoDelay();
 
     mUsedEndPointCount++;
     activeConnection->mConnectionState = TCPState::kConnected;
 
     // Set the TCPKeepalive configurations on the received connection
-    endPoint->EnableKeepAlive(activeConnection->mTCPKeepAliveIntervalSecs, activeConnection->mTCPMaxNumKeepAliveProbes);
+    // If it fails, we can still use the connection until it dies
+    RETURN_SAFELY_IGNORED endPoint->EnableKeepAlive(activeConnection->mTCPKeepAliveIntervalSecs,
+                                                    activeConnection->mTCPMaxNumKeepAliveProbes);
 
     char addrStr[Transport::PeerAddress::kMaxToStringSize];
     peerAddress.ToString(addrStr);
@@ -723,18 +739,9 @@ void TCPBase::InitEndpoint(const Inet::TCPEndPointHandle & endpoint)
     endpoint->SetConnectTimeout(mConnectTimeout);
 }
 
-CHIP_ERROR TCPBase::TryResetConnection(ActiveTCPConnectionState & connection)
-{
-    Inet::TCPEndPointHandle endpoint;
-    ReturnErrorOnFailure(mListenSocket->GetEndPointManager().NewEndPoint(endpoint));
-
-    InitEndpoint(endpoint);
-    PeerAddress & addr = connection.mPeerAddr;
-    ReturnErrorOnFailure(endpoint->Connect(addr.GetIPAddress(), addr.GetPort(), addr.GetInterface()));
-    connection.mConnectionState = TCPState::kConnecting;
-    connection.mEndPoint        = endpoint;
-    return CHIP_NO_ERROR;
-}
+#if INET_CONFIG_TEST
+bool TCPBase::sForceFailureInDoHandleIncomingConnection = false;
+#endif
 
 } // namespace Transport
 } // namespace chip

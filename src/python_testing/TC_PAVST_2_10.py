@@ -98,7 +98,7 @@ class TC_PAVST_2_10(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
     @run_if_endpoint_matches(has_cluster(Clusters.PushAvStreamTransport))
     async def test_TC_PAVST_2_10(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
         self.endpoint = endpoint
         self.node_id = self.dut_node_id
         pvcluster = Clusters.PushAvStreamTransport

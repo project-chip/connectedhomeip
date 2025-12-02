@@ -73,10 +73,10 @@ source_set("thread-network-directory-test-srcs") {
 }
 
 source_set("time-sync-data-provider-test-srcs") {
-  sources = [ "${chip_root}/src/app/clusters/time-synchronization-server/TimeSyncDataProvider.cpp" ]
-
   public_deps = [
+    "${chip_root}/src/app/clusters/time-synchronization-server:time-sync-data-provider",
     "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/persistence:persistence",
     "${chip_root}/src/lib/core",
   ]
 }
@@ -142,12 +142,17 @@ source_set("thread-border-router-management-test-srcs") {
     "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-border-router-management-server.cpp",
     "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-border-router-management-server.h",
     "${chip_root}/src/app/clusters/thread-border-router-management-server/thread-br-delegate.h",
+
+    # Sources needed because codegen integration of general commissioning provides general commissioning instance
+    "${chip_root}/src/app/clusters/general-commissioning-server/CodegenIntegration.cpp",
+    "${chip_root}/src/app/clusters/general-commissioning-server/CodegenIntegration.h",
   ]
 
   public_deps = [
     "${chip_root}/src/app",
     "${chip_root}/src/app/clusters/general-commissioning-server:general-commissioning-server",
     "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/util/mock:mock_codegen_data_model",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
   ]
@@ -300,6 +305,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/app/data-model-provider/tests:encode-decode",
     "${chip_root}/src/app/icd/client:handler",
     "${chip_root}/src/app/icd/client:manager",
+    "${chip_root}/src/app/icd/server:configuration-data",
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/server:terms_and_conditions",
     "${chip_root}/src/app/tests:helpers",
@@ -315,6 +321,7 @@ chip_test_suite("tests") {
 
   if (chip_device_platform != "android") {
     test_sources += [
+      "TestCertificateTableImpl.cpp",
       "TestExtensionFieldSets.cpp",
       "TestSceneTable.cpp",
     ]
@@ -322,6 +329,7 @@ chip_test_suite("tests") {
       ":actions-cluster-test-srcs",
       ":power-cluster-test-srcs",
       ":scenes-table-test-srcs",
+      "${chip_root}/src/app/clusters/tls-certificate-management-server:certificate-table",
     ]
   }
 

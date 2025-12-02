@@ -21,18 +21,28 @@
  */
 
 #include "CHIPCryptoPAL.h"
-#include "CHIPCryptoPALOpenSSL.h"
-
-#include <trusty_matter.h>
-
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/CHIPArgParser.hpp>
-
-static uint64_t mP256_Handler;
-static uint8_t mFabricIndex;
+#include <trusty_matter.h>
 
 namespace chip {
 namespace Crypto {
+
+static inline void from_Handle(uint64_t * p256_handler, P256KeypairContext * context)
+{
+    /* For Trusty OS, p256_handle used to identify the algorithm context */
+    static_assert(sizeof(context) >= sizeof(uint64_t));
+    memcpy(context, p256_handler, sizeof(uint64_t));
+}
+
+static inline uint64_t to_Handle(P256KeypairContext * context)
+{
+    uint64_t ret_handle = 0;
+
+    memcpy(&ret_handle, context, sizeof(uint64_t));
+
+    return ret_handle;
+}
 
 static matter::TrustyMatter & GetTrustyMatter()
 {
@@ -58,7 +68,7 @@ CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_len
     static_assert(P256ECDSASignature::Capacity() >= kP256_ECDSA_Signature_Length_Raw, "P256ECDSASignature must be large enough");
     VerifyOrExit(mInitialized, error = CHIP_ERROR_UNINITIALIZED);
 
-    rc = GetTrustyMatter().P256KeypairECSignMsg(mP256_Handler, digest, kSHA256_Hash_Length, sig, sig_size);
+    rc = GetTrustyMatter().P256KeypairECSignMsg(to_Handle(&mKeypair), digest, kSHA256_Hash_Length, sig, sig_size);
     VerifyOrExit(rc == MATTER_ERROR_OK, error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(sig_size == kP256_ECDSA_Signature_Length_Raw, error = CHIP_ERROR_INTERNAL);
 
@@ -75,7 +85,7 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
     int result;
     size_t out_buf_length = 0;
 
-    result = GetTrustyMatter().P256KeypairECDH_derive_secret(mP256_Handler, Uint8::to_const_uchar(remote_public_key),
+    result = GetTrustyMatter().P256KeypairECDH_derive_secret(to_Handle(&mKeypair), Uint8::to_const_uchar(remote_public_key),
                                                              remote_public_key.Length(), out_secret.Bytes(), out_buf_length);
     VerifyOrExit(result == MATTER_ERROR_OK, error = CHIP_ERROR_INTERNAL);
     VerifyOrExit((out_buf_length > 0), error = CHIP_ERROR_INTERNAL);
@@ -89,11 +99,18 @@ CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     uint8_t public_key[kP256_PublicKey_Length];
-    int rc = 0;
+    uint64_t p256_handle = 0;
+    int rc               = 0;
 
-    rc = GetTrustyMatter().P256KeypairInitialize(mP256_Handler, mFabricIndex, public_key);
+    if (!memcmp(&mKeypair, kTrustyMagicNumberFabricIndex, sizeof(kTrustyMagicNumberFabricIndex)))
+    {
+        /* Fixed p256_handle consists of magic number and a fabric index. */
+        p256_handle = to_Handle(&mKeypair);
+    }
+    rc = GetTrustyMatter().P256KeypairInitialize(p256_handle, public_key);
     VerifyOrExit(rc == MATTER_ERROR_OK, error = CHIP_ERROR_INTERNAL);
 
+    from_Handle(&p256_handle, &mKeypair);
     memcpy(Uint8::to_uchar(mPublicKey), public_key, kP256_PublicKey_Length);
 
     mInitialized = true;
@@ -105,23 +122,30 @@ exit:
 CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-    uint8_t privkey[kP256_PrivateKey_Length];
-    int rc = 0;
+    int rc           = 0;
 
-    rc = GetTrustyMatter().P256KeypairSerialize(mP256_Handler, privkey);
-    VerifyOrExit(rc == MATTER_ERROR_OK, error = CHIP_ERROR_INTERNAL);
+    size_t len = output.Length() == 0 ? output.Capacity() : output.Length();
+    Encoding::BufferWriter bbuf(output.Bytes(), len);
+    bbuf.Put(mPublicKey, mPublicKey.Length());
 
+    if (!memcmp(&mKeypair, kTrustyMagicNumberFabricIndex, sizeof(kTrustyMagicNumberFabricIndex)))
     {
-        size_t len = output.Length() == 0 ? output.Capacity() : output.Length();
-        Encoding::BufferWriter bbuf(output.Bytes(), len);
-        bbuf.Put(mPublicKey, mPublicKey.Length());
-        bbuf.Put(privkey, sizeof(privkey));
-        VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_NO_MEMORY);
-        output.SetLength(bbuf.Needed());
+        /* To keep confidential, private key not provided but p256_handle */
+        bbuf.Put(&mKeypair, sizeof(uint64_t));
     }
+    else
+    {
+        uint8_t privkey[kP256_PrivateKey_Length];
+        uint64_t p256_handle = to_Handle(&mKeypair);
+        rc                   = GetTrustyMatter().P256KeypairSerialize(p256_handle, privkey);
+        VerifyOrExit(rc == MATTER_ERROR_OK, error = CHIP_ERROR_INTERNAL);
+        bbuf.Put(privkey, sizeof(privkey));
+        ClearSecretData(privkey, sizeof(privkey));
+    }
+    VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_NO_MEMORY);
+    output.SetLength(bbuf.Needed());
 
 exit:
-    ClearSecretData(privkey, sizeof(privkey));
     return error;
 }
 
@@ -129,17 +153,31 @@ CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     Encoding::BufferWriter bbuf(mPublicKey, mPublicKey.Length());
-    int rc = 0;
+    int rc               = 0;
+    uint64_t p256_handle = 0;
 
-    uint8_t * pubkey  = input.Bytes();
-    uint8_t * privkey = input.Bytes() + mPublicKey.Length();
-
-    VerifyOrExit(input.Length() == mPublicKey.Length() + kP256_PrivateKey_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
+    uint8_t * pubkey = input.Bytes();
+    VerifyOrExit(input.Length() >= mPublicKey.Length(), error = CHIP_ERROR_INVALID_ARGUMENT);
     bbuf.Put(input.ConstBytes(), mPublicKey.Length());
     VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_NO_MEMORY);
 
-    rc = GetTrustyMatter().P256KeypairDeserialize(mP256_Handler, pubkey, mPublicKey.Length(), privkey, kP256_PrivateKey_Length);
-    VerifyOrExit(rc == MATTER_ERROR_OK, error = CHIP_ERROR_INTERNAL);
+    if (!memcmp(input.Bytes() + kP256_PublicKey_Length, kTrustyMagicNumberFabricIndex, sizeof(kTrustyMagicNumberFabricIndex)))
+    {
+        /* If the fixed p256_handle was passed in following the public key, then the private key should be interpreted as the
+         * p256_handle */
+        VerifyOrExit(input.Length() == mPublicKey.Length() + sizeof(uint64_t), error = CHIP_ERROR_INVALID_ARGUMENT);
+        memcpy(&p256_handle, input.Bytes() + kP256_PublicKey_Length, sizeof(uint64_t));
+    }
+    else
+    {
+        uint8_t * privkey;
+        VerifyOrExit(input.Length() == mPublicKey.Length() + kP256_PrivateKey_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
+        privkey = input.Bytes() + kP256_PublicKey_Length;
+        rc = GetTrustyMatter().P256KeypairDeserialize(p256_handle, pubkey, mPublicKey.Length(), privkey, kP256_PrivateKey_Length);
+        VerifyOrExit(rc == MATTER_ERROR_OK, error = CHIP_ERROR_INTERNAL);
+    }
+
+    from_Handle(&p256_handle, &mKeypair);
 
     mInitialized = true;
 
@@ -151,9 +189,9 @@ void P256Keypair::Clear()
 {
     if (mInitialized)
     {
-        GetTrustyMatter().P256KeypairDestroy(mP256_Handler);
-        mInitialized  = false;
-        mP256_Handler = 0;
+        uint64_t p256_handle = to_Handle(&mKeypair);
+        GetTrustyMatter().P256KeypairDestroy(p256_handle);
+        mInitialized = false;
     }
 }
 
@@ -166,7 +204,7 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t &
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_UNINITIALIZED);
 
-    if (GetTrustyMatter().P256KeypairNewCSR(mP256_Handler, out_csr, csr_length) != MATTER_ERROR_OK)
+    if (GetTrustyMatter().P256KeypairNewCSR(to_Handle(&mKeypair), out_csr, csr_length) != MATTER_ERROR_OK)
     {
         return CHIP_ERROR_INTERNAL;
     }

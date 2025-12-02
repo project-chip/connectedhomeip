@@ -86,14 +86,13 @@ class MatterCertParser:
     def get_subject_names(self) -> dict[int, object]:
         if self.SUBJECT_TAG not in self.parsed_tlv:
             raise ValueError(f"Did not find Subject tag in Matter TLV certificate: {self.parsed_tlv}")
-        return {tag: value for tag, value in self.parsed_tlv[self.SUBJECT_TAG]}
+        return dict(self.parsed_tlv[self.SUBJECT_TAG])
 
     def get_public_key_bytes(self) -> bytes:
         if self.SUBJECT_PUBLIC_KEY_TAG not in self.parsed_tlv:
             raise ValueError(f"Did not find Subject Public Key tag in Matter TLV certificate: {self.parsed_tlv}")
 
-        public_key_bytes = self.parsed_tlv[self.SUBJECT_PUBLIC_KEY_TAG]
-        return public_key_bytes
+        return self.parsed_tlv[self.SUBJECT_PUBLIC_KEY_TAG]
 
 
 # From Matter spec src/crypto_primitives/crypto_primitives.py
@@ -153,9 +152,8 @@ def generate_vendor_fabric_binding_message(
 
     fabric_id_bytes = fabric_id.to_bytes(length=8, byteorder='big')
     vendor_id_bytes = vendor_id.to_bytes(length=2, byteorder='big')
-    vendor_fabric_binding_message = FABRIC_BINDING_VERSION_1.to_bytes(
+    return FABRIC_BINDING_VERSION_1.to_bytes(
         length=1) + root_public_key_bytes + fabric_id_bytes + vendor_id_bytes
-    return vendor_fabric_binding_message
 
 # From Matter spec src/crypto_primitives/vid_verify_payload_test_vector.py
 
@@ -188,6 +186,7 @@ def get_unassigned_fabric_index(fabric_indices: list[int]) -> int:
             return fabric_index
     else:
         asserts.fail(f"Somehow could not find an unallocated fabric index in {fabric_indices}")
+    return None
 
 
 def get_entry_for_fabric(fabric_index: int, entries: list[object]) -> object:
@@ -204,11 +203,8 @@ def make_vid_matcher(fabric_index: int, expected_vid: int) -> AttributeMatcher:
     def predicate(report: AttributeValue) -> bool:
         if report.attribute != Clusters.OperationalCredentials.Attributes.Fabrics or report.endpoint_id != 0 or not isinstance(report.value, list):
             return False
-        for entry in report.value:
-            if entry.fabricIndex == fabric_index and entry.vendorID == expected_vid:
-                return True
-        else:
-            return False
+        return any(entry.fabricIndex == fabric_index and entry.vendorID == expected_vid
+                   for entry in report.value)
     return AttributeMatcher.from_callable(description=f"Fabrics list entry report for FabricIndex {fabric_index} has VendorID field set to 0x{expected_vid:04x}", matcher=predicate)
 
 
@@ -216,11 +212,8 @@ def make_vvs_matcher(fabric_index: int, expected_vvs: bytes) -> AttributeMatcher
     def predicate(report: AttributeValue) -> bool:
         if report.attribute != Clusters.OperationalCredentials.Attributes.Fabrics or report.endpoint_id != 0 or not isinstance(report.value, list):
             return False
-        for entry in report.value:
-            if entry.fabricIndex == fabric_index and entry.VIDVerificationStatement == expected_vvs:
-                return True
-        else:
-            return False
+        return any(entry.fabricIndex == fabric_index and entry.VIDVerificationStatement == expected_vvs
+                   for entry in report.value)
     return AttributeMatcher.from_callable(description=f"Fabrics list entry report for FabricIndex {fabric_index} has VIDVerificationStatement field set to correct VIDVerificationStatement value just set", matcher=predicate)
 
 
@@ -291,9 +284,10 @@ class test_step(object):
 
     def __exit__(self, exc_type, exc_value, traceback):
         if type is None:
-            return  # No exception
+            return None  # No exception
         if isinstance(exc_value, TestStepBlockPassException):
             return True  # Suppress special exception we expect to see.
+        return None
 
     @property
     def id(self):
@@ -319,7 +313,7 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
     def get_next_step_id(self, current_step_id) -> object:
         if isinstance(current_step_id, int):
             return current_step_id + 1
-        elif isinstance(current_step_id, str):
+        if isinstance(current_step_id, str):
             match = re.search(r"^(?P<step_number>\d+)", current_step_id)
             if match:
                 return int(match.group('step_number')) + 1

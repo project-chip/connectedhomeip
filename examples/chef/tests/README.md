@@ -22,7 +22,7 @@ shows all chef tests run in CI.
    container.
 
 ```
-docker run -it --rm ghcr.io/project-chip/chip-build:172 /bin/bash
+docker run -it --rm ghcr.io/project-chip/chip-build:175 /bin/bash
 ```
 
 Run the remaining commands inside the container.

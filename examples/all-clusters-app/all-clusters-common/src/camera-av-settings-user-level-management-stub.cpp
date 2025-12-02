@@ -80,7 +80,7 @@ Status AVSettingsUserLevelManagementDelegate::MPTZSetPosition(Optional<int16_t> 
     // the callback. The server itself will persist the new values.
     //
     mCallback = callback;
-    DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this);
 
     return Status::Success;
 }
@@ -93,7 +93,7 @@ Status AVSettingsUserLevelManagementDelegate::MPTZRelativeMove(Optional<int16_t>
     // the callback. The server itself will persist the new values.
     //
     mCallback = callback;
-    DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this);
 
     return Status::Success;
 }
@@ -106,7 +106,7 @@ Status AVSettingsUserLevelManagementDelegate::MPTZMoveToPreset(uint8_t aPreset, 
     // movements, invoke the callback. The server itself will persist the new values.
     //
     mCallback = callback;
-    DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this);
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(2), onTimerExpiry, this);
 
     return Status::Success;
 }
@@ -235,12 +235,12 @@ void emberAfCameraAvSettingsUserLevelManagementClusterInitCallback(chip::Endpoin
 
     gAVSettingsUserLevelManagementCluster = std::make_unique<CameraAvSettingsUserLevelMgmtServer>(
         kEndpointId, *gDelegate.get(), avsumFeatures, avsumAttrs, appMaxPresets);
-    gAVSettingsUserLevelManagementCluster->Init();
+    TEMPORARY_RETURN_IGNORED gAVSettingsUserLevelManagementCluster->Init();
 
     // Set app specific limits to pan, tilt, zoom
-    gAVSettingsUserLevelManagementCluster->SetPanMin(appPanMin);
-    gAVSettingsUserLevelManagementCluster->SetPanMax(appPanMax);
-    gAVSettingsUserLevelManagementCluster->SetTiltMin(appTiltMin);
-    gAVSettingsUserLevelManagementCluster->SetTiltMax(appTiltMax);
-    gAVSettingsUserLevelManagementCluster->SetZoomMax(appZoomMax);
+    TEMPORARY_RETURN_IGNORED gAVSettingsUserLevelManagementCluster->SetPanMin(appPanMin);
+    TEMPORARY_RETURN_IGNORED gAVSettingsUserLevelManagementCluster->SetPanMax(appPanMax);
+    TEMPORARY_RETURN_IGNORED gAVSettingsUserLevelManagementCluster->SetTiltMin(appTiltMin);
+    TEMPORARY_RETURN_IGNORED gAVSettingsUserLevelManagementCluster->SetTiltMax(appTiltMax);
+    TEMPORARY_RETURN_IGNORED gAVSettingsUserLevelManagementCluster->SetZoomMax(appZoomMax);
 }

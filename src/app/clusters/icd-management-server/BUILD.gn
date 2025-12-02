@@ -16,13 +16,22 @@ import("${chip_root}/src/app/icd/icd.gni")
 
 # transitional dependencies so that chip_data_model sets
 # the right dependencies
-group("icd-management-server") {
+source_set("icd-management-server") {
+  sources = [
+    "ICDManagementCluster.cpp",
+    "ICDManagementCluster.h",
+  ]
   public_deps = [
     "${chip_root}/src/app/icd/server:configuration-data",
     "${chip_root}/src/app/icd/server:icd-server-config",
+    "${chip_root}/src/app/icd/server:observer",
+    "${chip_root}/src/app/server-cluster",
   ]
   if (chip_enable_icd_server) {
-    public_deps += [ "${chip_root}/src/app/icd/server:notifier" ]
+    public_deps += [
+      "${chip_root}/src/app/icd/server:notifier",
+      "${chip_root}/src/app/server",
+    ]
     if (chip_enable_icd_checkin) {
       public_deps += [ "${chip_root}/src/app/icd/server:monitoring-table" ]
     }

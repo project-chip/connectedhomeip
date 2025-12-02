@@ -1089,6 +1089,14 @@ NS_ASSUME_NONNULL_BEGIN
         _caseSessionsPerFabric = @(0);
 
         _subscriptionsPerFabric = @(0);
+
+        _simultaneousInvocationsSupported = nil;
+
+        _simultaneousWritesSupported = nil;
+
+        _readPathsSupported = nil;
+
+        _subscribePathsSupported = nil;
     }
     return self;
 }
@@ -1099,13 +1107,17 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.caseSessionsPerFabric = self.caseSessionsPerFabric;
     other.subscriptionsPerFabric = self.subscriptionsPerFabric;
+    other.simultaneousInvocationsSupported = self.simultaneousInvocationsSupported;
+    other.simultaneousWritesSupported = self.simultaneousWritesSupported;
+    other.readPathsSupported = self.readPathsSupported;
+    other.subscribePathsSupported = self.subscribePathsSupported;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: caseSessionsPerFabric:%@; subscriptionsPerFabric:%@; >", NSStringFromClass([self class]), _caseSessionsPerFabric, _subscriptionsPerFabric];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: caseSessionsPerFabric:%@; subscriptionsPerFabric:%@; simultaneousInvocationsSupported:%@; simultaneousWritesSupported:%@; readPathsSupported:%@; subscribePathsSupported:%@; >", NSStringFromClass([self class]), _caseSessionsPerFabric, _subscriptionsPerFabric, _simultaneousInvocationsSupported, _simultaneousWritesSupported, _readPathsSupported, _subscribePathsSupported];
     return descriptionString;
 }
 
@@ -1784,6 +1796,45 @@ NS_ASSUME_NONNULL_BEGIN
 @dynamic channel;
 @dynamic wiFiBand;
 @dynamic rssi;
+@end
+
+@implementation MTRGeneralDiagnosticsClusterDeviceLoadStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _currentSubscriptions = @(0);
+
+        _currentSubscriptionsForFabric = @(0);
+
+        _totalSubscriptionsEstablished = @(0);
+
+        _totalInteractionModelMessagesSent = @(0);
+
+        _totalInteractionModelMessagesReceived = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRGeneralDiagnosticsClusterDeviceLoadStruct alloc] init];
+
+    other.currentSubscriptions = self.currentSubscriptions;
+    other.currentSubscriptionsForFabric = self.currentSubscriptionsForFabric;
+    other.totalSubscriptionsEstablished = self.totalSubscriptionsEstablished;
+    other.totalInteractionModelMessagesSent = self.totalInteractionModelMessagesSent;
+    other.totalInteractionModelMessagesReceived = self.totalInteractionModelMessagesReceived;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: currentSubscriptions:%@; currentSubscriptionsForFabric:%@; totalSubscriptionsEstablished:%@; totalInteractionModelMessagesSent:%@; totalInteractionModelMessagesReceived:%@; >", NSStringFromClass([self class]), _currentSubscriptions, _currentSubscriptionsForFabric, _totalSubscriptionsEstablished, _totalInteractionModelMessagesSent, _totalInteractionModelMessagesReceived];
+    return descriptionString;
+}
+
 @end
 
 @implementation MTRGeneralDiagnosticsClusterNetworkInterface
@@ -4864,6 +4915,36 @@ NS_ASSUME_NONNULL_BEGIN
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRActivatedCarbonFilterMonitoringClusterReplacementProductStruct alloc] init];
+
+    other.productIdentifierType = self.productIdentifierType;
+    other.productIdentifierValue = self.productIdentifierValue;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: productIdentifierType:%@; productIdentifierValue:%@; >", NSStringFromClass([self class]), _productIdentifierType, _productIdentifierValue];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRWaterTankLevelMonitoringClusterReplacementProductStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _productIdentifierType = @(0);
+
+        _productIdentifierValue = @"";
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRWaterTankLevelMonitoringClusterReplacementProductStruct alloc] init];
 
     other.productIdentifierType = self.productIdentifierType;
     other.productIdentifierValue = self.productIdentifierValue;
@@ -9563,6 +9644,141 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRContentControlClusterTimePeriodStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _startHour = @(0);
+
+        _startMinute = @(0);
+
+        _endHour = @(0);
+
+        _endMinute = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRContentControlClusterTimePeriodStruct alloc] init];
+
+    other.startHour = self.startHour;
+    other.startMinute = self.startMinute;
+    other.endHour = self.endHour;
+    other.endMinute = self.endMinute;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: startHour:%@; startMinute:%@; endHour:%@; endMinute:%@; >", NSStringFromClass([self class]), _startHour, _startMinute, _endHour, _endMinute];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRContentControlClusterTimeWindowStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _timeWindowIndex = nil;
+
+        _dayOfWeek = @(0);
+
+        _timePeriod = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRContentControlClusterTimeWindowStruct alloc] init];
+
+    other.timeWindowIndex = self.timeWindowIndex;
+    other.dayOfWeek = self.dayOfWeek;
+    other.timePeriod = self.timePeriod;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: timeWindowIndex:%@; dayOfWeek:%@; timePeriod:%@; >", NSStringFromClass([self class]), _timeWindowIndex, _dayOfWeek, _timePeriod];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRContentControlClusterAppInfoStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _catalogVendorID = @(0);
+
+        _applicationID = @"";
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRContentControlClusterAppInfoStruct alloc] init];
+
+    other.catalogVendorID = self.catalogVendorID;
+    other.applicationID = self.applicationID;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: catalogVendorID:%@; applicationID:%@; >", NSStringFromClass([self class]), _catalogVendorID, _applicationID];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRContentControlClusterBlockChannelStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _blockChannelIndex = nil;
+
+        _majorNumber = @(0);
+
+        _minorNumber = @(0);
+
+        _identifier = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRContentControlClusterBlockChannelStruct alloc] init];
+
+    other.blockChannelIndex = self.blockChannelIndex;
+    other.majorNumber = self.majorNumber;
+    other.minorNumber = self.minorNumber;
+    other.identifier = self.identifier;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: blockChannelIndex:%@; majorNumber:%@; minorNumber:%@; identifier:%@; >", NSStringFromClass([self class]), _blockChannelIndex, _majorNumber, _minorNumber, _identifier];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRContentControlClusterRatingNameStruct
 - (instancetype)init
 {
@@ -9604,6 +9820,29 @@ NS_ASSUME_NONNULL_BEGIN
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
     auto other = [[MTRContentControlClusterRemainingScreenTimeExpiredEvent alloc] init];
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRContentControlClusterEnteringBlockContentTimeWindowEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRContentControlClusterEnteringBlockContentTimeWindowEvent alloc] init];
 
     return other;
 }
