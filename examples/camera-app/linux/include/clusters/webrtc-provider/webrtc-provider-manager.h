@@ -22,7 +22,7 @@
 #include "webrtc-abstract.h"
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/CASESessionManager.h>
-#include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-cluster.h>
+#include <app/clusters/webrtc-transport-provider-server/WebRTCTransportProviderCluster.h>
 #include <media-controller.h>
 #include <webrtc-transport.h>
 

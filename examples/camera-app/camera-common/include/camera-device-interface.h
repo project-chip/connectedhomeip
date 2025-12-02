@@ -23,7 +23,7 @@
 #include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
 #include <app/clusters/chime-server/chime-server.h>
 #include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
-#include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-cluster.h>
+#include <app/clusters/webrtc-transport-provider-server/WebRTCTransportProviderCluster.h>
 #include <app/clusters/zone-management-server/zone-management-server.h>
 
 using chip::app::Clusters::CameraAvStreamManagement::AudioCapabilitiesStruct;

@@ -17,6 +17,6 @@ TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
     "${CLUSTER_DIR}/CodegenIntegration.cpp"
-    "${CLUSTER_DIR}/webrtc-transport-provider-cluster.cpp"
-    "${CLUSTER_DIR}/webrtc-transport-provider-cluster.h"
+    "${CLUSTER_DIR}/WebRTCTransportProviderCluster.cpp"
+    "${CLUSTER_DIR}/WebRTCTransportProviderCluster.h"
 )
