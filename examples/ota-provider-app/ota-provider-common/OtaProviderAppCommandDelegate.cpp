@@ -135,5 +135,6 @@ void OtaProviderAppCommandDelegate::OnEventCommandReceived(const char * json)
         return;
     }
 
-    PlatformMgr().ScheduleWork(OtaProviderAppCommandHandler::HandleCommand, reinterpret_cast<intptr_t>(handler));
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(OtaProviderAppCommandHandler::HandleCommand,
+                                                        reinterpret_cast<intptr_t>(handler));
 }
