@@ -31,108 +31,103 @@
 
 namespace chip {
 namespace app {
-namespace DataModelTests {
+    namespace DataModelTests {
 
-constexpr EndpointId kTestEndpointId = 1;
+        constexpr EndpointId kTestEndpointId = 1;
 
-constexpr ClusterId kPerpetualClusterId     = Testing::MockClusterId(2);
-constexpr AttributeId kPerpetualAttributeid = Testing::MockAttributeId(1);
+        constexpr ClusterId kPerpetualClusterId = Testing::MockClusterId(2);
+        constexpr AttributeId kPerpetualAttributeid = Testing::MockAttributeId(1);
 
-constexpr DataVersion kRejectedDataVersion = 1;
-constexpr DataVersion kAcceptedDataVersion = 5;
-constexpr DataVersion kDataVersion         = kAcceptedDataVersion;
+        constexpr DataVersion kRejectedDataVersion = 1;
+        constexpr DataVersion kAcceptedDataVersion = 5;
+        constexpr DataVersion kDataVersion = kAcceptedDataVersion;
 
-constexpr uint8_t kExampleClusterSpecificSuccess = 11u;
-constexpr uint8_t kExampleClusterSpecificFailure = 12u;
+        constexpr uint8_t kExampleClusterSpecificSuccess = 11u;
+        constexpr uint8_t kExampleClusterSpecificFailure = 12u;
 
-constexpr ClusterStatus kTestSuccessClusterStatus = 1;
-constexpr ClusterStatus kTestFailureClusterStatus = 2;
+        constexpr ClusterStatus kTestSuccessClusterStatus = 1;
+        constexpr ClusterStatus kTestFailureClusterStatus = 2;
 
-// Controls how the fixture responds to attribute reads
-enum class ReadResponseDirective
-{
-    kSendDataResponse,
-    kSendManyDataResponses,          // Many data blocks, for a single concrete path
-                                     // read, simulating a malicious server.
-    kSendManyDataResponsesWrongPath, // Many data blocks, all using the wrong
-                                     // path, for a single concrete path
-                                     // read, simulating a malicious server.
-    kSendDataError,
-    kSendTwoDataErrors, // Multiple errors, for a single concrete path,
-                        // simulating a malicious server.
-};
-extern ScopedChangeOnly<ReadResponseDirective> gReadResponseDirective;
+        // Controls how the fixture responds to attribute reads
+        enum class ReadResponseDirective {
+            kSendDataResponse,
+            kSendManyDataResponses, // Many data blocks, for a single concrete path
+                                    // read, simulating a malicious server.
+            kSendManyDataResponsesWrongPath, // Many data blocks, all using the wrong
+                                             // path, for a single concrete path
+                                             // read, simulating a malicious server.
+            kSendDataError,
+            kSendTwoDataErrors, // Multiple errors, for a single concrete path,
+                                // simulating a malicious server.
+        };
+        extern ScopedChangeOnly<ReadResponseDirective> gReadResponseDirective;
 
-// Number of reads of Clusters::UnitTesting::Attributes::Int16u that we have observed.
-// Every read will increment this count by 1 and return the new value.
-extern uint16_t gInt16uTotalReadCount;
+        // Number of reads of Clusters::UnitTesting::Attributes::Int16u that we have observed.
+        // Every read will increment this count by 1 and return the new value.
+        extern uint16_t gInt16uTotalReadCount;
 
-// Controls the ICD operating mode for the fixture
-extern ScopedChangeOnly<bool> gIsLitIcd;
+        // Controls the ICD operating mode for the fixture
+        extern ScopedChangeOnly<bool> gIsLitIcd;
 
-// Controls how the fixture responds to attribute writes
-enum class WriteResponseDirective
-{
-    kSendAttributeSuccess,
-    kSendAttributeError,
-    kSendMultipleSuccess,
-    kSendMultipleErrors,
-    kSendClusterSpecificSuccess,
-    kSendClusterSpecificFailure,
-};
-extern ScopedChangeOnly<WriteResponseDirective> gWriteResponseDirective;
+        // Controls how the fixture responds to attribute writes
+        enum class WriteResponseDirective {
+            kSendAttributeSuccess,
+            kSendAttributeError,
+            kSendMultipleSuccess,
+            kSendMultipleErrors,
+            kSendClusterSpecificSuccess,
+            kSendClusterSpecificFailure,
+        };
+        extern ScopedChangeOnly<WriteResponseDirective> gWriteResponseDirective;
 
-// Controls how the fixture responds to commands
-enum class CommandResponseDirective
-{
-    kSendDataResponse,
-    kSendSuccessStatusCode,
-    kSendMultipleSuccessStatusCodes,
-    kSendError,
-    kSendMultipleErrors,
-    kSendSuccessStatusCodeWithClusterStatus,
-    kSendErrorWithClusterStatus,
-    kAsync,
-};
-extern ScopedChangeOnly<CommandResponseDirective> gCommandResponseDirective;
+        // Controls how the fixture responds to commands
+        enum class CommandResponseDirective {
+            kSendDataResponse,
+            kSendSuccessStatusCode,
+            kSendMultipleSuccessStatusCodes,
+            kSendError,
+            kSendMultipleErrors,
+            kSendSuccessStatusCodeWithClusterStatus,
+            kSendErrorWithClusterStatus,
+            kAsync,
+        };
+        extern ScopedChangeOnly<CommandResponseDirective> gCommandResponseDirective;
 
-// Populated with the command handle when gCommandResponseDirective == kAsync
-extern CommandHandler::Handle gAsyncCommandHandle;
+        // Populated with the command handle when gCommandResponseDirective == kAsync
+        extern CommandHandler::Handle gAsyncCommandHandle;
 
-/// A customized class for read/write/invoke that matches functionality
-/// with the ember-compatibility-functions functionality here.
-///
-/// TODO: these functions currently redirect to ember functions, so could
-///       be merged with test-interaction-model-api.h/cpp as well. This is not done since
-///       if we remove the direct ember dependency from IM, we can implement
-///       distinct functional classes.
-/// TODO items for above:
-///      - once IM only supports DataModel
-///      - break ember-overrides in this h/cpp file
-class CustomDataModel : public CodegenDataModelProvider
-{
-public:
-    static CustomDataModel & Instance();
+        /// A customized class for read/write/invoke that matches functionality
+        /// with the ember-compatibility-functions functionality here.
+        ///
+        /// TODO: these functions currently redirect to ember functions, so could
+        ///       be merged with test-interaction-model-api.h/cpp as well. This is not done since
+        ///       if we remove the direct ember dependency from IM, we can implement
+        ///       distinct functional classes.
+        /// TODO items for above:
+        ///      - once IM only supports DataModel
+        ///      - break ember-overrides in this h/cpp file
+        class CustomDataModel : public CodegenDataModelProvider {
+        public:
+            static CustomDataModel & Instance();
 
-    CHIP_ERROR Shutdown() override { return CHIP_NO_ERROR; }
+            CHIP_ERROR Shutdown() override { return CHIP_NO_ERROR; }
 
-    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                AttributeValueEncoder & encoder) override;
-    DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
-                                                 AttributeValueDecoder & decoder) override;
-    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
-                                                               TLV::TLVReader & input_arguments, CommandHandler * handler) override;
+            DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                AttributeValueEncoder & encoder) override;
+            DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
+                AttributeValueDecoder & decoder) override;
+            std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                chip::TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
-    struct EnableInfiniteReads
-    {
-        EnableInfiniteReads() { Instance().mAllowInfiniteReads = true; }
-        ~EnableInfiniteReads() { Instance().mAllowInfiniteReads = false; }
-    };
+            struct EnableInfiniteReads {
+                EnableInfiniteReads() { Instance().mAllowInfiniteReads = true; }
+                ~EnableInfiniteReads() { Instance().mAllowInfiniteReads = false; }
+            };
 
-private:
-    bool mAllowInfiniteReads = false;
-};
+        private:
+            bool mAllowInfiniteReads = false;
+        };
 
-} // namespace DataModelTests
+    } // namespace DataModelTests
 } // namespace app
 } // namespace chip
