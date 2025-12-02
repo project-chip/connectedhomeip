@@ -53,7 +53,7 @@ class TC_GCAST_2_6(MatterBaseTest):
     def desc_TC_GCAST_2_6(self):
         return "[TC-GCAST-2.6] ConfigureAuxiliaryACL (Listener feature) with DUT as Server - PROVISIONAL"
 
-    def steps_TC_G_2_6(self):
+    def steps_TC_GCAST_2_6(self):
         return [
             TestStep("1a", "Commission DUT to TH (can be skipped if done in a preceding test)", is_commissioning=True),
             TestStep("1b", "TH removes any existing group and KeyID on the DUT."),
