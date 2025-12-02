@@ -33,6 +33,8 @@
 
 import functools
 import logging
+import os
+import tempfile
 from operator import ior
 
 from mobly import asserts
@@ -78,6 +80,16 @@ class TC_BOOLCFG_2_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_BOOLCFG_2_1(self):
+        # TEMPORARY: For testing retry mechanism - remove after testing
+        marker_file = os.path.join(tempfile.gettempdir(), "tc_boolcfg_2_1_ran_once")
+        if not os.path.exists(marker_file):
+            with open(marker_file, 'w') as f:
+                f.write("1")
+            asserts.fail("Simulated flaky failure - will pass on retry")
+        else:
+            os.remove(marker_file)
+            logging.info("Retry detected - marker file removed, test will proceed normally")
+        # END TEMPORARY
 
         endpoint = self.get_endpoint()
         all_alarm_mode_bitmap_bits = functools.reduce(
