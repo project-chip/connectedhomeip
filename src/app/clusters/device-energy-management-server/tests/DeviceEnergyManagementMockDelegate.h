@@ -114,8 +114,6 @@ private:
     OptOutStateEnum mOptOutState = OptOutStateEnum::kNoOptOut;
     DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> mPowerAdjustmentCapability;
     DataModel::Nullable<Structs::ForecastStruct::Type> mForecast;
-    int64_t mEnergySnapshot = 0;
-    int64_t mEnergyUse      = 0;
 };
 
 } // namespace DeviceEnergyManagement
