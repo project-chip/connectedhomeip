@@ -21,6 +21,7 @@
 #include <app/server-cluster/ServerClusterInterface.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/ReadOnlyBuffer.h>
+#include <vector>
 
 namespace chip {
 namespace Testing {
