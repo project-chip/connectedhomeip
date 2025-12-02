@@ -49,8 +49,13 @@ public:
     constexpr CriticalFailure(CHIP_ERROR err) : error(err) {}
 
     /**
-     * Handle the failure if there is one, i.e. if !IsSuccess(GetError()).
-     * Returns true if there is no failure & the handler wasn't called. Otherwise, calls fn() and returns false.
+     *  Handle the failure if there is one, i.e. if !IsSuccess(GetError()).
+     *  Returns true if there is no failure & the handler wasn't called. Otherwise, calls fn() and returns false.
+     *  Example usage:
+     *
+     *  @code
+     *    VerifyOrReturn(MethodReturningCriticalFailure().Handle([&](auto err) { ChipLogFailure(err); })));
+     *  @endcode
      */
     template <class F>
     __attribute__((always_inline)) inline bool Handle(F && fn)
@@ -71,8 +76,13 @@ public:
     __attribute__((always_inline)) inline CriticalFailure(CHIP_ERROR err) { SuccessOrDie(err); }
 
     /**
-     * Handle the failure, returning true always as this implementation is never an error; the lambda
-     * passed here will be optimized away in this build.
+     *  Handle the failure, returning true always as this implementation is never an error; the lambda
+     *  passed here will be optimized away in this build.
+     *  Example usage:
+     *
+     *  @code
+     *    VerifyOrReturn(MethodReturningCriticalFailure().Handle([&](auto err) { ChipLogFailure(err); })));
+     *  @endcode
      */
     template <class F>
     __attribute__((always_inline)) inline bool Handle(F && fn)
