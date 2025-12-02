@@ -148,31 +148,31 @@ TEST_F(TestAccessControlCluster, AttributesTest)
 
     ASSERT_EQ(expectedBuilder.AppendElements({
 #if CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
-        AccessControl::Attributes::Extension::kMetadataEntry,
+                  AccessControl::Attributes::Extension::kMetadataEntry,
 #endif
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-            AccessControl::Attributes::CommissioningARL::kMetadataEntry, AccessControl::Attributes::Arl::kMetadataEntry
+                  AccessControl::Attributes::CommissioningARL::kMetadataEntry, AccessControl::Attributes::Arl::kMetadataEntry
 #endif
-    }),
+              }),
               CHIP_NO_ERROR);
     ASSERT_EQ(expectedBuilder.AppendElements(AccessControl::Attributes::kMandatoryMetadata), CHIP_NO_ERROR);
     ASSERT_TRUE(chip::Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
 }
 
 // Helper function to count elements in a decodable list
+// Returns CHIP_ERROR to allow callers to use ASSERT_EQ/EXPECT_EQ for better error messages
 template <typename DecodableListType>
-size_t CountListElements(DecodableListType & list)
+CHIP_ERROR CountListElements(DecodableListType & list, size_t & count)
 {
-    size_t count = 0;
-    auto it      = list.begin();
+    count   = 0;
+    auto it = list.begin();
     while (it.Next())
     {
         ++count;
     }
-    // Verify that iteration completed successfully without errors
-    PW_ASSERT(it.GetStatus() == CHIP_NO_ERROR);
-    return count;
+    // Return the iterator status to the caller for assertion
+    return it.GetStatus();
 }
 
 TEST_F(TestAccessControlCluster, ReadAttributesTest)
@@ -208,7 +208,9 @@ TEST_F(TestAccessControlCluster, ReadAttributesTest)
     AccessControl::Attributes::Extension::TypeInfo::DecodableType extension;
     status = tester.ReadAttribute(AccessControl::Attributes::Extension::Id, extension);
     ASSERT_TRUE(status.IsSuccess());
-    ASSERT_EQ(CountListElements(extension), 0u);
+    size_t extensionCount = 0;
+    ASSERT_EQ(CountListElements(extension, extensionCount), CHIP_NO_ERROR);
+    ASSERT_EQ(extensionCount, 0u);
 #endif // CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
@@ -216,13 +218,17 @@ TEST_F(TestAccessControlCluster, ReadAttributesTest)
     AccessControl::Attributes::CommissioningARL::TypeInfo::DecodableType commissioningArl;
     status = tester.ReadAttribute(AccessControl::Attributes::CommissioningARL::Id, commissioningArl);
     ASSERT_TRUE(status.IsSuccess());
-    ASSERT_EQ(CountListElements(commissioningArl), 0u);
+    size_t commissioningArlCount = 0;
+    ASSERT_EQ(CountListElements(commissioningArl, commissioningArlCount), CHIP_NO_ERROR);
+    ASSERT_EQ(commissioningArlCount, 0u);
 
     // Read Arl attribute (optional)
     AccessControl::Attributes::Arl::TypeInfo::DecodableType arl;
     status = tester.ReadAttribute(AccessControl::Attributes::Arl::Id, arl);
     ASSERT_TRUE(status.IsSuccess());
-    ASSERT_EQ(CountListElements(arl), 0u);
+    size_t arlCount = 0;
+    ASSERT_EQ(CountListElements(arl, arlCount), CHIP_NO_ERROR);
+    ASSERT_EQ(arlCount, 0u);
 #endif // CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
 }
 
