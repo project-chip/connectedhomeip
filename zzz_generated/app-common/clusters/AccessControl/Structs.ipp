@@ -115,7 +115,8 @@ CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIn
 
 CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const
 {
-    bool includeSensitive = !aAccessingFabricIndex.HasValue() || (aAccessingFabricIndex.Value() == fabricIndex);
+    bool includeSensitive =
+        !aAccessingFabricIndex.HasValue() || (aAccessingFabricIndex.Value() == fabricIndex) || fabricIndex == kUndefinedFabricIndex;
 
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
 
@@ -224,7 +225,8 @@ CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIn
 
 CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const
 {
-    bool includeSensitive = !aAccessingFabricIndex.HasValue() || (aAccessingFabricIndex.Value() == fabricIndex);
+    bool includeSensitive =
+        !aAccessingFabricIndex.HasValue() || (aAccessingFabricIndex.Value() == fabricIndex) || fabricIndex == kUndefinedFabricIndex;
 
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
 
@@ -310,7 +312,8 @@ CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIn
 
 CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const
 {
-    bool includeSensitive = !aAccessingFabricIndex.HasValue() || (aAccessingFabricIndex.Value() == fabricIndex);
+    bool includeSensitive =
+        !aAccessingFabricIndex.HasValue() || (aAccessingFabricIndex.Value() == fabricIndex) || fabricIndex == kUndefinedFabricIndex;
 
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
 
