@@ -74,9 +74,9 @@ DataModel::ActionReturnStatus ValidateESAState(const DataModel::InvokeRequest & 
     {
         ChipLogError(Zcl, "DEM: ESAState mismatch - expected %d, got %d", static_cast<int>(expectedState),
                      static_cast<int>(currentState));
-        return AddResponseOnError(request, handler, Status::InvalidInState);
+        return Status::InvalidInState;
     }
-    return DataModel::ActionReturnStatus(Status::Success);
+    return Status::Success;
 }
 } // namespace
 
@@ -160,7 +160,7 @@ std::optional<DataModel::ActionReturnStatus> DeviceEnergyManagementCluster::Invo
         return HandleCancelRequest(request, input_arguments, handler);
 
     default:
-        return std::nullopt;
+        return Status::UnsupportedCommand;
     }
 }
 
@@ -230,7 +230,7 @@ DeviceEnergyManagementCluster::CheckOptOutAllowsRequest(DeviceEnergyManagement::
     if (adjustmentCause == AdjustmentCauseEnum::kUnknownEnumValue)
     {
         ChipLogError(Zcl, "DEM: adjustment cause is invalid (%d)", static_cast<int>(adjustmentCause));
-        return DataModel::ActionReturnStatus(Status::InvalidValue);
+        return Status::InvalidValue;
     }
 
     switch (optOutState)
@@ -287,7 +287,7 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandlePowerAdjustRe
     if (powerAdjustmentCapability.IsNull())
     {
         ChipLogError(Zcl, "DEM: PowerAdjustmentCapability is Null");
-        return AddResponseOnError(request, handler, Status::ConstraintError);
+        return Status::ConstraintError;
     }
 
     if (!IsWithinRange(commandData.power, commandData.duration, powerAdjustmentCapability.Value()))
@@ -326,8 +326,7 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandlePowerAdjustRe
         return AddResponseOnError(request, handler, Status::ConstraintError);
     }
 
-    handler->AddStatus(request.path, Status::Success);
-    return DataModel::ActionReturnStatus(Status::Success);
+    return Status::Success;
 }
 
 DataModel::ActionReturnStatus
