@@ -110,17 +110,12 @@ public:
         return app::DataModel::Decode(attributeData[0].dataReader, out);
     }
 
-    // Uses ::DecodableType (or ::DecodableList) for attribute writes.
-    // For simple types, ::Type may work since it aliases to ::DecodableType, but not for complex structs.
-    // Complex structs define a custom ::DecodableType with Decode() logic to map TLV fields back to members.
-
     // Write attribute from `value` parameter.
     // The `value` parameter must be of the correct type for the attribute being written.
     // Use `app::Clusters::<ClusterName>::Attributes::<AttributeName>::TypeInfo::Type` for the `value` parameter to be spec
     // compliant (see the comment of the class for usage example).
     // Will construct the attribute path using the first path returned by `GetPaths()` on the cluster.
     // @returns `CHIP_ERROR_INCORRECT_STATE` if `GetPaths()` doesn't return a list with one path.
-
     template <typename T>
     CHIP_ERROR WriteAttribute(AttributeId attr, const T & value)
     {
@@ -258,6 +253,13 @@ public:
         }
 
         return result;
+    }
+
+    // convenience method: most requests have a `GetCommandId` (and GetClusterId() as well).
+    template <typename RequestType, typename ResponseType = typename RequestType::ResponseType>
+    [[nodiscard]] InvokeResult<ResponseType> Invoke(const RequestType & request)
+    {
+        return Invoke(RequestType::GetCommandId(), request);
     }
 
     // Returns the next generated event from the event generator in the test server cluster context

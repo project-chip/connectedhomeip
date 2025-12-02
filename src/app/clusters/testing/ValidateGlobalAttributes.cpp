@@ -28,8 +28,8 @@ bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster, std::vector<
 {
     VerifyOrDie(cluster.GetPaths().size() == 1);
     auto path = cluster.GetPaths()[0];
-    ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> actualBuilder;
-    if (CHIP_ERROR err = cluster.Attributes(path, actualBuilder); err != CHIP_NO_ERROR)
+    ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> attributesBuilder;
+    if (CHIP_ERROR err = cluster.Attributes(path, attributesBuilder); err != CHIP_NO_ERROR)
     {
         ChipLogError(Test, "Failed to get attributes list from cluster. Error: %" CHIP_ERROR_FORMAT, err.Format());
         return false;
@@ -45,7 +45,7 @@ bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster, std::vector<
 
     SuccessOrDie(expectedBuilder.AppendElements(app::DefaultServerCluster::GlobalAttributes()));
 
-    return EqualAttributeSets(actualBuilder.TakeBuffer(), expectedBuilder.TakeBuffer());
+    return EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer());
 }
 
 bool IsAcceptedCommandsListEqualTo(app::ServerClusterInterface & cluster,
