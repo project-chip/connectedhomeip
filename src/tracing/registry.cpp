@@ -14,127 +14,157 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <lib/support/IntrusiveList.h>
 
-#include <matter/tracing/build_config.h>
-#include <platform/LockTracker.h>
 #include <tracing/registry.h>
 
-namespace chip {
-namespace Tracing {
-namespace {
+#include <lib/core/CHIPConfig.h>
+#include <lib/support/CodeUtils.h>
+#include <matter/tracing/build_config.h>
+#include <platform/LockTracker.h>
 
-IntrusiveList<Backend> gTracingBackends;
+#include <atomic>
+
+namespace chip::Tracing {
+
+#if MATTER_TRACING_ENABLED
+
+namespace {
+// Modifications of the backend array are protected by the Matter stack lock,
+// but iteration can happen from any thread at any time. Slots must be filled
+// from the begining of the array, so iteration can stop at the first nullptr.
+std::atomic<Backend *> gTracingBackends[CHIP_CONFIG_MAX_TRACING_BACKENDS]{};
+
+// A marker value to represent an empty slot in the backend array.
+// This avoids having to shift backends in the array when unregistering.
+alignas(Backend) constexpr char gNullBackendStorage{ 0 };
+Backend * NullBackend()
+{
+    return reinterpret_cast<Backend *>(const_cast<char *>(&gNullBackendStorage));
+}
+
+template <typename Fn>
+void ForEachBackend(Fn && fn)
+{
+    for (auto & slot : gTracingBackends)
+    {
+        Backend * backend = slot.load();
+        VerifyOrReturn(backend != nullptr);
+        if (backend != NullBackend())
+        {
+            fn(*backend);
+        }
+    }
+}
 
 } // namespace
 
-void Register(Backend & backend)
+void Register(Backend & aBackend)
 {
-    assertChipStackLockedByCurrentThread();
-    if (!backend.IsInList())
+    for (auto & slot : gTracingBackends)
     {
-        backend.Open();
-        gTracingBackends.PushBack(&backend);
+        Backend * backend = slot.load();
+        VerifyOrReturn(backend != &aBackend); // already registered
+        if (backend == nullptr || backend == NullBackend())
+        {
+            aBackend.Open();
+            slot.store(&aBackend);
+            return;
+        }
     }
+    VerifyOrDie(false); // CHIP_CONFIG_MAX_TRACING_BACKENDS exceeded
 }
 
-void Unregister(Backend & backend)
+void Unregister(Backend & aBackend)
 {
     assertChipStackLockedByCurrentThread();
-    if (backend.IsInList())
+    for (auto & slot : gTracingBackends)
     {
-        gTracingBackends.Remove(&backend);
-        backend.Close();
+        Backend * backend = slot.load();
+        if (backend == &aBackend)
+        {
+            slot.store(NullBackend());
+            aBackend.Close();
+            goto vacuum;
+        }
+    }
+    return;
+vacuum:
+    // Replace trailing NullBackend() entries with nullptr,
+    // so iteration can stop as early as possible.
+    for (int i = CHIP_CONFIG_MAX_TRACING_BACKENDS - 1; i >= 0; --i)
+    {
+        auto & slot = gTracingBackends[i];
+        VerifyOrReturn(slot.load() == NullBackend());
+        slot.store(nullptr);
     }
 }
-
-#if MATTER_TRACING_ENABLED
 
 namespace Internal {
 
 void Begin(const char * label, const char * group)
 {
-    for (auto & backend : gTracingBackends)
-    {
-        backend.TraceBegin(label, group);
-    }
+    ForEachBackend([&](Backend & backend) { backend.TraceBegin(label, group); });
 }
 
 void End(const char * label, const char * group)
 {
-    for (auto & backend : gTracingBackends)
-    {
-        backend.TraceEnd(label, group);
-    }
+    ForEachBackend([&](Backend & backend) { backend.TraceEnd(label, group); });
 }
 
 void Instant(const char * label, const char * group)
 {
-    for (auto & backend : gTracingBackends)
-    {
-        backend.TraceInstant(label, group);
-    }
+    ForEachBackend([&](Backend & backend) { backend.TraceInstant(label, group); });
 }
 
 void Counter(const char * label)
 {
-    for (auto & backend : gTracingBackends)
-    {
-        backend.TraceCounter(label);
-    }
+    ForEachBackend([&](Backend & backend) { backend.TraceCounter(label); });
 }
 
 void LogMessageSend(::chip::Tracing::MessageSendInfo & info)
 {
-    for (auto & backend : gTracingBackends)
-    {
-        backend.LogMessageSend(info);
-    }
+    ForEachBackend([&](Backend & backend) { backend.LogMessageSend(info); });
 }
 
 void LogMessageReceived(::chip::Tracing::MessageReceivedInfo & info)
 {
-    for (auto & backend : gTracingBackends)
-    {
-        backend.LogMessageReceived(info);
-    }
+    ForEachBackend([&](Backend & backend) { backend.LogMessageReceived(info); });
 }
 
 void LogNodeLookup(::chip::Tracing::NodeLookupInfo & info)
 {
-    for (auto & backend : gTracingBackends)
-    {
-        backend.LogNodeLookup(info);
-    }
+    ForEachBackend([&](Backend & backend) { backend.LogNodeLookup(info); });
 }
 
 void LogNodeDiscovered(::chip::Tracing::NodeDiscoveredInfo & info)
 {
-    for (auto & backend : gTracingBackends)
-    {
-        backend.LogNodeDiscovered(info);
-    }
+    ForEachBackend([&](Backend & backend) { backend.LogNodeDiscovered(info); });
 }
 
 void LogNodeDiscoveryFailed(::chip::Tracing::NodeDiscoveryFailedInfo & info)
 {
-    for (auto & backend : gTracingBackends)
-    {
-        backend.LogNodeDiscoveryFailed(info);
-    }
+    ForEachBackend([&](Backend & backend) { backend.LogNodeDiscoveryFailed(info); });
 }
 
 void LogMetricEvent(const ::chip::Tracing::MetricEvent & event)
 {
-    for (auto & backend : gTracingBackends)
-    {
-        backend.LogMetricEvent(event);
-    }
+    ForEachBackend([&](Backend & backend) { backend.LogMetricEvent(event); });
 }
 
 } // namespace Internal
 
+#else
+
+void Register(Backend & backend)
+{
+    /* no-op if tracing is disabled */
+}
+
+void Unregister(Backend & backend)
+{
+    /* no-op if tracing is disabled */
+}
+
 #endif // MATTTER_TRACING_ENABLED
 
-} // namespace Tracing
-} // namespace chip
+} // namespace chip::Tracing
