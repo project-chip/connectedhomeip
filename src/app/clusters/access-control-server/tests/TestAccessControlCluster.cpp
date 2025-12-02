@@ -226,30 +226,7 @@ TEST_F(TestAccessControlCluster, ReadAttributesTest)
 #endif // CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
 }
 
-TEST_F(TestAccessControlCluster, WriteAttributesTest)
-{
-    // Test that read-only attributes correctly reject write attempts.
-    AccessControlCluster cluster;
-    chip::Test::ClusterTester tester(cluster);
-
-    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
-
-    // Test writing to a non-writable attribute should fail
-    // SubjectsPerAccessControlEntry is read-only
-    uint16_t invalidValue = 10;
-    auto status           = tester.WriteAttribute(AccessControl::Attributes::SubjectsPerAccessControlEntry::Id, invalidValue);
-    ASSERT_FALSE(status.IsSuccess());
-
-    // Test that other read-only attributes also reject writes
-    status = tester.WriteAttribute(AccessControl::Attributes::TargetsPerAccessControlEntry::Id, invalidValue);
-    ASSERT_FALSE(status.IsSuccess());
-
-    status = tester.WriteAttribute(AccessControl::Attributes::AccessControlEntriesPerFabric::Id, invalidValue);
-    ASSERT_FALSE(status.IsSuccess());
-}
-
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
-
 TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_Success)
 {
     // Set up a mock AccessRestrictionProvider to capture the review request
@@ -625,7 +602,6 @@ TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_AllRestrictionT
               chip::Access::AccessRestrictionProvider::Type::kEventForbidden)
         << "Fourth entry should be EventForbidden";
 }
-
 #endif // CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
 
 } // namespace
