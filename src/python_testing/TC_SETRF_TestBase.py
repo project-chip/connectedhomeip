@@ -1359,7 +1359,7 @@ class CommodityTariffTestBaseHelper(MatterBaseTest):
             current_component_features_flags = 0
 
             # iterate over all feature flags
-            for feature_flag in features_fields_flags.keys():
+            for feature_flag in features_fields_flags:
 
                 current_component_features_flags |= features_fields_flags[feature_flag] if getattr(
                     tariff_component, feature_flag, None) is not None else current_component_features_flags | 0

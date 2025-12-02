@@ -478,7 +478,7 @@ def dump_ids_from_data_model_dirs():
             hashes += f'{"-" * pics_code_len}|'
 
         version_len: dict[str, int] = {}
-        for dir in supported.keys():
+        for dir in supported:
             tag_path = os.path.join(paths.get_data_model_path(), dir, 'spec_tag')
             try:
                 with open(tag_path, "r") as tag_file:
@@ -499,7 +499,7 @@ def dump_ids_from_data_model_dirs():
             if pics_codes is not None:
                 line += f'{pics_codes[id]:<{pics_code_len}}|'
 
-            for dir in supported.keys():
+            for dir in supported:
                 try:
                     line += f'{supported[dir][id]:<{version_len[dir]}}|'
                 except KeyError:

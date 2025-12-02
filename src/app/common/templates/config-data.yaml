@@ -98,7 +98,6 @@ ClustersWithInitFunctions:
     - Groups
     - Level Control
     - Mode Select
-    - Occupancy Sensing
     - On/Off
     - Pump Configuration and Control
     - Sample MEI
@@ -147,6 +146,7 @@ ClustersWithPreAttributeChangeFunctions:
 CodeDrivenClusters:
     # keep-sorted start
     - Access Control
+    - Activated Carbon Filter Monitoring
     - Administrator Commissioning
     - Basic Information
     - Binding
@@ -160,10 +160,12 @@ CodeDrivenClusters:
     - General Diagnostics
     - Group Key Management
     - Groupcast
+    - HEPA Filter Monitoring
     - ICD Management
     - Identify
     - Localization Configuration
     - OTA Software Update Provider
+    - Occupancy Sensing
     - Operational Credentials
     - Push AV Stream Transport
     - Software Diagnostics

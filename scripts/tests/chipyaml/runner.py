@@ -17,6 +17,7 @@
 import relative_importer  # isort: split # noqa: F401
 
 import asyncio
+import contextlib
 import importlib
 import os
 import sys
@@ -200,10 +201,8 @@ class YamlTestParserGroup(click.Group):
 
         # There is a single test, extract the custom config
         if len(tests) == 1:
-            try:
+            with contextlib.suppress(Exception):
                 custom_options = TestConfigParser.get_config(tests[0])
-            except Exception:
-                pass
             for key, value in custom_options.items():
                 param = click.Option(['--' + key], default=value, show_default=True)
                 # click converts parameter name to lowercase internally, so we need to override

@@ -16,7 +16,7 @@
  */
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/clusters/general-diagnostics-server/general-diagnostics-cluster.h>
+#include <app/clusters/general-diagnostics-server/GeneralDiagnosticsCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server/Server.h>
