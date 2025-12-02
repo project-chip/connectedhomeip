@@ -399,17 +399,15 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleStartTimeAdju
     uint32_t duration = forecast.endTime - forecast.startTime;
     if (commandData.requestedStartTime < earliestStartTimeEpoch)
     {
-        ChipLogError(Zcl, "DEM: Bad requestedStartTime %lu, earlier than earliestStartTime %lu.",
-                     static_cast<unsigned long>(commandData.requestedStartTime),
-                     static_cast<unsigned long>(earliestStartTimeEpoch));
+        ChipLogError(Zcl, "DEM: Bad requestedStartTime %" PRIu32 ", earlier than earliestStartTime %" PRIu32 ".",
+                     commandData.requestedStartTime, earliestStartTimeEpoch);
         return Status::ConstraintError;
     }
 
     if ((commandData.requestedStartTime + duration) > latestEndTimeEpoch)
     {
-        ChipLogError(Zcl, "DEM: Bad requestedStartTimeEpoch + duration %lu, later than latestEndTime %lu.",
-                     static_cast<unsigned long>(commandData.requestedStartTime + duration),
-                     static_cast<unsigned long>(latestEndTimeEpoch));
+        ChipLogError(Zcl, "DEM: Bad requestedStartTimeEpoch + duration %" PRIu32 ", later than latestEndTime %" PRIu32 ".",
+                     commandData.requestedStartTime + duration, latestEndTimeEpoch);
         return Status::ConstraintError;
     }
 
@@ -433,17 +431,16 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleStartTimeAdju
     // Verify Forecast.startTime was updated to requestedStartTime
     if (updatedForecast.startTime != commandData.requestedStartTime)
     {
-        ChipLogError(Zcl, "DEM: Forecast.startTime was not updated to requestedStartTime - expected: %lu, got: %lu",
-                     static_cast<unsigned long>(commandData.requestedStartTime),
-                     static_cast<unsigned long>(updatedForecast.startTime));
+        ChipLogError(Zcl, "DEM: Forecast.startTime was not updated to requestedStartTime - expected: %" PRIu32 ", got: %" PRIu32,
+                     commandData.requestedStartTime, updatedForecast.startTime);
         return Status::ConstraintError;
     }
 
     // Verify Forecast.forecastID was incremented (new ForecastID)
     if (updatedForecast.forecastID <= originalForecastID)
     {
-        ChipLogError(Zcl, "DEM: Forecast.forecastID was not incremented - original: %lu, got: %lu",
-                     static_cast<unsigned long>(originalForecastID), static_cast<unsigned long>(updatedForecast.forecastID));
+        ChipLogError(Zcl, "DEM: Forecast.forecastID was not incremented - original: %" PRIu32 ", got: %" PRIu32, originalForecastID,
+                     updatedForecast.forecastID);
         return Status::ConstraintError;
     }
 
@@ -451,8 +448,8 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleStartTimeAdju
     uint32_t expectedEndTime = commandData.requestedStartTime + duration;
     if (updatedForecast.endTime != expectedEndTime)
     {
-        ChipLogError(Zcl, "DEM: Forecast.endTime was not updated correctly - expected: %lu, got: %lu",
-                     static_cast<unsigned long>(expectedEndTime), static_cast<unsigned long>(updatedForecast.endTime));
+        ChipLogError(Zcl, "DEM: Forecast.endTime was not updated correctly - expected: %" PRIu32 ", got: %" PRIu32, expectedEndTime,
+                     updatedForecast.endTime);
         return Status::ConstraintError;
     }
 
@@ -522,7 +519,7 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandlePauseRequest(
     if ((commandData.duration < activeSlot.minPauseDuration.Value()) ||
         (commandData.duration > activeSlot.maxPauseDuration.Value()))
     {
-        ChipLogError(Zcl, "DEM: out of range pause duration %lu", static_cast<unsigned long>(commandData.duration));
+        ChipLogError(Zcl, "DEM: out of range pause duration %" PRIu32, commandData.duration);
         return Status::ConstraintError;
     }
 
@@ -547,7 +544,9 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleResumeRequest
 
     // Verify the Delegate updated its state and ForecastUpdateReason
     VerifyOrReturnError(mDelegate.GetESAState() != ESAStateEnum::kPaused, Status::InvalidInState);
-    VerifyOrReturnError(mDelegate.GetForecast().Value().forecastUpdateReason == ForecastUpdateReasonEnum::kInternalOptimization,
+    DataModel::Nullable<Structs::ForecastStruct::Type> forecast = mDelegate.GetForecast();
+    VerifyOrReturnError(!forecast.IsNull(), Status::Failure);
+    VerifyOrReturnError(forecast.Value().forecastUpdateReason == ForecastUpdateReasonEnum::kInternalOptimization,
                         Status::InvalidInState);
 
     return Status::Success;
@@ -767,10 +766,14 @@ DataModel::ActionReturnStatus DeviceEnergyManagementCluster::HandleCancelRequest
     else
     {
         status = mDelegate.CancelRequest();
-        if (status == Status::Success &&
-            mDelegate.GetForecast().Value().forecastUpdateReason != ForecastUpdateReasonEnum::kInternalOptimization)
+        if (status == Status::Success)
         {
-            return Status::Failure;
+            DataModel::Nullable<Structs::ForecastStruct::Type> updatedForecast = mDelegate.GetForecast();
+            if (updatedForecast.IsNull() ||
+                updatedForecast.Value().forecastUpdateReason != ForecastUpdateReasonEnum::kInternalOptimization)
+            {
+                return Status::Failure;
+            }
         }
     }
 
