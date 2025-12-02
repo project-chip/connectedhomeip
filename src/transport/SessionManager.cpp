@@ -1348,6 +1348,9 @@ void SessionManager::MarkSecureSessionOverTCPForEviction(Transport::ActiveTCPCon
 
 void SessionManager::CountMessagesReceived(const SessionHandle & sessionHandle, const PayloadHeader & payloadHeader)
 {
+    // For future counting usage.
+    (void)sessionHandle; 
+
     if (payloadHeader.GetProtocolID() == Protocols::InteractionModel::Id)
     {
         mMessageStats.InteractionModelMessagesReceived++;
@@ -1356,6 +1359,9 @@ void SessionManager::CountMessagesReceived(const SessionHandle & sessionHandle, 
 
 void SessionManager::CountMessagesSent(const SessionHandle & sessionHandle, const PayloadHeader & payloadHeader)
 {
+    // For future counting usage.
+    (void)sessionHandle; 
+
     if (payloadHeader.GetProtocolID() == Protocols::InteractionModel::Id)
     {
         mMessageStats.InteractionModelMessagesSent++;

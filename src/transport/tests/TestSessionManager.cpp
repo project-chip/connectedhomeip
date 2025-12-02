@@ -1076,8 +1076,9 @@ TEST_F(TestSessionManager, TestMessageStats)
     callback.ReceiveHandlerCallCount = 0;
 
     // Ensure base case, counts start at 0
-    EXPECT_EQ(sessionManager.GetIMMessagesReceived(), static_cast<uint32_t>(0));
-    EXPECT_EQ(sessionManager.GetIMMessagesSent(), static_cast<uint32_t>(0));
+    SessionManager::MessageStats messageStatistics = sessionManager.GetMessageStats();
+    EXPECT_EQ(messageStatistics.InteractionModelMessagesSent, static_cast<uint32_t>(0));
+    EXPECT_EQ(messageStatistics.InteractionModelMessagesReceived, static_cast<uint32_t>(0));
 
     PayloadHeader payloadHeader;
 
@@ -1098,9 +1099,11 @@ TEST_F(TestSessionManager, TestMessageStats)
 
     // Verify final stats results
     mContext.DrainAndServiceIO();
-    EXPECT_EQ(sessionManager.GetIMMessagesSent(), static_cast<uint32_t>(1));
-    EXPECT_EQ(sessionManager.GetIMMessagesReceived(), static_cast<uint32_t>(1));
+    messageStatistics = sessionManager.GetMessageStats();
+    EXPECT_EQ(messageStatistics.InteractionModelMessagesSent, static_cast<uint32_t>(1));
+    EXPECT_EQ(messageStatistics.InteractionModelMessagesReceived, static_cast<uint32_t>(1));
 
+    // Shutdown
     sessionManager.Shutdown();
 }
 

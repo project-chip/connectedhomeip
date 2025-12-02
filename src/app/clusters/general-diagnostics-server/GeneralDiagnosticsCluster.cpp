@@ -277,16 +277,17 @@ DataModel::ActionReturnStatus GeneralDiagnosticsCluster::ReadAttribute(const Dat
         return encoder.Encode(isTestEventTriggersEnabled);
     }
     case GeneralDiagnostics::Attributes::DeviceLoadStatus::Id: {
-        auto interactionModel                                    = InteractionModelEngine::GetInstance();
-        auto sessionManager                                      = interactionModel->GetExchangeManager()->GetSessionManager();
+        InteractionModelEngine *interactionModel        = InteractionModelEngine::GetInstance();
+        SessionManager *sessionManager                  = interactionModel->GetExchangeManager()->GetSessionManager();
+        const SessionManager::MessageStats messageStatistics = sessionManager->GetMessageStats();
+        static_assert(CHIP_IM_MAX_NUM_SUBSCRIPTIONS <= UINT16_MAX);
+
         GeneralDiagnostics::Structs::DeviceLoadStruct::Type load = {
-            .currentSubscriptions =
-                static_cast<uint16_t>(interactionModel->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe)),
-            .currentSubscriptionsForFabric         = static_cast<uint16_t>(interactionModel->GetNumActiveReadHandlers(
-                ReadHandler::InteractionType::Subscribe, encoder.AccessingFabricIndex())),
+            .currentSubscriptions                  = static_cast<uint16_t>(interactionModel->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe)),
+            .currentSubscriptionsForFabric         = static_cast<uint16_t>(interactionModel->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe, encoder.AccessingFabricIndex())),
             .totalSubscriptionsEstablished         = interactionModel->GetReportScheduler()->GetTotalSubscriptionsEstablished(),
-            .totalInteractionModelMessagesSent     = sessionManager->GetIMMessagesSent(),
-            .totalInteractionModelMessagesReceived = sessionManager->GetIMMessagesReceived(),
+            .totalInteractionModelMessagesSent     = messageStatistics.InteractionModelMessagesSent,
+            .totalInteractionModelMessagesReceived = messageStatistics.InteractionModelMessagesReceived,
         };
         return encoder.Encode(load);
     }

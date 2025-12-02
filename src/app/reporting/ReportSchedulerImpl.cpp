@@ -72,7 +72,7 @@ void ReportSchedulerImpl::OnSubscriptionEstablished(ReadHandler * aReadHandler)
                     " and system Timestamp 0x" ChipLogFormatX64 ".",
                     ChipLogValueX64(newNode->GetMinTimestamp().count()), ChipLogValueX64(newNode->GetMaxTimestamp().count()));
 
-    mNumSubscriptionsEstablished++;
+    mNumTotalSubscriptionsEstablished++;
 }
 
 void ReportSchedulerImpl::OnBecameReportable(ReadHandler * aReadHandler)

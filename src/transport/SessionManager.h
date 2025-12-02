@@ -149,6 +149,12 @@ public:
     SessionManager();
     ~SessionManager() override;
 
+    struct MessageStats
+    {
+        uint32_t InteractionModelMessagesReceived = 0;
+        uint32_t InteractionModelMessagesSent     = 0;
+    };
+
     /**
      * @brief
      *   This function takes the payload and returns an encrypted message which can be sent multiple times.
@@ -528,8 +534,7 @@ public:
 
     Crypto::SessionKeystore * GetSessionKeystore() const { return mSessionKeystore; }
 
-    uint32_t GetIMMessagesSent() { return mMessageStats.InteractionModelMessagesSent; }
-    uint32_t GetIMMessagesReceived() { return mMessageStats.InteractionModelMessagesReceived; }
+    MessageStats GetMessageStats() const { return mMessageStats; }
 
 private:
     /**
@@ -545,13 +550,6 @@ private:
     {
         kPayloadIsEncrypted,
         kPayloadIsUnencrypted,
-    };
-
-    struct MessageStats
-    {
-    public:
-        uint32_t InteractionModelMessagesReceived = 0;
-        uint32_t InteractionModelMessagesSent     = 0;
     };
 
     System::Layer * mSystemLayer               = nullptr;
