@@ -25,11 +25,13 @@ namespace chip::scenes {
 /// FixedEndpointCount - the number of fixed endpoints for this cluster in codegen/ember
 /// MaxIndexCount - the number of indexes (return value on success will always be less than this value)
 template <ClusterId ClusterId, size_t FixedEndpointCount, size_t MaxIndexCount>
-struct CodegenEndpointToIndex {
+struct CodegenEndpointToIndex
+{
     static bool EndpointIdToIndex(EndpointId endpointId, uint16_t & index)
     {
         uint16_t idx = emberAfGetClusterServerEndpointIndex(endpointId, ClusterId, FixedEndpointCount);
-        if (idx >= MaxIndexCount) {
+        if (idx >= MaxIndexCount)
+        {
             return false;
         }
         index = idx;
