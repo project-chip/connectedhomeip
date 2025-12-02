@@ -841,6 +841,7 @@ KvsPersistentStorageDelegate CommonCaseDeviceServerInitParams::sKvsPersistenStor
 PersistentStorageOperationalKeystore CommonCaseDeviceServerInitParams::sPersistentStorageOperationalKeystore;
 Credentials::PersistentStorageOpCertStore CommonCaseDeviceServerInitParams::sPersistentStorageOpCertStore;
 Credentials::GroupDataProviderImpl CommonCaseDeviceServerInitParams::sGroupDataProvider;
+chip::Access::ExtendedAccessControlDelegate CommonCaseDeviceServerInitParams::sExtendedAccessControlDelegate;
 app::DefaultTimerDelegate CommonCaseDeviceServerInitParams::sTimerDelegate;
 app::reporting::ReportSchedulerImpl
     CommonCaseDeviceServerInitParams::sReportScheduler(&CommonCaseDeviceServerInitParams::sTimerDelegate);

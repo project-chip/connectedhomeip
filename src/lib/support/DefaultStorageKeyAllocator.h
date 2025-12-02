@@ -171,6 +171,9 @@ public:
         return StorageKeyName::Formatted("f/%x/k/%x", fabric, keyset);
     }
 
+    // Groupcast
+    static StorageKeyName GroupcastAccess(chip::FabricIndex fabric) { return StorageKeyName::Formatted("f/%x/ga", fabric); }
+
     static StorageKeyName AttributeValue(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId)
     {
         // Needs at most 26 chars: 6 for "g/a///", 4 for the endpoint id, 8 each
