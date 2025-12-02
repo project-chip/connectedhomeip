@@ -158,21 +158,6 @@ public:
     DefaultModeSelectSceneHandler() = default;
     ~DefaultModeSelectSceneHandler() override {}
 
-    // Default function for the mode select cluster, only puts the mode select cluster ID in the span if supported on the given
-    // endpoint
-    virtual void GetSupportedClusters(EndpointId endpoint, Span<ClusterId> & clusterBuffer) override
-    {
-        if (emberAfContainsServer(endpoint, ModeSelect::Id) && clusterBuffer.size() >= 1)
-        {
-            clusterBuffer[0] = ModeSelect::Id;
-            clusterBuffer.reduce_size(1);
-        }
-        else
-        {
-            clusterBuffer.reduce_size(0);
-        }
-    }
-
     // Default function for mode select cluster, only checks if mode select is enabled on the endpoint
     bool SupportsCluster(EndpointId endpoint, ClusterId cluster) override
     {

@@ -48,7 +48,7 @@ class LogPipe(threading.Thread):
         self.daemon = False
         self.level = level
         self.fd_read, self.fd_write = pty.openpty()
-        self.reader = open(self.fd_read, encoding='utf-8', errors='ignore')
+        self.reader = open(self.fd_read, encoding='utf-8', errors='ignore')  # noqa: SIM115
         self.captured_logs = []
         self.capture_delegate = capture_delegate
         self.name = name

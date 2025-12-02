@@ -30,6 +30,7 @@ src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-
 src/app/clusters/chime-server/chime-server.cpp
 src/app/clusters/mode-base-server/mode-base-server.cpp
 src/app/clusters/resource-monitoring-server/ResourceMonitoringCluster.cpp
+src/app/clusters/resource-monitoring-server/tests/TestResourceMonitoringCluster.cpp
 src/app/clusters/thread-network-directory-server/thread-network-directory-server.cpp
 src/app/clusters/tls-certificate-management-server/tls-certificate-management-server.cpp
 src/app/clusters/tls-client-management-server/tls-client-management-server.cpp

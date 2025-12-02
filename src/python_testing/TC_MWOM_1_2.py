@@ -110,7 +110,7 @@ class TC_MWOM_1_2(MatterBaseTest):
 
         for m in supported_modes:
             for t in m.modeTags:
-                is_mfg = (0x8000 <= t.value and t.value <= 0xBFFF)
+                is_mfg = 0x8000 <= t.value <= 0xBFFF
                 asserts.assert_true(t.value in commonTags or t.value in derivedTags or is_mfg,
                                     "Found a SupportedModes entry with invalid mode tag value!")
                 if t.value == Clusters.MicrowaveOvenMode.Enums.ModeTag.kNormal:
