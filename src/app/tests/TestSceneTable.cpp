@@ -386,54 +386,6 @@ public:
     TestSceneHandler() = default;
     ~TestSceneHandler() override {}
 
-    // Fills in cluster buffer and adjusts its size to lower than the maximum number of cluster per scenes
-    virtual void GetSupportedClusters(EndpointId endpoint, Span<ClusterId> & clusterBuffer) override
-    {
-        ClusterId * buffer = clusterBuffer.data();
-        if (endpoint == kTestEndpoint1)
-        {
-            if (clusterBuffer.size() >= 2)
-            {
-                buffer[0] = kOnOffClusterId;
-                buffer[1] = kLevelControlClusterId;
-                clusterBuffer.reduce_size(2);
-            }
-        }
-        else if (endpoint == kTestEndpoint2)
-        {
-            if (clusterBuffer.size() >= 2)
-            {
-                buffer[0] = kOnOffClusterId;
-                buffer[1] = kColorControlClusterId;
-                clusterBuffer.reduce_size(2);
-            }
-        }
-        else if (endpoint == kTestEndpoint3)
-        {
-            if (clusterBuffer.size() >= 3)
-            {
-                buffer[0] = kOnOffClusterId;
-                buffer[1] = kLevelControlClusterId;
-                buffer[2] = kColorControlClusterId;
-                clusterBuffer.reduce_size(3);
-            }
-        }
-        else if (endpoint == kTestEndpoint4)
-        {
-            if (clusterBuffer.size() >= 3)
-            {
-                buffer[0] = MockClusterId(kOnOffClusterId);
-                buffer[1] = MockClusterId(kLevelControlClusterId);
-                buffer[2] = MockClusterId(kColorControlClusterId);
-                clusterBuffer.reduce_size(3);
-            }
-        }
-        else
-        {
-            clusterBuffer.reduce_size(0);
-        }
-    }
-
     // Default function only checks if endpoint and clusters are valid
     bool SupportsCluster(EndpointId endpoint, ClusterId cluster) override
     {

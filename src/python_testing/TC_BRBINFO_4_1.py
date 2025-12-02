@@ -158,6 +158,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         self.set_of_dut_endpoints_before_adding_device = set(root_part_list)
 
         self._active_change_event_subscription = None
+        self.dut_fsa_stdin = None
         self.th_icd_server = None
         self.storage = None
 
@@ -176,7 +177,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
             dut_fsa_stdin_pipe = self.user_params.get("dut_fsa_stdin_pipe")
             if not dut_fsa_stdin_pipe:
                 asserts.fail("CI setup requires --string-arg dut_fsa_stdin_pipe:<path_to_pipe>")
-            self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")
+            self.dut_fsa_stdin = open(dut_fsa_stdin_pipe, "w")  # noqa: SIM115
 
         self.th_icd_server_port = 5543
         self.th_icd_server_discriminator = random.randint(0, 4095)
@@ -229,6 +230,8 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         if self._active_change_event_subscription is not None:
             self._active_change_event_subscription.Shutdown()
             self._active_change_event_subscription = None
+        if self.dut_fsa_stdin is not None:
+            self.dut_fsa_stdin.close()
         if self.th_icd_server is not None:
             self.th_icd_server.terminate()
         if self.storage is not None:
