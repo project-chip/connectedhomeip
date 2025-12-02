@@ -550,10 +550,7 @@ bool emberAfJointFabricDatastoreClusterRefreshNodeCallback(
 
     app::JointFabricDatastore & jointFabricDatastore = Server::GetInstance().GetJointFabricDatastore();
 
-    ReadOnlyBufferBuilder<DataModel::EndpointEntry> endpointsList;
-    // TODO: Get Endpoints List from connected device with <nodeId>
-
-    SuccessOrExit(err = jointFabricDatastore.RefreshNode(nodeId, endpointsList.TakeBuffer()));
+    SuccessOrExit(err = jointFabricDatastore.RefreshNode(nodeId));
 
 exit:
     if (err == CHIP_NO_ERROR)
