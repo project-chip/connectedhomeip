@@ -24,7 +24,10 @@
 
 namespace chip::app {
 
-/// A proxy for a ServerClusterInterface that adds data version management and attribute change notifications.
+/// A proxy for a ServerClusterInterface that adds data version management and attribute change notification
+/// capability taht works together with an underlying server cluster interface:
+///   - a ServerClusterContext received from startup is retained
+///   - a data version delta is maintained compared to underlying, to account for extra data
 ///
 /// This class wraps an existing ServerClusterInterface instance and is intended to be
 /// used as a base class for extending cluster functionality, like adding new attributes
@@ -32,6 +35,19 @@ namespace chip::app {
 ///
 /// The class is intended to wrap a SINGLE cluster path for a given interface, even if the interface
 /// itself supports multiple paths.
+///
+/// Expected usage is that the `ServerClusterExtension` is registered while the `underlying` interface
+/// is not. This can be used to wrap an existing registered interface like:
+///
+/// ```
+/// ServerClusterInterface *underlying = registry.Get(clusterPath);
+/// registry.Unregister(underlying);
+/// auto extension = std::make_unique<RegisteredServerCluster<Extension>>(clusterPath, *underlying);
+/// registry.Register(extension->Registration());
+/// ```
+///
+/// An extension could be chained like `Extension2(path2, Extension1(path1 underlying))` if more than
+/// one extension is desired.
 ///
 /// NOTES:
 ///   - if changing an attribute (via WriteAttribute or as part of other operations), remember to call
