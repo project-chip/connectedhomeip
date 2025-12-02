@@ -704,6 +704,8 @@ private:
 
     CameraAVStreamManagementDelegate & mDelegate;
     const BitFlags<Feature> mEnabledFeatures;
+    EndpointId mEndpointId;
+    CameraAVStreamMgmtDelegate & mDelegate;
     const BitFlags<OptionalAttribute> mOptionalAttrs;
 
     // Attributes
