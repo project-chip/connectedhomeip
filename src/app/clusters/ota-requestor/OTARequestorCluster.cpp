@@ -74,10 +74,12 @@ DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(const DataModel
     case OtaSoftwareUpdateRequestor::Attributes::DefaultOTAProviders::Id: {
         if (!OtaRequestorInstance())
         {
+            // There are examples which enable the OTA requestor cluster in their zap configuration but don't
+            // enable the build flag that controls the implementation of the OTA requestor. The behaviour here
+            // maintains backwards compatibility for those examples.
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
             return CHIP_ERROR_INTERNAL;
 #else
-            // Return default values when the OTA requestor ought to be disabled for backwards compatibility.
             return encoder.EncodeEmptyList();
 #endif
         }
@@ -96,10 +98,12 @@ DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(const DataModel
     case OtaSoftwareUpdateRequestor::Attributes::UpdateState::Id:
         if (!OtaRequestorInstance())
         {
+            // There are examples which enable the OTA requestor cluster in their zap configuration but don't
+            // enable the build flag that controls the implementation of the OTA requestor. The behaviour here
+            // maintains backwards compatibility for those examples.
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
             return CHIP_ERROR_INTERNAL;
 #else
-            // Return default values when the OTA requestor ought to be disabled for backwards compatibility.
             return encoder.Encode(OtaSoftwareUpdateRequestor::UpdateStateEnum::kUnknown);
 #endif
         }
@@ -107,10 +111,12 @@ DataModel::ActionReturnStatus OTARequestorCluster::ReadAttribute(const DataModel
     case OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::Id:
         if (!OtaRequestorInstance())
         {
+            // There are examples which enable the OTA requestor cluster in their zap configuration but don't
+            // enable the build flag that controls the implementation of the OTA requestor. The behaviour here
+            // maintains backwards compatibility for those examples.
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
             return CHIP_ERROR_INTERNAL;
 #else
-            // Return default values when the OTA requestor ought to be disabled for backwards compatibility.
             return encoder.EncodeNull();
 #endif
         }
