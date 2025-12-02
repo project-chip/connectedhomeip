@@ -52,20 +52,50 @@ class DevicePairedCommand
 public:
     struct CallbackContext
     {
-        chip::NodeId nodeId;
+        NodeId nodeId;
+        EndpointId endpointId = kRootEndpointId;
         T objectToWrite;
         std::function<void()> onSuccess;
+        std::function<void(CHIP_ERROR, const std::vector<T> &)> onFetchSuccess;
 
         CallbackContext(chip::NodeId nId, T object, std::function<void()> onSuccessFn) :
             nodeId(nId), objectToWrite(object), onSuccess(onSuccessFn)
         {}
+
+        CallbackContext(chip::NodeId nId, std::function<void(CHIP_ERROR, const std::vector<T> &)> onFetchFn) :
+            nodeId(nId), objectToWrite(), onFetchSuccess(onFetchFn)
+        {}
+
+        CallbackContext(chip::NodeId nId, EndpointId eId, std::function<void(CHIP_ERROR, const std::vector<T> &)> onFetchFn) :
+            nodeId(nId), endpointId(eId), objectToWrite(), onFetchSuccess(onFetchFn)
+        {}
     };
+
     DevicePairedCommand(
         chip::NodeId nodeId, T object, std::function<void()> onSuccess = []() {}) :
         mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
         mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
     {
         mContext = std::make_shared<CallbackContext>(nodeId, object, onSuccess);
+    }
+
+    DevicePairedCommand(
+        chip::NodeId nodeId, std::function<void(CHIP_ERROR, const std::vector<T> &)> onFetchSuccess = []() {}) :
+        mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
+        mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
+    {
+        mContext   = std::make_shared<CallbackContext>(nodeId, onFetchSuccess);
+        mFetchOnly = true;
+    }
+
+    DevicePairedCommand(
+        chip::NodeId nodeId, EndpointId endpointId,
+        std::function<void(CHIP_ERROR, const std::vector<T> &)> onFetchSuccess = []() {}) :
+        mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
+        mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
+    {
+        mContext   = std::make_shared<CallbackContext>(nodeId, endpointId, onFetchSuccess);
+        mFetchOnly = true;
     }
 
     static void OnDeviceConnectedFn(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
@@ -81,14 +111,10 @@ public:
             ChipLogProgress(DeviceLayer, "OnDeviceConnectedFn - Syncing device with node id: " ChipLogFormatX64,
                             ChipLogValueX64(cbContext->nodeId));
 
-            // Static LUT for mapping type T to attribute ID
-            AttributeId attributeId = 0;
-
-            if constexpr (std::is_same_v<T,
-                                         app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type>)
+            if (pairingCommand->mFetchOnly == false)
             {
-                attributeId = Attributes::EndpointGroupIDList::Id;
-
+                if constexpr (std::is_same_v<
+                                  T, app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type>)
                 {
                     // Invoke Groups:AddGroup on the device's endpoint
                     chip::app::Clusters::Groups::Commands::AddGroup::Type addGroup;
@@ -99,12 +125,8 @@ public:
 
                     err = groupsCluster.InvokeCommand(addGroup, pairingCommand, OnCommandResponse, OnCommandFailure);
                 }
-            }
-            else if constexpr (std::is_same_v<T,
-                                              app::Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type>)
-            {
-                attributeId = Attributes::NodeKeySetList::Id;
-
+                else if constexpr (std::is_same_v<
+                                       T, app::Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type>)
                 {
                     // Invoke GroupKeyManagement::Commands::KeySetWrite on the device
                     chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::Type keySetWrite;
@@ -114,12 +136,8 @@ public:
 
                     err = groupsCluster.InvokeCommand(keySetWrite, pairingCommand, OnCommandResponse, OnCommandFailure);
                 }
-            }
-            else if constexpr (std::is_same_v<
-                                   T, app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type>)
-            {
-                attributeId = Attributes::EndpointBindingList::Id;
-
+                else if constexpr (std::is_same_v<
+                                       T, app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type>)
                 {
                     // populate keySetWrite from cbContext->objectToWrite
                     chip::app::Clusters::Binding::Structs::TargetStruct::Type target;
@@ -138,11 +156,7 @@ public:
                     err = groupsCluster.WriteAttribute<chip::app::Clusters::Binding::Attributes::Binding::TypeInfo>(
                         keySetWrite, pairingCommand, OnWriteSuccessResponse, OnWriteFailureResponse);
                 }
-            }
-            else if constexpr (std::is_same_v<T, app::Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type>)
-            {
-                attributeId = Attributes::NodeACLList::Id;
-
+                else if constexpr (std::is_same_v<T, app::Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type>)
                 {
                     // populate keySetWrite from cbContext->objectToWrite
                     chip::app::Clusters::AccessControl::Structs::AccessControlEntryStruct::Type target;
@@ -178,11 +192,262 @@ public:
                     err = groupsCluster.WriteAttribute<chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo>(
                         aclList, pairingCommand, OnWriteSuccessResponse, OnWriteFailureResponse);
                 }
+                else if constexpr (std::is_same_v<T,
+                                                  app::Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type>)
+                {
+                    // Invoke GroupKeyManagement::Commands::KeySetWrite on the device
+                    chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::Type keySetWrite;
+                    keySetWrite.groupKeySet.groupKeySetID = cbContext->objectToWrite.groupKeySetID;
+                    keySetWrite.groupKeySet.groupKeySecurityPolicy =
+                        static_cast<decltype(keySetWrite.groupKeySet.groupKeySecurityPolicy)>(
+                            cbContext->objectToWrite.groupKeySecurityPolicy);
+                    keySetWrite.groupKeySet.epochKey0       = cbContext->objectToWrite.epochKey0;
+                    keySetWrite.groupKeySet.epochStartTime0 = cbContext->objectToWrite.epochStartTime0;
+                    keySetWrite.groupKeySet.epochKey1       = cbContext->objectToWrite.epochKey1;
+                    keySetWrite.groupKeySet.epochStartTime1 = cbContext->objectToWrite.epochStartTime1;
+                    keySetWrite.groupKeySet.epochKey2       = cbContext->objectToWrite.epochKey2;
+                    keySetWrite.groupKeySet.epochStartTime2 = cbContext->objectToWrite.epochStartTime2;
+
+                    chip::Controller::ClusterBase groupsCluster(exchangeMgr, sessionHandle, kRootEndpointId);
+
+                    err = groupsCluster.InvokeCommand(keySetWrite, pairingCommand, OnCommandResponse, OnCommandFailure);
+                }
+                else
+                {
+                    ChipLogError(Controller, "Unknown type for attribute mapping");
+                    return;
+                }
             }
             else
             {
-                ChipLogError(Controller, "Unknown type for attribute mapping");
-                return;
+                if constexpr (std::is_same_v<T, app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::Type>)
+                {
+                    chip::Controller::ClusterBase descriptorCluster(exchangeMgr, sessionHandle, kRootEndpointId);
+
+                    err = descriptorCluster.ReadAttribute<chip::app::Clusters::Descriptor::Attributes::PartsList::TypeInfo>(
+                        pairingCommand,
+                        // Success lambda
+                        [](void * lambdaContext,
+                           const chip::app::Clusters::Descriptor::Attributes::PartsList::TypeInfo::DecodableType & dataResponse) {
+                            auto * instance      = static_cast<DevicePairedCommand *>(lambdaContext);
+                            auto lambdaCbContext = instance->mContext;
+
+                            std::vector<T> endpointEntries;
+
+                            auto iter = dataResponse.begin();
+                            while (iter.Next())
+                            {
+                                auto & responseEntry = iter.GetValue();
+
+                                T entry;
+                                entry.endpointID = responseEntry;
+                                entry.nodeID     = lambdaCbContext->nodeId;
+                                endpointEntries.push_back(entry);
+                            }
+
+                            if (iter.GetStatus() != CHIP_NO_ERROR)
+                            {
+                                ChipLogError(Controller, "Failed to iterate PartsList: %s", ErrorStr(iter.GetStatus()));
+                            }
+
+                            if (lambdaCbContext && lambdaCbContext->onFetchSuccess)
+                            {
+                                lambdaCbContext->onFetchSuccess(CHIP_NO_ERROR, endpointEntries);
+                            }
+                        },
+                        // Failure lambda
+                        [](void * lambdaContext, CHIP_ERROR readError) {
+                            auto * instance      = static_cast<DevicePairedCommand *>(lambdaContext);
+                            auto lambdaCbContext = instance->mContext;
+
+                            if (lambdaCbContext && lambdaCbContext->onFetchSuccess)
+                            {
+                                lambdaCbContext->onFetchSuccess(readError, {});
+                            }
+                        });
+                }
+                else if constexpr (std::is_same_v<
+                                       T, app::Clusters::JointFabricDatastore::Structs::DatastoreGroupInformationEntryStruct::Type>)
+                {
+                    chip::Controller::ClusterBase groupKeyMgmtCluster(exchangeMgr, sessionHandle,
+                                                                      pairingCommand->mContext->endpointId);
+
+                    err =
+                        groupKeyMgmtCluster
+                            .ReadAttribute<chip::app::Clusters::GroupKeyManagement::Attributes::GroupKeyMap::TypeInfo>(
+                                pairingCommand,
+                                // Success lambda
+                                [](void * lambdaContext,
+                                   const chip::app::Clusters::GroupKeyManagement::Attributes::GroupKeyMap::TypeInfo::DecodableType &
+                                       dataResponse) {
+                                    auto * instance      = static_cast<DevicePairedCommand *>(lambdaContext);
+                                    auto lambdaCbContext = instance->mContext;
+
+                                    std::vector<T> groupInfoEntries;
+
+                                    auto iter = dataResponse.begin();
+                                    while (iter.Next())
+                                    {
+                                        auto & responseEntry = iter.GetValue();
+
+                                        T entry;
+                                        entry.groupID       = responseEntry.groupId;
+                                        entry.groupKeySetID = responseEntry.groupKeySetID;
+                                        groupInfoEntries.push_back(entry);
+                                    }
+
+                                    if (iter.GetStatus() != CHIP_NO_ERROR)
+                                    {
+                                        ChipLogError(Controller, "Failed to iterate GroupKeyMap: %s", ErrorStr(iter.GetStatus()));
+                                    }
+
+                                    if (lambdaCbContext && lambdaCbContext->onFetchSuccess)
+                                    {
+                                        lambdaCbContext->onFetchSuccess(CHIP_NO_ERROR, groupInfoEntries);
+                                    }
+                                },
+                                // Failure lambda
+                                [](void * lambdaContext, CHIP_ERROR readError) {
+                                    auto * instance      = static_cast<DevicePairedCommand *>(lambdaContext);
+                                    auto lambdaCbContext = instance->mContext;
+
+                                    if (lambdaCbContext && lambdaCbContext->onFetchSuccess)
+                                    {
+                                        lambdaCbContext->onFetchSuccess(readError, {});
+                                    }
+                                });
+                }
+                else if constexpr (std::is_same_v<
+                                       T, app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type>)
+                {
+                    chip::Controller::ClusterBase bindingCluster(exchangeMgr, sessionHandle, kRootEndpointId);
+
+                    err = bindingCluster.ReadAttribute<chip::app::Clusters::Binding::Attributes::Binding::TypeInfo>(
+                        pairingCommand,
+                        // Success lambda
+                        [](void * lambdaContext,
+                           const chip::app::Clusters::Binding::Attributes::Binding::TypeInfo::DecodableType & dataResponse) {
+                            auto * instance      = static_cast<DevicePairedCommand *>(lambdaContext);
+                            auto lambdaCbContext = instance->mContext;
+
+                            std::vector<T> bindingEntries;
+
+                            auto iter = dataResponse.begin();
+                            while (iter.Next())
+                            {
+                                auto & responseEntry = iter.GetValue();
+
+                                T entry;
+                                entry.binding.node     = responseEntry.node;
+                                entry.binding.endpoint = responseEntry.endpoint;
+                                entry.binding.cluster  = responseEntry.cluster;
+                                entry.binding.group    = responseEntry.group;
+                                entry.endpointID       = lambdaCbContext->objectToWrite.endpointID;
+                                bindingEntries.push_back(entry);
+                            }
+
+                            if (iter.GetStatus() != CHIP_NO_ERROR)
+                            {
+                                ChipLogError(Controller, "Failed to iterate Binding: %s", ErrorStr(iter.GetStatus()));
+                            }
+
+                            if (lambdaCbContext && lambdaCbContext->onFetchSuccess)
+                            {
+                                lambdaCbContext->onFetchSuccess(CHIP_NO_ERROR, bindingEntries);
+                            }
+                        },
+                        // Failure lambda
+                        [](void * lambdaContext, CHIP_ERROR readError) {
+                            auto * instance      = static_cast<DevicePairedCommand *>(lambdaContext);
+                            auto lambdaCbContext = instance->mContext;
+
+                            if (lambdaCbContext && lambdaCbContext->onFetchSuccess)
+                            {
+                                lambdaCbContext->onFetchSuccess(readError, {});
+                            }
+                        });
+                }
+                else if constexpr (std::is_same_v<T, app::Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type>)
+                {
+                    chip::Controller::ClusterBase aclCluster(exchangeMgr, sessionHandle, kRootEndpointId);
+
+                    err = aclCluster.ReadAttribute<chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo>(
+                        pairingCommand,
+                        // Success lambda
+                        [](void * lambdaContext,
+                           const chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo::DecodableType & dataResponse) {
+                            auto * instance      = static_cast<DevicePairedCommand *>(lambdaContext);
+                            auto lambdaCbContext = instance->mContext;
+
+                            std::vector<T> aclEntries;
+
+                            auto iter = dataResponse.begin();
+                            while (iter.Next())
+                            {
+                                auto & responseEntry = iter.GetValue();
+
+                                T entry;
+                                entry.ACLEntry.privilege = static_cast<decltype(entry.ACLEntry.privilege)>(responseEntry.privilege);
+                                entry.ACLEntry.authMode  = static_cast<decltype(entry.ACLEntry.authMode)>(responseEntry.authMode);
+
+                                std::vector<uint64_t> subjectsCopy;
+                                auto subjectsIter = responseEntry.subjects.Value().begin();
+                                while (subjectsIter.Next())
+                                {
+                                    subjectsCopy.push_back(subjectsIter.GetValue());
+                                }
+                                entry.ACLEntry.subjects = chip::app::DataModel::List<const uint64_t>(
+                                    subjectsCopy.data(), static_cast<uint32_t>(subjectsCopy.size()));
+
+                                std::vector<
+                                    chip::app::Clusters::JointFabricDatastore::Structs::DatastoreAccessControlTargetStruct::Type>
+                                    convertedTargets;
+                                auto targetsIter = responseEntry.targets.Value().begin();
+                                while (targetsIter.Next())
+                                {
+                                    const auto & srcTarget = targetsIter.GetValue();
+
+                                    chip::app::Clusters::JointFabricDatastore::Structs::DatastoreAccessControlTargetStruct::Type
+                                        dst{};
+                                    dst.cluster    = srcTarget.cluster;
+                                    dst.endpoint   = srcTarget.endpoint;
+                                    dst.deviceType = srcTarget.deviceType;
+                                    convertedTargets.push_back(dst);
+                                }
+                                entry.ACLEntry.targets =
+                                    chip::app::DataModel::List<const chip::app::Clusters::JointFabricDatastore::Structs::
+                                                                   DatastoreAccessControlTargetStruct::Type>(
+                                        convertedTargets.data(), static_cast<uint32_t>(convertedTargets.size()));
+
+                                aclEntries.push_back(entry);
+                            }
+
+                            if (iter.GetStatus() != CHIP_NO_ERROR)
+                            {
+                                ChipLogError(Controller, "Failed to iterate Acl: %s", ErrorStr(iter.GetStatus()));
+                            }
+
+                            if (lambdaCbContext && lambdaCbContext->onFetchSuccess)
+                            {
+                                lambdaCbContext->onFetchSuccess(CHIP_NO_ERROR, aclEntries);
+                            }
+                        },
+                        // Failure lambda
+                        [](void * lambdaContext, CHIP_ERROR readError) {
+                            auto * instance      = static_cast<DevicePairedCommand *>(lambdaContext);
+                            auto lambdaCbContext = instance->mContext;
+
+                            if (lambdaCbContext && lambdaCbContext->onFetchSuccess)
+                            {
+                                lambdaCbContext->onFetchSuccess(readError, {});
+                            }
+                        });
+                }
+                else
+                {
+                    ChipLogError(Controller, "Unknown type for attribute mapping");
+                    return;
+                }
             }
 
             if (err != CHIP_NO_ERROR)
@@ -261,6 +526,7 @@ public:
     chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
     std::shared_ptr<CallbackContext> mContext;
+    bool mFetchOnly = false;
 };
 
 CHIP_ERROR JFADatastoreSync::Init(Server & server)
@@ -282,8 +548,8 @@ CHIP_ERROR JFADatastoreSync::SyncNode(
             DevicePairedCommand<app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type>>(
             nodeId, endpointGroupIDEntry, onSuccess);
 
-    TEMPORARY_RETURN_IGNORED GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
-                                                                         &pairingCommand->mOnDeviceConnectionFailureCallback);
+    ReturnErrorOnFailure(GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
+                                                                     &pairingCommand->mOnDeviceConnectionFailureCallback));
 
     return CHIP_NO_ERROR;
 }
@@ -299,8 +565,8 @@ CHIP_ERROR JFADatastoreSync::SyncNode(
             DevicePairedCommand<app::Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type>>(
             nodeId, nodeKeySetEntry, onSuccess);
 
-    TEMPORARY_RETURN_IGNORED GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
-                                                                         &pairingCommand->mOnDeviceConnectionFailureCallback);
+    ReturnErrorOnFailure(GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
+                                                                     &pairingCommand->mOnDeviceConnectionFailureCallback));
 
     return CHIP_NO_ERROR;
 }
@@ -316,8 +582,8 @@ CHIP_ERROR JFADatastoreSync::SyncNode(
             DevicePairedCommand<app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type>>(
             nodeId, bindingEntry, onSuccess);
 
-    TEMPORARY_RETURN_IGNORED GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
-                                                                         &pairingCommand->mOnDeviceConnectionFailureCallback);
+    ReturnErrorOnFailure(GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
+                                                                     &pairingCommand->mOnDeviceConnectionFailureCallback));
 
     return CHIP_NO_ERROR;
 }
@@ -334,8 +600,126 @@ JFADatastoreSync::SyncNode(NodeId nodeId,
             std::make_shared<DevicePairedCommand<app::Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type>>(
                 nodeId, aclEntry, onSuccess);
 
-    TEMPORARY_RETURN_IGNORED GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
-                                                                         &pairingCommand->mOnDeviceConnectionFailureCallback);
+    ReturnErrorOnFailure(GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
+                                                                     &pairingCommand->mOnDeviceConnectionFailureCallback));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+JFADatastoreSync::SyncNode(NodeId nodeId,
+                           const app::Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type & groupKeySet,
+                           std::function<void()> onSuccess)
+{
+    ChipLogProgress(DeviceLayer, "Creating Pairing Command with node id: " ChipLogFormatX64, ChipLogValueX64(nodeId));
+
+    std::shared_ptr<DevicePairedCommand<app::Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type>>
+        pairingCommand =
+            std::make_shared<DevicePairedCommand<app::Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type>>(
+                nodeId, groupKeySet, onSuccess);
+
+    ReturnErrorOnFailure(GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
+                                                                     &pairingCommand->mOnDeviceConnectionFailureCallback));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR JFADatastoreSync::FetchEndpointList(
+    NodeId nodeId,
+    std::function<void(
+        CHIP_ERROR,
+        const std::vector<app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::Type> & endpointEntryStruct)>
+        onSuccess)
+{
+    ChipLogProgress(DeviceLayer, "Creating Pairing Command with node id: " ChipLogFormatX64, ChipLogValueX64(nodeId));
+
+    std::shared_ptr<DevicePairedCommand<app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::Type>>
+        pairingCommand =
+            std::make_shared<DevicePairedCommand<app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointEntryStruct::Type>>(
+                nodeId, onSuccess);
+
+    ReturnErrorOnFailure(GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
+                                                                     &pairingCommand->mOnDeviceConnectionFailureCallback));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR JFADatastoreSync::FetchEndpointGroupList(
+    NodeId nodeId, EndpointId endpointId,
+    std::function<void(
+        CHIP_ERROR, const std::vector<app::Clusters::JointFabricDatastore::Structs::DatastoreGroupInformationEntryStruct::Type> &)>
+        onSuccess)
+{
+    ChipLogProgress(DeviceLayer, "Fetching group list for node " ChipLogFormatX64 " endpoint %u", ChipLogValueX64(nodeId),
+                    endpointId);
+
+    // TODO: Use endpointId to query GetGroupMembership command on that specific endpoint
+    // For now, create the pairing command with the endpoint parameter
+
+    std::shared_ptr<DevicePairedCommand<app::Clusters::JointFabricDatastore::Structs::DatastoreGroupInformationEntryStruct::Type>>
+        pairingCommand = std::make_shared<
+            DevicePairedCommand<app::Clusters::JointFabricDatastore::Structs::DatastoreGroupInformationEntryStruct::Type>>(
+            nodeId, endpointId, onSuccess);
+
+    ReturnErrorOnFailure(GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
+                                                                     &pairingCommand->mOnDeviceConnectionFailureCallback));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR JFADatastoreSync::FetchEndpointBindingList(
+    NodeId nodeId,
+    std::function<void(
+        CHIP_ERROR, const std::vector<app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type> &)>
+        onSuccess)
+{
+    ChipLogProgress(DeviceLayer, "Creating Pairing Command with node id: " ChipLogFormatX64, ChipLogValueX64(nodeId));
+
+    std::shared_ptr<DevicePairedCommand<app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type>>
+        pairingCommand = std::make_shared<
+            DevicePairedCommand<app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type>>(
+            nodeId, onSuccess);
+
+    ReturnErrorOnFailure(GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
+                                                                     &pairingCommand->mOnDeviceConnectionFailureCallback));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR JFADatastoreSync::FetchGroupKeySetList(
+    NodeId nodeId,
+    std::function<void(CHIP_ERROR,
+                       const std::vector<app::Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type> &)>
+        onSuccess)
+{
+    ChipLogProgress(DeviceLayer, "Creating Pairing Command with node id: " ChipLogFormatX64, ChipLogValueX64(nodeId));
+
+    std::shared_ptr<DevicePairedCommand<app::Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type>>
+        pairingCommand =
+            std::make_shared<DevicePairedCommand<app::Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type>>(
+                nodeId, onSuccess);
+
+    ReturnErrorOnFailure(GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
+                                                                     &pairingCommand->mOnDeviceConnectionFailureCallback));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR JFADatastoreSync::FetchACLList(
+    NodeId nodeId,
+    std::function<void(CHIP_ERROR,
+                       const std::vector<app::Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type> &)>
+        onSuccess)
+{
+    ChipLogProgress(DeviceLayer, "Creating Pairing Command with node id: " ChipLogFormatX64, ChipLogValueX64(nodeId));
+
+    std::shared_ptr<DevicePairedCommand<app::Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type>>
+        pairingCommand =
+            std::make_shared<DevicePairedCommand<app::Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type>>(
+                nodeId, onSuccess);
+
+    ReturnErrorOnFailure(GetDeviceCommissioner()->GetConnectedDevice(nodeId, &pairingCommand->mOnDeviceConnectedCallback,
+                                                                     &pairingCommand->mOnDeviceConnectionFailureCallback));
 
     return CHIP_NO_ERROR;
 }
