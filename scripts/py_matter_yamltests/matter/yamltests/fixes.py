@@ -144,7 +144,7 @@ def add_yaml_support_for_scientific_notation_without_dot(loader):
 def try_update_yaml_node_id_test_runner_state(tests, config):
     default_identity = 'alpha'
     identities = {
-        default_identity: None if 'nodeId' not in config else config['nodeId']}
+        default_identity: config.get('nodeId', None)}
 
     for test in tests:
         if not test.is_enabled:

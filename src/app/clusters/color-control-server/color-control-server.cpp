@@ -49,22 +49,6 @@ public:
     DefaultColorControlSceneHandler() = default;
     ~DefaultColorControlSceneHandler() override {}
 
-    // Default function for ColorControl cluster, only puts the ColorControl cluster ID in the span if supported on the caller
-    // endpoint
-    void GetSupportedClusters(EndpointId endpoint, Span<ClusterId> & clusterBuffer) override
-    {
-        ClusterId * buffer = clusterBuffer.data();
-        if (emberAfContainsServer(endpoint, ColorControl::Id) && clusterBuffer.size() >= 1)
-        {
-            buffer[0] = ColorControl::Id;
-            clusterBuffer.reduce_size(1);
-        }
-        else
-        {
-            clusterBuffer.reduce_size(0);
-        }
-    }
-
     // Default function for ColorControl cluster, only checks if ColorControl is enabled on the endpoint
     bool SupportsCluster(EndpointId endpoint, ClusterId cluster) override
     {

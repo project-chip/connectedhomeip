@@ -103,6 +103,14 @@ void MatterBooleanStateClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterBooleanStateClusterShutdownCallback(chip::EndpointId endpointId);
 
+void MatterHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterHepaFilterMonitoringClusterShutdownCallback(chip::EndpointId endpointId);
+
+void MatterActivatedCarbonFilterMonitoringClusterInitCallback(chip::EndpointId endpointId);
+
+void MatterActivatedCarbonFilterMonitoringClusterShutdownCallback(chip::EndpointId endpointId);
+
 void MatterBooleanStateConfigurationClusterInitCallback(chip::EndpointId endpointId);
 
 void MatterBooleanStateConfigurationClusterShutdownCallback(chip::EndpointId endpointId);

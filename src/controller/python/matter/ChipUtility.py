@@ -50,10 +50,7 @@ class ChipUtility(object):
 
     @staticmethod
     def IsByteArrayAllZeros(array):
-        for i in array:
-            if i != 0:
-                return False
-        return True
+        return all(i == 0 for i in array)
 
     @staticmethod
     def ByteArrayToHex(array):

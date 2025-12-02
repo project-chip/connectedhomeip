@@ -80,6 +80,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/clusters/time-format-localization-server/tests",
       "${chip_root}/src/app/clusters/time-synchronization-server/tests",
       "${chip_root}/src/app/clusters/localization-configuration-server/tests",
+      "${chip_root}/src/app/clusters/resource-monitoring-server/tests",
       "${chip_root}/src/app/clusters/valve-configuration-and-control-server/tests",
       "${chip_root}/src/app/cluster-building-blocks/tests",
       "${chip_root}/src/app/data-model-provider/tests",
