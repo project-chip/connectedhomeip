@@ -49,7 +49,7 @@ CHIP_ERROR PowerTopologyCluster::GetAvailableEndpoints(AttributeValueEncoder & a
             EndpointId endpointId;
             auto err = mDelegate.GetAvailableEndpointAtIndex(i, endpointId);
 
-            VerifyOrReturnError(!(err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED), CHIP_NO_ERROR); // End of list, safe to exit normally
+            VerifyOrReturnError(err != CHIP_ERROR_PROVIDER_LIST_EXHAUSTED, CHIP_NO_ERROR); // End of list, safe to exit normally
 
             ReturnErrorOnFailure(err);
             ReturnErrorOnFailure(encoder.Encode(endpointId));
@@ -68,7 +68,7 @@ CHIP_ERROR PowerTopologyCluster::GetActiveEndpoints(AttributeValueEncoder & aEnc
             EndpointId endpointId;
             auto err = mDelegate.GetActiveEndpointAtIndex(i, endpointId);
 
-            VerifyOrReturnError(!(err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED), CHIP_NO_ERROR); // End of list, safe to exit normally
+            VerifyOrReturnError(err != CHIP_ERROR_PROVIDER_LIST_EXHAUSTED, CHIP_NO_ERROR); // End of list, safe to exit normally
 
             ReturnErrorOnFailure(err);
             ReturnErrorOnFailure(encoder.Encode(endpointId));

@@ -36,7 +36,7 @@ void Instance::Shutdown()
     if (err != CHIP_NO_ERROR)
     {
 #if CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
-        ChipLogError(AppServer, "Failed to unregister Power Topology cluster");
+        ChipLogError(AppServer, "Failed to unregister Power Topology cluster: %" CHIP_ERROR_FORMAT, err.Format());
 #endif // CHIP_CODEGEN_CONFIG_ENABLE_CODEGEN_INTEGRATION_LOOKUP_ERRORS
     }
 }
