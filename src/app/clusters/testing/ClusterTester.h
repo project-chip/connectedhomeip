@@ -26,6 +26,7 @@
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
+#include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/server-cluster/ServerClusterInterface.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
@@ -69,34 +70,6 @@ namespace Test {
 //     ASSERT_GT(it.GetValue().label.size(), 0u);
 // }
 //
-
-// Detection traits for Encode() and EncodeForWrite()
-template <typename...>
-using void_t = void;
-
-template <typename T, typename = void>
-struct HasEncodeForWrite : std::false_type
-{
-};
-
-template <typename T>
-struct HasEncodeForWrite<T,
-                         void_t<decltype(std::declval<T>().EncodeForWrite(std::declval<TLV::TLVWriter &>(), TLV::AnonymousTag()))>>
-    : std::true_type
-{
-};
-
-template <typename T, typename = void>
-struct HasGenericEncode : std::false_type
-{
-};
-
-template <typename T>
-struct HasGenericEncode<T, void_t<decltype(std::declval<T>().Encode(std::declval<TLV::TLVWriter &>(), TLV::AnonymousTag()))>>
-    : std::true_type
-{
-};
-
 class ClusterTester
 {
 public:
@@ -147,16 +120,48 @@ public:
     // compliant (see the comment of the class for usage example).
     // Will construct the attribute path using the first path returned by `GetPaths()` on the cluster.
     // @returns `CHIP_ERROR_INCORRECT_STATE` if `GetPaths()` doesn't return a list with one path.
+
     template <typename T>
-    app::DataModel::ActionReturnStatus WriteAttribute(AttributeId attr_id, const T & value)
+    CHIP_ERROR WriteAttribute(AttributeId attr, const T & value)
     {
-        VerifyOrReturnError(VerifyClusterPathsValid(), CHIP_ERROR_INCORRECT_STATE);
-        auto path = mCluster.GetPaths()[0];
+        const auto & paths = mCluster.GetPaths();
+        VerifyOrReturnError(paths.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
 
-        app::Testing::WriteOperation writeOperation(path.mEndpointId, path.mClusterId, attr_id);
+        app::ConcreteAttributePath path(paths[0].mEndpointId, paths[0].mClusterId, attr);
+        app::Testing::WriteOperation writeOp(path);
 
-        app::AttributeValueDecoder decoder = writeOperation.DecoderFor(value);
-        return mCluster.WriteAttribute(writeOperation.GetRequest(), decoder);
+        // Create a stable object on the stack beware of a dangling ptr fabric index will change
+        Access::SubjectDescriptor subjectDescriptor{ mHandler.GetAccessingFabricIndex() };
+        writeOp.SetSubjectDescriptor(subjectDescriptor);
+
+        uint8_t buffer[1024];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+
+        // - DataModel::Encode(integral, enum, etc.) for simple types.
+        // - DataModel::Encode(List<X>) for lists (which iterates and calls Encode on elements).
+        // - DataModel::Encode(Struct) for non-fabric-scoped structs.
+        // - Note: For attribute writes, DataModel::EncodeForWrite is usually preferred for fabric-scoped types,
+        //         but the generic DataModel::Encode often works as a top-level function.
+        //         If you use EncodeForWrite, you ensure fabric-scoped list items are handled correctly:
+
+        if constexpr (app::DataModel::IsFabricScoped<T>::value)
+        {
+            // Using EncodeForWrite is safer for writes, as it handles fabric-scoped lists/structs correctly.
+            ReturnErrorOnFailure(chip::app::DataModel::EncodeForWrite(writer, TLV::AnonymousTag(), value));
+        }
+        else
+        {
+            // Use the generic DataModel::Encode for non-fabric-scoped data (scalars, simple structs, etc.).
+            ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, TLV::AnonymousTag(), value));
+        }
+
+        TLV::TLVReader reader;
+        reader.Init(buffer, writer.GetLengthWritten());
+        ReturnErrorOnFailure(reader.Next());
+
+        app::AttributeValueDecoder decoder(reader, *writeOp.GetRequest().subjectDescriptor);
+        return mCluster.WriteAttribute(writeOp.GetRequest(), decoder).GetUnderlyingError();
     }
 
     // Result structure for Invoke operations, containing both status and decoded response.
@@ -261,109 +266,9 @@ public:
         return mTestServerClusterContext.EventsGenerator().GetNextEvent();
     }
 
-    /// CHIP Test Cluster Write Helpers
-    //  - Multi-fabric writes are supported through WriteOperation subject descriptors.
-    // - Cluster paths are automatically deduced using cluster.GetPaths().
-
-    //  - Scalars/enums:
-    //    * Written directly using DecoderFor().
-    //    * `value` must match the attribute's ::DecodableType.
-    //    * Example: WriteAttribute(attrId, 42, fabricIndex);
-
-    //  - Structs/ZAP structs: use WriteAttribute(attrId, structValue, fabricIndex)
-    //     * Encoded into a TLV buffer via Encode() or EncodeForWrite().
-    //     * `value` must match ::DecodableType.
-    //     * Example: MyStruct s{42, true}; WriteAttribute(attrId, s, fabricIndex);
-
-    template <typename T>
-    CHIP_ERROR WriteAttribute(AttributeId attr, const T & value, FabricIndex fabricIndex)
-    {
-        const auto & paths = mCluster.GetPaths();
-        VerifyOrReturnError(paths.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
-
-        app::ConcreteAttributePath path(paths[0].mEndpointId, paths[0].mClusterId, attr);
-        app::Testing::WriteOperation writeOp(path);
-
-        // Create a stable object on the stack beware of a dangling ptr fabric index will change
-        Access::SubjectDescriptor subjectDescriptor{ fabricIndex };
-        writeOp.SetSubjectDescriptor(subjectDescriptor);
-
-        uint8_t buffer[1024];
-        TLV::TLVWriter writer;
-        writer.Init(buffer);
-
-        ReturnErrorOnFailure(EncodeValueToTLV(writer, value));
-
-        TLV::TLVReader reader;
-        reader.Init(buffer, writer.GetLengthWritten());
-        ReturnErrorOnFailure(reader.Next());
-
-        app::AttributeValueDecoder decoder(reader, *writeOp.GetRequest().subjectDescriptor);
-        return mCluster.WriteAttribute(writeOp.GetRequest(), decoder).GetUnderlyingError();
-    }
-
-    // - Lists: use WriteAttribute(attrId, listValue, fabricIndex)
-    //     * Encoded as TLV arrays. Each element is encoded individually.
-    //         - Struct elements must provide EncodeForWrite().
-    //         - Simple elements (integral, enum) handled by generic templated encoding.
-    //     * `value` must match ::DecodableList.
-    //     * Example: app::DataModel::List<int> l = {1,2,3}; WriteAttribute(attrId, l, fabricIndex);
-    template <typename ElementT>
-    CHIP_ERROR WriteAttribute(AttributeId attr, const app::DataModel::List<ElementT> & list, FabricIndex fabricIndex)
-    {
-        const auto & paths = mCluster.GetPaths();
-        VerifyOrReturnError(paths.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
-
-        app::ConcreteAttributePath path(paths[0].mEndpointId, paths[0].mClusterId, attr);
-        app::Testing::WriteOperation writeOp(path);
-        // Create a stable object on the stack beware of a dangling ptr fabric index will change
-        Access::SubjectDescriptor subjectDescriptor{ fabricIndex };
-        writeOp.SetSubjectDescriptor(subjectDescriptor);
-        uint8_t buffer[1024];
-        TLV::TLVWriter writer;
-        writer.Init(buffer);
-
-        TLV::TLVType outer;
-        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outer));
-
-        for (const auto & item : list)
-        {
-            ReturnErrorOnFailure(EncodeValueToTLV(writer, item));
-        }
-
-        ReturnErrorOnFailure(writer.EndContainer(outer));
-
-        TLV::TLVReader reader;
-        reader.Init(buffer, writer.GetLengthWritten());
-        ReturnErrorOnFailure(reader.Next());
-
-        app::AttributeValueDecoder decoder(reader, *writeOp.GetRequest().subjectDescriptor);
-        return mCluster.WriteAttribute(writeOp.GetRequest(), decoder).GetUnderlyingError();
-    }
+    void SetFabricIndex(FabricIndex fabricIndex) { mHandler.SetFabricIndex(fabricIndex); }
 
 private:
-    // Helper to encode any value to TLV
-    template <typename T>
-    static CHIP_ERROR EncodeValueToTLV(TLV::TLVWriter & writer, const T & value)
-    {
-        if constexpr (std::is_integral_v<T> || std::is_enum_v<T>)
-        {
-            return app::DataModel::Encode(writer, TLV::AnonymousTag(), value);
-        }
-        else if constexpr (HasEncodeForWrite<T>::value) // <-- Path B
-        {
-            return value.EncodeForWrite(writer, TLV::AnonymousTag());
-        }
-        else if constexpr (HasGenericEncode<T>::value) // <-- Path A
-        {
-            return value.Encode(writer, TLV::AnonymousTag());
-        }
-        else
-        {
-            static_assert(!sizeof(T), "Type not supported for TLV encoding");
-            return CHIP_ERROR_NOT_IMPLEMENTED;
-        }
-    }
     bool VerifyClusterPathsValid()
     {
         auto paths = mCluster.GetPaths();

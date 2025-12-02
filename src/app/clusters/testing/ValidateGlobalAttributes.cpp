@@ -20,16 +20,21 @@ namespace chip::Testing {
 bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster,
                              std::initializer_list<const app::DataModel::AttributeEntry> expected)
 {
+    std::vector<const app::DataModel::AttributeEntry> attributes(expected);
+    return IsAttributesListEqualTo(cluster, std::move(attributes));
+}
+
+bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster, std::vector<const app::DataModel::AttributeEntry> expected)
+{
     VerifyOrDie(cluster.GetPaths().size() == 1);
     auto path = cluster.GetPaths()[0];
-    ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> attributesBuilder;
-    if (CHIP_ERROR err = cluster.Attributes(path, attributesBuilder); err != CHIP_NO_ERROR)
+    ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> actualBuilder;
+    if (CHIP_ERROR err = cluster.Attributes(path, actualBuilder); err != CHIP_NO_ERROR)
     {
         ChipLogError(Test, "Failed to get attributes list from cluster. Error: %" CHIP_ERROR_FORMAT, err.Format());
         return false;
     }
 
-    // build expectation with global attributes
     ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> expectedBuilder;
 
     SuccessOrDie(expectedBuilder.EnsureAppendCapacity(expected.size()));
@@ -37,27 +42,8 @@ bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster,
     {
         SuccessOrDie(expectedBuilder.Append(entry));
     }
+
     SuccessOrDie(expectedBuilder.AppendElements(app::DefaultServerCluster::GlobalAttributes()));
-
-    return EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer());
-}
-
-bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster, const app::DataModel::AttributeEntry * entries, size_t count)
-{
-    ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> expectedBuilder;
-    SuccessOrDie(expectedBuilder.EnsureAppendCapacity(count));
-    for (size_t i = 0; i < count; ++i)
-    {
-        SuccessOrDie(expectedBuilder.Append(entries[i]));
-    }
-    SuccessOrDie(expectedBuilder.AppendElements(app::DefaultServerCluster::GlobalAttributes()));
-
-    ReadOnlyBufferBuilder<app::DataModel::AttributeEntry> actualBuilder;
-    if (CHIP_ERROR err = cluster.Attributes(cluster.GetPaths()[0], actualBuilder); err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Test, "Failed to get attributes list from cluster. Error: %" CHIP_ERROR_FORMAT, err.Format());
-        return false;
-    }
 
     return EqualAttributeSets(actualBuilder.TakeBuffer(), expectedBuilder.TakeBuffer());
 }

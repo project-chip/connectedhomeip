@@ -45,13 +45,13 @@ namespace Testing {
 bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster,
                              std::initializer_list<const app::DataModel::AttributeEntry> expected);
 
-/// Overload of IsAttributesListEqualTo that accepts a pointer and count for cleaner tests
+/// Overload of IsAttributesListEqualTo that accepts a standard vector of attribute entries.
 ///
 /// Parameters:
 ///     cluster - The cluster interface to test.
-///     entries - Pointer to the first attribute entry
-///     count - Number of attribute entries
-bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster, const app::DataModel::AttributeEntry * entries, size_t count);
+///     expected - A vector containing the expected attribute entries (must include all
+///                non-global, non-optional attributes).
+bool IsAttributesListEqualTo(app::ServerClusterInterface & cluster, std::vector<const app::DataModel::AttributeEntry> expected);
 
 /// Compares the accepted commands of a cluster against an expected set.
 ///
