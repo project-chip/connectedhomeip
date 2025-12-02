@@ -342,6 +342,11 @@ CHIP_ERROR GenericThreadDriver::DisconnectFromNetwork()
 {
     if (ThreadStackMgrImpl().IsThreadProvisioned())
     {
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+        // ClearAllSrpHostAndServices may cause temporary blocking, with a maximum duration of 2 seconds.
+        // However, only limited data traffic is expected during the network disconnection period.
+        ThreadStackMgrImpl().ClearAllSrpHostAndServices();
+#endif
         Thread::OperationalDataset emptyNetwork = {};
         // Attach to an empty network will disconnect the driver.
         ReturnErrorOnFailure(ThreadStackMgrImpl().AttachToThreadNetwork(emptyNetwork, nullptr));
