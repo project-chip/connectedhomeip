@@ -31,7 +31,7 @@ namespace chip::Tracing {
 namespace {
 // Modifications of the backend array are protected by the Matter stack lock,
 // but iteration can happen from any thread at any time. Slots must be filled
-// from the begining of the array, so iteration can stop at the first nullptr.
+// from the beginning of the array, so iteration can stop at the first nullptr.
 std::atomic<Backend *> gTracingBackends[CHIP_CONFIG_MAX_TRACING_BACKENDS]{};
 
 // A marker value to represent an empty slot in the backend array.
@@ -60,6 +60,7 @@ void ForEachBackend(Fn && fn)
 
 void Register(Backend & aBackend)
 {
+    assertChipStackLockedByCurrentThread();
     for (auto & slot : gTracingBackends)
     {
         Backend * backend = slot.load();
@@ -165,6 +166,6 @@ void Unregister(Backend & backend)
     /* no-op if tracing is disabled */
 }
 
-#endif // MATTTER_TRACING_ENABLED
+#endif // MATTER_TRACING_ENABLED
 
 } // namespace chip::Tracing
