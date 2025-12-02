@@ -578,13 +578,13 @@ public:
     CHIP_ERROR Serialize(P256SerializedKeypair & output) const override;
 
     /**
-     * @brief Initializes this object by import from a P256SerializedKeypair containing raw public and private key bytes.
+     * @brief Initializes this object by importing from a P256SerializedKeypair containing raw public and private key bytes.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR Deserialize(/* const */ P256SerializedKeypair & input) override;
 
     /**
-     * @brief Generate a new Certificate Signing Request (CSR).
+     * @brief Generates a new Certificate Signing Request (CSR).
      * @param csr Newly generated CSR in DER format
      * @param csr_length The caller provides the length of input buffer (csr). The function returns the actual length of generated
      *CSR.
@@ -593,7 +593,7 @@ public:
     CHIP_ERROR NewCertificateSigningRequest(uint8_t * csr, size_t & csr_length) const override;
 
     /**
-     * @brief A function to sign a msg using ECDSA
+     * @brief Signs a message using ECDSA
      * @param msg Message that needs to be signed
      * @param msg_length Length of message
      * @param out_signature Buffer that will hold the output signature. The signature consists of: 2 EC elements (r and s),
@@ -603,7 +603,7 @@ public:
     CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature) const override;
 
     /**
-     * @brief A function to derive a shared secret using ECDH
+     * @brief Derives a shared secret using ECDH
      *
      * This implements the CHIP_Crypto_ECDH(PrivateKey myPrivateKey, PublicKey theirPublicKey) cryptographic primitive
      * from the specification, using this class's private key from `mKeypair` as `myPrivateKey` and the remote
@@ -635,7 +635,7 @@ public:
      */
     CHIP_ERROR HazardousOperationLoadKeypairFromRaw(ByteSpan private_key, ByteSpan public_key);
 
-    /** @brief Return public key for the keypair.
+    /** @brief Returns the public key for the keypair.
      **/
     const P256PublicKey & Pubkey() const override { return mPublicKey; }
 
