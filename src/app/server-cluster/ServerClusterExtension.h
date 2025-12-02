@@ -86,9 +86,9 @@ protected:
     // Cluster context, set on Startup and reset to nullptr on shutdown.
     ServerClusterContext * mContext = nullptr;
 
-    // A data version increment for when the underlying cluster data changes.
-    // Since data version is explicitly random to start and wraps, the underlying
-    // path version is generally "real version + delta".
+    // A data version increment for when the extension's data changes.
+    // Since data version is explicitly random to start and wraps, the extension's
+    // version is computed as "underlying version + delta".
     DataVersion mVersionDelta = 0;
 
     /// Mark the given attribute as changed:
