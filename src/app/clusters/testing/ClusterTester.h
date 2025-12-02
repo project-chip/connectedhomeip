@@ -266,6 +266,8 @@ public:
         return mTestServerClusterContext.EventsGenerator().GetNextEvent();
     }
 
+    std::vector<app::AttributePathParams> & GetDirtyList() { return mTestServerClusterContext.ChangeListener().DirtyList(); }
+    
     void SetFabricIndex(FabricIndex fabricIndex) { mHandler.SetFabricIndex(fabricIndex); }
 
 private:
