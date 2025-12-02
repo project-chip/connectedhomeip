@@ -44,7 +44,10 @@ chip_test_suite("tests") {
     # SendMessage() to UDP:[::1]:5541 failed: b
     # deactivating since the Fake platform is mostly done to test Platform APIs
     if (chip_device_platform != "fake") {
-      test_sources += [ "TestWriteChunking.cpp" ]
+      test_sources += [
+        "TestDeviceController.cpp",
+        "TestWriteChunking.cpp",
+      ]
     }
 
     # Not supported on efr32.
@@ -64,7 +67,11 @@ chip_test_suite("tests") {
 
   cflags = [ "-Wconversion" ]
 
-  sources = [ "AutoCommissionerTestAccess.h" ]
+  sources = [
+    "AutoCommissionerTestAccess.h",
+    "ControllerAndCommissioningArgumentDefinitions.h",
+    "DispatchDataModel.h",
+  ]
 
   public_deps = [
     "${chip_root}/src/app/common:cluster-objects",
