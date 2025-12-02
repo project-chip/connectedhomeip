@@ -280,7 +280,7 @@ DataModel::ActionReturnStatus GeneralDiagnosticsCluster::ReadAttribute(const Dat
         InteractionModelEngine * interactionModel            = InteractionModelEngine::GetInstance();
         SessionManager * sessionManager                      = interactionModel->GetExchangeManager()->GetSessionManager();
         const SessionManager::MessageStats messageStatistics = sessionManager->GetMessageStats();
-        static_assert(CHIP_IM_MAX_NUM_SUBSCRIPTIONS <= UINT16_MAX);
+        static_assert(CHIP_IM_MAX_NUM_SUBSCRIPTIONS <= UINT16_MAX, "The maximum number of IM subscriptions is larger than expected (should fit within a 16 bit unsigned int)");
 
         GeneralDiagnostics::Structs::DeviceLoadStruct::Type load = {
             .currentSubscriptions =
