@@ -56,6 +56,26 @@ void ForEachBackend(Fn && fn)
     }
 }
 
+// Replace trailing NullBackend() entries with nullptr,
+// so iteration can stop as early as possible.
+void OptimizeBackends()
+{
+    for (int i = CHIP_CONFIG_MAX_TRACING_BACKENDS - 1; i >= 0; --i)
+    {
+        auto & slot    = gTracingBackends[i];
+        auto * backend = slot.load();
+        if (backend == NullBackend())
+        {
+            slot.store(nullptr);
+            continue;
+        }
+        if (backend != nullptr)
+        {
+            break;
+        }
+    }
+}
+
 } // namespace
 
 void Register(Backend & aBackend)
@@ -85,18 +105,9 @@ void Unregister(Backend & aBackend)
         {
             slot.store(NullBackend());
             aBackend.Close();
-            goto vacuum;
+            OptimizeBackends();
+            return;
         }
-    }
-    return;
-vacuum:
-    // Replace trailing NullBackend() entries with nullptr,
-    // so iteration can stop as early as possible.
-    for (int i = CHIP_CONFIG_MAX_TRACING_BACKENDS - 1; i >= 0; --i)
-    {
-        auto & slot = gTracingBackends[i];
-        VerifyOrReturn(slot.load() == NullBackend());
-        slot.store(nullptr);
     }
 }
 
