@@ -166,7 +166,7 @@ struct TestGroupKeyManagementClusterWithStorage : public TestGroupKeyManagementC
         auto listToWrite =
             app::DataModel::List<const GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(keys.data(), keys.size());
 
-        CHIP_ERROR err = tester.WriteAttribute(GroupKeyManagement::Attributes::GroupKeyMap::Id, listToWrite);
+        CHIP_ERROR err = tester.WriteAttribute(GroupKeyManagement::Attributes::GroupKeyMap::Id, listToWrite).GetUnderlyingError();
         ASSERT_EQ(err, CHIP_NO_ERROR);
     }
 
@@ -213,7 +213,7 @@ TEST_F(TestGroupKeyManagementClusterWithStorage, TestWriteGroupKeyMapAttributeDu
 
     auto listToWrite = app::DataModel::List<const GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(keys.data(), keys.size());
 
-    CHIP_ERROR err = tester.WriteAttribute(GroupKeyManagement::Attributes::GroupKeyMap::Id, listToWrite);
+    CHIP_ERROR err = tester.WriteAttribute(GroupKeyManagement::Attributes::GroupKeyMap::Id, listToWrite).GetUnderlyingError();
 
     ASSERT_EQ(err, CHIP_ERROR_DUPLICATE_KEY_ID);
 

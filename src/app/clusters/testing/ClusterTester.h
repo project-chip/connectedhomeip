@@ -117,15 +117,16 @@ public:
     // Will construct the attribute path using the first path returned by `GetPaths()` on the cluster.
     // @returns `CHIP_ERROR_INCORRECT_STATE` if `GetPaths()` doesn't return a list with one path.
     template <typename T>
-    CHIP_ERROR WriteAttribute(AttributeId attr, const T & value)
+    app::DataModel::ActionReturnStatus WriteAttribute(AttributeId attr, const T & value)
     {
         const auto & paths = mCluster.GetPaths();
+
         VerifyOrReturnError(paths.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
 
         app::ConcreteAttributePath path(paths[0].mEndpointId, paths[0].mClusterId, attr);
         app::Testing::WriteOperation writeOp(path);
 
-        // Create a stable object on the stack beware of a dangling ptr fabric index will change
+        // Create a stable object on the stack
         Access::SubjectDescriptor subjectDescriptor{ mHandler.GetAccessingFabricIndex() };
         writeOp.SetSubjectDescriptor(subjectDescriptor);
 
@@ -142,12 +143,10 @@ public:
 
         if constexpr (app::DataModel::IsFabricScoped<T>::value)
         {
-            // Using EncodeForWrite is safer for writes, as it handles fabric-scoped lists/structs correctly.
             ReturnErrorOnFailure(chip::app::DataModel::EncodeForWrite(writer, TLV::AnonymousTag(), value));
         }
         else
         {
-            // Use the generic DataModel::Encode for non-fabric-scoped data (scalars, simple structs, etc.).
             ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, TLV::AnonymousTag(), value));
         }
 
@@ -156,7 +155,8 @@ public:
         ReturnErrorOnFailure(reader.Next());
 
         app::AttributeValueDecoder decoder(reader, *writeOp.GetRequest().subjectDescriptor);
-        return mCluster.WriteAttribute(writeOp.GetRequest(), decoder).GetUnderlyingError();
+
+        return mCluster.WriteAttribute(writeOp.GetRequest(), decoder);
     }
 
     // Result structure for Invoke operations, containing both status and decoded response.
