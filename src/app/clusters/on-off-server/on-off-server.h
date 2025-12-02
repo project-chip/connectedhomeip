@@ -20,14 +20,11 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/clusters/scenes-server/SceneTable.h>
 #include <app/util/af-types.h>
 #include <app/util/basic-types.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <protocols/interaction_model/StatusCode.h>
-
-#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-#include <app/clusters/scenes-server/SceneTable.h>
-#endif
 
 /**********************************************************
  * Defines and Macros
@@ -53,9 +50,8 @@ public:
 
     static OnOffServer & Instance();
 
-#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
+    // Returns nullptr if scenes are not supported/built by the SDK
     chip::scenes::SceneHandler * GetSceneHandler();
-#endif
 
     bool offCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath);
     bool onCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath);
@@ -112,7 +108,7 @@ struct OnOffEffect
     using OffWithEffectTriggerCommand = void (*)(OnOffEffect *);
     using EffectVariantType           = std::underlying_type_t<chip::app::Clusters::OnOff::DelayedAllOffEffectVariantEnum>;
     static_assert(
-        std::is_same<EffectVariantType, std::underlying_type_t<chip::app::Clusters::OnOff::DyingLightEffectVariantEnum>>::value,
+        std::is_same_v<EffectVariantType, std::underlying_type_t<chip::app::Clusters::OnOff::DyingLightEffectVariantEnum>>,
         "chip::app::Clusters::OnOff::DelayedAllOffEffectVariantEnum and "
         "chip::app::Clusters::OnOff::DyingLightEffectVariantEnum underlying types differ.");
 
@@ -142,21 +138,6 @@ struct OnOffEffect
 
     void setNext(OnOffEffect * inst) { this->nextEffect = inst; }
 };
-
-/**********************************************************
- * Global
- *********************************************************/
-
-/** @brief On/off Cluster Level Control Effect
- *
- * This is called by the framework when the on/off cluster initiates a command
- * that must effect a level control change. The implementation assumes that the
- * client will handle any effect on the On/Off Cluster.
- *
- * @param endpoint   Ver.: always
- * @param newValue   Ver.: always
- */
-void emberAfOnOffClusterLevelControlEffectCallback(chip::EndpointId endpoint, bool newValue);
 
 /**********************************************************
  * Callbacks
