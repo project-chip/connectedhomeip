@@ -19,7 +19,7 @@
 
 namespace chip::scenes {
 
-/// Converts a an endpoint id into a 0-based index using codegen functions.
+/// Converts an endpoint id into a 0-based index using codegen functions.
 ///
 /// ClusterId - the cluster that is used
 /// FixedEndpointCount - the number of fixed endpoints for this cluster in codegen/ember

@@ -142,7 +142,7 @@ public:
     ///        asynchronous work to perform scene transitions over some period of time.
     ///
     /// Internally maintains an array of `MaxEndpointCount` items and uses the given `Finder` structure
-    /// to convert a endpoint ID into a 0-based index into the internal array using a
+    /// to convert an endpoint ID into a 0-based index into the internal array using a
     /// `bool Finder::EndpointIdToIndex(EndpointId, uint16_t&)` call.
     template <size_t MaxEndpointCount, typename Finder>
     struct TransitionTimeInterface
