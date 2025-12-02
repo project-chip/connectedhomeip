@@ -145,9 +145,8 @@ TEST_F(TestPowerTopologyCluster, FeatureMapReadTest)
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
     ClusterTester tester(cluster);
-    FeatureMap::TypeInfo::DecodableType featureMapValue;
-    auto status = tester.ReadAttribute(FeatureMap::Id, featureMapValue);
-    EXPECT_TRUE(status.IsSuccess());
+    FeatureMap::TypeInfo::DecodableType featureMapValue{};
+    ASSERT_TRUE(tester.ReadAttribute(FeatureMap::Id, featureMapValue).IsSuccess());
     EXPECT_EQ(featureMapValue, features.Raw());
 
     cluster.Shutdown();
