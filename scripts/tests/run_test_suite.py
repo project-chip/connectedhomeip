@@ -124,7 +124,7 @@ ExistingFilePath = click.Path(exists=True, dir_okay=False, path_type=Path)
     # Click allows passing StrEnum class directly, but doesn't show it in type hints.
     type=click.Choice(TestTag, case_sensitive=False),  # type: ignore[arg-type]
     multiple=True,
-    help='What test tags to include when running. Equivalent to "exlcude all except these" for priority purpuses.',
+    help='What test tags to include when running. Equivalent to "exclude all except these" for priority purposes.',
 )
 @click.option(
     '--exclude-tags',
